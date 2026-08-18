@@ -4,13 +4,10 @@
  */
 import Queue from 'bull'
 import { logger } from '../utils/logger'
+import { getBullRedisOptions } from './redis'
 
-// Redis 连接配置
-const redisConfig = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || undefined,
-}
+// Redis 连接配置（统一由 redis.ts 解析，禁止各自解析 REDIS_HOST/PORT）
+const redisConfig = getBullRedisOptions()
 
 // 资源限制配置 - 防止 CPU/内存被占满
 export const RESOURCE_LIMITS = {

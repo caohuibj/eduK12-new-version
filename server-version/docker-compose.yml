@@ -1,3 +1,14 @@
+# ============================================================
+# eduK12 / PTool — Docker Baseline (Milestone C / 2A)
+# steady-state: postgres | redis | backend | frontend
+# one-shot   : migrate / seed (profiles: ["ops"])
+#
+# 运行前：复制 .env.example -> .env 并填写 JWT_SECRET / DATA_ENCRYPTION_KEY
+#   docker compose --profile ops run --rm migrate
+#   docker compose --profile ops run --rm seed   # 首次/明确需要时
+#   docker compose up -d backend frontend
+# ============================================================
+
 version: '3.8'
 
 services:
@@ -10,53 +21,125 @@ services:
       POSTGRES_DB: ${DB_NAME:-ptool}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ptool} -d ${DB_NAME:-ptool}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+    restart: unless-stopped
+    # 默认不发布 Host port（仅容器内网可达）
+
+  redis:
+    image: redis:7-alpine
+    container_name: ptool-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    # 默认不发布 Host port
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: runtime
     container_name: ptool-backend
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY}
+      REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      # COS 可选；留空则不启用远程存储
+      COS_SECRET_ID: ${COS_SECRET_ID:-}
+      COS_SECRET_KEY: ${COS_SECRET_KEY:-}
+      COS_BUCKET: ${COS_BUCKET:-}
+      COS_REGION: ${COS_REGION:-}
+      COS_DOMAIN: ${COS_DOMAIN:-}
+      # 视频处理低配优化（沿用 baseline 默认）
+      VIDEO_LOW_POWER_MODE: ${VIDEO_LOW_POWER_MODE:-true}
+      VIDEO_RESOLUTION: ${VIDEO_RESOLUTION:-480p}
+      VIDEO_PRESET: ${VIDEO_PRESET:-ultrafast}
+      VIDEO_CRF: ${VIDEO_CRF:-28}
+      VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
     volumes:
-      - ./uploads:/app/uploads
-    ports:
-      - "3000:3000"
+      - uploads_data:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    # 默认不发布 Host port 3000（仅 frontend:80 对外）
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: ptool-frontend
-    depends_on:
-      - backend
-
-  nginx:
-    image: nginx:alpine
-    container_name: ptool-nginx
     ports:
       - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./uploads:/var/www/uploads:ro
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/", "||", "exit", "1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # 唯一 Host HTTP 入口
+
+  # ---------------- one-shot ops jobs ----------------
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ops
+    container_name: ptool-migrate
+    profiles: ["ops"]
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
+      NODE_ENV: production
+    command: npx prisma migrate deploy
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  seed:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ops
+    container_name: ptool-seed
+    profiles: ["ops"]
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
+      NODE_ENV: production
+    command: npm run db:seed
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
 volumes:
   postgres_data:
+  redis_data:
+  uploads_data:

@@ -14,6 +14,7 @@ import { Server, Socket } from 'socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
 import { createClient } from 'redis'
 import { logger } from '../utils/logger'
+import { getRedisUrl } from '../config/redis'
 
 export class SocketService {
   private io: Server | null = null
@@ -45,8 +46,8 @@ export class SocketService {
 
     // 配置 Redis Adapter（支持 PM2 集群模式）
     try {
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
-      
+      const redisUrl = getRedisUrl()
+
       this.redisClient = createClient({ url: redisUrl })
       this.redisSubscriber = createClient({ url: redisUrl })
       

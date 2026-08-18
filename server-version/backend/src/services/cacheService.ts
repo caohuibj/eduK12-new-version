@@ -5,6 +5,7 @@
 
 import { createClient } from 'redis'
 import { logger } from '../utils/logger'
+import { getRedisUrl } from '../config/redis'
 
 /**
  * 缓存配置
@@ -36,8 +37,7 @@ class CacheService {
   async initialize(): Promise<void> {
     try {
       this.client = createClient({
-        url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
-        password: process.env.REDIS_PASSWORD || undefined,
+        url: getRedisUrl(),
       })
 
       this.client.on('error', (err: Error) => {
