@@ -1,0 +1,34 @@
+<view class="login-container">
+  <view class="login-header">
+    <view class="logo">慧育空间</view>
+    <view class="subtitle">学生学习平台</view>
+  </view>
+
+  <view class="login-form">
+    <view class="form-item">
+      <input 
+        class="input" 
+        placeholder="请输入用户名" 
+        value="{{username}}"
+        bindinput="onUsernameInput"
+      />
+    </view>
+    <view class="form-item">
+      <input 
+        class="input password-input" 
+        type="password"
+        placeholder="请输入密码" 
+        value="{{password}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+    
+    <button class="btn btn-primary login-btn" bindtap="onLogin" loading="{{loading}}">
+      登录
+    </button>
+  </view>
+
+  <view class="login-footer">
+    <text class="link" bindtap="onGoRegister">没有账号？去注册</text>
+  </view>
+</view>

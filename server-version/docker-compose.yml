@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: ptool-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-ptool}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ptool123}
+      POSTGRES_DB: ${DB_NAME:-ptool}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ptool} -d ${DB_NAME:-ptool}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ptool-backend
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - ./uploads:/app/uploads
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ptool-frontend
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: ptool-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./uploads:/var/www/uploads:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:

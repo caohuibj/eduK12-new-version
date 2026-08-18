@@ -1,0 +1,32 @@
+.rich-text-container {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #333;
+}
+
+.rich-text-container >>> p {
+  margin-bottom: 16rpx;
+}
+
+.rich-text-container >>> img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8rpx;
+}
+
+.rich-text-container >>> h1,
+.rich-text-container >>> h2,
+.rich-text-container >>> h3 {
+  font-weight: 600;
+  margin: 24rpx 0 12rpx;
+}
+
+.rich-text-container >>> ul,
+.rich-text-container >>> ol {
+  padding-left: 32rpx;
+  margin: 16rpx 0;
+}
+
+.rich-text-container >>> li {
+  margin-bottom: 8rpx;
+}

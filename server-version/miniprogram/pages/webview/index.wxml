@@ -1,0 +1,35 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <view wx:else class="video-container">
+    <view class="video-header">
+      <view class="video-title">{{title}}</view>
+    </view>
+
+    <view wx:if="{{isBilibili}}" class="bilibili-player">
+      <view class="player-tip">
+        <text class="tip-title">B站视频</text>
+        <text class="tip-detail">小程序暂不支持直接播放B站视频</text>
+        <text class="tip-detail">请复制链接到浏览器观看</text>
+      </view>
+
+      <view class="action-buttons">
+        <button class="btn-action btn-copy" bindtap="copyVideoUrl">
+          <text class="btn-icon">📋</text>
+          <text class="btn-text">复制视频链接</text>
+        </button>
+      </view>
+
+      <view wx:if="{{videoUrl}}" class="link-info">
+        <text class="link-label">视频链接：</text>
+        <text class="link-text">{{videoUrl}}</text>
+      </view>
+    </view>
+
+    <view wx:else class="webview-container">
+      <web-view src="{{url}}" bindmessage="onMessage" binderror="onError" />
+    </view>
+  </view>
+</view>

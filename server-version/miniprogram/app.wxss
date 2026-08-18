@@ -1,0 +1,28 @@
+@import './styles/variables.wxss';
+@import './styles/common.wxss';
+@import './styles/components.wxss';
+
+page {
+  background-color: var(--bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.container {
+  padding: 32rpx;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 8rpx;
+  padding: 24rpx 0;
+  text-align: center;
+  font-size: 32rpx;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}

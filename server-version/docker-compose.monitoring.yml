@@ -1,0 +1,117 @@
+# =============================================================================
+# PTool 监控服务编排 (可选)
+# 功能: Prometheus + Grafana 可视化监控
+# 说明: 适用于需要图形化监控面板的场景
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # Prometheus - 指标收集
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ptool-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    networks:
+      - monitoring
+
+  # Grafana - 可视化面板
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ptool-grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  # Node Exporter - 主机指标
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: ptool-node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+
+  # PostgreSQL Exporter - 数据库指标
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: ptool-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - monitoring
+      - ptool-network
+    depends_on:
+      - postgres
+
+  # Redis Exporter - Redis指标
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: ptool-redis-exporter
+    environment:
+      REDIS_ADDR: "redis:6379"
+    ports:
+      - "9121:9121"
+    networks:
+      - monitoring
+      - ptool-network
+
+  # cAdvisor - 容器指标
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: ptool-cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  monitoring:
+    driver: bridge
+  ptool-network:
+    external: true
+    name: ptool_default

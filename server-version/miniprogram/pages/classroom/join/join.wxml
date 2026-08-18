@@ -1,0 +1,86 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 错误提示 -->
+  <view wx:if="{{error && !loading}}" class="error-container">
+    <view class="error-icon">❌</view>
+    <view class="error-title">课堂不存在</view>
+    <view class="error-message">{{error}}</view>
+    <button class="btn-primary" bindtap="goBack">返回首页</button>
+  </view>
+
+  <!-- 输入课堂码 -->
+  <view wx:if="{{!classroom && !loading && !error}}" class="input-container">
+    <view class="icon-wrapper">
+      <text class="icon">📱</text>
+    </view>
+    <view class="title">加入课堂</view>
+    <view class="subtitle">输入课堂码或扫码加入</view>
+    
+    <view class="input-wrapper">
+      <input 
+        class="code-input"
+        type="text"
+        placeholder="请输入课堂码"
+        value="{{code}}"
+        bindinput="onCodeInput"
+        maxlength="10"
+      />
+    </view>
+
+    <view class="btn-group">
+      <button class="btn-primary" bindtap="fetchClassroom" data-code="{{code}}">
+        加入课堂
+      </button>
+      <button class="btn-secondary" bindtap="scanCode">
+        扫码加入
+      </button>
+    </view>
+  </view>
+
+  <!-- 课堂信息 -->
+  <view wx:if="{{classroom && !loading}}" class="classroom-container">
+    <view class="classroom-header">
+      <view class="icon-wrapper">
+        <text class="icon">📚</text>
+      </view>
+      <view class="classroom-name">{{classroom.name}}</view>
+      <view class="classroom-code">课堂码: {{classroom.code}}</view>
+    </view>
+
+    <view class="classroom-info">
+      <view class="info-item">
+        <text class="info-label">课程</text>
+        <text class="info-value">{{classroom.course.title}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">教师</text>
+        <text class="info-value">{{classroom.creator.nickname}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">状态</text>
+        <text class="info-value {{classroom.status === 'ACTIVE' ? 'status-active' : ''}}">
+          {{classroom.status === 'PREPARING' ? '准备中' : classroom.status === 'ACTIVE' ? '进行中' : '已结束'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- 临时课堂提示 -->
+    <view class="tip-container">
+      <text class="tip-icon">✅</text>
+      <text class="tip-text">扫码即可参与课堂答题</text>
+    </view>
+
+    <!-- 操作按钮 -->
+    <button 
+      class="btn-primary btn-full"
+      bindtap="joinClassroom"
+      disabled="{{classroom.status === 'ENDED'}}"
+    >
+      {{classroom.status === 'ENDED' ? '课堂已结束' : '进入课堂'}}
+    </button>
+  </view>
+</view>

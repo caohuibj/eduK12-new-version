@@ -1,0 +1,937 @@
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import apiClient from '../../api/client'
+import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3, Link as LinkIcon } from 'lucide-react'
+import { ScaleSelector } from '../../components/ScaleSelector'
+import type { Scale } from '../../components/ScaleSelector/types'
+
+// 表单题目类型
+interface FormItem {
+  id: string
+  type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input'
+  label: string
+  placeholder: string | null
+  required: boolean
+  position: number
+  options: Array<{ value: string; label: string }> | null
+  createdAt: string
+  updatedAt: string
+}
+
+// 量表关联类型
+interface QuestionnaireScale {
+  id: string
+  scaleId: string
+  position: number
+  scale: Scale
+}
+
+// 统一内容项类型
+interface ContentItem {
+  type: 'form' | 'scale'
+  id: string
+  position: number
+  data: FormItem | QuestionnaireScale
+}
+
+interface Questionnaire {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  instruction: string | null
+  status: string
+  estimatedTime: number | null
+}
+
+const GeneralQuestionnaireEdit: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState<'basic' | 'content' | 'tokens'>('basic')
+
+  // 问卷基本信息
+  const [questionnaire, setQuestionnaire] = useState<Questionnaire>({
+    id: '',
+    code: '',
+    name: '',
+    description: '',
+    instruction: '',
+    status: 'DRAFT',
+    estimatedTime: 30,
+  })
+
+  // 可用的量表列表
+  const [availableScales, setAvailableScales] = useState<Scale[]>([])
+
+  // 表单题目列表
+  const [formItems, setFormItems] = useState<FormItem[]>([])
+
+  // 已关联的量表
+  const [questionnaireScales, setQuestionnaireScales] = useState<QuestionnaireScale[]>([])
+
+  // 选中的量表ID列表（用于穿梭框）
+  const [selectedScaleIds, setSelectedScaleIds] = useState<string[]>([])
+
+  // 访问令牌列表
+  const [tokens, setTokens] = useState<any[]>([])
+  const [showTokenModal, setShowTokenModal] = useState(false)
+  const [tokenForm, setTokenForm] = useState({ expiresDays: 30, maxUses: 0 })
+
+  // 表单题目编辑弹窗状态
+  const [showFormItemModal, setShowFormItemModal] = useState(false)
+  const [editingFormItem, setEditingFormItem] = useState<FormItem | null>(null)
+  const [formData, setFormData] = useState<{
+    type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input'
+    label: string
+    placeholder: string
+    required: boolean
+    options: Array<{ value: string; label: string }>
+  }>({
+    type: 'fill_blank',
+    label: '',
+    placeholder: '',
+    required: true,
+    options: [],
+  })
+
+  useEffect(() => {
+    if (id) {
+      fetchQuestionnaire()
+      fetchContent()
+      fetchTokens()
+    }
+    fetchAvailableScales()
+  }, [id])
+
+  const fetchQuestionnaire = async () => {
+    try {
+      const response = await apiClient.get<Questionnaire>(`/general-questionnaires/${id}`)
+      if (response.code === 0) {
+        setQuestionnaire(response.data)
+      }
+    } catch (err) {
+      console.error('获取问卷信息失败', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchContent = async () => {
+    try {
+      const [formRes, scalesRes] = await Promise.all([
+        apiClient.get<{ list: FormItem[] }>(`/general-questionnaires/${id}/form-items`),
+        apiClient.get<{ list: QuestionnaireScale[] }>(`/general-questionnaires/${id}/scales`),
+      ])
+
+      if (formRes.code === 0) {
+        setFormItems(formRes.data.list)
+      }
+      if (scalesRes.code === 0) {
+        setQuestionnaireScales(scalesRes.data.list)
+        // 同步到穿梭框选中状态
+        setSelectedScaleIds(scalesRes.data.list.map((qs: QuestionnaireScale) => qs.scaleId))
+      }
+    } catch (err) {
+      console.error('获取内容列表失败', err)
+    }
+  }
+
+  const fetchAvailableScales = async () => {
+    try {
+      const response = await apiClient.get<{ list: Scale[] }>('/scales')
+      if (response.code === 0) {
+        setAvailableScales(response.data.list.filter(s => s.status === 'PUBLISHED'))
+      }
+    } catch (err) {
+      console.error('获取量表列表失败', err)
+    }
+  }
+
+  const fetchTokens = async () => {
+    try {
+      const response = await apiClient.get<{ list: any[] }>(`/general-questionnaires/${id}/tokens`)
+      if (response.code === 0) {
+        setTokens(response.data.list)
+      }
+    } catch (err) {
+      console.error('获取令牌列表失败', err)
+    }
+  }
+
+  const handleSaveBasic = async () => {
+    if (!questionnaire.name) {
+      alert('问卷名称不能为空')
+      return
+    }
+
+    try {
+      setSaving(true)
+      const response = await apiClient.put<Questionnaire>(`/general-questionnaires/${id}`, {
+        name: questionnaire.name,
+        description: questionnaire.description,
+        instruction: questionnaire.instruction,
+        estimatedTime: questionnaire.estimatedTime,
+      })
+      if (response.code === 0) {
+        setQuestionnaire(response.data)
+        alert('保存成功')
+      } else {
+        alert(response.message)
+      }
+    } catch (err: any) {
+      alert(err.message || '保存失败')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // 处理量表选择变化
+  const handleScaleChange = async (newSelectedIds: string[]) => {
+    const added = newSelectedIds.filter(id => !selectedScaleIds.includes(id))
+    const removed = selectedScaleIds.filter(id => !newSelectedIds.includes(id))
+
+    // 添加新量表
+    for (const scaleId of added) {
+      try {
+        await apiClient.post(`/general-questionnaires/${id}/scales`, {
+          scaleId,
+          position: questionnaireScales.length + formItems.length,
+        })
+      } catch (err) {
+        console.error('添加量表失败', err)
+      }
+    }
+
+    // 移除量表
+    for (const scaleId of removed) {
+      try {
+        await apiClient.delete(`/general-questionnaires/${id}/scales/${scaleId}`)
+      } catch (err) {
+        console.error('移除量表失败', err)
+      }
+    }
+
+    setSelectedScaleIds(newSelectedIds)
+    fetchContent()
+  }
+
+  // 添加表单题目
+  const handleAddFormItem = async () => {
+    if (!formData.label) {
+      alert('题目标签不能为空')
+      return
+    }
+
+    try {
+      const dataToSend = {
+        ...formData,
+        options: ['single_choice', 'multiple_choice'].includes(formData.type) ? formData.options : null,
+      }
+
+      if (editingFormItem) {
+        const response = await apiClient.put<FormItem>(
+          `/general-questionnaires/${id}/form-items/${editingFormItem.id}`,
+          dataToSend
+        )
+        if (response.code === 0) {
+          fetchContent()
+          setShowFormItemModal(false)
+          resetFormData()
+        } else {
+          alert(response.message)
+        }
+      } else {
+        const response = await apiClient.post<FormItem>(
+          `/general-questionnaires/${id}/form-items`,
+          dataToSend
+        )
+        if (response.code === 0) {
+          fetchContent()
+          setShowFormItemModal(false)
+          resetFormData()
+        } else {
+          alert(response.message)
+        }
+      }
+    } catch (err: any) {
+      alert(err.message || '操作失败')
+    }
+  }
+
+  // 删除表单题目
+  const handleRemoveFormItem = async (itemId: string) => {
+    if (!confirm('确定要删除此表单题目吗？')) return
+
+    try {
+      const response = await apiClient.delete(`/general-questionnaires/${id}/form-items/${itemId}`)
+      if (response.code === 0) {
+        setFormItems(formItems.filter(fi => fi.id !== itemId))
+      } else {
+        alert(response.message)
+      }
+    } catch (err: any) {
+      alert(err.message || '删除失败')
+    }
+  }
+
+  // 编辑表单题目
+  const handleEditFormItem = (item: FormItem) => {
+    setEditingFormItem(item)
+    setFormData({
+      type: item.type,
+      label: item.label,
+      placeholder: item.placeholder || '',
+      required: item.required,
+      options: item.options || [],
+    })
+    setShowFormItemModal(true)
+  }
+
+  // 重置表单数据
+  const resetFormData = () => {
+    setEditingFormItem(null)
+    setFormData({
+      type: 'fill_blank',
+      label: '',
+      placeholder: '',
+      required: true,
+      options: [],
+    })
+  }
+
+  // 统一排序
+  const handleReorderContent = async (items: ContentItem[]) => {
+    try {
+      const response = await apiClient.post(`/general-questionnaires/${id}/content/reorder`, {
+        items: items.map((item, index) => ({
+          type: item.type,
+          id: item.data.id,
+          position: index,
+        })),
+      })
+      if (response.code === 0) {
+        fetchContent()
+      } else {
+        alert(response.message)
+      }
+    } catch (err: any) {
+      alert(err.message || '排序失败')
+    }
+  }
+
+  // 移动内容项
+  const handleMoveItem = (index: number, direction: 'up' | 'down') => {
+    const allItems: ContentItem[] = [
+      ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
+      ...questionnaireScales.map(qs => ({ type: 'scale' as const, id: qs.id, position: qs.position, data: qs })),
+    ].sort((a, b) => a.position - b.position)
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1
+    if (newIndex < 0 || newIndex >= allItems.length) return
+
+    const temp = allItems[index].position
+    allItems[index].position = allItems[newIndex].position
+    allItems[newIndex].position = temp
+
+    handleReorderContent(allItems.sort((a, b) => a.position - b.position))
+  }
+
+  // 发布问卷
+  const handlePublish = async () => {
+    if (questionnaireScales.length === 0 && formItems.length === 0) {
+      alert('问卷必须包含至少一个量表或表单题目')
+      return
+    }
+
+    try {
+      const response = await apiClient.post(`/general-questionnaires/${id}/publish`)
+      if (response.code === 0) {
+        setQuestionnaire({ ...questionnaire, status: 'PUBLISHED' })
+        alert('发布成功')
+      } else {
+        alert(response.message)
+      }
+    } catch (err: any) {
+      alert(err.message || '发布失败')
+    }
+  }
+
+  // 创建访问令牌
+  const handleCreateToken = async () => {
+    try {
+      const response = await apiClient.post(`/general-questionnaires/${id}/tokens`, tokenForm)
+      if (response.code === 0) {
+        fetchTokens()
+        setShowTokenModal(false)
+        setTokenForm({ expiresDays: 30, maxUses: 0 })
+      } else {
+        alert(response.message)
+      }
+    } catch (err: any) {
+      alert(err.message || '创建失败')
+    }
+  }
+
+  // 禁用令牌
+  const handleDisableToken = async (tokenId: string) => {
+    if (!confirm('确定要禁用此令牌吗？')) return
+
+    try {
+      await apiClient.delete(`/general-questionnaires/${id}/tokens/${tokenId}`)
+      fetchTokens()
+    } catch (err: any) {
+      alert(err.message || '禁用失败')
+    }
+  }
+
+  // 获取类型标签
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'fill_blank':
+        return '填空题'
+      case 'single_choice':
+        return '单选题'
+      case 'text_input':
+        return '文本输入'
+      default:
+        return type
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    )
+  }
+
+  // 合并所有内容项并排序
+  const allContentItems: ContentItem[] = [
+    ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
+    ...questionnaireScales.map(qs => ({ type: 'scale' as const, id: qs.id, position: qs.position, data: qs })),
+  ].sort((a, b) => a.position - b.position)
+
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Link to="/general-questionnaires" className="text-gray-500 hover:text-gray-700">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">编辑泛化问卷</h1>
+          <span
+            className={`px-2 py-1 text-xs rounded-full ${
+              questionnaire.status === 'PUBLISHED'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-800'
+            }`}
+          >
+            {questionnaire.status === 'PUBLISHED' ? '已发布' : '草稿'}
+          </span>
+        </div>
+        <div className="flex gap-3">
+          {questionnaire.status === 'DRAFT' && (
+            <button
+              onClick={handlePublish}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              发布问卷
+            </button>
+          )}
+          {activeTab === 'basic' && (
+            <button
+              onClick={handleSaveBasic}
+              disabled={saving}
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? '保存中...' : '保存'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="flex gap-8">
+          {[
+            { key: 'basic', label: '基本信息' },
+            { key: 'content', label: '内容编排' },
+            { key: 'tokens', label: '访问令牌' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as any)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === tab.key
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Basic Info Tab */}
+      {activeTab === 'basic' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                问卷编码
+              </label>
+              <input
+                type="text"
+                value={questionnaire.code}
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                问卷名称 *
+              </label>
+              <input
+                type="text"
+                value={questionnaire.name}
+                onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                问卷描述
+              </label>
+              <textarea
+                value={questionnaire.description || ''}
+                onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                预计用时（分钟）
+              </label>
+              <input
+                type="number"
+                value={questionnaire.estimatedTime || ''}
+                onChange={(e) =>
+                  setQuestionnaire({ ...questionnaire, estimatedTime: parseInt(e.target.value) || null })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                指导语
+              </label>
+              <textarea
+                value={questionnaire.instruction || ''}
+                onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                placeholder="指导用户如何作答..."
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content Tab */}
+      {activeTab === 'content' && (
+        <div className="space-y-6">
+          {/* 量表选择 */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium mb-4">选择量表</h3>
+            <ScaleSelector
+              scales={availableScales}
+              selected={selectedScaleIds}
+              onChange={handleScaleChange}
+              loading={false}
+            />
+          </div>
+
+          {/* 表单题目操作按钮 */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <button
+              onClick={() => {
+                resetFormData()
+                setShowFormItemModal(true)
+              }}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              添加表单题目
+            </button>
+          </div>
+
+          {/* 内容列表 */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium mb-4">问卷内容（按顺序）</h3>
+            {allContentItems.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>暂无内容</p>
+                <p className="text-sm mt-2">请在上方添加量表或表单题目</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {allContentItems.map((item, index) => (
+                  <div
+                    key={`${item.type}-${item.id}`}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                      <span className="text-sm text-gray-500 w-8">{index + 1}.</span>
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        item.type === 'form'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {item.type === 'form' ? '表单' : '量表'}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {item.type === 'form'
+                          ? (item.data as FormItem).label
+                          : (item.data as QuestionnaireScale).scale?.name}
+                      </span>
+                      {item.type === 'form' && (
+                        <span className="text-xs text-gray-500">
+                          ({getTypeLabel((item.data as FormItem).type)})
+                        </span>
+                      )}
+                      {item.type === 'scale' && (
+                        <span className="text-xs text-gray-500">
+                          ({(item.data as QuestionnaireScale).scale?._count?.items || 0}题)
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleMoveItem(index, 'up')}
+                        disabled={index === 0}
+                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                        title="上移"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() => handleMoveItem(index, 'down')}
+                        disabled={index === allContentItems.length - 1}
+                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                        title="下移"
+                      >
+                        ↓
+                      </button>
+                      {item.type === 'form' && (
+                        <button
+                          onClick={() => handleEditFormItem(item.data as FormItem)}
+                          className="p-1 text-blue-600 hover:text-blue-800"
+                          title="编辑"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (item.type === 'form') {
+                            handleRemoveFormItem(item.id)
+                          } else {
+                            if (confirm('确定要移除此量表吗？')) {
+                              const qs = item.data as QuestionnaireScale
+                              apiClient.delete(`/general-questionnaires/${id}/scales/${qs.scaleId}`)
+                                .then(() => fetchContent())
+                            }
+                          }
+                        }}
+                        className="p-1 text-red-600 hover:text-red-800"
+                        title={item.type === 'form' ? '删除' : '移除'}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tokens Tab */}
+      {activeTab === 'tokens' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">访问令牌</h3>
+              {questionnaire.status === 'PUBLISHED' && (
+                <button
+                  onClick={() => setShowTokenModal(true)}
+                  className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  生成令牌
+                </button>
+              )}
+            </div>
+
+            {questionnaire.status !== 'PUBLISHED' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <p className="text-yellow-800 text-sm">
+                  问卷发布后才能生成访问令牌
+                </p>
+              </div>
+            )}
+
+            {tokens.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>暂无访问令牌</p>
+                <p className="text-sm mt-2">发布问卷后可生成访问令牌</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {tokens.map((token) => (
+                  <div
+                    key={token.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LinkIcon className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <code className="text-sm bg-gray-200 px-2 py-1 rounded">
+                            {token.token}
+                          </code>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/public/questionnaire/${token.token}`)
+                              alert('链接已复制')
+                            }}
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            复制链接
+                          </button>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          过期时间: {new Date(token.expiresAt).toLocaleDateString()} |
+                          已使用: {token.useCount || 0} 次
+                          {token.maxUses > 0 && ` / ${token.maxUses} 次`}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        token.status === 'ACTIVE'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {token.status === 'ACTIVE' ? '有效' : '已禁用'}
+                      </span>
+                      {token.status === 'ACTIVE' && (
+                        <button
+                          onClick={() => handleDisableToken(token.id)}
+                          className="text-red-600 hover:text-red-800 text-sm"
+                        >
+                          禁用
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 表单题目编辑弹窗 */}
+      {showFormItemModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4">
+              {editingFormItem ? '编辑表单题目' : '添加表单题目'}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  题目类型 *
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    type: e.target.value as any,
+                    options: ['single_choice', 'multiple_choice'].includes(e.target.value) ? formData.options : []
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="fill_blank">填空题（短文本）</option>
+                  <option value="single_choice">单选题</option>
+                  <option value="multiple_choice">多选题</option>
+                  <option value="text_input">文本输入（长文本）</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  题目标签 *
+                </label>
+                <input
+                  type="text"
+                  value={formData.label}
+                  onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="如：性别、年龄、意见反馈"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  占位提示
+                </label>
+                <input
+                  type="text"
+                  value={formData.placeholder}
+                  onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="输入提示文字"
+                />
+              </div>
+              {['single_choice', 'multiple_choice'].includes(formData.type) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    选项列表
+                  </label>
+                  <div className="space-y-2">
+                    {formData.options.map((opt, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={opt.label}
+                          onChange={(e) => {
+                            const newOptions = [...formData.options]
+                            newOptions[idx] = { value: String(idx), label: e.target.value }
+                            setFormData({ ...formData, options: newOptions })
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                          placeholder={`选项 ${idx + 1}`}
+                        />
+                        <button
+                          onClick={() => {
+                            const newOptions = formData.options.filter((_, i) => i !== idx)
+                            setFormData({ ...formData, options: newOptions })
+                          }}
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                        >
+                          删除
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          options: [...formData.options, { value: String(formData.options.length), label: '' }]
+                        })
+                      }}
+                      className="w-full px-3 py-2 border border-dashed border-gray-300 rounded-md text-gray-600 hover:bg-gray-50"
+                    >
+                      + 添加选项
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="required"
+                  checked={formData.required}
+                  onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+                  className="mr-2"
+                />
+                <label htmlFor="required" className="text-sm text-gray-700">
+                  必填
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowFormItemModal(false)
+                  resetFormData()
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleAddFormItem}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+              >
+                {editingFormItem ? '保存' : '添加'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 令牌创建弹窗 */}
+      {showTokenModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4">生成访问令牌</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  有效期（天）
+                </label>
+                <input
+                  type="number"
+                  value={tokenForm.expiresDays}
+                  onChange={(e) => setTokenForm({ ...tokenForm, expiresDays: parseInt(e.target.value) || 30 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  min={1}
+                  max={365}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  最大使用次数（0表示无限制）
+                </label>
+                <input
+                  type="number"
+                  value={tokenForm.maxUses}
+                  onChange={(e) => setTokenForm({ ...tokenForm, maxUses: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  min={0}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowTokenModal(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleCreateToken}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+              >
+                生成
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default GeneralQuestionnaireEdit

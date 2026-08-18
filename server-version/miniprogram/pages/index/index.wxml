@@ -1,0 +1,48 @@
+<view class="page-container">
+  <view class="header">
+    <view class="welcome">欢迎回来，{{userInfo.nickname || '同学'}}</view>
+    <view class="join-btn" bindtap="onShowJoinModal">+ 加入</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <view wx:elif="{{courses.length === 0}}" class="empty-container">
+    <view class="empty-text">暂无课程</view>
+    <view class="empty-desc">点击右上角"加入"加入课程</view>
+  </view>
+
+  <view wx:else class="course-list">
+    <view 
+      class="course-card" 
+      wx:for="{{courses}}" 
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCourseTap"
+    >
+      <view class="course-title">{{item.title}}</view>
+      <view class="course-desc">{{item.description || '暂无描述'}}</view>
+      <view class="course-meta">
+        <text class="meta-item">{{item.studentCount || 0}}人</text>
+        <text class="meta-item">{{item.courseCode}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showJoinModal}}" bindtap="onHideJoinModal">
+    <view class="modal-content" catchtap>
+      <view class="modal-title">加入课程</view>
+      <input 
+        class="modal-input" 
+        placeholder="请输入课程码"
+        value="{{courseCode}}"
+        bindinput="onCourseCodeInput"
+      />
+      <view class="modal-btns">
+        <view class="modal-btn cancel" bindtap="onHideJoinModal">取消</view>
+        <view class="modal-btn confirm" bindtap="onJoinCourse">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,57 @@
+.page-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 32rpx;
+}
+
+.form-section {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-base);
+  padding: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-item input {
+  letter-spacing: 2px;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-color);
+  margin-bottom: 16rpx;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 2rpx solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding-right: 24rpx;
+}
+
+.input-wrapper .input {
+  flex: 1;
+  border: none;
+  padding-left: 24rpx;
+}
+
+.toggle-btn {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  padding: 8rpx 16rpx;
+}
+
+.submit-section {
+  margin-top: 48rpx;
+}
+
+.submit-section .btn {
+  width: 100%;
+}

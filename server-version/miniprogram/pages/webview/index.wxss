@@ -1,0 +1,104 @@
+.page-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.video-container {
+  min-height: 100vh;
+}
+
+.video-header {
+  padding: 32rpx;
+  background-color: var(--card-bg);
+}
+
+.video-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.bilibili-player {
+  padding: 48rpx 32rpx;
+}
+
+.player-tip {
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.tip-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #00a1d6;
+  margin-bottom: 16rpx;
+}
+
+.tip-detail {
+  display: block;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx 48rpx;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.btn-action::after {
+  border: none;
+}
+
+.btn-copy {
+  background-color: #00a1d6;
+  color: #fff;
+}
+
+.btn-icon {
+  margin-right: 16rpx;
+  font-size: 36rpx;
+}
+
+.btn-text {
+  font-weight: 500;
+}
+
+.link-info {
+  padding: 24rpx;
+  background-color: var(--card-bg);
+  border-radius: 8rpx;
+  margin-top: 24rpx;
+}
+
+.link-label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.link-text {
+  display: block;
+  font-size: 24rpx;
+  color: var(--primary-color);
+  word-break: break-all;
+}
+
+.webview-container {
+  width: 100%;
+  height: 100vh;
+}

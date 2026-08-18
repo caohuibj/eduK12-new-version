@@ -1,0 +1,572 @@
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import apiClient from '../../api/client'
+import { useClassroomSocket } from '../../hooks/useClassroomSocket'
+import { Play, Square, ArrowRight, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
+
+interface Question {
+  id: string
+  questionIndex: number
+  questionContent: any
+  timeLimit: number | null
+  startedAt: string | null
+  endedAt: string | null
+}
+
+interface Classroom {
+  id: string
+  code: string
+  name: string
+  status: string
+  course: {
+    id: string
+    title: string
+  }
+  questions: Question[]
+}
+
+const ClassroomControl: React.FC = () => {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+
+  const [classroom, setClassroom] = useState<Classroom | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
+  const [onlineCount, setOnlineCount] = useState(0)
+  const [answerCount, setAnswerCount] = useState(0)
+  const [stats, setStats] = useState<any>(null)
+  const [closing, setClosing] = useState(false)
+  const [activeTab, setActiveTab] = useState<string>('control')
+
+  // Socket 连接
+  const { isConnected, on, off, emit } = useClassroomSocket({
+    classroomId: id!,
+    role: 'teacher',
+    userId: 'current-user-id', // TODO: 从认证上下文获取
+    autoConnect: true,
+  })
+
+  // 获取课堂信息
+  const fetchClassroom = async () => {
+    try {
+      setLoading(true)
+      const response = await apiClient.get<Classroom>(`/classrooms/${id}`)
+      if (response.code === 0) {
+        setClassroom(response.data)
+      } else {
+        alert(response.message)
+        navigate('/teacher/classrooms')
+      }
+    } catch (err: any) {
+      alert(err.message || '获取课堂信息失败')
+      navigate('/teacher/classrooms')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchClassroom()
+  }, [id])
+
+  // 监听 Socket 事件
+  useEffect(() => {
+    if (!isConnected) return
+
+    // 教师加入成功
+    on('teacher:joined', (data) => {
+      console.log('教师已加入课堂', data)
+    })
+
+    // 实时统计
+    on('broadcast:stats', (data) => {
+      setAnswerCount(data.answerCount)
+      setStats(data)
+    })
+
+    // 在线人数
+    on('broadcast:online', (data) => {
+      setOnlineCount(data.onlineCount)
+    })
+
+    // 题目开始
+    on('broadcast:question', (data) => {
+      console.log('题目开始', data)
+      setCurrentQuestion({
+        id: data.questionId,
+        questionIndex: data.questionIndex,
+        questionContent: data.questionContent,
+        timeLimit: data.timeLimit,
+        startedAt: new Date().toISOString(),
+        endedAt: null,
+      })
+    })
+
+    // 答题结束
+    on('broadcast:finished', (data) => {
+      console.log('答题结束', data)
+      setCurrentQuestion((prev) => {
+        if (prev) {
+          return {
+            ...prev,
+            endedAt: new Date().toISOString(),
+          }
+        }
+        return prev
+      })
+      // 刷新课堂信息以更新题目状态
+      fetchClassroom()
+    })
+
+    // 下一题
+    on('broadcast:next', (data) => {
+      console.log('准备下一题', data)
+      setCurrentQuestion(null)
+    })
+
+    return () => {
+      off('teacher:joined')
+      off('broadcast:stats')
+      off('broadcast:online')
+      off('broadcast:question')
+      off('broadcast:finished')
+      off('broadcast:next')
+    }
+  }, [isConnected, on, off])
+
+  // 开始答题
+  const handleStartQuestion = () => {
+    if (!classroom) return
+
+    // 从已创建的题目中选择第一个未开始的题目
+    const unansweredQuestion = classroom.questions.find((q) => !q.startedAt)
+
+    if (!unansweredQuestion) {
+      alert('没有可用的题目，请先添加题目')
+      return
+    }
+
+    handleStartSpecificQuestion(unansweredQuestion)
+  }
+
+  // 开始指定题目
+  const handleStartSpecificQuestion = (question: Question) => {
+    if (!classroom || !isConnected) {
+      console.warn('无法开始题目：课堂不存在或 socket 未连接')
+      return
+    }
+
+    console.log('=== 教师开始题目 ===')
+    console.log('题目信息:', question)
+    console.log('题目内容:', question.questionContent)
+    console.log('题目类型:', question.questionContent?.type)
+
+    emit('teacher:start', {
+      classroomId: classroom.id,
+      questionId: question.id,
+      questionContent: question.questionContent,
+      timeLimit: question.timeLimit || 60,
+    })
+
+    setCurrentQuestion(question)
+
+    // 自动打开大屏窗口
+    const bigscreenUrl = `/bigscreen/${classroom.id}`
+    window.open(bigscreenUrl, `bigscreen-${classroom.id}`, 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no')
+  }
+
+  // 结束答题
+  const handleEndQuestion = () => {
+    if (!classroom || !currentQuestion) return
+
+    emit('teacher:end', {
+      classroomId: classroom.id,
+      questionId: currentQuestion.id,
+    })
+  }
+
+  // 下一题
+  const handleNextQuestion = () => {
+    if (!classroom) return
+
+    emit('teacher:next', {
+      classroomId: classroom.id,
+    })
+  }
+
+  // 关闭课堂
+  const handleCloseClassroom = async () => {
+    if (!classroom || closing) return
+
+    if (!confirm('确定要关闭课堂吗？关闭后将无法继续答题。')) {
+      return
+    }
+
+    setClosing(true)
+
+    // Socket 处理器会自动更新课堂状态，无需再调用 API
+    emit('teacher:close', {
+      classroomId: classroom.id,
+    })
+
+    // 延迟跳转，等待 Socket 事件处理完成
+    setTimeout(() => {
+      navigate('/teacher/classrooms')
+    }, 500)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    )
+  }
+
+  if (!classroom) {
+    return null
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 顶部状态栏 */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* 课堂名称和信息 */}
+          <div className="py-4">
+            <h1 className="text-2xl font-bold text-gray-900">{classroom.name}</h1>
+            <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+              <span>课堂码: {classroom.code}</span>
+              <span>课程: {classroom.course.title}</span>
+              <span className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                在线: {onlineCount} 人
+              </span>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="border-t border-gray-200">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('control')}
+                className={`${
+                  activeTab === 'control'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+              >
+                答题控制
+              </button>
+              {classroom.status === 'PREPARING' && (
+                <button
+                  onClick={() => setActiveTab('edit')}
+                  className={`${
+                    activeTab === 'edit'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
+                >
+                  <Edit className="w-4 h-4" />
+                  编辑题目
+                </button>
+              )}
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`${
+                  activeTab === 'history'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
+              >
+                <Monitor className="w-4 h-4" />
+                历史大屏
+              </button>
+              <button
+                onClick={() => setActiveTab('qrcode')}
+                className={`${
+                  activeTab === 'qrcode'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
+              >
+                <QrCode className="w-4 h-4" />
+                二维码
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('确定要关闭课堂吗？关闭后将无法继续答题。')) {
+                    handleCloseClassroom()
+                  }
+                }}
+                disabled={classroom.status === 'ENDED' || closing}
+                className={`${
+                  activeTab === 'close'
+                    ? 'border-red-500 text-red-600'
+                    : 'border-transparent text-red-500 hover:text-red-700 hover:border-red-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                <Square className="w-4 h-4" />
+                {closing ? '关闭中...' : '关闭课堂'}
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      {/* 主要内容区 */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 编辑题目 Tab */}
+        {activeTab === 'edit' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">点击下方按钮编辑题目</p>
+              <Link
+                to={`/teacher/classrooms/${classroom.id}/questions`}
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Edit className="w-5 h-5 mr-2" />
+                进入题目编辑
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* 历史大屏 Tab */}
+        {activeTab === 'history' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">历史大屏</h2>
+            {classroom.questions.filter(q => q.endedAt).length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                暂无历史记录
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {classroom.questions
+                  .filter(q => q.endedAt)
+                  .map((question) => (
+                    <div
+                      key={question.id}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        const bigscreenUrl = `/bigscreen/${classroom.id}?history=${question.id}`
+                        window.open(bigscreenUrl, `bigscreen-history-${question.id}`, 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no')
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-gray-900">第 {question.questionIndex} 题</div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {question.questionContent.question?.substring(0, 30)}...
+                          </div>
+                        </div>
+                        <Monitor className="w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 二维码 Tab */}
+        {activeTab === 'qrcode' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">课堂二维码</h2>
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-2">课堂码: <span className="font-mono text-lg font-semibold">{classroom.code}</span></p>
+              <p className="text-sm text-gray-500 mb-6">点击按钮生成二维码，学生扫码即可加入课堂</p>
+              <button
+                onClick={() => window.open(`/teacher/classrooms/${classroom.id}/qrcode`, '_blank', 'width=600,height=700')}
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <QrCode className="w-5 h-5 mr-2" />
+                生成二维码
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 答题控制 Tab */}
+        {activeTab === 'control' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 左侧：控制面板 */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow">
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">答题控制</h2>
+
+                  {/* 当前题目状态 */}
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-500 mb-2">当前状态</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {classroom.status === 'PREPARING' && '准备中'}
+                      {classroom.status === 'ACTIVE' && '答题进行中'}
+                      {classroom.status === 'ENDED' && '课堂已结束'}
+                    </div>
+                  </div>
+
+                  {/* 控制按钮 */}
+                  <div className="flex gap-4">
+                    {classroom.status === 'PREPARING' && (
+                      <div className="flex-1 text-center py-8 text-gray-500">
+                        请从右侧题目列表中选择题目开始答题
+                      </div>
+                    )}
+
+                    {classroom.status === 'ACTIVE' && currentQuestion && !currentQuestion.endedAt && (
+                      <>
+                        <button
+                          onClick={handleEndQuestion}
+                          className="flex-1 flex items-center justify-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                        >
+                          <Square className="w-5 h-5 mr-2" />
+                          结束答题
+                        </button>
+                        <a
+                          href={`/bigscreen/${classroom.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          <Monitor className="w-5 h-5 mr-2" />
+                          打开大屏
+                        </a>
+                      </>
+                    )}
+
+                    {classroom.status === 'ACTIVE' && currentQuestion && currentQuestion.endedAt && (
+                      <div className="flex-1 text-center py-8 text-gray-500">
+                        当前题目已结束，请从右侧选择下一题
+                      </div>
+                    )}
+
+                    {classroom.status === 'ACTIVE' && !currentQuestion && (
+                      <div className="flex-1 text-center py-8 text-gray-500">
+                        请从右侧题目列表中选择题目开始答题
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 答题统计 */}
+                  {classroom.status === 'ACTIVE' && (
+                    <div className="mt-6">
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">答题统计</h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-gray-900">{onlineCount}</div>
+                          <div className="text-sm text-gray-500">在线人数</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-green-600">{answerCount}</div>
+                          <div className="text-sm text-gray-500">已提交</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-gray-400">{onlineCount - answerCount}</div>
+                          <div className="text-sm text-gray-500">未提交</div>
+                        </div>
+                      </div>
+
+                      {/* 提交进度条 */}
+                      <div className="mt-4">
+                        <div className="flex justify-between text-sm text-gray-600 mb-1">
+                          <span>提交进度</span>
+                          <span>{onlineCount > 0 ? Math.round((answerCount / onlineCount) * 100) : 0}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-green-600 h-2 rounded-full transition-all"
+                            style={{ width: `${onlineCount > 0 ? (answerCount / onlineCount) * 100 : 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 右侧：题目列表 */}
+            <div>
+              <div className="bg-white rounded-lg shadow">
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">题目列表</h2>
+
+                  {classroom.questions.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 text-sm">
+                      暂无题目
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {classroom.questions.map((question, index) => (
+                        <div
+                          key={question.id}
+                          className={`p-3 rounded-lg border transition-all ${
+                            currentQuestion?.id === question.id
+                              ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-400 cursor-pointer'
+                              : question.endedAt
+                              ? 'bg-green-50 border-green-200 cursor-pointer hover:bg-green-100'
+                              : question.startedAt
+                              ? 'bg-yellow-50 border-yellow-200 cursor-not-allowed'
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100 cursor-pointer'
+                          }`}
+                          onClick={() => {
+                            // 已完成的题目，询问是否重新开始
+                            if (question.endedAt) {
+                              if (window.confirm('该题目已完成，是否重新开始？')) {
+                                // 重置题目状态
+                                handleStartSpecificQuestion(question)
+                              }
+                            }
+                            // 未开始的题目可以直接开始
+                            else if (!question.startedAt) {
+                              handleStartSpecificQuestion(question)
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-900">
+                                  第 {index + 1} 题
+                                </span>
+                                {question.startedAt && !question.endedAt && (
+                                  <span className="px-2 py-0.5 text-xs bg-yellow-200 text-yellow-800 rounded">
+                                    进行中
+                                  </span>
+                                )}
+                                {question.endedAt && (
+                                  <span className="px-2 py-0.5 text-xs bg-green-200 text-green-800 rounded">
+                                    已完成
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {question.questionContent.question?.substring(0, 30)}...
+                              </div>
+                            </div>
+                            {!question.startedAt && (
+                              <Play className="w-4 h-4 text-green-600" />
+                            )}
+                            {question.startedAt && !question.endedAt && (
+                              <CheckCircle className="w-4 h-4 text-yellow-600" />
+                            )}
+                            {question.endedAt && (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default ClassroomControl

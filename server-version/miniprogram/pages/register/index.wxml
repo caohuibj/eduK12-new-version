@@ -1,0 +1,63 @@
+<view class="register-container">
+  <view class="register-header">
+    <view class="title">学生注册</view>
+  </view>
+
+  <view class="register-form">
+    <view class="form-item">
+      <view class="form-label">课程码</view>
+      <input 
+        class="input" 
+        placeholder="请输入课程码" 
+        value="{{courseCode}}"
+        bindinput="onCourseCodeInput"
+      />
+    </view>
+    <view class="form-item">
+      <view class="form-label">用户名</view>
+      <input 
+        class="input" 
+        placeholder="请输入用户名" 
+        value="{{username}}"
+        bindinput="onUsernameInput"
+      />
+    </view>
+    <view class="form-item">
+      <view class="form-label">密码</view>
+      <input 
+        class="input password-input" 
+        type="password"
+        placeholder="请输入密码" 
+        value="{{password}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+    <view class="form-item">
+      <view class="form-label">确认密码</view>
+      <input 
+        class="input password-input" 
+        type="password"
+        placeholder="请再次输入密码" 
+        value="{{confirmPassword}}"
+        bindinput="onConfirmPasswordInput"
+      />
+    </view>
+    <view class="form-item">
+      <view class="form-label">中文昵称</view>
+      <input 
+        class="input" 
+        placeholder="请输入中文昵称" 
+        value="{{nickname}}"
+        bindinput="onNicknameInput"
+      />
+    </view>
+    
+    <button class="btn btn-primary register-btn" bindtap="onRegister" loading="{{loading}}">
+      注册
+    </button>
+  </view>
+
+  <view class="register-footer">
+    <text class="link" bindtap="onGoLogin">已有账号？去登录</text>
+  </view>
+</view>

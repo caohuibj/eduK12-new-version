@@ -1,0 +1,26 @@
+page {
+  --primary-color: #5bc0de;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --bg-color: #f7f8fa;
+  --card-bg: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #999999;
+  --border-color: #e5e5e5;
+  
+  --font-size-xs: 22rpx;
+  --font-size-sm: 24rpx;
+  --font-size-base: 28rpx;
+  --font-size-lg: 32rpx;
+  --font-size-xl: 36rpx;
+  
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-base: 24rpx;
+  --spacing-lg: 32rpx;
+  
+  --radius-sm: 8rpx;
+  --radius-base: 12rpx;
+  --radius-lg: 16rpx;
+}

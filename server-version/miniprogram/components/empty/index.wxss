@@ -1,0 +1,24 @@
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 48rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}

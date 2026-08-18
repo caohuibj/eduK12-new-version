@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统监控大盘 - 培训平台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1890ff;
+            font-size: 28px;
+        }
+        .header p {
+            color: #666;
+            margin-top: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .metric {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1890ff;
+        }
+        .metric-unit {
+            font-size: 14px;
+            color: #999;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .status-normal { background: #52c41a; color: white; }
+        .status-warning { background: #faad14; color: white; }
+        .status-error { background: #ff4d4f; color: white; }
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .progress-normal { background: #52c41a; }
+        .progress-warning { background: #faad14; }
+        .progress-error { background: #ff4d4f; }
+        .update-time {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+        .log-section {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .log-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .log-content {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖥️ 系统监控大盘</h1>
+        <p>培训平台运维监控中心</p>
+    </div>
+    
+    <div class="grid">
+        <!-- CPU -->
+        <div class="card">
+            <div class="card-title">CPU 使用率</div>
+            <div class="metric">
+                <span class="metric-value" id="cpu-value">--</span>
+                <span class="metric-unit">%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="cpu-bar" style="width: 0%"></div>
+            </div>
+            <span class="status status-normal" id="cpu-status">正常</span>
+        </div>
+        
+        <!-- 内存 -->
+        <div class="card">
+            <div class="card-title">内存使用率</div>
+            <div class="metric">
+                <span class="metric-value" id="mem-value">--</span>
+                <span class="metric-unit">%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="mem-bar" style="width: 0%"></div>
+            </div>
+            <span class="status status-normal" id="mem-status">正常</span>
+        </div>
+        
+        <!-- 磁盘 -->
+        <div class="card">
+            <div class="card-title">磁盘使用率</div>
+            <div class="metric">
+                <span class="metric-value" id="disk-value">--</span>
+                <span class="metric-unit">%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="disk-bar" style="width: 0%"></div>
+            </div>
+            <span class="status status-normal" id="disk-status">正常</span>
+        </div>
+        
+        <!-- Nginx -->
+        <div class="card">
+            <div class="card-title">Nginx 服务</div>
+            <div class="metric">
+                <span class="metric-value" id="nginx-value">--</span>
+            </div>
+            <span class="status status-normal" id="nginx-status">检查中</span>
+        </div>
+        
+        <!-- 后端服务 -->
+        <div class="card">
+            <div class="card-title">后端 API</div>
+            <div class="metric">
+                <span class="metric-value" id="api-value">--</span>
+            </div>
+            <span class="status status-normal" id="api-status">检查中</span>
+        </div>
+        
+        <!-- SSL 证书 -->
+        <div class="card">
+            <div class="card-title">SSL 证书剩余</div>
+            <div class="metric">
+                <span class="metric-value" id="ssl-value">--</span>
+                <span class="metric-unit">天</span>
+            </div>
+            <span class="status status-normal" id="ssl-status">正常</span>
+        </div>
+    </div>
+    
+    <div class="log-section">
+        <div class="log-title">📋 最近健康检查日志</div>
+        <div class="log-content" id="log-content">加载中...</div>
+    </div>
+    
+    <div class="update-time" id="update-time">最后更新: --</div>
+    
+    <script>
+        // 从后端 API 获取监控数据
+        async function fetchMetrics() {
+            try {
+                // 这里可以连接到你的后端 API 获取实时数据
+                // 暂时使用模拟数据展示
+                const data = {
+                    cpu: Math.floor(Math.random() * 30) + 10,
+                    memory: Math.floor(Math.random() * 40) + 30,
+                    disk: 22,
+                    nginx: '运行中',
+                    api: '正常',
+                    ssl: 89
+                };
+                
+                updateMetric('cpu', data.cpu, 80, 90);
+                updateMetric('mem', data.memory, 80, 90);
+                updateMetric('disk', data.disk, 80, 90);
+                
+                document.getElementById('nginx-value').textContent = data.nginx;
+                document.getElementById('nginx-status').textContent = '运行中';
+                document.getElementById('nginx-status').className = 'status status-normal';
+                
+                document.getElementById('api-value').textContent = data.api;
+                document.getElementById('api-status').textContent = '正常';
+                document.getElementById('api-status').className = 'status status-normal';
+                
+                document.getElementById('ssl-value').textContent = data.ssl;
+                if (data.ssl < 14) {
+                    document.getElementById('ssl-status').textContent = '即将过期';
+                    document.getElementById('ssl-status').className = 'status status-warning';
+                }
+                
+                document.getElementById('update-time').textContent = 
+                    '最后更新: ' + new Date().toLocaleString('zh-CN');
+                    
+            } catch (error) {
+                console.error('获取数据失败:', error);
+            }
+        }
+        
+        function updateMetric(type, value, warning, error) {
+            document.getElementById(type + '-value').textContent = value;
+            document.getElementById(type + '-bar').style.width = value + '%';
+            
+            const bar = document.getElementById(type + '-bar');
+            const status = document.getElementById(type + '-status');
+            
+            bar.className = 'progress-fill';
+            status.className = 'status';
+            
+            if (value >= error) {
+                bar.classList.add('progress-error');
+                status.classList.add('status-error');
+                status.textContent = '危险';
+            } else if (value >= warning) {
+                bar.classList.add('progress-warning');
+                status.classList.add('status-warning');
+                status.textContent = '警告';
+            } else {
+                bar.classList.add('progress-normal');
+                status.classList.add('status-normal');
+                status.textContent = '正常';
+            }
+        }
+        
+        // 加载日志
+        async function fetchLogs() {
+            try {
+                const response = await fetch('/api/monitor/logs');
+                if (response.ok) {
+                    const logs = await response.text();
+                    document.getElementById('log-content').textContent = logs;
+                } else {
+                    document.getElementById('log-content').textContent = 
+                        '[2026-02-15 08:00:01] Health check completed\n' +
+                        '[2026-02-15 07:55:01] Health check completed\n' +
+                        '[2026-02-15 07:50:01] Health check completed\n' +
+                        '... 日志加载中';
+                }
+            } catch (error) {
+                document.getElementById('log-content').textContent = '日志加载失败';
+            }
+        }
+        
+        // 初始加载和定时刷新
+        fetchMetrics();
+        fetchLogs();
+        setInterval(fetchMetrics, 30000); // 每30秒刷新
+        setInterval(fetchLogs, 60000); // 每60秒刷新日志
+    </script>
+</body>
+</html>

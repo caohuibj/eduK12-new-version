@@ -1,0 +1,33 @@
+import { Router } from 'express'
+import { assignmentController } from '../controllers/assignmentController'
+import { authenticate, requireTeacher } from '../middleware/auth'
+
+const router = Router()
+
+// 注意：特定路由必须在通用路由之前
+// 我的作业（必须在 /:id 之前）
+router.get('/my', authenticate, assignmentController.myAssignments)
+
+// 作业标签（必须在 /:id 之前）
+router.get('/tags', authenticate, assignmentController.getTags)
+
+// 作业列表和详情
+router.get('/', authenticate, assignmentController.list)
+router.post('/', authenticate, requireTeacher, assignmentController.create)
+router.get('/:id', authenticate, assignmentController.detail)
+router.put('/:id', authenticate, requireTeacher, assignmentController.update)
+router.delete('/:id', authenticate, requireTeacher, assignmentController.delete)
+
+// 提交相关
+router.post('/:id/submit', authenticate, assignmentController.submit)
+router.get('/:id/my-submission', authenticate, assignmentController.mySubmission)
+router.get('/:id/submissions', authenticate, requireTeacher, assignmentController.submissions)
+
+// 批改
+router.post('/:id/submissions/:submissionId/grade', authenticate, requireTeacher, assignmentController.grade)
+router.post('/:id/batch-grade', authenticate, requireTeacher, assignmentController.batchGrade)
+
+// 导出
+router.get('/:id/export', authenticate, requireTeacher, assignmentController.export)
+
+export default router

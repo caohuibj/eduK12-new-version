@@ -1,0 +1,36 @@
+<view class="video-player">
+  <block wx:if="{{videoType === 'cos' || videoType === 'local'}}">
+    <video 
+      class="video"
+      src="{{src}}"
+      poster="{{poster}}"
+      title="{{title}}"
+      controls
+      show-center-play-btn
+      enable-progress-gesture
+      binderror="onVideoError"
+      bindended="onVideoEnded"
+    />
+  </block>
+
+  <block wx:elif="{{videoType === 'bilibili'}}">
+    <view class="video-cover" bindtap="onPlay">
+      <image wx:if="{{poster}}" class="cover-image" src="{{poster}}" mode="aspectFill" />
+      <view wx:else class="cover-placeholder">
+        <text class="platform-tag">B站视频</text>
+      </view>
+      <view class="play-btn">
+        <text class="play-icon">▶</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:elif="{{videoType === 'youtube'}}">
+    <view class="video-cover" bindtap="onPlay">
+      <view class="cover-placeholder youtube">
+        <text class="platform-tag">YouTube</text>
+        <text class="tip-text">暂不支持</text>
+      </view>
+    </view>
+  </block>
+</view>

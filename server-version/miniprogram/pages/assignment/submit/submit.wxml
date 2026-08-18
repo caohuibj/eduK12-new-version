@@ -1,0 +1,179 @@
+<wxs src="./tools.wxs" module="tools" />
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <view class="assignment-header">
+      <view class="title">{{assignment.title}}</view>
+      <view class="desc">{{assignment.description || ''}}</view>
+      <view class="deadline">截止: {{assignment.deadline || '无截止时间'}}</view>
+    </view>
+
+    <view wx:if="{{assignment.contentText}}" class="content-section">
+      <view class="section-title">作业内容</view>
+      <view class="content">{{assignment.contentText}}</view>
+    </view>
+
+    <view wx:if="{{iframeVideos.length > 0}}" class="media-section">
+      <view class="section-title">视频资料</view>
+      <view class="video-list">
+        <view 
+          wx:for="{{iframeVideos}}" 
+          wx:key="index"
+          class="video-external"
+          data-url="{{item.url}}"
+          data-bvid="{{item.bvid}}"
+          bindtap="onIframeVideoTap"
+        >
+          <view class="video-icon">▶</view>
+          <view class="video-title">{{item.title}}</view>
+          <view class="video-tip">点击观看</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{assignment.videos && assignment.videos.length > 0}}" class="media-section">
+      <view class="section-title">视频资料</view>
+      <view class="video-list">
+        <view 
+          wx:for="{{assignment.videos}}" 
+          wx:key="index"
+        >
+          <video 
+            wx:if="{{item.type === 'library'}}"
+            class="video-player"
+            src="{{baseUrl}}{{item.url}}"
+            title="{{item.title}}"
+            enable-danmu="{{false}}"
+            show-center-play-btn="{{true}}"
+          />
+          <view wx:else class="video-external" data-url="{{item.url}}" bindtap="onExternalVideoTap">
+            <view class="video-icon">▶</view>
+            <view class="video-title">{{item.title}}</view>
+            <view class="video-tip">点击查看外部视频</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{assignment.images && assignment.images.length > 0}}" class="media-section">
+      <view class="section-title">图片资料</view>
+      <view class="image-list">
+        <image 
+          class="image-item" 
+          wx:for="{{assignment.images}}" 
+          wx:key="index"
+          src="{{baseUrl}}{{item.url}}"
+          mode="aspectFit"
+          data-url="{{baseUrl}}{{item.url}}"
+          bindtap="onImageTap"
+        />
+      </view>
+    </view>
+
+    <view wx:if="{{assignment.questionsList && assignment.questionsList.length > 0}}" class="questions-section">
+      <view class="section-title">题目</view>
+      <view class="question-item" wx:for="{{assignment.questionsList}}" wx:key="id" wx:for-index="qIndex">
+        <view class="question-text">{{qIndex + 1}}. {{item.question}}</view>
+        
+        <block wx:if="{{item.type === 'single_choice'}}">
+          <view class="options">
+            <label 
+              wx:for="{{item.options}}" 
+              wx:for-item="opt"
+              wx:key="key"
+              class="option {{answers[qIndex] === opt.key ? 'selected' : ''}}"
+              data-index="{{qIndex}}"
+              data-key="{{opt.key}}"
+              bindtap="onOptionSelect"
+            >
+              <radio 
+                value="{{opt.key}}" 
+                checked="{{answers[qIndex] === opt.key}}"
+              />
+              <text class="option-text">{{opt.key}}. {{opt.text}}</text>
+            </label>
+          </view>
+        </block>
+        
+        <block wx:if="{{item.type === 'multiple_choice'}}">
+          <view class="options">
+            <view 
+              wx:for="{{item.options}}" 
+              wx:for-item="opt"
+              wx:key="key"
+              class="option {{tools.includes(multiAnswers[qIndex], opt.key) ? 'selected' : ''}}"
+              data-index="{{qIndex}}"
+              data-key="{{opt.key}}"
+              bindtap="onMultiOptionSelect"
+            >
+              <view class="checkbox-icon {{tools.includes(multiAnswers[qIndex], opt.key) ? 'checked' : ''}}">
+                <text wx:if="{{tools.includes(multiAnswers[qIndex], opt.key)}}">✓</text>
+              </view>
+              <text class="option-text">{{opt.key}}. {{opt.text}}</text>
+            </view>
+          </view>
+        </block>
+        
+        <block wx:if="{{item.type === 'text'}}">
+          <view class="text-question">
+            <textarea 
+              class="text-answer-input"
+              placeholder="请输入答案..."
+              value="{{textAnswers[qIndex] || ''}}"
+              data-index="{{qIndex}}"
+              bindinput="onTextAnswerInput"
+              disabled="{{!!submission && !editing}}"
+            />
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="answer-section">
+      <view class="section-title">作答内容</view>
+      <textarea 
+        class="answer-input"
+        placeholder="请输入你的答案..."
+        value="{{content}}"
+        bindinput="onContentInput"
+        disabled="{{!!submission && !editing}}"
+      />
+    </view>
+
+    <view wx:if="{{submission}}" class="submitted-info">
+      <view class="section-title">已提交</view>
+      <view class="submitted-time">提交时间: {{submission.submittedAt || submission.createdAt}}</view>
+      <view wx:if="{{submission.comment}}" class="comment">
+        <view class="comment-label">教师评语:</view>
+        <view class="comment-content">{{submission.comment}}</view>
+      </view>
+      <button class="btn btn-secondary" bindtap="onEdit" wx:if="{{!editing && !assignment.isExpired}}">
+        修改作业
+      </button>
+    </view>
+
+    <view wx:if="{{editing}}" class="submit-section">
+      <button class="btn btn-primary" bindtap="onSubmit" loading="{{submitting}}">
+        保存修改
+      </button>
+      <button class="btn btn-cancel" bindtap="onCancelEdit">
+        取消
+      </button>
+    </view>
+
+    <!-- 过期提示（允许查看内容） -->
+    <view wx:if="{{assignment.isExpired && !submission && !editing}}" class="expired-section">
+      <view class="expired-icon">⏰</view>
+      <view class="expired-text">作业已截止，无法提交</view>
+    </view>
+
+    <view wx:elif="{{!submission && !assignment.isExpired}}" class="submit-section">
+      <button class="btn btn-primary" bindtap="onSubmit" loading="{{submitting}}">
+        提交作业
+      </button>
+    </view>
+  </block>
+</view>

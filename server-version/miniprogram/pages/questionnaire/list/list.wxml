@@ -1,0 +1,52 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <view wx:if="{{questionnaires.length === 0}}" class="empty-container">
+      <view class="empty-icon">📋</view>
+      <view class="empty-text">暂无可参与的问卷</view>
+    </view>
+
+    <view wx:else class="list-container">
+      <view 
+        class="questionnaire-card"
+        wx:for="{{questionnaires}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-completed="{{item.completed}}"
+        data-in-progress="{{item.inProgress}}"
+        data-assessmentid="{{item.assessmentId}}"
+        bindtap="onTap"
+      >
+        <view class="card-header">
+          <view class="card-title">{{item.name}}</view>
+          <view wx:if="{{item.isNew}}" class="new-badge">新</view>
+        </view>
+        
+        <view class="card-desc" wx:if="{{item.description}}">
+          {{item.description}}
+        </view>
+
+        <view class="card-info">
+          <view class="info-item">
+            <text class="info-icon">📊</text>
+            <text>{{item.scaleCount || 0}}个量表</text>
+          </view>
+          <view class="info-item" wx:if="{{item.estimatedTime}}">
+            <text class="info-icon">⏱</text>
+            <text>预计{{item.estimatedTime}}分钟</text>
+          </view>
+        </view>
+
+        <view class="card-footer">
+          <view class="status-tag {{item.completed ? 'completed' : item.inProgress ? 'in-progress' : 'pending'}}">
+            <text class="status-icon">{{item.completed ? '✓' : item.inProgress ? '◐' : '○'}}</text>
+            <text>{{item.completed ? '已完成' : item.inProgress ? '进行中' : '开始测评'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

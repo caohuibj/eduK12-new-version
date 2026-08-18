@@ -1,0 +1,845 @@
+import React, { useState, useEffect } from 'react'
+import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
+import apiClient from '../api/client'
+import RichTextEditor from '../components/RichTextEditor'
+import MediaSelector, { MediaItem } from '../components/MediaSelector'
+import TagBadge from '../components/TagBadge'
+import TagFilter from '../components/TagFilter'
+import TagInput from '../components/TagInput'
+import CheckinTokenManager from '../components/CheckinTokenManager'
+import { sanitizeHtml } from '../utils/sanitize'
+import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
+import type { Checkin, Course } from '../types'
+
+interface VideoItem {
+  type: 'library' | 'external' | 'upload'
+  id?: string
+  url: string
+  title: string
+  thumbnail?: string
+  source?: string
+}
+
+interface ImageItem {
+  url: string
+  name: string
+}
+
+interface DocumentItem {
+  id: string
+  url: string
+  title: string
+  fileName?: string
+}
+
+interface CheckinFormData {
+  courseId: string
+  title: string
+  content: string
+  videos: VideoItem[]
+  images: ImageItem[]
+  documents: DocumentItem[]
+  endTime: string
+  allowViewOthers: boolean
+  tags: string[]
+}
+
+interface CheckinSubmission {
+  id: string
+  studentId: string
+  student: {
+    id: string
+    username: string
+    nickname: string
+    avatarUrl?: string
+  }
+  content?: string
+  images?: string[]  // 后端返回字符串数组
+  createdAt: string
+}
+
+const CheckinList: React.FC = () => {
+  const [checkins, setCheckins] = useState<Checkin[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
+  const [loading, setLoading] = useState(true)
+  const [keyword, setKeyword] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [editingCheckin, setEditingCheckin] = useState<Checkin | null>(null)
+  const [formData, setFormData] = useState<CheckinFormData>({
+    courseId: '',
+    title: '',
+    content: '',
+    videos: [],
+    images: [],
+    documents: [],
+    endTime: '',
+    allowViewOthers: false,
+    tags: [],
+  })
+  const [showMediaSelector, setShowMediaSelector] = useState(false)
+  const [mediaSelectorType, setMediaSelectorType] = useState<'video' | 'image' | 'document'>('video')
+  const [availableTags, setAvailableTags] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  
+  // 提交列表弹窗状态
+  const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
+  const [selectedCheckin, setSelectedCheckin] = useState<Checkin | null>(null)
+  const [submissions, setSubmissions] = useState<CheckinSubmission[]>([])
+  const [submissionsLoading, setSubmissionsLoading] = useState(false)
+
+  useEffect(() => {
+    fetchCheckins()
+    fetchCourses()
+    fetchTags()
+  }, [])
+
+  const fetchCheckins = async () => {
+    try {
+      setLoading(true)
+      const response = await apiClient.get('/checkins')
+      if (response.code === 0) {
+        setCheckins(response.data.list)
+      }
+    } catch (error) {
+      console.error('获取打卡列表失败:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCourses = async () => {
+    try {
+      const response = await apiClient.get('/courses')
+      if (response.code === 0) {
+        setCourses(response.data.list)
+      }
+    } catch (error) {
+      console.error('获取课程列表失败:', error)
+    }
+  }
+
+  const fetchTags = async () => {
+    try {
+      const response = await apiClient.get('/checkins/tags')
+      if (response.code === 0) {
+        setAvailableTags(response.data.tags)
+      }
+    } catch (error) {
+      console.error('获取标签列表失败:', error)
+    }
+  }
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const data = {
+        courseId: formData.courseId,
+        title: formData.title,
+        description: '',
+        content: formData.content,
+        videos: formData.videos.length > 0 ? formData.videos : undefined,
+        images: formData.images.length > 0 ? formData.images : undefined,
+        documents: formData.documents.length > 0 ? formData.documents : undefined,
+        endTime: formData.endTime || undefined,
+        allowViewOthers: formData.allowViewOthers,
+        tags: formData.tags,
+      }
+      const response = await apiClient.post('/checkins', data)
+      if (response.code === 0) {
+        setShowModal(false)
+        resetForm()
+        fetchCheckins()
+      }
+    } catch (error: any) {
+      alert(error.message || '创建失败')
+    }
+  }
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingCheckin) return
+
+    try {
+      const data = {
+        title: formData.title,
+        description: '',
+        content: formData.content,
+        videos: formData.videos.length > 0 ? formData.videos : undefined,
+        images: formData.images.length > 0 ? formData.images : undefined,
+        documents: formData.documents.length > 0 ? formData.documents : undefined,
+        endTime: formData.endTime || undefined,
+        allowViewOthers: formData.allowViewOthers,
+        tags: formData.tags,
+      }
+      const response = await apiClient.put(`/checkins/${editingCheckin.id}`, data)
+      if (response.code === 0) {
+        setShowModal(false)
+        setEditingCheckin(null)
+        resetForm()
+        fetchCheckins()
+      }
+    } catch (error: any) {
+      alert(error.message || '更新失败')
+    }
+  }
+
+  const handleDelete = async (checkin: Checkin) => {
+    if (!window.confirm('确定要删除这个打卡吗？')) return
+    try {
+      const response = await apiClient.delete(`/checkins/${checkin.id}`)
+      if (response.code === 0) {
+        fetchCheckins()
+      }
+    } catch (error: any) {
+      alert(error.message || '删除失败')
+    }
+  }
+
+  const handleClone = async (checkin: Checkin) => {
+    if (!window.confirm('确定要复制这个打卡吗？')) return
+    
+    try {
+      // 确保 videos 和 images 是数组格式
+      let videos = checkin.videos
+      let images = checkin.images
+      
+      // 如果是字符串，尝试解析为 JSON
+      if (typeof videos === 'string') {
+        try { videos = JSON.parse(videos) } catch { videos = [] }
+      }
+      if (typeof images === 'string') {
+        try { images = JSON.parse(images) } catch { images = [] }
+      }
+      
+      const response = await apiClient.post('/checkins', {
+        courseId: checkin.courseId,
+        title: `${checkin.title} (复制)`,
+        description: checkin.description || '',
+        content: checkin.content || '',
+        videos: videos || [],
+        images: images || [],
+        allowViewOthers: checkin.allowViewOthers || false,
+      })
+      if (response.code === 0) {
+        fetchCheckins()
+      }
+    } catch (error: any) {
+      alert(error.message || '复制失败')
+    }
+  }
+
+  const handleExport = async (checkin: Checkin) => {
+    try {
+      const response = await fetch(`/api/checkins/${checkin.id}/export`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error('导出失败')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${checkin.title}_打卡数据.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error: any) {
+      alert(error.message || '导出失败')
+    }
+  }
+
+  // 打开提交列表弹窗
+  const openSubmissionsModal = (checkin: Checkin) => {
+    setSelectedCheckin(checkin)
+    setShowSubmissionsModal(true)
+    fetchSubmissions(checkin.id)
+  }
+
+  const fetchSubmissions = async (checkinId: string) => {
+    try {
+      setSubmissionsLoading(true)
+      const response = await apiClient.get(`/checkins/${checkinId}/submissions`)
+      if (response.code === 0) {
+        setSubmissions(response.data.list)
+      }
+    } catch (error) {
+      console.error('获取提交列表失败:', error)
+      alert('获取提交列表失败')
+    } finally {
+      setSubmissionsLoading(false)
+    }
+  }
+
+  const openCreateModal = () => {
+    resetForm()
+    setEditingCheckin(null)
+    setShowModal(true)
+  }
+
+  const openEditModal = (checkin: Checkin) => {
+    setEditingCheckin(checkin)
+    setFormData({
+      courseId: checkin.courseId,
+      title: checkin.title,
+      content: checkin.content || '',
+      videos: (checkin.videos as VideoItem[]) || [],
+      images: (checkin.images as ImageItem[]) || [],
+      documents: (checkin.documents as DocumentItem[]) || [],
+      endTime: checkin.endTime ? new Date(checkin.endTime).toISOString().slice(0, 16) : '',
+      allowViewOthers: checkin.allowViewOthers || false,
+      tags: checkin.tags || [],
+    })
+    setShowModal(true)
+  }
+
+  const resetForm = () => {
+    setFormData({
+      courseId: '',
+      title: '',
+      content: '',
+      videos: [],
+      images: [],
+      documents: [],
+      endTime: '',
+      allowViewOthers: false,
+      tags: [],
+    })
+  }
+
+  const handleAddMedia = (type: 'video' | 'image' | 'document') => {
+    setMediaSelectorType(type)
+    setShowMediaSelector(true)
+  }
+
+  const handleMediaSelect = (item: MediaItem) => {
+    if (mediaSelectorType === 'video') {
+      setFormData({
+        ...formData,
+        videos: [...formData.videos, item as VideoItem],
+      })
+    } else if (mediaSelectorType === 'image') {
+      setFormData({
+        ...formData,
+        images: [...formData.images, item as unknown as ImageItem],
+      })
+    } else if (mediaSelectorType === 'document') {
+      setFormData({
+        ...formData,
+        documents: [...formData.documents, item as DocumentItem],
+      })
+    }
+    setShowMediaSelector(false)
+  }
+
+  const removeVideo = (index: number) => {
+    setFormData({
+      ...formData,
+      videos: formData.videos.filter((_, i) => i !== index),
+    })
+  }
+
+  const removeImage = (index: number) => {
+    setFormData({
+      ...formData,
+      images: formData.images.filter((_, i) => i !== index),
+    })
+  }
+
+  const removeDocument = (index: number) => {
+    setFormData({
+      ...formData,
+      documents: formData.documents.filter((_, i) => i !== index),
+    })
+  }
+
+  const filteredCheckins = checkins.filter((c) => {
+    const matchesKeyword = c.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                           c.course?.title?.toLowerCase().includes(keyword.toLowerCase())
+    const matchesTags = selectedTags.length === 0 || 
+                       selectedTags.some(tag => c.tags?.includes(tag))
+    return matchesKeyword && matchesTags
+  })
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="搜索打卡..."
+            className="input pl-10 w-64"
+          />
+        </div>
+        <button
+          onClick={openCreateModal}
+          className="btn-primary flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>创建打卡</span>
+        </button>
+      </div>
+
+      {/* Tag Filter */}
+      {availableTags.length > 0 && (
+        <TagFilter
+          availableTags={availableTags}
+          selectedTags={selectedTags}
+          onChange={setSelectedTags}
+          title="标签筛选"
+        />
+      )}
+
+      {/* Checkin List */}
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : filteredCheckins.length === 0 ? (
+        <div className="text-center py-12">
+          <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">暂无打卡</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCheckins.map((checkin) => (
+            <div key={checkin.id} className="card hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1 break-words">{checkin.title}</h3>
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                    <BookOpen className="w-4 h-4" />
+                    <span>{checkin.course?.title || '未知课程'}</span>
+                  </div>
+                  {checkin.tags && checkin.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {checkin.tags.map((tag, index) => (
+                        <TagBadge key={index} tag={tag} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex space-x-1 ml-2">
+                  <CheckinTokenManager
+                    checkinId={checkin.id}
+                    checkinTitle={checkin.title}
+                    allowAnonymous={checkin.allowAnonymous || false}
+                    onAllowAnonymousChange={(value) => {
+                      // 更新本地状态
+                      setCheckins(checkins.map(c => 
+                        c.id === checkin.id ? { ...c, allowAnonymous: value } : c
+                      ))
+                    }}
+                  />
+                  <button
+                    onClick={() => handleExport(checkin)}
+                    className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded"
+                    title="导出打卡数据"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleClone(checkin)}
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded"
+                    title="复制打卡"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openEditModal(checkin)}
+                    className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(checkin)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div 
+                className="text-gray-600 text-sm mb-4 line-clamp-2"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content || checkin.description || '暂无描述') }}
+              />
+
+              <div className="flex items-center justify-between text-sm">
+                <button
+                  onClick={() => openSubmissionsModal(checkin)}
+                  className="flex items-center space-x-1 text-primary hover:text-primary-hover"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>{checkin._count?.submissions || 0} 人参与</span>
+                  <Eye className="w-3 h-3 ml-1" />
+                </button>
+                <div className="flex items-center space-x-1 text-gray-500">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>由 {checkin.creator?.nickname || '未知'} 创建</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-auto">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-semibold">
+                {editingCheckin ? '编辑打卡' : '创建打卡'}
+              </h2>
+            </div>
+            
+            <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="p-6 space-y-4">
+              {/* Course Selection */}
+              <div>
+                <label className="label">选择课程 *</label>
+                <select
+                  value={formData.courseId}
+                  onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+                  className="input w-full"
+                  required
+                  disabled={!!editingCheckin}
+                >
+                  <option value="">请选择课程</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title} (课程码: {course.courseCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="label">打卡标题 *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="input w-full"
+                  placeholder="请输入打卡标题"
+                  required
+                />
+              </div>
+
+              {/* Rich Text Content */}
+              <div>
+                <label className="label">打卡内容</label>
+                <RichTextEditor
+                  value={formData.content}
+                  onChange={(content) => setFormData({ ...formData, content })}
+                  placeholder="请输入打卡内容..."
+                  height="150px"
+                />
+              </div>
+
+              {/* End Time */}
+              <div>
+                <label className="label">截止时间</label>
+                <input
+                  type="datetime-local"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  className="input w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">设置后，学生需在截止时间前完成打卡</p>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="label">标签</label>
+                <TagInput
+                  value={formData.tags}
+                  onChange={(tags) => setFormData({ ...formData, tags })}
+                  placeholder="输入标签后按回车添加"
+                />
+              </div>
+
+              {/* Allow View Others */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="allowViewOthers"
+                  checked={formData.allowViewOthers}
+                  onChange={(e) => setFormData({ ...formData, allowViewOthers: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded"
+                />
+                <label htmlFor="allowViewOthers" className="text-sm text-gray-700">
+                  允许学生查看其他人的打卡内容
+                </label>
+              </div>
+
+              {/* Videos */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="label mb-0">视频</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddMedia('video')}
+                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                  >
+                    <Video className="w-4 h-4 mr-1" />
+                    添加视频
+                  </button>
+                </div>
+                {formData.videos.length > 0 && (
+                  <div className="space-y-2">
+                    {formData.videos.map((video, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center space-x-2">
+                          <Video className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm truncate">{video.title}</span>
+                          {video.source && (
+                            <span className="text-xs text-gray-500">({video.source})</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeVideo(index)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Images */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="label mb-0">图片</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddMedia('image')}
+                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                  >
+                    <ImageIcon className="w-4 h-4 mr-1" />
+                    添加图片
+                  </button>
+                </div>
+                {formData.images.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {formData.images.map((image, index) => {
+                      const imageUrl = normalizeImageUrl(image.url)
+                      return (
+                        <div key={index} className="relative group">
+                          <img
+                            src={imageUrl}
+                            alt={image.name}
+                            className="w-full h-20 object-cover rounded"
+                            onError={handleImageError}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="label mb-0">文档</label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddMedia('document')}
+                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                  >
+                    <FileText className="w-4 h-4 mr-1" />
+                    添加文档
+                  </button>
+                </div>
+                {formData.documents.length > 0 && (
+                  <div className="space-y-2">
+                    {formData.documents.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-4 h-4 text-red-500" />
+                          <span className="text-sm truncate">{doc.title}</span>
+                          {doc.fileName && (
+                            <span className="text-xs text-gray-500">({doc.fileName})</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeDocument(index)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex space-x-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false)
+                    setEditingCheckin(null)
+                    resetForm()
+                  }}
+                  className="flex-1 btn-secondary"
+                >
+                  取消
+                </button>
+                <button type="submit" className="flex-1 btn-primary">
+                  {editingCheckin ? '保存修改' : '创建打卡'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Media Selector */}
+      <MediaSelector
+        isOpen={showMediaSelector}
+        onClose={() => setShowMediaSelector(false)}
+        onSelect={handleMediaSelect}
+        type={mediaSelectorType}
+      />
+
+      {/* Submissions Modal */}
+      {showSubmissionsModal && selectedCheckin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 my-auto max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">打卡提交列表</h2>
+                <p className="text-sm text-gray-500 mt-1">{selectedCheckin.title}</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => handleExport(selectedCheckin)}
+                  className="btn-secondary flex items-center space-x-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>导出数据</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSubmissionsModal(false)
+                    setSelectedCheckin(null)
+                    setSubmissions([])
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Stats */}
+              <div className="flex items-center space-x-4 mb-4">
+                <span className="text-sm text-gray-500">
+                  共 {submissions.length} 人提交
+                </span>
+              </div>
+
+              {submissionsLoading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              ) : submissions.length === 0 ? (
+                <div className="text-center py-12">
+                  <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">暂无提交</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {submissions.map((submission) => (
+                    <div
+                      key={submission.id}
+                      className="border rounded-lg p-4 bg-white border-gray-200"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-800">
+                              {submission.student.nickname || submission.student.username}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              提交时间: {new Date(submission.createdAt).toLocaleString('zh-CN')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 提交内容 */}
+                      {submission.content && (
+                        <div className="mt-3 p-3 bg-gray-50 rounded text-sm text-gray-700">
+                          <p className="whitespace-pre-wrap">{submission.content}</p>
+                        </div>
+                      )}
+
+                      {/* 提交图片 */}
+                      {submission.images && submission.images.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-sm font-medium text-gray-700 mb-2">提交图片:</p>
+                          <div className="grid grid-cols-4 gap-2">
+                            {submission.images.map((imageUrl, index) => {
+                              const normalizedUrl = normalizeImageUrl(imageUrl)
+                              return (
+                                <a
+                                  key={index}
+                                  href={normalizedUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors"
+                                >
+                                  <img
+                                    src={normalizedUrl}
+                                    alt={`提交图片 ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                    onError={handleImageError}
+                                  />
+                                </a>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default CheckinList

@@ -1,0 +1,26 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <view wx:elif="{{checkins.length === 0}}" class="empty-container">
+    <view class="empty-text">暂无打卡任务</view>
+  </view>
+
+  <view wx:else class="checkin-list">
+    <view 
+      class="checkin-card" 
+      wx:for="{{checkins}}" 
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCheckinTap"
+    >
+      <view class="checkin-title">{{item.title}}</view>
+      <view class="checkin-course">{{item.course && item.course.title ? item.course.title : ''}}</view>
+      <view class="checkin-footer">
+        <text class="deadline">截止: {{item.endTime || '无截止时间'}}</text>
+        <text class="tag tag-{{item.statusInfo.class}}">{{item.statusInfo.text}}</text>
+      </view>
+    </view>
+  </view>
+</view>

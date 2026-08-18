@@ -1,0 +1,16 @@
+<view class="tabs-container">
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      data-tab="{{item.key}}"
+      bindtap="onTabTap"
+    >
+      <text class="tab-text">{{item.title}}</text>
+      <view wx:if="{{showBadge && item.badge > 0}}" class="tab-badge">
+        {{item.badge > 99 ? '99+' : item.badge}}
+      </view>
+    </view>
+  </view>
+</view>

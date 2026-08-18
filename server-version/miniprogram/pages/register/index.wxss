@@ -1,0 +1,51 @@
+.register-container {
+  min-height: 100vh;
+  padding: 48rpx 64rpx;
+  background-color: var(--bg-color);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 48rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.register-form {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-base);
+  padding: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-item input {
+  letter-spacing: 2px;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-color);
+  margin-bottom: 16rpx;
+}
+
+.register-btn {
+  margin-top: 32rpx;
+  width: 100%;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 32rpx;
+}
+
+.link {
+  color: var(--primary-color);
+  font-size: 28rpx;
+}

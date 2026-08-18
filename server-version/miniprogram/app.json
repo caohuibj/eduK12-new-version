@@ -1,0 +1,68 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/register/index",
+    "pages/index/index",
+    "pages/course/detail/detail",
+    "pages/assignment/list/index",
+    "pages/assignment/submit/submit",
+    "pages/checkin/list/index",
+    "pages/checkin/submit/submit",
+    "pages/questionnaire/list/list",
+    "pages/questionnaire/assessment/assessment",
+    "pages/questionnaire/result/result",
+    "pages/questionnaire/anonymous/list",
+    "pages/profile/index/index",
+    "pages/password/index/index",
+    "pages/webview/index",
+    "pages/classroom/join/join",
+    "pages/classroom/answer/answer"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#5bc0de",
+    "navigationBarTitleText": "慧育空间",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f8fa"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#5bc0de",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "课程",
+        "iconPath": "images/icons/course.png",
+        "selectedIconPath": "images/icons/course-active.png"
+      },
+      {
+        "pagePath": "pages/assignment/list/index",
+        "text": "作业",
+        "iconPath": "images/icons/assignment.png",
+        "selectedIconPath": "images/icons/assignment-active.png"
+      },
+      {
+        "pagePath": "pages/checkin/list/index",
+        "text": "打卡",
+        "iconPath": "images/icons/checkin.png",
+        "selectedIconPath": "images/icons/checkin-active.png"
+      },
+      {
+        "pagePath": "pages/questionnaire/list/list",
+        "text": "问卷",
+        "iconPath": "images/icons/questionnaire.png",
+        "selectedIconPath": "images/icons/questionnaire-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index/index",
+        "text": "我的",
+        "iconPath": "images/icons/profile.png",
+        "selectedIconPath": "images/icons/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

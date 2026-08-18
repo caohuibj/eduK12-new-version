@@ -1,0 +1,44 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <view class="user-header">
+      <view class="avatar">👤</view>
+      <view class="user-info">
+        <view class="nickname">{{userInfo.nickname || '未设置姓名'}}</view>
+        <view class="username">{{userInfo.username}}</view>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">中文昵称</view>
+      <view class="form-item">
+        <input 
+          class="input" 
+          value="{{nickname}}"
+          bindinput="onNicknameInput"
+          placeholder="请输入中文昵称"
+        />
+      </view>
+      <button class="btn btn-primary save-btn" bindtap="onSaveNickname" loading="{{saving}}">
+        保存修改
+      </button>
+    </view>
+
+    <view class="settings-section">
+      <view class="section-title">设置</view>
+      <view class="menu-item" bindtap="onGoPassword">
+        <text class="menu-text">修改密码</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+
+    <view class="logout-section">
+      <button class="btn btn-outline logout-btn" bindtap="onLogout">
+        退出登录
+      </button>
+    </view>
+  </block>
+</view>

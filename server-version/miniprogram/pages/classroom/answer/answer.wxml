@@ -1,0 +1,101 @@
+<view class="container">
+  <!-- 等待题目 -->
+  <view wx:if="{{!question && !isFinished}}" class="waiting-container">
+    <view class="waiting-icon">📚</view>
+    <view class="waiting-text">等待教师发布题目...</view>
+    <view class="waiting-tip">请保持页面打开，随时准备答题</view>
+    <button class="btn-exit" bindtap="exitClassroom">退出课堂</button>
+  </view>
+
+  <!-- 答题已结束 -->
+  <view wx:if="{{isFinished}}" class="finished-container">
+    <view class="finished-icon">✅</view>
+    <view class="finished-text">答题已结束</view>
+    <button class="btn-primary" bindtap="exitClassroom">返回首页</button>
+  </view>
+
+  <!-- 答题页面 -->
+  <view wx:if="{{question && !isFinished}}" class="answer-container">
+    <!-- 倒计时 -->
+    <view wx:if="{{countdown > 0}}" class="countdown-container {{countdown <= 10 ? 'countdown-warning' : ''}}">
+      <view class="countdown-label">剩余时间</view>
+      <view class="countdown-value">{{countdown}}秒</view>
+    </view>
+
+    <!-- 题目信息 -->
+    <view class="question-container">
+      <view class="question-header">
+        <view class="question-number">第 {{question.questionIndex}} 题</view>
+        <view class="question-type">
+          {{questionType === 'SINGLE_CHOICE' ? '单选题' : questionType === 'MULTIPLE_CHOICE' ? '多选题' : '判断题'}}
+        </view>
+      </view>
+      
+      <view class="question-content">
+        {{question.questionContent.question}}
+      </view>
+    </view>
+
+    <!-- 选项列表 -->
+    <view class="options-container">
+      <!-- 单选题 -->
+      <block wx:if="{{questionType === 'SINGLE_CHOICE'}}">
+        <view 
+          wx:for="{{options}}" 
+          wx:key="value"
+          class="option-item {{answer === item.value ? 'option-selected' : ''}} {{submitted ? 'option-disabled' : ''}}"
+          bindtap="selectAnswer"
+          data-answer="{{item.value}}"
+        >
+          <view class="option-label">{{item.label}}.</view>
+          <view class="option-text">{{item.text}}</view>
+          <view wx:if="{{answer === item.value}}" class="option-check">✓</view>
+        </view>
+      </block>
+
+      <!-- 多选题 -->
+      <block wx:if="{{questionType === 'MULTIPLE_CHOICE'}}">
+        <view 
+          wx:for="{{options}}" 
+          wx:key="value"
+          class="option-item {{multiAnswers.indexOf(item.value) > -1 ? 'option-selected' : ''}} {{submitted ? 'option-disabled' : ''}}"
+          bindtap="toggleMultiAnswer"
+          data-option="{{item.value}}"
+        >
+          <view class="option-label">{{item.label}}.</view>
+          <view class="option-text">{{item.text}}</view>
+          <view wx:if="{{multiAnswers.indexOf(item.value) > -1}}" class="option-check">✓</view>
+        </view>
+      </block>
+
+      <!-- 判断题 -->
+      <block wx:if="{{questionType === 'TRUE_FALSE'}}">
+        <view 
+          wx:for="{{options}}" 
+          wx:key="value"
+          class="option-item {{answer === item.value ? 'option-selected' : ''}} {{submitted ? 'option-disabled' : ''}}"
+          bindtap="selectAnswer"
+          data-answer="{{item.value}}"
+        >
+          <view class="option-text">{{item.label}}</view>
+          <view wx:if="{{answer === item.value}}" class="option-check">✓</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-container">
+      <button 
+        wx:if="{{!submitted}}"
+        class="btn-submit"
+        bindtap="submitAnswer"
+      >
+        提交答案
+      </button>
+      <view wx:else class="submitted-tip">
+        <text class="submitted-icon">✅</text>
+        <text class="submitted-text">已提交，等待下一题</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,39 @@
+<view class="container">
+  <!-- 标题 -->
+  <view class="header">
+    <text class="title">匿名问卷测评</text>
+    <text class="subtitle">无需登录即可参与</text>
+  </view>
+
+  <!-- 问卷列表 -->
+  <view class="questionnaire-list" wx:if="{{!loading && questionnaires.length > 0}}">
+    <view 
+      class="questionnaire-card" 
+      wx:for="{{questionnaires}}" 
+      wx:key="id"
+      data-token="{{item.token}}"
+      bindtap="startQuestionnaire"
+    >
+      <view class="questionnaire-info">
+        <text class="questionnaire-name">{{item.name}}</text>
+        <text class="questionnaire-desc" wx:if="{{item.description}}">{{item.description}}</text>
+        <view class="questionnaire-meta">
+          <text class="meta-item">预计用时：{{item.estimatedTime || 15}}分钟</text>
+        </view>
+      </view>
+      <view class="questionnaire-action">
+        <text class="action-text">开始测评</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && questionnaires.length === 0}}">
+    <text class="empty-text">暂无可用的匿名问卷</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

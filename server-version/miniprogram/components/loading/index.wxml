@@ -1,0 +1,9 @@
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-spinner" wx:if="{{type === 'spinner'}}">
+    <view class="spinner"></view>
+    <text class="loading-text" wx:if="{{text}}">{{text}}</text>
+  </view>
+  <view class="loading-skeleton" wx:else>
+    <view class="skeleton-item" wx:for="{{3}}" wx:key="index"></view>
+  </view>
+</view>

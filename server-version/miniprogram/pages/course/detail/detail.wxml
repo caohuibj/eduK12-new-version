@@ -1,0 +1,163 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <!-- 课程信息 -->
+    <view class="course-info">
+      <view class="course-header">
+        <view class="course-icon">
+          <text class="icon-text">📚</text>
+        </view>
+        <view class="course-content">
+          <view class="course-title">{{course.title}}</view>
+          <view class="course-desc" wx:if="{{course.description}}">{{course.description}}</view>
+          <view class="course-meta">
+            <text class="meta-item">👥 {{course.studentCount || 0}}名学员</text>
+            <text class="meta-item">📋 课程号: {{course.courseCode}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Tab 切换 -->
+    <view class="tabs-container">
+      <view class="tabs">
+        <view 
+          class="tab-item {{activeTab === 'assignments' ? 'active' : ''}}"
+          data-tab="assignments"
+          bindtap="onSwitchTab"
+        >
+          <text class="tab-text">作业</text>
+          <view wx:if="{{uncompletedAssignments > 0}}" class="tab-badge">
+            {{uncompletedAssignments > 99 ? '99+' : uncompletedAssignments}}
+          </view>
+        </view>
+        <view 
+          class="tab-item {{activeTab === 'checkins' ? 'active' : ''}}"
+          data-tab="checkins"
+          bindtap="onSwitchTab"
+        >
+          <text class="tab-text">打卡</text>
+          <view wx:if="{{uncompletedCheckins > 0}}" class="tab-badge">
+            {{uncompletedCheckins > 99 ? '99+' : uncompletedCheckins}}
+          </view>
+        </view>
+        <view 
+          class="tab-item {{activeTab === 'questionnaires' ? 'active' : ''}}"
+          data-tab="questionnaires"
+          bindtap="onSwitchTab"
+        >
+          <text class="tab-text">问卷</text>
+          <view wx:if="{{uncompletedQuestionnaires > 0}}" class="tab-badge">
+            {{uncompletedQuestionnaires > 99 ? '99+' : uncompletedQuestionnaires}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 作业列表 -->
+    <view wx:if="{{activeTab === 'assignments'}}" class="list-container">
+      <view wx:if="{{assignments.length === 0}}" class="empty-container">
+        <view class="empty-icon">📝</view>
+        <view class="empty-text">暂无作业</view>
+      </view>
+      <view wx:else class="item-list">
+        <view 
+          class="item-card" 
+          wx:for="{{assignments}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onAssignmentTap"
+        >
+          <view class="item-header">
+            <view class="item-title">{{item.title}}</view>
+            <view wx:if="{{item.isNew}}" class="new-badge">新</view>
+          </view>
+          <view class="item-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="item-footer">
+            <view class="item-info">
+              <text class="item-deadline {{item.isOverdue && !item.submitted ? 'overdue' : ''}}">
+                ⏰ 截止: {{item.deadline || '无截止时间'}}
+              </text>
+            </view>
+            <view class="tag {{item.submitted ? 'tag-success' : item.isOverdue ? 'tag-disabled' : 'tag-warning'}}">
+              <text class="tag-icon">{{item.submitted ? '✓' : item.isOverdue ? '✕' : '○'}}</text>
+              <text>{{item.submitted ? '已提交' : item.isOverdue ? '已截止' : '进行中'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 打卡列表 -->
+    <view wx:if="{{activeTab === 'checkins'}}" class="list-container">
+      <view wx:if="{{checkins.length === 0}}" class="empty-container">
+        <view class="empty-icon">📅</view>
+        <view class="empty-text">暂无打卡</view>
+      </view>
+      <view wx:else class="item-list">
+        <view 
+          class="item-card" 
+          wx:for="{{checkins}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onCheckinTap"
+        >
+          <view class="item-header">
+            <view class="item-title">{{item.title}}</view>
+            <view wx:if="{{item.isNew}}" class="new-badge">新</view>
+          </view>
+          <view class="item-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="item-footer">
+            <view class="item-info">
+              <text class="item-deadline {{item.isOverdue && !item.submitted ? 'overdue' : ''}}">
+                ⏰ 截止: {{item.endTime || '无截止时间'}}
+              </text>
+            </view>
+            <view class="tag {{item.submitted ? 'tag-success' : item.isOverdue ? 'tag-disabled' : 'tag-warning'}}">
+              <text class="tag-icon">{{item.submitted ? '✓' : item.isOverdue ? '✕' : '○'}}</text>
+              <text>{{item.submitted ? '已打卡' : item.isOverdue ? '已截止' : '进行中'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问卷列表 -->
+    <view wx:if="{{activeTab === 'questionnaires'}}" class="list-container">
+      <view wx:if="{{questionnaires.length === 0}}" class="empty-container">
+        <view class="empty-icon">📋</view>
+        <view class="empty-text">暂无问卷</view>
+      </view>
+      <view wx:else class="item-list">
+        <view
+          class="item-card" 
+          wx:for="{{questionnaires}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          data-completed="{{item.completed}}"
+          data-assessmentid="{{item.assessmentId}}"
+          bindtap="onQuestionnaireTap"
+        >
+          <view class="item-header">
+            <view class="item-title">{{item.name}}</view>
+            <view wx:if="{{item.isNew}}" class="new-badge">新</view>
+          </view>
+          <view class="item-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="item-footer">
+            <view class="item-info">
+              <text class="item-meta">📊 {{item.scaleCount || 0}}个量表</text>
+              <text class="item-meta" wx:if="{{item.estimatedTime}}">⏱ 预计{{item.estimatedTime}}分钟</text>
+            </view>
+            <view class="tag {{item.completed ? 'tag-success' : 'tag-primary'}}">
+              <text class="tag-icon">{{item.completed ? '✓' : '○'}}</text>
+              <text>{{item.completed ? '已完成' : '开始测评'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

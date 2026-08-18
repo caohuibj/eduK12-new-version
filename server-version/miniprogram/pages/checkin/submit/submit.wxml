@@ -1,0 +1,180 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <view class="checkin-header">
+      <view class="title">{{checkin.title}}</view>
+      <view class="desc">{{checkin.description || contentText || ''}}</view>
+      <view class="deadline">截止: {{checkin.endTime || '无截止时间'}}</view>
+    </view>
+
+    <!-- B站视频 -->
+    <view wx:if="{{iframeVideos.length > 0}}" class="media-section">
+      <view class="section-title">视频资料</view>
+      <view class="video-list">
+        <view 
+          wx:for="{{iframeVideos}}" 
+          wx:key="index"
+          class="video-external"
+          data-url="{{item.url}}"
+          data-bvid="{{item.bvid}}"
+          bindtap="onIframeVideoTap"
+        >
+          <view class="video-icon">🔗</view>
+          <view class="video-info">
+            <view class="video-title">{{item.title}}</view>
+            <view class="video-link">{{item.url}}</view>
+          </view>
+          <view class="video-tip">点击复制链接</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 打卡关联视频 -->
+    <view wx:if="{{checkinVideos && checkinVideos.length > 0}}" class="media-section">
+      <view class="section-title">视频资料</view>
+      <view class="video-list">
+        <view 
+          wx:for="{{checkinVideos}}" 
+          wx:key="index"
+        >
+          <video 
+            wx:if="{{item.type === 'library'}}"
+            class="video-player"
+            src="{{baseUrl}}{{item.url}}"
+            title="{{item.title}}"
+            enable-danmu="{{false}}"
+            show-center-play-btn="{{true}}"
+          />
+          <view wx:else class="video-external" data-url="{{item.url}}" data-title="{{item.title}}" bindtap="onExternalVideoTap">
+            <view class="video-icon">▶</view>
+            <view class="video-title">{{item.title}}</view>
+            <view class="video-tip">点击查看外部视频</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 打卡关联图片 -->
+    <view wx:if="{{checkinImages && checkinImages.length > 0}}" class="media-section">
+      <view class="section-title">相关图片</view>
+      <view class="image-list">
+        <image 
+          class="image-item" 
+          wx:for="{{checkinImages}}" 
+          wx:key="index"
+          src="{{baseUrl}}{{item.url || item}}"
+          mode="aspectFit"
+          data-url="{{item.url || item}}"
+          bindtap="onCheckinImageTap"
+        />
+      </view>
+    </view>
+
+    <view class="content-section">
+      <view class="section-title">打卡内容</view>
+      <textarea 
+        class="content-input"
+        placeholder="记录你的学习内容和心得..."
+        value="{{content}}"
+        bindinput="onContentInput"
+        disabled="{{!!submission}}"
+      />
+    </view>
+
+    <view wx:if="{{!submission}}" class="images-section">
+      <view class="section-title">上传图片</view>
+      <view class="image-grid">
+        <view 
+          class="image-item" 
+          wx:for="{{images}}" 
+          wx:key="index"
+        >
+          <image 
+            class="preview-image" 
+            src="{{item}}" 
+            mode="aspectFill"
+            data-src="{{item}}"
+            bindtap="onPreviewImage"
+          />
+          <view 
+            wx:if="{{!submission}}"
+            class="delete-btn"
+            data-index="{{index}}"
+            bindtap="onDeleteImage"
+          >×</view>
+        </view>
+        <view 
+          wx:if="{{!submission && images.length < 9}}"
+          class="add-image"
+          bindtap="onChooseImage"
+        >
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+      <view class="image-tip">最多上传9张图片</view>
+    </view>
+
+    <view wx:if="{{submission}}" class="submitted-info">
+      <view class="section-title">已打卡</view>
+      <view class="submitted-time">提交时间: {{submission.createdAt}}</view>
+    </view>
+
+    <!-- 查看他人打卡按钮 -->
+    <view wx:if="{{submission && checkin.allowViewOthers}}" class="view-others-section">
+      <button class="btn btn-secondary" bindtap="onViewOthers" loading="{{loadingOthers}}">
+        {{showOthers ? '收起他人打卡' : '查看他人打卡'}}
+      </button>
+    </view>
+
+    <!-- 他人打卡列表 -->
+    <view wx:if="{{showOthers && othersSubmissions.length > 0}}" class="others-section">
+      <view class="section-title">他人打卡 ({{othersSubmissions.length}}人)</view>
+      <view class="others-list">
+        <view wx:for="{{othersSubmissions}}" wx:key="id" class="others-card">
+          <view class="others-header">
+            <view class="others-avatar">{{item.student.nickname[0] || item.student.username[0]}}</view>
+            <view class="others-info">
+              <view class="others-name">{{item.student.nickname || item.student.username}}</view>
+              <view class="others-time">{{item.createdAt}}</view>
+            </view>
+          </view>
+          <view wx:if="{{item.content}}" class="others-content">{{item.content}}</view>
+          <view wx:if="{{item.images && item.images.length > 0}}" class="others-images">
+            <image 
+              wx:for="{{item.images}}" 
+              wx:for-item="img"
+              wx:key="index"
+              class="others-image"
+              src="{{baseUrl}}{{img}}"
+              mode="aspectFill"
+              data-url="{{img}}"
+              data-index="{{index}}"
+              data-submission-index="{{index}}"
+              bindtap="onPreviewOthersImage"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{showOthers && othersSubmissions.length === 0}}" class="others-empty">
+      暂无他人打卡
+    </view>
+
+    <!-- 过期提示（允许查看内容） -->
+    <view wx:if="{{checkin.isExpired && !submission}}" class="expired-section">
+      <view class="expired-icon">⏰</view>
+      <view class="expired-text">打卡已截止</view>
+    </view>
+
+    <view wx:elif="{{!submission}}" class="submit-section">
+      <button class="btn btn-primary" bindtap="onSubmit" loading="{{submitting}}">
+        提交打卡
+      </button>
+    </view>
+  </block>
+</view>

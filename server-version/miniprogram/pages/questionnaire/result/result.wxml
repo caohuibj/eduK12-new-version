@@ -1,0 +1,125 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <block wx:else>
+    <!-- 总体结果 -->
+    <view class="result-card">
+      <view class="result-title">{{report.questionnaireName || '测评报告'}}</view>
+      <view class="result-meta">
+        <text wx:if="{{report.completedAt}}">{{report.completedAt}}</text>
+        <text wx:if="{{report.totalTime > 0}}"> · 用时 {{report.totalTime}} 分钟</text>
+      </view>
+      <view class="result-stats">
+        <view class="stat-item">
+          <text class="stat-value">{{report.averageScore || report.totalScore || 0}}</text>
+          <text class="stat-label">平均分</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{report.totalDimensions || 0}}</text>
+          <text class="stat-label">评估维度</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{report.scaleReports.length || 0}}</text>
+          <text class="stat-label">量表数</text>
+        </view>
+      </view>
+      <view class="result-summary" wx:if="{{report.summary}}">
+        {{report.summary}}
+      </view>
+    </view>
+
+    <!-- 各量表详细报告 -->
+    <view class="scales-section" wx:if="{{report.scaleReports.length > 0}}">
+      <view class="section-title">量表分析</view>
+      <block wx:for="{{report.scaleReports}}" wx:key="scaleId">
+        <view class="scale-card">
+          <view class="scale-header">
+            <view class="scale-name">{{item.scaleName}}</view>
+          </view>
+          <view class="scale-summary" wx:if="{{item.summary}}">
+            {{item.summary}}
+          </view>
+          <!-- 量表维度 -->
+          <view class="scale-dimensions" wx:if="{{item.dimensions.length > 0}}">
+            <view class="dimension-item" wx:for="{{item.dimensions}}" wx:for-item="dim" wx:key="name">
+              <view class="dimension-row">
+                <text class="dimension-name">{{dim.name}}</text>
+                <text class="dimension-level {{dim.levelClass}}">{{dim.levelText}}</text>
+              </view>
+              <view class="dimension-score-bar">
+                <text class="score-label">{{dim.minScore || 0}}</text>
+                <view class="dimension-bar">
+                  <view class="dimension-fill {{dim.levelClass}}" style="width: {{dim.percent || 0}}%"></view>
+                </view>
+                <text class="score-label">{{dim.maxScore || 100}}</text>
+              </view>
+              <view class="score-display">
+                <text class="score-value">{{dim.normalizedScore || dim.score || 0}}分</text>
+              </view>
+              <view class="dimension-feedback" wx:if="{{dim.feedback || dim.interpretation}}">
+                {{dim.feedback || dim.interpretation}}
+              </view>
+              <!-- 维度建议 -->
+              <view class="dimension-suggestions" wx:if="{{dim.suggestions.length > 0}}">
+                <view class="suggestion-title">建议</view>
+                <view class="suggestion-item" wx:for="{{dim.suggestions}}" wx:for-item="sug" wx:key="index">
+                  <text class="suggestion-dot">•</text>
+                  <text>{{sug}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 维度分析汇总 -->
+    <view class="dimensions-card" wx:if="{{report.dimensions.length > 0 && report.scaleReports.length === 0}}">
+      <view class="card-title">维度分析</view>
+      <view class="dimension-list">
+        <view class="dimension-item" wx:for="{{report.dimensions}}" wx:key="name">
+          <view class="dimension-header">
+            <text class="dimension-name">{{item.name}}</text>
+            <text class="dimension-level {{item.levelClass}}">{{item.levelName || item.levelText}}</text>
+          </view>
+          <view class="dimension-score-bar">
+            <text class="score-label">{{item.score || 0}}</text>
+            <view class="dimension-bar">
+              <view class="dimension-fill {{item.levelClass}}" style="width: {{item.percent}}%"></view>
+            </view>
+            <text class="score-label">100</text>
+          </view>
+          <view class="dimension-feedback" wx:if="{{item.feedback || item.interpretation}}">
+            {{item.feedback || item.interpretation}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 建议 -->
+    <view class="suggestions-card" wx:if="{{report.suggestions.length > 0}}">
+      <view class="card-title">建议</view>
+      <view class="suggestion-list">
+        <view class="suggestion-item" wx:for="{{report.suggestions}}" wx:key="index">
+          <view class="suggestion-icon">💡</view>
+          <text class="suggestion-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 错误提示 -->
+    <view class="error-card" wx:if="{{error}}">
+      <view class="error-icon">⚠️</view>
+      <view class="error-text">{{error}}</view>
+      <button class="retry-btn" bindtap="loadReport">重试</button>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="footer-actions">
+      <button class="action-btn secondary" bindtap="onBack">返回</button>
+      <button class="action-btn primary" open-type="share">分享报告</button>
+    </view>
+  </block>
+</view>

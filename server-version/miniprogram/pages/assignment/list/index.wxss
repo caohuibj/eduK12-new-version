@@ -1,0 +1,135 @@
+.page-container {
+  padding: 24rpx;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0f7ff 0%, #f7f8fa 100%);
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+}
+
+.assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 作业卡片 - 优化版 */
+.assignment-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.assignment-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6rpx;
+  height: 100%;
+  background: linear-gradient(180deg, #5bc0de, #4a9ec2);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.assignment-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.assignment-card:active::before {
+  opacity: 1;
+}
+
+.assignment-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 10rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.assignment-course {
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.assignment-course::before {
+  content: '📚';
+  font-size: 20rpx;
+}
+
+.assignment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.deadline {
+  font-size: 24rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.deadline::before {
+  content: '⏰';
+  font-size: 20rpx;
+}
+
+/* 状态标签 - 优化版 */
+.tag-submitted {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+  color: #28a745;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.tag-ongoing {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.15));
+  color: #d97706;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.tag-expired {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.15));
+  color: #dc3545;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}

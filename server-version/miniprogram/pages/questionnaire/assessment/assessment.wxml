@@ -1,0 +1,114 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:elif="{{error}}">
+    <view class="error-container">
+      <text class="error-text">{{error}}</text>
+      <button class="retry-btn" bindtap="loadQuestionnaire">重试</button>
+    </view>
+  </block>
+
+  <block wx:elif="{{items.length === 0}}">
+    <view class="error-container">
+      <text class="error-text">量表暂无题目</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- 整体进度 -->
+    <view class="overall-progress">
+      <view class="progress-header">
+        <text class="progress-label">量表 {{currentScaleIndex + 1}} / {{totalScales}}</text>
+        <text class="scale-name">{{currentScale.name}}</text>
+      </view>
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{overallProgress}}%"></view>
+      </view>
+    </view>
+
+    <!-- 当前量表进度 -->
+    <view class="scale-progress">
+      <view class="scale-progress-header">
+        <text class="scale-progress-label">当前量表进度</text>
+        <text class="scale-progress-count">{{answeredCount}} / {{items.length}}</text>
+      </view>
+      <view class="scale-progress-track">
+        <view class="scale-progress-fill" style="width: {{scaleProgress}}%"></view>
+      </view>
+    </view>
+
+    <!-- 当前题目 -->
+    <view class="question-card">
+      <view class="question-header">
+        <text class="question-number">第 {{currentIndex + 1}} 题 / 共 {{items.length}} 题</text>
+      </view>
+      <view class="question-content">
+        <text class="question-text">{{currentItem.text}}</text>
+      </view>
+
+      <!-- 选项 -->
+      <view class="options-container">
+        <view 
+          wx:for="{{currentItem.options}}"
+          wx:key="value"
+          class="option-item {{answers[currentItem.id] === item.value ? 'selected' : ''}}"
+          data-item-id="{{currentItem.id}}"
+          data-value="{{item.value}}"
+          bindtap="onAnswer"
+        >
+          <text class="option-value">{{item.value}}.</text>
+          <text class="option-label">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 导航按钮 -->
+    <view class="nav-buttons">
+      <button 
+        class="nav-btn prev-btn {{currentIndex === 0 ? 'disabled' : ''}}"
+        bindtap="onPrev"
+        disabled="{{currentIndex === 0}}"
+      >
+        上一题
+      </button>
+
+      <block wx:if="{{currentIndex === items.length - 1}}">
+        <button 
+          class="nav-btn submit-btn"
+          bindtap="onCompleteScale"
+          loading="{{submitting}}"
+          disabled="{{submitting}}"
+        >
+          {{submitting ? '提交中...' : '完成量表'}}
+        </button>
+      </block>
+      <block wx:else>
+        <button class="nav-btn next-btn" bindtap="onNext">
+          下一题
+        </button>
+      </block>
+    </view>
+
+    <!-- 题目导航（可选展开） -->
+    <view class="question-nav">
+      <view class="nav-header" bindtap="toggleNav">
+        <text class="nav-title">题目导航</text>
+        <text class="nav-toggle">{{showNav ? '收起' : '展开'}}</text>
+      </view>
+      <view class="nav-grid {{showNav ? 'show' : ''}}">
+        <view 
+          wx:for="{{items}}" 
+          wx:key="id"
+          class="nav-item {{currentIndex === index ? 'current' : ''}} {{answers[item.id] ? 'answered' : ''}}"
+          data-index="{{index}}"
+          bindtap="onNavToQuestion"
+        >
+          {{index + 1}}
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
