@@ -2,7 +2,7 @@
 
 **仓库：** `caohuibj/eduK12-new-version`
 **本地路径：** `/Users/Qiang/Documents/trae_projects/eduK12-new-version`
-**基线 commit：** `8fb30f6cd2a8de8b3c68ca439e68692ecd00b9d6`（tag: `upstream-eduk12-server-v1` / `local-baseline-v1`）
+**导入基线 commit（冻结于 `import/server-version`）：** `8fb30f6cd2a8de8b3c68ca439e68692ecd00b9d6`（tag: `upstream-eduk12-server-v1` / `local-baseline-v1`；即原始 `server-version` 子树导入点，与 Host Baseline 运行代码无关）
 **依据：** `Huisurvey_Host_Baseline_Execution_Plan_v0.2.md`
 **执行日期：** 2026-08-18
 **执行人：** WorkBuddy（Craft 模式）
@@ -29,7 +29,7 @@
 
 | Gate | 内容 | 结果 | 关键证据 |
 |---|---|---|---|
-| **B1** | Git Baseline | ✅ PASS | `main`==`8fb30f6`；`dev` 已建并推送 `origin/dev`；`import/server-version` 冻结保留；源 tag 保留 |
+| **B1** | Git Baseline | ✅ PASS | `import/server-version` 冻结于 `8fb30f6`；`host-baseline-v1`=fcd09fd（已验证基线）；`dev`+`main` 同源同步、默认分支=main；源 tag 保留 |
 | **B2** | Host 工具链 | ✅ PASS | node/npm/docker/ffmpeg 版本齐备 |
 | **B3** | PostgreSQL / Redis（Docker） | ✅ PASS | `pg_isready` 接受连接；`redis-cli ping`=PONG；`SET/GET eduk12-host-baseline`=ok |
 | **B4** | Backend `npm ci` | ✅ PASS | 退出 0；lockfile 镜像已修复（FIND-3）；canvas 原生编译 OK（RISK-1） |
@@ -95,16 +95,30 @@
 - 基线修复已提交（lockfile + migrations），`host-baseline-v1` tag 已打并推送 origin，指向已验证 commit。
 - `import/server-version` 冻结，不再开发。
 
-### 6.2 GitHub 默认分支切换（已完成 ✅）
+### 6.2 GitHub 默认分支切换与分支纪律（已完成 ✅）
 
-**默认分支已切到 `main`**（原 `import/server-version` → `main`）。
+**默认分支：`import/server-version` → `main`**（已通过 GitHub API 完成，详见前版本记录）。
 
-- 说明：本环境最初无 `gh`/token，计划标注为“需手动”。后因用户提供了具有 `repo` scope 的 Personal Access Token，改用 GitHub API 完成：
-  - 远程 `main_pre`（基线 `8fb30f6`）经 `POST /branches/main_pre/rename` 改名为 `main`；
-  - 本地将 `main` 快进到 `dev`（`fcd09fd`，含全部基线修复）；
-  - `PATCH /repos/...` 设 `default_branch=main`（返回 200）。
-- 验证：`git ls-remote --symref origin HEAD` → `ref: refs/heads/main`。
-- 最终：`main` == `dev` == `fcd09fd`；`import/server-version` 冻结于 `8fb30f6`。
+**Git 拓扑（最终、闭合）：**
+
+```
+upstream / source baseline
+        │
+        8fb30f6   ← import/server-version [frozen]，原始导入基线
+        │
+        ▼
+     fcd09fd   ← host-baseline-v1 [immutable]，经 Host Baseline 验证的代码状态
+        │
+        ▼
+   documentation cleanup (本提交)   ← main == dev == 本提交，二者同步
+```
+
+- `import/server-version` = `8fb30f6`（冻结，原始 `server-version` 子树导入点；源 tag `upstream-eduk12-server-v1` / `local-baseline-v1` 指向同一 commit）。
+- `host-baseline-v1` tag = `fcd09fd`（**不可移动**；永久表示真正经过 Host Baseline 测试的代码状态）。
+- `main` == `dev` == 本提交（文档收尾 commit），二者经 `dev → main` 同步，无偏离；默认分支 = `main`。
+- 既往偏离说明（已修正）：`main` 曾领先 `dev` 一个仅修改本报告的文档提交（`3c0dd29`），不符合 `main ← dev` 纪律；本次通过 `dev` FF 到 `main`、在 `dev` 上统一修正本报告、再 `dev → main` FF 合入，已闭合。
+
+- 验证：`git ls-remote --symref origin HEAD` → `ref: refs/heads/main`；`origin/main` 与 `origin/dev` SHA 一致；`host-baseline-v1` 仍指向 `fcd09fd`。
 
 > ⚠️ 该 PAT 为一次性使用，建议用后即焚（GitHub Settings → Developer settings → Personal access tokens 撤销）。
 
