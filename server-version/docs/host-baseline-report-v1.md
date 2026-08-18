@@ -95,20 +95,18 @@
 - 基线修复已提交（lockfile + migrations），`host-baseline-v1` tag 已打并推送 origin，指向已验证 commit。
 - `import/server-version` 冻结，不再开发。
 
-### 6.2 需用户手动处理（⚠️ 重要）
-**GitHub 默认分支：`import/server-version` → `main`**
+### 6.2 GitHub 默认分支切换（已完成 ✅）
 
-本环境无 `gh` CLI、无 GITHUB_TOKEN、GitHub MCP 无“设默认分支”工具，无法自动化。请手动操作：
-1. 打开 `https://github.com/caohuibj/eduK12-new-version/settings/branches`
-2. Default branch → 改为 **`main`**
-3. 保存。
+**默认分支已切到 `main`**（原 `import/server-version` → `main`）。
 
-验证（可在本机执行）：
-```
-git fetch origin
-git branch -a
-git rev-parse origin/main origin/dev origin/import/server-version
-```
+- 说明：本环境最初无 `gh`/token，计划标注为“需手动”。后因用户提供了具有 `repo` scope 的 Personal Access Token，改用 GitHub API 完成：
+  - 远程 `main_pre`（基线 `8fb30f6`）经 `POST /branches/main_pre/rename` 改名为 `main`；
+  - 本地将 `main` 快进到 `dev`（`fcd09fd`，含全部基线修复）；
+  - `PATCH /repos/...` 设 `default_branch=main`（返回 200）。
+- 验证：`git ls-remote --symref origin HEAD` → `ref: refs/heads/main`。
+- 最终：`main` == `dev` == `fcd09fd`；`import/server-version` 冻结于 `8fb30f6`。
+
+> ⚠️ 该 PAT 为一次性使用，建议用后即焚（GitHub Settings → Developer settings → Personal access tokens 撤销）。
 
 ### 6.3 后续建议（非阻塞）
 - 生产前改 seed 硬编码口令（KI-002）、统一 Redis 配置（KI-001）。
