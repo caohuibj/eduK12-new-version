@@ -131,6 +131,8 @@ services:
     environment:
       DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
       NODE_ENV: production
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-rateK12admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-2026coding}
     command: npm run db:seed
     depends_on:
       postgres:

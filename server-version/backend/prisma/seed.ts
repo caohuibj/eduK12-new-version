@@ -16,9 +16,9 @@ async function main() {
     return
   }
 
-  // 创建默认管理员账号
-  const adminUsername = 'rateK12admin'
-  const adminPassword = '2026coding'
+  // 创建默认管理员账号（凭据优先来自环境变量，便于不同部署定制）
+  const adminUsername = process.env.ADMIN_USERNAME || 'rateK12admin'
+  const adminPassword = process.env.ADMIN_PASSWORD || '2026coding'
   const hashedPassword = await bcrypt.hash(adminPassword, 10)
 
   const admin = await prisma.user.create({
