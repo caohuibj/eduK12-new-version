@@ -125,7 +125,7 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
       const result: CognitiveResult | null =
         d.result ??
         (typeof d.score === 'number'
-          ? { score: d.score, metrics: d.metrics, qualityFlags: d.qualityFlags }
+          ? { score: d.score, metrics: d.metrics ?? {}, qualityFlags: d.qualityFlags ?? {} }
           : null)
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })

@@ -94,9 +94,9 @@ Stage B commits（feature/cognitive-runner，全部已 push）：
   533090e  feat(cognitive): add frontend registry and api contract
   8dc1a1c  feat(cognitive): add runner shell and routes
   751fe56  feat(cognitive): add fake task flow
-  <commit5> test(cognitive): cover fake runner browser checkpoint
-  <commit6> docs(cognitive): close frontend framework checkpoint（本条）
-HEAD: <push 后 HEAD>
+  d5c6977  test(cognitive): cover fake runner browser checkpoint
+  41c6a55  docs(cognitive): close frontend framework checkpoint（本条）
+HEAD: 41c6a551b2057bd534d98eb5d851c3eee9426fbe（后续收尾修复会推进，见 §7.1）
 ```
 
 ## 8. 已知事项 / 偏差（如实记录）
@@ -130,3 +130,8 @@ HEAD: <push 后 HEAD>
 ```
 
 **Milestone D 完成判定**：本阶段把 Frontend 框架与 Fake E2E 贯通（§35 链路：Auth→Assignment→Home→Registry→Runner→FakeTask→Session→Encrypted Trial→Server Scoring→Encrypted Result→Result Page 全部走通）；**剩余 Blockers 仅剩 Stage A 的 GitHub 访问与 merge**，闭合后即可正式进入 Reaction。
+
+## 7.1 收尾修复（typecheck 收口）
+
+E2E 后复跑 typecheck 暴露 1 处类型问题（complete 结果归一化时 metrics/qualityFlags 可空），已修：
+`useCognitiveSession.ts` → `metrics: d.metrics ?? {}`、`qualityFlags: d.qualityFlags ?? {}`；typecheck / 32 tests / build 复跑全 PASS。另将 vite 配置加载产生的 `*.timestamp-*.mjs` 临时文件加入 frontend .gitignore。
