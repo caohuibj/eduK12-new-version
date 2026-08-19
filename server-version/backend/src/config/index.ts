@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
 import path from 'path'
+import { HEX_32_BYTE_KEY } from '../utils/encryption'
 
 dotenv.config()
 
@@ -76,13 +77,13 @@ if (rawConfig.nodeEnv === 'production') {
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
     throw new Error('❌ JWT_SECRET must be set and at least 32 characters in production mode')
   }
-  if (!process.env.DATA_ENCRYPTION_KEY || process.env.DATA_ENCRYPTION_KEY.length !== 64) {
+  if (!process.env.DATA_ENCRYPTION_KEY || !HEX_32_BYTE_KEY.test(process.env.DATA_ENCRYPTION_KEY)) {
     throw new Error('❌ DATA_ENCRYPTION_KEY must be set and exactly 64 hex characters (32 bytes) in production mode')
   }
   // Cognitive 关闭时，旧 eduK12 系统仍应正常启动（模块隔离原则）：
   // 仅当 COGNITIVE_MODULE_ENABLED=true 才强制要求 DATA_PSEUDONYM_KEY。
   if (rawConfig.cognitiveModuleEnabled) {
-    if (!process.env.DATA_PSEUDONYM_KEY || process.env.DATA_PSEUDONYM_KEY.length !== 64) {
+    if (!process.env.DATA_PSEUDONYM_KEY || !HEX_32_BYTE_KEY.test(process.env.DATA_PSEUDONYM_KEY)) {
       throw new Error('❌ DATA_PSEUDONYM_KEY must be set and exactly 64 hex characters (32 bytes) when COGNITIVE_MODULE_ENABLED=true in production mode')
     }
   }

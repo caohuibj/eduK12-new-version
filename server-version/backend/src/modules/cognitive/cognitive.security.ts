@@ -1,5 +1,5 @@
 import { createHmac } from 'crypto'
-import { encryptField, decryptField } from '../../utils/encryption'
+import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encryption'
 
 /**
  * Cognitive 域专用安全助手。
@@ -27,8 +27,8 @@ export interface CognitiveEnvelope<T> {
 
 const getPseudonymKey = (): Buffer => {
   const key = process.env.DATA_PSEUDONYM_KEY
-  if (!key || key.length !== 64) {
-    throw new Error('DATA_PSEUDONYM_KEY must be 64 hex characters (32 bytes)')
+  if (!key || !HEX_32_BYTE_KEY.test(key)) {
+    throw new Error('DATA_PSEUDONYM_KEY must be exactly 64 hex characters (32 bytes)')
   }
   return Buffer.from(key, 'hex')
 }
@@ -36,8 +36,8 @@ const getPseudonymKey = (): Buffer => {
 // 从 DATA_ENCRYPTION_KEY 派生 trial 完整性密钥（domain separation），不新增环境变量。
 const getIntegrityKey = (): Buffer => {
   const encKey = process.env.DATA_ENCRYPTION_KEY
-  if (!encKey || encKey.length !== 64) {
-    throw new Error('DATA_ENCRYPTION_KEY must be 64 hex characters (32 bytes)')
+  if (!encKey || !HEX_32_BYTE_KEY.test(encKey)) {
+    throw new Error('DATA_ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes)')
   }
   return createHmac('sha256', Buffer.from(encKey, 'hex'))
     .update(INTEGRITY_DOMAIN)

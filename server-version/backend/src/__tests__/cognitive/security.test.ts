@@ -72,3 +72,39 @@ describe('cognitive.security — canonicalJson', () => {
     expect(canonicalJson({ b: 1, a: 2 })).toBe('{"a":2,"b":1}')
   })
 })
+
+describe('cognitive.security — key hex validation', () => {
+  // 仅校验长度不足以排除非 hex 字符（如 64 个 'z'），必须强制 64 hex 校验。
+  afterEach(() => {
+    // 还原 beforeAll 设定的有效密钥，避免污染其他用例
+    process.env.DATA_ENCRYPTION_KEY = ENC
+    process.env.DATA_PSEUDONYM_KEY = PSEUDO
+  })
+
+  it('accepts a 64-char hex key (no throw, round-trips)', () => {
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+    process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+    expect(() => getParticipantKey('u')).not.toThrow()
+    expect(() => hashTrialPayload({ x: 1 })).not.toThrow()
+  })
+
+  it('rejects a 63-char hex key', () => {
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(63)
+    expect(() => getParticipantKey('u')).toThrow(/DATA_PSEUDONYM_KEY/)
+  })
+
+  it('rejects a 65-char hex key', () => {
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(65)
+    expect(() => getParticipantKey('u')).toThrow(/DATA_PSEUDONYM_KEY/)
+  })
+
+  it('rejects a 64-char non-hex key (e.g. all "z")', () => {
+    process.env.DATA_PSEUDONYM_KEY = 'z'.repeat(64)
+    expect(() => getParticipantKey('u')).toThrow(/DATA_PSEUDONYM_KEY/)
+  })
+
+  it('rejects a 64-char non-hex DATA_ENCRYPTION_KEY (integrity key)', () => {
+    process.env.DATA_ENCRYPTION_KEY = 'z'.repeat(64)
+    expect(() => hashTrialPayload({ x: 1 })).toThrow(/DATA_ENCRYPTION_KEY/)
+  })
+})
