@@ -11,6 +11,10 @@
 FROM node:20-bookworm-slim AS deps
 WORKDIR /app
 
+# 可通过 --build-arg npm_config_jobs=1 降低并行，避免 native 编译 OOM（Milestone C §18）
+ARG npm_config_jobs
+ENV npm_config_jobs=${npm_config_jobs:-}
+
 # 编译期系统依赖（canvas 等 native module 需要）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
