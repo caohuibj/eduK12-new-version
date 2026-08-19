@@ -1,0 +1,74 @@
+# 最低 CI / merge gate（feature/cognitive-core → dev）
+#
+# 范围（D6.1 评审确认）：
+#   backend  : npm ci + prisma generate + npm run build + cognitive/config 测试
+#   frontend : npm build（vite build）
+#   docker   : docker compose config（拓扑合法）
+# DB 并发集成测试 / Docker E2E 暂为人工门禁（需真实 Postgres，见 docs/cognitive-d61-hardening-report-v1.md）。
+#
+# 说明：`npx vitest run src/__tests__/cognitive` 默认跳过 concurrency.integration.test.ts
+# （未设 COGNITIVE_INTEGRATION_DB_URL），不触碰数据库。
+
+name: CI
+
+on:
+  push:
+    branches:
+      - feature/cognitive-core
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: backend (ci + generate + build + tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: prisma generate
+        run: npx prisma generate
+      - name: build (tsc)
+        run: npm run build
+      - name: cognitive + config tests
+        run: npx vitest run src/__tests__/cognitive src/__tests__/config/keys.test.ts
+
+  frontend:
+    name: frontend (build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: build (vite)
+        run: npm run build
+
+  docker-config:
+    name: docker (compose config)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - name: validate compose
+        run: docker compose config
