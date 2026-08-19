@@ -22,6 +22,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     user: { findUnique: vi.fn() },
     $transaction: vi.fn(),
+    $queryRaw: vi.fn(),
   },
 }))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -94,6 +95,32 @@ const sessionRow = (overrides: any = {}) => ({
   ...overrides,
 })
 
+// D6.1：restartSession 在 $transaction + FOR UPDATE 行锁内读取 session（$queryRaw 返回 raw 行）。
+const rawRow = (s: any = sessionRow()) => ({
+  id: s.id,
+  user_id: s.userId,
+  participant_key: s.participantKey,
+  participant_snapshot_encrypted: s.participantSnapshotEncrypted,
+  assignment_id: s.assignmentId,
+  config_id: s.configId,
+  test_type: s.testType,
+  attempt_no: s.attemptNo,
+  status: s.status,
+  started_at: s.startedAt,
+  finished_at: s.finishedAt,
+  score_encrypted: s.scoreEncrypted,
+  metrics_encrypted: s.metricsEncrypted,
+  quality_flags_encrypted: s.qualityFlagsEncrypted,
+  config_version: s.configVersion,
+  config_snapshot_encrypted: s.configSnapshotEncrypted,
+  engine_version: s.engineVersion,
+  scoring_version: s.scoringVersion,
+  random_seed: s.randomSeed,
+  completion_key: s.completionKey,
+  created_at: s.createdAt,
+  updated_at: s.updatedAt,
+})
+
 beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(PUBLISHED_ASSIGNMENT)
@@ -101,8 +128,9 @@ beforeEach(() => {
   mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(CONFIG)
   mockPrisma.user.findUnique.mockResolvedValue({ nickname: 'Student 1' })
-  // $transaction 透传同一 mock 作为 tx
+  // $transaction 透传同一 mock 作为 tx；行锁 $queryRaw 默认返回 IN_PROGRESS 行
   mockPrisma.$transaction.mockImplementation(async (fn: any) => fn(mockPrisma))
+  mockPrisma.$queryRaw.mockResolvedValue([rawRow()])
 })
 
 describe('createSession eligibility', () => {
@@ -206,6 +234,20 @@ describe('createSession data', () => {
     const result = await createSession('student-1', 'asg-1')
     expect(result.attemptNo).toBe(2)
   })
+
+  it('D6.1: resumes an existing IN_PROGRESS session without re-checking eligibility (past-due assignment)', async () => {
+    mockPrisma.cognitiveSession.findFirst.mockResolvedValue(sessionRow({ attemptNo: 1, randomSeed: 'frozen' }))
+    // assignment 已过期 —— resume 现有 attempt 不应受影响（与 D5 冻结思想一致）。
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...PUBLISHED_ASSIGNMENT,
+      dueAt: new Date(Date.now() - 3600_000),
+    })
+    const result = await createSession('student-1', 'asg-1')
+    expect(result.attemptNo).toBe(1)
+    expect(result.randomSeed).toBe('frozen')
+    expect(mockPrisma.courseStudent.findUnique).not.toHaveBeenCalled()
+    expect(mockPrisma.cognitiveSession.create).not.toHaveBeenCalled()
+  })
 })
 
 describe('getSession', () => {
@@ -227,16 +269,19 @@ describe('getSession', () => {
 })
 
 describe('restartSession', () => {
-  it('abandons the old session and creates attemptNo+1', async () => {
+  it('locks the session row, abandons the old session and creates attemptNo+1', async () => {
     mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ attemptNo: 1 }))
     mockPrisma.cognitiveSession.count.mockResolvedValue(1) // maxAttempts=2
     mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 1 })
     mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: any) =>
       sessionRow({ attemptNo: data.attemptNo, status: data.status })
     )
+    // 行锁返回 locked 行（attemptNo=1, IN_PROGRESS）→ 新 attemptNo=2
+    mockPrisma.$queryRaw.mockResolvedValue([rawRow(sessionRow({ attemptNo: 1 }))])
 
     const result = await restartSession('student-1', 'session-1')
 
+    expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1)
     expect(mockPrisma.cognitiveSession.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'session-1', status: 'IN_PROGRESS' },
@@ -245,6 +290,15 @@ describe('restartSession', () => {
     )
     expect(result.attemptNo).toBe(2)
     expect(result.status).toBe('IN_PROGRESS')
+  })
+
+  it('D6.1: rejects restart when the locked row is no longer IN_PROGRESS', async () => {
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ attemptNo: 1 }))
+    mockPrisma.cognitiveSession.count.mockResolvedValue(1)
+    // 行锁内发现已被并发 complete/restart 改掉状态 → 400
+    mockPrisma.$queryRaw.mockResolvedValue([rawRow(sessionRow({ attemptNo: 1, status: 'ABANDONED' }))])
+    await expect(restartSession('student-1', 'session-1')).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.cognitiveSession.updateMany).not.toHaveBeenCalled()
   })
 
   it('rejects restart when maxAttempts reached', async () => {

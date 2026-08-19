@@ -222,6 +222,57 @@ describe('updateDraftAssignment', () => {
       statusCode: 400,
     })
   })
+
+  // D6.1 (P1)：时间窗不变量必须跨"本次 request + 既有行"合并校验
+  it('rejects PATCH opensAt beyond the existing dueAt', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      opensAt: new Date('2026-01-01T10:00:00Z'),
+      dueAt: new Date('2026-01-01T18:00:00Z'),
+    })
+    await expect(
+      updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { opensAt: '2026-01-01T20:00:00Z' })
+    ).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.cognitiveAssignment.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects PATCH dueAt before the existing opensAt', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      opensAt: new Date('2026-01-01T10:00:00Z'),
+      dueAt: new Date('2026-01-01T18:00:00Z'),
+    })
+    await expect(
+      updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { dueAt: '2026-01-01T08:00:00Z' })
+    ).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.cognitiveAssignment.update).not.toHaveBeenCalled()
+  })
+
+  it('accepts a valid PATCH of both opensAt and dueAt', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      opensAt: new Date('2026-01-01T10:00:00Z'),
+      dueAt: new Date('2026-01-01T18:00:00Z'),
+    })
+    mockPrisma.cognitiveAssignment.update.mockResolvedValue(assignment)
+    await expect(
+      updateDraftAssignment('teacher-1', TEACHER, 'asg-1', {
+        opensAt: '2026-01-02T10:00:00Z',
+        dueAt: '2026-01-02T18:00:00Z',
+      })
+    ).resolves.toBeTruthy()
+  })
+
+  it('accepts an unrelated-field PATCH when existing window is valid', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      opensAt: new Date('2026-01-01T10:00:00Z'),
+      dueAt: new Date('2026-01-01T18:00:00Z'),
+    })
+    mockPrisma.cognitiveAssignment.update.mockResolvedValue({ ...assignment, instruction: 'updated' })
+    const result = await updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { instruction: 'updated' })
+    expect(result.instruction).toBe('updated')
+  })
 })
 
 describe('publishAssignment / archiveAssignment', () => {

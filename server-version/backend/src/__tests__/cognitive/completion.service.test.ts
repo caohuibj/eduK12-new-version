@@ -9,6 +9,8 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     cognitiveSession: { findUnique: vi.fn(), updateMany: vi.fn() },
     cognitiveTrial: { findMany: vi.fn() },
+    $transaction: vi.fn(),
+    $queryRaw: vi.fn(),
   },
 }))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -17,6 +19,8 @@ import { completeSession } from '../../modules/cognitive/completion.service'
 import { encryptCognitivePayload, decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 
 const FAKE_CONFIG = { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }
+
+// D6.1：completeSession 在 $transaction + FOR UPDATE 行锁内读取 session（$queryRaw 返回 raw 行）。
 const sessionRow = (overrides: any = {}) => ({
   id: 'session-1',
   userId: 'student-1',
@@ -43,6 +47,31 @@ const sessionRow = (overrides: any = {}) => ({
   ...overrides,
 })
 
+const rawRow = (s: any = sessionRow()) => ({
+  id: s.id,
+  user_id: s.userId,
+  participant_key: s.participantKey,
+  participant_snapshot_encrypted: s.participantSnapshotEncrypted,
+  assignment_id: s.assignmentId,
+  config_id: s.configId,
+  test_type: s.testType,
+  attempt_no: s.attemptNo,
+  status: s.status,
+  started_at: s.startedAt,
+  finished_at: s.finishedAt,
+  score_encrypted: s.scoreEncrypted,
+  metrics_encrypted: s.metricsEncrypted,
+  quality_flags_encrypted: s.qualityFlagsEncrypted,
+  config_version: s.configVersion,
+  config_snapshot_encrypted: s.configSnapshotEncrypted,
+  engine_version: s.engineVersion,
+  scoring_version: s.scoringVersion,
+  random_seed: s.randomSeed,
+  completion_key: s.completionKey,
+  created_at: s.createdAt,
+  updated_at: s.updatedAt,
+})
+
 const trialRow = (trialIndex: number, payload: unknown) => ({
   id: `t-${trialIndex}`,
   sessionId: 'session-1',
@@ -58,7 +87,8 @@ const withTrials = (trials: { trialIndex: number; payload: unknown }[]) => {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow())
+  mockPrisma.$transaction.mockImplementation(async (fn: any) => fn(mockPrisma))
+  mockPrisma.$queryRaw.mockResolvedValue([rawRow()])
 })
 
 describe('completeSession happy path', () => {
@@ -86,8 +116,14 @@ describe('completeSession happy path', () => {
     const update = mockPrisma.cognitiveSession.updateMany.mock.calls[0][0]
     expect(update.where).toEqual({ id: 'session-1', status: 'IN_PROGRESS' })
     expect(update.data.status).toBe('COMPLETED')
-    expect(update.data.scoreEncrypted).not.toContain('66')
-    expect(update.data.metricsEncrypted).not.toContain('correctCount')
+    // 非明文：完整 envelope 明文 JSON（含真实值）不得出现在密文中（避免短子串随机撞中）
+    const scoreEnvelopeJson = JSON.stringify({ version: 1, value: result.score })
+    const metricsEnvelopeJson = JSON.stringify({
+      version: 1,
+      value: { trialCount: 3, correctCount: 2, accuracy: result.metrics.accuracy, meanRtMs: 500 },
+    })
+    expect(update.data.scoreEncrypted).not.toContain(scoreEnvelopeJson)
+    expect(update.data.metricsEncrypted).not.toContain(metricsEnvelopeJson)
     expect(update.data.qualityFlagsEncrypted).toBeTruthy()
     // decrypt 后 == 写入值
     expect(decryptCognitivePayload<number>(update.data.scoreEncrypted)).toBeCloseTo(66.67, 2)
@@ -133,22 +169,24 @@ describe('completeSession status/ownership', () => {
 
   it('rejects ABANDONED / INVALID sessions', async () => {
     for (const status of ['ABANDONED', 'INVALID']) {
-      mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ status }))
+      mockPrisma.$queryRaw.mockResolvedValue([rawRow(sessionRow({ status }))])
       await expect(completeSession('student-1', 'session-1')).rejects.toMatchObject({ statusCode: 400 })
     }
   })
 
   it('is idempotent for COMPLETED sessions: returns stored result without re-scoring', async () => {
     const stored = { score: 100, metrics: { trialCount: 3, correctCount: 3 }, qualityFlags: {} }
-    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(
-      sessionRow({
-        status: 'COMPLETED',
-        finishedAt: new Date('2026-01-01'),
-        scoreEncrypted: encryptCognitivePayload(stored.score),
-        metricsEncrypted: encryptCognitivePayload(stored.metrics),
-        qualityFlagsEncrypted: encryptCognitivePayload(stored.qualityFlags),
-      })
-    )
+    mockPrisma.$queryRaw.mockResolvedValue([
+      rawRow(
+        sessionRow({
+          status: 'COMPLETED',
+          finishedAt: new Date('2026-01-01'),
+          scoreEncrypted: encryptCognitivePayload(stored.score),
+          metricsEncrypted: encryptCognitivePayload(stored.metrics),
+          qualityFlagsEncrypted: encryptCognitivePayload(stored.qualityFlags),
+        })
+      ),
+    ])
     const result = await completeSession('student-1', 'session-1')
     expect(result.status).toBe('COMPLETED')
     expect(result.score).toBe(100)
@@ -163,17 +201,15 @@ describe('completeSession status/ownership', () => {
       { trialIndex: 2, payload: { correct: false, rtMs: 600 } },
     ])
     mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 0 })
-    mockPrisma.cognitiveSession.findUnique
-      .mockResolvedValueOnce(sessionRow())
-      .mockResolvedValueOnce(
-        sessionRow({
-          status: 'COMPLETED',
-          finishedAt: new Date('2026-01-01'),
-          scoreEncrypted: encryptCognitivePayload(66.66666666666667),
-          metricsEncrypted: encryptCognitivePayload({ trialCount: 3, correctCount: 2, accuracy: 2 / 3, meanRtMs: 500 }),
-          qualityFlagsEncrypted: encryptCognitivePayload({}),
-        })
-      )
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(
+      sessionRow({
+        status: 'COMPLETED',
+        finishedAt: new Date('2026-01-01'),
+        scoreEncrypted: encryptCognitivePayload(66.66666666666667),
+        metricsEncrypted: encryptCognitivePayload({ trialCount: 3, correctCount: 2, accuracy: 2 / 3, meanRtMs: 500 }),
+        qualityFlagsEncrypted: encryptCognitivePayload({}),
+      })
+    )
     const result = await completeSession('student-1', 'session-1')
     expect(result.status).toBe('COMPLETED')
     expect(result.score).toBeCloseTo(66.67, 2)
