@@ -16,6 +16,10 @@ const configSchema = z.object({
   adminPassword: z.string().min(6),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
+  // Cognitive 模块开关（严格 true/false，默认 true）
+  cognitiveModuleEnabled: z.boolean(),
+  // Cognitive 参与者假名化密钥（64 位十六进制；生产环境必需，独立于 DATA_ENCRYPTION_KEY）
+  dataPseudonymKey: z.string().optional(),
   // COS 配置 (可选)
   cosSecretId: z.string().optional(),
   cosSecretKey: z.string().optional(),
@@ -28,6 +32,16 @@ const parsePort = () => {
   const port = parseInt(process.env.PORT || '3000')
   if (isNaN(port)) return 3000
   return port
+}
+
+// 严格布尔环境变量解析：仅接受 'true'/'false'，缺省回落 fallback。
+// 不允许使用 z.coerce.boolean()（因为 Boolean('false') === true，会误判）。
+const parseBooleanEnv = (name: string, fallback: boolean): boolean => {
+  const v = process.env[name]
+  if (v === undefined) return fallback
+  if (v === 'true') return true
+  if (v === 'false') return false
+  throw new Error(`❌ ${name} must be 'true' or 'false' (got '${v}')`)
 }
 
 // 获取项目根目录（backend目录）
@@ -45,6 +59,10 @@ const rawConfig = {
   adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
+  // Cognitive 模块开关（严格解析，缺省 true）
+  cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', true),
+  // Cognitive 参与者假名化密钥（生产环境必需）
+  dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)
   cosSecretId: process.env.COS_SECRET_ID,
   cosSecretKey: process.env.COS_SECRET_KEY,
@@ -60,6 +78,9 @@ if (rawConfig.nodeEnv === 'production') {
   }
   if (!process.env.DATA_ENCRYPTION_KEY || process.env.DATA_ENCRYPTION_KEY.length !== 64) {
     throw new Error('❌ DATA_ENCRYPTION_KEY must be set and exactly 64 hex characters (32 bytes) in production mode')
+  }
+  if (!process.env.DATA_PSEUDONYM_KEY || process.env.DATA_PSEUDONYM_KEY.length !== 64) {
+    throw new Error('❌ DATA_PSEUDONYM_KEY must be set and exactly 64 hex characters (32 bytes) in production mode')
   }
 }
 
