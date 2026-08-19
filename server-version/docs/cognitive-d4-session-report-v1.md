@@ -79,7 +79,7 @@ POST   /api/cognitive/sessions/:id/restart  authenticate, requireRole(STUDENT) -
 
 ```text
 D4 base SHA:  5d0b78a
-D4 final SHA: <push 后 HEAD>
+D4 final SHA: f9a60acc6d825ea6b91956d244e1d5d4cd5e277c
 Build: PASS
 Cognitive tests: PASS (97/97)
 Full regression: 0 new failures (baseline 5 files / 8 failures)
