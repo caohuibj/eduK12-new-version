@@ -32,21 +32,34 @@ export function getRedisUrl(): string {
     return `redis://${auth}${host}:${port}`
   }
 
-  // 3. 回退：非生产允许 localhost；生产缺少配置时显式告警（不再静默连 localhost）
+  // 3. 回退：非生产允许 localhost；生产缺少配置时显式抛出，禁止静默回退 localhost
   if (process.env.NODE_ENV !== 'production') {
     return DEV_FALLBACK
   }
 
-  logger.error(
-    '[redis] 生产环境未配置 REDIS_URL / REDIS_HOST，Redis 相关功能将不可用'
+  // 生产环境未配置 Redis：显式失败，避免静默连接不存在的 localhost:6379
+  // （cacheService / socketService 已在各自 initialize() 中 catch 并降级）
+  throw new Error(
+    '[redis] NODE_ENV=production 但未配置 REDIS_URL / REDIS_HOST；' +
+      '拒绝回退到 localhost。请在 compose / 环境显式配置 Redis 连接。'
   )
-  return DEV_FALLBACK
 }
 
 /**
  * Bull Queue（底层 ioredis）连接选项。
  * ioredis 接受 Redis 连接 URL 字符串，无需拆成 host/port。
+ *
+ * 注意：按 Milestone D v1.2 收口（D0-9.1），生产环境缺 Redis 配置时
+ * getRedisUrl() 会显式抛出；但 Bull 队列按既有系统行为处理（保留回退地址），
+ * 因此此处 catch 后回退，避免队列模块在 import 时直接崩溃导致整个后端无法启动。
  */
 export function getBullRedisOptions(): string {
-  return getRedisUrl()
+  try {
+    return getRedisUrl()
+  } catch {
+    logger.warn(
+      '[redis] Bull 队列使用回退 Redis 地址（生产环境应显式配置 REDIS_URL）'
+    )
+    return DEV_FALLBACK
+  }
 }

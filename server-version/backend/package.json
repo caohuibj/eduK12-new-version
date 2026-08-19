@@ -13,6 +13,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts",
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend"
   },
   "dependencies": {
