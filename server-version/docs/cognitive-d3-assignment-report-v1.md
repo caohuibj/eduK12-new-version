@@ -88,8 +88,8 @@ POST   /api/cognitive/assignments/:id/archive  authenticate, requireTeacher -> a
 
 ```text
 D3 base SHA:  cffd2d3
-D3 final SHA: <push 后 HEAD>
-Ahead/behind dev: 记录 push 后实际值
+D3 final SHA: 9fd83eb59488b376908ae197ffbdddbe43666e89
+Ahead/behind dev: ahead 20 / behind 0
 Build: PASS
 Cognitive tests: PASS (76/76)
 Full regression: 0 new failures (baseline 5 files / 8 failures)
