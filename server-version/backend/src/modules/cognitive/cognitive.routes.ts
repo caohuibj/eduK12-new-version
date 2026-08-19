@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
-import { authenticate, requireTeacher } from '../../middleware/auth'
+import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
+import { UserRole } from '../../types'
 
 /**
  * Cognitive 路由（D3 起）。
@@ -19,5 +20,10 @@ router.get('/assignments/:id', authenticate, cognitiveController.getAssignment)
 router.patch('/assignments/:id', authenticate, requireTeacher, cognitiveController.updateAssignment)
 router.post('/assignments/:id/publish', authenticate, requireTeacher, cognitiveController.publishAssignment)
 router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveController.archiveAssignment)
+
+// D4 — Session / Attempt
+router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveController.createSession)
+router.get('/sessions/:id', authenticate, cognitiveController.getSession)
+router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
 export default router

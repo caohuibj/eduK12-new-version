@@ -2,11 +2,14 @@ import { Request, Response } from 'express'
 import { success, error, unauthorized } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
-import { CognitiveServiceError } from './assignment.service'
+import * as sessionService from './session.service'
+import { CognitiveServiceError } from './cognitive.errors'
 import {
   createAssignmentSchema,
   updateAssignmentSchema,
   listAssignmentsQuerySchema,
+  createSessionSchema,
+  restartSessionSchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 
@@ -87,6 +90,39 @@ export const cognitiveController = {
       if (!req.user) return unauthorized(res)
       const data = await assignmentService.archiveAssignment(req.user.userId, req.user.role, req.params.id)
       return success(res, data, '归档成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  // D4 — Session / Attempt
+  async createSession(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = createSessionSchema.parse(req.body)
+      const data = await sessionService.createSession(req.user.userId, input.assignmentId)
+      return success(res, data, '会话创建成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getSession(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await sessionService.getSession(req.user.userId, req.params.id)
+      return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async restartSession(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      restartSessionSchema.parse(req.body)
+      const data = await sessionService.restartSession(req.user.userId, req.params.id)
+      return success(res, data, '重启成功')
     } catch (err) {
       return handleError(res, err)
     }

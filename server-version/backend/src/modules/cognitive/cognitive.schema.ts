@@ -67,3 +67,20 @@ export const listAssignmentsQuerySchema = z
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>
 export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>
 export type ListAssignmentsQuery = z.infer<typeof listAssignmentsQuerySchema>
+
+// ---------------------------------------------------------------------------
+// D4 — Session request schemas
+// ---------------------------------------------------------------------------
+
+/**
+ * 创建 Session（D4 §4）：body 只含 assignmentId。
+ * 不接受 userId / participantKey / attemptNo / testType / config / randomSeed —— 全部由服务端决定。
+ */
+export const createSessionSchema = z
+  .object({
+    assignmentId: z.string().min(1),
+  })
+  .strict()
+
+/** restart 无 body。 */
+export const restartSessionSchema = z.object({}).strict()

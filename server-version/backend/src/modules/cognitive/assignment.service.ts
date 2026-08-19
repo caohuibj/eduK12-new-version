@@ -2,6 +2,15 @@ import { UserRole, CourseStudentStatus, CognitiveAssignmentStatus } from '@prism
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
+import {
+  CognitiveServiceError,
+  NOT_FOUND,
+  FORBIDDEN,
+  BAD_REQUEST,
+  CONFLICT,
+} from './cognitive.errors'
+
+export { CognitiveServiceError }
 
 /**
  * D3 — Cognitive Assignment / Distribution 服务。
@@ -10,21 +19,6 @@ import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } fr
  * 不做 Trial / Completion / History；不物理删除 Assignment；
  * 不引入 repository abstraction / policy engine / state machine 包。
  */
-
-/** 带 statusCode 的业务错误，controller 统一转 HTTP。 */
-export class CognitiveServiceError extends Error {
-  statusCode: number
-  constructor(message: string, statusCode: number) {
-    super(message)
-    this.name = 'CognitiveServiceError'
-    this.statusCode = statusCode
-  }
-}
-
-const NOT_FOUND = (msg: string) => new CognitiveServiceError(msg, 404)
-const FORBIDDEN = (msg: string) => new CognitiveServiceError(msg, 403)
-const BAD_REQUEST = (msg: string) => new CognitiveServiceError(msg, 400)
-const CONFLICT = (msg: string) => new CognitiveServiceError(msg, 409)
 
 /** 校验链：Course 存在 → 归属 → Config PUBLISHED → Registry 可识别 → configSchema.parse。 */
 const validateConfigForAssignment = async (courseId: string, configId: string, role: UserRole, userId: string) => {
