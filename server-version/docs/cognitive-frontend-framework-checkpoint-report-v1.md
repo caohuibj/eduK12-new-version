@@ -135,3 +135,10 @@ HEAD: 41c6a551b2057bd534d98eb5d851c3eee9426fbe（后续收尾修复会推进，�
 
 E2E 后复跑 typecheck 暴露 1 处类型问题（complete 结果归一化时 metrics/qualityFlags 可空），已修：
 `useCognitiveSession.ts` → `metrics: d.metrics ?? {}`、`qualityFlags: d.qualityFlags ?? {}`；typecheck / 32 tests / build 复跑全 PASS。另将 vite 配置加载产生的 `*.timestamp-*.mjs` 临时文件加入 frontend .gitignore。
+
+## 11. Stage A 收尾完成（2026-08-20 补充）
+
+- PR `feature/cognitive-core → dev` 已创建（#2）→ **PR CI 三 job 全 PASS** → **merge**（merge commit `0f73181`，树与 feature/cognitive-core 一致；注：期间 dev 经 PR #1 squash 至 `c22fa9b`，二次合入内容等价，已验证树零差异）。
+- **Milestone D Backend Core dev SHA = `0f73181`**；tag `cognitive-backend-core-v1` → `0f73181` 已推送。
+- `feature/cognitive-runner` 已 `git merge origin/dev` 同步（含 cognitive 后端；ci.yml 冲突保留升级版）→ push `abbff0c`。compose config / frontend typecheck / 32 tests 复验全 PASS。
+- 任务书 §44 十一问验收：第 1 问（Backend merge dev）与第 2 问（PR CI PASS）现为 **✅**；Milestone D 剩余 Blockers 全部闭合。
