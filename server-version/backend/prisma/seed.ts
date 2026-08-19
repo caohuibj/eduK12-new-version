@@ -33,39 +33,74 @@ async function seedAdmin() {
   console.log(`  密码: ${adminPassword}`)
 }
 
-// D1 基础：幂等写入 fake Cognitive 配置 v1（PUBLISHED）。
-// 不参与任何加密；仅作为 D2 scorer/registry 后续引用的已发布配置。
+// D1.1 修正：已发布配置不可变（Published Config Immutable）。
+// seed 只负责“确保存在”，绝不对已 PUBLISHED 的配置执行 UPDATE。
+// 行为：
+//   不存在           → create(status=PUBLISHED)
+//   存在且内容一致   → no-op（幂等，可安全重复运行）
+//   存在但内容不同   → FAIL（提示创建新版本 1.0.1 / 1.1.0，禁止覆盖已发布版本）
+// 修复前使用 upsert(update)，会在重新 seed 时静默覆盖同一 configVersion，违反 immutability。
+const FAKE_CONFIG_VERSION = '1.0.0'
+const FAKE_CONFIG_EXPECTED = {
+  name: 'Fake Cognitive Test v1.0.0',
+  status: 'PUBLISHED' as const,
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  config: {
+    trialCount: 3,
+    trialDurationMs: 1000,
+    allowPractice: false,
+    maxRtMs: 60000,
+  },
+}
+
+// 顺序无关的 JSON 深度相等：Postgres JSONB 不保证 key 顺序，禁止使用 JSON.stringify 直接比较。
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return a === b
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false
+    return a.every((v, i) => deepEqual(v, b[i]))
+  }
+  const ka = Object.keys(a as Record<string, unknown>)
+  const kb = Object.keys(b as Record<string, unknown>)
+  if (ka.length !== kb.length) return false
+  return ka.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]))
+}
+
 async function seedFakeCognitiveConfig() {
-  const result = await prisma.cognitiveTestConfig.upsert({
-    where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } },
-    create: {
-      testType: 'fake',
-      configVersion: '1.0.0',
-      name: 'Fake Cognitive Test v1.0.0',
-      status: 'PUBLISHED',
-      engineVersion: '1.0.0',
-      scoringVersion: '1.0.0',
-      config: {
-        trialCount: 3,
-        trialDurationMs: 1000,
-        allowPractice: false,
-        maxRtMs: 60000,
-      },
-    },
-    update: {
-      name: 'Fake Cognitive Test v1.0.0',
-      status: 'PUBLISHED',
-      engineVersion: '1.0.0',
-      scoringVersion: '1.0.0',
-      config: {
-        trialCount: 3,
-        trialDurationMs: 1000,
-        allowPractice: false,
-        maxRtMs: 60000,
-      },
-    },
+  const existing = await prisma.cognitiveTestConfig.findUnique({
+    where: { testType_configVersion: { testType: 'fake', configVersion: FAKE_CONFIG_VERSION } },
   })
-  console.log(`Fake Cognitive 配置已就绪: testType=${result.testType} configVersion=${result.configVersion} status=${result.status}`)
+
+  if (!existing) {
+    const created = await prisma.cognitiveTestConfig.create({
+      data: {
+        testType: 'fake',
+        configVersion: FAKE_CONFIG_VERSION,
+        ...FAKE_CONFIG_EXPECTED,
+      },
+    })
+    console.log(`Fake Cognitive 配置已创建: testType=${created.testType} configVersion=${created.configVersion} status=${created.status}`)
+    return
+  }
+
+  // 已存在：校验内容是否与基线一致（PUBLISHED 不可变，禁止任何 UPDATE）
+  const sameName = existing.name === FAKE_CONFIG_EXPECTED.name
+  const sameStatus = existing.status === FAKE_CONFIG_EXPECTED.status
+  const sameEngine = existing.engineVersion === FAKE_CONFIG_EXPECTED.engineVersion
+  const sameScoring = existing.scoringVersion === FAKE_CONFIG_EXPECTED.scoringVersion
+  const sameConfig = deepEqual(existing.config, FAKE_CONFIG_EXPECTED.config)
+  if (sameName && sameStatus && sameEngine && sameScoring && sameConfig) {
+    console.log(`Fake Cognitive 配置已存在且一致，跳过（幂等）: testType=${existing.testType} configVersion=${existing.configVersion} status=${existing.status}`)
+    return
+  }
+
+  // 内容不一致 → 明确失败，禁止覆盖已发布配置
+  console.error('❌ Fake Cognitive 配置已存在但内容与基线不一致，拒绝 UPDATE（PUBLISHED 配置不可变）。')
+  console.error('   如需变更，请创建新版本（如 1.0.1 / 1.1.0），并在 seed 中新增对应写入逻辑。')
+  console.error(`   当前: name=${existing.name} status=${existing.status} engineVersion=${existing.engineVersion} scoringVersion=${existing.scoringVersion}`)
+  throw new Error(`cognitiveTestConfig fake/${FAKE_CONFIG_VERSION} already PUBLISHED with divergent content; create a new configVersion instead of mutating it`)
 }
 
 async function main() {
