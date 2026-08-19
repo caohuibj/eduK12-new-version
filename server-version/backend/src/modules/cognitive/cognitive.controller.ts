@@ -4,6 +4,7 @@ import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
+import * as completionService from './completion.service'
 import { CognitiveServiceError } from './cognitive.errors'
 import {
   createAssignmentSchema,
@@ -12,6 +13,7 @@ import {
   createSessionSchema,
   restartSessionSchema,
   appendTrialSchema,
+  completeSessionSchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 
@@ -137,6 +139,18 @@ export const cognitiveController = {
       const input = appendTrialSchema.parse(req.body)
       const data = await trialService.appendTrial(req.user.userId, req.params.id, input)
       return success(res, data, '试次已记录')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  // D6 — Completion / Scoring
+  async completeSession(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      completeSessionSchema.parse(req.body) // strict {}：score/metrics/rawData 一律拒绝
+      const data = await completionService.completeSession(req.user.userId, req.params.id)
+      return success(res, data, '已完成')
     } catch (err) {
       return handleError(res, err)
     }

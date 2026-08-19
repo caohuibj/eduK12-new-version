@@ -102,3 +102,13 @@ export const appendTrialSchema = z
     payload: z.any(),
   })
   .strict()
+
+// ---------------------------------------------------------------------------
+// D6 — Completion request schema
+// ---------------------------------------------------------------------------
+
+/**
+ * Complete Session（D6 §4）：body 必须为严格空对象 `{}`。
+ * 客户端提交 score / metrics / rawData 会被 `.strict()` 直接拒绝 —— 评分由服务端权威决定。
+ */
+export const completeSessionSchema = z.object({}).strict()
