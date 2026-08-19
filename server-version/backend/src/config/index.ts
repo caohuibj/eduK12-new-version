@@ -16,7 +16,7 @@ const configSchema = z.object({
   adminPassword: z.string().min(6),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
-  // Cognitive 模块开关（严格 true/false，默认 true）
+  // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
   cognitiveModuleEnabled: z.boolean(),
   // Cognitive 参与者假名化密钥（64 位十六进制；生产环境必需，独立于 DATA_ENCRYPTION_KEY）
   dataPseudonymKey: z.string().optional(),
@@ -59,8 +59,8 @@ const rawConfig = {
   adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
-  // Cognitive 模块开关（严格解析，缺省 true）
-  cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', true),
+  // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
+  cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   // Cognitive 参与者假名化密钥（生产环境必需）
   dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)
@@ -79,8 +79,12 @@ if (rawConfig.nodeEnv === 'production') {
   if (!process.env.DATA_ENCRYPTION_KEY || process.env.DATA_ENCRYPTION_KEY.length !== 64) {
     throw new Error('❌ DATA_ENCRYPTION_KEY must be set and exactly 64 hex characters (32 bytes) in production mode')
   }
-  if (!process.env.DATA_PSEUDONYM_KEY || process.env.DATA_PSEUDONYM_KEY.length !== 64) {
-    throw new Error('❌ DATA_PSEUDONYM_KEY must be set and exactly 64 hex characters (32 bytes) in production mode')
+  // Cognitive 关闭时，旧 eduK12 系统仍应正常启动（模块隔离原则）：
+  // 仅当 COGNITIVE_MODULE_ENABLED=true 才强制要求 DATA_PSEUDONYM_KEY。
+  if (rawConfig.cognitiveModuleEnabled) {
+    if (!process.env.DATA_PSEUDONYM_KEY || process.env.DATA_PSEUDONYM_KEY.length !== 64) {
+      throw new Error('❌ DATA_PSEUDONYM_KEY must be set and exactly 64 hex characters (32 bytes) when COGNITIVE_MODULE_ENABLED=true in production mode')
+    }
   }
 }
 
