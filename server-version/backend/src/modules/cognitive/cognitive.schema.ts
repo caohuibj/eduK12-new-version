@@ -84,3 +84,21 @@ export const createSessionSchema = z
 
 /** restart 无 body。 */
 export const restartSessionSchema = z.object({}).strict()
+
+// ---------------------------------------------------------------------------
+// D5 — Trial request schemas
+// ---------------------------------------------------------------------------
+
+/**
+ * Append Trial（D5 §5）：body = { trialIndex, payload }。
+ * - trialIndex：non-negative integer。
+ * - payload：API shell 层 unknown，具体形状由 RegistryEntry.trialSchema 判定（不硬编码 fake shape）。
+ * - `.strict()`：拒绝 sessionId / payloadHash / payloadEncrypted / createdAt（全部服务端决定）。
+ */
+export const appendTrialSchema = z
+  .object({
+    trialIndex: z.number().int().min(0),
+    // API shell 层任意值，具体形状由 RegistryEntry.trialSchema 判定（不硬编码 fake shape）
+    payload: z.any(),
+  })
+  .strict()

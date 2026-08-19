@@ -3,6 +3,7 @@ import { success, error, unauthorized } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
 import * as sessionService from './session.service'
+import * as trialService from './trial.service'
 import { CognitiveServiceError } from './cognitive.errors'
 import {
   createAssignmentSchema,
@@ -10,6 +11,7 @@ import {
   listAssignmentsQuerySchema,
   createSessionSchema,
   restartSessionSchema,
+  appendTrialSchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 
@@ -123,6 +125,18 @@ export const cognitiveController = {
       restartSessionSchema.parse(req.body)
       const data = await sessionService.restartSession(req.user.userId, req.params.id)
       return success(res, data, '重启成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  // D5 — Append-only Trial
+  async appendTrial(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = appendTrialSchema.parse(req.body)
+      const data = await trialService.appendTrial(req.user.userId, req.params.id, input)
+      return success(res, data, '试次已记录')
     } catch (err) {
       return handleError(res, err)
     }

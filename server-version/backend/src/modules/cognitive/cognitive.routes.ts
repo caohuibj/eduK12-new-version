@@ -26,4 +26,7 @@ router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveC
 router.get('/sessions/:id', authenticate, cognitiveController.getSession)
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
+// D5 — Append-only Trial
+router.post('/sessions/:id/trials', authenticate, requireRole(UserRole.STUDENT), cognitiveController.appendTrial)
+
 export default router
