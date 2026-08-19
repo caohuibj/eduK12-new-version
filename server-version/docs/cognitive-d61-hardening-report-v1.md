@@ -62,11 +62,17 @@ nextDueAt   = input.dueAt   !== undefined ? new Date(input.dueAt)   : existing.d
 ## 6. 测试 / 构建 / Docker 结果
 
 - `npm run build`（tsc）：**0 error** ✅
-- `npx vitest run src/__tests__/cognitive`：**14 files / 128 passed / 4 skipped**（4 个并发集成测试默认 skip）✅
-- `npm test`（全量）：8 failed / 5 文件 —— 与 approved baseline **完全一致，0 新增失败** ✅
+- **Cognitive regression: PASS** —— `npx vitest run src/__tests__/cognitive`：**14 files / 128 passed / 4 skipped**（4 个并发集成测试默认 skip）✅
+- **Repository regression: PASS against approved baseline** —— `npm test`：8 failed / 5 文件，与 [Approved Known-Failure Baseline](./cognitive-approved-known-failure-baseline-v1.md) **完全一致，0 新增失败**（不允许顺手修）✅
 - `COGNITIVE_INTEGRATION_DB_URL=... npm run test:integration`：**4 passed**（真实 DB）✅；跑后 fixture 清理验证 0 残留 ✅
 - Docker：build backend → **4 服务 healthy**；运行时 E2E smoke（premature complete 400 + IN_PROGRESS → append 0/1/2 → COMPLETED 66.67 → append 400）✅
 - 无 Prisma schema 变更、无新 migration ✅
+
+## 6.1 真实 Git diff 核对（P1.5 复核）
+
+- **D6.1 范围 `20c2d39..HEAD`**：13 个文件，仅 backend cognitive 源码（session-lock/completion/trial/session/assignment.service）+ 测试（5 个更新 + concurrency 集成新增）+ `package.json`（test:integration 脚本）+ 2 份 docs。**无 schema.prisma / migration / seed / docker-compose / frontend** ✅
+- **全分支 `dev..feature/cognitive-core`**：schema.prisma（D1 新增 cognitive 模型/枚举 + Prisma format 列对齐，legacy 模型无语义变更）、2 个 D1 审查迁移、seed.ts（D1 env 化 admin + fake config 不可变 seed）、docker-compose.yml（D1 cognitive env 接线）、.env.example、config/index.ts、utils/encryption.ts、config/redis.ts —— 全部属于 **D1 阶段有意交付**，无无关漂移 ✅
+- 结论：D6.1 报告声明"无 Prisma schema / 无 migration / 无架构返工"（相对 D6）成立；merge 前对 D1 迁移做最终 review 即可。
 
 ## 7. Milestone D Backend Core Review Handoff
 
@@ -80,15 +86,15 @@ Full regression: 0 new failures (baseline 5 files / 8 failures)
 Docker: 4 healthy + E2E smoke PASS
 ```
 
-**当前状态**：P0 / 2×P1 / 文档 P2 已闭合。建议下一步：
-1. **Milestone D Backend Core Review PASS**（架构不变量 A1–A15 / 留存矩阵 / 加密幂等语义终审）。
-2. 建立 **PR CI / merge gate**（backend npm ci + prisma generate + build + cognitive tests + config tests + frontend build + docker compose config；DB 集成 / Docker E2E 仍人工）——目前 `.github/workflows` 尚不存在，且 dev 分支 8 个既有失败需正式 baseline 化。
+**当前状态**：P0 / 2×P1 / 文档 P2 已闭合；最低 CI（`.github/workflows/ci.yml`）已建立；Approved Known-Failure Baseline 已正式登记（`cognitive-approved-known-failure-baseline-v1.md`）。建议下一步：
+1. **Milestone D Backend Core Review PASS**（架构不变量 A1–A15 / 留存矩阵 / 加密幂等语义终审；重点复核 D1 的两条 migration 与 schema 变更）。
+2. CI 已就绪（backend npm ci + prisma generate + build + cognitive/config tests；frontend build；docker compose config）——作为 **merge gate**；DB 并发集成 / Docker E2E 仍人工。
 3. 开 **PR feature/cognitive-core → dev**，merge 后进入 Frontend CognitiveRunner shell / Fake Test E2E，再 Reaction / Memory / Stroop。
 
 ## 8. 未在本阶段处理（按评审建议，另立任务）
 
-- **CI / PR gate**（merge gate，非代码 blocker）。
-- **Baseline Test Debt Closeout**：dev 分支 8 个既有失败（checkinIntegration / scoringService / checkinSecurity / checkinTokenService / utils/cache）单独收口，避免 Cognitive PR 顺手扩大范围。
+- **Baseline Test Debt Closeout**：dev 分支 8 个既有失败（checkinIntegration / scoringService / checkinSecurity / checkinTokenService / utils/cache）单独收口，避免 Cognitive PR 顺手扩大范围（已登记于 `cognitive-approved-known-failure-baseline-v1.md`）。
 - **Admin seed 硬编码**（`rateK12admin/2026coding` fallback + console.log 明文密码）属既有基线问题，Milestone G / Production blocker，单独处理。
 - **Encryption key rotation 债务**（`payloadHash` 完整性密钥从 `DATA_ENCRYPTION_KEY` 派生；envelope 无 keyId/version）→ P2 Production security evolution，后续可升 envelope v2 或引入独立 `DATA_INTEGRITY_KEY`。
 - **D2–D4 报告 SHA 观感**：D3/D4 已补 final SHA；如需彻底消除歧义，可统一改为 "implementation SHA + checkpoint SHA" 双字段（与 D5 一致）。
+- **CI 已建立**（`.github/workflows/ci.yml`），无需再列为待办；`feature/cognitive-core → dev` merge gate 生效后如有需要可再扩展（如全量 npm test 纳入 approved-baseline 断言）。
