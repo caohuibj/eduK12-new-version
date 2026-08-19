@@ -72,7 +72,8 @@ POST   /api/cognitive/sessions/:id/trials   authenticate, requireRole(STUDENT) -
 
 ```text
 D5 base SHA:  0f14c91
-D5 final SHA: <push 后 HEAD>
+D5 implementation SHA: 3cc07cd（trial.service + 测试的最后实现 commit）
+D5 checkpoint SHA: 195b3c8（docs closeout，即 D6 base）
 Build: PASS
 Cognitive tests: PASS
 Full regression: 0 new failures (baseline 5 files / 8 failures)
