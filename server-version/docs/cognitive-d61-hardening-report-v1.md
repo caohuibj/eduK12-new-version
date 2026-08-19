@@ -72,7 +72,7 @@ nextDueAt   = input.dueAt   !== undefined ? new Date(input.dueAt)   : existing.d
 
 ```text
 D6.1 base SHA:  20c2d39
-D6.1 final SHA: <push 后 HEAD>
+D6.1 final SHA: 4a327065676c48f303751d7ee45d94409f5ecfb3
 Build: PASS
 Cognitive unit tests: PASS (128 passed / 4 skipped)
 Concurrency integration tests: PASS (4/4, real DB)
