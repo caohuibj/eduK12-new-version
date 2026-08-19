@@ -119,7 +119,14 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
         dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(response) })
         return
       }
-      const result: CognitiveResult | null = response.data.result ?? null
+      // complete 返回扁平 {score, metrics, qualityFlags}（completion.service）；
+      // GET session 返回 {result:{...}}（session.service COMPLETED 分支）。两种都兼容。
+      const d = response.data as CognitiveSession & Partial<CognitiveResult>
+      const result: CognitiveResult | null =
+        d.result ??
+        (typeof d.score === 'number'
+          ? { score: d.score, metrics: d.metrics, qualityFlags: d.qualityFlags }
+          : null)
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })
     } catch (err) {
