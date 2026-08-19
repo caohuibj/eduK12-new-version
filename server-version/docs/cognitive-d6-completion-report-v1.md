@@ -85,12 +85,12 @@ POST   /api/cognitive/sessions/:id/complete   authenticate, requireRole(STUDENT)
 
 ```text
 D6 base SHA:  195b3c8
-D6 final SHA: <push 后 HEAD>
+D6 final SHA: 3a7be823981d28d983ca7d374eb0af259c68c03c
 Build: PASS
 Cognitive tests: PASS (122/122, 13 files)
 Full regression: 0 new failures (baseline 5 files / 8 failures)
 Docker E2E: PASS (premature/complete/idempotent/append-reject + DB + old API smoke)
-Ahead/behind dev: 记录 push 后实际值
+Ahead/behind dev: ahead 31 / behind 0
 ```
 
 **建议后续**：触发一次 **Milestone D backend core review**（覆盖 A1–A15 架构不变量、留存矩阵、加密/幂等语义）；Reaction/Memory/Stroop、Frontend Runner、History、Export 需单独立任务书，不在本批次。
