@@ -250,11 +250,19 @@ export const updateDraftAssignment = async (
   assertCanManage(existing, role, userId)
   if (existing.status !== 'DRAFT') throw BAD_REQUEST('Only DRAFT assignments can be updated')
 
+  // D6.1 (P1)：时间窗不变量必须跨"本次 request + 既有行"合并校验 ——
+  // 只校验本次同时提供的字段会漏掉"只 PATCH opensAt/dueAt 其一"制造的非法状态。
+  const nextOpensAt = input.opensAt !== undefined ? new Date(input.opensAt) : existing.opensAt
+  const nextDueAt = input.dueAt !== undefined ? new Date(input.dueAt) : existing.dueAt
+  if (nextOpensAt && nextDueAt && nextDueAt.getTime() < nextOpensAt.getTime()) {
+    throw BAD_REQUEST('dueAt must be equal to or after opensAt')
+  }
+
   const data: any = {}
   if (input.title !== undefined) data.title = input.title
   if (input.instruction !== undefined) data.instruction = input.instruction
-  if (input.opensAt !== undefined) data.opensAt = new Date(input.opensAt)
-  if (input.dueAt !== undefined) data.dueAt = new Date(input.dueAt)
+  if (input.opensAt !== undefined) data.opensAt = nextOpensAt
+  if (input.dueAt !== undefined) data.dueAt = nextDueAt
   if (input.maxAttempts !== undefined) data.maxAttempts = input.maxAttempts
   if (input.required !== undefined) data.required = input.required
 
