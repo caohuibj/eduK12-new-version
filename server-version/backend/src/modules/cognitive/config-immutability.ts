@@ -18,8 +18,25 @@ export const assertConfigCoreMutable = (status: CognitiveConfigStatus): void => 
   }
 }
 
-// 延迟到 D2 / manage API 实现：
-// export const assertConfigStatusTransition = (
-//   from: CognitiveConfigStatus,
-//   to: CognitiveConfigStatus
-// ): void => { ... }
+// 允许的实际状态迁移（D2 Step 7）：
+//   DRAFT -> PUBLISHED
+//   PUBLISHED -> RETIRED
+// 拒绝：DRAFT -> RETIRED、PUBLISHED -> DRAFT、RETIRED -> DRAFT、RETIRED -> PUBLISHED。
+// 同状态不作为 "transition" 调用；调用方无需借此实现 no-op。
+const ALLOWED_TRANSITIONS: Record<CognitiveConfigStatus, CognitiveConfigStatus[]> = {
+  DRAFT: ['PUBLISHED'],
+  PUBLISHED: ['RETIRED'],
+  RETIRED: [],
+}
+
+export const assertConfigStatusTransition = (
+  from: CognitiveConfigStatus,
+  to: CognitiveConfigStatus
+): void => {
+  if (from === to) {
+    throw new Error(`${from} -> ${to} is not a transition`)
+  }
+  if (!ALLOWED_TRANSITIONS[from]?.includes(to)) {
+    throw new Error(`${from} -> ${to} is not an allowed status transition`)
+  }
+}
