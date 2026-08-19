@@ -90,6 +90,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # Stage B（v1.1 §26 Option A）：构建期 Feature Flag；默认 false，与 backend flag 一致
+        VITE_COGNITIVE_MODULE_ENABLED: ${VITE_COGNITIVE_MODULE_ENABLED:-false}
     container_name: ptool-frontend
     ports:
       - "80:80"
