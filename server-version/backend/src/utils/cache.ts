@@ -25,19 +25,19 @@ class MemoryCache {
   /**
    * 获取缓存
    * @param key 缓存键
-   * @returns 缓存值或 undefined
+   * @returns 缓存值或 null
    */
-  get<T>(key: string): T | undefined {
+  get<T>(key: string): T | null {
     const item = this.cache.get(key)
     
     if (!item) {
-      return undefined
+      return null
     }
 
     // 检查是否过期
-    if (Date.now() > item.expiresAt) {
+    if (Date.now() >= item.expiresAt) {
       this.cache.delete(key)
-      return undefined
+      return null
     }
 
     return item.value as T

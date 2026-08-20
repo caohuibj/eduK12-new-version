@@ -32,6 +32,8 @@ import documentRoutes from './routes/documents'
 import publicRoutes from './routes/public'
 import generalQuestionnaireRoutes from './routes/generalQuestionnaires'
 import classroomRoutes from './routes/classrooms'
+// 认知测评路由（D3+；仅在 COGNITIVE_MODULE_ENABLED=true 时挂载）
+import cognitiveRoutes from './modules/cognitive/cognitive.routes'
 
 const app = express()
 
@@ -88,6 +90,11 @@ app.use('/api/public', publicRoutes)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
+
+// 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
+if (config.cognitiveModuleEnabled) {
+  app.use('/api/cognitive', cognitiveRoutes)
+}
 
 // 404 处理
 app.use(notFoundHandler)

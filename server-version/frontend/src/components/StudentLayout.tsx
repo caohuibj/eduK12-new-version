@@ -1,8 +1,9 @@
 import React from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck } from 'lucide-react'
+import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck, Brain } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from './Footer'
+import { cognitiveModuleEnabled } from '../modules/cognitive/feature'
 
 const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth()
@@ -14,8 +15,13 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     navigate('/student/login')
   }
 
+  // Stage B（v1.1 §18）：Cognitive 导航在 flag=true 时显示；
+  // active 对 /student/cognitive 子路由采用 prefix 策略，进入 Runner/Result 仍高亮。
   const navItems = [
     { path: '/student', icon: BookOpen, label: '课程' },
+    ...(cognitiveModuleEnabled
+      ? [{ path: '/student/cognitive', icon: Brain, label: '认知测评' }]
+      : []),
     { path: '/student/profile', icon: Settings, label: '设置' },
   ]
 
@@ -55,7 +61,10 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex space-x-8">
             {navItems.map((item) => {
               const Icon = item.icon
-              const isActive = location.pathname === item.path
+              const isActive =
+                item.path === '/student/cognitive'
+                  ? location.pathname.startsWith('/student/cognitive')
+                  : location.pathname === item.path
               return (
                 <Link
                   key={item.path}

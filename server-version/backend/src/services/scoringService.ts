@@ -117,12 +117,14 @@ export function generateInterpretation(
   dimensionDescription?: string | null
 ): string {
   const baseInterpretation = `您在"${score.dimensionName}"维度上的得分为${score.normalizedScore}分`
+  const levelInterpretation = {
+    high: '表现突出',
+    medium: '表现中等',
+    low: '表现偏低'
+  }[score.level]
+  const description = dimensionDescription ? `。${dimensionDescription}` : ''
 
-  if (dimensionDescription) {
-    return `${baseInterpretation}。${dimensionDescription}`
-  }
-
-  return baseInterpretation
+  return `${baseInterpretation}，${levelInterpretation}${description}`
 }
 
 /**
@@ -178,7 +180,12 @@ export function generateSuggestions(level: string, dimensionCode: string): strin
  * 生成总体反馈
  */
 export function generateOverallFeedback(scores: DimensionScore[], scaleName: string): string {
-  return `您已完成"${scaleName}"测评。请查看各维度的详细解读，了解您的测评结果。`
+  const dimensionNames = scores
+    .map((score) => score.dimensionName)
+    .filter(Boolean)
+    .join('、')
+  const dimensions = dimensionNames ? `本次测评维度包括${dimensionNames}。` : ''
+  return `您已完成"${scaleName}"测评。${dimensions}请查看各维度的详细解读，了解您的测评结果。`
 }
 
 // ==================== 主要计算函数 ====================

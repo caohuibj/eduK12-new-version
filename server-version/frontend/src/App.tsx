@@ -65,6 +65,14 @@ import ClassroomJoin from './pages/student/ClassroomJoin'
 import ClassroomAnswer from './pages/student/ClassroomAnswer'
 import ClassroomEnter from './pages/student/ClassroomEnter'
 
+// Cognitive 页面（Stage B：URL 以 Assignment/Session 为核心；flag=false 时不注册 → 隐藏入口）
+import CognitiveHome from './modules/cognitive/pages/CognitiveHome'
+import CognitiveAssignmentEntry from './modules/cognitive/pages/CognitiveAssignmentEntry'
+import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
+import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
+import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
+import { cognitiveModuleEnabled } from './modules/cognitive/feature'
+
 // BigScreen Pages
 import BigScreen from './pages/bigscreen/BigScreen'
 
@@ -572,6 +580,52 @@ function App() {
               </OptionalStudentRoute>
             }
           />
+
+          {/* Cognitive 路由（Option A：flag=false 时不注册，/student/cognitive* 落 * → /） */}
+          {cognitiveModuleEnabled && (
+            <>
+              <Route
+                path="/student/cognitive"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveHome />
+                  </StudentProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/cognitive/assignments/:assignmentId"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveAssignmentEntry />
+                  </StudentProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/cognitive/history"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveHistory />
+                  </StudentProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/cognitive/sessions/:sessionId"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveRunner />
+                  </StudentProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/cognitive/sessions/:sessionId/result"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveResult />
+                  </StudentProtectedRoute>
+                }
+              />
+            </>
+          )}
 
           {/* Public Questionnaire Routes (无需认证) */}
           <Route
