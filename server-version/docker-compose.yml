@@ -55,8 +55,8 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY}
-      # Cognitive 模块开关（严格 true/false，Milestone D 完整验收前缺省 false）
-      COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-false}
+      # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）
+      COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
       # Cognitive 参与者假名化密钥（仅当 COGNITIVE_MODULE_ENABLED=true 时生产必需，64 位十六进制；与 DATA_ENCRYPTION_KEY 独立）
       DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
       REDIS_URL: redis://redis:6379
@@ -95,8 +95,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # Stage B（v1.1 §26 Option A）：构建期 Feature Flag；默认 false，与 backend flag 一致
-        VITE_COGNITIVE_MODULE_ENABLED: ${VITE_COGNITIVE_MODULE_ENABLED:-false}
+        # 构建期 Feature Flag；Release v1 默认开启，与 backend flag 一致
+        VITE_COGNITIVE_MODULE_ENABLED: ${VITE_COGNITIVE_MODULE_ENABLED:-true}
     container_name: ptool-frontend
     ports:
       - "80:80"

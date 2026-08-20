@@ -36,6 +36,7 @@ FROM deps AS build
 COPY prisma ./prisma
 RUN npx prisma generate
 COPY tsconfig.json ./
+COPY vitest.config.ts ./
 COPY src ./src
 RUN npm run build
 
