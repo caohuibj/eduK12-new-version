@@ -50,7 +50,7 @@ describe('cognitive history service', () => {
       select: expect.not.objectContaining({ metricsEncrypted: true }),
     }))
     expect(mockPrisma.cognitiveSession.count).toHaveBeenCalledWith({
-      where: { userId: 'student-1', status: 'COMPLETED' },
+      where: { participantIdentityId: 'participant-1', status: 'COMPLETED' },
     })
     expect(result).toEqual({
       total: 3,

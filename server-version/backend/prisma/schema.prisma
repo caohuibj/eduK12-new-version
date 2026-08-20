@@ -47,6 +47,7 @@ model User {
   createdClassrooms           Classroom[]                @relation("ClassroomCreator")
   // 认知测评模块关联（userId 删除时 Session 保留，userId 置空 -> SetNull）
   cognitiveSessions           CognitiveSession[]         @relation("SessionUser")
+  participantIdentity         ParticipantIdentity?
   createdCognitiveAssignments CognitiveAssignment[]      @relation("AssignmentCreator")
 
   @@map("users")
@@ -857,7 +858,7 @@ model ParticipantIdentity {
   createdAt     DateTime           @default(now()) @map("created_at")
   updatedAt     DateTime           @updatedAt @map("updated_at")
 
-  user     User              ? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user     User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
   sessions CognitiveSession[]
 
   @@map("participant_identities")

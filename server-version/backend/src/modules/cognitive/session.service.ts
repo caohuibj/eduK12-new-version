@@ -17,7 +17,7 @@ import { resolveCognitiveReference } from './reference'
  * 边界（D4 §3 / §19）：不写 Trial、不评分、不返回 score/metrics；
  * 不创建 anonymous/guest session；不建跨设备 resume 协议；不建 server timer；
  * 不引 Redis lock / websocket / heartbeat / fingerprint / device binding；
- * 不加新 migration。
+ * ParticipantIdentity 由 Phase 2 migration 提供稳定的数据边界。
  *
  * D6.1：
  * - P1：createSession 先找 existing IN_PROGRESS（resume 现有 attempt，不重新检查资格），
