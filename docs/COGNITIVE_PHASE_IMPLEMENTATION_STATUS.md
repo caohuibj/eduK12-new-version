@@ -19,12 +19,16 @@ Implemented:
 - [x] ParticipantIdentity table and migration backfill
 - [x] New sessions create and use a stable identity boundary
 - [x] Student history queries use ParticipantIdentity instead of direct user filtering
+- [x] Cursor pagination for cognitive history with opaque, versioned ordering tokens
+- [x] Public backend capability API at `GET /api/capabilities`
+- [x] Frontend Cognitive routes consume the backend capability instead of a separate build-time flag
+- [x] Opt-in end-to-end workflow integration test covering Assignment -> Session -> Trials -> Score -> Report -> History
 
-Pending:
+Compatibility:
 
-- Cursor pagination
-- Backend feature capability API
-- End-to-end integration workflow expansion
+- Existing page-number history pagination remains available for older clients.
+- Cursor mode uses `pagination=cursor` and returns `nextCursor` plus `hasMore`.
+- Integration suites remain opt-in through `COGNITIVE_INTEGRATION_DB_URL`.
 
 ## Design Principle
 

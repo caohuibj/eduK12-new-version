@@ -7,8 +7,9 @@ import type { CognitiveHistoryItem } from '../types'
 const CognitiveHistory: React.FC = () => {
   const navigate = useNavigate()
   const [items, setItems] = useState<CognitiveHistoryItem[]>([])
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [cursor, setCursor] = useState<string | undefined>()
+  const [cursorStack, setCursorStack] = useState<Array<string | undefined>>([undefined])
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,13 +19,14 @@ const CognitiveHistory: React.FC = () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await cognitiveApi.getHistory(page, 20)
+        const response = await cognitiveApi.getHistory(cursor, 20)
         if (response.code === 0 && response.data) {
           setItems(response.data.list)
-          setTotalPages(response.data.totalPages)
+          setNextCursor(response.data.nextCursor)
           setHasMore(response.data.hasMore)
+        } else {
+          setError(response.message || '获取历史记录失败')
         }
-        else setError(response.message || '获取历史记录失败')
       } catch (err) {
         setError((err as { message?: string }).message || '获取历史记录失败')
       } finally {
@@ -32,10 +34,25 @@ const CognitiveHistory: React.FC = () => {
       }
     }
     void load()
-  }, [page])
+  }, [cursor])
+
+  const goToNextPage = () => {
+    if (!nextCursor) return
+    setCursorStack((current) => [...current, cursor])
+    setCursor(nextCursor)
+  }
+
+  const goToPreviousPage = () => {
+    if (cursorStack.length <= 1) return
+    const previousCursor = cursorStack[cursorStack.length - 1]
+    setCursorStack((current) => current.slice(0, -1))
+    setCursor(previousCursor)
+  }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
   if (error) return <div className="card p-8 text-center text-red-500">{error}</div>
+
+  const pageNumber = cursorStack.length
 
   return (
     <div>
@@ -70,7 +87,7 @@ const CognitiveHistory: React.FC = () => {
                     {item.finishedAt ? new Date(item.finishedAt).toLocaleString('zh-CN') : '完成时间未知'}
                   </p>
                 </div>
-                  <div className="text-2xl font-bold text-primary">{Math.round(item.score)}</div>
+                <div className="text-2xl font-bold text-primary">{Math.round(item.score)}</div>
               </div>
               <p className="text-xs text-gray-400 mt-3">
                 {item.qualityState === 'interpretable' ? '数据质量：可解释' : '数据质量：不足以稳定解释'}
@@ -79,13 +96,13 @@ const CognitiveHistory: React.FC = () => {
           ))}
         </div>
       )}
-      {totalPages > 1 && (
+      {(cursorStack.length > 1 || hasMore) && (
         <div className="flex items-center justify-center gap-4 mt-6 text-sm text-gray-500">
-          <button type="button" className="btn-secondary" disabled={page === 1} onClick={() => setPage((current) => current - 1)}>
+          <button type="button" className="btn-secondary" disabled={cursorStack.length <= 1} onClick={goToPreviousPage}>
             上一页
           </button>
-          <span>第 {page} / {totalPages} 页</span>
-          <button type="button" className="btn-secondary" disabled={!hasMore} onClick={() => setPage((current) => current + 1)}>
+          <span>第 {pageNumber} 页</span>
+          <button type="button" className="btn-secondary" disabled={!hasMore || !nextCursor} onClick={goToNextPage}>
             下一页
           </button>
         </div>
@@ -95,3 +112,4 @@ const CognitiveHistory: React.FC = () => {
 }
 
 export default CognitiveHistory
+

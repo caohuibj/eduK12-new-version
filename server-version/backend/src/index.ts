@@ -32,6 +32,7 @@ import documentRoutes from './routes/documents'
 import publicRoutes from './routes/public'
 import generalQuestionnaireRoutes from './routes/generalQuestionnaires'
 import classroomRoutes from './routes/classrooms'
+import capabilityRoutes from './routes/capabilities'
 // 认知测评路由（D3+；仅在 COGNITIVE_MODULE_ENABLED=true 时挂载）
 import cognitiveRoutes from './modules/cognitive/cognitive.routes'
 
@@ -90,6 +91,8 @@ app.use('/api/public', publicRoutes)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
+// Runtime capabilities are public and let clients use the backend flag as the source of truth.
+app.use('/api/capabilities', capabilityRoutes)
 
 // 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
 if (config.cognitiveModuleEnabled) {

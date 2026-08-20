@@ -18,8 +18,14 @@ export const cognitiveApi = {
     apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my'),
   getAssignment: (id: string) =>
     apiClient.get<CognitiveAssignmentSummary>(`/cognitive/assignments/${id}`),
-  getHistory: (page = 1, pageSize = 20) =>
-    apiClient.get<CognitiveHistoryPage>(`/cognitive/history?page=${page}&pageSize=${pageSize}`),
+  getHistory: (cursor?: string, pageSize = 20) => {
+    const params = new URLSearchParams({
+      pagination: 'cursor',
+      pageSize: String(pageSize),
+    })
+    if (cursor) params.set('cursor', cursor)
+    return apiClient.get<CognitiveHistoryPage>(`/cognitive/history?${params.toString()}`)
+  },
   createSession: (assignmentId: string) =>
     apiClient.post<CognitiveSession>('/cognitive/sessions', { assignmentId }),
   getSession: (sessionId: string) =>
@@ -34,3 +40,4 @@ export const cognitiveApi = {
   completeSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/complete`, {}),
 }
+

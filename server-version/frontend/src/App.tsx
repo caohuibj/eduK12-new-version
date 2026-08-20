@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Layout from './components/Layout'
@@ -71,7 +71,7 @@ import CognitiveAssignmentEntry from './modules/cognitive/pages/CognitiveAssignm
 import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
 import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
 import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
-import { cognitiveModuleEnabled } from './modules/cognitive/feature'
+import { loadCognitiveCapability } from './modules/cognitive/feature'
 
 // BigScreen Pages
 import BigScreen from './pages/bigscreen/BigScreen'
@@ -193,6 +193,18 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 }
 
 function App() {
+  const [cognitiveModuleEnabled, setCognitiveModuleEnabled] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    void loadCognitiveCapability().then((enabled) => {
+      if (active) setCognitiveModuleEnabled(enabled)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -662,3 +674,4 @@ function App() {
 }
 
 export default App
+

@@ -37,9 +37,14 @@ describe('cognitive api wrapper', () => {
     expect(mockClient.get).toHaveBeenCalledWith('/cognitive/assignments/asg-1')
   })
 
-  it('GET /cognitive/history', async () => {
+  it('GET /cognitive/history uses cursor pagination from the first page', async () => {
     await cognitiveApi.getHistory()
-    expect(mockClient.get).toHaveBeenCalledWith('/cognitive/history?page=1&pageSize=20')
+    expect(mockClient.get).toHaveBeenCalledWith('/cognitive/history?pagination=cursor&pageSize=20')
+  })
+
+  it('GET /cognitive/history forwards the cursor token', async () => {
+    await cognitiveApi.getHistory('next-token', 10)
+    expect(mockClient.get).toHaveBeenCalledWith('/cognitive/history?pagination=cursor&pageSize=10&cursor=next-token')
   })
 
   it('POST /cognitive/sessions with { assignmentId }', async () => {
@@ -70,3 +75,4 @@ describe('cognitive api wrapper', () => {
     expect(mockClient.post).toHaveBeenCalledWith('/cognitive/sessions/sess-1/complete', {})
   })
 })
+

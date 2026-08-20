@@ -62,11 +62,13 @@ export interface CognitiveHistoryItem {
 
 export interface CognitiveHistoryPage {
   list: CognitiveHistoryItem[]
-  total: number
-  page: number
   pageSize: number
-  totalPages: number
+  nextCursor: string | null
   hasMore: boolean
+  // Kept optional for older offset-paginated responses during rollout.
+  total?: number
+  page?: number
+  totalPages?: number
 }
 
 /**
@@ -178,3 +180,4 @@ export type StroopTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+

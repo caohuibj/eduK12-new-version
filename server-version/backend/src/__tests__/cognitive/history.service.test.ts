@@ -13,7 +13,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { listMyHistory } from '../../modules/cognitive/history.service'
+import { encodeHistoryCursor, listMyHistory } from '../../modules/cognitive/history.service'
 
 process.env.DATA_ENCRYPTION_KEY = '11'.repeat(32)
 
@@ -91,5 +91,85 @@ describe('cognitive history service', () => {
     expect(item).toMatchObject({ title: 'stroop 测评', score: 30, qualityState: 'insufficient' })
     expect(item).not.toHaveProperty('metrics')
     expect(item).not.toHaveProperty('qualityFlags')
+  })
+
+  it('uses a stable cursor tuple and avoids offset queries', async () => {
+    const firstFinishedAt = new Date('2026-08-20T00:00:00Z')
+    const secondFinishedAt = new Date('2026-08-19T00:00:00Z')
+    const firstCreatedAt = new Date('2026-08-20T00:00:01Z')
+    const secondCreatedAt = new Date('2026-08-19T00:00:01Z')
+    const session = (id: string, finishedAt: Date, createdAt: Date) => ({
+      id,
+      assignmentId: 'assignment-1',
+      testType: 'reaction',
+      attemptNo: 1,
+      configVersion: '1.0.0',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      finishedAt,
+      createdAt,
+      scoreEncrypted: encryptCognitivePayload(88),
+      qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+      assignment: { title: 'Reaction pilot' },
+    })
+    mockPrisma.cognitiveSession.findMany.mockResolvedValueOnce([
+      session('session-1', firstFinishedAt, firstCreatedAt),
+      session('session-2', secondFinishedAt, secondCreatedAt),
+    ])
+
+    const first = await listMyHistory('student-1', {
+      page: 1,
+      pageSize: 1,
+      skip: 0,
+      take: 1,
+      cursorMode: true,
+    })
+
+    expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      take: 2,
+      orderBy: [
+        { finishedAt: { sort: 'desc', nulls: 'last' } },
+        { createdAt: 'desc' },
+        { id: 'desc' },
+      ],
+    }))
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls[0][0]).not.toHaveProperty('skip')
+    expect(first).toMatchObject({ hasMore: true, list: [{ sessionId: 'session-1' }] })
+    const nextCursor = (first as { nextCursor: string | null }).nextCursor
+    expect(nextCursor).toBe(encodeHistoryCursor({
+      id: 'session-1',
+      finishedAt: firstFinishedAt,
+      createdAt: firstCreatedAt,
+    }))
+
+    mockPrisma.cognitiveSession.findMany.mockResolvedValueOnce([
+      session('session-2', secondFinishedAt, secondCreatedAt),
+    ])
+    const second = await listMyHistory('student-1', {
+      page: 1,
+      pageSize: 1,
+      skip: 0,
+      take: 1,
+      cursorMode: true,
+      cursor: nextCursor!,
+    })
+
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls[1][0]).not.toHaveProperty('skip')
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls[1][0].where).toEqual(expect.objectContaining({
+      OR: expect.any(Array),
+    }))
+    expect(second).toMatchObject({ hasMore: false, nextCursor: null, list: [{ sessionId: 'session-2' }] })
+  })
+
+  it('rejects malformed cursors without querying cognitive records', async () => {
+    await expect(listMyHistory('student-1', {
+      page: 1,
+      pageSize: 20,
+      skip: 0,
+      take: 20,
+      cursorMode: true,
+      cursor: 'not-a-cursor',
+    })).rejects.toThrow('Invalid cognitive history cursor')
+    expect(mockPrisma.cognitiveSession.findMany).not.toHaveBeenCalled()
   })
 })

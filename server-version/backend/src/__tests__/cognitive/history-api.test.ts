@@ -75,4 +75,31 @@ describe('cognitive history API', () => {
       },
     }))
   })
+
+  it('returns cursor metadata for cursor-mode requests', async () => {
+    const res = makeRes()
+    ;(historyService.listMyHistory as any).mockResolvedValue({
+      list: [{ sessionId: 'session-1', score: 90 }],
+      nextCursor: 'next-token',
+      hasMore: true,
+    })
+
+    await cognitiveController.myHistory(makeReq({ query: { pagination: 'cursor', pageSize: '1' } }), res)
+
+    expect(historyService.listMyHistory).toHaveBeenCalledWith('student-1', {
+      page: 1,
+      pageSize: 1,
+      skip: 0,
+      take: 1,
+      cursorMode: true,
+    })
+    expect(res.body).toEqual(expect.objectContaining({
+      data: {
+        list: [{ sessionId: 'session-1', score: 90 }],
+        pageSize: 1,
+        nextCursor: 'next-token',
+        hasMore: true,
+      },
+    }))
+  })
 })
