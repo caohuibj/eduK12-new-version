@@ -55,6 +55,9 @@ const CognitiveHome: React.FC = () => {
       <div className="flex items-center space-x-2 mb-6">
         <Brain className="w-6 h-6 text-primary" />
         <h1 className="text-2xl font-bold text-gray-800">认知测评</h1>
+        <button type="button" onClick={() => navigate('/student/cognitive/history')} className="ml-auto text-sm text-primary hover:underline">
+          查看历史
+        </button>
       </div>
 
       {assignments.length === 0 ? (

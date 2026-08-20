@@ -70,6 +70,7 @@ import CognitiveHome from './modules/cognitive/pages/CognitiveHome'
 import CognitiveAssignmentEntry from './modules/cognitive/pages/CognitiveAssignmentEntry'
 import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
 import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
+import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
 import { cognitiveModuleEnabled } from './modules/cognitive/feature'
 
 // BigScreen Pages
@@ -596,6 +597,14 @@ function App() {
                 element={
                   <StudentProtectedRoute>
                     <CognitiveAssignmentEntry />
+                  </StudentProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/cognitive/history"
+                element={
+                  <StudentProtectedRoute>
+                    <CognitiveHistory />
                   </StudentProtectedRoute>
                 }
               />

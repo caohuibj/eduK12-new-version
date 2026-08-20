@@ -9,6 +9,7 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
+import { resolveCognitiveReference } from './reference'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -211,6 +212,7 @@ export const getSession = async (userId: string, sessionId: string) => {
 
   if (session.status === 'COMPLETED') {
     // D6 后：完成态返回 decrypted result。
+    const runnerPayload = toRunnerPayload(session)
     const score = session.scoreEncrypted
       ? decryptCognitivePayload<number>(session.scoreEncrypted)
       : null
@@ -220,12 +222,23 @@ export const getSession = async (userId: string, sessionId: string) => {
     const qualityFlags = session.qualityFlagsEncrypted
       ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
       : null
+    const report = (runnerPayload.config as { report?: Record<string, unknown> }).report ?? {}
+    const reference = metrics && score !== null
+      ? resolveCognitiveReference({
+          testType: session.testType,
+          metrics,
+          score,
+          referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
+          referenceVersion: report.referenceVersion as string | undefined,
+          referenceBand: report.referenceBand as string | undefined,
+        })
+      : undefined
     return {
-      ...toRunnerPayload(session),
+      ...runnerPayload,
       status: session.status,
       finishedAt: session.finishedAt,
       result: score !== null && metrics !== null && qualityFlags !== null
-        ? { score, metrics, qualityFlags }
+        ? { score, metrics, qualityFlags, reference }
         : null,
     }
   }

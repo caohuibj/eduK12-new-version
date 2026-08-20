@@ -2,7 +2,6 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCognitiveSession } from '../core/useCognitiveSession'
 import { resolveRunner } from '../registry'
-import type { FakeConfig } from '../types'
 
 /**
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
@@ -15,9 +14,10 @@ const CognitiveRunner: React.FC = () => {
   const controller = useCognitiveSession(sessionId ?? '')
   const { state } = controller
 
-  const config = (state.session?.config ?? {}) as unknown as FakeConfig
-  const total = config?.trialCount ?? 0
-  const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total
+  // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
+  // Memory（自适应）不依赖固定总数，完成信号由其自身推进逻辑在 Session 3 处理。
+  const config = (state.session?.config ?? {}) as Record<string, unknown>
+  const total = (config?.trialCount ?? config?.totalTrials ?? 0) as number
 
   if (state.status === 'COMPLETED') {
     // 完成态：结果页只读展示，不重新评分
@@ -101,12 +101,15 @@ const CognitiveRunner: React.FC = () => {
       )
     }
     const Runner = entry.RunnerComponent
+    const taskCompletes = entry.completionMode === 'task'
+    const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total && !taskCompletes
     return (
       <div className="max-w-2xl mx-auto">
         <Runner
           taskContext={state.taskContext}
           trialIndex={state.trialIndex}
           onTrialComplete={controller.appendTrial}
+          onTaskComplete={taskCompletes ? controller.complete : undefined}
         />
         {state.error && (
           <p className="text-sm text-red-500 text-center mt-3">{state.error.message}</p>

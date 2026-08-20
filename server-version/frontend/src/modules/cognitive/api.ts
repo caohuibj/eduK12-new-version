@@ -1,5 +1,5 @@
 import apiClient from '../../api/client'
-import type { CognitiveAssignmentSummary, CognitiveSession } from './types'
+import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
 
 /**
  * Cognitive API 封装（Stage B v1.1 §14/§15）。
@@ -18,6 +18,8 @@ export const cognitiveApi = {
     apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my'),
   getAssignment: (id: string) =>
     apiClient.get<CognitiveAssignmentSummary>(`/cognitive/assignments/${id}`),
+  getHistory: (page = 1, pageSize = 20) =>
+    apiClient.get<CognitiveHistoryPage>(`/cognitive/history?page=${page}&pageSize=${pageSize}`),
   createSession: (assignmentId: string) =>
     apiClient.post<CognitiveSession>('/cognitive/sessions', { assignmentId }),
   getSession: (sessionId: string) =>

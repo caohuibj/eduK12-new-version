@@ -37,6 +37,11 @@ describe('cognitive api wrapper', () => {
     expect(mockClient.get).toHaveBeenCalledWith('/cognitive/assignments/asg-1')
   })
 
+  it('GET /cognitive/history', async () => {
+    await cognitiveApi.getHistory()
+    expect(mockClient.get).toHaveBeenCalledWith('/cognitive/history?page=1&pageSize=20')
+  })
+
   it('POST /cognitive/sessions with { assignmentId }', async () => {
     await cognitiveApi.createSession('asg-1')
     expect(mockClient.post).toHaveBeenCalledWith('/cognitive/sessions', { assignmentId: 'asg-1' })

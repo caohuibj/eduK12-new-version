@@ -5,6 +5,7 @@ import * as assignmentService from './assignment.service'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
+import * as historyService from './history.service'
 import { CognitiveServiceError } from './cognitive.errors'
 import {
   createAssignmentSchema,
@@ -16,6 +17,7 @@ import {
   completeSessionSchema,
 } from './cognitive.schema'
 import { z } from 'zod'
+import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
@@ -49,6 +51,17 @@ export const cognitiveController = {
       if (!req.user) return unauthorized(res)
       const data = await assignmentService.listStudentAssignments(req.user.userId)
       return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async myHistory(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const pagination = getPaginationParams(req)
+      const data = await historyService.listMyHistory(req.user.userId, pagination)
+      return success(res, buildPaginatedResult(data.list, data.total, pagination))
     } catch (err) {
       return handleError(res, err)
     }

@@ -32,6 +32,41 @@ export interface CognitiveResult {
   score: number
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
+  reference?: CognitiveReference
+}
+
+export interface CognitiveReference {
+  mode: 'none' | 'simulated' | 'literature'
+  status: 'not_requested' | 'provisional' | 'unavailable'
+  available: boolean
+  label: string
+  version: string | null
+  band: string | null
+  referencePosition: number | null
+  disclaimer: string
+}
+
+export interface CognitiveHistoryItem {
+  sessionId: string
+  assignmentId: string | null
+  title: string
+  testType: string
+  attemptNo: number
+  configVersion: string
+  engineVersion: string
+  scoringVersion: string
+  finishedAt: string | null
+  score: number
+  qualityState: 'interpretable' | 'insufficient'
+}
+
+export interface CognitiveHistoryPage {
+  list: CognitiveHistoryItem[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  hasMore: boolean
 }
 
 /**
@@ -65,4 +100,81 @@ export interface FakeConfig {
 export interface FakeTrialPayload {
   correct: boolean
   rtMs: number
+}
+
+/** Reaction Test 冻结 config（与后端 reaction.config schema 一致）。 */
+export interface ReactionConfig {
+  totalTrials: number
+  foreperiodMinMs: number
+  foreperiodMaxMs: number
+  timeoutMs: number
+  readyDurationMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/**
+ * Reaction Test 单 trial payload（与后端 reaction.trial schema 一致）。
+ * 用 type alias 而非 interface：保证可赋值给 onTrialComplete 的 Record<string, unknown>。
+ */
+export type ReactionTrialPayload = {
+  foreperiodMs: number
+  rtMs: number | null
+  prematureCount: number
+  interrupted: boolean
+  inputMode: 'pointer' | 'touch' | 'keyboard'
+}
+
+export interface MemoryConfig {
+  startLength: number
+  maxLength: number
+  trialsPerLevel: number
+  digitDisplayMs: number
+  digitIntervalMs: number
+  readyDurationMs: number
+  inactivityGuardMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type MemoryTrialPayload = {
+  length: number
+  trialWithinLevel: 1 | 2
+  sequence: number[]
+  response: number[]
+  responseDurationMs: number
+  interrupted: boolean
+}
+
+export interface StroopConfig {
+  totalTrials: number
+  congruentRatio: number
+  fixationMs: number
+  stimulusDurationMs: number
+  isiMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type StroopColor = 'red' | 'green' | 'blue' | 'yellow'
+
+export type StroopTrialPayload = {
+  word: '红' | '绿' | '蓝' | '黄'
+  inkColor: StroopColor
+  response: StroopColor | null
+  rtMs: number | null
+  interrupted: boolean
 }

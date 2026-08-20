@@ -1,6 +1,9 @@
 import type { CognitiveTaskProps } from './core/runner.types'
 // 模块加载期注册 Fake（单向依赖：fake.registry 不反向 import 本文件，避免循环）
 import { fakeRegistryEntry } from './tasks/fake/fake.registry'
+import { reactionRegistryEntry } from './tasks/reaction/reaction.registry'
+import { memoryRegistryEntry } from './tasks/memory/memory.registry'
+import { stroopRegistryEntry } from './tasks/stroop/stroop.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -15,10 +18,42 @@ import { fakeRegistryEntry } from './tasks/fake/fake.registry'
  *  - 未知版本 → `resolveRunner` 返回 undefined → runner 态 `UNSUPPORTED`。
  */
 
+/**
+ * 指标展示定义（Milestone E §18 / 用户确认 R1：前端静态 metadata，非独立 Report Engine）。
+ * key 必须对应后端 scorer 返回的 metrics 字段名；displayType 决定渲染样式。
+ */
+export interface MetricDefinition {
+  key: string
+  label: string
+  unit?: string
+  displayType: 'number' | 'percentage' | 'ms' | 'text'
+}
+
+/**
+ * 即时报告定义（Milestone E §74）：标题 + headline 指标 + summary 指标 + 免责声明。
+ * 后端只负责 metrics JSON + scoringVersion + qualityFlags；展示层解释全部在前端。
+ */
+export interface ReportDefinition {
+  title: string
+  headlineMetric: string
+  summaryMetrics: string[]
+  indexLabel?: string
+  practicalTips?: string[]
+  disclaimer?: string
+}
+
 export interface CognitiveFrontendRegistryEntry {
   testType: string
+  /** 展示名（中文），如 “反应速度”。 */
+  name: string
   engineVersion: string
+  /** 与后端 registry key 对齐；前端不权威评分，仅透传。 */
+  scoringVersion: string
   RunnerComponent: React.ComponentType<CognitiveTaskProps>
+  metricDefinitions: MetricDefinition[]
+  reportDefinition: ReportDefinition
+  /** Memory 等自适应任务由任务本身决定何时完成。 */
+  completionMode?: 'manual' | 'task'
 }
 
 const REGISTRY = new Map<string, CognitiveFrontendRegistryEntry>()
@@ -40,3 +75,12 @@ export const resolveRunner = (
 
 // 注册 Fake Test：fake / 1.0.0
 registerCognitiveRunner(fakeRegistryEntry)
+
+// 注册 Reaction Test：reaction / 1.0.0（Milestone E Session 2）
+registerCognitiveRunner(reactionRegistryEntry)
+
+// 注册 Memory Test：memory / 1.0.0（Milestone E Session 3）
+registerCognitiveRunner(memoryRegistryEntry)
+
+// 注册 Stroop Test：stroop / 1.0.0（Milestone E Session 4）
+registerCognitiveRunner(stroopRegistryEntry)

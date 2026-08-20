@@ -32,7 +32,7 @@ const friendlyError = (err: unknown): RunnerError => {
 export interface CognitiveSessionController {
   state: RunnerState
   start: () => void
-  appendTrial: (payload: Record<string, unknown>) => Promise<void>
+  appendTrial: (payload: Record<string, unknown>) => Promise<boolean>
   complete: () => Promise<void>
   reload: () => void
 }
@@ -86,26 +86,28 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
   }, [])
 
   const appendTrial = useCallback(
-    async (payload: Record<string, unknown>) => {
+    async (payload: Record<string, unknown>): Promise<boolean> => {
       const nextIndex = stateRef.current.trialIndex
       dispatch({ type: 'TRIAL_SUBMIT_START' })
       try {
         const response = await cognitiveApi.appendTrial(sessionId, nextIndex, payload)
         if (response.code !== 0) {
           dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(response) })
-          return
+          return false
         }
         // 只有 append 成功后才写账本（可证明进度）
         writeSessionLedger(sessionId, { status: 'IN_PROGRESS', trialIndex: nextIndex })
         dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
+        return true
       } catch (err) {
         // 409 = 同 index 异 hash 冲突 → 禁止重跑，进入安全态
         const status = (err as { statusCode?: number }).statusCode
         if (status === 409) {
           dispatch({ type: 'TRIAL_CONFLICT' })
-          return
+          return false
         }
         dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(err) })
+        return false
       }
     },
     [sessionId]
@@ -125,7 +127,7 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
       const result: CognitiveResult | null =
         d.result ??
         (typeof d.score === 'number'
-          ? { score: d.score, metrics: d.metrics ?? {}, qualityFlags: d.qualityFlags ?? {} }
+          ? { score: d.score, metrics: d.metrics ?? {}, qualityFlags: d.qualityFlags ?? {}, reference: d.reference }
           : null)
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })

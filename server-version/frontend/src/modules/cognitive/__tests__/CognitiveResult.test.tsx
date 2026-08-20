@@ -30,8 +30,8 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-describe('CognitiveResult page', () => {
-  it('renders server score/metrics for COMPLETED session via GET only (no re-scoring)', async () => {
+describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §74)', () => {
+  it('renders reportDefinition-driven card via GET only (no re-scoring)', async () => {
     mockCognitiveApi.getSession.mockResolvedValue({
       code: 0,
       message: 'ok',
@@ -44,13 +44,23 @@ describe('CognitiveResult page', () => {
         finishedAt: '2026-01-01T00:00:00Z',
         config: {},
         randomSeed: 'seed',
-        result: { score: 66.67, metrics: { correctCount: 2, meanRtMs: 500 }, qualityFlags: {} },
+        result: {
+          score: 66.67,
+          metrics: { trialCount: 3, correctCount: 2, accuracy: 0.6667, meanRtMs: 500 },
+          qualityFlags: {},
+        },
       },
     })
     renderAt()
-    expect(await screen.findByText('测评完成')).toBeTruthy()
-    expect(screen.getByText('66.67')).toBeTruthy()
-    expect(screen.getByText('correctCount')).toBeTruthy()
+
+    // 标题来自 reportDefinition.title；headline（accuracy）按 percentage 渲染
+    expect(await screen.findByText('Fake 测试')).toBeTruthy()
+    expect(screen.getAllByText('67%').length).toBeGreaterThan(0)
+    // metricDefinitions 提供中文 label（summary 与 detail 都可能出现同一 label）
+    expect(screen.getByText('正确数')).toBeTruthy()
+    expect(screen.getAllByText('平均反应时').length).toBeGreaterThan(0)
+    // disclaimer 来自 reportDefinition
+    expect(screen.getByText('Fake 任务仅用于验证框架，不反映真实能力。')).toBeTruthy()
 
     // 只 GET 一次；绝不调用 complete / append（不重新评分）
     expect(mockCognitiveApi.getSession).toHaveBeenCalledTimes(1)
@@ -75,5 +85,43 @@ describe('CognitiveResult page', () => {
     })
     renderAt()
     expect(await screen.findByText('该测评尚未完成')).toBeTruthy()
+  })
+
+  it('hides a strong headline, index, and reference when quality is insufficient', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        config: {},
+        randomSeed: 'seed',
+        result: {
+          score: 30,
+          metrics: { medianRtMs: null, missRate: 1 },
+          qualityFlags: { interpretable: false },
+          reference: {
+            mode: 'simulated',
+            status: 'provisional',
+            available: true,
+            label: '模拟参考位置',
+            version: 'sim-k12-v0.1',
+            band: 'K7-9',
+            referencePosition: 10,
+            disclaimer: '模拟参考用于试运行与报告体验验证，不代表真实同龄人常模。',
+          },
+        },
+      },
+    })
+
+    renderAt()
+
+    expect(await screen.findByText('本次数据不足以稳定解释，建议重新测量。')).toBeTruthy()
+    expect(screen.getByText('暂不显示')).toBeTruthy()
+    expect(screen.queryByText('参考位置 10 / 100')).toBeNull()
+    expect(screen.getByText('中位反应时')).toBeTruthy()
   })
 })
