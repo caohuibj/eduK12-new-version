@@ -78,6 +78,8 @@ jobs:
   frontend:
     name: frontend (typecheck + cognitive tests + build)
     runs-on: ubuntu-latest
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
       run:
         working-directory: server-version/frontend
