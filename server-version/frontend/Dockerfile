@@ -12,9 +12,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-# Stage B（v1.1 §26 Option A）：构建期 Feature Flag（Vite 静态替换，值固化进产物）
+# Release v1：构建期 Feature Flag（Vite 静态替换，值固化进产物）
 ARG VITE_COGNITIVE_MODULE_ENABLED
-ENV VITE_COGNITIVE_MODULE_ENABLED=${VITE_COGNITIVE_MODULE_ENABLED:-false}
+ENV VITE_COGNITIVE_MODULE_ENABLED=${VITE_COGNITIVE_MODULE_ENABLED:-true}
 RUN npm run build
 
 FROM nginx:alpine AS runtime

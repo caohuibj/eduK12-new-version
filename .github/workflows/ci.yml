@@ -1,28 +1,29 @@
 # CI / merge gate
 #
 # 触发：
-#   push feature/cognitive-core / feature/cognitive-runner
+#   push feature/* / dev / main
 #   pull_request → dev / main
 #
 # jobs：
-#   backend       : npm ci + prisma generate + npm run build + cognitive/config tests
+#   backend       : npm ci + prisma generate + migrate deploy + seed + build + full regression
 #   frontend      : npm ci + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
-#   docker-config : docker compose config（拓扑合法）
+#   docker       : docker compose config + backend/frontend production image build
 #
 # 说明：
 #   - Vite build 不作为 TypeScript typecheck 的替代品（v1.1 §11）。
-#   - frontend typecheck 聚焦 Cognitive 模块（tsconfig.cognitive.json）；全仓 tsc -b 存在 ~90 个
-#     预存类型错误（前端从未有 typecheck 门禁），登记为独立清理项，不在本 PR 修复。
-#   - backend vitest 默认跳过 concurrency.integration.test.ts（未设 COGNITIVE_INTEGRATION_DB_URL），
-#     真实 DB 并发集成 / Docker E2E 仍为人工门禁。
+#   - frontend typecheck 聚焦 Cognitive 模块（tsconfig.cognitive.json）；全仓 tsc -b 的预存类型错误
+#     登记为独立清理项，不扩大本里程碑范围。
+#   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
+#     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
 
 name: CI
 
 on:
   push:
     branches:
-      - feature/cognitive-core
-      - feature/cognitive-runner
+      - 'feature/**'
+      - dev
+      - main
   pull_request:
     branches:
       - dev
@@ -31,8 +32,28 @@ on:
 
 jobs:
   backend:
-    name: backend (ci + generate + build + tests)
+    name: backend (ci + migrate + build + full regression)
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: server-version/backend
@@ -47,14 +68,23 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
+      - name: prisma migrate deploy
+        run: npx prisma migrate deploy
+      - name: seed reference and configuration data
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
       - name: build (tsc)
         run: npm run build
-      - name: cognitive + config tests
-        run: npx vitest run src/__tests__/cognitive src/__tests__/config/keys.test.ts
+      - name: full regression
+        run: npm test
 
   frontend:
     name: frontend (typecheck + cognitive tests + build)
     runs-on: ubuntu-latest
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
       run:
         working-directory: server-version/frontend
@@ -74,13 +104,21 @@ jobs:
       - name: build (vite)
         run: npm run build
 
-  docker-config:
-    name: docker (compose config)
+  docker:
+    name: docker (compose config + production builds)
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
       run:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
       - name: validate compose
-        run: docker compose config
+        run: docker compose config > /tmp/eduk12-compose-config.yml
+      - name: build production images
+        run: docker compose build backend frontend
