@@ -1,13 +1,20 @@
-# 最低 CI / merge gate（feature/cognitive-core → dev）
+# CI / merge gate
 #
-# 范围（D6.1 评审确认）：
-#   backend  : npm ci + prisma generate + npm run build + cognitive/config 测试
-#   frontend : npm build（vite build）
-#   docker   : docker compose config（拓扑合法）
-# DB 并发集成测试 / Docker E2E 暂为人工门禁（需真实 Postgres，见 docs/cognitive-d61-hardening-report-v1.md）。
+# 触发：
+#   push feature/cognitive-core / feature/cognitive-runner
+#   pull_request → dev / main
 #
-# 说明：`npx vitest run src/__tests__/cognitive` 默认跳过 concurrency.integration.test.ts
-# （未设 COGNITIVE_INTEGRATION_DB_URL），不触碰数据库。
+# jobs：
+#   backend       : npm ci + prisma generate + npm run build + cognitive/config tests
+#   frontend      : npm ci + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
+#   docker-config : docker compose config（拓扑合法）
+#
+# 说明：
+#   - Vite build 不作为 TypeScript typecheck 的替代品（v1.1 §11）。
+#   - frontend typecheck 聚焦 Cognitive 模块（tsconfig.cognitive.json）；全仓 tsc -b 存在 ~90 个
+#     预存类型错误（前端从未有 typecheck 门禁），登记为独立清理项，不在本 PR 修复。
+#   - backend vitest 默认跳过 concurrency.integration.test.ts（未设 COGNITIVE_INTEGRATION_DB_URL），
+#     真实 DB 并发集成 / Docker E2E 仍为人工门禁。
 
 name: CI
 
@@ -15,6 +22,7 @@ on:
   push:
     branches:
       - feature/cognitive-core
+      - feature/cognitive-runner
   pull_request:
     branches:
       - dev
@@ -45,7 +53,7 @@ jobs:
         run: npx vitest run src/__tests__/cognitive src/__tests__/config/keys.test.ts
 
   frontend:
-    name: frontend (build)
+    name: frontend (typecheck + cognitive tests + build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,6 +67,10 @@ jobs:
           cache-dependency-path: server-version/frontend/package-lock.json
       - name: npm ci
         run: npm ci
+      - name: typecheck
+        run: npm run typecheck
+      - name: cognitive frontend tests
+        run: npm run test:cognitive
       - name: build (vite)
         run: npm run build
 
