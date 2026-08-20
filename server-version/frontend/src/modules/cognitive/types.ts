@@ -66,3 +66,31 @@ export interface FakeTrialPayload {
   correct: boolean
   rtMs: number
 }
+
+/** Reaction Test 冻结 config（与后端 reaction.config schema 一致）。 */
+export interface ReactionConfig {
+  totalTrials: number
+  foreperiodMinMs: number
+  foreperiodMaxMs: number
+  timeoutMs: number
+  readyDurationMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/**
+ * Reaction Test 单 trial payload（与后端 reaction.trial schema 一致）。
+ * 用 type alias 而非 interface：保证可赋值给 onTrialComplete 的 Record<string, unknown>。
+ */
+export type ReactionTrialPayload = {
+  foreperiodMs: number
+  rtMs: number | null
+  prematureCount: number
+  interrupted: boolean
+  inputMode: 'pointer' | 'touch' | 'keyboard'
+}

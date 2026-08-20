@@ -2,6 +2,9 @@ import { RegistryEntry } from './cognitive.types'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
 import { scoreFakeV1 } from './scoring/fake.v1'
+import { reactionConfigSchema } from './schemas/reaction.config'
+import { reactionTrialSchema } from './schemas/reaction.trial'
+import { scoreReactionV1 } from './scoring/reaction.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -65,4 +68,14 @@ registerEntry({
   configSchema: fakeConfigSchema,
   trialSchema: fakeTrialSchema,
   score: scoreFakeV1,
+})
+
+// 注册 Reaction Test：reaction / 1.0.0 / 1.0.0（Milestone E Session 2）
+registerEntry({
+  testType: 'reaction',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: reactionConfigSchema,
+  trialSchema: reactionTrialSchema,
+  score: scoreReactionV1,
 })

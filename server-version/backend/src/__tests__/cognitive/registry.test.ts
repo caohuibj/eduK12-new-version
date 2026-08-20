@@ -28,9 +28,20 @@ describe('cognitive registry', () => {
     expect(getCognitiveRegistryEntry('fake', '1.0.0', '2.0.0')).toBeUndefined()
   })
 
+  it('looks up reaction v1 entry (Milestone E Session 2)', () => {
+    expect(hasCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')).toBe(true)
+    const entry = getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')
+    expect(entry).toBeDefined()
+    expect(entry?.testType).toBe('reaction')
+    expect(entry?.engineVersion).toBe('1.0.0')
+    expect(entry?.scoringVersion).toBe('1.0.0')
+  })
+
   it('fails lookup for an unknown testType', () => {
-    expect(hasCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')).toBe(false)
-    expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')).toBeUndefined()
+    expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBe(false)
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBeUndefined()
+    expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBe(false)
+    expect(getCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBeUndefined()
   })
 
   it('never falls back to the latest version for a wrong scoringVersion', () => {
