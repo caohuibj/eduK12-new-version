@@ -5,7 +5,7 @@
 #   pull_request → dev / main
 #
 # jobs：
-#   backend       : npm ci + prisma generate + migrate deploy + build + full regression
+#   backend       : npm ci + prisma generate + migrate deploy + seed + build + full regression
 #   frontend      : npm ci + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
 #   docker       : docker compose config + backend/frontend production image build
 #
@@ -70,6 +70,11 @@ jobs:
         run: npx prisma generate
       - name: prisma migrate deploy
         run: npx prisma migrate deploy
+      - name: seed reference and configuration data
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
       - name: build (tsc)
         run: npm run build
       - name: full regression
