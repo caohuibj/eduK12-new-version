@@ -37,11 +37,9 @@ describe('cognitive registry', () => {
     expect(entry?.scoringVersion).toBe('1.0.0')
   })
 
-  it('fails lookup for an unknown testType', () => {
-    expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBe(false)
-    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBeUndefined()
-    expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBe(false)
-    expect(getCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBeUndefined()
+  it('looks up the Milestone E Memory and Stroop entries', () => {
+    expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBe(true)
+    expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBe(true)
   })
 
   it('never falls back to the latest version for a wrong scoringVersion', () => {

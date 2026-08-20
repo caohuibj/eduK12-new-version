@@ -8,7 +8,6 @@ const baseConfig = {
   foreperiodMaxMs: 1500,
   timeoutMs: 2000,
   readyDurationMs: 1000,
-  validRtFloorMs: 100,
   report: {
     reportVersion: '1.0.0',
     referenceMode: 'simulated',

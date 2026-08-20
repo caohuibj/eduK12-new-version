@@ -5,6 +5,12 @@ import { scoreFakeV1 } from './scoring/fake.v1'
 import { reactionConfigSchema } from './schemas/reaction.config'
 import { reactionTrialSchema } from './schemas/reaction.trial'
 import { scoreReactionV1 } from './scoring/reaction.v1'
+import { memoryConfigSchema } from './schemas/memory.config'
+import { memoryTrialSchema } from './schemas/memory.trial'
+import { scoreMemoryV1 } from './scoring/memory.v1'
+import { stroopConfigSchema } from './schemas/stroop.config'
+import { stroopTrialSchema } from './schemas/stroop.trial'
+import { scoreStroopV1 } from './scoring/stroop.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -78,4 +84,24 @@ registerEntry({
   configSchema: reactionConfigSchema,
   trialSchema: reactionTrialSchema,
   score: scoreReactionV1,
+})
+
+// 注册 Memory Test：memory / 1.0.0 / 1.0.0（Milestone E Session 3）
+registerEntry({
+  testType: 'memory',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: memoryConfigSchema,
+  trialSchema: memoryTrialSchema,
+  score: scoreMemoryV1,
+})
+
+// 注册 Stroop Test：stroop / 1.0.0 / 1.0.0（Milestone E Session 4）
+registerEntry({
+  testType: 'stroop',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: stroopConfigSchema,
+  trialSchema: stroopTrialSchema,
+  score: scoreStroopV1,
 })

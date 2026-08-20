@@ -2,6 +2,8 @@ import type { CognitiveTaskProps } from './core/runner.types'
 // 模块加载期注册 Fake（单向依赖：fake.registry 不反向 import 本文件，避免循环）
 import { fakeRegistryEntry } from './tasks/fake/fake.registry'
 import { reactionRegistryEntry } from './tasks/reaction/reaction.registry'
+import { memoryRegistryEntry } from './tasks/memory/memory.registry'
+import { stroopRegistryEntry } from './tasks/stroop/stroop.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -35,6 +37,8 @@ export interface ReportDefinition {
   title: string
   headlineMetric: string
   summaryMetrics: string[]
+  indexLabel?: string
+  practicalTips?: string[]
   disclaimer?: string
 }
 
@@ -48,6 +52,8 @@ export interface CognitiveFrontendRegistryEntry {
   RunnerComponent: React.ComponentType<CognitiveTaskProps>
   metricDefinitions: MetricDefinition[]
   reportDefinition: ReportDefinition
+  /** Memory 等自适应任务由任务本身决定何时完成。 */
+  completionMode?: 'manual' | 'task'
 }
 
 const REGISTRY = new Map<string, CognitiveFrontendRegistryEntry>()
@@ -72,3 +78,9 @@ registerCognitiveRunner(fakeRegistryEntry)
 
 // 注册 Reaction Test：reaction / 1.0.0（Milestone E Session 2）
 registerCognitiveRunner(reactionRegistryEntry)
+
+// 注册 Memory Test：memory / 1.0.0（Milestone E Session 3）
+registerCognitiveRunner(memoryRegistryEntry)
+
+// 注册 Stroop Test：stroop / 1.0.0（Milestone E Session 4）
+registerCognitiveRunner(stroopRegistryEntry)

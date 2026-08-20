@@ -10,7 +10,6 @@ const config: ReactionConfig = {
   foreperiodMaxMs: 1500,
   timeoutMs: 2000,
   readyDurationMs: 1000,
-  validRtFloorMs: 100,
   report: { reportVersion: '1.0.0', referenceMode: 'simulated' },
 }
 
@@ -48,7 +47,7 @@ describe('reaction scorer — validation', () => {
 
 describe('reaction scorer — metrics', () => {
   it('computes median/mean/sd/ICV and derives valid/miss', () => {
-    // 5 试次，全部有效（>= validRtFloorMs 且 <= timeoutMs）
+    // 5 试次，全部有效（>= 100ms 且 <= timeoutMs）
     const trials = buildTrials(5, (i) => [250, 300, 350, 400, 450][i])
     const res = scoreReactionV1({ config, trials })
     expect(res.metrics.validTrialCount).toBe(5)
@@ -68,7 +67,7 @@ describe('reaction scorer — metrics', () => {
     expect(res.metrics.medianRtMs).toBe(300)
   })
 
-  it('treats rtMs < validRtFloorMs as miss', () => {
+  it('treats rtMs below the scoring floor as miss', () => {
     const trials = buildTrials(5, (i) => (i === 0 ? 50 : 300)) // 50 < 100 floor
     const res = scoreReactionV1({ config, trials })
     expect(res.metrics.validTrialCount).toBe(4)
@@ -128,7 +127,7 @@ describe('reaction scorer — Product Index (§35 piecewise)', () => {
   }
 
   it('maps fast RT to high index', () => {
-    // 最快有效 RT（= validRtFloorMs 100）→ 96（band 0..250 内线性：0→100, 250→90）
+    // 最快有效 RT（100ms）→ 96（band 0..250 内线性：0→100, 250→90）
     expect(indexFor(100)).toBe(96)
     expect(indexFor(250)).toBe(90)
   })

@@ -86,4 +86,42 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     renderAt()
     expect(await screen.findByText('该测评尚未完成')).toBeTruthy()
   })
+
+  it('hides a strong headline, index, and reference when quality is insufficient', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        config: {},
+        randomSeed: 'seed',
+        result: {
+          score: 30,
+          metrics: { medianRtMs: null, missRate: 1 },
+          qualityFlags: { interpretable: false },
+          reference: {
+            mode: 'simulated',
+            status: 'provisional',
+            available: true,
+            label: '模拟参考位置',
+            version: 'sim-k12-v0.1',
+            band: 'K7-9',
+            referencePosition: 10,
+            disclaimer: '模拟参考用于试运行与报告体验验证，不代表真实同龄人常模。',
+          },
+        },
+      },
+    })
+
+    renderAt()
+
+    expect(await screen.findByText('本次数据不足以稳定解释，建议重新测量。')).toBeTruthy()
+    expect(screen.getByText('暂不显示')).toBeTruthy()
+    expect(screen.queryByText('参考位置 10 / 100')).toBeNull()
+    expect(screen.getByText('中位反应时')).toBeTruthy()
+  })
 })

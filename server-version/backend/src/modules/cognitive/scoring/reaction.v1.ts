@@ -18,13 +18,14 @@ import { ReactionTrial } from '../schemas/reaction.trial'
  *   4. foreperiodMs 在 [foreperiodMinMs, foreperiodMaxMs] 范围内（§20 range invariant）
  *   5. 推导 valid hit / miss，计算科学指标 + Product Index + qualityFlags
  *
- * valid hit  = rtMs != null && rtMs >= validRtFloorMs && rtMs <= timeoutMs
- * miss       = rtMs == null || rtMs < validRtFloorMs || rtMs > timeoutMs
+ * valid hit  = rtMs != null && rtMs >= VALID_RT_FLOOR_MS && rtMs <= timeoutMs
+ * miss       = rtMs == null || rtMs < VALID_RT_FLOOR_MS || rtMs > timeoutMs
  */
 
 // F4：quality 阈值放 scoring v1 常量（由 scoringVersion 钉死，不进 config schema，避免 schema 膨胀）
 const MIN_VALID_RATIO = 0.6
 const HIGH_MISS_RATE = 0.3
+const VALID_RT_FLOOR_MS = 100
 
 // Reaction Performance Index v1 candidate（§35，product-defined，非 percentile / 常模 / device norm）
 // 分段线性映射（rt 越大 index 越低），round + clamp 到 [30, 100]。
@@ -107,7 +108,7 @@ export const scoreReactionV1 = (input: {
   })
 
   const isValid = (rt: number | null): rt is number =>
-    rt != null && rt >= config.validRtFloorMs && rt <= config.timeoutMs
+    rt != null && rt >= VALID_RT_FLOOR_MS && rt <= config.timeoutMs
 
   const validRts = sorted.map((t) => t.payload.rtMs).filter(isValid)
 

@@ -12,6 +12,7 @@ const router = Router()
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)
+router.get('/history', authenticate, requireRole(UserRole.STUDENT), cognitiveController.myHistory)
 
 // 教师端 Assignment 管理
 router.post('/assignments', authenticate, requireTeacher, cognitiveController.createAssignment)

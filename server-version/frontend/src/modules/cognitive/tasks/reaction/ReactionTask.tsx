@@ -25,7 +25,7 @@ import { deterministicForeperiod } from './prng'
 const PRACTICE_TRIALS = 3
 
 type Phase = 'instruction' | 'practice' | 'formal'
-type Sub = 'ready' | 'green' | 'feedback'
+type Sub = 'ready' | 'gray' | 'green' | 'feedback'
 
 export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete }) => {
   const config = taskContext.config as unknown as ReactionConfig
@@ -50,35 +50,46 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const [stimulusOnset, setStimulusOnset] = useState<number | null>(null)
   const [prematureCount, setPrematureCount] = useState(0)
   const [interrupted, setInterrupted] = useState(false)
+  const interruptedRef = useRef(false)
   /** premature 后重入 ready 用的 nonce，强制 ready→green 计时重新开始（§31）。 */
   const [round, setRound] = useState(0)
   const respondingRef = useRef(false)
 
   // 进入每个正式试次：派生确定性 foreperiod，重置子相位
   useEffect(() => {
-    if (phase !== 'formal') return
+    if (phase !== 'formal' || trialIndex >= total) return
     const fp = deterministicForeperiod(taskContext.randomSeed, trialIndex, foreperiodMin, foreperiodMax)
     setForeperiodMs(fp)
     setSub('ready')
     setStimulusOnset(null)
     setPrematureCount(0)
     setInterrupted(false)
+    interruptedRef.current = false
     setRound(0)
   }, [phase, trialIndex, taskContext.randomSeed, foreperiodMin, foreperiodMax])
 
-  // formal ready → green
+  // formal ready → gray
   useEffect(() => {
-    if (phase !== 'formal' || sub !== 'ready') return
+    if (phase !== 'formal' || trialIndex >= total || sub !== 'ready') return
     const t = window.setTimeout(() => {
-      setSub('green')
-      setStimulusOnset(performance.now())
+      setSub('gray')
     }, readyDurationMs)
     return () => window.clearTimeout(t)
   }, [phase, sub, readyDurationMs, round])
 
+  // formal gray → green：真正的刺激前间隔使用 seeded foreperiod。
+  useEffect(() => {
+    if (phase !== 'formal' || trialIndex >= total || sub !== 'gray') return
+    const t = window.setTimeout(() => {
+      setSub('green')
+      setStimulusOnset(performance.now())
+    }, foreperiodMs)
+    return () => window.clearTimeout(t)
+  }, [phase, sub, foreperiodMs, round])
+
   // formal green → timeout（无响应按 miss 提交）
   useEffect(() => {
-    if (phase !== 'formal' || sub !== 'green' || stimulusOnset == null) return
+    if (phase !== 'formal' || trialIndex >= total || sub !== 'green' || stimulusOnset == null) return
     const t = window.setTimeout(() => {
       void submit(null, 'pointer')
     }, timeoutMs)
@@ -87,9 +98,12 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   // visibility 中断检测
   useEffect(() => {
-    if (phase !== 'formal') return
+    if (phase !== 'formal' || trialIndex >= total) return
     const onVis = () => {
-      if (document.hidden) setInterrupted(true)
+      if (document.hidden) {
+        interruptedRef.current = true
+        setInterrupted(true)
+      }
     }
     document.addEventListener('visibilitychange', onVis)
     return () => document.removeEventListener('visibilitychange', onVis)
@@ -103,7 +117,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         foreperiodMs,
         rtMs,
         prematureCount,
-        interrupted,
+        interrupted: interruptedRef.current,
         inputMode,
       }
       try {
@@ -112,16 +126,17 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         respondingRef.current = false
       }
     },
-    [foreperiodMs, prematureCount, interrupted, onTrialComplete]
+    [foreperiodMs, prematureCount, onTrialComplete]
   )
 
   const handleFormalInput = useCallback(
     (inputMode: ReactionTrialPayload['inputMode']) => {
-      if (phase !== 'formal') return
-      if (sub === 'ready') {
+      if (phase !== 'formal' || trialIndex >= total) return
+      if (sub === 'ready' || sub === 'gray') {
         // 过早响应：prematureCount+1，不推进 trialIndex，重入 ready（§31）
         setPrematureCount((c) => c + 1)
         setStimulusOnset(null)
+        setSub('ready')
         setRound((r) => r + 1)
         return
       }
@@ -130,16 +145,16 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         void submit(rt, inputMode)
       }
     },
-    [phase, sub, stimulusOnset, submit]
+    [phase, sub, stimulusOnset, submit, trialIndex, total]
   )
 
   // formal 全程监听键盘（ready 阶段按键 = premature，green 阶段按键 = 响应）
   useEffect(() => {
-    if (phase !== 'formal') return
+    if (phase !== 'formal' || trialIndex >= total) return
     const onKey = () => handleFormalInput('keyboard')
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [phase, handleFormalInput])
+  }, [phase, trialIndex, total, handleFormalInput])
 
   // —— practice ——
   useEffect(() => {
@@ -253,6 +268,14 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
             </button>
           </div>
         )}
+      </div>
+    )
+  }
+
+  if (trialIndex >= total) {
+    return (
+      <div className="card p-8 max-w-2xl text-center">
+        <p className="text-gray-700">正式试次已完成，请提交测评结果。</p>
       </div>
     )
   }

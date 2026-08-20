@@ -3,8 +3,8 @@
 //   → instruction → practice ×3 → formal ×20 → complete → Result（+ refresh 不重新评分）
 //
 // 运行前提（与 Fake E2E 相同的 ops fixture 约定，F7）：
-//   1. seed 已运行（backend `npm run db:seed`）：reaction/1.0.0 PUBLISHED config 存在
-//      （名称含 "Reaction Time v1.0.0 [INTERNAL PILOT]"）
+//   1. seed 已运行（backend `npm run db:seed`）：reaction/1.0.1 PUBLISHED config 存在
+//      （名称含 "Reaction Time v1.0.1 [INTERNAL PILOT]"；旧的 1.0.0 配置保留不可变）
 //   2. 已存在 PUBLISHED 的 Reaction Assignment，标题 = "E2E Reaction v1"
 //      （创建方式与 Fake "E2E Fake Test v2" 相同：admin/teacher 经 API 或 DB 建 assignment →
 //       publish → 学生通过 courseCode 注册加入该 course）
@@ -17,9 +17,9 @@ const { execSync } = require('child_process')
 
 const BASE = 'http://localhost'
 const SHOT_DIR = '/tmp/e2e-reaction-shots'
-const USER = 'e2estudent'
-const PASS = 'e2e123456'
-const ASSIGNMENT_TITLE = 'E2E Reaction v1'
+const USER = process.env.COGNITIVE_E2E_USER || 'e2estudent'
+const PASS = process.env.COGNITIVE_E2E_PASS || 'e2e123456'
+const ASSIGNMENT_TITLE = process.env.COGNITIVE_E2E_ASSIGNMENT || 'E2E Reaction v2'
 const TOTAL_TRIALS = 20
 const PRACTICE_TRIALS = 3
 
@@ -30,10 +30,17 @@ const results = []
 const record = (name, ok, detail = '') => results.push({ name, ok, detail })
 
 async function studentLogin(page) {
-  await page.goto(`${BASE}/student/login`)
-  await page.fill('input[placeholder="请输入用户名"]', USER)
-  await page.fill('input[placeholder="请输入密码"]', PASS)
-  await page.getByRole('button', { name: '登录' }).click()
+  const token = process.env.COGNITIVE_E2E_TOKEN
+  if (token) {
+    await page.goto(`${BASE}/`)
+    await page.evaluate((value) => localStorage.setItem('token', value), token)
+    await page.reload()
+  } else {
+    await page.goto(`${BASE}/student/login`)
+    await page.fill('input[placeholder="请输入用户名"]', USER)
+    await page.fill('input[placeholder="请输入密码"]', PASS)
+    await page.getByRole('button', { name: '登录' }).click()
+  }
   await page.waitForURL('**/student', { timeout: 15000 })
 }
 
@@ -113,13 +120,19 @@ async function main() {
     // 9) 可选 DB 断言：1 COMPLETED session + 20 CognitiveTrial（encrypted payload）
     if (process.env.RUN_DB_CHECK === '1') {
       const countTrials = execSync(
-        `docker compose exec -T postgres psql -U ptool -d ptool -tAc "SELECT count(*) FROM \\"CognitiveTrial\\" t JOIN \\"CognitiveSession\\" s ON s.id = t.sessionId WHERE s.id = '${sessionId}';"`,
+        `docker compose exec -T postgres psql -U ptool -d ptool -tAc "SELECT count(*) FROM cognitive_trials t JOIN cognitive_sessions s ON s.id = t.session_id WHERE s.id = '${sessionId}';"`,
         { cwd: '/Users/Qiang/Documents/trae_projects/eduK12-new-version/server-version' }
       ).toString().trim()
       record('db-20-trials', countTrials === String(TOTAL_TRIALS), `trials=${countTrials}`)
 
+      const encryptedTrials = execSync(
+        `docker compose exec -T postgres psql -U ptool -d ptool -tAc "SELECT count(*) FROM cognitive_trials t JOIN cognitive_sessions s ON s.id = t.session_id WHERE s.id = '${sessionId}' AND t.payload_encrypted ~ '^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$';"`,
+        { cwd: '/Users/Qiang/Documents/trae_projects/eduK12-new-version/server-version' }
+      ).toString().trim()
+      record('db-trials-encrypted', encryptedTrials === String(TOTAL_TRIALS), `encrypted=${encryptedTrials}`)
+
       const status = execSync(
-        `docker compose exec -T postgres psql -U ptool -d ptool -tAc "SELECT status FROM \\"CognitiveSession\\" WHERE id = '${sessionId}';"`,
+        `docker compose exec -T postgres psql -U ptool -d ptool -tAc "SELECT status FROM cognitive_sessions WHERE id = '${sessionId}';"`,
         { cwd: '/Users/Qiang/Documents/trae_projects/eduK12-new-version/server-version' }
       ).toString().trim()
       record('db-session-completed', status === 'COMPLETED', status)

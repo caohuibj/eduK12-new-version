@@ -21,6 +21,8 @@ export const reactionRegistryEntry: CognitiveFrontendRegistryEntry = {
     title: '反应速度',
     headlineMetric: 'medianRtMs',
     summaryMetrics: ['medianRtMs', 'missRate'],
+    indexLabel: '反应表现指数',
+    practicalTips: ['在需要快速响应时先减少外部干扰。', '比较多次结果时尽量使用相近设备和作答方式。'],
     disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
   },
 }

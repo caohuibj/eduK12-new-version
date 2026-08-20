@@ -18,7 +18,7 @@ import { z } from 'zod'
 export const reactionTrialSchema = z
   .object({
     foreperiodMs: z.number().int().min(0),
-    rtMs: z.number().int().nullable(),
+    rtMs: z.number().int().min(0).nullable(),
     prematureCount: z.number().int().min(0),
     interrupted: z.boolean(),
     inputMode: z.enum(['pointer', 'touch', 'keyboard']),

@@ -24,7 +24,9 @@ export interface CognitiveTaskProps {
   /** 当前应渲染的试次（0-based）。 */
   trialIndex: number
   /** 提交单笔 raw trial；前端不得提交 score/payloadHash/加密内容。 */
-  onTrialComplete: (payload: Record<string, unknown>) => Promise<void>
+  onTrialComplete: (payload: Record<string, unknown>) => Promise<void | boolean>
+  /** 自适应任务在完成自己的终止条件后调用；固定总数任务可不使用。 */
+  onTaskComplete?: () => Promise<void>
 }
 
 export type RunnerStatus =

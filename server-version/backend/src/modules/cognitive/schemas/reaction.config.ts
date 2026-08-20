@@ -10,7 +10,7 @@ import { reportMetaSchema } from './report-meta'
  *   timeout     = 2000 ms（文献 A）
  *   readyDurationMs = 1000 ms
  *
- * F2 修复：validRtFloorMs = 100（green 出现后 <100ms 视为不可信，pilot-configurable）。
+ * RT valid floor is a scoring-version constant, not a config field.
  *
  * 采用与 Fake 一致的 `z.number().int().positive()`（非 .literal），以便测试/CI 使用较小
  * trial 数的 config（如 F4 的 5-trial flag 验证）。冻结值由 seed + 文档参数冻结表保证。
@@ -24,9 +24,12 @@ export const reactionConfigSchema = z
     foreperiodMaxMs: z.number().int().positive(),
     timeoutMs: z.number().int().positive(),
     readyDurationMs: z.number().int().positive(),
-    validRtFloorMs: z.number().int().positive(),
     report: reportMetaSchema,
   })
   .strict()
+  .refine((value) => value.foreperiodMaxMs >= value.foreperiodMinMs, {
+    message: 'foreperiodMaxMs must be greater than or equal to foreperiodMinMs',
+    path: ['foreperiodMaxMs'],
+  })
 
 export type ReactionConfig = z.infer<typeof reactionConfigSchema>

@@ -18,7 +18,6 @@ const CognitiveRunner: React.FC = () => {
   // Memory（自适应）不依赖固定总数，完成信号由其自身推进逻辑在 Session 3 处理。
   const config = (state.session?.config ?? {}) as Record<string, unknown>
   const total = (config?.trialCount ?? config?.totalTrials ?? 0) as number
-  const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total
 
   if (state.status === 'COMPLETED') {
     // 完成态：结果页只读展示，不重新评分
@@ -102,12 +101,15 @@ const CognitiveRunner: React.FC = () => {
       )
     }
     const Runner = entry.RunnerComponent
+    const taskCompletes = entry.completionMode === 'task'
+    const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total && !taskCompletes
     return (
       <div className="max-w-2xl mx-auto">
         <Runner
           taskContext={state.taskContext}
           trialIndex={state.trialIndex}
           onTrialComplete={controller.appendTrial}
+          onTaskComplete={taskCompletes ? controller.complete : undefined}
         />
         {state.error && (
           <p className="text-sm text-red-500 text-center mt-3">{state.error.message}</p>

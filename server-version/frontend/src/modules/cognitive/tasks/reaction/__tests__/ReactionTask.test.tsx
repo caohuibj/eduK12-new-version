@@ -18,7 +18,6 @@ const config = {
   foreperiodMaxMs: 1500,
   timeoutMs: 2000,
   readyDurationMs: 1000,
-  validRtFloorMs: 100,
   report: { reportVersion: '1.0.0', referenceMode: 'simulated' as const },
 }
 
@@ -71,6 +70,11 @@ async function enterFormal(
   return onTrialComplete
 }
 
+function advanceFormalToGreen(trialIndex = 0, seed = 'seed-123') {
+  act(() => vi.advanceTimersByTime(1000))
+  act(() => vi.advanceTimersByTime(deterministicForeperiod(seed, trialIndex, 700, 1500)))
+}
+
 describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
   it('is deterministic per (seed, trialIndex) and within range', () => {
     const a = deterministicForeperiod('seed-123', 0, 700, 1500)
@@ -112,9 +116,7 @@ describe('ReactionTask — formal trial', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
 
-    act(() => {
-      vi.advanceTimersByTime(1000) // ready -> green
-    })
+    advanceFormalToGreen()
     now += 320
     fireEvent.click(screen.getByLabelText('trial 0'))
     await act(async () => {})
@@ -148,9 +150,8 @@ describe('ReactionTask — formal trial', () => {
     })
     expect(screen.getByText('准备…')).toBeTruthy()
 
-    act(() => {
-      vi.advanceTimersByTime(600) // 重启后的 timer 触发 → green
-    })
+    act(() => vi.advanceTimersByTime(600)) // 重启后的 ready timer 触发 → gray
+    act(() => vi.advanceTimersByTime(deterministicForeperiod('seed-123', 0, 700, 1500)))
     expect(screen.getByText('点击！')).toBeTruthy()
 
     now += 250
@@ -164,9 +165,7 @@ describe('ReactionTask — formal trial', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
 
-    act(() => {
-      vi.advanceTimersByTime(1000) // green
-    })
+    advanceFormalToGreen()
     act(() => {
       vi.advanceTimersByTime(2000) // timeout
     })
@@ -185,9 +184,7 @@ describe('ReactionTask — formal trial', () => {
     )
     await enterFormal(onTrialComplete)
 
-    act(() => {
-      vi.advanceTimersByTime(1000) // green
-    })
+    advanceFormalToGreen()
     now += 200
     fireEvent.click(screen.getByLabelText('trial 0'))
     fireEvent.click(screen.getByLabelText('trial 0')) // 提交未完成时第二次点击
@@ -200,9 +197,7 @@ describe('ReactionTask — formal trial', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
 
-    act(() => {
-      vi.advanceTimersByTime(1000) // green
-    })
+    advanceFormalToGreen()
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
     fireEvent(document, new Event('visibilitychange'))
     now += 200
@@ -215,9 +210,7 @@ describe('ReactionTask — formal trial', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
 
-    act(() => {
-      vi.advanceTimersByTime(1000) // green
-    })
+    advanceFormalToGreen()
     now += 200
     fireEvent.keyDown(window, { key: ' ' })
     await act(async () => {})

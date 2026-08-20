@@ -11,6 +11,7 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "generate:simulated-reference": "tsx src/modules/cognitive/reference-data/generate-simulated-reference.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts",
