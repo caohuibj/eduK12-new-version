@@ -8,6 +8,7 @@ Implemented:
 - [x] Config validation enforcement in seed, Assignment publish, Session start, and Completion
 - [x] Version-keyed scoring engine dispatch for existing scorers
 - [x] Unified quality rules foundation
+- [x] Reaction and Stroop scorers consume shared RT quality rules without changing score thresholds
 - [x] Cognitive config bootstrap extraction from `prisma/seed.ts`
 - [x] Seed no longer contains default administrator credentials or logs passwords
 
@@ -24,7 +25,6 @@ Pending:
 - Cursor pagination
 - Backend feature capability API
 - End-to-end integration workflow expansion
-- Existing scorer-specific quality flags still require a dedicated behavior-preserving migration
 
 ## Design Principle
 

@@ -5,6 +5,7 @@ import {
 } from '../cognitive.types'
 import { StroopConfig } from '../schemas/stroop.config'
 import { StroopTrial } from '../schemas/stroop.trial'
+import { evaluateQuality, isReactionTimeWithinBounds } from '../quality/quality-rules'
 
 const WORD_TO_COLOR: Record<StroopTrial['word'], StroopTrial['inkColor']> = {
   红: 'red',
@@ -60,11 +61,22 @@ export const scoreStroopV1 = (input: {
   const congruentAccuracy = congruentCorrect / congruent.length
   const incongruentAccuracy = incongruentCorrect / incongruent.length
 
+  const qualityRules = { minReactionTimeMs: config.validRtFloorMs }
+  const qualityEvaluation = evaluateQuality(
+    {
+      reactionTimes: sorted
+        .map((trial) => trial.payload.rtMs)
+        .filter((rt): rt is number => rt !== null),
+      missingTrials: sorted.filter((trial) => trial.payload.rtMs === null).length,
+    },
+    qualityRules
+  )
+
   const validRts = (trials: ScoringTrial<StroopTrial>[]): number[] =>
     trials
       .filter((trial) => isCorrect(trial.payload) && trial.payload.rtMs !== null)
       .map((trial) => trial.payload.rtMs as number)
-      .filter((rt) => rt >= config.validRtFloorMs)
+      .filter((rt) => isReactionTimeWithinBounds(rt, qualityRules))
   const validCongruentRts = validRts(congruent)
   const validIncongruentRts = validRts(incongruent)
   const medianRtCongruent = median(validCongruentRts)
@@ -96,6 +108,7 @@ export const scoreStroopV1 = (input: {
       insufficientValidCongruentRt,
       insufficientValidIncongruentRt,
       interrupted: sorted.some((trial) => trial.payload.interrupted),
+      qualityReasons: qualityEvaluation.reasons,
     },
   }
 }

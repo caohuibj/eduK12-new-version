@@ -9,18 +9,29 @@ export interface QualityEvaluation {
   reasons: string[]
 }
 
+/** Shared boundary check used by each RT-based scorer. */
+export const isReactionTimeWithinBounds = (
+  reactionTimeMs: number,
+  rules: Pick<CognitiveQualityRules, 'minReactionTimeMs' | 'maxReactionTimeMs'>
+): boolean =>
+  (rules.minReactionTimeMs === undefined || reactionTimeMs >= rules.minReactionTimeMs) &&
+  (rules.maxReactionTimeMs === undefined || reactionTimeMs <= rules.maxReactionTimeMs)
+
 export function evaluateQuality(
   metrics: { reactionTimes?: number[]; missingTrials?: number },
   rules: CognitiveQualityRules,
 ): QualityEvaluation {
   const reasons: string[] = []
+  const addReason = (reason: string) => {
+    if (!reasons.includes(reason)) reasons.push(reason)
+  }
 
   for (const rt of metrics.reactionTimes ?? []) {
     if (rules.minReactionTimeMs !== undefined && rt < rules.minReactionTimeMs) {
-      reasons.push('reaction_time_below_floor')
+      addReason('reaction_time_below_floor')
     }
     if (rules.maxReactionTimeMs !== undefined && rt > rules.maxReactionTimeMs) {
-      reasons.push('reaction_time_timeout')
+      addReason('reaction_time_timeout')
     }
   }
 
@@ -28,7 +39,7 @@ export function evaluateQuality(
     rules.maxMissingTrials !== undefined &&
     (metrics.missingTrials ?? 0) > rules.maxMissingTrials
   ) {
-    reasons.push('too_many_missing_trials')
+    addReason('too_many_missing_trials')
   }
 
   return {

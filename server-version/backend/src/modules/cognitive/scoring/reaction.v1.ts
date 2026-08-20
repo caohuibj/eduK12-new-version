@@ -5,6 +5,7 @@ import {
 } from '../cognitive.types'
 import { ReactionConfig } from '../schemas/reaction.config'
 import { ReactionTrial } from '../schemas/reaction.trial'
+import { evaluateQuality, isReactionTimeWithinBounds } from '../quality/quality-rules'
 
 /**
  * Reaction Test v1 Scorer（Milestone E Session 2 / §33–§35）。
@@ -107,8 +108,13 @@ export const scoreReactionV1 = (input: {
     }
   })
 
+  const qualityRules = {
+    minReactionTimeMs: VALID_RT_FLOOR_MS,
+    maxReactionTimeMs: config.timeoutMs,
+    maxMissingTrials: config.totalTrials - Math.ceil(MIN_VALID_RATIO * config.totalTrials),
+  }
   const isValid = (rt: number | null): rt is number =>
-    rt != null && rt >= VALID_RT_FLOOR_MS && rt <= config.timeoutMs
+    rt != null && isReactionTimeWithinBounds(rt, qualityRules)
 
   const validRts = sorted.map((t) => t.payload.rtMs).filter(isValid)
 
@@ -128,6 +134,15 @@ export const scoreReactionV1 = (input: {
   const highMissRate = missRate >= HIGH_MISS_RATE
   const interpretable = !insufficientValidTrials
   const interrupted = interruptedCount > 0
+  const qualityEvaluation = evaluateQuality(
+    {
+      reactionTimes: sorted
+        .map((trial) => trial.payload.rtMs)
+        .filter((rt): rt is number => rt !== null),
+      missingTrials: missCount,
+    },
+    qualityRules
+  )
 
   const score = reactionPerformanceIndex(medianRtMs)
 
@@ -150,6 +165,9 @@ export const scoreReactionV1 = (input: {
       insufficientValidTrials,
       highMissRate,
       interrupted,
+      // Preserve the scoring-version interpretable threshold; expose the
+      // shared rule violations without changing the existing score semantics.
+      qualityReasons: qualityEvaluation.reasons,
     },
   }
 }
