@@ -1,4 +1,4 @@
-import { RegistryEntry } from './cognitive.types'
+import type { CognitiveScoreResult, RegistryEntry, ScoringTrial } from './cognitive.types'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
 import { scoreFakeV1 } from './scoring/fake.v1'
@@ -11,6 +11,7 @@ import { scoreMemoryV1 } from './scoring/memory.v1'
 import { stroopConfigSchema } from './schemas/stroop.config'
 import { stroopTrialSchema } from './schemas/stroop.trial'
 import { scoreStroopV1 } from './scoring/stroop.v1'
+import { ScoringEngineRegistry, scoringEngineKey } from './scoring/scoring-engine'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -28,8 +29,10 @@ type AnyRegistryEntry = RegistryEntry<unknown, unknown>
 
 const REGISTRY = new Map<string, AnyRegistryEntry>()
 
+export const scoringEngineRegistry = new ScoringEngineRegistry()
+
 const keyOf = (testType: string, engineVersion: string, scoringVersion: string): string =>
-  `${testType}/${engineVersion}/${scoringVersion}`
+  scoringEngineKey(testType, engineVersion, scoringVersion)
 
 const registerEntry = <TConfig, TTrial>(entry: RegistryEntry<TConfig, TTrial>): void => {
   const k = keyOf(entry.testType, entry.engineVersion, entry.scoringVersion)
@@ -37,6 +40,13 @@ const registerEntry = <TConfig, TTrial>(entry: RegistryEntry<TConfig, TTrial>): 
     throw new Error(`Cognitive registry duplicate key: ${k}`)
   }
   REGISTRY.set(k, entry as AnyRegistryEntry)
+  scoringEngineRegistry.register(k, {
+    calculate: ({ config, trials }) =>
+      entry.score({
+        config: config as TConfig,
+        trials: trials as unknown as ScoringTrial<TTrial>[],
+      }),
+  })
 }
 
 export const hasCognitiveRegistryEntry = (
@@ -105,3 +115,16 @@ registerEntry({
   trialSchema: stroopTrialSchema,
   score: scoreStroopV1,
 })
+
+
+/** Dispatch scoring through the exact frozen implementation tuple. */
+export const scoreWithCognitiveEngine = (
+  testType: string,
+  engineVersion: string,
+  scoringVersion: string,
+  input: { config: unknown; trials: ScoringTrial<unknown>[] }
+): CognitiveScoreResult =>
+  scoringEngineRegistry.calculate(
+    keyOf(testType, engineVersion, scoringVersion),
+    input
+  )

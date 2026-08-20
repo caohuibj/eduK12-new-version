@@ -6,7 +6,7 @@ import {
   decryptCognitivePayload,
   getParticipantKey,
 } from './cognitive.security'
-import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { parseCognitiveConfig } from './config/config-validator'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { resolveCognitiveReference } from './reference'
@@ -84,9 +84,17 @@ export const loadStartableAssignment = async (
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: assignment.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
 
-  const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-  const parsed = entry.configSchema.safeParse(config.config)
-  if (!parsed.success) {
+  let parsed: ReturnType<typeof parseCognitiveConfig>
+  try {
+    parsed = parseCognitiveConfig(
+      {
+        testType: config.testType,
+        engineVersion: config.engineVersion,
+        scoringVersion: config.scoringVersion,
+      },
+      config.config
+    )
+  } catch {
     throw BAD_REQUEST('CognitiveTestConfig does not match its registry schema')
   }
 
@@ -99,7 +107,7 @@ export const loadStartableAssignment = async (
       opensAt: assignment.opensAt,
       dueAt: assignment.dueAt,
     },
-    validatedConfig: parsed.data,
+    validatedConfig: parsed.config,
     config: {
       id: config.id,
       testType: config.testType,

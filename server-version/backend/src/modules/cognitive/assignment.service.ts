@@ -1,6 +1,6 @@
 import { UserRole, CourseStudentStatus, CognitiveAssignmentStatus } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { getCognitiveRegistryEntry } from './cognitive.registry'
+import { parseCognitiveConfig } from './config/config-validator'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
   CognitiveServiceError,
@@ -33,19 +33,19 @@ const validateConfigForAssignment = async (courseId: string, configId: string, r
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
   if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
 
-  const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-  if (!entry) {
-    throw BAD_REQUEST(
-      `No registry implementation for ${config.testType}/${config.engineVersion}/${config.scoringVersion}`
+  try {
+    const parsed = parseCognitiveConfig(
+      {
+        testType: config.testType,
+        engineVersion: config.engineVersion,
+        scoringVersion: config.scoringVersion,
+      },
+      config.config
     )
-  }
-
-  const parsed = entry.configSchema.safeParse(config.config)
-  if (!parsed.success) {
+    return { course, config, entry: parsed.entry, validatedConfig: parsed.config }
+  } catch {
     throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
   }
-
-  return { course, config, entry, validatedConfig: parsed.data }
 }
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN

@@ -3,8 +3,9 @@ import {
   encryptCognitivePayload,
   decryptCognitivePayload,
 } from './cognitive.security'
-import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { scoreWithCognitiveEngine } from './cognitive.registry'
 import { CognitiveScoringInputError } from './cognitive.types'
+import { parseCognitiveConfig } from './config/config-validator'
 import { resolveCognitiveReference } from './reference'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
@@ -76,13 +77,12 @@ export const completeSession = async (userId: string, sessionId: string) => {
     // IN_PROGRESS → 继续评分。
 
     // 用 frozen version 查 Registry，缺失 = 服务端配置错误，绝不静默换最新 scorer。
-    const entry = requireCognitiveRegistryEntry(
-      session.testType,
-      session.engineVersion,
-      session.scoringVersion
-    )
-
-    const validatedConfig = entry.configSchema.parse(
+    const { entry, config: validatedConfig } = parseCognitiveConfig(
+      {
+        testType: session.testType,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+      },
       decryptCognitivePayload<unknown>(session.configSnapshotEncrypted)
     )
 
@@ -97,7 +97,12 @@ export const completeSession = async (userId: string, sessionId: string) => {
 
     let result: { score: number; metrics: Record<string, unknown>; qualityFlags: Record<string, unknown> }
     try {
-      result = entry.score({ config: validatedConfig, trials: scoringTrials })
+      result = scoreWithCognitiveEngine(
+        session.testType,
+        session.engineVersion,
+        session.scoringVersion,
+        { config: validatedConfig, trials: scoringTrials }
+      )
     } catch (err) {
       if (err instanceof CognitiveScoringInputError) {
         // premature / malformed trials：Session 保持 IN_PROGRESS，学生可补交后再次 complete。
