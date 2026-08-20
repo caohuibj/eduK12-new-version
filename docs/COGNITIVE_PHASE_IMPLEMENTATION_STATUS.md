@@ -11,20 +11,21 @@ Implemented:
 - [x] Cognitive config bootstrap extraction from `prisma/seed.ts`
 - [x] Seed no longer contains default administrator credentials or logs passwords
 
-Pending:
-
-- Existing scorer-specific quality flags still require a dedicated behavior-preserving migration
-- Phase 2 platform capabilities
-
 ## Phase 2 - Platform Capability
 
-Planned:
+Implemented:
 
-- Cognitive data isolation
+- [x] ParticipantIdentity table and migration backfill
+- [x] New sessions create and use a stable identity boundary
+- [x] Student history queries use ParticipantIdentity instead of direct user filtering
+
+Pending:
+
 - Cursor pagination
 - Backend feature capability API
-- Integration test expansion
+- End-to-end integration workflow expansion
+- Existing scorer-specific quality flags still require a dedicated behavior-preserving migration
 
 ## Design Principle
 
-The refactor preserves existing assessment behavior while connecting governance layers to the real execution paths. Each change is isolated so the existing Cognitive API contract remains reviewable and reversible.
+The refactor preserves existing assessment behavior while introducing governance layers incrementally. Identity isolation is additive: the existing userId is retained for authorization and historical SetNull semantics while ParticipantIdentity becomes the canonical cognitive-data boundary.

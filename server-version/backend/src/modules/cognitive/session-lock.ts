@@ -22,6 +22,7 @@ export interface LockedSessionRow {
   id: string
   userId: string | null
   participantKey: string
+  participantIdentityId: string
   participantSnapshotEncrypted: string | null
   assignmentId: string | null
   configId: string
@@ -47,6 +48,7 @@ interface RawSessionRow {
   id: string
   user_id: string | null
   participant_key: string
+  participant_identity_id: string
   participant_snapshot_encrypted: string | null
   assignment_id: string | null
   config_id: string
@@ -79,7 +81,7 @@ export const lockSession = async (
 ): Promise<LockedSessionRow | null> => {
   const rows = await tx.$queryRaw<RawSessionRow[]>(Prisma.sql`
     SELECT
-      id, user_id, participant_key, participant_snapshot_encrypted, assignment_id,
+      id, user_id, participant_key, participant_identity_id, participant_snapshot_encrypted, assignment_id,
       config_id, test_type, attempt_no, status, started_at, finished_at,
       score_encrypted, metrics_encrypted, quality_flags_encrypted, config_version,
       config_snapshot_encrypted, engine_version, scoring_version, random_seed,
@@ -94,6 +96,7 @@ export const lockSession = async (
     id: r.id,
     userId: r.user_id,
     participantKey: r.participant_key,
+    participantIdentityId: r.participant_identity_id,
     participantSnapshotEncrypted: r.participant_snapshot_encrypted,
     assignmentId: r.assignment_id,
     configId: r.config_id,

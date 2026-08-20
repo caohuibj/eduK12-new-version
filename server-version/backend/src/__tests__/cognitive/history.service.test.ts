@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    participantIdentity: { findUnique: vi.fn() },
     cognitiveSession: {
       findMany: vi.fn(),
       count: vi.fn(),
@@ -18,6 +19,7 @@ process.env.DATA_ENCRYPTION_KEY = '11'.repeat(32)
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.participantIdentity.findUnique.mockResolvedValue({ id: 'participant-1' })
 })
 
 describe('cognitive history service', () => {
@@ -42,7 +44,7 @@ describe('cognitive history service', () => {
     const result = await listMyHistory('student-1', { page: 2, pageSize: 1, skip: 1, take: 1 })
 
     expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { userId: 'student-1', status: 'COMPLETED' },
+      where: { participantIdentityId: 'participant-1', status: 'COMPLETED' },
       skip: 1,
       take: 1,
       select: expect.not.objectContaining({ metricsEncrypted: true }),

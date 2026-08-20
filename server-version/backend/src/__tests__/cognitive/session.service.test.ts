@@ -13,6 +13,10 @@ const { mockPrisma } = vi.hoisted(() => ({
     course: { findUnique: vi.fn() },
     courseStudent: { findUnique: vi.fn() },
     cognitiveTestConfig: { findUnique: vi.fn() },
+    participantIdentity: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
     cognitiveSession: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
@@ -67,6 +71,7 @@ const sessionRow = (overrides: any = {}) => ({
   id: 'session-1',
   userId: 'student-1',
   participantKey: 'pkey',
+  participantIdentityId: 'participant-1',
   participantSnapshotEncrypted: 'enc-snap',
   assignmentId: 'asg-1',
   configId: 'config-1',
@@ -100,6 +105,7 @@ const rawRow = (s: any = sessionRow()) => ({
   id: s.id,
   user_id: s.userId,
   participant_key: s.participantKey,
+  participant_identity_id: s.participantIdentityId,
   participant_snapshot_encrypted: s.participantSnapshotEncrypted,
   assignment_id: s.assignmentId,
   config_id: s.configId,
@@ -128,6 +134,16 @@ beforeEach(() => {
   mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(CONFIG)
   mockPrisma.user.findUnique.mockResolvedValue({ nickname: 'Student 1' })
+  mockPrisma.participantIdentity.findUnique.mockResolvedValue({
+    id: 'participant-1',
+    userId: 'student-1',
+    participantKey: 'pkey',
+  })
+  mockPrisma.participantIdentity.create.mockResolvedValue({
+    id: 'participant-1',
+    userId: 'student-1',
+    participantKey: 'pkey',
+  })
   // $transaction 透传同一 mock 作为 tx；行锁 $queryRaw 默认返回 IN_PROGRESS 行
   mockPrisma.$transaction.mockImplementation(async (fn: any) => fn(mockPrisma))
   mockPrisma.$queryRaw.mockResolvedValue([rawRow()])
@@ -195,6 +211,7 @@ describe('createSession data', () => {
 
     const createData = mockPrisma.cognitiveSession.create.mock.calls[0][0].data
     expect(createData.participantKey).toMatch(/^[0-9a-f]{64}$/)
+    expect(createData.participantIdentityId).toBe('participant-1')
     expect(createData.participantKey).not.toBe('student-1')
     // participantSnapshot 密文非明文
     expect(createData.participantSnapshotEncrypted).not.toContain('Student 1')

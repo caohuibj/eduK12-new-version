@@ -121,6 +121,37 @@ export const loadStartableAssignment = async (
 const isPrismaUniqueViolation = (err: unknown): boolean =>
   typeof err === 'object' && err !== null && (err as { code?: string }).code === 'P2002'
 
+const ensureParticipantIdentity = async (userId: string, participantKey: string) => {
+  const existing = await prisma.participantIdentity.findUnique({
+    where: { participantKey },
+  })
+  if (existing) {
+    if (existing.userId && existing.userId !== userId) {
+      throw CONFLICT('Participant identity does not belong to this user')
+    }
+    return existing
+  }
+
+  try {
+    return await prisma.participantIdentity.create({
+      data: { userId, participantKey },
+    })
+  } catch (err) {
+    if (isPrismaUniqueViolation(err)) {
+      const concurrent = await prisma.participantIdentity.findUnique({
+        where: { participantKey },
+      })
+      if (concurrent) {
+        if (concurrent.userId && concurrent.userId !== userId) {
+          throw CONFLICT('Participant identity does not belong to this user')
+        }
+        return concurrent
+      }
+    }
+    throw err
+  }
+}
+
 /** 组装 runner payload（D4 §12）：绝不返回 participantKey / *Encrypted / userId。 */
 const toRunnerPayload = (session: {
   id: string
@@ -151,12 +182,14 @@ const toRunnerPayload = (session: {
 
 export const createSession = async (userId: string, assignmentId: string) => {
   const participantKey = getParticipantKey(userId)
+  const participantIdentity = await ensureParticipantIdentity(userId, participantKey)
+  const participantIdentityId = participantIdentity.id
 
   // D6.1 (P1)：**先**找 existing IN_PROGRESS → 直接 resume 冻结的现有 attempt，
   // **不重新检查资格**（opensAt/dueAt/membership/archive 状态不影响"继续"已有 session，
   // 与 D5 "Trial 写入不重查资格" 的冻结思想一致）。
   const existing = await prisma.cognitiveSession.findFirst({
-    where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+    where: { assignmentId, participantIdentityId, status: 'IN_PROGRESS' },
   })
   if (existing) return toRunnerPayload(existing)
 
@@ -164,13 +197,13 @@ export const createSession = async (userId: string, assignmentId: string) => {
   const ctx = await loadStartableAssignment(assignmentId, userId)
 
   // 已用次数（COMPLETED/ABANDONED/INVALID 均计入；IN_PROGRESS 已在上方返回）。
-  const used = await prisma.cognitiveSession.count({ where: { assignmentId, participantKey } })
+  const used = await prisma.cognitiveSession.count({ where: { assignmentId, participantIdentityId } })
   if (used >= ctx.assignment.maxAttempts) {
     throw CONFLICT('Maximum attempts reached for this assignment')
   }
 
   const last = await prisma.cognitiveSession.findFirst({
-    where: { assignmentId, participantKey },
+    where: { assignmentId, participantIdentityId },
     orderBy: { attemptNo: 'desc' },
     select: { attemptNo: true },
   })
@@ -186,6 +219,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
       data: {
         userId,
         participantKey,
+        participantIdentityId,
         participantSnapshotEncrypted,
         assignmentId: ctx.assignment.id,
         configId: ctx.config.id,
@@ -204,7 +238,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
     if (isPrismaUniqueViolation(err)) {
       // @@unique([assignmentId, participantKey, attemptNo]) 并发冲突 → 重读当前 session（不引 Redis lock）。
       const current = await prisma.cognitiveSession.findFirst({
-        where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+        where: { assignmentId, participantIdentityId, status: 'IN_PROGRESS' },
       })
       if (current) return toRunnerPayload(current)
       throw CONFLICT('Session already exists for this attempt')
@@ -266,8 +300,11 @@ export const restartSession = async (userId: string, sessionId: string) => {
   // restart 是**主动新 attempt** → 重新判定资格（尤其 dueAt / membership）。
   const ctx = await loadStartableAssignment(session.assignmentId, userId)
   const participantKey = getParticipantKey(userId)
+  const participantIdentity = await ensureParticipantIdentity(userId, participantKey)
 
-  const used = await prisma.cognitiveSession.count({ where: { assignmentId: session.assignmentId, participantKey } })
+  const used = await prisma.cognitiveSession.count({
+    where: { assignmentId: session.assignmentId, participantIdentityId: participantIdentity.id },
+  })
   if (used >= ctx.assignment.maxAttempts) {
     throw CONFLICT('Maximum attempts reached for this assignment')
   }
@@ -285,6 +322,9 @@ export const restartSession = async (userId: string, sessionId: string) => {
       if (locked.status !== 'IN_PROGRESS') {
         throw BAD_REQUEST('Session is no longer IN_PROGRESS')
       }
+      if (locked.participantIdentityId !== participantIdentity.id) {
+        throw CONFLICT('Participant identity does not match the session')
+      }
 
       const newAttemptNo = locked.attemptNo + 1
       const { count } = await tx.cognitiveSession.updateMany({
@@ -297,6 +337,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
         data: {
           userId,
           participantKey,
+          participantIdentityId: participantIdentity.id,
           participantSnapshotEncrypted,
           assignmentId: locked.assignmentId,
           configId: locked.configId,
@@ -314,7 +355,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
   } catch (err) {
     if (isPrismaUniqueViolation(err)) {
       const current = await prisma.cognitiveSession.findFirst({
-        where: { assignmentId: session.assignmentId, participantKey, status: 'IN_PROGRESS' },
+        where: { assignmentId: session.assignmentId, participantIdentityId: participantIdentity.id, status: 'IN_PROGRESS' },
       })
       if (current) return toRunnerPayload(current)
       throw CONFLICT('Restarted session already exists')

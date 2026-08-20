@@ -847,6 +847,22 @@ model CognitiveAssignment {
   @@map("cognitive_assignments")
 }
 
+// Stable pseudonymous identity boundary for cognitive records.
+// userId is nullable so the identity survives user deletion; participantKey is
+// the non-reversible lookup key used by the cognitive module.
+model ParticipantIdentity {
+  id            String             @id @default(uuid())
+  userId        String?            @unique @map("user_id")
+  participantKey String            @unique @map("participant_key")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  user     User              ? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  sessions CognitiveSession[]
+
+  @@map("participant_identities")
+}
+
 // 认知测评会话。所有敏感字段以密文存储（*Encrypted，统一 Cognitive 信封）。
 // participantSnapshotEncrypted 为预留的身份快照（即使 User 被删除也保留必要历史信息），
 // D4 Session API 写入时须用 Cognitive strict encryption 加密，禁止写入明文身份数据。
@@ -854,6 +870,7 @@ model CognitiveSession {
   id                           String                 @id @default(uuid())
   userId                       String?                @map("user_id")
   participantKey               String                 @map("participant_key")
+  participantIdentityId        String                 @map("participant_identity_id")
   participantSnapshotEncrypted String?                @map("participant_snapshot_encrypted")
   assignmentId                 String?                @map("assignment_id")
   configId                     String                 @map("config_id")
@@ -875,6 +892,7 @@ model CognitiveSession {
   updatedAt                    DateTime               @updatedAt @map("updated_at")
 
   user       User?                @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
+  participantIdentity ParticipantIdentity @relation(fields: [participantIdentityId], references: [id], onDelete: Restrict)
   assignment CognitiveAssignment? @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
   config     CognitiveTestConfig  @relation(fields: [configId], references: [id], onDelete: Restrict)
   trials     CognitiveTrial[]
@@ -886,6 +904,7 @@ model CognitiveSession {
   @@index([assignmentId])
   @@index([configId])
   @@index([participantKey])
+  @@index([participantIdentityId, status])
   @@map("cognitive_sessions")
 }
 

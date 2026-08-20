@@ -4,7 +4,18 @@ import type { PaginationParams } from '../../utils/pagination'
 
 /** 学生自己的已完成记录；不返回 raw trial、密文或详细 metrics。 */
 export const listMyHistory = async (userId: string, pagination: PaginationParams) => {
-  const where = { userId, status: 'COMPLETED' as const }
+  // History is read through the pseudonymous identity boundary rather than
+  // joining cognitive records directly to the application user row.
+  const identity = await prisma.participantIdentity.findUnique({
+    where: { userId },
+    select: { id: true },
+  })
+  if (!identity) return { list: [], total: 0 }
+
+  const where = {
+    participantIdentityId: identity.id,
+    status: 'COMPLETED' as const,
+  }
   const [sessions, total] = await Promise.all([
     prisma.cognitiveSession.findMany({
       where,
