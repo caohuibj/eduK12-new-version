@@ -55,10 +55,12 @@ export const getPublicAssignmentInfo = async (tokenValue: string) => {
 export const startPublicSession = async (tokenValue: string, recoveryToken?: string) => {
   const token = await loadToken(tokenValue)
   if (recoveryToken) {
-    const existing = await prisma.cognitiveSession.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash: hashRecoveryToken(recoveryToken), userId: null } })
+    const recoveryTokenHash = hashRecoveryToken(recoveryToken)
+    const existing = await prisma.cognitiveSession.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash, userId: null } })
     if (existing) {
-      return { session: await sessionService.getPublicSession(hashRecoveryToken(recoveryToken), existing.id), recoveryToken: null, anonymousCode: existing.anonymousCode }
+      return { session: await sessionService.getPublicSession(recoveryTokenHash, existing.id), recoveryToken: null, anonymousCode: existing.anonymousCode }
     }
+    throw FORBIDDEN('Invalid recovery credential')
   }
   assertWindow(token)
   const { config, parsedConfig } = validateAssignment(token.assignment)
