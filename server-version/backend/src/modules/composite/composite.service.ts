@@ -191,7 +191,22 @@ export const listComposites = async (userId: string, role: UserRole) => {
         orderBy: { position: 'asc' },
         include: {
           scale: { select: { id: true, name: true } },
-          cognitiveAssignment: { select: { id: true, title: true } },
+          cognitiveAssignment: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              config: {
+                select: {
+                  id: true,
+                  testType: true,
+                  name: true,
+                  engineVersion: true,
+                  scoringVersion: true,
+                },
+              },
+            },
+          },
         },
       },
       _count: { select: { attempts: true, accessTokens: true } },
@@ -230,8 +245,14 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
   const existing = await loadComposite(id)
   assertOwner(existing, userId, role)
   assertDraft(existing)
-  await validateCourse(input.courseId === undefined ? existing.courseId : input.courseId, userId, role)
-  if ((input.publicEnabled ?? existing.publicEnabled) && input.expiresAt === null && existing.expiresAt === null) {
+  const nextCourseId = input.courseId === undefined ? existing.courseId : input.courseId
+  await validateCourse(nextCourseId, userId, role)
+  const nextOpensAt = input.opensAt === undefined ? existing.opensAt : parseDate(input.opensAt)
+  const nextExpiresAt = input.expiresAt === undefined ? existing.expiresAt : parseDate(input.expiresAt)
+  if (nextOpensAt && nextExpiresAt && nextExpiresAt.getTime() < nextOpensAt.getTime()) {
+    throw compositeBadRequest('expiresAt 必须晚于或等于 opensAt')
+  }
+  if ((input.publicEnabled ?? existing.publicEnabled) && !nextExpiresAt) {
     throw compositeBadRequest('公开链接必须设置有效期')
   }
   return prisma.compositeAssessment.update({
@@ -714,12 +735,25 @@ const getOwnedChild = async (attemptId: string, itemId: string, context: { userI
   return { attempt, item }
 }
 
+const lockScaleAssessment = async (tx: Db, assessmentId: string) => {
+  const rows = await tx.$queryRaw<Array<{ status: string; answers: unknown }>>`
+    SELECT "status", "answers"
+    FROM "assessments"
+    WHERE "id" = ${assessmentId}
+    FOR UPDATE
+  `
+  const assessment = rows[0]
+  if (!assessment) throw compositeNotFound('量表测评记录不存在')
+  return assessment
+}
+
 export const saveAttempt = async (
   attemptId: string,
   context: { userId?: string; recoveryTokenHash?: string },
   draft?: { itemId: string; value: string },
 ) => {
   const attempt = await findAttempt(attemptId, context)
+  if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (draft) {
     const item = attempt.compositeAssessment.items.find((candidate: any) => candidate.id === draft.itemId)
     if (!item || item.type !== 'FORM') throw compositeBadRequest('只能保存当前综合测评中的表单草稿')
@@ -737,6 +771,7 @@ export const saveAttempt = async (
 
 export const saveFormAnswer = async (attemptId: string, itemId: string, value: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
+  if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (item.type !== 'FORM') throw compositeBadRequest('当前模块不是表单')
   if (item.required && !value.trim()) throw compositeBadRequest('此表单项为必填项')
   if (item.formType === 'single_choice' || item.formType === 'multiple_choice') {
@@ -751,17 +786,25 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
 
 export const saveScaleAnswer = async (attemptId: string, itemId: string, input: { itemId: string; value: number; responseTime?: number }, context: { userId?: string; recoveryTokenHash?: string }) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
+  if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (item.type !== 'SCALE') throw compositeBadRequest('当前模块不是量表')
   const assessment = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === itemId)
   if (!assessment || assessment.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
   const scaleItem = item.scale.items.find((candidate: any) => candidate.id === input.itemId)
   if (!scaleItem) throw compositeBadRequest('量表题目不存在')
-  const answers = decodeJson<any[]>(assessment.answers) ?? []
-  const answer = { itemId: input.itemId, value: input.value, responseTime: input.responseTime }
-  const index = answers.findIndex((candidate) => candidate.itemId === input.itemId)
-  if (index >= 0) answers[index] = { ...answers[index], ...answer }
-  else answers.push(answer)
-  await prisma.assessment.update({ where: { id: assessment.id }, data: { answers: answers as any, progress: Math.round((answers.length / Math.max(item.scale.items.length, 1)) * 100) } })
+  await prisma.$transaction(async (tx: Db) => {
+    const locked = await lockScaleAssessment(tx, assessment.id)
+    if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
+    const answers = decodeJson<any[]>(locked.answers) ?? []
+    const answer = { itemId: input.itemId, value: input.value, responseTime: input.responseTime }
+    const index = answers.findIndex((candidate) => candidate.itemId === input.itemId)
+    if (index >= 0) answers[index] = { ...answers[index], ...answer }
+    else answers.push(answer)
+    await tx.assessment.update({
+      where: { id: assessment.id },
+      data: { answers: answers as any, progress: Math.round((answers.length / Math.max(item.scale.items.length, 1)) * 100) },
+    })
+  })
   return getAttemptState(attempt.id, context)
 }
 
@@ -771,14 +814,32 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
   const assessment = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === itemId)
   if (!assessment) throw compositeNotFound('量表测评记录不存在')
   if (assessment.status === 'COMPLETED') return getAttemptState(attempt.id, context)
-  const answers = decodeJson<any[]>(assessment.answers) ?? []
-  const requiredIds = item.scale.items.filter((candidate: any) => candidate.required).map((candidate: any) => candidate.id)
-  const answered = new Set(answers.map((candidate) => candidate.itemId))
-  if (requiredIds.some((id: string) => !answered.has(id))) throw compositeBadRequest('还有必答题未完成')
-  const scores = calculateScores(answers, item.scale.items, item.scale.dimensions, item.scale.config as any)
-  const feedback = generateFeedbackWithLevels(scores, item.scale.dimensions, item.scale.name)
-  const completedAt = new Date()
-  await prisma.assessment.update({ where: { id: assessment.id }, data: { status: 'COMPLETED', progress: 100, answers: encryptField(answers) as any, scores: encryptField(scores) as any, feedback: encryptField(feedback) as any, completedAt, totalTime: completedAt.getTime() - assessment.startedAt.getTime() } })
+  const didComplete = await prisma.$transaction(async (tx: Db) => {
+    const locked = await lockScaleAssessment(tx, assessment.id)
+    if (locked.status === 'COMPLETED') return false
+    if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
+    const answers = decodeJson<any[]>(locked.answers) ?? []
+    const requiredIds = item.scale.items.filter((candidate: any) => candidate.required).map((candidate: any) => candidate.id)
+    const answered = new Set(answers.map((candidate) => candidate.itemId))
+    if (requiredIds.some((id: string) => !answered.has(id))) throw compositeBadRequest('还有必答题未完成')
+    const scores = calculateScores(answers, item.scale.items, item.scale.dimensions, item.scale.config as any)
+    const feedback = generateFeedbackWithLevels(scores, item.scale.dimensions, item.scale.name)
+    const completedAt = new Date()
+    await tx.assessment.update({
+      where: { id: assessment.id },
+      data: {
+        status: 'COMPLETED',
+        progress: 100,
+        answers: encryptField(answers) as any,
+        scores: encryptField(scores) as any,
+        feedback: encryptField(feedback) as any,
+        completedAt,
+        totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
+      },
+    })
+    return true
+  })
+  if (!didComplete) return getAttemptState(attempt.id, context)
   return getAttemptState(attempt.id, context)
 }
 
