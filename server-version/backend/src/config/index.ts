@@ -9,6 +9,7 @@ dotenv.config()
 const configSchema = z.object({
   port: z.number().int().min(1).max(65535),
   nodeEnv: z.enum(['development', 'production', 'test']),
+  corsOrigin: z.string().min(1),
   databaseUrl: z.string().url(),
   jwtSecret: z.string().min(32, 'JWT_SECRET must be at least 32 characters in production'),
   jwtExpiresIn: z.string(),
@@ -51,6 +52,7 @@ const projectRoot = path.resolve(__dirname, '..')
 const rawConfig = {
   port: parsePort(),
   nodeEnv: process.env.NODE_ENV || 'development',
+  corsOrigin: process.env.CORS_ORIGIN || '*',
   databaseUrl: process.env.DATABASE_URL || 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public',
   jwtSecret: process.env.NODE_ENV === 'production' ? (process.env.JWT_SECRET || '') : (process.env.JWT_SECRET || 'dev-secret-key-not-for-production'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
@@ -74,6 +76,9 @@ const rawConfig = {
 
 // 生产环境强制检查
 if (rawConfig.nodeEnv === 'production') {
+  if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.trim() === '*') {
+    throw new Error('❌ CORS_ORIGIN must be set to a specific frontend origin in production mode')
+  }
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
     throw new Error('❌ JWT_SECRET must be set and at least 32 characters in production mode')
   }

@@ -47,12 +47,24 @@ const decryptResult = (session: {
   }
 }
 
-export const completeSession = async (userId: string, sessionId: string) => {
+const completeSessionWithPrincipal = async (userId: string | null, sessionId: string, recoveryTokenHash?: string) => {
   return prisma.$transaction(async (tx) => {
     // 行锁：串行化 complete 与 append/restart，保证评分数据集冻结。
     const session = await lockSession(tx, sessionId)
     if (!session) throw NOT_FOUND('CognitiveSession not found')
-    if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    if (userId !== null) {
+      if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    } else {
+      let allowed = Boolean(recoveryTokenHash && session.recoveryTokenHash === recoveryTokenHash)
+      if (!allowed && recoveryTokenHash && session.compositeAttemptId) {
+        const attempt = await tx.compositeAssessmentAttempt.findUnique({
+          where: { id: session.compositeAttemptId },
+          select: { recoveryTokenHash: true, userId: true },
+        })
+        allowed = attempt?.userId === null && attempt.recoveryTokenHash === recoveryTokenHash
+      }
+      if (session.userId !== null || !allowed) throw FORBIDDEN('Recovery credential does not own this session')
+    }
 
     // COMPLETED：幂等返回已存结果（不要求 completionKey）。
     if (session.status === 'COMPLETED') {
@@ -153,3 +165,9 @@ export const completeSession = async (userId: string, sessionId: string) => {
     return { sessionId, status: 'COMPLETED', finishedAt, ...result, reference }
   })
 }
+
+export const completeSession = async (userId: string, sessionId: string) =>
+  completeSessionWithPrincipal(userId, sessionId)
+
+export const completeSessionForPublic = async (sessionId: string, recoveryTokenHash: string) =>
+  completeSessionWithPrincipal(null, sessionId, recoveryTokenHash)

@@ -101,6 +101,26 @@ export const cognitiveExportRequestSchema = z
 export type CognitiveExportQuery = z.infer<typeof cognitiveExportQuerySchema>
 export type CognitiveExportRequest = z.infer<typeof cognitiveExportRequestSchema>
 
+// 公开认知测评：入口令牌和恢复凭证均由服务端生成，客户端只能提交恢复凭证。
+export const cognitivePublicTokenSchema = z.object({
+  expiresAt: z.string().datetime(),
+  maxUses: z.number().int().min(0).default(0),
+}).strict()
+
+export const cognitivePublicStartSchema = z.object({
+  recoveryToken: z.string().min(20).max(200).optional(),
+}).strict()
+
+export const cognitivePublicTrialSchema = z.object({
+  recoveryToken: z.string().min(20).max(200),
+  trialIndex: z.number().int().min(0),
+  payload: z.any(),
+}).strict()
+
+export const cognitivePublicRecoverySchema = z.object({
+  recoveryToken: z.string().min(20).max(200),
+}).strict()
+
 // ---------------------------------------------------------------------------
 // D4 — Session request schemas
 // ---------------------------------------------------------------------------

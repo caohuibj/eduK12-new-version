@@ -61,7 +61,12 @@ services:
       DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
+      EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}
+      EXPORT_MAX_TRIALS: ${EXPORT_MAX_TRIALS:-100000}
+      EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
+      EXPORT_MAX_BYTES: ${EXPORT_MAX_BYTES:-52428800}
+      EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-24}
       # COS 可选；留空则不启用远程存储
       COS_SECRET_ID: ${COS_SECRET_ID:-}
       COS_SECRET_KEY: ${COS_SECRET_KEY:-}
@@ -82,7 +87,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5

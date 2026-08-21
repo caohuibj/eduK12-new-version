@@ -22,6 +22,11 @@ router.patch('/assignments/:id', authenticate, requireTeacher, cognitiveControll
 router.post('/assignments/:id/publish', authenticate, requireTeacher, cognitiveController.publishAssignment)
 router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveController.archiveAssignment)
 
+// 单个认知任务公开链接（参与者不要求登录，恢复凭证只存哈希）
+router.get('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.listPublicTokens)
+router.post('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.createPublicToken)
+router.delete('/assignments/:id/public-tokens/:tokenId', authenticate, requireTeacher, cognitiveController.disablePublicToken)
+
 // 教师端数据导出（下载路径携带 assignmentId，控制器会再次校验归属）
 router.get('/assignments/:id/export/files/:fileName', authenticate, requireTeacher, cognitiveController.downloadExportFile)
 router.get('/assignments/:id/export/preview', authenticate, requireTeacher, cognitiveController.getExportPreview)

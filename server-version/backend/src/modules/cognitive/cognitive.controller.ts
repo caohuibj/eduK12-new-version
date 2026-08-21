@@ -6,6 +6,7 @@ import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
 import * as historyService from './history.service'
+import * as publicCognitiveService from './public.service'
 import { CognitiveServiceError } from './cognitive.errors'
 import {
   createAssignmentSchema,
@@ -17,6 +18,10 @@ import {
   completeSessionSchema,
   cognitiveExportQuerySchema,
   cognitiveExportRequestSchema,
+  cognitivePublicTokenSchema,
+  cognitivePublicStartSchema,
+  cognitivePublicTrialSchema,
+  cognitivePublicRecoverySchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
@@ -111,6 +116,86 @@ export const cognitiveController = {
       if (!req.user) return unauthorized(res)
       const data = await assignmentService.archiveAssignment(req.user.userId, req.user.role, req.params.id)
       return success(res, data, '归档成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async createPublicToken(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = cognitivePublicTokenSchema.parse(req.body)
+      const data = await publicCognitiveService.createAccessTokenForAssignment(req.user.userId, req.user.role, req.params.id, input.expiresAt, input.maxUses)
+      return success(res, data, '公开链接创建成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async listPublicTokens(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await publicCognitiveService.listAccessTokens(req.user.userId, req.user.role, req.params.id)
+      return success(res, { list: data, total: data.length })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async disablePublicToken(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await publicCognitiveService.disableAccessToken(req.user.userId, req.user.role, req.params.id, req.params.tokenId)
+      return success(res, null, '公开链接已停用')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getPublicAssignment(req: Request, res: Response) {
+    try {
+      const data = await publicCognitiveService.getPublicAssignmentInfo(req.params.token)
+      return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async startPublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicStartSchema.parse(req.body || {})
+      const data = await publicCognitiveService.startPublicSession(req.params.token, input.recoveryToken)
+      return success(res, data, data.recoveryToken ? '匿名测评已开始，请保存恢复凭证' : '已恢复匿名测评')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getPublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicRecoverySchema.parse({ recoveryToken: req.headers['x-recovery-token'] })
+      const data = await publicCognitiveService.getSession(req.params.id, input.recoveryToken)
+      return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async appendPublicTrial(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicTrialSchema.parse(req.body)
+      const data = await publicCognitiveService.appendTrial(req.params.id, input.recoveryToken, { trialIndex: input.trialIndex, payload: input.payload })
+      return success(res, data, '试次已记录')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async completePublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicRecoverySchema.parse(req.body)
+      const data = await publicCognitiveService.completeSession(req.params.id, input.recoveryToken)
+      return success(res, data, '匿名测评已完成')
     } catch (err) {
       return handleError(res, err)
     }

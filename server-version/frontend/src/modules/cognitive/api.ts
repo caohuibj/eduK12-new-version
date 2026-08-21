@@ -1,6 +1,12 @@
 import apiClient from '../../api/client'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
 
+export interface CognitiveSessionApi {
+  getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
+  appendTrial: (sessionId: string, trialIndex: number, payload: Record<string, unknown>) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
+  completeSession: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession>>
+}
+
 /**
  * Cognitive API 封装（Stage B v1.1 §14/§15）。
  *
@@ -33,4 +39,16 @@ export const cognitiveApi = {
     ),
   completeSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/complete`, {}),
+}
+
+/** 公开匿名认知会话 API。恢复凭证只作为请求凭证，不写入 URL 路径。 */
+export const publicCognitiveApi = (recoveryToken: string): CognitiveSessionApi => ({
+  getSession: (sessionId) => apiClient.get<CognitiveSession>(`/public/cognitive/sessions/${sessionId}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  appendTrial: (sessionId, trialIndex, payload) => apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>(`/public/cognitive/sessions/${sessionId}/trials`, { recoveryToken, trialIndex, payload }),
+  completeSession: (sessionId) => apiClient.post<CognitiveSession>(`/public/cognitive/sessions/${sessionId}/complete`, { recoveryToken }),
+})
+
+export const publicCognitiveAssignmentApi = {
+  info: (token: string) => apiClient.get<{ title: string; instruction: string | null; testType: string; expiresAt: string; maxUses: number; usedCount: number }>(`/public/cognitive/assignments/${token}`),
+  start: (token: string, recoveryToken?: string) => apiClient.post<{ session: CognitiveSession; recoveryToken: string | null; anonymousCode: string | null }>(`/public/cognitive/assignments/${token}/start`, recoveryToken ? { recoveryToken } : {}),
 }

@@ -1,7 +1,9 @@
 import express from 'express'
+import { rateLimit } from 'express-rate-limit'
 import cors from 'cors'
 import { createServer } from 'http'
 import { config } from './config'
+import { prisma } from './config/database'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
@@ -34,8 +36,18 @@ import generalQuestionnaireRoutes from './routes/generalQuestionnaires'
 import classroomRoutes from './routes/classrooms'
 // 认知测评路由（D3+；仅在 COGNITIVE_MODULE_ENABLED=true 时挂载）
 import cognitiveRoutes from './modules/cognitive/cognitive.routes'
+import cognitivePublicRoutes from './modules/cognitive/cognitive.public.routes'
+import compositeRoutes from './modules/composite/composite.routes'
+import compositePublicRoutes from './modules/composite/composite.public.routes'
 
 const app = express()
+
+const publicAssessmentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 600,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
 
 // 创建 HTTP 服务器
 const server = createServer(app)
@@ -57,9 +69,9 @@ app.use((req, res, next) => {
 })
 
 // 中间件
-app.use(cors())
-app.use(express.json({ limit: '500mb' }))
-app.use(express.urlencoded({ extended: true, limit: '500mb' }))
+app.use(cors({ origin: config.corsOrigin, credentials: true }))
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 // 静态文件服务 - 使用绝对路径
 console.log('[Server] Static files serving from:', config.uploadDir)
@@ -71,6 +83,15 @@ app.use('/uploads', express.static(config.uploadDir, {
 // 健康检查
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+app.get('/ready', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`
+    res.json({ status: 'ok', timestamp: new Date().toISOString() })
+  } catch {
+    res.status(503).json({ status: 'unready', timestamp: new Date().toISOString() })
+  }
 })
 
 // API 路由
@@ -86,15 +107,21 @@ app.use('/api/scales', scaleRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
 // 泛化问卷路由（新增）
-app.use('/api/public', publicRoutes)
+
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
+// 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
+app.use('/api/composite-assessments', compositeRoutes)
+app.use('/api/public/composite-assessments', publicAssessmentLimiter, compositePublicRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
 
 // 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
 if (config.cognitiveModuleEnabled) {
   app.use('/api/cognitive', cognitiveRoutes)
+  app.use('/api/public/cognitive', publicAssessmentLimiter, cognitivePublicRoutes)
 }
+
+app.use('/api/public', publicAssessmentLimiter, publicRoutes)
 
 // 404 处理
 app.use(notFoundHandler)

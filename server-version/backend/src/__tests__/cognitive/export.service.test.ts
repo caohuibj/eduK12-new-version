@@ -140,6 +140,16 @@ describe('cognitive export service', () => {
     expect(csv).toContain('380')
   })
 
+  it('keeps the server-issued anonymous code in anonymous exports', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([
+      { ...session(), userId: null, anonymousCode: 'ANON-AB12CD34', user: null },
+    ])
+
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary' })
+
+    expect(data.rows[0].U_id).toBe('ANON-AB12CD34')
+  })
+
   it('filters completed sessions by completion date', async () => {
     mockPrisma.cognitiveSession.findMany.mockResolvedValue([])
 

@@ -54,7 +54,7 @@
 ```javascript
 // 在 socketService.ts 中添加连接限制
 io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] },
+  cors: { origin: config.corsOrigin, methods: ['GET', 'POST'] },
   pingTimeout: 60000,
   pingInterval: 25000,
   // 建议添加：
@@ -199,7 +199,7 @@ pgbench -c 10 -j 2 -t 1000 ptool_db
 ```typescript
 // src/services/socketService.ts
 io = new Server(server, {
-  cors: { origin: process.env.CORS_ORIGIN || '*', credentials: true },
+  cors: { origin: config.corsOrigin, credentials: true },
   transports: ['websocket', 'polling'],
   pingTimeout: 60000,
   pingInterval: 25000,
