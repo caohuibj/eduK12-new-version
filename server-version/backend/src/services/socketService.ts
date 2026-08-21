@@ -15,6 +15,7 @@ import { createAdapter } from '@socket.io/redis-adapter'
 import { createClient } from 'redis'
 import { logger } from '../utils/logger'
 import { getRedisUrl } from '../config/redis'
+import { config } from '../config'
 
 export class SocketService {
   private io: Server | null = null
@@ -31,7 +32,7 @@ export class SocketService {
     
     this.io = new Server(server, {
       cors: {
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: config.corsOrigin,
         methods: ['GET', 'POST'],
         credentials: true,
       },
