@@ -462,7 +462,7 @@ export const listAvailableForStudent = async (userId: string) => {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
     if (!latest.has(attempt.compositeAssessmentId)) latest.set(attempt.compositeAssessmentId, attempt)
   }
-  return list.map((item: any) => ({
+  return supportedList.map((item: any) => ({
     id: item.id,
     code: item.code,
     name: item.name,
