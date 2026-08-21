@@ -3,6 +3,7 @@ import { rateLimit } from 'express-rate-limit'
 import cors from 'cors'
 import { createServer } from 'http'
 import { config } from './config'
+import { prisma } from './config/database'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
@@ -68,7 +69,7 @@ app.use((req, res, next) => {
 })
 
 // 中间件
-app.use(cors())
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
@@ -84,6 +85,15 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.get('/ready', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`
+    res.json({ status: 'ok', timestamp: new Date().toISOString() })
+  } catch {
+    res.status(503).json({ status: 'unready', timestamp: new Date().toISOString() })
+  }
+})
+
 // API 路由
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
@@ -97,7 +107,7 @@ app.use('/api/scales', scaleRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
 // 泛化问卷路由（新增）
-app.use('/api/public', publicRoutes)
+app.use('/api/public', publicAssessmentLimiter, publicRoutes)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
 app.use('/api/composite-assessments', compositeRoutes)
