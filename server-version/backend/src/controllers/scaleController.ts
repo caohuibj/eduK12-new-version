@@ -261,8 +261,8 @@ export const scaleController = {
       }
 
       // 已发布的量表不能修改核心配置
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       const updated = await prisma.scale.update({
@@ -605,8 +605,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 检查编码是否已存在
@@ -663,8 +663,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       const dimension = await prisma.dimension.findUnique({
@@ -715,8 +715,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       await prisma.dimension.delete({
@@ -793,8 +793,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 获取当前最大排序号
@@ -866,8 +866,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       const item = await prisma.scaleItem.findUnique({
@@ -947,8 +947,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       await prisma.scaleItem.delete({
@@ -988,8 +988,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 批量更新排序
@@ -1582,6 +1582,9 @@ export const scaleController = {
 
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限修改此量表')
+      }
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 检查维度是否存在
