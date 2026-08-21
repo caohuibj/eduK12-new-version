@@ -107,7 +107,7 @@ app.use('/api/scales', scaleRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
 // 泛化问卷路由（新增）
-app.use('/api/public', publicAssessmentLimiter, publicRoutes)
+
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
 app.use('/api/composite-assessments', compositeRoutes)
@@ -120,6 +120,8 @@ if (config.cognitiveModuleEnabled) {
   app.use('/api/cognitive', cognitiveRoutes)
   app.use('/api/public/cognitive', publicAssessmentLimiter, cognitivePublicRoutes)
 }
+
+app.use('/api/public', publicAssessmentLimiter, publicRoutes)
 
 // 404 处理
 app.use(notFoundHandler)
