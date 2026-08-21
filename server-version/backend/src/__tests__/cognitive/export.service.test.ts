@@ -10,7 +10,11 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { exportCognitiveToCSV, getCognitiveExportData } from '../../modules/cognitive/export.service'
+import {
+  exportCognitiveToCSV,
+  getCognitiveExportData,
+  makeCognitiveExportFileName,
+} from '../../modules/cognitive/export.service'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
@@ -77,6 +81,16 @@ beforeEach(() => {
 })
 
 describe('cognitive export service', () => {
+  it('generates unique filenames for concurrent exports', () => {
+    const first = makeCognitiveExportFileName('assignment-1', 'summary', 'csv')
+    const second = makeCognitiveExportFileName('assignment-1', 'summary', 'csv')
+
+    expect(first).not.toBe(second)
+    expect(first).toMatch(
+      /^cognitive_assignme_summary_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.csv$/
+    )
+  })
+
   it('exports summary metrics without raw trial columns', async () => {
     mockPrisma.cognitiveSession.findMany.mockResolvedValue([session()])
 

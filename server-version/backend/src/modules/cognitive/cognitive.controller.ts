@@ -181,11 +181,9 @@ export const cognitiveController = {
 
       if (files.csvPath) {
         result.fileName = path.basename(files.csvPath)
-        result.csvPath = files.csvPath
       }
       if (files.savPath) {
         result.fileName = path.basename(files.savPath)
-        result.savPath = files.savPath
       }
 
       return success(res, result, '导出成功')
@@ -206,7 +204,7 @@ export const cognitiveController = {
       if (
         path.basename(fileName) !== fileName ||
         !fileName.startsWith(`cognitive_${assignmentId.substring(0, 8)}_`) ||
-        !/^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.(csv|sav)$/.test(fileName)
+        !/^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
       ) {
         return notFound(res, '文件不存在')
       }

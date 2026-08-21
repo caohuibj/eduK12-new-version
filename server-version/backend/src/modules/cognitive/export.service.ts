@@ -3,6 +3,7 @@ import * as path from 'path'
 import { prisma } from '../../config/database'
 import { decryptCognitivePayload } from './cognitive.security'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
+import { v4 as uuidv4 } from 'uuid'
 
 export type CognitiveExportDetail = 'summary' | 'full'
 export type CognitiveExportFormat = 'csv' | 'sav'
@@ -68,6 +69,15 @@ interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'sc
 
 const MAX_FIELD_NAME_LENGTH = 64
 const EXPORT_DIR = path.join(__dirname, '../../../exports')
+
+export const makeCognitiveExportFileName = (
+  assignmentId: string,
+  detail: CognitiveExportDetail,
+  format: CognitiveExportFormat
+): string => {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
+  return `cognitive_${assignmentId.substring(0, 8)}_${detail}_${timestamp}_${uuidv4()}.${format}`
+}
 
 const toSnakeCase = (value: string): string => {
   const normalized = value
@@ -448,11 +458,7 @@ export async function exportCognitiveToSav(data: CognitiveExportData): Promise<s
     measure: field.type === 'string' || field.type === 'date' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
   }))
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
-  const filePath = path.join(
-    EXPORT_DIR,
-    `cognitive_${data.assignmentId.substring(0, 8)}_${data.detail}_${timestamp}.sav`
-  )
+  const filePath = path.join(EXPORT_DIR, makeCognitiveExportFileName(data.assignmentId, data.detail, 'sav'))
   saveToFile(filePath, data.rows, variables)
   return filePath
 }
@@ -466,10 +472,8 @@ export async function saveCognitiveExportFiles(
   const exportData = data || await getCognitiveExportData(assignmentId, options)
   if (!fs.existsSync(EXPORT_DIR)) fs.mkdirSync(EXPORT_DIR, { recursive: true })
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
-  const baseFileName = `cognitive_${assignmentId.substring(0, 8)}_${exportData.detail}_${timestamp}`
   if (format === 'csv') {
-    const csvPath = path.join(EXPORT_DIR, `${baseFileName}.csv`)
+    const csvPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, exportData.detail, 'csv'))
     fs.writeFileSync(csvPath, `\uFEFF${exportCognitiveToCSV(exportData)}`, 'utf-8')
     return { data: exportData, csvPath }
   }
