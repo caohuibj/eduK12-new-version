@@ -69,7 +69,7 @@ app.use((req, res, next) => {
 })
 
 // 中间件
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
+app.use(cors({ origin: config.corsOrigin, credentials: true }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
