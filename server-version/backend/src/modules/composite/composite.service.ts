@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { config } from '../../config'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
 import { calculateScores, generateFeedbackWithLevels } from '../../services/scoringService'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
@@ -47,7 +48,7 @@ const loadComposite = async (id: string, includeItems = false) => {
             include: {
               scale: {
                 include: {
-                  items: { orderBy: { sortOrder: 'asc' } },
+                  items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } },
                   dimensions: true,
                 },
               },
@@ -73,6 +74,10 @@ const validateCourse = async (courseId: string | null | undefined, userId: strin
 
 const assertDraft = (composite: { status: string }) => {
   if (composite.status !== 'DRAFT') throw compositeConflict('只有草稿状态的综合测评可以修改')
+}
+
+const assertCognitiveModuleEnabled = () => {
+  if (!config.cognitiveModuleEnabled) throw compositeBadRequest('认知模块未启用')
 }
 
 const validateCognitiveConfig = (config: any) => {
@@ -101,6 +106,7 @@ const assertValidItem = async (input: AddCompositeItemInput, userId: string, rol
   }
 
   if (input.type === 'COGNITIVE') {
+    assertCognitiveModuleEnabled()
     if (!input.cognitiveAssignmentId || supplied !== 1) throw compositeBadRequest('认知模块必须提供 cognitiveAssignmentId')
     const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: input.cognitiveAssignmentId }, include: { config: true } })
     if (!assignment) throw compositeNotFound('认知任务不存在')
@@ -117,6 +123,12 @@ const assertValidItem = async (input: AddCompositeItemInput, userId: string, rol
   if (input.type === 'FORM') {
     if (!input.formType || !input.formLabel || supplied !== 1) {
       throw compositeBadRequest('表单模块必须提供 formType 和 formLabel')
+    }
+    if (input.formType === 'single_choice' || input.formType === 'multiple_choice') {
+      const options = input.formOptions ?? []
+      const values = options.map((option) => option.value)
+      if (values.length === 0) throw compositeBadRequest('选择题必须提供至少一个选项')
+      if (new Set(values).size !== values.length) throw compositeBadRequest('表单选项不能重复')
     }
     return
   }
@@ -351,6 +363,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
   for (const item of composite.items) {
+    if (item.type === 'COGNITIVE') assertCognitiveModuleEnabled()
     if (item.type === 'SCALE' && (!item.scale || item.scale.status !== 'PUBLISHED')) {
       throw compositeBadRequest('综合测评包含未发布量表')
     }
@@ -358,8 +371,17 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       throw compositeBadRequest('综合测评包含未发布认知任务')
     }
     if (item.type === 'COGNITIVE') validateCognitiveConfig(item.cognitiveAssignment.config)
-    if (item.type === 'FORM' && (!item.formType || !item.formLabel)) {
-      throw compositeBadRequest('综合测评包含未配置完成的表单')
+    if (item.type === 'FORM') {
+      if (!item.formType || !item.formLabel) {
+        throw compositeBadRequest('综合测评包含未配置完成的表单')
+      }
+      if (item.formType === 'single_choice' || item.formType === 'multiple_choice') {
+        const options = Array.isArray(item.formOptions) ? item.formOptions as Array<{ value: string }> : []
+        const values = options.map((option) => option.value)
+        if (values.length === 0 || new Set(values).size !== values.length) {
+          throw compositeBadRequest('综合测评包含无效的表单选项')
+        }
+      }
     }
   }
 
@@ -454,6 +476,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
 }
 
 const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null) => {
+  assertCognitiveModuleEnabled()
   const assignment = item.cognitiveAssignment
   const config = assignment?.config
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
@@ -562,7 +585,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 }
 
 const findPublicToken = async (tokenValue: string) => {
-  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
+  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   return token as any
@@ -614,7 +637,7 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
           items: {
             orderBy: { position: 'asc' },
             include: {
-              scale: { include: { items: { orderBy: { sortOrder: 'asc' } }, dimensions: true } },
+              scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } },
               cognitiveAssignment: { include: { config: true } },
             },
           },
@@ -669,15 +692,39 @@ const cognitiveRunnerPayload = (session: any) => {
 const completeAttemptIfReady = async (attempt: any, completedItems: number, totalItems: number) => {
   const progress = totalItems ? Math.round((completedItems / totalItems) * 100) : 100
   const shouldComplete = totalItems > 0 && completedItems === totalItems
-  if (shouldComplete && attempt.status !== 'COMPLETED') {
+
+  if (shouldComplete) {
     const completedAt = new Date()
-    await prisma.compositeAssessmentAttempt.update({ where: { id: attempt.id }, data: { status: 'COMPLETED', progress: 100, completedItems, completedAt, totalTime: completedAt.getTime() - attempt.startedAt.getTime(), lastSavedAt: completedAt } })
-    return { status: 'COMPLETED', progress: 100, completedAt }
+    const updated = await prisma.compositeAssessmentAttempt.updateMany({
+      where: { id: attempt.id, status: 'IN_PROGRESS' },
+      data: {
+        status: 'COMPLETED',
+        progress: 100,
+        completedItems,
+        completedAt,
+        totalTime: completedAt.getTime() - attempt.startedAt.getTime(),
+        lastSavedAt: completedAt,
+      },
+    })
+    if (updated.count === 1) return { status: 'COMPLETED', progress: 100, completedAt }
+  } else if (attempt.status === 'IN_PROGRESS') {
+    // Never let a stale GET lower progress or completedItems observed by a newer request.
+    await prisma.compositeAssessmentAttempt.updateMany({
+      where: {
+        id: attempt.id,
+        status: 'IN_PROGRESS',
+        completedItems: { lte: completedItems },
+      },
+      data: { progress, completedItems, lastSavedAt: new Date() },
+    })
   }
-  if (!shouldComplete && attempt.status === 'IN_PROGRESS') {
-    await prisma.compositeAssessmentAttempt.update({ where: { id: attempt.id }, data: { progress, completedItems, lastSavedAt: new Date() } })
-  }
-  return { status: attempt.status, progress, completedAt: attempt.completedAt }
+
+  const latest = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attempt.id },
+    select: { status: true, progress: true, completedAt: true },
+  })
+  if (!latest) throw compositeNotFound('综合测评记录不存在')
+  return latest
 }
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
@@ -686,6 +733,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
   const completed = (item: any) => {
+    if (!item.required) return true
     if (item.type === 'SCALE') return scaleMap.get(item.id)?.status === 'COMPLETED'
     if (item.type === 'COGNITIVE') return cognitiveMap.get(item.id)?.status === 'COMPLETED'
     return formMap.get(item.id)?.completed !== false && formMap.has(item.id)
@@ -778,7 +826,7 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
     const options = Array.isArray(item.formOptions) ? item.formOptions as Array<{ value: string }> : []
     const allowed = new Set(options.map((option) => option.value))
     const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
-    if (values.some((candidate) => !allowed.has(candidate))) throw compositeBadRequest('表单选项无效')
+    if (values.some((candidate) => !allowed.has(candidate)) || new Set(values).size !== values.length) throw compositeBadRequest('表单选项无效')
   }
   await prisma.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value, completed: true }, update: { value, completed: true } })
   return getAttemptState(attempt.id, context)
@@ -792,6 +840,18 @@ export const saveScaleAnswer = async (attemptId: string, itemId: string, input: 
   if (!assessment || assessment.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
   const scaleItem = item.scale.items.find((candidate: any) => candidate.id === input.itemId)
   if (!scaleItem) throw compositeBadRequest('量表题目不存在')
+  const scaleConfig = item.scale.config as { points?: number; labels?: Array<{ value: number }> } | null
+  const points = Number(scaleConfig?.points ?? 5)
+  if (!Number.isInteger(points) || points < 2 || points > 10 || input.value < 1 || input.value > points) {
+    throw compositeBadRequest('量表答案超出有效范围')
+  }
+  const configuredValues = [
+    ...(Array.isArray(scaleConfig?.labels) ? scaleConfig.labels.map((option) => Number(option.value)) : []),
+    ...(Array.isArray(scaleItem.options) ? (scaleItem.options as Array<{ value: unknown }>).map((option) => Number(option.value)) : []),
+  ].filter((value) => Number.isFinite(value))
+  if (configuredValues.length > 0 && !configuredValues.includes(input.value)) {
+    throw compositeBadRequest('量表答案不在题目选项中')
+  }
   await prisma.$transaction(async (tx: Db) => {
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
