@@ -81,4 +81,12 @@ describe('composite export service', () => {
     expect(csv).toContain('"[1,2,3]"')
     expect(csv).toContain('"[""left"",""right""]"')
   })
+
+  it('neutralizes spreadsheet formulas in CSV values', () => {
+    const csv = compositeExportService.exportToCSV({
+      fields: [{ name: 'value', label: 'value', type: 'string' }],
+      rows: [{ value: '=HYPERLINK("https://example.com")' }],
+    })
+    expect(csv).toContain("'=HYPERLINK")
+  })
 })
