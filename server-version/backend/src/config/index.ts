@@ -76,7 +76,7 @@ const rawConfig = {
 
 // 生产环境强制检查
 if (rawConfig.nodeEnv === 'production') {
-  if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.trim() === '*' ) {
+  if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.trim() === '*') {
     throw new Error('❌ CORS_ORIGIN must be set to a specific frontend origin in production mode')
   }
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
