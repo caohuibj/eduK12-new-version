@@ -23,12 +23,27 @@ const loginLimiter = rateLimit({
   }
 })
 
+// 注册及公开验证限流，避免批量账号创建和验证码枚举
+const registrationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      code: -1,
+      message: '请求过于频繁，请15分钟后再试'
+    })
+  },
+  skip: (req) => process.env.NODE_ENV === 'development'
+})
+
 // 公开接口
 router.post('/login', loginLimiter, authController.login)
-router.post('/register', authController.register)
-router.post('/student-register', authController.studentRegister)
-router.post('/verify-teacher-code', authController.verifyTeacherCode)
-router.post('/teacher-register', authController.teacherRegister)
+router.post('/register', registrationLimiter, authController.register)
+router.post('/student-register', registrationLimiter, authController.studentRegister)
+router.post('/verify-teacher-code', registrationLimiter, authController.verifyTeacherCode)
+router.post('/teacher-register', registrationLimiter, authController.teacherRegister)
 
 // 需要认证的接口
 router.get('/me', authenticate, authController.me)
