@@ -252,6 +252,7 @@ const getSessions = async (
         trials: {
           select: { trialIndex: true, payloadEncrypted: true },
           orderBy: { trialIndex: 'asc' },
+          take: EXPORT_MAX_TRIALS + 1,
         },
       },
       orderBy: [{ finishedAt: 'asc' }, { createdAt: 'asc' }],
