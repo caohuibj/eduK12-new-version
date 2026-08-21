@@ -113,6 +113,7 @@ jobs:
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
       COGNITIVE_MODULE_ENABLED: 'true'
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      CORS_ORIGIN: http://localhost
     defaults:
       run:
         working-directory: server-version
