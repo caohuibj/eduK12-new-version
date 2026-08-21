@@ -7,6 +7,15 @@ import { prisma } from '../../config/database'
 import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
+import {
+  assertExportLimits,
+  cleanupExpiredExportFiles,
+  ensureExportFileWithinLimit,
+  EXPORT_MAX_FIELDS,
+  EXPORT_MAX_RECORDS,
+  EXPORT_MAX_TRIALS,
+  exportLimitError,
+} from '../../services/exportStorage'
 
 export type CompositeExportDetail = 'summary' | 'full'
 export type CompositeExportFormat = 'csv' | 'sav'
@@ -51,6 +60,7 @@ const flatten = (value: unknown): Array<[string, unknown]> => {
 const addField = (fields: CompositeExportField[], name: string, label: string, type: CompositeExportField['type'], decimals = 0) => {
   const existing = fields.find((field) => field.name === name)
   if (!existing) {
+    if (fields.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
     fields.push({ name, label, type, width: type === 'string' ? 80 : 12, decimals })
     return name
   }
@@ -64,6 +74,7 @@ const addField = (fields: CompositeExportField[], name: string, label: string, t
     suffix = createHash('sha256').update(`${name}:${label}:${attempt}`).digest('hex').slice(0, 8)
     candidate = `${name.slice(0, Math.max(1, 64 - suffix.length - 1))}_${suffix}`
   }
+  if (fields.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
   fields.push({ name: candidate, label, type, width: type === 'string' ? 80 : 12, decimals })
   return candidate
 }
@@ -92,16 +103,27 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       attempts: {
         where: { status: 'COMPLETED', ...(completedDateWhere(options.dateRange) ? { completedAt: completedDateWhere(options.dateRange) } : {}) },
         orderBy: [{ completedAt: 'asc' }, { startedAt: 'asc' }],
+        take: EXPORT_MAX_RECORDS + 1,
         include: {
           user: { select: { id: true, nickname: true, username: true } },
           formAnswers: true,
           scaleAssessments: { include: { scale: { include: { items: true, dimensions: true } } } },
-          cognitiveSessions: { include: { assignment: { select: { title: true } }, trials: { orderBy: { trialIndex: 'asc' }, select: { trialIndex: true, payloadEncrypted: true } } } },
+          cognitiveSessions: {
+            include: {
+              assignment: { select: { title: true } },
+              trials: {
+                orderBy: { trialIndex: 'asc' },
+                take: EXPORT_MAX_TRIALS + 1,
+                select: { trialIndex: true, payloadEncrypted: true },
+              },
+            },
+          },
         },
       },
     },
   })
   if (!template) throw new Error('综合测评不存在')
+  assertExportLimits({ records: template.attempts.length })
 
   const fields: CompositeExportField[] = []
   addField(fields, 'U_id', '参与者编号', 'string')
@@ -198,6 +220,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
 
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
   for (const row of rows) for (const field of fields) if (!(field.name in row)) row[field.name] = null
+  assertExportLimits({ records: rows.length, fields: fields.length, trials: trialCount })
   return { assessmentId: template.id, assessmentName: template.name, detail, fields, rows, trialCount }
 }
 
@@ -217,11 +240,14 @@ export const saveExportFiles = async (
   data?: CompositeExportData
 ) => {
   const exportData = data ?? await getExportData(assessmentId, options)
+  cleanupExpiredExportFiles(EXPORT_DIR)
   fs.mkdirSync(EXPORT_DIR, { recursive: true })
   const fileName = makeFileName(assessmentId, exportData.detail, format)
   const filePath = path.join(EXPORT_DIR, fileName)
   if (format === 'csv') {
-    fs.writeFileSync(filePath, '\uFEFF' + exportToCSV(exportData), 'utf8')
+    const content = '\uFEFF' + exportToCSV(exportData)
+    assertExportLimits({ bytes: Buffer.byteLength(content, 'utf8') })
+    fs.writeFileSync(filePath, content, 'utf8')
   } else {
     const variables: SavVariable[] = exportData.fields.map((field) => ({
       name: field.name,
@@ -233,6 +259,7 @@ export const saveExportFiles = async (
       measure: field.type === 'string' || field.type === 'date' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
     }))
     saveToFile(filePath, exportData.rows, variables)
+    ensureExportFileWithinLimit(filePath)
   }
   return { filePath }
 }
