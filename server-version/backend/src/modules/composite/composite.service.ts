@@ -80,6 +80,12 @@ const assertCognitiveModuleEnabled = () => {
   if (!config.cognitiveModuleEnabled) throw compositeBadRequest('认知模块未启用')
 }
 
+const assertSupportedComposite = (composite: { items?: Array<{ type: string }> }) => {
+  if (!config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
+    throw compositeBadRequest('认知模块未启用')
+  }
+}
+
 const validateCognitiveConfig = (config: any) => {
   try {
     const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
@@ -224,7 +230,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
       _count: { select: { attempts: true, accessTokens: true } },
     },
   })
-  return list.map((item: any) => ({
+  return supportedList.map((item: any) => ({
     ...item,
     itemCount: item.items.length,
     items: item.items.map(mapItemForTeacher),
@@ -447,7 +453,10 @@ export const listAvailableForStudent = async (userId: string) => {
     orderBy: { publishedAt: 'desc' },
     include: { course: { select: { id: true, title: true, courseCode: true } }, items: { orderBy: { position: 'asc' }, select: { type: true, position: true, scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } }, formLabel: true } } },
   })
-  const attempts = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: list.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, progress: true, completedAt: true } })
+  const supportedList = config.cognitiveModuleEnabled
+    ? list
+    : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
+  const attempts = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: supportedList.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, progress: true, completedAt: true } })
   const latest = new Map<string, any>()
   for (const attempt of attempts) {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
@@ -506,6 +515,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
 
 const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null) => {
   for (const item of items) {
+    if (!item.required) continue
     if (item.type === 'SCALE') {
       await db.assessment.create({
         data: {
@@ -549,6 +559,7 @@ const createAttempt = async (
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
   const composite = await loadComposite(compositeId, true)
+  assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
 
   const isUniqueConstraintError = (err: unknown) =>
@@ -588,6 +599,7 @@ const findPublicToken = async (tokenValue: string) => {
   const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
+  assertSupportedComposite(token.compositeAssessment)
   return token as any
 }
 
@@ -661,6 +673,7 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  assertSupportedComposite(attempt.compositeAssessment)
   return attempt as any
 }
 
