@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { success, error, unauthorized } from '../../utils/response'
+import { success, error, unauthorized, notFound } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
 import * as sessionService from './session.service'
@@ -15,9 +15,13 @@ import {
   restartSessionSchema,
   appendTrialSchema,
   completeSessionSchema,
+  cognitiveExportQuerySchema,
+  cognitiveExportRequestSchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
+import * as fs from 'fs'
+import * as path from 'path'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
@@ -107,6 +111,109 @@ export const cognitiveController = {
       if (!req.user) return unauthorized(res)
       const data = await assignmentService.archiveAssignment(req.user.userId, req.user.role, req.params.id)
       return success(res, data, '归档成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  // Cognitive export
+  async getExportPreview(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = cognitiveExportQuerySchema.parse(req.query)
+
+      // 复用教师端 Assignment 权限校验，避免导出接口绕过创建者隔离。
+      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
+
+      const { cognitiveExportService } = await import('./export.service')
+      const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
+        detail: query.detail,
+        anonymize: true,
+      })
+
+      return success(res, {
+        assignmentId: data.assignmentId,
+        assignmentTitle: data.assignmentTitle,
+        testType: data.testType,
+        detail: data.detail,
+        completedCount: data.completedCount,
+        trialCount: data.trialCount,
+        fieldCount: data.fields.length,
+        fields: data.fields,
+      })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async exportData(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = cognitiveExportRequestSchema.parse(req.body || {})
+
+      // 复用教师端 Assignment 权限校验，管理员可导出所有任务。
+      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
+
+      const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
+      const { cognitiveExportService } = await import('./export.service')
+      const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
+        detail: input.detail,
+        anonymize,
+        dateRange: input.dateRange,
+      })
+      const files = await cognitiveExportService.saveCognitiveExportFiles(
+        req.params.id,
+        { detail: input.detail, anonymize, dateRange: input.dateRange },
+        input.format,
+        data
+      )
+
+      const result: Record<string, unknown> = {
+        assignmentId: data.assignmentId,
+        assignmentTitle: data.assignmentTitle,
+        detail: data.detail,
+        format: input.format,
+        anonymize,
+        recordCount: data.completedCount,
+        trialCount: data.trialCount,
+        fieldCount: data.fields.length,
+      }
+
+      if (files.csvPath) {
+        result.fileName = path.basename(files.csvPath)
+      }
+      if (files.savPath) {
+        result.fileName = path.basename(files.savPath)
+      }
+
+      return success(res, result, '导出成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async downloadExportFile(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const { id: assignmentId, fileName } = req.params
+
+      // 下载也必须重新执行 Assignment 归属校验，不能只依赖不可预测的文件名。
+      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, assignmentId)
+
+      // 文件名来自服务端生成结果，仍显式拒绝路径穿越和非导出文件名。
+      if (
+        path.basename(fileName) !== fileName ||
+        !fileName.startsWith(`cognitive_${assignmentId.substring(0, 8)}_`) ||
+        !/^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
+      ) {
+        return notFound(res, '文件不存在')
+      }
+
+      const exportDir = path.join(__dirname, '../../../exports')
+      const filePath = path.join(exportDir, fileName)
+      if (!fs.existsSync(filePath)) return notFound(res, '文件不存在')
+
+      return res.download(filePath)
     } catch (err) {
       return handleError(res, err)
     }

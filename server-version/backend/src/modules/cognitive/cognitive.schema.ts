@@ -69,6 +69,39 @@ export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>
 export type ListAssignmentsQuery = z.infer<typeof listAssignmentsQuerySchema>
 
 // ---------------------------------------------------------------------------
+// Cognitive export
+// ---------------------------------------------------------------------------
+
+/**
+ * 认知测评导出预览查询。
+ * summary 只导出服务端汇总指标；full 额外展开每个原始试次。
+ */
+export const cognitiveExportQuerySchema = z
+  .object({
+    detail: z.enum(['summary', 'full']).optional().default('summary'),
+  })
+  .strict()
+
+/**
+ * 认知测评导出请求。
+ * 日期兼容管理端 date input 的 YYYY-MM-DD，也兼容完整 ISO 时间。
+ */
+export const cognitiveExportRequestSchema = z
+  .object({
+    detail: z.enum(['summary', 'full']).optional().default('summary'),
+    format: z.enum(['csv', 'sav']).optional().default('csv'),
+    anonymize: z.boolean().optional().default(true),
+    dateRange: z.object({
+      start: z.string().min(1).optional(),
+      end: z.string().min(1).optional(),
+    }).optional(),
+  })
+  .strict()
+
+export type CognitiveExportQuery = z.infer<typeof cognitiveExportQuerySchema>
+export type CognitiveExportRequest = z.infer<typeof cognitiveExportRequestSchema>
+
+// ---------------------------------------------------------------------------
 // D4 — Session request schemas
 // ---------------------------------------------------------------------------
 
