@@ -435,8 +435,9 @@ export async function getCognitiveExportData(
 const csvValue = (value: unknown): string => {
   if (value === null || value === undefined) return ''
   const text = String(value)
-  if (/[",\r\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`
-  return text
+  const safeText = /^[\t\r ]*[=+\-@]/.test(text) ? `'${text}` : text
+  if (/[",\r\n]/.test(safeText)) return `"${safeText.replace(/"/g, '""')}"`
+  return safeText
 }
 
 export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 'rows'>): string {
