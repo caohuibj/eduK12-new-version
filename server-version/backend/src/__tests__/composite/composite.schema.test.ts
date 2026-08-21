@@ -3,6 +3,8 @@ import {
   addCompositeItemSchema,
   compositeExportRequestSchema,
   compositeSaveSchema,
+  compositeScaleAnswerSchema,
+  compositeFormAnswerSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
   publicRecoverySchema,
@@ -18,6 +20,7 @@ describe('composite assessment schemas', () => {
       formLabel: '年级',
       formOptions: [{ value: '3', label: '三年级' }],
     }).formType).toBe('single_choice')
+    expect(() => addCompositeItemSchema.parse({ type: 'FORM', formType: 'single_choice', formLabel: '年级' })).toThrow()
     expect(() => addCompositeItemSchema.parse({ type: 'SCALE', scaleId: 'scale-1', userId: 'student-1' })).toThrow()
   })
 
@@ -48,5 +51,10 @@ describe('composite assessment schemas', () => {
     expect(compositeSaveSchema.parse({})).toEqual({})
     expect(() => compositeSaveSchema.parse({ itemId: 'form-1' })).toThrow()
     expect(() => compositeSaveSchema.parse({ value: 'draft' })).toThrow()
+  })
+
+  it('bounds submitted answers and validates scale values', () => {
+    expect(() => compositeScaleAnswerSchema.parse({ itemId: 'question-1', value: 1.5 })).toThrow()
+    expect(() => compositeFormAnswerSchema.parse({ itemId: 'form-1', value: 'x'.repeat(10001) })).toThrow()
   })
 })
