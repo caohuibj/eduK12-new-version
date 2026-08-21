@@ -4,6 +4,15 @@ import { prisma } from '../../config/database'
 import { decryptCognitivePayload } from './cognitive.security'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
 import { v4 as uuidv4 } from 'uuid'
+import {
+  assertExportLimits,
+  cleanupExpiredExportFiles,
+  ensureExportFileWithinLimit,
+  EXPORT_MAX_FIELDS,
+  EXPORT_MAX_RECORDS,
+  EXPORT_MAX_TRIALS,
+  exportLimitError,
+} from '../../services/exportStorage'
 
 export type CognitiveExportDetail = 'summary' | 'full'
 export type CognitiveExportFormat = 'csv' | 'sav'
@@ -154,6 +163,7 @@ class ExportFieldBuilder {
       return name
     }
 
+    if (this.list.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
     const field: CognitiveExportField = { name, label, type, width, decimals }
     this.list.push(field)
     this.byName.set(name, field)
@@ -245,7 +255,9 @@ const getSessions = async (
         },
       },
       orderBy: [{ finishedAt: 'asc' }, { createdAt: 'asc' }],
+      take: EXPORT_MAX_RECORDS + 1,
     })
+    assertExportLimits({ records: sessions.length })
     return sessions as unknown as CognitiveExportSession[]
   }
 
@@ -253,7 +265,9 @@ const getSessions = async (
     where,
     include: includeUser,
     orderBy: [{ finishedAt: 'asc' }, { createdAt: 'asc' }],
+    take: EXPORT_MAX_RECORDS + 1,
   })
+  assertExportLimits({ records: sessions.length })
   return sessions as unknown as CognitiveExportSession[]
 }
 
@@ -420,15 +434,23 @@ export async function getCognitiveExportData(
   addBaseFields(builder, anonymize)
   for (const session of decodedSessions) addSessionFields(builder, session, detail)
 
+  const rows = buildRows(builder, assignment, decodedSessions, detail, anonymize)
+  const trialCount = decodedSessions.reduce((sum, session) => sum + session.trials.length, 0)
+  assertExportLimits({
+    records: decodedSessions.length,
+    fields: builder.fields.length,
+    trials: trialCount,
+  })
+
   return {
     assignmentId: assignment.id,
     assignmentTitle: assignment.title,
     testType: assignment.config?.testType || decodedSessions[0]?.testType || null,
     detail,
     fields: builder.fields,
-    rows: buildRows(builder, assignment, decodedSessions, detail, anonymize),
+    rows,
     completedCount: decodedSessions.length,
-    trialCount: decodedSessions.reduce((sum, session) => sum + session.trials.length, 0),
+    trialCount,
   }
 }
 
@@ -449,6 +471,7 @@ export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 
 }
 
 export async function exportCognitiveToSav(data: CognitiveExportData): Promise<string> {
+  cleanupExpiredExportFiles(EXPORT_DIR)
   if (!fs.existsSync(EXPORT_DIR)) fs.mkdirSync(EXPORT_DIR, { recursive: true })
 
   const variables: SavVariable[] = data.fields.map((field) => ({
@@ -463,6 +486,7 @@ export async function exportCognitiveToSav(data: CognitiveExportData): Promise<s
 
   const filePath = path.join(EXPORT_DIR, makeCognitiveExportFileName(data.assignmentId, data.detail, 'sav'))
   saveToFile(filePath, data.rows, variables)
+  ensureExportFileWithinLimit(filePath)
   return filePath
 }
 
@@ -473,11 +497,14 @@ export async function saveCognitiveExportFiles(
   data?: CognitiveExportData
 ): Promise<{ data: CognitiveExportData; csvPath?: string; savPath?: string }> {
   const exportData = data || await getCognitiveExportData(assignmentId, options)
+  cleanupExpiredExportFiles(EXPORT_DIR)
   if (!fs.existsSync(EXPORT_DIR)) fs.mkdirSync(EXPORT_DIR, { recursive: true })
 
   if (format === 'csv') {
     const csvPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, exportData.detail, 'csv'))
-    fs.writeFileSync(csvPath, `\uFEFF${exportCognitiveToCSV(exportData)}`, 'utf-8')
+    const content = `\uFEFF${exportCognitiveToCSV(exportData)}`
+    assertExportLimits({ bytes: Buffer.byteLength(content, 'utf8') })
+    fs.writeFileSync(csvPath, content, 'utf-8')
     return { data: exportData, csvPath }
   }
 
