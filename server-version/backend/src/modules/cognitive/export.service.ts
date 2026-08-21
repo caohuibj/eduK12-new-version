@@ -472,6 +472,11 @@ export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 
 }
 
 export async function exportCognitiveToSav(data: CognitiveExportData): Promise<string> {
+  assertExportLimits({
+    records: data.rows.length,
+    fields: data.fields.length,
+    trials: data.trialCount,
+  })
   cleanupExpiredExportFiles(EXPORT_DIR)
   if (!fs.existsSync(EXPORT_DIR)) fs.mkdirSync(EXPORT_DIR, { recursive: true })
 
@@ -498,6 +503,11 @@ export async function saveCognitiveExportFiles(
   data?: CognitiveExportData
 ): Promise<{ data: CognitiveExportData; csvPath?: string; savPath?: string }> {
   const exportData = data || await getCognitiveExportData(assignmentId, options)
+  assertExportLimits({
+    records: exportData.rows.length,
+    fields: exportData.fields.length,
+    trials: exportData.trialCount,
+  })
   cleanupExpiredExportFiles(EXPORT_DIR)
   if (!fs.existsSync(EXPORT_DIR)) fs.mkdirSync(EXPORT_DIR, { recursive: true })
 
