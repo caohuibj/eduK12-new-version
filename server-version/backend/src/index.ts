@@ -34,6 +34,9 @@ import generalQuestionnaireRoutes from './routes/generalQuestionnaires'
 import classroomRoutes from './routes/classrooms'
 // 认知测评路由（D3+；仅在 COGNITIVE_MODULE_ENABLED=true 时挂载）
 import cognitiveRoutes from './modules/cognitive/cognitive.routes'
+import cognitivePublicRoutes from './modules/cognitive/cognitive.public.routes'
+import compositeRoutes from './modules/composite/composite.routes'
+import compositePublicRoutes from './modules/composite/composite.public.routes'
 
 const app = express()
 
@@ -88,12 +91,16 @@ app.use('/api/documents', documentRoutes)
 // 泛化问卷路由（新增）
 app.use('/api/public', publicRoutes)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
+// 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
+app.use('/api/composite-assessments', compositeRoutes)
+app.use('/api/public/composite-assessments', compositePublicRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
 
 // 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
 if (config.cognitiveModuleEnabled) {
   app.use('/api/cognitive', cognitiveRoutes)
+  app.use('/api/public/cognitive', cognitivePublicRoutes)
 }
 
 // 404 处理

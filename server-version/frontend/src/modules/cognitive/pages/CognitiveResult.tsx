@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
-import { cognitiveApi } from '../api'
+import { cognitiveApi, publicCognitiveApi } from '../api'
+import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { resolveRunner, type MetricDefinition } from '../registry'
 import type { CognitiveSession } from '../types'
 
@@ -17,6 +18,10 @@ const formatMetric = (definition: MetricDefinition, value: unknown): string => {
 const CognitiveResult: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isPublic = searchParams.get('public') === '1'
+  const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
+  const sessionApi = useMemo(() => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi), [isPublic, recoveryToken])
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<CognitiveSession | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +31,7 @@ const CognitiveResult: React.FC = () => {
     let cancelled = false
     const load = async () => {
       try {
-        const response = await cognitiveApi.getSession(sessionId)
+        const response = await sessionApi.getSession(sessionId)
         if (cancelled) return
         if (response.code === 0 && response.data) {
           setSession(response.data)
@@ -40,14 +45,14 @@ const CognitiveResult: React.FC = () => {
     }
     void load()
     return () => { cancelled = true }
-  }, [sessionId])
+  }, [sessionApi, sessionId])
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" /></div>
   if (error || !session?.result) {
     return (
       <div className="card p-8 text-center">
         <p className="text-gray-600 mb-4">{error || '暂无结果'}</p>
-        <button onClick={() => navigate('/student/cognitive')} className="btn-secondary">返回列表</button>
+        <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">返回列表</button>
       </div>
     )
   }
@@ -65,7 +70,7 @@ const CognitiveResult: React.FC = () => {
 
   return (
     <div>
-      <button onClick={() => navigate('/student/cognitive')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
+      <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" /> 返回列表
       </button>
       <div className="card p-8 max-w-2xl text-center">
@@ -73,6 +78,7 @@ const CognitiveResult: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-2">{report?.title ?? entry?.name ?? '测评完成'}</h1>
         <p className="text-sm text-gray-500 mb-6">
           尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}）
+          {isPublic && session.anonymousCode ? ` · 匿名编号 ${session.anonymousCode}` : ''}
           {session.finishedAt ? ` · ${new Date(session.finishedAt).toLocaleString('zh-CN')}` : ''}
         </p>
 

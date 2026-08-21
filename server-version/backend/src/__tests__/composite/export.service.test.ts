@@ -1,0 +1,80 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    compositeAssessment: { findUnique: vi.fn() },
+  },
+}))
+
+vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+
+import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { compositeExportService } from '../../modules/composite/composite-export.service'
+
+const makeTemplate = (withTrials: boolean) => ({
+  id: 'composite-1',
+  name: '量表+反应时综合测评',
+  items: [{
+    id: 'item-cognitive',
+    type: 'COGNITIVE',
+    formLabel: null,
+    scale: null,
+    cognitiveAssignment: { title: '反应时任务' },
+  }],
+  attempts: [{
+    id: 'attempt-1',
+    userId: null,
+    anonymousCode: 'ANON-1234ABCD',
+    completedAt: new Date('2026-08-20T10:01:00.000Z'),
+    totalTime: 60_000,
+    user: null,
+    formAnswers: [],
+    scaleAssessments: [],
+    cognitiveSessions: [{
+      compositeItemId: 'item-cognitive',
+      scoreEncrypted: encryptCognitivePayload(88),
+      metricsEncrypted: encryptCognitivePayload({ meanRtMs: 350, validTrialCount: 2 }),
+      qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+      trials: withTrials ? [
+        { trialIndex: 0, payloadEncrypted: encryptCognitivePayload({ rtMs: 320, interrupted: false }) },
+        { trialIndex: 1, payloadEncrypted: encryptCognitivePayload({ rtMs: 380, interrupted: false }) },
+      ] : [],
+    }],
+  }],
+})
+
+beforeEach(() => vi.clearAllMocks())
+
+describe('composite export service', () => {
+  it('exports summary metrics without raw trials', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(false))
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+
+    expect(data.rows[0]).toMatchObject({
+      U_id: 'ANON-1234ABCD',
+      C001_score: 88,
+      C001_quality: 'interpretable',
+    })
+    expect(data.fields.map((field) => field.name)).toContain('C001_M_meanrtms')
+    expect(data.fields.some((field) => field.name.includes('t001'))).toBe(false)
+    expect(data.trialCount).toBe(0)
+  })
+
+  it('exports each cognitive trial value in full mode', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(true))
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'full' })
+    const csv = compositeExportService.exportToCSV(data)
+
+    expect(data.trialCount).toBe(2)
+    expect(data.rows[0]).toMatchObject({
+      C001_T001_rtms: 320,
+      C001_T002_rtms: 380,
+    })
+    expect(csv).toContain('320')
+    expect(csv).toContain('380')
+  })
+})

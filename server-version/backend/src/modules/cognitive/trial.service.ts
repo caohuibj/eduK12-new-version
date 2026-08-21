@@ -25,16 +25,29 @@ import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
  * - 幂等：同 index + 同 payloadHash → replay 返回 existing；同 index + 不同 hash → 409 不覆盖。
  * - 允许 out-of-order arrival，不检查 nextTrialIndex == count。
  */
-export const appendTrial = async (
-  userId: string,
+const appendTrialWithPrincipal = async (
+  userId: string | null,
   sessionId: string,
-  input: { trialIndex: number; payload?: unknown }
+  input: { trialIndex: number; payload?: unknown },
+  recoveryTokenHash?: string
 ) => {
   return prisma.$transaction(async (tx) => {
     // 行锁：同一 Session 的并发写（append/complete/restart）在此排队。
     const session = await lockSession(tx, sessionId)
     if (!session) throw NOT_FOUND('CognitiveSession not found')
-    if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    if (userId !== null) {
+      if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    } else {
+      let allowed = Boolean(recoveryTokenHash && session.recoveryTokenHash === recoveryTokenHash)
+      if (!allowed && recoveryTokenHash && session.compositeAttemptId) {
+        const attempt = await tx.compositeAssessmentAttempt.findUnique({
+          where: { id: session.compositeAttemptId },
+          select: { recoveryTokenHash: true, userId: true },
+        })
+        allowed = attempt?.userId === null && attempt.recoveryTokenHash === recoveryTokenHash
+      }
+      if (session.userId !== null || !allowed) throw FORBIDDEN('Recovery credential does not own this session')
+    }
     if (session.status !== 'IN_PROGRESS') throw BAD_REQUEST('Session is not IN_PROGRESS')
 
     const entry = requireCognitiveRegistryEntry(
@@ -71,3 +84,15 @@ export const appendTrial = async (
     return { trialId: trial.id, trialIndex: trial.trialIndex, createdAt: trial.createdAt }
   })
 }
+
+export const appendTrial = async (
+  userId: string,
+  sessionId: string,
+  input: { trialIndex: number; payload?: unknown }
+) => appendTrialWithPrincipal(userId, sessionId, input)
+
+export const appendTrialForPublic = async (
+  sessionId: string,
+  recoveryTokenHash: string,
+  input: { trialIndex: number; payload?: unknown }
+) => appendTrialWithPrincipal(null, sessionId, input, recoveryTokenHash)

@@ -15,7 +15,7 @@ import { resolveCognitiveReference } from './reference'
  * D4 — Cognitive Session / Attempt 服务。
  *
  * 边界（D4 §3 / §19）：不写 Trial、不评分、不返回 score/metrics；
- * 不创建 anonymous/guest session；不建跨设备 resume 协议；不建 server timer；
+ * 普通登录会话仍沿用课程成员资格；公开/综合测评匿名会话由 public.service 负责凭证和入口校验；不建 server timer；
  * 不引 Redis lock / websocket / heartbeat / fingerprint / device binding；
  * 不加新 migration。
  *
@@ -125,7 +125,8 @@ const toRunnerPayload = (session: {
   scoringVersion: string
   configSnapshotEncrypted: string
   randomSeed: string
-}) => {
+  anonymousCode?: string | null
+}, nextTrialIndex?: number, exposeAnonymousCode = false) => {
   const validatedConfig = decryptCognitivePayload<unknown>(session.configSnapshotEncrypted)
   return {
     sessionId: session.id,
@@ -138,6 +139,8 @@ const toRunnerPayload = (session: {
     scoringVersion: session.scoringVersion,
     config: validatedConfig,
     randomSeed: session.randomSeed,
+    ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
+    ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
   }
 }
 
@@ -206,7 +209,16 @@ export const createSession = async (userId: string, assignmentId: string) => {
 }
 
 export const getSession = async (userId: string, sessionId: string) => {
-  const session = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
+  const session = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      trials: {
+        orderBy: { trialIndex: 'desc' },
+        take: 1,
+        select: { trialIndex: true },
+      },
+    },
+  })
   if (!session) throw NOT_FOUND('CognitiveSession not found')
   if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
 
@@ -244,7 +256,63 @@ export const getSession = async (userId: string, sessionId: string) => {
   }
 
   // D4：IN_PROGRESS / ABANDONED / INVALID 只回运行信息 + decrypted config + randomSeed，不返回 score/metrics。
-  return toRunnerPayload(session)
+  // 综合测评允许登录学生跨设备续答，因此服务端提供下一个安全的试次索引。
+  const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
+  return toRunnerPayload(session, nextTrialIndex)
+}
+
+/**
+ * 公开/匿名会话读取。匿名参与不依赖登录态，而是通过综合测评的恢复凭证
+ * 或单个认知公开链接生成的 recoveryTokenHash 校验；服务端仍不返回任何密文。
+ */
+export const getPublicSession = async (recoveryTokenHash: string, sessionId: string) => {
+  const session = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      compositeAttempt: { select: { recoveryTokenHash: true, userId: true } },
+      trials: {
+        orderBy: { trialIndex: 'desc' },
+        take: 1,
+        select: { trialIndex: true },
+      },
+    },
+  })
+  if (!session) throw NOT_FOUND('CognitiveSession not found')
+  const allowed = session.userId === null && (
+    session.recoveryTokenHash === recoveryTokenHash ||
+    session.compositeAttempt?.recoveryTokenHash === recoveryTokenHash
+  )
+  if (!allowed) throw FORBIDDEN('Recovery credential does not own this session')
+
+  const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
+  const runnerPayload = toRunnerPayload(session, nextTrialIndex, true)
+  if (session.status !== 'COMPLETED') return runnerPayload
+
+  const score = session.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
+  const metrics = session.metricsEncrypted
+    ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted)
+    : null
+  const qualityFlags = session.qualityFlagsEncrypted
+    ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
+    : null
+  const report = (runnerPayload.config as { report?: Record<string, unknown> }).report ?? {}
+  const reference = metrics && score !== null
+    ? resolveCognitiveReference({
+        testType: session.testType,
+        metrics,
+        score,
+        referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
+        referenceVersion: report.referenceVersion as string | undefined,
+        referenceBand: report.referenceBand as string | undefined,
+      })
+    : undefined
+  return {
+    ...runnerPayload,
+    finishedAt: session.finishedAt,
+    result: score !== null && metrics !== null && qualityFlags !== null
+      ? { score, metrics, qualityFlags, reference }
+      : null,
+  }
 }
 
 export const restartSession = async (userId: string, sessionId: string) => {

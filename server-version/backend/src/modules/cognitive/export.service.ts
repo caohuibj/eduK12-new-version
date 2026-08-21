@@ -39,6 +39,7 @@ export interface CognitiveExportData {
 interface CognitiveExportSession {
   id: string
   userId: string | null
+  anonymousCode: string | null
   attemptNo: number
   testType: string
   configVersion: string
@@ -264,6 +265,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
   return {
     id: session.id,
     userId: session.userId,
+    anonymousCode: session.anonymousCode,
     attemptNo: session.attemptNo,
     testType: session.testType,
     configVersion: session.configVersion,
@@ -346,11 +348,11 @@ const fillBaseRow = (
   session: DecodedCognitiveExportSession,
   anonymize: boolean
 ) => {
-  row.U_id = session.userId
+  row.U_id = session.anonymousCode || (session.userId
     ? anonymize
       ? `U${session.userId.substring(0, 8)}`
       : session.userId
-    : 'ANONYMOUS'
+    : 'ANONYMOUS')
   if (!anonymize) row.U_name = session.user?.nickname || session.user?.username || null
   row.A_assignment_id = assignment.id
   row.A_assignment = assignment.title

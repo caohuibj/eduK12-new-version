@@ -84,6 +84,10 @@ export interface CognitiveSession {
   scoringVersion: string
   config: Record<string, unknown>
   randomSeed: string
+  /** 公开匿名恢复时由服务端返回，允许跨设备继续而不猜测下一个试次。 */
+  nextTrialIndex?: number
+  /** 公开匿名会话的参与者编号，不包含账号身份。 */
+  anonymousCode?: string | null
   finishedAt?: string | null
   result?: CognitiveResult | null
 }
