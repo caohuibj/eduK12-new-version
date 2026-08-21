@@ -240,6 +240,11 @@ export const saveExportFiles = async (
   data?: CompositeExportData
 ) => {
   const exportData = data ?? await getExportData(assessmentId, options)
+  assertExportLimits({
+    records: exportData.rows.length,
+    fields: exportData.fields.length,
+    trials: exportData.trialCount,
+  })
   cleanupExpiredExportFiles(EXPORT_DIR)
   fs.mkdirSync(EXPORT_DIR, { recursive: true })
   const fileName = makeFileName(assessmentId, exportData.detail, format)
