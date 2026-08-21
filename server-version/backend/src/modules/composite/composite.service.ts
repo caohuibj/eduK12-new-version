@@ -230,6 +230,9 @@ export const listComposites = async (userId: string, role: UserRole) => {
       _count: { select: { attempts: true, accessTokens: true } },
     },
   })
+  const supportedList = config.cognitiveModuleEnabled
+    ? list
+    : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
   return supportedList.map((item: any) => ({
     ...item,
     itemCount: item.items.length,
@@ -623,8 +626,10 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string) => {
   const token = await findPublicToken(tokenValue)
   if (recoveryToken) {
-    const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash: hashRecoveryToken(recoveryToken) } })
-    if (existing) return { attempt: await getAttemptState(existing.id, { recoveryTokenHash: hashRecoveryToken(recoveryToken) }), recoveryToken: null }
+    const recoveryTokenHash = hashRecoveryToken(recoveryToken)
+    const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
+    if (existing) return { attempt: await getAttemptState(existing.id, { recoveryTokenHash }), recoveryToken: null }
+    throw compositeForbidden('恢复凭证无效')
   }
   assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
