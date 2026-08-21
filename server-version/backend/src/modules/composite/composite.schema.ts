@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 const dateTime = z.string().datetime()
+const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
 
 export const createCompositeSchema = z.object({
   code: z.string().min(1).max(80),
@@ -31,7 +32,7 @@ export const updateCompositeSchema = z.object({
   { message: 'expiresAt 必须晚于或等于 opensAt' }
 )
 
-const formOption = z.object({ value: z.string(), label: z.string() }).strict()
+const formOption = z.object({ value: z.string().min(1), label: z.string().min(1) }).strict()
 
 export const addCompositeItemSchema = z.object({
   type: z.enum(['SCALE', 'COGNITIVE', 'FORM']),
@@ -43,7 +44,19 @@ export const addCompositeItemSchema = z.object({
   formLabel: z.string().min(1).max(500).optional(),
   formPlaceholder: z.string().nullable().optional(),
   formOptions: z.array(formOption).nullable().optional(),
-}).strict()
+}).strict().superRefine((input, ctx) => {
+  if (input.type === 'FORM' && (!input.formType || !input.formLabel)) {
+    ctx.addIssue({ code: 'custom', path: ['formLabel'], message: '表单模块必须提供 formType 和 formLabel' })
+  }
+  if (input.type === 'FORM' && (input.formType === 'single_choice' || input.formType === 'multiple_choice')) {
+    const values = input.formOptions?.map((option) => option.value) ?? []
+    if (values.length === 0) {
+      ctx.addIssue({ code: 'custom', path: ['formOptions'], message: '选择题必须提供至少一个选项' })
+    } else if (new Set(values).size !== values.length) {
+      ctx.addIssue({ code: 'custom', path: ['formOptions'], message: '表单选项不能重复' })
+    }
+  }
+})
 
 export const reorderCompositeItemsSchema = z.object({
   items: z.array(z.object({ id: z.string().min(1), position: z.number().int().min(0) }).strict()).min(1),
@@ -62,23 +75,23 @@ export const compositeExportRequestSchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
   format: z.enum(['csv', 'sav']).default('csv'),
   anonymize: z.boolean().default(true),
-  dateRange: z.object({ start: z.string().optional(), end: z.string().optional() }).optional(),
+  dateRange: z.object({ start: exportDate.optional(), end: exportDate.optional() }).strict().optional(),
 }).strict()
 
 export const compositeScaleAnswerSchema = z.object({
   itemId: z.string().min(1),
-  value: z.number(),
+  value: z.number().int().finite(),
   responseTime: z.number().int().nonnegative().optional(),
 }).strict()
 
 export const compositeFormAnswerSchema = z.object({
   itemId: z.string().min(1),
-  value: z.string(),
+  value: z.string().max(10000),
 }).strict()
 
 export const compositeSaveSchema = z.object({
   itemId: z.string().min(1).optional(),
-  value: z.string().optional(),
+  value: z.string().max(10000).optional(),
 }).strict().refine(
   (input) => (input.itemId === undefined) === (input.value === undefined),
   { message: '保存表单草稿时必须同时提供 itemId 和 value' },
