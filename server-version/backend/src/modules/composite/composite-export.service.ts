@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { createHash } from 'crypto'
 import * as path from 'path'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
 import { v4 as uuidv4 } from 'uuid'
@@ -31,7 +32,10 @@ const EXPORT_DIR = path.join(__dirname, '../../../exports')
 
 const fieldName = (prefix: string, value: string) => {
   const safe = value.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase() || 'value'
-  return `${prefix}${safe}`.slice(0, 64)
+  const base = `${prefix}${safe}`
+  if (base.length <= 64) return base
+  const suffix = createHash('sha256').update(`${prefix}:${value}`).digest('hex').slice(0, 8)
+  return `${base.slice(0, 64 - suffix.length - 1)}_${suffix}`
 }
 
 const decode = <T extends object>(value: unknown): T | null => {
