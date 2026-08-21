@@ -22,6 +22,11 @@ router.patch('/assignments/:id', authenticate, requireTeacher, cognitiveControll
 router.post('/assignments/:id/publish', authenticate, requireTeacher, cognitiveController.publishAssignment)
 router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveController.archiveAssignment)
 
+// 教师端数据导出（下载路径携带 assignmentId，控制器会再次校验归属）
+router.get('/assignments/:id/export/files/:fileName', authenticate, requireTeacher, cognitiveController.downloadExportFile)
+router.get('/assignments/:id/export/preview', authenticate, requireTeacher, cognitiveController.getExportPreview)
+router.post('/assignments/:id/export', authenticate, requireTeacher, cognitiveController.exportData)
+
 // D4 — Session / Attempt
 router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveController.createSession)
 router.get('/sessions/:id', authenticate, cognitiveController.getSession)
