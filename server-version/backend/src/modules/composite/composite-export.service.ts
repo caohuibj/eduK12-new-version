@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { prisma } from '../../config/database'
 import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
 
 export type CompositeExportDetail = 'summary' | 'full'
 export type CompositeExportFormat = 'csv' | 'sav'
@@ -158,7 +159,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           const metrics = session.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
           for (const [key, value] of Object.entries(metrics)) {
             const metricName = addField(fields, fieldName(`${childPrefix}M_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
-            row[metricName] = value
+            row[metricName] = scalarExportValue(value)
           }
           if (detail === 'full') {
             for (const trial of session.trials || []) {
@@ -166,7 +167,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
               trialCount += 1
               for (const [key, value] of flatten(payload)) {
                 const trialName = addField(fields, fieldName(`${childPrefix}T${String(trial.trialIndex + 1).padStart(3, '0')}_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] 第${trial.trialIndex + 1}次 ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
-                row[trialName] = value
+                row[trialName] = scalarExportValue(value)
               }
             }
           }
@@ -182,12 +183,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
 }
 
 export const exportToCSV = (data: CompositeExportData) => {
-  const quote = (value: unknown) => {
-    if (value === null || value === undefined) return ''
-    if (typeof value === 'string') return `"${value.replace(/"/g, '""')}"`
-    return String(value)
-  }
-  return [data.fields.map((field) => field.name).join(','), ...data.rows.map((row) => data.fields.map((field) => quote(row[field.name])).join(','))].join('\n')
+  return exportCognitiveToCSV(data)
 }
 
 export const makeFileName = (assessmentId: string, detail: CompositeExportDetail, format: CompositeExportFormat) => {

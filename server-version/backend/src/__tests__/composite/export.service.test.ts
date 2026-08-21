@@ -32,13 +32,13 @@ const makeTemplate = (withTrials: boolean) => ({
     user: null,
     formAnswers: [],
     scaleAssessments: [],
-    cognitiveSessions: [{
+      cognitiveSessions: [{
       compositeItemId: 'item-cognitive',
       scoreEncrypted: encryptCognitivePayload(88),
       metricsEncrypted: encryptCognitivePayload({ meanRtMs: 350, validTrialCount: 2 }),
       qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
       trials: withTrials ? [
-        { trialIndex: 0, payloadEncrypted: encryptCognitivePayload({ rtMs: 320, interrupted: false }) },
+        { trialIndex: 0, payloadEncrypted: encryptCognitivePayload({ rtMs: 320, sequence: [1, 2, 3], response: ['left', 'right'], interrupted: false }) },
         { trialIndex: 1, payloadEncrypted: encryptCognitivePayload({ rtMs: 380, interrupted: false }) },
       ] : [],
     }],
@@ -73,8 +73,12 @@ describe('composite export service', () => {
     expect(data.rows[0]).toMatchObject({
       C001_T001_rtms: 320,
       C001_T002_rtms: 380,
+      C001_T001_sequence: '[1,2,3]',
+      C001_T001_response: '["left","right"]',
     })
     expect(csv).toContain('320')
     expect(csv).toContain('380')
+    expect(csv).toContain('"[1,2,3]"')
+    expect(csv).toContain('"[""left"",""right""]"')
   })
 })

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   addCompositeItemSchema,
   compositeExportRequestSchema,
+  compositeSaveSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
   publicRecoverySchema,
@@ -40,5 +41,12 @@ describe('composite assessment schemas', () => {
     expect(publicRecoverySchema.parse({ recoveryToken: 'a'.repeat(24) }).recoveryToken).toHaveLength(24)
     expect(() => publicRecoverySchema.parse({ recoveryToken: 'a'.repeat(24), attemptId: 'attempt-1' })).toThrow()
     expect(compositeExportRequestSchema.parse({ detail: 'full', format: 'csv' }).anonymize).toBe(true)
+  })
+
+  it('allows an empty form draft but requires both draft fields together', () => {
+    expect(compositeSaveSchema.parse({ itemId: 'form-1', value: '' })).toEqual({ itemId: 'form-1', value: '' })
+    expect(compositeSaveSchema.parse({})).toEqual({})
+    expect(() => compositeSaveSchema.parse({ itemId: 'form-1' })).toThrow()
+    expect(() => compositeSaveSchema.parse({ value: 'draft' })).toThrow()
   })
 })

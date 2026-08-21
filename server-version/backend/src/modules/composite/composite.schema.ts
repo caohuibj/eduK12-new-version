@@ -76,6 +76,14 @@ export const compositeFormAnswerSchema = z.object({
   value: z.string(),
 }).strict()
 
+export const compositeSaveSchema = z.object({
+  itemId: z.string().min(1).optional(),
+  value: z.string().optional(),
+}).strict().refine(
+  (input) => (input.itemId === undefined) === (input.value === undefined),
+  { message: '保存表单草稿时必须同时提供 itemId 和 value' },
+)
+
 export const publicRecoverySchema = z.object({
   recoveryToken: z.string().min(20).max(200),
 }).strict()

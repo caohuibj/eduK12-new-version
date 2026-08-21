@@ -7,6 +7,7 @@ import {
   compositeExportQuerySchema,
   compositeExportRequestSchema,
   compositeFormAnswerSchema,
+  compositeSaveSchema,
   compositeScaleAnswerSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
@@ -136,7 +137,9 @@ export const compositeController = {
   async saveAttempt(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      return success(res, await service.saveAttempt(req.params.attemptId, { userId: req.user.userId }), '进度已保存')
+      const input = compositeSaveSchema.parse(req.body || {})
+      const draft = input.itemId !== undefined && input.value !== undefined ? { itemId: input.itemId, value: input.value } : undefined
+      return success(res, await service.saveAttempt(req.params.attemptId, { userId: req.user.userId }, draft), '进度已保存')
     } catch (err) { return handleError(res, err) }
   },
 
@@ -223,7 +226,11 @@ export const compositeController = {
   },
 
   async publicSave(req: Request, res: Response) {
-    try { return success(res, await service.saveAttempt(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }), '进度已保存') } catch (err) { return handleError(res, err) }
+    try {
+      const input = compositeSaveSchema.parse(req.body || {})
+      const draft = input.itemId !== undefined && input.value !== undefined ? { itemId: input.itemId, value: input.value } : undefined
+      return success(res, await service.saveAttempt(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }, draft), '进度已保存')
+    } catch (err) { return handleError(res, err) }
   },
 
   async publicScaleAnswer(req: Request, res: Response) {

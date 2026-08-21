@@ -480,7 +480,14 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
   }
 }
 
-const createAttempt = async (db: Db, composite: any, userId: string | null, accessTokenId: string | null, credential?: ReturnType<typeof createRecoveryCredential>) => {
+const createAttempt = async (
+  db: Db,
+  composite: any,
+  userId: string | null,
+  accessTokenId: string | null,
+  credential?: ReturnType<typeof createRecoveryCredential>,
+  attemptNo = 1,
+) => {
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
@@ -489,7 +496,7 @@ const createAttempt = async (db: Db, composite: any, userId: string | null, acce
       recoveryTokenHash: credential?.hash ?? null,
       participantKey: credential?.participantKey ?? `user:${userId}`,
       anonymousCode: credential?.anonymousCode ?? null,
-      attemptNo: 1,
+      attemptNo,
     },
   })
   await createChildRecords(db, attempt, composite.items, userId)
@@ -499,12 +506,38 @@ const createAttempt = async (db: Db, composite: any, userId: string | null, acce
 export const startUserAttempt = async (userId: string, compositeId: string) => {
   const composite = await loadComposite(compositeId, true)
   await assertStudentEligibility(composite, userId)
-  const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' }, orderBy: { startedAt: 'desc' } })
-  if (existing) return { attempt: await getAttemptState(existing.id, { userId }), recoveryToken: null }
-  const used = await prisma.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId } })
-  if (used >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
-  const attempt = await prisma.$transaction((tx) => createAttempt(tx, composite, userId, null))
-  return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
+
+  const isUniqueConstraintError = (err: unknown) =>
+    typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
+
+  for (let retry = 0; retry < 2; retry += 1) {
+    try {
+      const attempt = await prisma.$transaction(async (tx: Db) => {
+        // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
+        // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
+        await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+        const existing = await tx.compositeAssessmentAttempt.findFirst({
+          where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' },
+          orderBy: { startedAt: 'desc' },
+        })
+        if (existing) return existing
+
+        const used = await tx.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId } })
+        if (used >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
+        const latest = await tx.compositeAssessmentAttempt.findFirst({
+          where: { compositeAssessmentId: compositeId, userId },
+          orderBy: { attemptNo: 'desc' },
+          select: { attemptNo: true },
+        })
+        return createAttempt(tx, composite, userId, null, undefined, (latest?.attemptNo ?? 0) + 1)
+      })
+      return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
+    } catch (err) {
+      if (!isUniqueConstraintError(err) || retry === 1) throw err
+    }
+  }
+
+  throw compositeConflict('无法创建综合测评记录，请稍后重试')
 }
 
 const findPublicToken = async (tokenValue: string) => {
@@ -634,7 +667,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   const completed = (item: any) => {
     if (item.type === 'SCALE') return scaleMap.get(item.id)?.status === 'COMPLETED'
     if (item.type === 'COGNITIVE') return cognitiveMap.get(item.id)?.status === 'COMPLETED'
-    return formMap.has(item.id)
+    return formMap.get(item.id)?.completed !== false && formMap.has(item.id)
   }
   const completedItems = attempt.compositeAssessment.items.filter(completed).length
   const status = await completeAttemptIfReady(attempt, completedItems, attempt.compositeAssessment.items.length)
@@ -681,8 +714,24 @@ const getOwnedChild = async (attemptId: string, itemId: string, context: { userI
   return { attempt, item }
 }
 
-export const saveAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
-  await findAttempt(attemptId, context)
+export const saveAttempt = async (
+  attemptId: string,
+  context: { userId?: string; recoveryTokenHash?: string },
+  draft?: { itemId: string; value: string },
+) => {
+  const attempt = await findAttempt(attemptId, context)
+  if (draft) {
+    const item = attempt.compositeAssessment.items.find((candidate: any) => candidate.id === draft.itemId)
+    if (!item || item.type !== 'FORM') throw compositeBadRequest('只能保存当前综合测评中的表单草稿')
+    const existing = attempt.formAnswers.find((answer: any) => answer.itemId === draft.itemId)
+    if (!existing || existing.completed === false) {
+      await prisma.compositeFormAnswer.upsert({
+        where: { attemptId_itemId: { attemptId, itemId: draft.itemId } },
+        create: { attemptId, itemId: draft.itemId, value: draft.value, completed: false },
+        update: { value: draft.value, completed: false },
+      })
+    }
+  }
   return prisma.compositeAssessmentAttempt.update({ where: { id: attemptId }, data: { lastSavedAt: new Date() }, select: { id: true, lastSavedAt: true, status: true, progress: true } })
 }
 
@@ -696,7 +745,7 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
     const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
     if (values.some((candidate) => !allowed.has(candidate))) throw compositeBadRequest('表单选项无效')
   }
-  await prisma.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value }, update: { value } })
+  await prisma.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value, completed: true }, update: { value, completed: true } })
   return getAttemptState(attempt.id, context)
 }
 

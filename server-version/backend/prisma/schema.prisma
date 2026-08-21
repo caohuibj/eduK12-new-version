@@ -729,6 +729,7 @@ model CompositeAssessmentAttempt {
   @@index([userId, status])
   @@index([participantKey])
   @@index([accessTokenId])
+  @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@map("composite_assessment_attempts")
 }
 
@@ -737,6 +738,7 @@ model CompositeFormAnswer {
   attemptId   String                    @map("attempt_id")
   itemId      String                    @map("item_id")
   value       String
+  completed   Boolean                   @default(true)
   createdAt   DateTime                  @default(now()) @map("created_at")
   updatedAt   DateTime                  @updatedAt @map("updated_at")
 

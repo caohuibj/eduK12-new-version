@@ -143,7 +143,10 @@ const CompositeAssessmentPage: React.FC = () => {
   const saveAndExit = async () => {
     if (!attemptId) return
     try {
-      await api.save(attemptId)
+      const draft = state?.currentItem?.type === 'FORM'
+        ? { itemId: state.currentItem.id, value: formValue }
+        : undefined
+      await api.save(attemptId, draft)
       navigate(publicMode ? '/' : '/student')
     } catch (err) {
       setError((err as { message?: string }).message || '保存失败，请稍后重试')

@@ -93,7 +93,7 @@ const toSnakeCase = (value: string): string => {
 const makeFieldName = (prefix: string, key: string): string =>
   `${prefix}${toSnakeCase(key)}`.slice(0, MAX_FIELD_NAME_LENGTH)
 
-const scalarExportValue = (value: unknown): unknown => {
+export const scalarExportValue = (value: unknown): unknown => {
   if (value === null || value === undefined) return null
   if (typeof value === 'boolean') return value ? 1 : 0
   if (typeof value === 'number' || typeof value === 'string') return value
@@ -439,7 +439,7 @@ const csvValue = (value: unknown): string => {
   return text
 }
 
-export function exportCognitiveToCSV(data: CognitiveExportData): string {
+export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 'rows'>): string {
   const lines = [data.fields.map((field) => field.name).join(',')]
   for (const row of data.rows) {
     lines.push(data.fields.map((field) => csvValue(row[field.name])).join(','))
