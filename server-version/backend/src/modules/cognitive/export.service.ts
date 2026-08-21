@@ -432,10 +432,10 @@ export async function getCognitiveExportData(
   }
 }
 
-const csvValue = (value: unknown): string => {
+const csvValue = (value: unknown, type?: CognitiveExportField['type']): string => {
   if (value === null || value === undefined) return ''
   const text = String(value)
-  const safeText = /^[\t\r ]*[=+\-@]/.test(text) ? `'${text}` : text
+  const safeText = type === 'string' && /^[\t\r ]*[=+\-@]/.test(text) ? `'${text}` : text
   if (/[",\r\n]/.test(safeText)) return `"${safeText.replace(/"/g, '""')}"`
   return safeText
 }
@@ -443,7 +443,7 @@ const csvValue = (value: unknown): string => {
 export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 'rows'>): string {
   const lines = [data.fields.map((field) => field.name).join(',')]
   for (const row of data.rows) {
-    lines.push(data.fields.map((field) => csvValue(row[field.name])).join(','))
+    lines.push(data.fields.map((field) => csvValue(row[field.name], field.type)).join(','))
   }
   return lines.join('\n')
 }
