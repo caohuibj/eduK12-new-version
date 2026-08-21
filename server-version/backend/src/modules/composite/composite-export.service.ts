@@ -49,8 +49,23 @@ const flatten = (value: unknown): Array<[string, unknown]> => {
 }
 
 const addField = (fields: CompositeExportField[], name: string, label: string, type: CompositeExportField['type'], decimals = 0) => {
-  if (!fields.some((field) => field.name === name)) fields.push({ name, label, type, width: type === 'string' ? 80 : 12, decimals })
-  return name
+  const existing = fields.find((field) => field.name === name)
+  if (!existing) {
+    fields.push({ name, label, type, width: type === 'string' ? 80 : 12, decimals })
+    return name
+  }
+  if (existing.label === label) return name
+
+  let suffix = createHash('sha256').update(`${name}:${label}`).digest('hex').slice(0, 8)
+  let candidate = `${name.slice(0, Math.max(1, 64 - suffix.length - 1))}_${suffix}`
+  let attempt = 0
+  while (fields.some((field) => field.name === candidate)) {
+    attempt += 1
+    suffix = createHash('sha256').update(`${name}:${label}:${attempt}`).digest('hex').slice(0, 8)
+    candidate = `${name.slice(0, Math.max(1, 64 - suffix.length - 1))}_${suffix}`
+  }
+  fields.push({ name: candidate, label, type, width: type === 'string' ? 80 : 12, decimals })
+  return candidate
 }
 
 const completedDateWhere = (dateRange?: { start?: string; end?: string }) => {
