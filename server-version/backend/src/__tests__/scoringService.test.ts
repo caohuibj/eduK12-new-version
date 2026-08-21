@@ -164,6 +164,30 @@ describe('Scoring Service', () => {
     })
   })
 
+  it('calculates scores when item-dimension relations are present', () => {
+    const scores = scoringService.calculateScores(
+      [{ itemId: 'item-1', value: 4 }],
+      [{
+        id: 'item-1',
+        weight: 1,
+        reverse: false,
+        itemDimensions: [{ dimensionId: 'dimension-1', weight: 1, reverse: false }],
+      }],
+      [{
+        id: 'dimension-1',
+        code: 'focus',
+        name: '专注',
+        scoringMethod: 'sum',
+        minScore: null,
+        maxScore: null,
+      }],
+      { points: 5 },
+    )
+
+    expect(scores).toHaveLength(1)
+    expect(scores[0].rawScore).toBe(4)
+  })
+
   describe('Reverse scoring', () => {
     it('should apply reverse scoring correctly', () => {
       // 5点量表，反向计分：original 1 -> 5, 2 -> 4, 3 -> 3, 4 -> 2, 5 -> 1
