@@ -96,11 +96,14 @@ describe('ReactionTask — instruction & practice', () => {
     render(<ReactionTask taskContext={makeContext()} trialIndex={0} onTrialComplete={onTrialComplete} />)
     expect(screen.getByText('反应速度')).toBeTruthy()
     fireEvent.click(screen.getByText('开始练习'))
+    const practice = screen.getByLabelText('practice trial 0')
+    expect(practice.className).toContain('bg-gray-300')
     act(() => {
       vi.advanceTimersByTime(1000)
     })
+    expect(practice.className).toContain('bg-green-500')
     now = 500
-    fireEvent.click(screen.getByLabelText('practice trial 0'))
+    fireEvent.click(practice)
     await act(async () => {})
     expect(onTrialComplete).not.toHaveBeenCalled()
   })

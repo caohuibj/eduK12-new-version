@@ -58,10 +58,14 @@ const CompositeAssessmentEdit: React.FC = () => {
       setScales(scaleData)
       try {
         const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED')
-        const cognitiveData = Array.isArray(cognitiveResponse.data) ? cognitiveResponse.data : cognitiveResponse.data?.list || []
-        setCognitiveAssignments(cognitiveResponse.code === 0 ? cognitiveData : [])
-      } catch {
+        const cognitiveData = Array.isArray(cognitiveResponse.data)
+          ? cognitiveResponse.data
+          : cognitiveResponse.data?.list || []
+        if (cognitiveResponse.code !== 0) throw new Error(cognitiveResponse.message || '无法加载认知任务')
+        setCognitiveAssignments(cognitiveData)
+      } catch (err) {
         setCognitiveAssignments([])
+        setError(errorMessage(err, '无法加载已发布的认知任务'))
       }
       if (tokenResponse.code === 0 && tokenResponse.data?.list?.length) setToken(tokenResponse.data.list[0])
     } catch (err) {
