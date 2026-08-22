@@ -99,7 +99,22 @@ const validateCognitiveConfig = (config: any) => {
   }
 }
 
-const assertValidItem = async (input: AddCompositeItemInput, userId: string, role: UserRole) => {
+const assertCognitiveAssignmentOnCompositeCourse = (
+  assignment: { courseId: string | null },
+  composite: { courseId: string | null },
+) => {
+  if (!composite.courseId) throw compositeBadRequest('含认知模块的综合测评必须绑定课程')
+  if (assignment.courseId !== composite.courseId) {
+    throw compositeBadRequest('认知任务必须与综合测评属于同一课程')
+  }
+}
+
+const assertValidItem = async (
+  input: AddCompositeItemInput,
+  userId: string,
+  role: UserRole,
+  composite: { courseId: string | null },
+) => {
   const supplied = [input.scaleId, input.cognitiveAssignmentId, input.formLabel].filter(Boolean).length
   if (input.type === 'SCALE') {
     if (!input.scaleId || supplied !== 1) throw compositeBadRequest('量表模块必须提供 scaleId')
@@ -124,6 +139,7 @@ const assertValidItem = async (input: AddCompositeItemInput, userId: string, rol
     if (role !== UserRole.ADMIN && assignment.createdBy !== userId) {
       throw compositeForbidden('无权限使用此认知任务')
     }
+    assertCognitiveAssignmentOnCompositeCourse(assignment, composite)
     return
   }
 
@@ -470,7 +486,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
   const composite = await loadComposite(compositeId, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
-  await assertValidItem(input, userId, role)
+  await assertValidItem(input, userId, role, composite)
   const position = input.position ?? (composite.items.length ? Math.max(...composite.items.map((item: any) => item.position)) + 1 : 0)
   if (composite.items.some((item: any) => item.position === position)) {
     throw compositeConflict('模块排序位置已存在')
@@ -553,7 +569,10 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     if (item.type === 'COGNITIVE' && (!item.cognitiveAssignment || item.cognitiveAssignment.status !== 'PUBLISHED' || item.cognitiveAssignment.config.status !== 'PUBLISHED')) {
       throw compositeBadRequest('综合测评包含未发布认知任务')
     }
-    if (item.type === 'COGNITIVE') validateCognitiveConfig(item.cognitiveAssignment.config)
+    if (item.type === 'COGNITIVE') {
+      validateCognitiveConfig(item.cognitiveAssignment.config)
+      assertCognitiveAssignmentOnCompositeCourse(item.cognitiveAssignment, composite)
+    }
     if (item.type === 'FORM') {
       if (!item.formType || !item.formLabel) {
         throw compositeBadRequest('综合测评包含未配置完成的表单')
@@ -973,6 +992,14 @@ const decodeJson = <T extends object>(value: unknown): T | null => {
   return (value as T) ?? null
 }
 
+/** Report-only: a ciphertext/string that cannot be decoded is an error, not empty scores. */
+const decodeReportJson = <T extends object>(value: unknown): { ok: true; value: T | null } | { ok: false } => {
+  if (value == null) return { ok: true, value: null }
+  if (typeof value !== 'string') return { ok: true, value: value as T }
+  const decoded = safeDecrypt<T>(value)
+  return decoded == null ? { ok: false } : { ok: true, value: decoded }
+}
+
 const getOwnedChild = async (attemptId: string, itemId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await findAttempt(attemptId, context)
   const item = attempt.compositeAssessment.items.find((candidate: any) => candidate.id === itemId)
@@ -1104,13 +1131,19 @@ export const buildCompositeReport = (attempt: any) => {
     if (item.type === 'SCALE') {
       try {
         const result = scaleMap.get(item.id)
+        const scores = decodeReportJson(result?.scores)
+        const feedback = decodeReportJson(result?.feedback)
+        if (!scores.ok || !feedback.ok) {
+          logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+          return { itemId: item.id, type: item.type, label: item.scale?.name, scaleId: item.scaleId, decryptError: true }
+        }
         return {
           itemId: item.id,
           type: item.type,
           label: item.scale?.name,
           scaleId: item.scaleId,
-          scores: decodeJson(result?.scores) ?? [],
-          feedback: decodeJson(result?.feedback) ?? {},
+          scores: scores.value ?? [],
+          feedback: feedback.value ?? {},
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
         }

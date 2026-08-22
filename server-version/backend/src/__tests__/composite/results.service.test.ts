@@ -23,6 +23,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { encryptField } from '../../utils/encryption'
 import {
   buildCompositeReport,
   getCompositeForTeacher,
@@ -303,5 +304,40 @@ describe('buildCompositeReport decrypt degrade', () => {
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(attempt)
     const studentReport = await getReport('attempt-1', { userId: 'student-1' })
     expect(studentReport.modules.find((item: { type: string }) => item.type === 'COGNITIVE')).toMatchObject({ decryptError: true })
+  })
+
+  it('marks a scale module decryptError when scores ciphertext cannot be decoded', () => {
+    const attempt = completedAttemptForReport({
+      scaleAssessments: [{
+        compositeItemId: 'item-scale',
+        scores: 'aa:bb:cc',
+        feedback: encryptField({ summary: 'ok' }),
+        completedAt: new Date('2026-08-20T01:04:00Z'),
+        totalTime: 4000,
+      }],
+    })
+
+    const built = buildCompositeReport(attempt)
+    const scale = built.modules.find((item: { type: string }) => item.type === 'SCALE')
+    expect(scale).toMatchObject({ decryptError: true, type: 'SCALE', scaleId: 'scale-1' })
+    expect(scale).not.toHaveProperty('scores')
+    expect(scale).not.toHaveProperty('feedback')
+    expect(built.modules.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
+  })
+
+  it('marks a scale module decryptError when feedback ciphertext cannot be decoded', () => {
+    const attempt = completedAttemptForReport({
+      scaleAssessments: [{
+        compositeItemId: 'item-scale',
+        scores: encryptField({ total: 12 }),
+        feedback: 'aa:bb:cc',
+        completedAt: new Date('2026-08-20T01:04:00Z'),
+        totalTime: 4000,
+      }],
+    })
+
+    const scale = buildCompositeReport(attempt).modules.find((item: { type: string }) => item.type === 'SCALE')
+    expect(scale).toMatchObject({ decryptError: true })
+    expect(scale).not.toHaveProperty('scores')
   })
 })
