@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-const { mockNavigate, mockGet, mockCompositeApi } = vi.hoisted(() => ({
+const { mockNavigate, mockGet, mockCompositeApi, authState } = vi.hoisted(() => ({
   mockNavigate: vi.fn(),
   mockGet: vi.fn(),
   mockCompositeApi: {
@@ -11,6 +11,7 @@ const { mockNavigate, mockGet, mockCompositeApi } = vi.hoisted(() => ({
     copy: vi.fn(),
     create: vi.fn(),
   },
+  authState: { user: { id: 'teacher-1', role: 'TEACHER' as 'TEACHER' | 'ADMIN' } },
 }))
 
 vi.mock('react-router-dom', async () => {
@@ -27,7 +28,7 @@ vi.mock('../../../api/client', () => ({
 }))
 
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }),
+  useAuth: () => ({ user: authState.user }),
 }))
 
 import CompositeAssessmentList from '../CompositeAssessmentList'
@@ -35,6 +36,7 @@ import CompositeAssessmentList from '../CompositeAssessmentList'
 describe('CompositeAssessmentList library tab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    authState.user = { id: 'teacher-1', role: 'TEACHER' }
     mockCompositeApi.list.mockResolvedValue({
       code: 0,
       data: {
@@ -70,9 +72,9 @@ describe('CompositeAssessmentList library tab', () => {
       code: 0,
       data: {
         list: [
-          { id: 'c1', title: '语文', courseCode: 'YU', isLibrary: false },
-          { id: 'c2', title: '数学', courseCode: 'SHU', isLibrary: false },
-          { id: 'lib-course', title: '模板库', courseCode: 'LIB', isLibrary: true },
+          { id: 'c1', title: '语文', courseCode: 'YU', isLibrary: false, creatorId: 'teacher-1' },
+          { id: 'c2', title: '数学', courseCode: 'SHU', isLibrary: false, creatorId: 'teacher-1' },
+          { id: 'lib-course', title: '模板库', courseCode: 'LIB', isLibrary: true, creatorId: 'admin-1' },
         ],
       },
     })
@@ -100,5 +102,56 @@ describe('CompositeAssessmentList library tab', () => {
       expect(mockCompositeApi.copy).toHaveBeenCalledWith('lib-1', { courseId: 'c1' })
     })
     expect(mockNavigate).toHaveBeenCalledWith('/composite-assessments/draft-99')
+  })
+
+  it('lets an admin copy only onto their own non-library courses', async () => {
+    authState.user = { id: 'admin-1', role: 'ADMIN' }
+    mockGet.mockResolvedValue({
+      code: 0,
+      data: {
+        list: [
+          { id: 'own', title: '我的授课课', courseCode: 'OWN', isLibrary: false, creatorId: 'admin-1' },
+          { id: 'other-t', title: '王老师的课', courseCode: 'WT', isLibrary: false, creatorId: 'teacher-2' },
+          { id: 'lib-course', title: '模板库', courseCode: 'LIB', isLibrary: true, creatorId: 'admin-1' },
+          { id: 'peer', title: '同事授课课', courseCode: 'COL', isLibrary: false, creatorId: 'admin-2' },
+        ],
+      },
+    })
+
+    const user = userEvent.setup()
+    render(<CompositeAssessmentList />)
+    await screen.findByText('我的测评')
+    await user.click(screen.getByRole('button', { name: /管理员模板/ }))
+
+    expect(screen.getByRole('option', { name: /我的授课课/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /王老师的课/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /同事授课课/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /模板库/ })).not.toBeInTheDocument()
+  })
+
+  it('shows a library course badge on 我的 when the composite is bound to a library course', async () => {
+    mockCompositeApi.list.mockResolvedValue({
+      code: 0,
+      data: {
+        list: [{
+          id: 'lib-comp',
+          name: '库上的模板',
+          code: 'LIBC',
+          status: 'PUBLISHED',
+          itemCount: 1,
+          copyable: true,
+          canSetCopyable: true,
+          createdBy: 'admin-1',
+          creator: { id: 'admin-1', role: 'ADMIN' },
+          course: { id: 'lib-course', title: '模板库', courseCode: 'LIB', isLibrary: true },
+          attemptCounts: { started: 0, completed: 0 },
+        }],
+      },
+    })
+
+    render(<CompositeAssessmentList />)
+    expect(await screen.findByText('库上的模板')).toBeInTheDocument()
+    expect(screen.getByText('库课程')).toBeInTheDocument()
+    expect(screen.getByText('可复制')).toBeInTheDocument()
   })
 })

@@ -30,6 +30,11 @@ describe('composite library api', () => {
     expect(mockClient.post).toHaveBeenCalledWith('/composite-assessments/tpl-1/copy', { courseId: 'course-own' })
   })
 
+  it('POST /composite-assessments/:id/copy allows omitting courseId for self-copy', async () => {
+    await compositeApi.copy('mine-1', {})
+    expect(mockClient.post).toHaveBeenCalledWith('/composite-assessments/mine-1/copy', {})
+  })
+
   it('PATCH /composite-assessments/:id with copyable', async () => {
     await compositeApi.update('tpl-1', { copyable: true })
     expect(mockClient.patch).toHaveBeenCalledWith('/composite-assessments/tpl-1', { copyable: true })
