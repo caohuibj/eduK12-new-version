@@ -439,6 +439,10 @@ export const checkinController = {
         return notFound(res, '打卡不存在')
       }
 
+      if (checkin.endTime && new Date() > checkin.endTime) {
+        return error(res, Messages.CHECKIN.EXPIRED)
+      }
+
       // 检查是否已提交
       const existing = await prisma.checkinSubmission.findFirst({
         where: {
@@ -1136,7 +1140,7 @@ export const checkinController = {
 
       // 检查打卡是否已结束
       if (validation.checkin.endTime && new Date() > validation.checkin.endTime) {
-        return error(res, '打卡已结束')
+        return error(res, Messages.CHECKIN.EXPIRED)
       }
 
       // 创建匿名提交
