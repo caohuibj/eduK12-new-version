@@ -1,0 +1,117 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { UserRole } from '@prisma/client'
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
+    courseStudent: { findMany: vi.fn() },
+  },
+}))
+
+vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+vi.mock('../../utils/cache', () => ({ cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clearPattern: vi.fn() } }))
+
+import { courseController } from '../../controllers/courseController'
+
+const makeReq = (overrides: Record<string, unknown> = {}) => ({
+  user: { userId: 'admin-1', role: UserRole.ADMIN },
+  body: {},
+  params: { id: 'course-1' },
+  query: {},
+  ...overrides,
+})
+
+const makeRes = () => {
+  const res: any = { statusCode: 200, body: null }
+  res.status = vi.fn((code: number) => {
+    res.statusCode = code
+    return res
+  })
+  res.json = vi.fn((body: any) => {
+    res.body = body
+    return res
+  })
+  return res
+}
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+describe('course isLibrary', () => {
+  it('forbids a teacher from marking a course as library', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-1',
+      creatorId: 'teacher-1',
+      creator: { role: UserRole.TEACHER },
+    })
+    const res = makeRes()
+    await courseController.update(makeReq({
+      user: { userId: 'teacher-1', role: UserRole.TEACHER },
+      body: { isLibrary: true },
+    }) as any, res)
+    expect(res.statusCode).toBe(403)
+    expect(mockPrisma.course.update).not.toHaveBeenCalled()
+  })
+
+  it('lets ADMIN mark a second library course and forces recruiting off', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-2',
+      creatorId: 'admin-1',
+      creator: { role: UserRole.ADMIN },
+    })
+    mockPrisma.course.update.mockResolvedValue({ id: 'course-2', isLibrary: true, isRecruiting: false })
+    const res = makeRes()
+    await courseController.update(makeReq({
+      params: { id: 'course-2' },
+      body: { isLibrary: true },
+    }) as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(mockPrisma.course.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ isLibrary: true, isRecruiting: false }),
+    }))
+  })
+
+  it('rejects joining a library course by course code', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'library-1',
+      courseCode: 'LIB',
+      status: 'PUBLISHED',
+      isRecruiting: false,
+      isLibrary: true,
+    })
+    const res = makeRes()
+    await courseController.join(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      body: { courseCode: 'LIB' },
+    }) as any, res)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('库课程不能加入')
+  })
+
+  it('hides library course detail from students', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'library-1',
+      isLibrary: true,
+      isRecruiting: false,
+      _count: { students: 0 },
+    })
+    const res = makeRes()
+    await courseController.detail(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      params: { id: 'library-1' },
+    }) as any, res)
+    expect(res.statusCode).toBe(404)
+  })
+
+  it('omits library courses from the student myCourses list', async () => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([])
+    const res = makeRes()
+    await courseController.myCourses(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+    }) as any, res)
+    expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ course: { isLibrary: false } }),
+    }))
+  })
+})

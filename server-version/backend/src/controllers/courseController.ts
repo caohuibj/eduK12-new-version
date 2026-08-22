@@ -11,6 +11,7 @@ import { z } from 'zod'
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
   description: z.string().optional(),
+  isLibrary: z.boolean().optional(),
 })
 
 const updateCourseSchema = z.object({
@@ -18,6 +19,7 @@ const updateCourseSchema = z.object({
   description: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'COMPLETED']).optional(),
   coverUrl: z.string().optional(),
+  isLibrary: z.boolean().optional(),
 })
 
 // 分页参数解析工具函数
@@ -59,6 +61,7 @@ export const courseController = {
 
       // 学生只能看到自己已加入（ACTIVE/APPROVED）的课程，避免列出全站课程
       if (userRole === UserRole.STUDENT) {
+        where.isLibrary = false
         where.students = {
           some: {
             studentId: userId,
@@ -138,7 +141,11 @@ export const courseController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { title, description } = result.data
+      const { title, description, isLibrary } = result.data
+      const userRole = req.user?.role
+      if (isLibrary !== undefined && userRole !== UserRole.ADMIN) {
+        return forbidden(res, '只有管理员可以设置库课程')
+      }
 
       // 生成课程号
       const courseCode = await generateCourseCode()
@@ -150,6 +157,7 @@ export const courseController = {
           courseCode,
           creatorId: userId,
           status: CourseStatus.PUBLISHED,
+          ...(isLibrary ? { isLibrary: true, isRecruiting: false } : {}),
         },
         include: {
           creator: {
@@ -219,6 +227,10 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
+      if (req.user?.role === UserRole.STUDENT && course.isLibrary) {
+        return notFound(res, '课程不存在')
+      }
+
       return success(res, {
         ...course,
         studentCount: course._count.students,
@@ -239,7 +251,8 @@ export const courseController = {
       const { id } = req.params
 
       const course = await prisma.course.findUnique({
-        where: { id }
+        where: { id },
+        include: { creator: { select: { role: true } } },
       })
 
       if (!course) {
@@ -256,9 +269,23 @@ export const courseController = {
         return error(res, result.error.errors[0].message)
       }
 
+      if (result.data.isLibrary !== undefined) {
+        if (userRole !== UserRole.ADMIN) {
+          return forbidden(res, '只有管理员可以设置库课程')
+        }
+        if (result.data.isLibrary && course.creator.role !== UserRole.ADMIN) {
+          return forbidden(res, '不能把教师的课改成库课程')
+        }
+      }
+
+      const updateData: Record<string, unknown> = { ...result.data }
+      if (result.data.isLibrary === true) {
+        updateData.isRecruiting = false
+      }
+
       const updatedCourse = await prisma.course.update({
         where: { id },
-        data: result.data,
+        data: updateData,
         include: {
           creator: {
             select: {
@@ -385,6 +412,10 @@ export const courseController = {
       }
 
       // 检查是否正在招募
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
+      }
+
       if (!course.isRecruiting) {
         return error(res, '该课程已停止招募，无法加入')
       }
@@ -437,7 +468,8 @@ export const courseController = {
           studentId: userId,
           status: {
             in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]
-          }
+          },
+          course: { isLibrary: false },
         },
         include: {
           course: {
@@ -503,6 +535,10 @@ export const courseController = {
 
       if (course.status === 'COMPLETED' || course.endedAt) {
         return error(res, '课程已结束，无法加入')
+      }
+
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
       }
 
       if (!course.isRecruiting) {
@@ -962,6 +998,10 @@ export const courseController = {
       // 只有已完结的课程不能恢复招募
       if (course.status === CourseStatus.COMPLETED) {
         return error(res, '已完结的课程无法恢复招募')
+      }
+
+      if (course.isLibrary) {
+        return error(res, '库课程不能开启招募')
       }
 
       // 更新招募状态

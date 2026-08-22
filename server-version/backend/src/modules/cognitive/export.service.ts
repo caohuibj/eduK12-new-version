@@ -13,6 +13,8 @@ import {
   EXPORT_MAX_TRIALS,
   exportLimitError,
 } from '../../services/exportStorage'
+import { FORBIDDEN } from './cognitive.errors'
+import { isCompositeWrapper } from './assignment.access'
 
 export type CognitiveExportDetail = 'summary' | 'full'
 export type CognitiveExportFormat = 'csv' | 'sav'
@@ -208,6 +210,7 @@ const getAssignment = async (assignmentId: string) => {
       id: true,
       title: true,
       courseId: true,
+      listedStandalone: true,
       course: {
         select: { id: true, title: true, courseCode: true },
       },
@@ -223,6 +226,7 @@ const getAssignment = async (assignmentId: string) => {
   })
 
   if (!assignment) throw new Error('认知测评任务不存在')
+  if (isCompositeWrapper(assignment)) throw FORBIDDEN('请从综合测评导出')
   return assignment
 }
 

@@ -1,4 +1,4 @@
-import { UserRole, CourseStudentStatus, CognitiveAssignmentStatus } from '@prisma/client'
+import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
@@ -9,6 +9,7 @@ import {
   BAD_REQUEST,
   CONFLICT,
 } from './cognitive.errors'
+import { isCompositeWrapper, rejectWrapperForStandaloneUse } from './assignment.access'
 
 export { CognitiveServiceError }
 
@@ -140,6 +141,7 @@ export const listTeacherAssignments = async (
     dueAt: a.dueAt,
     maxAttempts: a.maxAttempts,
     required: a.required,
+    listedStandalone: a.listedStandalone,
     publishedAt: a.publishedAt,
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
@@ -164,7 +166,7 @@ export const listStudentAssignments = async (userId: string) => {
   if (courseIds.length === 0) return []
 
   const assignments = await prisma.cognitiveAssignment.findMany({
-    where: { courseId: { in: courseIds }, status: 'PUBLISHED' },
+    where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: true, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
     include: { config: true, course: true },
   })
@@ -208,6 +210,7 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
     dueAt: assignment.dueAt,
     maxAttempts: assignment.maxAttempts,
     required: assignment.required,
+    listedStandalone: assignment.listedStandalone,
     publishedAt: assignment.publishedAt,
     createdAt: assignment.createdAt,
     updatedAt: assignment.updatedAt,
@@ -227,7 +230,9 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
 export const getAssignmentForStudent = async (userId: string, id: string) => {
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id }, include: { config: true, course: true } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
-  if (assignment.status !== 'PUBLISHED' || !assignment.courseId) throw NOT_FOUND('CognitiveAssignment not found')
+  if (assignment.status !== 'PUBLISHED' || !assignment.courseId || isCompositeWrapper(assignment) || assignment.course?.isLibrary) {
+    throw NOT_FOUND('CognitiveAssignment not found')
+  }
 
   const membership = await prisma.courseStudent.findUnique({
     where: { courseId_studentId: { courseId: assignment.courseId, studentId: userId } },
@@ -270,6 +275,20 @@ export const updateDraftAssignment = async (
   const existing = await prisma.cognitiveAssignment.findUnique({ where: { id } })
   if (!existing) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(existing, role, userId)
+  if (isCompositeWrapper(existing)) {
+    const blocked = ['maxAttempts', 'required', 'opensAt', 'dueAt'] as const
+    if (blocked.some((key) => input[key] !== undefined)) {
+      throw BAD_REQUEST('综合测评用认知任务只能修改标题和指导语')
+    }
+    const updated = await prisma.cognitiveAssignment.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined ? { title: input.title } : {}),
+        ...(input.instruction !== undefined ? { instruction: input.instruction } : {}),
+      },
+    })
+    return updated
+  }
   if (existing.status !== 'DRAFT') throw BAD_REQUEST('Only DRAFT assignments can be updated')
 
   // D6.1 (P1)：时间窗不变量必须跨"本次 request + 既有行"合并校验 ——
@@ -335,6 +354,12 @@ export const archiveAssignment = async (userId: string, role: UserRole, id: stri
   if (!existing) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(existing, role, userId)
 
+  const referenced = await prisma.compositeAssessmentItem.findFirst({
+    where: { cognitiveAssignmentId: id, compositeAssessment: { status: { not: 'ARCHIVED' } } },
+    select: { id: true },
+  })
+  if (referenced) throw CONFLICT('仍被综合测评引用的认知任务不能归档')
+
   // DRAFT/PUBLISHED -> ARCHIVED；不物理删除；不提供 ARCHIVED -> PUBLISHED。
   const { count } = await prisma.cognitiveAssignment.updateMany({
     where: { id, status: { in: ['DRAFT', 'PUBLISHED'] as CognitiveAssignmentStatus[] } },
@@ -344,4 +369,50 @@ export const archiveAssignment = async (userId: string, role: UserRole, id: stri
 
   const archived = await prisma.cognitiveAssignment.findUnique({ where: { id } })
   return archived
+}
+
+export const ensureTeacherPublishedAssignment = async (
+  tx: Prisma.TransactionClient,
+  input: { userId: string; courseId: string; configId: string; title: string; instruction: string | null },
+) => {
+  const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
+  if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
+
+  const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+  if (!entry) {
+    throw BAD_REQUEST(`No registry implementation for ${config.testType}/${config.engineVersion}/${config.scoringVersion}`)
+  }
+  const parsed = entry.configSchema.safeParse(config.config)
+  if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
+
+  const existing = await tx.cognitiveAssignment.findFirst({
+    where: {
+      createdBy: input.userId,
+      courseId: input.courseId,
+      configId: input.configId,
+      status: 'PUBLISHED',
+      listedStandalone: false,
+    },
+  })
+  if (existing) return existing
+
+  const course = await tx.course.findUnique({ where: { id: input.courseId } })
+  if (!course) throw NOT_FOUND('Course not found')
+
+  return tx.cognitiveAssignment.create({
+    data: {
+      courseId: input.courseId,
+      configId: input.configId,
+      createdBy: input.userId,
+      title: input.title,
+      instruction: input.instruction,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
+      listedStandalone: false,
+      required: false,
+      maxAttempts: 1,
+      courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
+    },
+  })
 }

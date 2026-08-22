@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto'
+import { nanoid } from 'nanoid'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
@@ -18,9 +19,11 @@ import {
 } from './composite.errors'
 import type {
   AddCompositeItemInput,
+  CopyCompositeInput,
   CreateCompositeInput,
   UpdateCompositeInput,
 } from './composite.schema'
+import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
 
 type Db = any
 
@@ -42,35 +45,72 @@ const parseDate = (value: string | null | undefined) => (value ? new Date(value)
 const loadComposite = async (id: string, includeItems = false) => {
   const composite = await prisma.compositeAssessment.findUnique({
     where: { id },
-    include: includeItems
-      ? {
-          items: {
-            orderBy: { position: 'asc' },
-            include: {
-              scale: {
-                include: {
-                  items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } },
-                  dimensions: true,
+    include: {
+      creator: { select: { id: true, role: true } },
+      course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+      ...(includeItems
+        ? {
+            items: {
+              orderBy: { position: 'asc' as const },
+              include: {
+                scale: {
+                  include: {
+                    items: { orderBy: { sortOrder: 'asc' as const }, include: { itemDimensions: true } },
+                    dimensions: true,
+                  },
                 },
+                cognitiveAssignment: { include: { config: true } },
               },
-              cognitiveAssignment: { include: { config: true } },
             },
-          },
-        }
-      : undefined,
+          }
+        : {}),
+    },
   })
   if (!composite) throw compositeNotFound()
   return composite as any
 }
 
-const validateCourse = async (courseId: string | null | undefined, userId: string, role: UserRole) => {
+const validateCourse = async (
+  courseId: string | null | undefined,
+  userId: string,
+  role: UserRole,
+  options: { allowLibrary?: boolean; requireOwnCourse?: boolean } = {},
+) => {
   if (!courseId) return null
   const course = await prisma.course.findUnique({ where: { id: courseId } })
   if (!course) throw compositeNotFound('课程不存在')
-  if (role === UserRole.TEACHER && course.creatorId !== userId) {
+  if (course.isLibrary && !options.allowLibrary) {
+    throw compositeBadRequest('不能绑定库课程')
+  }
+  if ((options.requireOwnCourse || role === UserRole.TEACHER) && course.creatorId !== userId) {
     throw compositeForbidden('只能在自己创建的课程中发布综合测评')
   }
   return course
+}
+
+const isAdminLibraryTemplate = (composite: {
+  copyable?: boolean
+  status?: string
+  courseId?: string | null
+  creator?: { role?: UserRole | string } | null
+  course?: { isLibrary?: boolean } | null
+}) =>
+  Boolean(
+    composite.copyable
+    && composite.status === 'PUBLISHED'
+    && composite.creator?.role === UserRole.ADMIN
+    && composite.courseId
+    && composite.course?.isLibrary === true,
+  )
+
+const canSetCopyableFor = (composite: { status?: string; creator?: { role?: UserRole | string } | null; course?: { isLibrary?: boolean } | null }, role: UserRole) =>
+  role === UserRole.ADMIN
+  && composite.status === 'PUBLISHED'
+  && composite.creator?.role === UserRole.ADMIN
+  && composite.course?.isLibrary === true
+
+const assertNotLibraryComposite = (composite: { course?: { isLibrary?: boolean } | null }, message: string) => {
+  if (composite.course?.isLibrary) throw compositeBadRequest(message)
 }
 
 const assertDraft = (composite: { status: string }) => {
@@ -280,7 +320,7 @@ const mapAttemptRowForTeacher = (attempt: {
 
 export const createComposite = async (userId: string, role: UserRole, input: CreateCompositeInput) => {
   assertTeacher(role)
-  await validateCourse(input.courseId, userId, role)
+  await validateCourse(input.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (input.publicEnabled && !input.expiresAt) {
     throw compositeBadRequest('公开链接必须设置有效期')
   }
@@ -310,7 +350,8 @@ export const listComposites = async (userId: string, role: UserRole) => {
     where,
     orderBy: { createdAt: 'desc' },
     include: {
-      course: { select: { id: true, title: true, courseCode: true } },
+      creator: { select: { id: true, role: true } },
+      course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
       items: {
         orderBy: { position: 'asc' },
         include: {
@@ -343,6 +384,13 @@ export const listComposites = async (userId: string, role: UserRole) => {
     const { _count: _ignoredCount, ...rest } = item
     return {
       ...rest,
+      copyable: Boolean(item.copyable),
+      createdBy: item.createdBy,
+      creator: item.creator ? { id: item.creator.id, role: item.creator.role } : null,
+      course: item.course
+        ? { id: item.course.id, title: item.course.title, courseCode: item.course.courseCode, isLibrary: item.course.isLibrary }
+        : null,
+      canSetCopyable: canSetCopyableFor(item, role),
       itemCount: item.items.length,
       items: item.items.map(mapItemForTeacher),
       attemptCounts: counts.get(item.id) ?? emptyAttemptCounts(),
@@ -367,10 +415,145 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     expiresAt: composite.expiresAt,
     maxAttempts: composite.maxAttempts,
     publicEnabled: composite.publicEnabled,
+    copyable: Boolean(composite.copyable),
+    createdBy: composite.createdBy,
+    creator: composite.creator ? { id: composite.creator.id, role: composite.creator.role } : null,
+    course: composite.course
+      ? { id: composite.course.id, title: composite.course.title, courseCode: composite.course.courseCode, isLibrary: composite.course.isLibrary }
+      : null,
+    canSetCopyable: canSetCopyableFor(composite, role),
     publishedAt: composite.publishedAt,
     items: composite.items.map(mapItemForTeacher),
     attemptCounts: counts.get(composite.id) ?? emptyAttemptCounts(),
   }
+}
+
+export const listLibraryTemplates = async (userId: string, role: UserRole) => {
+  assertTeacher(role)
+  const list = await prisma.compositeAssessment.findMany({
+    where: { copyable: true, status: 'PUBLISHED' },
+    orderBy: { publishedAt: 'desc' },
+    include: {
+      creator: { select: { id: true, role: true } },
+      course: { select: { id: true, isLibrary: true, title: true } },
+      items: {
+        orderBy: { position: 'asc' },
+        include: {
+          scale: { select: { name: true } },
+          cognitiveAssignment: { select: { title: true, config: { select: { name: true } } } },
+        },
+      },
+    },
+  })
+  const templates = list.filter(isAdminLibraryTemplate)
+  const supported = config.cognitiveModuleEnabled
+    ? templates
+    : templates.filter((item) => !item.items.some((child) => child.type === 'COGNITIVE'))
+  return supported.map((item) => ({
+    id: item.id,
+    code: item.code,
+    name: item.name,
+    description: item.description,
+    items: item.items.map((child) => ({
+      type: child.type,
+      position: child.position,
+      label: child.scale?.name || child.cognitiveAssignment?.config?.name || child.cognitiveAssignment?.title || child.formLabel,
+    })),
+  }))
+}
+
+export const copyComposite = async (userId: string, role: UserRole, sourceId: string, input: CopyCompositeInput) => {
+  assertTeacher(role)
+  const source = await prisma.compositeAssessment.findUnique({
+    where: { id: sourceId },
+    include: {
+      creator: { select: { id: true, role: true } },
+      course: { select: { id: true, isLibrary: true, title: true } },
+      items: {
+        orderBy: { position: 'asc' },
+        include: {
+          scale: { select: { id: true, status: true } },
+          cognitiveAssignment: { include: { config: true } },
+        },
+      },
+    },
+  })
+  if (!source) throw compositeNotFound()
+  const selfCopy = source.createdBy === userId
+  const libraryCopy = isAdminLibraryTemplate(source)
+  if (!selfCopy && !libraryCopy) throw compositeForbidden('不能复制此综合测评')
+
+  const hasCognitive = source.items.some((item) => item.type === 'COGNITIVE')
+  if (hasCognitive) assertCognitiveModuleEnabled()
+  if (libraryCopy && !input.courseId) throw compositeBadRequest('复制管理员模板必须选择自己的授课课')
+
+  const targetCourseId = libraryCopy ? input.courseId : (input.courseId === undefined ? source.courseId : input.courseId)
+  if (hasCognitive && !targetCourseId) throw compositeBadRequest('含认知模块的模板必须绑定课程')
+  await validateCourse(targetCourseId, userId, role, { allowLibrary: false, requireOwnCourse: true })
+
+  let code = input.code ?? `${source.code}_copy_${nanoid(8)}`
+  const name = input.name ?? `${source.name}（副本）`
+
+  return prisma.$transaction(async (tx) => {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const taken = await tx.compositeAssessment.findUnique({ where: { code } })
+      if (!taken) break
+      if (input.code || attempt === 3) throw compositeConflict('综合测评编码已存在')
+      code = `${source.code}_copy_${nanoid(8)}`
+    }
+
+    const itemData: Array<Record<string, unknown>> = []
+    for (const item of source.items) {
+      if (item.type === 'SCALE') {
+        if (!item.scaleId || item.scale?.status !== 'PUBLISHED') throw compositeBadRequest('综合测评包含未发布量表')
+        itemData.push({ type: 'SCALE', position: item.position, required: item.required, scaleId: item.scaleId })
+      } else if (item.type === 'FORM') {
+        itemData.push({
+          type: 'FORM',
+          position: item.position,
+          required: item.required,
+          formType: item.formType,
+          formLabel: item.formLabel,
+          formPlaceholder: item.formPlaceholder,
+          formOptions: item.formOptions ?? undefined,
+        })
+      } else if (item.type === 'COGNITIVE') {
+        const assignment = item.cognitiveAssignment
+        if (!assignment?.configId || !targetCourseId) throw compositeBadRequest('认知任务配置不存在')
+        const ensured = await ensureTeacherPublishedAssignment(tx, {
+          userId,
+          courseId: targetCourseId,
+          configId: assignment.configId,
+          title: assignment.title || assignment.config.name,
+          instruction: assignment.instruction ?? assignment.config.instruction ?? null,
+        })
+        itemData.push({
+          type: 'COGNITIVE',
+          position: item.position,
+          required: item.required,
+          cognitiveAssignmentId: ensured.id,
+        })
+      }
+    }
+
+    return tx.compositeAssessment.create({
+      data: {
+        code,
+        name,
+        description: source.description,
+        instruction: source.instruction,
+        status: 'DRAFT',
+        courseId: targetCourseId,
+        createdBy: userId,
+        maxAttempts: source.maxAttempts,
+        publicEnabled: false,
+        copyable: false,
+        copiedFromId: source.id,
+        items: { create: itemData as any },
+      },
+      include: { items: { orderBy: { position: 'asc' } } },
+    })
+  })
 }
 
 export const listAttemptsForTeacher = async (
@@ -450,13 +633,22 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
   const existing = await loadComposite(id, true)
   assertOwner(existing, userId, role)
   const providedKeys = (Object.keys(input) as Array<keyof UpdateCompositeInput>).filter((key) => input[key] !== undefined)
-  const publicWindowOnly = providedKeys.length > 0 && providedKeys.every((key) => key === 'expiresAt' || key === 'publicEnabled')
+  if (input.copyable !== undefined) {
+    if (role !== UserRole.ADMIN) throw compositeForbidden('只有管理员可以把综合测评标为库模板')
+    if (existing.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布的综合测评可以设为库模板')
+    if (existing.creator?.role !== UserRole.ADMIN) throw compositeForbidden('只能把管理员创建的综合测评标为库模板')
+    if (existing.course?.isLibrary !== true) throw compositeBadRequest('只有绑定库课程的综合测评可以设为模板')
+  }
+  const publicWindowKeys = role === UserRole.ADMIN
+    ? (['expiresAt', 'publicEnabled', 'copyable'] as const)
+    : (['expiresAt', 'publicEnabled'] as const)
+  const publicWindowOnly = providedKeys.length > 0 && providedKeys.every((key) => (publicWindowKeys as readonly string[]).includes(key))
   if (existing.status !== 'DRAFT' && !publicWindowOnly) {
     throw compositeConflict('已发布的综合测评只能调整公开有效期')
   }
   const nextCourseId = input.courseId === undefined ? existing.courseId : input.courseId
   if (existing.status === 'DRAFT') {
-    await validateCourse(nextCourseId, userId, role)
+    await validateCourse(nextCourseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
     if (
       input.courseId !== undefined &&
       input.courseId !== existing.courseId &&
@@ -484,6 +676,7 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
       ...(input.expiresAt !== undefined ? { expiresAt: parseDate(input.expiresAt) } : {}),
       ...(input.maxAttempts !== undefined ? { maxAttempts: input.maxAttempts } : {}),
       ...(input.publicEnabled !== undefined ? { publicEnabled: input.publicEnabled } : {}),
+      ...(input.copyable !== undefined ? { copyable: input.copyable } : {}),
     },
   })
 }
@@ -565,7 +758,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   assertOwner(composite, userId, role)
   assertDraft(composite)
   if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
-  await validateCourse(composite.courseId, userId, role)
+  await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
   for (const item of composite.items) {
@@ -616,6 +809,7 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
+  assertNotLibraryComposite(composite, '库课程上的综合测评不能公开作答')
   const expiry = new Date(expiresAt)
   if (expiry.getTime() <= Date.now()) throw compositeBadRequest('有效期必须晚于当前时间')
   if (composite.expiresAt && expiry.getTime() > composite.expiresAt.getTime()) {
@@ -652,9 +846,9 @@ export const listAvailableForStudent = async (userId: string) => {
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
-    where: { status: 'PUBLISHED', courseId: { in: courseIds } },
+    where: { status: 'PUBLISHED', courseId: { in: courseIds }, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
-    include: { course: { select: { id: true, title: true, courseCode: true } }, items: { orderBy: { position: 'asc' }, select: { type: true, position: true, scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } }, formLabel: true } } },
+    include: { course: { select: { id: true, title: true, courseCode: true, isLibrary: true } }, items: { orderBy: { position: 'asc' }, select: { type: true, position: true, scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } }, formLabel: true } } },
   })
   const supportedList = config.cognitiveModuleEnabled
     ? list
@@ -681,6 +875,7 @@ export const listAvailableForStudent = async (userId: string) => {
 const assertStudentEligibility = async (composite: any, userId: string) => {
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('综合测评尚未发布')
   if (!composite.courseId) throw compositeForbidden('该综合测评仅允许通过公开链接访问')
+  if (composite.course?.isLibrary) throw compositeBadRequest('库课程上的综合测评不能作答')
   const membership = await prisma.courseStudent.findUnique({ where: { courseId_studentId: { courseId: composite.courseId, studentId: userId } } })
   if (!membership || !['ACTIVE', 'APPROVED'].includes(membership.status)) throw compositeForbidden('不是该课程的有效学生')
   if (composite.opensAt && composite.opensAt.getTime() > Date.now()) throw compositeBadRequest('综合测评尚未开始')
@@ -799,9 +994,10 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 }
 
 const findPublicToken = async (tokenValue: string) => {
-  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
+  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { course: { select: { isLibrary: true } }, items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
+  assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
   assertSupportedComposite(token.compositeAssessment)
   return token as any
 }

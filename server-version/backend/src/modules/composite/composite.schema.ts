@@ -27,6 +27,7 @@ export const updateCompositeSchema = z.object({
   expiresAt: dateTime.nullable().optional(),
   maxAttempts: z.number().int().positive().optional(),
   publicEnabled: z.boolean().optional(),
+  copyable: z.boolean().optional(),
 }).strict().refine(
   (value) => !value.opensAt || !value.expiresAt || new Date(value.expiresAt).getTime() >= new Date(value.opensAt).getTime(),
   { message: 'expiresAt 必须晚于或等于 opensAt' }
@@ -101,6 +102,12 @@ export const publicRecoverySchema = z.object({
   recoveryToken: z.string().min(20).max(200),
 }).strict()
 
+export const copyCompositeSchema = z.object({
+  courseId: z.string().min(1).nullable().optional(),
+  code: z.string().min(1).max(80).optional(),
+  name: z.string().min(1).max(200).optional(),
+}).strict()
+
 export const listCompositeAttemptsQuerySchema = z.object({
   status: z.enum(['IN_PROGRESS', 'COMPLETED', 'ABANDONED']).optional(),
   q: z.string().max(100).optional(),
@@ -111,4 +118,5 @@ export const listCompositeAttemptsQuerySchema = z.object({
 export type CreateCompositeInput = z.infer<typeof createCompositeSchema>
 export type UpdateCompositeInput = z.infer<typeof updateCompositeSchema>
 export type AddCompositeItemInput = z.infer<typeof addCompositeItemSchema>
+export type CopyCompositeInput = z.infer<typeof copyCompositeSchema>
 export type CompositeExportRequest = z.infer<typeof compositeExportRequestSchema>

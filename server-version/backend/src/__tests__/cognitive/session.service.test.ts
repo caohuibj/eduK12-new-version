@@ -123,6 +123,7 @@ const rawRow = (s: any = sessionRow()) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.cognitiveSession.findFirst.mockResolvedValue(null)
   mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(PUBLISHED_ASSIGNMENT)
   mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', title: 'C1' })
   mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
@@ -142,6 +143,22 @@ describe('createSession eligibility', () => {
   it('rejects a non-PUBLISHED assignment', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, status: 'DRAFT' })
     await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('rejects a composite wrapper for standalone sessions', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, listedStandalone: false })
+    await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  it('rejects resuming an in-progress wrapper session', async () => {
+    mockPrisma.cognitiveSession.findFirst.mockResolvedValue({ id: 'session-1', status: 'IN_PROGRESS' })
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, listedStandalone: false })
+    await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  it('rejects starting a library-course assignment', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', title: 'C1', isLibrary: true })
+    await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 403 })
   })
 
   it('rejects an assignment without course', async () => {

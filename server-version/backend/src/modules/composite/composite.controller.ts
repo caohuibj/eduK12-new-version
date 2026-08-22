@@ -10,6 +10,7 @@ import {
   compositeSaveSchema,
   compositeScaleAnswerSchema,
   createCompositeSchema,
+  copyCompositeSchema,
   createCompositeTokenSchema,
   listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
@@ -48,6 +49,21 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       return success(res, await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id))
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async library(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      return success(res, { list: await service.listLibraryTemplates(req.user.userId, req.user.role) })
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async copy(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await service.copyComposite(req.user.userId, req.user.role, req.params.id, copyCompositeSchema.parse(req.body || {}))
+      return success(res, data, '综合测评已复制为草稿')
     } catch (err) { return handleError(res, err) }
   },
 

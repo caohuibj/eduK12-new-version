@@ -9,6 +9,7 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
+import { rejectWrapperForStandaloneUse } from './assignment.access'
 import { resolveCognitiveReference } from './reference'
 
 /**
@@ -58,10 +59,12 @@ export const loadStartableAssignment = async (
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Assignment is not published')
+  rejectWrapperForStandaloneUse(assignment)
   if (!assignment.courseId) throw BAD_REQUEST('Assignment has no course')
 
   const course = await prisma.course.findUnique({ where: { id: assignment.courseId } })
   if (!course) throw NOT_FOUND('Course not found')
+  if (course.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
 
   const membership = await prisma.courseStudent.findUnique({
     where: { courseId_studentId: { courseId: assignment.courseId, studentId: userId } },
@@ -153,7 +156,16 @@ export const createSession = async (userId: string, assignmentId: string) => {
   const existing = await prisma.cognitiveSession.findFirst({
     where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
   })
-  if (existing) return toRunnerPayload(existing)
+  if (existing) {
+    const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
+    if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
+    rejectWrapperForStandaloneUse(assignment)
+    if (assignment.courseId) {
+      const course = await prisma.course.findUnique({ where: { id: assignment.courseId }, select: { isLibrary: true } })
+      if (course?.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
+    }
+    return toRunnerPayload(existing)
+  }
 
   // 无 existing → 这是"新 attempt"，才走完整资格链。
   const ctx = await loadStartableAssignment(assignmentId, userId)
