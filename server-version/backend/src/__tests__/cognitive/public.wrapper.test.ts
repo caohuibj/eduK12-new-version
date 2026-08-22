@@ -34,6 +34,18 @@ describe('public wrapper gates', () => {
       .rejects.toMatchObject({ statusCode: 400 })
   })
 
+  it('rejects public info for an assignment on a library course', async () => {
+    mockPrisma.cognitiveAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1',
+      isActive: true,
+      expiresAt: new Date(Date.now() + 60_000),
+      maxUses: 0,
+      usedCount: 0,
+      assignment: { ...wrapper, listedStandalone: true, course: { isLibrary: true } },
+    })
+    await expect(getPublicAssignmentInfo('token-value')).rejects.toMatchObject({ statusCode: 403 })
+  })
+
   it('rejects public info for a historical wrapper token', async () => {
     mockPrisma.cognitiveAccessToken.findUnique.mockResolvedValue({
       id: 'tok-1',

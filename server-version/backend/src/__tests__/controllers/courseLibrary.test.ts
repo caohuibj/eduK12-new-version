@@ -89,6 +89,21 @@ describe('course isLibrary', () => {
     expect(res.body.message).toBe('库课程不能加入')
   })
 
+  it('hides library course detail from students', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'library-1',
+      isLibrary: true,
+      isRecruiting: false,
+      _count: { students: 0 },
+    })
+    const res = makeRes()
+    await courseController.detail(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      params: { id: 'library-1' },
+    }) as any, res)
+    expect(res.statusCode).toBe(404)
+  })
+
   it('omits library courses from the student myCourses list', async () => {
     mockPrisma.courseStudent.findMany.mockResolvedValue([])
     const res = makeRes()

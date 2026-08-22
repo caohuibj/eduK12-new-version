@@ -227,6 +227,10 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
+      if (req.user?.role === UserRole.STUDENT && course.isLibrary) {
+        return notFound(res, '课程不存在')
+      }
+
       return success(res, {
         ...course,
         studentCount: course._count.students,
