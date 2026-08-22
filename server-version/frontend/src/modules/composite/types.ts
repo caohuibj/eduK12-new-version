@@ -77,5 +77,42 @@ export interface CompositeReport {
   anonymousCode: string | null
   completedAt: string | null
   totalTime: number | null
-  modules: Array<Record<string, unknown> & { itemId: string; type: CompositeItemType; label: string | null }>
+  modules: Array<Record<string, unknown> & { itemId: string; type: CompositeItemType; label: string | null; decryptError?: boolean }>
+}
+
+export interface CompositeAttemptCounts {
+  started: number
+  inProgress: number
+  completed: number
+  abandoned: number
+}
+
+export type CompositeAttemptListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
+
+export interface CompositeTeacherAttemptRow {
+  id: string
+  status: CompositeAttemptListStatus
+  progress: number
+  completedItems: number
+  startedAt: string
+  lastSavedAt: string
+  completedAt: string | null
+  totalTime: number | null
+  isAnonymous: boolean
+  anonymousCode: string | null
+  nickname: string | null
+  username: string | null
+  displayName: string | null
+  userId: string | null
+}
+
+export interface CompositeTeacherAttemptsResponse {
+  assessment: { id: string; name: string; code: string; status: string; courseId: string | null }
+  attemptCounts: CompositeAttemptCounts
+  list: CompositeTeacherAttemptRow[]
+  page: number
+  pageSize: number
+  total: number
+  totalPages: number
+  hasMore: boolean
 }

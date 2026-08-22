@@ -161,11 +161,15 @@ const CompositeAssessmentList: React.FC = () => {
               <div>
                 <h2 className="font-semibold text-gray-800">{item.name}</h2>
                 <p className="text-sm text-gray-500 mt-1">{item.code} · {item.itemCount || 0} 个模块 · {item.status}</p>
+                <p className="text-sm text-gray-600 mt-1">已开始 {item.attemptCounts?.started ?? 0} · 已完成 {item.attemptCounts?.completed ?? 0}</p>
                 {item.course && <p className="text-xs text-gray-400 mt-1">课程：{item.course.title}（{item.course.courseCode}）</p>}
               </div>
-              <button onClick={() => navigate(`/composite-assessments/${item.id}`)} className="btn-secondary">
-                <Settings className="w-4 h-4 inline mr-1" />配置
-              </button>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={() => navigate(`/composite-assessments/${item.id}/results`)} className="btn-secondary">结果</button>
+                <button onClick={() => navigate(`/composite-assessments/${item.id}`)} className="btn-secondary">
+                  <Settings className="w-4 h-4 inline mr-1" />配置
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -43,6 +43,7 @@ import ClassroomQRCode from './pages/teacher/ClassroomQRCode'
 import ClassroomQuestionEdit from './pages/teacher/ClassroomQuestionEdit'
 import CompositeAssessmentList from './pages/teacher/CompositeAssessmentList'
 import CompositeAssessmentEdit from './pages/teacher/CompositeAssessmentEdit'
+import CompositeAssessmentResults from './pages/teacher/CompositeAssessmentResults'
 import CognitiveAssignmentList from './pages/teacher/CognitiveAssignmentList'
 import CognitiveAssignmentEdit from './pages/teacher/CognitiveAssignmentEdit'
 
@@ -375,6 +376,22 @@ function AppRoutes() {
             element={
               <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
                 <CompositeAssessmentList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/composite-assessments/:id/results"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeAssessmentResults />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/composite-assessments/:id/attempts/:attemptId/report"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeReportPage />
               </ProtectedRoute>
             }
           />
