@@ -4,7 +4,12 @@ import type { PaginationParams } from '../../utils/pagination'
 
 /** 学生自己的已完成记录；不返回 raw trial、密文或详细 metrics。 */
 export const listMyHistory = async (userId: string, pagination: PaginationParams) => {
-  const where = { userId, status: 'COMPLETED' as const }
+  const where = {
+    userId,
+    status: 'COMPLETED' as const,
+    scoreEncrypted: { not: null },
+    qualityFlagsEncrypted: { not: null },
+  }
   const [sessions, total] = await Promise.all([
     prisma.cognitiveSession.findMany({
       where,
@@ -28,11 +33,10 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
     prisma.cognitiveSession.count({ where }),
   ])
 
-  const list = sessions.flatMap((session) => {
-    if (!session.scoreEncrypted || !session.qualityFlagsEncrypted) return []
-    const score = decryptCognitivePayload<number>(session.scoreEncrypted)
-    const qualityFlags = decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
-    return [{
+  const list = sessions.map((session) => {
+    const score = decryptCognitivePayload<number>(session.scoreEncrypted as string)
+    const qualityFlags = decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted as string)
+    return {
       sessionId: session.id,
       assignmentId: session.assignmentId,
       title: session.assignment?.title ?? `${session.testType} 测评`,
@@ -44,7 +48,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
       finishedAt: session.finishedAt,
       score,
       qualityState: qualityFlags.interpretable === false ? 'insufficient' : 'interpretable',
-    }]
+    }
   })
 
   return { list, total }

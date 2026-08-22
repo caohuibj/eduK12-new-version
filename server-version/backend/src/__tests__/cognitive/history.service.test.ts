@@ -42,13 +42,23 @@ describe('cognitive history service', () => {
     const result = await listMyHistory('student-1', { page: 2, pageSize: 1, skip: 1, take: 1 })
 
     expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { userId: 'student-1', status: 'COMPLETED' },
+      where: {
+        userId: 'student-1',
+        status: 'COMPLETED',
+        scoreEncrypted: { not: null },
+        qualityFlagsEncrypted: { not: null },
+      },
       skip: 1,
       take: 1,
       select: expect.not.objectContaining({ metricsEncrypted: true }),
     }))
     expect(mockPrisma.cognitiveSession.count).toHaveBeenCalledWith({
-      where: { userId: 'student-1', status: 'COMPLETED' },
+      where: {
+        userId: 'student-1',
+        status: 'COMPLETED',
+        scoreEncrypted: { not: null },
+        qualityFlagsEncrypted: { not: null },
+      },
     })
     expect(result).toEqual({
       total: 3,
