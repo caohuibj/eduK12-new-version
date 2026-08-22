@@ -6,6 +6,7 @@ import { success, error, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
+import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -364,18 +365,9 @@ export const authController = {
         return unauthorized(res, '用户不存在')
       }
 
-      // 检查账号是否被冻结
-      if (user.isFrozen) {
-        return unauthorized(res, '账号已被冻结，请联系教师')
-      }
-
-      // 检查账号是否过期
-      if (user.expiresAt && user.expiresAt < new Date()) {
-        return unauthorized(res, '账号已过期，请联系管理员')
-      }
-
-      if (user.role === UserRole.TEACHER && !user.teacherApproved) {
-        return unauthorized(res, '账号正在等待管理员审核，审核通过后即可登录')
+      const rejection = inactiveAccountMessage(user)
+      if (rejection) {
+        return unauthorized(res, rejection)
       }
 
       return success(res, {
