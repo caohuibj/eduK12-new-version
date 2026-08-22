@@ -81,7 +81,9 @@ export const scoreReactionV1 = (input: {
 }): CognitiveScoreResult => {
   const { config, trials } = input
 
-  const sorted = [...trials].sort((a, b) => a.trialIndex - b.trialIndex)
+  const sorted = [...trials]
+    .filter((trial) => trial.trialIndex >= 0 && trial.trialIndex < config.totalTrials)
+    .sort((a, b) => a.trialIndex - b.trialIndex)
 
   if (sorted.length !== config.totalTrials) {
     throw new CognitiveScoringInputError(

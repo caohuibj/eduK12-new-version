@@ -96,10 +96,11 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total || sub !== 'green' || stimulusOnset == null) return
     const t = window.setTimeout(() => {
+      setSub('feedback')
       void submit(null, 'pointer')
     }, timeoutMs)
     return () => window.clearTimeout(t)
-  }, [phase, sub, stimulusOnset, timeoutMs])
+  }, [phase, sub, stimulusOnset, timeoutMs, trialIndex, total])
 
   // visibility 中断检测
   useEffect(() => {
@@ -116,7 +117,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   const submit = useCallback(
     async (rtMs: number | null, inputMode: ReactionTrialPayload['inputMode']) => {
-      if (respondingRef.current) return
+      if (respondingRef.current || trialIndex >= total) return
       respondingRef.current = true
       const payload: ReactionTrialPayload = {
         foreperiodMs,
@@ -131,7 +132,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         respondingRef.current = false
       }
     },
-    [foreperiodMs, prematureCount, onTrialComplete]
+    [foreperiodMs, prematureCount, onTrialComplete, trialIndex, total]
   )
 
   const handleFormalInput = useCallback(
@@ -146,7 +147,8 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         return
       }
       if (sub === 'green' && stimulusOnset != null) {
-        const rt = performance.now() - stimulusOnset
+        const rt = Math.round(performance.now() - stimulusOnset)
+        setSub('feedback')
         void submit(rt, inputMode)
       }
     },

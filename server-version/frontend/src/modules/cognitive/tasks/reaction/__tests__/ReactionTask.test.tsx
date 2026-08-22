@@ -164,6 +164,31 @@ describe('ReactionTask — formal trial', () => {
     expect(onTrialComplete.mock.calls[0][0].prematureCount).toBe(1)
   })
 
+  it('rounds fractional reaction times to integers', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    await enterFormal(onTrialComplete)
+    advanceFormalToGreen()
+    now += 320.6
+    fireEvent.click(screen.getByLabelText('trial 0'))
+    await act(async () => {})
+    expect(onTrialComplete.mock.calls[0][0].rtMs).toBe(321)
+  })
+
+  it('does not append a second trial when the miss timeout fires after a click', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    await enterFormal(onTrialComplete)
+    advanceFormalToGreen()
+    now += 320
+    fireEvent.click(screen.getByLabelText('trial 0'))
+    await act(async () => {})
+    expect(onTrialComplete).toHaveBeenCalledTimes(1)
+    act(() => {
+      vi.advanceTimersByTime(2000)
+    })
+    await act(async () => {})
+    expect(onTrialComplete).toHaveBeenCalledTimes(1)
+  })
+
   it('timeout → rtMs null (miss)', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
