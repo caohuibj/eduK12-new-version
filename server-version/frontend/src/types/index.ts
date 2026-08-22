@@ -22,6 +22,7 @@ export interface Course {
   creatorId: string
   creator?: User
   isRecruiting: boolean
+  isLibrary?: boolean
   studentCount?: number
   students?: CourseStudent[]
   createdAt: string

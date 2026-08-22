@@ -16,18 +16,27 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const [token, setToken] = useState<any>(null)
   const [tokenExpiresAt, setTokenExpiresAt] = useState('')
   const [tokenMaxUses, setTokenMaxUses] = useState(0)
+  const [title, setTitle] = useState('')
+  const [instruction, setInstruction] = useState('')
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const isWrapper = detail?.listedStandalone === false
 
   const load = async () => {
     try {
-      const [detailResponse, tokenResponse] = await Promise.all([
-        cognitiveApi.getAssignment(id),
-        cognitiveApi.listPublicTokens(id),
-      ])
+      const detailResponse = await cognitiveApi.getAssignment(id)
       if (detailResponse.code !== 0 || !detailResponse.data) throw new Error(detailResponse.message || '认知任务不存在')
       setDetail(detailResponse.data)
-      const tokens = tokenResponse.code === 0 ? (tokenResponse.data?.list || []) : []
-      setToken(tokens.find((item: any) => item.isActive) || tokens[0] || null)
+      setTitle(detailResponse.data.title)
+      setInstruction(detailResponse.data.instruction || '')
+      if (detailResponse.data.listedStandalone !== false) {
+        const tokenResponse = await cognitiveApi.listPublicTokens(id)
+        const tokens = tokenResponse.code === 0 ? (tokenResponse.data?.list || []) : []
+        setToken(tokens.find((item: any) => item.isActive) || tokens[0] || null)
+      } else {
+        setToken(null)
+      }
     } catch (err) {
       setError((err as { message?: string }).message || '加载失败')
     }
@@ -46,6 +55,24 @@ const CognitiveAssignmentEdit: React.FC = () => {
     const response = await cognitiveApi.archiveAssignment(id)
     if (response.code !== 0) setError(response.message || '归档失败')
     else await load()
+  }
+
+  const saveWrapper = async () => {
+    if (!title.trim()) {
+      setError('标题不能为空')
+      return
+    }
+    try {
+      setSaving(true)
+      setError(null)
+      const response = await cognitiveApi.updateAssignment(id, { title: title.trim(), instruction })
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
+      await load()
+    } catch (err) {
+      setError((err as { message?: string }).message || '保存失败')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const createToken = async () => {
@@ -109,14 +136,19 @@ const CognitiveAssignmentEdit: React.FC = () => {
       </button>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">{detail.title}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold text-gray-800">{detail.title}</h1>
+            {isWrapper && (
+              <span className="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">综合测评用</span>
+            )}
+          </div>
           <p className="text-sm text-gray-500">
             {statusLabel[detail.status] || detail.status}
             {detail.config?.name ? ` · ${detail.config.name}` : ''}
           </p>
         </div>
         <div className="flex gap-2">
-          {isDraft && (
+          {isDraft && !isWrapper && (
             <button onClick={() => void publish()} className="btn-primary">
               <Send className="w-4 h-4 inline mr-1" />发布
             </button>
@@ -126,20 +158,52 @@ const CognitiveAssignmentEdit: React.FC = () => {
               <Archive className="w-4 h-4 inline mr-1" />归档
             </button>
           )}
-          <button onClick={() => void exportData('summary')} className="btn-secondary">
-            <Download className="w-4 h-4 inline mr-1" />导出摘要
-          </button>
-          <button onClick={() => void exportData('full')} className="btn-secondary">导出完整数据</button>
+          {!isWrapper && (
+            <>
+              <button onClick={() => void exportData('summary')} className="btn-secondary">
+                <Download className="w-4 h-4 inline mr-1" />导出摘要
+              </button>
+              <button onClick={() => void exportData('full')} className="btn-secondary">导出完整数据</button>
+            </>
+          )}
         </div>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {detail.instruction && (
+      {isWrapper ? (
         <div className="card p-6 mb-5">
-          <h2 className="font-semibold mb-2">学生须知</h2>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap">{detail.instruction}</p>
+          <h2 className="font-semibold mb-2">任务信息</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            此任务仅用于综合测评，不能单独发给学生或生成公开链接。群体数据请从综合测评导出。
+          </p>
+          <label className="block text-sm text-gray-600 mb-3">
+            标题
+            <input
+              className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label className="block text-sm text-gray-600 mb-4">
+            学生须知
+            <textarea
+              className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800 min-h-[96px]"
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+            />
+          </label>
+          <button onClick={() => void saveWrapper()} disabled={saving || !title.trim()} className="btn-primary">
+            {saving ? '保存中...' : '保存'}
+          </button>
         </div>
+      ) : (
+        detail.instruction && (
+          <div className="card p-6 mb-5">
+            <h2 className="font-semibold mb-2">学生须知</h2>
+            <p className="text-sm text-gray-600 whitespace-pre-wrap">{detail.instruction}</p>
+          </div>
+        )
       )}
-      {detail.status === 'PUBLISHED' && (
+      {detail.status === 'PUBLISHED' && !isWrapper && (
         <div className="card p-6">
           <h2 className="font-semibold mb-3">
             <LinkIcon className="w-4 h-4 inline mr-1" />公开匿名链接

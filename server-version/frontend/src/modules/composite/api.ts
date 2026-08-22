@@ -1,13 +1,18 @@
 import apiClient from '../../api/client'
 import type {
   CompositeAttemptState,
+  CompositeLibraryTemplate,
   CompositePublicInfo,
   CompositeReport,
   CompositeTeacherAttemptsResponse,
+  CompositeTeacherListItem,
 } from './types'
 
 export const compositeApi = {
-  list: () => apiClient.get<{ list: any[] }>('/composite-assessments'),
+  list: () => apiClient.get<{ list: CompositeTeacherListItem[] }>('/composite-assessments'),
+  listLibrary: () => apiClient.get<{ list: CompositeLibraryTemplate[] }>('/composite-assessments/library'),
+  copy: (id: string, input: { courseId: string; code?: string; name?: string }) =>
+    apiClient.post<{ id: string }>(`/composite-assessments/${id}/copy`, input),
   detail: (id: string) => apiClient.get<any>(`/composite-assessments/${id}`),
   create: (input: Record<string, unknown>) => apiClient.post<any>('/composite-assessments', input),
   update: (id: string, input: Record<string, unknown>) => apiClient.patch<any>(`/composite-assessments/${id}`, input),

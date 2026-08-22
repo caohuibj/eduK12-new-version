@@ -31,6 +31,8 @@ export const cognitiveApi = {
     instruction?: string
     maxAttempts?: number
   }) => apiClient.post<any>('/cognitive/assignments', body),
+  updateAssignment: (id: string, body: { title?: string; instruction?: string }) =>
+    apiClient.patch<any>(`/cognitive/assignments/${id}`, body),
   publishAssignment: (id: string) =>
     apiClient.post<any>(`/cognitive/assignments/${id}/publish`, {}),
   archiveAssignment: (id: string) =>
