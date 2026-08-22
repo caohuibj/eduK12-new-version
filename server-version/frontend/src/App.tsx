@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { CapabilitiesProvider, useCognitiveEnabled } from './contexts/CapabilitiesContext'
+import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesContext'
 import Layout from './components/Layout'
 import StudentLayout from './components/StudentLayout'
 
@@ -201,7 +201,15 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 }
 
 function AppRoutes() {
-  const cognitiveModuleEnabled = useCognitiveEnabled()
+  const { cognitiveEnabled: cognitiveModuleEnabled, isLoading } = useCapabilities()
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>加载中...</div>
+      </div>
+    )
+  }
 
   return (
         <Routes>

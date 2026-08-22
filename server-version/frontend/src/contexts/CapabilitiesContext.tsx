@@ -13,7 +13,7 @@ const CapabilitiesContext = createContext<CapabilitiesContextType>({
 })
 
 export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cognitiveEnabled, setCognitiveEnabled] = useState(cognitiveBuildEnabled)
+  const [cognitiveEnabled, setCognitiveEnabled] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -23,10 +23,12 @@ export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ childr
         if (cancelled) return
         if (response.code === 0 && typeof response.data?.cognitive === 'boolean') {
           setCognitiveEnabled(response.data.cognitive)
+        } else {
+          setCognitiveEnabled(cognitiveBuildEnabled)
         }
       })
       .catch(() => {
-        // Keep the build-time fallback when the capabilities endpoint is unreachable.
+        if (!cancelled) setCognitiveEnabled(cognitiveBuildEnabled)
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)
@@ -43,4 +45,6 @@ export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ childr
   )
 }
 
-export const useCognitiveEnabled = () => useContext(CapabilitiesContext).cognitiveEnabled
+export const useCapabilities = () => useContext(CapabilitiesContext)
+
+export const useCognitiveEnabled = () => useCapabilities().cognitiveEnabled
