@@ -1,6 +1,6 @@
 # 延后需求：综合测评教师端结果与作答一览
 
-**状态：** 只记录，本轮不实现。  
+**状态：** 设计已拍板，见 `docs/design-composite-teacher-results-and-admin-library.md`（Slice B；PR 1 API，PR 2 UI）。本轮 `fix/composite-create-ux` 仍不实现。  
 **提出：** 手动做完综合测评后，教师侧看不清有多少人作答、作答在哪看。  
 **当前停点：** `checkpoint-2026-08-22-followups`
 
