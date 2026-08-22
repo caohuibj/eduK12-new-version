@@ -18,7 +18,9 @@ import {
   FileText,
   ClipboardCheck,
   Share2,
+  Brain,
 } from 'lucide-react'
+import { cognitiveModuleEnabled } from '../modules/cognitive/feature'
 
 interface MenuItem {
   path: string
@@ -43,6 +45,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: '/scales', label: '心理量表', icon: <FileText className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/questionnaires', label: '聚合问卷', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/composite-assessments', label: '综合测评', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
+    ...(cognitiveModuleEnabled
+      ? [{ path: '/cognitive-assignments', label: '认知任务', icon: <Brain className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] as ('STUDENT' | 'TEACHER' | 'ADMIN')[] }]
+      : []),
     { path: '/general-questionnaires', label: '泛化问卷', icon: <Share2 className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/videos', label: '视频库', icon: <Video className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/images', label: '图片库', icon: <ImageIcon className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },

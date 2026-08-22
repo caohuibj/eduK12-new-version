@@ -7,6 +7,7 @@ export interface User {
   phone?: string
   isActive?: boolean
   isFrozen?: boolean
+  teacherApproved?: boolean
   expiresAt?: string
   createdAt?: string
 }

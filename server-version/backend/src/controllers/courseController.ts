@@ -57,6 +57,16 @@ export const courseController = {
         where.creatorId = userId
       }
 
+      // 学生只能看到自己已加入（ACTIVE/APPROVED）的课程，避免列出全站课程
+      if (userRole === UserRole.STUDENT) {
+        where.students = {
+          some: {
+            studentId: userId,
+            status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+          },
+        }
+      }
+
       // 并行执行查询和计数
       const [courses, total] = await Promise.all([
         prisma.course.findMany({
@@ -511,7 +521,7 @@ export const courseController = {
     }
   },
 
-  // 结束课程（冻结所有学生账号）
+  // 结束课程：只关闭本课（停止招募），不冻结学生在其他课程的账号
   async endCourse(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -542,31 +552,14 @@ export const courseController = {
       }
 
       const now = new Date()
-      const studentIds = course.students.map(s => s.studentId)
+      const studentCount = course.students.length
 
-      // 使用事务保证原子性：课程结束和学生冻结同时成功或失败
-      await prisma.$transaction(async (tx) => {
-        // 更新课程状态为已结束
-        await tx.course.update({
-          where: { id },
-          data: {
-            status: 'COMPLETED',
-            endedAt: now,
-          }
-        })
-
-        // 冻结所有学生账号
-        if (studentIds.length > 0) {
-          await tx.user.updateMany({
-            where: {
-              id: {
-                in: studentIds
-              }
-            },
-            data: {
-              isFrozen: true
-            }
-          })
+      await prisma.course.update({
+        where: { id },
+        data: {
+          status: 'COMPLETED',
+          endedAt: now,
+          isRecruiting: false,
         }
       })
 
@@ -576,8 +569,8 @@ export const courseController = {
 
       return success(res, {
         endedAt: now,
-        frozenStudents: studentIds.length
-      }, `课程已结束，${studentIds.length}名学生账号已冻结`)
+        studentCount,
+      }, Messages.COURSE.END_SUCCESS)
     } catch (err) {
       console.error('结束课程错误:', err)
       return error(res, '结束课程失败')

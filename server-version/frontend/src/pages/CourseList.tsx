@@ -111,16 +111,14 @@ const CourseList: React.FC = () => {
   }
 
   const handleEndCourse = async (course: Course) => {
-    const confirmMsg = course.studentCount && course.studentCount > 0
-      ? `警告：结束课程将冻结该课程的 ${course.studentCount} 名学生账号！\n\n此操作不可撤销，确定要继续吗？`
-      : '确定要结束这门课程吗？\n\n此操作不可撤销。'
+    const confirmMsg = '确定要结束这门课程吗？\n\n结束后将停止招募，已加入的学生账号不会被冻结，他们仍可登录并参加其他课程。此操作不可撤销。'
 
     if (!window.confirm(confirmMsg)) return
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/end`)
       if (response.code === 0) {
-        alert(`课程已结束，${response.data?.frozenStudents || 0} 名学生账号已冻结`)
+        alert(response.message || '课程已结束')
         fetchCourses()
       }
     } catch (error: any) {

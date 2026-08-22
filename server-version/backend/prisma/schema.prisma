@@ -21,6 +21,7 @@ model User {
   teacherCodeId               String?                    @map("teacher_code_id")
   expiresAt                   DateTime?                  @map("expires_at")
   isFrozen                    Boolean                    @default(false) @map("is_frozen")
+  teacherApproved             Boolean                    @default(true) @map("teacher_approved")
   checkinSubmissions          CheckinSubmission[]
   checkins                    Checkin[]                  @relation("CheckinCreator")
   courseStudents              CourseStudent[]

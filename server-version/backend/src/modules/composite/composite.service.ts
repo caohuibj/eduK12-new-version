@@ -858,17 +858,10 @@ export const saveScaleAnswer = async (attemptId: string, itemId: string, input: 
   if (!assessment || assessment.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
   const scaleItem = item.scale.items.find((candidate: any) => candidate.id === input.itemId)
   if (!scaleItem) throw compositeBadRequest('量表题目不存在')
-  const scaleConfig = item.scale.config as { points?: number; labels?: Array<{ value: number }> } | null
+  const scaleConfig = item.scale.config as { points?: number } | null
   const points = Number(scaleConfig?.points ?? 5)
   if (!Number.isInteger(points) || points < 2 || points > 10 || input.value < 1 || input.value > points) {
     throw compositeBadRequest('量表答案超出有效范围')
-  }
-  const configuredValues = [
-    ...(Array.isArray(scaleConfig?.labels) ? scaleConfig.labels.map((option) => Number(option.value)) : []),
-    ...(Array.isArray(scaleItem.options) ? (scaleItem.options as Array<{ value: unknown }>).map((option) => Number(option.value)) : []),
-  ].filter((value) => Number.isFinite(value))
-  if (configuredValues.length > 0 && !configuredValues.includes(input.value)) {
-    throw compositeBadRequest('量表答案不在题目选项中')
   }
   await prisma.$transaction(async (tx: Db) => {
     const locked = await lockScaleAssessment(tx, assessment.id)

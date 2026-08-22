@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react'
+import { resolveScaleOptions } from '../../utils/scaleLabels'
 
 interface ScaleItem {
   id: string
@@ -209,7 +210,7 @@ const ScaleAssessment: React.FC = () => {
 
         {/* Options */}
         <div className="space-y-3">
-          {(scale.config?.labels || currentItem?.options || [])?.map((option) => (
+          {resolveScaleOptions(scale.config, currentItem?.options).map((option) => (
             <button
               key={option.value}
               onClick={() => handleSelectAnswer(option.value)}

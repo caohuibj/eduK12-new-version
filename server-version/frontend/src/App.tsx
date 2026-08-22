@@ -42,6 +42,8 @@ import ClassroomQRCode from './pages/teacher/ClassroomQRCode'
 import ClassroomQuestionEdit from './pages/teacher/ClassroomQuestionEdit'
 import CompositeAssessmentList from './pages/teacher/CompositeAssessmentList'
 import CompositeAssessmentEdit from './pages/teacher/CompositeAssessmentEdit'
+import CognitiveAssignmentList from './pages/teacher/CognitiveAssignmentList'
+import CognitiveAssignmentEdit from './pages/teacher/CognitiveAssignmentEdit'
 
 // Public Pages
 import PublicQuestionnaire from './pages/public/PublicQuestionnaire'
@@ -375,6 +377,26 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {cognitiveModuleEnabled && (
+            <>
+              <Route
+                path="/cognitive-assignments"
+                element={
+                  <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                    <CognitiveAssignmentList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cognitive-assignments/:id"
+                element={
+                  <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                    <CognitiveAssignmentEdit />
+                  </ProtectedRoute>
+                }
+              />
+            </>
+          )}
           <Route
             path="/teacher/classrooms"
             element={

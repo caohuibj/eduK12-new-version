@@ -33,6 +33,16 @@ import * as path from 'path'
  * 模式：controller 只做 参数解析/鉴权调用/响应映射，业务在 service。
  */
 export const cognitiveController = {
+  async listConfigs(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await assignmentService.listPublishedConfigs(req.user.role)
+      return success(res, { list: data })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
   async createAssignment(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)

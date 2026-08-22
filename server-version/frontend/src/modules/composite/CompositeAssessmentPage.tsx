@@ -4,6 +4,7 @@ import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAttemptState, CompositeCurrentItem } from './types'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
+import { resolveScaleOptions } from '../../utils/scaleLabels'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) => `composite:recovery:attempt:${attemptId}`
@@ -248,7 +249,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const current = state.currentItem
   const scale = current?.scale
   const scaleQuestion = scale?.items?.[scaleIndex]
-  const scaleOptions = scale?.config?.labels || scaleQuestion?.options || []
+  const scaleOptions = resolveScaleOptions(scale?.config, scaleQuestion?.options)
 
   return (
     <div className="max-w-3xl mx-auto">

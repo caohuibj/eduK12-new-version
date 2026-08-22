@@ -20,6 +20,29 @@ export interface CognitiveSessionApi {
  */
 
 export const cognitiveApi = {
+  listConfigs: () =>
+    apiClient.get<{ list: Array<{ id: string; testType: string; configVersion: string; name: string; instruction: string | null }> }>('/cognitive/configs'),
+  listTeacherAssignments: (status?: string) =>
+    apiClient.get<any>(status ? `/cognitive/assignments?status=${encodeURIComponent(status)}` : '/cognitive/assignments'),
+  createAssignment: (body: {
+    courseId: string
+    configId: string
+    title: string
+    instruction?: string
+    maxAttempts?: number
+  }) => apiClient.post<any>('/cognitive/assignments', body),
+  publishAssignment: (id: string) =>
+    apiClient.post<any>(`/cognitive/assignments/${id}/publish`, {}),
+  archiveAssignment: (id: string) =>
+    apiClient.post<any>(`/cognitive/assignments/${id}/archive`, {}),
+  listPublicTokens: (id: string) =>
+    apiClient.get<{ list: any[]; total: number }>(`/cognitive/assignments/${id}/public-tokens`),
+  createPublicToken: (id: string, body: { expiresAt: string; maxUses: number }) =>
+    apiClient.post<any>(`/cognitive/assignments/${id}/public-tokens`, body),
+  disablePublicToken: (id: string, tokenId: string) =>
+    apiClient.delete<any>(`/cognitive/assignments/${id}/public-tokens/${tokenId}`),
+  exportData: (id: string, body: { detail: 'summary' | 'full'; format: 'csv' | 'sav' }) =>
+    apiClient.post<{ fileName: string }>(`/cognitive/assignments/${id}/export`, body),
   getMyAssignments: () =>
     apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my'),
   getAssignment: (id: string) =>

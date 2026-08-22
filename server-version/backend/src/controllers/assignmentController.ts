@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
-import { UserRole, AssignmentStatus, SubmissionStatus, Question } from '../types'
+import { UserRole, AssignmentStatus, SubmissionStatus, CourseStudentStatus, Question } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
@@ -66,9 +66,17 @@ export const assignmentController = {
         }
       }
 
-      // 学生只能看到已发布的作业
+      // 学生只能看到自己已加入课程中的已发布作业
       if (userRole === UserRole.STUDENT) {
         where.status = AssignmentStatus.PUBLISHED
+        where.course = {
+          students: {
+            some: {
+              studentId: userId,
+              status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+            },
+          },
+        }
       }
 
       // 教师只能看到自己课程的作业，管理员可以看到所有

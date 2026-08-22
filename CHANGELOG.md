@@ -1,5 +1,9 @@
 # Changelog
 
+## Local checkpoint — 2026-08-22
+
+Functional baseline on `dev` after PR #9, plus gap-fills from local testing (enrollment-scoped student lists, end-course without global freeze, teacher cognitive assignment UI, teacher registration approval, consecutive scale labels, public questionnaire quota on start not GET). See `docs/checkpoint-2026-08-22.md`.
+
 ## v1.0.0 — Release Candidate
 
 ### Added

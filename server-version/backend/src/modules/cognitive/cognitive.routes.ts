@@ -10,6 +10,8 @@ import { UserRole } from '../../types'
  */
 const router = Router()
 
+router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
+
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)
 router.get('/history', authenticate, requireRole(UserRole.STUDENT), cognitiveController.myHistory)

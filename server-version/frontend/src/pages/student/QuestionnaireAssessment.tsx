@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle, FileText, Layers } from 'lucide-react'
+import { resolveScaleOptions } from '../../utils/scaleLabels'
 
 // Build: 2026-03-29-v3 - 支持表单题目和量表混合流程
 
@@ -529,7 +530,7 @@ const QuestionnaireAssessment: React.FC = () => {
 
           {/* 选项 */}
           <div className="space-y-3">
-            {(data.currentScale.config?.labels || currentItem?.options || [])?.map((option) => (
+            {resolveScaleOptions(data.currentScale.config, currentItem?.options).map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleSelectAnswer(option.value)}

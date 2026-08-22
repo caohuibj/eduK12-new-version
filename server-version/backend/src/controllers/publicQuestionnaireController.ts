@@ -146,9 +146,6 @@ export const publicQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      // 记录访问
-      await tokenService.recordAccess(validation.token!.id)
-
       logger.info('公开访问问卷', {
         token: token.substring(0, 10) + '...',
         questionnaireId: questionnaire.id,
@@ -433,6 +430,11 @@ export const publicQuestionnaireController = {
 
         if (!questionnaire) {
           return notFound(res, '问卷不存在')
+        }
+
+        const claimed = await tokenService.claimAccess(tokenId)
+        if (!claimed) {
+          return error(res, '链接访问次数已达上限', 403)
         }
 
         // 创建问卷测评记录（匿名）

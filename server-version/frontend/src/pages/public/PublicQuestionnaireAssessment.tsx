@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, InputNumber, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
+import { resolveScaleOptions } from '../../utils/scaleLabels'
 
 // Build: 2026-03-29 - 支持表单题目和量表混合流程
 
@@ -513,20 +514,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     }
   }
 
-  // 复用量表逻辑：优先使用 labels，其次 options，最后生成数字
-  const options = data.currentScale.config?.labels || currentItem?.options
-  let displayOptions = []
-  
-  if (!options || options.length === 0) {
-    // 生成默认数字选项
-    const points = data.currentScale.config?.points || 5
-    displayOptions = Array.from({ length: points }, (_, i) => ({
-      value: i + 1,
-      label: String(i + 1)
-    }))
-  } else {
-    displayOptions = options
-  }
+  const displayOptions = resolveScaleOptions(data.currentScale.config, currentItem?.options)
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">

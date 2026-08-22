@@ -6,7 +6,8 @@ import { useAuth } from '../contexts/AuthContext'
 import type { User } from '../types'
 
 interface TeacherRegisterData {
-  token: string
+  token?: string
+  pendingApproval?: boolean
   user: User
 }
 
@@ -25,6 +26,7 @@ const TeacherRegister: React.FC = () => {
     nickname: '',
   })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [submitted, setSubmitted] = useState(false)
 
   const validateUsername = (username: string) => {
     const regex = /^[a-zA-Z0-9]+$/
@@ -82,7 +84,9 @@ const TeacherRegister: React.FC = () => {
         nickname: formData.nickname.trim(),
       })
 
-      if (response.code === 0 && response.data) {
+      if (response.code === 0 && response.data?.pendingApproval) {
+        setSubmitted(true)
+      } else if (response.code === 0 && response.data?.token) {
         loginWithToken(response.data.token, response.data.user)
         navigate('/dashboard')
       } else {
@@ -103,6 +107,23 @@ const TeacherRegister: React.FC = () => {
           <p className="text-gray-600 mb-4">请通过教师码登录页面进入</p>
           <Link to="/teacher/login" className="btn-primary inline-block">
             返回教师登录
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="card max-w-md text-center">
+          <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-gray-800 mb-2">已提交，等待管理员审核</h1>
+          <p className="text-gray-600 mb-6">
+            账号已创建。管理员在「用户管理」中点通过后，即可用刚才设置的用户名和密码登录。
+          </p>
+          <Link to="/teacher/account-login" className="btn-primary inline-block">
+            前往教师登录
           </Link>
         </div>
       </div>
@@ -236,7 +257,7 @@ const TeacherRegister: React.FC = () => {
 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
             <p className="font-medium mb-1">💡 账号说明</p>
-            <p>注册完成后，请使用设置的用户名和密码登录。教师码将立即失效，账号有效期为1年。</p>
+            <p>提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。</p>
           </div>
         </div>
       </div>

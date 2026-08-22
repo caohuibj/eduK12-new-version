@@ -89,6 +89,28 @@ export const createAssignment = async (
   return { ...assignment, config: undefined, course: { id: course.id, title: course.title, courseCode: course.courseCode } }
 }
 
+/** 教师创建任务时可选的已发布配置（不含运行 config JSON）。 */
+export const listPublishedConfigs = async (role: UserRole) => {
+  if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
+
+  const configs = await prisma.cognitiveTestConfig.findMany({
+    where: { status: 'PUBLISHED' },
+    orderBy: [{ testType: 'asc' }, { configVersion: 'asc' }],
+    select: {
+      id: true,
+      testType: true,
+      configVersion: true,
+      name: true,
+      instruction: true,
+      engineVersion: true,
+      scoringVersion: true,
+      status: true,
+    },
+  })
+
+  return configs
+}
+
 export const listTeacherAssignments = async (
   userId: string,
   role: UserRole,

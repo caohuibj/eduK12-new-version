@@ -8,6 +8,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField, safeDecrypt } from '../utils/encryption'
+import { normalizeScaleConfig, scaleLabelsError } from '../utils/scaleLabels'
 
 // ==================== Validation Schemas ====================
 
@@ -135,7 +136,8 @@ export const scaleController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { code, name, description, visibility, config, estimatedTime, instruction } = result.data
+      const { code, name, description, visibility, estimatedTime, instruction } = result.data
+      const config = normalizeScaleConfig(result.data.config)
 
       // 检查编码是否已存在
       const existingScale = await prisma.scale.findUnique({
@@ -265,9 +267,14 @@ export const scaleController = {
         return error(res, '只有草稿状态的量表可以修改')
       }
 
+      const payload = {
+        ...result.data,
+        config: result.data.config ? normalizeScaleConfig(result.data.config) : undefined,
+      }
+
       const updated = await prisma.scale.update({
         where: { id },
-        data: result.data,
+        data: payload,
         include: {
           creator: {
             select: {
@@ -372,9 +379,15 @@ export const scaleController = {
         return error(res, '量表必须包含至少一个维度')
       }
 
+      const normalized = normalizeScaleConfig(scale.config as { points?: number; labels?: Array<{ value: number; label: string }> } | null)
+      const labelsError = scaleLabelsError(normalized.points, scale.config ? (scale.config as { labels?: Array<{ value: number; label: string }> }).labels : null)
+      if (labelsError) {
+        return error(res, labelsError + '。请在编辑页为 1 到 ' + normalized.points + ' 每一档填写文字后再发布')
+      }
+
       const updated = await prisma.scale.update({
         where: { id },
-        data: { status: 'PUBLISHED' }
+        data: { status: 'PUBLISHED', config: normalized }
       })
 
       return success(res, updated, '量表发布成功')
@@ -1126,6 +1139,12 @@ export const scaleController = {
       const item = assessment.scale.items.find(i => i.id === itemId)
       if (!item) {
         return error(res, '题目不存在')
+      }
+
+      const scaleConfig = assessment.scale.config as { points?: number } | null
+      const points = Number(scaleConfig?.points ?? 5)
+      if (!Number.isInteger(value) || value < 1 || value > points) {
+        return error(res, '答案超出量表点数范围')
       }
 
       // 更新答案

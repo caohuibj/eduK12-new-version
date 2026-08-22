@@ -75,6 +75,10 @@ export const authController = {
         return unauthorized(res, '用户名或密码错误')
       }
 
+      if (user.role === UserRole.TEACHER && !user.teacherApproved) {
+        return unauthorized(res, '账号正在等待管理员审核，审核通过后即可登录')
+      }
+
       const token = generateToken({
         userId: user.id,
         username: user.username,
@@ -188,34 +192,30 @@ export const authController = {
           nickname,
           teacherCodeId: teacherCode.id,
           expiresAt,
+          teacherApproved: false,
         }
       })
 
-      // 标记教师码为已使用
+      // 标记教师码为已使用（待审期间不可再用同一码重复注册）
       await prisma.teacherCode.update({
         where: { id: teacherCode.id },
         data: { 
           usedCount: { increment: 1 },
-          isActive: false, // 使用一次后失效
+          isActive: false,
         }
       })
 
-      const token = generateToken({
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-      })
-
       return success(res, {
-        token,
+        pendingApproval: true,
         user: {
           id: user.id,
           username: user.username,
           role: user.role,
           nickname: user.nickname,
           expiresAt: user.expiresAt,
+          teacherApproved: false,
         }
-      }, '教师账号注册成功')
+      }, '已提交注册，请等待管理员审核通过后再登录')
     } catch (err) {
       logger.error('教师注册错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -372,6 +372,10 @@ export const authController = {
       // 检查账号是否过期
       if (user.expiresAt && user.expiresAt < new Date()) {
         return unauthorized(res, '账号已过期，请联系管理员')
+      }
+
+      if (user.role === UserRole.TEACHER && !user.teacherApproved) {
+        return unauthorized(res, '账号正在等待管理员审核，审核通过后即可登录')
       }
 
       return success(res, {

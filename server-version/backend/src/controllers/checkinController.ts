@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
-import { UserRole } from '../types'
+import { UserRole, CourseStudentStatus } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
@@ -92,6 +92,18 @@ export const checkinController = {
         const tagArray = (tags as string).split(',').map(t => t.trim()).filter(Boolean)
         if (tagArray.length > 0) {
           where.tags = { hasEvery: tagArray }
+        }
+      }
+
+      // 学生只能看到自己已加入课程中的打卡
+      if (userRole === UserRole.STUDENT) {
+        where.course = {
+          students: {
+            some: {
+              studentId: userId,
+              status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+            },
+          },
         }
       }
 

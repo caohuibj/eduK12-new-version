@@ -12,5 +12,6 @@ router.get('/:id', authenticate, userController.detail)
 router.put('/:id', authenticate, userController.update)
 router.delete('/:id', authenticate, requireAdmin, userController.delete)
 router.post('/:id/reset-password', authenticate, requireAdmin, userController.resetPassword)
+router.post('/:id/approve-teacher', authenticate, requireAdmin, userController.approveTeacher)
 
 export default router
