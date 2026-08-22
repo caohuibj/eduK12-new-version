@@ -447,7 +447,7 @@ export const listAttemptsForTeacher = async (
 
 export const updateComposite = async (userId: string, role: UserRole, id: string, input: UpdateCompositeInput) => {
   assertTeacher(role)
-  const existing = await loadComposite(id)
+  const existing = await loadComposite(id, true)
   assertOwner(existing, userId, role)
   const providedKeys = (Object.keys(input) as Array<keyof UpdateCompositeInput>).filter((key) => input[key] !== undefined)
   const publicWindowOnly = providedKeys.length > 0 && providedKeys.every((key) => key === 'expiresAt' || key === 'publicEnabled')
@@ -457,6 +457,13 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
   const nextCourseId = input.courseId === undefined ? existing.courseId : input.courseId
   if (existing.status === 'DRAFT') {
     await validateCourse(nextCourseId, userId, role)
+    if (
+      input.courseId !== undefined &&
+      input.courseId !== existing.courseId &&
+      existing.items.some((item: { type: string }) => item.type === 'COGNITIVE')
+    ) {
+      throw compositeBadRequest('请先移除认知模块，或复制到目标课程')
+    }
   }
   const nextOpensAt = input.opensAt === undefined ? existing.opensAt : parseDate(input.opensAt)
   const nextExpiresAt = input.expiresAt === undefined ? existing.expiresAt : parseDate(input.expiresAt)

@@ -7,7 +7,7 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
-    compositeAssessment: { findUnique: vi.fn() },
+    compositeAssessment: { findUnique: vi.fn(), update: vi.fn() },
     cognitiveAssignment: { findUnique: vi.fn() },
     compositeAssessmentItem: { create: vi.fn() },
     course: { findUnique: vi.fn() },
@@ -16,7 +16,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
-import { addItem, publishComposite } from '../../modules/composite/composite.service'
+import { addItem, publishComposite, updateComposite } from '../../modules/composite/composite.service'
 
 const TEACHER = UserRole.TEACHER
 
@@ -109,5 +109,39 @@ describe('publishComposite cognitive course match', () => {
 
     await expect(publishComposite('teacher-a', TEACHER, 'composite-1'))
       .rejects.toMatchObject({ statusCode: 400, message: '认知任务必须与综合测评属于同一课程' })
+  })
+})
+
+describe('updateComposite course change with cognitive items', () => {
+  it('rejects changing courseId when the draft already has a cognitive module', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ type: 'COGNITIVE', cognitiveAssignment: assignment() }],
+    }))
+    mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-2', creatorId: 'teacher-a' })
+
+    await expect(updateComposite('teacher-a', TEACHER, 'composite-1', { courseId: 'course-2' }))
+      .rejects.toMatchObject({ statusCode: 400, message: '请先移除认知模块，或复制到目标课程' })
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
+  })
+
+  it('allows changing courseId when the draft has no cognitive module', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ type: 'SCALE', scale: { status: 'PUBLISHED' } }],
+    }))
+    mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-2', creatorId: 'teacher-a' })
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ id: 'composite-1', courseId: 'course-2' })
+
+    await updateComposite('teacher-a', TEACHER, 'composite-1', { courseId: 'course-2' })
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalled()
+  })
+
+  it('allows a no-op courseId patch when cognitive items exist', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ type: 'COGNITIVE', cognitiveAssignment: assignment() }],
+    }))
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ id: 'composite-1', courseId: 'course-1' })
+
+    await updateComposite('teacher-a', TEACHER, 'composite-1', { courseId: 'course-1' })
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalled()
   })
 })
