@@ -57,12 +57,10 @@ export const updateAssignmentSchema = z
   )
 
 /** 教师端列表查询参数（D3 §5）。 */
-export const listAssignmentsQuerySchema = z
-  .object({
-    courseId: z.string().optional(),
-    status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
-  })
-  .strict()
+export const listAssignmentsQuerySchema = z.object({
+  courseId: z.string().optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
+})
 
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>
 export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>
@@ -76,11 +74,9 @@ export type ListAssignmentsQuery = z.infer<typeof listAssignmentsQuerySchema>
  * 认知测评导出预览查询。
  * summary 只导出服务端汇总指标；full 额外展开每个原始试次。
  */
-export const cognitiveExportQuerySchema = z
-  .object({
-    detail: z.enum(['summary', 'full']).optional().default('summary'),
-  })
-  .strict()
+export const cognitiveExportQuerySchema = z.object({
+  detail: z.enum(['summary', 'full']).optional().default('summary'),
+})
 
 /**
  * 认知测评导出请求。
