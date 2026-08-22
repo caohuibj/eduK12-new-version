@@ -8,6 +8,7 @@ import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
 import { BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND } from './cognitive.errors'
+import { isCompositeWrapper } from './assignment.access'
 
 const assertWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw FORBIDDEN('Public link is disabled')
@@ -54,6 +55,9 @@ export const getPublicAssignmentInfo = async (tokenValue: string) => {
 
 export const startPublicSession = async (tokenValue: string, recoveryToken?: string) => {
   const token = await loadToken(tokenValue)
+  if (isCompositeWrapper(token.assignment)) {
+    throw FORBIDDEN('此认知任务仅用于综合测评，不能单独作答或公开分发')
+  }
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
     const existing = await prisma.cognitiveSession.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash, userId: null } })
@@ -109,6 +113,7 @@ export const createAccessTokenForAssignment = async (userId: string, role: UserR
   if (!assignment) throw NOT_FOUND('Cognitive assignment not found')
   if (role !== UserRole.ADMIN && (role !== UserRole.TEACHER || assignment.createdBy !== userId)) throw FORBIDDEN('Not the creator of this assignment')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Only published assignments can create public links')
+  if (isCompositeWrapper(assignment)) throw BAD_REQUEST('此认知任务仅用于综合测评，不能单独作答或公开分发')
   const expiry = new Date(expiresAt)
   if (expiry.getTime() <= Date.now()) throw BAD_REQUEST('expiresAt must be in the future')
   const record = await prisma.cognitiveAccessToken.create({ data: { assignmentId, token: createAccessToken(), createdBy: userId, expiresAt: expiry, maxUses } })

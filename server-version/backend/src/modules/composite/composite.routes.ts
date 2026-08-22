@@ -17,6 +17,8 @@ router.get('/attempts/:attemptId/report', authenticate, requireRole(UserRole.STU
 // 教师端模板管理
 router.get('/', authenticate, requireTeacher, compositeController.list)
 router.post('/', authenticate, requireTeacher, compositeController.create)
+router.get('/library', authenticate, requireTeacher, compositeController.library)
+router.post('/:id/copy', authenticate, requireTeacher, compositeController.copy)
 router.get('/:id', authenticate, requireTeacher, compositeController.detail)
 router.patch('/:id', authenticate, requireTeacher, compositeController.update)
 router.post('/:id/items', authenticate, requireTeacher, compositeController.addItem)

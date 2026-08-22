@@ -59,6 +59,7 @@ describe('cognitive history service', () => {
         status: 'COMPLETED',
         scoreEncrypted: { not: null },
         qualityFlagsEncrypted: { not: null },
+        compositeAttemptId: null,
       },
       select: expect.not.objectContaining({ metricsEncrypted: true }),
     }))

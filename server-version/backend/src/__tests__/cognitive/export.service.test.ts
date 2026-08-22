@@ -81,6 +81,14 @@ beforeEach(() => {
 })
 
 describe('cognitive export service', () => {
+  it('rejects exporting a composite wrapper', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, listedStandalone: false })
+    await expect(getCognitiveExportData('assignment-1')).rejects.toMatchObject({
+      statusCode: 403,
+      message: '请从综合测评导出',
+    })
+  })
+
   it('generates unique filenames for concurrent exports', () => {
     const first = makeCognitiveExportFileName('assignment-1', 'summary', 'csv')
     const second = makeCognitiveExportFileName('assignment-1', 'summary', 'csv')

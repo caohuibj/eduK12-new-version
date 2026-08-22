@@ -144,6 +144,11 @@ describe('createSession eligibility', () => {
     await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 400 })
   })
 
+  it('rejects a composite wrapper for standalone sessions', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, listedStandalone: false })
+    await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 403 })
+  })
+
   it('rejects an assignment without course', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, courseId: null })
     await expect(createSession('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 400 })

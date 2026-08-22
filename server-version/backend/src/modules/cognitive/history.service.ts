@@ -24,6 +24,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
     status: 'COMPLETED' as const,
     scoreEncrypted: { not: null },
     qualityFlagsEncrypted: { not: null },
+    compositeAttemptId: null,
   }
   const sessions = await prisma.cognitiveSession.findMany({
     where,

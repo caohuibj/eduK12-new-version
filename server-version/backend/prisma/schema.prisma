@@ -85,6 +85,7 @@ model Course {
   updatedAt            DateTime              @updatedAt @map("updated_at")
   endedAt              DateTime?             @map("ended_at")
   isRecruiting         Boolean               @default(true) @map("is_recruiting")
+  isLibrary            Boolean               @default(false) @map("is_library")
   assignments          Assignment[]
   checkins             Checkin[]
   students             CourseStudent[]
@@ -100,6 +101,7 @@ model Course {
   cognitiveAssignments CognitiveAssignment[] @relation("CourseCognitiveAssignments")
   compositeAssessments CompositeAssessment[] @relation("CourseCompositeAssessments")
 
+  @@index([isLibrary])
   @@map("courses")
 }
 
@@ -657,18 +659,23 @@ model CompositeAssessment {
   expiresAt   DateTime?                 @map("expires_at")
   maxAttempts Int                       @default(1) @map("max_attempts")
   publicEnabled Boolean                 @default(false) @map("public_enabled")
+  copyable      Boolean                 @default(false) @map("copyable")
+  copiedFromId  String?                 @map("copied_from_id")
   createdAt   DateTime                  @default(now()) @map("created_at")
   updatedAt   DateTime                  @updatedAt @map("updated_at")
   publishedAt DateTime?                 @map("published_at")
 
   course       Course?                       @relation("CourseCompositeAssessments", fields: [courseId], references: [id], onDelete: SetNull)
   creator      User?                         @relation("CompositeAssessmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  copiedFrom   CompositeAssessment?          @relation("CompositeCopySource", fields: [copiedFromId], references: [id], onDelete: SetNull)
+  copies       CompositeAssessment[]         @relation("CompositeCopySource")
   items        CompositeAssessmentItem[]
   accessTokens CompositeAssessmentAccessToken[]
   attempts     CompositeAssessmentAttempt[]
 
   @@index([courseId, status])
   @@index([createdBy, status])
+  @@index([copyable, status])
   @@map("composite_assessments")
 }
 
@@ -1000,6 +1007,7 @@ model CognitiveAssignment {
   createdAt      DateTime                  @default(now()) @map("created_at")
   updatedAt      DateTime                  @updatedAt @map("updated_at")
   publishedAt    DateTime?                 @map("published_at")
+  listedStandalone Boolean                 @default(true) @map("listed_standalone")
 
   course   Course?             @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
   config   CognitiveTestConfig @relation(fields: [configId], references: [id], onDelete: Restrict)

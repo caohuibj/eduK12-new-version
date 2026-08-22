@@ -9,6 +9,7 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
+import { rejectWrapperForStandaloneUse } from './assignment.access'
 import { resolveCognitiveReference } from './reference'
 
 /**
@@ -58,6 +59,7 @@ export const loadStartableAssignment = async (
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Assignment is not published')
+  rejectWrapperForStandaloneUse(assignment)
   if (!assignment.courseId) throw BAD_REQUEST('Assignment has no course')
 
   const course = await prisma.course.findUnique({ where: { id: assignment.courseId } })

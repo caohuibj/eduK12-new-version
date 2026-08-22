@@ -14,6 +14,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       updateMany: vi.fn(),
     },
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
+    compositeAssessmentItem: { findFirst: vi.fn() },
   },
 }))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -72,6 +73,7 @@ const baseInput = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue(null)
 })
 
 describe('createAssignment', () => {
@@ -312,5 +314,49 @@ describe('publishAssignment / archiveAssignment', () => {
         data: { status: 'ARCHIVED' },
       })
     )
+  })
+
+  it('rejects archive when a non-archived composite still references the assignment', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, status: 'PUBLISHED' })
+    mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'item-1' })
+    await expect(archiveAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+  })
+})
+
+describe('composite wrapper assignment class', () => {
+  const wrapper = { ...assignment, status: 'PUBLISHED' as const, listedStandalone: false }
+
+  it('hides wrappers from the student assignment list', async () => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-1' }])
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
+    await listStudentAssignments('student-1')
+    expect(mockPrisma.cognitiveAssignment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ listedStandalone: true, status: 'PUBLISHED' }),
+      }),
+    )
+  })
+
+  it('returns 404 for student GET of a wrapper', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...wrapper, config, course })
+    await expect(getAssignmentForStudent('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('allows a narrow wrapper PATCH of title and instruction', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
+    mockPrisma.cognitiveAssignment.update.mockResolvedValue({ ...wrapper, title: '综合测评用' })
+    const result = await updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { title: '综合测评用', instruction: '说明' })
+    expect(result.title).toBe('综合测评用')
+    expect(mockPrisma.cognitiveAssignment.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { title: '综合测评用', instruction: '说明' } }),
+    )
+  })
+
+  it('rejects wrapper PATCH of maxAttempts', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
+    await expect(updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { maxAttempts: 3 })).rejects.toMatchObject({
+      statusCode: 400,
+    })
   })
 })
