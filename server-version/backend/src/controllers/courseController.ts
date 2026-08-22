@@ -80,6 +80,7 @@ export const courseController = {
                 id: true,
                 nickname: true,
                 username: true,
+                role: true,
               }
             },
             _count: {

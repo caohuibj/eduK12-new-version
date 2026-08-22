@@ -65,6 +65,7 @@ describe('CompositeAssessmentEdit copyable toggle', () => {
     render(<CompositeAssessmentEdit />)
 
     expect(await screen.findByText('允许教师复制')).toBeInTheDocument()
+    expect(screen.getByText('库课程')).toBeInTheDocument()
     expect(screen.queryByText('公开匿名链接')).not.toBeInTheDocument()
     expect(screen.getByText(/不能生成公开链接/)).toBeInTheDocument()
 

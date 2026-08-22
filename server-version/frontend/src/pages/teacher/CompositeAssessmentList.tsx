@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { compositeApi } from '../../modules/composite/api'
 import type { CompositeLibraryTemplate, CompositeTeacherListItem } from '../../modules/composite/types'
 
-type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean }
+type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean; creatorId?: string }
 
 const itemTypeLabel: Record<string, string> = {
   SCALE: '量表',
@@ -52,7 +52,7 @@ const CompositeAssessmentList: React.FC = () => {
   })
   const [error, setError] = useState<string | null>(null)
 
-  const teachingCourses = courses.filter((course) => !course.isLibrary)
+  const teachingCourses = courses.filter((course) => !course.isLibrary && course.creatorId === user?.id)
   const createCourses = isAdmin ? courses : teachingCourses
   const selectedCreateCourse = createCourses.find((course) => course.id === form.courseId)
 
