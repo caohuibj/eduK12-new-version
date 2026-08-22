@@ -3,12 +3,13 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck, Brain } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from './Footer'
-import { cognitiveModuleEnabled } from '../modules/cognitive/feature'
+import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 
 const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const cognitiveModuleEnabled = useCognitiveEnabled()
 
   const handleLogout = () => {
     logout()

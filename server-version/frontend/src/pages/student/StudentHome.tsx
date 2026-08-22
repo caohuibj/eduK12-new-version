@@ -4,11 +4,12 @@ import { Plus, Users, BookOpen, Clock, ChevronRight, Keyboard, Brain } from 'luc
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import type { Course } from '../../types'
-import { cognitiveModuleEnabled } from '../../modules/cognitive/feature'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 
 const StudentHome: React.FC = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const cognitiveModuleEnabled = useCognitiveEnabled()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [showJoinModal, setShowJoinModal] = useState(false)

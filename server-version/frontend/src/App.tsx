@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { CapabilitiesProvider, useCognitiveEnabled } from './contexts/CapabilitiesContext'
 import Layout from './components/Layout'
 import StudentLayout from './components/StudentLayout'
 
@@ -78,7 +79,7 @@ import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
 import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
 import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
 import PublicCognitiveAssignment from './modules/cognitive/pages/PublicCognitiveAssignment'
-import { cognitiveModuleEnabled } from './modules/cognitive/feature'
+
 
 // BigScreen Pages
 import BigScreen from './pages/bigscreen/BigScreen'
@@ -199,10 +200,10 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>
 }
 
-function App() {
+function AppRoutes() {
+  const cognitiveModuleEnabled = useCognitiveEnabled()
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
         <Routes>
           {/* Portal - Entry Point */}
           <Route
@@ -721,8 +722,18 @@ function App() {
           {/* Default Redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+  )
+}
+
+function App() {
+  return (
+    <CapabilitiesProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </CapabilitiesProvider>
   )
 }
 

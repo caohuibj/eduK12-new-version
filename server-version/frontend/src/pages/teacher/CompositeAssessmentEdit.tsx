@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronDown, ChevronUp, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
 import apiClient from '../../api/client'
 import { compositeApi } from '../../modules/composite/api'
-import { cognitiveModuleEnabled } from '../../modules/cognitive/feature'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 
 const CompositeAssessmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
@@ -20,6 +20,7 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [tokenExpiresAt, setTokenExpiresAt] = useState('')
   const [tokenMaxUses, setTokenMaxUses] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const cognitiveModuleEnabled = useCognitiveEnabled()
 
   const load = async () => {
     try {
