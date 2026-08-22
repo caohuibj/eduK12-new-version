@@ -269,6 +269,32 @@ describe('copyComposite', () => {
     expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
   })
 
+  it('copies a GRANT config from a library template without requiring a material grant', async () => {
+    mockPrisma.compositeAssessment.findUnique
+      .mockResolvedValueOnce(libraryTemplate({
+        items: [{
+          id: 'cog-1',
+          type: 'COGNITIVE',
+          position: 0,
+          required: true,
+          cognitiveAssignment: {
+            id: 'admin-asg',
+            title: '反应时',
+            instruction: '看绿点',
+            configId: 'config-1',
+            config: { ...publishedConfig, accessPolicy: 'GRANT' },
+          },
+        }],
+      }))
+      .mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-grant' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-grant', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalled()
+  })
+
   it('lets ADMIN publish a draft bound to a library course', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({
       status: 'DRAFT',

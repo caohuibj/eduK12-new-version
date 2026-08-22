@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
+import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
 import { safeDecrypt } from '../utils/encryption'
 import { z } from 'zod'
@@ -687,6 +688,10 @@ export const questionnaireController = {
 
       if (!scale) {
         return notFound(res, '量表不存在')
+      }
+
+      if (!userId || !userRole || !(await canUseScale(userId, userRole, scale))) {
+        return forbidden(res, '无权限使用此量表')
       }
 
       // 检查是否已关联

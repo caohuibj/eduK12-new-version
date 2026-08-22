@@ -10,6 +10,7 @@ import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } f
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReference } from '../cognitive/reference'
 import { logger } from '../../utils/logger'
+import { canUseScale } from '../../services/materialGrant'
 import {
   CompositeServiceError,
   compositeBadRequest,
@@ -160,10 +161,8 @@ const assertValidItem = async (
     if (!input.scaleId || supplied !== 1) throw compositeBadRequest('量表模块必须提供 scaleId')
     const scale = await prisma.scale.findUnique({ where: { id: input.scaleId } })
     if (!scale) throw compositeNotFound('量表不存在')
+    if (!(await canUseScale(userId, role, scale))) throw compositeForbidden('无权限使用此量表')
     if (scale.status !== 'PUBLISHED') throw compositeBadRequest('只能添加已发布量表')
-    if (role !== UserRole.ADMIN && scale.creatorId !== userId) {
-      throw compositeForbidden('无权限使用此量表')
-    }
     return
   }
 

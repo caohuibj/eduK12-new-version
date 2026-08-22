@@ -5,7 +5,8 @@ import { UserRole, CognitiveAssignmentStatus } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     course: { findUnique: vi.fn() },
-    cognitiveTestConfig: { findUnique: vi.fn() },
+    cognitiveTestConfig: { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+    materialGrant: { findUnique: vi.fn(), findMany: vi.fn() },
     cognitiveAssignment: {
       create: vi.fn(),
       findMany: vi.fn(),
@@ -21,6 +22,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import {
   createAssignment,
+  listPublishedConfigs,
   listTeacherAssignments,
   listStudentAssignments,
   getAssignmentForTeacher,
@@ -74,6 +76,34 @@ const baseInput = {
 beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue(null)
+  mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
+  mockPrisma.materialGrant.findMany.mockResolvedValue([])
+})
+
+describe('listPublishedConfigs', () => {
+  it('hides GRANT configs the teacher cannot instantiate', async () => {
+    mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([
+      { id: 'open-1', accessPolicy: 'OPEN' },
+    ])
+    await listPublishedConfigs('teacher-1', TEACHER)
+    expect(mockPrisma.cognitiveTestConfig.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        status: 'PUBLISHED',
+        OR: [
+          { accessPolicy: { not: 'GRANT' } },
+          { id: { in: [] } },
+        ],
+      }),
+    }))
+  })
+
+  it('does not filter GRANT configs for ADMIN', async () => {
+    mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([])
+    await listPublishedConfigs('admin-1', ADMIN)
+    expect(mockPrisma.cognitiveTestConfig.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { status: 'PUBLISHED' },
+    }))
+  })
 })
 
 describe('createAssignment', () => {
@@ -133,6 +163,21 @@ describe('createAssignment', () => {
   it('rejects a missing course', async () => {
     mockPrisma.course.findUnique.mockResolvedValue(null)
     await expect(createAssignment('teacher-1', TEACHER, baseInput)).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('forbids creating an assignment from a GRANT config without a grant', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({ ...config, accessPolicy: 'GRANT' })
+    await expect(createAssignment('teacher-1', TEACHER, baseInput)).rejects.toMatchObject({ statusCode: 403 })
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+  })
+
+  it('allows creating an assignment from a GRANT config with a grant', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({ ...config, accessPolicy: 'GRANT' })
+    mockPrisma.materialGrant.findUnique.mockResolvedValue({ id: 'g1' })
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue(assignment)
+    await expect(createAssignment('teacher-1', TEACHER, baseInput)).resolves.toMatchObject({ status: 'DRAFT' })
   })
 })
 

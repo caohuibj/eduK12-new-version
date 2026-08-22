@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
-import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
+import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
 import { UserRole } from '../../types'
 
 /**
@@ -11,6 +11,7 @@ import { UserRole } from '../../types'
 const router = Router()
 
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
+router.patch('/configs/:id/access-policy', authenticate, requireAdmin, cognitiveController.updateAccessPolicy)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)

@@ -12,6 +12,7 @@ import { rejectWrapperForStandaloneUse } from './assignment.access'
 import {
   createAssignmentSchema,
   updateAssignmentSchema,
+  updateAccessPolicySchema,
   listAssignmentsQuerySchema,
   createSessionSchema,
   restartSessionSchema,
@@ -37,8 +38,24 @@ export const cognitiveController = {
   async listConfigs(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const data = await assignmentService.listPublishedConfigs(req.user.role)
+      const data = await assignmentService.listPublishedConfigs(req.user.userId, req.user.role)
       return success(res, { list: data })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async updateAccessPolicy(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = updateAccessPolicySchema.parse(req.body)
+      const data = await assignmentService.updateConfigAccessPolicy(
+        req.user.userId,
+        req.user.role,
+        req.params.id,
+        input.accessPolicy,
+      )
+      return success(res, data, '已更新访问策略')
     } catch (err) {
       return handleError(res, err)
     }

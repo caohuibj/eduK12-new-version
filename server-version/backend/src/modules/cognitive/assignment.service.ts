@@ -1,4 +1,4 @@
-import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus } from '@prisma/client'
+import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
@@ -10,6 +10,8 @@ import {
   CONFLICT,
 } from './cognitive.errors'
 import { isCompositeWrapper, rejectWrapperForStandaloneUse } from './assignment.access'
+import { canInstantiateConfig, grantedResourceIds } from '../../services/materialGrant'
+import { config as appConfig } from '../../config'
 
 export { CognitiveServiceError }
 
@@ -70,6 +72,9 @@ export const createAssignment = async (
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
   const { course, config } = await validateConfigForAssignment(input.courseId, input.configId, role, userId)
+  if (!(await canInstantiateConfig(userId, role, config))) {
+    throw FORBIDDEN('无权限使用此认知任务类型')
+  }
 
   // create 只建 DRAFT；createdBy 由 JWT 决定；courseSnapshot 在 publish 时写入。
   const assignment = await prisma.cognitiveAssignment.create({
@@ -91,11 +96,20 @@ export const createAssignment = async (
 }
 
 /** 教师创建任务时可选的已发布配置（不含运行 config JSON）。 */
-export const listPublishedConfigs = async (role: UserRole) => {
+export const listPublishedConfigs = async (userId: string, role: UserRole) => {
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
+  const where: Record<string, unknown> = { status: 'PUBLISHED' }
+  if (role !== UserRole.ADMIN && appConfig.materialGrantsEnabled) {
+    const grantedIds = await grantedResourceIds(userId, MaterialResourceType.COGNITIVE_CONFIG)
+    where.OR = [
+      { accessPolicy: { not: 'GRANT' } },
+      { id: { in: grantedIds } },
+    ]
+  }
+
   const configs = await prisma.cognitiveTestConfig.findMany({
-    where: { status: 'PUBLISHED' },
+    where,
     orderBy: [{ testType: 'asc' }, { configVersion: 'asc' }],
     select: {
       id: true,
@@ -106,10 +120,35 @@ export const listPublishedConfigs = async (role: UserRole) => {
       engineVersion: true,
       scoringVersion: true,
       status: true,
+      accessPolicy: true,
     },
   })
 
   return configs
+}
+
+export const updateConfigAccessPolicy = async (
+  userId: string,
+  role: UserRole,
+  id: string,
+  accessPolicy: 'OPEN' | 'GRANT',
+) => {
+  if (role !== UserRole.ADMIN) throw FORBIDDEN('Admin role required')
+  const existing = await prisma.cognitiveTestConfig.findUnique({ where: { id } })
+  if (!existing) throw NOT_FOUND('CognitiveTestConfig not found')
+  const updated = await prisma.cognitiveTestConfig.update({
+    where: { id },
+    data: { accessPolicy },
+    select: {
+      id: true,
+      testType: true,
+      configVersion: true,
+      name: true,
+      status: true,
+      accessPolicy: true,
+    },
+  })
+  return updated
 }
 
 export const listTeacherAssignments = async (
@@ -386,6 +425,7 @@ export const ensureTeacherPublishedAssignment = async (
   const parsed = entry.configSchema.safeParse(config.config)
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
+  // copy / ensure 不调用 canInstantiateConfig：模板上已有的 configId 是一次性实例化许可。
   const existing = await tx.cognitiveAssignment.findFirst({
     where: {
       createdBy: input.userId,
