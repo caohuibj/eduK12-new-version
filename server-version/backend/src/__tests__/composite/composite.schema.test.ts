@@ -7,6 +7,7 @@ import {
   compositeFormAnswerSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
+  copyCompositeSchema,
   listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
 } from '../../modules/composite/composite.schema'
@@ -66,5 +67,11 @@ describe('composite assessment schemas', () => {
     })
     expect(() => listCompositeAttemptsQuerySchema.parse({ _t: '1' })).toThrow()
     expect(() => listCompositeAttemptsQuerySchema.parse({ status: 'DONE' })).toThrow()
+  })
+
+  it('allows omitting courseId on copy so self-copy can keep the source course', () => {
+    expect(copyCompositeSchema.parse({})).toEqual({})
+    expect(copyCompositeSchema.parse({ courseId: null }).courseId).toBeNull()
+    expect(copyCompositeSchema.parse({ courseId: 'course-1' }).courseId).toBe('course-1')
   })
 })

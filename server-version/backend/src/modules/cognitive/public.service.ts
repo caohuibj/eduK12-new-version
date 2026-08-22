@@ -25,6 +25,9 @@ const loadToken = async (value: string) => {
   if (token.assignment.status !== 'PUBLISHED' || token.assignment.config.status !== 'PUBLISHED') {
     throw FORBIDDEN('Cognitive assignment is not publicly available')
   }
+  if (isCompositeWrapper(token.assignment)) {
+    throw FORBIDDEN('此认知任务仅用于综合测评，不能单独作答或公开分发')
+  }
   return token as any
 }
 

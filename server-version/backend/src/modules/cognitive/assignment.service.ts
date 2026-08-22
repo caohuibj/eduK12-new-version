@@ -166,7 +166,7 @@ export const listStudentAssignments = async (userId: string) => {
   if (courseIds.length === 0) return []
 
   const assignments = await prisma.cognitiveAssignment.findMany({
-    where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: true },
+    where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: true, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
     include: { config: true, course: true },
   })
@@ -230,7 +230,7 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
 export const getAssignmentForStudent = async (userId: string, id: string) => {
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id }, include: { config: true, course: true } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
-  if (assignment.status !== 'PUBLISHED' || !assignment.courseId || isCompositeWrapper(assignment)) {
+  if (assignment.status !== 'PUBLISHED' || !assignment.courseId || isCompositeWrapper(assignment) || assignment.course?.isLibrary) {
     throw NOT_FOUND('CognitiveAssignment not found')
   }
 

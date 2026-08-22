@@ -103,7 +103,7 @@ export const publicRecoverySchema = z.object({
 }).strict()
 
 export const copyCompositeSchema = z.object({
-  courseId: z.string().min(1).nullable(),
+  courseId: z.string().min(1).nullable().optional(),
   code: z.string().min(1).max(80).optional(),
   name: z.string().min(1).max(200).optional(),
 }).strict()

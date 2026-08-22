@@ -8,6 +8,7 @@ import * as completionService from './completion.service'
 import * as historyService from './history.service'
 import * as publicCognitiveService from './public.service'
 import { CognitiveServiceError } from './cognitive.errors'
+import { rejectWrapperForStandaloneUse } from './assignment.access'
 import {
   createAssignmentSchema,
   updateAssignmentSchema,
@@ -296,7 +297,8 @@ export const cognitiveController = {
       const { id: assignmentId, fileName } = req.params
 
       // 下载也必须重新执行 Assignment 归属校验，不能只依赖不可预测的文件名。
-      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, assignmentId)
+      const assignment = await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, assignmentId)
+      rejectWrapperForStandaloneUse(assignment, '请从综合测评导出')
 
       // 文件名来自服务端生成结果，仍显式拒绝路径穿越和非导出文件名。
       if (

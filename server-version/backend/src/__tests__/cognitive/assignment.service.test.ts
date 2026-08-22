@@ -333,13 +333,28 @@ describe('composite wrapper assignment class', () => {
     await listStudentAssignments('student-1')
     expect(mockPrisma.cognitiveAssignment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ listedStandalone: true, status: 'PUBLISHED' }),
+        where: expect.objectContaining({
+          listedStandalone: true,
+          status: 'PUBLISHED',
+          course: { isLibrary: false },
+        }),
       }),
     )
   })
 
   it('returns 404 for student GET of a wrapper', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...wrapper, config, course })
+    await expect(getAssignmentForStudent('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('returns 404 for student GET of a library-course assignment', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      status: 'PUBLISHED',
+      listedStandalone: true,
+      config,
+      course: { ...course, isLibrary: true },
+    })
     await expect(getAssignmentForStudent('student-1', 'asg-1')).rejects.toMatchObject({ statusCode: 404 })
   })
 

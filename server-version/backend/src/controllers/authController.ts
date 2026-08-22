@@ -246,6 +246,10 @@ export const authController = {
         return error(res, '课程已结束，无法加入')
       }
 
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
+      }
+
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
         where: { username }

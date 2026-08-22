@@ -23,9 +23,12 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import {
   copyComposite,
   createAccessTokenForComposite,
+  getCompositeForTeacher,
   getPublicCompositeInfo,
+  listComposites,
   listAvailableForStudent,
   listLibraryTemplates,
+  publishComposite,
   startUserAttempt,
   updateComposite,
 } from '../../modules/composite/composite.service'
@@ -120,6 +123,52 @@ describe('copyable PATCH', () => {
       items: [],
     }))
     await expect(updateComposite('admin-1', ADMIN, 'source-1', { copyable: true })).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('lets ADMIN set copyable on a published library template', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({ items: [] }))
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ copyable: true })
+    await updateComposite('admin-1', ADMIN, 'source-1', { copyable: true })
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ copyable: true }),
+    }))
+  })
+})
+
+describe('list/detail copyable fields', () => {
+  it('sets canSetCopyable for ADMIN on a library template and false for a teacher row', async () => {
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([
+      libraryTemplate({ items: [] }),
+      libraryTemplate({
+        id: 'teacher-row',
+        createdBy: 'teacher-1',
+        creator: { id: 'teacher-1', role: TEACHER },
+        course: teacherCourse,
+        courseId: 'course-t',
+        copyable: false,
+        items: [],
+      }),
+    ])
+    const list = await listComposites('admin-1', ADMIN)
+    expect(list[0]).toMatchObject({
+      copyable: true,
+      createdBy: 'admin-1',
+      creator: { role: ADMIN },
+      course: { isLibrary: true },
+      canSetCopyable: true,
+    })
+    expect(list[1].canSetCopyable).toBe(false)
+  })
+
+  it('returns the same copyable fields on detail', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({ items: [] }))
+    const detail = await getCompositeForTeacher('admin-1', ADMIN, 'source-1')
+    expect(detail).toMatchObject({
+      copyable: true,
+      createdBy: 'admin-1',
+      canSetCopyable: true,
+      course: { isLibrary: true },
+    })
   })
 })
 
@@ -220,6 +269,28 @@ describe('copyComposite', () => {
     expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
   })
 
+  it('lets ADMIN publish a draft bound to a library course', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({
+      status: 'DRAFT',
+      copyable: false,
+      items: [{ type: 'FORM', formType: 'text_input', formLabel: '年级' }],
+    }))
+    mockPrisma.course.findUnique.mockResolvedValue(libraryCourse)
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
+    await publishComposite('admin-1', ADMIN, 'source-1')
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: 'PUBLISHED' }),
+    }))
+  })
+
+  it('forbids ADMIN from copying onto another teacher’s course', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate())
+    mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
+    await expect(copyComposite('admin-1', ADMIN, 'source-1', { courseId: 'course-t' })).rejects.toMatchObject({
+      statusCode: 403,
+    })
+  })
+
   it('self-copies a published composite without requiring copyable', async () => {
     mockPrisma.compositeAssessment.findUnique
       .mockResolvedValueOnce(libraryTemplate({
@@ -235,6 +306,23 @@ describe('copyComposite', () => {
 
     const copied = await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
     expect(copied.status).toBe('DRAFT')
+  })
+
+  it('self-copies with omitted courseId and keeps the source course', async () => {
+    mockPrisma.compositeAssessment.findUnique
+      .mockResolvedValueOnce(libraryTemplate({
+        copyable: false,
+        createdBy: 'teacher-1',
+        creator: { id: 'teacher-1', role: TEACHER },
+        course: teacherCourse,
+        courseId: 'course-t',
+        items: [{ id: 'form-1', type: 'FORM', position: 0, required: true, formType: 'text_input', formLabel: '年级', formPlaceholder: null, formOptions: null }],
+      }))
+      .mockResolvedValue(null)
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'self-copy', courseId: 'course-t' })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', {})
+    expect(mockPrisma.compositeAssessment.create.mock.calls[0][0].data.courseId).toBe('course-t')
   })
 
   it('rejects self-copy of a cognitive template without a course', async () => {

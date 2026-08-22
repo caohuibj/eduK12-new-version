@@ -64,6 +64,7 @@ export const loadStartableAssignment = async (
 
   const course = await prisma.course.findUnique({ where: { id: assignment.courseId } })
   if (!course) throw NOT_FOUND('Course not found')
+  if (course.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
 
   const membership = await prisma.courseStudent.findUnique({
     where: { courseId_studentId: { courseId: assignment.courseId, studentId: userId } },
@@ -155,7 +156,16 @@ export const createSession = async (userId: string, assignmentId: string) => {
   const existing = await prisma.cognitiveSession.findFirst({
     where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
   })
-  if (existing) return toRunnerPayload(existing)
+  if (existing) {
+    const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
+    if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
+    rejectWrapperForStandaloneUse(assignment)
+    if (assignment.courseId) {
+      const course = await prisma.course.findUnique({ where: { id: assignment.courseId }, select: { isLibrary: true } })
+      if (course?.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
+    }
+    return toRunnerPayload(existing)
+  }
 
   // 无 existing → 这是"新 attempt"，才走完整资格链。
   const ctx = await loadStartableAssignment(assignmentId, userId)

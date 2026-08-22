@@ -4,6 +4,7 @@ import { UserRole } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
+    courseStudent: { findMany: vi.fn() },
   },
 }))
 
@@ -86,5 +87,16 @@ describe('course isLibrary', () => {
     }) as any, res)
     expect(res.statusCode).toBe(400)
     expect(res.body.message).toBe('库课程不能加入')
+  })
+
+  it('omits library courses from the student myCourses list', async () => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([])
+    const res = makeRes()
+    await courseController.myCourses(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+    }) as any, res)
+    expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ course: { isLibrary: false } }),
+    }))
   })
 })

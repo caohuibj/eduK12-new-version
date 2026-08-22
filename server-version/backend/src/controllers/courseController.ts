@@ -464,7 +464,8 @@ export const courseController = {
           studentId: userId,
           status: {
             in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]
-          }
+          },
+          course: { isLibrary: false },
         },
         include: {
           course: {

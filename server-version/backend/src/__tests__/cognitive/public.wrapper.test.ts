@@ -14,7 +14,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
-import { createAccessTokenForAssignment, startPublicSession } from '../../modules/cognitive/public.service'
+import { createAccessTokenForAssignment, getPublicAssignmentInfo, startPublicSession } from '../../modules/cognitive/public.service'
 
 const wrapper = {
   id: 'asg-1',
@@ -32,6 +32,18 @@ describe('public wrapper gates', () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
     await expect(createAccessTokenForAssignment('teacher-1', UserRole.TEACHER, 'asg-1', new Date(Date.now() + 60_000).toISOString(), 0))
       .rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('rejects public info for a historical wrapper token', async () => {
+    mockPrisma.cognitiveAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1',
+      isActive: true,
+      expiresAt: new Date(Date.now() + 60_000),
+      maxUses: 0,
+      usedCount: 0,
+      assignment: wrapper,
+    })
+    await expect(getPublicAssignmentInfo('token-value')).rejects.toMatchObject({ statusCode: 403 })
   })
 
   it('rejects starting a public session for a wrapper token', async () => {

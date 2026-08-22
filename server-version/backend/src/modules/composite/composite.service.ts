@@ -74,7 +74,7 @@ const validateCourse = async (
   courseId: string | null | undefined,
   userId: string,
   role: UserRole,
-  options: { allowLibrary?: boolean } = {},
+  options: { allowLibrary?: boolean; requireOwnCourse?: boolean } = {},
 ) => {
   if (!courseId) return null
   const course = await prisma.course.findUnique({ where: { id: courseId } })
@@ -82,7 +82,7 @@ const validateCourse = async (
   if (course.isLibrary && !options.allowLibrary) {
     throw compositeBadRequest('不能绑定库课程')
   }
-  if (role === UserRole.TEACHER && course.creatorId !== userId) {
+  if ((options.requireOwnCourse || role === UserRole.TEACHER) && course.creatorId !== userId) {
     throw compositeForbidden('只能在自己创建的课程中发布综合测评')
   }
   return course
@@ -489,7 +489,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
 
   const targetCourseId = libraryCopy ? input.courseId : (input.courseId === undefined ? source.courseId : input.courseId)
   if (hasCognitive && !targetCourseId) throw compositeBadRequest('含认知模块的模板必须绑定课程')
-  await validateCourse(targetCourseId, userId, role, { allowLibrary: false })
+  await validateCourse(targetCourseId, userId, role, { allowLibrary: false, requireOwnCourse: true })
 
   let code = input.code ?? `${source.code}_copy_${nanoid(8)}`
   const name = input.name ?? `${source.name}（副本）`
@@ -758,7 +758,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   assertOwner(composite, userId, role)
   assertDraft(composite)
   if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
-  await validateCourse(composite.courseId, userId, role)
+  await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
   for (const item of composite.items) {
