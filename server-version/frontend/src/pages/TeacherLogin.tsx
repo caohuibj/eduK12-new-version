@@ -124,7 +124,7 @@ const TeacherLogin: React.FC = () => {
             <ol className="list-decimal list-inside space-y-1">
               <li>输入教师邀请码</li>
               <li>设置用户名、密码和真实姓名</li>
-              <li>完成注册后即可登录</li>
+              <li>提交后等待管理员审核，通过后即可登录</li>
             </ol>
           </div>
         </div>

@@ -24,13 +24,13 @@ const Portal: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/teacher/login" style={{ textDecoration: 'none' }}>
+          <Link to="/teacher/account-login" style={{ textDecoration: 'none' }}>
             <div style={{ background: '#faf5ff', borderRadius: '16px', padding: '30px', transition: 'all 0.3s', cursor: 'pointer' }}>
               <div style={{ width: '60px', height: '60px', background: 'linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span style={{ fontSize: '30px' }}>👨‍🏫</span>
               </div>
               <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#2d3748', marginBottom: '8px' }}>教师入口</h2>
-              <p style={{ color: '#718096', fontSize: '14px' }}>使用教师邀请码登录</p>
+              <p style={{ color: '#718096', fontSize: '14px' }}>使用账号登录，管理课程与测评</p>
             </div>
           </Link>
 

@@ -1,5 +1,7 @@
 # eduK12 本地 Checkpoint — 2026-08-22
 
+> 当前停点已前移到 `docs/checkpoint-2026-08-22-followups.md`（标签 `checkpoint-2026-08-22-followups`）。本文是当时快照；§7 里若干缺口已在后续停点关闭。
+
 **仓库工作树：** `/Users/Qiang/Documents/eduK12-dev`  
 **Git 分支：** `dev`（跟踪 `origin/dev`）  
 **基底提交：** `59c8d9c` Merge PR #9: composite assessments and anonymous cognitive access  

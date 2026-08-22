@@ -1,8 +1,13 @@
 /**
- * Cognitive Feature Flag（Stage B v1.1 §26，Option A）。
+ * Cognitive Feature Flag.
  *
- * 构建期读取 `VITE_COGNITIVE_MODULE_ENABLED`（Vite 静态替换，值固化进产物）：
- *  - 'true'  → 显示 Cognitive 导航 + 注册路由入口；
- *  - 其他/缺失 → 隐藏（legacy-only 构建可显式传入 false，避免"前端有入口、后端 404"）。
+ * `cognitiveBuildEnabled` is the Vite build-time switch
+ * (`VITE_COGNITIVE_MODULE_ENABLED`). A legacy-only bundle can set it to false.
+ *
+ * Runtime menus and routes must use `useCognitiveEnabled()` so GET /api/capabilities
+ * (the backend `COGNITIVE_MODULE_ENABLED` flag) is the source of truth.
  */
-export const cognitiveModuleEnabled = import.meta.env.VITE_COGNITIVE_MODULE_ENABLED === 'true'
+export const cognitiveBuildEnabled = import.meta.env.VITE_COGNITIVE_MODULE_ENABLED === 'true'
+
+/** Build-time fallback only. Prefer `useCognitiveEnabled()` in UI. */
+export const cognitiveModuleEnabled = cognitiveBuildEnabled

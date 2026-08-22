@@ -434,6 +434,10 @@ export const assignmentController = {
         return error(res, '作业未发布')
       }
 
+      if (assignment.deadline && new Date() > assignment.deadline) {
+        return error(res, Messages.ASSIGNMENT.DEADLINE_PASSED)
+      }
+
       // 检查是否已提交
       const existing = await prisma.submission.findFirst({
         where: {

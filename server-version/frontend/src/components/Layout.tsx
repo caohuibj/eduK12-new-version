@@ -20,7 +20,7 @@ import {
   Share2,
   Brain,
 } from 'lucide-react'
-import { cognitiveModuleEnabled } from '../modules/cognitive/feature'
+import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 
 interface MenuItem {
   path: string
@@ -33,6 +33,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const cognitiveModuleEnabled = useCognitiveEnabled()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 

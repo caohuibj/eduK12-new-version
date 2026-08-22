@@ -39,6 +39,7 @@ import cognitiveRoutes from './modules/cognitive/cognitive.routes'
 import cognitivePublicRoutes from './modules/cognitive/cognitive.public.routes'
 import compositeRoutes from './modules/composite/composite.routes'
 import compositePublicRoutes from './modules/composite/composite.public.routes'
+import capabilitiesRoutes from './routes/capabilities'
 
 const app = express()
 
@@ -93,6 +94,9 @@ app.get('/ready', async (_req, res) => {
     res.status(503).json({ status: 'unready', timestamp: new Date().toISOString() })
   }
 })
+
+// Runtime capabilities (public; backend flag is the source of truth)
+app.use('/api/capabilities', capabilitiesRoutes)
 
 // API 路由
 app.use('/api/auth', authRoutes)
