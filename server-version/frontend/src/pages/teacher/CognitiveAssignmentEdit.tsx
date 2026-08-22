@@ -49,16 +49,21 @@ const CognitiveAssignmentEdit: React.FC = () => {
   }
 
   const createToken = async () => {
-    if (!tokenExpiresAt) return
-    const response = await cognitiveApi.createPublicToken(id, {
-      expiresAt: new Date(tokenExpiresAt).toISOString(),
-      maxUses: tokenMaxUses,
-    })
-    if (response.code === 0) {
-      setToken({ ...response.data, isActive: true })
-      setTokenExpiresAt('')
-    } else {
-      setError(response.message || '生成公开链接失败')
+    if (!tokenExpiresAt) {
+      setError('请先选择公开链接的有效期')
+      return
+    }
+    try {
+      setError(null)
+      const response = await cognitiveApi.createPublicToken(id, {
+        expiresAt: new Date(tokenExpiresAt).toISOString(),
+        maxUses: Number(tokenMaxUses) || 0,
+      })
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
+      setToken({ ...response.data, isActive: true, usedCount: response.data.usedCount ?? 0 })
+    } catch (err) {
+      const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : '生成公开链接失败'
+      setError(message)
     }
   }
 
@@ -152,8 +157,11 @@ const CognitiveAssignmentEdit: React.FC = () => {
           ) : (
             <p className="text-gray-500 mb-3">尚未生成链接</p>
           )}
-          <div className="flex gap-2 mt-4">
-            <input type="datetime-local" value={tokenExpiresAt} onChange={(e) => setTokenExpiresAt(e.target.value)} className="border rounded px-3 py-2" />
+          <div className="flex flex-wrap gap-3 mt-4 items-center">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="datetime-local" value={tokenExpiresAt} onChange={(e) => setTokenExpiresAt(e.target.value)} className="border rounded px-3 py-2 text-base text-gray-800" />
+              <span>有效期</span>
+            </label>
             <input type="number" min={0} value={tokenMaxUses} onChange={(e) => setTokenMaxUses(Number(e.target.value))} className="border rounded px-3 py-2 w-28" placeholder="最大次数" />
             <button onClick={() => void createToken()} className="btn-secondary">生成新链接</button>
           </div>

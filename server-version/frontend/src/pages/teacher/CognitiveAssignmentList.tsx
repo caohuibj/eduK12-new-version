@@ -27,7 +27,8 @@ const CognitiveAssignmentList: React.FC = () => {
   const [courses, setCourses] = useState<CourseOption[]>([])
   const [configs, setConfigs] = useState<ConfigOption[]>([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     title: '',
@@ -60,7 +61,8 @@ const CognitiveAssignmentList: React.FC = () => {
 
   const create = async () => {
     try {
-      setCreating(true)
+      setSaving(true)
+      setError(null)
       const response = await cognitiveApi.createAssignment({
         title: form.title,
         courseId: form.courseId,
@@ -73,7 +75,7 @@ const CognitiveAssignmentList: React.FC = () => {
     } catch (err) {
       setError((err as { message?: string }).message || '创建失败')
     } finally {
-      setCreating(false)
+      setSaving(false)
     }
   }
 
@@ -86,12 +88,12 @@ const CognitiveAssignmentList: React.FC = () => {
           <Brain className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-bold text-gray-800">认知任务</h1>
         </div>
-        <button onClick={() => setCreating(true)} className="btn-primary">
+        <button onClick={() => setShowForm(true)} className="btn-primary">
           <Plus className="w-4 h-4 inline mr-1" />新建认知任务
         </button>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {creating && (
+      {showForm && (
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">新建认知任务</h2>
           <div className="grid md:grid-cols-2 gap-3">
@@ -112,8 +114,8 @@ const CognitiveAssignmentList: React.FC = () => {
             <textarea className="border rounded px-3 py-2 md:col-span-2" placeholder="学生须知（可选）" value={form.instruction} onChange={(e) => setForm({ ...form, instruction: e.target.value })} />
           </div>
           <div className="mt-4 flex gap-2">
-            <button onClick={() => void create()} disabled={creating || !form.title || !form.courseId || !form.configId} className="btn-primary">保存草稿</button>
-            <button onClick={() => setCreating(false)} className="btn-secondary">取消</button>
+            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId} className="btn-primary">{saving ? '保存中...' : '保存草稿'}</button>
+            <button onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
           </div>
         </div>
       )}

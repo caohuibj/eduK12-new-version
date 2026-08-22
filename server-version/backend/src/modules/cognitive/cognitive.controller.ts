@@ -57,7 +57,10 @@ export const cognitiveController = {
   async listAssignments(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const query = listAssignmentsQuerySchema.parse(req.query)
+      const query = listAssignmentsQuerySchema.parse({
+        courseId: typeof req.query.courseId === 'string' ? req.query.courseId : undefined,
+        status: typeof req.query.status === 'string' ? req.query.status : undefined,
+      })
       const data = await assignmentService.listTeacherAssignments(req.user.userId, req.user.role, query)
       return success(res, data)
     } catch (err) {

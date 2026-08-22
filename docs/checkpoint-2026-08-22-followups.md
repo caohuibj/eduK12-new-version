@@ -111,7 +111,9 @@ GitHub Actions 仍因账单未跑 runner。不能用 CI 绿勾代替上述结果
 - 教师不能在线编辑认知 config JSON（仍从已发布 config 建任务）。  
 - 学生认知历史在极端大量 session 时的数据库分页（见 §3.4）。  
 - 本 checkpoint **未 push**；远程 `origin/dev` 在打标签时仍是 `59c8d9c`。  
-- `origin/refactor/cognitive-phase1-phase2-optimization` **不要合入**。
+- `origin/refactor/cognitive-phase1-phase2-optimization` **不要合入**。  
+- 管理员向教师授权量表/认知任务、以及预编综合测评供教师复用：已记录，见 `docs/deferred-admin-library-reuse.md`。本停点不实现。  
+- 综合测评教师端作答人数、结果名单、在页内看报告：已记录，见 `docs/deferred-composite-teacher-results.md`。本停点不实现；现在只能导出。
 
 ---
 

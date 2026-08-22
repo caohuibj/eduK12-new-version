@@ -34,6 +34,21 @@ describe('reaction scorer — validation', () => {
     expect(() => scoreReactionV1({ config, trials })).toThrow(CognitiveScoringInputError)
   })
 
+  it('ignores a trailing extra trial beyond totalTrials', () => {
+    const trials = [...buildTrials(5, () => 300), {
+      trialIndex: 5,
+      payload: {
+        foreperiodMs: 800,
+        rtMs: 280,
+        prematureCount: 0,
+        interrupted: false,
+        inputMode: 'pointer' as const,
+      },
+    }]
+    const res = scoreReactionV1({ config, trials })
+    expect(res.metrics.validTrialCount).toBe(5)
+  })
+
   it('throws on non-contiguous trialIndex', () => {
     const trials = buildTrials(5, () => 300).map((t, i) => (i === 4 ? { ...t, trialIndex: 9 } : t))
     expect(() => scoreReactionV1({ config, trials })).toThrow(CognitiveScoringInputError)

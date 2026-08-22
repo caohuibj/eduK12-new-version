@@ -101,6 +101,18 @@ describe('cognitive assignment API', () => {
     expect(res.statusCode).toBe(400)
   })
 
+  it('lists published assignments even when the client sends a cache-buster query', async () => {
+    const req = makeReq({ query: { status: 'PUBLISHED', _t: '1787380000000' } })
+    const res = makeRes()
+    ;(assignmentService.listTeacherAssignments as any).mockResolvedValue([{ id: 'asg-1', title: '反应时（体验）', status: 'PUBLISHED' }])
+    await cognitiveController.listAssignments(req, res)
+    expect(res.body.code).toBe(0)
+    expect(assignmentService.listTeacherAssignments).toHaveBeenCalledWith('teacher-1', UserRole.TEACHER, {
+      status: 'PUBLISHED',
+    })
+    expect(res.body.data).toEqual([{ id: 'asg-1', title: '反应时（体验）', status: 'PUBLISHED' }])
+  })
+
   it('returns code:0 with data on success', async () => {
     const req = makeReq({
       body: { courseId: 'course-1', configId: 'config-1', title: 'x' },

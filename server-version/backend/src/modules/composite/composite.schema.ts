@@ -69,7 +69,7 @@ export const createCompositeTokenSchema = z.object({
 
 export const compositeExportQuerySchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
-}).strict()
+})
 
 export const compositeExportRequestSchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),

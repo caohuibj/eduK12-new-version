@@ -265,9 +265,15 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
   assertTeacher(role)
   const existing = await loadComposite(id)
   assertOwner(existing, userId, role)
-  assertDraft(existing)
+  const providedKeys = (Object.keys(input) as Array<keyof UpdateCompositeInput>).filter((key) => input[key] !== undefined)
+  const publicWindowOnly = providedKeys.length > 0 && providedKeys.every((key) => key === 'expiresAt' || key === 'publicEnabled')
+  if (existing.status !== 'DRAFT' && !publicWindowOnly) {
+    throw compositeConflict('已发布的综合测评只能调整公开有效期')
+  }
   const nextCourseId = input.courseId === undefined ? existing.courseId : input.courseId
-  await validateCourse(nextCourseId, userId, role)
+  if (existing.status === 'DRAFT') {
+    await validateCourse(nextCourseId, userId, role)
+  }
   const nextOpensAt = input.opensAt === undefined ? existing.opensAt : parseDate(input.opensAt)
   const nextExpiresAt = input.expiresAt === undefined ? existing.expiresAt : parseDate(input.expiresAt)
   if (nextOpensAt && nextExpiresAt && nextExpiresAt.getTime() < nextOpensAt.getTime()) {

@@ -27,6 +27,11 @@ const PRACTICE_TRIALS = 3
 type Phase = 'instruction' | 'practice' | 'formal'
 type Sub = 'ready' | 'gray' | 'green' | 'feedback'
 
+const stimulusClass = (isGo: boolean) =>
+  isGo
+    ? 'bg-green-500 hover:bg-green-600 ring-4 ring-green-200'
+    : 'bg-gray-300'
+
 export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete }) => {
   const config = taskContext.config as unknown as ReactionConfig
   const total = config?.totalTrials ?? 20
@@ -91,10 +96,11 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total || sub !== 'green' || stimulusOnset == null) return
     const t = window.setTimeout(() => {
+      setSub('feedback')
       void submit(null, 'pointer')
     }, timeoutMs)
     return () => window.clearTimeout(t)
-  }, [phase, sub, stimulusOnset, timeoutMs])
+  }, [phase, sub, stimulusOnset, timeoutMs, trialIndex, total])
 
   // visibility 中断检测
   useEffect(() => {
@@ -111,7 +117,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   const submit = useCallback(
     async (rtMs: number | null, inputMode: ReactionTrialPayload['inputMode']) => {
-      if (respondingRef.current) return
+      if (respondingRef.current || trialIndex >= total) return
       respondingRef.current = true
       const payload: ReactionTrialPayload = {
         foreperiodMs,
@@ -126,7 +132,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         respondingRef.current = false
       }
     },
-    [foreperiodMs, prematureCount, onTrialComplete]
+    [foreperiodMs, prematureCount, onTrialComplete, trialIndex, total]
   )
 
   const handleFormalInput = useCallback(
@@ -141,7 +147,8 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         return
       }
       if (sub === 'green' && stimulusOnset != null) {
-        const rt = performance.now() - stimulusOnset
+        const rt = Math.round(performance.now() - stimulusOnset)
+        setSub('feedback')
         void submit(rt, inputMode)
       }
     },
@@ -253,10 +260,10 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         {practiceSub !== 'feedback' ? (
           <button
             onClick={handlePracticeInput}
-            className="w-40 h-40 rounded-full bg-primary hover:bg-primary/90 transition-colors flex items-center justify-center mx-auto"
+            className={`w-40 h-40 rounded-full mx-auto flex items-center justify-center transition-colors ${stimulusClass(practiceSub === 'green')}`}
             aria-label={`practice trial ${practiceIndex}`}
           >
-            <span className="text-white text-2xl font-bold">
+            <span className={`text-2xl font-bold ${practiceSub === 'green' ? 'text-white' : 'text-gray-600'}`}>
               {practiceSub === 'green' ? '点击！' : '等待…'}
             </span>
           </button>
@@ -288,13 +295,11 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       </div>
       <button
         onClick={() => handleFormalInput('pointer')}
-        className={`w-48 h-48 rounded-full mx-auto flex items-center justify-center transition-colors ${
-          sub === 'green' ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300'
-        }`}
+        className={`w-48 h-48 rounded-full mx-auto flex items-center justify-center transition-colors ${stimulusClass(sub === 'green')}`}
         aria-label={`trial ${trialIndex}`}
       >
-        <span className="text-white text-2xl font-bold">
-          {sub === 'green' ? '点击！' : '准备…'}
+        <span className={`text-2xl font-bold ${sub === 'green' ? 'text-white' : 'text-gray-600'}`}>
+          {sub === 'green' ? '点击！' : sub === 'gray' ? '等待…' : '准备…'}
         </span>
       </button>
       <p className="text-xs text-gray-400 mt-6">

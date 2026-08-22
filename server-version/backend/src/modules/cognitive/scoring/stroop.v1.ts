@@ -28,7 +28,9 @@ export const scoreStroopV1 = (input: {
   trials: ScoringTrial<StroopTrial>[]
 }): CognitiveScoreResult => {
   const { config } = input
-  const sorted = [...input.trials].sort((a, b) => a.trialIndex - b.trialIndex)
+  const sorted = [...input.trials]
+    .filter((trial) => trial.trialIndex >= 0 && trial.trialIndex < config.totalTrials)
+    .sort((a, b) => a.trialIndex - b.trialIndex)
   if (sorted.length !== config.totalTrials) {
     throw new CognitiveScoringInputError(
       `stroop v1 expects exactly ${config.totalTrials} trials, got ${sorted.length}`
