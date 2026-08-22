@@ -104,9 +104,14 @@ describe('cognitive history service', () => {
     mockPrisma.cognitiveSession.findMany.mockResolvedValue([
       session({ id: 'good', scoreEncrypted: encryptCognitivePayload(88) }),
       session({
-        id: 'bad',
+        id: 'bad-score',
         scoreEncrypted: 'not-an-envelope',
         qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+      }),
+      session({
+        id: 'bad-flags',
+        scoreEncrypted: encryptCognitivePayload(40),
+        qualityFlagsEncrypted: 'not-an-envelope',
       }),
     ])
 
