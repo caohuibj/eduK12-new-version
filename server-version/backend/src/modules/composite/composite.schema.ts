@@ -101,6 +101,13 @@ export const publicRecoverySchema = z.object({
   recoveryToken: z.string().min(20).max(200),
 }).strict()
 
+export const listCompositeAttemptsQuerySchema = z.object({
+  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'ABANDONED']).optional(),
+  q: z.string().max(100).optional(),
+  page: z.union([z.string(), z.number()]).optional(),
+  pageSize: z.union([z.string(), z.number()]).optional(),
+}).strict()
+
 export type CreateCompositeInput = z.infer<typeof createCompositeSchema>
 export type UpdateCompositeInput = z.infer<typeof updateCompositeSchema>
 export type AddCompositeItemInput = z.infer<typeof addCompositeItemSchema>

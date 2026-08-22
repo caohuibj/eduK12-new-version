@@ -289,7 +289,7 @@ GET  /api/composite-assessments/:id/attempts/:attemptId/report
     anonymousCode: string | null
     nickname: string | null      // 登录学生主列；匿名/删除为 null
     username: string | null      // 登录学生副列；匿名/删除为 null
-    displayName: string          // 主列便捷字段，规则见下
+    displayName: string | null   // 主列便捷字段；登录且 nickname 为空时为 null，禁止回退 username
     userId: string | null        // 供排查，UI 默认不展示；用户删除后因 onDelete:SetNull 为 null
   }>
   page: number
@@ -315,7 +315,7 @@ isAnonymous = Boolean(attempt.anonymousCode)
 登录且 user 仍在：
   nickname = user.nickname        // 可空，主列允许空白
   username = user.username        // 副列必有（User.username unique 非空）
-  displayName = user.nickname     // 主列只放 nickname，不要回落到 username
+  displayName = user.nickname     // string | null；主列只放 nickname，不要回落到 username
 
 登录用户已删除（userId SetNull、无 anonymousCode）：
   nickname = null, username = null
@@ -329,7 +329,7 @@ isAnonymous = Boolean(attempt.anonymousCode)
 
 抽 `buildCompositeReport(attempt)`，从现有 `getReport` 拆出模块拼装（量表 `safeDecrypt` scores/feedback、认知 `decryptCognitivePayload` score/metrics/qualityFlags、表单明文、`resolveCognitiveReference`）。学生/匿名路径继续走 `findAttempt` 的身份校验，但拼装走**同一** builder。
 
-量表 `decodeJson` → `safeDecrypt` 失败已返回 `null`。认知 `decryptCognitivePayload`（`cognitive.security.ts`）对坏信封 **throw**；学生 `getReport` 今天可能因一个坏模块 500。history 已 skip 坏密文（`history.service.ts:66-71`）。`buildCompositeReport` 必须对每个模块 try/catch：失败则该模块 `{ decryptError: true, scores/score/metrics/qualityFlags: omitted }`，HTTP 仍 200，日志 `logger.warn` 只带 attemptId/itemId/type，**不带密文**。教师和学生/匿名报告同一降级。
+量表 `safeDecrypt` 失败返回 `null`（不 throw）。`buildCompositeReport` **不得**把解码失败伪装成空结果：若 `scores` / `feedback` 是字符串且解码为 null，该模块 `{ decryptError: true, scores/feedback omitted }`，不要 `?? []` / `?? {}`。字段本身为 `null`/`undefined`（未完成、无值）才用空数组/空对象。认知 `decryptCognitivePayload` 对坏信封 **throw**；catch 后同样 `decryptError: true`。HTTP 仍 200，日志 `logger.warn` 只带 attemptId/itemId/type，**不带密文**。教师和学生/匿名报告同一降级。
 
 教师路径：
 
@@ -508,6 +508,9 @@ D3「`createAssignment` 只插 DRAFT」仍约束 **HTTP POST /assignments**。en
 | 学生课表 | 今天已按成员过滤；纵深：list 对 STUDENT 加 `isLibrary: false` |
 | 教师拷贝目标 | `validateCourse`：目标课必须 `creatorId===教师`（ADMIN 则自己的课）且 **`isLibrary===false`**。库课不能当课堂投放目标 |
 | 教师课程下拉 | 复制/新建综合测评的课列表过滤 `isLibrary: false`。库课只出现在 ADMIN 课程管理，徽章「库课程」 |
+| 学生可用列表 | `listAvailableForStudent` 必须排除库课（`course.isLibrary: false`，或 include course 后过滤）。**只靠 `isRecruiting=false` 不够**：升库课不会清已有 `course_students`，旧成员仍会命中 `courseId in memberships` |
+| 学生直接开始 | `assertStudentEligibility`：综合测评所绑课程 `isLibrary` → **400**「库课程上的综合测评不能作答」。即使旧成员仍在花名册 |
+| 公开参与 | **库课模板不允许公开作答。** `createAccessTokenForComposite`、`getPublicCompositeInfo`、`startPublicAttempt` 均拒绝（400）。历史误发的 token 也要在 info/start 拦掉，不能只在创建时拦 |
 
 ADMIN 操作：建一门或多门库课（例如「材料库」「认知库」）并 `PATCH { isLibrary: true }` → 服务端把该课 `isRecruiting` 置 false。然后在选定的库课上建/发布 CognitiveAssignment，再编综合测评。第二门库课与第一门同等合法，不 409。
 
@@ -624,11 +627,11 @@ where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: tru
 
 **自复制**（教师复制自己的已发布综合测评）：同样换绑可选、同样 ensure 壳。这让教师能在同一课开第二份编排，而不改已有作答。自复制不要求源 `copyable` 或 ADMIN creator。
 
-**DRAFT 换课 vs wrapper（既有缺口，本阶段有限度收口）：**
+**DRAFT 换课 vs wrapper：**
 
-今天 `updateComposite` 允许 DRAFT 改 `courseId`，`assertValidItem` **不**要求 `assignment.courseId === composite.courseId`。拷贝刚结束时二者对齐，教师随后改课会让 item 仍指向旧课上的 wrapper。
+`assertValidItem` / `addItem` **必须**要求认知 `assignment.courseId === composite.courseId`（两边都非空）。跨课挂载 → **400**「认知任务必须与综合测评属于同一课程」。综合测评无 `courseId` 时加 COGNITIVE → **400**「含认知模块的综合测评必须绑定课程」。`publishComposite` 对已有 item 再跑同一校验，避免旧草稿带错课 assignment 发出去。同一教师把同一课上的 wrapper 再挂到**该课**另一份综合测评仍然允许（KD13）。
 
-本阶段**不**做「改课时 re-run ensure」。实现上加一条便宜校验：DRAFT 综合测评若已有 `type=COGNITIVE` 的 item，PATCH `courseId` 且新值与旧值不同 → **400**「请先移除认知模块，或复制到目标课程」。无认知模块时换课仍允许（与今天 SCALE/FORM 行为一致）。已发布综合测评本就不能改 `courseId`。这不是完整的换课迁移，只避免 copy 的 happy path 被随后 PATCH 弄脏。
+本阶段**不**做「改课时 re-run ensure」。另外：DRAFT 综合测评若已有 `type=COGNITIVE` 的 item，PATCH `courseId` 且新值与旧值不同 → **400**「请先移除认知模块，或复制到目标课程」。无认知模块时换课仍允许（与今天 SCALE/FORM 行为一致）。已发布综合测评本就不能改 `courseId`。这不是完整的换课迁移；addItem 课程一致性 + PATCH 换课 400 两道闸一起关。
 
 ##### 前端
 
@@ -1068,7 +1071,7 @@ B / A1 不加总开关：教师结果与模板复制都是加能力，角色校�
 - `listComposites`：0 作答、仅 IN_PROGRESS、混合状态 → counts 正确；payload **无** `_count`；空列表不打 `in: []`。
 - `listAttemptsForTeacher`：非 owner 教师 403；**ADMIN 读其他教师模板 200**；不返回 `recoveryTokenHash`；登录行 `nickname`+`username` 分开，主列不是 `nickname||username`；删除用户行 `isAnonymous=false`、`displayName='已删除用户'`、`username=null`。
 - `getReportForTeacher`：IN_PROGRESS → 400；跨模板 attemptId → 404；完成 → 模块类型齐全且无 `totalScore`；**ADMIN 读其他教师已完成 attempt → 200**。
-- `buildCompositeReport`：一个认知模块坏密文 → 该模块 `decryptError: true`，HTTP 200；学生 `getReport` 同样不 500。
+- `buildCompositeReport`：一个认知模块坏密文 → 该模块 `decryptError: true`，HTTP 200；学生 `getReport` 同样不 500。**量表 `scores` / `feedback` 坏密文同样 `decryptError: true`，不得变成空 `[]`/`{}`。**
 - 回归：学生 report、公开 report、导出 summary/full 仍绿（现有 `composite/export.service.test.ts`、`anonymousAccess.test.ts`）。教师强制匿名导出合同不改。
 
 ### Slice A1（PR 3 合入门槛 = wrapper 入口表 + `tx` 回滚 + `isAdminLibraryTemplate`。GRANT/MaterialGrant 用例放到 A2 / PR 5。）
@@ -1098,6 +1101,9 @@ B / A1 不加总开关：教师结果与模板复制都是加能力，角色校�
 - 自复制自己的 PUBLISHED → 成功。
 - DRAFT 含认知模块时 PATCH courseId → 400。
 - `COGNITIVE_MODULE_ENABLED=false` 时 library 不含认知模板。
+- 学生 `listAvailableForStudent` 不含绑库课的综合测评；旧成员仍在花名册时 `startUserAttempt` / `assertStudentEligibility` → 400。
+- 库课综合测评 `createAccessTokenForComposite` → 400；已有 token 的 `getPublicCompositeInfo` / `startPublicAttempt` → 400。
+- `addItem` COGNITIVE：`assignment.courseId !== composite.courseId` → 400；同课 → 200。`publishComposite` 对已错课的草稿同样 400。
 
 **不作为 PR 3 合入门槛（A2 才有列）：** GRANT config 下「无 grant 仍能 copy / 不能 createAssignment」。
 
@@ -1188,7 +1194,7 @@ B / A1 不加总开关：教师结果与模板复制都是加能力，角色校�
 - **影响文件：**
   - `server-version/backend/prisma/schema.prisma`
   - `server-version/backend/prisma/migrations/<new>/`（copyable、copied_from_id、listed_standalone、`courses.is_library`）
-  - `server-version/backend/src/modules/composite/composite.service.ts`（`copyComposite`、`ensureTeacherPublishedAssignment(tx, …)`、`isAdminLibraryTemplate` 含库课、DRAFT 换课 400、copyable PATCH）
+  - `server-version/backend/src/modules/composite/composite.service.ts`（`copyComposite`、`ensureTeacherPublishedAssignment(tx, …)`、`isAdminLibraryTemplate` 含库课、DRAFT 换课 400、copyable PATCH；**学生 list/start 与公开 token/info/start 拒绝库课**；addItem/publish 认知课一致性回归）
   - `server-version/backend/src/controllers/courseController.ts`（ADMIN `isLibrary` 可多门、强制停招、加入拒绝库课、教师课列表不含库课作目标；不因第二门库课 409）
   - `server-version/backend/src/modules/composite/composite.schema.ts`（`copyable` optional；copy body）
   - `server-version/backend/src/modules/composite/composite.controller.ts` / `composite.routes.ts`（`/library` 必须在 `/:id` 前）
@@ -1199,7 +1205,7 @@ B / A1 不加总开关：教师结果与模板复制都是加能力，角色校�
   - `server-version/backend/src/modules/cognitive/export.service.ts` 或 controller（wrapper 导出 403）
   - `server-version/backend/src/__tests__/composite/copy.service.test.ts`
   - `server-version/backend/src/__tests__/cognitive/`：assignment / session / public / history / export 回归
-- **内容：** 深拷贝合同、`ensure(tx)`、wrapper 受限类、自复制、**库课程 `Course.isLibrary`（一类管理员权限，可多门）**、copyable 仅 ADMIN+库课+PUBLISHED。list/detail 扩白名单含 `course.isLibrary` / `canSetCopyable`。DRAFT 或非库课 PATCH `copyable` → 400。库模板 copy 必选授课课。无授权表、无 GRANT 测试。合入门槛见 Test Plan A1。
+- **内容：** 深拷贝合同、`ensure(tx)`、wrapper 受限类、自复制、**库课程 `Course.isLibrary`（一类管理员权限，可多门）**、copyable 仅 ADMIN+库课+PUBLISHED。库课综合测评不可被学生列表/开始或公开链接作答（停招不清成员，必须查 `isLibrary`）。list/detail 扩白名单含 `course.isLibrary` / `canSetCopyable`。DRAFT 或非库课 PATCH `copyable` → 400。库模板 copy 必选授课课。无授权表、无 GRANT 测试。合入门槛见 Test Plan A1。
 
 ### PR 4 — feat(composite): library tab and copy-to-course UI
 
