@@ -157,8 +157,11 @@ const CognitiveAssignmentEdit: React.FC = () => {
           ) : (
             <p className="text-gray-500 mb-3">尚未生成链接</p>
           )}
-          <div className="flex gap-2 mt-4">
-            <input type="datetime-local" value={tokenExpiresAt} onChange={(e) => setTokenExpiresAt(e.target.value)} className="border rounded px-3 py-2" />
+          <div className="flex flex-wrap gap-3 mt-4 items-center">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="datetime-local" value={tokenExpiresAt} onChange={(e) => setTokenExpiresAt(e.target.value)} className="border rounded px-3 py-2 text-base text-gray-800" />
+              <span>有效期</span>
+            </label>
             <input type="number" min={0} value={tokenMaxUses} onChange={(e) => setTokenMaxUses(Number(e.target.value))} className="border rounded px-3 py-2 w-28" placeholder="最大次数" />
             <button onClick={() => void createToken()} className="btn-secondary">生成新链接</button>
           </div>

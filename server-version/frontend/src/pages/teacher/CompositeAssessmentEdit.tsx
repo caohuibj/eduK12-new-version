@@ -141,8 +141,16 @@ const CompositeAssessmentEdit: React.FC = () => {
     try {
       setSavingToken(true)
       setError(null)
+      const expiry = new Date(tokenExpiresAt)
+      if (Number.isNaN(expiry.getTime())) throw new Error('有效期格式无效')
+      const compositeExpiry = detail?.expiresAt ? new Date(detail.expiresAt) : null
+      if (compositeExpiry && expiry.getTime() > compositeExpiry.getTime()) {
+        const updated = await compositeApi.update(id, { expiresAt: expiry.toISOString() })
+        if (updated.code !== 0) throw new Error(updated.message || '无法延长测评有效期')
+        setDetail((current: any) => current ? { ...current, expiresAt: expiry.toISOString() } : current)
+      }
       const response = await compositeApi.createToken(id, {
-        expiresAt: new Date(tokenExpiresAt).toISOString(),
+        expiresAt: expiry.toISOString(),
         maxUses: Number(tokenMaxUses) || 0,
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
@@ -304,14 +312,14 @@ const CompositeAssessmentEdit: React.FC = () => {
             <p className="text-gray-500 mb-3">尚未生成链接</p>
           )}
           <div className="flex flex-wrap gap-3 mt-4 items-end">
-            <label className="text-sm text-gray-600">
-              链接有效期
+            <label className="flex items-center gap-2 text-sm text-gray-700">
               <input
                 type="datetime-local"
                 value={tokenExpiresAt}
                 onChange={(e) => setTokenExpiresAt(e.target.value)}
-                className="mt-1 block border rounded px-3 py-2 text-base text-gray-800"
+                className="border rounded px-3 py-2 text-base text-gray-800"
               />
+              <span>有效期</span>
             </label>
             <label className="text-sm text-gray-600">
               最大次数（0 不限制）

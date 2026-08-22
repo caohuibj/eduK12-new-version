@@ -49,6 +49,9 @@ const CompositeAssessmentList: React.FC = () => {
     try {
       setSaving(true)
       setError(null)
+      if (form.publicEnabled && !form.expiresAt) {
+        throw new Error('请填写公开作答的有效期')
+      }
       const response = await compositeApi.create({
         ...form,
         courseId: form.courseId || null,
@@ -126,12 +129,15 @@ const CompositeAssessmentList: React.FC = () => {
               允许公开匿名参与
             </label>
             {form.publicEnabled && (
-              <input
-                type="datetime-local"
-                className="border rounded px-3 py-2"
-                value={form.expiresAt}
-                onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-              />
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="datetime-local"
+                  className="border rounded px-3 py-2 text-base text-gray-800"
+                  value={form.expiresAt}
+                  onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
+                />
+                <span>有效期</span>
+              </label>
             )}
           </div>
           <div className="mt-4 flex gap-2">
