@@ -32,6 +32,10 @@ router.get('/:id/export/preview', authenticate, requireTeacher, compositeControl
 router.post('/:id/export', authenticate, requireTeacher, compositeController.exportData)
 router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeController.downloadExport)
 
+// 教师结果名单 / 只读报告（必须用 :id 前缀，勿复用学生 /attempts/:attemptId/report）
+router.get('/:id/attempts', authenticate, requireTeacher, compositeController.listAttempts)
+router.get('/:id/attempts/:attemptId/report', authenticate, requireTeacher, compositeController.teacherReport)
+
 // 登录学生开始/继续某个已发布综合测评
 router.post('/:id/attempts', authenticate, requireRole(UserRole.STUDENT), compositeController.startAttempt)
 

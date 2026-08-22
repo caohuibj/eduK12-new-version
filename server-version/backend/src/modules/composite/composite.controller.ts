@@ -11,12 +11,14 @@ import {
   compositeScaleAnswerSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
+  listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
   reorderCompositeItemsSchema,
   updateCompositeSchema,
 } from './composite.schema'
 import { z } from 'zod'
 import { isValidRecoveryToken, hashRecoveryToken } from '../../services/anonymousAccess'
+import { getPaginationParams } from '../../utils/pagination'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -170,6 +172,27 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       return success(res, await service.getReport(req.params.attemptId, { userId: req.user.userId }))
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async listAttempts(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = listCompositeAttemptsQuerySchema.parse(req.query)
+      const pagination = getPaginationParams(req)
+      return success(res, await service.listAttemptsForTeacher(req.user.userId, req.user.role, req.params.id, {
+        status: query.status,
+        q: query.q,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+      }))
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async teacherReport(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      return success(res, await service.getReportForTeacher(req.user.userId, req.user.role, req.params.id, req.params.attemptId))
     } catch (err) { return handleError(res, err) }
   },
 

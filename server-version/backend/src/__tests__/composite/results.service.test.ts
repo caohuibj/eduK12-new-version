@@ -1,0 +1,307 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { UserRole } from '@prisma/client'
+
+process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+process.env.COGNITIVE_MODULE_ENABLED = 'true'
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    compositeAssessment: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+    },
+    compositeAssessmentAttempt: {
+      groupBy: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      count: vi.fn(),
+    },
+  },
+}))
+
+vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+
+import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import {
+  buildCompositeReport,
+  getCompositeForTeacher,
+  getReport,
+  getReportForTeacher,
+  listAttemptsForTeacher,
+  listComposites,
+} from '../../modules/composite/composite.service'
+
+const TEACHER = UserRole.TEACHER
+const ADMIN = UserRole.ADMIN
+const page = { page: 1, pageSize: 20 }
+
+const compositeRow = (overrides: Record<string, unknown> = {}) => ({
+  id: 'composite-1',
+  code: 'C-1',
+  name: '综合测评 1',
+  description: null,
+  instruction: null,
+  status: 'PUBLISHED',
+  courseId: 'course-1',
+  createdBy: 'teacher-a',
+  opensAt: null,
+  expiresAt: null,
+  maxAttempts: 1,
+  publicEnabled: false,
+  publishedAt: new Date('2026-08-20T00:00:00Z'),
+  course: { id: 'course-1', title: '课', courseCode: 'C001' },
+  items: [],
+  _count: { attempts: 9, accessTokens: 3 },
+  ...overrides,
+})
+
+const attemptRow = (overrides: Record<string, unknown> = {}) => ({
+  id: 'attempt-1',
+  status: 'COMPLETED',
+  progress: 100,
+  completedItems: 2,
+  startedAt: new Date('2026-08-20T01:00:00Z'),
+  lastSavedAt: new Date('2026-08-20T01:05:00Z'),
+  completedAt: new Date('2026-08-20T01:05:00Z'),
+  totalTime: 300000,
+  anonymousCode: null,
+  userId: 'student-1',
+  user: { id: 'student-1', nickname: '小明', username: 'stu1' },
+  ...overrides,
+})
+
+const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => ({
+  id: 'attempt-1',
+  compositeAssessmentId: 'composite-1',
+  userId: 'student-1',
+  recoveryTokenHash: 'hash-should-not-leak',
+  anonymousCode: null,
+  status: 'COMPLETED',
+  completedAt: new Date('2026-08-20T01:05:00Z'),
+  totalTime: 300000,
+  compositeAssessment: {
+    id: 'composite-1',
+    name: '综合测评 1',
+    items: [
+      { id: 'item-form', type: 'FORM', formLabel: '年级', scale: null, cognitiveAssignment: null },
+      { id: 'item-scale', type: 'SCALE', scaleId: 'scale-1', scale: { name: '量表 A' }, cognitiveAssignment: null },
+      {
+        id: 'item-cog',
+        type: 'COGNITIVE',
+        scale: null,
+        cognitiveAssignment: { title: '反应时' },
+      },
+    ],
+  },
+  scaleAssessments: [{
+    compositeItemId: 'item-scale',
+    scores: { total: 12 },
+    feedback: { summary: 'ok' },
+    completedAt: new Date('2026-08-20T01:04:00Z'),
+    totalTime: 4000,
+  }],
+  cognitiveSessions: [{
+    id: 'session-1',
+    compositeItemId: 'item-cog',
+    testType: 'reaction',
+    finishedAt: new Date('2026-08-20T01:05:00Z'),
+    configSnapshotEncrypted: encryptCognitivePayload({ report: { referenceMode: 'none' } }),
+    scoreEncrypted: encryptCognitivePayload(88),
+    metricsEncrypted: encryptCognitivePayload({ meanRtMs: 350 }),
+    qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+  }],
+  formAnswers: [{ itemId: 'item-form', value: '三年级' }],
+  ...overrides,
+})
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
+  mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
+  mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
+})
+
+describe('listComposites attemptCounts', () => {
+  it('skips groupBy for an empty list and never returns _count', async () => {
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([])
+
+    const list = await listComposites('teacher-a', TEACHER)
+
+    expect(mockPrisma.compositeAssessmentAttempt.groupBy).not.toHaveBeenCalled()
+    expect(list).toEqual([])
+  })
+
+  it('maps mixed statuses and strips prisma _count from the payload', async () => {
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([
+      compositeRow(),
+      compositeRow({ id: 'composite-2', code: 'C-2', name: '综合测评 2', items: [], _count: { attempts: 1, accessTokens: 0 } }),
+    ])
+    mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([
+      { compositeAssessmentId: 'composite-1', status: 'COMPLETED', _count: { _all: 2 } },
+      { compositeAssessmentId: 'composite-1', status: 'IN_PROGRESS', _count: { _all: 1 } },
+      { compositeAssessmentId: 'composite-1', status: 'ABANDONED', _count: { _all: 1 } },
+    ])
+
+    const list = await listComposites('teacher-a', TEACHER)
+
+    expect(mockPrisma.compositeAssessmentAttempt.groupBy).toHaveBeenCalledWith({
+      by: ['compositeAssessmentId', 'status'],
+      where: { compositeAssessmentId: { in: ['composite-1', 'composite-2'] } },
+      _count: { _all: true },
+    })
+    expect(list[0].attemptCounts).toEqual({ started: 4, inProgress: 1, completed: 2, abandoned: 1 })
+    expect(list[1].attemptCounts).toEqual({ started: 0, inProgress: 0, completed: 0, abandoned: 0 })
+    expect(list[0]).not.toHaveProperty('_count')
+    expect(list[1]).not.toHaveProperty('_count')
+  })
+})
+
+describe('getCompositeForTeacher attemptCounts', () => {
+  it('returns the same count shape as the list and omits _count', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow({ items: [] }))
+    mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([
+      { compositeAssessmentId: 'composite-1', status: 'COMPLETED', _count: { _all: 3 } },
+    ])
+
+    const detail = await getCompositeForTeacher('teacher-a', TEACHER, 'composite-1')
+
+    expect(detail.attemptCounts).toEqual({ started: 3, inProgress: 0, completed: 3, abandoned: 0 })
+    expect(detail).not.toHaveProperty('_count')
+  })
+})
+
+describe('listAttemptsForTeacher', () => {
+  it('forbids another teacher and lets ADMIN read', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+
+    await expect(listAttemptsForTeacher('teacher-b', TEACHER, 'composite-1', page))
+      .rejects.toMatchObject({ statusCode: 403 })
+    expect(mockPrisma.compositeAssessmentAttempt.findMany).not.toHaveBeenCalled()
+
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([attemptRow()])
+    mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(1)
+    const adminResult = await listAttemptsForTeacher('admin-1', ADMIN, 'composite-1', page)
+    expect(adminResult.total).toBe(1)
+    expect(adminResult.list).toHaveLength(1)
+  })
+
+  it('splits nickname and username, and never returns recoveryTokenHash', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([
+      attemptRow(),
+      attemptRow({
+        id: 'attempt-anon',
+        anonymousCode: 'ANON-ABCDEF12',
+        userId: null,
+        user: null,
+      }),
+      attemptRow({
+        id: 'attempt-deleted',
+        userId: null,
+        user: null,
+        anonymousCode: null,
+      }),
+      attemptRow({
+        id: 'attempt-blank-nick',
+        user: { id: 'student-2', nickname: null, username: 'stu2' },
+      }),
+    ])
+    mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(4)
+
+    const result = await listAttemptsForTeacher('teacher-a', TEACHER, 'composite-1', page)
+
+    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).not.toHaveProperty('recoveryTokenHash')
+    expect(JSON.stringify(result)).not.toContain('recoveryTokenHash')
+    expect(result.list[0]).toMatchObject({
+      nickname: '小明',
+      username: 'stu1',
+      displayName: '小明',
+      isAnonymous: false,
+    })
+    expect(result.list[0].displayName).not.toBe('小明stu1')
+    expect(result.list[1]).toMatchObject({
+      isAnonymous: true,
+      anonymousCode: 'ANON-ABCDEF12',
+      nickname: null,
+      username: null,
+      displayName: 'ANON-ABCDEF12',
+    })
+    expect(result.list[2]).toMatchObject({
+      isAnonymous: false,
+      displayName: '已删除用户',
+      nickname: null,
+      username: null,
+    })
+    expect(result.list[3]).toMatchObject({
+      nickname: null,
+      username: 'stu2',
+      displayName: null,
+    })
+    expect(result.list[3].displayName).not.toBe('stu2')
+  })
+})
+
+describe('getReportForTeacher', () => {
+  it('forbids another teacher from reading the report', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+
+    await expect(getReportForTeacher('teacher-b', TEACHER, 'composite-1', 'attempt-1'))
+      .rejects.toMatchObject({ statusCode: 403 })
+    expect(mockPrisma.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('rejects in-progress attempts and cross-template ids', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(completedAttemptForReport({ status: 'IN_PROGRESS' }))
+
+    await expect(getReportForTeacher('teacher-a', TEACHER, 'composite-1', 'attempt-1'))
+      .rejects.toMatchObject({ statusCode: 400 })
+
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(
+      completedAttemptForReport({ compositeAssessmentId: 'composite-other' }),
+    )
+    await expect(getReportForTeacher('teacher-a', TEACHER, 'composite-1', 'attempt-1'))
+      .rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('lets ADMIN read another teacher’s completed report without a totalScore', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow({ createdBy: 'teacher-a' }))
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(completedAttemptForReport())
+
+    const report = await getReportForTeacher('admin-1', ADMIN, 'composite-1', 'attempt-1')
+    expect(report.modules.map((item: { type: string }) => item.type)).toEqual(['FORM', 'SCALE', 'COGNITIVE'])
+    expect(report).not.toHaveProperty('totalScore')
+    expect(report.modules.some((item: { decryptError?: boolean }) => item.decryptError)).toBe(false)
+  })
+})
+
+describe('buildCompositeReport decrypt degrade', () => {
+  it('marks a bad cognitive module without failing the report or student getReport', async () => {
+    const attempt = completedAttemptForReport({
+      cognitiveSessions: [{
+        id: 'session-bad',
+        compositeItemId: 'item-cog',
+        testType: 'reaction',
+        finishedAt: new Date('2026-08-20T01:05:00Z'),
+        configSnapshotEncrypted: 'not-an-envelope',
+        scoreEncrypted: 'not-an-envelope',
+        metricsEncrypted: 'not-an-envelope',
+        qualityFlagsEncrypted: 'not-an-envelope',
+      }],
+    })
+
+    const built = buildCompositeReport(attempt)
+    const cognitive = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE')
+    expect(cognitive).toMatchObject({ decryptError: true, type: 'COGNITIVE' })
+    expect(cognitive).not.toHaveProperty('score')
+    expect(cognitive).not.toHaveProperty('metrics')
+    expect(cognitive).not.toHaveProperty('qualityFlags')
+    expect(built.modules.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
+    expect(built).not.toHaveProperty('totalScore')
+
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(attempt)
+    const studentReport = await getReport('attempt-1', { userId: 'student-1' })
+    expect(studentReport.modules.find((item: { type: string }) => item.type === 'COGNITIVE')).toMatchObject({ decryptError: true })
+  })
+})

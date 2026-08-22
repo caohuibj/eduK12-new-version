@@ -7,6 +7,7 @@ import {
   compositeFormAnswerSchema,
   createCompositeSchema,
   createCompositeTokenSchema,
+  listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
 } from '../../modules/composite/composite.schema'
 
@@ -56,5 +57,14 @@ describe('composite assessment schemas', () => {
   it('bounds submitted answers and validates scale values', () => {
     expect(() => compositeScaleAnswerSchema.parse({ itemId: 'question-1', value: 1.5 })).toThrow()
     expect(() => compositeFormAnswerSchema.parse({ itemId: 'form-1', value: 'x'.repeat(10001) })).toThrow()
+  })
+
+  it('accepts teacher attempt list filters and rejects unknown query keys', () => {
+    expect(listCompositeAttemptsQuerySchema.parse({ status: 'COMPLETED', q: 'ANON', page: '1', pageSize: '20' })).toMatchObject({
+      status: 'COMPLETED',
+      q: 'ANON',
+    })
+    expect(() => listCompositeAttemptsQuerySchema.parse({ _t: '1' })).toThrow()
+    expect(() => listCompositeAttemptsQuerySchema.parse({ status: 'DONE' })).toThrow()
   })
 })

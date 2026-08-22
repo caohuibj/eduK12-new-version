@@ -8,6 +8,7 @@ import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReference } from '../cognitive/reference'
+import { logger } from '../../utils/logger'
 import {
   CompositeServiceError,
   compositeBadRequest,
@@ -172,6 +173,95 @@ const mapItemForTeacher = (item: any) => ({
     : null,
 })
 
+type AttemptCounts = {
+  started: number
+  inProgress: number
+  completed: number
+  abandoned: number
+}
+
+const emptyAttemptCounts = (): AttemptCounts => ({
+  started: 0,
+  inProgress: 0,
+  completed: 0,
+  abandoned: 0,
+})
+
+const loadAttemptCountsByCompositeIds = async (ids: string[]): Promise<Map<string, AttemptCounts>> => {
+  const byId = new Map<string, AttemptCounts>()
+  if (ids.length === 0) return byId
+  const grouped = await prisma.compositeAssessmentAttempt.groupBy({
+    by: ['compositeAssessmentId', 'status'],
+    where: { compositeAssessmentId: { in: ids } },
+    _count: { _all: true },
+  })
+  for (const row of grouped) {
+    const current = byId.get(row.compositeAssessmentId) ?? emptyAttemptCounts()
+    const n = row._count._all
+    if (row.status === 'IN_PROGRESS') current.inProgress += n
+    else if (row.status === 'COMPLETED') current.completed += n
+    else if (row.status === 'ABANDONED') current.abandoned += n
+    current.started = current.inProgress + current.completed + current.abandoned
+    byId.set(row.compositeAssessmentId, current)
+  }
+  return byId
+}
+
+const mapAttemptRowForTeacher = (attempt: {
+  id: string
+  status: string
+  progress: number
+  completedItems: number
+  startedAt: Date
+  lastSavedAt: Date
+  completedAt: Date | null
+  totalTime: number | null
+  anonymousCode: string | null
+  userId: string | null
+  user: { id: string; nickname: string | null; username: string } | null
+}) => {
+  const base = {
+    id: attempt.id,
+    status: attempt.status,
+    progress: attempt.progress,
+    completedItems: attempt.completedItems,
+    startedAt: attempt.startedAt,
+    lastSavedAt: attempt.lastSavedAt,
+    completedAt: attempt.completedAt,
+    totalTime: attempt.totalTime,
+    userId: attempt.userId,
+  }
+  if (attempt.anonymousCode) {
+    return {
+      ...base,
+      isAnonymous: true,
+      anonymousCode: attempt.anonymousCode,
+      nickname: null,
+      username: null,
+      displayName: attempt.anonymousCode,
+    }
+  }
+  if (!attempt.user) {
+    return {
+      ...base,
+      isAnonymous: false,
+      anonymousCode: null,
+      nickname: null,
+      username: null,
+      displayName: '已删除用户',
+    }
+  }
+  return {
+    ...base,
+    isAnonymous: false,
+    anonymousCode: null,
+    nickname: attempt.user.nickname,
+    username: attempt.user.username,
+    displayName: attempt.user.nickname,
+    userId: attempt.user.id,
+  }
+}
+
 export const createComposite = async (userId: string, role: UserRole, input: CreateCompositeInput) => {
   assertTeacher(role)
   await validateCourse(input.courseId, userId, role)
@@ -227,23 +317,28 @@ export const listComposites = async (userId: string, role: UserRole) => {
           },
         },
       },
-      _count: { select: { attempts: true, accessTokens: true } },
     },
   })
   const supportedList = config.cognitiveModuleEnabled
     ? list
     : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
-  return supportedList.map((item: any) => ({
-    ...item,
-    itemCount: item.items.length,
-    items: item.items.map(mapItemForTeacher),
-  }))
+  const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id))
+  return supportedList.map((item: any) => {
+    const { _count: _ignoredCount, ...rest } = item
+    return {
+      ...rest,
+      itemCount: item.items.length,
+      items: item.items.map(mapItemForTeacher),
+      attemptCounts: counts.get(item.id) ?? emptyAttemptCounts(),
+    }
+  })
 }
 
 export const getCompositeForTeacher = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  const counts = await loadAttemptCountsByCompositeIds([composite.id])
   return {
     id: composite.id,
     code: composite.code,
@@ -258,6 +353,79 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     publicEnabled: composite.publicEnabled,
     publishedAt: composite.publishedAt,
     items: composite.items.map(mapItemForTeacher),
+    attemptCounts: counts.get(composite.id) ?? emptyAttemptCounts(),
+  }
+}
+
+export const listAttemptsForTeacher = async (
+  userId: string,
+  role: UserRole,
+  compositeId: string,
+  query: {
+    status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
+    q?: string
+    page: number
+    pageSize: number
+  },
+) => {
+  assertTeacher(role)
+  const composite = await loadComposite(compositeId)
+  assertOwner(composite, userId, role)
+
+  const where: Record<string, unknown> = { compositeAssessmentId: compositeId }
+  if (query.status) where.status = query.status
+  const q = query.q?.trim()
+  if (q) {
+    where.OR = [
+      { anonymousCode: { contains: q, mode: 'insensitive' } },
+      { user: { is: { nickname: { contains: q, mode: 'insensitive' } } } },
+      { user: { is: { username: { contains: q, mode: 'insensitive' } } } },
+    ]
+  }
+
+  const [attempts, total, counts] = await Promise.all([
+    prisma.compositeAssessmentAttempt.findMany({
+      where,
+      skip: (query.page - 1) * query.pageSize,
+      take: query.pageSize,
+      orderBy: [
+        { completedAt: { sort: 'desc', nulls: 'last' } },
+        { startedAt: 'desc' },
+      ],
+      select: {
+        id: true,
+        status: true,
+        progress: true,
+        completedItems: true,
+        startedAt: true,
+        lastSavedAt: true,
+        completedAt: true,
+        totalTime: true,
+        anonymousCode: true,
+        userId: true,
+        user: { select: { id: true, nickname: true, username: true } },
+      },
+    }),
+    prisma.compositeAssessmentAttempt.count({ where }),
+    loadAttemptCountsByCompositeIds([compositeId]),
+  ])
+
+  const totalPages = Math.ceil(total / query.pageSize)
+  return {
+    assessment: {
+      id: composite.id,
+      name: composite.name,
+      code: composite.code,
+      status: composite.status,
+      courseId: composite.courseId,
+    },
+    attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
+    list: attempts.map(mapAttemptRowForTeacher),
+    page: query.page,
+    pageSize: query.pageSize,
+    total,
+    totalPages,
+    hasMore: query.page < totalPages,
   }
 }
 
@@ -651,7 +819,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
-const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+const loadAttemptWithChildren = async (attemptId: string) => {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     include: {
@@ -680,12 +848,17 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  return attempt as any
+}
+
+const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const attempt = await loadAttemptWithChildren(attemptId)
   const authorized = context.userId
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
   assertSupportedComposite(attempt.compositeAssessment)
-  return attempt as any
+  return attempt
 }
 
 const cognitiveRunnerPayload = (session: any) => {
@@ -920,38 +1093,91 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
   return getAttemptState(attempt.id, context)
 }
 
-export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
-  const attempt = await findAttempt(attemptId, context)
-  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
   const modules = attempt.compositeAssessment.items.map((item: any) => {
-    if (item.type === 'FORM') return { itemId: item.id, type: item.type, label: item.formLabel, value: formMap.get(item.id)?.value ?? null }
-    if (item.type === 'SCALE') {
-      const result = scaleMap.get(item.id)
-      return { itemId: item.id, type: item.type, label: item.scale?.name, scaleId: item.scaleId, scores: decodeJson(result?.scores) ?? [], feedback: decodeJson(result?.feedback) ?? {}, completedAt: result?.completedAt, totalTime: result?.totalTime }
+    if (item.type === 'FORM') {
+      return { itemId: item.id, type: item.type, label: item.formLabel, value: formMap.get(item.id)?.value ?? null }
     }
-    const session = cognitiveMap.get(item.id)
-    const config = session ? decryptCognitivePayload<Record<string, any>>(session.configSnapshotEncrypted) : {}
-    const score = session?.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
-    const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
-    const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
-    const report = config.report ?? {}
-    return {
-      itemId: item.id,
-      type: item.type,
-      label: item.cognitiveAssignment?.title,
-      sessionId: session?.id,
-      testType: session?.testType,
-      score,
-      metrics,
-      qualityFlags,
-      finishedAt: session?.finishedAt,
-      reference: session && score !== null ? resolveCognitiveReference({ testType: session.testType, metrics, score, referenceMode: report.referenceMode ?? 'none', referenceVersion: report.referenceVersion, referenceBand: report.referenceBand }) : undefined,
+    if (item.type === 'SCALE') {
+      try {
+        const result = scaleMap.get(item.id)
+        return {
+          itemId: item.id,
+          type: item.type,
+          label: item.scale?.name,
+          scaleId: item.scaleId,
+          scores: decodeJson(result?.scores) ?? [],
+          feedback: decodeJson(result?.feedback) ?? {},
+          completedAt: result?.completedAt,
+          totalTime: result?.totalTime,
+        }
+      } catch {
+        logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+        return { itemId: item.id, type: item.type, label: item.scale?.name, scaleId: item.scaleId, decryptError: true }
+      }
+    }
+    try {
+      const session = cognitiveMap.get(item.id)
+      const config = session ? decryptCognitivePayload<Record<string, any>>(session.configSnapshotEncrypted) : {}
+      const score = session?.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
+      const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
+      const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
+      const report = config.report ?? {}
+      return {
+        itemId: item.id,
+        type: item.type,
+        label: item.cognitiveAssignment?.title,
+        sessionId: session?.id,
+        testType: session?.testType,
+        score,
+        metrics,
+        qualityFlags,
+        finishedAt: session?.finishedAt,
+        reference: session && score !== null
+          ? resolveCognitiveReference({
+            testType: session.testType,
+            metrics,
+            score,
+            referenceMode: report.referenceMode ?? 'none',
+            referenceVersion: report.referenceVersion,
+            referenceBand: report.referenceBand,
+          })
+          : undefined,
+      }
+    } catch {
+      logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+      return { itemId: item.id, type: item.type, label: item.cognitiveAssignment?.title, decryptError: true }
     }
   })
-  return { id: attempt.id, assessmentId: attempt.compositeAssessment.id, name: attempt.compositeAssessment.name, anonymousCode: attempt.anonymousCode, completedAt: attempt.completedAt, totalTime: attempt.totalTime, modules }
+  return {
+    id: attempt.id,
+    assessmentId: attempt.compositeAssessment.id,
+    name: attempt.compositeAssessment.name,
+    anonymousCode: attempt.anonymousCode,
+    completedAt: attempt.completedAt,
+    totalTime: attempt.totalTime,
+    modules,
+  }
+}
+
+export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const attempt = await findAttempt(attemptId, context)
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  return buildCompositeReport(attempt)
+}
+
+export const getReportForTeacher = async (userId: string, role: UserRole, compositeId: string, attemptId: string) => {
+  assertTeacher(role)
+  const composite = await loadComposite(compositeId)
+  assertOwner(composite, userId, role)
+  const attempt = await loadAttemptWithChildren(attemptId)
+  if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  assertSupportedComposite(attempt.compositeAssessment)
+  return buildCompositeReport(attempt)
 }
 
 export const getExportContext = async (userId: string, role: UserRole, id: string) => {
