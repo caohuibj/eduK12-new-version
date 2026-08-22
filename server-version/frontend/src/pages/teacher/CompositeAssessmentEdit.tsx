@@ -215,6 +215,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{detail.name}</h1>
           <p className="text-sm text-gray-500">{detail.code} · {detail.status}</p>
+          <p className="text-sm text-gray-600 mt-1">已开始 {detail.attemptCounts?.started ?? 0} · 已完成 {detail.attemptCounts?.completed ?? 0}</p>
         </div>
         <div className="flex gap-2">
           {isDraft && (
@@ -222,6 +223,7 @@ const CompositeAssessmentEdit: React.FC = () => {
               <Send className="w-4 h-4 inline mr-1" />发布
             </button>
           )}
+          <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="btn-secondary">查看结果</button>
           <button onClick={() => void exportData('summary')} className="btn-secondary">
             <Download className="w-4 h-4 inline mr-1" />导出摘要
           </button>

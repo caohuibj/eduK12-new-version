@@ -1,5 +1,10 @@
 import apiClient from '../../api/client'
-import type { CompositeAttemptState, CompositePublicInfo, CompositeReport } from './types'
+import type {
+  CompositeAttemptState,
+  CompositePublicInfo,
+  CompositeReport,
+  CompositeTeacherAttemptsResponse,
+} from './types'
 
 export const compositeApi = {
   list: () => apiClient.get<{ list: any[] }>('/composite-assessments'),
@@ -22,6 +27,18 @@ export const compositeApi = {
   completeScale: (attemptId: string, itemId: string) => apiClient.post<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/complete`, {}),
   formAnswer: (attemptId: string, itemId: string, value: string) => apiClient.post<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/form-answer`, { itemId, value }),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report`),
+  attempts: (id: string, query: { status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; q?: string; page?: number; pageSize?: number } = {}) => {
+    const params = new URLSearchParams()
+    if (query.status) params.set('status', query.status)
+    const q = query.q?.trim()
+    if (q) params.set('q', q)
+    if (query.page) params.set('page', String(query.page))
+    if (query.pageSize) params.set('pageSize', String(query.pageSize))
+    const qs = params.toString()
+    return apiClient.get<CompositeTeacherAttemptsResponse>(`/composite-assessments/${id}/attempts${qs ? `?${qs}` : ''}`)
+  },
+  teacherReport: (compositeId: string, attemptId: string) =>
+    apiClient.get<CompositeReport>(`/composite-assessments/${compositeId}/attempts/${attemptId}/report`),
 }
 
 export const publicCompositeApi = (recoveryToken: string) => ({
