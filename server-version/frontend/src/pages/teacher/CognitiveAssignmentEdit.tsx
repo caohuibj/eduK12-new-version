@@ -49,16 +49,21 @@ const CognitiveAssignmentEdit: React.FC = () => {
   }
 
   const createToken = async () => {
-    if (!tokenExpiresAt) return
-    const response = await cognitiveApi.createPublicToken(id, {
-      expiresAt: new Date(tokenExpiresAt).toISOString(),
-      maxUses: tokenMaxUses,
-    })
-    if (response.code === 0) {
-      setToken({ ...response.data, isActive: true })
-      setTokenExpiresAt('')
-    } else {
-      setError(response.message || '生成公开链接失败')
+    if (!tokenExpiresAt) {
+      setError('请先选择公开链接的有效期')
+      return
+    }
+    try {
+      setError(null)
+      const response = await cognitiveApi.createPublicToken(id, {
+        expiresAt: new Date(tokenExpiresAt).toISOString(),
+        maxUses: Number(tokenMaxUses) || 0,
+      })
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
+      setToken({ ...response.data, isActive: true, usedCount: response.data.usedCount ?? 0 })
+    } catch (err) {
+      const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : '生成公开链接失败'
+      setError(message)
     }
   }
 
