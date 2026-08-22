@@ -42,6 +42,7 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [tokenMaxUses, setTokenMaxUses] = useState(0)
   const [savingToken, setSavingToken] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [savingCopyable, setSavingCopyable] = useState(false)
   const cognitiveModuleEnabled = useCognitiveEnabled()
 
   const load = async () => {
@@ -177,6 +178,20 @@ const CompositeAssessmentEdit: React.FC = () => {
     }
   }
 
+  const toggleCopyable = async (copyable: boolean) => {
+    try {
+      setSavingCopyable(true)
+      setError(null)
+      const response = await compositeApi.update(id, { copyable })
+      if (response.code !== 0) throw new Error(response.message || '更新复制开关失败')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err, '更新复制开关失败'))
+    } finally {
+      setSavingCopyable(false)
+    }
+  }
+
   const exportData = async (detailMode: 'summary' | 'full') => {
     try {
       const response = await compositeApi.exportData(id, { detail: detailMode, format: 'csv' })
@@ -203,6 +218,7 @@ const CompositeAssessmentEdit: React.FC = () => {
   if (!detail) return <div className="p-8 text-gray-500">{error || '加载中...'}</div>
 
   const isDraft = detail.status === 'DRAFT'
+  const isLibraryCourse = Boolean(detail.course?.isLibrary)
   const itemLabel = (item: any) =>
     item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.form?.label
 
@@ -213,7 +229,15 @@ const CompositeAssessmentEdit: React.FC = () => {
       </button>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">{detail.name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold text-gray-800">{detail.name}</h1>
+            {isLibraryCourse && (
+              <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
+            )}
+            {detail.copyable && (
+              <span className="px-2 py-0.5 text-xs rounded bg-emerald-100 text-emerald-700">可复制</span>
+            )}
+          </div>
           <p className="text-sm text-gray-500">{detail.code} · {detail.status}</p>
           <p className="text-sm text-gray-600 mt-1">已开始 {detail.attemptCounts?.started ?? 0} · 已完成 {detail.attemptCounts?.completed ?? 0}</p>
         </div>
@@ -231,6 +255,23 @@ const CompositeAssessmentEdit: React.FC = () => {
         </div>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
+      {detail.canSetCopyable && (
+        <div className="card p-6 mb-5">
+          <h2 className="font-semibold mb-2">管理员模板</h2>
+          <p className="text-sm text-gray-500 mb-3">
+            打开后，教师可把这份已发布综合测评复制成自己的草稿。关闭后立即从教师模板目录消失，已复制的草稿不受影响。
+          </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={Boolean(detail.copyable)}
+              disabled={savingCopyable}
+              onChange={(e) => void toggleCopyable(e.target.checked)}
+            />
+            允许教师复制
+          </label>
+        </div>
+      )}
       <div className="card p-6 mb-5">
         <h2 className="font-semibold mb-4">测评顺序</h2>
         {detail.items?.length ? (
@@ -276,7 +317,11 @@ const CompositeAssessmentEdit: React.FC = () => {
                 <option value="">请选择</option>
                 {type === 'SCALE'
                   ? scales.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)
-                  : cognitiveAssignments.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+                  : cognitiveAssignments.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.title}{item.listedStandalone === false ? '（综合测评用）' : ''}
+                    </option>
+                  ))}
               </select>
             ) : (
               <>
@@ -296,7 +341,10 @@ const CompositeAssessmentEdit: React.FC = () => {
           </button>
         </div>
       )}
-      {detail.status === 'PUBLISHED' && (
+      {detail.status === 'PUBLISHED' && isLibraryCourse && (
+        <p className="text-sm text-gray-500 mb-5">库课程上的综合测评不能生成公开链接，也不能发给学生作答。</p>
+      )}
+      {detail.status === 'PUBLISHED' && !isLibraryCourse && (
         <div className="card p-6">
           <h2 className="font-semibold mb-3">
             <LinkIcon className="w-4 h-4 inline mr-1" />公开匿名链接

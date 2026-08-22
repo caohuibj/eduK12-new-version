@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc -p tsconfig.cognitive.json --noEmit",
+    "test": "vitest run",
     "test:cognitive": "vitest run src/modules/cognitive",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -116,3 +116,41 @@ export interface CompositeTeacherAttemptsResponse {
   totalPages: number
   hasMore: boolean
 }
+
+export interface CompositeCourseRef {
+  id: string
+  title: string
+  courseCode?: string
+  isLibrary: boolean
+}
+
+export interface CompositeTeacherListItem {
+  id: string
+  code: string
+  name: string
+  description?: string | null
+  status: string
+  itemCount: number
+  copyable: boolean
+  canSetCopyable: boolean
+  createdBy: string
+  creator: { id: string; role: string } | null
+  course: CompositeCourseRef | null
+  attemptCounts?: CompositeAttemptCounts
+  items?: Array<{
+    type: CompositeItemType
+    position: number
+    label?: string | null
+    scale?: { name?: string } | null
+    cognitiveAssignment?: { title?: string } | null
+    form?: { label?: string } | null
+  }>
+}
+
+export interface CompositeLibraryTemplate {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  items: Array<{ type: CompositeItemType; position: number; label: string | null }>
+}
