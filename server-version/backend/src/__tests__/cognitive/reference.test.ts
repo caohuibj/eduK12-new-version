@@ -136,7 +136,7 @@ describe('cognitive reference resolver', () => {
     expect(result.comparison).toBeNull()
   })
 
-  it('enables literature-anchored simulated reference for matching 1.1.0 standard protocols', () => {
+  it('ignores seed/config K7-9 when the participant has no age band', () => {
     const result = resolveCognitiveReference({
       testType: 'reaction',
       metrics: { medianRtMs: 320 },
@@ -152,17 +152,37 @@ describe('cognitive reference resolver', () => {
         foreperiodMinMs: 700,
         foreperiodMaxMs: 1500,
         timeoutMs: 2000,
+        report: { reportVersion: '1.1.0', referenceMode: 'simulated', referenceVersion: LITERATURE_ANCHORED_SIM_VERSION, referenceBand: 'K7-9' },
       },
     })
-    expect(result.available).toBe(true)
-    expect(result.label).toBe('内部模拟参考')
-    expect(result.label).not.toMatch(/文献锚定/)
-    expect(result.comparison?.metricKey).toBe('medianRtMs')
-    expect(result.disclaimer).not.toMatch(/文献锚定/)
-    noPercentile(result.disclaimer)
+    expect(result.available).toBe(false)
+    expect(result.disclaimer).toContain('未采集参与者年龄带')
   })
 
-  it('does not default a missing or illegal band to the first age band', () => {
+  it('does not give a K10-12 participant the seed K7-9 comparison', () => {
+    const result = resolveCognitiveReference({
+      testType: 'reaction',
+      metrics: { medianRtMs: 320 },
+      score: 80,
+      referenceMode: 'simulated',
+      referenceVersion: LITERATURE_ANCHORED_SIM_VERSION,
+      referenceBand: 'K7-9',
+      participantAgeBand: null,
+      profile: 'standard',
+      scoringVersion: '1.1.0',
+      engineVersion: '1.0.0',
+      config: {
+        totalTrials: 20,
+        foreperiodMinMs: 700,
+        foreperiodMaxMs: 1500,
+        timeoutMs: 2000,
+      },
+    })
+    expect(result.available).toBe(false)
+    expect(result.band).toBeNull()
+  })
+
+  it('produces different comparisons when a participant age band is explicitly supplied', () => {
     const base = {
       testType: 'reaction' as const,
       metrics: { medianRtMs: 320 },
@@ -179,32 +199,12 @@ describe('cognitive reference resolver', () => {
         timeoutMs: 2000,
       },
     }
-    expect(resolveCognitiveReference(base).available).toBe(false)
-    expect(resolveCognitiveReference({ ...base, referenceBand: 'K99' }).available).toBe(false)
-  })
-
-  it('produces different comparisons for K7-9 and K10-12', () => {
-    const base = {
-      testType: 'reaction' as const,
-      metrics: { medianRtMs: 320 },
-      score: 80,
-      referenceMode: 'simulated' as const,
-      referenceVersion: LITERATURE_ANCHORED_SIM_VERSION,
-      profile: 'standard' as const,
-      scoringVersion: '1.1.0',
-      engineVersion: '1.0.0',
-      config: {
-        totalTrials: 20,
-        foreperiodMinMs: 700,
-        foreperiodMaxMs: 1500,
-        timeoutMs: 2000,
-      },
-    }
-    const younger = resolveCognitiveReference({ ...base, referenceBand: 'K7-9' })
-    const older = resolveCognitiveReference({ ...base, referenceBand: 'K10-12' })
+    const younger = resolveCognitiveReference({ ...base, participantAgeBand: 'K7-9' })
+    const older = resolveCognitiveReference({ ...base, participantAgeBand: 'K10-12' })
     expect(younger.available).toBe(true)
     expect(older.available).toBe(true)
     expect(younger.comparison?.referenceMean).not.toBe(older.comparison?.referenceMean)
+    expect(resolveCognitiveReference({ ...base, participantAgeBand: 'K99' }).available).toBe(false)
   })
 
   it('does not infer a missing profile as standard', () => {

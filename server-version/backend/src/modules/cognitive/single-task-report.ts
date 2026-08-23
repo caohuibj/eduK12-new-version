@@ -1,6 +1,7 @@
 import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskReportDefinition } from './cognitive.types'
 import type { CognitiveReference } from './reference'
 import type { FrozenReportSnapshot } from './profile-freeze'
+import { getCognitiveRegistryEntry } from './cognitive.registry'
 
 export interface CognitiveReportMetricView {
   key: string
@@ -66,6 +67,26 @@ const metricView = (
   }
 }
 
+const registryCompatReport = (input: {
+  testType: string
+  engineVersion: string
+  scoringVersion: string
+}): FrozenReportSnapshot | null => {
+  const entry = getCognitiveRegistryEntry(input.testType, input.engineVersion, input.scoringVersion)
+  if (!entry) return null
+  return {
+    profile: 'standard',
+    profileDefinitionVersion: entry.profileDefinitionVersion,
+    metricDefinitionVersion: entry.metricDefinitionVersion,
+    qualityDefinitionVersion: entry.qualityDefinitionVersion,
+    reportDefinitionVersion: entry.reportDefinitionVersion,
+    reportCaveats: [],
+    metricDefinitions: entry.metricDefinitions,
+    qualityDefinitions: entry.qualityDefinitions,
+    reportDefinition: entry.reportDefinition,
+  }
+}
+
 export const buildCognitiveSingleTaskReport = (input: {
   testType: string
   engineVersion: string
@@ -77,11 +98,12 @@ export const buildCognitiveSingleTaskReport = (input: {
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
   reference: CognitiveReference | null | undefined
-}): CognitiveSingleTaskReport => {
-  const frozen = input.frozenReport
-  const reportDefinition: SingleTaskReportDefinition | undefined = frozen?.reportDefinition
-  const metricDefinitions: Record<string, MetricDefinition> = frozen?.metricDefinitions ?? {}
-  const qualityDefinitions: Record<string, QualityDefinition> = frozen?.qualityDefinitions ?? {}
+}): CognitiveSingleTaskReport | null => {
+  const frozen = input.frozenReport ?? registryCompatReport(input)
+  if (!frozen) return null
+  const reportDefinition: SingleTaskReportDefinition | undefined = frozen.reportDefinition
+  const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
+  const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
   const interpretable = input.qualityFlags.interpretable !== false
   const primaryKeys = reportDefinition?.primaryMetrics ?? []
   const secondaryKeys = reportDefinition?.secondaryMetrics ?? []
@@ -109,7 +131,7 @@ export const buildCognitiveSingleTaskReport = (input: {
     productIndex: interpretable ? { label: '任务表现指数', value: input.score } : null,
     primaryMetrics: primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
     secondaryMetrics: secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
-    caveats: frozen?.reportCaveats ?? [],
+    caveats: input.frozenReport?.reportCaveats ?? frozen.reportCaveats ?? [],
     practicalTips: reportDefinition?.practicalTips ?? [],
     method: {
       testType: input.testType,
