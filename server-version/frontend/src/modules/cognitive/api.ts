@@ -21,7 +21,16 @@ export interface CognitiveSessionApi {
 
 export const cognitiveApi = {
   listConfigs: () =>
-    apiClient.get<{ list: Array<{ id: string; testType: string; configVersion: string; name: string; instruction: string | null }> }>('/cognitive/configs'),
+    apiClient.get<{ list: Array<{
+      id: string
+      testType: string
+      configVersion: string
+      name: string
+      instruction: string | null
+      accessPolicy?: 'OPEN' | 'GRANT'
+    }> }>('/cognitive/configs'),
+  updateConfigAccessPolicy: (id: string, accessPolicy: 'OPEN' | 'GRANT') =>
+    apiClient.patch<{ id: string; accessPolicy: 'OPEN' | 'GRANT' }>(`/cognitive/configs/${id}/access-policy`, { accessPolicy }),
   listTeacherAssignments: (status?: string) =>
     apiClient.get<any>(status ? `/cognitive/assignments?status=${encodeURIComponent(status)}` : '/cognitive/assignments'),
   createAssignment: (body: {

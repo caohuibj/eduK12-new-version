@@ -141,7 +141,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   const fetchAvailableScales = async () => {
     try {
-      const response = await apiClient.get<{ list: Scale[] }>('/scales')
+      const response = await apiClient.get<{ list: Scale[] }>('/scales?status=PUBLISHED&page=1&pageSize=100')
       if (response.code === 0) {
         setAvailableScales(response.data.list.filter(s => s.status === 'PUBLISHED'))
       }
