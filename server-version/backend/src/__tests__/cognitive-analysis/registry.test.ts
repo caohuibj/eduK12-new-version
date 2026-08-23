@@ -122,8 +122,15 @@ describe('Round 2 cognitive analysis registries', () => {
 
     expect(() =>
       validateAnalysisProtocolDefinitions([
-        { ...base, status: 'PUBLISHED', recommendedForCreate: true },
+        {
+          ...base,
+          status: 'PUBLISHED',
+          recommendedForCreate: true,
+          cognitiveSlots: base.cognitiveSlots.map((slot, index) => index === 0
+            ? { ...slot, testType: 'not-implemented' }
+            : slot),
+        },
       ]),
-    ).toThrow(/unresolved task: attention_stability_v1\/1.0.0\/patterncompare/)
+    ).toThrow(/unresolved task: attention_stability_v1\/1.0.0\/not-implemented/)
   })
 })

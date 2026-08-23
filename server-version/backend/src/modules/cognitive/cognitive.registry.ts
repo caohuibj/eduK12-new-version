@@ -13,6 +13,9 @@ import {
   corsiRegistryMeta,
   sstRegistryMeta,
   taskswitchRegistryMeta,
+  patterncompareRegistryMeta,
+  flankerRegistryMeta,
+  cardsortRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -47,6 +50,15 @@ import { scoreSstV1 } from './scoring/sst.v1'
 import { taskswitchConfigSchema } from './schemas/taskswitch.config'
 import { taskswitchTrialSchema } from './schemas/taskswitch.trial'
 import { scoreTaskswitchV1 } from './scoring/taskswitch.v1'
+import { patterncompareConfigSchema } from './schemas/patterncompare.config'
+import { patterncompareTrialSchema } from './schemas/patterncompare.trial'
+import { scorePatterncompareV1 } from './scoring/patterncompare.v1'
+import { flankerConfigSchema } from './schemas/flanker.config'
+import { flankerTrialSchema } from './schemas/flanker.trial'
+import { scoreFlankerV1 } from './scoring/flanker.v1'
+import { cardsortConfigSchema } from './schemas/cardsort.config'
+import { cardsortTrialSchema } from './schemas/cardsort.trial'
+import { scoreCardsortV1 } from './scoring/cardsort.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -244,4 +256,34 @@ registerEntry({
   trialSchema: taskswitchTrialSchema,
   score: scoreTaskswitchV1,
   ...taskswitchRegistryMeta,
+})
+
+registerEntry({
+  testType: 'patterncompare',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: patterncompareConfigSchema,
+  trialSchema: patterncompareTrialSchema,
+  score: scorePatterncompareV1,
+  ...patterncompareRegistryMeta,
+})
+
+registerEntry({
+  testType: 'flanker',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: flankerConfigSchema,
+  trialSchema: flankerTrialSchema,
+  score: scoreFlankerV1,
+  ...flankerRegistryMeta,
+})
+
+registerEntry({
+  testType: 'cardsort',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: cardsortConfigSchema,
+  trialSchema: cardsortTrialSchema,
+  score: scoreCardsortV1,
+  ...cardsortRegistryMeta,
 })

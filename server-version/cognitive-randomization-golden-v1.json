@@ -48,5 +48,35 @@
     { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "parity", "switchType": "switch", "stimulus": 2, "correctResponse": "left" },
     { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 8, "correctResponse": "right" },
     { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 9, "correctResponse": "right" }
+  ],
+  "patterncompare": [
+    { "leftPattern": { "shape": "circle", "fill": "outline", "marks": 2, "rotation": 90 }, "rightPattern": { "shape": "circle", "fill": "outline", "marks": 2, "rotation": 270 }, "correctResponse": "different" },
+    { "leftPattern": { "shape": "triangle", "fill": "solid", "marks": 3, "rotation": 180 }, "rightPattern": { "shape": "triangle", "fill": "solid", "marks": 3, "rotation": 180 }, "correctResponse": "same" },
+    { "leftPattern": { "shape": "square", "fill": "outline", "marks": 1, "rotation": 180 }, "rightPattern": { "shape": "square", "fill": "solid", "marks": 1, "rotation": 180 }, "correctResponse": "different" },
+    { "leftPattern": { "shape": "circle", "fill": "solid", "marks": 3, "rotation": 180 }, "rightPattern": { "shape": "circle", "fill": "solid", "marks": 3, "rotation": 180 }, "correctResponse": "same" }
+  ],
+  "flanker": [
+    { "targetDirection": "left", "flankerDirection": "left", "correctResponse": "left" },
+    { "targetDirection": "right", "flankerDirection": "right", "correctResponse": "right" },
+    { "targetDirection": "right", "flankerDirection": "left", "correctResponse": "right" },
+    { "targetDirection": "left", "flankerDirection": "right", "correctResponse": "left" },
+    { "targetDirection": "left", "flankerDirection": "right", "correctResponse": "left" },
+    { "targetDirection": "left", "flankerDirection": "left", "correctResponse": "left" },
+    { "targetDirection": "right", "flankerDirection": "left", "correctResponse": "right" },
+    { "targetDirection": "right", "flankerDirection": "right", "correctResponse": "right" }
+  ],
+  "cardsort": [
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": null, "switchType": "start", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": null },
+    { "blockIndex": 0, "ruleCue": "color", "previousRule": "shape", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "color", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "left" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "left" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": null, "switchType": "start", "stimulusColor": "red", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": null },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "red", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "left" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "color", "previousRule": "shape", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "color", "switchType": "switch", "stimulusColor": "blue", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" }
   ]
 }

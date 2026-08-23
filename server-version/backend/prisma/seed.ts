@@ -261,12 +261,12 @@ const LIT_SIM_REPORT = {
   referenceBand: 'K7-9',
 }
 
-async function seedPublishedCognitiveConfig(
+async function seedCognitiveConfig(
   testType: string,
   configVersion: string,
   expected: {
     name: string
-    status: 'PUBLISHED'
+    status: 'DRAFT' | 'PUBLISHED'
     engineVersion: string
     scoringVersion: string
     config: Record<string, unknown>
@@ -292,8 +292,11 @@ async function seedPublishedCognitiveConfig(
     console.log(`${testType} Cognitive 配置已存在且一致，跳过（幂等）: configVersion=${existing.configVersion}`)
     return
   }
-  throw new Error(`cognitiveTestConfig ${testType}/${configVersion} already PUBLISHED with divergent content; create a new configVersion instead of mutating it`)
+  throw new Error(`cognitiveTestConfig ${testType}/${configVersion} already exists with divergent content; create a new configVersion instead of mutating it`)
 }
+
+const seedPublishedCognitiveConfig = seedCognitiveConfig
+const seedDraftCognitiveConfig = seedCognitiveConfig
 
 async function seedRound1P0Configs() {
   await seedPublishedCognitiveConfig('reaction', '1.1.0', {
@@ -447,6 +450,52 @@ async function main() {
       intervalMs: 250,
       readyDurationMs: 800,
       inactivityGuardMs: 30000,
+      report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('patterncompare', '1.0.0', {
+    name: 'Pattern Comparison Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      durationSec: 60,
+      trialTimeoutMs: 2500,
+      isiMs: 250,
+      validRtFloorMs: 150,
+      stimulusSetVersion: 'geometric-v1.0.0',
+      report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('flanker', '1.0.0', {
+    name: 'Flanker Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 80,
+      congruentRatio: 0.5,
+      stimulusMs: 1800,
+      isiMs: 400,
+      validRtFloorMs: 150,
+      stimulusSetVersion: 'arrows-v1.0.0',
+      report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('cardsort', '1.0.0', {
+    name: 'Rule Card Sort Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 72,
+      switchRatio: 0.33,
+      blockCount: 3,
+      cueMs: 500,
+      stimulusMs: 2000,
+      isiMs: 350,
+      validRtFloorMs: 150,
+      stimulusSetVersion: 'geometric-cards-v1.0.0',
       report: NONE_REPORT,
     },
   })

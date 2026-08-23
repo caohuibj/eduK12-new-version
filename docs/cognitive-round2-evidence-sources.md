@@ -175,6 +175,16 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 
 **不可声称**：商业 Tower of London/Stockings of Cambridge 等价值；重复测试必须提示练习效应。
 
+### 3.10 PR3 刺激实现记录（待 pilot）
+
+| testType | stimulusSetVersion | sourceType | 实现与当前状态 |
+|---|---|---|---|
+| `patterncompare` | `geometric-v1.0.0` | internal-generated | 圆/方/三角、填充、标记数和带方向标记的旋转组合；seed 决定每个试次，same/different 成对平衡；config 保持 DRAFT |
+| `flanker` | `arrows-v1.0.0` | internal-generated | Unicode/CSS 箭头；每四试次精确平衡 congruence、目标方向和正确键；config 保持 DRAFT |
+| `cardsort` | `geometric-cards-v1.0.0` | internal-generated | 红/蓝与圆/星的双线索卡片，颜色同时有文字标签；switch 试次使用两规则冲突刺激；config 保持 DRAFT |
+
+以上三套刺激不含第三方图片。进入 PUBLISHED 前仍须完成第 6 节要求的 K7–K12 内容、可访问性和 pilot 审查；当前记录不等于发布许可。
+
 ---
 
 ## 4. P1 扩展任务来源与 Gate

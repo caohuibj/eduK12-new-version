@@ -197,3 +197,143 @@ export const taskswitchSequence = (
   }
   return trials
 }
+
+export type PatternStimulus = {
+  shape: 'circle' | 'square' | 'triangle'
+  fill: 'solid' | 'outline'
+  marks: 1 | 2 | 3
+  rotation: 0 | 90 | 180 | 270
+}
+
+export type PatterncompareTrialSpec = {
+  leftPattern: PatternStimulus
+  rightPattern: PatternStimulus
+  correctResponse: 'same' | 'different'
+}
+
+const PATTERN_SHAPES: PatternStimulus['shape'][] = ['circle', 'square', 'triangle']
+const PATTERN_FILLS: PatternStimulus['fill'][] = ['solid', 'outline']
+const PATTERN_ROTATIONS: PatternStimulus['rotation'][] = [0, 90, 180, 270]
+
+const randomPattern = (random: () => number): PatternStimulus => ({
+  shape: PATTERN_SHAPES[Math.floor(random() * PATTERN_SHAPES.length)],
+  fill: PATTERN_FILLS[Math.floor(random() * PATTERN_FILLS.length)],
+  marks: (Math.floor(random() * 3) + 1) as PatternStimulus['marks'],
+  rotation: PATTERN_ROTATIONS[Math.floor(random() * PATTERN_ROTATIONS.length)],
+})
+
+export const patterncompareTrial = (seed: string, trialIndex: number): PatterncompareTrialSpec => {
+  const labelRandom = seededRandom(seed, `patterncompare-label:${Math.floor(trialIndex / 2)}`)
+  const random = seededRandom(seed, `patterncompare-stimulus:${trialIndex}`)
+  const firstInPairIsSame = labelRandom() < 0.5
+  const same = trialIndex % 2 === 0 ? firstInPairIsSame : !firstInPairIsSame
+  const leftPattern = randomPattern(random)
+  const rightPattern = { ...leftPattern }
+  if (!same) {
+    const dimension = Math.floor(random() * 4)
+    if (dimension === 0) {
+      rightPattern.shape = PATTERN_SHAPES[(PATTERN_SHAPES.indexOf(leftPattern.shape) + 1 + Math.floor(random() * 2)) % 3]
+    } else if (dimension === 1) {
+      rightPattern.fill = leftPattern.fill === 'solid' ? 'outline' : 'solid'
+    } else if (dimension === 2) {
+      rightPattern.marks = ((leftPattern.marks % 3) + 1) as PatternStimulus['marks']
+    } else {
+      rightPattern.rotation = PATTERN_ROTATIONS[(PATTERN_ROTATIONS.indexOf(leftPattern.rotation) + 1 + Math.floor(random() * 3)) % 4]
+    }
+  }
+  return { leftPattern, rightPattern, correctResponse: same ? 'same' : 'different' }
+}
+
+export type FlankerTrialSpec = {
+  targetDirection: 'left' | 'right'
+  flankerDirection: 'left' | 'right'
+  correctResponse: 'left' | 'right'
+}
+
+export const flankerSequence = (seed: string, totalTrials: number): FlankerTrialSpec[] => {
+  const trials: FlankerTrialSpec[] = []
+  for (let block = 0; block < totalTrials / 4; block += 1) {
+    const blockTrials: FlankerTrialSpec[] = [
+      { targetDirection: 'left', flankerDirection: 'left', correctResponse: 'left' },
+      { targetDirection: 'right', flankerDirection: 'right', correctResponse: 'right' },
+      { targetDirection: 'left', flankerDirection: 'right', correctResponse: 'left' },
+      { targetDirection: 'right', flankerDirection: 'left', correctResponse: 'right' },
+    ]
+    trials.push(...shuffleInPlace(blockTrials, seededRandom(seed, `flanker:${block}`)))
+  }
+  return trials
+}
+
+type CardsortRule = 'color' | 'shape'
+type CardsortColor = 'red' | 'blue'
+type CardsortShape = 'circle' | 'star'
+
+export type CardsortTrialSpec = {
+  blockIndex: number
+  ruleCue: CardsortRule
+  previousRule: CardsortRule | null
+  switchType: 'start' | 'switch' | 'repeat'
+  stimulusColor: CardsortColor
+  stimulusShape: CardsortShape
+  correctResponse: 'left' | 'right'
+  previousRuleResponse: 'left' | 'right' | null
+}
+
+export const cardsortCorrectResponse = (
+  rule: CardsortRule,
+  color: CardsortColor,
+  shape: CardsortShape,
+): 'left' | 'right' => {
+  if (rule === 'color') return color === 'red' ? 'left' : 'right'
+  return shape === 'circle' ? 'left' : 'right'
+}
+
+const CARDSORT_STIMULI: Array<{ color: CardsortColor; shape: CardsortShape }> = [
+  { color: 'red', shape: 'circle' },
+  { color: 'red', shape: 'star' },
+  { color: 'blue', shape: 'circle' },
+  { color: 'blue', shape: 'star' },
+]
+
+export const cardsortSequence = (
+  seed: string,
+  totalTrials: number,
+  blockCount: number,
+  switchRatio: number,
+): CardsortTrialSpec[] => {
+  const perBlock = totalTrials / blockCount
+  const trials: CardsortTrialSpec[] = []
+  for (let blockIndex = 0; blockIndex < blockCount; blockIndex += 1) {
+    const switchCount = Math.max(1, Math.round((perBlock - 1) * switchRatio))
+    const switches = Array.from({ length: perBlock - 1 }, (_, index) => index < switchCount)
+    shuffleInPlace(switches, seededRandom(seed, `cardsort-switches:${blockIndex}`))
+    const startRandom = seededRandom(seed, `cardsort-start:${blockIndex}`)
+    const stimulusRandom = seededRandom(seed, `cardsort-stimuli:${blockIndex}`)
+    let previousRule: CardsortRule | null = null
+    for (let offset = 0; offset < perBlock; offset += 1) {
+      const shouldSwitch = offset > 0 && switches[offset - 1]
+      const ruleCue: CardsortRule = offset === 0
+        ? (startRandom() < 0.5 ? 'color' : 'shape')
+        : shouldSwitch
+          ? (previousRule === 'color' ? 'shape' : 'color')
+          : previousRule as CardsortRule
+      const switchType = offset === 0 ? 'start' : shouldSwitch ? 'switch' : 'repeat'
+      const candidates = shouldSwitch ? CARDSORT_STIMULI.slice(1, 3) : CARDSORT_STIMULI
+      const stimulus = candidates[Math.floor(stimulusRandom() * candidates.length)]
+      trials.push({
+        blockIndex,
+        ruleCue,
+        previousRule,
+        switchType,
+        stimulusColor: stimulus.color,
+        stimulusShape: stimulus.shape,
+        correctResponse: cardsortCorrectResponse(ruleCue, stimulus.color, stimulus.shape),
+        previousRuleResponse: previousRule
+          ? cardsortCorrectResponse(previousRule, stimulus.color, stimulus.shape)
+          : null,
+      })
+      previousRule = ruleCue
+    }
+  }
+  return trials
+}

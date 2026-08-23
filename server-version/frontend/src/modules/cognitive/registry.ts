@@ -10,6 +10,9 @@ import { nbackRegistryEntry } from './tasks/nback/nback.registry'
 import { corsiRegistryEntry } from './tasks/corsi/corsi.registry'
 import { sstRegistryEntry } from './tasks/sst/sst.registry'
 import { taskswitchRegistryEntry } from './tasks/taskswitch/taskswitch.registry'
+import { patterncompareRegistryEntry } from './tasks/patterncompare/patterncompare.registry'
+import { flankerRegistryEntry } from './tasks/flanker/flanker.registry'
+import { cardsortRegistryEntry } from './tasks/cardsort/cardsort.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -96,3 +99,6 @@ registerCognitiveRunner(nbackRegistryEntry)
 registerCognitiveRunner(corsiRegistryEntry)
 registerCognitiveRunner(sstRegistryEntry)
 registerCognitiveRunner(taskswitchRegistryEntry)
+registerCognitiveRunner(patterncompareRegistryEntry)
+registerCognitiveRunner(flankerRegistryEntry)
+registerCognitiveRunner(cardsortRegistryEntry)
