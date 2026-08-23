@@ -11,6 +11,8 @@ import {
   cptRegistryMeta,
   nbackRegistryMeta,
   corsiRegistryMeta,
+  sstRegistryMeta,
+  taskswitchRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -39,6 +41,12 @@ import { scoreNbackV1 } from './scoring/nback.v1'
 import { corsiConfigSchema } from './schemas/corsi.config'
 import { corsiTrialSchema } from './schemas/corsi.trial'
 import { scoreCorsiV1 } from './scoring/corsi.v1'
+import { sstConfigSchema } from './schemas/sst.config'
+import { sstTrialSchema } from './schemas/sst.trial'
+import { scoreSstV1 } from './scoring/sst.v1'
+import { taskswitchConfigSchema } from './schemas/taskswitch.config'
+import { taskswitchTrialSchema } from './schemas/taskswitch.trial'
+import { scoreTaskswitchV1 } from './scoring/taskswitch.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -216,4 +224,24 @@ registerEntry({
   trialSchema: corsiTrialSchema,
   score: scoreCorsiV1,
   ...corsiRegistryMeta,
+})
+
+registerEntry({
+  testType: 'sst',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: sstConfigSchema,
+  trialSchema: sstTrialSchema,
+  score: scoreSstV1,
+  ...sstRegistryMeta,
+})
+
+registerEntry({
+  testType: 'taskswitch',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: taskswitchConfigSchema,
+  trialSchema: taskswitchTrialSchema,
+  score: scoreTaskswitchV1,
+  ...taskswitchRegistryMeta,
 })

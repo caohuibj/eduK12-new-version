@@ -398,6 +398,41 @@ async function main() {
       report: NONE_REPORT,
     },
   })
+  await seedPublishedCognitiveConfig('sst', '1.0.0', {
+    name: 'Stop-Signal Task v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 96,
+      stopRatio: 0.25,
+      ssdStartMs: 250,
+      ssdMinMs: 50,
+      ssdMaxMs: 800,
+      ssdStepMs: 50,
+      goTimeoutMs: 1000,
+      isiMs: 500,
+      validRtFloorMs: 100,
+      report: NONE_REPORT,
+    },
+  })
+  await seedPublishedCognitiveConfig('taskswitch', '1.0.0', {
+    name: 'Task Switching v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 128,
+      switchRatio: 0.5,
+      blockCount: 4,
+      includePureBlocks: false,
+      cueMs: 400,
+      stimulusMs: 2000,
+      isiMs: 400,
+      validRtFloorMs: 200,
+      report: NONE_REPORT,
+    },
+  })
   await seedPublishedCognitiveConfig('corsi', '1.0.0', {
     name: 'Corsi Block-Tapping v1.0.0',
     status: 'PUBLISHED',
