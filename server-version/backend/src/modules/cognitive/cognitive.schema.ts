@@ -35,7 +35,7 @@ export const createAssignmentSchema = z
     dueAt: z.string().datetime().optional(),
     maxAttempts: z.number().int().positive().optional().default(1),
     required: z.boolean().optional().default(true),
-    profile: cognitiveProfileSchema.optional(),
+    profile: cognitiveProfileSchema,
   })
   .strict()
   .refine(

@@ -59,7 +59,7 @@ describe('cognitive assignment API', () => {
   it('forbids STUDENT from teacher-only create', async () => {
     const req = makeReq({
       user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
-      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x', profile: 'standard' },
     })
     const res = makeRes()
     // controller 依赖 route 中间件 requireTeacher；service 层也二次校验
@@ -69,6 +69,15 @@ describe('cognitive assignment API', () => {
     })
     await cognitiveController.createAssignment(req, res)
     expect(res.statusCode).toBe(403)
+  })
+
+  it('returns 400 when profile is omitted from create', async () => {
+    const req = makeReq({
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+    })
+    const res = makeRes()
+    await cognitiveController.createAssignment(req, res)
+    expect(res.statusCode).toBe(400)
   })
 
   it('returns 400 when strict schema rejects forged fields', async () => {
@@ -115,7 +124,7 @@ describe('cognitive assignment API', () => {
 
   it('returns code:0 with data on success', async () => {
     const req = makeReq({
-      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x', profile: 'standard' },
     })
     const res = makeRes()
     ;(assignmentService.createAssignment as any).mockResolvedValue({ id: 'asg-1', status: 'DRAFT' })

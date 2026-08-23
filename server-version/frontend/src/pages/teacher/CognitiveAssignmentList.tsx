@@ -63,11 +63,14 @@ const CognitiveAssignmentList: React.FC = () => {
   const selectableCourses = isAdmin ? courses : courses.filter((course) => !course.isLibrary)
   const selectedCourse = selectableCourses.find((course) => course.id === form.courseId)
   const selectedConfig = configs.find((config) => config.id === form.configId)
-  const selectedTest = tests.find((test) =>
-    test.testType === selectedConfig?.testType
-    && (!selectedConfig.engineVersion || test.engineVersion === selectedConfig.engineVersion)
-    && (!selectedConfig.scoringVersion || test.scoringVersion === selectedConfig.scoringVersion)
-  ) || tests.find((test) => test.testType === selectedConfig?.testType)
+  const selectedTest = selectedConfig?.engineVersion && selectedConfig.scoringVersion
+    ? tests.find((test) =>
+      test.testType === selectedConfig.testType
+      && test.engineVersion === selectedConfig.engineVersion
+      && test.scoringVersion === selectedConfig.scoringVersion
+    )
+    : undefined
+  const catalogMismatch = Boolean(selectedConfig) && !selectedTest
 
   const load = async () => {
     try {
@@ -191,13 +194,10 @@ const CognitiveAssignmentList: React.FC = () => {
             <select
               className="border rounded px-3 py-2"
               value={form.profile}
+              disabled={!selectedTest}
               onChange={(e) => setForm({ ...form, profile: e.target.value as 'experience' | 'standard' | 'research' })}
             >
-              {(selectedTest?.profiles || [
-                { profile: 'experience' as const, reportCaveats: [] },
-                { profile: 'standard' as const, reportCaveats: [] },
-                { profile: 'research' as const, reportCaveats: [] },
-              ]).map((profile) => (
+              {(selectedTest?.profiles || []).map((profile) => (
                 <option key={profile.profile} value={profile.profile}>
                   {profile.profile === 'experience' ? '体验版' : profile.profile === 'research' ? '科研版' : '正式版'}
                 </option>
@@ -212,8 +212,11 @@ const CognitiveAssignmentList: React.FC = () => {
           {selectedCourse?.isLibrary && (
             <p className="text-xs text-amber-600 mt-3">库课程上的认知任务不能单独发给学生，通常只作为综合测评模板的模块。</p>
           )}
+          {catalogMismatch && (
+            <p className="text-xs text-red-600 mt-3">任务配置与 Catalog 版本不一致，无法选择 Profile。请重新选择匹配 engineVersion / scoringVersion 的任务类型。</p>
+          )}
           <div className="mt-4 flex gap-2">
-            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId} className="btn-primary">{saving ? '保存中...' : '保存草稿'}</button>
+            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || !selectedTest} className="btn-primary">{saving ? '保存中...' : '保存草稿'}</button>
             <button onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
           </div>
         </div>

@@ -68,6 +68,43 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(mockCognitiveApi.appendTrial).not.toHaveBeenCalled()
   })
 
+  it('shows frozen experience caveats from the session payload', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        finishedAt: '2026-01-01T00:00:00Z',
+        config: {},
+        randomSeed: 'seed',
+        profile: 'experience',
+        reportCaveats: ['体验版，结果仅供体验。'],
+        reportDefinition: {
+          title: '简单反应时',
+          headlineMetric: 'medianRtMs',
+          primaryMetrics: ['medianRtMs'],
+          secondaryMetrics: [],
+          disclaimer: '不是常模',
+        },
+        metricDefinitions: {
+          medianRtMs: { key: 'medianRtMs', label: '中位反应时', unit: 'ms' },
+        },
+        result: {
+          score: 70,
+          metrics: { medianRtMs: 320 },
+          qualityFlags: { interpretable: true },
+        },
+      },
+    })
+    renderAt()
+    expect(await screen.findByText('体验版，结果仅供体验。')).toBeTruthy()
+    expect(screen.getAllByText(/体验版/).length).toBeGreaterThan(0)
+  })
+
   it('shows not-completed hint for IN_PROGRESS session', async () => {
     mockCognitiveApi.getSession.mockResolvedValue({
       code: 0,

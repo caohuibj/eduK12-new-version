@@ -65,6 +65,7 @@ const assignment = {
   dueAt: null,
   maxAttempts: 1,
   required: true,
+  profile: 'standard',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
   publishedAt: null,
@@ -76,6 +77,7 @@ const baseInput = {
   title: 'Fake Assignment',
   maxAttempts: 1,
   required: true,
+  profile: 'standard' as const,
 }
 
 beforeEach(() => {
@@ -358,6 +360,7 @@ describe('publishAssignment / archiveAssignment', () => {
     const data = mockPrisma.cognitiveAssignment.updateMany.mock.calls[0][0].data
     expect(data.resolvedConfigHash).toMatch(/^[a-f0-9]{64}$/)
     expect(data.resolvedConfigSnapshotEncrypted).toEqual(expect.any(String))
+    expect(data.resolvedReportSnapshotEncrypted).toEqual(expect.any(String))
     expect(data.profileDefinitionVersion).toBe('1.0.0')
   })
 
@@ -366,6 +369,17 @@ describe('publishAssignment / archiveAssignment', () => {
     await expect(updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { profile: 'research' })).rejects.toMatchObject({
       statusCode: 400,
     })
+  })
+
+  it('rejects publishing a draft without a profile', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, profile: null, course })
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({
+      statusCode: 400,
+      message: '发布前必须选择 Profile',
+    })
+    expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
   })
 
   it('rejects publishing a non-DRAFT', async () => {

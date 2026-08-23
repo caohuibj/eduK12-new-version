@@ -91,10 +91,16 @@ const CognitiveResult: React.FC = () => {
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-800 mb-2">{report?.title ?? entry?.name ?? '测评完成'}</h1>
         <p className="text-sm text-gray-500 mb-6">
-          尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}）
+          尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}
+          {session.profile === 'experience' ? ' · 体验版' : session.profile === 'research' ? ' · 科研版' : session.profile === 'standard' ? ' · 正式版' : ''}）
           {isPublic && session.anonymousCode ? ` · 匿名编号 ${session.anonymousCode}` : ''}
           {session.finishedAt ? ` · ${new Date(session.finishedAt).toLocaleString('zh-CN')}` : ''}
         </p>
+        {session.reportCaveats && session.reportCaveats.length > 0 && (
+          <div className="rounded-lg bg-amber-50 text-amber-800 px-4 py-3 mb-6 text-sm text-left">
+            {session.reportCaveats.map((caveat) => <p key={caveat}>{caveat}</p>)}
+          </div>
+        )}
 
         <div className={`rounded-lg px-4 py-3 mb-6 text-sm ${interpretable ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
           {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议重新测量。'}

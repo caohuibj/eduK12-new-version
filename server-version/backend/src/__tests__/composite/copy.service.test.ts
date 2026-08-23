@@ -8,7 +8,9 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn() },
+    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
+    cognitiveSession: { create: vi.fn() },
+    $queryRaw: vi.fn(),
     compositeAssessmentAccessToken: { findUnique: vi.fn(), create: vi.fn() },
     course: { findUnique: vi.fn() },
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
@@ -94,6 +96,9 @@ beforeEach(() => {
   mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedConfig)
   mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
+  mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+  mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
+  mockPrisma.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 0 })
 })
 
 describe('copyable PATCH', () => {
@@ -211,6 +216,46 @@ describe('copyComposite', () => {
     await expect(copyComposite('teacher-1', TEACHER, 'source-1', { courseId: null })).rejects.toMatchObject({ statusCode: 400 })
   })
 
+  it('copies a frozen cognitive snapshot into composite child sessions', async () => {
+    const frozenCipher = 'frozen-cipher'
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue({
+      id: 'comp-1',
+      status: 'PUBLISHED',
+      courseId: 'course-t',
+      maxAttempts: 1,
+      opensAt: null,
+      expiresAt: null,
+      course: teacherCourse,
+      items: [{
+        id: 'item-cog',
+        type: 'COGNITIVE',
+        required: true,
+        cognitiveAssignment: {
+          id: 'wrapper-1',
+          resolvedConfigSnapshotEncrypted: frozenCipher,
+          config: publishedConfig,
+        },
+      }],
+    })
+    mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
+    mockPrisma.compositeAssessmentAttempt.create.mockResolvedValue({ id: 'attempt-1', anonymousCode: null })
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      id: 'attempt-1',
+      userId: 'student-1',
+      status: 'IN_PROGRESS',
+      compositeAssessment: { items: [] },
+      scaleAssessments: [],
+      cognitiveSessions: [],
+      formAnswers: [],
+    })
+    mockPrisma.cognitiveSession.create.mockResolvedValue({ id: 'sess-1' })
+
+    await startUserAttempt('student-1', 'comp-1')
+    expect(mockPrisma.cognitiveSession.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ configSnapshotEncrypted: frozenCipher }),
+    }))
+  })
+
   it('rejects a library course as the copy target', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate())
     mockPrisma.course.findUnique.mockResolvedValue({ ...libraryCourse, creatorId: 'admin-1' })
@@ -239,7 +284,16 @@ describe('copyComposite', () => {
     expect(copied.createdBy).toBe('teacher-1')
     expect(copied.courseId).toBe('course-t')
     expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ listedStandalone: false, status: 'PUBLISHED', createdBy: 'teacher-1', courseId: 'course-t' }),
+      data: expect.objectContaining({
+        listedStandalone: false,
+        status: 'PUBLISHED',
+        createdBy: 'teacher-1',
+        courseId: 'course-t',
+        profile: 'standard',
+        resolvedConfigHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        resolvedConfigSnapshotEncrypted: expect.any(String),
+        resolvedReportSnapshotEncrypted: expect.any(String),
+      }),
     }))
     const createdItems = mockPrisma.compositeAssessment.create.mock.calls[0][0].data.items.create
     expect(createdItems.find((item: { type: string }) => item.type === 'SCALE').scaleId).toBe('scale-1')

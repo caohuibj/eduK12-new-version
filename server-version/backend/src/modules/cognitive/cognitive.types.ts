@@ -18,7 +18,7 @@ export interface ScoringTrial<TTrial> {
 
 /** Scorer 的标准返回：score + metrics + qualityFlags（三者在 D6 全部加密存储）。 */
 export interface CognitiveScoreResult {
-  score: number | null
+  score: number
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
 }
