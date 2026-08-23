@@ -230,4 +230,43 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(headings.indexOf('主要指标')).toBeLessThan(headings.indexOf('次级指标'))
     expect(headings.indexOf('次级指标')).toBeLessThan(headings.indexOf('方法说明'))
   })
+
+  it('uses frozen practical tips instead of the live frontend registry', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        configVersion: '1.1.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        finishedAt: '2026-01-01T00:00:00Z',
+        config: {},
+        randomSeed: 'seed',
+        profile: 'standard',
+        reportDefinition: {
+          title: '简单反应时',
+          headlineMetric: 'medianRtMs',
+          primaryMetrics: ['medianRtMs'],
+          secondaryMetrics: [],
+          practicalTips: ['冻结建议'],
+          disclaimer: '不是常模',
+        },
+        metricDefinitions: {
+          medianRtMs: { key: 'medianRtMs', label: '中位反应时', unit: 'ms' },
+        },
+        result: {
+          score: 70,
+          metrics: { medianRtMs: 320 },
+          qualityFlags: { interpretable: true },
+        },
+      },
+    })
+    renderAt()
+    expect(await screen.findByText('冻结建议')).toBeTruthy()
+    expect(screen.queryByText('在需要快速响应时先减少外部干扰。')).toBeNull()
+  })
 })

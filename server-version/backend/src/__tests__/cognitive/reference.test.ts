@@ -41,6 +41,9 @@ describe('cognitive reference resolver', () => {
       observed: 7,
     }))
     expect(result.comparison?.rangeLabel).toEqual(expect.any(String))
+    expect(result.label).toBe('历史模拟参考')
+    expect(result.label).not.toMatch(/文献锚定/)
+    expect(result.disclaimer).not.toMatch(/文献锚定/)
     noPercentile(result.disclaimer)
     noPercentile(result.comparison?.rangeLabel ?? '')
   })
@@ -111,7 +114,7 @@ describe('cognitive reference resolver', () => {
     expect(result).toMatchObject({ mode: 'literature', status: 'unavailable', available: false, referencePosition: null })
   })
 
-  it('enables literature reference only when protocol matches', () => {
+  it('keeps literature unavailable even when protocol matches until provenance is enabled', () => {
     const result = resolveCognitiveReference({
       testType: 'reaction',
       metrics: { medianRtMs: 310 },
@@ -128,11 +131,9 @@ describe('cognitive reference resolver', () => {
         timeoutMs: 2000,
       },
     })
-    expect(result.available).toBe(true)
-    expect(result.protocolMatched).toBe(true)
-    expect(result.comparison?.metricKey).toBe('medianRtMs')
-    expect(result.sources?.[0].doi).toBeTruthy()
-    noPercentile(result.disclaimer)
+    expect(result.available).toBe(false)
+    expect(result.status).toBe('unavailable')
+    expect(result.comparison).toBeNull()
   })
 
   it('enables literature-anchored simulated reference for matching 1.1.0 standard protocols', () => {
@@ -154,9 +155,78 @@ describe('cognitive reference resolver', () => {
       },
     })
     expect(result.available).toBe(true)
-    expect(result.label).toBe('文献锚定模拟参考')
+    expect(result.label).toBe('内部模拟参考')
+    expect(result.label).not.toMatch(/文献锚定/)
     expect(result.comparison?.metricKey).toBe('medianRtMs')
+    expect(result.disclaimer).not.toMatch(/文献锚定/)
     noPercentile(result.disclaimer)
+  })
+
+  it('does not default a missing or illegal band to the first age band', () => {
+    const base = {
+      testType: 'reaction' as const,
+      metrics: { medianRtMs: 320 },
+      score: 80,
+      referenceMode: 'simulated' as const,
+      referenceVersion: LITERATURE_ANCHORED_SIM_VERSION,
+      profile: 'standard' as const,
+      scoringVersion: '1.1.0',
+      engineVersion: '1.0.0',
+      config: {
+        totalTrials: 20,
+        foreperiodMinMs: 700,
+        foreperiodMaxMs: 1500,
+        timeoutMs: 2000,
+      },
+    }
+    expect(resolveCognitiveReference(base).available).toBe(false)
+    expect(resolveCognitiveReference({ ...base, referenceBand: 'K99' }).available).toBe(false)
+  })
+
+  it('produces different comparisons for K7-9 and K10-12', () => {
+    const base = {
+      testType: 'reaction' as const,
+      metrics: { medianRtMs: 320 },
+      score: 80,
+      referenceMode: 'simulated' as const,
+      referenceVersion: LITERATURE_ANCHORED_SIM_VERSION,
+      profile: 'standard' as const,
+      scoringVersion: '1.1.0',
+      engineVersion: '1.0.0',
+      config: {
+        totalTrials: 20,
+        foreperiodMinMs: 700,
+        foreperiodMaxMs: 1500,
+        timeoutMs: 2000,
+      },
+    }
+    const younger = resolveCognitiveReference({ ...base, referenceBand: 'K7-9' })
+    const older = resolveCognitiveReference({ ...base, referenceBand: 'K10-12' })
+    expect(younger.available).toBe(true)
+    expect(older.available).toBe(true)
+    expect(younger.comparison?.referenceMean).not.toBe(older.comparison?.referenceMean)
+  })
+
+  it('does not infer a missing profile as standard', () => {
+    const result = resolveCognitiveReference({
+      testType: 'reaction',
+      metrics: { medianRtMs: 320 },
+      score: 80,
+      referenceMode: 'simulated',
+      referenceVersion: LITERATURE_ANCHORED_SIM_VERSION,
+      referenceBand: 'K7-9',
+      profile: null,
+      scoringVersion: '1.1.0',
+      engineVersion: '1.0.0',
+      config: {
+        totalTrials: 20,
+        foreperiodMinMs: 700,
+        foreperiodMaxMs: 1500,
+        timeoutMs: 2000,
+      },
+    })
+    expect(result.available).toBe(false)
+    expect(result.protocolMatched).toBe(false)
   })
 
   it('rejects experience-length protocols for the literature-anchored simulated set', () => {
@@ -192,8 +262,8 @@ describe('cognitive reference resolver', () => {
   })
 
   it('describes relative SD without rank language', () => {
-    expect(describeRelativeSd(330, 330, 40)).toBe('接近该研究样本报告范围')
-    expect(describeRelativeSd(410, 330, 40)).toBe('高于文献参考均值约 2 SD')
-    expect(describeRelativeSd(250, 330, 40)).toBe('低于文献参考均值约 2 SD')
+    expect(describeRelativeSd(330, 330, 40)).toBe('接近该参考分布范围')
+    expect(describeRelativeSd(410, 330, 40, '内部模拟参考均值')).toBe('高于内部模拟参考均值约 2 SD')
+    expect(describeRelativeSd(250, 330, 40, '历史模拟参考均值')).toBe('低于历史模拟参考均值约 2 SD')
   })
 })

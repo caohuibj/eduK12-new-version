@@ -6,6 +6,8 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { CognitiveScoringInputError } from './cognitive.types'
 import { resolveCognitiveReferenceForResult } from './reference'
+import { loadFrozenMeasurementContext } from './profile-freeze'
+import { buildCognitiveSingleTaskReport } from './single-task-report'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 
@@ -29,6 +31,57 @@ import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
  * D6.1（P0）：行锁保证评分读取的 trials 数据集与完成时冻结的数据集一致 ——
  * 并发 append 必须排队，无法在评分期间写入新 trial。
  */
+
+const buildCompletedPayload = async (
+  tx: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
+  session: {
+    id: string
+    assignmentId: string | null
+    testType: string
+    engineVersion: string
+    scoringVersion: string
+    configVersion: string
+  },
+  score: number,
+  metrics: Record<string, unknown>,
+  qualityFlags: Record<string, unknown>,
+  finishedAt: Date | null,
+  config: Record<string, unknown>,
+) => {
+  const freeze = await loadFrozenMeasurementContext(tx, session.assignmentId)
+  const reference = resolveCognitiveReferenceForResult({
+    testType: session.testType,
+    metrics,
+    score,
+    qualityFlags,
+    config,
+    profile: freeze.profile,
+    engineVersion: session.engineVersion,
+    scoringVersion: session.scoringVersion,
+    configVersion: session.configVersion,
+  })
+  return {
+    sessionId: session.id,
+    status: 'COMPLETED' as const,
+    finishedAt,
+    score,
+    metrics,
+    qualityFlags,
+    reference,
+    singleTaskReport: buildCognitiveSingleTaskReport({
+      testType: session.testType,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      configVersion: session.configVersion,
+      profile: freeze.profile,
+      frozenReport: freeze.frozenReport,
+      score,
+      metrics,
+      qualityFlags,
+      reference,
+    }),
+  }
+}
 
 const decryptResult = (session: {
   scoreEncrypted: string | null
@@ -70,17 +123,7 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
     if (session.status === 'COMPLETED') {
       const { score, metrics, qualityFlags, finishedAt } = decryptResult(session)
       const config = decryptCognitivePayload<Record<string, unknown>>(session.configSnapshotEncrypted)
-      const reference = resolveCognitiveReferenceForResult({
-        testType: session.testType,
-        metrics,
-        score,
-        qualityFlags,
-        config,
-        engineVersion: session.engineVersion,
-        scoringVersion: session.scoringVersion,
-        configVersion: session.configVersion,
-      })
-      return { sessionId, status: 'COMPLETED', finishedAt, score, metrics, qualityFlags, reference }
+      return buildCompletedPayload(tx, session, score, metrics, qualityFlags, finishedAt, config)
     }
     if (session.status === 'ABANDONED' || session.status === 'INVALID') {
       throw BAD_REQUEST(`Session is ${session.status} and cannot be completed`)
@@ -140,32 +183,28 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
       const reloaded = await tx.cognitiveSession.findUnique({ where: { id: sessionId } })
       if (reloaded?.status === 'COMPLETED') {
         const { score, metrics, qualityFlags, finishedAt: fin } = decryptResult(reloaded)
-        const reference = resolveCognitiveReferenceForResult({
-          testType: reloaded.testType,
-          metrics,
+        return buildCompletedPayload(
+          tx,
+          reloaded,
           score,
+          metrics,
           qualityFlags,
-          config: validatedConfig as Record<string, unknown>,
-          engineVersion: reloaded.engineVersion,
-          scoringVersion: reloaded.scoringVersion,
-          configVersion: reloaded.configVersion,
-        })
-        return { sessionId, status: 'COMPLETED', finishedAt: fin, score, metrics, qualityFlags, reference }
+          fin,
+          validatedConfig as Record<string, unknown>,
+        )
       }
       throw CONFLICT('Session cannot be completed in its current state')
     }
 
-    const reference = resolveCognitiveReferenceForResult({
-      testType: session.testType,
-      metrics: result.metrics,
-      score: result.score,
-      qualityFlags: result.qualityFlags,
-      config: validatedConfig as Record<string, unknown>,
-      engineVersion: session.engineVersion,
-      scoringVersion: session.scoringVersion,
-      configVersion: session.configVersion,
-    })
-    return { sessionId, status: 'COMPLETED', finishedAt, ...result, reference }
+    return buildCompletedPayload(
+      tx,
+      session,
+      result.score,
+      result.metrics,
+      result.qualityFlags,
+      finishedAt,
+      validatedConfig as Record<string, unknown>,
+    )
   })
 }
 

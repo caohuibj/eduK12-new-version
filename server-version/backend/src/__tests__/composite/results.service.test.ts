@@ -277,6 +277,114 @@ describe('getReportForTeacher', () => {
   })
 })
 
+describe('composite cognitive single-task report', () => {
+  const frozenReport = {
+    profile: 'experience' as const,
+    profileDefinitionVersion: '1.1.0',
+    metricDefinitionVersion: '1.1.0',
+    qualityDefinitionVersion: '1.1.0',
+    reportDefinitionVersion: '1.1.0',
+    reportCaveats: ['体验版，结果仅供体验。'],
+    metricDefinitions: {
+      medianRtMs: {
+        key: 'medianRtMs',
+        label: '中位反应时',
+        construct: 'processing_speed',
+        description: '中位反应时',
+        unit: 'ms',
+        valueType: 'number',
+        direction: 'lower_is_better',
+        role: 'primary',
+        availableProfiles: ['experience', 'standard', 'research'],
+        export: { summary: true, label: '中位反应时' },
+      },
+    },
+    qualityDefinitions: {
+      insufficientValidTrials: { key: 'insufficientValidTrials', label: '有效试次不足', description: '' },
+    },
+    reportDefinition: {
+      title: '简单反应时',
+      headlineMetric: 'medianRtMs',
+      primaryMetrics: ['medianRtMs'],
+      secondaryMetrics: [],
+      practicalTips: ['冻结建议'],
+      disclaimer: '不是医学诊断或人口常模。',
+    },
+  }
+
+  it('hides the product index when quality is insufficient', () => {
+    const built = buildCompositeReport(completedAttemptForReport({
+      compositeAssessment: {
+        id: 'composite-1',
+        name: '综合测评 1',
+        items: [{
+          id: 'item-cog',
+          type: 'COGNITIVE',
+          scale: null,
+          cognitiveAssignment: {
+            title: '反应时',
+            profile: 'experience',
+            resolvedReportSnapshotEncrypted: encryptCognitivePayload(frozenReport),
+          },
+        }],
+      },
+      cognitiveSessions: [{
+        id: 'session-1',
+        compositeItemId: 'item-cog',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        configVersion: '1.1.0',
+        finishedAt: new Date('2026-08-20T01:05:00Z'),
+        configSnapshotEncrypted: encryptCognitivePayload({ report: { referenceMode: 'none' } }),
+        scoreEncrypted: encryptCognitivePayload(30),
+        metricsEncrypted: encryptCognitivePayload({ medianRtMs: null }),
+        qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: false, insufficientValidTrials: true }),
+      }],
+    }))
+    const cognitive = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE')
+    expect(cognitive.singleTaskReport.productIndex).toBeNull()
+    expect(cognitive.singleTaskReport.headline).toBeNull()
+    expect(JSON.stringify(cognitive.singleTaskReport)).not.toMatch(/任务指标/)
+  })
+
+  it('renders frozen Chinese labels and the experience caveat', () => {
+    const built = buildCompositeReport(completedAttemptForReport({
+      compositeAssessment: {
+        id: 'composite-1',
+        name: '综合测评 1',
+        items: [{
+          id: 'item-cog',
+          type: 'COGNITIVE',
+          scale: null,
+          cognitiveAssignment: {
+            title: '反应时',
+            profile: 'experience',
+            resolvedReportSnapshotEncrypted: encryptCognitivePayload(frozenReport),
+          },
+        }],
+      },
+      cognitiveSessions: [{
+        id: 'session-1',
+        compositeItemId: 'item-cog',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        configVersion: '1.1.0',
+        finishedAt: new Date('2026-08-20T01:05:00Z'),
+        configSnapshotEncrypted: encryptCognitivePayload({ report: { referenceMode: 'none' } }),
+        scoreEncrypted: encryptCognitivePayload(70),
+        metricsEncrypted: encryptCognitivePayload({ medianRtMs: 320 }),
+        qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+      }],
+    }))
+    const report = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE').singleTaskReport
+    expect(report.primaryMetrics[0].label).toBe('中位反应时')
+    expect(report.caveats).toContain('体验版，结果仅供体验。')
+    expect(report.productIndex.label).toBe('任务表现指数')
+  })
+})
+
 describe('buildCompositeReport decrypt degrade', () => {
   it('marks a bad cognitive module without failing the report or student getReport', async () => {
     const attempt = completedAttemptForReport({

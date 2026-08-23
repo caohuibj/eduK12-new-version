@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeReport } from './types'
+import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
+import type { CognitiveSingleTaskReport } from '../cognitive/types'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 
@@ -63,7 +65,11 @@ const CompositeReportPage: React.FC = () => {
             <>
               {module.type === 'FORM' && <p className="text-gray-700 whitespace-pre-wrap">{String(module.value || '—')}</p>}
               {module.type === 'SCALE' && <><p className="text-sm font-semibold text-gray-600 mb-2">维度结果</p><pre className="text-sm bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(module.feedback || module.scores || {}, null, 2)}</pre></>}
-              {module.type === 'COGNITIVE' && <><div className="text-4xl font-bold text-primary mb-4">{String(module.score ?? '—')}<span className="text-sm text-gray-500 ml-2">分</span></div><p className="text-sm font-semibold text-gray-600 mb-2">任务指标</p><pre className="text-sm bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify({ metrics: module.metrics, qualityFlags: module.qualityFlags }, null, 2)}</pre></>}
+              {module.type === 'COGNITIVE' && (
+                module.singleTaskReport
+                  ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as CognitiveSingleTaskReport} />
+                  : <p className="text-gray-500">该认知任务尚未完成或没有可展示的单任务报告。</p>
+              )}
             </>
           )}
         </div>

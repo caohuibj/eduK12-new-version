@@ -256,7 +256,7 @@ export const generateLiteratureAnchoredSimulatedReference = (
       protocol: task.protocol,
       metricKey: task.metricKey,
       bands: task.bands.map((band) => buildBand(mulberry32(seed + band.seedOffset), band)),
-      disclaimer: '仅为文献锚定模拟参考，不代表中国学生常模。不得解释为诊断。',
+      disclaimer: '内部固定种子模拟分布，用于开发与协议匹配验证，不代表文献样本或中国学生常模。',
     }
   }
   return sets

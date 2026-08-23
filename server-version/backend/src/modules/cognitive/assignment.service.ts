@@ -434,9 +434,24 @@ export const archiveAssignment = async (userId: string, role: UserRole, id: stri
   return archived
 }
 
+export type FrozenAssignmentCopy = {
+  profile: string | null
+  profileDefinitionVersion: string | null
+  resolvedConfigSnapshotEncrypted: string | null
+  resolvedConfigHash: string | null
+  resolvedReportSnapshotEncrypted: string | null
+}
+
 export const ensureTeacherPublishedAssignment = async (
   tx: Prisma.TransactionClient,
-  input: { userId: string; courseId: string; configId: string; title: string; instruction: string | null },
+  input: {
+    userId: string
+    courseId: string
+    configId: string
+    title: string
+    instruction: string | null
+    sourceFreeze?: FrozenAssignmentCopy | null
+  },
 ) => {
   const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
@@ -449,7 +464,18 @@ export const ensureTeacherPublishedAssignment = async (
   const parsed = entry.configSchema.safeParse(config.config)
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
+  const source = input.sourceFreeze ?? null
+  const copiedProfile = source?.profile ?? null
+  const copiedHash = source?.resolvedConfigHash ?? null
+  const hasCopiedFreeze = Boolean(
+    copiedProfile &&
+    source?.resolvedConfigSnapshotEncrypted &&
+    copiedHash &&
+    source?.resolvedReportSnapshotEncrypted,
+  )
+
   // copy / ensure 不调用 canInstantiateConfig：模板上已有的 configId 是一次性实例化许可。
+  // 复用必须匹配冻结 Profile 与 config hash，禁止把 research 套到已有 standard wrapper。
   const existing = await tx.cognitiveAssignment.findFirst({
     where: {
       createdBy: input.userId,
@@ -457,6 +483,8 @@ export const ensureTeacherPublishedAssignment = async (
       configId: input.configId,
       status: 'PUBLISHED',
       listedStandalone: false,
+      profile: copiedProfile,
+      resolvedConfigHash: copiedHash,
     },
   })
   if (existing) return existing
@@ -464,11 +492,21 @@ export const ensureTeacherPublishedAssignment = async (
   const course = await tx.course.findUnique({ where: { id: input.courseId } })
   if (!course) throw NOT_FOUND('Course not found')
 
-  const freeze = freezeAssignmentProfile({
-    entry,
-    baseConfig: config.config,
-    profile: 'standard',
-  })
+  const freezeData = hasCopiedFreeze
+    ? {
+        profile: copiedProfile,
+        profileDefinitionVersion: source?.profileDefinitionVersion ?? null,
+        resolvedConfigSnapshotEncrypted: source?.resolvedConfigSnapshotEncrypted ?? null,
+        resolvedConfigHash: copiedHash,
+        resolvedReportSnapshotEncrypted: source?.resolvedReportSnapshotEncrypted ?? null,
+      }
+    : {
+        profile: null,
+        profileDefinitionVersion: null,
+        resolvedConfigSnapshotEncrypted: null,
+        resolvedConfigHash: null,
+        resolvedReportSnapshotEncrypted: null,
+      }
 
   return tx.cognitiveAssignment.create({
     data: {
@@ -483,7 +521,7 @@ export const ensureTeacherPublishedAssignment = async (
       required: false,
       maxAttempts: 1,
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
-      ...freezeDataForWrite(freeze),
+      ...freezeData,
     },
   })
 }

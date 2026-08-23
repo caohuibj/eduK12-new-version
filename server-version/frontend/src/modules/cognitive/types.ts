@@ -29,11 +29,45 @@ export interface CognitiveAssignmentSummary {
 
 export type CognitiveSessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED' | 'INVALID'
 
+export interface CognitiveReportMetricView {
+  key: string
+  label: string
+  unit?: string
+  value: unknown
+  formatted: string
+}
+
+export interface CognitiveSingleTaskReport {
+  testType: string
+  profile: 'experience' | 'standard' | 'research' | null
+  profileLabel: string | null
+  title: string
+  interpretable: boolean
+  qualityState: 'interpretable' | 'insufficient'
+  qualityFlags: Array<{ key: string; label: string; active: boolean }>
+  headline: CognitiveReportMetricView | null
+  productIndex: { label: string; value: number } | null
+  primaryMetrics: CognitiveReportMetricView[]
+  secondaryMetrics: CognitiveReportMetricView[]
+  caveats: string[]
+  practicalTips: string[]
+  method: {
+    testType: string
+    engineVersion: string
+    scoringVersion: string
+    configVersion: string
+    profile: 'experience' | 'standard' | 'research' | null
+  }
+  disclaimer: string
+  reference: CognitiveReference | null
+}
+
 export interface CognitiveResult {
   score: number
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
   reference?: CognitiveReference
+  singleTaskReport?: CognitiveSingleTaskReport | null
 }
 
 export interface CognitiveReferenceComparison {
@@ -43,6 +77,7 @@ export interface CognitiveReferenceComparison {
   referenceSd: number
   sdDelta: number | null
   rangeLabel: string
+  meanLabel?: string
 }
 
 export interface CognitiveReference {
@@ -91,6 +126,7 @@ export interface CognitiveReportDefinition {
   primaryMetrics?: string[]
   secondaryMetrics?: string[]
   summaryMetrics?: string[]
+  practicalTips?: string[]
   disclaimer: string
 }
 

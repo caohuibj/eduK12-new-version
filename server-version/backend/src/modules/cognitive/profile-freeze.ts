@@ -90,6 +90,46 @@ export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapsho
   return decryptCognitivePayload<FrozenReportSnapshot>(encrypted)
 }
 
+export interface FrozenMeasurementContext {
+  profile: CognitiveProfile | null
+  frozenReport: FrozenReportSnapshot | null
+  resolvedConfigHash: string | null
+}
+
+/** 读取发布时冻结的 Profile / 报告快照；缺失时保持 null，不得回填 standard。 */
+export const loadFrozenMeasurementContext = async (
+  db: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
+  assignmentId: string | null | undefined,
+): Promise<FrozenMeasurementContext> => {
+  if (!assignmentId) {
+    return { profile: null, frozenReport: null, resolvedConfigHash: null }
+  }
+  const assignment = await db.cognitiveAssignment.findUnique({
+    where: { id: assignmentId },
+    select: {
+      profile: true,
+      resolvedConfigHash: true,
+      resolvedReportSnapshotEncrypted: true,
+    },
+  } as never) as {
+    profile: string | null
+    resolvedConfigHash: string | null
+    resolvedReportSnapshotEncrypted: string | null
+  } | null
+  if (!assignment) {
+    return { profile: null, frozenReport: null, resolvedConfigHash: null }
+  }
+  const profile =
+    assignment.profile === 'experience' || assignment.profile === 'standard' || assignment.profile === 'research'
+      ? assignment.profile
+      : null
+  return {
+    profile,
+    frozenReport: readFrozenReport(assignment.resolvedReportSnapshotEncrypted),
+    resolvedConfigHash: assignment.resolvedConfigHash,
+  }
+}
+
 export const freezeDataForWrite = (freeze: ReturnType<typeof freezeAssignmentProfile>) => ({
   profile: freeze.profile,
   profileDefinitionVersion: freeze.profileDefinitionVersion,

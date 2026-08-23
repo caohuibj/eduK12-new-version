@@ -12,6 +12,7 @@ import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
 import { resolveCognitiveReferenceForResult } from './reference'
+import { buildCognitiveSingleTaskReport } from './single-task-report'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -281,6 +282,8 @@ export const getSession = async (userId: string, sessionId: string) => {
     const qualityFlags = session.qualityFlagsEncrypted
       ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
       : null
+    const frozenReport = readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
+    const profile = frozenReport?.profile ?? runnerPayload.profile ?? null
     const reference = metrics && score !== null
       ? resolveCognitiveReferenceForResult({
           testType: session.testType,
@@ -288,18 +291,32 @@ export const getSession = async (userId: string, sessionId: string) => {
           score,
           qualityFlags: qualityFlags ?? undefined,
           config: runnerPayload.config as Record<string, unknown>,
-          profile: runnerPayload.profile,
+          profile,
           engineVersion: session.engineVersion,
           scoringVersion: session.scoringVersion,
           configVersion: session.configVersion,
         })
       : undefined
+    const singleTaskReport = score !== null && metrics !== null && qualityFlags !== null
+      ? buildCognitiveSingleTaskReport({
+          testType: session.testType,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          configVersion: session.configVersion,
+          profile,
+          frozenReport,
+          score,
+          metrics,
+          qualityFlags,
+          reference: reference ?? null,
+        })
+      : null
     return {
       ...runnerPayload,
       status: session.status,
       finishedAt: session.finishedAt,
       result: score !== null && metrics !== null && qualityFlags !== null
-        ? { score, metrics, qualityFlags, reference }
+        ? { score, metrics, qualityFlags, reference, singleTaskReport }
         : null,
     }
   }
@@ -345,6 +362,8 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   const qualityFlags = session.qualityFlagsEncrypted
     ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
     : null
+  const frozenReport = readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
+  const profile = frozenReport?.profile ?? runnerPayload.profile ?? null
   const reference = metrics && score !== null
     ? resolveCognitiveReferenceForResult({
         testType: session.testType,
@@ -352,17 +371,31 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
         score,
         qualityFlags: qualityFlags ?? undefined,
         config: runnerPayload.config as Record<string, unknown>,
-        profile: runnerPayload.profile,
+        profile,
         engineVersion: session.engineVersion,
         scoringVersion: session.scoringVersion,
         configVersion: session.configVersion,
       })
     : undefined
+  const singleTaskReport = score !== null && metrics !== null && qualityFlags !== null
+    ? buildCognitiveSingleTaskReport({
+        testType: session.testType,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+        configVersion: session.configVersion,
+        profile,
+        frozenReport,
+        score,
+        metrics,
+        qualityFlags,
+        reference: reference ?? null,
+      })
+    : null
   return {
     ...runnerPayload,
     finishedAt: session.finishedAt,
     result: score !== null && metrics !== null && qualityFlags !== null
-      ? { score, metrics, qualityFlags, reference }
+      ? { score, metrics, qualityFlags, reference, singleTaskReport }
       : null,
   }
 }
