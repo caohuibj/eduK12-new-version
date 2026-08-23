@@ -195,6 +195,16 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 
 三套实现目前只完成工程一致性验证。`daily-scenes-v1.0.0` 尚需 K7–K12 学生对场景顺序的可理解性与文化内容审核；`nonverbal-pairs-v1.0.0` 尚需符号可辨识度、色觉无关性和设备尺寸 pilot。审核前均不得改成 PUBLISHED 或 `recommendedForCreate`。
 
+### 3.12 PR5 题库实现记录（待内容双审与 pilot）
+
+| testType | stimulusSetVersion | sourceType | 实现与当前状态 |
+|---|---|---|---|
+| `matrix` | `matrix-generator-v1.0.0` | internal-generated | 24 个内部抽象 3×3 项目（两行完整示例、第三行缺项），覆盖 progression / alternation / combination 三个规则族与三档难度；生成器验证在这三类定义规则中只有目标规则能同时解释两行示例，每题固定四选一；config 保持 DRAFT |
+| `mentalrotation` | `rotation-objects-v1.0.0` | internal-generated | 4 个内部折线对象族，平衡 same/mirror 与 0°/45°/90°/135°/180°；Session seed 选择并排序 item；config 保持 DRAFT |
+| `tower` | `three-peg-tower-v1.0.0` | internal-generated | 三圆盘、三柱状态空间，内部 BFS 为每题冻结最短步数；服务端逐步重放合法/非法 move；config 保持 DRAFT |
+
+这些题库不包含 MaRs-IB、ICAR、Raven、Tower of London 或其他商业题册内容。`matrix-generator-v1.0.0` 进入 PUBLISHED 前仍须由两名内容审查者独立确认每题唯一答案；三套题库都须完成 K7–K12 可理解性、设备交互和练习效应 pilot。本表仅证明来源与版本边界，不等于内容审核签字。
+
 ---
 
 ## 4. P1 扩展任务来源与 Gate

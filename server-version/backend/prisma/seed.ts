@@ -548,6 +548,18 @@ async function main() {
       report: NONE_REPORT,
     },
   })
+  await seedDraftCognitiveConfig('matrix', '1.0.0', {
+    name: 'Matrix Reasoning Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: { itemCount: 16, optionCount: 4, itemTimeoutMs: 30000, validRtFloorMs: 300, stimulusSetVersion: 'matrix-generator-v1.0.0', report: NONE_REPORT },
+  })
+  await seedDraftCognitiveConfig('mentalrotation', '1.0.0', {
+    name: 'Mental Rotation Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: { totalTrials: 40, stimulusMs: 5000, isiMs: 400, validRtFloorMs: 200, stimulusSetVersion: 'rotation-objects-v1.0.0', report: NONE_REPORT },
+  })
+  await seedDraftCognitiveConfig('tower', '1.0.0', {
+    name: 'Three-Peg Tower Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: { problemCount: 10, maxMovesFactor: 3, inactivityGuardMs: 90000, stimulusSetVersion: 'three-peg-tower-v1.0.0', report: NONE_REPORT },
+  })
   console.log('数据库初始化完成。')
 }
 
