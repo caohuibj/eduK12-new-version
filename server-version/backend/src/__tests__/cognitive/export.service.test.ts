@@ -11,6 +11,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import {
+  buildCognitiveResearchPackage,
   exportCognitiveToCSV,
   getCognitiveExportData,
   makeCognitiveExportFileName,
@@ -176,5 +177,69 @@ describe('cognitive export service', () => {
         },
       }),
     }))
+  })
+
+  it('adds profile, definition versions, and interpretable to summary', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([session()])
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary', anonymize: true })
+    const names = data.fields.map((field) => field.name)
+    expect(names).toEqual(expect.arrayContaining([
+      'A_profile',
+      'A_metric_definition_version',
+      'A_quality_interpretable',
+    ]))
+    expect(data.rows[0].A_quality_interpretable).toBe(1)
+    expect(data.fields.find((field) => field.name === 'M_mean_rt_ms')?.label).toContain('平均反应时')
+  })
+
+  it('keeps null metric values distinct from zero', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([{
+      ...session(),
+      metricsEncrypted: encryptCognitivePayload({ medianRtMs: null, missCount: 0 }),
+    }])
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary' })
+    expect(data.rows[0].M_median_rt_ms).toBeNull()
+    expect(data.rows[0].M_miss_count).toBe(0)
+  })
+
+  it('builds research-long tables whose dictionary keys are in the registry', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([session(true)])
+    const data = await getCognitiveExportData('assignment-1', { detail: 'research' })
+    const pack = buildCognitiveResearchPackage(
+      { ...assignment, profile: 'standard', resolvedReportSnapshotEncrypted: null },
+      [{
+        id: 'session-1',
+        userId: 'student-1',
+        anonymousCode: null,
+        attemptNo: 1,
+        testType: 'reaction',
+        configVersion: '1.0.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        startedAt: new Date('2026-08-20T10:00:00.000Z'),
+        finishedAt: new Date('2026-08-20T10:01:00.000Z'),
+        user: { id: 'student-1', nickname: '小明', username: 'student-1' },
+        score: 88,
+        metrics: { meanRtMs: 350, medianRtMs: 340, validTrialCount: 3 },
+        qualityFlags: { interpretable: true, interrupted: false },
+        trials: [
+          { trialIndex: 0, payload: { rtMs: 320, foreperiodMs: 500 } },
+          { trialIndex: 1, payload: { rtMs: 380, foreperiodMs: 700 } },
+        ],
+      }],
+      true,
+    )
+    expect(pack.sessionRows).toHaveLength(1)
+    expect(pack.metricRows.length).toBeGreaterThan(0)
+    expect(pack.trialRows).toHaveLength(2)
+    expect(pack.manifest.files).toEqual(expect.arrayContaining([
+      'sessions.csv', 'metrics.csv', 'trials.csv', 'manifest.json', 'data_dictionary.xlsx', 'README.txt',
+    ]))
+    const reaction = (await import('../../modules/cognitive/cognitive.registry')).getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')!
+    const registryKeys = [...Object.keys(reaction.metricDefinitions), ...Object.keys(reaction.qualityDefinitions)]
+    for (const row of pack.dictionaryRows) {
+      expect(registryKeys).toContain(row.key)
+    }
+    expect(data.trialCount).toBe(2)
   })
 })

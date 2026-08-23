@@ -351,6 +351,37 @@ async function main() {
   await seedMemoryCognitiveConfig()
   await seedStroopCognitiveConfig()
   await seedRound1P0Configs()
+  const NONE_REPORT = { reportVersion: '1.0.0', referenceMode: 'none' as const }
+  await seedPublishedCognitiveConfig('gonogo', '1.0.0', {
+    name: 'Go/No-Go v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 120,
+      nogoRatio: 0.25,
+      stimulusMs: 800,
+      isiMs: 500,
+      validRtFloorMs: 100,
+      report: NONE_REPORT,
+    },
+  })
+  await seedPublishedCognitiveConfig('cpt', '1.0.0', {
+    name: 'CPT-X v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 180,
+      targetRatio: 0.2,
+      blockCount: 3,
+      stimulusMs: 500,
+      isiMs: 1000,
+      validRtFloorMs: 100,
+      perseverationRtMs: 100,
+      report: NONE_REPORT,
+    },
+  })
   console.log('数据库初始化完成。')
 }
 

@@ -7,6 +7,8 @@ import {
   reactionRegistryMetaV11,
   stroopRegistryMeta,
   stroopRegistryMetaV11,
+  gonogoRegistryMeta,
+  cptRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -23,6 +25,12 @@ import { stroopConfigSchema } from './schemas/stroop.config'
 import { stroopTrialSchema } from './schemas/stroop.trial'
 import { scoreStroopV1 } from './scoring/stroop.v1'
 import { scoreStroopV1_1 } from './scoring/stroop.v1_1'
+import { gonogoConfigSchema } from './schemas/gonogo.config'
+import { gonogoTrialSchema } from './schemas/gonogo.trial'
+import { scoreGonogoV1 } from './scoring/gonogo.v1'
+import { cptConfigSchema } from './schemas/cpt.config'
+import { cptTrialSchema } from './schemas/cpt.trial'
+import { scoreCptV1 } from './scoring/cpt.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -160,4 +168,24 @@ registerEntry({
   trialSchema: stroopTrialSchema,
   score: scoreStroopV1_1,
   ...stroopRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'gonogo',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: gonogoConfigSchema,
+  trialSchema: gonogoTrialSchema,
+  score: scoreGonogoV1,
+  ...gonogoRegistryMeta,
+})
+
+registerEntry({
+  testType: 'cpt',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: cptConfigSchema,
+  trialSchema: cptTrialSchema,
+  score: scoreCptV1,
+  ...cptRegistryMeta,
 })

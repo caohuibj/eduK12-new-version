@@ -4,6 +4,8 @@ import { fakeRegistryEntry } from './tasks/fake/fake.registry'
 import { reactionRegistryEntry } from './tasks/reaction/reaction.registry'
 import { memoryRegistryEntry } from './tasks/memory/memory.registry'
 import { stroopRegistryEntry } from './tasks/stroop/stroop.registry'
+import { gonogoRegistryEntry } from './tasks/gonogo/gonogo.registry'
+import { cptRegistryEntry } from './tasks/cpt/cpt.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -84,3 +86,5 @@ registerCognitiveRunner(memoryRegistryEntry)
 
 // 注册 Stroop Test：stroop / 1.0.0（Milestone E Session 4）
 registerCognitiveRunner(stroopRegistryEntry)
+registerCognitiveRunner(gonogoRegistryEntry)
+registerCognitiveRunner(cptRegistryEntry)

@@ -36,8 +36,8 @@ Content-Type: application/json
 }
 ```
 
-- `detail`: `summary` 或 `full`，默认 `summary`。
-- `format`: `csv` 或 `sav`，默认 `csv`。
+- `detail`: `summary`、`full` 或 `research`，默认 `summary`。
+- `format`: `csv`、`sav`、`xlsx` 或 `zip`，默认 `csv`。research 主路径是 `zip`。
 - `anonymize`: 管理员可选择；教师始终强制脱敏。
 - `dateRange`: 按完成时间筛选，开始/结束日期均可省略。
 
@@ -60,3 +60,18 @@ GET /api/cognitive/assignments/:assignmentId/export/files/:fileName
 | `T001_` | 完整模式的第 1 个原始试次；按试次序号递增 |
 
 导出服务直接解密 Cognitive 域密文后生成文件，不重新评分，也不信任客户端提交的分数；评分结果仍以服务端完成测评时冻结的版本为准。
+
+摘要导出另含 `A_profile`、`A_metric_definition_version`、`A_quality_definition_version`、`A_report_definition_version`、`A_quality_interpretable`。`M_*` / `Q_*` 的中文 label 来自冻结的 metric/quality registry。
+
+### research zip
+
+`detail=research` 且 `format=zip` 时生成：
+
+- `sessions.csv`：一 session 一行
+- `metrics.csv`：一 metric/quality 一行
+- `trials.csv`：一 trial 一行，任务私有字段在 `task_payload_json`
+- `manifest.json`
+- `data_dictionary.xlsx`（key ⊆ 冻结 Registry）
+- `README.txt`
+
+`format=xlsx` 把 Summary / Sessions / Metrics / Trials / Dictionary / Methods 做成多 sheet。full wide 仅兼容保留。教师导出始终匿名；综合测评 wrapper 返回 403。
