@@ -44,4 +44,13 @@ describe('cognitive frontend registry', () => {
   it('rejects an unknown testType', () => {
     expect(resolveRunner('unknown-task', '1.0.0')).toBeUndefined()
   })
+
+  it('resolves every Round 1 P0/P1 runner and contains no percentile copy', () => {
+    const entries = [
+      'reaction', 'memory', 'stroop',
+      'gonogo', 'cpt', 'nback', 'corsi', 'sst', 'taskswitch',
+    ].map((testType) => resolveRunner(testType, '1.0.0'))
+    expect(entries.every(Boolean)).toBe(true)
+    expect(JSON.stringify(entries)).not.toMatch(/参考位置\s*\d|百分位|percentile|超过全国\s*\d+%/i)
+  })
 })
