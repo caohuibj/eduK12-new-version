@@ -57,3 +57,68 @@ export const cptSequence = (seed: string, totalTrials: number, targetRatio: numb
     stimulus: isTarget ? 'X' : LETTERS[Math.floor(letterRng() * (LETTERS.length - 1))],
   }))
 }
+
+const NBACK_LETTERS = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'M', 'P', 'Q', 'R', 'S', 'T', 'V', 'X']
+
+export type NbackTrialSpec = {
+  nLevel: 1 | 2 | 3
+  blockIndex: number
+  stimulus: string
+  target: boolean
+}
+
+export const nbackSequence = (
+  seed: string,
+  nLevels: Array<1 | 2 | 3>,
+  trialCountByN: number[],
+  blockCountByN: number[],
+  targetRatio: number,
+): NbackTrialSpec[] => {
+  const trials: NbackTrialSpec[] = []
+  let globalBlockIndex = 0
+  nLevels.forEach((nLevel, levelIndex) => {
+    const trialCount = trialCountByN[levelIndex]
+    const blockCount = blockCountByN[levelIndex]
+    const perBlock = trialCount / blockCount
+    for (let blockWithinLevel = 0; blockWithinLevel < blockCount; blockWithinLevel += 1) {
+      const eligible = Math.max(0, perBlock - nLevel)
+      const targetCount = Math.min(eligible, Math.max(1, Math.round(eligible * targetRatio)))
+      const eligibleFlags = Array.from({ length: eligible }, (_, index) => index < targetCount)
+      shuffleInPlace(eligibleFlags, seededRandom(seed, `nback-targets:${nLevel}:${blockWithinLevel}`))
+      const isTarget = [...Array.from({ length: nLevel }, () => false), ...eligibleFlags]
+      const letterRng = seededRandom(seed, `nback-letters:${nLevel}:${blockWithinLevel}`)
+      const stimuli: string[] = []
+      for (let index = 0; index < perBlock; index += 1) {
+        if (isTarget[index]) {
+          stimuli.push(stimuli[index - nLevel])
+          continue
+        }
+        let letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
+        if (index >= nLevel) {
+          let guard = 0
+          while (letter === stimuli[index - nLevel] && guard < 16) {
+            letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
+            guard += 1
+          }
+        }
+        stimuli.push(letter)
+      }
+      stimuli.forEach((stimulus, index) => {
+        trials.push({
+          nLevel,
+          blockIndex: globalBlockIndex,
+          stimulus,
+          target: Boolean(isTarget[index]),
+        })
+      })
+      globalBlockIndex += 1
+    }
+  })
+  return trials
+}
+
+export const corsiSequence = (seed: string, trialIndex: number, spanLength: number, boardSize = 9): number[] => {
+  const blocks = Array.from({ length: boardSize }, (_, index) => index)
+  shuffleInPlace(blocks, seededRandom(seed, `corsi:${trialIndex}:${spanLength}`))
+  return blocks.slice(0, spanLength)
+}

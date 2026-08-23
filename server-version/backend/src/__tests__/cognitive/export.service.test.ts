@@ -237,6 +237,8 @@ describe('cognitive export service', () => {
     expect(pack.manifest.files).toEqual(expect.arrayContaining([
       'sessions.csv', 'metrics.csv', 'trials.csv', 'manifest.json', 'data_dictionary.xlsx', 'README.txt',
     ]))
+    expect(pack.manifest.randomizationAlgorithmVersion).toBe('reaction-foreperiod-v1.0.0')
+    expect(pack.sessionRows[0].A_randomization_algorithm_version).toBe('reaction-foreperiod-v1.0.0')
     const reaction = (await import('../../modules/cognitive/cognitive.registry')).getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')!
     const registryKeys = [...Object.keys(reaction.metricDefinitions), ...Object.keys(reaction.qualityDefinitions)]
     for (const row of pack.dictionaryRows) {

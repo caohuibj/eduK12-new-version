@@ -43,8 +43,23 @@ const profileLabelOf = (profile: CognitiveProfile | null): string | null => {
   return null
 }
 
-const formatMetric = (definition: Pick<MetricDefinition, 'unit'> | undefined, value: unknown): string => {
+const formatMapValue = (metricKey: string, value: unknown): string => {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return '—'
+  if (/rate/i.test(metricKey)) return `${Math.round(number * 100)}%`
+  if (/rt/i.test(metricKey)) return `${Math.round(number)} ms`
+  return String(Math.round(number * 100) / 100)
+}
+
+const formatMetric = (key: string, definition: Pick<MetricDefinition, 'unit'> | undefined, value: unknown): string => {
   if (value === null || value === undefined || value === '') return '—'
+  if (definition?.unit === 'map') {
+    if (typeof value !== 'object' || Array.isArray(value)) return '—'
+    const entries = Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => Number(left) - Number(right))
+      .map(([nLevel, item]) => `${nLevel}-back：${formatMapValue(key, item)}`)
+    return entries.length > 0 ? entries.join('；') : '—'
+  }
   const number = Number(value)
   if (!Number.isFinite(number)) return String(value)
   if (definition?.unit === 'ratio') return `${Math.round(number * 100)}%`
@@ -63,7 +78,7 @@ const metricView = (
     label: definition?.label ?? key,
     unit: definition?.unit,
     value: metrics[key],
-    formatted: formatMetric(definition, metrics[key]),
+    formatted: formatMetric(key, definition, metrics[key]),
   }
 }
 
@@ -76,6 +91,7 @@ const registryCompatReport = (input: {
   if (!entry) return null
   return {
     profile: 'standard',
+    randomizationAlgorithmVersion: entry.randomizationAlgorithmVersion,
     profileDefinitionVersion: entry.profileDefinitionVersion,
     metricDefinitionVersion: entry.metricDefinitionVersion,
     qualityDefinitionVersion: entry.qualityDefinitionVersion,

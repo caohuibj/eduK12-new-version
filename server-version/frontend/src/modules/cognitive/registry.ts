@@ -6,6 +6,8 @@ import { memoryRegistryEntry } from './tasks/memory/memory.registry'
 import { stroopRegistryEntry } from './tasks/stroop/stroop.registry'
 import { gonogoRegistryEntry } from './tasks/gonogo/gonogo.registry'
 import { cptRegistryEntry } from './tasks/cpt/cpt.registry'
+import { nbackRegistryEntry } from './tasks/nback/nback.registry'
+import { corsiRegistryEntry } from './tasks/corsi/corsi.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -88,3 +90,5 @@ registerCognitiveRunner(memoryRegistryEntry)
 registerCognitiveRunner(stroopRegistryEntry)
 registerCognitiveRunner(gonogoRegistryEntry)
 registerCognitiveRunner(cptRegistryEntry)
+registerCognitiveRunner(nbackRegistryEntry)
+registerCognitiveRunner(corsiRegistryEntry)
