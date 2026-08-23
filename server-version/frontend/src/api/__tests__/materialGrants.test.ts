@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { mockClient } = vi.hoisted(() => ({
-  mockClient: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
+  mockClient: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }))
 
 vi.mock('../client', () => ({ default: mockClient }))
@@ -12,6 +12,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockClient.get.mockResolvedValue({ code: 0, data: { list: [] } })
   mockClient.post.mockResolvedValue({ code: 0, data: {} })
+  mockClient.put.mockResolvedValue({ code: 0, data: { list: [] } })
   mockClient.delete.mockResolvedValue({ code: 0, data: { id: 'g1' } })
 })
 
@@ -27,6 +28,15 @@ describe('materialGrantApi', () => {
       resourceType: 'COGNITIVE_CONFIG',
       resourceId: 'cfg-1',
       teacherIds: ['t1', 't2'],
+    })
+  })
+
+  it('sets the full teacher list for one resource atomically', async () => {
+    await materialGrantApi.set({ resourceType: 'SCALE', resourceId: 'scale-1', teacherIds: ['t2'] })
+    expect(mockClient.put).toHaveBeenCalledWith('/admin/material-grants/set', {
+      resourceType: 'SCALE',
+      resourceId: 'scale-1',
+      teacherIds: ['t2'],
     })
   })
 

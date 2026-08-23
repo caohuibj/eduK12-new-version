@@ -271,3 +271,60 @@ export const batchCreateGrants = async (input: {
   })
   return Promise.all(rows.map((row) => attachResource(row)))
 }
+
+const grantInclude = {
+  teacher: { select: { id: true, username: true, nickname: true, role: true } },
+  granter: { select: { id: true, username: true, nickname: true } },
+} as const
+
+// 授权弹窗保存：把某材料的授权名单一次设成 teacherIds。
+// 新增与撤销必须同事务；已有 grant 即使教师后来不合格也保留（不出现在选择器里，payload 仍会带上）。
+export const setGrants = async (input: {
+  resourceType: MaterialResourceType
+  resourceId: string
+  teacherIds: string[]
+  grantedBy: string
+}) => {
+  if (!Array.isArray(input.teacherIds)) {
+    throw grantBadRequest('teacherIds 必须是数组')
+  }
+  await assertGrantableResource(input.resourceType, input.resourceId)
+  const desiredIds = [...new Set(input.teacherIds)]
+
+  await prisma.$transaction(async (tx) => {
+    const existing = await tx.materialGrant.findMany({
+      where: { resourceType: input.resourceType, resourceId: input.resourceId },
+      select: { id: true, teacherId: true },
+    })
+    const existingIds = new Set(existing.map((row) => row.teacherId))
+    const toAdd = desiredIds.filter((id) => !existingIds.has(id))
+    const toRemoveIds = existing.filter((row) => !desiredIds.includes(row.teacherId)).map((row) => row.id)
+
+    if (toAdd.length) {
+      const teachers = await tx.user.findMany({ where: { id: { in: toAdd } } })
+      if (teachers.length !== toAdd.length) throw grantNotFound('教师不存在')
+      if (teachers.some((teacher) => !isEligibleTeacher(teacher))) {
+        throw grantBadRequest('只能授权给已审核且未冻结的在职教师')
+      }
+      await tx.materialGrant.createMany({
+        data: toAdd.map((teacherId) => ({
+          teacherId,
+          resourceType: input.resourceType,
+          resourceId: input.resourceId,
+          grantedBy: input.grantedBy,
+        })),
+        skipDuplicates: true,
+      })
+    }
+    if (toRemoveIds.length) {
+      await tx.materialGrant.deleteMany({ where: { id: { in: toRemoveIds } } })
+    }
+  })
+
+  const rows = await prisma.materialGrant.findMany({
+    where: { resourceType: input.resourceType, resourceId: input.resourceId },
+    orderBy: { createdAt: 'desc' },
+    include: grantInclude,
+  })
+  return Promise.all(rows.map((row) => attachResource(row)))
+}
