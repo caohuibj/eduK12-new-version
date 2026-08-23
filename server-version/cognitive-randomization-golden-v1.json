@@ -78,5 +78,21 @@
     { "blockIndex": 1, "ruleCue": "color", "previousRule": "shape", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "left", "previousRuleResponse": "right" },
     { "blockIndex": 1, "ruleCue": "shape", "previousRule": "color", "switchType": "switch", "stimulusColor": "blue", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "right" },
     { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" }
+  ],
+  "digitbackward": [[1, 7], [1, 4], [4, 9, 6], [1, 8, 4]],
+  "picturesequence": ["scene-31", "scene-32", "scene-33", "scene-34", "scene-35", "scene-36", "scene-37", "scene-38", "scene-39", "scene-40", "scene-41", "scene-42"],
+  "pairedassociate": [
+    { "itemId": "pair-01", "targetPosition": 4 },
+    { "itemId": "pair-02", "targetPosition": 6 },
+    { "itemId": "pair-03", "targetPosition": 1 },
+    { "itemId": "pair-04", "targetPosition": 0 },
+    { "itemId": "pair-05", "targetPosition": 8 },
+    { "itemId": "pair-06", "targetPosition": 11 },
+    { "itemId": "pair-07", "targetPosition": 2 },
+    { "itemId": "pair-08", "targetPosition": 10 },
+    { "itemId": "pair-09", "targetPosition": 7 },
+    { "itemId": "pair-10", "targetPosition": 9 },
+    { "itemId": "pair-11", "targetPosition": 5 },
+    { "itemId": "pair-12", "targetPosition": 3 }
   ]
 }
