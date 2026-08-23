@@ -167,4 +167,3 @@ export interface RecommendationRuleDefinition {
   priority: RecommendationResult['priority']
   text: string
 }
-

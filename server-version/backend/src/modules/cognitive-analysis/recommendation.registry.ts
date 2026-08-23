@@ -6,4 +6,3 @@ export const COGNITIVE_RECOMMENDATION_RULE_VERSION = '1.0.0'
 const RULES: RecommendationRuleDefinition[] = []
 
 export const listRecommendationRuleDefinitions = (): RecommendationRuleDefinition[] => [...RULES]
-

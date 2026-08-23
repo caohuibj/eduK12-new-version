@@ -4,4 +4,3 @@ export * from './cognitive-analysis.types'
 export * from './domain.registry'
 export * from './evidence-mapping.registry'
 export * from './recommendation.registry'
-
