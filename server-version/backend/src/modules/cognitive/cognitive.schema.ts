@@ -23,6 +23,8 @@ export const versionStringSchema = z.string().min(1)
  * `.strict()`：body 中禁止出现 createdBy / status / courseSnapshot / publishedAt，
  * 这些字段全部由服务端决定。
  */
+export const cognitiveProfileSchema = z.enum(['experience', 'standard', 'research'])
+
 export const createAssignmentSchema = z
   .object({
     courseId: z.string().min(1),
@@ -33,6 +35,7 @@ export const createAssignmentSchema = z
     dueAt: z.string().datetime().optional(),
     maxAttempts: z.number().int().positive().optional().default(1),
     required: z.boolean().optional().default(true),
+    profile: cognitiveProfileSchema.optional(),
   })
   .strict()
   .refine(
@@ -49,6 +52,7 @@ export const updateAssignmentSchema = z
     dueAt: z.string().datetime().optional(),
     maxAttempts: z.number().int().positive().optional(),
     required: z.boolean().optional(),
+    profile: cognitiveProfileSchema.optional(),
   })
   .strict()
   .refine(

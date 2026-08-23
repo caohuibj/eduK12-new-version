@@ -59,8 +59,22 @@ const CognitiveResult: React.FC = () => {
 
   const { result } = session
   const entry = resolveRunner(session.testType, session.engineVersion)
-  const report = entry?.reportDefinition
-  const metricDefs = entry?.metricDefinitions ?? []
+  const report = session.reportDefinition
+    ? {
+        title: session.reportDefinition.title,
+        headlineMetric: session.reportDefinition.headlineMetric || session.reportDefinition.primaryMetrics?.[0] || '',
+        summaryMetrics: session.reportDefinition.primaryMetrics || session.reportDefinition.summaryMetrics || [],
+        disclaimer: session.reportDefinition.disclaimer,
+      }
+    : entry?.reportDefinition
+  const metricDefs = session.metricDefinitions
+    ? Object.values(session.metricDefinitions).map((definition) => ({
+        key: definition.key,
+        label: definition.label,
+        unit: definition.unit,
+        displayType: definition.unit === 'ms' ? 'ms' as const : definition.unit === 'ratio' ? 'percentage' as const : 'number' as const,
+      }))
+    : (entry?.metricDefinitions ?? [])
   const interpretable = result.qualityFlags.interpretable !== false
   const metricValue = (key: string) => result.metrics?.[key]
   const headlineDefinition = report

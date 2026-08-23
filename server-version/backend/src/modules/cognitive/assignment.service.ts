@@ -1,6 +1,8 @@
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { getCognitiveRegistryEntry } from './cognitive.registry'
+import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
+import { freezeAssignmentProfile } from './profile-freeze'
+import type { CognitiveProfile } from './cognitive.types'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
   CognitiveServiceError,
@@ -71,12 +73,15 @@ export const createAssignment = async (
 ) => {
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
-  const { course, config } = await validateConfigForAssignment(input.courseId, input.configId, role, userId)
+  const { course, config, entry } = await validateConfigForAssignment(input.courseId, input.configId, role, userId)
   if (!(await canInstantiateConfig(userId, role, config))) {
     throw FORBIDDEN('无权限使用此认知任务类型')
   }
+  if (input.profile && !hasCognitiveProfile(entry, input.profile)) {
+    throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
+  }
 
-  // create 只建 DRAFT；createdBy 由 JWT 决定；courseSnapshot 在 publish 时写入。
+  // create 只建 DRAFT；createdBy 由 JWT 决定；courseSnapshot 与 resolved snapshot 在 publish 时写入。
   const assignment = await prisma.cognitiveAssignment.create({
     data: {
       courseId: input.courseId,
@@ -89,6 +94,7 @@ export const createAssignment = async (
       dueAt: input.dueAt ? new Date(input.dueAt) : null,
       maxAttempts: input.maxAttempts,
       required: input.required,
+      profile: input.profile ?? null,
     },
   })
 
@@ -345,6 +351,15 @@ export const updateDraftAssignment = async (
   if (input.dueAt !== undefined) data.dueAt = nextDueAt
   if (input.maxAttempts !== undefined) data.maxAttempts = input.maxAttempts
   if (input.required !== undefined) data.required = input.required
+  if (input.profile !== undefined) {
+    const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: existing.configId } })
+    if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+    const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+    if (!entry || !hasCognitiveProfile(entry, input.profile)) {
+      throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
+    }
+    data.profile = input.profile
+  }
 
   const updated = await prisma.cognitiveAssignment.update({ where: { id }, data })
   return updated
@@ -358,21 +373,33 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
   assertCanManage(existing, role, userId)
   if (existing.status !== 'DRAFT') throw CONFLICT('Only DRAFT assignments can be published')
 
-  // publish 重检 Course/Config/Registry/schema（复用校验链）。
-  const { course } = await validateConfigForAssignment(
+  // publish 重检 Course/Config/Registry/schema（复用校验链），并在此时冻结 Profile。
+  const { course, config, entry } = await validateConfigForAssignment(
     existing.courseId as string,
     existing.configId,
     role,
     userId
   )
 
-  // 单次条件写：DRAFT -> PUBLISHED + publishedAt + 最小 courseSnapshot。
+  const freeze = existing.profile
+    ? freezeAssignmentProfile({
+        entry,
+        baseConfig: config.config,
+        profile: existing.profile as CognitiveProfile,
+      })
+    : null
+  // 单次条件写：DRAFT -> PUBLISHED + publishedAt + 最小 courseSnapshot + resolved snapshot。
   const { count } = await prisma.cognitiveAssignment.updateMany({
     where: { id, status: 'DRAFT' },
     data: {
       status: 'PUBLISHED',
       publishedAt: new Date(),
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
+      ...(freeze ? {
+        profileDefinitionVersion: freeze.profileDefinitionVersion,
+        resolvedConfigSnapshotEncrypted: freeze.resolvedConfigSnapshotEncrypted,
+        resolvedConfigHash: freeze.resolvedConfigHash,
+      } : {}),
     },
   })
 

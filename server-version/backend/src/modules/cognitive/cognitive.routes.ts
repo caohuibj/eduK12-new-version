@@ -10,6 +10,8 @@ import { UserRole } from '../../types'
  */
 const router = Router()
 
+router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
+router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
 router.patch('/configs/:id/access-policy', authenticate, requireAdmin, cognitiveController.updateAccessPolicy)
 

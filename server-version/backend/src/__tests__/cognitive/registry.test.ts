@@ -16,6 +16,8 @@ describe('cognitive registry', () => {
     expect(entry?.testType).toBe('fake')
     expect(entry?.engineVersion).toBe('1.0.0')
     expect(entry?.scoringVersion).toBe('1.0.0')
+    expect(entry?.profiles.standard.profile).toBe('standard')
+    expect(entry?.metricDefinitions.accuracy).toBeDefined()
   })
 
   it('fails lookup for a wrong engineVersion', () => {

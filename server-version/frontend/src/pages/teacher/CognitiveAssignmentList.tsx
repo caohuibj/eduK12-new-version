@@ -12,7 +12,15 @@ type ConfigOption = {
   testType: string
   configVersion: string
   name: string
+  engineVersion?: string
+  scoringVersion?: string
   accessPolicy?: 'OPEN' | 'GRANT'
+}
+type TestCatalogRow = {
+  testType: string
+  engineVersion: string
+  scoringVersion: string
+  profiles: Array<{ profile: 'experience' | 'standard' | 'research'; reportCaveats: string[] }>
 }
 type AssignmentRow = {
   id: string
@@ -37,6 +45,7 @@ const CognitiveAssignmentList: React.FC = () => {
   const [list, setList] = useState<AssignmentRow[]>([])
   const [courses, setCourses] = useState<CourseOption[]>([])
   const [configs, setConfigs] = useState<ConfigOption[]>([])
+  const [tests, setTests] = useState<TestCatalogRow[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -48,24 +57,32 @@ const CognitiveAssignmentList: React.FC = () => {
     configId: '',
     instruction: '',
     maxAttempts: 1,
+    profile: 'standard' as 'experience' | 'standard' | 'research',
   })
 
   const selectableCourses = isAdmin ? courses : courses.filter((course) => !course.isLibrary)
   const selectedCourse = selectableCourses.find((course) => course.id === form.courseId)
   const selectedConfig = configs.find((config) => config.id === form.configId)
+  const selectedTest = tests.find((test) =>
+    test.testType === selectedConfig?.testType
+    && (!selectedConfig.engineVersion || test.engineVersion === selectedConfig.engineVersion)
+    && (!selectedConfig.scoringVersion || test.scoringVersion === selectedConfig.scoringVersion)
+  ) || tests.find((test) => test.testType === selectedConfig?.testType)
 
   const load = async () => {
     try {
-      const [assignmentsRes, coursesRes, configsRes] = await Promise.all([
+      const [assignmentsRes, coursesRes, configsRes, testsRes] = await Promise.all([
         cognitiveApi.listTeacherAssignments(),
         apiClient.get<{ list: CourseOption[] }>('/courses?status=all&page=1&pageSize=100'),
         cognitiveApi.listConfigs(),
+        cognitiveApi.listTests(),
       ])
       if (assignmentsRes.code !== 0) throw new Error(assignmentsRes.message || '获取认知任务失败')
       const rows = Array.isArray(assignmentsRes.data) ? assignmentsRes.data : assignmentsRes.data?.list || []
       setList(rows)
       setCourses(coursesRes.code === 0 ? (coursesRes.data?.list || []) : [])
       setConfigs(configsRes.code === 0 ? (configsRes.data?.list || []) : [])
+      setTests(testsRes.code === 0 ? (testsRes.data?.list || []) : [])
     } catch (err) {
       setError((err as { message?: string }).message || '加载失败')
     } finally {
@@ -85,6 +102,7 @@ const CognitiveAssignmentList: React.FC = () => {
         configId: form.configId,
         instruction: form.instruction || undefined,
         maxAttempts: Number(form.maxAttempts) || 1,
+        profile: form.profile,
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '创建失败')
       navigate(`/cognitive-assignments/${response.data.id}`)
@@ -170,7 +188,25 @@ const CognitiveAssignmentList: React.FC = () => {
                 </button>
               </div>
             )}
+            <select
+              className="border rounded px-3 py-2"
+              value={form.profile}
+              onChange={(e) => setForm({ ...form, profile: e.target.value as 'experience' | 'standard' | 'research' })}
+            >
+              {(selectedTest?.profiles || [
+                { profile: 'experience' as const, reportCaveats: [] },
+                { profile: 'standard' as const, reportCaveats: [] },
+                { profile: 'research' as const, reportCaveats: [] },
+              ]).map((profile) => (
+                <option key={profile.profile} value={profile.profile}>
+                  {profile.profile === 'experience' ? '体验版' : profile.profile === 'research' ? '科研版' : '正式版'}
+                </option>
+              ))}
+            </select>
             <input type="number" min={1} className="border rounded px-3 py-2" placeholder="最大次数" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: Number(e.target.value) })} />
+            {form.profile === 'experience' && (
+              <p className="text-xs text-amber-600 md:col-span-2">体验版，结果仅供体验。</p>
+            )}
             <textarea className="border rounded px-3 py-2 md:col-span-2" placeholder="学生须知（可选）" value={form.instruction} onChange={(e) => setForm({ ...form, instruction: e.target.value })} />
           </div>
           {selectedCourse?.isLibrary && (

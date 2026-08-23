@@ -33,6 +33,7 @@ import {
   restartSession,
 } from '../../modules/cognitive/session.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { hashResolvedConfig } from '../../modules/cognitive/profile-freeze'
 
 const PUBLISHED_ASSIGNMENT = {
   id: 'asg-1',
@@ -224,6 +225,33 @@ describe('createSession data', () => {
     expect(createData.configVersion).toBe('1.0.0')
     expect(createData.engineVersion).toBe('1.0.0')
     expect(createData.scoringVersion).toBe('1.0.0')
+  })
+
+  it('copies the assignment resolved snapshot instead of re-merging live config', async () => {
+    const frozenConfig = { trialCount: 8, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }
+    const frozenCipher = encryptCognitivePayload(frozenConfig)
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...PUBLISHED_ASSIGNMENT,
+      profile: 'experience',
+      resolvedConfigSnapshotEncrypted: frozenCipher,
+      resolvedConfigHash: hashResolvedConfig(frozenConfig),
+    })
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({
+      ...CONFIG,
+      config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+    })
+    mockPrisma.cognitiveSession.count.mockResolvedValue(0)
+    mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: any) =>
+      sessionRow({ configSnapshotEncrypted: data.configSnapshotEncrypted })
+    )
+
+    await createSession('student-1', 'asg-1')
+    const createData = mockPrisma.cognitiveSession.create.mock.calls[0][0].data
+    expect(createData.configSnapshotEncrypted).toBe(frozenCipher)
+    expect(decryptCognitivePayload<Record<string, unknown>>(createData.configSnapshotEncrypted).trialCount).toBe(8)
+
+    await createSession('student-1', 'asg-1')
+    expect(mockPrisma.cognitiveSession.create.mock.calls[1][0].data.configSnapshotEncrypted).toBe(frozenCipher)
   })
 
   it('returns the existing IN_PROGRESS session without creating a new one', async () => {

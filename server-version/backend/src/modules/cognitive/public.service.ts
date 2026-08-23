@@ -2,8 +2,9 @@ import { randomBytes } from 'crypto'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
-import { encryptCognitivePayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { hashResolvedConfig } from './profile-freeze'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
@@ -36,9 +37,18 @@ const validateAssignment = (assignment: any) => {
   if (assignment.dueAt && assignment.dueAt.getTime() < Date.now()) throw BAD_REQUEST('Cognitive assignment is past due')
   const config = assignment.config
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+  if (assignment.resolvedConfigSnapshotEncrypted) {
+    const thawed = decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted)
+    const parsed = entry.configSchema.safeParse(thawed)
+    if (!parsed.success) throw BAD_REQUEST('冻结的 Profile 配置与任务 schema 不匹配')
+    if (assignment.resolvedConfigHash && hashResolvedConfig(parsed.data) !== assignment.resolvedConfigHash) {
+      throw BAD_REQUEST('冻结的 Profile 配置校验失败')
+    }
+    return { config, parsedConfig: parsed.data, snapshotEncrypted: assignment.resolvedConfigSnapshotEncrypted as string }
+  }
   const parsed = entry.configSchema.safeParse(config.config)
   if (!parsed.success) throw BAD_REQUEST('Cognitive config does not match its registry schema')
-  return { config, parsedConfig: parsed.data }
+  return { config, parsedConfig: parsed.data, snapshotEncrypted: encryptCognitivePayload(parsed.data) }
 }
 
 export const getPublicAssignmentInfo = async (tokenValue: string) => {
@@ -70,7 +80,7 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
     throw FORBIDDEN('Invalid recovery credential')
   }
   assertWindow(token)
-  const { config, parsedConfig } = validateAssignment(token.assignment)
+  const { config, snapshotEncrypted } = validateAssignment(token.assignment)
   const credential = createRecoveryCredential()
   const created = await prisma.$transaction(async (tx) => {
     const claimed = await tx.cognitiveAccessToken.updateMany({
@@ -92,7 +102,7 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
         attemptNo: 1,
         status: 'IN_PROGRESS',
         configVersion: config.configVersion,
-        configSnapshotEncrypted: encryptCognitivePayload(parsedConfig),
+        configSnapshotEncrypted: snapshotEncrypted,
         engineVersion: config.engineVersion,
         scoringVersion: config.scoringVersion,
         randomSeed: randomBytes(16).toString('hex'),

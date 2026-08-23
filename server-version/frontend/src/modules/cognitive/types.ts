@@ -74,6 +74,15 @@ export interface CognitiveHistoryPage {
  * Runner 会话（对应后端 toRunnerPayload + COMPLETED 附加字段）。
  * config = 冻结的 config snapshot（decrypted）；randomSeed 必须 accept/retain/pass，禁止 regenerate。
  */
+export interface CognitiveReportDefinition {
+  title: string
+  headlineMetric?: string
+  primaryMetrics?: string[]
+  secondaryMetrics?: string[]
+  summaryMetrics?: string[]
+  disclaimer: string
+}
+
 export interface CognitiveSession {
   sessionId: string
   assignmentId: string | null
@@ -85,6 +94,8 @@ export interface CognitiveSession {
   scoringVersion: string
   config: Record<string, unknown>
   randomSeed: string
+  metricDefinitions?: Record<string, { key: string; label: string; unit?: string }>
+  reportDefinition?: CognitiveReportDefinition
   /** 公开匿名恢复时由服务端返回，允许跨设备继续而不猜测下一个试次。 */
   nextTrialIndex?: number
   /** 公开匿名会话的参与者编号，不包含账号身份。 */

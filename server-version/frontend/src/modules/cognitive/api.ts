@@ -20,6 +20,16 @@ export interface CognitiveSessionApi {
  */
 
 export const cognitiveApi = {
+  listTests: () =>
+    apiClient.get<{ list: Array<{
+      testType: string
+      name: string
+      engineVersion: string
+      scoringVersion: string
+      recommendedForCreate: boolean
+      profiles: Array<{ profile: 'experience' | 'standard' | 'research'; estimatedMinutes: [number, number]; reportCaveats: string[] }>
+      reportDefinition: { title: string; primaryMetrics: string[]; secondaryMetrics: string[]; disclaimer: string }
+    }> }>('/cognitive/tests'),
   listConfigs: () =>
     apiClient.get<{ list: Array<{
       id: string
@@ -27,6 +37,8 @@ export const cognitiveApi = {
       configVersion: string
       name: string
       instruction: string | null
+      engineVersion?: string
+      scoringVersion?: string
       accessPolicy?: 'OPEN' | 'GRANT'
     }> }>('/cognitive/configs'),
   updateConfigAccessPolicy: (id: string, accessPolicy: 'OPEN' | 'GRANT') =>
@@ -39,6 +51,7 @@ export const cognitiveApi = {
     title: string
     instruction?: string
     maxAttempts?: number
+    profile?: 'experience' | 'standard' | 'research'
   }) => apiClient.post<any>('/cognitive/assignments', body),
   updateAssignment: (id: string, body: { title?: string; instruction?: string }) =>
     apiClient.patch<any>(`/cognitive/assignments/${id}`, body),

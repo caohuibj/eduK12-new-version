@@ -1037,6 +1037,10 @@ model CognitiveAssignment {
   updatedAt      DateTime                  @updatedAt @map("updated_at")
   publishedAt    DateTime?                 @map("published_at")
   listedStandalone Boolean                 @default(true) @map("listed_standalone")
+  profile          String?
+  profileDefinitionVersion String?         @map("profile_definition_version")
+  resolvedConfigSnapshotEncrypted String?  @map("resolved_config_snapshot_encrypted")
+  resolvedConfigHash String?               @map("resolved_config_hash")
 
   course   Course?             @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
   config   CognitiveTestConfig @relation(fields: [configId], references: [id], onDelete: Restrict)
