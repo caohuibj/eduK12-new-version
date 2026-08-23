@@ -130,4 +130,37 @@ describe('buildCognitiveSingleTaskReport', () => {
     expect(report?.primaryMetrics[0].label).not.toBe('medianRtMs')
     expect(report?.caveats).toEqual([])
   })
+
+  it('hides research-only metrics from experience and standard reports', () => {
+    const report = buildCognitiveSingleTaskReport({
+      testType: 'cpt',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      configVersion: '1.0.0',
+      profile: 'standard',
+      frozenReport: null,
+      score: 70,
+      metrics: { dPrime: 1.2, omissionRate: 0.1, commissionRate: 0.1, rtICV: 0.2, blockSlopeRt: 12, blockSlopeOmission: 0.01 },
+      qualityFlags: { interpretable: true },
+      reference: null,
+    })
+    const keys = [...(report?.primaryMetrics ?? []), ...(report?.secondaryMetrics ?? [])].map((metric) => metric.key)
+    expect(keys).not.toContain('blockSlopeRt')
+    expect(keys).not.toContain('blockSlopeOmission')
+    const research = buildCognitiveSingleTaskReport({
+      testType: 'cpt',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      configVersion: '1.0.0',
+      profile: 'research',
+      frozenReport: null,
+      score: 70,
+      metrics: { dPrime: 1.2, omissionRate: 0.1, commissionRate: 0.1, rtICV: 0.2, blockSlopeRt: 12, blockSlopeOmission: 0.01 },
+      qualityFlags: { interpretable: true },
+      reference: null,
+    })
+    const researchKeys = [...(research?.primaryMetrics ?? []), ...(research?.secondaryMetrics ?? [])].map((metric) => metric.key)
+    expect(researchKeys).toContain('blockSlopeRt')
+    expect(researchKeys).toContain('blockSlopeOmission')
+  })
 })

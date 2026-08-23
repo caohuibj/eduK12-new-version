@@ -5,6 +5,7 @@ import { scoreGonogoV1 } from '../../modules/cognitive/scoring/gonogo.v1'
 import { scoreCptV1 } from '../../modules/cognitive/scoring/cpt.v1'
 import { mergeProfileConfig } from '../../modules/cognitive/profile-freeze'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
+import { cptSequence, gonogoSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../../modules/cognitive/randomization'
 
 const gonogoConfig = {
   totalTrials: 8,
@@ -40,28 +41,35 @@ describe('gonogo schema and profiles', () => {
 })
 
 describe('gonogo scorer', () => {
-  const trial = (index: number, trialType: 'go' | 'nogo', responded: boolean, rtMs: number | null = responded ? 300 : null) => ({
-    trialIndex: index,
-    payload: { trialType, responded, rtMs, interrupted: false },
-  })
+  const seed = 'seed-gonogo'
+  const sequence = gonogoSequence(seed, 8, 0.25)
+  const trialsFor = (mutate?: (index: number, type: 'go' | 'nogo') => { trialType: 'go' | 'nogo'; responded: boolean; rtMs: number | null }) =>
+    sequence.map((trialType, index) => {
+      const next = mutate?.(index, trialType) ?? {
+        trialType,
+        responded: trialType === 'go',
+        rtMs: trialType === 'go' ? 300 : null,
+      }
+      return { trialIndex: index, payload: { ...next, interrupted: false } }
+    })
 
-  it('computes commissionRate and dPrime on a balanced short form', () => {
-    const trials = [
-      trial(0, 'go', true, 280),
-      trial(1, 'go', true, 300),
-      trial(2, 'go', true, 320),
-      trial(3, 'go', true, 340),
-      trial(4, 'go', true, 260),
-      trial(5, 'go', true, 310),
-      trial(6, 'nogo', false),
-      trial(7, 'nogo', true, 220),
-    ]
-    const result = scoreGonogoV1({ config: gonogoConfig, trials })
-    expect(result.metrics.commissionRate).toBe(0.5)
-    expect(result.metrics.hitRate).toBe(1)
+  it('computes commissionRate and dPrime on the frozen seed sequence', () => {
+    const result = scoreGonogoV1({ config: gonogoConfig, trials: trialsFor(), randomSeed: seed })
+    expect(result.metrics.nogoTrialCount).toBe(2)
     expect(typeof result.metrics.dPrime).toBe('number')
     expect(result.qualityFlags.interpretable).toBe(true)
     expect(getCognitiveRegistryEntry('gonogo', '1.0.0', '1.0.0')!.metricDefinitions.commissionRate).toBeDefined()
+  })
+
+  it('rejects a swapped trialType that still keeps 25% no-go', () => {
+    const swapped = trialsFor((index, trialType) => {
+      const flipped = sequence.findIndex((value, other) => other !== index && value !== trialType)
+      if (index === 0 || index === flipped) {
+        return { trialType: trialType === 'go' ? 'nogo' : 'go', responded: false, rtMs: null }
+      }
+      return { trialType, responded: trialType === 'go', rtMs: trialType === 'go' ? 300 : null }
+    })
+    expect(() => scoreGonogoV1({ config: gonogoConfig, trials: swapped, randomSeed: seed })).toThrow(/frozen seed sequence/)
   })
 })
 
@@ -77,22 +85,100 @@ describe('cpt schema, profiles and scorer', () => {
   })
 
   it('reports dPrime, omission, commission and rtICV together', () => {
-    const trials = Array.from({ length: 12 }, (_, index) => ({
+    const seed = 'seed-cpt'
+    const expected = cptSequence(seed, 12, 0.25, 1)
+    const trials = expected.map((item, index) => ({
       trialIndex: index,
       payload: {
-        blockIndex: 0,
-        stimulus: index % 4 === 0 ? 'X' : 'A',
-        isTarget: index % 4 === 0,
-        responded: index % 4 === 0 || index === 1,
-        rtMs: index % 4 === 0 || index === 1 ? 280 : null,
+        ...item,
+        responded: item.isTarget,
+        rtMs: item.isTarget ? 280 : null,
         interrupted: false,
       },
     }))
-    const result = scoreCptV1({ config: cptConfig, trials })
+    const result = scoreCptV1({ config: cptConfig, trials, randomSeed: seed })
     expect(result.metrics.omissionRate).toBe(0)
-    expect(result.metrics.commissionRate).toBeGreaterThan(0)
     expect(result.metrics.dPrime).toEqual(expect.any(Number))
-    expect(result.metrics.rtICV === null || typeof result.metrics.rtICV === 'number').toBe(true)
     expect(result.qualityFlags.interpretable).toBe(true)
+    expect(() => scoreCptV1({
+      config: cptConfig,
+      randomSeed: seed,
+      trials: trials.map((trial, index) => index === 0
+        ? { ...trial, payload: { ...trial.payload, isTarget: !trial.payload.isTarget } }
+        : trial),
+    })).toThrow(/frozen seed sequence/)
+  })
+
+  it('keeps missing block RT out of slope instead of writing 0ms', () => {
+    const seed = 'seed-cpt-blocks'
+    const config = { ...cptConfig, totalTrials: 12, blockCount: 3, targetRatio: 0.5 }
+    const expected = cptSequence(seed, 12, 0.5, 3)
+    const trials = expected.map((item, index) => {
+      const skipHits = item.blockIndex === 1 && item.isTarget
+      return {
+        trialIndex: index,
+        payload: {
+          ...item,
+          responded: item.isTarget && !skipHits,
+          rtMs: item.isTarget && !skipHits ? 250 + item.blockIndex * 40 : null,
+          interrupted: false,
+        },
+      }
+    })
+    const result = scoreCptV1({ config, trials, randomSeed: seed })
+    expect(result.metrics.blockSlopeRt).toBe(40)
+    expect(result.metrics.blockSlopeRt).not.toBe(0)
+
+    const oneBlockHits = expected.map((item, index) => ({
+      trialIndex: index,
+      payload: {
+        ...item,
+        responded: item.blockIndex === 0 && item.isTarget,
+        rtMs: item.blockIndex === 0 && item.isTarget ? 250 : null,
+        interrupted: false,
+      },
+    }))
+    const sparse = scoreCptV1({ config, trials: oneBlockHits, randomSeed: seed })
+    expect(sparse.metrics.blockSlopeRt).toBeNull()
+  })
+
+  it('rejects a stimulus that contradicts isTarget', () => {
+    const seed = 'seed-cpt'
+    const expected = cptSequence(seed, 12, 0.25, 1)
+    const trials = expected.map((item, index) => ({
+      trialIndex: index,
+      payload: {
+        ...item,
+        stimulus: index === 0 ? (item.isTarget ? 'A' : 'X') : item.stimulus,
+        responded: item.isTarget,
+        rtMs: item.isTarget ? 280 : null,
+        interrupted: false,
+      },
+    }))
+    expect(() => scoreCptV1({ config: cptConfig, trials, randomSeed: seed })).toThrow(/mismatch|frozen seed sequence/)
+  })
+})
+
+describe('randomization contract', () => {
+  it('is deterministic per seed and versioned', () => {
+    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe('seq-v1.0.0')
+    expect(gonogoSequence('seed-1', 8, 0.25)).toEqual(['nogo', 'nogo', 'go', 'go', 'go', 'go', 'go', 'go'])
+    expect(gonogoSequence('seed-1', 8, 0.25)).toEqual(gonogoSequence('seed-1', 8, 0.25))
+    expect(gonogoSequence('seed-1', 8, 0.25)).not.toEqual(gonogoSequence('seed-2', 8, 0.25))
+    expect(cptSequence('seed-1', 12, 0.25, 1)).toEqual([
+      { blockIndex: 0, isTarget: true, stimulus: 'X' },
+      { blockIndex: 0, isTarget: false, stimulus: 'B' },
+      { blockIndex: 0, isTarget: true, stimulus: 'X' },
+      { blockIndex: 0, isTarget: false, stimulus: 'N' },
+      { blockIndex: 0, isTarget: false, stimulus: 'A' },
+      { blockIndex: 0, isTarget: false, stimulus: 'D' },
+      { blockIndex: 0, isTarget: false, stimulus: 'U' },
+      { blockIndex: 0, isTarget: false, stimulus: 'N' },
+      { blockIndex: 0, isTarget: false, stimulus: 'B' },
+      { blockIndex: 0, isTarget: true, stimulus: 'X' },
+      { blockIndex: 0, isTarget: false, stimulus: 'N' },
+      { blockIndex: 0, isTarget: false, stimulus: 'N' },
+    ])
+    expect(cptSequence('seed-1', 12, 0.25, 1).every((trial) => trial.isTarget === (trial.stimulus === 'X'))).toBe(true)
   })
 })

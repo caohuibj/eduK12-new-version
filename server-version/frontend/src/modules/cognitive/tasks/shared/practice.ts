@@ -1,0 +1,3 @@
+export const PRACTICE_TRIAL_COUNT = 4
+export const PRACTICE_PASS_CORRECT = 3
+export const PRACTICE_FEEDBACK_MS = 600

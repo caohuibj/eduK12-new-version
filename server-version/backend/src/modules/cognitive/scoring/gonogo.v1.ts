@@ -2,10 +2,12 @@ import { CognitiveScoreResult, CognitiveScoringInputError, ScoringTrial } from '
 import { GonogoConfig } from '../schemas/gonogo.config'
 import { GonogoTrial } from '../schemas/gonogo.trial'
 import { dPrime, median } from './signal-detection'
+import { gonogoSequence } from '../randomization'
 
 export const scoreGonogoV1 = (input: {
   config: GonogoConfig
   trials: ScoringTrial<GonogoTrial>[]
+  randomSeed?: string
 }): CognitiveScoreResult => {
   const { config, trials } = input
   const sorted = [...trials]
@@ -22,6 +24,15 @@ export const scoreGonogoV1 = (input: {
   const expectedNogo = Math.round(config.totalTrials * config.nogoRatio)
   const nogo = sorted.filter((trial) => trial.payload.trialType === 'nogo')
   const go = sorted.filter((trial) => trial.payload.trialType === 'go')
+  if (!input.randomSeed) {
+    throw new CognitiveScoringInputError('gonogo v1 requires session randomSeed')
+  }
+  const expected = gonogoSequence(input.randomSeed, config.totalTrials, config.nogoRatio)
+  sorted.forEach((trial, index) => {
+    if (trial.payload.trialType !== expected[index]) {
+      throw new CognitiveScoringInputError(`gonogo v1 trial ${index} trialType does not match the frozen seed sequence`)
+    }
+  })
   if (nogo.length !== expectedNogo || go.length !== config.totalTrials - expectedNogo) {
     throw new CognitiveScoringInputError(`gonogo v1 expects ${expectedNogo} no-go trials`)
   }

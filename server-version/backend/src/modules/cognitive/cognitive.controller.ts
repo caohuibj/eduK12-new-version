@@ -30,6 +30,7 @@ import { z } from 'zod'
 import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
 import * as fs from 'fs'
 import * as path from 'path'
+import { isAllowedCognitiveExportFileName } from './export.service'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
@@ -349,7 +350,7 @@ export const cognitiveController = {
       if (
         path.basename(fileName) !== fileName ||
         !fileName.startsWith(`cognitive_${assignmentId.substring(0, 8)}_`) ||
-        !/^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
+        !isAllowedCognitiveExportFileName(fileName)
       ) {
         return notFound(res, '文件不存在')
       }

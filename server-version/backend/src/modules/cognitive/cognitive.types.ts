@@ -82,6 +82,7 @@ export interface RegistryEntry<TConfig, TTrial> {
   score(input: {
     config: TConfig
     trials: ScoringTrial<TTrial>[]
+    randomSeed?: string
   }): CognitiveScoreResult
   profileDefinitionVersion: string
   profiles: Record<CognitiveProfile, CognitiveProfileDefinition>

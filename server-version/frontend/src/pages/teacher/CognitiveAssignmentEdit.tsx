@@ -101,8 +101,8 @@ const CognitiveAssignmentEdit: React.FC = () => {
     else setError(response.message || '停用公开链接失败')
   }
 
-  const exportData = async (detailMode: 'summary' | 'full') => {
-    const response = await cognitiveApi.exportData(id, { detail: detailMode, format: 'csv' })
+  const exportData = async (detailMode: 'summary' | 'full' | 'research', format: 'csv' | 'zip' | 'xlsx' = 'csv') => {
+    const response = await cognitiveApi.exportData(id, { detail: detailMode, format })
     if (response.code !== 0 || !response.data?.fileName) {
       setError(response.message || '导出失败')
       return
@@ -164,6 +164,8 @@ const CognitiveAssignmentEdit: React.FC = () => {
                 <Download className="w-4 h-4 inline mr-1" />导出摘要
               </button>
               <button onClick={() => void exportData('full')} className="btn-secondary">导出完整数据</button>
+              <button onClick={() => void exportData('research', 'zip')} className="btn-secondary">科研长表 ZIP</button>
+              <button onClick={() => void exportData('research', 'xlsx')} className="btn-secondary">科研工作簿 XLSX</button>
             </>
           )}
         </div>

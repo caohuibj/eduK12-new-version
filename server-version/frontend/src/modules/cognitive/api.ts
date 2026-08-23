@@ -65,7 +65,7 @@ export const cognitiveApi = {
     apiClient.post<any>(`/cognitive/assignments/${id}/public-tokens`, body),
   disablePublicToken: (id: string, tokenId: string) =>
     apiClient.delete<any>(`/cognitive/assignments/${id}/public-tokens/${tokenId}`),
-  exportData: (id: string, body: { detail: 'summary' | 'full'; format: 'csv' | 'sav' }) =>
+  exportData: (id: string, body: { detail: 'summary' | 'full' | 'research'; format: 'csv' | 'sav' | 'zip' | 'xlsx' }) =>
     apiClient.post<{ fileName: string }>(`/cognitive/assignments/${id}/export`, body),
   getMyAssignments: () =>
     apiClient.get<CognitiveAssignmentSummary[]>('/cognitive/assignments/my'),

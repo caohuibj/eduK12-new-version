@@ -153,7 +153,11 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
 
     let result: { score: number; metrics: Record<string, unknown>; qualityFlags: Record<string, unknown> }
     try {
-      result = entry.score({ config: validatedConfig, trials: scoringTrials })
+      result = entry.score({
+        config: validatedConfig,
+        trials: scoringTrials,
+        randomSeed: session.randomSeed,
+      })
     } catch (err) {
       if (err instanceof CognitiveScoringInputError) {
         // premature / malformed trials：Session 保持 IN_PROGRESS，学生可补交后再次 complete。

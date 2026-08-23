@@ -2,20 +2,23 @@ import { CognitiveScoreResult, CognitiveScoringInputError, ScoringTrial } from '
 import { CptConfig } from '../schemas/cpt.config'
 import { CptTrial } from '../schemas/cpt.trial'
 import { dPrime, mean, median, sd } from './signal-detection'
+import { cptSequence } from '../randomization'
 
-const slope = (values: number[]): number | null => {
-  if (values.length < 2) return null
-  const xs = values.map((_, index) => index)
+const slope = (points: Array<{ x: number; y: number }>): number | null => {
+  if (points.length < 2) return null
+  const xs = points.map((point) => point.x)
+  const ys = points.map((point) => point.y)
   const xMean = mean(xs)
-  const yMean = mean(values)
+  const yMean = mean(ys)
   const denom = xs.reduce((sum, x) => sum + (x - xMean) ** 2, 0)
   if (denom === 0) return 0
-  return values.reduce((sum, y, index) => sum + (xs[index] - xMean) * (y - yMean), 0) / denom
+  return ys.reduce((sum, y, index) => sum + (xs[index] - xMean) * (y - yMean), 0) / denom
 }
 
 export const scoreCptV1 = (input: {
   config: CptConfig
   trials: ScoringTrial<CptTrial>[]
+  randomSeed?: string
 }): CognitiveScoreResult => {
   const { config, trials } = input
   const sorted = [...trials]
@@ -29,17 +32,28 @@ export const scoreCptV1 = (input: {
       throw new CognitiveScoringInputError(`cpt v1 requires contiguous trialIndex 0..${config.totalTrials - 1}`)
     }
   })
-  const perBlock = config.totalTrials / config.blockCount
-  sorted.forEach((trial) => {
-    if (trial.payload.blockIndex !== Math.floor(trial.trialIndex / perBlock)) {
-      throw new CognitiveScoringInputError(`cpt v1 trial ${trial.trialIndex} has an inconsistent blockIndex`)
+  if (!input.randomSeed) {
+    throw new CognitiveScoringInputError('cpt v1 requires session randomSeed')
+  }
+  const expected = cptSequence(input.randomSeed, config.totalTrials, config.targetRatio, config.blockCount)
+  const expectedTargets = expected.filter((trial) => trial.isTarget).length
+  sorted.forEach((trial, index) => {
+    const want = expected[index]
+    if (
+      trial.payload.blockIndex !== want.blockIndex
+      || trial.payload.isTarget !== want.isTarget
+      || trial.payload.stimulus !== want.stimulus
+    ) {
+      throw new CognitiveScoringInputError(`cpt v1 trial ${index} does not match the frozen seed sequence`)
+    }
+    if (trial.payload.isTarget !== (trial.payload.stimulus === 'X')) {
+      throw new CognitiveScoringInputError(`cpt v1 trial ${index} stimulus/isTarget mismatch`)
     }
   })
-
   const targets = sorted.filter((trial) => trial.payload.isTarget)
   const nontargets = sorted.filter((trial) => !trial.payload.isTarget)
-  if (targets.length === 0 || nontargets.length === 0) {
-    throw new CognitiveScoringInputError('cpt v1 requires both targets and non-targets')
+  if (targets.length !== expectedTargets || nontargets.length === 0) {
+    throw new CognitiveScoringInputError(`cpt v1 expects ${expectedTargets} targets`)
   }
   const hits = targets.filter((trial) => trial.payload.responded && (trial.payload.rtMs ?? 0) >= config.validRtFloorMs)
   const omissions = targets.length - hits.length
@@ -52,14 +66,17 @@ export const scoreCptV1 = (input: {
   const rtICV = hitMean > 0 ? hitSd / hitMean : null
   const perseverations = sorted.filter((trial) => trial.payload.rtMs != null && trial.payload.rtMs < config.perseverationRtMs).length
   const perseverationRate = perseverations / sorted.length
-  const blockOmission: number[] = []
-  const blockRt: number[] = []
+  const blockOmission: Array<{ x: number; y: number }> = []
+  const blockRt: Array<{ x: number; y: number }> = []
   for (let block = 0; block < config.blockCount; block += 1) {
     const blockTrials = sorted.filter((trial) => trial.payload.blockIndex === block)
     const blockTargets = blockTrials.filter((trial) => trial.payload.isTarget)
     const blockHits = blockTargets.filter((trial) => trial.payload.responded && (trial.payload.rtMs ?? 0) >= config.validRtFloorMs)
-    blockOmission.push(blockTargets.length ? 1 - blockHits.length / blockTargets.length : 0)
-    blockRt.push(median(blockHits.map((trial) => trial.payload.rtMs as number)) ?? 0)
+    if (blockTargets.length > 0) {
+      blockOmission.push({ x: block, y: 1 - blockHits.length / blockTargets.length })
+    }
+    const blockMedian = median(blockHits.map((trial) => trial.payload.rtMs as number))
+    if (blockMedian != null) blockRt.push({ x: block, y: blockMedian })
   }
   const insufficientTargets = targets.length < 3
   const highOmissionRate = omissionRate >= 0.4
