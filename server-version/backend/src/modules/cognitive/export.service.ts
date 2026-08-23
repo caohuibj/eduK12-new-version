@@ -15,9 +15,13 @@ import {
 } from '../../services/exportStorage'
 import { FORBIDDEN } from './cognitive.errors'
 import { isCompositeWrapper } from './assignment.access'
+import { getCognitiveRegistryEntry } from './cognitive.registry'
+import { readFrozenReport } from './profile-freeze'
+import { buildZipStore } from './export-zip'
+import * as XLSX from 'xlsx'
 
-export type CognitiveExportDetail = 'summary' | 'full'
-export type CognitiveExportFormat = 'csv' | 'sav'
+export type CognitiveExportDetail = 'summary' | 'full' | 'research'
+export type CognitiveExportFormat = 'csv' | 'sav' | 'xlsx' | 'zip'
 
 export interface CognitiveExportOptions {
   detail?: CognitiveExportDetail
@@ -84,7 +88,7 @@ const EXPORT_DIR = path.join(__dirname, '../../../exports')
 
 export const makeCognitiveExportFileName = (
   assignmentId: string,
-  detail: CognitiveExportDetail,
+  detail: CognitiveExportDetail | 'summary' | 'full' | 'research',
   format: CognitiveExportFormat
 ): string => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
@@ -214,6 +218,9 @@ const getAssignment = async (assignmentId: string) => {
       course: {
         select: { id: true, title: true, courseCode: true },
       },
+      profile: true,
+      profileDefinitionVersion: true,
+      resolvedReportSnapshotEncrypted: true,
       config: {
         select: {
           testType: true,
@@ -248,7 +255,7 @@ const getSessions = async (
     },
   }
 
-  if (detail === 'full') {
+  if (detail === 'full' || detail === 'research') {
     const sessions = await prisma.cognitiveSession.findMany({
       where,
       include: {
@@ -316,19 +323,47 @@ const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean) => {
   builder.add('A_config_version', '配置版本', 'string', 20)
   builder.add('A_engine_version', '引擎版本', 'string', 20)
   builder.add('A_scoring_version', '评分版本', 'string', 20)
+  builder.add('A_profile', '测评档位', 'string', 20)
+  builder.add('A_metric_definition_version', '指标定义版本', 'string', 20)
+  builder.add('A_quality_definition_version', '质量定义版本', 'string', 20)
+  builder.add('A_report_definition_version', '报告定义版本', 'string', 20)
+  builder.add('A_quality_interpretable', '结果可解释', 'numeric', 4, 0)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 8, 0)
   builder.add('A_date', '完成日期', 'date', 24)
 }
 
+const reportContextFor = (assignment: Awaited<ReturnType<typeof getAssignment>>, session: DecodedCognitiveExportSession) => {
+  const frozen = readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
+  const entry = frozen
+    ? null
+    : getCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
+  return {
+    profile: assignment.profile ?? frozen?.profile ?? null,
+    metricDefinitionVersion: frozen?.metricDefinitionVersion ?? entry?.metricDefinitionVersion ?? null,
+    qualityDefinitionVersion: frozen?.qualityDefinitionVersion ?? entry?.qualityDefinitionVersion ?? null,
+    reportDefinitionVersion: frozen?.reportDefinitionVersion ?? entry?.reportDefinitionVersion ?? null,
+    metricDefinitions: frozen?.metricDefinitions ?? entry?.metricDefinitions ?? {},
+    qualityDefinitions: frozen?.qualityDefinitions ?? entry?.qualityDefinitions ?? {},
+  }
+}
+
+const metricLabel = (
+  session: DecodedCognitiveExportSession,
+  key: string,
+  defs: Record<string, { label?: string; export?: { label: string } }>,
+) => defs[key]?.export?.label || defs[key]?.label || key
+
 const addSessionFields = (
   builder: ExportFieldBuilder,
   session: DecodedCognitiveExportSession,
-  detail: CognitiveExportDetail
+  detail: CognitiveExportDetail,
+  assignment: Awaited<ReturnType<typeof getAssignment>>,
 ) => {
+  const context = reportContextFor(assignment, session)
   for (const [key, value] of Object.entries(session.metrics).sort(([a], [b]) => a.localeCompare(b))) {
     builder.add(
       makeFieldName('M_', key),
-      `[${session.testType}] ${key}`,
+      `[${session.testType}] ${metricLabel(session, key, context.metricDefinitions)}`,
       inferFieldType(value),
       12,
       typeof value === 'number' && !Number.isInteger(value) ? 4 : 0
@@ -338,7 +373,7 @@ const addSessionFields = (
   for (const [key, value] of Object.entries(session.qualityFlags).sort(([a], [b]) => a.localeCompare(b))) {
     builder.add(
       makeFieldName('Q_', key),
-      `[${session.testType}] 质量标记：${key}`,
+      `[${session.testType}] ${context.qualityDefinitions[key]?.label || `质量标记：${key}`}`,
       inferFieldType(value),
       12,
       0
@@ -383,6 +418,12 @@ const fillBaseRow = (
   row.A_config_version = session.configVersion
   row.A_engine_version = session.engineVersion
   row.A_scoring_version = session.scoringVersion
+  const context = reportContextFor(assignment, session)
+  row.A_profile = context.profile
+  row.A_metric_definition_version = context.metricDefinitionVersion
+  row.A_quality_definition_version = context.qualityDefinitionVersion
+  row.A_report_definition_version = context.reportDefinitionVersion
+  row.A_quality_interpretable = session.qualityFlags.interpretable === false ? 0 : 1
   row.A_duration_s = session.finishedAt
     ? Math.round((session.finishedAt.getTime() - session.startedAt.getTime()) / 1000)
     : null
@@ -402,12 +443,13 @@ const buildRows = (
 
     fillBaseRow(row, assignment, session, anonymize)
 
+    const context = reportContextFor(assignment, session)
     for (const [key, value] of Object.entries(session.metrics)) {
-      const label = `[${session.testType}] ${key}`
+      const label = `[${session.testType}] ${metricLabel(session, key, context.metricDefinitions)}`
       row[builder.resolve(makeFieldName('M_', key), label)] = scalarExportValue(value)
     }
     for (const [key, value] of Object.entries(session.qualityFlags)) {
-      const label = `[${session.testType}] 质量标记：${key}`
+      const label = `[${session.testType}] ${context.qualityDefinitions[key]?.label || `质量标记：${key}`}`
       row[builder.resolve(makeFieldName('Q_', key), label)] = scalarExportValue(value)
     }
 
@@ -437,7 +479,7 @@ export async function getCognitiveExportData(
   const builder = new ExportFieldBuilder()
 
   addBaseFields(builder, anonymize)
-  for (const session of decodedSessions) addSessionFields(builder, session, detail)
+  for (const session of decodedSessions) addSessionFields(builder, session, detail, assignment)
 
   const rows = buildRows(builder, assignment, decodedSessions, detail, anonymize)
   const trialCount = decodedSessions.reduce((sum, session) => sum + session.trials.length, 0)
@@ -500,12 +542,139 @@ export async function exportCognitiveToSav(data: CognitiveExportData): Promise<s
   return filePath
 }
 
+const tableToCsv = (headers: string[], rows: Array<Record<string, unknown>>): string => {
+  const lines = [headers.join(',')]
+  for (const row of rows) {
+    lines.push(headers.map((header) => csvValue(row[header])).join(','))
+  }
+  return `${lines.join('\n')}\n`
+}
+
+export const buildCognitiveResearchPackage = (
+  assignment: Awaited<ReturnType<typeof getAssignment>>,
+  sessions: DecodedCognitiveExportSession[],
+  anonymize: boolean,
+) => {
+  const sessionRows = sessions.map((session) => {
+    const context = reportContextFor(assignment, session)
+    return {
+      session_id: session.id,
+      U_id: session.anonymousCode || (session.userId
+        ? anonymize ? `U${session.userId.substring(0, 8)}` : session.userId
+        : 'ANONYMOUS'),
+      A_assignment_id: assignment.id,
+      A_test_type: session.testType,
+      A_attempt: session.attemptNo,
+      A_score: session.score,
+      A_profile: context.profile,
+      A_config_version: session.configVersion,
+      A_engine_version: session.engineVersion,
+      A_scoring_version: session.scoringVersion,
+      A_metric_definition_version: context.metricDefinitionVersion,
+      A_quality_definition_version: context.qualityDefinitionVersion,
+      A_report_definition_version: context.reportDefinitionVersion,
+      A_quality_interpretable: session.qualityFlags.interpretable === false ? 0 : 1,
+      A_finished_at: session.finishedAt?.toISOString() ?? null,
+    }
+  })
+  const metricRows: Array<Record<string, unknown>> = []
+  const dictionaryRows: Array<Record<string, unknown>> = []
+  const seenKeys = new Set<string>()
+  for (const session of sessions) {
+    const context = reportContextFor(assignment, session)
+    for (const [key, value] of Object.entries(session.metrics)) {
+      const def = context.metricDefinitions[key]
+      metricRows.push({
+        session_id: session.id,
+        metric_key: key,
+        metric_label: metricLabel(session, key, context.metricDefinitions),
+        unit: def?.unit ?? '',
+        role: def?.role ?? '',
+        value: scalarExportValue(value),
+      })
+      if (!seenKeys.has(`M:${key}`)) {
+        seenKeys.add(`M:${key}`)
+        dictionaryRows.push({
+          key,
+          source: 'metric',
+          label: metricLabel(session, key, context.metricDefinitions),
+          unit: def?.unit ?? '',
+          role: def?.role ?? '',
+          test_type: session.testType,
+        })
+      }
+    }
+    for (const [key, value] of Object.entries(session.qualityFlags)) {
+      metricRows.push({
+        session_id: session.id,
+        metric_key: `Q_${key}`,
+        metric_label: context.qualityDefinitions[key]?.label || key,
+        unit: '',
+        role: 'quality',
+        value: scalarExportValue(value),
+      })
+      if (!seenKeys.has(`Q:${key}`)) {
+        seenKeys.add(`Q:${key}`)
+        dictionaryRows.push({
+          key,
+          source: 'quality',
+          label: context.qualityDefinitions[key]?.label || key,
+          unit: '',
+          role: 'quality',
+          test_type: session.testType,
+        })
+      }
+    }
+  }
+  const trialRows = sessions.flatMap((session) =>
+    session.trials.map((trial) => ({
+      session_id: session.id,
+      trial_index: trial.trialIndex,
+      test_type: session.testType,
+      task_payload_json: JSON.stringify(trial.payload),
+    })),
+  )
+  const manifest = {
+    assignmentId: assignment.id,
+    assignmentTitle: assignment.title,
+    testType: assignment.config?.testType ?? null,
+    detail: 'research',
+    generatedAt: new Date().toISOString(),
+    sessionCount: sessions.length,
+    metricRowCount: metricRows.length,
+    trialRowCount: trialRows.length,
+    files: ['sessions.csv', 'metrics.csv', 'trials.csv', 'manifest.json', 'data_dictionary.xlsx', 'README.txt'],
+  }
+  const readme = [
+    'Cognitive research-long export',
+    '',
+    'sessions.csv: one completed session per row',
+    'metrics.csv: one metric or quality flag per row',
+    'trials.csv: one trial per row; task-specific fields are in task_payload_json',
+    'data_dictionary.xlsx: key/label/unit/role from the frozen metric/quality registry',
+    '',
+    'Scores are server-computed. This package is not a population norm and is not a diagnosis.',
+    'Dictionary keys must be a subset of the frozen Registry for this assignment version.',
+  ].join('\n')
+  return { sessionRows, metricRows, trialRows, dictionaryRows, manifest, readme }
+}
+
+const writeXlsxWorkbook = (sheets: Record<string, Array<Record<string, unknown>>>, filePath: string) => {
+  const workbook = XLSX.utils.book_new()
+  for (const [name, rows] of Object.entries(sheets)) {
+    const sheet = XLSX.utils.json_to_sheet(rows)
+    XLSX.utils.book_append_sheet(workbook, sheet, name.slice(0, 31))
+  }
+  XLSX.writeFile(workbook, filePath)
+  ensureExportFileWithinLimit(filePath)
+}
+
 export async function saveCognitiveExportFiles(
   assignmentId: string,
   options: CognitiveExportOptions = {},
   format: CognitiveExportFormat = 'csv',
   data?: CognitiveExportData
-): Promise<{ data: CognitiveExportData; csvPath?: string; savPath?: string }> {
+): Promise<{ data: CognitiveExportData; csvPath?: string; savPath?: string; xlsxPath?: string; zipPath?: string }> {
   const exportData = data || await getCognitiveExportData(assignmentId, options)
   assertExportLimits({
     records: exportData.rows.length,
@@ -522,9 +691,53 @@ export async function saveCognitiveExportFiles(
     fs.writeFileSync(csvPath, content, 'utf-8')
     return { data: exportData, csvPath }
   }
+  if (format === 'sav') {
+    const savPath = await exportCognitiveToSav(exportData)
+    return { data: exportData, savPath }
+  }
 
-  const savPath = await exportCognitiveToSav(exportData)
-  return { data: exportData, savPath }
+  const assignment = await getAssignment(assignmentId)
+  const sessions = (await getSessions(assignmentId, 'research', options.dateRange)).map(decodeSession)
+  const pack = buildCognitiveResearchPackage(assignment, sessions, options.anonymize ?? true)
+  const dictionaryKeys = pack.dictionaryRows.map((row) => String(row.key))
+  const registryKeys = sessions.flatMap((session) => {
+    const context = reportContextFor(assignment, session)
+    return [...Object.keys(context.metricDefinitions), ...Object.keys(context.qualityDefinitions)]
+  })
+  if (dictionaryKeys.some((key) => registryKeys.length > 0 && !registryKeys.includes(key))) {
+    throw new Error('data dictionary keys must be a subset of the frozen registry')
+  }
+
+  if (format === 'xlsx') {
+    const xlsxPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, 'research', 'xlsx'))
+    writeXlsxWorkbook({
+      Summary: exportData.rows,
+      Sessions: pack.sessionRows,
+      Metrics: pack.metricRows,
+      Trials: pack.trialRows,
+      Dictionary: pack.dictionaryRows,
+      Methods: [{ readme: pack.readme, manifest: JSON.stringify(pack.manifest) }],
+    }, xlsxPath)
+    return { data: exportData, xlsxPath }
+  }
+
+  const zipPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, 'research', 'zip'))
+  const dictionaryPath = path.join(EXPORT_DIR, `dict-${path.basename(zipPath, '.zip')}.xlsx`)
+  writeXlsxWorkbook({ Dictionary: pack.dictionaryRows }, dictionaryPath)
+  const dictionaryBytes = fs.readFileSync(dictionaryPath)
+  fs.unlinkSync(dictionaryPath)
+  const zip = buildZipStore([
+    { name: 'sessions.csv', data: tableToCsv(Object.keys(pack.sessionRows[0] || { session_id: '' }), pack.sessionRows) },
+    { name: 'metrics.csv', data: tableToCsv(['session_id', 'metric_key', 'metric_label', 'unit', 'role', 'value'], pack.metricRows) },
+    { name: 'trials.csv', data: tableToCsv(['session_id', 'trial_index', 'test_type', 'task_payload_json'], pack.trialRows) },
+    { name: 'manifest.json', data: `${JSON.stringify(pack.manifest, null, 2)}\n` },
+    { name: 'data_dictionary.xlsx', data: dictionaryBytes },
+    { name: 'README.txt', data: `${pack.readme}\n` },
+  ])
+  assertExportLimits({ bytes: zip.length })
+  fs.writeFileSync(zipPath, zip)
+  ensureExportFileWithinLimit(zipPath)
+  return { data: exportData, zipPath }
 }
 
 export const cognitiveExportService = {

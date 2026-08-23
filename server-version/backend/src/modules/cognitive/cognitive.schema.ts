@@ -84,7 +84,7 @@ export type UpdateAccessPolicyInput = z.infer<typeof updateAccessPolicySchema>
  * summary 只导出服务端汇总指标；full 额外展开每个原始试次。
  */
 export const cognitiveExportQuerySchema = z.object({
-  detail: z.enum(['summary', 'full']).optional().default('summary'),
+  detail: z.enum(['summary', 'full', 'research']).optional().default('summary'),
 })
 
 /**
@@ -93,8 +93,8 @@ export const cognitiveExportQuerySchema = z.object({
  */
 export const cognitiveExportRequestSchema = z
   .object({
-    detail: z.enum(['summary', 'full']).optional().default('summary'),
-    format: z.enum(['csv', 'sav']).optional().default('csv'),
+    detail: z.enum(['summary', 'full', 'research']).optional().default('summary'),
+    format: z.enum(['csv', 'sav', 'xlsx', 'zip']).optional().default('csv'),
     anonymize: z.boolean().optional().default(true),
     dateRange: z.object({
       start: z.string().min(1).optional(),

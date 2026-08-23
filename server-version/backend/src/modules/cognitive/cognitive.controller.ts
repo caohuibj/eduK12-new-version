@@ -323,6 +323,12 @@ export const cognitiveController = {
       if (files.savPath) {
         result.fileName = path.basename(files.savPath)
       }
+      if (files.xlsxPath) {
+        result.fileName = path.basename(files.xlsxPath)
+      }
+      if (files.zipPath) {
+        result.fileName = path.basename(files.zipPath)
+      }
 
       return success(res, result, '导出成功')
     } catch (err) {
