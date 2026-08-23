@@ -888,6 +888,8 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const parsedConfig = validateCognitiveConfig(config)
   const anonymous = !userId
+  const configSnapshotEncrypted = assignment.resolvedConfigSnapshotEncrypted
+    || encryptCognitivePayload(parsedConfig)
   return db.cognitiveSession.create({
     data: {
       userId,
@@ -901,7 +903,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       attemptNo: 1,
       status: 'IN_PROGRESS',
       configVersion: config.configVersion,
-      configSnapshotEncrypted: encryptCognitivePayload(parsedConfig),
+      configSnapshotEncrypted,
       engineVersion: config.engineVersion,
       scoringVersion: config.scoringVersion,
       randomSeed: randomBytes(16).toString('hex'),

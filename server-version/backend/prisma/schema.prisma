@@ -1041,6 +1041,7 @@ model CognitiveAssignment {
   profileDefinitionVersion String?         @map("profile_definition_version")
   resolvedConfigSnapshotEncrypted String?  @map("resolved_config_snapshot_encrypted")
   resolvedConfigHash String?               @map("resolved_config_hash")
+  resolvedReportSnapshotEncrypted String?  @map("resolved_report_snapshot_encrypted")
 
   course   Course?             @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
   config   CognitiveTestConfig @relation(fields: [configId], references: [id], onDelete: Restrict)

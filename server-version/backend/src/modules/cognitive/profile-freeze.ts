@@ -1,7 +1,25 @@
 import { createHash } from 'crypto'
-import { encryptCognitivePayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { BAD_REQUEST } from './cognitive.errors'
-import type { CognitiveProfile, RegistryEntry } from './cognitive.types'
+import type {
+  CognitiveProfile,
+  MetricDefinition,
+  QualityDefinition,
+  RegistryEntry,
+  SingleTaskReportDefinition,
+} from './cognitive.types'
+
+export interface FrozenReportSnapshot {
+  profile: CognitiveProfile
+  profileDefinitionVersion: string
+  metricDefinitionVersion: string
+  qualityDefinitionVersion: string
+  reportDefinitionVersion: string
+  reportCaveats: string[]
+  metricDefinitions: Record<string, MetricDefinition>
+  qualityDefinitions: Record<string, QualityDefinition>
+  reportDefinition: SingleTaskReportDefinition
+}
 
 const sortValue = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(sortValue)
@@ -45,11 +63,37 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
   profile: CognitiveProfile
 }) => {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
+  const profileDefinition = input.entry.profiles[input.profile]
+  const resolvedReport: FrozenReportSnapshot = {
+    profile: input.profile,
+    profileDefinitionVersion: input.entry.profileDefinitionVersion,
+    metricDefinitionVersion: input.entry.metricDefinitionVersion,
+    qualityDefinitionVersion: input.entry.qualityDefinitionVersion,
+    reportDefinitionVersion: input.entry.reportDefinitionVersion,
+    reportCaveats: profileDefinition.reportCaveats,
+    metricDefinitions: input.entry.metricDefinitions,
+    qualityDefinitions: input.entry.qualityDefinitions,
+    reportDefinition: input.entry.reportDefinition,
+  }
   return {
     profile: input.profile,
     profileDefinitionVersion: input.entry.profileDefinitionVersion,
     resolvedConfig,
     resolvedConfigHash: hashResolvedConfig(resolvedConfig),
     resolvedConfigSnapshotEncrypted: encryptCognitivePayload(resolvedConfig),
+    resolvedReportSnapshotEncrypted: encryptCognitivePayload(resolvedReport),
   }
 }
+
+export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapshot | null => {
+  if (!encrypted) return null
+  return decryptCognitivePayload<FrozenReportSnapshot>(encrypted)
+}
+
+export const freezeDataForWrite = (freeze: ReturnType<typeof freezeAssignmentProfile>) => ({
+  profile: freeze.profile,
+  profileDefinitionVersion: freeze.profileDefinitionVersion,
+  resolvedConfigSnapshotEncrypted: freeze.resolvedConfigSnapshotEncrypted,
+  resolvedConfigHash: freeze.resolvedConfigHash,
+  resolvedReportSnapshotEncrypted: freeze.resolvedReportSnapshotEncrypted,
+})

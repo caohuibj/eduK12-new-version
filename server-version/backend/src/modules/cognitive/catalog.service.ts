@@ -1,4 +1,4 @@
-import { NOT_FOUND } from './cognitive.errors'
+import { BAD_REQUEST, NOT_FOUND } from './cognitive.errors'
 import {
   getCognitiveRegistryEntry,
   listCognitiveRegistryEntries,
@@ -39,6 +39,9 @@ export const getCognitiveTestCatalog = (
   engineVersion?: string,
   scoringVersion?: string,
 ) => {
+  if (Boolean(engineVersion) !== Boolean(scoringVersion)) {
+    throw BAD_REQUEST('engineVersion 与 scoringVersion 必须同时提供')
+  }
   if (engineVersion && scoringVersion) {
     const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
     if (!entry) {

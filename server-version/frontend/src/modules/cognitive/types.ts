@@ -94,6 +94,8 @@ export interface CognitiveSession {
   scoringVersion: string
   config: Record<string, unknown>
   randomSeed: string
+  profile?: 'experience' | 'standard' | 'research' | null
+  reportCaveats?: string[]
   metricDefinitions?: Record<string, { key: string; label: string; unit?: string }>
   reportDefinition?: CognitiveReportDefinition
   /** 公开匿名恢复时由服务端返回，允许跨设备继续而不猜测下一个试次。 */

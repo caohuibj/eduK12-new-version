@@ -26,7 +26,7 @@ vi.mock('../../../modules/cognitive/api', () => ({
     listConfigs: () => Promise.resolve({
       code: 0,
       data: {
-        list: [{ id: 'cfg-1', name: '反应时', testType: 'reaction', configVersion: '1.0.0', accessPolicy: 'OPEN' }],
+        list: [{ id: 'cfg-1', name: '反应时', testType: 'reaction', configVersion: '1.0.0', engineVersion: '1.0.0', scoringVersion: '1.0.0', accessPolicy: 'OPEN' }],
       },
     }),
     listTests: () => Promise.resolve({

@@ -32,6 +32,7 @@ describe('profile merge / freeze', () => {
     const frozen = freezeAssignmentProfile({ entry, baseConfig: reactionBase, profile: 'experience' })
     expect(frozen.resolvedConfigHash).toBe(hashResolvedConfig(frozen.resolvedConfig))
     expect(frozen.resolvedConfig.totalTrials).toBe(8)
+    expect(frozen.resolvedReportSnapshotEncrypted).toEqual(expect.any(String))
   })
 })
 
@@ -57,5 +58,9 @@ describe('cognitive tests catalog', () => {
   it('returns the version list when the detail query omits versions', () => {
     const row = getCognitiveTestCatalog('stroop')
     expect('list' in row && row.list).toHaveLength(1)
+  })
+
+  it('rejects a detail query that supplies only one version', () => {
+    expect(() => getCognitiveTestCatalog('reaction', '1.0.0')).toThrow(/必须同时提供/)
   })
 })

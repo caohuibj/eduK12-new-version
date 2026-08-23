@@ -1,7 +1,7 @@
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
-import { freezeAssignmentProfile } from './profile-freeze'
+import { freezeAssignmentProfile, freezeDataForWrite } from './profile-freeze'
 import type { CognitiveProfile } from './cognitive.types'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
@@ -77,7 +77,7 @@ export const createAssignment = async (
   if (!(await canInstantiateConfig(userId, role, config))) {
     throw FORBIDDEN('无权限使用此认知任务类型')
   }
-  if (input.profile && !hasCognitiveProfile(entry, input.profile)) {
+  if (!hasCognitiveProfile(entry, input.profile)) {
     throw BAD_REQUEST('只能从该任务已声明的 Profile 中选择')
   }
 
@@ -94,7 +94,7 @@ export const createAssignment = async (
       dueAt: input.dueAt ? new Date(input.dueAt) : null,
       maxAttempts: input.maxAttempts,
       required: input.required,
-      profile: input.profile ?? null,
+      profile: input.profile,
     },
   })
 
@@ -381,13 +381,14 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
     userId
   )
 
-  const freeze = existing.profile
-    ? freezeAssignmentProfile({
-        entry,
-        baseConfig: config.config,
-        profile: existing.profile as CognitiveProfile,
-      })
-    : null
+  if (!existing.profile) {
+    throw BAD_REQUEST('发布前必须选择 Profile')
+  }
+  const freeze = freezeAssignmentProfile({
+    entry,
+    baseConfig: config.config,
+    profile: existing.profile as CognitiveProfile,
+  })
   // 单次条件写：DRAFT -> PUBLISHED + publishedAt + 最小 courseSnapshot + resolved snapshot。
   const { count } = await prisma.cognitiveAssignment.updateMany({
     where: { id, status: 'DRAFT' },
@@ -395,11 +396,7 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
       status: 'PUBLISHED',
       publishedAt: new Date(),
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
-      ...(freeze ? {
-        profileDefinitionVersion: freeze.profileDefinitionVersion,
-        resolvedConfigSnapshotEncrypted: freeze.resolvedConfigSnapshotEncrypted,
-        resolvedConfigHash: freeze.resolvedConfigHash,
-      } : {}),
+      ...freezeDataForWrite(freeze),
     },
   })
 
@@ -467,6 +464,12 @@ export const ensureTeacherPublishedAssignment = async (
   const course = await tx.course.findUnique({ where: { id: input.courseId } })
   if (!course) throw NOT_FOUND('Course not found')
 
+  const freeze = freezeAssignmentProfile({
+    entry,
+    baseConfig: config.config,
+    profile: 'standard',
+  })
+
   return tx.cognitiveAssignment.create({
     data: {
       courseId: input.courseId,
@@ -480,6 +483,7 @@ export const ensureTeacherPublishedAssignment = async (
       required: false,
       maxAttempts: 1,
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
+      ...freezeDataForWrite(freeze),
     },
   })
 }
