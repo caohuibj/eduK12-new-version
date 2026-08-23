@@ -53,6 +53,17 @@ describe('scaleController.list source', () => {
     expect(res.body.data.list.some((row: { source: string }) => row.source === 'other')).toBe(false)
   })
 
+  it('keeps student tag lists unfiltered by creatorId', async () => {
+    mockPrisma.scale.findMany.mockResolvedValue([
+      { tags: ['焦虑'] },
+      { tags: ['注意'] },
+    ])
+    const res = makeRes()
+    await scaleController.getTags(makeReq({ user: { userId: 'student-1', role: UserRole.STUDENT } }) as any, res)
+    expect(mockPrisma.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: {} }))
+    expect(res.body.data.tags).toEqual(['焦虑', '注意'])
+  })
+
   it('labels admin rows owned/other', async () => {
     mockPrisma.scale.findMany.mockResolvedValue([
       { id: 'scale-own', creatorId: 'admin-1', name: '管理员自己的' },

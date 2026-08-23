@@ -52,9 +52,9 @@ export const scaleWhereForViewer = async (
   extra: Record<string, unknown> = {},
 ) => {
   if (role === UserRole.ADMIN) return extra
-  if (role !== UserRole.TEACHER || !config.materialGrantsEnabled) {
-    return { ...extra, creatorId: userId }
-  }
+  // 学生等非教师角色：GET /scales/tags 只要求登录，保持全量标签，不要按 creatorId 滤成空。
+  if (role !== UserRole.TEACHER) return extra
+  if (!config.materialGrantsEnabled) return { ...extra, creatorId: userId }
   const grantedIds = await grantedResourceIds(userId, MaterialResourceType.SCALE)
   return {
     ...extra,
@@ -65,6 +65,8 @@ export const scaleWhereForViewer = async (
   }
 }
 
+// 撤销 grant 只拦新的 addItem / addScale / 空白 createAssignment。
+// 已挂在 DRAFT 综合测评或问卷里的 scaleId 仍可发布；不扫描草稿、不拆已发布容器。
 export const canUseScale = async (
   userId: string,
   role: UserRole | string,
@@ -196,7 +198,11 @@ export const createGrant = async (input: {
 }) => {
   await assertEligibleTeacher(input.teacherId)
   await assertGrantableResource(input.resourceType, input.resourceId)
-  const existing = await prisma.materialGrant.findUnique({
+  const grantInclude = {
+    teacher: { select: { id: true, username: true, nickname: true, role: true } },
+    granter: { select: { id: true, username: true, nickname: true } },
+  } as const
+  const upserted = await prisma.materialGrant.upsert({
     where: {
       teacherId_resourceType_resourceId: {
         teacherId: input.teacherId,
@@ -204,25 +210,16 @@ export const createGrant = async (input: {
         resourceId: input.resourceId,
       },
     },
-    include: {
-      teacher: { select: { id: true, username: true, nickname: true, role: true } },
-      granter: { select: { id: true, username: true, nickname: true } },
-    },
-  })
-  if (existing) return attachResource(existing)
-  const created = await prisma.materialGrant.create({
-    data: {
+    create: {
       teacherId: input.teacherId,
       resourceType: input.resourceType,
       resourceId: input.resourceId,
       grantedBy: input.grantedBy,
     },
-    include: {
-      teacher: { select: { id: true, username: true, nickname: true, role: true } },
-      granter: { select: { id: true, username: true, nickname: true } },
-    },
+    update: {},
+    include: grantInclude,
   })
-  return attachResource(created)
+  return attachResource(upserted)
 }
 
 export const deleteGrant = async (id: string) => {
@@ -243,14 +240,34 @@ export const batchCreateGrants = async (input: {
   }
   await assertGrantableResource(input.resourceType, input.resourceId)
   const uniqueIds = [...new Set(input.teacherIds)]
-  const list = []
-  for (const teacherId of uniqueIds) {
-    list.push(await createGrant({
-      teacherId,
+  const teachers = await prisma.user.findMany({ where: { id: { in: uniqueIds } } })
+  if (teachers.length !== uniqueIds.length) throw grantNotFound('教师不存在')
+  if (teachers.some((teacher) => !isEligibleTeacher(teacher))) {
+    throw grantBadRequest('只能授权给已审核且未冻结的在职教师')
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.materialGrant.createMany({
+      data: uniqueIds.map((teacherId) => ({
+        teacherId,
+        resourceType: input.resourceType,
+        resourceId: input.resourceId,
+        grantedBy: input.grantedBy,
+      })),
+      skipDuplicates: true,
+    })
+  })
+
+  const rows = await prisma.materialGrant.findMany({
+    where: {
       resourceType: input.resourceType,
       resourceId: input.resourceId,
-      grantedBy: input.grantedBy,
-    }))
-  }
-  return list
+      teacherId: { in: uniqueIds },
+    },
+    include: {
+      teacher: { select: { id: true, username: true, nickname: true, role: true } },
+      granter: { select: { id: true, username: true, nickname: true } },
+    },
+  })
+  return Promise.all(rows.map((row) => attachResource(row)))
 }

@@ -8,9 +8,12 @@ const { mockPrisma } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
+      createMany: vi.fn(),
+      upsert: vi.fn(),
       delete: vi.fn(),
     },
-    user: { findUnique: vi.fn() },
+    user: { findUnique: vi.fn(), findMany: vi.fn() },
+    $transaction: vi.fn(),
     scale: { findUnique: vi.fn() },
     cognitiveTestConfig: { findUnique: vi.fn() },
   },
@@ -26,6 +29,7 @@ vi.mock('../../config', () => ({
 }))
 
 import {
+  batchCreateGrants,
   canInstantiateConfig,
   canUseScale,
   createGrant,
@@ -46,6 +50,7 @@ beforeEach(() => {
   flags.materialGrantsEnabled = true
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
   mockPrisma.materialGrant.findMany.mockResolvedValue([])
+  mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => unknown) => fn(mockPrisma))
 })
 
 describe('canUseScale', () => {
@@ -136,6 +141,10 @@ describe('scaleSource / scaleWhereForViewer', () => {
       status: 'PUBLISHED',
     })
   })
+
+  it('does not isolate students by creatorId so /scales/tags stays global', async () => {
+    await expect(scaleWhereForViewer('student-1', UserRole.STUDENT)).resolves.toEqual({})
+  })
 })
 
 describe('createGrant / listGrants / deleteGrant', () => {
@@ -169,7 +178,7 @@ describe('createGrant / listGrants / deleteGrant', () => {
     })).rejects.toMatchObject({ statusCode: 400 })
   })
 
-  it('returns the existing row when posting the same grant twice', async () => {
+  it('upserts so a concurrent duplicate grant does not throw', async () => {
     mockPrisma.user.findUnique.mockResolvedValue(eligibleTeacher)
     mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-1', status: 'PUBLISHED', name: '焦虑' })
     const existing = {
@@ -182,7 +191,7 @@ describe('createGrant / listGrants / deleteGrant', () => {
       teacher: { id: 'teacher-1', username: 't', nickname: 'T', role: TEACHER },
       granter: { id: 'admin-1', username: 'a', nickname: 'A' },
     }
-    mockPrisma.materialGrant.findUnique.mockResolvedValue(existing)
+    mockPrisma.materialGrant.upsert.mockResolvedValue(existing)
     const result = await createGrant({
       teacherId: 'teacher-1',
       resourceType: MaterialResourceType.SCALE,
@@ -190,6 +199,7 @@ describe('createGrant / listGrants / deleteGrant', () => {
       grantedBy: 'admin-1',
     })
     expect(result.id).toBe('g1')
+    expect(mockPrisma.materialGrant.upsert).toHaveBeenCalled()
     expect(mockPrisma.materialGrant.create).not.toHaveBeenCalled()
   })
 
@@ -213,5 +223,77 @@ describe('createGrant / listGrants / deleteGrant', () => {
     mockPrisma.materialGrant.findUnique.mockResolvedValue({ id: 'orphan' })
     mockPrisma.materialGrant.delete.mockResolvedValue({ id: 'orphan' })
     await expect(deleteGrant('orphan')).resolves.toEqual({ id: 'orphan' })
+  })
+})
+
+describe('batchCreateGrants', () => {
+  const eligibleTeacher = {
+    id: 'teacher-1',
+    role: TEACHER,
+    teacherApproved: true,
+    isActive: true,
+    isFrozen: false,
+    username: 't1',
+    nickname: 'T1',
+  }
+
+  it('pre-validates teachers and writes nothing when one is ineligible', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-1', status: 'PUBLISHED', name: '焦虑' })
+    mockPrisma.user.findMany.mockResolvedValue([
+      eligibleTeacher,
+      { ...eligibleTeacher, id: 'teacher-2', isFrozen: true },
+    ])
+    await expect(batchCreateGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-1', 'teacher-2'],
+      grantedBy: 'admin-1',
+    })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+  })
+
+  it('creates all grants in one transaction when every teacher is eligible', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-1', status: 'PUBLISHED', name: '焦虑' })
+    mockPrisma.user.findMany.mockResolvedValue([
+      eligibleTeacher,
+      { ...eligibleTeacher, id: 'teacher-2', username: 't2' },
+    ])
+    mockPrisma.materialGrant.createMany.mockResolvedValue({ count: 2 })
+    mockPrisma.materialGrant.findMany.mockResolvedValue([
+      {
+        id: 'g1',
+        teacherId: 'teacher-1',
+        resourceType: MaterialResourceType.SCALE,
+        resourceId: 'scale-1',
+        grantedBy: 'admin-1',
+        createdAt: new Date(),
+        teacher: { id: 'teacher-1', username: 't1', nickname: 'T1', role: TEACHER },
+        granter: { id: 'admin-1', username: 'a', nickname: 'A' },
+      },
+      {
+        id: 'g2',
+        teacherId: 'teacher-2',
+        resourceType: MaterialResourceType.SCALE,
+        resourceId: 'scale-1',
+        grantedBy: 'admin-1',
+        createdAt: new Date(),
+        teacher: { id: 'teacher-2', username: 't2', nickname: 'T1', role: TEACHER },
+        granter: { id: 'admin-1', username: 'a', nickname: 'A' },
+      },
+    ])
+    const list = await batchCreateGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-1', 'teacher-2'],
+      grantedBy: 'admin-1',
+    })
+    expect(mockPrisma.materialGrant.createMany).toHaveBeenCalledWith(expect.objectContaining({
+      skipDuplicates: true,
+      data: [
+        { teacherId: 'teacher-1', resourceType: MaterialResourceType.SCALE, resourceId: 'scale-1', grantedBy: 'admin-1' },
+        { teacherId: 'teacher-2', resourceType: MaterialResourceType.SCALE, resourceId: 'scale-1', grantedBy: 'admin-1' },
+      ],
+    }))
+    expect(list).toHaveLength(2)
   })
 })

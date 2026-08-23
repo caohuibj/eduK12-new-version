@@ -138,6 +138,18 @@ describe('addItem scale grants', () => {
       required: true,
     })).rejects.toMatchObject({ statusCode: 403 })
   })
+
+  it('still publishes a draft after the scale grant is revoked', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ type: 'SCALE', scale: { id: 'scale-other', status: 'PUBLISHED', creatorId: 'admin-1' } }],
+    }))
+    mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
+    await publishComposite('teacher-a', TEACHER, 'composite-1')
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: 'PUBLISHED' }),
+    }))
+  })
 })
 
 describe('publishComposite cognitive course match', () => {
