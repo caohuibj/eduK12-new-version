@@ -104,3 +104,63 @@ describe('memory scorer', () => {
     })).toThrow(CognitiveScoringInputError)
   })
 })
+
+describe('memory scorer 1.1.0', () => {
+  it('adds totalCorrectTrials without changing the frozen index', async () => {
+    const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
+    const trials = [
+      { trialIndex: 0, payload: trial(2, 1, true) },
+      { trialIndex: 1, payload: trial(2, 2, false) },
+      { trialIndex: 2, payload: trial(3, 1, true) },
+      { trialIndex: 3, payload: trial(3, 2, false) },
+      { trialIndex: 4, payload: trial(4, 1, false) },
+      { trialIndex: 5, payload: trial(4, 2, false, 600, true) },
+    ]
+    const result = scoreMemoryV1_1({ config, trials })
+    expect(result.score).toBe(60)
+    expect(result.metrics.totalCorrectTrials).toBe(2)
+    expect(result.qualityFlags.insufficientCompletedLevels).toBe(false)
+    expect(result.qualityFlags.interpretable).toBe(true)
+  })
+
+  it('marks insufficientCompletedLevels when only one length is finished', async () => {
+    const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
+    const result = scoreMemoryV1_1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: trial(2, 1, false) },
+        { trialIndex: 1, payload: trial(2, 2, false) },
+      ],
+    })
+    expect(result.qualityFlags.insufficientCompletedLevels).toBe(true)
+    expect(result.qualityFlags.interpretable).toBe(false)
+    expect(scoreMemoryV1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: trial(2, 1, false) },
+        { trialIndex: 1, payload: trial(2, 2, false) },
+      ],
+    }).metrics.totalCorrectTrials).toBeUndefined()
+  })
+
+  it('flags perseverative identical-digit responses', async () => {
+    const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
+    const stuck: MemoryTrial = {
+      length: 2,
+      trialWithinLevel: 1,
+      sequence: [1, 2],
+      response: [0, 0],
+      responseDurationMs: 400,
+      interrupted: false,
+    }
+    const result = scoreMemoryV1_1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: stuck },
+        { trialIndex: 1, payload: { ...stuck, trialWithinLevel: 2 } },
+      ],
+    })
+    expect(result.qualityFlags.invalidSequencePattern).toBe(true)
+    expect(result.qualityFlags.interpretable).toBe(false)
+  })
+})

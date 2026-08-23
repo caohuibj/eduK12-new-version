@@ -8,7 +8,7 @@ import { calculateScores, generateFeedbackWithLevels } from '../../services/scor
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
-import { resolveCognitiveReference } from '../cognitive/reference'
+import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { logger } from '../../utils/logger'
 import { canUseScale } from '../../services/materialGrant'
 import {
@@ -1362,7 +1362,6 @@ export const buildCompositeReport = (attempt: any) => {
       const score = session?.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
       const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
       const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
-      const report = config.report ?? {}
       return {
         itemId: item.id,
         type: item.type,
@@ -1374,13 +1373,15 @@ export const buildCompositeReport = (attempt: any) => {
         qualityFlags,
         finishedAt: session?.finishedAt,
         reference: session && score !== null
-          ? resolveCognitiveReference({
+          ? resolveCognitiveReferenceForResult({
             testType: session.testType,
             metrics,
             score,
-            referenceMode: report.referenceMode ?? 'none',
-            referenceVersion: report.referenceVersion,
-            referenceBand: report.referenceBand,
+            qualityFlags,
+            config,
+            engineVersion: session.engineVersion,
+            scoringVersion: session.scoringVersion,
+            configVersion: session.configVersion,
           })
           : undefined,
       }

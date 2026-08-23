@@ -29,7 +29,8 @@ describe('memory schemas', () => {
   })
 
   it('rejects invalid candidate bounds and obsolete config fields', () => {
-    expect(memoryConfigSchema.safeParse({ ...config, startLength: 3 }).success).toBe(false)
+    expect(memoryConfigSchema.safeParse({ ...config, startLength: 3 }).success).toBe(true)
+    expect(memoryConfigSchema.safeParse({ ...config, startLength: 1 }).success).toBe(false)
     expect(memoryConfigSchema.safeParse({ ...config, maxLength: 12 }).success).toBe(false)
     expect(memoryConfigSchema.safeParse({ ...config, feedbackDurationMs: 700 }).success).toBe(false)
   })

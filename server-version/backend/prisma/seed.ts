@@ -254,6 +254,95 @@ async function seedStroopCognitiveConfig() {
   throw new Error(`cognitiveTestConfig stroop/${STROOP_CONFIG_VERSION} already PUBLISHED with divergent content; create a new configVersion instead of mutating it`)
 }
 
+const LIT_SIM_REPORT = {
+  reportVersion: '1.1.0',
+  referenceMode: 'simulated' as const,
+  referenceVersion: 'lit-sim-k12-v0.2',
+  referenceBand: 'K7-9',
+}
+
+async function seedPublishedCognitiveConfig(
+  testType: string,
+  configVersion: string,
+  expected: {
+    name: string
+    status: 'PUBLISHED'
+    engineVersion: string
+    scoringVersion: string
+    config: Record<string, unknown>
+  },
+) {
+  const existing = await prisma.cognitiveTestConfig.findUnique({
+    where: { testType_configVersion: { testType, configVersion } },
+  })
+  if (!existing) {
+    const created = await prisma.cognitiveTestConfig.create({
+      data: { testType, configVersion, ...expected },
+    })
+    console.log(`${testType} Cognitive 配置已创建: configVersion=${created.configVersion} scoringVersion=${created.scoringVersion}`)
+    return
+  }
+  const same =
+    existing.name === expected.name &&
+    existing.status === expected.status &&
+    existing.engineVersion === expected.engineVersion &&
+    existing.scoringVersion === expected.scoringVersion &&
+    deepEqual(existing.config, expected.config)
+  if (same) {
+    console.log(`${testType} Cognitive 配置已存在且一致，跳过（幂等）: configVersion=${existing.configVersion}`)
+    return
+  }
+  throw new Error(`cognitiveTestConfig ${testType}/${configVersion} already PUBLISHED with divergent content; create a new configVersion instead of mutating it`)
+}
+
+async function seedRound1P0Configs() {
+  await seedPublishedCognitiveConfig('reaction', '1.1.0', {
+    name: 'Reaction Time v1.1.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.1.0',
+    config: {
+      totalTrials: 20,
+      foreperiodMinMs: 700,
+      foreperiodMaxMs: 1500,
+      timeoutMs: 2000,
+      readyDurationMs: 1000,
+      report: LIT_SIM_REPORT,
+    },
+  })
+  await seedPublishedCognitiveConfig('memory', '1.1.0', {
+    name: 'Working Memory Span v1.1.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.1.0',
+    config: {
+      startLength: 3,
+      maxLength: 9,
+      trialsPerLevel: 2,
+      digitDisplayMs: 800,
+      digitIntervalMs: 200,
+      readyDurationMs: 1000,
+      inactivityGuardMs: 30000,
+      report: LIT_SIM_REPORT,
+    },
+  })
+  await seedPublishedCognitiveConfig('stroop', '1.1.0', {
+    name: 'Color-Word Stroop v1.1.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.1.0',
+    config: {
+      totalTrials: 40,
+      congruentRatio: 0.5,
+      fixationMs: 500,
+      stimulusDurationMs: 2000,
+      isiMs: 500,
+      validRtFloorMs: 200,
+      report: LIT_SIM_REPORT,
+    },
+  })
+}
+
 async function main() {
   console.log('开始初始化数据库...')
   await seedAdmin()
@@ -261,6 +350,7 @@ async function main() {
   await seedReactionCognitiveConfig()
   await seedMemoryCognitiveConfig()
   await seedStroopCognitiveConfig()
+  await seedRound1P0Configs()
   console.log('数据库初始化完成。')
 }
 

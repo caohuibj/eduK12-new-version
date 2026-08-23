@@ -36,6 +36,15 @@ export interface CognitiveResult {
   reference?: CognitiveReference
 }
 
+export interface CognitiveReferenceComparison {
+  metricKey: string
+  observed: number
+  referenceMean: number
+  referenceSd: number
+  sdDelta: number | null
+  rangeLabel: string
+}
+
 export interface CognitiveReference {
   mode: 'none' | 'simulated' | 'literature'
   status: 'not_requested' | 'provisional' | 'unavailable'
@@ -44,6 +53,8 @@ export interface CognitiveReference {
   version: string | null
   band: string | null
   referencePosition: number | null
+  comparison?: CognitiveReferenceComparison | null
+  protocolMatched?: boolean
   disclaimer: string
 }
 
@@ -97,6 +108,7 @@ export interface CognitiveSession {
   profile?: 'experience' | 'standard' | 'research' | null
   reportCaveats?: string[]
   metricDefinitions?: Record<string, { key: string; label: string; unit?: string }>
+  qualityDefinitions?: Record<string, { key: string; label: string; description?: string }>
   reportDefinition?: CognitiveReportDefinition
   /** 公开匿名恢复时由服务端返回，允许跨设备继续而不猜测下一个试次。 */
   nextTrialIndex?: number

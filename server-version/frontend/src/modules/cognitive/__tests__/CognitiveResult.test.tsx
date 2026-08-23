@@ -161,4 +161,73 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(screen.queryByText('参考位置 10 / 100')).toBeNull()
     expect(screen.getByText('中位反应时')).toBeTruthy()
   })
+
+  it('renders quality → primary → secondary → method and never shows a rank position', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        configVersion: '1.1.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        finishedAt: '2026-01-01T00:00:00Z',
+        config: {},
+        randomSeed: 'seed',
+        profile: 'standard',
+        reportDefinition: {
+          title: '简单反应时',
+          headlineMetric: 'medianRtMs',
+          primaryMetrics: ['medianRtMs', 'rtICV', 'missRate'],
+          secondaryMetrics: ['meanRtMs'],
+          disclaimer: '不是医学诊断或人口常模。',
+        },
+        metricDefinitions: {
+          medianRtMs: { key: 'medianRtMs', label: '中位反应时', unit: 'ms' },
+          rtICV: { key: 'rtICV', label: '反应时变异系数', unit: 'ratio' },
+          missRate: { key: 'missRate', label: '遗漏率', unit: 'ratio' },
+          meanRtMs: { key: 'meanRtMs', label: '平均反应时', unit: 'ms' },
+        },
+        result: {
+          score: 70,
+          metrics: { medianRtMs: 320, rtICV: 0.2, missRate: 0.05, meanRtMs: 330 },
+          qualityFlags: { interpretable: true },
+          reference: {
+            mode: 'simulated',
+            status: 'provisional',
+            available: true,
+            label: '文献锚定模拟参考',
+            version: 'lit-sim-k12-v0.2',
+            band: 'K7-9',
+            referencePosition: null,
+            comparison: {
+              metricKey: 'medianRtMs',
+              observed: 320,
+              referenceMean: 330,
+              referenceSd: 40,
+              sdDelta: -0.25,
+              rangeLabel: '接近该研究样本报告范围',
+            },
+            disclaimer: '仅为文献锚定模拟参考，不代表中国学生常模。',
+          },
+        },
+      },
+    })
+    renderAt()
+    expect(await screen.findByText('数据质量')).toBeTruthy()
+    expect(screen.getByText('主要指标')).toBeTruthy()
+    expect(screen.getByText('次级指标')).toBeTruthy()
+    expect(screen.getByText('方法说明')).toBeTruthy()
+    expect(screen.getByText('任务表现指数')).toBeTruthy()
+    expect(screen.getByText('接近该研究样本报告范围')).toBeTruthy()
+    expect(screen.queryByText(/参考位置/)).toBeNull()
+    expect(screen.queryByText(/百分位/)).toBeNull()
+    const headings = screen.getAllByRole('heading').map((node) => node.textContent)
+    expect(headings.indexOf('数据质量')).toBeLessThan(headings.indexOf('主要指标'))
+    expect(headings.indexOf('主要指标')).toBeLessThan(headings.indexOf('次级指标'))
+    expect(headings.indexOf('次级指标')).toBeLessThan(headings.indexOf('方法说明'))
+  })
 })

@@ -36,6 +36,26 @@ describe('profile merge / freeze', () => {
   })
 })
 
+describe('memory 1.1.0 profile patches', () => {
+  it('starts experience/standard/research at length 3 without mutating 1.0.0', () => {
+    const v11 = getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')!
+    const base = {
+      startLength: 3,
+      maxLength: 9,
+      trialsPerLevel: 2,
+      digitDisplayMs: 800,
+      digitIntervalMs: 200,
+      readyDurationMs: 1000,
+      inactivityGuardMs: 30000,
+      report: { reportVersion: '1.1.0', referenceMode: 'none' as const },
+    }
+    expect(mergeProfileConfig(v11, base, 'experience')).toMatchObject({ startLength: 3, maxLength: 6 })
+    expect(mergeProfileConfig(v11, base, 'standard')).toMatchObject({ startLength: 3, maxLength: 8 })
+    expect(mergeProfileConfig(v11, base, 'research')).toMatchObject({ startLength: 3, maxLength: 9 })
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')?.profiles.experience.configPatch).not.toMatchObject({ startLength: 3 })
+  })
+})
+
 describe('cognitive tests catalog', () => {
   it('returns every registered version instead of a latest fallback', () => {
     const catalog = listCognitiveTestsCatalog()
@@ -57,7 +77,7 @@ describe('cognitive tests catalog', () => {
 
   it('returns the version list when the detail query omits versions', () => {
     const row = getCognitiveTestCatalog('stroop')
-    expect('list' in row && row.list).toHaveLength(1)
+    expect('list' in row && row.list).toHaveLength(2)
   })
 
   it('rejects a detail query that supplies only one version', () => {

@@ -2,8 +2,11 @@ import { CognitiveProfile, RegistryEntry } from './cognitive.types'
 import {
   fakeRegistryMeta,
   memoryRegistryMeta,
+  memoryRegistryMetaV11,
   reactionRegistryMeta,
+  reactionRegistryMetaV11,
   stroopRegistryMeta,
+  stroopRegistryMetaV11,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -11,12 +14,15 @@ import { scoreFakeV1 } from './scoring/fake.v1'
 import { reactionConfigSchema } from './schemas/reaction.config'
 import { reactionTrialSchema } from './schemas/reaction.trial'
 import { scoreReactionV1 } from './scoring/reaction.v1'
+import { scoreReactionV1_1 } from './scoring/reaction.v1_1'
 import { memoryConfigSchema } from './schemas/memory.config'
 import { memoryTrialSchema } from './schemas/memory.trial'
 import { scoreMemoryV1 } from './scoring/memory.v1'
+import { scoreMemoryV1_1 } from './scoring/memory.v1_1'
 import { stroopConfigSchema } from './schemas/stroop.config'
 import { stroopTrialSchema } from './schemas/stroop.trial'
 import { scoreStroopV1 } from './scoring/stroop.v1'
+import { scoreStroopV1_1 } from './scoring/stroop.v1_1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -124,4 +130,34 @@ registerEntry({
   trialSchema: stroopTrialSchema,
   score: scoreStroopV1,
   ...stroopRegistryMeta,
+})
+
+registerEntry({
+  testType: 'reaction',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: reactionConfigSchema,
+  trialSchema: reactionTrialSchema,
+  score: scoreReactionV1_1,
+  ...reactionRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'memory',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: memoryConfigSchema,
+  trialSchema: memoryTrialSchema,
+  score: scoreMemoryV1_1,
+  ...memoryRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'stroop',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: stroopConfigSchema,
+  trialSchema: stroopTrialSchema,
+  score: scoreStroopV1_1,
+  ...stroopRegistryMetaV11,
 })

@@ -44,6 +44,16 @@ describe('cognitive registry', () => {
     expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBe(true)
   })
 
+  it('registers scoringVersion 1.1.0 without replacing 1.0.0', () => {
+    expect(hasCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')).toBe(true)
+    expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')).toBe(true)
+    expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.1.0')).toBe(true)
+    expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
+    expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')?.recommendedForCreate).toBe(true)
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')?.metricDefinitions.totalCorrectTrials).toBeDefined()
+    expect(getCognitiveRegistryEntry('stroop', '1.0.0', '1.1.0')?.profiles.standard.configPatch.totalTrials).toBe(40)
+  })
+
   it('never falls back to the latest version for a wrong scoringVersion', () => {
     // 错误版本必须明确失败，绝不回退到 fake/1.0.0/1.0.0
     expect(hasCognitiveRegistryEntry('fake', '1.0.0', '9.9.9')).toBe(false)

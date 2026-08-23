@@ -81,3 +81,31 @@ describe('stroop scorer', () => {
     })).toThrow(CognitiveScoringInputError)
   })
 })
+
+describe('stroop scorer 1.1.0', () => {
+  it('adds lowAccuracy without changing v1 metrics', async () => {
+    const { scoreStroopV1_1 } = await import('../../modules/cognitive/scoring/stroop.v1_1')
+    const trials = [
+      { trialIndex: 0, payload: hit('红', 'red', 300) },
+      { trialIndex: 1, payload: hit('蓝', 'blue', 350) },
+      { trialIndex: 2, payload: hit('红', 'green', 500) },
+      { trialIndex: 3, payload: hit('黄', 'blue', 550) },
+    ]
+    const ok = scoreStroopV1_1({ config, trials })
+    expect(ok.metrics.stroopEffectMs).toBe(200)
+    expect(ok.qualityFlags.lowAccuracy).toBe(false)
+
+    const poor = scoreStroopV1_1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: { ...hit('红', 'red', 300), response: 'blue' } },
+        { trialIndex: 1, payload: { ...hit('蓝', 'blue', 350), response: 'red' } },
+        { trialIndex: 2, payload: { ...hit('红', 'green', 500), response: 'red' } },
+        { trialIndex: 3, payload: { word: '黄', inkColor: 'blue', response: null, rtMs: null, interrupted: false } },
+      ],
+    })
+    expect(poor.metrics.accuracy).toBe(0)
+    expect(poor.qualityFlags.lowAccuracy).toBe(true)
+    expect(scoreStroopV1({ config, trials }).qualityFlags.lowAccuracy).toBeUndefined()
+  })
+})
