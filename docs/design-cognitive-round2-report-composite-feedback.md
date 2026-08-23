@@ -2,6 +2,8 @@
 # Huisurvey Cognitive Round 2 开发设计
 ## 单任务报告升级、多认知任务画像、认知 + 心理量表综合反馈
 
+> 本文是概念设计。可执行的 PR 顺序、受控综合协议、新增任务清单与发布 Gate 见：`docs/design-cognitive-round2-executable-pr-plan.md`。
+
 **版本**：v1.0  
 **目标项目**：`caohuibj/eduK12-new-version`  
 **参考项目**：`caohuibj/cogtest` 的 Aggregate Report / cognitive report 设计  
