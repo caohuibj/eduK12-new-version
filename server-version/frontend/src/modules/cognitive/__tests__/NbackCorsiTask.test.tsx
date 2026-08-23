@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import { NbackTask } from '../tasks/nback/NbackTask'
 import { CorsiTask } from '../tasks/corsi/CorsiTask'
-import { corsiSequence, nbackSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../tasks/shared/prng'
+import { corsiSequence, cptSequence, gonogoSequence, nbackSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../tasks/shared/prng'
+import golden from '../../../../../cognitive-randomization-golden-v1.json'
 
 const nbackContext = {
   sessionId: 's1',
@@ -60,8 +61,59 @@ describe('N-Back and Corsi runners', () => {
   })
 
   it('matches the backend seed sequence contract', () => {
-    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe('seq-v1.0.0')
-    expect(nbackSequence('seed-1', [1], [16], [1], 0.3)).toEqual(nbackSequence('seed-1', [1], [16], [1], 0.3))
-    expect(corsiSequence('seed-1', 0, 3)).toEqual(corsiSequence('seed-1', 0, 3))
+    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe(golden.version)
+    expect(nbackSequence(golden.seed, [1, 2], [6, 8], [2, 2], 0.3)).toEqual(golden.nback)
+    expect(corsiSequence(golden.seed, 3, 5)).toEqual(golden.corsi)
+    expect(gonogoSequence(golden.seed, 8, 0.25)).toEqual(golden.gonogo)
+    expect(cptSequence(golden.seed, 8, 0.25, 2)).toEqual(golden.cpt)
+  })
+
+  it('records a Corsi timeout as an interrupted trial and advances', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn().mockResolvedValue(true)
+    try {
+      render(
+        <CorsiTask
+          taskContext={{
+            ...nbackContext,
+            testType: 'corsi',
+            config: {
+              startSpan: 3,
+              maxSpan: 3,
+              highlightMs: 1,
+              intervalMs: 1,
+              readyDurationMs: 1,
+              inactivityGuardMs: 20,
+            },
+          }}
+          trialIndex={0}
+          onTrialComplete={onTrialComplete}
+        />,
+      )
+      const reachResponsePhase = async () => {
+        await act(async () => { vi.advanceTimersByTime(1) })
+        await act(async () => { vi.advanceTimersByTime(10) })
+      }
+      fireEvent.click(screen.getByText('开始练习'))
+      await reachResponsePhase()
+      for (const block of [0, 4, 8]) fireEvent.click(screen.getByLabelText(`block-${block}`))
+      fireEvent.click(screen.getByText('提交'))
+      await reachResponsePhase()
+      for (const block of [2, 6, 1]) fireEvent.click(screen.getByLabelText(`block-${block}`))
+      fireEvent.click(screen.getByText('提交'))
+      fireEvent.click(screen.getByText('开始正式测验'))
+      await reachResponsePhase()
+      await act(async () => { vi.advanceTimersByTime(20); await Promise.resolve() })
+
+      expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({
+        spanLength: 3,
+        trialWithinLevel: 1,
+        response: [],
+        interrupted: true,
+      }))
+      expect(screen.queryByText(/响应超时/)).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

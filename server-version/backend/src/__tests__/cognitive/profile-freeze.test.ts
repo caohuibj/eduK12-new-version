@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
-import { freezeAssignmentProfile, hashResolvedConfig, mergeProfileConfig } from '../../modules/cognitive/profile-freeze'
+import { freezeAssignmentProfile, hashResolvedConfig, mergeProfileConfig, readFrozenReport } from '../../modules/cognitive/profile-freeze'
 import { listCognitiveTestsCatalog, getCognitiveTestCatalog } from '../../modules/cognitive/catalog.service'
 
 beforeAll(() => {
@@ -33,6 +33,8 @@ describe('profile merge / freeze', () => {
     expect(frozen.resolvedConfigHash).toBe(hashResolvedConfig(frozen.resolvedConfig))
     expect(frozen.resolvedConfig.totalTrials).toBe(8)
     expect(frozen.resolvedReportSnapshotEncrypted).toEqual(expect.any(String))
+    expect(readFrozenReport(frozen.resolvedReportSnapshotEncrypted)?.randomizationAlgorithmVersion)
+      .toBe('reaction-foreperiod-v1.0.0')
   })
 })
 

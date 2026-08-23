@@ -11,6 +11,8 @@ import type {
 
 export interface FrozenReportSnapshot {
   profile: CognitiveProfile
+  /** Optional only so report snapshots published before this field remain readable. */
+  randomizationAlgorithmVersion?: string
   profileDefinitionVersion: string
   metricDefinitionVersion: string
   qualityDefinitionVersion: string
@@ -66,6 +68,7 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
   const profileDefinition = input.entry.profiles[input.profile]
   const resolvedReport: FrozenReportSnapshot = {
     profile: input.profile,
+    randomizationAlgorithmVersion: input.entry.randomizationAlgorithmVersion,
     profileDefinitionVersion: input.entry.profileDefinitionVersion,
     metricDefinitionVersion: input.entry.metricDefinitionVersion,
     qualityDefinitionVersion: input.entry.qualityDefinitionVersion,

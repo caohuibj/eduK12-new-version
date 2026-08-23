@@ -57,6 +57,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   const [inactivityExpired, setInactivityExpired] = useState(false)
   const [interrupted, setInterrupted] = useState(false)
   const responseStartedAtRef = useRef<number | null>(null)
+  const responseRef = useRef<number[]>([])
   const submittingRef = useRef(false)
 
   const sequence = useMemo(
@@ -70,6 +71,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
     setPracticeIndex(0)
     setPracticeCorrect(0)
     setResponse([])
+    responseRef.current = []
     setLit(null)
     setPracticeNonce((value) => value + 1)
     setSubPhase('ready')
@@ -81,6 +83,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
     setTrialWithinLevel(1)
     setLevelCorrectCount(0)
     setResponse([])
+    responseRef.current = []
     setInterrupted(false)
     setLit(null)
     setSubPhase('ready')
@@ -112,13 +115,6 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   }, [phase, subPhase, activeSequence, highlightMs, intervalMs, practiceNonce])
 
   useEffect(() => {
-    if (phase !== 'formal' || subPhase !== 'response') return
-    setInactivityExpired(false)
-    const timer = window.setTimeout(() => setInactivityExpired(true), inactivityGuardMs)
-    return () => window.clearTimeout(timer)
-  }, [phase, subPhase, inactivityGuardMs, trialIndex])
-
-  useEffect(() => {
     if (phase !== 'formal') return
     const onVisibilityChange = () => {
       if (document.hidden) setInterrupted(true)
@@ -134,7 +130,11 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
       return
     }
     if (!inactivityExpired) {
-      setResponse((current) => (current.length < sequence.length ? [...current, block] : current))
+      setResponse((current) => {
+        const next = current.length < sequence.length ? [...current, block] : current
+        responseRef.current = next
+        return next
+      })
     }
   }
 
@@ -155,25 +155,35 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
     setSubPhase('ready')
   }
 
-  const submitFormal = useCallback(async () => {
-    if (phase !== 'formal' || subPhase !== 'response' || inactivityExpired || response.length !== sequence.length || submittingRef.current) return
+  const submitFormal = useCallback(async (answer: number[] = response, timedOut = false) => {
+    if (
+      phase !== 'formal'
+      || subPhase !== 'response'
+      || (!timedOut && (inactivityExpired || answer.length !== sequence.length))
+      || submittingRef.current
+    ) return
     submittingRef.current = true
-    const correct = sameSequence(sequence, response)
+    const correct = sameSequence(sequence, answer)
     try {
       const accepted = await onTrialComplete({
         spanLength: span,
         trialWithinLevel,
         sequence,
-        response,
+        response: answer,
         responseDurationMs: Math.max(0, Math.round(performance.now() - (responseStartedAtRef.current ?? performance.now()))),
-        interrupted,
+        interrupted: interrupted || timedOut,
       })
-      if (accepted === false) return
+      if (accepted === false) {
+        setInactivityExpired(false)
+        return
+      }
       if (trialWithinLevel === 1) {
         setLevelCorrectCount(correct ? 1 : 0)
         setTrialWithinLevel(2)
         setResponse([])
+        responseRef.current = []
         setInterrupted(false)
+        setInactivityExpired(false)
         setSubPhase('ready')
       } else {
         const levelPassed = levelCorrectCount + (correct ? 1 : 0) > 0
@@ -185,13 +195,25 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
         setTrialWithinLevel(1)
         setLevelCorrectCount(0)
         setResponse([])
+        responseRef.current = []
         setInterrupted(false)
+        setInactivityExpired(false)
         setSubPhase('ready')
       }
     } finally {
       submittingRef.current = false
     }
   }, [phase, subPhase, inactivityExpired, response, sequence, span, trialWithinLevel, interrupted, levelCorrectCount, maxSpan, onTrialComplete, onTaskComplete])
+
+  useEffect(() => {
+    if (phase !== 'formal' || subPhase !== 'response' || inactivityExpired) return
+    setInactivityExpired(false)
+    const timer = window.setTimeout(() => {
+      setInactivityExpired(true)
+      void submitFormal(responseRef.current, true)
+    }, inactivityGuardMs)
+    return () => window.clearTimeout(timer)
+  }, [phase, subPhase, inactivityGuardMs, inactivityExpired, trialIndex, submitFormal])
 
   if (phase === 'instruction') {
     return (
@@ -241,10 +263,11 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
       {subPhase === 'response' && (
         <>
           <p className="text-sm text-gray-500 mb-3">已点 {response.length} / {activeSequence.length}</p>
+          {inactivityExpired && <p className="text-sm text-amber-700 mb-3">响应超时，正在记录并进入下一题…</p>}
           <button
             type="button"
             className="btn-primary"
-            disabled={response.length !== activeSequence.length}
+            disabled={inactivityExpired || response.length !== activeSequence.length}
             onClick={() => { phase === 'practice' ? submitPractice() : void submitFormal() }}
           >
             提交

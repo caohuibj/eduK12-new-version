@@ -331,6 +331,7 @@ const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean) => {
   builder.add('A_metric_definition_version', '指标定义版本', 'string', 20)
   builder.add('A_quality_definition_version', '质量定义版本', 'string', 20)
   builder.add('A_report_definition_version', '报告定义版本', 'string', 20)
+  builder.add('A_randomization_algorithm_version', '随机化算法版本', 'string', 40)
   builder.add('A_quality_interpretable', '结果可解释', 'numeric', 4, 0)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 8, 0)
   builder.add('A_date', '完成日期', 'date', 24)
@@ -346,6 +347,9 @@ const reportContextFor = (assignment: Awaited<ReturnType<typeof getAssignment>>,
     metricDefinitionVersion: frozen?.metricDefinitionVersion ?? entry?.metricDefinitionVersion ?? null,
     qualityDefinitionVersion: frozen?.qualityDefinitionVersion ?? entry?.qualityDefinitionVersion ?? null,
     reportDefinitionVersion: frozen?.reportDefinitionVersion ?? entry?.reportDefinitionVersion ?? null,
+    randomizationAlgorithmVersion: frozen
+      ? frozen.randomizationAlgorithmVersion ?? null
+      : entry?.randomizationAlgorithmVersion ?? null,
     metricDefinitions: frozen?.metricDefinitions ?? entry?.metricDefinitions ?? {},
     qualityDefinitions: frozen?.qualityDefinitions ?? entry?.qualityDefinitions ?? {},
   }
@@ -442,6 +446,7 @@ const fillBaseRow = (
   row.A_metric_definition_version = context.metricDefinitionVersion
   row.A_quality_definition_version = context.qualityDefinitionVersion
   row.A_report_definition_version = context.reportDefinitionVersion
+  row.A_randomization_algorithm_version = context.randomizationAlgorithmVersion
   row.A_quality_interpretable = session.qualityFlags.interpretable === false ? 0 : 1
   row.A_duration_s = session.finishedAt
     ? Math.round((session.finishedAt.getTime() - session.startedAt.getTime()) / 1000)
@@ -593,6 +598,7 @@ export const buildCognitiveResearchPackage = (
       A_metric_definition_version: context.metricDefinitionVersion,
       A_quality_definition_version: context.qualityDefinitionVersion,
       A_report_definition_version: context.reportDefinitionVersion,
+      A_randomization_algorithm_version: context.randomizationAlgorithmVersion,
       A_quality_interpretable: session.qualityFlags.interpretable === false ? 0 : 1,
       A_finished_at: session.finishedAt?.toISOString() ?? null,
     }
@@ -654,6 +660,9 @@ export const buildCognitiveResearchPackage = (
       task_payload_json: JSON.stringify(trial.payload),
     })),
   )
+  const randomizationVersions = [...new Set(
+    sessions.map((session) => reportContextFor(assignment, session).randomizationAlgorithmVersion),
+  )]
   const manifest = {
     assignmentId: assignment.id,
     assignmentTitle: assignment.title,
@@ -664,7 +673,7 @@ export const buildCognitiveResearchPackage = (
     metricRowCount: metricRows.length,
     trialRowCount: trialRows.length,
     files: ['sessions.csv', 'metrics.csv', 'trials.csv', 'manifest.json', 'data_dictionary.xlsx', 'README.txt'],
-    randomizationAlgorithmVersion: 'seq-v1.0.0',
+    randomizationAlgorithmVersion: randomizationVersions.length === 1 ? randomizationVersions[0] : null,
   }
   const readme = [
     'Cognitive research-long export',

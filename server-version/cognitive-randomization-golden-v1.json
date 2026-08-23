@@ -1,0 +1,32 @@
+{
+  "version": "seq-v1.0.0",
+  "seed": "golden-seed",
+  "nback": [
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "C", "target": false },
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "C", "target": true },
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "H", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "X", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "C", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "C", "target": true },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "P", "target": false },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "V", "target": false },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "P", "target": true },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "B", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "J", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "M", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "J", "target": true },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "F", "target": false }
+  ],
+  "corsi": [4, 3, 1, 0, 8],
+  "gonogo": ["nogo", "go", "go", "go", "nogo", "go", "go", "go"],
+  "cpt": [
+    { "blockIndex": 0, "isTarget": false, "stimulus": "H" },
+    { "blockIndex": 0, "isTarget": true, "stimulus": "X" },
+    { "blockIndex": 0, "isTarget": false, "stimulus": "B" },
+    { "blockIndex": 0, "isTarget": false, "stimulus": "B" },
+    { "blockIndex": 1, "isTarget": true, "stimulus": "X" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "C" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "H" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "B" }
+  ]
+}
