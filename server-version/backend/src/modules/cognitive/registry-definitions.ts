@@ -129,6 +129,7 @@ export const reactionRegistryMetaV11 = {
   } as Record<string, QualityDefinition>,
   reportDefinition: {
     ...reactionRegistryMeta.reportDefinition,
+    practicalTips: ['在需要快速响应时先减少外部干扰。', '比较多次结果时尽量使用相近设备和作答方式。'],
     disclaimer: '结果反映本次任务表现，不是医学诊断或人口常模。任务表现指数不是常模位置。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
@@ -223,6 +224,7 @@ export const memoryRegistryMetaV11 = {
     headlineMetric: 'maxSpan',
     primaryMetrics: ['maxSpan', 'totalCorrectTrials'],
     secondaryMetrics: ['levelsPassed', 'firstTryPassCount', 'medianResponseDurationMs', 'trialCount'],
+    practicalTips: ['较长信息可以尝试分组、复述和分段记忆。'],
     disclaimer: 'maxSpan 是本次任务容量指标，不是标准化记忆等级。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
@@ -318,6 +320,7 @@ export const stroopRegistryMetaV11 = {
     headlineMetric: 'stroopEffectMs',
     primaryMetrics: ['stroopEffectMs', 'incongruentAccuracy', 'errorCost'],
     secondaryMetrics: ['accuracy', 'congruentAccuracy', 'medianRtCongruent', 'medianRtIncongruent', 'timeoutCount'],
+    practicalTips: ['面对冲突信息时先确认目标规则，再做响应。', '减少多任务切换可降低无关信息干扰。'],
     disclaimer: '不得仅以总体准确率代表抑制能力，也不是年龄常模。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,

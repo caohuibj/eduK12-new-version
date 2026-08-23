@@ -81,6 +81,11 @@ const libraryTemplate = (overrides: Record<string, unknown> = {}) => ({
         title: '反应时',
         instruction: '看绿点',
         configId: 'config-1',
+        profile: 'standard',
+        profileDefinitionVersion: '1.0.0',
+        resolvedConfigHash: 'a'.repeat(64),
+        resolvedConfigSnapshotEncrypted: 'cipher-config-standard',
+        resolvedReportSnapshotEncrypted: 'cipher-report-standard',
         config: publishedConfig,
       },
     },
@@ -290,9 +295,9 @@ describe('copyComposite', () => {
         createdBy: 'teacher-1',
         courseId: 'course-t',
         profile: 'standard',
-        resolvedConfigHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-        resolvedConfigSnapshotEncrypted: expect.any(String),
-        resolvedReportSnapshotEncrypted: expect.any(String),
+        resolvedConfigHash: 'a'.repeat(64),
+        resolvedConfigSnapshotEncrypted: 'cipher-config-standard',
+        resolvedReportSnapshotEncrypted: 'cipher-report-standard',
       }),
     }))
     const createdItems = mockPrisma.compositeAssessment.create.mock.calls[0][0].data.items.create
@@ -414,6 +419,113 @@ describe('copyComposite', () => {
       courseId: null,
     }))
     await expect(copyComposite('teacher-1', TEACHER, 'source-1', { courseId: null })).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('copies experience freeze identity instead of remelting standard', async () => {
+    const source = libraryTemplate()
+    source.items[2].cognitiveAssignment = {
+      ...source.items[2].cognitiveAssignment,
+      profile: 'experience',
+      profileDefinitionVersion: '1.1.0',
+      resolvedConfigHash: 'e'.repeat(64),
+      resolvedConfigSnapshotEncrypted: 'cipher-config-experience',
+      resolvedReportSnapshotEncrypted: 'cipher-report-experience',
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-exp' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-exp', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        profile: 'experience',
+        resolvedConfigHash: 'e'.repeat(64),
+        resolvedConfigSnapshotEncrypted: 'cipher-config-experience',
+        resolvedReportSnapshotEncrypted: 'cipher-report-experience',
+      }),
+    }))
+  })
+
+  it('does not reuse a standard wrapper when copying a research template', async () => {
+    const source = libraryTemplate()
+    source.items[2].cognitiveAssignment = {
+      ...source.items[2].cognitiveAssignment,
+      profile: 'research',
+      profileDefinitionVersion: '1.1.0',
+      resolvedConfigHash: 'b'.repeat(64),
+      resolvedConfigSnapshotEncrypted: 'cipher-config-research',
+      resolvedReportSnapshotEncrypted: 'cipher-report-research',
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-research' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-r', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    expect(mockPrisma.cognitiveAssignment.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        profile: 'research',
+        resolvedConfigHash: 'b'.repeat(64),
+      }),
+    }))
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        profile: 'research',
+        resolvedConfigHash: 'b'.repeat(64),
+        resolvedConfigSnapshotEncrypted: 'cipher-config-research',
+      }),
+    }))
+  })
+
+  it('keeps the source freeze ciphertext when live registry metadata would differ', async () => {
+    const source = libraryTemplate()
+    source.items[2].cognitiveAssignment = {
+      ...source.items[2].cognitiveAssignment,
+      profile: 'research',
+      profileDefinitionVersion: 'frozen-old',
+      resolvedConfigHash: 'c'.repeat(64),
+      resolvedConfigSnapshotEncrypted: 'frozen-config-cipher',
+      resolvedReportSnapshotEncrypted: 'frozen-report-cipher',
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-frozen' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-frozen', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    const created = mockPrisma.cognitiveAssignment.create.mock.calls[0][0].data
+    expect(created.resolvedConfigSnapshotEncrypted).toBe('frozen-config-cipher')
+    expect(created.resolvedReportSnapshotEncrypted).toBe('frozen-report-cipher')
+    expect(created.profileDefinitionVersion).toBe('frozen-old')
+    expect(created.profile).toBe('research')
+  })
+
+  it('copies a legacy unfrozen source without inventing standard', async () => {
+    const source = libraryTemplate()
+    source.items[2].cognitiveAssignment = {
+      id: 'admin-asg',
+      title: '反应时',
+      instruction: '看绿点',
+      configId: 'config-1',
+      profile: null,
+      profileDefinitionVersion: null,
+      resolvedConfigHash: null,
+      resolvedConfigSnapshotEncrypted: null,
+      resolvedReportSnapshotEncrypted: null,
+      config: publishedConfig,
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-legacy' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-legacy', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        profile: null,
+        resolvedConfigHash: null,
+        resolvedConfigSnapshotEncrypted: null,
+        resolvedReportSnapshotEncrypted: null,
+      }),
+    }))
   })
 })
 

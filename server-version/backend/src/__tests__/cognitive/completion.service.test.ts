@@ -9,6 +9,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     cognitiveSession: { findUnique: vi.fn(), updateMany: vi.fn() },
     cognitiveTrial: { findMany: vi.fn() },
+    cognitiveAssignment: { findUnique: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
   },
@@ -89,6 +90,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.$transaction.mockImplementation(async (fn: any) => fn(mockPrisma))
   mockPrisma.$queryRaw.mockResolvedValue([rawRow()])
+  mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(null)
 })
 
 describe('completeSession happy path', () => {

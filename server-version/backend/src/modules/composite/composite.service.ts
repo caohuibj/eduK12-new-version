@@ -9,6 +9,8 @@ import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
+import { readFrozenReport } from '../cognitive/profile-freeze'
+import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
 import { logger } from '../../utils/logger'
 import { canUseScale } from '../../services/materialGrant'
 import {
@@ -525,6 +527,13 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           configId: assignment.configId,
           title: assignment.title || assignment.config.name,
           instruction: assignment.instruction ?? assignment.config.instruction ?? null,
+          sourceFreeze: {
+            profile: assignment.profile ?? null,
+            profileDefinitionVersion: assignment.profileDefinitionVersion ?? null,
+            resolvedConfigSnapshotEncrypted: assignment.resolvedConfigSnapshotEncrypted ?? null,
+            resolvedConfigHash: assignment.resolvedConfigHash ?? null,
+            resolvedReportSnapshotEncrypted: assignment.resolvedReportSnapshotEncrypted ?? null,
+          },
         })
         itemData.push({
           type: 'COGNITIVE',
@@ -1362,6 +1371,40 @@ export const buildCompositeReport = (attempt: any) => {
       const score = session?.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
       const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
       const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
+      const frozenReport = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
+      const profile = frozenReport?.profile
+        ?? (item.cognitiveAssignment?.profile === 'experience'
+          || item.cognitiveAssignment?.profile === 'standard'
+          || item.cognitiveAssignment?.profile === 'research'
+          ? item.cognitiveAssignment.profile
+          : null)
+      const reference = session && score !== null
+        ? resolveCognitiveReferenceForResult({
+          testType: session.testType,
+          metrics,
+          score,
+          qualityFlags,
+          config,
+          profile,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          configVersion: session.configVersion,
+        })
+        : undefined
+      const singleTaskReport = session && score !== null
+        ? buildCognitiveSingleTaskReport({
+          testType: session.testType,
+          engineVersion: session.engineVersion ?? '',
+          scoringVersion: session.scoringVersion ?? '',
+          configVersion: session.configVersion ?? '',
+          profile,
+          frozenReport,
+          score,
+          metrics,
+          qualityFlags,
+          reference: reference ?? null,
+        })
+        : null
       return {
         itemId: item.id,
         type: item.type,
@@ -1372,18 +1415,8 @@ export const buildCompositeReport = (attempt: any) => {
         metrics,
         qualityFlags,
         finishedAt: session?.finishedAt,
-        reference: session && score !== null
-          ? resolveCognitiveReferenceForResult({
-            testType: session.testType,
-            metrics,
-            score,
-            qualityFlags,
-            config,
-            engineVersion: session.engineVersion,
-            scoringVersion: session.scoringVersion,
-            configVersion: session.configVersion,
-          })
-          : undefined,
+        reference,
+        singleTaskReport,
       }
     } catch {
       logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })

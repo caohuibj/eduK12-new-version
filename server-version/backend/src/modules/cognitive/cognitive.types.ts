@@ -66,6 +66,7 @@ export interface SingleTaskReportDefinition {
   headlineMetric?: string
   primaryMetrics: string[]
   secondaryMetrics: string[]
+  practicalTips?: string[]
   disclaimer: string
 }
 

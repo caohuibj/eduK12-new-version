@@ -143,7 +143,32 @@ describe('memory scorer 1.1.0', () => {
     }).metrics.totalCorrectTrials).toBeUndefined()
   })
 
-  it('flags perseverative identical-digit responses', async () => {
+  it('does not flag a correct repeated-digit target as invalid', async () => {
+    const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
+    const repeats: MemoryTrial = {
+      length: 3,
+      trialWithinLevel: 1,
+      sequence: [5, 5, 5],
+      response: [5, 5, 5],
+      responseDurationMs: 400,
+      interrupted: false,
+    }
+    const result = scoreMemoryV1_1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: trial(2, 1, true) },
+        { trialIndex: 1, payload: trial(2, 2, true) },
+        { trialIndex: 2, payload: repeats },
+        { trialIndex: 3, payload: { ...repeats, trialWithinLevel: 2 } },
+        { trialIndex: 4, payload: trial(4, 1, false) },
+        { trialIndex: 5, payload: trial(4, 2, false) },
+      ],
+    })
+    expect(result.qualityFlags.invalidSequencePattern).toBe(false)
+    expect(result.metrics.perseverativeTrialCount).toBe(0)
+  })
+
+  it('does not flag a single incorrect repeated response', async () => {
     const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
     const stuck: MemoryTrial = {
       length: 2,
@@ -157,10 +182,47 @@ describe('memory scorer 1.1.0', () => {
       config,
       trials: [
         { trialIndex: 0, payload: stuck },
-        { trialIndex: 1, payload: { ...stuck, trialWithinLevel: 2 } },
+        { trialIndex: 1, payload: trial(2, 2, false) },
       ],
     })
+    expect(result.qualityFlags.invalidSequencePattern).toBe(false)
+    expect(result.metrics.perseverativeTrialCount).toBe(1)
+  })
+
+  it('flags sustained incorrect repeated responses across trials', async () => {
+    const { scoreMemoryV1_1 } = await import('../../modules/cognitive/scoring/memory.v1_1')
+    const stuck = (length: number, trialWithinLevel: 1 | 2): MemoryTrial => ({
+      length,
+      trialWithinLevel,
+      sequence: Array.from({ length }, (_, index) => index),
+      response: Array.from({ length }, () => 0),
+      responseDurationMs: 400,
+      interrupted: false,
+    })
+    const result = scoreMemoryV1_1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: trial(2, 1, true) },
+        { trialIndex: 1, payload: stuck(2, 2) },
+        { trialIndex: 2, payload: stuck(3, 1) },
+        { trialIndex: 3, payload: trial(3, 2, true) },
+        { trialIndex: 4, payload: stuck(4, 1) },
+        { trialIndex: 5, payload: stuck(4, 2) },
+      ],
+    })
+    expect(result.metrics.perseverativeTrialCount).toBe(4)
     expect(result.qualityFlags.invalidSequencePattern).toBe(true)
     expect(result.qualityFlags.interpretable).toBe(false)
+    expect(scoreMemoryV1({
+      config,
+      trials: [
+        { trialIndex: 0, payload: trial(2, 1, true) },
+        { trialIndex: 1, payload: stuck(2, 2) },
+        { trialIndex: 2, payload: stuck(3, 1) },
+        { trialIndex: 3, payload: trial(3, 2, true) },
+        { trialIndex: 4, payload: stuck(4, 1) },
+        { trialIndex: 5, payload: stuck(4, 2) },
+      ],
+    }).qualityFlags.invalidSequencePattern).toBeUndefined()
   })
 })

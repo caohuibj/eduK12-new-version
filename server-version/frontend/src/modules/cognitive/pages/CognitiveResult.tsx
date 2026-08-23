@@ -5,6 +5,7 @@ import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { resolveRunner, type MetricDefinition } from '../registry'
 import type { CognitiveSession } from '../types'
+import CognitiveSingleTaskReportCard from '../CognitiveSingleTaskReportCard'
 
 const formatMetric = (definition: MetricDefinition, value: unknown): string => {
   if (value === null || value === undefined || value === '') return '—'
@@ -115,7 +116,7 @@ const CognitiveResult: React.FC = () => {
     .filter(([key, value]) => key !== 'interpretable' && value === true)
     .map(([key]) => session.qualityDefinitions?.[key]?.label ?? key)
   const comparison = result.reference?.comparison
-  const tips = entry?.reportDefinition?.practicalTips ?? []
+  const tips = session.reportDefinition?.practicalTips ?? []
 
   return (
     <div>
@@ -124,6 +125,15 @@ const CognitiveResult: React.FC = () => {
       </button>
       <div className="card p-8 max-w-2xl text-center">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+        {result.singleTaskReport ? (
+          <CognitiveSingleTaskReportCard
+            report={result.singleTaskReport}
+            attemptNo={session.attemptNo}
+            finishedAt={session.finishedAt}
+            anonymousCode={isPublic ? session.anonymousCode : null}
+          />
+        ) : (
+        <>
         <h1 className="text-2xl font-bold text-gray-800 mb-2">{report?.title ?? entry?.name ?? '测评完成'}</h1>
         <p className="text-sm text-gray-500 mb-6">
           尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}
@@ -179,7 +189,7 @@ const CognitiveResult: React.FC = () => {
               <>
                 <p className="text-lg font-semibold text-gray-800 mt-1">{comparison.rangeLabel}</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  观察值 {comparison.observed} · 文献参考均值 {comparison.referenceMean}
+                  观察值 {comparison.observed} · {comparison.meanLabel || '参考均值'} {comparison.referenceMean}
                   {comparison.referenceSd ? `（SD ${comparison.referenceSd}）` : ''}
                 </p>
               </>
@@ -206,6 +216,8 @@ const CognitiveResult: React.FC = () => {
         </section>
 
         {report?.disclaimer && <p className="text-xs text-gray-400 mt-6 border-t pt-3">{report.disclaimer}</p>}
+        </>
+        )}
       </div>
     </div>
   )

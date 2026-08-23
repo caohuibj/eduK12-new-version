@@ -8,7 +8,7 @@ import {
   LITERATURE_ANCHORED_SIM_VERSION,
   type LiteratureAnchoredSimulatedReference,
 } from './reference-data/generate-literature-anchored-reference'
-import { LITERATURE_REFERENCE_SETS } from './reference-data/literature/sets'
+import { LITERATURE_REFERENCE_SETS, literatureSetIsEnabled } from './reference-data/literature/sets'
 import { matchProtocol, type ObservedProtocol } from './reference-protocol'
 
 export interface CognitiveReferenceComparison {
@@ -18,6 +18,7 @@ export interface CognitiveReferenceComparison {
   referenceSd: number
   sdDelta: number | null
   rangeLabel: string
+  meanLabel: string
 }
 
 export interface CognitiveReference {
@@ -76,14 +77,20 @@ const sd = (values: number[]): number => {
   return Math.sqrt(values.reduce((sum, value) => sum + (value - m) ** 2, 0) / values.length)
 }
 
-export const describeRelativeSd = (observed: number, referenceMean: number, referenceSd: number): string => {
-  if (!(referenceSd > 0)) return '接近该研究样本报告范围'
+export const describeRelativeSd = (
+  observed: number,
+  referenceMean: number,
+  referenceSd: number,
+  meanNoun = '参考均值',
+  closeLabel = '接近该参考分布范围',
+): string => {
+  if (!(referenceSd > 0)) return closeLabel
   const z = (observed - referenceMean) / referenceSd
-  if (Math.abs(z) < 0.5) return '接近该研究样本报告范围'
+  if (Math.abs(z) < 0.5) return closeLabel
   const magnitude = Math.round(Math.abs(z) * 10) / 10
   return observed > referenceMean
-    ? `高于文献参考均值约 ${magnitude} SD`
-    : `低于文献参考均值约 ${magnitude} SD`
+    ? `高于${meanNoun}约 ${magnitude} SD`
+    : `低于${meanNoun}约 ${magnitude} SD`
 }
 
 const comparisonOf = (
@@ -91,13 +98,16 @@ const comparisonOf = (
   observed: number,
   referenceMean: number,
   referenceSd: number,
+  meanLabel = '参考均值',
+  closeLabel = '接近该参考分布范围',
 ): CognitiveReferenceComparison => ({
   metricKey,
   observed,
   referenceMean,
   referenceSd,
   sdDelta: referenceSd > 0 ? Math.round(((observed - referenceMean) / referenceSd) * 100) / 100 : null,
-  rangeLabel: describeRelativeSd(observed, referenceMean, referenceSd),
+  rangeLabel: describeRelativeSd(observed, referenceMean, referenceSd, meanLabel, closeLabel),
+  meanLabel,
 })
 
 const observedProtocol = (input: {
@@ -143,13 +153,25 @@ export const resolveCognitiveReference = (input: {
   if (input.referenceMode === 'literature') {
     const sets = LITERATURE_REFERENCE_SETS.filter((set) => set.testType === input.testType)
     const selected = version ? sets.find((set) => set.version === version) : sets.find((set) => matchProtocol(set.protocol, protocol))
-    if (!selected || !matchProtocol(selected.protocol, protocol)) {
-      return unavailable('literature', version ?? selected?.version ?? null, band, '研究参考暂不可用', PROTOCOL_DISCLAIMER)
+    if (!selected || !matchProtocol(selected.protocol, protocol) || !literatureSetIsEnabled(selected)) {
+      return unavailable(
+        'literature',
+        version ?? selected?.version ?? null,
+        band,
+        '研究参考暂不可用',
+        selected && !literatureSetIsEnabled(selected)
+          ? selected.disclaimer
+          : PROTOCOL_DISCLAIMER,
+        Boolean(selected && matchProtocol(selected.protocol, protocol)),
+      )
     }
-    const bandData = selected.bands.find((candidate) => candidate.id === band) ?? selected.bands[0]
+    if (!band) {
+      return unavailable('literature', selected.version, null, '研究参考暂不可用', '未指定参考年龄带，不展示研究参考。', true)
+    }
+    const bandData = selected.bands.find((candidate) => candidate.id === band)
     const value = input.metrics[selected.metricKey]
     if (!bandData || typeof value !== 'number' || !Number.isFinite(value)) {
-      return unavailable('literature', selected.version, band, '研究参考暂不可用', PROTOCOL_DISCLAIMER, true)
+      return unavailable('literature', selected.version, band, '研究参考暂不可用', '参考年龄带不匹配或指标不可用。', true)
     }
     return {
       mode: 'literature',
@@ -159,7 +181,14 @@ export const resolveCognitiveReference = (input: {
       version: selected.version,
       band: bandData.id,
       referencePosition: null,
-      comparison: comparisonOf(selected.metricKey, value, bandData.mean, bandData.sd),
+      comparison: comparisonOf(
+        selected.metricKey,
+        value,
+        bandData.mean,
+        bandData.sd,
+        '文献参考均值',
+        '接近该研究样本报告范围',
+      ),
       protocolMatched: true,
       disclaimer: selected.disclaimer,
       sources: selected.sources,
@@ -171,21 +200,31 @@ export const resolveCognitiveReference = (input: {
     if (!set || !matchProtocol(set.protocol, protocol)) {
       return unavailable('simulated', version, band, '模拟参考不可用', PROTOCOL_DISCLAIMER)
     }
+    if (!band) {
+      return unavailable('simulated', version, null, '模拟参考不可用', '未指定参考年龄带，不展示模拟参考。', true)
+    }
     const bandData = set.bands.find((candidate) => candidate.id === band)
     const metric = bandData?.metrics[set.metricKey]
     const value = input.metrics[set.metricKey]
     if (!bandData || !metric || typeof value !== 'number' || !Number.isFinite(value)) {
-      return unavailable('simulated', version, band, '模拟参考不可用', '当前任务没有匹配的模拟参考指标。', true)
+      return unavailable('simulated', version, band, '模拟参考不可用', '参考年龄带不匹配或没有匹配的模拟参考指标。', true)
     }
     return {
       mode: 'simulated',
       status: 'provisional',
       available: true,
-      label: '文献锚定模拟参考',
+      label: '内部模拟参考',
       version,
       band,
       referencePosition: null,
-      comparison: comparisonOf(set.metricKey, value, metric.mean, metric.sd),
+      comparison: comparisonOf(
+        set.metricKey,
+        value,
+        metric.mean,
+        metric.sd,
+        '内部模拟参考均值',
+        '接近该模拟参考范围',
+      ),
       protocolMatched: true,
       disclaimer: set.disclaimer,
     }
@@ -209,13 +248,20 @@ export const resolveCognitiveReference = (input: {
     mode: 'simulated',
     status: 'provisional',
     available: true,
-    label: '文献锚定模拟参考',
+    label: '历史模拟参考',
     version,
     band,
     referencePosition: null,
-    comparison: comparisonOf(metricKey, value, referenceMean, referenceSd),
+    comparison: comparisonOf(
+      metricKey,
+      value,
+      referenceMean,
+      referenceSd,
+      '历史模拟参考均值',
+      '接近该历史模拟分布范围',
+    ),
     protocolMatched: true,
-    disclaimer: '仅为文献锚定模拟参考，不代表中国学生常模。不得解释为诊断。',
+    disclaimer: '由固定种子开发模拟数据生成，不代表真实样本或文献样本；仅保留用于历史结果兼容。',
   }
 }
 
