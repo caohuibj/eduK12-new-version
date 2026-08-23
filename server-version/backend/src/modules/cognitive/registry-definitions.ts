@@ -446,3 +446,108 @@ export const cptRegistryMeta = {
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
 }
+
+export const nbackRegistryMeta = {
+  name: 'N-Back 工作记忆更新',
+  category: 'working_memory_updating',
+  profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [2, 3],
+      configPatch: { nLevels: [1], trialCountByN: [30], blockCountByN: [1] },
+      reportCaveats: ['体验版只有 1-back，结果仅供体验。maxReliableN 不是标准化工作记忆等级。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [6, 8],
+      configPatch: { nLevels: [1, 2], trialCountByN: [40, 60], blockCountByN: [1, 1] },
+      reportCaveats: ['正式版看各 N 的 d′ 与负荷效应，不是常模等级。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [12, 16],
+      configPatch: { nLevels: [1, 2, 3], trialCountByN: [60, 60, 60], blockCountByN: [2, 2, 2] },
+      reportCaveats: ['科研档含 1/2/3-back；仍不是人口常模。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    dPrimeByN: metric('dPrimeByN', '各 N 水平 d′', 'working_memory_updating', 'map', 'higher_is_better', 'primary'),
+    maxReliableN: metric('maxReliableN', '达到质量门槛的最高 N', 'working_memory_updating', 'level', 'higher_is_better', 'primary'),
+    hitRateByN: metric('hitRateByN', '各 N 命中率', 'working_memory_updating', 'map', 'higher_is_better', 'secondary'),
+    falseAlarmRateByN: metric('falseAlarmRateByN', '各 N 误报率', 'working_memory_updating', 'map', 'lower_is_better', 'secondary'),
+    medianRtByN: metric('medianRtByN', '各 N 正确反应中位RT', 'working_memory_updating', 'map', 'descriptive', 'secondary'),
+    loadCostDPrime: metric('loadCostDPrime', '高负荷相对低负荷的 d′ 下降', 'working_memory_updating', 'd-prime', 'signed', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '至少一个 N 水平达到质量门槛。' },
+    insufficientTargetsByN: { key: 'insufficientTargetsByN', label: '某 N 目标不足', description: '至少一个 N 水平目标试次过少。' },
+    ceilingOrFloorByN: { key: 'ceilingOrFloorByN', label: '某 N 触顶或触底', description: '命中率接近天花板或地板。' },
+    excessiveOmissions: { key: 'excessiveOmissions', label: '目标遗漏过高', description: '目标遗漏率达到 0.4。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在 interrupted 试次。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: {
+    title: 'N-Back 工作记忆更新',
+    headlineMetric: 'maxReliableN',
+    primaryMetrics: ['dPrimeByN', 'maxReliableN'],
+    secondaryMetrics: ['hitRateByN', 'falseAlarmRateByN', 'medianRtByN', 'loadCostDPrime'],
+    practicalTips: ['maxReliableN 只是本次配置内表现，不是标准化工作记忆等级。'],
+    disclaimer: '结果反映本次工作记忆更新任务表现，不是临床诊断或常模。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: true,
+}
+
+export const corsiRegistryMeta = {
+  name: 'Corsi 视空间广度',
+  category: 'visuospatial_memory',
+  profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [2, 4],
+      configPatch: { startSpan: 3, maxSpan: 6 },
+      reportCaveats: ['体验版广度上限较低，结果仅供体验。Corsi 不与数字广度合并为记忆总分。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [5, 7],
+      configPatch: { startSpan: 3, maxSpan: 8 },
+      reportCaveats: ['正式版反映视空间广度，不是统一记忆总分。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [7, 10],
+      configPatch: { startSpan: 3, maxSpan: 9 },
+      reportCaveats: ['科研档上限 9；连续一整级失败即终止。仍不是常模。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    maxSpan: metric('maxSpan', '最大空间广度', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
+    totalCorrectTrials: metric('totalCorrectTrials', '总正确试次', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
+    firstTryPassCount: metric('firstTryPassCount', '首次通过级数', 'visuospatial_memory', 'count', 'higher_is_better', 'secondary'),
+    medianResponseDurationMs: metric('medianResponseDurationMs', '中位复现时长', 'visuospatial_memory', 'ms', 'descriptive', 'secondary'),
+    sequenceErrorDistance: metric('sequenceErrorDistance', '序列位置错误距离', 'visuospatial_memory', 'score', 'lower_is_better', 'research_only', { availableProfiles: ['research'] }),
+    trialCount: metric('trialCount', '正式试次数', 'visuospatial_memory', 'count', 'descriptive', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '完成级数与序列是否达到门槛。' },
+    insufficientCompletedLevels: { key: 'insufficientCompletedLevels', label: '完成级数不足', description: '完成的广度级数过少。' },
+    invalidBlockSequence: { key: 'invalidBlockSequence', label: '无效方块序列', description: '作答含重复或越界方块。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在 interrupted 试次。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: {
+    title: 'Corsi 视空间广度',
+    headlineMetric: 'maxSpan',
+    primaryMetrics: ['maxSpan', 'totalCorrectTrials'],
+    secondaryMetrics: ['firstTryPassCount', 'medianResponseDurationMs', 'sequenceErrorDistance'],
+    practicalTips: ['Corsi 代表视空间广度，不要与数字广度合并成记忆总分。'],
+    disclaimer: '结果反映本次视空间记忆任务表现，不是临床诊断或常模。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: true,
+}

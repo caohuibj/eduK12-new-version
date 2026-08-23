@@ -9,6 +9,8 @@ import {
   stroopRegistryMetaV11,
   gonogoRegistryMeta,
   cptRegistryMeta,
+  nbackRegistryMeta,
+  corsiRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -31,6 +33,12 @@ import { scoreGonogoV1 } from './scoring/gonogo.v1'
 import { cptConfigSchema } from './schemas/cpt.config'
 import { cptTrialSchema } from './schemas/cpt.trial'
 import { scoreCptV1 } from './scoring/cpt.v1'
+import { nbackConfigSchema } from './schemas/nback.config'
+import { nbackTrialSchema } from './schemas/nback.trial'
+import { scoreNbackV1 } from './scoring/nback.v1'
+import { corsiConfigSchema } from './schemas/corsi.config'
+import { corsiTrialSchema } from './schemas/corsi.trial'
+import { scoreCorsiV1 } from './scoring/corsi.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -188,4 +196,24 @@ registerEntry({
   trialSchema: cptTrialSchema,
   score: scoreCptV1,
   ...cptRegistryMeta,
+})
+
+registerEntry({
+  testType: 'nback',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: nbackConfigSchema,
+  trialSchema: nbackTrialSchema,
+  score: scoreNbackV1,
+  ...nbackRegistryMeta,
+})
+
+registerEntry({
+  testType: 'corsi',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: corsiConfigSchema,
+  trialSchema: corsiTrialSchema,
+  score: scoreCorsiV1,
+  ...corsiRegistryMeta,
 })

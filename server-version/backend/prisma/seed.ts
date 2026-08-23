@@ -382,6 +382,39 @@ async function main() {
       report: NONE_REPORT,
     },
   })
+  await seedPublishedCognitiveConfig('nback', '1.0.0', {
+    name: 'N-Back v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      nLevels: [1, 2],
+      trialCountByN: [40, 60],
+      blockCountByN: [1, 1],
+      targetRatio: 0.3,
+      stimulusMs: 500,
+      isiMs: 2000,
+      validRtFloorMs: 150,
+      report: NONE_REPORT,
+    },
+  })
+  await seedPublishedCognitiveConfig('corsi', '1.0.0', {
+    name: 'Corsi Block-Tapping v1.0.0',
+    status: 'PUBLISHED',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      startSpan: 3,
+      maxSpan: 8,
+      trialsPerLevel: 2,
+      boardSize: 9,
+      highlightMs: 500,
+      intervalMs: 250,
+      readyDurationMs: 800,
+      inactivityGuardMs: 30000,
+      report: NONE_REPORT,
+    },
+  })
   console.log('数据库初始化完成。')
 }
 
