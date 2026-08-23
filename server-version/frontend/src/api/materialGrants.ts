@@ -30,13 +30,30 @@ export const materialGrantApi = {
   batch: (input: { resourceType: MaterialResourceType; resourceId: string; teacherIds: string[] }) =>
     apiClient.post<{ list: MaterialGrantRow[] }>('/admin/material-grants/batch', input),
   remove: (id: string) => apiClient.delete<{ id: string }>(`/admin/material-grants/${id}`),
-  listTeachers: () => apiClient.get<{ list: User[] }>('/users?role=TEACHER&page=1&pageSize=100'),
+  listTeachers: async () => {
+    const pageSize = 100
+    const list: User[] = []
+    let page = 1
+    let last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
+    if (last.code !== 0 || !last.data) return last
+    list.push(...(last.data.list || []))
+    const total = last.data.total ?? list.length
+    while (list.length < total) {
+      page += 1
+      last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
+      if (last.code !== 0 || !last.data) return last
+      const chunk = last.data.list || []
+      if (chunk.length === 0) break
+      list.push(...chunk)
+    }
+    return { ...last, data: { ...last.data, list, total } }
+  },
 }
 
 export const eligibleGrantTeachers = (users: User[]) =>
   users.filter((user) =>
     user.role === 'TEACHER'
-    && user.teacherApproved !== false
-    && user.isActive !== false
-    && user.isFrozen !== true
+    && user.teacherApproved === true
+    && user.isActive === true
+    && user.isFrozen === false
   )

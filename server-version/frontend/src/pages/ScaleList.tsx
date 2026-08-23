@@ -68,7 +68,7 @@ const ScaleList: React.FC = () => {
   const fetchScales = async () => {
     try {
       setLoading(true)
-      const response = await apiClient.get<{ list: Scale[]; total: number }>('/scales')
+      const response = await apiClient.get<{ list: Scale[]; total: number }>('/scales?page=1&pageSize=100')
       if (response.code === 0) {
         setScales(response.data.list)
       } else {

@@ -30,11 +30,23 @@ describe('materialGrantApi', () => {
     })
   })
 
-  it('keeps frozen teachers out of the grant picker', () => {
+  it('keeps only approved, active, unfrozen teachers', () => {
     expect(eligibleGrantTeachers([
       { id: 'ok', username: 'ok', role: 'TEACHER', teacherApproved: true, isActive: true, isFrozen: false },
       { id: 'frozen', username: 'no', role: 'TEACHER', teacherApproved: true, isActive: true, isFrozen: true },
+      { id: 'pending', username: 'p', role: 'TEACHER', teacherApproved: undefined, isActive: true, isFrozen: false },
       { id: 'admin', username: 'a', role: 'ADMIN' },
     ]).map((user) => user.id)).toEqual(['ok'])
+  })
+
+  it('pages through the teacher directory past the first 100 rows', async () => {
+    const page1 = Array.from({ length: 100 }, (_, index) => ({ id: `t${index}`, username: `t${index}`, role: 'TEACHER' as const }))
+    mockClient.get
+      .mockResolvedValueOnce({ code: 0, data: { list: page1, total: 101, page: 1, pageSize: 100 } })
+      .mockResolvedValueOnce({ code: 0, data: { list: [{ id: 't100', username: 't100', role: 'TEACHER' }], total: 101, page: 2, pageSize: 100 } })
+    const response = await materialGrantApi.listTeachers()
+    expect(mockClient.get).toHaveBeenNthCalledWith(1, '/users?role=TEACHER&page=1&pageSize=100')
+    expect(mockClient.get).toHaveBeenNthCalledWith(2, '/users?role=TEACHER&page=2&pageSize=100')
+    expect(response.data?.list).toHaveLength(101)
   })
 })

@@ -12,29 +12,33 @@ const MaterialGrants: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const load = async (type: '' | MaterialResourceType = resourceType) => {
-    try {
-      setLoading(true)
-      const response = await materialGrantApi.list(type ? { resourceType: type } : {})
-      if (response.code !== 0) throw new Error(response.message || '获取授权列表失败')
-      setList(response.data?.list || [])
-    } catch (err) {
-      setError((err as { message?: string }).message || '获取授权列表失败')
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await materialGrantApi.list(resourceType ? { resourceType } : {})
+        if (response.code !== 0) throw new Error(response.message || '获取授权列表失败')
+        setList(response.data?.list || [])
+      } catch (err) {
+        setError((err as { message?: string }).message || '获取授权列表失败')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
-
-  useEffect(() => { void load('') }, [])
+    void run()
+  }, [resourceType])
 
   const revoke = async (grant: MaterialGrantRow) => {
     if (!confirm(`撤销「${grant.teacher?.nickname || grant.teacher?.username || grant.teacherId}」的授权？`)) return
-    const response = await materialGrantApi.remove(grant.id)
-    if (response.code !== 0) {
-      setError(response.message || '撤销失败')
-      return
+    try {
+      setError(null)
+      const response = await materialGrantApi.remove(grant.id)
+      if (response.code !== 0) throw new Error(response.message || '撤销失败')
+      setList((current) => current.filter((row) => row.id !== grant.id))
+    } catch (err) {
+      setError((err as { message?: string }).message || '撤销失败')
     }
-    await load()
   }
 
   return (
@@ -47,11 +51,7 @@ const MaterialGrants: React.FC = () => {
         <select
           className="ml-2 border rounded px-3 py-2"
           value={resourceType}
-          onChange={(e) => {
-            const next = e.target.value as '' | MaterialResourceType
-            setResourceType(next)
-            void load(next)
-          }}
+          onChange={(e) => setResourceType(e.target.value as '' | MaterialResourceType)}
         >
           <option value="">全部</option>
           <option value="SCALE">量表</option>
