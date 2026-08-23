@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest'
 import { UserRole, CognitiveAssignmentStatus } from '@prisma/client'
 
 // 绝不连真实 DB：mock config/database 单例（vi.hoisted 保证 mock 工厂先于引用初始化）
@@ -31,6 +31,11 @@ import {
   publishAssignment,
   archiveAssignment,
 } from '../../modules/cognitive/assignment.service'
+
+beforeAll(() => {
+  process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+  process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+})
 
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
@@ -339,6 +344,28 @@ describe('publishAssignment / archiveAssignment', () => {
         data: expect.objectContaining({ status: 'PUBLISHED', courseSnapshot: { id: 'course-1', title: 'C1', courseCode: 'CC1' } }),
       })
     )
+  })
+
+  it('freezes a selected profile into resolved snapshot hash at publish', async () => {
+    mockPrisma.cognitiveAssignment.findUnique
+      .mockResolvedValueOnce({ ...assignment, profile: 'experience', course })
+      .mockResolvedValueOnce({ ...assignment, status: 'PUBLISHED', profile: 'experience' })
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveAssignment.updateMany.mockResolvedValue({ count: 1 })
+
+    await publishAssignment('teacher-1', TEACHER, 'asg-1')
+    const data = mockPrisma.cognitiveAssignment.updateMany.mock.calls[0][0].data
+    expect(data.resolvedConfigHash).toMatch(/^[a-f0-9]{64}$/)
+    expect(data.resolvedConfigSnapshotEncrypted).toEqual(expect.any(String))
+    expect(data.profileDefinitionVersion).toBe('1.0.0')
+  })
+
+  it('rejects updating profile after publish', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, status: 'PUBLISHED', profile: 'standard' })
+    await expect(updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { profile: 'research' })).rejects.toMatchObject({
+      statusCode: 400,
+    })
   })
 
   it('rejects publishing a non-DRAFT', async () => {

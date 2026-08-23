@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { success, error, unauthorized, notFound } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
+import * as catalogService from './catalog.service'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
@@ -35,6 +36,27 @@ import * as path from 'path'
  * 模式：controller 只做 参数解析/鉴权调用/响应映射，业务在 service。
  */
 export const cognitiveController = {
+  async listTests(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const testType = typeof req.query.testType === 'string' ? req.query.testType : undefined
+      return success(res, catalogService.listCognitiveTestsCatalog(testType))
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getTest(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const engineVersion = typeof req.query.engineVersion === 'string' ? req.query.engineVersion : undefined
+      const scoringVersion = typeof req.query.scoringVersion === 'string' ? req.query.scoringVersion : undefined
+      return success(res, catalogService.getCognitiveTestCatalog(req.params.testType, engineVersion, scoringVersion))
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
   async listConfigs(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)

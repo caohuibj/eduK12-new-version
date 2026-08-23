@@ -29,6 +29,23 @@ vi.mock('../../../modules/cognitive/api', () => ({
         list: [{ id: 'cfg-1', name: '反应时', testType: 'reaction', configVersion: '1.0.0', accessPolicy: 'OPEN' }],
       },
     }),
+    listTests: () => Promise.resolve({
+      code: 0,
+      data: {
+        list: [{
+          testType: 'reaction',
+          engineVersion: '1.0.0',
+          scoringVersion: '1.0.0',
+          recommendedForCreate: true,
+          profiles: [
+            { profile: 'experience', estimatedMinutes: [1, 2], reportCaveats: ['体验版'] },
+            { profile: 'standard', estimatedMinutes: [2, 3], reportCaveats: [] },
+            { profile: 'research', estimatedMinutes: [5, 7], reportCaveats: [] },
+          ],
+          reportDefinition: { title: '简单反应时', primaryMetrics: ['medianRtMs'], secondaryMetrics: [], disclaimer: '' },
+        }],
+      },
+    }),
     createAssignment: vi.fn(),
     updateConfigAccessPolicy: vi.fn(),
   },

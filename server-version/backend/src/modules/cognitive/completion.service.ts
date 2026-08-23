@@ -107,7 +107,7 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
       payload: entry.trialSchema.parse(decryptCognitivePayload<unknown>(t.payloadEncrypted)),
     }))
 
-    let result: { score: number; metrics: Record<string, unknown>; qualityFlags: Record<string, unknown> }
+    let result: { score: number | null; metrics: Record<string, unknown>; qualityFlags: Record<string, unknown> }
     try {
       result = entry.score({ config: validatedConfig, trials: scoringTrials })
     } catch (err) {

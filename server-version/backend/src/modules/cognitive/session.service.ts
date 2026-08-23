@@ -7,6 +7,7 @@ import {
   getParticipantKey,
 } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { hashResolvedConfig } from './profile-freeze'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
@@ -37,6 +38,7 @@ interface StartableContext {
     dueAt: Date | null
   }
   validatedConfig: unknown
+  configSnapshotEncrypted: string
   config: {
     id: string
     testType: string
@@ -88,9 +90,26 @@ export const loadStartableAssignment = async (
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
 
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-  const parsed = entry.configSchema.safeParse(config.config)
-  if (!parsed.success) {
-    throw BAD_REQUEST('CognitiveTestConfig does not match its registry schema')
+  let validatedConfig: unknown
+  let configSnapshotEncrypted: string
+  if (assignment.resolvedConfigSnapshotEncrypted) {
+    const thawed = decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted)
+    const parsedFrozen = entry.configSchema.safeParse(thawed)
+    if (!parsedFrozen.success) {
+      throw BAD_REQUEST('冻结的 Profile 配置与任务 schema 不匹配')
+    }
+    if (assignment.resolvedConfigHash && hashResolvedConfig(parsedFrozen.data) !== assignment.resolvedConfigHash) {
+      throw BAD_REQUEST('冻结的 Profile 配置校验失败')
+    }
+    validatedConfig = parsedFrozen.data
+    configSnapshotEncrypted = assignment.resolvedConfigSnapshotEncrypted
+  } else {
+    const parsed = entry.configSchema.safeParse(config.config)
+    if (!parsed.success) {
+      throw BAD_REQUEST('CognitiveTestConfig does not match its registry schema')
+    }
+    validatedConfig = parsed.data
+    configSnapshotEncrypted = encryptCognitivePayload(parsed.data)
   }
 
   return {
@@ -102,7 +121,8 @@ export const loadStartableAssignment = async (
       opensAt: assignment.opensAt,
       dueAt: assignment.dueAt,
     },
-    validatedConfig: parsed.data,
+    validatedConfig,
+    configSnapshotEncrypted,
     config: {
       id: config.id,
       testType: config.testType,
@@ -131,6 +151,7 @@ const toRunnerPayload = (session: {
   anonymousCode?: string | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false) => {
   const validatedConfig = decryptCognitivePayload<unknown>(session.configSnapshotEncrypted)
+  const entry = requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
   return {
     sessionId: session.id,
     assignmentId: session.assignmentId,
@@ -142,6 +163,8 @@ const toRunnerPayload = (session: {
     scoringVersion: session.scoringVersion,
     config: validatedConfig,
     randomSeed: session.randomSeed,
+    metricDefinitions: entry.metricDefinitions,
+    reportDefinition: entry.reportDefinition,
     ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
     ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
   }
@@ -185,7 +208,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = encryptCognitivePayload(ctx.validatedConfig)
+  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
@@ -346,7 +369,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = encryptCognitivePayload(ctx.validatedConfig)
+  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
   const randomSeed = randomBytes(16).toString('hex')
 
   try {

@@ -1,4 +1,10 @@
-import { RegistryEntry } from './cognitive.types'
+import { CognitiveProfile, RegistryEntry } from './cognitive.types'
+import {
+  fakeRegistryMeta,
+  memoryRegistryMeta,
+  reactionRegistryMeta,
+  stroopRegistryMeta,
+} from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
 import { scoreFakeV1 } from './scoring/fake.v1'
@@ -66,6 +72,16 @@ export const requireCognitiveRegistryEntry = (
   return entry
 }
 
+export const listCognitiveRegistryEntries = (): AnyRegistryEntry[] => [...REGISTRY.values()]
+
+export const listCognitiveRegistryEntriesForType = (testType: string): AnyRegistryEntry[] =>
+  listCognitiveRegistryEntries().filter((entry) => entry.testType === testType)
+
+export const hasCognitiveProfile = (entry: AnyRegistryEntry, profile: string): profile is CognitiveProfile =>
+  profile === 'experience' || profile === 'standard' || profile === 'research'
+    ? Boolean(entry.profiles[profile])
+    : false
+
 // 注册 Fake Test：fake / 1.0.0 / 1.0.0
 registerEntry({
   testType: 'fake',
@@ -74,6 +90,7 @@ registerEntry({
   configSchema: fakeConfigSchema,
   trialSchema: fakeTrialSchema,
   score: scoreFakeV1,
+  ...fakeRegistryMeta,
 })
 
 // 注册 Reaction Test：reaction / 1.0.0 / 1.0.0（Milestone E Session 2）
@@ -84,6 +101,7 @@ registerEntry({
   configSchema: reactionConfigSchema,
   trialSchema: reactionTrialSchema,
   score: scoreReactionV1,
+  ...reactionRegistryMeta,
 })
 
 // 注册 Memory Test：memory / 1.0.0 / 1.0.0（Milestone E Session 3）
@@ -94,6 +112,7 @@ registerEntry({
   configSchema: memoryConfigSchema,
   trialSchema: memoryTrialSchema,
   score: scoreMemoryV1,
+  ...memoryRegistryMeta,
 })
 
 // 注册 Stroop Test：stroop / 1.0.0 / 1.0.0（Milestone E Session 4）
@@ -104,4 +123,5 @@ registerEntry({
   configSchema: stroopConfigSchema,
   trialSchema: stroopTrialSchema,
   score: scoreStroopV1,
+  ...stroopRegistryMeta,
 })
