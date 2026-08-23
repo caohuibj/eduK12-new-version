@@ -52,6 +52,7 @@ describe('cognitive registry', () => {
     expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')?.recommendedForCreate).toBe(true)
     expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')?.metricDefinitions.totalCorrectTrials).toBeDefined()
     expect(getCognitiveRegistryEntry('stroop', '1.0.0', '1.1.0')?.profiles.standard.configPatch.totalTrials).toBe(40)
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')?.metricDefinitions.perseverativeTrialCount).toBeDefined()
   })
 
   it('never falls back to the latest version for a wrong scoringVersion', () => {

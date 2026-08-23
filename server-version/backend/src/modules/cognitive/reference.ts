@@ -138,6 +138,8 @@ export const resolveCognitiveReference = (input: {
   scoringVersion?: string
   configVersion?: string
   config?: Record<string, unknown>
+  /** 参与者年龄带；不得用 seed/config 默认 band 冒充。 */
+  participantAgeBand?: string | null
 }): CognitiveReference => {
   const version = input.referenceVersion ?? null
   const band = input.referenceBand ?? null
@@ -196,18 +198,25 @@ export const resolveCognitiveReference = (input: {
   }
 
   if (version === LITERATURE_ANCHORED_SIM_VERSION) {
+    const participantBand = input.participantAgeBand ?? null
+    if (!participantBand) {
+      return unavailable(
+        'simulated',
+        version,
+        null,
+        '模拟参考不可用',
+        '未采集参与者年龄带，不展示分年龄模拟参考。',
+      )
+    }
     const set = literatureAnchoredSets[input.testType]
     if (!set || !matchProtocol(set.protocol, protocol)) {
-      return unavailable('simulated', version, band, '模拟参考不可用', PROTOCOL_DISCLAIMER)
+      return unavailable('simulated', version, participantBand, '模拟参考不可用', PROTOCOL_DISCLAIMER)
     }
-    if (!band) {
-      return unavailable('simulated', version, null, '模拟参考不可用', '未指定参考年龄带，不展示模拟参考。', true)
-    }
-    const bandData = set.bands.find((candidate) => candidate.id === band)
+    const bandData = set.bands.find((candidate) => candidate.id === participantBand)
     const metric = bandData?.metrics[set.metricKey]
     const value = input.metrics[set.metricKey]
     if (!bandData || !metric || typeof value !== 'number' || !Number.isFinite(value)) {
-      return unavailable('simulated', version, band, '模拟参考不可用', '参考年龄带不匹配或没有匹配的模拟参考指标。', true)
+      return unavailable('simulated', version, participantBand, '模拟参考不可用', '参考年龄带不匹配或没有匹配的模拟参考指标。', true)
     }
     return {
       mode: 'simulated',
@@ -215,7 +224,7 @@ export const resolveCognitiveReference = (input: {
       available: true,
       label: '内部模拟参考',
       version,
-      band,
+      band: participantBand,
       referencePosition: null,
       comparison: comparisonOf(
         set.metricKey,

@@ -15,7 +15,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     course: { findUnique: vi.fn() },
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
     cognitiveTestConfig: { findUnique: vi.fn() },
-    cognitiveAssignment: { findFirst: vi.fn(), create: vi.fn(), findUnique: vi.fn() },
+    cognitiveAssignment: { findFirst: vi.fn(), findMany: vi.fn(), create: vi.fn(), findUnique: vi.fn() },
     $transaction: vi.fn(),
   },
 }))
@@ -34,6 +34,7 @@ import {
   startUserAttempt,
   updateComposite,
 } from '../../modules/composite/composite.service'
+import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
@@ -49,6 +50,23 @@ const publishedConfig = {
   scoringVersion: '1.0.0',
   config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
 }
+
+const standardReportCipher = encryptCognitivePayload({
+  profile: 'standard',
+  profileDefinitionVersion: '1.0.0',
+  reportDefinition: { title: '正式版报告', primaryMetrics: ['accuracy'], secondaryMetrics: [], disclaimer: 'd' },
+})
+const experienceReportCipher = encryptCognitivePayload({
+  profile: 'experience',
+  profileDefinitionVersion: '1.1.0',
+  reportDefinition: { title: '体验版报告', primaryMetrics: ['accuracy'], secondaryMetrics: [], disclaimer: 'd' },
+})
+const researchReportCipher = encryptCognitivePayload({
+  profile: 'research',
+  profileDefinitionVersion: '1.1.0',
+  reportDefinition: { title: '科研版报告', primaryMetrics: ['accuracy'], secondaryMetrics: [], disclaimer: 'd' },
+})
+const standardConfigCipher = encryptCognitivePayload({ trialCount: 3 })
 
 const libraryCourse = { id: 'library-1', title: '材料库', courseCode: 'LIB', isLibrary: true, creatorId: 'admin-1' }
 const teacherCourse = { id: 'course-t', title: '授课课', courseCode: 'T1', isLibrary: false, creatorId: 'teacher-1' }
@@ -84,8 +102,8 @@ const libraryTemplate = (overrides: Record<string, unknown> = {}) => ({
         profile: 'standard',
         profileDefinitionVersion: '1.0.0',
         resolvedConfigHash: 'a'.repeat(64),
-        resolvedConfigSnapshotEncrypted: 'cipher-config-standard',
-        resolvedReportSnapshotEncrypted: 'cipher-report-standard',
+        resolvedConfigSnapshotEncrypted: standardConfigCipher,
+        resolvedReportSnapshotEncrypted: standardReportCipher,
         config: publishedConfig,
       },
     },
@@ -99,6 +117,7 @@ beforeEach(() => {
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
   mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+  mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedConfig)
   mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
   mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
@@ -296,8 +315,8 @@ describe('copyComposite', () => {
         courseId: 'course-t',
         profile: 'standard',
         resolvedConfigHash: 'a'.repeat(64),
-        resolvedConfigSnapshotEncrypted: 'cipher-config-standard',
-        resolvedReportSnapshotEncrypted: 'cipher-report-standard',
+        resolvedConfigSnapshotEncrypted: standardConfigCipher,
+        resolvedReportSnapshotEncrypted: standardReportCipher,
       }),
     }))
     const createdItems = mockPrisma.compositeAssessment.create.mock.calls[0][0].data.items.create
@@ -310,7 +329,14 @@ describe('copyComposite', () => {
     mockPrisma.compositeAssessment.findUnique
       .mockResolvedValueOnce(libraryTemplate())
       .mockResolvedValue(null)
-    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue({ id: 'wrapper-1', listedStandalone: false })
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([{
+      id: 'wrapper-1',
+      listedStandalone: false,
+      profile: 'standard',
+      profileDefinitionVersion: '1.0.0',
+      resolvedConfigHash: 'a'.repeat(64),
+      resolvedReportSnapshotEncrypted: standardReportCipher,
+    }])
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-2', items: [] })
 
     await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
@@ -428,8 +454,8 @@ describe('copyComposite', () => {
       profile: 'experience',
       profileDefinitionVersion: '1.1.0',
       resolvedConfigHash: 'e'.repeat(64),
-      resolvedConfigSnapshotEncrypted: 'cipher-config-experience',
-      resolvedReportSnapshotEncrypted: 'cipher-report-experience',
+      resolvedConfigSnapshotEncrypted: standardConfigCipher,
+      resolvedReportSnapshotEncrypted: experienceReportCipher,
     }
     mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-exp' })
@@ -440,8 +466,8 @@ describe('copyComposite', () => {
       data: expect.objectContaining({
         profile: 'experience',
         resolvedConfigHash: 'e'.repeat(64),
-        resolvedConfigSnapshotEncrypted: 'cipher-config-experience',
-        resolvedReportSnapshotEncrypted: 'cipher-report-experience',
+        resolvedConfigSnapshotEncrypted: standardConfigCipher,
+        resolvedReportSnapshotEncrypted: experienceReportCipher,
       }),
     }))
   })
@@ -453,16 +479,16 @@ describe('copyComposite', () => {
       profile: 'research',
       profileDefinitionVersion: '1.1.0',
       resolvedConfigHash: 'b'.repeat(64),
-      resolvedConfigSnapshotEncrypted: 'cipher-config-research',
-      resolvedReportSnapshotEncrypted: 'cipher-report-research',
+      resolvedConfigSnapshotEncrypted: standardConfigCipher,
+      resolvedReportSnapshotEncrypted: researchReportCipher,
     }
     mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
-    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-research' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-r', items: [] })
 
     await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
-    expect(mockPrisma.cognitiveAssignment.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockPrisma.cognitiveAssignment.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
         profile: 'research',
         resolvedConfigHash: 'b'.repeat(64),
@@ -472,9 +498,44 @@ describe('copyComposite', () => {
       data: expect.objectContaining({
         profile: 'research',
         resolvedConfigHash: 'b'.repeat(64),
-        resolvedConfigSnapshotEncrypted: 'cipher-config-research',
+        resolvedReportSnapshotEncrypted: researchReportCipher,
       }),
     }))
+  })
+
+  it('does not reuse a wrapper when the report snapshot differs', async () => {
+    const source = libraryTemplate()
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([{
+      id: 'wrapper-old-report',
+      listedStandalone: false,
+      profile: 'standard',
+      profileDefinitionVersion: '1.0.0',
+      resolvedConfigHash: 'a'.repeat(64),
+      resolvedReportSnapshotEncrypted: experienceReportCipher,
+    }])
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-new-report' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-new-report', items: [] })
+
+    await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalled()
+  })
+
+  it('rejects a partially frozen source instead of writing a null legacy wrapper', async () => {
+    const source = libraryTemplate()
+    source.items[2].cognitiveAssignment = {
+      ...source.items[2].cognitiveAssignment,
+      profile: 'standard',
+      profileDefinitionVersion: null,
+      resolvedConfigHash: 'a'.repeat(64),
+      resolvedConfigSnapshotEncrypted: standardConfigCipher,
+      resolvedReportSnapshotEncrypted: null,
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    await expect(copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })).rejects.toMatchObject({
+      statusCode: 400,
+    })
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
   })
 
   it('keeps the source freeze ciphertext when live registry metadata would differ', async () => {
@@ -484,8 +545,8 @@ describe('copyComposite', () => {
       profile: 'research',
       profileDefinitionVersion: 'frozen-old',
       resolvedConfigHash: 'c'.repeat(64),
-      resolvedConfigSnapshotEncrypted: 'frozen-config-cipher',
-      resolvedReportSnapshotEncrypted: 'frozen-report-cipher',
+      resolvedConfigSnapshotEncrypted: standardConfigCipher,
+      resolvedReportSnapshotEncrypted: researchReportCipher,
     }
     mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-frozen' })
@@ -493,8 +554,8 @@ describe('copyComposite', () => {
 
     await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
     const created = mockPrisma.cognitiveAssignment.create.mock.calls[0][0].data
-    expect(created.resolvedConfigSnapshotEncrypted).toBe('frozen-config-cipher')
-    expect(created.resolvedReportSnapshotEncrypted).toBe('frozen-report-cipher')
+    expect(created.resolvedConfigSnapshotEncrypted).toBe(standardConfigCipher)
+    expect(created.resolvedReportSnapshotEncrypted).toBe(researchReportCipher)
     expect(created.profileDefinitionVersion).toBe('frozen-old')
     expect(created.profile).toBe('research')
   })

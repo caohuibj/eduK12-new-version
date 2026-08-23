@@ -86,18 +86,18 @@ describe('buildCognitiveSingleTaskReport', () => {
       ...baseInput,
       qualityFlags: { interpretable: false, insufficientValidTrials: true },
     })
-    expect(report.productIndex).toBeNull()
-    expect(report.headline).toBeNull()
-    expect(report.reference).toBeNull()
-    expect(report.qualityFlags.find((flag) => flag.key === 'insufficientValidTrials')?.label).toBe('有效试次不足')
+    expect(report?.productIndex).toBeNull()
+    expect(report?.headline).toBeNull()
+    expect(report?.reference).toBeNull()
+    expect(report?.qualityFlags.find((flag) => flag.key === 'insufficientValidTrials')?.label).toBe('有效试次不足')
   })
 
   it('uses frozen Chinese labels and experience caveats', () => {
     const report = buildCognitiveSingleTaskReport(baseInput)
-    expect(report.primaryMetrics.map((metric) => metric.label)).toEqual(['中位反应时', '遗漏率'])
-    expect(report.secondaryMetrics.map((metric) => metric.label)).toEqual(['平均反应时'])
-    expect(report.caveats).toEqual(['体验版，结果仅供体验。'])
-    expect(report.practicalTips).toEqual(['冻结建议'])
+    expect(report?.primaryMetrics.map((metric) => metric.label)).toEqual(['中位反应时', '遗漏率'])
+    expect(report?.secondaryMetrics.map((metric) => metric.label)).toEqual(['平均反应时'])
+    expect(report?.caveats).toEqual(['体验版，结果仅供体验。'])
+    expect(report?.practicalTips).toEqual(['冻结建议'])
     expect(report.productIndex?.label).toBe('任务表现指数')
     expect(JSON.stringify(report)).not.toMatch(/\{"metrics"/)
   })
@@ -108,5 +108,26 @@ describe('buildCognitiveSingleTaskReport', () => {
     const composite = buildCognitiveSingleTaskReport(baseInput)
     expect(student).toEqual(teacher)
     expect(teacher).toEqual(composite)
+  })
+
+  it('uses exact Registry definitions for a legacy session without a frozen report snapshot', () => {
+    const report = buildCognitiveSingleTaskReport({
+      testType: 'reaction',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      configVersion: '1.0.1',
+      profile: null,
+      frozenReport: null,
+      score: 70,
+      metrics: { medianRtMs: 320, missRate: 0.1, meanRtMs: 330 },
+      qualityFlags: { interpretable: true },
+      reference: null,
+    })
+    expect(report).not.toBeNull()
+    expect(report?.profile).toBeNull()
+    expect(report?.title).toBe('简单反应时')
+    expect(report?.primaryMetrics.length).toBeGreaterThan(0)
+    expect(report?.primaryMetrics[0].label).not.toBe('medianRtMs')
+    expect(report?.caveats).toEqual([])
   })
 })

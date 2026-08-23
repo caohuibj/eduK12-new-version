@@ -1,7 +1,7 @@
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
-import { freezeAssignmentProfile, freezeDataForWrite } from './profile-freeze'
+import { freezeAssignmentProfile, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
 import type { CognitiveProfile } from './cognitive.types'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
@@ -465,18 +465,23 @@ export const ensureTeacherPublishedAssignment = async (
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
   const source = input.sourceFreeze ?? null
+  const freezeFields = [
+    source?.profile,
+    source?.profileDefinitionVersion,
+    source?.resolvedConfigSnapshotEncrypted,
+    source?.resolvedConfigHash,
+    source?.resolvedReportSnapshotEncrypted,
+  ]
+  const presentCount = freezeFields.filter((value) => value != null && value !== '').length
+  if (presentCount > 0 && presentCount < freezeFields.length) {
+    throw BAD_REQUEST('来源认知任务冻结信息不完整，无法复制')
+  }
   const copiedProfile = source?.profile ?? null
   const copiedHash = source?.resolvedConfigHash ?? null
-  const hasCopiedFreeze = Boolean(
-    copiedProfile &&
-    source?.resolvedConfigSnapshotEncrypted &&
-    copiedHash &&
-    source?.resolvedReportSnapshotEncrypted,
-  )
+  const hasCopiedFreeze = presentCount === freezeFields.length
 
   // copy / ensure 不调用 canInstantiateConfig：模板上已有的 configId 是一次性实例化许可。
-  // 复用必须匹配冻结 Profile 与 config hash，禁止把 research 套到已有 standard wrapper。
-  const existing = await tx.cognitiveAssignment.findFirst({
+  const candidates = await tx.cognitiveAssignment.findMany({
     where: {
       createdBy: input.userId,
       courseId: input.courseId,
@@ -487,7 +492,16 @@ export const ensureTeacherPublishedAssignment = async (
       resolvedConfigHash: copiedHash,
     },
   })
-  if (existing) return existing
+  if (hasCopiedFreeze) {
+    const sourceReportHash = hashResolvedConfig(readFrozenReport(source?.resolvedReportSnapshotEncrypted))
+    const existing = candidates.find((candidate) =>
+      candidate.profileDefinitionVersion === source?.profileDefinitionVersion
+      && hashResolvedConfig(readFrozenReport(candidate.resolvedReportSnapshotEncrypted)) === sourceReportHash
+    )
+    if (existing) return existing
+  } else if (candidates[0]) {
+    return candidates[0]
+  }
 
   const course = await tx.course.findUnique({ where: { id: input.courseId } })
   if (!course) throw NOT_FOUND('Course not found')

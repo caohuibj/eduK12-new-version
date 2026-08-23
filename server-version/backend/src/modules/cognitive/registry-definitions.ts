@@ -213,6 +213,14 @@ export const memoryRegistryMetaV11 = {
   metricDefinitions: {
     ...memoryRegistryMeta.metricDefinitions,
     totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary'),
+    perseverativeTrialCount: metric(
+      'perseverativeTrialCount',
+      '持续重复作答试次数',
+      'working_memory',
+      'count',
+      'lower_is_better',
+      'quality',
+    ),
   } as Record<string, MetricDefinition>,
   qualityDefinitions: {
     ...memoryRegistryMeta.qualityDefinitions,
