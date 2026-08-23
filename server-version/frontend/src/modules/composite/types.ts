@@ -154,3 +154,41 @@ export interface CompositeLibraryTemplate {
   description: string | null
   items: Array<{ type: CompositeItemType; position: number; label: string | null }>
 }
+
+export type AnalysisProtocolProfile = 'standard' | 'research'
+
+export interface AnalysisProtocolCatalogItem {
+  key: string
+  version: string
+  status: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
+  name: string
+  description: string
+  recommendedForCreate: boolean
+  profiles: AnalysisProtocolProfile[]
+  estimatedMinutes: Record<AnalysisProtocolProfile, [number, number]>
+  outputDomains: string[]
+  cognitiveSlots: Array<{
+    key: string
+    label: string
+    position: number
+    testType: string
+  }>
+  disabledReason?: string
+}
+
+export interface AnalysisProtocolCatalog {
+  domainDefinitionVersion: string
+  evidenceMappingVersion: string
+  domains: Array<{ key: string; label: string; description: string }>
+  list: AnalysisProtocolCatalogItem[]
+}
+
+export interface AnalysisProtocolSelection {
+  key: string
+  version: string
+  profile: AnalysisProtocolProfile
+}
+
+export interface CompositeAnalysisProtocol extends AnalysisProtocolSelection {
+  frozen: boolean
+}

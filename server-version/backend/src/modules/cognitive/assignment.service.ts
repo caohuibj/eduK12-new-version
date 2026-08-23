@@ -451,6 +451,7 @@ export const ensureTeacherPublishedAssignment = async (
     title: string
     instruction: string | null
     sourceFreeze?: FrozenAssignmentCopy | null
+    profile?: CognitiveProfile
   },
 ) => {
   const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
@@ -465,6 +466,7 @@ export const ensureTeacherPublishedAssignment = async (
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
   const source = input.sourceFreeze ?? null
+  if (source && input.profile) throw BAD_REQUEST('不能同时指定来源冻结信息和新 Profile')
   const freezeFields = [
     source?.profile,
     source?.profileDefinitionVersion,
@@ -476,9 +478,13 @@ export const ensureTeacherPublishedAssignment = async (
   if (presentCount > 0 && presentCount < freezeFields.length) {
     throw BAD_REQUEST('来源认知任务冻结信息不完整，无法复制')
   }
-  const copiedProfile = source?.profile ?? null
-  const copiedHash = source?.resolvedConfigHash ?? null
   const hasCopiedFreeze = presentCount === freezeFields.length
+  const generatedFreeze = input.profile
+    ? freezeDataForWrite(freezeAssignmentProfile({ entry, baseConfig: parsed.data, profile: input.profile }))
+    : null
+  const copiedProfile = source?.profile ?? generatedFreeze?.profile ?? null
+  const copiedHash = source?.resolvedConfigHash ?? generatedFreeze?.resolvedConfigHash ?? null
+  const hasFreeze = hasCopiedFreeze || generatedFreeze !== null
 
   // copy / ensure 不调用 canInstantiateConfig：模板上已有的 configId 是一次性实例化许可。
   const candidates = await tx.cognitiveAssignment.findMany({
@@ -492,10 +498,12 @@ export const ensureTeacherPublishedAssignment = async (
       resolvedConfigHash: copiedHash,
     },
   })
-  if (hasCopiedFreeze) {
-    const sourceReportHash = hashResolvedConfig(readFrozenReport(source?.resolvedReportSnapshotEncrypted))
+  if (hasFreeze) {
+    const expectedDefinitionVersion = source?.profileDefinitionVersion ?? generatedFreeze?.profileDefinitionVersion
+    const expectedReportEncrypted = source?.resolvedReportSnapshotEncrypted ?? generatedFreeze?.resolvedReportSnapshotEncrypted
+    const sourceReportHash = hashResolvedConfig(readFrozenReport(expectedReportEncrypted))
     const existing = candidates.find((candidate) =>
-      candidate.profileDefinitionVersion === source?.profileDefinitionVersion
+      candidate.profileDefinitionVersion === expectedDefinitionVersion
       && hashResolvedConfig(readFrozenReport(candidate.resolvedReportSnapshotEncrypted)) === sourceReportHash
     )
     if (existing) return existing
@@ -514,13 +522,15 @@ export const ensureTeacherPublishedAssignment = async (
         resolvedConfigHash: copiedHash,
         resolvedReportSnapshotEncrypted: source?.resolvedReportSnapshotEncrypted ?? null,
       }
-    : {
-        profile: null,
-        profileDefinitionVersion: null,
-        resolvedConfigSnapshotEncrypted: null,
-        resolvedConfigHash: null,
-        resolvedReportSnapshotEncrypted: null,
-      }
+    : generatedFreeze
+      ? generatedFreeze
+      : {
+          profile: null,
+          profileDefinitionVersion: null,
+          resolvedConfigSnapshotEncrypted: null,
+          resolvedConfigHash: null,
+          resolvedReportSnapshotEncrypted: null,
+        }
 
   return tx.cognitiveAssignment.create({
     data: {

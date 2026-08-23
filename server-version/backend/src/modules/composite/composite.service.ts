@@ -24,11 +24,28 @@ import type {
   AddCompositeItemInput,
   CopyCompositeInput,
   CreateCompositeInput,
+  SetCompositeAnalysisProtocolInput,
   UpdateCompositeInput,
 } from './composite.schema'
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
+import {
+  buildFrozenAnalysisProtocolSnapshot,
+  encryptFrozenAnalysisProtocolSnapshot,
+  getAnalysisProtocolDefinition,
+  readFrozenAnalysisProtocolSnapshot,
+  validateFrozenAnalysisProtocolSnapshot,
+} from '../cognitive-analysis'
+import type {
+  AnalysisProtocolDefinition,
+  CognitiveAnalysisProfile,
+} from '../cognitive-analysis'
 
 type Db = any
+
+const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
+  const { analysisProtocolSnapshotEncrypted: _ignored, ...safe } = row
+  return safe
+}
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN
 
@@ -120,6 +137,12 @@ const assertDraft = (composite: { status: string }) => {
   if (composite.status !== 'DRAFT') throw compositeConflict('只有草稿状态的综合测评可以修改')
 }
 
+const assertCollectionOnlyEditing = (composite: { analysisProtocolKey?: string | null }) => {
+  if (composite.analysisProtocolKey) {
+    throw compositeConflict('固定分析协议的模块不能单独添加、移除或排序')
+  }
+}
+
 const assertCognitiveModuleEnabled = () => {
   if (!config.cognitiveModuleEnabled) throw compositeBadRequest('认知模块未启用')
 }
@@ -127,6 +150,60 @@ const assertCognitiveModuleEnabled = () => {
 const assertSupportedComposite = (composite: { items?: Array<{ type: string }> }) => {
   if (!config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
     throw compositeBadRequest('认知模块未启用')
+  }
+}
+
+const requirePublishedAnalysisProtocol = (key: string, version: string) => {
+  const protocol = getAnalysisProtocolDefinition(key, version)
+  if (!protocol || protocol.status !== 'PUBLISHED') {
+    throw compositeBadRequest('综合分析协议不存在或尚未发布')
+  }
+  return protocol
+}
+
+export const materializeAnalysisProtocol = async (
+  db: Db,
+  input: {
+    compositeId: string
+    courseId: string
+    userId: string
+    profile: CognitiveAnalysisProfile
+    protocol: AnalysisProtocolDefinition
+  },
+) => {
+  if (input.protocol.status !== 'PUBLISHED') throw compositeBadRequest('只能使用已发布的综合分析协议')
+  if (!input.protocol.profiles.includes(input.profile)) throw compositeBadRequest('综合分析协议不支持该 Profile')
+  if (input.protocol.scaleSlots.length > 0) throw compositeBadRequest('当前版本尚未实现量表协议槽位')
+
+  for (const slot of [...input.protocol.cognitiveSlots].sort((a, b) => a.position - b.position)) {
+    const taskConfig = await db.cognitiveTestConfig.findUnique({
+      where: { testType_configVersion: { testType: slot.testType, configVersion: slot.configVersion } },
+    })
+    if (
+      !taskConfig ||
+      taskConfig.status !== 'PUBLISHED' ||
+      taskConfig.engineVersion !== slot.engineVersion ||
+      taskConfig.scoringVersion !== slot.scoringVersion
+    ) {
+      throw compositeBadRequest(`协议任务配置不可用：${slot.label}`)
+    }
+    const assignment = await ensureTeacherPublishedAssignment(db, {
+      userId: input.userId,
+      courseId: input.courseId,
+      configId: taskConfig.id,
+      title: slot.label,
+      instruction: taskConfig.instruction ?? null,
+      profile: input.profile,
+    })
+    await db.compositeAssessmentItem.create({
+      data: {
+        compositeAssessmentId: input.compositeId,
+        type: 'COGNITIVE',
+        position: slot.position,
+        required: true,
+        cognitiveAssignmentId: assignment.id,
+      },
+    })
   }
 }
 
@@ -211,9 +288,11 @@ const mapItemForTeacher = (item: any) => ({
         id: item.cognitiveAssignment.id,
         title: item.cognitiveAssignment.title,
         status: item.cognitiveAssignment.status,
+        profile: item.cognitiveAssignment.profile ?? null,
         config: {
           id: item.cognitiveAssignment.config.id,
           testType: item.cognitiveAssignment.config.testType,
+          configVersion: item.cognitiveAssignment.config.configVersion,
           name: item.cognitiveAssignment.config.name,
           engineVersion: item.cognitiveAssignment.config.engineVersion,
           scoringVersion: item.cognitiveAssignment.config.scoringVersion,
@@ -328,19 +407,43 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
   const existing = await prisma.compositeAssessment.findUnique({ where: { code: input.code } })
   if (existing) throw compositeConflict('综合测评编码已存在')
 
-  return prisma.compositeAssessment.create({
-    data: {
-      code: input.code,
-      name: input.name,
-      description: input.description ?? null,
-      instruction: input.instruction ?? null,
-      courseId: input.courseId ?? null,
-      createdBy: userId,
-      opensAt: parseDate(input.opensAt),
-      expiresAt: parseDate(input.expiresAt),
-      maxAttempts: input.maxAttempts,
-      publicEnabled: input.publicEnabled,
-    },
+  const selection = input.analysisProtocol ?? null
+  const protocol = selection
+    ? requirePublishedAnalysisProtocol(selection.key, selection.version)
+    : null
+  if (protocol) {
+    assertCognitiveModuleEnabled()
+    if (!input.courseId) throw compositeBadRequest('综合分析协议必须绑定课程')
+  }
+
+  return prisma.$transaction(async (tx: Db) => {
+    const composite = await tx.compositeAssessment.create({
+      data: {
+        code: input.code,
+        name: input.name,
+        description: input.description ?? null,
+        instruction: input.instruction ?? null,
+        courseId: input.courseId ?? null,
+        createdBy: userId,
+        opensAt: parseDate(input.opensAt),
+        expiresAt: parseDate(input.expiresAt),
+        maxAttempts: input.maxAttempts,
+        publicEnabled: input.publicEnabled,
+        analysisProtocolKey: protocol?.key ?? null,
+        analysisProtocolVersion: protocol?.version ?? null,
+        analysisProtocolSnapshotEncrypted: null,
+      },
+    })
+    if (protocol && selection && input.courseId) {
+      await materializeAnalysisProtocol(tx, {
+        compositeId: composite.id,
+        courseId: input.courseId,
+        userId,
+        profile: selection.profile,
+        protocol,
+      })
+    }
+    return withoutAnalysisProtocolCipher(composite)
   })
 }
 
@@ -362,10 +465,12 @@ export const listComposites = async (userId: string, role: UserRole) => {
               id: true,
               title: true,
               status: true,
+              profile: true,
               config: {
                 select: {
                   id: true,
                   testType: true,
+                  configVersion: true,
                   name: true,
                   engineVersion: true,
                   scoringVersion: true,
@@ -382,7 +487,11 @@ export const listComposites = async (userId: string, role: UserRole) => {
     : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
   const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id))
   return supportedList.map((item: any) => {
-    const { _count: _ignoredCount, ...rest } = item
+    const {
+      _count: _ignoredCount,
+      analysisProtocolSnapshotEncrypted: _ignoredProtocolSnapshot,
+      ...rest
+    } = item
     return {
       ...rest,
       copyable: Boolean(item.copyable),
@@ -424,6 +533,16 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
       : null,
     canSetCopyable: canSetCopyableFor(composite, role),
     publishedAt: composite.publishedAt,
+    analysisProtocol: composite.analysisProtocolKey
+      ? {
+          key: composite.analysisProtocolKey,
+          version: composite.analysisProtocolVersion,
+          profile:
+            composite.items.find((item: any) => item.type === 'COGNITIVE')?.cognitiveAssignment?.profile
+            ?? null,
+          frozen: Boolean(composite.analysisProtocolSnapshotEncrypted),
+        }
+      : null,
     items: composite.items.map(mapItemForTeacher),
     attemptCounts: counts.get(composite.id) ?? emptyAttemptCounts(),
   }
@@ -483,6 +602,30 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
   const selfCopy = source.createdBy === userId
   const libraryCopy = isAdminLibraryTemplate(source)
   if (!selfCopy && !libraryCopy) throw compositeForbidden('不能复制此综合测评')
+
+  const hasProtocolKey = Boolean(source.analysisProtocolKey)
+  const hasProtocolVersion = Boolean(source.analysisProtocolVersion)
+  const hasProtocolSnapshot = Boolean(source.analysisProtocolSnapshotEncrypted)
+  if (
+    hasProtocolKey !== hasProtocolVersion ||
+    (hasProtocolSnapshot && !hasProtocolKey) ||
+    (source.status === 'PUBLISHED' && hasProtocolKey && !hasProtocolSnapshot)
+  ) {
+    throw compositeBadRequest('来源综合测评的分析协议冻结信息不完整')
+  }
+  if (hasProtocolSnapshot) {
+    try {
+      const snapshot = readFrozenAnalysisProtocolSnapshot(source.analysisProtocolSnapshotEncrypted as string)
+      validateFrozenAnalysisProtocolSnapshot(
+        snapshot,
+        source.analysisProtocolKey as string,
+        source.analysisProtocolVersion as string,
+        source.items,
+      )
+    } catch (err) {
+      throw compositeBadRequest(err instanceof Error ? err.message : '来源综合分析协议快照不可用')
+    }
+  }
 
   const hasCognitive = source.items.some((item) => item.type === 'COGNITIVE')
   if (hasCognitive) assertCognitiveModuleEnabled()
@@ -544,7 +687,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
       }
     }
 
-    return tx.compositeAssessment.create({
+    const copied = await tx.compositeAssessment.create({
       data: {
         code,
         name,
@@ -557,10 +700,14 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         publicEnabled: false,
         copyable: false,
         copiedFromId: source.id,
+        analysisProtocolKey: source.analysisProtocolKey ?? null,
+        analysisProtocolVersion: source.analysisProtocolVersion ?? null,
+        analysisProtocolSnapshotEncrypted: source.analysisProtocolSnapshotEncrypted ?? null,
         items: { create: itemData as any },
       },
       include: { items: { orderBy: { position: 'asc' } } },
     })
+    return withoutAnalysisProtocolCipher(copied)
   })
 }
 
@@ -673,7 +820,7 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
   if ((input.publicEnabled ?? existing.publicEnabled) && !nextExpiresAt) {
     throw compositeBadRequest('公开链接必须设置有效期')
   }
-  return prisma.compositeAssessment.update({
+  const updated = await prisma.compositeAssessment.update({
     where: { id },
     data: {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -687,6 +834,68 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
       ...(input.copyable !== undefined ? { copyable: input.copyable } : {}),
     },
   })
+  return withoutAnalysisProtocolCipher(updated)
+}
+
+export const setCompositeAnalysisProtocol = async (
+  userId: string,
+  role: UserRole,
+  id: string,
+  input: SetCompositeAnalysisProtocolInput,
+) => {
+  assertTeacher(role)
+  const composite = await loadComposite(id, true)
+  assertOwner(composite, userId, role)
+  assertDraft(composite)
+
+  const hasKey = Boolean(composite.analysisProtocolKey)
+  const hasVersion = Boolean(composite.analysisProtocolVersion)
+  const hasSnapshot = Boolean(composite.analysisProtocolSnapshotEncrypted)
+  if (hasKey !== hasVersion || (hasSnapshot && !hasKey)) {
+    throw compositeBadRequest('综合测评的分析协议冻结信息不完整')
+  }
+
+  const selection = input.analysisProtocol
+  if (!selection) {
+    const updated = await prisma.compositeAssessment.update({
+      where: { id },
+      data: {
+        analysisProtocolKey: null,
+        analysisProtocolVersion: null,
+        analysisProtocolSnapshotEncrypted: null,
+      },
+    })
+    return withoutAnalysisProtocolCipher(updated)
+  }
+
+  assertCognitiveModuleEnabled()
+  if (!composite.courseId) throw compositeBadRequest('综合分析协议必须绑定课程')
+  const protocol = requirePublishedAnalysisProtocol(selection.key, selection.version)
+  if (!hasKey && composite.items.length > 0) {
+    throw compositeConflict('请选择空白草稿启用固定分析协议，或先移除现有模块')
+  }
+
+  return prisma.$transaction(async (tx: Db) => {
+    if (hasKey) {
+      await tx.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: id } })
+    }
+    const updated = await tx.compositeAssessment.update({
+      where: { id },
+      data: {
+        analysisProtocolKey: protocol.key,
+        analysisProtocolVersion: protocol.version,
+        analysisProtocolSnapshotEncrypted: null,
+      },
+    })
+    await materializeAnalysisProtocol(tx, {
+      compositeId: id,
+      courseId: composite.courseId,
+      userId,
+      profile: selection.profile,
+      protocol,
+    })
+    return withoutAnalysisProtocolCipher(updated)
+  })
 }
 
 export const addItem = async (userId: string, role: UserRole, compositeId: string, input: AddCompositeItemInput) => {
@@ -694,6 +903,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
   const composite = await loadComposite(compositeId, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
+  assertCollectionOnlyEditing(composite)
   await assertValidItem(input, userId, role, composite)
   const position = input.position ?? (composite.items.length ? Math.max(...composite.items.map((item: any) => item.position)) + 1 : 0)
   if (composite.items.some((item: any) => item.position === position)) {
@@ -720,6 +930,7 @@ export const removeItem = async (userId: string, role: UserRole, compositeId: st
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
   assertDraft(composite)
+  assertCollectionOnlyEditing(composite)
   const item = await prisma.compositeAssessmentItem.findUnique({ where: { id: itemId } })
   if (!item || item.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评模块不存在')
   await prisma.compositeAssessmentItem.delete({ where: { id: itemId } })
@@ -730,6 +941,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   const composite = await loadComposite(compositeId, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
+  assertCollectionOnlyEditing(composite)
   if (items.length !== composite.items.length) throw compositeBadRequest('必须同时提交全部模块的排序')
   const known = new Set(composite.items.map((item: any) => item.id))
   const itemIds = new Set<string>()
@@ -795,10 +1007,50 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     }
   }
 
-  return prisma.compositeAssessment.update({
+  const hasProtocolKey = Boolean(composite.analysisProtocolKey)
+  const hasProtocolVersion = Boolean(composite.analysisProtocolVersion)
+  const hasProtocolSnapshot = Boolean(composite.analysisProtocolSnapshotEncrypted)
+  if (hasProtocolKey !== hasProtocolVersion || (hasProtocolSnapshot && !hasProtocolKey)) {
+    throw compositeBadRequest('综合测评的分析协议冻结信息不完整')
+  }
+
+  let analysisProtocolSnapshotEncrypted: string | null = null
+  if (hasProtocolKey && hasProtocolVersion) {
+    try {
+      if (hasProtocolSnapshot) {
+        const snapshot = readFrozenAnalysisProtocolSnapshot(
+          composite.analysisProtocolSnapshotEncrypted as string,
+        )
+        validateFrozenAnalysisProtocolSnapshot(
+          snapshot,
+          composite.analysisProtocolKey as string,
+          composite.analysisProtocolVersion as string,
+          composite.items,
+        )
+        analysisProtocolSnapshotEncrypted = composite.analysisProtocolSnapshotEncrypted
+      } else {
+        const protocol = requirePublishedAnalysisProtocol(
+          composite.analysisProtocolKey as string,
+          composite.analysisProtocolVersion as string,
+        )
+        const snapshot = buildFrozenAnalysisProtocolSnapshot(protocol, composite.items)
+        analysisProtocolSnapshotEncrypted = encryptFrozenAnalysisProtocolSnapshot(snapshot)
+      }
+    } catch (err) {
+      if (err instanceof CompositeServiceError) throw err
+      throw compositeBadRequest(err instanceof Error ? err.message : '综合分析协议校验失败')
+    }
+  }
+
+  const published = await prisma.compositeAssessment.update({
     where: { id },
-    data: { status: 'PUBLISHED', publishedAt: new Date() },
+    data: {
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
+      analysisProtocolSnapshotEncrypted,
+    },
   })
+  return withoutAnalysisProtocolCipher(published)
 }
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {

@@ -3,6 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronDown, ChevronUp, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
 import apiClient from '../../api/client'
 import { compositeApi } from '../../modules/composite/api'
+import type {
+  AnalysisProtocolCatalogItem,
+  AnalysisProtocolProfile,
+  CompositeAnalysisProtocol,
+} from '../../modules/composite/types'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 
 const pad = (value: number) => String(value).padStart(2, '0')
@@ -32,6 +37,10 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [detail, setDetail] = useState<any>(null)
   const [scales, setScales] = useState<any[]>([])
   const [cognitiveAssignments, setCognitiveAssignments] = useState<any[]>([])
+  const [protocols, setProtocols] = useState<AnalysisProtocolCatalogItem[]>([])
+  const [protocolChoice, setProtocolChoice] = useState('')
+  const [protocolProfile, setProtocolProfile] = useState<AnalysisProtocolProfile>('standard')
+  const [savingProtocol, setSavingProtocol] = useState(false)
   const [type, setType] = useState<'SCALE' | 'COGNITIVE' | 'FORM'>('SCALE')
   const [selectedId, setSelectedId] = useState('')
   const [formLabel, setFormLabel] = useState('')
@@ -47,13 +56,19 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const load = async () => {
     try {
-      const [detailResponse, scaleResponse, tokenResponse] = await Promise.all([
+      const [detailResponse, scaleResponse, tokenResponse, protocolResponse] = await Promise.all([
         compositeApi.detail(id),
         apiClient.get<any>('/scales?status=PUBLISHED&page=1&pageSize=100'),
         compositeApi.listTokens(id),
+        compositeApi.listAnalysisProtocols(),
       ])
       if (detailResponse.code !== 0 || !detailResponse.data) throw new Error(detailResponse.message || '综合测评不存在')
       setDetail(detailResponse.data)
+      const currentProtocol = detailResponse.data.analysisProtocol as CompositeAnalysisProtocol | null | undefined
+      setProtocolChoice(currentProtocol ? `${currentProtocol.key}/${currentProtocol.version}` : '')
+      setProtocolProfile(currentProtocol?.profile === 'research' ? 'research' : 'standard')
+      if (protocolResponse.code === 0 && protocolResponse.data) setProtocols(protocolResponse.data.list)
+      else setError(protocolResponse.message || '无法加载综合分析协议')
       setTokenExpiresAt((current) => current || suggestedTokenExpiry(detailResponse.data.expiresAt))
       const scaleData = Array.isArray(scaleResponse.data) ? scaleResponse.data : scaleResponse.data?.list || scaleResponse.data?.data?.list || []
       setScales(scaleData)
@@ -75,6 +90,30 @@ const CompositeAssessmentEdit: React.FC = () => {
   }
 
   useEffect(() => { void load() }, [id])
+
+  const saveAnalysisProtocol = async () => {
+    const selected = protocols.find((protocol) => `${protocol.key}/${protocol.version}` === protocolChoice)
+    const current = detail?.analysisProtocol as CompositeAnalysisProtocol | null | undefined
+    if (protocolChoice && !selected) {
+      setError('当前协议版本已停止新建，可保留现状或切换为“仅收集”')
+      return
+    }
+    if (!protocolChoice && current && !confirm('切换为“仅收集”后，现有任务会保留，但不再生成综合分析报告。确定继续吗？')) return
+    try {
+      setSavingProtocol(true)
+      setError(null)
+      const response = await compositeApi.setAnalysisProtocol(
+        id,
+        selected ? { key: selected.key, version: selected.version, profile: protocolProfile } : null,
+      )
+      if (response.code !== 0) throw new Error(response.message || '更新报告模式失败')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err, '更新报告模式失败'))
+    } finally {
+      setSavingProtocol(false)
+    }
+  }
 
   const addItem = async () => {
     try {
@@ -219,6 +258,12 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const isDraft = detail.status === 'DRAFT'
   const isLibraryCourse = Boolean(detail.course?.isLibrary)
+  const analysisProtocol = detail.analysisProtocol as CompositeAnalysisProtocol | null | undefined
+  const protocolLocked = Boolean(analysisProtocol)
+  const selectedProtocol = protocols.find((protocol) => `${protocol.key}/${protocol.version}` === protocolChoice)
+  const currentProtocolId = analysisProtocol ? `${analysisProtocol.key}/${analysisProtocol.version}` : ''
+  const protocolSelectionChanged = protocolChoice !== currentProtocolId
+    || (Boolean(analysisProtocol) && protocolProfile !== analysisProtocol?.profile)
   const itemLabel = (item: any) =>
     item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.form?.label
 
@@ -273,6 +318,88 @@ const CompositeAssessmentEdit: React.FC = () => {
         </div>
       )}
       <div className="card p-6 mb-5">
+        <h2 className="font-semibold mb-2">报告模式</h2>
+        {analysisProtocol ? (
+          <p className="text-sm text-gray-600 mb-3">
+            固定协议：{selectedProtocol?.name ?? analysisProtocol.key} · v{analysisProtocol.version} ·
+            {analysisProtocol.profile === 'research' ? ' 科研档' : ' 标准档'}
+            {analysisProtocol.frozen ? ' · 已随发布冻结' : ''}
+          </p>
+        ) : (
+          <p className="text-sm text-gray-600 mb-3">仅收集：可以自由组合模块，结果只显示各单项，不生成综合分析报告。</p>
+        )}
+        {isDraft ? (
+          <div className="space-y-3">
+            <select
+              aria-label="编辑报告模式"
+              value={protocolChoice}
+              onChange={(e) => {
+                const protocol = protocols.find((item) => `${item.key}/${item.version}` === e.target.value)
+                setProtocolChoice(e.target.value)
+                if (protocol && !protocol.profiles.includes(protocolProfile)) {
+                  setProtocolProfile(protocol.profiles[0])
+                }
+              }}
+              className="block w-full border rounded px-3 py-2 text-base text-gray-800"
+            >
+              <option value="">仅收集：自由组合，只显示单项结果</option>
+              {analysisProtocol && !protocols.some((protocol) => `${protocol.key}/${protocol.version}` === currentProtocolId) && (
+                <option value={currentProtocolId} disabled>{analysisProtocol.key} · v{analysisProtocol.version}（保留现状）</option>
+              )}
+              {protocols.map((protocol) => (
+                <option
+                  key={`${protocol.key}/${protocol.version}`}
+                  value={`${protocol.key}/${protocol.version}`}
+                  disabled={protocol.status !== 'PUBLISHED'}
+                >
+                  {protocol.name} · v{protocol.version}{protocol.status !== 'PUBLISHED' ? '（尚未开放）' : ''}
+                </option>
+              ))}
+            </select>
+            {selectedProtocol && (
+              <div className="rounded border border-blue-100 bg-blue-50 p-3 text-sm text-gray-600">
+                <p>{selectedProtocol.description}</p>
+                <p className="mt-2">固定任务：{[...selectedProtocol.cognitiveSlots]
+                  .sort((a, b) => a.position - b.position)
+                  .map((slot) => slot.label)
+                  .join(' · ')}</p>
+                <label className="mt-3 block">
+                  测验档位
+                  <select
+                    aria-label="编辑测验档位"
+                    value={protocolProfile}
+                    onChange={(e) => setProtocolProfile(e.target.value as AnalysisProtocolProfile)}
+                    className="mt-1 block w-full border rounded bg-white px-3 py-2 text-base text-gray-800"
+                  >
+                    {selectedProtocol.profiles.map((profile) => {
+                      const minutes = selectedProtocol.estimatedMinutes[profile]
+                      return <option key={profile} value={profile}>{profile === 'standard' ? '标准档' : '科研档'} · 约 {minutes[0]}–{minutes[1]} 分钟</option>
+                    })}
+                  </select>
+                </label>
+              </div>
+            )}
+            {!analysisProtocol && detail.items?.length > 0 && protocolChoice && (
+              <p className="text-xs text-amber-600">已有自由组合模块的草稿不能直接启用固定协议；请先移除全部模块。</p>
+            )}
+            <button
+              onClick={() => void saveAnalysisProtocol()}
+              disabled={
+                savingProtocol
+                || !protocolSelectionChanged
+                || Boolean(!analysisProtocol && detail.items?.length > 0 && protocolChoice)
+                || Boolean(protocolChoice && !selectedProtocol)
+              }
+              className="btn-secondary"
+            >
+              {savingProtocol ? '保存中...' : '保存报告模式'}
+            </button>
+          </div>
+        ) : (
+          <p className="text-xs text-gray-500">发布后报告模式和协议版本不可更改。</p>
+        )}
+      </div>
+      <div className="card p-6 mb-5">
         <h2 className="font-semibold mb-4">测评顺序</h2>
         {detail.items?.length ? (
           <div className="space-y-2">
@@ -283,7 +410,7 @@ const CompositeAssessmentEdit: React.FC = () => {
                   <strong>{itemLabel(item)}</strong>
                   <span className="text-xs text-gray-400 ml-2">{item.type}</span>
                 </div>
-                {isDraft && (
+                {isDraft && !protocolLocked && (
                   <div className="flex items-center gap-1">
                     <button onClick={() => void moveItem(index, -1)} disabled={index === 0} className="text-gray-500 disabled:text-gray-200" aria-label="上移">
                       <ChevronUp className="w-4 h-4" />
@@ -302,8 +429,11 @@ const CompositeAssessmentEdit: React.FC = () => {
         ) : (
           <p className="text-gray-500">还没有模块</p>
         )}
+        {isDraft && protocolLocked && (
+          <p className="text-xs text-blue-700 mt-3">固定协议的任务、必答属性和顺序不可单独修改。</p>
+        )}
       </div>
-      {isDraft && (
+      {isDraft && !protocolLocked && (
         <div className="card p-6 mb-5">
           <h2 className="font-semibold mb-4">添加模块</h2>
           <div className="flex gap-2 mb-3">

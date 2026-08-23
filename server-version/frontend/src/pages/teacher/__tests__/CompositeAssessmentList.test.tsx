@@ -8,6 +8,7 @@ const { mockNavigate, mockGet, mockCompositeApi, authState } = vi.hoisted(() => 
   mockCompositeApi: {
     list: vi.fn(),
     listLibrary: vi.fn(),
+    listAnalysisProtocols: vi.fn(),
     copy: vi.fn(),
     create: vi.fn(),
   },
@@ -68,6 +69,11 @@ describe('CompositeAssessmentList library tab', () => {
       },
     })
     mockCompositeApi.copy.mockResolvedValue({ code: 0, data: { id: 'draft-99' } })
+    mockCompositeApi.create.mockResolvedValue({ code: 0, data: { id: 'created-1' } })
+    mockCompositeApi.listAnalysisProtocols.mockResolvedValue({
+      code: 0,
+      data: { domainDefinitionVersion: '1.0.0', evidenceMappingVersion: '1.0.0', domains: [], list: [] },
+    })
     mockGet.mockResolvedValue({
       code: 0,
       data: {
@@ -153,5 +159,49 @@ describe('CompositeAssessmentList library tab', () => {
     expect(await screen.findByText('库上的模板')).toBeInTheDocument()
     expect(screen.getByText('库课程')).toBeInTheDocument()
     expect(screen.getByText('可复制')).toBeInTheDocument()
+  })
+
+  it('creates a fixed published protocol with an explicit profile and course', async () => {
+    mockCompositeApi.listAnalysisProtocols.mockResolvedValue({
+      code: 0,
+      data: {
+        domainDefinitionVersion: '1.0.0',
+        evidenceMappingVersion: '1.0.0',
+        domains: [],
+        list: [{
+          key: 'attention_v1',
+          version: '1.0.0',
+          status: 'PUBLISHED',
+          name: '注意与稳定性',
+          description: '固定注意任务',
+          recommendedForCreate: true,
+          profiles: ['standard', 'research'],
+          estimatedMinutes: { standard: [10, 15], research: [20, 30] },
+          outputDomains: ['sustained_attention'],
+          cognitiveSlots: [{ key: 'cpt', label: '持续注意', position: 0, testType: 'cpt' }],
+        }],
+      },
+    })
+
+    const user = userEvent.setup()
+    render(<CompositeAssessmentList />)
+    await screen.findByText('我的测评')
+    await user.click(screen.getByRole('button', { name: '新建综合测评' }))
+    await user.type(screen.getByPlaceholderText('编码'), 'ATTN')
+    await user.type(screen.getByPlaceholderText('名称'), '注意测评')
+    await user.selectOptions(screen.getByLabelText(/绑定课程/), 'c1')
+    await user.selectOptions(screen.getByLabelText('报告模式'), 'attention_v1/1.0.0')
+    await user.selectOptions(screen.getByLabelText('测验档位'), 'research')
+    await user.click(screen.getByRole('button', { name: '保存' }))
+
+    await waitFor(() => {
+      expect(mockCompositeApi.create).toHaveBeenCalledWith(expect.objectContaining({
+        code: 'ATTN',
+        name: '注意测评',
+        courseId: 'c1',
+        analysisProtocol: { key: 'attention_v1', version: '1.0.0', profile: 'research' },
+      }))
+    })
+    expect(mockNavigate).toHaveBeenCalledWith('/composite-assessments/created-1')
   })
 })

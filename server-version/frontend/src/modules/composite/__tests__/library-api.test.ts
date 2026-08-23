@@ -5,6 +5,7 @@ const { mockClient } = vi.hoisted(() => ({
     get: vi.fn(),
     post: vi.fn(),
     patch: vi.fn(),
+    put: vi.fn(),
   },
 }))
 
@@ -17,6 +18,7 @@ beforeEach(() => {
   mockClient.get.mockResolvedValue({ code: 0, message: 'ok', data: { list: [] } })
   mockClient.post.mockResolvedValue({ code: 0, message: 'ok', data: { id: 'draft-1' } })
   mockClient.patch.mockResolvedValue({ code: 0, message: 'ok', data: {} })
+  mockClient.put.mockResolvedValue({ code: 0, message: 'ok', data: {} })
 })
 
 describe('composite library api', () => {
@@ -38,5 +40,16 @@ describe('composite library api', () => {
   it('PATCH /composite-assessments/:id with copyable', async () => {
     await compositeApi.update('tpl-1', { copyable: true })
     expect(mockClient.patch).toHaveBeenCalledWith('/composite-assessments/tpl-1', { copyable: true })
+  })
+
+  it('lists and explicitly sets a fixed analysis protocol', async () => {
+    await compositeApi.listAnalysisProtocols()
+    expect(mockClient.get).toHaveBeenCalledWith('/composite-assessments/analysis-protocols')
+
+    const selection = { key: 'attention_v1', version: '1.0.0', profile: 'standard' as const }
+    await compositeApi.setAnalysisProtocol('tpl-1', selection)
+    expect(mockClient.put).toHaveBeenCalledWith('/composite-assessments/tpl-1/analysis-protocol', {
+      analysisProtocol: selection,
+    })
   })
 })

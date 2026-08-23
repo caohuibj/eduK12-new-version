@@ -4,7 +4,12 @@ import { ClipboardList, Copy, Plus, Settings } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { compositeApi } from '../../modules/composite/api'
-import type { CompositeLibraryTemplate, CompositeTeacherListItem } from '../../modules/composite/types'
+import type {
+  AnalysisProtocolCatalogItem,
+  AnalysisProtocolProfile,
+  CompositeLibraryTemplate,
+  CompositeTeacherListItem,
+} from '../../modules/composite/types'
 
 type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean; creatorId?: string }
 
@@ -36,6 +41,7 @@ const CompositeAssessmentList: React.FC = () => {
   const [list, setList] = useState<CompositeTeacherListItem[]>([])
   const [library, setLibrary] = useState<CompositeLibraryTemplate[]>([])
   const [courses, setCourses] = useState<CourseOption[]>([])
+  const [protocols, setProtocols] = useState<AnalysisProtocolCatalogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -49,19 +55,23 @@ const CompositeAssessmentList: React.FC = () => {
     courseId: '',
     publicEnabled: false,
     expiresAt: '',
+    protocolId: '',
+    protocolProfile: 'standard' as AnalysisProtocolProfile,
   })
   const [error, setError] = useState<string | null>(null)
 
   const teachingCourses = courses.filter((course) => !course.isLibrary && course.creatorId === user?.id)
   const createCourses = isAdmin ? courses : teachingCourses
   const selectedCreateCourse = createCourses.find((course) => course.id === form.courseId)
+  const selectedProtocol = protocols.find((protocol) => `${protocol.key}/${protocol.version}` === form.protocolId)
 
   const load = async () => {
     try {
-      const [compositeRes, libraryRes, coursesRes] = await Promise.all([
+      const [compositeRes, libraryRes, coursesRes, protocolRes] = await Promise.all([
         compositeApi.list(),
         compositeApi.listLibrary(),
         apiClient.get<{ list: CourseOption[] }>('/courses?status=all&page=1&pageSize=100'),
+        compositeApi.listAnalysisProtocols(),
       ])
       if (compositeRes.code === 0 && compositeRes.data) setList(compositeRes.data.list)
       else setError(compositeRes.message || '获取综合测评列表失败')
@@ -69,6 +79,8 @@ const CompositeAssessmentList: React.FC = () => {
       else setError((current) => current || libraryRes.message || '获取管理员模板失败')
       const courseList = coursesRes.code === 0 ? (coursesRes.data?.list || []) : []
       setCourses(courseList)
+      if (protocolRes.code === 0 && protocolRes.data) setProtocols(protocolRes.data.list)
+      else setError((current) => current || protocolRes.message || '获取综合分析协议失败')
       const selectable = isAdmin ? courseList : courseList.filter((course) => !course.isLibrary)
       if (selectable.length === 1) {
         setForm((prev) => prev.courseId ? prev : { ...prev, courseId: selectable[0].id })
@@ -95,10 +107,23 @@ const CompositeAssessmentList: React.FC = () => {
       if (form.publicEnabled && !form.expiresAt) {
         throw new Error('请填写公开作答的有效期')
       }
+      if (selectedProtocol && !form.courseId) {
+        throw new Error('综合分析协议必须绑定课程')
+      }
       const response = await compositeApi.create({
-        ...form,
+        code: form.code,
+        name: form.name,
+        description: form.description,
+        publicEnabled: form.publicEnabled,
         courseId: form.courseId || null,
         expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
+        analysisProtocol: selectedProtocol
+          ? {
+              key: selectedProtocol.key,
+              version: selectedProtocol.version,
+              profile: form.protocolProfile,
+            }
+          : null,
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '创建失败')
       navigate(`/composite-assessments/${response.data.id}`)
@@ -200,6 +225,68 @@ const CompositeAssessmentList: React.FC = () => {
             {selectedCreateCourse?.isLibrary && (
               <p className="text-xs text-amber-600 md:col-span-2">库课程上的综合测评不能发给学生作答，只作为管理员模板。</p>
             )}
+            <label className="md:col-span-2 text-sm text-gray-600">
+              报告模式
+              <select
+                aria-label="报告模式"
+                className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
+                value={form.protocolId}
+                onChange={(e) => {
+                  const protocol = protocols.find((item) => `${item.key}/${item.version}` === e.target.value)
+                  const profile = protocol?.profiles.includes(form.protocolProfile)
+                    ? form.protocolProfile
+                    : protocol?.profiles[0] ?? 'standard'
+                  setForm({ ...form, protocolId: e.target.value, protocolProfile: profile })
+                }}
+              >
+                <option value="">仅收集：自由添加模块，只显示单项结果</option>
+                {protocols.map((protocol) => (
+                  <option
+                    key={`${protocol.key}/${protocol.version}`}
+                    value={`${protocol.key}/${protocol.version}`}
+                    disabled={protocol.status !== 'PUBLISHED'}
+                  >
+                    {protocol.name} · v{protocol.version}{protocol.status !== 'PUBLISHED' ? '（尚未开放）' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {selectedProtocol && (
+              <div className="md:col-span-2 rounded border border-blue-100 bg-blue-50 p-3 text-sm">
+                <p className="font-medium text-gray-800">{selectedProtocol.name}</p>
+                <p className="text-gray-600 mt-1">{selectedProtocol.description}</p>
+                <p className="text-gray-600 mt-2">
+                  固定任务：{[...selectedProtocol.cognitiveSlots]
+                    .sort((a, b) => a.position - b.position)
+                    .map((slot) => slot.label)
+                    .join(' · ')}
+                </p>
+                <label className="mt-3 block text-gray-600">
+                  测验档位
+                  <select
+                    aria-label="测验档位"
+                    className="mt-1 block w-full border rounded bg-white px-3 py-2 text-base text-gray-800"
+                    value={form.protocolProfile}
+                    onChange={(e) => setForm({ ...form, protocolProfile: e.target.value as AnalysisProtocolProfile })}
+                  >
+                    {selectedProtocol.profiles.map((profile) => {
+                      const minutes = selectedProtocol.estimatedMinutes[profile]
+                      return (
+                        <option key={profile} value={profile}>
+                          {profile === 'standard' ? '标准档' : '科研档'} · 约 {minutes[0]}–{minutes[1]} 分钟
+                        </option>
+                      )
+                    })}
+                  </select>
+                </label>
+                <p className="text-xs text-blue-700 mt-2">创建后任务及顺序固定；发布时冻结协议和各任务版本。</p>
+              </div>
+            )}
+            {!selectedProtocol && protocols.some((protocol) => protocol.status !== 'PUBLISHED') && (
+              <p className="md:col-span-2 text-xs text-gray-500">
+                尚未开放的分析协议会在任务和分析规则通过发布验收后启用。
+              </p>
+            )}
             <textarea
               className="border rounded px-3 py-2 md:col-span-2"
               placeholder="说明"
@@ -229,7 +316,7 @@ const CompositeAssessmentList: React.FC = () => {
           <div className="mt-4 flex gap-2">
             <button
               onClick={() => void create()}
-              disabled={saving || !form.code.trim() || !form.name.trim()}
+              disabled={saving || !form.code.trim() || !form.name.trim() || Boolean(selectedProtocol && !form.courseId)}
               className="btn-primary"
             >
               {saving ? '保存中...' : '保存'}
