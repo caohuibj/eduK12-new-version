@@ -26,6 +26,7 @@ import ImageLibrary from './pages/ImageLibrary'
 import DocumentLibrary from './pages/DocumentLibrary'
 import UserList from './pages/UserList'
 import TeacherCodeList from './pages/TeacherCodeList'
+import MaterialGrants from './pages/admin/MaterialGrants'
 import TeacherProfile from './pages/teacher/TeacherProfile'
 import ScaleList from './pages/ScaleList'
 import ScaleEdit from './pages/ScaleEdit'
@@ -508,6 +509,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute roles={['ADMIN']}>
                 <TeacherCodeList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/material-grants"
+            element={
+              <ProtectedRoute roles={['ADMIN']}>
+                <MaterialGrants />
               </ProtectedRoute>
             }
           />

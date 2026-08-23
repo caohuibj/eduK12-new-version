@@ -55,6 +55,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: '/documents', label: '文档库', icon: <FileText className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/users', label: '用户管理', icon: <Users className="w-5 h-5" />, roles: ['ADMIN'] },
     { path: '/teacher-codes', label: '教师码', icon: <Key className="w-5 h-5" />, roles: ['ADMIN'] },
+    { path: '/admin/material-grants', label: '材料授权', icon: <Key className="w-5 h-5" />, roles: ['ADMIN'] },
   ]
 
   const filteredMenuItems = menuItems.filter(

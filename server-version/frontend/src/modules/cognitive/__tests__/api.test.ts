@@ -77,4 +77,9 @@ describe('cognitive api wrapper', () => {
       instruction: '仅综合测评使用',
     })
   })
+
+  it('PATCH /cognitive/configs/:id/access-policy', async () => {
+    await cognitiveApi.updateConfigAccessPolicy('cfg-1', 'GRANT')
+    expect(mockClient.patch).toHaveBeenCalledWith('/cognitive/configs/cfg-1/access-policy', { accessPolicy: 'GRANT' })
+  })
 })

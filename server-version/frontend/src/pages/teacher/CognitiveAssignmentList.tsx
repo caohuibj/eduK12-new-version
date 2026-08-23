@@ -4,9 +4,16 @@ import { Brain, Plus, Settings } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { cognitiveApi } from '../../modules/cognitive/api'
+import MaterialGrantModal from '../../components/MaterialGrantModal'
 
 type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean }
-type ConfigOption = { id: string; testType: string; configVersion: string; name: string }
+type ConfigOption = {
+  id: string
+  testType: string
+  configVersion: string
+  name: string
+  accessPolicy?: 'OPEN' | 'GRANT'
+}
 type AssignmentRow = {
   id: string
   title: string
@@ -34,6 +41,7 @@ const CognitiveAssignmentList: React.FC = () => {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [grantConfig, setGrantConfig] = useState<ConfigOption | null>(null)
   const [form, setForm] = useState({
     title: '',
     courseId: '',
@@ -44,6 +52,7 @@ const CognitiveAssignmentList: React.FC = () => {
 
   const selectableCourses = isAdmin ? courses : courses.filter((course) => !course.isLibrary)
   const selectedCourse = selectableCourses.find((course) => course.id === form.courseId)
+  const selectedConfig = configs.find((config) => config.id === form.configId)
 
   const load = async () => {
     try {
@@ -86,6 +95,20 @@ const CognitiveAssignmentList: React.FC = () => {
     }
   }
 
+  const changeAccessPolicy = async (accessPolicy: 'OPEN' | 'GRANT') => {
+    if (!selectedConfig) return
+    try {
+      setError(null)
+      const response = await cognitiveApi.updateConfigAccessPolicy(selectedConfig.id, accessPolicy)
+      if (response.code !== 0) throw new Error(response.message || '更新访问策略失败')
+      setConfigs((current) => current.map((config) => (
+        config.id === selectedConfig.id ? { ...config, accessPolicy } : config
+      )))
+    } catch (err) {
+      setError((err as { message?: string }).message || '更新访问策略失败')
+    }
+  }
+
   if (loading) return <div className="text-gray-500 p-8">加载中...</div>
 
   return (
@@ -116,9 +139,37 @@ const CognitiveAssignmentList: React.FC = () => {
             <select className="border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value })}>
               <option value="">选择任务类型</option>
               {configs.map((config) => (
-                <option key={config.id} value={config.id}>{config.name} · {config.testType} {config.configVersion}</option>
+                <option key={config.id} value={config.id}>
+                  {config.name} · {config.testType} {config.configVersion}{config.accessPolicy ? ` · ${config.accessPolicy}` : ''}
+                </option>
               ))}
             </select>
+            {isAdmin && selectedConfig && (
+              <div className="md:col-span-2 flex flex-wrap items-center gap-3 text-sm text-gray-700">
+                <span>访问策略</span>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="accessPolicy"
+                    checked={(selectedConfig.accessPolicy || 'OPEN') === 'OPEN'}
+                    onChange={() => void changeAccessPolicy('OPEN')}
+                  />
+                  OPEN 全员可用
+                </label>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="accessPolicy"
+                    checked={selectedConfig.accessPolicy === 'GRANT'}
+                    onChange={() => void changeAccessPolicy('GRANT')}
+                  />
+                  GRANT 需授权
+                </label>
+                <button type="button" onClick={() => setGrantConfig(selectedConfig)} className="btn-secondary">
+                  授权给教师
+                </button>
+              </div>
+            )}
             <input type="number" min={1} className="border rounded px-3 py-2" placeholder="最大次数" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: Number(e.target.value) })} />
             <textarea className="border rounded px-3 py-2 md:col-span-2" placeholder="学生须知（可选）" value={form.instruction} onChange={(e) => setForm({ ...form, instruction: e.target.value })} />
           </div>
@@ -156,6 +207,14 @@ const CognitiveAssignmentList: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+      {grantConfig && (
+        <MaterialGrantModal
+          resourceType="COGNITIVE_CONFIG"
+          resourceId={grantConfig.id}
+          resourceName={grantConfig.name}
+          onClose={() => setGrantConfig(null)}
+        />
       )}
     </div>
   )
