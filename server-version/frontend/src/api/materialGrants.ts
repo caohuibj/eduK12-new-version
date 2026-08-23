@@ -29,6 +29,8 @@ export const materialGrantApi = {
     apiClient.post<MaterialGrantRow>('/admin/material-grants', input),
   batch: (input: { resourceType: MaterialResourceType; resourceId: string; teacherIds: string[] }) =>
     apiClient.post<{ list: MaterialGrantRow[] }>('/admin/material-grants/batch', input),
+  set: (input: { resourceType: MaterialResourceType; resourceId: string; teacherIds: string[] }) =>
+    apiClient.put<{ list: MaterialGrantRow[] }>('/admin/material-grants/set', input),
   remove: (id: string) => apiClient.delete<{ id: string }>(`/admin/material-grants/${id}`),
   listTeachers: async () => {
     const pageSize = 100

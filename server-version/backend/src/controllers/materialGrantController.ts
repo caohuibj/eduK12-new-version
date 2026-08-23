@@ -8,6 +8,7 @@ import {
   createGrant,
   deleteGrant,
   listGrants,
+  setGrants,
 } from '../services/materialGrant'
 
 const resourceTypeSchema = z.nativeEnum(MaterialResourceType)
@@ -22,6 +23,12 @@ const batchSchema = z.object({
   resourceType: resourceTypeSchema,
   resourceId: z.string().min(1),
   teacherIds: z.array(z.string().min(1)).min(1),
+}).strict()
+
+const setSchema = z.object({
+  resourceType: resourceTypeSchema,
+  resourceId: z.string().min(1),
+  teacherIds: z.array(z.string().min(1)),
 }).strict()
 
 const handleError = (res: Response, err: unknown) => {
@@ -67,6 +74,17 @@ export const materialGrantController = {
       const input = batchSchema.parse(req.body)
       const list = await batchCreateGrants({ ...input, grantedBy: req.user.userId })
       return success(res, { list }, '已批量授权')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async set(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = setSchema.parse(req.body)
+      const list = await setGrants({ ...input, grantedBy: req.user.userId })
+      return success(res, { list }, '已保存授权')
     } catch (err) {
       return handleError(res, err)
     }

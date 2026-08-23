@@ -11,6 +11,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       createMany: vi.fn(),
       upsert: vi.fn(),
       delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
     user: { findUnique: vi.fn(), findMany: vi.fn() },
     $transaction: vi.fn(),
@@ -37,6 +38,7 @@ import {
   listGrants,
   scaleSource,
   scaleWhereForViewer,
+  setGrants,
 } from '../../services/materialGrant'
 
 const TEACHER = UserRole.TEACHER
@@ -295,5 +297,131 @@ describe('batchCreateGrants', () => {
       ],
     }))
     expect(list).toHaveLength(2)
+  })
+})
+
+describe('setGrants', () => {
+  const eligibleTeacher = {
+    id: 'teacher-1',
+    role: TEACHER,
+    teacherApproved: true,
+    isActive: true,
+    isFrozen: false,
+    username: 't1',
+    nickname: 'T1',
+  }
+  const grantRow = (teacherId: string, id = `g-${teacherId}`) => ({
+    id,
+    teacherId,
+    resourceType: MaterialResourceType.SCALE,
+    resourceId: 'scale-1',
+    grantedBy: 'admin-1',
+    createdAt: new Date(),
+    teacher: { id: teacherId, username: teacherId, nickname: teacherId, role: TEACHER },
+    granter: { id: 'admin-1', username: 'a', nickname: 'A' },
+  })
+
+  beforeEach(() => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-1', status: 'PUBLISHED', name: '焦虑' })
+  })
+
+  it('adds and removes in one transaction', async () => {
+    mockPrisma.materialGrant.findMany
+      .mockResolvedValueOnce([{ id: 'g-old', teacherId: 'teacher-1' }])
+      .mockResolvedValueOnce([grantRow('teacher-2')])
+    mockPrisma.user.findMany.mockResolvedValue([{ ...eligibleTeacher, id: 'teacher-2' }])
+    mockPrisma.materialGrant.createMany.mockResolvedValue({ count: 1 })
+    mockPrisma.materialGrant.deleteMany.mockResolvedValue({ count: 1 })
+
+    const list = await setGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-2'],
+      grantedBy: 'admin-1',
+    })
+
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.materialGrant.createMany).toHaveBeenCalledWith(expect.objectContaining({
+      skipDuplicates: true,
+      data: [{
+        teacherId: 'teacher-2',
+        resourceType: MaterialResourceType.SCALE,
+        resourceId: 'scale-1',
+        grantedBy: 'admin-1',
+      }],
+    }))
+    expect(mockPrisma.materialGrant.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['g-old'] } },
+    })
+    expect(list).toHaveLength(1)
+    expect(list[0].teacherId).toBe('teacher-2')
+  })
+
+  it('writes nothing when a newly added teacher is ineligible', async () => {
+    mockPrisma.materialGrant.findMany.mockResolvedValueOnce([{ id: 'g-old', teacherId: 'teacher-1' }])
+    mockPrisma.user.findMany.mockResolvedValue([{ ...eligibleTeacher, id: 'teacher-2', isFrozen: true }])
+
+    await expect(setGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-1', 'teacher-2'],
+      grantedBy: 'admin-1',
+    })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.deleteMany).not.toHaveBeenCalled()
+  })
+
+  it('keeps an existing grant to a now-ineligible teacher without re-validating them', async () => {
+    mockPrisma.materialGrant.findMany
+      .mockResolvedValueOnce([{ id: 'g-frozen', teacherId: 'teacher-frozen' }])
+      .mockResolvedValueOnce([grantRow('teacher-frozen', 'g-frozen')])
+
+    const list = await setGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-frozen'],
+      grantedBy: 'admin-1',
+    })
+
+    expect(mockPrisma.user.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.deleteMany).not.toHaveBeenCalled()
+    expect(list[0].teacherId).toBe('teacher-frozen')
+  })
+
+  it('revokes every grant when teacherIds is empty', async () => {
+    mockPrisma.materialGrant.findMany
+      .mockResolvedValueOnce([{ id: 'g1', teacherId: 'teacher-1' }, { id: 'g2', teacherId: 'teacher-2' }])
+      .mockResolvedValueOnce([])
+    mockPrisma.materialGrant.deleteMany.mockResolvedValue({ count: 2 })
+
+    const list = await setGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: [],
+      grantedBy: 'admin-1',
+    })
+
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['g1', 'g2'] } },
+    })
+    expect(list).toEqual([])
+  })
+
+  it('rolls back both writes when deleteMany fails inside the transaction', async () => {
+    mockPrisma.materialGrant.findMany.mockResolvedValueOnce([{ id: 'g-old', teacherId: 'teacher-1' }])
+    mockPrisma.user.findMany.mockResolvedValue([{ ...eligibleTeacher, id: 'teacher-2' }])
+    mockPrisma.materialGrant.createMany.mockResolvedValue({ count: 1 })
+    mockPrisma.materialGrant.deleteMany.mockRejectedValue(new Error('db down'))
+
+    await expect(setGrants({
+      resourceType: MaterialResourceType.SCALE,
+      resourceId: 'scale-1',
+      teacherIds: ['teacher-2'],
+      grantedBy: 'admin-1',
+    })).rejects.toThrow('db down')
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.materialGrant.createMany).toHaveBeenCalled()
   })
 })

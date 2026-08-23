@@ -3,7 +3,6 @@ import { X } from 'lucide-react'
 import {
   eligibleGrantTeachers,
   materialGrantApi,
-  type MaterialGrantRow,
   type MaterialResourceType,
 } from '../api/materialGrants'
 import type { User } from '../types'
@@ -25,7 +24,6 @@ const MaterialGrantModal: React.FC<MaterialGrantModalProps> = ({
   onClose,
 }) => {
   const [teachers, setTeachers] = useState<User[]>([])
-  const [grants, setGrants] = useState<MaterialGrantRow[]>([])
   const [selected, setSelected] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -42,7 +40,6 @@ const MaterialGrantModal: React.FC<MaterialGrantModalProps> = ({
         const teacherList = teachersRes.code === 0 ? eligibleGrantTeachers(teachersRes.data?.list || []) : []
         const grantList = grantsRes.code === 0 ? (grantsRes.data?.list || []) : []
         setTeachers(teacherList)
-        setGrants(grantList)
         const next: Record<string, boolean> = {}
         for (const grant of grantList) next[grant.teacherId] = true
         setSelected(next)
@@ -57,20 +54,11 @@ const MaterialGrantModal: React.FC<MaterialGrantModalProps> = ({
 
   const save = async () => {
     const selectedIds = Object.entries(selected).filter(([, checked]) => checked).map(([id]) => id)
-    const currentIds = new Set(grants.map((grant) => grant.teacherId))
-    const toAdd = selectedIds.filter((id) => !currentIds.has(id))
-    const toRemove = grants.filter((grant) => !selectedIds.includes(grant.teacherId))
     try {
       setSaving(true)
       setError(null)
-      if (toAdd.length) {
-        const added = await materialGrantApi.batch({ resourceType, resourceId, teacherIds: toAdd })
-        if (added.code !== 0) throw new Error(added.message || '授权失败')
-      }
-      for (const grant of toRemove) {
-        const removed = await materialGrantApi.remove(grant.id)
-        if (removed.code !== 0) throw new Error(removed.message || '撤销授权失败')
-      }
+      const saved = await materialGrantApi.set({ resourceType, resourceId, teacherIds: selectedIds })
+      if (saved.code !== 0) throw new Error(saved.message || '保存授权失败')
       onClose()
     } catch (err) {
       setError((err as { message?: string }).message || '保存授权失败')
