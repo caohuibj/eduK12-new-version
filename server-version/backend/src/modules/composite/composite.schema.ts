@@ -2,6 +2,11 @@ import { z } from 'zod'
 
 const dateTime = z.string().datetime()
 const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
+const analysisProtocolSelection = z.object({
+  key: z.string().min(1).max(100),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确协议版本'),
+  profile: z.enum(['standard', 'research']),
+}).strict()
 
 export const createCompositeSchema = z.object({
   code: z.string().min(1).max(80),
@@ -13,6 +18,7 @@ export const createCompositeSchema = z.object({
   expiresAt: dateTime.nullable().optional(),
   maxAttempts: z.number().int().positive().optional().default(1),
   publicEnabled: z.boolean().optional().default(false),
+  analysisProtocol: analysisProtocolSelection.nullable().optional(),
 }).strict().refine(
   (value) => !value.opensAt || !value.expiresAt || new Date(value.expiresAt).getTime() >= new Date(value.opensAt).getTime(),
   { message: 'expiresAt 必须晚于或等于 opensAt' }
@@ -32,6 +38,10 @@ export const updateCompositeSchema = z.object({
   (value) => !value.opensAt || !value.expiresAt || new Date(value.expiresAt).getTime() >= new Date(value.opensAt).getTime(),
   { message: 'expiresAt 必须晚于或等于 opensAt' }
 )
+
+export const setCompositeAnalysisProtocolSchema = z.object({
+  analysisProtocol: analysisProtocolSelection.nullable(),
+}).strict()
 
 const formOption = z.object({ value: z.string().min(1), label: z.string().min(1) }).strict()
 
@@ -117,6 +127,7 @@ export const listCompositeAttemptsQuerySchema = z.object({
 
 export type CreateCompositeInput = z.infer<typeof createCompositeSchema>
 export type UpdateCompositeInput = z.infer<typeof updateCompositeSchema>
+export type SetCompositeAnalysisProtocolInput = z.infer<typeof setCompositeAnalysisProtocolSchema>
 export type AddCompositeItemInput = z.infer<typeof addCompositeItemSchema>
 export type CopyCompositeInput = z.infer<typeof copyCompositeSchema>
 export type CompositeExportRequest = z.infer<typeof compositeExportRequestSchema>

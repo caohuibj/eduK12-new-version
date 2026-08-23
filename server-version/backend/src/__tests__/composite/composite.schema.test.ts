@@ -10,6 +10,7 @@ import {
   copyCompositeSchema,
   listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
+  setCompositeAnalysisProtocolSchema,
 } from '../../modules/composite/composite.schema'
 
 describe('composite assessment schemas', () => {
@@ -73,5 +74,18 @@ describe('composite assessment schemas', () => {
     expect(copyCompositeSchema.parse({})).toEqual({})
     expect(copyCompositeSchema.parse({ courseId: null }).courseId).toBeNull()
     expect(copyCompositeSchema.parse({ courseId: 'course-1' }).courseId).toBe('course-1')
+  })
+
+  it('accepts only explicit fixed protocol versions and standard/research profiles', () => {
+    const selection = { key: 'attention_v1', version: '1.0.0', profile: 'research' as const }
+    expect(createCompositeSchema.parse({ code: 'ATTN', name: '注意', analysisProtocol: selection }).analysisProtocol).toEqual(selection)
+    expect(setCompositeAnalysisProtocolSchema.parse({ analysisProtocol: null })).toEqual({ analysisProtocol: null })
+    expect(() => setCompositeAnalysisProtocolSchema.parse({
+      analysisProtocol: { key: 'attention_v1', version: 'latest', profile: 'experience' },
+    })).toThrow()
+    expect(() => setCompositeAnalysisProtocolSchema.parse({
+      analysisProtocol: { key: 'attention_v1', profile: 'standard' },
+    })).toThrow()
+    expect(() => setCompositeAnalysisProtocolSchema.parse({ analysisProtocol: null, keepItems: true })).toThrow()
   })
 })

@@ -1,5 +1,7 @@
 import apiClient from '../../api/client'
 import type {
+  AnalysisProtocolCatalog,
+  AnalysisProtocolSelection,
   CompositeAttemptState,
   CompositeLibraryTemplate,
   CompositePublicInfo,
@@ -10,12 +12,15 @@ import type {
 
 export const compositeApi = {
   list: () => apiClient.get<{ list: CompositeTeacherListItem[] }>('/composite-assessments'),
+  listAnalysisProtocols: () => apiClient.get<AnalysisProtocolCatalog>('/composite-assessments/analysis-protocols'),
   listLibrary: () => apiClient.get<{ list: CompositeLibraryTemplate[] }>('/composite-assessments/library'),
   copy: (id: string, input: { courseId?: string | null; code?: string; name?: string } = {}) =>
     apiClient.post<{ id: string }>(`/composite-assessments/${id}/copy`, input),
   detail: (id: string) => apiClient.get<any>(`/composite-assessments/${id}`),
   create: (input: Record<string, unknown>) => apiClient.post<any>('/composite-assessments', input),
   update: (id: string, input: Record<string, unknown>) => apiClient.patch<any>(`/composite-assessments/${id}`, input),
+  setAnalysisProtocol: (id: string, analysisProtocol: AnalysisProtocolSelection | null) =>
+    apiClient.put<any>(`/composite-assessments/${id}/analysis-protocol`, { analysisProtocol }),
   addItem: (id: string, input: Record<string, unknown>) => apiClient.post<any>(`/composite-assessments/${id}/items`, input),
   removeItem: (id: string, itemId: string) => apiClient.delete(`/composite-assessments/${id}/items/${itemId}`),
   reorderItems: (id: string, items: Array<{ id: string; position: number }>) => apiClient.post(`/composite-assessments/${id}/items/reorder`, { items }),
