@@ -16,6 +16,9 @@ import { cardsortRegistryEntry } from './tasks/cardsort/cardsort.registry'
 import { digitbackwardRegistryEntry } from './tasks/digitbackward/digitbackward.registry'
 import { picturesequenceRegistryEntry } from './tasks/picturesequence/picturesequence.registry'
 import { pairedassociateRegistryEntry } from './tasks/pairedassociate/pairedassociate.registry'
+import { matrixRegistryEntry } from './tasks/matrix/matrix.registry'
+import { mentalrotationRegistryEntry } from './tasks/mentalrotation/mentalrotation.registry'
+import { towerRegistryEntry } from './tasks/tower/tower.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -108,3 +111,6 @@ registerCognitiveRunner(cardsortRegistryEntry)
 registerCognitiveRunner(digitbackwardRegistryEntry)
 registerCognitiveRunner(picturesequenceRegistryEntry)
 registerCognitiveRunner(pairedassociateRegistryEntry)
+registerCognitiveRunner(matrixRegistryEntry)
+registerCognitiveRunner(mentalrotationRegistryEntry)
+registerCognitiveRunner(towerRegistryEntry)

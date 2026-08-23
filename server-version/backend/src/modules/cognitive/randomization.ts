@@ -373,3 +373,221 @@ export const pairedAssociateSet = (seed: string, pairCount: number): PairedAssoc
   )
   return ids.map((itemId, index) => ({ itemId, targetPosition: positions[index] }))
 }
+
+export type MatrixRuleFamily = 'progression' | 'alternation' | 'combination'
+export type MatrixItemSpec = {
+  itemId: string
+  ruleFamily: MatrixRuleFamily
+  difficulty: 1 | 2 | 3
+  panels: number[]
+  options: number[]
+  correctOption: number
+  stimulusSetVersion: 'matrix-generator-v1.0.0'
+}
+
+const wrapSymbol = (value: number) => ((value - 1) % 8 + 8) % 8 + 1
+
+const matrixApplicableRules = (rows: number[][]): MatrixRuleFamily[] => {
+  const progressionStep = wrapSymbol(rows[0][1] - rows[0][0])
+  const progression = rows.every((row) =>
+    wrapSymbol(row[1] - row[0]) === progressionStep && row[2] === wrapSymbol(row[1] + progressionStep),
+  )
+  const alternation = rows.every((row) => row[0] === row[2])
+  const combination = rows.every((row) => row[2] === wrapSymbol(row[0] + row[1]))
+  return [progression && 'progression', alternation && 'alternation', combination && 'combination'].filter(Boolean) as MatrixRuleFamily[]
+}
+
+const buildMatrixPanels = (ruleFamily: MatrixRuleFamily, difficulty: 1 | 2 | 3, itemIndex: number): { panels: number[]; correct: number } => {
+  for (let attempt = 0; attempt < 128; attempt += 1) {
+    const starts = [wrapSymbol(itemIndex + attempt + 1), wrapSymbol(itemIndex * 2 + attempt * 2 + 3), wrapSymbol(itemIndex * 3 + attempt * 3 + 5)]
+    if (new Set(starts).size < 3) continue
+    const seconds = starts.map((start, row) => ruleFamily === 'progression'
+      ? wrapSymbol(start + difficulty)
+      : wrapSymbol(start + difficulty + row + 1 + attempt))
+    const thirds = starts.slice(0, 2).map((start, row) => ruleFamily === 'progression'
+      ? wrapSymbol(seconds[row] + difficulty)
+      : ruleFamily === 'alternation'
+        ? start
+        : wrapSymbol(start + seconds[row]))
+    const exampleRows = [[starts[0], seconds[0], thirds[0]], [starts[1], seconds[1], thirds[1]]]
+    if (matrixApplicableRules(exampleRows).length === 1 && matrixApplicableRules(exampleRows)[0] === ruleFamily) {
+      const correct = ruleFamily === 'progression'
+        ? wrapSymbol(seconds[2] + difficulty)
+        : ruleFamily === 'alternation'
+          ? starts[2]
+          : wrapSymbol(starts[2] + seconds[2])
+      return { panels: [...exampleRows.flat(), starts[2], seconds[2]], correct }
+    }
+  }
+  throw new Error(`Unable to generate unique matrix item ${itemIndex}`)
+}
+
+const buildMatrixBank = (): MatrixItemSpec[] => Array.from({ length: 24 }, (_, index) => {
+  const difficulty = (Math.floor(index / 8) + 1) as 1 | 2 | 3
+  const ruleFamily = ['progression', 'alternation', 'combination'][index % 3] as MatrixRuleFamily
+  const { panels, correct } = buildMatrixPanels(ruleFamily, difficulty, index)
+  const optionValues = [correct]
+  for (let offset = 1; optionValues.length < 4; offset += 1) {
+    const candidate = wrapSymbol(correct + offset + (offset % 2 === 0 ? difficulty : 0))
+    if (!optionValues.includes(candidate)) optionValues.push(candidate)
+  }
+  const itemId = `matrix-${String(index + 1).padStart(2, '0')}`
+  const correctOption = index % 4
+  const options = optionValues.slice(1)
+  options.splice(correctOption, 0, correct)
+  return {
+    itemId,
+    ruleFamily,
+    difficulty,
+    panels,
+    options,
+    correctOption,
+    stimulusSetVersion: 'matrix-generator-v1.0.0',
+  }
+})
+
+const MATRIX_BANK = buildMatrixBank()
+
+export const matrixSequence = (seed: string, itemCount: number): MatrixItemSpec[] => {
+  const groups = ([1, 2, 3] as const).flatMap((difficulty) => (['progression', 'alternation', 'combination'] as const).map((ruleFamily) =>
+    shuffleInPlace([...MATRIX_BANK.filter((item) => item.difficulty === difficulty && item.ruleFamily === ruleFamily)], seededRandom(seed, `matrix:${difficulty}:${ruleFamily}`)),
+  ))
+  let selected: MatrixItemSpec[]
+  if (itemCount === 6) selected = [groups[0][0], groups[1][0], groups[3][0], groups[5][0], groups[7][0], groups[8][0]]
+  else if (itemCount === 16) selected = [...groups.map((group) => group[0]), ...groups.slice(0, 7).map((group) => group[1])]
+  else selected = groups.flat()
+  const ordered = selected.sort((left, right) => left.difficulty - right.difficulty)
+  const correctPositions = shuffleInPlace(ordered.map((_, index) => index % 4), seededRandom(seed, 'matrix-options'))
+  return ordered.map((item, index) => {
+    const correctValue = item.options[item.correctOption]
+    const options = item.options.filter((_, optionIndex) => optionIndex !== item.correctOption)
+    const correctOption = correctPositions[index]
+    options.splice(correctOption, 0, correctValue)
+    return { ...item, options, correctOption }
+  })
+}
+
+export type RotationItemSpec = {
+  itemId: string
+  objectFamily: 'elbow' | 'fork' | 'step' | 'zigzag'
+  angle: 0 | 45 | 90 | 135 | 180
+  mirrored: boolean
+  variant: 0 | 1
+  difficulty: 1 | 2 | 3
+  correctResponse: 'same' | 'mirror'
+  stimulusSetVersion: 'rotation-objects-v1.0.0'
+}
+
+const ROTATION_ANGLES: RotationItemSpec['angle'][] = [0, 45, 90, 135, 180]
+const ROTATION_FAMILIES: RotationItemSpec['objectFamily'][] = ['elbow', 'fork', 'step', 'zigzag']
+const ROTATION_BANK: RotationItemSpec[] = []
+for (const angle of ROTATION_ANGLES) {
+  for (const mirrored of [false, true]) {
+    for (const objectFamily of ROTATION_FAMILIES) {
+      for (let variant = 0; variant < 2; variant += 1) {
+        const index = ROTATION_BANK.length + 1
+        ROTATION_BANK.push({
+          itemId: `rotation-${String(index).padStart(3, '0')}`,
+          objectFamily,
+          angle,
+          mirrored,
+          variant: variant as 0 | 1,
+          difficulty: angle <= 45 ? 1 : angle === 90 ? 2 : 3,
+          correctResponse: mirrored ? 'mirror' : 'same',
+          stimulusSetVersion: 'rotation-objects-v1.0.0',
+        })
+      }
+    }
+  }
+}
+
+export const mentalRotationSequence = (seed: string, totalTrials: number): RotationItemSpec[] => {
+  const categories = ROTATION_ANGLES.flatMap((angle) => [false, true].map((mirrored) => ({ angle, mirrored })))
+  const perCategory = Math.floor(totalTrials / categories.length)
+  let remainder = totalTrials % categories.length
+  const selected = categories.flatMap(({ angle, mirrored }, categoryIndex) => {
+    const take = perCategory + (remainder-- > 0 ? 1 : 0)
+    const candidates = ROTATION_BANK.filter((item) => item.angle === angle && item.mirrored === mirrored)
+    return shuffleInPlace([...candidates], seededRandom(seed, `rotation-category:${categoryIndex}`)).slice(0, take)
+  })
+  return shuffleInPlace(selected, seededRandom(seed, 'rotation-order'))
+}
+
+export type TowerState = [number, number, number]
+export type TowerMove = { disk: number; from: number; to: number; atMs: number }
+export type TowerProblemSpec = {
+  problemId: string
+  initialState: TowerState
+  targetState: TowerState
+  minimumMoves: number
+  difficulty: 1 | 2 | 3
+  stimulusSetVersion: 'three-peg-tower-v1.0.0'
+}
+
+const stateKey = (state: TowerState) => state.join('')
+const statesEqual = (left: TowerState, right: TowerState) => left.every((value, index) => value === right[index])
+
+const legalTowerMoves = (state: TowerState): Array<{ disk: number; from: number; to: number }> => {
+  const moves: Array<{ disk: number; from: number; to: number }> = []
+  for (let from = 0; from < 3; from += 1) {
+    const disk = state.findIndex((peg) => peg === from)
+    if (disk < 0) continue
+    for (let to = 0; to < 3; to += 1) {
+      if (to === from) continue
+      const destinationTop = state.findIndex((peg) => peg === to)
+      if (destinationTop < 0 || destinationTop > disk) moves.push({ disk, from, to })
+    }
+  }
+  return moves
+}
+
+export const applyTowerMove = (state: TowerState, move: Pick<TowerMove, 'disk' | 'from' | 'to'>): { state: TowerState; valid: boolean } => {
+  const legal = legalTowerMoves(state).some((candidate) => candidate.disk === move.disk && candidate.from === move.from && candidate.to === move.to)
+  if (!legal) return { state: [...state] as TowerState, valid: false }
+  const next = [...state] as TowerState
+  next[move.disk] = move.to
+  return { state: next, valid: true }
+}
+
+const towerDistance = (initial: TowerState, target: TowerState): number => {
+  const queue: Array<{ state: TowerState; distance: number }> = [{ state: initial, distance: 0 }]
+  const visited = new Set([stateKey(initial)])
+  while (queue.length > 0) {
+    const current = queue.shift() as { state: TowerState; distance: number }
+    if (statesEqual(current.state, target)) return current.distance
+    for (const move of legalTowerMoves(current.state)) {
+      const next = applyTowerMove(current.state, move).state
+      const key = stateKey(next)
+      if (!visited.has(key)) { visited.add(key); queue.push({ state: next, distance: current.distance + 1 }) }
+    }
+  }
+  throw new Error('tower state graph is disconnected')
+}
+
+const buildTowerBank = (): TowerProblemSpec[] => {
+  const states = Array.from({ length: 27 }, (_, value) => [value % 3, Math.floor(value / 3) % 3, Math.floor(value / 9) % 3] as TowerState)
+  const candidates = states.flatMap((initialState, initialIndex) => states.slice(initialIndex + 1).map((targetState) => ({ initialState, targetState, distance: towerDistance(initialState, targetState) })))
+  const bands = [
+    candidates.filter((item) => item.distance >= 2 && item.distance <= 3),
+    candidates.filter((item) => item.distance >= 4 && item.distance <= 5),
+    candidates.filter((item) => item.distance >= 6),
+  ]
+  return bands.flatMap((band, bandIndex) => band.sort((a, b) => a.distance - b.distance || stateKey(a.initialState).localeCompare(stateKey(b.initialState)) || stateKey(a.targetState).localeCompare(stateKey(b.targetState))).slice(0, 6).map((item, index) => ({
+    problemId: `tower-${String(bandIndex * 6 + index + 1).padStart(2, '0')}`,
+    initialState: item.initialState,
+    targetState: item.targetState,
+    minimumMoves: item.distance,
+    difficulty: (bandIndex + 1) as 1 | 2 | 3,
+    stimulusSetVersion: 'three-peg-tower-v1.0.0' as const,
+  })))
+}
+
+const TOWER_BANK = buildTowerBank()
+
+export const towerSequence = (seed: string, problemCount: number): TowerProblemSpec[] => {
+  const quotas = problemCount === 4 ? [2, 2, 0] : problemCount === 10 ? [4, 4, 2] : [6, 6, 6]
+  return quotas.flatMap((quota, band) => shuffleInPlace(
+    TOWER_BANK.filter((problem) => problem.difficulty === band + 1),
+    seededRandom(seed, `tower-band:${band + 1}`),
+  ).slice(0, quota))
+}

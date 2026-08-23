@@ -959,3 +959,87 @@ export const pairedassociateRegistryMeta = {
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: false,
 }
+
+export const matrixRegistryMeta = {
+  name: '矩阵规则推理', category: 'fluid_reasoning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: { profile: 'experience' as const, estimatedMinutes: [3, 5], configPatch: { itemCount: 6 }, reportCaveats: ['体验档题目较少，不进入综合分析。'] },
+    standard: { profile: 'standard' as const, estimatedMinutes: [8, 12], configPatch: { itemCount: 16 }, reportCaveats: ['内部生成题库，只描述本次规则归纳表现。'] },
+    research: { profile: 'research' as const, estimatedMinutes: [12, 18], configPatch: { itemCount: 24 }, reportCaveats: ['科研档覆盖全部三种规则族和难度；仍不是智力测验。'] },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    accuracy: metric('accuracy', '正确率', 'fluid_reasoning', 'ratio', 'higher_is_better', 'primary'),
+    accuracyByRuleFamily: metric('accuracyByRuleFamily', '各规则族正确率', 'fluid_reasoning', 'map', 'descriptive', 'primary'),
+    reachedDifficulty: metric('reachedDifficulty', '达到的最高难度', 'fluid_reasoning', 'level', 'descriptive', 'secondary'),
+    medianRtMs: metric('medianRtMs', '正确反应中位时长', 'fluid_reasoning', 'ms', 'descriptive', 'secondary'),
+    omissionRate: metric('omissionRate', '遗漏比例', 'fluid_reasoning', 'ratio', 'lower_is_better', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '遗漏与回答模式是否达到门槛。' },
+    constantResponse: { key: 'constantResponse', label: '恒定选项回答', description: '足够多题始终选择同一选项。' },
+    excessiveOmissions: { key: 'excessiveOmissions', label: '遗漏过多', description: '遗漏比例达到 0.3。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在切屏或超时。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: { title: '矩阵规则推理', headlineMetric: 'accuracy', primaryMetrics: ['accuracy', 'accuracyByRuleFamily'], secondaryMetrics: ['reachedDifficulty', 'medianRtMs', 'omissionRate'], practicalTips: ['正确率按规则族和难度覆盖一起阅读，不换算 IQ 或智力等级。'], disclaimer: '结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。' } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
+
+export const mentalrotationRegistryMeta = {
+  name: '心理旋转', category: 'visuospatial_reasoning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: { profile: 'experience' as const, estimatedMinutes: [2, 4], configPatch: { totalTrials: 12 }, reportCaveats: ['体验档角度条件较少，不进入综合分析。'] },
+    standard: { profile: 'standard' as const, estimatedMinutes: [6, 9], configPatch: { totalTrials: 40 }, reportCaveats: ['角度、镜像和图形族平衡；不代表完整空间能力。'] },
+    research: { profile: 'research' as const, estimatedMinutes: [11, 16], configPatch: { totalTrials: 80 }, reportCaveats: ['科研档使用完整内部题库；仍不是空间智力常模。'] },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    accuracy: metric('accuracy', '正确率', 'visuospatial_reasoning', 'ratio', 'higher_is_better', 'primary'),
+    angleCost: metric('angleCost', '大角度反应时代价', 'visuospatial_reasoning', 'ms', 'lower_is_better', 'primary'),
+    medianCorrectRtMs: metric('medianCorrectRtMs', '正确反应中位RT', 'visuospatial_reasoning', 'ms', 'lower_is_better', 'primary'),
+    mirrorErrorRate: metric('mirrorErrorRate', '镜像项目错误率', 'visuospatial_reasoning', 'ratio', 'lower_is_better', 'secondary'),
+    omissionRate: metric('omissionRate', '遗漏比例', 'visuospatial_reasoning', 'ratio', 'lower_is_better', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '准确率、遗漏和角度覆盖是否达到门槛。' },
+    constantResponse: { key: 'constantResponse', label: '恒定回答', description: '足够多试次始终选择同一种判断。' },
+    insufficientAngleCoverage: { key: 'insufficientAngleCoverage', label: '角度有效试次不足', description: '小角度或大角度正确有效反应不足。' },
+    excessiveOmissions: { key: 'excessiveOmissions', label: '遗漏过多', description: '遗漏比例达到 0.3。' },
+    lowAccuracy: { key: 'lowAccuracy', label: '准确率过低', description: '总体正确率低于 0.5。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在切屏或超时。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: { title: '心理旋转', headlineMetric: 'accuracy', primaryMetrics: ['accuracy', 'angleCost', 'medianCorrectRtMs'], secondaryMetrics: ['mirrorErrorRate', 'omissionRate'], practicalTips: ['角度代价只在大小角度都有足够正确反应时解释，并与正确率同屏阅读。'], disclaimer: '结果只反映本次内部几何旋转任务表现，不是完整空间智力、诊断或人口常模。' } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
+
+export const towerRegistryMeta = {
+  name: '塔式规划', category: 'planning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: { profile: 'experience' as const, estimatedMinutes: [3, 5], configPatch: { problemCount: 4 }, reportCaveats: ['体验档仅含低、中难度问题，不进入综合分析。'] },
+    standard: { profile: 'standard' as const, estimatedMinutes: [8, 13], configPatch: { problemCount: 10 }, reportCaveats: ['报告解题、最短路径效率与规则违反，不形成计划能力等级。'] },
+    research: { profile: 'research' as const, estimatedMinutes: [15, 22], configPatch: { problemCount: 18 }, reportCaveats: ['科研档覆盖三档最短路径难度；重复测试可能有练习效应。'] },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    minimumMoveSolveRate: metric('minimumMoveSolveRate', '最短步解题比例', 'planning', 'ratio', 'higher_is_better', 'primary'),
+    excessMoves: metric('excessMoves', '已解题平均额外步数', 'planning', 'count', 'lower_is_better', 'primary'),
+    solveRate: metric('solveRate', '解题比例', 'planning', 'ratio', 'higher_is_better', 'secondary'),
+    firstMoveLatencyMs: metric('firstMoveLatencyMs', '首步计划时长', 'planning', 'ms', 'descriptive', 'secondary'),
+    ruleViolations: metric('ruleViolations', '规则违反次数', 'planning', 'count', 'lower_is_better', 'primary'),
+    noAttemptRate: metric('noAttemptRate', '未尝试问题比例', 'planning', 'ratio', 'lower_is_better', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '尝试覆盖和规则违反是否达到门槛。' },
+    excessiveRuleViolations: { key: 'excessiveRuleViolations', label: '规则违反过多', description: '无效移动次数达到质量门。' },
+    insufficientAttemptedProblems: { key: 'insufficientAttemptedProblems', label: '尝试问题不足', description: '少于一半问题有移动尝试。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在切屏或超时。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: { title: '塔式规划', headlineMetric: 'minimumMoveSolveRate', primaryMetrics: ['minimumMoveSolveRate', 'excessMoves', 'ruleViolations'], secondaryMetrics: ['solveRate', 'firstMoveLatencyMs', 'noAttemptRate'], practicalTips: ['解题比例、额外步数和规则违反应分开阅读；首步时长只作方法信息。'], disclaimer: '结果只反映本次内部塔式任务表现，不是商业 Tower 测验、计划能力诊断或人口常模。' } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}

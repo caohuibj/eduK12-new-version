@@ -19,6 +19,9 @@ import {
   digitbackwardRegistryMeta,
   picturesequenceRegistryMeta,
   pairedassociateRegistryMeta,
+  matrixRegistryMeta,
+  mentalrotationRegistryMeta,
+  towerRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -71,6 +74,15 @@ import { scorePicturesequenceV1 } from './scoring/picturesequence.v1'
 import { pairedassociateConfigSchema } from './schemas/pairedassociate.config'
 import { pairedassociateTrialSchema } from './schemas/pairedassociate.trial'
 import { scorePairedassociateV1 } from './scoring/pairedassociate.v1'
+import { matrixConfigSchema } from './schemas/matrix.config'
+import { matrixTrialSchema } from './schemas/matrix.trial'
+import { scoreMatrixV1 } from './scoring/matrix.v1'
+import { mentalrotationConfigSchema } from './schemas/mentalrotation.config'
+import { mentalrotationTrialSchema } from './schemas/mentalrotation.trial'
+import { scoreMentalrotationV1 } from './scoring/mentalrotation.v1'
+import { towerConfigSchema } from './schemas/tower.config'
+import { towerTrialSchema } from './schemas/tower.trial'
+import { scoreTowerV1 } from './scoring/tower.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -329,3 +341,7 @@ registerEntry({
   score: scorePairedassociateV1,
   ...pairedassociateRegistryMeta,
 })
+
+registerEntry({ testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: matrixConfigSchema, trialSchema: matrixTrialSchema, score: scoreMatrixV1, ...matrixRegistryMeta })
+registerEntry({ testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta })
+registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, score: scoreTowerV1, ...towerRegistryMeta })
