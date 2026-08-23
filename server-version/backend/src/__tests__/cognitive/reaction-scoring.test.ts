@@ -161,3 +161,24 @@ describe('reaction scorer — Product Index (§35 piecewise)', () => {
     expect(indexFor(9999)).toBe(30)
   })
 })
+
+describe('reaction scorer 1.1.0 quality flags', () => {
+  it('keeps v1 metrics and adds excessivePremature / extremeRtPattern', async () => {
+    const { scoreReactionV1_1 } = await import('../../modules/cognitive/scoring/reaction.v1_1')
+    const trials = buildTrials(5, () => 300)
+    trials[0].payload.prematureCount = 1
+    const res = scoreReactionV1_1({ config, trials })
+    expect(res.metrics.medianRtMs).toBe(300)
+    expect(res.qualityFlags.excessivePremature).toBe(true)
+    expect(res.qualityFlags.extremeRtPattern).toBe(false)
+    expect(res.qualityFlags.interpretable).toBe(true)
+  })
+
+  it('flags extremeRtPattern when ICV exceeds 0.8', async () => {
+    const { scoreReactionV1_1 } = await import('../../modules/cognitive/scoring/reaction.v1_1')
+    const trials = buildTrials(5, (i) => [100, 100, 100, 100, 1800][i])
+    const res = scoreReactionV1_1({ config, trials })
+    expect(res.qualityFlags.extremeRtPattern).toBe(true)
+    expect(scoreReactionV1({ config, trials }).qualityFlags.extremeRtPattern).toBeUndefined()
+  })
+})

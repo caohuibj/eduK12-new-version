@@ -11,7 +11,7 @@ import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from 
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
-import { resolveCognitiveReference } from './reference'
+import { resolveCognitiveReferenceForResult } from './reference'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -172,6 +172,7 @@ const toRunnerPayload = (session: {
     profile: report?.profile ?? null,
     reportCaveats: report?.reportCaveats ?? [],
     metricDefinitions: report?.metricDefinitions ?? entry?.metricDefinitions,
+    qualityDefinitions: report?.qualityDefinitions ?? entry?.qualityDefinitions,
     reportDefinition: report?.reportDefinition ?? entry?.reportDefinition,
     ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
     ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
@@ -280,15 +281,17 @@ export const getSession = async (userId: string, sessionId: string) => {
     const qualityFlags = session.qualityFlagsEncrypted
       ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
       : null
-    const report = (runnerPayload.config as { report?: Record<string, unknown> }).report ?? {}
     const reference = metrics && score !== null
-      ? resolveCognitiveReference({
+      ? resolveCognitiveReferenceForResult({
           testType: session.testType,
           metrics,
           score,
-          referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-          referenceVersion: report.referenceVersion as string | undefined,
-          referenceBand: report.referenceBand as string | undefined,
+          qualityFlags: qualityFlags ?? undefined,
+          config: runnerPayload.config as Record<string, unknown>,
+          profile: runnerPayload.profile,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          configVersion: session.configVersion,
         })
       : undefined
     return {
@@ -342,15 +345,17 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   const qualityFlags = session.qualityFlagsEncrypted
     ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
     : null
-  const report = (runnerPayload.config as { report?: Record<string, unknown> }).report ?? {}
   const reference = metrics && score !== null
-    ? resolveCognitiveReference({
+    ? resolveCognitiveReferenceForResult({
         testType: session.testType,
         metrics,
         score,
-        referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-        referenceVersion: report.referenceVersion as string | undefined,
-        referenceBand: report.referenceBand as string | undefined,
+        qualityFlags: qualityFlags ?? undefined,
+        config: runnerPayload.config as Record<string, unknown>,
+        profile: runnerPayload.profile,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+        configVersion: session.configVersion,
       })
     : undefined
   return {

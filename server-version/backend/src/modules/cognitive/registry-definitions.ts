@@ -113,6 +113,24 @@ export const reactionRegistryMeta = {
     secondaryMetrics: ['meanRtMs', 'sdRtMs', 'fastestRtMs', 'prematureCount', 'validTrialCount'],
     disclaimer: '结果反映本次任务表现，不是医学诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
+
+export const reactionRegistryMetaV11 = {
+  ...reactionRegistryMeta,
+  profileDefinitionVersion: '1.1.0',
+  metricDefinitionVersion: '1.1.0',
+  qualityDefinitionVersion: '1.1.0',
+  reportDefinitionVersion: '1.1.0',
+  qualityDefinitions: {
+    ...reactionRegistryMeta.qualityDefinitions,
+    excessivePremature: { key: 'excessivePremature', label: '提前反应过多', description: '至少 20% 试次出现提前反应。' },
+    extremeRtPattern: { key: 'extremeRtPattern', label: '反应时模式极端', description: '有效反应时变异系数超过 0.8。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinition: {
+    ...reactionRegistryMeta.reportDefinition,
+    disclaimer: '结果反映本次任务表现，不是医学诊断或人口常模。任务表现指数不是常模位置。',
+  } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
 }
 
@@ -125,7 +143,7 @@ export const memoryRegistryMeta = {
       profile: 'experience' as const,
       estimatedMinutes: [2, 3],
       configPatch: { maxLength: 6 },
-      reportCaveats: ['体验版，结果仅供体验。本版本 startLength 仍为已发布配置的 2。'],
+      reportCaveats: ['体验版，结果仅供体验。本 scoringVersion 对应已发布 startLength=2 配置。'],
     },
     standard: {
       profile: 'standard' as const,
@@ -160,6 +178,51 @@ export const memoryRegistryMeta = {
     headlineMetric: 'maxSpan',
     primaryMetrics: ['maxSpan', 'levelsPassed'],
     secondaryMetrics: ['firstTryPassCount', 'medianResponseDurationMs', 'trialCount'],
+    disclaimer: 'maxSpan 是本次任务容量指标，不是标准化记忆等级。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
+
+export const memoryRegistryMetaV11 = {
+  ...memoryRegistryMeta,
+  profileDefinitionVersion: '1.1.0',
+  metricDefinitionVersion: '1.1.0',
+  qualityDefinitionVersion: '1.1.0',
+  reportDefinitionVersion: '1.1.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [2, 3],
+      configPatch: { startLength: 3, maxLength: 6 },
+      reportCaveats: ['体验版，结果仅供体验。startLength=3 的短程，不能当作完整广度测量。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [4, 6],
+      configPatch: { startLength: 3, maxLength: 8 },
+      reportCaveats: ['正式版结果不是人口常模，maxSpan 只描述本次任务容量。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [6, 8],
+      configPatch: { startLength: 3, maxLength: 9 },
+      reportCaveats: ['科研版提高上限，仍须与具体记分定义一起解释。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitions: {
+    ...memoryRegistryMeta.metricDefinitions,
+    totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitions: {
+    ...memoryRegistryMeta.qualityDefinitions,
+    insufficientCompletedLevels: { key: 'insufficientCompletedLevels', label: '完成层级不足', description: '完成的长度层级少于两级，结果不够稳定。' },
+    invalidSequencePattern: { key: 'invalidSequencePattern', label: '序列模式异常', description: '作答呈持续重复同一数字等异常模式。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinition: {
+    title: '数字广度顺背',
+    headlineMetric: 'maxSpan',
+    primaryMetrics: ['maxSpan', 'totalCorrectTrials'],
+    secondaryMetrics: ['levelsPassed', 'firstTryPassCount', 'medianResponseDurationMs', 'trialCount'],
     disclaimer: 'maxSpan 是本次任务容量指标，不是标准化记忆等级。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
@@ -210,6 +273,46 @@ export const stroopRegistryMeta = {
     interrupted: { key: 'interrupted', label: '作答中断', description: '存在 interrupted 试次。' },
   } as Record<string, QualityDefinition>,
   reportDefinitionVersion: '1.0.0',
+  reportDefinition: {
+    title: '色词 Stroop',
+    headlineMetric: 'stroopEffectMs',
+    primaryMetrics: ['stroopEffectMs', 'incongruentAccuracy', 'errorCost'],
+    secondaryMetrics: ['accuracy', 'congruentAccuracy', 'medianRtCongruent', 'medianRtIncongruent', 'timeoutCount'],
+    disclaimer: '不得仅以总体准确率代表抑制能力，也不是年龄常模。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
+
+export const stroopRegistryMetaV11 = {
+  ...stroopRegistryMeta,
+  profileDefinitionVersion: '1.1.0',
+  metricDefinitionVersion: '1.1.0',
+  qualityDefinitionVersion: '1.1.0',
+  reportDefinitionVersion: '1.1.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [2, 2],
+      configPatch: { totalTrials: 16, congruentRatio: 0.5 },
+      reportCaveats: ['体验版，结果仅供体验。短程干扰效应不稳定。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [4, 5],
+      configPatch: { totalTrials: 40, congruentRatio: 0.5 },
+      reportCaveats: ['正式版结果反映本次色词干扰表现，不是年龄常模。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [8, 10],
+      configPatch: { totalTrials: 96, congruentRatio: 0.5 },
+      reportCaveats: ['科研档增加试次；仍不是年龄常模。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  qualityDefinitions: {
+    ...stroopRegistryMeta.qualityDefinitions,
+    lowAccuracy: { key: 'lowAccuracy', label: '总体准确率过低', description: '总体准确率低于 0.5，抑制指标需谨慎解释。' },
+  } as Record<string, QualityDefinition>,
   reportDefinition: {
     title: '色词 Stroop',
     headlineMetric: 'stroopEffectMs',
