@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { SstTask } from '../tasks/sst/SstTask'
 import { TaskswitchTask } from '../tasks/taskswitch/TaskswitchTask'
 import { sstSequence, taskswitchSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../tasks/shared/prng'
+import golden from '../../../../../cognitive-randomization-golden-v1.json'
 
 const context = {
   sessionId: 's1',
@@ -64,9 +65,8 @@ describe('SST and Task Switching runners', () => {
   })
 
   it('matches the backend seed sequence contract', () => {
-    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe('seq-v1.0.0')
-    expect(sstSequence('seed-1', 40, 0.25)).toEqual(sstSequence('seed-1', 40, 0.25))
-    expect(sstSequence('seed-1', 40, 0.25).filter((trial) => trial.trialType === 'stop')).toHaveLength(10)
-    expect(taskswitchSequence('seed-1', 48, 2, 0.5, false)[0].switchType).toBe('start')
+    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe(golden.version)
+    expect(sstSequence(golden.seed, 8, 0.25)).toEqual(golden.sst)
+    expect(taskswitchSequence(golden.seed, 8, 2, 0.5, false)).toEqual(golden.taskswitch)
   })
 })

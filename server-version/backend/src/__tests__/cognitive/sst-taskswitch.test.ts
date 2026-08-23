@@ -6,6 +6,7 @@ import { scoreTaskswitchV1 } from '../../modules/cognitive/scoring/taskswitch.v1
 import { mergeProfileConfig } from '../../modules/cognitive/profile-freeze'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { sstSequence, taskswitchSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../../modules/cognitive/randomization'
+import golden from '../../../../cognitive-randomization-golden-v1.json'
 
 const sstConfig = {
   totalTrials: 40,
@@ -90,6 +91,33 @@ describe('sst scorer', () => {
   it('rejects an SSD that does not follow the staircase', () => {
     expect(() => scoreSstV1({ config: sstConfig, trials: trialsFor((_index, ssd) => ssd + 50), randomSeed: seed })).toThrow(/staircase|frozen seed sequence/)
   })
+
+  it('includes choice errors and replaces Go omissions in the integration distribution', () => {
+    let goIndex = 0
+    const sparseGo = trialsFor().map((trial) => {
+      if (trial.payload.trialType !== 'go') return trial
+      const currentGo = goIndex
+      goIndex += 1
+      if (currentGo >= 15) {
+        return { ...trial, payload: { ...trial.payload, response: null, rtMs: null } }
+      }
+      if (currentGo === 14) {
+        return {
+          ...trial,
+          payload: {
+            ...trial.payload,
+            response: trial.payload.goStimulus === 'left' ? 'right' as const : 'left' as const,
+            rtMs: 200,
+          },
+        }
+      }
+      return trial
+    })
+    const result = scoreSstV1({ config: sstConfig, trials: sparseGo, randomSeed: seed })
+    expect(result.metrics.goChoiceErrorRate).toBeGreaterThan(0)
+    expect(result.metrics.goOmissionRate).toBe(0.5)
+    expect(result.metrics.ssrtMs).toBe(420 - (result.metrics.meanSsdMs as number))
+  })
 })
 
 describe('taskswitch schema, profiles and scorer', () => {
@@ -139,5 +167,11 @@ describe('sst/taskswitch randomization contract', () => {
     expect(sstSequence('seed-1', 40, 0.25).filter((trial) => trial.trialType === 'stop')).toHaveLength(10)
     expect(taskswitchSequence('seed-1', 48, 2, 0.5, false)).toEqual(taskswitchSequence('seed-1', 48, 2, 0.5, false))
     expect(taskswitchSequence('seed-1', 48, 2, 0.5, false)[0].switchType).toBe('start')
+  })
+
+  it('matches the repository-wide golden vectors', () => {
+    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe(golden.version)
+    expect(sstSequence(golden.seed, 8, 0.25)).toEqual(golden.sst)
+    expect(taskswitchSequence(golden.seed, 8, 2, 0.5, false)).toEqual(golden.taskswitch)
   })
 })

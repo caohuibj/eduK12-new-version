@@ -96,7 +96,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     setFeedback(null)
     const trialSsd = phase === 'formal'
       ? (current.trialType === 'stop' ? ssdRef.current : null)
-      : current.ssdMs
+      : PRACTICE[practiceIndex].ssdMs
     const show = window.setTimeout(() => {
       setVisible(true)
       onsetRef.current = performance.now()

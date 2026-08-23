@@ -563,6 +563,7 @@ export const corsiRegistryMeta = {
 export const sstRegistryMeta = {
   name: '停止信号任务 SST',
   category: 'response_inhibition',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -600,7 +601,7 @@ export const sstRegistryMeta = {
     insufficientStopTrials: { key: 'insufficientStopTrials', label: 'Stop 试次不足', description: 'Stop 试次过少。' },
     pRespondStopOutOfRange: { key: 'pRespondStopOutOfRange', label: 'Stop 响应概率失控', description: 'p(respond|stop) 低于 0.25 或高于 0.75。' },
     highGoOmission: { key: 'highGoOmission', label: 'Go 遗漏过高', description: 'Go 遗漏率达到 0.2。' },
-    strategicSlowingSuspected: { key: 'strategicSlowingSuspected', label: '疑似策略性等待', description: '失败 Stop 的 RT 不低于 Go 中位 RT。' },
+    strategicSlowingSuspected: { key: 'strategicSlowingSuspected', label: '疑似策略性等待', description: '失败 Stop 的平均 RT 不低于全部有响应 Go 试次的平均 RT。' },
     interrupted: { key: 'interrupted', label: '作答中断', description: '存在 interrupted 试次。' },
   } as Record<string, QualityDefinition>,
   reportDefinitionVersion: '1.0.0',
@@ -618,6 +619,7 @@ export const sstRegistryMeta = {
 export const taskswitchRegistryMeta = {
   name: '任务转换 Task Switching',
   category: 'cognitive_flexibility',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {

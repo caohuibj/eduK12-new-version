@@ -64,8 +64,14 @@ export const scoreSstV1 = (input: {
       .filter((rt): rt is number => rt != null && rt >= config.validRtFloorMs),
   )
   const meanSsdMs = stop.length ? Math.round(mean(stop.map((trial) => trial.payload.ssdMs as number))) : null
+  // Integration method: include every Go response (choice errors and premature
+  // responses included), then replace Go omissions with the maximum observed Go RT.
+  const goResponseRts = go
+    .map((trial) => trial.payload.rtMs)
+    .filter((rt): rt is number => rt != null)
+  const maxGoRt = goResponseRts.length > 0 ? Math.max(...goResponseRts) : null
   const rankedGo = go
-    .map((trial) => (trial.payload.rtMs != null && trial.payload.response === trial.payload.goStimulus ? trial.payload.rtMs : Number.POSITIVE_INFINITY))
+    .map((trial) => trial.payload.rtMs ?? maxGoRt ?? Number.POSITIVE_INFINITY)
     .sort((a, b) => a - b)
   const nthIndex = Math.max(0, Math.min(rankedGo.length - 1, Math.round(pRespondStop * rankedGo.length) - 1))
   const nthRt = rankedGo.length ? rankedGo[nthIndex] : Number.POSITIVE_INFINITY
@@ -76,8 +82,17 @@ export const scoreSstV1 = (input: {
   const insufficientStopTrials = stop.length < Math.max(6, Math.round(expectedStop * 0.5))
   const pRespondStopOutOfRange = pRespondStop < 0.25 || pRespondStop > 0.75
   const highGoOmission = goOmissionRate >= 0.2
+  const goMeanResponseRtMs = goResponseRts.length > 0 ? mean(goResponseRts) : null
+  const unsuccessfulStopResponseRts = unsuccessful
+    .map((trial) => trial.payload.rtMs)
+    .filter((rt): rt is number => rt != null)
+  const unsuccessfulStopMeanRtMs = unsuccessfulStopResponseRts.length > 0
+    ? mean(unsuccessfulStopResponseRts)
+    : null
   const strategicSlowingSuspected =
-    goMedianRtMs != null && unsuccessfulStopRtMs != null && unsuccessfulStopRtMs >= goMedianRtMs
+    goMeanResponseRtMs != null
+    && unsuccessfulStopMeanRtMs != null
+    && unsuccessfulStopMeanRtMs >= goMeanResponseRtMs
   const interrupted = sorted.some((trial) => trial.payload.interrupted)
   const interpretable = !insufficientStopTrials && !pRespondStopOutOfRange && !highGoOmission && ssrtMs != null && ssrtMs > 0
 
