@@ -46,6 +46,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(null)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
   const interruptedRef = useRef(false)
@@ -71,8 +72,11 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
+    setAcknowledgedBlockIndex(null)
     setPhase('formal')
   }
+
+  const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
 
   useEffect(() => {
     const onHidden = () => { if (document.hidden) interruptedRef.current = true }
@@ -82,8 +86,8 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
     if (phase === 'formal' && (trialIndex >= total || !current)) return
+    if (phase === 'formal' && acknowledgedBlockIndex !== current.blockIndex) return
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
@@ -127,9 +131,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
       }
     }, isiMs + stimulusMs)
     return () => { window.clearTimeout(show); window.clearTimeout(hide) }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete, onTaskComplete])
-
-  const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
+  }, [phase, trialIndex, practiceIndex, practiceNonce, current, total, isiMs, stimulusMs, acknowledgedBlockIndex, onTrialComplete, onTaskComplete])
 
   const respond = async () => {
     if (!visible || respondedRef.current || onsetRef.current == null || submittingRef.current) return
@@ -170,6 +172,18 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
         ) : (
           <button className="btn-secondary" onClick={startPractice}>重新练习</button>
         )}
+      </div>
+    )
+  }
+
+  if (phase === 'formal' && current && acknowledgedBlockIndex !== current.blockIndex) {
+    const totalBlocks = sequence.length === 0 ? 0 : Math.max(...sequence.map((trial) => trial.blockIndex)) + 1
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-3">{current.nLevel}-back</h2>
+        <p className="text-gray-600 mb-2">区块 {current.blockIndex + 1} / {totalBlocks}</p>
+        <p className="text-xs text-gray-400 mb-6">每个区块会重新开始；前 {current.nLevel} 个字母不会是目标。</p>
+        <button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>开始本区块</button>
       </div>
     )
   }

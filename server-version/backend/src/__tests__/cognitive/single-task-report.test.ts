@@ -110,6 +110,35 @@ describe('buildCognitiveSingleTaskReport', () => {
     expect(teacher).toEqual(composite)
   })
 
+  it('formats N-Back map metrics by level instead of stringifying objects', () => {
+    const report = buildCognitiveSingleTaskReport({
+      testType: 'nback',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      configVersion: '1.0.0',
+      profile: 'research',
+      frozenReport: null,
+      score: 75,
+      metrics: {
+        dPrimeByN: { '1': 1.25, '2': 0.8 },
+        maxReliableN: 2,
+        hitRateByN: { '1': 0.8, '2': 0.65 },
+        falseAlarmRateByN: { '1': 0.1, '2': 0.2 },
+        medianRtByN: { '1': 410, '2': 480 },
+        loadCostDPrime: 0.45,
+      },
+      qualityFlags: { interpretable: true },
+      reference: null,
+    })
+    expect(report?.primaryMetrics.find((metric) => metric.key === 'dPrimeByN')?.formatted)
+      .toBe('1-back：1.25；2-back：0.8')
+    expect(report?.secondaryMetrics.find((metric) => metric.key === 'hitRateByN')?.formatted)
+      .toBe('1-back：80%；2-back：65%')
+    expect(report?.secondaryMetrics.find((metric) => metric.key === 'medianRtByN')?.formatted)
+      .toBe('1-back：410 ms；2-back：480 ms')
+    expect(JSON.stringify(report)).not.toContain('[object Object]')
+  })
+
   it('uses exact Registry definitions for a legacy session without a frozen report snapshot', () => {
     const report = buildCognitiveSingleTaskReport({
       testType: 'reaction',

@@ -5,7 +5,8 @@ import { scoreNbackV1 } from '../../modules/cognitive/scoring/nback.v1'
 import { scoreCorsiV1 } from '../../modules/cognitive/scoring/corsi.v1'
 import { mergeProfileConfig } from '../../modules/cognitive/profile-freeze'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
-import { corsiSequence, nbackSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../../modules/cognitive/randomization'
+import { corsiSequence, cptSequence, gonogoSequence, nbackSequence, RANDOMIZATION_ALGORITHM_VERSION } from '../../modules/cognitive/randomization'
+import golden from '../../../../cognitive-randomization-golden-v1.json'
 
 const nbackConfig = {
   nLevels: [1] as Array<1 | 2 | 3>,
@@ -123,5 +124,27 @@ describe('nback/corsi randomization contract', () => {
     expect(corsiSequence('seed-1', 0, 3)).toEqual(corsiSequence('seed-1', 0, 3))
     expect(corsiSequence('seed-1', 0, 3)).not.toEqual(corsiSequence('seed-1', 1, 3))
     expect(new Set(corsiSequence('seed-1', 0, 4)).size).toBe(4)
+  })
+
+  it('restarts target eligibility inside every block and uses global block ids', () => {
+    const sequence = nbackSequence('block-seed', [1, 2, 3], [60, 60, 60], [2, 2, 2], 0.3)
+    expect([...new Set(sequence.map((trial) => trial.blockIndex))]).toEqual([0, 1, 2, 3, 4, 5])
+    for (const blockIndex of [0, 1, 2, 3, 4, 5]) {
+      const block = sequence.filter((trial) => trial.blockIndex === blockIndex)
+      const nLevel = block[0].nLevel
+      expect(block.slice(0, nLevel).every((trial) => trial.target === false)).toBe(true)
+      block.forEach((trial, index) => {
+        if (index < nLevel) return
+        expect(trial.target).toBe(trial.stimulus === block[index - nLevel].stimulus)
+      })
+    }
+  })
+
+  it('matches the repository-wide golden vectors', () => {
+    expect(RANDOMIZATION_ALGORITHM_VERSION).toBe(golden.version)
+    expect(nbackSequence(golden.seed, [1, 2], [6, 8], [2, 2], 0.3)).toEqual(golden.nback)
+    expect(corsiSequence(golden.seed, 3, 5)).toEqual(golden.corsi)
+    expect(gonogoSequence(golden.seed, 8, 0.25)).toEqual(golden.gonogo)
+    expect(cptSequence(golden.seed, 8, 0.25, 2)).toEqual(golden.cpt)
   })
 })

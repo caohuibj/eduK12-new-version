@@ -75,40 +75,44 @@ export const nbackSequence = (
   targetRatio: number,
 ): NbackTrialSpec[] => {
   const trials: NbackTrialSpec[] = []
+  let globalBlockIndex = 0
   nLevels.forEach((nLevel, levelIndex) => {
     const trialCount = trialCountByN[levelIndex]
     const blockCount = blockCountByN[levelIndex]
     const perBlock = trialCount / blockCount
-    const eligible = Math.max(0, trialCount - nLevel)
-    const targetCount = Math.min(eligible, Math.max(1, Math.round(eligible * targetRatio)))
-    const eligibleFlags = Array.from({ length: eligible }, (_, index) => index < targetCount)
-    shuffleInPlace(eligibleFlags, seededRandom(seed, `nback-targets:${nLevel}`))
-    const isTarget = [...Array.from({ length: nLevel }, () => false), ...eligibleFlags]
-    const letterRng = seededRandom(seed, `nback-letters:${nLevel}`)
-    const stimuli: string[] = []
-    for (let index = 0; index < trialCount; index += 1) {
-      if (isTarget[index]) {
-        stimuli.push(stimuli[index - nLevel])
-        continue
-      }
-      let letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
-      if (index >= nLevel) {
-        let guard = 0
-        while (letter === stimuli[index - nLevel] && guard < 16) {
-          letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
-          guard += 1
+    for (let blockWithinLevel = 0; blockWithinLevel < blockCount; blockWithinLevel += 1) {
+      const eligible = Math.max(0, perBlock - nLevel)
+      const targetCount = Math.min(eligible, Math.max(1, Math.round(eligible * targetRatio)))
+      const eligibleFlags = Array.from({ length: eligible }, (_, index) => index < targetCount)
+      shuffleInPlace(eligibleFlags, seededRandom(seed, `nback-targets:${nLevel}:${blockWithinLevel}`))
+      const isTarget = [...Array.from({ length: nLevel }, () => false), ...eligibleFlags]
+      const letterRng = seededRandom(seed, `nback-letters:${nLevel}:${blockWithinLevel}`)
+      const stimuli: string[] = []
+      for (let index = 0; index < perBlock; index += 1) {
+        if (isTarget[index]) {
+          stimuli.push(stimuli[index - nLevel])
+          continue
         }
+        let letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
+        if (index >= nLevel) {
+          let guard = 0
+          while (letter === stimuli[index - nLevel] && guard < 16) {
+            letter = NBACK_LETTERS[Math.floor(letterRng() * NBACK_LETTERS.length)]
+            guard += 1
+          }
+        }
+        stimuli.push(letter)
       }
-      stimuli.push(letter)
-    }
-    stimuli.forEach((stimulus, index) => {
-      trials.push({
-        nLevel,
-        blockIndex: Math.floor(index / perBlock),
-        stimulus,
-        target: Boolean(isTarget[index]),
+      stimuli.forEach((stimulus, index) => {
+        trials.push({
+          nLevel,
+          blockIndex: globalBlockIndex,
+          stimulus,
+          target: Boolean(isTarget[index]),
+        })
       })
-    })
+      globalBlockIndex += 1
+    }
   })
   return trials
 }

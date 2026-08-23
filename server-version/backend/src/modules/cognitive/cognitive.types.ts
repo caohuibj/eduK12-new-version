@@ -77,6 +77,7 @@ export interface RegistryEntry<TConfig, TTrial> {
   category: string
   engineVersion: string
   scoringVersion: string
+  randomizationAlgorithmVersion: string
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
   score(input: {

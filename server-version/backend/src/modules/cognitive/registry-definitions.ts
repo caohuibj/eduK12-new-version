@@ -33,6 +33,7 @@ const metric = (
 export const fakeRegistryMeta = {
   name: 'Fake 测试',
   category: 'framework',
+  randomizationAlgorithmVersion: 'none',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: { profile: 'experience' as const, estimatedMinutes: [1, 2], configPatch: { trialCount: 3 }, reportCaveats: ['框架任务，仅供体验。'] },
@@ -64,6 +65,7 @@ export const fakeRegistryMeta = {
 export const reactionRegistryMeta = {
   name: '简单反应时',
   category: 'processing_speed',
+  randomizationAlgorithmVersion: 'reaction-foreperiod-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -138,6 +140,7 @@ export const reactionRegistryMetaV11 = {
 export const memoryRegistryMeta = {
   name: '数字广度顺背',
   category: 'working_memory',
+  randomizationAlgorithmVersion: 'memory-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -241,6 +244,7 @@ export const memoryRegistryMetaV11 = {
 export const stroopRegistryMeta = {
   name: '色词 Stroop',
   category: 'inhibitory_control',
+  randomizationAlgorithmVersion: 'stroop-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -337,6 +341,7 @@ export const stroopRegistryMetaV11 = {
 export const gonogoRegistryMeta = {
   name: 'Go/No-Go',
   category: 'response_inhibition',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -392,6 +397,7 @@ export const gonogoRegistryMeta = {
 export const cptRegistryMeta = {
   name: '连续执行任务 CPT-X',
   category: 'sustained_attention',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -450,6 +456,7 @@ export const cptRegistryMeta = {
 export const nbackRegistryMeta = {
   name: 'N-Back 工作记忆更新',
   category: 'working_memory_updating',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
@@ -503,6 +510,7 @@ export const nbackRegistryMeta = {
 export const corsiRegistryMeta = {
   name: 'Corsi 视空间广度',
   category: 'visuospatial_memory',
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: {
