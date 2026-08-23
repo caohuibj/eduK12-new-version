@@ -5,6 +5,7 @@ import { createServer } from 'http'
 import { config } from './config'
 import { prisma } from './config/database'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
+import { authenticate, requireAdmin } from './middleware/auth'
 import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
 import { classroomSocketHandler } from './services/classroomSocketHandler'
@@ -40,6 +41,7 @@ import cognitivePublicRoutes from './modules/cognitive/cognitive.public.routes'
 import compositeRoutes from './modules/composite/composite.routes'
 import compositePublicRoutes from './modules/composite/composite.public.routes'
 import capabilitiesRoutes from './routes/capabilities'
+import materialGrantRoutes from './routes/materialGrants'
 
 const app = express()
 
@@ -101,6 +103,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/assignments', assignmentRoutes)
 app.use('/api/checkins', checkinRoutes)

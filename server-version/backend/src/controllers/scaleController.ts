@@ -9,6 +9,7 @@ import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField, safeDecrypt } from '../utils/encryption'
 import { normalizeScaleConfig, scaleLabelsError } from '../utils/scaleLabels'
+import { scaleSource, scaleWhereForViewer } from '../services/materialGrant'
 
 // ==================== Validation Schemas ====================
 
@@ -59,22 +60,19 @@ export const scaleController = {
       const { courseId, status } = req.query
       const pagination = getPaginationParams(req)
 
-      let where: any = {}
+      const extra: Record<string, unknown> = {}
 
       // 按课程筛选
       if (courseId) {
-        where.courseScales = { some: { courseId: courseId as string } }
+        extra.courseScales = { some: { courseId: courseId as string } }
       }
 
       // 按状态筛选
       if (status) {
-        where.status = status as string
+        extra.status = status as string
       }
 
-      // 教师只能看到自己创建的量表
-      if (userRole === UserRole.TEACHER) {
-        where.creatorId = userId
-      }
+      const where = await scaleWhereForViewer(userId as string, userRole as UserRole, extra)
 
       // 并行查询量表列表和总数
       const [scales, total] = await Promise.all([
@@ -115,7 +113,11 @@ export const scaleController = {
         prisma.scale.count({ where }),
       ])
 
-      const result = buildPaginatedResult(scales, total, pagination)
+      const withSource = scales.map((scale) => ({
+        ...scale,
+        source: scaleSource(userId as string, userRole as UserRole, scale),
+      }))
+      const result = buildPaginatedResult(withSource, total, pagination)
       return success(res, result)
     } catch (err) {
       logger.error('获取量表列表错误', err)
@@ -1830,12 +1832,7 @@ export const scaleController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
 
-      let where: any = {}
-
-      // 教师只能看自己创建的量表标签
-      if (userRole === UserRole.TEACHER) {
-        where.creatorId = userId
-      }
+      const where = await scaleWhereForViewer(userId as string, userRole as UserRole)
 
       const scales = await prisma.scale.findMany({
         where,

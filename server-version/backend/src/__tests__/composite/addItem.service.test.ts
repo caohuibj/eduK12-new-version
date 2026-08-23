@@ -11,6 +11,8 @@ const { mockPrisma } = vi.hoisted(() => ({
     cognitiveAssignment: { findUnique: vi.fn() },
     compositeAssessmentItem: { create: vi.fn() },
     course: { findUnique: vi.fn() },
+    scale: { findUnique: vi.fn() },
+    materialGrant: { findUnique: vi.fn() },
   },
 }))
 
@@ -58,6 +60,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', creatorId: 'teacher-a' })
+  mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
 })
 
 describe('addItem cognitive course match', () => {
@@ -95,6 +98,57 @@ describe('addItem cognitive course match', () => {
       cognitiveAssignmentId: 'asg-1',
       required: true,
     })).rejects.toMatchObject({ statusCode: 400, message: '含认知模块的综合测评必须绑定课程' })
+  })
+})
+
+describe('addItem scale grants', () => {
+  it('forbids another teacher published scale without a grant', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED' })
+    await expect(addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'SCALE',
+      scaleId: 'scale-other',
+      required: true,
+    })).rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  it('allows a granted published scale', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED' })
+    mockPrisma.materialGrant.findUnique.mockResolvedValue({ id: 'g1' })
+    await addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'SCALE',
+      scaleId: 'scale-other',
+      required: true,
+    })
+    expect(mockPrisma.compositeAssessmentItem.create).toHaveBeenCalled()
+  })
+
+  it('keeps an existing scale item after a grant is revoked', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ id: 'item-scale', type: 'SCALE', scaleId: 'scale-other' }],
+    }))
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED' })
+    expect(draftComposite({
+      items: [{ id: 'item-scale', type: 'SCALE', scaleId: 'scale-other' }],
+    }).items).toHaveLength(1)
+    await expect(addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'SCALE',
+      scaleId: 'scale-other',
+      required: true,
+    })).rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  it('still publishes a draft after the scale grant is revoked', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{ type: 'SCALE', scale: { id: 'scale-other', status: 'PUBLISHED', creatorId: 'admin-1' } }],
+    }))
+    mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
+    await publishComposite('teacher-a', TEACHER, 'composite-1')
+    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ status: 'PUBLISHED' }),
+    }))
   })
 })
 

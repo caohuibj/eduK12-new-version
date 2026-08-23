@@ -14,6 +14,7 @@ import { success, error, forbidden, notFound } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
 import { UserRole } from '../types'
+import { canUseScale } from '../services/materialGrant'
 import { z } from 'zod'
 
 // ==================== Validation Schemas ====================
@@ -479,6 +480,10 @@ export const generalQuestionnaireController = {
 
       if (!scale) {
         return notFound(res, '量表不存在')
+      }
+
+      if (!userId || !(await canUseScale(userId, req.user?.role as UserRole, scale))) {
+        return forbidden(res, '无权限使用此量表')
       }
 
       // 检查是否已关联

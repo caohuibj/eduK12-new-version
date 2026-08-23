@@ -54,6 +54,8 @@ model User {
   compositeAssessmentAttempts CompositeAssessmentAttempt[] @relation("CompositeAttemptUser")
   createdCompositeAccessTokens CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
   createdCognitiveAccessTokens CognitiveAccessToken[]      @relation("CognitiveTokenCreator")
+  materialGrantsReceived       MaterialGrant[]             @relation("MaterialGrantTeacher")
+  materialGrantsGiven          MaterialGrant[]             @relation("MaterialGrantGranter")
 
   @@map("users")
 }
@@ -314,6 +316,32 @@ enum ScaleVisibility {
   HIDDEN // 未关联不可见（默认）
   COURSE // 关联课程后可见
   PUBLIC // 全体可见
+}
+
+enum MaterialResourceType {
+  SCALE
+  COGNITIVE_CONFIG
+}
+
+enum CognitiveConfigAccessPolicy {
+  OPEN
+  GRANT
+}
+
+model MaterialGrant {
+  id           String               @id @default(uuid())
+  teacherId    String               @map("teacher_id")
+  resourceType MaterialResourceType @map("resource_type")
+  resourceId   String               @map("resource_id")
+  grantedBy    String               @map("granted_by")
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  teacher User @relation("MaterialGrantTeacher", fields: [teacherId], references: [id], onDelete: Cascade)
+  granter User @relation("MaterialGrantGranter", fields: [grantedBy], references: [id], onDelete: Restrict)
+
+  @@unique([teacherId, resourceType, resourceId])
+  @@index([resourceType, resourceId])
+  @@map("material_grants")
 }
 
 // 量表表
@@ -977,10 +1005,11 @@ model CognitiveTestConfig {
   config         Json? // 任务定义（刺激参数、计数等），非参与者行为数据
   status         CognitiveConfigStatus @default(DRAFT)
   engineVersion  String                @map("engine_version")
-  scoringVersion String                @map("scoring_version")
-  createdAt      DateTime              @default(now()) @map("created_at")
-  updatedAt      DateTime              @updatedAt @map("updated_at")
-  publishedAt    DateTime?             @map("published_at")
+  scoringVersion String                     @map("scoring_version")
+  accessPolicy   CognitiveConfigAccessPolicy @default(OPEN) @map("access_policy")
+  createdAt      DateTime                   @default(now()) @map("created_at")
+  updatedAt      DateTime                   @updatedAt @map("updated_at")
+  publishedAt    DateTime?                  @map("published_at")
 
   assignments CognitiveAssignment[]
   sessions    CognitiveSession[]

@@ -64,7 +64,12 @@ export const listAssignmentsQuerySchema = z.object({
 
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>
 export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>
+export const updateAccessPolicySchema = z.object({
+  accessPolicy: z.enum(['OPEN', 'GRANT']),
+}).strict()
+
 export type ListAssignmentsQuery = z.infer<typeof listAssignmentsQuerySchema>
+export type UpdateAccessPolicyInput = z.infer<typeof updateAccessPolicySchema>
 
 // ---------------------------------------------------------------------------
 // Cognitive export
