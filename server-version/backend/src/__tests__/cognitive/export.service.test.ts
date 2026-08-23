@@ -14,8 +14,10 @@ import {
   buildCognitiveResearchPackage,
   exportCognitiveToCSV,
   getCognitiveExportData,
+  isAllowedCognitiveExportFileName,
   makeCognitiveExportFileName,
 } from '../../modules/cognitive/export.service'
+import { cognitiveExportRequestSchema } from '../../modules/cognitive/cognitive.schema'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
@@ -241,5 +243,41 @@ describe('cognitive export service', () => {
       expect(registryKeys).toContain(row.key)
     }
     expect(data.trialCount).toBe(2)
+  })
+
+  it('accepts research zip/xlsx filenames and rejects illegal detail/format combos', () => {
+    const zip = makeCognitiveExportFileName('assignment-1', 'research', 'zip')
+    const xlsx = makeCognitiveExportFileName('assignment-1', 'research', 'xlsx')
+    expect(isAllowedCognitiveExportFileName(zip)).toBe(true)
+    expect(isAllowedCognitiveExportFileName(xlsx)).toBe(true)
+    expect(isAllowedCognitiveExportFileName(zip.replace('research', 'summary'))).toBe(false)
+    expect(cognitiveExportRequestSchema.safeParse({ detail: 'summary', format: 'zip' }).success).toBe(false)
+    expect(cognitiveExportRequestSchema.safeParse({ detail: 'research', format: 'csv' }).success).toBe(false)
+    expect(cognitiveExportRequestSchema.safeParse({ detail: 'research', format: 'zip' }).success).toBe(true)
+  })
+
+  it('omits research-only CPT slopes from a standard summary', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({
+      ...assignment,
+      profile: 'standard',
+      config: { testType: 'cpt', configVersion: '1.0.0', engineVersion: '1.0.0', scoringVersion: '1.0.0' },
+    })
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([{
+      ...session(),
+      testType: 'cpt',
+      metricsEncrypted: encryptCognitivePayload({
+        dPrime: 1.2,
+        omissionRate: 0.1,
+        commissionRate: 0.1,
+        rtICV: 0.2,
+        blockSlopeRt: 12,
+        blockSlopeOmission: 0.01,
+      }),
+    }])
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary', anonymize: true })
+    const names = data.fields.map((field) => field.name)
+    expect(names).toContain('M_d_prime')
+    expect(names).not.toContain('M_block_slope_rt')
+    expect(names).not.toContain('M_block_slope_omission')
   })
 })

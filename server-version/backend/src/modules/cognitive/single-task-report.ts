@@ -105,8 +105,14 @@ export const buildCognitiveSingleTaskReport = (input: {
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
   const interpretable = input.qualityFlags.interpretable !== false
-  const primaryKeys = reportDefinition?.primaryMetrics ?? []
-  const secondaryKeys = reportDefinition?.secondaryMetrics ?? []
+  const metricVisible = (key: string) => {
+    const definition = metricDefinitions[key]
+    if (!definition) return true
+    if (!input.profile || !definition.availableProfiles) return true
+    return definition.availableProfiles.includes(input.profile)
+  }
+  const primaryKeys = (reportDefinition?.primaryMetrics ?? []).filter(metricVisible)
+  const secondaryKeys = (reportDefinition?.secondaryMetrics ?? []).filter(metricVisible)
   const headlineKey = reportDefinition?.headlineMetric || primaryKeys[0]
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')

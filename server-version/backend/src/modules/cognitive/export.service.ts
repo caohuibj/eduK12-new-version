@@ -86,6 +86,10 @@ interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'sc
 const MAX_FIELD_NAME_LENGTH = 64
 const EXPORT_DIR = path.join(__dirname, '../../../exports')
 
+export const isAllowedCognitiveExportFileName = (fileName: string): boolean =>
+  /^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
+  || /^cognitive_[a-zA-Z0-9-]+_research_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(zip|xlsx)$/.test(fileName)
+
 export const makeCognitiveExportFileName = (
   assignmentId: string,
   detail: CognitiveExportDetail | 'summary' | 'full' | 'research',
@@ -350,8 +354,22 @@ const reportContextFor = (assignment: Awaited<ReturnType<typeof getAssignment>>,
 const metricLabel = (
   session: DecodedCognitiveExportSession,
   key: string,
-  defs: Record<string, { label?: string; export?: { label: string } }>,
+  defs: Record<string, { label?: string; export?: { label: string }; availableProfiles?: string[] }>,
 ) => defs[key]?.export?.label || defs[key]?.label || key
+
+const includeMetricInWideExport = (
+  key: string,
+  defs: Record<string, { export?: { summary: boolean }; availableProfiles?: string[] }>,
+  profile: string | null,
+  detail: CognitiveExportDetail,
+) => {
+  if (detail === 'research') return true
+  const definition = defs[key]
+  if (!definition) return false
+  if (definition.export && definition.export.summary === false) return false
+  if (profile && definition.availableProfiles && !definition.availableProfiles.includes(profile)) return false
+  return true
+}
 
 const addSessionFields = (
   builder: ExportFieldBuilder,
@@ -361,6 +379,7 @@ const addSessionFields = (
 ) => {
   const context = reportContextFor(assignment, session)
   for (const [key, value] of Object.entries(session.metrics).sort(([a], [b]) => a.localeCompare(b))) {
+    if (!includeMetricInWideExport(key, context.metricDefinitions, context.profile, detail)) continue
     builder.add(
       makeFieldName('M_', key),
       `[${session.testType}] ${metricLabel(session, key, context.metricDefinitions)}`,
@@ -445,6 +464,7 @@ const buildRows = (
 
     const context = reportContextFor(assignment, session)
     for (const [key, value] of Object.entries(session.metrics)) {
+      if (!includeMetricInWideExport(key, context.metricDefinitions, context.profile, detail)) continue
       const label = `[${session.testType}] ${metricLabel(session, key, context.metricDefinitions)}`
       row[builder.resolve(makeFieldName('M_', key), label)] = scalarExportValue(value)
     }
@@ -644,6 +664,7 @@ export const buildCognitiveResearchPackage = (
     metricRowCount: metricRows.length,
     trialRowCount: trialRows.length,
     files: ['sessions.csv', 'metrics.csv', 'trials.csv', 'manifest.json', 'data_dictionary.xlsx', 'README.txt'],
+    randomizationAlgorithmVersion: 'seq-v1.0.0',
   }
   const readme = [
     'Cognitive research-long export',
