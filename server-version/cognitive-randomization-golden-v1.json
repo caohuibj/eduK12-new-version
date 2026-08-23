@@ -28,5 +28,25 @@
     { "blockIndex": 1, "isTarget": false, "stimulus": "C" },
     { "blockIndex": 1, "isTarget": false, "stimulus": "H" },
     { "blockIndex": 1, "isTarget": false, "stimulus": "B" }
+  ],
+  "sst": [
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" },
+    { "trialType": "stop", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" },
+    { "trialType": "stop", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" }
+  ],
+  "taskswitch": [
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": null, "switchType": "start", "stimulus": 6, "correctResponse": "right" },
+    { "blockIndex": 0, "taskRule": "magnitude", "previousTaskRule": "parity", "switchType": "switch", "stimulus": 2, "correctResponse": "left" },
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": "magnitude", "switchType": "switch", "stimulus": 1, "correctResponse": "left" },
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": "parity", "switchType": "repeat", "stimulus": 9, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "parity", "previousTaskRule": null, "switchType": "start", "stimulus": 3, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "parity", "switchType": "switch", "stimulus": 2, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 8, "correctResponse": "right" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 9, "correctResponse": "right" }
   ]
 }

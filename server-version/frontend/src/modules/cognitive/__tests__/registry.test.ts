@@ -36,6 +36,8 @@ describe('cognitive frontend registry', () => {
     expect(resolveRunner('stroop', '9.9.9')).toBeUndefined()
     expect(resolveRunner('nback', '1.0.0')?.completionMode).toBe('task')
     expect(resolveRunner('corsi', '1.0.0')?.completionMode).toBe('task')
+    expect(resolveRunner('sst', '1.0.0')?.completionMode).toBe('task')
+    expect(resolveRunner('taskswitch', '1.0.0')?.completionMode).toBe('task')
     expect(resolveRunner('nback', '9.9.9')).toBeUndefined()
   })
 

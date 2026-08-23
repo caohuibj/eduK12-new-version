@@ -122,3 +122,78 @@ export const corsiSequence = (seed: string, trialIndex: number, spanLength: numb
   shuffleInPlace(blocks, seededRandom(seed, `corsi:${trialIndex}:${spanLength}`))
   return blocks.slice(0, spanLength)
 }
+
+export type SstTrialSpec = {
+  trialType: 'go' | 'stop'
+  goStimulus: 'left' | 'right'
+}
+
+export const sstSequence = (seed: string, totalTrials: number, stopRatio: number): SstTrialSpec[] => {
+  const stopCount = Math.round(totalTrials * stopRatio)
+  const types: Array<'go' | 'stop'> = Array.from({ length: totalTrials }, (_, index) => (index < stopCount ? 'stop' : 'go'))
+  shuffleInPlace(types, seededRandom(seed, 'sst-types'))
+  const sideRng = seededRandom(seed, 'sst-sides')
+  return types.map((trialType) => ({
+    trialType,
+    goStimulus: sideRng() < 0.5 ? 'left' : 'right',
+  }))
+}
+
+const TASKSWITCH_STIMULI = [1, 2, 3, 4, 6, 7, 8, 9]
+type TaskRule = 'parity' | 'magnitude'
+
+export type TaskswitchTrialSpec = {
+  blockIndex: number
+  taskRule: TaskRule
+  previousTaskRule: TaskRule | null
+  switchType: 'start' | 'switch' | 'repeat'
+  stimulus: number
+  correctResponse: 'left' | 'right'
+}
+
+export const taskswitchCorrectResponse = (taskRule: TaskRule, stimulus: number): 'left' | 'right' => {
+  if (taskRule === 'parity') return stimulus % 2 === 1 ? 'left' : 'right'
+  return stimulus < 5 ? 'left' : 'right'
+}
+
+export const taskswitchSequence = (
+  seed: string,
+  totalTrials: number,
+  blockCount: number,
+  switchRatio: number,
+  includePureBlocks: boolean,
+): TaskswitchTrialSpec[] => {
+  const perBlock = totalTrials / blockCount
+  const switchRng = seededRandom(seed, 'taskswitch-switch')
+  const startRng = seededRandom(seed, 'taskswitch-start')
+  const stimRng = seededRandom(seed, 'taskswitch-stim')
+  const trials: TaskswitchTrialSpec[] = []
+  for (let block = 0; block < blockCount; block += 1) {
+    for (let offset = 0; offset < perBlock; offset += 1) {
+      const previous = offset === 0 ? null : trials[trials.length - 1].taskRule
+      let taskRule: TaskRule
+      let switchType: 'start' | 'switch' | 'repeat'
+      if (offset === 0) {
+        taskRule = includePureBlocks && block === 1 ? 'magnitude' : includePureBlocks && block === 0 ? 'parity' : (startRng() < 0.5 ? 'parity' : 'magnitude')
+        switchType = 'start'
+      } else if (includePureBlocks && block < 2) {
+        taskRule = previous as TaskRule
+        switchType = 'repeat'
+      } else {
+        const shouldSwitch = switchRng() < switchRatio
+        taskRule = shouldSwitch ? (previous === 'parity' ? 'magnitude' : 'parity') : previous as TaskRule
+        switchType = shouldSwitch ? 'switch' : 'repeat'
+      }
+      const stimulus = TASKSWITCH_STIMULI[Math.floor(stimRng() * TASKSWITCH_STIMULI.length)]
+      trials.push({
+        blockIndex: block,
+        taskRule,
+        previousTaskRule: previous,
+        switchType,
+        stimulus,
+        correctResponse: taskswitchCorrectResponse(taskRule, stimulus),
+      })
+    }
+  }
+  return trials
+}
