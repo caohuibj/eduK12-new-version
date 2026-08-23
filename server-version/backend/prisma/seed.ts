@@ -499,6 +499,55 @@ async function main() {
       report: NONE_REPORT,
     },
   })
+  await seedDraftCognitiveConfig('digitbackward', '1.0.0', {
+    name: 'Digit Span Backward Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      startSpan: 2,
+      maxSpan: 7,
+      trialsPerLevel: 2,
+      digitDisplayMs: 800,
+      digitIntervalMs: 200,
+      readyDurationMs: 800,
+      inactivityGuardMs: 30000,
+      stimulusSetVersion: 'digits-v1.0.0',
+      report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('picturesequence', '1.0.0', {
+    name: 'Picture Sequence Learning Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      itemCount: 12,
+      learningRounds: 3,
+      delayedEnabled: false,
+      delayedDelayMs: 0,
+      studyMsPerItem: 900,
+      inactivityGuardMs: 60000,
+      stimulusSetVersion: 'daily-scenes-v1.0.0',
+      report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('pairedassociate', '1.0.0', {
+    name: 'Paired Associate Learning Pilot v1.0.0',
+    status: 'DRAFT',
+    engineVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    config: {
+      pairCount: 12,
+      learningRounds: 3,
+      delayedEnabled: false,
+      delayedDelayMs: 0,
+      studyDurationMs: 12000,
+      inactivityGuardMs: 90000,
+      stimulusSetVersion: 'nonverbal-pairs-v1.0.0',
+      report: NONE_REPORT,
+    },
+  })
   console.log('数据库初始化完成。')
 }
 

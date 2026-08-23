@@ -337,3 +337,39 @@ export const cardsortSequence = (
   }
   return trials
 }
+
+export const digitBackwardSequence = (seed: string, trialIndex: number, spanLength: number): number[] => {
+  const digits = Array.from({ length: 10 }, (_, index) => index)
+  shuffleInPlace(digits, seededRandom(seed, `digitbackward:${trialIndex}:${spanLength}`))
+  const sequence = digits.slice(0, spanLength)
+  const ascending = sequence.every((value, index) => index === 0 || value === sequence[index - 1] + 1)
+  const descending = sequence.every((value, index) => index === 0 || value === sequence[index - 1] - 1)
+  if ((ascending || descending) && sequence.length > 2) {
+    const last = sequence.pop() as number
+    sequence.splice(1, 0, last)
+  }
+  return sequence
+}
+
+const PICTURE_STORY_BANKS = [
+  Array.from({ length: 15 }, (_, index) => `scene-${String(index + 1).padStart(2, '0')}`),
+  Array.from({ length: 15 }, (_, index) => `scene-${String(index + 16).padStart(2, '0')}`),
+  Array.from({ length: 15 }, (_, index) => `scene-${String(index + 31).padStart(2, '0')}`),
+]
+
+export const pictureSequenceItems = (seed: string, itemCount: number): string[] => {
+  const random = seededRandom(seed, 'picturesequence-story')
+  const bank = PICTURE_STORY_BANKS[Math.floor(random() * PICTURE_STORY_BANKS.length)]
+  return bank.slice(0, itemCount)
+}
+
+export type PairedAssociateSpec = { itemId: string; targetPosition: number }
+
+export const pairedAssociateSet = (seed: string, pairCount: number): PairedAssociateSpec[] => {
+  const ids = Array.from({ length: pairCount }, (_, index) => `pair-${String(index + 1).padStart(2, '0')}`)
+  const positions = shuffleInPlace(
+    Array.from({ length: pairCount }, (_, index) => index),
+    seededRandom(seed, 'pairedassociate-positions'),
+  )
+  return ids.map((itemId, index) => ({ itemId, targetPosition: positions[index] }))
+}

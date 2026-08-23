@@ -16,6 +16,9 @@ import {
   patterncompareRegistryMeta,
   flankerRegistryMeta,
   cardsortRegistryMeta,
+  digitbackwardRegistryMeta,
+  picturesequenceRegistryMeta,
+  pairedassociateRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -59,6 +62,15 @@ import { scoreFlankerV1 } from './scoring/flanker.v1'
 import { cardsortConfigSchema } from './schemas/cardsort.config'
 import { cardsortTrialSchema } from './schemas/cardsort.trial'
 import { scoreCardsortV1 } from './scoring/cardsort.v1'
+import { digitbackwardConfigSchema } from './schemas/digitbackward.config'
+import { digitbackwardTrialSchema } from './schemas/digitbackward.trial'
+import { scoreDigitbackwardV1 } from './scoring/digitbackward.v1'
+import { picturesequenceConfigSchema } from './schemas/picturesequence.config'
+import { picturesequenceTrialSchema } from './schemas/picturesequence.trial'
+import { scorePicturesequenceV1 } from './scoring/picturesequence.v1'
+import { pairedassociateConfigSchema } from './schemas/pairedassociate.config'
+import { pairedassociateTrialSchema } from './schemas/pairedassociate.trial'
+import { scorePairedassociateV1 } from './scoring/pairedassociate.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -286,4 +298,34 @@ registerEntry({
   trialSchema: cardsortTrialSchema,
   score: scoreCardsortV1,
   ...cardsortRegistryMeta,
+})
+
+registerEntry({
+  testType: 'digitbackward',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: digitbackwardConfigSchema,
+  trialSchema: digitbackwardTrialSchema,
+  score: scoreDigitbackwardV1,
+  ...digitbackwardRegistryMeta,
+})
+
+registerEntry({
+  testType: 'picturesequence',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: picturesequenceConfigSchema,
+  trialSchema: picturesequenceTrialSchema,
+  score: scorePicturesequenceV1,
+  ...picturesequenceRegistryMeta,
+})
+
+registerEntry({
+  testType: 'pairedassociate',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: pairedassociateConfigSchema,
+  trialSchema: pairedassociateTrialSchema,
+  score: scorePairedassociateV1,
+  ...pairedassociateRegistryMeta,
 })

@@ -106,7 +106,7 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 - NIH Toolbox Picture Sequence Memory 开发与验证：https://pmc.ncbi.nlm.nih.gov/articles/PMC4254833/
 - 儿童在线任务的施测结构描述：https://pmc.ncbi.nlm.nih.gov/articles/PMC9817474/
 
-**Huisurvey 转化**：自有、文化适宜的日常场景图片；多轮学习后拖放排序。服务端计算 adjacent-pair、position 与 learning gain；科研档延迟结果缺失时保留 null。
+**Huisurvey 转化**：自有、文化适宜的日常场景图片；多轮学习后用点击顺序排序（兼容触屏与键盘，不强制拖放）。服务端计算 adjacent-pair、position 与 learning gain；科研档延迟结果缺失时保留 null。
 
 **刺激策略**：原创插画或明确可商用资产；每套故事记录图片、正确顺序、内容审核和 stimulusSetVersion。
 
@@ -184,6 +184,16 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 | `cardsort` | `geometric-cards-v1.0.0` | internal-generated | 红/蓝与圆/星的双线索卡片，颜色同时有文字标签；switch 试次使用两规则冲突刺激；config 保持 DRAFT |
 
 以上三套刺激不含第三方图片。进入 PUBLISHED 前仍须完成第 6 节要求的 K7–K12 内容、可访问性和 pilot 审查；当前记录不等于发布许可。
+
+### 3.11 PR4 刺激实现记录（待 pilot）
+
+| testType | stimulusSetVersion | sourceType | 实现与当前状态 |
+|---|---|---|---|
+| `digitbackward` | `digits-v1.0.0` | internal-generated | Session seed 生成不重复数字序列，并排除明显连续升降序；服务端验证完全倒序；config 保持 DRAFT |
+| `picturesequence` | `daily-scenes-v1.0.0` | internal-generated | 三套各 15 项的校内日常场景卡；使用内部 SVG 图形与文字双编码，正确故事顺序由 seed 选择；config 保持 DRAFT |
+| `pairedassociate` | `nonverbal-pairs-v1.0.0` | internal-generated | 18 个内部抽象符号与位置网格，seed 冻结项目—位置映射；不复制 CANTAB 图案或布局；config 保持 DRAFT |
+
+三套实现目前只完成工程一致性验证。`daily-scenes-v1.0.0` 尚需 K7–K12 学生对场景顺序的可理解性与文化内容审核；`nonverbal-pairs-v1.0.0` 尚需符号可辨识度、色觉无关性和设备尺寸 pilot。审核前均不得改成 PUBLISHED 或 `recommendedForCreate`。
 
 ---
 

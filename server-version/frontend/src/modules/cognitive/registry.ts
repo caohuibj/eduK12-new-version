@@ -13,6 +13,9 @@ import { taskswitchRegistryEntry } from './tasks/taskswitch/taskswitch.registry'
 import { patterncompareRegistryEntry } from './tasks/patterncompare/patterncompare.registry'
 import { flankerRegistryEntry } from './tasks/flanker/flanker.registry'
 import { cardsortRegistryEntry } from './tasks/cardsort/cardsort.registry'
+import { digitbackwardRegistryEntry } from './tasks/digitbackward/digitbackward.registry'
+import { picturesequenceRegistryEntry } from './tasks/picturesequence/picturesequence.registry'
+import { pairedassociateRegistryEntry } from './tasks/pairedassociate/pairedassociate.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -102,3 +105,6 @@ registerCognitiveRunner(taskswitchRegistryEntry)
 registerCognitiveRunner(patterncompareRegistryEntry)
 registerCognitiveRunner(flankerRegistryEntry)
 registerCognitiveRunner(cardsortRegistryEntry)
+registerCognitiveRunner(digitbackwardRegistryEntry)
+registerCognitiveRunner(picturesequenceRegistryEntry)
+registerCognitiveRunner(pairedassociateRegistryEntry)
