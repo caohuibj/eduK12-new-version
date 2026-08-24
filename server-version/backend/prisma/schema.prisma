@@ -53,6 +53,7 @@ model User {
   createdCompositeAssessments CompositeAssessment[]       @relation("CompositeAssessmentCreator")
   compositeAssessmentAttempts CompositeAssessmentAttempt[] @relation("CompositeAttemptUser")
   createdCompositeAccessTokens CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
+  generatedCompositeAnalysisSnapshots CompositeAnalysisSnapshot[] @relation("CompositeAnalysisSnapshotGenerator")
   createdCognitiveAccessTokens CognitiveAccessToken[]      @relation("CognitiveTokenCreator")
   materialGrantsReceived       MaterialGrant[]             @relation("MaterialGrantTeacher")
   materialGrantsGiven          MaterialGrant[]             @relation("MaterialGrantGranter")
@@ -674,6 +675,11 @@ enum CompositeAssessmentAttemptStatus {
   ABANDONED
 }
 
+enum CompositeAnalysisSnapshotGenerationReason {
+  COMPLETION
+  REANALYSIS
+}
+
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
   id          String                    @id @default(uuid())
@@ -771,6 +777,7 @@ model CompositeAssessmentAttempt {
   scaleAssessments   Assessment[]                    @relation("CompositeAttemptAssessments")
   cognitiveSessions  CognitiveSession[]               @relation("CompositeAttemptCognitiveSessions")
   formAnswers        CompositeFormAnswer[]
+  analysisSnapshots  CompositeAnalysisSnapshot[]
 
   @@index([compositeAssessmentId, status])
   @@index([userId, status])
@@ -778,6 +785,31 @@ model CompositeAssessmentAttempt {
   @@index([accessTokenId])
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@map("composite_assessment_attempts")
+}
+
+// Package-scoped cognitive analysis output. Rows are append-only at the
+// application level; the completion row is the historical default and an
+// explicit reanalysis creates a separate row.
+model CompositeAnalysisSnapshot {
+  id                       String                                  @id @default(uuid())
+  attemptId                String                                  @map("attempt_id")
+  packageKey               String                                  @map("package_key")
+  packageVersion           String                                  @map("package_version")
+  analysisDefinitionVersion String                                 @map("analysis_definition_version")
+  analysisVersion          String                                  @map("analysis_version")
+  reportSchemaVersion      String                                  @map("report_schema_version")
+  inputFingerprint         String                                  @map("input_fingerprint")
+  generationReason         CompositeAnalysisSnapshotGenerationReason @map("generation_reason")
+  generatedBy              String?                                 @map("generated_by")
+  payloadEncrypted         String                                  @map("payload_encrypted")
+  createdAt                DateTime                                @default(now()) @map("created_at")
+
+  attempt                 CompositeAssessmentAttempt              @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  generator               User?                                   @relation("CompositeAnalysisSnapshotGenerator", fields: [generatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([attemptId, analysisVersion, inputFingerprint], map: "composite_analysis_snapshots_attempt_version_fingerprint_key")
+  @@index([attemptId, generationReason, createdAt], map: "composite_analysis_snapshots_attempt_reason_created_idx")
+  @@map("composite_analysis_snapshots")
 }
 
 model CompositeFormAnswer {
