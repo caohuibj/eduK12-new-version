@@ -1,4 +1,5 @@
 import type { CognitiveProfile } from '../cognitive/cognitive.types'
+import type { FrozenReportSnapshot } from '../cognitive/profile-freeze'
 
 export type CognitiveAnalysisProfile = Exclude<CognitiveProfile, 'experience'>
 
@@ -37,6 +38,30 @@ export interface CognitiveMetricEvidenceMapping {
 export type EvidenceInterpretation = 'descriptive' | 'criterion' | 'reference' | 'self_report'
 export type EvidenceDirectionClass = 'more_difficulty' | 'more_strength' | 'neutral' | 'unknown'
 
+/** JSON-compatible metric value. Structured metrics are intentionally preserved. */
+export type EvidenceValue =
+  | null
+  | boolean
+  | number
+  | string
+  | EvidenceValue[]
+  | { [key: string]: EvidenceValue }
+
+export type CognitiveMetricInterpretation =
+  | {
+    interpretation: 'descriptive'
+    directionClass: 'unknown'
+    provenance?: Record<string, string>
+  }
+  | {
+    interpretation: 'criterion' | 'reference'
+    directionClass: Exclude<EvidenceDirectionClass, 'unknown'>
+    provenance: Record<string, string> & {
+      basisId: string
+      basisVersion: string
+    }
+  }
+
 export interface EvidenceItem {
   id: string
   sourceType: 'cognitive_metric' | 'scale_dimension'
@@ -44,7 +69,7 @@ export interface EvidenceItem {
   construct: CognitiveDomainKey
   facet?: string
   metricKey?: string
-  value: number | string | null
+  value: EvidenceValue
   unit?: string
   role: EvidenceRole
   interpretation: EvidenceInterpretation
@@ -52,6 +77,23 @@ export interface EvidenceItem {
   interpretable: boolean
   qualityFlags: string[]
   provenance: Record<string, string>
+}
+
+/** Decrypted, immutable single-task result supplied to the package analysis engine. */
+export interface FrozenCognitiveModuleResult {
+  slotKey: string
+  sourceResultId: string
+  assignmentId?: string | null
+  profile: CognitiveAnalysisProfile
+  testType: string
+  configVersion: string
+  engineVersion: string
+  scoringVersion: string
+  metrics: Record<string, unknown>
+  qualityFlags: Record<string, unknown>
+  frozenReport: FrozenReportSnapshot
+  metricInterpretations?: Record<string, CognitiveMetricInterpretation>
+  provenance?: Record<string, string>
 }
 
 export type CognitiveDomainStatus =
@@ -90,6 +132,30 @@ export interface RecommendationResult {
   priority: 'info' | 'watch' | 'follow_up'
   evidenceRefs: string[]
   text: string
+}
+
+export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.0'
+export const COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v1'
+
+export interface CognitivePackageAnalysisResult {
+  packageKey: string
+  packageVersion: string
+  analysisProtocolKey: string
+  analysisProtocolVersion: string
+  profile: CognitiveAnalysisProfile
+  analysisVersion: typeof COGNITIVE_ANALYSIS_VERSION
+  reportSchemaVersion: typeof COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION
+  qualitySummary: {
+    interpretableModules: number
+    excludedModules: string[]
+    warnings: string[]
+  }
+  evidence: EvidenceItem[]
+  cognitiveDomains: CognitiveDomainResult[]
+  crossSourceFindings: CrossSourceFinding[]
+  recommendations: RecommendationResult[]
+  limitations: string[]
+  provenance: Record<string, string>
 }
 
 export interface CompositeReportV2<TModule = unknown> {

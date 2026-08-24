@@ -1,8 +1,9 @@
 import type { CognitiveDomainDefinition, CognitiveDomainKey } from './cognitive-analysis.types'
 
-export const COGNITIVE_DOMAIN_DEFINITION_VERSION = '1.0.0'
+const COGNITIVE_DOMAIN_DEFINITION_V1_VERSION = '1.0.0'
+export const COGNITIVE_DOMAIN_DEFINITION_VERSION = COGNITIVE_DOMAIN_DEFINITION_V1_VERSION
 
-const DEFINITIONS: CognitiveDomainDefinition[] = [
+const DEFINITIONS_V1: CognitiveDomainDefinition[] = [
   {
     key: 'processing_speed',
     label: '加工速度',
@@ -105,10 +106,17 @@ export const validateDomainDefinitions = (definitions: CognitiveDomainDefinition
   }
 }
 
-validateDomainDefinitions(DEFINITIONS)
+validateDomainDefinitions(DEFINITIONS_V1)
 
-const BY_KEY = new Map<CognitiveDomainKey, CognitiveDomainDefinition>(
-  DEFINITIONS.map((definition) => [definition.key, definition]),
+const DEFINITIONS_BY_VERSION = new Map<string, CognitiveDomainDefinition[]>([
+  [COGNITIVE_DOMAIN_DEFINITION_V1_VERSION, DEFINITIONS_V1],
+])
+
+const BY_VERSION_AND_KEY = new Map<string, Map<CognitiveDomainKey, CognitiveDomainDefinition>>(
+  [...DEFINITIONS_BY_VERSION].map(([version, definitions]) => [
+    version,
+    new Map(definitions.map((definition) => [definition.key, definition])),
+  ]),
 )
 
 const cloneDomain = (definition: CognitiveDomainDefinition): CognitiveDomainDefinition => ({
@@ -116,12 +124,18 @@ const cloneDomain = (definition: CognitiveDomainDefinition): CognitiveDomainDefi
   facets: definition.facets.map((facet) => ({ ...facet })),
 })
 
-export const listCognitiveDomainDefinitions = (): CognitiveDomainDefinition[] =>
-  DEFINITIONS.map(cloneDomain)
+export const hasCognitiveDomainDefinitionVersion = (version: string): boolean =>
+  DEFINITIONS_BY_VERSION.has(version)
+
+export const listCognitiveDomainDefinitions = (
+  version = COGNITIVE_DOMAIN_DEFINITION_VERSION,
+): CognitiveDomainDefinition[] =>
+  (DEFINITIONS_BY_VERSION.get(version) ?? []).map(cloneDomain)
 
 export const getCognitiveDomainDefinition = (
   key: CognitiveDomainKey,
+  version = COGNITIVE_DOMAIN_DEFINITION_VERSION,
 ): CognitiveDomainDefinition | undefined => {
-  const definition = BY_KEY.get(key)
+  const definition = BY_VERSION_AND_KEY.get(version)?.get(key)
   return definition ? cloneDomain(definition) : undefined
 }
