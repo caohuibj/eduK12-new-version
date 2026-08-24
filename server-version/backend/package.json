@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts",
+    "test:integration:pr8": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend"
   },
   "dependencies": {

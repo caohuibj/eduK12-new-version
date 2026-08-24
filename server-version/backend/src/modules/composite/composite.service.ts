@@ -52,6 +52,12 @@ import {
   resolveCompositeItemLabel,
   resolveLibraryItemLabel,
 } from './report-package-label'
+import {
+  buildPackageAnalysisForAttempt,
+  buildCompletionSnapshotExpectation,
+  persistOrGetPackageAnalysisSnapshot,
+  readCompletionPackageAnalysisSnapshot,
+} from './composite-analysis-snapshot.service'
 
 type Db = any
 
@@ -1610,6 +1616,39 @@ const loadAttemptWithChildren = async (attemptId: string) => {
   return attempt as any
 }
 
+const lockCompositeAttempt = async (tx: Db, attemptId: string) => {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "composite_assessment_attempts"
+    WHERE "id" = ${attemptId}
+    FOR UPDATE
+  `
+  if (!rows?.[0]) throw compositeNotFound('综合测评记录不存在')
+}
+
+const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
+  const attempt = await tx.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    include: {
+      compositeAssessment: {
+        include: {
+          items: {
+            orderBy: { position: 'asc' as const },
+            include: {
+              cognitiveAssignment: { include: { config: true } },
+            },
+          },
+        },
+      },
+      scaleAssessments: true,
+      cognitiveSessions: true,
+      formAnswers: true,
+    },
+  })
+  if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  return attempt as any
+}
+
 const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await loadAttemptWithChildren(attemptId)
   const authorized = context.userId
@@ -1645,14 +1684,80 @@ const cognitiveRunnerPayload = (session: any) => {
   }
 }
 
-const completeAttemptIfReady = async (attempt: any, completedItems: number, totalItems: number) => {
+const latestChildrenByItem = (children: any[]) => {
+  const map = new Map<string, any>()
+  for (const child of children) {
+    const itemId = child.compositeItemId ?? child.itemId
+    if (!itemId) continue
+    const current = map.get(itemId)
+    if (!current || (child.attemptNo ?? 0) >= (current.attemptNo ?? 0)) {
+      map.set(itemId, child)
+    }
+  }
+  return map
+}
+
+const attemptCompletedItemMaps = (attempt: any) => ({
+  scaleMap: latestChildrenByItem(attempt.scaleAssessments),
+  cognitiveMap: latestChildrenByItem(attempt.cognitiveSessions),
+  formMap: latestChildrenByItem(attempt.formAnswers),
+})
+
+const isAttemptItemCompleted = (
+  item: any,
+  maps: ReturnType<typeof attemptCompletedItemMaps>,
+) => {
+  if (!item.required) return true
+  if (item.type === 'SCALE') return maps.scaleMap.get(item.id)?.status === 'COMPLETED'
+  if (item.type === 'COGNITIVE') return maps.cognitiveMap.get(item.id)?.status === 'COMPLETED'
+  return maps.formMap.get(item.id)?.completed !== false && maps.formMap.has(item.id)
+}
+
+const countAttemptCompletedItems = (attempt: any, maps = attemptCompletedItemMaps(attempt)) =>
+  attempt.compositeAssessment.items.filter((item: any) => isAttemptItemCompleted(item, maps)).length
+
+/**
+ * Parent Attempt finalization and reanalysis are serialized on the Attempt
+ * row. Child modules commit their own frozen result rows first; this check
+ * only promotes the parent after it sees those committed rows. Package
+ * analysis and its immutable snapshot are written before the parent status
+ * changes, so any analysis/encryption/DB failure rolls completion back as one
+ * transaction.
+ */
+const finalizeAttemptIfReady = async (attemptId: string) => prisma.$transaction(async (tx: Db) => {
+  await lockCompositeAttempt(tx, attemptId)
+  const attempt = await loadAttemptForFinalization(tx, attemptId)
+  const maps = attemptCompletedItemMaps(attempt)
+  const completedItems = countAttemptCompletedItems(attempt, maps)
+  const totalItems = attempt.compositeAssessment.items.length
   const progress = totalItems ? Math.round((completedItems / totalItems) * 100) : 100
   const shouldComplete = totalItems > 0 && completedItems === totalItems
 
-  if (shouldComplete) {
+  if (attempt.status === 'COMPLETED') {
+    return {
+      status: attempt.status,
+      progress: attempt.progress,
+      completedAt: attempt.completedAt,
+    }
+  }
+
+  if (shouldComplete && attempt.status === 'IN_PROGRESS') {
+    const packageAnalysis = buildPackageAnalysisForAttempt(attempt)
+    if (packageAnalysis) {
+      const persisted = await persistOrGetPackageAnalysisSnapshot(tx, {
+        attemptId: attempt.id,
+        analysis: packageAnalysis.analysis,
+        inputFingerprint: packageAnalysis.inputFingerprint,
+        generationReason: 'COMPLETION',
+      })
+      if (!persisted.created && persisted.row.generationReason !== 'COMPLETION') {
+        throw new Error('综合测评完成时的分析快照已被其他生成原因占用')
+      }
+    }
+
     const completedAt = new Date()
-    const updated = await prisma.compositeAssessmentAttempt.updateMany({
-      where: { id: attempt.id, status: 'IN_PROGRESS' },
+    await tx.compositeAssessmentAttempt.update({
+      where: { id: attempt.id },
       data: {
         status: 'COMPLETED',
         progress: 100,
@@ -1662,10 +1767,12 @@ const completeAttemptIfReady = async (attempt: any, completedItems: number, tota
         lastSavedAt: completedAt,
       },
     })
-    if (updated.count === 1) return { status: 'COMPLETED', progress: 100, completedAt }
-  } else if (attempt.status === 'IN_PROGRESS') {
+    return { status: 'COMPLETED', progress: 100, completedAt }
+  }
+
+  if (attempt.status === 'IN_PROGRESS') {
     // Never let a stale GET lower progress or completedItems observed by a newer request.
-    await prisma.compositeAssessmentAttempt.updateMany({
+    await tx.compositeAssessmentAttempt.updateMany({
       where: {
         id: attempt.id,
         status: 'IN_PROGRESS',
@@ -1675,27 +1782,22 @@ const completeAttemptIfReady = async (attempt: any, completedItems: number, tota
     })
   }
 
-  const latest = await prisma.compositeAssessmentAttempt.findUnique({
+  const latest = await tx.compositeAssessmentAttempt.findUnique({
     where: { id: attempt.id },
     select: { status: true, progress: true, completedAt: true },
   })
   if (!latest) throw compositeNotFound('综合测评记录不存在')
   return latest
-}
+})
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  await findAttempt(attemptId, context)
+  await finalizeAttemptIfReady(attemptId)
   const attempt = await findAttempt(attemptId, context)
-  const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
-  const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
-  const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
-  const completed = (item: any) => {
-    if (!item.required) return true
-    if (item.type === 'SCALE') return scaleMap.get(item.id)?.status === 'COMPLETED'
-    if (item.type === 'COGNITIVE') return cognitiveMap.get(item.id)?.status === 'COMPLETED'
-    return formMap.get(item.id)?.completed !== false && formMap.has(item.id)
-  }
-  const completedItems = attempt.compositeAssessment.items.filter(completed).length
-  const status = await completeAttemptIfReady(attempt, completedItems, attempt.compositeAssessment.items.length)
+  const maps = attemptCompletedItemMaps(attempt)
+  const { scaleMap, cognitiveMap, formMap } = maps
+  const completed = (item: any) => isAttemptItemCompleted(item, maps)
+  const completedItems = countAttemptCompletedItems(attempt, maps)
   const currentIndex = attempt.compositeAssessment.items.findIndex((item: any) => !completed(item))
   const current = currentIndex >= 0 ? attempt.compositeAssessment.items[currentIndex] : null
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
@@ -1717,14 +1819,14 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
     instruction: attempt.compositeAssessment.instruction,
-    status: status.status,
-    progress: status.progress,
+    status: attempt.status,
+    progress: attempt.progress,
     completedItems,
     totalItems: attempt.compositeAssessment.items.length,
     currentIndex: currentIndex < 0 ? attempt.compositeAssessment.items.length : currentIndex,
     startedAt: attempt.startedAt,
     lastSavedAt: attempt.lastSavedAt,
-    completedAt: status.completedAt,
+    completedAt: attempt.completedAt,
     anonymousCode: attempt.anonymousCode,
     items: attempt.compositeAssessment.items.map((item: any, index: number) => ({ id: item.id, type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels), completed: completed(item), index })),
     currentItem,
@@ -1993,6 +2095,97 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   const attempt = await findAttempt(attemptId, context)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   return buildCompositeReport(attempt)
+}
+
+/**
+ * Internal PR8 read path for the future package report API. The completion
+ * snapshot is the participant/default history; this helper never falls back
+ * to running the live analysis engine.
+ */
+export const getDefaultPackageAnalysisSnapshot = async (
+  attemptId: string,
+  context: { userId?: string; recoveryTokenHash?: string },
+) => {
+  const attempt = await findAttempt(attemptId, context)
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  const packageFields = [
+    attempt.compositeAssessment.reportPackageKey,
+    attempt.compositeAssessment.reportPackageVersion,
+    attempt.compositeAssessment.reportPackageProfile,
+    attempt.compositeAssessment.reportPackageSnapshotEncrypted,
+  ]
+  if (packageFields.every((value) => value === null || value === undefined)) return null
+  if (packageFields.some((value) => !value)) {
+    throw compositeBadRequest('综合测评的报告包冻结信息不完整')
+  }
+  const packageSnapshot = readFrozenReportPackageSnapshot(
+    attempt.compositeAssessment.reportPackageSnapshotEncrypted,
+  )
+  if (
+    packageSnapshot.packageKey !== attempt.compositeAssessment.reportPackageKey
+    || packageSnapshot.packageVersion !== attempt.compositeAssessment.reportPackageVersion
+    || packageSnapshot.profile !== attempt.compositeAssessment.reportPackageProfile
+  ) {
+    throw compositeBadRequest('综合测评报告包实例与冻结快照不匹配')
+  }
+  const snapshot = await readCompletionPackageAnalysisSnapshot(prisma, attemptId, {
+    ...buildCompletionSnapshotExpectation({
+      attemptId: attempt.id,
+      assessmentId: attempt.compositeAssessment.id,
+      packageSnapshot,
+    }),
+  })
+  if (!snapshot) throw compositeBadRequest('综合测评缺少完成时分析快照')
+  return snapshot
+}
+
+/**
+ * Explicit administrative reanalysis. It appends an immutable row when the
+ * analysis input/version differs; the unique fingerprint constraint makes a
+ * repeated request idempotent and never overwrites the completion row.
+ */
+export const reanalyzePackageAttempt = async (
+  userId: string,
+  role: UserRole,
+  attemptId: string,
+) => {
+  if (role !== UserRole.ADMIN) throw compositeForbidden('只有管理员可以重新生成综合分析')
+  const existing = await loadAttemptWithChildren(attemptId)
+  if (existing.status !== 'COMPLETED') throw compositeBadRequest('只有已完成综合测评可以重新分析')
+  if (!existing.compositeAssessment.reportPackageKey) {
+    throw compositeBadRequest('collection-only 综合测评不支持综合分析')
+  }
+
+  const snapshot = await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
+    const attempt = await loadAttemptForFinalization(tx, attemptId)
+    if (attempt.status !== 'COMPLETED') throw compositeBadRequest('只有已完成综合测评可以重新分析')
+    const packageAnalysis = buildPackageAnalysisForAttempt(attempt)
+    if (!packageAnalysis) throw compositeBadRequest('综合测评不包含可分析报告包')
+    return persistOrGetPackageAnalysisSnapshot(tx, {
+      attemptId: attempt.id,
+      analysis: packageAnalysis.analysis,
+      inputFingerprint: packageAnalysis.inputFingerprint,
+      generationReason: 'REANALYSIS',
+      generatedBy: userId,
+    })
+  })
+
+  const { row, created } = snapshot
+  return {
+    id: row.id,
+    attemptId: row.attemptId,
+    packageKey: row.packageKey,
+    packageVersion: row.packageVersion,
+    analysisDefinitionVersion: row.analysisDefinitionVersion,
+    analysisVersion: row.analysisVersion,
+    reportSchemaVersion: row.reportSchemaVersion,
+    inputFingerprint: row.inputFingerprint,
+    generationReason: row.generationReason,
+    generatedBy: row.generatedBy,
+    createdAt: row.createdAt,
+    created,
+  }
 }
 
 export const getReportForTeacher = async (userId: string, role: UserRole, compositeId: string, attemptId: string) => {
