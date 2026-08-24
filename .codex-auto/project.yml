@@ -1,0 +1,34 @@
+protocol:
+  repository: caohuibj/codex-auto
+  version: v1
+project:
+  repository: caohuibj/eduK12-new-version
+  integration_branch: dev
+  production_branch: main
+workflow:
+  execution_mode: chatgpt-app
+  human_merge_required: true
+  feature_branch_pattern: codex-auto/*
+  task_contract_required: true
+  independent_review_required: true
+architecture:
+  protected_boundaries: []
+  prohibited_changes: []
+verification:
+  required:
+  - backend-build
+  - backend-unit
+  - frontend-typecheck
+  - frontend-cognitive
+  - frontend-build
+  - docker-config
+  conditional: []
+quality:
+  avoid:
+  - unrelated refactor
+  - unnecessary abstraction
+escalation:
+  always_escalate:
+  - auth/security boundary changes
+  - destructive data migration
+  - public API break
