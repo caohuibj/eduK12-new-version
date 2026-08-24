@@ -11,6 +11,7 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
+import { buildFormBackgroundReport, buildScaleUnitReport } from '../reporting/scale-unit-report'
 import { logger } from '../../utils/logger'
 import { canUseScale } from '../../services/materialGrant'
 import {
@@ -1457,14 +1458,6 @@ const decodeJson = <T extends object>(value: unknown): T | null => {
   return (value as T) ?? null
 }
 
-/** Report-only: a ciphertext/string that cannot be decoded is an error, not empty scores. */
-const decodeReportJson = <T extends object>(value: unknown): { ok: true; value: T | null } | { ok: false } => {
-  if (value == null) return { ok: true, value: null }
-  if (typeof value !== 'string') return { ok: true, value: value as T }
-  const decoded = safeDecrypt<T>(value)
-  return decoded == null ? { ok: false } : { ok: true, value: decoded }
-}
-
 const getOwnedChild = async (attemptId: string, itemId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await findAttempt(attemptId, context)
   const item = attempt.compositeAssessment.items.find((candidate: any) => candidate.id === itemId)
@@ -1589,32 +1582,49 @@ export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
-  const modules = attempt.compositeAssessment.items.map((item: any) => {
+  const unitReports = attempt.compositeAssessment.items.map((item: any) => {
     if (item.type === 'FORM') {
-      return { itemId: item.id, type: item.type, label: item.formLabel, value: formMap.get(item.id)?.value ?? null }
+      return buildFormBackgroundReport({ itemId: item.id, label: item.formLabel, value: formMap.get(item.id)?.value ?? null })
     }
     if (item.type === 'SCALE') {
       try {
         const result = scaleMap.get(item.id)
-        const scores = decodeReportJson(result?.scores)
-        const feedback = decodeReportJson(result?.feedback)
-        if (!scores.ok || !feedback.ok) {
-          logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-          return { itemId: item.id, type: item.type, label: item.scale?.name, scaleId: item.scaleId, decryptError: true }
-        }
-        return {
+        const report = buildScaleUnitReport({
           itemId: item.id,
-          type: item.type,
-          label: item.scale?.name,
           scaleId: item.scaleId,
-          scores: scores.value ?? [],
-          feedback: feedback.value ?? {},
+          scaleCode: item.scale?.code,
+          scaleName: item.scale?.name || '未知量表',
+          scores: result?.scores,
+          feedback: result?.feedback,
+          dimensions: item.scale?.dimensions,
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
+        })
+        if (report.decryptError) {
+          logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+          return report
         }
+        return report
       } catch {
         logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-        return { itemId: item.id, type: item.type, label: item.scale?.name, scaleId: item.scaleId, decryptError: true }
+        return {
+          itemId: item.id,
+          type: 'SCALE' as const,
+          kind: 'scale' as const,
+          scaleId: item.scaleId,
+          scaleCode: item.scale?.code ?? null,
+          scaleName: item.scale?.name || '未知量表',
+          dimensionScores: [],
+          feedback: { overall: '', dimensions: [] },
+          completedAt: null,
+          totalTime: null,
+          method: {
+            scaleId: item.scaleId,
+            scaleCode: item.scale?.code ?? null,
+            reportDefinitionVersion: 'scale-unit-report-v1',
+          },
+          decryptError: true,
+        }
       }
     }
     try {
@@ -1660,6 +1670,7 @@ export const buildCompositeReport = (attempt: any) => {
       return {
         itemId: item.id,
         type: item.type,
+        kind: 'cognitive' as const,
         label: item.cognitiveAssignment?.title,
         sessionId: session?.id,
         testType: session?.testType,
@@ -1672,18 +1683,22 @@ export const buildCompositeReport = (attempt: any) => {
       }
     } catch {
       logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-      return { itemId: item.id, type: item.type, label: item.cognitiveAssignment?.title, decryptError: true }
+      return { itemId: item.id, type: item.type, kind: 'cognitive' as const, label: item.cognitiveAssignment?.title, decryptError: true }
     }
   })
-  return {
+  const report = {
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
     anonymousCode: attempt.anonymousCode,
     completedAt: attempt.completedAt,
     totalTime: attempt.totalTime,
-    modules,
+    unitReports,
   }
+  // Keep direct callers of the pre-PR6A builder source-compatible while the
+  // JSON/API contract exposes only the collection-only unitReports field.
+  Object.defineProperty(report, 'modules', { value: unitReports, enumerable: false })
+  return report
 }
 
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {

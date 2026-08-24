@@ -385,6 +385,98 @@ describe('composite cognitive single-task report', () => {
   })
 })
 
+describe('collection-only mixed unit reports', () => {
+  it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', () => {
+    const built = buildCompositeReport(completedAttemptForReport({
+      compositeAssessment: {
+        id: 'composite-1',
+        name: '混合容器',
+        items: [
+          {
+            id: 'item-scale-a',
+            type: 'SCALE',
+            scaleId: 'scale-a',
+            scale: { id: 'scale-a', code: 'S-A', name: '量表 A', dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A', minScore: 0, maxScore: 10 }] },
+            cognitiveAssignment: null,
+          },
+          {
+            id: 'item-scale-b',
+            type: 'SCALE',
+            scaleId: 'scale-b',
+            scale: { id: 'scale-b', code: 'S-B', name: '量表 B', dimensions: [{ id: 'dimension-b', code: 'B', name: '维度 B', minScore: 0, maxScore: 10 }] },
+            cognitiveAssignment: null,
+          },
+          {
+            id: 'item-cog-a',
+            type: 'COGNITIVE',
+            scale: null,
+            cognitiveAssignment: { title: '认知 A', profile: 'experience' },
+          },
+          {
+            id: 'item-cog-b',
+            type: 'COGNITIVE',
+            scale: null,
+            cognitiveAssignment: { title: '认知 B', profile: 'experience' },
+          },
+        ],
+      },
+      scaleAssessments: [
+        {
+          compositeItemId: 'item-scale-a',
+          scores: [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: 0, level: 'low' }],
+          feedback: { overall: 'A', dimensions: [{ dimensionId: 'dimension-a', score: 0, level: 'low', interpretation: '', suggestions: [] }] },
+          completedAt: new Date('2026-08-20T01:01:00Z'),
+          totalTime: 0,
+        },
+        {
+          compositeItemId: 'item-scale-b',
+          scores: [{ dimensionId: 'dimension-b', rawScore: null, normalizedScore: null, level: null }],
+          feedback: { overall: 'B', dimensions: [{ dimensionId: 'dimension-b', score: null, level: null, interpretation: '', suggestions: [] }] },
+          completedAt: new Date('2026-08-20T01:02:00Z'),
+          totalTime: null,
+        },
+      ],
+      cognitiveSessions: [
+        {
+          id: 'session-cog-a',
+          compositeItemId: 'item-cog-a',
+          testType: 'reaction',
+          engineVersion: '1.0.0',
+          scoringVersion: '1.1.0',
+          configVersion: '1.1.0',
+          finishedAt: new Date('2026-08-20T01:03:00Z'),
+          configSnapshotEncrypted: encryptCognitivePayload({ report: { referenceMode: 'none' } }),
+          scoreEncrypted: encryptCognitivePayload(0),
+          metricsEncrypted: encryptCognitivePayload({ zeroMetric: 0, missingMetric: null }),
+          qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: false }),
+        },
+        {
+          id: 'session-cog-b',
+          compositeItemId: 'item-cog-b',
+          testType: 'reaction',
+          engineVersion: '1.0.0',
+          scoringVersion: '1.1.0',
+          configVersion: '1.1.0',
+          finishedAt: new Date('2026-08-20T01:04:00Z'),
+          configSnapshotEncrypted: encryptCognitivePayload({ report: { referenceMode: 'none' } }),
+          scoreEncrypted: encryptCognitivePayload(null),
+          metricsEncrypted: encryptCognitivePayload({ zeroMetric: null }),
+          qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+        },
+      ],
+      formAnswers: [],
+    }))
+
+    expect(built.unitReports.map((item: { type: string }) => item.type)).toEqual(['SCALE', 'SCALE', 'COGNITIVE', 'COGNITIVE'])
+    expect(built.modules).toBe(built.unitReports)
+    expect(built.unitReports[0]).toMatchObject({ scaleId: 'scale-a', dimensionScores: [{ rawScore: 0, normalizedScore: 0 }] })
+    expect(built.unitReports[1]).toMatchObject({ scaleId: 'scale-b', dimensionScores: [{ rawScore: null, normalizedScore: null }], totalTime: null })
+    expect(built.unitReports[2]).toMatchObject({ score: 0, qualityFlags: { interpretable: false }, metrics: { zeroMetric: 0, missingMetric: null } })
+    expect(built.unitReports[3]).toMatchObject({ score: null, qualityFlags: { interpretable: true }, metrics: { zeroMetric: null } })
+    expect(JSON.stringify(built)).not.toMatch(/averageScore|overallScore|overallSummary|Domain|consistency|convergence/)
+  })
+})
+
 describe('buildCompositeReport decrypt degrade', () => {
   it('marks a bad cognitive module without failing the report or student getReport', async () => {
     const attempt = completedAttemptForReport({

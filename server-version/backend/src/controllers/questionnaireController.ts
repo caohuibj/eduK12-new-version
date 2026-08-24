@@ -8,72 +8,92 @@ import { safeDecrypt } from '../utils/encryption'
 import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
+import { buildFormBackgroundReport, buildScaleUnitReport } from '../modules/reporting/scale-unit-report'
 
-// 辅助函数：解析数据字段（支持加密和非加密数据）
-function parseDataField(data: any): any {
-  if (!data) return null
-  if (typeof data === 'string') {
-    return safeDecrypt(data)
-  }
-  return data
-}
+/**
+ * Build the collection-only questionnaire envelope.  The legacy JSON column
+ * is accepted as an input for old records, but only its individual scale
+ * reports are projected into the current response.
+ */
+function buildQuestionnaireCollectionReport(qa: any): any {
+  const questionnaireScales = [...(qa.questionnaire?.questionnaireScales || [])]
+    .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+  const assessments = Array.isArray(qa.scaleAssessments) ? qa.scaleAssessments : []
+  const storedScaleReports = Array.isArray(qa.aggregateReport?.scaleReports)
+    ? qa.aggregateReport.scaleReports
+    : []
+  const seen = new Set<string>()
+  const unitReports = [
+    ...questionnaireScales.map((questionnaireScale: any) => {
+      const scaleId = questionnaireScale.scaleId
+      seen.add(scaleId)
+      const assessment = assessments.find((candidate: any) => candidate.scaleId === scaleId)
+      const stored = storedScaleReports.find((candidate: any) => candidate.scaleId === scaleId)
+      const scale = questionnaireScale.scale || assessment?.scale
+      return buildScaleUnitReport({
+        itemId: questionnaireScale.id || scaleId,
+        scaleId,
+        scaleCode: scale?.code,
+        scaleName: scale?.name || stored?.scaleName || '未知量表',
+        scores: stored?.dimensionScores ?? assessment?.scores,
+        feedback: stored?.feedback ?? assessment?.feedback,
+        dimensions: scale?.dimensions,
+        completedAt: assessment?.completedAt ?? stored?.completedAt,
+        totalTime: assessment?.totalTime ?? stored?.totalTime,
+      })
+    }),
+    ...assessments
+      .filter((assessment: any) => !seen.has(assessment.scaleId))
+      .map((assessment: any) => {
+        const stored = storedScaleReports.find((candidate: any) => candidate.scaleId === assessment.scaleId)
+        return buildScaleUnitReport({
+          itemId: assessment.id,
+          scaleId: assessment.scaleId,
+          scaleCode: assessment.scale?.code,
+          scaleName: assessment.scale?.name || stored?.scaleName || '未知量表',
+          scores: stored?.dimensionScores ?? assessment.scores,
+          feedback: stored?.feedback ?? assessment.feedback,
+          dimensions: assessment.scale?.dimensions,
+          completedAt: assessment.completedAt ?? stored?.completedAt,
+          totalTime: assessment.totalTime ?? stored?.totalTime,
+        })
+      }),
+    ...storedScaleReports
+      .filter((stored: any) => !seen.has(stored.scaleId) && !assessments.some((assessment: any) => assessment.scaleId === stored.scaleId))
+      .map((stored: any) => buildScaleUnitReport({
+        itemId: stored.scaleId,
+        scaleId: stored.scaleId,
+        scaleName: stored.scaleName || '未知量表',
+        scores: stored.dimensionScores,
+        feedback: stored.feedback,
+        completedAt: stored.completedAt,
+        totalTime: stored.totalTime,
+      })),
+  ]
 
-// 辅助函数：生成聚合报告
-function generateAggregateReportForQA(qa: any): any {
-  const scaleReports = qa.scaleAssessments.map((sa: any) => {
-    // 解密 scores 和 feedback（如果是加密的话）
-    let scores = parseDataField(sa.scores)
-    if (!Array.isArray(scores)) {
-      scores = scores ? Object.values(scores) : []
-    }
-    const feedback = parseDataField(sa.feedback) || {}
-    
-    const scaleInfo = qa.questionnaire?.questionnaireScales?.find(
-      (qs: any) => qs.scaleId === sa.scaleId
-    )
-
-    return {
-      scaleId: sa.scaleId,
-      scaleName: scaleInfo?.scale?.name || sa.scale?.name || '未知量表',
-      dimensionScores: scores || [],
-      feedback,
-      completedAt: sa.completedAt,
-      totalTime: sa.totalTime,
-    }
-  })
-
-  const totalDimensions = scaleReports.reduce(
-    (sum: number, sr: any) => sum + (sr.dimensionScores?.length || 0),
-    0
-  )
-  
-  // 计算平均分（仅当有量表时）
-  const avgScore = scaleReports.length > 0
-    ? scaleReports.reduce((sum: number, sr: any) => {
-        const avg = (sr.dimensionScores || []).reduce(
-          (s: number, d: any) => s + (d.normalizedScore || 0),
-          0
-        ) / (sr.dimensionScores?.length || 1)
-        return sum + avg
-      }, 0) / scaleReports.length
-    : 0
-
-  // 构建摘要文本
-  let overallSummary = ''
-  if (scaleReports.length > 0) {
-    overallSummary = `您已完成「${qa.questionnaire?.name || '问卷'}」测评，共包含 ${scaleReports.length} 个量表，${totalDimensions} 个维度。`
-  } else {
-    overallSummary = `您已完成「${qa.questionnaire?.name || '问卷'}」问卷填写。`
-  }
+  const formItems = [...(qa.questionnaire?.formItems || [])]
+    .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+  const formAnswers = new Map((qa.formAnswers || []).map((answer: any) => [answer.formItemId, answer.value]))
+  const backgroundValues = formItems.map((item: any) => buildFormBackgroundReport({
+    itemId: item.id,
+    label: item.label,
+    value: formAnswers.has(item.id) ? String(formAnswers.get(item.id)) : null,
+  }))
+  const totalDimensions = unitReports.reduce((sum: number, report: any) => sum + report.dimensionScores.length, 0)
 
   return {
     questionnaireName: qa.questionnaire?.name || '问卷',
-    scaleReports,
     totalDimensions,
-    averageScore: Math.round(avgScore * 100) / 100,
-    overallSummary,
+    backgroundValues,
+    unitReports,
   }
 }
+
+const collectionReportForStorage = (report: any) => ({
+  reportDefinitionVersion: 'collection-only-v1',
+  scaleReports: report.unitReports,
+  totalDimensions: report.totalDimensions,
+})
 
 // ==================== Validation Schemas ====================
 
@@ -1917,9 +1937,9 @@ export const questionnaireController = {
       // 检查是否所有内容都已完成
       const allCompleted = currentIndex < 0
 
-      // 如果所有内容都完成了，生成聚合报告并更新问卷测评状态
+      // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && qa.status !== 'COMPLETED') {
-        const aggregateReport = generateAggregateReportForQA(qa)
+        const collectionReport = buildQuestionnaireCollectionReport(qa)
         const totalTime = Date.now() - new Date(qa.startedAt).getTime()
 
         await prisma.questionnaireAssessment.update({
@@ -1929,7 +1949,7 @@ export const questionnaireController = {
             progress: 100,
             completedAt: new Date(),
             totalTime,
-            aggregateReport: aggregateReport as any,
+            aggregateReport: collectionReportForStorage(collectionReport) as any,
           },
         })
 
@@ -1998,6 +2018,9 @@ export const questionnaireController = {
         include: {
           questionnaire: {
             include: {
+              formItems: {
+                orderBy: { position: 'asc' },
+              },
               questionnaireScales: {
                 include: {
                   scale: {
@@ -2028,6 +2051,7 @@ export const questionnaireController = {
               },
             },
           },
+          formAnswers: true,
         },
       })
 
@@ -2040,7 +2064,12 @@ export const questionnaireController = {
       }
 
       if (qa.status === 'COMPLETED') {
-        return success(res, qa, '问卷测评已完成')
+        return success(res, {
+          questionnaireId: qa.questionnaireId,
+          completedAt: qa.completedAt,
+          totalTime: qa.totalTime,
+          ...buildQuestionnaireCollectionReport(qa),
+        }, '问卷测评已完成')
       }
 
       // 检查所有量表是否完成（如果有量表的话）
@@ -2053,74 +2082,7 @@ export const questionnaireController = {
         }
       }
 
-      // 生成聚合报告
-      const { generateFeedbackWithLevels } = await import('../services/scoringService')
-      
-      const scaleReports = qa.scaleAssessments.map(sa => {
-        // 解密 scores（如果加密的话）
-        let scores: any[] = []
-        let rawScores = sa.scores
-        if (typeof rawScores === 'string') {
-          rawScores = safeDecrypt(rawScores)
-        }
-        if (rawScores) {
-          if (Array.isArray(rawScores)) {
-            scores = rawScores
-          } else if (typeof rawScores === 'object') {
-            scores = Object.values(rawScores)
-          }
-        }
-        
-        // 解密 feedback（如果加密的话）
-        let feedback = sa.feedback as any
-        if (typeof feedback === 'string') {
-          feedback = safeDecrypt(feedback) || {}
-        }
-        const scaleInfo = qa.questionnaire.questionnaireScales.find(
-          qs => qs.scaleId === sa.scaleId
-        )
-
-        return {
-          scaleId: sa.scaleId,
-          scaleName: scaleInfo?.scale.name || sa.scale.name,
-          dimensionScores: scores,
-          feedback,
-          completedAt: sa.completedAt,
-          totalTime: sa.totalTime,
-        }
-      })
-
-      // 生成整体摘要
-      const totalDimensions = scaleReports.reduce(
-        (sum, sr) => sum + (sr.dimensionScores?.length || 0),
-        0
-      )
-      
-      // 计算平均分（仅当有量表时）
-      const avgScore = scaleReports.length > 0
-        ? scaleReports.reduce((sum, sr) => {
-            const dimScores = sr.dimensionScores || []
-            if (dimScores.length === 0) return sum
-            const avg = dimScores.reduce((s: number, d: any) => s + (d.normalizedScore || d.score || 0), 0) / dimScores.length
-            return sum + avg
-          }, 0) / scaleReports.length
-        : 0
-
-      // 构建摘要文本
-      let overallSummary = ''
-      if (scaleReports.length > 0) {
-        overallSummary = `您已完成「${qa.questionnaire.name}」测评，共包含 ${qa.scaleAssessments.length} 个量表，${totalDimensions} 个维度。`
-      } else {
-        overallSummary = `您已完成「${qa.questionnaire.name}」问卷填写。`
-      }
-
-      const aggregateReport = {
-        questionnaireName: qa.questionnaire.name,
-        scaleReports,
-        totalDimensions,
-        averageScore: Math.round(avgScore * 100) / 100,
-        overallSummary,
-      }
+      const collectionReport = buildQuestionnaireCollectionReport(qa)
 
       // 计算总时间
       const totalTime = Date.now() - new Date(qa.startedAt).getTime()
@@ -2133,13 +2095,14 @@ export const questionnaireController = {
           progress: 100,
           completedAt: new Date(),
           totalTime,
-          aggregateReport: aggregateReport as any,
+          aggregateReport: collectionReportForStorage(collectionReport) as any,
         },
       })
 
+      const { aggregateReport: _legacyAggregateReport, ...safeUpdated } = updated as any
       return success(res, {
-        ...updated,
-        aggregateReport,
+        ...safeUpdated,
+        ...collectionReport,
       }, '问卷测评已完成')
     } catch (err) {
       logger.error('完成问卷测评错误', err)
@@ -2147,7 +2110,7 @@ export const questionnaireController = {
     }
   },
 
-  // 获取聚合报告
+  // 获取问卷独立结果
   async getReport(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -2158,6 +2121,9 @@ export const questionnaireController = {
         include: {
           questionnaire: {
             include: {
+              formItems: {
+                orderBy: { position: 'asc' },
+              },
               questionnaireScales: {
                 include: {
                   scale: {
@@ -2179,6 +2145,7 @@ export const questionnaireController = {
             }
           },
           scaleAssessments: true,
+          formAnswers: true,
         },
       })
 
@@ -2194,55 +2161,17 @@ export const questionnaireController = {
         return error(res, '问卷测评未完成')
       }
 
-      // 构建维度信息映射（用于补充 minScore/maxScore）
-      const dimensionMap = new Map<string, { minScore: number; maxScore: number }>()
-      for (const qs of qa.questionnaire.questionnaireScales) {
-        const points = (qs.scale.config as any)?.points || 5
-        for (const dim of qs.scale.dimensions) {
-          // 使用自定义分数区间或计算理论分数区间
-          let minScore: number, maxScore: number
-          if (dim.minScore !== null && dim.maxScore !== null) {
-            minScore = Number(dim.minScore)
-            maxScore = Number(dim.maxScore)
-          } else {
-            // 计算理论分数区间
-            const itemCount = dim.itemDimensions?.length || 0
-            minScore = itemCount // 每题最低 1 分
-            maxScore = itemCount * points // 每题最高 points 分
-          }
-          dimensionMap.set(dim.id, { minScore, maxScore })
-        }
-      }
-
-      // 补充 aggregateReport 中缺失的 minScore/maxScore
-      const aggregateReport = qa.aggregateReport as any
-      if (aggregateReport?.scaleReports) {
-        for (const scaleReport of aggregateReport.scaleReports) {
-          if (scaleReport.feedback?.dimensions) {
-            for (const dim of scaleReport.feedback.dimensions) {
-              if (dim.minScore === undefined || dim.minScore === null ||
-                  dim.maxScore === undefined || dim.maxScore === null) {
-                const dimInfo = dimensionMap.get(dim.dimensionId)
-                if (dimInfo) {
-                  dim.minScore = dimInfo.minScore
-                  dim.maxScore = dimInfo.maxScore
-                }
-              }
-            }
-          }
-        }
-      }
+      const collectionReport = buildQuestionnaireCollectionReport(qa)
 
       return success(res, {
         questionnaireId: qa.questionnaireId,
-        questionnaireName: qa.questionnaire.name,
         completedAt: qa.completedAt,
         totalTime: qa.totalTime,
-        aggregateReport,
+        ...collectionReport,
       })
     } catch (err) {
-      logger.error('获取聚合报告错误', err)
-      return error(res, '获取聚合报告失败')
+      logger.error('获取问卷独立结果错误', err)
+      return error(res, '获取问卷独立结果失败')
     }
   },
 

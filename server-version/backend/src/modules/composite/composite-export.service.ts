@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { prisma } from '../../config/database'
 import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { readFrozenReport } from '../cognitive/profile-freeze'
 import { exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
 import {
   assertExportLimits,
@@ -57,6 +58,26 @@ const flatten = (value: unknown): Array<[string, unknown]> => {
   return Object.entries(value as Record<string, unknown>)
 }
 
+const slotPrefix = (type: 'S' | 'C', index: number) => `${type}${String(index + 1).padStart(3, '0')}_`
+
+const safeCognitiveValue = <T>(value: string | null | undefined): T | null => {
+  if (!value) return null
+  try {
+    return decryptCognitivePayload<T>(value)
+  } catch {
+    return null
+  }
+}
+
+const frozenReportFor = (assignment: any) => {
+  if (!assignment?.resolvedReportSnapshotEncrypted) return null
+  try {
+    return readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
+  } catch {
+    return null
+  }
+}
+
 const addField = (fields: CompositeExportField[], name: string, label: string, type: CompositeExportField['type'], decimals = 0) => {
   const existing = fields.find((field) => field.name === name)
   if (!existing) {
@@ -97,7 +118,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         orderBy: { position: 'asc' },
         include: {
           scale: { include: { items: { orderBy: { sortOrder: 'asc' } }, dimensions: true } },
-          cognitiveAssignment: { select: { title: true } },
+          cognitiveAssignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
         },
       },
       attempts: {
@@ -110,7 +131,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           scaleAssessments: { include: { scale: { include: { items: true, dimensions: true } } } },
           cognitiveSessions: {
             include: {
-              assignment: { select: { title: true } },
+              assignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
               trials: {
                 orderBy: { trialIndex: 'asc' },
                 take: EXPORT_MAX_TRIALS + 1,
@@ -137,8 +158,11 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   formItems.forEach((item: any, index: number) => addField(fields, `F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${item.formLabel}`, 'string'))
 
   template.items.forEach((item: any, index: number) => {
-    const prefix = `S${String(index + 1).padStart(3, '0')}_`
+    const prefix = slotPrefix('S', index)
     if (item.type === 'SCALE' && item.scale) {
+      addField(fields, `${prefix}scale_id`, `[${item.scale.name}] 量表ID`, 'string')
+      addField(fields, `${prefix}scale_code`, `[${item.scale.name}] 量表编码`, 'string')
+      addField(fields, `${prefix}report_definition_version`, `[${item.scale.name}] 报告定义版本`, 'string')
       if (detail === 'full') {
         item.scale.items.forEach((scaleItem: any) => {
           addField(fields, fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${item.scale.name}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric')
@@ -148,8 +172,20 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       item.scale.dimensions.forEach((dimension: any) => addField(fields, fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${item.scale.name}] ${dimension.name}得分`, 'numeric', 2))
     }
     if (item.type === 'COGNITIVE') {
-      addField(fields, `C${String(index + 1).padStart(3, '0')}_score`, `[${item.cognitiveAssignment?.title || '认知任务'}] 测评得分`, 'numeric', 2)
-      addField(fields, `C${String(index + 1).padStart(3, '0')}_quality`, `[${item.cognitiveAssignment?.title || '认知任务'}] 数据质量`, 'string')
+      const childPrefix = slotPrefix('C', index)
+      const title = item.cognitiveAssignment?.title || '认知任务'
+      addField(fields, `${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 2)
+      addField(fields, `${childPrefix}quality`, `[${title}] 数据质量`, 'string')
+      addField(fields, `${childPrefix}profile`, `[${title}] Profile`, 'string')
+      addField(fields, `${childPrefix}profile_definition_version`, `[${title}] profile-definition version`, 'string')
+      addField(fields, `${childPrefix}metric_definition_version`, `[${title}] metric-definition version`, 'string')
+      addField(fields, `${childPrefix}quality_definition_version`, `[${title}] quality-definition version`, 'string')
+      addField(fields, `${childPrefix}test_type`, `[${title}] testType`, 'string')
+      addField(fields, `${childPrefix}engine_version`, `[${title}] engineVersion`, 'string')
+      addField(fields, `${childPrefix}scoring_version`, `[${title}] scoringVersion`, 'string')
+      addField(fields, `${childPrefix}config_version`, `[${title}] configVersion`, 'string')
+      addField(fields, `${childPrefix}randomization_algorithm_version`, `[${title}] randomization algorithm version`, 'string')
+      addField(fields, `${childPrefix}report_definition_version`, `[${title}] report-definition version`, 'string')
     }
   })
 
@@ -162,7 +198,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       A_attempt_id: attempt.id,
       A_assessment: template.name,
       A_date: attempt.completedAt?.toISOString() ?? null,
-      A_duration_s: attempt.totalTime ? Math.round(attempt.totalTime / 1000) : null,
+      A_duration_s: attempt.totalTime == null ? null : Math.round(attempt.totalTime / 1000),
     }
     if (!anonymize) row.U_name = attempt.user?.nickname || attempt.user?.username || null
 
@@ -173,7 +209,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
 
     for (let index = 0; index < template.items.length; index += 1) {
       const item: any = template.items[index]
-      const prefix = `S${String(index + 1).padStart(3, '0')}_`
+      const prefix = slotPrefix('S', index)
       if (item.type === 'SCALE') {
         const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
         const answers = decode<any[]>(result?.answers) ?? []
@@ -185,6 +221,9 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           }
         }
         const scores = decode<any[]>(result?.scores) ?? []
+        row[`${prefix}scale_id`] = item.scale?.id ?? item.scaleId ?? null
+        row[`${prefix}scale_code`] = item.scale?.code ?? null
+        row[`${prefix}report_definition_version`] = 'scale-unit-report-v1'
         for (const score of scores) {
           const dimension = item.scale.dimensions.find((candidate: any) => candidate.id === score.dimensionId)
           if (dimension) row[fieldName(`${prefix}D_`, dimension.code || dimension.id)] = score.rawScore ?? score.normalizedScore ?? null
@@ -192,14 +231,29 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       }
       if (item.type === 'COGNITIVE') {
         const session = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === item.id)
-        const childPrefix = `C${String(index + 1).padStart(3, '0')}_`
+        const childPrefix = slotPrefix('C', index)
+        const assignment = session?.assignment || item.cognitiveAssignment
         if (session) {
-          row[`${childPrefix}score`] = session.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
-          const quality = session.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
-          row[`${childPrefix}quality`] = quality.interpretable === false ? 'insufficient' : 'interpretable'
-          const metrics = session.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
+          const score = safeCognitiveValue<number>(session.scoreEncrypted)
+          const quality = safeCognitiveValue<Record<string, unknown>>(session.qualityFlagsEncrypted) || {}
+          const metrics = safeCognitiveValue<Record<string, unknown>>(session.metricsEncrypted) || {}
+          const frozenReport = frozenReportFor(assignment)
+          row[`${childPrefix}score`] = score
+          row[`${childPrefix}quality`] = quality.interpretable === false ? 'insufficient' : quality.interpretable === true ? 'interpretable' : null
+          row[`${childPrefix}profile`] = frozenReport?.profile ?? assignment?.profile ?? null
+          row[`${childPrefix}profile_definition_version`] = frozenReport?.profileDefinitionVersion ?? null
+          row[`${childPrefix}metric_definition_version`] = frozenReport?.metricDefinitionVersion ?? null
+          row[`${childPrefix}quality_definition_version`] = frozenReport?.qualityDefinitionVersion ?? null
+          row[`${childPrefix}test_type`] = session.testType ?? null
+          row[`${childPrefix}engine_version`] = session.engineVersion ?? null
+          row[`${childPrefix}scoring_version`] = session.scoringVersion ?? null
+          row[`${childPrefix}config_version`] = session.configVersion ?? null
+          row[`${childPrefix}randomization_algorithm_version`] = frozenReport?.randomizationAlgorithmVersion ?? null
+          row[`${childPrefix}report_definition_version`] = frozenReport?.reportDefinitionVersion ?? null
           for (const [key, value] of Object.entries(metrics)) {
-            const metricName = addField(fields, fieldName(`${childPrefix}M_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
+            const definition = frozenReport?.metricDefinitions?.[key]
+            const metricLabel = definition?.export?.label || definition?.label || key
+            const metricName = addField(fields, fieldName(`${childPrefix}M_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] ${metricLabel}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
             row[metricName] = scalarExportValue(value)
           }
           if (detail === 'full') {

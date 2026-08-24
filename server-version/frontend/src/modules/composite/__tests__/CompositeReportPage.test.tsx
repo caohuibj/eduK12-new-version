@@ -79,4 +79,77 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.queryByText('分')).toBeNull()
     expect(screen.queryByText(/"metrics"/)).toBeNull()
   })
+
+  it('renders two Scale and two Cognitive unit cards in container order', async () => {
+    const mixedReportResponse = {
+      code: 0,
+      data: {
+        id: 'attempt-mixed',
+        assessmentId: 'c1',
+        name: '混合容器',
+        anonymousCode: null,
+        completedAt: '2026-01-01T00:00:00Z',
+        totalTime: 0,
+        unitReports: [
+          {
+            itemId: 'item-scale-a',
+            type: 'SCALE',
+            kind: 'scale',
+            scaleId: 'scale-a',
+            scaleCode: 'S-A',
+            scaleName: '量表 A',
+            dimensionScores: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', rawScore: 0, normalizedScore: 0, level: 'low', itemCount: 1, minScore: 0, maxScore: 10 }],
+            feedback: { overall: '', dimensions: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', score: 0, minScore: 0, maxScore: 10, level: 'low', interpretation: '', suggestions: [] }] },
+            completedAt: null,
+            totalTime: 0,
+            method: { scaleId: 'scale-a', scaleCode: 'S-A', reportDefinitionVersion: 'scale-unit-report-v1' },
+          },
+          {
+            itemId: 'item-scale-b',
+            type: 'SCALE',
+            kind: 'scale',
+            scaleId: 'scale-b',
+            scaleCode: 'S-B',
+            scaleName: '量表 B',
+            dimensionScores: [{ dimensionId: 'd-b', dimensionCode: 'B', dimensionName: '维度 B', rawScore: null, normalizedScore: null, level: null, itemCount: null, minScore: 0, maxScore: 10 }],
+            feedback: { overall: '', dimensions: [{ dimensionId: 'd-b', dimensionCode: 'B', dimensionName: '维度 B', score: null, minScore: 0, maxScore: 10, level: null, interpretation: '', suggestions: [] }] },
+            completedAt: null,
+            totalTime: null,
+            method: { scaleId: 'scale-b', scaleCode: 'S-B', reportDefinitionVersion: 'scale-unit-report-v1' },
+          },
+          { itemId: 'item-cog-a', type: 'COGNITIVE', kind: 'cognitive', label: '认知 A', singleTaskReport: null },
+          { itemId: 'item-cog-b', type: 'COGNITIVE', kind: 'cognitive', label: '认知 B', singleTaskReport: null },
+        ],
+      },
+    }
+    mockCompositeApi.report.mockResolvedValue(mixedReportResponse)
+    mockCompositeApi.teacherReport.mockResolvedValue(mixedReportResponse)
+
+    const participantView = render(
+      <MemoryRouter initialEntries={['/student/composite/attempts/attempt-mixed/report']}>
+        <Routes>
+          <Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(await screen.findByTestId('scale-unit-report-item-scale-a')).toBeTruthy()
+    expect(screen.getByTestId('scale-unit-report-item-scale-b')).toBeTruthy()
+    expect(screen.getByText('认知 A')).toBeTruthy()
+    expect(screen.getByText('认知 B')).toBeTruthy()
+    expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
+
+    participantView.unmount()
+    render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-mixed/report']}>
+        <Routes>
+          <Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+    expect(await screen.findByTestId('scale-unit-report-item-scale-a')).toBeTruthy()
+    expect(screen.getByTestId('scale-unit-report-item-scale-b')).toBeTruthy()
+    expect(screen.getByText('认知 A')).toBeTruthy()
+    expect(screen.getByText('认知 B')).toBeTruthy()
+  })
 })

@@ -1,4 +1,5 @@
 import type { CognitiveSession } from '../cognitive/types'
+import type { FormBackgroundReport, ScaleUnitReport } from '../reporting/types'
 
 export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM'
 
@@ -77,7 +78,17 @@ export interface CompositeReport {
   anonymousCode: string | null
   completedAt: string | null
   totalTime: number | null
-  modules: Array<Record<string, unknown> & { itemId: string; type: CompositeItemType; label: string | null; decryptError?: boolean }>
+  unitReports: Array<
+    | FormBackgroundReport
+    | ScaleUnitReport
+    | (Record<string, unknown> & {
+        itemId: string
+        type: 'COGNITIVE'
+        kind: 'cognitive'
+        label: string | null
+        decryptError?: boolean
+      })
+  >
 }
 
 export interface CompositeAttemptCounts {

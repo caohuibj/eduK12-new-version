@@ -5,6 +5,8 @@ import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeReport } from './types'
 import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
 import type { CognitiveSingleTaskReport } from '../cognitive/types'
+import ScaleUnitReportCard from '../reporting/ScaleUnitReportCard'
+import type { ScaleUnitReport } from '../reporting/types'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 
@@ -21,6 +23,7 @@ const CompositeReportPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const backTo = teacherMode && id ? `/composite-assessments/${id}/results` : publicMode ? '/' : '/student'
+  const unitReports = report?.unitReports || (report as (CompositeReport & { modules?: CompositeReport['unitReports'] }) | null)?.modules || []
 
   const load = async (credential = recoveryToken) => {
     if (!attemptId) return
@@ -55,16 +58,16 @@ const CompositeReportPage: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <button onClick={() => navigate(backTo)} className="flex items-center text-gray-500 hover:text-gray-700 mb-4"><ArrowLeft className="w-4 h-4 mr-1" />返回</button>
-      <div className="card p-8 mb-5"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" /><h1 className="text-2xl font-bold text-center text-gray-800">{report.name}</h1><p className="text-center text-gray-500 mt-2">本报告分别展示各量表和认知任务结果，不做跨模块综合计算。</p>{report.anonymousCode && <p className="text-center text-sm text-gray-500 mt-2">匿名编号：{report.anonymousCode}</p>}</div>
-      <div className="space-y-4">{report.modules.map((module) => (
+      <div className="card p-8 mb-5"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" /><h1 className="text-2xl font-bold text-center text-gray-800">{report.name}</h1><p className="text-center text-gray-500 mt-2">以下按容器顺序展示各模块的独立结果。</p>{report.anonymousCode && <p className="text-center text-sm text-gray-500 mt-2">匿名编号：{report.anonymousCode}</p>}</div>
+      <div className="space-y-4">{unitReports.map((module) => (
         <div key={module.itemId} className="card p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">{module.label || module.type}</h2>
-          {module.decryptError ? (
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">{module.type === 'SCALE' ? module.scaleName : module.label || module.type}</h2>
+          {'decryptError' in module && module.decryptError ? (
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
             <>
-              {module.type === 'FORM' && <p className="text-gray-700 whitespace-pre-wrap">{String(module.value || '—')}</p>}
-              {module.type === 'SCALE' && <><p className="text-sm font-semibold text-gray-600 mb-2">维度结果</p><pre className="text-sm bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(module.feedback || module.scores || {}, null, 2)}</pre></>}
+              {module.type === 'FORM' && <p className="text-gray-700 whitespace-pre-wrap">{module.value ?? '—'}</p>}
+              {module.type === 'SCALE' && <ScaleUnitReportCard report={module as ScaleUnitReport} />}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as CognitiveSingleTaskReport} />

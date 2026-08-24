@@ -45,9 +45,192 @@ const makeTemplate = (withTrials: boolean, metrics: Record<string, unknown> = { 
   }],
 })
 
+const mixedFrozenReport = {
+  profile: 'standard',
+  profileDefinitionVersion: 'profile-2.0.0',
+  metricDefinitionVersion: 'metric-2.1.0',
+  qualityDefinitionVersion: 'quality-2.2.0',
+  reportDefinitionVersion: 'report-2.3.0',
+  randomizationAlgorithmVersion: 'random-2.4.0',
+  reportCaveats: [],
+  metricDefinitions: {
+    zeroMetric: {
+      key: 'zeroMetric',
+      label: '冻结零指标',
+      construct: 'speed',
+      description: '冻结定义',
+      unit: 'ms',
+      valueType: 'number',
+      direction: 'higher_is_better',
+      role: 'primary',
+      availableProfiles: ['standard'],
+      export: { summary: true, label: '冻结零指标' },
+    },
+  },
+  qualityDefinitions: {},
+  reportDefinition: {
+    title: '冻结任务',
+    headlineMetric: 'zeroMetric',
+    primaryMetrics: ['zeroMetric'],
+    secondaryMetrics: [],
+    practicalTips: [],
+    disclaimer: '仅供测试',
+  },
+}
+
+const makeMixedTemplate = () => ({
+  id: 'composite-mixed',
+  name: '混合宽表测评',
+  items: [
+    {
+      id: 'item-scale-a',
+      type: 'SCALE',
+      formLabel: null,
+      scale: {
+        id: 'scale-a',
+        code: 'S-A',
+        name: '量表 A',
+        items: [{ id: 'scale-item-a', itemCode: 'A1', content: '题目 A' }],
+        dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A' }],
+      },
+      cognitiveAssignment: null,
+    },
+    {
+      id: 'item-scale-b',
+      type: 'SCALE',
+      formLabel: null,
+      scale: {
+        id: 'scale-b',
+        code: 'S-B',
+        name: '量表 B',
+        items: [{ id: 'scale-item-b', itemCode: 'B1', content: '题目 B' }],
+        dimensions: [{ id: 'dimension-b', code: 'B', name: '维度 B' }],
+      },
+      cognitiveAssignment: null,
+    },
+    {
+      id: 'item-cog-a',
+      type: 'COGNITIVE',
+      formLabel: null,
+      scale: null,
+      cognitiveAssignment: {
+        title: '认知 A',
+        profile: 'standard',
+        resolvedReportSnapshotEncrypted: encryptCognitivePayload(mixedFrozenReport),
+      },
+    },
+    {
+      id: 'item-cog-b',
+      type: 'COGNITIVE',
+      formLabel: null,
+      scale: null,
+      cognitiveAssignment: {
+        title: '认知 B',
+        profile: 'standard',
+        resolvedReportSnapshotEncrypted: encryptCognitivePayload(mixedFrozenReport),
+      },
+    },
+  ],
+  attempts: [{
+    id: 'attempt-mixed',
+    userId: null,
+    anonymousCode: 'ANON-MIXED',
+    completedAt: new Date('2026-08-20T10:01:00.000Z'),
+    totalTime: 0,
+    user: null,
+    formAnswers: [],
+    scaleAssessments: [
+      {
+        compositeItemId: 'item-scale-a',
+        answers: [],
+        scores: [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: 0 }],
+      },
+      {
+        compositeItemId: 'item-scale-b',
+        answers: [],
+        scores: [{ dimensionId: 'dimension-b', rawScore: null, normalizedScore: null }],
+      },
+    ],
+    cognitiveSessions: [
+      {
+        compositeItemId: 'item-cog-a',
+        assignment: {
+          title: '认知 A',
+          profile: 'standard',
+          resolvedReportSnapshotEncrypted: encryptCognitivePayload(mixedFrozenReport),
+        },
+        testType: 'reaction',
+        engineVersion: 'engine-1.0.0',
+        scoringVersion: 'scoring-1.1.0',
+        configVersion: 'config-1.2.0',
+        scoreEncrypted: encryptCognitivePayload(0),
+        metricsEncrypted: encryptCognitivePayload({ zeroMetric: 0, nullMetric: null }),
+        qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: false }),
+        trials: [],
+      },
+      {
+        compositeItemId: 'item-cog-b',
+        assignment: {
+          title: '认知 B',
+          profile: 'standard',
+          resolvedReportSnapshotEncrypted: encryptCognitivePayload(mixedFrozenReport),
+        },
+        testType: 'reaction',
+        engineVersion: 'engine-1.0.1',
+        scoringVersion: 'scoring-1.1.1',
+        configVersion: 'config-1.2.1',
+        scoreEncrypted: encryptCognitivePayload(null),
+        metricsEncrypted: encryptCognitivePayload({ zeroMetric: null }),
+        qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+        trials: [],
+      },
+    ],
+  }],
+})
+
 beforeEach(() => vi.clearAllMocks())
 
 describe('composite export service', () => {
+  it('exports a stable mixed summary row with repeated slots, provenance, frozen labels, zero and null', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeMixedTemplate())
+
+    const data = await compositeExportService.getExportData('composite-mixed', { detail: 'summary' })
+    const row = data.rows[0]
+    const names = data.fields.map((field) => field.name)
+
+    expect(data.rows).toHaveLength(1)
+    expect(data.trialCount).toBe(0)
+    expect(new Set(names).size).toBe(names.length)
+    expect(row).toMatchObject({
+      A_duration_s: 0,
+      S001_scale_id: 'scale-a',
+      S001_scale_code: 'S-A',
+      S001_report_definition_version: 'scale-unit-report-v1',
+      S001_D_a: 0,
+      S002_scale_id: 'scale-b',
+      S002_scale_code: 'S-B',
+      S002_D_b: null,
+      C003_score: 0,
+      C003_quality: 'insufficient',
+      C003_profile: 'standard',
+      C003_profile_definition_version: 'profile-2.0.0',
+      C003_metric_definition_version: 'metric-2.1.0',
+      C003_quality_definition_version: 'quality-2.2.0',
+      C003_test_type: 'reaction',
+      C003_engine_version: 'engine-1.0.0',
+      C003_scoring_version: 'scoring-1.1.0',
+      C003_config_version: 'config-1.2.0',
+      C003_randomization_algorithm_version: 'random-2.4.0',
+      C003_report_definition_version: 'report-2.3.0',
+      C003_M_zerometric: 0,
+      C003_M_nullmetric: null,
+      C004_score: null,
+      C004_quality: 'interpretable',
+      C004_M_zerometric: null,
+    })
+    expect(data.fields.find((field) => field.name === 'C003_M_zerometric')?.label).toContain('冻结零指标')
+  })
+
   it('exports summary metrics without raw trials', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(false))
 
