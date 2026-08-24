@@ -1,7 +1,0 @@
-interface:
-  display_name: "Codex Auto"
-  short_description: "Run the project-local Sol/Luna development workflow"
-  default_prompt: "Use codex-auto to implement this change in eduk12-local."
-
-policy:
-  allow_implicit_invocation: true
