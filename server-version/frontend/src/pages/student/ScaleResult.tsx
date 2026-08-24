@@ -36,7 +36,7 @@ interface Feedback {
   disclaimer?: string | null
 }
 
-interface Assessment {
+export interface Assessment {
   id: string
   status: string
   scores: DimensionScore[]
@@ -46,10 +46,57 @@ interface Assessment {
   totalTime: number
   scale: {
     id: string
+    code: string | null
     name: string
     description: string | null
   }
 }
+
+export const toScaleUnitReport = (value: Assessment): ScaleUnitReport => ({
+  itemId: value.id,
+  type: 'SCALE',
+  kind: 'scale',
+  scaleId: value.scale.id,
+  scaleCode: value.scale.code,
+  label: value.scale.name,
+  scaleName: value.scale.name,
+  dimensionScores: value.scores.map((dimension) => ({
+    dimensionId: dimension.dimensionId,
+    dimensionCode: dimension.dimensionCode,
+    dimensionName: dimension.dimensionName,
+    rawScore: dimension.rawScore,
+    normalizedScore: dimension.normalizedScore,
+    level: dimension.level,
+    itemCount: dimension.itemCount,
+    minScore: dimension.minScore ?? null,
+    maxScore: dimension.maxScore ?? null,
+  })),
+  feedback: {
+    overall: value.feedback.overall || '',
+    dimensions: value.feedback.dimensions.map((dimension) => ({
+      dimensionId: dimension.dimensionId,
+      dimensionCode: dimension.dimensionCode,
+      dimensionName: dimension.dimensionName,
+      score: dimension.score,
+      minScore: dimension.minScore,
+      maxScore: dimension.maxScore,
+      level: dimension.level,
+      levelName: dimension.levelName,
+      interpretation: dimension.interpretation || '',
+      suggestions: dimension.suggestions || [],
+    })),
+    feedbackLevel: value.feedback.feedbackLevel,
+  },
+  caveats: value.feedback.caveats ?? [],
+  disclaimer: value.feedback.disclaimer ?? '量表结果仅反映本次作答，不构成医学诊断或人口常模。',
+  completedAt: value.completedAt || null,
+  totalTime: value.totalTime ?? null,
+  method: {
+    scaleId: value.scale.id,
+    scaleCode: value.scale.code,
+    reportDefinitionVersion: 'scale-unit-report-v1',
+  },
+})
 
 const ScaleResult: React.FC = () => {
   const { assessmentId } = useParams<{ assessmentId: string }>()
@@ -80,48 +127,6 @@ const ScaleResult: React.FC = () => {
     const seconds = Math.floor((ms % 60000) / 1000)
     return `${minutes}分${seconds}秒`
   }
-
-  const toUnitReport = (value: Assessment): ScaleUnitReport => ({
-    itemId: value.id,
-    type: 'SCALE',
-    kind: 'scale',
-    scaleId: value.scale.id,
-    scaleCode: null,
-    label: value.scale.name,
-    scaleName: value.scale.name,
-    dimensionScores: value.scores.map((dimension) => ({
-      dimensionId: dimension.dimensionId,
-      dimensionCode: dimension.dimensionCode,
-      dimensionName: dimension.dimensionName,
-      rawScore: dimension.rawScore,
-      normalizedScore: dimension.normalizedScore,
-      level: dimension.level,
-      itemCount: dimension.itemCount,
-      minScore: dimension.minScore ?? null,
-      maxScore: dimension.maxScore ?? null,
-    })),
-    feedback: {
-      overall: value.feedback.overall || '',
-      dimensions: value.feedback.dimensions.map((dimension) => ({
-        dimensionId: dimension.dimensionId,
-        dimensionCode: dimension.dimensionCode,
-        dimensionName: dimension.dimensionName,
-        score: dimension.score,
-        minScore: dimension.minScore,
-        maxScore: dimension.maxScore,
-        level: dimension.level,
-        levelName: dimension.levelName,
-        interpretation: dimension.interpretation || '',
-        suggestions: dimension.suggestions || [],
-      })),
-      feedbackLevel: value.feedback.feedbackLevel,
-    },
-    caveats: value.feedback.caveats || [],
-    disclaimer: value.feedback.disclaimer || '量表结果仅反映本次作答，不构成医学诊断或人口常模。',
-    completedAt: value.completedAt || null,
-    totalTime: value.totalTime ?? null,
-    method: { scaleId: value.scale.id, scaleCode: null, reportDefinitionVersion: 'scale-unit-report-v1' },
-  })
 
   if (loading) {
     return (
@@ -164,7 +169,7 @@ const ScaleResult: React.FC = () => {
         </div>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
-        <ScaleUnitReportCard report={toUnitReport(assessment)} />
+        <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
       </div>
     </div>
   )
