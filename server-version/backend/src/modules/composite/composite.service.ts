@@ -11,7 +11,7 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
-import { buildFormBackgroundReport, buildScaleUnitReport } from '../reporting/scale-unit-report'
+import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
 import { logger } from '../../utils/logger'
 import { canUseScale } from '../../services/materialGrant'
 import {
@@ -1582,9 +1582,12 @@ export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
-  const unitReports = attempt.compositeAssessment.items.map((item: any) => {
+  const unitReports: any[] = []
+  const backgroundValues: any[] = []
+  for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      return buildFormBackgroundReport({ itemId: item.id, label: item.formLabel, value: formMap.get(item.id)?.value ?? null })
+      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: item.formLabel, value: formMap.get(item.id)?.value ?? null }))
+      continue
     }
     if (item.type === 'SCALE') {
       try {
@@ -1602,12 +1605,14 @@ export const buildCompositeReport = (attempt: any) => {
         })
         if (report.decryptError) {
           logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-          return report
+          unitReports.push(report)
+          continue
         }
-        return report
+        unitReports.push(report)
+        continue
       } catch {
         logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-        return {
+        unitReports.push({
           itemId: item.id,
           type: 'SCALE' as const,
           kind: 'scale' as const,
@@ -1623,8 +1628,11 @@ export const buildCompositeReport = (attempt: any) => {
             scaleCode: item.scale?.code ?? null,
             reportDefinitionVersion: 'scale-unit-report-v1',
           },
+          caveats: [],
+          disclaimer: SCALE_REPORT_DISCLAIMER,
           decryptError: true,
-        }
+        })
+        continue
       }
     }
     try {
@@ -1667,7 +1675,7 @@ export const buildCompositeReport = (attempt: any) => {
           reference: reference ?? null,
         })
         : null
-      return {
+      unitReports.push({
         itemId: item.id,
         type: item.type,
         kind: 'cognitive' as const,
@@ -1680,12 +1688,12 @@ export const buildCompositeReport = (attempt: any) => {
         finishedAt: session?.finishedAt,
         reference,
         singleTaskReport,
-      }
+      })
     } catch {
       logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-      return { itemId: item.id, type: item.type, kind: 'cognitive' as const, label: item.cognitiveAssignment?.title, decryptError: true }
+      unitReports.push({ itemId: item.id, type: item.type, kind: 'cognitive' as const, label: item.cognitiveAssignment?.title, decryptError: true })
     }
-  })
+  }
   const report = {
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
@@ -1693,6 +1701,7 @@ export const buildCompositeReport = (attempt: any) => {
     anonymousCode: attempt.anonymousCode,
     completedAt: attempt.completedAt,
     totalTime: attempt.totalTime,
+    backgroundValues,
     unitReports,
   }
   // Keep direct callers of the pre-PR6A builder source-compatible while the

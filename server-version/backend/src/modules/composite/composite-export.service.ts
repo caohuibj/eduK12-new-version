@@ -100,6 +100,19 @@ const addField = (fields: CompositeExportField[], name: string, label: string, t
   return candidate
 }
 
+const includeFrozenMetric = (definition: any, detail: CompositeExportDetail) => {
+  if (!definition || (definition.valueType !== 'number' && definition.valueType !== 'integer')) return false
+  return detail === 'full' || definition.export?.summary !== false
+}
+
+const frozenMetricType = (definition: any): CompositeExportField['type'] => (
+  definition?.valueType === 'number' || definition?.valueType === 'integer' ? 'numeric' : 'string'
+)
+
+const frozenMetricDecimals = (definition: any) => (
+  definition?.valueType === 'integer' ? 0 : definition?.precision ?? 4
+)
+
 const completedDateWhere = (dateRange?: { start?: string; end?: string }) => {
   if (!dateRange?.start && !dateRange?.end) return undefined
   const value: { gte?: Date; lte?: Date } = {}
@@ -186,6 +199,21 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       addField(fields, `${childPrefix}config_version`, `[${title}] configVersion`, 'string')
       addField(fields, `${childPrefix}randomization_algorithm_version`, `[${title}] randomization algorithm version`, 'string')
       addField(fields, `${childPrefix}report_definition_version`, `[${title}] report-definition version`, 'string')
+      const frozenReport = frozenReportFor(item.cognitiveAssignment)
+      if (frozenReport) {
+        for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
+          const definition = frozenReport.metricDefinitions[key]
+          if (!includeFrozenMetric(definition, detail)) continue
+          const metricLabel = definition.export?.label || definition.label || key
+          addField(
+            fields,
+            fieldName(`${childPrefix}M_`, key),
+            `[${title}] ${metricLabel}`,
+            frozenMetricType(definition),
+            frozenMetricDecimals(definition),
+          )
+        }
+      }
     }
   })
 
@@ -250,11 +278,26 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           row[`${childPrefix}config_version`] = session.configVersion ?? null
           row[`${childPrefix}randomization_algorithm_version`] = frozenReport?.randomizationAlgorithmVersion ?? null
           row[`${childPrefix}report_definition_version`] = frozenReport?.reportDefinitionVersion ?? null
-          for (const [key, value] of Object.entries(metrics)) {
-            const definition = frozenReport?.metricDefinitions?.[key]
-            const metricLabel = definition?.export?.label || definition?.label || key
-            const metricName = addField(fields, fieldName(`${childPrefix}M_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] ${metricLabel}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
-            row[metricName] = scalarExportValue(value)
+          if (frozenReport) {
+            for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
+              const definition = frozenReport.metricDefinitions[key]
+              if (!includeFrozenMetric(definition, detail)) continue
+              const metricName = fieldName(`${childPrefix}M_`, key)
+              row[metricName] = scalarExportValue(metrics[key] ?? null)
+            }
+          } else {
+            // Historical assignments without a frozen report remain readable,
+            // but once a snapshot exists no row can add a data-dependent field.
+            for (const [key, value] of Object.entries(metrics)) {
+              const metricName = addField(
+                fields,
+                fieldName(`${childPrefix}M_`, key),
+                `[${item.cognitiveAssignment?.title || '认知任务'}] ${key}`,
+                typeof value === 'number' ? 'numeric' : 'string',
+                typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
+              )
+              row[metricName] = scalarExportValue(value)
+            }
           }
           if (detail === 'full') {
             for (const trial of session.trials || []) {
@@ -308,19 +351,22 @@ export const saveExportFiles = async (
     assertExportLimits({ bytes: Buffer.byteLength(content, 'utf8') })
     fs.writeFileSync(filePath, content, 'utf8')
   } else {
-    const variables: SavVariable[] = exportData.fields.map((field) => ({
-      name: field.name,
-      label: field.label,
-      type: field.type === 'string' || field.type === 'date' ? VariableType.String : VariableType.Numeric,
-      width: field.type === 'string' || field.type === 'date' ? (field.width || 80) : 8,
-      decimal: field.decimals || 0,
-      columns: field.width || 8,
-      measure: field.type === 'string' || field.type === 'date' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
-    }))
+    const variables = toSavVariables(exportData.fields)
     saveToFile(filePath, exportData.rows, variables)
     ensureExportFileWithinLimit(filePath)
   }
   return { filePath }
 }
 
-export const compositeExportService = { getExportData, exportToCSV, makeFileName, saveExportFiles }
+/** Keep SAV's numeric/null columns aligned with the frozen export schema. */
+export const toSavVariables = (fields: CompositeExportField[]): SavVariable[] => fields.map((field) => ({
+  name: field.name,
+  label: field.label,
+  type: field.type === 'string' || field.type === 'date' ? VariableType.String : VariableType.Numeric,
+  width: field.type === 'string' || field.type === 'date' ? (field.width || 80) : 8,
+  decimal: field.decimals || 0,
+  columns: field.width || 8,
+  measure: field.type === 'string' || field.type === 'date' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
+}))
+
+export const compositeExportService = { getExportData, exportToCSV, makeFileName, saveExportFiles, toSavVariables }

@@ -8,93 +8,13 @@ import { safeDecrypt } from '../utils/encryption'
 import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
-import { buildFormBackgroundReport, buildScaleUnitReport } from '../modules/reporting/scale-unit-report'
+import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
 
 /**
  * Build the collection-only questionnaire envelope.  The legacy JSON column
  * is accepted as an input for old records, but only its individual scale
  * reports are projected into the current response.
  */
-function buildQuestionnaireCollectionReport(qa: any): any {
-  const questionnaireScales = [...(qa.questionnaire?.questionnaireScales || [])]
-    .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
-  const assessments = Array.isArray(qa.scaleAssessments) ? qa.scaleAssessments : []
-  const storedScaleReports = Array.isArray(qa.aggregateReport?.scaleReports)
-    ? qa.aggregateReport.scaleReports
-    : []
-  const seen = new Set<string>()
-  const unitReports = [
-    ...questionnaireScales.map((questionnaireScale: any) => {
-      const scaleId = questionnaireScale.scaleId
-      seen.add(scaleId)
-      const assessment = assessments.find((candidate: any) => candidate.scaleId === scaleId)
-      const stored = storedScaleReports.find((candidate: any) => candidate.scaleId === scaleId)
-      const scale = questionnaireScale.scale || assessment?.scale
-      return buildScaleUnitReport({
-        itemId: questionnaireScale.id || scaleId,
-        scaleId,
-        scaleCode: scale?.code,
-        scaleName: scale?.name || stored?.scaleName || '未知量表',
-        scores: stored?.dimensionScores ?? assessment?.scores,
-        feedback: stored?.feedback ?? assessment?.feedback,
-        dimensions: scale?.dimensions,
-        completedAt: assessment?.completedAt ?? stored?.completedAt,
-        totalTime: assessment?.totalTime ?? stored?.totalTime,
-      })
-    }),
-    ...assessments
-      .filter((assessment: any) => !seen.has(assessment.scaleId))
-      .map((assessment: any) => {
-        const stored = storedScaleReports.find((candidate: any) => candidate.scaleId === assessment.scaleId)
-        return buildScaleUnitReport({
-          itemId: assessment.id,
-          scaleId: assessment.scaleId,
-          scaleCode: assessment.scale?.code,
-          scaleName: assessment.scale?.name || stored?.scaleName || '未知量表',
-          scores: stored?.dimensionScores ?? assessment.scores,
-          feedback: stored?.feedback ?? assessment.feedback,
-          dimensions: assessment.scale?.dimensions,
-          completedAt: assessment.completedAt ?? stored?.completedAt,
-          totalTime: assessment.totalTime ?? stored?.totalTime,
-        })
-      }),
-    ...storedScaleReports
-      .filter((stored: any) => !seen.has(stored.scaleId) && !assessments.some((assessment: any) => assessment.scaleId === stored.scaleId))
-      .map((stored: any) => buildScaleUnitReport({
-        itemId: stored.scaleId,
-        scaleId: stored.scaleId,
-        scaleName: stored.scaleName || '未知量表',
-        scores: stored.dimensionScores,
-        feedback: stored.feedback,
-        completedAt: stored.completedAt,
-        totalTime: stored.totalTime,
-      })),
-  ]
-
-  const formItems = [...(qa.questionnaire?.formItems || [])]
-    .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
-  const formAnswers = new Map((qa.formAnswers || []).map((answer: any) => [answer.formItemId, answer.value]))
-  const backgroundValues = formItems.map((item: any) => buildFormBackgroundReport({
-    itemId: item.id,
-    label: item.label,
-    value: formAnswers.has(item.id) ? String(formAnswers.get(item.id)) : null,
-  }))
-  const totalDimensions = unitReports.reduce((sum: number, report: any) => sum + report.dimensionScores.length, 0)
-
-  return {
-    questionnaireName: qa.questionnaire?.name || '问卷',
-    totalDimensions,
-    backgroundValues,
-    unitReports,
-  }
-}
-
-const collectionReportForStorage = (report: any) => ({
-  reportDefinitionVersion: 'collection-only-v1',
-  scaleReports: report.unitReports,
-  totalDimensions: report.totalDimensions,
-})
-
 // ==================== Validation Schemas ====================
 
 const createQuestionnaireSchema = z.object({

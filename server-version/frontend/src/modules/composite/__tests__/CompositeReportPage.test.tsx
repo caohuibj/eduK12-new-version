@@ -90,6 +90,7 @@ describe('CompositeReportPage cognitive module', () => {
         anonymousCode: null,
         completedAt: '2026-01-01T00:00:00Z',
         totalTime: 0,
+        backgroundValues: [{ itemId: 'item-form', type: 'FORM', kind: 'background', label: '年级', value: '三年级' }],
         unitReports: [
           {
             itemId: 'item-scale-a',
@@ -100,6 +101,8 @@ describe('CompositeReportPage cognitive module', () => {
             scaleName: '量表 A',
             dimensionScores: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', rawScore: 0, normalizedScore: 0, level: 'low', itemCount: 1, minScore: 0, maxScore: 10 }],
             feedback: { overall: '', dimensions: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', score: 0, minScore: 0, maxScore: 10, level: 'low', interpretation: '', suggestions: [] }] },
+            caveats: ['量表测试注意事项'],
+            disclaimer: '量表测试免责声明',
             completedAt: null,
             totalTime: 0,
             method: { scaleId: 'scale-a', scaleCode: 'S-A', reportDefinitionVersion: 'scale-unit-report-v1' },
@@ -113,6 +116,8 @@ describe('CompositeReportPage cognitive module', () => {
             scaleName: '量表 B',
             dimensionScores: [{ dimensionId: 'd-b', dimensionCode: 'B', dimensionName: '维度 B', rawScore: null, normalizedScore: null, level: null, itemCount: null, minScore: 0, maxScore: 10 }],
             feedback: { overall: '', dimensions: [{ dimensionId: 'd-b', dimensionCode: 'B', dimensionName: '维度 B', score: null, minScore: 0, maxScore: 10, level: null, interpretation: '', suggestions: [] }] },
+            caveats: [],
+            disclaimer: '量表测试免责声明',
             completedAt: null,
             totalTime: null,
             method: { scaleId: 'scale-b', scaleCode: 'S-B', reportDefinitionVersion: 'scale-unit-report-v1' },
@@ -137,10 +142,14 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByTestId('scale-unit-report-item-scale-b')).toBeTruthy()
     expect(screen.getByText('认知 A')).toBeTruthy()
     expect(screen.getByText('认知 B')).toBeTruthy()
+    expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
+    expect(screen.getByText('背景信息')).toBeTruthy()
+    expect(screen.getByText('三年级')).toBeTruthy()
+    expect(screen.getByText('量表测试注意事项')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
 
     participantView.unmount()
-    render(
+    const teacherView = render(
       <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-mixed/report']}>
         <Routes>
           <Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} />
@@ -151,5 +160,24 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByTestId('scale-unit-report-item-scale-b')).toBeTruthy()
     expect(screen.getByText('认知 A')).toBeTruthy()
     expect(screen.getByText('认知 B')).toBeTruthy()
+    expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
+    expect(screen.getByText('背景信息')).toBeTruthy()
+    teacherView.unmount()
+
+    window.sessionStorage.setItem('composite:recovery:attempt:attempt-mixed', 'recovery-token-for-test')
+    const publicView = render(
+      <MemoryRouter initialEntries={['/public/composite/attempts/attempt-mixed/report']}>
+        <Routes>
+          <Route path="/public/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+    expect(await screen.findByTestId('scale-unit-report-item-scale-a')).toBeTruthy()
+    expect(screen.getByText('认知 A')).toBeTruthy()
+    expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
+    expect(screen.getByText('背景信息')).toBeTruthy()
+    expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
+    publicView.unmount()
+    window.sessionStorage.removeItem('composite:recovery:attempt:attempt-mixed')
   })
 })

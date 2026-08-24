@@ -78,8 +78,8 @@ export interface CompositeReport {
   anonymousCode: string | null
   completedAt: string | null
   totalTime: number | null
+  backgroundValues: FormBackgroundReport[]
   unitReports: Array<
-    | FormBackgroundReport
     | ScaleUnitReport
     | (Record<string, unknown> & {
         itemId: string

@@ -36,6 +36,13 @@ export interface ScaleFeedback {
   feedbackLevel?: string
 }
 
+/**
+ * These two fields are part of the per-scale report rather than a collection
+ * summary.  Keeping them here means questionnaire and Composite consumers
+ * render the same caveat/disclaimer for the same stored scale result.
+ */
+export const SCALE_REPORT_DISCLAIMER = '量表结果仅反映本次作答，不构成医学诊断或人口常模。'
+
 export interface ScaleUnitReport {
   itemId?: string
   type: 'SCALE'
@@ -46,6 +53,8 @@ export interface ScaleUnitReport {
   scaleName: string
   dimensionScores: ScaleDimensionScore[]
   feedback: ScaleFeedback
+  caveats: string[]
+  disclaimer: string
   completedAt: Date | string | null
   totalTime: number | null
   method: {
@@ -158,6 +167,8 @@ export interface BuildScaleUnitReportInput {
   scores: unknown
   feedback: unknown
   dimensions?: ScaleDimensionMeta[]
+  caveats?: string[]
+  disclaimer?: string | null
   completedAt?: Date | string | null
   totalTime?: number | null
 }
@@ -170,6 +181,15 @@ export interface BuildScaleUnitReportInput {
 export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUnitReport => {
   const scores = decodeReportField<any[]>(input.scores)
   const feedback = decodeReportField<Record<string, unknown>>(input.feedback)
+  const feedbackRecord = feedback.ok ? asRecord(feedback.value) : {}
+  const caveats = Array.isArray(input.caveats)
+    ? input.caveats.map(String)
+    : Array.isArray(feedbackRecord.caveats)
+      ? feedbackRecord.caveats.map(String)
+      : []
+  const disclaimer = input.disclaimer
+    ?? (feedbackRecord.disclaimer == null ? null : String(feedbackRecord.disclaimer))
+    ?? SCALE_REPORT_DISCLAIMER
   const base = {
     ...(input.itemId ? { itemId: input.itemId } : {}),
     type: 'SCALE' as const,
@@ -185,6 +205,8 @@ export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUni
       scaleCode: input.scaleCode ?? null,
       reportDefinitionVersion: SCALE_REPORT_DEFINITION_VERSION,
     },
+    caveats,
+    disclaimer: disclaimer || SCALE_REPORT_DISCLAIMER,
   }
 
   if (!scores.ok || !feedback.ok) {

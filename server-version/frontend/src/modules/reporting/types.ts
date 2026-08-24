@@ -38,6 +38,8 @@ export interface ScaleUnitReport {
     dimensions: ScaleDimensionFeedback[]
     feedbackLevel?: string
   }
+  caveats: string[]
+  disclaimer: string
   completedAt: string | null
   totalTime: number | null
   method: {

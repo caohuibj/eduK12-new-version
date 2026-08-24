@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { VariableType } from 'sav-writer'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
@@ -11,7 +12,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { compositeExportService } from '../../modules/composite/composite-export.service'
+import { compositeExportService, toSavVariables } from '../../modules/composite/composite-export.service'
 
 const makeTemplate = (withTrials: boolean, metrics: Record<string, unknown> = { meanRtMs: 350, validTrialCount: 2 }) => ({
   id: 'composite-1',
@@ -65,6 +66,18 @@ const mixedFrozenReport = {
       role: 'primary',
       availableProfiles: ['standard'],
       export: { summary: true, label: '冻结零指标' },
+    },
+    nullMetric: {
+      key: 'nullMetric',
+      label: '冻结空指标',
+      construct: 'speed',
+      description: '冻结定义',
+      unit: 'ms',
+      valueType: 'number',
+      direction: 'higher_is_better',
+      role: 'secondary',
+      availableProfiles: ['standard'],
+      export: { summary: true, label: '冻结空指标' },
     },
   },
   qualityDefinitions: {},
@@ -229,6 +242,23 @@ describe('composite export service', () => {
       C004_M_zerometric: null,
     })
     expect(data.fields.find((field) => field.name === 'C003_M_zerometric')?.label).toContain('冻结零指标')
+    expect(data.fields.find((field) => field.name === 'C003_M_nullmetric')?.type).toBe('numeric')
+  })
+
+  it('predeclares frozen scalar columns even with zero attempts and keeps SAV nullability typed', async () => {
+    const withAttempt = makeMixedTemplate()
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(withAttempt).mockResolvedValueOnce({ ...withAttempt, attempts: [] })
+
+    const populated = await compositeExportService.getExportData('composite-mixed', { detail: 'summary' })
+    const empty = await compositeExportService.getExportData('composite-mixed', { detail: 'summary', dateRange: { start: '2030-01-01', end: '2030-01-02' } })
+    expect(empty.rows).toEqual([])
+    expect(empty.fields.map((field) => [field.name, field.type])).toEqual(populated.fields.map((field) => [field.name, field.type]))
+    const csv = compositeExportService.exportToCSV(populated)
+    expect(csv).toContain('0')
+    expect(csv).toContain('C003_M_nullmetric')
+    const sav = toSavVariables(populated.fields)
+    expect(sav.find((variable) => variable.name === 'C003_M_nullmetric')?.type).toBe(VariableType.Numeric)
+    expect(sav.find((variable) => variable.name === 'C003_M_nullmetric')?.measure).toBeDefined()
   })
 
   it('exports summary metrics without raw trials', async () => {

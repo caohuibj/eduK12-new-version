@@ -1,0 +1,167 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { mockPrisma, mockCache } = vi.hoisted(() => ({
+  mockPrisma: {
+    questionnaireAssessment: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+  },
+  mockCache: {
+    getQuestionnaireScales: vi.fn(),
+    getQuestionnaireFormItems: vi.fn(),
+  },
+}))
+
+vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+vi.mock('../../services/cacheService', () => ({ cacheService: mockCache }))
+
+import { questionnaireController } from '../../controllers/questionnaireController'
+import { publicQuestionnaireController } from '../../controllers/publicQuestionnaireController'
+
+const scale = {
+  id: 'scale-1',
+  code: 'S-1',
+  name: '学习投入',
+  dimensions: [{ id: 'dimension-1', code: 'engagement', name: '投入', minScore: 0, maxScore: 20 }],
+  items: [],
+}
+
+const legacyScaleReport = {
+  scaleId: 'scale-1',
+  scaleName: '学习投入',
+  dimensionScores: [{ dimensionId: 'dimension-1', rawScore: 0, normalizedScore: null, level: 'low' }],
+  feedback: {
+    overall: '单项反馈',
+    dimensions: [{ dimensionId: 'dimension-1', score: 0, level: 'low', interpretation: '', suggestions: [] }],
+  },
+  completedAt: new Date('2026-08-20T01:00:00.000Z'),
+  totalTime: 0,
+}
+
+const makeQa = (overrides: Record<string, unknown> = {}) => ({
+  id: 'qa-1',
+  sessionId: 'session-1',
+  questionnaireId: 'questionnaire-1',
+  userId: 'student-1',
+  status: 'IN_PROGRESS',
+  startedAt: new Date('2026-08-20T00:00:00.000Z'),
+  completedAt: null,
+  totalTime: null,
+  questionnaire: {
+    id: 'questionnaire-1',
+    name: '学习问卷',
+    instruction: null,
+    formItems: [{ id: 'form-1', label: '年级', position: 0 }],
+    questionnaireScales: [{ id: 'questionnaire-scale-1', scaleId: 'scale-1', position: 1, scale }],
+  },
+  scaleAssessments: [{
+    id: 'assessment-1',
+    scaleId: 'scale-1',
+    status: 'COMPLETED',
+    progress: 100,
+    scores: legacyScaleReport.dimensionScores,
+    feedback: legacyScaleReport.feedback,
+    completedAt: legacyScaleReport.completedAt,
+    totalTime: 0,
+    scale,
+  }],
+  formAnswers: [{ formItemId: 'form-1', value: '三年级' }],
+  // This shape represents pre-PR6A rows.  It must be read for individual
+  // scale values but never exposed as a collection aggregate.
+  aggregateReport: {
+    averageScore: 99,
+    overallSummary: '不应出现在当前报告',
+    scaleReports: [legacyScaleReport],
+  },
+  ...overrides,
+})
+
+const response = () => ({
+  json: vi.fn(),
+  status: vi.fn().mockReturnThis(),
+}) as any
+
+const dataOf = (res: any) => res.json.mock.calls[0]?.[0]?.data
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockPrisma.questionnaireAssessment.update.mockImplementation(async ({ data }: any) => ({
+    ...makeQa({ status: 'COMPLETED', completedAt: new Date('2026-08-20T00:01:00.000Z'), totalTime: 1000 }),
+    ...data,
+  }))
+  mockCache.getQuestionnaireScales.mockResolvedValue([{ id: 'questionnaire-scale-1', scaleId: 'scale-1', position: 1, scale }])
+  mockCache.getQuestionnaireFormItems.mockResolvedValue([{ id: 'form-1', label: '年级', position: 0 }])
+})
+
+describe('collection-only questionnaire completion/report contract', () => {
+  it('auth explicit completion stores per-scale reports and omits legacy aggregate fields', async () => {
+    const qa = makeQa()
+    mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(qa)
+    const res = response()
+
+    await questionnaireController.completeAssessment({ params: { id: 'qa-1' }, user: { userId: 'student-1' } } as any, res)
+
+    expect(res.json).toHaveBeenCalled()
+    expect(dataOf(res)).toMatchObject({ backgroundValues: [{ value: '三年级' }], unitReports: [{ scaleId: 'scale-1', caveats: [], disclaimer: expect.any(String) }] })
+    expect(dataOf(res)).not.toHaveProperty('averageScore')
+    expect(dataOf(res)).not.toHaveProperty('overallSummary')
+    expect(dataOf(res)).not.toHaveProperty('aggregateReport')
+    expect(mockPrisma.questionnaireAssessment.update.mock.calls[0][0].data.aggregateReport).toMatchObject({ reportDefinitionVersion: 'collection-only-v1' })
+  })
+
+  it('auth automatic completion follows the same projection', async () => {
+    const qa = makeQa()
+    mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(qa)
+    const res = response()
+
+    await questionnaireController.getAssessment({ params: { id: 'qa-1' }, user: { userId: 'student-1' } } as any, res)
+
+    expect(res.json).toHaveBeenCalled()
+    expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
+    expect(mockPrisma.questionnaireAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ scaleReports: expect.any(Array) }) }),
+    }))
+  })
+
+  it('public explicit completion returns the same scale DTO and strips legacy aggregate data', async () => {
+    const qa = makeQa({ userId: null })
+    mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(qa)
+    const res = response()
+
+    await publicQuestionnaireController.completeAssessment({ params: { sessionId: 'session-1' } } as any, res)
+
+    expect(dataOf(res)).toMatchObject({ backgroundValues: [{ itemId: 'form-1', value: '三年级' }], unitReports: [{ scaleId: 'scale-1', dimensionScores: [{ rawScore: 0 }], totalTime: 0 }] })
+    expect(dataOf(res)).not.toHaveProperty('averageScore')
+    expect(dataOf(res)).not.toHaveProperty('overallSummary')
+    expect(dataOf(res)).not.toHaveProperty('aggregateReport')
+  })
+
+  it('public automatic completion persists the same collection-only shape', async () => {
+    const qa = makeQa({ userId: null })
+    mockPrisma.questionnaireAssessment.findUnique
+      .mockResolvedValueOnce(qa)
+      .mockResolvedValueOnce(qa)
+    const res = response()
+
+    await publicQuestionnaireController.getAssessment({ params: { sessionId: 'session-1' } } as any, res)
+
+    expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
+    expect(mockPrisma.questionnaireAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v1' }) }),
+    }))
+  })
+
+  it('authenticated report reads legacy scaleReports without reviving aggregate conclusions', async () => {
+    const qa = makeQa({ status: 'COMPLETED', completedAt: new Date('2026-08-20T00:01:00.000Z'), totalTime: 1000 })
+    mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(qa)
+    const res = response()
+
+    await questionnaireController.getReport({ params: { id: 'qa-1' }, user: { userId: 'student-1' } } as any, res)
+
+    expect(dataOf(res).unitReports).toHaveLength(1)
+    expect(dataOf(res).unitReports[0]).toMatchObject({ scaleId: 'scale-1', caveats: [], disclaimer: expect.any(String) })
+    expect(dataOf(res)).not.toHaveProperty('averageScore')
+    expect(dataOf(res)).not.toHaveProperty('overallSummary')
+  })
+})

@@ -24,11 +24,16 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { encryptField } from '../../utils/encryption'
+import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/reference'
+import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
+import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
+import { buildQuestionnaireCollectionReport } from '../../modules/reporting/questionnaire-collection-report'
 import {
   buildCompositeReport,
   getCompositeForTeacher,
   getReport,
   getReportForTeacher,
+  getExportContext,
   listAttemptsForTeacher,
   listComposites,
 } from '../../modules/composite/composite.service'
@@ -271,9 +276,19 @@ describe('getReportForTeacher', () => {
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(completedAttemptForReport())
 
     const report = await getReportForTeacher('admin-1', ADMIN, 'composite-1', 'attempt-1')
-    expect(report.modules.map((item: { type: string }) => item.type)).toEqual(['FORM', 'SCALE', 'COGNITIVE'])
+    expect(report.backgroundValues).toEqual([{ itemId: 'item-form', type: 'FORM', kind: 'background', label: '年级', value: '三年级' }])
+    expect(report.unitReports.map((item: { type: string }) => item.type)).toEqual(['SCALE', 'COGNITIVE'])
     expect(report).not.toHaveProperty('totalScore')
-    expect(report.modules.some((item: { decryptError?: boolean }) => item.decryptError)).toBe(false)
+    expect(report.unitReports.some((item: { decryptError?: boolean }) => item.decryptError)).toBe(false)
+  })
+})
+
+describe('getExportContext ownership', () => {
+  it('denies another teacher while allowing the owner and admin', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    await expect(getExportContext('teacher-b', TEACHER, 'composite-1')).rejects.toMatchObject({ statusCode: 403 })
+    await expect(getExportContext('teacher-a', TEACHER, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
+    await expect(getExportContext('admin-1', ADMIN, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
   })
 })
 
@@ -383,9 +398,102 @@ describe('composite cognitive single-task report', () => {
     expect(report.caveats).toContain('体验版，结果仅供体验。')
     expect(report.productIndex.label).toBe('任务表现指数')
   })
+
+  it.each([
+    ['normal', 'standard', true, { referenceMode: 'none' }],
+    ['experience', 'experience', true, { referenceMode: 'none' }],
+    ['quality-failed', 'standard', false, { referenceMode: 'simulated' }],
+    ['missing-reference', 'standard', true, { referenceMode: 'none' }],
+  ] as const)('%s Composite report is deep-equal to the direct frozen builder', (name, profile, interpretable, reportConfig) => {
+    const frozen = name === 'missing-reference' ? null : frozenReport
+    const assignment = {
+      title: '冻结认知任务',
+      profile,
+      resolvedReportSnapshotEncrypted: frozen ? encryptCognitivePayload({ ...frozen, profile }) : null,
+    }
+    const session = {
+      id: `session-${name}`,
+      compositeItemId: 'item-cog',
+      testType: 'reaction',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.1.0',
+      configVersion: '1.1.0',
+      finishedAt: new Date('2026-08-20T01:05:00Z'),
+      configSnapshotEncrypted: encryptCognitivePayload({ report: reportConfig }),
+      scoreEncrypted: encryptCognitivePayload(70),
+      metricsEncrypted: encryptCognitivePayload({ medianRtMs: interpretable ? 320 : null }),
+      qualityFlagsEncrypted: encryptCognitivePayload({ interpretable, insufficientValidTrials: !interpretable }),
+    }
+    const attempt = completedAttemptForReport({
+      compositeAssessment: {
+        id: 'composite-1',
+        name: '综合测评 1',
+        items: [{ id: 'item-cog', type: 'COGNITIVE', scale: null, cognitiveAssignment: assignment }],
+      },
+      cognitiveSessions: [session],
+      formAnswers: [],
+    })
+
+    const composite = buildCompositeReport(attempt).unitReports.find((item: { type: string }) => item.type === 'COGNITIVE') as any
+    const config = { report: reportConfig }
+    const score = 70
+    const metrics = { medianRtMs: interpretable ? 320 : null }
+    const qualityFlags = { interpretable, insufficientValidTrials: !interpretable }
+    const reference = resolveCognitiveReferenceForResult({
+      testType: session.testType,
+      metrics,
+      score,
+      qualityFlags,
+      config,
+      profile,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      configVersion: session.configVersion,
+    })
+    const direct = buildCognitiveSingleTaskReport({
+      testType: session.testType,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      configVersion: session.configVersion,
+      profile,
+      frozenReport: readFrozenReport(assignment.resolvedReportSnapshotEncrypted),
+      score,
+      metrics,
+      qualityFlags,
+      reference,
+    })
+    expect(composite.singleTaskReport).toEqual(direct)
+  })
 })
 
 describe('collection-only mixed unit reports', () => {
+  it('uses the same Scale DTO for Composite and Questionnaire/public projections', () => {
+    const scores = [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: null, level: 'low' }]
+    const feedback = {
+      overall: '单项反馈',
+      caveats: ['同一项注意事项'],
+      disclaimer: '同一项免责声明',
+      dimensions: [{ dimensionId: 'dimension-a', score: 0, level: 'low', interpretation: '解释', suggestions: ['建议'] }],
+    }
+    const scale = { id: 'scale-a', code: 'S-A', name: '量表 A', dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A', minScore: 0, maxScore: 10 }] }
+    const composite = buildCompositeReport(completedAttemptForReport({
+      compositeAssessment: {
+        id: 'composite-1',
+        name: '综合测评 1',
+        items: [{ id: 'item-scale-a', type: 'SCALE', scaleId: 'scale-a', scale, cognitiveAssignment: null }],
+      },
+      scaleAssessments: [{ compositeItemId: 'item-scale-a', scores, feedback, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0 }],
+      cognitiveSessions: [],
+      formAnswers: [],
+    })).unitReports[0]
+    const questionnaire = buildQuestionnaireCollectionReport({
+      questionnaire: { name: '问卷', questionnaireScales: [{ id: 'item-scale-a', scaleId: 'scale-a', position: 0, scale }], formItems: [] },
+      scaleAssessments: [{ id: 'assessment-a', scaleId: 'scale-a', scores, feedback, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0, scale }],
+      formAnswers: [],
+    }).unitReports[0]
+    expect(composite).toEqual(questionnaire)
+  })
+
   it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', () => {
     const built = buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
@@ -397,6 +505,13 @@ describe('collection-only mixed unit reports', () => {
             type: 'SCALE',
             scaleId: 'scale-a',
             scale: { id: 'scale-a', code: 'S-A', name: '量表 A', dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A', minScore: 0, maxScore: 10 }] },
+            cognitiveAssignment: null,
+          },
+          {
+            id: 'item-form',
+            type: 'FORM',
+            formLabel: '年级',
+            scale: null,
             cognitiveAssignment: null,
           },
           {
@@ -464,10 +579,11 @@ describe('collection-only mixed unit reports', () => {
           qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
         },
       ],
-      formAnswers: [],
+      formAnswers: [{ itemId: 'item-form', value: '三年级' }],
     }))
 
     expect(built.unitReports.map((item: { type: string }) => item.type)).toEqual(['SCALE', 'SCALE', 'COGNITIVE', 'COGNITIVE'])
+    expect(built.backgroundValues).toEqual([{ itemId: 'item-form', type: 'FORM', kind: 'background', label: '年级', value: '三年级' }])
     expect(built.modules).toBe(built.unitReports)
     expect(built.unitReports[0]).toMatchObject({ scaleId: 'scale-a', dimensionScores: [{ rawScore: 0, normalizedScore: 0 }] })
     expect(built.unitReports[1]).toMatchObject({ scaleId: 'scale-b', dimensionScores: [{ rawScore: null, normalizedScore: null }], totalTime: null })
@@ -498,7 +614,7 @@ describe('buildCompositeReport decrypt degrade', () => {
     expect(cognitive).not.toHaveProperty('score')
     expect(cognitive).not.toHaveProperty('metrics')
     expect(cognitive).not.toHaveProperty('qualityFlags')
-    expect(built.modules.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
+    expect(built.backgroundValues.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
     expect(built).not.toHaveProperty('totalScore')
 
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(attempt)
@@ -522,7 +638,7 @@ describe('buildCompositeReport decrypt degrade', () => {
     expect(scale).toMatchObject({ decryptError: true, type: 'SCALE', scaleId: 'scale-1' })
     expect(scale).not.toHaveProperty('scores')
     expect(scale).not.toHaveProperty('feedback')
-    expect(built.modules.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
+    expect(built.backgroundValues.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
   })
 
   it('marks a scale module decryptError when feedback ciphertext cannot be decoded', () => {

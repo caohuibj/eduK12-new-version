@@ -61,6 +61,10 @@ const ScaleUnitReportCard: React.FC<{ report: ScaleUnitReport }> = ({ report }) 
         })}
       </div>
       {report.feedback.overall && <p className="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg">{report.feedback.overall}</p>}
+      {(report.caveats || []).length > 0 && <ul className="list-disc list-inside text-sm text-amber-700 mt-4 space-y-1" data-testid="scale-caveats">
+        {(report.caveats || []).map((caveat) => <li key={caveat}>{caveat}</li>)}
+      </ul>}
+      {report.disclaimer && <p className="text-xs text-gray-500 mt-3" data-testid="scale-disclaimer">{report.disclaimer}</p>}
     </div>
   )
 }
