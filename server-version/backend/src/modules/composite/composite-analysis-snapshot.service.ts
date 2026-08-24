@@ -345,6 +345,16 @@ const validatePayloadMetadata = (
   validateProvenanceContract(payload, expected)
 }
 
+/**
+ * Persist one immutable snapshot or return the row already occupying the
+ * unique tuple.
+ *
+ * Callers must hold `FOR UPDATE` on the parent Attempt for the whole
+ * transaction before invoking this helper. The `created` flag is derived
+ * from the read-before-upsert fast path; the database unique constraint still
+ * guarantees one row, but concurrent unlocked callers cannot both reliably
+ * observe which one inserted it.
+ */
 export const persistOrGetPackageAnalysisSnapshot = async (
   db: SnapshotDb,
   input: {

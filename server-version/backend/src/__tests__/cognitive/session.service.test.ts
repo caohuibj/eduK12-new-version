@@ -70,6 +70,10 @@ const sessionRow = (overrides: any = {}) => ({
   participantKey: 'pkey',
   participantSnapshotEncrypted: 'enc-snap',
   assignmentId: 'asg-1',
+  compositeAttemptId: null,
+  compositeItemId: null,
+  recoveryTokenHash: null,
+  anonymousCode: null,
   configId: 'config-1',
   testType: 'fake',
   attemptNo: 1,
@@ -103,6 +107,10 @@ const rawRow = (s: any = sessionRow()) => ({
   participant_key: s.participantKey,
   participant_snapshot_encrypted: s.participantSnapshotEncrypted,
   assignment_id: s.assignmentId,
+  composite_attempt_id: s.compositeAttemptId,
+  composite_item_id: s.compositeItemId,
+  recovery_token_hash: s.recoveryTokenHash,
+  anonymous_code: s.anonymousCode,
   config_id: s.configId,
   test_type: s.testType,
   attempt_no: s.attemptNo,
@@ -335,6 +343,35 @@ describe('restartSession', () => {
     )
     expect(result.attemptNo).toBe(2)
     expect(result.status).toBe('IN_PROGRESS')
+  })
+
+  it('restarts a composite wrapper while preserving its Attempt/item linkage', async () => {
+    const compositeSession = sessionRow({
+      participantKey: 'user-key:attempt-1:item-1',
+      compositeAttemptId: 'attempt-1',
+      compositeItemId: 'item-1',
+      anonymousCode: null,
+    })
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(compositeSession)
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, listedStandalone: false })
+    mockPrisma.cognitiveSession.count.mockResolvedValue(1)
+    mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 1 })
+    mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: any) => sessionRow(data))
+    mockPrisma.$queryRaw.mockResolvedValue([rawRow(compositeSession)])
+
+    const result = await restartSession('student-1', 'session-1')
+
+    expect(result.attemptNo).toBe(2)
+    expect(mockPrisma.cognitiveSession.count).toHaveBeenCalledWith({
+      where: { assignmentId: 'asg-1', participantKey: compositeSession.participantKey },
+    })
+    expect(mockPrisma.cognitiveSession.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        participantKey: compositeSession.participantKey,
+        compositeAttemptId: 'attempt-1',
+        compositeItemId: 'item-1',
+      }),
+    })
   })
 
   it('D6.1: rejects restart when the locked row is no longer IN_PROGRESS', async () => {

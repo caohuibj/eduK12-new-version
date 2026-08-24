@@ -58,12 +58,13 @@ interface StartableContext {
  */
 export const loadStartableAssignment = async (
   assignmentId: string,
-  userId: string
+  userId: string,
+  options: { allowCompositeWrapper?: boolean } = {},
 ): Promise<StartableContext> => {
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Assignment is not published')
-  rejectWrapperForStandaloneUse(assignment)
+  if (!options.allowCompositeWrapper) rejectWrapperForStandaloneUse(assignment)
   if (!assignment.courseId) throw BAD_REQUEST('Assignment has no course')
 
   const course = await prisma.course.findUnique({ where: { id: assignment.courseId } })
@@ -409,8 +410,14 @@ export const restartSession = async (userId: string, sessionId: string) => {
   }
 
   // restart 是**主动新 attempt** → 重新判定资格（尤其 dueAt / membership）。
-  const ctx = await loadStartableAssignment(session.assignmentId, userId)
-  const participantKey = getParticipantKey(userId)
+  const ctx = await loadStartableAssignment(session.assignmentId, userId, {
+    allowCompositeWrapper: Boolean(session.compositeAttemptId && session.compositeItemId),
+  })
+  // Composite sessions use an attempt/item-scoped participant key. Preserve
+  // the frozen key across restart; falling back to the standalone user key
+  // would disconnect the new Session from the Composite Attempt and also
+  // make the completion path unable to select it as the latest result.
+  const participantKey = session.participantKey
 
   const used = await prisma.cognitiveSession.count({ where: { assignmentId: session.assignmentId, participantKey } })
   if (used >= ctx.assignment.maxAttempts) {
@@ -444,6 +451,9 @@ export const restartSession = async (userId: string, sessionId: string) => {
           participantKey,
           participantSnapshotEncrypted,
           assignmentId: locked.assignmentId,
+          compositeAttemptId: locked.compositeAttemptId,
+          compositeItemId: locked.compositeItemId,
+          recoveryTokenHash: locked.recoveryTokenHash,
           configId: locked.configId,
           testType: locked.testType,
           attemptNo: newAttemptNo,
@@ -453,6 +463,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
           engineVersion: locked.engineVersion,
           scoringVersion: locked.scoringVersion,
           randomSeed,
+          anonymousCode: locked.anonymousCode,
         },
       })
     }).then((created) => toRunnerPayload(created, undefined, false, ctx.frozenReport))
