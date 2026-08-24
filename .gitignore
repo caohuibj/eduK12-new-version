@@ -1,1 +1,8 @@
 .deploy/
+
+# codex-auto project-local runtime
+.codex-auto/runtime/
+.codex-auto/.env
+.codex-auto/audit/
+.codex-auto/tasks/
+.codex-auto/results/
