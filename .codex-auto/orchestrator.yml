@@ -30,10 +30,9 @@ routing:
     reasoning_effort: max
     max_output_tokens: 12000
     temperature: null
-github:
-  repository: caohuibj/eduK12-new-version
+repository:
+  identifier: eduk12-local
   base_branch: dev
-  remote: origin
   feature_branch_prefix: codex-auto/
   context_max_bytes: 120000
   allowed_paths:
@@ -46,6 +45,7 @@ github:
   - .codex/**
   - .github/workflows/**
   - .codex-auto/**
+  - AGENTS.md
   - '*.pem'
   - '*.key'
   - '**/*.pem'
@@ -63,6 +63,9 @@ github:
     - --prefix
     - server-version/backend
     - test
+    backend-integration:
+    - sh
+    - scripts/codex-auto-backend-integration.sh
     frontend-typecheck:
     - npm
     - --prefix
@@ -89,14 +92,11 @@ github:
     - -f
     - server-version/docker-compose.yml
     - config
-  required_ci_checks:
-  - backend (ci + migrate + build + full regression)
-  - frontend (typecheck + cognitive tests + build)
-  - docker (compose config + production builds)
+github: null
 policy:
   max_fix_cycles: 2
-  human_merge_required: true
-  protocol_version: v1
+  human_integration_required: true
+  protocol_version: v2
 audit:
   path: .codex-auto/audit/{task_id}.jsonl
   max_payload_chars: 20000

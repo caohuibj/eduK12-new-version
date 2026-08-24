@@ -1,13 +1,15 @@
 protocol:
   repository: caohuibj/codex-auto
-  version: v1
+  version: v2
 project:
-  repository: caohuibj/eduK12-new-version
+  repository: eduk12-local
+  github_repository: null
   integration_branch: dev
   production_branch: main
 workflow:
   execution_mode: chatgpt-app
-  human_merge_required: true
+  repository_mode: local-git
+  human_integration_required: true
   feature_branch_pattern: codex-auto/*
   task_contract_required: true
   independent_review_required: true
@@ -18,6 +20,7 @@ verification:
   required:
   - backend-build
   - backend-unit
+  - backend-integration
   - frontend-typecheck
   - frontend-cognitive
   - frontend-build
