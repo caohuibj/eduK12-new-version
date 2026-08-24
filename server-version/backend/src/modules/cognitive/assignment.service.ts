@@ -168,7 +168,13 @@ export const listTeacherAssignments = async (
   if (role === UserRole.TEACHER) where.createdBy = userId
   if (query.courseId) where.courseId = query.courseId
   if (query.status) where.status = query.status
-  if (query.listedStandalone !== undefined) where.listedStandalone = query.listedStandalone
+  // Wrapper assignments materialized for report packages are implementation
+  // details, not standalone teacher-library entries. Keep an explicit query
+  // override for admin/tooling callers, but default only the teacher directory
+  // to standalone assignments so admins can still inspect internal wrappers.
+  if (query.listedStandalone !== undefined || role === UserRole.TEACHER) {
+    where.listedStandalone = query.listedStandalone ?? true
+  }
 
   const assignments = await prisma.cognitiveAssignment.findMany({
     where,
@@ -246,6 +252,14 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(assignment, role, userId)
 
+  const packageReference = await prisma.compositeAssessmentItem.findFirst({
+    where: {
+      cognitiveAssignmentId: id,
+      compositeAssessment: { reportPackageKey: { not: null } },
+    },
+    select: { id: true },
+  })
+
   return {
     id: assignment.id,
     courseId: assignment.courseId,
@@ -257,6 +271,7 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
     maxAttempts: assignment.maxAttempts,
     required: assignment.required,
     listedStandalone: assignment.listedStandalone,
+    reportPackageLocked: Boolean(packageReference),
     publishedAt: assignment.publishedAt,
     createdAt: assignment.createdAt,
     updatedAt: assignment.updatedAt,
@@ -322,6 +337,14 @@ export const updateDraftAssignment = async (
   if (!existing) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(existing, role, userId)
   if (isCompositeWrapper(existing)) {
+    const packageReference = await prisma.compositeAssessmentItem.findFirst({
+      where: {
+        cognitiveAssignmentId: id,
+        compositeAssessment: { reportPackageKey: { not: null } },
+      },
+      select: { id: true },
+    })
+    if (packageReference) throw CONFLICT('报告包引用的认知任务已冻结，不能修改')
     const blocked = ['maxAttempts', 'required', 'opensAt', 'dueAt'] as const
     if (blocked.some((key) => input[key] !== undefined)) {
       throw BAD_REQUEST('综合测评用认知任务只能修改标题和指导语')
@@ -417,6 +440,17 @@ export const archiveAssignment = async (userId: string, role: UserRole, id: stri
   const existing = await prisma.cognitiveAssignment.findUnique({ where: { id } })
   if (!existing) throw NOT_FOUND('CognitiveAssignment not found')
   assertCanManage(existing, role, userId)
+
+  if (isCompositeWrapper(existing)) {
+    const packageReference = await prisma.compositeAssessmentItem.findFirst({
+      where: {
+        cognitiveAssignmentId: id,
+        compositeAssessment: { reportPackageKey: { not: null } },
+      },
+      select: { id: true },
+    })
+    if (packageReference) throw CONFLICT('报告包引用的认知任务已冻结，不能修改')
+  }
 
   const referenced = await prisma.compositeAssessmentItem.findFirst({
     where: { cognitiveAssignmentId: id, compositeAssessment: { status: { not: 'ARCHIVED' } } },

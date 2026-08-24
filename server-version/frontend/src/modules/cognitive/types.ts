@@ -15,6 +15,7 @@ export interface CognitiveAssignmentSummary {
   maxAttempts: number
   required: boolean
   listedStandalone?: boolean
+  reportPackageLocked?: boolean
   publishedAt: string | null
   course: { id: string; title: string; courseCode: string } | null
   config: {

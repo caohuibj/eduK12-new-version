@@ -47,6 +47,11 @@ import type {
   CognitiveAnalysisProfile,
   ReportPackageDefinition,
 } from '../cognitive-analysis'
+import {
+  getFrozenPackageSlotLabels,
+  resolveCompositeItemLabel,
+  resolveLibraryItemLabel,
+} from './report-package-label'
 
 type Db = any
 
@@ -345,16 +350,16 @@ const assertValidItem = async (
   throw compositeBadRequest('不支持的综合测评模块类型')
 }
 
-const mapItemForTeacher = (item: any) => ({
+const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string>()) => ({
   id: item.id,
   type: item.type,
   position: item.position,
   required: item.required,
-  scale: item.scale ? { id: item.scale.id, code: item.scale.code, name: item.scale.name } : null,
+  scale: item.scale ? { id: item.scale.id, code: item.scale.code, name: packageSlotLabels.get(item.position) ?? item.scale.name } : null,
   cognitiveAssignment: item.cognitiveAssignment
     ? {
         id: item.cognitiveAssignment.id,
-        title: item.cognitiveAssignment.title,
+        title: packageSlotLabels.get(item.position) ?? item.cognitiveAssignment.title,
         status: item.cognitiveAssignment.status,
         profile: item.cognitiveAssignment.profile ?? null,
         config: {
@@ -370,7 +375,7 @@ const mapItemForTeacher = (item: any) => ({
   form: item.type === 'FORM'
     ? {
         type: item.formType,
-        label: item.formLabel,
+        label: packageSlotLabels.get(item.position) ?? item.formLabel,
         placeholder: item.formPlaceholder,
         options: item.formOptions,
       }
@@ -598,7 +603,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
         : null,
       canSetCopyable: canSetCopyableFor(item, role),
       itemCount: item.items.length,
-      items: item.items.map(mapItemForTeacher),
+      items: item.items.map((child: any) => mapItemForTeacher(child, getFrozenPackageSlotLabels(item))),
       attemptCounts: counts.get(item.id) ?? emptyAttemptCounts(),
     }
   })
@@ -642,7 +647,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
           frozen: Boolean(composite.analysisProtocolSnapshotEncrypted),
         }
       : null,
-    items: composite.items.map(mapItemForTeacher),
+    items: composite.items.map((item: any) => mapItemForTeacher(item, getFrozenPackageSlotLabels(composite))),
     attemptCounts: counts.get(composite.id) ?? emptyAttemptCounts(),
   }
 }
@@ -676,7 +681,7 @@ export const listLibraryTemplates = async (userId: string, role: UserRole) => {
     items: item.items.map((child) => ({
       type: child.type,
       position: child.position,
-      label: child.scale?.name || child.cognitiveAssignment?.config?.name || child.cognitiveAssignment?.title || child.formLabel,
+      label: resolveLibraryItemLabel(child, getFrozenPackageSlotLabels(item)),
     })),
   }))
 }
@@ -1396,7 +1401,7 @@ export const listAvailableForStudent = async (userId: string) => {
     instruction: item.instruction,
     estimatedModules: item.items.length,
     course: item.course,
-    items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: child.scale?.name || child.cognitiveAssignment?.title || child.formLabel })),
+    items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
     attempt: latest.get(item.id) ?? null,
   }))
 }
@@ -1538,6 +1543,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
   assertTokenWindow(token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
+  const packageSlotLabels = getFrozenPackageSlotLabels(composite)
   return {
     id: composite.id,
     name: composite.name,
@@ -1546,7 +1552,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
     expiresAt: token.expiresAt,
     maxUses: token.maxUses,
     usedCount: token.usedCount,
-    items: composite.items.map((item: any) => ({ type: item.type, position: item.position, label: item.scale?.name || item.cognitiveAssignment?.title || item.formLabel })),
+    items: composite.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
   }
 }
 
@@ -1692,12 +1698,16 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   const status = await completeAttemptIfReady(attempt, completedItems, attempt.compositeAssessment.items.length)
   const currentIndex = attempt.compositeAssessment.items.findIndex((item: any) => !completed(item))
   const current = currentIndex >= 0 ? attempt.compositeAssessment.items[currentIndex] : null
+  const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   let currentItem: any = null
   if (current?.type === 'FORM') {
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, form: { type: current.formType, label: current.formLabel, placeholder: current.formPlaceholder, options: current.formOptions }, value: formMap.get(current.id)?.value ?? null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, form: { type: current.formType, label: packageSlotLabels.get(current.position) ?? current.formLabel, placeholder: current.formPlaceholder, options: current.formOptions }, value: formMap.get(current.id)?.value ?? null }
   } else if (current?.type === 'SCALE') {
     const assessment = scaleMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, scaleAssessmentId: assessment?.id, scale: current.scale, answers: decodeJson<any[]>(assessment?.answers) ?? [] }
+    const scale = current.scale
+      ? { ...current.scale, name: packageSlotLabels.get(current.position) ?? current.scale.name }
+      : current.scale
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, scaleAssessmentId: assessment?.id, scale, answers: decodeJson<any[]>(assessment?.answers) ?? [] }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
     currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session) : null }
@@ -1716,7 +1726,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     lastSavedAt: attempt.lastSavedAt,
     completedAt: status.completedAt,
     anonymousCode: attempt.anonymousCode,
-    items: attempt.compositeAssessment.items.map((item: any, index: number) => ({ id: item.id, type: item.type, position: item.position, label: item.scale?.name || item.cognitiveAssignment?.title || item.formLabel, completed: completed(item), index })),
+    items: attempt.compositeAssessment.items.map((item: any, index: number) => ({ id: item.id, type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels), completed: completed(item), index })),
     currentItem,
   }
 }
@@ -1852,9 +1862,10 @@ export const buildCompositeReport = (attempt: any) => {
   const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
   const unitReports: any[] = []
   const backgroundValues: any[] = []
+  const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: item.formLabel, value: formMap.get(item.id)?.value ?? null }))
+      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: formMap.get(item.id)?.value ?? null }))
       continue
     }
     if (item.type === 'SCALE') {
@@ -1947,7 +1958,7 @@ export const buildCompositeReport = (attempt: any) => {
         itemId: item.id,
         type: item.type,
         kind: 'cognitive' as const,
-        label: item.cognitiveAssignment?.title,
+        label: resolveCompositeItemLabel(item, packageSlotLabels),
         sessionId: session?.id,
         testType: session?.testType,
         score,
@@ -1959,7 +1970,7 @@ export const buildCompositeReport = (attempt: any) => {
       })
     } catch {
       logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
-      unitReports.push({ itemId: item.id, type: item.type, kind: 'cognitive' as const, label: item.cognitiveAssignment?.title, decryptError: true })
+      unitReports.push({ itemId: item.id, type: item.type, kind: 'cognitive' as const, label: resolveCompositeItemLabel(item, packageSlotLabels), decryptError: true })
     }
   }
   const report = {

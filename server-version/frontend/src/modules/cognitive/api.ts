@@ -43,8 +43,13 @@ export const cognitiveApi = {
     }> }>('/cognitive/configs'),
   updateConfigAccessPolicy: (id: string, accessPolicy: 'OPEN' | 'GRANT') =>
     apiClient.patch<{ id: string; accessPolicy: 'OPEN' | 'GRANT' }>(`/cognitive/configs/${id}/access-policy`, { accessPolicy }),
-  listTeacherAssignments: (status?: string) =>
-    apiClient.get<any>(status ? `/cognitive/assignments?status=${encodeURIComponent(status)}` : '/cognitive/assignments'),
+  listTeacherAssignments: (status?: string, listedStandalone?: boolean) => {
+    const params = new URLSearchParams()
+    if (status) params.set('status', status)
+    if (listedStandalone !== undefined) params.set('listedStandalone', String(listedStandalone))
+    const query = params.toString()
+    return apiClient.get<any>(`/cognitive/assignments${query ? `?${query}` : ''}`)
+  },
   createAssignment: (body: {
     courseId: string
     configId: string

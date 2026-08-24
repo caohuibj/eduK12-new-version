@@ -714,6 +714,7 @@ model CompositeAssessment {
   @@index([courseId, status])
   @@index([createdBy, status])
   @@index([copyable, status])
+  @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
   @@map("composite_assessments")
 }
 

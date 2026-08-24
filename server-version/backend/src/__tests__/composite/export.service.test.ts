@@ -20,6 +20,7 @@ const makeTemplate = (withTrials: boolean, metrics: Record<string, unknown> = { 
   items: [{
     id: 'item-cognitive',
     type: 'COGNITIVE',
+    position: 0,
     formLabel: null,
     scale: null,
     cognitiveAssignment: { title: '反应时任务' },
@@ -274,6 +275,25 @@ describe('composite export service', () => {
     expect(data.fields.map((field) => field.name)).toContain('C001_M_meanrtms')
     expect(data.fields.some((field) => field.name.includes('t001'))).toBe(false)
     expect(data.trialCount).toBe(0)
+  })
+
+  it('uses the frozen package slot label instead of a live wrapper title', async () => {
+    const template: any = makeTemplate(false)
+    template.reportPackageKey = 'attention_stability_v1'
+    template.reportPackageVersion = '1.0.0'
+    template.reportPackageSnapshotEncrypted = encryptCognitivePayload({
+      snapshotVersion: 1,
+      packageKey: 'attention_stability_v1',
+      packageVersion: '1.0.0',
+      packageDefinition: { slots: [{ position: 0, label: '冻结槽位名称' }] },
+      analysisProtocolSnapshot: {},
+    })
+    template.items[0].cognitiveAssignment.title = 'live wrapper title'
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+
+    expect(data.fields.find((field) => field.name === 'C001_score')?.label).toContain('冻结槽位名称')
   })
 
   it('exports each cognitive trial value in full mode', async () => {

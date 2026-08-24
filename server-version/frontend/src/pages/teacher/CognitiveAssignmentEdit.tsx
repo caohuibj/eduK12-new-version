@@ -22,6 +22,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const isWrapper = detail?.listedStandalone === false
+  const isPackageLocked = isWrapper && Boolean(detail?.reportPackageLocked)
 
   const load = async () => {
     try {
@@ -153,7 +154,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
               <Send className="w-4 h-4 inline mr-1" />发布
             </button>
           )}
-          {canArchive && (
+          {canArchive && !isPackageLocked && (
             <button onClick={() => void archive()} className="btn-secondary">
               <Archive className="w-4 h-4 inline mr-1" />归档
             </button>
@@ -177,25 +178,39 @@ const CognitiveAssignmentEdit: React.FC = () => {
           <p className="text-sm text-gray-500 mb-4">
             此任务仅用于综合测评，不能单独发给学生或生成公开链接。群体数据请从综合测评导出。
           </p>
-          <label className="block text-sm text-gray-600 mb-3">
-            标题
-            <input
-              className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </label>
-          <label className="block text-sm text-gray-600 mb-4">
-            学生须知
-            <textarea
-              className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800 min-h-[96px]"
-              value={instruction}
-              onChange={(e) => setInstruction(e.target.value)}
-            />
-          </label>
-          <button onClick={() => void saveWrapper()} disabled={saving || !title.trim()} className="btn-primary">
-            {saving ? '保存中...' : '保存'}
-          </button>
+          {isPackageLocked ? (
+            <>
+              <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800 mb-4">
+                此任务已被报告包引用并冻结，标题、指导语和生命周期不能修改；综合测评中的固定槽位名称以报告包快照为准。
+              </p>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div><span className="text-gray-500">标题：</span>{detail.title}</div>
+                {detail.instruction && <div><span className="text-gray-500">学生须知：</span><span className="whitespace-pre-wrap">{detail.instruction}</span></div>}
+              </div>
+            </>
+          ) : (
+            <>
+              <label className="block text-sm text-gray-600 mb-3">
+                标题
+                <input
+                  className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </label>
+              <label className="block text-sm text-gray-600 mb-4">
+                学生须知
+                <textarea
+                  className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800 min-h-[96px]"
+                  value={instruction}
+                  onChange={(e) => setInstruction(e.target.value)}
+                />
+              </label>
+              <button onClick={() => void saveWrapper()} disabled={saving || !title.trim()} className="btn-primary">
+                {saving ? '保存中...' : '保存'}
+              </button>
+            </>
+          )}
         </div>
       ) : (
         detail.instruction && (

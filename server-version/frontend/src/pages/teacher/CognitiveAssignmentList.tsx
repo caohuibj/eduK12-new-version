@@ -75,14 +75,16 @@ const CognitiveAssignmentList: React.FC = () => {
   const load = async () => {
     try {
       const [assignmentsRes, coursesRes, configsRes, testsRes] = await Promise.all([
-        cognitiveApi.listTeacherAssignments(),
+        cognitiveApi.listTeacherAssignments(undefined, isAdmin ? undefined : true),
         apiClient.get<{ list: CourseOption[] }>('/courses?status=all&page=1&pageSize=100'),
         cognitiveApi.listConfigs(),
         cognitiveApi.listTests(),
       ])
       if (assignmentsRes.code !== 0) throw new Error(assignmentsRes.message || '获取认知任务失败')
       const rows = Array.isArray(assignmentsRes.data) ? assignmentsRes.data : assignmentsRes.data?.list || []
-      setList(rows)
+      // Keep package-internal wrappers out of the teacher library even if an
+      // older backend ignores the default listedStandalone query parameter.
+      setList(isAdmin ? rows : rows.filter((row: AssignmentRow) => row.listedStandalone !== false))
       setCourses(coursesRes.code === 0 ? (coursesRes.data?.list || []) : [])
       setConfigs(configsRes.code === 0 ? (configsRes.data?.list || []) : [])
       setTests(testsRes.code === 0 ? (testsRes.data?.list || []) : [])

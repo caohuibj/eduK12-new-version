@@ -194,7 +194,7 @@ describe('listTeacherAssignments / listStudentAssignments', () => {
     const result = await listTeacherAssignments('teacher-1', TEACHER, {})
     expect(result).toHaveLength(1)
     expect(mockPrisma.cognitiveAssignment.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ createdBy: 'teacher-1' }) })
+      expect.objectContaining({ where: expect.objectContaining({ createdBy: 'teacher-1', listedStandalone: true }) })
     )
     expect((result[0] as any).config).toEqual({
       id: 'config-1',
@@ -230,6 +230,14 @@ describe('getAssignmentForTeacher / getAssignmentForStudent', () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, config, course })
     const result = await getAssignmentForTeacher('teacher-1', TEACHER, 'asg-1')
     expect(result.id).toBe('asg-1')
+    expect(result.reportPackageLocked).toBe(false)
+  })
+
+  it('marks a package-referenced wrapper as locked for the teacher UI', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, listedStandalone: false, config, course })
+    mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'package-item-1' })
+    const result = await getAssignmentForTeacher('teacher-1', TEACHER, 'asg-1')
+    expect(result.reportPackageLocked).toBe(true)
   })
 
   it('teacher cannot read another teacher assignment', async () => {
@@ -454,10 +462,26 @@ describe('composite wrapper assignment class', () => {
     )
   })
 
+  it('rejects PATCH for a wrapper referenced by a report package', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
+    mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'package-item-1' })
+    await expect(updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { title: '不可修改' })).rejects.toMatchObject({
+      statusCode: 409,
+    })
+    expect(mockPrisma.cognitiveAssignment.update).not.toHaveBeenCalled()
+  })
+
   it('rejects wrapper PATCH of maxAttempts', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
     await expect(updateDraftAssignment('teacher-1', TEACHER, 'asg-1', { maxAttempts: 3 })).rejects.toMatchObject({
       statusCode: 400,
     })
+  })
+
+  it('rejects archive for a wrapper referenced by a report package', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(wrapper)
+    mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'package-item-1' })
+    await expect(archiveAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
   })
 })

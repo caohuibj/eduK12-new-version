@@ -66,4 +66,26 @@ describe('CognitiveAssignmentEdit wrapper', () => {
       })
     })
   })
+
+  it('renders a report-package wrapper as read-only after freeze', async () => {
+    mockCognitiveApi.getAssignment.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 'wrap-1',
+        title: '冻结槽位任务',
+        instruction: '固定说明',
+        status: 'PUBLISHED',
+        listedStandalone: false,
+        reportPackageLocked: true,
+        config: { name: 'Reaction' },
+      },
+    })
+
+    render(<CognitiveAssignmentEdit />)
+
+    expect(await screen.findByText(/已被报告包引用并冻结/)).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('冻结槽位任务')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '保存' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '归档' })).not.toBeInTheDocument()
+  })
 })

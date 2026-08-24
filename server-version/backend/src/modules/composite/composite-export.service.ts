@@ -8,6 +8,7 @@ import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
+import { getFrozenPackageSlotLabels } from './report-package-label'
 import {
   assertExportLimits,
   cleanupExpiredExportFiles,
@@ -158,6 +159,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   })
   if (!template) throw new Error('综合测评不存在')
   assertExportLimits({ records: template.attempts.length })
+  const packageSlotLabels = getFrozenPackageSlotLabels(template)
 
   const fields: CompositeExportField[] = []
   addField(fields, 'U_id', '参与者编号', 'string')
@@ -168,25 +170,26 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   addField(fields, 'A_duration_s', '完成用时(秒)', 'numeric')
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
-  formItems.forEach((item: any, index: number) => addField(fields, `F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${item.formLabel}`, 'string'))
+  formItems.forEach((item: any, index: number) => addField(fields, `F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string'))
 
   template.items.forEach((item: any, index: number) => {
     const prefix = slotPrefix('S', index)
     if (item.type === 'SCALE' && item.scale) {
-      addField(fields, `${prefix}scale_id`, `[${item.scale.name}] 量表ID`, 'string')
-      addField(fields, `${prefix}scale_code`, `[${item.scale.name}] 量表编码`, 'string')
-      addField(fields, `${prefix}report_definition_version`, `[${item.scale.name}] 报告定义版本`, 'string')
+      const scaleLabel = packageSlotLabels.get(item.position) ?? item.scale.name
+      addField(fields, `${prefix}scale_id`, `[${scaleLabel}] 量表ID`, 'string')
+      addField(fields, `${prefix}scale_code`, `[${scaleLabel}] 量表编码`, 'string')
+      addField(fields, `${prefix}report_definition_version`, `[${scaleLabel}] 报告定义版本`, 'string')
       if (detail === 'full') {
         item.scale.items.forEach((scaleItem: any) => {
-          addField(fields, fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${item.scale.name}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric')
-          addField(fields, fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id), `[${item.scale.name}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`, 'numeric')
+          addField(fields, fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric')
+          addField(fields, fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`, 'numeric')
         })
       }
-      item.scale.dimensions.forEach((dimension: any) => addField(fields, fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${item.scale.name}] ${dimension.name}得分`, 'numeric', 2))
+      item.scale.dimensions.forEach((dimension: any) => addField(fields, fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${scaleLabel}] ${dimension.name}得分`, 'numeric', 2))
     }
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
-      const title = item.cognitiveAssignment?.title || '认知任务'
+      const title = packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')
       addField(fields, `${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 2)
       addField(fields, `${childPrefix}quality`, `[${title}] 数据质量`, 'string')
       addField(fields, `${childPrefix}profile`, `[${title}] Profile`, 'string')
@@ -292,7 +295,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
               const metricName = addField(
                 fields,
                 fieldName(`${childPrefix}M_`, key),
-                `[${item.cognitiveAssignment?.title || '认知任务'}] ${key}`,
+                `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${key}`,
                 typeof value === 'number' ? 'numeric' : 'string',
                 typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
               )
@@ -304,7 +307,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
               const payload = decryptCognitivePayload<unknown>(trial.payloadEncrypted)
               trialCount += 1
               for (const [key, value] of flatten(payload)) {
-                const trialName = addField(fields, fieldName(`${childPrefix}T${String(trial.trialIndex + 1).padStart(3, '0')}_`, key), `[${item.cognitiveAssignment?.title || '认知任务'}] 第${trial.trialIndex + 1}次 ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
+                const trialName = addField(fields, fieldName(`${childPrefix}T${String(trial.trialIndex + 1).padStart(3, '0')}_`, key), `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] 第${trial.trialIndex + 1}次 ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
                 row[trialName] = scalarExportValue(value)
               }
             }
