@@ -4,11 +4,14 @@ import { ClipboardList, Copy, Plus, Settings } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { compositeApi } from '../../modules/composite/api'
+import MaterialGrantModal from '../../components/MaterialGrantModal'
 import type {
   AnalysisProtocolCatalogItem,
   AnalysisProtocolProfile,
   CompositeLibraryTemplate,
   CompositeTeacherListItem,
+  ReportPackageCatalogItem,
+  ReportPackageProfile,
 } from '../../modules/composite/types'
 
 type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean; creatorId?: string }
@@ -38,15 +41,21 @@ const CompositeAssessmentList: React.FC = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
+  // The package catalog is the PR6B teacher-facing contract. Keep the old
+  // protocol UI only for older test/integration doubles that do not expose the
+  // package endpoint; a deployed client always has this method.
+  const packageCatalogAvailable = typeof compositeApi.listReportPackages === 'function'
   const [list, setList] = useState<CompositeTeacherListItem[]>([])
   const [library, setLibrary] = useState<CompositeLibraryTemplate[]>([])
   const [courses, setCourses] = useState<CourseOption[]>([])
   const [protocols, setProtocols] = useState<AnalysisProtocolCatalogItem[]>([])
+  const [reportPackages, setReportPackages] = useState<ReportPackageCatalogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [copyingId, setCopyingId] = useState<string | null>(null)
   const [copyCourseId, setCopyCourseId] = useState<Record<string, string>>({})
+  const [grantPackage, setGrantPackage] = useState<ReportPackageCatalogItem | null>(null)
   const [tab, setTab] = useState<'mine' | 'library'>('mine')
   const [form, setForm] = useState({
     code: '',
@@ -55,6 +64,8 @@ const CompositeAssessmentList: React.FC = () => {
     courseId: '',
     publicEnabled: false,
     expiresAt: '',
+    packageId: '',
+    packageProfile: 'standard' as ReportPackageProfile,
     protocolId: '',
     protocolProfile: 'standard' as AnalysisProtocolProfile,
   })
@@ -64,14 +75,20 @@ const CompositeAssessmentList: React.FC = () => {
   const createCourses = isAdmin ? courses : teachingCourses
   const selectedCreateCourse = createCourses.find((course) => course.id === form.courseId)
   const selectedProtocol = protocols.find((protocol) => `${protocol.key}/${protocol.version}` === form.protocolId)
+  const selectedPackage = reportPackages.find((pkg) => `${pkg.key}/${pkg.version}` === form.packageId)
 
   const load = async () => {
     try {
-      const [compositeRes, libraryRes, coursesRes, protocolRes] = await Promise.all([
+      const [compositeRes, libraryRes, coursesRes, protocolRes, packageRes] = await Promise.all([
         compositeApi.list(),
         compositeApi.listLibrary(),
         apiClient.get<{ list: CourseOption[] }>('/courses?status=all&page=1&pageSize=100'),
-        compositeApi.listAnalysisProtocols(),
+        packageCatalogAvailable
+          ? Promise.resolve({ code: 0, data: { list: [] as AnalysisProtocolCatalogItem[] }, message: '' })
+          : compositeApi.listAnalysisProtocols(),
+        packageCatalogAvailable
+          ? compositeApi.listReportPackages!()
+          : Promise.resolve({ code: 0, data: { list: [] } }),
       ])
       if (compositeRes.code === 0 && compositeRes.data) setList(compositeRes.data.list)
       else setError(compositeRes.message || '获取综合测评列表失败')
@@ -81,6 +98,7 @@ const CompositeAssessmentList: React.FC = () => {
       setCourses(courseList)
       if (protocolRes.code === 0 && protocolRes.data) setProtocols(protocolRes.data.list)
       else setError((current) => current || protocolRes.message || '获取综合分析协议失败')
+      if (packageRes.code === 0 && packageRes.data) setReportPackages(packageRes.data.list)
       const selectable = isAdmin ? courseList : courseList.filter((course) => !course.isLibrary)
       if (selectable.length === 1) {
         setForm((prev) => prev.courseId ? prev : { ...prev, courseId: selectable[0].id })
@@ -107,8 +125,8 @@ const CompositeAssessmentList: React.FC = () => {
       if (form.publicEnabled && !form.expiresAt) {
         throw new Error('请填写公开作答的有效期')
       }
-      if (selectedProtocol && !form.courseId) {
-        throw new Error('综合分析协议必须绑定课程')
+      if ((selectedProtocol || selectedPackage) && !form.courseId) {
+        throw new Error('报告包必须绑定课程')
       }
       const response = await compositeApi.create({
         code: form.code,
@@ -117,13 +135,21 @@ const CompositeAssessmentList: React.FC = () => {
         publicEnabled: form.publicEnabled,
         courseId: form.courseId || null,
         expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
-        analysisProtocol: selectedProtocol
-          ? {
-              key: selectedProtocol.key,
-              version: selectedProtocol.version,
-              profile: form.protocolProfile,
-            }
+        reportPackage: selectedPackage
+          ? { key: selectedPackage.key, version: selectedPackage.version, profile: form.packageProfile }
           : null,
+        // Keep the legacy field only for old locally published protocols. New
+        // package clients omit it entirely so the external contract has one
+        // fixed-report selector.
+        ...(packageCatalogAvailable ? {} : {
+          analysisProtocol: !selectedPackage && selectedProtocol
+            ? {
+                key: selectedProtocol.key,
+                version: selectedProtocol.version,
+                profile: form.protocolProfile,
+              }
+            : null,
+        }),
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '创建失败')
       navigate(`/composite-assessments/${response.data.id}`)
@@ -188,6 +214,29 @@ const CompositeAssessmentList: React.FC = () => {
         </button>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
+      {isAdmin && reportPackages.length > 0 && (
+        <div className="card p-5 mb-6">
+          <h2 className="font-semibold text-gray-800">内置报告包目录</h2>
+          <p className="text-xs text-gray-500 mt-1 mb-3">包定义由代码版本控制；只有已发布版本可以授权和实例化。</p>
+          <div className="space-y-2">
+            {reportPackages.map((pkg) => (
+              <div key={`${pkg.key}/${pkg.version}`} className="flex items-center justify-between gap-3 border rounded px-3 py-2">
+                <div>
+                  <p className="text-sm font-medium">{pkg.name} · v{pkg.version}</p>
+                  <p className="text-xs text-gray-500">{pkg.status}{pkg.disabledReason ? ` · ${pkg.disabledReason}` : ''}</p>
+                </div>
+                <button
+                  className="btn-secondary text-sm"
+                  disabled={pkg.status !== 'PUBLISHED'}
+                  onClick={() => setGrantPackage(pkg)}
+                >
+                  授权教师
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {showForm && (
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">新建综合测评</h2>
@@ -225,33 +274,80 @@ const CompositeAssessmentList: React.FC = () => {
             {selectedCreateCourse?.isLibrary && (
               <p className="text-xs text-amber-600 md:col-span-2">库课程上的综合测评不能发给学生作答，只作为管理员模板。</p>
             )}
-            <label className="md:col-span-2 text-sm text-gray-600">
-              报告模式
-              <select
-                aria-label="报告模式"
-                className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
-                value={form.protocolId}
-                onChange={(e) => {
-                  const protocol = protocols.find((item) => `${item.key}/${item.version}` === e.target.value)
-                  const profile = protocol?.profiles.includes(form.protocolProfile)
-                    ? form.protocolProfile
-                    : protocol?.profiles[0] ?? 'standard'
-                  setForm({ ...form, protocolId: e.target.value, protocolProfile: profile })
-                }}
-              >
-                <option value="">仅收集：自由添加模块，只显示单项结果</option>
-                {protocols.map((protocol) => (
-                  <option
-                    key={`${protocol.key}/${protocol.version}`}
-                    value={`${protocol.key}/${protocol.version}`}
-                    disabled={protocol.status !== 'PUBLISHED'}
+            {reportPackages.length > 0 && (
+              <label className="md:col-span-2 text-sm text-gray-600">
+                已授权报告包
+                <select
+                  aria-label="已授权报告包"
+                  className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
+                  value={form.packageId}
+                  onChange={(e) => {
+                    const pkg = reportPackages.find((item) => `${item.key}/${item.version}` === e.target.value)
+                    const profile = pkg?.profiles.includes(form.packageProfile) ? form.packageProfile : pkg?.profiles[0] ?? 'standard'
+                    setForm({ ...form, packageId: e.target.value, packageProfile: profile, protocolId: '' })
+                  }}
+                >
+                  <option value="">仅收集：自由添加模块，只显示单项结果</option>
+                  {reportPackages.map((pkg) => (
+                    <option key={`${pkg.key}/${pkg.version}`} value={`${pkg.key}/${pkg.version}`} disabled={pkg.status !== 'PUBLISHED'}>
+                      {pkg.name} · v{pkg.version}{pkg.status !== 'PUBLISHED' ? '（尚未开放）' : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {selectedPackage && (
+              <div className="md:col-span-2 rounded border border-emerald-100 bg-emerald-50 p-3 text-sm">
+                <p className="font-medium text-gray-800">{selectedPackage.name}</p>
+                <p className="text-gray-600 mt-1">{selectedPackage.description}</p>
+                <p className="text-gray-600 mt-2">
+                  固定槽位：{[...selectedPackage.slots].sort((a, b) => a.position - b.position).map((slot) => slot.label).join(' · ')}
+                </p>
+                <label className="mt-3 block text-gray-600">
+                  测验档位
+                  <select
+                    aria-label="报告包档位"
+                    className="mt-1 block w-full border rounded bg-white px-3 py-2 text-base text-gray-800"
+                    value={form.packageProfile}
+                    onChange={(e) => setForm({ ...form, packageProfile: e.target.value as ReportPackageProfile })}
                   >
-                    {protocol.name} · v{protocol.version}{protocol.status !== 'PUBLISHED' ? '（尚未开放）' : ''}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {selectedProtocol && (
+                    {selectedPackage.profiles.map((profile) => {
+                      const minutes = selectedPackage.estimatedMinutes[profile]
+                      return <option key={profile} value={profile}>{profile === 'standard' ? '标准档' : '科研档'} · 约 {minutes[0]}–{minutes[1]} 分钟</option>
+                    })}
+                  </select>
+                </label>
+                <p className="text-xs text-emerald-700 mt-2">该包由管理员授权；创建后固定槽位、版本和报告定义不可改写。</p>
+              </div>
+            )}
+            {!packageCatalogAvailable && <>
+              <label className="md:col-span-2 text-sm text-gray-600">
+                报告模式
+                <select
+                  aria-label="报告模式"
+                  className="mt-1 block w-full border rounded px-3 py-2 text-base text-gray-800"
+                  value={selectedPackage ? '' : form.protocolId}
+                  onChange={(e) => {
+                    const protocol = protocols.find((item) => `${item.key}/${item.version}` === e.target.value)
+                    const profile = protocol?.profiles.includes(form.protocolProfile)
+                      ? form.protocolProfile
+                      : protocol?.profiles[0] ?? 'standard'
+                    setForm({ ...form, protocolId: e.target.value, protocolProfile: profile, packageId: '' })
+                  }}
+                >
+                  <option value="">仅收集：自由添加模块，只显示单项结果</option>
+                  {protocols.map((protocol) => (
+                    <option
+                      key={`${protocol.key}/${protocol.version}`}
+                      value={`${protocol.key}/${protocol.version}`}
+                      disabled={protocol.status !== 'PUBLISHED'}
+                    >
+                      {protocol.name} · v{protocol.version}{protocol.status !== 'PUBLISHED' ? '（尚未开放）' : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {selectedProtocol && (
               <div className="md:col-span-2 rounded border border-blue-100 bg-blue-50 p-3 text-sm">
                 <p className="font-medium text-gray-800">{selectedProtocol.name}</p>
                 <p className="text-gray-600 mt-1">{selectedProtocol.description}</p>
@@ -281,12 +377,13 @@ const CompositeAssessmentList: React.FC = () => {
                 </label>
                 <p className="text-xs text-blue-700 mt-2">创建后任务及顺序固定；发布时冻结协议和各任务版本。</p>
               </div>
-            )}
-            {!selectedProtocol && protocols.some((protocol) => protocol.status !== 'PUBLISHED') && (
-              <p className="md:col-span-2 text-xs text-gray-500">
-                尚未开放的分析协议会在任务和分析规则通过发布验收后启用。
-              </p>
-            )}
+              )}
+              {!selectedProtocol && !selectedPackage && protocols.some((protocol) => protocol.status !== 'PUBLISHED') && (
+                <p className="md:col-span-2 text-xs text-gray-500">
+                  尚未开放的分析协议会在任务和分析规则通过发布验收后启用。
+                </p>
+              )}
+            </>}
             <textarea
               className="border rounded px-3 py-2 md:col-span-2"
               placeholder="说明"
@@ -316,7 +413,7 @@ const CompositeAssessmentList: React.FC = () => {
           <div className="mt-4 flex gap-2">
             <button
               onClick={() => void create()}
-              disabled={saving || !form.code.trim() || !form.name.trim() || Boolean(selectedProtocol && !form.courseId)}
+              disabled={saving || !form.code.trim() || !form.name.trim() || Boolean((selectedProtocol || selectedPackage) && !form.courseId)}
               className="btn-primary"
             >
               {saving ? '保存中...' : '保存'}
@@ -404,6 +501,14 @@ const CompositeAssessmentList: React.FC = () => {
             )
           })}
         </div>
+      )}
+      {grantPackage && (
+        <MaterialGrantModal
+          resourceType="REPORT_PACKAGE"
+          resourceId={`${grantPackage.key}@${grantPackage.version}`}
+          resourceName={`${grantPackage.name} · v${grantPackage.version}`}
+          onClose={() => setGrantPackage(null)}
+        />
       )}
     </div>
   )

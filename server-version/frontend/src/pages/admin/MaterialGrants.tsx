@@ -4,6 +4,7 @@ import { materialGrantApi, type MaterialGrantRow, type MaterialResourceType } fr
 const typeLabel: Record<MaterialResourceType, string> = {
   SCALE: '量表',
   COGNITIVE_CONFIG: '认知任务类型',
+  REPORT_PACKAGE: '报告包',
 }
 
 const MaterialGrants: React.FC = () => {
@@ -44,7 +45,7 @@ const MaterialGrants: React.FC = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-800 mb-4">材料授权</h1>
-      <p className="text-sm text-gray-500 mb-4">总览已有授权。量表授权请在量表列表操作，认知任务类型授权请在新建认知任务的类型下拉旁操作。</p>
+      <p className="text-sm text-gray-500 mb-4">总览已有授权。量表和认知任务授权在对应材料页面操作；报告包授权只对代码内已发布版本开放。</p>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <label className="text-sm text-gray-600 mb-4 block">
         类型
@@ -56,6 +57,7 @@ const MaterialGrants: React.FC = () => {
           <option value="">全部</option>
           <option value="SCALE">量表</option>
           <option value="COGNITIVE_CONFIG">认知任务类型</option>
+          <option value="REPORT_PACKAGE">报告包</option>
         </select>
       </label>
       {loading ? (

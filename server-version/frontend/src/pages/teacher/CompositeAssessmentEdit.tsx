@@ -7,6 +7,8 @@ import type {
   AnalysisProtocolCatalogItem,
   AnalysisProtocolProfile,
   CompositeAnalysisProtocol,
+  ReportPackageCatalogItem,
+  ReportPackageProfile,
 } from '../../modules/composite/types'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 
@@ -34,12 +36,19 @@ const errorMessage = (err: unknown, fallback: string) => {
 const CompositeAssessmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  // PR6B replaces the teacher-facing protocol picker with the package catalog.
+  // The legacy branch remains only for older integration doubles/historical
+  // records that predate the package endpoint.
+  const packageCatalogAvailable = typeof compositeApi.listReportPackages === 'function'
   const [detail, setDetail] = useState<any>(null)
   const [scales, setScales] = useState<any[]>([])
   const [cognitiveAssignments, setCognitiveAssignments] = useState<any[]>([])
   const [protocols, setProtocols] = useState<AnalysisProtocolCatalogItem[]>([])
+  const [reportPackages, setReportPackages] = useState<ReportPackageCatalogItem[]>([])
   const [protocolChoice, setProtocolChoice] = useState('')
   const [protocolProfile, setProtocolProfile] = useState<AnalysisProtocolProfile>('standard')
+  const [packageChoice, setPackageChoice] = useState('')
+  const [packageProfile, setPackageProfile] = useState<ReportPackageProfile>('standard')
   const [savingProtocol, setSavingProtocol] = useState(false)
   const [type, setType] = useState<'SCALE' | 'COGNITIVE' | 'FORM'>('SCALE')
   const [selectedId, setSelectedId] = useState('')
@@ -56,19 +65,28 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const load = async () => {
     try {
-      const [detailResponse, scaleResponse, tokenResponse, protocolResponse] = await Promise.all([
+      const [detailResponse, scaleResponse, tokenResponse, protocolResponse, packageResponse] = await Promise.all([
         compositeApi.detail(id),
         apiClient.get<any>('/scales?status=PUBLISHED&page=1&pageSize=100'),
         compositeApi.listTokens(id),
-        compositeApi.listAnalysisProtocols(),
+        packageCatalogAvailable
+          ? Promise.resolve({ code: 0, data: { list: [] as AnalysisProtocolCatalogItem[] }, message: '' })
+          : compositeApi.listAnalysisProtocols(),
+        packageCatalogAvailable
+          ? compositeApi.listReportPackages!()
+          : Promise.resolve({ code: 0, data: { list: [] } }),
       ])
       if (detailResponse.code !== 0 || !detailResponse.data) throw new Error(detailResponse.message || '综合测评不存在')
       setDetail(detailResponse.data)
       const currentProtocol = detailResponse.data.analysisProtocol as CompositeAnalysisProtocol | null | undefined
       setProtocolChoice(currentProtocol ? `${currentProtocol.key}/${currentProtocol.version}` : '')
       setProtocolProfile(currentProtocol?.profile === 'research' ? 'research' : 'standard')
+      const currentPackage = detailResponse.data.reportPackage as { key: string; version: string; profile?: ReportPackageProfile | null } | null | undefined
+      setPackageChoice(currentPackage ? `${currentPackage.key}/${currentPackage.version}` : '')
+      setPackageProfile(currentPackage?.profile === 'research' ? 'research' : 'standard')
       if (protocolResponse.code === 0 && protocolResponse.data) setProtocols(protocolResponse.data.list)
       else setError(protocolResponse.message || '无法加载综合分析协议')
+      if (packageResponse.code === 0 && packageResponse.data) setReportPackages(packageResponse.data.list)
       setTokenExpiresAt((current) => current || suggestedTokenExpiry(detailResponse.data.expiresAt))
       const scaleData = Array.isArray(scaleResponse.data) ? scaleResponse.data : scaleResponse.data?.list || scaleResponse.data?.data?.list || []
       setScales(scaleData)
@@ -110,6 +128,30 @@ const CompositeAssessmentEdit: React.FC = () => {
       await load()
     } catch (err) {
       setError(errorMessage(err, '更新报告模式失败'))
+    } finally {
+      setSavingProtocol(false)
+    }
+  }
+
+  const saveReportPackage = async () => {
+    const selected = reportPackages.find((pkg) => `${pkg.key}/${pkg.version}` === packageChoice)
+    const current = detail?.reportPackage as { key: string; version: string; profile?: ReportPackageProfile | null } | null | undefined
+    if (packageChoice && !selected) {
+      setError('当前报告包版本已停止新建，请保留现状或切换为仅收集')
+      return
+    }
+    if (!packageChoice && current && !confirm('报告包实例不能切回自由组合；如需收集模式，请复制为新的草稿。')) return
+    try {
+      setSavingProtocol(true)
+      setError(null)
+      const response = await compositeApi.setReportPackage(
+        id,
+        selected ? { key: selected.key, version: selected.version, profile: packageProfile } : null,
+      )
+      if (response.code !== 0) throw new Error(response.message || '更新报告包失败')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err, '更新报告包失败'))
     } finally {
       setSavingProtocol(false)
     }
@@ -258,8 +300,11 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const isDraft = detail.status === 'DRAFT'
   const isLibraryCourse = Boolean(detail.course?.isLibrary)
-  const analysisProtocol = detail.analysisProtocol as CompositeAnalysisProtocol | null | undefined
-  const protocolLocked = Boolean(analysisProtocol)
+  const reportPackage = detail.reportPackage as { key: string; version: string; profile?: ReportPackageProfile | null; frozen?: boolean } | null | undefined
+  const analysisProtocol = reportPackage ? null : detail.analysisProtocol as CompositeAnalysisProtocol | null | undefined
+  const protocolLocked = Boolean(analysisProtocol || reportPackage)
+  const packageLocked = Boolean(reportPackage)
+  const selectedPackage = reportPackages.find((pkg) => `${pkg.key}/${pkg.version}` === packageChoice)
   const selectedProtocol = protocols.find((protocol) => `${protocol.key}/${protocol.version}` === protocolChoice)
   const currentProtocolId = analysisProtocol ? `${analysisProtocol.key}/${analysisProtocol.version}` : ''
   const protocolSelectionChanged = protocolChoice !== currentProtocolId
@@ -317,7 +362,56 @@ const CompositeAssessmentEdit: React.FC = () => {
           </label>
         </div>
       )}
-      <div className="card p-6 mb-5">
+      {reportPackages.length > 0 && (
+        <div className="card p-6 mb-5">
+          <h2 className="font-semibold mb-2">报告包</h2>
+          {reportPackage ? (
+            <p className="text-sm text-gray-600 mb-3">
+              已选报告包：{selectedPackage?.name ?? reportPackage.key} · v{reportPackage.version} ·
+              {reportPackage.profile === 'research' ? ' 科研档' : ' 标准档'}
+              {reportPackage.frozen ? ' · 已冻结' : ''}
+            </p>
+          ) : (
+            <p className="text-sm text-gray-600 mb-3">仅显示本人获授权且已发布的固定报告包；自由组合仍保持 collection-only。</p>
+          )}
+          {isDraft && !packageLocked && (
+            <div className="space-y-3">
+              <select
+                aria-label="编辑报告包"
+                value={packageChoice}
+                onChange={(e) => {
+                  const pkg = reportPackages.find((item) => `${item.key}/${item.version}` === e.target.value)
+                  const profile = pkg?.profiles.includes(packageProfile) ? packageProfile : pkg?.profiles[0] ?? 'standard'
+                  setPackageChoice(e.target.value)
+                  setPackageProfile(profile)
+                  setProtocolChoice('')
+                }}
+                className="block w-full border rounded px-3 py-2 text-base text-gray-800"
+              >
+                <option value="">仅收集：自由组合，只显示单项结果</option>
+                {reportPackages.map((pkg) => <option key={`${pkg.key}/${pkg.version}`} value={`${pkg.key}/${pkg.version}`} disabled={pkg.status !== 'PUBLISHED'}>{pkg.name} · v{pkg.version}{pkg.status !== 'PUBLISHED' ? '（尚未开放）' : ''}</option>)}
+              </select>
+              {selectedPackage && (
+                <div className="rounded border border-emerald-100 bg-emerald-50 p-3 text-sm text-gray-600">
+                  <p>{selectedPackage.description}</p>
+                  <p className="mt-2">固定槽位：{[...selectedPackage.slots].sort((a, b) => a.position - b.position).map((slot) => slot.label).join(' · ')}</p>
+                  <label className="mt-3 block">
+                    测验档位
+                    <select aria-label="编辑报告包档位" value={packageProfile} onChange={(e) => setPackageProfile(e.target.value as ReportPackageProfile)} className="mt-1 block w-full border rounded bg-white px-3 py-2 text-base text-gray-800">
+                      {selectedPackage.profiles.map((profile) => <option key={profile} value={profile}>{profile === 'standard' ? '标准档' : '科研档'}</option>)}
+                    </select>
+                  </label>
+                </div>
+              )}
+              <button onClick={() => void saveReportPackage()} disabled={savingProtocol || !packageChoice || Boolean(detail.items?.length)} className="btn-secondary">
+                {savingProtocol ? '保存中...' : '启用报告包'}
+              </button>
+              {detail.items?.length > 0 && <p className="text-xs text-amber-600">已有自由组合模块；请先移除全部模块再启用报告包。</p>}
+            </div>
+          )}
+        </div>
+      )}
+      {!packageCatalogAvailable && reportPackages.length === 0 && <div className="card p-6 mb-5">
         <h2 className="font-semibold mb-2">报告模式</h2>
         {analysisProtocol ? (
           <p className="text-sm text-gray-600 mb-3">
@@ -398,7 +492,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         ) : (
           <p className="text-xs text-gray-500">发布后报告模式和协议版本不可更改。</p>
         )}
-      </div>
+      </div>}
       <div className="card p-6 mb-5">
         <h2 className="font-semibold mb-4">测评顺序</h2>
         {detail.items?.length ? (

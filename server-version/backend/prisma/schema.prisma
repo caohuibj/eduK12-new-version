@@ -321,6 +321,7 @@ enum ScaleVisibility {
 enum MaterialResourceType {
   SCALE
   COGNITIVE_CONFIG
+  REPORT_PACKAGE
 }
 
 enum CognitiveConfigAccessPolicy {
@@ -692,6 +693,12 @@ model CompositeAssessment {
   analysisProtocolKey String?           @map("analysis_protocol_key")
   analysisProtocolVersion String?       @map("analysis_protocol_version")
   analysisProtocolSnapshotEncrypted String? @map("analysis_protocol_snapshot_encrypted")
+  // PR6B package boundary. The legacy analysisProtocol* fields remain readable
+  // for historical composites; new package instances use these frozen fields.
+  reportPackageKey String? @map("report_package_key")
+  reportPackageVersion String? @map("report_package_version")
+  reportPackageProfile String? @map("report_package_profile")
+  reportPackageSnapshotEncrypted String? @map("report_package_snapshot_encrypted")
   createdAt   DateTime                  @default(now()) @map("created_at")
   updatedAt   DateTime                  @updatedAt @map("updated_at")
   publishedAt DateTime?                 @map("published_at")

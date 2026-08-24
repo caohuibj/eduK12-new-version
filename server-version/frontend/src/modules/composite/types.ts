@@ -147,6 +147,7 @@ export interface CompositeTeacherListItem {
   createdBy: string
   creator: { id: string; role: string } | null
   course: CompositeCourseRef | null
+  reportPackage?: CompositeReportPackage | null
   attemptCounts?: CompositeAttemptCounts
   items?: Array<{
     type: CompositeItemType
@@ -192,6 +193,48 @@ export interface AnalysisProtocolCatalog {
   evidenceMappingVersion: string
   domains: Array<{ key: string; label: string; description: string }>
   list: AnalysisProtocolCatalogItem[]
+}
+
+export type ReportPackageProfile = 'standard' | 'research'
+
+export interface ReportPackageCatalogItem {
+  key: string
+  version: string
+  status: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
+  name: string
+  description: string
+  profiles: ReportPackageProfile[]
+  estimatedMinutes: Record<ReportPackageProfile, [number, number]>
+  reportDefinitionVersion: string
+  analysisProtocolKey: string
+  analysisProtocolVersion: string
+  audience: Array<'participant' | 'teacher' | 'researcher'>
+  granted: boolean
+  disabledReason?: string | null
+  slots: Array<{
+    key: string
+    label: string
+    position: number
+    required: true
+    type: 'COGNITIVE' | 'SCALE'
+    testType?: string
+    configVersion?: string
+    engineVersion?: string
+    scoringVersion?: string
+    mappingKey?: string
+    mappingVersion?: string
+  }>
+}
+
+export interface ReportPackageCatalog {
+  list: ReportPackageCatalogItem[]
+}
+
+export interface CompositeReportPackage {
+  key: string
+  version: string
+  profile: ReportPackageProfile | null
+  frozen: boolean
 }
 
 export interface AnalysisProtocolSelection {

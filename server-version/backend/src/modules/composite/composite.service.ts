@@ -13,7 +13,7 @@ import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
 import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
 import { logger } from '../../utils/logger'
-import { canUseScale } from '../../services/materialGrant'
+import { canUseReportPackage, canUseScale } from '../../services/materialGrant'
 import {
   CompositeServiceError,
   compositeBadRequest,
@@ -26,12 +26,18 @@ import type {
   CopyCompositeInput,
   CreateCompositeInput,
   SetCompositeAnalysisProtocolInput,
+  SetCompositeReportPackageInput,
   UpdateCompositeInput,
 } from './composite.schema'
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
+  buildFrozenReportPackageSnapshot,
+  encryptFrozenReportPackageSnapshot,
+  getReportPackageDefinition,
+  readFrozenReportPackageSnapshot,
+  validateFrozenReportPackageSnapshot,
   getAnalysisProtocolDefinition,
   readFrozenAnalysisProtocolSnapshot,
   validateFrozenAnalysisProtocolSnapshot,
@@ -39,13 +45,37 @@ import {
 import type {
   AnalysisProtocolDefinition,
   CognitiveAnalysisProfile,
+  ReportPackageDefinition,
 } from '../cognitive-analysis'
 
 type Db = any
 
+const reportPackageSummary = (row: {
+  reportPackageKey?: string | null
+  reportPackageVersion?: string | null
+  reportPackageProfile?: string | null
+  reportPackageSnapshotEncrypted?: string | null
+}) => row.reportPackageKey && row.reportPackageVersion
+  ? {
+      key: row.reportPackageKey,
+      version: row.reportPackageVersion,
+      profile: row.reportPackageProfile,
+      frozen: Boolean(row.reportPackageSnapshotEncrypted),
+    }
+  : null
+
 const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
-  const { analysisProtocolSnapshotEncrypted: _ignored, ...safe } = row
-  return safe
+  const {
+    analysisProtocolSnapshotEncrypted: _ignoredProtocol,
+    reportPackageSnapshotEncrypted: _ignoredPackage,
+    analysisProtocolKey: _ignoredProtocolKey,
+    analysisProtocolVersion: _ignoredProtocolVersion,
+    reportPackageKey: _ignoredPackageKey,
+    reportPackageVersion: _ignoredPackageVersion,
+    reportPackageProfile: _ignoredPackageProfile,
+    ...safe
+  } = row
+  return { ...safe, reportPackage: reportPackageSummary(row) }
 }
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN
@@ -138,8 +168,11 @@ const assertDraft = (composite: { status: string }) => {
   if (composite.status !== 'DRAFT') throw compositeConflict('只有草稿状态的综合测评可以修改')
 }
 
-const assertCollectionOnlyEditing = (composite: { analysisProtocolKey?: string | null }) => {
-  if (composite.analysisProtocolKey) {
+const assertCollectionOnlyEditing = (composite: {
+  analysisProtocolKey?: string | null
+  reportPackageKey?: string | null
+}) => {
+  if (composite.analysisProtocolKey || composite.reportPackageKey) {
     throw compositeConflict('固定分析协议的模块不能单独添加、移除或排序')
   }
 }
@@ -160,6 +193,14 @@ const requirePublishedAnalysisProtocol = (key: string, version: string) => {
     throw compositeBadRequest('综合分析协议不存在或尚未发布')
   }
   return protocol
+}
+
+const requirePublishedReportPackage = (key: string, version: string) => {
+  const definition = getReportPackageDefinition(key, version)
+  if (!definition || definition.status !== 'PUBLISHED') {
+    throw compositeBadRequest('报告包不存在或尚未发布')
+  }
+  return definition
 }
 
 export const materializeAnalysisProtocol = async (
@@ -206,6 +247,29 @@ export const materializeAnalysisProtocol = async (
       },
     })
   }
+}
+
+export const materializeReportPackage = async (
+  db: Db,
+  input: {
+    compositeId: string
+    courseId: string
+    userId: string
+    profile: CognitiveAnalysisProfile
+    packageDefinition: ReportPackageDefinition
+  },
+) => {
+  const protocol = requirePublishedAnalysisProtocol(
+    input.packageDefinition.analysisProtocolKey,
+    input.packageDefinition.analysisProtocolVersion,
+  )
+  await materializeAnalysisProtocol(db, {
+    compositeId: input.compositeId,
+    courseId: input.courseId,
+    userId: input.userId,
+    profile: input.profile,
+    protocol,
+  })
 }
 
 const validateCognitiveConfig = (config: any) => {
@@ -408,10 +472,21 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
   const existing = await prisma.compositeAssessment.findUnique({ where: { code: input.code } })
   if (existing) throw compositeConflict('综合测评编码已存在')
 
-  const selection = input.analysisProtocol ?? null
-  const protocol = selection
-    ? requirePublishedAnalysisProtocol(selection.key, selection.version)
+  const packageSelection = input.reportPackage ?? null
+  const packageDefinition = packageSelection
+    ? requirePublishedReportPackage(packageSelection.key, packageSelection.version)
     : null
+  if (packageDefinition) {
+    if (!await canUseReportPackage(userId, role, packageDefinition.key, packageDefinition.version)) {
+      throw compositeForbidden('没有该报告包的授权')
+    }
+  }
+  const selection = input.analysisProtocol ?? null
+  const protocol = packageDefinition
+    ? requirePublishedAnalysisProtocol(packageDefinition.analysisProtocolKey, packageDefinition.analysisProtocolVersion)
+    : selection
+      ? requirePublishedAnalysisProtocol(selection.key, selection.version)
+      : null
   if (protocol) {
     assertCognitiveModuleEnabled()
     if (!input.courseId) throw compositeBadRequest('综合分析协议必须绑定课程')
@@ -433,16 +508,36 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
         analysisProtocolKey: protocol?.key ?? null,
         analysisProtocolVersion: protocol?.version ?? null,
         analysisProtocolSnapshotEncrypted: null,
+        reportPackageKey: packageDefinition?.key ?? null,
+        reportPackageVersion: packageDefinition?.version ?? null,
+        reportPackageProfile: packageSelection?.profile ?? null,
+        reportPackageSnapshotEncrypted: null,
       },
     })
-    if (protocol && selection && input.courseId) {
-      await materializeAnalysisProtocol(tx, {
-        compositeId: composite.id,
-        courseId: input.courseId,
-        userId,
-        profile: selection.profile,
-        protocol,
-      })
+    if (protocol && input.courseId && (selection || packageSelection)) {
+      if (packageDefinition && packageSelection) {
+        await materializeReportPackage(tx, {
+          compositeId: composite.id,
+          courseId: input.courseId,
+          userId,
+          profile: packageSelection.profile,
+          packageDefinition,
+        })
+      } else if (selection) {
+        await materializeAnalysisProtocol(tx, {
+          compositeId: composite.id,
+          courseId: input.courseId,
+          userId,
+          profile: selection.profile,
+          protocol,
+        })
+      }
+    }
+    if (packageDefinition && !packageSelection) {
+      throw compositeBadRequest('报告包 Profile 缺失')
+    }
+    if (packageDefinition && packageSelection && !packageDefinition.profiles.includes(packageSelection.profile)) {
+      throw compositeBadRequest('报告包不支持该 Profile')
     }
     return withoutAnalysisProtocolCipher(composite)
   })
@@ -491,10 +586,17 @@ export const listComposites = async (userId: string, role: UserRole) => {
     const {
       _count: _ignoredCount,
       analysisProtocolSnapshotEncrypted: _ignoredProtocolSnapshot,
+      analysisProtocolKey: _ignoredProtocolKey,
+      analysisProtocolVersion: _ignoredProtocolVersion,
+      reportPackageSnapshotEncrypted: _ignoredPackageSnapshot,
+      reportPackageKey: _ignoredPackageKey,
+      reportPackageVersion: _ignoredPackageVersion,
+      reportPackageProfile: _ignoredPackageProfile,
       ...rest
     } = item
     return {
       ...rest,
+      reportPackage: reportPackageSummary(item),
       copyable: Boolean(item.copyable),
       createdBy: item.createdBy,
       creator: item.creator ? { id: item.creator.id, role: item.creator.role } : null,
@@ -534,7 +636,10 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
       : null,
     canSetCopyable: canSetCopyableFor(composite, role),
     publishedAt: composite.publishedAt,
-    analysisProtocol: composite.analysisProtocolKey
+    reportPackage: reportPackageSummary(composite),
+    // Legacy protocol metadata is retained only for historical composites that
+    // predate PR6B; new package instances expose package semantics instead.
+    analysisProtocol: !composite.reportPackageKey && composite.analysisProtocolKey
       ? {
           key: composite.analysisProtocolKey,
           version: composite.analysisProtocolVersion,
@@ -603,6 +708,45 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
   const selfCopy = source.createdBy === userId
   const libraryCopy = isAdminLibraryTemplate(source)
   if (!selfCopy && !libraryCopy) throw compositeForbidden('不能复制此综合测评')
+
+  const hasPackageKey = Boolean(source.reportPackageKey)
+  const hasPackageVersion = Boolean(source.reportPackageVersion)
+  const hasPackageProfile = Boolean(source.reportPackageProfile)
+  const hasPackageSnapshot = Boolean(source.reportPackageSnapshotEncrypted)
+  if (
+    hasPackageKey !== hasPackageVersion
+    || hasPackageKey !== hasPackageProfile
+    || (hasPackageSnapshot && !hasPackageKey)
+    || (source.status === 'PUBLISHED' && hasPackageKey && !hasPackageSnapshot)
+  ) {
+    throw compositeBadRequest('来源综合测评的报告包冻结信息不完整')
+  }
+  const packageDefinition = hasPackageKey && hasPackageVersion
+    ? requirePublishedReportPackage(source.reportPackageKey as string, source.reportPackageVersion as string)
+    : null
+  if (packageDefinition && !await canUseReportPackage(userId, role, packageDefinition.key, packageDefinition.version)) {
+    throw compositeForbidden('没有该报告包的授权，不能创建新的包实例')
+  }
+  if (packageDefinition && hasPackageSnapshot) {
+    try {
+      const protocol = requirePublishedAnalysisProtocol(
+        packageDefinition.analysisProtocolKey,
+        packageDefinition.analysisProtocolVersion,
+      )
+      validateFrozenReportPackageSnapshot(
+        readFrozenReportPackageSnapshot(source.reportPackageSnapshotEncrypted as string),
+        packageDefinition,
+        protocol,
+        source.items,
+      )
+      const frozenPackage = readFrozenReportPackageSnapshot(source.reportPackageSnapshotEncrypted as string)
+      if (frozenPackage.profile !== source.reportPackageProfile) {
+        throw new Error('来源报告包快照 Profile 与实例不匹配')
+      }
+    } catch (err) {
+      throw compositeBadRequest(err instanceof Error ? err.message : '来源报告包快照不可用')
+    }
+  }
 
   const hasProtocolKey = Boolean(source.analysisProtocolKey)
   const hasProtocolVersion = Boolean(source.analysisProtocolVersion)
@@ -704,6 +848,10 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         analysisProtocolKey: source.analysisProtocolKey ?? null,
         analysisProtocolVersion: source.analysisProtocolVersion ?? null,
         analysisProtocolSnapshotEncrypted: source.analysisProtocolSnapshotEncrypted ?? null,
+        reportPackageKey: source.reportPackageKey ?? null,
+        reportPackageVersion: source.reportPackageVersion ?? null,
+        reportPackageProfile: source.reportPackageProfile ?? null,
+        reportPackageSnapshotEncrypted: source.reportPackageSnapshotEncrypted ?? null,
         items: { create: itemData as any },
       },
       include: { items: { orderBy: { position: 'asc' } } },
@@ -848,6 +996,9 @@ export const setCompositeAnalysisProtocol = async (
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
+  if (composite.reportPackageKey) {
+    throw compositeConflict('报告包实例不能通过旧版分析协议接口修改')
+  }
 
   const hasKey = Boolean(composite.analysisProtocolKey)
   const hasVersion = Boolean(composite.analysisProtocolVersion)
@@ -894,6 +1045,69 @@ export const setCompositeAnalysisProtocol = async (
       userId,
       profile: selection.profile,
       protocol,
+    })
+    return withoutAnalysisProtocolCipher(updated)
+  })
+}
+
+export const setCompositeReportPackage = async (
+  userId: string,
+  role: UserRole,
+  id: string,
+  input: SetCompositeReportPackageInput,
+) => {
+  assertTeacher(role)
+  const composite = await loadComposite(id, true)
+  assertOwner(composite, userId, role)
+  assertDraft(composite)
+
+  const selection = input.reportPackage
+  if (!selection) {
+    if (composite.reportPackageKey) {
+      throw compositeConflict('已配置的报告包只能通过复制创建新的 collection-only 草稿')
+    }
+    return withoutAnalysisProtocolCipher(composite)
+  }
+
+  assertCognitiveModuleEnabled()
+  if (!composite.courseId) throw compositeBadRequest('报告包必须绑定课程')
+  const definition = requirePublishedReportPackage(selection.key, selection.version)
+  if (!definition.profiles.includes(selection.profile)) throw compositeBadRequest('报告包不支持该 Profile')
+  if (!await canUseReportPackage(userId, role, definition.key, definition.version)) {
+    throw compositeForbidden('没有该报告包的授权')
+  }
+  if (!composite.reportPackageKey && composite.items.length > 0) {
+    throw compositeConflict('请选择空白草稿启用报告包，或先移除现有模块')
+  }
+
+  const protocol = requirePublishedAnalysisProtocol(
+    definition.analysisProtocolKey,
+    definition.analysisProtocolVersion,
+  )
+  return prisma.$transaction(async (tx: Db) => {
+    if (composite.reportPackageKey) {
+      await tx.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: id } })
+    }
+    const updated = await tx.compositeAssessment.update({
+      where: { id },
+      data: {
+        reportPackageKey: definition.key,
+        reportPackageVersion: definition.version,
+        reportPackageProfile: selection.profile,
+        reportPackageSnapshotEncrypted: null,
+        // Keep the internal protocol reference for the existing frozen task
+        // machinery; it is never exposed as the teacher-facing mode.
+        analysisProtocolKey: protocol.key,
+        analysisProtocolVersion: protocol.version,
+        analysisProtocolSnapshotEncrypted: null,
+      },
+    })
+    await materializeReportPackage(tx, {
+      compositeId: id,
+      courseId: composite.courseId as string,
+      userId,
+      profile: selection.profile,
+      packageDefinition: definition,
     })
     return withoutAnalysisProtocolCipher(updated)
   })
@@ -1008,6 +1222,53 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     }
   }
 
+  const hasPackageKey = Boolean(composite.reportPackageKey)
+  const hasPackageVersion = Boolean(composite.reportPackageVersion)
+  const hasPackageProfile = Boolean(composite.reportPackageProfile)
+  const hasPackageSnapshot = Boolean(composite.reportPackageSnapshotEncrypted)
+  if (
+    hasPackageKey !== hasPackageVersion
+    || hasPackageKey !== hasPackageProfile
+    || (hasPackageSnapshot && !hasPackageKey)
+    || (hasPackageKey && !composite.analysisProtocolKey)
+  ) {
+    throw compositeBadRequest('综合测评的报告包冻结信息不完整')
+  }
+
+  let reportPackageSnapshotEncrypted: string | null = null
+  let packageAnalysisProtocolSnapshotEncrypted: string | null = null
+  if (hasPackageKey && hasPackageVersion && hasPackageProfile) {
+    try {
+      const definition = requirePublishedReportPackage(
+        composite.reportPackageKey as string,
+        composite.reportPackageVersion as string,
+      )
+      if (!definition.profiles.includes(composite.reportPackageProfile as CognitiveAnalysisProfile)) {
+        throw compositeBadRequest('报告包 Profile 不匹配')
+      }
+      const protocol = requirePublishedAnalysisProtocol(
+        definition.analysisProtocolKey,
+        definition.analysisProtocolVersion,
+      )
+      const packageSnapshot = hasPackageSnapshot
+        ? readFrozenReportPackageSnapshot(composite.reportPackageSnapshotEncrypted as string)
+        : buildFrozenReportPackageSnapshot(definition, protocol, composite.items)
+      validateFrozenReportPackageSnapshot(packageSnapshot, definition, protocol, composite.items)
+      if (packageSnapshot.profile !== composite.reportPackageProfile) {
+        throw compositeBadRequest('报告包快照 Profile 与实例不匹配')
+      }
+      reportPackageSnapshotEncrypted = hasPackageSnapshot
+        ? composite.reportPackageSnapshotEncrypted as string
+        : encryptFrozenReportPackageSnapshot(packageSnapshot)
+      packageAnalysisProtocolSnapshotEncrypted = encryptFrozenAnalysisProtocolSnapshot(
+        packageSnapshot.analysisProtocolSnapshot,
+      )
+    } catch (err) {
+      if (err instanceof CompositeServiceError) throw err
+      throw compositeBadRequest(err instanceof Error ? err.message : '报告包冻结校验失败')
+    }
+  }
+
   const hasProtocolKey = Boolean(composite.analysisProtocolKey)
   const hasProtocolVersion = Boolean(composite.analysisProtocolVersion)
   const hasProtocolSnapshot = Boolean(composite.analysisProtocolSnapshotEncrypted)
@@ -1015,10 +1276,14 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     throw compositeBadRequest('综合测评的分析协议冻结信息不完整')
   }
 
-  let analysisProtocolSnapshotEncrypted: string | null = null
+  let analysisProtocolSnapshotEncrypted: string | null = packageAnalysisProtocolSnapshotEncrypted
   if (hasProtocolKey && hasProtocolVersion) {
     try {
-      if (hasProtocolSnapshot) {
+      if (hasPackageKey && packageAnalysisProtocolSnapshotEncrypted) {
+        // The package snapshot above is authoritative; this internal copy is
+        // retained solely for the existing task-freeze machinery.
+        analysisProtocolSnapshotEncrypted = packageAnalysisProtocolSnapshotEncrypted
+      } else if (hasProtocolSnapshot) {
         const snapshot = readFrozenAnalysisProtocolSnapshot(
           composite.analysisProtocolSnapshotEncrypted as string,
         )
@@ -1049,6 +1314,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       status: 'PUBLISHED',
       publishedAt: new Date(),
       analysisProtocolSnapshotEncrypted,
+      reportPackageSnapshotEncrypted,
     },
   })
   return withoutAnalysisProtocolCipher(published)

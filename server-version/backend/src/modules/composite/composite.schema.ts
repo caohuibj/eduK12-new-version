@@ -8,6 +8,15 @@ const analysisProtocolSelection = z.object({
   profile: z.enum(['standard', 'research']),
 }).strict()
 
+// PR6B package selection is the only teacher-facing fixed-report mode. The
+// legacy analysisProtocol shape remains accepted for historical internal
+// callers while new UI/API callers use reportPackage.
+const reportPackageSelection = z.object({
+  key: z.string().min(1).max(100),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确报告包版本'),
+  profile: z.enum(['standard', 'research']),
+}).strict()
+
 export const createCompositeSchema = z.object({
   code: z.string().min(1).max(80),
   name: z.string().min(1).max(200),
@@ -18,8 +27,12 @@ export const createCompositeSchema = z.object({
   expiresAt: dateTime.nullable().optional(),
   maxAttempts: z.number().int().positive().optional().default(1),
   publicEnabled: z.boolean().optional().default(false),
+  reportPackage: reportPackageSelection.nullable().optional(),
   analysisProtocol: analysisProtocolSelection.nullable().optional(),
 }).strict().refine(
+  (value) => !(value.reportPackage && value.analysisProtocol),
+  { message: '不能同时选择报告包和旧版分析协议' },
+).refine(
   (value) => !value.opensAt || !value.expiresAt || new Date(value.expiresAt).getTime() >= new Date(value.opensAt).getTime(),
   { message: 'expiresAt 必须晚于或等于 opensAt' }
 )
@@ -41,6 +54,10 @@ export const updateCompositeSchema = z.object({
 
 export const setCompositeAnalysisProtocolSchema = z.object({
   analysisProtocol: analysisProtocolSelection.nullable(),
+}).strict()
+
+export const setCompositeReportPackageSchema = z.object({
+  reportPackage: reportPackageSelection.nullable(),
 }).strict()
 
 const formOption = z.object({ value: z.string().min(1), label: z.string().min(1) }).strict()
@@ -128,6 +145,7 @@ export const listCompositeAttemptsQuerySchema = z.object({
 export type CreateCompositeInput = z.infer<typeof createCompositeSchema>
 export type UpdateCompositeInput = z.infer<typeof updateCompositeSchema>
 export type SetCompositeAnalysisProtocolInput = z.infer<typeof setCompositeAnalysisProtocolSchema>
+export type SetCompositeReportPackageInput = z.infer<typeof setCompositeReportPackageSchema>
 export type AddCompositeItemInput = z.infer<typeof addCompositeItemSchema>
 export type CopyCompositeInput = z.infer<typeof copyCompositeSchema>
 export type CompositeExportRequest = z.infer<typeof compositeExportRequestSchema>

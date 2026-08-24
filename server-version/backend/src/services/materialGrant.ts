@@ -1,6 +1,11 @@
 import { MaterialResourceType, UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
 import { config } from '../config'
+import {
+  getReportPackageByResourceId,
+  getReportPackageDefinition,
+  reportPackageResourceId,
+} from '../modules/cognitive-analysis/report-package.registry'
 
 export class MaterialGrantError extends Error {
   statusCode: number
@@ -12,6 +17,8 @@ export class MaterialGrantError extends Error {
 }
 
 export type ScaleSource = 'owned' | 'granted' | 'other'
+
+export const reportPackageGrantId = reportPackageResourceId
 
 const grantNotFound = (message = '授权记录不存在') => new MaterialGrantError(message, 404)
 const grantBadRequest = (message: string) => new MaterialGrantError(message, 400)
@@ -109,6 +116,28 @@ export const canInstantiateConfig = async (
   return Boolean(grant)
 }
 
+export const canUseReportPackage = async (
+  userId: string,
+  role: UserRole | string,
+  packageKey: string,
+  packageVersion: string,
+): Promise<boolean> => {
+  const definition = getReportPackageDefinition(packageKey, packageVersion)
+  if (!definition || definition.status !== 'PUBLISHED') return false
+  if (role === UserRole.ADMIN) return true
+  if (role !== UserRole.TEACHER || !config.materialGrantsEnabled) return false
+  const grant = await prisma.materialGrant.findUnique({
+    where: {
+      teacherId_resourceType_resourceId: {
+        teacherId: userId,
+        resourceType: MaterialResourceType.REPORT_PACKAGE,
+        resourceId: reportPackageResourceId(packageKey, packageVersion),
+      },
+    },
+  })
+  return Boolean(grant)
+}
+
 const assertEligibleTeacher = async (teacherId: string) => {
   const teacher = await prisma.user.findUnique({ where: { id: teacherId } })
   if (!teacher) throw grantNotFound('教师不存在')
@@ -127,6 +156,12 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
     const testConfig = await prisma.cognitiveTestConfig.findUnique({ where: { id: resourceId } })
     if (!testConfig) throw grantNotFound('认知任务类型不存在')
     if (testConfig.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布的认知任务类型')
+    return
+  }
+  if (resourceType === MaterialResourceType.REPORT_PACKAGE) {
+    const definition = getReportPackageByResourceId(resourceId)
+    if (!definition) throw grantNotFound('报告包不存在')
+    if (definition.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布报告包')
     return
   }
   throw grantBadRequest('不支持的材料类型')
@@ -148,13 +183,19 @@ const attachResource = async (grant: {
     const scale = await prisma.scale.findUnique({ where: { id: grant.resourceId }, select: { id: true, name: true, status: true } })
     resource = scale
     resourceMissing = !scale
-  } else {
+  } else if (grant.resourceType === MaterialResourceType.COGNITIVE_CONFIG) {
     const testConfig = await prisma.cognitiveTestConfig.findUnique({
       where: { id: grant.resourceId },
       select: { id: true, name: true, status: true },
     })
     resource = testConfig
     resourceMissing = !testConfig
+  } else {
+    const definition = getReportPackageByResourceId(grant.resourceId)
+    resource = definition
+      ? { id: grant.resourceId, name: definition.name, status: definition.status }
+      : null
+    resourceMissing = !definition
   }
   return {
     id: grant.id,
