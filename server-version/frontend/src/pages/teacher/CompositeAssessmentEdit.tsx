@@ -91,12 +91,12 @@ const CompositeAssessmentEdit: React.FC = () => {
       const scaleData = Array.isArray(scaleResponse.data) ? scaleResponse.data : scaleResponse.data?.list || scaleResponse.data?.data?.list || []
       setScales(scaleData)
       try {
-        const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED')
+        const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED&listedStandalone=true')
         const cognitiveData = Array.isArray(cognitiveResponse.data)
           ? cognitiveResponse.data
           : cognitiveResponse.data?.list || []
         if (cognitiveResponse.code !== 0) throw new Error(cognitiveResponse.message || '无法加载认知任务')
-        setCognitiveAssignments(cognitiveData)
+        setCognitiveAssignments(cognitiveData.filter((item: any) => item.listedStandalone !== false))
       } catch (err) {
         setCognitiveAssignments([])
         setError(errorMessage(err, '无法加载已发布的认知任务'))

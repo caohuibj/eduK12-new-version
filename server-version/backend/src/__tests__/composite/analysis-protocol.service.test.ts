@@ -168,27 +168,17 @@ describe('Composite analysis protocol selection', () => {
     expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCalled()
   })
 
-  it('materializes exact required assignments and items for a published protocol', async () => {
-    await createComposite('teacher-1', TEACHER, {
+  it('rejects a bare analysis protocol at the creation boundary', async () => {
+    await expect(createComposite('teacher-1', TEACHER, {
       code: 'C-1',
       name: '综合测评',
       courseId: 'course-1',
       maxAttempts: 1,
       publicEnabled: false,
       analysisProtocol: { key: protocol.key, version: protocol.version, profile: 'standard' },
-    })
-    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ profile: 'standard', resolvedConfigHash: expect.any(String) }),
-    }))
-    expect(mockPrisma.compositeAssessmentItem.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        compositeAssessmentId: 'composite-1',
-        type: 'COGNITIVE',
-        position: 0,
-        required: true,
-        cognitiveAssignmentId: 'assignment-protocol',
-      }),
-    })
+    } as any)).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+    expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCalled()
   })
 
   it('requires a course and refuses a collection draft that already has arbitrary items', async () => {
@@ -199,7 +189,7 @@ describe('Composite analysis protocol selection', () => {
       maxAttempts: 1,
       publicEnabled: false,
       analysisProtocol: { key: protocol.key, version: protocol.version, profile: 'standard' },
-    })).rejects.toMatchObject({ statusCode: 400 })
+    } as any)).rejects.toMatchObject({ statusCode: 400 })
 
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
       items: [{ id: 'form-1', type: 'FORM', position: 0 }],
@@ -359,7 +349,7 @@ describe('Composite analysis protocol publish freeze', () => {
 })
 
 describe('Composite analysis protocol copy', () => {
-  it('preserves and validates the full frozen protocol snapshot on copy', async () => {
+  it('does not copy a legacy fixed-protocol instance without a report package', async () => {
     const assignment = frozenAssignment('standard')
     const items = [{
       id: 'item-1',
@@ -383,22 +373,9 @@ describe('Composite analysis protocol copy', () => {
         analysisProtocolSnapshotEncrypted: encrypted,
         items,
       }))
-      .mockResolvedValueOnce(null)
-    mockPrisma.compositeAssessment.create.mockResolvedValue({
-      id: 'copy-1',
-      status: 'DRAFT',
-      analysisProtocolSnapshotEncrypted: encrypted,
-    })
-
-    const copied = await copyComposite('teacher-1', TEACHER, 'composite-1', { courseId: 'course-1' })
-    expect(mockPrisma.compositeAssessment.create).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({
-        analysisProtocolKey: protocol.key,
-        analysisProtocolVersion: protocol.version,
-        analysisProtocolSnapshotEncrypted: encrypted,
-      }),
-    }))
-    expect(copied).not.toHaveProperty('analysisProtocolSnapshotEncrypted')
+    await expect(copyComposite('teacher-1', TEACHER, 'composite-1', { courseId: 'course-1' }))
+      .rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
   })
 
   it('rejects a published protocol source without its frozen snapshot', async () => {

@@ -101,6 +101,7 @@ export const cognitiveController = {
       const query = listAssignmentsQuerySchema.parse({
         courseId: typeof req.query.courseId === 'string' ? req.query.courseId : undefined,
         status: typeof req.query.status === 'string' ? req.query.status : undefined,
+        listedStandalone: typeof req.query.listedStandalone === 'string' ? req.query.listedStandalone : undefined,
       })
       const data = await assignmentService.listTeacherAssignments(req.user.userId, req.user.role, query)
       return success(res, data)

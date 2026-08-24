@@ -76,9 +76,9 @@ describe('composite assessment schemas', () => {
     expect(copyCompositeSchema.parse({ courseId: 'course-1' }).courseId).toBe('course-1')
   })
 
-  it('accepts only explicit fixed protocol versions and standard/research profiles', () => {
+  it('accepts only explicit internal protocol versions and rejects bare creation', () => {
     const selection = { key: 'attention_v1', version: '1.0.0', profile: 'research' as const }
-    expect(createCompositeSchema.parse({ code: 'ATTN', name: '注意', analysisProtocol: selection }).analysisProtocol).toEqual(selection)
+    expect(() => createCompositeSchema.parse({ code: 'ATTN', name: '注意', analysisProtocol: selection })).toThrow()
     expect(setCompositeAnalysisProtocolSchema.parse({ analysisProtocol: null })).toEqual({ analysisProtocol: null })
     expect(() => setCompositeAnalysisProtocolSchema.parse({
       analysisProtocol: { key: 'attention_v1', version: 'latest', profile: 'experience' },

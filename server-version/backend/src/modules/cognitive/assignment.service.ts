@@ -168,6 +168,7 @@ export const listTeacherAssignments = async (
   if (role === UserRole.TEACHER) where.createdBy = userId
   if (query.courseId) where.courseId = query.courseId
   if (query.status) where.status = query.status
+  if (query.listedStandalone !== undefined) where.listedStandalone = query.listedStandalone
 
   const assignments = await prisma.cognitiveAssignment.findMany({
     where,

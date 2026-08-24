@@ -9,8 +9,8 @@ const analysisProtocolSelection = z.object({
 }).strict()
 
 // PR6B package selection is the only teacher-facing fixed-report mode. The
-// legacy analysisProtocol shape remains accepted for historical internal
-// callers while new UI/API callers use reportPackage.
+// legacy analysisProtocol shape is retained below only for historical
+// migration/setter code; it is intentionally absent from createCompositeSchema.
 const reportPackageSelection = z.object({
   key: z.string().min(1).max(100),
   version: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确报告包版本'),
@@ -28,11 +28,7 @@ export const createCompositeSchema = z.object({
   maxAttempts: z.number().int().positive().optional().default(1),
   publicEnabled: z.boolean().optional().default(false),
   reportPackage: reportPackageSelection.nullable().optional(),
-  analysisProtocol: analysisProtocolSelection.nullable().optional(),
 }).strict().refine(
-  (value) => !(value.reportPackage && value.analysisProtocol),
-  { message: '不能同时选择报告包和旧版分析协议' },
-).refine(
   (value) => !value.opensAt || !value.expiresAt || new Date(value.expiresAt).getTime() >= new Date(value.opensAt).getTime(),
   { message: 'expiresAt 必须晚于或等于 opensAt' }
 )

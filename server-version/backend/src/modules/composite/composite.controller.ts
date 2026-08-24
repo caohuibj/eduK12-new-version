@@ -16,7 +16,6 @@ import {
   publicRecoverySchema,
   reorderCompositeItemsSchema,
   setCompositeReportPackageSchema,
-  setCompositeAnalysisProtocolSchema,
   updateCompositeSchema,
 } from './composite.schema'
 import { z } from 'zod'
@@ -24,7 +23,7 @@ import { isValidRecoveryToken, hashRecoveryToken } from '../../services/anonymou
 import { getPaginationParams } from '../../utils/pagination'
 import * as path from 'path'
 import * as fs from 'fs'
-import { listAnalysisProtocolCatalog, listReportPackageCatalog } from '../cognitive-analysis'
+import { listReportPackageCatalog } from '../cognitive-analysis'
 
 const recoveryFromRequest = (req: Request): string => {
   const value = req.headers['x-recovery-token']
@@ -33,13 +32,6 @@ const recoveryFromRequest = (req: Request): string => {
 }
 
 export const compositeController = {
-  async analysisProtocols(req: Request, res: Response) {
-    try {
-      if (!req.user) return unauthorized(res)
-      return success(res, listAnalysisProtocolCatalog(req.user.role === UserRole.ADMIN))
-    } catch (err) { return handleError(res, err) }
-  },
-
   async reportPackages(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -88,18 +80,6 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       return success(res, await service.updateComposite(req.user.userId, req.user.role, req.params.id, updateCompositeSchema.parse(req.body)), '综合测评已更新')
-    } catch (err) { return handleError(res, err) }
-  },
-
-  async setAnalysisProtocol(req: Request, res: Response) {
-    try {
-      if (!req.user) return unauthorized(res)
-      const input = setCompositeAnalysisProtocolSchema.parse(req.body)
-      return success(
-        res,
-        await service.setCompositeAnalysisProtocol(req.user.userId, req.user.role, req.params.id, input),
-        '综合分析协议已更新',
-      )
     } catch (err) { return handleError(res, err) }
   },
 

@@ -318,6 +318,9 @@ const assertValidItem = async (
     if (assignment.status !== 'PUBLISHED' || assignment.config.status !== 'PUBLISHED') {
       throw compositeBadRequest('只能添加已发布认知任务')
     }
+    if (assignment.listedStandalone === false) {
+      throw compositeForbidden('报告包内部认知任务不能用于仅收集综合测评')
+    }
     validateCognitiveConfig(assignment.config)
     if (role !== UserRole.ADMIN && assignment.createdBy !== userId) {
       throw compositeForbidden('无权限使用此认知任务')
@@ -465,6 +468,12 @@ const mapAttemptRowForTeacher = (attempt: {
 
 export const createComposite = async (userId: string, role: UserRole, input: CreateCompositeInput) => {
   assertTeacher(role)
+  // A bare analysis protocol is a legacy persisted-data concept, not a
+  // creation mode. The controller schema rejects it; keep this guard here as
+  // defense-in-depth for internal callers that might bypass the controller.
+  if (Object.prototype.hasOwnProperty.call(input, 'analysisProtocol')) {
+    throw compositeBadRequest('固定报告必须从获授权报告包创建')
+  }
   await validateCourse(input.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (input.publicEnabled && !input.expiresAt) {
     throw compositeBadRequest('公开链接必须设置有效期')
@@ -480,13 +489,13 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
     if (!await canUseReportPackage(userId, role, packageDefinition.key, packageDefinition.version)) {
       throw compositeForbidden('没有该报告包的授权')
     }
+    if (!packageSelection || !packageDefinition.profiles.includes(packageSelection.profile)) {
+      throw compositeBadRequest('报告包不支持该 Profile')
+    }
   }
-  const selection = input.analysisProtocol ?? null
   const protocol = packageDefinition
     ? requirePublishedAnalysisProtocol(packageDefinition.analysisProtocolKey, packageDefinition.analysisProtocolVersion)
-    : selection
-      ? requirePublishedAnalysisProtocol(selection.key, selection.version)
-      : null
+    : null
   if (protocol) {
     assertCognitiveModuleEnabled()
     if (!input.courseId) throw compositeBadRequest('综合分析协议必须绑定课程')
@@ -514,30 +523,14 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
         reportPackageSnapshotEncrypted: null,
       },
     })
-    if (protocol && input.courseId && (selection || packageSelection)) {
-      if (packageDefinition && packageSelection) {
-        await materializeReportPackage(tx, {
-          compositeId: composite.id,
-          courseId: input.courseId,
-          userId,
-          profile: packageSelection.profile,
-          packageDefinition,
-        })
-      } else if (selection) {
-        await materializeAnalysisProtocol(tx, {
-          compositeId: composite.id,
-          courseId: input.courseId,
-          userId,
-          profile: selection.profile,
-          protocol,
-        })
-      }
-    }
-    if (packageDefinition && !packageSelection) {
-      throw compositeBadRequest('报告包 Profile 缺失')
-    }
-    if (packageDefinition && packageSelection && !packageDefinition.profiles.includes(packageSelection.profile)) {
-      throw compositeBadRequest('报告包不支持该 Profile')
+    if (packageDefinition && packageSelection && input.courseId) {
+      await materializeReportPackage(tx, {
+        compositeId: composite.id,
+        courseId: input.courseId,
+        userId,
+        profile: packageSelection.profile,
+        packageDefinition,
+      })
     }
     return withoutAnalysisProtocolCipher(composite)
   })
@@ -757,6 +750,12 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
     (source.status === 'PUBLISHED' && hasProtocolKey && !hasProtocolSnapshot)
   ) {
     throw compositeBadRequest('来源综合测评的分析协议冻结信息不完整')
+  }
+  if (hasPackageKey && (!hasProtocolKey || !hasProtocolVersion)) {
+    throw compositeBadRequest('来源综合测评的报告包内部协议引用不完整')
+  }
+  if (!hasPackageKey && (hasProtocolKey || hasProtocolVersion || hasProtocolSnapshot)) {
+    throw compositeBadRequest('旧版固定协议实例不能复制，请从获授权报告包创建')
   }
   if (hasProtocolSnapshot) {
     try {
@@ -1207,6 +1206,9 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     if (item.type === 'COGNITIVE') {
       validateCognitiveConfig(item.cognitiveAssignment.config)
       assertCognitiveAssignmentOnCompositeCourse(item.cognitiveAssignment, composite)
+      if (!composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
+        throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
+      }
     }
     if (item.type === 'FORM') {
       if (!item.formType || !item.formLabel) {

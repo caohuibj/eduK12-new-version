@@ -77,6 +77,18 @@ describe('addItem cognitive course match', () => {
     expect(mockPrisma.compositeAssessmentItem.create).toHaveBeenCalled()
   })
 
+  it('rejects a report-package wrapper in collection-only mode', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment({ listedStandalone: false }))
+
+    await expect(addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'COGNITIVE',
+      cognitiveAssignmentId: 'asg-1',
+      required: true,
+    })).rejects.toMatchObject({ statusCode: 403 })
+    expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCalled()
+  })
+
   it('rejects an assignment from another course', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment({ courseId: 'course-2' }))

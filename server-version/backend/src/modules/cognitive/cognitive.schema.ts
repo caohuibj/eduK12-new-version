@@ -64,6 +64,7 @@ export const updateAssignmentSchema = z
 export const listAssignmentsQuerySchema = z.object({
   courseId: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
+  listedStandalone: z.enum(['true', 'false']).transform((value) => value === 'true').optional(),
 })
 
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>

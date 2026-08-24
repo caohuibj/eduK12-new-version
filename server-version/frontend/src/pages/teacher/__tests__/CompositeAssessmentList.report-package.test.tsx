@@ -61,4 +61,11 @@ describe('CompositeAssessmentList report package mode', () => {
     })))
     expect(mockApi.create.mock.calls[0][0]).not.toHaveProperty('analysisProtocol')
   })
+
+  it('shows fixed slots in the admin package catalog', async () => {
+    authState.user = { id: 'admin-1', role: 'ADMIN' }
+    render(<CompositeAssessmentList />)
+
+    expect(await screen.findByText('固定槽位：持续注意')).toBeInTheDocument()
+  })
 })

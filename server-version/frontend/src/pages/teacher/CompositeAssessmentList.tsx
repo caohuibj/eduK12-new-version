@@ -224,6 +224,9 @@ const CompositeAssessmentList: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium">{pkg.name} · v{pkg.version}</p>
                   <p className="text-xs text-gray-500">{pkg.status}{pkg.disabledReason ? ` · ${pkg.disabledReason}` : ''}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    固定槽位：{[...pkg.slots].sort((a, b) => a.position - b.position).map((slot) => slot.label).join(' · ')}
+                  </p>
                 </div>
                 <button
                   className="btn-secondary text-sm"
