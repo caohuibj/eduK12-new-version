@@ -22,6 +22,9 @@ import { towerRegistryEntry } from './tasks/tower/tower.registry'
 import { trailmakingRegistryEntry } from './tasks/trailmaking/trailmaking.registry'
 import { reversallearningRegistryEntry } from './tasks/reversallearning/reversallearning.registry'
 import { bartRegistryEntry } from './tasks/bart/bart.registry'
+import { wordlistRegistryEntry } from './tasks/wordlist/wordlist.registry'
+import { lexicaldecisionRegistryEntry } from './tasks/lexicaldecision/lexicaldecision.registry'
+import { emotionrecognitionRegistryEntry } from './tasks/emotionrecognition/emotionrecognition.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -121,3 +124,6 @@ registerCognitiveRunner(towerRegistryEntry)
 registerCognitiveRunner(trailmakingRegistryEntry)
 registerCognitiveRunner(reversallearningRegistryEntry)
 registerCognitiveRunner(bartRegistryEntry)
+registerCognitiveRunner(wordlistRegistryEntry)
+registerCognitiveRunner(lexicaldecisionRegistryEntry)
+registerCognitiveRunner(emotionrecognitionRegistryEntry)

@@ -25,6 +25,9 @@ import {
   trailmakingRegistryMeta,
   reversallearningRegistryMeta,
   bartRegistryMeta,
+  wordlistRegistryMeta,
+  lexicaldecisionRegistryMeta,
+  emotionrecognitionRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -95,6 +98,15 @@ import { scoreReversallearningV1 } from './scoring/reversallearning.v1'
 import { bartConfigSchema } from './schemas/bart.config'
 import { bartTrialSchema } from './schemas/bart.trial'
 import { scoreBartV1 } from './scoring/bart.v1'
+import { wordlistConfigSchema } from './schemas/wordlist.config'
+import { wordlistTrialSchema } from './schemas/wordlist.trial'
+import { scoreWordlistV1 } from './scoring/wordlist.v1'
+import { lexicaldecisionConfigSchema } from './schemas/lexicaldecision.config'
+import { lexicaldecisionTrialSchema } from './schemas/lexicaldecision.trial'
+import { scoreLexicaldecisionV1 } from './scoring/lexicaldecision.v1'
+import { emotionrecognitionConfigSchema } from './schemas/emotionrecognition.config'
+import { emotionrecognitionTrialSchema } from './schemas/emotionrecognition.trial'
+import { scoreEmotionrecognitionV1 } from './scoring/emotionrecognition.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -360,3 +372,6 @@ registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.
 registerEntry({ testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, score: scoreTrailmakingV1, ...trailmakingRegistryMeta })
 registerEntry({ testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, score: scoreReversallearningV1, ...reversallearningRegistryMeta })
 registerEntry({ testType: 'bart', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: bartConfigSchema, trialSchema: bartTrialSchema, score: scoreBartV1, ...bartRegistryMeta })
+registerEntry({ testType: 'wordlist', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: wordlistConfigSchema, trialSchema: wordlistTrialSchema, score: scoreWordlistV1, ...wordlistRegistryMeta })
+registerEntry({ testType: 'lexicaldecision', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: lexicaldecisionConfigSchema, trialSchema: lexicaldecisionTrialSchema, score: scoreLexicaldecisionV1, ...lexicaldecisionRegistryMeta })
+registerEntry({ testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta })

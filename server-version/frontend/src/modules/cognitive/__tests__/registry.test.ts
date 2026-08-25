@@ -7,6 +7,9 @@ import { StroopTask } from '../tasks/stroop/StroopTask'
 import { TrailmakingTask } from '../tasks/trailmaking/TrailmakingTask'
 import { ReversallearningTask } from '../tasks/reversallearning/ReversallearningTask'
 import { BartTask } from '../tasks/bart/BartTask'
+import { WordlistTask } from '../tasks/wordlist/WordlistTask'
+import { LexicaldecisionTask } from '../tasks/lexicaldecision/LexicaldecisionTask'
+import { EmotionrecognitionTask } from '../tasks/emotionrecognition/EmotionrecognitionTask'
 
 describe('cognitive frontend registry', () => {
   it('resolves fake / 1.0.0 to the FakeTask runner', () => {
@@ -56,6 +59,18 @@ describe('cognitive frontend registry', () => {
     expect(resolveRunner('reversallearning', '9.9.9')).toBeUndefined()
     expect(resolveRunner('bart', '9.9.9')).toBeUndefined()
     expect(resolveRunner('bart', '1.0.0')?.reportDefinition.showProductIndex).toBe(false)
+  })
+
+  it('resolves PR13 runners by exact testType and engineVersion', () => {
+    expect(resolveRunner('wordlist', '1.0.0')?.RunnerComponent).toBe(WordlistTask)
+    expect(resolveRunner('lexicaldecision', '1.0.0')?.RunnerComponent).toBe(LexicaldecisionTask)
+    expect(resolveRunner('emotionrecognition', '1.0.0')?.RunnerComponent).toBe(EmotionrecognitionTask)
+    expect(resolveRunner('wordlist', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('lexicaldecision', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('emotionrecognition', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('wordlist', '1.0.0')?.completionMode).toBe('task')
+    expect(resolveRunner('lexicaldecision', '1.0.0')?.completionMode).toBe('task')
+    expect(resolveRunner('emotionrecognition', '1.0.0')?.completionMode).toBe('task')
   })
 
   it('resolves every Round 1 P0/P1 runner and contains no percentile copy', () => {

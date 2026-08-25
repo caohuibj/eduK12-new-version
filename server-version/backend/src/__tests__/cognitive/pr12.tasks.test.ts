@@ -160,6 +160,7 @@ describe('PR12 cognitive task contracts', () => {
     })
     const result = scoreBartV1({ config: bartConfig, trials, randomSeed: seed })
     expect(result.score).toBe(0)
+    expect(result.showProductIndex).toBe(false)
     expect(result.metrics.completedBalloonCount).toBe(10)
     expect(result.metrics.adjustedPumps).toBeTypeOf('number')
     expect(result.qualityFlags.invalidOutcome).toBe(false)

@@ -1,0 +1,38 @@
+{
+  "seed": "pr13-lexicaldecision-golden",
+  "config": {
+    "totalTrials": 40,
+    "realWordRatio": 0.5,
+    "stimulusMs": 1200,
+    "trialTimeoutMs": 3000,
+    "isiMs": 300,
+    "validRtFloorMs": 150,
+    "stimulusSetVersion": "zh-lexical-v1.0.0",
+    "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+    "report": { "reportVersion": "1.0.0", "referenceMode": "none" }
+  },
+  "rtMs": 300,
+  "expected": {
+    "score": 100,
+    "metrics": {
+      "dPrime": 3.9615,
+      "lexicalityEffectMs": 0,
+      "accuracyReal": 1,
+      "accuracyPseudo": 1,
+      "medianRtReal": 300,
+      "medianRtPseudo": 300,
+      "accuracyByFrequencyBand": { "high": 1, "medium": 1, "low": 1 },
+      "omissionRate": 0,
+      "validResponseCount": 40
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientRealWords": false,
+      "insufficientPseudoWords": false,
+      "lowAccuracy": false,
+      "excessiveOmissions": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  }
+}
