@@ -479,6 +479,9 @@ export const towerSequence = (seed: string, problemCount: number): TowerProblemS
 export const TRAILMAKING_RANDOMIZATION_ALGORITHM_VERSION = 'trailmaking-sequence-v1.0.0'
 export const REVERSALLEARNING_RANDOMIZATION_ALGORITHM_VERSION = 'reversallearning-sequence-v1.0.0'
 export const BART_RANDOMIZATION_ALGORITHM_VERSION = 'bart-sequence-v1.0.0'
+export const WORDLIST_RANDOMIZATION_ALGORITHM_VERSION = 'wordlist-sequence-v1.0.0'
+export const LEXICALDECISION_RANDOMIZATION_ALGORITHM_VERSION = 'lexicaldecision-sequence-v1.0.0'
+export const EMOTIONRECOGNITION_RANDOMIZATION_ALGORITHM_VERSION = 'emotionrecognition-sequence-v1.0.0'
 
 export type TrailmakingPart = 'A' | 'B'
 export type TrailmakingItemSpec = { targetId: string; label: string; part: TrailmakingPart; order: number; x: number; y: number; stimulusSetVersion: 'trailmaking-generated-v1.0.0' }

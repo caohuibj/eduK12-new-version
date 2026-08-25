@@ -839,6 +839,30 @@ async function main() {
       stimulusSetVersion: 'bart-generated-v1.0.0', report: NONE_REPORT,
     },
   })
+  await seedDraftCognitiveConfig('wordlist', '1.0.0', {
+    name: 'Chinese Wordlist Free Recall Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      listLength: 12, learningRounds: 3, delayedEnabled: false, delayedDelayMs: 60000,
+      studyMsPerWord: 800, recallTimeoutMs: 60000, inactivityGuardMs: 120000,
+      inputMode: 'typed-free-recall', normalizationVersion: 'wordlist-normalization-v1.0.0',
+      stimulusSetVersion: 'chinese-wordlist-v1.0.0', report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('lexicaldecision', '1.0.0', {
+    name: 'Chinese Lexical Decision Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 100, realWordRatio: 0.5, stimulusMs: 1200, trialTimeoutMs: 3000, isiMs: 300,
+      validRtFloorMs: 150, stimulusSetVersion: 'zh-lexical-v1.0.0',
+      pseudowordGeneratorVersion: 'zh-pseudoword-generator-v1.0.0', report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('emotionrecognition', '1.0.0', {
+    name: 'Six Basic Emotion Face Classification Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 60, stimulusMs: 3000, trialTimeoutMs: 5000, isiMs: 300, validRtFloorMs: 200,
+      emotionCategoryVersion: 'basic-emotion-6-v1.0.0', stimulusSetVersion: 'emotion-faces-ai-zh-v1.0.0', report: NONE_REPORT,
+    },
+  })
   console.log('数据库初始化完成。')
 }
 

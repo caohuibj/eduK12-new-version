@@ -55,6 +55,7 @@ export const scoreBartV1 = (input: {
     // CognitiveScoreResult requires a numeric compatibility field. BART never
     // exposes this field as a product index or report metric.
     score: 0,
+    showProductIndex: false,
     metrics: {
       adjustedPumps: mean(cashoutPumps),
       explosionCount,

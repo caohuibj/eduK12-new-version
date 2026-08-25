@@ -213,8 +213,8 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 |---|---|---|---|
 | `trailmaking` | PEBL executive battery：https://pmc.ncbi.nlm.nih.gov/articles/PMC3705215/ | research-only | 鼠标/触屏设备差异与路径绘制 pilot |
 | `wordlist` | 儿童纵向神经心理电池中的 list learning：https://pmc.ncbi.nlm.nih.gov/articles/PMC2602743/ | DRAFT | 自有中文词表、词频/年龄、输入与错别字规则；不复制 CVLT/RAVLT |
-| `lexicaldecision` | 作为常见语言加工范式收录；具体中文词库来源在 PR12 前补齐 | DRAFT | 词频、字长、地区差异、伪词生成与许可审核 |
-| `emotionrecognition` | NIH Toolbox Emotion Battery 总体方法背景：https://pmc.ncbi.nlm.nih.gov/articles/PMC3982906/ | DRAFT | 肖像/绘图许可、文化/年龄/类别平衡；无 norm |
+| `lexicaldecision` | 中文词汇判断与词频/字长研究：https://pmc.ncbi.nlm.nih.gov/articles/PMC4841330/ | DRAFT | 自有词库、词频、字长、地区差异、伪词生成与许可审核 |
+| `emotionrecognition` | NIH Toolbox Emotion Battery 总体方法背景：https://pmc.ncbi.nlm.nih.gov/articles/PMC3982906/；东亚面孔表达资料：https://pmc.ncbi.nlm.nih.gov/articles/PMC9658752/ | DRAFT | 合成面孔资产、文化/年龄/类别平衡、跨文化表达限制；无 norm |
 | `reversallearning` | 先作为概率学习研究范式，PR11 前补充具体儿童/青少年实现来源 | research-only | 反馈概率、阶段长度、策略/遗漏解释 pilot |
 | `bart` | BART 重测研究：https://pmc.ncbi.nlm.nih.gov/articles/PMC4244869/ | research-only | 不输出好坏；不进入 K12 核心协议 |
 
@@ -249,6 +249,44 @@ PR11/PR12 开始前，表中仍写“补齐”的条目必须升级为具体原�
 **Pilot 要求**：覆盖青少年和成人、鼠标/触屏/键盘可操作路径，检查动画节奏、超时、现金化理解、连续泵压模式、设备误触和 outcome 恢复。Pilot 只能评估协议可用性、数据完整性和重测特征，不能把指标转换为风险分层。
 
 **不可声称**：所有 BART 指标均为 `descriptive`；报告只描述泵压、爆破、现金化、遗漏和中断，不显示“任务表现指数”，不输出“风险高/低”“好/坏”、冲动性等级、人格判断、临床结论或处分建议。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，不进入任何已发布 ReportPackage 或综合分析。
+
+### 4.4 PR13 `wordlist`
+
+**范式来源**：参考儿童纵向神经心理电池中的 list-learning 结构：https://pmc.ncbi.nlm.nih.gov/articles/PMC2602743/。该来源只用于确认学习轮次、即时/延迟回忆的范式边界；本实现不复制 CVLT、RAVLT 或其他商业词表、指导语和常模。
+
+**自有刺激与版本**：`chinese-wordlist-v1.0.0` 是仓库内自有中文词库，当前实现位置为 `server-version/backend/src/modules/cognitive/pr13-stimuli.ts`，前端以同版本的本地确定性镜像重放。体验、标准、科研 profile 分别使用 8/12/15 词和 2/3/5 轮；科研版延迟等待初始值为 60 秒。词条按短、具体、日常可理解方向建立，不声明代表任何年龄常模或语言地区人群。`wordlist-normalization-v1.0.0` 仅执行 Unicode NFKC、空白/标点清理和英文字母大小写归一，不做繁简转换、同义词匹配或未经 pilot 证明的模糊纠错。
+
+**Pilot 要求**：分别检查青少年和成人对指导语、键盘自由输入、中文输入法、标点/空白、错别字规则和延迟阶段的理解；记录空回忆、侵入词、重复输入、输入法差异、设备中断和延迟等待完成率。Pilot 必须覆盖键盘可访问性和不同中文输入环境，不把输入速度直接解释为记忆能力。
+
+**不可声称**：不输出记忆能力等级、临床记忆结论、IQ、年龄常模、百分位、学习障碍或语言能力诊断。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，延迟阶段不完整时延迟指标保持 `null`，不伪造为零。
+
+### 4.5 PR13 `lexicaldecision`
+
+**范式来源**：参考中文词汇判断与词频/字长效应研究：https://pmc.ncbi.nlm.nih.gov/articles/PMC4841330/。该来源用于词汇判断范式、词长与词频带的研究背景，不把本任务当作原研究的复现，也不复制其刺激、常模或评分阈值。
+
+**自有词库与伪词策略**：`zh-lexical-v1.0.0` 维护在 `server-version/backend/src/modules/cognitive/pr13-stimuli.ts`，包含 2/3 字和 high/medium/low 六个分组，每组当前冻结 30 个真词，共 180 个真词。伪词由 `zh-pseudoword-generator-v1.0.0` 在构建阶段使用内部字符池生成，并以 `server-version/backend/src/modules/cognitive/pr13-lexical-bank.ts` 和前端镜像 `server-version/frontend/src/modules/cognitive/tasks/shared/pr13LexicalBank.ts` 的 checked-in manifest 冻结为 180 个条目；运行时只按 Session seed 从冻结 bank 取样，不再动态生成。词频带是内部粗粒度标签，不是外部标准化频率分数；前端不保存或提交真实词文本以外的权威正确答案，服务端复核 stimulus ID、词长、词频带和生成器版本。
+
+**许可与审查**：词库为项目自有内部数据，伪词为项目自有生成结果；当前不引入第三方词表文件。checked-in manifest 已锁定版本和条目，当前内容审查状态仍为 DRAFT/待双人复核；进入 PUBLISHED 前须完成中文地区/年龄可理解性、字长和频率带双人复核，排除专名、歧义词、禁用词和可能被误认为真词的伪词，并在不同键盘/触屏设备上检查 RT floor、输入延迟和遗漏率。审查人、日期和禁用词清单须写入本版本发布审查记录。
+
+**不可声称**：不输出阅读能力、词汇量、语言障碍、智力、年龄常模或百分位结论。`dPrime`、词频带正确率和真词/伪词反应时差只描述当前冻结任务中的响应。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，不进入 Domain mapping、Evidence、Recommendation 或 ReportPackage。
+
+### 4.6 PR13 `emotionrecognition`
+
+**范式与文化背景来源**：任务采用六类基本情绪分类的研究范式背景，参考 NIH Toolbox Emotion Battery：https://pmc.ncbi.nlm.nih.gov/articles/PMC3982906/；东亚面孔表达数据库研究：https://pmc.ncbi.nlm.nih.gov/articles/PMC9658752/；跨文化情绪表达差异研究：https://pmc.ncbi.nlm.nih.gov/articles/PMC3358835/。这些资料只用于范式、内容和文化限制审查，不能当作本项目常模或发布依据。
+
+**自有 AI 生成资产**：`emotion-faces-ai-zh-v1.0.0` 位于 `server-version/frontend/src/assets/emotion-faces-ai-zh-v1.0.0/`，由 20 组虚构、合成、无真实人物对应的亚洲呈现成人身份组成，每组含 `happy`、`sad`、`angry`、`fear`、`disgust`、`surprise` 六类，共 120 个内部 stimulus ID。资产采用 Codex ImageGen 生成流程；生成记录批次为 `pr13-emotion-faces-zh-v1.0.0-batch-01`，统一提示约束为“fictional synthetic adult Asian-presenting identity sheet、六类表情、每组身份保持一致、无真实人物、无文字水印、灰色背景和白色分隔”，具体模型版本由生成服务记录，未将运行时远程 URL 或模型依赖写入产品。当前五个本地 contact sheet 的 SHA-256 为：
+
+| 文件 | SHA-256 |
+|---|---|
+| `sheet-01.png` | `15973efd8b60c540840c96219f0d2bcb3719e3b2a143c6b6e24d99c6a542dd8d` |
+| `sheet-02.png` | `17d2cf7358145cc07c8241bc5ef2e05307c1ed782374c11036b91f9ac3589f04` |
+| `sheet-03.png` | `1f3d8368497eade4f835aa10726243bb56ce685fe82317c15a366c881b5b98ea` |
+| `sheet-04.png` | `1d5c1da07b65fe075b85283778c6957e97d9b0491412cf6d9a195b65df863b43` |
+| `sheet-05.png` | `c387523b3d9d80255ffc2634eefb63c7c9bcd2e214c75d0fc3b9f52aefac1ebe` |
+
+资产为本项目内部生成和内部持有的 DRAFT 资源；不保存或推断参与者族群、身份或面部特征。发布前必须完成生成资产内容审查、年龄可理解性、六类类别平衡、色觉/可访问性、跨文化表达限制和设备尺寸 pilot，并明确记录生成模型、提示词批次、审查人和日期。
+
+**不可声称**：不输出情绪识别能力、共情能力、人格、文化能力、临床状态、智力、年龄常模或百分位结论。报告只描述参与者对当前六类合成面孔的分类响应；当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，不进入任何综合分析协议。
 
 ---
 
