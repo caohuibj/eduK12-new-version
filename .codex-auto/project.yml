@@ -47,6 +47,7 @@ verification:
     - backend-unit
     - frontend-typecheck
     - frontend-cognitive
+    - frontend-composite
     - frontend-build
   conditional:
     - condition: backend API, persistence, Cognitive session/scoring, export, encryption, or authorization behavior changes

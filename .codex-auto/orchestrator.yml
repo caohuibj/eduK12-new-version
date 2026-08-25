@@ -78,12 +78,21 @@ repository:
       - server-version/frontend
       - run
       - test:cognitive
+    frontend-composite:
+      - npm
+      - --prefix
+      - server-version/frontend
+      - run
+      - test:composite
     frontend-build:
       - npm
       - --prefix
       - server-version/frontend
       - run
       - build
+    e2e:
+      - sh
+      - scripts/codex-auto-e2e.sh
     docker-config:
       - env
       - CORS_ORIGIN=http://localhost

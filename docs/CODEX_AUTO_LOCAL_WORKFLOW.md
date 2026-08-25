@@ -8,9 +8,15 @@
 
 常规变更要求 backend build/unit、frontend typecheck/cognitive/build。涉及 backend API、
 持久化、认知 session/scoring、导出、加密或授权行为时，额外要求
-`COGNITIVE_INTEGRATION_DB_URL` 指向隔离 PostgreSQL 的 backend integration；未配置时门脚本
-必须明确失败，不得把跳过当作通过。用户可见流程、Docker、依赖、运行时或静态资源变更按
-项目配置触发相应 E2E 或 Docker 门。
+`COGNITIVE_INTEGRATION_DB_URL` 和 `PR8_INTEGRATION_DATABASE_URL` 分别对应 Cognitive 并发
+与 Composite Snapshot 集成套件；门脚本只运行已配置的隔离数据库套件，两个都未配置时明确
+失败，不得把没有任何集成证据当作通过。用户可见流程、Docker、依赖、运行时或静态资源变更
+按项目配置触发相应 E2E 或 Docker 门。
+
+E2E 门默认运行 `scripts/codex-auto-e2e.sh` 的 Composite 公开入口套件，需要在隔离 Gate
+服务中设置 `COMPOSITE_E2E_ISOLATED_DB=1`、一次性公开令牌、综合测评 ID 和教师登录凭证。
+`EDUK12_E2E_SUITE=round1|round2|all` 可选择已有的认知浏览器门；所有 E2E 都只允许操作
+专用环境，不使用共享开发库。
 
 ## 集成边界
 

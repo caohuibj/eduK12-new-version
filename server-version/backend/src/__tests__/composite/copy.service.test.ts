@@ -625,6 +625,33 @@ describe('library composites are not takeable', () => {
     ]))
   })
 
+  it('keeps an active attempt exclusive while preserving the latest completed report', async () => {
+    const now = Date.now()
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([{
+      id: 'active-2', code: 'ACTIVE-2', name: '继续中的测评', description: null, instruction: null,
+      opensAt: new Date(now - 60_000), expiresAt: new Date(now + 60_000), maxAttempts: 2,
+      course: teacherCourse, items: [],
+    }])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([
+      { id: 'attempt-active', compositeAssessmentId: 'active-2', status: 'IN_PROGRESS', progress: 40, completedAt: null },
+      { id: 'attempt-completed', compositeAssessmentId: 'active-2', status: 'COMPLETED', progress: 100, completedAt: new Date(now - 120_000) },
+    ])
+
+    const list = await listAvailableForStudent('student-1')
+
+    expect(list).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'active-2',
+        attemptsUsed: 2,
+        canContinue: true,
+        canStartNewAttempt: false,
+        attempt: expect.objectContaining({ id: 'attempt-active', status: 'IN_PROGRESS' }),
+        latestCompletedAttempt: expect.objectContaining({ id: 'attempt-completed', status: 'COMPLETED' }),
+      }),
+    ]))
+  })
+
   it('omits library-course composites from the student list', async () => {
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'library-1' }])
     mockPrisma.compositeAssessment.findMany.mockResolvedValue([])

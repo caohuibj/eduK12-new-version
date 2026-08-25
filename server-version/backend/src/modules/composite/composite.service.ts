@@ -1456,6 +1456,11 @@ export const listAvailableForStudent = async (userId: string) => {
     const compositeAttempts = attemptsByCompositeId.get(item.id) || []
     const attemptsUsed = compositeAttempts.length
     const availability = availabilityFor(item)
+    const latestAttempt = latest.get(item.id) ?? null
+    const canContinue = latestAttempt?.status === 'IN_PROGRESS'
+    // `attempts` is ordered newest-first, so this is the most recent completed
+    // attempt even when a newer attempt is currently in progress.
+    const latestCompletedAttempt = compositeAttempts.find((attempt) => attempt.status === 'COMPLETED') ?? null
     return {
       id: item.id,
       code: item.code,
@@ -1469,10 +1474,11 @@ export const listAvailableForStudent = async (userId: string) => {
       maxAttempts: item.maxAttempts,
       attemptsUsed,
       availability,
-      canStartNewAttempt: availability === 'OPEN' && attemptsUsed < item.maxAttempts,
-      canContinue: latest.get(item.id)?.status === 'IN_PROGRESS',
+      canStartNewAttempt: availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
+      canContinue,
       items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-      attempt: latest.get(item.id) ?? null,
+      attempt: latestAttempt,
+      latestCompletedAttempt,
     }
   })
 }

@@ -37,6 +37,7 @@ interface CompositeAssessment {
   items: Array<{ type: string; label: string | null }>
   course: { id: string; title: string; courseCode: string } | null
   attempt: { id: string; status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; progress: number } | null
+  latestCompletedAttempt: { id: string; status: 'COMPLETED'; progress: number } | null
   opensAt: string | null
   expiresAt: string | null
   maxAttempts: number
@@ -421,14 +422,18 @@ const CourseDetail: React.FC = () => {
               const attempt = composite.attempt
               const canContinue = composite.canContinue || attempt?.status === 'IN_PROGRESS'
               const canStartNewAttempt = composite.canStartNewAttempt
-              const canViewReport = attempt?.status === 'COMPLETED'
+              const latestCompletedAttempt = composite.latestCompletedAttempt
+                || (attempt?.status === 'COMPLETED' ? attempt : null)
+              const canViewReport = Boolean(latestCompletedAttempt)
+              const reportTarget = latestCompletedAttempt
+                ? `/student/composite/attempts/${latestCompletedAttempt.id}/report`
+                : ''
               const target = canContinue
                 ? `/student/composite/attempts/${attempt?.id}`
                 : canStartNewAttempt
                   ? `/student/composite/${composite.id}`
-                  : canViewReport
-                    ? `/student/composite/attempts/${attempt.id}/report`
-                    : ''
+                  : reportTarget
+              const showReportAction = canViewReport && (canContinue || canStartNewAttempt)
               const availabilityLabel = composite.availability === 'UPCOMING'
                 ? '尚未开始'
                 : composite.availability === 'EXPIRED'
@@ -463,9 +468,16 @@ const CourseDetail: React.FC = () => {
                         </p>
                       )}
                     </div>
-                    <button onClick={() => { if (target) navigate(target) }} disabled={!target} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
-                      {actionLabel}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => { if (target) navigate(target) }} disabled={!target} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                        {actionLabel}
+                      </button>
+                      {showReportAction && (
+                        <button onClick={() => { if (reportTarget) navigate(reportTarget) }} className="btn-secondary">
+                          查看上次报告
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
