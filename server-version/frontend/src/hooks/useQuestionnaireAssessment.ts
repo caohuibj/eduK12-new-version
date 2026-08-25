@@ -82,7 +82,6 @@ export function useQuestionnaireAssessment(
   }
 
   const submitAnswer = async (itemId: string, value: number | string) => {
-    try {
       // 计算作答时间（毫秒）
       const now = Date.now()
       const startTime = answerTimestamps[itemId] || now
@@ -110,10 +109,6 @@ export function useQuestionnaireAssessment(
         ...prev,
         [itemId]: value
       }))
-      
-    } catch (err) {
-      throw err
-    }
   }
 
   // 记录开始作答时间
@@ -126,7 +121,6 @@ export function useQuestionnaireAssessment(
 
   // 完成当前量表并获取下一个量表
   const completeScaleAndFetchNext = async () => {
-    try {
       // 1. 完成当前量表
       const response = await fetch(`/api/public/assessments/${sessionId}/scale/complete`, {
         method: 'POST',
@@ -192,14 +186,9 @@ export function useQuestionnaireAssessment(
           }
         }
       }
-
-    } catch (err) {
-      throw err
-    }
   }
 
   const completeAssessment = async () => {
-    try {
       const response = await fetch(`/api/public/assessments/${sessionId}/complete`, {
         method: 'POST'
       })
@@ -210,10 +199,6 @@ export function useQuestionnaireAssessment(
 
       setIsCompleted(true)
       setProgress(100)
-      
-    } catch (err) {
-      throw err
-    }
   }
 
   return {

@@ -543,7 +543,7 @@ const VideoLibrary: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayVideos.map((video) => {
-            // @ts-ignore - isProcessed 是后端返回的字段
+            // @ts-expect-error - isProcessed 是后端返回但尚未进入旧版前端类型的字段
             const isProcessed = video.isProcessed || (video as any).status === 'COMPLETED'
             return (
             <div key={video.id} className="card hover:shadow-lg transition-shadow">
