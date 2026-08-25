@@ -9,6 +9,7 @@ const { mockCompositeApi, authState } = vi.hoisted(() => ({
     teacherReport: vi.fn(),
     snapshots: vi.fn(),
     reanalyze: vi.fn(),
+    downloadAnalysisExport: vi.fn(),
   },
   authState: { user: null as null | { role: 'STUDENT' | 'TEACHER' | 'ADMIN' } },
 }))
@@ -25,6 +26,7 @@ beforeEach(() => {
   authState.user = null
   mockCompositeApi.snapshots.mockResolvedValue({ code: 0, data: { list: [], total: 0 } })
   mockCompositeApi.reanalyze.mockResolvedValue({ code: 0, data: { id: 'snapshot-new' } })
+  mockCompositeApi.downloadAnalysisExport.mockResolvedValue({ blob: new Blob(['analysis']), fileName: 'analysis.json' })
 })
 
 describe('CompositeReportPage cognitive module', () => {
@@ -279,6 +281,57 @@ describe('CompositeReportPage cognitive module', () => {
     await waitFor(() => expect(mockCompositeApi.reanalyze).toHaveBeenCalledWith('attempt-admin'))
     await waitFor(() => expect(mockCompositeApi.snapshots).toHaveBeenCalledTimes(2))
     await waitFor(() => expect(mockCompositeApi.teacherReport).toHaveBeenCalledWith('c1', 'attempt-admin', 'snapshot-new'))
+  })
+
+  it('shows analysis export controls only for package staff reports and passes the selected Snapshot', async () => {
+    authState.user = { role: 'TEACHER' }
+    mockCompositeApi.teacherReport.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 'attempt-export',
+        assessmentId: 'c1',
+        name: '教师报告',
+        anonymousCode: null,
+        completedAt: '2026-01-01T00:00:00Z',
+        totalTime: 0,
+        backgroundValues: [],
+        packageReport: {
+          audience: 'teacher',
+          packageName: '报告包',
+          packageKey: 'package-1',
+          packageVersion: '1.0.0',
+          profile: 'standard',
+          qualitySummary: { interpretableModules: 0, excludedModules: [], warnings: [] },
+          cognitiveDomains: [],
+          recommendations: [],
+          limitations: [],
+          snapshotId: 'snapshot-selected',
+          snapshotCreatedAt: '2026-01-02T00:00:00Z',
+          generationReason: 'REANALYSIS',
+          sourceSummary: [],
+          qualityFlags: [],
+          observationPrompts: [],
+        },
+        unitReports: [],
+      },
+    })
+    mockCompositeApi.snapshots.mockResolvedValue({ code: 0, data: { list: [], total: 0 } })
+    const createObjectURL = vi.fn(() => 'blob:analysis')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL })
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-export/report?snapshotId=snapshot-selected']}>
+        <Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByTestId('composite-analysis-export-controls')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '导出 JSON' }))
+    await waitFor(() => expect(mockCompositeApi.downloadAnalysisExport).toHaveBeenCalledWith('c1', 'attempt-export', 'json', 'snapshot-selected'))
+    anchorClick.mockRestore()
+    vi.unstubAllGlobals()
   })
 
   it('does not show package controls for a collection-only teacher report', async () => {

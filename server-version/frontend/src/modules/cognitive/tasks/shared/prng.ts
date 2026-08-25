@@ -475,3 +475,46 @@ export const towerSequence = (seed: string, problemCount: number): TowerProblemS
   const quotas = problemCount === 4 ? [2, 2, 0] : problemCount === 10 ? [4, 4, 2] : [6, 6, 6]
   return quotas.flatMap((quota, band) => shuffleInPlace([...TOWER_BANK.filter((problem) => problem.difficulty === band + 1)], seededRandom(seed, `tower-band:${band + 1}`)).slice(0, quota))
 }
+
+export const TRAILMAKING_RANDOMIZATION_ALGORITHM_VERSION = 'trailmaking-sequence-v1.0.0'
+export const REVERSALLEARNING_RANDOMIZATION_ALGORITHM_VERSION = 'reversallearning-sequence-v1.0.0'
+export const BART_RANDOMIZATION_ALGORITHM_VERSION = 'bart-sequence-v1.0.0'
+
+export type TrailmakingPart = 'A' | 'B'
+export type TrailmakingItemSpec = { targetId: string; label: string; part: TrailmakingPart; order: number; x: number; y: number; stimulusSetVersion: 'trailmaking-generated-v1.0.0' }
+const TRAILMAKING_GRID = Array.from({ length: 48 }, (_, index) => ({ x: index % 8, y: Math.floor(index / 8) }))
+const TRAILMAKING_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+const trailmakingLabels = (part: TrailmakingPart, count: number): string[] => part === 'A'
+  ? Array.from({ length: count }, (_, index) => String(index + 1))
+  : Array.from({ length: count }, (_, index) => index % 2 === 0 ? String(Math.floor(index / 2) + 1) : TRAILMAKING_LETTERS[Math.floor(index / 2)])
+const trailmakingPart = (seed: string, part: TrailmakingPart, count: number, offset: number, fixedPositions?: Array<{ x: number; y: number }>): TrailmakingItemSpec[] => {
+  const positions = fixedPositions ?? shuffleInPlace([...TRAILMAKING_GRID], seededRandom(seed, `trailmaking:positions:${part}`)).slice(0, count)
+  return trailmakingLabels(part, count).map((label, index) => ({ targetId: `${part}-${String(index + 1).padStart(2, '0')}`, label, part, order: offset + index, x: positions[index].x, y: positions[index].y, stimulusSetVersion: 'trailmaking-generated-v1.0.0' }))
+}
+export const trailmakingSequence = (seed: string, form: 'A' | 'AB', partAItemCount: number, partBItemCount: number): TrailmakingItemSpec[] => {
+  const positions = shuffleInPlace([...TRAILMAKING_GRID], seededRandom(seed, 'trailmaking:positions:all'))
+  const partA = trailmakingPart(seed, 'A', partAItemCount, 0, positions.slice(0, partAItemCount))
+  const partB = form === 'AB' ? trailmakingPart(seed, 'B', partBItemCount, partA.length, positions.slice(partAItemCount, partAItemCount + partBItemCount)) : []
+  return [...partA, ...partB]
+}
+
+export type ReversallearningSegment = 'acquisition' | 'reversal'
+export type ReversallearningTrialSpec = { segment: ReversallearningSegment; leftSymbol: 'A' | 'B'; rightSymbol: 'A' | 'B'; correctSymbol: 'A' | 'B'; correctResponse: 'left' | 'right'; acquisitionResponse: 'left' | 'right'; rewardRoll: number; stimulusSetVersion: 'reversal-symbols-v1.0.0' }
+export const reversallearningSequence = (seed: string, totalTrials: number, acquisitionTrials: number, reversalTrials: number, rewardProbability: number): ReversallearningTrialSpec[] => {
+  if (acquisitionTrials + reversalTrials !== totalTrials) throw new Error('reversallearning sequence lengths must sum to totalTrials')
+  return Array.from({ length: totalTrials }, (_, trialIndex) => {
+    const segment: ReversallearningSegment = trialIndex < acquisitionTrials ? 'acquisition' : 'reversal'
+    const leftSymbol: 'A' | 'B' = seededRandom(seed, `reversallearning:position:${trialIndex}`)() < 0.5 ? 'A' : 'B'
+    const rightSymbol = leftSymbol === 'A' ? 'B' : 'A'
+    const correctSymbol: 'A' | 'B' = segment === 'acquisition' ? 'A' : 'B'
+    const correctResponse = leftSymbol === correctSymbol ? 'left' : 'right'
+    const acquisitionResponse = leftSymbol === 'A' ? 'left' : 'right'
+    const rewardRoll = seededRandom(seed, `reversallearning:feedback:${trialIndex}`)()
+    // Keep the raw roll in the replay contract; the runner applies the frozen probability locally.
+    void rewardProbability
+    return { segment, leftSymbol, rightSymbol, correctSymbol, correctResponse, acquisitionResponse, rewardRoll, stimulusSetVersion: 'reversal-symbols-v1.0.0' }
+  })
+}
+
+export type BartBalloonSpec = { balloonIndex: number; explosionThreshold: number; stimulusSetVersion: 'bart-generated-v1.0.0' }
+export const bartSequence = (seed: string, balloonCount: number, maxPumps: number): BartBalloonSpec[] => Array.from({ length: balloonCount }, (_, balloonIndex) => ({ balloonIndex, explosionThreshold: Math.floor(seededRandom(seed, `bart:threshold:${balloonIndex}`)() * maxPumps) + 1, stimulusSetVersion: 'bart-generated-v1.0.0' }))

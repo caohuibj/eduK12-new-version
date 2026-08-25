@@ -48,6 +48,7 @@ export interface CognitiveSingleTaskReport {
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
   headline: CognitiveReportMetricView | null
   productIndex: { label: string; value: number } | null
+  showProductIndex?: boolean
   primaryMetrics: CognitiveReportMetricView[]
   secondaryMetrics: CognitiveReportMetricView[]
   caveats: string[]
@@ -127,6 +128,7 @@ export interface CognitiveReportDefinition {
   primaryMetrics?: string[]
   secondaryMetrics?: string[]
   summaryMetrics?: string[]
+  showProductIndex?: boolean
   practicalTips?: string[]
   disclaimer: string
 }

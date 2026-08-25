@@ -190,7 +190,9 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
       const title = packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')
-      addField(fields, `${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 2)
+      const frozenReport = frozenReportFor(item.cognitiveAssignment)
+      const showProductIndex = frozenReport?.reportDefinition?.showProductIndex !== false
+      if (showProductIndex) addField(fields, `${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 2)
       addField(fields, `${childPrefix}quality`, `[${title}] 数据质量`, 'string')
       addField(fields, `${childPrefix}profile`, `[${title}] Profile`, 'string')
       addField(fields, `${childPrefix}profile_definition_version`, `[${title}] profile-definition version`, 'string')
@@ -202,7 +204,6 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       addField(fields, `${childPrefix}config_version`, `[${title}] configVersion`, 'string')
       addField(fields, `${childPrefix}randomization_algorithm_version`, `[${title}] randomization algorithm version`, 'string')
       addField(fields, `${childPrefix}report_definition_version`, `[${title}] report-definition version`, 'string')
-      const frozenReport = frozenReportFor(item.cognitiveAssignment)
       if (frozenReport) {
         for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
           const definition = frozenReport.metricDefinitions[key]
@@ -269,7 +270,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           const quality = safeCognitiveValue<Record<string, unknown>>(session.qualityFlagsEncrypted) || {}
           const metrics = safeCognitiveValue<Record<string, unknown>>(session.metricsEncrypted) || {}
           const frozenReport = frozenReportFor(assignment)
-          row[`${childPrefix}score`] = score
+          if (frozenReport?.reportDefinition?.showProductIndex !== false) row[`${childPrefix}score`] = score
           row[`${childPrefix}quality`] = quality.interpretable === false ? 'insufficient' : quality.interpretable === true ? 'interpretable' : null
           row[`${childPrefix}profile`] = frozenReport?.profile ?? assignment?.profile ?? null
           row[`${childPrefix}profile_definition_version`] = frozenReport?.profileDefinitionVersion ?? null
@@ -373,3 +374,16 @@ export const toSavVariables = (fields: CompositeExportField[]): SavVariable[] =>
 }))
 
 export const compositeExportService = { getExportData, exportToCSV, makeFileName, saveExportFiles, toSavVariables }
+
+// PR11 analysis exports are implemented as a separate frozen-Snapshot path;
+// re-export the builder here so existing composite export imports remain the
+// single public module entry point without changing the legacy wide export.
+export {
+  buildCompositeAnalysisExport,
+  compositeAnalysisExportService,
+} from './composite-analysis-export.service'
+export type {
+  CompositeAnalysisExportContext,
+  CompositeAnalysisExportFormat,
+  CompositeAnalysisExportResult,
+} from './composite-analysis-export.service'

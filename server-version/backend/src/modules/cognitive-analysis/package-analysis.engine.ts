@@ -26,6 +26,11 @@ import {
   MULTISOURCE_ANALYSIS_VERSION,
 } from './cognitive-analysis.types'
 import {
+  buildRecommendations,
+  COGNITIVE_RECOMMENDATION_RULE_VERSION,
+  LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
+} from './recommendation.registry'
+import {
   getCognitiveDomainDefinition,
   hasCognitiveDomainDefinitionVersion,
 } from './domain.registry'
@@ -89,7 +94,7 @@ const PR7_BUILT_IN_PACKAGE_CONTRACTS = new Map<string, {
   packageReportDefinitionVersion: 'report-package-v1',
   domainDefinitionVersion: '1.0.0',
   evidenceMappingVersion: '1.0.0',
-  recommendationRuleVersion: '1.0.0',
+  recommendationRuleVersion: LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
 }]))
 
 const PR10_MULTISOURCE_PACKAGE_KEY = 'inhibitory_control_multisource_v1'
@@ -100,7 +105,7 @@ const PR10_BUILT_IN_PACKAGE_CONTRACT = {
   packageReportDefinitionVersion: 'report-package-v1',
   domainDefinitionVersion: '1.0.0',
   evidenceMappingVersion: '1.0.0',
-  recommendationRuleVersion: '1.0.0',
+  recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
 }
 
 const validateCognitiveSlot = (value: unknown, label: string): CognitiveProtocolSlotDefinition => {
@@ -297,7 +302,14 @@ const validatePackageSnapshot = (
   ) {
     fail('冻结分析协议引用不支持的 Evidence mapping 版本')
   }
-  if (protocol.recommendationRuleVersion !== builtInContract.recommendationRuleVersion) {
+  const supportedRecommendationRuleVersions = isMultisource
+    ? new Set([
+        builtInContract.recommendationRuleVersion,
+        COGNITIVE_RECOMMENDATION_RULE_VERSION,
+        LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
+      ])
+    : new Set([LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION])
+  if (!supportedRecommendationRuleVersions.has(protocol.recommendationRuleVersion)) {
     fail('冻结分析协议引用不支持的 recommendation rule 版本')
   }
   if (!Array.isArray(protocol.outputDomains) || protocol.outputDomains.length === 0) {
@@ -1272,6 +1284,20 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
     provenance.assessmentId = requireNonEmptyString(input.assessmentId, 'assessmentId')
   }
 
+  const crossSourceFindings = buildCrossSourceFindings(packageDefinition.key, evidence)
+  // PR7 cognitive-only packages keep their historical no-recommendation
+  // behavior. PR11 rules are enabled only by the versioned multisource
+  // protocol; a frozen 1.0.0 multisource protocol remains stable as well.
+  const recommendations = isMultisource && protocol.recommendationRuleVersion === COGNITIVE_RECOMMENDATION_RULE_VERSION
+    ? buildRecommendations({
+      packageKey: packageDefinition.key,
+      packageVersion: packageDefinition.version,
+      cognitiveDomains,
+      crossSourceFindings,
+      evidence,
+    }, protocol.recommendationRuleVersion)
+    : []
+
   return {
     packageKey: packageDefinition.key,
     packageVersion: packageDefinition.version,
@@ -1287,14 +1313,16 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
     },
     evidence,
     cognitiveDomains,
-    crossSourceFindings: buildCrossSourceFindings(packageDefinition.key, evidence),
-    recommendations: [],
+    crossSourceFindings,
+    recommendations,
     limitations: isMultisource
       ? [
         '本报告包不计算跨任务平均、Domain score、overall score、percentile 或 IQ。',
         'ADEXI 是参与者自评来源；跨来源 finding 仅描述本次行为任务与自评的方向关系，不代表诊断、因果或稳定特质。',
         '学员可以是青少年或成人；本包不按年龄或教师/学员身份限制作答，具体适用性仍需结合项目审核。',
-        '当前 recommendations 保留接口但不新增规则；观察线索仅复用冻结任务报告已生成的 watchItems。',
+        ...(protocol.recommendationRuleVersion === LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION
+          ? ['该历史分析规则版本不补生成 PR11 建议，既有冻结报告保持稳定。']
+          : ['建议仅基于冻结 Domain/finding 证据生成，面向描述性观察，不产生诊断、因果或处分类结论。']),
       ]
       : [
         'PR7 不计算跨任务平均、Domain score、overall score、percentile 或 IQ。',

@@ -636,4 +636,11 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
     wrongScoring[0].scoringVersion = '9.9.9'
     expectInputError(() => buildPackageCognitiveAnalysis(snapshot, wrongScoring), /任务版本/)
   })
+
+  it('rejects PR11 recommendation rules on a cognitive-only frozen protocol', () => {
+    const snapshot = makePackageSnapshot('attention_stability_v1')
+    const forged = structuredClone(snapshot)
+    forged.analysisProtocolSnapshot.protocolDefinition.recommendationRuleVersion = '1.1.0'
+    expect(() => buildPackageCognitiveAnalysis(forged, makeModuleResults(forged))).toThrow(/recommendation rule/)
+  })
 })

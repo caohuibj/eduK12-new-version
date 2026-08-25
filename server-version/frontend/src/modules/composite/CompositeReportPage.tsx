@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
-import type { CompositeReport, CompositeSnapshotMetadata } from './types'
+import type { CompositeAnalysisExportFormat, CompositeReport, CompositeSnapshotMetadata } from './types'
 import { useAuth } from '../../contexts/AuthContext'
 import CompositePackageReport from './CompositePackageReport'
 import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
@@ -34,6 +34,7 @@ const CompositeReportPage: React.FC = () => {
   const [snapshotLoading, setSnapshotLoading] = useState(false)
   const [snapshotError, setSnapshotError] = useState<string | null>(null)
   const [reanalyzing, setReanalyzing] = useState(false)
+  const [exportingFormat, setExportingFormat] = useState<CompositeAnalysisExportFormat | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -116,6 +117,29 @@ const CompositeReportPage: React.FC = () => {
     } finally { setReanalyzing(false) }
   }
 
+  const downloadAnalysisExport = async (format: CompositeAnalysisExportFormat) => {
+    if (!staffMode || !id || !attemptId || !report?.packageReport) return
+    setExportingFormat(format)
+    setSnapshotError(null)
+    try {
+      // A default teacher/admin report includes the completion Snapshot ID;
+      // using it here keeps the downloaded file on the same frozen version as
+      // the screen. An explicitly selected history ID wins over the default.
+      const snapshotId = selectedSnapshotId || report.packageReport.snapshotId
+      const download = await compositeApi.downloadAnalysisExport(id, attemptId, format, snapshotId)
+      const objectUrl = URL.createObjectURL(download.blob)
+      const anchor = document.createElement('a')
+      anchor.href = objectUrl
+      anchor.download = download.fileName
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(objectUrl)
+    } catch (err) {
+      setSnapshotError((err as { message?: string }).message || '分析导出失败')
+    } finally { setExportingFormat(null) }
+  }
+
   const showSnapshotControls = staffMode && (Boolean(report?.packageReport) || snapshots.length > 0)
   const snapshotControls = showSnapshotControls && <div className="card p-5 mb-4" data-testid="composite-snapshot-controls">
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -128,6 +152,25 @@ const CompositeReportPage: React.FC = () => {
     </div>
     {snapshotLoading && <p className="text-xs text-gray-500 mt-2">加载报告历史...</p>}
     {snapshotError && <p className="text-sm text-red-600 mt-2">{snapshotError}</p>}
+    {report?.packageReport && (
+      <div className="mt-4 border-t pt-4" data-testid="composite-analysis-export-controls">
+        <p className="text-sm font-medium text-gray-700 mb-2">当前 Snapshot 分析导出</p>
+        <div className="flex flex-wrap gap-2">
+          {(['json', 'zip', 'xlsx'] as CompositeAnalysisExportFormat[]).map((format) => (
+            <button
+              key={format}
+              type="button"
+              onClick={() => void downloadAnalysisExport(format)}
+              disabled={exportingFormat !== null}
+              className="btn-secondary"
+              aria-label={`导出 ${format.toUpperCase()}`}
+            >
+              {exportingFormat === format ? '导出中...' : `导出 ${format.toUpperCase()}`}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
   </div>
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>

@@ -13,6 +13,7 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, req
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), compositeController.completeScale)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), compositeController.saveFormAnswer)
 router.get('/attempts/:attemptId/report', authenticate, requireRole(UserRole.STUDENT), compositeController.report)
+router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
 router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
 
@@ -41,6 +42,7 @@ router.get('/:id/export/files/:fileName', authenticate, requireTeacher, composit
 // 教师结果名单 / 只读报告（必须用 :id 前缀，勿复用学生 /attempts/:attemptId/report）
 router.get('/:id/attempts', authenticate, requireTeacher, compositeController.listAttempts)
 router.get('/:id/attempts/:attemptId/report', authenticate, requireTeacher, compositeController.teacherReport)
+router.get('/:id/attempts/:attemptId/analysis-export', authenticate, requireTeacher, compositeController.teacherAnalysisExport)
 
 // 登录学生开始/继续某个已发布综合测评
 router.post('/:id/attempts', authenticate, requireRole(UserRole.STUDENT), compositeController.startAttempt)

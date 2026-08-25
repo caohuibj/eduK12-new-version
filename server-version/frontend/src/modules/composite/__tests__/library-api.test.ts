@@ -11,7 +11,7 @@ const { mockClient } = vi.hoisted(() => ({
 
 vi.mock('../../../api/client', () => ({ default: mockClient }))
 
-import { compositeApi } from '../api'
+import { compositeAnalysisExportPath, participantCompositeAnalysisExportPath, publicCompositeAnalysisExportPath, compositeApi } from '../api'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -59,6 +59,17 @@ describe('composite library api', () => {
 
     await compositeApi.teacherReport('composite-1', 'attempt-1', 'snapshot-2')
     expect(mockClient.get).toHaveBeenCalledWith('/composite-assessments/composite-1/attempts/attempt-1/report?snapshotId=snapshot-2')
+  })
+
+  it('builds the analysis export path with the selected Snapshot', () => {
+    expect(compositeAnalysisExportPath('composite-1', 'attempt-1', 'xlsx', 'snapshot-2'))
+      .toBe('/composite-assessments/composite-1/attempts/attempt-1/analysis-export?format=xlsx&snapshotId=snapshot-2')
+    expect(compositeAnalysisExportPath('composite-1', 'attempt-1', 'zip'))
+      .toBe('/composite-assessments/composite-1/attempts/attempt-1/analysis-export?format=zip')
+    expect(participantCompositeAnalysisExportPath('attempt-1', 'json'))
+      .toBe('/composite-assessments/attempts/attempt-1/analysis-export?format=json')
+    expect(publicCompositeAnalysisExportPath('attempt-1', 'zip'))
+      .toBe('/public/composite-assessments/attempts/attempt-1/analysis-export?format=zip')
   })
 
   it('posts an empty body for administrative reanalysis', async () => {

@@ -277,6 +277,25 @@ describe('composite export service', () => {
     expect(data.trialCount).toBe(0)
   })
 
+  it('omits the product-index score column for a frozen BART report', async () => {
+    const template: any = makeTemplate(false)
+    template.items[0].cognitiveAssignment = {
+      title: 'BART 泵压任务',
+      profile: 'standard',
+      resolvedReportSnapshotEncrypted: encryptCognitivePayload({
+        profile: 'standard',
+        reportDefinition: { showProductIndex: false },
+        metricDefinitions: {},
+      }),
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+
+    expect(data.fields.some((field) => field.name === 'C001_score')).toBe(false)
+    expect(data.rows[0]).not.toHaveProperty('C001_score')
+  })
+
   it('uses the frozen package slot label instead of a live wrapper title', async () => {
     const template: any = makeTemplate(false)
     template.reportPackageKey = 'attention_stability_v1'

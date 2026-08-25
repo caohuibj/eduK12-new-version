@@ -74,6 +74,13 @@ export interface CompositePublicInfo {
 
 export type CompositeReportAudience = 'participant' | 'teacher' | 'researcher'
 
+export type CompositeAnalysisExportFormat = 'json' | 'zip' | 'xlsx'
+
+export interface CompositeAnalysisExportDownload {
+  blob: Blob
+  fileName: string
+}
+
 export interface CompositeSnapshotMetadata {
   id: string
   attemptId: string
@@ -130,7 +137,7 @@ export interface CompositePackageReport {
     warnings: string[]
   }
   cognitiveDomains: CompositePackageDomain[]
-  recommendations: Array<{ priority: string; text: string; evidenceRefs?: string[]; ruleId?: string }>
+  recommendations: Array<{ priority: string; text: string; evidenceRefs?: string[]; ruleId?: string; construct?: string }>
   limitations: string[]
   sourceSummary?: Array<{
     sourceType: 'behavioral' | 'self_report'

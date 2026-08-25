@@ -66,6 +66,8 @@ export interface SingleTaskReportDefinition {
   headlineMetric?: string
   primaryMetrics: string[]
   secondaryMetrics: string[]
+  /** Defaults to true for existing tasks; descriptive tasks may suppress it. */
+  showProductIndex?: boolean
   practicalTips?: string[]
   disclaimer: string
 }

@@ -28,7 +28,7 @@ export const cognitiveApi = {
       scoringVersion: string
       recommendedForCreate: boolean
       profiles: Array<{ profile: 'experience' | 'standard' | 'research'; estimatedMinutes: [number, number]; reportCaveats: string[] }>
-      reportDefinition: { title: string; primaryMetrics: string[]; secondaryMetrics: string[]; disclaimer: string }
+      reportDefinition: { title: string; primaryMetrics: string[]; secondaryMetrics: string[]; showProductIndex?: boolean; disclaimer: string }
     }> }>('/cognitive/tests'),
   listConfigs: () =>
     apiClient.get<{ list: Array<{

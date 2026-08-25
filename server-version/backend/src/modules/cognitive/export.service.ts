@@ -314,7 +314,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
   }
 }
 
-const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean) => {
+const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean, includeProductIndex: boolean) => {
   builder.add('U_id', '用户ID', 'string', 32)
   if (!anonymize) builder.add('U_name', '姓名', 'string', 40)
   builder.add('A_assignment_id', '认知测评任务ID', 'string', 40)
@@ -323,7 +323,7 @@ const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean) => {
   builder.add('A_course', '课程名称', 'string', 80)
   builder.add('A_test_type', '认知测验类型', 'string', 30)
   builder.add('A_attempt', '尝试次数', 'numeric', 4, 0)
-  builder.add('A_score', '测评得分', 'numeric', 8, 2)
+  if (includeProductIndex) builder.add('A_score', '测评得分', 'numeric', 8, 2)
   builder.add('A_config_version', '配置版本', 'string', 20)
   builder.add('A_engine_version', '引擎版本', 'string', 20)
   builder.add('A_scoring_version', '评分版本', 'string', 20)
@@ -352,6 +352,7 @@ const reportContextFor = (assignment: Awaited<ReturnType<typeof getAssignment>>,
       : entry?.randomizationAlgorithmVersion ?? null,
     metricDefinitions: frozen?.metricDefinitions ?? entry?.metricDefinitions ?? {},
     qualityDefinitions: frozen?.qualityDefinitions ?? entry?.qualityDefinitions ?? {},
+    showProductIndex: (frozen?.reportDefinition ?? entry?.reportDefinition)?.showProductIndex !== false,
   }
 }
 
@@ -423,7 +424,8 @@ const fillBaseRow = (
   row: Record<string, unknown>,
   assignment: Awaited<ReturnType<typeof getAssignment>>,
   session: DecodedCognitiveExportSession,
-  anonymize: boolean
+  anonymize: boolean,
+  includeProductIndex: boolean,
 ) => {
   row.U_id = session.anonymousCode || (session.userId
     ? anonymize
@@ -437,11 +439,11 @@ const fillBaseRow = (
   row.A_course = assignment.course?.title || null
   row.A_test_type = session.testType
   row.A_attempt = session.attemptNo
-  row.A_score = session.score
+  const context = reportContextFor(assignment, session)
+  if (includeProductIndex && context.showProductIndex) row.A_score = session.score
   row.A_config_version = session.configVersion
   row.A_engine_version = session.engineVersion
   row.A_scoring_version = session.scoringVersion
-  const context = reportContextFor(assignment, session)
   row.A_profile = context.profile
   row.A_metric_definition_version = context.metricDefinitionVersion
   row.A_quality_definition_version = context.qualityDefinitionVersion
@@ -459,13 +461,14 @@ const buildRows = (
   assignment: Awaited<ReturnType<typeof getAssignment>>,
   sessions: DecodedCognitiveExportSession[],
   detail: CognitiveExportDetail,
-  anonymize: boolean
+  anonymize: boolean,
+  includeProductIndex: boolean,
 ): Record<string, unknown>[] => {
   return sessions.map((session) => {
     const row: Record<string, unknown> = {}
     for (const field of builder.fields) row[field.name] = null
 
-    fillBaseRow(row, assignment, session, anonymize)
+    fillBaseRow(row, assignment, session, anonymize, includeProductIndex)
 
     const context = reportContextFor(assignment, session)
     for (const [key, value] of Object.entries(session.metrics)) {
@@ -502,11 +505,14 @@ export async function getCognitiveExportData(
   const sessions = await getSessions(assignmentId, detail, options.dateRange)
   const decodedSessions = sessions.map(decodeSession)
   const builder = new ExportFieldBuilder()
+  const includeProductIndex = decodedSessions.length === 0
+    ? assignment.config?.testType !== 'bart'
+    : decodedSessions.some((session) => reportContextFor(assignment, session).showProductIndex)
 
-  addBaseFields(builder, anonymize)
+  addBaseFields(builder, anonymize, includeProductIndex)
   for (const session of decodedSessions) addSessionFields(builder, session, detail, assignment)
 
-  const rows = buildRows(builder, assignment, decodedSessions, detail, anonymize)
+  const rows = buildRows(builder, assignment, decodedSessions, detail, anonymize, includeProductIndex)
   const trialCount = decodedSessions.reduce((sum, session) => sum + session.trials.length, 0)
   assertExportLimits({
     records: decodedSessions.length,
@@ -590,7 +596,7 @@ export const buildCognitiveResearchPackage = (
       A_assignment_id: assignment.id,
       A_test_type: session.testType,
       A_attempt: session.attemptNo,
-      A_score: session.score,
+      ...(context.showProductIndex ? { A_score: session.score } : {}),
       A_profile: context.profile,
       A_config_version: session.configVersion,
       A_engine_version: session.engineVersion,

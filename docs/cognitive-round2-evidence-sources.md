@@ -220,6 +220,36 @@ NIH Toolbox 认知电池的专家设计优先覆盖执行功能、情景记忆�
 
 PR11/PR12 开始前，表中仍写“补齐”的条目必须升级为具体原始研究和最终 stimulus/内容记录；否则代码可以 DRAFT 合入，但 config 不得 PUBLISHED/recommended。
 
+### 4.1 PR12 `trailmaking`
+
+**范式来源**：采用 Trail Making 的数字顺序与数字—字母交替结构，参考 PEBL executive battery 的开放范式实现记录：https://pmc.ncbi.nlm.nih.gov/articles/PMC3705215/。该来源只用于确认范式和实施注意事项，不复制商业题册、题目布局或计分转换。
+
+**自制刺激策略**：`trailmaking-generated-v1.0.0` 使用内部生成的 12/24 项字母数字目标集合和固定网格位置；Session `randomSeed` 冻结每一部分的目标顺序。正式 payload 只记录目标 ID、相对时间、粗粒度 pointer/device 类别和中断状态，不保存坐标轨迹、User-Agent、屏幕指纹或设备标识。
+
+**Pilot 要求**：至少覆盖鼠标、触屏、触控笔和键盘可访问路径；比较桌面、平板和手机上的可读性、误触、单步超时和完成率。Pilot 必须区分动作速度、设备和指针方式影响，不能把设备差异当作 motor 能力证据。
+
+**不可声称**：不输出神经心理学 Trail Making 等价值、motor 能力结论、执行功能诊断、年龄常模或百分位。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`；只有设备/年龄带 pilot、可访问性、重测和内容审查通过后才能创建新的 PUBLISHED configVersion。
+
+### 4.2 PR12 `reversallearning`
+
+**范式来源**：采用固定 acquisition/reversal 两阶段的概率反馈学习范式；阶段长度、反馈概率和连续正确 criterion 作为协议参数冻结，首版不运行时自适应停止。任务名和指标仅描述本次选择、反馈、准确性、遗漏与反转成本，不宣称等价于任何商业神经心理电池。
+
+**自制刺激策略**：`reversal-symbols-v1.0.0` 使用内部生成的两种非语言符号和左右位置。服务端按 Session seed 重建每个 trial 的位置、潜在正确选项和反馈 roll；客户端只提交 `choice`、`rtMs` 和 `interrupted`，不提交阶段、正确答案或反馈结论。
+
+**Pilot 要求**：分别在青少年和成人样本检查 acquisition/reversal 的有效试次比例、反馈概率理解、遗漏、恒定选择、criterion 达成率、左右位置偏好、设备输入延迟和中断恢复。Pilot 方案在开始前应记录两段 criterion 的预期达标率和允许的不足比例；若大量样本因固定 criterion 进入 `insufficient`，应作为协议/pilot 结果复核，不把它误判为实现缺陷。criterion 未达到时指标必须保持 `null`，不得改写为零或解释为人格特征。
+
+**不可声称**：不输出人格、冲动性、风险偏好、学习能力等级、诊断、IQ、年龄常模或百分位；`reversalCost` 只表示本任务两阶段准确性差异。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，不进入 Domain mapping、Evidence、Recommendation 或综合分析协议。
+
+### 4.3 PR12 `bart`
+
+**范式来源**：参考 BART 的重测和信度研究记录：https://pmc.ncbi.nlm.nih.gov/articles/PMC4244869/。工程实现使用虚拟泵压计数，不产生真实货币、奖品或课程奖励，也不复制商业 BART 的刺激素材、奖励规则或常模。
+
+**自制刺激策略**：`bart-generated-v1.0.0` 使用内部生成的 balloon 序列和 seed 冻结的爆破阈值。服务端根据阈值验证 cashout/explosion 一致性；未完成 balloon 只计遗漏，不推断爆破。首版阈值范围为 `1..maxPumps`，因此 0 泵现金化是合法的未泵压行为，不表示爆破或异常。正式 payload 只保存泵压数、完成、现金化和中断状态。
+
+**Pilot 要求**：覆盖青少年和成人、鼠标/触屏/键盘可操作路径，检查动画节奏、超时、现金化理解、连续泵压模式、设备误触和 outcome 恢复。Pilot 只能评估协议可用性、数据完整性和重测特征，不能把指标转换为风险分层。
+
+**不可声称**：所有 BART 指标均为 `descriptive`；报告只描述泵压、爆破、现金化、遗漏和中断，不显示“任务表现指数”，不输出“风险高/低”“好/坏”、冲动性等级、人格判断、临床结论或处分建议。当前 config 为 `DRAFT`、`referenceMode: none`、`recommendedForCreate: false`，不进入任何已发布 ReportPackage 或综合分析。
+
 ---
 
 ## 5. 明确排除或延期

@@ -156,9 +156,22 @@ export interface RecommendationResult {
   ruleId: string
   ruleVersion: string
   audience: 'participant' | 'teacher' | 'researcher'
+  /** Scope of the rule for researcher-side audit; safe projections omit it. */
+  construct?: RecommendationConstruct
   priority: 'info' | 'watch' | 'follow_up'
   evidenceRefs: string[]
   text: string
+}
+
+export type RecommendationAudience = RecommendationResult['audience']
+export type RecommendationConstruct = CognitiveDomainKey | 'domain' | 'cross_source'
+
+export interface RecommendationRuleContext {
+  packageKey: string
+  packageVersion: string
+  cognitiveDomains: CognitiveDomainResult[]
+  crossSourceFindings: CrossSourceFinding[]
+  evidence: EvidenceItem[]
 }
 
 export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.0'
@@ -269,8 +282,11 @@ export interface AnalysisProtocolDefinition {
 export interface RecommendationRuleDefinition {
   id: string
   version: string
-  construct: CognitiveDomainKey
-  audiences: Array<'participant' | 'teacher' | 'researcher'>
+  construct: RecommendationConstruct
+  audiences: RecommendationAudience[]
   priority: RecommendationResult['priority']
-  text: string
+  domainMatches?: (domain: CognitiveDomainResult, context: RecommendationRuleContext) => boolean
+  matches: (context: RecommendationRuleContext) => boolean
+  evidenceRefs: (context: RecommendationRuleContext) => string[]
+  textByAudience: Record<RecommendationAudience, (context: RecommendationRuleContext) => string>
 }

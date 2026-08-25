@@ -239,4 +239,20 @@ describe('Round 2 cognitive analysis registries', () => {
       ]),
     ).toThrow(/unresolved task: attention_stability_v1\/1.0.0\/not-implemented/)
   })
+
+  it('scopes PR11 recommendation rules to multi-source protocols and requires a version bump before publish', () => {
+    const cognitiveOnly = listAnalysisProtocolDefinitions().find((protocol) => protocol.scaleSlots.length === 0)
+    const multisource = listAnalysisProtocolDefinitions().find((protocol) => protocol.scaleSlots.length > 0)
+    if (!cognitiveOnly || !multisource) throw new Error('missing protocol fixtures')
+
+    expect(() => validateAnalysisProtocolDefinitions([{
+      ...cognitiveOnly,
+      recommendationRuleVersion: '1.1.0',
+    }])).toThrow(/multi-source protocol/)
+
+    expect(() => validateAnalysisProtocolDefinitions([{
+      ...multisource,
+      status: 'PUBLISHED',
+    }])).toThrow(/must bump protocol version/)
+  })
 })

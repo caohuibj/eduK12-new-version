@@ -94,6 +94,7 @@ const projectSafeSingleTaskReport = (
         .map((flag: any) => ({ key: flag.key, label: flag.label, active: flag.active }))
       : [],
     headline: participantMetric(report.headline),
+    ...(report.showProductIndex !== undefined ? { showProductIndex: report.showProductIndex === true } : {}),
     // This is a score-derived /100 index and is intentionally excluded from
     // participant and teacher package DTOs.
     productIndex: null,
@@ -171,7 +172,10 @@ const projectResearchSingleTaskReport = (report: any) => {
     qualityState: report.qualityState,
     qualityFlags: projectQualityFlags(report.qualityFlags),
     headline: projectResearchMetric(report.headline),
-    productIndex: report.productIndex && typeof report.productIndex === 'object' && !Array.isArray(report.productIndex)
+    ...(report.showProductIndex !== undefined ? { showProductIndex: report.showProductIndex === true } : {}),
+    productIndex: report.showProductIndex === false
+      ? null
+      : report.productIndex && typeof report.productIndex === 'object' && !Array.isArray(report.productIndex)
       ? { label: report.productIndex.label, value: report.productIndex.value }
       : null,
     primaryMetrics: metrics(report.primaryMetrics),
@@ -267,7 +271,7 @@ const projectResearchCognitiveUnit = (unit: any) => ({
   label: unit.label ?? null,
   sessionId: unit.sessionId ?? null,
   testType: unit.testType ?? null,
-  score: unit.score ?? null,
+  score: unit.singleTaskReport?.showProductIndex === false ? null : unit.score ?? null,
   metrics: stripPayloadEncrypted(unit.metrics ?? {}),
   qualityFlags: stripPayloadEncrypted(unit.qualityFlags ?? {}),
   finishedAt: unit.finishedAt ?? null,
@@ -411,6 +415,7 @@ const projectResearcherRecommendation = (recommendation: CognitivePackageAnalysi
   ruleId: recommendation.ruleId,
   ruleVersion: recommendation.ruleVersion,
   audience: recommendation.audience,
+  ...(recommendation.construct ? { construct: recommendation.construct } : {}),
   priority: recommendation.priority,
   evidenceRefs: stringArray(recommendation.evidenceRefs),
   text: recommendation.text,
@@ -500,6 +505,20 @@ const buildPackageReport = (input: CompositeReportProjectionInput): CompositePac
     provenance: projectStringRecord(analysis.provenance),
   }
 }
+
+/**
+ * Project only the frozen package analysis using the same audience whitelist
+ * as the HTTP report. Analysis exports call this pure helper so a file cannot
+ * accidentally grow a broader field set than the on-screen report.
+ */
+export const projectCompositePackageAnalysis = (input: {
+  packageSnapshot: CompositeReportProjectionInput['packageSnapshot']
+  snapshot: CompositeReportProjectionInput['snapshot']
+  audience: CompositeReportAudience
+}): CompositePackageReport => buildPackageReport({
+  report: {},
+  ...input,
+})
 
 const withLegacyModules = (report: Record<string, any>): Record<string, any> => {
   Object.defineProperty(report, 'modules', {

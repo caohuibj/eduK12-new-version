@@ -19,6 +19,9 @@ import { pairedassociateRegistryEntry } from './tasks/pairedassociate/pairedasso
 import { matrixRegistryEntry } from './tasks/matrix/matrix.registry'
 import { mentalrotationRegistryEntry } from './tasks/mentalrotation/mentalrotation.registry'
 import { towerRegistryEntry } from './tasks/tower/tower.registry'
+import { trailmakingRegistryEntry } from './tasks/trailmaking/trailmaking.registry'
+import { reversallearningRegistryEntry } from './tasks/reversallearning/reversallearning.registry'
+import { bartRegistryEntry } from './tasks/bart/bart.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -53,6 +56,7 @@ export interface ReportDefinition {
   headlineMetric: string
   summaryMetrics: string[]
   indexLabel?: string
+  showProductIndex?: boolean
   practicalTips?: string[]
   disclaimer?: string
 }
@@ -114,3 +118,6 @@ registerCognitiveRunner(pairedassociateRegistryEntry)
 registerCognitiveRunner(matrixRegistryEntry)
 registerCognitiveRunner(mentalrotationRegistryEntry)
 registerCognitiveRunner(towerRegistryEntry)
+registerCognitiveRunner(trailmakingRegistryEntry)
+registerCognitiveRunner(reversallearningRegistryEntry)
+registerCognitiveRunner(bartRegistryEntry)

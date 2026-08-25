@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   addCompositeItemSchema,
+  compositeAnalysisExportQuerySchema,
+  compositeParticipantAnalysisExportQuerySchema,
   compositeExportRequestSchema,
   compositeReanalysisBodySchema,
   compositeReportQuerySchema,
@@ -82,6 +84,15 @@ describe('composite assessment schemas', () => {
     expect(() => compositeReportQuerySchema.parse({ attemptId: 'attempt-1' })).toThrow()
     expect(compositeReanalysisBodySchema.parse({})).toEqual({})
     expect(() => compositeReanalysisBodySchema.parse({ snapshotId: 'snapshot-1' })).toThrow()
+  })
+
+  it('keeps analysis export formats strict and forbids Snapshot selection for participant routes', () => {
+    expect(compositeAnalysisExportQuerySchema.parse({})).toEqual({ format: 'zip' })
+    expect(compositeAnalysisExportQuerySchema.parse({ format: 'json', snapshotId: 'snapshot-1' })).toEqual({ format: 'json', snapshotId: 'snapshot-1' })
+    expect(() => compositeAnalysisExportQuerySchema.parse({ format: 'csv' })).toThrow()
+    expect(() => compositeAnalysisExportQuerySchema.parse({ format: 'zip', attemptId: 'attempt-1' })).toThrow()
+    expect(compositeParticipantAnalysisExportQuerySchema.parse({})).toEqual({ format: 'zip' })
+    expect(() => compositeParticipantAnalysisExportQuerySchema.parse({ snapshotId: 'snapshot-1' })).toThrow()
   })
 
   it('allows omitting courseId on copy so self-copy can keep the source course', () => {

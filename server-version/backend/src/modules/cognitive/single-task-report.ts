@@ -21,6 +21,7 @@ export interface CognitiveSingleTaskReport {
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
   headline: CognitiveReportMetricView | null
   productIndex: { label: '任务表现指数'; value: number } | null
+  showProductIndex: boolean
   primaryMetrics: CognitiveReportMetricView[]
   secondaryMetrics: CognitiveReportMetricView[]
   caveats: string[]
@@ -130,6 +131,7 @@ export const buildCognitiveSingleTaskReport = (input: {
   const primaryKeys = (reportDefinition?.primaryMetrics ?? []).filter(metricVisible)
   const secondaryKeys = (reportDefinition?.secondaryMetrics ?? []).filter(metricVisible)
   const headlineKey = reportDefinition?.headlineMetric || primaryKeys[0]
+  const showProductIndex = reportDefinition?.showProductIndex !== false
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
     .map(([key, value]) => ({
@@ -150,7 +152,8 @@ export const buildCognitiveSingleTaskReport = (input: {
     qualityState: interpretable ? 'interpretable' : 'insufficient',
     qualityFlags,
     headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions) : null,
-    productIndex: interpretable ? { label: '任务表现指数', value: input.score } : null,
+    productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
+    showProductIndex,
     primaryMetrics: primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
     secondaryMetrics: secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
     caveats: input.frozenReport?.reportCaveats ?? frozen.reportCaveats ?? [],

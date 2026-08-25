@@ -818,6 +818,27 @@ async function main() {
     name: 'Three-Peg Tower Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
     config: { problemCount: 10, maxMovesFactor: 3, inactivityGuardMs: 90000, stimulusSetVersion: 'three-peg-tower-v1.0.0', report: NONE_REPORT },
   })
+  await seedDraftCognitiveConfig('trailmaking', '1.0.0', {
+    name: 'Trail Making Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      form: 'AB', partAItemCount: 12, partBItemCount: 12, stepTimeoutMs: 15000,
+      stimulusSetVersion: 'trailmaking-generated-v1.0.0', report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('reversallearning', '1.0.0', {
+    name: 'Probabilistic Reversal Learning Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      totalTrials: 120, acquisitionTrials: 60, reversalTrials: 60, criterionConsecutiveCorrect: 6,
+      rewardProbability: 0.8, trialTimeoutMs: 3000, stimulusSetVersion: 'reversal-symbols-v1.0.0', report: NONE_REPORT,
+    },
+  })
+  await seedDraftCognitiveConfig('bart', '1.0.0', {
+    name: 'Balloon Pumping Pilot v1.0.0', status: 'DRAFT', engineVersion: '1.0.0', scoringVersion: '1.0.0',
+    config: {
+      balloonCount: 30, maxPumps: 12, trialTimeoutMs: 15000, pumpAnimationMs: 200,
+      stimulusSetVersion: 'bart-generated-v1.0.0', report: NONE_REPORT,
+    },
+  })
   console.log('数据库初始化完成。')
 }
 

@@ -34,9 +34,12 @@ const CognitiveSingleTaskReportCard: React.FC<{
           {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议重新测量。'}
         </div>
         {activeFlags.length > 0 && (
-          <ul className="mt-2 text-xs text-gray-500 list-disc list-inside">
-            {activeFlags.map((flag) => <li key={flag.key}>{flag.label}</li>)}
-          </ul>
+          <div className="mt-2">
+            <p className="text-xs text-gray-500">解释提示（不自动表示结果无效）</p>
+            <ul className="mt-1 text-xs text-gray-500 list-disc list-inside">
+              {activeFlags.map((flag) => <li key={flag.key}>{flag.label}</li>)}
+            </ul>
+          </div>
         )}
       </section>
 
@@ -47,12 +50,14 @@ const CognitiveSingleTaskReportCard: React.FC<{
         </div>
       )}
 
-      <div className={`rounded-lg mb-6 ${interpretable ? 'bg-primary/5 p-5' : 'bg-gray-50 p-4'}`}>
-        <div className="text-sm text-gray-500">任务表现指数</div>
-        <div className={`font-bold ${interpretable ? 'text-4xl text-primary' : 'text-lg text-gray-400'}`}>
-          {report.productIndex ? `${Math.round(report.productIndex.value)} / 100` : '暂不显示'}
+      {report.showProductIndex !== false && (
+        <div className={`rounded-lg mb-6 ${interpretable ? 'bg-primary/5 p-5' : 'bg-gray-50 p-4'}`}>
+          <div className="text-sm text-gray-500">任务表现指数</div>
+          <div className={`font-bold ${interpretable ? 'text-4xl text-primary' : 'text-lg text-gray-400'}`}>
+            {report.productIndex ? `${Math.round(report.productIndex.value)} / 100` : '暂不显示'}
+          </div>
         </div>
-      </div>
+      )}
 
       {report.primaryMetrics.length > 0 && (
         <section className="mb-6">

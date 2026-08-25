@@ -73,6 +73,7 @@ const CognitiveResult: React.FC = () => {
         headlineMetric: session.reportDefinition.headlineMetric || session.reportDefinition.primaryMetrics?.[0] || '',
         primaryMetrics: session.reportDefinition.primaryMetrics || session.reportDefinition.summaryMetrics || [],
         secondaryMetrics: session.reportDefinition.secondaryMetrics || [],
+        showProductIndex: session.reportDefinition.showProductIndex,
         disclaimer: session.reportDefinition.disclaimer,
       }
     : entry?.reportDefinition
@@ -81,6 +82,7 @@ const CognitiveResult: React.FC = () => {
           headlineMetric: entry.reportDefinition.headlineMetric,
           primaryMetrics: entry.reportDefinition.summaryMetrics,
           secondaryMetrics: [],
+          showProductIndex: entry.reportDefinition.showProductIndex,
           disclaimer: entry.reportDefinition.disclaimer,
         }
       : undefined
@@ -161,12 +163,14 @@ const CognitiveResult: React.FC = () => {
           </div>
         )}
 
-        <div className={`rounded-lg mb-6 ${interpretable ? 'bg-primary/5 p-5' : 'bg-gray-50 p-4'}`}>
-          <div className="text-sm text-gray-500">任务表现指数</div>
-          <div className={`font-bold ${interpretable ? 'text-4xl text-primary' : 'text-lg text-gray-400'}`}>
-            {interpretable ? `${Math.round(result.score)} / 100` : '暂不显示'}
+        {report?.showProductIndex !== false && (
+          <div className={`rounded-lg mb-6 ${interpretable ? 'bg-primary/5 p-5' : 'bg-gray-50 p-4'}`}>
+            <div className="text-sm text-gray-500">任务表现指数</div>
+            <div className={`font-bold ${interpretable ? 'text-4xl text-primary' : 'text-lg text-gray-400'}`}>
+              {interpretable ? `${Math.round(result.score)} / 100` : '暂不显示'}
+            </div>
           </div>
-        </div>
+        )}
 
         {report && primaryKeys.length > 0 && (
           <section className="mb-6">

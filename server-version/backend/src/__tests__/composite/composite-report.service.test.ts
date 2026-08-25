@@ -18,6 +18,8 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import { UserRole } from '@prisma/client'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import {
+  getAnalysisExportForParticipant,
+  getAnalysisExportForTeacher,
   getReport,
   getReportForTeacher,
   listPackageAnalysisSnapshotsForTeacher,
@@ -194,5 +196,40 @@ describe('PR9 package report service', () => {
     mockPrisma.compositeAnalysisSnapshot.findFirst.mockResolvedValue(null)
     await expect(getReport('attempt-1', { userId: 'student-1' }))
       .rejects.toThrow('缺少完成时分析快照')
+  })
+
+  it('uses the completion Snapshot for participant exports and exact history for staff exports', async () => {
+    const participant = await getAnalysisExportForParticipant('attempt-1', { userId: 'student-1' })
+    expect(participant).toMatchObject({ audience: 'participant', snapshot: { id: 'snapshot-completion' } })
+
+    const teacher = await getAnalysisExportForTeacher(
+      'teacher-a',
+      UserRole.TEACHER,
+      'composite-1',
+      'attempt-1',
+      'snapshot-reanalysis',
+    )
+    expect(teacher).toMatchObject({ audience: 'teacher', snapshot: { id: 'snapshot-reanalysis' } })
+
+    await expect(getAnalysisExportForTeacher('teacher-b', UserRole.TEACHER, 'composite-1', 'attempt-1'))
+      .rejects.toMatchObject({ statusCode: 403 })
+  })
+
+  it('rejects collection-only analysis exports before Snapshot lookup', async () => {
+    state.attempt = {
+      ...state.attempt,
+      compositeAssessment: {
+        ...state.attempt.compositeAssessment,
+        reportPackageKey: null,
+        reportPackageVersion: null,
+        reportPackageProfile: null,
+        reportPackageSnapshotEncrypted: null,
+      },
+    }
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(state.attempt)
+    mockPrisma.compositeAnalysisSnapshot.findFirst.mockClear()
+    await expect(getAnalysisExportForTeacher('admin-1', UserRole.ADMIN, 'composite-1', 'attempt-1', 'snapshot-1'))
+      .rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.compositeAnalysisSnapshot.findFirst).not.toHaveBeenCalled()
   })
 })

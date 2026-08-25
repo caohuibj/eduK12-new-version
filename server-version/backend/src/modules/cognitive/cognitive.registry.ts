@@ -22,6 +22,9 @@ import {
   matrixRegistryMeta,
   mentalrotationRegistryMeta,
   towerRegistryMeta,
+  trailmakingRegistryMeta,
+  reversallearningRegistryMeta,
+  bartRegistryMeta,
 } from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
@@ -83,6 +86,15 @@ import { scoreMentalrotationV1 } from './scoring/mentalrotation.v1'
 import { towerConfigSchema } from './schemas/tower.config'
 import { towerTrialSchema } from './schemas/tower.trial'
 import { scoreTowerV1 } from './scoring/tower.v1'
+import { trailmakingConfigSchema } from './schemas/trailmaking.config'
+import { trailmakingTrialSchema } from './schemas/trailmaking.trial'
+import { scoreTrailmakingV1 } from './scoring/trailmaking.v1'
+import { reversallearningConfigSchema } from './schemas/reversallearning.config'
+import { reversallearningTrialSchema } from './schemas/reversallearning.trial'
+import { scoreReversallearningV1 } from './scoring/reversallearning.v1'
+import { bartConfigSchema } from './schemas/bart.config'
+import { bartTrialSchema } from './schemas/bart.trial'
+import { scoreBartV1 } from './scoring/bart.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -345,3 +357,6 @@ registerEntry({
 registerEntry({ testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: matrixConfigSchema, trialSchema: matrixTrialSchema, score: scoreMatrixV1, ...matrixRegistryMeta })
 registerEntry({ testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta })
 registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, score: scoreTowerV1, ...towerRegistryMeta })
+registerEntry({ testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, score: scoreTrailmakingV1, ...trailmakingRegistryMeta })
+registerEntry({ testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, score: scoreReversallearningV1, ...reversallearningRegistryMeta })
+registerEntry({ testType: 'bart', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: bartConfigSchema, trialSchema: bartTrialSchema, score: scoreBartV1, ...bartRegistryMeta })

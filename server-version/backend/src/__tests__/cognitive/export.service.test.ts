@@ -125,6 +125,54 @@ describe('cognitive export service', () => {
     expect(query.include).not.toHaveProperty('trials')
   })
 
+  it('omits the product-index field from BART wide and research exports', async () => {
+    const bartAssignment = {
+      ...assignment,
+      config: {
+        testType: 'bart',
+        configVersion: '1.0.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+      },
+    }
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(bartAssignment)
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([{
+      ...session(),
+      testType: 'bart',
+      scoreEncrypted: encryptCognitivePayload(0),
+      metricsEncrypted: encryptCognitivePayload({ adjustedPumps: 3.4, explosionCount: 1, cashoutCount: 9 }),
+      qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true, interrupted: false }),
+    }])
+
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary', anonymize: true })
+    expect(data.fields.map((field) => field.name)).not.toContain('A_score')
+    expect(data.rows[0]).not.toHaveProperty('A_score')
+    expect(exportCognitiveToCSV(data).split('\n')[0]).not.toContain('A_score')
+
+    const pack = buildCognitiveResearchPackage(
+      { ...bartAssignment, profile: 'standard', resolvedReportSnapshotEncrypted: null },
+      [{
+        id: 'bart-session',
+        userId: 'student-1',
+        anonymousCode: null,
+        attemptNo: 1,
+        testType: 'bart',
+        configVersion: '1.0.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        startedAt: new Date('2026-08-20T10:00:00.000Z'),
+        finishedAt: new Date('2026-08-20T10:01:00.000Z'),
+        user: { id: 'student-1', nickname: '小明', username: 'student-1' },
+        score: 0,
+        metrics: { adjustedPumps: 3.4 },
+        qualityFlags: { interpretable: true, interrupted: false },
+        trials: [],
+      }] as never,
+      true,
+    )
+    expect(pack.sessionRows[0]).not.toHaveProperty('A_score')
+  })
+
   it('exports every raw trial value in full mode', async () => {
     mockPrisma.cognitiveSession.findMany.mockResolvedValue([session(true)])
 

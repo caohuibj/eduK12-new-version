@@ -68,6 +68,7 @@ import type {
   CompositeReportAudience,
   CompositeSnapshotMetadata,
 } from './composite-report.types'
+import type { CompositeAnalysisExportContext } from './composite-analysis-export.service'
 
 type Db = any
 
@@ -2216,10 +2217,49 @@ const projectHttpReport = async (
   })
 }
 
+const packageAnalysisExportContextFor = async (
+  attempt: any,
+  audience: CompositeReportAudience,
+  snapshotId?: string,
+): Promise<CompositeAnalysisExportContext> => {
+  const packageFields = [
+    attempt.compositeAssessment.reportPackageKey,
+    attempt.compositeAssessment.reportPackageVersion,
+    attempt.compositeAssessment.reportPackageProfile,
+    attempt.compositeAssessment.reportPackageSnapshotEncrypted,
+  ]
+  if (packageFields.every((value) => value === null || value === undefined)) {
+    throw compositeBadRequest('collection-only 综合测评不支持综合分析导出')
+  }
+  if (packageFields.some((value) => !value)) {
+    throw compositeBadRequest('综合测评的报告包冻结信息不完整')
+  }
+  // The collection-only and incomplete-package cases are rejected above;
+  // the supported export path therefore always returns a package context.
+  const packageContext = (await readPackageSnapshotForReport(attempt, snapshotId))!
+  return {
+    attemptId: attempt.id,
+    assessmentId: attempt.compositeAssessment.id,
+    assessmentName: attempt.compositeAssessment.name,
+    audience,
+    packageSnapshot: packageContext.packageSnapshot,
+    snapshot: packageContext.snapshot,
+  }
+}
+
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await findAttempt(attemptId, context)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   return projectHttpReport(attempt, 'participant')
+}
+
+export const getAnalysisExportForParticipant = async (
+  attemptId: string,
+  context: { userId?: string; recoveryTokenHash?: string },
+): Promise<CompositeAnalysisExportContext> => {
+  const attempt = await findAttempt(attemptId, context)
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  return packageAnalysisExportContextFor(attempt, 'participant')
 }
 
 /**
@@ -2420,6 +2460,23 @@ export const getReportForTeacher = async (
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment)
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
+}
+
+export const getAnalysisExportForTeacher = async (
+  userId: string,
+  role: UserRole,
+  compositeId: string,
+  attemptId: string,
+  snapshotId?: string,
+): Promise<CompositeAnalysisExportContext> => {
+  assertTeacher(role)
+  const composite = await loadComposite(compositeId)
+  assertOwner(composite, userId, role)
+  const attempt = await loadAttemptWithChildren(attemptId)
+  if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  assertSupportedComposite(attempt.compositeAssessment)
+  return packageAnalysisExportContextFor(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 
 export const getExportContext = async (userId: string, role: UserRole, id: string) => {

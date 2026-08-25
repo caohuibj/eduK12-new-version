@@ -10,7 +10,10 @@ import {
   COGNITIVE_EVIDENCE_MAPPING_VERSION,
   listCognitiveEvidenceMappings,
 } from './evidence-mapping.registry'
-import { COGNITIVE_RECOMMENDATION_RULE_VERSION } from './recommendation.registry'
+import {
+  COGNITIVE_RECOMMENDATION_RULE_VERSION,
+  LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
+} from './recommendation.registry'
 import { getScaleDimensionEvidenceMapping } from './scale-evidence-mapping.registry'
 
 const currentSlot = (
@@ -90,7 +93,9 @@ const draftProtocol = (
   outputDomains,
   domainDefinitionVersion: COGNITIVE_DOMAIN_DEFINITION_VERSION,
   evidenceMappingVersion: COGNITIVE_EVIDENCE_MAPPING_VERSION,
-  recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
+  // PR7 cognitive-only protocols retain their historical no-recommendation
+  // contract. New package semantics opt into the PR11 rules explicitly below.
+  recommendationRuleVersion: LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
   disabledReason: 'Round 2 核心任务、分析引擎与发布 Gate 尚未全部完成',
 })
 
@@ -127,6 +132,9 @@ const PROTOCOLS: AnalysisProtocolDefinition[] = [
     outputDomains: ['response_inhibition'],
     domainDefinitionVersion: COGNITIVE_DOMAIN_DEFINITION_VERSION,
     evidenceMappingVersion: COGNITIVE_EVIDENCE_MAPPING_VERSION,
+    // This package is still DRAFT. PR11 changes its recommendation semantics
+    // in-place only while it remains unpublished; bump the protocol/package
+    // version before changing status to PUBLISHED.
     recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
     disabledReason: 'ADEXI 量表已取得使用授权；适用人群与发布材料仍需完成项目审核，PR10 保持 DRAFT。',
   },
@@ -222,9 +230,22 @@ export const validateAnalysisProtocolDefinitions = (
     if (
       protocol.domainDefinitionVersion !== COGNITIVE_DOMAIN_DEFINITION_VERSION ||
       protocol.evidenceMappingVersion !== COGNITIVE_EVIDENCE_MAPPING_VERSION ||
-      protocol.recommendationRuleVersion !== COGNITIVE_RECOMMENDATION_RULE_VERSION
+      ![
+        COGNITIVE_RECOMMENDATION_RULE_VERSION,
+        LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
+      ].includes(protocol.recommendationRuleVersion)
     ) {
       throw new Error(`Analysis protocol registry version mismatch: ${key}`)
+    }
+    if (protocol.recommendationRuleVersion === COGNITIVE_RECOMMENDATION_RULE_VERSION && protocol.scaleSlots.length === 0) {
+      throw new Error(`Current recommendation rules require a multi-source protocol: ${key}`)
+    }
+    if (
+      protocol.status === 'PUBLISHED'
+      && protocol.recommendationRuleVersion === COGNITIVE_RECOMMENDATION_RULE_VERSION
+      && protocol.version === '1.0.0'
+    ) {
+      throw new Error(`Published protocol with PR11 recommendation rules must bump protocol version: ${key}`)
     }
     if (
       protocol.profiles.length === 0 ||

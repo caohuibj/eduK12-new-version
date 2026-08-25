@@ -99,6 +99,15 @@ export const compositeReportQuerySchema = z.object({
   snapshotId: z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/).optional(),
 }).strict()
 
+export const compositeAnalysisExportQuerySchema = z.object({
+  format: z.enum(['json', 'zip', 'xlsx']).default('zip'),
+  snapshotId: z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/).optional(),
+}).strict()
+
+export const compositeParticipantAnalysisExportQuerySchema = z.object({
+  format: z.enum(['json', 'zip', 'xlsx']).default('zip'),
+}).strict()
+
 export const compositeReanalysisBodySchema = z.object({}).strict()
 
 export const compositeExportRequestSchema = z.object({
@@ -151,3 +160,4 @@ export type SetCompositeReportPackageInput = z.infer<typeof setCompositeReportPa
 export type AddCompositeItemInput = z.infer<typeof addCompositeItemSchema>
 export type CopyCompositeInput = z.infer<typeof copyCompositeSchema>
 export type CompositeExportRequest = z.infer<typeof compositeExportRequestSchema>
+export type CompositeAnalysisExportQuery = z.infer<typeof compositeAnalysisExportQuerySchema>

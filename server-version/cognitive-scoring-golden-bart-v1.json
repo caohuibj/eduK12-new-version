@@ -1,0 +1,37 @@
+{
+  "version": "pr12-bart-scoring-v1",
+  "seed": "bart-golden-v1",
+  "config": {
+    "balloonCount": 10,
+    "maxPumps": 6,
+    "trialTimeoutMs": 3000,
+    "pumpAnimationMs": 100,
+    "stimulusSetVersion": "bart-generated-v1.0.0",
+    "report": {
+      "reportVersion": "1.0.0",
+      "referenceMode": "none"
+    }
+  },
+  "responsePattern": "threshold-aware-cashout-or-explosion",
+  "expected": {
+    "score": 0,
+    "metrics": {
+      "adjustedPumps": 3.4444,
+      "explosionCount": 1,
+      "cashoutCount": 9,
+      "meanPumpsAllCompleted": 3.2,
+      "cashoutRate": 0.9,
+      "completedBalloonCount": 10,
+      "omissionRate": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientCompletedBalloons": false,
+      "insufficientCashoutBalloons": false,
+      "excessiveOmissions": false,
+      "constantPumpPattern": false,
+      "invalidOutcome": false,
+      "interrupted": false
+    }
+  }
+}

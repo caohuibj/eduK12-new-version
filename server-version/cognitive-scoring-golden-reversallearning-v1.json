@@ -1,0 +1,44 @@
+{
+  "version": "pr12-reversallearning-scoring-v1",
+  "seed": "reversallearning-golden-v1",
+  "config": {
+    "totalTrials": 40,
+    "acquisitionTrials": 20,
+    "reversalTrials": 20,
+    "criterionConsecutiveCorrect": 6,
+    "rewardProbability": 0.8,
+    "trialTimeoutMs": 3000,
+    "stimulusSetVersion": "reversal-symbols-v1.0.0",
+    "report": {
+      "reportVersion": "1.0.0",
+      "referenceMode": "none"
+    }
+  },
+  "responsePattern": "correct-response-400ms",
+  "expected": {
+    "score": 100,
+    "metrics": {
+      "acquisitionAccuracy": 1,
+      "reversalAccuracy": 1,
+      "reversalCost": 0,
+      "perseverativeErrorCount": 0,
+      "trialsToAcquisitionCriterion": 6,
+      "trialsToReversalCriterion": 6,
+      "feedbackWinRate": 0.775,
+      "omissionRate": 0,
+      "medianRtMs": 400,
+      "validResponseCount": 40
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientAcquisitionTrials": false,
+      "insufficientReversalTrials": false,
+      "lowAccuracy": false,
+      "excessiveOmissions": false,
+      "constantChoice": false,
+      "noAcquisitionCriterion": false,
+      "noReversalCriterion": false,
+      "interrupted": false
+    }
+  }
+}

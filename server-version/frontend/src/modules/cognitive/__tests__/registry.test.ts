@@ -4,6 +4,9 @@ import { FakeTask } from '../tasks/fake/FakeTask'
 import { ReactionTask } from '../tasks/reaction/ReactionTask'
 import { MemoryTask } from '../tasks/memory/MemoryTask'
 import { StroopTask } from '../tasks/stroop/StroopTask'
+import { TrailmakingTask } from '../tasks/trailmaking/TrailmakingTask'
+import { ReversallearningTask } from '../tasks/reversallearning/ReversallearningTask'
+import { BartTask } from '../tasks/bart/BartTask'
 
 describe('cognitive frontend registry', () => {
   it('resolves fake / 1.0.0 to the FakeTask runner', () => {
@@ -43,6 +46,16 @@ describe('cognitive frontend registry', () => {
 
   it('rejects an unknown testType', () => {
     expect(resolveRunner('unknown-task', '1.0.0')).toBeUndefined()
+  })
+
+  it('resolves PR12 runners by exact testType and engineVersion', () => {
+    expect(resolveRunner('trailmaking', '1.0.0')?.RunnerComponent).toBe(TrailmakingTask)
+    expect(resolveRunner('reversallearning', '1.0.0')?.RunnerComponent).toBe(ReversallearningTask)
+    expect(resolveRunner('bart', '1.0.0')?.RunnerComponent).toBe(BartTask)
+    expect(resolveRunner('trailmaking', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('reversallearning', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('bart', '9.9.9')).toBeUndefined()
+    expect(resolveRunner('bart', '1.0.0')?.reportDefinition.showProductIndex).toBe(false)
   })
 
   it('resolves every Round 1 P0/P1 runner and contains no percentile copy', () => {

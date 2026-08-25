@@ -8,6 +8,12 @@ const statusLabel: Record<string, string> = {
   interpretable: '可解释',
 }
 
+const recommendationPriorityLabel: Record<string, string> = {
+  info: '信息',
+  watch: '观察',
+  follow_up: '跟进',
+}
+
 const facetCoverageFor = (domain: PackageReport['cognitiveDomains'][number]) => {
   if (domain.facetCoverage) return domain.facetCoverage
   if (!domain.evidence) return []
@@ -143,7 +149,7 @@ const CompositePackageReport: React.FC<{ report: PackageReport }> = ({ report })
         </div>
       )}
 
-      {(report.recommendations.length > 0 || report.limitations.length > 0) && <div className="card p-6"><h2 className="text-lg font-semibold text-gray-800 mb-3">建议与限制</h2>{report.recommendations.length > 0 && <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">{report.recommendations.map((recommendation, index) => <li key={`${recommendation.priority}-${index}`}>{recommendation.text}</li>)}</ul>}{report.limitations.length > 0 && <ul className="mt-3 list-disc list-inside text-sm text-amber-700 space-y-1">{report.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>}</div>}
+      {(report.recommendations.length > 0 || report.limitations.length > 0) && <div className="card p-6"><h2 className="text-lg font-semibold text-gray-800 mb-3">建议与限制</h2>{report.recommendations.length > 0 && <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">{report.recommendations.map((recommendation, index) => <li key={`${recommendation.priority}-${index}`}><span className="mr-2 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500" data-testid={`recommendation-priority-${index}`}>{recommendationPriorityLabel[recommendation.priority] || recommendation.priority}</span>{recommendation.text}</li>)}</ul>}{report.limitations.length > 0 && <ul className="mt-3 list-disc list-inside text-sm text-amber-700 space-y-1">{report.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>}</div>}
     </section>
   )
 }

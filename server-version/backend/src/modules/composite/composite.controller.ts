@@ -6,6 +6,8 @@ import {
   addCompositeItemSchema,
   compositeExportQuerySchema,
   compositeExportRequestSchema,
+  compositeAnalysisExportQuerySchema,
+  compositeParticipantAnalysisExportQuerySchema,
   compositeFormAnswerSchema,
   compositeReanalysisBodySchema,
   compositeReportQuerySchema,
@@ -26,11 +28,24 @@ import { getPaginationParams } from '../../utils/pagination'
 import * as path from 'path'
 import * as fs from 'fs'
 import { listReportPackageCatalog } from '../cognitive-analysis'
+import { buildCompositeAnalysisExport } from './composite-export.service'
 
 const recoveryFromRequest = (req: Request): string => {
   const value = req.headers['x-recovery-token']
   if (!isValidRecoveryToken(value)) throw new z.ZodError([{ code: 'custom', path: ['recoveryToken'], message: '缺少有效恢复凭证' }])
   return value
+}
+
+const sendAnalysisExport = (
+  res: Response,
+  context: Awaited<ReturnType<typeof service.getAnalysisExportForParticipant>>,
+  format: 'json' | 'zip' | 'xlsx',
+): Response => {
+  const file = buildCompositeAnalysisExport(context, format)
+  res.setHeader('Content-Type', file.contentType)
+  res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`)
+  res.setHeader('Content-Length', String(file.body.length))
+  return res.status(200).send(file.body)
 }
 
 export const compositeController = {
@@ -214,6 +229,15 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async analysisExport(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = compositeParticipantAnalysisExportQuerySchema.parse(req.query)
+      const context = await service.getAnalysisExportForParticipant(req.params.attemptId, { userId: req.user.userId })
+      return sendAnalysisExport(res, context, query.format)
+    } catch (err) { return handleError(res, err) }
+  },
+
   async snapshots(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -262,6 +286,21 @@ export const compositeController = {
         req.params.attemptId,
         query.snapshotId,
       ))
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async teacherAnalysisExport(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = compositeAnalysisExportQuerySchema.parse(req.query)
+      const context = await service.getAnalysisExportForTeacher(
+        req.user.userId,
+        req.user.role,
+        req.params.id,
+        req.params.attemptId,
+        query.snapshotId,
+      )
+      return sendAnalysisExport(res, context, query.format)
     } catch (err) { return handleError(res, err) }
   },
 
@@ -349,6 +388,17 @@ export const compositeController = {
 
   async publicReport(req: Request, res: Response) {
     try { return success(res, await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+  },
+
+  async publicAnalysisExport(req: Request, res: Response) {
+    try {
+      const query = compositeParticipantAnalysisExportQuerySchema.parse(req.query)
+      const context = await service.getAnalysisExportForParticipant(
+        req.params.attemptId,
+        { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
+      )
+      return sendAnalysisExport(res, context, query.format)
+    } catch (err) { return handleError(res, err) }
   },
 }
 

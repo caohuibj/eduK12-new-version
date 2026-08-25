@@ -20,13 +20,15 @@ describe('CompositePackageReport', () => {
         caveats: [],
         facetCoverage: [{ facet: 'response_stability', evidenceCount: 1, interpretable: true, directionClasses: ['unknown'] }],
       }],
-      recommendations: [],
+      recommendations: [{ priority: 'watch', text: '可作为后续观察线索。' }],
       limitations: ['不作诊断。'],
     }} />)
 
     expect(screen.getByText('注意稳定性报告包')).toBeTruthy()
     expect(screen.getByTestId('composite-domain-sustained_attention')).toBeTruthy()
     expect(screen.getByText('response_stability · 1')).toBeTruthy()
+    expect(screen.getByTestId('recommendation-priority-0')).toHaveTextContent('观察')
+    expect(screen.getByText('可作为后续观察线索。')).toBeTruthy()
     expect(screen.queryByText(/overallScore|percentile|雷达/)).toBeNull()
     expect(screen.queryByText(/"metrics"/)).toBeNull()
   })

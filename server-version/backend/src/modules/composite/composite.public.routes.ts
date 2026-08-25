@@ -9,6 +9,7 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', compositeControll
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', compositeController.publicCompleteScale)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', compositeController.publicFormAnswer)
 router.get('/attempts/:attemptId/report', compositeController.publicReport)
+router.get('/attempts/:attemptId/analysis-export', compositeController.publicAnalysisExport)
 router.get('/:token', compositeController.publicInfo)
 router.post('/:token/start', compositeController.publicStart)
 
