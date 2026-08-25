@@ -268,7 +268,10 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
             type="button"
             className="btn-primary"
             disabled={inactivityExpired || response.length !== activeSequence.length}
-            onClick={() => { phase === 'practice' ? submitPractice() : void submitFormal() }}
+            onClick={() => {
+              if (phase === 'practice') submitPractice()
+              else void submitFormal()
+            }}
           >
             提交
           </button>
