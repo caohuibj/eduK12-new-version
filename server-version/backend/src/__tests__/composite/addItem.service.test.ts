@@ -64,6 +64,18 @@ beforeEach(() => {
 })
 
 describe('addItem cognitive course match', () => {
+  it('rejects newly added optional modules until optional execution states exist', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
+
+    await expect(addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'FORM',
+      formType: 'text_input',
+      formLabel: '备注',
+      required: false,
+    })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCalled()
+  })
+
   it('allows a published assignment on the same course', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment())

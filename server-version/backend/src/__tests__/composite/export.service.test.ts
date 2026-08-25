@@ -6,6 +6,8 @@ process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findUnique: vi.fn() },
+    compositeAssessmentAttempt: { count: vi.fn() },
+    cognitiveTrial: { count: vi.fn() },
   },
 }))
 
@@ -202,9 +204,28 @@ const makeMixedTemplate = () => ({
   }],
 })
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
+  mockPrisma.cognitiveTrial.count.mockResolvedValue(0)
+})
 
 describe('composite export service', () => {
+  it('rejects an oversized attempt scope before loading the composite graph', async () => {
+    mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(10_001)
+
+    await expect(compositeExportService.getExportData('composite-mixed')).rejects.toMatchObject({ statusCode: 413 })
+    expect(mockPrisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('rejects an oversized full-export trial scope before loading nested trials', async () => {
+    mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(1)
+    mockPrisma.cognitiveTrial.count.mockResolvedValue(100_001)
+
+    await expect(compositeExportService.getExportData('composite-mixed', { detail: 'full' })).rejects.toMatchObject({ statusCode: 413 })
+    expect(mockPrisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+  })
+
   it('exports a stable mixed summary row with repeated slots, provenance, frozen labels, zero and null', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeMixedTemplate())
 

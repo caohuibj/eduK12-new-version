@@ -125,6 +125,31 @@ const completedDateWhere = (dateRange?: { start?: string; end?: string }) => {
 export const getExportData = async (assessmentId: string, options: { detail?: CompositeExportDetail; anonymize?: boolean; dateRange?: { start?: string; end?: string } } = {}): Promise<CompositeExportData> => {
   const detail = options.detail ?? 'summary'
   const anonymize = options.anonymize ?? true
+  const completedAttemptWhere = {
+    compositeAssessmentId: assessmentId,
+    status: 'COMPLETED' as const,
+    ...(completedDateWhere(options.dateRange) ? { completedAt: completedDateWhere(options.dateRange) } : {}),
+  }
+
+  // Preflight the bounded export scope before materializing nested answers,
+  // sessions, trials, or encrypted payloads. The later query and final check
+  // remain in place to protect against concurrent changes and generated-field
+  // growth.
+  const recordCount = await prisma.compositeAssessmentAttempt.count({ where: completedAttemptWhere })
+  assertExportLimits({ records: recordCount })
+  if (detail === 'full') {
+    const trialCount = await prisma.cognitiveTrial.count({
+      where: {
+        session: {
+          is: {
+            compositeAttempt: { is: completedAttemptWhere },
+          },
+        },
+      },
+    })
+    assertExportLimits({ trials: trialCount })
+  }
+
   const template = await prisma.compositeAssessment.findUnique({
     where: { id: assessmentId },
     include: {
@@ -136,7 +161,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         },
       },
       attempts: {
-        where: { status: 'COMPLETED', ...(completedDateWhere(options.dateRange) ? { completedAt: completedDateWhere(options.dateRange) } : {}) },
+        where: completedAttemptWhere,
         orderBy: [{ completedAt: 'asc' }, { startedAt: 'asc' }],
         take: EXPORT_MAX_RECORDS + 1,
         include: {

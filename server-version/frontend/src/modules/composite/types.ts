@@ -72,6 +72,16 @@ export interface CompositePublicInfo {
   items: Array<{ type: CompositeItemType; position: number; label: string | null }>
 }
 
+export interface CompositePublicAccessToken {
+  id: string
+  token: string
+  expiresAt: string
+  maxUses: number
+  usedCount: number
+  isActive: boolean
+  createdAt: string
+}
+
 export type CompositeReportAudience = 'participant' | 'teacher' | 'researcher'
 
 export type CompositeAnalysisExportFormat = 'json' | 'zip' | 'xlsx'

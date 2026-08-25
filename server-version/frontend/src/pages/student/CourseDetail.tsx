@@ -37,6 +37,13 @@ interface CompositeAssessment {
   items: Array<{ type: string; label: string | null }>
   course: { id: string; title: string; courseCode: string } | null
   attempt: { id: string; status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; progress: number } | null
+  opensAt: string | null
+  expiresAt: string | null
+  maxAttempts: number
+  attemptsUsed: number
+  canContinue: boolean
+  canStartNewAttempt: boolean
+  availability: 'UPCOMING' | 'OPEN' | 'EXPIRED'
 }
 
 const CourseDetail: React.FC = () => {
@@ -148,7 +155,9 @@ const CourseDetail: React.FC = () => {
   const uncompletedAssignments = assignments.filter(a => !a.submitted).length
   const uncompletedCheckins = checkins.filter(c => !c.submission).length
   const uncompletedQuestionnaires = questionnaires.filter(q => !q.completed).length
-  const uncompletedComposites = composites.filter((item) => item.attempt?.status !== 'COMPLETED').length
+  const uncompletedComposites = composites.filter((item) => (
+    item.canContinue || item.canStartNewAttempt
+  )).length
 
   // 角标组件
   const Badge: React.FC<{ count: number }> = ({ count }) => {
@@ -410,11 +419,30 @@ const CourseDetail: React.FC = () => {
           ) : (
             composites.map((composite) => {
               const attempt = composite.attempt
-              const target = attempt?.status === 'COMPLETED'
-                ? `/student/composite/attempts/${attempt.id}/report`
-                : attempt?.status === 'IN_PROGRESS'
-                  ? `/student/composite/attempts/${attempt.id}`
-                  : `/student/composite/${composite.id}`
+              const canContinue = composite.canContinue || attempt?.status === 'IN_PROGRESS'
+              const canStartNewAttempt = composite.canStartNewAttempt
+              const canViewReport = attempt?.status === 'COMPLETED'
+              const target = canContinue
+                ? `/student/composite/attempts/${attempt?.id}`
+                : canStartNewAttempt
+                  ? `/student/composite/${composite.id}`
+                  : canViewReport
+                    ? `/student/composite/attempts/${attempt.id}/report`
+                    : ''
+              const availabilityLabel = composite.availability === 'UPCOMING'
+                ? '尚未开始'
+                : composite.availability === 'EXPIRED'
+                  ? '已过期'
+                  : !canStartNewAttempt && composite.attemptsUsed >= composite.maxAttempts
+                    ? '已达到最大次数'
+                    : '可以开始'
+              const actionLabel = canContinue
+                ? '继续测评'
+                : canStartNewAttempt
+                  ? attempt?.status === 'COMPLETED' ? '再次测评' : '开始测评'
+                  : canViewReport
+                    ? '查看报告'
+                  : availabilityLabel
               return (
                 <div key={composite.id} className="card hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between">
@@ -424,10 +452,19 @@ const CourseDetail: React.FC = () => {
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <span>{composite.estimatedModules} 个模块</span>
                         {attempt && <span>{attempt.status === 'COMPLETED' ? '已完成' : `已完成 ${attempt.progress}%`}</span>}
+                        <span className={composite.availability === 'OPEN' ? 'text-green-600' : 'text-amber-600'}>{availabilityLabel}</span>
+                        {composite.maxAttempts > 1 && <span>已使用 {composite.attemptsUsed} / {composite.maxAttempts} 次</span>}
                       </div>
+                      {(composite.opensAt || composite.expiresAt) && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          {composite.opensAt && `开始：${formatDate(composite.opensAt)}`}
+                          {composite.opensAt && composite.expiresAt && ' · '}
+                          {composite.expiresAt && `截止：${formatDate(composite.expiresAt)}`}
+                        </p>
+                      )}
                     </div>
-                    <button onClick={() => navigate(target)} className="btn-primary">
-                      {attempt?.status === 'COMPLETED' ? '查看报告' : attempt?.status === 'IN_PROGRESS' ? '继续测评' : '开始测评'}
+                    <button onClick={() => { if (target) navigate(target) }} disabled={!target} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                      {actionLabel}
                     </button>
                   </div>
                 </div>

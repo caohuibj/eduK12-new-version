@@ -29,6 +29,7 @@ describe('composite assessment schemas', () => {
     }).formType).toBe('single_choice')
     expect(() => addCompositeItemSchema.parse({ type: 'FORM', formType: 'single_choice', formLabel: '年级' })).toThrow()
     expect(() => addCompositeItemSchema.parse({ type: 'SCALE', scaleId: 'scale-1', userId: 'student-1' })).toThrow()
+    expect(() => addCompositeItemSchema.parse({ type: 'SCALE', scaleId: 'scale-1', required: false })).toThrow()
   })
 
   it('requires a valid time window for public templates and tokens', () => {

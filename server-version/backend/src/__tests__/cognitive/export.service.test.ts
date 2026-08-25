@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     cognitiveAssignment: { findUnique: vi.fn() },
-    cognitiveSession: { findMany: vi.fn() },
+    cognitiveSession: { count: vi.fn(), findMany: vi.fn() },
+    cognitiveTrial: { count: vi.fn() },
   },
 }))
 
@@ -81,9 +82,26 @@ const session = (withTrials = false) => ({
 beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment)
+  mockPrisma.cognitiveSession.count.mockResolvedValue(0)
+  mockPrisma.cognitiveTrial.count.mockResolvedValue(0)
 })
 
 describe('cognitive export service', () => {
+  it('rejects an oversized record scope before loading sessions', async () => {
+    mockPrisma.cognitiveSession.count.mockResolvedValue(10_001)
+
+    await expect(getCognitiveExportData('assignment-1')).rejects.toMatchObject({ statusCode: 413 })
+    expect(mockPrisma.cognitiveSession.findMany).not.toHaveBeenCalled()
+  })
+
+  it('rejects an oversized full-export trial scope before loading encrypted trials', async () => {
+    mockPrisma.cognitiveSession.count.mockResolvedValue(1)
+    mockPrisma.cognitiveTrial.count.mockResolvedValue(100_001)
+
+    await expect(getCognitiveExportData('assignment-1', { detail: 'full' })).rejects.toMatchObject({ statusCode: 413 })
+    expect(mockPrisma.cognitiveSession.findMany).not.toHaveBeenCalled()
+  })
+
   it('rejects exporting a composite wrapper', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, listedStandalone: false })
     await expect(getCognitiveExportData('assignment-1')).rejects.toMatchObject({

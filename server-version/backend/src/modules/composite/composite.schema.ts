@@ -61,7 +61,9 @@ const formOption = z.object({ value: z.string().min(1), label: z.string().min(1)
 export const addCompositeItemSchema = z.object({
   type: z.enum(['SCALE', 'COGNITIVE', 'FORM']),
   position: z.number().int().min(0).optional(),
-  required: z.boolean().optional().default(true),
+  // Optional Composite items are historical/read-only data until the product
+  // has an explicit PENDING/COMPLETED/SKIPPED execution contract.
+  required: z.literal(true).optional().default(true),
   scaleId: z.string().min(1).optional(),
   cognitiveAssignmentId: z.string().min(1).optional(),
   formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input']).optional(),

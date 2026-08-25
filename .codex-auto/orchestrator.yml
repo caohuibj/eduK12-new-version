@@ -1,0 +1,104 @@
+providers:
+  chatgpt_app:
+    type: chatgpt_app
+    api_key_env: null
+    base_url: null
+    timeout_seconds: 180.0
+    store: false
+routing:
+  planning:
+    provider: chatgpt_app
+    model: gpt-5.6-sol
+    reasoning_effort: high
+    max_output_tokens: 8000
+    temperature: null
+  implementation:
+    provider: chatgpt_app
+    model: gpt-5.6-luna
+    reasoning_effort: max
+    max_output_tokens: 20000
+    temperature: null
+  review:
+    provider: chatgpt_app
+    model: gpt-5.6-sol
+    reasoning_effort: high
+    max_output_tokens: 10000
+    temperature: null
+  fix:
+    provider: chatgpt_app
+    model: gpt-5.6-luna
+    reasoning_effort: max
+    max_output_tokens: 12000
+    temperature: null
+repository:
+  identifier: eduk12-local
+  base_branch: dev
+  feature_branch_prefix: codex-auto/
+  context_max_bytes: 120000
+  allowed_paths:
+    - '**'
+  forbidden_paths:
+    - .env
+    - .env.*
+    - .git/**
+    - .agents/skills/**
+    - .codex/**
+    - .github/workflows/**
+    - .codex-auto/**
+    - AGENTS.md
+    - '*.pem'
+    - '*.key'
+    - '**/*.pem'
+    - '**/*.key'
+  allow_deletions: false
+  verification_commands:
+    backend-build:
+      - npm
+      - --prefix
+      - server-version/backend
+      - run
+      - build
+    backend-unit:
+      - npm
+      - --prefix
+      - server-version/backend
+      - test
+    backend-integration:
+      - sh
+      - scripts/codex-auto-backend-integration.sh
+    frontend-typecheck:
+      - npm
+      - --prefix
+      - server-version/frontend
+      - run
+      - typecheck
+    frontend-cognitive:
+      - npm
+      - --prefix
+      - server-version/frontend
+      - run
+      - test:cognitive
+    frontend-build:
+      - npm
+      - --prefix
+      - server-version/frontend
+      - run
+      - build
+    docker-config:
+      - env
+      - CORS_ORIGIN=http://localhost
+      - docker
+      - compose
+      - -f
+      - server-version/docker-compose.yml
+      - config
+github: null
+policy:
+  max_fix_cycles: 2
+  human_integration_required: true
+  protocol_version: v2
+audit:
+  path: .codex-auto/audit/{task_id}.jsonl
+  max_payload_chars: 20000
+cost:
+  models: {}

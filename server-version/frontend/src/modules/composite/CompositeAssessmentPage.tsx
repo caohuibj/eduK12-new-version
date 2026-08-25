@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
-import type { CompositeAttemptState, CompositeCurrentItem } from './types'
+import type { CompositeAttemptState, CompositeCurrentItem, CompositePublicInfo } from './types'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
 import { resolveScaleOptions } from '../../utils/scaleLabels'
 
@@ -23,7 +23,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [state, setState] = useState<CompositeAttemptState | null>(null)
-  const [publicInfo, setPublicInfo] = useState<{ name: string; description: string | null; instruction: string | null; items: Array<{ label: string | null }> } | null>(null)
+  const [publicInfo, setPublicInfo] = useState<CompositePublicInfo | null>(null)
   const [recoveryToken, setRecoveryToken] = useState('')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [newRecoveryToken, setNewRecoveryToken] = useState<string | null>(null)
@@ -126,7 +126,9 @@ const CompositeAssessmentPage: React.FC = () => {
           if (id) await loadAttempt(id, saved)
           else await start(saved)
         } else if (!id) {
-          await start()
+          // Merely opening a public link must not consume a participation slot.
+          // The explicit button below is the only path for a new anonymous attempt.
+          setLoading(false)
         } else {
           setLoading(false)
           setError('请输入恢复凭证后继续匿名测评')

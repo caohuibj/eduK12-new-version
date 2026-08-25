@@ -592,6 +592,39 @@ describe('copyComposite', () => {
 })
 
 describe('library composites are not takeable', () => {
+  it('returns attempt counts and explicit availability windows for students', async () => {
+    const now = Date.now()
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([
+      {
+        id: 'open-2', code: 'OPEN-2', name: '可重做', description: null, instruction: null,
+        opensAt: new Date(now - 60_000), expiresAt: new Date(now + 60_000), maxAttempts: 2,
+        course: teacherCourse, items: [],
+      },
+      {
+        id: 'upcoming', code: 'UPCOMING', name: '尚未开始', description: null, instruction: null,
+        opensAt: new Date(now + 60_000), expiresAt: null, maxAttempts: 1,
+        course: teacherCourse, items: [],
+      },
+      {
+        id: 'expired', code: 'EXPIRED', name: '已过期', description: null, instruction: null,
+        opensAt: null, expiresAt: new Date(now - 60_000), maxAttempts: 1,
+        course: teacherCourse, items: [],
+      },
+    ])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([{
+      id: 'attempt-1', compositeAssessmentId: 'open-2', status: 'COMPLETED', progress: 100, completedAt: new Date(),
+    }])
+
+    const list = await listAvailableForStudent('student-1')
+
+    expect(list).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'open-2', attemptsUsed: 1, maxAttempts: 2, canStartNewAttempt: true, canContinue: false, availability: 'OPEN' }),
+      expect.objectContaining({ id: 'upcoming', attemptsUsed: 0, canStartNewAttempt: false, availability: 'UPCOMING' }),
+      expect.objectContaining({ id: 'expired', attemptsUsed: 0, canStartNewAttempt: false, availability: 'EXPIRED' }),
+    ]))
+  })
+
   it('omits library-course composites from the student list', async () => {
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'library-1' }])
     mockPrisma.compositeAssessment.findMany.mockResolvedValue([])

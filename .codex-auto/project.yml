@@ -1,0 +1,107 @@
+protocol:
+  repository: caohuibj/codex-auto
+  version: v2
+
+project:
+  name: eduK12-new-version
+  repository: caohuibj/eduK12-new-version
+  integration_branch: dev
+  production_branch: main
+
+workflow:
+  execution_mode: chatgpt-app
+  repository_mode: local-git
+  human_integration_required: true
+  feature_branch_pattern: "codex-auto/*"
+  task_contract_required: true
+  independent_review_required: true
+
+architecture:
+  protected_boundaries:
+    - Existing Auth/User remains the authoritative identity system.
+    - Cognitive remains an isolated domain inside the existing server application.
+    - Existing education modules may be used by Cognitive, but must not depend on Cognitive.
+    - Do not introduce a second login, JWT, user, or standalone cognitive backend.
+  dependency_rules:
+    - Preserve the existing Route -> Controller -> Service/Prisma -> PostgreSQL direction unless a scoped task explicitly changes it.
+    - New Cognitive tasks must integrate through the shared Cognitive Registry and Runner rather than bespoke application-level routing.
+  prohibited_changes:
+    - Large framework migrations unrelated to the task.
+    - Express-to-NestJS, React-to-Next.js, Prisma replacement, or equivalent stack rewrites without explicit approval.
+    - Unrelated refactors of legacy modules.
+
+persistence:
+  invariants:
+    - Preserve CognitiveSession configSnapshot.
+    - Preserve engineVersion and scoringVersion on sessions/results.
+    - Preserve randomSeed for randomized tasks where applicable.
+    - Preserve trial-level raw behavioral data; do not reduce persistence to product scores only.
+    - Session ownership must derive from authenticated server-side user context, never a client-supplied userId.
+  migration_policy:
+    - Schema changes require explicit migration review and backward/data-integrity analysis.
+    - Container recreation must not destroy persistent PostgreSQL or required application data.
+
+verification:
+  required:
+    - backend-build
+    - backend-unit
+    - frontend-typecheck
+    - frontend-cognitive
+    - frontend-build
+  conditional:
+    - condition: backend API, persistence, Cognitive session/scoring, export, encryption, or authorization behavior changes
+      require:
+        - backend-integration
+    - condition: user-visible workflow changes
+      require:
+        - e2e
+    - condition: Docker, dependency, runtime, static asset, or deployment changes
+      require:
+        - docker-config
+  regression_scope:
+    - Auth
+    - Users
+    - Courses
+    - Assignments
+    - Checkins
+    - Scales
+    - Questionnaires
+    - Classrooms
+    - Uploads
+    - Videos
+    - Documents
+    - Cognitive
+    - Composite assessments
+
+runtime:
+  required_environments:
+    - host-development
+    - docker-development
+    - docker-production-where-affected
+  deployment_constraints:
+    - Frontend, backend, PostgreSQL, and Redis remain separate service boundaries.
+    - Persistent data must survive container rebuild/restart through external storage or volumes as designed.
+    - A feature affecting deployment is not complete until the relevant Docker build/runtime path is verified.
+
+quality:
+  avoid:
+    - unrelated refactor
+    - unnecessary abstraction
+    - defensive engineering without a concrete failure mode or requirement
+    - duplicate architecture introduced only for a single task
+  definition_of_done:
+    - The scoped feature works in the required local/runtime environment.
+    - Data is complete, attributable, and version-traceable where applicable.
+    - Required tests and regression checks have evidence, not assertion-only status.
+    - No blocking regression is introduced into existing modules.
+    - Deployment-affecting changes remain reproducible on a standard Linux/Docker environment without source-code edits.
+
+escalation:
+  always_escalate:
+    - Auth, identity, authorization, or session ownership boundary changes.
+    - Destructive or irreversible data migrations.
+    - Public API contract breaks.
+    - Cognitive scoring semantics, scoringVersion policy, or norm interpretation changes.
+    - Changes that remove or reinterpret stored raw trial data.
+    - Cross-domain dependency direction changes.
+    - Requirements that conflict with this profile or the pinned codex-auto protocol.

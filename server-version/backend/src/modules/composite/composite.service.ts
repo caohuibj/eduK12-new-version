@@ -1169,6 +1169,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
   assertOwner(composite, userId, role)
   assertDraft(composite)
   assertCollectionOnlyEditing(composite)
+  if (input.required !== true) throw compositeBadRequest('新增加的综合测评模块必须为必答模块')
   await assertValidItem(input, userId, role, composite)
   const position = input.position ?? (composite.items.length ? Math.max(...composite.items.map((item: any) => item.position)) + 1 : 0)
   if (composite.items.some((item: any) => item.position === position)) {
@@ -1439,17 +1440,41 @@ export const listAvailableForStudent = async (userId: string) => {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
     if (!latest.has(attempt.compositeAssessmentId)) latest.set(attempt.compositeAssessmentId, attempt)
   }
-  return supportedList.map((item: any) => ({
-    id: item.id,
-    code: item.code,
-    name: item.name,
-    description: item.description,
-    instruction: item.instruction,
-    estimatedModules: item.items.length,
-    course: item.course,
-    items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-    attempt: latest.get(item.id) ?? null,
-  }))
+  const attemptsByCompositeId = new Map<string, any[]>()
+  for (const attempt of attempts) {
+    const compositeAttempts = attemptsByCompositeId.get(attempt.compositeAssessmentId) || []
+    compositeAttempts.push(attempt)
+    attemptsByCompositeId.set(attempt.compositeAssessmentId, compositeAttempts)
+  }
+  const now = Date.now()
+  const availabilityFor = (item: any): 'UPCOMING' | 'OPEN' | 'EXPIRED' => {
+    if (item.opensAt && item.opensAt.getTime() > now) return 'UPCOMING'
+    if (item.expiresAt && item.expiresAt.getTime() < now) return 'EXPIRED'
+    return 'OPEN'
+  }
+  return supportedList.map((item: any) => {
+    const compositeAttempts = attemptsByCompositeId.get(item.id) || []
+    const attemptsUsed = compositeAttempts.length
+    const availability = availabilityFor(item)
+    return {
+      id: item.id,
+      code: item.code,
+      name: item.name,
+      description: item.description,
+      instruction: item.instruction,
+      estimatedModules: item.items.length,
+      course: item.course,
+      opensAt: item.opensAt,
+      expiresAt: item.expiresAt,
+      maxAttempts: item.maxAttempts,
+      attemptsUsed,
+      availability,
+      canStartNewAttempt: availability === 'OPEN' && attemptsUsed < item.maxAttempts,
+      canContinue: latest.get(item.id)?.status === 'IN_PROGRESS',
+      items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
+      attempt: latest.get(item.id) ?? null,
+    }
+  })
 }
 
 const assertStudentEligibility = async (composite: any, userId: string) => {

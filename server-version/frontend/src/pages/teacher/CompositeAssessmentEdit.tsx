@@ -7,6 +7,7 @@ import type {
   AnalysisProtocolCatalogItem,
   AnalysisProtocolProfile,
   CompositeAnalysisProtocol,
+  CompositePublicAccessToken,
   ReportPackageCatalogItem,
   ReportPackageProfile,
 } from '../../modules/composite/types'
@@ -55,7 +56,7 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [formLabel, setFormLabel] = useState('')
   const [formType, setFormType] = useState('text_input')
   const [formOptions, setFormOptions] = useState('')
-  const [token, setToken] = useState<any>(null)
+  const [tokens, setTokens] = useState<CompositePublicAccessToken[]>([])
   const [tokenExpiresAt, setTokenExpiresAt] = useState('')
   const [tokenMaxUses, setTokenMaxUses] = useState(0)
   const [savingToken, setSavingToken] = useState(false)
@@ -101,7 +102,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         setCognitiveAssignments([])
         setError(errorMessage(err, '无法加载已发布的认知任务'))
       }
-      if (tokenResponse.code === 0 && tokenResponse.data?.list?.length) setToken(tokenResponse.data.list[0])
+      if (tokenResponse.code === 0 && tokenResponse.data) setTokens(tokenResponse.data.list)
     } catch (err) {
       setError(errorMessage(err, '加载配置失败'))
     }
@@ -240,7 +241,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         maxUses: Number(tokenMaxUses) || 0,
       })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
-      setToken({ ...response.data, isActive: true, usedCount: response.data.usedCount ?? 0 })
+      await load()
     } catch (err) {
       setError(errorMessage(err, '生成公开链接失败'))
     } finally {
@@ -248,14 +249,24 @@ const CompositeAssessmentEdit: React.FC = () => {
     }
   }
 
-  const disableToken = async () => {
-    if (!token || !confirm('确定停用当前公开链接吗？')) return
+  const disableToken = async (token: CompositePublicAccessToken) => {
+    if (!confirm('确定停用这个公开链接吗？')) return
     try {
       const response = await compositeApi.disableToken(id, token.id)
-      if (response.code === 0) setToken({ ...token, isActive: false })
+      if (response.code === 0) setTokens((current) => current.map((item) => item.id === token.id ? { ...item, isActive: false } : item))
       else setError(response.message || '停用公开链接失败')
     } catch (err) {
       setError(errorMessage(err, '停用公开链接失败'))
+    }
+  }
+
+  const copyTokenLink = async (token: CompositePublicAccessToken) => {
+    const link = `${window.location.origin}/public/composite/${token.token}`
+    try {
+      await navigator.clipboard.writeText(link)
+      setError(null)
+    } catch {
+      setError('复制链接失败，请手动复制')
     }
   }
 
@@ -579,15 +590,30 @@ const CompositeAssessmentEdit: React.FC = () => {
           {!detail.publicEnabled && (
             <p className="text-amber-600 text-sm mb-3">创建时未勾选「允许公开匿名参与」。仍可生成链接，登录学生课内入口不受影响。</p>
           )}
-          {token ? (
-            <div className="text-sm">
-              <p className="break-all text-primary mb-2">{window.location.origin}/public/composite/{token.token}</p>
-              <p className="text-gray-500">
-                有效期：{new Date(token.expiresAt).toLocaleString('zh-CN')} · 已使用 {token.usedCount ?? 0} 次 · {token.isActive ? '使用中' : '已停用'}
-              </p>
-              {token.isActive && (
-                <button onClick={() => void disableToken()} className="text-red-500 text-sm mt-2">停用当前链接</button>
-              )}
+          {tokens.length ? (
+            <div className="space-y-3 text-sm">
+              {tokens.map((token) => {
+                const expired = new Date(token.expiresAt).getTime() <= Date.now()
+                const exhausted = token.maxUses > 0 && token.usedCount >= token.maxUses
+                const status = !token.isActive ? '已停用' : expired ? '已过期' : exhausted ? '已用尽' : '使用中'
+                return (
+                  <div key={token.id} className="border rounded p-3">
+                    <p className="break-all text-primary mb-2">{window.location.origin}/public/composite/{token.token}</p>
+                    <p className="text-gray-500">
+                      创建于：{new Date(token.createdAt).toLocaleString('zh-CN')} · 有效期至：{new Date(token.expiresAt).toLocaleString('zh-CN')}
+                    </p>
+                    <p className="text-gray-500">
+                      最大次数：{token.maxUses || '不限制'} · 已使用 {token.usedCount} 次 · {status}
+                    </p>
+                    <div className="flex gap-3 mt-2">
+                      <button onClick={() => void copyTokenLink(token)} className="text-primary text-sm">复制链接</button>
+                      {token.isActive && (
+                        <button onClick={() => void disableToken(token)} className="text-red-500 text-sm">停用此链接</button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           ) : (
             <p className="text-gray-500 mb-3">尚未生成链接</p>

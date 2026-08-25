@@ -259,7 +259,17 @@ const getSessions = async (
     },
   }
 
+  // Count against the same completed/date-filtered scope before loading any
+  // session payloads. The bounded query below remains as a defense-in-depth
+  // check for races and keeps the existing nested take limits in place.
+  const recordCount = await prisma.cognitiveSession.count({ where })
+  assertExportLimits({ records: recordCount })
+
   if (detail === 'full' || detail === 'research') {
+    const trialCount = await prisma.cognitiveTrial.count({
+      where: { session: { is: where } },
+    })
+    assertExportLimits({ trials: trialCount })
     const sessions = await prisma.cognitiveSession.findMany({
       where,
       include: {

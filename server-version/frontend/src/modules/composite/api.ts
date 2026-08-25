@@ -13,6 +13,7 @@ import type {
   CompositeTeacherListItem,
   CompositeAnalysisExportDownload,
   CompositeAnalysisExportFormat,
+  CompositePublicAccessToken,
 } from './types'
 
 export const compositeAnalysisExportPath = (
@@ -92,7 +93,7 @@ export const compositeApi = {
   removeItem: (id: string, itemId: string) => apiClient.delete(`/composite-assessments/${id}/items/${itemId}`),
   reorderItems: (id: string, items: Array<{ id: string; position: number }>) => apiClient.post(`/composite-assessments/${id}/items/reorder`, { items }),
   publish: (id: string) => apiClient.post<any>(`/composite-assessments/${id}/publish`, {}),
-  listTokens: (id: string) => apiClient.get<{ list: any[] }>(`/composite-assessments/${id}/public-tokens`),
+  listTokens: (id: string) => apiClient.get<{ list: CompositePublicAccessToken[] }>(`/composite-assessments/${id}/public-tokens`),
   createToken: (id: string, input: { expiresAt: string; maxUses: number }) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' }) => apiClient.post<any>(`/composite-assessments/${id}/export`, input),

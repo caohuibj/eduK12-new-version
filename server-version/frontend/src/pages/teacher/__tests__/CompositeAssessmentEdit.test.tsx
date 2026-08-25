@@ -104,6 +104,46 @@ describe('CompositeAssessmentEdit copyable toggle', () => {
     expect(screen.getByText('公开匿名链接')).toBeInTheDocument()
   })
 
+  it('shows every public token and disables only the selected token', async () => {
+    mockCompositeApi.detail.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 'tpl-1',
+        name: '教师测评',
+        code: 'T1',
+        status: 'PUBLISHED',
+        publicEnabled: true,
+        copyable: false,
+        canSetCopyable: false,
+        course: { id: 'c1', title: '语文', isLibrary: false },
+        items: [],
+        attemptCounts: { started: 0, completed: 0 },
+      },
+    })
+    mockCompositeApi.listTokens.mockResolvedValue({
+      code: 0,
+      data: {
+        list: [
+          { id: 'token-a', token: 'token-a-value', expiresAt: '2030-01-01T00:00:00.000Z', maxUses: 2, usedCount: 1, isActive: true, createdAt: '2029-01-01T00:00:00.000Z' },
+          { id: 'token-b', token: 'token-b-value', expiresAt: '2030-02-01T00:00:00.000Z', maxUses: 0, usedCount: 0, isActive: true, createdAt: '2029-01-02T00:00:00.000Z' },
+        ],
+      },
+    })
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const user = userEvent.setup()
+
+    render(<CompositeAssessmentEdit />)
+
+    expect(await screen.findByText(/token-a-value/)).toBeInTheDocument()
+    expect(screen.getByText(/token-b-value/)).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: '复制链接' })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: '停用此链接' })).toHaveLength(2)
+
+    await user.click(screen.getAllByRole('button', { name: '停用此链接' })[1])
+    expect(mockCompositeApi.disableToken).toHaveBeenCalledWith('tpl-1', 'token-b')
+    confirmSpy.mockRestore()
+  })
+
   it('locks fixed protocol items and can explicitly switch a draft to collection-only', async () => {
     mockCompositeApi.detail.mockResolvedValue({
       code: 0,
