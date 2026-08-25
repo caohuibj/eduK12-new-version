@@ -1,0 +1,18 @@
+# PR14 release Gate override. It removes the baseline fixed container names and
+# host-port collision so the Gate can run only as an explicitly named,
+# project-scoped stack with project-scoped named volumes.
+services:
+  postgres:
+    container_name: null
+  redis:
+    container_name: null
+  backend:
+    container_name: null
+  frontend:
+    container_name: null
+    ports:
+      - "${COGNITIVE_R2_GATE_HTTP_PORT:-8088}:80"
+  migrate:
+    container_name: null
+  seed:
+    container_name: null
