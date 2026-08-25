@@ -1,21 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CompositeReportPage from '../CompositeReportPage'
 
-const { mockCompositeApi } = vi.hoisted(() => ({
+const { mockCompositeApi, authState } = vi.hoisted(() => ({
   mockCompositeApi: {
     report: vi.fn(),
     teacherReport: vi.fn(),
+    snapshots: vi.fn(),
+    reanalyze: vi.fn(),
   },
+  authState: { user: null as null | { role: 'STUDENT' | 'TEACHER' | 'ADMIN' } },
 }))
 vi.mock('../api', () => ({
   compositeApi: mockCompositeApi,
   publicCompositeApi: () => mockCompositeApi,
 }))
+vi.mock('../../../contexts/AuthContext', () => ({
+  useAuth: () => ({ user: authState.user }),
+}))
 
 beforeEach(() => {
   vi.clearAllMocks()
+  authState.user = null
+  mockCompositeApi.snapshots.mockResolvedValue({ code: 0, data: { list: [], total: 0 } })
+  mockCompositeApi.reanalyze.mockResolvedValue({ code: 0, data: { id: 'snapshot-new' } })
 })
 
 describe('CompositeReportPage cognitive module', () => {
@@ -177,7 +186,127 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
     expect(screen.getByText('背景信息')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
+    expect(mockCompositeApi.snapshots).not.toHaveBeenCalled()
     publicView.unmount()
     window.sessionStorage.removeItem('composite:recovery:attempt:attempt-mixed')
+  })
+
+  it('loads teacher Snapshot history and keeps an explicit URL selection', async () => {
+    authState.user = { role: 'TEACHER' }
+    const response = {
+      code: 0,
+      data: {
+        id: 'attempt-teacher',
+        assessmentId: 'c1',
+        name: '教师报告',
+        anonymousCode: null,
+        completedAt: '2026-01-01T00:00:00Z',
+        totalTime: 0,
+        backgroundValues: [],
+        packageReport: {
+          audience: 'teacher',
+          packageName: '报告包',
+          packageKey: 'package-1',
+          packageVersion: '1.0.0',
+          profile: 'standard',
+          qualitySummary: { interpretableModules: 0, excludedModules: [], warnings: [] },
+          cognitiveDomains: [],
+          recommendations: [],
+          limitations: [],
+          snapshotId: 'snapshot-2',
+          snapshotCreatedAt: '2026-01-02T00:00:00Z',
+          generationReason: 'REANALYSIS',
+          sourceSummary: [],
+          qualityFlags: [],
+          observationPrompts: [],
+        },
+        unitReports: [],
+      },
+    }
+    mockCompositeApi.teacherReport.mockResolvedValue(response)
+    mockCompositeApi.snapshots.mockResolvedValue({
+      code: 0,
+      data: {
+        list: [{
+          id: 'snapshot-2', attemptId: 'attempt-teacher', packageKey: 'p', packageVersion: '1.0.0', profile: 'standard',
+          analysisDefinitionVersion: '1.0.0', analysisProtocolKey: 'p', analysisProtocolVersion: '1.0.0',
+          analysisVersion: 'a', reportSchemaVersion: 'r', generationReason: 'REANALYSIS', createdAt: '2026-01-02T00:00:00Z',
+        }],
+        total: 1,
+      },
+    })
+
+    const selectedView = render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-teacher/report?snapshotId=snapshot-2']}>
+        <Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByTestId('composite-snapshot-controls')).toBeTruthy()
+    expect(mockCompositeApi.snapshots).toHaveBeenCalledWith('attempt-teacher')
+    expect(mockCompositeApi.teacherReport).toHaveBeenCalledWith('c1', 'attempt-teacher', 'snapshot-2')
+    expect(screen.getByLabelText('报告版本')).toHaveValue('snapshot-2')
+    selectedView.unmount()
+
+    vi.clearAllMocks()
+    mockCompositeApi.teacherReport.mockRejectedValue(new Error('Snapshot 不存在'))
+    mockCompositeApi.snapshots.mockResolvedValue({
+      code: 0,
+      data: { list: [{ ...response.data.packageReport, id: 'snapshot-valid', attemptId: 'attempt-teacher', generationReason: 'COMPLETION', createdAt: '2026-01-01T00:00:00Z' }], total: 1 },
+    })
+    render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-teacher/report?snapshotId=snapshot-missing']}>
+        <Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+      </MemoryRouter>,
+    )
+    expect(await screen.findByText('Snapshot 不存在')).toBeTruthy()
+    expect(await screen.findByTestId('composite-snapshot-controls')).toBeTruthy()
+    expect(mockCompositeApi.teacherReport.mock.calls).toEqual([['c1', 'attempt-teacher', 'snapshot-missing']])
+  })
+
+  it('shows the admin reanalysis control and loads the returned Snapshot', async () => {
+    authState.user = { role: 'ADMIN' }
+    const response = { code: 0, data: { id: 'attempt-admin', assessmentId: 'c1', name: '管理员报告', anonymousCode: null, completedAt: null, totalTime: null, backgroundValues: [], packageReport: { audience: 'researcher', packageName: '报告包', packageKey: 'package-1', packageVersion: '1.0.0', profile: 'standard', qualitySummary: { interpretableModules: 0, excludedModules: [], warnings: [] }, cognitiveDomains: [], recommendations: [], limitations: [], snapshotId: 'snapshot-1', snapshotCreatedAt: '2026-01-01T00:00:00Z', generationReason: 'COMPLETION', analysisDefinitionVersion: '1.0.0', analysisProtocolKey: 'package-1', analysisProtocolVersion: '1.0.0', analysisVersion: 'analysis-1', reportSchemaVersion: 'schema-1', inputFingerprint: 'f'.repeat(64), evidence: [], crossSourceFindings: [], provenance: {} }, unitReports: [] } }
+    mockCompositeApi.teacherReport.mockResolvedValue(response)
+    render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-admin/report']}>
+        <Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    const button = await screen.findByRole('button', { name: '重新分析' })
+    fireEvent.click(button)
+    await waitFor(() => expect(mockCompositeApi.reanalyze).toHaveBeenCalledWith('attempt-admin'))
+    await waitFor(() => expect(mockCompositeApi.snapshots).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(mockCompositeApi.teacherReport).toHaveBeenCalledWith('c1', 'attempt-admin', 'snapshot-new'))
+  })
+
+  it('does not show package controls for a collection-only teacher report', async () => {
+    authState.user = { role: 'ADMIN' }
+    mockCompositeApi.teacherReport.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 'attempt-collection',
+        assessmentId: 'c1',
+        name: '独立模块集合',
+        anonymousCode: null,
+        completedAt: '2026-01-01T00:00:00Z',
+        totalTime: 1,
+        backgroundValues: [],
+        unitReports: [],
+      },
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-collection/report']}>
+        <Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('独立模块集合')).toBeTruthy()
+    expect(screen.queryByTestId('composite-package-report')).toBeNull()
+    expect(screen.queryByTestId('composite-snapshot-controls')).toBeNull()
+    expect(screen.queryByRole('button', { name: '重新分析' })).toBeNull()
+    expect(mockCompositeApi.snapshots).not.toHaveBeenCalled()
   })
 })

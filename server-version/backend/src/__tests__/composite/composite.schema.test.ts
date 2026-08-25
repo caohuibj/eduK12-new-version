@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   addCompositeItemSchema,
   compositeExportRequestSchema,
+  compositeReanalysisBodySchema,
+  compositeReportQuerySchema,
   compositeSaveSchema,
   compositeScaleAnswerSchema,
   compositeFormAnswerSchema,
@@ -68,6 +70,18 @@ describe('composite assessment schemas', () => {
     })
     expect(() => listCompositeAttemptsQuerySchema.parse({ _t: '1' })).toThrow()
     expect(() => listCompositeAttemptsQuerySchema.parse({ status: 'DONE' })).toThrow()
+  })
+
+  it('accepts only an explicit Snapshot id in report queries and only an empty reanalysis body', () => {
+    expect(compositeReportQuerySchema.parse({ snapshotId: 'snapshot-1' })).toEqual({ snapshotId: 'snapshot-1' })
+    expect(compositeReportQuerySchema.parse({})).toEqual({})
+    expect(() => compositeReportQuerySchema.parse({ snapshotId: '' })).toThrow()
+    expect(() => compositeReportQuerySchema.parse({ snapshotId: '   ' })).toThrow()
+    expect(() => compositeReportQuerySchema.parse({ snapshotId: 'snapshot/other' })).toThrow()
+    expect(() => compositeReportQuerySchema.parse({ snapshotId: ['snapshot-1'] })).toThrow()
+    expect(() => compositeReportQuerySchema.parse({ attemptId: 'attempt-1' })).toThrow()
+    expect(compositeReanalysisBodySchema.parse({})).toEqual({})
+    expect(() => compositeReanalysisBodySchema.parse({ snapshotId: 'snapshot-1' })).toThrow()
   })
 
   it('allows omitting courseId on copy so self-copy can keep the source course', () => {

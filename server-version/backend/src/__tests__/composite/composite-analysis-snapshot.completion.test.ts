@@ -99,7 +99,13 @@ beforeEach(() => {
   snapshotRows.clear()
   stateRef.current = makeState()
   buildPackageAnalysisMock.mockReturnValue({
-    packageSnapshot: {},
+    packageSnapshot: {
+      profile: 'standard',
+      analysisProtocolSnapshot: {
+        protocolKey: 'attention_stability_v1',
+        protocolVersion: '1.0.0',
+      },
+    },
     moduleResults: [],
     analysis,
     inputFingerprint: 'f'.repeat(64),
@@ -168,6 +174,12 @@ describe('PR8 package completion transaction', () => {
       generatedBy: 'admin-1',
       created: true,
     })
+    expect(Object.keys(result).sort()).toEqual([
+      'analysisDefinitionVersion', 'analysisProtocolKey', 'analysisProtocolVersion', 'analysisVersion',
+      'attemptId', 'created', 'createdAt', 'generatedBy', 'generationReason', 'id', 'inputFingerprint',
+      'packageKey', 'packageVersion', 'profile', 'reportSchemaVersion',
+    ].sort())
+    expect(result).not.toHaveProperty('payloadEncrypted')
     expect(mockPrisma.compositeAnalysisSnapshot.upsert).toHaveBeenCalledWith(expect.objectContaining({
       update: {},
       create: expect.objectContaining({ generationReason: 'REANALYSIS', generatedBy: 'admin-1' }),

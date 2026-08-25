@@ -11,6 +11,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
   anonymousCode?: string | null
 }> = ({ report, attemptNo, finishedAt, anonymousCode }) => {
   const interpretable = report.interpretable
+  const method = report.method || {} as CognitiveSingleTaskReport['method']
   const comparison = report.reference?.comparison
   const activeFlags = report.qualityFlags.filter((flag) => flag.active)
   const profileText = profileLabelOf(report.profile, report.profileLabel)
@@ -20,7 +21,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
       <h1 className="text-2xl font-bold text-gray-800 mb-2">{report.title}</h1>
       <p className="text-sm text-gray-500 mb-6">
         {attemptNo != null ? `尝试 #${attemptNo}（` : ''}
-        {report.method.testType} / {report.method.engineVersion}
+        {method.testType || report.testType}{method.engineVersion ? ` / ${method.engineVersion}` : ''}
         {profileText ? ` · ${profileText}` : ''}
         {anonymousCode ? ` · 匿名编号 ${anonymousCode}` : ''}
         {finishedAt ? ` · ${new Date(finishedAt).toLocaleString('zh-CN')}` : ''}
@@ -106,13 +107,13 @@ const CognitiveSingleTaskReportCard: React.FC<{
         </section>
       )}
 
-      <section className="text-left mt-4 border-t pt-3">
+      {(method.engineVersion || method.scoringVersion || method.configVersion) && <section className="text-left mt-4 border-t pt-3">
         <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明</h2>
         <p className="text-xs text-gray-500">
-          任务 {report.method.testType} · 引擎 {report.method.engineVersion} · 评分 {report.method.scoringVersion} · 配置 {report.method.configVersion}
+          任务 {method.testType || report.testType} · 引擎 {method.engineVersion} · 评分 {method.scoringVersion} · 配置 {method.configVersion}
           {profileText ? ` · ${profileText}` : ''}
         </p>
-      </section>
+      </section>}
 
       {report.disclaimer && <p className="text-xs text-gray-400 mt-6 border-t pt-3">{report.disclaimer}</p>}
     </>

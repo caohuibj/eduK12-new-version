@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
-import { authenticate, requireRole, requireTeacher } from '../../middleware/auth'
+import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 
 const router = Router()
@@ -13,6 +13,8 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, req
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), compositeController.completeScale)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), compositeController.saveFormAnswer)
 router.get('/attempts/:attemptId/report', authenticate, requireRole(UserRole.STUDENT), compositeController.report)
+router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
+router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
 
 // 教师端模板管理
 router.get('/', authenticate, requireTeacher, compositeController.list)

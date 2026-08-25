@@ -71,6 +71,82 @@ export interface CompositePublicInfo {
   items: Array<{ type: CompositeItemType; position: number; label: string | null }>
 }
 
+export type CompositeReportAudience = 'participant' | 'teacher' | 'researcher'
+
+export interface CompositeSnapshotMetadata {
+  id: string
+  attemptId: string
+  packageKey: string
+  packageVersion: string
+  profile: 'standard' | 'research'
+  analysisDefinitionVersion: string
+  analysisProtocolKey: string
+  analysisProtocolVersion: string
+  analysisVersion: string
+  reportSchemaVersion: string
+  inputFingerprint?: string
+  generationReason: 'COMPLETION' | 'REANALYSIS'
+  generatedBy?: string | null
+  createdAt: string
+}
+
+export interface CompositePackageDomain {
+  domain: string
+  label: string
+  status: string
+  consistency: string
+  summary: string
+  caveats: string[]
+  facetCoverage?: Array<{
+    facet: string
+    evidenceCount: number
+    interpretable: boolean
+    directionClasses: string[]
+  }>
+  evidence?: Array<Record<string, unknown>>
+  strengths?: string[]
+  watchItems?: string[]
+}
+
+export interface CompositePackageReport {
+  audience: CompositeReportAudience
+  packageName: string
+  packageKey: string
+  packageVersion: string
+  profile: 'standard' | 'research'
+  snapshotId?: string
+  snapshotCreatedAt?: string
+  generationReason?: 'COMPLETION' | 'REANALYSIS'
+  analysisDefinitionVersion?: string
+  analysisProtocolKey?: string
+  analysisProtocolVersion?: string
+  analysisVersion?: string
+  reportSchemaVersion?: string
+  inputFingerprint?: string
+  qualitySummary: {
+    interpretableModules: number
+    excludedModules: string[]
+    warnings: string[]
+  }
+  cognitiveDomains: CompositePackageDomain[]
+  recommendations: Array<{ priority: string; text: string; evidenceRefs?: string[]; ruleId?: string }>
+  limitations: string[]
+  sourceSummary?: Array<{
+    slotKey: string | null
+    taskType: string | null
+    facet: string | null
+    role: 'primary' | 'supporting'
+    interpretable: boolean
+    qualityFlags: string[]
+    directionClass: string
+  }>
+  qualityFlags?: string[]
+  observationPrompts?: string[]
+  evidence?: Array<Record<string, unknown>>
+  crossSourceFindings?: Array<Record<string, unknown>>
+  provenance?: Record<string, string>
+}
+
 export interface CompositeReport {
   id: string
   assessmentId: string
@@ -79,6 +155,7 @@ export interface CompositeReport {
   completedAt: string | null
   totalTime: number | null
   backgroundValues: FormBackgroundReport[]
+  packageReport?: CompositePackageReport
   unitReports: Array<
     | ScaleUnitReport
     | (Record<string, unknown> & {
@@ -87,6 +164,10 @@ export interface CompositeReport {
         kind: 'cognitive'
         label: string | null
         decryptError?: boolean
+        qualityState?: 'interpretable' | 'insufficient' | null
+        testType?: string | null
+        finishedAt?: string | null
+        singleTaskReport?: Record<string, unknown> | null
       })
   >
 }

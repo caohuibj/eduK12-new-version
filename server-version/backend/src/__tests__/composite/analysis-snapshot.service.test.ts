@@ -18,8 +18,10 @@ import {
 import {
   buildPackageAnalysisForAttempt,
   buildPackageAnalysisInputFingerprint,
+  listPackageAnalysisSnapshotMetadata,
   persistOrGetPackageAnalysisSnapshot,
   readCompletionPackageAnalysisSnapshot,
+  readPackageAnalysisSnapshot,
   type CompositeAnalysisSnapshotRow,
   type PackageAnalysisAttemptInput,
 } from '../../modules/composite/composite-analysis-snapshot.service'
@@ -384,6 +386,51 @@ describe('PR8 package analysis snapshot service', () => {
     await expect(readCompletionPackageAnalysisSnapshot({
       compositeAnalysisSnapshot: { findUnique: vi.fn(), upsert: vi.fn(), findFirst },
     }, 'attempt-1', snapshotExpectation)).rejects.toThrow(/provenance 缺少有效字段/)
+  })
+
+  it('selects an exact Snapshot without fallback and lists metadata without decrypting payloads', async () => {
+    const row: CompositeAnalysisSnapshotRow = {
+      id: 'snapshot-reanalysis',
+      attemptId: 'attempt-1',
+      packageKey: 'attention_stability_v1',
+      packageVersion: '1.0.0',
+      analysisDefinitionVersion: '1.0.0',
+      analysisVersion: 'cognitive-evidence-domain-v1.0.0',
+      reportSchemaVersion: 'cognitive-package-analysis-v1',
+      inputFingerprint: 'f'.repeat(64),
+      generationReason: 'REANALYSIS',
+      generatedBy: 'admin-1',
+      payloadEncrypted: encryptCognitivePayload(minimalAnalysis()),
+      createdAt: new Date('2026-08-24T14:00:00Z'),
+    }
+    const findFirst = vi.fn()
+    findFirst.mockResolvedValueOnce(row)
+    const selected = await readPackageAnalysisSnapshot({
+      compositeAnalysisSnapshot: { findUnique: vi.fn(), upsert: vi.fn(), findFirst },
+    }, { attemptId: 'attempt-1', snapshotId: row.id, expected: snapshotExpectation })
+    expect(selected?.id).toBe(row.id)
+    expect(findFirst).toHaveBeenCalledWith({ where: { id: row.id, attemptId: 'attempt-1' } })
+
+    findFirst.mockResolvedValueOnce(null)
+    await expect(readPackageAnalysisSnapshot({
+      compositeAnalysisSnapshot: { findUnique: vi.fn(), upsert: vi.fn(), findFirst },
+    }, { attemptId: 'attempt-1', snapshotId: 'snapshot-other-attempt', expected: snapshotExpectation })).resolves.toBeNull()
+
+    findFirst.mockResolvedValueOnce({ ...row, payloadEncrypted: 'not-a-cipher' })
+    await expect(readPackageAnalysisSnapshot({
+      compositeAnalysisSnapshot: { findUnique: vi.fn(), upsert: vi.fn(), findFirst },
+    }, { attemptId: 'attempt-1', snapshotId: row.id, expected: snapshotExpectation })).rejects.toThrow('分析快照不可用')
+
+    const findMany = vi.fn().mockResolvedValue([row, { ...row, id: 'snapshot-completion', generationReason: 'COMPLETION' }])
+    const metadata = await listPackageAnalysisSnapshotMetadata({
+      compositeAnalysisSnapshot: { findUnique: vi.fn(), upsert: vi.fn(), findFirst: vi.fn(), findMany },
+    }, 'attempt-1')
+    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { attemptId: 'attempt-1' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      select: expect.not.objectContaining({ payloadEncrypted: true }),
+    }))
+    expect(metadata[0]).not.toHaveProperty('payloadEncrypted')
   })
 
   it('does not let a retired live config invalidate frozen package history', () => {

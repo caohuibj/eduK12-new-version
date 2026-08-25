@@ -52,4 +52,17 @@ describe('composite library api', () => {
       analysisProtocol: selection,
     })
   })
+
+  it('reads Snapshot history and passes an explicit Snapshot to teacher reports', async () => {
+    await compositeApi.snapshots('attempt-1')
+    expect(mockClient.get).toHaveBeenCalledWith('/composite-assessments/attempts/attempt-1/snapshots')
+
+    await compositeApi.teacherReport('composite-1', 'attempt-1', 'snapshot-2')
+    expect(mockClient.get).toHaveBeenCalledWith('/composite-assessments/composite-1/attempts/attempt-1/report?snapshotId=snapshot-2')
+  })
+
+  it('posts an empty body for administrative reanalysis', async () => {
+    await compositeApi.reanalyze('attempt-1')
+    expect(mockClient.post).toHaveBeenCalledWith('/composite-assessments/attempts/attempt-1/reanalyze', {})
+  })
 })

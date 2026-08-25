@@ -95,6 +95,12 @@ export const compositeExportQuerySchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
 })
 
+export const compositeReportQuerySchema = z.object({
+  snapshotId: z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/).optional(),
+}).strict()
+
+export const compositeReanalysisBodySchema = z.object({}).strict()
+
 export const compositeExportRequestSchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
   format: z.enum(['csv', 'sav']).default('csv'),

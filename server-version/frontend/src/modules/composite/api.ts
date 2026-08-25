@@ -8,6 +8,7 @@ import type {
   CompositeLibraryTemplate,
   CompositePublicInfo,
   CompositeReport,
+  CompositeSnapshotMetadata,
   CompositeTeacherAttemptsResponse,
   CompositeTeacherListItem,
 } from './types'
@@ -42,6 +43,8 @@ export const compositeApi = {
   completeScale: (attemptId: string, itemId: string) => apiClient.post<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/complete`, {}),
   formAnswer: (attemptId: string, itemId: string, value: string) => apiClient.post<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/form-answer`, { itemId, value }),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report`),
+  snapshots: (attemptId: string) => apiClient.get<{ list: CompositeSnapshotMetadata[]; total: number }>(`/composite-assessments/attempts/${attemptId}/snapshots`),
+  reanalyze: (attemptId: string) => apiClient.post<CompositeSnapshotMetadata>(`/composite-assessments/attempts/${attemptId}/reanalyze`, {}),
   attempts: (id: string, query: { status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; q?: string; page?: number; pageSize?: number } = {}) => {
     const params = new URLSearchParams()
     if (query.status) params.set('status', query.status)
@@ -52,8 +55,10 @@ export const compositeApi = {
     const qs = params.toString()
     return apiClient.get<CompositeTeacherAttemptsResponse>(`/composite-assessments/${id}/attempts${qs ? `?${qs}` : ''}`)
   },
-  teacherReport: (compositeId: string, attemptId: string) =>
-    apiClient.get<CompositeReport>(`/composite-assessments/${compositeId}/attempts/${attemptId}/report`),
+  teacherReport: (compositeId: string, attemptId: string, snapshotId?: string) => {
+    const query = snapshotId ? `?${new URLSearchParams({ snapshotId }).toString()}` : ''
+    return apiClient.get<CompositeReport>(`/composite-assessments/${compositeId}/attempts/${attemptId}/report${query}`)
+  },
 }
 
 export const publicCompositeApi = (recoveryToken: string) => ({

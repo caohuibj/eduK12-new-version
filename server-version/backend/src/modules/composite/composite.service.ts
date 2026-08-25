@@ -55,9 +55,19 @@ import {
 import {
   buildPackageAnalysisForAttempt,
   buildCompletionSnapshotExpectation,
+  listPackageAnalysisSnapshotMetadata,
   persistOrGetPackageAnalysisSnapshot,
   readCompletionPackageAnalysisSnapshot,
+  readPackageAnalysisSnapshot,
 } from './composite-analysis-snapshot.service'
+import {
+  projectCompositeCollectionReport,
+  projectCompositeReport,
+} from './composite-report.projector'
+import type {
+  CompositeReportAudience,
+  CompositeSnapshotMetadata,
+} from './composite-report.types'
 
 type Db = any
 
@@ -2056,7 +2066,7 @@ export const buildCompositeReport = (attempt: any) => {
           reference: reference ?? null,
         })
         : null
-      unitReports.push({
+      const unitReport = {
         itemId: item.id,
         type: item.type,
         kind: 'cognitive' as const,
@@ -2069,7 +2079,12 @@ export const buildCompositeReport = (attempt: any) => {
         finishedAt: session?.finishedAt,
         reference,
         singleTaskReport,
+      }
+      Object.defineProperty(unitReport, '__frozenMetricDefinitions', {
+        value: frozenReport?.metricDefinitions,
+        enumerable: false,
       })
+      unitReports.push(unitReport)
     } catch {
       logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
       unitReports.push({ itemId: item.id, type: item.type, kind: 'cognitive' as const, label: resolveCompositeItemLabel(item, packageSlotLabels), decryptError: true })
@@ -2091,10 +2106,86 @@ export const buildCompositeReport = (attempt: any) => {
   return report
 }
 
+const readPackageSnapshotForReport = async (attempt: any, snapshotId?: string) => {
+  const packageFields = [
+    attempt.compositeAssessment.reportPackageKey,
+    attempt.compositeAssessment.reportPackageVersion,
+    attempt.compositeAssessment.reportPackageProfile,
+    attempt.compositeAssessment.reportPackageSnapshotEncrypted,
+  ]
+  const collectionOnly = packageFields.every((value) => value === null || value === undefined)
+  if (collectionOnly) {
+    if (snapshotId) throw compositeNotFound('分析快照不存在')
+    return null
+  }
+  if (packageFields.some((value) => !value)) {
+    throw compositeBadRequest('综合测评的报告包冻结信息不完整')
+  }
+
+  let packageSnapshot
+  try {
+    packageSnapshot = readFrozenReportPackageSnapshot(
+      attempt.compositeAssessment.reportPackageSnapshotEncrypted,
+    )
+    if (
+      packageSnapshot.packageKey !== attempt.compositeAssessment.reportPackageKey
+      || packageSnapshot.packageVersion !== attempt.compositeAssessment.reportPackageVersion
+      || packageSnapshot.profile !== attempt.compositeAssessment.reportPackageProfile
+    ) {
+      throw new Error('报告包实例与冻结快照不匹配')
+    }
+  } catch {
+    logger.warn('composite package snapshot unavailable', {
+      attemptId: attempt.id,
+      snapshotId: snapshotId ?? null,
+      packageKey: attempt.compositeAssessment.reportPackageKey,
+      packageVersion: attempt.compositeAssessment.reportPackageVersion,
+      profile: attempt.compositeAssessment.reportPackageProfile,
+    })
+    throw compositeBadRequest('分析快照不可用')
+  }
+
+  let snapshot
+  try {
+    snapshot = await readPackageAnalysisSnapshot(prisma, {
+      attemptId: attempt.id,
+      snapshotId,
+      expected: buildCompletionSnapshotExpectation({
+        attemptId: attempt.id,
+        assessmentId: attempt.compositeAssessment.id,
+        packageSnapshot,
+      }),
+    })
+  } catch {
+    throw compositeBadRequest('分析快照不可用')
+  }
+  if (!snapshot) {
+    if (snapshotId) throw compositeNotFound('分析快照不存在')
+    throw compositeBadRequest('综合测评缺少完成时分析快照')
+  }
+  return { packageSnapshot, snapshot }
+}
+
+const projectHttpReport = async (
+  attempt: any,
+  audience: CompositeReportAudience,
+  snapshotId?: string,
+) => {
+  const report = buildCompositeReport(attempt)
+  const packageContext = await readPackageSnapshotForReport(attempt, snapshotId)
+  if (!packageContext) return projectCompositeCollectionReport(report, audience)
+  return projectCompositeReport({
+    report,
+    packageSnapshot: packageContext.packageSnapshot,
+    snapshot: packageContext.snapshot,
+    audience,
+  })
+}
+
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await findAttempt(attemptId, context)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-  return buildCompositeReport(attempt)
+  return projectHttpReport(attempt, 'participant')
 }
 
 /**
@@ -2162,33 +2253,131 @@ export const reanalyzePackageAttempt = async (
     if (attempt.status !== 'COMPLETED') throw compositeBadRequest('只有已完成综合测评可以重新分析')
     const packageAnalysis = buildPackageAnalysisForAttempt(attempt)
     if (!packageAnalysis) throw compositeBadRequest('综合测评不包含可分析报告包')
-    return persistOrGetPackageAnalysisSnapshot(tx, {
+    const persisted = await persistOrGetPackageAnalysisSnapshot(tx, {
       attemptId: attempt.id,
       analysis: packageAnalysis.analysis,
       inputFingerprint: packageAnalysis.inputFingerprint,
       generationReason: 'REANALYSIS',
       generatedBy: userId,
     })
+    return { ...persisted, packageSnapshot: packageAnalysis.packageSnapshot }
   })
 
-  const { row, created } = snapshot
+  const { row, created, packageSnapshot } = snapshot
   return {
     id: row.id,
     attemptId: row.attemptId,
     packageKey: row.packageKey,
     packageVersion: row.packageVersion,
+    profile: packageSnapshot.profile,
     analysisDefinitionVersion: row.analysisDefinitionVersion,
+    analysisProtocolKey: packageSnapshot.analysisProtocolSnapshot.protocolKey,
+    analysisProtocolVersion: packageSnapshot.analysisProtocolSnapshot.protocolVersion,
     analysisVersion: row.analysisVersion,
     reportSchemaVersion: row.reportSchemaVersion,
     inputFingerprint: row.inputFingerprint,
     generationReason: row.generationReason,
     generatedBy: row.generatedBy,
-    createdAt: row.createdAt,
+    createdAt: row.createdAt.toISOString(),
     created,
   }
 }
 
-export const getReportForTeacher = async (userId: string, role: UserRole, compositeId: string, attemptId: string) => {
+const toSnapshotMetadata = (
+  row: Omit<Awaited<ReturnType<typeof listPackageAnalysisSnapshotMetadata>>[number], 'payloadEncrypted'>,
+  packageSnapshot: ReturnType<typeof readFrozenReportPackageSnapshot>,
+  includeSensitive: boolean,
+): CompositeSnapshotMetadata => {
+  return {
+    id: row.id,
+    attemptId: row.attemptId,
+    packageKey: row.packageKey,
+    packageVersion: row.packageVersion,
+    profile: packageSnapshot.profile,
+    analysisDefinitionVersion: row.analysisDefinitionVersion,
+    analysisProtocolKey: packageSnapshot.analysisProtocolSnapshot.protocolKey,
+    analysisProtocolVersion: packageSnapshot.analysisProtocolSnapshot.protocolVersion,
+    analysisVersion: row.analysisVersion,
+    reportSchemaVersion: row.reportSchemaVersion,
+    ...(includeSensitive ? { inputFingerprint: row.inputFingerprint, generatedBy: row.generatedBy } : {}),
+    generationReason: row.generationReason,
+    createdAt: row.createdAt.toISOString(),
+  }
+}
+
+export const listPackageAnalysisSnapshotsForTeacher = async (
+  userId: string,
+  role: UserRole,
+  attemptId: string,
+) => {
+  assertTeacher(role)
+  const attempt = await loadAttemptWithChildren(attemptId)
+  const composite = await loadComposite(attempt.compositeAssessmentId)
+  assertOwner(composite, userId, role)
+  assertSupportedComposite(attempt.compositeAssessment)
+  if (!attempt.compositeAssessment.reportPackageKey) return { list: [], total: 0 }
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  if (
+    !attempt.compositeAssessment.reportPackageVersion
+    || !attempt.compositeAssessment.reportPackageProfile
+    || !attempt.compositeAssessment.reportPackageSnapshotEncrypted
+  ) {
+    throw compositeBadRequest('综合测评的报告包冻结信息不完整')
+  }
+
+  const rows = await listPackageAnalysisSnapshotMetadata(prisma, attemptId)
+  let packageSnapshot: ReturnType<typeof readFrozenReportPackageSnapshot>
+  try {
+    packageSnapshot = readFrozenReportPackageSnapshot(attempt.compositeAssessment.reportPackageSnapshotEncrypted)
+    if (
+      packageSnapshot.packageKey !== attempt.compositeAssessment.reportPackageKey
+      || packageSnapshot.packageVersion !== attempt.compositeAssessment.reportPackageVersion
+      || packageSnapshot.profile !== attempt.compositeAssessment.reportPackageProfile
+    ) {
+      throw new Error('报告包实例与冻结快照不匹配')
+    }
+    buildCompletionSnapshotExpectation({
+      attemptId: attempt.id,
+      assessmentId: attempt.compositeAssessment.id,
+      packageSnapshot,
+    })
+  } catch {
+    logger.warn('composite package snapshot metadata unavailable', {
+      attemptId: attempt.id,
+      snapshotId: null,
+      packageKey: attempt.compositeAssessment.reportPackageKey,
+      packageVersion: attempt.compositeAssessment.reportPackageVersion,
+    })
+    throw compositeBadRequest('分析快照不可用')
+  }
+  const driftedRow = rows.find((row) => (
+    row.attemptId !== attempt.id
+    || row.packageKey !== packageSnapshot.packageKey
+    || row.packageVersion !== packageSnapshot.packageVersion
+    || row.analysisDefinitionVersion !== packageSnapshot.analysisProtocolSnapshot.protocolVersion
+  ))
+  if (driftedRow) {
+    logger.warn('composite analysis snapshot metadata drift', {
+      attemptId: attempt.id,
+      snapshotId: driftedRow.id,
+      packageKey: driftedRow.packageKey,
+      packageVersion: driftedRow.packageVersion,
+      analysisVersion: driftedRow.analysisVersion,
+      reportSchemaVersion: driftedRow.reportSchemaVersion,
+    })
+    throw compositeBadRequest('分析快照不可用')
+  }
+  const list = rows.map((row) => toSnapshotMetadata(row, packageSnapshot, role === UserRole.ADMIN))
+  return { list, total: list.length }
+}
+
+export const getReportForTeacher = async (
+  userId: string,
+  role: UserRole,
+  compositeId: string,
+  attemptId: string,
+  snapshotId?: string,
+) => {
   assertTeacher(role)
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
@@ -2196,7 +2385,7 @@ export const getReportForTeacher = async (userId: string, role: UserRole, compos
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment)
-  return buildCompositeReport(attempt)
+  return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 
 export const getExportContext = async (userId: string, role: UserRole, id: string) => {

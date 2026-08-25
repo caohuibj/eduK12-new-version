@@ -7,6 +7,8 @@ import {
   compositeExportQuerySchema,
   compositeExportRequestSchema,
   compositeFormAnswerSchema,
+  compositeReanalysisBodySchema,
+  compositeReportQuerySchema,
   compositeSaveSchema,
   compositeScaleAnswerSchema,
   createCompositeSchema,
@@ -212,6 +214,29 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async snapshots(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      return success(res, await service.listPackageAnalysisSnapshotsForTeacher(
+        req.user.userId,
+        req.user.role,
+        req.params.attemptId,
+      ))
+    } catch (err) { return handleError(res, err) }
+  },
+
+  async reanalyze(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      compositeReanalysisBodySchema.parse(req.body === undefined ? {} : req.body)
+      return success(res, await service.reanalyzePackageAttempt(
+        req.user.userId,
+        req.user.role,
+        req.params.attemptId,
+      ), '综合分析已重新生成')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async listAttempts(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -229,7 +254,14 @@ export const compositeController = {
   async teacherReport(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      return success(res, await service.getReportForTeacher(req.user.userId, req.user.role, req.params.id, req.params.attemptId))
+      const query = compositeReportQuerySchema.parse(req.query)
+      return success(res, await service.getReportForTeacher(
+        req.user.userId,
+        req.user.role,
+        req.params.id,
+        req.params.attemptId,
+        query.snapshotId,
+      ))
     } catch (err) { return handleError(res, err) }
   },
 

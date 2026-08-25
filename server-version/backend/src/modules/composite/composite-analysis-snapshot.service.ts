@@ -6,6 +6,7 @@ import {
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
 import { buildPackageCognitiveAnalysis } from '../cognitive-analysis/package-analysis.engine'
 import { readFrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
+import { logger } from '../../utils/logger'
 import type {
   CognitivePackageAnalysisResult,
   FrozenCognitiveModuleResult,
@@ -121,6 +122,7 @@ type SnapshotDb = {
     findUnique: (args: any) => PromiseLike<CompositeAnalysisSnapshotRow | null>
     upsert: (args: any) => PromiseLike<CompositeAnalysisSnapshotRow>
     findFirst: (args: any) => PromiseLike<CompositeAnalysisSnapshotRow | null>
+    findMany?: (args: any) => PromiseLike<CompositeAnalysisSnapshotRow[]>
   }
 }
 
@@ -415,6 +417,82 @@ export const readCompletionPackageAnalysisSnapshot = async (
   validatePayloadMetadata(row, payload, expected)
   const { payloadEncrypted: _payloadEncrypted, ...metadata } = row
   return { ...metadata, payload }
+}
+
+/**
+ * Read the immutable snapshot selected by the report API.
+ *
+ * The completion path deliberately remains a separate PR8 helper so its
+ * detailed validation errors stay available to the existing finalization
+ * tests. HTTP callers use this wrapper, which never exposes decryption or
+ * provenance details to a client and never falls back after an explicit id.
+ */
+export const readPackageAnalysisSnapshot = async (
+  db: SnapshotDb,
+  input: {
+    attemptId: string
+    snapshotId?: string
+    expected: CompletionSnapshotExpectation
+  },
+): Promise<DecryptedCompositeAnalysisSnapshot | null> => {
+  const row = input.snapshotId
+    ? await db.compositeAnalysisSnapshot.findFirst({
+        where: { id: input.snapshotId, attemptId: input.attemptId },
+      })
+    : await db.compositeAnalysisSnapshot.findFirst({
+        where: { attemptId: input.attemptId, generationReason: 'COMPLETION' },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      })
+
+  if (!row) return null
+
+  try {
+    const payload = decryptCognitivePayload<CognitivePackageAnalysisResult>(row.payloadEncrypted)
+    validatePayloadMetadata(row, payload, input.expected)
+    const { payloadEncrypted: _payloadEncrypted, ...metadata } = row
+    return { ...metadata, payload }
+  } catch {
+    logger.warn('composite analysis snapshot unavailable', {
+      attemptId: input.attemptId,
+      snapshotId: input.snapshotId ?? row.id,
+      packageKey: row.packageKey,
+      packageVersion: row.packageVersion,
+      analysisVersion: row.analysisVersion,
+      reportSchemaVersion: row.reportSchemaVersion,
+    })
+    throw new Error('分析快照不可用')
+  }
+}
+
+/**
+ * Return only database metadata. The encrypted analysis payload is excluded
+ * at the query boundary and therefore is never decrypted for history lists.
+ */
+export const listPackageAnalysisSnapshotMetadata = async (
+  db: SnapshotDb,
+  attemptId: string,
+): Promise<Array<Omit<CompositeAnalysisSnapshotRow, 'payloadEncrypted'>>> => {
+  if (!db.compositeAnalysisSnapshot.findMany) {
+    throw new Error('Snapshot metadata list is not supported by this database client')
+  }
+  const rows = await db.compositeAnalysisSnapshot.findMany({
+    where: { attemptId },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    select: {
+      id: true,
+      attemptId: true,
+      packageKey: true,
+      packageVersion: true,
+      analysisDefinitionVersion: true,
+      analysisVersion: true,
+      reportSchemaVersion: true,
+      inputFingerprint: true,
+      generationReason: true,
+      generatedBy: true,
+      createdAt: true,
+    },
+  })
+  return rows.map(({ payloadEncrypted: _payloadEncrypted, ...metadata }) => metadata)
 }
 
 export const buildCompletionSnapshotExpectation = (input: {
