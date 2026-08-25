@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { projectCompositeReport } from '../../modules/composite/composite-report.projector'
+import {
+  projectCompositeCollectionReport,
+  projectCompositeReport,
+} from '../../modules/composite/composite-report.projector'
 
   const evidence = {
     id: 'evidence-1',
@@ -45,7 +48,9 @@ const makeInput = () => {
       method: { testType: 'cpt', engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', profile: 'research' },
       disclaimer: '不是诊断',
       reference: null,
+      futureSensitiveField: 'must-not-leak',
     },
+    futureSensitiveField: 'must-not-leak',
   }
   Object.defineProperty(unit, '__frozenMetricDefinitions', {
     value: { blockSlopeRt: { role: 'research_only', availableProfiles: ['research'] } },
@@ -82,6 +87,7 @@ const makeInput = () => {
         completedAt: new Date('2026-08-25T00:30:00Z'),
         totalTime: 60,
         method: { reportDefinitionVersion: 'internal-version', payloadEncrypted: 'must-not-leak' },
+        futureSensitiveField: 'must-not-leak',
       }],
       payloadEncrypted: 'must-not-leak',
     },
@@ -152,12 +158,18 @@ describe('PR9 composite report projector', () => {
     expect(participant.unitReports[0]).not.toHaveProperty('sessionId')
     expect(participant.unitReports[0].singleTaskReport.primaryMetrics).toEqual([])
     expect(participant.unitReports[0].singleTaskReport.secondaryMetrics).toEqual([])
+    expect(participant.unitReports[0].singleTaskReport.productIndex).toBeNull()
     expect(Object.keys(participant.unitReports[0]).sort()).toEqual([
       'finishedAt', 'itemId', 'kind', 'label', 'qualityState', 'singleTaskReport', 'testType', 'type',
     ].sort())
-    expect(participant.unitReports[1]).toHaveProperty('dimensionScores')
-    expect(participant.unitReports[1]).toHaveProperty('method')
-    expect(participant.unitReports[1].dimensionScores[0]).toMatchObject({ rawScore: 99 })
+    expect(Object.keys(participant.unitReports[1]).sort()).toEqual([
+      'caveats', 'completedAt', 'disclaimer', 'itemId', 'kind', 'label',
+      'scaleCode', 'scaleName', 'totalTime', 'type',
+    ].sort())
+    expect(participant.unitReports[1]).not.toHaveProperty('dimensionScores')
+    expect(participant.unitReports[1]).not.toHaveProperty('feedback')
+    expect(participant.unitReports[1]).not.toHaveProperty('method')
+    expect(JSON.stringify(participant.unitReports[1])).not.toMatch(/rawScore|normalizedScore|"score"/)
     expect(JSON.stringify(participant.unitReports[1])).not.toContain('payloadEncrypted')
 
     const teacher = projectCompositeReport({ ...input, audience: 'teacher' })
@@ -176,8 +188,11 @@ describe('PR9 composite report projector', () => {
       'recommendations', 'snapshotCreatedAt', 'snapshotId', 'sourceSummary',
     ].sort())
     expect(Object.keys(teacher.packageReport.sourceSummary[0]).sort()).toEqual([
-      'directionClass', 'facet', 'interpretable', 'qualityFlags', 'role', 'slotKey', 'taskType',
+      'directionClass', 'facet', 'interpretable', 'qualityFlags', 'role', 'slotKey', 'sourceType', 'taskType',
     ].sort())
+    expect(teacher.unitReports[1]).not.toHaveProperty('dimensionScores')
+    expect(teacher.unitReports[1]).not.toHaveProperty('feedback')
+    expect(teacher.unitReports[1]).not.toHaveProperty('method')
 
     const researcher = projectCompositeReport({ ...input, audience: 'researcher' })
     expect(researcher.packageReport).toMatchObject({
@@ -207,9 +222,57 @@ describe('PR9 composite report projector', () => {
       dimensionScores: [{ rawScore: 99 }],
       method: { reportDefinitionVersion: 'internal-version' },
     })
+    expect(Object.keys(researcher.unitReports[0]).sort()).toEqual([
+      'finishedAt', 'itemId', 'kind', 'label', 'metrics', 'qualityFlags', 'reference',
+      'score', 'sessionId', 'singleTaskReport', 'testType', 'type',
+    ].sort())
+    expect(researcher.unitReports[0]).not.toHaveProperty('futureSensitiveField')
+    expect(researcher.unitReports[0].singleTaskReport).not.toHaveProperty('futureSensitiveField')
+    expect(researcher.unitReports[1]).not.toHaveProperty('futureSensitiveField')
     expect(JSON.stringify(researcher.unitReports)).not.toContain('payloadEncrypted')
     expect(JSON.stringify(participant)).not.toContain('payloadEncrypted')
     expect(JSON.stringify(teacher)).not.toContain('payloadEncrypted')
     expect(JSON.stringify(researcher)).not.toContain('payloadEncrypted')
+  })
+
+  it('preserves standalone scale report fields for collection-only participant and teacher views', () => {
+    const input = makeInput()
+    for (const audience of ['participant', 'teacher'] as const) {
+      const collection = projectCompositeCollectionReport(input.report, audience)
+      expect(collection).not.toHaveProperty('packageReport')
+      expect(collection.unitReports[1]).toMatchObject({
+        dimensionScores: [{ rawScore: 99, normalizedScore: 88 }],
+        feedback: { overall: '解释文本', dimensions: [{ score: 88 }] },
+        method: { reportDefinitionVersion: 'internal-version' },
+      })
+      expect(JSON.stringify(collection.unitReports[1])).not.toContain('payloadEncrypted')
+    }
+  })
+
+  it('labels a scale evidence source in the teacher source summary', () => {
+    const input = makeInput() as any
+    const scaleEvidence = {
+      ...evidence,
+      id: 'scale-evidence-1',
+      sourceType: 'scale_dimension' as const,
+      sourceResultId: 'assessment-1',
+      metricKey: 'inhibition',
+      provenance: {
+        slotKey: 'adexi_inhibition',
+        sourceType: 'scale_assessment',
+        scaleCode: 'adexi_v1',
+      },
+    }
+    input.snapshot.payload.evidence = [evidence, scaleEvidence]
+    input.snapshot.payload.cognitiveDomains[0].evidence = [evidence, scaleEvidence]
+
+    const teacher = projectCompositeReport({ ...input, audience: 'teacher' })
+    expect(teacher.packageReport.sourceSummary).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sourceType: 'self_report',
+        slotKey: 'adexi_inhibition',
+        taskType: 'adexi_v1',
+      }),
+    ]))
   })
 })

@@ -60,11 +60,21 @@ describe('CompositePackageReport', () => {
       reportSchemaVersion: 'schema-1',
       inputFingerprint: 'f'.repeat(64),
       evidence: [],
-      crossSourceFindings: [],
+      crossSourceFindings: [{
+        construct: 'response_inhibition',
+        type: 'convergence',
+        availability: 'available',
+        summary: '两类来源呈现一致的描述性线索。',
+        caveat: '不代表诊断。',
+        evidenceRefs: ['evidence-a', 'evidence-b'],
+      }],
       provenance: {},
     }} />)
 
     expect(screen.getByText('response_stability · 1')).toBeTruthy()
     expect(screen.queryByText('123')).toBeNull()
+    expect(screen.getByTestId('composite-cross-source-findings')).toBeTruthy()
+    expect(screen.getByText('两类来源呈现一致的描述性线索。')).toBeTruthy()
+    expect(screen.queryByText(/raw|dimensionScore/)).toBeNull()
   })
 })

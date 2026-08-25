@@ -168,15 +168,24 @@ describe('Round 2 cognitive analysis registries', () => {
     ).toThrow(/same domain/)
   })
 
-  it('registers six exact DRAFT protocols and hides them from the create catalog', () => {
+  it('registers seven exact DRAFT protocols and hides them from the create catalog', () => {
     const protocols = listAnalysisProtocolDefinitions()
-    expect(protocols).toHaveLength(6)
-    expect(new Set(protocols.map((protocol) => `${protocol.key}/${protocol.version}`)).size).toBe(6)
+    expect(protocols).toHaveLength(7)
+    expect(new Set(protocols.map((protocol) => `${protocol.key}/${protocol.version}`)).size).toBe(7)
     expect(protocols.every((protocol) => protocol.status === 'DRAFT')).toBe(true)
     expect(protocols.every((protocol) => protocol.recommendedForCreate === false)).toBe(true)
     expect(protocols.every((protocol) => protocol.profiles.join(',') === 'standard,research')).toBe(true)
     expect(listAnalysisProtocolCatalog().list).toEqual([])
-    expect(listAnalysisProtocolCatalog(true).list).toHaveLength(6)
+    expect(listAnalysisProtocolCatalog(true).list).toHaveLength(7)
+    expect(listAnalysisProtocolCatalog(true).list.find((item) => item.key === 'inhibitory_control_multisource_v1')).toMatchObject({
+      scaleSlots: [{
+        key: 'adexi_inhibition',
+        expectedScaleCode: 'adexi_v1',
+        expectedDimensionCode: 'inhibition',
+        respondentType: 'participant_self_report',
+        valueSelector: 'dimensionScore',
+      }],
+    })
   })
 
   it('pins exact versions and keeps the comprehensive K12 protocol non-configurable', () => {

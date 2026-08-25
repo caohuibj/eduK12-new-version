@@ -3,6 +3,7 @@ import type {
   AnalysisProtocolDefinition,
   CognitiveAnalysisProfile,
   CognitiveProtocolSlotDefinition,
+  ScaleProtocolSlotDefinition,
 } from './cognitive-analysis.types'
 import { COGNITIVE_DOMAIN_DEFINITION_VERSION, getCognitiveDomainDefinition } from './domain.registry'
 import {
@@ -10,6 +11,7 @@ import {
   listCognitiveEvidenceMappings,
 } from './evidence-mapping.registry'
 import { COGNITIVE_RECOMMENDATION_RULE_VERSION } from './recommendation.registry'
+import { getScaleDimensionEvidenceMapping } from './scale-evidence-mapping.registry'
 
 const currentSlot = (
   key: string,
@@ -50,6 +52,19 @@ const memory = (position: number) => currentSlot('memory', '数字顺背', posit
 const corsi = (position: number) => currentSlot('corsi', 'Corsi', position, 'corsi', '1.0.0', '1.0.0', '1.0.0')
 const nback = (position: number) => currentSlot('nback', 'N-Back', position, 'nback', '1.0.0', '1.0.0', '1.0.0')
 const taskswitch = (position: number) => currentSlot('taskswitch', '任务切换', position, 'taskswitch', '1.0.0', '1.0.0', '1.0.0')
+
+const adexiInhibition = (position: number): ScaleProtocolSlotDefinition => ({
+  key: 'adexi_inhibition',
+  label: 'ADEXI 抑制自评',
+  position,
+  required: true,
+  mappingKey: 'adexi_v1.inhibition.response_inhibition.v1',
+  mappingVersion: '1.0.0',
+  expectedScaleCode: 'adexi_v1',
+  expectedDimensionCode: 'inhibition',
+  respondentType: 'participant_self_report',
+  valueSelector: 'dimensionScore',
+})
 
 const profiles: CognitiveAnalysisProfile[] = ['standard', 'research']
 
@@ -98,6 +113,23 @@ const PROTOCOLS: AnalysisProtocolDefinition[] = [
     [gonogo(0), sst(1), stroop(2), futureSlot('flanker', 'Flanker', 3, 'flanker')],
     ['response_inhibition', 'interference_control'],
   ),
+  {
+    key: 'inhibitory_control_multisource_v1',
+    version: '1.0.0',
+    status: 'DRAFT',
+    name: '抑制控制跨来源画像',
+    description: '由 Go/No-Go 行为任务与 ADEXI 学员自评共同呈现抑制控制的描述性证据，不按学员年龄或身份限制作答。',
+    recommendedForCreate: false,
+    profiles,
+    estimatedMinutes: { standard: [8, 15], research: [10, 20] },
+    cognitiveSlots: [gonogo(0)],
+    scaleSlots: [adexiInhibition(1)],
+    outputDomains: ['response_inhibition'],
+    domainDefinitionVersion: COGNITIVE_DOMAIN_DEFINITION_VERSION,
+    evidenceMappingVersion: COGNITIVE_EVIDENCE_MAPPING_VERSION,
+    recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
+    disabledReason: 'ADEXI 量表已取得使用授权；适用人群与发布材料仍需完成项目审核，PR10 保持 DRAFT。',
+  },
   draftProtocol(
     'working_memory_v1',
     '工作记忆分面',
@@ -231,6 +263,29 @@ export const validateAnalysisProtocolDefinitions = (
           throw new Error(`PUBLISHED analysis protocol task definition mismatch: ${key}/${slot.testType}`)
         }
       }
+    }
+
+    for (const slot of protocol.scaleSlots) {
+      if (slotKeys.has(slot.key)) throw new Error(`Duplicate analysis protocol slot key: ${key}/${slot.key}`)
+      if (positions.has(slot.position)) throw new Error(`Duplicate analysis protocol position: ${key}/${slot.position}`)
+      if (!slot.mappingKey || !slot.mappingVersion || !slot.expectedScaleCode || !slot.expectedDimensionCode) {
+        throw new Error(`Scale analysis protocol slot mapping is incomplete: ${key}/${slot.key}`)
+      }
+      if (slot.respondentType !== 'participant_self_report' || slot.valueSelector !== 'dimensionScore') {
+        throw new Error(`Scale analysis protocol slot respondent/value selector is invalid: ${key}/${slot.key}`)
+      }
+      const mapping = getScaleDimensionEvidenceMapping(slot.mappingKey, slot.mappingVersion)
+      if (
+        !mapping
+        || mapping.scaleCode !== slot.expectedScaleCode
+        || mapping.dimensionCode !== slot.expectedDimensionCode
+        || mapping.respondentType !== slot.respondentType
+        || mapping.valueSelector !== slot.valueSelector
+      ) {
+        throw new Error(`Scale analysis protocol slot mapping is unresolved: ${key}/${slot.key}`)
+      }
+      slotKeys.add(slot.key)
+      positions.add(slot.position)
     }
 
     for (const domainKey of protocol.outputDomains) {

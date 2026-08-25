@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from '@prisma/client'
+import { Prisma, PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -11,7 +11,7 @@ async function seedAdmin() {
 
   if (existingAdmin) {
     console.log('管理员账号已存在，跳过创建')
-    return
+    return existingAdmin.id
   }
 
   // 创建默认管理员账号（凭据优先来自环境变量，便于不同部署定制）
@@ -31,6 +31,7 @@ async function seedAdmin() {
   console.log('默认管理员账号创建成功:')
   console.log(`  用户名: ${admin.username}`)
   console.log(`  密码: ${adminPassword}`)
+  return admin.id
 }
 
 // D1.1 修正：已发布配置不可变（Published Config Immutable）。
@@ -277,7 +278,7 @@ async function seedCognitiveConfig(
   })
   if (!existing) {
     const created = await prisma.cognitiveTestConfig.create({
-      data: { testType, configVersion, ...expected },
+      data: { testType, configVersion, ...expected, config: expected.config as Prisma.InputJsonValue },
     })
     console.log(`${testType} Cognitive 配置已创建: configVersion=${created.configVersion} scoringVersion=${created.scoringVersion}`)
     return
@@ -346,9 +347,266 @@ async function seedRound1P0Configs() {
   })
 }
 
+// PR10：ADEXI 参与者自评量表。
+// 该量表已获得正式授权；量表本身按课程可见的 PUBLISHED 资源写入，跨来源报告包仍保持 DRAFT，等待整体发布审核。
+// 学员可为青少年或成人；这里不设置年龄或角色限制，教师只负责发布和查看结果。
+const ADEXI_CODE = 'adexi_v1'
+const ADEXI_VERSION = '1.0.0'
+const ADEXI_OPTIONS = [
+  { value: 1, label: '绝对不符合' },
+  { value: 2, label: '不太符合' },
+  { value: 3, label: '有时符合' },
+  { value: 4, label: '比较符合' },
+  { value: 5, label: '非常符合' },
+]
+const ADEXI_SOURCE_ITEMS = [
+  'I have difficulty remembering lengthy instructions',
+  'I sometimes have difficulty remembering what I am doing in the middle of an activity',
+  'I have a tendency to do things without first thinking about what could happen',
+  'I sometimes have difficulty stopping myself from doing something that I like even though someone tells me that it is not allowed.',
+  'When someone asks me to do several things, I sometimes remember only the first or last',
+  'I sometimes have difficulty refraining from smiling or laughing in situations where it is inappropriate',
+  'I have difficulty coming up with a different way of solving a problem when I get stuck',
+  'When someone asks me to fetch something, I sometimes forget what I am supposed to fetch',
+  'I have difficulty planning for an activity (e.g., remembering to bring everything necessary when going on a trip/to work/to school)',
+  'I sometimes have difficulty stopping an activity that I like (e.g., I watch TV or sit in front of the computer in the evening even though it is time to go to bed)',
+  'I sometimes have difficulty understanding verbal instructions unless I am also shown how to do something',
+  'I have difficulties with tasks or activities that involve several steps',
+  'I have difficulty thinking ahead or learning from experience',
+  'People that I meet sometimes seem to think that I am more lively/wilder compared to other people my age',
+]
+const ADEXI_ITEMS = [
+  '我难以记住较长的指令。',
+  '在一项活动进行到一半时，我有时难以记住自己正在做什么。',
+  '我往往会不先考虑可能发生什么就直接做事。',
+  '即使别人告诉我不可以，我有时仍难以阻止自己做喜欢的事情。',
+  '别人让我做几件事时，我有时只记得第一件或最后一件。',
+  '在不合适的场合，我有时难以忍住不微笑或大笑。',
+  '遇到困难时，我难以想出另一种解决问题的方法。',
+  '别人让我去拿某样东西时，我有时会忘记自己应该拿什么。',
+  '我难以为一项活动做计划（例如出行、上班或上学时记得带齐所需物品）。',
+  '我有时难以停止喜欢的活动（例如晚上到了该睡觉的时间，我仍看电视或坐在电脑前）。',
+  '除非同时有人示范，否则我有时难以理解口头指令。',
+  '涉及多个步骤的任务或活动对我来说比较困难。',
+  '我难以提前思考或从经验中学习。',
+  '我遇到的人有时似乎认为，与同龄人相比，我更活跃或更“野”。',
+]
+const ADEXI_WORKING_MEMORY_ITEMS = new Set([1, 2, 5, 7, 8, 9, 11, 12, 13])
+const ADEXI_EXPECTED = {
+  name: 'ADEXI 执行功能参与者自评 v1.0.0',
+  description: '14 项执行功能参与者自评，包含工作记忆与抑制两个维度；PR10 仅以描述性证据使用。',
+  status: 'PUBLISHED' as const,
+  visibility: 'COURSE' as const,
+  estimatedTime: 5,
+  instruction: '请根据你自己的日常体验作答。没有正确或错误答案；本量表不是诊断工具。',
+  tags: ['PR10', 'ADEXI', 'participant-self-report', 'inhibitory-control'],
+  config: {
+    points: 5,
+    labels: ADEXI_OPTIONS,
+    respondentType: 'participant_self_report',
+    source: 'ADEXI_SELFREPORT_ENG',
+    sourceUrl: 'https://chexi.se/onewebmedia/ADEXI_SELFREPORT_ENG.pdf',
+    licenseStatus: 'authorized',
+    scoring: {
+      method: 'sum',
+      dimensions: {
+        working_memory: { itemCodes: [1, 2, 5, 7, 8, 9, 11, 12, 13] },
+        inhibition: { itemCodes: [3, 4, 6, 10, 14] },
+      },
+    },
+    sourceItems: ADEXI_SOURCE_ITEMS,
+    applicabilityNote: 'PR10 不按学员年龄或教师/学员角色限制作答；开放前仍需完成项目适用性审核。',
+  },
+}
+
+const normalizeADEXI = (scale: any) => {
+  const dimensionsById = new Map((scale.dimensions ?? []).map((dimension: any) => [dimension.id, dimension.code]))
+  return {
+    code: scale.code,
+    name: scale.name,
+    description: scale.description,
+    status: scale.status,
+    visibility: scale.visibility,
+    estimatedTime: scale.estimatedTime,
+    instruction: scale.instruction,
+    tags: [...(scale.tags ?? [])],
+    config: scale.config,
+    dimensions: [...(scale.dimensions ?? [])]
+      .sort((left: any, right: any) => left.code.localeCompare(right.code))
+      .map((dimension: any) => ({
+        code: dimension.code,
+        name: dimension.name,
+        description: dimension.description,
+        scoringMethod: dimension.scoringMethod,
+        minScore: dimension.minScore === null ? null : Number(dimension.minScore),
+        maxScore: dimension.maxScore === null ? null : Number(dimension.maxScore),
+      })),
+    items: [...(scale.items ?? [])]
+      .sort((left: any, right: any) => left.sortOrder - right.sortOrder)
+      .map((item: any) => ({
+        itemCode: item.itemCode,
+        content: item.content,
+        type: item.type,
+        reverse: item.reverse,
+        required: item.required,
+        weight: Number(item.weight),
+        sortOrder: item.sortOrder,
+        options: item.options,
+        randomizeOptions: item.randomizeOptions,
+        dimensions: [...(item.itemDimensions ?? [])]
+          .sort((left: any, right: any) => String(left.dimensionId).localeCompare(String(right.dimensionId)))
+          .map((itemDimension: any) => ({
+            dimensionCode: dimensionsById.get(itemDimension.dimensionId) ?? null,
+            weight: Number(itemDimension.weight),
+            reverse: itemDimension.reverse,
+          })),
+      })),
+  }
+}
+
+const ADEXI_EXPECTED_SHAPE = {
+  code: ADEXI_CODE,
+  ...ADEXI_EXPECTED,
+  dimensions: [
+    {
+      code: 'inhibition',
+      name: '抑制（自评）',
+      description: '与抑制冲动、停止偏好活动和在不合适场合抑制反应有关的参与者自评。',
+      scoringMethod: 'sum',
+      minScore: 5,
+      maxScore: 25,
+    },
+    {
+      code: 'working_memory',
+      name: '工作记忆（自评）',
+      description: '与记住、保持和处理多步骤信息有关的参与者自评。',
+      scoringMethod: 'sum',
+      minScore: 9,
+      maxScore: 45,
+    },
+  ],
+  items: ADEXI_ITEMS.map((content, index) => ({
+    itemCode: `ADEXI-${String(index + 1).padStart(2, '0')}`,
+    content,
+    type: 'single',
+    reverse: false,
+    required: true,
+    weight: 1,
+    sortOrder: index,
+    options: ADEXI_OPTIONS,
+    randomizeOptions: false,
+    dimensions: [{
+      dimensionCode: ADEXI_WORKING_MEMORY_ITEMS.has(index + 1) ? 'working_memory' : 'inhibition',
+      weight: 1,
+      reverse: false,
+    }],
+  })),
+}
+
+async function seedADEXI(adminId: string) {
+  const existing = await prisma.scale.findUnique({
+    where: { code: ADEXI_CODE },
+    include: { dimensions: true, items: { include: { itemDimensions: true } } },
+  })
+  if (existing) {
+    const normalized = normalizeADEXI(existing)
+    const same = deepEqual(normalized, ADEXI_EXPECTED_SHAPE)
+    if (same) {
+      console.log(`ADEXI 量表已存在且一致，跳过（幂等）: code=${ADEXI_CODE} status=${existing.status}`)
+      return
+    }
+
+    // The earlier PR10 seed intentionally created a DRAFT/HIDDEN row while
+    // authorization was pending. Promote only that exact content in place;
+    // any other content drift still fails closed and requires a new version.
+    const existingConfig = normalized.config && typeof normalized.config === 'object' && !Array.isArray(normalized.config)
+      ? normalized.config as Record<string, unknown>
+      : null
+    const authorizedTransition = existing.status === 'DRAFT'
+      && existing.visibility === 'HIDDEN'
+      && existingConfig
+      && deepEqual({
+        ...normalized,
+        status: ADEXI_EXPECTED_SHAPE.status,
+        visibility: ADEXI_EXPECTED_SHAPE.visibility,
+        config: {
+          ...existingConfig,
+          licenseStatus: ADEXI_EXPECTED_SHAPE.config.licenseStatus,
+        },
+      }, ADEXI_EXPECTED_SHAPE)
+    if (authorizedTransition) {
+      await prisma.scale.update({
+        where: { id: existing.id },
+        data: {
+          status: ADEXI_EXPECTED.status,
+          visibility: ADEXI_EXPECTED.visibility,
+          config: ADEXI_EXPECTED.config,
+        },
+      })
+      console.log(`ADEXI 量表已从旧 DRAFT/HIDDEN 基线安全升级: code=${ADEXI_CODE} status=${ADEXI_EXPECTED.status}`)
+      return
+    }
+    throw new Error(`scale ${ADEXI_CODE} already exists with divergent content; create a new scale code/version instead of mutating it`)
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const scale = await tx.scale.create({
+      data: {
+        code: ADEXI_CODE,
+        creatorId: adminId,
+        ...ADEXI_EXPECTED,
+      },
+    })
+    const dimensions = new Map<string, string>()
+    for (const dimension of [
+      {
+        code: 'working_memory',
+        name: '工作记忆（自评）',
+        description: '与记住、保持和处理多步骤信息有关的参与者自评。',
+        scoringMethod: 'sum',
+        minScore: 9,
+        maxScore: 45,
+      },
+      {
+        code: 'inhibition',
+        name: '抑制（自评）',
+        description: '与抑制冲动、停止偏好活动和在不合适场合抑制反应有关的参与者自评。',
+        scoringMethod: 'sum',
+        minScore: 5,
+        maxScore: 25,
+      },
+    ]) {
+      const created = await tx.dimension.create({ data: { scaleId: scale.id, ...dimension } })
+      dimensions.set(dimension.code, created.id)
+    }
+    for (const [index, content] of ADEXI_ITEMS.entries()) {
+      const dimensionCode = ADEXI_WORKING_MEMORY_ITEMS.has(index + 1) ? 'working_memory' : 'inhibition'
+      await tx.scaleItem.create({
+        data: {
+          scaleId: scale.id,
+          itemCode: `ADEXI-${String(index + 1).padStart(2, '0')}`,
+          content,
+          type: 'single',
+          reverse: false,
+          required: true,
+          weight: 1,
+          sortOrder: index,
+          options: ADEXI_OPTIONS,
+          randomizeOptions: false,
+          itemDimensions: {
+            create: [{ dimensionId: dimensions.get(dimensionCode)!, weight: 1, reverse: false }],
+          },
+        },
+      })
+    }
+  })
+  console.log(`ADEXI 量表已创建为 PUBLISHED/COURSE: code=${ADEXI_CODE} version=${ADEXI_VERSION}`)
+}
+
 async function main() {
   console.log('开始初始化数据库...')
-  await seedAdmin()
+  const adminId = await seedAdmin()
+  await seedADEXI(adminId)
   await seedFakeCognitiveConfig()
   await seedReactionCognitiveConfig()
   await seedMemoryCognitiveConfig()

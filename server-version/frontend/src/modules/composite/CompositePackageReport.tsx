@@ -96,8 +96,8 @@ const CompositePackageReport: React.FC<{ report: PackageReport }> = ({ report })
 
       {isTeacher && report.sourceSummary && (
         <div className="card p-6" data-testid="composite-source-summary">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">行为任务来源</h2>
-          <div className="overflow-x-auto"><table className="min-w-full text-sm"><thead><tr className="text-left text-gray-500 border-b"><th className="py-2 pr-3">任务槽位</th><th className="py-2 pr-3">任务类型</th><th className="py-2 pr-3">facet</th><th className="py-2 pr-3">角色</th><th className="py-2 pr-3">方向</th></tr></thead><tbody>{report.sourceSummary.map((source, index) => <tr key={`${source.slotKey || 'source'}-${index}`} className="border-b last:border-0"><td className="py-2 pr-3">{source.slotKey || '—'}</td><td className="py-2 pr-3">{source.taskType || '—'}</td><td className="py-2 pr-3">{source.facet || '—'}</td><td className="py-2 pr-3">{source.role === 'primary' ? '主要' : '支持'}</td><td className="py-2 pr-3">{source.directionClass}</td></tr>)}</tbody></table></div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">来源摘要</h2>
+          <div className="overflow-x-auto"><table className="min-w-full text-sm"><thead><tr className="text-left text-gray-500 border-b"><th className="py-2 pr-3">来源</th><th className="py-2 pr-3">任务槽位</th><th className="py-2 pr-3">任务类型</th><th className="py-2 pr-3">facet</th><th className="py-2 pr-3">角色</th><th className="py-2 pr-3">方向</th></tr></thead><tbody>{report.sourceSummary.map((source, index) => <tr key={`${source.slotKey || 'source'}-${index}`} className="border-b last:border-0"><td className="py-2 pr-3">{source.sourceType === 'self_report' ? '参与者自评' : '行为任务'}</td><td className="py-2 pr-3">{source.slotKey || '—'}</td><td className="py-2 pr-3">{source.taskType || '—'}</td><td className="py-2 pr-3">{source.facet || '—'}</td><td className="py-2 pr-3">{source.role === 'primary' ? '主要' : '支持'}</td><td className="py-2 pr-3">{source.directionClass}</td></tr>)}</tbody></table></div>
           {report.qualityFlags && report.qualityFlags.length > 0 && <p className="mt-3 text-xs text-amber-700">质量 flags：{report.qualityFlags.join('、')}</p>}
         </div>
       )}
@@ -113,6 +113,33 @@ const CompositePackageReport: React.FC<{ report: PackageReport }> = ({ report })
         <div className="card p-6" data-testid="composite-evidence-refs">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">证据引用</h2>
           <div className="space-y-2">{report.evidence.map((evidence, index) => <div key={String(evidence.id || index)} className="rounded-lg bg-gray-50 p-3 text-xs text-gray-600"><span className="font-medium text-gray-800">{String(evidence.id || 'Evidence')}</span><span className="ml-2">{String(evidence.sourceType || '')}</span><span className="ml-2">{String(evidence.sourceResultId || '')}</span><span className="ml-2">{String(evidence.facet || evidence.construct || '')}</span><span className="ml-2">{String(evidence.directionClass || '')}</span></div>)}</div>
+        </div>
+      )}
+
+      {isResearcher && report.crossSourceFindings && report.crossSourceFindings.length > 0 && (
+        <div className="card p-6" data-testid="composite-cross-source-findings">
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">跨来源描述性发现</h2>
+          <div className="space-y-3">
+            {report.crossSourceFindings.map((finding, index) => {
+              const evidenceRefs = Array.isArray(finding.evidenceRefs)
+                ? finding.evidenceRefs.map(String).join('、')
+                : ''
+              const availability = typeof finding.availability === 'string' ? finding.availability : ''
+              const caveat = typeof finding.caveat === 'string' ? finding.caveat : ''
+              return (
+                <article key={`${String(finding.construct || 'finding')}-${index}`} className="rounded-lg border border-gray-100 p-4 text-sm text-gray-600">
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                    <span>{String(finding.construct || '—')}</span>
+                    <span>{String(finding.type || '—')}</span>
+                    {availability && <span>{availability}</span>}
+                  </div>
+                  <p className="mt-2">{String(finding.summary || '')}</p>
+                  {caveat && <p className="mt-2 text-xs text-amber-700">{caveat}</p>}
+                  {evidenceRefs && <p className="mt-2 text-xs text-gray-400">Evidence refs：{evidenceRefs}</p>}
+                </article>
+              )
+            })}
+          </div>
         </div>
       )}
 

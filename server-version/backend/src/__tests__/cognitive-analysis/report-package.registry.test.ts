@@ -7,12 +7,13 @@ import {
 } from '../../modules/cognitive-analysis/report-package.registry'
 
 describe('ReportPackageRegistry PR6B', () => {
-  it('registers the six built-in cognitive-only packages as disabled drafts', () => {
+  it('registers the six cognitive-only packages plus the PR10 multi-source draft', () => {
     const packages = listReportPackageDefinitions()
-    expect(packages).toHaveLength(6)
+    expect(packages).toHaveLength(7)
     expect(packages.map((item) => item.key)).toEqual([
       'attention_stability_v1',
       'inhibitory_control_v1',
+      'inhibitory_control_multisource_v1',
       'working_memory_v1',
       'executive_control_v1',
       'learning_reasoning_v1',
@@ -24,6 +25,19 @@ describe('ReportPackageRegistry PR6B', () => {
       expect(definition.slots.every((slot) => slot.required)).toBe(true)
       expect(definition.reportDefinitionVersion).toBe('report-package-v1')
     }
+    expect(packages.find((item) => item.key === 'inhibitory_control_multisource_v1')?.slots).toEqual([
+      expect.objectContaining({
+        key: 'gonogo',
+        position: 0,
+        testType: 'gonogo',
+      }),
+      expect.objectContaining({
+        key: 'adexi_inhibition',
+        position: 1,
+        expectedScaleCode: 'adexi_v1',
+        expectedDimensionCode: 'inhibition',
+      }),
+    ])
   })
 
   it('resolves exact key/version resource ids and returns defensive copies', () => {

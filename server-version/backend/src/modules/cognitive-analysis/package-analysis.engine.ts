@@ -11,6 +11,8 @@ import type {
   CognitivePackageAnalysisResult,
   CognitiveAnalysisProfile,
   CognitiveProtocolSlotDefinition,
+  FrozenScaleModuleResult,
+  ScaleProtocolSlotDefinition,
   EvidenceDirectionClass,
   EvidenceInterpretation,
   EvidenceItem,
@@ -20,6 +22,8 @@ import type {
 import {
   COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
   COGNITIVE_ANALYSIS_VERSION,
+  MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION,
+  MULTISOURCE_ANALYSIS_VERSION,
 } from './cognitive-analysis.types'
 import {
   getCognitiveDomainDefinition,
@@ -31,10 +35,12 @@ import {
 } from './evidence-mapping.registry'
 import type { ReportPackageDefinition } from './report-package.registry'
 import type { FrozenReportPackageSnapshot } from './report-package-freeze'
+import type { FrozenScaleSlotMeasurement } from './protocol-freeze'
 
 export interface BuildPackageCognitiveAnalysisInput {
   packageSnapshot: FrozenReportPackageSnapshot
   moduleResults: FrozenCognitiveModuleResult[]
+  scaleResults?: FrozenScaleModuleResult[]
   attemptId?: string
   assessmentId?: string
 }
@@ -86,6 +92,17 @@ const PR7_BUILT_IN_PACKAGE_CONTRACTS = new Map<string, {
   recommendationRuleVersion: '1.0.0',
 }]))
 
+const PR10_MULTISOURCE_PACKAGE_KEY = 'inhibitory_control_multisource_v1'
+const PR10_MULTISOURCE_PACKAGE_VERSION = '1.0.0'
+const PR10_BUILT_IN_PACKAGE_CONTRACT = {
+  protocolKey: PR10_MULTISOURCE_PACKAGE_KEY,
+  protocolVersion: PR10_MULTISOURCE_PACKAGE_VERSION,
+  packageReportDefinitionVersion: 'report-package-v1',
+  domainDefinitionVersion: '1.0.0',
+  evidenceMappingVersion: '1.0.0',
+  recommendationRuleVersion: '1.0.0',
+}
+
 const validateCognitiveSlot = (value: unknown, label: string): CognitiveProtocolSlotDefinition => {
   if (!isRecord(value)) fail(`${label} 格式无效`)
   const slot = value as Record<string, unknown>
@@ -109,14 +126,48 @@ const validateCognitiveSlot = (value: unknown, label: string): CognitiveProtocol
   return value as unknown as CognitiveProtocolSlotDefinition
 }
 
+const validateScaleSlot = (value: unknown, label: string): ScaleProtocolSlotDefinition => {
+  if (!isRecord(value)) fail(`${label} 格式无效`)
+  const slot = value as Record<string, unknown>
+  for (const field of [
+    'key',
+    'label',
+    'mappingKey',
+    'mappingVersion',
+    'expectedScaleCode',
+    'expectedDimensionCode',
+    'respondentType',
+    'valueSelector',
+  ]) {
+    requireNonEmptyString(slot[field], `${label} ${field}`)
+  }
+  if (!Number.isInteger(slot.position) || (slot.position as number) < 0) fail(`${label} position 无效`)
+  if (slot.required !== true) fail(`${label} 必须是 required`)
+  if (slot.respondentType !== 'participant_self_report' || slot.valueSelector !== 'dimensionScore') {
+    fail(`${label} respondent/value selector 无效`)
+  }
+  return value as unknown as ScaleProtocolSlotDefinition
+}
+
+const canonicalSlotValue = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(canonicalSlotValue)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+        .map(([key, entry]) => [key, canonicalSlotValue(entry)]),
+    )
+  }
+  return value
+}
+
 const sameSlots = (
-  left: CognitiveProtocolSlotDefinition[],
-  right: CognitiveProtocolSlotDefinition[],
+  left: Array<CognitiveProtocolSlotDefinition | ScaleProtocolSlotDefinition>,
+  right: Array<CognitiveProtocolSlotDefinition | ScaleProtocolSlotDefinition>,
 ): boolean => left.length === right.length && left.every((slot, index) => {
   const candidate = right[index]
-  return Boolean(candidate) && Object.keys(slot).every(
-    (key) => slot[key as keyof CognitiveProtocolSlotDefinition] === candidate[key as keyof CognitiveProtocolSlotDefinition],
-  ) && Object.keys(candidate).length === Object.keys(slot).length
+  return Boolean(candidate)
+    && JSON.stringify(canonicalSlotValue(slot)) === JSON.stringify(canonicalSlotValue(candidate))
 })
 
 const sortedByPosition = <T extends { position: number }>(items: T[]): T[] =>
@@ -128,9 +179,10 @@ const validatePackageSnapshot = (
   packageDefinition: ReportPackageDefinition
   protocol: AnalysisProtocolDefinition
   measurementsBySlot: Map<string, { resolvedConfigHash: string; resolvedReportHash: string }>
+  scaleMeasurementsBySlot: Map<string, FrozenScaleSlotMeasurement>
 } => {
-  if (!isRecord(snapshot) || snapshot.snapshotVersion !== 1) {
-    fail('PR7 只接受版本为 1 的冻结报告包快照')
+  if (!isRecord(snapshot) || (snapshot.snapshotVersion !== 1 && snapshot.snapshotVersion !== 2)) {
+    fail('冻结报告包快照版本无效')
   }
   const packageKey = requireNonEmptyString(snapshot.packageKey, '冻结报告包 packageKey')
   const packageVersion = requireNonEmptyString(snapshot.packageVersion, '冻结报告包 packageVersion')
@@ -143,7 +195,12 @@ const validatePackageSnapshot = (
     fail('冻结报告包外层与包定义的 key/version 不匹配')
   }
   const builtInContract = PR7_BUILT_IN_PACKAGE_CONTRACTS.get(`${packageKey}@${packageVersion}`)
-    ?? fail('报告包不是 PR7 允许的六个内置精确版本')
+    ?? (packageKey === PR10_MULTISOURCE_PACKAGE_KEY && packageVersion === PR10_MULTISOURCE_PACKAGE_VERSION
+      ? PR10_BUILT_IN_PACKAGE_CONTRACT
+      : fail('报告包不是支持的内置精确版本'))
+  const isMultisource = packageKey === PR10_MULTISOURCE_PACKAGE_KEY
+  if (isMultisource && snapshot.snapshotVersion !== 2) fail('跨来源报告包必须使用版本 2 快照')
+  if (!isMultisource && snapshot.snapshotVersion !== 1) fail('认知-only 报告包必须使用版本 1 快照')
   if (
     packageDefinition.analysisProtocolKey !== builtInContract.protocolKey ||
     packageDefinition.analysisProtocolVersion !== builtInContract.protocolVersion ||
@@ -157,17 +214,23 @@ const validatePackageSnapshot = (
   if (packageDefinition.profiles.some((profile) => !isCognitiveProfile(profile))) {
     fail('冻结报告包包含非法 Profile')
   }
-  const packageCognitiveSlots = sortedByPosition(
-    packageDefinition.slots.map((slot, index) => {
-      if (!isRecord(slot) || typeof slot.testType !== 'string') {
-        fail(`PR7 不接受含 scale slot 的报告包：slots[${index}]`)
-      }
-      return validateCognitiveSlot(slot, `冻结报告包 slots[${index}]`)
-    }),
-  )
+  const packageCognitiveSlots: CognitiveProtocolSlotDefinition[] = []
+  const packageScaleSlots: ScaleProtocolSlotDefinition[] = []
+  for (const [index, slot] of packageDefinition.slots.entries()) {
+    if (!isRecord(slot)) fail(`PR7 不接受含 scale slot 的报告包：slots[${index}]`)
+    const rawSlot = slot as unknown as Record<string, unknown>
+    if (typeof rawSlot.testType === 'string') {
+      packageCognitiveSlots.push(validateCognitiveSlot(rawSlot, `冻结报告包 slots[${index}]`))
+    } else if (isMultisource && typeof rawSlot.expectedScaleCode === 'string') {
+      packageScaleSlots.push(validateScaleSlot(rawSlot, `冻结报告包 slots[${index}]`))
+    } else {
+      fail(`PR7 不接受含 scale slot 的报告包：slots[${index}]`)
+    }
+  }
+  const sortedPackageSlots = sortedByPosition([...packageCognitiveSlots, ...packageScaleSlots])
 
   const protocolSnapshot = snapshot.analysisProtocolSnapshot
-  if (!isRecord(protocolSnapshot) || protocolSnapshot.snapshotVersion !== 1) {
+  if (!isRecord(protocolSnapshot) || (protocolSnapshot.snapshotVersion !== 1 && protocolSnapshot.snapshotVersion !== 2)) {
     fail('冻结报告包缺少有效的冻结分析协议')
   }
   if (
@@ -192,29 +255,34 @@ const validatePackageSnapshot = (
   if (protocol.profiles.some((profile) => !isCognitiveProfile(profile))) {
     fail('冻结分析协议包含非法 Profile')
   }
-  if (!Array.isArray(protocol.scaleSlots) || protocol.scaleSlots.length > 0) {
-    fail('PR7 不接受含 scale slot 的分析协议')
-  }
   if (!Array.isArray(protocol.cognitiveSlots)) fail('冻结分析协议 cognitiveSlots 格式无效')
+  if (!Array.isArray(protocol.scaleSlots)) fail('冻结分析协议 scaleSlots 格式无效')
+  if (isMultisource && protocol.scaleSlots.length === 0) fail('跨来源报告包缺少 scale slot')
+  if (!isMultisource && protocol.scaleSlots.length > 0) fail('PR7 不接受含 scale slot 的分析协议')
   const protocolCognitiveSlots = sortedByPosition(
     protocol.cognitiveSlots.map((slot, index) =>
       validateCognitiveSlot(slot, `冻结分析协议 cognitiveSlots[${index}]`)),
   )
-  if (!sameSlots(packageCognitiveSlots, protocolCognitiveSlots)) {
+  const protocolScaleSlots = sortedByPosition(
+    protocol.scaleSlots.map((slot, index) =>
+      validateScaleSlot(slot, `冻结分析协议 scaleSlots[${index}]`)),
+  )
+  const protocolAllSlots = sortedByPosition([...protocolCognitiveSlots, ...protocolScaleSlots])
+  if (!sameSlots(sortedPackageSlots, protocolAllSlots)) {
     fail('报告包槽位与内部分析协议槽位不完全一致')
   }
   const slotKeys = new Set<string>()
   const positions = new Set<number>()
   const testTypes = new Set<string>()
-  for (const slot of protocolCognitiveSlots) {
+  for (const slot of protocolAllSlots) {
     if (slotKeys.has(slot.key)) fail(`冻结分析协议槽位重复：${slot.key}`)
     if (positions.has(slot.position)) fail(`冻结分析协议槽位 position 重复：${slot.position}`)
-    if (testTypes.has(slot.testType)) fail(`冻结分析协议任务重复：${slot.testType}`)
+    if ('testType' in slot && testTypes.has(slot.testType)) fail(`冻结分析协议任务重复：${slot.testType}`)
     slotKeys.add(slot.key)
     positions.add(slot.position)
-    testTypes.add(slot.testType)
+    if ('testType' in slot) testTypes.add(slot.testType)
   }
-  if (protocolCognitiveSlots.some((slot, index) => slot.position !== index)) {
+  if (protocolAllSlots.some((slot, index) => slot.position !== index)) {
     fail('冻结分析协议槽位 position 必须从 0 连续排列')
   }
   if (
@@ -272,7 +340,78 @@ const validatePackageSnapshot = (
     if (!measurementKeys.has(slot.key)) fail(`冻结报告包缺少任务测量：${slot.key}`)
   }
 
-  return { packageDefinition, protocol, measurementsBySlot }
+  const scaleMeasurements = protocolSnapshot.scaleMeasurements
+  if (isMultisource && (!Array.isArray(scaleMeasurements) || scaleMeasurements.length !== protocolScaleSlots.length)) {
+    fail('冻结报告包的量表测量数量不匹配')
+  }
+  if (!isMultisource && scaleMeasurements !== undefined && scaleMeasurements.length > 0) {
+    fail('认知-only 报告包不应包含量表测量')
+  }
+  const scaleMeasurementsBySlot = new Map<string, FrozenScaleSlotMeasurement>()
+  for (const rawMeasurement of scaleMeasurements ?? []) {
+    if (!isRecord(rawMeasurement)) fail('冻结报告包量表测量格式无效')
+    const slotKey = requireNonEmptyString(rawMeasurement.slotKey, '冻结量表测量 slotKey')
+    if (scaleMeasurementsBySlot.has(slotKey)) fail(`冻结量表测量重复：${slotKey}`)
+    const scaleId = requireNonEmptyString(rawMeasurement.scaleId, `冻结量表测量 scaleId：${slotKey}`)
+    const scaleCode = requireNonEmptyString(rawMeasurement.scaleCode, `冻结量表测量 scaleCode：${slotKey}`)
+    const dimensionCode = requireNonEmptyString(rawMeasurement.dimensionCode, `冻结量表测量 dimensionCode：${slotKey}`)
+    const scaleDefinitionHash = requireNonEmptyString(rawMeasurement.scaleDefinitionHash, `冻结量表测量 definition hash：${slotKey}`)
+    if (!SHA256_PATTERN.test(scaleDefinitionHash)) fail(`冻结量表测量 definition hash 无效：${slotKey}`)
+    const mappingKey = requireNonEmptyString(rawMeasurement.mappingKey, `冻结量表测量 mappingKey：${slotKey}`)
+    const mappingVersion = requireNonEmptyString(rawMeasurement.mappingVersion, `冻结量表测量 mappingVersion：${slotKey}`)
+    const mappingDomain = requireNonEmptyString(rawMeasurement.mappingDomain, `冻结量表测量 mappingDomain：${slotKey}`)
+    const mappingFacet = requireNonEmptyString(rawMeasurement.mappingFacet, `冻结量表测量 mappingFacet：${slotKey}`)
+    const mappingDomainDefinition = getCognitiveDomainDefinition(
+      mappingDomain as CognitiveDomainKey,
+      protocol.domainDefinitionVersion,
+    )
+    if (
+      !mappingDomainDefinition
+      || !protocol.outputDomains.includes(mappingDomain as CognitiveDomainKey)
+      || !mappingDomainDefinition.facets.some((facet) => facet.key === mappingFacet)
+    ) {
+      fail(`冻结量表测量 mappingDomain 无效：${slotKey}`)
+    }
+    if (rawMeasurement.mappingRole !== 'primary' && rawMeasurement.mappingRole !== 'supporting') {
+      fail(`冻结量表测量 mappingRole 无效：${slotKey}`)
+    }
+    if (rawMeasurement.mappingDirectionClass !== 'more_difficulty' && rawMeasurement.mappingDirectionClass !== 'more_strength') {
+      fail(`冻结量表测量 mappingDirectionClass 无效：${slotKey}`)
+    }
+    if (rawMeasurement.respondentType !== 'participant_self_report' || rawMeasurement.valueSelector !== 'dimensionScore') {
+      fail(`冻结量表测量 respondent/value selector 无效：${slotKey}`)
+    }
+    const slot = protocolScaleSlots.find((candidate) => candidate.key === slotKey)
+    if (
+      !slot
+      || slot.expectedScaleCode !== scaleCode
+      || slot.expectedDimensionCode !== dimensionCode
+      || slot.mappingKey !== mappingKey
+      || slot.mappingVersion !== mappingVersion
+    ) {
+      fail(`冻结量表测量与协议槽位不匹配：${slotKey}`)
+    }
+    scaleMeasurementsBySlot.set(slotKey, {
+      slotKey,
+      scaleId,
+      scaleCode,
+      dimensionCode,
+      scaleDefinitionHash,
+      mappingKey,
+      mappingVersion,
+      mappingDomain: mappingDomain as CognitiveDomainKey,
+      mappingFacet,
+      mappingRole: rawMeasurement.mappingRole,
+      mappingDirectionClass: rawMeasurement.mappingDirectionClass,
+      respondentType: 'participant_self_report',
+      valueSelector: 'dimensionScore',
+    })
+  }
+  for (const slot of protocolScaleSlots) {
+    if (!scaleMeasurementsBySlot.has(slot.key)) fail(`冻结报告包缺少量表测量：${slot.key}`)
+  }
+
+  return { packageDefinition, protocol, measurementsBySlot, scaleMeasurementsBySlot }
 }
 
 const validateFrozenReport = (
@@ -376,6 +515,64 @@ const validateModuleResults = (
   }
   for (const slot of slots) {
     if (!bySlot.has(slot.key)) fail(`冻结任务结果缺少槽位：${slot.key}`)
+  }
+  return bySlot
+}
+
+const validateScaleResults = (
+  results: FrozenScaleModuleResult[] | undefined,
+  slots: ScaleProtocolSlotDefinition[],
+  profile: CognitiveAnalysisProfile,
+  measurementsBySlot: Map<string, FrozenScaleSlotMeasurement>,
+): Map<string, FrozenScaleModuleResult> => {
+  const normalizedResults = results ?? []
+  if ((slots.length > 0 && !Array.isArray(results)) || normalizedResults.length !== slots.length) {
+    fail(`冻结量表结果数量不匹配：需要 ${slots.length} 个量表结果`)
+  }
+  const bySlot = new Map<string, FrozenScaleModuleResult>()
+  for (const result of normalizedResults) {
+    if (!result || !isRecord(result)) fail('冻结量表结果格式无效')
+    const slotKey = requireNonEmptyString(result.slotKey, '冻结量表结果 slotKey')
+    if (bySlot.has(slotKey)) fail(`冻结量表结果重复：${slotKey}`)
+    const slot = slots.find((candidate) => candidate.key === slotKey)
+      ?? fail(`冻结量表结果包含未知槽位：${slotKey}`)
+    if (result.profile !== profile) fail(`冻结量表结果 Profile 不匹配：${slotKey}`)
+    requireNonEmptyString(result.sourceResultId, `冻结量表 sourceResultId：${slotKey}`)
+    requireNonEmptyString(result.scaleId, `冻结量表 scaleId：${slotKey}`)
+    requireNonEmptyString(result.scaleCode, `冻结量表 scaleCode：${slotKey}`)
+    requireNonEmptyString(result.dimensionCode, `冻结量表 dimensionCode：${slotKey}`)
+    requireNonEmptyString(result.scaleDefinitionHash, `冻结量表 definition hash：${slotKey}`)
+    const measurement = measurementsBySlot.get(slotKey)
+      ?? fail(`冻结量表缺少 measurement：${slotKey}`)
+    if (
+      result.scaleId !== measurement.scaleId
+      || result.scaleCode !== measurement.scaleCode
+      || result.dimensionCode !== measurement.dimensionCode
+      || result.scaleDefinitionHash !== measurement.scaleDefinitionHash
+    ) {
+      fail(`冻结量表结果与 measurement 不匹配：${slotKey}`)
+    }
+    if (result.mappingKey !== slot.mappingKey || result.mappingVersion !== slot.mappingVersion) {
+      fail(`冻结量表 mapping 版本不匹配：${slotKey}`)
+    }
+    if (result.respondentType !== slot.respondentType || result.valueSelector !== slot.valueSelector) {
+      fail(`冻结量表 respondent/value selector 不匹配：${slotKey}`)
+    }
+    if (result.dimensionScore !== null && (typeof result.dimensionScore !== 'number' || !Number.isFinite(result.dimensionScore))) {
+      fail(`冻结量表 dimensionScore 格式无效：${slotKey}`)
+    }
+    if (!isRecord(result.qualityFlags)) fail(`冻结量表 qualityFlags 格式无效：${slotKey}`)
+    for (const [qualityKey, value] of Object.entries(result.qualityFlags)) {
+      if (typeof value !== 'boolean') fail(`冻结量表 quality flag 不是 boolean：${slotKey}/${qualityKey}`)
+    }
+    if (result.provenance !== undefined) {
+      if (!isRecord(result.provenance)) fail(`冻结量表 provenance 格式无效：${slotKey}`)
+      validateProvenance(result.provenance, slotKey, true)
+    }
+    bySlot.set(slotKey, result)
+  }
+  for (const slot of slots) {
+    if (!bySlot.has(slot.key)) fail(`冻结量表结果缺少槽位：${slot.key}`)
   }
   return bySlot
 }
@@ -550,8 +747,9 @@ const evidenceId = (
   metricKey: string
   domain: CognitiveDomainKey
   facet: string
-  role: 'primary' | 'supporting'
+    role: 'primary' | 'supporting'
 },
+  analysisVersion = COGNITIVE_ANALYSIS_VERSION,
 ): string =>
   [
     packageDefinition.key,
@@ -559,8 +757,10 @@ const evidenceId = (
     protocol.key,
     protocol.version,
     protocol.evidenceMappingVersion,
-    COGNITIVE_ANALYSIS_VERSION,
-    COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
+    analysisVersion,
+    analysisVersion === MULTISOURCE_ANALYSIS_VERSION
+      ? MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION
+      : COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
     result.profile,
     result.slotKey,
     result.sourceResultId,
@@ -582,7 +782,17 @@ const buildEvidence = (
   slots: CognitiveProtocolSlotDefinition[],
   modulesBySlot: Map<string, FrozenCognitiveModuleResult>,
   measurementsBySlot: Map<string, { resolvedConfigHash: string; resolvedReportHash: string }>,
+  options: {
+    analysisVersion?: CognitivePackageAnalysisResult['analysisVersion']
+    reportSchemaVersion?: CognitivePackageAnalysisResult['reportSchemaVersion']
+    packageSnapshotVersion?: string
+    analysisProtocolSnapshotVersion?: string
+  } = {},
 ): EvidenceItem[] => {
+  const analysisVersion = options.analysisVersion ?? COGNITIVE_ANALYSIS_VERSION
+  const reportSchemaVersion = options.reportSchemaVersion ?? COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION
+  const packageSnapshotVersion = options.packageSnapshotVersion ?? '1'
+  const analysisProtocolSnapshotVersion = options.analysisProtocolSnapshotVersion ?? '1'
   const outputDomains = new Set(protocol.outputDomains)
   const evidence: EvidenceItem[] = []
   for (const slot of slots) {
@@ -635,18 +845,18 @@ const buildEvidence = (
         ...(interpretation.provenance ?? {}),
         packageKey: packageDefinition.key,
         packageVersion: packageDefinition.version,
-        packageSnapshotVersion: '1',
+        packageSnapshotVersion,
         packageReportDefinitionVersion: packageDefinition.reportDefinitionVersion,
         resolvedConfigHash: measurement.resolvedConfigHash,
         resolvedReportHash: measurement.resolvedReportHash,
         analysisProtocolKey: protocol.key,
         analysisProtocolVersion: protocol.version,
-        analysisProtocolSnapshotVersion: '1',
+        analysisProtocolSnapshotVersion,
         domainDefinitionVersion: protocol.domainDefinitionVersion,
         evidenceMappingVersion: protocol.evidenceMappingVersion,
         recommendationRuleVersion: protocol.recommendationRuleVersion,
-        analysisVersion: COGNITIVE_ANALYSIS_VERSION,
-        reportSchemaVersion: COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
+        analysisVersion,
+        reportSchemaVersion,
         profile: result.profile,
         slotKey: slot.key,
         sourceResultId: result.sourceResultId,
@@ -667,7 +877,7 @@ const buildEvidence = (
       validateProvenance(provenance, `${slot.key}/${mapping.metricKey}`)
 
       evidence.push({
-        id: evidenceId(packageDefinition, protocol, result, mapping),
+        id: evidenceId(packageDefinition, protocol, result, mapping, analysisVersion),
         sourceType: 'cognitive_metric',
         sourceResultId: result.sourceResultId,
         construct: mapping.domain,
@@ -683,6 +893,115 @@ const buildEvidence = (
         provenance,
       })
     }
+  }
+  return evidence
+}
+
+const scaleEvidenceId = (
+  packageDefinition: ReportPackageDefinition,
+  protocol: AnalysisProtocolDefinition,
+  result: FrozenScaleModuleResult,
+  analysisVersion: string,
+): string => [
+  packageDefinition.key,
+  packageDefinition.version,
+  protocol.key,
+  protocol.version,
+  analysisVersion,
+  result.profile,
+  result.slotKey,
+  result.sourceResultId,
+  result.scaleCode,
+  result.dimensionCode,
+  result.mappingKey,
+  result.mappingVersion,
+].map((part) => encodeURIComponent(part)).join(':')
+
+const buildScaleEvidence = (
+  packageDefinition: ReportPackageDefinition,
+  protocol: AnalysisProtocolDefinition,
+  slots: ScaleProtocolSlotDefinition[],
+  resultsBySlot: Map<string, FrozenScaleModuleResult>,
+  measurementsBySlot: Map<string, FrozenScaleSlotMeasurement>,
+  options: {
+    analysisVersion: CognitivePackageAnalysisResult['analysisVersion']
+    reportSchemaVersion: CognitivePackageAnalysisResult['reportSchemaVersion']
+    packageSnapshotVersion: string
+    analysisProtocolSnapshotVersion: string
+  },
+): EvidenceItem[] => {
+  const evidence: EvidenceItem[] = []
+  for (const slot of slots) {
+    const result = resultsBySlot.get(slot.key)
+    if (!result) return fail(`内部错误：找不到冻结量表结果 ${slot.key}`)
+    const measurement = measurementsBySlot.get(slot.key)
+    if (!measurement) return fail(`内部错误：找不到冻结量表测量 ${slot.key}`)
+    const scaleMatches = result.scaleCode === measurement.scaleCode
+      && result.dimensionCode === measurement.dimensionCode
+      && result.scaleId === measurement.scaleId
+      && result.scaleDefinitionHash === measurement.scaleDefinitionHash
+      && result.mappingKey === measurement.mappingKey
+      && result.mappingVersion === measurement.mappingVersion
+      && result.respondentType === slot.respondentType
+      && result.valueSelector === slot.valueSelector
+    const qualityFlags = [
+      ...activeQualityFlags(result.qualityFlags),
+      ...(scaleMatches ? [] : ['frozenMappingMismatch']),
+    ].sort()
+    const interpretable = scaleMatches
+      && result.qualityFlags.interpretable === true
+      && result.dimensionScore !== null
+    const provenance: Record<string, string> = {
+      ...(result.provenance ?? {}),
+      packageKey: packageDefinition.key,
+      packageVersion: packageDefinition.version,
+      packageSnapshotVersion: options.packageSnapshotVersion,
+      packageReportDefinitionVersion: packageDefinition.reportDefinitionVersion,
+      analysisProtocolKey: protocol.key,
+      analysisProtocolVersion: protocol.version,
+      analysisProtocolSnapshotVersion: options.analysisProtocolSnapshotVersion,
+      domainDefinitionVersion: protocol.domainDefinitionVersion,
+      evidenceMappingVersion: protocol.evidenceMappingVersion,
+      recommendationRuleVersion: protocol.recommendationRuleVersion,
+      analysisVersion: options.analysisVersion,
+      reportSchemaVersion: options.reportSchemaVersion,
+      profile: result.profile,
+      slotKey: slot.key,
+      sourceResultId: result.sourceResultId,
+      sourceType: 'scale_assessment',
+      scaleId: result.scaleId,
+      scaleCode: result.scaleCode,
+      dimensionCode: result.dimensionCode,
+      mappingKey: result.mappingKey,
+      mappingVersion: result.mappingVersion,
+      mappingDomain: measurement.mappingDomain,
+      mappingFacet: measurement.mappingFacet,
+      mappingRole: measurement.mappingRole,
+      mappingDirectionClass: measurement.mappingDirectionClass,
+      respondentType: result.respondentType,
+      valueSelector: result.valueSelector,
+      scaleDefinitionHash: result.scaleDefinitionHash,
+    }
+    if (result.compositeItemId) provenance.compositeItemId = result.compositeItemId
+    validateProvenance(provenance, `${slot.key}/${slot.expectedDimensionCode}`)
+    evidence.push({
+      id: scaleEvidenceId(packageDefinition, protocol, result, options.analysisVersion),
+      sourceType: 'scale_dimension',
+      sourceResultId: result.sourceResultId,
+      construct: measurement.mappingDomain,
+      facet: measurement.mappingFacet,
+      metricKey: result.dimensionCode,
+      value: interpretable ? normalizeEvidenceValue(result.dimensionScore, `${slot.key}/${result.dimensionCode}`) : null,
+      unit: 'raw_dimension_score',
+      role: measurement.mappingRole,
+      interpretation: 'self_report',
+      // The frozen mapping records scale orientation, but without a frozen
+      // threshold/reference the observed raw sum has no participant direction.
+      directionClass: 'unknown',
+      interpretable,
+      qualityFlags,
+      provenance,
+    })
   }
   return evidence
 }
@@ -811,21 +1130,119 @@ const buildDomainResults = (
   })
 }
 
+const buildCrossSourceFindings = (
+  packageKey: string,
+  evidence: EvidenceItem[],
+): CognitivePackageAnalysisResult['crossSourceFindings'] => {
+  if (packageKey !== PR10_MULTISOURCE_PACKAGE_KEY) return []
+  const behavioral = evidence.find((item) =>
+    item.sourceType === 'cognitive_metric'
+    && item.construct === 'response_inhibition'
+    && item.metricKey === 'commissionRate')
+  const selfReport = evidence.find((item) =>
+    item.sourceType === 'scale_dimension'
+    && item.construct === 'response_inhibition'
+    && item.metricKey === 'inhibition')
+  const refs = [behavioral?.id, selfReport?.id].filter((value): value is string => Boolean(value))
+  const behavioralAvailable = behavioral?.interpretable === true
+  const selfReportAvailable = selfReport?.interpretable === true
+
+  if (behavioralAvailable && selfReportAvailable) {
+    return [{
+      construct: 'response_inhibition',
+      type: 'paired_description',
+      evidenceRefs: refs,
+      summary: '本次报告同时保留了 Go/No-Go 行为任务结果与 ADEXI 参与者自评结果，供分来源并列阅读。',
+      caveat: '当前没有冻结阈值或参照用于判断两类来源的一致、分歧或高低；该 finding 不代表诊断、因果或稳定特质。',
+      confidence: 'descriptive',
+      availability: 'available',
+    }]
+  }
+
+  if (behavioralAvailable || selfReportAvailable) {
+    return [{
+      construct: 'response_inhibition',
+      type: 'single_source',
+      evidenceRefs: refs,
+      summary: behavioralAvailable
+        ? '当前仅保留了可解释的行为任务描述结果。'
+        : '当前仅保留了可解释的参与者自评描述结果。',
+      caveat: '另一来源质量不足或冻结输入不可用，未进行跨来源比较。',
+      confidence: 'descriptive',
+      availability: 'available',
+    }]
+  }
+
+  return [{
+    construct: 'response_inhibition',
+    type: 'insufficient_quality',
+    evidenceRefs: refs,
+    summary: '当前两类来源均不足以进行跨来源比较。',
+    caveat: '请检查完成状态和数据质量；未生成诊断或因果结论。',
+    confidence: 'descriptive',
+    availability: 'unavailable',
+  }]
+}
+
 const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackageAnalysisResult => {
   if (!isRecord(input)) fail('PR7 引擎输入格式无效')
-  const { packageDefinition, protocol, measurementsBySlot } = validatePackageSnapshot(input.packageSnapshot)
+  const {
+    packageDefinition,
+    protocol,
+    measurementsBySlot,
+    scaleMeasurementsBySlot,
+  } = validatePackageSnapshot(input.packageSnapshot)
+  const isMultisource = packageDefinition.key === PR10_MULTISOURCE_PACKAGE_KEY
+  const analysisVersion = isMultisource ? MULTISOURCE_ANALYSIS_VERSION : COGNITIVE_ANALYSIS_VERSION
+  const reportSchemaVersion = isMultisource
+    ? MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION
+    : COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION
   const slots = sortedByPosition<CognitiveProtocolSlotDefinition>(protocol.cognitiveSlots)
+  const scaleSlots = sortedByPosition<ScaleProtocolSlotDefinition>(protocol.scaleSlots)
   const modulesBySlot = validateModuleResults(
     input.moduleResults,
     slots,
     input.packageSnapshot.profile,
     measurementsBySlot,
   )
-  const evidence = buildEvidence(packageDefinition, protocol, slots, modulesBySlot, measurementsBySlot)
+  const scaleResultsBySlot = validateScaleResults(
+    input.scaleResults ?? [],
+    scaleSlots,
+    input.packageSnapshot.profile,
+    scaleMeasurementsBySlot,
+  )
+  const evidence = [
+    ...buildEvidence(packageDefinition, protocol, slots, modulesBySlot, measurementsBySlot, {
+      analysisVersion,
+      reportSchemaVersion,
+      packageSnapshotVersion: String(input.packageSnapshot.snapshotVersion),
+      analysisProtocolSnapshotVersion: String(input.packageSnapshot.analysisProtocolSnapshot.snapshotVersion),
+    }),
+    ...(isMultisource
+      ? buildScaleEvidence(
+        packageDefinition,
+        protocol,
+        scaleSlots,
+        scaleResultsBySlot,
+        scaleMeasurementsBySlot,
+        {
+          analysisVersion,
+          reportSchemaVersion,
+          packageSnapshotVersion: String(input.packageSnapshot.snapshotVersion),
+          analysisProtocolSnapshotVersion: String(input.packageSnapshot.analysisProtocolSnapshot.snapshotVersion),
+        },
+      )
+      : []),
+  ]
   const cognitiveDomains = buildDomainResults(protocol, evidence, modulesBySlot, slots)
-  const excludedModules = slots
+  const excludedModules = [
+    ...slots
     .filter((slot) => modulesBySlot.get(slot.key)?.qualityFlags.interpretable !== true)
-    .map((slot) => slot.key)
+    .map((slot) => slot.key),
+    ...scaleSlots
+      .filter((slot) => scaleResultsBySlot.get(slot.key)?.qualityFlags.interpretable !== true)
+      .map((slot) => slot.key),
+  ]
   const hasUndirectedEvidence = evidence.some(
     (item) => item.directionClass === 'unknown' || item.directionClass === 'neutral',
   )
@@ -836,13 +1253,13 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
   const provenance: Record<string, string> = {
     packageKey: packageDefinition.key,
     packageVersion: packageDefinition.version,
-    packageSnapshotVersion: '1',
+    packageSnapshotVersion: String(input.packageSnapshot.snapshotVersion),
     analysisProtocolKey: protocol.key,
     analysisProtocolVersion: protocol.version,
-    analysisProtocolSnapshotVersion: '1',
+    analysisProtocolSnapshotVersion: String(input.packageSnapshot.analysisProtocolSnapshot.snapshotVersion),
     profile: input.packageSnapshot.profile,
-    analysisVersion: COGNITIVE_ANALYSIS_VERSION,
-    reportSchemaVersion: COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
+    analysisVersion,
+    reportSchemaVersion,
     packageReportDefinitionVersion: packageDefinition.reportDefinitionVersion,
     domainDefinitionVersion: protocol.domainDefinitionVersion,
     evidenceMappingVersion: protocol.evidenceMappingVersion,
@@ -861,22 +1278,29 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
     analysisProtocolKey: protocol.key,
     analysisProtocolVersion: protocol.version,
     profile: input.packageSnapshot.profile,
-    analysisVersion: COGNITIVE_ANALYSIS_VERSION,
-    reportSchemaVersion: COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION,
+    analysisVersion,
+    reportSchemaVersion,
     qualitySummary: {
-      interpretableModules: slots.length - excludedModules.length,
+      interpretableModules: slots.length + scaleSlots.length - excludedModules.length,
       excludedModules,
       warnings,
     },
     evidence,
     cognitiveDomains,
-    crossSourceFindings: [],
+    crossSourceFindings: buildCrossSourceFindings(packageDefinition.key, evidence),
     recommendations: [],
-    limitations: [
-      'PR7 不计算跨任务平均、Domain score、overall score、percentile 或 IQ。',
-      'PR7 不生成跨来源 findings 或 recommendations。',
-      '没有可比较的 criterion/reference 方向的 Evidence 仅作 descriptive 处理。',
-    ],
+    limitations: isMultisource
+      ? [
+        '本报告包不计算跨任务平均、Domain score、overall score、percentile 或 IQ。',
+        'ADEXI 是参与者自评来源；跨来源 finding 仅描述本次行为任务与自评的方向关系，不代表诊断、因果或稳定特质。',
+        '学员可以是青少年或成人；本包不按年龄或教师/学员身份限制作答，具体适用性仍需结合项目审核。',
+        '当前 recommendations 保留接口但不新增规则；观察线索仅复用冻结任务报告已生成的 watchItems。',
+      ]
+      : [
+        'PR7 不计算跨任务平均、Domain score、overall score、percentile 或 IQ。',
+        'PR7 不生成跨来源 findings 或 recommendations。',
+        '没有可比较的 criterion/reference 方向的 Evidence 仅作 descriptive 处理。',
+      ],
     provenance,
   }
 }
