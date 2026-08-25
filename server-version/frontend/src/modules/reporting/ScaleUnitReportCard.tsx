@@ -1,6 +1,17 @@
 import React from 'react'
 import type { ScaleUnitReport } from './types'
 
+export type SafeScaleUnitReport = Pick<
+  ScaleUnitReport,
+  'itemId' | 'type' | 'kind' | 'scaleCode' | 'scaleName' | 'caveats' | 'disclaimer' | 'completedAt' | 'totalTime' | 'decryptError'
+> & {
+  scaleId?: string
+  label?: string | null
+  dimensionScores?: ScaleUnitReport['dimensionScores']
+  feedback?: ScaleUnitReport['feedback']
+  method?: ScaleUnitReport['method']
+}
+
 const levelColor = (level: string | null) => {
   if (level === 'high') return 'text-green-600 bg-green-100'
   if (level === 'medium') return 'text-yellow-600 bg-yellow-100'
@@ -16,18 +27,20 @@ const levelLabel = (level: string | null, explicit?: string) => {
   return level || '—'
 }
 
-const ScaleUnitReportCard: React.FC<{ report: ScaleUnitReport }> = ({ report }) => {
+const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report }) => {
   if (report.decryptError) {
     return <p className="text-amber-700">该量表结果无法解密，分数未展示。</p>
   }
 
+  const feedback = report.feedback ?? { overall: '', dimensions: [] }
+
   return (
     <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`}>
       <p className="text-xs text-gray-500 mb-4">
-        {report.scaleName} · 结果定义 {report.method.reportDefinitionVersion}
+        {report.scaleName}{report.method?.reportDefinitionVersion ? ` · 结果定义 ${report.method.reportDefinitionVersion}` : ''}
       </p>
       <div className="space-y-4">
-        {report.feedback.dimensions.map((dimension) => {
+        {feedback.dimensions.map((dimension) => {
           const minScore = dimension.minScore ?? 0
           const maxScore = dimension.maxScore ?? 100
           const score = dimension.score
@@ -60,7 +73,7 @@ const ScaleUnitReportCard: React.FC<{ report: ScaleUnitReport }> = ({ report }) 
           )
         })}
       </div>
-      {report.feedback.overall && <p className="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg">{report.feedback.overall}</p>}
+      {feedback.overall && <p className="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded-lg">{feedback.overall}</p>}
       {(report.caveats || []).length > 0 && <ul className="list-disc list-inside text-sm text-amber-700 mt-4 space-y-1" data-testid="scale-caveats">
         {(report.caveats || []).map((caveat) => <li key={caveat}>{caveat}</li>)}
       </ul>}

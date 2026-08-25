@@ -47,6 +47,10 @@ export const listReportPackageCatalog = async (userId: string, role: UserRole) =
         } : {
           mappingKey: slot.mappingKey,
           mappingVersion: slot.mappingVersion,
+          expectedScaleCode: slot.expectedScaleCode,
+          expectedDimensionCode: slot.expectedDimensionCode,
+          respondentType: slot.respondentType,
+          valueSelector: slot.valueSelector,
         }),
       })),
       granted: isAdmin || granted.has(reportPackageResourceId(definition.key, definition.version)),

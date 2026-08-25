@@ -56,14 +56,6 @@ const safeMetricView = (metric: any) => {
   }
 }
 
-const safeProductIndex = (productIndex: any) => {
-  if (!productIndex || typeof productIndex !== 'object' || Array.isArray(productIndex)) return null
-  return {
-    label: productIndex.label,
-    value: productIndex.value,
-  }
-}
-
 /**
  * Keep the existing single-task presentation contract while removing the
  * encrypted-result projection fields owned by the composite builder.
@@ -102,7 +94,9 @@ const projectSafeSingleTaskReport = (
         .map((flag: any) => ({ key: flag.key, label: flag.label, active: flag.active }))
       : [],
     headline: participantMetric(report.headline),
-    productIndex: safeProductIndex(report.productIndex),
+    // This is a score-derived /100 index and is intentionally excluded from
+    // participant and teacher package DTOs.
+    productIndex: null,
     primaryMetrics: Array.isArray(report.primaryMetrics) ? visibleMetrics(report.primaryMetrics) : [],
     secondaryMetrics: Array.isArray(report.secondaryMetrics) ? visibleMetrics(report.secondaryMetrics) : [],
     caveats: stringArray(report.caveats),
@@ -118,20 +112,189 @@ const projectSafeSingleTaskReport = (
   }
 }
 
+const projectResearchMetric = (metric: any) => {
+  if (!metric || typeof metric !== 'object' || Array.isArray(metric)) return null
+  return {
+    key: metric.key,
+    label: metric.label,
+    ...(metric.unit !== undefined ? { unit: metric.unit } : {}),
+    value: stripPayloadEncrypted(metric.value),
+    formatted: metric.formatted,
+  }
+}
+
+const projectQualityFlags = (flags: unknown): Array<{ key: unknown; label: unknown; active: unknown }> =>
+  Array.isArray(flags)
+    ? flags
+      .filter((flag) => flag && typeof flag === 'object' && !Array.isArray(flag))
+      .map((flag: any) => ({ key: flag.key, label: flag.label, active: flag.active }))
+    : []
+
+const projectReference = (reference: any) => {
+  if (!reference || typeof reference !== 'object' || Array.isArray(reference)) return null
+  const comparison = reference.comparison && typeof reference.comparison === 'object' && !Array.isArray(reference.comparison)
+    ? {
+        metricKey: reference.comparison.metricKey,
+        observed: reference.comparison.observed,
+        referenceMean: reference.comparison.referenceMean,
+        referenceSd: reference.comparison.referenceSd,
+        sdDelta: reference.comparison.sdDelta,
+        rangeLabel: reference.comparison.rangeLabel,
+        ...(reference.comparison.meanLabel !== undefined ? { meanLabel: reference.comparison.meanLabel } : {}),
+      }
+    : null
+  return {
+    mode: reference.mode,
+    status: reference.status,
+    available: reference.available,
+    label: reference.label,
+    version: reference.version ?? null,
+    band: reference.band ?? null,
+    referencePosition: reference.referencePosition ?? null,
+    ...(comparison ? { comparison } : {}),
+    ...(reference.protocolMatched !== undefined ? { protocolMatched: reference.protocolMatched } : {}),
+    disclaimer: reference.disclaimer,
+  }
+}
+
+const projectResearchSingleTaskReport = (report: any) => {
+  if (!report || typeof report !== 'object' || Array.isArray(report)) return null
+  const metrics = (value: unknown) => Array.isArray(value)
+    ? value.map(projectResearchMetric).filter(Boolean)
+    : []
+  return {
+    testType: report.testType,
+    profile: report.profile ?? null,
+    profileLabel: report.profileLabel ?? null,
+    title: report.title,
+    interpretable: report.interpretable,
+    qualityState: report.qualityState,
+    qualityFlags: projectQualityFlags(report.qualityFlags),
+    headline: projectResearchMetric(report.headline),
+    productIndex: report.productIndex && typeof report.productIndex === 'object' && !Array.isArray(report.productIndex)
+      ? { label: report.productIndex.label, value: report.productIndex.value }
+      : null,
+    primaryMetrics: metrics(report.primaryMetrics),
+    secondaryMetrics: metrics(report.secondaryMetrics),
+    caveats: stringArray(report.caveats),
+    practicalTips: stringArray(report.practicalTips),
+    method: {
+      testType: report.method?.testType ?? report.testType,
+      engineVersion: report.method?.engineVersion,
+      scoringVersion: report.method?.scoringVersion,
+      configVersion: report.method?.configVersion,
+      profile: report.method?.profile ?? report.profile ?? null,
+    },
+    disclaimer: typeof report.disclaimer === 'string' ? report.disclaimer : '',
+    reference: projectReference(report.reference),
+  }
+}
+
+const projectSafeScaleUnit = (unit: any) => ({
+  itemId: unit.itemId,
+  type: 'SCALE' as const,
+  kind: 'scale' as const,
+  label: unit.label ?? null,
+  scaleCode: unit.scaleCode ?? null,
+  scaleName: unit.scaleName,
+  completedAt: unit.completedAt ?? null,
+  totalTime: unit.totalTime ?? null,
+  caveats: stringArray(unit.caveats),
+  disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
+  ...(unit.decryptError ? { decryptError: true } : {}),
+})
+
+const projectScaleDimensionScore = (dimension: any) => ({
+  dimensionId: dimension.dimensionId,
+  dimensionCode: dimension.dimensionCode ?? null,
+  dimensionName: dimension.dimensionName,
+  rawScore: dimension.rawScore ?? null,
+  normalizedScore: dimension.normalizedScore ?? null,
+  level: dimension.level ?? null,
+  ...(dimension.levelName !== undefined ? { levelName: dimension.levelName } : {}),
+  itemCount: dimension.itemCount ?? null,
+  minScore: dimension.minScore ?? null,
+  maxScore: dimension.maxScore ?? null,
+})
+
+const projectScaleDimensionFeedback = (dimension: any) => ({
+  dimensionId: dimension.dimensionId,
+  dimensionCode: dimension.dimensionCode ?? null,
+  dimensionName: dimension.dimensionName,
+  score: dimension.score ?? null,
+  minScore: dimension.minScore ?? null,
+  maxScore: dimension.maxScore ?? null,
+  level: dimension.level ?? null,
+  ...(dimension.levelName !== undefined ? { levelName: dimension.levelName } : {}),
+  interpretation: dimension.interpretation,
+  suggestions: stringArray(dimension.suggestions),
+})
+
+const projectResearchScaleUnit = (unit: any) => ({
+  itemId: unit.itemId,
+  type: 'SCALE' as const,
+  kind: 'scale' as const,
+  scaleId: unit.scaleId,
+  scaleCode: unit.scaleCode ?? null,
+  label: unit.label ?? null,
+  scaleName: unit.scaleName,
+  dimensionScores: Array.isArray(unit.dimensionScores)
+    ? unit.dimensionScores.map(projectScaleDimensionScore)
+    : [],
+  feedback: {
+    overall: typeof unit.feedback?.overall === 'string' ? unit.feedback.overall : '',
+    dimensions: Array.isArray(unit.feedback?.dimensions)
+      ? unit.feedback.dimensions.map(projectScaleDimensionFeedback)
+      : [],
+    ...(unit.feedback?.feedbackLevel !== undefined ? { feedbackLevel: unit.feedback.feedbackLevel } : {}),
+  },
+  completedAt: unit.completedAt ?? null,
+  totalTime: unit.totalTime ?? null,
+  method: {
+    scaleId: unit.method?.scaleId ?? unit.scaleId,
+    scaleCode: unit.method?.scaleCode ?? unit.scaleCode ?? null,
+    reportDefinitionVersion: unit.method?.reportDefinitionVersion,
+  },
+  caveats: stringArray(unit.caveats),
+  disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
+  ...(unit.decryptError ? { decryptError: true } : {}),
+})
+
+const projectResearchCognitiveUnit = (unit: any) => ({
+  itemId: unit.itemId,
+  type: 'COGNITIVE' as const,
+  kind: 'cognitive' as const,
+  label: unit.label ?? null,
+  sessionId: unit.sessionId ?? null,
+  testType: unit.testType ?? null,
+  score: unit.score ?? null,
+  metrics: stripPayloadEncrypted(unit.metrics ?? {}),
+  qualityFlags: stripPayloadEncrypted(unit.qualityFlags ?? {}),
+  finishedAt: unit.finishedAt ?? null,
+  reference: projectReference(unit.reference),
+  singleTaskReport: projectResearchSingleTaskReport(unit.singleTaskReport),
+  ...(unit.decryptError ? { decryptError: true } : {}),
+})
+
 export const projectCompositeUnitReports = (
   unitReports: any[],
   audience: CompositeReportAudience,
+  context: 'collection' | 'package' = 'package',
 ): any[] => {
   const projected: any[] = []
   for (const unit of unitReports) {
     if (!unit || typeof unit !== 'object' || Array.isArray(unit)) continue
     if (unit.type === 'SCALE') {
-      projected.push(stripPayloadEncrypted(unit))
+      projected.push(
+        context === 'collection' || audience === 'researcher'
+          ? projectResearchScaleUnit(unit)
+          : projectSafeScaleUnit(unit),
+      )
       continue
     }
     if (unit.type !== 'COGNITIVE') continue
     if (audience === 'researcher') {
-      projected.push(stripPayloadEncrypted(unit))
+      projected.push(projectResearchCognitiveUnit(unit))
       continue
     }
     if (unit.decryptError) {
@@ -191,8 +354,13 @@ const safeRecommendations = (
   .map(({ priority, text }) => ({ priority, text }))
 
 const teacherSourceSummary = (evidence: EvidenceItem[]): CompositeTeacherSourceSummary[] => evidence.map((item) => ({
+  sourceType: item.sourceType === 'scale_dimension' ? 'self_report' : 'behavioral',
   slotKey: typeof item.provenance?.slotKey === 'string' ? item.provenance.slotKey : null,
-  taskType: typeof item.provenance?.testType === 'string' ? item.provenance.testType : null,
+  taskType: typeof item.provenance?.testType === 'string'
+    ? item.provenance.testType
+    : typeof item.provenance?.scaleCode === 'string'
+      ? item.provenance.scaleCode
+      : item.sourceType,
   facet: item.facet ?? null,
   role: item.role,
   interpretable: item.interpretable,
@@ -236,6 +404,7 @@ const projectCrossSourceFinding = (finding: CognitivePackageAnalysisResult['cros
   summary: finding.summary,
   ...(finding.caveat !== undefined ? { caveat: finding.caveat } : {}),
   confidence: finding.confidence,
+  ...(finding.availability !== undefined ? { availability: finding.availability } : {}),
 })
 
 const projectResearcherRecommendation = (recommendation: CognitivePackageAnalysisResult['recommendations'][number]) => ({
@@ -340,7 +509,11 @@ const withLegacyModules = (report: Record<string, any>): Record<string, any> => 
   return report
 }
 
-const projectReportEnvelope = (report: Record<string, any>, audience: CompositeReportAudience) => ({
+const projectReportEnvelope = (
+  report: Record<string, any>,
+  audience: CompositeReportAudience,
+  context: 'collection' | 'package' = 'package',
+) => ({
   id: report.id,
   assessmentId: report.assessmentId,
   name: report.name,
@@ -356,7 +529,7 @@ const projectReportEnvelope = (report: Record<string, any>, audience: CompositeR
         value: typeof background.value === 'string' ? background.value : null,
       }))
     : [],
-  unitReports: projectCompositeUnitReports(report.unitReports ?? [], audience),
+  unitReports: projectCompositeUnitReports(report.unitReports ?? [], audience, context),
 })
 
 export const projectCompositeReport = (input: CompositeReportProjectionInput): Record<string, any> => withLegacyModules({
@@ -367,4 +540,4 @@ export const projectCompositeReport = (input: CompositeReportProjectionInput): R
 export const projectCompositeCollectionReport = (
   report: Record<string, any>,
   audience: CompositeReportAudience,
-): Record<string, any> => withLegacyModules(projectReportEnvelope(report, audience))
+): Record<string, any> => withLegacyModules(projectReportEnvelope(report, audience, 'collection'))

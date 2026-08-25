@@ -27,6 +27,18 @@ export const listAnalysisProtocolCatalog = (includeNonPublished = false) => ({
         position: slot.position,
         testType: slot.testType,
       })),
+      scaleSlots: protocol.scaleSlots.map((slot) => ({
+        key: slot.key,
+        label: slot.label,
+        position: slot.position,
+        type: 'SCALE' as const,
+        expectedScaleCode: slot.expectedScaleCode,
+        expectedDimensionCode: slot.expectedDimensionCode,
+        mappingKey: slot.mappingKey,
+        mappingVersion: slot.mappingVersion,
+        respondentType: slot.respondentType,
+        valueSelector: slot.valueSelector,
+      })),
       ...(includeNonPublished ? { disabledReason: protocol.disabledReason } : {}),
     })),
 })

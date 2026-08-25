@@ -48,6 +48,7 @@ export interface CompositeParticipantDomain {
 }
 
 export interface CompositeTeacherSourceSummary {
+  sourceType: 'behavioral' | 'self_report'
   slotKey: string | null
   taskType: string | null
   facet: string | null

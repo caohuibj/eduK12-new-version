@@ -453,7 +453,10 @@ const CompositeAssessmentEdit: React.FC = () => {
             {selectedProtocol && (
               <div className="rounded border border-blue-100 bg-blue-50 p-3 text-sm text-gray-600">
                 <p>{selectedProtocol.description}</p>
-                <p className="mt-2">固定任务：{[...selectedProtocol.cognitiveSlots]
+                <p className="mt-2">固定任务：{[
+                  ...selectedProtocol.cognitiveSlots,
+                  ...(selectedProtocol.scaleSlots ?? []),
+                ]
                   .sort((a, b) => a.position - b.position)
                   .map((slot) => slot.label)
                   .join(' · ')}</p>

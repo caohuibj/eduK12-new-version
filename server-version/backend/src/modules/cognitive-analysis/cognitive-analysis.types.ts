@@ -96,6 +96,29 @@ export interface FrozenCognitiveModuleResult {
   provenance?: Record<string, string>
 }
 
+/**
+ * Frozen scored output for a scale slot. Raw answers are deliberately not a
+ * member of this contract; the package engine receives only the selected
+ * dimension score and immutable mapping metadata.
+ */
+export interface FrozenScaleModuleResult {
+  slotKey: string
+  sourceResultId: string
+  compositeItemId?: string | null
+  scaleId: string
+  scaleCode: string
+  dimensionCode: string
+  scaleDefinitionHash: string
+  dimensionScore: number | null
+  profile: CognitiveAnalysisProfile
+  mappingKey: string
+  mappingVersion: string
+  respondentType: 'participant_self_report'
+  valueSelector: 'dimensionScore'
+  qualityFlags: Record<string, unknown>
+  provenance?: Record<string, string>
+}
+
 export type CognitiveDomainStatus =
   | 'not_measured'
   | 'insufficient_quality'
@@ -118,11 +141,15 @@ export interface CognitiveDomainResult {
 
 export interface CrossSourceFinding {
   construct: CognitiveDomainKey
-  type: 'convergence' | 'divergence' | 'single_source' | 'insufficient_quality'
+  type: 'paired_description' | 'convergence' | 'divergence' | 'single_source' | 'insufficient_quality'
   evidenceRefs: string[]
   summary: string
   caveat?: string
   confidence: 'descriptive' | 'moderate'
+  /** A finding can be retained as an explicit unavailable record when a
+   * frozen source cannot be compared. This is intentionally not a diagnosis
+   * state and keeps the distinction visible to researcher/admin consumers. */
+  availability?: 'available' | 'unavailable'
 }
 
 export interface RecommendationResult {
@@ -135,7 +162,17 @@ export interface RecommendationResult {
 }
 
 export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.0'
+export const MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.0'
 export const COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v1'
+export const MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v2'
+
+export type CognitivePackageAnalysisVersion =
+  | typeof COGNITIVE_ANALYSIS_VERSION
+  | typeof MULTISOURCE_ANALYSIS_VERSION
+
+export type CognitivePackageAnalysisReportSchemaVersion =
+  | typeof COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION
+  | typeof MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION
 
 export interface CognitivePackageAnalysisResult {
   packageKey: string
@@ -143,8 +180,8 @@ export interface CognitivePackageAnalysisResult {
   analysisProtocolKey: string
   analysisProtocolVersion: string
   profile: CognitiveAnalysisProfile
-  analysisVersion: typeof COGNITIVE_ANALYSIS_VERSION
-  reportSchemaVersion: typeof COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION
+  analysisVersion: CognitivePackageAnalysisVersion
+  reportSchemaVersion: CognitivePackageAnalysisReportSchemaVersion
   qualitySummary: {
     interpretableModules: number
     excludedModules: string[]
@@ -205,6 +242,10 @@ export interface ScaleProtocolSlotDefinition {
   required: true
   mappingKey: string
   mappingVersion: string
+  expectedScaleCode: string
+  expectedDimensionCode: string
+  respondentType: 'participant_self_report'
+  valueSelector: 'dimensionScore'
 }
 
 export interface AnalysisProtocolDefinition {

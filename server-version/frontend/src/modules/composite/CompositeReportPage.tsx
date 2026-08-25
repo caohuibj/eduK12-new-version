@@ -7,8 +7,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import CompositePackageReport from './CompositePackageReport'
 import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
 import type { CognitiveSingleTaskReport } from '../cognitive/types'
-import ScaleUnitReportCard from '../reporting/ScaleUnitReportCard'
-import type { ScaleUnitReport } from '../reporting/types'
+import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 type LegacyCompositeModule = Record<string, unknown> & {
@@ -156,7 +155,7 @@ const CompositeReportPage: React.FC = () => {
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
             <>
-              {module.type === 'SCALE' && <ScaleUnitReportCard report={module as unknown as ScaleUnitReport} />}
+              {module.type === 'SCALE' && <ScaleUnitReportCard report={module as SafeScaleUnitReport} />}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} />

@@ -14,8 +14,17 @@ describe('ReportPackage catalog visibility', () => {
 
   it('lets admins inspect all package versions, including disabled drafts', async () => {
     const result = await listReportPackageCatalog('admin-1', UserRole.ADMIN)
-    expect(result).toHaveLength(6)
+    expect(result).toHaveLength(7)
     expect(result.every((item) => item.status === 'DRAFT' && item.disabledReason)).toBe(true)
+    expect(result.find((item) => item.key === 'inhibitory_control_multisource_v1')?.slots).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        type: 'SCALE',
+        expectedScaleCode: 'adexi_v1',
+        expectedDimensionCode: 'inhibition',
+        respondentType: 'participant_self_report',
+        valueSelector: 'dimensionScore',
+      }),
+    ]))
     expect(mockPrisma.materialGrant.findMany).not.toHaveBeenCalled()
   })
 

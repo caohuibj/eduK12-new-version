@@ -131,6 +131,103 @@ const packageItem = () => ({
   },
 })
 
+const scaleSlot = {
+  key: 'adexi_inhibition',
+  label: 'ADEXI 抑制自评',
+  position: 1,
+  required: true as const,
+  mappingKey: 'adexi_v1.inhibition.response_inhibition.v1',
+  mappingVersion: '1.0.0',
+  expectedScaleCode: 'adexi_v1',
+  expectedDimensionCode: 'inhibition',
+  respondentType: 'participant_self_report' as const,
+  valueSelector: 'dimensionScore' as const,
+}
+
+const scaleProtocol = {
+  ...protocol,
+  key: 'inhibitory_control_multisource_v1',
+  name: '抑制控制跨来源画像',
+  cognitiveSlots: protocol.cognitiveSlots,
+  scaleSlots: [scaleSlot],
+  outputDomains: ['response_inhibition' as const],
+}
+
+const scalePackageDefinition = {
+  ...packageDefinition,
+  key: scaleProtocol.key,
+  name: scaleProtocol.name,
+  slots: [...scaleProtocol.cognitiveSlots, scaleSlot],
+  analysisProtocolKey: scaleProtocol.key,
+}
+
+const adexiScale = (status = 'PUBLISHED') => ({
+  id: 'scale-adexi',
+  code: 'adexi_v1',
+  name: 'ADEXI',
+  description: 'draft fixture',
+  status,
+  visibility: 'HIDDEN',
+  config: { respondentType: 'participant_self_report' },
+  estimatedTime: 5,
+  instruction: 'self report',
+  tags: ['ADEXI'],
+  dimensions: [{
+    id: 'dimension-inhibition',
+    code: 'inhibition',
+    name: '抑制',
+    description: 'self-report inhibition',
+    scoringMethod: 'sum',
+    weight: 1,
+    minScore: 1,
+    maxScore: 5,
+    levelFeedback: null,
+  }],
+  items: [{
+    id: 'scale-item-1',
+    itemCode: 'ADEXI-01',
+    content: 'draft item',
+    type: 'single',
+    reverse: false,
+    required: true,
+    weight: 1,
+    sortOrder: 0,
+    options: [{ value: 1, label: '1' }],
+    randomizeOptions: false,
+    itemDimensions: [{ dimensionId: 'dimension-inhibition', weight: 1, reverse: false }],
+  }],
+})
+
+const scalePackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => {
+  const cognitiveItem = packageItem()
+  const scaleItem = {
+    id: 'item-scale',
+    compositeAssessmentId: 'composite-1',
+    type: 'SCALE',
+    position: 1,
+    required: true,
+    scaleId: 'scale-adexi',
+    scale: adexiScale(),
+    cognitiveAssignment: null,
+  }
+  const items = [cognitiveItem, scaleItem]
+  const snapshot = buildFrozenReportPackageSnapshot(scalePackageDefinition, scaleProtocol, items)
+  return {
+    ...frozenPackageComposite(status),
+    name: scalePackageDefinition.name,
+    status,
+    reportPackageKey: scalePackageDefinition.key,
+    reportPackageVersion: scalePackageDefinition.version,
+    reportPackageSnapshotEncrypted: status === 'PUBLISHED' ? encryptFrozenReportPackageSnapshot(snapshot) : null,
+    analysisProtocolKey: scaleProtocol.key,
+    analysisProtocolVersion: scaleProtocol.version,
+    analysisProtocolSnapshotEncrypted: status === 'PUBLISHED'
+      ? encryptFrozenAnalysisProtocolSnapshot(snapshot.analysisProtocolSnapshot)
+      : null,
+    items,
+  }
+}
+
 const frozenPackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => {
   const item = packageItem()
   const snapshot = buildFrozenReportPackageSnapshot(packageDefinition, protocol, [item])
@@ -302,6 +399,69 @@ describe('ReportPackage composite boundary', () => {
     expect(create.data.reportPackageProfile).toBe(source.reportPackageProfile)
     expect(create.data.reportPackageSnapshotEncrypted).toBe(source.reportPackageSnapshotEncrypted)
     expect(create.data.analysisProtocolSnapshotEncrypted).toBe(source.analysisProtocolSnapshotEncrypted)
+  })
+
+  it('freezes and copies a package scale slot without changing the frozen package', async () => {
+    packageMock.mockReturnValue(scalePackageDefinition)
+    protocolMock.mockReturnValue(scaleProtocol)
+    const draft = scalePackageComposite('DRAFT')
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draft)
+    mockPrisma.compositeAssessment.update.mockResolvedValue({ ...draft, status: 'PUBLISHED' })
+
+    await publishComposite('teacher-1', UserRole.TEACHER, draft.id)
+    const publishedCipher = mockPrisma.compositeAssessment.update.mock.calls[0][0].data.reportPackageSnapshotEncrypted
+    const publishedSnapshot = readFrozenReportPackageSnapshot(publishedCipher)
+    expect(publishedSnapshot.analysisProtocolSnapshot.scaleMeasurements?.[0]).toMatchObject({
+      slotKey: 'adexi_inhibition',
+      scaleId: 'scale-adexi',
+      scaleCode: 'adexi_v1',
+      dimensionCode: 'inhibition',
+      mappingVersion: '1.0.0',
+      mappingDomain: 'response_inhibition',
+    })
+
+    const source = scalePackageComposite('PUBLISHED')
+    mockPrisma.compositeAssessment.findUnique.mockReset()
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'copy-scale', reportPackageKey: source.reportPackageKey })
+    await copyComposite('teacher-1', UserRole.TEACHER, source.id, { code: 'PKG-SCALE-COPY' })
+    const create = mockPrisma.compositeAssessment.create.mock.calls[0][0]
+    expect(create.data.reportPackageSnapshotEncrypted).toBe(source.reportPackageSnapshotEncrypted)
+    expect(create.data.items.create).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'SCALE', position: 1, scaleId: 'scale-adexi' }),
+    ]))
+  })
+
+  it('blocks a new copy after the current scale is retired while keeping historical unit reporting readable', async () => {
+    packageMock.mockReturnValue(scalePackageDefinition)
+    protocolMock.mockReturnValue(scaleProtocol)
+    const source = scalePackageComposite('PUBLISHED')
+    source.items[1].scale.status = 'DEPRECATED'
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(source)
+
+    await expect(copyComposite('teacher-1', UserRole.TEACHER, source.id, { code: 'PKG-SCALE-COPY' }))
+      .rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
+
+    const historical = buildCompositeReport({
+      id: 'attempt-scale-history',
+      anonymousCode: null,
+      completedAt: new Date('2026-08-25T00:00:00Z'),
+      totalTime: 10,
+      compositeAssessment: source,
+      scaleAssessments: [{
+        compositeItemId: 'item-scale',
+        scores: [{ dimensionId: 'dimension-inhibition', rawScore: 3 }],
+        feedback: { overall: '', dimensions: [{ dimensionId: 'dimension-inhibition', score: 3, suggestions: [] }] },
+        completedAt: new Date('2026-08-25T00:00:00Z'),
+        totalTime: 10,
+      }],
+      cognitiveSessions: [],
+      formAnswers: [],
+    })
+    expect(historical.unitReports).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'SCALE', scaleCode: 'adexi_v1' }),
+    ]))
   })
 
   it('revocation blocks new package copies while an existing package remains readable', async () => {

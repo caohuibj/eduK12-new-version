@@ -10,7 +10,7 @@ import {
 import type { ReportPackageDefinition } from './report-package.registry'
 
 export interface FrozenReportPackageSnapshot {
-  snapshotVersion: 1
+  snapshotVersion: 1 | 2
   packageKey: string
   packageVersion: string
   profile: CognitiveAnalysisProfile
@@ -57,7 +57,7 @@ export const buildFrozenReportPackageSnapshot = (
   assertPackageProtocol(definition, protocol)
   const analysisProtocolSnapshot = buildFrozenAnalysisProtocolSnapshot(protocol, items)
   return {
-    snapshotVersion: 1,
+    snapshotVersion: analysisProtocolSnapshot.snapshotVersion,
     packageKey: definition.key,
     packageVersion: definition.version,
     profile: analysisProtocolSnapshot.profile,
@@ -72,7 +72,7 @@ export const encryptFrozenReportPackageSnapshot = (snapshot: FrozenReportPackage
 export const readFrozenReportPackageSnapshot = (encrypted: string): FrozenReportPackageSnapshot => {
   const snapshot = decryptCognitivePayload<FrozenReportPackageSnapshot>(encrypted)
   if (
-    snapshot?.snapshotVersion !== 1
+    (snapshot?.snapshotVersion !== 1 && snapshot?.snapshotVersion !== 2)
     || !snapshot.packageKey
     || !snapshot.packageVersion
     || !snapshot.packageDefinition

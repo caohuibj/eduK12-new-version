@@ -1,5 +1,6 @@
 import type { CognitiveSession } from '../cognitive/types'
-import type { FormBackgroundReport, ScaleUnitReport } from '../reporting/types'
+import type { FormBackgroundReport } from '../reporting/types'
+import type { SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 
 export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM'
 
@@ -132,6 +133,7 @@ export interface CompositePackageReport {
   recommendations: Array<{ priority: string; text: string; evidenceRefs?: string[]; ruleId?: string }>
   limitations: string[]
   sourceSummary?: Array<{
+    sourceType: 'behavioral' | 'self_report'
     slotKey: string | null
     taskType: string | null
     facet: string | null
@@ -157,7 +159,7 @@ export interface CompositeReport {
   backgroundValues: FormBackgroundReport[]
   packageReport?: CompositePackageReport
   unitReports: Array<
-    | ScaleUnitReport
+    | SafeScaleUnitReport
     | (Record<string, unknown> & {
         itemId: string
         type: 'COGNITIVE'
@@ -266,6 +268,18 @@ export interface AnalysisProtocolCatalogItem {
     position: number
     testType: string
   }>
+  scaleSlots?: Array<{
+    key: string
+    label: string
+    position: number
+    type: 'SCALE'
+    expectedScaleCode: string
+    expectedDimensionCode: string
+    mappingKey: string
+    mappingVersion: string
+    respondentType: 'participant_self_report'
+    valueSelector: 'dimensionScore'
+  }>
   disabledReason?: string
 }
 
@@ -304,6 +318,10 @@ export interface ReportPackageCatalogItem {
     scoringVersion?: string
     mappingKey?: string
     mappingVersion?: string
+    expectedScaleCode?: string
+    expectedDimensionCode?: string
+    respondentType?: 'participant_self_report'
+    valueSelector?: 'dimensionScore'
   }>
 }
 

@@ -236,7 +236,6 @@ export const materializeAnalysisProtocol = async (
 ) => {
   if (input.protocol.status !== 'PUBLISHED') throw compositeBadRequest('只能使用已发布的综合分析协议')
   if (!input.protocol.profiles.includes(input.profile)) throw compositeBadRequest('综合分析协议不支持该 Profile')
-  if (input.protocol.scaleSlots.length > 0) throw compositeBadRequest('当前版本尚未实现量表协议槽位')
 
   for (const slot of [...input.protocol.cognitiveSlots].sort((a, b) => a.position - b.position)) {
     const taskConfig = await db.cognitiveTestConfig.findUnique({
@@ -265,6 +264,28 @@ export const materializeAnalysisProtocol = async (
         position: slot.position,
         required: true,
         cognitiveAssignmentId: assignment.id,
+      },
+    })
+  }
+
+  for (const slot of [...input.protocol.scaleSlots].sort((a, b) => a.position - b.position)) {
+    const scale = await db.scale.findUnique({
+      where: { code: slot.expectedScaleCode },
+      include: { dimensions: true },
+    })
+    if (!scale || scale.status !== 'PUBLISHED') {
+      throw compositeBadRequest(`协议量表不可用：${slot.label}`)
+    }
+    if (!scale.dimensions?.some((dimension: { code: string }) => dimension.code === slot.expectedDimensionCode)) {
+      throw compositeBadRequest(`协议量表维度不可用：${slot.label}`)
+    }
+    await db.compositeAssessmentItem.create({
+      data: {
+        compositeAssessmentId: input.compositeId,
+        type: 'SCALE',
+        position: slot.position,
+        required: true,
+        scaleId: scale.id,
       },
     })
   }
@@ -712,7 +733,15 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
       items: {
         orderBy: { position: 'asc' },
         include: {
-          scale: { select: { id: true, status: true } },
+          scale: {
+            include: {
+              items: {
+                orderBy: { sortOrder: 'asc' },
+                include: { itemDimensions: true },
+              },
+              dimensions: true,
+            },
+          },
           cognitiveAssignment: { include: { config: true } },
         },
       },
@@ -1646,6 +1675,7 @@ const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
             orderBy: { position: 'asc' as const },
             include: {
               cognitiveAssignment: { include: { config: true } },
+              scale: { select: { id: true, code: true, status: true } },
             },
           },
         },
@@ -1975,6 +2005,7 @@ export const buildCompositeReport = (attempt: any) => {
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
+  const packageBased = Boolean(attempt.compositeAssessment.reportPackageKey)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
       backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: formMap.get(item.id)?.value ?? null }))
@@ -2033,6 +2064,9 @@ export const buildCompositeReport = (attempt: any) => {
       const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
       const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
       const frozenReport = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
+      if (packageBased && !frozenReport) {
+        throw new Error('报告包认知模块缺少冻结报告定义')
+      }
       const profile = frozenReport?.profile
         ?? (item.cognitiveAssignment?.profile === 'experience'
           || item.cognitiveAssignment?.profile === 'standard'

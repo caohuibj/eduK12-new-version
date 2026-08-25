@@ -355,7 +355,10 @@ const CompositeAssessmentList: React.FC = () => {
                 <p className="font-medium text-gray-800">{selectedProtocol.name}</p>
                 <p className="text-gray-600 mt-1">{selectedProtocol.description}</p>
                 <p className="text-gray-600 mt-2">
-                  固定任务：{[...selectedProtocol.cognitiveSlots]
+                  固定任务：{[
+                    ...selectedProtocol.cognitiveSlots,
+                    ...(selectedProtocol.scaleSlots ?? []),
+                  ]
                     .sort((a, b) => a.position - b.position)
                     .map((slot) => slot.label)
                     .join(' · ')}

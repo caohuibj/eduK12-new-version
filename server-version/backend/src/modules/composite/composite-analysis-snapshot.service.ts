@@ -4,14 +4,20 @@ import {
   encryptCognitivePayload,
 } from '../cognitive/cognitive.security'
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
+import { safeDecrypt } from '../../utils/encryption'
 import { buildPackageCognitiveAnalysis } from '../cognitive-analysis/package-analysis.engine'
 import { readFrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
 import { logger } from '../../utils/logger'
 import type {
   CognitivePackageAnalysisResult,
   FrozenCognitiveModuleResult,
+  FrozenScaleModuleResult,
 } from '../cognitive-analysis/cognitive-analysis.types'
 import type { FrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
+import type {
+  FrozenScaleSlotMeasurement,
+  ProtocolCompositeItem,
+} from '../cognitive-analysis/protocol-freeze'
 
 export type CompositeAnalysisSnapshotGenerationReason = 'COMPLETION' | 'REANALYSIS'
 
@@ -20,7 +26,7 @@ export interface PackageAnalysisFingerprintInput {
   moduleResults: FrozenCognitiveModuleResult[]
   analysisVersion: string
   reportSchemaVersion: string
-  scaleResults?: unknown[]
+  scaleResults?: FrozenScaleModuleResult[]
 }
 
 export interface CompositeAnalysisSnapshotRow {
@@ -71,6 +77,8 @@ export interface PackageAnalysisAttemptInput {
       type: string
       position: number
       required: boolean
+      scaleId?: string | null
+      scale?: ProtocolCompositeItem['scale']
       cognitiveAssignment?: {
         id?: string | null
         profile?: string | null
@@ -88,6 +96,16 @@ export interface PackageAnalysisAttemptInput {
       } | null
     }>
   }
+  scaleAssessments?: Array<{
+    id: string
+    compositeItemId?: string | null
+    scaleId: string
+    status: string
+    scores?: unknown
+    attemptNo?: number
+    completedAt?: Date | string | null
+    startedAt?: Date | string | null
+  }>
   cognitiveSessions: Array<{
     id: string
     assignmentId?: string | null
@@ -108,6 +126,7 @@ export interface PackageAnalysisAttemptInput {
 export interface BuiltPackageAnalysis {
   packageSnapshot: FrozenReportPackageSnapshot
   moduleResults: FrozenCognitiveModuleResult[]
+  scaleResults: FrozenScaleModuleResult[]
   analysis: CognitivePackageAnalysisResult
   inputFingerprint: string
 }
@@ -188,6 +207,24 @@ const moduleResultForFingerprint = (result: FrozenCognitiveModuleResult) => ({
   provenance: result.provenance ?? null,
 })
 
+const scaleResultForFingerprint = (result: FrozenScaleModuleResult) => ({
+  slotKey: result.slotKey,
+  sourceResultId: result.sourceResultId,
+  compositeItemId: result.compositeItemId ?? null,
+  scaleId: result.scaleId,
+  scaleCode: result.scaleCode,
+  dimensionCode: result.dimensionCode,
+  scaleDefinitionHash: result.scaleDefinitionHash,
+  dimensionScore: result.dimensionScore,
+  profile: result.profile,
+  mappingKey: result.mappingKey,
+  mappingVersion: result.mappingVersion,
+  respondentType: result.respondentType,
+  valueSelector: result.valueSelector,
+  qualityFlags: result.qualityFlags,
+  provenance: result.provenance ?? null,
+})
+
 /**
  * Hash the canonical plaintext semantics used by the analysis engine.
  * Randomized encrypted envelopes, timestamps, and raw trials are deliberately
@@ -198,8 +235,10 @@ export const buildPackageAnalysisInputFingerprint = (
   input: PackageAnalysisFingerprintInput,
 ): string => {
   const moduleOrder = new Map(
-    input.packageSnapshot.analysisProtocolSnapshot.protocolDefinition.cognitiveSlots
-      .map((slot) => [slot.key, slot.position] as const),
+    [
+      ...input.packageSnapshot.analysisProtocolSnapshot.protocolDefinition.cognitiveSlots,
+      ...input.packageSnapshot.analysisProtocolSnapshot.protocolDefinition.scaleSlots,
+    ].map((slot) => [slot.key, slot.position] as const),
   )
   const modules = [...input.moduleResults]
     .sort((left, right) => {
@@ -208,15 +247,20 @@ export const buildPackageAnalysisInputFingerprint = (
       return leftPosition - rightPosition || compareStrings(left.slotKey, right.slotKey)
     })
     .map(moduleResultForFingerprint)
+  const scaleResults = [...(input.scaleResults ?? [])]
+    .sort((left, right) => {
+      const leftPosition = moduleOrder.get(left.slotKey) ?? Number.MAX_SAFE_INTEGER
+      const rightPosition = moduleOrder.get(right.slotKey) ?? Number.MAX_SAFE_INTEGER
+      return leftPosition - rightPosition || compareStrings(left.slotKey, right.slotKey)
+    })
+    .map(scaleResultForFingerprint)
 
   const semanticInput = {
     packageSnapshot: protocolSnapshotForFingerprint(input.packageSnapshot),
     analysisVersion: input.analysisVersion,
     reportSchemaVersion: input.reportSchemaVersion,
     modules,
-    // PR8 is cognitive-only. Keep the field explicit so future scale mapping
-    // changes alter the fingerprint without changing the table contract.
-    scaleResults: input.scaleResults ?? [],
+    scaleResults,
   }
 
   return createHash('sha256')
@@ -555,6 +599,51 @@ const selectLatestSession = (
   return candidates[0] ?? null
 }
 
+const dateValue = (value: Date | string | null | undefined): number => {
+  if (!value) return 0
+  const parsed = value instanceof Date ? value.getTime() : new Date(value).getTime()
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const selectLatestScaleAssessment = (
+  assessments: NonNullable<PackageAnalysisAttemptInput['scaleAssessments']>,
+  itemId: string,
+  scaleId: string,
+) => {
+  const candidates = assessments
+    .filter((assessment) =>
+      assessment.compositeItemId === itemId && assessment.scaleId === scaleId)
+    .sort((left, right) =>
+      (right.attemptNo ?? 0) - (left.attemptNo ?? 0)
+      || dateValue(right.completedAt ?? right.startedAt) - dateValue(left.completedAt ?? left.startedAt)
+      || compareStrings(left.id, right.id),
+    )
+  return candidates[0] ?? null
+}
+
+const readScaleDimensionScore = (
+  assessment: NonNullable<PackageAnalysisAttemptInput['scaleAssessments']>[number],
+  dimensionCode: string,
+  slotKey: string,
+): number => {
+  const decoded = typeof assessment.scores === 'string'
+    ? safeDecrypt<unknown[]>(assessment.scores)
+    : assessment.scores
+  if (!Array.isArray(decoded)) {
+    throw new Error(`报告包槽位量表 scores 格式无效：${slotKey}`)
+  }
+  const dimension = decoded.find((candidate) =>
+    isRecord(candidate) && candidate.dimensionCode === dimensionCode)
+  if (!isRecord(dimension)) {
+    throw new Error(`报告包槽位量表维度缺失：${slotKey}/${dimensionCode}`)
+  }
+  const rawScore = dimension.rawScore ?? dimension.score
+  if (typeof rawScore !== 'number' || !Number.isFinite(rawScore)) {
+    throw new Error(`报告包槽位量表维度分数无效：${slotKey}/${dimensionCode}`)
+  }
+  return rawScore
+}
+
 const buildFrozenModuleResults = (
   attempt: PackageAnalysisAttemptInput,
   packageSnapshot: FrozenReportPackageSnapshot,
@@ -568,9 +657,6 @@ const buildFrozenModuleResults = (
     throw new Error('冻结报告包内部分析协议结构无效')
   }
   const slots = [...protocol.cognitiveSlots].sort((left, right) => left.position - right.position)
-  if (attempt.compositeAssessment.items.length !== slots.length) {
-    throw new Error('综合测评实例槽位数量与冻结报告包不匹配')
-  }
   const itemsByPosition = new Map(attempt.compositeAssessment.items.map((item) => [item.position, item]))
   const measurementsBySlot = new Map(
     packageSnapshot.analysisProtocolSnapshot.cognitiveMeasurements.map((measurement) => [measurement.slotKey, measurement]),
@@ -693,6 +779,70 @@ const buildFrozenModuleResults = (
   })
 }
 
+const buildFrozenScaleResults = (
+  attempt: PackageAnalysisAttemptInput,
+  packageSnapshot: FrozenReportPackageSnapshot,
+): FrozenScaleModuleResult[] => {
+  const protocol = packageSnapshot.analysisProtocolSnapshot.protocolDefinition
+  const measurements = packageSnapshot.analysisProtocolSnapshot.scaleMeasurements
+  if (!protocol || !Array.isArray(protocol.scaleSlots)) {
+    throw new Error('冻结报告包内部量表协议结构无效')
+  }
+  if (protocol.scaleSlots.length === 0) return []
+  if (!Array.isArray(measurements)) throw new Error('冻结报告包内部量表测量缺失')
+  const slots = [...protocol.scaleSlots].sort((left, right) => left.position - right.position)
+  const measurementsBySlot = new Map(measurements.map((measurement) => [measurement.slotKey, measurement]))
+  const itemsByPosition = new Map(attempt.compositeAssessment.items.map((item) => [item.position, item]))
+  const scaleAssessments = attempt.scaleAssessments ?? []
+
+  return slots.map((slot) => {
+    const measurement = measurementsBySlot.get(slot.key)
+    if (!measurement) throw new Error(`报告包快照缺少量表测量：${slot.key}`)
+    const item = itemsByPosition.get(slot.position)
+    if (
+      !item
+      || item.type !== 'SCALE'
+      || item.required !== true
+      || item.scaleId !== measurement.scaleId
+    ) {
+      throw new Error(`报告包槽位未绑定必需量表：${slot.key}`)
+    }
+    if (item.scale?.id && item.scale.id !== measurement.scaleId) {
+      throw new Error(`报告包槽位量表 ID 不匹配：${slot.key}`)
+    }
+    if (item.scale?.code && item.scale.code !== measurement.scaleCode) {
+      throw new Error(`报告包槽位量表 code 不匹配：${slot.key}`)
+    }
+
+    const assessment = selectLatestScaleAssessment(scaleAssessments, item.id, measurement.scaleId)
+    if (!assessment || assessment.status !== 'COMPLETED') {
+      throw new Error(`报告包槽位量表测评尚未完成：${slot.key}`)
+    }
+    const dimensionScore = readScaleDimensionScore(assessment, measurement.dimensionCode, slot.key)
+
+    return {
+      slotKey: slot.key,
+      sourceResultId: assessment.id,
+      compositeItemId: item.id,
+      scaleId: measurement.scaleId,
+      scaleCode: measurement.scaleCode,
+      dimensionCode: measurement.dimensionCode,
+      scaleDefinitionHash: measurement.scaleDefinitionHash,
+      dimensionScore,
+      profile: packageSnapshot.profile,
+      mappingKey: measurement.mappingKey,
+      mappingVersion: measurement.mappingVersion,
+      respondentType: measurement.respondentType,
+      valueSelector: measurement.valueSelector,
+      qualityFlags: { interpretable: true },
+      provenance: {
+        sourceType: 'scale_assessment',
+        compositeItemId: item.id,
+      },
+    }
+  })
+}
+
 /**
  * Build the immutable PR7 input from a completed package Attempt. The
  * function deliberately consumes only frozen assignment/session result
@@ -725,18 +875,26 @@ export const buildPackageAnalysisForAttempt = (
   ) {
     throw new Error('综合测评报告包实例与冻结快照不匹配')
   }
+  const protocol = packageSnapshot.analysisProtocolSnapshot.protocolDefinition
+  const expectedItemCount = protocol.cognitiveSlots.length + protocol.scaleSlots.length
+  if (attempt.compositeAssessment.items.length !== expectedItemCount) {
+    throw new Error('综合测评实例槽位数量与冻结报告包不匹配')
+  }
   const moduleResults = buildFrozenModuleResults(attempt, packageSnapshot)
+  const scaleResults = buildFrozenScaleResults(attempt, packageSnapshot)
   const analysis = buildPackageCognitiveAnalysis({
     packageSnapshot,
     moduleResults,
+    scaleResults,
     attemptId: attempt.id,
     assessmentId: attempt.compositeAssessmentId,
   })
   const inputFingerprint = buildPackageAnalysisInputFingerprint({
     packageSnapshot,
     moduleResults,
+    scaleResults,
     analysisVersion: analysis.analysisVersion,
     reportSchemaVersion: analysis.reportSchemaVersion,
   })
-  return { packageSnapshot, moduleResults, analysis, inputFingerprint }
+  return { packageSnapshot, moduleResults, scaleResults, analysis, inputFingerprint }
 }
