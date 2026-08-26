@@ -141,17 +141,13 @@ const BigScreen: React.FC = () => {
       setStats(data)
     })
 
-    on('broadcast:online', (data) => {
+    on('broadcast:online', (data: { onlineCount: number }) => {
       setOnlineCount(data.onlineCount)
     })
 
     on('broadcast:finished', () => {
       setIsFinished(true)
       setCountdown(null)
-    })
-
-    // 错误处理
-    on('error' as any, (data) => {
     })
 
     return () => {
@@ -335,8 +331,10 @@ const BigScreen: React.FC = () => {
     }
 
     // 检查是否有数据（wordCloud或textAnswers）
-    const hasWordCloud = stats?.wordCloud && (stats.wordCloud.topWords || stats.wordCloud.wordFrequency)
-    const hasTextAnswers = stats?.textAnswers && stats.textAnswers.length > 0
+    const wordCloud = stats?.wordCloud
+    const textAnswers = stats?.textAnswers
+    const hasWordCloud = Boolean(wordCloud && (wordCloud.topWords || wordCloud.wordFrequency))
+    const hasTextAnswers = Boolean(textAnswers && textAnswers.length > 0)
     
     
     if (!hasWordCloud && !hasTextAnswers) {
@@ -351,25 +349,25 @@ const BigScreen: React.FC = () => {
     // 优先使用后端分词结果，降级到前端简单分词
     let data: Array<{ name: string; value: number }>
     
-    if (hasWordCloud) {
+    if (hasWordCloud && wordCloud) {
       // 使用后端分词结果
-      if (stats.wordCloud.topWords && stats.wordCloud.topWords.length > 0) {
-        data = stats.wordCloud.topWords.map((item: any) => ({
+      if (wordCloud.topWords && wordCloud.topWords.length > 0) {
+        data = wordCloud.topWords.map((item: any) => ({
           name: item.word,
           value: item.count,
         }))
-      } else if (stats.wordCloud.wordFrequency) {
-        data = Object.entries(stats.wordCloud.wordFrequency)
+      } else if (wordCloud.wordFrequency) {
+        data = Object.entries(wordCloud.wordFrequency)
           .map(([name, value]) => ({ name, value: value as number }))
           .sort((a, b) => b.value - a.value)
           .slice(0, 50)
       } else {
         data = []
       }
-    } else {
+    } else if (textAnswers) {
       // 降级方案：前端简单分词
       const wordFrequency: Record<string, number> = {}
-      stats.textAnswers.forEach((answer) => {
+      textAnswers.forEach((answer) => {
         const words = answer.text.split(/\s+/)
         words.forEach((word) => {
           if (word.trim()) {
@@ -382,6 +380,8 @@ const BigScreen: React.FC = () => {
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 50)
+    } else {
+      data = []
     }
 
     const option = {

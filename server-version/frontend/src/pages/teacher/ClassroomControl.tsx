@@ -52,10 +52,10 @@ const ClassroomControl: React.FC = () => {
     try {
       setLoading(true)
       const response = await apiClient.get<Classroom>(`/classrooms/${id}`)
-      if (response.code === 0) {
+      if (response.code === 0 && response.data) {
         setClassroom(response.data)
       } else {
-        alert(response.message)
+        alert(response.message || '课堂信息缺失')
         navigate('/teacher/classrooms')
       }
     } catch (err: any) {

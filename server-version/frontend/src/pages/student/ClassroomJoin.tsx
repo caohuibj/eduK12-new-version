@@ -28,10 +28,10 @@ const ClassroomJoin: React.FC = () => {
     try {
       setLoading(true)
       const response = await apiClient.get<Classroom>(`/classrooms/code/${code}`)
-      if (response.code === 0) {
+      if (response.code === 0 && response.data) {
         setClassroom(response.data)
       } else {
-        setError(response.message)
+        setError(response.message || '课堂信息缺失')
       }
     } catch (err: any) {
       setError(err.message || '获取课堂信息失败')
