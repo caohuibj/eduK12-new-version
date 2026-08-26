@@ -486,8 +486,8 @@ export class ClassroomSocketHandler {
         return
       }
 
-      if (classroom.status === 'ENDED') {
-        this.emitError(socket, '课堂已结束')
+      if (classroom.status !== 'PREPARING' && classroom.status !== 'ACTIVE') {
+        this.emitError(socket, '课堂当前不可开始答题')
         return
       }
 
@@ -655,8 +655,8 @@ export class ClassroomSocketHandler {
         where: { id: classroomId },
         select: { status: true },
       })
-      if (!classroom || classroom.status === 'ENDED') {
-        this.emitError(socket, '课堂已结束或不存在')
+      if (!classroom || classroom.status !== 'ACTIVE') {
+        this.emitError(socket, '课堂当前不可提交答案')
         return
       }
 
@@ -766,6 +766,11 @@ export class ClassroomSocketHandler {
         return
       }
 
+      if (classroom.status !== 'ACTIVE') {
+        this.emitError(socket, '课堂当前不可结束答题')
+        return
+      }
+
       const questionId = readString(data, 'questionId')
       if (!questionId) {
         this.emitError(socket, '缺少题目信息')
@@ -777,10 +782,15 @@ export class ClassroomSocketHandler {
           id: questionId,
           classroomId: classroom.id,
         },
-        select: { id: true, endedAt: true },
+        select: { id: true, startedAt: true, endedAt: true },
       })
       if (!question) {
         this.emitError(socket, '题目不存在或不属于当前课堂')
+        return
+      }
+
+      if (!question.startedAt || question.endedAt) {
+        this.emitError(socket, '题目当前不可结束')
         return
       }
 
@@ -795,6 +805,7 @@ export class ClassroomSocketHandler {
         where: {
           id: question.id,
           classroomId: classroom.id,
+          startedAt: { not: null },
           endedAt: null,
         },
         data: { endedAt: new Date() },
@@ -826,6 +837,11 @@ export class ClassroomSocketHandler {
         return
       }
 
+      if (classroom.status !== 'ACTIVE') {
+        this.emitError(socket, '课堂当前不可结束答题')
+        return
+      }
+
       const questionId = readString(data, 'questionId')
       if (!questionId) {
         this.emitError(socket, '缺少题目信息')
@@ -837,10 +853,15 @@ export class ClassroomSocketHandler {
           id: questionId,
           classroomId: classroom.id,
         },
-        select: { id: true },
+        select: { id: true, startedAt: true, endedAt: true },
       })
       if (!question) {
         this.emitError(socket, '题目不存在或不属于当前课堂')
+        return
+      }
+
+      if (!question.startedAt || question.endedAt) {
+        this.emitError(socket, '题目当前不可结束')
         return
       }
 
@@ -855,6 +876,7 @@ export class ClassroomSocketHandler {
         where: {
           id: question.id,
           classroomId: classroom.id,
+          startedAt: { not: null },
           endedAt: null,
         },
         data: { endedAt: new Date() },
@@ -886,6 +908,11 @@ export class ClassroomSocketHandler {
         return
       }
 
+      if (classroom.status !== 'ACTIVE') {
+        this.emitError(socket, '课堂当前不可切换题目')
+        return
+      }
+
       socketService.broadcastToRoom(
         'classroom:' + classroom.id,
         'broadcast:next',
@@ -902,6 +929,11 @@ export class ClassroomSocketHandler {
     try {
       const classroom = await this.authorizeManagerAction(socket, 'teacher')
       if (!classroom) {
+        return
+      }
+
+      if (classroom.status === 'ENDED') {
+        this.emitError(socket, '课堂已结束')
         return
       }
 
