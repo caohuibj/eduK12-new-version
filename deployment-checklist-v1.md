@@ -2,7 +2,7 @@
 
 ## Before deployment
 
-- [ ] `dev` has passed CI and repository review.
+- [ ] The release-candidate commit on `main` has passed CI and repository review.
 - [ ] Release candidate regression report is approved.
 - [ ] Backend and frontend images are built from the reviewed commit.
 - [ ] `JWT_SECRET` is at least 32 characters and unique to production.
