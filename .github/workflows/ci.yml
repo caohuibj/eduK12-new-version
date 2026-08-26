@@ -6,7 +6,7 @@
 #
 # jobs：
 #   backend       : npm ci + prisma generate + migrate deploy + seed + build + full regression
-#   frontend      : npm ci + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
+#   frontend      : npm ci + lint + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
 #   docker       : baseline + monitoring compose config + backend/frontend production image build
 #
 # 说明：
@@ -79,7 +79,7 @@ jobs:
         run: npm test
 
   frontend:
-    name: frontend (typecheck + cognitive tests + build)
+    name: frontend (lint + typecheck + cognitive tests + build)
     runs-on: ubuntu-latest
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -95,6 +95,8 @@ jobs:
           cache-dependency-path: server-version/frontend/package-lock.json
       - name: npm ci
         run: npm ci
+      - name: lint
+        run: npm run lint
       - name: typecheck
         run: npm run typecheck
       - name: cognitive frontend tests

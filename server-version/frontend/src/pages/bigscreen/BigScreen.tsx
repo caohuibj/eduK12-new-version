@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import * as echarts from 'echarts'
 import 'echarts-wordcloud'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
+import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 
@@ -31,6 +32,7 @@ const BigScreen: React.FC = () => {
   const [searchParams] = useSearchParams()
   const historyQuestionId = searchParams.get('history')
   const isHistoryMode = !!historyQuestionId
+  const { isLoading: authLoading, user } = useAuth()
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const [stats, setStats] = useState<Stats | null>(null)
@@ -46,9 +48,9 @@ const BigScreen: React.FC = () => {
 
   // Socket 连接
   const { isConnected, on, off, emit } = useClassroomSocket({
-    classroomId: classroomId!,
+    classroomId,
     role: 'bigscreen',
-    autoConnect: !isHistoryMode, // 历史模式不需要socket连接
+    autoConnect: !isHistoryMode && !authLoading && !!user,
   })
 
   // 历史模式加载历史数据
@@ -530,7 +532,6 @@ const BigScreen: React.FC = () => {
               if (!isHistoryMode && currentQuestion && !isFinished) {
                 console.log('大屏退出，自动结束当前题目')
                 emit('bigscreen:close', {
-                  classroomId: classroomId,
                   questionId: currentQuestion.questionId,
                 })
               }
