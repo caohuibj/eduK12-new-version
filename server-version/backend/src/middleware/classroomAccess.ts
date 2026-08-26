@@ -10,7 +10,7 @@ export interface ClassroomAccessRecord {
   status: string
   course: {
     creatorId: string
-    shares: Array<{ sharedTo: string }>
+    shares: Array<{ sharedTo: string; receiver: { role: UserRole } }>
   }
 }
 
@@ -35,7 +35,12 @@ export async function findClassroomAccess(
         select: {
           creatorId: true,
           shares: {
-            select: { sharedTo: true },
+            select: {
+              sharedTo: true,
+              receiver: {
+                select: { role: true },
+              },
+            },
           },
         },
       },
@@ -59,7 +64,10 @@ export function canManageClassroom(
   return (
     classroom.creatorId === userId ||
     classroom.course.creatorId === userId ||
-    classroom.course.shares.some((share) => share.sharedTo === userId)
+    classroom.course.shares.some(
+      (share) =>
+        share.sharedTo === userId && share.receiver.role === UserRole.TEACHER
+    )
   )
 }
 
