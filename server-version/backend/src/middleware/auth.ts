@@ -50,7 +50,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, rejection)
     }
 
-    req.user = payload
+    // The database role is authoritative so a role change invalidates stale JWT claims.
+    req.user = { ...payload, role: user!.role }
     next()
   } catch (err) {
     next(err)
@@ -69,7 +70,7 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
       if (payload) {
         const user = await loadAccountStatus(payload.userId)
         if (!inactiveAccountMessage(user)) {
-          req.user = payload
+          req.user = { ...payload, role: user!.role }
         }
       }
     }
