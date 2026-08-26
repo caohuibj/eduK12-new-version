@@ -221,9 +221,17 @@ export const userController = {
         return forbidden(res, '无权限修改此用户')
       }
 
+      // 账号启停是管理动作，不能由用户通过自助资料接口修改自己的状态。
+      if (result.data.isActive !== undefined && currentUserRole !== UserRole.ADMIN) {
+        return forbidden(res, '只有管理员可以修改账号状态')
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: result.data,
+        data: {
+          ...result.data,
+          ...(result.data.isActive !== undefined ? { tokenVersion: { increment: 1 } } : {}),
+        },
         select: {
           id: true,
           username: true,
@@ -289,7 +297,10 @@ export const userController = {
 
       await prisma.user.update({
         where: { id },
-        data: { passwordHash: hashedPassword }
+        data: {
+          passwordHash: hashedPassword,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, null, '密码已重置')
@@ -332,7 +343,10 @@ export const userController = {
       const hashedPassword = await hashPassword(newPassword)
       await prisma.user.update({
         where: { id: userId },
-        data: { passwordHash: hashedPassword }
+        data: {
+          passwordHash: hashedPassword,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, null, '密码修改成功')

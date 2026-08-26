@@ -735,7 +735,10 @@ export const courseController = {
 
       await prisma.user.update({
         where: { id: studentId },
-        data: { passwordHash: hashedPassword }
+        data: {
+          passwordHash: hashedPassword,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, { tempPassword }, `密码已重置为 ${tempPassword}，请提醒学生尽快修改密码`)
@@ -936,7 +939,10 @@ export const courseController = {
       // 更新学生冻结状态
       await prisma.user.update({
         where: { id: studentId },
-        data: { isFrozen }
+        data: {
+          isFrozen,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, { isFrozen }, isFrozen ? '学生账号已冻结' : '学生账号已解冻')

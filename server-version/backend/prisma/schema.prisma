@@ -16,6 +16,7 @@ model User {
   avatarUrl                   String?                    @map("avatar_url")
   phone                       String?
   isActive                    Boolean                    @default(true) @map("is_active")
+  tokenVersion                Int                        @default(0) @map("token_version")
   createdAt                   DateTime                   @default(now()) @map("created_at")
   updatedAt                   DateTime                   @updatedAt @map("updated_at")
   teacherCodeId               String?                    @map("teacher_code_id")
@@ -549,6 +550,8 @@ model QuestionnaireAssessment {
   userId          String?          @map("user_id") // 改为可选，支持匿名测评
   tokenId         String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
   sessionId       String?          @unique @map("session_id") // 匿名会话标识
+  resumeTokenHash String?          @unique @map("resume_token_hash") // 服务端恢复凭据哈希
+  resumeTokenExpiresAt DateTime?   @map("resume_token_expires_at")
   status          AssessmentStatus @default(IN_PROGRESS)
   progress        Int              @default(0) // 总体进度
   completedScales Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
@@ -571,6 +574,7 @@ model QuestionnaireAssessment {
   @@index([startedAt])
   @@index([tokenId]) // 新增：令牌索引
   @@index([sessionId]) // 新增：会话索引
+  @@index([resumeTokenExpiresAt])
   @@map("questionnaire_assessments")
 }
 

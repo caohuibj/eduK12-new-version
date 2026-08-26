@@ -19,28 +19,57 @@ const formatTime = () => {
   return new Date().toISOString()
 }
 
+const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body)/i
+const SENSITIVE_TEXT = /(Bearer\s+)[^\s,}]+/gi
+
+const redactText = (value: string): string => value.replace(SENSITIVE_TEXT, '$1[REDACTED]')
+
+const redactLogValue = (value: unknown, key?: string): unknown => {
+  if (key && SENSITIVE_KEY.test(key)) return '[REDACTED]'
+  if (typeof value === 'string') return redactText(value)
+  if (value instanceof Error) {
+    return {
+      name: value.name,
+      message: redactText(value.message),
+      stack: value.stack ? redactText(value.stack) : undefined,
+    }
+  }
+  if (Array.isArray(value)) return value.map((item) => redactLogValue(item))
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([entryKey, entryValue]) => [
+        entryKey,
+        redactLogValue(entryValue, entryKey),
+      ])
+    )
+  }
+  return value
+}
+
+const safeArgs = (args: unknown[]) => args.map((arg) => redactLogValue(arg))
+
 export const logger = {
-  debug: (message: string, ...args: any[]) => {
+  debug: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.DEBUG) {
-      console.debug(`[${formatTime()}] [DEBUG] ${message}`, ...args)
+      console.debug(`[${formatTime()}] [DEBUG] ${message}`, ...safeArgs(args))
     }
   },
 
-  info: (message: string, ...args: any[]) => {
+  info: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.INFO) {
-      console.info(`[${formatTime()}] [INFO] ${message}`, ...args)
+      console.info(`[${formatTime()}] [INFO] ${message}`, ...safeArgs(args))
     }
   },
 
-  warn: (message: string, ...args: any[]) => {
+  warn: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.WARN) {
-      console.warn(`[${formatTime()}] [WARN] ${message}`, ...args)
+      console.warn(`[${formatTime()}] [WARN] ${message}`, ...safeArgs(args))
     }
   },
 
-  error: (message: string, error?: any) => {
+  error: (message: string, error?: unknown) => {
     if (currentLevel <= LogLevel.ERROR) {
-      console.error(`[${formatTime()}] [ERROR] ${message}`, error)
+      console.error(`[${formatTime()}] [ERROR] ${message}`, redactLogValue(error))
     }
   },
 }

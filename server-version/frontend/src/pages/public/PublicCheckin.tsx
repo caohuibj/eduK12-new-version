@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result, Input, Upload, Image } from 'antd'
 import { CheckCircleOutlined, UploadOutlined, CameraOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
+import { sanitizeHtml } from '../../utils/sanitize'
 
 interface CheckinData {
   id: string
@@ -246,7 +247,7 @@ const PublicCheckin: React.FC = () => {
             <div className="bg-gray-50 p-6 rounded-lg mb-8">
               <div 
                 className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: checkin.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }}
               />
             </div>
           )}

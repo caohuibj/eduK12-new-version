@@ -78,6 +78,7 @@ export const authController = {
         userId: user.id,
         username: user.username,
         role: user.role,
+        tokenVersion: user.tokenVersion,
       })
 
       return success(res, {
@@ -278,6 +279,7 @@ export const authController = {
         userId: user.id,
         username: user.username,
         role: user.role,
+        tokenVersion: user.tokenVersion,
       })
 
       return success(res, {
@@ -370,7 +372,10 @@ export const authController = {
       const hashedPassword = await hashPassword(newPassword)
       await prisma.user.update({
         where: { id: userId },
-        data: { passwordHash: hashedPassword }
+        data: {
+          passwordHash: hashedPassword,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, null, '密码修改成功')

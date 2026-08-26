@@ -862,32 +862,6 @@ export const publicQuestionnaireController = {
       const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
       
       const answers = assessment.answers as any[]
-      
-      // DEBUG: 打印计分信息
-      logger.info('DEBUG completeScaleAssessment', {
-        scaleAssessmentId,
-        scaleId: assessment.scaleId,
-        scaleName: scale.name,
-        answerCount: answers?.length || 0,
-        answers: answers?.map((a: any) => ({ itemId: a.itemId, value: a.value })),
-        itemCount: scale.items?.length || 0,
-        dimensionCount: scale.dimensions?.length || 0,
-      })
-
-      // DEBUG: 打印 items 和 itemDimensions
-      logger.info('DEBUG items with itemDimensions', {
-        scaleAssessmentId,
-        items: scale.items?.map((item: any) => ({
-          id: item.id,
-          content: item.content?.substring(0, 30),
-          itemDimensionsCount: item.itemDimensions?.length || 0,
-          itemDimensions: item.itemDimensions?.map((id: any) => ({
-            dimensionId: id.dimensionId,
-            dimensionName: id.dimension?.name,
-            reverse: id.reverse,
-          })),
-        })),
-      })
 
       const scores = calculateScores(
         answers,
@@ -895,19 +869,6 @@ export const publicQuestionnaireController = {
         scale.dimensions,
         scale.config as any
       )
-
-      // DEBUG: 打印计算结果
-      logger.info('DEBUG calculateScores result', {
-        scaleAssessmentId,
-        scoresCount: scores.length,
-        scores: scores.map(s => ({
-          dimensionId: s.dimensionId,
-          dimensionName: s.dimensionName,
-          rawScore: s.rawScore,
-          normalizedScore: s.normalizedScore,
-          itemCount: s.itemCount,
-        })),
-      })
 
       // 生成反馈
       const feedback = generateFeedbackWithLevels(

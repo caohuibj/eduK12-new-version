@@ -1,6 +1,7 @@
 import express from 'express'
 import { rateLimit } from 'express-rate-limit'
 import cors from 'cors'
+import helmet from 'helmet'
 import { createServer } from 'http'
 import { config } from './config'
 import { prisma } from './config/database'
@@ -72,6 +73,9 @@ app.use((req, res, next) => {
 })
 
 // 中间件
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
@@ -168,7 +172,7 @@ server.listen(config.port, () => {
 // 优雅关闭（增加超时保护）
 let shutdownStarted = false
 
-const gracefulShutdown = async (signal: string) => {
+const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
   logger.info(`${signal} signal received: closing HTTP server`)
@@ -176,7 +180,7 @@ const gracefulShutdown = async (signal: string) => {
   // 设置强制退出超时（5秒）
   const forceExit = setTimeout(() => {
     logger.warn('⚠️  Forced exit after timeout')
-    process.exit(1)
+    process.exit(exitCode || 1)
   }, 5000)
   
   server.close(async () => {
@@ -188,9 +192,17 @@ const gracefulShutdown = async (signal: string) => {
       prisma.$disconnect(),
     ])
     clearTimeout(forceExit)
-    process.exit(0)
+    process.exit(exitCode)
   })
 }
 
 process.on('SIGTERM', () => { void gracefulShutdown('SIGTERM') })
 process.on('SIGINT', () => { void gracefulShutdown('SIGINT') })
+process.on('uncaughtException', (err) => {
+  logger.error('未捕获异常，服务将退出', err)
+  void gracefulShutdown('uncaughtException', 1)
+})
+process.on('unhandledRejection', (reason) => {
+  logger.error('未处理的 Promise rejection，服务将退出', reason)
+  void gracefulShutdown('unhandledRejection', 1)
+})

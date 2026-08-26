@@ -20,6 +20,7 @@ const ACCOUNT_STATUS_SELECT = {
   expiresAt: true,
   role: true,
   teacherApproved: true,
+  tokenVersion: true,
 } as const
 
 const loadAccountStatus = async (userId: string) => {
@@ -50,6 +51,10 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, rejection)
     }
 
+    if (payload.tokenVersion !== user!.tokenVersion) {
+      return unauthorized(res, '认证令牌已失效，请重新登录')
+    }
+
     // The database role is authoritative so a role change invalidates stale JWT claims.
     req.user = { ...payload, role: user!.role }
     next()
@@ -69,7 +74,7 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
 
       if (payload) {
         const user = await loadAccountStatus(payload.userId)
-        if (!inactiveAccountMessage(user)) {
+        if (!inactiveAccountMessage(user) && payload.tokenVersion === user!.tokenVersion) {
           req.user = { ...payload, role: user!.role }
         }
       }

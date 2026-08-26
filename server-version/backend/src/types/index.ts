@@ -7,6 +7,7 @@ export interface JwtPayload {
   userId: string
   username: string
   role: UserRole
+  tokenVersion: number
 }
 
 // Request with user
