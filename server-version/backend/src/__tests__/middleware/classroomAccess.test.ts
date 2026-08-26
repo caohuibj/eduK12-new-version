@@ -23,7 +23,16 @@ const classroom = {
   status: 'PREPARING',
   course: {
     creatorId: 'course-owner',
-    shares: [{ sharedTo: 'course-teacher' }],
+    shares: [
+      {
+        sharedTo: 'course-teacher',
+        receiver: { role: UserRole.TEACHER },
+      },
+      {
+        sharedTo: 'shared-student',
+        receiver: { role: UserRole.STUDENT },
+      },
+    ],
   },
 }
 
@@ -56,6 +65,7 @@ describe('classroom manager policy', () => {
   it('rejects unrelated teachers and students', () => {
     expect(canManageClassroom(classroom, 'other-teacher', UserRole.TEACHER)).toBe(false)
     expect(canManageClassroom(classroom, 'student-1', UserRole.STUDENT)).toBe(false)
+    expect(canManageClassroom(classroom, 'shared-student', UserRole.TEACHER)).toBe(false)
   })
 
   it('returns 401 when the resource request is unauthenticated', async () => {
