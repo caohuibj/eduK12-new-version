@@ -41,6 +41,7 @@
     "nanoid": "^3.3.11",
     "node-cache": "^5.1.2",
     "pinyin-pro": "^3.28.0",
+    "proxy-addr": "^2.0.7",
     "redis": "^5.11.0",
     "sav-writer": "^1.0.0",
     "sharp": "^0.34.5",

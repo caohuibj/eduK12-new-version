@@ -18,6 +18,12 @@ import { logger } from '../utils/logger'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import { StatsAggregator } from '../services/statsAggregator'
+import { userCanManageClassroom } from '../middleware/classroomAccess'
+import {
+  checkClassroomLookupRateLimit,
+  checkFailedClassroomCodeRateLimit,
+  type ClassroomRateLimitResult,
+} from '../utils/classroomRateLimiter'
 
 // ==================== Validation Schemas ====================
 
@@ -53,6 +59,25 @@ async function generateClassroomCode(): Promise<string> {
   }
 
   return code!
+}
+
+
+function rejectClassroomRateLimit(
+  res: Response,
+  result: ClassroomRateLimitResult
+): boolean {
+  if (!result.available) {
+    error(res, '公共课堂入口暂不可用，请稍后重试', -1, 503)
+    return true
+  }
+
+  if (!result.allowed) {
+    res.set('Retry-After', String(result.retryAfterSeconds))
+    error(res, '请求过于频繁，请稍后重试', -1, 429)
+    return true
+  }
+
+  return false
 }
 
 // ==================== Controller ====================
@@ -128,7 +153,7 @@ export const classroomController = {
         },
       })
 
-      logger.info('创建课堂', { classroomId: classroom.id, code, userId })
+      logger.info('创建课堂', { classroomId: classroom.id })
 
       return success(res, classroom, '课堂创建成功')
     } catch (err) {
@@ -258,50 +283,61 @@ export const classroomController = {
    */
   async getByCode(req: Request, res: Response) {
     try {
-      const { code } = req.params
-      const userId = req.user?.userId
+      const code = String(req.params.code || '').trim()
+      const ipAddress = req.ip || req.socket.remoteAddress || 'unknown'
+
+      const lookupLimit = await checkClassroomLookupRateLimit(ipAddress)
+      if (rejectClassroomRateLimit(res, lookupLimit)) {
+        return
+      }
+
+      if (!/^\d{6}$/.test(code)) {
+        const failedLimit = await checkFailedClassroomCodeRateLimit(
+          ipAddress,
+          code || 'invalid'
+        )
+        if (rejectClassroomRateLimit(res, failedLimit)) {
+          return
+        }
+        return notFound(res, '课堂不存在或当前不可加入')
+      }
 
       const classroom = await prisma.classroom.findUnique({
         where: { code },
-        include: {
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          status: true,
           course: {
             select: {
               id: true,
               title: true,
             },
           },
-          creator: {
-            select: {
-              id: true,
-              nickname: true,
-            },
-          },
         },
       })
 
-      if (!classroom) {
-        return notFound(res, '课堂不存在')
-      }
-
-      // 检查学生是否在课程中
-      let isInCourse = false
-      if (userId) {
-        const courseStudent = await prisma.courseStudent.findFirst({
-          where: {
-            courseId: classroom.courseId,
-            studentId: userId,
-            status: { in: ['ACTIVE', 'APPROVED'] },
-          },
-        })
-        isInCourse = !!courseStudent
+      if (!classroom || !['PREPARING', 'ACTIVE'].includes(classroom.status)) {
+        const failedLimit = await checkFailedClassroomCodeRateLimit(
+          ipAddress,
+          code
+        )
+        if (rejectClassroomRateLimit(res, failedLimit)) {
+          return
+        }
+        return notFound(res, '课堂不存在或当前不可加入')
       }
 
       return success(res, {
-        ...classroom,
-        isInCourse,
+        id: classroom.id,
+        code: classroom.code,
+        name: classroom.name,
+        status: classroom.status,
+        course: classroom.course,
       })
     } catch (err) {
-      logger.error('通过课堂码获取课堂信息错误', err)
+      logger.error('通过课堂码获取课堂信息错误')
       return error(res, '获取课堂信息失败')
     }
   },
@@ -330,7 +366,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(id, userId, userRole))) {
         return forbidden(res, '无权限修改此课堂')
       }
 
@@ -352,7 +388,7 @@ export const classroomController = {
         },
       })
 
-      logger.info('更新课堂', { classroomId: id, userId })
+      logger.info('更新课堂', { classroomId: id })
 
       return success(res, updated, '课堂更新成功')
     } catch (err) {
@@ -387,7 +423,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(id, userId, userRole))) {
         return forbidden(res, '无权限删除此课堂')
       }
 
@@ -405,7 +441,7 @@ export const classroomController = {
         where: { id },
       })
 
-      logger.info('删除课堂', { classroomId: id, userId })
+      logger.info('删除课堂', { classroomId: id })
 
       return success(res, null, '课堂已删除')
     } catch (err) {
@@ -421,6 +457,8 @@ export const classroomController = {
   async getQRCode(req: Request, res: Response) {
     try {
       const { id } = req.params
+      const userId = req.user?.userId
+      const userRole = req.user?.role
 
       const classroom = await prisma.classroom.findUnique({
         where: { id },
@@ -433,6 +471,10 @@ export const classroomController = {
 
       if (!classroom) {
         return notFound(res, '课堂不存在')
+      }
+
+      if (!(await userCanManageClassroom(id, userId, userRole))) {
+        return forbidden(res, '无权限生成此课堂二维码')
       }
 
       // 生成二维码内容（课堂码）
@@ -485,7 +527,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(classroomId, userId, userRole))) {
         return forbidden(res, '无权限添加题目')
       }
 
@@ -504,7 +546,7 @@ export const classroomController = {
         },
       })
 
-      logger.info('创建课堂题目', { classroomId, questionId: question.id, userId })
+      logger.info('创建课堂题目', { classroomId, questionId: question.id })
 
       return success(res, question, '题目创建成功')
     } catch (err) {
@@ -541,7 +583,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (question.classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(classroomId, userId, userRole))) {
         return forbidden(res, '无权限修改题目')
       }
 
@@ -564,7 +606,7 @@ export const classroomController = {
         },
       })
 
-      logger.info('更新课堂题目', { classroomId, questionId, userId })
+      logger.info('更新课堂题目', { classroomId, questionId })
 
       return success(res, updated, '题目更新成功')
     } catch (err) {
@@ -602,7 +644,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (question.classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(classroomId, userId, userRole))) {
         return forbidden(res, '无权限删除题目')
       }
 
@@ -636,7 +678,7 @@ export const classroomController = {
         }
       }
 
-      logger.info('删除课堂题目', { classroomId, questionId, userId })
+      logger.info('删除课堂题目', { classroomId, questionId })
 
       return success(res, null, '题目已删除')
     } catch (err) {
@@ -670,7 +712,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (originalClassroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(id, userId, userRole))) {
         return forbidden(res, '无权限复制此课堂')
       }
 
@@ -715,8 +757,6 @@ export const classroomController = {
       logger.info('复制课堂', {
         originalClassroomId: id,
         newClassroomId: newClassroom.id,
-        code,
-        userId,
       })
 
       return success(res, newClassroom, '课堂复制成功')
@@ -831,7 +871,7 @@ export const classroomController = {
           try {
             logger.info('开始生成词云数据', { questionId, questionType: content.type })
             const questionStats = await statsAggregator.getQuestionStats(questionId)
-            logger.info('词云数据生成结果', { 
+            logger.debug('词云数据生成结果', {
               hasStats: !!questionStats?.stats,
               hasTopWords: !!questionStats?.stats?.topWords,
               topWordsCount: questionStats?.stats?.topWords?.length || 0,
@@ -842,7 +882,10 @@ export const classroomController = {
                 topWords: questionStats.stats.topWords,
                 wordFrequency: questionStats.stats.wordFrequency,
               }
-              logger.info('词云数据已设置', { wordCloud })
+              logger.debug('词云数据已设置', {
+                topWordsCount: wordCloud.topWords?.length || 0,
+                wordFrequencyCount: Object.keys(wordCloud.wordFrequency || {}).length,
+              })
             }
           } catch (error) {
             logger.error('生成词云数据失败', error)
@@ -911,7 +954,7 @@ export const classroomController = {
       }
 
       // 权限检查
-      if (classroom.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await userCanManageClassroom(classroomId, userId, userRole))) {
         return forbidden(res, '无权限导出此课堂数据')
       }
 
@@ -981,7 +1024,7 @@ export const classroomController = {
         },
       }
 
-      logger.info('导出课堂数据', { classroomId, userId })
+      logger.info('导出课堂数据', { classroomId })
 
       return success(res, exportData)
     } catch (err) {

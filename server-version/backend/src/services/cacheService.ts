@@ -10,6 +10,12 @@ import { getRedisUrl } from '../config/redis'
 /**
  * 缓存配置
  */
+export interface RateLimitResult {
+  allowed: boolean
+  remaining: number
+  retryAfterSeconds: number
+}
+
 const CACHE_CONFIG = {
   // 默认缓存时间（秒）
   defaultTTL: parseInt(process.env.CACHE_TTL || '300'), // 5分钟
@@ -23,6 +29,15 @@ const CACHE_CONFIG = {
   // 统计数据缓存时间
   statsTTL: 60, // 1分钟
 }
+
+const RATE_LIMIT_SCRIPT = `
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+local ttl = redis.call('TTL', KEYS[1])
+return { count, ttl }
+`
 
 /**
  * Redis 缓存服务类
@@ -41,7 +56,7 @@ class CacheService {
       })
 
       this.client.on('error', (err: Error) => {
-        logger.error('[CacheService] Redis客户端错误:', err)
+        logger.error('[CacheService] Redis客户端错误')
         this.isConnected = false
       })
 
@@ -56,7 +71,7 @@ class CacheService {
       this.isConnected = true
       logger.info('[CacheService] Redis缓存服务初始化完成')
     } catch (error) {
-      logger.error('[CacheService] Redis连接失败:', error)
+      logger.error('[CacheService] Redis连接失败')
       this.isConnected = false
       // 不抛出错误，允许服务在没有缓存的情况下运行
     }
@@ -80,7 +95,7 @@ class CacheService {
       logger.info(`[CacheService] 缓存命中: ${key}`)
       return JSON.parse(value) as T
     } catch (error) {
-      logger.error(`[CacheService] 获取缓存失败: ${key}`, error)
+      logger.error('[CacheService] 获取缓存失败')
       return null
     }
   }
@@ -98,7 +113,7 @@ class CacheService {
       await this.client.setEx(key, ttl, JSON.stringify(value))
       logger.info(`[CacheService] 缓存已设置: ${key}, TTL: ${ttl}秒`)
     } catch (error) {
-      logger.error(`[CacheService] 设置缓存失败: ${key}`, error)
+      logger.error('[CacheService] 设置缓存失败')
     }
   }
 
@@ -113,7 +128,7 @@ class CacheService {
     try {
       await this.client.del(key)
     } catch (error) {
-      logger.error(`[CacheService] 删除缓存失败: ${key}`, error)
+      logger.error('[CacheService] 删除缓存失败')
     }
   }
 
@@ -132,7 +147,7 @@ class CacheService {
         logger.info(`[CacheService] 删除缓存: ${pattern}, 数量: ${keys.length}`)
       }
     } catch (error) {
-      logger.error(`[CacheService] 批量删除缓存失败: ${pattern}`, error)
+      logger.error('[CacheService] 批量删除缓存失败')
     }
   }
 
@@ -161,6 +176,48 @@ class CacheService {
     return value
   }
 
+
+  /**
+   * Atomically consume one Redis-backed rate-limit token.
+   *
+   * Returning null is intentional: public classroom lookup callers must fail
+   * closed when Redis is unavailable instead of silently bypassing limits.
+   */
+  async consumeRateLimit(
+    key: string,
+    limit: number,
+    windowSeconds: number
+  ): Promise<RateLimitResult | null> {
+    if (!this.isConnected || !this.client) {
+      return null
+    }
+
+    try {
+      const rawResult = await this.client.eval(RATE_LIMIT_SCRIPT, {
+        keys: [key],
+        arguments: [String(windowSeconds)],
+      }) as unknown
+      if (!Array.isArray(rawResult) || rawResult.length < 2) {
+        return null
+      }
+
+      const count = Number(rawResult[0])
+      const ttl = Number(rawResult[1])
+      if (!Number.isFinite(count) || count < 1 || !Number.isFinite(ttl)) {
+        return null
+      }
+
+      const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds
+      return {
+        allowed: count <= limit,
+        remaining: Math.max(0, limit - count),
+        retryAfterSeconds,
+      }
+    } catch {
+      return null
+    }
+  }
+
   /**
    * 获取缓存统计信息
    */
@@ -179,7 +236,7 @@ class CacheService {
         info: info
       }
     } catch (error) {
-      logger.error('[CacheService] 获取统计信息失败', error)
+      logger.error('[CacheService] 获取统计信息失败')
       return { connected: false, error: String(error) }
     }
   }

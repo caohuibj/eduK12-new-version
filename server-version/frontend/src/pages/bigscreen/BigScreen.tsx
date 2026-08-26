@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import * as echarts from 'echarts'
 import 'echarts-wordcloud'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
+import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 
@@ -31,6 +32,7 @@ const BigScreen: React.FC = () => {
   const [searchParams] = useSearchParams()
   const historyQuestionId = searchParams.get('history')
   const isHistoryMode = !!historyQuestionId
+  const { isLoading: authLoading, user } = useAuth()
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const [stats, setStats] = useState<Stats | null>(null)
@@ -46,9 +48,9 @@ const BigScreen: React.FC = () => {
 
   // Socket 连接
   const { isConnected, on, off, emit } = useClassroomSocket({
-    classroomId: classroomId!,
+    classroomId,
     role: 'bigscreen',
-    autoConnect: !isHistoryMode, // 历史模式不需要socket连接
+    autoConnect: !isHistoryMode && !authLoading && !!user,
   })
 
   // 历史模式加载历史数据
@@ -58,14 +60,12 @@ const BigScreen: React.FC = () => {
     const loadHistoryData = async () => {
       try {
         setLoading(true)
-        console.log('加载历史统计数据', { classroomId, historyQuestionId })
         
         const response = await apiClient.get<any>(
           `/classrooms/${classroomId}/questions/${historyQuestionId}/stats`
         )
         
         if (response.code === 0 && response.data) {
-          console.log('历史统计数据加载成功', response.data)
           
           setCurrentQuestion({
             questionId: response.data.question.id,
@@ -77,11 +77,9 @@ const BigScreen: React.FC = () => {
           setStats(response.data.stats)
           setIsFinished(true)
         } else {
-          console.error('加载历史数据失败', response.message)
           alert('加载历史数据失败: ' + response.message)
         }
       } catch (err: any) {
-        console.error('加载历史数据错误', err)
         alert('加载历史数据错误: ' + (err.message || '未知错误'))
       } finally {
         setLoading(false)
@@ -94,14 +92,11 @@ const BigScreen: React.FC = () => {
   // 监听 Socket 事件
   useEffect(() => {
     if (!isConnected) {
-      console.warn('Socket 未连接，无法监听事件')
       return
     }
 
-    console.log('大屏端开始监听 Socket 事件')
 
     on('bigscreen:joined', (data) => {
-      console.log('大屏已加入课堂', data)
       
       // 如果有当前题目，设置题目和状态
       if (data.currentQuestion) {
@@ -130,7 +125,6 @@ const BigScreen: React.FC = () => {
     })
 
     on('broadcast:question', (data: Question) => {
-      console.log('大屏端收到题目', data)
       setCurrentQuestion(data)
       setStats(null)
       setIsFinished(false)
@@ -144,32 +138,23 @@ const BigScreen: React.FC = () => {
     })
 
     on('broadcast:stats', (data: Stats) => {
-      console.log('=== 大屏收到统计 ===')
-      console.log('完整数据:', JSON.stringify(data, null, 2))
-      console.log('选项统计:', data.optionStats)
-      console.log('答案数量:', data.answerCount)
-      console.log('当前题目类型:', currentQuestion?.questionContent.type)
       setStats(data)
     })
 
     on('broadcast:online', (data) => {
-      console.log('在线人数更新', data)
       setOnlineCount(data.onlineCount)
     })
 
     on('broadcast:finished', () => {
-      console.log('答题结束')
       setIsFinished(true)
       setCountdown(null)
     })
 
     // 错误处理
     on('error' as any, (data) => {
-      console.error('Socket 错误', data)
     })
 
     return () => {
-      console.log('清理 Socket 事件监听器')
       off('bigscreen:joined')
       off('broadcast:question')
       off('broadcast:stats')
@@ -202,13 +187,9 @@ const BigScreen: React.FC = () => {
     if (currentQuestion.questionContent.type !== 'single_choice' &&
         currentQuestion.questionContent.type !== 'multiple_choice') return
     
-    console.log('=== 图表更新检查 ===')
-    console.log('是否结束:', isFinished)
-    console.log('统计数据:', stats)
     
     // 如果还没结束且没有统计数据，不显示图表
     if (!isFinished && !stats) {
-      console.log('跳过图表更新：未结束且无统计数据')
       return
     }
 
@@ -221,10 +202,6 @@ const BigScreen: React.FC = () => {
     const optionStats = stats?.optionStats || {}
     const totalCount = stats?.answerCount || 1
 
-    console.log('=== 图表数据准备 ===')
-    console.log('题目选项:', options)
-    console.log('选项统计:', optionStats)
-    console.log('总答案数:', totalCount)
 
     const categories = options.map((opt: any) => opt.value || opt.key)
     const data = options.map((opt: any) => optionStats[opt.value || opt.key] || 0)
@@ -233,9 +210,6 @@ const BigScreen: React.FC = () => {
       return totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : 0
     })
 
-    console.log('X轴类别:', categories)
-    console.log('柱状图数据:', data)
-    console.log('百分比:', percentages)
 
     const option = {
       backgroundColor: 'transparent',
@@ -352,17 +326,11 @@ const BigScreen: React.FC = () => {
 
   // 初始化/更新词云
   useEffect(() => {
-    console.log('=== 词云 useEffect 触发 ===')
-    console.log('wordCloudRef.current:', wordCloudRef.current ? '存在' : '不存在')
-    console.log('currentQuestion:', currentQuestion ? '存在' : '不存在')
-    console.log('stats:', stats ? JSON.stringify(stats, null, 2).substring(0, 200) : '不存在')
     
     if (!wordCloudRef.current) {
-      console.log('❌ 词云容器未就绪，跳过')
       return
     }
     if (!currentQuestion) {
-      console.log('❌ 当前题目不存在，跳过')
       return
     }
 
@@ -370,16 +338,11 @@ const BigScreen: React.FC = () => {
     const hasWordCloud = stats?.wordCloud && (stats.wordCloud.topWords || stats.wordCloud.wordFrequency)
     const hasTextAnswers = stats?.textAnswers && stats.textAnswers.length > 0
     
-    console.log('数据检查:', { hasWordCloud, hasTextAnswers, wordCloudData: stats?.wordCloud })
     
     if (!hasWordCloud && !hasTextAnswers) {
-      console.log('❌ 没有词云或文本答案数据，跳过')
       return
     }
 
-    console.log('✅ 词云更新检查通过')
-    console.log('有词云数据:', hasWordCloud)
-    console.log('有文本答案:', hasTextAnswers)
 
     if (!wordCloudInstance.current) {
       wordCloudInstance.current = echarts.init(wordCloudRef.current)
@@ -389,7 +352,6 @@ const BigScreen: React.FC = () => {
     let data: Array<{ name: string; value: number }>
     
     if (hasWordCloud) {
-      console.log('使用后端分词结果', stats.wordCloud)
       // 使用后端分词结果
       if (stats.wordCloud.topWords && stats.wordCloud.topWords.length > 0) {
         data = stats.wordCloud.topWords.map((item: any) => ({
@@ -405,7 +367,6 @@ const BigScreen: React.FC = () => {
         data = []
       }
     } else {
-      console.log('使用前端简单分词（降级方案）')
       // 降级方案：前端简单分词
       const wordFrequency: Record<string, number> = {}
       stats.textAnswers.forEach((answer) => {
@@ -528,9 +489,7 @@ const BigScreen: React.FC = () => {
             onClick={() => {
               // 非历史模式下，如果有正在进行的题目，通知后端结束
               if (!isHistoryMode && currentQuestion && !isFinished) {
-                console.log('大屏退出，自动结束当前题目')
                 emit('bigscreen:close', {
-                  classroomId: classroomId,
                   questionId: currentQuestion.questionId,
                 })
               }

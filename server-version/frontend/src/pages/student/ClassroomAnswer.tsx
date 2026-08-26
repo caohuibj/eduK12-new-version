@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react'
@@ -13,45 +13,35 @@ interface Question {
 
 const ClassroomAnswer: React.FC = () => {
   const { classroomId } = useParams<{ classroomId: string }>()
+  const [searchParams] = useSearchParams()
+  const classroomCode = searchParams.get('code') || ''
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { isLoading: authLoading } = useAuth()
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const [answer, setAnswer] = useState<any>(null)
   const [multiAnswers, setMultiAnswers] = useState<string[]>([]) // 多选题答案
   const [submitted, setSubmitted] = useState(false)
   const [countdown, setCountdown] = useState<number | null>(null)
-  const [sessionId, setSessionId] = useState<string | null>(null)
   const [isFinished, setIsFinished] = useState(false) // 答题是否已结束
 
-  // Socket 连接（支持临时学生模式）
-  // 已登录学生：使用 user.id
-  // 未登录学生：不传 studentId，后端会生成临时ID
+  // Socket 连接只使用课堂码；session 由服务端创建并绑定。
   const { isConnected, on, off, emit } = useClassroomSocket({
-    classroomId: classroomId!,
+    classroomId,
+    classroomCode,
     role: 'student',
-    studentId: user?.id, // 如果已登录，传用户ID；否则传 undefined
-    autoConnect: true,
+    autoConnect: !authLoading && !!classroomId && !!classroomCode,
   })
 
   // 监听 Socket 事件
   useEffect(() => {
     if (!isConnected) {
-      console.warn('Socket 未连接，无法监听事件')
       return
     }
 
-    console.log('学生端开始监听 Socket 事件')
-
-    // 学生加入成功
-    on('student:joined', (data) => {
-      console.log('学生已加入课堂', data)
-      setSessionId(data.sessionId)
-    })
 
     // 接收题目
     on('broadcast:question', (data: Question & { remainingTime?: number }) => {
-      console.log('学生端收到题目', data)
       setCurrentQuestion(data)
       setAnswer(null)
       setMultiAnswers([])
@@ -69,14 +59,12 @@ const ClassroomAnswer: React.FC = () => {
 
     // 答题结束
     on('broadcast:finished', () => {
-      console.log('答题结束')
       setCountdown(null)
       setIsFinished(true) // 标记答题已结束
     })
 
     // 下一题
     on('broadcast:next', () => {
-      console.log('准备下一题')
       setCurrentQuestion(null)
       setAnswer(null)
       setMultiAnswers([])
@@ -87,26 +75,21 @@ const ClassroomAnswer: React.FC = () => {
 
     // 课堂关闭
     on('broadcast:closed', () => {
-      console.log('课堂关闭')
       alert('课堂已结束')
       navigate('/student')
     })
 
     // 提交成功
     on('student:submitted', () => {
-      console.log('提交成功')
       setSubmitted(true)
     })
 
     // 错误处理
     on('error' as any, (data) => {
-      console.error('Socket 错误', data)
       alert(data.message || '发生错误')
     })
 
     return () => {
-      console.log('清理 Socket 事件监听器')
-      off('student:joined')
       off('broadcast:question')
       off('broadcast:finished')
       off('broadcast:next')
@@ -135,8 +118,7 @@ const ClassroomAnswer: React.FC = () => {
 
   // 提交答案
   const handleSubmit = () => {
-    if (!currentQuestion || !sessionId || !isConnected) {
-      console.warn('无法提交答案：题目不存在、会话不存在或 socket 未连接')
+    if (!currentQuestion || !isConnected) {
       return
     }
 
@@ -150,19 +132,15 @@ const ClassroomAnswer: React.FC = () => {
     if (currentQuestion.questionContent.type === 'single_choice') {
       if (!answer) return
       emit('student:submit', {
-        classroomId,
         questionId: currentQuestion.questionId,
-        sessionId,
-        answer: answer,
+        answer,
       })
     }
     // 多选题
     else if (currentQuestion.questionContent.type === 'multiple_choice') {
       if (multiAnswers.length === 0) return
       emit('student:submit', {
-        classroomId,
         questionId: currentQuestion.questionId,
-        sessionId,
         answer: multiAnswers.join(','), // 用逗号分隔多个选项
       })
     }
@@ -170,10 +148,8 @@ const ClassroomAnswer: React.FC = () => {
     else {
       if (!answer) return
       emit('student:submit', {
-        classroomId,
         questionId: currentQuestion.questionId,
-        sessionId,
-        answer: answer,
+        answer,
       })
     }
   }
@@ -322,6 +298,16 @@ const ClassroomAnswer: React.FC = () => {
       default:
         return <div className="text-gray-500">未知题目类型</div>
     }
+  }
+
+  if (!classroomId || !classroomCode) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center text-gray-500">
+          缺少课堂码，请返回扫码入口重新加入课堂
+        </div>
+      </div>
+    )
   }
 
   if (!isConnected) {

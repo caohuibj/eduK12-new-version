@@ -132,11 +132,8 @@ class WordSegmentationService {
         }
       }
       
-      logger.info('[WordSegmentation] 词频计算完成', {
+      logger.debug('[WordSegmentation] 词频计算完成', {
         wordCount: Object.keys(wordFrequency).length,
-        topWords: Object.entries(wordFrequency)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
       });
       
       return wordFrequency;
@@ -171,11 +168,8 @@ class WordSegmentationService {
       }
     }
     
-    logger.info('[WordSegmentation] 降级方案词频计算完成', {
+    logger.debug('[WordSegmentation] 降级方案词频计算完成', {
       wordCount: Object.keys(wordFrequency).length,
-      topWords: Object.entries(wordFrequency)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
     });
     
     return wordFrequency;

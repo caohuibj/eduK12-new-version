@@ -6,6 +6,19 @@
 
 ---
 
+## 安全更新（main 生产候选）
+
+当前实现以服务器上下文为唯一授权来源。教师和大屏 Socket 必须携带有效 JWT，
+服务器根据当前账号和课堂归属授予权限；客户端携带的 role、userId、studentId、
+sessionId、classroomId 等字段不能改变授权上下文。匿名学生只能通过有效课堂码
+加入可加入课堂；首次加入由服务器创建 session，后续重连必须提供绑定到该课堂
+session 的服务端签发 resume token。公共课堂码接口只返回加入所需的最小摘要，
+并受 Redis 限流保护；合法查询/加入使用可覆盖共享 NAT 课堂的宽预算，失败课堂码
+使用严格预算，Redis 不可用时 fail-closed。答案统计广播前和周期性地重新校验教师/
+大屏 Socket，账号冻结、失效或降权后立即断开。提交授权使用 server-bound socket
+上下文，`leftAt` 仅用于参与/presence 审计，不作为活动 Socket 的授权条件。生产日志
+不得记录答案、题目内容、广播 payload 或 Redis 凭据。
+
 ## 一、功能概述
 
 ### 1.1 需求背景
@@ -28,7 +41,7 @@
 
 **学生端**
 
-- 扫码进入课堂（通过课程关系验证）
+- 扫码进入处于可加入状态的课堂；匿名模式由服务器创建并绑定 session
 - 实时接收题目推送
 - 提交答案
 - 查看答题结果
@@ -44,7 +57,7 @@
 | 原则 | 说明 |
 |------|------|
 | 独立模块 | 新建 `/classrooms` 模块，不影响现有问卷功能 |
-| 关联课程 | 课堂关联课程，学生通过 CourseStudent 关系验证 |
+| 关联课程 | 课堂关联课程；学生通过有效课堂码匿名加入，session 由服务器绑定 |
 | 稳健增量 | 渐进式开发，零影响现有功能 |
 | 数据稳定 | 复用表单题目，支持数据导出 |
 | 多端支持 | Web + 微信小程序 |
@@ -210,39 +223,42 @@ model ClassroomAnswer {
 
 ### 4.2 事件类型
 
+客户端只发送业务输入，身份和授权上下文由服务器建立。
+
 **教师端事件**
 
 | 事件 | 参数 | 说明 |
 |------|------|------|
-| `teacher:join` | `{ classroomId, role, userId }` | 教师加入课堂 |
-| `teacher:start` | `{ classroomId, questionContent, timeLimit }` | 开始答题 |
-| `teacher:end` | `{ classroomId, questionId }` | 结束答题 |
-| `teacher:next` | `{ classroomId }` | 下一题 |
-| `teacher:close` | `{ classroomId }` | 关闭课堂 |
+| teacher:join | { classroomId } | 需要 JWT；服务器验证管理员、课堂创建者或课程创建者权限 |
+| teacher:start | { questionId, timeLimit } | 服务器从已加入课堂推导 classroomId，并验证题目归属 |
+| teacher:end | { questionId } | 服务器验证已加入课堂和题目归属 |
+| teacher:next | 无 | 服务器验证已加入课堂和管理权限 |
+| teacher:close | 无 | 服务器验证已加入课堂和管理权限 |
 
 **学生端事件**
 
 | 事件 | 参数 | 说明 |
 |------|------|------|
-| `student:join` | `{ classroomId, role, studentId }` | 学生加入课堂 |
-| `student:submit` | `{ classroomId, questionId, sessionId, answer }` | 提交答案 |
-| `student:leave` | `{ classroomId, sessionId }` | 离开课堂 |
+| student:join | { code, resumeToken? } | 服务器检查可加入状态；首次创建 session，重连验证绑定的 resume token |
+| student:submit | { questionId, answer } | classroom、student、session 均从服务器上下文推导 |
+| student:leave | 无 | session 从服务器上下文推导 |
 
 **大屏端事件**
 
 | 事件 | 参数 | 说明 |
 |------|------|------|
-| `bigscreen:join` | `{ classroomId, role }` | 大屏加入课堂 |
+| bigscreen:join | { classroomId } | 需要 JWT 和课堂管理权限 |
+| bigscreen:close | { questionId } | 需要 JWT，并验证已加入课堂和题目归属 |
 
 **广播事件**
 
 | 事件 | 数据 | 说明 |
 |------|------|------|
-| `broadcast:question` | `{ questionId, questionContent, timeLimit }` | 推送题目 |
-| `broadcast:stats` | `{ questionId, answerCount, totalSessions, submissionRate }` | 实时统计 |
-| `broadcast:online` | `{ onlineCount }` | 在线人数 |
-| `broadcast:finished` | `{ questionId }` | 答题结束 |
-| `broadcast:closed` | `{ classroomId }` | 课堂关闭 |
+| broadcast:question | { questionId, questionContent, timeLimit } | 推送当前题目 |
+| broadcast:stats | { questionId, answerCount, totalSessions, submissionRate } | 仅教师和大屏房间 |
+| broadcast:online | { onlineCount } | 课堂在线人数 |
+| broadcast:finished | { questionId } | 答题结束 |
+| broadcast:closed | { classroomId } | 课堂关闭 |
 
 ---
 
@@ -267,8 +283,8 @@ model ClassroomAnswer {
 
 **扫码入场页面** (`/student/classroom/join/:code`)
 
-- 显示课堂信息、课程、教师
-- 检查学生是否在课程中
+- 显示课堂名称、课程摘要和状态，不展示教师身份等非必要信息
+- 通过课堂码公共入口完成最小化加入检查
 - 进入课堂按钮
 
 **答题界面** (`/student/classroom/answer/:classroomId`)
@@ -314,7 +330,8 @@ model ClassroomAnswer {
 
 ### 7.1 权限验证
 
-- 学生加入课堂：检查 CourseStudent 关系
+- 学生加入课堂：检查课堂码、可加入状态、Redis 限流；首次由服务器创建 session，
+  重连验证同课堂 resume token，提交时不以 `leftAt` 作为 Socket 授权条件
 - 教师创建课堂：检查课程所有权
 - 管理员全局权限
 
@@ -355,7 +372,7 @@ model ClassroomAnswer {
 | 场景 | 步骤 | 预期结果 |
 |------|------|----------|
 | 创建课堂 | 教师填写表单提交 | 课堂创建成功，生成课堂码 |
-| 学生加入 | 学生扫码加入 | 通过课程关系验证，成功加入 |
+| 学生加入 | 学生扫码加入 | 课堂码有效且课堂可加入，session 创建成功 |
 | 开始答题 | 教师点击开始 | 题目推送到学生端和大屏 |
 | 提交答案 | 学生提交答案 | 实时统计更新，大屏显示 |
 | 结束答题 | 教师点击结束 | 停止接收答案，展示最终统计 |
@@ -374,7 +391,7 @@ model ClassroomAnswer {
 ### 功能验收
 
 - ✅ 教师可在课程下创建课堂
-- ✅ 学生通过课程关系参与课堂
+- ✅ 学生通过有效课堂码参与可加入课堂，session 由服务器绑定
 - ✅ 实时答题、实时展示
 - ✅ 三端协同工作正常
 - ✅ 现有作业、打卡、问卷功能不受影响
@@ -453,7 +470,7 @@ model ClassroomAnswer {
 ## 十三、常见问题
 
 **Q: 学生无法加入课堂？**  
-A: 检查学生是否在课堂关联的课程中，CourseStudent 关系是否正确。
+A: 检查课堂是否仍处于可加入状态、课堂码是否正确，以及 Redis 限流服务是否可用。
 
 **Q: Socket.IO 连接失败？**  
 A: 检查 Nginx 配置是否支持 WebSocket 升级，检查防火墙设置。

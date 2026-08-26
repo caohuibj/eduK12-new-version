@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
+import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, ArrowRight, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 
 interface Question {
@@ -28,6 +29,7 @@ interface Classroom {
 const ClassroomControl: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { isLoading: authLoading, user } = useAuth()
 
   const [classroom, setClassroom] = useState<Classroom | null>(null)
   const [loading, setLoading] = useState(true)
@@ -42,8 +44,7 @@ const ClassroomControl: React.FC = () => {
   const { isConnected, on, off, emit } = useClassroomSocket({
     classroomId: id!,
     role: 'teacher',
-    userId: 'current-user-id', // TODO: 从认证上下文获取
-    autoConnect: true,
+    autoConnect: !authLoading && !!user,
   })
 
   // 获取课堂信息
@@ -75,7 +76,6 @@ const ClassroomControl: React.FC = () => {
 
     // 教师加入成功
     on('teacher:joined', (data) => {
-      console.log('教师已加入课堂', data)
     })
 
     // 实时统计
@@ -91,7 +91,6 @@ const ClassroomControl: React.FC = () => {
 
     // 题目开始
     on('broadcast:question', (data) => {
-      console.log('题目开始', data)
       setCurrentQuestion({
         id: data.questionId,
         questionIndex: data.questionIndex,
@@ -104,7 +103,6 @@ const ClassroomControl: React.FC = () => {
 
     // 答题结束
     on('broadcast:finished', (data) => {
-      console.log('答题结束', data)
       setCurrentQuestion((prev) => {
         if (prev) {
           return {
@@ -120,7 +118,6 @@ const ClassroomControl: React.FC = () => {
 
     // 下一题
     on('broadcast:next', (data) => {
-      console.log('准备下一题', data)
       setCurrentQuestion(null)
     })
 
@@ -152,19 +149,11 @@ const ClassroomControl: React.FC = () => {
   // 开始指定题目
   const handleStartSpecificQuestion = (question: Question) => {
     if (!classroom || !isConnected) {
-      console.warn('无法开始题目：课堂不存在或 socket 未连接')
       return
     }
 
-    console.log('=== 教师开始题目 ===')
-    console.log('题目信息:', question)
-    console.log('题目内容:', question.questionContent)
-    console.log('题目类型:', question.questionContent?.type)
-
     emit('teacher:start', {
-      classroomId: classroom.id,
       questionId: question.id,
-      questionContent: question.questionContent,
       timeLimit: question.timeLimit || 60,
     })
 
@@ -180,7 +169,6 @@ const ClassroomControl: React.FC = () => {
     if (!classroom || !currentQuestion) return
 
     emit('teacher:end', {
-      classroomId: classroom.id,
       questionId: currentQuestion.id,
     })
   }
@@ -189,9 +177,7 @@ const ClassroomControl: React.FC = () => {
   const handleNextQuestion = () => {
     if (!classroom) return
 
-    emit('teacher:next', {
-      classroomId: classroom.id,
-    })
+    emit('teacher:next', {})
   }
 
   // 关闭课堂
@@ -205,9 +191,7 @@ const ClassroomControl: React.FC = () => {
     setClosing(true)
 
     // Socket 处理器会自动更新课堂状态，无需再调用 API
-    emit('teacher:close', {
-      classroomId: classroom.id,
-    })
+    emit('teacher:close', {})
 
     // 延迟跳转，等待 Socket 事件处理完成
     setTimeout(() => {

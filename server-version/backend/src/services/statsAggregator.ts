@@ -124,15 +124,8 @@ export class StatsAggregator {
   private async aggregateFillBlank(question: any): Promise<any> {
     const answers = question.answers
 
-    logger.info('aggregateFillBlank 调试', {
-      answersCount: answers?.length,
-      firstAnswer: answers?.[0] ? {
-        id: answers[0].id,
-        answer: answers[0].answer,
-        answerType: typeof answers[0].answer,
-        isString: typeof answers[0].answer === 'string',
-        isObject: typeof answers[0].answer === 'object',
-      } : null
+    logger.debug('填空题答案聚合开始', {
+      answersCount: answers?.length || 0,
     })
 
     // 收集所有答案文本
@@ -155,10 +148,9 @@ export class StatsAggregator {
       }
     })
 
-    logger.info('收集到的答案文本', { 
-      totalAnswers: answers.length, 
+    logger.debug('填空题答案文本已收集', {
+      totalAnswers: answers.length,
       collectedTexts: answerTexts.length,
-      firstText: answerTexts[0]?.substring(0, 50)
     })
 
     // 词频统计
@@ -234,11 +226,8 @@ export class StatsAggregator {
       logger.info('开始计算词频', { textCount: texts.length })
       // 使用分词服务
       const wordFrequency = await wordSegmentation.calculateWordFrequency(texts)
-      logger.info('词频计算完成', { 
+      logger.debug('词频计算完成', {
         wordCount: Object.keys(wordFrequency).length,
-        topWords: Object.entries(wordFrequency)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
       })
       return wordFrequency
     } catch (error) {

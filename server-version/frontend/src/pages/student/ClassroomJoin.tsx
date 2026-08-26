@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { useAuth } from '../../contexts/AuthContext'
 import { QrCode, AlertCircle, CheckCircle } from 'lucide-react'
 
 interface Classroom {
@@ -13,18 +12,12 @@ interface Classroom {
     id: string
     title: string
   }
-  creator: {
-    id: string
-    nickname: string
-  }
   isInCourse: boolean
 }
 
 const ClassroomJoin: React.FC = () => {
   const { code } = useParams<{ code: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
-
   const [classroom, setClassroom] = useState<Classroom | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -66,7 +59,7 @@ const ClassroomJoin: React.FC = () => {
 
     // 直接跳转到答题页面
     // 即使没有登录，也可以进入课堂（临时学生模式）
-    navigate(`/student/classroom/answer/${classroom.id}`)
+    navigate(`/student/classroom/answer/${classroom.id}?code=${encodeURIComponent(classroom.code)}`)
   }
 
   if (loading) {
@@ -116,10 +109,6 @@ const ClassroomJoin: React.FC = () => {
           <div className="flex justify-between items-center py-2 border-b">
             <span className="text-gray-500">课程</span>
             <span className="font-medium text-gray-900">{classroom.course.title}</span>
-          </div>
-          <div className="flex justify-between items-center py-2 border-b">
-            <span className="text-gray-500">教师</span>
-            <span className="font-medium text-gray-900">{classroom.creator.nickname}</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b">
             <span className="text-gray-500">状态</span>
