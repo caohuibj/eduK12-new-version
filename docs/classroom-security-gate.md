@@ -45,3 +45,11 @@ backend and frontend checks from clean working trees, run the production and mon
 compose config checks, build both images, and execute the staging flow in
 deployment-checklist-v1.md. Do not describe the SHA as release-gate passed until this
 evidence is attached and approved.
+
+## Supported client boundary
+
+The current release contract applies to `server-version/frontend`, which sends Socket.IO
+handshake authentication and server-safe classroom events. The legacy
+`server-version/miniprogram` raw WebSocket client still carries the retired client
+identity/query contract and is not a supported classroom client for this release. Do not
+enable or advertise it until it is separately migrated and passes this gate.
