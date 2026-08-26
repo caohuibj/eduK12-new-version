@@ -36,15 +36,12 @@ const ClassroomAnswer: React.FC = () => {
   // 监听 Socket 事件
   useEffect(() => {
     if (!isConnected) {
-      console.warn('Socket 未连接，无法监听事件')
       return
     }
 
-    console.log('学生端开始监听 Socket 事件')
 
     // 接收题目
     on('broadcast:question', (data: Question & { remainingTime?: number }) => {
-      console.log('学生端收到题目', data)
       setCurrentQuestion(data)
       setAnswer(null)
       setMultiAnswers([])
@@ -62,14 +59,12 @@ const ClassroomAnswer: React.FC = () => {
 
     // 答题结束
     on('broadcast:finished', () => {
-      console.log('答题结束')
       setCountdown(null)
       setIsFinished(true) // 标记答题已结束
     })
 
     // 下一题
     on('broadcast:next', () => {
-      console.log('准备下一题')
       setCurrentQuestion(null)
       setAnswer(null)
       setMultiAnswers([])
@@ -80,25 +75,21 @@ const ClassroomAnswer: React.FC = () => {
 
     // 课堂关闭
     on('broadcast:closed', () => {
-      console.log('课堂关闭')
       alert('课堂已结束')
       navigate('/student')
     })
 
     // 提交成功
     on('student:submitted', () => {
-      console.log('提交成功')
       setSubmitted(true)
     })
 
     // 错误处理
     on('error' as any, (data) => {
-      console.error('Socket 错误', data)
       alert(data.message || '发生错误')
     })
 
     return () => {
-      console.log('清理 Socket 事件监听器')
       off('student:joined')
       off('broadcast:question')
       off('broadcast:finished')
@@ -129,7 +120,6 @@ const ClassroomAnswer: React.FC = () => {
   // 提交答案
   const handleSubmit = () => {
     if (!currentQuestion || !isConnected) {
-      console.warn('无法提交答案：题目不存在或 socket 未连接')
       return
     }
 
