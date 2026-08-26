@@ -35,18 +35,7 @@ const ClassroomAnswer: React.FC = () => {
 
   // 监听 Socket 事件
   useEffect(() => {
-  
-  if (!classroomId || !classroomCode) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center text-gray-500">
-          缺少课堂码，请返回扫码入口重新加入课堂
-        </div>
-      </div>
-    )
-  }
-
-  if (!isConnected) {
+    if (!isConnected) {
       console.warn('Socket 未连接，无法监听事件')
       return
     }
@@ -320,6 +309,16 @@ const ClassroomAnswer: React.FC = () => {
       default:
         return <div className="text-gray-500">未知题目类型</div>
     }
+  }
+
+  if (!classroomId || !classroomCode) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center text-gray-500">
+          缺少课堂码，请返回扫码入口重新加入课堂
+        </div>
+      </div>
+    )
   }
 
   if (!isConnected) {
