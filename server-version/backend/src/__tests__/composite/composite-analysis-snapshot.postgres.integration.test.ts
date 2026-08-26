@@ -68,7 +68,7 @@ const makeAnalysis = (): CognitivePackageAnalysisResult => ({
   analysisProtocolKey: 'attention_stability_v1',
   analysisProtocolVersion: '1.0.0',
   profile: 'standard',
-  analysisVersion: 'cognitive-evidence-domain-v1.0.0',
+  analysisVersion: 'cognitive-evidence-domain-v1.0.1',
   reportSchemaVersion: 'cognitive-package-analysis-v1',
   qualitySummary: { interpretableModules: 0, excludedModules: [], warnings: [] },
   evidence: [],

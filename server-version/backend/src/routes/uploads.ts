@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { success, error } from '../utils/response'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
@@ -11,6 +11,7 @@ import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS, cos } from '../utils/cos'
 
 const router = Router()
+router.use(authenticate, requireTeacher)
 
 // 图片处理状态存储（内存缓存，重启后清空）
 // 生产环境应使用 Redis 存储
@@ -24,7 +25,7 @@ const imageStatusCache = new Map<string, {
 }>()
 
 // 确保上传目录存在（使用绝对路径）
-const imagesDir = path.join(config.uploadDir, 'images')
+const imagesDir = path.resolve(config.uploadDir, 'images')
 const videosDir = path.join(config.uploadDir, 'videos')
 console.log('[Upload] Images directory:', imagesDir)
 console.log('[Upload] Videos directory:', videosDir)
@@ -44,6 +45,17 @@ try {
   }
 } catch (err) {
   console.error('[Upload] Failed to create directories:', err)
+}
+
+const resolveImagePath = (filename: string): string | null => {
+  if (!filename || filename.includes('\0')) return null
+
+  const candidate = path.resolve(imagesDir, filename)
+  if (candidate !== imagesDir && !candidate.startsWith(`${imagesDir}${path.sep}`)) {
+    return null
+  }
+
+  return candidate
 }
 
 // 配置图片存储
@@ -73,7 +85,7 @@ const imageUpload = multer({
 })
 
 // 获取图片列表
-router.get('/images', authenticate, async (req, res) => {
+router.get('/images', async (req, res) => {
   try {
     const images: any[] = []
     
@@ -145,10 +157,13 @@ router.get('/images', authenticate, async (req, res) => {
 })
 
 // 删除图片
-router.delete('/images/:filename', authenticate, async (req, res) => {
+router.delete('/images/:filename', async (req, res) => {
   try {
     const { filename } = req.params
-    const filePath = path.join(config.uploadDir, 'images', filename)
+    const filePath = resolveImagePath(filename)
+    if (!filePath) {
+      return error(res, '非法文件名', -1, 400)
+    }
     
     // 先尝试删除本地文件
     if (fs.existsSync(filePath)) {
@@ -175,7 +190,7 @@ router.delete('/images/:filename', authenticate, async (req, res) => {
 })
 
 // 重命名图片
-router.put('/images/:filename', authenticate, async (req, res) => {
+router.put('/images/:filename', async (req, res) => {
   try {
     const { filename } = req.params
     const { newName } = req.body
@@ -185,19 +200,28 @@ router.put('/images/:filename', authenticate, async (req, res) => {
     }
     
     const trimmedName = newName.trim()
+    if (trimmedName === '.' || trimmedName === '..' || /[\\/\0]/.test(trimmedName)) {
+      return error(res, '文件名包含非法字符', -1, 400)
+    }
     
     // 获取文件扩展名
     const ext = path.extname(filename)
     const newFilename = `${trimmedName}${ext}`
     
-    const oldPath = path.join(config.uploadDir, 'images', filename)
+    const oldPath = resolveImagePath(filename)
+    if (!oldPath) {
+      return error(res, '非法文件名', -1, 400)
+    }
     
     // 检查是本地文件还是 COS 文件
     const isLocalFile = fs.existsSync(oldPath)
     
     if (isLocalFile) {
       // 本地文件重命名
-      const newPath = path.join(config.uploadDir, 'images', newFilename)
+      const newPath = resolveImagePath(newFilename)
+      if (!newPath) {
+        return error(res, '文件名包含非法字符', -1, 400)
+      }
       
       // 检查新文件名是否已存在
       if (fs.existsSync(newPath) && filename !== newFilename) {
@@ -242,7 +266,7 @@ router.put('/images/:filename', authenticate, async (req, res) => {
   }
 })
 // 上传图片（异步处理）- 立即返回，后台队列处理
-router.post('/image', authenticate, imageUpload.single('image'), async (req, res) => {
+router.post('/image', imageUpload.single('image'), async (req, res) => {
   try {
     const file = req.file
     if (!file) {
@@ -284,7 +308,7 @@ router.post('/image', authenticate, imageUpload.single('image'), async (req, res
 })
 
 // 查询图片处理状态
-router.get('/image/status/:imageId', authenticate, async (req, res) => {
+router.get('/image/status/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params
 

@@ -147,7 +147,7 @@ describe('PR10 multi-source package analysis', () => {
   it('combines Go/No-Go and ADEXI without an age or teacher-answering gate', () => {
     const built = buildPackageAnalysisForAttempt(makeAttempt())
     expect(built?.scaleResults).toHaveLength(1)
-    expect(built?.analysis.analysisVersion).toBe('cognitive-evidence-domain-v1.1.0')
+    expect(built?.analysis.analysisVersion).toBe('cognitive-evidence-domain-v1.1.1')
     expect(built?.analysis.reportSchemaVersion).toBe('cognitive-package-analysis-v2')
     const scaleEvidence = built?.analysis.evidence.find((item) => item.sourceType === 'scale_dimension')
     expect(scaleEvidence).toMatchObject({

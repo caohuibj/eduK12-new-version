@@ -34,7 +34,7 @@ async function resetPassword(username, newPassword) {
       data: { passwordHash: hashedPassword }
     })
 
-    console.log(`✅ 用户 ${username} 密码已重置为: ${newPassword}`)
+    console.log(`✅ 用户 ${username} 密码已重置（新密码不会写入日志）`)
     console.log(`   角色: ${user.role}`)
     console.log(`   昵称: ${user.nickname || '无'}`)
     
@@ -45,8 +45,14 @@ async function resetPassword(username, newPassword) {
   }
 }
 
-// 从命令行获取参数
-const username = process.argv[2] || 'rateK12admin'
-const newPassword = process.argv[3] || 'admin123456'
+// 从命令行获取参数；禁止使用可预测的默认账号或密码。
+const username = process.argv[2]
+const newPassword = process.argv[3]
+
+if (!username || !newPassword || newPassword.length < 6) {
+  console.error('用法: node scripts/reset-password.js <username> <new-password>')
+  console.error('新密码至少需要 6 个字符；密码不会写入日志。')
+  process.exit(1)
+}
 
 resetPassword(username, newPassword)

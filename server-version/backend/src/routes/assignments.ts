@@ -1,6 +1,7 @@
 import { Router } from 'express'
+import { UserRole } from '../types'
 import { assignmentController } from '../controllers/assignmentController'
-import { authenticate, requireTeacher } from '../middleware/auth'
+import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 
 const router = Router()
 
@@ -19,8 +20,8 @@ router.put('/:id', authenticate, requireTeacher, assignmentController.update)
 router.delete('/:id', authenticate, requireTeacher, assignmentController.delete)
 
 // 提交相关
-router.post('/:id/submit', authenticate, assignmentController.submit)
-router.get('/:id/my-submission', authenticate, assignmentController.mySubmission)
+router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), assignmentController.submit)
+router.get('/:id/my-submission', authenticate, requireRole(UserRole.STUDENT), assignmentController.mySubmission)
 router.get('/:id/submissions', authenticate, requireTeacher, assignmentController.submissions)
 
 // 批改

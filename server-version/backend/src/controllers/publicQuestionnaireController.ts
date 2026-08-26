@@ -144,19 +144,17 @@ export const publicQuestionnaireController = {
       const { token } = req.params
       const { challenge, proof, sessionId } = req.body
 
-      // 验证 POW（暂时禁用，开发阶段）
-      // TODO: 生产环境启用 POW 验证
-      // if (!challenge || !proof) {
-      //   return error(res, '缺少 POW 验证信息', 400)
-      // }
-      // const storedChallenge = powService.getChallenge(challenge)
-      // if (!storedChallenge) {
-      //   return error(res, 'POW 挑战已过期，请刷新页面重试', 400)
-      // }
-      // const powValid = powService.verifyPOW(challenge, proof, storedChallenge.difficulty)
-      // if (!powValid) {
-      //   return error(res, 'POW 验证失败', 400)
-      // }
+      if (typeof challenge !== 'string' || typeof proof !== 'string' || !challenge || !proof) {
+        return error(res, '缺少 POW 验证信息', -1, 400)
+      }
+      const storedChallenge = powService.getChallenge(challenge)
+      if (!storedChallenge) {
+        return error(res, 'POW 挑战已过期，请刷新页面重试', -1, 400)
+      }
+      const powValid = powService.verifyPOW(challenge, proof, storedChallenge.difficulty)
+      if (!powValid) {
+        return error(res, 'POW 验证失败', -1, 400)
+      }
 
       // 验证令牌
       const validation = await tokenService.validateToken(token)

@@ -118,8 +118,11 @@ export class SocketService {
       
       // 关闭 Socket.IO
       if (this.io) {
-        this.io.close(() => {
-          logger.info('Socket.IO 服务已关闭')
+        await new Promise<void>((resolve) => {
+          this.io!.close(() => {
+            logger.info('Socket.IO 服务已关闭')
+            resolve()
+          })
         })
       }
     } catch (error) {

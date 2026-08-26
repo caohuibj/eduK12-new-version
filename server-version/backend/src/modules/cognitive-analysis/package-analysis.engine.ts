@@ -1031,13 +1031,16 @@ const calculateConsistency = (primaryEvidence: EvidenceItem[]): CognitiveDomainC
   if (sources.size < 2) return 'not_applicable'
 
   const sourceDirections = [...sources.values()]
-  const hasAmbiguousSource = sourceDirections.some(
-    (directions) =>
-      directions.has('unknown') ||
-      directions.has('neutral') ||
-      directions.has('more_strength') && directions.has('more_difficulty') ||
-      directions.size !== 1,
-  )
+  // unknown/neutral do not provide a comparable direction. They must not be
+  // promoted to mixed merely because another independent task is directional.
+  if (sourceDirections.some((directions) => directions.has('unknown') || directions.has('neutral'))) {
+    return 'not_applicable'
+  }
+
+  // A single source containing both known directions is a within-task
+  // conflict. Preserve the useful mixed label, but do not treat it as a
+  // cross-task divergence.
+  const hasConflictingSource = sourceDirections.some((directions) => directions.size !== 1)
   const knownDirections = new Set<EvidenceDirectionClass>()
   for (const directions of sourceDirections) {
     for (const direction of directions) {
@@ -1047,7 +1050,7 @@ const calculateConsistency = (primaryEvidence: EvidenceItem[]): CognitiveDomainC
     }
   }
   if (knownDirections.size === 0) return 'not_applicable'
-  if (hasAmbiguousSource) return 'mixed'
+  if (hasConflictingSource) return 'mixed'
   return knownDirections.size === 1 ? 'consistent' : 'divergent'
 }
 

@@ -182,8 +182,9 @@ describe('PR11 engine to projected export chain', () => {
     expect(analysis.provenance.recommendationRuleVersion).toBe('1.1.0')
     expect(analysis.recommendations).toEqual(expect.arrayContaining([
       expect.objectContaining({ ruleId: 'clear_difficulty_watch', construct: 'domain', audience: 'participant' }),
-      expect.objectContaining({ ruleId: 'mixed_or_divergent_context', construct: 'cross_source', audience: 'researcher' }),
+      expect.objectContaining({ ruleId: 'paired_source_description_info', construct: 'cross_source', audience: 'researcher' }),
     ]))
+    expect(analysis.recommendations.some((recommendation) => recommendation.ruleId === 'mixed_or_divergent_context')).toBe(false)
     expect(analysis.limitations.join(' ')).toContain('建议仅基于冻结 Domain/finding 证据生成')
 
     const snapshot = {

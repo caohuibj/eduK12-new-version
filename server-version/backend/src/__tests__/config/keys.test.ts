@@ -9,6 +9,7 @@ const SAVED = [
   'NODE_ENV',
   'JWT_SECRET',
   'DATABASE_URL',
+  'CORS_ORIGIN',
   'PORT',
   'DATA_ENCRYPTION_KEY',
   'DATA_PSEUDONYM_KEY',
@@ -22,6 +23,7 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     process.env.NODE_ENV = 'production'
     process.env.JWT_SECRET = 'production-test-secret-needs-at-least-32-chars'
     process.env.DATABASE_URL = 'postgresql://ptool:ptool123@localhost:5432/ptool'
+    process.env.CORS_ORIGIN = 'https://frontend.example.test'
     process.env.PORT = '3000'
     process.env.DATA_ENCRYPTION_KEY = VALID_HEX
   })

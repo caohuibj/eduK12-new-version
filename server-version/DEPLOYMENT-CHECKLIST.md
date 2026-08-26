@@ -126,6 +126,7 @@ GRANT ALL PRIVILEGES ON DATABASE ptool TO ptool;
 cd /opt/server-version/backend
 npm install
 npx prisma migrate deploy
+npm run db:seed
 npm run build
 pm2 start dist/index.js --name ptool-api
 

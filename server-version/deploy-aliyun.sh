@@ -83,10 +83,47 @@ echo "[4/6] 配置环境变量..."
 $SSH_CMD << 'EOF'
   cd /opt/ptool
   if [ ! -f .env ]; then
-    cp .env.example .env
-    # 生成随机密钥
+    DB_USER=ptool
+    DB_PASSWORD=$(openssl rand -hex 32)
+    DB_NAME=ptool
     JWT_SECRET=$(openssl rand -hex 32)
-    sed -i "s/your-secret-key-change-in-production/$JWT_SECRET/g" .env
+    DATA_ENCRYPTION_KEY=$(openssl rand -hex 32)
+    DATA_PSEUDONYM_KEY=$(openssl rand -hex 32)
+    ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+    ADMIN_PASSWORD=$(openssl rand -hex 24)
+    GRAFANA_PASSWORD=$(openssl rand -hex 24)
+    CORS_ORIGIN=${CORS_ORIGIN:-http://$(hostname -I | awk '{print $1}')}
+    umask 077
+    cat > .env << ENV_VARS
+DB_USER=$DB_USER
+DB_PASSWORD=$DB_PASSWORD
+DB_NAME=$DB_NAME
+DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@postgres:5432/$DB_NAME?schema=public
+POSTGRES_EXPORTER_DATA_SOURCE_NAME=postgresql://$DB_USER:$DB_PASSWORD@postgres:5432/$DB_NAME?sslmode=disable
+NODE_ENV=production
+JWT_SECRET=$JWT_SECRET
+DATA_ENCRYPTION_KEY=$DATA_ENCRYPTION_KEY
+DATA_PSEUDONYM_KEY=$DATA_PSEUDONYM_KEY
+COGNITIVE_MODULE_ENABLED=false
+VITE_COGNITIVE_MODULE_ENABLED=false
+MATERIAL_GRANTS_ENABLED=true
+CORS_ORIGIN=$CORS_ORIGIN
+TRUST_PROXY_HOPS=1
+ADMIN_USERNAME=$ADMIN_USERNAME
+ADMIN_PASSWORD=$ADMIN_PASSWORD
+GRAFANA_PASSWORD=$GRAFANA_PASSWORD
+ENV_VARS
+    cat > /root/.ptool-credentials << CREDENTIALS
+PTool deployment credentials
+============================
+Admin username: $ADMIN_USERNAME
+Admin password: $ADMIN_PASSWORD
+Database password: $DB_PASSWORD
+JWT secret: $JWT_SECRET
+Data encryption key: $DATA_ENCRYPTION_KEY
+============================
+CREDENTIALS
+    chmod 600 .env /root/.ptool-credentials
   fi
 EOF
 
@@ -95,7 +132,9 @@ echo "[5/6] 启动服务..."
 $SSH_CMD << 'EOF'
   cd /opt/ptool
   docker-compose down 2>/dev/null || true
-  docker-compose up -d
+  docker-compose --profile ops run --rm migrate
+  docker-compose --profile ops run --rm seed
+  docker-compose up -d backend frontend
 EOF
 
 # 6. 检查状态
@@ -107,12 +146,12 @@ $SSH_CMD << 'EOF'
   echo ""
   echo "=== 部署完成 ==="
   echo "访问地址: http://$(curl -s ifconfig.me 2>/dev/null || echo '请查看服务器公网IP')"
-  echo "默认账号: admin / admin123"
+  echo "管理员凭据: /root/.ptool-credentials"
 EOF
 
 echo ""
 echo "=== 部署成功 ==="
 echo "访问地址: http://$SERVER_IP"
-echo "默认账号: admin / admin123"
+echo "管理员凭据: /root/.ptool-credentials"
 echo ""
 echo "查看日志: ssh root@$SERVER_IP 'cd /opt/ptool && docker-compose logs -f'"

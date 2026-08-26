@@ -3,7 +3,7 @@
 # steady-state: postgres | redis | backend | frontend
 # one-shot   : migrate / seed (profiles: ["ops"])
 #
-# 运行前：复制 .env.example -> .env 并填写 JWT_SECRET / DATA_ENCRYPTION_KEY
+# 运行前：复制 .env.example -> .env 并填写数据库、JWT、加密、CORS 和 seed 凭据
 #   docker compose --profile ops run --rm migrate
 #   docker compose --profile ops run --rm seed   # 首次/明确需要时
 #   docker compose up -d backend frontend
@@ -14,13 +14,13 @@ services:
     image: postgres:14-alpine
     container_name: ptool-postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-ptool}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-ptool123}
-      POSTGRES_DB: ${DB_NAME:-ptool}
+      POSTGRES_USER: ${DB_USER:?DB_USER must be set}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      POSTGRES_DB: ${DB_NAME:?DB_NAME must be set}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ptool} -d ${DB_NAME:-ptool}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:?DB_USER must be set} -d ${DB_NAME:?DB_NAME must be set}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -50,11 +50,12 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
-      JWT_SECRET: ${JWT_SECRET}
+      # Supply a complete URL with percent-encoded user/password credentials.
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
-      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
       # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）
       COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
       # Cognitive 参与者假名化密钥（仅当 COGNITIVE_MODULE_ENABLED=true 时生产必需，64 位十六进制；与 DATA_ENCRYPTION_KEY 独立）
@@ -62,6 +63,7 @@ services:
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads
       CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
       EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}
       EXPORT_MAX_TRIALS: ${EXPORT_MAX_TRIALS:-100000}
       EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
@@ -125,7 +127,7 @@ services:
     container_name: ptool-migrate
     profiles: ["ops"]
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
     command: npx prisma migrate deploy
     depends_on:
@@ -141,10 +143,10 @@ services:
     container_name: ptool-seed
     profiles: ["ops"]
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
-      ADMIN_USERNAME: ${ADMIN_USERNAME:-rateK12admin}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-2026coding}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?ADMIN_USERNAME must be set for the initial seed}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set for the initial seed}
     command: npm run db:seed
     depends_on:
       postgres:

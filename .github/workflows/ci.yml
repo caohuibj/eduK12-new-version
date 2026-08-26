@@ -7,7 +7,7 @@
 # jobs：
 #   backend       : npm ci + prisma generate + migrate deploy + seed + build + full regression
 #   frontend      : npm ci + typecheck（tsconfig.cognitive.json 严格门禁，覆盖新代码）+ cognitive tests + vite build
-#   docker       : docker compose config + backend/frontend production image build
+#   docker       : baseline + monitoring compose config + backend/frontend production image build
 #
 # 说明：
 #   - Vite build 不作为 TypeScript typecheck 的替代品（v1.1 §11）。
@@ -111,6 +111,14 @@ jobs:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      DB_USER: ci-ptool
+      DB_PASSWORD: ci-ptool-password
+      DB_NAME: ptool
+      DATABASE_URL: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?schema=public
+      POSTGRES_EXPORTER_DATA_SOURCE_NAME: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?sslmode=disable
+      ADMIN_USERNAME: ci-admin
+      ADMIN_PASSWORD: ci-admin-password-2026
+      GRAFANA_PASSWORD: ci-grafana-password-2026
       COGNITIVE_MODULE_ENABLED: 'true'
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       CORS_ORIGIN: http://localhost
@@ -121,5 +129,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: validate compose
         run: docker compose config > /tmp/eduk12-compose-config.yml
+      - name: validate monitoring compose
+        run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
         run: docker compose build backend frontend

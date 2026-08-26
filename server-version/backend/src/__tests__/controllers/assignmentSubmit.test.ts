@@ -4,6 +4,7 @@ import { AssignmentStatus, UserRole } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     assignment: { findUnique: vi.fn() },
+    courseStudent: { findFirst: vi.fn() },
     submission: { findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
     submissionHistory: { findFirst: vi.fn(), create: vi.fn() },
   },
@@ -38,11 +39,13 @@ const makeRes = () => {
 describe('assignment submit deadline', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockPrisma.courseStudent.findFirst.mockResolvedValue({ id: 'membership-1' })
   })
 
   it('rejects a new submit after the deadline', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',
+      courseId: 'course-1',
       status: AssignmentStatus.PUBLISHED,
       deadline: new Date(Date.now() - 60_000),
     })
@@ -58,6 +61,7 @@ describe('assignment submit deadline', () => {
   it('rejects a resubmit after the deadline', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',
+      courseId: 'course-1',
       status: AssignmentStatus.PUBLISHED,
       deadline: new Date(Date.now() - 60_000),
     })
@@ -74,6 +78,7 @@ describe('assignment submit deadline', () => {
   it('accepts a submit when no deadline is set', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',
+      courseId: 'course-1',
       status: AssignmentStatus.PUBLISHED,
       deadline: null,
     })
@@ -85,5 +90,21 @@ describe('assignment submit deadline', () => {
 
     expect(res.body.code).toBe(0)
     expect(mockPrisma.submission.create).toHaveBeenCalledOnce()
+  })
+
+  it('rejects a student who is not a member of the assignment course', async () => {
+    mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      id: 'asg-1',
+      courseId: 'course-1',
+      status: AssignmentStatus.PUBLISHED,
+      deadline: null,
+    })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq(), res)
+
+    expect(res.statusCode).toBe(403)
+    expect(mockPrisma.submission.create).not.toHaveBeenCalled()
   })
 })

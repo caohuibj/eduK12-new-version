@@ -14,7 +14,7 @@
 
 ### 3. 管理员入口
 - **登录**: http://localhost:5173/admin/login
-- 账号密码来自环境变量 `ADMIN_USERNAME` / `ADMIN_PASSWORD`（未设置时默认为 `admin` / `admin123`）
+- 账号密码来自部署环境中的 `ADMIN_USERNAME` / `ADMIN_PASSWORD`
 
 ### 4. 学生入口
 - **已有账号**: http://localhost:5173/student/login
@@ -54,7 +54,7 @@
 ## 测试账号
 
 ### 管理员账号
-- 用户名/密码以 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 为准（未设置时为 `admin` / `admin123`）
+- 用户名/密码以部署环境中的 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 为准
 - 角色: ADMIN
 
 ### 测试学生账号

@@ -8,6 +8,7 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import path from 'path'
 import fs from 'fs'
+import { validateRemoteUrl } from '../utils/videoDownloader'
 
 const updateVideoSchema = z.object({
   title: z.string().min(1, '视频标题不能为空'),
@@ -192,14 +193,14 @@ export const videoController = {
         return error(res, '视频链接格式不正确')
       }
 
-      // 支持的URL类型
-      const supportedProtocols = ['http://', 'https://']
-      const isValidProtocol = supportedProtocols.some(p => videoUrl.toLowerCase().startsWith(p))
-      if (!isValidProtocol) {
-        return error(res, '仅支持 http:// 或 https:// 链接')
+      try {
+        await validateRemoteUrl(urlResult.data)
+      } catch {
+        return error(res, '视频链接必须指向可访问的公网 HTTP(S) 地址')
       }
 
-      logger.info(`用户 ${userId} 提交视频链接: ${videoUrl.substring(0, 50)}...`)
+      const parsedVideoUrl = new URL(urlResult.data)
+      logger.info(`用户 ${userId} 提交视频链接`, { host: parsedVideoUrl.hostname })
 
       // 创建数据库记录
       const video = await prisma.video.create({
@@ -210,7 +211,7 @@ export const videoController = {
           fileSize: 0,
           mimeType: 'video/mp4',
           teacherId: userId,
-          originalUrl: videoUrl,
+          originalUrl: urlResult.data,
           status: 'PENDING',
         },
         include: {
@@ -224,10 +225,10 @@ export const videoController = {
         }
       })
 
-      // 添加到视频处理队列 (使用新的处理器类型)
-      await videoQueue.add('download-and-transcode', {
+      // The worker consumes the named transcode job and detects URL mode from videoUrl.
+      await videoQueue.add('transcode', {
         videoId: video.id,
-        videoUrl,           // 视频链接
+        videoUrl: urlResult.data, // 视频链接
         teacherId: userId,
         watermarkText: watermarkText || '慧育空间教学专属视频',
         downloadOptions: {
