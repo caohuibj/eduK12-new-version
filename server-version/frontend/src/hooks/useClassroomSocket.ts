@@ -2,8 +2,8 @@
  * 课堂 Socket.IO 连接管理 Hook
  *
  * 身份只通过 Socket.IO handshake auth 中的 token 传递。课堂教师/大屏
- * 事件不再携带 userId、role、studentId 或 sessionId；学生匿名加入只携带
- * 课堂码，session 由服务器创建。
+ * 事件不再携带 userId、role、studentId 或 sessionId；学生匿名加入携带
+ * 课堂码和可选的服务端签发 resume token，session 仍由服务器推导。
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -30,6 +30,47 @@ interface SocketEvents {
   error?: (data: any) => void
 }
 
+const resumeTokenKey = (classroomCode?: string): string | null => {
+  return classroomCode ? `classroom-resume-token:${classroomCode}` : null
+}
+
+const readResumeToken = (key: string | null): string | null => {
+  if (!key) {
+    return null
+  }
+
+  try {
+    const token = window.localStorage.getItem(key)
+    return token?.trim() || null
+  } catch {
+    return null
+  }
+}
+
+const saveResumeToken = (key: string | null, token: unknown): void => {
+  if (!key || typeof token !== 'string' || !token.trim()) {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(key, token)
+  } catch {
+    // A storage-disabled browser can still participate for the current socket.
+  }
+}
+
+const clearResumeToken = (key: string | null): void => {
+  if (!key) {
+    return
+  }
+
+  try {
+    window.localStorage.removeItem(key)
+  } catch {
+    // Ignore storage failures; the server remains the source of truth.
+  }
+}
+
 export function useClassroomSocket(options: UseClassroomSocketOptions) {
   const {
     classroomId,
@@ -49,6 +90,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
 
     const socketUrl = window.location.origin
     const token = localStorage.getItem('token')
+    const studentResumeKey = role === 'student' ? resumeTokenKey(classroomCode) : null
 
     socketRef.current = io(socketUrl + '/classroom', {
       transports: ['websocket', 'polling'],
@@ -61,6 +103,12 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
 
     const socket = socketRef.current
 
+    socket.on('student:joined', (data) => {
+      if (role === 'student') {
+        saveResumeToken(studentResumeKey, data?.resumeToken)
+      }
+    })
+
     socket.on('connect', () => {
       setIsConnected(true)
       setError(null)
@@ -71,7 +119,11 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
         }
       } else if (role === 'student') {
         if (classroomCode) {
-          socket.emit('student:join', { code: classroomCode })
+          const storedResumeToken = readResumeToken(studentResumeKey)
+          socket.emit('student:join', {
+            code: classroomCode,
+            ...(storedResumeToken ? { resumeToken: storedResumeToken } : {}),
+          })
         }
       } else if (role === 'bigscreen') {
         if (classroomId) {
@@ -93,6 +145,9 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     })
 
     socket.on('error', (data) => {
+      if (role === 'student' && data?.message === '学生会话无效') {
+        clearResumeToken(studentResumeKey)
+      }
       setError(data?.message || '发生错误')
     })
   }, [classroomCode, classroomId, role])

@@ -55,16 +55,16 @@ describe('classroom manager policy', () => {
     mockPrisma.classroom.findUnique.mockResolvedValue(classroom)
   })
 
-  it('allows administrators, classroom creators, course owners and shared teachers', () => {
+  it('allows administrators, classroom creators and course owners', () => {
     expect(canManageClassroom(classroom, 'admin-1', UserRole.ADMIN)).toBe(true)
     expect(canManageClassroom(classroom, 'teacher-creator', UserRole.TEACHER)).toBe(true)
     expect(canManageClassroom(classroom, 'course-owner', UserRole.TEACHER)).toBe(true)
-    expect(canManageClassroom(classroom, 'course-teacher', UserRole.TEACHER)).toBe(true)
   })
 
   it('rejects unrelated teachers and students', () => {
     expect(canManageClassroom(classroom, 'other-teacher', UserRole.TEACHER)).toBe(false)
     expect(canManageClassroom(classroom, 'student-1', UserRole.STUDENT)).toBe(false)
+    expect(canManageClassroom(classroom, 'course-teacher', UserRole.TEACHER)).toBe(false)
     expect(canManageClassroom(classroom, 'shared-student', UserRole.TEACHER)).toBe(false)
   })
 
@@ -94,7 +94,7 @@ describe('classroom manager policy', () => {
     expect(next).not.toHaveBeenCalled()
   })
 
-  it('allows a course-shared teacher through the route gate', async () => {
+  it('blocks a course-shared teacher at the route gate', async () => {
     const req = {
       params: { id: classroom.id },
       user: { userId: 'course-teacher', role: UserRole.TEACHER },
@@ -104,7 +104,8 @@ describe('classroom manager policy', () => {
 
     await requireClassroomManager()(req, res, next)
 
-    expect(next).toHaveBeenCalledOnce()
+    expect(res.statusCode).toBe(403)
+    expect(next).not.toHaveBeenCalled()
   })
 
   it('returns 404 when the classroom does not exist', async () => {

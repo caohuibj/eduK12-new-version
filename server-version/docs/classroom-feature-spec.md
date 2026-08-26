@@ -11,7 +11,8 @@
 当前实现以服务器上下文为唯一授权来源。教师和大屏 Socket 必须携带有效 JWT，
 服务器根据当前账号和课堂归属授予权限；客户端携带的 role、userId、studentId、
 sessionId、classroomId 等字段不能改变授权上下文。匿名学生只能通过有效课堂码
-加入可加入课堂，session 由服务器创建。公共课堂码接口只返回加入所需的最小摘要，
+加入可加入课堂；首次加入由服务器创建 session，后续重连必须提供绑定到该课堂
+session 的服务端签发 resume token。公共课堂码接口只返回加入所需的最小摘要，
 并受 Redis 限流保护；Redis 不可用时 fail-closed。答案统计只发送到已授权的教师
 和大屏房间。生产日志不得记录答案、题目内容、广播 payload 或 Redis 凭据。
 
@@ -225,7 +226,7 @@ model ClassroomAnswer {
 
 | 事件 | 参数 | 说明 |
 |------|------|------|
-| teacher:join | { classroomId } | 需要 JWT；服务器验证管理员、课堂创建者、课程创建者或正式课程教师权限 |
+| teacher:join | { classroomId } | 需要 JWT；服务器验证管理员、课堂创建者或课程创建者权限 |
 | teacher:start | { questionId, timeLimit } | 服务器从已加入课堂推导 classroomId，并验证题目归属 |
 | teacher:end | { questionId } | 服务器验证已加入课堂和题目归属 |
 | teacher:next | 无 | 服务器验证已加入课堂和管理权限 |
@@ -235,7 +236,7 @@ model ClassroomAnswer {
 
 | 事件 | 参数 | 说明 |
 |------|------|------|
-| student:join | { code } | 仅课堂码；服务器检查可加入状态并创建 session |
+| student:join | { code, resumeToken? } | 服务器检查可加入状态；首次创建 session，重连验证绑定的 resume token |
 | student:submit | { questionId, answer } | classroom、student、session 均从服务器上下文推导 |
 | student:leave | 无 | session 从服务器上下文推导 |
 

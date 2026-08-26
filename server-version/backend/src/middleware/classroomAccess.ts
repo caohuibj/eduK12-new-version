@@ -10,16 +10,16 @@ export interface ClassroomAccessRecord {
   status: string
   course: {
     creatorId: string
-    shares: Array<{ sharedTo: string; receiver: { role: UserRole } }>
   }
 }
 
 /**
  * Return only the ownership fields needed for classroom authorization.
  *
- * A course share is the persisted representation of a formal teacher
- * assignment in this codebase. The classroom creator and course creator are
- * also managers; administrators bypass the resource checks.
+ * Course shares grant reusable course-content access. They do not grant
+ * access to a classroom's roster, identities, answers, or live controls.
+ * Classroom managers are administrators, the classroom creator, and the
+ * course creator.
  */
 export async function findClassroomAccess(
   classroomId: string
@@ -34,14 +34,6 @@ export async function findClassroomAccess(
       course: {
         select: {
           creatorId: true,
-          shares: {
-            select: {
-              sharedTo: true,
-              receiver: {
-                select: { role: true },
-              },
-            },
-          },
         },
       },
     },
@@ -63,11 +55,7 @@ export function canManageClassroom(
 
   return (
     classroom.creatorId === userId ||
-    classroom.course.creatorId === userId ||
-    classroom.course.shares.some(
-      (share) =>
-        share.sharedTo === userId && share.receiver.role === UserRole.TEACHER
-    )
+    classroom.course.creatorId === userId
   )
 }
 

@@ -14,6 +14,7 @@ const {
     getClassroomNamespace: vi.fn(),
     broadcastToRoom: vi.fn(),
     getRoomConnectionCount: vi.fn(),
+    refreshAuthenticatedSocket: vi.fn(),
   },
   mockPrisma: {
     classroom: { findUnique: vi.fn() },
@@ -53,15 +54,19 @@ const makeSocket = (data: Record<string, unknown>) => ({
   emit: vi.fn(),
   join: vi.fn(),
   leave: vi.fn(),
-  handshake: { address: '127.0.0.1' },
+  disconnect: vi.fn(),
+  handshake: { address: '127.0.0.1', headers: {} },
   conn: { remoteAddress: '127.0.0.1' },
 })
 
 const getHandlers = (socket: any) =>
   new Map<string, (data?: unknown) => Promise<void>>(
-    socket.on.mock.calls.map(([event, handler]: [string, (data?: unknown) => Promise<void>]) => [
+    socket.on.mock.calls.map(([event, handler]: [string, (data?: unknown) => void]) => [
       event,
-      handler,
+      async (data?: unknown) => {
+        handler(data)
+        await new Promise<void>((resolve) => setImmediate(resolve))
+      },
     ])
   )
 
@@ -69,6 +74,8 @@ describe('classroom socket authorization boundary', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
+    mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
+    mockCanManageClassroom.mockReturnValue(true)
     mockLookupLimit.mockResolvedValue({
       available: true,
       allowed: true,
@@ -135,6 +142,120 @@ describe('classroom socket authorization boundary', () => {
       message: '课堂会话无效',
     })
     expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
+  })
+
+  it('issues one resume token for an anonymous session and restores it', async () => {
+    const handler = new ClassroomSocketHandler()
+    handler.initialize()
+    const connect = mockNamespace.on.mock.calls[0][1]
+    const firstSocket = makeSocket({ authenticated: false })
+    connect(firstSocket)
+    const firstHandlers = getHandlers(firstSocket)
+    const session = {
+      id: 'session-1',
+      classroomId: 'classroom-1',
+      studentId: 'temp_student-1',
+      leftAt: null,
+      isTemporary: true,
+    }
+
+    mockPrisma.classroom.findUnique.mockResolvedValue({
+      id: 'classroom-1',
+      code: '123456',
+      name: '课堂',
+      status: 'ACTIVE',
+    })
+    mockPrisma.classroomSession.findUnique.mockResolvedValue(null)
+    mockPrisma.classroomSession.create.mockResolvedValue(session)
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue(null)
+
+    await firstHandlers.get('student:join')!({ code: '123456' })
+
+    const joinedCall = firstSocket.emit.mock.calls.find(
+      ([event]: [string]) => event === 'student:joined'
+    )
+    const resumeToken = joinedCall?.[1]?.resumeToken
+    expect(typeof resumeToken).toBe('string')
+    expect(mockPrisma.classroomSession.create).toHaveBeenCalledOnce()
+
+    vi.clearAllMocks()
+    mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
+    mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
+    const secondSocket = makeSocket({ authenticated: false })
+    connect(secondSocket)
+    const secondHandlers = getHandlers(secondSocket)
+    mockPrisma.classroom.findUnique.mockResolvedValue({
+      id: 'classroom-1',
+      code: '123456',
+      name: '课堂',
+      status: 'ACTIVE',
+    })
+    mockPrisma.classroomSession.findFirst.mockResolvedValue(session)
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue(null)
+
+    await secondHandlers.get('student:join')!({
+      code: '123456',
+      resumeToken,
+    })
+
+    expect(mockPrisma.classroomSession.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: 'session-1',
+        classroomId: 'classroom-1',
+        isTemporary: true,
+      },
+    })
+    expect(mockPrisma.classroomSession.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an invalid anonymous resume token without creating a new session', async () => {
+    const handler = new ClassroomSocketHandler()
+    handler.initialize()
+    const connect = mockNamespace.on.mock.calls[0][1]
+    const socket = makeSocket({ authenticated: false })
+    connect(socket)
+    const handlers = getHandlers(socket)
+
+    mockPrisma.classroom.findUnique.mockResolvedValue({
+      id: 'classroom-1',
+      code: '123456',
+      name: '课堂',
+      status: 'ACTIVE',
+    })
+
+    await handlers.get('student:join')!({
+      code: '123456',
+      resumeToken: 'forged-token',
+    })
+
+    expect(socket.emit).toHaveBeenCalledWith('error', {
+      message: '学生会话无效',
+    })
+    expect(mockPrisma.classroomSession.findFirst).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomSession.create).not.toHaveBeenCalled()
+  })
+
+  it('refreshes the account before each manager action', async () => {
+    const handler = new ClassroomSocketHandler()
+    handler.initialize()
+    const connect = mockNamespace.on.mock.calls[0][1]
+    const socket = makeSocket({
+      authenticated: true,
+      userId: 'teacher-1',
+      userRole: 'TEACHER',
+      classroomId: 'classroom-1',
+    })
+    connect(socket)
+    const handlers = getHandlers(socket)
+    mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(false)
+
+    await handlers.get('teacher:next')!()
+
+    expect(socket.emit).toHaveBeenCalledWith('error', {
+      message: '需要经过认证的教师或管理员连接',
+    })
+    expect(mockFindClassroomAccess).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
   it('rejects a forged session before expired-question side effects', async () => {

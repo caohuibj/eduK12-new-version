@@ -30,6 +30,15 @@ const CACHE_CONFIG = {
   statsTTL: 60, // 1分钟
 }
 
+const RATE_LIMIT_SCRIPT = `
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+local ttl = redis.call('TTL', KEYS[1])
+return { count, ttl }
+`
+
 /**
  * Redis 缓存服务类
  */
@@ -184,12 +193,20 @@ class CacheService {
     }
 
     try {
-      const count = Number(await this.client.incr(key))
-      if (count === 1) {
-        await this.client.expire(key, windowSeconds)
+      const rawResult = await this.client.eval(RATE_LIMIT_SCRIPT, {
+        keys: [key],
+        arguments: [String(windowSeconds)],
+      }) as unknown
+      if (!Array.isArray(rawResult) || rawResult.length < 2) {
+        return null
       }
 
-      const ttl = Number(await this.client.ttl(key))
+      const count = Number(rawResult[0])
+      const ttl = Number(rawResult[1])
+      if (!Number.isFinite(count) || count < 1 || !Number.isFinite(ttl)) {
+        return null
+      }
+
       const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds
       return {
         allowed: count <= limit,

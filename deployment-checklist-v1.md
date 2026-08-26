@@ -5,7 +5,8 @@
 - [ ] The release candidate is an exact reviewed commit or tag on main.
 - [ ] The PR review records the exact SHA and the local/backup verification evidence.
 - [ ] Classroom Socket security gate passes: JWT teacher/bigscreen auth, server-derived
-      classroom/question/session context, cross-class rejection, and no unauthorized
+      classroom/question/session context, classroom-bound anonymous resume token,
+      trusted-proxy-aware IP limiting, cross-class rejection, and no unauthorized
       database writes or broadcasts.
 - [ ] Classroom HTTP IDOR checks pass for detail, QR code, questions, stats and export.
 - [ ] Public classroom-code checks pass: joinable status only, minimal response, IP/code

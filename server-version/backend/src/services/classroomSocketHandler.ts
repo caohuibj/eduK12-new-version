@@ -15,8 +15,14 @@ import { Socket } from 'socket.io'
 import { UserRole } from '../types'
 import { socketService } from './socketService'
 import { prisma } from '../config/database'
+import { config } from '../config'
 import { logger } from '../utils/logger'
 import { StatsAggregator } from './statsAggregator'
+import {
+  generateClassroomResumeToken,
+  verifyClassroomResumeToken,
+} from '../utils/jwt'
+import { resolveSocketClientIp } from '../utils/socketClientIp'
 import {
   canManageClassroom,
   findClassroomAccess,
@@ -128,7 +134,7 @@ export class ClassroomSocketHandler {
   }
 
   private socketAddress(socket: Socket): string {
-    return socket.handshake.address || socket.conn.remoteAddress || 'unknown'
+    return resolveSocketClientIp(socket, config.trustProxyHops)
   }
 
   private rejectRateLimitedSocket(
@@ -161,7 +167,10 @@ export class ClassroomSocketHandler {
     classroomId: string,
     expectedRole: Exclude<ClientRole, 'student'>
   ): Promise<ClassroomAccessRecord | null> {
-    if (!this.isManagerSocket(socket)) {
+    if (
+      !(await socketService.refreshAuthenticatedSocket(socket)) ||
+      !this.isManagerSocket(socket)
+    ) {
       this.emitError(socket, '需要经过认证的教师或管理员连接')
       return null
     }
@@ -307,7 +316,8 @@ export class ClassroomSocketHandler {
       }
 
       const isTemporary = socket.data.authenticated !== true
-      const actualStudentId = isTemporary
+      const resumeToken = isTemporary ? readString(data, 'resumeToken') : null
+      let actualStudentId = isTemporary
         ? 'temp_' + randomUUID()
         : socket.data.userId
 
@@ -316,29 +326,57 @@ export class ClassroomSocketHandler {
         return
       }
 
-      let session = await prisma.classroomSession.findUnique({
-        where: {
-          classroomId_studentId: {
-            classroomId: classroom.id,
-            studentId: actualStudentId,
-          },
-        },
-      })
+      let session
+      if (isTemporary && resumeToken) {
+        const resume = verifyClassroomResumeToken(resumeToken, classroom.id)
+        if (!resume) {
+          this.emitError(socket, '学生会话无效')
+          return
+        }
 
-      if (!session) {
-        session = await prisma.classroomSession.create({
-          data: {
+        session = await prisma.classroomSession.findFirst({
+          where: {
+            id: resume.sessionId,
             classroomId: classroom.id,
-            studentId: actualStudentId,
-            isTemporary,
+            isTemporary: true,
           },
         })
+        if (!session) {
+          this.emitError(socket, '学生会话无效')
+          return
+        }
+        actualStudentId = session.studentId
       } else {
+        session = await prisma.classroomSession.findUnique({
+          where: {
+            classroomId_studentId: {
+              classroomId: classroom.id,
+              studentId: actualStudentId,
+            },
+          },
+        })
+
+        if (!session) {
+          session = await prisma.classroomSession.create({
+            data: {
+              classroomId: classroom.id,
+              studentId: actualStudentId,
+              isTemporary,
+            },
+          })
+        }
+      }
+
+      if (session.leftAt) {
         session = await prisma.classroomSession.update({
           where: { id: session.id },
           data: { leftAt: null },
         })
       }
+
+      const issuedResumeToken = isTemporary
+        ? resumeToken || generateClassroomResumeToken(classroom.id, session.id)
+        : null
 
       const room = 'classroom:' + classroom.id
       socket.join(room)
@@ -356,6 +394,7 @@ export class ClassroomSocketHandler {
       socket.emit('student:joined', {
         classroomId: classroom.id,
         status: classroom.status,
+        ...(issuedResumeToken ? { resumeToken: issuedResumeToken } : {}),
       })
 
       const activeQuestion = await prisma.classroomQuestion.findFirst({

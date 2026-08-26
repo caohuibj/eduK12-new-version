@@ -137,6 +137,51 @@ export class SocketService {
   }
 
   /**
+   * Re-check the account behind an already-connected privileged socket.
+   * Handshake authentication is not enough because an administrator can
+   * freeze, deactivate, expire, or change the role of an account while the
+   * socket remains open.
+   */
+  async refreshAuthenticatedSocket(socket: Socket): Promise<boolean> {
+    if (
+      socket.data.authenticated !== true ||
+      typeof socket.data.userId !== 'string'
+    ) {
+      return false
+    }
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: socket.data.userId },
+        select: {
+          id: true,
+          role: true,
+          isActive: true,
+          isFrozen: true,
+          expiresAt: true,
+          teacherApproved: true,
+        },
+      })
+
+      if (!user || inactiveAccountMessage(user)) {
+        socket.data.authenticated = false
+        socket.data.userId = undefined
+        socket.data.userRole = undefined
+        return false
+      }
+
+      socket.data.userRole = user.role
+      return true
+    } catch {
+      // Fail closed if the account cannot be revalidated.
+      socket.data.authenticated = false
+      socket.data.userId = undefined
+      socket.data.userRole = undefined
+      return false
+    }
+  }
+
+  /**
    * 获取课堂命名空间
    */
   getClassroomNamespace(): any {

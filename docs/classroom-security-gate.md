@@ -13,14 +13,15 @@ mainline and is required before production-candidate promotion.
 | teacher:next / teacher:close | no authority fields | joined classroom and manager permission |
 | bigscreen:join | classroomId | JWT account and classroom manager permission |
 | bigscreen:close | questionId | joined classroom and question ownership |
-| student:join | classroom code | joinable classroom; server-created session |
+| student:join | classroom code and optional resume token | joinable classroom; server-verified session binding |
 | student:submit | questionId, answer | classroom, student and session from server socket context |
 | student:leave | no fields | session from server socket context |
 
 Teacher and bigscreen sockets require a valid JWT and a current database account. Manager
-access is limited to administrators, the classroom creator, the course creator, and a
-formal course teacher recorded through CourseShare. Anonymous sockets can only use the
-student code-join flow.
+access is limited to administrators, the classroom creator, and the course creator.
+CourseShare grants reusable course content only; it does not grant classroom-manager
+access. Anonymous sockets can only use the student code-join flow, and reconnects must
+present the server-issued token bound to the same classroom session.
 
 ## Evidence checklist
 

@@ -329,7 +329,13 @@ export const classroomController = {
         return notFound(res, '课堂不存在或当前不可加入')
       }
 
-      return success(res, classroom)
+      return success(res, {
+        id: classroom.id,
+        code: classroom.code,
+        name: classroom.name,
+        status: classroom.status,
+        course: classroom.course,
+      })
     } catch (err) {
       logger.error('通过课堂码获取课堂信息错误')
       return error(res, '获取课堂信息失败')
