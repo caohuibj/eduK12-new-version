@@ -4,7 +4,17 @@
 # 直接在服务器上执行: sudo bash remote-deploy.sh
 # =============================================================================
 
-set -e
+set -Eeuo pipefail
+
+cat >&2 <<'NOTICE'
+此远程宿主机部署脚本已停用。
+生产环境唯一支持的拓扑是 server-version/docker-compose.yml；请在目标主机安装
+Docker/Compose，使用受保护的 .env，并按 Compose 文档启动服务。
+本脚本不会安装或操作宿主机 PostgreSQL、Redis、Nginx、PM2，也不会写入凭据。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
 
 APP_DIR="/opt/ptool"
 BACKEND_DIR="$APP_DIR/server-version/backend"
@@ -270,3 +280,5 @@ main() {
 }
 
 main
+
+LEGACY_SCRIPT

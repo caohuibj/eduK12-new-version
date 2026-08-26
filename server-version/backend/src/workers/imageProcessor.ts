@@ -12,8 +12,8 @@ import path from 'path'
 let sharp: any = null
 try {
   sharp = require('sharp')
-} catch (e) {
-  console.warn('[ImageProcessor] sharp 模块不可用，图片处理功能将被禁用')
+} catch {
+  logger.warn('[ImageProcessor] sharp 模块不可用，图片处理功能将被禁用')
 }
 
 import { imageQueue, RESOURCE_LIMITS } from '../config/queue'

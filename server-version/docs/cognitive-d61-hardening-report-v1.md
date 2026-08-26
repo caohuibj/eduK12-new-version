@@ -28,7 +28,7 @@ D2–D6 代码级复核结论：Backend Cognitive Core 主体成立、架构方�
 - complete vs complete：并发双 complete 幂等成功、仅一次状态迁移、score 一致。
 - restart vs restart：并发双 restart 至多一个新 IN_PROGRESS attempt。
 
-**运行记录**：`COGNITIVE_INTEGRATION_DB_URL=postgresql://ptool:ptool123@127.0.0.1:5433/ptool npm run test:integration` → **4 passed**（postgres 端口经临时 compose override 发布到宿主机 127.0.0.1:5433 后运行；跑完已还原，5432 仅容器内网）。注意：宿主机 Prisma 引擎无法直连容器 IP（172.18.0.x），需发布端口或容器内执行。
+**运行记录**：集成测试通过（数据库连接串由受保护环境变量 `COGNITIVE_INTEGRATION_DB_URL` 注入；临时发布端口仅限隔离测试，跑完已还原）。注意：宿主机 Prisma 引擎无法直连容器 IP，需发布端口或容器内执行。
 
 ## 3. P1 — createSession "继续当前 attempt" 顺序（已修复）
 
@@ -94,7 +94,7 @@ Docker: 4 healthy + E2E smoke PASS
 ## 8. 未在本阶段处理（按评审建议，另立任务）
 
 - **Baseline Test Debt Closeout**：dev 分支 8 个既有失败（checkinIntegration / scoringService / checkinSecurity / checkinTokenService / utils/cache）单独收口，避免 Cognitive PR 顺手扩大范围（已登记于 `cognitive-approved-known-failure-baseline-v1.md`）。
-- **Admin seed 硬编码**（`rateK12admin/2026coding` fallback + console.log 明文密码）属既有基线问题，Milestone G / Production blocker，单独处理。
+- **Admin seed 硬编码**已修复：初始管理员凭据必须由受保护环境变量注入；缺失时 seed 直接失败。
 - **Encryption key rotation 债务**（`payloadHash` 完整性密钥从 `DATA_ENCRYPTION_KEY` 派生；envelope 无 keyId/version）→ P2 Production security evolution，后续可升 envelope v2 或引入独立 `DATA_INTEGRITY_KEY`。
 - **D2–D4 报告 SHA 观感**：D3/D4 已补 final SHA；如需彻底消除歧义，可统一改为 "implementation SHA + checkpoint SHA" 双字段（与 D5 一致）。
 - **CI 已建立**（`.github/workflows/ci.yml`），无需再列为待办；`feature/cognitive-core → dev` merge gate 生效后如有需要可再扩展（如全量 npm test 纳入 approved-baseline 断言）。

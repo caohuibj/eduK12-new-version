@@ -208,12 +208,6 @@ export function calculateScores(
     answerMap.set(answer.itemId, Number(answer.value))
   })
 
-  // DEBUG: 打印答案映射
-  console.log('DEBUG calculateScores answerMap', {
-    answerCount: answers.length,
-    answerMapEntries: Array.from(answerMap.entries()).slice(0, 5),
-  })
-
   // 计算每个维度的分数
   const dimensionScores: DimensionScore[] = []
 
@@ -222,14 +216,6 @@ export function calculateScores(
     const dimensionItems = items.filter(item =>
       item.itemDimensions?.some((id: any) => id.dimensionId === dimension.id)
     )
-
-    // DEBUG: 打印维度关联的题目
-    console.log('DEBUG calculateScores dimension', {
-      dimensionId: dimension.id,
-      dimensionName: dimension.name,
-      dimensionItemsCount: dimensionItems.length,
-      dimensionItemIds: dimensionItems.map((i: any) => i.id),
-    })
 
     if (dimensionItems.length === 0) {
       continue
@@ -246,17 +232,6 @@ export function calculateScores(
       // 获取题目在该维度的关联配置
       const itemDim = item.itemDimensions?.find((id: any) => id.dimensionId === dimension.id)
       if (!itemDim) continue
-
-      // DEBUG: 打印题目匹配情况
-      if (itemCount < 3) {
-        console.log('DEBUG calculateScores item match', {
-          dimensionId: dimension.id,
-          itemId: item.id,
-          answerValue,
-          itemDimFound: !!itemDim,
-          reverse: itemDim.reverse || item.reverse,
-        })
-      }
 
       // 计算分数
       let score = answerValue

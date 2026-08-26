@@ -71,9 +71,6 @@ setup_cron() {
 # 全量备份 - 每天凌晨2点
 0 2 * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh full >> /var/log/ptool/monitoring/cron-backup.log 2>&1
 
-# 增量备份 - 每小时
-0 * * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh incremental >> /var/log/ptool/monitoring/cron-backup.log 2>&1
-
 # 日志管理 - 每天凌晨3点
 0 3 * * * /opt/ptool/server-version/scripts/monitoring/log-manager.sh rotate >> /var/log/ptool/monitoring/cron-log.log 2>&1
 
@@ -102,8 +99,8 @@ show_config() {
     echo "  每1分钟   - 自动故障恢复"
     echo "  每5分钟   - 健康监控 + 安全监控"
     echo "  每10分钟  - 性能监控"
-    echo "  每小时    - 增量备份"
     echo "  每天2点   - 全量备份"
+    echo "  每周日4点 - 最新全量备份校验"
     echo "  每天3点   - 日志轮转"
     echo "  每周日4点 - 清理旧日志"
     echo ""

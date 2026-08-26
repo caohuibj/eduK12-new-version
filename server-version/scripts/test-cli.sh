@@ -16,6 +16,8 @@ TESTS_FAILED=0
 
 # API 基础 URL
 API_URL="${API_URL:-http://localhost:3000}"
+TEST_ADMIN_USERNAME="${TEST_ADMIN_USERNAME:-${ADMIN_USERNAME:-}}"
+TEST_ADMIN_PASSWORD="${TEST_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}"
 
 echo "========================================"
 echo "  PTool CLI 测试"
@@ -64,7 +66,11 @@ echo ""
 
 # 用户认证测试
 echo "2. 用户认证"
-test_api "Login Page" "GET" "/api/auth/login" "200" '{"username":"admin","password":"admin123"}'
+if [ -n "$TEST_ADMIN_USERNAME" ] && [ -n "$TEST_ADMIN_PASSWORD" ]; then
+    test_api "Login" "POST" "/api/auth/login" "200" "{\"username\":\"$TEST_ADMIN_USERNAME\",\"password\":\"$TEST_ADMIN_PASSWORD\"}"
+else
+    echo -e "测试: Login ... ${YELLOW}跳过${NC} (请设置 TEST_ADMIN_USERNAME 和 TEST_ADMIN_PASSWORD)"
+fi
 test_api "Invalid Login" "POST" "/api/auth/login" "200" '{"username":"invalid","password":"wrong"}'
 echo ""
 

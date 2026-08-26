@@ -180,26 +180,36 @@ export const authController = {
       expiresAt.setFullYear(expiresAt.getFullYear() + 1)
 
       const hashedPassword = await hashPassword(password)
-      const user = await prisma.user.create({
-        data: {
-          username,
-          passwordHash: hashedPassword,
-          role: UserRole.TEACHER,
-          nickname,
-          teacherCodeId: teacherCode.id,
-          expiresAt,
-          teacherApproved: false,
-        }
+      // 注册账号和教师码占用必须是一个事务。先用条件更新抢占注册码，
+      // 并发请求只有一个能成功；后续创建失败时占用也会一并回滚。
+      const user = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.$executeRaw`
+          UPDATE "teacher_codes"
+          SET "used_count" = "used_count" + 1, "is_active" = false
+          WHERE "id" = ${teacherCode.id}
+            AND "is_active" = true
+            AND ("expires_at" IS NULL OR "expires_at" > NOW())
+            AND "used_count" < "max_uses"
+        `
+
+        if (Number(claimed) !== 1) return null
+
+        return tx.user.create({
+          data: {
+            username,
+            passwordHash: hashedPassword,
+            role: UserRole.TEACHER,
+            nickname,
+            teacherCodeId: teacherCode.id,
+            expiresAt,
+            teacherApproved: false,
+          }
+        })
       })
 
-      // 标记教师码为已使用（待审期间不可再用同一码重复注册）
-      await prisma.teacherCode.update({
-        where: { id: teacherCode.id },
-        data: { 
-          usedCount: { increment: 1 },
-          isActive: false,
-        }
-      })
+      if (!user) {
+        return error(res, '教师邀请码已被使用或已过期')
+      }
 
       return success(res, {
         pendingApproval: true,
@@ -256,23 +266,27 @@ export const authController = {
 
       // 创建学生账号，有效期到课程结束
       const hashedPassword = await hashPassword(password)
-      const user = await prisma.user.create({
-        data: {
-          username,
-          passwordHash: hashedPassword,
-          role: UserRole.STUDENT,
-          nickname,
-          expiresAt: course.endedAt || null,
-        }
-      })
+      // 账号创建和课程关系创建必须原子完成，避免留下无法加入课程的孤立账号。
+      const user = await prisma.$transaction(async (tx) => {
+        const createdUser = await tx.user.create({
+          data: {
+            username,
+            passwordHash: hashedPassword,
+            role: UserRole.STUDENT,
+            nickname,
+            expiresAt: course.endedAt || null,
+          }
+        })
 
-      // 自动加入课程
-      await prisma.courseStudent.create({
-        data: {
-          courseId: course.id,
-          studentId: user.id,
-          status: 'ACTIVE',
-        }
+        await tx.courseStudent.create({
+          data: {
+            courseId: course.id,
+            studentId: createdUser.id,
+            status: 'ACTIVE',
+          }
+        })
+
+        return createdUser
       })
 
       const token = generateToken({

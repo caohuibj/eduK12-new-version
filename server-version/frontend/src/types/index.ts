@@ -68,6 +68,7 @@ export interface Assignment {
   images?: MediaItem[]
   documents?: DocumentItem[]
   tags?: string[]
+  submitted?: boolean
   mySubmission?: Submission
   _count?: { submissions: number }
   createdAt: string
@@ -110,10 +111,15 @@ export interface Checkin {
   documents?: DocumentItem[]
   endTime?: string
   allowViewOthers?: boolean
+  allowAnonymous?: boolean
+  status?: 'DRAFT' | 'PUBLISHED'
+  courseName?: string
+  submitted?: boolean
   tags?: string[]
   creatorId: string
   creator?: User
   submissions?: CheckinSubmission[]
+  submission?: CheckinSubmission
   _count?: { submissions: number }
   createdAt: string
   updatedAt: string
@@ -140,6 +146,8 @@ export interface Video {
   teacher?: User
   usageCount: number
   url?: string
+  processedUrl?: string
+  thumbnailUrl?: string
   createdAt: string
   updatedAt: string
 }
@@ -176,7 +184,7 @@ export interface TeacherCode {
 export interface ApiResponse<T = any> {
   code: number
   message: string
-  data?: T
+  data: T
 }
 
 export interface CourseShare {

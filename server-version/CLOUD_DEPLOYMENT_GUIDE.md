@@ -1,5 +1,10 @@
 # ☁️ 云端部署实战指南
 
+> **已废弃：请勿按本文中的宿主机、PM2 或本地 PostgreSQL 步骤部署生产环境。**
+> 当前唯一支持的生产拓扑是 `docker-compose.yml`：PostgreSQL 和 Redis 只加入内部 Compose 网络，
+> 不发布宿主机端口；密钥通过受保护的 Compose `.env` 注入。本文仅保留云资源和域名规划参考，
+> 具体启动、迁移、备份和恢复请以仓库中的 Compose 运维文档及脚本为准。
+
 **目标环境**: 腾讯云轻量应用服务器 + COS + CDN  
 **适用规模**: 100-300人教学场景  
 **预计费用**: ¥300-400/月
@@ -97,7 +102,7 @@ sudo apt install -y git
 
 ---
 
-### 第三步: 数据库配置
+### 第三步: 数据库配置（历史参考，不适用于当前生产环境）
 
 ```bash
 # 1. 创建数据库用户
@@ -109,19 +114,13 @@ CREATE USER ptool WITH ENCRYPTED PASSWORD 'your-secure-password';
 GRANT ALL PRIVILEGES ON DATABASE ptool TO ptool;
 \q
 
-# 3. 配置远程访问 (如果需要)
-sudo nano /etc/postgresql/14/main/postgresql.conf
-# 修改: listen_addresses = '*'
-
-sudo nano /etc/postgresql/14/main/pg_hba.conf
-# 添加: host all all 0.0.0.0/0 md5
-
-sudo systemctl restart postgresql
+# 当前生产环境禁止将 PostgreSQL 监听到公网或使用全网段放行规则。
+# 请使用 Docker Compose 内部的 postgres 服务名连接，不执行宿主机远程开放配置。
 ```
 
 ---
 
-### 第四步: 部署后端
+### 第四步: 部署后端（历史参考，不适用于当前生产环境）
 
 ```bash
 # 1. 进入项目目录
@@ -175,15 +174,12 @@ npm run db:seed
 # 5. 构建
 npm run build
 
-# 6. 使用 PM2 启动
-pm2 start dist/index.js --name "ptool-api"
-pm2 save
-pm2 startup systemd
+# 当前生产环境不使用 PM2；请使用仓库根目录的 Docker Compose 生产入口。
 ```
 
 ---
 
-### 第五步: 部署前端
+### 第五步: 部署前端（历史参考，不适用于当前生产环境）
 
 ```bash
 # 1. 进入前端目录
@@ -214,7 +210,7 @@ sudo chown -R www-data:www-data /var/www/html
 
 ---
 
-### 第六步: Nginx 配置
+### 第六步: Nginx 配置（历史参考，不适用于当前生产环境）
 
 ```bash
 sudo nano /etc/nginx/sites-available/ptool
@@ -346,14 +342,13 @@ const url = getCOSUrl(cosKey)
 
 ## 📊 性能调优
 
-### PM2 集群模式
+### PM2 集群模式（已废弃）
 
 ```bash
 # 使用所有 CPU 核心
-pm2 start dist/index.js -i max --name "ptool-api"
+# 当前生产拓扑不使用 PM2。请通过 Compose 管理 backend 副本和生命周期。
 
 # 或指定核心数
-pm2 start dist/index.js -i 2 --name "ptool-api"
 ```
 
 ### 数据库优化
@@ -393,8 +388,8 @@ net.ipv4.tcp_max_syn_backlog = 65535
 ### 日志查看
 
 ```bash
-# PM2 日志
-pm2 logs ptool-api
+# 当前生产日志通过 Docker Compose 服务查看。
+docker compose logs -f backend
 
 # Nginx 日志
 sudo tail -f /var/log/nginx/access.log
@@ -407,22 +402,14 @@ sudo tail -f /var/log/syslog
 ### 性能监控
 
 ```bash
-# 安装监控
-pm2 install pm2-server-monit
-
-# 查看状态
-pm2 status
-pm2 monit
+# 监控服务和指标端点由仓库中的 Docker Compose 监控配置管理。
 ```
 
 ### 备份脚本
 
 ```bash
-# 数据库备份
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-pg_dump -U ptool ptool > /backup/ptool_$DATE.sql
-find /backup -name "ptool_*.sql" -mtime +7 -delete
+# 数据库备份请使用仓库中的加密备份入口；不要直接操作宿主机 PostgreSQL。
+./scripts/monitoring/backup-enhanced.sh full
 ```
 
 ---
@@ -461,8 +448,8 @@ app.use(express.json({ limit: '500mb' }));
 # 查看连接数
 sudo -u postgres psql -c "SELECT count(*) FROM pg_stat_activity;"
 
-# 重启 PM2 释放连接
-pm2 restart ptool-api
+# 通过 Compose 重启 backend 服务以释放连接：
+docker compose restart backend
 ```
 
 ### Q3: 内存不足？
@@ -489,7 +476,7 @@ sudo swapon /swapfile
 - [ ] HTTPS 证书申请
 - [ ] 环境变量配置
 - [ ] 数据库迁移完成
-- [ ] PM2 启动正常
+- [ ] Docker Compose 服务启动正常
 - [ ] Nginx 配置正确
 - [ ] 文件上传测试通过
 - [ ] 登录/注册测试通过

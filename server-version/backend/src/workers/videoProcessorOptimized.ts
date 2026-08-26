@@ -10,8 +10,8 @@ import path from 'path'
 let createCanvas: any = null
 try {
   createCanvas = require('canvas').createCanvas
-} catch (e) {
-  console.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
+} catch {
+  logger.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
 }
 
 import { videoQueue } from '../config/queue'

@@ -178,7 +178,7 @@ export const courseController = {
 
       // 清除相关缓存
       const clearedKeys = cache.clearPattern(`courses:list:`)
-      console.log(`[课程创建] 缓存已清除, userId: ${userId}, 时间: ${new Date().toISOString()}`)
+      logger.info('[课程创建] 缓存已清除', { userId, clearedKeys })
       logger.debug('Course cache cleared after create', { userId })
 
       return success(res, course, Messages.COURSE.CREATE_SUCCESS)
@@ -260,7 +260,7 @@ export const courseController = {
         _count: undefined,
       })
     } catch (err) {
-      console.error('获取课程详情错误:', err)
+      logger.error('获取课程详情错误', err)
       return error(res, '获取课程详情失败')
     }
   },
@@ -475,7 +475,7 @@ export const courseController = {
 
       return success(res, null, '加入课程成功')
     } catch (err) {
-      console.error('加入课程错误:', err)
+      logger.error('加入课程错误', err)
       return error(res, '加入课程失败')
     }
   },
@@ -526,7 +526,7 @@ export const courseController = {
         total: courses.length,
       })
     } catch (err) {
-      console.error('获取我的课程错误:', err)
+      logger.error('获取我的课程错误', err)
       return error(res, '获取我的课程失败')
     }
   },
@@ -574,7 +574,7 @@ export const courseController = {
         isRecruiting: course.isRecruiting,
       }, '课程码有效')
     } catch (err) {
-      console.error('验证课程码错误:', err)
+      logger.error('验证课程码错误', err)
       return error(res, '验证失败')
     }
   },
@@ -623,14 +623,14 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[结束课程] 缓存已清除, courseId: ${id}`)
+      logger.info('[结束课程] 缓存已清除', { courseId: id })
 
       return success(res, {
         endedAt: now,
         studentCount,
       }, Messages.COURSE.END_SUCCESS)
     } catch (err) {
-      console.error('结束课程错误:', err)
+      logger.error('结束课程错误', err)
       return error(res, '结束课程失败')
     }
   },
@@ -691,7 +691,7 @@ export const courseController = {
         total: students.length,
       })
     } catch (err) {
-      console.error('获取学生列表错误:', err)
+      logger.error('获取学生列表错误', err)
       return error(res, '获取学生列表失败')
     }
   },
@@ -743,7 +743,7 @@ export const courseController = {
 
       return success(res, { tempPassword }, `密码已重置为 ${tempPassword}，请提醒学生尽快修改密码`)
     } catch (err) {
-      console.error('重置密码错误:', err)
+      logger.error('重置密码错误', err)
       return error(res, '重置密码失败')
     }
   },
@@ -823,7 +823,7 @@ export const courseController = {
         total: courseStudents.length,
       })
     } catch (err) {
-      console.error('批量获取学生列表错误:', err)
+      logger.error('批量获取学生列表错误', err)
       return error(res, '获取学生列表失败')
     }
   },
@@ -863,7 +863,7 @@ export const courseController = {
 
       return success(res, { coverUrl }, '封面上传成功')
     } catch (err) {
-      console.error('上传封面错误:', err)
+      logger.error('上传封面错误', err)
       return error(res, '上传封面失败')
     }
   },
@@ -898,7 +898,7 @@ export const courseController = {
 
       return success(res, null, '学生已从课程中移除')
     } catch (err) {
-      console.error('移除学生错误:', err)
+      logger.error('移除学生错误', err)
       return error(res, '移除学生失败')
     }
   },
@@ -947,7 +947,7 @@ export const courseController = {
 
       return success(res, { isFrozen }, isFrozen ? '学生账号已冻结' : '学生账号已解冻')
     } catch (err) {
-      console.error('冻结/解冻学生错误:', err)
+      logger.error('冻结/解冻学生错误', err)
       return error(res, '操作失败')
     }
   },
@@ -994,7 +994,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[停止招募] 缓存已清除, courseId: ${id}`)
+      logger.info('[停止招募] 缓存已清除', { courseId: id })
 
       return success(res, updatedCourse, '课程已停止招募，现有学生不受影响')
     } catch (err) {
@@ -1049,7 +1049,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[恢复招募] 缓存已清除, courseId: ${id}`)
+      logger.info('[恢复招募] 缓存已清除', { courseId: id })
 
       return success(res, updatedCourse, '课程已恢复招募')
     } catch (err) {
@@ -1158,7 +1158,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[复制课程] 缓存已清除, 新课程ID: ${newCourse.id}`)
+      logger.info('[复制课程] 缓存已清除', { courseId: newCourse.id })
 
       return success(res, {
         ...clonedCourseWithDetails,
@@ -1166,7 +1166,7 @@ export const courseController = {
         _count: undefined,
       }, `课程复制成功，包含 ${originalCourse.assignments.length} 个作业和 ${originalCourse.checkins.length} 个打卡`)
     } catch (err) {
-      console.error('复制课程错误:', err)
+      logger.error('复制课程错误', err)
       return error(res, '复制课程失败')
     }
   },
@@ -1246,7 +1246,7 @@ export const courseController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      console.error('获取课程作业错误:', err)
+      logger.error('获取课程作业错误', err)
       return error(res, '获取课程作业失败')
     }
   },
@@ -1325,7 +1325,7 @@ export const courseController = {
         total: formattedCheckins.length,
       })
     } catch (err) {
-      console.error('获取课程打卡错误:', err)
+      logger.error('获取课程打卡错误', err)
       return error(res, '获取课程打卡失败')
     }
   },
@@ -1382,13 +1382,13 @@ export const courseController = {
         })
       }
 
-      console.log(`[分享课程] 课程 ${id} 已分享给 ${userIds.length} 个用户`)
+      logger.info('[分享课程] 课程已分享', { courseId: id, recipientCount: userIds.length })
 
       return success(res, {
         sharedCount: userIds.length
       }, `课程已分享给 ${userIds.length} 个用户`)
     } catch (err) {
-      console.error('分享课程错误:', err)
+      logger.error('分享课程错误', err)
       return error(res, '分享课程失败')
     }
   },
@@ -1452,7 +1452,7 @@ export const courseController = {
         total: formattedShares.length,
       })
     } catch (err) {
-      console.error('获取分享课程错误:', err)
+      logger.error('获取分享课程错误', err)
       return error(res, '获取分享课程失败')
     }
   },
@@ -1482,11 +1482,11 @@ export const courseController = {
         where: { id: shareId }
       })
 
-      console.log(`[取消分享] 分享记录 ${shareId} 已删除`)
+      logger.info('[取消分享] 分享记录已删除', { shareId })
 
       return success(res, null, '已取消分享')
     } catch (err) {
-      console.error('取消分享错误:', err)
+      logger.error('取消分享错误', err)
       return error(res, '取消分享失败')
     }
   },
@@ -1573,11 +1573,11 @@ export const courseController = {
 
       // 清除缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[从分享复制] 新课程 ${newCourse.id} 已创建`)
+      logger.info('[从分享复制] 课程已创建', { courseId: newCourse.id })
 
       return success(res, newCourse, `课程复制成功`)
     } catch (err) {
-      console.error('从分享复制课程错误:', err)
+      logger.error('从分享复制课程错误', err)
       return error(res, '复制课程失败')
     }
   },

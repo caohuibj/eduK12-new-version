@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result } from 'antd'
 import { SafetyOutlined } from '@ant-design/icons'
 import { completePOW } from '../../utils/powService'
+import { saveQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 
 const PublicQuestionnaire: React.FC = () => {
   const { token } = useParams<{ token: string }>()
@@ -83,6 +84,9 @@ const PublicQuestionnaire: React.FC = () => {
       
       // 保存 sessionId
       localStorage.setItem(`questionnaire_session_${token}`, data.data.sessionId)
+      if (token && data.data.resumeToken) {
+        saveQuestionnaireResumeToken(token, data.data.sessionId, data.data.resumeToken)
+      }
       
       // 跳转到测评页面
       window.location.href = `/public/questionnaire/${token}/assessment?sessionId=${data.data.sessionId}`

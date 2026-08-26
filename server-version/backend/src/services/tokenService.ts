@@ -11,6 +11,7 @@
 import { prisma } from '../config/database'
 import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
+import { Prisma } from '@prisma/client'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
@@ -168,8 +169,8 @@ export const tokenService = {
    * 真正开始一次公开问卷时占用名额。预览 GET 不调用。
    * maxUses=0 表示不限制。并发下用条件更新避免超额。
    */
-  async claimAccess(tokenId: string): Promise<boolean> {
-    const claimed = await prisma.$executeRaw`
+  async claimAccess(tokenId: string, db: typeof prisma | Prisma.TransactionClient = prisma): Promise<boolean> {
+    const claimed = await db.$executeRaw`
       UPDATE "questionnaire_access_tokens"
       SET "used_count" = "used_count" + 1
       WHERE "id" = ${tokenId}

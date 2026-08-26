@@ -13,7 +13,7 @@ vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 
 import { authenticate, optionalAuthenticate, requireSelfOrAdmin } from '../../middleware/auth'
 
-const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT }
+const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, tokenVersion: 0 }
 
 const activeUser = {
   isActive: true,
@@ -21,6 +21,7 @@ const activeUser = {
   expiresAt: null,
   role: UserRole.STUDENT,
   teacherApproved: true,
+  tokenVersion: 0,
 }
 
 const makeReq = (authorization?: string) =>
@@ -88,6 +89,18 @@ describe('authenticate account status', () => {
 
     expect(req.user).toEqual(payload)
     expect(next).toHaveBeenCalledOnce()
+  })
+
+  it('rejects a token issued before a forced logout or password change', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({ ...activeUser, tokenVersion: 1 })
+    const res = makeRes()
+    const next = vi.fn()
+
+    await authenticate(makeReq('Bearer stale-token'), res, next)
+
+    expect(res.statusCode).toBe(401)
+    expect(res.body.message).toBe('认证令牌已失效，请重新登录')
+    expect(next).not.toHaveBeenCalled()
   })
 })
 

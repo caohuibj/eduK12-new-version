@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, InputNumber, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
 import { resolveScaleOptions } from '../../utils/scaleLabels'
+import { questionnaireResumeHeaders } from '../../utils/questionnaireResume'
 
 // Build: 2026-03-29 - 支持表单题目和量表混合流程
 
@@ -17,6 +18,11 @@ interface ScaleItem {
 
 interface ScaleLabel {
   value: number
+  label: string
+}
+
+interface FormOption {
+  value: string
   label: string
 }
 
@@ -41,7 +47,7 @@ interface FormItem {
   placeholder: string | null
   required: boolean
   position: number
-  options: Array<{ value: string; label: string }> | null
+  options: FormOption[] | string | null
 }
 
 // 内容项类型
@@ -65,6 +71,37 @@ interface QuestionnaireAssessmentData {
   contentItems: ContentItem[]
   totalItems: number
   sessionId: string
+}
+
+const ensureResponseOk = async (response: Response, fallbackMessage: string): Promise<void> => {
+  if (response.ok) return
+
+  let message = fallbackMessage
+  try {
+    const result = await response.json() as { message?: unknown }
+    if (typeof result.message === 'string' && result.message) message = result.message
+  } catch {
+    // Keep the safe fallback when the server response is not JSON.
+  }
+  throw new Error(message)
+}
+
+const parseFormOptions = (options: FormItem['options']): FormOption[] => {
+  if (Array.isArray(options)) return options
+  if (typeof options !== 'string') return []
+
+  try {
+    const parsed: unknown = JSON.parse(options)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((option): option is FormOption => (
+      Boolean(option)
+      && typeof option === 'object'
+      && typeof (option as FormOption).value === 'string'
+      && typeof (option as FormOption).label === 'string'
+    ))
+  } catch {
+    return []
+  }
 }
 
 const PublicQuestionnaireAssessment: React.FC = () => {
@@ -98,11 +135,10 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     try {
       setLoading(true)
       
-      const response = await fetch(`/api/public/assessments/${sessionId}`)
-      
-      if (!response.ok) {
-        throw new Error('获取测评失败')
-      }
+      const response = await fetch(`/api/public/assessments/${sessionId}`, {
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
+      await ensureResponseOk(response, '获取测评失败')
 
       const result = await response.json()
       
@@ -133,7 +169,9 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
   const fetchExistingAnswers = async (assessmentId: string) => {
     try {
-      const response = await fetch(`/api/public/assessments/${sessionId}/scale/${assessmentId}`)
+      const response = await fetch(`/api/public/assessments/${sessionId}/scale/${assessmentId}`, {
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
       if (response.ok) {
         const result = await response.json()
         if (result.data.answers) {
@@ -165,9 +203,12 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
     // 提交答案（包含作答时间）
     try {
-      await fetch(`/api/public/assessments/${sessionId}/answers`, {
+      const response = await fetch(`/api/public/assessments/${sessionId}/answers`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
+        },
         body: JSON.stringify({
           scaleAssessmentId: data.currentScale.scaleAssessmentId,
           itemId: item.id,
@@ -175,6 +216,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
           responseTime,
         }),
       })
+      await ensureResponseOk(response, '提交答案失败')
       
       // 如果不是最后一题，自动跳到下一题
       if (currentIndex < items.length - 1) {
@@ -225,14 +267,18 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         : formAnswer
       
       // 保存表单答案
-      await fetch(`/api/public/assessments/${sessionId}/form-answer`, {
+      const response = await fetch(`/api/public/assessments/${sessionId}/form-answer`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
+        },
         body: JSON.stringify({
           formItemId: formItem.id,
           value: valueToSubmit,
         }),
       })
+      await ensureResponseOk(response, '提交失败')
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -258,13 +304,17 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     try {
       setSubmitting(true)
       // 完成当前量表
-      await fetch(`/api/public/assessments/${sessionId}/scale/complete`, {
+      const response = await fetch(`/api/public/assessments/${sessionId}/scale/complete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
+        },
         body: JSON.stringify({
           scaleAssessmentId: data.currentScale.scaleAssessmentId,
         }),
       })
+      await ensureResponseOk(response, '提交失败')
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -278,13 +328,20 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   // 移动到下一个内容项
   const moveToNextItem = async () => {
     // 重新获取测评状态
-    const response = await fetch(`/api/public/assessments/${sessionId}`)
+    const response = await fetch(`/api/public/assessments/${sessionId}`, {
+      headers: questionnaireResumeHeaders(token, sessionId),
+    })
+    await ensureResponseOk(response, '获取测评失败')
     const result = await response.json()
     
     if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
         result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
       // 所有内容完成
-      await fetch(`/api/public/assessments/${sessionId}/complete`, { method: 'POST' })
+      const completeResponse = await fetch(`/api/public/assessments/${sessionId}/complete`, {
+        method: 'POST',
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
+      await ensureResponseOk(completeResponse, '完成测评失败')
       navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
     } else {
       // 切换到下一项
@@ -388,9 +445,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               <div className="space-y-3">
                 {(() => {
                   // 解析 options（兼容字符串和数组）
-                  const options = typeof formItem.options === 'string' 
-                    ? JSON.parse(formItem.options) 
-                    : formItem.options || []
+                  const options = parseFormOptions(formItem.options)
                   
                   return options.map((option) => (
                     <button
@@ -413,9 +468,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               <div className="space-y-3">
                 {(() => {
                   // 解析 options（兼容字符串和数组）
-                  const options = typeof formItem.options === 'string' 
-                    ? JSON.parse(formItem.options) 
-                    : formItem.options || []
+                  const options = parseFormOptions(formItem.options)
                   
                   return options.map((option) => {
                     const currentAnswers = Array.isArray(formAnswer) ? formAnswer : []

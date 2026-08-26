@@ -43,6 +43,7 @@ interface AssignmentFormData {
   videos: VideoItem[]
   images: ImageItem[]
   documents: DocumentItem[]
+  tags: string[]
 }
 
 interface Submission {

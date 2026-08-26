@@ -22,10 +22,13 @@ LOAD_THRESHOLD=${LOAD_THRESHOLD:-4}         # 负载告警阈值(2核)
 CONN_THRESHOLD=${CONN_THRESHOLD:-15}        # 数据库连接数告警
 
 # 服务配置
-API_URL=${API_URL:-"http://localhost:3001"}
+API_URL=${API_URL:-"http://localhost"}
 API_TIMEOUT=${API_TIMEOUT:-10}
 DB_NAME=${DB_NAME:-"ptool"}
-DB_USER=${DB_NAME:-"ptool"}
+DB_USER=${DB_USER:-"ptool"}
+POSTGRES_CONTAINER=${POSTGRES_CONTAINER:-"ptool-postgres"}
+REDIS_CONTAINER=${REDIS_CONTAINER:-"ptool-redis"}
+FRONTEND_CONTAINER=${FRONTEND_CONTAINER:-"ptool-frontend"}
 
 # 加载自定义配置
 if [ -f "$CONFIG_FILE" ]; then
@@ -154,7 +157,15 @@ check_api() {
 # 检查数据库连接
 check_database() {
     local conn_count
-    conn_count=$(sudo -u postgres psql -d "$DB_NAME" -t -c "SELECT count(*) FROM pg_stat_activity WHERE datname = '$DB_NAME';" 2>/dev/null | xargs || echo "0")
+    if ! docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1; then
+        send_alert "CRITICAL" "PostgreSQL 容器不存在: $POSTGRES_CONTAINER"
+        return 1
+    fi
+    if ! conn_count=$(docker exec "$POSTGRES_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT count(*) FROM pg_stat_activity WHERE datname = '$DB_NAME';" 2>/dev/null); then
+        send_alert "CRITICAL" "PostgreSQL 查询失败"
+        return 1
+    fi
+    conn_count=$(echo "$conn_count" | xargs)
     
     log_info "数据库连接数: $conn_count"
     
@@ -167,29 +178,27 @@ check_database() {
 
 # 检查Redis
 check_redis() {
-    if command -v redis-cli &> /dev/null; then
-        local redis_ping
-        redis_ping=$(redis-cli ping 2>/dev/null || echo "FAILED")
-        
-        log_info "Redis状态: $redis_ping"
-        
-        if [ "$redis_ping" != "PONG" ]; then
-            send_alert "CRITICAL" "Redis服务异常"
-            return 1
-        fi
+    local redis_ping
+    redis_ping=$(docker exec "$REDIS_CONTAINER" redis-cli ping 2>/dev/null || echo "FAILED")
+
+    log_info "Redis状态: $redis_ping"
+
+    if [ "$redis_ping" != "PONG" ]; then
+        send_alert "CRITICAL" "Redis服务异常"
+        return 1
     fi
     return 0
 }
 
 # 检查Nginx
 check_nginx() {
-    local nginx_status
-    nginx_status=$(systemctl is-active nginx 2>/dev/null || echo "unknown")
-    
-    log_info "Nginx状态: $nginx_status"
-    
-    if [ "$nginx_status" != "active" ]; then
-        send_alert "CRITICAL" "Nginx服务异常: $nginx_status"
+    local frontend_status
+    frontend_status=$(docker inspect --format '{{.State.Health.Status}}' "$FRONTEND_CONTAINER" 2>/dev/null || echo "unknown")
+
+    log_info "前端容器状态: $frontend_status"
+
+    if [ "$frontend_status" != "healthy" ]; then
+        send_alert "CRITICAL" "前端容器异常: $frontend_status"
         return 1
     fi
     return 0

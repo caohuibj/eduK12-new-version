@@ -52,7 +52,7 @@ const StudentManagement: React.FC = () => {
         return
       }
 
-      const myCourses = coursesRes.data.list
+      const myCourses: Course[] = coursesRes.data.list
       setCourses(myCourses)
 
       if (myCourses.length === 0) {

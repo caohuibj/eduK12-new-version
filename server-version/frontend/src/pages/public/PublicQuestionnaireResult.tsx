@@ -4,6 +4,7 @@ import { Card, Spin, Result, Button } from 'antd'
 import { Clock, FileText } from 'lucide-react'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
+import { questionnaireResumeHeaders } from '../../utils/questionnaireResume'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -12,7 +13,7 @@ const formatTime = (ms: number) => {
 }
 
 const PublicQuestionnaireResult: React.FC = () => {
-  const { token: _token } = useParams<{ token: string }>()
+  const { token } = useParams<{ token: string }>()
   const [searchParams] = useSearchParams()
   const sessionId = searchParams.get('sessionId')
   const [loading, setLoading] = useState(true)
@@ -23,7 +24,9 @@ const PublicQuestionnaireResult: React.FC = () => {
     if (!sessionId) return
     try {
       setLoading(true)
-      const response = await fetch(`/api/public/assessments/${sessionId}/report`)
+      const response = await fetch(`/api/public/assessments/${sessionId}/report`, {
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
       if (!response.ok) throw new Error('获取报告失败')
       const data = await response.json()
       setReport(data.data)

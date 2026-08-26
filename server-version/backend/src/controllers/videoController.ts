@@ -413,7 +413,7 @@ export const videoController = {
         url: `/uploads/videos/${updated.fileName}`,
       }, '标签更新成功')
     } catch (err) {
-      console.error('更新标签错误:', err)
+      logger.error('更新标签错误', err)
       return error(res, '更新标签失败')
     }
   },
@@ -489,7 +489,7 @@ export const videoController = {
         total: assignments.length + checkins.length,
       }, '获取引用情况成功')
     } catch (err) {
-      console.error('检查引用错误:', err)
+      logger.error('检查引用错误', err)
       return error(res, '检查引用失败')
     }
   },
@@ -568,7 +568,7 @@ export const videoController = {
 
       return success(res, null, '视频已删除')
     } catch (err) {
-      console.error('删除视频错误:', err)
+      logger.error('删除视频错误', err)
       return error(res, '删除视频失败')
     }
   },
@@ -607,7 +607,7 @@ export const videoController = {
 
       return success(res, null, '视频已恢复')
     } catch (err) {
-      console.error('恢复视频错误:', err)
+      logger.error('恢复视频错误', err)
       return error(res, '恢复视频失败')
     }
   }

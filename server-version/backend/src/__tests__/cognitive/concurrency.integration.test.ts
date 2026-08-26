@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client'
  * complete vs complete / restart vs restart）。
  *
  * 运行方式（需指向真实 Postgres，例如 compose postgres 容器 IP）：
- *   COGNITIVE_INTEGRATION_DB_URL=postgresql://ptool:ptool123@<pg-ip>:5432/ptool \
+ *   COGNITIVE_INTEGRATION_DB_URL=postgresql://<pg-host>:5432/ptool \
  *     npm run test:integration
  *
  * 默认 `npm test` 不设该变量 → 本文件整体 skip，不触碰任何数据库、

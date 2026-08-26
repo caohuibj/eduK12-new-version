@@ -5,7 +5,17 @@
 # 触发: Git webhook 或手动执行
 # =============================================================================
 
-set -e
+set -Eeuo pipefail
+
+cat >&2 <<'NOTICE'
+此宿主机 CI/CD 部署脚本已停用。
+生产发布必须通过受控的 Docker Compose 流程完成；请参阅
+server-version/docker-compose.yml 和部署文档，先执行本地发布门禁，再按版本发布。
+本脚本不会操作 PM2、宿主机 PostgreSQL、Redis 或 Nginx。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
 
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -484,3 +494,5 @@ main() {
 }
 
 main "$@"
+
+LEGACY_SCRIPT

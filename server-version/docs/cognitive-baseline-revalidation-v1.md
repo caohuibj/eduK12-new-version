@@ -40,7 +40,7 @@ GET  /health                -> 200   (backend 可达)
 POST /api/auth/login        -> 200 + JWT
 ```
 
-登录凭据：`rateK12admin / 2026coding`（与 DB 中既有管理员一致，seed 幂等跳过）。
+登录凭据：由受保护环境变量 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 注入（与 DB 中既有管理员一致，seed 幂等跳过）。
 
 ## 4. 旧业务模块 Smoke（D0-5）
 
@@ -105,12 +105,12 @@ Redis 连接: redis://redis:6379
 
 ### 8.2 Seed 管理员凭据漂移（D0-9.2）
 
-**问题：** `prisma/seed.ts` 硬编码 `rateK12admin / 2026coding`，而 `.env.example` 写的是 `admin / admin123`（或 `your-secure-admin-password`），两者不一致。
+**问题：** 旧版 `prisma/seed.ts` 曾硬编码管理员凭据，且与示例配置不一致。
 
 **修复：**
-- `prisma/seed.ts`：从 `process.env.ADMIN_USERNAME / ADMIN_PASSWORD` 读取，缺失时回退到既有默认值 `rateK12admin / 2026coding`（保证当前运行栈不受影响；DB 中已有管理员时 seed 幂等跳过）。
-- `docker-compose.yml` `seed` 服务新增 `ADMIN_USERNAME / ADMIN_PASSWORD` 环境（默认 `rateK12admin / 2026coding`）。
-- 根 `.env.example` 与 `backend/.env.example` 的管理员变量对齐为 `rateK12admin / 2026coding`，并加注"默认仅用于本地演示，生产务必改强密码"。
+- `prisma/seed.ts`：只从 `process.env.ADMIN_USERNAME / ADMIN_PASSWORD` 读取，缺失时直接失败（DB 中已有管理员时仍幂等跳过）。
+- `docker-compose.yml` 的 `seed` 服务要求显式注入 `ADMIN_USERNAME / ADMIN_PASSWORD`。
+- `.env.example` 只保留空变量名，不保存可登录的示例口令。
 
 ## 9. Known Issues / Observations
 

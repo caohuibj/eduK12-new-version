@@ -832,7 +832,7 @@ const VideoLibrary: React.FC = () => {
             </div>
             <div className="p-4">
               <SecureVideoPlayer
-                src={playingVideo.url}
+                src={playingVideo.url || `/uploads/videos/${playingVideo.fileName}`}
                 title={playingVideo.title}
                 userId={user?.id}
                 watermarkText="慧育空间专属教学资料"

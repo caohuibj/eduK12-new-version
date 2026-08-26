@@ -22,7 +22,7 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     for (const k of SAVED) delete process.env[k]
     process.env.NODE_ENV = 'production'
     process.env.JWT_SECRET = 'production-test-secret-needs-at-least-32-chars'
-    process.env.DATABASE_URL = 'postgresql://ptool:ptool123@localhost:5432/ptool'
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/ptool'
     process.env.CORS_ORIGIN = 'https://frontend.example.test'
     process.env.PORT = '3000'
     process.env.DATA_ENCRYPTION_KEY = VALID_HEX

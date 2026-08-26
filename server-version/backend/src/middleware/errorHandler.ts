@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from 'express'
 import { error } from '../utils/response'
 import { logger } from '../utils/logger'
 
-export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
   const rawStatusCode = Number(err?.statusCode)
   const statusCode = Number.isInteger(rawStatusCode) && rawStatusCode >= 400 && rawStatusCode < 600
     ? rawStatusCode
     : 500
 
   logger.error('Unhandled request error', {
+    requestId: req.requestId,
     statusCode,
     error: err,
   })

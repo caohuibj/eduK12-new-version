@@ -29,7 +29,7 @@ cd /Users/Qiang/CodeBuddy/ptool/server-version
 
 #### 1.1 管理员登录
 - [ ] 访问 http://localhost
-- [ ] 使用 admin / admin123 登录
+- [ ] 使用受保护环境配置中的管理员凭据登录
 - [ ] 验证跳转到课程管理页面
 
 #### 1.2 教师注册

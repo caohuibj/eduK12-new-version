@@ -9,6 +9,7 @@ import fs from 'fs'
 import { config } from '../config'
 import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS, cos } from '../utils/cos'
+import { logger } from '../utils/logger'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
@@ -27,24 +28,23 @@ const imageStatusCache = new Map<string, {
 // 确保上传目录存在（使用绝对路径）
 const imagesDir = path.resolve(config.uploadDir, 'images')
 const videosDir = path.join(config.uploadDir, 'videos')
-console.log('[Upload] Images directory:', imagesDir)
-console.log('[Upload] Videos directory:', videosDir)
+logger.info('[Upload] Upload directories configured', { imagesDir, videosDir })
 
 try {
   if (!fs.existsSync(config.uploadDir)) {
     fs.mkdirSync(config.uploadDir, { recursive: true })
-    console.log('[Upload] Created upload root directory:', config.uploadDir)
+    logger.info('[Upload] Created upload root directory', { uploadDir: config.uploadDir })
   }
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true })
-    console.log('[Upload] Created images directory:', imagesDir)
+    logger.info('[Upload] Created images directory', { imagesDir })
   }
   if (!fs.existsSync(videosDir)) {
     fs.mkdirSync(videosDir, { recursive: true })
-    console.log('[Upload] Created videos directory:', videosDir)
+    logger.info('[Upload] Created videos directory', { videosDir })
   }
 } catch (err) {
-  console.error('[Upload] Failed to create directories:', err)
+  logger.error('[Upload] Failed to create directories', err)
 }
 
 const resolveImagePath = (filename: string): string | null => {
@@ -139,7 +139,7 @@ router.get('/images', async (req, res) => {
         const uniqueCompletedJobs = completedJobs.filter(img => !localFilenames.has(img.filename))
         images.push(...uniqueCompletedJobs)
       } catch (queueErr) {
-        console.error('[Upload] 获取队列图片失败:', queueErr)
+        logger.error('[Upload] 获取队列图片失败', queueErr)
       }
     }
     
@@ -151,7 +151,7 @@ router.get('/images', async (req, res) => {
       total: images.length,
     })
   } catch (err) {
-    console.error('获取图片列表错误:', err)
+    logger.error('获取图片列表错误', err)
     return error(res, '获取图片列表失败')
   }
 })
@@ -175,16 +175,16 @@ router.delete('/images/:filename', async (req, res) => {
       try {
         const cosKey = `images/${filename}`
         await deleteFromCOS(cosKey)
-        console.log(`[Upload] 已从 COS 删除: ${cosKey}`)
-      } catch (cosErr) {
+        logger.info('[Upload] 已从 COS 删除', { cosKey })
+      } catch {
         // COS 删除失败不影响返回成功（可能文件本来就不在 COS）
-        console.log(`[Upload] COS 删除 skipped: ${filename}`)
+        logger.warn('[Upload] COS 删除 skipped', { filename })
       }
     }
     
     return success(res, null, '删除成功')
   } catch (err) {
-    console.error('删除图片错误:', err)
+    logger.error('删除图片错误', err)
     return error(res, '删除失败')
   }
 })
@@ -243,9 +243,9 @@ router.put('/images/:filename', async (req, res) => {
           // 删除旧文件
           await deleteFromCOS(oldCosKey)
           
-          console.log(`[Upload] COS 重命名: ${oldCosKey} -> ${newCosKey}`)
+          logger.info('[Upload] COS 重命名', { oldCosKey, newCosKey })
         } catch (cosErr) {
-          console.error('[Upload] COS 重命名失败:', cosErr)
+          logger.error('[Upload] COS 重命名失败', cosErr)
           // COS 失败不影响本地重命名结果
         }
       }
@@ -261,7 +261,7 @@ router.put('/images/:filename', async (req, res) => {
       return error(res, '云存储图片暂不支持重命名，请联系管理员')
     }
   } catch (err) {
-    console.error('重命名图片错误:', err)
+    logger.error('重命名图片错误', err)
     return error(res, '重命名失败')
   }
 })
@@ -291,7 +291,7 @@ router.post('/image', imageUpload.single('image'), async (req, res) => {
       originalSize: file.size,
     })
 
-    console.log(`[Upload] 图片已加入处理队列: ${imageId}, job: ${job.id}`)
+    logger.info('[Upload] 图片已加入处理队列', { imageId, jobId: job.id })
 
     // 立即返回，前端通过状态接口轮询结果
     return success(res, {
@@ -302,7 +302,7 @@ router.post('/image', imageUpload.single('image'), async (req, res) => {
       pollUrl: `/uploads/image/status/${imageId}`,
     })
   } catch (err) {
-    console.error('上传图片错误:', err)
+    logger.error('上传图片错误', err)
     return error(res, '上传失败')
   }
 })
@@ -385,7 +385,7 @@ router.get('/image/status/:imageId', async (req, res) => {
       status,
     })
   } catch (err) {
-    console.error('查询图片状态错误:', err)
+    logger.error('查询图片状态错误', err)
     return error(res, '查询失败')
   }
 })

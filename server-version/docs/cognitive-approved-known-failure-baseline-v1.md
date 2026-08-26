@@ -48,7 +48,7 @@
 ```text
 docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm -e NODE_ENV=test \\
-  -e COGNITIVE_INTEGRATION_DB_URL=postgresql://ptool:ptool123@postgres:5432/ptool?schema=public \\
+  -e COGNITIVE_INTEGRATION_DB_URL="$COGNITIVE_INTEGRATION_DB_URL" \\
   --entrypoint npm migrate test
 ```
 

@@ -2,6 +2,8 @@
 # 视频上传 API 测试
 
 API_URL="http://localhost:3001"
+TEST_ADMIN_USERNAME="${TEST_ADMIN_USERNAME:-${ADMIN_USERNAME:-}}"
+TEST_ADMIN_PASSWORD="${TEST_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}"
 TEST_VIDEO="/Users/Qiang/CodeBuddy/ptool/server-version/test-videos/test-1080p.mp4"
 
 echo "========================================"
@@ -11,11 +13,14 @@ echo ""
 
 # 1. 登录获取 token
 echo "1. 登录获取 token..."
+if [ -z "$TEST_ADMIN_USERNAME" ] || [ -z "$TEST_ADMIN_PASSWORD" ]; then
+  echo "❌ 请设置 TEST_ADMIN_USERNAME 和 TEST_ADMIN_PASSWORD"
+  exit 1
+fi
 login_response=$(curl -s -X POST "$API_URL/api/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}')
+  -d "{\"username\":\"$TEST_ADMIN_USERNAME\",\"password\":\"$TEST_ADMIN_PASSWORD\"}")
 
-echo "登录响应: $login_response"
 token=$(echo "$login_response" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
 
 if [ -z "$token" ]; then

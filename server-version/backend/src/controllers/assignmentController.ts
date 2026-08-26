@@ -413,7 +413,7 @@ export const assignmentController = {
 
       return success(res, null, '作业已删除')
     } catch (err) {
-      console.error('删除作业错误:', err)
+      logger.error('删除作业错误', err)
       return error(res, '删除作业失败')
     }
   },
@@ -508,7 +508,7 @@ export const assignmentController = {
 
       return success(res, submission, '作业提交成功')
     } catch (err) {
-      console.error('提交作业错误:', err)
+      logger.error('提交作业错误', err)
       return error(res, '提交作业失败')
     }
   },
@@ -562,7 +562,7 @@ export const assignmentController = {
         total: submissions.length,
       })
     } catch (err) {
-      console.error('获取提交列表错误:', err)
+      logger.error('获取提交列表错误', err)
       return error(res, '获取提交列表失败')
     }
   },
@@ -624,7 +624,7 @@ export const assignmentController = {
 
       return success(res, updated, '批改成功')
     } catch (err) {
-      console.error('批改作业错误:', err)
+      logger.error('批改作业错误', err)
       return error(res, '批改失败')
     }
   },
@@ -688,7 +688,7 @@ export const assignmentController = {
         gradedCount: submissions.length
       }, `批量批改成功，共 ${submissions.length} 份作业`)
     } catch (err) {
-      console.error('批量批改错误:', err)
+      logger.error('批量批改错误', err)
       return error(res, '批量批改失败')
     }
   },
@@ -801,7 +801,7 @@ export const assignmentController = {
       const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
       res.send(buffer)
     } catch (err) {
-      console.error('导出数据错误:', err)
+      logger.error('导出数据错误', err)
       return error(res, '导出数据失败')
     }
   },
@@ -842,7 +842,7 @@ export const assignmentController = {
 
       return success(res, submission)
     } catch (err) {
-      console.error('获取我的提交错误:', err)
+      logger.error('获取我的提交错误', err)
       return error(res, '获取我的提交失败')
     }
   },
@@ -902,7 +902,7 @@ export const assignmentController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      console.error('获取我的作业错误:', err)
+      logger.error('获取我的作业错误', err)
       return error(res, '获取我的作业失败')
     }
   },

@@ -4,6 +4,7 @@
 
 import { Router } from 'express'
 import { publicQuestionnaireController } from '../controllers/publicQuestionnaireController'
+import { requireQuestionnaireResume } from '../middleware/publicQuestionnaireAuth'
 
 const router = Router()
 
@@ -15,12 +16,12 @@ router.get('/questionnaires/:token', publicQuestionnaireController.getQuestionna
 router.post('/questionnaires/:token/start', publicQuestionnaireController.startAssessment)
 
 // 测评管理
-router.get('/assessments/:sessionId', publicQuestionnaireController.getAssessment)
-router.get('/assessments/:sessionId/scale/:scaleAssessmentId', publicQuestionnaireController.getScaleAssessment)
-router.patch('/assessments/:sessionId/answers', publicQuestionnaireController.submitAnswer)
-router.post('/assessments/:sessionId/form-answer', publicQuestionnaireController.submitFormAnswer)
-router.post('/assessments/:sessionId/scale/complete', publicQuestionnaireController.completeScaleAssessment)
-router.post('/assessments/:sessionId/complete', publicQuestionnaireController.completeAssessment)
-router.get('/assessments/:sessionId/report', publicQuestionnaireController.getReport)
+router.get('/assessments/:sessionId', requireQuestionnaireResume, publicQuestionnaireController.getAssessment)
+router.get('/assessments/:sessionId/scale/:scaleAssessmentId', requireQuestionnaireResume, publicQuestionnaireController.getScaleAssessment)
+router.patch('/assessments/:sessionId/answers', requireQuestionnaireResume, publicQuestionnaireController.submitAnswer)
+router.post('/assessments/:sessionId/form-answer', requireQuestionnaireResume, publicQuestionnaireController.submitFormAnswer)
+router.post('/assessments/:sessionId/scale/complete', requireQuestionnaireResume, publicQuestionnaireController.completeScaleAssessment)
+router.post('/assessments/:sessionId/complete', requireQuestionnaireResume, publicQuestionnaireController.completeAssessment)
+router.get('/assessments/:sessionId/report', requireQuestionnaireResume, publicQuestionnaireController.getReport)
 
 export default router

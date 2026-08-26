@@ -2,6 +2,8 @@
 # 快速测试脚本
 
 API_URL="${API_URL:-http://localhost:3001}"
+TEST_ADMIN_USERNAME="${TEST_ADMIN_USERNAME:-${ADMIN_USERNAME:-}}"
+TEST_ADMIN_PASSWORD="${TEST_ADMIN_PASSWORD:-${ADMIN_PASSWORD:-}}"
 
 echo "========================================"
 echo "  PTool CLI 测试"
@@ -29,16 +31,20 @@ fi
 # 登录测试
 echo ""
 echo "2. 用户认证"
-response=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' 2>/dev/null || echo -e "\n000")
-http_code=$(echo "$response" | tail -n1)
-if [ "$http_code" = "200" ]; then
-  echo "  ✅ 登录接口正常 (HTTP $http_code)"
-  ((TESTS_PASSED++))
+if [ -n "$TEST_ADMIN_USERNAME" ] && [ -n "$TEST_ADMIN_PASSWORD" ]; then
+  response=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d "{\"username\":\"$TEST_ADMIN_USERNAME\",\"password\":\"$TEST_ADMIN_PASSWORD\"}" 2>/dev/null || echo -e "\n000")
+  http_code=$(echo "$response" | tail -n1)
+  if [ "$http_code" = "200" ]; then
+    echo "  ✅ 登录接口正常 (HTTP $http_code)"
+    ((TESTS_PASSED++))
+  else
+    echo "  ❌ 登录失败 (HTTP $http_code)"
+    ((TESTS_FAILED++))
+  fi
 else
-  echo "  ❌ 登录失败 (HTTP $http_code)"
-  ((TESTS_FAILED++))
+  echo "  ⏭️  登录测试跳过 (请设置 TEST_ADMIN_USERNAME 和 TEST_ADMIN_PASSWORD)"
 fi
 
 # 课程列表 (无认证)
@@ -107,5 +113,5 @@ echo "  后端 API: http://localhost:3001"
 echo "  前端:     http://localhost:5173"
 echo ""
 echo "默认账号:"
-echo "  管理员: admin / admin123"
+echo "  管理员凭据来自受保护的环境配置"
 echo ""

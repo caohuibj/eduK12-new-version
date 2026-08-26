@@ -19,7 +19,7 @@ const formatTime = () => {
   return new Date().toISOString()
 }
 
-const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body)/i
+const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body|message|query|sql)/i
 const SENSITIVE_TEXT = /(Bearer\s+)[^\s,}]+/gi
 
 const redactText = (value: string): string => value.replace(SENSITIVE_TEXT, '$1[REDACTED]')
@@ -30,7 +30,10 @@ const redactLogValue = (value: unknown, key?: string): unknown => {
   if (value instanceof Error) {
     return {
       name: value.name,
-      message: redactText(value.message),
+      // Error messages can contain database values or request input.  Keep
+      // the class and sanitized stack for server-side diagnosis, never the
+      // raw message.
+      message: '[REDACTED]',
       stack: value.stack ? redactText(value.stack) : undefined,
     }
   }

@@ -15,47 +15,33 @@ if (require('fs').existsSync(backendNodeModules)) {
 const COS = require('cos-nodejs-sdk-v5')
 const fs = require('fs')
 
-// 从 backend/.env 读取配置
-function loadConfig() {
-  const envPath = path.join(__dirname, '../../backend/.env')
-  const config = {}
-
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8')
-    const lines = content.split('\n')
-
-    for (const line of lines) {
-      const match = line.match(/^([^=]+)=(.*)$/)
-      if (match) {
-        config[match[1]] = match[2].trim().replace(/^["']|["']$/g, '')
-      }
-    }
+function requiredEnv(name) {
+  const value = process.env[name]
+  if (!value || !value.trim()) {
+    throw new Error(`${name} must be provided through the process environment`)
   }
-
-  return config
+  return value.trim()
 }
 
 // 初始化 COS 客户端
 function initCOS() {
-  const config = loadConfig()
+  try {
+    const secretId = requiredEnv('COS_SECRET_ID')
+    const secretKey = requiredEnv('COS_SECRET_KEY')
+    const bucket = requiredEnv('COS_BUCKET')
+    const region = requiredEnv('COS_REGION')
 
-  const secretId = config.COS_SECRET_ID
-  const secretKey = config.COS_SECRET_KEY
-  const bucket = config.COS_BUCKET
-  const region = config.COS_REGION
-
-  if (!secretId || !secretKey || !bucket || !region) {
+    return {
+      cos: new COS({ SecretId: secretId, SecretKey: secretKey }),
+      bucket,
+      region
+    }
+  } catch (error) {
     console.error(JSON.stringify({
       success: false,
-      error: 'COS 配置不完整，请检查 backend/.env'
+      error: error.message || 'COS 配置不完整'
     }))
     process.exit(1)
-  }
-
-  return {
-    cos: new COS({ SecretId: secretId, SecretKey: secretKey }),
-    bucket,
-    region
   }
 }
 

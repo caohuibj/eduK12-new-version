@@ -10,6 +10,7 @@ import { authenticate, requireAdmin } from './middleware/auth'
 import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
 import { classroomSocketHandler } from './services/classroomSocketHandler'
+import { requestId } from './middleware/requestId'
 
 // 导入 Worker (启动视频处理队列)
 // 使用优化版本 (支持硬件负担最小模式)
@@ -62,6 +63,7 @@ app.set('trust proxy', config.trustProxyHops)
 
 // 禁用 API 缓存 - 确保数据实时更新
 app.set('etag', false)
+app.use(requestId)
 app.use((req, res, next) => {
   // 对 API 请求禁用缓存
   if (req.path.startsWith('/api')) {
@@ -81,7 +83,7 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 // 静态文件服务 - 使用绝对路径
-console.log('[Server] Static files serving from:', config.uploadDir)
+logger.info('[Server] Static files configured', { uploadDir: config.uploadDir })
 app.use('/uploads', express.static(config.uploadDir, {
   maxAge: '7d',
   immutable: true
@@ -99,6 +101,28 @@ app.get('/ready', async (_req, res) => {
   } catch {
     res.status(503).json({ status: 'unready', timestamp: new Date().toISOString() })
   }
+})
+
+// Prometheus-compatible process metrics.  The backend is only reachable from
+// the Compose network in production; the endpoint intentionally contains no
+// request payload, account, or assessment data.
+app.get('/metrics', (_req, res) => {
+  const memory = process.memoryUsage()
+  const lines = [
+    '# HELP process_uptime_seconds Process uptime in seconds.',
+    '# TYPE process_uptime_seconds gauge',
+    `process_uptime_seconds ${process.uptime()}`,
+    '# HELP process_resident_memory_bytes Resident memory size in bytes.',
+    '# TYPE process_resident_memory_bytes gauge',
+    `process_resident_memory_bytes ${memory.rss}`,
+    '# HELP process_heap_used_bytes V8 heap used in bytes.',
+    '# TYPE process_heap_used_bytes gauge',
+    `process_heap_used_bytes ${memory.heapUsed}`,
+    '# HELP process_heap_total_bytes V8 heap total in bytes.',
+    '# TYPE process_heap_total_bytes gauge',
+    `process_heap_total_bytes ${memory.heapTotal}`,
+  ]
+  res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8').send(`${lines.join('\n')}\n`)
 })
 
 // Runtime capabilities (public; backend flag is the source of truth)

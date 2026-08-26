@@ -26,6 +26,7 @@ interface Questionnaire {
   scaleCount: number
   completed: boolean
   completedAt: string | null
+  createdAt?: string
 }
 
 interface CompositeAssessment {
@@ -138,8 +139,8 @@ const CourseDetail: React.FC = () => {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
+  const formatDate = (dateString?: string | null) => {
+    return dateString ? new Date(dateString).toLocaleDateString('zh-CN') : '—'
   }
 
   const isOverdue = (deadline?: string) => {

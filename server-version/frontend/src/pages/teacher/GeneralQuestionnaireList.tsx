@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Card, Space, Modal, Form, InputNumber, message, Tag } from 'antd'
-import { PlusOutlined, LinkOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
+import { PlusOutlined, LinkOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 
 const GeneralQuestionnaireList: React.FC = () => {

@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import { z } from 'zod'
 import path from 'path'
 import { HEX_32_BYTE_KEY } from '../utils/encryption'
+import { logger } from '../utils/logger'
 
 dotenv.config()
 
@@ -65,7 +66,9 @@ const rawConfig = {
   port: parsePort(),
   nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigin: process.env.CORS_ORIGIN || '*',
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public',
+  // Development still requires an explicit DATABASE_URL when credentials are
+  // needed; the fallback intentionally contains no embedded password.
+  databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/ptool?schema=public',
   // Docker production topology is frontend proxy -> backend, while local
   // development normally has no trusted proxy in front of the API.
   trustProxyHops: parseNonNegativeInteger('TRUST_PROXY_HOPS', process.env.NODE_ENV === 'production' ? 1 : 0),
@@ -114,7 +117,7 @@ if (rawConfig.nodeEnv === 'production') {
 const result = configSchema.safeParse(rawConfig)
 
 if (!result.success) {
-  console.error('❌ Configuration validation failed:', result.error.errors)
+  logger.error('Configuration validation failed', result.error.errors)
   throw new Error(`Configuration error: ${result.error.errors.map(e => e.message).join(', ')}`)
 }
 
