@@ -419,7 +419,17 @@ export const persistOrGetPackageAnalysisSnapshot = async (
     },
   }
   const existing = await db.compositeAnalysisSnapshot.findUnique({ where: uniqueKey })
-  if (existing) return { row: existing, created: false }
+  if (existing) {
+    if (input.generationReason === 'REANALYSIS') {
+      logger.info('composite analysis reanalysis request was idempotent', {
+        attemptId: input.attemptId,
+        snapshotId: existing.id,
+        analysisVersion: input.analysis.analysisVersion,
+        generatedBy: input.generatedBy ?? null,
+      })
+    }
+    return { row: existing, created: false }
+  }
 
   const payloadEncrypted = encryptCognitivePayload(input.analysis)
   const row = await db.compositeAnalysisSnapshot.upsert({

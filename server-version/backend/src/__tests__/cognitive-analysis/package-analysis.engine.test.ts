@@ -202,7 +202,7 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
     for (const packageKey of PACKAGE_KEYS) {
       const result = analyse(packageKey)
       expect(result.packageKey).toBe(packageKey)
-      expect(result.analysisVersion).toBe('cognitive-evidence-domain-v1.0.0')
+      expect(result.analysisVersion).toBe('cognitive-evidence-domain-v1.0.1')
       expect(result.reportSchemaVersion).toBe('cognitive-package-analysis-v1')
       expect(result.evidence).toHaveLength(expectedEvidenceCounts[packageKey])
       expect(new Set(result.evidence.map((item) => item.id)).size).toBe(result.evidence.length)
@@ -219,7 +219,7 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
         domainDefinitionVersion: '1.0.0',
         evidenceMappingVersion: '1.0.0',
         recommendationRuleVersion: '1.0.0',
-        analysisVersion: 'cognitive-evidence-domain-v1.0.0',
+        analysisVersion: 'cognitive-evidence-domain-v1.0.1',
         reportSchemaVersion: 'cognitive-package-analysis-v1',
         assignmentId: expect.any(String),
       })
@@ -313,14 +313,14 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
       directionBySlot: { reaction: 'more_strength', patterncompare: 'more_strength' },
       directionByMetric: { 'patterncompare/medianCorrectRtMs': 'unknown' },
     })
-    expect(mixed.cognitiveDomains.find((domain) => domain.domain === 'processing_speed')?.consistency).toBe('mixed')
+    expect(mixed.cognitiveDomains.find((domain) => domain.domain === 'processing_speed')?.consistency).toBe('not_applicable')
 
     const neutral = analyse('attention_stability_v1', {
       directionBySlot: { reaction: 'more_strength', patterncompare: 'more_strength' },
       directionByMetric: { 'patterncompare/medianCorrectRtMs': 'neutral' },
     })
     const neutralDomain = neutral.cognitiveDomains.find((domain) => domain.domain === 'processing_speed')
-    expect(neutralDomain?.consistency).toBe('mixed')
+    expect(neutralDomain?.consistency).toBe('not_applicable')
     expect(neutralDomain?.caveats).toContain(
       '存在 unknown/neutral 方向的指标，仅作描述，不用于跨任务方向性判断。',
     )

@@ -174,8 +174,8 @@ export interface RecommendationRuleContext {
   evidence: EvidenceItem[]
 }
 
-export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.0'
-export const MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.0'
+export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.1'
+export const MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.1'
 export const COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v1'
 export const MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v2'
 
