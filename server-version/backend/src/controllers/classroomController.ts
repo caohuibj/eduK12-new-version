@@ -318,7 +318,7 @@ export const classroomController = {
         },
       })
 
-      if (!classroom || classroom.status === 'ENDED') {
+      if (!classroom || !['PREPARING', 'ACTIVE'].includes(classroom.status)) {
         const failedLimit = await checkFailedClassroomCodeRateLimit(
           ipAddress,
           code
