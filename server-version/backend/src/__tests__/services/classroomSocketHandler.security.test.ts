@@ -137,4 +137,40 @@ describe('classroom socket authorization boundary', () => {
     expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
+  it('rejects a forged session before expired-question side effects', async () => {
+    const handler = new ClassroomSocketHandler()
+    handler.initialize()
+    const connect = mockNamespace.on.mock.calls[0][1]
+    const socket = makeSocket({
+      authenticated: false,
+      clientRole: 'student',
+      classroomId: 'classroom-1',
+      sessionId: 'forged-session',
+      studentId: 'forged-student',
+    })
+    connect(socket)
+    const handlers = getHandlers(socket)
+
+    mockPrisma.classroom.findUnique.mockResolvedValue({ status: 'ACTIVE' })
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({
+      id: 'question-1',
+      startedAt: new Date(Date.now() - 10_000),
+      endedAt: null,
+      timeLimit: 1,
+    })
+    mockPrisma.classroomSession.findFirst.mockResolvedValue(null)
+
+    await handlers.get('student:submit')!({
+      questionId: 'question-1',
+      answer: 'answer',
+    })
+
+    expect(socket.emit).toHaveBeenCalledWith('error', {
+      message: '课堂会话无效',
+    })
+    expect(mockPrisma.classroomQuestion.updateMany).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
+  })
+
 })
