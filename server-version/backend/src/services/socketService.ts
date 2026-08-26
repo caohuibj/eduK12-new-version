@@ -16,6 +16,7 @@ import { config } from '../config'
 import { verifyToken } from '../utils/jwt'
 import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
+import { UserRole } from '../types'
 
 type SocketNext = (error?: Error) => void
 
@@ -177,6 +178,38 @@ export class SocketService {
       socket.data.authenticated = false
       socket.data.userId = undefined
       socket.data.userRole = undefined
+      return false
+    }
+  }
+
+  /**
+   * Revalidate every manager socket in a room before sensitive manager-only
+   * data is broadcast. fetchSockets also covers sockets connected to another
+   * process when the Redis adapter is active.
+   */
+  async revalidateManagerSockets(room: string): Promise<boolean> {
+    if (!this.classroomNamespace) {
+      return false
+    }
+
+    try {
+      const sockets = await this.classroomNamespace.in(room).fetchSockets()
+      await Promise.all(
+        sockets.map(async (socket: any) => {
+          const valid = await this.refreshAuthenticatedSocket(socket as Socket)
+          const managerRole =
+            socket.data.userRole === UserRole.ADMIN ||
+            socket.data.userRole === UserRole.TEACHER
+
+          if (!valid || !managerRole) {
+            socket.disconnect(true)
+          }
+        })
+      )
+      return true
+    } catch {
+      // Do not send manager-only data when the room cannot be revalidated.
+      logger.error('课堂 manager Socket 撤权校验失败')
       return false
     }
   }

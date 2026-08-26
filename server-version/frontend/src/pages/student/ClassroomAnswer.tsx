@@ -90,7 +90,6 @@ const ClassroomAnswer: React.FC = () => {
     })
 
     return () => {
-      off('student:joined')
       off('broadcast:question')
       off('broadcast:finished')
       off('broadcast:next')

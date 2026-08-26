@@ -6,8 +6,9 @@
 - [ ] The PR review records the exact SHA and the local/backup verification evidence.
 - [ ] Classroom Socket security gate passes: JWT teacher/bigscreen auth, server-derived
       classroom/question/session context, classroom-bound anonymous resume token,
-      trusted-proxy-aware IP limiting, cross-class rejection, and no unauthorized
-      database writes or broadcasts.
+      trusted-proxy-aware IP limiting, passive manager revocation, reconnect-safe
+      student sessions, cross-class rejection, and no unauthorized database writes or
+      broadcasts.
 - [ ] Classroom HTTP IDOR checks pass for detail, QR code, questions, stats and export.
 - [ ] Public classroom-code checks pass: joinable status only, minimal response, IP/code
       rate limits, uniform invalid/closed response, and Redis-unavailable fail-closed.

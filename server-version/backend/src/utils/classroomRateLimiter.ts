@@ -8,7 +8,10 @@ export interface ClassroomRateLimitResult {
 }
 
 const LOOKUP_WINDOW_SECONDS = 60
-const LOOKUP_LIMIT_PER_IP = 60
+// A normal student uses one HTTP lookup and one Socket.IO join. A school or
+// lab may put many students behind one NAT address, so leave room for 100
+// students plus reconnects while keeping failed-code checks strict.
+const LOOKUP_LIMIT_PER_IP = 300
 const FAILED_CODE_LIMIT_PER_IP = 5
 
 const safeKeyPart = (value: string): string => {

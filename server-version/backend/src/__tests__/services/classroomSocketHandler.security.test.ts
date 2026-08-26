@@ -14,12 +14,13 @@ const {
     getClassroomNamespace: vi.fn(),
     broadcastToRoom: vi.fn(),
     getRoomConnectionCount: vi.fn(),
+    revalidateManagerSockets: vi.fn(),
     refreshAuthenticatedSocket: vi.fn(),
   },
   mockPrisma: {
     classroom: { findUnique: vi.fn() },
     classroomQuestion: { findFirst: vi.fn(), updateMany: vi.fn() },
-    classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
+    classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
     classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), count: vi.fn(), findMany: vi.fn() },
   },
   mockFindClassroomAccess: vi.fn(),
@@ -74,6 +75,7 @@ describe('classroom socket authorization boundary', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
+    mockSocketService.revalidateManagerSockets.mockResolvedValue(true)
     mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
     mockCanManageClassroom.mockReturnValue(true)
     mockLookupLimit.mockResolvedValue({
@@ -258,6 +260,7 @@ describe('classroom socket authorization boundary', () => {
     expect(mockFindClassroomAccess).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
+
   it('rejects a forged session before expired-question side effects', async () => {
     const handler = new ClassroomSocketHandler()
     handler.initialize()
@@ -292,6 +295,77 @@ describe('classroom socket authorization boundary', () => {
     expect(mockPrisma.classroomQuestion.updateMany).not.toHaveBeenCalled()
     expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
+  })
+
+  it('revalidates manager rooms before broadcasting answer statistics', async () => {
+    const handler = new ClassroomSocketHandler()
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({
+      id: 'question-1',
+      questionContent: {},
+    })
+    mockPrisma.classroomAnswer.count.mockResolvedValue(0)
+    mockPrisma.classroomSession.count.mockResolvedValue(0)
+
+    await (handler as any).broadcastStats('classroom-1', 'question-1')
+
+    expect(mockSocketService.revalidateManagerSockets).toHaveBeenNthCalledWith(
+      1,
+      'classroom:classroom-1:teacher'
+    )
+    expect(mockSocketService.revalidateManagerSockets).toHaveBeenNthCalledWith(
+      2,
+      'classroom:classroom-1:bigscreen'
+    )
+    expect(mockSocketService.broadcastToRoom).toHaveBeenCalledWith(
+      'classroom:classroom-1:teacher',
+      'broadcast:stats',
+      expect.any(Object)
+    )
+  })
+
+  it('does not require leftAt to be null for a server-bound student submit', async () => {
+    const handler = new ClassroomSocketHandler()
+    handler.initialize()
+    const connect = mockNamespace.on.mock.calls[0][1]
+    const socket = makeSocket({
+      authenticated: false,
+      clientRole: 'student',
+      classroomId: 'classroom-1',
+      sessionId: 'server-session',
+      studentId: 'server-student',
+    })
+    connect(socket)
+    const handlers = getHandlers(socket)
+
+    const question = {
+      id: 'question-1',
+      startedAt: new Date(),
+      endedAt: null,
+      timeLimit: null,
+      questionContent: {},
+    }
+    mockPrisma.classroom.findUnique.mockResolvedValue({ status: 'ACTIVE' })
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue(question)
+    mockPrisma.classroomSession.findFirst.mockResolvedValue({ id: 'server-session' })
+    mockPrisma.classroomAnswer.findUnique.mockResolvedValue(null)
+    mockPrisma.classroomAnswer.create.mockResolvedValue({ id: 'answer-1' })
+    mockPrisma.classroomAnswer.count.mockResolvedValue(1)
+    mockPrisma.classroomSession.count.mockResolvedValue(1)
+
+    await handlers.get('student:submit')!({
+      questionId: 'question-1',
+      answer: 'answer',
+    })
+
+    expect(mockPrisma.classroomSession.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: 'server-session',
+        classroomId: 'classroom-1',
+        studentId: 'server-student',
+      },
+      select: { id: true },
+    })
+    expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
   })
 
 })

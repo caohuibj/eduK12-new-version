@@ -36,6 +36,8 @@ import {
 
 type ClientRole = 'teacher' | 'student' | 'bigscreen'
 
+const MANAGER_SOCKET_REVALIDATION_INTERVAL_MS = 15_000
+
 const isJoinableClassroomStatus = (status: string): boolean => {
   return status === 'PREPARING' || status === 'ACTIVE'
 }
@@ -81,6 +83,7 @@ const answerText = (answer: unknown): string | null => {
 
 export class ClassroomSocketHandler {
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
+  private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
 
   initialize(): void {
     const namespace = socketService.getClassroomNamespace()
@@ -160,6 +163,42 @@ export class ClassroomSocketHandler {
       (socket.data.userRole === UserRole.ADMIN ||
         socket.data.userRole === UserRole.TEACHER)
     )
+  }
+
+  private startManagerRevalidation(socket: Socket): void {
+    this.stopManagerRevalidation(socket)
+
+    const timer = setInterval(() => {
+      void this.revalidateManagerSocket(socket)
+    }, MANAGER_SOCKET_REVALIDATION_INTERVAL_MS)
+    timer.unref?.()
+    this.managerRevalidationTimers.set(socket.id, timer)
+  }
+
+  private stopManagerRevalidation(socket: Socket): void {
+    const timer = this.managerRevalidationTimers.get(socket.id)
+    if (!timer) {
+      return
+    }
+
+    clearInterval(timer)
+    this.managerRevalidationTimers.delete(socket.id)
+  }
+
+  private async revalidateManagerSocket(socket: Socket): Promise<void> {
+    if (
+      socket.data.clientRole !== 'teacher' &&
+      socket.data.clientRole !== 'bigscreen'
+    ) {
+      this.stopManagerRevalidation(socket)
+      return
+    }
+
+    const valid = await socketService.refreshAuthenticatedSocket(socket)
+    if (!valid || !this.isManagerSocket(socket)) {
+      this.stopManagerRevalidation(socket)
+      socket.disconnect(true)
+    }
   }
 
   private async authorizeManagerForClassroom(
@@ -243,6 +282,7 @@ export class ClassroomSocketHandler {
       socket.join(room + ':teacher')
       socket.data.classroomId = classroom.id
       socket.data.clientRole = 'teacher'
+      this.startManagerRevalidation(socket)
 
       logger.info('教师加入课堂', {
         classroomId: classroom.id,
@@ -456,6 +496,7 @@ export class ClassroomSocketHandler {
       socket.join(room + ':bigscreen')
       socket.data.classroomId = classroom.id
       socket.data.clientRole = 'bigscreen'
+      this.startManagerRevalidation(socket)
 
       const response: Record<string, any> = {
         classroomId: classroom.id,
@@ -727,7 +768,6 @@ export class ClassroomSocketHandler {
           id: sessionId,
           classroomId,
           studentId,
-          leftAt: null,
         },
         select: { id: true },
       })
@@ -1053,6 +1093,8 @@ export class ClassroomSocketHandler {
   }
 
   private async handleDisconnect(socket: Socket): Promise<void> {
+    this.stopManagerRevalidation(socket)
+
     try {
       if (
         socket.data.clientRole === 'student' &&
@@ -1222,6 +1264,14 @@ export class ClassroomSocketHandler {
     }
 
     const room = 'classroom:' + classroomId
+    const managerRoomsValid = await Promise.all([
+      socketService.revalidateManagerSockets(room + ':teacher'),
+      socketService.revalidateManagerSockets(room + ':bigscreen'),
+    ])
+    if (managerRoomsValid.some((valid) => !valid)) {
+      return
+    }
+
     // Statistics contain answer-derived data and are restricted to managers.
     socketService.broadcastToRoom(room + ':teacher', 'broadcast:stats', stats)
     socketService.broadcastToRoom(

@@ -21,7 +21,9 @@ Teacher and bigscreen sockets require a valid JWT and a current database account
 access is limited to administrators, the classroom creator, and the course creator.
 CourseShare grants reusable course content only; it does not grant classroom-manager
 access. Anonymous sockets can only use the student code-join flow, and reconnects must
-present the server-issued token bound to the same classroom session.
+present the server-issued token bound to the same classroom session. Manager sockets are
+periodically revalidated and are revalidated again before answer-derived statistics are
+broadcast; frozen, expired, deactivated or downgraded accounts are disconnected.
 
 ## Evidence checklist
 
@@ -30,6 +32,11 @@ present the server-issued token bound to the same classroom session.
 - [ ] Forged userId, role, studentId, sessionId and classroomId fields do not grant access.
 - [ ] A question from another classroom is rejected before any answer write or broadcast.
 - [ ] A forged session is rejected before any answer write or broadcast.
+- [ ] A manager socket revoked, frozen or downgraded after joining is disconnected without
+      requiring another client action.
+- [ ] A shared-NAT classroom with 100 students can complete the normal lookup-plus-join
+      flow without exhausting the valid-flow IP budget; failed-code limits remain strict.
+- [ ] Disconnect/reconnect ordering cannot invalidate a server-bound student session submit.
 - [ ] HTTP resource substitution returns 401 without authentication and 403 without access.
 - [ ] Invalid, closed and nonexistent classroom codes have the same public response.
 - [ ] Redis-unavailable public lookup fails closed.

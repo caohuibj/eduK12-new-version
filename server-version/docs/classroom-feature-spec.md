@@ -13,8 +13,11 @@
 sessionId、classroomId 等字段不能改变授权上下文。匿名学生只能通过有效课堂码
 加入可加入课堂；首次加入由服务器创建 session，后续重连必须提供绑定到该课堂
 session 的服务端签发 resume token。公共课堂码接口只返回加入所需的最小摘要，
-并受 Redis 限流保护；Redis 不可用时 fail-closed。答案统计只发送到已授权的教师
-和大屏房间。生产日志不得记录答案、题目内容、广播 payload 或 Redis 凭据。
+并受 Redis 限流保护；合法查询/加入使用可覆盖共享 NAT 课堂的宽预算，失败课堂码
+使用严格预算，Redis 不可用时 fail-closed。答案统计广播前和周期性地重新校验教师/
+大屏 Socket，账号冻结、失效或降权后立即断开。提交授权使用 server-bound socket
+上下文，`leftAt` 仅用于参与/presence 审计，不作为活动 Socket 的授权条件。生产日志
+不得记录答案、题目内容、广播 payload 或 Redis 凭据。
 
 ## 一、功能概述
 
@@ -327,7 +330,8 @@ model ClassroomAnswer {
 
 ### 7.1 权限验证
 
-- 学生加入课堂：检查课堂码、可加入状态、Redis 限流，并由服务器创建 session
+- 学生加入课堂：检查课堂码、可加入状态、Redis 限流；首次由服务器创建 session，
+  重连验证同课堂 resume token，提交时不以 `leftAt` 作为 Socket 授权条件
 - 教师创建课堂：检查课程所有权
 - 管理员全局权限
 

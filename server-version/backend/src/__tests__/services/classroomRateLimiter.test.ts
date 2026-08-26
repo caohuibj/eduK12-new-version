@@ -65,4 +65,31 @@ describe('classroom public lookup rate limits', () => {
       retryAfterSeconds: 60,
     })
   })
+
+  it('keeps a shared-NAT budget for 100 students doing lookup and join', async () => {
+    mockCacheService.consumeRateLimit.mockResolvedValue({
+      allowed: true,
+      remaining: 299,
+      retryAfterSeconds: 60,
+    })
+
+    const results = await Promise.all(
+      Array.from({ length: 100 }, () =>
+        Promise.all([
+          checkClassroomLookupRateLimit('198.51.100.10'),
+          checkClassroomLookupRateLimit('198.51.100.10'),
+        ])
+      )
+    )
+
+    expect(results.flat().every((result) => result.allowed)).toBe(true)
+    expect(mockCacheService.consumeRateLimit).toHaveBeenCalledTimes(200)
+    expect(
+      new Set(
+        mockCacheService.consumeRateLimit.mock.calls.map(
+          ([, limit]: [string, number]) => limit
+        )
+      )
+    ).toEqual(new Set([300]))
+  })
 })
