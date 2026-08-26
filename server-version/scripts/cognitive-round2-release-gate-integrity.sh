@@ -25,4 +25,17 @@ if ! git -C "${REPO_DIR}" merge-base --is-ancestor "${BASE_SHA}" "${HEAD_SHA}"; 
   exit 1
 fi
 
+if ! git -C "${REPO_DIR}" diff --quiet; then
+  echo "Round 2 Gate requires a clean working tree; unstaged changes would be tested instead of HEAD." >&2
+  exit 1
+fi
+if ! git -C "${REPO_DIR}" diff --cached --quiet; then
+  echo "Round 2 Gate requires a clean index; staged changes would be tested instead of HEAD." >&2
+  exit 1
+fi
+if [[ -n "$(git -C "${REPO_DIR}" ls-files --others --exclude-standard)" ]]; then
+  echo "Round 2 Gate requires no untracked files; untracked source could be tested instead of HEAD." >&2
+  exit 1
+fi
+
 printf '%s\n%s\n' "${BASE_SHA}" "${HEAD_SHA}"

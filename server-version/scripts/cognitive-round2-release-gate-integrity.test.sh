@@ -38,6 +38,13 @@ if [[ "${normal_output}" != "${expected_output}" ]]; then
   exit 1
 fi
 
+printf 'local fix\n' > "${TEMP_REPO}/ordinary-source.ts"
+assert_rejected 'an ordinary untracked source change' bash "${CHECK}" "${TEMP_REPO}" "${BASE_SHA}" "${BASE_SHA}"
+git -C "${TEMP_REPO}" add ordinary-source.ts
+assert_rejected 'an ordinary staged source change' bash "${CHECK}" "${TEMP_REPO}" "${BASE_SHA}" "${BASE_SHA}"
+git -C "${TEMP_REPO}" rm --cached -q ordinary-source.ts
+rm -f "${TEMP_REPO}/ordinary-source.ts"
+
 assert_rejected 'a caller-supplied old HEAD ref' env COGNITIVE_R2_GATE_HEAD_REF="${BASE_SHA}" bash "${CHECK}" "${TEMP_REPO}" "${BASE_SHA}" "${BASE_SHA}"
 assert_rejected 'BASE_REF=HEAD' bash "${CHECK}" "${TEMP_REPO}" "HEAD" "${BASE_SHA}"
 
