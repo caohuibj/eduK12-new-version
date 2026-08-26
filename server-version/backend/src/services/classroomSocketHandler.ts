@@ -30,6 +30,10 @@ import {
 
 type ClientRole = 'teacher' | 'student' | 'bigscreen'
 
+const isJoinableClassroomStatus = (status: string): boolean => {
+  return status === 'PREPARING' || status === 'ACTIVE'
+}
+
 const asRecord = (data: unknown): Record<string, any> => {
   return data && typeof data === 'object' ? data as Record<string, any> : {}
 }
@@ -282,7 +286,7 @@ export class ClassroomSocketHandler {
         },
       })
 
-      if (!classroom || classroom.status === 'ENDED') {
+      if (!classroom || !isJoinableClassroomStatus(classroom.status)) {
         const failedLimit = await checkFailedClassroomCodeRateLimit(
           address,
           code
@@ -708,6 +712,7 @@ export class ClassroomSocketHandler {
           id: sessionId,
           classroomId,
           studentId,
+          leftAt: null,
         },
         select: { id: true },
       })
