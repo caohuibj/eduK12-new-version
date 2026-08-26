@@ -96,3 +96,16 @@ export const requireRole = (...roles: UserRole[]) => {
 
 export const requireAdmin = requireRole(UserRole.ADMIN)
 export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
+
+/** Allow a user to access only their own record, unless they are an admin. */
+export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return unauthorized(res)
+  }
+
+  if (req.user.role !== UserRole.ADMIN && req.user.userId !== req.params.id) {
+    return forbidden(res, '无权限查看此用户')
+  }
+
+  next()
+}

@@ -1,6 +1,7 @@
 import { Router } from 'express'
+import { UserRole } from '../types'
 import { checkinController } from '../controllers/checkinController'
-import { authenticate, requireTeacher } from '../middleware/auth'
+import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 
 const router = Router()
 
@@ -26,11 +27,11 @@ router.get('/', authenticate, checkinController.list)
 router.post('/', authenticate, requireTeacher, checkinController.create)
 
 // 特定路由必须在 /:id 之前
-router.get('/:id/my-submission', authenticate, checkinController.mySubmission)
-router.post('/:id/submit', authenticate, checkinController.submit)
+router.get('/:id/my-submission', authenticate, requireRole(UserRole.STUDENT), checkinController.mySubmission)
+router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), checkinController.submit)
 router.get('/:id/export', authenticate, requireTeacher, checkinController.export)
 router.get('/:id/submissions', authenticate, requireTeacher, checkinController.submissions)
-router.get('/:id/others-submissions', authenticate, checkinController.othersSubmissions)
+router.get('/:id/others-submissions', authenticate, requireRole(UserRole.STUDENT), checkinController.othersSubmissions)
 
 // 匿名打卡相关路由
 router.post('/:id/tokens', authenticate, requireTeacher, checkinController.createAccessToken)

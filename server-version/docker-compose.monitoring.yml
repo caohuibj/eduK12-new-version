@@ -36,7 +36,7 @@ services:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD must be set}
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
       - monitoring
@@ -66,7 +66,7 @@ services:
     image: prometheuscommunity/postgres-exporter:latest
     container_name: ptool-postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://${DB_USER:-ptool}:${DB_PASSWORD:-ptool123}@postgres:5432/${DB_NAME:-ptool}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}?sslmode=disable"
     ports:
       - "9187:9187"
     networks:

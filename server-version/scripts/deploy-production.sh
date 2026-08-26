@@ -19,6 +19,11 @@ FRONTEND_DIR="$APP_DIR/server-version/frontend"
 NGINX_DIR="$APP_DIR/server-version/nginx"
 DB_NAME="ptool"
 DB_USER="ptool"
+ADMIN_USERNAME="${ADMIN_USERNAME:-admin}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -hex 24)}"
+JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
+DATA_ENCRYPTION_KEY="${DATA_ENCRYPTION_KEY:-$(openssl rand -hex 32)}"
+CORS_ORIGIN="${CORS_ORIGIN:-}"
 
 # 打印信息
 print_info() {
@@ -67,7 +72,7 @@ setup_database() {
     print_info "配置 PostgreSQL 数据库..."
     
     # 生成随机密码
-    DB_PASSWORD=$(openssl rand -base64 32)
+    DB_PASSWORD=$(openssl rand -hex 32)
     
     # 创建数据库和用户
     sudo -u postgres psql << EOF
@@ -84,12 +89,17 @@ EOF
     systemctl restart postgresql
     
     print_info "数据库配置完成"
-    print_warn "数据库密码: $DB_PASSWORD (请保存到 .env 文件)"
+    print_info "数据库凭据已生成，并将写入受保护的部署凭据文件"
 }
 
 # 配置环境变量
 setup_environment() {
     print_info "配置环境变量..."
+
+    if [ -z "$CORS_ORIGIN" ]; then
+        print_error "必须通过 CORS_ORIGIN 指定实际前端 origin 后才能进行生产部署"
+        return 1
+    fi
     
     # 后端环境变量
     cat > $BACKEND_DIR/.env << EOF
@@ -101,17 +111,23 @@ LOG_LEVEL=info
 # Database
 DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME?schema=public
 
-# JWT (请修改为强密码!)
-JWT_SECRET=CHANGE_THIS_TO_32_CHAR_RANDOM_STRING
+# JWT
+JWT_SECRET=$JWT_SECRET
 JWT_EXPIRES_IN=7d
 
 # Upload
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=52428800
 
-# Admin (请修改!)
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=CHANGE_THIS_PASSWORD
+# Admin (由脚本生成；不会写入日志)
+ADMIN_USERNAME=$ADMIN_USERNAME
+ADMIN_PASSWORD=$ADMIN_PASSWORD
+
+# Data encryption
+DATA_ENCRYPTION_KEY=$DATA_ENCRYPTION_KEY
+COGNITIVE_MODULE_ENABLED=false
+TRUST_PROXY_HOPS=1
+CORS_ORIGIN=$CORS_ORIGIN
 
 # COS (可选，但强烈推荐)
 # COS_SECRET_ID=your-secret-id
@@ -120,6 +136,20 @@ ADMIN_PASSWORD=CHANGE_THIS_PASSWORD
 # COS_REGION=ap-guangzhou
 # COS_DOMAIN=https://your-bucket.cos.ap-guangzhou.myqcloud.com
 EOF
+
+    CREDENTIALS_FILE="/root/.ptool-credentials"
+    umask 077
+    cat > "$CREDENTIALS_FILE" << EOF
+PTool deployment credentials
+============================
+Admin username: $ADMIN_USERNAME
+Admin password: $ADMIN_PASSWORD
+Database password: $DB_PASSWORD
+JWT secret: $JWT_SECRET
+Data encryption key: $DATA_ENCRYPTION_KEY
+============================
+EOF
+    print_info "凭据已保存到受保护文件: $CREDENTIALS_FILE"
     
     # 前端环境变量
     cat > $FRONTEND_DIR/.env.production << EOF
@@ -305,7 +335,7 @@ show_deployment_info() {
     echo "备份位置: /backup/$APP_NAME/"
     echo ""
     echo "重要提醒:"
-    echo "  1. 请修改 $BACKEND_DIR/.env 中的 JWT_SECRET 和管理员密码"
+    echo "  1. 管理员、数据库和加密凭据保存在 /root/.ptool-credentials"
     echo "  2. 建议配置 HTTPS (使用 certbot)"
     echo "  3. 建议配置 COS 存储以提升性能"
     echo "  4. 建议配置域名解析"

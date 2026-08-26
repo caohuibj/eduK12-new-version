@@ -1,12 +1,13 @@
 import { Router } from 'express'
 import { videoController } from '../controllers/videoController'
-import { authenticate, requireAdmin } from '../middleware/auth'
+import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { validateUploadedFile } from '../utils/fileValidator'
 
 const router = Router()
+router.use(authenticate, requireTeacher)
 
 // 配置 multer 存储
 import { config } from '../config'
@@ -44,14 +45,14 @@ const upload = multer({
   }
 })
 
-router.get('/', authenticate, videoController.list)
-router.post('/upload', authenticate, upload.single('video'), validateUploadedFile(allowedVideoTypes), videoController.upload)
-router.post('/upload-from-url', authenticate, videoController.uploadFromUrl)  // 从URL下载视频
-router.get('/:id/status', authenticate, videoController.getStatus)
-router.put('/:id', authenticate, videoController.update)
-router.put('/:id/tags', authenticate, videoController.updateTags)
-router.get('/:id/references', authenticate, videoController.checkReferences)
-router.delete('/:id', authenticate, videoController.delete)
-router.post('/:id/restore', authenticate, videoController.restore)
+router.get('/', videoController.list)
+router.post('/upload', upload.single('video'), validateUploadedFile(allowedVideoTypes), videoController.upload)
+router.post('/upload-from-url', videoController.uploadFromUrl)  // 从URL下载视频
+router.get('/:id/status', videoController.getStatus)
+router.put('/:id', videoController.update)
+router.put('/:id/tags', videoController.updateTags)
+router.get('/:id/references', videoController.checkReferences)
+router.delete('/:id', videoController.delete)
+router.post('/:id/restore', videoController.restore)
 
 export default router

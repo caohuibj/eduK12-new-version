@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { documentController } from '../controllers/documentController'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
 
 const router = Router()
+router.use(authenticate, requireTeacher)
 
 // 配置PDF上传（使用内存存储）
 const documentUpload = multer({
@@ -21,11 +22,11 @@ const documentUpload = multer({
 })
 
 // 路由
-router.get('/', authenticate, documentController.list)
-router.get('/:id', authenticate, documentController.detail)
-router.post('/upload', authenticate, documentUpload.single('document'), documentController.upload)
-router.put('/:id', authenticate, documentController.update)
-router.delete('/:id', authenticate, documentController.delete)
-router.post('/:id/restore', authenticate, documentController.restore)
+router.get('/', documentController.list)
+router.get('/:id', documentController.detail)
+router.post('/upload', documentUpload.single('document'), documentController.upload)
+router.put('/:id', documentController.update)
+router.delete('/:id', documentController.delete)
+router.post('/:id/restore', documentController.restore)
 
 export default router

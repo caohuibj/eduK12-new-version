@@ -11,6 +11,11 @@ BACKEND_DIR="$APP_DIR/server-version/backend"
 FRONTEND_DIR="$APP_DIR/server-version/frontend"
 IP_ADDRESS="140.143.146.97"
 DOMAIN="eduk12.top"
+DB_PASSWORD="${DB_PASSWORD:-$(openssl rand -hex 24)}"
+JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
+DATA_ENCRYPTION_KEY="${DATA_ENCRYPTION_KEY:-$(openssl rand -hex 32)}"
+ADMIN_USERNAME="${ADMIN_USERNAME:-admin}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -hex 24)}"
 
 # 颜色
 GREEN='\033[0;32m'
@@ -51,10 +56,6 @@ generate_configs() {
     if [ ! -f ".env" ]; then
         warn ".env 不存在，创建默认配置..."
         
-        # 生成随机密码
-        DB_PASSWORD=$(openssl rand -base64 24 | tr -d '=+/')
-        JWT_SECRET=$(openssl rand -base64 48 | tr -d '=+/')
-        
         cat > .env << EOF
 NODE_ENV=production
 PORT=3000
@@ -64,8 +65,12 @@ JWT_SECRET=$JWT_SECRET
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=52428800
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=Eduk12@admin
+ADMIN_USERNAME=$ADMIN_USERNAME
+ADMIN_PASSWORD=$ADMIN_PASSWORD
+DATA_ENCRYPTION_KEY=$DATA_ENCRYPTION_KEY
+COGNITIVE_MODULE_ENABLED=false
+TRUST_PROXY_HOPS=1
+CORS_ORIGIN=http://$IP_ADDRESS
 REDIS_URL=redis://localhost:6379
 VIDEO_LOW_POWER_MODE=true
 VIDEO_RESOLUTION=480p
@@ -83,8 +88,9 @@ PTool 部署凭证 - $(date)
 ========================
 数据库密码: $DB_PASSWORD
 JWT密钥: $JWT_SECRET
-管理员账号: admin
-管理员密码: Eduk12@admin
+管理员账号: $ADMIN_USERNAME
+管理员密码: $ADMIN_PASSWORD
+数据加密密钥: $DATA_ENCRYPTION_KEY
 ========================
 EOF
         chmod 600 /home/ubuntu/.ptool-credentials
@@ -109,7 +115,7 @@ setup_database() {
     if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw ptool; then
         warn "数据库不存在，创建中..."
         sudo -u postgres psql -c "CREATE DATABASE ptool;"
-        sudo -u postgres psql -c "CREATE USER ptool WITH PASSWORD 'ptool123';"
+        sudo -u postgres psql -c "CREATE USER ptool WITH PASSWORD '$DB_PASSWORD';"
         sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ptool TO ptool;"
     fi
     
@@ -228,9 +234,9 @@ show_completion() {
     echo "   前台: http://$IP_ADDRESS"
     echo "   API:  http://$IP_ADDRESS/api/health"
     echo ""
-    echo "👤 管理员:"
-    echo "   账号: admin"
-    echo "   密码: Eduk12@admin (或查看 .env 文件)"
+echo "👤 管理员:"
+echo "   账号: $ADMIN_USERNAME"
+echo "   密码: 请从受保护凭证文件读取"
     echo ""
     echo "📁 重要路径:"
     echo "   应用: $APP_DIR"

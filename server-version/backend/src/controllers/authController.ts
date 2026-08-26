@@ -14,12 +14,6 @@ const loginSchema = z.object({
   password: z.string().min(1, '密码不能为空'),
 })
 
-const registerSchema = z.object({
-  username: z.string().min(3, '用户名至少3个字符'),
-  password: z.string().min(6, '密码至少6个字符'),
-  nickname: z.string().optional(),
-})
-
 const teacherRegisterSchema = z.object({
   teacherCode: z.string().min(1, '教师码不能为空'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
@@ -302,55 +296,9 @@ export const authController = {
     }
   },
 
-  // 学生注册（旧版兼容）
+  // 旧版无课程归属注册接口已停用：学生账号必须通过课程码注册。
   async register(req: Request, res: Response) {
-    try {
-      const result = registerSchema.safeParse(req.body)
-      if (!result.success) {
-        return error(res, result.error.errors[0].message)
-      }
-
-      const { username, password, nickname } = result.data
-
-      // 检查用户名是否已存在
-      const existingUser = await prisma.user.findUnique({
-        where: { username }
-      })
-
-      if (existingUser) {
-        return error(res, '用户名已存在')
-      }
-
-      // 创建学生账号
-      const hashedPassword = await hashPassword(password)
-      const user = await prisma.user.create({
-        data: {
-          username,
-          passwordHash: hashedPassword,
-          role: UserRole.STUDENT,
-          nickname: nickname || username,
-        }
-      })
-
-      const token = generateToken({
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-      })
-
-      return success(res, {
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role,
-          nickname: user.nickname,
-        }
-      }, '注册成功')
-    } catch (err) {
-      logger.error('注册错误', err)
-      return error(res, Messages.COMMON.FAILED)
-    }
+    return error(res, '学生账号必须使用课程码注册', -1, 410)
   },
 
   // 获取当前用户信息

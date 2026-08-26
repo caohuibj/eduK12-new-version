@@ -19,6 +19,7 @@ import './workers/imageProcessor'
 import './services/wordSegmentation'
 // Redis缓存服务
 import { cacheService } from './services/cacheService'
+import { closeQueues } from './config/queue'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -55,9 +56,8 @@ const publicAssessmentLimiter = rateLimit({
 // 创建 HTTP 服务器
 const server = createServer(app)
 
-// 信任反向代理 - 正确获取客户端IP (Nginx反向代理)
-// 使用 'loopback' 只信任本地代理，更安全
-app.set('trust proxy', 'loopback')
+// 信任反向代理 - hop 数由部署拓扑显式配置，避免错误解析客户端 IP。
+app.set('trust proxy', config.trustProxyHops)
 
 // 禁用 API 缓存 - 确保数据实时更新
 app.set('etag', false)
@@ -166,7 +166,11 @@ server.listen(config.port, () => {
 })
 
 // 优雅关闭（增加超时保护）
-const gracefulShutdown = (signal: string) => {
+let shutdownStarted = false
+
+const gracefulShutdown = async (signal: string) => {
+  if (shutdownStarted) return
+  shutdownStarted = true
   logger.info(`${signal} signal received: closing HTTP server`)
   
   // 设置强制退出超时（5秒）
@@ -175,13 +179,18 @@ const gracefulShutdown = (signal: string) => {
     process.exit(1)
   }, 5000)
   
-  server.close(() => {
+  server.close(async () => {
     logger.info('HTTP server closed')
-    socketService.close()
+    await Promise.allSettled([
+      socketService.close(),
+      closeQueues(),
+      cacheService.close(),
+      prisma.$disconnect(),
+    ])
     clearTimeout(forceExit)
     process.exit(0)
   })
 }
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
-process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM', () => { void gracefulShutdown('SIGTERM') })
+process.on('SIGINT', () => { void gracefulShutdown('SIGINT') })

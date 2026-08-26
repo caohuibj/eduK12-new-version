@@ -111,6 +111,11 @@ jobs:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      DB_USER: ci-ptool
+      DB_PASSWORD: ci-ptool-password
+      DB_NAME: ptool
+      ADMIN_USERNAME: ci-admin
+      ADMIN_PASSWORD: ci-admin-password-2026
       COGNITIVE_MODULE_ENABLED: 'true'
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       CORS_ORIGIN: http://localhost

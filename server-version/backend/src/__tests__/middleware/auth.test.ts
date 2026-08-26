@@ -11,7 +11,7 @@ const { mockPrisma, mockVerifyToken } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 
-import { authenticate, optionalAuthenticate } from '../../middleware/auth'
+import { authenticate, optionalAuthenticate, requireSelfOrAdmin } from '../../middleware/auth'
 
 const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT }
 
@@ -26,6 +26,7 @@ const activeUser = {
 const makeReq = (authorization?: string) =>
   ({
     headers: authorization ? { authorization } : {},
+    params: { id: 'user-1' },
     user: undefined,
   }) as any
 
@@ -107,6 +108,29 @@ describe('optionalAuthenticate account status', () => {
 
     expect(req.user).toBeUndefined()
     expect(res.statusCode).toBe(0)
+    expect(next).toHaveBeenCalledOnce()
+  })
+})
+
+describe('requireSelfOrAdmin', () => {
+  it('rejects access to another user record', () => {
+    const req = { user: payload, params: { id: 'user-2' } } as any
+    const res = makeRes()
+    const next = vi.fn()
+
+    requireSelfOrAdmin(req, res, next)
+
+    expect(res.statusCode).toBe(403)
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('allows an administrator to inspect another user record', () => {
+    const req = { user: { ...payload, role: UserRole.ADMIN }, params: { id: 'user-2' } } as any
+    const res = makeRes()
+    const next = vi.fn()
+
+    requireSelfOrAdmin(req, res, next)
+
     expect(next).toHaveBeenCalledOnce()
   })
 })

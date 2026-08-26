@@ -11,6 +11,7 @@ import path from 'path'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 import { config } from '../config'
+import { canAccessCourseAsStaff, hasActiveCourseMembership } from '../utils/courseAccess'
 
 const createCheckinSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -249,6 +250,10 @@ export const checkinController = {
             select: {
               id: true,
               title: true,
+              creatorId: true,
+              shares: {
+                select: { sharedTo: true },
+              },
             }
           },
           creator: {
@@ -262,6 +267,14 @@ export const checkinController = {
 
       if (!checkin) {
         return notFound(res, '打卡不存在')
+      }
+
+      if (req.user?.role === UserRole.STUDENT) {
+        if (!req.user.userId || !(await hasActiveCourseMembership(checkin.course.id, req.user.userId))) {
+          return forbidden(res, '您不是该课程的学员')
+        }
+      } else if (!canAccessCourseAsStaff(checkin.course, req.user?.userId, req.user?.role)) {
+        return forbidden(res, '您没有权限访问此打卡')
       }
 
       // 回填视频URL：当videos中url为空但id存在时，从videos表补充有效URL
@@ -293,7 +306,9 @@ export const checkinController = {
         }
       }
 
-      return success(res, checkin)
+      const { course: courseWithAccess, ...checkinData } = checkin
+      const { shares: _shares, ...course } = courseWithAccess
+      return success(res, { ...checkinData, course })
     } catch (err) {
       logger.error('获取打卡详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -439,6 +454,10 @@ export const checkinController = {
         return notFound(res, '打卡不存在')
       }
 
+      if (req.user?.role !== UserRole.STUDENT || !(await hasActiveCourseMembership(checkin.courseId, userId))) {
+        return forbidden(res, '您不是该课程的学员')
+      }
+
       if (checkin.endTime && new Date() > checkin.endTime) {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
@@ -488,6 +507,23 @@ export const checkinController = {
 
       if (!userId) {
         return error(res, '未登录')
+      }
+
+      if (req.user?.role !== UserRole.STUDENT) {
+        return forbidden(res, '仅学生可以查看自己的提交')
+      }
+
+      const checkin = await prisma.checkin.findUnique({
+        where: { id },
+        select: { courseId: true },
+      })
+
+      if (!checkin) {
+        return notFound(res, '打卡不存在')
+      }
+
+      if (!(await hasActiveCourseMembership(checkin.courseId, userId))) {
+        return forbidden(res, '您不是该课程的学员')
       }
 
       const submission = await prisma.checkinSubmission.findFirst({
@@ -664,6 +700,7 @@ export const checkinController = {
         include: {
           course: {
             select: {
+              id: true,
               title: true,
             }
           }
@@ -672,6 +709,10 @@ export const checkinController = {
 
       if (!checkin) {
         return notFound(res, '打卡不存在')
+      }
+
+      if (!userId || !(await hasActiveCourseMembership(checkin.course.id, userId))) {
+        return forbidden(res, '您不是该课程的学员')
       }
 
       // 检查是否允许查看他人打卡

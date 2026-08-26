@@ -4,7 +4,7 @@ import { UserRole } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
-    courseStudent: { findMany: vi.fn() },
+    courseStudent: { findMany: vi.fn(), findFirst: vi.fn() },
   },
 }))
 
@@ -102,6 +102,49 @@ describe('course isLibrary', () => {
       params: { id: 'library-1' },
     }) as any, res)
     expect(res.statusCode).toBe(404)
+  })
+
+  it('hides a course detail from a non-member student', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-1',
+      isLibrary: false,
+      courseCode: 'SECRET-CODE',
+      isRecruiting: true,
+      students: [],
+      _count: { students: 0 },
+    })
+    mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    const res = makeRes()
+
+    await courseController.detail(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      params: { id: 'course-1' },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(403)
+  })
+
+  it('does not return the course code or roster to a member student', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-1',
+      title: 'Private course',
+      isLibrary: false,
+      courseCode: 'SECRET-CODE',
+      isRecruiting: true,
+      students: [{ student: { id: 'student-2', nickname: 'Other', username: 'other', avatarUrl: null } }],
+      _count: { students: 1 },
+    })
+    mockPrisma.courseStudent.findFirst.mockResolvedValue({ id: 'membership-1' })
+    const res = makeRes()
+
+    await courseController.detail(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      params: { id: 'course-1' },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data).not.toHaveProperty('courseCode')
+    expect(res.body.data).not.toHaveProperty('students')
   })
 
   it('omits library courses from the student myCourses list', async () => {
