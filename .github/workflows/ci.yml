@@ -1,8 +1,8 @@
 # CI / merge gate
 #
 # 触发：
-#   push feature/* / dev / main
-#   pull_request → dev / main
+#   push feature/* / main
+#   pull_request → main
 #
 # jobs：
 #   backend       : npm ci + prisma generate + migrate deploy + seed + build + full regression
@@ -22,11 +22,9 @@ on:
   push:
     branches:
       - 'feature/**'
-      - dev
       - main
   pull_request:
     branches:
-      - dev
       - main
   workflow_dispatch:
 
