@@ -683,6 +683,20 @@ export class ClassroomSocketHandler {
         return
       }
 
+      const session = await prisma.classroomSession.findFirst({
+        where: {
+          id: sessionId,
+          classroomId,
+          studentId,
+          leftAt: null,
+        },
+        select: { id: true },
+      })
+      if (!session) {
+        this.emitError(socket, '课堂会话无效')
+        return
+      }
+
       if (
         question.timeLimit &&
         Date.now() >= question.startedAt.getTime() + question.timeLimit * 1000
@@ -704,20 +718,6 @@ export class ClassroomSocketHandler {
           await this.broadcastStats(classroomId, question.id)
         }
         this.emitError(socket, '答题已结束，无法提交答案')
-        return
-      }
-
-      const session = await prisma.classroomSession.findFirst({
-        where: {
-          id: sessionId,
-          classroomId,
-          studentId,
-          leftAt: null,
-        },
-        select: { id: true },
-      })
-      if (!session) {
-        this.emitError(socket, '课堂会话无效')
         return
       }
 
