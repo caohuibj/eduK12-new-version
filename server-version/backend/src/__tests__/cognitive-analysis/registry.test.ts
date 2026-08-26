@@ -168,15 +168,34 @@ describe('Round 2 cognitive analysis registries', () => {
     ).toThrow(/same domain/)
   })
 
-  it('registers seven exact DRAFT protocols and hides them from the create catalog', () => {
+  it('keeps the PR14 protocols versioned and hidden from the create catalog', () => {
+    const gateMode = process.env.COGNITIVE_R2_GATE_MODE ?? 'pre-release'
+    const candidatePackage = process.env.COGNITIVE_R2_GATE_CANDIDATE_PACKAGE ?? ''
     const protocols = listAnalysisProtocolDefinitions()
-    expect(protocols).toHaveLength(7)
-    expect(new Set(protocols.map((protocol) => `${protocol.key}/${protocol.version}`)).size).toBe(7)
-    expect(protocols.every((protocol) => protocol.status === 'DRAFT')).toBe(true)
-    expect(protocols.every((protocol) => protocol.recommendedForCreate === false)).toBe(true)
-    expect(protocols.every((protocol) => protocol.profiles.join(',') === 'standard,research')).toBe(true)
-    expect(listAnalysisProtocolCatalog().list).toEqual([])
-    expect(listAnalysisProtocolCatalog(true).list).toHaveLength(7)
+    const expectedKeys = [
+      'attention_stability_v1',
+      'inhibitory_control_v1',
+      'inhibitory_control_multisource_v1',
+      'working_memory_v1',
+      'executive_control_v1',
+      'learning_reasoning_v1',
+      'k12_core_profile_v1',
+    ]
+    const protocolByKey = new Map(protocols.map((protocol) => [protocol.key, protocol]))
+    for (const key of expectedKeys) {
+      const expectedStatus = gateMode === 'promotion-candidate' && candidatePackage === `${key}@1.0.0` ? 'PUBLISHED' : 'DRAFT'
+      expect(protocolByKey.get(key)).toMatchObject({
+        key,
+        version: '1.0.0',
+        status: expectedStatus,
+        profiles: ['standard', 'research'],
+      })
+      const protocol = protocolByKey.get(key)
+      if (expectedStatus === 'DRAFT') expect(protocol?.recommendedForCreate).toBe(false)
+      const publicCatalogItem = listAnalysisProtocolCatalog().list.find((item) => item.key === key)
+      if (protocol?.recommendedForCreate) expect(publicCatalogItem).toBeDefined()
+      else expect(publicCatalogItem).toBeUndefined()
+    }
     expect(listAnalysisProtocolCatalog(true).list.find((item) => item.key === 'inhibitory_control_multisource_v1')).toMatchObject({
       scaleSlots: [{
         key: 'adexi_inhibition',

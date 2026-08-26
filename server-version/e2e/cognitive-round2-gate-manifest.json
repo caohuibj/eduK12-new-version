@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "pr14-gate-evidence-v1",
+  "reviewBaseCommit": "25098332a354e9d169f62da6edf2d88f43066dbd",
+  "stimulusSets": [
+    { "id": "patterncompare", "version": "geometric-v1.0.0" },
+    { "id": "flanker", "version": "arrows-v1.0.0" },
+    { "id": "cardsort", "version": "geometric-cards-v1.0.0" },
+    { "id": "digitbackward", "version": "digits-v1.0.0" },
+    { "id": "picturesequence", "version": "daily-scenes-v1.0.0" },
+    { "id": "pairedassociate", "version": "nonverbal-pairs-v1.0.0" },
+    { "id": "matrix", "version": "matrix-generator-v1.0.0" },
+    { "id": "mentalrotation", "version": "rotation-objects-v1.0.0" },
+    { "id": "tower", "version": "three-peg-tower-v1.0.0" },
+    { "id": "trailmaking", "version": "trailmaking-generated-v1.0.0" },
+    { "id": "reversallearning", "version": "reversal-symbols-v1.0.0" },
+    { "id": "bart", "version": "bart-generated-v1.0.0" },
+    { "id": "wordlist", "version": "chinese-wordlist-v1.0.0" },
+    { "id": "lexicaldecision", "version": "zh-lexical-v1.0.0" },
+    { "id": "emotionrecognition", "version": "emotion-faces-ai-zh-v1.0.0" }
+  ],
+  "supportingArtifacts": [
+    { "id": "wordlist.normalization", "version": "wordlist-normalization-v1.0.0" },
+    { "id": "lexicaldecision.pseudoword-generator", "version": "zh-pseudoword-generator-v1.0.0" },
+    { "id": "emotionrecognition.category", "version": "basic-emotion-6-v1.0.0" }
+  ],
+  "multisourcePackages": [
+    {
+      "key": "inhibitory_control_multisource_v1",
+      "version": "1.0.0",
+      "reviewedScaleCodes": ["adexi_v1"]
+    }
+  ],
+  "candidatePackages": [
+    { "key": "attention_stability_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "inhibitory_control_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "working_memory_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "executive_control_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "learning_reasoning_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "k12_core_profile_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "inhibitory_control_multisource_v1", "version": "1.0.0", "kind": "multisource" }
+  ]
+}

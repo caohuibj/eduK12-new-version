@@ -7,16 +7,14 @@ import { prisma } from '../../config/database'
 import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { readFrozenReport } from '../cognitive/profile-freeze'
-import { exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
+import { ExportFieldBuilder, exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
 import { getFrozenPackageSlotLabels } from './report-package-label'
 import {
   assertExportLimits,
   cleanupExpiredExportFiles,
   ensureExportFileWithinLimit,
-  EXPORT_MAX_FIELDS,
   EXPORT_MAX_RECORDS,
   EXPORT_MAX_TRIALS,
-  exportLimitError,
 } from '../../services/exportStorage'
 
 export type CompositeExportDetail = 'summary' | 'full'
@@ -79,28 +77,6 @@ const frozenReportFor = (assignment: any) => {
   }
 }
 
-const addField = (fields: CompositeExportField[], name: string, label: string, type: CompositeExportField['type'], decimals = 0) => {
-  const existing = fields.find((field) => field.name === name)
-  if (!existing) {
-    if (fields.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
-    fields.push({ name, label, type, width: type === 'string' ? 80 : 12, decimals })
-    return name
-  }
-  if (existing.label === label) return name
-
-  let suffix = createHash('sha256').update(`${name}:${label}`).digest('hex').slice(0, 8)
-  let candidate = `${name.slice(0, Math.max(1, 64 - suffix.length - 1))}_${suffix}`
-  let attempt = 0
-  while (fields.some((field) => field.name === candidate)) {
-    attempt += 1
-    suffix = createHash('sha256').update(`${name}:${label}:${attempt}`).digest('hex').slice(0, 8)
-    candidate = `${name.slice(0, Math.max(1, 64 - suffix.length - 1))}_${suffix}`
-  }
-  if (fields.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
-  fields.push({ name: candidate, label, type, width: type === 'string' ? 80 : 12, decimals })
-  return candidate
-}
-
 const includeFrozenMetric = (definition: any, detail: CompositeExportDetail) => {
   if (!definition || (definition.valueType !== 'number' && definition.valueType !== 'integer')) return false
   return detail === 'full' || definition.export?.summary !== false
@@ -156,7 +132,12 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       items: {
         orderBy: { position: 'asc' },
         include: {
-          scale: { include: { items: { orderBy: { sortOrder: 'asc' } }, dimensions: true } },
+          scale: {
+            include: {
+              ...(detail === 'full' ? { items: { orderBy: { sortOrder: 'asc' } } } : {}),
+              dimensions: true,
+            },
+          },
           cognitiveAssignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
         },
       },
@@ -167,15 +148,23 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         include: {
           user: { select: { id: true, nickname: true, username: true } },
           formAnswers: true,
-          scaleAssessments: { include: { scale: { include: { items: true, dimensions: true } } } },
+          scaleAssessments: {
+            select: {
+              compositeItemId: true,
+              answers: detail === 'full',
+              scores: true,
+            },
+          },
           cognitiveSessions: {
             include: {
               assignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
-              trials: {
-                orderBy: { trialIndex: 'asc' },
-                take: EXPORT_MAX_TRIALS + 1,
-                select: { trialIndex: true, payloadEncrypted: true },
-              },
+              ...(detail === 'full' ? {
+                trials: {
+                  orderBy: { trialIndex: 'asc' },
+                  take: EXPORT_MAX_TRIALS + 1,
+                  select: { trialIndex: true, payloadEncrypted: true },
+                },
+              } : {}),
             },
           },
         },
@@ -186,59 +175,59 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   assertExportLimits({ records: template.attempts.length })
   const packageSlotLabels = getFrozenPackageSlotLabels(template)
 
-  const fields: CompositeExportField[] = []
-  addField(fields, 'U_id', '参与者编号', 'string')
-  if (!anonymize) addField(fields, 'U_name', '姓名', 'string')
-  addField(fields, 'A_attempt_id', '综合测评记录ID', 'string')
-  addField(fields, 'A_assessment', '综合测评名称', 'string')
-  addField(fields, 'A_date', '完成日期', 'date')
-  addField(fields, 'A_duration_s', '完成用时(秒)', 'numeric')
+  const builder = new ExportFieldBuilder()
+  builder.add('U_id', '参与者编号', 'string', 80)
+  if (!anonymize) builder.add('U_name', '姓名', 'string', 80)
+  builder.add('A_attempt_id', '综合测评记录ID', 'string', 80)
+  builder.add('A_assessment', '综合测评名称', 'string', 80)
+  builder.add('A_date', '完成日期', 'date', 80)
+  builder.add('A_duration_s', '完成用时(秒)', 'numeric', 12)
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
-  formItems.forEach((item: any, index: number) => addField(fields, `F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string'))
+  formItems.forEach((item: any, index: number) => builder.add(`F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string', 80))
 
   template.items.forEach((item: any, index: number) => {
     const prefix = slotPrefix('S', index)
     if (item.type === 'SCALE' && item.scale) {
       const scaleLabel = packageSlotLabels.get(item.position) ?? item.scale.name
-      addField(fields, `${prefix}scale_id`, `[${scaleLabel}] 量表ID`, 'string')
-      addField(fields, `${prefix}scale_code`, `[${scaleLabel}] 量表编码`, 'string')
-      addField(fields, `${prefix}report_definition_version`, `[${scaleLabel}] 报告定义版本`, 'string')
+      builder.add(`${prefix}scale_id`, `[${scaleLabel}] 量表ID`, 'string', 80)
+      builder.add(`${prefix}scale_code`, `[${scaleLabel}] 量表编码`, 'string', 80)
+      builder.add(`${prefix}report_definition_version`, `[${scaleLabel}] 报告定义版本`, 'string', 80)
       if (detail === 'full') {
         item.scale.items.forEach((scaleItem: any) => {
-          addField(fields, fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric')
-          addField(fields, fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`, 'numeric')
+          builder.add(fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric', 12)
+          builder.add(fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`, 'numeric', 12)
         })
       }
-      item.scale.dimensions.forEach((dimension: any) => addField(fields, fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${scaleLabel}] ${dimension.name}得分`, 'numeric', 2))
+      item.scale.dimensions.forEach((dimension: any) => builder.add(fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${scaleLabel}] ${dimension.name}得分`, 'numeric', 12, 2))
     }
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
       const title = packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')
       const frozenReport = frozenReportFor(item.cognitiveAssignment)
       const showProductIndex = frozenReport?.reportDefinition?.showProductIndex !== false
-      if (showProductIndex) addField(fields, `${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 2)
-      addField(fields, `${childPrefix}quality`, `[${title}] 数据质量`, 'string')
-      addField(fields, `${childPrefix}profile`, `[${title}] Profile`, 'string')
-      addField(fields, `${childPrefix}profile_definition_version`, `[${title}] profile-definition version`, 'string')
-      addField(fields, `${childPrefix}metric_definition_version`, `[${title}] metric-definition version`, 'string')
-      addField(fields, `${childPrefix}quality_definition_version`, `[${title}] quality-definition version`, 'string')
-      addField(fields, `${childPrefix}test_type`, `[${title}] testType`, 'string')
-      addField(fields, `${childPrefix}engine_version`, `[${title}] engineVersion`, 'string')
-      addField(fields, `${childPrefix}scoring_version`, `[${title}] scoringVersion`, 'string')
-      addField(fields, `${childPrefix}config_version`, `[${title}] configVersion`, 'string')
-      addField(fields, `${childPrefix}randomization_algorithm_version`, `[${title}] randomization algorithm version`, 'string')
-      addField(fields, `${childPrefix}report_definition_version`, `[${title}] report-definition version`, 'string')
+      if (showProductIndex) builder.add(`${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 12, 2)
+      builder.add(`${childPrefix}quality`, `[${title}] 数据质量`, 'string', 80)
+      builder.add(`${childPrefix}profile`, `[${title}] Profile`, 'string', 80)
+      builder.add(`${childPrefix}profile_definition_version`, `[${title}] profile-definition version`, 'string', 80)
+      builder.add(`${childPrefix}metric_definition_version`, `[${title}] metric-definition version`, 'string', 80)
+      builder.add(`${childPrefix}quality_definition_version`, `[${title}] quality-definition version`, 'string', 80)
+      builder.add(`${childPrefix}test_type`, `[${title}] testType`, 'string', 80)
+      builder.add(`${childPrefix}engine_version`, `[${title}] engineVersion`, 'string', 80)
+      builder.add(`${childPrefix}scoring_version`, `[${title}] scoringVersion`, 'string', 80)
+      builder.add(`${childPrefix}config_version`, `[${title}] configVersion`, 'string', 80)
+      builder.add(`${childPrefix}randomization_algorithm_version`, `[${title}] randomization algorithm version`, 'string', 80)
+      builder.add(`${childPrefix}report_definition_version`, `[${title}] report-definition version`, 'string', 80)
       if (frozenReport) {
         for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
           const definition = frozenReport.metricDefinitions[key]
           if (!includeFrozenMetric(definition, detail)) continue
           const metricLabel = definition.export?.label || definition.label || key
-          addField(
-            fields,
+          builder.add(
             fieldName(`${childPrefix}M_`, key),
             `[${title}] ${metricLabel}`,
             frozenMetricType(definition),
+            12,
             frozenMetricDecimals(definition),
           )
         }
@@ -248,7 +237,6 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
 
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
-  const itemMap = new Map(template.items.map((item: any) => [item.id, item]))
   for (const attempt of template.attempts as any[]) {
     const row: Record<string, unknown> = {
       U_id: attempt.anonymousCode || (attempt.userId ? `U${attempt.userId.substring(0, 8)}` : 'ANONYMOUS'),
@@ -269,12 +257,15 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       const prefix = slotPrefix('S', index)
       if (item.type === 'SCALE') {
         const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
-        const answers = decode<any[]>(result?.answers) ?? []
+        const answers = detail === 'full' ? decode<any[]>(result?.answers) ?? [] : []
         const answerMap = new Map(answers.map((answer) => [answer.itemId, answer]))
         if (detail === 'full') {
           for (const scaleItem of item.scale.items) {
-            row[fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id)] = answerMap.get(scaleItem.id)?.value ?? null
-            row[fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id)] = answerMap.get(scaleItem.id)?.responseTime ?? null
+            const itemCode = scaleItem.itemCode || scaleItem.id
+            const questionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${scaleItem.itemCode || ''} ${scaleItem.content}`
+            const responseTimeLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`
+            row[builder.resolve(fieldName(`${prefix}Q_`, itemCode), questionLabel)] = answerMap.get(scaleItem.id)?.value ?? null
+            row[builder.resolve(fieldName(`${prefix}RT_`, itemCode), responseTimeLabel)] = answerMap.get(scaleItem.id)?.responseTime ?? null
           }
         }
         const scores = decode<any[]>(result?.scores) ?? []
@@ -283,7 +274,10 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         row[`${prefix}report_definition_version`] = 'scale-unit-report-v1'
         for (const score of scores) {
           const dimension = item.scale.dimensions.find((candidate: any) => candidate.id === score.dimensionId)
-          if (dimension) row[fieldName(`${prefix}D_`, dimension.code || dimension.id)] = score.rawScore ?? score.normalizedScore ?? null
+          if (dimension) {
+            const dimensionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${dimension.name}得分`
+            row[builder.resolve(fieldName(`${prefix}D_`, dimension.code || dimension.id), dimensionLabel)] = score.rawScore ?? score.normalizedScore ?? null
+          }
         }
       }
       if (item.type === 'COGNITIVE') {
@@ -311,18 +305,21 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
             for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
               const definition = frozenReport.metricDefinitions[key]
               if (!includeFrozenMetric(definition, detail)) continue
-              const metricName = fieldName(`${childPrefix}M_`, key)
+              const metricLabel = definition.export?.label || definition.label || key
+              const metricName = builder.resolve(fieldName(`${childPrefix}M_`, key), `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${metricLabel}`)
               row[metricName] = scalarExportValue(metrics[key] ?? null)
             }
           } else {
             // Historical assignments without a frozen report remain readable,
             // but once a snapshot exists no row can add a data-dependent field.
             for (const [key, value] of Object.entries(metrics)) {
-              const metricName = addField(
-                fields,
+              const metricLabel = `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${key}`
+              const metricType = typeof value === 'number' ? 'numeric' : 'string'
+              const metricName = builder.add(
                 fieldName(`${childPrefix}M_`, key),
-                `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${key}`,
-                typeof value === 'number' ? 'numeric' : 'string',
+                metricLabel,
+                metricType,
+                metricType === 'numeric' ? 12 : 80,
                 typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
               )
               row[metricName] = scalarExportValue(value)
@@ -333,7 +330,15 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
               const payload = decryptCognitivePayload<unknown>(trial.payloadEncrypted)
               trialCount += 1
               for (const [key, value] of flatten(payload)) {
-                const trialName = addField(fields, fieldName(`${childPrefix}T${String(trial.trialIndex + 1).padStart(3, '0')}_`, key), `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] 第${trial.trialIndex + 1}次 ${key}`, typeof value === 'number' ? 'numeric' : 'string', typeof value === 'number' && !Number.isInteger(value) ? 4 : 0)
+                const trialLabel = `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] 第${trial.trialIndex + 1}次 ${key}`
+                const trialType = typeof value === 'number' ? 'numeric' : 'string'
+                const trialName = builder.add(
+                  fieldName(`${childPrefix}T${String(trial.trialIndex + 1).padStart(3, '0')}_`, key),
+                  trialLabel,
+                  trialType,
+                  trialType === 'numeric' ? 12 : 80,
+                  typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
+                )
                 row[trialName] = scalarExportValue(value)
               }
             }
@@ -345,9 +350,9 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   }
 
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
-  for (const row of rows) for (const field of fields) if (!(field.name in row)) row[field.name] = null
-  assertExportLimits({ records: rows.length, fields: fields.length, trials: trialCount })
-  return { assessmentId: template.id, assessmentName: template.name, detail, fields, rows, trialCount }
+  for (const row of rows) for (const field of builder.fields) if (!(field.name in row)) row[field.name] = null
+  assertExportLimits({ records: rows.length, fields: builder.fields.length, trials: trialCount })
+  return { assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
 }
 
 export const exportToCSV = (data: CompositeExportData) => {

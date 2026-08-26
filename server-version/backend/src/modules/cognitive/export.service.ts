@@ -135,7 +135,7 @@ const mergeFieldType = (
   return 'numeric'
 }
 
-class ExportFieldBuilder {
+export class ExportFieldBuilder {
   private readonly list: CognitiveExportField[] = []
   private readonly byName = new Map<string, CognitiveExportField>()
   private readonly byKey = new Map<string, string>()

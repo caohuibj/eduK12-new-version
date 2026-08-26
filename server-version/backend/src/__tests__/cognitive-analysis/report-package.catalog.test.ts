@@ -13,9 +13,24 @@ describe('ReportPackage catalog visibility', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('lets admins inspect all package versions, including disabled drafts', async () => {
+    const gateMode = process.env.COGNITIVE_R2_GATE_MODE ?? 'pre-release'
+    const candidatePackage = process.env.COGNITIVE_R2_GATE_CANDIDATE_PACKAGE ?? ''
     const result = await listReportPackageCatalog('admin-1', UserRole.ADMIN)
-    expect(result).toHaveLength(7)
-    expect(result.every((item) => item.status === 'DRAFT' && item.disabledReason)).toBe(true)
+    const expectedKeys = [
+      'attention_stability_v1',
+      'inhibitory_control_v1',
+      'inhibitory_control_multisource_v1',
+      'working_memory_v1',
+      'executive_control_v1',
+      'learning_reasoning_v1',
+      'k12_core_profile_v1',
+    ]
+    for (const key of expectedKeys) {
+      const expectedStatus = gateMode === 'promotion-candidate' && candidatePackage === `${key}@1.0.0` ? 'PUBLISHED' : 'DRAFT'
+      const item = result.find((entry) => entry.key === key)
+      expect(item).toMatchObject({ status: expectedStatus })
+      if (expectedStatus === 'DRAFT') expect(item?.disabledReason).toEqual(expect.any(String))
+    }
     expect(result.find((item) => item.key === 'inhibitory_control_multisource_v1')?.slots).toEqual(expect.arrayContaining([
       expect.objectContaining({
         type: 'SCALE',

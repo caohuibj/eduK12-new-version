@@ -67,6 +67,14 @@ beforeEach(() => {
             opensAt: null, expiresAt: null, maxAttempts: 2, attemptsUsed: 2,
             canContinue: false, canStartNewAttempt: false, availability: 'OPEN',
           },
+          {
+            id: 'composite-active', name: '进行中的测评', description: null, instruction: null,
+            estimatedModules: 1, items: [], course: { id: 'course-1', title: '语文课程', courseCode: 'C-1' },
+            attempt: { id: 'attempt-active', status: 'IN_PROGRESS', progress: 40 },
+            latestCompletedAttempt: null,
+            opensAt: null, expiresAt: null, maxAttempts: 1, attemptsUsed: 1,
+            canContinue: true, canStartNewAttempt: false, availability: 'OPEN',
+          },
         ],
       },
     })
@@ -92,6 +100,9 @@ describe('CourseDetail composite availability', () => {
     expect(screen.getByRole('button', { name: '查看上次报告' })).toBeEnabled()
     expect(screen.getByRole('button', { name: '尚未开始' })).toBeDisabled()
     expect(screen.getByRole('button', { name: '查看报告' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: '继续测评' })).toBeEnabled()
+    expect(screen.getByText('进行中')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /综合测评/ })).toHaveTextContent('1')
 
     await user.click(screen.getByRole('button', { name: '再次测评' }))
     expect(mockNavigate).toHaveBeenCalledWith('/student/composite/composite-repeat')
