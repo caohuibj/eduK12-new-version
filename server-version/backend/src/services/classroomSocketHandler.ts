@@ -952,12 +952,17 @@ export class ClassroomSocketHandler {
           id: socket.data.sessionId,
           classroomId,
           studentId: socket.data.studentId,
+          leftAt: null,
         },
         data: { leftAt: new Date() },
       })
 
       socket.leave('classroom:' + classroomId)
       socket.leave('classroom:' + classroomId + ':students')
+      socket.data.clientRole = undefined
+      socket.data.classroomId = undefined
+      socket.data.studentId = undefined
+      socket.data.sessionId = undefined
       if (result.count > 0) {
         await this.broadcastOnlineCount(classroomId)
       }
@@ -985,6 +990,7 @@ export class ClassroomSocketHandler {
             id: socket.data.sessionId,
             classroomId,
             studentId: socket.data.studentId,
+            leftAt: null,
           },
           data: { leftAt: new Date() },
         })
