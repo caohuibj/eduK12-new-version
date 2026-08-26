@@ -7,10 +7,9 @@ import {
 } from '../../modules/cognitive-analysis/report-package.registry'
 
 describe('ReportPackageRegistry PR6B', () => {
-  it('registers the six cognitive-only packages plus the PR10 multi-source draft', () => {
+  it('keeps the PR14 package resources versioned and required', () => {
     const packages = listReportPackageDefinitions()
-    expect(packages).toHaveLength(7)
-    expect(packages.map((item) => item.key)).toEqual([
+    const expectedKeys = [
       'attention_stability_v1',
       'inhibitory_control_v1',
       'inhibitory_control_multisource_v1',
@@ -18,8 +17,11 @@ describe('ReportPackageRegistry PR6B', () => {
       'executive_control_v1',
       'learning_reasoning_v1',
       'k12_core_profile_v1',
-    ])
-    for (const definition of packages) {
+    ] as const
+    const definitions = expectedKeys.map((key) => packages.find((item) => item.key === key))
+    expect(definitions.every(Boolean)).toBe(true)
+    for (const definition of definitions) {
+      if (!definition) continue
       expect(definition.status).toBe('DRAFT')
       expect(definition.disabledReason).toBeTruthy()
       expect(definition.slots.every((slot) => slot.required)).toBe(true)

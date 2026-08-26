@@ -62,12 +62,17 @@ PR12/PR13 的 `trailmaking`、`reversallearning`、`bart`、`wordlist`、`lexica
 COGNITIVE_R2_GATE_RUN_DOCKER=1 \
 COGNITIVE_R2_GATE_ISOLATED_DB=1 \
 COGNITIVE_R2_GATE_RUN_E2E=1 \
+COGNITIVE_R2_GATE_BASE_REF=25098332a354e9d169f62da6edf2d88f43066dbd \
 COGNITIVE_GATE_ENV_FILE=/path/to/dedicated-gate.env \
 COGNITIVE_R2_E2E_FIXTURE_FILE=/path/to/pr14-e2e-fixtures.json \
 COGNITIVE_R2_GATE_EVIDENCE_FILE=/path/to/pr14-gate-evidence.json \
 bash server-version/scripts/cognitive-round2-release-gate.sh
 ```
 
+`COGNITIVE_R2_GATE_BASE_REF` 必须指向本次复核的 PR 基线；脚本会同时检查该基线到 HEAD 的已提交 diff、暂存/未提交 diff 和未跟踪文件。Gate Compose project 每次运行都会生成唯一后缀，并在退出时清理 project-scoped containers、volumes 和 orphan services。
+
 同时必须在当前 shell 中提供 `PR8_INTEGRATION_DATABASE_URL` 和 `COGNITIVE_INTEGRATION_DB_URL`，且两者都指向专用、可清理的 PostgreSQL；脚本只检查是否存在，不打印其值。
 
 fixture manifest 只应包含 assessment/attempt/package/slot 等非敏感验证数据；env 和 evidence 文件不得提交或输出密码、token、数据库 URL 或学生身份信息。
+
+Evidence 文件必须符合 `server-version/e2e/cognitive-round2-gate-manifest.json` 的完整 stimulus、supporting artifact 和 multisource package 清单；pilot 必须明确为 `APPROVED`，设备问题为空，中断恢复为 `PASS`，并满足标准电池时长边界。

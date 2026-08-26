@@ -2,9 +2,12 @@
 //
 // This harness is intentionally fixture-backed and does not seed, migrate, or
 // query a database. It may mutate only the explicitly isolated Gate service
-// through the normal HTTP contract (the package grant and, for a draft fixture,
-// package instantiation/publish in scenario 2). The
-// fixture manifest contains IDs and expected labels, never credentials.
+// through the normal HTTP contract (the package grant and, for a draft
+// assessment fixture, package instantiation/publish in scenario 2). The
+// package definition used by the authorization scenario must already be
+// PUBLISHED; the assessment fixture may remain DRAFT until the teacher
+// instantiates and publishes that package-backed assessment. The fixture
+// manifest contains IDs and expected labels, never credentials.
 //
 // Required before running:
 //   COGNITIVE_R2_E2E_ISOLATED_DB=1
@@ -214,7 +217,7 @@ const scenarioPackageAuthorizationAndReport = async (page, fixtures) => {
   const adminCatalog = assertSuccess(await jsonFetch(page, '/composite-assessments/report-packages'), 'admin package catalog')
   const packageItem = adminCatalog.list.find((item) => item.key === fixtures.package.key && item.version === fixtures.package.version)
   assert.ok(packageItem, 'admin package catalog is missing the fixture package')
-  assert.equal(packageItem.status, 'PUBLISHED', 'package fixture is not PUBLISHED in the isolated Gate environment')
+  assert.equal(packageItem.status, 'PUBLISHED', 'report package definition is not PUBLISHED in the isolated Gate environment')
   const grant = assertSuccess(await jsonFetch(page, '/admin/material-grants/set', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

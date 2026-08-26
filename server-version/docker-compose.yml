@@ -104,7 +104,7 @@ services:
         VITE_COGNITIVE_MODULE_ENABLED: ${VITE_COGNITIVE_MODULE_ENABLED:-true}
     container_name: ptool-frontend
     ports:
-      - "80:80"
+      - "${FRONTEND_HTTP_PORT:-80}:80"
     depends_on:
       backend:
         condition: service_healthy

@@ -7,11 +7,23 @@ REPO_DIR="$(cd "${SERVER_DIR}/.." && pwd)"
 RUN_DOCKER="${COGNITIVE_R2_GATE_RUN_DOCKER:-0}"
 RUN_E2E="${COGNITIVE_R2_GATE_RUN_E2E:-0}"
 GATE_ENV_FILE="${COGNITIVE_GATE_ENV_FILE:-}"
-GATE_PROJECT="${COGNITIVE_R2_GATE_PROJECT:-eduk12-pr14-gate}"
+GATE_PROJECT_PREFIX="${COGNITIVE_R2_GATE_PROJECT:-eduk12-pr14-gate}"
+GATE_RUN_ID="${COGNITIVE_R2_GATE_RUN_ID:-$(date -u +%Y%m%d%H%M%S)-$$}"
 GATE_HTTP_PORT="${COGNITIVE_R2_GATE_HTTP_PORT:-8088}"
+GATE_BASE_REF="${COGNITIVE_R2_GATE_BASE_REF:-}"
+GATE_HEAD_REF="${COGNITIVE_R2_GATE_HEAD_REF:-HEAD}"
 
+if [[ ! "${GATE_PROJECT_PREFIX}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,40}$ ]]; then
+  echo "Invalid COGNITIVE_R2_GATE_PROJECT; use a short project prefix." >&2
+  exit 1
+fi
+if [[ ! "${GATE_RUN_ID}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,20}$ ]]; then
+  echo "Invalid COGNITIVE_R2_GATE_RUN_ID; use a short run identifier." >&2
+  exit 1
+fi
+GATE_PROJECT="${GATE_PROJECT_PREFIX}-${GATE_RUN_ID}"
 if [[ ! "${GATE_PROJECT}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,62}$ ]]; then
-  echo "Invalid COGNITIVE_R2_GATE_PROJECT; use a short project-scoped name." >&2
+  echo "The generated Gate project name is too long." >&2
   exit 1
 fi
 if ! [[ "${GATE_HTTP_PORT}" =~ ^[0-9]+$ ]] || (( GATE_HTTP_PORT < 1024 || GATE_HTTP_PORT > 65535 )); then
@@ -28,18 +40,20 @@ required() {
   [[ -n "$1" ]] || fail_external_gate "$2 is required"
 }
 
-if [[ -n "$(git -C "${REPO_DIR}" diff --name-only -- server-version/backend/prisma/schema.prisma server-version/backend/prisma/migrations)" ]]; then
-  echo "PR14 gate refuses to run with Prisma schema or migration changes." >&2
+if [[ -z "${GATE_BASE_REF}" ]]; then
+  echo "COGNITIVE_R2_GATE_BASE_REF is required; pass the reviewed PR base commit or ref." >&2
   exit 1
 fi
-if ! git -C "${REPO_DIR}" diff --quiet -- server-version/frontend/src/modules/reporting/ScaleUnitReportCard.tsx; then
-  echo "PR14 gate refuses to run because ScaleUnitReportCard.tsx changed." >&2
+if ! GATE_BASE_SHA="$(git -C "${REPO_DIR}" rev-parse --verify "${GATE_BASE_REF}^{commit}" 2>/dev/null)"; then
+  echo "COGNITIVE_R2_GATE_BASE_REF does not resolve to a commit: ${GATE_BASE_REF}" >&2
   exit 1
 fi
-if [[ -n "$(git -C "${REPO_DIR}" ls-files --others --exclude-standard -- server-version/backend/prisma/schema.prisma server-version/backend/prisma/migrations)" ]]; then
-  echo "PR14 gate refuses to run with untracked Prisma schema or migration files." >&2
+if ! GATE_HEAD_SHA="$(git -C "${REPO_DIR}" rev-parse --verify "${GATE_HEAD_REF}^{commit}" 2>/dev/null)"; then
+  echo "COGNITIVE_R2_GATE_HEAD_REF does not resolve to a commit: ${GATE_HEAD_REF}" >&2
   exit 1
 fi
+
+bash "${SCRIPT_DIR}/cognitive-round2-release-gate-scope.sh" "${REPO_DIR}" "${GATE_BASE_SHA}" "${GATE_HEAD_SHA}"
 if [[ "${RUN_DOCKER}" == "1" ]]; then
   required "${PR8_INTEGRATION_DATABASE_URL:-}" "PR8_INTEGRATION_DATABASE_URL"
   required "${COGNITIVE_INTEGRATION_DB_URL:-}" "COGNITIVE_INTEGRATION_DB_URL"
@@ -61,6 +75,10 @@ npm test -- --reporter=dot
 npm run build
 
 git -C "${REPO_DIR}" diff --check
+git -C "${REPO_DIR}" diff --cached --check
+
+node "${SERVER_DIR}/e2e/validate-cognitive-round2-gate-evidence.test.cjs"
+bash "${SERVER_DIR}/scripts/cognitive-round2-release-gate-scope.test.sh"
 
 if [[ "${RUN_DOCKER}" != "1" ]]; then
   fail_external_gate "set COGNITIVE_R2_GATE_RUN_DOCKER=1 with a dedicated Gate env file to run isolated Docker build and smoke"
@@ -77,6 +95,15 @@ if [[ "${COGNITIVE_R2_GATE_ISOLATED_DB:-0}" != "1" ]]; then
   fail_external_gate "set COGNITIVE_R2_GATE_ISOLATED_DB=1; the baseline/shared database is not an allowed Gate target"
 fi
 COMPOSE_ARGS=(--project-name "${GATE_PROJECT}" --env-file "${GATE_ENV_FILE}" -f "${SERVER_DIR}/docker-compose.yml" -f "${SERVER_DIR}/docker-compose.pr14-gate.yml")
+export FRONTEND_HTTP_PORT="${GATE_HTTP_PORT}"
+
+compose_ready=1
+cleanup() {
+  if [[ "${compose_ready}" == "1" ]]; then
+    docker compose "${COMPOSE_ARGS[@]}" down --volumes --remove-orphans >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
 
 cd "${SERVER_DIR}"
 docker compose "${COMPOSE_ARGS[@]}" config >/dev/null

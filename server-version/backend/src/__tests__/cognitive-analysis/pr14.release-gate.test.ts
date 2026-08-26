@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
@@ -17,6 +19,12 @@ import {
 import { projectCompositeCollectionReport } from '../../modules/composite/composite-report.projector'
 
 const REPORT = { reportVersion: '1.0.0' as const, referenceMode: 'none' as const }
+const GATE_MANIFEST = JSON.parse(readFileSync(resolve(__dirname, '../../../../e2e/cognitive-round2-gate-manifest.json'), 'utf8')) as {
+  schemaVersion: string
+  stimulusSets: Array<{ id: string; version: string }>
+  supportingArtifacts: Array<{ id: string; version: string }>
+  multisourcePackages: Array<{ key: string; version: string; reviewedScaleCodes: string[] }>
+}
 
 /**
  * These are the published-config-shaped fixtures used by the existing task
@@ -76,6 +84,8 @@ const CORE_PACKAGES = [
   'learning_reasoning_v1',
   'k12_core_profile_v1',
 ] as const
+const MULTISOURCE_PACKAGE = 'inhibitory_control_multisource_v1' as const
+const PR14_PACKAGE_KEYS = [...CORE_PACKAGES, MULTISOURCE_PACKAGE] as const
 const DRAFT_ONLY_TASKS = [
   'trailmaking',
   'reversallearning',
@@ -84,6 +94,9 @@ const DRAFT_ONLY_TASKS = [
   'lexicaldecision',
   'emotionrecognition',
 ] as const
+
+const isPr14Package = (key: string): key is typeof PR14_PACKAGE_KEYS[number] =>
+  (PR14_PACKAGE_KEYS as readonly string[]).includes(key)
 
 const cognitiveItemsFor = (packageKey: string) => {
   const definition = getReportPackageDefinition(packageKey, '1.0.0')
@@ -197,6 +210,23 @@ const multisourceItems = () => {
 }
 
 describe('PR14 Round 2 release gate contracts', () => {
+  it('keeps the evidence manifest aligned with the exact Round 2 task and package registry scope', () => {
+    expect(GATE_MANIFEST.stimulusSets).toEqual(ROUND2_TASKS.map((testType) => ({
+      id: testType,
+      version: BASE_CONFIGS[testType].stimulusSetVersion,
+    })))
+    expect(GATE_MANIFEST.supportingArtifacts).toEqual([
+      { id: 'wordlist.normalization', version: 'wordlist-normalization-v1.0.0' },
+      { id: 'lexicaldecision.pseudoword-generator', version: 'zh-pseudoword-generator-v1.0.0' },
+      { id: 'emotionrecognition.category', version: 'basic-emotion-6-v1.0.0' },
+    ])
+    expect(GATE_MANIFEST.multisourcePackages).toEqual([{
+      key: MULTISOURCE_PACKAGE,
+      version: '1.0.0',
+      reviewedScaleCodes: ['adexi_v1'],
+    }])
+  })
+
   it('covers every Round 2 task with an exact Registry key, strict schema, Profile merge and frozen provenance', () => {
     const registry = listCognitiveRegistryEntries()
     for (const testType of ROUND2_TASKS) {
@@ -220,14 +250,14 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(registeredRound2.map((entry) => entry.testType).sort()).toEqual([...ROUND2_TASKS].sort())
   })
 
-  it('keeps all six core package contracts fixed, versioned, disabled and unpublished', () => {
+  it('keeps the PR14 package contracts fixed, versioned, disabled and unpublished', () => {
     const protocols = listAnalysisProtocolDefinitions()
     const packages = listReportPackageDefinitions()
-    expect(packages).toHaveLength(7)
+    const packageByKey = new Map(packages.map((definition) => [definition.key, definition]))
 
     for (const packageKey of CORE_PACKAGES) {
       const protocol = protocols.find((candidate) => candidate.key === packageKey && candidate.version === '1.0.0')
-      const definition = packages.find((candidate) => candidate.key === packageKey && candidate.version === '1.0.0')
+      const definition = packageByKey.get(packageKey)
       expect(protocol, packageKey).toBeDefined()
       expect(definition, packageKey).toBeDefined()
       expect(protocol).toMatchObject({ status: 'DRAFT', recommendedForCreate: false })
@@ -255,7 +285,18 @@ describe('PR14 Round 2 release gate contracts', () => {
       }
     }
 
-    for (const definition of packages) {
+    const multisource = packageByKey.get(MULTISOURCE_PACKAGE)
+    expect(multisource).toMatchObject({
+      key: MULTISOURCE_PACKAGE,
+      version: '1.0.0',
+      status: 'DRAFT',
+      disabledReason: expect.any(String),
+    })
+    expect(multisource?.slots.map((slot) => slot.position)).toEqual(
+      multisource?.slots.map((_, index) => index),
+    )
+
+    for (const definition of packages.filter((candidate) => isPr14Package(candidate.key))) {
       expect(definition.status, definition.key).toBe('DRAFT')
       expect(JSON.stringify(definition), definition.key).not.toMatch(/overallScore|averageScore|percentile|\bIQ\b|诊断/i)
     }
@@ -376,13 +417,27 @@ describe('PR14 Round 2 release gate contracts', () => {
   it('keeps PR12/PR13 tasks and every package out of the publish/recommendation path', () => {
     const catalogText = JSON.stringify({
       registry: listCognitiveRegistryEntries(),
-      protocols: listAnalysisProtocolDefinitions(),
-      packages: listReportPackageDefinitions(),
+      protocols: listAnalysisProtocolDefinitions().filter((protocol) => isPr14Package(protocol.key)),
+      packages: listReportPackageDefinitions().filter((definition) => isPr14Package(definition.key)),
     })
     for (const testType of DRAFT_ONLY_TASKS) {
       const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')!
       expect(entry.recommendedForCreate, testType).toBe(false)
     }
     expect(catalogText).not.toMatch(/"status":"PUBLISHED"/)
+  })
+
+  it('does not let a future published package expand the PR14-specific assertions', () => {
+    const futurePackage = {
+      key: 'future_package_v1',
+      version: '1.0.0',
+      status: 'PUBLISHED',
+      recommendedForCreate: true,
+    }
+    const scopedPackages = [...listReportPackageDefinitions(), futurePackage].filter((definition) => isPr14Package(definition.key))
+
+    expect(isPr14Package(futurePackage.key)).toBe(false)
+    expect(scopedPackages.some((definition) => definition.key === futurePackage.key)).toBe(false)
+    expect(scopedPackages.map((definition) => definition.key).sort()).toEqual([...PR14_PACKAGE_KEYS].sort())
   })
 })
