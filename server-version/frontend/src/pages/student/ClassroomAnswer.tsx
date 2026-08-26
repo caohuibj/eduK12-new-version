@@ -85,9 +85,10 @@ const ClassroomAnswer: React.FC = () => {
     })
 
     // 错误处理
-    on('error' as any, (data) => {
+    const handleError = (data: { message?: string }) => {
       alert(data.message || '发生错误')
-    })
+    }
+    on('error', handleError)
 
     return () => {
       off('broadcast:question')
@@ -95,6 +96,7 @@ const ClassroomAnswer: React.FC = () => {
       off('broadcast:next')
       off('broadcast:closed')
       off('student:submitted')
+      off('error', handleError)
     }
   }, [isConnected, on, off, navigate])
 
