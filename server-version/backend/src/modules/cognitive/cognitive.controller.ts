@@ -1,29 +1,89 @@
 import { Request, Response } from 'express'
-import { success, error, unauthorized } from '../../utils/response'
+import { success, error, unauthorized, notFound } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
+import * as catalogService from './catalog.service'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
 import * as historyService from './history.service'
+import * as publicCognitiveService from './public.service'
 import { CognitiveServiceError } from './cognitive.errors'
+import { rejectWrapperForStandaloneUse } from './assignment.access'
 import {
   createAssignmentSchema,
   updateAssignmentSchema,
+  updateAccessPolicySchema,
   listAssignmentsQuerySchema,
   createSessionSchema,
   restartSessionSchema,
   appendTrialSchema,
   completeSessionSchema,
+  cognitiveExportQuerySchema,
+  cognitiveExportRequestSchema,
+  cognitivePublicTokenSchema,
+  cognitivePublicStartSchema,
+  cognitivePublicTrialSchema,
+  cognitivePublicRecoverySchema,
 } from './cognitive.schema'
 import { z } from 'zod'
 import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
+import * as fs from 'fs'
+import * as path from 'path'
+import { isAllowedCognitiveExportFileName } from './export.service'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
  * 模式：controller 只做 参数解析/鉴权调用/响应映射，业务在 service。
  */
 export const cognitiveController = {
+  async listTests(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const testType = typeof req.query.testType === 'string' ? req.query.testType : undefined
+      return success(res, catalogService.listCognitiveTestsCatalog(testType))
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getTest(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const engineVersion = typeof req.query.engineVersion === 'string' ? req.query.engineVersion : undefined
+      const scoringVersion = typeof req.query.scoringVersion === 'string' ? req.query.scoringVersion : undefined
+      return success(res, catalogService.getCognitiveTestCatalog(req.params.testType, engineVersion, scoringVersion))
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async listConfigs(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await assignmentService.listPublishedConfigs(req.user.userId, req.user.role)
+      return success(res, { list: data })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async updateAccessPolicy(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = updateAccessPolicySchema.parse(req.body)
+      const data = await assignmentService.updateConfigAccessPolicy(
+        req.user.userId,
+        req.user.role,
+        req.params.id,
+        input.accessPolicy,
+      )
+      return success(res, data, '已更新访问策略')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
   async createAssignment(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -38,7 +98,11 @@ export const cognitiveController = {
   async listAssignments(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const query = listAssignmentsQuerySchema.parse(req.query)
+      const query = listAssignmentsQuerySchema.parse({
+        courseId: typeof req.query.courseId === 'string' ? req.query.courseId : undefined,
+        status: typeof req.query.status === 'string' ? req.query.status : undefined,
+        listedStandalone: typeof req.query.listedStandalone === 'string' ? req.query.listedStandalone : undefined,
+      })
       const data = await assignmentService.listTeacherAssignments(req.user.userId, req.user.role, query)
       return success(res, data)
     } catch (err) {
@@ -107,6 +171,196 @@ export const cognitiveController = {
       if (!req.user) return unauthorized(res)
       const data = await assignmentService.archiveAssignment(req.user.userId, req.user.role, req.params.id)
       return success(res, data, '归档成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async createPublicToken(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = cognitivePublicTokenSchema.parse(req.body)
+      const data = await publicCognitiveService.createAccessTokenForAssignment(req.user.userId, req.user.role, req.params.id, input.expiresAt, input.maxUses)
+      return success(res, data, '公开链接创建成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async listPublicTokens(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await publicCognitiveService.listAccessTokens(req.user.userId, req.user.role, req.params.id)
+      return success(res, { list: data, total: data.length })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async disablePublicToken(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await publicCognitiveService.disableAccessToken(req.user.userId, req.user.role, req.params.id, req.params.tokenId)
+      return success(res, null, '公开链接已停用')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getPublicAssignment(req: Request, res: Response) {
+    try {
+      const data = await publicCognitiveService.getPublicAssignmentInfo(req.params.token)
+      return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async startPublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicStartSchema.parse(req.body || {})
+      const data = await publicCognitiveService.startPublicSession(req.params.token, input.recoveryToken)
+      return success(res, data, data.recoveryToken ? '匿名测评已开始，请保存恢复凭证' : '已恢复匿名测评')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async getPublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicRecoverySchema.parse({ recoveryToken: req.headers['x-recovery-token'] })
+      const data = await publicCognitiveService.getSession(req.params.id, input.recoveryToken)
+      return success(res, data)
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async appendPublicTrial(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicTrialSchema.parse(req.body)
+      const data = await publicCognitiveService.appendTrial(req.params.id, input.recoveryToken, { trialIndex: input.trialIndex, payload: input.payload })
+      return success(res, data, '试次已记录')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async completePublicSession(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicRecoverySchema.parse(req.body)
+      const data = await publicCognitiveService.completeSession(req.params.id, input.recoveryToken)
+      return success(res, data, '匿名测评已完成')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  // Cognitive export
+  async getExportPreview(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = cognitiveExportQuerySchema.parse(req.query)
+
+      // 复用教师端 Assignment 权限校验，避免导出接口绕过创建者隔离。
+      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
+
+      const { cognitiveExportService } = await import('./export.service')
+      const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
+        detail: query.detail,
+        anonymize: true,
+      })
+
+      return success(res, {
+        assignmentId: data.assignmentId,
+        assignmentTitle: data.assignmentTitle,
+        testType: data.testType,
+        detail: data.detail,
+        completedCount: data.completedCount,
+        trialCount: data.trialCount,
+        fieldCount: data.fields.length,
+        fields: data.fields,
+      })
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async exportData(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = cognitiveExportRequestSchema.parse(req.body || {})
+
+      // 复用教师端 Assignment 权限校验，管理员可导出所有任务。
+      await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
+
+      const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
+      const { cognitiveExportService } = await import('./export.service')
+      const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
+        detail: input.detail,
+        anonymize,
+        dateRange: input.dateRange,
+      })
+      const files = await cognitiveExportService.saveCognitiveExportFiles(
+        req.params.id,
+        { detail: input.detail, anonymize, dateRange: input.dateRange },
+        input.format,
+        data
+      )
+
+      const result: Record<string, unknown> = {
+        assignmentId: data.assignmentId,
+        assignmentTitle: data.assignmentTitle,
+        detail: data.detail,
+        format: input.format,
+        anonymize,
+        recordCount: data.completedCount,
+        trialCount: data.trialCount,
+        fieldCount: data.fields.length,
+      }
+
+      if (files.csvPath) {
+        result.fileName = path.basename(files.csvPath)
+      }
+      if (files.savPath) {
+        result.fileName = path.basename(files.savPath)
+      }
+      if (files.xlsxPath) {
+        result.fileName = path.basename(files.xlsxPath)
+      }
+      if (files.zipPath) {
+        result.fileName = path.basename(files.zipPath)
+      }
+
+      return success(res, result, '导出成功')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async downloadExportFile(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const { id: assignmentId, fileName } = req.params
+
+      // 下载也必须重新执行 Assignment 归属校验，不能只依赖不可预测的文件名。
+      const assignment = await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, assignmentId)
+      rejectWrapperForStandaloneUse(assignment, '请从综合测评导出')
+
+      // 文件名来自服务端生成结果，仍显式拒绝路径穿越和非导出文件名。
+      if (
+        path.basename(fileName) !== fileName ||
+        !fileName.startsWith(`cognitive_${assignmentId.substring(0, 8)}_`) ||
+        !isAllowedCognitiveExportFileName(fileName)
+      ) {
+        return notFound(res, '文件不存在')
+      }
+
+      const exportDir = path.join(__dirname, '../../../exports')
+      const filePath = path.join(exportDir, fileName)
+      if (!fs.existsSync(filePath)) return notFound(res, '文件不存在')
+
+      return res.download(filePath)
     } catch (err) {
       return handleError(res, err)
     }

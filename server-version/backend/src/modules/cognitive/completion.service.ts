@@ -5,7 +5,9 @@ import {
 } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { CognitiveScoringInputError } from './cognitive.types'
-import { resolveCognitiveReference } from './reference'
+import { resolveCognitiveReferenceForResult } from './reference'
+import { loadFrozenMeasurementContext } from './profile-freeze'
+import { buildCognitiveSingleTaskReport } from './single-task-report'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 
@@ -30,6 +32,57 @@ import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
  * 并发 append 必须排队，无法在评分期间写入新 trial。
  */
 
+const buildCompletedPayload = async (
+  tx: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
+  session: {
+    id: string
+    assignmentId: string | null
+    testType: string
+    engineVersion: string
+    scoringVersion: string
+    configVersion: string
+  },
+  score: number,
+  metrics: Record<string, unknown>,
+  qualityFlags: Record<string, unknown>,
+  finishedAt: Date | null,
+  config: Record<string, unknown>,
+) => {
+  const freeze = await loadFrozenMeasurementContext(tx, session.assignmentId)
+  const reference = resolveCognitiveReferenceForResult({
+    testType: session.testType,
+    metrics,
+    score,
+    qualityFlags,
+    config,
+    profile: freeze.profile,
+    engineVersion: session.engineVersion,
+    scoringVersion: session.scoringVersion,
+    configVersion: session.configVersion,
+  })
+  return {
+    sessionId: session.id,
+    status: 'COMPLETED' as const,
+    finishedAt,
+    score,
+    metrics,
+    qualityFlags,
+    reference,
+    singleTaskReport: buildCognitiveSingleTaskReport({
+      testType: session.testType,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      configVersion: session.configVersion,
+      profile: freeze.profile,
+      frozenReport: freeze.frozenReport,
+      score,
+      metrics,
+      qualityFlags,
+      reference,
+    }),
+  }
+}
+
 const decryptResult = (session: {
   scoreEncrypted: string | null
   metricsEncrypted: string | null
@@ -47,27 +100,30 @@ const decryptResult = (session: {
   }
 }
 
-export const completeSession = async (userId: string, sessionId: string) => {
+const completeSessionWithPrincipal = async (userId: string | null, sessionId: string, recoveryTokenHash?: string) => {
   return prisma.$transaction(async (tx) => {
     // 行锁：串行化 complete 与 append/restart，保证评分数据集冻结。
     const session = await lockSession(tx, sessionId)
     if (!session) throw NOT_FOUND('CognitiveSession not found')
-    if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    if (userId !== null) {
+      if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+    } else {
+      let allowed = Boolean(recoveryTokenHash && session.recoveryTokenHash === recoveryTokenHash)
+      if (!allowed && recoveryTokenHash && session.compositeAttemptId) {
+        const attempt = await tx.compositeAssessmentAttempt.findUnique({
+          where: { id: session.compositeAttemptId },
+          select: { recoveryTokenHash: true, userId: true },
+        })
+        allowed = attempt?.userId === null && attempt.recoveryTokenHash === recoveryTokenHash
+      }
+      if (session.userId !== null || !allowed) throw FORBIDDEN('Recovery credential does not own this session')
+    }
 
     // COMPLETED：幂等返回已存结果（不要求 completionKey）。
     if (session.status === 'COMPLETED') {
       const { score, metrics, qualityFlags, finishedAt } = decryptResult(session)
       const config = decryptCognitivePayload<Record<string, unknown>>(session.configSnapshotEncrypted)
-      const report = (config.report ?? {}) as Record<string, unknown>
-      const reference = resolveCognitiveReference({
-        testType: session.testType,
-        metrics,
-        score,
-        referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-        referenceVersion: report.referenceVersion as string | undefined,
-        referenceBand: report.referenceBand as string | undefined,
-      })
-      return { sessionId, status: 'COMPLETED', finishedAt, score, metrics, qualityFlags, reference }
+      return buildCompletedPayload(tx, session, score, metrics, qualityFlags, finishedAt, config)
     }
     if (session.status === 'ABANDONED' || session.status === 'INVALID') {
       throw BAD_REQUEST(`Session is ${session.status} and cannot be completed`)
@@ -97,7 +153,11 @@ export const completeSession = async (userId: string, sessionId: string) => {
 
     let result: { score: number; metrics: Record<string, unknown>; qualityFlags: Record<string, unknown> }
     try {
-      result = entry.score({ config: validatedConfig, trials: scoringTrials })
+      result = entry.score({
+        config: validatedConfig,
+        trials: scoringTrials,
+        randomSeed: session.randomSeed,
+      })
     } catch (err) {
       if (err instanceof CognitiveScoringInputError) {
         // premature / malformed trials：Session 保持 IN_PROGRESS，学生可补交后再次 complete。
@@ -127,29 +187,33 @@ export const completeSession = async (userId: string, sessionId: string) => {
       const reloaded = await tx.cognitiveSession.findUnique({ where: { id: sessionId } })
       if (reloaded?.status === 'COMPLETED') {
         const { score, metrics, qualityFlags, finishedAt: fin } = decryptResult(reloaded)
-        const report = (validatedConfig as { report?: Record<string, unknown> }).report ?? {}
-        const reference = resolveCognitiveReference({
-          testType: reloaded.testType,
-          metrics,
+        return buildCompletedPayload(
+          tx,
+          reloaded,
           score,
-          referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-          referenceVersion: report.referenceVersion as string | undefined,
-          referenceBand: report.referenceBand as string | undefined,
-        })
-        return { sessionId, status: 'COMPLETED', finishedAt: fin, score, metrics, qualityFlags, reference }
+          metrics,
+          qualityFlags,
+          fin,
+          validatedConfig as Record<string, unknown>,
+        )
       }
       throw CONFLICT('Session cannot be completed in its current state')
     }
 
-    const report = (validatedConfig as { report?: Record<string, unknown> }).report ?? {}
-    const reference = resolveCognitiveReference({
-      testType: session.testType,
-      metrics: result.metrics,
-      score: result.score,
-      referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-      referenceVersion: report.referenceVersion as string | undefined,
-      referenceBand: report.referenceBand as string | undefined,
-    })
-    return { sessionId, status: 'COMPLETED', finishedAt, ...result, reference }
+    return buildCompletedPayload(
+      tx,
+      session,
+      result.score,
+      result.metrics,
+      result.qualityFlags,
+      finishedAt,
+      validatedConfig as Record<string, unknown>,
+    )
   })
 }
+
+export const completeSession = async (userId: string, sessionId: string) =>
+  completeSessionWithPrincipal(userId, sessionId)
+
+export const completeSessionForPublic = async (sessionId: string, recoveryTokenHash: string) =>
+  completeSessionWithPrincipal(null, sessionId, recoveryTokenHash)

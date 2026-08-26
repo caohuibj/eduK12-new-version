@@ -14,6 +14,8 @@ export interface CognitiveAssignmentSummary {
   dueAt: string | null
   maxAttempts: number
   required: boolean
+  listedStandalone?: boolean
+  reportPackageLocked?: boolean
   publishedAt: string | null
   course: { id: string; title: string; courseCode: string } | null
   config: {
@@ -28,11 +30,56 @@ export interface CognitiveAssignmentSummary {
 
 export type CognitiveSessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED' | 'INVALID'
 
+export interface CognitiveReportMetricView {
+  key: string
+  label: string
+  unit?: string
+  value: unknown
+  formatted: string
+}
+
+export interface CognitiveSingleTaskReport {
+  testType: string
+  profile: 'experience' | 'standard' | 'research' | null
+  profileLabel: string | null
+  title: string
+  interpretable: boolean
+  qualityState: 'interpretable' | 'insufficient'
+  qualityFlags: Array<{ key: string; label: string; active: boolean }>
+  headline: CognitiveReportMetricView | null
+  productIndex: { label: string; value: number } | null
+  showProductIndex?: boolean
+  primaryMetrics: CognitiveReportMetricView[]
+  secondaryMetrics: CognitiveReportMetricView[]
+  caveats: string[]
+  practicalTips: string[]
+  method: {
+    testType: string
+    engineVersion: string
+    scoringVersion: string
+    configVersion: string
+    profile: 'experience' | 'standard' | 'research' | null
+  }
+  disclaimer: string
+  reference: CognitiveReference | null
+}
+
 export interface CognitiveResult {
   score: number
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
   reference?: CognitiveReference
+  singleTaskReport?: CognitiveSingleTaskReport | null
+}
+
+export interface CognitiveReferenceComparison {
+  metricKey: string
+  observed: number
+  referenceMean: number
+  referenceSd: number
+  sdDelta: number | null
+  rangeLabel: string
+  meanLabel?: string
 }
 
 export interface CognitiveReference {
@@ -43,6 +90,8 @@ export interface CognitiveReference {
   version: string | null
   band: string | null
   referencePosition: number | null
+  comparison?: CognitiveReferenceComparison | null
+  protocolMatched?: boolean
   disclaimer: string
 }
 
@@ -73,6 +122,17 @@ export interface CognitiveHistoryPage {
  * Runner 会话（对应后端 toRunnerPayload + COMPLETED 附加字段）。
  * config = 冻结的 config snapshot（decrypted）；randomSeed 必须 accept/retain/pass，禁止 regenerate。
  */
+export interface CognitiveReportDefinition {
+  title: string
+  headlineMetric?: string
+  primaryMetrics?: string[]
+  secondaryMetrics?: string[]
+  summaryMetrics?: string[]
+  showProductIndex?: boolean
+  practicalTips?: string[]
+  disclaimer: string
+}
+
 export interface CognitiveSession {
   sessionId: string
   assignmentId: string | null
@@ -84,6 +144,15 @@ export interface CognitiveSession {
   scoringVersion: string
   config: Record<string, unknown>
   randomSeed: string
+  profile?: 'experience' | 'standard' | 'research' | null
+  reportCaveats?: string[]
+  metricDefinitions?: Record<string, { key: string; label: string; unit?: string }>
+  qualityDefinitions?: Record<string, { key: string; label: string; description?: string }>
+  reportDefinition?: CognitiveReportDefinition
+  /** 公开匿名恢复时由服务端返回，允许跨设备继续而不猜测下一个试次。 */
+  nextTrialIndex?: number
+  /** 公开匿名会话的参与者编号，不包含账号身份。 */
+  anonymousCode?: string | null
   finishedAt?: string | null
   result?: CognitiveResult | null
 }

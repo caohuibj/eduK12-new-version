@@ -6,17 +6,12 @@ import { success, error, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
+import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
 
 const loginSchema = z.object({
   username: z.string().min(1, '用户名不能为空'),
   password: z.string().min(1, '密码不能为空'),
-})
-
-const registerSchema = z.object({
-  username: z.string().min(3, '用户名至少3个字符'),
-  password: z.string().min(6, '密码至少6个字符'),
-  nickname: z.string().optional(),
 })
 
 const teacherRegisterSchema = z.object({
@@ -73,6 +68,10 @@ export const authController = {
       const isValid = await comparePassword(password, user.passwordHash)
       if (!isValid) {
         return unauthorized(res, '用户名或密码错误')
+      }
+
+      if (user.role === UserRole.TEACHER && !user.teacherApproved) {
+        return unauthorized(res, '账号正在等待管理员审核，审核通过后即可登录')
       }
 
       const token = generateToken({
@@ -188,34 +187,30 @@ export const authController = {
           nickname,
           teacherCodeId: teacherCode.id,
           expiresAt,
+          teacherApproved: false,
         }
       })
 
-      // 标记教师码为已使用
+      // 标记教师码为已使用（待审期间不可再用同一码重复注册）
       await prisma.teacherCode.update({
         where: { id: teacherCode.id },
         data: { 
           usedCount: { increment: 1 },
-          isActive: false, // 使用一次后失效
+          isActive: false,
         }
       })
 
-      const token = generateToken({
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-      })
-
       return success(res, {
-        token,
+        pendingApproval: true,
         user: {
           id: user.id,
           username: user.username,
           role: user.role,
           nickname: user.nickname,
           expiresAt: user.expiresAt,
+          teacherApproved: false,
         }
-      }, '教师账号注册成功')
+      }, '已提交注册，请等待管理员审核通过后再登录')
     } catch (err) {
       logger.error('教师注册错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -243,6 +238,10 @@ export const authController = {
 
       if (course.status === 'COMPLETED' || course.endedAt) {
         return error(res, '课程已结束，无法加入')
+      }
+
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
       }
 
       // 检查用户名是否已存在
@@ -297,55 +296,9 @@ export const authController = {
     }
   },
 
-  // 学生注册（旧版兼容）
+  // 旧版无课程归属注册接口已停用：学生账号必须通过课程码注册。
   async register(req: Request, res: Response) {
-    try {
-      const result = registerSchema.safeParse(req.body)
-      if (!result.success) {
-        return error(res, result.error.errors[0].message)
-      }
-
-      const { username, password, nickname } = result.data
-
-      // 检查用户名是否已存在
-      const existingUser = await prisma.user.findUnique({
-        where: { username }
-      })
-
-      if (existingUser) {
-        return error(res, '用户名已存在')
-      }
-
-      // 创建学生账号
-      const hashedPassword = await hashPassword(password)
-      const user = await prisma.user.create({
-        data: {
-          username,
-          passwordHash: hashedPassword,
-          role: UserRole.STUDENT,
-          nickname: nickname || username,
-        }
-      })
-
-      const token = generateToken({
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-      })
-
-      return success(res, {
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role,
-          nickname: user.nickname,
-        }
-      }, '注册成功')
-    } catch (err) {
-      logger.error('注册错误', err)
-      return error(res, Messages.COMMON.FAILED)
-    }
+    return error(res, '学生账号必须使用课程码注册', -1, 410)
   },
 
   // 获取当前用户信息
@@ -364,14 +317,9 @@ export const authController = {
         return unauthorized(res, '用户不存在')
       }
 
-      // 检查账号是否被冻结
-      if (user.isFrozen) {
-        return unauthorized(res, '账号已被冻结，请联系教师')
-      }
-
-      // 检查账号是否过期
-      if (user.expiresAt && user.expiresAt < new Date()) {
-        return unauthorized(res, '账号已过期，请联系管理员')
+      const rejection = inactiveAccountMessage(user)
+      if (rejection) {
+        return unauthorized(res, rejection)
       }
 
       return success(res, {

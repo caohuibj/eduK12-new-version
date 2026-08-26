@@ -19,21 +19,85 @@ export interface ScoringTrial<TTrial> {
 /** Scorer 的标准返回：score + metrics + qualityFlags（三者在 D6 全部加密存储）。 */
 export interface CognitiveScoreResult {
   score: number
+  /** Optional display policy; omitted means the existing product-index behavior. */
+  showProductIndex?: boolean
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
+}
+
+export type CognitiveProfile = 'experience' | 'standard' | 'research'
+
+export type MetricDirection =
+  | 'higher_is_better'
+  | 'lower_is_better'
+  | 'descriptive'
+  | 'signed'
+  | 'target_range'
+
+export interface MetricDefinition {
+  key: string
+  label: string
+  shortLabel?: string
+  construct: string
+  description: string
+  unit: 'ms' | 'ratio' | 'count' | 'd-prime' | 'level' | 'score' | 'map'
+  valueType: 'number' | 'integer' | 'object' | 'array'
+  direction: MetricDirection
+  role: 'primary' | 'secondary' | 'quality' | 'research_only'
+  precision?: number
+  requiresQualityFlags?: string[]
+  availableProfiles: CognitiveProfile[]
+  export: { summary: boolean; label: string }
+}
+
+export interface QualityDefinition {
+  key: string
+  label: string
+  description: string
+}
+
+export interface CognitiveProfileDefinition {
+  profile: CognitiveProfile
+  estimatedMinutes: [number, number]
+  configPatch: Record<string, unknown>
+  reportCaveats: string[]
+}
+
+export interface SingleTaskReportDefinition {
+  title: string
+  headlineMetric?: string
+  primaryMetrics: string[]
+  secondaryMetrics: string[]
+  /** Defaults to true for existing tasks; descriptive tasks may suppress it. */
+  showProductIndex?: boolean
+  practicalTips?: string[]
+  disclaimer: string
 }
 
 /** 一个注册的 Cognitive Test 实现：版本键 + 双 Zod schema + 纯函数 scorer。 */
 export interface RegistryEntry<TConfig, TTrial> {
   testType: string
+  name: string
+  category: string
   engineVersion: string
   scoringVersion: string
+  randomizationAlgorithmVersion: string
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
   score(input: {
     config: TConfig
     trials: ScoringTrial<TTrial>[]
+    randomSeed?: string
   }): CognitiveScoreResult
+  profileDefinitionVersion: string
+  profiles: Record<CognitiveProfile, CognitiveProfileDefinition>
+  metricDefinitionVersion: string
+  metricDefinitions: Record<string, MetricDefinition>
+  qualityDefinitionVersion: string
+  qualityDefinitions: Record<string, QualityDefinition>
+  reportDefinitionVersion: string
+  reportDefinition: SingleTaskReportDefinition
+  recommendedForCreate?: boolean
 }
 
 /**

@@ -269,9 +269,16 @@ const StudentRegister: React.FC = () => {
             </button>
           </form>
 
+          <div className="mt-6 pt-6 border-t text-center">
+            <p className="text-sm text-gray-500 mb-3">已经有账号？</p>
+            <Link to="/student/login" className="inline-flex justify-center w-full btn-secondary">
+              已有账号，去登录
+            </Link>
+          </div>
+
           <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
             <p className="font-medium mb-1">💡 账号说明</p>
-            <p>注册完成后，账号有效期与课程期限一致。课程结束后账号将自动冻结。</p>
+            <p>注册后即可用该账号登录。结束课程不会冻结账号，你仍可参加其他课程。</p>
           </div>
         </div>
       </div>

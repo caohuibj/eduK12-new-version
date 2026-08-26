@@ -7,15 +7,18 @@ import {
   getParticipantKey,
 } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
-import { resolveCognitiveReference } from './reference'
+import { rejectWrapperForStandaloneUse } from './assignment.access'
+import { resolveCognitiveReferenceForResult } from './reference'
+import { buildCognitiveSingleTaskReport } from './single-task-report'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
  *
  * 边界（D4 §3 / §19）：不写 Trial、不评分、不返回 score/metrics；
- * 不创建 anonymous/guest session；不建跨设备 resume 协议；不建 server timer；
+ * 普通登录会话仍沿用课程成员资格；公开/综合测评匿名会话由 public.service 负责凭证和入口校验；不建 server timer；
  * 不引 Redis lock / websocket / heartbeat / fingerprint / device binding；
  * 不加新 migration。
  *
@@ -36,6 +39,8 @@ interface StartableContext {
     dueAt: Date | null
   }
   validatedConfig: unknown
+  configSnapshotEncrypted: string
+  frozenReport: FrozenReportSnapshot | null
   config: {
     id: string
     testType: string
@@ -53,15 +58,18 @@ interface StartableContext {
  */
 export const loadStartableAssignment = async (
   assignmentId: string,
-  userId: string
+  userId: string,
+  options: { allowCompositeWrapper?: boolean } = {},
 ): Promise<StartableContext> => {
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Assignment is not published')
+  if (!options.allowCompositeWrapper) rejectWrapperForStandaloneUse(assignment)
   if (!assignment.courseId) throw BAD_REQUEST('Assignment has no course')
 
   const course = await prisma.course.findUnique({ where: { id: assignment.courseId } })
   if (!course) throw NOT_FOUND('Course not found')
+  if (course.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
 
   const membership = await prisma.courseStudent.findUnique({
     where: { courseId_studentId: { courseId: assignment.courseId, studentId: userId } },
@@ -85,9 +93,28 @@ export const loadStartableAssignment = async (
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
 
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
-  const parsed = entry.configSchema.safeParse(config.config)
-  if (!parsed.success) {
-    throw BAD_REQUEST('CognitiveTestConfig does not match its registry schema')
+  let validatedConfig: unknown
+  let configSnapshotEncrypted: string
+  let frozenReport: FrozenReportSnapshot | null = null
+  if (assignment.resolvedConfigSnapshotEncrypted) {
+    const thawed = decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted)
+    const parsedFrozen = entry.configSchema.safeParse(thawed)
+    if (!parsedFrozen.success) {
+      throw BAD_REQUEST('冻结的 Profile 配置与任务 schema 不匹配')
+    }
+    if (assignment.resolvedConfigHash && hashResolvedConfig(parsedFrozen.data) !== assignment.resolvedConfigHash) {
+      throw BAD_REQUEST('冻结的 Profile 配置校验失败')
+    }
+    validatedConfig = parsedFrozen.data
+    configSnapshotEncrypted = assignment.resolvedConfigSnapshotEncrypted
+    frozenReport = readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
+  } else {
+    const parsed = entry.configSchema.safeParse(config.config)
+    if (!parsed.success) {
+      throw BAD_REQUEST('CognitiveTestConfig does not match its registry schema')
+    }
+    validatedConfig = parsed.data
+    configSnapshotEncrypted = encryptCognitivePayload(parsed.data)
   }
 
   return {
@@ -99,7 +126,9 @@ export const loadStartableAssignment = async (
       opensAt: assignment.opensAt,
       dueAt: assignment.dueAt,
     },
-    validatedConfig: parsed.data,
+    validatedConfig,
+    configSnapshotEncrypted,
+    frozenReport,
     config: {
       id: config.id,
       testType: config.testType,
@@ -125,8 +154,12 @@ const toRunnerPayload = (session: {
   scoringVersion: string
   configSnapshotEncrypted: string
   randomSeed: string
-}) => {
+  anonymousCode?: string | null
+  assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
+}, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
   const validatedConfig = decryptCognitivePayload<unknown>(session.configSnapshotEncrypted)
+  const report = frozenReport ?? readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
+  const entry = report ? null : requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
   return {
     sessionId: session.id,
     assignmentId: session.assignmentId,
@@ -138,6 +171,13 @@ const toRunnerPayload = (session: {
     scoringVersion: session.scoringVersion,
     config: validatedConfig,
     randomSeed: session.randomSeed,
+    profile: report?.profile ?? null,
+    reportCaveats: report?.reportCaveats ?? [],
+    metricDefinitions: report?.metricDefinitions ?? entry?.metricDefinitions,
+    qualityDefinitions: report?.qualityDefinitions ?? entry?.qualityDefinitions,
+    reportDefinition: report?.reportDefinition ?? entry?.reportDefinition,
+    ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
+    ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
   }
 }
 
@@ -149,8 +189,18 @@ export const createSession = async (userId: string, assignmentId: string) => {
   // 与 D5 "Trial 写入不重查资格" 的冻结思想一致）。
   const existing = await prisma.cognitiveSession.findFirst({
     where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+    include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } } },
   })
-  if (existing) return toRunnerPayload(existing)
+  if (existing) {
+    const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
+    if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
+    rejectWrapperForStandaloneUse(assignment)
+    if (assignment.courseId) {
+      const course = await prisma.course.findUnique({ where: { id: assignment.courseId }, select: { isLibrary: true } })
+      if (course?.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
+    }
+    return toRunnerPayload(existing)
+  }
 
   // 无 existing → 这是"新 attempt"，才走完整资格链。
   const ctx = await loadStartableAssignment(assignmentId, userId)
@@ -170,7 +220,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = encryptCognitivePayload(ctx.validatedConfig)
+  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
@@ -191,12 +241,13 @@ export const createSession = async (userId: string, assignmentId: string) => {
         randomSeed,
       },
     })
-    return toRunnerPayload(session)
+    return toRunnerPayload(session, undefined, false, ctx.frozenReport)
   } catch (err) {
     if (isPrismaUniqueViolation(err)) {
       // @@unique([assignmentId, participantKey, attemptNo]) 并发冲突 → 重读当前 session（不引 Redis lock）。
       const current = await prisma.cognitiveSession.findFirst({
         where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } } },
       })
       if (current) return toRunnerPayload(current)
       throw CONFLICT('Session already exists for this attempt')
@@ -206,7 +257,17 @@ export const createSession = async (userId: string, assignmentId: string) => {
 }
 
 export const getSession = async (userId: string, sessionId: string) => {
-  const session = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
+  const session = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      assignment: { select: { resolvedReportSnapshotEncrypted: true } },
+      trials: {
+        orderBy: { trialIndex: 'desc' },
+        take: 1,
+        select: { trialIndex: true },
+      },
+    },
+  })
   if (!session) throw NOT_FOUND('CognitiveSession not found')
   if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
 
@@ -222,29 +283,122 @@ export const getSession = async (userId: string, sessionId: string) => {
     const qualityFlags = session.qualityFlagsEncrypted
       ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
       : null
-    const report = (runnerPayload.config as { report?: Record<string, unknown> }).report ?? {}
+    const frozenReport = readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
+    const profile = frozenReport?.profile ?? runnerPayload.profile ?? null
     const reference = metrics && score !== null
-      ? resolveCognitiveReference({
+      ? resolveCognitiveReferenceForResult({
           testType: session.testType,
           metrics,
           score,
-          referenceMode: (report.referenceMode as 'none' | 'simulated' | 'literature' | undefined) ?? 'none',
-          referenceVersion: report.referenceVersion as string | undefined,
-          referenceBand: report.referenceBand as string | undefined,
+          qualityFlags: qualityFlags ?? undefined,
+          config: runnerPayload.config as Record<string, unknown>,
+          profile,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          configVersion: session.configVersion,
         })
       : undefined
+    const singleTaskReport = score !== null && metrics !== null && qualityFlags !== null
+      ? buildCognitiveSingleTaskReport({
+          testType: session.testType,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          configVersion: session.configVersion,
+          profile,
+          frozenReport,
+          score,
+          metrics,
+          qualityFlags,
+          reference: reference ?? null,
+        })
+      : null
     return {
       ...runnerPayload,
       status: session.status,
       finishedAt: session.finishedAt,
       result: score !== null && metrics !== null && qualityFlags !== null
-        ? { score, metrics, qualityFlags, reference }
+        ? { score, metrics, qualityFlags, reference, singleTaskReport }
         : null,
     }
   }
 
   // D4：IN_PROGRESS / ABANDONED / INVALID 只回运行信息 + decrypted config + randomSeed，不返回 score/metrics。
-  return toRunnerPayload(session)
+  // 综合测评允许登录学生跨设备续答，因此服务端提供下一个安全的试次索引。
+  const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
+  return toRunnerPayload(session, nextTrialIndex)
+}
+
+/**
+ * 公开/匿名会话读取。匿名参与不依赖登录态，而是通过综合测评的恢复凭证
+ * 或单个认知公开链接生成的 recoveryTokenHash 校验；服务端仍不返回任何密文。
+ */
+export const getPublicSession = async (recoveryTokenHash: string, sessionId: string) => {
+  const session = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      assignment: { select: { resolvedReportSnapshotEncrypted: true } },
+      compositeAttempt: { select: { recoveryTokenHash: true, userId: true } },
+      trials: {
+        orderBy: { trialIndex: 'desc' },
+        take: 1,
+        select: { trialIndex: true },
+      },
+    },
+  })
+  if (!session) throw NOT_FOUND('CognitiveSession not found')
+  const allowed = session.userId === null && (
+    session.recoveryTokenHash === recoveryTokenHash ||
+    session.compositeAttempt?.recoveryTokenHash === recoveryTokenHash
+  )
+  if (!allowed) throw FORBIDDEN('Recovery credential does not own this session')
+
+  const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
+  const runnerPayload = toRunnerPayload(session, nextTrialIndex, true)
+  if (session.status !== 'COMPLETED') return runnerPayload
+
+  const score = session.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
+  const metrics = session.metricsEncrypted
+    ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted)
+    : null
+  const qualityFlags = session.qualityFlagsEncrypted
+    ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted)
+    : null
+  const frozenReport = readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
+  const profile = frozenReport?.profile ?? runnerPayload.profile ?? null
+  const reference = metrics && score !== null
+    ? resolveCognitiveReferenceForResult({
+        testType: session.testType,
+        metrics,
+        score,
+        qualityFlags: qualityFlags ?? undefined,
+        config: runnerPayload.config as Record<string, unknown>,
+        profile,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+        configVersion: session.configVersion,
+      })
+    : undefined
+  const singleTaskReport = score !== null && metrics !== null && qualityFlags !== null
+    ? buildCognitiveSingleTaskReport({
+        testType: session.testType,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+        configVersion: session.configVersion,
+        profile,
+        frozenReport,
+        score,
+        metrics,
+        qualityFlags,
+        reference: reference ?? null,
+      })
+    : null
+  return {
+    ...runnerPayload,
+    finishedAt: session.finishedAt,
+    result: score !== null && metrics !== null && qualityFlags !== null
+      ? { score, metrics, qualityFlags, reference, singleTaskReport }
+      : null,
+  }
 }
 
 export const restartSession = async (userId: string, sessionId: string) => {
@@ -256,8 +410,14 @@ export const restartSession = async (userId: string, sessionId: string) => {
   }
 
   // restart 是**主动新 attempt** → 重新判定资格（尤其 dueAt / membership）。
-  const ctx = await loadStartableAssignment(session.assignmentId, userId)
-  const participantKey = getParticipantKey(userId)
+  const ctx = await loadStartableAssignment(session.assignmentId, userId, {
+    allowCompositeWrapper: Boolean(session.compositeAttemptId && session.compositeItemId),
+  })
+  // Composite sessions use an attempt/item-scoped participant key. Preserve
+  // the frozen key across restart; falling back to the standalone user key
+  // would disconnect the new Session from the Composite Attempt and also
+  // make the completion path unable to select it as the latest result.
+  const participantKey = session.participantKey
 
   const used = await prisma.cognitiveSession.count({ where: { assignmentId: session.assignmentId, participantKey } })
   if (used >= ctx.assignment.maxAttempts) {
@@ -266,7 +426,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = encryptCognitivePayload(ctx.validatedConfig)
+  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
@@ -291,6 +451,9 @@ export const restartSession = async (userId: string, sessionId: string) => {
           participantKey,
           participantSnapshotEncrypted,
           assignmentId: locked.assignmentId,
+          compositeAttemptId: locked.compositeAttemptId,
+          compositeItemId: locked.compositeItemId,
+          recoveryTokenHash: locked.recoveryTokenHash,
           configId: locked.configId,
           testType: locked.testType,
           attemptNo: newAttemptNo,
@@ -300,9 +463,10 @@ export const restartSession = async (userId: string, sessionId: string) => {
           engineVersion: locked.engineVersion,
           scoringVersion: locked.scoringVersion,
           randomSeed,
+          anonymousCode: locked.anonymousCode,
         },
       })
-    }).then((created) => toRunnerPayload(created))
+    }).then((created) => toRunnerPayload(created, undefined, false, ctx.frozenReport))
   } catch (err) {
     if (isPrismaUniqueViolation(err)) {
       const current = await prisma.cognitiveSession.findFirst({

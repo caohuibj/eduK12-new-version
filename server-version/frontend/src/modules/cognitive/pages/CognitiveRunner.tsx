@@ -1,7 +1,19 @@
-import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { cognitiveApi, publicCognitiveApi } from '../api'
+import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { useCognitiveSession } from '../core/useCognitiveSession'
 import { resolveRunner } from '../registry'
+
+const safeInternalReturnTo = (value: string | null, fallback: string) => {
+  if (!value) return fallback
+  try {
+    const decoded = decodeURIComponent(value)
+    return decoded.startsWith('/') && !decoded.startsWith('//') ? decoded : fallback
+  } catch {
+    return fallback
+  }
+}
 
 /**
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
@@ -11,7 +23,14 @@ import { resolveRunner } from '../registry'
 const CognitiveRunner: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
-  const controller = useCognitiveSession(sessionId ?? '')
+  const [searchParams] = useSearchParams()
+  const isPublic = searchParams.get('public') === '1'
+  const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
+  const sessionApi = useMemo(
+    () => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
+    [isPublic, recoveryToken]
+  )
+  const controller = useCognitiveSession(sessionId ?? '', sessionApi)
   const { state } = controller
 
   // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
@@ -21,7 +40,16 @@ const CognitiveRunner: React.FC = () => {
 
   if (state.status === 'COMPLETED') {
     // 完成态：结果页只读展示，不重新评分
-    if (sessionId) navigate(`/student/cognitive/sessions/${sessionId}/result`, { replace: true })
+    if (sessionId) {
+      const returnTo = searchParams.get('returnTo')
+      const target = safeInternalReturnTo(
+        returnTo,
+        isPublic
+          ? `/public/cognitive/sessions/${sessionId}/result?public=1`
+          : `/student/cognitive/sessions/${sessionId}/result`,
+      )
+      navigate(target, { replace: true })
+    }
     return null
   }
 
@@ -44,6 +72,11 @@ const CognitiveRunner: React.FC = () => {
         <p className="text-sm text-gray-400 mb-6">
           尝试 #{state.session?.attemptNo}（{state.session?.testType} / {state.session?.engineVersion}）
         </p>
+        {isPublic && recoveryToken && (
+          <p className="text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-3 mb-6">
+            匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存它，之后可在其他设备继续作答。
+          </p>
+        )}
         <button onClick={controller.start} className="btn-primary">
           开始测评
         </button>
@@ -105,6 +138,11 @@ const CognitiveRunner: React.FC = () => {
     const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total && !taskCompletes
     return (
       <div className="max-w-2xl mx-auto">
+        {isPublic && recoveryToken && (
+          <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
+            匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存它，之后可在其他设备继续作答。
+          </p>
+        )}
         <Runner
           taskContext={state.taskContext}
           trialIndex={state.trialIndex}

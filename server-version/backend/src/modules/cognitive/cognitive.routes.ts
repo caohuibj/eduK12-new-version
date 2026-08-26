@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
-import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
+import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
 import { UserRole } from '../../types'
 
 /**
@@ -9,6 +9,11 @@ import { UserRole } from '../../types'
  * `/assignments/my` 必须先于 `/assignments/:id` 注册。
  */
 const router = Router()
+
+router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
+router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
+router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
+router.patch('/configs/:id/access-policy', authenticate, requireAdmin, cognitiveController.updateAccessPolicy)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)
@@ -21,6 +26,16 @@ router.get('/assignments/:id', authenticate, cognitiveController.getAssignment)
 router.patch('/assignments/:id', authenticate, requireTeacher, cognitiveController.updateAssignment)
 router.post('/assignments/:id/publish', authenticate, requireTeacher, cognitiveController.publishAssignment)
 router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveController.archiveAssignment)
+
+// 单个认知任务公开链接（参与者不要求登录，恢复凭证只存哈希）
+router.get('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.listPublicTokens)
+router.post('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.createPublicToken)
+router.delete('/assignments/:id/public-tokens/:tokenId', authenticate, requireTeacher, cognitiveController.disablePublicToken)
+
+// 教师端数据导出（下载路径携带 assignmentId，控制器会再次校验归属）
+router.get('/assignments/:id/export/files/:fileName', authenticate, requireTeacher, cognitiveController.downloadExportFile)
+router.get('/assignments/:id/export/preview', authenticate, requireTeacher, cognitiveController.getExportPreview)
+router.post('/assignments/:id/export', authenticate, requireTeacher, cognitiveController.exportData)
 
 // D4 — Session / Attempt
 router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveController.createSession)

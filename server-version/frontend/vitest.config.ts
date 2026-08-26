@@ -9,6 +9,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: false, // 测试内显式 import { describe, it, expect } from 'vitest'
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/modules/cognitive/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 })

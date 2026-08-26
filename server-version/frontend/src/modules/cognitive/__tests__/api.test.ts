@@ -69,4 +69,17 @@ describe('cognitive api wrapper', () => {
     await cognitiveApi.completeSession('sess-1')
     expect(mockClient.post).toHaveBeenCalledWith('/cognitive/sessions/sess-1/complete', {})
   })
+
+  it('PATCH /cognitive/assignments/:id for wrapper title and instruction', async () => {
+    await cognitiveApi.updateAssignment('asg-1', { title: '壳标题', instruction: '仅综合测评使用' })
+    expect(mockClient.patch).toHaveBeenCalledWith('/cognitive/assignments/asg-1', {
+      title: '壳标题',
+      instruction: '仅综合测评使用',
+    })
+  })
+
+  it('PATCH /cognitive/configs/:id/access-policy', async () => {
+    await cognitiveApi.updateConfigAccessPolicy('cfg-1', 'GRANT')
+    expect(mockClient.patch).toHaveBeenCalledWith('/cognitive/configs/cfg-1/access-policy', { accessPolicy: 'GRANT' })
+  })
 })

@@ -30,6 +30,20 @@ const UserList: React.FC = () => {
     }
   }
 
+  const handleApprove = async (userId: string) => {
+    try {
+      const response = await apiClient.post(`/users/${userId}/approve-teacher`)
+      if (response.code === 0) {
+        alert('已通过该教师的注册审核')
+        fetchUsers()
+      } else {
+        alert(response.message || '审核失败')
+      }
+    } catch (error: any) {
+      alert(error.message || '审核失败')
+    }
+  }
+
   const handleExtend = async (userId: string, months: number = 12) => {
     try {
       setExtendingUser(userId)
@@ -195,7 +209,12 @@ const UserList: React.FC = () => {
                       </td>
                     )}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {user.isFrozen ? (
+                      {user.role === 'TEACHER' && user.teacherApproved === false ? (
+                        <span className="flex items-center text-orange-600 text-sm">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          待审核
+                        </span>
+                      ) : user.isFrozen ? (
                         <span className="flex items-center text-gray-500 text-sm">
                           <AlertCircle className="w-4 h-4 mr-1" />
                           已冻结
@@ -214,14 +233,25 @@ const UserList: React.FC = () => {
                     </td>
                     {activeTab === 'TEACHER' && (
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleExtend(user.id, 12)}
-                          disabled={extendingUser === user.id}
-                          className="text-sm text-primary hover:text-primary-dark flex items-center space-x-1"
-                        >
-                          <Clock className="w-4 h-4" />
-                          <span>{extendingUser === user.id ? '处理中...' : '延期1年'}</span>
-                        </button>
+                        <div className="flex items-center space-x-3">
+                          {user.teacherApproved === false && (
+                            <button
+                              onClick={() => handleApprove(user.id)}
+                              className="text-sm text-green-700 hover:text-green-800 flex items-center space-x-1"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              <span>通过</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleExtend(user.id, 12)}
+                            disabled={extendingUser === user.id}
+                            className="text-sm text-primary hover:text-primary-dark flex items-center space-x-1"
+                          >
+                            <Clock className="w-4 h-4" />
+                            <span>{extendingUser === user.id ? '处理中...' : '延期1年'}</span>
+                          </button>
+                        </div>
                       </td>
                     )}
                   </tr>

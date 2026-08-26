@@ -15,7 +15,7 @@ const CourseList: React.FC = () => {
   const [keyword, setKeyword] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
-  const [formData, setFormData] = useState({ title: '', description: '' })
+  const [formData, setFormData] = useState({ title: '', description: '', isLibrary: false })
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string>('')
   const [isUploadingCover, setIsUploadingCover] = useState(false)
@@ -61,14 +61,23 @@ const CourseList: React.FC = () => {
     }
   }
 
+  const coursePayload = () => {
+    const payload: { title: string; description: string; isLibrary?: boolean } = {
+      title: formData.title,
+      description: formData.description,
+    }
+    if (isAdmin) payload.isLibrary = formData.isLibrary
+    return payload
+  }
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await apiClient.post('/courses', formData)
+      const response = await apiClient.post('/courses', coursePayload())
       if (response.code === 0) {
         alert(`课程创建成功！课程码: ${response.data.courseCode}`)
         setShowCreateModal(false)
-        setFormData({ title: '', description: '' })
+        setFormData({ title: '', description: '', isLibrary: false })
         fetchCourses()
       }
     } catch (error: any) {
@@ -79,12 +88,15 @@ const CourseList: React.FC = () => {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingCourse) return
+    if (isAdmin && formData.isLibrary && !editingCourse.isLibrary) {
+      if (!window.confirm('标记为库课程后将停止招募，学生无法加入或作答。确定继续？')) return
+    }
 
     try {
-      const response = await apiClient.put(`/courses/${editingCourse.id}`, formData)
+      const response = await apiClient.put(`/courses/${editingCourse.id}`, coursePayload())
       if (response.code === 0) {
         setEditingCourse(null)
-        setFormData({ title: '', description: '' })
+        setFormData({ title: '', description: '', isLibrary: false })
         fetchCourses()
       }
     } catch (error: any) {
@@ -111,16 +123,14 @@ const CourseList: React.FC = () => {
   }
 
   const handleEndCourse = async (course: Course) => {
-    const confirmMsg = course.studentCount && course.studentCount > 0
-      ? `警告：结束课程将冻结该课程的 ${course.studentCount} 名学生账号！\n\n此操作不可撤销，确定要继续吗？`
-      : '确定要结束这门课程吗？\n\n此操作不可撤销。'
+    const confirmMsg = '确定要结束这门课程吗？\n\n结束后将停止招募，已加入的学生账号不会被冻结，他们仍可登录并参加其他课程。此操作不可撤销。'
 
     if (!window.confirm(confirmMsg)) return
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/end`)
       if (response.code === 0) {
-        alert(`课程已结束，${response.data?.frozenStudents || 0} 名学生账号已冻结`)
+        alert(response.message || '课程已结束')
         fetchCourses()
       }
     } catch (error: any) {
@@ -261,6 +271,7 @@ const CourseList: React.FC = () => {
     setFormData({
       title: course.title,
       description: course.description || '',
+      isLibrary: Boolean(course.isLibrary),
     })
     setCoverPreview(course.coverUrl || '')
     setCoverFile(null)
@@ -344,7 +355,16 @@ const CourseList: React.FC = () => {
   )
 
   // 获取课程状态标签
+  const canMarkLibrary = (course?: Course | null) => {
+    if (!isAdmin) return false
+    if (!course) return true
+    return course.creator?.role === 'ADMIN' || course.creatorId === user?.id
+  }
+
   const getCourseStatusLabel = (course: Course) => {
+    if (course.isLibrary) {
+      return { text: '库课程', className: 'bg-indigo-100 text-indigo-700' }
+    }
     if (course.status === 'COMPLETED') {
       return { text: '已完结', className: 'bg-gray-100 text-gray-700' }
     }
@@ -406,7 +426,7 @@ const CourseList: React.FC = () => {
         {activeTab === 'my' && (
           <button
             onClick={() => {
-              setFormData({ title: '', description: '' })
+              setFormData({ title: '', description: '', isLibrary: false })
               setShowCreateModal(true)
             }}
             className="btn-primary flex items-center space-x-2"
@@ -450,7 +470,12 @@ const CourseList: React.FC = () => {
                   )}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-1 break-words" title={course.title}>{course.title}</h3>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h3 className="text-lg font-semibold text-gray-800 break-words" title={course.title}>{course.title}</h3>
+                        {course.isLibrary && (
+                          <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-500">课程码: {course.courseCode}</p>
                     </div>
                     <div className="flex space-x-1 ml-2" onClick={(e) => e.stopPropagation()}>
@@ -473,7 +498,7 @@ const CourseList: React.FC = () => {
                         <Copy className="w-4 h-4" />
                       </button>
                       {/* 停止/恢复招募 */}
-                      {course.status === 'PUBLISHED' && (
+                      {course.status === 'PUBLISHED' && !course.isLibrary && (
                         course.isRecruiting ? (
                           <button
                             onClick={() => handleStopRecruiting(course)}
@@ -718,6 +743,20 @@ const CourseList: React.FC = () => {
                   placeholder="请输入课程描述（可选）"
                 />
               </div>
+              {canMarkLibrary(editingCourse) && (
+                <label className="flex items-start gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={formData.isLibrary}
+                    onChange={(e) => setFormData({ ...formData, isLibrary: e.target.checked })}
+                  />
+                  <span>
+                    标记为库课程
+                    <span className="block text-xs text-gray-500 mt-1">学生不可见、不可加入。管理员可在其上预编可复制的综合测评模板。</span>
+                  </span>
+                </label>
+              )}
               <div className="flex space-x-3 pt-4">
                 <button
                   type="button"

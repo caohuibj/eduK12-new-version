@@ -16,6 +16,8 @@ describe('cognitive registry', () => {
     expect(entry?.testType).toBe('fake')
     expect(entry?.engineVersion).toBe('1.0.0')
     expect(entry?.scoringVersion).toBe('1.0.0')
+    expect(entry?.profiles.standard.profile).toBe('standard')
+    expect(entry?.metricDefinitions.accuracy).toBeDefined()
   })
 
   it('fails lookup for a wrong engineVersion', () => {
@@ -40,6 +42,17 @@ describe('cognitive registry', () => {
   it('looks up the Milestone E Memory and Stroop entries', () => {
     expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.0.0')).toBe(true)
     expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.0.0')).toBe(true)
+  })
+
+  it('registers scoringVersion 1.1.0 without replacing 1.0.0', () => {
+    expect(hasCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')).toBe(true)
+    expect(hasCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')).toBe(true)
+    expect(hasCognitiveRegistryEntry('stroop', '1.0.0', '1.1.0')).toBe(true)
+    expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
+    expect(getCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')?.recommendedForCreate).toBe(true)
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')?.metricDefinitions.totalCorrectTrials).toBeDefined()
+    expect(getCognitiveRegistryEntry('stroop', '1.0.0', '1.1.0')?.profiles.standard.configPatch.totalTrials).toBe(40)
+    expect(getCognitiveRegistryEntry('memory', '1.0.0', '1.1.0')?.metricDefinitions.perseverativeTrialCount).toBeDefined()
   })
 
   it('never falls back to the latest version for a wrong scoringVersion', () => {

@@ -1,12 +1,13 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
-import { UserRole, AssignmentStatus, SubmissionStatus, Question } from '../types'
+import { UserRole, AssignmentStatus, SubmissionStatus, CourseStudentStatus, Question } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
+import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -66,9 +67,17 @@ export const assignmentController = {
         }
       }
 
-      // 学生只能看到已发布的作业
+      // 学生只能看到自己已加入课程中的已发布作业
       if (userRole === UserRole.STUDENT) {
         where.status = AssignmentStatus.PUBLISHED
+        where.course = {
+          students: {
+            some: {
+              studentId: userId,
+              status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+            },
+          },
+        }
       }
 
       // 教师只能看到自己课程的作业，管理员可以看到所有
@@ -260,6 +269,9 @@ export const assignmentController = {
               title: true,
               courseCode: true,
               creatorId: true,
+              shares: {
+                select: { sharedTo: true },
+              },
             }
           }
         }
@@ -269,9 +281,16 @@ export const assignmentController = {
         return notFound(res, '作业不存在')
       }
 
-      // 学生只能看到已发布的作业
-      if (userRole === UserRole.STUDENT && assignment.status !== AssignmentStatus.PUBLISHED) {
-        return forbidden(res, '无权限查看此作业')
+      if (userRole === UserRole.STUDENT) {
+        if (!userId || !(await hasActiveCourseMembership(assignment.course.id, userId))) {
+          return forbidden(res, '您不是该课程的学员')
+        }
+        // 学生只能看到已发布的作业
+        if (assignment.status !== AssignmentStatus.PUBLISHED) {
+          return forbidden(res, '无权限查看此作业')
+        }
+      } else if (!canAccessCourseContent(assignment.course, userId, userRole)) {
+        return forbidden(res, '您没有权限访问此作业')
       }
 
       // 查询学生的提交
@@ -285,8 +304,11 @@ export const assignmentController = {
         })
       }
 
+      const { shares: _shares, ...course } = assignment.course
+
       return success(res, {
         ...assignment,
+        course,
         mySubmission,
       })
     } catch (err) {
@@ -422,8 +444,16 @@ export const assignmentController = {
         return notFound(res, '作业不存在')
       }
 
+      if (req.user?.role !== UserRole.STUDENT || !(await hasActiveCourseMembership(assignment.courseId, userId))) {
+        return forbidden(res, '您不是该课程的学员')
+      }
+
       if (assignment.status !== AssignmentStatus.PUBLISHED) {
         return error(res, '作业未发布')
+      }
+
+      if (assignment.deadline && new Date() > assignment.deadline) {
+        return error(res, Messages.ASSIGNMENT.DEADLINE_PASSED)
       }
 
       // 检查是否已提交
@@ -786,6 +816,23 @@ export const assignmentController = {
         return error(res, '未登录')
       }
 
+      if (req.user?.role !== UserRole.STUDENT) {
+        return forbidden(res, '仅学生可以查看自己的提交')
+      }
+
+      const assignment = await prisma.assignment.findUnique({
+        where: { id },
+        select: { courseId: true },
+      })
+
+      if (!assignment) {
+        return notFound(res, '作业不存在')
+      }
+
+      if (!(await hasActiveCourseMembership(assignment.courseId, userId))) {
+        return forbidden(res, '您不是该课程的学员')
+      }
+
       const submission = await prisma.submission.findFirst({
         where: {
           assignmentId: id,
@@ -891,4 +938,3 @@ export const assignmentController = {
     }
   }
 }
-

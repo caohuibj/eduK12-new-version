@@ -24,6 +24,10 @@ export interface LockedSessionRow {
   participantKey: string
   participantSnapshotEncrypted: string | null
   assignmentId: string | null
+  compositeAttemptId: string | null
+  compositeItemId: string | null
+  recoveryTokenHash: string | null
+  anonymousCode: string | null
   configId: string
   testType: string
   attemptNo: number
@@ -49,6 +53,10 @@ interface RawSessionRow {
   participant_key: string
   participant_snapshot_encrypted: string | null
   assignment_id: string | null
+  composite_attempt_id: string | null
+  composite_item_id: string | null
+  recovery_token_hash: string | null
+  anonymous_code: string | null
   config_id: string
   test_type: string
   attempt_no: number
@@ -80,6 +88,7 @@ export const lockSession = async (
   const rows = await tx.$queryRaw<RawSessionRow[]>(Prisma.sql`
     SELECT
       id, user_id, participant_key, participant_snapshot_encrypted, assignment_id,
+      composite_attempt_id, composite_item_id, recovery_token_hash, anonymous_code,
       config_id, test_type, attempt_no, status, started_at, finished_at,
       score_encrypted, metrics_encrypted, quality_flags_encrypted, config_version,
       config_snapshot_encrypted, engine_version, scoring_version, random_seed,
@@ -96,6 +105,10 @@ export const lockSession = async (
     participantKey: r.participant_key,
     participantSnapshotEncrypted: r.participant_snapshot_encrypted,
     assignmentId: r.assignment_id,
+    compositeAttemptId: r.composite_attempt_id,
+    compositeItemId: r.composite_item_id,
+    recoveryTokenHash: r.recovery_token_hash,
+    anonymousCode: r.anonymous_code,
     configId: r.config_id,
     testType: r.test_type,
     attemptNo: r.attempt_no,

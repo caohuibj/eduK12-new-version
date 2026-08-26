@@ -1,0 +1,184 @@
+{
+  "version": "round1-scoring-v1",
+  "reaction": {
+    "score": 70,
+    "metrics": {
+      "totalTrials": 5,
+      "medianRtMs": 350,
+      "meanRtMs": 350,
+      "sdRtMs": 70.71067811865476,
+      "rtICV": 0.20203050891044216,
+      "fastestRtMs": 250,
+      "missCount": 0,
+      "missRate": 0,
+      "prematureCount": 1,
+      "validTrialCount": 5
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientValidTrials": false,
+      "highMissRate": false,
+      "interrupted": false,
+      "excessivePremature": true,
+      "extremeRtPattern": false
+    }
+  },
+  "memory": {
+    "score": 60,
+    "metrics": {
+      "maxSpan": 3,
+      "levelsPassed": 2,
+      "firstTryPassCount": 2,
+      "trialCount": 6,
+      "interruptedCount": 1,
+      "medianResponseDurationMs": 150,
+      "totalCorrectTrials": 2,
+      "perseverativeTrialCount": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "interrupted": true,
+      "insufficientCompletedLevels": false,
+      "invalidSequencePattern": false
+    }
+  },
+  "stroop": {
+    "score": 100,
+    "metrics": {
+      "accuracy": 1,
+      "congruentAccuracy": 1,
+      "incongruentAccuracy": 1,
+      "medianRtCongruent": 325,
+      "medianRtIncongruent": 525,
+      "stroopEffectMs": 200,
+      "errorCost": 0,
+      "timeoutCount": 0,
+      "validCongruentRtCount": 2,
+      "validIncongruentRtCount": 2
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientValidCongruentRt": false,
+      "insufficientValidIncongruentRt": false,
+      "interrupted": false,
+      "lowAccuracy": false
+    }
+  },
+  "gonogo": {
+    "score": 80,
+    "metrics": {
+      "commissionRate": 0,
+      "dPrime": 2.433,
+      "goMedianRtMs": 300,
+      "hitRate": 1,
+      "omissionRate": 0,
+      "commissionErrors": 0,
+      "goTrialCount": 6,
+      "nogoTrialCount": 2
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientNoGoTrials": false,
+      "excessiveOmissions": false,
+      "extremeCommissionRate": false,
+      "interrupted": false
+    }
+  },
+  "cpt": {
+    "score": 91,
+    "metrics": {
+      "dPrime": 2.795,
+      "omissionRate": 0,
+      "commissionRate": 0,
+      "rtICV": 0,
+      "hitMedianRtMs": 280,
+      "hitRtSdMs": 0,
+      "blockSlopeRt": null,
+      "blockSlopeOmission": null,
+      "perseverationRate": 0,
+      "targetCount": 3,
+      "hitCount": 3
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientTargets": false,
+      "highOmissionRate": false,
+      "highPerseverationRate": false,
+      "interrupted": false
+    }
+  },
+  "nback": {
+    "score": 89,
+    "metrics": {
+      "dPrimeByN": { "1": 3.115 },
+      "maxReliableN": 1,
+      "hitRateByN": { "1": 1 },
+      "falseAlarmRateByN": { "1": 0 },
+      "medianRtByN": { "1": 320 },
+      "loadCostDPrime": null
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientTargetsByN": false,
+      "ceilingOrFloorByN": true,
+      "excessiveOmissions": false,
+      "interrupted": false
+    }
+  },
+  "corsi": {
+    "score": 75,
+    "metrics": {
+      "maxSpan": 3,
+      "totalCorrectTrials": 2,
+      "firstTryPassCount": 1,
+      "medianResponseDurationMs": 950,
+      "sequenceErrorDistance": 1,
+      "trialCount": 4
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientCompletedLevels": false,
+      "invalidBlockSequence": false,
+      "interrupted": false
+    }
+  },
+  "sst": {
+    "score": 66,
+    "metrics": {
+      "ssrtMs": 195,
+      "pRespondStop": 0.5,
+      "goMedianRtMs": 420,
+      "goOmissionRate": 0,
+      "goChoiceErrorRate": 0,
+      "meanSsdMs": 225,
+      "unsuccessfulStopRtMs": 300
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientStopTrials": false,
+      "pRespondStopOutOfRange": false,
+      "highGoOmission": false,
+      "strategicSlowingSuspected": false,
+      "interrupted": false
+    }
+  },
+  "taskswitch": {
+    "score": 85,
+    "metrics": {
+      "switchCostRtMs": 120,
+      "switchCostAccuracy": 0,
+      "medianRtSwitch": 520,
+      "medianRtRepeat": 400,
+      "accuracySwitch": 1,
+      "accuracyRepeat": 1,
+      "mixingCost": null
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientSwitchTrials": false,
+      "insufficientRepeatTrials": false,
+      "lowAccuracy": false,
+      "interrupted": false
+    }
+  }
+}

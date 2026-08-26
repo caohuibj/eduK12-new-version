@@ -34,6 +34,21 @@ describe('reaction scorer — validation', () => {
     expect(() => scoreReactionV1({ config, trials })).toThrow(CognitiveScoringInputError)
   })
 
+  it('ignores a trailing extra trial beyond totalTrials', () => {
+    const trials = [...buildTrials(5, () => 300), {
+      trialIndex: 5,
+      payload: {
+        foreperiodMs: 800,
+        rtMs: 280,
+        prematureCount: 0,
+        interrupted: false,
+        inputMode: 'pointer' as const,
+      },
+    }]
+    const res = scoreReactionV1({ config, trials })
+    expect(res.metrics.validTrialCount).toBe(5)
+  })
+
   it('throws on non-contiguous trialIndex', () => {
     const trials = buildTrials(5, () => 300).map((t, i) => (i === 4 ? { ...t, trialIndex: 9 } : t))
     expect(() => scoreReactionV1({ config, trials })).toThrow(CognitiveScoringInputError)
@@ -144,5 +159,26 @@ describe('reaction scorer — Product Index (§35 piecewise)', () => {
   it('clamps very slow RT to 30', () => {
     expect(indexFor(2000)).toBe(30)
     expect(indexFor(9999)).toBe(30)
+  })
+})
+
+describe('reaction scorer 1.1.0 quality flags', () => {
+  it('keeps v1 metrics and adds excessivePremature / extremeRtPattern', async () => {
+    const { scoreReactionV1_1 } = await import('../../modules/cognitive/scoring/reaction.v1_1')
+    const trials = buildTrials(5, () => 300)
+    trials[0].payload.prematureCount = 1
+    const res = scoreReactionV1_1({ config, trials })
+    expect(res.metrics.medianRtMs).toBe(300)
+    expect(res.qualityFlags.excessivePremature).toBe(true)
+    expect(res.qualityFlags.extremeRtPattern).toBe(false)
+    expect(res.qualityFlags.interpretable).toBe(true)
+  })
+
+  it('flags extremeRtPattern when ICV exceeds 0.8', async () => {
+    const { scoreReactionV1_1 } = await import('../../modules/cognitive/scoring/reaction.v1_1')
+    const trials = buildTrials(5, (i) => [100, 100, 100, 100, 1800][i])
+    const res = scoreReactionV1_1({ config, trials })
+    expect(res.qualityFlags.extremeRtPattern).toBe(true)
+    expect(scoreReactionV1({ config, trials }).qualityFlags.extremeRtPattern).toBeUndefined()
   })
 })

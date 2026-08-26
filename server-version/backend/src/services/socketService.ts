@@ -15,6 +15,7 @@ import { createAdapter } from '@socket.io/redis-adapter'
 import { createClient } from 'redis'
 import { logger } from '../utils/logger'
 import { getRedisUrl } from '../config/redis'
+import { config } from '../config'
 
 export class SocketService {
   private io: Server | null = null
@@ -31,7 +32,7 @@ export class SocketService {
     
     this.io = new Server(server, {
       cors: {
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: config.corsOrigin,
         methods: ['GET', 'POST'],
         credentials: true,
       },
@@ -117,8 +118,11 @@ export class SocketService {
       
       // 关闭 Socket.IO
       if (this.io) {
-        this.io.close(() => {
-          logger.info('Socket.IO 服务已关闭')
+        await new Promise<void>((resolve) => {
+          this.io!.close(() => {
+            logger.info('Socket.IO 服务已关闭')
+            resolve()
+          })
         })
       }
     } catch (error) {

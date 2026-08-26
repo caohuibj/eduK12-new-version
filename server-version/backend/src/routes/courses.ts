@@ -52,6 +52,7 @@ router.get('/shared-to-me', authenticate, courseController.getSharedToMe)
 // 动态路由（:id）放在静态路由之后
 router.get('/:id', authenticate, courseController.detail)
 router.put('/:id', authenticate, requireTeacher, courseController.update)
+router.patch('/:id', authenticate, requireTeacher, courseController.update)
 router.delete('/:id', authenticate, requireTeacher, courseController.delete)
 router.post('/join', authenticate, courseController.join)
 

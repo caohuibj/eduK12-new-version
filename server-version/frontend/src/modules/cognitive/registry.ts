@@ -4,6 +4,27 @@ import { fakeRegistryEntry } from './tasks/fake/fake.registry'
 import { reactionRegistryEntry } from './tasks/reaction/reaction.registry'
 import { memoryRegistryEntry } from './tasks/memory/memory.registry'
 import { stroopRegistryEntry } from './tasks/stroop/stroop.registry'
+import { gonogoRegistryEntry } from './tasks/gonogo/gonogo.registry'
+import { cptRegistryEntry } from './tasks/cpt/cpt.registry'
+import { nbackRegistryEntry } from './tasks/nback/nback.registry'
+import { corsiRegistryEntry } from './tasks/corsi/corsi.registry'
+import { sstRegistryEntry } from './tasks/sst/sst.registry'
+import { taskswitchRegistryEntry } from './tasks/taskswitch/taskswitch.registry'
+import { patterncompareRegistryEntry } from './tasks/patterncompare/patterncompare.registry'
+import { flankerRegistryEntry } from './tasks/flanker/flanker.registry'
+import { cardsortRegistryEntry } from './tasks/cardsort/cardsort.registry'
+import { digitbackwardRegistryEntry } from './tasks/digitbackward/digitbackward.registry'
+import { picturesequenceRegistryEntry } from './tasks/picturesequence/picturesequence.registry'
+import { pairedassociateRegistryEntry } from './tasks/pairedassociate/pairedassociate.registry'
+import { matrixRegistryEntry } from './tasks/matrix/matrix.registry'
+import { mentalrotationRegistryEntry } from './tasks/mentalrotation/mentalrotation.registry'
+import { towerRegistryEntry } from './tasks/tower/tower.registry'
+import { trailmakingRegistryEntry } from './tasks/trailmaking/trailmaking.registry'
+import { reversallearningRegistryEntry } from './tasks/reversallearning/reversallearning.registry'
+import { bartRegistryEntry } from './tasks/bart/bart.registry'
+import { wordlistRegistryEntry } from './tasks/wordlist/wordlist.registry'
+import { lexicaldecisionRegistryEntry } from './tasks/lexicaldecision/lexicaldecision.registry'
+import { emotionrecognitionRegistryEntry } from './tasks/emotionrecognition/emotionrecognition.registry'
 
 /**
  * 前端 Cognitive Registry（Stage B v1.1 §16）。
@@ -38,6 +59,7 @@ export interface ReportDefinition {
   headlineMetric: string
   summaryMetrics: string[]
   indexLabel?: string
+  showProductIndex?: boolean
   practicalTips?: string[]
   disclaimer?: string
 }
@@ -84,3 +106,24 @@ registerCognitiveRunner(memoryRegistryEntry)
 
 // 注册 Stroop Test：stroop / 1.0.0（Milestone E Session 4）
 registerCognitiveRunner(stroopRegistryEntry)
+registerCognitiveRunner(gonogoRegistryEntry)
+registerCognitiveRunner(cptRegistryEntry)
+registerCognitiveRunner(nbackRegistryEntry)
+registerCognitiveRunner(corsiRegistryEntry)
+registerCognitiveRunner(sstRegistryEntry)
+registerCognitiveRunner(taskswitchRegistryEntry)
+registerCognitiveRunner(patterncompareRegistryEntry)
+registerCognitiveRunner(flankerRegistryEntry)
+registerCognitiveRunner(cardsortRegistryEntry)
+registerCognitiveRunner(digitbackwardRegistryEntry)
+registerCognitiveRunner(picturesequenceRegistryEntry)
+registerCognitiveRunner(pairedassociateRegistryEntry)
+registerCognitiveRunner(matrixRegistryEntry)
+registerCognitiveRunner(mentalrotationRegistryEntry)
+registerCognitiveRunner(towerRegistryEntry)
+registerCognitiveRunner(trailmakingRegistryEntry)
+registerCognitiveRunner(reversallearningRegistryEntry)
+registerCognitiveRunner(bartRegistryEntry)
+registerCognitiveRunner(wordlistRegistryEntry)
+registerCognitiveRunner(lexicaldecisionRegistryEntry)
+registerCognitiveRunner(emotionrecognitionRegistryEntry)

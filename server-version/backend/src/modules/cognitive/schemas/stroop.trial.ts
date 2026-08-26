@@ -11,7 +11,7 @@ export const stroopTrialSchema = z
     word: wordSchema,
     inkColor: colorSchema,
     response: colorSchema.nullable(),
-    rtMs: z.number().int().min(0).nullable(),
+    rtMs: z.number().min(0).nullable().transform((value) => (value == null ? null : Math.round(value))),
     interrupted: z.boolean(),
   })
   .strict()

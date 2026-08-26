@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../api/client'
-import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Users, ClipboardList, Download, X } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Users, ClipboardList, Download, X, UserPlus } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import TagBadge from '../components/TagBadge'
 import TagFilter from '../components/TagFilter'
+import MaterialGrantModal from '../components/MaterialGrantModal'
 
 interface Scale {
   id: string
@@ -15,6 +16,7 @@ interface Scale {
   estimatedTime: number | null
   instruction: string | null
   tags?: string[]
+  source?: 'owned' | 'granted' | 'other'
   createdAt: string
   updatedAt: string
   creator: {
@@ -56,6 +58,7 @@ const ScaleList: React.FC = () => {
     dateEnd: '',
     format: 'csv' as 'csv' | 'sav' | 'spss'
   })
+  const [grantTarget, setGrantTarget] = useState<Scale | null>(null)
 
   useEffect(() => {
     fetchScales()
@@ -65,7 +68,7 @@ const ScaleList: React.FC = () => {
   const fetchScales = async () => {
     try {
       setLoading(true)
-      const response = await apiClient.get<{ list: Scale[]; total: number }>('/scales')
+      const response = await apiClient.get<{ list: Scale[]; total: number }>('/scales?page=1&pageSize=100')
       if (response.code === 0) {
         setScales(response.data.list)
       } else {
@@ -319,7 +322,12 @@ const ScaleList: React.FC = () => {
                 <tr key={scale.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{scale.name}</div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="text-sm font-medium text-gray-900">{scale.name}</div>
+                        {scale.source === 'granted' && (
+                          <span className="px-2 py-0.5 text-xs rounded bg-emerald-100 text-emerald-700">管理员授权 · 只读</span>
+                        )}
+                      </div>
                       <div className="text-sm text-gray-500">{scale.code}</div>
                       {scale.course && (
                         <div className="text-xs text-blue-600 mt-1">
@@ -362,48 +370,63 @@ const ScaleList: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
-                      <Link
-                        to={`/scales/${scale.id}`}
-                        className="text-primary hover:text-primary/80"
-                        title="编辑"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                      {scale.status === 'DRAFT' && (
-                        <button
-                          onClick={() => handlePublish(scale.id)}
-                          className="text-green-600 hover:text-green-800"
-                          title="发布"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                      )}
-                      {scale.status === 'PUBLISHED' && (
-                        <button
-                          onClick={() => handleDeprecate(scale.id)}
-                          className="text-yellow-600 hover:text-yellow-800"
-                          title="废弃"
-                        >
-                          <EyeOff className="w-4 h-4" />
-                        </button>
-                      )}
-                      {scale._count.assessments > 0 && (
-                        <button
-                          onClick={() => handleOpenExport(scale.id)}
-                          className="text-blue-600 hover:text-blue-800"
-                          title="导出数据"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      )}
-                      {scale._count.assessments === 0 && scale.status === 'DRAFT' && (
-                        <button
-                          onClick={() => handleDelete(scale.id, scale.name)}
-                          className="text-red-600 hover:text-red-800"
-                          title="删除"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      {scale.source === 'granted' ? (
+                        <span className="text-xs text-gray-400">只读</span>
+                      ) : (
+                        <>
+                          <Link
+                            to={`/scales/${scale.id}`}
+                            className="text-primary hover:text-primary/80"
+                            title="编辑"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                          {scale.status === 'DRAFT' && (
+                            <button
+                              onClick={() => handlePublish(scale.id)}
+                              className="text-green-600 hover:text-green-800"
+                              title="发布"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          )}
+                          {scale.status === 'PUBLISHED' && (
+                            <button
+                              onClick={() => handleDeprecate(scale.id)}
+                              className="text-yellow-600 hover:text-yellow-800"
+                              title="废弃"
+                            >
+                              <EyeOff className="w-4 h-4" />
+                            </button>
+                          )}
+                          {scale._count.assessments > 0 && (
+                            <button
+                              onClick={() => handleOpenExport(scale.id)}
+                              className="text-blue-600 hover:text-blue-800"
+                              title="导出数据"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          )}
+                          {scale._count.assessments === 0 && scale.status === 'DRAFT' && (
+                            <button
+                              onClick={() => handleDelete(scale.id, scale.name)}
+                              className="text-red-600 hover:text-red-800"
+                              title="删除"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                          {isAdmin && scale.status === 'PUBLISHED' && (
+                            <button
+                              onClick={() => setGrantTarget(scale)}
+                              className="text-indigo-600 hover:text-indigo-800"
+                              title="授权给教师"
+                            >
+                              <UserPlus className="w-4 h-4" />
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </td>
@@ -576,6 +599,14 @@ const ScaleList: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      {grantTarget && (
+        <MaterialGrantModal
+          resourceType="SCALE"
+          resourceId={grantTarget.id}
+          resourceName={grantTarget.name}
+          onClose={() => setGrantTarget(null)}
+        />
       )}
     </div>
   )

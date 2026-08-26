@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express'
 import { verifyToken } from '../utils/jwt'
 import { JwtPayload, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
+import { prisma } from '../config/database'
+import { inactiveAccountMessage } from '../utils/accountStatus'
 
 // Extend Express Request
 declare global {
@@ -12,40 +14,70 @@ declare global {
   }
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return unauthorized(res, '缺少认证令牌')
-  }
+const ACCOUNT_STATUS_SELECT = {
+  isActive: true,
+  isFrozen: true,
+  expiresAt: true,
+  role: true,
+  teacherApproved: true,
+} as const
 
-  const token = authHeader.substring(7)
-  const payload = verifyToken(token)
-
-  if (!payload) {
-    return unauthorized(res, '无效的认证令牌')
-  }
-
-  req.user = payload
-  next()
+const loadAccountStatus = async (userId: string) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: ACCOUNT_STATUS_SELECT,
+  })
 }
 
-// 可选认证中间件 - 有token就验证，没有也允许访问
-export const optionalAuthenticate = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization
-  
-  // 如果有 token，尝试验证
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return unauthorized(res, '缺少认证令牌')
+    }
+
     const token = authHeader.substring(7)
     const payload = verifyToken(token)
-    
-    if (payload) {
-      req.user = payload
+
+    if (!payload) {
+      return unauthorized(res, '无效的认证令牌')
     }
+
+    const user = await loadAccountStatus(payload.userId)
+    const rejection = inactiveAccountMessage(user)
+    if (rejection) {
+      return unauthorized(res, rejection)
+    }
+
+    req.user = payload
+    next()
+  } catch (err) {
+    next(err)
   }
-  
-  // 无论是否有 token，都继续执行
-  next()
+}
+
+// 可选认证中间件 - 有有效且未停用的 token 才挂上 req.user；课堂等公开入口不因冻结账号 401。
+export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const payload = verifyToken(token)
+
+      if (payload) {
+        const user = await loadAccountStatus(payload.userId)
+        if (!inactiveAccountMessage(user)) {
+          req.user = payload
+        }
+      }
+    }
+
+    next()
+  } catch (err) {
+    next(err)
+  }
 }
 
 export const requireRole = (...roles: UserRole[]) => {
@@ -64,3 +96,16 @@ export const requireRole = (...roles: UserRole[]) => {
 
 export const requireAdmin = requireRole(UserRole.ADMIN)
 export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
+
+/** Allow a user to access only their own record, unless they are an admin. */
+export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return unauthorized(res)
+  }
+
+  if (req.user.role !== UserRole.ADMIN && req.user.userId !== req.params.id) {
+    return forbidden(res, '无权限查看此用户')
+  }
+
+  next()
+}

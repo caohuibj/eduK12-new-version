@@ -59,7 +59,7 @@ describe('cognitive assignment API', () => {
   it('forbids STUDENT from teacher-only create', async () => {
     const req = makeReq({
       user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
-      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x', profile: 'standard' },
     })
     const res = makeRes()
     // controller 依赖 route 中间件 requireTeacher；service 层也二次校验
@@ -69,6 +69,15 @@ describe('cognitive assignment API', () => {
     })
     await cognitiveController.createAssignment(req, res)
     expect(res.statusCode).toBe(403)
+  })
+
+  it('returns 400 when profile is omitted from create', async () => {
+    const req = makeReq({
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+    })
+    const res = makeRes()
+    await cognitiveController.createAssignment(req, res)
+    expect(res.statusCode).toBe(400)
   })
 
   it('returns 400 when strict schema rejects forged fields', async () => {
@@ -101,9 +110,21 @@ describe('cognitive assignment API', () => {
     expect(res.statusCode).toBe(400)
   })
 
+  it('lists published assignments even when the client sends a cache-buster query', async () => {
+    const req = makeReq({ query: { status: 'PUBLISHED', _t: '1787380000000' } })
+    const res = makeRes()
+    ;(assignmentService.listTeacherAssignments as any).mockResolvedValue([{ id: 'asg-1', title: '反应时（体验）', status: 'PUBLISHED' }])
+    await cognitiveController.listAssignments(req, res)
+    expect(res.body.code).toBe(0)
+    expect(assignmentService.listTeacherAssignments).toHaveBeenCalledWith('teacher-1', UserRole.TEACHER, {
+      status: 'PUBLISHED',
+    })
+    expect(res.body.data).toEqual([{ id: 'asg-1', title: '反应时（体验）', status: 'PUBLISHED' }])
+  })
+
   it('returns code:0 with data on success', async () => {
     const req = makeReq({
-      body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
+      body: { courseId: 'course-1', configId: 'config-1', title: 'x', profile: 'standard' },
     })
     const res = makeRes()
     ;(assignmentService.createAssignment as any).mockResolvedValue({ id: 'asg-1', status: 'DRAFT' })

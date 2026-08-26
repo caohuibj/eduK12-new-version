@@ -22,9 +22,12 @@ fi
 # 配置变量（请修改以下值）
 DOMAIN="${DOMAIN:-}"                          # 你的域名，如 edu.example.com
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@localhost}" # 管理员邮箱
-DB_PASSWORD="${DB_PASSWORD:-$(openssl rand -base64 16)}"  # 数据库密码（自动生成）
-JWT_SECRET="${JWT_SECRET:-$(openssl rand -base64 32)}"    # JWT密钥（自动生成）
-ADMIN_PASSWORD="${ADMIN_PASSWORD:-Admin123!@#}"           # 后台管理员密码
+DB_PASSWORD="${DB_PASSWORD:-$(openssl rand -hex 24)}"     # 数据库密码（自动生成）
+JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"       # JWT密钥（自动生成）
+DATA_ENCRYPTION_KEY="${DATA_ENCRYPTION_KEY:-$(openssl rand -hex 32)}"
+ADMIN_USERNAME="${ADMIN_USERNAME:-admin}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(openssl rand -hex 24)}" # 后台管理员密码
+CORS_ORIGIN="${CORS_ORIGIN:-http://${DOMAIN:-140.143.146.97}}"
 
 # COS配置（可选）
 COS_SECRET_ID="${COS_SECRET_ID:-}"
@@ -99,8 +102,12 @@ JWT_SECRET=$JWT_SECRET
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=52428800
-ADMIN_USERNAME=admin
+ADMIN_USERNAME=$ADMIN_USERNAME
 ADMIN_PASSWORD=$ADMIN_PASSWORD
+DATA_ENCRYPTION_KEY=$DATA_ENCRYPTION_KEY
+COGNITIVE_MODULE_ENABLED=false
+TRUST_PROXY_HOPS=1
+CORS_ORIGIN=$CORS_ORIGIN
 REDIS_URL=redis://localhost:6379
 VIDEO_LOW_POWER_MODE=true
 VIDEO_RESOLUTION=480p
@@ -111,6 +118,20 @@ TEMP_DIR=/tmp/videos
 MAX_DOWNLOAD_SIZE=2147483648
 DOWNLOAD_TIMEOUT=900000
 EOF
+
+CREDENTIALS_FILE="/root/.ptool-credentials"
+umask 077
+cat > "$CREDENTIALS_FILE" << EOF
+PTool deployment credentials
+============================
+Admin username: $ADMIN_USERNAME
+Admin password: $ADMIN_PASSWORD
+Database password: $DB_PASSWORD
+JWT secret: $JWT_SECRET
+Data encryption key: $DATA_ENCRYPTION_KEY
+============================
+EOF
+info "凭据已保存到受保护文件: $CREDENTIALS_FILE"
 
 if [ -n "$COS_SECRET_ID" ]; then
     cat >> .env << EOF
@@ -133,6 +154,7 @@ cd /opt/ptool/server-version/backend
 npm install
 npx prisma migrate deploy
 npx prisma generate
+ADMIN_USERNAME="$ADMIN_USERNAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" npm run db:seed
 npm run build
 
 # 10. 构建前端
@@ -218,11 +240,7 @@ fi
 # 完成
 step "========== 部署完成 =========="
 info "访问地址: http://${DOMAIN:-140.143.146.97}"
-info "后台登录: 用户名 admin, 密码 $ADMIN_PASSWORD"
-info "数据库密码: $DB_PASSWORD"
-info "JWT密钥: $JWT_SECRET"
-info ""
-info "请保存以上密码信息！"
+info "后台、数据库和加密凭据已保存到: /root/.ptool-credentials"
 info ""
 info "常用命令:"
 info "  pm2 status          - 查看服务状态"

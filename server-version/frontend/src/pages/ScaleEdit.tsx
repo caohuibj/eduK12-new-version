@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../api/client'
 import { Save, Plus, Trash2, ChevronLeft, GripVertical } from 'lucide-react'
 import TagInput from '../components/TagInput'
+import { completeScaleLabels } from '../utils/scaleLabels'
 
 interface Dimension {
   id: string
@@ -220,7 +221,16 @@ const ScaleEdit: React.FC = () => {
     try {
       const response = await apiClient.get<Scale>(`/scales/${id}`)
       if (response.code === 0) {
-        setScale(response.data)
+        const loaded = response.data
+        const points = loaded.config?.points || 5
+        setScale({
+          ...loaded,
+          config: {
+            ...loaded.config,
+            points,
+            labels: completeScaleLabels(points, loaded.config?.labels),
+          },
+        })
       }
     } catch (err) {
       console.error('获取量表信息失败', err)
@@ -314,11 +324,23 @@ const ScaleEdit: React.FC = () => {
           visibility: scale.visibility,
           estimatedTime: scale.estimatedTime,
           instruction: scale.instruction,
-          config: scale.config,
+          config: {
+            ...scale.config,
+            points: scale.config?.points || 5,
+            labels: completeScaleLabels(scale.config?.points, scale.config?.labels),
+          },
           tags: scale.tags || [],
         })
         if (response.code === 0) {
-          setScale(response.data)
+          const points = response.data.config?.points || 5
+          setScale({
+            ...response.data,
+            config: {
+              ...response.data.config,
+              points,
+              labels: completeScaleLabels(points, response.data.config?.labels),
+            },
+          })
           alert('保存成功')
         } else {
           alert(response.message)
@@ -827,55 +849,56 @@ const ScaleEdit: React.FC = () => {
                 value={scale.config?.points || 5}
                 onChange={(e) => {
                   const newPoints = Math.min(10, Math.max(2, parseInt(e.target.value) || 5))
-                  const newLabels = generateDefaultLabels(newPoints)
                   setScale({
                     ...scale,
                     config: {
                       ...scale.config,
                       points: newPoints,
-                      labels: newLabels,
+                      labels: completeScaleLabels(newPoints, scale.config?.labels),
                     },
                   })
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
               />
               <p className="mt-1 text-xs text-gray-500">
-                支持 2-10 点量表，修改点数会重置选项文字
+                2–10 点。档位必须连续为 1 到 N，不能跳过。改点数会补齐或去掉最高档，已填写的文字会保留。
               </p>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                选项设置
+                档位文字
               </label>
               <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
                 <div className="space-y-2">
-                  {scale.config?.labels?.map((opt, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <span className="w-6 h-6 flex items-center justify-center bg-primary text-white text-xs rounded-full">
+                  {completeScaleLabels(scale.config?.points, scale.config?.labels).map((opt, idx) => (
+                    <div key={opt.value} className="flex items-center gap-3">
+                      <span className="w-8 h-8 flex items-center justify-center bg-primary text-white text-sm rounded-full">
                         {opt.value}
                       </span>
                       <input
                         type="text"
                         value={opt.label}
                         onChange={(e) => {
-                          const newLabels = [...(scale.config?.labels || [])]
+                          const points = scale.config?.points || 5
+                          const newLabels = completeScaleLabels(points, scale.config?.labels)
                           newLabels[idx] = { ...opt, label: e.target.value }
                           setScale({
                             ...scale,
                             config: {
                               ...scale.config,
+                              points,
                               labels: newLabels,
                             },
                           })
                         }}
                         className="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                        placeholder={`选项 ${opt.value} 的文字`}
+                        placeholder={`第 ${opt.value} 档的文字，如「不同意」`}
                       />
                     </div>
                   ))}
                 </div>
                 <p className="mt-2 text-xs text-gray-500">
-                  李克特量表的所有题目共用相同的选项，在此统一设置
+                  每一档学生都能选择。分值固定为 1 到 {scale.config?.points || 5}，只需改文字。
                 </p>
               </div>
             </div>

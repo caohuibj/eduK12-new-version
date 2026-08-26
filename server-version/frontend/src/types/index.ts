@@ -7,6 +7,7 @@ export interface User {
   phone?: string
   isActive?: boolean
   isFrozen?: boolean
+  teacherApproved?: boolean
   expiresAt?: string
   createdAt?: string
 }
@@ -21,6 +22,7 @@ export interface Course {
   creatorId: string
   creator?: User
   isRecruiting: boolean
+  isLibrary?: boolean
   studentCount?: number
   students?: CourseStudent[]
   createdAt: string

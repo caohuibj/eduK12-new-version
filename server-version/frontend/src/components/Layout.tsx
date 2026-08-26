@@ -18,7 +18,9 @@ import {
   FileText,
   ClipboardCheck,
   Share2,
+  Brain,
 } from 'lucide-react'
+import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 
 interface MenuItem {
   path: string
@@ -31,6 +33,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const cognitiveModuleEnabled = useCognitiveEnabled()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
@@ -42,12 +45,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: '/teacher/classrooms', label: '课堂互动', icon: <Share2 className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/scales', label: '心理量表', icon: <FileText className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/questionnaires', label: '聚合问卷', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
+    { path: '/composite-assessments', label: '综合测评', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
+    ...(cognitiveModuleEnabled
+      ? [{ path: '/cognitive-assignments', label: '认知任务', icon: <Brain className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] as ('STUDENT' | 'TEACHER' | 'ADMIN')[] }]
+      : []),
     { path: '/general-questionnaires', label: '泛化问卷', icon: <Share2 className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/videos', label: '视频库', icon: <Video className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/images', label: '图片库', icon: <ImageIcon className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/documents', label: '文档库', icon: <FileText className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/users', label: '用户管理', icon: <Users className="w-5 h-5" />, roles: ['ADMIN'] },
     { path: '/teacher-codes', label: '教师码', icon: <Key className="w-5 h-5" />, roles: ['ADMIN'] },
+    { path: '/admin/material-grants', label: '材料授权', icon: <Key className="w-5 h-5" />, roles: ['ADMIN'] },
   ]
 
   const filteredMenuItems = menuItems.filter(

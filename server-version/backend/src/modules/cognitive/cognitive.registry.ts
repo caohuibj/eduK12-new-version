@@ -1,16 +1,112 @@
-import { RegistryEntry } from './cognitive.types'
+import { CognitiveProfile, RegistryEntry } from './cognitive.types'
+import {
+  fakeRegistryMeta,
+  memoryRegistryMeta,
+  memoryRegistryMetaV11,
+  reactionRegistryMeta,
+  reactionRegistryMetaV11,
+  stroopRegistryMeta,
+  stroopRegistryMetaV11,
+  gonogoRegistryMeta,
+  cptRegistryMeta,
+  nbackRegistryMeta,
+  corsiRegistryMeta,
+  sstRegistryMeta,
+  taskswitchRegistryMeta,
+  patterncompareRegistryMeta,
+  flankerRegistryMeta,
+  cardsortRegistryMeta,
+  digitbackwardRegistryMeta,
+  picturesequenceRegistryMeta,
+  pairedassociateRegistryMeta,
+  matrixRegistryMeta,
+  mentalrotationRegistryMeta,
+  towerRegistryMeta,
+  trailmakingRegistryMeta,
+  reversallearningRegistryMeta,
+  bartRegistryMeta,
+  wordlistRegistryMeta,
+  lexicaldecisionRegistryMeta,
+  emotionrecognitionRegistryMeta,
+} from './registry-definitions'
 import { fakeConfigSchema } from './schemas/fake.config'
 import { fakeTrialSchema } from './schemas/fake.trial'
 import { scoreFakeV1 } from './scoring/fake.v1'
 import { reactionConfigSchema } from './schemas/reaction.config'
 import { reactionTrialSchema } from './schemas/reaction.trial'
 import { scoreReactionV1 } from './scoring/reaction.v1'
+import { scoreReactionV1_1 } from './scoring/reaction.v1_1'
 import { memoryConfigSchema } from './schemas/memory.config'
 import { memoryTrialSchema } from './schemas/memory.trial'
 import { scoreMemoryV1 } from './scoring/memory.v1'
+import { scoreMemoryV1_1 } from './scoring/memory.v1_1'
 import { stroopConfigSchema } from './schemas/stroop.config'
 import { stroopTrialSchema } from './schemas/stroop.trial'
 import { scoreStroopV1 } from './scoring/stroop.v1'
+import { scoreStroopV1_1 } from './scoring/stroop.v1_1'
+import { gonogoConfigSchema } from './schemas/gonogo.config'
+import { gonogoTrialSchema } from './schemas/gonogo.trial'
+import { scoreGonogoV1 } from './scoring/gonogo.v1'
+import { cptConfigSchema } from './schemas/cpt.config'
+import { cptTrialSchema } from './schemas/cpt.trial'
+import { scoreCptV1 } from './scoring/cpt.v1'
+import { nbackConfigSchema } from './schemas/nback.config'
+import { nbackTrialSchema } from './schemas/nback.trial'
+import { scoreNbackV1 } from './scoring/nback.v1'
+import { corsiConfigSchema } from './schemas/corsi.config'
+import { corsiTrialSchema } from './schemas/corsi.trial'
+import { scoreCorsiV1 } from './scoring/corsi.v1'
+import { sstConfigSchema } from './schemas/sst.config'
+import { sstTrialSchema } from './schemas/sst.trial'
+import { scoreSstV1 } from './scoring/sst.v1'
+import { taskswitchConfigSchema } from './schemas/taskswitch.config'
+import { taskswitchTrialSchema } from './schemas/taskswitch.trial'
+import { scoreTaskswitchV1 } from './scoring/taskswitch.v1'
+import { patterncompareConfigSchema } from './schemas/patterncompare.config'
+import { patterncompareTrialSchema } from './schemas/patterncompare.trial'
+import { scorePatterncompareV1 } from './scoring/patterncompare.v1'
+import { flankerConfigSchema } from './schemas/flanker.config'
+import { flankerTrialSchema } from './schemas/flanker.trial'
+import { scoreFlankerV1 } from './scoring/flanker.v1'
+import { cardsortConfigSchema } from './schemas/cardsort.config'
+import { cardsortTrialSchema } from './schemas/cardsort.trial'
+import { scoreCardsortV1 } from './scoring/cardsort.v1'
+import { digitbackwardConfigSchema } from './schemas/digitbackward.config'
+import { digitbackwardTrialSchema } from './schemas/digitbackward.trial'
+import { scoreDigitbackwardV1 } from './scoring/digitbackward.v1'
+import { picturesequenceConfigSchema } from './schemas/picturesequence.config'
+import { picturesequenceTrialSchema } from './schemas/picturesequence.trial'
+import { scorePicturesequenceV1 } from './scoring/picturesequence.v1'
+import { pairedassociateConfigSchema } from './schemas/pairedassociate.config'
+import { pairedassociateTrialSchema } from './schemas/pairedassociate.trial'
+import { scorePairedassociateV1 } from './scoring/pairedassociate.v1'
+import { matrixConfigSchema } from './schemas/matrix.config'
+import { matrixTrialSchema } from './schemas/matrix.trial'
+import { scoreMatrixV1 } from './scoring/matrix.v1'
+import { mentalrotationConfigSchema } from './schemas/mentalrotation.config'
+import { mentalrotationTrialSchema } from './schemas/mentalrotation.trial'
+import { scoreMentalrotationV1 } from './scoring/mentalrotation.v1'
+import { towerConfigSchema } from './schemas/tower.config'
+import { towerTrialSchema } from './schemas/tower.trial'
+import { scoreTowerV1 } from './scoring/tower.v1'
+import { trailmakingConfigSchema } from './schemas/trailmaking.config'
+import { trailmakingTrialSchema } from './schemas/trailmaking.trial'
+import { scoreTrailmakingV1 } from './scoring/trailmaking.v1'
+import { reversallearningConfigSchema } from './schemas/reversallearning.config'
+import { reversallearningTrialSchema } from './schemas/reversallearning.trial'
+import { scoreReversallearningV1 } from './scoring/reversallearning.v1'
+import { bartConfigSchema } from './schemas/bart.config'
+import { bartTrialSchema } from './schemas/bart.trial'
+import { scoreBartV1 } from './scoring/bart.v1'
+import { wordlistConfigSchema } from './schemas/wordlist.config'
+import { wordlistTrialSchema } from './schemas/wordlist.trial'
+import { scoreWordlistV1 } from './scoring/wordlist.v1'
+import { lexicaldecisionConfigSchema } from './schemas/lexicaldecision.config'
+import { lexicaldecisionTrialSchema } from './schemas/lexicaldecision.trial'
+import { scoreLexicaldecisionV1 } from './scoring/lexicaldecision.v1'
+import { emotionrecognitionConfigSchema } from './schemas/emotionrecognition.config'
+import { emotionrecognitionTrialSchema } from './schemas/emotionrecognition.trial'
+import { scoreEmotionrecognitionV1 } from './scoring/emotionrecognition.v1'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -66,6 +162,16 @@ export const requireCognitiveRegistryEntry = (
   return entry
 }
 
+export const listCognitiveRegistryEntries = (): AnyRegistryEntry[] => [...REGISTRY.values()]
+
+export const listCognitiveRegistryEntriesForType = (testType: string): AnyRegistryEntry[] =>
+  listCognitiveRegistryEntries().filter((entry) => entry.testType === testType)
+
+export const hasCognitiveProfile = (entry: AnyRegistryEntry, profile: string): profile is CognitiveProfile =>
+  profile === 'experience' || profile === 'standard' || profile === 'research'
+    ? Boolean(entry.profiles[profile])
+    : false
+
 // 注册 Fake Test：fake / 1.0.0 / 1.0.0
 registerEntry({
   testType: 'fake',
@@ -74,6 +180,7 @@ registerEntry({
   configSchema: fakeConfigSchema,
   trialSchema: fakeTrialSchema,
   score: scoreFakeV1,
+  ...fakeRegistryMeta,
 })
 
 // 注册 Reaction Test：reaction / 1.0.0 / 1.0.0（Milestone E Session 2）
@@ -84,6 +191,7 @@ registerEntry({
   configSchema: reactionConfigSchema,
   trialSchema: reactionTrialSchema,
   score: scoreReactionV1,
+  ...reactionRegistryMeta,
 })
 
 // 注册 Memory Test：memory / 1.0.0 / 1.0.0（Milestone E Session 3）
@@ -94,6 +202,7 @@ registerEntry({
   configSchema: memoryConfigSchema,
   trialSchema: memoryTrialSchema,
   score: scoreMemoryV1,
+  ...memoryRegistryMeta,
 })
 
 // 注册 Stroop Test：stroop / 1.0.0 / 1.0.0（Milestone E Session 4）
@@ -104,4 +213,165 @@ registerEntry({
   configSchema: stroopConfigSchema,
   trialSchema: stroopTrialSchema,
   score: scoreStroopV1,
+  ...stroopRegistryMeta,
 })
+
+registerEntry({
+  testType: 'reaction',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: reactionConfigSchema,
+  trialSchema: reactionTrialSchema,
+  score: scoreReactionV1_1,
+  ...reactionRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'memory',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: memoryConfigSchema,
+  trialSchema: memoryTrialSchema,
+  score: scoreMemoryV1_1,
+  ...memoryRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'stroop',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.1.0',
+  configSchema: stroopConfigSchema,
+  trialSchema: stroopTrialSchema,
+  score: scoreStroopV1_1,
+  ...stroopRegistryMetaV11,
+})
+
+registerEntry({
+  testType: 'gonogo',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: gonogoConfigSchema,
+  trialSchema: gonogoTrialSchema,
+  score: scoreGonogoV1,
+  ...gonogoRegistryMeta,
+})
+
+registerEntry({
+  testType: 'cpt',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: cptConfigSchema,
+  trialSchema: cptTrialSchema,
+  score: scoreCptV1,
+  ...cptRegistryMeta,
+})
+
+registerEntry({
+  testType: 'nback',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: nbackConfigSchema,
+  trialSchema: nbackTrialSchema,
+  score: scoreNbackV1,
+  ...nbackRegistryMeta,
+})
+
+registerEntry({
+  testType: 'corsi',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: corsiConfigSchema,
+  trialSchema: corsiTrialSchema,
+  score: scoreCorsiV1,
+  ...corsiRegistryMeta,
+})
+
+registerEntry({
+  testType: 'sst',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: sstConfigSchema,
+  trialSchema: sstTrialSchema,
+  score: scoreSstV1,
+  ...sstRegistryMeta,
+})
+
+registerEntry({
+  testType: 'taskswitch',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: taskswitchConfigSchema,
+  trialSchema: taskswitchTrialSchema,
+  score: scoreTaskswitchV1,
+  ...taskswitchRegistryMeta,
+})
+
+registerEntry({
+  testType: 'patterncompare',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: patterncompareConfigSchema,
+  trialSchema: patterncompareTrialSchema,
+  score: scorePatterncompareV1,
+  ...patterncompareRegistryMeta,
+})
+
+registerEntry({
+  testType: 'flanker',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: flankerConfigSchema,
+  trialSchema: flankerTrialSchema,
+  score: scoreFlankerV1,
+  ...flankerRegistryMeta,
+})
+
+registerEntry({
+  testType: 'cardsort',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: cardsortConfigSchema,
+  trialSchema: cardsortTrialSchema,
+  score: scoreCardsortV1,
+  ...cardsortRegistryMeta,
+})
+
+registerEntry({
+  testType: 'digitbackward',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: digitbackwardConfigSchema,
+  trialSchema: digitbackwardTrialSchema,
+  score: scoreDigitbackwardV1,
+  ...digitbackwardRegistryMeta,
+})
+
+registerEntry({
+  testType: 'picturesequence',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: picturesequenceConfigSchema,
+  trialSchema: picturesequenceTrialSchema,
+  score: scorePicturesequenceV1,
+  ...picturesequenceRegistryMeta,
+})
+
+registerEntry({
+  testType: 'pairedassociate',
+  engineVersion: '1.0.0',
+  scoringVersion: '1.0.0',
+  configSchema: pairedassociateConfigSchema,
+  trialSchema: pairedassociateTrialSchema,
+  score: scorePairedassociateV1,
+  ...pairedassociateRegistryMeta,
+})
+
+registerEntry({ testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: matrixConfigSchema, trialSchema: matrixTrialSchema, score: scoreMatrixV1, ...matrixRegistryMeta })
+registerEntry({ testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta })
+registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, score: scoreTowerV1, ...towerRegistryMeta })
+registerEntry({ testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, score: scoreTrailmakingV1, ...trailmakingRegistryMeta })
+registerEntry({ testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, score: scoreReversallearningV1, ...reversallearningRegistryMeta })
+registerEntry({ testType: 'bart', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: bartConfigSchema, trialSchema: bartTrialSchema, score: scoreBartV1, ...bartRegistryMeta })
+registerEntry({ testType: 'wordlist', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: wordlistConfigSchema, trialSchema: wordlistTrialSchema, score: scoreWordlistV1, ...wordlistRegistryMeta })
+registerEntry({ testType: 'lexicaldecision', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: lexicaldecisionConfigSchema, trialSchema: lexicaldecisionTrialSchema, score: scoreLexicaldecisionV1, ...lexicaldecisionRegistryMeta })
+registerEntry({ testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta })

@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesContext'
 import Layout from './components/Layout'
 import StudentLayout from './components/StudentLayout'
 
@@ -25,6 +26,7 @@ import ImageLibrary from './pages/ImageLibrary'
 import DocumentLibrary from './pages/DocumentLibrary'
 import UserList from './pages/UserList'
 import TeacherCodeList from './pages/TeacherCodeList'
+import MaterialGrants from './pages/admin/MaterialGrants'
 import TeacherProfile from './pages/teacher/TeacherProfile'
 import ScaleList from './pages/ScaleList'
 import ScaleEdit from './pages/ScaleEdit'
@@ -40,6 +42,11 @@ import ClassroomCreate from './pages/teacher/ClassroomCreate'
 import ClassroomEdit from './pages/teacher/ClassroomEdit'
 import ClassroomQRCode from './pages/teacher/ClassroomQRCode'
 import ClassroomQuestionEdit from './pages/teacher/ClassroomQuestionEdit'
+import CompositeAssessmentList from './pages/teacher/CompositeAssessmentList'
+import CompositeAssessmentEdit from './pages/teacher/CompositeAssessmentEdit'
+import CompositeAssessmentResults from './pages/teacher/CompositeAssessmentResults'
+import CognitiveAssignmentList from './pages/teacher/CognitiveAssignmentList'
+import CognitiveAssignmentEdit from './pages/teacher/CognitiveAssignmentEdit'
 
 // Public Pages
 import PublicQuestionnaire from './pages/public/PublicQuestionnaire'
@@ -64,6 +71,8 @@ import QuestionnaireResult from './pages/student/QuestionnaireResult'
 import ClassroomJoin from './pages/student/ClassroomJoin'
 import ClassroomAnswer from './pages/student/ClassroomAnswer'
 import ClassroomEnter from './pages/student/ClassroomEnter'
+import CompositeAssessmentPage from './modules/composite/CompositeAssessmentPage'
+import CompositeReportPage from './modules/composite/CompositeReportPage'
 
 // Cognitive 页面（Stage B：URL 以 Assignment/Session 为核心；flag=false 时不注册 → 隐藏入口）
 import CognitiveHome from './modules/cognitive/pages/CognitiveHome'
@@ -71,7 +80,8 @@ import CognitiveAssignmentEntry from './modules/cognitive/pages/CognitiveAssignm
 import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
 import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
 import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
-import { cognitiveModuleEnabled } from './modules/cognitive/feature'
+import PublicCognitiveAssignment from './modules/cognitive/pages/PublicCognitiveAssignment'
+
 
 // BigScreen Pages
 import BigScreen from './pages/bigscreen/BigScreen'
@@ -192,10 +202,18 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>
 }
 
-function App() {
+function AppRoutes() {
+  const { cognitiveEnabled: cognitiveModuleEnabled, isLoading } = useCapabilities()
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>加载中...</div>
+      </div>
+    )
+  }
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
         <Routes>
           {/* Portal - Entry Point */}
           <Route
@@ -355,6 +373,58 @@ function App() {
             }
           />
           <Route
+            path="/composite-assessments"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeAssessmentList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/composite-assessments/:id/results"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeAssessmentResults />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/composite-assessments/:id/attempts/:attemptId/report"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeReportPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/composite-assessments/:id"
+            element={
+              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                <CompositeAssessmentEdit />
+              </ProtectedRoute>
+            }
+          />
+          {cognitiveModuleEnabled && (
+            <>
+              <Route
+                path="/cognitive-assignments"
+                element={
+                  <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                    <CognitiveAssignmentList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cognitive-assignments/:id"
+                element={
+                  <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+                    <CognitiveAssignmentEdit />
+                  </ProtectedRoute>
+                }
+              />
+            </>
+          )}
+          <Route
             path="/teacher/classrooms"
             element={
               <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
@@ -439,6 +509,14 @@ function App() {
             element={
               <ProtectedRoute roles={['ADMIN']}>
                 <TeacherCodeList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/material-grants"
+            element={
+              <ProtectedRoute roles={['ADMIN']}>
+                <MaterialGrants />
               </ProtectedRoute>
             }
           />
@@ -581,6 +659,20 @@ function App() {
             }
           />
 
+          {/* 综合测评：量表、表单和认知任务在同一容器内按配置顺序完成 */}
+          <Route
+            path="/student/composite/:assessmentId"
+            element={<StudentProtectedRoute><CompositeAssessmentPage /></StudentProtectedRoute>}
+          />
+          <Route
+            path="/student/composite/attempts/:attemptId"
+            element={<StudentProtectedRoute><CompositeAssessmentPage /></StudentProtectedRoute>}
+          />
+          <Route
+            path="/student/composite/attempts/:attemptId/report"
+            element={<StudentProtectedRoute><CompositeReportPage /></StudentProtectedRoute>}
+          />
+
           {/* Cognitive 路由（Option A：flag=false 时不注册，/student/cognitive* 落 * → /） */}
           {cognitiveModuleEnabled && (
             <>
@@ -624,8 +716,16 @@ function App() {
                   </StudentProtectedRoute>
                 }
               />
+              <Route path="/public/cognitive/assignments/:token" element={<PublicCognitiveAssignment />} />
+              <Route path="/public/cognitive/sessions/:sessionId" element={<CognitiveRunner />} />
+              <Route path="/public/cognitive/sessions/:sessionId/result" element={<CognitiveResult />} />
             </>
           )}
+
+          {/* 综合测评公开匿名入口 */}
+          <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
+          <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
+          <Route path="/public/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />
 
           {/* Public Questionnaire Routes (无需认证) */}
           <Route
@@ -656,8 +756,18 @@ function App() {
           {/* Default Redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+  )
+}
+
+function App() {
+  return (
+    <CapabilitiesProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </CapabilitiesProvider>
   )
 }
 

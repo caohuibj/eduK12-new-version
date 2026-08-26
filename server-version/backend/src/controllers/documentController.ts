@@ -148,6 +148,10 @@ export const documentController = {
         return notFound(res, '文档不存在')
       }
 
+      if (document.teacherId !== req.user?.userId && req.user?.role !== UserRole.ADMIN) {
+        return forbidden(res, '无权限查看此文档')
+      }
+
       return success(res, {
         ...document,
         url: document.cosUrl || `/uploads/documents/${document.fileName}`,

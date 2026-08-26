@@ -3,6 +3,17 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.cognitive.tsbuildinfo"
   },
-  "include": ["src/modules/cognitive", "src/test", "src/vite-env.d.ts"],
+  "include": [
+    "src/modules/cognitive",
+    "src/modules/reporting",
+    "src/modules/composite",
+    "src/pages/teacher/CompositeAssessmentList.tsx",
+    "src/pages/teacher/CompositeAssessmentEdit.tsx",
+    "src/pages/student/ScaleResult.tsx",
+    "src/pages/student/QuestionnaireResult.tsx",
+    "src/pages/public/PublicQuestionnaireResult.tsx",
+    "src/test",
+    "src/vite-env.d.ts"
+  ],
   "references": []
 }

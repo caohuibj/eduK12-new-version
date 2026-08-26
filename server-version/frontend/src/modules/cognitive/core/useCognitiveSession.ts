@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react'
-import { cognitiveApi } from '../api'
+import { cognitiveApi, type CognitiveSessionApi } from '../api'
 import { resolveRunner } from '../registry'
 import type { CognitiveResult, CognitiveSession } from '../types'
 import {
@@ -15,7 +15,7 @@ import type { RunnerError, RunnerState } from './runner.types'
  * 挂载即 LOADING → GET /cognitive/sessions/:id：
  *  - COMPLETED → SESSION_LOADED（携带 stored result，结果页只读展示，**不重新评分**，v1.1 §21.3）
  *  - IN_PROGRESS → 读本地账本：有账本 → 续跑（trialIndex = 账本+1，进度已证明）；
- *                  无账本 → RECOVERY_REQUIRED（禁止默认为 0 / 猜测 / 重提旧 trial，v1.1 §21.2）
+ *                  无账本且服务端没有安全断点 → RECOVERY_REQUIRED（禁止默认为 0 / 猜测 / 重提旧 trial，v1.1 §21.2）
  *  - ABANDONED/INVALID/404 → SESSION_ERROR（友好文案）
  *  - testType+engineVersion 无法解析 → RUNNER_UNSUPPORTED（无 latest fallback，v1.1 §16）
  *
@@ -37,7 +37,7 @@ export interface CognitiveSessionController {
   reload: () => void
 }
 
-export function useCognitiveSession(sessionId: string): CognitiveSessionController {
+export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi = cognitiveApi): CognitiveSessionController {
   const [state, dispatch] = useReducer(runnerReducer, initialRunnerState)
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
@@ -45,7 +45,7 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
   const load = useCallback(async () => {
     dispatch({ type: 'LOADING' })
     try {
-      const response = await cognitiveApi.getSession(sessionId)
+      const response = await api.getSession(sessionId)
       if (response.code !== 0 || !response.data) {
         dispatch({ type: 'SESSION_ERROR', error: { code: 'NOT_FOUND', message: '测评不存在或不可访问' } })
         return
@@ -65,17 +65,20 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
         dispatch({ type: 'RUNNER_UNSUPPORTED' })
         return
       }
-      // 进度证明：本地账本
+      // 优先使用本地账本；匿名恢复跨设备时，服务端提供的 nextTrialIndex 是已保存试次计数，
+      // 不需要猜测或重复提交旧试次。
       const ledger = readSessionLedger(sessionId)
-      if (!ledger) {
+      if (!ledger && session.nextTrialIndex === undefined) {
         dispatch({ type: 'RECOVERY_REQUIRED' })
         return
       }
-      dispatch({ type: 'SESSION_LOADED', session, trialIndex: ledger.trialIndex + 1 })
+      const trialIndex = ledger ? ledger.trialIndex + 1 : session.nextTrialIndex!
+      writeSessionLedger(sessionId, { status: session.status, trialIndex: trialIndex - 1 })
+      dispatch({ type: 'SESSION_LOADED', session, trialIndex })
     } catch (err) {
       dispatch({ type: 'SESSION_ERROR', error: friendlyError(err) })
     }
-  }, [sessionId])
+  }, [api, sessionId])
 
   useEffect(() => {
     void load()
@@ -90,7 +93,7 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
       const nextIndex = stateRef.current.trialIndex
       dispatch({ type: 'TRIAL_SUBMIT_START' })
       try {
-        const response = await cognitiveApi.appendTrial(sessionId, nextIndex, payload)
+        const response = await api.appendTrial(sessionId, nextIndex, payload)
         if (response.code !== 0) {
           dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(response) })
           return false
@@ -110,13 +113,13 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
         return false
       }
     },
-    [sessionId]
+    [api, sessionId]
   )
 
   const complete = useCallback(async () => {
     dispatch({ type: 'COMPLETE_START' })
     try {
-      const response = await cognitiveApi.completeSession(sessionId)
+      const response = await api.completeSession(sessionId)
       if (response.code !== 0 || !response.data) {
         dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(response) })
         return
@@ -134,7 +137,7 @@ export function useCognitiveSession(sessionId: string): CognitiveSessionControll
     } catch (err) {
       dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(err) })
     }
-  }, [sessionId])
+  }, [api, sessionId])
 
   const reload = useCallback(() => {
     void load()

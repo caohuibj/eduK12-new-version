@@ -62,7 +62,7 @@ export const Messages = {
     SUBMIT_SUCCESS: '签到成功',
     ALREADY_CHECKED: '已签到，请勿重复操作',
     NOT_FOUND: '签到不存在',
-    EXPIRED: '签到已结束',
+    EXPIRED: '打卡已结束',
   },
 
   // 文件上传

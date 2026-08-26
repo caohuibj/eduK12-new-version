@@ -1,0 +1,126 @@
+{
+  "version": "seq-v1.0.0",
+  "seed": "golden-seed",
+  "nback": [
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "C", "target": false },
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "C", "target": true },
+    { "nLevel": 1, "blockIndex": 0, "stimulus": "H", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "X", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "C", "target": false },
+    { "nLevel": 1, "blockIndex": 1, "stimulus": "C", "target": true },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "P", "target": false },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "V", "target": false },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "P", "target": true },
+    { "nLevel": 2, "blockIndex": 2, "stimulus": "B", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "J", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "M", "target": false },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "J", "target": true },
+    { "nLevel": 2, "blockIndex": 3, "stimulus": "F", "target": false }
+  ],
+  "corsi": [4, 3, 1, 0, 8],
+  "gonogo": ["nogo", "go", "go", "go", "nogo", "go", "go", "go"],
+  "cpt": [
+    { "blockIndex": 0, "isTarget": false, "stimulus": "H" },
+    { "blockIndex": 0, "isTarget": true, "stimulus": "X" },
+    { "blockIndex": 0, "isTarget": false, "stimulus": "B" },
+    { "blockIndex": 0, "isTarget": false, "stimulus": "B" },
+    { "blockIndex": 1, "isTarget": true, "stimulus": "X" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "C" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "H" },
+    { "blockIndex": 1, "isTarget": false, "stimulus": "B" }
+  ],
+  "sst": [
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" },
+    { "trialType": "stop", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" },
+    { "trialType": "stop", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "left" },
+    { "trialType": "go", "goStimulus": "right" }
+  ],
+  "taskswitch": [
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": null, "switchType": "start", "stimulus": 6, "correctResponse": "right" },
+    { "blockIndex": 0, "taskRule": "magnitude", "previousTaskRule": "parity", "switchType": "switch", "stimulus": 2, "correctResponse": "left" },
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": "magnitude", "switchType": "switch", "stimulus": 1, "correctResponse": "left" },
+    { "blockIndex": 0, "taskRule": "parity", "previousTaskRule": "parity", "switchType": "repeat", "stimulus": 9, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "parity", "previousTaskRule": null, "switchType": "start", "stimulus": 3, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "parity", "switchType": "switch", "stimulus": 2, "correctResponse": "left" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 8, "correctResponse": "right" },
+    { "blockIndex": 1, "taskRule": "magnitude", "previousTaskRule": "magnitude", "switchType": "repeat", "stimulus": 9, "correctResponse": "right" }
+  ],
+  "patterncompare": [
+    { "leftPattern": { "shape": "circle", "fill": "outline", "marks": 2, "rotation": 90 }, "rightPattern": { "shape": "circle", "fill": "outline", "marks": 2, "rotation": 270 }, "correctResponse": "different" },
+    { "leftPattern": { "shape": "triangle", "fill": "solid", "marks": 3, "rotation": 180 }, "rightPattern": { "shape": "triangle", "fill": "solid", "marks": 3, "rotation": 180 }, "correctResponse": "same" },
+    { "leftPattern": { "shape": "square", "fill": "outline", "marks": 1, "rotation": 180 }, "rightPattern": { "shape": "square", "fill": "solid", "marks": 1, "rotation": 180 }, "correctResponse": "different" },
+    { "leftPattern": { "shape": "circle", "fill": "solid", "marks": 3, "rotation": 180 }, "rightPattern": { "shape": "circle", "fill": "solid", "marks": 3, "rotation": 180 }, "correctResponse": "same" }
+  ],
+  "flanker": [
+    { "targetDirection": "left", "flankerDirection": "left", "correctResponse": "left" },
+    { "targetDirection": "right", "flankerDirection": "right", "correctResponse": "right" },
+    { "targetDirection": "right", "flankerDirection": "left", "correctResponse": "right" },
+    { "targetDirection": "left", "flankerDirection": "right", "correctResponse": "left" },
+    { "targetDirection": "left", "flankerDirection": "right", "correctResponse": "left" },
+    { "targetDirection": "left", "flankerDirection": "left", "correctResponse": "left" },
+    { "targetDirection": "right", "flankerDirection": "left", "correctResponse": "right" },
+    { "targetDirection": "right", "flankerDirection": "right", "correctResponse": "right" }
+  ],
+  "cardsort": [
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": null, "switchType": "start", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": null },
+    { "blockIndex": 0, "ruleCue": "color", "previousRule": "shape", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "color", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "left" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "left" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 0, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": null, "switchType": "start", "stimulusColor": "red", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": null },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "red", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "left" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "color", "previousRule": "shape", "switchType": "switch", "stimulusColor": "red", "stimulusShape": "star", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "color", "switchType": "switch", "stimulusColor": "blue", "stimulusShape": "circle", "correctResponse": "left", "previousRuleResponse": "right" },
+    { "blockIndex": 1, "ruleCue": "shape", "previousRule": "shape", "switchType": "repeat", "stimulusColor": "blue", "stimulusShape": "star", "correctResponse": "right", "previousRuleResponse": "right" }
+  ],
+  "digitbackward": [[1, 7], [1, 4], [4, 9, 6], [1, 8, 4]],
+  "picturesequence": ["scene-31", "scene-32", "scene-33", "scene-34", "scene-35", "scene-36", "scene-37", "scene-38", "scene-39", "scene-40", "scene-41", "scene-42"],
+  "pairedassociate": [
+    { "itemId": "pair-01", "targetPosition": 4 },
+    { "itemId": "pair-02", "targetPosition": 6 },
+    { "itemId": "pair-03", "targetPosition": 1 },
+    { "itemId": "pair-04", "targetPosition": 0 },
+    { "itemId": "pair-05", "targetPosition": 8 },
+    { "itemId": "pair-06", "targetPosition": 11 },
+    { "itemId": "pair-07", "targetPosition": 2 },
+    { "itemId": "pair-08", "targetPosition": 10 },
+    { "itemId": "pair-09", "targetPosition": 7 },
+    { "itemId": "pair-10", "targetPosition": 9 },
+    { "itemId": "pair-11", "targetPosition": 5 },
+    { "itemId": "pair-12", "targetPosition": 3 }
+  ],
+  "matrix": [
+    { "itemId": "matrix-07", "ruleFamily": "progression", "difficulty": 1, "panels": [8, 1, 2, 1, 2, 3, 2, 3], "options": [5, 7, 4, 1], "correctOption": 2, "stimulusSetVersion": "matrix-generator-v1.0.0" },
+    { "itemId": "matrix-02", "ruleFamily": "alternation", "difficulty": 1, "panels": [2, 4, 2, 5, 8, 5, 8, 4], "options": [1, 3, 5, 8], "correctOption": 3, "stimulusSetVersion": "matrix-generator-v1.0.0" },
+    { "itemId": "matrix-10", "ruleFamily": "progression", "difficulty": 2, "panels": [2, 4, 6, 5, 7, 1, 8, 2], "options": [4, 5, 8, 7], "correctOption": 0, "stimulusSetVersion": "matrix-generator-v1.0.0" },
+    { "itemId": "matrix-09", "ruleFamily": "combination", "difficulty": 2, "panels": [1, 4, 5, 3, 7, 2, 5, 2], "options": [8, 7, 3, 2], "correctOption": 1, "stimulusSetVersion": "matrix-generator-v1.0.0" },
+    { "itemId": "matrix-20", "ruleFamily": "alternation", "difficulty": 3, "panels": [4, 8, 4, 1, 6, 1, 6, 4], "options": [7, 6, 3, 1], "correctOption": 1, "stimulusSetVersion": "matrix-generator-v1.0.0" },
+    { "itemId": "matrix-18", "ruleFamily": "combination", "difficulty": 3, "panels": [2, 6, 8, 5, 2, 7, 8, 6], "options": [6, 7, 3, 1], "correctOption": 0, "stimulusSetVersion": "matrix-generator-v1.0.0" }
+  ],
+  "mentalrotation": [
+    { "itemId": "rotation-013", "objectFamily": "step", "angle": 0, "mirrored": true, "variant": 0, "difficulty": 1, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-033", "objectFamily": "elbow", "angle": 90, "mirrored": false, "variant": 0, "difficulty": 2, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-025", "objectFamily": "elbow", "angle": 45, "mirrored": true, "variant": 0, "difficulty": 1, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-075", "objectFamily": "fork", "angle": 180, "mirrored": true, "variant": 0, "difficulty": 3, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-054", "objectFamily": "step", "angle": 135, "mirrored": false, "variant": 1, "difficulty": 3, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-045", "objectFamily": "step", "angle": 90, "mirrored": true, "variant": 0, "difficulty": 2, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-014", "objectFamily": "step", "angle": 0, "mirrored": true, "variant": 1, "difficulty": 1, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-070", "objectFamily": "step", "angle": 180, "mirrored": false, "variant": 1, "difficulty": 3, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-063", "objectFamily": "zigzag", "angle": 135, "mirrored": true, "variant": 0, "difficulty": 3, "correctResponse": "mirror", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-001", "objectFamily": "elbow", "angle": 0, "mirrored": false, "variant": 0, "difficulty": 1, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-002", "objectFamily": "elbow", "angle": 0, "mirrored": false, "variant": 1, "difficulty": 1, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" },
+    { "itemId": "rotation-019", "objectFamily": "fork", "angle": 45, "mirrored": false, "variant": 0, "difficulty": 1, "correctResponse": "same", "stimulusSetVersion": "rotation-objects-v1.0.0" }
+  ],
+  "tower": [
+    { "problemId": "tower-01", "initialState": [0, 0, 0], "targetState": [1, 2, 0], "minimumMoves": 2, "difficulty": 1, "stimulusSetVersion": "three-peg-tower-v1.0.0" },
+    { "problemId": "tower-04", "initialState": [0, 0, 1], "targetState": [1, 2, 1], "minimumMoves": 2, "difficulty": 1, "stimulusSetVersion": "three-peg-tower-v1.0.0" },
+    { "problemId": "tower-09", "initialState": [0, 0, 1], "targetState": [0, 1, 2], "minimumMoves": 4, "difficulty": 2, "stimulusSetVersion": "three-peg-tower-v1.0.0" },
+    { "problemId": "tower-11", "initialState": [0, 0, 1], "targetState": [1, 1, 2], "minimumMoves": 4, "difficulty": 2, "stimulusSetVersion": "three-peg-tower-v1.0.0" }
+  ]
+}

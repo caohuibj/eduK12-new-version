@@ -28,15 +28,35 @@ interface Questionnaire {
   completedAt: string | null
 }
 
+interface CompositeAssessment {
+  id: string
+  name: string
+  description: string | null
+  instruction: string | null
+  estimatedModules: number
+  items: Array<{ type: string; label: string | null }>
+  course: { id: string; title: string; courseCode: string } | null
+  attempt: { id: string; status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; progress: number } | null
+  latestCompletedAttempt: { id: string; status: 'COMPLETED'; progress: number } | null
+  opensAt: string | null
+  expiresAt: string | null
+  maxAttempts: number
+  attemptsUsed: number
+  canContinue: boolean
+  canStartNewAttempt: boolean
+  availability: 'UPCOMING' | 'OPEN' | 'EXPIRED'
+}
+
 const CourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'assignments' | 'checkins' | 'questionnaires'>('assignments')
+  const [activeTab, setActiveTab] = useState<'assignments' | 'checkins' | 'questionnaires' | 'composites'>('assignments')
   const [course, setCourse] = useState<Course | null>(null)
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [scales, setScales] = useState<Scale[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
+  const [composites, setComposites] = useState<CompositeAssessment[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -46,6 +66,7 @@ const CourseDetail: React.FC = () => {
       fetchCheckins()
       fetchScales()
       fetchQuestionnaires()
+      fetchComposites()
     }
   }, [courseId])
 
@@ -106,6 +127,17 @@ const CourseDetail: React.FC = () => {
     }
   }
 
+  const fetchComposites = async () => {
+    try {
+      const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available')
+      if (response.code === 0) {
+        setComposites((response.data?.list || []).filter((item) => item.course?.id === courseId))
+      }
+    } catch (error) {
+      console.error('获取综合测评列表失败:', error)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN')
   }
@@ -124,6 +156,11 @@ const CourseDetail: React.FC = () => {
   const uncompletedAssignments = assignments.filter(a => !a.submitted).length
   const uncompletedCheckins = checkins.filter(c => !c.submission).length
   const uncompletedQuestionnaires = questionnaires.filter(q => !q.completed).length
+  const uncompletedComposites = composites.filter((item) => {
+    const hasActiveAttempt = item.canContinue || item.attempt?.status === 'IN_PROGRESS'
+    const hasCompletedAttempt = Boolean(item.latestCompletedAttempt || item.attempt?.status === 'COMPLETED')
+    return hasActiveAttempt || (!hasCompletedAttempt && item.canStartNewAttempt)
+  }).length
 
   // 角标组件
   const Badge: React.FC<{ count: number }> = ({ count }) => {
@@ -225,6 +262,18 @@ const CourseDetail: React.FC = () => {
           <ClipboardCheck className="w-4 h-4" />
           <span>问卷</span>
           <Badge count={uncompletedQuestionnaires} />
+        </button>
+        <button
+          onClick={() => setActiveTab('composites')}
+          className={`relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+            activeTab === 'composites'
+              ? 'bg-white text-primary shadow-sm'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          <ClipboardCheck className="w-4 h-4" />
+          <span>综合测评</span>
+          <Badge count={uncompletedComposites} />
         </button>
       </div>
 
@@ -359,6 +408,85 @@ const CourseDetail: React.FC = () => {
                 </div>
               </div>
             ))
+          )}
+        </div>
+      )}
+
+      {activeTab === 'composites' && (
+        <div className="space-y-4">
+          {composites.length === 0 ? (
+            <div className="card text-center py-12">
+              <ClipboardCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">暂无综合测评</p>
+            </div>
+          ) : (
+            composites.map((composite) => {
+              const attempt = composite.attempt
+              const hasActiveAttempt = composite.canContinue || attempt?.status === 'IN_PROGRESS'
+              const canContinue = hasActiveAttempt
+              const canStartNewAttempt = composite.canStartNewAttempt
+              const latestCompletedAttempt = composite.latestCompletedAttempt
+                || (attempt?.status === 'COMPLETED' ? attempt : null)
+              const canViewReport = Boolean(latestCompletedAttempt)
+              const reportTarget = latestCompletedAttempt
+                ? `/student/composite/attempts/${latestCompletedAttempt.id}/report`
+                : ''
+              const target = canContinue
+                ? `/student/composite/attempts/${attempt?.id}`
+                : canStartNewAttempt
+                  ? `/student/composite/${composite.id}`
+                  : reportTarget
+              const showReportAction = canViewReport && (canContinue || canStartNewAttempt)
+              const availabilityLabel = hasActiveAttempt
+                ? '进行中'
+                : composite.availability === 'UPCOMING'
+                ? '尚未开始'
+                : composite.availability === 'EXPIRED'
+                  ? '已过期'
+                  : !canStartNewAttempt && composite.attemptsUsed >= composite.maxAttempts
+                    ? '已达到最大次数'
+                    : '可以开始'
+              const actionLabel = canContinue
+                ? '继续测评'
+                : canStartNewAttempt
+                  ? attempt?.status === 'COMPLETED' ? '再次测评' : '开始测评'
+                  : canViewReport
+                    ? '查看报告'
+                  : availabilityLabel
+              return (
+                <div key={composite.id} className="card hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">{composite.name}</h3>
+                      {composite.description && <p className="text-gray-600 text-sm mb-3">{composite.description}</p>}
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span>{composite.estimatedModules} 个模块</span>
+                        {attempt && <span>{attempt.status === 'COMPLETED' ? '已完成' : `已完成 ${attempt.progress}%`}</span>}
+                        <span className={composite.availability === 'OPEN' ? 'text-green-600' : 'text-amber-600'}>{availabilityLabel}</span>
+                        {composite.maxAttempts > 1 && <span>已使用 {composite.attemptsUsed} / {composite.maxAttempts} 次</span>}
+                      </div>
+                      {(composite.opensAt || composite.expiresAt) && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          {composite.opensAt && `开始：${formatDate(composite.opensAt)}`}
+                          {composite.opensAt && composite.expiresAt && ' · '}
+                          {composite.expiresAt && `截止：${formatDate(composite.expiresAt)}`}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => { if (target) navigate(target) }} disabled={!target} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                        {actionLabel}
+                      </button>
+                      {showReportAction && (
+                        <button onClick={() => { if (reportTarget) navigate(reportTarget) }} className="btn-secondary">
+                          查看上次报告
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })
           )}
         </div>
       )}

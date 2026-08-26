@@ -172,7 +172,12 @@ const TeacherCourseDetail: React.FC = () => {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{course.title}</h1>
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <h1 className="text-2xl font-bold text-gray-800">{course.title}</h1>
+                  {course.isLibrary && (
+                    <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
+                  )}
+                </div>
                 {course.description && (
                   <p className="text-gray-600 mb-3">{course.description}</p>
                 )}

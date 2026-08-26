@@ -61,6 +61,7 @@ export const userController = {
             phone: true,
             isActive: true,
             isFrozen: true,
+            teacherApproved: true,
             expiresAt: true,
             createdAt: true,
           },
@@ -81,6 +82,39 @@ export const userController = {
       })
     } catch (err) {
       logger.error('获取用户列表错误', err)
+      return error(res, Messages.COMMON.FAILED)
+    }
+  },
+
+  async approveTeacher(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      const user = await prisma.user.findUnique({ where: { id } })
+      if (!user) {
+        return notFound(res, '用户不存在')
+      }
+      if (user.role !== UserRole.TEACHER) {
+        return error(res, '只能审核教师账号')
+      }
+      if (user.teacherApproved) {
+        return success(res, { id: user.id, teacherApproved: true }, '该教师已通过审核')
+      }
+
+      const updated = await prisma.user.update({
+        where: { id },
+        data: { teacherApproved: true },
+        select: {
+          id: true,
+          username: true,
+          nickname: true,
+          role: true,
+          teacherApproved: true,
+        },
+      })
+
+      return success(res, updated, '教师账号已通过审核')
+    } catch (err) {
+      logger.error('审核教师账号错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },

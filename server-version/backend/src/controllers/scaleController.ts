@@ -8,6 +8,8 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField, safeDecrypt } from '../utils/encryption'
+import { normalizeScaleConfig, scaleLabelsError } from '../utils/scaleLabels'
+import { scaleSource, scaleWhereForViewer } from '../services/materialGrant'
 
 // ==================== Validation Schemas ====================
 
@@ -58,22 +60,19 @@ export const scaleController = {
       const { courseId, status } = req.query
       const pagination = getPaginationParams(req)
 
-      let where: any = {}
+      const extra: Record<string, unknown> = {}
 
       // 按课程筛选
       if (courseId) {
-        where.courseScales = { some: { courseId: courseId as string } }
+        extra.courseScales = { some: { courseId: courseId as string } }
       }
 
       // 按状态筛选
       if (status) {
-        where.status = status as string
+        extra.status = status as string
       }
 
-      // 教师只能看到自己创建的量表
-      if (userRole === UserRole.TEACHER) {
-        where.creatorId = userId
-      }
+      const where = await scaleWhereForViewer(userId as string, userRole as UserRole, extra)
 
       // 并行查询量表列表和总数
       const [scales, total] = await Promise.all([
@@ -114,7 +113,11 @@ export const scaleController = {
         prisma.scale.count({ where }),
       ])
 
-      const result = buildPaginatedResult(scales, total, pagination)
+      const withSource = scales.map((scale) => ({
+        ...scale,
+        source: scaleSource(userId as string, userRole as UserRole, scale),
+      }))
+      const result = buildPaginatedResult(withSource, total, pagination)
       return success(res, result)
     } catch (err) {
       logger.error('获取量表列表错误', err)
@@ -135,7 +138,8 @@ export const scaleController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { code, name, description, visibility, config, estimatedTime, instruction } = result.data
+      const { code, name, description, visibility, estimatedTime, instruction } = result.data
+      const config = normalizeScaleConfig(result.data.config)
 
       // 检查编码是否已存在
       const existingScale = await prisma.scale.findUnique({
@@ -261,13 +265,18 @@ export const scaleController = {
       }
 
       // 已发布的量表不能修改核心配置
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
+      }
+
+      const payload = {
+        ...result.data,
+        config: result.data.config ? normalizeScaleConfig(result.data.config) : undefined,
       }
 
       const updated = await prisma.scale.update({
         where: { id },
-        data: result.data,
+        data: payload,
         include: {
           creator: {
             select: {
@@ -372,9 +381,15 @@ export const scaleController = {
         return error(res, '量表必须包含至少一个维度')
       }
 
+      const normalized = normalizeScaleConfig(scale.config as { points?: number; labels?: Array<{ value: number; label: string }> } | null)
+      const labelsError = scaleLabelsError(normalized.points, scale.config ? (scale.config as { labels?: Array<{ value: number; label: string }> }).labels : null)
+      if (labelsError) {
+        return error(res, labelsError + '。请在编辑页为 1 到 ' + normalized.points + ' 每一档填写文字后再发布')
+      }
+
       const updated = await prisma.scale.update({
         where: { id },
-        data: { status: 'PUBLISHED' }
+        data: { status: 'PUBLISHED', config: normalized }
       })
 
       return success(res, updated, '量表发布成功')
@@ -605,8 +620,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 检查编码是否已存在
@@ -663,8 +678,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       const dimension = await prisma.dimension.findUnique({
@@ -715,8 +730,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       await prisma.dimension.delete({
@@ -793,8 +808,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 获取当前最大排序号
@@ -866,8 +881,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       const item = await prisma.scaleItem.findUnique({
@@ -947,8 +962,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       await prisma.scaleItem.delete({
@@ -988,8 +1003,8 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (scale.status === 'PUBLISHED') {
-        return error(res, '已发布的量表不能修改')
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
       }
 
       // 批量更新排序
@@ -1126,6 +1141,12 @@ export const scaleController = {
       const item = assessment.scale.items.find(i => i.id === itemId)
       if (!item) {
         return error(res, '题目不存在')
+      }
+
+      const scaleConfig = assessment.scale.config as { points?: number } | null
+      const points = Number(scaleConfig?.points ?? 5)
+      if (!Number.isInteger(value) || value < 1 || value > points) {
+        return error(res, '答案超出量表点数范围')
       }
 
       // 更新答案
@@ -1583,6 +1604,9 @@ export const scaleController = {
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限修改此量表')
       }
+      if (scale.status !== 'DRAFT') {
+        return error(res, '只有草稿状态的量表可以修改')
+      }
 
       // 检查维度是否存在
       const dimension = await prisma.dimension.findFirst({
@@ -1808,12 +1832,7 @@ export const scaleController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
 
-      let where: any = {}
-
-      // 教师只能看自己创建的量表标签
-      if (userRole === UserRole.TEACHER) {
-        where.creatorId = userId
-      }
+      const where = await scaleWhereForViewer(userId as string, userRole as UserRole)
 
       const scales = await prisma.scale.findMany({
         where,

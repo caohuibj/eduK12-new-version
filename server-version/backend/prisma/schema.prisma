@@ -21,6 +21,7 @@ model User {
   teacherCodeId               String?                    @map("teacher_code_id")
   expiresAt                   DateTime?                  @map("expires_at")
   isFrozen                    Boolean                    @default(false) @map("is_frozen")
+  teacherApproved             Boolean                    @default(true) @map("teacher_approved")
   checkinSubmissions          CheckinSubmission[]
   checkins                    Checkin[]                  @relation("CheckinCreator")
   courseStudents              CourseStudent[]
@@ -48,6 +49,14 @@ model User {
   // 认知测评模块关联（userId 删除时 Session 保留，userId 置空 -> SetNull）
   cognitiveSessions           CognitiveSession[]         @relation("SessionUser")
   createdCognitiveAssignments CognitiveAssignment[]      @relation("AssignmentCreator")
+  // 综合测评模块关联
+  createdCompositeAssessments CompositeAssessment[]       @relation("CompositeAssessmentCreator")
+  compositeAssessmentAttempts CompositeAssessmentAttempt[] @relation("CompositeAttemptUser")
+  createdCompositeAccessTokens CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
+  generatedCompositeAnalysisSnapshots CompositeAnalysisSnapshot[] @relation("CompositeAnalysisSnapshotGenerator")
+  createdCognitiveAccessTokens CognitiveAccessToken[]      @relation("CognitiveTokenCreator")
+  materialGrantsReceived       MaterialGrant[]             @relation("MaterialGrantTeacher")
+  materialGrantsGiven          MaterialGrant[]             @relation("MaterialGrantGranter")
 
   @@map("users")
 }
@@ -79,6 +88,7 @@ model Course {
   updatedAt            DateTime              @updatedAt @map("updated_at")
   endedAt              DateTime?             @map("ended_at")
   isRecruiting         Boolean               @default(true) @map("is_recruiting")
+  isLibrary            Boolean               @default(false) @map("is_library")
   assignments          Assignment[]
   checkins             Checkin[]
   students             CourseStudent[]
@@ -92,7 +102,9 @@ model Course {
   classrooms           Classroom[]
   // 认知测评模块关联（courseId 删除时 Assignment 保留，courseId 置空 + courseSnapshot -> SetNull）
   cognitiveAssignments CognitiveAssignment[] @relation("CourseCognitiveAssignments")
+  compositeAssessments CompositeAssessment[] @relation("CourseCompositeAssessments")
 
+  @@index([isLibrary])
   @@map("courses")
 }
 
@@ -307,6 +319,33 @@ enum ScaleVisibility {
   PUBLIC // 全体可见
 }
 
+enum MaterialResourceType {
+  SCALE
+  COGNITIVE_CONFIG
+  REPORT_PACKAGE
+}
+
+enum CognitiveConfigAccessPolicy {
+  OPEN
+  GRANT
+}
+
+model MaterialGrant {
+  id           String               @id @default(uuid())
+  teacherId    String               @map("teacher_id")
+  resourceType MaterialResourceType @map("resource_type")
+  resourceId   String               @map("resource_id")
+  grantedBy    String               @map("granted_by")
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  teacher User @relation("MaterialGrantTeacher", fields: [teacherId], references: [id], onDelete: Cascade)
+  granter User @relation("MaterialGrantGranter", fields: [grantedBy], references: [id], onDelete: Restrict)
+
+  @@unique([teacherId, resourceType, resourceId])
+  @@index([resourceType, resourceId])
+  @@map("material_grants")
+}
+
 // 量表表
 model Scale {
   id            String          @id @default(uuid())
@@ -331,6 +370,8 @@ model Scale {
   courseScales        CourseScale[]
   // 聚合问卷模块关联
   questionnaireScales QuestionnaireScale[] @relation("QuestionnaireScales")
+  // 综合测评模块关联
+  compositeItems      CompositeAssessmentItem[] @relation("CompositeAssessmentScale")
 
   @@map("scales")
 }
@@ -409,17 +450,23 @@ model Assessment {
   totalTime                 Int?             @map("total_time") // 总用时（毫秒）
   // 聚合问卷模块关联（可选，单体量表测评时为空）
   questionnaireAssessmentId String?          @map("questionnaire_assessment_id")
+  compositeAttemptId       String?            @map("composite_attempt_id")
+  compositeItemId          String?            @map("composite_item_id")
 
   // 关联
   scale                   Scale                    @relation(fields: [scaleId], references: [id], onDelete: Cascade)
   user                    User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   questionnaireAssessment QuestionnaireAssessment? @relation(fields: [questionnaireAssessmentId], references: [id])
+  compositeAttempt       CompositeAssessmentAttempt? @relation("CompositeAttemptAssessments", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
+  compositeItem          CompositeAssessmentItem? @relation("CompositeScaleAssessments", fields: [compositeItemId], references: [id], onDelete: Restrict)
 
   // 性能优化索引
   @@index([userId, status]) // 用户查询自己的测评
   @@index([scaleId, status]) // 按量表统计
   @@index([startedAt]) // 时间范围查询
   @@index([questionnaireAssessmentId])
+  @@index([compositeAttemptId])
+  @@index([compositeItemId])
   @@index([status, startedAt]) // 新增：统计场景优化
   @@map("assessments")
 }
@@ -606,6 +653,200 @@ model QuestionnaireFormAnswer {
   @@unique([questionnaireAssessmentId, formItemId])
   @@index([questionnaireAssessmentId])
   @@map("questionnaire_form_answers")
+}
+
+// ==================== 心理量表 + 认知任务综合测评 ====================
+
+enum CompositeAssessmentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CompositeAssessmentItemType {
+  SCALE
+  COGNITIVE
+  FORM
+}
+
+enum CompositeAssessmentAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum CompositeAnalysisSnapshotGenerationReason {
+  COMPLETION
+  REANALYSIS
+}
+
+// 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
+model CompositeAssessment {
+  id          String                    @id @default(uuid())
+  code        String                    @unique
+  name        String
+  description String?
+  instruction String?
+  status      CompositeAssessmentStatus @default(DRAFT)
+  courseId    String?                   @map("course_id")
+  createdBy   String?                   @map("created_by")
+  opensAt     DateTime?                 @map("opens_at")
+  expiresAt   DateTime?                 @map("expires_at")
+  maxAttempts Int                       @default(1) @map("max_attempts")
+  publicEnabled Boolean                 @default(false) @map("public_enabled")
+  copyable      Boolean                 @default(false) @map("copyable")
+  copiedFromId  String?                 @map("copied_from_id")
+  analysisProtocolKey String?           @map("analysis_protocol_key")
+  analysisProtocolVersion String?       @map("analysis_protocol_version")
+  analysisProtocolSnapshotEncrypted String? @map("analysis_protocol_snapshot_encrypted")
+  // PR6B package boundary. The legacy analysisProtocol* fields remain readable
+  // for historical composites; new package instances use these frozen fields.
+  reportPackageKey String? @map("report_package_key")
+  reportPackageVersion String? @map("report_package_version")
+  reportPackageProfile String? @map("report_package_profile")
+  reportPackageSnapshotEncrypted String? @map("report_package_snapshot_encrypted")
+  createdAt   DateTime                  @default(now()) @map("created_at")
+  updatedAt   DateTime                  @updatedAt @map("updated_at")
+  publishedAt DateTime?                 @map("published_at")
+
+  course       Course?                       @relation("CourseCompositeAssessments", fields: [courseId], references: [id], onDelete: SetNull)
+  creator      User?                         @relation("CompositeAssessmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  copiedFrom   CompositeAssessment?          @relation("CompositeCopySource", fields: [copiedFromId], references: [id], onDelete: SetNull)
+  copies       CompositeAssessment[]         @relation("CompositeCopySource")
+  items        CompositeAssessmentItem[]
+  accessTokens CompositeAssessmentAccessToken[]
+  attempts     CompositeAssessmentAttempt[]
+
+  @@index([courseId, status])
+  @@index([createdBy, status])
+  @@index([copyable, status])
+  @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
+  @@map("composite_assessments")
+}
+
+// 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
+model CompositeAssessmentItem {
+  id                    String                       @id @default(uuid())
+  compositeAssessmentId String                       @map("composite_assessment_id")
+  type                  CompositeAssessmentItemType
+  position              Int                          @default(0)
+  required              Boolean                      @default(true)
+  scaleId               String?                      @map("scale_id")
+  cognitiveAssignmentId String?                      @map("cognitive_assignment_id")
+  formType              String?                      @map("form_type")
+  formLabel             String?                      @map("form_label")
+  formPlaceholder       String?                      @map("form_placeholder")
+  formOptions           Json?                        @map("form_options")
+  createdAt             DateTime                     @default(now()) @map("created_at")
+  updatedAt             DateTime                     @updatedAt @map("updated_at")
+
+  compositeAssessment CompositeAssessment  @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  scale              Scale?                @relation("CompositeAssessmentScale", fields: [scaleId], references: [id], onDelete: Restrict)
+  cognitiveAssignment CognitiveAssignment? @relation("CompositeAssessmentCognitiveAssignment", fields: [cognitiveAssignmentId], references: [id], onDelete: Restrict)
+  scaleAssessments   Assessment[]          @relation("CompositeScaleAssessments")
+  cognitiveSessions  CognitiveSession[]    @relation("CompositeCognitiveSessions")
+  formAnswers        CompositeFormAnswer[]
+
+  @@unique([compositeAssessmentId, position])
+  @@index([scaleId])
+  @@index([cognitiveAssignmentId])
+  @@map("composite_assessment_items")
+}
+
+// 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
+model CompositeAssessmentAttempt {
+  id                    String                          @id @default(uuid())
+  compositeAssessmentId String                          @map("composite_assessment_id")
+  userId                String?                         @map("user_id")
+  accessTokenId         String?                         @map("access_token_id")
+  recoveryTokenHash     String?                         @unique @map("recovery_token_hash")
+  participantKey        String                          @map("participant_key")
+  anonymousCode         String?                         @map("anonymous_code")
+  attemptNo             Int                             @default(1) @map("attempt_no")
+  status                CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  progress              Int                             @default(0)
+  completedItems        Int                             @default(0) @map("completed_items")
+  startedAt             DateTime                        @default(now()) @map("started_at")
+  lastSavedAt           DateTime                        @default(now()) @map("last_saved_at")
+  completedAt           DateTime?                       @map("completed_at")
+  totalTime             Int?                            @map("total_time")
+
+  compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  user               User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  accessToken        CompositeAssessmentAccessToken?  @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
+  scaleAssessments   Assessment[]                    @relation("CompositeAttemptAssessments")
+  cognitiveSessions  CognitiveSession[]               @relation("CompositeAttemptCognitiveSessions")
+  formAnswers        CompositeFormAnswer[]
+  analysisSnapshots  CompositeAnalysisSnapshot[]
+
+  @@index([compositeAssessmentId, status])
+  @@index([userId, status])
+  @@index([participantKey])
+  @@index([accessTokenId])
+  @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
+  @@map("composite_assessment_attempts")
+}
+
+// Package-scoped cognitive analysis output. Rows are append-only at the
+// application level; the completion row is the historical default and an
+// explicit reanalysis creates a separate row.
+model CompositeAnalysisSnapshot {
+  id                       String                                  @id @default(uuid())
+  attemptId                String                                  @map("attempt_id")
+  packageKey               String                                  @map("package_key")
+  packageVersion           String                                  @map("package_version")
+  analysisDefinitionVersion String                                 @map("analysis_definition_version")
+  analysisVersion          String                                  @map("analysis_version")
+  reportSchemaVersion      String                                  @map("report_schema_version")
+  inputFingerprint         String                                  @map("input_fingerprint")
+  generationReason         CompositeAnalysisSnapshotGenerationReason @map("generation_reason")
+  generatedBy              String?                                 @map("generated_by")
+  payloadEncrypted         String                                  @map("payload_encrypted")
+  createdAt                DateTime                                @default(now()) @map("created_at")
+
+  attempt                 CompositeAssessmentAttempt              @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  generator               User?                                   @relation("CompositeAnalysisSnapshotGenerator", fields: [generatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([attemptId, analysisVersion, inputFingerprint], map: "composite_analysis_snapshots_attempt_version_fingerprint_key")
+  @@index([attemptId, generationReason, createdAt], map: "composite_analysis_snapshots_attempt_reason_created_idx")
+  @@map("composite_analysis_snapshots")
+}
+
+model CompositeFormAnswer {
+  id          String                    @id @default(uuid())
+  attemptId   String                    @map("attempt_id")
+  itemId      String                    @map("item_id")
+  value       String
+  completed   Boolean                   @default(true)
+  createdAt   DateTime                  @default(now()) @map("created_at")
+  updatedAt   DateTime                  @updatedAt @map("updated_at")
+
+  attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  item    CompositeAssessmentItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, itemId])
+  @@index([attemptId])
+  @@map("composite_form_answers")
+}
+
+model CompositeAssessmentAccessToken {
+  id                    String   @id @default(uuid())
+  compositeAssessmentId String   @map("composite_assessment_id")
+  token                 String   @unique
+  createdBy             String   @map("created_by")
+  expiresAt             DateTime @map("expires_at")
+  maxUses               Int      @default(0) @map("max_uses")
+  usedCount             Int      @default(0) @map("used_count")
+  isActive              Boolean  @default(true) @map("is_active")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  compositeAssessment CompositeAssessment          @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  creator             User                        @relation("CompositeTokenCreator", fields: [createdBy], references: [id])
+  attempts            CompositeAssessmentAttempt[]
+
+  @@index([compositeAssessmentId])
+  @@index([isActive, expiresAt])
+  @@map("composite_assessment_access_tokens")
 }
 
 // ==================== 文档库模块 ====================
@@ -807,10 +1048,11 @@ model CognitiveTestConfig {
   config         Json? // 任务定义（刺激参数、计数等），非参与者行为数据
   status         CognitiveConfigStatus @default(DRAFT)
   engineVersion  String                @map("engine_version")
-  scoringVersion String                @map("scoring_version")
-  createdAt      DateTime              @default(now()) @map("created_at")
-  updatedAt      DateTime              @updatedAt @map("updated_at")
-  publishedAt    DateTime?             @map("published_at")
+  scoringVersion String                     @map("scoring_version")
+  accessPolicy   CognitiveConfigAccessPolicy @default(OPEN) @map("access_policy")
+  createdAt      DateTime                   @default(now()) @map("created_at")
+  updatedAt      DateTime                   @updatedAt @map("updated_at")
+  publishedAt    DateTime?                  @map("published_at")
 
   assignments CognitiveAssignment[]
   sessions    CognitiveSession[]
@@ -837,11 +1079,19 @@ model CognitiveAssignment {
   createdAt      DateTime                  @default(now()) @map("created_at")
   updatedAt      DateTime                  @updatedAt @map("updated_at")
   publishedAt    DateTime?                 @map("published_at")
+  listedStandalone Boolean                 @default(true) @map("listed_standalone")
+  profile          String?
+  profileDefinitionVersion String?         @map("profile_definition_version")
+  resolvedConfigSnapshotEncrypted String?  @map("resolved_config_snapshot_encrypted")
+  resolvedConfigHash String?               @map("resolved_config_hash")
+  resolvedReportSnapshotEncrypted String?  @map("resolved_report_snapshot_encrypted")
 
   course   Course?             @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
   config   CognitiveTestConfig @relation(fields: [configId], references: [id], onDelete: Restrict)
   creator  User?               @relation("AssignmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   sessions CognitiveSession[]
+  compositeItems CompositeAssessmentItem[] @relation("CompositeAssessmentCognitiveAssignment")
+  accessTokens CognitiveAccessToken[]
 
   @@index([courseId])
   @@map("cognitive_assignments")
@@ -856,6 +1106,11 @@ model CognitiveSession {
   participantKey               String                 @map("participant_key")
   participantSnapshotEncrypted String?                @map("participant_snapshot_encrypted")
   assignmentId                 String?                @map("assignment_id")
+  compositeAttemptId           String?                @map("composite_attempt_id")
+  compositeItemId              String?                @map("composite_item_id")
+  accessTokenId                String?                @map("access_token_id")
+  recoveryTokenHash            String?                @unique @map("recovery_token_hash")
+  anonymousCode                String?                @map("anonymous_code")
   configId                     String                 @map("config_id")
   testType                     String                 @map("test_type")
   attemptNo                    Int                    @default(1) @map("attempt_no")
@@ -877,6 +1132,9 @@ model CognitiveSession {
   user       User?                @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
   assignment CognitiveAssignment? @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
   config     CognitiveTestConfig  @relation(fields: [configId], references: [id], onDelete: Restrict)
+  compositeAttempt CompositeAssessmentAttempt? @relation("CompositeAttemptCognitiveSessions", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
+  compositeItem CompositeAssessmentItem? @relation("CompositeCognitiveSessions", fields: [compositeItemId], references: [id], onDelete: Restrict)
+  accessToken CognitiveAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
   trials     CognitiveTrial[]
 
   // 同一分发下，按稳定匿名标识 participantKey + 尝试次数保证唯一；
@@ -885,8 +1143,33 @@ model CognitiveSession {
   @@index([userId, status])
   @@index([assignmentId])
   @@index([configId])
+  @@index([compositeAttemptId])
+  @@index([compositeItemId])
+  @@index([accessTokenId])
+  @@index([recoveryTokenHash])
   @@index([participantKey])
   @@map("cognitive_sessions")
+}
+
+// 单个认知任务的公开链接。公开参与始终 userId=NULL，不能仅靠“导出脱敏”冒充匿名。
+model CognitiveAccessToken {
+  id           String   @id @default(uuid())
+  assignmentId String   @map("assignment_id")
+  token        String   @unique
+  createdBy    String   @map("created_by")
+  expiresAt    DateTime @map("expires_at")
+  maxUses      Int      @default(0) @map("max_uses")
+  usedCount    Int      @default(0) @map("used_count")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  assignment CognitiveAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  creator    User                @relation("CognitiveTokenCreator", fields: [createdBy], references: [id])
+  sessions   CognitiveSession[]
+
+  @@index([assignmentId])
+  @@index([isActive, expiresAt])
+  @@map("cognitive_access_tokens")
 }
 
 // 认知原始试次。append-only：无 updatedAt；payloadHash 用于幂等/冲突判断。

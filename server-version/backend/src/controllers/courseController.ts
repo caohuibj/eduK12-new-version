@@ -7,10 +7,16 @@ import { logger } from '../utils/logger'
 import { cache } from '../utils/cache'
 import { Messages, CACHE_TTL } from '../constants'
 import { z } from 'zod'
+import {
+  canAccessCourseContent,
+  canAccessCourseRoster,
+  hasActiveCourseMembership,
+} from '../utils/courseAccess'
 
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
   description: z.string().optional(),
+  isLibrary: z.boolean().optional(),
 })
 
 const updateCourseSchema = z.object({
@@ -18,6 +24,7 @@ const updateCourseSchema = z.object({
   description: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'COMPLETED']).optional(),
   coverUrl: z.string().optional(),
+  isLibrary: z.boolean().optional(),
 })
 
 // 分页参数解析工具函数
@@ -57,6 +64,17 @@ export const courseController = {
         where.creatorId = userId
       }
 
+      // 学生只能看到自己已加入（ACTIVE/APPROVED）的课程，避免列出全站课程
+      if (userRole === UserRole.STUDENT) {
+        where.isLibrary = false
+        where.students = {
+          some: {
+            studentId: userId,
+            status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+          },
+        }
+      }
+
       // 并行执行查询和计数
       const [courses, total] = await Promise.all([
         prisma.course.findMany({
@@ -67,6 +85,7 @@ export const courseController = {
                 id: true,
                 nickname: true,
                 username: true,
+                role: true,
               }
             },
             _count: {
@@ -128,7 +147,11 @@ export const courseController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { title, description } = result.data
+      const { title, description, isLibrary } = result.data
+      const userRole = req.user?.role
+      if (isLibrary !== undefined && userRole !== UserRole.ADMIN) {
+        return forbidden(res, '只有管理员可以设置库课程')
+      }
 
       // 生成课程号
       const courseCode = await generateCourseCode()
@@ -140,6 +163,7 @@ export const courseController = {
           courseCode,
           creatorId: userId,
           status: CourseStatus.PUBLISHED,
+          ...(isLibrary ? { isLibrary: true, isRecruiting: false } : {}),
         },
         include: {
           creator: {
@@ -191,6 +215,9 @@ export const courseController = {
               }
             }
           },
+          shares: {
+            select: { sharedTo: true },
+          },
           _count: {
             select: {
               students: {
@@ -209,9 +236,26 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
+      if (req.user?.role === UserRole.STUDENT && course.isLibrary) {
+        return notFound(res, '课程不存在')
+      }
+
+      if (req.user?.role === UserRole.STUDENT) {
+        const isMember = await hasActiveCourseMembership(id, req.user.userId)
+        if (!isMember) {
+          return forbidden(res, '您不是该课程的学员')
+        }
+      } else if (!canAccessCourseContent(course, req.user?.userId, req.user?.role)) {
+        return forbidden(res, '您没有权限访问该课程')
+      }
+
+      const canViewRoster = canAccessCourseRoster(course, req.user?.userId, req.user?.role)
+      const { _count, students, shares: _shares, courseCode, ...courseFields } = course
+
       return success(res, {
-        ...course,
-        studentCount: course._count.students,
+        ...courseFields,
+        ...(canViewRoster ? { courseCode, students } : {}),
+        studentCount: _count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
       })
@@ -229,7 +273,8 @@ export const courseController = {
       const { id } = req.params
 
       const course = await prisma.course.findUnique({
-        where: { id }
+        where: { id },
+        include: { creator: { select: { role: true } } },
       })
 
       if (!course) {
@@ -246,9 +291,23 @@ export const courseController = {
         return error(res, result.error.errors[0].message)
       }
 
+      if (result.data.isLibrary !== undefined) {
+        if (userRole !== UserRole.ADMIN) {
+          return forbidden(res, '只有管理员可以设置库课程')
+        }
+        if (result.data.isLibrary && course.creator.role !== UserRole.ADMIN) {
+          return forbidden(res, '不能把教师的课改成库课程')
+        }
+      }
+
+      const updateData: Record<string, unknown> = { ...result.data }
+      if (result.data.isLibrary === true) {
+        updateData.isRecruiting = false
+      }
+
       const updatedCourse = await prisma.course.update({
         where: { id },
-        data: result.data,
+        data: updateData,
         include: {
           creator: {
             select: {
@@ -375,6 +434,10 @@ export const courseController = {
       }
 
       // 检查是否正在招募
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
+      }
+
       if (!course.isRecruiting) {
         return error(res, '该课程已停止招募，无法加入')
       }
@@ -427,7 +490,8 @@ export const courseController = {
           studentId: userId,
           status: {
             in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]
-          }
+          },
+          course: { isLibrary: false },
         },
         include: {
           course: {
@@ -495,6 +559,10 @@ export const courseController = {
         return error(res, '课程已结束，无法加入')
       }
 
+      if (course.isLibrary) {
+        return error(res, '库课程不能加入')
+      }
+
       if (!course.isRecruiting) {
         return error(res, '该课程已停止招募，无法加入')
       }
@@ -511,7 +579,7 @@ export const courseController = {
     }
   },
 
-  // 结束课程（冻结所有学生账号）
+  // 结束课程：只关闭本课（停止招募），不冻结学生在其他课程的账号
   async endCourse(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -542,31 +610,14 @@ export const courseController = {
       }
 
       const now = new Date()
-      const studentIds = course.students.map(s => s.studentId)
+      const studentCount = course.students.length
 
-      // 使用事务保证原子性：课程结束和学生冻结同时成功或失败
-      await prisma.$transaction(async (tx) => {
-        // 更新课程状态为已结束
-        await tx.course.update({
-          where: { id },
-          data: {
-            status: 'COMPLETED',
-            endedAt: now,
-          }
-        })
-
-        // 冻结所有学生账号
-        if (studentIds.length > 0) {
-          await tx.user.updateMany({
-            where: {
-              id: {
-                in: studentIds
-              }
-            },
-            data: {
-              isFrozen: true
-            }
-          })
+      await prisma.course.update({
+        where: { id },
+        data: {
+          status: 'COMPLETED',
+          endedAt: now,
+          isRecruiting: false,
         }
       })
 
@@ -576,8 +627,8 @@ export const courseController = {
 
       return success(res, {
         endedAt: now,
-        frozenStudents: studentIds.length
-      }, `课程已结束，${studentIds.length}名学生账号已冻结`)
+        studentCount,
+      }, Messages.COURSE.END_SUCCESS)
     } catch (err) {
       console.error('结束课程错误:', err)
       return error(res, '结束课程失败')
@@ -600,7 +651,7 @@ export const courseController = {
       }
 
       // 权限检查
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限查看此课程的学生')
       }
 
@@ -661,7 +712,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -830,7 +881,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -866,7 +917,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -969,6 +1020,10 @@ export const courseController = {
       // 只有已完结的课程不能恢复招募
       if (course.status === CourseStatus.COMPLETED) {
         return error(res, '已完结的课程无法恢复招募')
+      }
+
+      if (course.isLibrary) {
+        return error(res, '库课程不能开启招募')
       }
 
       // 更新招募状态
@@ -1370,16 +1425,21 @@ export const courseController = {
       })
 
       // 格式化返回数据
-      const formattedShares = shares.map(share => ({
-        id: share.id,
-        createdAt: share.createdAt,
-        course: {
-          ...share.course,
-          studentCount: share.course._count.students,
-          _count: undefined,
-        },
-        sharer: share.sharer,
-      }))
+      const formattedShares = shares.map(share => {
+        // A share grants reusable course content, not the original course
+        // join secret or enrolled student identity data.
+        const { courseCode: _courseCode, _count, ...courseFields } = share.course
+        return {
+          id: share.id,
+          createdAt: share.createdAt,
+          course: {
+            ...courseFields,
+            studentCount: _count.students,
+            _count: undefined,
+          },
+          sharer: share.sharer,
+        }
+      })
 
       return success(res, {
         list: formattedShares,

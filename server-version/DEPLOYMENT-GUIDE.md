@@ -69,8 +69,10 @@ scp -r server-version root@your-server-ip:/opt/
 # 6. 启动服务
 cd /opt/server-version
 cp .env.example .env
-# 编辑 .env 文件，修改 JWT_SECRET 等配置
-docker-compose up -d
+# 编辑 .env 文件：填写 DB_*、完整且已 percent-encode 的 DATABASE_URL、JWT/加密密钥、CORS 和管理员凭据
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm seed
+docker compose up -d backend frontend
 
 # 7. 配置安全组
 # 阿里云控制台 -> 安全组 -> 添加规则
@@ -81,8 +83,10 @@ docker-compose up -d
 
 ```bash
 # 1. 购买轻量应用服务器（Docker 镜像）
-# 2. 直接上传 docker-compose.yml
-# 3. 执行 docker-compose up -d
+# 2. 直接上传项目并填写 .env
+# 3. 执行 docker compose --profile ops run --rm migrate
+# 4. 执行 docker compose --profile ops run --rm seed
+# 5. 执行 docker compose up -d backend frontend
 ```
 
 ## 4. 腾讯云部署步骤
@@ -133,8 +137,10 @@ docker exec -i ptool-postgres psql -U ptool ptool < backup.sql
 
 # 更新部署
 git pull
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm seed
+docker compose up -d --build backend frontend
 ```
 
 ## 7. 性能优化（初期可跳过）
@@ -181,8 +187,10 @@ docker-compose restart backend
 git pull
 
 # 重新构建并启动
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm seed
+docker compose up -d --build backend frontend
 ```
 
 ## 9. 一键部署脚本
@@ -223,9 +231,11 @@ if [ ! -f .env ]; then
     sed -i "s/your-secret-key-change-in-production/$(openssl rand -hex 32)/g" .env
 fi
 
-# 启动服务
-docker-compose down 2>/dev/null || true
-docker-compose up -d
+# 迁移、初始化管理员/内置配置并启动服务
+docker compose down 2>/dev/null || true
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm seed
+docker compose up -d backend frontend
 
 # 等待服务启动
 sleep 10
@@ -234,7 +244,7 @@ sleep 10
 if docker-compose ps | grep -q "Up"; then
     echo "=== 部署成功 ==="
     echo "访问地址: http://$(curl -s ifconfig.me)"
-    echo "默认账号: admin / admin123"
+    echo "管理员账号: 使用 .env 中配置的 ADMIN_USERNAME / ADMIN_PASSWORD"
 else
     echo "=== 部署失败，请检查日志 ==="
     docker-compose logs

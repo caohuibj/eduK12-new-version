@@ -165,6 +165,22 @@ export const tokenService = {
   },
 
   /**
+   * 真正开始一次公开问卷时占用名额。预览 GET 不调用。
+   * maxUses=0 表示不限制。并发下用条件更新避免超额。
+   */
+  async claimAccess(tokenId: string): Promise<boolean> {
+    const claimed = await prisma.$executeRaw`
+      UPDATE "questionnaire_access_tokens"
+      SET "used_count" = "used_count" + 1
+      WHERE "id" = ${tokenId}
+        AND "is_active" = true
+        AND "expires_at" > NOW()
+        AND ("max_uses" = 0 OR "used_count" < "max_uses")
+    `
+    return Number(claimed) > 0
+  },
+
+  /**
    * 记录访问（增加 usedCount）
    */
   async recordAccess(tokenId: string): Promise<void> {

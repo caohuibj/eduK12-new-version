@@ -9,16 +9,18 @@ dotenv.config()
 const configSchema = z.object({
   port: z.number().int().min(1).max(65535),
   nodeEnv: z.enum(['development', 'production', 'test']),
+  corsOrigin: z.string().min(1),
   databaseUrl: z.string().url(),
+  trustProxyHops: z.number().int().min(0).max(10),
   jwtSecret: z.string().min(32, 'JWT_SECRET must be at least 32 characters in production'),
   jwtExpiresIn: z.string(),
   uploadDir: z.string(),
-  adminUsername: z.string().min(1),
-  adminPassword: z.string().min(6),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
   cognitiveModuleEnabled: z.boolean(),
+  // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
+  materialGrantsEnabled: z.boolean(),
   // Cognitive 参与者假名化密钥（64 位十六进制；生产环境必需，独立于 DATA_ENCRYPTION_KEY）
   dataPseudonymKey: z.string().optional(),
   // COS 配置 (可选)
@@ -33,6 +35,17 @@ const parsePort = () => {
   const port = parseInt(process.env.PORT || '3000')
   if (isNaN(port)) return 3000
   return port
+}
+
+const parseNonNegativeInteger = (name: string, fallback: number): number => {
+  const value = process.env[name]
+  if (value === undefined || value === '') return fallback
+
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`❌ ${name} must be a non-negative integer (got '${value}')`)
+  }
+  return parsed
 }
 
 // 严格布尔环境变量解析：仅接受 'true'/'false'，缺省回落 fallback。
@@ -51,17 +64,20 @@ const projectRoot = path.resolve(__dirname, '..')
 const rawConfig = {
   port: parsePort(),
   nodeEnv: process.env.NODE_ENV || 'development',
+  corsOrigin: process.env.CORS_ORIGIN || '*',
   databaseUrl: process.env.DATABASE_URL || 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public',
+  // Docker production topology is frontend proxy -> backend, while local
+  // development normally has no trusted proxy in front of the API.
+  trustProxyHops: parseNonNegativeInteger('TRUST_PROXY_HOPS', process.env.NODE_ENV === 'production' ? 1 : 0),
   jwtSecret: process.env.NODE_ENV === 'production' ? (process.env.JWT_SECRET || '') : (process.env.JWT_SECRET || 'dev-secret-key-not-for-production'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
-  adminUsername: process.env.ADMIN_USERNAME || 'admin',
-  adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
+  materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
   // Cognitive 参与者假名化密钥（生产环境必需）
   dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)
@@ -74,6 +90,12 @@ const rawConfig = {
 
 // 生产环境强制检查
 if (rawConfig.nodeEnv === 'production') {
+  if (!process.env.DATABASE_URL || process.env.DATABASE_URL.trim() === '') {
+    throw new Error('❌ DATABASE_URL must be set in production mode')
+  }
+  if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.trim() === '*') {
+    throw new Error('❌ CORS_ORIGIN must be set to a specific frontend origin in production mode')
+  }
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
     throw new Error('❌ JWT_SECRET must be set and at least 32 characters in production mode')
   }

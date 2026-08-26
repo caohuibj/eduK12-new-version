@@ -101,9 +101,9 @@ const StudentCourseLogin: React.FC = () => {
           </form>
 
           <div className="mt-6 pt-6 border-t text-center">
-            <p className="text-sm text-gray-500 mb-2">已有账号？</p>
-            <Link to="/student/login" className="text-primary hover:underline font-medium">
-              直接登录
+            <p className="text-sm text-gray-500 mb-3">已经注册过？用账号密码登录即可，不必再填课程码。</p>
+            <Link to="/student/login" className="inline-flex justify-center w-full btn-secondary">
+              已有账号，去登录
             </Link>
           </div>
 

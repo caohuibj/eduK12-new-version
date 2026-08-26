@@ -1,0 +1,41 @@
+{
+  "seed": "pr13-emotionrecognition-golden",
+  "config": {
+    "totalTrials": 24,
+    "stimulusMs": 3000,
+    "trialTimeoutMs": 5000,
+    "isiMs": 300,
+    "validRtFloorMs": 200,
+    "emotionCategoryVersion": "basic-emotion-6-v1.0.0",
+    "stimulusSetVersion": "emotion-faces-ai-zh-v1.0.0",
+    "report": { "reportVersion": "1.0.0", "referenceMode": "none" }
+  },
+  "rtMs": 300,
+  "expected": {
+    "score": 100,
+    "metrics": {
+      "accuracy": 1,
+      "balancedAccuracy": 1,
+      "accuracyByEmotion": { "happy": 1, "sad": 1, "angry": 1, "fear": 1, "disgust": 1, "surprise": 1 },
+      "confusionMatrix": {
+        "happy": { "happy": 4, "sad": 0, "angry": 0, "fear": 0, "disgust": 0, "surprise": 0 },
+        "sad": { "happy": 0, "sad": 4, "angry": 0, "fear": 0, "disgust": 0, "surprise": 0 },
+        "angry": { "happy": 0, "sad": 0, "angry": 4, "fear": 0, "disgust": 0, "surprise": 0 },
+        "fear": { "happy": 0, "sad": 0, "angry": 0, "fear": 4, "disgust": 0, "surprise": 0 },
+        "disgust": { "happy": 0, "sad": 0, "angry": 0, "fear": 0, "disgust": 4, "surprise": 0 },
+        "surprise": { "happy": 0, "sad": 0, "angry": 0, "fear": 0, "disgust": 0, "surprise": 4 }
+      },
+      "medianRtMs": 300,
+      "omissionRate": 0,
+      "validResponseCount": 24
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientPerCategory": false,
+      "lowAccuracy": false,
+      "excessiveOmissions": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  }
+}

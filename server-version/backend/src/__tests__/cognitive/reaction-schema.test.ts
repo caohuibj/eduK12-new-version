@@ -60,6 +60,12 @@ describe('reaction trial schema', () => {
     expect(reactionTrialSchema.safeParse(baseTrial).success).toBe(true)
   })
 
+  it('rounds fractional rtMs', () => {
+    const parsed = reactionTrialSchema.safeParse({ ...baseTrial, rtMs: 320.6 })
+    expect(parsed.success).toBe(true)
+    if (parsed.success) expect(parsed.data.rtMs).toBe(321)
+  })
+
   it('parses a timeout/miss trial (rtMs null)', () => {
     expect(reactionTrialSchema.safeParse({ ...baseTrial, rtMs: null }).success).toBe(true)
   })
