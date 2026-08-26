@@ -156,9 +156,11 @@ const CourseDetail: React.FC = () => {
   const uncompletedAssignments = assignments.filter(a => !a.submitted).length
   const uncompletedCheckins = checkins.filter(c => !c.submission).length
   const uncompletedQuestionnaires = questionnaires.filter(q => !q.completed).length
-  const uncompletedComposites = composites.filter((item) => (
-    item.canContinue || item.canStartNewAttempt
-  )).length
+  const uncompletedComposites = composites.filter((item) => {
+    const hasActiveAttempt = item.canContinue || item.attempt?.status === 'IN_PROGRESS'
+    const hasCompletedAttempt = Boolean(item.latestCompletedAttempt || item.attempt?.status === 'COMPLETED')
+    return hasActiveAttempt || (!hasCompletedAttempt && item.canStartNewAttempt)
+  }).length
 
   // 角标组件
   const Badge: React.FC<{ count: number }> = ({ count }) => {
@@ -420,7 +422,8 @@ const CourseDetail: React.FC = () => {
           ) : (
             composites.map((composite) => {
               const attempt = composite.attempt
-              const canContinue = composite.canContinue || attempt?.status === 'IN_PROGRESS'
+              const hasActiveAttempt = composite.canContinue || attempt?.status === 'IN_PROGRESS'
+              const canContinue = hasActiveAttempt
               const canStartNewAttempt = composite.canStartNewAttempt
               const latestCompletedAttempt = composite.latestCompletedAttempt
                 || (attempt?.status === 'COMPLETED' ? attempt : null)
@@ -434,7 +437,9 @@ const CourseDetail: React.FC = () => {
                   ? `/student/composite/${composite.id}`
                   : reportTarget
               const showReportAction = canViewReport && (canContinue || canStartNewAttempt)
-              const availabilityLabel = composite.availability === 'UPCOMING'
+              const availabilityLabel = hasActiveAttempt
+                ? '进行中'
+                : composite.availability === 'UPCOMING'
                 ? '尚未开始'
                 : composite.availability === 'EXPIRED'
                   ? '已过期'

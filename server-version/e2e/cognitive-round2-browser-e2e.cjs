@@ -5,9 +5,10 @@
 // through the normal HTTP contract (the package grant and, for a draft
 // assessment fixture, package instantiation/publish in scenario 2). The
 // package definition used by the authorization scenario must already be
-// PUBLISHED; the assessment fixture may remain DRAFT until the teacher
-// instantiates and publishes that package-backed assessment. The fixture
-// manifest contains IDs and expected labels, never credentials.
+// PUBLISHED and must be the exact promotion candidate selected by the Gate;
+// the assessment fixture may remain DRAFT until the teacher instantiates and
+// publishes that package-backed assessment. The fixture manifest contains IDs
+// and expected labels, never credentials.
 //
 // Required before running:
 //   COGNITIVE_R2_E2E_ISOLATED_DB=1
@@ -25,6 +26,7 @@ const assert = require('assert/strict')
 const fs = require('fs')
 const path = require('path')
 const { chromium } = require('../backend/node_modules/playwright-core')
+const { MANIFEST, validateCandidatePackage } = require('./validate-cognitive-round2-gate-candidate.cjs')
 
 const BASE_URL = (process.env.COGNITIVE_E2E_BASE_URL || 'http://127.0.0.1').replace(/\/$/, '')
 const FIXTURE_FILE = process.env.COGNITIVE_R2_E2E_FIXTURE_FILE
@@ -78,9 +80,17 @@ const loadFixtures = () => {
   required(fixture.package.key, 'package.key')
   required(fixture.package.version, 'package.version')
   required(fixture.package.teacherId, 'package.teacherId')
+  const fixturePackageResourceId = `${fixture.package.key}@${fixture.package.version}`
+  validateCandidatePackage(fixturePackageResourceId)
+  if (process.env.COGNITIVE_R2_E2E_EXPECTED_PACKAGE) {
+    assert.equal(fixturePackageResourceId, process.env.COGNITIVE_R2_E2E_EXPECTED_PACKAGE, 'fixture package is not the selected Gate candidate')
+  }
   required(fixture.qualityFailure.validUnitLabel, 'qualityFailure.validUnitLabel')
   required(fixture.multisource.packageKey, 'multisource.packageKey')
   required(fixture.reanalysis.packageKey, 'reanalysis.packageKey')
+  const multisourceManifest = MANIFEST.multisourcePackages?.[0]
+  assert.equal(fixture.multisource.packageKey, multisourceManifest?.key, 'fixture multisource package is not the reviewed package')
+  assert.ok(MANIFEST.candidatePackages.some((item) => item.key === fixture.reanalysis.packageKey && item.version === '1.0.0'), 'fixture reanalysis package is not a reviewed candidate')
   assert.ok(Array.isArray(fixture.collection.unitLabels) && fixture.collection.unitLabels.length > 0, 'collection.unitLabels must not be empty')
   assert.ok(Array.isArray(fixture.package.slotLabels) && fixture.package.slotLabels.length > 0, 'package.slotLabels must not be empty')
   assert.ok(Array.isArray(fixture.multisource.expectedFindingTypes) && fixture.multisource.expectedFindingTypes.length > 0, 'multisource.expectedFindingTypes must not be empty')

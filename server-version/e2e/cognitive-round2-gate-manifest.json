@@ -1,5 +1,6 @@
 {
   "schemaVersion": "pr14-gate-evidence-v1",
+  "reviewBaseCommit": "25098332a354e9d169f62da6edf2d88f43066dbd",
   "stimulusSets": [
     { "id": "patterncompare", "version": "geometric-v1.0.0" },
     { "id": "flanker", "version": "arrows-v1.0.0" },
@@ -28,5 +29,14 @@
       "version": "1.0.0",
       "reviewedScaleCodes": ["adexi_v1"]
     }
+  ],
+  "candidatePackages": [
+    { "key": "attention_stability_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "inhibitory_control_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "working_memory_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "executive_control_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "learning_reasoning_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "k12_core_profile_v1", "version": "1.0.0", "kind": "cognitive-only" },
+    { "key": "inhibitory_control_multisource_v1", "version": "1.0.0", "kind": "multisource" }
   ]
 }

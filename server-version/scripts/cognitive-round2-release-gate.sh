@@ -11,7 +11,9 @@ GATE_PROJECT_PREFIX="${COGNITIVE_R2_GATE_PROJECT:-eduk12-pr14-gate}"
 GATE_RUN_ID="${COGNITIVE_R2_GATE_RUN_ID:-$(date -u +%Y%m%d%H%M%S)-$$}"
 GATE_HTTP_PORT="${COGNITIVE_R2_GATE_HTTP_PORT:-8088}"
 GATE_BASE_REF="${COGNITIVE_R2_GATE_BASE_REF:-}"
-GATE_HEAD_REF="${COGNITIVE_R2_GATE_HEAD_REF:-HEAD}"
+GATE_MODE="${COGNITIVE_R2_GATE_MODE:-pre-release}"
+GATE_MANIFEST_FILE="${SERVER_DIR}/e2e/cognitive-round2-gate-manifest.json"
+GATE_CANDIDATE_PACKAGE="${COGNITIVE_R2_GATE_CANDIDATE_PACKAGE:-}"
 
 if [[ ! "${GATE_PROJECT_PREFIX}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,40}$ ]]; then
   echo "Invalid COGNITIVE_R2_GATE_PROJECT; use a short project prefix." >&2
@@ -30,9 +32,24 @@ if ! [[ "${GATE_HTTP_PORT}" =~ ^[0-9]+$ ]] || (( GATE_HTTP_PORT < 1024 || GATE_H
   echo "Invalid COGNITIVE_R2_GATE_HTTP_PORT; use a TCP port from 1024 through 65535." >&2
   exit 1
 fi
+if [[ "${GATE_MODE}" != "pre-release" && "${GATE_MODE}" != "promotion-candidate" ]]; then
+  echo "Invalid COGNITIVE_R2_GATE_MODE; use pre-release or promotion-candidate." >&2
+  exit 1
+fi
+if [[ "${GATE_MODE}" == "promotion-candidate" ]]; then
+  if [[ -z "${GATE_CANDIDATE_PACKAGE}" ]]; then
+    echo "COGNITIVE_R2_GATE_CANDIDATE_PACKAGE is required in promotion-candidate mode." >&2
+    exit 1
+  fi
+else
+  if [[ -n "${GATE_CANDIDATE_PACKAGE}" ]]; then
+    echo "COGNITIVE_R2_GATE_CANDIDATE_PACKAGE requires promotion-candidate mode." >&2
+    exit 1
+  fi
+fi
 
 fail_external_gate() {
-  echo "PR14 automated checks are complete, but the external release Gate is BLOCKED: $1" >&2
+  echo "Round 2 automated checks are complete, but the external release Gate is BLOCKED: $1" >&2
   exit 2
 }
 
@@ -44,13 +61,19 @@ if [[ -z "${GATE_BASE_REF}" ]]; then
   echo "COGNITIVE_R2_GATE_BASE_REF is required; pass the reviewed PR base commit or ref." >&2
   exit 1
 fi
-if ! GATE_BASE_SHA="$(git -C "${REPO_DIR}" rev-parse --verify "${GATE_BASE_REF}^{commit}" 2>/dev/null)"; then
-  echo "COGNITIVE_R2_GATE_BASE_REF does not resolve to a commit: ${GATE_BASE_REF}" >&2
+if [[ ! -f "${GATE_MANIFEST_FILE}" ]]; then
+  echo "Round 2 Gate manifest is missing: ${GATE_MANIFEST_FILE}" >&2
   exit 1
 fi
-if ! GATE_HEAD_SHA="$(git -C "${REPO_DIR}" rev-parse --verify "${GATE_HEAD_REF}^{commit}" 2>/dev/null)"; then
-  echo "COGNITIVE_R2_GATE_HEAD_REF does not resolve to a commit: ${GATE_HEAD_REF}" >&2
+if ! GATE_MANIFEST_BASE_SHA="$(node -e "const fs=require('fs'); const manifest=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); process.stdout.write(String(manifest.reviewBaseCommit || ''))" "${GATE_MANIFEST_FILE}")" || [[ ! "${GATE_MANIFEST_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "Round 2 Gate manifest has no valid reviewBaseCommit." >&2
   exit 1
+fi
+GATE_REF_OUTPUT="$(bash "${SCRIPT_DIR}/cognitive-round2-release-gate-integrity.sh" "${REPO_DIR}" "${GATE_BASE_REF}" "${GATE_MANIFEST_BASE_SHA}")"
+GATE_BASE_SHA="${GATE_REF_OUTPUT%%$'\n'*}"
+GATE_HEAD_SHA="${GATE_REF_OUTPUT#*$'\n'}"
+if [[ "${GATE_MODE}" == "promotion-candidate" ]]; then
+  node "${SERVER_DIR}/e2e/validate-cognitive-round2-gate-candidate.cjs" "${GATE_CANDIDATE_PACKAGE}" >/dev/null
 fi
 
 bash "${SCRIPT_DIR}/cognitive-round2-release-gate-scope.sh" "${REPO_DIR}" "${GATE_BASE_SHA}" "${GATE_HEAD_SHA}"
@@ -60,6 +83,8 @@ if [[ "${RUN_DOCKER}" == "1" ]]; then
 fi
 
 cd "${SERVER_DIR}/backend"
+export COGNITIVE_R2_GATE_MODE="${GATE_MODE}"
+export COGNITIVE_R2_GATE_CANDIDATE_PACKAGE="${GATE_CANDIDATE_PACKAGE}"
 npx tsc --noEmit
 npm test -- --reporter=dot
 if [[ "${RUN_DOCKER}" == "1" ]]; then
@@ -132,12 +157,16 @@ curl --fail --silent --show-error "http://127.0.0.1:${GATE_HTTP_PORT}/" >/dev/nu
 if [[ "${RUN_E2E}" != "1" ]]; then
   fail_external_gate "Docker smoke passed, but COGNITIVE_R2_GATE_RUN_E2E=1 and a fixture manifest are required"
 fi
+if [[ "${GATE_MODE}" != "promotion-candidate" ]]; then
+  fail_external_gate "set COGNITIVE_R2_GATE_MODE=promotion-candidate with an exact candidate package before running browser E2E"
+fi
 if [[ "${COGNITIVE_R2_E2E_ISOLATED_DB:-0}" != "1" ]]; then
   fail_external_gate "set COGNITIVE_R2_E2E_ISOLATED_DB=1 for the browser fixture service"
 fi
 required "${COGNITIVE_R2_E2E_FIXTURE_FILE:-}" "COGNITIVE_R2_E2E_FIXTURE_FILE"
 
 COGNITIVE_E2E_BASE_URL="${COGNITIVE_E2E_BASE_URL:-http://127.0.0.1:${GATE_HTTP_PORT}}" \
+COGNITIVE_R2_E2E_EXPECTED_PACKAGE="${GATE_CANDIDATE_PACKAGE}" \
   node "${SERVER_DIR}/e2e/cognitive-round2-browser-e2e.cjs"
 
 EVIDENCE_FILE="${COGNITIVE_R2_GATE_EVIDENCE_FILE:-}"

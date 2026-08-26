@@ -8,6 +8,8 @@ import {
 
 describe('ReportPackageRegistry PR6B', () => {
   it('keeps the PR14 package resources versioned and required', () => {
+    const gateMode = process.env.COGNITIVE_R2_GATE_MODE ?? 'pre-release'
+    const candidatePackage = process.env.COGNITIVE_R2_GATE_CANDIDATE_PACKAGE ?? ''
     const packages = listReportPackageDefinitions()
     const expectedKeys = [
       'attention_stability_v1',
@@ -22,8 +24,9 @@ describe('ReportPackageRegistry PR6B', () => {
     expect(definitions.every(Boolean)).toBe(true)
     for (const definition of definitions) {
       if (!definition) continue
-      expect(definition.status).toBe('DRAFT')
-      expect(definition.disabledReason).toBeTruthy()
+      const expectedStatus = gateMode === 'promotion-candidate' && candidatePackage === `${definition.key}@1.0.0` ? 'PUBLISHED' : 'DRAFT'
+      expect(definition.status).toBe(expectedStatus)
+      if (expectedStatus === 'DRAFT') expect(definition.disabledReason).toBeTruthy()
       expect(definition.slots.every((slot) => slot.required)).toBe(true)
       expect(definition.reportDefinitionVersion).toBe('report-package-v1')
     }

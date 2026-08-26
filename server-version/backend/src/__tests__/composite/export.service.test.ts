@@ -287,6 +287,7 @@ describe('composite export service', () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(false))
 
     const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+    const query = mockPrisma.compositeAssessment.findUnique.mock.calls[0][0]
 
     expect(data.rows[0]).toMatchObject({
       U_id: 'ANON-1234ABCD',
@@ -296,6 +297,9 @@ describe('composite export service', () => {
     expect(data.fields.map((field) => field.name)).toContain('C001_M_meanrtms')
     expect(data.fields.some((field) => field.name.includes('t001'))).toBe(false)
     expect(data.trialCount).toBe(0)
+    expect(query.include.attempts.include.cognitiveSessions.include).not.toHaveProperty('trials')
+    expect(query.include.items.include.scale.include).not.toHaveProperty('items')
+    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: false, scores: true })
   })
 
   it('omits the product-index score column for a frozen BART report', async () => {
@@ -340,6 +344,7 @@ describe('composite export service', () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(true))
 
     const data = await compositeExportService.getExportData('composite-1', { detail: 'full' })
+    const query = mockPrisma.compositeAssessment.findUnique.mock.calls[0][0]
     const csv = compositeExportService.exportToCSV(data)
 
     expect(data.trialCount).toBe(2)
@@ -353,6 +358,9 @@ describe('composite export service', () => {
     expect(csv).toContain('380')
     expect(csv).toContain('"[1,2,3]"')
     expect(csv).toContain('"[""left"",""right""]"')
+    expect(query.include.attempts.include.cognitiveSessions.include).toHaveProperty('trials')
+    expect(query.include.items.include.scale.include).toHaveProperty('items')
+    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: true, scores: true })
   })
 
   it('keeps normalized dynamic keys distinct', async () => {
@@ -364,6 +372,77 @@ describe('composite export service', () => {
     expect(collidingFields).toHaveLength(2)
     expect(new Set(collidingFields.map((field) => field.name)).size).toBe(2)
     expect(collidingFields.map((field) => data.rows[0][field.name])).toEqual(expect.arrayContaining(['first', 'second']))
+  })
+
+  it('keeps frozen metric values distinct when normalized keys collide', async () => {
+    const template: any = makeTemplate(false, { 'a-b': 11, a_b: 22 })
+    const metricDefinitions = {
+      'a-b': { label: '指标 a-b', valueType: 'number', export: { summary: true, label: '指标 a-b' } },
+      a_b: { label: '指标 a_b', valueType: 'number', export: { summary: true, label: '指标 a_b' } },
+    }
+    template.items[0].cognitiveAssignment = {
+      title: '冻结碰撞任务',
+      profile: 'standard',
+      resolvedReportSnapshotEncrypted: encryptCognitivePayload({
+        ...mixedFrozenReport,
+        metricDefinitions,
+      }),
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+    const collidingFields = data.fields.filter((field) => field.label.includes('指标 a'))
+
+    expect(collidingFields).toHaveLength(2)
+    expect(new Set(collidingFields.map((field) => field.name)).size).toBe(2)
+    expect(collidingFields.map((field) => data.rows[0][field.name])).toEqual(expect.arrayContaining([11, 22]))
+  })
+
+  it('keeps frozen metric names distinct after long-name truncation', async () => {
+    const keyA = `${'long_metric_'.repeat(8)}a`
+    const keyB = `${'long_metric_'.repeat(8)}b`
+    const template: any = makeTemplate(false, { [keyA]: 31, [keyB]: 47 })
+    const metricDefinitions = {
+      [keyA]: { label: '长指标 A', valueType: 'number', export: { summary: true, label: '长指标 A' } },
+      [keyB]: { label: '长指标 B', valueType: 'number', export: { summary: true, label: '长指标 B' } },
+    }
+    template.items[0].cognitiveAssignment = {
+      title: '冻结长字段任务',
+      profile: 'standard',
+      resolvedReportSnapshotEncrypted: encryptCognitivePayload({
+        ...mixedFrozenReport,
+        metricDefinitions,
+      }),
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+    const longFields = data.fields.filter((field) => field.label.includes('长指标'))
+
+    expect(longFields).toHaveLength(2)
+    expect(new Set(longFields.map((field) => field.name)).size).toBe(2)
+    expect(longFields.every((field) => field.name.length <= 64)).toBe(true)
+    expect(longFields.map((field) => data.rows[0][field.name])).toEqual(expect.arrayContaining([31, 47]))
+  })
+
+  it('keeps dimension values distinct when scale dimension codes normalize to one name', async () => {
+    const template: any = makeMixedTemplate()
+    template.items[0].scale.dimensions = [
+      { id: 'dimension-a', code: 'a-b', name: '维度 a-b' },
+      { id: 'dimension-b', code: 'a_b', name: '维度 a_b' },
+    ]
+    template.attempts[0].scaleAssessments[0].scores = [
+      { dimensionId: 'dimension-a', rawScore: 13, normalizedScore: 13 },
+      { dimensionId: 'dimension-b', rawScore: 29, normalizedScore: 29 },
+    ]
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-mixed', { detail: 'summary' })
+    const dimensionFields = data.fields.filter((field) => field.label.includes('维度 a'))
+
+    expect(dimensionFields).toHaveLength(2)
+    expect(new Set(dimensionFields.map((field) => field.name)).size).toBe(2)
+    expect(dimensionFields.map((field) => data.rows[0][field.name])).toEqual(expect.arrayContaining([13, 29]))
   })
 
   it('neutralizes spreadsheet formulas in CSV values', () => {

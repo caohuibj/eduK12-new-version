@@ -169,6 +169,8 @@ describe('Round 2 cognitive analysis registries', () => {
   })
 
   it('keeps the PR14 protocols versioned and hidden from the create catalog', () => {
+    const gateMode = process.env.COGNITIVE_R2_GATE_MODE ?? 'pre-release'
+    const candidatePackage = process.env.COGNITIVE_R2_GATE_CANDIDATE_PACKAGE ?? ''
     const protocols = listAnalysisProtocolDefinitions()
     const expectedKeys = [
       'attention_stability_v1',
@@ -181,14 +183,18 @@ describe('Round 2 cognitive analysis registries', () => {
     ]
     const protocolByKey = new Map(protocols.map((protocol) => [protocol.key, protocol]))
     for (const key of expectedKeys) {
+      const expectedStatus = gateMode === 'promotion-candidate' && candidatePackage === `${key}@1.0.0` ? 'PUBLISHED' : 'DRAFT'
       expect(protocolByKey.get(key)).toMatchObject({
         key,
         version: '1.0.0',
-        status: 'DRAFT',
-        recommendedForCreate: false,
+        status: expectedStatus,
         profiles: ['standard', 'research'],
       })
-      expect(listAnalysisProtocolCatalog().list.find((item) => item.key === key)).toBeUndefined()
+      const protocol = protocolByKey.get(key)
+      if (expectedStatus === 'DRAFT') expect(protocol?.recommendedForCreate).toBe(false)
+      const publicCatalogItem = listAnalysisProtocolCatalog().list.find((item) => item.key === key)
+      if (protocol?.recommendedForCreate) expect(publicCatalogItem).toBeDefined()
+      else expect(publicCatalogItem).toBeUndefined()
     }
     expect(listAnalysisProtocolCatalog(true).list.find((item) => item.key === 'inhibitory_control_multisource_v1')).toMatchObject({
       scaleSlots: [{

@@ -21,9 +21,11 @@ import { projectCompositeCollectionReport } from '../../modules/composite/compos
 const REPORT = { reportVersion: '1.0.0' as const, referenceMode: 'none' as const }
 const GATE_MANIFEST = JSON.parse(readFileSync(resolve(__dirname, '../../../../e2e/cognitive-round2-gate-manifest.json'), 'utf8')) as {
   schemaVersion: string
+  reviewBaseCommit: string
   stimulusSets: Array<{ id: string; version: string }>
   supportingArtifacts: Array<{ id: string; version: string }>
   multisourcePackages: Array<{ key: string; version: string; reviewedScaleCodes: string[] }>
+  candidatePackages: Array<{ key: string; version: string; kind: string }>
 }
 
 /**
@@ -97,6 +99,12 @@ const DRAFT_ONLY_TASKS = [
 
 const isPr14Package = (key: string): key is typeof PR14_PACKAGE_KEYS[number] =>
   (PR14_PACKAGE_KEYS as readonly string[]).includes(key)
+
+const GATE_MODE = process.env.COGNITIVE_R2_GATE_MODE ?? 'pre-release'
+const GATE_CANDIDATE_PACKAGE = process.env.COGNITIVE_R2_GATE_CANDIDATE_PACKAGE ?? ''
+const expectedPackageStatus = (key: string) => (
+  GATE_MODE === 'promotion-candidate' && GATE_CANDIDATE_PACKAGE === `${key}@1.0.0` ? 'PUBLISHED' : 'DRAFT'
+)
 
 const cognitiveItemsFor = (packageKey: string) => {
   const definition = getReportPackageDefinition(packageKey, '1.0.0')
@@ -211,6 +219,7 @@ const multisourceItems = () => {
 
 describe('PR14 Round 2 release gate contracts', () => {
   it('keeps the evidence manifest aligned with the exact Round 2 task and package registry scope', () => {
+    expect(GATE_MANIFEST.reviewBaseCommit).toBe('25098332a354e9d169f62da6edf2d88f43066dbd')
     expect(GATE_MANIFEST.stimulusSets).toEqual(ROUND2_TASKS.map((testType) => ({
       id: testType,
       version: BASE_CONFIGS[testType].stimulusSetVersion,
@@ -225,6 +234,10 @@ describe('PR14 Round 2 release gate contracts', () => {
       version: '1.0.0',
       reviewedScaleCodes: ['adexi_v1'],
     }])
+    expect(GATE_MANIFEST.candidatePackages).toEqual([
+      ...CORE_PACKAGES.map((key) => ({ key, version: '1.0.0', kind: 'cognitive-only' })),
+      { key: MULTISOURCE_PACKAGE, version: '1.0.0', kind: 'multisource' },
+    ])
   })
 
   it('covers every Round 2 task with an exact Registry key, strict schema, Profile merge and frozen provenance', () => {
@@ -250,7 +263,7 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(registeredRound2.map((entry) => entry.testType).sort()).toEqual([...ROUND2_TASKS].sort())
   })
 
-  it('keeps the PR14 package contracts fixed, versioned, disabled and unpublished', () => {
+  it('keeps the PR14 package contracts fixed, versioned, and limited to the selected release mode', () => {
     const protocols = listAnalysisProtocolDefinitions()
     const packages = listReportPackageDefinitions()
     const packageByKey = new Map(packages.map((definition) => [definition.key, definition]))
@@ -260,14 +273,17 @@ describe('PR14 Round 2 release gate contracts', () => {
       const definition = packageByKey.get(packageKey)
       expect(protocol, packageKey).toBeDefined()
       expect(definition, packageKey).toBeDefined()
-      expect(protocol).toMatchObject({ status: 'DRAFT', recommendedForCreate: false })
+      const expectedStatus = expectedPackageStatus(packageKey)
+      expect(protocol).toMatchObject({ status: expectedStatus })
+      if (expectedStatus === 'DRAFT') expect(protocol?.recommendedForCreate).toBe(false)
       expect(definition).toMatchObject({
-        status: 'DRAFT',
+        status: expectedStatus,
         analysisProtocolKey: packageKey,
         analysisProtocolVersion: '1.0.0',
         profiles: ['standard', 'research'],
       })
-      expect(definition?.disabledReason).toBeTruthy()
+      if (expectedStatus === 'DRAFT') expect(definition?.disabledReason).toBeTruthy()
+      else expect(definition?.disabledReason).toBeUndefined()
       expect(definition?.slots.map((slot) => slot.position)).toEqual(
         definition?.slots.map((_, index) => index),
       )
@@ -289,15 +305,16 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(multisource).toMatchObject({
       key: MULTISOURCE_PACKAGE,
       version: '1.0.0',
-      status: 'DRAFT',
-      disabledReason: expect.any(String),
+      status: expectedPackageStatus(MULTISOURCE_PACKAGE),
     })
+    if (expectedPackageStatus(MULTISOURCE_PACKAGE) === 'DRAFT') expect(multisource?.disabledReason).toEqual(expect.any(String))
+    else expect(multisource?.disabledReason).toBeUndefined()
     expect(multisource?.slots.map((slot) => slot.position)).toEqual(
       multisource?.slots.map((_, index) => index),
     )
 
     for (const definition of packages.filter((candidate) => isPr14Package(candidate.key))) {
-      expect(definition.status, definition.key).toBe('DRAFT')
+      expect(definition.status, definition.key).toBe(expectedPackageStatus(definition.key))
       expect(JSON.stringify(definition), definition.key).not.toMatch(/overallScore|averageScore|percentile|\bIQ\b|诊断/i)
     }
   })
@@ -414,17 +431,15 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(JSON.stringify(report)).not.toMatch(/overallScore|averageScore|percentile|\bIQ\b|诊断建议/i)
   })
 
-  it('keeps PR12/PR13 tasks and every package out of the publish/recommendation path', () => {
-    const catalogText = JSON.stringify({
-      registry: listCognitiveRegistryEntries(),
-      protocols: listAnalysisProtocolDefinitions().filter((protocol) => isPr14Package(protocol.key)),
-      packages: listReportPackageDefinitions().filter((definition) => isPr14Package(definition.key)),
-    })
+  it('keeps PR12/PR13 tasks and limits package publication to the selected candidate', () => {
     for (const testType of DRAFT_ONLY_TASKS) {
       const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')!
       expect(entry.recommendedForCreate, testType).toBe(false)
     }
-    expect(catalogText).not.toMatch(/"status":"PUBLISHED"/)
+    for (const packageKey of PR14_PACKAGE_KEYS) {
+      const definition = listReportPackageDefinitions().find((candidate) => candidate.key === packageKey)
+      expect(definition?.status, packageKey).toBe(expectedPackageStatus(packageKey))
+    }
   })
 
   it('does not let a future published package expand the PR14-specific assertions', () => {
