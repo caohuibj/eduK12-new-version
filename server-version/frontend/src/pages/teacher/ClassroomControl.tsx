@@ -76,7 +76,6 @@ const ClassroomControl: React.FC = () => {
 
     // 教师加入成功
     on('teacher:joined', (data) => {
-      console.log('教师已加入课堂', data)
     })
 
     // 实时统计
@@ -92,7 +91,6 @@ const ClassroomControl: React.FC = () => {
 
     // 题目开始
     on('broadcast:question', (data) => {
-      console.log('题目开始', data)
       setCurrentQuestion({
         id: data.questionId,
         questionIndex: data.questionIndex,
@@ -105,7 +103,6 @@ const ClassroomControl: React.FC = () => {
 
     // 答题结束
     on('broadcast:finished', (data) => {
-      console.log('答题结束', data)
       setCurrentQuestion((prev) => {
         if (prev) {
           return {
@@ -121,7 +118,6 @@ const ClassroomControl: React.FC = () => {
 
     // 下一题
     on('broadcast:next', (data) => {
-      console.log('准备下一题', data)
       setCurrentQuestion(null)
     })
 
@@ -153,7 +149,6 @@ const ClassroomControl: React.FC = () => {
   // 开始指定题目
   const handleStartSpecificQuestion = (question: Question) => {
     if (!classroom || !isConnected) {
-      console.warn('无法开始题目：课堂不存在或 socket 未连接')
       return
     }
 
