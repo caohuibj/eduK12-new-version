@@ -123,6 +123,7 @@ setup_database() {
     npm install
     npx prisma migrate deploy
     npx prisma generate
+    ADMIN_USERNAME="$ADMIN_USERNAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" npm run db:seed
     
     info "数据库设置完成"
 }

@@ -50,7 +50,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}?schema=public
+      # Supply a complete URL with percent-encoded user/password credentials.
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
@@ -126,7 +127,7 @@ services:
     container_name: ptool-migrate
     profiles: ["ops"]
     environment:
-      DATABASE_URL: postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
     command: npx prisma migrate deploy
     depends_on:
@@ -142,7 +143,7 @@ services:
     container_name: ptool-seed
     profiles: ["ops"]
     environment:
-      DATABASE_URL: postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
       ADMIN_USERNAME: ${ADMIN_USERNAME:?ADMIN_USERNAME must be set for the initial seed}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set for the initial seed}

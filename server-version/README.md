@@ -33,18 +33,23 @@ cd server-version
 
 # 2. 复制环境变量文件
 cp .env.example .env
+# 编辑 .env：填写 DB_*、完整且已 percent-encode 的 DATABASE_URL、JWT/加密密钥、CORS 和管理员凭据
 
-# 3. 启动服务
-docker-compose up -d
+# 3. 先执行一次迁移和幂等 seed
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm seed
 
-# 4. 查看日志
-docker-compose logs -f
+# 4. 启动服务
+docker compose up -d backend frontend
+
+# 5. 查看日志
+docker compose logs -f
 ```
 
 ### 访问应用
 
 - 管理端：http://localhost
-- 默认管理员账号：`admin` / `admin123`
+- 管理员账号：使用 `.env` 中的 `ADMIN_USERNAME` / `ADMIN_PASSWORD`
 
 ### 停止服务
 

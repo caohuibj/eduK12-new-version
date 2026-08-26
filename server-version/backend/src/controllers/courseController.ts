@@ -7,7 +7,11 @@ import { logger } from '../utils/logger'
 import { cache } from '../utils/cache'
 import { Messages, CACHE_TTL } from '../constants'
 import { z } from 'zod'
-import { canAccessCourseAsStaff, hasActiveCourseMembership } from '../utils/courseAccess'
+import {
+  canAccessCourseContent,
+  canAccessCourseRoster,
+  hasActiveCourseMembership,
+} from '../utils/courseAccess'
 
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
@@ -241,15 +245,16 @@ export const courseController = {
         if (!isMember) {
           return forbidden(res, '您不是该课程的学员')
         }
-      } else if (!canAccessCourseAsStaff(course, req.user?.userId, req.user?.role)) {
+      } else if (!canAccessCourseContent(course, req.user?.userId, req.user?.role)) {
         return forbidden(res, '您没有权限访问该课程')
       }
 
+      const canViewRoster = canAccessCourseRoster(course, req.user?.userId, req.user?.role)
       const { _count, students, shares: _shares, courseCode, ...courseFields } = course
 
       return success(res, {
         ...courseFields,
-        ...(req.user?.role === UserRole.STUDENT ? {} : { courseCode, students }),
+        ...(canViewRoster ? { courseCode, students } : {}),
         studentCount: _count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
@@ -646,7 +651,7 @@ export const courseController = {
       }
 
       // 权限检查
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限查看此课程的学生')
       }
 
@@ -707,7 +712,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -876,7 +881,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -912,7 +917,7 @@ export const courseController = {
         return notFound(res, '课程不存在')
       }
 
-      if (userRole !== UserRole.ADMIN && course.creatorId !== userId) {
+      if (!canAccessCourseRoster(course, userId, userRole)) {
         return forbidden(res, '无权限管理此课程的学生')
       }
 
@@ -1420,16 +1425,21 @@ export const courseController = {
       })
 
       // 格式化返回数据
-      const formattedShares = shares.map(share => ({
-        id: share.id,
-        createdAt: share.createdAt,
-        course: {
-          ...share.course,
-          studentCount: share.course._count.students,
-          _count: undefined,
-        },
-        sharer: share.sharer,
-      }))
+      const formattedShares = shares.map(share => {
+        // A share grants reusable course content, not the original course
+        // join secret or enrolled student identity data.
+        const { courseCode: _courseCode, _count, ...courseFields } = share.course
+        return {
+          id: share.id,
+          createdAt: share.createdAt,
+          course: {
+            ...courseFields,
+            studentCount: _count.students,
+            _count: undefined,
+          },
+          sharer: share.sharer,
+        }
+      })
 
       return success(res, {
         list: formattedShares,

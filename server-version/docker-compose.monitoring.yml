@@ -66,7 +66,7 @@ services:
     image: prometheuscommunity/postgres-exporter:latest
     container_name: ptool-postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://${DB_USER:?DB_USER must be set}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:?DB_NAME must be set}?sslmode=disable"
+      DATA_SOURCE_NAME: ${POSTGRES_EXPORTER_DATA_SOURCE_NAME:?POSTGRES_EXPORTER_DATA_SOURCE_NAME must be set with URL-encoded credentials}
     ports:
       - "9187:9187"
     networks:

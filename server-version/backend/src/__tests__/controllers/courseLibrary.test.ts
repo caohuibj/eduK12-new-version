@@ -5,6 +5,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
     courseStudent: { findMany: vi.fn(), findFirst: vi.fn() },
+    courseShare: { findMany: vi.fn() },
   },
 }))
 
@@ -145,6 +146,57 @@ describe('course isLibrary', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body.data).not.toHaveProperty('courseCode')
     expect(res.body.data).not.toHaveProperty('students')
+  })
+
+  it('does not return the course code or roster to a shared teacher', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-1',
+      creatorId: 'owner-1',
+      shares: [{ sharedTo: 'teacher-1' }],
+      title: 'Shared course',
+      isLibrary: false,
+      courseCode: 'SECRET-CODE',
+      isRecruiting: true,
+      students: [{ student: { id: 'student-2', nickname: 'Other', username: 'other', avatarUrl: null } }],
+      _count: { students: 1 },
+    })
+    const res = makeRes()
+
+    await courseController.detail(makeReq({
+      user: { userId: 'teacher-1', role: UserRole.TEACHER },
+      params: { id: 'course-1' },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data).not.toHaveProperty('courseCode')
+    expect(res.body.data).not.toHaveProperty('students')
+  })
+
+  it('does not return the original course code in a shared-course listing', async () => {
+    mockPrisma.courseShare.findMany.mockResolvedValue([{
+      id: 'share-1',
+      createdAt: new Date('2026-08-25T00:00:00Z'),
+      course: {
+        id: 'course-1',
+        title: 'Shared course',
+        courseCode: 'SECRET-CODE',
+        creatorId: 'owner-1',
+        status: 'PUBLISHED',
+        isRecruiting: true,
+        _count: { students: 3, assignments: 1, checkins: 1 },
+        creator: { id: 'owner-1', nickname: 'Owner', username: 'owner' },
+      },
+      sharer: { id: 'owner-1', nickname: 'Owner', username: 'owner' },
+    }])
+    const res = makeRes()
+
+    await courseController.getSharedToMe(makeReq({
+      user: { userId: 'teacher-1', role: UserRole.TEACHER },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.list[0].course).not.toHaveProperty('courseCode')
+    expect(res.body.data.list[0].course.studentCount).toBe(3)
   })
 
   it('omits library courses from the student myCourses list', async () => {

@@ -7,7 +7,7 @@ import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
-import { canAccessCourseAsStaff, hasActiveCourseMembership } from '../utils/courseAccess'
+import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -289,7 +289,7 @@ export const assignmentController = {
         if (assignment.status !== AssignmentStatus.PUBLISHED) {
           return forbidden(res, '无权限查看此作业')
         }
-      } else if (!canAccessCourseAsStaff(assignment.course, userId, userRole)) {
+      } else if (!canAccessCourseContent(assignment.course, userId, userRole)) {
         return forbidden(res, '您没有权限访问此作业')
       }
 

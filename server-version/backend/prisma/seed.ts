@@ -1,5 +1,10 @@
 import { Prisma, PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import dotenv from 'dotenv'
+
+// `npm run db:seed` is also used directly by bare-metal deployment scripts,
+// outside Prisma CLI's environment loading path.
+dotenv.config()
 
 const prisma = new PrismaClient()
 

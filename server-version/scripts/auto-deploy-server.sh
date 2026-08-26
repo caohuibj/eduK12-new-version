@@ -154,6 +154,7 @@ cd /opt/ptool/server-version/backend
 npm install
 npx prisma migrate deploy
 npx prisma generate
+ADMIN_USERNAME="$ADMIN_USERNAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" npm run db:seed
 npm run build
 
 # 10. 构建前端

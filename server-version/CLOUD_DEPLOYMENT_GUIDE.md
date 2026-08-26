@@ -170,6 +170,7 @@ COS_DOMAIN=https://ptool-uploads-yourname.cos.ap-guangzhou.myqcloud.com
 # 4. 数据库迁移
 npx prisma migrate deploy
 npx prisma generate
+npm run db:seed
 
 # 5. 构建
 npm run build

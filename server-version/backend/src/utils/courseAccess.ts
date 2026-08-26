@@ -28,7 +28,7 @@ export interface CourseOwnerAccess {
   shares?: Array<{ sharedTo: string }>
 }
 
-export function canAccessCourseAsStaff(
+export function canAccessCourseContent(
   course: CourseOwnerAccess,
   userId: string | undefined,
   role: UserRole | undefined,
@@ -36,4 +36,17 @@ export function canAccessCourseAsStaff(
   if (role === UserRole.ADMIN) return true
   if (!userId) return false
   return course.creatorId === userId || Boolean(course.shares?.some((share) => share.sharedTo === userId))
+}
+
+/**
+ * Student identity and roster management stay with the course owner/admin.
+ * A CourseShare grants content access, not access to enrolled student data.
+ */
+export function canAccessCourseRoster(
+  course: CourseOwnerAccess,
+  userId: string | undefined,
+  role: UserRole | undefined,
+): boolean {
+  if (role === UserRole.ADMIN) return true
+  return Boolean(userId && course.creatorId === userId)
 }

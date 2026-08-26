@@ -174,6 +174,10 @@ deploy_backend() {
     # 数据库迁移
     npx prisma migrate deploy
     npx prisma generate
+
+    # 首次管理员和内置参考配置：seed 是幂等的，可安全重复执行。
+    # 显式传入凭据，避免依赖 shell 是否 export 了脚本变量。
+    ADMIN_USERNAME="$ADMIN_USERNAME" ADMIN_PASSWORD="$ADMIN_PASSWORD" npm run db:seed
     
     # 构建
     npm run build

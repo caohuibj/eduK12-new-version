@@ -11,7 +11,7 @@ import path from 'path'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 import { config } from '../config'
-import { canAccessCourseAsStaff, hasActiveCourseMembership } from '../utils/courseAccess'
+import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 
 const createCheckinSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -273,7 +273,7 @@ export const checkinController = {
         if (!req.user.userId || !(await hasActiveCourseMembership(checkin.course.id, req.user.userId))) {
           return forbidden(res, '您不是该课程的学员')
         }
-      } else if (!canAccessCourseAsStaff(checkin.course, req.user?.userId, req.user?.role)) {
+      } else if (!canAccessCourseContent(checkin.course, req.user?.userId, req.user?.role)) {
         return forbidden(res, '您没有权限访问此打卡')
       }
 
