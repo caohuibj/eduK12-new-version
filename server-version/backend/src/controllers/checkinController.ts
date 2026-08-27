@@ -133,6 +133,25 @@ export class PublicUploadSessionLimitError extends Error {
   }
 }
 
+export class PublicUploadSessionAlreadySubmittedError extends Error {
+  constructor() {
+    super('该签到会话已经提交')
+    this.name = 'PublicUploadSessionAlreadySubmittedError'
+  }
+}
+
+/** Serialize every upload and submit transition for one anonymous session. */
+export const withPublicUploadSessionLock = async <T>(
+  db: AssetDatabase,
+  checkinId: string,
+  sessionId: string,
+  operation: () => Promise<T>,
+): Promise<T> => {
+  const stagingEntityId = publicUploadStagingEntityId(checkinId, sessionId)
+  await db.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stagingEntityId}))`
+  return operation()
+}
+
 let lastPublicUploadCleanupAt = 0
 
 /** Remove abandoned anonymous upload references and their unreferenced blobs. */
@@ -171,7 +190,12 @@ const runPublicUploadCleanup = async (): Promise<void> => {
   }
 }
 
-export const validatePublicSubmissionImages = async (images: unknown, checkinId: string, sessionId: string) => {
+export const validatePublicSubmissionImages = async (
+  images: unknown,
+  checkinId: string,
+  sessionId: string,
+  db: AssetDatabase = prisma,
+) => {
   const result = z.array(publicSubmissionImageSchema).max(MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION).safeParse(images || [])
   if (!result.success) return null
 
@@ -181,7 +205,7 @@ export const validatePublicSubmissionImages = async (images: unknown, checkinId:
 
   const stagingEntityId = publicUploadStagingEntityId(checkinId, sessionId)
 
-  const assets = await prisma.storedAsset.findMany({
+  const assets = await db.storedAsset.findMany({
     where: {
       id: { in: assetIds },
       accessScope: 'PUBLIC_CHECKIN',
@@ -198,6 +222,47 @@ export const validatePublicSubmissionImages = async (images: unknown, checkinId:
     select: { id: true },
   })
   return assets.length === assetIds.length ? result.data : null
+}
+
+export const stagePublicUploadAsset = async (params: {
+  assetId: string
+  checkinId: string
+  sessionId: string
+  db: AssetDatabase
+}): Promise<void> => {
+  const { assetId, checkinId, sessionId, db } = params
+  const stagingEntityId = publicUploadStagingEntityId(checkinId, sessionId)
+
+  await withPublicUploadSessionLock(db, checkinId, sessionId, async () => {
+    const existingSubmission = await db.checkinSubmission.findUnique({
+      where: {
+        checkinId_sessionId: {
+          checkinId,
+          sessionId,
+        },
+      },
+      select: { id: true },
+    })
+    if (existingSubmission) throw new PublicUploadSessionAlreadySubmittedError()
+
+    const stagedCount = await db.assetReference.count({
+      where: {
+        entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+        entityId: stagingEntityId,
+        field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+      },
+    })
+    if (stagedCount >= MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION) {
+      throw new PublicUploadSessionLimitError()
+    }
+
+    await attachAssetReference({
+      assetId,
+      entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+      entityId: stagingEntityId,
+      field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+    }, db)
+  })
 }
 
 const syncSubmissionAssetReferences = async (
@@ -1516,7 +1581,6 @@ export const checkinController = {
       })) {
         return unauthorized(res, '匿名签到会话凭据无效')
       }
-      const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
@@ -1530,31 +1594,19 @@ export const checkinController = {
         scopeId: validation.checkin.id,
       })
       try {
-        await prisma.$transaction(async (tx) => {
-          // Serialize uploads for one browser session so the per-session cap
-          // cannot be bypassed by parallel requests.
-          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stagingEntityId}))`
-          const stagedCount = await tx.assetReference.count({
-            where: {
-              entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
-              entityId: stagingEntityId,
-              field: PUBLIC_UPLOAD_REFERENCE_FIELD,
-            },
-          })
-          if (stagedCount >= MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION) {
-            throw new PublicUploadSessionLimitError()
-          }
-          await attachAssetReference({
-            assetId: asset.id,
-            entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
-            entityId: stagingEntityId,
-            field: PUBLIC_UPLOAD_REFERENCE_FIELD,
-          }, tx)
-        })
+        await prisma.$transaction(async (tx) => stagePublicUploadAsset({
+          assetId: asset.id,
+          checkinId: validation.checkin.id,
+          sessionId,
+          db: tx,
+        }))
       } catch (referenceError) {
         await discardUnreferencedAsset(asset)
         if (referenceError instanceof PublicUploadSessionLimitError) {
           return error(res, `每个会话最多上传${MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION}张图片`, -1, 409)
+        }
+        if (referenceError instanceof PublicUploadSessionAlreadySubmittedError) {
+          return error(res, '该签到会话已经提交，不能继续上传图片', -1, 409)
         }
         throw referenceError
       }
@@ -1626,25 +1678,53 @@ export const checkinController = {
 
       await runPublicUploadCleanup()
 
-      const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
-      const validatedImages = await validatePublicSubmissionImages(images, validation.checkin.id, sessionId)
-      if (!validatedImages) {
-        return error(res, '图片凭据无效或不属于当前签到')
-      }
-
       // Claim the quota and create the submission in one transaction. A
-      // duplicate session rolls back the claim; a different concurrent
       // session can consume at most one remaining slot.
-      const result = await prisma.$transaction(async (tx) => {
-        const existingSubmission = await tx.checkinSubmission.findUnique({
-          where: {
-            checkinId_sessionId: {
-              checkinId: validation.checkin.id,
-              sessionId,
+      const result = await prisma.$transaction(async (tx) => (
+        withPublicUploadSessionLock(tx, validation.checkin.id, sessionId, async () => {
+          const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
+          const existingSubmission = await tx.checkinSubmission.findUnique({
+            where: {
+              checkinId_sessionId: {
+                checkinId: validation.checkin.id,
+                sessionId,
+              },
             },
-          },
-        })
-        if (existingSubmission) {
+          })
+          if (existingSubmission) {
+            await tx.assetReference.deleteMany({
+              where: {
+                entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+                entityId: stagingEntityId,
+                field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+              },
+            })
+            return { kind: 'existing' as const }
+          }
+
+          const validatedImages = await validatePublicSubmissionImages(
+            images,
+            validation.checkin.id,
+            sessionId,
+            tx,
+          )
+          if (!validatedImages) return { kind: 'invalid-images' as const }
+
+          const claimed = await checkinTokenService.claimSubmissionSlot(validation.token.id, tx)
+          if (!claimed) return { kind: 'over-limit' as const }
+
+          const submission = await tx.checkinSubmission.create({
+            data: {
+              checkinId: validation.checkin.id,
+              studentId: null, // 匿名提交
+              content,
+              images: validatedImages,
+              sessionId,
+              tokenId: validation.token.id,
+              isAnonymous: true,
+            },
+          })
+          await syncSubmissionAssetReferences(submission.id, validatedImages, tx)
           await tx.assetReference.deleteMany({
             where: {
               entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
@@ -1652,36 +1732,13 @@ export const checkinController = {
               field: PUBLIC_UPLOAD_REFERENCE_FIELD,
             },
           })
-          return { kind: 'existing' as const }
-        }
-
-        const claimed = await checkinTokenService.claimSubmissionSlot(validation.token.id, tx)
-        if (!claimed) return { kind: 'over-limit' as const }
-
-        const submission = await tx.checkinSubmission.create({
-          data: {
-            checkinId: validation.checkin.id,
-            studentId: null, // 匿名提交
-            content,
-            images: validatedImages,
-            sessionId,
-            tokenId: validation.token.id,
-            isAnonymous: true,
-          },
+          return { kind: 'created' as const, submission }
         })
-        await syncSubmissionAssetReferences(submission.id, validatedImages, tx)
-        await tx.assetReference.deleteMany({
-          where: {
-            entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
-            entityId: stagingEntityId,
-            field: PUBLIC_UPLOAD_REFERENCE_FIELD,
-          },
-        })
-        return { kind: 'created' as const, submission }
-      })
+      ))
 
       if (result.kind === 'existing') return error(res, '您已经提交过了')
       if (result.kind === 'over-limit') return error(res, '访问令牌已达到匿名提交上限', -1, 409)
+      if (result.kind === 'invalid-images') return error(res, '图片凭据无效或不属于当前签到')
       const submission = result.submission
 
       logger.info('匿名用户提交打卡', {

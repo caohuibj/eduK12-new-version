@@ -18,6 +18,10 @@ const configSchema = z.object({
   cookieSecure: z.boolean(),
   assetSigningSecret: z.string().min(32, 'ASSET_SIGNING_SECRET must be at least 32 characters'),
   uploadDir: z.string(),
+  publicCheckinUploadIpLimit: z.number().int().min(1).max(10000),
+  publicCheckinUploadTokenLimit: z.number().int().min(1).max(10000),
+  publicCheckinSubmitIpLimit: z.number().int().min(1).max(10000),
+  publicCheckinSubmitTokenLimit: z.number().int().min(1).max(10000),
   // Keep legacy static uploads available only during the reversible migration
   // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
   // and verified.
@@ -55,6 +59,17 @@ const parseNonNegativeInteger = (name: string, fallback: number): number => {
   return parsed
 }
 
+const parsePositiveInteger = (name: string, fallback: number): number => {
+  const value = process.env[name]
+  if (value === undefined || value === '') return fallback
+
+  const parsed = Number(value)
+  if (!Number.isSafeInteger(parsed) || parsed < 1 || parsed > 10000) {
+    throw new Error(`❌ ${name} must be an integer between 1 and 10000 (got '${value}')`)
+  }
+  return parsed
+}
+
 // 严格布尔环境变量解析：仅接受 'true'/'false'，缺省回落 fallback。
 // 不允许使用 z.coerce.boolean()（因为 Boolean('false') === true，会误判）。
 const parseBooleanEnv = (name: string, fallback: boolean): boolean => {
@@ -88,6 +103,12 @@ const rawConfig = {
   assetSigningSecret: process.env.ASSET_SIGNING_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-asset-signing-secret-not-for-production'),
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
+  // Public check-in limits use a 15-minute window. Token limits are shared by
+  // the whole class link; IP limits are intentionally wider for school NATs.
+  publicCheckinUploadIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_IP_LIMIT', 1800),
+  publicCheckinUploadTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT', 600),
+  publicCheckinSubmitIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_IP_LIMIT', 600),
+  publicCheckinSubmitTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT', 120),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,

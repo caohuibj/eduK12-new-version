@@ -4,12 +4,16 @@ const { mockPrisma, mockCheckinTokenService } = vi.hoisted(() => ({
   mockPrisma: {
     checkin: { findUnique: vi.fn() },
     storedAsset: { findMany: vi.fn() },
-    assetReference: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
+    checkinSubmission: { findUnique: vi.fn(), create: vi.fn() },
+    assetReference: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn(), upsert: vi.fn() },
+    $executeRaw: vi.fn(),
+    $transaction: vi.fn(),
   },
   mockCheckinTokenService: {
     validateToken: vi.fn(),
     createSessionCapability: vi.fn(),
     verifySessionCapability: vi.fn(),
+    claimSubmissionSlot: vi.fn(),
   },
 }))
 
@@ -50,6 +54,10 @@ describe('public check-in session capability', () => {
       capability: 'v1.1234567890.server-issued-capability',
       expiresAt: Math.floor(Date.now() / 1000) + 3600,
     })
+    mockCheckinTokenService.verifySessionCapability.mockReturnValue(true)
+    mockCheckinTokenService.claimSubmissionSlot.mockResolvedValue(true)
+    mockPrisma.$executeRaw.mockResolvedValue(0)
+    mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
 
   it('returns a server-issued capability with the public check-in session', async () => {
@@ -108,5 +116,57 @@ describe('public check-in session capability', () => {
       capability: 'forged-capability',
     }))
     expect(mockPrisma.storedAsset.findMany).not.toHaveBeenCalled()
+  })
+
+  it('serializes a valid submission under the session lock', async () => {
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{ id: 'asset-1' }])
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.checkinSubmission.create.mockResolvedValue({ id: 'submission-1' })
+    mockPrisma.assetReference.upsert.mockResolvedValue({})
+    const response = makeRes()
+
+    await checkinController.submitPublicCheckin(
+      makeRequest({
+        content: 'anonymous response',
+        images: [{ assetId: 'asset-1' }],
+        sessionId: 'session_abcdefghijklmnop',
+      }, {
+        'X-Checkin-Token': 'ck_abcdefghijklmnop',
+        'X-Checkin-Session-Capability': 'server-issued-capability',
+      }),
+      response,
+    )
+
+    expect(response.statusCode).toBe(200)
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockCheckinTokenService.claimSubmissionSlot).toHaveBeenCalledWith('token-1', mockPrisma)
+    expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        entityType: 'CheckinUploadSession',
+        entityId: 'checkin-1:session_abcdefghijklmnop',
+      }),
+    }))
+  })
+
+  it('does not claim another slot or allow a duplicate session upload path', async () => {
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue({ id: 'submission-1' })
+    const response = makeRes()
+
+    await checkinController.submitPublicCheckin(
+      makeRequest({
+        content: 'duplicate response',
+        images: [],
+        sessionId: 'session_abcdefghijklmnop',
+      }, {
+        'X-Checkin-Token': 'ck_abcdefghijklmnop',
+        'X-Checkin-Session-Capability': 'server-issued-capability',
+      }),
+      response,
+    )
+
+    expect(response.statusCode).toBe(400)
+    expect(response.body.message).toBe('您已经提交过了')
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockCheckinTokenService.claimSubmissionSlot).not.toHaveBeenCalled()
   })
 })

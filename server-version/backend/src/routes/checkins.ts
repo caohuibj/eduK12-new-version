@@ -3,19 +3,20 @@ import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
+import { config } from '../config'
 
 const router = Router()
 
 const publicUploadIpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinUploadIpLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
 })
 
 const publicUploadTokenLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinUploadTokenLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   keyGenerator: (req) => {
@@ -28,14 +29,14 @@ const publicUploadTokenLimiter = rateLimit({
 
 const publicSubmitIpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinSubmitIpLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
 })
 
 const publicSubmitTokenLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinSubmitTokenLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   keyGenerator: (req) => {
