@@ -6,7 +6,6 @@ import { useAuth } from '../../contexts/AuthContext'
 import type { User } from '../../types'
 
 interface StudentRegisterData {
-  token: string
   user: User
 }
 
@@ -14,7 +13,7 @@ const StudentRegister: React.FC = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const courseCode = searchParams.get('course') || '' 
-  const { loginWithToken } = useAuth()
+  const { setAuthenticatedUser } = useAuth()
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -63,9 +62,9 @@ const StudentRegister: React.FC = () => {
   }
 
   const validatePassword = (password: string) => {
-    const regex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d).{8,128}$/
     if (!regex.test(password)) {
-      return '密码必须包含字母和数字，长度8-12位'
+      return '密码必须包含字母和数字，长度8-128位'
     }
     return ''
   }
@@ -118,7 +117,7 @@ const StudentRegister: React.FC = () => {
       )
 
       if (response.code === 0 && response.data) {
-        loginWithToken(response.data.token, response.data.user)
+        setAuthenticatedUser(response.data.user)
         navigate('/student')
       } else {
         setError(response.message || '注册失败')
@@ -221,7 +220,7 @@ const StudentRegister: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                密码 <span className="text-xs text-gray-500">(字母+数字，8-12位)</span>
+                密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
               </label>
               <input
                 type="password"

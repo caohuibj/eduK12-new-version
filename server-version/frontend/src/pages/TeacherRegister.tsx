@@ -1,21 +1,17 @@
 import React, { useState } from 'react'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { Users, Loader2, ArrowLeft, CheckCircle } from 'lucide-react'
 import apiClient from '../api/client'
-import { useAuth } from '../contexts/AuthContext'
 import type { User } from '../types'
 
 interface TeacherRegisterData {
-  token?: string
   pendingApproval?: boolean
   user: User
 }
 
 const TeacherRegister: React.FC = () => {
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const teacherCode = searchParams.get('code') || ''
-  const { loginWithToken } = useAuth()
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -40,9 +36,9 @@ const TeacherRegister: React.FC = () => {
   }
 
   const validatePassword = (password: string) => {
-    const regex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d).{8,128}$/
     if (!regex.test(password)) {
-      return '密码必须包含字母和数字，长度8-12位'
+      return '密码必须包含字母和数字，长度8-128位'
     }
     return ''
   }
@@ -86,9 +82,6 @@ const TeacherRegister: React.FC = () => {
 
       if (response.code === 0 && response.data?.pendingApproval) {
         setSubmitted(true)
-      } else if (response.code === 0 && response.data?.token) {
-        loginWithToken(response.data.token, response.data.user)
-        navigate('/dashboard')
       } else {
         setError(response.message || '注册失败')
       }
@@ -207,7 +200,7 @@ const TeacherRegister: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                密码 <span className="text-xs text-gray-500">(字母+数字，8-12位)</span>
+                密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
               </label>
               <input
                 type="password"

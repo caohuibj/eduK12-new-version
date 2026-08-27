@@ -10,16 +10,17 @@ import path from 'path'
 let createCanvas: any = null
 try {
   createCanvas = require('canvas').createCanvas
-} catch (e) {
-  console.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
+} catch {
+  logger.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
 }
 
 import { videoQueue } from '../config/queue'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
-import { config } from '../config'
-import { isCOSEnabled, uploadToCOS } from '../utils/cos'
-import { downloadVideo, cleanupTempFile, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
+import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
+import { attachAssetReference, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+
+const VIDEO_PROCESSING_FAILURE_MESSAGE = '视频处理失败，请稍后重试或联系管理员'
 
 // 处理策略类型
 interface ProcessingStrategy {
@@ -114,7 +115,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   // 如果 FFmpeg 不可用，直接标记为失败
   if (!ffmpegAvailable) {
-    await markVideoFailed(videoId, 'FFmpeg 未安装，无法处理视频')
+    await markVideoFailed(videoId, 'VIDEO_PROCESSOR_UNAVAILABLE')
     throw new Error('FFmpeg 未安装')
   }
 
@@ -167,6 +168,24 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       const stat = await fs.stat(inputPath)
       originalFileSize = stat.size
       logger.info(`[${videoId}] 文件大小: ${(originalFileSize / 1024 / 1024).toFixed(2)}MB`)
+    }
+
+    // URL imports do not have a database asset until the download succeeds.
+    // Store the downloaded original before producing derivatives.
+    if (isUrlMode) {
+      const originalAsset = await storeAssetFromFile({
+        filePath: inputPath,
+        originalName: `${videoId}-original${path.extname(inputPath) || '.mp4'}`,
+        mimeType: 'video/mp4',
+        ownerId: teacherId,
+      })
+      await prisma.$transaction(async (tx) => {
+        await tx.video.update({
+          where: { id: videoId },
+          data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
+        })
+        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' }, tx)
+      })
     }
 
     await job.progress(10)
@@ -227,38 +246,22 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤6：上传存储
     logger.info(`[${videoId}] 步骤 6/6: 上传存储...`)
-    let processedUrl: string
-    let thumbnailUrl: string
-
-    if (isCOSEnabled()) {
-      const timestamp = Date.now()
-      const processedKey = `videos/processed/${timestamp}-${videoId}.mp4`
-      const thumbnailKey = `videos/thumbnails/${timestamp}-${videoId}.jpg`
-
-      ;[processedUrl, thumbnailUrl] = await Promise.all([
-        uploadToCOS(outputPath, processedKey),
-        uploadToCOS(thumbnailPath, thumbnailKey)
-      ])
-
-      logger.info(`[${videoId}] 已上传至 COS`)
-    } else {
-      // 本地存储
-      const publicVideoDir = path.join(config.uploadDir, 'processed')
-      const publicThumbDir = path.join(config.uploadDir, 'thumbnails')
-      await fs.mkdir(publicVideoDir, { recursive: true })
-      await fs.mkdir(publicThumbDir, { recursive: true })
-
-      const publicVideoPath = path.join(publicVideoDir, `${videoId}.mp4`)
-      const publicThumbPath = path.join(publicThumbDir, `${videoId}.jpg`)
-
-      await fs.copyFile(outputPath, publicVideoPath)
-      await fs.copyFile(thumbnailPath, publicThumbPath)
-
-      processedUrl = `/uploads/processed/${videoId}.mp4`
-      thumbnailUrl = `/uploads/thumbnails/${videoId}.jpg`
-
-      logger.info(`[${videoId}] 已保存到本地: ${processedUrl}`)
-    }
+    const [processedAsset, thumbnailAsset] = await Promise.all([
+      storeAssetFromFile({
+        filePath: outputPath,
+        originalName: `${videoId}-processed.mp4`,
+        mimeType: 'video/mp4',
+        ownerId: teacherId,
+      }),
+      storeAssetFromFile({
+        filePath: thumbnailPath,
+        originalName: `${videoId}-thumbnail.jpg`,
+        mimeType: 'image/jpeg',
+        ownerId: teacherId,
+      }),
+    ])
+    const processedUrl = await getSignedAssetUrl(processedAsset.id)
+    const thumbnailUrl = await getSignedAssetUrl(thumbnailAsset.id)
 
     await job.progress(95)
 
@@ -266,18 +269,24 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     const duration = await getVideoDuration(outputPath)
     const fileSize = (await fs.stat(outputPath)).size
 
-    // 更新数据库
-    await prisma.video.update({
-      where: { id: videoId },
-      data: {
-        status: 'COMPLETED',
-        processedUrl,
-        thumbnailUrl,
-        resolution: PROCESSING_CONFIG.resolution,
-        duration,
-        fileSize,
-        processedAt: new Date()
-      }
+    // Update the video and attach both derivatives atomically.
+    await prisma.$transaction(async (tx) => {
+      await tx.video.update({
+        where: { id: videoId },
+        data: {
+          status: 'COMPLETED',
+          processedUrl: null,
+          thumbnailUrl: null,
+          processedAssetId: processedAsset.id,
+          thumbnailAssetId: thumbnailAsset.id,
+          resolution: PROCESSING_CONFIG.resolution,
+          duration,
+          fileSize,
+          processedAt: new Date()
+        }
+      })
+      await attachAssetReference({ assetId: processedAsset.id, entityType: 'Video', entityId: videoId, field: 'processed' }, tx)
+      await attachAssetReference({ assetId: thumbnailAsset.id, entityType: 'Video', entityId: videoId, field: 'thumbnail' }, tx)
     })
 
     await job.progress(100)
@@ -291,7 +300,9 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   } catch (error: any) {
     logger.error(`❌ 视频处理失败: ${videoId}`, error)
-    await markVideoFailed(videoId, error.message || '处理失败')
+    // Never persist ffmpeg, filesystem, URL, or dependency details; the
+    // status endpoint is visible to teachers.
+    await markVideoFailed(videoId, VIDEO_PROCESSING_FAILURE_MESSAGE)
     await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
     throw error
   }

@@ -169,6 +169,23 @@ describe('CheckinTokenService', () => {
       expect(validation.valid).toBe(false)
       expect(validation.overLimit).toBe(true)
     })
+
+    it('uses maxUses for atomic submission slots without consuming page views', async () => {
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      const tokenData = await checkinTokenService.createToken({
+        checkinId: testCheckinId,
+        createdBy: testUserId,
+        expiresAt,
+        maxUses: 1,
+      })
+
+      expect(await checkinTokenService.claimSubmissionSlot(tokenData.id)).toBe(true)
+      expect(await checkinTokenService.claimSubmissionSlot(tokenData.id)).toBe(false)
+      expect((await checkinTokenService.validateToken(tokenData.token)).overLimit).toBe(true)
+      expect((await checkinTokenService.validateToken(tokenData.token, { ignoreUsageLimit: true })).valid).toBe(true)
+
+      await prisma.checkinAccessToken.delete({ where: { id: tokenData.id } })
+    })
   })
 
   describe('recordAccess', () => {

@@ -5,6 +5,7 @@ import apiClient from '../../api/client'
 import type { Assignment, Submission, MediaItem, DocumentItem } from '../../types'
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import PdfViewer from '../../components/PdfViewer'
+import { sanitizeHtml } from '../../utils/sanitize'
 
 const AssignmentSubmit: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>()
@@ -189,7 +190,7 @@ const AssignmentSubmit: React.FC = () => {
         {assignment.content && (
           <div 
             className="text-gray-700 mb-4 prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: assignment.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(assignment.content) }}
           />
         )}
         <div className={`flex items-center space-x-2 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>

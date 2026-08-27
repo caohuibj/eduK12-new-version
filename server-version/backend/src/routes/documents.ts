@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { documentController } from '../controllers/documentController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
+import { validateUploadedFile } from '../utils/fileValidator'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
@@ -12,19 +13,15 @@ const documentUpload = multer({
   limits: {
     fileSize: 20 * 1024 * 1024, // 20MB
   },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true)
-    } else {
-      cb(new Error('只支持PDF格式文档'))
-    }
-  }
+  // The client MIME is only a hint. The content is checked by the
+  // validateUploadedFile middleware after Multer has buffered it.
+  fileFilter: (_req, _file, cb) => cb(null, true),
 })
 
 // 路由
 router.get('/', documentController.list)
 router.get('/:id', documentController.detail)
-router.post('/upload', documentUpload.single('document'), documentController.upload)
+router.post('/upload', documentUpload.single('document'), validateUploadedFile(['application/pdf']), documentController.upload)
 router.put('/:id', documentController.update)
 router.delete('/:id', documentController.delete)
 router.post('/:id/restore', documentController.restore)

@@ -4,6 +4,15 @@
 
 set -e
 
+cat >&2 <<'NOTICE'
+此宿主机依赖安装入口已停用。
+FFmpeg、Redis 和应用运行时依赖由 Docker Compose 镜像管理；请不要在宿主机执行
+apt、systemctl 或 Redis/PostgreSQL 安装操作。参阅 server-version/docker-compose.yml。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 echo "========================================"
 echo "  PTool 视频处理依赖安装"
 echo "========================================"
@@ -109,3 +118,4 @@ echo "========================================"
 echo ""
 echo "Redis 状态:"
 systemctl status redis-server --no-pager || systemctl status redis --no-pager
+LEGACY_SCRIPT

@@ -2,16 +2,24 @@ const COS = require('cos-nodejs-sdk-v5')
 const fs = require('fs')
 const path = require('path')
 
+const requiredEnv = (name) => {
+  const value = process.env[name]
+  if (!value || !value.trim()) {
+    throw new Error(`${name} must be set before uploading files to COS`)
+  }
+  return value.trim()
+}
+
 const config = {
-  SecretId: 'AKIDz32xrfMtGQQK7pP2a3Po5aGvTpGXgeR4',
-  SecretKey: 'YG1pXIxcKuRmy0ibO5pS9iO1UrBWluBX',
-  Bucket: 'ptool-videos-edu-1393949445',
-  Region: 'ap-beijing'
+  SecretId: requiredEnv('COS_SECRET_ID'),
+  SecretKey: requiredEnv('COS_SECRET_KEY'),
+  Bucket: requiredEnv('COS_BUCKET'),
+  Region: requiredEnv('COS_REGION')
 }
 
 const cos = new COS(config)
 
-const imagesDir = '/opt/ptool/server-version/backend/uploads/images'
+const imagesDir = process.env.UPLOAD_IMAGES_DIR || '/opt/ptool/server-version/backend/uploads/images'
 
 async function uploadFile(filePath, key) {
   return new Promise((resolve, reject) => {

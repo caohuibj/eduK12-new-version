@@ -10,6 +10,7 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField, safeDecrypt } from '../utils/encryption'
 import { normalizeScaleConfig, scaleLabelsError } from '../utils/scaleLabels'
 import { scaleSource, scaleWhereForViewer } from '../services/materialGrant'
+import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 
 // ==================== Validation Schemas ====================
 
@@ -1113,81 +1114,90 @@ export const scaleController = {
       const { assessmentId } = req.params
       const { itemId, value, responseTime } = req.body
 
-      // 获取测评记录
-      const assessment = await prisma.assessment.findUnique({
-        where: { id: assessmentId },
-        include: {
-          scale: {
-            include: {
-              items: true,
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const assessment = await tx.assessment.findUnique({
+          where: { id: assessmentId },
+          include: {
+            scale: {
+              include: {
+                items: true,
+              }
             }
           }
-        }
-      })
-
-      if (!assessment) {
-        return notFound(res, '测评记录不存在')
-      }
-
-      if (assessment.userId !== userId) {
-        return forbidden(res, '无权限操作此测评')
-      }
-
-      if (assessment.status !== 'IN_PROGRESS') {
-        return error(res, '测评已结束')
-      }
-
-      // 验证题目是否存在
-      const item = assessment.scale.items.find(i => i.id === itemId)
-      if (!item) {
-        return error(res, '题目不存在')
-      }
-
-      const scaleConfig = assessment.scale.config as { points?: number } | null
-      const points = Number(scaleConfig?.points ?? 5)
-      if (!Number.isInteger(value) || value < 1 || value > points) {
-        return error(res, '答案超出量表点数范围')
-      }
-
-      // 更新答案
-      const answers = (assessment.answers as any[]) || []
-      const existingIndex = answers.findIndex(a => a.itemId === itemId)
-
-      if (existingIndex >= 0) {
-        // 更新已有答案
-        answers[existingIndex] = {
-          ...answers[existingIndex],
-          value,
-          answeredAt: new Date().toISOString(),
-          changeCount: (answers[existingIndex].changeCount || 0) + 1,
-          responseTime,
-        }
-      } else {
-        // 添加新答案
-        answers.push({
-          itemId,
-          value,
-          answeredAt: new Date().toISOString(),
-          firstAnsweredAt: new Date().toISOString(),
-          changeCount: 0,
-          responseTime,
         })
-      }
 
-      // 计算进度
-      const totalItems = assessment.scale.items.length
-      const progress = Math.round((answers.length / totalItems) * 100)
+        if (!assessment) return { kind: 'not-found' as const }
+        if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+        if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
 
-      // 保存
-      const updated = await prisma.assessment.update({
-        where: { id: assessmentId },
-        data: {
-          answers: answers as any,
-          progress,
+        const item = assessment.scale.items.find(i => i.id === itemId)
+        if (!item) return { kind: 'item-not-found' as const }
+
+        const scaleConfig = assessment.scale.config as { points?: number } | null
+        const points = Number(scaleConfig?.points ?? 5)
+        if (!Number.isInteger(value) || value < 1 || value > points) {
+          return { kind: 'invalid-value' as const }
+        }
+
+        const answers = Array.isArray(assessment.answers) ? [...assessment.answers as any[]] : []
+        const existingIndex = answers.findIndex(a => a && a.itemId === itemId)
+        const now = new Date().toISOString()
+
+        if (existingIndex >= 0) {
+          answers[existingIndex] = {
+            ...answers[existingIndex],
+            value,
+            answeredAt: now,
+            changeCount: (answers[existingIndex].changeCount || 0) + 1,
+            responseTime,
+          }
+        } else {
+          answers.push({
+            itemId,
+            value,
+            answeredAt: now,
+            firstAnsweredAt: now,
+            changeCount: 0,
+            responseTime,
+          })
+        }
+
+        const answeredItems = new Set(
+          answers.filter((answer) => answer && typeof answer.itemId === 'string').map((answer) => answer.itemId)
+        ).size
+        const totalItems = assessment.scale.items.length
+        const progress = totalItems === 0 ? 100 : Math.round((answeredItems / totalItems) * 100)
+
+        const updated = await tx.assessment.updateMany({
+          where: {
+            id: assessmentId,
+            userId,
+            status: 'IN_PROGRESS',
+          },
+          data: {
+            answers: answers as any,
+            progress,
+          }
+        })
+
+        if (updated.count !== 1) return { kind: 'ended' as const }
+        return {
+          kind: 'saved' as const,
+          assessment: {
+            ...assessment,
+            answers,
+            progress,
+          },
         }
       })
 
-      return success(res, updated, '答案已保存')
+      if (result.kind === 'not-found') return notFound(res, '测评记录不存在')
+      if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (result.kind === 'ended') return error(res, '测评已结束')
+      if (result.kind === 'item-not-found') return error(res, '题目不存在')
+      if (result.kind === 'invalid-value') return error(res, '答案超出量表点数范围')
+
+      return success(res, result.assessment, '答案已保存')
     } catch (err) {
       logger.error('提交答案错误', err)
       return error(res, '提交答案失败')
@@ -1200,95 +1210,111 @@ export const scaleController = {
       const userId = req.user?.userId
       const { assessmentId } = req.params
 
-      // 获取测评记录
-      const assessment = await prisma.assessment.findUnique({
-        where: { id: assessmentId },
-        include: {
-          scale: {
-            include: {
-              items: {
-                include: {
-                  itemDimensions: {
-                    include: {
-                      dimension: true
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const assessment = await tx.assessment.findUnique({
+          where: { id: assessmentId },
+          include: {
+            scale: {
+              include: {
+                items: {
+                  include: {
+                    itemDimensions: {
+                      include: {
+                        dimension: true
+                      }
                     }
                   }
-                }
-              },
-              dimensions: true,
+                },
+                dimensions: true,
+              }
             }
           }
+        })
+
+        if (!assessment) return { kind: 'not-found' as const }
+        if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+
+        const decrypted = (record: typeof assessment) => ({
+          ...record,
+          answers: safeDecrypt<any[]>(record.answers as string) || record.answers,
+          scores: safeDecrypt<any>(record.scores as string) || record.scores,
+          feedback: safeDecrypt<any>(record.feedback as string) || record.feedback,
+        })
+
+        if (assessment.status === 'COMPLETED') {
+          return { kind: 'completed' as const, assessment: decrypted(assessment) }
+        }
+        if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+
+        const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
+        const decryptedAnswers = safeDecrypt<any[]>(assessment.answers as string)
+        const answers = Array.isArray(decryptedAnswers) ? decryptedAnswers : []
+        const scores = calculateScores(
+          answers,
+          assessment.scale.items,
+          assessment.scale.dimensions,
+          assessment.scale.config as any
+        )
+        const feedback = generateFeedbackWithLevels(
+          scores,
+          assessment.scale.dimensions,
+          assessment.scale.name
+        )
+        const completedAt = new Date()
+        const totalTime = completedAt.getTime() - new Date(assessment.startedAt).getTime()
+        const encryptedAnswers = encryptField(answers)
+        const encryptedScores = encryptField(scores)
+        const encryptedFeedback = encryptField(feedback)
+
+        const updated = await tx.assessment.updateMany({
+          where: {
+            id: assessmentId,
+            userId,
+            status: 'IN_PROGRESS',
+          },
+          data: {
+            status: 'COMPLETED',
+            answers: encryptedAnswers as any,
+            scores: encryptedScores as any,
+            feedback: encryptedFeedback as any,
+            completedAt,
+            totalTime,
+            progress: 100,
+          }
+        })
+
+        if (updated.count !== 1) {
+          const current = await tx.assessment.findUnique({ where: { id: assessmentId } })
+          if (current?.status === 'COMPLETED') {
+            return { kind: 'completed' as const, assessment: decrypted(current as typeof assessment) }
+          }
+          return { kind: 'ended' as const }
+        }
+
+        if (assessment.questionnaireAssessmentId) {
+          await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId)
+        }
+
+        return {
+          kind: 'completed' as const,
+          assessment: {
+            ...assessment,
+            status: 'COMPLETED' as const,
+            answers,
+            scores,
+            feedback,
+            completedAt,
+            totalTime,
+            progress: 100,
+          },
         }
       })
 
-      if (!assessment) {
-        return notFound(res, '测评记录不存在')
-      }
+      if (result.kind === 'not-found') return notFound(res, '测评记录不存在')
+      if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (result.kind === 'ended') return error(res, '测评已结束')
 
-      if (assessment.userId !== userId) {
-        return forbidden(res, '无权限操作此测评')
-      }
-
-      if (assessment.status === 'COMPLETED') {
-        // 解密已完成的测评数据
-        const decryptedAssessment = {
-          ...assessment,
-          answers: safeDecrypt<any[]>(assessment.answers as string) || assessment.answers,
-          scores: safeDecrypt<any[]>(assessment.scores as string) || assessment.scores,
-          feedback: safeDecrypt<any>(assessment.feedback as string) || assessment.feedback,
-        }
-        return success(res, decryptedAssessment, '测评已完成')
-      }
-
-      // 计算分数
-      const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
-      
-      // 解密已有的答案数据（支持渐进式迁移）
-      const answers = safeDecrypt<any[]>(assessment.answers as string) || assessment.answers as any[]
-      
-      const scores = calculateScores(
-        answers,
-        assessment.scale.items,
-        assessment.scale.dimensions,
-        assessment.scale.config as any
-      )
-
-      // 生成反馈（使用自定义等级配置）
-      const feedback = generateFeedbackWithLevels(
-        scores, 
-        assessment.scale.dimensions,
-        assessment.scale.name
-      )
-
-      // 计算总时间
-      const totalTime = Date.now() - new Date(assessment.startedAt).getTime()
-
-      // 加密敏感数据后存储
-      const encryptedAnswers = encryptField(answers)
-      const encryptedScores = encryptField(scores)
-      const encryptedFeedback = encryptField(feedback)
-
-      // 更新测评记录
-      const updated = await prisma.assessment.update({
-        where: { id: assessmentId },
-        data: {
-          status: 'COMPLETED',
-          answers: encryptedAnswers as any,
-          scores: encryptedScores as any,
-          feedback: encryptedFeedback as any,
-          completedAt: new Date(),
-          totalTime,
-          progress: 100,
-        }
-      })
-
-      // 返回解密后的数据给客户端
-      return success(res, {
-        ...updated,
-        answers,
-        scores,
-        feedback,
-      }, '测评已完成')
+      return success(res, result.assessment, '测评已完成')
     } catch (err) {
       logger.error('完成测评错误', err)
       return error(res, '完成测评失败')

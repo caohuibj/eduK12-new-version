@@ -13,7 +13,7 @@ vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 
 import { authenticate, optionalAuthenticate, requireSelfOrAdmin } from '../../middleware/auth'
 
-const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT }
+const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, tokenVersion: 0 }
 
 const activeUser = {
   isActive: true,
@@ -21,11 +21,13 @@ const activeUser = {
   expiresAt: null,
   role: UserRole.STUDENT,
   teacherApproved: true,
+  tokenVersion: 0,
+  mustChangePassword: false,
 }
 
-const makeReq = (authorization?: string) =>
+const makeReq = (sessionToken?: string) =>
   ({
-    headers: authorization ? { authorization } : {},
+    headers: sessionToken ? { cookie: `ptool_session=${encodeURIComponent(sessionToken)}` } : {},
     params: { id: 'user-1' },
     user: undefined,
   }) as any
@@ -55,7 +57,7 @@ describe('authenticate account status', () => {
     const res = makeRes()
     const next = vi.fn()
 
-    await authenticate(makeReq('Bearer valid-token'), res, next)
+    await authenticate(makeReq('valid-token'), res, next)
 
     expect(res.statusCode).toBe(401)
     expect(res.body.message).toBe('账号已被冻结，请联系教师')
@@ -72,7 +74,7 @@ describe('authenticate account status', () => {
     const res = makeRes()
     const next = vi.fn()
 
-    await authenticate(makeReq('Bearer valid-token'), res, next)
+    await authenticate(makeReq('valid-token'), res, next)
 
     expect(res.statusCode).toBe(401)
     expect(res.body.message).toContain('等待管理员审核')
@@ -80,14 +82,26 @@ describe('authenticate account status', () => {
   })
 
   it('attaches the payload for an active account', async () => {
-    const req = makeReq('Bearer valid-token')
+    const req = makeReq('valid-token')
     const res = makeRes()
     const next = vi.fn()
 
     await authenticate(req, res, next)
 
-    expect(req.user).toEqual(payload)
+    expect(req.user).toEqual({ ...payload, mustChangePassword: false })
     expect(next).toHaveBeenCalledOnce()
+  })
+
+  it('rejects a token issued before a forced logout or password change', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({ ...activeUser, tokenVersion: 1 })
+    const res = makeRes()
+    const next = vi.fn()
+
+    await authenticate(makeReq('stale-token'), res, next)
+
+    expect(res.statusCode).toBe(401)
+    expect(res.body.message).toBe('认证令牌已失效，请重新登录')
+    expect(next).not.toHaveBeenCalled()
   })
 })
 
@@ -100,7 +114,7 @@ describe('optionalAuthenticate account status', () => {
 
   it('ignores a frozen token instead of returning 401', async () => {
     mockPrisma.user.findUnique.mockResolvedValue({ ...activeUser, isFrozen: true })
-    const req = makeReq('Bearer valid-token')
+    const req = makeReq('valid-token')
     const res = makeRes()
     const next = vi.fn()
 

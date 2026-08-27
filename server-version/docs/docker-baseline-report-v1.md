@@ -88,7 +88,7 @@
 ## 5. 已知观察项（非阻塞）
 
 - **运行时镜像残留 `prisma` CLI 二进制**：`npm prune --omit=dev` 后 `node_modules/.bin/prisma` 仍存在（无害；应用以 `node dist/index.js` 启动，不依赖它）。如需极致精简可后续调整 prune 策略。
-- **seed 默认口令**：`prisma/seed.ts` 硬编码管理员口令 `2026coding`（与 `.env.example` 的 `ADMIN_PASSWORD=ptool123` 不一致）。属源码既有行为，未在本次改动范围；建议后续将 seed 口令统一改为读取 `ADMIN_PASSWORD`。
+- **seed 凭据**：`prisma/seed.ts` 不再包含默认管理员口令，必须从受保护环境变量读取；缺失时直接失败。
 
 ---
 

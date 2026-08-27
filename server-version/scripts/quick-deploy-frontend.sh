@@ -2,7 +2,16 @@
 # 快速部署脚本 - 构建并部署前端，刷新 CDN
 # 使用方法: ./quick-deploy-frontend.sh [--skip-cdn]
 
-set -e
+set -Eeuo pipefail
+
+cat >&2 <<'NOTICE'
+此宿主机前端快速部署脚本已停用。
+生产前端必须作为 server-version/docker-compose.yml 的 frontend 服务发布，
+请使用 Compose 的构建/更新流程，并通过前端容器健康检查确认发布结果。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
 
 # 颜色定义
 RED='\033[0;31m'
@@ -122,3 +131,5 @@ main() {
 }
 
 main
+
+LEGACY_SCRIPT

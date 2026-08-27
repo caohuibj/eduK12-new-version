@@ -18,7 +18,7 @@
 | Node | v22.22.2 | 计划要求 20.x，偏差 KI-006，用 22 执行正常 |
 | npm | 10.9.7 | |
 | Docker | 29.2.1 / compose 5.0.2 | context `lima-docker-vm`，无 Docker Desktop |
-| PostgreSQL | 14（Docker `eduk12-postgres`） | `ptool/ptool123@ptool` |
+| PostgreSQL | 14（Docker `eduk12-postgres`） | 凭据由受保护环境配置注入 |
 | Redis | 7-alpine（Docker `eduk12-redis`） | 独立 `docker run`，不在 compose（KI-003） |
 | FFmpeg | 8.0.1（本机） | Video Worker 依赖，已验证可用（FIND-5） |
 | Host 内存 | 8 GB（Lima VM 占 4 GB） | 原生构建需停 VM 防 OOM（FIND-4） |
@@ -35,7 +35,7 @@
 | **B4** | Backend `npm ci` | ✅ PASS | 退出 0；lockfile 镜像已修复（FIND-3）；canvas 原生编译 OK（RISK-1） |
 | **B5** | Backend Build（`tsc`） | ✅ PASS | `npm run build` 退出 0；`dist/index.js` 存在 |
 | **B6** | Prisma | ✅ PASS | `validate`/`generate` 通过；`migrate deploy` 退出 0；31 张表齐全（含 2 个修正 migration，FIND-1/2） |
-| **B7** | Seed | ✅ PASS | `rateK12admin/2026coding` 创建；二次运行幂等跳过 |
+| **B7** | Seed | ✅ PASS | 管理员凭据由受保护环境注入；二次运行幂等跳过 |
 | **B8** | Backend Runtime + Auth | ✅ PASS | `:3000/health`=200；`/api/auth/login`→token；`/me`(带 token)=200；无 token/错密码=401 |
 | **B9** | Frontend `npm ci` / Build / Runtime | ✅ PASS | `npm ci` 退出 0；`npm run build` 5428 模块转换成功，`dist/` 生成 |
 | **B10** | Vite Proxy | ✅ PASS | `:5173/api/...` 正确转发到 `:3000`（401 来自后端）；`/uploads` 可达后端静态 |

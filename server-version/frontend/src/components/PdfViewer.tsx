@@ -72,6 +72,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
 
         const renderContext = {
           canvasContext: context,
+          canvas,
           viewport: viewport,
         }
 

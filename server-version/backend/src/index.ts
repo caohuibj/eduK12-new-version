@@ -1,6 +1,7 @@
 import express from 'express'
 import { rateLimit } from 'express-rate-limit'
 import cors from 'cors'
+import helmet from 'helmet'
 import { createServer } from 'http'
 import { config } from './config'
 import { prisma } from './config/database'
@@ -9,6 +10,9 @@ import { authenticate, requireAdmin } from './middleware/auth'
 import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
 import { classroomSocketHandler } from './services/classroomSocketHandler'
+import { requestId } from './middleware/requestId'
+import { csrfProtection } from './middleware/csrf'
+import { legacyUploadGuard } from './middleware/legacyUploadGuard'
 
 // 导入 Worker (启动视频处理队列)
 // 使用优化版本 (支持硬件负担最小模式)
@@ -43,6 +47,7 @@ import compositeRoutes from './modules/composite/composite.routes'
 import compositePublicRoutes from './modules/composite/composite.public.routes'
 import capabilitiesRoutes from './routes/capabilities'
 import materialGrantRoutes from './routes/materialGrants'
+import assetRoutes, { publicAssetRouter } from './routes/assets'
 
 const app = express()
 
@@ -56,11 +61,48 @@ const publicAssessmentLimiter = rateLimit({
 // 创建 HTTP 服务器
 const server = createServer(app)
 
+const requestMetricCounts = new Map<string, number>()
+const MAX_REQUEST_METRIC_KEYS = 10_000
+const OTHER_REQUEST_METRIC_KEY = 'OTHER|/__other__|OTHER'
+const normalizeMetricPath = (req: express.Request): string => {
+  const routePath = req.route?.path
+  if (routePath) return `${req.baseUrl}${routePath}`
+  const normalized = req.path
+    .replace(/\/ck_[A-Za-z0-9_-]+/g, '/:token')
+    .replace(/\/[0-9a-f]{8,}(?=\/|$)/gi, '/:id')
+    .replace(/\/[^/]{32,}(?=\/|$)/g, '/:id')
+  // Express does not expose a route template for unmatched requests. Keep
+  // those requests in one bounded bucket so attacker-controlled 404 paths
+  // cannot grow this process-local map without limit.
+  return normalized === req.path && !req.route
+    ? (req.path.startsWith('/api/') ? '/api/:unmatched' : '/:unmatched')
+    : normalized
+}
+
+app.use((req, res, next) => {
+  const startedAt = process.hrtime.bigint()
+  res.once('finish', () => {
+    const pathLabel = normalizeMetricPath(req)
+    let key = `${req.method}|${pathLabel}|${res.statusCode}`
+    // Reserve one slot for the aggregate bucket. Once the cap is reached,
+    // new route/status combinations are counted there instead of growing the
+    // process-local map indefinitely.
+    if (!requestMetricCounts.has(key) && requestMetricCounts.size >= MAX_REQUEST_METRIC_KEYS - 1) {
+      key = OTHER_REQUEST_METRIC_KEY
+    }
+    requestMetricCounts.set(key, (requestMetricCounts.get(key) || 0) + 1)
+    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000
+    if (durationMs > 10_000) logger.warn('HTTP request exceeded latency threshold', { method: req.method, path: pathLabel, durationMs: Math.round(durationMs) })
+  })
+  next()
+})
+
 // 信任反向代理 - hop 数由部署拓扑显式配置，避免错误解析客户端 IP。
 app.set('trust proxy', config.trustProxyHops)
 
 // 禁用 API 缓存 - 确保数据实时更新
 app.set('etag', false)
+app.use(requestId)
 app.use((req, res, next) => {
   // 对 API 请求禁用缓存
   if (req.path.startsWith('/api')) {
@@ -72,13 +114,17 @@ app.use((req, res, next) => {
 })
 
 // 中间件
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
+app.use('/api', csrfProtection)
 
 // 静态文件服务 - 使用绝对路径
-console.log('[Server] Static files serving from:', config.uploadDir)
-app.use('/uploads', express.static(config.uploadDir, {
+logger.info('[Server] Static files configured', { uploadDir: config.uploadDir })
+app.use('/uploads', legacyUploadGuard(config.legacyUploadsEnabled), express.static(config.uploadDir, {
   maxAge: '7d',
   immutable: true
 }))
@@ -97,6 +143,48 @@ app.get('/ready', async (_req, res) => {
   }
 })
 
+// Prometheus-compatible process metrics.  The backend is only reachable from
+// the Compose network in production; the endpoint intentionally contains no
+// request payload, account, or assessment data.
+app.get('/metrics', async (_req, res) => {
+  const memory = process.memoryUsage()
+  const lines = [
+    '# HELP process_uptime_seconds Process uptime in seconds.',
+    '# TYPE process_uptime_seconds gauge',
+    `process_uptime_seconds ${process.uptime()}`,
+    '# HELP process_resident_memory_bytes Resident memory size in bytes.',
+    '# TYPE process_resident_memory_bytes gauge',
+    `process_resident_memory_bytes ${memory.rss}`,
+    '# HELP process_heap_used_bytes V8 heap used in bytes.',
+    '# TYPE process_heap_used_bytes gauge',
+    `process_heap_used_bytes ${memory.heapUsed}`,
+    '# HELP process_heap_total_bytes V8 heap total in bytes.',
+    '# TYPE process_heap_total_bytes gauge',
+    `process_heap_total_bytes ${memory.heapTotal}`,
+    '# HELP ptool_api_requests_total Completed API requests by normalized route and status.',
+    '# TYPE ptool_api_requests_total counter',
+  ]
+  for (const [key, count] of requestMetricCounts) {
+    const [method, route, status] = key.split('|')
+    const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    lines.push(`ptool_api_requests_total{method="${escape(method)}",route="${escape(route)}",status="${escape(status)}"} ${count}`)
+  }
+  const backupStatusFile = process.env.BACKUP_STATUS_FILE
+  if (backupStatusFile) {
+    try {
+      const timestamp = Number(require('fs').readFileSync(backupStatusFile, 'utf8').trim())
+      if (Number.isFinite(timestamp) && timestamp > 0) {
+        lines.push('# HELP ptool_backup_last_success_timestamp_seconds Unix timestamp of the last verified backup.')
+        lines.push('# TYPE ptool_backup_last_success_timestamp_seconds gauge')
+        lines.push(`ptool_backup_last_success_timestamp_seconds ${timestamp}`)
+      }
+    } catch {
+      // Missing status is intentionally left visible to Prometheus as absent.
+    }
+  }
+  res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8').send(`${lines.join('\n')}\n`)
+})
+
 // Runtime capabilities (public; backend flag is the source of truth)
 app.use('/api/capabilities', capabilitiesRoutes)
 
@@ -113,6 +201,8 @@ app.use('/api/uploads', uploadRoutes)
 app.use('/api/scales', scaleRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
+app.use('/api/assets', assetRoutes)
+app.use('/api/public/assets', publicAssetRouter)
 // 泛化问卷路由（新增）
 
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
@@ -168,7 +258,7 @@ server.listen(config.port, () => {
 // 优雅关闭（增加超时保护）
 let shutdownStarted = false
 
-const gracefulShutdown = async (signal: string) => {
+const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
   logger.info(`${signal} signal received: closing HTTP server`)
@@ -176,7 +266,7 @@ const gracefulShutdown = async (signal: string) => {
   // 设置强制退出超时（5秒）
   const forceExit = setTimeout(() => {
     logger.warn('⚠️  Forced exit after timeout')
-    process.exit(1)
+    process.exit(exitCode || 1)
   }, 5000)
   
   server.close(async () => {
@@ -188,9 +278,17 @@ const gracefulShutdown = async (signal: string) => {
       prisma.$disconnect(),
     ])
     clearTimeout(forceExit)
-    process.exit(0)
+    process.exit(exitCode)
   })
 }
 
 process.on('SIGTERM', () => { void gracefulShutdown('SIGTERM') })
 process.on('SIGINT', () => { void gracefulShutdown('SIGINT') })
+process.on('uncaughtException', (err) => {
+  logger.error('未捕获异常，服务将退出', err)
+  void gracefulShutdown('uncaughtException', 1)
+})
+process.on('unhandledRejection', (reason) => {
+  logger.error('未处理的 Promise rejection，服务将退出', reason)
+  void gracefulShutdown('unhandledRejection', 1)
+})

@@ -8,55 +8,57 @@ datasource db {
 }
 
 model User {
-  id                          String                     @id @default(uuid())
-  username                    String                     @unique
-  passwordHash                String                     @map("password_hash")
-  role                        UserRole                   @default(STUDENT)
-  nickname                    String?
-  avatarUrl                   String?                    @map("avatar_url")
-  phone                       String?
-  isActive                    Boolean                    @default(true) @map("is_active")
-  createdAt                   DateTime                   @default(now()) @map("created_at")
-  updatedAt                   DateTime                   @updatedAt @map("updated_at")
-  teacherCodeId               String?                    @map("teacher_code_id")
-  expiresAt                   DateTime?                  @map("expires_at")
-  isFrozen                    Boolean                    @default(false) @map("is_frozen")
-  teacherApproved             Boolean                    @default(true) @map("teacher_approved")
-  checkinSubmissions          CheckinSubmission[]
-  checkins                    Checkin[]                  @relation("CheckinCreator")
-  courseStudents              CourseStudent[]
-  createdCourses              Course[]                   @relation("CourseCreator")
-  submissions                 Submission[]
-  teacherCodes                TeacherCode[]              @relation("TeacherCodeCreator")
-  teacherCode                 TeacherCode?               @relation("UserTeacherCode", fields: [teacherCodeId], references: [id])
-  videos                      Video[]
-  sharedCourses               CourseShare[]              @relation("SharedBy")
-  receivedCourses             CourseShare[]              @relation("SharedTo")
+  id                                  String                           @id @default(uuid())
+  username                            String                           @unique
+  passwordHash                        String                           @map("password_hash")
+  role                                UserRole                         @default(STUDENT)
+  nickname                            String?
+  avatarUrl                           String?                          @map("avatar_url")
+  phone                               String?
+  isActive                            Boolean                          @default(true) @map("is_active")
+  tokenVersion                        Int                              @default(0) @map("token_version")
+  mustChangePassword                  Boolean                          @default(false) @map("must_change_password")
+  createdAt                           DateTime                         @default(now()) @map("created_at")
+  updatedAt                           DateTime                         @updatedAt @map("updated_at")
+  teacherCodeId                       String?                          @map("teacher_code_id")
+  expiresAt                           DateTime?                        @map("expires_at")
+  isFrozen                            Boolean                          @default(false) @map("is_frozen")
+  teacherApproved                     Boolean                          @default(true) @map("teacher_approved")
+  checkinSubmissions                  CheckinSubmission[]
+  checkins                            Checkin[]                        @relation("CheckinCreator")
+  courseStudents                      CourseStudent[]
+  createdCourses                      Course[]                         @relation("CourseCreator")
+  submissions                         Submission[]
+  teacherCodes                        TeacherCode[]                    @relation("TeacherCodeCreator")
+  teacherCode                         TeacherCode?                     @relation("UserTeacherCode", fields: [teacherCodeId], references: [id])
+  videos                              Video[]
+  sharedCourses                       CourseShare[]                    @relation("SharedBy")
+  receivedCourses                     CourseShare[]                    @relation("SharedTo")
   // 心理问卷模块关联
-  assessments                 Assessment[]
-  createdScales               Scale[]                    @relation("ScaleCreator")
+  assessments                         Assessment[]
+  createdScales                       Scale[]                          @relation("ScaleCreator")
   // 聚合问卷模块关联
-  createdQuestionnaires       Questionnaire[]            @relation("QuestionnaireCreator")
-  questionnaireAssessments    QuestionnaireAssessment[]  @relation("UserQuestionnaireAssessments")
+  createdQuestionnaires               Questionnaire[]                  @relation("QuestionnaireCreator")
+  questionnaireAssessments            QuestionnaireAssessment[]        @relation("UserQuestionnaireAssessments")
   // 访问令牌关联（新增）
-  createdAccessTokens         QuestionnaireAccessToken[] @relation("TokenCreator")
+  createdAccessTokens                 QuestionnaireAccessToken[]       @relation("TokenCreator")
   // 匿名打卡令牌关联
-  createdCheckinTokens        CheckinAccessToken[]       @relation("CheckinTokenCreator")
+  createdCheckinTokens                CheckinAccessToken[]             @relation("CheckinTokenCreator")
   // 文档库关联
-  documents                   Document[]
+  documents                           Document[]
   // 课堂模块关联
-  createdClassrooms           Classroom[]                @relation("ClassroomCreator")
+  createdClassrooms                   Classroom[]                      @relation("ClassroomCreator")
   // 认知测评模块关联（userId 删除时 Session 保留，userId 置空 -> SetNull）
-  cognitiveSessions           CognitiveSession[]         @relation("SessionUser")
-  createdCognitiveAssignments CognitiveAssignment[]      @relation("AssignmentCreator")
+  cognitiveSessions                   CognitiveSession[]               @relation("SessionUser")
+  createdCognitiveAssignments         CognitiveAssignment[]            @relation("AssignmentCreator")
   // 综合测评模块关联
-  createdCompositeAssessments CompositeAssessment[]       @relation("CompositeAssessmentCreator")
-  compositeAssessmentAttempts CompositeAssessmentAttempt[] @relation("CompositeAttemptUser")
-  createdCompositeAccessTokens CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
-  generatedCompositeAnalysisSnapshots CompositeAnalysisSnapshot[] @relation("CompositeAnalysisSnapshotGenerator")
-  createdCognitiveAccessTokens CognitiveAccessToken[]      @relation("CognitiveTokenCreator")
-  materialGrantsReceived       MaterialGrant[]             @relation("MaterialGrantTeacher")
-  materialGrantsGiven          MaterialGrant[]             @relation("MaterialGrantGranter")
+  createdCompositeAssessments         CompositeAssessment[]            @relation("CompositeAssessmentCreator")
+  compositeAssessmentAttempts         CompositeAssessmentAttempt[]     @relation("CompositeAttemptUser")
+  createdCompositeAccessTokens        CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
+  generatedCompositeAnalysisSnapshots CompositeAnalysisSnapshot[]      @relation("CompositeAnalysisSnapshotGenerator")
+  createdCognitiveAccessTokens        CognitiveAccessToken[]           @relation("CognitiveTokenCreator")
+  materialGrantsReceived              MaterialGrant[]                  @relation("MaterialGrantTeacher")
+  materialGrantsGiven                 MaterialGrant[]                  @relation("MaterialGrantGranter")
 
   @@map("users")
 }
@@ -81,6 +83,7 @@ model Course {
   title                String
   description          String?
   coverUrl             String?               @map("cover_url")
+  coverAssetId         String?               @map("cover_asset_id")
   status               CourseStatus          @default(DRAFT)
   courseCode           String                @unique @map("course_code")
   creatorId            String                @map("creator_id")
@@ -93,6 +96,7 @@ model Course {
   checkins             Checkin[]
   students             CourseStudent[]
   creator              User                  @relation("CourseCreator", fields: [creatorId], references: [id])
+  coverAsset           StoredAsset?          @relation("CourseCoverAsset", fields: [coverAssetId], references: [id], onDelete: SetNull)
   shares               CourseShare[]
   // 心理问卷模块关联
   courseScales         CourseScale[]
@@ -234,30 +238,36 @@ model CheckinSubmission {
 }
 
 model Video {
-  id             String      @id @default(uuid())
-  title          String
-  filePath       String      @map("file_path")
-  fileName       String      @map("file_name")
-  fileSize       Int         @map("file_size")
-  mimeType       String      @map("mime_type")
-  teacherId      String      @map("teacher_id")
-  usageCount     Int         @default(0) @map("usage_count")
-  createdAt      DateTime    @default(now()) @map("created_at")
-  updatedAt      DateTime    @updatedAt @map("updated_at")
-  deletedAt      DateTime?   @map("deleted_at")
-  isDeleted      Boolean     @default(false) @map("is_deleted")
-  tags           String[]    @default([])
-  duration       Int?
-  errorMessage   String?     @map("error_message")
-  originalUrl    String?     @map("original_url")
-  originalCosUrl String?     @map("original_cos_url") // 原始文件COS URL（低频存储）
-  originalCosKey String?     @map("original_cos_key") // 原始文件COS Key
-  processedAt    DateTime?   @map("processed_at")
-  processedUrl   String?     @map("processed_url")
-  resolution     String?
-  status         VideoStatus @default(PENDING)
-  thumbnailUrl   String?     @map("thumbnail_url")
-  teacher        User        @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  id               String       @id @default(uuid())
+  title            String
+  filePath         String       @map("file_path")
+  fileName         String       @map("file_name")
+  fileSize         Int          @map("file_size")
+  mimeType         String       @map("mime_type")
+  teacherId        String       @map("teacher_id")
+  usageCount       Int          @default(0) @map("usage_count")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  deletedAt        DateTime?    @map("deleted_at")
+  isDeleted        Boolean      @default(false) @map("is_deleted")
+  tags             String[]     @default([])
+  duration         Int?
+  errorMessage     String?      @map("error_message")
+  originalUrl      String?      @map("original_url")
+  originalCosUrl   String?      @map("original_cos_url") // 原始文件COS URL（低频存储）
+  originalCosKey   String?      @map("original_cos_key") // 原始文件COS Key
+  processedAt      DateTime?    @map("processed_at")
+  processedUrl     String?      @map("processed_url")
+  resolution       String?
+  status           VideoStatus  @default(PENDING)
+  thumbnailUrl     String?      @map("thumbnail_url")
+  originalAssetId  String?      @map("original_asset_id")
+  processedAssetId String?      @map("processed_asset_id")
+  thumbnailAssetId String?      @map("thumbnail_asset_id")
+  teacher          User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  originalAsset    StoredAsset? @relation("VideoOriginalAsset", fields: [originalAssetId], references: [id], onDelete: SetNull)
+  processedAsset   StoredAsset? @relation("VideoProcessedAsset", fields: [processedAssetId], references: [id], onDelete: SetNull)
+  thumbnailAsset   StoredAsset? @relation("VideoThumbnailAsset", fields: [thumbnailAssetId], references: [id], onDelete: SetNull)
 
   @@map("videos")
 }
@@ -363,13 +373,13 @@ model Scale {
   tags          String[]        @default([])
 
   // 关联
-  creator             User                 @relation("ScaleCreator", fields: [creatorId], references: [id])
+  creator             User                      @relation("ScaleCreator", fields: [creatorId], references: [id])
   items               ScaleItem[]
   dimensions          Dimension[]
   assessments         Assessment[]
   courseScales        CourseScale[]
   // 聚合问卷模块关联
-  questionnaireScales QuestionnaireScale[] @relation("QuestionnaireScales")
+  questionnaireScales QuestionnaireScale[]      @relation("QuestionnaireScales")
   // 综合测评模块关联
   compositeItems      CompositeAssessmentItem[] @relation("CompositeAssessmentScale")
 
@@ -450,15 +460,15 @@ model Assessment {
   totalTime                 Int?             @map("total_time") // 总用时（毫秒）
   // 聚合问卷模块关联（可选，单体量表测评时为空）
   questionnaireAssessmentId String?          @map("questionnaire_assessment_id")
-  compositeAttemptId       String?            @map("composite_attempt_id")
-  compositeItemId          String?            @map("composite_item_id")
+  compositeAttemptId        String?          @map("composite_attempt_id")
+  compositeItemId           String?          @map("composite_item_id")
 
   // 关联
-  scale                   Scale                    @relation(fields: [scaleId], references: [id], onDelete: Cascade)
-  user                    User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questionnaireAssessment QuestionnaireAssessment? @relation(fields: [questionnaireAssessmentId], references: [id])
-  compositeAttempt       CompositeAssessmentAttempt? @relation("CompositeAttemptAssessments", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
-  compositeItem          CompositeAssessmentItem? @relation("CompositeScaleAssessments", fields: [compositeItemId], references: [id], onDelete: Restrict)
+  scale                   Scale                       @relation(fields: [scaleId], references: [id], onDelete: Cascade)
+  user                    User?                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionnaireAssessment QuestionnaireAssessment?    @relation(fields: [questionnaireAssessmentId], references: [id])
+  compositeAttempt        CompositeAssessmentAttempt? @relation("CompositeAttemptAssessments", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
+  compositeItem           CompositeAssessmentItem?    @relation("CompositeScaleAssessments", fields: [compositeItemId], references: [id], onDelete: Restrict)
 
   // 性能优化索引
   @@index([userId, status]) // 用户查询自己的测评
@@ -544,19 +554,21 @@ model QuestionnaireScale {
 
 // 问卷测评记录表
 model QuestionnaireAssessment {
-  id              String           @id @default(uuid())
-  questionnaireId String           @map("questionnaire_id")
-  userId          String?          @map("user_id") // 改为可选，支持匿名测评
-  tokenId         String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
-  sessionId       String?          @unique @map("session_id") // 匿名会话标识
-  status          AssessmentStatus @default(IN_PROGRESS)
-  progress        Int              @default(0) // 总体进度
-  completedScales Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
-  completedForms  Int              @default(0) @map("completed_forms") // 已完成表单数量（缓存）
-  startedAt       DateTime         @default(now()) @map("started_at")
-  completedAt     DateTime?        @map("completed_at")
-  totalTime       Int?             @map("total_time") // 总用时（毫秒）
-  aggregateReport Json?            @map("aggregate_report") // 聚合报告（加密存储）
+  id                   String           @id @default(uuid())
+  questionnaireId      String           @map("questionnaire_id")
+  userId               String?          @map("user_id") // 改为可选，支持匿名测评
+  tokenId              String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
+  sessionId            String?          @unique @map("session_id") // 匿名会话标识
+  resumeTokenHash      String?          @unique @map("resume_token_hash") // 服务端恢复凭据哈希
+  resumeTokenExpiresAt DateTime?        @map("resume_token_expires_at")
+  status               AssessmentStatus @default(IN_PROGRESS)
+  progress             Int              @default(0) // 总体进度
+  completedScales      Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
+  completedForms       Int              @default(0) @map("completed_forms") // 已完成表单数量（缓存）
+  startedAt            DateTime         @default(now()) @map("started_at")
+  completedAt          DateTime?        @map("completed_at")
+  totalTime            Int?             @map("total_time") // 总用时（毫秒）
+  aggregateReport      Json?            @map("aggregate_report") // 聚合报告（加密存储）
 
   // 关联
   questionnaire    Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
@@ -571,6 +583,7 @@ model QuestionnaireAssessment {
   @@index([startedAt])
   @@index([tokenId]) // 新增：令牌索引
   @@index([sessionId]) // 新增：会话索引
+  @@index([resumeTokenExpiresAt])
   @@map("questionnaire_assessments")
 }
 
@@ -682,37 +695,37 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
-  id          String                    @id @default(uuid())
-  code        String                    @unique
-  name        String
-  description String?
-  instruction String?
-  status      CompositeAssessmentStatus @default(DRAFT)
-  courseId    String?                   @map("course_id")
-  createdBy   String?                   @map("created_by")
-  opensAt     DateTime?                 @map("opens_at")
-  expiresAt   DateTime?                 @map("expires_at")
-  maxAttempts Int                       @default(1) @map("max_attempts")
-  publicEnabled Boolean                 @default(false) @map("public_enabled")
-  copyable      Boolean                 @default(false) @map("copyable")
-  copiedFromId  String?                 @map("copied_from_id")
-  analysisProtocolKey String?           @map("analysis_protocol_key")
-  analysisProtocolVersion String?       @map("analysis_protocol_version")
-  analysisProtocolSnapshotEncrypted String? @map("analysis_protocol_snapshot_encrypted")
+  id                                String                    @id @default(uuid())
+  code                              String                    @unique
+  name                              String
+  description                       String?
+  instruction                       String?
+  status                            CompositeAssessmentStatus @default(DRAFT)
+  courseId                          String?                   @map("course_id")
+  createdBy                         String?                   @map("created_by")
+  opensAt                           DateTime?                 @map("opens_at")
+  expiresAt                         DateTime?                 @map("expires_at")
+  maxAttempts                       Int                       @default(1) @map("max_attempts")
+  publicEnabled                     Boolean                   @default(false) @map("public_enabled")
+  copyable                          Boolean                   @default(false) @map("copyable")
+  copiedFromId                      String?                   @map("copied_from_id")
+  analysisProtocolKey               String?                   @map("analysis_protocol_key")
+  analysisProtocolVersion           String?                   @map("analysis_protocol_version")
+  analysisProtocolSnapshotEncrypted String?                   @map("analysis_protocol_snapshot_encrypted")
   // PR6B package boundary. The legacy analysisProtocol* fields remain readable
   // for historical composites; new package instances use these frozen fields.
-  reportPackageKey String? @map("report_package_key")
-  reportPackageVersion String? @map("report_package_version")
-  reportPackageProfile String? @map("report_package_profile")
-  reportPackageSnapshotEncrypted String? @map("report_package_snapshot_encrypted")
-  createdAt   DateTime                  @default(now()) @map("created_at")
-  updatedAt   DateTime                  @updatedAt @map("updated_at")
-  publishedAt DateTime?                 @map("published_at")
+  reportPackageKey                  String?                   @map("report_package_key")
+  reportPackageVersion              String?                   @map("report_package_version")
+  reportPackageProfile              String?                   @map("report_package_profile")
+  reportPackageSnapshotEncrypted    String?                   @map("report_package_snapshot_encrypted")
+  createdAt                         DateTime                  @default(now()) @map("created_at")
+  updatedAt                         DateTime                  @updatedAt @map("updated_at")
+  publishedAt                       DateTime?                 @map("published_at")
 
-  course       Course?                       @relation("CourseCompositeAssessments", fields: [courseId], references: [id], onDelete: SetNull)
-  creator      User?                         @relation("CompositeAssessmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
-  copiedFrom   CompositeAssessment?          @relation("CompositeCopySource", fields: [copiedFromId], references: [id], onDelete: SetNull)
-  copies       CompositeAssessment[]         @relation("CompositeCopySource")
+  course       Course?                          @relation("CourseCompositeAssessments", fields: [courseId], references: [id], onDelete: SetNull)
+  creator      User?                            @relation("CompositeAssessmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  copiedFrom   CompositeAssessment?             @relation("CompositeCopySource", fields: [copiedFromId], references: [id], onDelete: SetNull)
+  copies       CompositeAssessment[]            @relation("CompositeCopySource")
   items        CompositeAssessmentItem[]
   accessTokens CompositeAssessmentAccessToken[]
   attempts     CompositeAssessmentAttempt[]
@@ -726,26 +739,26 @@ model CompositeAssessment {
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
 model CompositeAssessmentItem {
-  id                    String                       @id @default(uuid())
-  compositeAssessmentId String                       @map("composite_assessment_id")
+  id                    String                      @id @default(uuid())
+  compositeAssessmentId String                      @map("composite_assessment_id")
   type                  CompositeAssessmentItemType
-  position              Int                          @default(0)
-  required              Boolean                      @default(true)
-  scaleId               String?                      @map("scale_id")
-  cognitiveAssignmentId String?                      @map("cognitive_assignment_id")
-  formType              String?                      @map("form_type")
-  formLabel             String?                      @map("form_label")
-  formPlaceholder       String?                      @map("form_placeholder")
-  formOptions           Json?                        @map("form_options")
-  createdAt             DateTime                     @default(now()) @map("created_at")
-  updatedAt             DateTime                     @updatedAt @map("updated_at")
+  position              Int                         @default(0)
+  required              Boolean                     @default(true)
+  scaleId               String?                     @map("scale_id")
+  cognitiveAssignmentId String?                     @map("cognitive_assignment_id")
+  formType              String?                     @map("form_type")
+  formLabel             String?                     @map("form_label")
+  formPlaceholder       String?                     @map("form_placeholder")
+  formOptions           Json?                       @map("form_options")
+  createdAt             DateTime                    @default(now()) @map("created_at")
+  updatedAt             DateTime                    @updatedAt @map("updated_at")
 
-  compositeAssessment CompositeAssessment  @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
-  scale              Scale?                @relation("CompositeAssessmentScale", fields: [scaleId], references: [id], onDelete: Restrict)
-  cognitiveAssignment CognitiveAssignment? @relation("CompositeAssessmentCognitiveAssignment", fields: [cognitiveAssignmentId], references: [id], onDelete: Restrict)
-  scaleAssessments   Assessment[]          @relation("CompositeScaleAssessments")
-  cognitiveSessions  CognitiveSession[]    @relation("CompositeCognitiveSessions")
-  formAnswers        CompositeFormAnswer[]
+  compositeAssessment CompositeAssessment   @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  scale               Scale?                @relation("CompositeAssessmentScale", fields: [scaleId], references: [id], onDelete: Restrict)
+  cognitiveAssignment CognitiveAssignment?  @relation("CompositeAssessmentCognitiveAssignment", fields: [cognitiveAssignmentId], references: [id], onDelete: Restrict)
+  scaleAssessments    Assessment[]          @relation("CompositeScaleAssessments")
+  cognitiveSessions   CognitiveSession[]    @relation("CompositeCognitiveSessions")
+  formAnswers         CompositeFormAnswer[]
 
   @@unique([compositeAssessmentId, position])
   @@index([scaleId])
@@ -755,35 +768,35 @@ model CompositeAssessmentItem {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
-  id                    String                          @id @default(uuid())
-  compositeAssessmentId String                          @map("composite_assessment_id")
-  userId                String?                         @map("user_id")
-  accessTokenId         String?                         @map("access_token_id")
-  recoveryTokenHash     String?                         @unique @map("recovery_token_hash")
-  participantKey        String                          @map("participant_key")
-  anonymousCode         String?                         @map("anonymous_code")
-  attemptNo             Int                             @default(1) @map("attempt_no")
+  id                    String                           @id @default(uuid())
+  compositeAssessmentId String                           @map("composite_assessment_id")
+  userId                String?                          @map("user_id")
+  accessTokenId         String?                          @map("access_token_id")
+  recoveryTokenHash     String?                          @unique @map("recovery_token_hash")
+  participantKey        String                           @map("participant_key")
+  anonymousCode         String?                          @map("anonymous_code")
+  attemptNo             Int                              @default(1) @map("attempt_no")
   status                CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
-  progress              Int                             @default(0)
-  completedItems        Int                             @default(0) @map("completed_items")
-  startedAt             DateTime                        @default(now()) @map("started_at")
-  lastSavedAt           DateTime                        @default(now()) @map("last_saved_at")
-  completedAt           DateTime?                       @map("completed_at")
-  totalTime             Int?                            @map("total_time")
+  progress              Int                              @default(0)
+  completedItems        Int                              @default(0) @map("completed_items")
+  startedAt             DateTime                         @default(now()) @map("started_at")
+  lastSavedAt           DateTime                         @default(now()) @map("last_saved_at")
+  completedAt           DateTime?                        @map("completed_at")
+  totalTime             Int?                             @map("total_time")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
-  user               User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
-  accessToken        CompositeAssessmentAccessToken?  @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
-  scaleAssessments   Assessment[]                    @relation("CompositeAttemptAssessments")
-  cognitiveSessions  CognitiveSession[]               @relation("CompositeAttemptCognitiveSessions")
-  formAnswers        CompositeFormAnswer[]
-  analysisSnapshots  CompositeAnalysisSnapshot[]
+  user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  accessToken         CompositeAssessmentAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
+  scaleAssessments    Assessment[]                    @relation("CompositeAttemptAssessments")
+  cognitiveSessions   CognitiveSession[]              @relation("CompositeAttemptCognitiveSessions")
+  formAnswers         CompositeFormAnswer[]
+  analysisSnapshots   CompositeAnalysisSnapshot[]
 
+  @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@index([compositeAssessmentId, status])
   @@index([userId, status])
   @@index([participantKey])
   @@index([accessTokenId])
-  @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@map("composite_assessment_attempts")
 }
 
@@ -791,21 +804,21 @@ model CompositeAssessmentAttempt {
 // application level; the completion row is the historical default and an
 // explicit reanalysis creates a separate row.
 model CompositeAnalysisSnapshot {
-  id                       String                                  @id @default(uuid())
-  attemptId                String                                  @map("attempt_id")
-  packageKey               String                                  @map("package_key")
-  packageVersion           String                                  @map("package_version")
-  analysisDefinitionVersion String                                 @map("analysis_definition_version")
-  analysisVersion          String                                  @map("analysis_version")
-  reportSchemaVersion      String                                  @map("report_schema_version")
-  inputFingerprint         String                                  @map("input_fingerprint")
-  generationReason         CompositeAnalysisSnapshotGenerationReason @map("generation_reason")
-  generatedBy              String?                                 @map("generated_by")
-  payloadEncrypted         String                                  @map("payload_encrypted")
-  createdAt                DateTime                                @default(now()) @map("created_at")
+  id                        String                                    @id @default(uuid())
+  attemptId                 String                                    @map("attempt_id")
+  packageKey                String                                    @map("package_key")
+  packageVersion            String                                    @map("package_version")
+  analysisDefinitionVersion String                                    @map("analysis_definition_version")
+  analysisVersion           String                                    @map("analysis_version")
+  reportSchemaVersion       String                                    @map("report_schema_version")
+  inputFingerprint          String                                    @map("input_fingerprint")
+  generationReason          CompositeAnalysisSnapshotGenerationReason @map("generation_reason")
+  generatedBy               String?                                   @map("generated_by")
+  payloadEncrypted          String                                    @map("payload_encrypted")
+  createdAt                 DateTime                                  @default(now()) @map("created_at")
 
-  attempt                 CompositeAssessmentAttempt              @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  generator               User?                                   @relation("CompositeAnalysisSnapshotGenerator", fields: [generatedBy], references: [id], onDelete: SetNull)
+  attempt   CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  generator User?                      @relation("CompositeAnalysisSnapshotGenerator", fields: [generatedBy], references: [id], onDelete: SetNull)
 
   @@unique([attemptId, analysisVersion, inputFingerprint], map: "composite_analysis_snapshots_attempt_version_fingerprint_key")
   @@index([attemptId, generationReason, createdAt], map: "composite_analysis_snapshots_attempt_reason_created_idx")
@@ -813,13 +826,13 @@ model CompositeAnalysisSnapshot {
 }
 
 model CompositeFormAnswer {
-  id          String                    @id @default(uuid())
-  attemptId   String                    @map("attempt_id")
-  itemId      String                    @map("item_id")
-  value       String
-  completed   Boolean                   @default(true)
-  createdAt   DateTime                  @default(now()) @map("created_at")
-  updatedAt   DateTime                  @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  attemptId String   @map("attempt_id")
+  itemId    String   @map("item_id")
+  value     String
+  completed Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   item    CompositeAssessmentItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
@@ -841,7 +854,7 @@ model CompositeAssessmentAccessToken {
   createdAt             DateTime @default(now()) @map("created_at")
 
   compositeAssessment CompositeAssessment          @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
-  creator             User                        @relation("CompositeTokenCreator", fields: [createdBy], references: [id])
+  creator             User                         @relation("CompositeTokenCreator", fields: [createdBy], references: [id])
   attempts            CompositeAssessmentAttempt[]
 
   @@index([compositeAssessmentId])
@@ -869,14 +882,59 @@ model Document {
   pageCount  Int?      @map("page_count")
   cosUrl     String?   @map("cos_url")
   cosKey     String?   @map("cos_key")
+  assetId    String?   @map("asset_id")
 
   // 关联
-  teacher User @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacher User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  asset   StoredAsset? @relation("DocumentAsset", fields: [assetId], references: [id], onDelete: SetNull)
 
   // 性能优化索引
   @@index([createdAt])
   @@index([teacherId])
   @@map("documents")
+}
+
+// ==================== 统一文件资产 ====================
+
+model StoredAsset {
+  id           String    @id @default(uuid())
+  objectKey    String    @unique @map("object_key")
+  provider     String    @default("local")
+  mimeType     String    @map("mime_type")
+  sizeBytes    Int       @map("size_bytes")
+  sha256       String
+  originalName String?   @map("original_name")
+  ownerId      String?   @map("owner_id")
+  accessScope  String    @default("PRIVATE") @map("access_scope")
+  scopeId      String?   @map("scope_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  courseCovers    Course[]         @relation("CourseCoverAsset")
+  documents       Document[]       @relation("DocumentAsset")
+  videoOriginals  Video[]          @relation("VideoOriginalAsset")
+  videoProcessed  Video[]          @relation("VideoProcessedAsset")
+  videoThumbnails Video[]          @relation("VideoThumbnailAsset")
+  references      AssetReference[]
+
+  @@index([ownerId])
+  @@index([accessScope, scopeId])
+  @@map("stored_assets")
+}
+
+model AssetReference {
+  id         String      @id @default(uuid())
+  assetId    String      @map("asset_id")
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id")
+  field      String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  asset      StoredAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, entityType, entityId, field])
+  @@index([entityType, entityId])
+  @@map("asset_references")
 }
 
 // ==================== 课堂互动模块 ====================
@@ -1040,19 +1098,19 @@ enum CognitiveSessionStatus {
 
 // 认知测试配置（任务定义）。config 为任务参数（非参与者原始行为数据），按明文 Json 存储。
 model CognitiveTestConfig {
-  id             String                @id @default(uuid())
-  testType       String                @map("test_type")
-  configVersion  String                @map("config_version")
+  id             String                      @id @default(uuid())
+  testType       String                      @map("test_type")
+  configVersion  String                      @map("config_version")
   name           String
   instruction    String?
   config         Json? // 任务定义（刺激参数、计数等），非参与者行为数据
-  status         CognitiveConfigStatus @default(DRAFT)
-  engineVersion  String                @map("engine_version")
-  scoringVersion String                     @map("scoring_version")
+  status         CognitiveConfigStatus       @default(DRAFT)
+  engineVersion  String                      @map("engine_version")
+  scoringVersion String                      @map("scoring_version")
   accessPolicy   CognitiveConfigAccessPolicy @default(OPEN) @map("access_policy")
-  createdAt      DateTime                   @default(now()) @map("created_at")
-  updatedAt      DateTime                   @updatedAt @map("updated_at")
-  publishedAt    DateTime?                  @map("published_at")
+  createdAt      DateTime                    @default(now()) @map("created_at")
+  updatedAt      DateTime                    @updatedAt @map("updated_at")
+  publishedAt    DateTime?                   @map("published_at")
 
   assignments CognitiveAssignment[]
   sessions    CognitiveSession[]
@@ -1064,34 +1122,34 @@ model CognitiveTestConfig {
 
 // 认知测评分发（课程作业）。courseId 可空 + SetNull，保留 courseSnapshot 以抵御课程删除。
 model CognitiveAssignment {
-  id             String                    @id @default(uuid())
-  courseId       String?                   @map("course_id")
-  courseSnapshot Json?                     @map("course_snapshot")
-  configId       String                    @map("config_id")
-  createdBy      String?                   @map("created_by")
-  title          String
-  instruction    String?
-  status         CognitiveAssignmentStatus @default(DRAFT)
-  opensAt        DateTime?                 @map("opens_at")
-  dueAt          DateTime?                 @map("due_at")
-  maxAttempts    Int                       @default(1) @map("max_attempts")
-  required       Boolean                   @default(true)
-  createdAt      DateTime                  @default(now()) @map("created_at")
-  updatedAt      DateTime                  @updatedAt @map("updated_at")
-  publishedAt    DateTime?                 @map("published_at")
-  listedStandalone Boolean                 @default(true) @map("listed_standalone")
-  profile          String?
-  profileDefinitionVersion String?         @map("profile_definition_version")
-  resolvedConfigSnapshotEncrypted String?  @map("resolved_config_snapshot_encrypted")
-  resolvedConfigHash String?               @map("resolved_config_hash")
-  resolvedReportSnapshotEncrypted String?  @map("resolved_report_snapshot_encrypted")
+  id                              String                    @id @default(uuid())
+  courseId                        String?                   @map("course_id")
+  courseSnapshot                  Json?                     @map("course_snapshot")
+  configId                        String                    @map("config_id")
+  createdBy                       String?                   @map("created_by")
+  title                           String
+  instruction                     String?
+  status                          CognitiveAssignmentStatus @default(DRAFT)
+  opensAt                         DateTime?                 @map("opens_at")
+  dueAt                           DateTime?                 @map("due_at")
+  maxAttempts                     Int                       @default(1) @map("max_attempts")
+  required                        Boolean                   @default(true)
+  createdAt                       DateTime                  @default(now()) @map("created_at")
+  updatedAt                       DateTime                  @updatedAt @map("updated_at")
+  publishedAt                     DateTime?                 @map("published_at")
+  listedStandalone                Boolean                   @default(true) @map("listed_standalone")
+  profile                         String?
+  profileDefinitionVersion        String?                   @map("profile_definition_version")
+  resolvedConfigSnapshotEncrypted String?                   @map("resolved_config_snapshot_encrypted")
+  resolvedConfigHash              String?                   @map("resolved_config_hash")
+  resolvedReportSnapshotEncrypted String?                   @map("resolved_report_snapshot_encrypted")
 
-  course   Course?             @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
-  config   CognitiveTestConfig @relation(fields: [configId], references: [id], onDelete: Restrict)
-  creator  User?               @relation("AssignmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
-  sessions CognitiveSession[]
+  course         Course?                   @relation("CourseCognitiveAssignments", fields: [courseId], references: [id], onDelete: SetNull)
+  config         CognitiveTestConfig       @relation(fields: [configId], references: [id], onDelete: Restrict)
+  creator        User?                     @relation("AssignmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  sessions       CognitiveSession[]
   compositeItems CompositeAssessmentItem[] @relation("CompositeAssessmentCognitiveAssignment")
-  accessTokens CognitiveAccessToken[]
+  accessTokens   CognitiveAccessToken[]
 
   @@index([courseId])
   @@map("cognitive_assignments")
@@ -1129,13 +1187,13 @@ model CognitiveSession {
   createdAt                    DateTime               @default(now()) @map("created_at")
   updatedAt                    DateTime               @updatedAt @map("updated_at")
 
-  user       User?                @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
-  assignment CognitiveAssignment? @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
-  config     CognitiveTestConfig  @relation(fields: [configId], references: [id], onDelete: Restrict)
+  user             User?                       @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
+  assignment       CognitiveAssignment?        @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
+  config           CognitiveTestConfig         @relation(fields: [configId], references: [id], onDelete: Restrict)
   compositeAttempt CompositeAssessmentAttempt? @relation("CompositeAttemptCognitiveSessions", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
-  compositeItem CompositeAssessmentItem? @relation("CompositeCognitiveSessions", fields: [compositeItemId], references: [id], onDelete: Restrict)
-  accessToken CognitiveAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
-  trials     CognitiveTrial[]
+  compositeItem    CompositeAssessmentItem?    @relation("CompositeCognitiveSessions", fields: [compositeItemId], references: [id], onDelete: Restrict)
+  accessToken      CognitiveAccessToken?       @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
+  trials           CognitiveTrial[]
 
   // 同一分发下，按稳定匿名标识 participantKey + 尝试次数保证唯一；
   // assignmentId 为 NULL 的内部直测会话依赖应用层保证（见 v1.2 P0-4）。

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Image as ImageIcon, Trash2, Upload, X, AlertCircle, Eye, Edit2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
+import { ensureCsrfToken } from '../api/client'
 import axios from 'axios'
 
 interface ImageItem {
@@ -84,12 +85,12 @@ const ImageLibrary: React.FC = () => {
       const formData = new FormData()
       formData.append('image', selectedFile)
 
-      const token = localStorage.getItem('token')
-      
+      const csrfToken = await ensureCsrfToken()
       const response = await axios.post('/api/uploads/image', formData, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,
+          ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {

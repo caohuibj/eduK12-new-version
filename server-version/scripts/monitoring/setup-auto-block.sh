@@ -6,6 +6,11 @@
 
 set -e
 
+echo '此 iptables 自动封禁安装脚本已停用；AUTO_BLOCK_IP 默认关闭，生产启用需单独的网关/运维审批。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "========================================"
@@ -63,3 +68,4 @@ echo "  sudo /opt/ptool/server-version/scripts/monitoring/auto-block.sh list    
 echo "  sudo /opt/ptool/server-version/scripts/monitoring/auto-block.sh block <ip>   # 手动封禁"
 echo "  sudo /opt/ptool/server-version/scripts/monitoring/auto-block.sh unblock <ip> # 手动解封"
 echo "========================================"
+LEGACY_SCRIPT

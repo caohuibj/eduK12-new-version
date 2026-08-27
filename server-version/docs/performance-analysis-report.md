@@ -295,7 +295,7 @@ export const cacheMiddleware = (key: string) => (req, res, next) => {
 ```bash
 # 根据 2C4G 服务器配置优化
 PRISMA_CONNECTION_POOL_SIZE=5  # 从 10 减少到 5
-DATABASE_URL="postgresql://ptool:ptool123@localhost:5432/ptool?schema=public&connection_limit=5&pool_timeout=60"
+DATABASE_URL="${DATABASE_URL:?set DATABASE_URL in the protected environment}"
 ```
 
 **说明**: 
@@ -387,7 +387,7 @@ sudo nginx -t && sudo nginx -s reload
 ### 4.3 添加数据库索引
 
 ```bash
-PGPASSWORD=ptool123 psql -U ptool -d ptool -h localhost << 'EOF'
+PGPASSWORD="${DB_PASSWORD:?set DB_PASSWORD in the protected environment}" psql -U ptool -d ptool -h localhost << 'EOF'
 CREATE INDEX IF NOT EXISTS idx_assessment_user_scale ON assessments(user_id, scale_id, status);
 CREATE INDEX IF NOT EXISTS idx_course_student_user ON course_students(student_id, status);
 CREATE INDEX IF NOT EXISTS idx_scale_status_visibility ON scales(status, visibility);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../api/client'
+import { sessionFetch } from '../api/client'
 import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Users, Layers, GripVertical, Download, X, Copy } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -170,13 +171,9 @@ const QuestionnaireList: React.FC = () => {
       
       if (response.code === 0) {
         // 使用 fetch 下载文件（带认证）
-        const token = localStorage.getItem('token')
-        
         // 下载文件
         const fileUrl = `/api/questionnaires/exports/${response.data.fileName}`
-        fetch(fileUrl, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        sessionFetch(fileUrl)
           .then(res => res.blob())
           .then(blob => {
             const url = window.URL.createObjectURL(blob)

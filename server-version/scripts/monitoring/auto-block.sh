@@ -23,6 +23,7 @@ AUTO_BLOCK_IP=${AUTO_BLOCK_IP:-false}
 MAX_FAILED_LOGIN=${MAX_FAILED_LOGIN:-5}
 LOGIN_WINDOW=${LOGIN_WINDOW:-300}
 BLOCK_DURATION=${BLOCK_DURATION:-86400}
+TRUSTED_IPS=${TRUSTED_IPS:-}
 
 # 初始化
 init() {
@@ -35,6 +36,67 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$BLOCK_LOG"
 }
 
+# Only accept IPv4 addresses before passing values to firewall commands.
+valid_ipv4() {
+    local ip="$1"
+    [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || return 1
+    local octet
+    IFS='.' read -r -a octets <<< "$ip"
+    for octet in "${octets[@]}"; do
+        [ "$octet" -le 255 ] || return 1
+    done
+}
+
+is_trusted_ip() {
+    local ip="$1"
+    case ",$TRUSTED_IPS," in
+        *",$ip,"*) return 0 ;;
+    esac
+    # Never auto-block local/private networks by default. Explicit public
+    # addresses can be added to TRUSTED_IPS when a gateway requires it.
+    case "$ip" in
+        10.*|127.*|192.168.*) return 0 ;;
+        172.1[6-9].*|172.2[0-9].*|172.3[0-1].*) return 0 ;;
+    esac
+    return 1
+}
+
+# Return only log entries inside LOGIN_WINDOW.  The previous implementation
+# counted an unbounded tail of auth/nginx logs, which turned old failures into
+# new bans.  journalctl is preferred; the file fallback parses each timestamp.
+recent_auth_failures() {
+    if command -v journalctl &> /dev/null; then
+        journalctl --since "-${LOGIN_WINDOW} seconds" --no-pager -q 2>/dev/null \
+            | grep "Failed password" || true
+        return 0
+    fi
+
+    local now year line timestamp timestamp_epoch
+    now=$(date +%s)
+    year=$(date +%Y)
+    while IFS= read -r line; do
+        timestamp=$(echo "$line" | awk '{print $1 " " $2 " " $3}')
+        timestamp_epoch=$(date -d "$year $timestamp" +%s 2>/dev/null || echo 0)
+        if [ "$timestamp_epoch" -gt 0 ] && [ $((now - timestamp_epoch)) -ge 0 ] && [ $((now - timestamp_epoch)) -le "$LOGIN_WINDOW" ]; then
+            echo "$line"
+        fi
+    done < <(grep "Failed password" /var/log/auth.log 2>/dev/null || true)
+}
+
+recent_nginx_requests() {
+    local now line timestamp timestamp_epoch
+    now=$(date +%s)
+    while IFS= read -r line; do
+        if [[ "$line" =~ \[([^]]+)\] ]]; then
+            timestamp="${BASH_REMATCH[1]}"
+            timestamp_epoch=$(date -d "$timestamp" +%s 2>/dev/null || echo 0)
+            if [ "$timestamp_epoch" -gt 0 ] && [ $((now - timestamp_epoch)) -ge 0 ] && [ $((now - timestamp_epoch)) -le "$LOGIN_WINDOW" ]; then
+                echo "$line"
+            fi
+        fi
+    done < <(tail -n 2000 /var/log/nginx/access.log 2>/dev/null || true)
+}
+
 # 检查IP是否已封禁
 is_blocked() {
     local ip="$1"
@@ -45,6 +107,11 @@ is_blocked() {
 block_ip() {
     local ip="$1"
     local reason="${2:-暴力破解攻击}"
+
+    if ! valid_ipv4 "$ip"; then
+        log "拒绝封禁无效 IPv4 地址"
+        return 1
+    fi
     
     if is_blocked "$ip"; then
         log "IP $ip 已在封禁列表中"
@@ -97,9 +164,9 @@ save_iptables() {
 check_ssh_bruteforce() {
     log "检查SSH暴力破解..."
     
-    # 获取最近5分钟的失败登录记录
+    # 获取 LOGIN_WINDOW 内的失败登录记录
     local failed_attempts
-    failed_attempts=$(grep "Failed password" /var/log/auth.log 2>/dev/null | tail -100 || echo "")
+    failed_attempts=$(recent_auth_failures)
     
     if [ -z "$failed_attempts" ]; then
         return 0
@@ -118,7 +185,8 @@ check_ssh_bruteforce() {
     done <<< "$suspicious_ips"
 }
 
-# 检查Web登录暴力破解
+# Only login failures are eligible for the opt-in block. Do not infer abuse
+# from arbitrary URLs, SQL/XSS strings, SSH logs, or successful requests.
 check_web_bruteforce() {
     log "检查Web登录暴力破解..."
     
@@ -126,11 +194,11 @@ check_web_bruteforce() {
     if [ -f "/var/log/nginx/access.log" ]; then
         # 查找登录接口的频繁请求
         local suspicious_ips
-        suspicious_ips=$(grep "/api/auth/login" /var/log/nginx/access.log 2>/dev/null | \
-            awk '{print $1}' | sort | uniq -c | sort -rn | head -10)
+        suspicious_ips=$(recent_nginx_requests | awk '$0 ~ /\/api\/auth\/login/ && ($9 == "401" || $9 == "403") {print $1}' | \
+            sort | uniq -c | sort -rn | head -10)
         
         while read -r count ip; do
-            if [ -n "$ip" ] && [ "$count" -gt 20 ]; then
+            if [ -n "$ip" ] && [ "$count" -gt "$MAX_FAILED_LOGIN" ] && ! is_trusted_ip "$ip"; then
                 if ! is_blocked "$ip"; then
                     block_ip "$ip" "Web登录暴力破解(${count}次请求)"
                 fi
@@ -149,7 +217,7 @@ check_web_attacks() {
     
     # SQL注入尝试
     local sql_ips
-    sql_ips=$(grep -iE "(union|select|insert|update|delete|drop).*--" /var/log/nginx/access.log 2>/dev/null | \
+    sql_ips=$(recent_nginx_requests | grep -iE "(union|select|insert|update|delete|drop).*--" | \
         awk '{print $1}' | sort | uniq -c | sort -rn | head -5)
     
     while read -r count ip; do
@@ -162,7 +230,7 @@ check_web_attacks() {
     
     # XSS尝试
     local xss_ips
-    xss_ips=$(grep -iE "(<script|javascript:|onerror=|onload=)" /var/log/nginx/access.log 2>/dev/null | \
+    xss_ips=$(recent_nginx_requests | grep -iE "(<script|javascript:|onerror=|onload=)" | \
         awk '{print $1}' | sort | uniq -c | sort -rn | head -5)
     
     while read -r count ip; do
@@ -175,7 +243,7 @@ check_web_attacks() {
     
     # 目录遍历尝试
     local traversal_ips
-    traversal_ips=$(grep -E "\.\./|\.\.\\\\" /var/log/nginx/access.log 2>/dev/null | \
+    traversal_ips=$(recent_nginx_requests | grep -E "\.\./|\.\.\\\\" | \
         awk '{print $1}' | sort | uniq -c | sort -rn | head -5)
     
     while read -r count ip; do
@@ -196,9 +264,9 @@ cleanup_expired_blocks() {
     local cutoff=$((now - BLOCK_DURATION))
     
     while IFS= read -r line; do
-        if [[ "$line" =~ ^\[([0-9]{4}-[0-9]{2}-[0-9]{2}) ]]; then
-            local block_date="${BASH_REMATCH[1]}"
-            local block_timestamp=$(date -d "$block_date" +%s 2>/dev/null || echo "0")
+        if [[ "$line" =~ ^\[([0-9]{4}-[0-9]{2}-[0-9]{2})[[:space:]]([0-9]{2}:[0-9]{2}:[0-9]{2})\] ]]; then
+            local block_timestamp
+            block_timestamp=$(date -d "${BASH_REMATCH[1]} ${BASH_REMATCH[2]}" +%s 2>/dev/null || echo "0")
             
             if [ "$block_timestamp" -lt "$cutoff" ]; then
                 # 提取IP
@@ -233,9 +301,7 @@ main() {
     init
     log "========== 自动封禁检查开始 =========="
     
-    check_ssh_bruteforce
     check_web_bruteforce
-    check_web_attacks
     cleanup_expired_blocks
     
     log "========== 自动封禁检查完成 =========="

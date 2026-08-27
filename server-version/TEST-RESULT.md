@@ -59,7 +59,7 @@
 
 ### 教师端/管理端
 - 本地访问: http://localhost:5173
-- 默认账号: admin / admin123
+- 管理员凭据来自受保护环境配置
 
 ### API 接口
 - Base URL: http://localhost:3001/api

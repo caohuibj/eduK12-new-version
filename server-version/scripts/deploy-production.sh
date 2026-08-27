@@ -5,6 +5,17 @@
 
 set -e  # 遇错即停
 
+cat >&2 <<'NOTICE'
+此脚本已停用：生产环境必须使用 server-version/docker-compose.yml。
+请勿在宿主机安装 PostgreSQL、Redis 或 PM2；请按 Docker Compose 部署文档操作。
+NOTICE
+exit 1
+
+# The former host/PM2 implementation is retained below as inert history so
+# old references fail safely instead of silently deploying an unsupported
+# topology.
+: <<'LEGACY_SCRIPT'
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -82,9 +93,7 @@ GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
 \q
 EOF
     
-    # 允许远程连接 (可选)
-    sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /etc/postgresql/14/main/postgresql.conf
-    echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/14/main/pg_hba.conf
+    # 远程数据库配置已移除；生产环境不允许公网监听或全网段放行。
     
     systemctl restart postgresql
     
@@ -384,3 +393,5 @@ main() {
 
 # 运行主函数
 main
+
+LEGACY_SCRIPT

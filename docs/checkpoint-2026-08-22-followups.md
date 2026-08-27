@@ -84,7 +84,7 @@
 
 `/login` 不是路由，访问会回到门户。
 
-管理员账号来自 `ADMIN_USERNAME` / `ADMIN_PASSWORD`（未设置时配置默认为 `admin` / `admin123`）。
+管理员账号来自 `ADMIN_USERNAME` / `ADMIN_PASSWORD`；未设置时不会创建初始管理员。
 
 ---
 

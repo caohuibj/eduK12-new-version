@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, Video, Image as ImageIcon, Link as LinkIcon, Upload, Search, Check, FileVideo, AlertCircle, FileText } from 'lucide-react'
 import apiClient from '../api/client'
+import { ensureCsrfToken } from '../api/client'
 import axios from 'axios'
 import type { Video as VideoType, Document as DocumentType } from '../types'
 
 export interface MediaItem {
   type: 'library' | 'external' | 'upload'
   id?: string
+  assetId?: string
   url: string
   title: string
   thumbnail?: string
@@ -15,6 +17,7 @@ export interface MediaItem {
 
 interface ImageItem {
   id: string
+  assetId?: string
   url: string
   filename: string
   name: string
@@ -137,6 +140,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
       onSelect({
         type: 'library',
         id: selectedDocument.id,
+        assetId: selectedDocument.assetId,
         url: selectedDocument.url || '',
         title: selectedDocument.title,
       })
@@ -145,6 +149,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
       onSelect({
         type: 'library',
         id: selectedImage.id,
+        assetId: selectedImage.assetId || selectedImage.id,
         url: selectedImage.url,
         title: selectedImage.name,
       })
@@ -156,6 +161,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
       onSelect({
         type: 'library',
         id: selectedVideo.id,
+        assetId: selectedVideo.processedAssetId || selectedVideo.originalAssetId,
         url: videoUrl,
         title: selectedVideo.title,
         source: 'library',
@@ -243,7 +249,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
     try {
       const formData = new FormData()
-      const token = localStorage.getItem('token')
+      const csrfToken = await ensureCsrfToken()
 
       if (isDocumentMode) {
         // 上传文档
@@ -251,9 +257,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         formData.append('title', uploadTitle.trim())
 
         const response = await axios.post('/api/documents/upload', formData, {
+          withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
+            ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
           },
           onUploadProgress: (progressEvent) => {
             if (progressEvent.total) {
@@ -280,9 +287,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         formData.append('image', uploadFile)
 
         const response = await axios.post('/api/uploads/image', formData, {
+          withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
+            ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
           },
           onUploadProgress: (progressEvent) => {
             if (progressEvent.total) {
@@ -297,6 +305,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           onSelect({
             type: 'library',
             id: uploadedImage.filename,
+            assetId: uploadedImage.assetId,
             url: uploadedImage.url,
             title: uploadedImage.name,
           })
@@ -310,9 +319,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         formData.append('title', uploadTitle.trim())
 
         const response = await axios.post('/api/videos/upload', formData, {
+          withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
+            ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
           },
           onUploadProgress: (progressEvent) => {
             if (progressEvent.total) {
@@ -327,6 +337,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           onSelect({
             type: 'library',
             id: uploadedVideo.id,
+            assetId: uploadedVideo.processedAssetId || uploadedVideo.originalAssetId,
             url: uploadedVideo.url || uploadedVideo.originalUrl || '',
             title: uploadedVideo.title,
           })

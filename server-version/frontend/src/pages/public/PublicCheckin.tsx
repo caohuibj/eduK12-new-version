@@ -8,18 +8,133 @@ import { useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result, Input, Upload, Image } from 'antd'
 import { CheckCircleOutlined, UploadOutlined, CameraOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
+import { sanitizeHtml } from '../../utils/sanitize'
+
+type PublicAssetSource = string | {
+  assetId?: string
+  url?: string | null
+  processedUrl?: string | null
+  originalUrl?: string | null
+  fileName?: string
+  title?: string
+  name?: string
+  size?: number
+  fileSize?: number
+}
 
 interface CheckinData {
   id: string
   title: string
   description?: string
   content?: string
-  images?: string[]
-  videos?: any[]
-  documents?: any[]
+  images?: PublicAssetSource[]
+  videos?: PublicAssetSource[]
+  documents?: PublicAssetSource[]
   endTime?: string
   createdAt: string
   allowViewOthers: boolean
+}
+
+const sourceUrl = (source: PublicAssetSource | undefined): string => {
+  if (typeof source === 'string') return source
+  return source?.url || source?.processedUrl || source?.originalUrl || (source?.fileName ? `/uploads/videos/${source.fileName}` : '')
+}
+
+const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string | undefined): string => {
+  const directUrl = sourceUrl(source)
+  const [resolvedUrl, setResolvedUrl] = useState(directUrl)
+
+  useEffect(() => {
+    let disposed = false
+    let objectUrl = ''
+
+    if (!directUrl || !directUrl.startsWith('/api/public/assets/')) {
+      setResolvedUrl(directUrl)
+      return () => undefined
+    }
+
+    setResolvedUrl('')
+    fetch(directUrl, { headers: { 'X-Checkin-Token': token || '' } })
+      .then((response) => {
+        if (!response.ok) throw new Error('asset unavailable')
+        return response.blob()
+      })
+      .then((blob) => {
+        if (disposed) return
+        objectUrl = URL.createObjectURL(blob)
+        setResolvedUrl(objectUrl)
+      })
+      .catch(() => {
+        if (!disposed) setResolvedUrl('')
+      })
+
+    return () => {
+      disposed = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [directUrl, token])
+
+  return resolvedUrl
+}
+
+const PublicAssetImage: React.FC<{ source: PublicAssetSource; token?: string; alt: string }> = ({ source, token, alt }) => {
+  const url = usePublicAssetUrl(source, token)
+  return url ? (
+    <Image
+      src={url}
+      alt={alt}
+      className="rounded-lg object-cover"
+      style={{ maxHeight: '200px', width: '100%' }}
+    />
+  ) : <div className="h-32 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">图片暂不可用</div>
+}
+
+const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; title: string }> = ({ source, token, title }) => {
+  const url = usePublicAssetUrl(source, token)
+  if (!url) return <div className="border rounded-lg p-4 bg-red-50 text-red-600 text-sm">{title}：视频暂不可用</div>
+
+  return (
+    <div className="border rounded-lg overflow-hidden bg-gray-50">
+      <div className="p-3 flex items-center">
+        <VideoCameraOutlined className="text-blue-500 mr-2" />
+        <span className="text-sm font-medium">{title}</span>
+      </div>
+      <div onContextMenu={(e) => e.preventDefault()} className="relative">
+        <video
+          src={url}
+          controls
+          controlsList="nodownload"
+          disablePictureInPicture
+          className="w-full max-h-80 bg-black"
+          preload="metadata"
+          onContextMenu={(e) => e.preventDefault()}
+          poster="/video-error.png"
+        >
+          您的浏览器不支持视频播放
+        </video>
+      </div>
+    </div>
+  )
+}
+
+const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string; title: string; size?: string }> = ({ source, token, title, size }) => {
+  const url = usePublicAssetUrl(source, token)
+  return (
+    <div
+      onClick={() => url && window.open(url, '_blank', 'noopener,noreferrer')}
+      onContextMenu={(e) => e.preventDefault()}
+      className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${url ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-60'}`}
+    >
+      <div className="flex items-center space-x-3">
+        <FileTextOutlined className="text-red-500 text-xl" />
+        <div>
+          <div className="text-sm font-medium text-gray-900">{title}</div>
+          {size && <div className="text-xs text-gray-500">{size}</div>}
+        </div>
+      </div>
+      <span className="text-blue-600 text-sm">{url ? '在线查看' : '暂不可用'}</span>
+    </div>
+  )
 }
 
 const PublicCheckin: React.FC = () => {
@@ -57,41 +172,13 @@ const PublicCheckin: React.FC = () => {
 
       const data = await response.json()
       
-      // 处理图片格式：将对象数组转为字符串数组
-      const checkinData = data.data.checkin
-      if (checkinData.images && Array.isArray(checkinData.images)) {
-        checkinData.images = checkinData.images.map((img: any) => {
-          if (typeof img === 'string') return img
-          if (img && img.url) return img.url
-          return ''
-        }).filter(Boolean)
-      }
-      
-      // 处理视频格式：保持对象结构，统一格式
-      if (checkinData.videos && Array.isArray(checkinData.videos)) {
-        checkinData.videos = checkinData.videos.map((video: any) => {
-          if (typeof video === 'string') {
-            return { url: video }
-          }
-          return video
-        })
-      }
-      
-      // 处理文档格式：保持对象结构，统一格式
-      if (checkinData.documents && Array.isArray(checkinData.documents)) {
-        checkinData.documents = checkinData.documents.map((doc: any) => {
-          if (typeof doc === 'string') {
-            return { url: doc }
-          }
-          return doc
-        })
-      }
+      const checkinData = data.data.checkin as CheckinData
       
       setCheckin(checkinData)
       setSessionId(data.data.sessionId)
       
-      // 保存会话信息
-      localStorage.setItem(`checkin_session_${token}`, data.data.sessionId)
+      // 会话标识只用于本次浏览器会话，不能长期留在 localStorage。
+      sessionStorage.setItem(`checkin_session_${token}`, data.data.sessionId)
       
     } catch (err: any) {
       setError(err.message || '打卡访问失败')
@@ -104,12 +191,16 @@ const PublicCheckin: React.FC = () => {
   /**
    * 上传图片
    */
-  const uploadImage = async (file: File): Promise<string> => {
+  const uploadImage = async (file: File): Promise<{ assetId: string }> => {
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('sessionId', sessionId)
 
     const response = await fetch(`/api/checkins/public/${token}/upload`, {
       method: 'POST',
+      headers: {
+        'X-Checkin-Token': token || '',
+      },
       body: formData,
     })
 
@@ -118,7 +209,7 @@ const PublicCheckin: React.FC = () => {
     }
 
     const data = await response.json()
-    return data.data.url
+    return { assetId: data.data.assetId }
   }
 
   /**
@@ -129,11 +220,10 @@ const PublicCheckin: React.FC = () => {
       setSubmitting(true)
 
       // 上传图片
-      const uploadedImages: string[] = []
+      const uploadedImages: Array<{ assetId: string }> = []
       for (const file of imageList) {
         if (file.originFileObj) {
-          const url = await uploadImage(file.originFileObj)
-          uploadedImages.push(url)
+          uploadedImages.push(await uploadImage(file.originFileObj))
         }
       }
 
@@ -142,6 +232,7 @@ const PublicCheckin: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Checkin-Token': token || '',
         },
         body: JSON.stringify({
           content,
@@ -246,7 +337,7 @@ const PublicCheckin: React.FC = () => {
             <div className="bg-gray-50 p-6 rounded-lg mb-8">
               <div 
                 className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: checkin.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }}
               />
             </div>
           )}
@@ -258,12 +349,7 @@ const PublicCheckin: React.FC = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {checkin.images.map((img, index) => (
                   <div key={index} className="relative">
-                    <Image
-                      src={img}
-                      alt={`参考图片 ${index + 1}`}
-                      className="rounded-lg object-cover"
-                      style={{ maxHeight: '200px', width: '100%' }}
-                    />
+                    <PublicAssetImage source={img} token={token} alt={`参考图片 ${index + 1}`} />
                   </div>
                 ))}
               </div>
@@ -278,57 +364,10 @@ const PublicCheckin: React.FC = () => {
                 参考视频
               </h3>
               <div className="space-y-3">
-                {checkin.videos.map((video: any, index: number) => {
-                  // 调试：打印视频数据
-                  console.log(`视频 ${index + 1} 数据:`, video)
-                  
-                  // 构造视频URL - 多重fallback确保能播放
-                  const videoUrl = typeof video === 'string' 
-                    ? video 
-                    : (video.url || video.processedUrl || video.originalUrl || (video.fileName && `/uploads/videos/${video.fileName}`) || '')
-                  const videoTitle = video.title || `视频 ${index + 1}`
-                  
-                  console.log(`视频 ${index + 1} URL:`, videoUrl)
-                  
-                  // 如果没有视频URL，显示错误提示
-                  if (!videoUrl) {
-                    return (
-                      <div key={index} className="border rounded-lg p-4 bg-red-50">
-                        <p className="text-red-600 text-sm">视频 {index + 1}: URL无效，无法播放</p>
-                      </div>
-                    )
-                  }
-                  
+                {checkin.videos.map((video, index) => {
+                  const videoTitle = typeof video === 'string' ? `视频 ${index + 1}` : (video.title || `视频 ${index + 1}`)
                   return (
-                    <div key={index} className="border rounded-lg overflow-hidden bg-gray-50">
-                      <div className="p-3 flex items-center">
-                        <VideoCameraOutlined className="text-blue-500 mr-2" />
-                        <span className="text-sm font-medium">{videoTitle}</span>
-                      </div>
-                      <div 
-                        onContextMenu={(e) => e.preventDefault()}
-                        className="relative"
-                      >
-                        <video
-                          src={videoUrl}
-                          controls
-                          controlsList="nodownload"
-                          disablePictureInPicture
-                          className="w-full max-h-80 bg-black"
-                          preload="metadata"
-                          onContextMenu={(e) => e.preventDefault()}
-                          onError={(e) => {
-                            console.error('视频加载失败:', videoUrl)
-                            const target = e.target as HTMLVideoElement
-                            target.poster = '/video-error.png'
-                          }}
-                        >
-                          <source src={videoUrl} type="video/mp4" />
-                          <source src={videoUrl} type="video/webm" />
-                          您的浏览器不支持视频播放
-                        </video>
-                      </div>
-                    </div>
+                    <PublicAssetVideo key={index} source={video} token={token} title={videoTitle} />
                   )
                 })}
               </div>
@@ -343,30 +382,12 @@ const PublicCheckin: React.FC = () => {
                 参考文档
               </h3>
               <div className="space-y-2">
-                {checkin.documents.map((doc: any, index: number) => {
-                  const docUrl = typeof doc === 'string' ? doc : (doc.url || doc.cosUrl)
-                  const docTitle = doc.title || doc.fileName || `文档 ${index + 1}`
-                  const docSize = doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : ''
-                  
+                {checkin.documents.map((doc, index) => {
+                  const docTitle = typeof doc === 'string' ? `文档 ${index + 1}` : (doc.title || doc.fileName || `文档 ${index + 1}`)
+                  const docBytes = typeof doc === 'string' ? undefined : (doc.size || doc.fileSize)
+                  const docSize = docBytes ? `${(docBytes / 1024).toFixed(1)} KB` : ''
                   return (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        // 使用内嵌预览而非直接下载
-                        window.open(docUrl, '_blank', 'noopener,noreferrer')
-                      }}
-                      onContextMenu={(e) => e.preventDefault()}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <FileTextOutlined className="text-red-500 text-xl" />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{docTitle}</div>
-                          {docSize && <div className="text-xs text-gray-500">{docSize}</div>}
-                        </div>
-                      </div>
-                      <span className="text-blue-600 text-sm">在线查看</span>
-                    </div>
+                    <PublicAssetDocument key={index} source={doc} token={token} title={docTitle} size={docSize} />
                   )
                 })}
               </div>

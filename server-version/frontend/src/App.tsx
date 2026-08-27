@@ -16,75 +16,76 @@ import StudentCourseLogin from './pages/StudentCourseLogin'
 import StudentRegister from './pages/student/StudentRegister'
 
 // Admin/Teacher Pages
-import CourseList from './pages/CourseList'
-import CourseStudents from './pages/CourseStudents'
-import StudentManagement from './pages/StudentManagement'
-import AssignmentList from './pages/AssignmentList'
-import CheckinList from './pages/CheckinList'
-import VideoLibrary from './pages/VideoLibrary'
-import ImageLibrary from './pages/ImageLibrary'
-import DocumentLibrary from './pages/DocumentLibrary'
-import UserList from './pages/UserList'
-import TeacherCodeList from './pages/TeacherCodeList'
-import MaterialGrants from './pages/admin/MaterialGrants'
-import TeacherProfile from './pages/teacher/TeacherProfile'
-import ScaleList from './pages/ScaleList'
-import ScaleEdit from './pages/ScaleEdit'
-import QuestionnaireList from './pages/QuestionnaireList'
-import QuestionnaireEdit from './pages/QuestionnaireEdit'
-import TeacherCourseDetail from './pages/teacher/TeacherCourseDetail'
-import GeneralQuestionnaireList from './pages/teacher/GeneralQuestionnaireList'
-import GeneralQuestionnaireCreate from './pages/teacher/GeneralQuestionnaireCreate'
-import GeneralQuestionnaireEdit from './pages/teacher/GeneralQuestionnaireEdit'
-import ClassroomList from './pages/teacher/ClassroomList'
-import ClassroomControl from './pages/teacher/ClassroomControl'
-import ClassroomCreate from './pages/teacher/ClassroomCreate'
-import ClassroomEdit from './pages/teacher/ClassroomEdit'
-import ClassroomQRCode from './pages/teacher/ClassroomQRCode'
-import ClassroomQuestionEdit from './pages/teacher/ClassroomQuestionEdit'
-import CompositeAssessmentList from './pages/teacher/CompositeAssessmentList'
-import CompositeAssessmentEdit from './pages/teacher/CompositeAssessmentEdit'
-import CompositeAssessmentResults from './pages/teacher/CompositeAssessmentResults'
-import CognitiveAssignmentList from './pages/teacher/CognitiveAssignmentList'
-import CognitiveAssignmentEdit from './pages/teacher/CognitiveAssignmentEdit'
+const CourseList = React.lazy(() => import('./pages/CourseList'))
+const CourseStudents = React.lazy(() => import('./pages/CourseStudents'))
+const StudentManagement = React.lazy(() => import('./pages/StudentManagement'))
+const AssignmentList = React.lazy(() => import('./pages/AssignmentList'))
+const CheckinList = React.lazy(() => import('./pages/CheckinList'))
+const VideoLibrary = React.lazy(() => import('./pages/VideoLibrary'))
+const ImageLibrary = React.lazy(() => import('./pages/ImageLibrary'))
+const DocumentLibrary = React.lazy(() => import('./pages/DocumentLibrary'))
+const UserList = React.lazy(() => import('./pages/UserList'))
+const TeacherCodeList = React.lazy(() => import('./pages/TeacherCodeList'))
+const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
+const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
+const ScaleList = React.lazy(() => import('./pages/ScaleList'))
+const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
+const QuestionnaireList = React.lazy(() => import('./pages/QuestionnaireList'))
+const QuestionnaireEdit = React.lazy(() => import('./pages/QuestionnaireEdit'))
+const TeacherCourseDetail = React.lazy(() => import('./pages/teacher/TeacherCourseDetail'))
+const GeneralQuestionnaireList = React.lazy(() => import('./pages/teacher/GeneralQuestionnaireList'))
+const GeneralQuestionnaireCreate = React.lazy(() => import('./pages/teacher/GeneralQuestionnaireCreate'))
+const GeneralQuestionnaireEdit = React.lazy(() => import('./pages/teacher/GeneralQuestionnaireEdit'))
+const ClassroomList = React.lazy(() => import('./pages/teacher/ClassroomList'))
+const ClassroomControl = React.lazy(() => import('./pages/teacher/ClassroomControl'))
+const ClassroomCreate = React.lazy(() => import('./pages/teacher/ClassroomCreate'))
+const ClassroomEdit = React.lazy(() => import('./pages/teacher/ClassroomEdit'))
+const ClassroomQRCode = React.lazy(() => import('./pages/teacher/ClassroomQRCode'))
+const ClassroomQuestionEdit = React.lazy(() => import('./pages/teacher/ClassroomQuestionEdit'))
+const CompositeAssessmentList = React.lazy(() => import('./pages/teacher/CompositeAssessmentList'))
+const CompositeAssessmentEdit = React.lazy(() => import('./pages/teacher/CompositeAssessmentEdit'))
+const CompositeAssessmentResults = React.lazy(() => import('./pages/teacher/CompositeAssessmentResults'))
+const CognitiveAssignmentList = React.lazy(() => import('./pages/teacher/CognitiveAssignmentList'))
+const CognitiveAssignmentEdit = React.lazy(() => import('./pages/teacher/CognitiveAssignmentEdit'))
 
 // Public Pages
-import PublicQuestionnaire from './pages/public/PublicQuestionnaire'
-import PublicQuestionnaireAssessment from './pages/public/PublicQuestionnaireAssessment'
-import PublicQuestionnaireResult from './pages/public/PublicQuestionnaireResult'
-import PublicCheckin from './pages/public/PublicCheckin'
+const PublicQuestionnaire = React.lazy(() => import('./pages/public/PublicQuestionnaire'))
+const PublicQuestionnaireAssessment = React.lazy(() => import('./pages/public/PublicQuestionnaireAssessment'))
+const PublicQuestionnaireResult = React.lazy(() => import('./pages/public/PublicQuestionnaireResult'))
+const PublicCheckin = React.lazy(() => import('./pages/public/PublicCheckin'))
 
 // Student Pages
-import StudentHome from './pages/student/StudentHome'
-import CourseDetail from './pages/student/CourseDetail'
-import AssignmentSubmit from './pages/student/AssignmentSubmit'
-import CheckinSubmit from './pages/student/CheckinSubmit'
-import StudentCheckins from './pages/student/StudentCheckins'
-import StudentAssignments from './pages/student/StudentAssignments'
-import StudentProfile from './pages/student/StudentProfile'
-import StudentScales from './pages/student/StudentScales'
-import ScaleAssessment from './pages/student/ScaleAssessment'
-import ScaleResult from './pages/student/ScaleResult'
-import StudentQuestionnaires from './pages/student/StudentQuestionnaires'
-import QuestionnaireAssessment from './pages/student/QuestionnaireAssessment'
-import QuestionnaireResult from './pages/student/QuestionnaireResult'
-import ClassroomJoin from './pages/student/ClassroomJoin'
-import ClassroomAnswer from './pages/student/ClassroomAnswer'
-import ClassroomEnter from './pages/student/ClassroomEnter'
-import CompositeAssessmentPage from './modules/composite/CompositeAssessmentPage'
-import CompositeReportPage from './modules/composite/CompositeReportPage'
+const StudentHome = React.lazy(() => import('./pages/student/StudentHome'))
+const CourseDetail = React.lazy(() => import('./pages/student/CourseDetail'))
+const AssignmentSubmit = React.lazy(() => import('./pages/student/AssignmentSubmit'))
+const CheckinSubmit = React.lazy(() => import('./pages/student/CheckinSubmit'))
+const StudentCheckins = React.lazy(() => import('./pages/student/StudentCheckins'))
+const StudentAssignments = React.lazy(() => import('./pages/student/StudentAssignments'))
+const StudentProfile = React.lazy(() => import('./pages/student/StudentProfile'))
+const StudentScales = React.lazy(() => import('./pages/student/StudentScales'))
+const ScaleAssessment = React.lazy(() => import('./pages/student/ScaleAssessment'))
+const ScaleResult = React.lazy(() => import('./pages/student/ScaleResult'))
+const StudentQuestionnaires = React.lazy(() => import('./pages/student/StudentQuestionnaires'))
+const QuestionnaireAssessment = React.lazy(() => import('./pages/student/QuestionnaireAssessment'))
+const QuestionnaireResult = React.lazy(() => import('./pages/student/QuestionnaireResult'))
+const ClassroomJoin = React.lazy(() => import('./pages/student/ClassroomJoin'))
+const ClassroomAnswer = React.lazy(() => import('./pages/student/ClassroomAnswer'))
+const ClassroomEnter = React.lazy(() => import('./pages/student/ClassroomEnter'))
+const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
+const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
 
 // Cognitive 页面（Stage B：URL 以 Assignment/Session 为核心；flag=false 时不注册 → 隐藏入口）
-import CognitiveHome from './modules/cognitive/pages/CognitiveHome'
-import CognitiveAssignmentEntry from './modules/cognitive/pages/CognitiveAssignmentEntry'
-import CognitiveRunner from './modules/cognitive/pages/CognitiveRunner'
-import CognitiveResult from './modules/cognitive/pages/CognitiveResult'
-import CognitiveHistory from './modules/cognitive/pages/CognitiveHistory'
-import PublicCognitiveAssignment from './modules/cognitive/pages/PublicCognitiveAssignment'
+const CognitiveHome = React.lazy(() => import('./modules/cognitive/pages/CognitiveHome'))
+const CognitiveAssignmentEntry = React.lazy(() => import('./modules/cognitive/pages/CognitiveAssignmentEntry'))
+const CognitiveRunner = React.lazy(() => import('./modules/cognitive/pages/CognitiveRunner'))
+const CognitiveResult = React.lazy(() => import('./modules/cognitive/pages/CognitiveResult'))
+const CognitiveHistory = React.lazy(() => import('./modules/cognitive/pages/CognitiveHistory'))
+const PublicCognitiveAssignment = React.lazy(() => import('./modules/cognitive/pages/PublicCognitiveAssignment'))
 
 
 // BigScreen Pages
-import BigScreen from './pages/bigscreen/BigScreen'
+const BigScreen = React.lazy(() => import('./pages/bigscreen/BigScreen'))
+import FirstLoginPasswordChange from './pages/FirstLoginPasswordChange'
 
 // Protected Route for Teachers/Admins
 const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({
@@ -103,6 +104,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' |
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />
+  }
+
+  if (user?.mustChangePassword) {
+    return <FirstLoginPasswordChange />
   }
 
   if (roles && user && !roles.includes(user.role)) {
@@ -130,6 +135,10 @@ const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
 
   if (user?.role !== 'STUDENT') {
     return <Navigate to="/" replace />
+  }
+
+  if (user.mustChangePassword) {
+    return <FirstLoginPasswordChange />
   }
 
   return <StudentLayout>{children}</StudentLayout>
@@ -214,7 +223,8 @@ function AppRoutes() {
   }
 
   return (
-        <Routes>
+    <React.Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>加载中...</div>}>
+      <Routes>
           {/* Portal - Entry Point */}
           <Route
             path="/"
@@ -755,7 +765,8 @@ function AppRoutes() {
 
           {/* Default Redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+      </Routes>
+    </React.Suspense>
   )
 }
 

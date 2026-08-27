@@ -12,7 +12,7 @@
 | ID | 内容 | 影响 | 处理 |
 |---|---|---|---|
 | KI-001 | `.env.example` 写 `REDIS_URL`，但运行时 `config/queue.ts` / `cacheService.ts` 读 `REDIS_HOST/PORT/PASSWORD`，`socketService.ts` 读 `REDIS_URL` | 配置语义不一致，易误配 | 仅登记；本次 `.env` 已同时补齐 `REDIS_HOST/PORT`（不读 `REDIS_URL` 亦可连） |
-| KI-002 | `prisma/seed.ts` hard-code 管理员 `rateK12admin` / `2026coding`，且不读 `ADMIN_USERNAME/ADMIN_PASSWORD` | 口令写死在代码，生产安全隐患 | 仅登记；seed 两次幂等（第二次跳过）已验证 |
+| KI-002 | `prisma/seed.ts` 曾 hard-code 管理员凭据 | 口令写死在代码，生产安全隐患 | 已修复：seed 只读受保护的 `ADMIN_USERNAME/ADMIN_PASSWORD`，缺失即失败 |
 | KI-003 | `docker-compose.yml` 含 postgres/backend/frontend/nginx，**缺 Redis** | 若用 compose 起全栈会缺 Redis | 仅登记；本基线用独立 `docker run` 起 `eduk12-redis` |
 | KI-004 | Backend Docker image 未内置 FFmpeg | 容器化转码会失败 | 本基线用本机 ffmpeg 8.0.1；容器化留待 Milestone C |
 | KI-005 | migration / seed 部署耦合（seed 依赖特定表与 admin） | 部署顺序敏感 | 仅登记 |

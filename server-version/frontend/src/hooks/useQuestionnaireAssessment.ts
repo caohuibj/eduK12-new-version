@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { questionnaireResumeHeaders } from '../utils/questionnaireResume'
 
 interface UseQuestionnaireAssessmentResult {
   loading: boolean
@@ -42,7 +43,9 @@ export function useQuestionnaireAssessment(
     try {
       setLoading(true)
       
-      const response = await fetch(`/api/public/assessments/${sessionId}`)
+      const response = await fetch(`/api/public/assessments/${sessionId}`, {
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
       
       if (!response.ok) {
         throw new Error('获取测评失败')
@@ -90,7 +93,8 @@ export function useQuestionnaireAssessment(
       const response = await fetch(`/api/public/assessments/${sessionId}/answers`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
         },
         body: JSON.stringify({
           scaleAssessmentId: scaleAssessment.id,
@@ -125,7 +129,8 @@ export function useQuestionnaireAssessment(
       const response = await fetch(`/api/public/assessments/${sessionId}/scale/complete`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
         },
         body: JSON.stringify({
           scaleAssessmentId: scaleAssessment.id
@@ -137,7 +142,9 @@ export function useQuestionnaireAssessment(
       }
 
       // 2. 获取问卷测评状态
-      const statusResponse = await fetch(`/api/public/assessments/${sessionId}`)
+      const statusResponse = await fetch(`/api/public/assessments/${sessionId}`, {
+        headers: questionnaireResumeHeaders(token, sessionId),
+      })
       if (!statusResponse.ok) {
         throw new Error('获取状态失败')
       }
@@ -152,7 +159,8 @@ export function useQuestionnaireAssessment(
           (qa?.currentScaleIndex !== undefined && qa.currentScaleIndex >= totalScales)) {
         // 所有量表完成，调用问卷完成接口
         const completeResponse = await fetch(`/api/public/assessments/${sessionId}/complete`, {
-          method: 'POST'
+          method: 'POST',
+          headers: questionnaireResumeHeaders(token, sessionId),
         })
 
         if (!completeResponse.ok) {
@@ -190,7 +198,8 @@ export function useQuestionnaireAssessment(
 
   const completeAssessment = async () => {
       const response = await fetch(`/api/public/assessments/${sessionId}/complete`, {
-        method: 'POST'
+        method: 'POST',
+        headers: questionnaireResumeHeaders(token, sessionId),
       })
 
       if (!response.ok) {

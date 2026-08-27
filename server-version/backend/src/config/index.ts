@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import { z } from 'zod'
 import path from 'path'
 import { HEX_32_BYTE_KEY } from '../utils/encryption'
+import { logger } from '../utils/logger'
 
 dotenv.config()
 
@@ -14,7 +15,13 @@ const configSchema = z.object({
   trustProxyHops: z.number().int().min(0).max(10),
   jwtSecret: z.string().min(32, 'JWT_SECRET must be at least 32 characters in production'),
   jwtExpiresIn: z.string(),
+  cookieSecure: z.boolean(),
+  assetSigningSecret: z.string().min(32, 'ASSET_SIGNING_SECRET must be at least 32 characters'),
   uploadDir: z.string(),
+  // Keep legacy static uploads available only during the reversible migration
+  // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
+  // and verified.
+  legacyUploadsEnabled: z.boolean(),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
@@ -64,15 +71,24 @@ const projectRoot = path.resolve(__dirname, '..')
 const rawConfig = {
   port: parsePort(),
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigin: process.env.CORS_ORIGIN || '*',
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public',
+  // Cookie authentication requires a concrete origin; Compose overrides this
+  // for the deployed frontend and local development uses Vite's default.
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  // Development still requires an explicit DATABASE_URL when credentials are
+  // needed; the fallback intentionally contains no embedded password.
+  databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/ptool?schema=public',
   // Docker production topology is frontend proxy -> backend, while local
   // development normally has no trusted proxy in front of the API.
   trustProxyHops: parseNonNegativeInteger('TRUST_PROXY_HOPS', process.env.NODE_ENV === 'production' ? 1 : 0),
   jwtSecret: process.env.NODE_ENV === 'production' ? (process.env.JWT_SECRET || '') : (process.env.JWT_SECRET || 'dev-secret-key-not-for-production'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  cookieSecure: parseBooleanEnv('COOKIE_SECURE', process.env.NODE_ENV === 'production'),
+  // Production must supply a separate signing key. The development fallback
+  // keeps the local test environment self-contained without reusing JWT.
+  assetSigningSecret: process.env.ASSET_SIGNING_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-asset-signing-secret-not-for-production'),
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
+  legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
@@ -114,7 +130,7 @@ if (rawConfig.nodeEnv === 'production') {
 const result = configSchema.safeParse(rawConfig)
 
 if (!result.success) {
-  console.error('❌ Configuration validation failed:', result.error.errors)
+  logger.error('Configuration validation failed', result.error.errors)
   throw new Error(`Configuration error: ${result.error.errors.map(e => e.message).join(', ')}`)
 }
 

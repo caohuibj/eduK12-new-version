@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, ZoomIn, FileText } from 'lucide-react'
 import apiClient from '../../api/client'
 import { sanitizeHtml } from '../../utils/sanitize'
-import type { Checkin, CheckinSubmission, MediaItem, DocumentItem } from '../../types'
+import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, DocumentItem } from '../../types'
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import PdfViewer from '../../components/PdfViewer'
@@ -22,13 +22,23 @@ interface OtherSubmission {
   createdAt: string
 }
 
+const imageUrlFor = (image: CheckinSubmissionImage): string => (
+  typeof image === 'string' ? image : image.url || ''
+)
+
+const normalizeSubmissionImages = (images: CheckinSubmissionImage[] | undefined): CheckinSubmissionImage[] => (
+  (images || []).filter((image) => (
+    typeof image === 'string' ? image.length > 0 : !!image?.assetId
+  ))
+)
+
 const CheckinSubmit: React.FC = () => {
   const { checkinId } = useParams<{ checkinId: string }>()
   const navigate = useNavigate()
   const [checkin, setCheckin] = useState<Checkin | null>(null)
   const [submission, setSubmission] = useState<CheckinSubmission | null>(null)
   const [content, setContent] = useState('')
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<CheckinSubmissionImage[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -64,7 +74,7 @@ const CheckinSubmit: React.FC = () => {
       if (submissionRes.code === 0 && submissionRes.data) {
         setSubmission(submissionRes.data)
         setContent(submissionRes.data.content || '')
-        setImages(submissionRes.data.images || [])
+        setImages(normalizeSubmissionImages(submissionRes.data.images))
       }
     } catch (error) {
       console.error('获取打卡详情失败:', error)
@@ -93,43 +103,17 @@ const CheckinSubmit: React.FC = () => {
     formData.append('image', file)
 
     try {
-      const response = await apiClient.post('/uploads/image', formData, {
+      const response = await apiClient.post(`/checkins/${checkinId}/submission-image`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
-      if (response.code === 0) {
-        // 处理异步队列模式：需要轮询获取最终结果
-        const { imageId, status, pollUrl } = response.data
-        
-        if (status === 'pending' && pollUrl) {
-          // 轮询等待处理完成
-          const maxAttempts = 30 // 最多轮询30次（约15秒）
-          const pollInterval = 500 // 每500ms轮询一次
-          
-          for (let i = 0; i < maxAttempts; i++) {
-            await new Promise(resolve => setTimeout(resolve, pollInterval))
-            
-            const statusResponse = await apiClient.get(pollUrl)
-            
-            if (statusResponse.code === 0) {
-              const { status, url, error } = statusResponse.data
-              
-              if (status === 'completed' && url) {
-                setImages([...images, url])
-                return
-              } else if (status === 'failed') {
-                alert(error || '图片处理失败')
-                return
-              }
-              // 继续轮询...
-            }
-          }
-          
-          alert('图片处理超时，请稍后重试')
-        } else if (response.data.url) {
-          // 兼容同步模式（直接返回URL）
-          setImages([...images, response.data.url])
-        }
+      const uploaded = response.data as { assetId?: string; url?: string }
+      if (response.code === 0 && uploaded.assetId && uploaded.url) {
+        setImages((current) => (
+          current.length < 9
+            ? [...current, { assetId: uploaded.assetId as string, url: uploaded.url }]
+            : current
+        ))
       } else {
         alert('图片上传失败')
       }
@@ -153,7 +137,11 @@ const CheckinSubmit: React.FC = () => {
     try {
       const response = await apiClient.post(`/checkins/${checkinId}/submit`, {
         content,
-        images,
+        // The URL is display metadata; the API accepts only legacy references
+        // or the server-issued asset ID.
+        images: images.map((image) => (
+          typeof image === 'string' ? image : { assetId: image.assetId }
+        )),
       })
 
       if (response.code === 0) {
@@ -162,8 +150,8 @@ const CheckinSubmit: React.FC = () => {
       } else {
         alert(response.message || '打卡失败')
       }
-    } catch (error: any) {
-      alert(error.message || '打卡失败')
+    } catch {
+      alert('打卡失败')
     } finally {
       setSubmitting(false)
     }
@@ -410,7 +398,8 @@ const CheckinSubmit: React.FC = () => {
             {images.length > 0 && (
               <div className="grid grid-cols-3 gap-4">
                 {images.map((image, index) => {
-                  const imageUrl = normalizeImageUrl(image)
+                  const imageUrl = normalizeImageUrl(imageUrlFor(image))
+                  if (!imageUrlFor(image)) return null
                   return (
                     <div key={index} className="aspect-square rounded-lg overflow-hidden">
                       <img
@@ -455,7 +444,8 @@ const CheckinSubmit: React.FC = () => {
               </label>
               <div className="grid grid-cols-4 gap-4">
                 {images.map((image, index) => {
-                  const imageUrl = normalizeImageUrl(image)
+                  const imageUrl = normalizeImageUrl(imageUrlFor(image))
+                  if (!imageUrlFor(image)) return null
                   return (
                   <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
                     <img

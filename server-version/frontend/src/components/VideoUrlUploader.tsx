@@ -5,6 +5,7 @@
 import React, { useState } from 'react'
 import { message, Input, Button, Card, Progress, Space, Typography, Alert } from 'antd'
 import { CloudDownloadOutlined, LinkOutlined, LoadingOutlined } from '@ant-design/icons'
+import { sessionFetch } from '../api/client'
 
 const { Text, Title } = Typography
 
@@ -43,11 +44,10 @@ export const VideoUrlUploader: React.FC<VideoUrlUploaderProps> = ({ onSuccess })
     setStatus('downloading')
 
     try {
-      const response = await fetch('/api/videos/upload-from-url', {
+      const response = await sessionFetch('/api/videos/upload-from-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           title: title.trim(),
@@ -58,7 +58,7 @@ export const VideoUrlUploader: React.FC<VideoUrlUploaderProps> = ({ onSuccess })
 
       const data = await response.json()
 
-      if (data.success) {
+      if (data.code === 0) {
         message.success('视频链接已提交，正在后台处理')
         setVideoId(data.data.id)
         setStatus('processing')
@@ -84,14 +84,10 @@ export const VideoUrlUploader: React.FC<VideoUrlUploaderProps> = ({ onSuccess })
   const pollStatus = async (id: string) => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/videos/${id}/status`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
+      const response = await sessionFetch(`/api/videos/${id}/status`)
         const data = await response.json()
 
-        if (data.success) {
+        if (data.code === 0) {
           setProgress(data.data.progress || 0)
           
           switch (data.data.status) {

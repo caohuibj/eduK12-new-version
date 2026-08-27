@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Link as LinkIcon, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
+import { sessionFetch } from '../../api/client'
 
 const statusLabel: Record<string, string> = {
   DRAFT: '草稿',
@@ -109,10 +110,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
       return
     }
     try {
-      const authToken = localStorage.getItem('token')
-      const download = await fetch(`/api/cognitive/assignments/${id}/export/files/${response.data.fileName}`, {
-        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
-      })
+      const download = await sessionFetch(`/api/cognitive/assignments/${id}/export/files/${response.data.fileName}`)
       if (!download.ok) throw new Error('下载导出文件失败')
       const blobUrl = URL.createObjectURL(await download.blob())
       const anchor = document.createElement('a')

@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
+import { isValidPassword } from '../src/utils/password'
 
 // `npm run db:seed` is also used directly by bare-metal deployment scripts,
 // outside Prisma CLI's environment loading path.
@@ -25,6 +26,9 @@ async function seedAdmin() {
   const adminPassword = process.env.ADMIN_PASSWORD
   if (!adminUsername || !adminPassword) {
     throw new Error('ADMIN_USERNAME and ADMIN_PASSWORD must be set before creating the initial administrator')
+  }
+  if (!isValidPassword(adminPassword)) {
+    throw new Error('ADMIN_PASSWORD must be 8-128 characters and contain both letters and numbers')
   }
   const hashedPassword = await bcrypt.hash(adminPassword, 10)
 

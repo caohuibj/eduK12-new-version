@@ -17,22 +17,13 @@ import { verifyToken } from '../utils/jwt'
 import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { UserRole } from '../types'
+import { getCookieValue } from '../utils/authCookies'
 
 type SocketNext = (error?: Error) => void
 
 const getSocketToken = (socket: Socket): string | null => {
-  const auth = socket.handshake.auth as { token?: unknown } | undefined
-  if (typeof auth?.token === 'string' && auth.token.trim()) {
-    return auth.token.trim()
-  }
-
-  const authorization = socket.handshake.headers.authorization
-  if (typeof authorization === 'string' && authorization.startsWith('Bearer ')) {
-    const token = authorization.substring(7).trim()
-    return token || null
-  }
-
-  return null
+  const cookieToken = getCookieValue(socket.handshake.headers.cookie, 'ptool_session')
+  return cookieToken
 }
 
 export class SocketService {
@@ -95,7 +86,11 @@ export class SocketService {
 
         if (token) {
           const payload = verifyToken(token)
-          if (!payload || typeof payload.userId !== 'string') {
+          if (
+            !payload ||
+            typeof payload.userId !== 'string' ||
+            !Number.isInteger(payload.tokenVersion)
+          ) {
             return next(new Error('Socket认证失败'))
           }
 
@@ -108,6 +103,8 @@ export class SocketService {
               isFrozen: true,
               expiresAt: true,
               teacherApproved: true,
+              tokenVersion: true,
+              mustChangePassword: true,
             },
           })
 
@@ -116,8 +113,17 @@ export class SocketService {
             return next(new Error(rejection))
           }
 
+          if (payload.tokenVersion !== user!.tokenVersion) {
+            return next(new Error('Socket认证令牌已失效'))
+          }
+
+          if (user!.mustChangePassword) {
+            return next(new Error('首次登录必须先修改密码'))
+          }
+
           socket.data.authenticated = true
           socket.data.userId = user!.id
+          socket.data.tokenVersion = payload.tokenVersion
           // Always use the current database role, never the JWT role or a
           // client-supplied role.
           socket.data.userRole = user!.role
@@ -161,13 +167,21 @@ export class SocketService {
           isFrozen: true,
           expiresAt: true,
           teacherApproved: true,
+          tokenVersion: true,
+          mustChangePassword: true,
         },
       })
 
-      if (!user || inactiveAccountMessage(user)) {
+      if (
+        !user ||
+        inactiveAccountMessage(user) ||
+        user.mustChangePassword ||
+        user.tokenVersion !== socket.data.tokenVersion
+      ) {
         socket.data.authenticated = false
         socket.data.userId = undefined
         socket.data.userRole = undefined
+        socket.data.tokenVersion = undefined
         return false
       }
 
@@ -178,6 +192,7 @@ export class SocketService {
       socket.data.authenticated = false
       socket.data.userId = undefined
       socket.data.userRole = undefined
+      socket.data.tokenVersion = undefined
       return false
     }
   }

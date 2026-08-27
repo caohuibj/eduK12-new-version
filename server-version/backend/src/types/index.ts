@@ -7,6 +7,8 @@ export interface JwtPayload {
   userId: string
   username: string
   role: UserRole
+  tokenVersion: number
+  mustChangePassword?: boolean
 }
 
 // Request with user

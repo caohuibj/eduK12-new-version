@@ -10,6 +10,8 @@ interface SecureVideoPlayerProps {
   src: string                    // 视频源URL (支持HLS m3u8或直接mp4)
   title?: string                 // 视频标题
   className?: string
+  userId?: string                // 可选的水印用户标识（保留兼容调用方）
+  watermarkText?: string         // 可选的水印文字（保留兼容调用方）
 }
 
 // 视频配置 - 单一480p清晰度

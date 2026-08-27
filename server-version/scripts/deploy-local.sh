@@ -4,6 +4,11 @@
 
 set -e
 
+echo '此宿主机本地部署脚本已停用；请使用 server-version/docker-compose.yml 的本地 Compose 入口。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -102,12 +107,12 @@ setup_environment() {
         cat > .env << EOF
 NODE_ENV=development
 PORT=3000
-DATABASE_URL=postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-JWT_SECRET=local-test-secret-key-for-development-only
+DATABASE_URL=postgresql://localhost:5432/ptool?schema=public
+JWT_SECRET=${JWT_SECRET:?set JWT_SECRET in the protected local environment}
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
+ADMIN_PASSWORD=REPLACE_WITH_A_LOCAL_PASSWORD
 LOG_LEVEL=debug
 EOF
         print_info ".env 文件已创建"
@@ -295,7 +300,7 @@ main() {
     echo "  项目路径: $PROJECT_ROOT"
     echo "  后端地址: http://localhost:3000"
     echo "  前端地址: http://localhost:5173"
-    echo "  管理员: admin / admin123"
+    echo "  管理员凭据: 读取本地受保护配置"
     echo "========================================"
     echo ""
     print_info "部署完成! 请使用 'bash start-local.sh' 启动服务"
@@ -303,3 +308,5 @@ main() {
 
 # 运行主函数
 main
+
+LEGACY_SCRIPT

@@ -2,9 +2,15 @@
 # PM2后端服务监控脚本
 # 用法: ./monitor.sh [quick|full]
 
+echo '此 PM2/宿主机监控入口已停用；请检查 Docker Compose 服务和 Prometheus。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 MODE=${1:-quick}
 
 echo "========================================="
+LEGACY_SCRIPT
 echo "后端服务运行状态监控"
 echo "时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "========================================="

@@ -8,6 +8,18 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import {
+  AssetReferenceValidationError,
+  hydrateAssetReferences,
+  syncAssetReferences,
+  validateAssetReferencesForCourse,
+} from '../services/assetStorage'
+
+const attachmentSchema = z.union([
+  z.string().min(1).max(2048),
+  z.record(z.unknown()),
+])
+const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -15,9 +27,9 @@ const createAssignmentSchema = z.object({
   description: z.string().optional(),
   deadline: z.string().optional(), // 接受任何字符串格式，后端再转换
   questions: z.array(z.any()).optional(),
-  videos: z.array(z.any()).optional(), // 改为any支持新结构
-  documents: z.array(z.any()).optional(),
-  images: z.array(z.any()).optional(),
+  videos: attachmentsSchema.optional(),
+  documents: attachmentsSchema.optional(),
+  images: attachmentsSchema.optional(),
   tags: z.array(z.string().max(20, '标签最多20个字符')).max(10, '最多10个标签').optional().default([]),
   content: z.string().optional(),
 })
@@ -28,9 +40,9 @@ const updateAssignmentSchema = z.object({
   deadline: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
   questions: z.array(z.any()).optional(),
-  videos: z.array(z.any()).optional(),
-  documents: z.array(z.any()).optional(),
-  images: z.array(z.any()).optional(),
+  videos: attachmentsSchema.optional(),
+  documents: attachmentsSchema.optional(),
+  images: attachmentsSchema.optional(),
   tags: z.array(z.string().max(20, '标签最多20个字符')).max(10, '最多10个标签').optional(),
   content: z.string().optional(),
 })
@@ -147,7 +159,15 @@ export const assignmentController = {
         }))
       }
 
-      return success(res, buildPaginatedResult(formattedAssignments, total, pagination))
+      const hydratedAssignments = await Promise.all(
+        formattedAssignments.map((assignment) => hydrateAssetReferences(assignment, false, {
+          entityType: 'Assignment',
+          entityId: assignment.id,
+          courseId: assignment.courseId,
+          parentAccess: true,
+        })),
+      )
+      return success(res, buildPaginatedResult(hydratedAssignments, total, pagination))
     } catch (err) {
       logger.error('获取作业列表错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -209,33 +229,63 @@ export const assignmentController = {
         }
       }
 
-      const assignment = await prisma.assignment.create({
-        data: {
+      const assetValues = {
+        videos: videos || [],
+        images: images || [],
+        documents: documents || [],
+      }
+      const assignment = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
           courseId,
-          title,
-          description,
-          content: content || null,
-          deadline: deadlineDate,
-          status: AssignmentStatus.PUBLISHED,
-          questions: questions || [],
-          tags: tags || [],
-          videos: videos || [],
-          images: images || [],
-          documents: documents || [],
-        },
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-              courseCode: true,
+          ownerId: userId,
+          role: req.user?.role,
+          db: tx,
+        })
+
+        const created = await tx.assignment.create({
+          data: {
+            courseId,
+            title,
+            description,
+            content: content || null,
+            deadline: deadlineDate,
+            status: AssignmentStatus.PUBLISHED,
+            questions: questions || [],
+            tags: tags || [],
+            videos: (videos || []) as any,
+            images: (images || []) as any,
+            documents: (documents || []) as any,
+          },
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+                courseCode: true,
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Assignment',
+          entityId: created.id,
+          values: assetValues,
+          db: tx,
+        })
+        return created
       })
 
-      return success(res, assignment, '作业创建成功')
+      return success(res, await hydrateAssetReferences(assignment, false, {
+        entityType: 'Assignment',
+        entityId: assignment.id,
+        courseId,
+        parentAccess: true,
+      }), '作业创建成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('创建作业错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -306,11 +356,16 @@ export const assignmentController = {
 
       const { shares: _shares, ...course } = assignment.course
 
-      return success(res, {
+      return success(res, await hydrateAssetReferences({
         ...assignment,
         course,
         mySubmission,
-      })
+      }, false, {
+        entityType: 'Assignment',
+        entityId: assignment.id,
+        courseId: assignment.course.id,
+        parentAccess: true,
+      }))
     } catch (err) {
       logger.error('获取作业详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -359,22 +414,51 @@ export const assignmentController = {
         }
       }
 
-      const updated = await prisma.assignment.update({
-        where: { id },
-        data: updateData,
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-              courseCode: true,
+      const assetValues = {
+        videos: result.data.videos === undefined ? assignment.videos : result.data.videos,
+        images: result.data.images === undefined ? assignment.images : result.data.images,
+        documents: result.data.documents === undefined ? assignment.documents : result.data.documents,
+      }
+      const updated = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
+          courseId: assignment.courseId,
+          ownerId: userId!,
+          role: userRole,
+          db: tx,
+        })
+        const saved = await tx.assignment.update({
+          where: { id },
+          data: updateData,
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+                courseCode: true,
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Assignment',
+          entityId: id,
+          values: assetValues,
+          db: tx,
+        })
+        return saved
       })
 
-      return success(res, updated, '作业更新成功')
+      return success(res, await hydrateAssetReferences(updated, false, {
+        entityType: 'Assignment',
+        entityId: id,
+        courseId: assignment.courseId,
+        parentAccess: true,
+      }), '作业更新成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('更新作业错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -407,13 +491,16 @@ export const assignmentController = {
         return forbidden(res, '无权限删除此作业')
       }
 
-      await prisma.assignment.delete({
-        where: { id }
+      await prisma.$transaction(async (tx) => {
+        await tx.assetReference.deleteMany({
+          where: { entityType: 'Assignment', entityId: id },
+        })
+        await tx.assignment.delete({ where: { id } })
       })
 
       return success(res, null, '作业已删除')
     } catch (err) {
-      console.error('删除作业错误:', err)
+      logger.error('删除作业错误', err)
       return error(res, '删除作业失败')
     }
   },
@@ -508,7 +595,7 @@ export const assignmentController = {
 
       return success(res, submission, '作业提交成功')
     } catch (err) {
-      console.error('提交作业错误:', err)
+      logger.error('提交作业错误', err)
       return error(res, '提交作业失败')
     }
   },
@@ -562,7 +649,7 @@ export const assignmentController = {
         total: submissions.length,
       })
     } catch (err) {
-      console.error('获取提交列表错误:', err)
+      logger.error('获取提交列表错误', err)
       return error(res, '获取提交列表失败')
     }
   },
@@ -624,7 +711,7 @@ export const assignmentController = {
 
       return success(res, updated, '批改成功')
     } catch (err) {
-      console.error('批改作业错误:', err)
+      logger.error('批改作业错误', err)
       return error(res, '批改失败')
     }
   },
@@ -688,7 +775,7 @@ export const assignmentController = {
         gradedCount: submissions.length
       }, `批量批改成功，共 ${submissions.length} 份作业`)
     } catch (err) {
-      console.error('批量批改错误:', err)
+      logger.error('批量批改错误', err)
       return error(res, '批量批改失败')
     }
   },
@@ -801,7 +888,7 @@ export const assignmentController = {
       const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
       res.send(buffer)
     } catch (err) {
-      console.error('导出数据错误:', err)
+      logger.error('导出数据错误', err)
       return error(res, '导出数据失败')
     }
   },
@@ -842,7 +929,7 @@ export const assignmentController = {
 
       return success(res, submission)
     } catch (err) {
-      console.error('获取我的提交错误:', err)
+      logger.error('获取我的提交错误', err)
       return error(res, '获取我的提交失败')
     }
   },
@@ -902,7 +989,7 @@ export const assignmentController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      console.error('获取我的作业错误:', err)
+      logger.error('获取我的作业错误', err)
       return error(res, '获取我的作业失败')
     }
   },

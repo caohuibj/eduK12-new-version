@@ -1,4 +1,4 @@
-import apiClient from '../../api/client'
+import apiClient, { sessionFetch } from '../../api/client'
 import type {
   AnalysisProtocolCatalog,
   AnalysisProtocolSelection,
@@ -51,13 +51,8 @@ const downloadAnalysisExport = async (
   fallbackFileName: string,
   extraHeaders: Record<string, string> = {},
 ): Promise<CompositeAnalysisExportDownload> => {
-  const token = typeof localStorage === 'undefined' ? '' : localStorage.getItem('token')
-  const headers = {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...extraHeaders,
-  }
-  const response = await fetch(`/api${path}`, {
-    headers: Object.keys(headers).length > 0 ? headers : undefined,
+  const response = await sessionFetch(`/api${path}`, {
+    headers: Object.keys(extraHeaders).length > 0 ? extraHeaders : undefined,
   })
   if (!response.ok) {
     let message = '分析导出失败'

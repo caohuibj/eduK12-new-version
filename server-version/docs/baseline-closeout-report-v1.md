@@ -35,7 +35,7 @@ docker compose --profile ops run --rm \
   -e NODE_ENV=test \
   -e JWT_SECRET=<test-only-secret> \
   -e DATA_ENCRYPTION_KEY=<64-hex-test-key> \
-  -e COGNITIVE_INTEGRATION_DB_URL='postgresql://ptool:ptool123@postgres:5432/ptool?schema=public' \
+  -e COGNITIVE_INTEGRATION_DB_URL='${COGNITIVE_INTEGRATION_DB_URL:?set integration URL in the protected environment}' \
   --entrypoint npm migrate test
 ```
 

@@ -1,14 +1,18 @@
-import { Router } from 'express'
+import { Router, Request } from 'express'
 import { success, error } from '../utils/response'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
 import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 
 import { config } from '../config'
 import { imageQueue } from '../config/queue'
-import { isCOSEnabled, uploadToCOS, deleteFromCOS, cos } from '../utils/cos'
+import { isCOSEnabled, uploadToCOS, deleteFromCOS } from '../utils/cos'
+import { logger } from '../utils/logger'
+import { getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { prisma } from '../config/database'
+import { UserRole } from '../types'
+import { detectMimeType } from '../utils/fileValidator'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
@@ -27,24 +31,23 @@ const imageStatusCache = new Map<string, {
 // 确保上传目录存在（使用绝对路径）
 const imagesDir = path.resolve(config.uploadDir, 'images')
 const videosDir = path.join(config.uploadDir, 'videos')
-console.log('[Upload] Images directory:', imagesDir)
-console.log('[Upload] Videos directory:', videosDir)
+logger.info('[Upload] Upload directories configured', { imagesDir, videosDir })
 
 try {
   if (!fs.existsSync(config.uploadDir)) {
     fs.mkdirSync(config.uploadDir, { recursive: true })
-    console.log('[Upload] Created upload root directory:', config.uploadDir)
+    logger.info('[Upload] Created upload root directory', { uploadDir: config.uploadDir })
   }
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true })
-    console.log('[Upload] Created images directory:', imagesDir)
+    logger.info('[Upload] Created images directory', { imagesDir })
   }
   if (!fs.existsSync(videosDir)) {
     fs.mkdirSync(videosDir, { recursive: true })
-    console.log('[Upload] Created videos directory:', videosDir)
+    logger.info('[Upload] Created videos directory', { videosDir })
   }
 } catch (err) {
-  console.error('[Upload] Failed to create directories:', err)
+  logger.error('[Upload] Failed to create directories', err)
 }
 
 const resolveImagePath = (filename: string): string | null => {
@@ -59,18 +62,10 @@ const resolveImagePath = (filename: string): string | null => {
 }
 
 // 配置图片存储
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, imagesDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`
-    cb(null, uniqueName)
-  }
-})
-
 const imageUpload = multer({
-  storage: imageStorage,
+  // New uploads go straight into StoredAsset. Memory storage prevents a
+  // partially handled file from appearing in the legacy public /uploads tree.
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
@@ -84,14 +79,37 @@ const imageUpload = multer({
   }
 })
 
+const canManageAsset = (req: Request, ownerId: string | null): boolean =>
+  req.user?.role === UserRole.ADMIN || ownerId === req.user?.userId
+
 // 获取图片列表
 router.get('/images', async (req, res) => {
   try {
     const images: any[] = []
+
+    const assetWhere = {
+      mimeType: { startsWith: 'image/' },
+      deletedAt: null,
+      // Anonymous check-in uploads are temporary/submission-scoped assets,
+      // not part of a teacher's reusable media library.
+      accessScope: { not: 'PUBLIC_CHECKIN' },
+      ...(req.user?.role === UserRole.TEACHER ? { ownerId: req.user.userId } : {}),
+    }
+    const assets = await prisma.storedAsset.findMany({ where: assetWhere, orderBy: { createdAt: 'desc' } })
+    images.push(...await Promise.all(assets.map(async (asset) => ({
+      id: asset.id,
+      assetId: asset.id,
+      url: await getSignedAssetUrl(asset.id),
+      filename: asset.id,
+      name: asset.originalName || asset.id,
+      size: asset.sizeBytes,
+      createdAt: asset.createdAt,
+      storage: asset.provider,
+    }))))
     
-    // 1. 从本地文件系统获取旧图片
+    // 1. 从本地文件系统获取旧图片 during the migration window only.
     const imagesDir = path.join(config.uploadDir, 'images')
-    if (fs.existsSync(imagesDir)) {
+    if (config.legacyUploadsEnabled && fs.existsSync(imagesDir)) {
       const files = fs.readdirSync(imagesDir)
       const localImages = files
         .filter(file => {
@@ -114,7 +132,7 @@ router.get('/images', async (req, res) => {
     }
     
     // 2. 从 Redis 队列获取已上传到 COS 的图片
-    if (isCOSEnabled()) {
+    if (config.legacyUploadsEnabled && isCOSEnabled()) {
       try {
         const jobs = await imageQueue.getJobs(['completed'], 0, 200)
         const completedJobs = jobs
@@ -139,7 +157,7 @@ router.get('/images', async (req, res) => {
         const uniqueCompletedJobs = completedJobs.filter(img => !localFilenames.has(img.filename))
         images.push(...uniqueCompletedJobs)
       } catch (queueErr) {
-        console.error('[Upload] 获取队列图片失败:', queueErr)
+        logger.error('[Upload] 获取队列图片失败', queueErr)
       }
     }
     
@@ -151,7 +169,7 @@ router.get('/images', async (req, res) => {
       total: images.length,
     })
   } catch (err) {
-    console.error('获取图片列表错误:', err)
+    logger.error('获取图片列表错误', err)
     return error(res, '获取图片列表失败')
   }
 })
@@ -160,6 +178,29 @@ router.get('/images', async (req, res) => {
 router.delete('/images/:filename', async (req, res) => {
   try {
     const { filename } = req.params
+
+    const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
+    if (asset) {
+      if (!canManageAsset(req, asset.ownerId)) return error(res, '无权限删除此图片', -1, 403)
+      const deleted = await prisma.storedAsset.updateMany({
+        where: {
+          id: asset.id,
+          references: { none: {} },
+        },
+        data: { deletedAt: new Date() },
+      })
+      if (deleted.count !== 1) {
+        return error(res, '文件仍被课程内容引用，请先移除引用', -1, 409)
+      }
+      if (asset.provider === 'local') {
+        await fs.promises.rm(getLocalAssetPath(asset.objectKey), { force: true }).catch(() => undefined)
+      }
+      return success(res, null, '删除成功')
+    }
+
+    if (req.user?.role !== UserRole.ADMIN || !config.legacyUploadsEnabled) {
+      return error(res, '旧图片只能由管理员在迁移窗口内管理', -1, 403)
+    }
     const filePath = resolveImagePath(filename)
     if (!filePath) {
       return error(res, '非法文件名', -1, 400)
@@ -175,16 +216,16 @@ router.delete('/images/:filename', async (req, res) => {
       try {
         const cosKey = `images/${filename}`
         await deleteFromCOS(cosKey)
-        console.log(`[Upload] 已从 COS 删除: ${cosKey}`)
-      } catch (cosErr) {
+        logger.info('[Upload] 已从 COS 删除', { cosKey })
+      } catch {
         // COS 删除失败不影响返回成功（可能文件本来就不在 COS）
-        console.log(`[Upload] COS 删除 skipped: ${filename}`)
+        logger.warn('[Upload] COS 删除 skipped', { filename })
       }
     }
     
     return success(res, null, '删除成功')
   } catch (err) {
-    console.error('删除图片错误:', err)
+    logger.error('删除图片错误', err)
     return error(res, '删除失败')
   }
 })
@@ -202,6 +243,25 @@ router.put('/images/:filename', async (req, res) => {
     const trimmedName = newName.trim()
     if (trimmedName === '.' || trimmedName === '..' || /[\\/\0]/.test(trimmedName)) {
       return error(res, '文件名包含非法字符', -1, 400)
+    }
+
+    const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
+    if (asset) {
+      if (!canManageAsset(req, asset.ownerId)) return error(res, '无权限修改此图片', -1, 403)
+      const extension = path.extname(asset.originalName || '')
+      const updated = await prisma.storedAsset.update({
+        where: { id: asset.id },
+        data: { originalName: `${trimmedName}${extension}` },
+      })
+      return success(res, {
+        oldFilename: asset.id,
+        newFilename: updated.id,
+        url: await getSignedAssetUrl(updated.id),
+      }, '重命名成功')
+    }
+
+    if (req.user?.role !== UserRole.ADMIN || !config.legacyUploadsEnabled) {
+      return error(res, '旧图片只能由管理员在迁移窗口内管理', -1, 403)
     }
     
     // 获取文件扩展名
@@ -243,9 +303,9 @@ router.put('/images/:filename', async (req, res) => {
           // 删除旧文件
           await deleteFromCOS(oldCosKey)
           
-          console.log(`[Upload] COS 重命名: ${oldCosKey} -> ${newCosKey}`)
+          logger.info('[Upload] COS 重命名', { oldCosKey, newCosKey })
         } catch (cosErr) {
-          console.error('[Upload] COS 重命名失败:', cosErr)
+          logger.error('[Upload] COS 重命名失败', cosErr)
           // COS 失败不影响本地重命名结果
         }
       }
@@ -261,48 +321,44 @@ router.put('/images/:filename', async (req, res) => {
       return error(res, '云存储图片暂不支持重命名，请联系管理员')
     }
   } catch (err) {
-    console.error('重命名图片错误:', err)
+    logger.error('重命名图片错误', err)
     return error(res, '重命名失败')
   }
 })
-// 上传图片（异步处理）- 立即返回，后台队列处理
+// Upload into the unified StoredAsset catalog. The current disk middleware is
+// retained as a staging layer for compatibility; the staged file is removed
+// before the request completes.
 router.post('/image', imageUpload.single('image'), async (req, res) => {
   try {
     const file = req.file
     if (!file) {
       return error(res, '请选择图片文件')
     }
+    const detectedMimeType = detectMimeType(file.buffer.subarray(0, 16))
+    if (!detectedMimeType || !['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(detectedMimeType)) {
+      return error(res, '图片内容类型无效')
+    }
 
-    const imageId = uuidv4()
-    const inputPath = file.path
-
-    // 初始化状态
-    imageStatusCache.set(imageId, {
-      status: 'pending',
-      originalSize: file.size,
+    const asset = await storeAsset({
+      buffer: file.buffer,
+      originalName: file.originalname,
+      mimeType: detectedMimeType,
+      ownerId: req.user?.userId,
     })
 
-    // 添加到处理队列
-    const job = await imageQueue.add('compress', {
-      imageId,
-      inputPath,
-      originalFilename: file.originalname,
-      mimetype: file.mimetype,
-      originalSize: file.size,
-    })
-
-    console.log(`[Upload] 图片已加入处理队列: ${imageId}, job: ${job.id}`)
-
-    // 立即返回，前端通过状态接口轮询结果
     return success(res, {
-      imageId,
-      jobId: job.id,
-      status: 'pending',
-      message: '图片已上传，正在处理中',
-      pollUrl: `/uploads/image/status/${imageId}`,
-    })
+      id: asset.id,
+      assetId: asset.id,
+      filename: asset.id,
+      name: asset.originalName || file.originalname,
+      size: asset.sizeBytes,
+      createdAt: asset.createdAt,
+      url: await getSignedAssetUrl(asset.id),
+      storage: asset.provider,
+      status: 'completed',
+    }, '图片上传成功')
   } catch (err) {
-    console.error('上传图片错误:', err)
+    logger.error('上传图片错误', err)
     return error(res, '上传失败')
   }
 })
@@ -373,7 +429,10 @@ router.get('/image/status/:imageId', async (req, res) => {
             error: string
           } = {
             status: 'failed',
-            error: job.failedReason || '处理失败',
+            // Queue failure reasons may contain filesystem, dependency, or
+            // request details. They are for server logs only, never a client
+            // response.
+            error: '图片处理失败，请稍后重试或联系管理员',
           }
           imageStatusCache.set(imageId, failedData)
           return success(res, failedData)
@@ -385,7 +444,7 @@ router.get('/image/status/:imageId', async (req, res) => {
       status,
     })
   } catch (err) {
-    console.error('查询图片状态错误:', err)
+    logger.error('查询图片状态错误', err)
     return error(res, '查询失败')
   }
 })

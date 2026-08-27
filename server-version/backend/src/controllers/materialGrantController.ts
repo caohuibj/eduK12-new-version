@@ -36,9 +36,11 @@ const handleError = (res: Response, err: unknown) => {
     return error(res, err.issues.map((issue) => issue.message).join('; '), -1, 400)
   }
   if (err instanceof MaterialGrantError) {
-    return error(res, err.message, -1, err.statusCode)
+    return err.statusCode < 500
+      ? error(res, err.message, -1, err.statusCode)
+      : error(res, '服务器内部错误', -1, 500)
   }
-  return error(res, err instanceof Error ? err.message : '操作失败', -1, 500)
+  return error(res, '服务器内部错误', -1, 500)
 }
 
 export const materialGrantController = {

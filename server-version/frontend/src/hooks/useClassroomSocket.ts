@@ -1,7 +1,7 @@
 /**
  * 课堂 Socket.IO 连接管理 Hook
  *
- * 身份只通过 Socket.IO handshake auth 中的 token 传递。课堂教师/大屏
+ * 已登录身份通过 HttpOnly 会话 Cookie 由 Socket.IO 握手传递。课堂教师/大屏
  * 事件不再携带 userId、role、studentId 或 sessionId；学生匿名加入携带
  * 课堂码和可选的服务端签发 resume token，session 仍由服务器推导。
  */
@@ -89,7 +89,6 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     }
 
     const socketUrl = window.location.origin
-    const token = localStorage.getItem('token')
     const studentResumeKey = role === 'student' ? resumeTokenKey(classroomCode) : null
 
     socketRef.current = io(socketUrl + '/classroom', {
@@ -98,7 +97,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      auth: token ? { token } : undefined,
+      withCredentials: true,
     })
 
     const socket = socketRef.current

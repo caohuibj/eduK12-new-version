@@ -3,6 +3,7 @@ import { prisma } from '../config/database'
 import { success, error, notFound } from '../utils/response'
 import { generateTeacherCode } from '../utils/teacherCode'
 import { z } from 'zod'
+import { logger } from '../utils/logger'
 
 const createCodeSchema = z.object({
   maxUses: z.number().int().min(1).default(1),
@@ -33,7 +34,7 @@ export const teacherCodeController = {
         total: codes.length,
       })
     } catch (err) {
-      console.error('获取教师码列表错误:', err)
+      logger.error('获取教师码列表错误', err)
       return error(res, '获取教师码列表失败')
     }
   },
@@ -76,7 +77,7 @@ export const teacherCodeController = {
 
       return success(res, teacherCode, '教师码生成成功')
     } catch (err) {
-      console.error('生成教师码错误:', err)
+      logger.error('生成教师码错误', err)
       return error(res, '生成教师码失败')
     }
   },
@@ -100,7 +101,7 @@ export const teacherCodeController = {
 
       return success(res, null, '教师码已删除')
     } catch (err) {
-      console.error('删除教师码错误:', err)
+      logger.error('删除教师码错误', err)
       return error(res, '删除教师码失败')
     }
   },
@@ -136,7 +137,7 @@ export const teacherCodeController = {
 
       return success(res, { valid: true })
     } catch (err) {
-      console.error('验证教师码错误:', err)
+      logger.error('验证教师码错误', err)
       return error(res, '验证教师码失败')
     }
   }

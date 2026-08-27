@@ -5,7 +5,9 @@ const { mockPrisma, mockCache } = vi.hoisted(() => ({
     questionnaireAssessment: {
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
   mockCache: {
     getQuestionnaireScales: vi.fn(),
@@ -86,6 +88,9 @@ const dataOf = (res: any) => res.json.mock.calls[0]?.[0]?.data
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => Promise<unknown>) => callback(mockPrisma))
+  mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(makeQa())
+  mockPrisma.questionnaireAssessment.updateMany.mockResolvedValue({ count: 1 })
   mockPrisma.questionnaireAssessment.update.mockImplementation(async ({ data }: any) => ({
     ...makeQa({ status: 'COMPLETED', completedAt: new Date('2026-08-20T00:01:00.000Z'), totalTime: 1000 }),
     ...data,
@@ -107,7 +112,12 @@ describe('collection-only questionnaire completion/report contract', () => {
     expect(dataOf(res)).not.toHaveProperty('averageScore')
     expect(dataOf(res)).not.toHaveProperty('overallSummary')
     expect(dataOf(res)).not.toHaveProperty('aggregateReport')
-    expect(mockPrisma.questionnaireAssessment.update.mock.calls[0][0].data.aggregateReport).toMatchObject({ reportDefinitionVersion: 'collection-only-v1' })
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'qa-1', status: 'IN_PROGRESS' },
+      data: expect.objectContaining({
+        aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v1' }),
+      }),
+    }))
   })
 
   it('auth automatic completion follows the same projection', async () => {
@@ -119,7 +129,7 @@ describe('collection-only questionnaire completion/report contract', () => {
 
     expect(res.json).toHaveBeenCalled()
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
-    expect(mockPrisma.questionnaireAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ aggregateReport: expect.objectContaining({ scaleReports: expect.any(Array) }) }),
     }))
   })
@@ -147,7 +157,7 @@ describe('collection-only questionnaire completion/report contract', () => {
     await publicQuestionnaireController.getAssessment({ params: { sessionId: 'session-1' } } as any, res)
 
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
-    expect(mockPrisma.questionnaireAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v1' }) }),
     }))
   })

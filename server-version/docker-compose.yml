@@ -42,6 +42,7 @@ services:
     # 默认不发布 Host port
 
   backend:
+    image: server-version-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -54,6 +55,9 @@ services:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      # Do not silently downgrade secure cookies in a production-mode
+      # container. Set false explicitly for local HTTP and true for HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly (false for local HTTP, true for HTTPS)}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
       # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）
@@ -62,6 +66,11 @@ services:
       DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads
+      ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
+      ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:-false}
+      ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:?ASSET_SIGNING_SECRET must be set}
+      CREDENTIAL_HANDOFF_DIR: /app/.local
+      CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
       CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
       TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
       EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}
@@ -83,11 +92,14 @@ services:
       VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
     volumes:
       - uploads_data:/app/uploads
+      - credential_handoff_data:/app/.local
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      backend-volume-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
@@ -96,6 +108,17 @@ services:
       start_period: 30s
     restart: unless-stopped
     # 默认不发布 Host port 3000（仅 frontend:80 对外）
+
+  # Named volumes keep their existing ownership when they are reused.  Run a
+  # short-lived root init container so the long-running API can stay non-root.
+  backend-volume-init:
+    image: server-version-backend:latest
+    user: root
+    command: ["sh", "-ec", "chown -R node:node /app/uploads /app/.local && chmod 750 /app/uploads && chmod 700 /app/.local"]
+    volumes:
+      - uploads_data:/app/uploads
+      - credential_handoff_data:/app/.local
+    restart: "no"
 
   frontend:
     build:
@@ -157,3 +180,4 @@ volumes:
   postgres_data:
   redis_data:
   uploads_data:
+  credential_handoff_data:

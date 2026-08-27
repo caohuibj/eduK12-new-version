@@ -2,17 +2,9 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Users, Loader2, ArrowLeft } from 'lucide-react'
 import apiClient from '../api/client'
-import { useAuth } from '../contexts/AuthContext'
-import type { User } from '../types'
-
-interface TeacherLoginData {
-  token: string
-  user: User
-}
 
 const TeacherLogin: React.FC = () => {
   const navigate = useNavigate()
-  const { loginWithToken } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [teacherCode, setTeacherCode] = useState('')

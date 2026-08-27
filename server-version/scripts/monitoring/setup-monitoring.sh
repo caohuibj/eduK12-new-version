@@ -6,6 +6,11 @@
 
 set -e
 
+echo '此宿主机监控安装脚本已停用；请使用 pinned Docker Compose monitoring 服务。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="/var/log/ptool/monitoring"
 MONITORING_DIR="$SCRIPT_DIR"
@@ -99,11 +104,10 @@ setup_cron() {
 # 全量备份 - 每天凌晨2点执行
 0 2 * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh full >> /var/log/ptool/monitoring/backup-cron.log 2>&1
 
-# 增量备份 - 每小时执行一次
-0 * * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh incremental >> /var/log/ptool/monitoring/backup-cron.log 2>&1
+# 增量 WAL tar 备份已暂停，直到完成正式 PITR 链路
 
-# 备份验证 - 每周日凌晨4点
-0 4 * * 0 /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh verify >> /var/log/ptool/monitoring/backup-verify-cron.log 2>&1
+# 最新全量备份校验 - 每周日凌晨4点
+0 4 * * 0 /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh verify-latest >> /var/log/ptool/monitoring/backup-verify-cron.log 2>&1
 
 # 清理旧日志 - 每周日凌晨5点
 0 5 * * 0 find /var/log/ptool/monitoring -name "*.log" -mtime +30 -delete
@@ -140,7 +144,7 @@ CONN_THRESHOLD=15
 # ALERT_EMAIL="admin@example.com"
 
 # API检查配置
-API_URL="http://localhost:3000"
+API_URL="http://localhost"
 API_TIMEOUT=10
 
 # 数据库配置
@@ -162,7 +166,7 @@ RETENTION_DAYS=30
 
 # 加密配置
 ENABLE_ENCRYPTION=true
-# BACKUP_ENCRYPTION_KEY="your-32-byte-key"  # 如不设置将自动生成
+# BACKUP_ENCRYPTION_KEY="your-32-byte-key"  # 必须通过受保护的 ignored 配置注入
 
 # 远程存储配置 (可选)
 # REMOTE_TYPE="cos"  # s3, cos, oss, scp
@@ -433,3 +437,4 @@ main() {
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
     main
 fi
+LEGACY_SCRIPT

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Card, Space, Modal, Form, InputNumber, message, Tag } from 'antd'
-import { PlusOutlined, LinkOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
+import { PlusOutlined, LinkOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { sessionFetch } from '../../api/client'
 
 const GeneralQuestionnaireList: React.FC = () => {
   const navigate = useNavigate()
@@ -19,11 +20,7 @@ const GeneralQuestionnaireList: React.FC = () => {
   const fetchQuestionnaires = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-      
-      const response = await fetch('/api/general-questionnaires', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const response = await sessionFetch('/api/general-questionnaires')
       
       if (!response.ok) {
         throw new Error('获取泛化问卷列表失败')
@@ -51,10 +48,7 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const fetchTokens = async (questionnaireId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${questionnaireId}/tokens`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/tokens`)
       
       if (!response.ok) {
         throw new Error('获取令牌列表失败')
@@ -70,12 +64,10 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const handleGenerateToken = async (values: any) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens`, {
+      const response = await sessionFetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           expiresDays: values.expiresIn,
@@ -108,10 +100,8 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const handleDisableToken = async (tokenId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens/${tokenId}`, {
+      const response = await sessionFetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens/${tokenId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
       })
 
       if (!response.ok) {
@@ -128,10 +118,7 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const handleExportData = async (questionnaireId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${questionnaireId}/export`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/export`)
       
       if (!response.ok) {
         throw new Error('导出数据失败')
@@ -152,10 +139,8 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const handleDuplicate = async (questionnaireId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${questionnaireId}/duplicate`, {
+      const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/duplicate`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
       })
 
       if (!response.ok) {
@@ -172,10 +157,8 @@ const GeneralQuestionnaireList: React.FC = () => {
 
   const handlePublish = async (questionnaireId: string) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/general-questionnaires/${questionnaireId}/publish`, {
+      const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/publish`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
       })
 
       if (!response.ok) {

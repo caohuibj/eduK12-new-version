@@ -409,8 +409,12 @@ const recoveryFromBody = (req: Request): string => {
 
 const handleError = (res: Response, err: unknown): Response => {
   if (err instanceof z.ZodError) return error(res, err.issues.map((item) => item.message).join('; '), -1, 400)
-  if (service.isCompositeError(err)) return error(res, err.message, -1, err.statusCode)
+  if (service.isCompositeError(err)) {
+    return err.statusCode < 500
+      ? error(res, err.message, -1, err.statusCode)
+      : error(res, '服务器内部错误', -1, 500)
+  }
   const maybe = err as { statusCode?: unknown; message?: unknown }
-  if (typeof maybe.statusCode === 'number') return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
-  return error(res, err instanceof Error ? err.message : 'Internal server error', -1, 500)
+  if (typeof maybe.statusCode === 'number' && maybe.statusCode >= 400 && maybe.statusCode < 500) return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
+  return error(res, '服务器内部错误', -1, 500)
 }

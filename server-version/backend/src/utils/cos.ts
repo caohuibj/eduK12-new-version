@@ -76,6 +76,23 @@ export const getCOSUrl = (key: string): string => {
   return `${config.cosDomain}/${key}`
 }
 
+// 只返回短时效签名地址；永久 COS 地址不应进入业务响应。
+export const getCOSSignedUrl = (key: string, expiresInSeconds = 600): Promise<string> => {
+  if (!isCOSEnabled()) return Promise.reject(new Error('COS storage is not configured'))
+  return new Promise((resolve, reject) => {
+    ;(cos as any).getObjectUrl({
+      Bucket: config.cosBucket!,
+      Region: config.cosRegion!,
+      Key: key,
+      Sign: true,
+      Expires: Math.min(600, Math.max(1, expiresInSeconds)),
+    } as any, (err: any, data: any) => {
+      if (err || !data?.Url) reject(err || new Error('COS signed URL unavailable'))
+      else resolve(data.Url)
+    })
+  })
+}
+
 // 从 URL 提取 Key
 export const extractCOSKey = (url: string): string | null => {
   if (!config.cosDomain) return null

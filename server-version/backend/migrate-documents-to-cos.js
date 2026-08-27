@@ -9,15 +9,22 @@ const fs = require('fs')
 const path = require('path')
 const COS = require('cos-nodejs-sdk-v5')
 
+require('dotenv').config()
+const requiredEnv = (name) => {
+  const value = process.env[name]
+  if (!value || !value.trim()) throw new Error(`${name} must be set before migrating files to COS`)
+  return value.trim()
+}
+
 // 从环境变量读取配置
 const cos = new COS({
-  SecretId: process.env.COS_SECRET_ID,
-  SecretKey: process.env.COS_SECRET_KEY,
+  SecretId: requiredEnv('COS_SECRET_ID'),
+  SecretKey: requiredEnv('COS_SECRET_KEY'),
 })
 
-const COS_BUCKET = process.env.COS_BUCKET
-const COS_REGION = process.env.COS_REGION
-const COS_DOMAIN = process.env.COS_DOMAIN
+const COS_BUCKET = requiredEnv('COS_BUCKET')
+const COS_REGION = requiredEnv('COS_REGION')
+const COS_DOMAIN = requiredEnv('COS_DOMAIN')
 
 async function migrateDocuments() {
   try {
@@ -108,9 +115,6 @@ async function migrateDocuments() {
     await prisma.$disconnect()
   }
 }
-
-// 加载环境变量
-require('dotenv').config()
 
 // 执行迁移
 migrateDocuments()

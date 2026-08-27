@@ -12,22 +12,16 @@ if (require('fs').existsSync(backendNodeModules)) {
 const COS = require('cos-nodejs-sdk-v5');
 const fs = require('fs');
 
-// 读取配置
-function loadConfig() {
-  const envPath = path.join(__dirname, '../../backend/.env');
-  const config = {};
-  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) config[match[1]] = match[2].trim().replace(/^["']|["']$/g, '');
-  });
-  return config;
-}
+const requiredEnv = (name) => {
+  const value = process.env[name];
+  if (!value || !value.trim()) throw new Error(`${name} must be set before cleaning COS backups`);
+  return value.trim();
+};
 
 async function cleanupByFilename(daysToKeep) {
-  const config = loadConfig();
-  const cos = new COS({ SecretId: config.COS_SECRET_ID, SecretKey: config.COS_SECRET_KEY });
-  const bucket = config.COS_BUCKET;
-  const region = config.COS_REGION;
+  const cos = new COS({ SecretId: requiredEnv('COS_SECRET_ID'), SecretKey: requiredEnv('COS_SECRET_KEY') });
+  const bucket = requiredEnv('COS_BUCKET');
+  const region = requiredEnv('COS_REGION');
   const prefix = 'backups/ptool/';
 
   // 获取所有文件
@@ -73,4 +67,7 @@ async function cleanupByFilename(daysToKeep) {
 }
 
 const days = process.argv[2] || 5;
-cleanupByFilename(days).catch(console.error);
+cleanupByFilename(days).catch(() => {
+  console.error(JSON.stringify({ success: false, error: 'COS 备份清理失败' }));
+  process.exitCode = 1;
+});

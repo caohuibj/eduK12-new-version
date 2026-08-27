@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { User, Lock, Save, Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
+import { isValidPassword, passwordPolicyMessage } from '../../utils/password'
 
 const TeacherProfile: React.FC = () => {
   const navigate = useNavigate()
@@ -54,8 +55,8 @@ const TeacherProfile: React.FC = () => {
   }
 
   const validatePassword = (password: string) => {
-    if (password.length < 6) {
-      return '密码至少6个字符'
+    if (!isValidPassword(password)) {
+      return passwordPolicyMessage
     }
     return ''
   }
@@ -273,7 +274,7 @@ const TeacherProfile: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                新密码 <span className="text-xs text-gray-500">(至少6位)</span>
+                新密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
               </label>
               <div className="relative">
                 <input

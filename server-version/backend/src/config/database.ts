@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { logger } from '../utils/logger'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -23,7 +24,7 @@ if (process.env.NODE_ENV === 'production') {
       // 简单健康检查
       await prisma.$queryRaw`SELECT 1`
     } catch (err) {
-      console.error('[Prisma] 连接池健康检查失败:', err)
+      logger.error('[Prisma] 连接池健康检查失败', err)
     }
   }, 30000) // 每30秒检查一次
 }

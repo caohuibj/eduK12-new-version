@@ -7,6 +7,11 @@
 
 set -e
 
+echo '此宿主机自动恢复脚本已停用；请使用容器编排和人工确认的运维流程。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="/var/log/ptool/monitoring/auto-heal.log"
@@ -311,3 +316,4 @@ case "${1:-heal}" in
         exit 1
         ;;
 esac
+LEGACY_SCRIPT

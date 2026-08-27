@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
 import apiClient from '../api/client'
+import { sessionFetch } from '../api/client'
 import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
 import TagBadge from '../components/TagBadge'
@@ -230,11 +231,7 @@ const CheckinList: React.FC = () => {
 
   const handleExport = async (checkin: Checkin) => {
     try {
-      const response = await fetch(`/api/checkins/${checkin.id}/export`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+      const response = await sessionFetch(`/api/checkins/${checkin.id}/export`)
       
       if (!response.ok) {
         throw new Error('导出失败')

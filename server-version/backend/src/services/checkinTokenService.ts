@@ -4,13 +4,14 @@
  * 功能：
  * - 生成唯一访问令牌（用于匿名打卡）
  * - 验证令牌有效性
- * - 检查过期和访问限制
- * - 记录访问次数
+ * - 检查过期和匿名提交额度
+ * - 原子地占用匿名提交额度
  */
 
 import { prisma } from '../config/database'
 import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
+import { Prisma } from '@prisma/client'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
@@ -81,7 +82,7 @@ export const checkinTokenService = {
   /**
    * 验证令牌有效性
    */
-  async validateToken(tokenString: string): Promise<CheckinTokenValidation> {
+  async validateToken(tokenString: string, options: { ignoreUsageLimit?: boolean } = {}): Promise<CheckinTokenValidation> {
     // 查询令牌
     const accessToken = await prisma.checkinAccessToken.findUnique({
       where: { token: tokenString },
@@ -123,7 +124,7 @@ export const checkinTokenService = {
     }
 
     // 检查是否超过访问限制
-    if (accessToken.maxUses > 0 && accessToken.usedCount >= accessToken.maxUses) {
+    if (!options.ignoreUsageLimit && accessToken.maxUses > 0 && accessToken.usedCount >= accessToken.maxUses) {
       return {
         valid: false,
         expired: false,
@@ -155,7 +156,6 @@ export const checkinTokenService = {
     }
 
     logger.info('打卡令牌验证成功', {
-      token: tokenString.substring(0, 10) + '...',
       tokenId: accessToken.id
     })
 
@@ -170,32 +170,38 @@ export const checkinTokenService = {
   },
 
   /**
-   * 检查令牌是否超过访问限制
+   * 检查令牌是否超过匿名提交限制
    */
   isOverLimit(maxUses: number, usedCount: number): boolean {
     return maxUses > 0 && usedCount >= maxUses
   },
 
   /**
-   * 记录访问（增加 usedCount）
+   * Atomically reserve one anonymous submission slot. maxUses is a quota for
+   * successful submissions, not page views; callers should run this inside
+   * the same transaction as submission creation.
+   */
+  async claimSubmissionSlot(
+    tokenId: string,
+    db: typeof prisma | Prisma.TransactionClient = prisma,
+  ): Promise<boolean> {
+    const updated = await db.$executeRaw`
+      UPDATE "checkin_access_tokens"
+      SET "used_count" = "used_count" + 1
+      WHERE "id" = ${tokenId}
+        AND "is_active" = TRUE
+        AND "expires_at" > NOW()
+        AND ("max_uses" = 0 OR "used_count" < "max_uses")
+    `
+    return updated === 1
+  },
+
+  /**
+   * Legacy counter entry point retained for compatibility. New public
+   * check-in flows claim a slot together with the submission transaction.
    */
   async recordAccess(tokenId: string): Promise<void> {
-    const token = await prisma.checkinAccessToken.findUnique({
-      where: { id: tokenId },
-      select: { token: true, maxUses: true, usedCount: true },
-    })
-
-    if (!token) return
-
-    // 更新访问计数
-    await prisma.checkinAccessToken.update({
-      where: { id: tokenId },
-      data: {
-        usedCount: {
-          increment: 1,
-        },
-      },
-    })
+    await this.claimSubmissionSlot(tokenId)
   },
 
   /**

@@ -4,7 +4,17 @@
 # 配置: 2核4G5M / Ubuntu 22.04
 # =============================================================================
 
-set -e
+set -Eeuo pipefail
+
+cat >&2 <<'NOTICE'
+此宿主机部署脚本已停用。
+生产环境唯一支持的拓扑是 server-version/docker-compose.yml；请使用 Compose 文档
+配置受保护的 .env 后启动 postgres、redis、backend 和 frontend 服务。
+本脚本不会安装或操作宿主机 PostgreSQL、Redis、Nginx、PM2，也不会写入凭据。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
 
 # 颜色
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
@@ -247,3 +257,5 @@ info "  pm2 status          - 查看服务状态"
 info "  pm2 logs ptool-api  - 查看日志"
 info "  ptool-ops status    - 系统监控"
 info ""
+
+LEGACY_SCRIPT

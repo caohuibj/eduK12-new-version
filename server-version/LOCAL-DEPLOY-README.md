@@ -1,5 +1,10 @@
 # PTool 本地部署指南 (CLI 版本)
 
+> 本文原有的 Node/SQLite/宿主机 CLI 流程已停用，`scripts/deploy-local.sh`
+> 会直接 fail-fast。当前本地测试统一使用 Docker Compose；请以
+> `docs/REVIEW-REMEDIATION-20260826.md` 和 `docs/BACKUP-RESTORE.md` 为准，
+> 不要把下方旧命令用于任何共享或生产环境。
+
 **适用场景**: 本地开发环境、快速测试  
 **部署时间**: 5-10分钟  
 **难度**: ⭐⭐ 简单
@@ -66,12 +71,12 @@ cd backend
 cat > .env << EOF
 NODE_ENV=development
 PORT=3000
-DATABASE_URL=postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-JWT_SECRET=local-test-secret
+DATABASE_URL=postgresql://localhost:5432/ptool?schema=public
+JWT_SECRET=<从本地 ignored 配置注入的随机值>
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
+ADMIN_USERNAME=your-local-admin
+ADMIN_PASSWORD=your-local-admin-password
 EOF
 ```
 
@@ -134,7 +139,7 @@ curl http://localhost:3000/health
 # 登录测试
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"YOUR_ADMIN_USERNAME","password":"YOUR_ADMIN_PASSWORD"}'
 
 # 获取课程列表 (需要 token)
 curl http://localhost:3000/api/courses \
@@ -299,7 +304,7 @@ server-version/
 
 | 角色 | 用户名 | 密码 |
 |-----|-------|------|
-| 管理员 | admin | admin123 |
+| 管理员 | 由 `ADMIN_USERNAME` 配置 | 由 `ADMIN_PASSWORD` 配置 |
 
 ---
 
@@ -315,7 +320,7 @@ server-version/
 ## ✅ 验证部署成功
 
 1. 访问 http://localhost:5173 看到登录页面
-2. 使用 admin/admin123 登录成功
+2. 使用受保护配置中的管理员凭据登录成功
 3. 能创建课程、上传图片
 4. 运行 `bash scripts/test-cli.sh` 全部通过
 

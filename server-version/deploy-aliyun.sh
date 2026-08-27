@@ -3,6 +3,16 @@
 
 set -e
 
+cat >&2 <<'NOTICE'
+此旧版阿里云宿主机部署入口已停用。
+生产环境唯一支持路径是 server-version/docker-compose.yml；请使用受保护的 .env
+启动 Compose 的 postgres、redis、backend 和 frontend 服务。
+本脚本不会连接远程主机、安装依赖、写入凭据或操作 PM2/宿主机数据库。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 SERVER_IP=""
 SSH_KEY=""
 SSH_PASSWORD=""
@@ -155,3 +165,4 @@ echo "访问地址: http://$SERVER_IP"
 echo "管理员凭据: /root/.ptool-credentials"
 echo ""
 echo "查看日志: ssh root@$SERVER_IP 'cd /opt/ptool && docker-compose logs -f'"
+LEGACY_SCRIPT

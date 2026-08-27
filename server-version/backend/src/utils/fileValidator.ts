@@ -10,6 +10,7 @@ const FILE_SIGNATURES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
   'image/gif': [0x47, 0x49, 0x46, 0x38], // GIF87a or GIF89a
   'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header
+  'application/pdf': [0x25, 0x50, 0x44, 0x46, 0x2D], // %PDF-
   // 视频
   'video/mp4': [0x00, 0x00, 0x00], // MP4 有多种变体
   'video/webm': [0x1A, 0x45, 0xDF, 0xA3], // EBML header
@@ -61,6 +62,10 @@ export const detectMimeType = (buffer: Buffer): string | null => {
   if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46) {
     return 'image/webp'
   }
+  // PDF
+  if (buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46 && buffer[4] === 0x2D) {
+    return 'application/pdf'
+  }
   // 检查 WebM
   if (buffer[0] === 0x1A && buffer[1] === 0x45 && buffer[2] === 0xDF && buffer[3] === 0xA3) {
     return 'video/webm'
@@ -107,20 +112,24 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
     }
 
     const fs = require('fs')
-    const path = req.file.path
-
-    // 读取文件头（前8字节足够检测大多数类型）
-    const fd = fs.openSync(path, 'r')
-    const buffer = Buffer.alloc(8)
-    fs.readSync(fd, buffer, 0, 8, 0)
-    fs.closeSync(fd)
+    let buffer: Buffer
+    if (Buffer.isBuffer(req.file.buffer)) {
+      buffer = req.file.buffer.subarray(0, 8)
+    } else if (req.file.path) {
+      const fd = fs.openSync(req.file.path, 'r')
+      buffer = Buffer.alloc(8)
+      fs.readSync(fd, buffer, 0, 8, 0)
+      fs.closeSync(fd)
+    } else {
+      return res.status(400).json({ code: -1, message: '无法读取上传文件' })
+    }
 
     // 检测真实文件类型
     const detectedType = detectMimeType(buffer)
 
     if (!detectedType) {
       // 删除可疑文件
-      fs.unlinkSync(path)
+      if (req.file.path) fs.unlinkSync(req.file.path)
       return res.status(400).json({
         code: -1,
         message: '无法识别文件类型，可能是不支持的格式或恶意文件'
@@ -129,7 +138,7 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
 
     // 检查是否在允许列表中
     if (!allowedTypes.includes(detectedType)) {
-      fs.unlinkSync(path)
+      if (req.file.path) fs.unlinkSync(req.file.path)
       return res.status(400).json({
         code: -1,
         message: `文件类型不匹配，检测到 ${detectedType}，但不在允许列表中`

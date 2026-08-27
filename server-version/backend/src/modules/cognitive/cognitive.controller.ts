@@ -429,12 +429,14 @@ const handleError = (res: Response, err: unknown): Response => {
     return error(res, err.issues.map((i) => i.message).join('; '), -1, 400)
   }
   if (err instanceof CognitiveServiceError) {
-    return error(res, err.message, -1, err.statusCode)
+    return err.statusCode < 500
+      ? error(res, err.message, -1, err.statusCode)
+      : error(res, '服务器内部错误', -1, 500)
   }
   // 兼容带 statusCode 的服务错误（如被 mock 的 plain object）
   const maybe = err as { statusCode?: unknown; message?: unknown }
-  if (typeof maybe.statusCode === 'number') {
+  if (typeof maybe.statusCode === 'number' && maybe.statusCode >= 400 && maybe.statusCode < 500) {
     return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
   }
-  return error(res, err instanceof Error ? err.message : 'Internal server error', -1, 500)
+  return error(res, '服务器内部错误', -1, 500)
 }

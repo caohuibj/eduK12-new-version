@@ -78,7 +78,7 @@ const CourseStudents: React.FC = () => {
   }
 
   const handleResetPassword = async (student: Student) => {
-    if (!window.confirm(`确定要重置 ${student.nickname} 的密码为 12345678 吗？`)) {
+    if (!window.confirm(`确定要为 ${student.nickname} 生成一次性临时密码吗？\n\n临时密码只会写入受保护的本地交接文件。`)) {
       return
     }
 
@@ -86,7 +86,7 @@ const CourseStudents: React.FC = () => {
     try {
       const response = await apiClient.post(`/courses/${courseId}/students/${student.id}/reset-password`)
       if (response.code === 0) {
-        alert(`已将 ${student.nickname} 的密码重置为 12345678`)
+        alert(response.message || `已为 ${student.nickname} 生成一次性临时密码，请从受保护的本地交接文件中读取。`)
       }
     } catch (error: any) {
       alert(error.message || '重置密码失败')

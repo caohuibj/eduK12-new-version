@@ -78,7 +78,7 @@
 | 功能 | 实现要点 |
 |---|---|
 | 门户 | `/` 三角色入口。学生卡片进 `/student/course-login` |
-| 管理员登录 | `/admin/login`，种子账号见环境变量 `ADMIN_USERNAME` / `ADMIN_PASSWORD`（默认 `rateK12admin` / `2026coding`） |
+| 管理员登录 | `/admin/login`，种子账号仅从受保护环境变量 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 读取 |
 | 教师码 | 管理员生成；提交注册后作废（`isActive=false`） |
 | 教师注册 | 验证码 → 填资料 → **不发 JWT**，`teacherApproved=false` → 管理员「用户管理」点通过 → 才能登录 |
 | 教师登录 | `/teacher/account-login`；待审提示「正在等待管理员审核」 |

@@ -2,14 +2,17 @@ import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
-import { hashPassword } from '../utils/password'
+import { hashPassword, comparePassword, generateTempPassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { z } from 'zod'
+import { clearSessionCookie } from '../utils/authCookies'
+import path from 'node:path'
+import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
 
 const createUserSchema = z.object({
   username: z.string().min(3, '用户名至少3个字符'),
-  password: z.string().min(6, '密码至少6个字符'),
+  password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   role: z.enum(['STUDENT', 'TEACHER', 'ADMIN']),
   nickname: z.string().optional(),
 })
@@ -64,6 +67,7 @@ export const userController = {
             teacherApproved: true,
             expiresAt: true,
             createdAt: true,
+            mustChangePassword: true,
           },
           orderBy: {
             createdAt: 'desc'
@@ -156,6 +160,7 @@ export const userController = {
           phone: true,
           isActive: true,
           createdAt: true,
+          mustChangePassword: true,
         }
       })
 
@@ -182,6 +187,7 @@ export const userController = {
           phone: true,
           isActive: true,
           createdAt: true,
+          mustChangePassword: true,
         }
       })
 
@@ -221,9 +227,17 @@ export const userController = {
         return forbidden(res, '无权限修改此用户')
       }
 
+      // 账号启停是管理动作，不能由用户通过自助资料接口修改自己的状态。
+      if (result.data.isActive !== undefined && currentUserRole !== UserRole.ADMIN) {
+        return forbidden(res, '只有管理员可以修改账号状态')
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: result.data,
+        data: {
+          ...result.data,
+          ...(result.data.isActive !== undefined ? { tokenVersion: { increment: 1 } } : {}),
+        },
         select: {
           id: true,
           username: true,
@@ -233,6 +247,7 @@ export const userController = {
           phone: true,
           isActive: true,
           createdAt: true,
+          mustChangePassword: true,
         }
       })
 
@@ -271,28 +286,38 @@ export const userController = {
   async resetPassword(req: Request, res: Response) {
     try {
       const { id } = req.params
-      const { newPassword } = req.body
-
-      if (!newPassword || newPassword.length < 6) {
-        return error(res, '新密码至少6个字符')
-      }
 
       const user = await prisma.user.findUnique({
-        where: { id }
+        where: { id },
+        select: { id: true, username: true },
       })
 
       if (!user) {
         return notFound(res, '用户不存在')
       }
 
-      const hashedPassword = await hashPassword(newPassword)
+      const temporaryPassword = generateTempPassword()
+      const hashedPassword = await hashPassword(temporaryPassword)
+      const handoffFile = await writeCredentialHandoff([{
+        username: user.username,
+        temporaryPassword,
+      }], 'admin-password-reset')
 
-      await prisma.user.update({
-        where: { id },
-        data: { passwordHash: hashedPassword }
-      })
+      try {
+        await prisma.user.update({
+          where: { id },
+          data: {
+            passwordHash: hashedPassword,
+            tokenVersion: { increment: 1 },
+            mustChangePassword: true,
+          }
+        })
+      } catch (updateError) {
+        removeCredentialHandoff(handoffFile)
+        throw updateError
+      }
 
-      return success(res, null, '密码已重置')
+      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
     } catch (err) {
       logger.error('重置密码错误', err)
       return error(res, Messages.USER.PASSWORD_RESET)
@@ -309,8 +334,8 @@ export const userController = {
         return error(res, '请输入原密码和新密码')
       }
 
-      if (newPassword.length < 6) {
-        return error(res, '新密码至少6个字符')
+      if (typeof newPassword !== 'string' || !isValidPassword(newPassword)) {
+        return error(res, '密码必须包含字母和数字，长度为8-128个字符')
       }
 
       const user = await prisma.user.findUnique({
@@ -322,7 +347,6 @@ export const userController = {
       }
 
       // 验证原密码
-      const { comparePassword } = require('../utils/password')
       const isValid = await comparePassword(oldPassword, user.passwordHash)
       if (!isValid) {
         return error(res, '原密码错误')
@@ -332,8 +356,14 @@ export const userController = {
       const hashedPassword = await hashPassword(newPassword)
       await prisma.user.update({
         where: { id: userId },
-        data: { passwordHash: hashedPassword }
+        data: {
+          passwordHash: hashedPassword,
+          tokenVersion: { increment: 1 },
+          mustChangePassword: false,
+        }
       })
+
+      clearSessionCookie(req, res)
 
       return success(res, null, '密码修改成功')
     } catch (err) {
@@ -360,6 +390,7 @@ export const userController = {
           isFrozen: true,
           expiresAt: true,
           createdAt: true,
+          mustChangePassword: true,
         }
       })
 

@@ -67,6 +67,11 @@ COPY package*.json ./
 # 仅保留 production 依赖（移除 tsx / prisma CLI / typescript / vitest 等）
 RUN npm prune --omit=dev
 
+# The long-running API and workers do not need root. Keep the mounted upload
+# volume writable by the application user while leaving the image immutable.
+RUN mkdir -p /app/uploads /app/.local && chown -R node:node /app
+USER node
+
 EXPOSE 3000
 CMD ["node", "dist/index.js"]
 

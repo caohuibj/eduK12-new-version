@@ -8,7 +8,8 @@ import { safeDecrypt } from '../utils/encryption'
 import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
-import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
+import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
+import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 
 /**
  * Build the collection-only questionnaire envelope.  The legacy JSON column
@@ -1061,53 +1062,56 @@ export const questionnaireController = {
         ? JSON.stringify(value)  // 多选：数组转字符串
         : value;                  // 单选、填空：直接存储
 
-      // 检查问卷测评是否存在
-      const qa = await prisma.questionnaireAssessment.findUnique({
-        where: { id: assessmentId },
-        include: {
-          questionnaire: {
-            include: {
-              formItems: true,
+      const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const qa = await tx.questionnaireAssessment.findUnique({
+          where: { id: assessmentId },
+          include: {
+            questionnaire: {
+              include: {
+                formItems: true,
+              },
             },
           },
-        },
-      })
+        })
 
-      if (!qa) {
-        return notFound(res, '问卷测评不存在')
-      }
+        if (!qa) return { kind: 'not-found' as const }
+        if (qa.userId !== userId) return { kind: 'forbidden' as const }
+        if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
-      if (qa.userId !== userId) {
-        return forbidden(res, '无权限操作此测评')
-      }
+        const formItem = qa.questionnaire.formItems.find(fi => fi.id === formItemId)
+        if (!formItem) return { kind: 'form-not-found' as const }
 
-      // 检查表单题目是否存在
-      const formItem = qa.questionnaire.formItems.find(fi => fi.id === formItemId)
-      if (!formItem) {
-        return error(res, '表单题目不存在')
-      }
-
-      // 保存或更新表单答案
-      const formAnswer = await prisma.questionnaireFormAnswer.upsert({
-        where: {
-          questionnaireAssessmentId_formItemId: {
+        const formAnswer = await tx.questionnaireFormAnswer.upsert({
+          where: {
+            questionnaireAssessmentId_formItemId: {
+              questionnaireAssessmentId: assessmentId,
+              formItemId,
+            },
+          },
+          create: {
             questionnaireAssessmentId: assessmentId,
             formItemId,
+            value: valueToStore,
           },
-        },
-        create: {
-          questionnaireAssessmentId: assessmentId,
-          formItemId,
-          value: valueToStore,
-        },
-        update: {
-          value: valueToStore,
-        },
+          update: {
+            value: valueToStore,
+          },
+        })
+
+        await refreshQuestionnaireProgress(tx, assessmentId)
+        return { kind: 'saved' as const, formAnswer }
       })
+
+      if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
+      if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
 
       logger.info('保存表单答案', { assessmentId, formItemId, userId })
 
-      return success(res, formAnswer, '表单答案保存成功')
+      return success(res, outcome.formAnswer, '表单答案保存成功')
     } catch (err) {
       logger.error('保存表单答案错误', err)
       return error(res, '保存表单答案失败')
@@ -1134,28 +1138,28 @@ export const questionnaireController = {
 
       const { answers } = result.data
 
-      // 检查问卷测评是否存在
-      const qa = await prisma.questionnaireAssessment.findUnique({
-        where: { id: assessmentId },
-      })
+      const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const qa = await tx.questionnaireAssessment.findUnique({
+          where: { id: assessmentId },
+          include: {
+            questionnaire: {
+              include: { formItems: true },
+            },
+          },
+        })
 
-      if (!qa) {
-        return notFound(res, '问卷测评不存在')
-      }
+        if (!qa) return { kind: 'not-found' as const }
+        if (qa.userId !== userId) return { kind: 'forbidden' as const }
+        if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
-      if (qa.userId !== userId) {
-        return forbidden(res, '无权限操作此测评')
-      }
+        const formItemIds = new Set(qa.questionnaire.formItems.map((item) => item.id))
+        if (answers.some((answer) => !formItemIds.has(answer.formItemId))) {
+          return { kind: 'form-not-found' as const }
+        }
 
-      // 批量保存表单答案
-      await prisma.$transaction(
-        answers.map(answer => {
-          // 处理多选题答案格式：数组转JSON字符串
-          const valueToStore = Array.isArray(answer.value) 
-            ? JSON.stringify(answer.value)
-            : answer.value;
-
-          return prisma.questionnaireFormAnswer.upsert({
+        for (const answer of answers) {
+          await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
                 questionnaireAssessmentId: assessmentId,
@@ -1165,14 +1169,23 @@ export const questionnaireController = {
             create: {
               questionnaireAssessmentId: assessmentId,
               formItemId: answer.formItemId,
-              value: valueToStore,
+              value: answer.value,
             },
             update: {
-              value: valueToStore,
+              value: answer.value,
             },
           })
-        })
-      )
+        }
+
+        await refreshQuestionnaireProgress(tx, assessmentId)
+        return { kind: 'saved' as const }
+      })
+
+      if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
+      if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
 
       logger.info('批量保存表单答案', { assessmentId, count: answers.length, userId })
 
@@ -1666,12 +1679,17 @@ export const questionnaireController = {
           }
         }
 
+        // 所有项目都已完成，使用条件状态转换完成问卷，避免重复生成报告。
+        const completion = await withSerializableQuestionnaireTransaction((tx) =>
+          refreshQuestionnaireProgress(tx, existingQA.id)
+        )
+
         // 所有项目都已完成，返回已完成状态
         return success(res, {
           questionnaireAssessment: {
             id: existingQA.id,
-            status: existingQA.status,
-            progress: existingQA.progress,
+            status: completion?.completed ? 'COMPLETED' : existingQA.status,
+            progress: completion?.completed ? 100 : completion?.progress ?? existingQA.progress,
             currentIndex: contentItems.length,
           },
           currentFormItem: null,
@@ -1687,26 +1705,29 @@ export const questionnaireController = {
         }, '问卷测评已完成')
       }
 
-      // 创建新的问卷测评
-      const qa = await prisma.questionnaireAssessment.create({
-        data: {
-          questionnaireId: id,
-          userId: userId!,
-          status: 'IN_PROGRESS',
-          progress: 0,
-        },
-      })
+      // 问卷主记录和量表子记录必须原子创建，避免留下半成品测评。
+      const qa = await prisma.$transaction(async (tx) => {
+        const created = await tx.questionnaireAssessment.create({
+          data: {
+            questionnaireId: id,
+            userId: userId!,
+            status: 'IN_PROGRESS',
+            progress: 0,
+          },
+        })
 
-      // 为每个量表创建 ScaleAssessment（批量创建优化）
-      await prisma.assessment.createMany({
-        data: questionnaire.questionnaireScales.map(qs => ({
-          scaleId: qs.scaleId,
-          userId: userId!,
-          status: 'IN_PROGRESS',
-          progress: 0,
-          answers: [],
-          questionnaireAssessmentId: qa.id,
-        })),
+        await tx.assessment.createMany({
+          data: questionnaire.questionnaireScales.map(qs => ({
+            scaleId: qs.scaleId,
+            userId: userId!,
+            status: 'IN_PROGRESS',
+            progress: 0,
+            answers: [],
+            questionnaireAssessmentId: created.id,
+          })),
+        })
+
+        return created
       })
 
       // 查询刚创建的量表测评记录
@@ -1856,22 +1877,13 @@ export const questionnaireController = {
 
       // 检查是否所有内容都已完成
       const allCompleted = currentIndex < 0
+      let completion: Awaited<ReturnType<typeof refreshQuestionnaireProgress>> = null
 
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && qa.status !== 'COMPLETED') {
-        const collectionReport = buildQuestionnaireCollectionReport(qa)
-        const totalTime = Date.now() - new Date(qa.startedAt).getTime()
-
-        await prisma.questionnaireAssessment.update({
-          where: { id: qa.id },
-          data: {
-            status: 'COMPLETED',
-            progress: 100,
-            completedAt: new Date(),
-            totalTime,
-            aggregateReport: collectionReportForStorage(collectionReport) as any,
-          },
-        })
+        completion = await withSerializableQuestionnaireTransaction((tx) =>
+          refreshQuestionnaireProgress(tx, qa.id)
+        )
 
         logger.info('问卷测评自动完成', {
           questionnaireAssessmentId: qa.id,
@@ -1883,12 +1895,12 @@ export const questionnaireController = {
       return success(res, {
         questionnaireAssessment: {
           id: qa.id,
-          status: allCompleted ? 'COMPLETED' : qa.status,
-          progress: allCompleted ? 100 : progress,
+          status: completion?.completed ? 'COMPLETED' : qa.status,
+          progress: completion?.completed ? 100 : progress,
           currentIndex: allCompleted ? contentItems.length : currentIndex,
           startedAt: qa.startedAt,
-          completedAt: qa.completedAt,
-          totalTime: qa.totalTime,
+          completedAt: completion?.completedAt ?? qa.completedAt,
+          totalTime: completion?.totalTime ?? qa.totalTime,
         },
         questionnaire: {
           id: qa.questionnaire.id,
@@ -1933,96 +1945,84 @@ export const questionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
-      const qa = await prisma.questionnaireAssessment.findUnique({
-        where: { id },
-        include: {
-          questionnaire: {
-            include: {
-              formItems: {
-                orderBy: { position: 'asc' },
-              },
-              questionnaireScales: {
-                include: {
-                  scale: {
-                    include: {
-                      dimensions: true,
-                    },
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const qa = await tx.questionnaireAssessment.findUnique({
+          where: { id },
+          include: {
+            questionnaire: {
+              include: {
+                formItems: { orderBy: { position: 'asc' } },
+                questionnaireScales: {
+                  include: {
+                    scale: { include: { dimensions: true } },
                   },
+                  orderBy: { position: 'asc' },
                 },
-                orderBy: { position: 'asc' },
               },
             },
-          },
-          scaleAssessments: {
-            include: {
-              scale: {
-                include: {
-                  items: {
-                    include: {
-                      itemDimensions: {
-                        include: {
-                          dimension: true,
-                        },
+            scaleAssessments: {
+              include: {
+                scale: {
+                  include: {
+                    items: {
+                      include: {
+                        itemDimensions: { include: { dimension: true } },
                       },
                     },
+                    dimensions: true,
                   },
-                  dimensions: true,
                 },
               },
             },
+            formAnswers: true,
           },
-          formAnswers: true,
-        },
-      })
+        })
 
-      if (!qa) {
-        return notFound(res, '问卷测评不存在')
-      }
+        if (!qa) return { kind: 'not-found' as const }
+        if (qa.userId !== userId) return { kind: 'forbidden' as const }
 
-      if (qa.userId !== userId) {
-        return forbidden(res, '无权限操作此测评')
-      }
-
-      if (qa.status === 'COMPLETED') {
-        return success(res, {
-          questionnaireId: qa.questionnaireId,
-          completedAt: qa.completedAt,
-          totalTime: qa.totalTime,
-          ...buildQuestionnaireCollectionReport(qa),
-        }, '问卷测评已完成')
-      }
-
-      // 检查所有量表是否完成（如果有量表的话）
-      if (qa.scaleAssessments.length > 0) {
-        const incompleteScales = qa.scaleAssessments.filter(
-          sa => sa.status !== 'COMPLETED'
-        )
-        if (incompleteScales.length > 0) {
-          return error(res, '还有量表未完成')
+        if (qa.status === 'COMPLETED') {
+          return {
+            kind: 'completed' as const,
+            questionnaireId: qa.questionnaireId,
+            completedAt: qa.completedAt,
+            totalTime: qa.totalTime,
+            collectionReport: buildQuestionnaireCollectionReport(qa),
+          }
         }
-      }
 
-      const collectionReport = buildQuestionnaireCollectionReport(qa)
+        if (qa.scaleAssessments.some((assessment) => assessment.status !== 'COMPLETED')) {
+          return { kind: 'incomplete-scales' as const }
+        }
+        const answeredFormItemIds = new Set(qa.formAnswers.map((answer) => answer.formItemId))
+        if (qa.questionnaire.formItems.some((item) => !answeredFormItemIds.has(item.id))) {
+          return { kind: 'incomplete-forms' as const }
+        }
 
-      // 计算总时间
-      const totalTime = Date.now() - new Date(qa.startedAt).getTime()
-
-      // 更新问卷测评
-      const updated = await prisma.questionnaireAssessment.update({
-        where: { id },
-        data: {
-          status: 'COMPLETED',
-          progress: 100,
-          completedAt: new Date(),
-          totalTime,
-          aggregateReport: collectionReportForStorage(collectionReport) as any,
-        },
+        const progress = await refreshQuestionnaireProgress(tx, qa.id)
+        if (!progress) return { kind: 'incomplete-forms' as const }
+        if (progress.status !== 'IN_PROGRESS' && !progress.completed) return { kind: 'closed' as const }
+        if (!progress.completed) return { kind: 'incomplete-forms' as const }
+        return {
+          kind: 'completed' as const,
+          questionnaireId: qa.questionnaireId,
+          completedAt: progress.completedAt || new Date(),
+          totalTime: progress.totalTime ?? (Date.now() - new Date(qa.startedAt).getTime()),
+          collectionReport: progress?.collectionReport || buildQuestionnaireCollectionReport(qa),
+        }
       })
 
-      const { aggregateReport: _legacyAggregateReport, ...safeUpdated } = updated as any
+      if (result.kind === 'not-found') return notFound(res, '问卷测评不存在')
+      if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
+      if (result.kind === 'incomplete-scales') return error(res, '还有量表未完成')
+      if (result.kind === 'incomplete-forms') return error(res, '还有表单题目未完成')
+
       return success(res, {
-        ...safeUpdated,
-        ...collectionReport,
+        questionnaireId: result.questionnaireId,
+        completedAt: result.completedAt,
+        totalTime: result.totalTime,
+        ...result.collectionReport,
       }, '问卷测评已完成')
     } catch (err) {
       logger.error('完成问卷测评错误', err)
@@ -2143,7 +2143,12 @@ export const questionnaireController = {
         dateRange
       }, format as 'csv' | 'sav')
 
-      logger.info(`问卷数据导出成功: ${questionnaire.name}, 记录数: ${exportData.rows.length}, 格式: ${format}, 脱敏: ${anonymize}`)
+      logger.info('问卷数据导出成功', {
+        questionnaireId: questionnaire.id,
+        recordCount: exportData.rows.length,
+        format,
+        anonymize,
+      })
 
       const result: any = {
         recordCount: exportData.rows.length,
@@ -2164,7 +2169,7 @@ export const questionnaireController = {
       return success(res, result, '导出成功')
     } catch (err) {
       logger.error('导出问卷数据错误', err)
-      return error(res, '导出问卷数据失败: ' + (err as Error).message)
+      return error(res, '导出问卷数据失败')
     }
   },
 

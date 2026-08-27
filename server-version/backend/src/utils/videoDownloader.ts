@@ -11,6 +11,7 @@ import { pipeline, Transform } from 'stream';
 import { promises as dns } from 'dns';
 import http from 'http';
 import https from 'https';
+import { logger } from './logger';
 
 // ipaddr.js is already present transitively through proxy-addr. Keep address
 // classification centralized and reject every non-unicast range.
@@ -183,7 +184,7 @@ export async function downloadVideo(
 
   try {
     const parsedUrl = new URL(videoUrl);
-    console.log(`[下载] 开始下载视频: ${parsedUrl.hostname}`);
+    logger.info('[下载] 开始下载视频', { hostname: parsedUrl.hostname });
 
     const { response } = await requestWithSafeRedirects(videoUrl, opts.timeout!);
     const contentLength = parseInt(response.headers['content-length'] || '0', 10);
@@ -205,7 +206,7 @@ export async function downloadVideo(
     // 获取下载后的文件信息
     const stats = fs.statSync(localPath);
     
-    console.log(`[下载] 完成: ${localPath}, 大小: ${(stats.size / 1024 / 1024).toFixed(2)}MB`);
+    logger.info('[下载] 完成', { localPath, sizeMb: (stats.size / 1024 / 1024).toFixed(2) });
 
     return {
       success: true,
@@ -221,7 +222,7 @@ export async function downloadVideo(
       fs.unlinkSync(localPath);
     }
 
-    console.error('[下载] 失败:', error.message);
+    logger.error('[下载] 失败', error);
     
     return {
       success: false,
@@ -237,10 +238,10 @@ export function cleanupTempFile(filePath: string): void {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`[清理] 已删除临时文件: ${filePath}`);
+      logger.info('[清理] 已删除临时文件', { filePath });
     }
   } catch (error: any) {
-    console.error(`[清理] 删除失败: ${filePath}`, error.message);
+    logger.error('[清理] 删除失败', error);
   }
 }
 

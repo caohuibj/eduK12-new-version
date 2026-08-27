@@ -12,6 +12,9 @@ import {
   canAccessCourseRoster,
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
+import { attachAssetReference, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
+import path from 'node:path'
 
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
@@ -32,6 +35,71 @@ const getPaginationParams = (req: Request) => {
   const page = Math.max(1, parseInt(req.query.page as string) || 1)
   const pageSize = Math.min(100, parseInt(req.query.pageSize as string) || 100)
   return { page, pageSize, skip: (page - 1) * pageSize }
+}
+
+/**
+ * AssetReference is intentionally polymorphic, so Prisma cannot cascade
+ * references when a course removes its assignments/check-ins. Collect every
+ * descendant id and clean the references in the same transaction as the
+ * course delete.
+ */
+const deleteCourseWithAssetReferences = async (courseId: string) => {
+  await prisma.$transaction(async (tx) => {
+    const assignments = await tx.assignment.findMany({
+      where: { courseId },
+      select: { id: true },
+    })
+    const checkins = await tx.checkin.findMany({
+      where: { courseId },
+      select: { id: true },
+    })
+
+    const assignmentIds = assignments.map(({ id }) => id)
+    const checkinIds = checkins.map(({ id }) => id)
+    const submissions = checkinIds.length > 0
+      ? await tx.checkinSubmission.findMany({
+        where: { checkinId: { in: checkinIds } },
+        select: { id: true },
+      })
+      : []
+
+    await tx.assetReference.deleteMany({
+      where: {
+        entityType: 'Course',
+        entityId: courseId,
+      },
+    })
+
+    if (assignmentIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'Assignment',
+          entityId: { in: assignmentIds },
+        },
+      })
+    }
+
+    if (checkinIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'Checkin',
+          entityId: { in: checkinIds },
+        },
+      })
+    }
+
+    const submissionIds = submissions.map(({ id }) => id)
+    if (submissionIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'CheckinSubmission',
+          entityId: { in: submissionIds },
+        },
+      })
+    }
+
+    await tx.course.delete({ where: { id: courseId } })
+  })
 }
 
 export const courseController = {
@@ -110,12 +178,13 @@ export const courseController = {
       ])
 
       // 格式化返回数据
-      const formattedCourses = courses.map(course => ({
+      const formattedCourses = await Promise.all(courses.map(async course => ({
         ...course,
+        coverUrl: course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl,
         studentCount: course._count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
-      }))
+      })))
 
       const result = {
         list: formattedCourses,
@@ -178,7 +247,7 @@ export const courseController = {
 
       // 清除相关缓存
       const clearedKeys = cache.clearPattern(`courses:list:`)
-      console.log(`[课程创建] 缓存已清除, userId: ${userId}, 时间: ${new Date().toISOString()}`)
+      logger.info('[课程创建] 缓存已清除', { userId, clearedKeys })
       logger.debug('Course cache cleared after create', { userId })
 
       return success(res, course, Messages.COURSE.CREATE_SUCCESS)
@@ -251,16 +320,18 @@ export const courseController = {
 
       const canViewRoster = canAccessCourseRoster(course, req.user?.userId, req.user?.role)
       const { _count, students, shares: _shares, courseCode, ...courseFields } = course
+      const coverUrl = course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl
 
       return success(res, {
         ...courseFields,
+        coverUrl,
         ...(canViewRoster ? { courseCode, students } : {}),
         studentCount: _count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
       })
     } catch (err) {
-      console.error('获取课程详情错误:', err)
+      logger.error('获取课程详情错误', err)
       return error(res, '获取课程详情失败')
     }
   },
@@ -365,15 +436,13 @@ export const courseController = {
       // 权限检查
       if (userRole === UserRole.ADMIN) {
         // 管理员可以删除任何课程
-        await prisma.course.delete({
-          where: { id }
-        })
+        await deleteCourseWithAssetReferences(id)
         // 清除相关缓存
-      cache.clearPattern(`courses:list:`)
-      cache.delete(`course:${id}`)
-      logger.debug('Course cache cleared after delete', { courseId: id })
+        cache.clearPattern(`courses:list:`)
+        cache.delete(`course:${id}`)
+        logger.debug('Course cache cleared after delete', { courseId: id })
 
-      return success(res, {
+        return success(res, {
           deletedStudents: course._count.students
         }, hasStudents ? '课程已删除（包含学生数据）' : '课程已删除')
       }
@@ -393,9 +462,7 @@ export const courseController = {
       }
 
       // 满足条件，可以删除
-      await prisma.course.delete({
-        where: { id }
-      })
+      await deleteCourseWithAssetReferences(id)
 
       // 清除相关缓存
       cache.clearPattern(`courses:list:`)
@@ -475,7 +542,7 @@ export const courseController = {
 
       return success(res, null, '加入课程成功')
     } catch (err) {
-      console.error('加入课程错误:', err)
+      logger.error('加入课程错误', err)
       return error(res, '加入课程失败')
     }
   },
@@ -526,7 +593,7 @@ export const courseController = {
         total: courses.length,
       })
     } catch (err) {
-      console.error('获取我的课程错误:', err)
+      logger.error('获取我的课程错误', err)
       return error(res, '获取我的课程失败')
     }
   },
@@ -574,7 +641,7 @@ export const courseController = {
         isRecruiting: course.isRecruiting,
       }, '课程码有效')
     } catch (err) {
-      console.error('验证课程码错误:', err)
+      logger.error('验证课程码错误', err)
       return error(res, '验证失败')
     }
   },
@@ -623,14 +690,14 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[结束课程] 缓存已清除, courseId: ${id}`)
+      logger.info('[结束课程] 缓存已清除', { courseId: id })
 
       return success(res, {
         endedAt: now,
         studentCount,
       }, Messages.COURSE.END_SUCCESS)
     } catch (err) {
-      console.error('结束课程错误:', err)
+      logger.error('结束课程错误', err)
       return error(res, '结束课程失败')
     }
   },
@@ -691,7 +758,7 @@ export const courseController = {
         total: students.length,
       })
     } catch (err) {
-      console.error('获取学生列表错误:', err)
+      logger.error('获取学生列表错误', err)
       return error(res, '获取学生列表失败')
     }
   },
@@ -733,14 +800,25 @@ export const courseController = {
       const tempPassword = generateTempPassword()
       const hashedPassword = await hashPassword(tempPassword)
 
-      await prisma.user.update({
-        where: { id: studentId },
-        data: { passwordHash: hashedPassword }
-      })
+      const student = await prisma.user.findUnique({ where: { id: studentId }, select: { username: true } })
+      const handoffFile = await writeCredentialHandoff([{ username: student?.username || studentId, temporaryPassword: tempPassword }], 'student-password-reset')
+      try {
+        await prisma.user.update({
+          where: { id: studentId },
+          data: {
+            passwordHash: hashedPassword,
+            tokenVersion: { increment: 1 },
+            mustChangePassword: true,
+          }
+        })
+      } catch (updateError) {
+        removeCredentialHandoff(handoffFile)
+        throw updateError
+      }
 
-      return success(res, { tempPassword }, `密码已重置为 ${tempPassword}，请提醒学生尽快修改密码`)
+      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
     } catch (err) {
-      console.error('重置密码错误:', err)
+      logger.error('重置密码错误', err)
       return error(res, '重置密码失败')
     }
   },
@@ -820,7 +898,7 @@ export const courseController = {
         total: courseStudents.length,
       })
     } catch (err) {
-      console.error('批量获取学生列表错误:', err)
+      logger.error('批量获取学生列表错误', err)
       return error(res, '获取学生列表失败')
     }
   },
@@ -850,17 +928,40 @@ export const courseController = {
         return error(res, '请选择图片文件')
       }
 
-      const coverUrl = `/uploads/covers/${file.filename}`
-
-      // 更新课程封面
-      await prisma.course.update({
-        where: { id },
-        data: { coverUrl }
+      const asset = await storeAsset({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        ownerId: userId,
+        accessScope: 'COURSE',
+        scopeId: id,
       })
 
-      return success(res, { coverUrl }, '封面上传成功')
+      // Keep the course pointer and its reference in one transaction. The
+      // previous cover reference is removed only after the new pointer is
+      // ready, so an asset cannot be detached from a live course by a
+      // partially completed upload.
+      await prisma.$transaction(async (tx) => {
+        await tx.course.update({
+          where: { id },
+          data: { coverAssetId: asset.id, coverUrl: null }
+        })
+        if (course.coverAssetId && course.coverAssetId !== asset.id) {
+          await tx.assetReference.deleteMany({
+            where: {
+              assetId: course.coverAssetId,
+              entityType: 'Course',
+              entityId: id,
+              field: 'cover',
+            },
+          })
+        }
+        await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' }, tx)
+      })
+
+      return success(res, { coverUrl: await getSignedAssetUrl(asset.id) }, '封面上传成功')
     } catch (err) {
-      console.error('上传封面错误:', err)
+      logger.error('上传封面错误', err)
       return error(res, '上传封面失败')
     }
   },
@@ -895,7 +996,7 @@ export const courseController = {
 
       return success(res, null, '学生已从课程中移除')
     } catch (err) {
-      console.error('移除学生错误:', err)
+      logger.error('移除学生错误', err)
       return error(res, '移除学生失败')
     }
   },
@@ -936,12 +1037,15 @@ export const courseController = {
       // 更新学生冻结状态
       await prisma.user.update({
         where: { id: studentId },
-        data: { isFrozen }
+        data: {
+          isFrozen,
+          tokenVersion: { increment: 1 },
+        }
       })
 
       return success(res, { isFrozen }, isFrozen ? '学生账号已冻结' : '学生账号已解冻')
     } catch (err) {
-      console.error('冻结/解冻学生错误:', err)
+      logger.error('冻结/解冻学生错误', err)
       return error(res, '操作失败')
     }
   },
@@ -988,7 +1092,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[停止招募] 缓存已清除, courseId: ${id}`)
+      logger.info('[停止招募] 缓存已清除', { courseId: id })
 
       return success(res, updatedCourse, '课程已停止招募，现有学生不受影响')
     } catch (err) {
@@ -1043,7 +1147,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[恢复招募] 缓存已清除, courseId: ${id}`)
+      logger.info('[恢复招募] 缓存已清除', { courseId: id })
 
       return success(res, updatedCourse, '课程已恢复招募')
     } catch (err) {
@@ -1152,7 +1256,7 @@ export const courseController = {
 
       // 清除课程列表缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[复制课程] 缓存已清除, 新课程ID: ${newCourse.id}`)
+      logger.info('[复制课程] 缓存已清除', { courseId: newCourse.id })
 
       return success(res, {
         ...clonedCourseWithDetails,
@@ -1160,7 +1264,7 @@ export const courseController = {
         _count: undefined,
       }, `课程复制成功，包含 ${originalCourse.assignments.length} 个作业和 ${originalCourse.checkins.length} 个打卡`)
     } catch (err) {
-      console.error('复制课程错误:', err)
+      logger.error('复制课程错误', err)
       return error(res, '复制课程失败')
     }
   },
@@ -1240,7 +1344,7 @@ export const courseController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      console.error('获取课程作业错误:', err)
+      logger.error('获取课程作业错误', err)
       return error(res, '获取课程作业失败')
     }
   },
@@ -1319,7 +1423,7 @@ export const courseController = {
         total: formattedCheckins.length,
       })
     } catch (err) {
-      console.error('获取课程打卡错误:', err)
+      logger.error('获取课程打卡错误', err)
       return error(res, '获取课程打卡失败')
     }
   },
@@ -1376,13 +1480,13 @@ export const courseController = {
         })
       }
 
-      console.log(`[分享课程] 课程 ${id} 已分享给 ${userIds.length} 个用户`)
+      logger.info('[分享课程] 课程已分享', { courseId: id, recipientCount: userIds.length })
 
       return success(res, {
         sharedCount: userIds.length
       }, `课程已分享给 ${userIds.length} 个用户`)
     } catch (err) {
-      console.error('分享课程错误:', err)
+      logger.error('分享课程错误', err)
       return error(res, '分享课程失败')
     }
   },
@@ -1446,7 +1550,7 @@ export const courseController = {
         total: formattedShares.length,
       })
     } catch (err) {
-      console.error('获取分享课程错误:', err)
+      logger.error('获取分享课程错误', err)
       return error(res, '获取分享课程失败')
     }
   },
@@ -1476,11 +1580,11 @@ export const courseController = {
         where: { id: shareId }
       })
 
-      console.log(`[取消分享] 分享记录 ${shareId} 已删除`)
+      logger.info('[取消分享] 分享记录已删除', { shareId })
 
       return success(res, null, '已取消分享')
     } catch (err) {
-      console.error('取消分享错误:', err)
+      logger.error('取消分享错误', err)
       return error(res, '取消分享失败')
     }
   },
@@ -1567,11 +1671,11 @@ export const courseController = {
 
       // 清除缓存
       cache.clearPattern(`courses:list:`)
-      console.log(`[从分享复制] 新课程 ${newCourse.id} 已创建`)
+      logger.info('[从分享复制] 课程已创建', { courseId: newCourse.id })
 
       return success(res, newCourse, `课程复制成功`)
     } catch (err) {
-      console.error('从分享复制课程错误:', err)
+      logger.error('从分享复制课程错误', err)
       return error(res, '复制课程失败')
     }
   },

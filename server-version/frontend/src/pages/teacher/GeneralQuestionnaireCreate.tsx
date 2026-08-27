@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, Form, Input, Button, message, Space } from 'antd'
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons'
+import { sessionFetch } from '../../api/client'
 
 const { TextArea } = Input
 
@@ -13,13 +14,10 @@ const GeneralQuestionnaireCreate: React.FC = () => {
   const handleSubmit = async (values: any) => {
     try {
       setSaving(true)
-      const token = localStorage.getItem('token')
-
-      const response = await fetch('/api/general-questionnaires', {
+      const response = await sessionFetch('/api/general-questionnaires', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           code: values.code,
