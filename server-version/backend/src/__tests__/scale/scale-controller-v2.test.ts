@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     $transaction: vi.fn(),
     scale: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
+    materialGrant: { findUnique: vi.fn() },
     assessment: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
@@ -83,6 +84,28 @@ describe('Scale v2 controller boundaries', () => {
 
     expect(res.statusCode).toBe(404)
     expect(mockPrisma.assessment.findFirst).not.toHaveBeenCalled()
+  })
+
+  it('hides an unowned and ungranted scale from a teacher detail request', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ ...publicScale, creatorId: 'teacher-owner' })
+    mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
+    const res = makeRes()
+
+    await scaleController.detail(makeReq({
+      user: { userId: 'teacher-viewer', role: UserRole.TEACHER },
+      params: { id: 'scale-1' },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(404)
+    expect(mockPrisma.materialGrant.findUnique).toHaveBeenCalledWith({
+      where: {
+        teacherId_resourceType_resourceId: {
+          teacherId: 'teacher-viewer',
+          resourceType: 'SCALE',
+          resourceId: 'scale-1',
+        },
+      },
+    })
   })
 
   it('keeps an assessment in progress when a required item is missing', async () => {

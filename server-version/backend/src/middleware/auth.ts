@@ -115,6 +115,7 @@ export const requireRole = (...roles: UserRole[]) => {
 
 export const requireAdmin = requireRole(UserRole.ADMIN)
 export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
+export const requireStudent = requireRole(UserRole.STUDENT)
 
 /** Allow a user to access only their own record, unless they are an admin. */
 export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
-import { authenticate, requireTeacher } from '../middleware/auth'
+import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 
 const router = Router()
 
@@ -23,16 +23,16 @@ router.get('/tags', authenticate, scaleController.getTags)
 // ==================== 测评流程（学生） ====================
 
 // 开始测评：Scale Assessment v2 是唯一运行入口。
-router.post('/:scaleId/assessments', authenticate, scaleController.startAssessmentV2)
+router.post('/:scaleId/assessments', authenticate, requireStudent, scaleController.startAssessmentV2)
 
 // 提交答案
-router.patch('/assessments/:assessmentId/answers', authenticate, scaleController.submitAnswerV2)
+router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, scaleController.submitAnswerV2)
 
 // 完成测评
-router.post('/assessments/:assessmentId/complete', authenticate, scaleController.completeAssessmentV2)
+router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, scaleController.completeAssessmentV2)
 
 // 获取测评结果
-router.get('/assessments/:assessmentId', authenticate, scaleController.getAssessmentV2)
+router.get('/assessments/:assessmentId', authenticate, requireStudent, scaleController.getAssessmentV2)
 
 // 获取量表详情（所有登录用户可访问）
 // Keep this after the two-segment assessment routes so /assessments/:id
