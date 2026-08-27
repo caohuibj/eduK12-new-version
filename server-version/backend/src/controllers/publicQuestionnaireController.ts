@@ -31,6 +31,8 @@ import {
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
 import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { validateContextAnswer } from '../modules/assessment-context'
+import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -41,6 +43,11 @@ const publicScaleRunner = (scale: any) => {
     return { ...metadata, definition: null, definitionError: true }
   }
 }
+
+const assessmentContextState = (row: { contextSnapshotEncrypted?: string | null; contextSnapshotHash?: string | null; contextFrozenAt?: Date | null }) => ({
+  status: row.contextSnapshotEncrypted && row.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+  frozenAt: row.contextFrozenAt?.toISOString() ?? null,
+})
 
 export const publicQuestionnaireController = {
   /**
@@ -327,7 +334,7 @@ export const publicQuestionnaireController = {
             const item = contentItems[i]
             if (item.type === 'form') {
               const answer = formAnswerMap.get(item.data.id)
-              if (!answer) {
+              if (!answer && (item.data.required !== false || Boolean(item.data.contextKey))) {
                 currentIndex = i
                 currentItem = item
                 break
@@ -345,9 +352,10 @@ export const publicQuestionnaireController = {
           // 检查是否所有内容都已完成
           if (currentIndex === -1 || !currentItem) {
             // 所有内容已完成，使用条件状态转换避免重复生成报告。
-            await withSerializableQuestionnaireTransaction((tx) =>
-              refreshQuestionnaireProgress(tx, questionnaireAssessment!.id)
-            )
+            await withSerializableQuestionnaireTransaction(async (tx) => {
+              await freezeQuestionnaireAssessmentContext(tx, questionnaireAssessment!.id)
+              return refreshQuestionnaireProgress(tx, questionnaireAssessment!.id)
+            })
 
             logger.info('问卷测评在startAssessment中自动完成', {
               questionnaireAssessmentId: questionnaireAssessment.id,
@@ -360,6 +368,7 @@ export const publicQuestionnaireController = {
                 status: 'COMPLETED',
                 progress: 100,
                 currentIndex: contentItems.length,
+                context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: null,
               currentScale: null,
@@ -384,6 +393,7 @@ export const publicQuestionnaireController = {
                 status: questionnaireAssessment.status,
                 progress: questionnaireAssessment.progress,
                 currentIndex,
+                context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: currentItem.data,
               currentScale: null,
@@ -406,6 +416,7 @@ export const publicQuestionnaireController = {
                 status: questionnaireAssessment.status,
                 progress: questionnaireAssessment.progress,
                 currentIndex,
+                context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: null,
               currentScale: {
@@ -531,7 +542,8 @@ export const publicQuestionnaireController = {
               id: questionnaireAssessment.id,
               status: questionnaireAssessment.status,
               progress: questionnaireAssessment.progress,
-              currentScaleIndex: 0,
+              currentIndex: 0,
+              context: assessmentContextState(questionnaireAssessment),
             },
             currentFormItem: firstItem.data,
             currentScale: null,
@@ -561,7 +573,8 @@ export const publicQuestionnaireController = {
               id: questionnaireAssessment.id,
               status: questionnaireAssessment.status,
               progress: questionnaireAssessment.progress,
-              currentScaleIndex: 0,
+              currentIndex: 0,
+              context: assessmentContextState(questionnaireAssessment),
             },
             currentFormItem: null,
             currentScale: firstScale ? {
@@ -598,13 +611,16 @@ export const publicQuestionnaireController = {
       // 优化：只查询必要的数据，不加载题目详情
       const questionnaireAssessment = await prisma.questionnaireAssessment.findUnique({
         where: { sessionId },
-        select: {
-          id: true,
-          status: true,
-          progress: true,
-          startedAt: true,
-          completedAt: true,
-          totalTime: true,
+          select: {
+            id: true,
+            status: true,
+            progress: true,
+            startedAt: true,
+            completedAt: true,
+            totalTime: true,
+            contextSnapshotEncrypted: true,
+            contextSnapshotHash: true,
+            contextFrozenAt: true,
           questionnaire: {
             select: {
               id: true,
@@ -687,7 +703,7 @@ export const publicQuestionnaireController = {
         const item = contentItems[i]
         if (item.type === 'form') {
           const answer = formAnswerMap.get(item.data.id)
-          if (!answer) {
+          if (!answer && (item.data.required !== false || Boolean(item.data.contextKey))) {
             currentIndex = i
             currentItem = item
             break
@@ -708,7 +724,7 @@ export const publicQuestionnaireController = {
       // 计算进度
       const completedCount = contentItems.filter((item) => {
         if (item.type === 'form') {
-          return formAnswerMap.has(item.data.id)
+          return (item.data.required === false && !item.data.contextKey) || formAnswerMap.has(item.data.id)
         } else {
           const sa = saMap.get(item.data.scaleId)
           return sa && sa.status === 'COMPLETED'
@@ -717,24 +733,28 @@ export const publicQuestionnaireController = {
       let progress = contentItems.length === 0
         ? 100
         : Math.round((completedCount / contentItems.length) * 100)
+      let contextState = assessmentContextState(questionnaireAssessment)
 
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && questionnaireAssessment.status !== 'COMPLETED') {
-        const completion = await withSerializableQuestionnaireTransaction((tx) =>
-          refreshQuestionnaireProgress(tx, questionnaireAssessment.id)
-        )
-        if (completion?.completed) {
+        const completionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+          const frozen = await freezeQuestionnaireAssessmentContext(tx, questionnaireAssessment.id)
+          const completion = await refreshQuestionnaireProgress(tx, questionnaireAssessment.id)
+          return { completion, contextState: { status: 'frozen' as const, frozenAt: frozen.context.frozenAt } }
+        })
+        if (completionResult.completion?.completed) {
           questionnaireAssessment.status = 'COMPLETED'
           questionnaireAssessment.progress = 100
-          questionnaireAssessment.completedAt = completion.completedAt
-          questionnaireAssessment.totalTime = completion.totalTime
+          questionnaireAssessment.completedAt = completionResult.completion.completedAt
+          questionnaireAssessment.totalTime = completionResult.completion.totalTime
           progress = 100
-        } else if (completion) {
+        } else if (completionResult.completion) {
           allCompleted = false
           questionnaireAssessment.status = 'IN_PROGRESS'
-          questionnaireAssessment.progress = completion.progress
-          progress = completion.progress
+          questionnaireAssessment.progress = completionResult.completion.progress
+          progress = completionResult.completion.progress
         }
+        contextState = completionResult.contextState
       }
 
       // 准备返回数据
@@ -747,6 +767,7 @@ export const publicQuestionnaireController = {
           startedAt: questionnaireAssessment.startedAt,
           completedAt: questionnaireAssessment.completedAt,
           totalTime: questionnaireAssessment.totalTime,
+          context: contextState,
         },
         currentFormItem: null,
         currentScale: null,
@@ -777,8 +798,29 @@ export const publicQuestionnaireController = {
 
       return success(res, responseData)
     } catch (err) {
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('获取匿名测评状态错误', err)
       return error(res, '获取测评状态失败')
+    }
+  },
+
+  async freezeContext(req: Request, res: Response) {
+    try {
+      const { sessionId } = req.params
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const assessment = await tx.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true, status: true } })
+        if (!assessment) return { kind: 'not-found' as const }
+        if (assessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
+        const frozen = await freezeQuestionnaireAssessmentContext(tx, assessment.id)
+        return { kind: 'frozen' as const, frozenAt: frozen.context.frozenAt }
+      })
+      if (result.kind === 'not-found') return notFound(res, '测评不存在')
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能冻结人口学上下文', -1, 409)
+      return success(res, { status: 'frozen', frozenAt: result.frozenAt }, '人口学上下文已冻结')
+    } catch (err) {
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('冻结匿名问卷人口学上下文错误', err)
+      return error(res, '冻结人口学上下文失败')
     }
   },
 
@@ -880,6 +922,8 @@ export const publicQuestionnaireController = {
           return { kind: 'invalid-answer' as const }
         }
 
+        await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
+
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const answers = [...stored.answers]
@@ -908,6 +952,7 @@ export const publicQuestionnaireController = {
       return success(res, { saved: true })
     } catch (err) {
       logger.error('提交答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, '提交答案失败')
     }
   },
@@ -952,12 +997,18 @@ export const publicQuestionnaireController = {
           return { kind: 'closed' as const }
         }
 
+        const contextSnapshot = await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
         if (missingRequiredItems.length > 0) return { kind: 'missing-required' as const, count: missingRequiredItems.length }
-        const scaleResult = await buildScaleResultForRecord({ scale: assessment.scale, answers: stored.answers })
+        const scaleResult = await buildScaleResultForRecord({
+          scale: assessment.scale,
+          answers: stored.answers,
+          participantContext: contextSnapshot.context.values,
+          participantContextHash: contextSnapshot.hash,
+        })
         const completedAt = new Date()
         const totalTime = completedAt.getTime() - assessment.startedAt.getTime()
         const updated = await tx.assessment.updateMany({
@@ -988,6 +1039,7 @@ export const publicQuestionnaireController = {
       return success(res, { completed: true, progress: result.progress ?? null })
     } catch (err) {
       logger.error('完成量表测评错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, '完成量表测评失败')
     }
   },
@@ -1058,12 +1110,14 @@ export const publicQuestionnaireController = {
 
         if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
+        await freezeQuestionnaireAssessmentContext(tx, qa.id)
+
         const incompleteScales = qa.scaleAssessments.filter(
           (sa) => sa.status !== 'COMPLETED'
         )
         if (incompleteScales.length > 0) return { kind: 'incomplete-scales' as const }
         const answeredFormItemIds = new Set(qa.formAnswers.map((answer) => answer.formItemId))
-        if (qa.questionnaire.formItems.some((item) => !answeredFormItemIds.has(item.id))) {
+        if (qa.questionnaire.formItems.some((item) => (item.required !== false || Boolean(item.contextKey)) && !answeredFormItemIds.has(item.id))) {
           return { kind: 'incomplete-forms' as const }
         }
 
@@ -1095,6 +1149,7 @@ export const publicQuestionnaireController = {
         ...result.collectionReport,
       }, result.kind === 'completed' ? '问卷测评已完成' : '问卷测评已完成')
     } catch (err) {
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('完成问卷测评错误', err)
       return error(res, '完成问卷测评失败')
     }
@@ -1140,6 +1195,15 @@ export const publicQuestionnaireController = {
 
         if (!formItem) return { kind: 'form-not-found' as const }
 
+        if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
+          if (formItem.contextKey) return { kind: 'context-frozen' as const }
+        }
+        if (formItem.contextKey) {
+          const contextValue = Array.isArray(value) ? JSON.stringify(value) : String(value)
+          const validationMessage = validateContextAnswer(formItem, contextValue)
+          if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
+        }
+
         await tx.questionnaireFormAnswer.upsert({
           where: {
             questionnaireAssessmentId_formItemId: {
@@ -1176,10 +1240,13 @@ export const publicQuestionnaireController = {
       if (result.kind === 'closed') {
         return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       }
+      if (result.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
+      if (result.kind === 'invalid-context-answer') return error(res, result.message)
 
       return success(res, { formItemId, value }, '答案已保存')
     } catch (err) {
       logger.error('提交表单答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, '提交失败')
     }
   },

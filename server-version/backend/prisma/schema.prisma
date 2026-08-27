@@ -542,6 +542,9 @@ model QuestionnaireAssessment {
   completedAt          DateTime?        @map("completed_at")
   totalTime            Int?             @map("total_time") // 总用时（毫秒）
   aggregateReport      Json?            @map("aggregate_report") // 聚合报告（加密存储）
+  contextSnapshotEncrypted String?      @map("context_snapshot_encrypted")
+  contextSnapshotHash      String?      @map("context_snapshot_hash")
+  contextFrozenAt          DateTime?    @map("context_frozen_at")
 
   // 关联
   questionnaire    Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
@@ -612,6 +615,7 @@ model QuestionnaireFormItem {
   required        Boolean  @default(true) // 是否必填
   position        Int      @default(0) // 统一排序位置（与量表共享排序空间）
   options         Json? // 单选选项列表 [{value: "male", label: "男"}]
+  contextKey      String?  @map("context_key")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -621,6 +625,7 @@ model QuestionnaireFormItem {
 
   // 性能优化索引
   @@index([questionnaireId, position])
+  @@unique([questionnaireId, contextKey])
   @@map("questionnaire_form_items")
 }
 
@@ -723,6 +728,7 @@ model CompositeAssessmentItem {
   formLabel             String?                     @map("form_label")
   formPlaceholder       String?                     @map("form_placeholder")
   formOptions           Json?                       @map("form_options")
+  contextKey            String?                     @map("context_key")
   createdAt             DateTime                    @default(now()) @map("created_at")
   updatedAt             DateTime                    @updatedAt @map("updated_at")
 
@@ -736,6 +742,7 @@ model CompositeAssessmentItem {
   @@unique([compositeAssessmentId, position])
   @@index([scaleId])
   @@index([cognitiveAssignmentId])
+  @@unique([compositeAssessmentId, contextKey])
   @@map("composite_assessment_items")
 }
 
@@ -756,6 +763,9 @@ model CompositeAssessmentAttempt {
   lastSavedAt           DateTime                         @default(now()) @map("last_saved_at")
   completedAt           DateTime?                        @map("completed_at")
   totalTime             Int?                             @map("total_time")
+  contextSnapshotEncrypted String?                       @map("context_snapshot_encrypted")
+  contextSnapshotHash      String?                       @map("context_snapshot_hash")
+  contextFrozenAt          DateTime?                     @map("context_frozen_at")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)

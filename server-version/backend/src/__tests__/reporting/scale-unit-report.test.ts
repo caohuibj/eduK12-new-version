@@ -17,6 +17,7 @@ const makeResult = (overrides: Partial<ScaleResultV2> = {}): ScaleResultV2 => ({
     reportVersion: '2.0.0',
     definitionHash: 'h'.repeat(64),
     referenceVersions: [],
+    assessmentContext: null,
   },
   quality: { status: 'interpretable', flags: [] },
   itemScores: [{ itemCode: 'Q1', responseValue: 'never', baseScore: 1, score: 1 }],

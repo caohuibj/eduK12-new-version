@@ -190,6 +190,13 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async freezeContext(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      return success(res, await service.freezeContext(req.params.attemptId, { userId: req.user.userId }), '人口学上下文已冻结')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async saveAttempt(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -354,6 +361,12 @@ export const compositeController = {
 
   async publicAttempt(req: Request, res: Response) {
     try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+  },
+
+  async publicFreezeContext(req: Request, res: Response) {
+    try {
+      return success(res, await service.freezeContext(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }), '人口学上下文已冻结')
+    } catch (err) { return handleError(res, err) }
   },
 
   async publicSave(req: Request, res: Response) {

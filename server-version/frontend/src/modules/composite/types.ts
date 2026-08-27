@@ -61,7 +61,7 @@ export interface CompositeCurrentItem {
   type: CompositeItemType
   position: number
   required: boolean
-  form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null }
+  form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
   scale?: CompositeScale
   scaleAssessmentId?: string
   answers?: Array<{ itemCode: string; responseValue: CompositeScaleResponseValue; responseTimeMs?: number; changeCount?: number }>
@@ -84,6 +84,7 @@ export interface CompositeAttemptState {
   anonymousCode: string | null
   items: CompositeItemSummary[]
   currentItem: CompositeCurrentItem | null
+  context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
 }
 
 export interface CompositePublicInfo {

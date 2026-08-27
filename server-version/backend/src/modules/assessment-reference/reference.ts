@@ -1,12 +1,24 @@
 import type { ScaleReferencePolicy } from '../scale/scale-definition'
 import type { ScaleScoreValue } from '../scale/scale-scoring'
+import type { AssessmentContextValues } from '../assessment-context'
 
 export type ReferenceEvidenceLevel = 'none' | 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm'
 export type ReferenceKind = 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample'
 export type ReferenceProvenance = 'literature_reported' | 'literature_derived_estimate' | 'local_observed'
 
+export interface ReferencePopulationMatch {
+  minAgeMonthsInclusive?: number
+  maxAgeMonthsExclusive?: number
+  sexAtBirth?: Array<'female' | 'male' | 'intersex'>
+  gradeLevels?: string[]
+  primaryLanguages?: string[]
+  countriesOrRegions?: string[]
+}
+
 export interface ReferencePopulation {
   description?: string
+  match?: ReferencePopulationMatch
+  /** Deprecated display/matching fields retained for existing local fixtures. */
   ageBand?: string | null
   sexScope?: string | null
   language?: string | null
@@ -78,6 +90,32 @@ export interface ReferenceDefinitionIssue {
   severity: 'error' | 'warning'
 }
 
+const constrainedValuesOverlap = (left?: string[] | null, right?: string[] | null): boolean => {
+  if (!left || left.length === 0 || !right || right.length === 0) return true
+  return left.some((value) => right.includes(value))
+}
+
+const ageRangesOverlap = (left?: ReferencePopulationMatch, right?: ReferencePopulationMatch): boolean => {
+  const min = Math.max(left?.minAgeMonthsInclusive ?? -Infinity, right?.minAgeMonthsInclusive ?? -Infinity)
+  const max = Math.min(left?.maxAgeMonthsExclusive ?? Infinity, right?.maxAgeMonthsExclusive ?? Infinity)
+  return min < max
+}
+
+const populationsOverlap = (left: ReferencePopulation, right: ReferencePopulation): boolean => {
+  const leftMatch = left.match
+  const rightMatch = right.match
+  if (!ageRangesOverlap(leftMatch, rightMatch)) return false
+  if (!constrainedValuesOverlap(leftMatch?.sexAtBirth, rightMatch?.sexAtBirth)) return false
+  if (!constrainedValuesOverlap(leftMatch?.gradeLevels, rightMatch?.gradeLevels)) return false
+  if (!constrainedValuesOverlap(leftMatch?.primaryLanguages, rightMatch?.primaryLanguages)) return false
+  if (!constrainedValuesOverlap(leftMatch?.countriesOrRegions, rightMatch?.countriesOrRegions)) return false
+  if (left.sexScope != null && right.sexScope != null && left.sexScope !== right.sexScope) return false
+  if (left.language != null && right.language != null && left.language !== right.language) return false
+  if (left.countryOrRegion != null && right.countryOrRegion != null && left.countryOrRegion !== right.countryOrRegion) return false
+  if (left.ageBand != null && right.ageBand != null && left.ageBand !== right.ageBand) return false
+  return true
+}
+
 export const validateReferenceSetDefinition = (
   input: unknown,
 ): { definition?: AssessmentReferenceSetDefinition; issues: ReferenceDefinitionIssue[] } => {
@@ -92,6 +130,7 @@ export const validateReferenceSetDefinition = (
   if (!Array.isArray(value.entries) || value.entries.length === 0) issues.push({ path: 'entries', message: '至少需要一条 reference entry', severity: 'error' })
   const entries = Array.isArray(value.entries) ? value.entries : []
   const seen = new Set<string>()
+  const entriesByScoreAndKind = new Map<string, Array<{ index: number; population: ReferencePopulation }>>()
   entries.forEach((entry, index) => {
     const path = `entries.${index}`
     if (!entry || typeof entry !== 'object') {
@@ -99,9 +138,25 @@ export const validateReferenceSetDefinition = (
       return
     }
     const candidate = entry as Partial<AssessmentReferenceEntry>
-    const uniqueKey = `${candidate.scoreKey}:${candidate.referenceKind}`
+    const population = candidate.population as ReferencePopulation | undefined
+    const uniqueKey = `${candidate.scoreKey}:${candidate.referenceKind}:${JSON.stringify(population?.match ?? population ?? {})}`
     if (seen.has(uniqueKey)) issues.push({ path, message: '同一 reference set 中 scoreKey/referenceKind 不能重复', severity: 'error' })
     seen.add(uniqueKey)
+    if (typeof candidate.scoreKey === 'string' && typeof candidate.referenceKind === 'string' && population && typeof population === 'object') {
+      const groupKey = `${candidate.scoreKey}:${candidate.referenceKind}`
+      const previous = entriesByScoreAndKind.get(groupKey) ?? []
+      previous.forEach((prior) => {
+        if (populationsOverlap(prior.population, population)) {
+          issues.push({
+            path: `${path}.population`,
+            message: `与 entries.${prior.index} 的 population.match 重叠；同一 score/reference kind 必须使用互不重叠的人群范围`,
+            severity: 'error',
+          })
+        }
+      })
+      previous.push({ index, population })
+      entriesByScoreAndKind.set(groupKey, previous)
+    }
     if (typeof candidate.scoreKey !== 'string' || candidate.scoreKey.length === 0) issues.push({ path: `${path}.scoreKey`, message: 'scoreKey 不能为空', severity: 'error' })
     if (!['normative_distribution', 'criterion_threshold', 'descriptive_sample'].includes(candidate.referenceKind ?? '')) issues.push({ path: `${path}.referenceKind`, message: 'referenceKind 不合法', severity: 'error' })
     if (!['literature_beta', 'local_pilot', 'local_norm', 'validated_norm'].includes(candidate.evidenceLevel ?? '')) issues.push({ path: `${path}.evidenceLevel`, message: 'evidenceLevel 不合法', severity: 'error' })
@@ -118,13 +173,39 @@ export const validateReferenceSetDefinition = (
     if (!candidate.population || typeof candidate.population !== 'object') {
       issues.push({ path: `${path}.population`, message: '必须提供 population 描述', severity: 'error' })
     } else {
-      const population = candidate.population
+      const population = candidate.population as ReferencePopulation
       ;(['description', 'ageBand', 'sexScope', 'language', 'countryOrRegion'] as const).forEach((field) => {
         const fieldValue = population[field]
         if (fieldValue !== undefined && fieldValue !== null && typeof fieldValue !== 'string') {
           issues.push({ path: `${path}.population.${field}`, message: `${field} 必须是字符串或 null`, severity: 'error' })
         }
       })
+      if (population.match !== undefined) {
+        if (!population.match || typeof population.match !== 'object' || Array.isArray(population.match)) {
+          issues.push({ path: `${path}.population.match`, message: 'population.match 必须是对象', severity: 'error' })
+        } else {
+          const match = population.match
+          if (match.minAgeMonthsInclusive !== undefined && (!Number.isInteger(match.minAgeMonthsInclusive) || match.minAgeMonthsInclusive < 0)) {
+            issues.push({ path: `${path}.population.match.minAgeMonthsInclusive`, message: '年龄下界必须是非负整数月数', severity: 'error' })
+          }
+          if (match.maxAgeMonthsExclusive !== undefined && (!Number.isInteger(match.maxAgeMonthsExclusive) || match.maxAgeMonthsExclusive <= 0)) {
+            issues.push({ path: `${path}.population.match.maxAgeMonthsExclusive`, message: '年龄上界必须是正整数月数', severity: 'error' })
+          }
+          if (match.minAgeMonthsInclusive !== undefined && match.maxAgeMonthsExclusive !== undefined && match.minAgeMonthsInclusive >= match.maxAgeMonthsExclusive) {
+            issues.push({ path: `${path}.population.match`, message: '年龄下界必须小于不含上界', severity: 'error' })
+          }
+          ;(['sexAtBirth', 'gradeLevels', 'primaryLanguages', 'countriesOrRegions'] as const).forEach((field) => {
+            const values = match[field]
+            if (values !== undefined && (!Array.isArray(values) || values.length === 0 || values.some((value) => typeof value !== 'string' || value.length === 0))) {
+              issues.push({ path: `${path}.population.match.${field}`, message: `${field} 必须是非空字符串数组`, severity: 'error' })
+            }
+          })
+          const sexValues = match.sexAtBirth ?? []
+          if (sexValues.some((value) => !['female', 'male', 'intersex'].includes(value))) {
+            issues.push({ path: `${path}.population.match.sexAtBirth`, message: 'sexAtBirth 匹配值不合法', severity: 'error' })
+          }
+        }
+      }
     }
     const statistics = candidate.statistics
     if (!statistics || typeof statistics !== 'object') issues.push({ path: `${path}.statistics`, message: '必须提供 statistics', severity: 'error' })
@@ -210,10 +291,17 @@ const validatePercentiles = (
 }
 
 export interface ReferenceContext {
+  birthYearMonth?: AssessmentContextValues['birthYearMonth']
+  ageMonthsAtFreeze?: AssessmentContextValues['ageMonthsAtFreeze']
+  ageYearsAtFreeze?: AssessmentContextValues['ageYearsAtFreeze']
+  sexAtBirth?: AssessmentContextValues['sexAtBirth']
+  gradeLevel?: AssessmentContextValues['gradeLevel']
+  primaryLanguage?: AssessmentContextValues['primaryLanguage']
+  countryOrRegion?: string | null
+  /** Deprecated fixture fields. New callers should use AssessmentContextV1 values. */
   ageBand?: string | null
   sexScope?: string | null
   language?: string | null
-  countryOrRegion?: string | null
 }
 
 export interface ResolvedScaleReference {
@@ -222,7 +310,7 @@ export interface ResolvedScaleReference {
   referenceKind: ReferenceKind
   evidenceLevel: Exclude<ReferenceEvidenceLevel, 'none'> | null
   status: 'available' | 'unavailable'
-  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'insufficient_data'
+  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data'
   label: string
   value: number | null
   mean: number | null
@@ -300,12 +388,49 @@ const percentileFromTable = (
   return null
 }
 
-const matchesContext = (population: ReferencePopulation, context: ReferenceContext): boolean => (
-  (population.ageBand == null || population.ageBand === context.ageBand) &&
-  (population.sexScope == null || population.sexScope === context.sexScope) &&
-  (population.language == null || population.language === context.language) &&
-  (population.countryOrRegion == null || population.countryOrRegion === context.countryOrRegion)
-)
+const contextValueMissing = (value: unknown): boolean => value === undefined || value === null || value === '' || value === 'not_disclosed'
+
+const populationRequiredKeys = (population: ReferencePopulation): string[] => {
+  const match = population.match
+  const keys: string[] = []
+  if (match?.minAgeMonthsInclusive !== undefined || match?.maxAgeMonthsExclusive !== undefined || population.ageBand != null) keys.push('age')
+  if ((match?.sexAtBirth?.length ?? 0) > 0 || population.sexScope != null) keys.push('sexAtBirth')
+  if ((match?.gradeLevels?.length ?? 0) > 0) keys.push('gradeLevel')
+  if ((match?.primaryLanguages?.length ?? 0) > 0 || population.language != null) keys.push('primaryLanguage')
+  if ((match?.countriesOrRegions?.length ?? 0) > 0 || population.countryOrRegion != null) keys.push('countryOrRegion')
+  return keys
+}
+
+const missingPopulationContext = (population: ReferencePopulation, context: ReferenceContext): boolean => {
+  const keys = populationRequiredKeys(population)
+  return keys.some((key) => {
+    if (key === 'age') return contextValueMissing(context.ageMonthsAtFreeze) && contextValueMissing(context.ageBand)
+    if (key === 'sexAtBirth') return contextValueMissing(context.sexAtBirth) && contextValueMissing(context.sexScope)
+    if (key === 'gradeLevel') return contextValueMissing(context.gradeLevel)
+    if (key === 'primaryLanguage') return contextValueMissing(context.primaryLanguage) && contextValueMissing(context.language)
+    return contextValueMissing(context.countryOrRegion)
+  })
+}
+
+const matchesContext = (population: ReferencePopulation, context: ReferenceContext): boolean => {
+  const match = population.match
+  const ageMatches = match?.minAgeMonthsInclusive === undefined || (typeof context.ageMonthsAtFreeze === 'number' && context.ageMonthsAtFreeze >= match.minAgeMonthsInclusive)
+  const ageUpperMatches = match?.maxAgeMonthsExclusive === undefined || (typeof context.ageMonthsAtFreeze === 'number' && context.ageMonthsAtFreeze < match.maxAgeMonthsExclusive)
+  const sexMatches = !match?.sexAtBirth || match.sexAtBirth.includes(context.sexAtBirth as 'female' | 'male' | 'intersex')
+  const gradeMatches = !match?.gradeLevels || match.gradeLevels.includes(context.gradeLevel ?? '')
+  const languageMatches = !match?.primaryLanguages || match.primaryLanguages.includes(context.primaryLanguage ?? '')
+  const countryMatches = !match?.countriesOrRegions || match.countriesOrRegions.includes(context.countryOrRegion ?? '')
+  return ageMatches
+    && ageUpperMatches
+    && sexMatches
+    && gradeMatches
+    && languageMatches
+    && countryMatches
+    && (population.ageBand == null || population.ageBand === context.ageBand)
+    && (population.sexScope == null || population.sexScope === context.sexScope)
+    && (population.language == null || population.language === context.language || population.language === context.primaryLanguage)
+    && (population.countryOrRegion == null || population.countryOrRegion === context.countryOrRegion)
+}
 
 const criterionBandFor = (value: number, thresholds: ReferenceThreshold[]): ResolvedScaleReference['criterionBand'] => {
   const threshold = thresholds.find((candidate) => (
@@ -343,10 +468,19 @@ export const resolveScaleReference = (input: {
       const set = input.references.find((candidate) => candidate.instrumentType === 'scale' && candidate.instrumentKey === input.instrumentKey && candidate.referenceVersion === selection.referenceVersion)
       if (!set) return unavailable(selection, 'not_found')
       if (set.status !== 'ACTIVE') return unavailable(selection, 'inactive', '该 reference 尚未激活，不用于结果解释。')
-      const entry = set.entries.find((candidate) => candidate.scoreKey === selection.scoreKey && candidate.referenceKind === selection.referenceKind)
-      if (!entry) return unavailable(selection, 'not_found')
-      if (entry.instrumentVersion !== input.instrumentVersion || entry.scoringVersion !== input.scoringVersion) return unavailable(selection, 'version_mismatch', 'reference 与本次量表版本或计分版本不匹配。')
-      if (!matchesContext(entry.population, context)) return unavailable(selection, 'missing_context', '该 reference 需要年龄、性别、语言或地区上下文；本次测评未提供匹配上下文。')
+      const entries = set.entries.filter((candidate) => candidate.scoreKey === selection.scoreKey && candidate.referenceKind === selection.referenceKind)
+      if (entries.length === 0) return unavailable(selection, 'not_found')
+      const versionEntries = entries.filter((candidate) => candidate.instrumentVersion === input.instrumentVersion && candidate.scoringVersion === input.scoringVersion)
+      if (versionEntries.length === 0) return unavailable(selection, 'version_mismatch', 'reference 与本次量表版本或计分版本不匹配。')
+      const missingContext = versionEntries.some((candidate) => missingPopulationContext(candidate.population, context))
+      const matches = versionEntries.filter((candidate) => !missingPopulationContext(candidate.population, context) && matchesContext(candidate.population, context))
+      if (matches.length === 0) {
+        return unavailable(selection, missingContext ? 'missing_context' : 'no_population_match', missingContext
+          ? '该 reference 需要年龄、性别、语言或地区上下文；本次测评未提供匹配上下文。'
+          : '本次测评上下文不属于该 reference 的样本范围。')
+      }
+      if (matches.length > 1) return unavailable(selection, 'ambiguous_population', 'reference 定义存在重叠的人群范围，未自动选择。')
+      const entry = matches[0]
       if (input.score.value === null || input.score.status === 'not_calculable') return unavailable(selection, 'insufficient_data', '分数不可计算，因此隐藏 reference。')
 
       const value = input.score.value

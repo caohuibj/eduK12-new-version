@@ -21,6 +21,7 @@ describe('ScaleUnitReportCard PR6A null/zero and caveat contract', () => {
           reportVersion: '2.0.0',
           definitionHash: 'hash-1',
           referenceVersions: [],
+          assessmentContext: null,
         },
         quality: { status: 'interpretable', flags: [] },
         itemScores: [],
@@ -48,6 +49,7 @@ describe('ScaleUnitReportCard PR6A null/zero and caveat contract', () => {
         reportVersion: '2.0.0',
         definitionHash: 'hash-1',
         referenceVersions: [],
+        assessmentContext: null,
       },
     }} />)
 

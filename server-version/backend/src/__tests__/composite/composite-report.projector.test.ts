@@ -14,6 +14,7 @@ const scaleResult = {
     reportVersion: '2.0.0',
     definitionHash: 'h'.repeat(64),
     referenceVersions: [],
+    assessmentContext: null,
   },
   quality: { status: 'interpretable' as const, flags: [] },
   itemScores: [],

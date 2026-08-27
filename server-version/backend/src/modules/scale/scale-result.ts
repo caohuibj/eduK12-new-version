@@ -31,6 +31,10 @@ export interface ScaleResultV2 {
     reportVersion: string
     definitionHash: string
     referenceVersions: string[]
+    assessmentContext: {
+      schemaVersion: 1
+      snapshotHash: string
+    } | null
   }
   quality: ScaleScoringOutput['quality']
   itemScores: ScaleScoringOutput['itemScores']
@@ -130,6 +134,7 @@ export const buildScaleResult = (input: {
   answers: ScaleAnswer[]
   referenceSets?: AssessmentReferenceSetDefinition[]
   participantContext?: ReferenceContext
+  participantContextHash?: string | null
 }): ScaleResultV2 => {
   const scoring = scoreScale(input.definition, input.answers)
   const references = scoring.quality.status === 'invalid'
@@ -169,6 +174,9 @@ export const buildScaleResult = (input: {
       reportVersion: input.definition.report.reportVersion,
       definitionHash: hashScaleDefinition(input.definition),
       referenceVersions,
+      assessmentContext: input.participantContextHash
+        ? { schemaVersion: 1, snapshotHash: input.participantContextHash }
+        : null,
     },
     quality: scoring.quality,
     itemScores: scoring.itemScores,

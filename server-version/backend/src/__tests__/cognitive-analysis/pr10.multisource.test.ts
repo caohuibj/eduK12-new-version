@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
 
-import { encryptField } from '../../utils/encryption'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { freezeAssignmentProfile } from '../../modules/cognitive/profile-freeze'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
@@ -18,6 +17,7 @@ import {
   buildPackageAnalysisInputFingerprint,
   type PackageAnalysisAttemptInput,
 } from '../../modules/composite/composite-analysis-snapshot.service'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 
 const makeAttempt = (): PackageAnalysisAttemptInput => {
   const packageDefinition = getReportPackageDefinition('inhibitory_control_multisource_v1', '1.0.0')
@@ -74,6 +74,9 @@ const makeAttempt = (): PackageAnalysisAttemptInput => {
         description: 'draft fixture',
         status: 'PUBLISHED',
         visibility: 'HIDDEN',
+        instrumentClass: 'STANDARD',
+        instrumentVersion: '2.0.0',
+        definition: structuredClone(ADEXI_V2_DEFINITION),
         config: { respondentType: 'participant_self_report' },
         estimatedTime: 5,
         instruction: 'self report',
@@ -137,7 +140,11 @@ const makeAttempt = (): PackageAnalysisAttemptInput => {
       compositeItemId: 'item-adexi',
       scaleId: 'scale-adexi',
       status: 'COMPLETED',
-      scores: encryptField([{ dimensionId: 'dimension-inhibition', dimensionCode: 'inhibition', rawScore: 17 }]),
+      result: {
+        schemaVersion: 2,
+        scores: [{ key: 'inhibition', value: 17 }],
+        method: { assessmentContext: null },
+      },
       completedAt: new Date('2026-08-25T00:00:00Z'),
     }],
   }
@@ -196,8 +203,9 @@ describe('PR10 multi-source package analysis', () => {
     const firstAttempt = makeAttempt()
     const secondAttempt = makeAttempt()
     const secondScale = secondAttempt.compositeAssessment.items[1]?.scale
-    if (!secondScale?.items?.[0]) throw new Error('missing scale definition fixture')
-    secondScale.items[0].content = 'changed draft item'
+    const secondScaleDefinition = secondScale?.definition as typeof ADEXI_V2_DEFINITION | undefined
+    if (!secondScaleDefinition?.items?.[0]) throw new Error('missing scale definition fixture')
+    secondScaleDefinition.items[0].content = 'changed draft item'
 
     const definition = getReportPackageDefinition('inhibitory_control_multisource_v1', '1.0.0')
     const protocol = definition && getAnalysisProtocolDefinition(definition.key, definition.version)

@@ -14,6 +14,7 @@ describe('standalone ScaleResult unit-report adapter', () => {
         reportVersion: '2.0.0',
         definitionHash: 'hash-1',
         referenceVersions: [],
+        assessmentContext: null,
       },
       quality: { status: 'interpretable', flags: [] },
       itemScores: [],

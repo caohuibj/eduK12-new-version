@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+
 const { mockPrisma, mockCache } = vi.hoisted(() => ({
   mockPrisma: {
     questionnaireAssessment: {
@@ -37,6 +39,7 @@ const v2ScaleResult = {
     reportVersion: '2.0.0',
     definitionHash: 'h'.repeat(64),
     referenceVersions: [],
+    assessmentContext: null,
   },
   quality: { status: 'interpretable' as const, flags: [] },
   itemScores: [],

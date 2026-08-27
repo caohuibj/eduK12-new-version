@@ -32,12 +32,13 @@ interface Scale {
 // 表单题目类型
 interface FormItem {
   id: string
-  type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input'
+  type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input' | 'year_month'
   label: string
   placeholder: string | null
   required: boolean
   position: number
   options: Array<{ value: string; label: string }> | null
+  contextKey?: string | null
 }
 
 // 内容项类型
@@ -55,6 +56,7 @@ interface QuestionnaireAssessmentData {
     status: string
     progress: number
     currentIndex: number
+    context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
   }
   currentFormItem: FormItem | null
   currentScale: (Scale & { scaleAssessmentId: string }) | null
@@ -74,6 +76,12 @@ const QuestionnaireAssessment: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const [formAnswer, setFormAnswer] = useState<string | string[]>('')
   const [submitting, setSubmitting] = useState(false)
+
+  const freezeContextBeforeScale = async (assessmentId: string) => {
+    const response = await apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/questionnaires/assessments/${assessmentId}/context/freeze`)
+    if (response.code !== 0 || !response.data) throw new Error(response.message || '人口学上下文冻结失败')
+    return response.data
+  }
   
   // 记录当前题目开始显示的时间
   const itemStartTimeRef = useRef<number>(Date.now())
@@ -119,15 +127,26 @@ const QuestionnaireAssessment: React.FC = () => {
           return
         }
 
-        setData(response.data)
+        let nextData = response.data
+        if (response.data.currentScale?.scaleAssessmentId) {
+          const frozen = await freezeContextBeforeScale(response.data.questionnaireAssessment.id)
+          nextData = {
+            ...response.data,
+            questionnaireAssessment: {
+              ...response.data.questionnaireAssessment,
+              context: { status: 'frozen', frozenAt: frozen.frozenAt },
+            },
+          }
+        }
+        setData(nextData)
         
         // 根据当前项类型处理
-        if (response.data.currentFormItem) {
+        if (nextData.currentFormItem) {
           // 当前是表单题目
           setFormAnswer('')
-        } else if (response.data.currentScale?.scaleAssessmentId) {
+        } else if (nextData.currentScale?.scaleAssessmentId) {
           // 当前是量表
-          fetchExistingAnswers(response.data.currentScale.scaleAssessmentId)
+          fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
         }
       }
     } catch (err) {
@@ -280,17 +299,28 @@ const QuestionnaireAssessment: React.FC = () => {
         navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)
       } else {
         // 切换到下一项
-        setData(statusResponse.data)
+        let nextData = statusResponse.data
+        if (statusResponse.data.currentScale?.scaleAssessmentId) {
+          const frozen = await freezeContextBeforeScale(data.questionnaireAssessment.id)
+          nextData = {
+            ...statusResponse.data,
+            questionnaireAssessment: {
+              ...statusResponse.data.questionnaireAssessment,
+              context: { status: 'frozen', frozenAt: frozen.frozenAt },
+            },
+          }
+        }
+        setData(nextData)
         setScaleIndex(0)
         setAnswers({})
         setFormAnswer('')
         
-        if (statusResponse.data.currentFormItem) {
+        if (nextData.currentFormItem) {
           // 下一项是表单题目
           setFormAnswer('')
-        } else if (statusResponse.data.currentScale?.scaleAssessmentId) {
+        } else if (nextData.currentScale?.scaleAssessmentId) {
           // 下一项是量表
-          fetchExistingAnswers(statusResponse.data.currentScale.scaleAssessmentId)
+          fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
         }
       }
     }
@@ -349,7 +379,8 @@ const QuestionnaireAssessment: React.FC = () => {
               【{formItem.type === 'fill_blank' ? '填空' : 
                   formItem.type === 'single_choice' ? '单选' : 
                   formItem.type === 'multiple_choice' ? '多选' : 
-                  formItem.type === 'text_input' ? '长文本' : '未知'}】
+                  formItem.type === 'text_input' ? '长文本' :
+                  formItem.type === 'year_month' ? '年月' : '未知'}】
             </span>
           </h2>
 
@@ -371,6 +402,19 @@ const QuestionnaireAssessment: React.FC = () => {
               rows={5}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
             />
+          )}
+
+          {formItem.type === 'year_month' && (
+            <input
+              type="month"
+              value={typeof formAnswer === 'string' ? formAnswer : ''}
+              onChange={(e) => setFormAnswer(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
+            />
+          )}
+
+          {formItem.contextKey && (
+            <p className="text-sm text-gray-500 mt-3">此字段用于本次问卷的测评参考；进入量表后将冻结，并由同一问卷中的后续量表共享。</p>
           )}
 
           {formItem.type === 'single_choice' && (

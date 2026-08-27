@@ -57,6 +57,7 @@ const makeScaleResult = (input: {
     reportVersion: '2.0.0',
     definitionHash: 'h'.repeat(64),
     referenceVersions: [],
+    assessmentContext: null,
   },
   quality: {
     status: input.value === null ? 'invalid' as const : 'interpretable' as const,

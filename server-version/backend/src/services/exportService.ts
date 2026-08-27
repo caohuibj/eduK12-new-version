@@ -538,6 +538,7 @@ async function getQuestionnaireExportDataV2(
   fields.push(
     { name: 'U_time', label: '完成用时(秒)', type: 'numeric', width: 6 },
     { name: 'U_date', label: '完成日期', type: 'string', width: 10 },
+    { name: 'CONTEXT_SNAPSHOT_HASH', label: '测评上下文快照哈希', type: 'string', width: 64 },
   )
 
   const formFieldMap = new Map<string, string>()
@@ -564,6 +565,7 @@ async function getQuestionnaireExportDataV2(
     reportVersionField: string
     definitionHashField: string
     referenceVersionsField: string
+    contextSnapshotHashField: string
   }
 
   const scaleMaps: ScaleMap[] = []
@@ -602,6 +604,7 @@ async function getQuestionnaireExportDataV2(
       reportVersionField: `${prefix}REPORT_VERSION`,
       definitionHashField: `${prefix}DEFINITION_HASH`,
       referenceVersionsField: `${prefix}REFERENCE_VERSIONS`,
+      contextSnapshotHashField: `${prefix}CONTEXT_SNAPSHOT_HASH`,
     }
     fields.push(
       { name: metadataFields.qualityStatusField, label: `[${scale.name}] 质量状态`, type: 'string', width: 16 },
@@ -611,6 +614,7 @@ async function getQuestionnaireExportDataV2(
       { name: metadataFields.reportVersionField, label: `[${scale.name}] 报告版本`, type: 'string', width: 16 },
       { name: metadataFields.definitionHashField, label: `[${scale.name}] 定义哈希`, type: 'string', width: 64 },
       { name: metadataFields.referenceVersionsField, label: `[${scale.name}] 使用的参考版本`, type: 'string', width: 32 },
+      { name: metadataFields.contextSnapshotHashField, label: `[${scale.name}] 测评上下文快照哈希`, type: 'string', width: 64 },
     )
     scaleMaps.push({ scaleId: scale.id, items, scores, responseFields, itemScoreFields, responseTimeFields, scoreFields, ...metadataFields })
   }
@@ -621,6 +625,7 @@ async function getQuestionnaireExportDataV2(
       U_id: assessment.userId ? (anonymize ? `U${assessment.userId.substring(0, 8)}` : assessment.userId) : 'ANONYMOUS',
       U_time: assessment.totalTime == null ? null : Math.round(assessment.totalTime / 1000),
       U_date: assessment.completedAt ? assessment.completedAt.toISOString().split('T')[0] : null,
+      CONTEXT_SNAPSHOT_HASH: assessment.contextSnapshotHash ?? null,
     }
     if (!anonymize) row.U_name = assessment.user?.nickname || assessment.user?.username || null
     const formAnswerMap = new Map(assessment.formAnswers.map((answer) => [answer.formItemId, answer.value]))
@@ -654,6 +659,7 @@ async function getQuestionnaireExportDataV2(
       row[scaleMap.reportVersionField] = result.result?.method.reportVersion ?? null
       row[scaleMap.definitionHashField] = result.result?.method.definitionHash ?? null
       row[scaleMap.referenceVersionsField] = result.result?.method.referenceVersions.join('|') ?? null
+      row[scaleMap.contextSnapshotHashField] = result.result?.method.assessmentContext?.snapshotHash ?? assessment.contextSnapshotHash ?? null
     })
     rows.push(row)
   }

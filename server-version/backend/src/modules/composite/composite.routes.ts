@@ -8,6 +8,7 @@ const router = Router()
 // 学生端（必须在 /:id 之前）
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getAttempt)
+router.post('/attempts/:attemptId/context/freeze', authenticate, requireRole(UserRole.STUDENT), compositeController.freezeContext)
 router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUDENT), compositeController.saveAttempt)
 router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), compositeController.saveScaleAnswer)
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), compositeController.completeScale)

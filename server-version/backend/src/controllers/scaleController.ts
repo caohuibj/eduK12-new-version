@@ -8,7 +8,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField } from '../utils/encryption'
-import { scaleSource, scaleWhereForViewer } from '../services/materialGrant'
+import { canUseScale, scaleSource, scaleWhereForViewer } from '../services/materialGrant'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import {
   createCustomScaleDefinition,
@@ -29,6 +29,7 @@ import {
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 
 // ==================== Validation Schemas ====================
 
@@ -367,8 +368,14 @@ export const scaleController = {
       }
 
       let runner = null
-      if (req.user?.role === UserRole.STUDENT && !(await canStudentAccessScale(scale, req.user.userId))) {
-        return notFound(res, '量表不存在')
+      if (req.user?.role === UserRole.ADMIN) {
+        // Administrators can inspect every scale for management and support.
+      } else if (req.user?.role === UserRole.TEACHER) {
+        if (!(await canUseScale(req.user.userId, req.user.role, scale))) return notFound(res, '量表不存在')
+      } else if (req.user?.role === UserRole.STUDENT) {
+        if (!(await canStudentAccessScale(scale, req.user.userId))) return notFound(res, '量表不存在')
+      } else {
+        return forbidden(res, '无权限查看此量表')
       }
       if (scale.definition) {
         try {
@@ -718,6 +725,9 @@ export const scaleController = {
         } catch (err) {
           return { kind: 'invalid-answer' as const, message: err instanceof Error ? err.message : '回答不合法' }
         }
+        const contextSnapshot = assessment.questionnaireAssessmentId
+          ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+          : null
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const answers = [...stored.answers]
@@ -743,6 +753,7 @@ export const scaleController = {
       return success(res, transactionResult.assessment, '答案已保存')
     } catch (err) {
       logger.error('提交 v2 量表答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, err instanceof Error ? err.message : '提交答案失败')
     }
   },
@@ -762,12 +773,20 @@ export const scaleController = {
           return { kind: 'completed' as const, assessment: scaleAssessmentForResponse(assessment) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+        const contextSnapshot = assessment.questionnaireAssessmentId
+          ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+          : null
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
         if (missingRequiredItems.length > 0) return { kind: 'missing-required' as const, count: missingRequiredItems.length }
-        const result = await buildScaleResultForRecord({ scale: assessment.scale, answers: stored.answers })
+        const result = await buildScaleResultForRecord({
+          scale: assessment.scale,
+          answers: stored.answers,
+          participantContext: contextSnapshot?.context.values,
+          participantContextHash: contextSnapshot?.hash,
+        })
         const completedAt = new Date()
         const totalTime = completedAt.getTime() - new Date(assessment.startedAt).getTime()
         const updated = await tx.assessment.updateMany({
@@ -800,6 +819,7 @@ export const scaleController = {
       return success(res, transactionResult.assessment, '测评已完成')
     } catch (err) {
       logger.error('完成 v2 量表测评错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, err instanceof Error ? err.message : '完成测评失败')
     }
   },

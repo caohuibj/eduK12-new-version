@@ -30,7 +30,7 @@ export interface ScaleReferenceValue {
   referenceKind: 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample'
   evidenceLevel: 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm' | null
   status: 'available' | 'unavailable'
-  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'insufficient_data'
+  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data'
   label: string
   value: number | null
   mean: number | null
@@ -49,6 +49,14 @@ export interface ScaleReferenceValue {
   } | null
   population: {
     description?: string
+    match?: {
+      minAgeMonthsInclusive?: number
+      maxAgeMonthsExclusive?: number
+      sexAtBirth?: Array<'female' | 'male' | 'intersex'>
+      gradeLevels?: string[]
+      primaryLanguages?: string[]
+      countriesOrRegions?: string[]
+    }
     ageBand?: string | null
     sexScope?: string | null
     language?: string | null
@@ -88,6 +96,10 @@ export interface ScaleResultV2 {
     reportVersion: string
     definitionHash: string
     referenceVersions: string[]
+    assessmentContext: {
+      schemaVersion: 1
+      snapshotHash: string
+    } | null
   }
   quality: {
     status: 'interpretable' | 'limited' | 'invalid'

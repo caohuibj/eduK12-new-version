@@ -186,6 +186,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   builder.add('A_assessment', '综合测评名称', 'string', 80)
   builder.add('A_date', '完成日期', 'date', 80)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 12)
+  builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
   formItems.forEach((item: any, index: number) => builder.add(`F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string', 80))
@@ -218,6 +219,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       builder.add(`${prefix}scoring_version`, `[${scaleLabel}] 计分版本`, 'string', 24)
       builder.add(`${prefix}definition_hash`, `[${scaleLabel}] 定义哈希`, 'string', 80)
       builder.add(`${prefix}reference_versions`, `[${scaleLabel}] 使用的参考版本`, 'string', 48)
+      builder.add(`${prefix}context_snapshot_hash`, `[${scaleLabel}] 测评上下文快照哈希`, 'string', 64)
     }
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
@@ -262,6 +264,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       A_assessment: template.name,
       A_date: attempt.completedAt?.toISOString() ?? null,
       A_duration_s: attempt.totalTime == null ? null : Math.round(attempt.totalTime / 1000),
+      A_context_snapshot_hash: attempt.contextSnapshotHash ?? null,
     }
     if (!anonymize) row.U_name = attempt.user?.nickname || attempt.user?.username || null
 
@@ -302,6 +305,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         row[`${prefix}scoring_version`] = scaleResult?.method?.scoringVersion ?? null
         row[`${prefix}definition_hash`] = scaleResult?.method?.definitionHash ?? null
         row[`${prefix}reference_versions`] = Array.isArray(scaleResult?.method?.referenceVersions) ? scaleResult.method.referenceVersions.join('|') : null
+        row[`${prefix}context_snapshot_hash`] = scaleResult?.method?.assessmentContext?.snapshotHash ?? attempt.contextSnapshotHash ?? null
         const scoreMap = new Map<string, any>((scaleResult?.scores || []).map((score: any) => [score.key, score]))
         v2Scores.forEach((score: any) => {
           const scoreLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${score.key} ${score.label}冻结得分`

@@ -61,15 +61,14 @@ const formOption = z.object({ value: z.string().min(1), label: z.string().min(1)
 export const addCompositeItemSchema = z.object({
   type: z.enum(['SCALE', 'COGNITIVE', 'FORM']),
   position: z.number().int().min(0).optional(),
-  // Optional Composite items are historical/read-only data until the product
-  // has an explicit PENDING/COMPLETED/SKIPPED execution contract.
-  required: z.literal(true).optional().default(true),
+  required: z.boolean().optional().default(true),
   scaleId: z.string().min(1).optional(),
   cognitiveAssignmentId: z.string().min(1).optional(),
-  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input']).optional(),
+  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month']).optional(),
   formLabel: z.string().min(1).max(500).optional(),
   formPlaceholder: z.string().nullable().optional(),
   formOptions: z.array(formOption).nullable().optional(),
+  contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
 }).strict().superRefine((input, ctx) => {
   if (input.type === 'FORM' && (!input.formType || !input.formLabel)) {
     ctx.addIssue({ code: 'custom', path: ['formLabel'], message: '表单模块必须提供 formType 和 formLabel' })
@@ -81,6 +80,12 @@ export const addCompositeItemSchema = z.object({
     } else if (new Set(values).size !== values.length) {
       ctx.addIssue({ code: 'custom', path: ['formOptions'], message: '表单选项不能重复' })
     }
+  }
+  if (input.type !== 'FORM' && input.contextKey !== undefined && input.contextKey !== null) {
+    ctx.addIssue({ code: 'custom', path: ['contextKey'], message: '只有表单模块可以绑定 contextKey' })
+  }
+  if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
+    ctx.addIssue({ code: 'custom', path: ['required'], message: '只有 context 表单可以设置为非必填' })
   }
 })
 

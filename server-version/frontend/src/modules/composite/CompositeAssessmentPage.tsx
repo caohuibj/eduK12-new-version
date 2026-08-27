@@ -41,6 +41,14 @@ const CompositeAssessmentPage: React.FC = () => {
     [publicMode, recoveryToken]
   )
 
+  const freezeBeforeMeasurement = async (next: CompositeAttemptState, credential = recoveryToken): Promise<CompositeAttemptState> => {
+    if (next.status === 'COMPLETED' || !next.currentItem || next.currentItem.type === 'FORM' || next.context?.status === 'frozen') return next
+    const client = publicMode ? publicCompositeApi(credential) : compositeApi
+    const frozen = await client.freezeContext(next.id)
+    if (frozen.code !== 0 || !frozen.data) throw new Error(frozen.message || '人口学上下文冻结失败')
+    return { ...next, context: { status: 'frozen', frozenAt: frozen.data.frozenAt } }
+  }
+
   const goReport = (id: string) => {
     navigate(publicMode ? `/public/composite/attempts/${id}/report` : `/student/composite/attempts/${id}/report`)
   }
@@ -72,7 +80,7 @@ const CompositeAssessmentPage: React.FC = () => {
       const response = await (publicMode ? publicCompositeApi(credential).getAttempt(id) : compositeApi.getAttempt(id))
       if (response.code !== 0 || !response.data) throw new Error(response.message || '综合测评记录不存在')
       if (publicMode) store(attemptKey(id), credential)
-      applyState(response.data)
+      applyState(await freezeBeforeMeasurement(response.data, credential))
     } catch (err) {
       setError((err as { message?: string }).message || '加载综合测评失败')
     } finally {
@@ -95,13 +103,13 @@ const CompositeAssessmentPage: React.FC = () => {
           store(attemptKey(response.data.attempt.id), returnedCredential)
         }
         if (response.data.attempt.status === 'COMPLETED') goReport(response.data.attempt.id)
-        else applyState(response.data.attempt)
+        else applyState(await freezeBeforeMeasurement(response.data.attempt, returnedCredential))
         if (response.data.recoveryToken) setNewRecoveryToken(response.data.recoveryToken)
       } else {
         const response = await compositeApi.start(params.assessmentId || '')
         if (response.code !== 0 || !response.data) throw new Error(response.message || '无法开始综合测评')
         if (response.data.attempt.status === 'COMPLETED') goReport(response.data.attempt.id)
-        else applyState(response.data.attempt)
+        else applyState(await freezeBeforeMeasurement(response.data.attempt))
       }
     } catch (err) {
       setError((err as { message?: string }).message || '无法开始综合测评')
@@ -185,7 +193,7 @@ const CompositeAssessmentPage: React.FC = () => {
       setSubmitting(true)
       const response = await api.completeScale(state.id, state.currentItem.id)
       if (response.code !== 0 || !response.data) throw new Error(response.message || '量表提交失败')
-      applyState(response.data)
+      applyState(await freezeBeforeMeasurement(response.data))
     } catch (err) {
       setError((err as { message?: string }).message || '量表提交失败')
     } finally {
@@ -199,7 +207,9 @@ const CompositeAssessmentPage: React.FC = () => {
       setSubmitting(true)
       const response = await api.formAnswer(state.id, state.currentItem.id, formValue)
       if (response.code !== 0 || !response.data) throw new Error(response.message || '表单提交失败')
-      applyState(response.data)
+      // Context is owned by the parent attempt. Freeze it once the next
+      // module begins, so all later scale/cognitive modules share one snapshot.
+      applyState(await freezeBeforeMeasurement(response.data))
     } catch (err) {
       setError((err as { message?: string }).message || '表单提交失败')
     } finally {
@@ -273,7 +283,14 @@ const CompositeAssessmentPage: React.FC = () => {
 
       {current?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{state.items[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">完成该认知任务后会自动回到综合测评。</p><button onClick={() => enterCognitive(current)} className="btn-primary">开始/继续认知任务</button></div>}
 
-      {current?.type === 'FORM' && current.form && <div className="card p-8"><h2 className="text-xl font-semibold mb-6">{current.form.label}{current.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h2>{current.form.type === 'single_choice' ? <div className="space-y-2">{(current.form.options || []).map((option) => <button key={option.value} onClick={() => setFormValue(option.value)} className={`block w-full text-left border rounded px-4 py-3 ${formValue === option.value ? 'border-primary bg-primary/5' : ''}`}>{option.label}</button>)}</div> : current.form.type === 'multiple_choice' ? <div className="space-y-2">{(current.form.options || []).map((option) => { const selected = formValue.split(',').filter(Boolean).includes(option.value); return <button key={option.value} onClick={() => setFormValue((old) => { const values = old.split(',').filter(Boolean); return selected ? values.filter((value) => value !== option.value).join(',') : [...values, option.value].join(',') })} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5' : ''}`}>{option.label}</button> })}</div> : <textarea value={formValue} onChange={(event) => setFormValue(event.target.value)} placeholder={current.form.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}<button onClick={() => void submitForm()} disabled={submitting} className="btn-primary mt-6">保存并进入下一项</button></div>}
+      {current?.type === 'FORM' && current.form && <div className="card p-8">
+        <h2 className="text-xl font-semibold mb-6">
+          {current.form.label}{current.required && <span className="text-red-500 text-sm ml-2">必填</span>}
+        </h2>
+        {current.form.contextKey && <p className="text-sm text-gray-500 mb-4">此字段用于本次测评的参考匹配；同一父级测评中的后续模块会复用这份信息。</p>}
+        {current.form.type === 'single_choice' ? <div className="space-y-2">{(current.form.options || []).map((option) => <button key={option.value} onClick={() => setFormValue(option.value)} className={`block w-full text-left border rounded px-4 py-3 ${formValue === option.value ? 'border-primary bg-primary/5' : ''}`}>{option.label}</button>)}</div> : current.form.type === 'multiple_choice' ? <div className="space-y-2">{(current.form.options || []).map((option) => { const selected = formValue.split(',').filter(Boolean).includes(option.value); return <button key={option.value} onClick={() => setFormValue((old) => { const values = old.split(',').filter(Boolean); return selected ? values.filter((value) => value !== option.value).join(',') : [...values, option.value].join(',') })} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5' : ''}`}>{option.label}</button> })}</div> : current.form.type === 'year_month' ? <input type="month" value={formValue} onChange={(event) => setFormValue(event.target.value)} className="w-full border rounded px-3 py-2" /> : <textarea value={formValue} onChange={(event) => setFormValue(event.target.value)} placeholder={current.form.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
+        <button onClick={() => void submitForm()} disabled={submitting} className="btn-primary mt-6">保存并进入下一项</button>
+      </div>}
 
       {current?.type === 'SCALE' && scale && scaleQuestion && <div className="card p-8"><p className="text-sm text-gray-500 mb-2">{scale.name} · 第 {scaleIndex + 1} / {scaleItems.length} 题</p><h2 className="text-xl font-semibold mb-6">{scaleQuestion.content}</h2><div className="space-y-2">{scaleQuestion.options.map((option) => <button key={`${typeof option.value}:${String(option.value)}`} onClick={() => void submitScaleAnswer(option.value)} className={`block w-full text-left border rounded px-4 py-3 ${scaleAnswers[scaleQuestion.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}><span>{option.label}</span></button>)}</div><div className="flex justify-between mt-6"><button onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button onClick={() => setScaleIndex((index) => Math.min(scaleItems.length - 1, index + 1))} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button onClick={() => void completeScale()} disabled={submitting} className="btn-primary">完成量表</button>}</div></div>}
 

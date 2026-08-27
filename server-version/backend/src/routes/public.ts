@@ -17,6 +17,7 @@ router.post('/questionnaires/:token/start', publicQuestionnaireController.startA
 
 // 测评管理
 router.get('/assessments/:sessionId', requireQuestionnaireResume, publicQuestionnaireController.getAssessment)
+router.post('/assessments/:sessionId/context/freeze', requireQuestionnaireResume, publicQuestionnaireController.freezeContext)
 router.get('/assessments/:sessionId/scale/:scaleAssessmentId', requireQuestionnaireResume, publicQuestionnaireController.getScaleAssessment)
 router.patch('/assessments/:sessionId/answers', requireQuestionnaireResume, publicQuestionnaireController.submitAnswer)
 router.post('/assessments/:sessionId/form-answer', requireQuestionnaireResume, publicQuestionnaireController.submitFormAnswer)

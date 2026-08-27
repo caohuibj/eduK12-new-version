@@ -66,6 +66,7 @@ const makeScaleResult = (input: {
     reportVersion: '2.0.0',
     definitionHash: 'h'.repeat(64),
     referenceVersions: [],
+    assessmentContext: null,
   },
   quality: {
     status: input.scores.every((score) => score.value !== null) ? 'interpretable' : 'invalid',

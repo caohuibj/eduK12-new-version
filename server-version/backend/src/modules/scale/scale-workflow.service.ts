@@ -90,7 +90,7 @@ const isScaleResultV2 = (value: unknown): value is ScaleResultV2 => {
   const quality = result.quality
   return result.schemaVersion === 2
     && Boolean(instrument && typeof instrument === 'object' && typeof instrument.scaleId === 'string' && typeof instrument.code === 'string' && typeof instrument.name === 'string' && typeof instrument.instrumentVersion === 'string')
-    && Boolean(method && typeof method === 'object' && typeof method.scaleId === 'string' && typeof method.instrumentVersion === 'string' && typeof method.scoringVersion === 'string' && typeof method.reportVersion === 'string' && typeof method.definitionHash === 'string' && Array.isArray(method.referenceVersions))
+    && Boolean(method && typeof method === 'object' && typeof method.scaleId === 'string' && typeof method.instrumentVersion === 'string' && typeof method.scoringVersion === 'string' && typeof method.reportVersion === 'string' && typeof method.definitionHash === 'string' && Array.isArray(method.referenceVersions) && (method.assessmentContext === null || (typeof method.assessmentContext === 'object' && method.assessmentContext !== null && method.assessmentContext.schemaVersion === 1 && typeof method.assessmentContext.snapshotHash === 'string')))
     && Boolean(quality && typeof quality === 'object' && (quality.status === 'interpretable' || quality.status === 'limited' || quality.status === 'invalid') && Array.isArray(quality.flags))
     && Array.isArray(result.itemScores)
     && Array.isArray(result.scores)
@@ -158,6 +158,7 @@ export const buildScaleResultForRecord = async (input: {
   }
   answers: ScaleAnswer[]
   participantContext?: ReferenceContext
+  participantContextHash?: string | null
 }): Promise<ScaleResultV2> => {
   const definition = scaleDefinitionFromRecord(input.scale)
   const referenceSets = await loadScaleReferenceSets(input.scale.code)
@@ -170,5 +171,6 @@ export const buildScaleResultForRecord = async (input: {
     answers: input.answers,
     referenceSets,
     participantContext: input.participantContext,
+    participantContextHash: input.participantContextHash,
   })
 }

@@ -4,16 +4,18 @@ import apiClient from '../api/client'
 import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3 } from 'lucide-react'
 import { ScaleSelector } from '../components/ScaleSelector'
 import type { Scale } from '../components/ScaleSelector/types'
+import { contextOptionsForKey, contextValueHint } from '../modules/assessment-context/options'
 
 // 表单题目类型
 interface FormItem {
   id: string
-  type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input'
+  type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input' | 'year_month'
   label: string
   placeholder: string | null
   required: boolean
   position: number
   options: Array<{ value: string; label: string }> | null
+  contextKey: string | null
   createdAt: string
   updatedAt: string
 }
@@ -100,17 +102,19 @@ const QuestionnaireEdit: React.FC = () => {
   const [showFormItemModal, setShowFormItemModal] = useState(false)
   const [editingFormItem, setEditingFormItem] = useState<FormItem | null>(null)
   const [formData, setFormData] = useState<{
-    type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input'
+    type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input' | 'year_month'
     label: string
     placeholder: string
     required: boolean
     options: Array<{ value: string; label: string }>
+    contextKey: string
   }>({
     type: 'fill_blank',
     label: '',
     placeholder: '',
     required: true,
     options: [],
+    contextKey: '',
   })
 
   useEffect(() => {
@@ -226,6 +230,7 @@ const QuestionnaireEdit: React.FC = () => {
       const dataToSend = {
         ...formData,
         options: ['single_choice', 'multiple_choice'].includes(formData.type) ? formData.options : null,
+        contextKey: formData.contextKey || null,
       }
       
       if (editingFormItem) {
@@ -285,6 +290,7 @@ const QuestionnaireEdit: React.FC = () => {
       placeholder: item.placeholder || '',
       required: item.required,
       options: item.options || [],
+      contextKey: item.contextKey || '',
     })
     setShowFormItemModal(true)
   }
@@ -298,6 +304,7 @@ const QuestionnaireEdit: React.FC = () => {
       placeholder: '',
       required: true,
       options: [],
+      contextKey: '',
     })
   }
 
@@ -432,6 +439,8 @@ const QuestionnaireEdit: React.FC = () => {
         return '多选题'
       case 'text_input':
         return '文本输入'
+      case 'year_month':
+        return '年月选择'
       default:
         return type
     }
@@ -660,6 +669,9 @@ const QuestionnaireEdit: React.FC = () => {
                           ({getTypeLabel((item.data as FormItem).type)})
                         </span>
                       )}
+                      {item.type === 'form' && (item.data as FormItem).contextKey && (
+                        <span className="text-xs text-amber-700">（用于测评参考）</span>
+                      )}
                       {item.type === 'scale' && (
                         <span className="text-xs text-gray-500">
                           ({scaleItemCount((item.data as QuestionnaireScale).scale)}题)
@@ -787,18 +799,63 @@ const QuestionnaireEdit: React.FC = () => {
                 </label>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    type: e.target.value as any,
-                    options: ['single_choice', 'multiple_choice'].includes(e.target.value) ? formData.options : []
-                  })}
+                  onChange={(e) => {
+                    const nextType = e.target.value as typeof formData.type
+                    const forcedType = formData.contextKey
+                      ? formData.contextKey === 'birthYearMonth' ? 'year_month' : 'single_choice'
+                      : nextType
+                    setFormData({
+                      ...formData,
+                      type: forcedType,
+                      options: ['single_choice', 'multiple_choice'].includes(forcedType) ? formData.options : [],
+                    })
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 >
                   <option value="fill_blank">填空题（短文本）</option>
                   <option value="single_choice">单选题</option>
                   <option value="multiple_choice">多选题</option>
                   <option value="text_input">文本输入（长文本）</option>
+                  <option value="year_month">年月选择</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  用于测评参考
+                </label>
+                <select
+                  value={formData.contextKey}
+                  onChange={(e) => {
+                    const contextKey = e.target.value
+                    const nextType = contextKey === 'birthYearMonth'
+                      ? 'year_month'
+                      : contextKey
+                        ? 'single_choice'
+                        : formData.type === 'year_month' ? 'fill_blank' : formData.type
+                    setFormData({
+                      ...formData,
+                      contextKey,
+                      type: nextType,
+                      options: contextKey && contextKey !== formData.contextKey
+                        ? contextOptionsForKey(contextKey)
+                        : ['single_choice', 'multiple_choice'].includes(nextType) ? formData.options : [],
+                    })
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">不绑定人口学含义</option>
+                  <option value="birthYearMonth">出生年月（YYYY-MM）</option>
+                  <option value="sexAtBirth">出生时性别</option>
+                  <option value="gradeLevel">年级</option>
+                  <option value="primaryLanguage">主要语言（BCP 47）</option>
+                  <option value="countryOrRegion">国家/地区（ISO 两位代码）</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  只选择明确绑定的字段才会进入本次问卷的参考上下文；标签可以按需要本地化。
+                </p>
+                {formData.contextKey && contextValueHint(formData.contextKey) && (
+                  <p className="text-xs text-blue-600 mt-1">{contextValueHint(formData.contextKey)}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -833,11 +890,21 @@ const QuestionnaireEdit: React.FC = () => {
                     {formData.options.map((opt, idx) => (
                       <div key={idx} className="flex gap-2">
                         <input
+                          value={opt.value}
+                          onChange={(e) => {
+                            const newOptions = [...formData.options]
+                            newOptions[idx] = { ...opt, value: e.target.value }
+                            setFormData({ ...formData, options: newOptions })
+                          }}
+                          className="w-36 px-3 py-2 border border-gray-300 rounded-md"
+                          placeholder="稳定 value"
+                        />
+                        <input
                           type="text"
                           value={opt.label}
                           onChange={(e) => {
                             const newOptions = [...formData.options]
-                            newOptions[idx] = { value: String(idx), label: e.target.value }
+                            newOptions[idx] = { ...opt, label: e.target.value }
                             setFormData({ ...formData, options: newOptions })
                           }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
@@ -858,7 +925,7 @@ const QuestionnaireEdit: React.FC = () => {
                       onClick={() => {
                         setFormData({
                           ...formData,
-                          options: [...formData.options, { value: String(formData.options.length), label: '' }]
+                          options: [...formData.options, { value: formData.contextKey ? '' : String(formData.options.length), label: '' }]
                         })
                       }}
                       className="w-full px-3 py-2 border border-dashed border-gray-300 rounded-md text-gray-600 hover:bg-gray-50"
