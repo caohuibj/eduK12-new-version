@@ -60,6 +60,8 @@ services:
       COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly (false for local HTTP, true for HTTPS)}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
+      # AssessmentContext 快照指纹密钥；留空时由 backend 从 DATA_ENCRYPTION_KEY 派生域隔离 HMAC 密钥
+      ASSESSMENT_CONTEXT_HASH_KEY: ${ASSESSMENT_CONTEXT_HASH_KEY:-}
       # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）
       COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
       # Cognitive 参与者假名化密钥（仅当 COGNITIVE_MODULE_ENABLED=true 时生产必需，64 位十六进制；与 DATA_ENCRYPTION_KEY 独立）
