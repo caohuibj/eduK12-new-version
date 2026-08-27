@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../api/client'
+import { sessionFetch } from '../api/client'
 import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Users, ClipboardList, Download, X, UserPlus } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import TagBadge from '../components/TagBadge'
@@ -175,13 +176,9 @@ const ScaleList: React.FC = () => {
       
       if (response.code === 0) {
         // 使用 fetch 下载文件（带认证）
-        const token = localStorage.getItem('token')
-        
         // 下载主文件
         const mainUrl = `/api/scales/exports/${response.data.fileName}`
-        fetch(mainUrl, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        sessionFetch(mainUrl)
           .then(res => res.blob())
           .then(blob => {
             const url = window.URL.createObjectURL(blob)
@@ -195,9 +192,7 @@ const ScaleList: React.FC = () => {
         // 如果是 spss 格式，还需要下载 SPS 文件
         if (response.data.spsPath) {
           const spsFileName = response.data.fileName.replace('.csv', '.sps')
-          fetch(`/api/scales/exports/${spsFileName}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
+          sessionFetch(`/api/scales/exports/${spsFileName}`)
             .then(res => res.blob())
             .then(blob => {
               const url = window.URL.createObjectURL(blob)

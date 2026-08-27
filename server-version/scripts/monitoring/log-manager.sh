@@ -6,6 +6,14 @@
 
 set -e
 
+cat >&2 <<'NOTICE'
+此宿主机日志轮转入口已停用。
+请使用 Docker logging/平台日志保留策略；本脚本不会清空宿主机 Nginx、PM2 或应用日志。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_BASE_DIR="/var/log/ptool"
@@ -201,3 +209,4 @@ main() {
 }
 
 main "$@"
+LEGACY_SCRIPT

@@ -6,6 +6,11 @@
 
 set -e
 
+echo '此宿主机监控安装脚本已停用；请使用 pinned Docker Compose monitoring 服务。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="/var/log/ptool/monitoring"
 MONITORING_DIR="$SCRIPT_DIR"
@@ -432,3 +437,4 @@ main() {
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
     main
 fi
+LEGACY_SCRIPT

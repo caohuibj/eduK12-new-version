@@ -7,6 +7,15 @@
 
 set -e
 
+cat >&2 <<'NOTICE'
+此宿主机运维 Dashboard 已停用。
+它原先会读取宿主机 PostgreSQL/Redis、PM2 和 systemd，并提供重启动作；这些路径不再受支持。
+请使用 server-version/docker-compose.monitoring.yml 的 Prometheus、Grafana 和 Alertmanager。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -359,3 +368,4 @@ EOF
 }
 
 main "$@"
+LEGACY_SCRIPT

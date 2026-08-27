@@ -15,7 +15,7 @@ export const errorHandler = (err: any, req: Request, res: Response, _next: NextF
   })
 
   // Prisma error
-  if (err.code) {
+  if (err?.code) {
     switch (err.code) {
       case 'P2002':
         return error(res, '数据已存在', -1, 409)

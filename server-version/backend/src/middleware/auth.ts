@@ -4,6 +4,7 @@ import { JwtPayload, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
 import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
+import { getSessionToken } from '../utils/authCookies'
 
 // Extend Express Request
 declare global {
@@ -21,6 +22,7 @@ const ACCOUNT_STATUS_SELECT = {
   role: true,
   teacherApproved: true,
   tokenVersion: true,
+  mustChangePassword: true,
 } as const
 
 const loadAccountStatus = async (userId: string) => {
@@ -32,13 +34,11 @@ const loadAccountStatus = async (userId: string) => {
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = getSessionToken(req)
+    if (!token) {
       return unauthorized(res, '缺少认证令牌')
     }
 
-    const token = authHeader.substring(7)
     const payload = verifyToken(token)
 
     if (!payload) {
@@ -55,8 +55,23 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
 
-    // The database role is authoritative so a role change invalidates stale JWT claims.
-    req.user = { ...payload, role: user!.role }
+    // The database role and password-reset state are authoritative so account
+    // changes take effect immediately even before the JWT expires.
+    req.user = { ...payload, role: user!.role, mustChangePassword: user!.mustChangePassword }
+
+    const allowedWhileChangingPassword = new Set([
+      '/api/auth/me',
+      '/api/auth/change-password',
+      '/api/users/change-password',
+      '/api/auth/logout',
+      '/api/auth/csrf',
+    ])
+    if (
+      user!.mustChangePassword &&
+      !allowedWhileChangingPassword.has(req.originalUrl.split('?')[0])
+    ) {
+      return forbidden(res, '首次登录必须先修改密码')
+    }
     next()
   } catch (err) {
     next(err)
@@ -66,16 +81,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 // 可选认证中间件 - 有有效且未停用的 token 才挂上 req.user；课堂等公开入口不因冻结账号 401。
 export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7)
+    const token = getSessionToken(req)
+    if (token) {
       const payload = verifyToken(token)
 
       if (payload) {
         const user = await loadAccountStatus(payload.userId)
         if (!inactiveAccountMessage(user) && payload.tokenVersion === user!.tokenVersion) {
-          req.user = { ...payload, role: user!.role }
+          req.user = { ...payload, role: user!.role, mustChangePassword: user!.mustChangePassword }
         }
       }
     }

@@ -7,6 +7,14 @@
 
 set -e
 
+cat >&2 <<'NOTICE'
+此宿主机 Certbot/Nginx 证书入口已停用。
+请在受控的边缘代理或云负载均衡中管理 TLS；本脚本不会安装软件、写入 systemd 或重载宿主机 Nginx。
+NOTICE
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="/var/log/ptool/monitoring/ssl-manager.log"
@@ -254,3 +262,4 @@ main() {
 }
 
 main "$@"
+LEGACY_SCRIPT

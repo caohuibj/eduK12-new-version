@@ -72,21 +72,29 @@ export const refreshQuestionnaireProgress = async (
   const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))
   const completed = completedItems >= totalItems
 
+  const resultFor = (row: typeof qa, isCompleted: boolean, completedAt: Date | null, totalTime: number | null, collectionReport: any | null): QuestionnaireProgressResult => ({
+    status: row.status,
+    progress: row.status === 'IN_PROGRESS' ? progress : row.progress,
+    completedScales,
+    completedForms,
+    completed: isCompleted,
+    completedAt,
+    totalTime,
+    collectionReport,
+  })
+
   if (qa.status === 'COMPLETED') {
-    return {
-      status: qa.status,
-      progress: qa.progress,
-      completedScales,
-      completedForms,
-      completed: true,
-      completedAt: qa.completedAt,
-      totalTime: qa.totalTime,
-      collectionReport: buildQuestionnaireCollectionReport(qa),
-    }
+    return resultFor(qa, true, qa.completedAt, qa.totalTime, buildQuestionnaireCollectionReport(qa))
+  }
+
+  // ABANDONED and any future terminal states are database facts, not states
+  // that this helper may reopen or complete as a side effect of a stale write.
+  if (qa.status !== 'IN_PROGRESS') {
+    return resultFor(qa, false, qa.completedAt, qa.totalTime, null)
   }
 
   if (!completed) {
-    await db.questionnaireAssessment.updateMany({
+    const updated = await db.questionnaireAssessment.updateMany({
       where: { id: questionnaireAssessmentId, status: 'IN_PROGRESS' },
       data: {
         completedScales,
@@ -95,23 +103,23 @@ export const refreshQuestionnaireProgress = async (
       },
     })
 
-    return {
-      status: 'IN_PROGRESS',
-      progress,
-      completedScales,
-      completedForms,
-      completed: false,
-      completedAt: null,
-      totalTime: null,
-      collectionReport: null,
-    }
+    if (updated.count === 1) return resultFor(qa, false, null, null, null)
+
+    const current = await db.questionnaireAssessment.findUnique({
+      where: { id: questionnaireAssessmentId },
+      include: questionnaireProgressInclude,
+    })
+    if (!current) return null
+    return current.status === 'COMPLETED'
+      ? resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
+      : resultFor(current, false, current.completedAt, current.totalTime, null)
   }
 
   const collectionReport = buildQuestionnaireCollectionReport(qa)
   const completedAt = new Date()
   const totalTime = completedAt.getTime() - new Date(qa.startedAt).getTime()
 
-  await db.questionnaireAssessment.updateMany({
+  const updated = await db.questionnaireAssessment.updateMany({
     where: { id: questionnaireAssessmentId, status: 'IN_PROGRESS' },
     data: {
       status: 'COMPLETED',
@@ -124,16 +132,31 @@ export const refreshQuestionnaireProgress = async (
     },
   })
 
-  return {
-    status: 'COMPLETED',
-    progress: 100,
-    completedScales,
-    completedForms,
-    completed: true,
-    completedAt,
-    totalTime,
-    collectionReport,
+  if (updated.count === 1) {
+    return {
+      status: 'COMPLETED',
+      progress: 100,
+      completedScales,
+      completedForms,
+      completed: true,
+      completedAt,
+      totalTime,
+      collectionReport,
+    }
   }
+
+  // Another serializable transaction won the completion race. Return its
+  // persisted result rather than inventing a second completion timestamp or
+  // report in the caller.
+  const current = await db.questionnaireAssessment.findUnique({
+    where: { id: questionnaireAssessmentId },
+    include: questionnaireProgressInclude,
+  })
+  if (!current) return null
+  if (current.status === 'COMPLETED') {
+    return resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
+  }
+  return resultFor(current, false, current.completedAt, current.totalTime, null)
 }
 
 /** Run a mutation at serializable isolation and retry PostgreSQL conflicts. */

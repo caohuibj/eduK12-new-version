@@ -11,6 +11,7 @@ import { logger } from './utils/logger'
 import { socketService } from './services/socketService'
 import { classroomSocketHandler } from './services/classroomSocketHandler'
 import { requestId } from './middleware/requestId'
+import { csrfProtection } from './middleware/csrf'
 
 // 导入 Worker (启动视频处理队列)
 // 使用优化版本 (支持硬件负担最小模式)
@@ -45,6 +46,7 @@ import compositeRoutes from './modules/composite/composite.routes'
 import compositePublicRoutes from './modules/composite/composite.public.routes'
 import capabilitiesRoutes from './routes/capabilities'
 import materialGrantRoutes from './routes/materialGrants'
+import assetRoutes, { publicAssetRouter } from './routes/assets'
 
 const app = express()
 
@@ -57,6 +59,28 @@ const publicAssessmentLimiter = rateLimit({
 
 // 创建 HTTP 服务器
 const server = createServer(app)
+
+const requestMetricCounts = new Map<string, number>()
+const normalizeMetricPath = (req: express.Request): string => {
+  const routePath = req.route?.path
+  if (routePath) return `${req.baseUrl}${routePath}`
+  return req.path
+    .replace(/\/ck_[A-Za-z0-9_-]+/g, '/:token')
+    .replace(/\/[0-9a-f]{8,}(?=\/|$)/gi, '/:id')
+    .replace(/\/[^/]{32,}(?=\/|$)/g, '/:id')
+}
+
+app.use((req, res, next) => {
+  const startedAt = process.hrtime.bigint()
+  res.once('finish', () => {
+    const pathLabel = normalizeMetricPath(req)
+    const key = `${req.method}|${pathLabel}|${res.statusCode}`
+    requestMetricCounts.set(key, (requestMetricCounts.get(key) || 0) + 1)
+    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000
+    if (durationMs > 10_000) logger.warn('HTTP request exceeded latency threshold', { method: req.method, path: pathLabel, durationMs: Math.round(durationMs) })
+  })
+  next()
+})
 
 // 信任反向代理 - hop 数由部署拓扑显式配置，避免错误解析客户端 IP。
 app.set('trust proxy', config.trustProxyHops)
@@ -81,10 +105,16 @@ app.use(helmet({
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
+app.use('/api', csrfProtection)
 
 // 静态文件服务 - 使用绝对路径
 logger.info('[Server] Static files configured', { uploadDir: config.uploadDir })
-app.use('/uploads', express.static(config.uploadDir, {
+app.use('/uploads', (req, res, next) => {
+  if (!config.legacyUploadsEnabled) {
+    return res.status(410).json({ code: -1, message: '旧文件访问入口已停用，请使用资产接口' })
+  }
+  return next()
+}, express.static(config.uploadDir, {
   maxAge: '7d',
   immutable: true
 }))
@@ -106,7 +136,7 @@ app.get('/ready', async (_req, res) => {
 // Prometheus-compatible process metrics.  The backend is only reachable from
 // the Compose network in production; the endpoint intentionally contains no
 // request payload, account, or assessment data.
-app.get('/metrics', (_req, res) => {
+app.get('/metrics', async (_req, res) => {
   const memory = process.memoryUsage()
   const lines = [
     '# HELP process_uptime_seconds Process uptime in seconds.',
@@ -121,7 +151,27 @@ app.get('/metrics', (_req, res) => {
     '# HELP process_heap_total_bytes V8 heap total in bytes.',
     '# TYPE process_heap_total_bytes gauge',
     `process_heap_total_bytes ${memory.heapTotal}`,
+    '# HELP ptool_api_requests_total Completed API requests by normalized route and status.',
+    '# TYPE ptool_api_requests_total counter',
   ]
+  for (const [key, count] of requestMetricCounts) {
+    const [method, route, status] = key.split('|')
+    const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    lines.push(`ptool_api_requests_total{method="${escape(method)}",route="${escape(route)}",status="${escape(status)}"} ${count}`)
+  }
+  const backupStatusFile = process.env.BACKUP_STATUS_FILE
+  if (backupStatusFile) {
+    try {
+      const timestamp = Number(require('fs').readFileSync(backupStatusFile, 'utf8').trim())
+      if (Number.isFinite(timestamp) && timestamp > 0) {
+        lines.push('# HELP ptool_backup_last_success_timestamp_seconds Unix timestamp of the last verified backup.')
+        lines.push('# TYPE ptool_backup_last_success_timestamp_seconds gauge')
+        lines.push(`ptool_backup_last_success_timestamp_seconds ${timestamp}`)
+      }
+    } catch {
+      // Missing status is intentionally left visible to Prometheus as absent.
+    }
+  }
   res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8').send(`${lines.join('\n')}\n`)
 })
 
@@ -141,6 +191,8 @@ app.use('/api/uploads', uploadRoutes)
 app.use('/api/scales', scaleRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
+app.use('/api/assets', assetRoutes)
+app.use('/api/public/assets', publicAssetRouter)
 // 泛化问卷路由（新增）
 
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)

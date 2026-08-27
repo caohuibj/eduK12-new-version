@@ -23,6 +23,7 @@ AUTO_BLOCK_IP=${AUTO_BLOCK_IP:-false}
 MAX_FAILED_LOGIN=${MAX_FAILED_LOGIN:-5}
 LOGIN_WINDOW=${LOGIN_WINDOW:-300}
 BLOCK_DURATION=${BLOCK_DURATION:-86400}
+TRUSTED_IPS=${TRUSTED_IPS:-}
 
 # 初始化
 init() {
@@ -44,6 +45,20 @@ valid_ipv4() {
     for octet in "${octets[@]}"; do
         [ "$octet" -le 255 ] || return 1
     done
+}
+
+is_trusted_ip() {
+    local ip="$1"
+    case ",$TRUSTED_IPS," in
+        *",$ip,"*) return 0 ;;
+    esac
+    # Never auto-block local/private networks by default. Explicit public
+    # addresses can be added to TRUSTED_IPS when a gateway requires it.
+    case "$ip" in
+        10.*|127.*|192.168.*) return 0 ;;
+        172.1[6-9].*|172.2[0-9].*|172.3[0-1].*) return 0 ;;
+    esac
+    return 1
 }
 
 # Return only log entries inside LOGIN_WINDOW.  The previous implementation
@@ -170,7 +185,8 @@ check_ssh_bruteforce() {
     done <<< "$suspicious_ips"
 }
 
-# 检查Web登录暴力破解
+# Only login failures are eligible for the opt-in block. Do not infer abuse
+# from arbitrary URLs, SQL/XSS strings, SSH logs, or successful requests.
 check_web_bruteforce() {
     log "检查Web登录暴力破解..."
     
@@ -178,11 +194,11 @@ check_web_bruteforce() {
     if [ -f "/var/log/nginx/access.log" ]; then
         # 查找登录接口的频繁请求
         local suspicious_ips
-        suspicious_ips=$(recent_nginx_requests | grep "/api/auth/login" | \
-            awk '{print $1}' | sort | uniq -c | sort -rn | head -10)
+        suspicious_ips=$(recent_nginx_requests | awk '$0 ~ /\/api\/auth\/login/ && ($9 == "401" || $9 == "403") {print $1}' | \
+            sort | uniq -c | sort -rn | head -10)
         
         while read -r count ip; do
-            if [ -n "$ip" ] && [ "$count" -gt 20 ]; then
+            if [ -n "$ip" ] && [ "$count" -gt "$MAX_FAILED_LOGIN" ] && ! is_trusted_ip "$ip"; then
                 if ! is_blocked "$ip"; then
                     block_ip "$ip" "Web登录暴力破解(${count}次请求)"
                 fi
@@ -285,9 +301,7 @@ main() {
     init
     log "========== 自动封禁检查开始 =========="
     
-    check_ssh_bruteforce
     check_web_bruteforce
-    check_web_attacks
     cleanup_expired_blocks
     
     log "========== 自动封禁检查完成 =========="

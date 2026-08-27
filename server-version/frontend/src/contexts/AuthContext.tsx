@@ -1,15 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import { authApi, type LoginData } from '../api/auth'
-import type { User, ApiResponse } from '../types'
+import { authApi } from '../api/auth'
+import type { User } from '../types'
 
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
   login: (username: string, password: string) => Promise<void>
-  register: (username: string, password: string, nickname?: string, teacherCode?: string) => Promise<void>
-  loginWithToken: (token: string, userData: User) => void
-  logout: () => void
+  setAuthenticatedUser: (userData: User) => void
+  logout: () => Promise<void>
   setUser: (user: User | null) => void
 }
 
@@ -21,18 +20,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token')
-      if (token) {
-        try {
-          const response = await authApi.me()
-          if (response.code === 0 && response.data) {
-            setUser(response.data)
-          } else {
-            localStorage.removeItem('token')
-          }
-        } catch (error) {
-          localStorage.removeItem('token')
-        }
+      try {
+        const response = await authApi.me()
+        if (response.code === 0 && response.data) setUser(response.data)
+      } catch {
+        // An absent or expired HttpOnly cookie simply means signed out.
       }
       setIsLoading(false)
     }
@@ -40,36 +32,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [])
 
   const login = async (username: string, password: string) => {
+    await authApi.csrf()
     const response = await authApi.login({ username, password })
     if (response.code === 0 && response.data) {
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
       setUser(response.data.user)
     } else {
       throw new Error(response.message || '登录失败')
     }
   }
 
-  const register = async (username: string, password: string, nickname?: string, teacherCode?: string) => {
-    const response = await authApi.register({ username, password, nickname, teacherCode })
-    if (response.code === 0 && response.data) {
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      setUser(response.data.user)
-    } else {
-      throw new Error(response.message || '注册失败')
-    }
-  }
-
-  const loginWithToken = (token: string, userData: User) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(userData))
+  const setAuthenticatedUser = (userData: User) => {
     setUser(userData)
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+  const logout = async () => {
+    try {
+      await authApi.csrf()
+      await authApi.logout()
+    } catch {
+      // Clearing local state is still safe if the session has already expired.
+    }
     setUser(null)
   }
 
@@ -79,8 +61,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isAuthenticated: !!user,
       isLoading,
       login,
-      register,
-      loginWithToken,
+      setAuthenticatedUser,
       logout,
       setUser,
     }}>

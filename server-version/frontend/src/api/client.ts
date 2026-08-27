@@ -1,8 +1,9 @@
-import axios from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import type { ApiResponse } from '../types'
 
 const axiosClient = axios.create({
   baseURL: '/api',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
@@ -10,12 +11,45 @@ const axiosClient = axios.create({
   },
 })
 
-// 请求拦截器 - 添加 token 和禁用缓存参数
+const readCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null
+  const encodedName = `${encodeURIComponent(name)}=`
+  const item = document.cookie.split('; ').find((entry) => entry.startsWith(encodedName))
+  return item ? decodeURIComponent(item.slice(encodedName.length)) : null
+}
+
+export const getCsrfToken = (): string | null => readCookie('ptool_csrf')
+
+export const ensureCsrfToken = async (): Promise<string | null> => {
+  const existing = getCsrfToken()
+  if (existing) return existing
+
+  const response = await fetch('/api/auth/csrf', { credentials: 'same-origin' })
+  if (!response.ok) return null
+  const body = await response.json() as { data?: { csrfToken?: string } }
+  return body.data?.csrfToken || getCsrfToken()
+}
+
+export const sessionFetch = async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
+  const method = (init.method || 'GET').toUpperCase()
+  const headers = new Headers(init.headers)
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrfToken = await ensureCsrfToken()
+    if (csrfToken) headers.set('X-CSRF-Token', csrfToken)
+  }
+  return fetch(input, { ...init, headers, credentials: 'same-origin' })
+}
+
+// 请求拦截器 - 使用 Cookie 会话并为写请求添加 CSRF
 axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  async (config) => {
+    const method = (config.method || 'get').toUpperCase()
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && typeof window !== 'undefined') {
+      const csrfToken = await ensureCsrfToken()
+      if (csrfToken) {
+        config.headers = config.headers || {}
+        config.headers['X-CSRF-Token'] = csrfToken
+      }
     }
     return config
   },
@@ -27,18 +61,16 @@ axiosClient.interceptors.request.use(
 // 响应拦截器 - 处理错误
 axiosClient.interceptors.response.use(
   (response) => {
-    return response.data
+    return response
   },
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
       // 使用事件通知替代强制刷新，保留用户操作状态
-      window.dispatchEvent(new CustomEvent('auth:expired', {
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('auth:expired', {
         detail: { message: '登录已过期，请重新登录' }
       }))
       // 延迟跳转，让应用有机会保存状态
-      setTimeout(() => {
+      if (typeof window !== 'undefined') setTimeout(() => {
         window.location.href = '/'
       }, 100)
     }
@@ -46,19 +78,30 @@ axiosClient.interceptors.response.use(
   }
 )
 
-// 类型安全的 API 客户端
-// axios拦截器已经返回了 response.data，类型就是 ApiResponse<T>
+const parseApiResponse = <T>(value: unknown): ApiResponse<T> => {
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    typeof (value as { code?: unknown }).code !== 'number' ||
+    typeof (value as { message?: unknown }).message !== 'string'
+  ) {
+    throw new Error('服务响应格式无效')
+  }
+  return value as ApiResponse<T>
+}
+
+// 类型安全的 API 客户端；所有 JSON 响应先验证公共包络结构。
 const apiClient = {
-  get: <T = any>(url: string, config?: any): Promise<ApiResponse<T>> => 
-    axiosClient.get(url, config) as Promise<ApiResponse<T>>,
-  post: <T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => 
-    axiosClient.post(url, data, config) as Promise<ApiResponse<T>>,
-  put: <T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => 
-    axiosClient.put(url, data, config) as Promise<ApiResponse<T>>,
-  patch: <T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => 
-    axiosClient.patch(url, data, config) as Promise<ApiResponse<T>>,
-  delete: <T = any>(url: string, config?: any): Promise<ApiResponse<T>> => 
-    axiosClient.delete(url, config) as Promise<ApiResponse<T>>,
+  get: <T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    axiosClient.get<ApiResponse<T>>(url, config).then((response) => parseApiResponse<T>(response.data)),
+  post: <T = any>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    axiosClient.post<ApiResponse<T>>(url, data, config).then((response) => parseApiResponse<T>(response.data)),
+  put: <T = any>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    axiosClient.put<ApiResponse<T>>(url, data, config).then((response) => parseApiResponse<T>(response.data)),
+  patch: <T = any>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    axiosClient.patch<ApiResponse<T>>(url, data, config).then((response) => parseApiResponse<T>(response.data)),
+  delete: <T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    axiosClient.delete<ApiResponse<T>>(url, config).then((response) => parseApiResponse<T>(response.data)),
 }
 
 export default apiClient

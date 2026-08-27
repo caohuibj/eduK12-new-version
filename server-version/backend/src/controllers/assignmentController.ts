@@ -8,6 +8,7 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import { hydrateAssetReferences } from '../services/assetStorage'
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -147,7 +148,10 @@ export const assignmentController = {
         }))
       }
 
-      return success(res, buildPaginatedResult(formattedAssignments, total, pagination))
+      const hydratedAssignments = await Promise.all(
+        formattedAssignments.map((assignment) => hydrateAssetReferences(assignment, false)),
+      )
+      return success(res, buildPaginatedResult(hydratedAssignments, total, pagination))
     } catch (err) {
       logger.error('获取作业列表错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -234,7 +238,7 @@ export const assignmentController = {
         }
       })
 
-      return success(res, assignment, '作业创建成功')
+      return success(res, await hydrateAssetReferences(assignment, false), '作业创建成功')
     } catch (err) {
       logger.error('创建作业错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -306,11 +310,11 @@ export const assignmentController = {
 
       const { shares: _shares, ...course } = assignment.course
 
-      return success(res, {
+      return success(res, await hydrateAssetReferences({
         ...assignment,
         course,
         mySubmission,
-      })
+      }, false))
     } catch (err) {
       logger.error('获取作业详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -373,7 +377,7 @@ export const assignmentController = {
         }
       })
 
-      return success(res, updated, '作业更新成功')
+      return success(res, await hydrateAssetReferences(updated, false), '作业更新成功')
     } catch (err) {
       logger.error('更新作业错误', err)
       return error(res, Messages.COMMON.FAILED)

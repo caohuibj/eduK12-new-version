@@ -16,6 +16,10 @@ const configSchema = z.object({
   jwtSecret: z.string().min(32, 'JWT_SECRET must be at least 32 characters in production'),
   jwtExpiresIn: z.string(),
   uploadDir: z.string(),
+  // Keep legacy static uploads available only during the reversible migration
+  // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
+  // and verified.
+  legacyUploadsEnabled: z.boolean(),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
@@ -65,7 +69,9 @@ const projectRoot = path.resolve(__dirname, '..')
 const rawConfig = {
   port: parsePort(),
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigin: process.env.CORS_ORIGIN || '*',
+  // Cookie authentication requires a concrete origin; Compose overrides this
+  // for the deployed frontend and local development uses Vite's default.
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   // Development still requires an explicit DATABASE_URL when credentials are
   // needed; the fallback intentionally contains no embedded password.
   databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/ptool?schema=public',
@@ -76,6 +82,7 @@ const rawConfig = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
+  legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）

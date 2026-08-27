@@ -13,6 +13,8 @@ import { logger } from '../utils/logger'
 import { config } from '../config'
 import { validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 
+const VIDEO_PROCESSING_FAILURE_MESSAGE = '视频处理失败，请稍后重试或联系管理员'
+
 // 处理策略类型
 interface ProcessingStrategy {
   mode: 'watermark-only' | 'transcode'
@@ -115,7 +117,7 @@ videoQueue.process('transcode', 2, async (job) => {
       where: { id: videoId },
       data: {
         status: 'FAILED',
-        errorMessage: 'FFmpeg 未安装，无法处理视频'
+        errorMessage: 'VIDEO_PROCESSOR_UNAVAILABLE'
       }
     })
     throw new Error('FFmpeg 未安装')
@@ -357,7 +359,7 @@ videoQueue.process('transcode', 2, async (job) => {
       where: { id: videoId },
       data: {
         status: 'FAILED',
-        errorMessage: error.message || '处理失败'
+        errorMessage: VIDEO_PROCESSING_FAILURE_MESSAGE
       }
     })
 

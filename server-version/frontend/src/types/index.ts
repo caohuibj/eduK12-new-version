@@ -10,6 +10,7 @@ export interface User {
   teacherApproved?: boolean
   expiresAt?: string
   createdAt?: string
+  mustChangePassword?: boolean
 }
 
 export interface Course {
@@ -17,6 +18,7 @@ export interface Course {
   title: string
   description?: string
   coverUrl?: string
+  coverAssetId?: string
   status: 'DRAFT' | 'PUBLISHED' | 'COMPLETED'
   courseCode: string
   creatorId: string
@@ -41,6 +43,8 @@ export interface CourseStudent {
 
 export interface MediaItem {
   type?: 'library' | 'external' | 'upload'
+  id?: string
+  assetId?: string
   url: string
   title?: string
   name?: string
@@ -49,6 +53,7 @@ export interface MediaItem {
 
 export interface DocumentItem {
   id: string
+  assetId?: string
   url: string
   title: string
   fileName?: string
@@ -131,8 +136,13 @@ export interface CheckinSubmission {
   studentId: string
   student?: User
   content?: string
-  images?: string[]  // 后端返回字符串数组
+  images?: CheckinSubmissionImage[]
   createdAt: string
+}
+
+export type CheckinSubmissionImage = string | {
+  assetId: string
+  url?: string
 }
 
 export interface Video {
@@ -146,6 +156,9 @@ export interface Video {
   teacher?: User
   usageCount: number
   url?: string
+  originalAssetId?: string
+  processedAssetId?: string
+  thumbnailAssetId?: string
   processedUrl?: string
   thumbnailUrl?: string
   createdAt: string
@@ -163,6 +176,7 @@ export interface Document {
   teacher?: User
   usageCount: number
   url?: string
+  assetId?: string
   tags: string[]
   pageCount?: number
   createdAt: string

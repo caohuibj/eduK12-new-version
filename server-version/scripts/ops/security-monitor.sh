@@ -7,6 +7,11 @@
 
 set -e
 
+echo '此宿主机安全监控脚本已停用；请使用本地 Compose 监控服务或经审批的外部运维方案。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/../monitoring/monitor-config.env"
@@ -423,3 +428,4 @@ case "${1:-run}" in
         exit 1
         ;;
 esac
+LEGACY_SCRIPT

@@ -3,7 +3,11 @@ import { useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result } from 'antd'
 import { SafetyOutlined } from '@ant-design/icons'
 import { completePOW } from '../../utils/powService'
-import { saveQuestionnaireResumeToken } from '../../utils/questionnaireResume'
+import {
+  questionnaireResumeHeaders,
+  readQuestionnaireSessionId,
+  saveQuestionnaireResumeToken,
+} from '../../utils/questionnaireResume'
 
 const PublicQuestionnaire: React.FC = () => {
   const { token } = useParams<{ token: string }>()
@@ -26,7 +30,9 @@ const PublicQuestionnaire: React.FC = () => {
       setLoading(true)
       
       // 获取问卷信息（GET 请求，无需 POW）
-      const response = await fetch(`/api/public/questionnaires/${token}`)
+      const response = await fetch(`/api/public/questionnaires/${token}`, {
+        headers: questionnaireResumeHeaders(token, readQuestionnaireSessionId(token)),
+      })
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -35,11 +41,6 @@ const PublicQuestionnaire: React.FC = () => {
 
       const data = await response.json()
       setQuestionnaire(data.data.questionnaire)
-      
-      // 保存 tokenId
-      if (data.data.tokenId) {
-        localStorage.setItem(`questionnaire_token_${token}`, data.data.tokenId)
-      }
       
     } catch (err: any) {
       setError(err.message || '问卷访问失败')
@@ -61,12 +62,13 @@ const PublicQuestionnaire: React.FC = () => {
       setPowLoading(false)
       
       // 2. 开始测评
-      const sessionId = localStorage.getItem(`questionnaire_session_${token}`)
-      
+      const sessionId = readQuestionnaireSessionId(token)
+
       const response = await fetch(`/api/public/questionnaires/${token}/start`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...questionnaireResumeHeaders(token, sessionId),
         },
         body: JSON.stringify({ 
           sessionId,
@@ -82,8 +84,6 @@ const PublicQuestionnaire: React.FC = () => {
 
       const data = await response.json()
       
-      // 保存 sessionId
-      localStorage.setItem(`questionnaire_session_${token}`, data.data.sessionId)
       if (token && data.data.resumeToken) {
         saveQuestionnaireResumeToken(token, data.data.sessionId, data.data.resumeToken)
       }

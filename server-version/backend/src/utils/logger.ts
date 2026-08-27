@@ -19,14 +19,19 @@ const formatTime = () => {
   return new Date().toISOString()
 }
 
-const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body|message|query|sql)/i
-const SENSITIVE_TEXT = /(Bearer\s+)[^\s,}]+/gi
+const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body|message|query|sql|error|err)/i
+const SENSITIVE_TEXT = /(Bearer\s+)[^\s,}]+|((?:token|password|secret|code|sessionId|resumeToken|authorization)=)[^&\s,}]+/gi
 
-const redactText = (value: string): string => value.replace(SENSITIVE_TEXT, '$1[REDACTED]')
+const redactText = (value: string): string => value.replace(SENSITIVE_TEXT, (_match, bearerPrefix, keyPrefix) => `${bearerPrefix || keyPrefix}[REDACTED]`)
+
+const redactStack = (stack: string): string => {
+  const lines = stack.split('\n')
+  // The first line is `Error: <raw message>` and can contain request input.
+  // Keep only the error class; retain sanitized frames for diagnosis.
+  return [`${lines[0]?.split(':')[0] || 'Error'}: [REDACTED]`, ...lines.slice(1).map(redactText)].join('\n')
+}
 
 const redactLogValue = (value: unknown, key?: string): unknown => {
-  if (key && SENSITIVE_KEY.test(key)) return '[REDACTED]'
-  if (typeof value === 'string') return redactText(value)
   if (value instanceof Error) {
     return {
       name: value.name,
@@ -34,9 +39,11 @@ const redactLogValue = (value: unknown, key?: string): unknown => {
       // the class and sanitized stack for server-side diagnosis, never the
       // raw message.
       message: '[REDACTED]',
-      stack: value.stack ? redactText(value.stack) : undefined,
+      stack: value.stack ? redactStack(value.stack) : undefined,
     }
   }
+  if (key && SENSITIVE_KEY.test(key)) return '[REDACTED]'
+  if (typeof value === 'string') return redactText(value)
   if (Array.isArray(value)) return value.map((item) => redactLogValue(item))
   if (value && typeof value === 'object') {
     return Object.fromEntries(
@@ -54,25 +61,25 @@ const safeArgs = (args: unknown[]) => args.map((arg) => redactLogValue(arg))
 export const logger = {
   debug: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.DEBUG) {
-      console.debug(`[${formatTime()}] [DEBUG] ${message}`, ...safeArgs(args))
+      console.debug(`[${formatTime()}] [DEBUG] ${redactText(message)}`, ...safeArgs(args))
     }
   },
 
   info: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.INFO) {
-      console.info(`[${formatTime()}] [INFO] ${message}`, ...safeArgs(args))
+      console.info(`[${formatTime()}] [INFO] ${redactText(message)}`, ...safeArgs(args))
     }
   },
 
   warn: (message: string, ...args: unknown[]) => {
     if (currentLevel <= LogLevel.WARN) {
-      console.warn(`[${formatTime()}] [WARN] ${message}`, ...safeArgs(args))
+      console.warn(`[${formatTime()}] [WARN] ${redactText(message)}`, ...safeArgs(args))
     }
   },
 
   error: (message: string, error?: unknown) => {
     if (currentLevel <= LogLevel.ERROR) {
-      console.error(`[${formatTime()}] [ERROR] ${message}`, redactLogValue(error))
+      console.error(`[${formatTime()}] [ERROR] ${redactText(message)}`, redactLogValue(error))
     }
   },
 }

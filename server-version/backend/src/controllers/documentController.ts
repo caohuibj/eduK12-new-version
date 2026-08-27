@@ -3,9 +3,8 @@ import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
-import { uploadBufferToCOS, isCOSEnabled } from '../utils/cos'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
-import { v4 as uuidv4 } from 'uuid'
+import { attachAssetReference, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 
 export const documentController = {
   // 获取文档列表（添加分页和缓存优化）
@@ -57,10 +56,10 @@ export const documentController = {
       ])
 
       // 添加URL（优先使用COS URL）
-      const documentsWithUrl = documents.map(doc => ({
+      const documentsWithUrl = await Promise.all(documents.map(async doc => ({
         ...doc,
-        url: doc.cosUrl || `/uploads/documents/${doc.fileName}`,
-      }))
+        url: doc.assetId ? await getSignedAssetUrl(doc.assetId) : (doc.cosUrl || ''),
+      })))
 
       return success(res, buildPaginatedResult(documentsWithUrl, total, pagination))
     } catch (err) {
@@ -84,30 +83,23 @@ export const documentController = {
 
       const { title } = req.body
 
-      // 检查COS是否启用
-      if (!isCOSEnabled()) {
-        logger.error('COS未配置，无法上传文档')
-        return error(res, '文档存储服务未配置')
-      }
-
-      // 生成COS Key
-      const cosKey = `documents/${Date.now()}-${uuidv4()}.pdf`
-
       try {
-        // 上传到COS
-        const cosUrl = await uploadBufferToCOS(file.buffer, cosKey)
-        logger.info(`文档已上传到COS: ${cosUrl}`)
+        const asset = await storeAsset({
+          buffer: file.buffer,
+          originalName: file.originalname,
+          mimeType: file.mimetype,
+          ownerId: userId,
+        })
 
         // 保存到数据库
         const document = await prisma.document.create({
           data: {
             title: title || file.originalname.replace(/\.pdf$/i, ''),
-            filePath: cosKey, // 存储COS Key
+            filePath: asset.objectKey,
             fileName: file.originalname,
             fileSize: file.size,
             teacherId: userId,
-            cosUrl: cosUrl,
-            cosKey: cosKey,
+            assetId: asset.id,
           },
           include: {
             teacher: {
@@ -115,10 +107,11 @@ export const documentController = {
             }
           }
         })
+        await attachAssetReference({ assetId: asset.id, entityType: 'Document', entityId: document.id, field: 'file' })
 
         return success(res, {
           ...document,
-          url: cosUrl,
+          url: await getSignedAssetUrl(asset.id),
         }, '文档上传成功')
       } catch (uploadError) {
         logger.error('上传到COS失败', uploadError)
@@ -154,7 +147,7 @@ export const documentController = {
 
       return success(res, {
         ...document,
-        url: document.cosUrl || `/uploads/documents/${document.fileName}`,
+        url: document.assetId ? await getSignedAssetUrl(document.assetId) : (document.cosUrl || ''),
       })
     } catch (err) {
       logger.error('获取文档详情错误', err)
@@ -199,7 +192,7 @@ export const documentController = {
 
       return success(res, {
         ...updated,
-        url: updated.cosUrl || `/uploads/documents/${updated.fileName}`,
+        url: updated.assetId ? await getSignedAssetUrl(updated.assetId) : (updated.cosUrl || ''),
       }, '文档更新成功')
     } catch (err) {
       logger.error('更新文档错误', err)

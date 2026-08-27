@@ -3,7 +3,7 @@ import { prisma } from '../config/database'
 import { unauthorized } from '../utils/response'
 import { hashQuestionnaireResumeToken, questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
 
-const getBearerToken = (req: Request): string | null => {
+export const getQuestionnaireResumeToken = (req: Request): string | null => {
   const value = req.headers.authorization
   if (!value || !value.startsWith('Bearer ')) return null
 
@@ -18,7 +18,7 @@ const getBearerToken = (req: Request): string | null => {
  */
 export const requireQuestionnaireResume = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = getBearerToken(req)
+    const token = getQuestionnaireResumeToken(req)
     if (!token) return unauthorized(res, '缺少测评恢复凭据')
 
     const assessment = await prisma.questionnaireAssessment.findUnique({

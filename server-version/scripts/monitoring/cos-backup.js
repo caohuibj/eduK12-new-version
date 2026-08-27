@@ -23,6 +23,8 @@ function requiredEnv(name) {
   return value.trim()
 }
 
+const safeFailure = (fallback) => JSON.stringify({ success: false, error: fallback })
+
 // 初始化 COS 客户端
 function initCOS() {
   try {
@@ -37,10 +39,7 @@ function initCOS() {
       region
     }
   } catch (error) {
-    console.error(JSON.stringify({
-      success: false,
-      error: error.message || 'COS 配置不完整'
-    }))
+    console.error(safeFailure('COS 配置不完整'))
     process.exit(1)
   }
 }
@@ -114,11 +113,7 @@ async function uploadFile(localPath, remoteKey) {
     }))
     process.exit(0)
   } catch (err) {
-    console.error(JSON.stringify({
-      success: false,
-      error: err.message || err,
-      code: err.code || 'UNKNOWN'
-    }))
+    console.error(safeFailure('COS 上传失败'))
     process.exit(1)
   }
 }
@@ -146,11 +141,7 @@ async function deleteFile(remoteKey) {
     }))
     process.exit(0)
   } catch (err) {
-    console.error(JSON.stringify({
-      success: false,
-      error: err.message || err,
-      code: err.code || 'UNKNOWN'
-    }))
+    console.error(safeFailure('COS 删除失败'))
     process.exit(1)
   }
 }
@@ -187,11 +178,7 @@ async function listFiles(prefix = '') {
     }))
     process.exit(0)
   } catch (err) {
-    console.error(JSON.stringify({
-      success: false,
-      error: err.message || err,
-      code: err.code || 'UNKNOWN'
-    }))
+    console.error(safeFailure('COS 列表查询失败'))
     process.exit(1)
   }
 }
@@ -220,11 +207,7 @@ async function downloadFile(remoteKey, localPath) {
     }))
     process.exit(0)
   } catch (err) {
-    console.error(JSON.stringify({
-      success: false,
-      error: err.message || err,
-      code: err.code || 'UNKNOWN'
-    }))
+    console.error(safeFailure('COS 下载失败'))
     process.exit(1)
   }
 }
@@ -281,11 +264,7 @@ async function cleanupOldBackups(prefix, daysToKeep) {
     }))
     process.exit(0)
   } catch (err) {
-    console.error(JSON.stringify({
-      success: false,
-      error: err.message || err,
-      code: err.code || 'UNKNOWN'
-    }))
+    console.error(safeFailure('COS 备份清理失败'))
     process.exit(1)
   }
 }

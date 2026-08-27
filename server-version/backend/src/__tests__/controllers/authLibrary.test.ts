@@ -10,7 +10,13 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ generateToken: vi.fn(() => 'token') }))
-vi.mock('../../utils/password', () => ({ hashPassword: vi.fn(async () => 'hash'), comparePassword: vi.fn() }))
+vi.mock('../../utils/password', () => ({
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_MAX_LENGTH: 128,
+  isValidPassword: vi.fn(() => true),
+  hashPassword: vi.fn(async () => 'hash'),
+  comparePassword: vi.fn(),
+}))
 
 import { authController } from '../../controllers/authController'
 

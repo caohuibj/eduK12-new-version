@@ -4,6 +4,11 @@
 
 set -e
 
+echo '此宿主机本地部署脚本已停用；请使用 server-version/docker-compose.yml 的本地 Compose 入口。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -103,7 +108,7 @@ setup_environment() {
 NODE_ENV=development
 PORT=3000
 DATABASE_URL=postgresql://localhost:5432/ptool?schema=public
-JWT_SECRET=local-test-secret-key-for-development-only
+JWT_SECRET=${JWT_SECRET:?set JWT_SECRET in the protected local environment}
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
 ADMIN_USERNAME=admin
@@ -303,3 +308,5 @@ main() {
 
 # 运行主函数
 main
+
+LEGACY_SCRIPT

@@ -107,20 +107,24 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
     }
 
     const fs = require('fs')
-    const path = req.file.path
-
-    // 读取文件头（前8字节足够检测大多数类型）
-    const fd = fs.openSync(path, 'r')
-    const buffer = Buffer.alloc(8)
-    fs.readSync(fd, buffer, 0, 8, 0)
-    fs.closeSync(fd)
+    let buffer: Buffer
+    if (Buffer.isBuffer(req.file.buffer)) {
+      buffer = req.file.buffer.subarray(0, 8)
+    } else if (req.file.path) {
+      const fd = fs.openSync(req.file.path, 'r')
+      buffer = Buffer.alloc(8)
+      fs.readSync(fd, buffer, 0, 8, 0)
+      fs.closeSync(fd)
+    } else {
+      return res.status(400).json({ code: -1, message: '无法读取上传文件' })
+    }
 
     // 检测真实文件类型
     const detectedType = detectMimeType(buffer)
 
     if (!detectedType) {
       // 删除可疑文件
-      fs.unlinkSync(path)
+      if (req.file.path) fs.unlinkSync(req.file.path)
       return res.status(400).json({
         code: -1,
         message: '无法识别文件类型，可能是不支持的格式或恶意文件'
@@ -129,7 +133,7 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
 
     // 检查是否在允许列表中
     if (!allowedTypes.includes(detectedType)) {
-      fs.unlinkSync(path)
+      if (req.file.path) fs.unlinkSync(req.file.path)
       return res.status(400).json({
         code: -1,
         message: `文件类型不匹配，检测到 ${detectedType}，但不在允许列表中`

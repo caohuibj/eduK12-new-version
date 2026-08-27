@@ -17,22 +17,13 @@ import { verifyToken } from '../utils/jwt'
 import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { UserRole } from '../types'
+import { getCookieValue } from '../utils/authCookies'
 
 type SocketNext = (error?: Error) => void
 
 const getSocketToken = (socket: Socket): string | null => {
-  const auth = socket.handshake.auth as { token?: unknown } | undefined
-  if (typeof auth?.token === 'string' && auth.token.trim()) {
-    return auth.token.trim()
-  }
-
-  const authorization = socket.handshake.headers.authorization
-  if (typeof authorization === 'string' && authorization.startsWith('Bearer ')) {
-    const token = authorization.substring(7).trim()
-    return token || null
-  }
-
-  return null
+  const cookieToken = getCookieValue(socket.handshake.headers.cookie, 'ptool_session')
+  return cookieToken
 }
 
 export class SocketService {

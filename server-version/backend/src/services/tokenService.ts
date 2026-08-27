@@ -81,7 +81,7 @@ export const tokenService = {
   /**
    * 验证令牌有效性
    */
-  async validateToken(tokenString: string): Promise<TokenValidation> {
+  async validateToken(tokenString: string, options: { allowOverLimit?: boolean } = {}): Promise<TokenValidation> {
     // 查询令牌
     const accessToken = await prisma.questionnaireAccessToken.findUnique({
       where: { token: tokenString },
@@ -123,11 +123,12 @@ export const tokenService = {
     }
 
     // 检查是否超过访问限制
-    if (accessToken.maxUses > 0 && accessToken.usedCount >= accessToken.maxUses) {
+    const overLimit = accessToken.maxUses > 0 && accessToken.usedCount >= accessToken.maxUses
+    if (overLimit && !options.allowOverLimit) {
       return {
         valid: false,
         expired: false,
-        overLimit: true,
+        overLimit,
         disabled: false,
         token: accessToken,
       }
@@ -137,14 +138,16 @@ export const tokenService = {
     const result: TokenValidation = {
       valid: true,
       expired: false,
-      overLimit: false,
+      // A caller may use a valid, unexpired token to locate an in-progress
+      // session even after its one-time start quota was consumed. The start
+      // transaction still performs the quota check for new sessions.
+      overLimit,
       disabled: false,
       token: accessToken,
       questionnaire: accessToken.questionnaire,
     }
 
     logger.info('令牌验证成功', {
-      token: tokenString.substring(0, 10) + '...',
       tokenId: accessToken.id
     })
 

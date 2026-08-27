@@ -1244,6 +1244,7 @@ export const scaleController = {
         if (assessment.status === 'COMPLETED') {
           return { kind: 'completed' as const, assessment: decrypted(assessment) }
         }
+        if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
 
         const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
         const decryptedAnswers = safeDecrypt<any[]>(assessment.answers as string)

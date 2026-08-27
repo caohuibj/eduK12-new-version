@@ -2,6 +2,7 @@ import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
 import { authController } from '../controllers/authController'
 import { authenticate, requireAdmin } from '../middleware/auth'
+import { issueCsrfToken } from '../utils/authCookies'
 
 const router = Router()
 
@@ -45,9 +46,14 @@ router.post('/student-register', registrationLimiter, authController.studentRegi
 router.post('/verify-teacher-code', registrationLimiter, authController.verifyTeacherCode)
 router.post('/teacher-register', registrationLimiter, authController.teacherRegister)
 
+router.get('/csrf', (req, res) => {
+  return res.json({ code: 0, message: '操作成功', data: { csrfToken: issueCsrfToken(req, res) } })
+})
+
 // 需要认证的接口
 router.get('/me', authenticate, authController.me)
 router.post('/change-password', authenticate, authController.changePassword)
+router.post('/logout', authenticate, authController.logout)
 
 // 管理员专属接口 - 账号延期
 router.post('/extend-account', authenticate, requireAdmin, authController.extendAccount)

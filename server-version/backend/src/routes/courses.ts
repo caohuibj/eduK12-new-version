@@ -2,31 +2,11 @@ import { Router } from 'express'
 import { courseController } from '../controllers/courseController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
-import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import fs from 'fs'
 
 const router = Router()
 
-// 确保封面上传目录存在
-const coversDir = path.join(process.cwd(), 'uploads', 'covers')
-if (!fs.existsSync(coversDir)) {
-  fs.mkdirSync(coversDir, { recursive: true })
-}
-
-// 配置封面存储
-const coverStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, coversDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`
-    cb(null, uniqueName)
-  }
-})
-
 const coverUpload = multer({
-  storage: coverStorage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
   },

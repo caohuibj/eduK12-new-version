@@ -155,7 +155,6 @@ export const checkinTokenService = {
     }
 
     logger.info('打卡令牌验证成功', {
-      token: tokenString.substring(0, 10) + '...',
       tokenId: accessToken.id
     })
 

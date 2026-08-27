@@ -62,6 +62,11 @@ services:
       DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
       REDIS_URL: redis://redis:6379
       UPLOAD_DIR: /app/uploads
+      ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
+      ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:-false}
+      # Defaults to the already-required JWT secret when omitted; set a
+      # dedicated secret before a production rollout.
+      ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:-}
       CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
       TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
       EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}

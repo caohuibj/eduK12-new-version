@@ -17,6 +17,7 @@ model User {
   phone                       String?
   isActive                    Boolean                    @default(true) @map("is_active")
   tokenVersion                Int                        @default(0) @map("token_version")
+  mustChangePassword          Boolean                    @default(false) @map("must_change_password")
   createdAt                   DateTime                   @default(now()) @map("created_at")
   updatedAt                   DateTime                   @updatedAt @map("updated_at")
   teacherCodeId               String?                    @map("teacher_code_id")
@@ -82,6 +83,7 @@ model Course {
   title                String
   description          String?
   coverUrl             String?               @map("cover_url")
+  coverAssetId         String?               @unique @map("cover_asset_id")
   status               CourseStatus          @default(DRAFT)
   courseCode           String                @unique @map("course_code")
   creatorId            String                @map("creator_id")
@@ -94,6 +96,7 @@ model Course {
   checkins             Checkin[]
   students             CourseStudent[]
   creator              User                  @relation("CourseCreator", fields: [creatorId], references: [id])
+  coverAsset           StoredAsset?          @relation("CourseCoverAsset", fields: [coverAssetId], references: [id], onDelete: SetNull)
   shares               CourseShare[]
   // 心理问卷模块关联
   courseScales         CourseScale[]
@@ -258,7 +261,13 @@ model Video {
   resolution     String?
   status         VideoStatus @default(PENDING)
   thumbnailUrl   String?     @map("thumbnail_url")
+  originalAssetId  String?   @unique @map("original_asset_id")
+  processedAssetId String?   @unique @map("processed_asset_id")
+  thumbnailAssetId String?   @unique @map("thumbnail_asset_id")
   teacher        User        @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  originalAsset  StoredAsset? @relation("VideoOriginalAsset", fields: [originalAssetId], references: [id], onDelete: SetNull)
+  processedAsset StoredAsset? @relation("VideoProcessedAsset", fields: [processedAssetId], references: [id], onDelete: SetNull)
+  thumbnailAsset StoredAsset? @relation("VideoThumbnailAsset", fields: [thumbnailAssetId], references: [id], onDelete: SetNull)
 
   @@map("videos")
 }
@@ -873,14 +882,59 @@ model Document {
   pageCount  Int?      @map("page_count")
   cosUrl     String?   @map("cos_url")
   cosKey     String?   @map("cos_key")
+  assetId    String?   @unique @map("asset_id")
 
   // 关联
   teacher User @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  asset   StoredAsset? @relation("DocumentAsset", fields: [assetId], references: [id], onDelete: SetNull)
 
   // 性能优化索引
   @@index([createdAt])
   @@index([teacherId])
   @@map("documents")
+}
+
+// ==================== 统一文件资产 ====================
+
+model StoredAsset {
+  id           String   @id @default(uuid())
+  objectKey    String   @unique @map("object_key")
+  provider     String   @default("local")
+  mimeType     String   @map("mime_type")
+  sizeBytes    Int      @map("size_bytes")
+  sha256       String
+  originalName String?  @map("original_name")
+  ownerId      String?  @map("owner_id")
+  accessScope  String   @default("PRIVATE") @map("access_scope")
+  scopeId      String?  @map("scope_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  courseCover    Course?   @relation("CourseCoverAsset")
+  document       Document? @relation("DocumentAsset")
+  videoOriginal  Video?    @relation("VideoOriginalAsset")
+  videoProcessed Video?    @relation("VideoProcessedAsset")
+  videoThumbnail Video?    @relation("VideoThumbnailAsset")
+  references     AssetReference[]
+
+  @@index([ownerId])
+  @@index([accessScope, scopeId])
+  @@map("stored_assets")
+}
+
+model AssetReference {
+  id         String      @id @default(uuid())
+  assetId    String      @map("asset_id")
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id")
+  field      String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  asset      StoredAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, entityType, entityId, field])
+  @@index([entityType, entityId])
+  @@map("asset_references")
 }
 
 // ==================== 课堂互动模块 ====================

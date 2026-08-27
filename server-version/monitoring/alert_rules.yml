@@ -1,0 +1,77 @@
+groups:
+  - name: eduk12-availability
+    rules:
+      - alert: EduK12BackendDown
+        expr: up{job="ptool-api"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: eduK12 backend metrics endpoint is unavailable
+
+      - alert: EduK12Api5xxRateHigh
+        expr: |
+          sum(rate(ptool_api_requests_total{status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(ptool_api_requests_total[5m])), 1)
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: API 5xx rate exceeded 5 percent for five minutes
+
+      - alert: EduK12DatabaseConnectionsHigh
+        expr: |
+          max(pg_stat_activity_count)
+          /
+          clamp_min(max(pg_settings_max_connections), 1)
+          > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          service: postgres
+        annotations:
+          summary: PostgreSQL connections exceeded 80 percent of configured maximum
+
+      - alert: EduK12DiskSpaceLow
+        expr: |
+          node_filesystem_avail_bytes{mountpoint="/", fstype!=""}
+          /
+          clamp_min(node_filesystem_size_bytes{mountpoint="/", fstype!=""}, 1)
+          < 0.15
+        for: 10m
+        labels:
+          severity: warning
+          service: host
+        annotations:
+          summary: root filesystem free space is below 15 percent
+
+      - alert: EduK12BackupStale
+        expr: time() - ptool_backup_last_success_timestamp_seconds > 26 * 60 * 60
+        for: 30m
+        labels:
+          severity: critical
+          service: backup
+        annotations:
+          summary: the last verified database backup is older than 26 hours
+
+      - alert: EduK12BackupStatusMissing
+        expr: absent(ptool_backup_last_success_timestamp_seconds)
+        for: 26h
+        labels:
+          severity: critical
+          service: backup
+        annotations:
+          summary: no verified backup status metric has been reported for 26 hours
+
+      - alert: EduK12MonitoringTargetDown
+        expr: up{job=~"node-exporter|postgres-exporter|redis-exporter|cadvisor"} == 0
+        for: 10m
+        labels:
+          severity: warning
+          service: monitoring
+        annotations:
+          summary: a monitoring exporter target is down

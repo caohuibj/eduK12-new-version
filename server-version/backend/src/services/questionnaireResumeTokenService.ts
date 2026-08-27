@@ -33,6 +33,35 @@ export const questionnaireResumeTokenService = {
     return token
   },
 
+  /**
+   * Rotate a capability only if the presented hash is still current. This
+   * makes two concurrent resume requests a compare-and-swap: one succeeds and
+   * the other cannot reuse the old capability.
+   */
+  async rotate(
+    assessmentId: string,
+    currentToken: string,
+    accessTokenExpiresAt: Date,
+    db: typeof prisma | Prisma.TransactionClient = prisma,
+  ): Promise<string | null> {
+    const token = randomBytes(32).toString('base64url')
+    const expiresAt = getResumeExpiry(accessTokenExpiresAt)
+    const updated = await db.questionnaireAssessment.updateMany({
+      where: {
+        id: assessmentId,
+        resumeTokenHash: hashQuestionnaireResumeToken(currentToken),
+        resumeTokenExpiresAt: { gt: new Date() },
+        status: 'IN_PROGRESS',
+      },
+      data: {
+        resumeTokenHash: hashQuestionnaireResumeToken(token),
+        resumeTokenExpiresAt: expiresAt,
+      },
+    })
+
+    return updated.count === 1 ? token : null
+  },
+
   isExpired(expiresAt: Date | null): boolean {
     return !expiresAt || expiresAt.getTime() <= Date.now()
   },

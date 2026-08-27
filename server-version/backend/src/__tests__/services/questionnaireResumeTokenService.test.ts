@@ -4,6 +4,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     questionnaireAssessment: {
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
   },
 }))
@@ -19,6 +20,7 @@ describe('questionnaire resume capability', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockPrisma.questionnaireAssessment.update.mockResolvedValue({})
+    mockPrisma.questionnaireAssessment.updateMany.mockResolvedValue({ count: 1 })
   })
 
   it('generates a high-entropy token and stores only its hash', async () => {
@@ -42,6 +44,34 @@ describe('questionnaire resume capability', () => {
       .data.resumeTokenExpiresAt as Date
 
     expect(storedExpiry.getTime()).toBeLessThanOrEqual(expiresAt.getTime())
+  })
+
+  it('rotates only the currently presented capability', async () => {
+    const currentToken = 'current-resume-token'
+    const token = await questionnaireResumeTokenService.rotate(
+      'assessment-1',
+      currentToken,
+      new Date(Date.now() + 60 * 60 * 1000),
+    )
+    const update = mockPrisma.questionnaireAssessment.updateMany.mock.calls[0][0]
+
+    expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(update.where).toEqual(expect.objectContaining({
+      id: 'assessment-1',
+      resumeTokenHash: hashQuestionnaireResumeToken(currentToken),
+      status: 'IN_PROGRESS',
+    }))
+    expect(update.data.resumeTokenHash).toBe(hashQuestionnaireResumeToken(token!))
+  })
+
+  it('reports a failed compare-and-swap when another request already rotated the token', async () => {
+    mockPrisma.questionnaireAssessment.updateMany.mockResolvedValue({ count: 0 })
+
+    await expect(questionnaireResumeTokenService.rotate(
+      'assessment-1',
+      'stale-resume-token',
+      new Date(Date.now() + 60 * 60 * 1000),
+    )).resolves.toBeNull()
   })
 
   it('treats missing and past expiry values as expired', () => {

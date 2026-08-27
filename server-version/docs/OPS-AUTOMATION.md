@@ -1,5 +1,10 @@
 # PTool 运维自动化系统
 
+> 当前状态（2026-08-26）：本文下方保留的宿主机、PM2、sudo、cron、COS 和
+> 自动修复示例仅作历史参考，相关脚本已停用并会 fail-fast。当前 PR 的支持
+> 范围是本地 Docker Compose；备份请使用 `docs/BACKUP-RESTORE.md` 中的统一
+> Node 入口。生产服务器和 COS 尚未配置，不要执行本文的宿主机运维命令。
+
 ## 系统概览
 
 ```
@@ -33,38 +38,36 @@
 
 ## 快速开始
 
-### 1. 一键安装
+### 1. 当前本地入口
 
 ```bash
-# 进入项目目录
-cd /opt/ptool/server-version
-
-# 运行安装脚本
-sudo bash scripts/monitoring/setup-monitoring.sh
+# 在仓库根目录启动本地 Compose（按本机 .env.example 准备 ignored 配置）
+cd <repo-root>
+docker compose --env-file server-version/.env \
+  -f server-version/docker-compose.yml up -d
 ```
 
-### 2. 配置参数
+监控 Compose 仅用于本地观察，端口默认绑定到 `127.0.0.1`；应用对外入口是
+前端的 `http://localhost/`，后端健康检查为容器内 `/ready`，指标入口为
+容器内 `/metrics`。数据库和 Redis 不发布宿主机端口。
+
+### 2. 配置边界
 
 ```bash
-# 编辑监控配置
-sudo nano scripts/monitoring/monitor-config.env
-
-# 编辑备份配置
-sudo nano scripts/monitoring/backup-config.env
-
-# 编辑部署配置
-sudo nano scripts/monitoring/deploy-config.env
+# 本地只使用 ignored 的环境文件或进程环境变量；不要创建并提交配置备份
+# 备份密钥必须通过 BACKUP_ENCRYPTION_KEY 注入
+# COS、远程 webhook、生产域名和宿主机 cron 均不属于当前本地测试范围
 ```
 
-### 3. 启动仪表盘
+### 3. 查看状态
 
 ```bash
-# 查看系统状态
-ptool-ops status
-
-# 启动交互式仪表盘
-ptool-ops dashboard
+docker compose --env-file server-version/.env \
+  -f server-version/docker-compose.yml ps
 ```
+
+下方旧组件说明、快捷命令和定时任务不构成当前部署步骤；涉及已停用脚本的
+命令不应在本地执行。
 
 ## 组件详解
 
@@ -189,55 +192,21 @@ export ADMIN_EMAIL="admin@your-domain.com"
 
 **定时任务：** 每周一凌晨3点执行
 
-### 5. 增强备份系统 (backup-enhanced.sh)
+### 5. 备份系统（统一入口）
 
-**功能：**
-- 全量备份 (数据库+文件+配置)
-- 增量备份 (WAL归档)
-- AES-256加密
-- 多地存储 (COS/S3/OSS/SCP)
-- 备份完整性验证
-- 自动清理旧备份 (保留30天)
+旧的 shell 实现已经停用；`backup-enhanced.sh` 仅转发到统一 Node 入口。
+当前只支持加密数据库包、实际解密校验和隔离 PostgreSQL 恢复。WAL tar
+增量备份、多地上传、宿主机恢复和自动清理暂不支持。
 
-**配置：**
 ```bash
-# backup-config.env
-ENABLE_ENCRYPTION=true
-BACKUP_ENCRYPTION_KEY="your-32-byte-key"
-
-# 远程存储配置
-REMOTE_TYPE="cos"                    # s3, cos, oss, scp
-REMOTE_ENDPOINT="https://cos..."
-REMOTE_BUCKET="your-bucket"
-REMOTE_ACCESS_KEY="..."
-REMOTE_SECRET_KEY="..."
+cd server-version/backend
+BACKUP_ENCRYPTION_KEY='只在当前进程中注入的本地测试密钥' npm run backup:db
+BACKUP_ENCRYPTION_KEY='只在当前进程中注入的本地测试密钥' npm run verify:backup
 ```
 
-**使用：**
-```bash
-# 执行全量备份
-./scripts/monitoring/backup-enhanced.sh full
-
-# 执行增量备份
-./scripts/monitoring/backup-enhanced.sh incremental
-
-# 列出所有备份
-./scripts/monitoring/backup-enhanced.sh list
-
-# 验证备份
-./scripts/monitoring/backup-enhanced.sh verify /path/to/backup.enc
-
-# 恢复备份 (交互式)
-./scripts/monitoring/backup-enhanced.sh restore /path/to/backup.enc
-
-# 清理旧备份
-./scripts/monitoring/backup-enhanced.sh cleanup
-```
-
-**定时任务：**
-- 全量备份：每天凌晨2点
-- 增量备份：每小时
-- 备份验证：每周日凌晨4点
+完整参数和恢复命令见 `docs/BACKUP-RESTORE.md`。本地验证时请显式指定
+`eduk12-dev-pg`、`eduk12_dev` 等测试目标，禁止把可丢弃数据库重置流程用于
+Compose 的 `ptool` 数据库。
 
 ### 6. CI/CD 自动化部署 (deploy-ci-cd.sh)
 
@@ -347,20 +316,8 @@ ptool-ops ssl           # 显示SSL证书信息
 # 健康监控 - 每5分钟
 */5 * * * * /opt/ptool/server-version/scripts/monitoring/health-monitor.sh run
 
-# 自动恢复 - 每分钟
-* * * * * /opt/ptool/server-version/scripts/monitoring/auto-heal.sh heal
-
-# 日志管理 - 每天凌晨1点
-0 1 * * * /opt/ptool/server-version/scripts/monitoring/log-manager.sh daily
-
-# SSL续期 - 每周一凌晨3点
-0 3 * * 1 /opt/ptool/server-version/scripts/monitoring/ssl-manager.sh renew
-
-# 全量备份 - 每天凌晨2点
-0 2 * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh full
-
-# 增量备份 - 每小时
-0 * * * * /opt/ptool/server-version/scripts/monitoring/backup-enhanced.sh incremental
+# 本地 PR 不安装宿主机 cron。生产调度、通知和保留策略须另行审批并实现
+# 受控的 Compose/备份运维入口后再配置。
 ```
 
 ## 告警配置示例

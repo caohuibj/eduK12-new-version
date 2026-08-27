@@ -11,6 +11,12 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/backup-config.env"
 
+# The old shell implementation is retained only as a compatibility wrapper.
+# All supported operations now use the single authenticated Node.js entrypoint.
+exec node "${SCRIPT_DIR}/../backup/backup-db.mjs" "$@"
+
+: <<'LEGACY_SCRIPT'
+
 # 默认配置
 BACKUP_BASE_DIR="${BACKUP_BASE_DIR:-/backup/ptool}"
 LOCAL_BACKUP_DIR="${LOCAL_BACKUP_DIR:-$BACKUP_BASE_DIR/local}"
@@ -643,3 +649,4 @@ main() {
 }
 
 main "$@"
+LEGACY_SCRIPT

@@ -2,6 +2,13 @@
 # CodeBuddy 内存清理脚本
 # 使用方法: ./cleanup-memory.sh
 
+set -e
+
+echo '此宿主机内存清理脚本已停用；请使用 Docker Desktop/操作系统自身的资源管理。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 echo "=== 开始清理内存 ==="
 echo ""
 
@@ -37,3 +44,5 @@ echo "=== 清理完成 ==="
 echo ""
 echo "当前内存状态:"
 free -h
+
+LEGACY_SCRIPT

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronDown, ChevronUp, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
 import apiClient from '../../api/client'
+import { sessionFetch } from '../../api/client'
 import { compositeApi } from '../../modules/composite/api'
 import type {
   AnalysisProtocolCatalogItem,
@@ -291,10 +292,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         setError(response.message || '导出失败')
         return
       }
-      const authToken = localStorage.getItem('token')
-      const download = await fetch(`/api/composite-assessments/${id}/export/files/${response.data.fileName}`, {
-        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
-      })
+      const download = await sessionFetch(`/api/composite-assessments/${id}/export/files/${response.data.fileName}`)
       if (!download.ok) throw new Error('下载导出文件失败')
       const blobUrl = URL.createObjectURL(await download.blob())
       const anchor = document.createElement('a')

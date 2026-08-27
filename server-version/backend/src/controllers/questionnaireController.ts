@@ -1077,6 +1077,7 @@ export const questionnaireController = {
         if (!qa) return { kind: 'not-found' as const }
         if (qa.userId !== userId) return { kind: 'forbidden' as const }
         if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
         const formItem = qa.questionnaire.formItems.find(fi => fi.id === formItemId)
         if (!formItem) return { kind: 'form-not-found' as const }
@@ -1105,6 +1106,7 @@ export const questionnaireController = {
       if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
       if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
 
       logger.info('保存表单答案', { assessmentId, formItemId, userId })
@@ -1149,6 +1151,7 @@ export const questionnaireController = {
         if (!qa) return { kind: 'not-found' as const }
         if (qa.userId !== userId) return { kind: 'forbidden' as const }
         if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
         const formItemIds = new Set(qa.questionnaire.formItems.map((item) => item.id))
         if (answers.some((answer) => !formItemIds.has(answer.formItemId))) {
@@ -1181,6 +1184,7 @@ export const questionnaireController = {
       if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
       if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
 
       logger.info('批量保存表单答案', { assessmentId, count: answers.length, userId })
@@ -1996,18 +2000,21 @@ export const questionnaireController = {
         }
 
         const progress = await refreshQuestionnaireProgress(tx, qa.id)
-        if (!progress?.completed) return { kind: 'incomplete-forms' as const }
+        if (!progress) return { kind: 'incomplete-forms' as const }
+        if (progress.status !== 'IN_PROGRESS' && !progress.completed) return { kind: 'closed' as const }
+        if (!progress.completed) return { kind: 'incomplete-forms' as const }
         return {
           kind: 'completed' as const,
           questionnaireId: qa.questionnaireId,
-          completedAt: new Date(),
-          totalTime: Date.now() - new Date(qa.startedAt).getTime(),
+          completedAt: progress.completedAt || new Date(),
+          totalTime: progress.totalTime ?? (Date.now() - new Date(qa.startedAt).getTime()),
           collectionReport: progress?.collectionReport || buildQuestionnaireCollectionReport(qa),
         }
       })
 
       if (result.kind === 'not-found') return notFound(res, '问卷测评不存在')
       if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
       if (result.kind === 'incomplete-scales') return error(res, '还有量表未完成')
       if (result.kind === 'incomplete-forms') return error(res, '还有表单题目未完成')
 
@@ -2136,7 +2143,12 @@ export const questionnaireController = {
         dateRange
       }, format as 'csv' | 'sav')
 
-      logger.info(`问卷数据导出成功: ${questionnaire.name}, 记录数: ${exportData.rows.length}, 格式: ${format}, 脱敏: ${anonymize}`)
+      logger.info('问卷数据导出成功', {
+        questionnaireId: questionnaire.id,
+        recordCount: exportData.rows.length,
+        format,
+        anonymize,
+      })
 
       const result: any = {
         recordCount: exportData.rows.length,
@@ -2157,7 +2169,7 @@ export const questionnaireController = {
       return success(res, result, '导出成功')
     } catch (err) {
       logger.error('导出问卷数据错误', err)
-      return error(res, '导出问卷数据失败: ' + (err as Error).message)
+      return error(res, '导出问卷数据失败')
     }
   },
 

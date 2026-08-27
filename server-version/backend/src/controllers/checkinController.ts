@@ -1,17 +1,15 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound } from '../utils/response'
+import { success, error, forbidden, notFound, unauthorized } from '../utils/response'
 import { UserRole, CourseStudentStatus } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import multer from 'multer'
-import path from 'path'
-import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'
-import { config } from '../config'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import { attachAssetReference, getSignedAssetUrl, hydrateAssetReferences, storeAsset } from '../services/assetStorage'
+import { config } from '../config'
 
 const createCheckinSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -38,29 +36,110 @@ const updateCheckinSchema = z.object({
   allowViewOthers: z.boolean().optional(),
 })
 
+const isLegacyUploadReference = (value: string): boolean => {
+  if (!/^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@%/_-]+$/.test(value)) return false
+  return !value.split('/').includes('..')
+}
+
 const submitCheckinSchema = z.object({
   content: z.string().optional(),
   tags: z.array(z.string().max(20)).max(10).optional().default([]),
-  images: z.array(z.string()).optional(),
+  // During the asset migration, accept only old local upload references or a
+  // server-issued asset capability. Client-supplied URLs are never trusted.
+  images: z.array(z.union([
+    z.string().min(1).max(2048).refine(isLegacyUploadReference, '图片引用无效'),
+    z.object({ assetId: z.string().min(1).max(100) }).strict(),
+  ])).max(9).optional(),
 })
 
-// 配置匿名打卡图片存储
-const publicImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const imagesDir = path.join(config.uploadDir, 'images')
-    if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir, { recursive: true })
-    }
-    cb(null, imagesDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`
-    cb(null, uniqueName)
+type SubmissionAssetImage = { assetId: string }
+
+const isSubmissionAssetImage = (value: unknown): value is SubmissionAssetImage => (
+  !!value && typeof value === 'object' && typeof (value as SubmissionAssetImage).assetId === 'string'
+)
+
+const validateStudentSubmissionImages = async (
+  images: Array<string | SubmissionAssetImage> | undefined,
+  courseId: string,
+  studentId: string,
+) => {
+  const values = images || []
+  const assetImages = values.filter(isSubmissionAssetImage)
+  const assetIds = assetImages.map((image) => image.assetId)
+
+  if (new Set(assetIds).size !== assetIds.length) return null
+  if (!assetIds.length) {
+    if (!config.legacyUploadsEnabled && values.some((image) => typeof image === 'string')) return null
+    return values
   }
+
+  const assets = await prisma.storedAsset.findMany({
+    where: {
+      id: { in: assetIds },
+      ownerId: studentId,
+      accessScope: 'COURSE',
+      scopeId: courseId,
+      mimeType: { startsWith: 'image/' },
+      deletedAt: null,
+    },
+    select: { id: true },
+  })
+
+  if (assets.length !== assetIds.length) return null
+  if (!config.legacyUploadsEnabled && values.some((image) => typeof image === 'string')) return null
+  return values
+}
+
+const publicSubmissionImageSchema = z.object({
+  assetId: z.string().min(1).max(100),
+}).strict()
+
+const publicSubmissionSchema = z.object({
+  content: z.string().max(1000).optional(),
+  images: z.array(publicSubmissionImageSchema).max(9).optional().default([]),
+  sessionId: z.string().min(1).max(100),
 })
+
+const validatePublicSubmissionImages = async (images: unknown, checkinId: string) => {
+  const result = z.array(publicSubmissionImageSchema).max(9).safeParse(images || [])
+  if (!result.success) return null
+
+  const assetIds = [...new Set(result.data.map((item) => item.assetId))]
+  if (assetIds.length !== result.data.length) return null
+  if (!assetIds.length) return result.data
+
+  const assets = await prisma.storedAsset.findMany({
+    where: {
+      id: { in: assetIds },
+      accessScope: 'PUBLIC_CHECKIN',
+      scopeId: checkinId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  })
+  return assets.length === assetIds.length ? result.data : null
+}
+
+const syncSubmissionAssetReferences = async (
+  submissionId: string,
+  images: Array<string | SubmissionAssetImage>,
+) => {
+  await prisma.assetReference.deleteMany({
+    where: { entityType: 'CheckinSubmission', entityId: submissionId, field: 'images' },
+  })
+
+  await Promise.all(
+    images.filter(isSubmissionAssetImage).map((image) => attachAssetReference({
+      assetId: image.assetId,
+      entityType: 'CheckinSubmission',
+      entityId: submissionId,
+      field: 'images',
+    })),
+  )
+}
 
 const publicImageUpload = multer({
-  storage: publicImageStorage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
@@ -73,6 +152,10 @@ const publicImageUpload = multer({
     }
   }
 })
+
+// Student submissions use memory storage so a file is never exposed through
+// the legacy public /uploads tree before it has an ownership record.
+export const submissionImageUpload = publicImageUpload
 
 export const checkinController = {
   // 获取打卡列表（添加分页优化）
@@ -160,7 +243,10 @@ export const checkinController = {
         prisma.checkin.count({ where })
       ])
 
-      return success(res, buildPaginatedResult(checkins, total, pagination))
+      const hydratedCheckins = await Promise.all(
+        checkins.map((checkin) => hydrateAssetReferences(checkin, false)),
+      )
+      return success(res, buildPaginatedResult(hydratedCheckins, total, pagination))
     } catch (err) {
       logger.error('获取打卡列表错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -231,7 +317,7 @@ export const checkinController = {
         }
       })
 
-      return success(res, checkin, '打卡创建成功')
+      return success(res, await hydrateAssetReferences(checkin, false), '打卡创建成功')
     } catch (err) {
       logger.error('创建打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -308,7 +394,8 @@ export const checkinController = {
 
       const { course: courseWithAccess, ...checkinData } = checkin
       const { shares: _shares, ...course } = courseWithAccess
-      return success(res, { ...checkinData, course })
+      const hydrated = await hydrateAssetReferences({ ...checkinData, course }, false)
+      return success(res, hydrated)
     } catch (err) {
       logger.error('获取打卡详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -383,7 +470,7 @@ export const checkinController = {
         }
       })
 
-      return success(res, updatedCheckin, '打卡更新成功')
+      return success(res, await hydrateAssetReferences(updatedCheckin, false), '打卡更新成功')
     } catch (err) {
       logger.error('更新打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -462,6 +549,11 @@ export const checkinController = {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
 
+      const validatedImages = await validateStudentSubmissionImages(images, checkin.courseId, userId)
+      if (!validatedImages) {
+        return error(res, '图片凭据无效或不属于当前课程')
+      }
+
       // 检查是否已提交
       const existing = await prisma.checkinSubmission.findFirst({
         where: {
@@ -476,10 +568,11 @@ export const checkinController = {
           where: { id: existing.id },
           data: {
             content,
-            images: images || [],
+            images: validatedImages,
           }
         })
-        return success(res, updated, '打卡更新成功')
+        await syncSubmissionAssetReferences(updated.id, validatedImages)
+        return success(res, await hydrateAssetReferences(updated, false), '打卡更新成功')
       }
 
       // 创建新提交
@@ -488,14 +581,65 @@ export const checkinController = {
           checkinId: id,
           studentId: userId,
           content,
-          images: images || [],
+          images: validatedImages,
         }
       })
 
-      return success(res, submission, '打卡成功')
+      await syncSubmissionAssetReferences(submission.id, validatedImages)
+      return success(res, await hydrateAssetReferences(submission, false), '打卡成功')
     } catch (err) {
       logger.error('提交打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
+    }
+  },
+
+  // 学生提交打卡图片。文件先写入私有资产存储，提交接口会再次校验资产归属。
+  async uploadStudentSubmissionImage(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const { id } = req.params
+      if (!userId || req.user?.role !== UserRole.STUDENT) {
+        return forbidden(res, '仅学生可以上传打卡图片')
+      }
+
+      const checkin = await prisma.checkin.findUnique({
+        where: { id },
+        select: { courseId: true, endTime: true },
+      })
+      if (!checkin) return notFound(res, '打卡不存在')
+      if (!(await hasActiveCourseMembership(checkin.courseId, userId))) {
+        return forbidden(res, '您不是该课程的学员')
+      }
+      if (checkin.endTime && new Date() > checkin.endTime) {
+        return error(res, Messages.CHECKIN.EXPIRED)
+      }
+
+      const file = req.file
+      if (!file) return error(res, '请选择图片文件')
+
+      const asset = await storeAsset({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        ownerId: userId,
+        accessScope: 'COURSE',
+        scopeId: checkin.courseId,
+      })
+      const url = await getSignedAssetUrl(asset.id)
+      if (!url) return error(res, '图片上传失败')
+
+      logger.info('学生上传打卡图片', {
+        assetId: asset.id,
+        checkinId: id,
+      })
+      return success(res, {
+        assetId: asset.id,
+        url,
+        size: asset.sizeBytes,
+      }, '上传成功')
+    } catch (err) {
+      logger.error('学生上传打卡图片错误', err)
+      return error(res, '上传失败')
     }
   },
 
@@ -533,7 +677,7 @@ export const checkinController = {
         }
       })
 
-      return success(res, submission)
+      return success(res, submission ? await hydrateAssetReferences(submission, false) : null)
     } catch (err) {
       logger.error('获取我的打卡提交错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -587,9 +731,13 @@ export const checkinController = {
         submission: checkin.submissions.length > 0 ? checkin.submissions[0] : undefined
       }))
 
+      const hydratedCheckins = await Promise.all(
+        formattedCheckins.map((checkin) => hydrateAssetReferences(checkin, false)),
+      )
+
       return success(res, {
-        list: formattedCheckins,
-        total: formattedCheckins.length,
+        list: hydratedCheckins,
+        total: hydratedCheckins.length,
       })
     } catch (err) {
       logger.error('获取我的打卡错误', err)
@@ -643,7 +791,10 @@ export const checkinController = {
       })
 
       // 格式化返回数据，确保 images 是字符串数组
-      const formattedSubmissions = submissions.map(sub => {
+      const hydratedSubmissions = await Promise.all(
+        submissions.map((submission) => hydrateAssetReferences(submission, false)),
+      )
+      const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
         if (sub.images) {
           // 处理可能的多种格式：字符串数组、对象数组、JSON字符串
@@ -652,10 +803,10 @@ export const checkinController = {
               if (typeof img === 'string') {
                 return img
               }
-              if (img && typeof img === 'object' && img.url) {
+              if (img && typeof img === 'object' && typeof img.url === 'string') {
                 return img.url
               }
-              return String(img)
+              return ''
             }).filter(Boolean)
           } else if (typeof sub.images === 'string') {
             try {
@@ -663,8 +814,8 @@ export const checkinController = {
               if (Array.isArray(parsed)) {
                 imageUrls = parsed.map((img: any) => {
                   if (typeof img === 'string') return img
-                  if (img && img.url) return img.url
-                  return String(img)
+                  if (img && typeof img.url === 'string') return img.url
+                  return ''
                 }).filter(Boolean)
               }
             } catch {
@@ -742,7 +893,10 @@ export const checkinController = {
       })
 
       // 格式化返回数据，确保 images 是字符串数组
-      const formattedSubmissions = submissions.map(sub => {
+      const hydratedSubmissions = await Promise.all(
+        submissions.map((submission) => hydrateAssetReferences(submission, false)),
+      )
+      const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
         if (sub.images) {
           // 处理可能的多种格式：字符串数组、对象数组、JSON字符串
@@ -751,10 +905,10 @@ export const checkinController = {
               if (typeof img === 'string') {
                 return img
               }
-              if (img && typeof img === 'object' && img.url) {
+              if (img && typeof img === 'object' && typeof img.url === 'string') {
                 return img.url
               }
-              return String(img)
+              return ''
             }).filter(Boolean)
           } else if (typeof sub.images === 'string') {
             try {
@@ -762,8 +916,8 @@ export const checkinController = {
               if (Array.isArray(parsed)) {
                 imageUrls = parsed.map((img: any) => {
                   if (typeof img === 'string') return img
-                  if (img && img.url) return img.url
-                  return String(img)
+                  if (img && typeof img.url === 'string') return img.url
+                  return ''
                 }).filter(Boolean)
               }
             } catch {
@@ -998,7 +1152,6 @@ export const checkinController = {
           },
         },
       })
-
       if (!token) {
         return notFound(res, '令牌不存在')
       }
@@ -1070,16 +1223,21 @@ export const checkinController = {
         },
       })
 
+      if (!checkin) {
+        return notFound(res, '打卡不存在')
+      }
+      const publicCheckin = await hydrateAssetReferences(checkin, true)
+
       // 生成会话ID（用于防重复提交）
       const sessionId = checkinTokenService.generateSessionId()
 
       logger.info('匿名用户访问打卡', {
-        token: token.substring(0, 10) + '...',
         checkinId: checkin?.id,
+        tokenId: validation.token!.id,
       })
 
       return success(res, {
-        checkin,
+        checkin: publicCheckin,
         sessionId,
         tokenId: validation.token.id,
       })
@@ -1095,6 +1253,10 @@ export const checkinController = {
   async uploadPublicImage(req: Request, res: Response) {
     try {
       const { token } = req.params
+
+      if (req.header('X-Checkin-Token') !== token) {
+        return unauthorized(res, '缺少签到访问令牌')
+      }
 
       // 验证令牌
       const { checkinTokenService } = await import('../services/checkinTokenService')
@@ -1112,27 +1274,38 @@ export const checkinController = {
         return error(res, message)
       }
 
-      // 使用 multer 处理上传
-      publicImageUpload.single('file')(req, res, async (multerErr) => {
-        if (multerErr) {
-          logger.error('公开上传图片错误', multerErr)
-          return error(res, multerErr.message || '上传失败')
-        }
-
-        const file = req.file
-        if (!file) {
-          return error(res, '请选择图片文件')
-        }
-
-        const imageUrl = `/uploads/images/${file.filename}`
-
-        logger.info('匿名用户上传图片', {
-          filename: file.filename,
-          token: token.substring(0, 10) + '...',
+      // 使用 multer 处理上传，并等待回调结束，确保存储异常进入统一错误处理。
+      await new Promise<void>((resolve, reject) => {
+        publicImageUpload.single('file')(req, res, (multerErr) => {
+          if (multerErr) reject(multerErr)
+          else resolve()
         })
-
-        return success(res, { url: imageUrl }, '上传成功')
       })
+
+      const file = req.file
+      if (!file) {
+        return error(res, '请选择图片文件')
+      }
+
+      const asset = await storeAsset({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        ownerId: validation.token?.createdBy,
+        accessScope: 'PUBLIC_CHECKIN',
+        scopeId: validation.checkin.id,
+      })
+      await attachAssetReference({ assetId: asset.id, entityType: 'Checkin', entityId: validation.checkin.id, field: 'public-image' })
+
+      logger.info('匿名用户上传图片', {
+        assetId: asset.id,
+        checkinId: validation.checkin.id,
+      })
+
+      return success(res, {
+        assetId: asset.id,
+        url: await getSignedAssetUrl(asset.id, true),
+      }, '上传成功')
     } catch (err) {
       logger.error('公开上传图片错误', err)
       return error(res, '上传失败')
@@ -1145,7 +1318,16 @@ export const checkinController = {
   async submitPublicCheckin(req: Request, res: Response) {
     try {
       const { token } = req.params
-      const { content, images, sessionId } = req.body
+
+      if (req.header('X-Checkin-Token') !== token) {
+        return unauthorized(res, '缺少签到访问令牌')
+      }
+
+      const parsedBody = publicSubmissionSchema.safeParse(req.body)
+      if (!parsedBody.success) {
+        return error(res, '提交内容格式无效')
+      }
+      const { content, images, sessionId } = parsedBody.data
 
       // 导入令牌服务
       const { checkinTokenService } = await import('../services/checkinTokenService')
@@ -1184,18 +1366,30 @@ export const checkinController = {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
 
+      const validatedImages = await validatePublicSubmissionImages(images, validation.checkin.id)
+      if (!validatedImages) {
+        return error(res, '图片凭据无效或不属于当前签到')
+      }
+
       // 创建匿名提交
       const submission = await prisma.checkinSubmission.create({
         data: {
           checkinId: validation.checkin.id,
           studentId: null, // 匿名提交
           content,
-          images,
+          images: validatedImages,
           sessionId,
           tokenId: validation.token.id,
           isAnonymous: true,
         },
       })
+
+      await Promise.all(validatedImages.map((image) => attachAssetReference({
+        assetId: image.assetId,
+        entityType: 'CheckinSubmission',
+        entityId: submission.id,
+        field: 'images',
+      })))
 
       logger.info('匿名用户提交打卡', {
         submissionId: submission.id,
@@ -1206,6 +1400,9 @@ export const checkinController = {
       return success(res, submission, '提交成功')
     } catch (err) {
       logger.error('公开提交打卡错误', err)
+      if ((err as { code?: string })?.code === 'P2002') {
+        return error(res, '您已经提交过了', -1, 409)
+      }
       return error(res, '提交打卡失败')
     }
   },

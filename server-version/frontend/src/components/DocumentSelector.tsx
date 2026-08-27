@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, FileText, Upload, Search, Check, AlertCircle } from 'lucide-react'
 import apiClient from '../api/client'
+import { ensureCsrfToken } from '../api/client'
 import axios from 'axios'
 import type { Document } from '../types'
 
 export interface DocumentItem {
   id: string
+  assetId?: string
   title: string
   url: string
   allowDownload: boolean  // ⭐ 权限控制
@@ -82,6 +84,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       // 添加，默认禁止下载
       onSelect([...selected, {
         id: doc.id,
+        assetId: doc.assetId,
         title: doc.title,
         url: doc.url || `/uploads/documents/${doc.fileName}`,
         allowDownload: false  // ⭐ 默认禁止下载
@@ -129,12 +132,12 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       formData.append('document', uploadFile)
       formData.append('title', uploadTitle.trim())
 
-      const token = localStorage.getItem('token')
-
+      const csrfToken = await ensureCsrfToken()
       const response = await axios.post('/api/documents/upload', formData, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,
+          ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -149,6 +152,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
         // 上传后自动选中，默认禁止下载
         onSelect([...selected, {
           id: uploadedDoc.id,
+          assetId: uploadedDoc.assetId,
           title: uploadedDoc.title,
           url: uploadedDoc.url,
           allowDownload: false

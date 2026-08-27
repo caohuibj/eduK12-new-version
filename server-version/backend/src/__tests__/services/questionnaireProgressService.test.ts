@@ -93,6 +93,21 @@ describe('questionnaire progress consistency', () => {
     expect(mockPrisma.questionnaireAssessment.updateMany).not.toHaveBeenCalled()
   })
 
+  it('keeps abandoned rows closed and does not recompute or transition them', async () => {
+    mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(makeQa({
+      status: 'ABANDONED',
+      progress: 25,
+      completedScales: 0,
+      completedForms: 0,
+      formAnswers: [{ formItemId: 'form-1', value: '三年级' }],
+    }))
+
+    const result = await refreshQuestionnaireProgress(mockPrisma as any, 'qa-1')
+
+    expect(result).toMatchObject({ status: 'ABANDONED', progress: 25, completed: false })
+    expect(mockPrisma.questionnaireAssessment.updateMany).not.toHaveBeenCalled()
+  })
+
   it('retries serializable conflicts', async () => {
     const transactionCallback = vi.fn(async () => 'ok')
     mockPrisma.$transaction

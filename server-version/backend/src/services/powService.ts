@@ -39,7 +39,7 @@ export const powService = {
     const key = `pow:${challenge}`
     challengeCache.set(key, { challenge, difficulty, timestamp })
 
-    logger.debug('POW 挑战已生成', { challenge, difficulty })
+    logger.debug('POW 挑战已生成', { difficulty })
 
     return {
       challenge,
@@ -57,13 +57,13 @@ export const powService = {
     const stored = challengeCache.get(key) as POWChallenge | undefined
 
     if (!stored) {
-      logger.warn('POW 挑战不存在或已过期', { challenge })
+      logger.warn('POW 挑战不存在或已过期')
       return false
     }
 
     // 验证难度匹配
     if (stored.difficulty !== difficulty) {
-      logger.warn('POW 难度不匹配', { challenge, expected: stored.difficulty, provided: difficulty })
+      logger.warn('POW 难度不匹配', { expectedDifficulty: stored.difficulty, providedDifficulty: difficulty })
       return false
     }
 
@@ -72,14 +72,14 @@ export const powService = {
     const target = '0'.repeat(difficulty)
 
     if (!hash.startsWith(target)) {
-      logger.warn('POW 验证失败', { challenge, proof, hash, target })
+      logger.warn('POW 验证失败', { difficulty, proofValid: false })
       return false
     }
 
     // 验证成功，删除挑战（防止重放）
     challengeCache.del(key)
 
-    logger.info('POW 验证成功', { challenge })
+    logger.info('POW 验证成功', { difficulty })
     return true
   },
 

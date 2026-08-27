@@ -237,7 +237,7 @@ class CacheService {
       }
     } catch (error) {
       logger.error('[CacheService] 获取统计信息失败')
-      return { connected: false, error: String(error) }
+      return { connected: false, error: 'cache_unavailable' }
     }
   }
 

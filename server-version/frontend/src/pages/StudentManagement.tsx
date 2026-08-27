@@ -146,8 +146,8 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await apiClient.post(`/courses/${student.courseId}/students/${student.id}/reset-password`)
       if (response.code === 0) {
-        const tempPassword = response.data?.tempPassword || '未知'
-        alert(`已将 ${student.nickname} 的密码重置为: ${tempPassword}\n请提醒学生尽快修改密码！`)
+        const handoffFile = response.data?.handoffFile || '受保护的交接文件'
+        alert(`${response.message || '密码已重置'}\n文件：${handoffFile}\n请从本机受保护的交接目录读取临时密码，并让学生首次登录后立即修改。`)
       }
     } catch (error: any) {
       alert(error.message || '重置密码失败')

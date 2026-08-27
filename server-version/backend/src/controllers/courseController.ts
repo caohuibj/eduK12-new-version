@@ -12,6 +12,9 @@ import {
   canAccessCourseRoster,
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
+import { attachAssetReference, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
+import path from 'node:path'
 
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
@@ -110,12 +113,13 @@ export const courseController = {
       ])
 
       // 格式化返回数据
-      const formattedCourses = courses.map(course => ({
+      const formattedCourses = await Promise.all(courses.map(async course => ({
         ...course,
+        coverUrl: course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl,
         studentCount: course._count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
-      }))
+      })))
 
       const result = {
         list: formattedCourses,
@@ -251,9 +255,11 @@ export const courseController = {
 
       const canViewRoster = canAccessCourseRoster(course, req.user?.userId, req.user?.role)
       const { _count, students, shares: _shares, courseCode, ...courseFields } = course
+      const coverUrl = course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl
 
       return success(res, {
         ...courseFields,
+        coverUrl,
         ...(canViewRoster ? { courseCode, students } : {}),
         studentCount: _count.students,
         isRecruiting: course.isRecruiting,
@@ -733,15 +739,23 @@ export const courseController = {
       const tempPassword = generateTempPassword()
       const hashedPassword = await hashPassword(tempPassword)
 
-      await prisma.user.update({
-        where: { id: studentId },
-        data: {
-          passwordHash: hashedPassword,
-          tokenVersion: { increment: 1 },
-        }
-      })
+      const student = await prisma.user.findUnique({ where: { id: studentId }, select: { username: true } })
+      const handoffFile = await writeCredentialHandoff([{ username: student?.username || studentId, temporaryPassword: tempPassword }], 'student-password-reset')
+      try {
+        await prisma.user.update({
+          where: { id: studentId },
+          data: {
+            passwordHash: hashedPassword,
+            tokenVersion: { increment: 1 },
+            mustChangePassword: true,
+          }
+        })
+      } catch (updateError) {
+        removeCredentialHandoff(handoffFile)
+        throw updateError
+      }
 
-      return success(res, { tempPassword }, `密码已重置为 ${tempPassword}，请提醒学生尽快修改密码`)
+      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
     } catch (err) {
       logger.error('重置密码错误', err)
       return error(res, '重置密码失败')
@@ -853,15 +867,23 @@ export const courseController = {
         return error(res, '请选择图片文件')
       }
 
-      const coverUrl = `/uploads/covers/${file.filename}`
+      const asset = await storeAsset({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        ownerId: userId,
+        accessScope: 'COURSE',
+        scopeId: id,
+      })
 
       // 更新课程封面
       await prisma.course.update({
         where: { id },
-        data: { coverUrl }
+        data: { coverAssetId: asset.id, coverUrl: null }
       })
+      await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' })
 
-      return success(res, { coverUrl }, '封面上传成功')
+      return success(res, { coverUrl: await getSignedAssetUrl(asset.id) }, '封面上传成功')
     } catch (err) {
       logger.error('上传封面错误', err)
       return error(res, '上传封面失败')

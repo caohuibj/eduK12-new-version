@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { UserRole } from '../types'
-import { checkinController } from '../controllers/checkinController'
+import { checkinController, submissionImageUpload } from '../controllers/checkinController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 
 const router = Router()
@@ -28,6 +28,13 @@ router.post('/', authenticate, requireTeacher, checkinController.create)
 
 // 特定路由必须在 /:id 之前
 router.get('/:id/my-submission', authenticate, requireRole(UserRole.STUDENT), checkinController.mySubmission)
+router.post(
+  '/:id/submission-image',
+  authenticate,
+  requireRole(UserRole.STUDENT),
+  submissionImageUpload.single('image'),
+  checkinController.uploadStudentSubmissionImage,
+)
 router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), checkinController.submit)
 router.get('/:id/export', authenticate, requireTeacher, checkinController.export)
 router.get('/:id/submissions', authenticate, requireTeacher, checkinController.submissions)

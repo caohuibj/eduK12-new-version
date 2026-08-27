@@ -1,5 +1,10 @@
 # PTool 本地部署指南 (CLI 版本)
 
+> 本文原有的 Node/SQLite/宿主机 CLI 流程已停用，`scripts/deploy-local.sh`
+> 会直接 fail-fast。当前本地测试统一使用 Docker Compose；请以
+> `docs/REVIEW-REMEDIATION-20260826.md` 和 `docs/BACKUP-RESTORE.md` 为准，
+> 不要把下方旧命令用于任何共享或生产环境。
+
 **适用场景**: 本地开发环境、快速测试  
 **部署时间**: 5-10分钟  
 **难度**: ⭐⭐ 简单
@@ -67,7 +72,7 @@ cat > .env << EOF
 NODE_ENV=development
 PORT=3000
 DATABASE_URL=postgresql://localhost:5432/ptool?schema=public
-JWT_SECRET=local-test-secret
+JWT_SECRET=<从本地 ignored 配置注入的随机值>
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=./uploads
 ADMIN_USERNAME=your-local-admin

@@ -224,7 +224,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
         role="img"
         aria-label={asset.label}
         className="mx-auto mb-6 h-64 w-52 rounded-xl border border-gray-200 bg-gray-100 bg-no-repeat shadow-inner"
-        style={{ backgroundImage: `url(${asset.url})`, backgroundSize: '600% 400%', backgroundPosition: asset.backgroundPosition }}
+        style={{ backgroundImage: asset.backgroundImage, backgroundSize: '600% 400%', backgroundPosition: asset.backgroundPosition }}
       >
         {!stimulusVisible && <span className="sr-only">刺激已结束，请选择你的响应</span>}
       </div>

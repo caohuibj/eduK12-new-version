@@ -7,14 +7,20 @@ require('dotenv').config()
 
 const prisma = new PrismaClient()
 
+const requiredEnv = (name) => {
+  const value = process.env[name]
+  if (!value || !value.trim()) throw new Error(`${name} must be set before backing up files to COS`)
+  return value.trim()
+}
+
 const cos = new COS({
-  SecretId: process.env.COS_SECRET_ID,
-  SecretKey: process.env.COS_SECRET_KEY,
+  SecretId: requiredEnv('COS_SECRET_ID'),
+  SecretKey: requiredEnv('COS_SECRET_KEY'),
 })
 
-const bucket = process.env.COS_BUCKET
-const region = process.env.COS_REGION
-const domain = process.env.COS_DOMAIN
+const bucket = requiredEnv('COS_BUCKET')
+const region = requiredEnv('COS_REGION')
+const domain = requiredEnv('COS_DOMAIN')
 
 // 需要备份的文件名
 const SELECTED_FILES = [

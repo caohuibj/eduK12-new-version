@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import apiClient from '../api/client'
+import { sessionFetch } from '../api/client'
 import QuestionEditor, { Question } from '../components/QuestionEditor'
 import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
@@ -317,11 +318,7 @@ const AssignmentList: React.FC = () => {
 
   const handleExport = async (assignment: Assignment) => {
     try {
-      const response = await fetch(`/api/assignments/${assignment.id}/export`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+      const response = await sessionFetch(`/api/assignments/${assignment.id}/export`)
       
       if (!response.ok) {
         throw new Error('导出失败')

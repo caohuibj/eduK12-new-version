@@ -3,3 +3,4 @@
 # Local credentials and historical environment backups must never be tracked.
 **/.env.backup*
 **/.env.*.backup
+.local/credential-handoff-*.json

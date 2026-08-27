@@ -6,6 +6,11 @@
 
 set -e
 
+echo '此宿主机 cron 安装脚本已停用；仓库不再自动安排主机修复或数据库操作。请使用 Docker Compose 监控配置。' >&2
+exit 1
+
+: <<'LEGACY_SCRIPT'
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MONITOR_DIR="${SCRIPT_DIR}/../monitoring"
 OPS_DIR="${SCRIPT_DIR}"
@@ -178,3 +183,4 @@ case "${1:-setup}" in
         exit 1
         ;;
 esac
+LEGACY_SCRIPT

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, Search, Video as VideoIcon, Trash2, Edit, Upload, X, FileVideo, AlertCircle, Loader2, CheckCircle2, Play, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
+import { ensureCsrfToken } from '../api/client'
 import axios from 'axios'
 import type { Video } from '../types'
 import SecureVideoPlayer from '../components/SecureVideoPlayer'
@@ -151,12 +152,12 @@ const VideoLibrary: React.FC = () => {
       formData.append('video', item.file)
       formData.append('title', item.title)
 
-      const token = localStorage.getItem('token')
-
+      const csrfToken = await ensureCsrfToken()
       const response = await axios.post('/api/videos/upload', formData, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
+          ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -267,12 +268,12 @@ const VideoLibrary: React.FC = () => {
       formData.append('video', selectedFile)
       formData.append('title', videoTitle.trim())
 
-      const token = localStorage.getItem('token')
-      
+      const csrfToken = await ensureCsrfToken()
       const response = await axios.post('/api/videos/upload', formData, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,
+          ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {

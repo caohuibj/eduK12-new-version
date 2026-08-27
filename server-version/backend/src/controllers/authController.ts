@@ -1,13 +1,14 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { generateToken } from '../utils/jwt'
-import { hashPassword, comparePassword } from '../utils/password'
+import { hashPassword, comparePassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
 import { success, error, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
+import { setSessionCookie, clearSessionCookie } from '../utils/authCookies'
 
 const loginSchema = z.object({
   username: z.string().min(1, '用户名不能为空'),
@@ -17,7 +18,7 @@ const loginSchema = z.object({
 const teacherRegisterSchema = z.object({
   teacherCode: z.string().min(1, '教师码不能为空'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
-  password: z.string().min(8, '密码至少8个字符').max(12, '密码最多12个字符'),
+  password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(1, '真实姓名不能为空'),
 })
 
@@ -28,7 +29,7 @@ const verifyTeacherCodeSchema = z.object({
 const studentRegisterSchema = z.object({
   courseCode: z.string().min(1, '课程码不能为空'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
-  password: z.string().min(8, '密码至少8个字符').max(12, '密码最多12个字符'),
+  password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(2, '姓名至少2个字符'),
 })
 
@@ -79,10 +80,12 @@ export const authController = {
         username: user.username,
         role: user.role,
         tokenVersion: user.tokenVersion,
+        mustChangePassword: user.mustChangePassword,
       })
 
+      setSessionCookie(req, res, token)
+
       return success(res, {
-        token,
         user: {
           id: user.id,
           username: user.username,
@@ -91,6 +94,7 @@ export const authController = {
           avatarUrl: user.avatarUrl,
           phone: user.phone,
           expiresAt: user.expiresAt,
+          mustChangePassword: user.mustChangePassword,
         }
       }, '登录成功')
     } catch (err) {
@@ -185,7 +189,11 @@ export const authController = {
       const user = await prisma.$transaction(async (tx) => {
         const claimed = await tx.$executeRaw`
           UPDATE "teacher_codes"
-          SET "used_count" = "used_count" + 1, "is_active" = false
+          SET "used_count" = "used_count" + 1,
+              "is_active" = CASE
+                WHEN "used_count" + 1 >= "max_uses" THEN false
+                ELSE "is_active"
+              END
           WHERE "id" = ${teacherCode.id}
             AND "is_active" = true
             AND ("expires_at" IS NULL OR "expires_at" > NOW())
@@ -294,16 +302,19 @@ export const authController = {
         username: user.username,
         role: user.role,
         tokenVersion: user.tokenVersion,
+        mustChangePassword: user.mustChangePassword,
       })
 
+      setSessionCookie(req, res, token)
+
       return success(res, {
-        token,
         user: {
           id: user.id,
           username: user.username,
           role: user.role,
           nickname: user.nickname,
           expiresAt: user.expiresAt,
+          mustChangePassword: user.mustChangePassword,
         }
       }, '注册成功，已加入课程')
     } catch (err) {
@@ -346,6 +357,7 @@ export const authController = {
         avatarUrl: user.avatarUrl,
         phone: user.phone,
         expiresAt: user.expiresAt,
+        mustChangePassword: user.mustChangePassword,
       })
     } catch (err) {
       logger.error('获取用户信息错误', err)
@@ -366,8 +378,8 @@ export const authController = {
         return error(res, '请提供旧密码和新密码')
       }
 
-      if (newPassword.length < 6) {
-        return error(res, '新密码至少6个字符')
+      if (typeof newPassword !== 'string' || !isValidPassword(newPassword)) {
+        return error(res, '密码必须包含字母和数字，长度为8-128个字符')
       }
 
       const user = await prisma.user.findUnique({
@@ -389,14 +401,22 @@ export const authController = {
         data: {
           passwordHash: hashedPassword,
           tokenVersion: { increment: 1 },
+          mustChangePassword: false,
         }
       })
+
+      clearSessionCookie(req, res)
 
       return success(res, null, '密码修改成功')
     } catch (err) {
       logger.error('修改密码错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
+  },
+
+  async logout(req: Request, res: Response) {
+    clearSessionCookie(req, res)
+    return success(res, null, '已退出登录')
   },
 
   // 延期教师账号

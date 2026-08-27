@@ -6,9 +6,8 @@ import { videoQueue } from '../config/queue'
 import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
-import path from 'path'
-import fs from 'fs'
 import { validateRemoteUrl } from '../utils/videoDownloader'
+import { attachAssetReference, getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 
 const updateVideoSchema = z.object({
   title: z.string().min(1, '视频标题不能为空'),
@@ -70,20 +69,27 @@ export const videoController = {
       ])
 
       // 添加视频URL - 优先使用处理后的URL
-      const videosWithUrl = videos.map(video => {
-        // 确保 URL 不是 file:// 协议
-        let processedUrl = video.processedUrl
-        if (processedUrl && processedUrl.startsWith('file://')) {
-          processedUrl = null // file:// 协议不可用，使用原始视频
-        }
-        
+      const videosWithUrl = await Promise.all(videos.map(async video => {
+        // Legacy URLs remain a migration-window fallback. New rows only use
+        // short-lived signed asset URLs.
+        const processedUrl = video.processedAssetId
+          ? await getSignedAssetUrl(video.processedAssetId)
+          : (video.processedUrl && !video.processedUrl.startsWith('file://') ? video.processedUrl : null)
+        const originalUrl = video.originalAssetId
+          ? await getSignedAssetUrl(video.originalAssetId)
+          : `/uploads/videos/${video.fileName}`
+        const thumbnailUrl = video.thumbnailAssetId
+          ? await getSignedAssetUrl(video.thumbnailAssetId)
+          : video.thumbnailUrl
         return {
           ...video,
-          url: processedUrl || `/uploads/videos/${video.fileName}`,
-          originalUrl: `/uploads/videos/${video.fileName}`,
+          url: processedUrl || originalUrl || '',
+          originalUrl,
+          processedUrl,
+          thumbnailUrl,
           isProcessed: !!processedUrl,
         }
-      })
+      }))
 
       return success(res, buildPaginatedResult(videosWithUrl, total, pagination))
     } catch (err) {
@@ -107,24 +113,28 @@ export const videoController = {
 
       const { title } = req.body
       if (!title) {
-        // 删除上传的文件
-        fs.unlinkSync(file.path)
         return error(res, '请输入视频标题')
       }
 
-      // 生成原始视频 URL (本地路径)
-      const originalUrl = `file://${file.path}`
+      const originalAsset = await storeAsset({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        ownerId: userId,
+        provider: 'local',
+      })
+      const processingInput = `file://${getLocalAssetPath(originalAsset.objectKey)}`
 
       // 创建数据库记录
       const video = await prisma.video.create({
         data: {
           title,
-          filePath: file.path,
-          fileName: file.filename,
+          filePath: originalAsset.objectKey,
+          fileName: file.originalname,
           fileSize: file.size,
           mimeType: file.mimetype,
           teacherId: userId,
-          originalUrl,
+          originalAssetId: originalAsset.id,
           status: 'PENDING',
         },
         include: {
@@ -137,11 +147,12 @@ export const videoController = {
           }
         }
       })
+      await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: video.id, field: 'original' })
 
       // 添加到视频处理队列
       await videoQueue.add('transcode', {
         videoId: video.id,
-        originalUrl,
+        originalUrl: processingInput,
         teacherId: userId,
       }, {
         delay: 1000, // 延迟1秒确保文件写入完成
@@ -159,7 +170,7 @@ export const videoController = {
         id: video.id,
         title: video.title,
         status: 'PENDING',
-        originalUrl: `/uploads/videos/${video.fileName}`,
+        originalUrl: await getSignedAssetUrl(originalAsset.id),
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
@@ -304,14 +315,24 @@ export const videoController = {
         title: video.title,
         status: video.status,
         progress,
-        originalUrl: video.originalUrl ? `/uploads/videos/${video.fileName}` : null,
-        processedUrl: video.processedUrl,
-        thumbnailUrl: video.thumbnailUrl,
+        originalUrl: video.originalAssetId
+          ? await getSignedAssetUrl(video.originalAssetId)
+          : (video.originalUrl ? `/uploads/videos/${video.fileName}` : null),
+        processedUrl: video.processedAssetId
+          ? await getSignedAssetUrl(video.processedAssetId)
+          : video.processedUrl,
+        thumbnailUrl: video.thumbnailAssetId
+          ? await getSignedAssetUrl(video.thumbnailAssetId)
+          : video.thumbnailUrl,
         resolution: video.resolution,
         duration: video.duration,
         fileSize: video.fileSize,
         processedAt: video.processedAt,
-        errorMessage: video.errorMessage,
+        // Older rows may contain dependency/filesystem details. Never return
+        // persisted worker error text to the browser.
+        errorMessage: video.status === 'FAILED'
+          ? '视频处理失败，请稍后重试或联系管理员'
+          : null,
         createdAt: video.createdAt,
       })
     } catch (err) {
@@ -361,7 +382,9 @@ export const videoController = {
 
       return success(res, {
         ...updated,
-        url: `/uploads/videos/${updated.fileName}`,
+        url: updated.originalAssetId
+          ? await getSignedAssetUrl(updated.originalAssetId)
+          : `/uploads/videos/${updated.fileName}`,
       }, '视频更新成功')
     } catch (err) {
       logger.error('更新视频错误', err)
@@ -410,7 +433,9 @@ export const videoController = {
 
       return success(res, {
         ...updated,
-        url: `/uploads/videos/${updated.fileName}`,
+        url: updated.originalAssetId
+          ? await getSignedAssetUrl(updated.originalAssetId)
+          : `/uploads/videos/${updated.fileName}`,
       }, '标签更新成功')
     } catch (err) {
       logger.error('更新标签错误', err)

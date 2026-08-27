@@ -1,0 +1,14 @@
+global:
+  resolve_timeout: 5m
+
+# This receiver intentionally has no external target. Alertmanager keeps the
+# alert state in its local UI until the optional protected webhook is enabled.
+route:
+  receiver: local
+  group_by: ['alertname', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: local

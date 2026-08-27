@@ -11,7 +11,7 @@
 
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, notFound } from '../utils/response'
+import { success, error, notFound, unauthorized } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { powService } from '../services/powService'
 import { logger } from '../utils/logger'
@@ -20,6 +20,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { getQuestionnaireResumeToken } from '../middleware/publicQuestionnaireAuth'
+import { hashQuestionnaireResumeToken } from '../services/questionnaireResumeTokenService'
 
 export const publicQuestionnaireController = {
   /**
@@ -49,8 +51,13 @@ export const publicQuestionnaireController = {
     try {
       const { token } = req.params
 
-      // 验证令牌
-      const validation = await tokenService.validateToken(token)
+      // A consumed maxUses quota blocks new sessions, but an existing
+      // in-progress session may still read its questionnaire with its
+      // server-issued resume capability. The binding is checked below.
+      const suppliedResumeToken = getQuestionnaireResumeToken(req)
+      const validation = await tokenService.validateToken(token, {
+        allowOverLimit: Boolean(suppliedResumeToken),
+      })
       
       if (!validation.valid) {
         if (validation.expired) {
@@ -63,6 +70,30 @@ export const publicQuestionnaireController = {
           return error(res, '链接访问次数已达上限', 403)
         }
         return notFound(res, '链接无效')
+      }
+
+      if (validation.overLimit) {
+        const resumeAssessment = suppliedResumeToken
+          ? await prisma.questionnaireAssessment.findUnique({
+              where: { resumeTokenHash: hashQuestionnaireResumeToken(suppliedResumeToken) },
+              select: {
+                questionnaireId: true,
+                tokenId: true,
+                status: true,
+                resumeTokenExpiresAt: true,
+              },
+            })
+          : null
+
+        if (
+          !resumeAssessment ||
+          resumeAssessment.questionnaireId !== validation.questionnaire!.id ||
+          resumeAssessment.tokenId !== validation.token!.id ||
+          resumeAssessment.status !== 'IN_PROGRESS' ||
+          questionnaireResumeTokenService.isExpired(resumeAssessment.resumeTokenExpiresAt)
+        ) {
+          return error(res, '链接访问次数已达上限', -1, 403)
+        }
       }
 
       // 获取问卷详情（包含表单题目和量表）
@@ -153,7 +184,10 @@ export const publicQuestionnaireController = {
       }
 
       // 验证令牌
-      const validation = await tokenService.validateToken(token)
+      const suppliedResumeToken = getQuestionnaireResumeToken(req)
+      const validation = await tokenService.validateToken(token, {
+        allowOverLimit: Boolean(suppliedResumeToken),
+      })
       if (!validation.valid) {
         return error(res, '链接无效或已过期', 403)
       }
@@ -161,15 +195,47 @@ export const publicQuestionnaireController = {
       const questionnaireId = validation.questionnaire!.id
       const tokenId = validation.token!.id
 
-      // 检查是否有进行中的测评（断点续答）
+      // sessionId is only a locator. A resume capability is required before
+      // it can identify an existing assessment; otherwise always create a new
+      // session and never re-issue a capability for an attacker-supplied ID.
       let questionnaireAssessment = null
       let resumeToken: string | null = null
-      let sessionIdToUse = sessionId || uuidv4()
+      let sessionIdToUse = uuidv4()
+      if (suppliedResumeToken) {
+        const resumeAssessment = await prisma.questionnaireAssessment.findUnique({
+          where: { resumeTokenHash: hashQuestionnaireResumeToken(suppliedResumeToken) },
+          select: {
+            id: true,
+            sessionId: true,
+            questionnaireId: true,
+            tokenId: true,
+            status: true,
+            resumeTokenExpiresAt: true,
+          },
+        })
 
-      if (sessionId) {
+        if (
+          !resumeAssessment ||
+          resumeAssessment.questionnaireId !== questionnaireId ||
+          resumeAssessment.tokenId !== tokenId ||
+          resumeAssessment.status !== 'IN_PROGRESS' ||
+          questionnaireResumeTokenService.isExpired(resumeAssessment.resumeTokenExpiresAt) ||
+          (sessionId && resumeAssessment.sessionId !== sessionId)
+        ) {
+          return unauthorized(res, '测评恢复凭据无效或已过期')
+        }
+
+        sessionIdToUse = resumeAssessment.sessionId || uuidv4()
+      }
+
+      if (suppliedResumeToken) {
         // 优化：一次查询获取完整数据，避免重复查询
         const existingAssessment = await prisma.questionnaireAssessment.findFirst({
-          where: { sessionId },
+          where: {
+            sessionId: sessionIdToUse,
+            questionnaireId,
+            tokenId,
+          },
           include: {
             questionnaire: {
               include: {
@@ -200,25 +266,18 @@ export const publicQuestionnaireController = {
           },
         })
 
-        // 如果测评已完成，直接返回提示
-        if (existingAssessment && existingAssessment.status === 'COMPLETED') {
-          return error(res, '您已完成该问卷测评，无需重复作答', 400)
-        }
-
-        // 如果测评进行中且属于当前 token，恢复测评
-        if (existingAssessment && existingAssessment.status === 'IN_PROGRESS' && existingAssessment.tokenId === tokenId) {
+        // The capability lookup above already bound this row to the public
+        // token and session. Rotate the opaque capability on every resume.
+        if (existingAssessment && existingAssessment.status === 'IN_PROGRESS') {
           questionnaireAssessment = existingAssessment
-          resumeToken = await questionnaireResumeTokenService.issue(
+          resumeToken = await questionnaireResumeTokenService.rotate(
             existingAssessment.id,
+            suppliedResumeToken,
             validation.token!.expiresAt,
           )
-        } else {
-          // sessionId 不存在或不匹配，生成新的
-          sessionIdToUse = uuidv4()
-        }
-
-        // 断点续答：找到当前应该进行的内容项
-        if (questionnaireAssessment) {
+          if (!resumeToken) return unauthorized(res, '测评恢复凭据无效或已过期')
+          // 断点续答：找到当前应该进行的内容项
+          if (questionnaireAssessment) {
           const saMap = new Map(
             questionnaireAssessment.scaleAssessments.map(sa => [sa.scaleId, sa])
           )
@@ -337,6 +396,7 @@ export const publicQuestionnaireController = {
               sessionId: sessionIdToUse,
               resumeToken,
             }, '继续测评')
+          }
           }
         }
       }
@@ -755,6 +815,13 @@ export const publicQuestionnaireController = {
           return { kind: 'completed' as const }
         }
 
+        if (
+          assessment.status !== 'IN_PROGRESS' ||
+          assessment.questionnaireAssessment.status !== 'IN_PROGRESS'
+        ) {
+          return { kind: 'closed' as const }
+        }
+
         const answers = (assessment.answers as any[]) || []
         const existingIndex = answers.findIndex((a) => a.itemId === itemId)
         const answerData: any = { itemId, value }
@@ -766,10 +833,31 @@ export const publicQuestionnaireController = {
           answers.push(answerData)
         }
 
-        await tx.assessment.updateMany({
+        const updated = await tx.assessment.updateMany({
           where: { id: scaleAssessmentId, status: 'IN_PROGRESS' },
           data: { answers },
         })
+
+        // A concurrent scale completion may win after the row was read. Do
+        // not report a successful answer write when the conditional update
+        // did not change an in-progress row.
+        if (updated.count !== 1) {
+          const current = await tx.assessment.findUnique({
+            where: { id: scaleAssessmentId },
+            select: {
+              status: true,
+              questionnaireAssessment: { select: { sessionId: true, status: true } },
+            },
+          })
+
+          if (
+            current?.questionnaireAssessment?.sessionId === sessionId &&
+            (current.status === 'COMPLETED' || current.questionnaireAssessment.status === 'COMPLETED')
+          ) {
+            return { kind: 'completed' as const }
+          }
+          return { kind: 'closed' as const }
+        }
 
         return { kind: 'saved' as const }
       })
@@ -784,6 +872,10 @@ export const publicQuestionnaireController = {
 
       if (result.kind === 'completed') {
         return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      }
+
+      if (result.kind === 'closed') {
+        return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       }
 
       return success(res, { saved: true })
@@ -866,6 +958,13 @@ export const publicQuestionnaireController = {
           return { kind: 'completed' as const }
         }
 
+        if (
+          assessment.status !== 'IN_PROGRESS' ||
+          assessment.questionnaireAssessment.status !== 'IN_PROGRESS'
+        ) {
+          return { kind: 'closed' as const }
+        }
+
         const answers = (assessment.answers as any[]) || []
         const scores = calculateScores(
           answers,
@@ -894,7 +993,23 @@ export const publicQuestionnaireController = {
           },
         })
 
-        if (updated.count !== 1) return { kind: 'completed' as const }
+        if (updated.count !== 1) {
+          const current = await tx.assessment.findUnique({
+            where: { id: scaleAssessmentId },
+            select: {
+              status: true,
+              questionnaireAssessment: { select: { sessionId: true, status: true } },
+            },
+          })
+
+          if (
+            current?.questionnaireAssessment?.sessionId === sessionId &&
+            (current.status === 'COMPLETED' || current.questionnaireAssessment.status === 'COMPLETED')
+          ) {
+            return { kind: 'completed' as const }
+          }
+          return { kind: 'closed' as const }
+        }
 
         const progress = await refreshQuestionnaireProgress(
           tx,
@@ -905,6 +1020,7 @@ export const publicQuestionnaireController = {
 
       if (result.kind === 'not-found') return notFound(res, '量表测评不存在')
       if (result.kind === 'forbidden') return error(res, '量表测评不属于当前会话', 403)
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
 
       return success(res, { completed: true })
     } catch (err) {
@@ -974,6 +1090,8 @@ export const publicQuestionnaireController = {
           }
         }
 
+        if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
+
         const incompleteScales = qa.scaleAssessments.filter(
           (sa) => sa.status !== 'COMPLETED'
         )
@@ -988,13 +1106,14 @@ export const publicQuestionnaireController = {
         return {
           kind: 'completed' as const,
           questionnaireId: qa.questionnaireId,
-          completedAt: new Date(),
-          totalTime: Date.now() - new Date(qa.startedAt).getTime(),
+          completedAt: progress.completedAt || new Date(),
+          totalTime: progress.totalTime ?? (Date.now() - new Date(qa.startedAt).getTime()),
           collectionReport: progress?.collectionReport || buildQuestionnaireCollectionReport(qa),
         }
       })
 
       if (result.kind === 'not-found') return notFound(res, '测评不存在')
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
       if (result.kind === 'incomplete-scales') return error(res, '还有量表未完成')
       if (result.kind === 'incomplete-forms') return error(res, '还有表单题目未完成')
 
@@ -1047,6 +1166,7 @@ export const publicQuestionnaireController = {
 
         if (!questionnaireAssessment) return { kind: 'not-found' as const }
         if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (questionnaireAssessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
         const formItem = questionnaireAssessment.questionnaire.formItems.find(
           (fi: any) => fi.id === formItemId
@@ -1085,6 +1205,10 @@ export const publicQuestionnaireController = {
 
       if (result.kind === 'completed') {
         return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      }
+
+      if (result.kind === 'closed') {
+        return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       }
 
       return success(res, { formItemId, value }, '答案已保存')
