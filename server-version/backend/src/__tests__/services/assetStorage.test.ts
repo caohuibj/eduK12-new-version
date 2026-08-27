@@ -3,13 +3,14 @@ import path from 'node:path'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
-const { mockPrisma, mockCheckinValidate } = vi.hoisted(() => ({
+const { mockPrisma, mockCheckinValidate, mockCheckinVerifySession } = vi.hoisted(() => ({
   mockPrisma: {
     storedAsset: { findUnique: vi.fn(), findMany: vi.fn() },
     course: { findUnique: vi.fn() },
     assetReference: { findMany: vi.fn(), findFirst: vi.fn() },
   },
   mockCheckinValidate: vi.fn(),
+  mockCheckinVerifySession: vi.fn(),
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -26,7 +27,10 @@ vi.mock('../../utils/cos', () => ({
   uploadBufferToCOS: vi.fn(),
 }))
 vi.mock('../../services/checkinTokenService', () => ({
-  checkinTokenService: { validateToken: mockCheckinValidate },
+  checkinTokenService: {
+    validateToken: mockCheckinValidate,
+    verifySessionCapability: mockCheckinVerifySession,
+  },
 }))
 
 import {
@@ -104,6 +108,7 @@ describe('stored asset access boundary', () => {
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset())
     mockPrisma.course.findUnique.mockResolvedValue(null)
     mockPrisma.assetReference.findFirst.mockResolvedValue(null)
+    mockCheckinVerifySession.mockReturnValue(true)
   })
 
   it('issues a short-lived URL only to the asset owner', async () => {
@@ -143,24 +148,74 @@ describe('stored asset access boundary', () => {
     expect(unrelatedResponse.statusCode).toBe(403)
   })
 
-  it('requires the matching check-in token and scope for public assets', async () => {
+  it('requires the matching check-in token and server-issued session for staged assets', async () => {
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({
       ownerId: null,
       accessScope: 'PUBLIC_CHECKIN',
       scopeId: 'checkin-1',
     }))
-    mockCheckinValidate.mockResolvedValue({ valid: true, checkin: { id: 'checkin-1' } })
+    mockCheckinValidate.mockResolvedValue({
+      valid: true,
+      token: { id: 'token-1', expiresAt: new Date(Date.now() + 60_000) },
+      checkin: { id: 'checkin-1', courseId: 'course-1' },
+    })
+    mockPrisma.assetReference.findFirst.mockResolvedValue({ id: 'staging-reference-1' })
+    const sessionId = 'session_abcdefghijklmnop'
+    const sessionHeaders: Record<string, string> = {
+      'X-Checkin-Token': 'checkin-token',
+      'X-Checkin-Session-Id': sessionId,
+      'X-Checkin-Session-Capability': 'server-issued-capability',
+    }
+    const publicRequest = request({
+      user: undefined,
+      header: vi.fn((name: string) => sessionHeaders[name]),
+    })
     const res = makeRes()
 
-    await issuePublicAssetUrl(request({ user: undefined }), res)
+    await issuePublicAssetUrl(publicRequest, res)
 
     expect(res.statusCode).toBe(200)
     expect(res.body.data.url).toContain('/api/public/assets/asset-1/content')
+    expect(mockCheckinVerifySession).toHaveBeenCalledWith(expect.objectContaining({
+      checkinId: 'checkin-1',
+      tokenId: 'token-1',
+      sessionId,
+      capability: 'server-issued-capability',
+    }))
+    expect(mockPrisma.assetReference.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        entityType: 'CheckinUploadSession',
+        entityId: `checkin-1:${sessionId}`,
+        field: 'staging',
+      }),
+    }))
 
-    mockCheckinValidate.mockResolvedValue({ valid: true, checkin: { id: 'other-checkin' } })
-    const crossScopeResponse = makeRes()
-    await issuePublicAssetUrl(request({ user: undefined }), crossScopeResponse)
-    expect(crossScopeResponse.statusCode).toBe(401)
+    mockCheckinVerifySession.mockReturnValue(false)
+    const crossSessionResponse = makeRes()
+    await issuePublicAssetUrl(publicRequest, crossSessionResponse)
+    expect(crossSessionResponse.statusCode).toBe(401)
+  })
+
+  it('does not expose a submitted anonymous asset through the shared check-in token', async () => {
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({
+      ownerId: null,
+      accessScope: 'PUBLIC_CHECKIN',
+      scopeId: 'checkin-1',
+    }))
+    mockCheckinValidate.mockResolvedValue({
+      valid: true,
+      token: { id: 'token-1', expiresAt: new Date(Date.now() + 60_000) },
+      checkin: { id: 'checkin-1', courseId: 'course-1' },
+    })
+    // A submitted asset has only a CheckinSubmission reference, not the
+    // short-lived CheckinUploadSession staging reference.
+    mockPrisma.assetReference.findFirst.mockResolvedValue(null)
+
+    const response = makeRes()
+    await issuePublicAssetUrl(request({ user: undefined }), response)
+
+    expect(response.statusCode).toBe(401)
+    expect(mockCheckinVerifySession).not.toHaveBeenCalled()
   })
 
   it('allows a public token to read a course-scoped asset referenced by that check-in', async () => {

@@ -11,6 +11,7 @@ import TagBadge from '../components/TagBadge'
 import TagFilter from '../components/TagFilter'
 import { sanitizeHtml } from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
+import { buildAssignmentAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Assignment, Course } from '../types'
 
 interface VideoItem {
@@ -265,10 +266,7 @@ const AssignmentList: React.FC = () => {
         description: formData.description,
         content: formData.content,
         deadline: formData.deadline || undefined,
-        questions: formData.questions.length > 0 ? formData.questions : undefined,
-        videos: formData.videos.length > 0 ? formData.videos : undefined,
-        images: formData.images.length > 0 ? formData.images : undefined,
-        documents: formData.documents.length > 0 ? formData.documents : undefined,
+        ...buildAssignmentAttachmentUpdateFields(formData),
         tags: formData.tags,
       }
       const response = await apiClient.put(`/assignments/${editingAssignment.id}`, data)
@@ -307,6 +305,7 @@ const AssignmentList: React.FC = () => {
         questions: assignment.questions,
         videos: assignment.videos,
         images: assignment.images,
+        documents: assignment.documents,
       })
       if (response.code === 0) {
         fetchAssignments()

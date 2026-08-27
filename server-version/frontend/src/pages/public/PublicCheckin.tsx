@@ -143,6 +143,7 @@ const PublicCheckin: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [checkin, setCheckin] = useState<CheckinData | null>(null)
   const [sessionId, setSessionId] = useState<string>('')
+  const [sessionCapability, setSessionCapability] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   
   // 表单数据
@@ -176,9 +177,11 @@ const PublicCheckin: React.FC = () => {
       
       setCheckin(checkinData)
       setSessionId(data.data.sessionId)
+      setSessionCapability(data.data.sessionCapability)
       
       // 会话标识只用于本次浏览器会话，不能长期留在 localStorage。
       sessionStorage.setItem(`checkin_session_${token}`, data.data.sessionId)
+      sessionStorage.setItem(`checkin_session_capability_${token}`, data.data.sessionCapability)
       
     } catch (err: any) {
       setError(err.message || '打卡访问失败')
@@ -200,6 +203,7 @@ const PublicCheckin: React.FC = () => {
       method: 'POST',
       headers: {
         'X-Checkin-Token': token || '',
+        'X-Checkin-Session-Capability': sessionCapability,
       },
       body: formData,
     })
@@ -233,6 +237,7 @@ const PublicCheckin: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-Checkin-Token': token || '',
+          'X-Checkin-Session-Capability': sessionCapability,
         },
         body: JSON.stringify({
           content,

@@ -10,6 +10,7 @@ import TagInput from '../components/TagInput'
 import CheckinTokenManager from '../components/CheckinTokenManager'
 import { sanitizeHtml } from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
+import { buildAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Checkin, Course } from '../types'
 
 interface VideoItem {
@@ -165,9 +166,7 @@ const CheckinList: React.FC = () => {
         title: formData.title,
         description: '',
         content: formData.content,
-        videos: formData.videos.length > 0 ? formData.videos : undefined,
-        images: formData.images.length > 0 ? formData.images : undefined,
-        documents: formData.documents.length > 0 ? formData.documents : undefined,
+        ...buildAttachmentUpdateFields(formData),
         endTime: formData.endTime || undefined,
         allowViewOthers: formData.allowViewOthers,
         tags: formData.tags,
@@ -219,6 +218,7 @@ const CheckinList: React.FC = () => {
         content: checkin.content || '',
         videos: videos || [],
         images: images || [],
+        documents: checkin.documents || [],
         allowViewOthers: checkin.allowViewOthers || false,
       })
       if (response.code === 0) {

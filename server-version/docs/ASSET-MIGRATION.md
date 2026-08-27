@@ -28,6 +28,11 @@ are publicly deliverable only when the check-in has an exact
 `AssetReference`, together with a short-lived signature and
 `X-Checkin-Token`. Anonymous participant uploads use `PUBLIC_CHECKIN` scope,
 have a `CheckinUploadSession` staging reference bound to the server-issued
-session ID, are limited to nine images per session, and are promoted to the
-`CheckinSubmission` reference inside the submit transaction. Abandoned staging
+session ID and HMAC capability, are limited to nine images per session, and
+are promoted to the `CheckinSubmission` reference inside the submit
+transaction. A shared check-in token cannot read staged or submitted
+participant media; staged preview requests must also send
+`X-Checkin-Session-Id` and `X-Checkin-Session-Capability`. Upload and submit
+transitions for one session use the same database advisory lock; once a
+session is submitted, further uploads are rejected. Abandoned staging
 references and unreferenced blobs are eligible for the 24-hour cleanup path.
