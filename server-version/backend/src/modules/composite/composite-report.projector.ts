@@ -194,75 +194,56 @@ const projectResearchSingleTaskReport = (report: any) => {
   }
 }
 
-const projectSafeScaleUnit = (unit: any) => ({
-  itemId: unit.itemId,
-  type: 'SCALE' as const,
-  kind: 'scale' as const,
-  label: unit.label ?? null,
-  scaleCode: unit.scaleCode ?? null,
-  scaleName: unit.scaleName,
-  completedAt: unit.completedAt ?? null,
-  totalTime: unit.totalTime ?? null,
-  caveats: stringArray(unit.caveats),
-  disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
-  ...(unit.decryptError ? { decryptError: true } : {}),
-})
+const projectSafeScaleUnit = (unit: any) => {
+  const base = {
+    itemId: unit.itemId,
+    type: 'SCALE' as const,
+    kind: 'scale' as const,
+    label: unit.label ?? null,
+    scaleCode: unit.scaleCode ?? null,
+    scaleName: unit.scaleName,
+    completedAt: unit.completedAt ?? null,
+    totalTime: unit.totalTime ?? null,
+    caveats: stringArray(unit.caveats),
+    disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
+  }
+  return {
+    ...base,
+    scaleId: unit.scaleId,
+    quality: unit.quality ?? unit.result?.quality ?? null,
+    scores: Array.isArray(unit.scores) ? unit.scores : Array.isArray(unit.result?.scores) ? unit.result.scores : [],
+    references: Array.isArray(unit.references) ? unit.references : Array.isArray(unit.result?.references) ? unit.result.references : [],
+    interpretations: Array.isArray(unit.interpretations) ? unit.interpretations : Array.isArray(unit.result?.interpretations) ? unit.result.interpretations : [],
+    method: unit.method ?? unit.result?.method ?? null,
+    ...(unit.decryptError ? { decryptError: true } : {}),
+  }
+}
 
-const projectScaleDimensionScore = (dimension: any) => ({
-  dimensionId: dimension.dimensionId,
-  dimensionCode: dimension.dimensionCode ?? null,
-  dimensionName: dimension.dimensionName,
-  rawScore: dimension.rawScore ?? null,
-  normalizedScore: dimension.normalizedScore ?? null,
-  level: dimension.level ?? null,
-  ...(dimension.levelName !== undefined ? { levelName: dimension.levelName } : {}),
-  itemCount: dimension.itemCount ?? null,
-  minScore: dimension.minScore ?? null,
-  maxScore: dimension.maxScore ?? null,
-})
-
-const projectScaleDimensionFeedback = (dimension: any) => ({
-  dimensionId: dimension.dimensionId,
-  dimensionCode: dimension.dimensionCode ?? null,
-  dimensionName: dimension.dimensionName,
-  score: dimension.score ?? null,
-  minScore: dimension.minScore ?? null,
-  maxScore: dimension.maxScore ?? null,
-  level: dimension.level ?? null,
-  ...(dimension.levelName !== undefined ? { levelName: dimension.levelName } : {}),
-  interpretation: dimension.interpretation,
-  suggestions: stringArray(dimension.suggestions),
-})
-
-const projectResearchScaleUnit = (unit: any) => ({
-  itemId: unit.itemId,
-  type: 'SCALE' as const,
-  kind: 'scale' as const,
-  scaleId: unit.scaleId,
-  scaleCode: unit.scaleCode ?? null,
-  label: unit.label ?? null,
-  scaleName: unit.scaleName,
-  dimensionScores: Array.isArray(unit.dimensionScores)
-    ? unit.dimensionScores.map(projectScaleDimensionScore)
-    : [],
-  feedback: {
-    overall: typeof unit.feedback?.overall === 'string' ? unit.feedback.overall : '',
-    dimensions: Array.isArray(unit.feedback?.dimensions)
-      ? unit.feedback.dimensions.map(projectScaleDimensionFeedback)
-      : [],
-    ...(unit.feedback?.feedbackLevel !== undefined ? { feedbackLevel: unit.feedback.feedbackLevel } : {}),
-  },
-  completedAt: unit.completedAt ?? null,
-  totalTime: unit.totalTime ?? null,
-  method: {
-    scaleId: unit.method?.scaleId ?? unit.scaleId,
-    scaleCode: unit.method?.scaleCode ?? unit.scaleCode ?? null,
-    reportDefinitionVersion: unit.method?.reportDefinitionVersion,
-  },
-  caveats: stringArray(unit.caveats),
-  disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
-  ...(unit.decryptError ? { decryptError: true } : {}),
-})
+const projectResearchScaleUnit = (unit: any) => {
+  const base = {
+    itemId: unit.itemId,
+    type: 'SCALE' as const,
+    kind: 'scale' as const,
+    scaleId: unit.scaleId,
+    scaleCode: unit.scaleCode ?? null,
+    label: unit.label ?? null,
+    scaleName: unit.scaleName,
+    completedAt: unit.completedAt ?? null,
+    totalTime: unit.totalTime ?? null,
+    caveats: stringArray(unit.caveats),
+    disclaimer: typeof unit.disclaimer === 'string' ? unit.disclaimer : '',
+    ...(unit.decryptError ? { decryptError: true } : {}),
+  }
+  return {
+    ...base,
+    quality: unit.quality ?? unit.result?.quality ?? null,
+    scores: Array.isArray(unit.scores) ? unit.scores : Array.isArray(unit.result?.scores) ? unit.result.scores : [],
+    references: Array.isArray(unit.references) ? unit.references : Array.isArray(unit.result?.references) ? unit.result.references : [],
+    interpretations: Array.isArray(unit.interpretations) ? unit.interpretations : Array.isArray(unit.result?.interpretations) ? unit.result.interpretations : [],
+    result: unit.result ?? null,
+    method: unit.method ?? unit.result?.method ?? null,
+  }
+}
 
 const projectResearchCognitiveUnit = (unit: any) => ({
   itemId: unit.itemId,

@@ -1,24 +1,10 @@
 import { pinyin } from 'pinyin-pro'
 import { prisma } from '../config/database'
-import { logger } from '../utils/logger'
-import { safeDecrypt } from '../utils/encryption'
 import * as fs from 'fs'
 import * as path from 'path'
 import { saveToFile, SavVariable, VariableType, VariableMeasure } from 'sav-writer'
-
-// ==================== 类型定义 ====================
-
-interface AnswerItem {
-  itemId: string
-  value: any
-  responseTime?: number
-}
-
-interface ScoreItem {
-  dimensionId: string
-  rawScore?: number
-  normalizedScore?: number
-}
+import { readScaleAnswers, readScaleResult } from '../modules/scale/scale-workflow.service'
+import { readContextFormAnswers } from '../modules/assessment-context'
 
 // ==================== 类型定义 ====================
 
@@ -50,7 +36,6 @@ interface ExportData {
 const FIELD_RULES = {
   USER_PREFIX: 'U_',
   QUESTION_PREFIX: 'Q_',
-  DIMENSION_PREFIX: 'D_',
   MAX_LENGTH: 8,
 }
 
@@ -101,19 +86,6 @@ export function clearFieldNameCache(): void {
   fieldNameCache.clear()
 }
 
-// ==================== 反向计分处理 ====================
-
-/**
- * 应用反向计分
- * @param value 原始分值
- * @param reverse 是否反向计分
- * @param points 量表点数
- */
-export function applyReverseScore(value: number, reverse: boolean, points: number): number {
-  if (!reverse || value === null || value === undefined) return value
-  return points + 1 - value
-}
-
 // ==================== 数据导出服务 ====================
 
 /**
@@ -132,23 +104,28 @@ export async function getScaleExportData(
 
   clearFieldNameCache()
 
-  // 获取量表信息
+  // The v2 definition is the only source for item order, response values and
+  // score keys. Export never re-runs reverse scoring or another scorer.
   const scale = await prisma.scale.findUnique({
     where: { id: scaleId },
-    include: {
-      items: {
-        orderBy: { sortOrder: 'asc' }
-      },
-      dimensions: true
-    }
+    select: { id: true, name: true, definition: true },
   })
 
   if (!scale) {
     throw new Error('量表不存在')
   }
 
-  // 获取量表点数
-  const points = (scale.config as any)?.points || 5
+  const definition = scale.definition && typeof scale.definition === 'object'
+    ? scale.definition as {
+        items?: Array<{ itemCode: string; content: string }>
+        scoring?: { scores?: Array<{ key: string; label: string }> }
+      }
+    : null
+  const definitionItems = Array.isArray(definition?.items) ? definition.items : []
+  const definitionScores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
+  if (definitionItems.length === 0 || definitionScores.length === 0) {
+    throw new Error('量表尚未安装有效的 v2 definition')
+  }
 
   // 构建查询条件
   const where: any = {
@@ -193,44 +170,48 @@ export async function getScaleExportData(
   fields.push({ name: 'U_time', label: '完成用时(秒)', type: 'numeric', width: 6 })
   fields.push({ name: 'U_date', label: '完成日期', type: 'string', width: 10 })
 
-  // 题目字段
-  const itemFieldMap = new Map<string, string>()
-  const rtFieldMap = new Map<string, string>() // 作答时间字段映射
-  for (const item of scale.items) {
-    const fieldName = toPinyinFieldName(item.content.substring(0, 10), FIELD_RULES.QUESTION_PREFIX)
-    itemFieldMap.set(item.id, fieldName)
+  // Each item has response value, transformed item score and response time.
+  const itemFieldMap = new Map<string, { response: string; score: string; responseTime: string }>()
+  for (const item of definitionItems) {
+    const responseField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}V_`)
+    const scoreField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}S_`)
+    const responseTimeField = toPinyinFieldName(item.itemCode, 'RT_')
+    itemFieldMap.set(item.itemCode, { response: responseField, score: scoreField, responseTime: responseTimeField })
     fields.push({
-      name: fieldName,
-      label: `${item.itemCode || ''} ${item.content.substring(0, 20)}`,
+      name: responseField,
+      label: `${item.itemCode} 原始回答 ${item.content.substring(0, 20)}`,
+      type: 'string',
+      width: 16,
+    })
+    fields.push({
+      name: scoreField,
+      label: `${item.itemCode} 映射后题目分值`,
       type: 'numeric',
-      width: 2,
+      width: 8,
       decimals: 0
     })
-    // 作答时间字段
-    const rtFieldName = 'RT_' + fieldName.substring(2) // 将 Q_xxx 改为 RT_xxx
-    rtFieldMap.set(item.id, rtFieldName)
-    fields.push({
-      name: rtFieldName,
-      label: `${item.itemCode || ''} 作答时间(毫秒)`,
-      type: 'numeric',
-      width: 6,
-      decimals: 0
-    })
+    fields.push({ name: responseTimeField, label: `${item.itemCode} 作答时间(毫秒)`, type: 'numeric', width: 8, decimals: 0 })
   }
 
-  // 维度字段
-  const dimensionFieldMap = new Map<string, string>()
-  for (const dimension of scale.dimensions) {
-    const fieldName = toPinyinFieldName(dimension.name, FIELD_RULES.DIMENSION_PREFIX)
-    dimensionFieldMap.set(dimension.id, fieldName)
+  const scoreFieldMap = new Map<string, string>()
+  for (const score of definitionScores) {
+    const fieldName = toPinyinFieldName(score.key, 'SCORE_')
+    scoreFieldMap.set(score.key, fieldName)
     fields.push({
       name: fieldName,
-      label: `${dimension.name}得分`,
+      label: `${score.key} ${score.label}冻结得分`,
       type: 'numeric',
-      width: 5,
-      decimals: 2
+      width: 10,
+      decimals: 6,
     })
   }
+  fields.push({ name: 'QUALITY_STATUS', label: '质量状态', type: 'string', width: 16 })
+  fields.push({ name: 'QUALITY_FLAGS', label: '质量问题', type: 'string', width: 32 })
+  fields.push({ name: 'INSTRUMENT_VERSION', label: '量表版本', type: 'string', width: 16 })
+  fields.push({ name: 'SCORING_VERSION', label: '计分版本', type: 'string', width: 16 })
+  fields.push({ name: 'REPORT_VERSION', label: '报告版本', type: 'string', width: 16 })
+  fields.push({ name: 'DEFINITION_HASH', label: '定义哈希', type: 'string', width: 64 })
+  fields.push({ name: 'REFERENCE_VERSIONS', label: '使用的参考版本', type: 'string', width: 32 })
 
   // 构建数据行
   const rows: Record<string, any>[] = []
@@ -245,56 +226,40 @@ export async function getScaleExportData(
     if (!anonymize && assessment.user) {
       row['U_name'] = assessment.user.nickname || assessment.user.username
     }
-    row['U_time'] = assessment.totalTime ? Math.round(assessment.totalTime / 1000) : null
+    row['U_time'] = assessment.totalTime == null ? null : Math.round(assessment.totalTime / 1000)
     row['U_date'] = assessment.completedAt ? assessment.completedAt.toISOString().split('T')[0] : null
 
-    // 题目得分（处理反向计分）- 支持加密存储
-    const rawAnswers = assessment.answers
-    let answers: AnswerItem[] = []
-    if (Array.isArray(rawAnswers)) {
-      answers = rawAnswers as unknown as AnswerItem[]
-    } else if (typeof rawAnswers === 'string' && rawAnswers) {
-      const decrypted = safeDecrypt<AnswerItem[]>(rawAnswers)
-      if (decrypted) {
-        answers = decrypted
-      }
-    }
-    const answerMap = new Map(answers.map(a => [a.itemId, a.value]))
-    const responseTimeMap = new Map(answers.map(a => [a.itemId, a.responseTime]))
+    // Raw answers are exported for both completed and in-progress records;
+    // completed scores are always read from the frozen result payload.
+    const parsedAnswers = readScaleAnswers(assessment.answers)
+    const answers = parsedAnswers.answers
+    const answerMap = new Map(answers.map((answer) => [answer.itemCode, answer.responseValue]))
+    const responseTimeMap = new Map(answers.map((answer) => [answer.itemCode, answer.responseTimeMs]))
 
-    for (const item of scale.items) {
-      const fieldName = itemFieldMap.get(item.id)!
-      const rtFieldName = rtFieldMap.get(item.id)!
-      const rawValue = answerMap.get(item.id)
-      
-      if (rawValue !== undefined && rawValue !== null) {
-        // 应用反向计分
-        row[fieldName] = applyReverseScore(Number(rawValue), item.reverse, points)
-      } else {
-        row[fieldName] = null // 缺失值
-      }
-      
-      // 作答时间
-      row[rtFieldName] = responseTimeMap.get(item.id) ?? null
+    const parsedResult = assessment.status === 'COMPLETED' ? readScaleResult(assessment.result) : { result: null, decryptError: false }
+    const resultValue = parsedResult.result
+    const itemScores = Array.isArray(resultValue?.itemScores) ? resultValue.itemScores : []
+    const itemScoreMap = new Map(itemScores.map((item: any) => [item.itemCode, item]))
+    for (const item of definitionItems) {
+      const fieldNames = itemFieldMap.get(item.itemCode)!
+      row[fieldNames.response] = answerMap.get(item.itemCode) ?? null
+      row[fieldNames.score] = resultValue ? itemScoreMap.get(item.itemCode)?.score ?? null : null
+      row[fieldNames.responseTime] = responseTimeMap.get(item.itemCode) ?? null
     }
 
-    // 维度得分 - 支持加密存储
-    const rawScores = assessment.scores
-    let scores: ScoreItem[] = []
-    if (Array.isArray(rawScores)) {
-      scores = rawScores as unknown as ScoreItem[]
-    } else if (typeof rawScores === 'string' && rawScores) {
-      const decrypted = safeDecrypt<ScoreItem[]>(rawScores)
-      if (decrypted) {
-        scores = decrypted
-      }
+    for (const score of definitionScores) {
+      const fieldName = scoreFieldMap.get(score.key)!
+      row[fieldName] = resultValue?.scores?.find((candidate: any) => candidate?.key === score.key)?.value ?? null
     }
-    for (const score of scores) {
-      const fieldName = dimensionFieldMap.get(score.dimensionId)
-      if (fieldName) {
-        row[fieldName] = score.rawScore ?? score.normalizedScore ?? null
-      }
-    }
+    row.QUALITY_STATUS = parsedResult.decryptError || parsedAnswers.decryptError ? 'decrypt_error' : resultValue?.quality?.status ?? null
+    row.QUALITY_FLAGS = parsedResult.decryptError || parsedAnswers.decryptError
+      ? 'decrypt_error'
+      : Array.isArray(resultValue?.quality?.flags) ? resultValue.quality.flags.join('|') : null
+    row.INSTRUMENT_VERSION = resultValue?.method?.instrumentVersion ?? null
+    row.SCORING_VERSION = resultValue?.method?.scoringVersion ?? null
+    row.REPORT_VERSION = resultValue?.method?.reportVersion ?? null
+    row.DEFINITION_HASH = resultValue?.method?.definitionHash ?? null
+    row.REFERENCE_VERSIONS = Array.isArray(resultValue?.method?.referenceVersions) ? resultValue.method.referenceVersions.join('|') : null
 
     rows.push(row)
   }
@@ -507,267 +472,199 @@ export async function getQuestionnaireExportData(
   questionnaireId: string,
   options: ExportOptions = {}
 ): Promise<ExportData> {
+  return getQuestionnaireExportDataV2(questionnaireId, options)
+}
+
+/**
+ * Questionnaire wide export backed by the same frozen ScaleResultV2 contract
+ * as standalone scale export. Raw response values and mapped item scores are
+ * separate columns; score columns are populated only from a completed,
+ * frozen result and never recalculated during export.
+ */
+async function getQuestionnaireExportDataV2(
+  questionnaireId: string,
+  options: ExportOptions = {},
+): Promise<ExportData> {
   const {
     anonymize = true,
     includeProgress = false,
     minProgress = 100,
-    dateRange
+    dateRange,
   } = options
 
   clearFieldNameCache()
-
-  // 获取问卷信息（包含表单题目）
   const questionnaire = await prisma.questionnaire.findUnique({
     where: { id: questionnaireId },
     include: {
-      formItems: {
-        orderBy: { position: 'asc' }
-      },
+      formItems: { orderBy: { position: 'asc' } },
       questionnaireScales: {
+        orderBy: { position: 'asc' },
         include: {
           scale: {
-            include: {
-              items: { orderBy: { sortOrder: 'asc' } },
-              dimensions: true
-            }
-          }
+            select: { id: true, name: true, code: true, instrumentVersion: true, definition: true },
+          },
         },
-        orderBy: { position: 'asc' }
-      }
-    }
+      },
+    },
   })
+  if (!questionnaire) throw new Error('问卷不存在')
 
-  if (!questionnaire) {
-    throw new Error('问卷不存在')
-  }
+  const where: any = { questionnaireId, progress: { gte: minProgress } }
+  if (!includeProgress) where.status = 'COMPLETED'
+  if (dateRange?.start) where.completedAt = { ...where.completedAt, gte: new Date(dateRange.start) }
+  if (dateRange?.end) where.completedAt = { ...where.completedAt, lte: new Date(`${dateRange.end}T23:59:59`) }
 
-  // 获取问卷测评记录（包含表单答案）
-  const where: any = {
-    questionnaireId,
-    progress: { gte: minProgress }
-  }
-  
-  if (!includeProgress) {
-    where.status = 'COMPLETED'
-  }
-
-  if (dateRange?.start) {
-    where.completedAt = { ...where.completedAt, gte: new Date(dateRange.start) }
-  }
-  if (dateRange?.end) {
-    where.completedAt = { ...where.completedAt, lte: new Date(dateRange.end + 'T23:59:59') }
-  }
-
-  const questionnaireAssessments = await prisma.questionnaireAssessment.findMany({
+  const assessments = await prisma.questionnaireAssessment.findMany({
     where,
     include: {
-      user: {
-        select: { id: true, nickname: true, username: true }
-      },
+      user: { select: { id: true, nickname: true, username: true } },
       formAnswers: true,
       scaleAssessments: {
-        include: {
-          scale: {
-            include: {
-              items: { orderBy: { sortOrder: 'asc' } },
-              dimensions: true
-            }
-          }
+        select: {
+          id: true,
+          scaleId: true,
+          status: true,
+          answers: true,
+          result: true,
         },
-        orderBy: { startedAt: 'asc' }
-      }
+      },
     },
-    orderBy: { completedAt: 'asc' }
+    orderBy: { completedAt: 'asc' },
   })
 
-  // 构建字段定义
-  const fields: ExportField[] = []
+  const fields: ExportField[] = [
+    { name: 'U_id', label: '用户ID', type: 'string', width: 32 },
+  ]
+  if (!anonymize) fields.push({ name: 'U_name', label: '姓名', type: 'string', width: 20 })
+  fields.push(
+    { name: 'U_time', label: '完成用时(秒)', type: 'numeric', width: 6 },
+    { name: 'U_date', label: '完成日期', type: 'string', width: 10 },
+    { name: 'CONTEXT_SNAPSHOT_HASH', label: '测评上下文快照哈希', type: 'string', width: 64 },
+  )
 
-  // 用户基础信息字段
-  fields.push({ name: 'U_id', label: '用户ID', type: 'string', width: 32 })
-  if (!anonymize) {
-    fields.push({ name: 'U_name', label: '姓名', type: 'string', width: 20 })
-  }
-  fields.push({ name: 'U_time', label: '完成用时(秒)', type: 'numeric', width: 6 })
-  fields.push({ name: 'U_date', label: '完成日期', type: 'string', width: 10 })
-
-  // 为每个表单题目添加字段
   const formFieldMap = new Map<string, string>()
-  for (let formIndex = 0; formIndex < questionnaire.formItems.length; formIndex++) {
-    const formItem = questionnaire.formItems[formIndex]
-    const fieldName = toPinyinFieldName(formItem.label.substring(0, 8), `F${formIndex + 1}_`)
+  questionnaire.formItems.forEach((formItem, index) => {
+    const fieldName = toPinyinFieldName(formItem.label.substring(0, 8), `F${index + 1}_`)
     formFieldMap.set(formItem.id, fieldName)
-    fields.push({
-      name: fieldName,
-      label: `[表单] ${formItem.label}`,
-      type: 'string',
-      width: 20
-    })
-  }
+    fields.push({ name: fieldName, label: `[表单] ${formItem.label}`, type: 'string', width: 20 })
+  })
 
-  // 为每个量表添加题目和维度字段
-  const scaleFieldMaps: Array<{
-    scaleIndex: number
+  type V2Item = { itemCode: string; content: string }
+  type V2Score = { key: string; label: string }
+  type ScaleMap = {
     scaleId: string
-    itemFieldMap: Map<string, string>
-    rtFieldMap: Map<string, string>
-    dimensionFieldMap: Map<string, string>
-    points: number
-  }> = []
-
-  for (let scaleIndex = 0; scaleIndex < questionnaire.questionnaireScales.length; scaleIndex++) {
-    const qs = questionnaire.questionnaireScales[scaleIndex]
-    const scale = qs.scale
-    const points = (scale.config as any)?.points || 5
-    const prefix = `S${scaleIndex + 1}_`
-
-    const itemFieldMap = new Map<string, string>()
-    const rtFieldMap = new Map<string, string>()
-    const dimensionFieldMap = new Map<string, string>()
-
-    // 题目字段
-    for (const item of scale.items) {
-      const fieldName = toPinyinFieldName(item.content.substring(0, 8), `${FIELD_RULES.QUESTION_PREFIX}${prefix}`)
-      itemFieldMap.set(item.id, fieldName)
-      fields.push({
-        name: fieldName,
-        label: `[${scale.name}] ${item.itemCode || ''} ${item.content.substring(0, 15)}`,
-        type: 'numeric',
-        width: 2,
-        decimals: 0
-      })
-      // 作答时间字段
-      const rtFieldName = 'RT_' + fieldName.substring(2) // 将 Q_Sn_xxx 改为 RT_Sn_xxx
-      rtFieldMap.set(item.id, rtFieldName)
-      fields.push({
-        name: rtFieldName,
-        label: `[${scale.name}] ${item.itemCode || ''} 作答时间(毫秒)`,
-        type: 'numeric',
-        width: 6,
-        decimals: 0
-      })
-    }
-
-    // 维度字段
-    for (const dimension of scale.dimensions) {
-      const fieldName = toPinyinFieldName(dimension.name, `${FIELD_RULES.DIMENSION_PREFIX}${prefix}`)
-      dimensionFieldMap.set(dimension.id, fieldName)
-      fields.push({
-        name: fieldName,
-        label: `[${scale.name}] ${dimension.name}得分`,
-        type: 'numeric',
-        width: 5,
-        decimals: 2
-      })
-    }
-
-    scaleFieldMaps.push({
-      scaleIndex,
-      scaleId: scale.id,
-      itemFieldMap,
-      rtFieldMap,
-      dimensionFieldMap,
-      points
-    })
+    items: V2Item[]
+    scores: V2Score[]
+    responseFields: Map<string, string>
+    itemScoreFields: Map<string, string>
+    responseTimeFields: Map<string, string>
+    scoreFields: Map<string, string>
+    qualityStatusField: string
+    qualityFlagsField: string
+    instrumentVersionField: string
+    scoringVersionField: string
+    reportVersionField: string
+    definitionHashField: string
+    referenceVersionsField: string
+    contextSnapshotHashField: string
   }
 
-  // 构建数据行
+  const scaleMaps: ScaleMap[] = []
+  for (let scaleIndex = 0; scaleIndex < questionnaire.questionnaireScales.length; scaleIndex += 1) {
+    const scale = questionnaire.questionnaireScales[scaleIndex].scale
+    const definition = scale.definition && typeof scale.definition === 'object' ? scale.definition as any : null
+    const items: V2Item[] = Array.isArray(definition?.items) ? definition.items : []
+    const scores: V2Score[] = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
+    if (items.length === 0 || scores.length === 0) throw new Error(`问卷包含尚未安装有效 v2 definition 的量表：${scale.code}`)
+    const prefix = `S${scaleIndex + 1}_`
+    const responseFields = new Map<string, string>()
+    const itemScoreFields = new Map<string, string>()
+    const responseTimeFields = new Map<string, string>()
+    const scoreFields = new Map<string, string>()
+    items.forEach((item) => {
+      const responseField = toPinyinFieldName(item.itemCode, `${prefix}Q_V_`)
+      const scoreField = toPinyinFieldName(item.itemCode, `${prefix}Q_S_`)
+      const responseTimeField = toPinyinFieldName(item.itemCode, `${prefix}RT_`)
+      responseFields.set(item.itemCode, responseField)
+      itemScoreFields.set(item.itemCode, scoreField)
+      responseTimeFields.set(item.itemCode, responseTimeField)
+      fields.push({ name: responseField, label: `[${scale.name}] ${item.itemCode} 原始回答`, type: 'string', width: 32 })
+      fields.push({ name: scoreField, label: `[${scale.name}] ${item.itemCode} 映射后题目分值`, type: 'numeric', width: 10, decimals: 6 })
+      fields.push({ name: responseTimeField, label: `[${scale.name}] ${item.itemCode} 作答时间(毫秒)`, type: 'numeric', width: 10, decimals: 0 })
+    })
+    scores.forEach((score) => {
+      const scoreField = toPinyinFieldName(score.key, `${prefix}SCORE_`)
+      scoreFields.set(score.key, scoreField)
+      fields.push({ name: scoreField, label: `[${scale.name}] ${score.key} ${score.label}冻结得分`, type: 'numeric', width: 12, decimals: 6 })
+    })
+    const metadataFields = {
+      qualityStatusField: `${prefix}QUALITY_STATUS`,
+      qualityFlagsField: `${prefix}QUALITY_FLAGS`,
+      instrumentVersionField: `${prefix}INSTRUMENT_VERSION`,
+      scoringVersionField: `${prefix}SCORING_VERSION`,
+      reportVersionField: `${prefix}REPORT_VERSION`,
+      definitionHashField: `${prefix}DEFINITION_HASH`,
+      referenceVersionsField: `${prefix}REFERENCE_VERSIONS`,
+      contextSnapshotHashField: `${prefix}CONTEXT_SNAPSHOT_HASH`,
+    }
+    fields.push(
+      { name: metadataFields.qualityStatusField, label: `[${scale.name}] 质量状态`, type: 'string', width: 16 },
+      { name: metadataFields.qualityFlagsField, label: `[${scale.name}] 质量问题`, type: 'string', width: 48 },
+      { name: metadataFields.instrumentVersionField, label: `[${scale.name}] 量表版本`, type: 'string', width: 16 },
+      { name: metadataFields.scoringVersionField, label: `[${scale.name}] 计分版本`, type: 'string', width: 16 },
+      { name: metadataFields.reportVersionField, label: `[${scale.name}] 报告版本`, type: 'string', width: 16 },
+      { name: metadataFields.definitionHashField, label: `[${scale.name}] 定义哈希`, type: 'string', width: 64 },
+      { name: metadataFields.referenceVersionsField, label: `[${scale.name}] 使用的参考版本`, type: 'string', width: 32 },
+      { name: metadataFields.contextSnapshotHashField, label: `[${scale.name}] 测评上下文快照哈希`, type: 'string', width: 64 },
+    )
+    scaleMaps.push({ scaleId: scale.id, items, scores, responseFields, itemScoreFields, responseTimeFields, scoreFields, ...metadataFields })
+  }
+
   const rows: Record<string, any>[] = []
-
-  for (const qa of questionnaireAssessments) {
-    const row: Record<string, any> = {}
-
-    // 用户基础信息
-    row['U_id'] = qa.userId ? (anonymize ? `U${qa.userId.substring(0, 8)}` : qa.userId) : 'ANONYMOUS'
-    if (!anonymize && qa.user) {
-      row['U_name'] = qa.user.nickname || qa.user.username
+  for (const assessment of assessments) {
+    const row: Record<string, any> = {
+      U_id: assessment.userId ? (anonymize ? `U${assessment.userId.substring(0, 8)}` : assessment.userId) : 'ANONYMOUS',
+      U_time: assessment.totalTime == null ? null : Math.round(assessment.totalTime / 1000),
+      U_date: assessment.completedAt ? assessment.completedAt.toISOString().split('T')[0] : null,
+      CONTEXT_SNAPSHOT_HASH: assessment.contextSnapshotHash ?? null,
     }
-    row['U_time'] = qa.totalTime ? Math.round(qa.totalTime / 1000) : null
-    row['U_date'] = qa.completedAt ? qa.completedAt.toISOString().split('T')[0] : null
-
-    // 填充表单答案
-    const formAnswerMap = new Map(qa.formAnswers.map(fa => [fa.formItemId, fa.value]))
-    for (const formItem of questionnaire.formItems) {
+    if (!anonymize) row.U_name = assessment.user?.nickname || assessment.user?.username || null
+    const readableFormAnswers = readContextFormAnswers(questionnaire.formItems, assessment.formAnswers)
+    const formAnswerMap = new Map(readableFormAnswers.map((answer) => [answer.formItemId, answer.value]))
+    questionnaire.formItems.forEach((formItem) => {
       const fieldName = formFieldMap.get(formItem.id)
-      if (fieldName) {
-        row[fieldName] = formAnswerMap.get(formItem.id) ?? null
-      }
-    }
+      if (fieldName) row[fieldName] = formAnswerMap.get(formItem.id) ?? null
+    })
 
-    // 为每个量表填充数据
-    for (const scaleMap of scaleFieldMaps) {
-      const scaleAssessment = qa.scaleAssessments.find(sa => sa.scaleId === scaleMap.scaleId)
-      
-      if (scaleAssessment) {
-        // 解密 answers 字段（支持加密存储）
-        const rawAnswers = scaleAssessment.answers
-        let answers: AnswerItem[] = []
-        if (Array.isArray(rawAnswers)) {
-          answers = rawAnswers as unknown as AnswerItem[]
-        } else if (typeof rawAnswers === 'string' && rawAnswers) {
-          const decrypted = safeDecrypt<AnswerItem[]>(rawAnswers)
-          if (decrypted) {
-            answers = decrypted
-          }
-        }
-        
-        const answerMap = new Map(answers.map(a => [a.itemId, a.value]))
-        const responseTimeMap = new Map(answers.map(a => [a.itemId, a.responseTime]))
-        
-        const scale = questionnaire.questionnaireScales.find(qs => qs.scaleId === scaleMap.scaleId)?.scale
-        const items = scale?.items || []
-        
-        for (const item of items) {
-          const fieldName = scaleMap.itemFieldMap.get(item.id)
-          const rtFieldName = scaleMap.rtFieldMap.get(item.id)
-          if (fieldName) {
-            const rawValue = answerMap.get(item.id)
-            if (rawValue !== undefined && rawValue !== null) {
-              row[fieldName] = applyReverseScore(Number(rawValue), item.reverse, scaleMap.points)
-            } else {
-              row[fieldName] = null
-            }
-          }
-          if (rtFieldName) {
-            row[rtFieldName] = responseTimeMap.get(item.id) ?? null
-          }
-        }
-
-        // 解密 scores 字段（支持加密存储）
-        const rawScores = scaleAssessment.scores
-        let scores: ScoreItem[] = []
-        if (Array.isArray(rawScores)) {
-          scores = rawScores as unknown as ScoreItem[]
-        } else if (typeof rawScores === 'string' && rawScores) {
-          const decrypted = safeDecrypt<ScoreItem[]>(rawScores)
-          if (decrypted) {
-            scores = decrypted
-          }
-        }
-        
-        for (const score of scores) {
-          const fieldName = scaleMap.dimensionFieldMap.get(score.dimensionId)
-          if (fieldName) {
-            row[fieldName] = score.rawScore ?? score.normalizedScore ?? null
-          }
-        }
-      } else {
-        // 该量表未测评，填充 null
-        for (const fieldName of scaleMap.itemFieldMap.values()) {
-          row[fieldName] = null
-        }
-        for (const fieldName of scaleMap.rtFieldMap.values()) {
-          row[fieldName] = null
-        }
-        for (const fieldName of scaleMap.dimensionFieldMap.values()) {
-          row[fieldName] = null
-        }
-      }
-    }
-
+    scaleMaps.forEach((scaleMap) => {
+      const child = assessment.scaleAssessments.find((candidate) => candidate.scaleId === scaleMap.scaleId)
+      const answers = child ? readScaleAnswers(child.answers) : { answers: [], decryptError: false }
+      const result = child && child.status === 'COMPLETED' ? readScaleResult(child.result) : { result: null, decryptError: false }
+      const answerMap = new Map(answers.answers.map((answer) => [answer.itemCode, answer]))
+      const itemScoreMap = new Map((result.result?.itemScores ?? []).map((item) => [item.itemCode, item]))
+      const scoreMap = new Map((result.result?.scores ?? []).map((score) => [score.key, score]))
+      scaleMap.items.forEach((item) => {
+        const answer = answerMap.get(item.itemCode)
+        row[scaleMap.responseFields.get(item.itemCode)!] = answer?.responseValue ?? null
+        row[scaleMap.itemScoreFields.get(item.itemCode)!] = result.result ? itemScoreMap.get(item.itemCode)?.score ?? null : null
+        row[scaleMap.responseTimeFields.get(item.itemCode)!] = answer?.responseTimeMs ?? null
+      })
+      scaleMap.scores.forEach((score) => {
+        row[scaleMap.scoreFields.get(score.key)!] = result.result ? scoreMap.get(score.key)?.value ?? null : null
+      })
+      row[scaleMap.qualityStatusField] = result.decryptError || answers.decryptError ? 'decrypt_error' : result.result?.quality.status ?? null
+      row[scaleMap.qualityFlagsField] = result.decryptError || answers.decryptError
+        ? 'decrypt_error'
+        : result.result?.quality.flags.join('|') ?? null
+      row[scaleMap.instrumentVersionField] = result.result?.method.instrumentVersion ?? null
+      row[scaleMap.scoringVersionField] = result.result?.method.scoringVersion ?? null
+      row[scaleMap.reportVersionField] = result.result?.method.reportVersion ?? null
+      row[scaleMap.definitionHashField] = result.result?.method.definitionHash ?? null
+      row[scaleMap.referenceVersionsField] = result.result?.method.referenceVersions.join('|') ?? null
+      row[scaleMap.contextSnapshotHashField] = result.result?.method.assessmentContext?.snapshotHash ?? assessment.contextSnapshotHash ?? null
+    })
     rows.push(row)
   }
-
   return { fields, rows }
 }
 
@@ -869,7 +766,6 @@ export async function saveQuestionnaireExportFiles(
 
 export const exportService = {
   toPinyinFieldName,
-  applyReverseScore,
   getScaleExportData,
   exportToCSV,
   exportToSPSS,

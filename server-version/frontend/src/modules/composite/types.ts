@@ -13,22 +13,47 @@ export interface CompositeItemSummary {
   index: number
 }
 
-export interface CompositeScaleItem {
-  id: string
+export type CompositeScaleResponseValue = string | number
+
+export interface CompositeScaleRunnerItem {
   itemCode: string
   content: string
+  type: string
   required: boolean
-  options: Array<{ value: number; label: string }> | null
+  sortOrder: number
+  responseSetKey: string
+  randomizeOptions: boolean
+  options: Array<{ value: CompositeScaleResponseValue; label: string }>
+}
+
+export interface CompositeScaleDefinition {
+  schemaVersion: 2
+  respondentType: string
+  display: { randomizeItems: boolean }
+  items: CompositeScaleRunnerItem[]
+}
+
+/** @deprecated Relational v1 fields are kept optional for old authoring data only. */
+export interface CompositeScaleItem {
+  id?: string
+  itemCode?: string
+  content?: string
+  required?: boolean
+  options?: Array<{ value: CompositeScaleResponseValue; label: string }> | null
 }
 
 export interface CompositeScale {
   id: string
   name: string
-  instruction: string | null
-  estimatedTime: number | null
-  config: { points?: number; labels?: Array<{ value: number; label: string }> } | null
-  items: CompositeScaleItem[]
-  dimensions: Array<{ id: string; name: string }>
+  instruction?: string | null
+  estimatedTime?: number | null
+  definition?: CompositeScaleDefinition
+  /** @deprecated v1 authoring fields. */
+  config?: { points?: number; labels?: Array<{ value: number; label: string }> } | null
+  /** @deprecated v1 authoring fields. */
+  items?: CompositeScaleItem[]
+  /** @deprecated v1 authoring fields. */
+  dimensions?: Array<{ id: string; name: string }>
 }
 
 export interface CompositeCurrentItem {
@@ -36,10 +61,10 @@ export interface CompositeCurrentItem {
   type: CompositeItemType
   position: number
   required: boolean
-  form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null }
+  form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
   scale?: CompositeScale
   scaleAssessmentId?: string
-  answers?: Array<{ itemId: string; value: number; responseTime?: number }>
+  answers?: Array<{ itemCode: string; responseValue: CompositeScaleResponseValue; responseTimeMs?: number; changeCount?: number }>
   cognitiveSession?: CognitiveSession
 }
 
@@ -59,6 +84,7 @@ export interface CompositeAttemptState {
   anonymousCode: string | null
   items: CompositeItemSummary[]
   currentItem: CompositeCurrentItem | null
+  context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
 }
 
 export interface CompositePublicInfo {

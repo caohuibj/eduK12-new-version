@@ -23,7 +23,6 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { encryptField } from '../../utils/encryption'
 import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/reference'
 import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
@@ -41,6 +40,49 @@ import {
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
 const page = { page: 1, pageSize: 20 }
+
+const makeScaleResult = (input: {
+  scaleId: string
+  code: string
+  name: string
+  scoreKey: string
+  value: number | null
+}) => ({
+  schemaVersion: 2 as const,
+  instrument: { scaleId: input.scaleId, code: input.code, name: input.name, instrumentVersion: '2.0.0' },
+  method: {
+    scaleId: input.scaleId,
+    instrumentVersion: '2.0.0',
+    scoringVersion: '2.0.0',
+    reportVersion: '2.0.0',
+    definitionHash: 'h'.repeat(64),
+    referenceVersions: [],
+    assessmentContext: null,
+  },
+  quality: {
+    status: input.value === null ? 'invalid' as const : 'interpretable' as const,
+    flags: input.value === null ? ['score_not_calculable' as const] : [],
+  },
+  itemScores: input.value === null ? [] : [{ itemCode: 'Q1', responseValue: 'never', baseScore: 0, score: 0 }],
+  scores: [{
+    key: input.scoreKey,
+    type: 'dimension' as const,
+    label: input.scoreKey,
+    direction: 'descriptive' as const,
+    canonical: true,
+    displayPrecision: 0,
+    value: input.value,
+    range: { min: 0, max: 10 },
+    expectedItems: ['Q1'],
+    answeredItems: input.value === null ? [] : ['Q1'],
+    status: input.value === null ? 'not_calculable' as const : 'calculated' as const,
+    prorated: false,
+  }],
+  references: [],
+  interpretations: [],
+  caveats: [],
+  disclaimer: '同一项免责声明',
+})
 
 const compositeRow = (overrides: Record<string, unknown> = {}) => ({
   id: 'composite-1',
@@ -91,7 +133,7 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
     name: '综合测评 1',
     items: [
       { id: 'item-form', type: 'FORM', formLabel: '年级', scale: null, cognitiveAssignment: null },
-      { id: 'item-scale', type: 'SCALE', scaleId: 'scale-1', scale: { name: '量表 A' }, cognitiveAssignment: null },
+      { id: 'item-scale', type: 'SCALE', scaleId: 'scale-1', scale: { id: 'scale-1', code: 'S-1', name: '量表 A' }, cognitiveAssignment: null },
       {
         id: 'item-cog',
         type: 'COGNITIVE',
@@ -102,8 +144,7 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
   },
   scaleAssessments: [{
     compositeItemId: 'item-scale',
-    scores: { total: 12 },
-    feedback: { summary: 'ok' },
+    result: makeScaleResult({ scaleId: 'scale-1', code: 'S-1', name: '量表 A', scoreKey: 'A', value: 12 }),
     completedAt: new Date('2026-08-20T01:04:00Z'),
     totalTime: 4000,
   }],
@@ -468,27 +509,21 @@ describe('composite cognitive single-task report', () => {
 
 describe('collection-only mixed unit reports', () => {
   it('uses the same Scale DTO for Composite and Questionnaire/public projections', () => {
-    const scores = [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: null, level: 'low' }]
-    const feedback = {
-      overall: '单项反馈',
-      caveats: ['同一项注意事项'],
-      disclaimer: '同一项免责声明',
-      dimensions: [{ dimensionId: 'dimension-a', score: 0, level: 'low', interpretation: '解释', suggestions: ['建议'] }],
-    }
-    const scale = { id: 'scale-a', code: 'S-A', name: '量表 A', dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A', minScore: 0, maxScore: 10 }] }
+    const result = makeScaleResult({ scaleId: 'scale-a', code: 'S-A', name: '量表 A', scoreKey: 'A', value: 0 })
+    const scale = { id: 'scale-a', code: 'S-A', name: '量表 A' }
     const composite = buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '综合测评 1',
         items: [{ id: 'item-scale-a', type: 'SCALE', scaleId: 'scale-a', scale, cognitiveAssignment: null }],
       },
-      scaleAssessments: [{ compositeItemId: 'item-scale-a', scores, feedback, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0 }],
+      scaleAssessments: [{ compositeItemId: 'item-scale-a', result, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0 }],
       cognitiveSessions: [],
       formAnswers: [],
     })).unitReports[0]
     const questionnaire = buildQuestionnaireCollectionReport({
       questionnaire: { name: '问卷', questionnaireScales: [{ id: 'item-scale-a', scaleId: 'scale-a', position: 0, scale }], formItems: [] },
-      scaleAssessments: [{ id: 'assessment-a', scaleId: 'scale-a', scores, feedback, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0, scale }],
+      scaleAssessments: [{ id: 'assessment-a', scaleId: 'scale-a', result, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0, scale }],
       formAnswers: [],
     }).unitReports[0]
     expect(composite).toEqual(questionnaire)
@@ -504,7 +539,7 @@ describe('collection-only mixed unit reports', () => {
             id: 'item-scale-a',
             type: 'SCALE',
             scaleId: 'scale-a',
-            scale: { id: 'scale-a', code: 'S-A', name: '量表 A', dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A', minScore: 0, maxScore: 10 }] },
+            scale: { id: 'scale-a', code: 'S-A', name: '量表 A' },
             cognitiveAssignment: null,
           },
           {
@@ -518,7 +553,7 @@ describe('collection-only mixed unit reports', () => {
             id: 'item-scale-b',
             type: 'SCALE',
             scaleId: 'scale-b',
-            scale: { id: 'scale-b', code: 'S-B', name: '量表 B', dimensions: [{ id: 'dimension-b', code: 'B', name: '维度 B', minScore: 0, maxScore: 10 }] },
+            scale: { id: 'scale-b', code: 'S-B', name: '量表 B' },
             cognitiveAssignment: null,
           },
           {
@@ -538,15 +573,13 @@ describe('collection-only mixed unit reports', () => {
       scaleAssessments: [
         {
           compositeItemId: 'item-scale-a',
-          scores: [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: 0, level: 'low' }],
-          feedback: { overall: 'A', dimensions: [{ dimensionId: 'dimension-a', score: 0, level: 'low', interpretation: '', suggestions: [] }] },
+          result: makeScaleResult({ scaleId: 'scale-a', code: 'S-A', name: '量表 A', scoreKey: 'A', value: 0 }),
           completedAt: new Date('2026-08-20T01:01:00Z'),
           totalTime: 0,
         },
         {
           compositeItemId: 'item-scale-b',
-          scores: [{ dimensionId: 'dimension-b', rawScore: null, normalizedScore: null, level: null }],
-          feedback: { overall: 'B', dimensions: [{ dimensionId: 'dimension-b', score: null, level: null, interpretation: '', suggestions: [] }] },
+          result: makeScaleResult({ scaleId: 'scale-b', code: 'S-B', name: '量表 B', scoreKey: 'B', value: null }),
           completedAt: new Date('2026-08-20T01:02:00Z'),
           totalTime: null,
         },
@@ -585,8 +618,8 @@ describe('collection-only mixed unit reports', () => {
     expect(built.unitReports.map((item: { type: string }) => item.type)).toEqual(['SCALE', 'SCALE', 'COGNITIVE', 'COGNITIVE'])
     expect(built.backgroundValues).toEqual([{ itemId: 'item-form', type: 'FORM', kind: 'background', label: '年级', value: '三年级' }])
     expect(built.modules).toBe(built.unitReports)
-    expect(built.unitReports[0]).toMatchObject({ scaleId: 'scale-a', dimensionScores: [{ rawScore: 0, normalizedScore: 0 }] })
-    expect(built.unitReports[1]).toMatchObject({ scaleId: 'scale-b', dimensionScores: [{ rawScore: null, normalizedScore: null }], totalTime: null })
+    expect(built.unitReports[0]).toMatchObject({ scaleId: 'scale-a', scores: [{ key: 'A', value: 0 }] })
+    expect(built.unitReports[1]).toMatchObject({ scaleId: 'scale-b', scores: [{ key: 'B', value: null }], quality: { status: 'invalid' }, totalTime: null })
     expect(built.unitReports[2]).toMatchObject({ score: 0, qualityFlags: { interpretable: false }, metrics: { zeroMetric: 0, missingMetric: null } })
     expect(built.unitReports[3]).toMatchObject({ score: null, qualityFlags: { interpretable: true }, metrics: { zeroMetric: null } })
     expect(JSON.stringify(built)).not.toMatch(/averageScore|overallScore|overallSummary|Domain|consistency|convergence/)
@@ -622,12 +655,11 @@ describe('buildCompositeReport decrypt degrade', () => {
     expect(studentReport.modules.find((item: { type: string }) => item.type === 'COGNITIVE')).toMatchObject({ decryptError: true })
   })
 
-  it('marks a scale module decryptError when scores ciphertext cannot be decoded', () => {
+  it('marks a scale module decryptError when the frozen v2 result ciphertext cannot be decoded', () => {
     const attempt = completedAttemptForReport({
       scaleAssessments: [{
         compositeItemId: 'item-scale',
-        scores: 'aa:bb:cc',
-        feedback: encryptField({ summary: 'ok' }),
+        result: 'aa:bb:cc',
         completedAt: new Date('2026-08-20T01:04:00Z'),
         totalTime: 4000,
       }],
@@ -636,17 +668,16 @@ describe('buildCompositeReport decrypt degrade', () => {
     const built = buildCompositeReport(attempt)
     const scale = built.modules.find((item: { type: string }) => item.type === 'SCALE')
     expect(scale).toMatchObject({ decryptError: true, type: 'SCALE', scaleId: 'scale-1' })
-    expect(scale).not.toHaveProperty('scores')
+    expect(scale).toHaveProperty('scores', [])
     expect(scale).not.toHaveProperty('feedback')
     expect(built.backgroundValues.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
   })
 
-  it('marks a scale module decryptError when feedback ciphertext cannot be decoded', () => {
+  it('marks a scale module decryptError when the result is not v2', () => {
     const attempt = completedAttemptForReport({
       scaleAssessments: [{
         compositeItemId: 'item-scale',
-        scores: encryptField({ total: 12 }),
-        feedback: 'aa:bb:cc',
+        result: { schemaVersion: 1, scores: [], feedback: {} },
         completedAt: new Date('2026-08-20T01:04:00Z'),
         totalTime: 4000,
       }],
@@ -654,6 +685,6 @@ describe('buildCompositeReport decrypt degrade', () => {
 
     const scale = buildCompositeReport(attempt).modules.find((item: { type: string }) => item.type === 'SCALE')
     expect(scale).toMatchObject({ decryptError: true })
-    expect(scale).not.toHaveProperty('scores')
+    expect(scale).toHaveProperty('scores', [])
   })
 })

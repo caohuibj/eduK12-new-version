@@ -11,6 +11,7 @@ router.get('/available', authenticate, questionnaireController.available)
 
 // 获取问卷测评状态（必须在 /:id 之前）
 router.get('/assessments/:id', authenticate, questionnaireController.getAssessment)
+router.post('/assessments/:id/context/freeze', authenticate, questionnaireController.freezeContext)
 
 // 完成问卷测评
 router.post('/assessments/:id/complete', authenticate, questionnaireController.completeAssessment)

@@ -17,6 +17,7 @@ import {
   validateProtocolCompositeItems,
 } from '../../modules/cognitive-analysis'
 import { projectCompositeCollectionReport } from '../../modules/composite/composite-report.projector'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 
 const REPORT = { reportVersion: '1.0.0' as const, referenceMode: 'none' as const }
 const GATE_MANIFEST = JSON.parse(readFileSync(resolve(__dirname, '../../../../e2e/cognitive-round2-gate-manifest.json'), 'utf8')) as {
@@ -185,6 +186,9 @@ const multisourceItems = () => {
         name: 'ADEXI',
         status: 'PUBLISHED',
         visibility: 'HIDDEN',
+        instrumentClass: 'STANDARD' as const,
+        instrumentVersion: '2.0.0',
+        definition: structuredClone(ADEXI_V2_DEFINITION),
         config: { respondentType: 'participant_self_report' },
         estimatedTime: 5,
         instruction: 'self report fixture',
@@ -383,7 +387,16 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(validated.scaleMeasurements[0]).toMatchObject(reverse)
 
     const changedItems = items.map((item) => item.id === 'item-adexi'
-      ? { ...item, scale: { ...item.scale!, items: [{ ...item.scale!.items![0], content: 'changed' }] } }
+      ? {
+          ...item,
+          scale: {
+            ...item.scale!,
+            definition: {
+              ...(item.scale!.definition as typeof ADEXI_V2_DEFINITION),
+              items: [{ ...(item.scale!.definition as typeof ADEXI_V2_DEFINITION).items[0], content: 'changed' }, ...(item.scale!.definition as typeof ADEXI_V2_DEFINITION).items.slice(1)],
+            },
+          },
+        }
       : item)
     expect(() => validateFrozenReportPackageSnapshot(snapshot, definition, protocol, changedItems))
       .toThrow(/协议量表冻结内容不匹配/)

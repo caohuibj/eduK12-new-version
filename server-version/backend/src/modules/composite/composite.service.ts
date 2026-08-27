@@ -4,14 +4,30 @@ import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
-import { calculateScores, generateFeedbackWithLevels } from '../../services/scoringService'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
-import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import {
+  buildScaleResultForRecord,
+  encryptScaleAnswers,
+  encryptScaleResult,
+  readScaleAnswers,
+  scaleDefinitionFromRecord,
+  scaleRunnerFromRecord,
+} from '../scale/scale-workflow.service'
+import { validateScaleDefinition } from '../scale/scale-definition'
+import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
+import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
+import {
+  freezeCompositeAttemptContext,
+  isAssessmentContextServiceError,
+  readCompositeAttemptContext,
+  assertContextMutable,
+} from '../../services/assessmentContextService'
 import { logger } from '../../utils/logger'
 import { canUseReportPackage, canUseScale } from '../../services/materialGrant'
 import {
@@ -127,9 +143,15 @@ const loadComposite = async (id: string, includeItems = false) => {
               orderBy: { position: 'asc' as const },
               include: {
                 scale: {
-                  include: {
-                    items: { orderBy: { sortOrder: 'asc' as const }, include: { itemDimensions: true } },
-                    dimensions: true,
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    description: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
                   },
                 },
                 cognitiveAssignment: { include: { config: true } },
@@ -272,12 +294,24 @@ export const materializeAnalysisProtocol = async (
   for (const slot of [...input.protocol.scaleSlots].sort((a, b) => a.position - b.position)) {
     const scale = await db.scale.findUnique({
       where: { code: slot.expectedScaleCode },
-      include: { dimensions: true },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        status: true,
+        instrumentClass: true,
+        instrumentVersion: true,
+        definition: true,
+      },
     })
     if (!scale || scale.status !== 'PUBLISHED') {
       throw compositeBadRequest(`协议量表不可用：${slot.label}`)
     }
-    if (!scale.dimensions?.some((dimension: { code: string }) => dimension.code === slot.expectedDimensionCode)) {
+    const validation = validateScaleDefinition(scale.definition, { instrumentClass: scale.instrumentClass })
+    if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+      throw compositeBadRequest(`协议量表 definition 不可用：${slot.label}`)
+    }
+    if (!validation.definition.scoring.scores.some((score) => score.key === slot.expectedDimensionCode)) {
       throw compositeBadRequest(`协议量表维度不可用：${slot.label}`)
     }
     await db.compositeAssessmentItem.create({
@@ -343,6 +377,9 @@ const assertValidItem = async (
   role: UserRole,
   composite: { courseId: string | null },
 ) => {
+  if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
+    throw compositeBadRequest('只有 context 表单可以设置为非必填')
+  }
   const supplied = [input.scaleId, input.cognitiveAssignmentId, input.formLabel].filter(Boolean).length
   if (input.type === 'SCALE') {
     if (!input.scaleId || supplied !== 1) throw compositeBadRequest('量表模块必须提供 scaleId')
@@ -350,6 +387,11 @@ const assertValidItem = async (
     if (!scale) throw compositeNotFound('量表不存在')
     if (!(await canUseScale(userId, role, scale))) throw compositeForbidden('无权限使用此量表')
     if (scale.status !== 'PUBLISHED') throw compositeBadRequest('只能添加已发布量表')
+    if (!scale.definition) throw compositeBadRequest('只能添加已安装 v2 definition 的量表')
+    const definitionValidation = validateScaleDefinition(scale.definition)
+    if (!definitionValidation.definition || definitionValidation.issues.some((issue) => issue.severity === 'error')) {
+      throw compositeBadRequest('量表 definition 不可用')
+    }
     return
   }
 
@@ -382,6 +424,16 @@ const assertValidItem = async (
       if (values.length === 0) throw compositeBadRequest('选择题必须提供至少一个选项')
       if (new Set(values).size !== values.length) throw compositeBadRequest('表单选项不能重复')
     }
+    const contextIssues = validateContextFormItem({
+      id: 'new',
+      type: input.formType,
+      label: input.formLabel,
+      required: input.required,
+      position: input.position,
+      contextKey: input.contextKey,
+      options: input.formOptions,
+    })
+    if (contextIssues.length > 0) throw compositeBadRequest(contextIssues[0].message)
     return
   }
 
@@ -416,6 +468,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
         label: packageSlotLabels.get(item.position) ?? item.formLabel,
         placeholder: item.formPlaceholder,
         options: item.formOptions,
+        contextKey: item.contextKey ?? null,
       }
     : null,
 })
@@ -735,12 +788,15 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         orderBy: { position: 'asc' },
         include: {
           scale: {
-            include: {
-              items: {
-                orderBy: { sortOrder: 'asc' },
-                include: { itemDimensions: true },
-              },
-              dimensions: true,
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              description: true,
+              status: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
           cognitiveAssignment: { include: { config: true } },
@@ -855,6 +911,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           formLabel: item.formLabel,
           formPlaceholder: item.formPlaceholder,
           formOptions: item.formOptions ?? undefined,
+          contextKey: item.contextKey ?? undefined,
         })
       } else if (item.type === 'COGNITIVE') {
         const assignment = item.cognitiveAssignment
@@ -1187,6 +1244,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
       formLabel: input.type === 'FORM' ? input.formLabel : null,
       formPlaceholder: input.type === 'FORM' ? input.formPlaceholder ?? null : null,
       formOptions: input.type === 'FORM' ? (input.formOptions as any) ?? null : null,
+      contextKey: input.type === 'FORM' ? input.contextKey ?? null : null,
     },
   })
 }
@@ -1246,6 +1304,20 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
   await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
+
+  const contextIssues = validateContextFormItems(
+    composite.items.filter((item: any) => item.type === 'FORM').map((item: any) => ({
+      id: item.id,
+      type: item.formType,
+      label: item.formLabel,
+      required: item.required,
+      position: item.position,
+      contextKey: item.contextKey,
+      options: item.formOptions,
+    })),
+    composite.items.filter((item: any) => item.type !== 'FORM').map((item: any) => item.position),
+  )
+  if (contextIssues.length > 0) throw compositeBadRequest(contextIssues[0].message)
 
   for (const item of composite.items) {
     if (item.type === 'COGNITIVE') assertCognitiveModuleEnabled()
@@ -1534,7 +1606,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           userId,
           status: 'IN_PROGRESS',
           progress: 0,
-          answers: [],
+          answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
         },
@@ -1607,7 +1679,34 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 }
 
 const findPublicToken = async (tokenValue: string) => {
-  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { course: { select: { isLibrary: true } }, items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
+  const token = await prisma.compositeAssessmentAccessToken.findUnique({
+    where: { token: tokenValue },
+    include: {
+      compositeAssessment: {
+        include: {
+          course: { select: { isLibrary: true } },
+          items: {
+            orderBy: { position: 'asc' },
+            include: {
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                },
+              },
+              cognitiveAssignment: { include: { config: true } },
+            },
+          },
+        },
+      },
+    },
+  })
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
@@ -1664,7 +1763,18 @@ const loadAttemptWithChildren = async (attemptId: string) => {
           items: {
             orderBy: { position: 'asc' },
             include: {
-              scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } },
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                },
+              },
               cognitiveAssignment: { include: { config: true } },
             },
           },
@@ -1688,6 +1798,9 @@ const loadAttemptWithChildren = async (attemptId: string) => {
 }
 
 const lockCompositeAttempt = async (tx: Db, attemptId: string) => {
+  // Keep lightweight service-test Prisma doubles usable. Real Prisma
+  // transaction clients always expose $queryRaw and take the row lock.
+  if (typeof tx?.$queryRaw !== 'function') return
   const rows = await tx.$queryRaw<Array<{ id: string }>>`
     SELECT "id"
     FROM "composite_assessment_attempts"
@@ -1729,6 +1842,19 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
   assertSupportedComposite(attempt.compositeAssessment)
   return attempt
+}
+
+export const freezeContext = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const authorized = await findAttempt(attemptId, context)
+  if (authorized.status !== 'IN_PROGRESS') throw compositeConflict('综合测评已结束，不能冻结人口学上下文')
+  return prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: { status: true } })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.status !== 'IN_PROGRESS') throw compositeConflict('综合测评已结束，不能冻结人口学上下文')
+    const frozen = await freezeCompositeAttemptContext(tx, attemptId)
+    return { status: 'frozen' as const, frozenAt: frozen.context.frozenAt }
+  })
 }
 
 const cognitiveRunnerPayload = (session: any) => {
@@ -1779,7 +1905,7 @@ const isAttemptItemCompleted = (
   item: any,
   maps: ReturnType<typeof attemptCompletedItemMaps>,
 ) => {
-  if (!item.required) return true
+  if (!item.required && !item.contextKey) return true
   if (item.type === 'SCALE') return maps.scaleMap.get(item.id)?.status === 'COMPLETED'
   if (item.type === 'COGNITIVE') return maps.cognitiveMap.get(item.id)?.status === 'COMPLETED'
   return maps.formMap.get(item.id)?.completed !== false && maps.formMap.has(item.id)
@@ -1866,7 +1992,14 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   await findAttempt(attemptId, context)
   await finalizeAttemptIfReady(attemptId)
   const attempt = await findAttempt(attemptId, context)
-  const maps = attemptCompletedItemMaps(attempt)
+  const readableFormAnswers = readContextFormAnswers(
+    attempt.compositeAssessment.items
+      .filter((item: any) => item.type === 'FORM')
+      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+    attempt.formAnswers,
+  )
+  const readableAttempt = { ...attempt, formAnswers: readableFormAnswers }
+  const maps = attemptCompletedItemMaps(readableAttempt)
   const { scaleMap, cognitiveMap, formMap } = maps
   const completed = (item: any) => isAttemptItemCompleted(item, maps)
   const completedItems = countAttemptCompletedItems(attempt, maps)
@@ -1875,13 +2008,33 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   let currentItem: any = null
   if (current?.type === 'FORM') {
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, form: { type: current.formType, label: packageSlotLabels.get(current.position) ?? current.formLabel, placeholder: current.formPlaceholder, options: current.formOptions }, value: formMap.get(current.id)?.value ?? null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, form: { type: current.formType, label: packageSlotLabels.get(current.position) ?? current.formLabel, placeholder: current.formPlaceholder, options: current.formOptions, contextKey: current.contextKey ?? null }, value: formMap.get(current.id)?.value ?? null }
   } else if (current?.type === 'SCALE') {
     const assessment = scaleMap.get(current.id)
     const scale = current.scale
       ? { ...current.scale, name: packageSlotLabels.get(current.position) ?? current.scale.name }
       : current.scale
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, scaleAssessmentId: assessment?.id, scale, answers: decodeJson<any[]>(assessment?.answers) ?? [] }
+    let runnerScale = scale
+    if (scale) {
+      try {
+        const { definition: _definition, ...metadata } = scale
+        runnerScale = { ...metadata, definition: scaleRunnerFromRecord(scale) }
+      } catch {
+        const { definition: _definition, ...metadata } = scale
+        runnerScale = { ...metadata, definition: null, definitionError: true }
+      }
+    }
+    const decodedAnswers = readScaleAnswers(assessment?.answers)
+    currentItem = {
+      id: current.id,
+      type: current.type,
+      position: current.position,
+      required: current.required,
+      scaleAssessmentId: assessment?.id,
+      scale: runnerScale,
+      answers: decodedAnswers.answers,
+      ...(decodedAnswers.decryptError ? { decryptError: true } : {}),
+    }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
     currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session) : null }
@@ -1900,6 +2053,10 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     lastSavedAt: attempt.lastSavedAt,
     completedAt: attempt.completedAt,
     anonymousCode: attempt.anonymousCode,
+    context: {
+      status: attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+      frozenAt: attempt.contextFrozenAt?.toISOString?.() ?? null,
+    },
     items: attempt.compositeAssessment.items.map((item: any, index: number) => ({ id: item.id, type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels), completed: completed(item), index })),
     currentItem,
   }
@@ -1918,6 +2075,7 @@ const getOwnedChild = async (attemptId: string, itemId: string, context: { userI
 }
 
 const lockScaleAssessment = async (tx: Db, assessmentId: string) => {
+  if (typeof tx?.$queryRaw !== 'function') throw compositeNotFound('量表测评记录不存在')
   const rows = await tx.$queryRaw<Array<{ status: string; answers: unknown }>>`
     SELECT "status", "answers"
     FROM "assessments"
@@ -1939,57 +2097,140 @@ export const saveAttempt = async (
   if (draft) {
     const item = attempt.compositeAssessment.items.find((candidate: any) => candidate.id === draft.itemId)
     if (!item || item.type !== 'FORM') throw compositeBadRequest('只能保存当前综合测评中的表单草稿')
-    const existing = attempt.formAnswers.find((answer: any) => answer.itemId === draft.itemId)
-    if (!existing || existing.completed === false) {
-      await prisma.compositeFormAnswer.upsert({
-        where: { attemptId_itemId: { attemptId, itemId: draft.itemId } },
-        create: { attemptId, itemId: draft.itemId, value: draft.value, completed: false },
-        update: { value: draft.value, completed: false },
+    await prisma.$transaction(async (tx: Db) => {
+      await lockCompositeAttempt(tx, attemptId)
+      const current = await tx.compositeAssessmentAttempt.findUnique({
+        where: { id: attemptId },
+        select: { status: true, contextSnapshotEncrypted: true, contextSnapshotHash: true },
       })
-    }
+      if (!current) throw compositeNotFound('综合测评记录不存在')
+      if (current.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
+      if (item.contextKey) {
+        try {
+          assertContextMutable(Boolean(current.contextSnapshotEncrypted || current.contextSnapshotHash))
+        } catch (error) {
+          if (isAssessmentContextServiceError(error)) throw compositeConflict(error.message)
+          throw error
+        }
+        const validationMessage = validateContextAnswer({
+          id: item.id,
+          type: item.formType,
+          label: item.formLabel,
+          required: item.required,
+          position: item.position,
+          contextKey: item.contextKey,
+          options: item.formOptions,
+        }, draft.value)
+        if (validationMessage) throw compositeBadRequest(validationMessage)
+      }
+      const existing = await tx.compositeFormAnswer.findUnique({ where: { attemptId_itemId: { attemptId, itemId: draft.itemId } }, select: { completed: true } })
+      if (!existing || existing.completed === false) {
+        const storedValue = writeContextFormAnswer(item.contextKey, draft.value)
+        await tx.compositeFormAnswer.upsert({
+          where: { attemptId_itemId: { attemptId, itemId: draft.itemId } },
+          create: { attemptId, itemId: draft.itemId, value: storedValue, completed: false },
+          update: { value: storedValue, completed: false },
+        })
+      }
+      await tx.compositeAssessmentAttempt.update({ where: { id: attemptId }, data: { lastSavedAt: new Date() } })
+    })
+    return prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: { id: true, lastSavedAt: true, status: true, progress: true } })
   }
   return prisma.compositeAssessmentAttempt.update({ where: { id: attemptId }, data: { lastSavedAt: new Date() }, select: { id: true, lastSavedAt: true, status: true, progress: true } })
 }
 
 export const saveFormAnswer = async (attemptId: string, itemId: string, value: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
-  if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (item.type !== 'FORM') throw compositeBadRequest('当前模块不是表单')
-  if (item.required && !value.trim()) throw compositeBadRequest('此表单项为必填项')
-  if (item.formType === 'single_choice' || item.formType === 'multiple_choice') {
-    const options = Array.isArray(item.formOptions) ? item.formOptions as Array<{ value: string }> : []
-    const allowed = new Set(options.map((option) => option.value))
-    const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
-    if (values.some((candidate) => !allowed.has(candidate)) || new Set(values).size !== values.length) throw compositeBadRequest('表单选项无效')
-  }
-  await prisma.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value, completed: true }, update: { value, completed: true } })
+  await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: { status: true, contextSnapshotEncrypted: true, contextSnapshotHash: true },
+    })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
+    if (item.contextKey) {
+      try {
+        assertContextMutable(Boolean(current.contextSnapshotEncrypted || current.contextSnapshotHash))
+      } catch (error) {
+        if (isAssessmentContextServiceError(error)) throw compositeConflict(error.message)
+        throw error
+      }
+      const validationMessage = validateContextAnswer({
+        id: item.id,
+        type: item.formType,
+        label: item.formLabel,
+        required: item.required,
+        position: item.position,
+        contextKey: item.contextKey,
+        options: item.formOptions,
+      }, value)
+      if (validationMessage) throw compositeBadRequest(validationMessage)
+    }
+    if (item.required && !value.trim()) throw compositeBadRequest('此表单项为必填项')
+    if (item.formType === 'single_choice' || item.formType === 'multiple_choice') {
+      const options = Array.isArray(item.formOptions) ? item.formOptions as Array<{ value: string }> : []
+      const allowed = new Set(options.map((option) => option.value))
+      const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
+      if (values.some((candidate) => !allowed.has(candidate)) || new Set(values).size !== values.length) throw compositeBadRequest('表单选项无效')
+    }
+    const storedValue = writeContextFormAnswer(item.contextKey, value)
+    await tx.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value: storedValue, completed: true }, update: { value: storedValue, completed: true } })
+  })
   return getAttemptState(attempt.id, context)
 }
 
-export const saveScaleAnswer = async (attemptId: string, itemId: string, input: { itemId: string; value: number; responseTime?: number }, context: { userId?: string; recoveryTokenHash?: string }) => {
+export const saveScaleAnswer = async (
+  attemptId: string,
+  itemId: string,
+  input: { itemCode: string; responseValue: string | number; responseTimeMs?: number },
+  context: { userId?: string; recoveryTokenHash?: string },
+) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
   if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (item.type !== 'SCALE') throw compositeBadRequest('当前模块不是量表')
   const assessment = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === itemId)
   if (!assessment || assessment.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-  const scaleItem = item.scale.items.find((candidate: any) => candidate.id === input.itemId)
-  if (!scaleItem) throw compositeBadRequest('量表题目不存在')
-  const scaleConfig = item.scale.config as { points?: number } | null
-  const points = Number(scaleConfig?.points ?? 5)
-  if (!Number.isInteger(points) || points < 2 || points > 10 || input.value < 1 || input.value > points) {
-    throw compositeBadRequest('量表答案超出有效范围')
+  let definition
+  try {
+    const scale = item.scale
+    if (!scale?.definition) throw new Error('量表尚未安装 v2 definition')
+    definition = scaleDefinitionFromRecord(scale)
+    validateScaleAnswer(definition, {
+      itemCode: input.itemCode,
+      responseValue: input.responseValue,
+      responseTimeMs: input.responseTimeMs,
+    })
+  } catch (error) {
+    if (error instanceof ScaleAnswerValidationError) throw compositeBadRequest(error.issues[0]?.message || '量表答案无效')
+    throw compositeBadRequest('量表尚未安装有效的 v2 definition')
   }
   await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-    const answers = decodeJson<any[]>(locked.answers) ?? []
-    const answer = { itemId: input.itemId, value: input.value, responseTime: input.responseTime }
-    const index = answers.findIndex((candidate) => candidate.itemId === input.itemId)
+    await freezeCompositeAttemptContext(tx, attemptId)
+    const decoded = readScaleAnswers(locked.answers)
+    if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
+    const answers = decoded.answers
+    const index = answers.findIndex((candidate) => candidate.itemCode === input.itemCode)
+    const answer = {
+      itemCode: input.itemCode,
+      responseValue: input.responseValue,
+      ...(input.responseTimeMs === undefined ? {} : { responseTimeMs: input.responseTimeMs }),
+      answeredAt: new Date().toISOString(),
+      changeCount: index >= 0 ? (answers[index].changeCount ?? 0) + 1 : 0,
+    }
     if (index >= 0) answers[index] = { ...answers[index], ...answer }
     else answers.push(answer)
     await tx.assessment.update({
       where: { id: assessment.id },
-      data: { answers: answers as any, progress: Math.round((answers.length / Math.max(item.scale.items.length, 1)) * 100) },
+      data: {
+        answers: encryptScaleAnswers(answers),
+        result: null,
+        progress: Math.round((answers.length / Math.max(definition.items.length, 1)) * 100),
+      },
     })
   })
   return getAttemptState(attempt.id, context)
@@ -2002,24 +2243,32 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
   if (!assessment) throw compositeNotFound('量表测评记录不存在')
   if (assessment.status === 'COMPLETED') return getAttemptState(attempt.id, context)
   const didComplete = await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status === 'COMPLETED') return false
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-    const answers = decodeJson<any[]>(locked.answers) ?? []
-    const requiredIds = item.scale.items.filter((candidate: any) => candidate.required).map((candidate: any) => candidate.id)
-    const answered = new Set(answers.map((candidate) => candidate.itemId))
-    if (requiredIds.some((id: string) => !answered.has(id))) throw compositeBadRequest('还有必答题未完成')
-    const scores = calculateScores(answers, item.scale.items, item.scale.dimensions, item.scale.config as any)
-    const feedback = generateFeedbackWithLevels(scores, item.scale.dimensions, item.scale.name)
+    if (!item.scale?.definition) throw compositeBadRequest('量表尚未安装有效的 v2 definition')
+    const contextSnapshot = await freezeCompositeAttemptContext(tx, attemptId)
+    const decoded = readScaleAnswers(locked.answers)
+    if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
+    const answers = decoded.answers
+    const definition = scaleDefinitionFromRecord(item.scale)
+    const missingRequiredItems = missingRequiredScaleItemCodes(definition, answers)
+    if (missingRequiredItems.length > 0) throw compositeBadRequest(`还有 ${missingRequiredItems.length} 道必答题未作答`)
+    const result = await buildScaleResultForRecord({
+      scale: item.scale,
+      answers,
+      participantContext: contextSnapshot.context.values,
+      participantContextHash: contextSnapshot.hash,
+    })
     const completedAt = new Date()
     await tx.assessment.update({
       where: { id: assessment.id },
       data: {
         status: 'COMPLETED',
         progress: 100,
-        answers: encryptField(answers) as any,
-        scores: encryptField(scores) as any,
-        feedback: encryptField(feedback) as any,
+        answers: encryptScaleAnswers(answers),
+        result: encryptScaleResult(result),
         completedAt,
         totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
       },
@@ -2033,7 +2282,13 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
-  const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
+  const readableFormAnswers = readContextFormAnswers(
+    attempt.compositeAssessment.items
+      .filter((item: any) => item.type === 'FORM')
+      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+    attempt.formAnswers,
+  )
+  const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
@@ -2051,9 +2306,7 @@ export const buildCompositeReport = (attempt: any) => {
           scaleId: item.scaleId,
           scaleCode: item.scale?.code,
           scaleName: item.scale?.name || '未知量表',
-          scores: result?.scores,
-          feedback: result?.feedback,
-          dimensions: item.scale?.dimensions,
+          result: result?.result,
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
         })
@@ -2073,14 +2326,21 @@ export const buildCompositeReport = (attempt: any) => {
           scaleId: item.scaleId,
           scaleCode: item.scale?.code ?? null,
           scaleName: item.scale?.name || '未知量表',
-          dimensionScores: [],
-          feedback: { overall: '', dimensions: [] },
+          result: null,
+          quality: null,
+          scores: [],
+          references: [],
+          interpretations: [],
           completedAt: null,
           totalTime: null,
           method: {
             scaleId: item.scaleId,
-            scaleCode: item.scale?.code ?? null,
-            reportDefinitionVersion: 'scale-unit-report-v1',
+            instrumentVersion: item.scale?.instrumentVersion ?? '',
+            scoringVersion: '',
+            reportVersion: SCALE_REPORT_DEFINITION_VERSION,
+            definitionHash: '',
+            referenceVersions: [],
+            assessmentContext: null,
           },
           caveats: [],
           disclaimer: SCALE_REPORT_DISCLAIMER,

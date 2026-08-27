@@ -7,29 +7,37 @@ import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
-import { encryptField, safeDecrypt } from '../utils/encryption'
-import { normalizeScaleConfig, scaleLabelsError } from '../utils/scaleLabels'
-import { scaleSource, scaleWhereForViewer } from '../services/materialGrant'
+import { encryptField } from '../utils/encryption'
+import { canUseScale, scaleSource, scaleWhereForViewer } from '../services/materialGrant'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import {
+  createCustomScaleDefinition,
+  hashScaleDefinition,
+  validateScaleDefinition,
+  type ScaleDefinitionV2,
+} from '../modules/scale/scale-definition'
+import { getScalePackage, validateScalePackage } from '../modules/scale/scale-package.registry'
+import { canStudentAccessScale } from '../modules/scale/scale-access'
+import {
+  buildScaleResultForRecord,
+  encryptScaleAnswers,
+  encryptScaleResult,
+  readScaleAnswers,
+  readScaleResult,
+  scaleAssessmentForResponse,
+  scaleDefinitionFromRecord,
+  scaleRunnerFromRecord,
+} from '../modules/scale/scale-workflow.service'
+import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 
 // ==================== Validation Schemas ====================
-
-const labelSchema = z.object({
-  value: z.number().int().min(1),
-  label: z.string().min(1, '选项文字不能为空'),
-})
 
 const createScaleSchema = z.object({
   code: z.string().min(1, '量表编码不能为空'),
   name: z.string().min(1, '量表名称不能为空'),
   description: z.string().optional(),
   visibility: z.enum(['HIDDEN', 'COURSE', 'PUBLIC']).optional(),
-  config: z.object({
-    points: z.number().int().min(2).max(10).optional(),
-    labels: z.array(labelSchema).optional(),
-    randomizeItems: z.boolean().optional(),
-    randomizeOptions: z.boolean().optional(),
-  }).optional(),
   estimatedTime: z.number().int().positive().optional(),
   instruction: z.string().optional(),
   tags: z.array(z.string().max(20)).max(10).optional().default([]),
@@ -39,16 +47,28 @@ const updateScaleSchema = z.object({
   name: z.string().min(1, '量表名称不能为空').optional(),
   description: z.string().optional(),
   visibility: z.enum(['HIDDEN', 'COURSE', 'PUBLIC']).optional(),
-  config: z.object({
-    points: z.number().int().min(2).max(10).optional(),
-    labels: z.array(labelSchema).optional(),
-    randomizeItems: z.boolean().optional(),
-    randomizeOptions: z.boolean().optional(),
-  }).optional(),
   estimatedTime: z.number().int().positive().optional(),
   instruction: z.string().optional(),
   tags: z.array(z.string().max(20)).max(10).optional().default([]),
 })
+
+const definitionRequestSchema = z.object({
+  definition: z.unknown(),
+})
+
+const answerPreviewSchema = z.object({
+  answers: z.array(z.object({
+    itemCode: z.string().min(1),
+    responseValue: z.union([z.string(), z.number().finite()]),
+    responseTimeMs: z.number().finite().nonnegative().optional(),
+    answeredAt: z.string().optional(),
+    changeCount: z.number().int().nonnegative().optional(),
+  })),
+})
+
+const definitionIssuesMessage = (issues: Array<{ path: string; message: string }>): string => (
+  issues.slice(0, 5).map((issue) => `${issue.path}: ${issue.message}`).join('；')
+)
 
 // ==================== Controller ====================
 
@@ -99,8 +119,6 @@ export const scaleController = {
             },
             _count: {
               select: {
-                items: true,
-                dimensions: true,
                 assessments: true,
               }
             }
@@ -139,8 +157,8 @@ export const scaleController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { code, name, description, visibility, estimatedTime, instruction } = result.data
-      const config = normalizeScaleConfig(result.data.config)
+      const { code, name, description, visibility, estimatedTime, instruction, tags } = result.data
+      const definition = createCustomScaleDefinition()
 
       // 检查编码是否已存在
       const existingScale = await prisma.scale.findUnique({
@@ -157,10 +175,14 @@ export const scaleController = {
           name,
           description,
           visibility: visibility || 'HIDDEN',
-          config: config as any,
+          instrumentClass: 'CUSTOM_DESCRIPTIVE',
+          instrumentVersion: '2.0.0',
+          definition: definition as any,
+          definitionHash: hashScaleDefinition(definition),
           estimatedTime,
           instruction,
           creatorId: userId,
+          tags,
         },
         include: {
           creator: {
@@ -190,6 +212,124 @@ export const scaleController = {
     }
   },
 
+  // 原子保存完整的 ScaleDefinitionV2。新建的教师量表只能是描述性自定义量表。
+  async updateDefinition(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+      const { id } = req.params
+      const parsedBody = definitionRequestSchema.safeParse(req.body)
+      if (!parsedBody.success) return error(res, '请提供完整的 definition')
+
+      const scale = await prisma.scale.findUnique({ where: { id } })
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限修改此量表')
+      if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表 definition 由代码 package 管理，不能通过网页修改')
+      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以修改 definition')
+
+      const validation = validateScaleDefinition(parsedBody.data.definition, { instrumentClass: 'CUSTOM_DESCRIPTIVE' })
+      if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+        return error(res, definitionIssuesMessage(validation.issues))
+      }
+      const updated = await prisma.scale.update({
+        where: { id },
+        data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition) },
+      })
+      return success(res, { ...updated, definition: validation.definition }, 'definition 保存成功')
+    } catch (err) {
+      logger.error('保存量表 definition 错误', err)
+      return error(res, '保存量表 definition 失败')
+    }
+  },
+
+  // 发布前返回可定位的 release gate 问题；不会修改数据库。
+  async validateDefinition(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+      const { id } = req.params
+      const scale = await prisma.scale.findUnique({ where: { id } })
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限校验此量表')
+      if (scale.instrumentClass === 'STANDARD') {
+        const scalePackage = getScalePackage(scale.code, scale.instrumentVersion)
+        if (!scalePackage) return success(res, { valid: false, issues: [{ path: 'package', message: 'STANDARD package 未注册', severity: 'error' }], definitionHash: scale.definitionHash })
+        const packageValidation = validateScalePackage(scalePackage)
+        return success(res, packageValidation)
+      }
+      const validation = validateScaleDefinition(scale.definition, {
+        instrumentClass: scale.instrumentClass,
+        forPublish: true,
+        scorerKeys: getScaleCustomScorerKeys(),
+        requireGoldenFixture: false,
+        hasGoldenFixture: false,
+      })
+      return success(res, {
+        valid: Boolean(validation.definition) && validation.issues.every((issue) => issue.severity !== 'error'),
+        issues: validation.issues,
+        definitionHash: validation.definition ? hashScaleDefinition(validation.definition) : null,
+      })
+    } catch (err) {
+      logger.error('校验量表 definition 错误', err)
+      return error(res, '校验量表 definition 失败')
+    }
+  },
+
+  // 用给定回答执行同一套权威 scorer，不写入测评记录。
+  async previewDefinition(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+      const { id } = req.params
+      const body = answerPreviewSchema.safeParse(req.body)
+      if (!body.success) return error(res, body.error.errors[0]?.message ?? '回答格式不正确')
+      const scale = await prisma.scale.findUnique({
+        where: { id },
+        select: { id: true, code: true, name: true, creatorId: true, instrumentVersion: true, instrumentClass: true, definition: true },
+      })
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限预览此量表')
+      const result = await buildScaleResultForRecord({
+        scale,
+        answers: body.data.answers,
+      })
+      return success(res, result)
+    } catch (err) {
+      logger.error('预览量表计分错误', err)
+      return error(res, err instanceof Error ? err.message : '预览量表计分失败')
+    }
+  },
+
+  async publishV2(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+      const { id } = req.params
+      const scale = await prisma.scale.findUnique({ where: { id } })
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限发布此量表')
+      if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
+      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布')
+
+      const validation = validateScaleDefinition(scale.definition, {
+        instrumentClass: 'CUSTOM_DESCRIPTIVE',
+        forPublish: true,
+        scorerKeys: getScaleCustomScorerKeys(),
+      })
+      if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+        return error(res, definitionIssuesMessage(validation.issues))
+      }
+      const updated = await prisma.scale.update({
+        where: { id },
+        data: { status: 'PUBLISHED', definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition) },
+      })
+      return success(res, updated, '量表发布成功')
+    } catch (err) {
+      logger.error('发布 v2 量表错误', err)
+      return error(res, '发布量表失败')
+    }
+  },
+
   // 获取量表详情
   async detail(req: Request, res: Response) {
     try {
@@ -215,12 +355,6 @@ export const scaleController = {
               }
             }
           },
-          items: {
-            orderBy: {
-              sortOrder: 'asc'
-            }
-          },
-          dimensions: true,
           _count: {
             select: {
               assessments: true,
@@ -233,14 +367,35 @@ export const scaleController = {
         return notFound(res, '量表不存在')
       }
 
-      return success(res, scale)
+      let runner = null
+      if (req.user?.role === UserRole.ADMIN) {
+        // Administrators can inspect every scale for management and support.
+      } else if (req.user?.role === UserRole.TEACHER) {
+        if (!(await canUseScale(req.user.userId, req.user.role, scale))) return notFound(res, '量表不存在')
+      } else if (req.user?.role === UserRole.STUDENT) {
+        if (!(await canStudentAccessScale(scale, req.user.userId))) return notFound(res, '量表不存在')
+      } else {
+        return forbidden(res, '无权限查看此量表')
+      }
+      if (scale.definition) {
+        try {
+          runner = scaleRunnerFromRecord(scale)
+        } catch {
+          runner = null
+        }
+      }
+      if (req.user?.role === UserRole.STUDENT) {
+        const { definition: _definition, ...metadata } = scale
+        return success(res, { ...metadata, runner })
+      }
+      return success(res, { ...scale, runner })
     } catch (err) {
       logger.error('获取量表详情错误', err)
       return error(res, '获取量表详情失败')
     }
   },
 
-  // 更新量表
+  // 更新量表元数据
   async update(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -270,10 +425,7 @@ export const scaleController = {
         return error(res, '只有草稿状态的量表可以修改')
       }
 
-      const payload = {
-        ...result.data,
-        config: result.data.config ? normalizeScaleConfig(result.data.config) : undefined,
-      }
+      const payload = result.data
 
       const updated = await prisma.scale.update({
         where: { id },
@@ -346,57 +498,6 @@ export const scaleController = {
     } catch (err) {
       logger.error('删除量表错误', err)
       return error(res, '删除量表失败')
-    }
-  },
-
-  // 发布量表
-  async publish(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { id } = req.params
-
-      const scale = await prisma.scale.findUnique({
-        where: { id },
-        include: {
-          items: true,
-          dimensions: true,
-        }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      // 权限检查
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限发布此量表')
-      }
-
-      // 发布前验证
-      if (scale.items.length === 0) {
-        return error(res, '量表必须包含至少一个题目')
-      }
-
-      if (scale.dimensions.length === 0) {
-        return error(res, '量表必须包含至少一个维度')
-      }
-
-      const normalized = normalizeScaleConfig(scale.config as { points?: number; labels?: Array<{ value: number; label: string }> } | null)
-      const labelsError = scaleLabelsError(normalized.points, scale.config ? (scale.config as { labels?: Array<{ value: number; label: string }> }).labels : null)
-      if (labelsError) {
-        return error(res, labelsError + '。请在编辑页为 1 到 ' + normalized.points + ' 每一档填写文字后再发布')
-      }
-
-      const updated = await prisma.scale.update({
-        where: { id },
-        data: { status: 'PUBLISHED', config: normalized }
-      })
-
-      return success(res, updated, '量表发布成功')
-    } catch (err) {
-      logger.error('发布量表错误', err)
-      return error(res, '发布量表失败')
     }
   },
 
@@ -515,11 +616,6 @@ export const scaleController = {
               }
             }
           },
-          _count: {
-            select: {
-              items: true,
-            }
-          }
         },
         orderBy: {
           createdAt: 'desc'
@@ -548,7 +644,7 @@ export const scaleController = {
         visibility: scale.visibility,
         estimatedTime: scale.estimatedTime,
         courses: scale.courseScales.map(cs => cs.course),
-        itemCount: scale._count.items,
+        itemCount: Array.isArray((scale.definition as any)?.items) ? (scale.definition as any).items.length : 0,
         completed: completedMap.has(scale.id),
         completedAt: completedMap.get(scale.id)?.completedAt || null,
         assessmentId: completedMap.get(scale.id)?.id || null,
@@ -564,803 +660,183 @@ export const scaleController = {
     }
   },
 
-  // ==================== 维度管理 ====================
+  // ==================== Scale Assessment v2 workflow ====================
 
-  // 获取维度列表
-  async listDimensions(req: Request, res: Response) {
-    try {
-      const { scaleId } = req.params
-
-      const dimensions = await prisma.dimension.findMany({
-        where: { scaleId },
-        include: {
-          _count: {
-            select: {
-              itemDimensions: true,
-            }
-          }
-        },
-        orderBy: {
-          code: 'asc'
-        }
-      })
-
-      return success(res, {
-        list: dimensions,
-        total: dimensions.length,
-      })
-    } catch (err) {
-      logger.error('获取维度列表错误', err)
-      return error(res, '获取维度列表失败')
-    }
-  },
-
-  // 创建维度
-  async createDimension(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId } = req.params
-
-      const { code, name, description, scoringMethod, weight, minScore, maxScore } = req.body
-
-      if (!code || !name) {
-        return error(res, '维度编码和名称不能为空')
-      }
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      // 检查编码是否已存在
-      const existingDimension = await prisma.dimension.findFirst({
-        where: {
-          scaleId,
-          code
-        }
-      })
-
-      if (existingDimension) {
-        return error(res, '维度编码已存在')
-      }
-
-      const dimension = await prisma.dimension.create({
-        data: {
-          scaleId,
-          code,
-          name,
-          description,
-          scoringMethod: scoringMethod || 'sum',
-          weight: weight || 1.0,
-          minScore: minScore !== undefined ? minScore : null,
-          maxScore: maxScore !== undefined ? maxScore : null,
-        }
-      })
-
-      return success(res, dimension, '维度创建成功')
-    } catch (err) {
-      logger.error('创建维度错误', err)
-      return error(res, '创建维度失败')
-    }
-  },
-
-  // 更新维度
-  async updateDimension(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId, dimensionId } = req.params
-
-      const { name, description, scoringMethod, weight, minScore, maxScore } = req.body
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      const dimension = await prisma.dimension.findUnique({
-        where: { id: dimensionId }
-      })
-
-      if (!dimension || dimension.scaleId !== scaleId) {
-        return notFound(res, '维度不存在')
-      }
-
-      const updateData: any = {}
-      if (name !== undefined) updateData.name = name
-      if (description !== undefined) updateData.description = description
-      if (scoringMethod !== undefined) updateData.scoringMethod = scoringMethod
-      if (weight !== undefined) updateData.weight = weight
-      if (minScore !== undefined) updateData.minScore = minScore
-      if (maxScore !== undefined) updateData.maxScore = maxScore
-
-      const updated = await prisma.dimension.update({
-        where: { id: dimensionId },
-        data: updateData
-      })
-
-      return success(res, updated, '维度更新成功')
-    } catch (err) {
-      logger.error('更新维度错误', err)
-      return error(res, '更新维度失败')
-    }
-  },
-
-  // 删除维度
-  async deleteDimension(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId, dimensionId } = req.params
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      await prisma.dimension.delete({
-        where: { id: dimensionId }
-      })
-
-      return success(res, null, '维度已删除')
-    } catch (err) {
-      logger.error('删除维度错误', err)
-      return error(res, '删除维度失败')
-    }
-  },
-
-  // ==================== 题目管理 ====================
-
-  // 获取题目列表
-  async listItems(req: Request, res: Response) {
-    try {
-      const { scaleId } = req.params
-
-      const items = await prisma.scaleItem.findMany({
-        where: { scaleId },
-        include: {
-          itemDimensions: {
-            include: {
-              dimension: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                }
-              }
-            }
-          }
-        },
-        orderBy: {
-          sortOrder: 'asc'
-        }
-      })
-
-      return success(res, {
-        list: items,
-        total: items.length,
-      })
-    } catch (err) {
-      logger.error('获取题目列表错误', err)
-      return error(res, '获取题目列表失败')
-    }
-  },
-
-  // 创建题目
-  async createItem(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId } = req.params
-
-      const { itemCode, content, type, reverse, required, weight, sortOrder, options, randomizeOptions, dimensions } = req.body
-
-      if (!content) {
-        return error(res, '题目内容不能为空')
-      }
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      // 获取当前最大排序号
-      const maxSortOrder = await prisma.scaleItem.aggregate({
-        where: { scaleId },
-        _max: { sortOrder: true }
-      })
-
-      const item = await prisma.scaleItem.create({
-        data: {
-          scaleId,
-          itemCode: itemCode || `Q${(maxSortOrder._max.sortOrder || 0) + 1}`,
-          content,
-          type: type || 'single',
-          reverse: reverse || false,
-          required: required !== false,
-          weight: weight || 1.0,
-          sortOrder: sortOrder || (maxSortOrder._max.sortOrder || 0) + 1,
-          options: options as any,
-          randomizeOptions: randomizeOptions || false,
-        },
-        include: {
-          itemDimensions: {
-            include: {
-              dimension: true
-            }
-          }
-        }
-      })
-
-      // 如果提供了维度关联，创建关联
-      if (dimensions && Array.isArray(dimensions) && dimensions.length > 0) {
-        await prisma.itemDimension.createMany({
-          data: dimensions.map((dim: any) => ({
-            itemId: item.id,
-            dimensionId: dim.dimensionId,
-            weight: dim.weight || 1.0,
-            reverse: dim.reverse || false,
-          }))
-        })
-      }
-
-      return success(res, item, '题目创建成功')
-    } catch (err) {
-      logger.error('创建题目错误', err)
-      return error(res, '创建题目失败')
-    }
-  },
-
-  // 更新题目
-  async updateItem(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId, itemId } = req.params
-
-      const { itemCode, content, type, reverse, required, weight, sortOrder, options, randomizeOptions, dimensions } = req.body
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      const item = await prisma.scaleItem.findUnique({
-        where: { id: itemId }
-      })
-
-      if (!item || item.scaleId !== scaleId) {
-        return notFound(res, '题目不存在')
-      }
-
-      const updated = await prisma.scaleItem.update({
-        where: { id: itemId },
-        data: {
-          itemCode,
-          content,
-          type,
-          reverse,
-          required,
-          weight,
-          sortOrder,
-          options: options as any,
-          randomizeOptions,
-        },
-        include: {
-          itemDimensions: {
-            include: {
-              dimension: true
-            }
-          }
-        }
-      })
-
-      // 更新维度关联
-      if (dimensions !== undefined) {
-        // 删除旧的关联
-        await prisma.itemDimension.deleteMany({
-          where: { itemId }
-        })
-
-        // 创建新的关联
-        if (Array.isArray(dimensions) && dimensions.length > 0) {
-          await prisma.itemDimension.createMany({
-            data: dimensions.map((dim: any) => ({
-              itemId,
-              dimensionId: dim.dimensionId,
-              weight: dim.weight || 1.0,
-              reverse: dim.reverse || false,
-            }))
-          })
-        }
-      }
-
-      return success(res, updated, '题目更新成功')
-    } catch (err) {
-      logger.error('更新题目错误', err)
-      return error(res, '更新题目失败')
-    }
-  },
-
-  // 删除题目
-  async deleteItem(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId, itemId } = req.params
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      await prisma.scaleItem.delete({
-        where: { id: itemId }
-      })
-
-      return success(res, null, '题目已删除')
-    } catch (err) {
-      logger.error('删除题目错误', err)
-      return error(res, '删除题目失败')
-    }
-  },
-
-  // 批量排序题目
-  async reorderItems(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId } = req.params
-
-      const { items } = req.body // items: [{ id, sortOrder }, ...]
-
-      if (!items || !Array.isArray(items)) {
-        return error(res, '请提供题目排序数据')
-      }
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      // 批量更新排序
-      await prisma.$transaction(
-        items.map((item: any) =>
-          prisma.scaleItem.update({
-            where: { id: item.id },
-            data: { sortOrder: item.sortOrder }
-          })
-        )
-      )
-
-      return success(res, null, '题目排序更新成功')
-    } catch (err) {
-      logger.error('题目排序错误', err)
-      return error(res, '题目排序失败')
-    }
-  },
-
-  // ==================== 测评流程 ====================
-
-  // 开始测评
-  async startAssessment(req: Request, res: Response) {
+  async startAssessmentV2(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const { scaleId } = req.params
-
-      // 检查量表是否存在且已发布
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
-        include: {
-          items: {
-            orderBy: { sortOrder: 'asc' }
-          },
-          dimensions: true,
-        }
+        select: { id: true, code: true, name: true, description: true, instruction: true, estimatedTime: true, status: true, visibility: true, instrumentVersion: true, instrumentClass: true, definition: true },
       })
-
-      if (!scale) {
+      if (!scale) return notFound(res, '量表不存在')
+      if (req.user?.role === UserRole.STUDENT && !(await canStudentAccessScale(scale, userId!))) {
         return notFound(res, '量表不存在')
       }
+      if (scale.status !== 'PUBLISHED') return error(res, '量表未发布')
+      const definition = scaleDefinitionFromRecord(scale)
+      const runner = scaleRunnerFromRecord(scale)
 
-      if (scale.status !== 'PUBLISHED') {
-        return error(res, '量表未发布')
-      }
-
-      // 检查是否有进行中的测评
-      const existingAssessment = await prisma.assessment.findFirst({
-        where: {
-          scaleId,
-          userId,
-          status: 'IN_PROGRESS'
-        }
-      })
-
-      if (existingAssessment) {
-        // 返回已有测评和量表信息
+      const existing = await prisma.assessment.findFirst({ where: { scaleId, userId, status: 'IN_PROGRESS' } })
+      if (existing) {
+        const stored = readScaleAnswers(existing.answers)
+        if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
         return success(res, {
-          assessment: existingAssessment,
-          scale: {
-            id: scale.id,
-            name: scale.name,
-            instruction: scale.instruction,
-            estimatedTime: scale.estimatedTime,
-            config: scale.config,
-            items: scale.items,
-            dimensions: scale.dimensions,
-          }
+          assessment: scaleAssessmentForResponse(existing),
+          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
         }, '继续未完成的测评')
       }
 
-      // 创建新的测评记录
       const assessment = await prisma.assessment.create({
-        data: {
-          scaleId,
-          userId: userId!,
-          status: 'IN_PROGRESS',
-          progress: 0,
-          answers: [],
-          startedAt: new Date(),
-        }
+        data: { scaleId, userId: userId!, status: 'IN_PROGRESS', progress: 0, answers: encryptField([]), startedAt: new Date() },
       })
-
       return success(res, {
-        assessment,
-        scale: {
-          id: scale.id,
-          name: scale.name,
-          instruction: scale.instruction,
-          estimatedTime: scale.estimatedTime,
-          config: scale.config,
-          items: scale.items,
-          dimensions: scale.dimensions,
-        }
+        assessment: scaleAssessmentForResponse(assessment),
+        scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
       }, '测评已开始')
     } catch (err) {
-      logger.error('开始测评错误', err)
-      return error(res, '开始测评失败')
+      logger.error('开始 v2 量表测评错误', err)
+      return error(res, err instanceof Error ? err.message : '开始测评失败')
     }
   },
 
-  // 提交答案
-  async submitAnswer(req: Request, res: Response) {
+  async submitAnswerV2(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const { assessmentId } = req.params
-      const { itemId, value, responseTime } = req.body
+      const itemCode = typeof req.body?.itemCode === 'string' ? req.body.itemCode : ''
+      const responseValue = req.body?.responseValue as string | number
+      const responseTimeMs = req.body?.responseTimeMs ?? req.body?.responseTime
+      if (!itemCode || (typeof responseValue !== 'string' && typeof responseValue !== 'number')) return error(res, 'itemCode 和 responseValue 不能为空')
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
-          include: {
-            scale: {
-              include: {
-                items: true,
-              }
-            }
-          }
+          include: { scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
         })
-
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-
-        const item = assessment.scale.items.find(i => i.id === itemId)
-        if (!item) return { kind: 'item-not-found' as const }
-
-        const scaleConfig = assessment.scale.config as { points?: number } | null
-        const points = Number(scaleConfig?.points ?? 5)
-        if (!Number.isInteger(value) || value < 1 || value > points) {
-          return { kind: 'invalid-value' as const }
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const answer = { itemCode, responseValue, responseTimeMs: responseTimeMs === undefined ? undefined : Number(responseTimeMs), answeredAt: new Date().toISOString() }
+        try {
+          validateScaleAnswer(definition, answer)
+        } catch (err) {
+          return { kind: 'invalid-answer' as const, message: err instanceof Error ? err.message : '回答不合法' }
         }
-
-        const answers = Array.isArray(assessment.answers) ? [...assessment.answers as any[]] : []
-        const existingIndex = answers.findIndex(a => a && a.itemId === itemId)
-        const now = new Date().toISOString()
-
-        if (existingIndex >= 0) {
-          answers[existingIndex] = {
-            ...answers[existingIndex],
-            value,
-            answeredAt: now,
-            changeCount: (answers[existingIndex].changeCount || 0) + 1,
-            responseTime,
-          }
-        } else {
-          answers.push({
-            itemId,
-            value,
-            answeredAt: now,
-            firstAnsweredAt: now,
-            changeCount: 0,
-            responseTime,
-          })
-        }
-
-        const answeredItems = new Set(
-          answers.filter((answer) => answer && typeof answer.itemId === 'string').map((answer) => answer.itemId)
-        ).size
-        const totalItems = assessment.scale.items.length
-        const progress = totalItems === 0 ? 100 : Math.round((answeredItems / totalItems) * 100)
-
+        const contextSnapshot = assessment.questionnaireAssessmentId
+          ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+          : null
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const answers = [...stored.answers]
+        const existingIndex = answers.findIndex((candidate) => candidate.itemCode === itemCode)
+        const previous = existingIndex >= 0 ? answers[existingIndex] : undefined
+        const nextAnswer = { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
+        if (existingIndex >= 0) answers[existingIndex] = nextAnswer
+        else answers.push(nextAnswer)
+        const progress = definition.items.length === 0 ? 100 : Math.round((new Set(answers.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
         const updated = await tx.assessment.updateMany({
-          where: {
-            id: assessmentId,
-            userId,
-            status: 'IN_PROGRESS',
-          },
-          data: {
-            answers: answers as any,
-            progress,
-          }
+          where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
+          data: { answers: encryptScaleAnswers(answers), progress },
         })
-
         if (updated.count !== 1) return { kind: 'ended' as const }
-        return {
-          kind: 'saved' as const,
-          assessment: {
-            ...assessment,
-            answers,
-            progress,
-          },
-        }
+        return { kind: 'saved' as const, assessment: scaleAssessmentForResponse({ ...assessment, answers, progress, result: null }) }
       })
 
-      if (result.kind === 'not-found') return notFound(res, '测评记录不存在')
-      if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
-      if (result.kind === 'ended') return error(res, '测评已结束')
-      if (result.kind === 'item-not-found') return error(res, '题目不存在')
-      if (result.kind === 'invalid-value') return error(res, '答案超出量表点数范围')
-
-      return success(res, result.assessment, '答案已保存')
+      if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')
+      if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (transactionResult.kind === 'ended') return error(res, '测评已结束')
+      if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
+      if (transactionResult.kind === 'invalid-answer') return error(res, transactionResult.message)
+      return success(res, transactionResult.assessment, '答案已保存')
     } catch (err) {
-      logger.error('提交答案错误', err)
-      return error(res, '提交答案失败')
+      logger.error('提交 v2 量表答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, err instanceof Error ? err.message : '提交答案失败')
     }
   },
 
-  // 完成测评
-  async completeAssessment(req: Request, res: Response) {
+  async completeAssessmentV2(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const { assessmentId } = req.params
-
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
-          include: {
-            scale: {
-              include: {
-                items: {
-                  include: {
-                    itemDimensions: {
-                      include: {
-                        dimension: true
-                      }
-                    }
-                  }
-                },
-                dimensions: true,
-              }
-            }
-          }
+          include: { scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
         })
-
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
-
-        const decrypted = (record: typeof assessment) => ({
-          ...record,
-          answers: safeDecrypt<any[]>(record.answers as string) || record.answers,
-          scores: safeDecrypt<any>(record.scores as string) || record.scores,
-          feedback: safeDecrypt<any>(record.feedback as string) || record.feedback,
-        })
-
         if (assessment.status === 'COMPLETED') {
-          return { kind: 'completed' as const, assessment: decrypted(assessment) }
+          return { kind: 'completed' as const, assessment: scaleAssessmentForResponse(assessment) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-
-        const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
-        const decryptedAnswers = safeDecrypt<any[]>(assessment.answers as string)
-        const answers = Array.isArray(decryptedAnswers) ? decryptedAnswers : []
-        const scores = calculateScores(
-          answers,
-          assessment.scale.items,
-          assessment.scale.dimensions,
-          assessment.scale.config as any
-        )
-        const feedback = generateFeedbackWithLevels(
-          scores,
-          assessment.scale.dimensions,
-          assessment.scale.name
-        )
+        const contextSnapshot = assessment.questionnaireAssessmentId
+          ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+          : null
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
+        if (missingRequiredItems.length > 0) return { kind: 'missing-required' as const, count: missingRequiredItems.length }
+        const result = await buildScaleResultForRecord({
+          scale: assessment.scale,
+          answers: stored.answers,
+          participantContext: contextSnapshot?.context.values,
+          participantContextHash: contextSnapshot?.hash,
+        })
         const completedAt = new Date()
         const totalTime = completedAt.getTime() - new Date(assessment.startedAt).getTime()
-        const encryptedAnswers = encryptField(answers)
-        const encryptedScores = encryptField(scores)
-        const encryptedFeedback = encryptField(feedback)
-
         const updated = await tx.assessment.updateMany({
-          where: {
-            id: assessmentId,
-            userId,
-            status: 'IN_PROGRESS',
-          },
+          where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
           data: {
             status: 'COMPLETED',
-            answers: encryptedAnswers as any,
-            scores: encryptedScores as any,
-            feedback: encryptedFeedback as any,
+            answers: encryptScaleAnswers(stored.answers),
+            result: encryptScaleResult(result),
             completedAt,
             totalTime,
             progress: 100,
-          }
+          },
         })
-
         if (updated.count !== 1) {
           const current = await tx.assessment.findUnique({ where: { id: assessmentId } })
           if (current?.status === 'COMPLETED') {
-            return { kind: 'completed' as const, assessment: decrypted(current as typeof assessment) }
+            return { kind: 'completed' as const, assessment: scaleAssessmentForResponse(current) }
           }
           return { kind: 'ended' as const }
         }
-
-        if (assessment.questionnaireAssessmentId) {
-          await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId)
-        }
-
-        return {
-          kind: 'completed' as const,
-          assessment: {
-            ...assessment,
-            status: 'COMPLETED' as const,
-            answers,
-            scores,
-            feedback,
-            completedAt,
-            totalTime,
-            progress: 100,
-          },
-        }
+        if (assessment.questionnaireAssessmentId) await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId)
+        return { kind: 'completed' as const, assessment: scaleAssessmentForResponse({ ...assessment, status: 'COMPLETED' as const, answers: stored.answers, result, completedAt, totalTime, progress: 100 }) }
       })
 
-      if (result.kind === 'not-found') return notFound(res, '测评记录不存在')
-      if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
-      if (result.kind === 'ended') return error(res, '测评已结束')
-
-      return success(res, result.assessment, '测评已完成')
+      if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')
+      if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (transactionResult.kind === 'ended') return error(res, '测评已结束')
+      if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
+      if (transactionResult.kind === 'missing-required') return error(res, `还有 ${transactionResult.count} 道必答题未作答`, -1, 409)
+      return success(res, transactionResult.assessment, '测评已完成')
     } catch (err) {
-      logger.error('完成测评错误', err)
-      return error(res, '完成测评失败')
+      logger.error('完成 v2 量表测评错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, err instanceof Error ? err.message : '完成测评失败')
     }
   },
 
-  // 获取测评结果
-  async getAssessment(req: Request, res: Response) {
+  async getAssessmentV2(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const { assessmentId } = req.params
-
       const assessment = await prisma.assessment.findUnique({
         where: { id: assessmentId },
-        include: {
-          scale: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
-              description: true,
-              config: true,
-            }
-          }
-        }
+        include: { scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
       })
-
-      if (!assessment) {
-        return notFound(res, '测评记录不存在')
-      }
-
-      if (assessment.userId !== userId) {
-        return forbidden(res, '无权限查看此测评')
-      }
-
-      // 解密敏感数据
-      const decryptedAssessment = {
-        ...assessment,
-        answers: safeDecrypt<any[]>(assessment.answers as string) || assessment.answers,
-        scores: safeDecrypt<any[]>(assessment.scores as string) || assessment.scores,
-        feedback: safeDecrypt<any>(assessment.feedback as string) || assessment.feedback,
-      }
-
-      return success(res, decryptedAssessment)
+      if (!assessment) return notFound(res, '测评记录不存在')
+      if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')
+      return success(res, scaleAssessmentForResponse(assessment))
     } catch (err) {
-      logger.error('获取测评结果错误', err)
+      logger.error('获取 v2 量表结果错误', err)
       return error(res, '获取测评结果失败')
     }
   },
@@ -1388,7 +864,7 @@ export const scaleController = {
       })
 
       return success(res, {
-        list: assessments,
+        list: assessments.map((assessment) => scaleAssessmentForResponse(assessment)),
         total: assessments.length,
       })
     } catch (err) {
@@ -1434,7 +910,7 @@ export const scaleController = {
       })
 
       return success(res, {
-        list: assessments,
+        list: assessments.map((assessment) => scaleAssessmentForResponse(assessment)),
         total: assessments.length,
       })
     } catch (err) {
@@ -1560,135 +1036,6 @@ export const scaleController = {
     }
   },
 
-  // 获取维度反馈配置
-  async getDimensionFeedback(req: Request, res: Response) {
-    try {
-      const { scaleId, dimensionId } = req.params
-
-      const dimension = await prisma.dimension.findFirst({
-        where: {
-          id: dimensionId,
-          scaleId
-        },
-        include: {
-          _count: {
-            select: {
-              itemDimensions: true
-            }
-          }
-        }
-      })
-
-      if (!dimension) {
-        return notFound(res, '维度不存在')
-      }
-
-      // 获取量表配置
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId },
-        select: { config: true }
-      })
-
-      const points = (scale?.config as any)?.points || 5
-      const itemCount = dimension._count.itemDimensions
-
-      // 计算分数范围
-      const minScore = itemCount * 1
-      const maxScore = itemCount * points
-
-      return success(res, {
-        dimensionId: dimension.id,
-        dimensionName: dimension.name,
-        scoringMethod: dimension.scoringMethod,
-        itemCount,
-        scoreRange: { min: minScore, max: maxScore },
-        levelFeedback: dimension.levelFeedback || { levels: [] }
-      })
-    } catch (err) {
-      logger.error('获取维度反馈配置错误', err)
-      return error(res, '获取维度反馈配置失败')
-    }
-  },
-
-  // 更新维度反馈配置
-  async updateDimensionFeedback(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { scaleId, dimensionId } = req.params
-      const { levelFeedback } = req.body
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-      if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
-      }
-
-      // 检查维度是否存在
-      const dimension = await prisma.dimension.findFirst({
-        where: {
-          id: dimensionId,
-          scaleId
-        }
-      })
-
-      if (!dimension) {
-        return notFound(res, '维度不存在')
-      }
-
-      // 验证等级配置
-      if (levelFeedback?.levels && Array.isArray(levelFeedback.levels)) {
-        const levels = levelFeedback.levels
-        
-        // 检查必填字段
-        for (const level of levels) {
-          if (!level.name?.trim()) {
-            return error(res, '等级名称不能为空')
-          }
-          if (level.min === undefined || level.max === undefined) {
-            return error(res, '分数区间不能为空')
-          }
-          if (level.min > level.max) {
-            return error(res, `等级 "${level.name}" 分数下限不能大于上限`)
-          }
-          if (!level.interpretation?.trim()) {
-            return error(res, `等级 "${level.name}" 解读文本不能为空`)
-          }
-        }
-
-        // 检查区间重叠
-        const sorted = [...levels].sort((a: any, b: any) => a.min - b.min)
-        for (let i = 1; i < sorted.length; i++) {
-          if ((sorted[i] as any).min <= (sorted[i-1] as any).max) {
-            return error(res, `等级 "${(sorted[i-1] as any).name}" 和 "${(sorted[i] as any).name}" 分数区间重叠`)
-          }
-        }
-      }
-
-      const updated = await prisma.dimension.update({
-        where: { id: dimensionId },
-        data: {
-          levelFeedback: levelFeedback || { levels: [] }
-        }
-      })
-
-      return success(res, updated, '维度反馈配置更新成功')
-    } catch (err) {
-      logger.error('更新维度反馈配置错误', err)
-      return error(res, '更新维度反馈配置失败')
-    }
-  },
-
   // 导出量表数据
   async exportScaleData(req: Request, res: Response) {
     try {
@@ -1753,17 +1100,15 @@ export const scaleController = {
         anonymize  // 返回实际使用的脱敏状态
       }
 
-      // 根据格式返回文件路径
+      // 只向客户端返回可下载的文件名，不暴露服务器文件系统路径。
       if (files.csvPath) {
         result.fileName = path.basename(files.csvPath)
-        result.csvPath = files.csvPath
       }
       if (files.savPath) {
         result.fileName = path.basename(files.savPath)
-        result.savPath = files.savPath
       }
       if (files.spsPath) {
-        result.spsPath = files.spsPath
+        result.additionalFileNames = [path.basename(files.spsPath)]
       }
 
       return success(res, result, '导出成功')
@@ -1784,15 +1129,10 @@ export const scaleController = {
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
         include: {
-          items: { orderBy: { sortOrder: 'asc' }, take: 5 },
-          dimensions: true,
           _count: {
-            select: {
-              items: true,
-              assessments: { where: { status: 'COMPLETED' } }
-            }
-          }
-        }
+            select: { assessments: { where: { status: 'COMPLETED' } } },
+          },
+        },
       })
 
       if (!scale) {
@@ -1819,8 +1159,10 @@ export const scaleController = {
         scaleName: scale.name,
         totalRecords: previewData.rows.length,
         completedCount: scale._count.assessments,
-        itemCount: scale._count.items,
-        dimensionCount: scale.dimensions.length,
+        itemCount: Array.isArray((scale.definition as any)?.items) ? (scale.definition as any).items.length : 0,
+        dimensionCount: Array.isArray((scale.definition as any)?.scoring?.scores)
+          ? (scale.definition as any).scoring.scores.filter((score: any) => score.type === 'dimension').length
+          : 0,
         fields: previewData.fields,
         sampleData: sampleRows
       })

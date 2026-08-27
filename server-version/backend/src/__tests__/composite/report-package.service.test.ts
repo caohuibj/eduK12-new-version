@@ -9,6 +9,7 @@ import {
   readFrozenAnalysisProtocolSnapshot,
   readFrozenReportPackageSnapshot,
 } from '../../modules/cognitive-analysis'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 
 const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
   mockPrisma: {
@@ -168,34 +169,12 @@ const adexiScale = (status = 'PUBLISHED') => ({
   description: 'draft fixture',
   status,
   visibility: 'HIDDEN',
-  config: { respondentType: 'participant_self_report' },
+  instrumentClass: 'STANDARD',
+  instrumentVersion: '2.0.0',
+  definition: ADEXI_V2_DEFINITION,
   estimatedTime: 5,
   instruction: 'self report',
   tags: ['ADEXI'],
-  dimensions: [{
-    id: 'dimension-inhibition',
-    code: 'inhibition',
-    name: '抑制',
-    description: 'self-report inhibition',
-    scoringMethod: 'sum',
-    weight: 1,
-    minScore: 1,
-    maxScore: 5,
-    levelFeedback: null,
-  }],
-  items: [{
-    id: 'scale-item-1',
-    itemCode: 'ADEXI-01',
-    content: 'draft item',
-    type: 'single',
-    reverse: false,
-    required: true,
-    weight: 1,
-    sortOrder: 0,
-    options: [{ value: 1, label: '1' }],
-    randomizeOptions: false,
-    itemDimensions: [{ dimensionId: 'dimension-inhibition', weight: 1, reverse: false }],
-  }],
 })
 
 const scalePackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => {

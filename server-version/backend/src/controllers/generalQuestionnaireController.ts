@@ -16,6 +16,7 @@ import { logger } from '../utils/logger'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { z } from 'zod'
+import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 
 // ==================== Validation Schemas ====================
 
@@ -71,6 +72,7 @@ export const generalQuestionnaireController = {
                   code: true,
                   name: true,
                   status: true,
+                  definition: true,
                 },
               },
             },
@@ -93,14 +95,11 @@ export const generalQuestionnaireController = {
       // 计算每个问卷的总题数（表单题目 + 量表题目）
       const questionnairesWithStats = await Promise.all(
         questionnaires.map(async (qn) => {
-          const scaleIds = qn.questionnaireScales.map((qs) => qs.scaleId)
-          
-          // 量表题目数量
-          const scaleItemCount = await prisma.scaleItem.count({
-            where: {
-              scaleId: { in: scaleIds },
-            },
-          })
+          // ScaleDefinitionV2 是量表题目数量的唯一来源。
+          const scaleItemCount = qn.questionnaireScales.reduce((sum, qs) => {
+            const definition = qs.scale.definition as any
+            return sum + (Array.isArray(definition?.items) ? definition.items.length : 0)
+          }, 0)
           
           // 表单题目数量
           const formItemCount = await prisma.questionnaireFormItem.count({
@@ -423,13 +422,14 @@ export const generalQuestionnaireController = {
         where: { questionnaireId: id },
         include: {
           scale: {
-            include: {
-              _count: {
-                select: {
-                  items: true,
-                  dimensions: true,
-                },
-              },
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              status: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
         },
@@ -591,13 +591,14 @@ export const generalQuestionnaireController = {
           questionnaireScales: {
             include: {
               scale: {
-                include: {
-                  _count: {
-                    select: {
-                      items: true,
-                      dimensions: true,
-                    },
-                  },
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
                 },
               },
             },
@@ -674,6 +675,9 @@ export const generalQuestionnaireController = {
           return error(res, '问卷中的所有量表必须先发布')
         }
       }
+
+      const contextIssues = validateContextFormItems(questionnaire.formItems, questionnaire.questionnaireScales.map((item) => item.position))
+      if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       const updated = await prisma.questionnaire.update({
         where: { id },
@@ -784,6 +788,7 @@ export const generalQuestionnaireController = {
               required: item.required,
               position: item.position,
               options: item.options as any,
+              contextKey: item.contextKey,
             })),
           })
         }
@@ -856,7 +861,7 @@ export const generalQuestionnaireController = {
       const { id } = req.params
 
       const addFormItemSchema = z.object({
-        type: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input']),
+        type: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month']),
         label: z.string().min(1, '题目标签不能为空'),
         placeholder: z.string().optional(),
         required: z.boolean().optional().default(true),
@@ -865,6 +870,7 @@ export const generalQuestionnaireController = {
           value: z.string(),
           label: z.string(),
         })).nullish(),
+        contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
       })
 
       const result = addFormItemSchema.safeParse(req.body)
@@ -872,7 +878,9 @@ export const generalQuestionnaireController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { type, label, placeholder, required, position, options } = result.data
+      const { type, label, placeholder, required, position, options, contextKey } = result.data
+      const contextIssues = validateContextFormItem({ id: 'new', type, label, required, position, contextKey, options })
+      if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       // 检查问卷是否存在和权限
       const questionnaire = await prisma.questionnaire.findUnique({
@@ -906,6 +914,7 @@ export const generalQuestionnaireController = {
           required: required ?? true,
           position: position !== undefined ? position : maxPosition + 1,
           options: options ? JSON.parse(JSON.stringify(options)) : null,
+          contextKey: contextKey ?? null,
         },
       })
 
@@ -928,7 +937,7 @@ export const generalQuestionnaireController = {
       const { id, itemId } = req.params
 
       const updateFormItemSchema = z.object({
-        type: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input']).optional(),
+        type: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month']).optional(),
         label: z.string().min(1, '题目标签不能为空').optional(),
         placeholder: z.string().nullable().optional(),
         required: z.boolean().optional(),
@@ -937,6 +946,7 @@ export const generalQuestionnaireController = {
           value: z.string(),
           label: z.string(),
         })).nullish(),
+        contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
       })
 
       const result = updateFormItemSchema.safeParse(req.body)
@@ -965,6 +975,17 @@ export const generalQuestionnaireController = {
       if (formItem.questionnaire.status === 'PUBLISHED') {
         return error(res, '已发布的问卷不能修改')
       }
+
+      const contextIssues = validateContextFormItem({
+        id: formItem.id,
+        type: result.data.type ?? formItem.type,
+        label: result.data.label ?? formItem.label,
+        required: result.data.required ?? formItem.required,
+        position: result.data.position ?? formItem.position,
+        contextKey: result.data.contextKey !== undefined ? result.data.contextKey : formItem.contextKey,
+        options: result.data.options !== undefined ? result.data.options : formItem.options,
+      })
+      if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       // 处理 options 字段
       const updateData: any = { ...result.data }

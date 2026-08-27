@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+
 const { mockPrisma, mockCache } = vi.hoisted(() => ({
   mockPrisma: {
     questionnaireAssessment: {
@@ -25,20 +27,40 @@ const scale = {
   id: 'scale-1',
   code: 'S-1',
   name: '学习投入',
-  dimensions: [{ id: 'dimension-1', code: 'engagement', name: '投入', minScore: 0, maxScore: 20 }],
-  items: [],
 }
 
-const legacyScaleReport = {
-  scaleId: 'scale-1',
-  scaleName: '学习投入',
-  dimensionScores: [{ dimensionId: 'dimension-1', rawScore: 0, normalizedScore: null, level: 'low' }],
-  feedback: {
-    overall: '单项反馈',
-    dimensions: [{ dimensionId: 'dimension-1', score: 0, level: 'low', interpretation: '', suggestions: [] }],
+const v2ScaleResult = {
+  schemaVersion: 2 as const,
+  instrument: { scaleId: 'scale-1', code: 'S-1', name: '学习投入', instrumentVersion: '2.0.0' },
+  method: {
+    scaleId: 'scale-1',
+    instrumentVersion: '2.0.0',
+    scoringVersion: '2.0.0',
+    reportVersion: '2.0.0',
+    definitionHash: 'h'.repeat(64),
+    referenceVersions: [],
+    assessmentContext: null,
   },
-  completedAt: new Date('2026-08-20T01:00:00.000Z'),
-  totalTime: 0,
+  quality: { status: 'interpretable' as const, flags: [] },
+  itemScores: [],
+  scores: [{
+    key: 'engagement',
+    type: 'dimension' as const,
+    label: '投入',
+    direction: 'descriptive' as const,
+    canonical: true,
+    displayPrecision: 1,
+    value: 0,
+    range: { min: 0, max: 20 },
+    expectedItems: ['Q1'],
+    answeredItems: ['Q1'],
+    status: 'calculated' as const,
+    prorated: false,
+  }],
+  references: [],
+  interpretations: [],
+  caveats: [],
+  disclaimer: '量表结果仅反映本次作答，不构成医学诊断或人口常模。',
 }
 
 const makeQa = (overrides: Record<string, unknown> = {}) => ({
@@ -62,9 +84,8 @@ const makeQa = (overrides: Record<string, unknown> = {}) => ({
     scaleId: 'scale-1',
     status: 'COMPLETED',
     progress: 100,
-    scores: legacyScaleReport.dimensionScores,
-    feedback: legacyScaleReport.feedback,
-    completedAt: legacyScaleReport.completedAt,
+    result: v2ScaleResult,
+    completedAt: new Date('2026-08-20T01:00:00.000Z'),
     totalTime: 0,
     scale,
   }],
@@ -74,7 +95,7 @@ const makeQa = (overrides: Record<string, unknown> = {}) => ({
   aggregateReport: {
     averageScore: 99,
     overallSummary: '不应出现在当前报告',
-    scaleReports: [legacyScaleReport],
+    scaleReports: [{ scaleId: 'scale-1', result: v2ScaleResult }],
   },
   ...overrides,
 })
@@ -115,7 +136,7 @@ describe('collection-only questionnaire completion/report contract', () => {
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'qa-1', status: 'IN_PROGRESS' },
       data: expect.objectContaining({
-        aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v1' }),
+        aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v2' }),
       }),
     }))
   })
@@ -141,7 +162,7 @@ describe('collection-only questionnaire completion/report contract', () => {
 
     await publicQuestionnaireController.completeAssessment({ params: { sessionId: 'session-1' } } as any, res)
 
-    expect(dataOf(res)).toMatchObject({ backgroundValues: [{ itemId: 'form-1', value: '三年级' }], unitReports: [{ scaleId: 'scale-1', dimensionScores: [{ rawScore: 0 }], totalTime: 0 }] })
+    expect(dataOf(res)).toMatchObject({ backgroundValues: [{ itemId: 'form-1', value: '三年级' }], unitReports: [{ scaleId: 'scale-1', scores: [{ key: 'engagement', value: 0 }], totalTime: 0 }] })
     expect(dataOf(res)).not.toHaveProperty('averageScore')
     expect(dataOf(res)).not.toHaveProperty('overallSummary')
     expect(dataOf(res)).not.toHaveProperty('aggregateReport')
@@ -158,7 +179,7 @@ describe('collection-only questionnaire completion/report contract', () => {
 
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v1' }) }),
+      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v2' }) }),
     }))
   })
 

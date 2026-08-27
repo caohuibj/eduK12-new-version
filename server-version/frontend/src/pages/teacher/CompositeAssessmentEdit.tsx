@@ -12,6 +12,7 @@ import type {
   ReportPackageCatalogItem,
   ReportPackageProfile,
 } from '../../modules/composite/types'
+import { contextOptionsForKey, contextValueHint, parseDelimitedOptions, serializeDelimitedOptions } from '../../modules/assessment-context/options'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 
 const pad = (value: number) => String(value).padStart(2, '0')
@@ -57,6 +58,8 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [formLabel, setFormLabel] = useState('')
   const [formType, setFormType] = useState('text_input')
   const [formOptions, setFormOptions] = useState('')
+  const [formContextKey, setFormContextKey] = useState('')
+  const [formRequired, setFormRequired] = useState(true)
   const [tokens, setTokens] = useState<CompositePublicAccessToken[]>([])
   const [tokenExpiresAt, setTokenExpiresAt] = useState('')
   const [tokenMaxUses, setTokenMaxUses] = useState(0)
@@ -161,21 +164,22 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const addItem = async () => {
     try {
-      const input: Record<string, unknown> = { type, required: true }
+      const input: Record<string, unknown> = { type, required: type === 'FORM' ? formRequired : true }
       if (type === 'SCALE') input.scaleId = selectedId
       if (type === 'COGNITIVE') input.cognitiveAssignmentId = selectedId
       if (type === 'FORM') {
         input.formLabel = formLabel
         input.formType = formType
-        input.formOptions = formOptions
-          ? formOptions.split(',').map((value) => ({ value: value.trim(), label: value.trim() }))
-          : null
+        input.formOptions = formOptions ? parseDelimitedOptions(formOptions) : null
+        input.contextKey = formContextKey || null
       }
       const response = await compositeApi.addItem(id, input)
       if (response.code !== 0) throw new Error(response.message || '添加模块失败')
       setSelectedId('')
       setFormLabel('')
       setFormOptions('')
+      setFormContextKey('')
+      setFormRequired(true)
       await load()
     } catch (err) {
       setError(errorMessage(err, '添加模块失败'))
@@ -542,7 +546,7 @@ const CompositeAssessmentEdit: React.FC = () => {
       {isDraft && !protocolLocked && (
         <div className="card p-6 mb-5">
           <h2 className="font-semibold mb-4">添加模块</h2>
-          <div className="flex gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-3">
             <select value={type} onChange={(e) => { setType(e.target.value as any); setSelectedId('') }} className="border rounded px-3 py-2">
               <option value="SCALE">心理量表</option>
               {cognitiveModuleEnabled && <option value="COGNITIVE">认知任务</option>}
@@ -562,13 +566,45 @@ const CompositeAssessmentEdit: React.FC = () => {
             ) : (
               <>
                 <input value={formLabel} onChange={(e) => setFormLabel(e.target.value)} className="border rounded px-3 py-2 flex-1" placeholder="表单项标签" />
-                <select value={formType} onChange={(e) => setFormType(e.target.value)} className="border rounded px-3 py-2">
+                <select
+                  value={formType}
+                  onChange={(e) => {
+                    const nextType = e.target.value
+                    setFormType(formContextKey
+                      ? formContextKey === 'birthYearMonth' ? 'year_month' : 'single_choice'
+                      : nextType)
+                  }}
+                  className="border rounded px-3 py-2"
+                >
                   <option value="text_input">文本</option>
                   <option value="fill_blank">填空</option>
                   <option value="single_choice">单选</option>
                   <option value="multiple_choice">多选</option>
+                  <option value="year_month">年月</option>
                 </select>
-                <input value={formOptions} onChange={(e) => setFormOptions(e.target.value)} className="border rounded px-3 py-2" placeholder="选项，用逗号分隔" />
+                <input value={formOptions} onChange={(e) => setFormOptions(e.target.value)} className="border rounded px-3 py-2" placeholder="选项：value=显示文案，用逗号分隔" />
+                {formContextKey && contextValueHint(formContextKey) && <p className="text-xs text-blue-600 w-full">{contextValueHint(formContextKey)}</p>}
+                <select
+                  value={formContextKey}
+                  onChange={(e) => {
+                    const contextKey = e.target.value
+                    setFormContextKey(contextKey)
+                    setFormType(contextKey === 'birthYearMonth' ? 'year_month' : contextKey ? 'single_choice' : formType === 'year_month' ? 'fill_blank' : formType)
+                    if (contextKey && contextKey !== formContextKey) setFormOptions(serializeDelimitedOptions(contextOptionsForKey(contextKey)))
+                  }}
+                  className="border rounded px-3 py-2"
+                >
+                  <option value="">普通表单</option>
+                  <option value="birthYearMonth">出生年月</option>
+                  <option value="sexAtBirth">出生时性别</option>
+                  <option value="gradeLevel">年级</option>
+                  <option value="primaryLanguage">主要语言</option>
+                  <option value="countryOrRegion">国家/地区</option>
+                </select>
+                <label className="flex items-center gap-1 text-sm text-gray-600 whitespace-nowrap">
+                  <input type="checkbox" checked={formRequired} onChange={(e) => setFormRequired(e.target.checked)} />
+                  必填
+                </label>
               </>
             )}
           </div>

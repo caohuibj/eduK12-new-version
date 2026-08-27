@@ -19,6 +19,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { addItem, publishComposite, updateComposite } from '../../modules/composite/composite.service'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 
 const TEACHER = UserRole.TEACHER
 
@@ -128,7 +129,7 @@ describe('addItem cognitive course match', () => {
 describe('addItem scale grants', () => {
   it('forbids another teacher published scale without a grant', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
-    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED' })
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED', instrumentClass: 'STANDARD', instrumentVersion: '2.0.0', definition: ADEXI_V2_DEFINITION })
     await expect(addItem('teacher-a', TEACHER, 'composite-1', {
       type: 'SCALE',
       scaleId: 'scale-other',
@@ -138,7 +139,7 @@ describe('addItem scale grants', () => {
 
   it('allows a granted published scale', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
-    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED' })
+    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-other', creatorId: 'admin-1', status: 'PUBLISHED', instrumentClass: 'STANDARD', instrumentVersion: '2.0.0', definition: ADEXI_V2_DEFINITION })
     mockPrisma.materialGrant.findUnique.mockResolvedValue({ id: 'g1' })
     await addItem('teacher-a', TEACHER, 'composite-1', {
       type: 'SCALE',

@@ -11,7 +11,7 @@ const { mockPrisma, mockVerifyToken } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 
-import { authenticate, optionalAuthenticate, requireSelfOrAdmin } from '../../middleware/auth'
+import { authenticate, optionalAuthenticate, requireSelfOrAdmin, requireStudent } from '../../middleware/auth'
 
 const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, tokenVersion: 0 }
 
@@ -144,6 +144,29 @@ describe('requireSelfOrAdmin', () => {
     const next = vi.fn()
 
     requireSelfOrAdmin(req, res, next)
+
+    expect(next).toHaveBeenCalledOnce()
+  })
+})
+
+describe('requireStudent', () => {
+  it('rejects a teacher from student-only scale assessment routes', () => {
+    const req = { user: { ...payload, role: UserRole.TEACHER } } as any
+    const res = makeRes()
+    const next = vi.fn()
+
+    requireStudent(req, res, next)
+
+    expect(res.statusCode).toBe(403)
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('allows a student through', () => {
+    const req = { user: payload } as any
+    const res = makeRes()
+    const next = vi.fn()
+
+    requireStudent(req, res, next)
 
     expect(next).toHaveBeenCalledOnce()
   })

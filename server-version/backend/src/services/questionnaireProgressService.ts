@@ -12,24 +12,14 @@ const questionnaireProgressInclude = {
       },
       questionnaireScales: {
         include: {
-          scale: {
-            include: {
-              dimensions: true,
-            },
-          },
+          scale: true,
         },
         orderBy: { position: 'asc' as const },
       },
     },
   },
   scaleAssessments: {
-    include: {
-      scale: {
-        include: {
-          dimensions: true,
-        },
-      },
-    },
+    include: { scale: true },
   },
   formAnswers: true,
 } as const
@@ -66,7 +56,10 @@ export const refreshQuestionnaireProgress = async (
   const completedScales = qa.scaleAssessments.filter(
     (assessment) => scaleIds.has(assessment.scaleId) && assessment.status === 'COMPLETED',
   ).length
-  const completedForms = qa.formAnswers.filter((answer) => formItemIds.has(answer.formItemId)).length
+  const answeredFormItemIds = new Set(qa.formAnswers.filter((answer) => formItemIds.has(answer.formItemId)).map((answer) => answer.formItemId))
+  const completedForms = qa.questionnaire.formItems.filter((item) => (
+    (item.required === false && !item.contextKey) || answeredFormItemIds.has(item.id)
+  )).length
   const totalItems = scaleIds.size + formItemIds.size
   const completedItems = completedScales + completedForms
   const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))

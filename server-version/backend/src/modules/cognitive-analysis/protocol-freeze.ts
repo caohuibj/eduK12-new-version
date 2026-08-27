@@ -7,6 +7,7 @@ import type {
   EvidenceRole,
 } from './cognitive-analysis.types'
 import { getScaleDimensionEvidenceMapping } from './scale-evidence-mapping.registry'
+import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 
 export interface FrozenProtocolSlotMeasurement {
   slotKey: string
@@ -52,38 +53,12 @@ export interface ProtocolCompositeItem {
     description?: string | null
     status?: string | null
     visibility?: string | null
-    config?: unknown
+    instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
+    instrumentVersion?: string | null
+    definition?: unknown
     estimatedTime?: number | null
     instruction?: string | null
     tags?: string[]
-    dimensions?: Array<{
-      id?: string | null
-      code?: string | null
-      name?: string | null
-      description?: string | null
-      scoringMethod?: string | null
-      weight?: unknown
-      minScore?: unknown
-      maxScore?: unknown
-      levelFeedback?: unknown
-    }>
-    items?: Array<{
-      id?: string | null
-      itemCode?: string | null
-      content?: string | null
-      type?: string | null
-      reverse?: boolean | null
-      required?: boolean | null
-      weight?: unknown
-      sortOrder?: number | null
-      options?: unknown
-      randomizeOptions?: boolean | null
-      itemDimensions?: Array<{
-        dimensionId?: string | null
-        weight?: unknown
-        reverse?: boolean | null
-      }>
-    }>
   } | null
   cognitiveAssignment?: {
     profile?: string | null
@@ -105,97 +80,19 @@ function fail(message: string): never {
   throw new Error(message)
 }
 
-const decimalValue = (value: unknown): string | number | null => {
-  if (value === null || value === undefined) return null
-  if (typeof value === 'string' || typeof value === 'number') return value
-  return String(value)
-}
-
 const buildScaleDefinitionHash = (
   scale: NonNullable<ProtocolCompositeItem['scale']>,
-  scaleId: string,
 ): string => {
-  if (
-    typeof scale.name !== 'string'
-    || !Array.isArray(scale.dimensions)
-    || !Array.isArray(scale.items)
-  ) {
-    fail('协议量表定义不完整')
+  if (scale.definition === undefined || scale.definition === null) {
+    fail('协议量表缺少 ScaleDefinitionV2')
   }
-  const dimensions = scale.dimensions.map((dimension) => {
-    if (
-      !dimension.id
-      || !dimension.code
-      || typeof dimension.name !== 'string'
-      || typeof dimension.scoringMethod !== 'string'
-    ) {
-      fail('协议量表维度定义不完整')
-    }
-    return {
-      id: dimension.id,
-      code: dimension.code,
-      name: dimension.name,
-      description: dimension.description ?? null,
-      scoringMethod: dimension.scoringMethod,
-      weight: decimalValue(dimension.weight),
-      minScore: decimalValue(dimension.minScore),
-      maxScore: decimalValue(dimension.maxScore),
-      levelFeedback: dimension.levelFeedback ?? null,
-    }
-  }).sort((left, right) => left.code.localeCompare(right.code) || left.id.localeCompare(right.id))
-  const dimensionIds = new Set(dimensions.map((dimension) => dimension.id))
-  const items = scale.items.map((item) => {
-    if (
-      !item.id
-      || !item.itemCode
-      || typeof item.content !== 'string'
-      || typeof item.type !== 'string'
-      || typeof item.reverse !== 'boolean'
-      || typeof item.required !== 'boolean'
-      || typeof item.sortOrder !== 'number'
-      || typeof item.randomizeOptions !== 'boolean'
-      || !Array.isArray(item.itemDimensions)
-    ) {
-      fail('协议量表题目定义不完整')
-    }
-    const itemDimensions = item.itemDimensions.map((link) => {
-      if (!link.dimensionId || !dimensionIds.has(link.dimensionId) || typeof link.reverse !== 'boolean') {
-        fail('协议量表题目维度映射不完整')
-      }
-      return {
-        dimensionId: link.dimensionId,
-        weight: decimalValue(link.weight),
-        reverse: link.reverse,
-      }
-    }).sort((left, right) => left.dimensionId.localeCompare(right.dimensionId))
-    return {
-      id: item.id,
-      itemCode: item.itemCode,
-      content: item.content,
-      type: item.type,
-      reverse: item.reverse,
-      required: item.required,
-      weight: decimalValue(item.weight),
-      sortOrder: item.sortOrder,
-      options: item.options ?? null,
-      randomizeOptions: item.randomizeOptions,
-      itemDimensions,
-    }
-  }).sort((left, right) => left.sortOrder - right.sortOrder || left.itemCode.localeCompare(right.itemCode))
-
-  return hashResolvedConfig({
-    id: scaleId,
-    code: scale.code,
-    name: scale.name,
-    description: scale.description ?? null,
-    visibility: scale.visibility ?? null,
-    config: scale.config ?? null,
-    estimatedTime: scale.estimatedTime ?? null,
-    instruction: scale.instruction ?? null,
-    tags: [...(scale.tags ?? [])].sort(),
-    dimensions,
-    items,
+  const validation = validateScaleDefinition(scale.definition, {
+    instrumentClass: scale.instrumentClass ?? undefined,
   })
+  if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+    fail('协议量表 v2 definition 不完整')
+  }
+  return hashScaleDefinition(validation.definition)
 }
 
 const readProfile = (value: string | null | undefined): CognitiveAnalysisProfile => {
@@ -264,8 +161,14 @@ export const validateProtocolCompositeItems = (
       ) {
         fail(`协议量表版本不匹配：${scaleSlot.key}`)
       }
-      const dimension = scale.dimensions?.find((candidate) => candidate.code === scaleSlot.expectedDimensionCode)
-      if (!dimension) fail(`协议量表维度不匹配：${scaleSlot.key}`)
+      const v2Validation = scale.definition !== undefined && scale.definition !== null
+        ? validateScaleDefinition(scale.definition, { instrumentClass: scale.instrumentClass ?? undefined })
+        : undefined
+      if (!v2Validation || !v2Validation.definition || v2Validation.issues.some((issue) => issue.severity === 'error')) {
+        fail(`协议量表 v2 definition 不完整：${scaleSlot.key}`)
+      }
+      const dimension = v2Validation.definition.scoring.scores.find((candidate) => candidate.key === scaleSlot.expectedDimensionCode)
+      if (!dimension) fail(`协议量表 score key 不匹配：${scaleSlot.key}`)
       const expectedMeasurement = expectedScaleBySlot.get(scaleSlot.key)
       const mapping = expectedMeasurement
         ? {
@@ -296,7 +199,7 @@ export const validateProtocolCompositeItems = (
       ) {
         fail(`协议量表 Evidence mapping 不匹配：${scaleSlot.key}`)
       }
-      const scaleDefinitionHash = buildScaleDefinitionHash(scale, scaleId)
+      const scaleDefinitionHash = buildScaleDefinitionHash(scale)
       const measurement: FrozenScaleSlotMeasurement = {
         slotKey: scaleSlot.key,
         scaleId,

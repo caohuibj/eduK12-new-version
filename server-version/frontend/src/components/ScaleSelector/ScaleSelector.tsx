@@ -4,6 +4,18 @@ import { SearchOutlined, HolderOutlined } from '@ant-design/icons'
 import type { TransferProps } from 'antd'
 import { Scale, ScaleSelectorProps, ScaleInfo } from './types'
 
+const itemCount = (scale: Scale): number => (
+  scale.definition?.schemaVersion === 2 && Array.isArray(scale.definition.items)
+    ? scale.definition.items.length
+    : 0
+)
+
+const dimensionCount = (scale: Scale): number => (
+  scale.definition?.schemaVersion === 2 && Array.isArray(scale.definition.scoring?.scores)
+    ? scale.definition.scoring.scores.filter((score) => score.type === 'dimension').length
+    : 0
+)
+
 const ScaleSelector: React.FC<ScaleSelectorProps> = ({
   scales,
   selected,
@@ -15,7 +27,7 @@ const ScaleSelector: React.FC<ScaleSelectorProps> = ({
     return scales.map(scale => ({
       key: scale.id,
       title: scale.name,
-      description: `${scale._count?.items || 0}题 · ${scale._count?.dimensions || 0}维度`,
+      description: `${itemCount(scale)}题 · ${dimensionCount(scale)}维度`,
       scale,
     }))
   }, [scales])
@@ -28,8 +40,8 @@ const ScaleSelector: React.FC<ScaleSelectorProps> = ({
         id: scale.id,
         name: scale.name,
         code: scale.code,
-        items: scale._count?.items || 0,
-        dimensions: scale._count?.dimensions || 0,
+        items: itemCount(scale),
+        dimensions: dimensionCount(scale),
       } : null
     }).filter(Boolean) as ScaleInfo[]
   }, [scales, selected])

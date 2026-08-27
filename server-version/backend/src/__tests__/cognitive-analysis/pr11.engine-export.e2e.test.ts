@@ -12,6 +12,7 @@ import {
 } from '../../modules/cognitive-analysis'
 import { buildCompositeAnalysisExport } from '../../modules/composite/composite-analysis-export.service'
 import { projectCompositePackageAnalysis } from '../../modules/composite/composite-report.projector'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 
 const zipEntry = (zip: Buffer, target: string): string => {
   let offset = 0
@@ -89,6 +90,9 @@ const makeSnapshotAndResults = (): {
       description: 'fixture',
       status: 'PUBLISHED',
       visibility: 'HIDDEN',
+      instrumentClass: 'STANDARD' as const,
+      instrumentVersion: '2.0.0',
+      definition: ADEXI_V2_DEFINITION,
       config: { respondentType: 'participant_self_report' },
       estimatedTime: 5,
       instruction: 'self report',

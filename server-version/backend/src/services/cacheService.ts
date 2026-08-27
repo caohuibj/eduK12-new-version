@@ -276,16 +276,7 @@ class CacheService {
       const { prisma } = await import('../config/database')
       return prisma.questionnaireScale.findMany({
         where: { questionnaireId },
-        include: { 
-          scale: {
-            include: {
-              items: {
-                orderBy: { sortOrder: 'asc' }
-              },
-              dimensions: true
-            }
-          }
-        },
+        include: { scale: true },
         orderBy: { position: 'asc' }
       })
     }, CACHE_CONFIG.defaultTTL)
@@ -314,19 +305,7 @@ class CacheService {
       const { prisma } = await import('../config/database')
       return prisma.scale.findUnique({
         where: { id: scaleId },
-        include: {
-          items: {
-            orderBy: { sortOrder: 'asc' },
-            include: {
-              itemDimensions: {
-                include: {
-                  dimension: true
-                }
-              }
-            }
-          },
-          dimensions: true
-        }
+        include: { assessments: false }
       })
     }, CACHE_CONFIG.defaultTTL * 2) // 量表配置缓存时间更长
   }
