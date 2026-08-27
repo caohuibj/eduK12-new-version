@@ -317,6 +317,11 @@ enum ScaleStatus {
   ARCHIVED // 已归档
 }
 
+enum ScaleInstrumentClass {
+  STANDARD
+  CUSTOM_DESCRIPTIVE
+}
+
 enum AssessmentStatus {
   IN_PROGRESS // 进行中
   COMPLETED // 已完成
@@ -327,6 +332,17 @@ enum ScaleVisibility {
   HIDDEN // 未关联不可见（默认）
   COURSE // 关联课程后可见
   PUBLIC // 全体可见
+}
+
+enum AssessmentReferenceInstrumentType {
+  SCALE
+  COGNITIVE
+}
+
+enum AssessmentReferenceStatus {
+  DRAFT
+  ACTIVE
+  RETIRED
 }
 
 enum MaterialResourceType {
@@ -358,24 +374,25 @@ model MaterialGrant {
 
 // 量表表
 model Scale {
-  id            String          @id @default(uuid())
-  code          String          @unique // 量表编码
-  name          String // 量表名称
-  description   String? // 量表描述
-  status        ScaleStatus     @default(DRAFT) // 状态
-  visibility    ScaleVisibility @default(HIDDEN) // 可见性
-  config        Json? // 配置（点数、标签类型、随机化等）
-  estimatedTime Int?            @map("estimated_time") // 预计用时（分钟）
-  instruction   String? // 指导语
-  creatorId     String          @map("creator_id") // 创建者ID
-  createdAt     DateTime        @default(now()) @map("created_at")
-  updatedAt     DateTime        @updatedAt @map("updated_at")
-  tags          String[]        @default([])
+  id               String                @id @default(uuid())
+  code             String                @unique // 量表编码
+  name             String // 量表名称
+  description      String? // 量表描述
+  status           ScaleStatus           @default(DRAFT) // 状态
+  visibility       ScaleVisibility       @default(HIDDEN) // 可见性
+  instrumentClass  ScaleInstrumentClass  @default(CUSTOM_DESCRIPTIVE) @map("instrument_class")
+  instrumentVersion String               @default("2.0.0") @map("instrument_version")
+  definition       Json? // ScaleDefinitionV2；运行时唯一计分来源
+  definitionHash   String?               @map("definition_hash")
+  estimatedTime    Int?                  @map("estimated_time") // 预计用时（分钟）
+  instruction      String? // 指导语
+  creatorId        String                @map("creator_id") // 创建者ID
+  createdAt        DateTime              @default(now()) @map("created_at")
+  updatedAt        DateTime              @updatedAt @map("updated_at")
+  tags             String[]              @default([])
 
   // 关联
   creator             User                      @relation("ScaleCreator", fields: [creatorId], references: [id])
-  items               ScaleItem[]
-  dimensions          Dimension[]
   assessments         Assessment[]
   courseScales        CourseScale[]
   // 聚合问卷模块关联
@@ -386,65 +403,6 @@ model Scale {
   @@map("scales")
 }
 
-// 题目表
-model ScaleItem {
-  id               String  @id @default(uuid())
-  scaleId          String  @map("scale_id")
-  itemCode         String  @map("item_code") // 题目编码，如 Q1
-  content          String // 题目内容
-  type             String  @default("single") // 题目类型：single（单选）
-  reverse          Boolean @default(false) // 是否反向计分
-  required         Boolean @default(true) // 是否必填
-  weight           Decimal @default(1.0) // 权重
-  sortOrder        Int     @default(0) @map("sort_order") // 排序
-  options          Json? // 选项列表
-  randomizeOptions Boolean @default(false) @map("randomize_options") // 选项是否随机
-
-  // 关联
-  scale          Scale           @relation(fields: [scaleId], references: [id], onDelete: Cascade)
-  itemDimensions ItemDimension[]
-
-  // 性能优化索引
-  @@index([sortOrder])
-  @@map("scale_items")
-}
-
-// 维度表
-model Dimension {
-  id            String   @id @default(uuid())
-  scaleId       String   @map("scale_id")
-  code          String // 维度编码
-  name          String // 维度名称
-  description   String? // 维度描述
-  scoringMethod String   @default("sum") @map("scoring_method") // 计分方式：sum/average
-  weight        Decimal  @default(1.0) // 维度权重
-  minScore      Decimal? @map("min_score") // 最低分（可选，不设置则使用理论最低分）
-  maxScore      Decimal? @map("max_score") // 最高分（可选，不设置则使用理论最高分）
-  levelFeedback Json?    @map("level_feedback") // 等级配置与反馈模板
-
-  // 关联
-  scale          Scale           @relation(fields: [scaleId], references: [id], onDelete: Cascade)
-  itemDimensions ItemDimension[]
-
-  @@map("dimensions")
-}
-
-// 题目维度关联表
-model ItemDimension {
-  id          String  @id @default(uuid())
-  itemId      String  @map("item_id")
-  dimensionId String  @map("dimension_id")
-  weight      Decimal @default(1.0) // 该题目在该维度中的权重
-  reverse     Boolean @default(false) // 该题目在该维度是否反向计分
-
-  // 关联
-  item      ScaleItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  dimension Dimension @relation(fields: [dimensionId], references: [id], onDelete: Cascade)
-
-  @@unique([itemId, dimensionId])
-  @@map("item_dimensions")
-}
-
 // 测评记录表
 model Assessment {
   id                        String           @id @default(uuid())
@@ -452,8 +410,7 @@ model Assessment {
   userId                    String?          @map("user_id") // 改为可选，支持匿名测评
   status                    AssessmentStatus @default(IN_PROGRESS)
   answers                   Json? // 答案数组（加密存储）
-  scores                    Json? // 各维度分数（加密存储）
-  feedback                  Json? // 反馈内容（加密存储）
+  result                    Json?             // 加密的完整 ScaleResultV2
   progress                  Int              @default(0) // 进度百分比
   startedAt                 DateTime         @default(now()) @map("started_at")
   completedAt               DateTime?        @map("completed_at") // 完成时间
@@ -479,6 +436,22 @@ model Assessment {
   @@index([compositeItemId])
   @@index([status, startedAt]) // 新增：统计场景优化
   @@map("assessments")
+}
+
+// 通用 Reference Core。definition 保存结构化 reference set，避免 scale/cognitive 各自维护一套表。
+model AssessmentReferenceSet {
+  id              String                                @id @default(uuid())
+  instrumentType  AssessmentReferenceInstrumentType    @map("instrument_type")
+  instrumentKey   String                                @map("instrument_key")
+  referenceVersion String                               @map("reference_version")
+  status          AssessmentReferenceStatus            @default(DRAFT)
+  definition      Json
+  createdAt       DateTime                              @default(now()) @map("created_at")
+  updatedAt       DateTime                              @updatedAt @map("updated_at")
+
+  @@unique([instrumentType, instrumentKey, referenceVersion])
+  @@index([instrumentType, instrumentKey, status])
+  @@map("assessment_reference_sets")
 }
 
 // 课程量表关联表（支持将量表关联到课程）

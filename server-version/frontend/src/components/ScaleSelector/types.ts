@@ -3,10 +3,11 @@ export interface Scale {
   code: string
   name: string
   status: string
-  _count?: {
-    items: number
-    dimensions: number
-  }
+  definition?: {
+    schemaVersion?: number
+    items?: unknown[]
+    scoring?: { scores?: Array<{ type?: string }> }
+  } | null
 }
 
 export interface ScaleSelectorProps {

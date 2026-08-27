@@ -133,9 +133,13 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         orderBy: { position: 'asc' },
         include: {
           scale: {
-            include: {
-              ...(detail === 'full' ? { items: { orderBy: { sortOrder: 'asc' } } } : {}),
-              dimensions: true,
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
           cognitiveAssignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
@@ -152,7 +156,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
             select: {
               compositeItemId: true,
               answers: detail === 'full',
-              scores: true,
+              result: true,
             },
           },
           cognitiveSessions: {
@@ -193,13 +197,27 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       builder.add(`${prefix}scale_id`, `[${scaleLabel}] 量表ID`, 'string', 80)
       builder.add(`${prefix}scale_code`, `[${scaleLabel}] 量表编码`, 'string', 80)
       builder.add(`${prefix}report_definition_version`, `[${scaleLabel}] 报告定义版本`, 'string', 80)
+      const definition = item.scale.definition && typeof item.scale.definition === 'object' ? item.scale.definition as any : null
+      const v2Items = Array.isArray(definition?.items) ? definition.items : []
+      const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
+      if (v2Items.length === 0 || v2Scores.length === 0) {
+        throw new Error(`量表 ${item.scale.code || item.scale.id} 没有有效的 ScaleDefinitionV2`)
+      }
       if (detail === 'full') {
-        item.scale.items.forEach((scaleItem: any) => {
-          builder.add(fieldName(`${prefix}Q_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} ${scaleItem.content}`, 'numeric', 12)
-          builder.add(fieldName(`${prefix}RT_`, scaleItem.itemCode || scaleItem.id), `[${scaleLabel}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`, 'numeric', 12)
+        v2Items.forEach((scaleItem: any) => {
+          const itemCode = scaleItem.itemCode
+          builder.add(fieldName(`${prefix}Q_V_`, itemCode), `[${scaleLabel}] ${itemCode} 原始回答`, 'string', 32)
+          builder.add(fieldName(`${prefix}Q_S_`, itemCode), `[${scaleLabel}] ${itemCode} 映射后题目分值`, 'numeric', 12, 6)
+          builder.add(fieldName(`${prefix}RT_`, itemCode), `[${scaleLabel}] ${itemCode} 作答时间(毫秒)`, 'numeric', 12)
         })
       }
-      item.scale.dimensions.forEach((dimension: any) => builder.add(fieldName(`${prefix}D_`, dimension.code || dimension.id), `[${scaleLabel}] ${dimension.name}得分`, 'numeric', 12, 2))
+      v2Scores.forEach((score: any) => builder.add(fieldName(`${prefix}SCORE_`, score.key), `[${scaleLabel}] ${score.key} ${score.label}冻结得分`, 'numeric', 12, 6))
+      builder.add(`${prefix}quality_status`, `[${scaleLabel}] 质量状态`, 'string', 24)
+      builder.add(`${prefix}quality_flags`, `[${scaleLabel}] 质量问题`, 'string', 80)
+      builder.add(`${prefix}instrument_version`, `[${scaleLabel}] 量表版本`, 'string', 24)
+      builder.add(`${prefix}scoring_version`, `[${scaleLabel}] 计分版本`, 'string', 24)
+      builder.add(`${prefix}definition_hash`, `[${scaleLabel}] 定义哈希`, 'string', 80)
+      builder.add(`${prefix}reference_versions`, `[${scaleLabel}] 使用的参考版本`, 'string', 48)
     }
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
@@ -257,28 +275,38 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       const prefix = slotPrefix('S', index)
       if (item.type === 'SCALE') {
         const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
-        const answers = detail === 'full' ? decode<any[]>(result?.answers) ?? [] : []
-        const answerMap = new Map(answers.map((answer) => [answer.itemId, answer]))
-        if (detail === 'full') {
-          for (const scaleItem of item.scale.items) {
-            const itemCode = scaleItem.itemCode || scaleItem.id
-            const questionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${scaleItem.itemCode || ''} ${scaleItem.content}`
-            const responseTimeLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${scaleItem.itemCode || ''} 作答时间(毫秒)`
-            row[builder.resolve(fieldName(`${prefix}Q_`, itemCode), questionLabel)] = answerMap.get(scaleItem.id)?.value ?? null
-            row[builder.resolve(fieldName(`${prefix}RT_`, itemCode), responseTimeLabel)] = answerMap.get(scaleItem.id)?.responseTime ?? null
-          }
-        }
-        const scores = decode<any[]>(result?.scores) ?? []
         row[`${prefix}scale_id`] = item.scale?.id ?? item.scaleId ?? null
         row[`${prefix}scale_code`] = item.scale?.code ?? null
-        row[`${prefix}report_definition_version`] = 'scale-unit-report-v1'
-        for (const score of scores) {
-          const dimension = item.scale.dimensions.find((candidate: any) => candidate.id === score.dimensionId)
-          if (dimension) {
-            const dimensionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${dimension.name}得分`
-            row[builder.resolve(fieldName(`${prefix}D_`, dimension.code || dimension.id), dimensionLabel)] = score.rawScore ?? score.normalizedScore ?? null
-          }
+        const definition = item.scale.definition && typeof item.scale.definition === 'object' ? item.scale.definition as any : null
+        const v2Items = Array.isArray(definition?.items) ? definition.items : []
+        const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
+        const scaleResult = decode<Record<string, any>>(result?.result)
+        const answers = detail === 'full' ? decode<any[]>(result?.answers) ?? [] : []
+        const answerMap = new Map<string, any>(answers.map((answer) => [answer.itemCode, answer]))
+        const itemScoreMap = new Map<string, any>((scaleResult?.itemScores || []).map((answer: any) => [answer.itemCode, answer]))
+        if (detail === 'full') {
+          v2Items.forEach((scaleItem: any) => {
+            const itemCode = scaleItem.itemCode
+            const questionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 原始回答`
+            const scoreLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 映射后题目分值`
+            const responseTimeLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 作答时间(毫秒)`
+            row[builder.resolve(fieldName(`${prefix}Q_V_`, itemCode), questionLabel)] = answerMap.get(itemCode)?.responseValue ?? null
+            row[builder.resolve(fieldName(`${prefix}Q_S_`, itemCode), scoreLabel)] = itemScoreMap.get(itemCode)?.score ?? null
+            row[builder.resolve(fieldName(`${prefix}RT_`, itemCode), responseTimeLabel)] = answerMap.get(itemCode)?.responseTimeMs ?? null
+          })
         }
+        row[`${prefix}report_definition_version`] = scaleResult?.method?.reportVersion ?? null
+        row[`${prefix}quality_status`] = scaleResult?.quality?.status ?? null
+        row[`${prefix}quality_flags`] = Array.isArray(scaleResult?.quality?.flags) ? scaleResult.quality.flags.join('|') : null
+        row[`${prefix}instrument_version`] = scaleResult?.method?.instrumentVersion ?? null
+        row[`${prefix}scoring_version`] = scaleResult?.method?.scoringVersion ?? null
+        row[`${prefix}definition_hash`] = scaleResult?.method?.definitionHash ?? null
+        row[`${prefix}reference_versions`] = Array.isArray(scaleResult?.method?.referenceVersions) ? scaleResult.method.referenceVersions.join('|') : null
+        const scoreMap = new Map<string, any>((scaleResult?.scores || []).map((score: any) => [score.key, score]))
+        v2Scores.forEach((score: any) => {
+          const scoreLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${score.key} ${score.label}冻结得分`
+          row[builder.resolve(fieldName(`${prefix}SCORE_`, score.key), scoreLabel)] = scoreMap.get(score.key)?.value ?? null
+        })
       }
       if (item.type === 'COGNITIVE') {
         const session = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === item.id)

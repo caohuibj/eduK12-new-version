@@ -16,6 +16,84 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { compositeExportService, toSavVariables } from '../../modules/composite/composite-export.service'
 
+const makeScaleDefinition = (itemCode: string, scoreKeys: string[]) => ({
+  schemaVersion: 2,
+  respondentType: 'participant_self_report',
+  source: { title: '测试量表', citation: '测试来源' },
+  license: { status: 'authorized', redistribution: 'restricted' },
+  display: { randomizeItems: false },
+  responseSets: [{ key: 'default', options: [{ value: 'never', label: '从不', score: 0 }] }],
+  items: [{ itemCode, content: `题目 ${itemCode}`, type: 'single', required: true, sortOrder: 0, responseSetKey: 'default', randomizeOptions: false }],
+  scoring: {
+    scoringVersion: '2.0.0',
+    itemRules: [{ itemCode, transform: { type: 'identity' } }],
+    defaultMissingPolicy: { type: 'complete_required' },
+    scores: scoreKeys.map((key) => ({
+      key,
+      type: 'dimension',
+      label: `维度 ${key}`,
+      direction: 'descriptive',
+      canonical: true,
+      displayPrecision: 0,
+      missingPolicy: { type: 'complete_required' },
+      source: { type: 'items', items: [{ itemCode, weight: 1 }], aggregation: 'sum' },
+    })),
+  },
+  report: {
+    reportVersion: '2.0.0',
+    primaryScoreKeys: scoreKeys,
+    scoreOrder: scoreKeys,
+    interpretations: scoreKeys.map((key) => ({ scoreKey: key, headline: `维度 ${key}`, source: { type: 'score_only' }, summary: '描述性结果', bands: [], guidance: [] })),
+    limitations: [],
+    disclaimer: '仅供测试',
+  },
+  referencePolicy: { type: 'none' },
+})
+
+const makeScaleResult = (input: {
+  scaleId: string
+  code: string
+  name: string
+  itemCode: string
+  scores: Array<{ key: string; value: number | null; status?: 'calculated' | 'limited' | 'not_calculable' }>
+}) => ({
+  schemaVersion: 2,
+  instrument: { scaleId: input.scaleId, code: input.code, name: input.name, instrumentVersion: '2.0.0' },
+  method: {
+    scaleId: input.scaleId,
+    instrumentVersion: '2.0.0',
+    scoringVersion: '2.0.0',
+    reportVersion: '2.0.0',
+    definitionHash: 'h'.repeat(64),
+    referenceVersions: [],
+  },
+  quality: {
+    status: input.scores.every((score) => score.value !== null) ? 'interpretable' : 'invalid',
+    flags: input.scores.every((score) => score.value !== null) ? [] : ['score_not_calculable'],
+  },
+  itemScores: input.scores.some((score) => score.value !== null)
+    ? [{ itemCode: input.itemCode, responseValue: 'never', baseScore: 0, score: 0 }]
+    : [],
+  scores: input.scores.map((score) => ({
+    key: score.key,
+    type: 'dimension',
+    label: `维度 ${score.key}`,
+    direction: 'descriptive',
+    canonical: true,
+    displayPrecision: 0,
+    value: score.value,
+    range: { min: 0, max: 10 },
+    expectedItems: [input.itemCode],
+    answeredItems: score.value === null ? [] : [input.itemCode],
+    status: score.status ?? (score.value === null ? 'not_calculable' : 'calculated'),
+    prorated: false,
+  })),
+  references: [],
+  interpretations: [],
+  caveats: [],
+  disclaimer: '仅供测试',
+})
+
 const makeTemplate = (withTrials: boolean, metrics: Record<string, unknown> = { meanRtMs: 350, validTrialCount: 2 }) => ({
   id: 'composite-1',
   name: '量表+反应时综合测评',
@@ -106,8 +184,9 @@ const makeMixedTemplate = () => ({
         id: 'scale-a',
         code: 'S-A',
         name: '量表 A',
-        items: [{ id: 'scale-item-a', itemCode: 'A1', content: '题目 A' }],
-        dimensions: [{ id: 'dimension-a', code: 'A', name: '维度 A' }],
+        instrumentClass: 'CUSTOM_DESCRIPTIVE',
+        instrumentVersion: '2.0.0',
+        definition: makeScaleDefinition('A1', ['A']),
       },
       cognitiveAssignment: null,
     },
@@ -119,8 +198,9 @@ const makeMixedTemplate = () => ({
         id: 'scale-b',
         code: 'S-B',
         name: '量表 B',
-        items: [{ id: 'scale-item-b', itemCode: 'B1', content: '题目 B' }],
-        dimensions: [{ id: 'dimension-b', code: 'B', name: '维度 B' }],
+        instrumentClass: 'CUSTOM_DESCRIPTIVE',
+        instrumentVersion: '2.0.0',
+        definition: makeScaleDefinition('B1', ['B']),
       },
       cognitiveAssignment: null,
     },
@@ -159,12 +239,12 @@ const makeMixedTemplate = () => ({
       {
         compositeItemId: 'item-scale-a',
         answers: [],
-        scores: [{ dimensionId: 'dimension-a', rawScore: 0, normalizedScore: 0 }],
+        result: makeScaleResult({ scaleId: 'scale-a', code: 'S-A', name: '量表 A', itemCode: 'A1', scores: [{ key: 'A', value: 0 }] }),
       },
       {
         compositeItemId: 'item-scale-b',
         answers: [],
-        scores: [{ dimensionId: 'dimension-b', rawScore: null, normalizedScore: null }],
+        result: makeScaleResult({ scaleId: 'scale-b', code: 'S-B', name: '量表 B', itemCode: 'B1', scores: [{ key: 'B', value: null }] }),
       },
     ],
     cognitiveSessions: [
@@ -240,11 +320,12 @@ describe('composite export service', () => {
       A_duration_s: 0,
       S001_scale_id: 'scale-a',
       S001_scale_code: 'S-A',
-      S001_report_definition_version: 'scale-unit-report-v1',
-      S001_D_a: 0,
+      S001_report_definition_version: '2.0.0',
+      S001_SCORE_a: 0,
       S002_scale_id: 'scale-b',
       S002_scale_code: 'S-B',
-      S002_D_b: null,
+      S002_report_definition_version: '2.0.0',
+      S002_SCORE_b: null,
       C003_score: 0,
       C003_quality: 'insufficient',
       C003_profile: 'standard',
@@ -298,8 +379,9 @@ describe('composite export service', () => {
     expect(data.fields.some((field) => field.name.includes('t001'))).toBe(false)
     expect(data.trialCount).toBe(0)
     expect(query.include.attempts.include.cognitiveSessions.include).not.toHaveProperty('trials')
-    expect(query.include.items.include.scale.include).not.toHaveProperty('items')
-    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: false, scores: true })
+    expect(query.include.items.include.scale.select).toHaveProperty('definition')
+    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: false, result: true })
+    expect(query.include.attempts.include.scaleAssessments.select).not.toHaveProperty('scores')
   })
 
   it('omits the product-index score column for a frozen BART report', async () => {
@@ -359,8 +441,9 @@ describe('composite export service', () => {
     expect(csv).toContain('"[1,2,3]"')
     expect(csv).toContain('"[""left"",""right""]"')
     expect(query.include.attempts.include.cognitiveSessions.include).toHaveProperty('trials')
-    expect(query.include.items.include.scale.include).toHaveProperty('items')
-    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: true, scores: true })
+    expect(query.include.items.include.scale.select).toHaveProperty('definition')
+    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: true, result: true })
+    expect(query.include.attempts.include.scaleAssessments.select).not.toHaveProperty('scores')
   })
 
   it('keeps normalized dynamic keys distinct', async () => {
@@ -427,14 +510,14 @@ describe('composite export service', () => {
 
   it('keeps dimension values distinct when scale dimension codes normalize to one name', async () => {
     const template: any = makeMixedTemplate()
-    template.items[0].scale.dimensions = [
-      { id: 'dimension-a', code: 'a-b', name: '维度 a-b' },
-      { id: 'dimension-b', code: 'a_b', name: '维度 a_b' },
-    ]
-    template.attempts[0].scaleAssessments[0].scores = [
-      { dimensionId: 'dimension-a', rawScore: 13, normalizedScore: 13 },
-      { dimensionId: 'dimension-b', rawScore: 29, normalizedScore: 29 },
-    ]
+    template.items[0].scale.definition = makeScaleDefinition('A1', ['a-b', 'a_b'])
+    template.attempts[0].scaleAssessments[0].result = makeScaleResult({
+      scaleId: 'scale-a',
+      code: 'S-A',
+      name: '量表 A',
+      itemCode: 'A1',
+      scores: [{ key: 'a-b', value: 13 }, { key: 'a_b', value: 29 }],
+    })
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
 
     const data = await compositeExportService.getExportData('composite-mixed', { detail: 'summary' })

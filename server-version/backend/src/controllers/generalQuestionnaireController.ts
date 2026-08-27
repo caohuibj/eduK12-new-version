@@ -71,6 +71,7 @@ export const generalQuestionnaireController = {
                   code: true,
                   name: true,
                   status: true,
+                  definition: true,
                 },
               },
             },
@@ -93,14 +94,11 @@ export const generalQuestionnaireController = {
       // 计算每个问卷的总题数（表单题目 + 量表题目）
       const questionnairesWithStats = await Promise.all(
         questionnaires.map(async (qn) => {
-          const scaleIds = qn.questionnaireScales.map((qs) => qs.scaleId)
-          
-          // 量表题目数量
-          const scaleItemCount = await prisma.scaleItem.count({
-            where: {
-              scaleId: { in: scaleIds },
-            },
-          })
+          // ScaleDefinitionV2 是量表题目数量的唯一来源。
+          const scaleItemCount = qn.questionnaireScales.reduce((sum, qs) => {
+            const definition = qs.scale.definition as any
+            return sum + (Array.isArray(definition?.items) ? definition.items.length : 0)
+          }, 0)
           
           // 表单题目数量
           const formItemCount = await prisma.questionnaireFormItem.count({
@@ -423,13 +421,14 @@ export const generalQuestionnaireController = {
         where: { questionnaireId: id },
         include: {
           scale: {
-            include: {
-              _count: {
-                select: {
-                  items: true,
-                  dimensions: true,
-                },
-              },
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              status: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
         },
@@ -591,13 +590,14 @@ export const generalQuestionnaireController = {
           questionnaireScales: {
             include: {
               scale: {
-                include: {
-                  _count: {
-                    select: {
-                      items: true,
-                      dimensions: true,
-                    },
-                  },
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
                 },
               },
             },

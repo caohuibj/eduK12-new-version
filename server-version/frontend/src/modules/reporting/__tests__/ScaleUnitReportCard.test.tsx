@@ -11,22 +11,47 @@ describe('ScaleUnitReportCard PR6A null/zero and caveat contract', () => {
       scaleId: 'scale-1',
       scaleCode: 'S-1',
       scaleName: '学习投入',
-      dimensionScores: [],
-      feedback: {
-        overall: '单项反馈',
-        dimensions: [
-          { dimensionId: 'd-zero', dimensionCode: 'zero', dimensionName: '零分维度', score: 0, minScore: 0, maxScore: 10, level: 'low', interpretation: '', suggestions: [] },
-          { dimensionId: 'd-null', dimensionCode: 'missing', dimensionName: '缺失维度', score: null, minScore: 0, maxScore: 10, level: null, interpretation: '', suggestions: [] },
+      result: {
+        schemaVersion: 2,
+        instrument: { scaleId: 'scale-1', code: 'S-1', name: '学习投入', instrumentVersion: '2.0.0' },
+        method: {
+          scaleId: 'scale-1',
+          instrumentVersion: '2.0.0',
+          scoringVersion: '2.0.0',
+          reportVersion: '2.0.0',
+          definitionHash: 'hash-1',
+          referenceVersions: [],
+        },
+        quality: { status: 'interpretable', flags: [] },
+        itemScores: [],
+        scores: [
+          { key: 'zero', type: 'dimension', label: '零分维度', direction: 'descriptive', canonical: true, displayPrecision: 1, value: 0, range: { min: 0, max: 10 }, expectedItems: ['Q1'], answeredItems: ['Q1'], status: 'calculated', prorated: false },
+          { key: 'missing', type: 'dimension', label: '缺失维度', direction: 'descriptive', canonical: false, displayPrecision: 1, value: null, range: { min: 0, max: 10 }, expectedItems: ['Q2'], answeredItems: [], status: 'not_calculable', prorated: false },
         ],
+        references: [],
+        interpretations: [],
+        caveats: [],
+        disclaimer: '不构成医学诊断。',
       },
+      quality: { status: 'interpretable', flags: [] },
+      scores: [],
+      references: [],
+      interpretations: [],
       caveats: ['量表结果只用于本次作答解读。'],
       disclaimer: '不构成医学诊断。',
       completedAt: null,
       totalTime: 0,
-      method: { scaleId: 'scale-1', scaleCode: 'S-1', reportDefinitionVersion: 'scale-unit-report-v1' },
+      method: {
+        scaleId: 'scale-1',
+        instrumentVersion: '2.0.0',
+        scoringVersion: '2.0.0',
+        reportVersion: '2.0.0',
+        definitionHash: 'hash-1',
+        referenceVersions: [],
+      },
     }} />)
 
-    expect(screen.getByText('0.0分')).toBeTruthy()
+    expect(screen.getAllByText('0.0').length).toBeGreaterThan(0)
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
     expect(screen.getByText('量表结果只用于本次作答解读。')).toBeTruthy()
     expect(screen.getByText('不构成医学诊断。')).toBeTruthy()

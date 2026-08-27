@@ -5,20 +5,52 @@ process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 import { encryptField } from '../../utils/encryption'
 import { buildScaleUnitReport } from '../../modules/reporting/scale-unit-report'
 import { buildQuestionnaireCollectionReport } from '../../modules/reporting/questionnaire-collection-report'
+import type { ScaleResultV2 } from '../../modules/scale/scale-result'
+
+const makeResult = (overrides: Partial<ScaleResultV2> = {}): ScaleResultV2 => ({
+  schemaVersion: 2,
+  instrument: { scaleId: 'scale-1', code: 'S-1', name: '学习投入', instrumentVersion: '2.0.0' },
+  method: {
+    scaleId: 'scale-1',
+    instrumentVersion: '2.0.0',
+    scoringVersion: '2.0.0',
+    reportVersion: '2.0.0',
+    definitionHash: 'h'.repeat(64),
+    referenceVersions: [],
+  },
+  quality: { status: 'interpretable', flags: [] },
+  itemScores: [{ itemCode: 'Q1', responseValue: 'never', baseScore: 1, score: 1 }],
+  scores: [{
+    key: 'engagement',
+    type: 'dimension',
+    label: '投入',
+    direction: 'descriptive',
+    canonical: true,
+    displayPrecision: 1,
+    value: 0,
+    range: { min: 0, max: 20 },
+    expectedItems: ['Q1'],
+    answeredItems: ['Q1'],
+    status: 'calculated',
+    prorated: false,
+  }],
+  references: [],
+  interpretations: [],
+  caveats: ['同一项注意事项'],
+  disclaimer: '同一项免责声明',
+  ...overrides,
+})
 
 describe('Scale unit report contract', () => {
-  it('projects one scale without collection interpretation and preserves zero/null', () => {
+  it('projects one v2 scale result without collection interpretation and preserves zero/null', () => {
+    const result = makeResult()
     const report = buildScaleUnitReport({
       itemId: 'questionnaire-scale-1',
       scaleId: 'scale-1',
       scaleCode: 'S-1',
       scaleName: '学习投入',
-      dimensions: [{ id: 'dimension-1', code: 'engagement', name: '投入', minScore: 0, maxScore: 20 }],
-      scores: [{ dimensionId: 'dimension-1', rawScore: 0, normalizedScore: null, level: 'low', itemCount: 4 }],
-      feedback: {
-        overall: '单项反馈',
-        dimensions: [{ dimensionId: 'dimension-1', score: 0, level: 'low', interpretation: '解释', suggestions: [] }],
-      },
+      result,
+      completedAt: new Date('2026-08-20T01:00:00.000Z'),
       totalTime: 0,
     })
 
@@ -27,49 +59,54 @@ describe('Scale unit report contract', () => {
       kind: 'scale',
       scaleId: 'scale-1',
       totalTime: 0,
-      dimensionScores: [{ rawScore: 0, normalizedScore: null, minScore: 0, maxScore: 20 }],
-      feedback: { dimensions: [{ score: 0, minScore: 0, maxScore: 20 }] },
+      result,
+      scores: [{ key: 'engagement', value: 0, range: { min: 0, max: 20 } }],
+      caveats: ['同一项注意事项'],
+      disclaimer: '同一项免责声明',
     })
     expect(report).not.toHaveProperty('averageScore')
     expect(report).not.toHaveProperty('overallScore')
     expect(report).not.toHaveProperty('overallSummary')
   })
 
-  it('reads historical encrypted scale fields and keeps malformed fields local to the unit', () => {
+  it('decrypts only the frozen v2 result and keeps malformed ciphertext local to the unit', () => {
+    const result = makeResult()
     const report = buildScaleUnitReport({
-      scaleId: 'scale-legacy',
+      scaleId: 'scale-v2',
       scaleName: '历史量表',
-      scores: encryptField([{ dimensionId: 'd1', rawScore: 3, normalizedScore: 0 }]),
-      feedback: encryptField({ dimensions: [{ dimensionId: 'd1', score: 0, suggestions: [] }] }),
+      result: encryptField(result),
     })
-    expect(report.dimensionScores[0]).toMatchObject({ rawScore: 3, normalizedScore: 0 })
-    expect(report.feedback.dimensions[0]).toMatchObject({ score: 0 })
+    expect(report.scores[0]).toMatchObject({ key: 'engagement', value: 0 })
+    expect(report.method?.definitionHash).toBe('h'.repeat(64))
 
     const degraded = buildScaleUnitReport({
       scaleId: 'scale-bad',
       scaleName: '损坏量表',
-      scores: 'not-a-ciphertext',
-      feedback: { dimensions: [] },
+      result: 'not-a-ciphertext',
     })
-    expect(degraded).toMatchObject({ decryptError: true, dimensionScores: [] })
-    expect(degraded).not.toHaveProperty('feedback')
+    expect(degraded).toMatchObject({ decryptError: true, result: null, scores: [] })
   })
 
   it('keeps caveats and disclaimer identical across authenticated/public collection projections', () => {
+    const result = makeResult()
     const qa = {
       questionnaire: {
         name: '问卷',
-        questionnaireScales: [{ id: 'questionnaire-scale-1', scaleId: 'scale-1', position: 0, scale: { id: 'scale-1', code: 'S-1', name: '学习投入', dimensions: [{ id: 'dimension-1', code: 'engagement', name: '投入', minScore: 0, maxScore: 20 }] } }],
+        questionnaireScales: [{
+          id: 'questionnaire-scale-1',
+          scaleId: 'scale-1',
+          position: 0,
+          scale: { id: 'scale-1', code: 'S-1', name: '学习投入' },
+        }],
         formItems: [],
       },
       scaleAssessments: [{
         id: 'assessment-1',
         scaleId: 'scale-1',
-        scores: [{ dimensionId: 'dimension-1', rawScore: 0, normalizedScore: null }],
-        feedback: { overall: '单项反馈', caveats: ['同一项注意事项'], disclaimer: '同一项免责声明', dimensions: [{ dimensionId: 'dimension-1', score: 0, level: 'low', interpretation: '', suggestions: [] }] },
+        result,
         completedAt: new Date('2026-08-20T01:00:00.000Z'),
         totalTime: 0,
-        scale: { id: 'scale-1', code: 'S-1', name: '学习投入', dimensions: [{ id: 'dimension-1', code: 'engagement', name: '投入', minScore: 0, maxScore: 20 }] },
+        scale: { id: 'scale-1', code: 'S-1', name: '学习投入' },
       }],
       formAnswers: [],
     }
@@ -80,9 +117,7 @@ describe('Scale unit report contract', () => {
       scaleId: 'scale-1',
       scaleCode: 'S-1',
       scaleName: '学习投入',
-      scores: qa.scaleAssessments[0].scores,
-      feedback: qa.scaleAssessments[0].feedback,
-      dimensions: qa.questionnaire.questionnaireScales[0].scale.dimensions,
+      result,
       completedAt: qa.scaleAssessments[0].completedAt,
       totalTime: 0,
     })

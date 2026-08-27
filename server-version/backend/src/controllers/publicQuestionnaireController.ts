@@ -15,13 +15,32 @@ import { success, error, notFound, unauthorized } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { powService } from '../services/powService'
 import { logger } from '../utils/logger'
-import { encryptField, safeDecrypt } from '../utils/encryption'
 import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import { getQuestionnaireResumeToken } from '../middleware/publicQuestionnaireAuth'
 import { hashQuestionnaireResumeToken } from '../services/questionnaireResumeTokenService'
+import {
+  buildScaleResultForRecord,
+  encryptScaleAnswers,
+  encryptScaleResult,
+  readScaleAnswers,
+  scaleAssessmentForResponse,
+  scaleDefinitionFromRecord,
+  scaleRunnerFromRecord,
+} from '../modules/scale/scale-workflow.service'
+import { validateScaleAnswer } from '../modules/scale/scale-scoring'
+
+const publicScaleRunner = (scale: any) => {
+  try {
+    const { definition: _definition, ...metadata } = scale
+    return { ...metadata, definition: scaleRunnerFromRecord(scale) }
+  } catch {
+    const { definition: _definition, ...metadata } = scale
+    return { ...metadata, definition: null, definitionError: true }
+  }
+}
 
 export const publicQuestionnaireController = {
   /**
@@ -108,12 +127,15 @@ export const publicQuestionnaireController = {
               scale: {
                 select: {
                   id: true,
+                  code: true,
                   name: true,
+                  description: true,
                   estimatedTime: true,
-                  config: true,
-                  _count: {
-                    select: { items: true },
-                  },
+                  instruction: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
                 },
               },
             },
@@ -245,11 +267,17 @@ export const publicQuestionnaireController = {
                 questionnaireScales: {
                   include: {
                     scale: {
-                      include: {
-                        items: {
-                          orderBy: { sortOrder: 'asc' },
-                        },
-                        dimensions: true,
+                      select: {
+                        id: true,
+                        code: true,
+                        name: true,
+                        description: true,
+                        instruction: true,
+                        estimatedTime: true,
+                        status: true,
+                        instrumentClass: true,
+                        instrumentVersion: true,
+                        definition: true,
                       },
                     },
                   },
@@ -381,9 +409,9 @@ export const publicQuestionnaireController = {
               },
               currentFormItem: null,
               currentScale: {
-                ...currentItem.data.scale,
+                ...publicScaleRunner(currentItem.data.scale),
                 scaleAssessmentId: sa?.id,
-                assessment: sa,
+                assessment: sa ? scaleAssessmentForResponse(sa) : sa,
               },
               contentItems: contentItems.map((item, idx) => ({
                 type: item.type,
@@ -413,11 +441,17 @@ export const publicQuestionnaireController = {
             questionnaireScales: {
               include: {
                 scale: {
-                  include: {
-                    items: {
-                      orderBy: { sortOrder: 'asc' },
-                    },
-                    dimensions: true,
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    description: true,
+                    instruction: true,
+                    estimatedTime: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
                   },
                 },
               },
@@ -456,7 +490,7 @@ export const publicQuestionnaireController = {
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
               progress: 0,
-              answers: [],
+              answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
             })),
           })
@@ -531,7 +565,7 @@ export const publicQuestionnaireController = {
             },
             currentFormItem: null,
             currentScale: firstScale ? {
-              ...firstScale.scale,
+              ...publicScaleRunner(firstScale.scale),
               scaleAssessmentId: firstAssessment?.id,
             } : null,
             contentItems: contentItems.map((item, idx) => ({
@@ -587,10 +621,15 @@ export const publicQuestionnaireController = {
               startedAt: true,
               completedAt: true,
               totalTime: true,
+              answers: true,
               scale: {
                 select: {
                   id: true,
+                  code: true,
                   name: true,
+                  instrumentVersion: true,
+                  instrumentClass: true,
+                  definition: true,
                 },
               },
             },
@@ -729,9 +768,9 @@ export const publicQuestionnaireController = {
         } else {
           const sa = saMap.get(currentItem.data.scaleId)
           responseData.currentScale = {
-            ...currentItem.data.scale,
+            ...publicScaleRunner(currentItem.data.scale),
             scaleAssessmentId: sa?.id,
-            assessment: sa,
+            assessment: sa ? scaleAssessmentForResponse(sa) : sa,
           }
         }
       }
@@ -755,6 +794,7 @@ export const publicQuestionnaireController = {
       const assessment = await prisma.assessment.findUnique({
         where: { id: scaleAssessmentId },
         include: {
+          scale: true,
           questionnaireAssessment: {
             select: { id: true, sessionId: true }
           }
@@ -771,10 +811,8 @@ export const publicQuestionnaireController = {
       }
 
       return success(res, {
-        id: assessment.id,
-        answers: assessment.answers,
-        status: assessment.status,
-        progress: assessment.progress,
+        ...scaleAssessmentForResponse(assessment),
+        scale: publicScaleRunner(assessment.scale),
       })
     } catch (err) {
       logger.error('获取量表测评详情错误', err)
@@ -789,95 +827,84 @@ export const publicQuestionnaireController = {
   async submitAnswer(req: Request, res: Response) {
     try {
       const { sessionId } = req.params
-      const { scaleAssessmentId, itemId, value, responseTime } = req.body
+      const { scaleAssessmentId } = req.body
+      const itemCode = req.body?.itemCode
+      const responseValue = req.body?.responseValue
+      const rawResponseTime = req.body?.responseTimeMs ?? req.body?.responseTime
+      const responseTimeMs = rawResponseTime === undefined ? undefined : Number(rawResponseTime)
 
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: scaleAssessmentId },
           include: {
+            scale: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                instrumentVersion: true,
+                instrumentClass: true,
+                definition: true,
+              },
+            },
             questionnaireAssessment: {
-              select: { id: true, sessionId: true, status: true }
-            }
-          }
+              select: { id: true, sessionId: true, status: true },
+            },
+          },
         })
 
         if (!assessment) return { kind: 'not-found' as const }
-
-        if (!assessment.questionnaireAssessment ||
-            assessment.questionnaireAssessment.sessionId !== sessionId) {
+        if (!assessment.questionnaireAssessment || assessment.questionnaireAssessment.sessionId !== sessionId) {
           return { kind: 'forbidden' as const }
         }
-
-        if (
-          assessment.status === 'COMPLETED' ||
-          assessment.questionnaireAssessment.status === 'COMPLETED'
-        ) {
+        if (assessment.status === 'COMPLETED' || assessment.questionnaireAssessment.status === 'COMPLETED') {
           return { kind: 'completed' as const }
         }
-
-        if (
-          assessment.status !== 'IN_PROGRESS' ||
-          assessment.questionnaireAssessment.status !== 'IN_PROGRESS'
-        ) {
+        if (assessment.status !== 'IN_PROGRESS' || assessment.questionnaireAssessment.status !== 'IN_PROGRESS') {
           return { kind: 'closed' as const }
         }
-
-        const answers = (assessment.answers as any[]) || []
-        const existingIndex = answers.findIndex((a) => a.itemId === itemId)
-        const answerData: any = { itemId, value }
-        if (responseTime !== undefined) answerData.responseTime = responseTime
-
-        if (existingIndex >= 0) {
-          answers[existingIndex] = answerData
-        } else {
-          answers.push(answerData)
+        if (typeof itemCode !== 'string' || (typeof responseValue !== 'string' && typeof responseValue !== 'number')) {
+          return { kind: 'invalid-answer' as const }
         }
 
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const answer = {
+          itemCode,
+          responseValue,
+          ...(responseTimeMs === undefined ? {} : { responseTimeMs }),
+          answeredAt: new Date().toISOString(),
+        }
+        try {
+          validateScaleAnswer(definition, answer)
+        } catch {
+          return { kind: 'invalid-answer' as const }
+        }
+
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const answers = [...stored.answers]
+        const existingIndex = answers.findIndex((candidate) => candidate.itemCode === itemCode)
+        const previous = existingIndex >= 0 ? answers[existingIndex] : undefined
+        const nextAnswer = { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
+        if (existingIndex >= 0) answers[existingIndex] = nextAnswer
+        else answers.push(nextAnswer)
+        const progress = definition.items.length === 0
+          ? 100
+          : Math.round((new Set(answers.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
         const updated = await tx.assessment.updateMany({
-          where: { id: scaleAssessmentId, status: 'IN_PROGRESS' },
-          data: { answers },
+          where: { id: scaleAssessmentId, status: 'IN_PROGRESS', questionnaireAssessmentId: assessment.questionnaireAssessmentId },
+          data: { answers: encryptScaleAnswers(answers), progress },
         })
-
-        // A concurrent scale completion may win after the row was read. Do
-        // not report a successful answer write when the conditional update
-        // did not change an in-progress row.
-        if (updated.count !== 1) {
-          const current = await tx.assessment.findUnique({
-            where: { id: scaleAssessmentId },
-            select: {
-              status: true,
-              questionnaireAssessment: { select: { sessionId: true, status: true } },
-            },
-          })
-
-          if (
-            current?.questionnaireAssessment?.sessionId === sessionId &&
-            (current.status === 'COMPLETED' || current.questionnaireAssessment.status === 'COMPLETED')
-          ) {
-            return { kind: 'completed' as const }
-          }
-          return { kind: 'closed' as const }
-        }
-
+        if (updated.count !== 1) return { kind: 'closed' as const }
         return { kind: 'saved' as const }
       })
 
-      if (result.kind === 'not-found') {
-        return notFound(res, '量表测评不存在')
-      }
-
-      if (result.kind === 'forbidden') {
-        return error(res, '量表测评不属于当前会话', 403)
-      }
-
-      if (result.kind === 'completed') {
-        return error(res, '测评已完成，不能继续修改答案', -1, 409)
-      }
-
-      if (result.kind === 'closed') {
-        return error(res, '测评已关闭，不能继续修改答案', -1, 409)
-      }
-
+      if (result.kind === 'not-found') return notFound(res, '量表测评不存在')
+      if (result.kind === 'forbidden') return error(res, '量表测评不属于当前会话', 403)
+      if (result.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (result.kind === 'invalid-answer') return error(res, '回答值不属于该题目的响应集', -1, 400)
+      if (result.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员', -1, 500)
       return success(res, { saved: true })
     } catch (err) {
       logger.error('提交答案错误', err)
@@ -894,90 +921,42 @@ export const publicQuestionnaireController = {
       const { sessionId } = req.params
       const { scaleAssessmentId } = req.body
 
-      const { cacheService } = await import('../services/cacheService')
-
-      const initialAssessment = await prisma.assessment.findUnique({
-        where: { id: scaleAssessmentId },
-        select: {
-          id: true,
-          scaleId: true,
-          questionnaireAssessmentId: true,
-          questionnaireAssessment: {
-            select: {
-              id: true,
-              sessionId: true,
-            },
-          },
-        },
-      })
-
-      if (!initialAssessment) {
-        return notFound(res, '量表测评不存在')
-      }
-
-      if (!initialAssessment.questionnaireAssessment ||
-          initialAssessment.questionnaireAssessment.sessionId !== sessionId) {
-        return error(res, '量表测评不属于当前会话', 403)
-      }
-
-      const scale = await cacheService.getScaleConfig(initialAssessment.scaleId)
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      const { calculateScores, generateFeedbackWithLevels } = await import('../services/scoringService')
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: scaleAssessmentId },
-          select: {
-            id: true,
-            answers: true,
-            status: true,
-            questionnaireAssessmentId: true,
-            questionnaireAssessment: {
+          include: {
+            scale: {
               select: {
                 id: true,
-                sessionId: true,
-                status: true,
+                code: true,
+                name: true,
+                instrumentVersion: true,
+                instrumentClass: true,
+                definition: true,
               },
+            },
+            questionnaireAssessment: {
+              select: { id: true, sessionId: true, status: true },
             },
           },
         })
 
         if (!assessment) return { kind: 'not-found' as const }
-        if (
-          !assessment.questionnaireAssessment ||
-          assessment.questionnaireAssessment.sessionId !== sessionId
-        ) {
+        if (!assessment.questionnaireAssessment || assessment.questionnaireAssessment.sessionId !== sessionId) {
           return { kind: 'forbidden' as const }
         }
-        if (
-          assessment.status === 'COMPLETED' ||
-          assessment.questionnaireAssessment.status === 'COMPLETED'
-        ) {
+        if (assessment.status === 'COMPLETED' || assessment.questionnaireAssessment.status === 'COMPLETED') {
           return { kind: 'completed' as const }
         }
-
-        if (
-          assessment.status !== 'IN_PROGRESS' ||
-          assessment.questionnaireAssessment.status !== 'IN_PROGRESS'
-        ) {
+        if (assessment.status !== 'IN_PROGRESS' || assessment.questionnaireAssessment.status !== 'IN_PROGRESS') {
           return { kind: 'closed' as const }
         }
 
-        const answers = (assessment.answers as any[]) || []
-        const scores = calculateScores(
-          answers,
-          scale.items,
-          scale.dimensions,
-          scale.config as any,
-        )
-        const feedback = generateFeedbackWithLevels(
-          scores,
-          scale.dimensions,
-          scale.name,
-        )
-
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const scaleResult = await buildScaleResultForRecord({ scale: assessment.scale, answers: stored.answers })
+        const completedAt = new Date()
+        const totalTime = completedAt.getTime() - assessment.startedAt.getTime()
         const updated = await tx.assessment.updateMany({
           where: {
             id: scaleAssessmentId,
@@ -986,43 +965,23 @@ export const publicQuestionnaireController = {
           },
           data: {
             status: 'COMPLETED',
-            completedAt: new Date(),
-            scores: encryptField(scores) as any,
-            feedback: encryptField(feedback) as any,
+            answers: encryptScaleAnswers(stored.answers),
+            result: encryptScaleResult(scaleResult),
+            completedAt,
+            totalTime,
             progress: 100,
           },
         })
-
-        if (updated.count !== 1) {
-          const current = await tx.assessment.findUnique({
-            where: { id: scaleAssessmentId },
-            select: {
-              status: true,
-              questionnaireAssessment: { select: { sessionId: true, status: true } },
-            },
-          })
-
-          if (
-            current?.questionnaireAssessment?.sessionId === sessionId &&
-            (current.status === 'COMPLETED' || current.questionnaireAssessment.status === 'COMPLETED')
-          ) {
-            return { kind: 'completed' as const }
-          }
-          return { kind: 'closed' as const }
-        }
-
-        const progress = await refreshQuestionnaireProgress(
-          tx,
-          assessment.questionnaireAssessmentId!,
-        )
+        if (updated.count !== 1) return { kind: 'closed' as const }
+        const progress = await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId!)
         return { kind: 'completed' as const, progress }
       })
 
       if (result.kind === 'not-found') return notFound(res, '量表测评不存在')
       if (result.kind === 'forbidden') return error(res, '量表测评不属于当前会话', 403)
+      if (result.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员', -1, 500)
       if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
-
-      return success(res, { completed: true })
+      return success(res, { completed: true, progress: result.progress ?? null })
     } catch (err) {
       logger.error('完成量表测评错误', err)
       return error(res, '完成量表测评失败')
@@ -1049,8 +1008,13 @@ export const publicQuestionnaireController = {
                 questionnaireScales: {
                   include: {
                     scale: {
-                      include: {
-                        dimensions: true,
+                      select: {
+                        id: true,
+                        code: true,
+                        name: true,
+                        instrumentClass: true,
+                        instrumentVersion: true,
+                        definition: true,
                       },
                     },
                   },
@@ -1061,15 +1025,13 @@ export const publicQuestionnaireController = {
             scaleAssessments: {
               include: {
                 scale: {
-                  include: {
-                    items: {
-                      include: {
-                        itemDimensions: {
-                          include: { dimension: true },
-                        },
-                      },
-                    },
-                    dimensions: true,
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
                   },
                 },
               },
@@ -1235,12 +1197,36 @@ export const publicQuestionnaireController = {
                 orderBy: { position: 'asc' },
               },
               questionnaireScales: {
-                include: { scale: { include: { dimensions: true } } },
+                include: {
+                  scale: {
+                    select: {
+                      id: true,
+                      code: true,
+                      name: true,
+                      instrumentClass: true,
+                      instrumentVersion: true,
+                      definition: true,
+                    },
+                  },
+                },
                 orderBy: { position: 'asc' },
               },
             },
           },
-          scaleAssessments: { include: { scale: { include: { dimensions: true } } } },
+          scaleAssessments: {
+            include: {
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                },
+              },
+            },
+          },
           formAnswers: true,
         },
       })

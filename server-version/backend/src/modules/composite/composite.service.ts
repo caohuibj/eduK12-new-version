@@ -4,14 +4,23 @@ import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
-import { calculateScores, generateFeedbackWithLevels } from '../../services/scoringService'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
-import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import {
+  buildScaleResultForRecord,
+  encryptScaleAnswers,
+  encryptScaleResult,
+  readScaleAnswers,
+  scaleDefinitionFromRecord,
+  scaleRunnerFromRecord,
+} from '../scale/scale-workflow.service'
+import { validateScaleDefinition } from '../scale/scale-definition'
+import { ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { logger } from '../../utils/logger'
 import { canUseReportPackage, canUseScale } from '../../services/materialGrant'
 import {
@@ -127,9 +136,15 @@ const loadComposite = async (id: string, includeItems = false) => {
               orderBy: { position: 'asc' as const },
               include: {
                 scale: {
-                  include: {
-                    items: { orderBy: { sortOrder: 'asc' as const }, include: { itemDimensions: true } },
-                    dimensions: true,
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    description: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
                   },
                 },
                 cognitiveAssignment: { include: { config: true } },
@@ -272,12 +287,24 @@ export const materializeAnalysisProtocol = async (
   for (const slot of [...input.protocol.scaleSlots].sort((a, b) => a.position - b.position)) {
     const scale = await db.scale.findUnique({
       where: { code: slot.expectedScaleCode },
-      include: { dimensions: true },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        status: true,
+        instrumentClass: true,
+        instrumentVersion: true,
+        definition: true,
+      },
     })
     if (!scale || scale.status !== 'PUBLISHED') {
       throw compositeBadRequest(`协议量表不可用：${slot.label}`)
     }
-    if (!scale.dimensions?.some((dimension: { code: string }) => dimension.code === slot.expectedDimensionCode)) {
+    const validation = validateScaleDefinition(scale.definition, { instrumentClass: scale.instrumentClass })
+    if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+      throw compositeBadRequest(`协议量表 definition 不可用：${slot.label}`)
+    }
+    if (!validation.definition.scoring.scores.some((score) => score.key === slot.expectedDimensionCode)) {
       throw compositeBadRequest(`协议量表维度不可用：${slot.label}`)
     }
     await db.compositeAssessmentItem.create({
@@ -350,6 +377,11 @@ const assertValidItem = async (
     if (!scale) throw compositeNotFound('量表不存在')
     if (!(await canUseScale(userId, role, scale))) throw compositeForbidden('无权限使用此量表')
     if (scale.status !== 'PUBLISHED') throw compositeBadRequest('只能添加已发布量表')
+    if (!scale.definition) throw compositeBadRequest('只能添加已安装 v2 definition 的量表')
+    const definitionValidation = validateScaleDefinition(scale.definition)
+    if (!definitionValidation.definition || definitionValidation.issues.some((issue) => issue.severity === 'error')) {
+      throw compositeBadRequest('量表 definition 不可用')
+    }
     return
   }
 
@@ -735,12 +767,15 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         orderBy: { position: 'asc' },
         include: {
           scale: {
-            include: {
-              items: {
-                orderBy: { sortOrder: 'asc' },
-                include: { itemDimensions: true },
-              },
-              dimensions: true,
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              description: true,
+              status: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
           cognitiveAssignment: { include: { config: true } },
@@ -1534,7 +1569,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           userId,
           status: 'IN_PROGRESS',
           progress: 0,
-          answers: [],
+          answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
         },
@@ -1607,7 +1642,34 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 }
 
 const findPublicToken = async (tokenValue: string) => {
-  const token = await prisma.compositeAssessmentAccessToken.findUnique({ where: { token: tokenValue }, include: { compositeAssessment: { include: { course: { select: { isLibrary: true } }, items: { orderBy: { position: 'asc' }, include: { scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } }, cognitiveAssignment: { include: { config: true } } } } } } } })
+  const token = await prisma.compositeAssessmentAccessToken.findUnique({
+    where: { token: tokenValue },
+    include: {
+      compositeAssessment: {
+        include: {
+          course: { select: { isLibrary: true } },
+          items: {
+            orderBy: { position: 'asc' },
+            include: {
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                },
+              },
+              cognitiveAssignment: { include: { config: true } },
+            },
+          },
+        },
+      },
+    },
+  })
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
@@ -1664,7 +1726,18 @@ const loadAttemptWithChildren = async (attemptId: string) => {
           items: {
             orderBy: { position: 'asc' },
             include: {
-              scale: { include: { items: { orderBy: { sortOrder: 'asc' }, include: { itemDimensions: true } }, dimensions: true } },
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                },
+              },
               cognitiveAssignment: { include: { config: true } },
             },
           },
@@ -1881,7 +1954,27 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     const scale = current.scale
       ? { ...current.scale, name: packageSlotLabels.get(current.position) ?? current.scale.name }
       : current.scale
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, scaleAssessmentId: assessment?.id, scale, answers: decodeJson<any[]>(assessment?.answers) ?? [] }
+    let runnerScale = scale
+    if (scale) {
+      try {
+        const { definition: _definition, ...metadata } = scale
+        runnerScale = { ...metadata, definition: scaleRunnerFromRecord(scale) }
+      } catch {
+        const { definition: _definition, ...metadata } = scale
+        runnerScale = { ...metadata, definition: null, definitionError: true }
+      }
+    }
+    const decodedAnswers = readScaleAnswers(assessment?.answers)
+    currentItem = {
+      id: current.id,
+      type: current.type,
+      position: current.position,
+      required: current.required,
+      scaleAssessmentId: assessment?.id,
+      scale: runnerScale,
+      answers: decodedAnswers.answers,
+      ...(decodedAnswers.decryptError ? { decryptError: true } : {}),
+    }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
     currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session) : null }
@@ -1966,30 +2059,54 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
   return getAttemptState(attempt.id, context)
 }
 
-export const saveScaleAnswer = async (attemptId: string, itemId: string, input: { itemId: string; value: number; responseTime?: number }, context: { userId?: string; recoveryTokenHash?: string }) => {
+export const saveScaleAnswer = async (
+  attemptId: string,
+  itemId: string,
+  input: { itemCode: string; responseValue: string | number; responseTimeMs?: number },
+  context: { userId?: string; recoveryTokenHash?: string },
+) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
   if (attempt.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
   if (item.type !== 'SCALE') throw compositeBadRequest('当前模块不是量表')
   const assessment = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === itemId)
   if (!assessment || assessment.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-  const scaleItem = item.scale.items.find((candidate: any) => candidate.id === input.itemId)
-  if (!scaleItem) throw compositeBadRequest('量表题目不存在')
-  const scaleConfig = item.scale.config as { points?: number } | null
-  const points = Number(scaleConfig?.points ?? 5)
-  if (!Number.isInteger(points) || points < 2 || points > 10 || input.value < 1 || input.value > points) {
-    throw compositeBadRequest('量表答案超出有效范围')
+  let definition
+  try {
+    const scale = item.scale
+    if (!scale?.definition) throw new Error('量表尚未安装 v2 definition')
+    definition = scaleDefinitionFromRecord(scale)
+    validateScaleAnswer(definition, {
+      itemCode: input.itemCode,
+      responseValue: input.responseValue,
+      responseTimeMs: input.responseTimeMs,
+    })
+  } catch (error) {
+    if (error instanceof ScaleAnswerValidationError) throw compositeBadRequest(error.issues[0]?.message || '量表答案无效')
+    throw compositeBadRequest('量表尚未安装有效的 v2 definition')
   }
   await prisma.$transaction(async (tx: Db) => {
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-    const answers = decodeJson<any[]>(locked.answers) ?? []
-    const answer = { itemId: input.itemId, value: input.value, responseTime: input.responseTime }
-    const index = answers.findIndex((candidate) => candidate.itemId === input.itemId)
+    const decoded = readScaleAnswers(locked.answers)
+    if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
+    const answers = decoded.answers
+    const index = answers.findIndex((candidate) => candidate.itemCode === input.itemCode)
+    const answer = {
+      itemCode: input.itemCode,
+      responseValue: input.responseValue,
+      ...(input.responseTimeMs === undefined ? {} : { responseTimeMs: input.responseTimeMs }),
+      answeredAt: new Date().toISOString(),
+      changeCount: index >= 0 ? (answers[index].changeCount ?? 0) + 1 : 0,
+    }
     if (index >= 0) answers[index] = { ...answers[index], ...answer }
     else answers.push(answer)
     await tx.assessment.update({
       where: { id: assessment.id },
-      data: { answers: answers as any, progress: Math.round((answers.length / Math.max(item.scale.items.length, 1)) * 100) },
+      data: {
+        answers: encryptScaleAnswers(answers),
+        result: null,
+        progress: Math.round((answers.length / Math.max(definition.items.length, 1)) * 100),
+      },
     })
   })
   return getAttemptState(attempt.id, context)
@@ -2005,21 +2122,22 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status === 'COMPLETED') return false
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-    const answers = decodeJson<any[]>(locked.answers) ?? []
-    const requiredIds = item.scale.items.filter((candidate: any) => candidate.required).map((candidate: any) => candidate.id)
-    const answered = new Set(answers.map((candidate) => candidate.itemId))
-    if (requiredIds.some((id: string) => !answered.has(id))) throw compositeBadRequest('还有必答题未完成')
-    const scores = calculateScores(answers, item.scale.items, item.scale.dimensions, item.scale.config as any)
-    const feedback = generateFeedbackWithLevels(scores, item.scale.dimensions, item.scale.name)
+    if (!item.scale?.definition) throw compositeBadRequest('量表尚未安装有效的 v2 definition')
+    const decoded = readScaleAnswers(locked.answers)
+    if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
+    const answers = decoded.answers
+    const result = await buildScaleResultForRecord({
+      scale: item.scale,
+      answers,
+    })
     const completedAt = new Date()
     await tx.assessment.update({
       where: { id: assessment.id },
       data: {
         status: 'COMPLETED',
         progress: 100,
-        answers: encryptField(answers) as any,
-        scores: encryptField(scores) as any,
-        feedback: encryptField(feedback) as any,
+        answers: encryptScaleAnswers(answers),
+        result: encryptScaleResult(result),
         completedAt,
         totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
       },
@@ -2051,9 +2169,7 @@ export const buildCompositeReport = (attempt: any) => {
           scaleId: item.scaleId,
           scaleCode: item.scale?.code,
           scaleName: item.scale?.name || '未知量表',
-          scores: result?.scores,
-          feedback: result?.feedback,
-          dimensions: item.scale?.dimensions,
+          result: result?.result,
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
         })
@@ -2073,14 +2189,20 @@ export const buildCompositeReport = (attempt: any) => {
           scaleId: item.scaleId,
           scaleCode: item.scale?.code ?? null,
           scaleName: item.scale?.name || '未知量表',
-          dimensionScores: [],
-          feedback: { overall: '', dimensions: [] },
+          result: null,
+          quality: null,
+          scores: [],
+          references: [],
+          interpretations: [],
           completedAt: null,
           totalTime: null,
           method: {
             scaleId: item.scaleId,
-            scaleCode: item.scale?.code ?? null,
-            reportDefinitionVersion: 'scale-unit-report-v1',
+            instrumentVersion: item.scale?.instrumentVersion ?? '',
+            scoringVersion: '',
+            reportVersion: SCALE_REPORT_DEFINITION_VERSION,
+            definitionHash: '',
+            referenceVersions: [],
           },
           caveats: [],
           disclaimer: SCALE_REPORT_DISCLAIMER,

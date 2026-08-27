@@ -12,24 +12,14 @@ const questionnaireProgressInclude = {
       },
       questionnaireScales: {
         include: {
-          scale: {
-            include: {
-              dimensions: true,
-            },
-          },
+          scale: true,
         },
         orderBy: { position: 'asc' as const },
       },
     },
   },
   scaleAssessments: {
-    include: {
-      scale: {
-        include: {
-          dimensions: true,
-        },
-      },
-    },
+    include: { scale: true },
   },
   formAnswers: true,
 } as const

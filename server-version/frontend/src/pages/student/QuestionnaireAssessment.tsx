@@ -2,22 +2,18 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle, FileText, Layers } from 'lucide-react'
-import { resolveScaleOptions } from '../../utils/scaleLabels'
 
-// Build: 2026-03-29-v3 - 支持表单题目和量表混合流程
+type ResponseValue = string | number
 
-interface ScaleItem {
-  id: string
+interface ScaleRunnerItem {
   itemCode: string
   content: string
   type: string
-  reverse: boolean
-  options: Array<{ value: number; label: string }> | null
-}
-
-interface ScaleLabel {
-  value: number
-  label: string
+  required: boolean
+  sortOrder: number
+  responseSetKey: string
+  randomizeOptions: boolean
+  options: Array<{ value: ResponseValue; label: string }>
 }
 
 interface Scale {
@@ -25,12 +21,12 @@ interface Scale {
   name: string
   instruction: string | null
   estimatedTime: number | null
-  config: {
-    points?: number
-    labels?: ScaleLabel[]
-  } | null
-  items: ScaleItem[]
-  dimensions: any[]
+  definition: {
+    schemaVersion: 2
+    respondentType: string
+    display: { randomizeItems: boolean }
+    items: ScaleRunnerItem[]
+  }
 }
 
 // 表单题目类型
@@ -73,8 +69,9 @@ const QuestionnaireAssessment: React.FC = () => {
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<QuestionnaireAssessmentData | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, number>>({})
+  // 问卷的 currentIndex 表示整体内容位置；量表内部必须使用独立索引。
+  const [scaleIndex, setScaleIndex] = useState(0)
+  const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const [formAnswer, setFormAnswer] = useState<string | string[]>('')
   const [submitting, setSubmitting] = useState(false)
   
@@ -88,7 +85,7 @@ const QuestionnaireAssessment: React.FC = () => {
   // 切换题目时重置计时器
   useEffect(() => {
     itemStartTimeRef.current = Date.now()
-  }, [currentIndex])
+  }, [scaleIndex])
 
   const startAssessment = async () => {
     try {
@@ -144,9 +141,9 @@ const QuestionnaireAssessment: React.FC = () => {
     try {
       const response = await apiClient.get(`/scales/assessments/${assessmentId}`)
       if (response.code === 0 && response.data.answers) {
-        const existingAnswers: Record<string, number> = {}
+        const existingAnswers: Record<string, ResponseValue> = {}
         response.data.answers.forEach((a: any) => {
-          existingAnswers[a.itemId] = a.value
+          existingAnswers[a.itemCode] = a.responseValue
         })
         setAnswers(existingAnswers)
       }
@@ -156,31 +153,31 @@ const QuestionnaireAssessment: React.FC = () => {
   }
 
   // 处理量表题目答案选择
-  const handleSelectAnswer = async (value: number) => {
+  const handleSelectAnswer = async (value: ResponseValue) => {
     if (!data?.currentScale) return
 
-    const items = data.currentScale.items || []
-    const item = items[currentIndex]
+    const items = data.currentScale.definition.items
+    const item = items[scaleIndex]
     if (!item) return
 
     // 计算作答时间（毫秒）
     const responseTime = Date.now() - itemStartTimeRef.current
 
     // 更新本地状态
-    setAnswers({ ...answers, [item.id]: value })
+    setAnswers({ ...answers, [item.itemCode]: value })
 
     // 提交答案（包含作答时间）
     try {
       await apiClient.patch(`/scales/assessments/${data.currentScale.scaleAssessmentId}/answers`, {
-        itemId: item.id,
-        value,
-        responseTime,
+        itemCode: item.itemCode,
+        responseValue: value,
+        responseTimeMs: responseTime,
       })
       
       // 如果不是最后一题，自动跳到下一题
-      if (currentIndex < items.length - 1) {
+      if (scaleIndex < items.length - 1) {
         setTimeout(() => {
-          setCurrentIndex(currentIndex + 1)
+          setScaleIndex((index) => index + 1)
         }, 200)
       }
     } catch (err) {
@@ -189,15 +186,15 @@ const QuestionnaireAssessment: React.FC = () => {
   }
 
   const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1)
+    if (scaleIndex > 0) {
+      setScaleIndex((index) => index - 1)
     }
   }
 
   const handleNext = () => {
-    const items = data?.currentScale?.items || []
-    if (data && currentIndex < items.length - 1) {
-      setCurrentIndex(currentIndex + 1)
+    const items = data?.currentScale?.definition.items || []
+    if (data && scaleIndex < items.length - 1) {
+      setScaleIndex((index) => index + 1)
     }
   }
 
@@ -243,8 +240,8 @@ const QuestionnaireAssessment: React.FC = () => {
   const handleCompleteScale = async () => {
     if (!data?.currentScale) return
 
-    const items = data.currentScale.items || []
-    const unanswered = items.filter((item) => !answers[item.id])
+    const items = data.currentScale.definition.items
+    const unanswered = items.filter((item) => item.required && answers[item.itemCode] === undefined)
     if (unanswered.length > 0) {
       if (!confirm(`还有 ${unanswered.length} 道题目未作答，确定要提交吗？`)) {
         return
@@ -284,7 +281,7 @@ const QuestionnaireAssessment: React.FC = () => {
       } else {
         // 切换到下一项
         setData(statusResponse.data)
-        setCurrentIndex(0)
+        setScaleIndex(0)
         setAnswers({})
         setFormAnswer('')
         
@@ -473,7 +470,7 @@ const QuestionnaireAssessment: React.FC = () => {
 
   // 渲染量表题目
   if (data.currentScale) {
-    const items = data.currentScale.items || []
+    const items = data.currentScale.definition.items
     if (items.length === 0) {
       return (
         <div className="text-center py-12">
@@ -482,8 +479,8 @@ const QuestionnaireAssessment: React.FC = () => {
       )
     }
 
-    const currentItem = items[currentIndex]
-    const selectedValue = answers[currentItem?.id]
+    const currentItem = items[scaleIndex]
+    const selectedValue = currentItem ? answers[currentItem.itemCode] : undefined
     const scaleProgress = Math.round((Object.keys(answers).length / items.length) * 100)
 
     return (
@@ -522,7 +519,7 @@ const QuestionnaireAssessment: React.FC = () => {
         {/* 题目 */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="text-sm text-gray-500 mb-2">
-            第 {currentIndex + 1} 题 / 共 {items.length} 题
+            第 {scaleIndex + 1} 题 / 共 {items.length} 题
           </div>
           <h2 className="text-lg font-medium text-gray-900 mb-6">
             {currentItem?.content}
@@ -530,9 +527,9 @@ const QuestionnaireAssessment: React.FC = () => {
 
           {/* 选项 */}
           <div className="space-y-3">
-            {resolveScaleOptions(data.currentScale.config, currentItem?.options).map((option) => (
+            {(currentItem?.options || []).map((option) => (
               <button
-                key={option.value}
+                key={`${typeof option.value}:${String(option.value)}`}
                 onClick={() => handleSelectAnswer(option.value)}
                 className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                   selectedValue === option.value
@@ -540,7 +537,7 @@ const QuestionnaireAssessment: React.FC = () => {
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
-                <span className="font-medium">{option.value}.</span> {option.label}
+                {option.label}
               </button>
             ))}
           </div>
@@ -550,14 +547,14 @@ const QuestionnaireAssessment: React.FC = () => {
         <div className="flex justify-between">
           <button
             onClick={handlePrevious}
-            disabled={currentIndex === 0}
+            disabled={scaleIndex === 0}
             className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             上一题
           </button>
 
-          {currentIndex === items.length - 1 ? (
+          {scaleIndex === items.length - 1 ? (
             <button
               onClick={handleCompleteScale}
               disabled={submitting}
@@ -583,12 +580,12 @@ const QuestionnaireAssessment: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             {items.map((item, index) => (
               <button
-                key={item.id}
-                onClick={() => setCurrentIndex(index)}
+                key={item.itemCode}
+                onClick={() => setScaleIndex(index)}
                 className={`w-8 h-8 rounded text-sm font-medium ${
-                  currentIndex === index
+                  scaleIndex === index
                     ? 'bg-primary text-white'
-                    : answers[item.id]
+                    : answers[item.itemCode] !== undefined
                     ? 'bg-green-100 text-green-800'
                     : 'bg-gray-100 text-gray-600'
                 }`}

@@ -3,47 +3,16 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ArrowLeft } from 'lucide-react'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
-import type { ScaleUnitReport } from '../../modules/reporting/types'
-
-interface DimensionScore {
-  dimensionId: string
-  dimensionCode: string | null
-  dimensionName: string
-  rawScore: number | null
-  normalizedScore: number | null
-  level: 'high' | 'medium' | 'low' | null
-  itemCount: number | null
-  minScore?: number | null
-  maxScore?: number | null
-}
-
-interface Feedback {
-  overall: string
-  dimensions: Array<{
-    dimensionId: string
-    dimensionCode: string | null
-    dimensionName: string
-    score: number | null
-    minScore: number | null
-    maxScore: number | null
-    level: string | null
-    levelName?: string
-    interpretation: string
-    suggestions: string[]
-  }>
-  feedbackLevel: string
-  caveats?: string[]
-  disclaimer?: string | null
-}
+import type { ScaleResultV2, ScaleUnitReport } from '../../modules/reporting/types'
 
 export interface Assessment {
   id: string
   status: string
-  scores: DimensionScore[]
-  feedback: Feedback
+  result?: ScaleResultV2 | null
+  decryptError?: boolean
   startedAt: string
-  completedAt: string
-  totalTime: number
+  completedAt: string | null
+  totalTime: number | null
   scale: {
     id: string
     code: string | null
@@ -52,51 +21,29 @@ export interface Assessment {
   }
 }
 
-export const toScaleUnitReport = (value: Assessment): ScaleUnitReport => ({
-  itemId: value.id,
-  type: 'SCALE',
-  kind: 'scale',
-  scaleId: value.scale.id,
-  scaleCode: value.scale.code,
-  label: value.scale.name,
-  scaleName: value.scale.name,
-  dimensionScores: value.scores.map((dimension) => ({
-    dimensionId: dimension.dimensionId,
-    dimensionCode: dimension.dimensionCode,
-    dimensionName: dimension.dimensionName,
-    rawScore: dimension.rawScore,
-    normalizedScore: dimension.normalizedScore,
-    level: dimension.level,
-    itemCount: dimension.itemCount,
-    minScore: dimension.minScore ?? null,
-    maxScore: dimension.maxScore ?? null,
-  })),
-  feedback: {
-    overall: value.feedback.overall || '',
-    dimensions: value.feedback.dimensions.map((dimension) => ({
-      dimensionId: dimension.dimensionId,
-      dimensionCode: dimension.dimensionCode,
-      dimensionName: dimension.dimensionName,
-      score: dimension.score,
-      minScore: dimension.minScore,
-      maxScore: dimension.maxScore,
-      level: dimension.level,
-      levelName: dimension.levelName,
-      interpretation: dimension.interpretation || '',
-      suggestions: dimension.suggestions || [],
-    })),
-    feedbackLevel: value.feedback.feedbackLevel,
-  },
-  caveats: value.feedback.caveats ?? [],
-  disclaimer: value.feedback.disclaimer ?? '量表结果仅反映本次作答，不构成医学诊断或人口常模。',
-  completedAt: value.completedAt || null,
-  totalTime: value.totalTime ?? null,
-  method: {
+export const toScaleUnitReport = (value: Assessment): ScaleUnitReport => {
+  const disclaimer = value.result?.disclaimer ?? '量表结果仅反映本次作答，不构成医学诊断或人口常模。'
+  return {
+    itemId: value.id,
+    type: 'SCALE',
+    kind: 'scale',
     scaleId: value.scale.id,
     scaleCode: value.scale.code,
-    reportDefinitionVersion: 'scale-unit-report-v1',
-  },
-})
+    label: value.scale.name,
+    scaleName: value.scale.name,
+    result: value.result ?? null,
+    quality: value.result?.quality ?? null,
+    scores: value.result?.scores ?? [],
+    references: value.result?.references ?? [],
+    interpretations: value.result?.interpretations ?? [],
+    caveats: value.result?.caveats ?? [],
+    disclaimer,
+    completedAt: value.completedAt,
+    totalTime: value.totalTime,
+    method: value.result?.method ?? null,
+    ...(value.decryptError ? { decryptError: true } : {}),
+  }
+}
 
 const ScaleResult: React.FC = () => {
   const { assessmentId } = useParams<{ assessmentId: string }>()
@@ -164,7 +111,7 @@ const ScaleResult: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
-          <span>完成时间: {new Date(assessment.completedAt).toLocaleString('zh-CN')}</span>
+          {assessment.completedAt && <span>完成时间: {new Date(assessment.completedAt).toLocaleString('zh-CN')}</span>}
           {assessment.totalTime != null && <span>用时: {formatTime(assessment.totalTime)}</span>}
         </div>
       </div>

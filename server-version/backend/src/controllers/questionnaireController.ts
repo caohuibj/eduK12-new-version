@@ -4,17 +4,39 @@ import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
-import { safeDecrypt } from '../utils/encryption'
 import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
+
+const questionnaireScaleRunner = (scale: any) => {
+  try {
+    const { definition: _definition, ...metadata } = scale
+    return { ...metadata, definition: scaleRunnerFromRecord(scale) }
+  } catch {
+    const { definition: _definition, ...metadata } = scale
+    return { ...metadata, definition: null, definitionError: true }
+  }
+}
+
+const scaleItemCountForScale = (scale: { definition?: unknown }): number => {
+  const definition = scale.definition as any
+  return Array.isArray(definition?.items) ? definition.items.length : 0
+}
+
+const scaleDimensionCount = (scale: { definition?: unknown }): number => {
+  const definition = scale.definition as any
+  return Array.isArray(definition?.scoring?.scores)
+    ? definition.scoring.scores.filter((score: any) => score.type === 'dimension').length
+    : 0
+}
 
 /**
- * Build the collection-only questionnaire envelope.  The legacy JSON column
- * is accepted as an input for old records, but only its individual scale
- * reports are projected into the current response.
+ * Build the collection-only questionnaire envelope. A stored collection
+ * snapshot may be present, but only v2 scale results are projected into the
+ * current response.
  */
 // ==================== Validation Schemas ====================
 
@@ -98,6 +120,7 @@ export const questionnaireController = {
                   code: true,
                   name: true,
                   status: true,
+                  definition: true,
                 },
               },
             },
@@ -129,14 +152,8 @@ export const questionnaireController = {
       // 计算每个问卷的总题数（表单题目 + 量表题目）
       const questionnairesWithStats = await Promise.all(
         questionnaires.map(async (qn) => {
-          const scaleIds = qn.questionnaireScales.map(qs => qs.scaleId)
-          
-          // 量表题目数量
-          const scaleItemCount = await prisma.scaleItem.count({
-            where: {
-              scaleId: { in: scaleIds },
-            },
-          })
+          // ScaleDefinitionV2 是量表题目数量的唯一来源。
+          const scaleItemCount = qn.questionnaireScales.reduce((sum, qs) => sum + scaleItemCountForScale(qs.scale), 0)
           
           // 表单题目数量
           const formItemCount = await prisma.questionnaireFormItem.count({
@@ -233,13 +250,14 @@ export const questionnaireController = {
           questionnaireScales: {
             include: {
               scale: {
-                include: {
-                  _count: {
-                    select: {
-                      items: true,
-                      dimensions: true,
-                    },
-                  },
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
                 },
               },
             },
@@ -563,13 +581,14 @@ export const questionnaireController = {
         where: { questionnaireId: id },
         include: {
           scale: {
-            include: {
-              _count: {
-                select: {
-                  items: true,
-                  dimensions: true,
-                },
-              },
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              status: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+              definition: true,
             },
           },
         },
@@ -1216,9 +1235,9 @@ export const questionnaireController = {
                 code: true,
                 name: true,
                 status: true,
-                _count: {
-                  select: { items: true },
-                },
+                definition: true,
+                instrumentClass: true,
+                instrumentVersion: true,
               },
             },
           },
@@ -1455,9 +1474,9 @@ export const questionnaireController = {
                 select: {
                   id: true,
                   name: true,
-                  _count: {
-                    select: { items: true },
-                  },
+                definition: true,
+                instrumentClass: true,
+                instrumentVersion: true,
                 },
               },
             },
@@ -1502,16 +1521,16 @@ export const questionnaireController = {
       // 计算总题数（表单题目 + 量表题目）
       const questionnairesWithStatus = questionnaires.map(qn => {
         // 量表题目数量
-        const scaleItemCount = qn.questionnaireScales.reduce(
-          (sum, qs) => sum + (qs.scale._count?.items || 0),
-          0
+        const scaleItemCountValue = qn.questionnaireScales.reduce(
+          (sum, qs) => sum + scaleItemCountForScale(qs.scale),
+          0,
         )
         
         // 表单题目数量
         const formItemCount = qn.formItems ? qn.formItems.length : 0
         
         // 总题目数 = 表单 + 量表
-        const totalItems = formItemCount + scaleItemCount
+        const totalItems = formItemCount + scaleItemCountValue
         
         const assessment = assessmentMap.get(qn.id)
         return {
@@ -1557,11 +1576,14 @@ export const questionnaireController = {
           questionnaireScales: {
             include: {
               scale: {
-                include: {
-                  items: {
-                    orderBy: { sortOrder: 'asc' },
-                  },
-                  dimensions: true,
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  status: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
                 },
               },
             },
@@ -1663,9 +1685,9 @@ export const questionnaireController = {
               },
               currentFormItem: null,
               currentScale: {
-                ...currentItem.data.scale,
+                ...questionnaireScaleRunner(currentItem.data.scale),
                 scaleAssessmentId: sa?.id,
-                assessment: sa,
+              assessment: sa ? scaleAssessmentForResponse(sa) : sa,
               },
               totalItems: contentItems.length,
               contentItems: contentItems.map((item, idx) => ({
@@ -1722,7 +1744,7 @@ export const questionnaireController = {
             userId: userId!,
             status: 'IN_PROGRESS',
             progress: 0,
-            answers: [],
+            answers: encryptScaleAnswers([]),
             questionnaireAssessmentId: created.id,
           })),
         })
@@ -1770,7 +1792,7 @@ export const questionnaireController = {
           },
           currentFormItem: null,
           currentScale: {
-            ...firstItem?.data.scale,
+            ...questionnaireScaleRunner(firstItem?.data.scale),
             scaleAssessmentId: firstScaleAssessment?.id,
           },
           totalItems: contentItems.length,
@@ -1806,12 +1828,15 @@ export const questionnaireController = {
               },
               questionnaireScales: {
                 include: {
-                  scale: {
-                    include: {
-                      items: {
-                        orderBy: { sortOrder: 'asc' },
-                      },
-                      dimensions: true,
+                      scale: {
+                    select: {
+                      id: true,
+                      code: true,
+                      name: true,
+                      status: true,
+                      instrumentClass: true,
+                      instrumentVersion: true,
+                      definition: true,
                     },
                   },
                 },
@@ -1910,9 +1935,11 @@ export const questionnaireController = {
         },
         currentFormItem: currentItem?.type === 'form' ? currentItem.data : null,
         currentScale: currentItem?.type === 'scale' ? {
-          ...currentItem.data.scale,
+          ...questionnaireScaleRunner(currentItem.data.scale),
           scaleAssessmentId: saMap.get(currentItem.data.scaleId)?.id,
-          assessment: saMap.get(currentItem.data.scaleId),
+          assessment: saMap.get(currentItem.data.scaleId)
+            ? scaleAssessmentForResponse(saMap.get(currentItem.data.scaleId))
+            : undefined,
         } : null,
         totalItems: contentItems.length,
         contentItems: contentItems.map((item, idx) => ({
@@ -1954,7 +1981,17 @@ export const questionnaireController = {
                 formItems: { orderBy: { position: 'asc' } },
                 questionnaireScales: {
                   include: {
-                    scale: { include: { dimensions: true } },
+                    scale: {
+                      select: {
+                        id: true,
+                        code: true,
+                        name: true,
+                        status: true,
+                        instrumentClass: true,
+                        instrumentVersion: true,
+                        definition: true,
+                      },
+                    },
                   },
                   orderBy: { position: 'asc' },
                 },
@@ -1963,13 +2000,14 @@ export const questionnaireController = {
             scaleAssessments: {
               include: {
                 scale: {
-                  include: {
-                    items: {
-                      include: {
-                        itemDimensions: { include: { dimension: true } },
-                      },
-                    },
-                    dimensions: true,
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
                   },
                 },
               },
@@ -2047,18 +2085,15 @@ export const questionnaireController = {
               questionnaireScales: {
                 include: {
                   scale: {
-                    include: {
-                      dimensions: {
-                        include: {
-                          itemDimensions: {
-                            include: {
-                              item: true
-                            }
-                          }
-                        }
-                      },
-                      items: true,
-                    }
+                    select: {
+                      id: true,
+                      code: true,
+                      name: true,
+                      status: true,
+                      instrumentClass: true,
+                      instrumentVersion: true,
+                      definition: true,
+                    },
                   }
                 }
               }
@@ -2189,9 +2224,8 @@ export const questionnaireController = {
                 select: {
                   id: true,
                   name: true,
-                  _count: {
-                    select: { items: true, dimensions: true }
-                  }
+                  definition: true,
+                  instrumentVersion: true,
                 }
               }
             },
@@ -2221,10 +2255,10 @@ export const questionnaireController = {
       })
 
       const totalItems = questionnaire.questionnaireScales.reduce(
-        (sum, qs) => sum + (qs.scale._count?.items || 0), 0
+        (sum, qs) => sum + scaleItemCountForScale(qs.scale), 0,
       )
       const totalDimensions = questionnaire.questionnaireScales.reduce(
-        (sum, qs) => sum + (qs.scale._count?.dimensions || 0), 0
+        (sum, qs) => sum + scaleDimensionCount(qs.scale), 0,
       )
 
       return success(res, {
@@ -2238,8 +2272,8 @@ export const questionnaireController = {
         scales: questionnaire.questionnaireScales.map(qs => ({
           id: qs.scale.id,
           name: qs.scale.name,
-          itemCount: qs.scale._count?.items || 0,
-          dimensionCount: qs.scale._count?.dimensions || 0
+          itemCount: scaleItemCountForScale(qs.scale),
+          dimensionCount: scaleDimensionCount(qs.scale),
         }))
       })
     } catch (err) {

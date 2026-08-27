@@ -14,9 +14,16 @@ interface Scale {
   name: string
   description: string | null
   status: 'DRAFT' | 'PUBLISHED' | 'DEPRECATED' | 'ARCHIVED'
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+  instrumentVersion?: string
   estimatedTime: number | null
   instruction: string | null
   tags?: string[]
+  definition?: {
+    schemaVersion?: number
+    items?: unknown[]
+    scoring?: { scores?: Array<{ type?: string }> }
+  } | null
   source?: 'owned' | 'granted' | 'other'
   createdAt: string
   updatedAt: string
@@ -25,16 +32,28 @@ interface Scale {
     username: string
     nickname: string | null
   }
-  course: {
-    id: string
-    title: string
-  } | null
+  courseScales?: Array<{
+    course: {
+      id: string
+      title: string
+    }
+  }>
   _count: {
-    items: number
-    dimensions: number
-    assessments: number
+    assessments?: number
   }
 }
+
+const v2ItemCount = (scale: Scale): number => (
+  scale.definition?.schemaVersion === 2 && Array.isArray(scale.definition.items)
+    ? scale.definition.items.length
+    : 0
+)
+
+const v2DimensionCount = (scale: Scale): number => (
+  scale.definition?.schemaVersion === 2 && Array.isArray(scale.definition.scoring?.scores)
+    ? scale.definition.scoring.scores.filter((score) => score.type === 'dimension').length
+    : 0
+)
 
 const ScaleList: React.FC = () => {
   const navigate = useNavigate()
@@ -324,9 +343,13 @@ const ScaleList: React.FC = () => {
                         )}
                       </div>
                       <div className="text-sm text-gray-500">{scale.code}</div>
-                      {scale.course && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {scale.instrumentClass === 'STANDARD' ? 'STANDARD package · 只读' : '自定义量表 · 描述性结果'}
+                        {scale.instrumentVersion ? ` · v${scale.instrumentVersion}` : ''}
+                      </div>
+                      {scale.courseScales && scale.courseScales.length > 0 && (
                         <div className="text-xs text-blue-600 mt-1">
-                          课程: {scale.course.title}
+                          课程: {scale.courseScales.map((courseScale) => courseScale.course.title).join('、')}
                         </div>
                       )}
                       {scale.tags && scale.tags.length > 0 && (
@@ -345,15 +368,15 @@ const ScaleList: React.FC = () => {
                     <div className="text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <ClipboardList className="w-4 h-4" />
-                        {scale._count.items} 题
+                        {v2ItemCount(scale)} 题
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <FileText className="w-4 h-4" />
-                        {scale._count.dimensions} 维度
+                        {v2DimensionCount(scale)} 维度
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Users className="w-4 h-4" />
-                        {scale._count.assessments} 测评
+                        {scale._count?.assessments ?? 0} 测评
                       </div>
                     </div>
                   </td>
@@ -376,7 +399,7 @@ const ScaleList: React.FC = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Link>
-                          {scale.status === 'DRAFT' && (
+                          {scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' && (
                             <button
                               onClick={() => handlePublish(scale.id)}
                               className="text-green-600 hover:text-green-800"
@@ -394,7 +417,7 @@ const ScaleList: React.FC = () => {
                               <EyeOff className="w-4 h-4" />
                             </button>
                           )}
-                          {scale._count.assessments > 0 && (
+                          {(scale._count?.assessments ?? 0) > 0 && (
                             <button
                               onClick={() => handleOpenExport(scale.id)}
                               className="text-blue-600 hover:text-blue-800"
@@ -403,7 +426,7 @@ const ScaleList: React.FC = () => {
                               <Download className="w-4 h-4" />
                             </button>
                           )}
-                          {scale._count.assessments === 0 && scale.status === 'DRAFT' && (
+                          {(scale._count?.assessments ?? 0) === 0 && scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' && (
                             <button
                               onClick={() => handleDelete(scale.id, scale.name)}
                               className="text-red-600 hover:text-red-800"
@@ -572,7 +595,7 @@ const ScaleList: React.FC = () => {
                   <li><strong>CSV</strong>: 通用数据格式，Excel/SPSS 均可导入</li>
                   <li><strong>SAV</strong>: SPSS 原生格式，直接双击打开</li>
                   <li><strong>CSV+SPS</strong>: CSV 数据 + SPSS 语法文件</li>
-                  <li>字段名已转换为拼音，反向题已自动反转分数</li>
+                  <li>导出读取已冻结的 v2 结果；不会在导出阶段重新计分或套用旧的反向公式</li>
                 </ul>
               </div>
             </div>

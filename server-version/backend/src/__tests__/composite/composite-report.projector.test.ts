@@ -4,6 +4,47 @@ import {
   projectCompositeReport,
 } from '../../modules/composite/composite-report.projector'
 
+const scaleResult = {
+  schemaVersion: 2 as const,
+  instrument: { scaleId: 'scale-definition-1', code: 'S1', name: '量表', instrumentVersion: '2.0.0' },
+  method: {
+    scaleId: 'scale-definition-1',
+    instrumentVersion: '2.0.0',
+    scoringVersion: '2.0.0',
+    reportVersion: '2.0.0',
+    definitionHash: 'h'.repeat(64),
+    referenceVersions: [],
+  },
+  quality: { status: 'interpretable' as const, flags: [] },
+  itemScores: [],
+  scores: [{
+    key: 'D1',
+    type: 'dimension' as const,
+    label: '维度',
+    direction: 'descriptive' as const,
+    canonical: true,
+    displayPrecision: 0,
+    value: 88,
+    range: { min: 0, max: 100 },
+    expectedItems: ['Q1'],
+    answeredItems: ['Q1'],
+    status: 'calculated' as const,
+    prorated: false,
+  }],
+  references: [],
+  interpretations: [{
+    scoreKey: 'D1',
+    headline: '维度结果',
+    label: null,
+    interpretation: '解释文本',
+    guidance: [{ category: 'reflection' as const, text: '建议' }],
+    limitations: [],
+    referenceVersion: null,
+  }],
+  caveats: [],
+  disclaimer: '不作诊断',
+}
+
   const evidence = {
     id: 'evidence-1',
     sourceType: 'cognitive_metric' as const,
@@ -70,23 +111,14 @@ const makeInput = () => {
         type: 'SCALE',
         kind: 'scale',
         scaleId: 'scale-definition-1',
-        scaleCode: 'S1',
-        label: '量表',
-        scaleName: '量表',
-        dimensionScores: [{ dimensionId: 'd1', rawScore: 99, normalizedScore: 88 }],
-        feedback: {
-          overall: '解释文本',
-          dimensions: [{
-            dimensionId: 'd1', dimensionCode: 'D1', dimensionName: '维度', score: 88,
-            minScore: 0, maxScore: 100, level: 'high', interpretation: '解释', suggestions: ['建议'],
-            payloadEncrypted: 'must-not-leak',
-          }],
-        },
+      scaleCode: 'S1',
+      label: '量表',
+      scaleName: '量表',
+        result: scaleResult,
         caveats: [],
         disclaimer: '不作诊断',
         completedAt: new Date('2026-08-25T00:30:00Z'),
         totalTime: 60,
-        method: { reportDefinitionVersion: 'internal-version', payloadEncrypted: 'must-not-leak' },
         futureSensitiveField: 'must-not-leak',
       }],
       payloadEncrypted: 'must-not-leak',
@@ -164,12 +196,12 @@ describe('PR9 composite report projector', () => {
     ].sort())
     expect(Object.keys(participant.unitReports[1]).sort()).toEqual([
       'caveats', 'completedAt', 'disclaimer', 'itemId', 'kind', 'label',
-      'scaleCode', 'scaleName', 'totalTime', 'type',
+      'interpretations', 'method', 'quality', 'references', 'scaleCode', 'scaleId',
+      'scaleName', 'scores', 'totalTime', 'type',
     ].sort())
-    expect(participant.unitReports[1]).not.toHaveProperty('dimensionScores')
-    expect(participant.unitReports[1]).not.toHaveProperty('feedback')
-    expect(participant.unitReports[1]).not.toHaveProperty('method')
-    expect(JSON.stringify(participant.unitReports[1])).not.toMatch(/rawScore|normalizedScore|"score"/)
+    expect(participant.unitReports[1]).toMatchObject({ scores: [{ key: 'D1', value: 88 }], method: scaleResult.method })
+    expect(participant.unitReports[1]).not.toHaveProperty('result')
+    expect(JSON.stringify(participant.unitReports[1])).not.toMatch(/rawScore|normalizedScore/)
     expect(JSON.stringify(participant.unitReports[1])).not.toContain('payloadEncrypted')
 
     const teacher = projectCompositeReport({ ...input, audience: 'teacher' })
@@ -190,9 +222,8 @@ describe('PR9 composite report projector', () => {
     expect(Object.keys(teacher.packageReport.sourceSummary[0]).sort()).toEqual([
       'directionClass', 'facet', 'interpretable', 'qualityFlags', 'role', 'slotKey', 'sourceType', 'taskType',
     ].sort())
-    expect(teacher.unitReports[1]).not.toHaveProperty('dimensionScores')
-    expect(teacher.unitReports[1]).not.toHaveProperty('feedback')
-    expect(teacher.unitReports[1]).not.toHaveProperty('method')
+    expect(teacher.unitReports[1]).toMatchObject({ scores: [{ key: 'D1', value: 88 }], method: scaleResult.method })
+    expect(teacher.unitReports[1]).not.toHaveProperty('result')
 
     const researcher = projectCompositeReport({ ...input, audience: 'researcher' })
     expect(researcher.packageReport).toMatchObject({
@@ -219,8 +250,9 @@ describe('PR9 composite report projector', () => {
     ].sort())
     expect(researcher.unitReports[0]).toMatchObject({ score: 88, metrics: { blockSlopeRt: 12 }, sessionId: 'session-1' })
     expect(researcher.unitReports[1]).toMatchObject({
-      dimensionScores: [{ rawScore: 99 }],
-      method: { reportDefinitionVersion: 'internal-version' },
+      result: scaleResult,
+      scores: [{ key: 'D1', value: 88 }],
+      method: scaleResult.method,
     })
     expect(Object.keys(researcher.unitReports[0]).sort()).toEqual([
       'finishedAt', 'itemId', 'kind', 'label', 'metrics', 'qualityFlags', 'reference',
@@ -241,9 +273,9 @@ describe('PR9 composite report projector', () => {
       const collection = projectCompositeCollectionReport(input.report, audience)
       expect(collection).not.toHaveProperty('packageReport')
       expect(collection.unitReports[1]).toMatchObject({
-        dimensionScores: [{ rawScore: 99, normalizedScore: 88 }],
-        feedback: { overall: '解释文本', dimensions: [{ score: 88 }] },
-        method: { reportDefinitionVersion: 'internal-version' },
+        scores: [{ key: 'D1', value: 88 }],
+        interpretations: [{ scoreKey: 'D1', interpretation: '解释文本' }],
+        method: scaleResult.method,
       })
       expect(JSON.stringify(collection.unitReports[1])).not.toContain('payloadEncrypted')
     }

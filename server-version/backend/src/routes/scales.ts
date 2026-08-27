@@ -20,22 +20,24 @@ router.get('/assessments/my', authenticate, scaleController.listMyAssessments)
 // 获取量表标签列表（必须在 /:id 之前）
 router.get('/tags', authenticate, scaleController.getTags)
 
-// 获取量表详情（所有登录用户可访问）
-router.get('/:id', authenticate, scaleController.detail)
-
 // ==================== 测评流程（学生） ====================
 
-// 开始测评
-router.post('/:scaleId/assessments', authenticate, scaleController.startAssessment)
+// 开始测评：Scale Assessment v2 是唯一运行入口。
+router.post('/:scaleId/assessments', authenticate, scaleController.startAssessmentV2)
 
 // 提交答案
-router.patch('/assessments/:assessmentId/answers', authenticate, scaleController.submitAnswer)
+router.patch('/assessments/:assessmentId/answers', authenticate, scaleController.submitAnswerV2)
 
 // 完成测评
-router.post('/assessments/:assessmentId/complete', authenticate, scaleController.completeAssessment)
+router.post('/assessments/:assessmentId/complete', authenticate, scaleController.completeAssessmentV2)
 
 // 获取测评结果
-router.get('/assessments/:assessmentId', authenticate, scaleController.getAssessment)
+router.get('/assessments/:assessmentId', authenticate, scaleController.getAssessmentV2)
+
+// 获取量表详情（所有登录用户可访问）
+// Keep this after the two-segment assessment routes so /assessments/:id
+// cannot be captured as a scale id.
+router.get('/:id', authenticate, scaleController.detail)
 
 // ==================== 管理端接口（教师和管理员） ====================
 
@@ -48,11 +50,16 @@ router.post('/', authenticate, requireTeacher, scaleController.create)
 // 更新量表
 router.put('/:id', authenticate, requireTeacher, scaleController.update)
 
+// v2 聚合 definition 管理
+router.put('/:id/definition', authenticate, requireTeacher, scaleController.updateDefinition)
+router.post('/:id/validate', authenticate, requireTeacher, scaleController.validateDefinition)
+router.post('/:id/preview', authenticate, requireTeacher, scaleController.previewDefinition)
+
 // 删除量表
 router.delete('/:id', authenticate, requireTeacher, scaleController.delete)
 
-// 发布量表
-router.post('/:id/publish', authenticate, requireTeacher, scaleController.publish)
+// 发布量表：重新执行 v2 release gate。
+router.post('/:id/publish', authenticate, requireTeacher, scaleController.publishV2)
 
 // 废弃量表
 router.post('/:id/deprecate', authenticate, requireTeacher, scaleController.deprecate)
@@ -62,43 +69,6 @@ router.post('/:id/archive', authenticate, requireTeacher, scaleController.archiv
 
 // 获取量表的所有测评记录
 router.get('/:scaleId/assessments', authenticate, requireTeacher, scaleController.listScaleAssessments)
-
-// ==================== 维度管理 ====================
-
-// 获取维度列表
-router.get('/:scaleId/dimensions', authenticate, requireTeacher, scaleController.listDimensions)
-
-// 创建维度
-router.post('/:scaleId/dimensions', authenticate, requireTeacher, scaleController.createDimension)
-
-// 更新维度
-router.put('/:scaleId/dimensions/:dimensionId', authenticate, requireTeacher, scaleController.updateDimension)
-
-// 删除维度
-router.delete('/:scaleId/dimensions/:dimensionId', authenticate, requireTeacher, scaleController.deleteDimension)
-
-// 获取维度反馈配置
-router.get('/:scaleId/dimensions/:dimensionId/feedback', authenticate, requireTeacher, scaleController.getDimensionFeedback)
-
-// 更新维度反馈配置
-router.put('/:scaleId/dimensions/:dimensionId/feedback', authenticate, requireTeacher, scaleController.updateDimensionFeedback)
-
-// ==================== 题目管理 ====================
-
-// 获取题目列表
-router.get('/:scaleId/items', authenticate, requireTeacher, scaleController.listItems)
-
-// 创建题目
-router.post('/:scaleId/items', authenticate, requireTeacher, scaleController.createItem)
-
-// 更新题目
-router.put('/:scaleId/items/:itemId', authenticate, requireTeacher, scaleController.updateItem)
-
-// 删除题目
-router.delete('/:scaleId/items/:itemId', authenticate, requireTeacher, scaleController.deleteItem)
-
-// 批量排序题目
-router.post('/:scaleId/items/reorder', authenticate, requireTeacher, scaleController.reorderItems)
 
 // ==================== 课程关联管理 ====================
 

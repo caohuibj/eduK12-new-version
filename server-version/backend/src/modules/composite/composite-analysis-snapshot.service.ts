@@ -101,7 +101,7 @@ export interface PackageAnalysisAttemptInput {
     compositeItemId?: string | null
     scaleId: string
     status: string
-    scores?: unknown
+    result?: unknown
     attemptNo?: number
     completedAt?: Date | string | null
     startedAt?: Date | string | null
@@ -636,22 +636,21 @@ const readScaleDimensionScore = (
   dimensionCode: string,
   slotKey: string,
 ): number => {
-  const decoded = typeof assessment.scores === 'string'
-    ? safeDecrypt<unknown[]>(assessment.scores)
-    : assessment.scores
-  if (!Array.isArray(decoded)) {
-    throw new Error(`报告包槽位量表 scores 格式无效：${slotKey}`)
+  const decodedResult: Record<string, any> | null = typeof assessment.result === 'string'
+    ? safeDecrypt<Record<string, any>>(assessment.result)
+    : assessment.result && typeof assessment.result === 'object' && !Array.isArray(assessment.result)
+      ? assessment.result as Record<string, any>
+      : null
+  if (decodedResult && typeof decodedResult === 'object' && decodedResult.schemaVersion === 2) {
+    const score = Array.isArray(decodedResult.scores)
+      ? decodedResult.scores.find((candidate: any) => candidate?.key === dimensionCode)
+      : undefined
+    if (!score || typeof score.value !== 'number' || !Number.isFinite(score.value)) {
+      throw new Error(`报告包槽位量表 score 不可用：${slotKey}/${dimensionCode}`)
+    }
+    return score.value
   }
-  const dimension = decoded.find((candidate) =>
-    isRecord(candidate) && candidate.dimensionCode === dimensionCode)
-  if (!isRecord(dimension)) {
-    throw new Error(`报告包槽位量表维度缺失：${slotKey}/${dimensionCode}`)
-  }
-  const rawScore = dimension.rawScore ?? dimension.score
-  if (typeof rawScore !== 'number' || !Number.isFinite(rawScore)) {
-    throw new Error(`报告包槽位量表维度分数无效：${slotKey}/${dimensionCode}`)
-  }
-  return rawScore
+  throw new Error(`报告包槽位量表 ScaleResultV2 格式无效：${slotKey}`)
 }
 
 const buildFrozenModuleResults = (

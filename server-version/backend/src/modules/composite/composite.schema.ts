@@ -120,9 +120,9 @@ export const compositeExportRequestSchema = z.object({
 }).strict()
 
 export const compositeScaleAnswerSchema = z.object({
-  itemId: z.string().min(1),
-  value: z.number().int().finite(),
-  responseTime: z.number().int().nonnegative().optional(),
+  itemCode: z.string().min(1),
+  responseValue: z.union([z.string(), z.number().finite()]),
+  responseTimeMs: z.number().finite().nonnegative().optional(),
 }).strict()
 
 export const compositeFormAnswerSchema = z.object({

@@ -1,1651 +1,285 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, CheckCircle, Eye, Plus, Save, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
-import { Save, Plus, Trash2, ChevronLeft, GripVertical } from 'lucide-react'
-import TagInput from '../components/TagInput'
-import { completeScaleLabels } from '../utils/scaleLabels'
 
-interface Dimension {
-  id: string
-  code: string
-  name: string
-  description: string | null
-  scoringMethod: string
-  weight: number
-  minScore: number | null
-  maxScore: number | null
-  _count?: {
-    itemDimensions: number
-  }
-  levelFeedback?: LevelFeedback
-}
+type ResponseValue = string | number
+type Direction = 'higher_is_better' | 'higher_is_worse' | 'higher_is_more' | 'lower_is_better' | 'bipolar' | 'descriptive'
+type Aggregation = 'sum' | 'mean'
 
-// 等级反馈配置
-interface LevelConfig {
-  name: string
-  min: number
-  max: number
-  interpretation: string
-  suggestions: string[]
-}
-
-interface LevelFeedback {
-  levels: LevelConfig[]
-}
-
-interface ScaleItem {
-  id: string
-  itemCode: string
-  content: string
-  type: string
-  reverse: boolean
-  required: boolean
-  weight: number
-  sortOrder: number
-  options: Array<{ value: number; label: string }> | null
-  itemDimensions: Array<{
-    dimensionId: string
-    weight: number
-    reverse: boolean
-    dimension: {
-      id: string
-      code: string
-      name: string
-    }
-  }>
-}
-
-interface ScaleLabel {
-  value: number
+interface ResponseOption {
+  value: ResponseValue
   label: string
+  score: number
 }
 
-// 默认选项模板
-const DEFAULT_LABELS: Record<number, ScaleLabel[]> = {
-  2: [
-    { value: 1, label: '否' },
-    { value: 2, label: '是' },
-  ],
-  3: [
-    { value: 1, label: '不同意' },
-    { value: 2, label: '一般' },
-    { value: 3, label: '同意' },
-  ],
-  4: [
-    { value: 1, label: '非常不同意' },
-    { value: 2, label: '不同意' },
-    { value: 3, label: '同意' },
-    { value: 4, label: '非常同意' },
-  ],
-  5: [
-    { value: 1, label: '非常不同意' },
-    { value: 2, label: '不同意' },
-    { value: 3, label: '一般' },
-    { value: 4, label: '同意' },
-    { value: 5, label: '非常同意' },
-  ],
-  6: [
-    { value: 1, label: '完全不同意' },
-    { value: 2, label: '不同意' },
-    { value: 3, label: '稍微不同意' },
-    { value: 4, label: '稍微同意' },
-    { value: 5, label: '同意' },
-    { value: 6, label: '完全同意' },
-  ],
-  7: [
-    { value: 1, label: '完全不同意' },
-    { value: 2, label: '不同意' },
-    { value: 3, label: '稍微不同意' },
-    { value: 4, label: '一般' },
-    { value: 5, label: '稍微同意' },
-    { value: 6, label: '同意' },
-    { value: 7, label: '完全同意' },
-  ],
-}
-
-// 生成默认选项
-const generateDefaultLabels = (points: number): ScaleLabel[] => {
-  if (DEFAULT_LABELS[points]) {
-    return DEFAULT_LABELS[points]
+interface ScaleDefinition {
+  schemaVersion: 2
+  respondentType: string
+  source: { title?: string; citation?: string; url?: string; publicationYear?: number }
+  license: { status: 'self_authored' | 'authorized' | 'verified' | 'unknown'; redistribution: 'allowed' | 'restricted' | 'unknown'; note?: string }
+  display: { randomizeItems: boolean }
+  responseSets: Array<{ key: string; options: ResponseOption[] }>
+  items: Array<{ itemCode: string; content: string; type: string; required: boolean; sortOrder: number; responseSetKey: string; randomizeOptions: boolean }>
+  scoring: {
+    scoringVersion: string
+    itemRules: Array<{ itemCode: string; transform: { type: 'identity' | 'reverse' } }>
+    defaultMissingPolicy: { type: 'complete_required' }
+    scores: Array<{
+      key: string
+      type: 'total' | 'dimension'
+      label: string
+      description?: string
+      direction: Direction
+      canonical: boolean
+      displayPrecision: number
+      source: { type: 'items'; items: Array<{ itemCode: string; weight: number }>; aggregation: Aggregation }
+    }>
   }
-  // 8-10 点量表使用自动生成的数字标签
-  return Array.from({ length: points }, (_, i) => ({
-    value: i + 1,
-    label: `选项${i + 1}`,
-  }))
+  report: {
+    reportVersion: string
+    primaryScoreKeys: string[]
+    scoreOrder: string[]
+    interpretations: Array<{ scoreKey: string; headline: string; source: { type: 'score_only' }; summary: string; bands: []; guidance: [] }>
+    limitations: string[]
+    disclaimer: string
+  }
+  referencePolicy: { type: 'none' }
 }
 
-interface Scale {
+interface ScaleMeta {
   id: string
   code: string
   name: string
   description: string | null
   status: string
   visibility: 'HIDDEN' | 'COURSE' | 'PUBLIC'
-  config: {
-    points?: number
-    labels?: ScaleLabel[]
-    randomizeItems?: boolean
-  } | null
+  instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+  instrumentVersion: string
   estimatedTime: number | null
   instruction: string | null
   tags?: string[]
-  courseScales?: Array<{
-    course: {
-      id: string
-      title: string
-    }
-  }>
+}
+
+const emptyDefinition = (): ScaleDefinition => ({
+  schemaVersion: 2,
+  respondentType: 'participant_self_report',
+  source: { title: '教师自建内容' },
+  license: { status: 'self_authored', redistribution: 'allowed' },
+  display: { randomizeItems: false },
+  responseSets: [{ key: 'default', options: [
+    { value: 'option_1', label: '选项 1', score: 1 },
+    { value: 'option_2', label: '选项 2', score: 2 },
+    { value: 'option_3', label: '选项 3', score: 3 },
+    { value: 'option_4', label: '选项 4', score: 4 },
+    { value: 'option_5', label: '选项 5', score: 5 },
+  ] }],
+  items: [],
+  scoring: { scoringVersion: '2.0.0', itemRules: [], defaultMissingPolicy: { type: 'complete_required' }, scores: [] },
+  report: { reportVersion: 'scale-report-v2', primaryScoreKeys: [], scoreOrder: [], interpretations: [], limitations: ['这是自定义描述性量表结果，不提供人口常模或诊断结论。'], disclaimer: '量表结果仅反映本次作答，不构成医学诊断或人口常模。' },
+  referencePolicy: { type: 'none' },
+})
+
+const emptyScale = (): ScaleMeta => ({
+  id: '', code: '', name: '', description: '', status: 'DRAFT', visibility: 'HIDDEN', instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: '2.0.0', estimatedTime: 15, instruction: '', tags: [],
+})
+
+const normalizeDefinition = (raw: any): ScaleDefinition => {
+  const base = emptyDefinition()
+  if (!raw || raw.schemaVersion !== 2) return base
+  return {
+    ...base,
+    ...raw,
+    source: { ...base.source, ...(raw.source || {}) },
+    license: { ...base.license, ...(raw.license || {}) },
+    display: { ...base.display, ...(raw.display || {}) },
+    responseSets: Array.isArray(raw.responseSets) && raw.responseSets.length > 0 ? raw.responseSets : base.responseSets,
+    items: raw.items || [],
+    scoring: {
+      ...base.scoring,
+      ...(raw.scoring || {}),
+      itemRules: raw.scoring?.itemRules || [],
+      scores: raw.scoring?.scores || [],
+      defaultMissingPolicy: { type: 'complete_required' },
+    },
+    report: { ...base.report, ...(raw.report || {}) },
+    referencePolicy: { type: 'none' },
+  }
+}
+
+const scoreSourceFor = (definition: ScaleDefinition, scoreKey: string) => {
+  const score = definition.scoring.scores.find((candidate) => candidate.key === scoreKey)
+  return score?.source.type === 'items' ? score.source.items : []
+}
+
+const updateReportContract = (definition: ScaleDefinition): ScaleDefinition => {
+  const keys = definition.scoring.scores.map((score) => score.key)
+  const interpretations = definition.scoring.scores.map((score) => {
+    const existing = definition.report.interpretations.find((candidate) => candidate.scoreKey === score.key)
+    return existing || { scoreKey: score.key, headline: score.label, source: { type: 'score_only' as const }, summary: `${score.label}为描述性结果，请结合题目内容和实际情境理解。`, bands: [] as [], guidance: [] as [] }
+  })
+  return {
+    ...definition,
+    report: {
+      ...definition.report,
+      primaryScoreKeys: definition.scoring.scores.filter((score) => score.canonical).map((score) => score.key),
+      scoreOrder: keys,
+      interpretations,
+    } as ScaleDefinition['report'],
+  }
 }
 
 const ScaleEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const isNew = id === 'new'
-
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState<'basic' | 'dimensions' | 'items' | 'feedback'>('basic')
+  const [scale, setScale] = useState<ScaleMeta>(emptyScale)
+  const [definition, setDefinition] = useState<ScaleDefinition>(emptyDefinition)
+  const [activeTab, setActiveTab] = useState<'basic' | 'responses' | 'items' | 'scores' | 'report'>('basic')
+  const [issues, setIssues] = useState<Array<{ path: string; message: string; severity?: string }>>([])
+  const [preview, setPreview] = useState<any>(null)
 
-  // 反馈配置状态
-  const [feedbackDimensionId, setFeedbackDimensionId] = useState<string>('')
-  const [levelFeedback, setLevelFeedback] = useState<LevelFeedback>({ levels: [] })
-  const [savingFeedback, setSavingFeedback] = useState(false)
-
-  // 量表基本信息
-  const [scale, setScale] = useState<Scale>({
-    id: '',
-    code: '',
-    name: '',
-    description: '',
-    status: 'DRAFT',
-    visibility: 'HIDDEN',
-    config: {
-      points: 5,
-      labels: DEFAULT_LABELS[5],
-      randomizeItems: false,
-    },
-    estimatedTime: 15,
-    instruction: '',
-    tags: [],
-    courseScales: [],
-  })
-
-  // 可关联的课程列表
-  const [availableCourses, setAvailableCourses] = useState<Array<{ id: string; title: string }>>([])
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([])
-
-  // 维度列表
-  const [dimensions, setDimensions] = useState<Dimension[]>([])
-  const [newDimension, setNewDimension] = useState({
-    code: '',
-    name: '',
-    description: '',
-    scoringMethod: 'sum',
-    minScore: null as number | null,
-    maxScore: null as number | null,
-  })
-  const [editingDimension, setEditingDimension] = useState<Dimension | null>(null)
-  const [showDimensionModal, setShowDimensionModal] = useState(false)
-
-  // 题目列表
-  const [items, setItems] = useState<ScaleItem[]>([])
-  const [editingItem, setEditingItem] = useState<ScaleItem | null>(null)
-  const [showItemModal, setShowItemModal] = useState(false)
-
-  // 批量输入题目
-  const [batchItemsText, setBatchItemsText] = useState('')
-  const [showBatchInput, setShowBatchInput] = useState(false)
+  const standard = scale.instrumentClass === 'STANDARD'
+  const responseSet = definition.responseSets[0]
+  const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
 
   useEffect(() => {
-    if (!isNew && id) {
-      fetchScale()
-      fetchDimensions()
-      fetchItems()
+    if (isNew || !id) return
+    const load = async () => {
+      try {
+        const response = await apiClient.get<any>(`/scales/${id}`)
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '量表加载失败')
+        const value = response.data
+        setScale({
+          id: value.id, code: value.code, name: value.name, description: value.description, status: value.status, visibility: value.visibility,
+          instrumentClass: value.instrumentClass || 'CUSTOM_DESCRIPTIVE', instrumentVersion: value.instrumentVersion || '2.0.0', estimatedTime: value.estimatedTime, instruction: value.instruction, tags: value.tags || [],
+        })
+        setDefinition(normalizeDefinition(value.definition))
+      } catch (error) {
+        setIssues([{ path: 'load', message: (error as { message?: string }).message || '量表加载失败', severity: 'error' }])
+      } finally { setLoading(false) }
     }
-    fetchAvailableCourses()
+    void load()
   }, [id, isNew])
 
-  const fetchAvailableCourses = async () => {
-    try {
-      const response = await apiClient.get<{ list: Array<{ id: string; title: string }> }>('/courses')
-      if (response.code === 0) {
-        setAvailableCourses(response.data.list)
-      }
-    } catch (err) {
-      console.error('获取课程列表失败', err)
-    }
-  }
-
-  const fetchScale = async () => {
-    try {
-      const response = await apiClient.get<Scale>(`/scales/${id}`)
-      if (response.code === 0) {
-        const loaded = response.data
-        const points = loaded.config?.points || 5
-        setScale({
-          ...loaded,
-          config: {
-            ...loaded.config,
-            points,
-            labels: completeScaleLabels(points, loaded.config?.labels),
-          },
-        })
-      }
-    } catch (err) {
-      console.error('获取量表信息失败', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchDimensions = async () => {
-    try {
-      const response = await apiClient.get<{ list: Dimension[] }>(`/scales/${id}/dimensions`)
-      if (response.code === 0) {
-        setDimensions(response.data.list)
-      }
-    } catch (err) {
-      console.error('获取维度列表失败', err)
-    }
-  }
-
-  const fetchItems = async () => {
-    try {
-      const response = await apiClient.get<{ list: ScaleItem[] }>(`/scales/${id}/items`)
-      if (response.code === 0) {
-        setItems(response.data.list)
-      }
-    } catch (err) {
-      console.error('获取题目列表失败', err)
-    }
-  }
-
-  // 课程关联处理
-  const handleAddCourse = async () => {
-    if (!selectedCourses[0] || !scale.id) return
-
-    try {
-      const response = await apiClient.post(`/scales/${scale.id}/courses`, {
-        courseIds: selectedCourses,
-      })
-      if (response.code === 0) {
-        // 刷新量表信息
-        fetchScale()
-        setSelectedCourses([])
-      } else {
-        alert(response.message || '添加关联失败')
-      }
-    } catch (err) {
-      console.error('添加课程关联失败', err)
-      alert('添加关联失败')
-    }
-  }
-
-  const handleRemoveCourse = async (courseId: string) => {
-    if (!scale.id) return
-
-    try {
-      const response = await apiClient.delete(`/scales/${scale.id}/courses/${courseId}`)
-      if (response.code === 0) {
-        // 更新本地状态
-        setScale({
-          ...scale,
-          courseScales: scale.courseScales?.filter((cs) => cs.course.id !== courseId),
-        })
-      } else {
-        alert(response.message || '取消关联失败')
-      }
-    } catch (err) {
-      console.error('取消课程关联失败', err)
-      alert('取消关联失败')
-    }
-  }
-
-  const handleSaveBasic = async () => {
-    if (!scale.code || !scale.name) {
-      alert('量表编码和名称不能为空')
-      return
-    }
-
+  const saveBasic = async () => {
+    if (!scale.code || !scale.name) { setIssues([{ path: 'basic', message: '量表编码和名称不能为空', severity: 'error' }]); return }
     try {
       setSaving(true)
       if (isNew) {
-        const response = await apiClient.post<Scale>('/scales', scale)
-        if (response.code === 0) {
-          navigate(`/scales/${response.data.id}`)
-        } else {
-          alert(response.message)
-        }
-      } else {
-        const response = await apiClient.put<Scale>(`/scales/${id}`, {
-          name: scale.name,
-          description: scale.description,
-          visibility: scale.visibility,
-          estimatedTime: scale.estimatedTime,
-          instruction: scale.instruction,
-          config: {
-            ...scale.config,
-            points: scale.config?.points || 5,
-            labels: completeScaleLabels(scale.config?.points, scale.config?.labels),
-          },
-          tags: scale.tags || [],
-        })
-        if (response.code === 0) {
-          const points = response.data.config?.points || 5
-          setScale({
-            ...response.data,
-            config: {
-              ...response.data.config,
-              points,
-              labels: completeScaleLabels(points, response.data.config?.labels),
-            },
-          })
-          alert('保存成功')
-        } else {
-          alert(response.message)
-        }
+        const response = await apiClient.post<any>('/scales', { code: scale.code, name: scale.name, description: scale.description || undefined, visibility: scale.visibility, estimatedTime: scale.estimatedTime || undefined, instruction: scale.instruction || undefined, tags: scale.tags || [] })
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '创建失败')
+        navigate(`/scales/${response.data.id}`)
+        return
       }
-    } catch (err: any) {
-      alert(err.message || '保存失败')
-    } finally {
-      setSaving(false)
-    }
+      const response = await apiClient.put<any>(`/scales/${scale.id}`, { name: scale.name, description: scale.description || undefined, visibility: scale.visibility, estimatedTime: scale.estimatedTime || undefined, instruction: scale.instruction || undefined, tags: scale.tags || [] })
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
+      setScale((current) => ({ ...current, ...response.data }))
+      setIssues([])
+    } catch (error) { setIssues([{ path: 'basic', message: (error as { message?: string }).message || '保存失败', severity: 'error' }]) } finally { setSaving(false) }
   }
 
-  const handleAddDimension = async () => {
-    if (!newDimension.code || !newDimension.name) {
-      alert('维度编码和名称不能为空')
-      return
-    }
-
+  const saveDefinition = async (): Promise<boolean> => {
+    if (!scale.id || standard) return false
     try {
-      const response = await apiClient.post<Dimension>(`/scales/${id}/dimensions`, {
-        code: newDimension.code,
-        name: newDimension.name,
-        description: newDimension.description,
-        scoringMethod: newDimension.scoringMethod,
-        minScore: newDimension.minScore,
-        maxScore: newDimension.maxScore,
-      })
-      if (response.code === 0) {
-        setDimensions([...dimensions, response.data])
-        setNewDimension({ code: '', name: '', description: '', scoringMethod: 'sum', minScore: null, maxScore: null })
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '添加维度失败')
-    }
+      setSaving(true)
+      const next = updateReportContract(definition)
+      const response = await apiClient.put<any>(`/scales/${scale.id}/definition`, { definition: next })
+      if (response.code !== 0) throw new Error(response.message || 'definition 保存失败')
+      setDefinition(normalizeDefinition(response.data.definition || next))
+      setIssues([])
+      return true
+    } catch (error) { setIssues([{ path: 'definition', message: (error as { message?: string }).message || 'definition 保存失败', severity: 'error' }]); return false } finally { setSaving(false) }
   }
 
-  const handleUpdateDimension = async () => {
-    if (!editingDimension) return
-
+  const validate = async () => {
+    if (!scale.id) return
     try {
-      const response = await apiClient.put<Dimension>(
-        `/scales/${id}/dimensions/${editingDimension.id}`,
-        {
-          name: editingDimension.name,
-          description: editingDimension.description,
-          scoringMethod: editingDimension.scoringMethod,
-          minScore: editingDimension.minScore,
-          maxScore: editingDimension.maxScore,
-        }
-      )
-      if (response.code === 0) {
-        setDimensions(dimensions.map(d => d.id === editingDimension.id ? response.data : d))
-        setShowDimensionModal(false)
-        setEditingDimension(null)
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '更新维度失败')
-    }
+      const response = await apiClient.post<any>(`/scales/${scale.id}/validate`, {})
+      if (response.code !== 0) throw new Error(response.message || '校验失败')
+      setIssues(response.data.issues || [])
+      if (response.data.valid) setIssues([{ path: 'definition', message: '发布检查通过，可以发布描述性量表。', severity: 'success' }])
+    } catch (error) { setIssues([{ path: 'validate', message: (error as { message?: string }).message || '校验失败', severity: 'error' }]) }
   }
 
-  const handleDeleteDimension = async (dimensionId: string) => {
-    if (!confirm('确定要删除此维度吗？')) return
-
+  const previewDefinition = async () => {
+    if (!scale.id || sortedItems.length === 0) return
     try {
-      const response = await apiClient.delete(`/scales/${id}/dimensions/${dimensionId}`)
-      if (response.code === 0) {
-        setDimensions(dimensions.filter((d) => d.id !== dimensionId))
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '删除维度失败')
-    }
+      const response = await apiClient.post<any>(`/scales/${scale.id}/preview`, { answers: sortedItems.map((item) => ({ itemCode: item.itemCode, responseValue: responseSet.options[0]?.value })) })
+      if (response.code !== 0) throw new Error(response.message || '预览失败')
+      setPreview(response.data)
+    } catch (error) { setIssues([{ path: 'preview', message: (error as { message?: string }).message || '预览失败', severity: 'error' }]) }
   }
 
-  const handleAddItem = () => {
-    setEditingItem({
-      id: '',
-      itemCode: `Q${items.length + 1}`,
-      content: '',
-      type: 'single',
-      reverse: false,
-      required: true,
-      weight: 1,
-      sortOrder: items.length + 1,
-      options: null, // 选项从量表配置获取，题目不再单独存储
-      itemDimensions: [],
-    })
-    setShowItemModal(true)
-  }
-
-  // 批量添加题目
-  const handleBatchAddItems = async () => {
-    if (!batchItemsText.trim()) {
-      alert('请输入题目内容')
-      return
-    }
-
-    // 按行分割，过滤空行
-    const lines = batchItemsText
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-
-    if (lines.length === 0) {
-      alert('没有有效的题目内容')
-      return
-    }
-
+  const publish = async () => {
+    if (!scale.id || standard) return
+    const saved = await saveDefinition()
+    if (!saved) return
     try {
-      // 批量创建题目
-      let successCount = 0
-      for (let i = 0; i < lines.length; i++) {
-        const payload = {
-          itemCode: `Q${items.length + successCount + 1}`,
-          content: lines[i],
-          type: 'single',
-          reverse: false,
-          required: true,
-          weight: 1,
-          options: null,
-          dimensions: [],
-        }
-
-        const response = await apiClient.post<ScaleItem>(`/scales/${id}/items`, payload)
-        if (response.code === 0) {
-          successCount++
-        }
-      }
-
-      if (successCount > 0) {
-        // 重新获取题目列表
-        fetchItems()
-        setBatchItemsText('')
-        setShowBatchInput(false)
-        alert(`成功添加 ${successCount} 道题目`)
-      }
-    } catch (err: any) {
-      alert(err.message || '批量添加失败')
-    }
+      const response = await apiClient.post<any>(`/scales/${scale.id}/publish`, {})
+      if (response.code !== 0) throw new Error(response.message || '发布失败')
+      setScale((current) => ({ ...current, status: 'PUBLISHED' }))
+      setIssues([{ path: 'publish', message: '量表已发布。', severity: 'success' }])
+    } catch (error) { setIssues([{ path: 'publish', message: (error as { message?: string }).message || '发布失败', severity: 'error' }]) }
   }
 
-  // 更新题目的维度关联
-  const handleToggleItemDimension = async (
-    itemId: string,
-    dimensionId: string,
-    checked: boolean
-  ) => {
-    const item = items.find((i) => i.id === itemId)
-    if (!item) return
+  const updateOption = (index: number, patch: Partial<ResponseOption>) => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.map((option, optionIndex) => optionIndex === index ? { ...option, ...patch } : option) }] }))
+  const addOption = () => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: [...current.responseSets[0].options, { value: `option_${current.responseSets[0].options.length + 1}`, label: `选项 ${current.responseSets[0].options.length + 1}`, score: current.responseSets[0].options.length + 1 }] }] }))
+  const removeOption = (index: number) => setDefinition((current) => current.responseSets[0].options.length <= 2 ? current : ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.filter((_, optionIndex) => optionIndex !== index) }] }))
 
-    let newItemDimensions = [...item.itemDimensions]
-
-    if (checked) {
-      // 添加维度关联
-      const dim = dimensions.find((d) => d.id === dimensionId)
-      if (dim) {
-        newItemDimensions.push({
-          dimensionId,
-          weight: 1,
-          reverse: false,
-          dimension: { id: dim.id, code: dim.code, name: dim.name },
-        })
-      }
-    } else {
-      // 移除维度关联
-      newItemDimensions = newItemDimensions.filter((d) => d.dimensionId !== dimensionId)
+  const addItem = () => setDefinition((current) => {
+    const itemCodes = new Set(current.items.map((item) => item.itemCode))
+    let number = current.items.length + 1
+    while (itemCodes.has(`Q${number}`)) number += 1
+    const itemCode = `Q${number}`
+    return {
+      ...current,
+      items: [...current.items, { itemCode, content: '', type: 'single', required: true, sortOrder: current.items.length + 1, responseSetKey: 'default', randomizeOptions: false }],
+      scoring: { ...current.scoring, itemRules: [...current.scoring.itemRules, { itemCode, transform: { type: 'identity' } }] },
     }
+  })
+  const updateItem = (itemCode: string, patch: Partial<ScaleDefinition['items'][number]>) => setDefinition((current) => ({ ...current, items: current.items.map((item) => item.itemCode === itemCode ? { ...item, ...patch } : item) }))
+  const toggleReverse = (itemCode: string) => setDefinition((current) => ({ ...current, scoring: { ...current.scoring, itemRules: current.scoring.itemRules.map((rule) => rule.itemCode === itemCode ? { ...rule, transform: { type: rule.transform.type === 'reverse' ? 'identity' : 'reverse' } } : rule) } }))
+  const removeItem = (itemCode: string) => setDefinition((current) => ({ ...current, items: current.items.filter((item) => item.itemCode !== itemCode).map((item, index) => ({ ...item, sortOrder: index + 1 })), scoring: { ...current.scoring, itemRules: current.scoring.itemRules.filter((rule) => rule.itemCode !== itemCode), scores: current.scoring.scores.map((score) => ({ ...score, source: { ...score.source, items: score.source.items.filter((item) => item.itemCode !== itemCode) } })) } }))
 
-    try {
-      const response = await apiClient.put<ScaleItem>(`/scales/${id}/items/${itemId}`, {
-        itemCode: item.itemCode,
-        content: item.content,
-        type: item.type,
-        reverse: item.reverse,
-        required: item.required,
-        weight: item.weight,
-        options: item.options,
-        dimensions: newItemDimensions.map((d) => ({
-          dimensionId: d.dimensionId,
-          weight: d.weight,
-          reverse: d.reverse,
-        })),
-      })
+  const addScore = (type: 'total' | 'dimension') => setDefinition((current) => {
+    const scoreKeys = new Set(current.scoring.scores.map((score) => score.key))
+    let index = current.scoring.scores.length + 1
+    while (scoreKeys.has(`${type}_${index}`)) index += 1
+    const key = `${type}_${index}`
+    const items = [...current.items].sort((a, b) => a.sortOrder - b.sortOrder)
+    const score = { key, type, label: type === 'total' ? '总分' : `维度 ${index}`, direction: 'descriptive' as Direction, canonical: current.scoring.scores.length === 0, displayPrecision: 1, source: { type: 'items' as const, items: items.slice(0, 1).map((item) => ({ itemCode: item.itemCode, weight: 1 })), aggregation: 'sum' as Aggregation } }
+    return updateReportContract({ ...current, scoring: { ...current.scoring, scores: [...current.scoring.scores, score] } })
+  })
+  const updateScore = (key: string, patch: Partial<ScaleDefinition['scoring']['scores'][number]>) => setDefinition((current) => updateReportContract({ ...current, scoring: { ...current.scoring, scores: current.scoring.scores.map((score) => score.key === key ? { ...score, ...patch } : score) } }))
+  const toggleScoreItem = (scoreKey: string, itemCode: string) => setDefinition((current) => updateReportContract({ ...current, scoring: { ...current.scoring, scores: current.scoring.scores.map((score) => { if (score.key !== scoreKey) return score; const exists = score.source.items.some((item) => item.itemCode === itemCode); const items = exists ? score.source.items.filter((item) => item.itemCode !== itemCode) : [...score.source.items, { itemCode, weight: 1 }]; return { ...score, source: { ...score.source, items } } }) } }))
+  const removeScore = (key: string) => setDefinition((current) => updateReportContract({ ...current, scoring: { ...current.scoring, scores: current.scoring.scores.filter((score) => score.key !== key) } }))
+  const updateInterpretation = (scoreKey: string, patch: { headline?: string; summary?: string }) => setDefinition((current) => ({ ...current, report: { ...current.report, interpretations: current.report.interpretations.map((entry) => entry.scoreKey === scoreKey ? { ...entry, ...patch } : entry) } }))
 
-      if (response.code === 0) {
-        setItems(items.map((i) => (i.id === itemId ? response.data : i)))
-      }
-    } catch (err: any) {
-      console.error('更新维度关联失败', err)
-    }
-  }
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
 
-  // 切换题目反向计分
-  const handleToggleReverse = async (itemId: string, reverse: boolean) => {
-    const item = items.find((i) => i.id === itemId)
-    if (!item) return
-
-    try {
-      const response = await apiClient.put<ScaleItem>(`/scales/${id}/items/${itemId}`, {
-        itemCode: item.itemCode,
-        content: item.content,
-        type: item.type,
-        reverse: reverse,
-        required: item.required,
-        weight: item.weight,
-        options: item.options,
-        dimensions: item.itemDimensions.map((d) => ({
-          dimensionId: d.dimensionId,
-          weight: d.weight,
-          reverse: d.reverse,
-        })),
-      })
-
-      if (response.code === 0) {
-        setItems(items.map((i) => (i.id === itemId ? response.data : i)))
-      }
-    } catch (err: any) {
-      console.error('更新反向计分失败', err)
-    }
-  }
-
-  const handleSaveItem = async () => {
-    if (!editingItem?.content) {
-      alert('题目内容不能为空')
-      return
-    }
-
-    try {
-      const payload = {
-        itemCode: editingItem.itemCode,
-        content: editingItem.content,
-        type: editingItem.type,
-        reverse: editingItem.reverse,
-        required: editingItem.required,
-        weight: editingItem.weight,
-        options: editingItem.options,
-        dimensions: editingItem.itemDimensions.map((d) => ({
-          dimensionId: d.dimensionId,
-          weight: d.weight,
-          reverse: d.reverse,
-        })),
-      }
-
-      if (editingItem.id) {
-        const response = await apiClient.put<ScaleItem>(
-          `/scales/${id}/items/${editingItem.id}`,
-          payload
-        )
-        if (response.code === 0) {
-          setItems(items.map((i) => (i.id === editingItem.id ? response.data : i)))
-          setShowItemModal(false)
-        } else {
-          alert(response.message)
-        }
-      } else {
-        const response = await apiClient.post<ScaleItem>(`/scales/${id}/items`, payload)
-        if (response.code === 0) {
-          setItems([...items, response.data])
-          setShowItemModal(false)
-        } else {
-          alert(response.message)
-        }
-      }
-    } catch (err: any) {
-      alert(err.message || '保存题目失败')
-    }
-  }
-
-  const handleDeleteItem = async (itemId: string) => {
-    if (!confirm('确定要删除此题目吗？')) return
-
-    try {
-      const response = await apiClient.delete(`/scales/${id}/items/${itemId}`)
-      if (response.code === 0) {
-        setItems(items.filter((i) => i.id !== itemId))
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '删除题目失败')
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    )
-  }
-
+  const tabs: Array<[typeof activeTab, string]> = [['basic', '基本信息'], ['responses', '响应选项'], ['items', '题目'], ['scores', '计分'], ['report', '报告文案']]
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Link to="/scales" className="text-gray-500 hover:text-gray-700">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {isNew ? '创建量表' : '编辑量表'}
-          </h1>
-          <span
-            className={`px-2 py-1 text-xs rounded-full ${
-              scale.status === 'PUBLISHED'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
-          >
-            {scale.status === 'PUBLISHED' ? '已发布' : '草稿'}
-          </span>
-        </div>
-        {activeTab === 'basic' && (
-          <button
-            onClick={handleSaveBasic}
-            disabled={saving}
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? '保存中...' : '保存'}
-          </button>
-        )}
-      </div>
+    <div className="max-w-5xl mx-auto p-6">
+      <Link to="/scales" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft className="w-4 h-4 mr-1" />返回量表列表</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5"><div><h1 className="text-2xl font-bold text-gray-900">{isNew ? '创建描述性量表' : scale.name || '量表编辑'}</h1><p className="text-sm text-gray-500 mt-1">{standard ? 'STANDARD package · 只读' : '自定义量表 · 描述性结果 · 不提供群体参考'}</p></div><div className="flex gap-2">{!isNew && <button onClick={() => void previewDefinition()} disabled={saving || standard} className="btn-secondary"><Eye className="w-4 h-4 inline mr-1" />计分预览</button>}{!standard && <button onClick={() => void (isNew ? saveBasic() : saveDefinition())} disabled={saving} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存草稿</button>}</div></div>
+      {issues.length > 0 && <div className="mb-5 rounded-lg border p-4 bg-gray-50"><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
+      <div className="flex gap-1 border-b mb-6 overflow-x-auto">{tabs.map(([key, label]) => <button key={key} onClick={() => setActiveTab(key)} className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === key ? 'border-b-2 border-primary text-primary' : 'text-gray-500'}`}>{label}</button>)}</div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="flex gap-8">
-          {[
-            { key: 'basic', label: '基本信息' },
-            { key: 'dimensions', label: '维度管理' },
-            { key: 'items', label: '题目管理' },
-            { key: 'feedback', label: '反馈配置' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              disabled={isNew && tab.key !== 'basic'}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.key
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              } ${(isNew && tab.key !== 'basic') ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
+      {activeTab === 'basic' && <section className="card p-6 space-y-4"><div className="grid md:grid-cols-2 gap-4"><label className="text-sm text-gray-700">量表编码<input disabled={!isNew || standard} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">量表名称<input disabled={standard} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={standard} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select disabled={standard} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option><option value="PUBLIC">公开可用</option></select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={standard} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={standard} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={standard} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={saving || standard} className="btn-primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
-      {/* Basic Info Tab */}
-      {activeTab === 'basic' && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                量表编码 *
-              </label>
-              <input
-                type="text"
-                value={scale.code}
-                onChange={(e) => setScale({ ...scale, code: e.target.value })}
-                disabled={!isNew}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-100"
-                placeholder="如: big-five-personality"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                量表名称 *
-              </label>
-              <input
-                type="text"
-                value={scale.name}
-                onChange={(e) => setScale({ ...scale, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="如: 大五人格量表"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                量表描述
-              </label>
-              <textarea
-                value={scale.description || ''}
-                onChange={(e) => setScale({ ...scale, description: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="简要描述量表的用途和特点"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                预计用时（分钟）
-              </label>
-              <input
-                type="number"
-                value={scale.estimatedTime || ''}
-                onChange={(e) =>
-                  setScale({ ...scale, estimatedTime: parseInt(e.target.value) || null })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                可见性设置 *
-              </label>
-              <select
-                value={scale.visibility}
-                onChange={(e) => setScale({ ...scale, visibility: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              >
-                <option value="HIDDEN">未关联不可见</option>
-                <option value="COURSE">关联课程后可见</option>
-                <option value="PUBLIC">全体可见</option>
-              </select>
-              <p className="mt-1 text-xs text-gray-500">
-                {scale.visibility === 'HIDDEN' && '量表不会对学生显示，需要先关联课程'}
-                {scale.visibility === 'COURSE' && '只有关联课程的学生可以看到'}
-                {scale.visibility === 'PUBLIC' && '所有学生都可以看到此量表'}
-              </p>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                标签
-              </label>
-              <TagInput
-                value={scale.tags || []}
-                onChange={(tags) => setScale({ ...scale, tags })}
-                maxTags={10}
-                maxLength={20}
-                placeholder="输入标签后按回车添加"
-              />
-            </div>
-            {scale.visibility === 'COURSE' && (
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  关联课程
-                </label>
-                <div className="border border-gray-300 rounded-md p-3">
-                  {scale.courseScales && scale.courseScales.length > 0 && (
-                    <div className="mb-2">
-                      <p className="text-xs text-gray-500 mb-1">已关联课程：</p>
-                      <div className="flex flex-wrap gap-2">
-                        {scale.courseScales.map((cs, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                          >
-                            {cs.course.title}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveCourse(cs.course.id)}
-                              className="ml-1 text-blue-600 hover:text-blue-800"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <select
-                      value={selectedCourses[0] || ''}
-                      onChange={(e) => setSelectedCourses([e.target.value])}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="">选择要关联的课程...</option>
-                      {availableCourses
-                        .filter(
-                          (c) =>
-                            !scale.courseScales?.some((cs) => cs.course.id === c.id)
-                        )
-                        .map((course) => (
-                          <option key={course.id} value={course.id}>
-                            {course.title}
-                          </option>
-                        ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={handleAddCourse}
-                      disabled={!selectedCourses[0]}
-                      className="px-3 py-2 bg-gray-600 text-white rounded-md text-sm hover:bg-gray-700 disabled:opacity-50"
-                    >
-                      添加
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                量表点数
-              </label>
-              <input
-                type="number"
-                min={2}
-                max={10}
-                value={scale.config?.points || 5}
-                onChange={(e) => {
-                  const newPoints = Math.min(10, Math.max(2, parseInt(e.target.value) || 5))
-                  setScale({
-                    ...scale,
-                    config: {
-                      ...scale.config,
-                      points: newPoints,
-                      labels: completeScaleLabels(newPoints, scale.config?.labels),
-                    },
-                  })
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                2–10 点。档位必须连续为 1 到 N，不能跳过。改点数会补齐或去掉最高档，已填写的文字会保留。
-              </p>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                档位文字
-              </label>
-              <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
-                <div className="space-y-2">
-                  {completeScaleLabels(scale.config?.points, scale.config?.labels).map((opt, idx) => (
-                    <div key={opt.value} className="flex items-center gap-3">
-                      <span className="w-8 h-8 flex items-center justify-center bg-primary text-white text-sm rounded-full">
-                        {opt.value}
-                      </span>
-                      <input
-                        type="text"
-                        value={opt.label}
-                        onChange={(e) => {
-                          const points = scale.config?.points || 5
-                          const newLabels = completeScaleLabels(points, scale.config?.labels)
-                          newLabels[idx] = { ...opt, label: e.target.value }
-                          setScale({
-                            ...scale,
-                            config: {
-                              ...scale.config,
-                              points,
-                              labels: newLabels,
-                            },
-                          })
-                        }}
-                        className="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                        placeholder={`第 ${opt.value} 档的文字，如「不同意」`}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  每一档学生都能选择。分值固定为 1 到 {scale.config?.points || 5}，只需改文字。
-                </p>
-              </div>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                指导语
-              </label>
-              <textarea
-                value={scale.instruction || ''}
-                onChange={(e) => setScale({ ...scale, instruction: e.target.value })}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="指导用户如何作答..."
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {activeTab === 'responses' && <section className="card p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">共享响应选项</h2><p className="text-sm text-gray-500">学生只看到标签；分值仅由服务端用于权威计分。</p></div><button onClick={addOption} disabled={standard} className="btn-secondary"><Plus className="w-4 h-4 inline mr-1" />增加选项</button></div><div className="space-y-3">{responseSet.options.map((option, index) => <div key={index} className="grid grid-cols-[1fr_1fr_100px_40px] gap-2 items-center"><input disabled={standard} value={String(option.value)} onChange={(event) => updateOption(index, { value: event.target.value })} className="input" placeholder="稳定 value" /><input disabled={standard} value={option.label} onChange={(event) => updateOption(index, { label: event.target.value })} className="input" placeholder="显示标签" /><input disabled={standard} type="number" value={option.score} onChange={(event) => updateOption(index, { score: Number(event.target.value) })} className="input" placeholder="基础分" /><button onClick={() => removeOption(index)} disabled={standard || responseSet.options.length <= 2} className="text-red-500 disabled:text-gray-300"><Trash2 className="w-4 h-4" /></button></div>)}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={saving || standard} className="btn-primary">保存响应集</button></div></section>}
 
-      {/* Dimensions Tab */}
-      {activeTab === 'dimensions' && (
-        <div className="space-y-6">
-          {/* Add Dimension Form */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium mb-4">添加维度</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                value={newDimension.code}
-                onChange={(e) => setNewDimension({ ...newDimension, code: e.target.value })}
-                placeholder="维度编码（如: extraversion）"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              />
-              <input
-                type="text"
-                value={newDimension.name}
-                onChange={(e) => setNewDimension({ ...newDimension, name: e.target.value })}
-                placeholder="维度名称（如: 外向性）"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              />
-              <input
-                type="text"
-                value={newDimension.description || ''}
-                onChange={(e) =>
-                  setNewDimension({ ...newDimension, description: e.target.value })
-                }
-                placeholder="维度描述"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-              />
-              <div className="flex gap-2 items-center">
-                <span className="text-sm text-gray-500">分数区间:</span>
-                <input
-                  type="number"
-                  value={newDimension.minScore ?? ''}
-                  onChange={(e) => setNewDimension({ ...newDimension, minScore: e.target.value ? Number(e.target.value) : null })}
-                  placeholder="最低分"
-                  className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                />
-                <span>-</span>
-                <input
-                  type="number"
-                  value={newDimension.maxScore ?? ''}
-                  onChange={(e) => setNewDimension({ ...newDimension, maxScore: e.target.value ? Number(e.target.value) : null })}
-                  placeholder="最高分"
-                  className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                />
-              </div>
-              <div className="md:col-span-2 flex justify-end">
-                <button
-                  onClick={handleAddDimension}
-                  className="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  添加
-                </button>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              分数区间可选。如不设置，系统将根据题目数量和选项分值自动计算理论分数区间。
-            </p>
-          </div>
+      {activeTab === 'items' && <section className="card p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">题目</h2><p className="text-sm text-gray-500">每题使用稳定 itemCode；本编辑器强制完整作答。</p></div><button onClick={addItem} disabled={standard} className="btn-secondary"><Plus className="w-4 h-4 inline mr-1" />增加题目</button></div><div className="space-y-3">{sortedItems.map((item) => { const rule = definition.scoring.itemRules.find((candidate) => candidate.itemCode === item.itemCode); return <div key={item.itemCode} className="border rounded-lg p-3 grid md:grid-cols-[100px_1fr_auto] gap-3 items-start"><input disabled value={item.itemCode} className="input bg-gray-50" title="itemCode 是稳定标识，不能在编辑器中修改" /><textarea disabled={standard} value={item.content} onChange={(event) => updateItem(item.itemCode, { content: event.target.value })} className="input min-h-20" placeholder="题目内容" /><div className="flex md:flex-col gap-2 text-sm"><label><input type="checkbox" checked={rule?.transform.type === 'reverse'} disabled={standard} onChange={() => toggleReverse(item.itemCode)} /> 反向计分</label><label><input type="checkbox" checked={item.required} disabled /> 必答</label><button onClick={() => removeItem(item.itemCode)} disabled={standard} className="text-red-500 text-left"><Trash2 className="w-4 h-4 inline mr-1" />删除</button></div></div> })}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={saving || standard} className="btn-primary">保存题目</button></div></section>}
 
-          {/* Dimensions List */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    编码
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    名称
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    描述
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    分数区间
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    计分方式
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    关联题目数
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                    操作
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {dimensions.map((dim) => (
-                  <tr key={dim.id}>
-                    <td className="px-6 py-4 text-sm text-gray-900">{dim.code}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{dim.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{dim.description || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {dim.minScore !== null && dim.maxScore !== null
-                        ? `${dim.minScore} - ${dim.maxScore}`
-                        : '自动计算'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {dim.scoringMethod === 'sum' ? '求和' : '平均'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {dim._count?.itemDimensions || 0}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingDimension(dim)
-                            setShowDimensionModal(true)
-                          }}
-                          className="text-primary hover:text-primary/80"
-                        >
-                          编辑
-                        </button>
-                        <button
-                          onClick={() => handleDeleteDimension(dim.id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {dimensions.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                      暂无维度，请先添加维度
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {activeTab === 'scores' && <section className="card p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">计分定义</h2><p className="text-sm text-gray-500">仅开放 sum / mean、total / dimension、方向和 canonical；不开放权重、proration、threshold 或 custom scorer。</p></div><div className="flex gap-2"><button onClick={() => addScore('total')} disabled={standard || sortedItems.length === 0} className="btn-secondary">+ 总分</button><button onClick={() => addScore('dimension')} disabled={standard || sortedItems.length === 0} className="btn-secondary">+ 维度</button></div></div><div className="space-y-5">{definition.scoring.scores.map((score) => <article key={score.key} className="border rounded-lg p-4"><div className="grid md:grid-cols-[1fr_1fr_180px_auto] gap-2 items-center"><input disabled={standard} value={score.key} onChange={(event) => updateScore(score.key, { key: event.target.value })} className="input" placeholder="稳定 score key" /><input disabled={standard} value={score.label} onChange={(event) => updateScore(score.key, { label: event.target.value })} className="input" placeholder="显示名称" /><select disabled={standard} value={score.direction} onChange={(event) => updateScore(score.key, { direction: event.target.value as Direction })} className="input"><option value="descriptive">描述性</option><option value="higher_is_more">高分代表更多</option><option value="higher_is_worse">高分代表更多困难</option><option value="higher_is_better">高分更有利</option><option value="lower_is_better">低分更有利</option><option value="bipolar">双向</option></select><button onClick={() => removeScore(score.key)} disabled={standard} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div><div className="flex flex-wrap gap-4 mt-3 text-sm"><label><input type="checkbox" checked={score.canonical} disabled={standard} onChange={(event) => updateScore(score.key, { canonical: event.target.checked })} /> canonical</label><label>聚合<select disabled={standard} value={score.source.aggregation} onChange={(event) => updateScore(score.key, { source: { ...score.source, aggregation: event.target.value as Aggregation } })} className="input ml-1 py-1"><option value="sum">sum</option><option value="mean">mean</option></select></label></div><div className="mt-3 flex flex-wrap gap-2">{sortedItems.map((item) => <button type="button" key={item.itemCode} disabled={standard} onClick={() => toggleScoreItem(score.key, item.itemCode)} className={`px-2 py-1 rounded border text-xs ${scoreSourceFor(definition, score.key).some((candidate) => candidate.itemCode === item.itemCode) ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 text-gray-500'}`}>{item.itemCode}</button>)}</div></article>)}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={saving || standard} className="btn-primary">保存计分定义</button></div></section>}
 
-      {/* Items Tab */}
-      {activeTab === 'items' && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowBatchInput(!showBatchInput)}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                批量添加
-              </button>
-              <button
-                onClick={handleAddItem}
-                className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                单个添加
-              </button>
-            </div>
-          </div>
+      {activeTab === 'report' && <section className="card p-6"><h2 className="font-semibold mb-2">量表专属解释</h2><p className="text-sm text-gray-500 mb-5">自定义量表仅能写描述性解释；页面不会提供 cutoff、正常/异常、常模或百分位配置。</p><div className="space-y-4">{definition.scoring.scores.map((score) => { const entry = definition.report.interpretations.find((candidate) => candidate.scoreKey === score.key); if (!entry) return null; return <article key={score.key} className="border rounded-lg p-4 space-y-2"><h3 className="font-medium">{score.label}</h3><input disabled={standard} value={entry.headline} onChange={(event) => updateInterpretation(score.key, { headline: event.target.value })} className="input w-full" placeholder="标题" /><textarea disabled={standard} value={entry.summary} onChange={(event) => updateInterpretation(score.key, { summary: event.target.value })} className="input w-full min-h-20" placeholder="描述性解释" /></article> })}</div><label className="block text-sm text-gray-700 mt-5">免责声明<textarea disabled={standard} value={definition.report.disclaimer} onChange={(event) => setDefinition((current) => ({ ...current, report: { ...current.report, disclaimer: event.target.value } }))} className="input mt-1 w-full min-h-20" /></label><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={saving || standard} className="btn-primary">保存报告定义</button></div></section>}
 
-          {/* 批量输入区域 */}
-          {showBatchInput && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium mb-4">批量添加题目</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                每行输入一个题目内容，提交后将批量创建题目。创建后可在下方表格中编辑维度和反向计分。
-              </p>
-              <textarea
-                value={batchItemsText}
-                onChange={(e) => setBatchItemsText(e.target.value)}
-                rows={10}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary font-mono text-sm"
-                placeholder="请输入题目内容，每行一个题目，例如：&#10;我经常感到快乐&#10;我容易与他人建立联系&#10;我喜欢尝试新事物&#10;我经常感到焦虑"
-              />
-              <div className="flex justify-end gap-3 mt-4">
-                <button
-                  onClick={() => {
-                    setShowBatchInput(false)
-                    setBatchItemsText('')
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleBatchAddItems}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  批量创建题目
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-12">
-                    #
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    题目内容
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    关联维度
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-24">
-                    反向计分
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                    操作
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {items.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className="px-4 py-4 text-sm text-gray-500">{index + 1}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.content}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        {dimensions.map((dim) => {
-                          const isLinked = item.itemDimensions.some(
-                            (d) => d.dimensionId === dim.id
-                          )
-                          return (
-                            <label
-                              key={dim.id}
-                              className={`inline-flex items-center px-2 py-1 rounded text-xs cursor-pointer transition-colors ${
-                                isLinked
-                                  ? 'bg-primary text-white'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isLinked}
-                                onChange={(e) =>
-                                  handleToggleItemDimension(item.id, dim.id, e.target.checked)
-                                }
-                                className="sr-only"
-                              />
-                              {dim.name}
-                            </label>
-                          )
-                        })}
-                        {dimensions.length === 0 && (
-                          <span className="text-xs text-gray-400">请先添加维度</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={item.reverse}
-                          onChange={(e) => handleToggleReverse(item.id, e.target.checked)}
-                          className="sr-only peer"
-                        />
-                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                      </label>
-                    </td>
-                    <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(item)
-                          setShowItemModal(true)
-                        }}
-                        className="text-primary hover:text-primary/80"
-                      >
-                        编辑
-                      </button>
-                      <button
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {items.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                      暂无题目，请先添加题目
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Feedback Config Tab */}
-      {activeTab === 'feedback' && (
-        <div className="space-y-6">
-          {/* 维度选择 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium mb-4">选择维度</h3>
-            {dimensions.length === 0 ? (
-              <p className="text-gray-500">请先在"维度管理"中创建维度</p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {dimensions.map((dim) => (
-                  <button
-                    key={dim.id}
-                    onClick={() => {
-                      setFeedbackDimensionId(dim.id)
-                      setLevelFeedback(dim.levelFeedback || { levels: [] })
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      feedbackDimensionId === dim.id
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {dim.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 等级配置 */}
-          {feedbackDimensionId && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">等级配置</h3>
-                <button
-                  onClick={() => {
-                    setLevelFeedback({
-                      ...levelFeedback,
-                      levels: [
-                        ...levelFeedback.levels,
-                        {
-                          name: `等级${levelFeedback.levels.length + 1}`,
-                          min: 0,
-                          max: 10,
-                          interpretation: '',
-                          suggestions: []
-                        }
-                      ]
-                    })
-                  }}
-                  className="flex items-center px-3 py-1.5 bg-primary text-white text-sm rounded-md hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  添加等级
-                </button>
-              </div>
-
-              {/* 等级列表 */}
-              <div className="space-y-4">
-                {levelFeedback.levels.map((level, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-3 flex-1">
-                        <input
-                          type="text"
-                          value={level.name}
-                          onChange={(e) => {
-                            const newLevels = [...levelFeedback.levels]
-                            newLevels[index] = { ...level, name: e.target.value }
-                            setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                          }}
-                          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium w-32"
-                          placeholder="等级名称"
-                        />
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <span>分数区间:</span>
-                          <input
-                            type="number"
-                            value={level.min}
-                            onChange={(e) => {
-                              const newLevels = [...levelFeedback.levels]
-                              newLevels[index] = { ...level, min: Number(e.target.value) }
-                              setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                            }}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                          <span>-</span>
-                          <input
-                            type="number"
-                            value={level.max}
-                            onChange={(e) => {
-                              const newLevels = [...levelFeedback.levels]
-                              newLevels[index] = { ...level, max: Number(e.target.value) }
-                              setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                            }}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                          <span>分</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newLevels = levelFeedback.levels.filter((_, i) => i !== index)
-                          setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          得分解读
-                        </label>
-                        <textarea
-                          value={level.interpretation}
-                          onChange={(e) => {
-                            const newLevels = [...levelFeedback.levels]
-                            newLevels[index] = { ...level, interpretation: e.target.value }
-                            setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                          }}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                          placeholder="该等级的解读文本，可使用 {{dimensionName}} 占位符"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          建议 (每行一条)
-                        </label>
-                        <textarea
-                          value={level.suggestions.join('\n')}
-                          onChange={(e) => {
-                            const newLevels = [...levelFeedback.levels]
-                            newLevels[index] = { 
-                              ...level, 
-                              suggestions: e.target.value.split('\n').filter(s => s.trim()) 
-                            }
-                            setLevelFeedback({ ...levelFeedback, levels: newLevels })
-                          }}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                          placeholder="建议1&#10;建议2&#10;建议3"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {levelFeedback.levels.length === 0 && (
-                  <p className="text-center text-gray-500 py-8">
-                    点击"添加等级"按钮创建等级配置
-                  </p>
-                )}
-              </div>
-
-              {/* 保存按钮 */}
-              <div className="flex justify-end mt-6">
-                <button
-                  onClick={async () => {
-                    if (!feedbackDimensionId) return
-                    setSavingFeedback(true)
-                    try {
-                      const response = await apiClient.put(
-                        `/scales/${id}/dimensions/${feedbackDimensionId}/feedback`,
-                        { levelFeedback }
-                      )
-                      if (response.code === 0) {
-                        // 更新本地维度数据
-                        setDimensions(dimensions.map(d => 
-                          d.id === feedbackDimensionId 
-                            ? { ...d, levelFeedback }
-                            : d
-                        ))
-                        alert('保存成功')
-                      } else {
-                        alert(response.message || '保存失败')
-                      }
-                    } catch (err: any) {
-                      alert(err.message || '保存失败')
-                    } finally {
-                      setSavingFeedback(false)
-                    }
-                  }}
-                  disabled={savingFeedback}
-                  className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {savingFeedback ? '保存中...' : '保存配置'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Dimension Edit Modal */}
-      {showDimensionModal && editingDimension && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
-            <div className="p-6">
-              <h3 className="text-lg font-medium mb-4">编辑维度</h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    维度编码
-                  </label>
-                  <input
-                    type="text"
-                    value={editingDimension.code}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    维度名称 *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingDimension.name}
-                    onChange={(e) =>
-                      setEditingDimension({ ...editingDimension, name: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    维度描述
-                  </label>
-                  <textarea
-                    value={editingDimension.description || ''}
-                    onChange={(e) =>
-                      setEditingDimension({ ...editingDimension, description: e.target.value })
-                    }
-                    rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    分数区间（可选）
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={editingDimension.minScore ?? ''}
-                      onChange={(e) =>
-                        setEditingDimension({
-                          ...editingDimension,
-                          minScore: e.target.value ? Number(e.target.value) : null,
-                        })
-                      }
-                      placeholder="最低分"
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    />
-                    <span>-</span>
-                    <input
-                      type="number"
-                      value={editingDimension.maxScore ?? ''}
-                      onChange={(e) =>
-                        setEditingDimension({
-                          ...editingDimension,
-                          maxScore: e.target.value ? Number(e.target.value) : null,
-                        })
-                      }
-                      placeholder="最高分"
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    如不设置，系统将自动计算理论分数区间
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  onClick={() => {
-                    setShowDimensionModal(false)
-                    setEditingDimension(null)
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleUpdateDimension}
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-                >
-                  保存
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Item Modal */}
-      {showItemModal && editingItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h3 className="text-lg font-medium mb-4">
-                {editingItem.id ? '编辑题目' : '添加题目'}
-              </h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    题目内容 *
-                  </label>
-                  <textarea
-                    value={editingItem.content}
-                    onChange={(e) =>
-                      setEditingItem({ ...editingItem, content: e.target.value })
-                    }
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="请输入题目内容"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      题目编码
-                    </label>
-                    <input
-                      type="text"
-                      value={editingItem.itemCode}
-                      onChange={(e) =>
-                        setEditingItem({ ...editingItem, itemCode: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  <div className="flex items-center pt-6">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={editingItem.reverse}
-                        onChange={(e) =>
-                          setEditingItem({ ...editingItem, reverse: e.target.checked })
-                        }
-                        className="mr-2"
-                      />
-                      反向计分
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    关联维度
-                  </label>
-                  <div className="space-y-2">
-                    {dimensions.map((dim) => {
-                      const isLinked = editingItem.itemDimensions.some(
-                        (d) => d.dimensionId === dim.id
-                      )
-                      return (
-                        <label key={dim.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={isLinked}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setEditingItem({
-                                  ...editingItem,
-                                  itemDimensions: [
-                                    ...editingItem.itemDimensions,
-                                    {
-                                      dimensionId: dim.id,
-                                      weight: 1,
-                                      reverse: false,
-                                      dimension: {
-                                        id: dim.id,
-                                        code: dim.code,
-                                        name: dim.name,
-                                      },
-                                    },
-                                  ],
-                                })
-                              } else {
-                                setEditingItem({
-                                  ...editingItem,
-                                  itemDimensions: editingItem.itemDimensions.filter(
-                                    (d) => d.dimensionId !== dim.id
-                                  ),
-                                })
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          {dim.name}
-                        </label>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  onClick={() => setShowItemModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleSaveItem}
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-                >
-                  保存
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {preview && <section className="card p-6 mt-5"><h2 className="font-semibold mb-3">计分预览</h2><pre className="text-xs bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(preview, null, 2)}</pre></section>}
+      {!isNew && !standard && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={saving} className="btn-secondary">运行发布检查</button><button onClick={() => void publish()} disabled={saving || scale.status !== 'DRAFT'} className="btn-primary">发布描述性量表</button></div>}
     </div>
   )
 }

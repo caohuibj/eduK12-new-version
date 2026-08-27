@@ -26,6 +26,13 @@ interface QuestionnaireScale {
   scale: Scale
 }
 
+const scaleItemCount = (scale: Scale | undefined): number => {
+  const definition = scale?.definition
+  return definition?.schemaVersion === 2 && Array.isArray(definition.items)
+    ? definition.items.length
+    : 0
+}
+
 // 统一内容项类型
 interface ContentItem {
   type: 'form' | 'scale'
@@ -655,7 +662,7 @@ const QuestionnaireEdit: React.FC = () => {
                       )}
                       {item.type === 'scale' && (
                         <span className="text-xs text-gray-500">
-                          ({(item.data as QuestionnaireScale).scale?._count?.items || 0}题)
+                          ({scaleItemCount((item.data as QuestionnaireScale).scale)}题)
                         </span>
                       )}
                     </div>
