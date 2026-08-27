@@ -1435,8 +1435,13 @@ export const checkinController = {
         parentAccess: true,
       })
 
-      // 生成会话ID（用于防重复提交）
-      const sessionId = checkinTokenService.generateSessionId()
+      // The session ID is only a locator. The capability is the signed proof
+      // that this session was issued for this exact check-in token.
+      const session = checkinTokenService.createSessionCapability({
+        checkinId: checkin.id,
+        tokenId: validation.token!.id,
+        tokenExpiresAt: validation.token!.expiresAt,
+      })
 
       logger.info('匿名用户访问打卡', {
         checkinId: checkin?.id,
@@ -1445,7 +1450,9 @@ export const checkinController = {
 
       return success(res, {
         checkin: publicCheckin,
-        sessionId,
+        sessionId: session.sessionId,
+        sessionCapability: session.capability,
+        sessionExpiresAt: new Date(session.expiresAt * 1000).toISOString(),
         tokenId: validation.token.id,
       })
     } catch (err) {
@@ -1500,6 +1507,15 @@ export const checkinController = {
         return error(res, '会话标识无效')
       }
       const sessionId = sessionResult.data
+      if (!checkinTokenService.verifySessionCapability({
+        checkinId: validation.checkin.id,
+        tokenId: validation.token!.id,
+        sessionId,
+        capability: req.header('X-Checkin-Session-Capability'),
+        tokenExpiresAt: validation.token!.expiresAt,
+      })) {
+        return unauthorized(res, '匿名签到会话凭据无效')
+      }
       const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
@@ -1591,6 +1607,16 @@ export const checkinController = {
           message = '访问令牌已被禁用'
         }
         return error(res, message)
+      }
+
+      if (!checkinTokenService.verifySessionCapability({
+        checkinId: validation.checkin.id,
+        tokenId: validation.token!.id,
+        sessionId,
+        capability: req.header('X-Checkin-Session-Capability'),
+        tokenExpiresAt: validation.token!.expiresAt,
+      })) {
+        return unauthorized(res, '匿名签到会话凭据无效')
       }
 
       // 检查打卡是否已结束

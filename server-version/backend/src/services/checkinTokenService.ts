@@ -8,13 +8,47 @@
  * - 原子地占用匿名提交额度
  */
 
+import crypto from 'node:crypto'
 import { prisma } from '../config/database'
 import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
 import { Prisma } from '@prisma/client'
+import { config } from '../config'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
+
+export const PUBLIC_CHECKIN_SESSION_TTL_SECONDS = 24 * 60 * 60
+
+const sessionCapabilitySecret = crypto
+  .createHmac('sha256', config.assetSigningSecret)
+  .update('public-checkin-session-capability-v1')
+  .digest()
+
+const sessionCapabilityPayload = (params: {
+  checkinId: string
+  tokenId: string
+  sessionId: string
+  expiresAt: number
+}) => `v1.${params.checkinId}.${params.tokenId}.${params.sessionId}.${params.expiresAt}`
+
+const createSessionCapabilitySignature = (params: {
+  checkinId: string
+  tokenId: string
+  sessionId: string
+  expiresAt: number
+}): string => crypto
+  .createHmac('sha256', sessionCapabilitySecret)
+  .update(sessionCapabilityPayload(params))
+  .digest('base64url')
+
+export interface PublicCheckinSessionCapability {
+  sessionId: string
+  capability: string
+  expiresAt: number
+}
+
+const sessionCapabilityPattern = /^v1\.(\d+)\.([A-Za-z0-9_-]{40,100})$/
 
 export interface CheckinTokenValidation {
   valid: boolean
@@ -287,5 +321,65 @@ export const checkinTokenService = {
    */
   generateSessionId(): string {
     return `session_${nanoid()}`
+  },
+
+  /**
+   * Issue a short-lived, stateless capability for one anonymous check-in
+   * session. The signed payload binds the capability to the exact check-in
+   * and access token; sessionId alone is never an authorization credential.
+   */
+  createSessionCapability(params: {
+    checkinId: string
+    tokenId: string
+    tokenExpiresAt: Date
+  }): PublicCheckinSessionCapability {
+    const now = Math.floor(Date.now() / 1000)
+    const tokenExpiresAt = Math.floor(params.tokenExpiresAt.getTime() / 1000)
+    const expiresAt = Math.min(tokenExpiresAt, now + PUBLIC_CHECKIN_SESSION_TTL_SECONDS)
+    if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) {
+      throw new Error('匿名签到访问令牌有效期不足以创建会话')
+    }
+
+    const sessionId = this.generateSessionId()
+    const signature = createSessionCapabilitySignature({
+      checkinId: params.checkinId,
+      tokenId: params.tokenId,
+      sessionId,
+      expiresAt,
+    })
+    return {
+      sessionId,
+      capability: `v1.${expiresAt}.${signature}`,
+      expiresAt,
+    }
+  },
+
+  /** Verify a capability and all of the server-side bindings it carries. */
+  verifySessionCapability(params: {
+    checkinId: string
+    tokenId: string
+    sessionId: string
+    capability: string | undefined
+    tokenExpiresAt: Date
+  }): boolean {
+    if (!params.capability || !/^session_[a-z0-9]{16}$/.test(params.sessionId)) return false
+    const match = sessionCapabilityPattern.exec(params.capability)
+    if (!match) return false
+
+    const expiresAt = Number(match[1])
+    const now = Math.floor(Date.now() / 1000)
+    const tokenExpiresAt = Math.floor(params.tokenExpiresAt.getTime() / 1000)
+    if (!Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > tokenExpiresAt) return false
+
+    const expected = createSessionCapabilitySignature({
+      checkinId: params.checkinId,
+      tokenId: params.tokenId,
+      sessionId: params.sessionId,
+      expiresAt,
+    })
+    const expectedBuffer = Buffer.from(expected)
+    const suppliedBuffer = Buffer.from(match[2])
+    return expectedBuffer.length === suppliedBuffer.length
+      && crypto.timingSafeEqual(expectedBuffer, suppliedBuffer)
   },
 }

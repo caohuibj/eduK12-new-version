@@ -26,6 +26,26 @@ const publicUploadTokenLimiter = rateLimit({
   },
 })
 
+const publicSubmitIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+const publicSubmitTokenLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const token = req.params.token
+    return typeof token === 'string' && /^ck_[a-z0-9]{16}$/.test(token)
+      ? `checkin-token:${token}`
+      : 'checkin-token:invalid'
+  },
+})
+
 // ==================== 公开路由（无需登录）====================
 // 公开获取打卡详情（通过令牌）
 router.get('/public/:token', checkinController.getPublicCheckin)
@@ -34,7 +54,7 @@ router.get('/public/:token', checkinController.getPublicCheckin)
 router.post('/public/:token/upload', publicUploadIpLimiter, publicUploadTokenLimiter, checkinController.uploadPublicImage)
 
 // 公开提交打卡（通过令牌）
-router.post('/public/:token/submit', checkinController.submitPublicCheckin)
+router.post('/public/:token/submit', publicSubmitIpLimiter, publicSubmitTokenLimiter, checkinController.submitPublicCheckin)
 
 // ==================== 需要登录的路由 ====================
 // 注意：特定路由必须在通用路由之前
