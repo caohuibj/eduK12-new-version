@@ -59,6 +59,24 @@ docker compose --env-file server-version/.env \
 # COS、远程 webhook、生产域名和宿主机 cron 均不属于当前本地测试范围
 ```
 
+### 一次性凭据交接文件
+
+密码重置接口只返回受保护交接文件的文件名，不会把临时密码放入 API
+响应、日志、数据库或 `/uploads`。Docker Compose 后端将交接目录挂载到
+`/app/.local` 的独立命名卷；本地读取示例：
+
+```bash
+docker compose --env-file server-version/.env \
+  -f server-version/docker-compose.yml cp \
+  ptool-backend:/app/.local/<handoff-file>.json ./<handoff-file>.json
+chmod 600 ./<handoff-file>.json
+```
+
+交付后立即删除副本和容器内文件；系统默认清理超过 24 小时的交接文件，
+`CREDENTIAL_HANDOFF_TTL_HOURS` 最多允许配置为 7 天。不要把该文件复制到
+上传目录、提交 Git 或发送到聊天工具。当前尚未配置生产服务器；上述流程
+仅用于本地测试。
+
 ### 3. 查看状态
 
 ```bash

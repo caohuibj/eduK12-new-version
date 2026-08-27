@@ -19,6 +19,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    const handleAuthExpired = () => {
+      // A 401 from login/public capability endpoints is not reported by the
+      // transport as session expiry. For an authenticated API request, clear
+      // the in-memory identity so ProtectedRoute can redirect normally.
+      setUser((currentUser) => currentUser ? null : currentUser)
+    }
+
+    window.addEventListener('auth:expired', handleAuthExpired)
+    return () => window.removeEventListener('auth:expired', handleAuthExpired)
+  }, [])
+
+  useEffect(() => {
     const initAuth = async () => {
       try {
         const response = await authApi.me()

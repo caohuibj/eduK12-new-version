@@ -14,7 +14,7 @@ export const ASSET_URL_TTL_SECONDS = 10 * 60
 // `assets/<uuid>.pdf`). Keeping one root here also makes worker paths and the
 // migration script agree on where an asset physically lives.
 const ASSET_ROOT = path.resolve(config.uploadDir)
-const ASSET_SIGNING_SECRET = process.env.ASSET_SIGNING_SECRET || config.jwtSecret
+const ASSET_SIGNING_SECRET = config.assetSigningSecret
 
 export type AssetProvider = 'local' | 'cos'
 
@@ -264,7 +264,7 @@ export const issuePrivateAssetUrl = async (req: Request, res: Response) => {
 const validatePublicCheckinAsset = async (assetId: string, token: string | undefined) => {
   if (!token) return null
   const { checkinTokenService } = await import('./checkinTokenService')
-  const validation = await checkinTokenService.validateToken(token)
+  const validation = await checkinTokenService.validateToken(token, { ignoreUsageLimit: true })
   if (!validation.valid || !validation.checkin) return null
   const asset = await prisma.storedAsset.findUnique({ where: { id: assetId } })
   if (!asset || asset.deletedAt || asset.accessScope !== 'PUBLIC_CHECKIN' || asset.scopeId !== validation.checkin.id) return null
@@ -302,6 +302,7 @@ export const serveAsset = async (req: Request, res: Response) => {
 
   const localPath = localPathFor(asset.objectKey)
   if (!fs.existsSync(localPath)) return notFound(res, '文件不存在')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('Content-Type', asset.mimeType)
   res.setHeader('Content-Length', String(asset.sizeBytes))
   res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.originalName || asset.id)}"`)

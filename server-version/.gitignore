@@ -62,3 +62,8 @@ backups/
 
 # 备份配置（包含敏感信息）
 scripts/monitoring/backup-config.env
+
+# One-time local credential handoffs
+.local/credential-handoff-*.json
+.local/admin-password-reset-*.json
+.local/student-password-reset-*.json

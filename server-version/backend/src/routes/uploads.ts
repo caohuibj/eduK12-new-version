@@ -12,6 +12,7 @@ import { logger } from '../utils/logger'
 import { getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
+import { detectMimeType } from '../utils/fileValidator'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
@@ -321,11 +322,15 @@ router.post('/image', imageUpload.single('image'), async (req, res) => {
     if (!file) {
       return error(res, '请选择图片文件')
     }
+    const detectedMimeType = detectMimeType(file.buffer.subarray(0, 16))
+    if (!detectedMimeType || !['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(detectedMimeType)) {
+      return error(res, '图片内容类型无效')
+    }
 
     const asset = await storeAsset({
       buffer: file.buffer,
       originalName: file.originalname,
-      mimeType: file.mimetype,
+      mimeType: detectedMimeType,
       ownerId: req.user?.userId,
     })
 

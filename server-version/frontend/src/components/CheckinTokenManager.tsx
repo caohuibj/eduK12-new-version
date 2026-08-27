@@ -203,7 +203,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      最大访问次数（0表示无限制）
+                      最大匿名提交次数（0表示无限制）
                     </label>
                     <InputNumber
                       value={maxUses}
@@ -270,7 +270,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                                 </span>
                                 <span className="flex items-center">
                                   <Users className="w-4 h-4 mr-1" />
-                                  {token.usedCount} / {token.maxUses || '∞'} 次访问
+                                  {token.usedCount} / {token.maxUses || '∞'} 次提交
                                 </span>
                                 <span className="flex items-center">
                                   <CheckCircle className="w-4 h-4 mr-1" />

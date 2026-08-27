@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('../../config', () => ({ config: { cookieSecure: false } }))
+
 import {
   csrfTokensMatch,
   getCookieValue,
   parseCookieHeader,
+  setSessionCookie,
 } from '../../utils/authCookies'
 
 describe('cookie authentication helpers', () => {
@@ -19,5 +23,20 @@ describe('cookie authentication helpers', () => {
     expect(csrfTokensMatch('csrf-token', 'different-token')).toBe(false)
     expect(csrfTokensMatch(null, 'csrf-token')).toBe(false)
     expect(csrfTokensMatch('csrf-token', null)).toBe(false)
+  })
+
+  it('does not mark local HTTP cookies Secure, but honors an explicitly secure request', () => {
+    const headers = new Map<string, unknown>()
+    const res = {
+      getHeader: (name: string) => headers.get(name),
+      setHeader: (name: string, value: unknown) => headers.set(name, value),
+    }
+
+    setSessionCookie({ secure: false } as any, res as any, 'session-token')
+    expect(String(headers.get('Set-Cookie'))).not.toContain('Secure')
+
+    headers.clear()
+    setSessionCookie({ secure: true } as any, res as any, 'session-token')
+    expect(String(headers.get('Set-Cookie'))).toContain('Secure')
   })
 })

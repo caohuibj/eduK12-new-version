@@ -25,7 +25,12 @@ const FirstLoginPasswordChange: React.FC = () => {
       if (response.code !== 0) throw new Error(response.message || '密码修改失败')
       setUser(null)
       message.success('密码已修改，请使用新密码重新登录')
-      navigate('/' + (user?.role === 'STUDENT' ? 'student/login' : 'teacher/login'), { replace: true })
+      const loginPath = user?.role === 'ADMIN'
+        ? '/admin/login'
+        : user?.role === 'TEACHER'
+          ? '/teacher/account-login'
+          : '/student/login'
+      navigate(loginPath, { replace: true })
     } catch (error) {
       message.error(error instanceof Error ? error.message : '密码修改失败')
     } finally {

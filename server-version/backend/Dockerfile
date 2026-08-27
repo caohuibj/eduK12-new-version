@@ -69,7 +69,7 @@ RUN npm prune --omit=dev
 
 # The long-running API and workers do not need root. Keep the mounted upload
 # volume writable by the application user while leaving the image immutable.
-RUN mkdir -p /app/uploads && chown -R node:node /app
+RUN mkdir -p /app/uploads /app/.local && chown -R node:node /app
 USER node
 
 EXPOSE 3000

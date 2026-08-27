@@ -10,6 +10,7 @@ import multer from 'multer'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 import { attachAssetReference, getSignedAssetUrl, hydrateAssetReferences, storeAsset } from '../services/assetStorage'
 import { config } from '../config'
+import { detectMimeType } from '../utils/fileValidator'
 
 const createCheckinSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -152,6 +153,12 @@ const publicImageUpload = multer({
     }
   }
 })
+
+const acceptedImageMimeTypes = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+const detectAcceptedImageMimeType = (file: { buffer: Buffer }): string | null => {
+  const detected = detectMimeType(file.buffer.subarray(0, 16))
+  return detected && acceptedImageMimeTypes.has(detected) ? detected : null
+}
 
 // Student submissions use memory storage so a file is never exposed through
 // the legacy public /uploads tree before it has an ownership record.
@@ -616,11 +623,13 @@ export const checkinController = {
 
       const file = req.file
       if (!file) return error(res, '请选择图片文件')
+      const detectedMimeType = detectAcceptedImageMimeType(file)
+      if (!detectedMimeType) return error(res, '图片内容类型无效')
 
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
-        mimeType: file.mimetype,
+        mimeType: detectedMimeType,
         ownerId: userId,
         accessScope: 'COURSE',
         scopeId: checkin.courseId,
@@ -1189,7 +1198,7 @@ export const checkinController = {
       const { checkinTokenService } = await import('../services/checkinTokenService')
 
       // 验证令牌
-      const validation = await checkinTokenService.validateToken(token)
+      const validation = await checkinTokenService.validateToken(token, { ignoreUsageLimit: true })
 
       if (!validation.valid) {
         let message = '无效的访问令牌'
@@ -1202,9 +1211,6 @@ export const checkinController = {
         }
         return error(res, message)
       }
-
-      // 记录访问
-      await checkinTokenService.recordAccess(validation.token.id)
 
       // 获取打卡详情（不包含敏感信息）
       const checkin = await prisma.checkin.findUnique({
@@ -1260,7 +1266,9 @@ export const checkinController = {
 
       // 验证令牌
       const { checkinTokenService } = await import('../services/checkinTokenService')
-      const validation = await checkinTokenService.validateToken(token)
+      // maxUses limits successful anonymous submissions, not page views or
+      // upload steps. The submission transaction claims the slot atomically.
+      const validation = await checkinTokenService.validateToken(token, { ignoreUsageLimit: true })
 
       if (!validation.valid) {
         let message = '无效的访问令牌'
@@ -1286,11 +1294,13 @@ export const checkinController = {
       if (!file) {
         return error(res, '请选择图片文件')
       }
+      const detectedMimeType = detectAcceptedImageMimeType(file)
+      if (!detectedMimeType) return error(res, '图片内容类型无效')
 
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
-        mimeType: file.mimetype,
+        mimeType: detectedMimeType,
         ownerId: validation.token?.createdBy,
         accessScope: 'PUBLIC_CHECKIN',
         scopeId: validation.checkin.id,
@@ -1333,7 +1343,7 @@ export const checkinController = {
       const { checkinTokenService } = await import('../services/checkinTokenService')
 
       // 验证令牌
-      const validation = await checkinTokenService.validateToken(token)
+      const validation = await checkinTokenService.validateToken(token, { ignoreUsageLimit: true })
 
       if (!validation.valid) {
         let message = '无效的访问令牌'
@@ -1347,20 +1357,6 @@ export const checkinController = {
         return error(res, message)
       }
 
-      // 检查是否已提交（通过 sessionId 防重复）
-      const existingSubmission = await prisma.checkinSubmission.findUnique({
-        where: {
-          checkinId_sessionId: {
-            checkinId: validation.checkin.id,
-            sessionId,
-          },
-        },
-      })
-
-      if (existingSubmission) {
-        return error(res, '您已经提交过了')
-      }
-
       // 检查打卡是否已结束
       if (validation.checkin.endTime && new Date() > validation.checkin.endTime) {
         return error(res, Messages.CHECKIN.EXPIRED)
@@ -1371,18 +1367,40 @@ export const checkinController = {
         return error(res, '图片凭据无效或不属于当前签到')
       }
 
-      // 创建匿名提交
-      const submission = await prisma.checkinSubmission.create({
-        data: {
-          checkinId: validation.checkin.id,
-          studentId: null, // 匿名提交
-          content,
-          images: validatedImages,
-          sessionId,
-          tokenId: validation.token.id,
-          isAnonymous: true,
-        },
+      // Claim the quota and create the submission in one transaction. A
+      // duplicate session rolls back the claim; a different concurrent
+      // session can consume at most one remaining slot.
+      const result = await prisma.$transaction(async (tx) => {
+        const existingSubmission = await tx.checkinSubmission.findUnique({
+          where: {
+            checkinId_sessionId: {
+              checkinId: validation.checkin.id,
+              sessionId,
+            },
+          },
+        })
+        if (existingSubmission) return { kind: 'existing' as const }
+
+        const claimed = await checkinTokenService.claimSubmissionSlot(validation.token.id, tx)
+        if (!claimed) return { kind: 'over-limit' as const }
+
+        const submission = await tx.checkinSubmission.create({
+          data: {
+            checkinId: validation.checkin.id,
+            studentId: null, // 匿名提交
+            content,
+            images: validatedImages,
+            sessionId,
+            tokenId: validation.token.id,
+            isAnonymous: true,
+          },
+        })
+        return { kind: 'created' as const, submission }
       })
+
+      if (result.kind === 'existing') return error(res, '您已经提交过了')
+      if (result.kind === 'over-limit') return error(res, '访问令牌已达到匿名提交上限', -1, 409)
+      const submission = result.submission
 
       await Promise.all(validatedImages.map((image) => attachAssetReference({
         assetId: image.assetId,

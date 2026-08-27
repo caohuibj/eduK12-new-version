@@ -40,6 +40,30 @@ export const sessionFetch = async (input: RequestInfo | URL, init: RequestInit =
   return fetch(input, { ...init, headers, credentials: 'same-origin' })
 }
 
+/**
+ * The transport layer may report an expired authenticated session, but it
+ * must not navigate. Login failures and capability-authenticated public
+ * endpoints also legitimately return 401 and must remain on their page.
+ */
+export const shouldInvalidateSession = (error: {
+  response?: { status?: number }
+  config?: { url?: string }
+}): boolean => {
+  if (error.response?.status !== 401) return false
+
+  const rawUrl = error.config?.url || ''
+  const pathname = rawUrl
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .replace(/^\/api(?=\/|$)/, '')
+    .split('?')[0]
+
+  if (/^\/auth\/(login|csrf|register|student-register|verify-teacher-code|teacher-register)$/.test(pathname)) {
+    return false
+  }
+  if (pathname.startsWith('/public/') || pathname.startsWith('/checkins/public/')) return false
+  return true
+}
+
 // 请求拦截器 - 使用 Cookie 会话并为写请求添加 CSRF
 axiosClient.interceptors.request.use(
   async (config) => {
@@ -64,15 +88,11 @@ axiosClient.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.response?.status === 401) {
-      // 使用事件通知替代强制刷新，保留用户操作状态
+    if (shouldInvalidateSession(error)) {
+      // Report expiry to AuthContext; navigation belongs to route guards.
       if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('auth:expired', {
         detail: { message: '登录已过期，请重新登录' }
       }))
-      // 延迟跳转，让应用有机会保存状态
-      if (typeof window !== 'undefined') setTimeout(() => {
-        window.location.href = '/'
-      }, 100)
     }
     return Promise.reject(error.response?.data || error.message)
   }

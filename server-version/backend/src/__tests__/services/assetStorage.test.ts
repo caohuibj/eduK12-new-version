@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
 const { mockPrisma, mockCheckinValidate } = vi.hoisted(() => ({
@@ -14,6 +16,7 @@ vi.mock('../../config', () => ({
   config: {
     uploadDir: '/tmp/eduk12-asset-storage-test',
     jwtSecret: 'asset-storage-test-secret-with-more-than-32-chars',
+    assetSigningSecret: 'asset-signing-test-secret-with-more-than-32-chars',
   },
 }))
 vi.mock('../../utils/cos', () => ({
@@ -33,7 +36,10 @@ import {
 } from '../../services/assetStorage'
 
 const makeRes = () => {
-  const res: any = { statusCode: 200, body: null }
+  const headers = new Map<string, string>()
+  let finish: () => void = () => undefined
+  const finished = new Promise<void>((resolve) => { finish = resolve })
+  const res: any = { statusCode: 200, body: null, headers, finished }
   res.status = vi.fn((code: number) => {
     res.statusCode = code
     return res
@@ -47,7 +53,12 @@ const makeRes = () => {
     res.redirectUrl = url
     return res
   })
-  res.setHeader = vi.fn()
+  res.setHeader = vi.fn((name: string, value: string) => headers.set(name, value))
+  res.on = vi.fn().mockReturnValue(res)
+  res.once = vi.fn().mockReturnValue(res)
+  res.emit = vi.fn().mockReturnValue(true)
+  res.write = vi.fn().mockReturnValue(true)
+  res.end = vi.fn(() => { finish(); return res })
   return res
 }
 
@@ -75,6 +86,17 @@ const request = (overrides: Record<string, unknown> = {}) => ({
 })
 
 describe('stored asset access boundary', () => {
+  const assetPath = path.join('/tmp/eduk12-asset-storage-test', 'assets', 'asset-1.pdf')
+
+  beforeAll(() => {
+    fs.mkdirSync(path.dirname(assetPath), { recursive: true })
+    fs.writeFileSync(assetPath, 'test asset')
+  })
+
+  afterAll(() => {
+    fs.rmSync('/tmp/eduk12-asset-storage-test', { recursive: true, force: true })
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset())
@@ -156,5 +178,17 @@ describe('stored asset access boundary', () => {
     expect(url.searchParams.get('expires')).toBe(String(expiresAt))
     expect(url.searchParams.get('signature')).toMatch(/^[A-Za-z0-9_-]{40,100}$/)
     expect(assetStorageInternals.signedPath('asset-2', expiresAt)).not.toBe(signed)
+  })
+
+  it('serves local assets with an explicit MIME type and nosniff protection', async () => {
+    const expiresAt = Math.floor(Date.now() / 1000) + 60
+    const url = new URL(assetStorageInternals.signedPath('asset-1', expiresAt), 'http://localhost')
+    const res = makeRes()
+
+    await serveAsset(request({ query: Object.fromEntries(url.searchParams) }), res)
+    await res.finished
+
+    expect(res.headers.get('Content-Type')).toBe('application/pdf')
+    expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })
 })

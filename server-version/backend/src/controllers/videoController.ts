@@ -116,10 +116,12 @@ export const videoController = {
         return error(res, '请输入视频标题')
       }
 
+      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType || file.mimetype
+
       const originalAsset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
-        mimeType: file.mimetype,
+        mimeType: detectedMimeType,
         ownerId: userId,
         provider: 'local',
       })
@@ -132,7 +134,7 @@ export const videoController = {
           filePath: originalAsset.objectKey,
           fileName: file.originalname,
           fileSize: file.size,
-          mimeType: file.mimetype,
+          mimeType: detectedMimeType,
           teacherId: userId,
           originalAssetId: originalAsset.id,
           status: 'PENDING',

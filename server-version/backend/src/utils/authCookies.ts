@@ -1,5 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { Request, Response } from 'express'
+import { config } from '../config'
 
 export const AUTH_COOKIE_NAME = 'ptool_session'
 export const CSRF_COOKIE_NAME = 'ptool_csrf'
@@ -65,7 +66,7 @@ const serializeCookie = (
 }
 
 const isSecureRequest = (req: Request): boolean =>
-  process.env.NODE_ENV === 'production' || req.secure === true
+  config.cookieSecure || req.secure === true
 
 export const getSessionToken = (req: Request): string | null => getCookie(req, AUTH_COOKIE_NAME)
 

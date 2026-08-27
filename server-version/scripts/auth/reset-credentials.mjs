@@ -32,6 +32,23 @@ function temporaryPassword() {
   }
 }
 
+function cleanupHandoffs(handoffDir) {
+  const configured = Number(process.env.CREDENTIAL_HANDOFF_TTL_HOURS || 24)
+  const ttlHours = Number.isFinite(configured) && configured > 0 ? Math.min(configured, 7 * 24) : 24
+  const cutoff = Date.now() - ttlHours * 60 * 60 * 1000
+  const pattern = /^(?:credential-handoff|admin-password-reset|student-password-reset)-.+\.json$/
+  for (const name of fs.readdirSync(handoffDir)) {
+    if (!pattern.test(name)) continue
+    const filePath = path.join(handoffDir, name)
+    try {
+      const stat = fs.statSync(filePath)
+      if (stat.isFile() && stat.mtimeMs < cutoff) fs.unlinkSync(filePath)
+    } catch (error) {
+      if (error?.code !== 'ENOENT') throw error
+    }
+  }
+}
+
 async function main() {
   if (process.env.CREDENTIAL_RESET_CONFIRMATION !== 'LOCAL_DEVELOPMENT_RESET') {
     fail('CREDENTIAL_RESET_CONFIRMATION=LOCAL_DEVELOPMENT_RESET is required')
@@ -39,6 +56,8 @@ async function main() {
   assertLocalDatabase()
   const handoffDir = path.resolve(process.env.CREDENTIAL_HANDOFF_DIR || path.join(process.cwd(), '.local'))
   fs.mkdirSync(handoffDir, { recursive: true, mode: 0o700 })
+  fs.chmodSync(handoffDir, 0o700)
+  cleanupHandoffs(handoffDir)
   const handoffPath = path.join(handoffDir, `credential-handoff-${new Date().toISOString().replace(/[:.]/g, '-')}-${crypto.randomUUID()}.json`)
 
   try {

@@ -8,6 +8,7 @@ const INVALID_HEX = 'z'.repeat(64)
 const SAVED = [
   'NODE_ENV',
   'JWT_SECRET',
+  'ASSET_SIGNING_SECRET',
   'DATABASE_URL',
   'CORS_ORIGIN',
   'PORT',
@@ -22,6 +23,7 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     for (const k of SAVED) delete process.env[k]
     process.env.NODE_ENV = 'production'
     process.env.JWT_SECRET = 'production-test-secret-needs-at-least-32-chars'
+    process.env.ASSET_SIGNING_SECRET = 'production-asset-signing-test-secret-needs-32'
     process.env.DATABASE_URL = 'postgresql://localhost:5432/ptool'
     process.env.CORS_ORIGIN = 'https://frontend.example.test'
     process.env.PORT = '3000'

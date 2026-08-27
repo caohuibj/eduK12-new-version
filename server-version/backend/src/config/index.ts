@@ -15,6 +15,8 @@ const configSchema = z.object({
   trustProxyHops: z.number().int().min(0).max(10),
   jwtSecret: z.string().min(32, 'JWT_SECRET must be at least 32 characters in production'),
   jwtExpiresIn: z.string(),
+  cookieSecure: z.boolean(),
+  assetSigningSecret: z.string().min(32, 'ASSET_SIGNING_SECRET must be at least 32 characters'),
   uploadDir: z.string(),
   // Keep legacy static uploads available only during the reversible migration
   // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
@@ -80,6 +82,10 @@ const rawConfig = {
   trustProxyHops: parseNonNegativeInteger('TRUST_PROXY_HOPS', process.env.NODE_ENV === 'production' ? 1 : 0),
   jwtSecret: process.env.NODE_ENV === 'production' ? (process.env.JWT_SECRET || '') : (process.env.JWT_SECRET || 'dev-secret-key-not-for-production'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  cookieSecure: parseBooleanEnv('COOKIE_SECURE', process.env.NODE_ENV === 'production'),
+  // Production must supply a separate signing key. The development fallback
+  // keeps the local test environment self-contained without reusing JWT.
+  assetSigningSecret: process.env.ASSET_SIGNING_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-asset-signing-secret-not-for-production'),
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),

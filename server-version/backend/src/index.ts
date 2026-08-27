@@ -12,6 +12,7 @@ import { socketService } from './services/socketService'
 import { classroomSocketHandler } from './services/classroomSocketHandler'
 import { requestId } from './middleware/requestId'
 import { csrfProtection } from './middleware/csrf'
+import { legacyUploadGuard } from './middleware/legacyUploadGuard'
 
 // 导入 Worker (启动视频处理队列)
 // 使用优化版本 (支持硬件负担最小模式)
@@ -109,12 +110,7 @@ app.use('/api', csrfProtection)
 
 // 静态文件服务 - 使用绝对路径
 logger.info('[Server] Static files configured', { uploadDir: config.uploadDir })
-app.use('/uploads', (req, res, next) => {
-  if (!config.legacyUploadsEnabled) {
-    return res.status(410).json({ code: -1, message: '旧文件访问入口已停用，请使用资产接口' })
-  }
-  return next()
-}, express.static(config.uploadDir, {
+app.use('/uploads', legacyUploadGuard(config.legacyUploadsEnabled), express.static(config.uploadDir, {
   maxAge: '7d',
   immutable: true
 }))
