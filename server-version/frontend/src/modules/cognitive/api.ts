@@ -3,7 +3,7 @@ import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
-  appendTrial: (sessionId: string, trialIndex: number, payload: Record<string, unknown>) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
+  appendTrial: (sessionId: string, trialIndex: number, payload: unknown) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
   completeSession: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession>>
 }
 
@@ -84,7 +84,7 @@ export const cognitiveApi = {
     apiClient.get<CognitiveSession>(`/cognitive/sessions/${sessionId}`),
   restartSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/restart`, {}),
-  appendTrial: (sessionId: string, trialIndex: number, payload: Record<string, unknown>) =>
+  appendTrial: (sessionId: string, trialIndex: number, payload: unknown) =>
     apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>(
       `/cognitive/sessions/${sessionId}/trials`,
       { trialIndex, payload }

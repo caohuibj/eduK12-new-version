@@ -14,6 +14,8 @@ import {
 import { isCompositeWrapper, rejectWrapperForStandaloneUse } from './assignment.access'
 import { canInstantiateConfig, grantedResourceIds } from '../../services/materialGrant'
 import { config as appConfig } from '../../config'
+import { assertTaskCanPublish } from './v2/publication-gate'
+import { getCognitiveV2TaskDefinition } from './v2/registry'
 
 export { CognitiveServiceError }
 
@@ -404,6 +406,22 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
     role,
     userId
   )
+
+  // PR-B publication gate: an assignment may only freeze a task definition
+  // that satisfies the v2 protocol/metric/report contract. This is intentionally
+  // checked at publish time as well as at runtime so a later registry edit
+  // cannot make an invalid definition distributable.
+  const v2Definition = getCognitiveV2TaskDefinition(
+    config.testType,
+    config.engineVersion,
+    config.scoringVersion,
+  )
+  if (!v2Definition) throw BAD_REQUEST('No Cognitive v2 definition for this task version')
+  try {
+    assertTaskCanPublish(v2Definition)
+  } catch (err) {
+    throw BAD_REQUEST(err instanceof Error ? err.message : 'Cognitive task publication gate failed')
+  }
 
   if (!existing.profile) {
     throw BAD_REQUEST('发布前必须选择 Profile')

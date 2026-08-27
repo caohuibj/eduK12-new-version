@@ -374,22 +374,22 @@ model MaterialGrant {
 
 // 量表表
 model Scale {
-  id               String                @id @default(uuid())
-  code             String                @unique // 量表编码
-  name             String // 量表名称
-  description      String? // 量表描述
-  status           ScaleStatus           @default(DRAFT) // 状态
-  visibility       ScaleVisibility       @default(HIDDEN) // 可见性
-  instrumentClass  ScaleInstrumentClass  @default(CUSTOM_DESCRIPTIVE) @map("instrument_class")
+  id                String               @id @default(uuid())
+  code              String               @unique // 量表编码
+  name              String // 量表名称
+  description       String? // 量表描述
+  status            ScaleStatus          @default(DRAFT) // 状态
+  visibility        ScaleVisibility      @default(HIDDEN) // 可见性
+  instrumentClass   ScaleInstrumentClass @default(CUSTOM_DESCRIPTIVE) @map("instrument_class")
   instrumentVersion String               @default("2.0.0") @map("instrument_version")
-  definition       Json? // ScaleDefinitionV2；运行时唯一计分来源
-  definitionHash   String?               @map("definition_hash")
-  estimatedTime    Int?                  @map("estimated_time") // 预计用时（分钟）
-  instruction      String? // 指导语
-  creatorId        String                @map("creator_id") // 创建者ID
-  createdAt        DateTime              @default(now()) @map("created_at")
-  updatedAt        DateTime              @updatedAt @map("updated_at")
-  tags             String[]              @default([])
+  definition        Json? // ScaleDefinitionV2；运行时唯一计分来源
+  definitionHash    String?              @map("definition_hash")
+  estimatedTime     Int?                 @map("estimated_time") // 预计用时（分钟）
+  instruction       String? // 指导语
+  creatorId         String               @map("creator_id") // 创建者ID
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  tags              String[]             @default([])
 
   // 关联
   creator             User                      @relation("ScaleCreator", fields: [creatorId], references: [id])
@@ -410,7 +410,7 @@ model Assessment {
   userId                    String?          @map("user_id") // 改为可选，支持匿名测评
   status                    AssessmentStatus @default(IN_PROGRESS)
   answers                   Json? // 答案数组（加密存储）
-  result                    Json?             // 加密的完整 ScaleResultV2
+  result                    Json? // 加密的完整 ScaleResultV2
   progress                  Int              @default(0) // 进度百分比
   startedAt                 DateTime         @default(now()) @map("started_at")
   completedAt               DateTime?        @map("completed_at") // 完成时间
@@ -440,14 +440,14 @@ model Assessment {
 
 // 通用 Reference Core。definition 保存结构化 reference set，避免 scale/cognitive 各自维护一套表。
 model AssessmentReferenceSet {
-  id              String                                @id @default(uuid())
-  instrumentType  AssessmentReferenceInstrumentType    @map("instrument_type")
-  instrumentKey   String                                @map("instrument_key")
-  referenceVersion String                               @map("reference_version")
-  status          AssessmentReferenceStatus            @default(DRAFT)
-  definition      Json
-  createdAt       DateTime                              @default(now()) @map("created_at")
-  updatedAt       DateTime                              @updatedAt @map("updated_at")
+  id               String                            @id @default(uuid())
+  instrumentType   AssessmentReferenceInstrumentType @map("instrument_type")
+  instrumentKey    String                            @map("instrument_key")
+  referenceVersion String                            @map("reference_version")
+  status           AssessmentReferenceStatus         @default(DRAFT)
+  definition       Json
+  createdAt        DateTime                          @default(now()) @map("created_at")
+  updatedAt        DateTime                          @updatedAt @map("updated_at")
 
   @@unique([instrumentType, instrumentKey, referenceVersion])
   @@index([instrumentType, instrumentKey, status])
@@ -527,24 +527,24 @@ model QuestionnaireScale {
 
 // 问卷测评记录表
 model QuestionnaireAssessment {
-  id                   String           @id @default(uuid())
-  questionnaireId      String           @map("questionnaire_id")
-  userId               String?          @map("user_id") // 改为可选，支持匿名测评
-  tokenId              String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
-  sessionId            String?          @unique @map("session_id") // 匿名会话标识
-  resumeTokenHash      String?          @unique @map("resume_token_hash") // 服务端恢复凭据哈希
-  resumeTokenExpiresAt DateTime?        @map("resume_token_expires_at")
-  status               AssessmentStatus @default(IN_PROGRESS)
-  progress             Int              @default(0) // 总体进度
-  completedScales      Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
-  completedForms       Int              @default(0) @map("completed_forms") // 已完成表单数量（缓存）
-  startedAt            DateTime         @default(now()) @map("started_at")
-  completedAt          DateTime?        @map("completed_at")
-  totalTime            Int?             @map("total_time") // 总用时（毫秒）
-  aggregateReport      Json?            @map("aggregate_report") // 聚合报告（加密存储）
-  contextSnapshotEncrypted String?      @map("context_snapshot_encrypted")
-  contextSnapshotHash      String?      @map("context_snapshot_hash")
-  contextFrozenAt          DateTime?    @map("context_frozen_at")
+  id                       String           @id @default(uuid())
+  questionnaireId          String           @map("questionnaire_id")
+  userId                   String?          @map("user_id") // 改为可选，支持匿名测评
+  tokenId                  String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
+  sessionId                String?          @unique @map("session_id") // 匿名会话标识
+  resumeTokenHash          String?          @unique @map("resume_token_hash") // 服务端恢复凭据哈希
+  resumeTokenExpiresAt     DateTime?        @map("resume_token_expires_at")
+  status                   AssessmentStatus @default(IN_PROGRESS)
+  progress                 Int              @default(0) // 总体进度
+  completedScales          Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
+  completedForms           Int              @default(0) @map("completed_forms") // 已完成表单数量（缓存）
+  startedAt                DateTime         @default(now()) @map("started_at")
+  completedAt              DateTime?        @map("completed_at")
+  totalTime                Int?             @map("total_time") // 总用时（毫秒）
+  aggregateReport          Json?            @map("aggregate_report") // 聚合报告（加密存储）
+  contextSnapshotEncrypted String?          @map("context_snapshot_encrypted")
+  contextSnapshotHash      String?          @map("context_snapshot_hash")
+  contextFrozenAt          DateTime?        @map("context_frozen_at")
 
   // 关联
   questionnaire    Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
@@ -623,9 +623,9 @@ model QuestionnaireFormItem {
   questionnaire Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
   answers       QuestionnaireFormAnswer[]
 
+  @@unique([questionnaireId, contextKey])
   // 性能优化索引
   @@index([questionnaireId, position])
-  @@unique([questionnaireId, contextKey])
   @@map("questionnaire_form_items")
 }
 
@@ -740,32 +740,32 @@ model CompositeAssessmentItem {
   formAnswers         CompositeFormAnswer[]
 
   @@unique([compositeAssessmentId, position])
+  @@unique([compositeAssessmentId, contextKey])
   @@index([scaleId])
   @@index([cognitiveAssignmentId])
-  @@unique([compositeAssessmentId, contextKey])
   @@map("composite_assessment_items")
 }
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
-  id                    String                           @id @default(uuid())
-  compositeAssessmentId String                           @map("composite_assessment_id")
-  userId                String?                          @map("user_id")
-  accessTokenId         String?                          @map("access_token_id")
-  recoveryTokenHash     String?                          @unique @map("recovery_token_hash")
-  participantKey        String                           @map("participant_key")
-  anonymousCode         String?                          @map("anonymous_code")
-  attemptNo             Int                              @default(1) @map("attempt_no")
-  status                CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
-  progress              Int                              @default(0)
-  completedItems        Int                              @default(0) @map("completed_items")
-  startedAt             DateTime                         @default(now()) @map("started_at")
-  lastSavedAt           DateTime                         @default(now()) @map("last_saved_at")
-  completedAt           DateTime?                        @map("completed_at")
-  totalTime             Int?                             @map("total_time")
-  contextSnapshotEncrypted String?                       @map("context_snapshot_encrypted")
-  contextSnapshotHash      String?                       @map("context_snapshot_hash")
-  contextFrozenAt          DateTime?                     @map("context_frozen_at")
+  id                       String                           @id @default(uuid())
+  compositeAssessmentId    String                           @map("composite_assessment_id")
+  userId                   String?                          @map("user_id")
+  accessTokenId            String?                          @map("access_token_id")
+  recoveryTokenHash        String?                          @unique @map("recovery_token_hash")
+  participantKey           String                           @map("participant_key")
+  anonymousCode            String?                          @map("anonymous_code")
+  attemptNo                Int                              @default(1) @map("attempt_no")
+  status                   CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  progress                 Int                              @default(0)
+  completedItems           Int                              @default(0) @map("completed_items")
+  startedAt                DateTime                         @default(now()) @map("started_at")
+  lastSavedAt              DateTime                         @default(now()) @map("last_saved_at")
+  completedAt              DateTime?                        @map("completed_at")
+  totalTime                Int?                             @map("total_time")
+  contextSnapshotEncrypted String?                          @map("context_snapshot_encrypted")
+  contextSnapshotHash      String?                          @map("context_snapshot_hash")
+  contextFrozenAt          DateTime?                        @map("context_frozen_at")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
@@ -1161,6 +1161,7 @@ model CognitiveSession {
   scoreEncrypted               String?                @map("score_encrypted")
   metricsEncrypted             String?                @map("metrics_encrypted")
   qualityFlagsEncrypted        String?                @map("quality_flags_encrypted")
+  resultSnapshotEncrypted      String?                @map("result_snapshot_encrypted")
   configVersion                String                 @map("config_version")
   configSnapshotEncrypted      String                 @map("config_snapshot_encrypted")
   engineVersion                String                 @map("engine_version")

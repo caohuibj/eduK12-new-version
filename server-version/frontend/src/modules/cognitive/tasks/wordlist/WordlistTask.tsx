@@ -120,6 +120,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
       const accepted = await onTrialComplete({
         listId: stage.listId,
         stimulusSetVersion: stage.stimulusSetVersion,
+        phase: stage.phase === 'delayed' ? 'delayed' : 'learning',
         responses: responsesRef.current,
         responseDurationMs: Math.max(0, Math.round(performance.now() - startedAtRef.current)),
         interrupted: interruptedRef.current || timedOut,

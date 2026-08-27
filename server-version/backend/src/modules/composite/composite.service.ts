@@ -7,6 +7,8 @@ import { encryptField, safeDecrypt } from '../../utils/encryption'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
+import * as cognitiveSessionService from '../cognitive/session.service'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
@@ -46,6 +48,8 @@ import type {
   UpdateCompositeInput,
 } from './composite.schema'
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
+import { assertTaskCanPublish } from '../cognitive/v2/publication-gate'
+import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -354,6 +358,13 @@ const validateCognitiveConfig = (config: any) => {
     const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
     const parsed = entry.configSchema.safeParse(config.config)
     if (!parsed.success) throw compositeBadRequest('认知任务配置不符合当前版本规范')
+    const definition = getCognitiveV2TaskDefinition(config.testType, config.engineVersion, config.scoringVersion)
+    if (!definition) throw compositeBadRequest('认知任务缺少 Cognitive v2 definition')
+    try {
+      assertTaskCanPublish(definition)
+    } catch {
+      throw compositeBadRequest('认知任务未通过 Cognitive v2 publication gate')
+    }
     return parsed.data
   } catch (err) {
     if (err instanceof CompositeServiceError) throw err
@@ -1572,8 +1583,27 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const parsedConfig = validateCognitiveConfig(config)
   const anonymous = !userId
-  const configSnapshotEncrypted = assignment.resolvedConfigSnapshotEncrypted
-    || encryptCognitivePayload(parsedConfig)
+  let sessionConfig = parsedConfig
+  if (assignment.resolvedConfigSnapshotEncrypted) {
+    try {
+      sessionConfig = requireCognitiveRegistryEntry(
+        config.testType,
+        config.engineVersion,
+        config.scoringVersion,
+      ).configSchema.parse(
+        decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted),
+      )
+    } catch {
+      throw compositeBadRequest('认知任务冻结的 Profile 配置不可用')
+    }
+  }
+  const configSnapshotEncrypted = cognitiveSessionService.createCognitiveSessionConfigSnapshot({
+    testType: config.testType,
+    configVersion: config.configVersion,
+    engineVersion: config.engineVersion,
+    scoringVersion: config.scoringVersion,
+    config: sessionConfig,
+  })
   return db.cognitiveSession.create({
     data: {
       userId,
@@ -1858,8 +1888,21 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
 }
 
 const cognitiveRunnerPayload = (session: any) => {
-  const config = decryptCognitivePayload<Record<string, unknown>>(session.configSnapshotEncrypted)
-  const result = session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
+  const storedConfig = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const config = storedConfig.config
+  const resultSnapshot = session.status === 'COMPLETED' && session.resultSnapshotEncrypted
+    ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
+    : null
+  const result = resultSnapshot
+    ? {
+        metrics: resultSnapshot.metrics,
+        quality: resultSnapshot.quality,
+        qualityFlags: resultSnapshot.quality.flags,
+        references: resultSnapshot.references,
+        report: resultSnapshot.report,
+        assessmentContext: resultSnapshot.assessmentContext,
+      }
+    : session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
     ? {
         score: decryptCognitivePayload<number>(session.scoreEncrypted),
         metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
@@ -1876,6 +1919,7 @@ const cognitiveRunnerPayload = (session: any) => {
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
     config,
+    ...(storedConfig.snapshot ? { protocol: storedConfig.snapshot.protocol, protocolSignature: storedConfig.snapshot.protocolSignature } : {}),
     randomSeed: session.randomSeed,
     nextTrialIndex: (session.trials?.[0]?.trialIndex ?? -1) + 1,
     ...(result ? { result } : {}),
@@ -2351,10 +2395,21 @@ export const buildCompositeReport = (attempt: any) => {
     }
     try {
       const session = cognitiveMap.get(item.id)
-      const config = session ? decryptCognitivePayload<Record<string, any>>(session.configSnapshotEncrypted) : {}
-      const score = session?.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
-      const metrics = session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {}
-      const qualityFlags = session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {}
+      const config = session
+        ? cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted).config
+        : {}
+      const resultSnapshot = session?.resultSnapshotEncrypted
+        ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
+        : null
+      const score = resultSnapshot
+        ? null
+        : session?.scoreEncrypted
+          ? decryptCognitivePayload<number>(session.scoreEncrypted)
+          : null
+      const metrics = resultSnapshot?.metrics
+        ?? (session?.metricsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted) : {})
+      const qualityFlags = resultSnapshot?.quality.flags
+        ?? (session?.qualityFlagsEncrypted ? decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted) : {})
       const frozenReport = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
       if (packageBased && !frozenReport) {
         throw new Error('报告包认知模块缺少冻结报告定义')
@@ -2365,7 +2420,7 @@ export const buildCompositeReport = (attempt: any) => {
           || item.cognitiveAssignment?.profile === 'research'
           ? item.cognitiveAssignment.profile
           : null)
-      const reference = session && score !== null
+      const legacyReference = session && score !== null
         ? resolveCognitiveReferenceForResult({
           testType: session.testType,
           metrics,
@@ -2378,7 +2433,10 @@ export const buildCompositeReport = (attempt: any) => {
           configVersion: session.configVersion,
         })
         : undefined
-      const singleTaskReport = session && score !== null
+      const reference = resultSnapshot ? resultSnapshot.references[0] : legacyReference
+      const singleTaskReport = resultSnapshot
+        ? resultSnapshot.report
+        : session && score !== null
         ? buildCognitiveSingleTaskReport({
           testType: session.testType,
           engineVersion: session.engineVersion ?? '',
@@ -2389,7 +2447,7 @@ export const buildCompositeReport = (attempt: any) => {
           score,
           metrics,
           qualityFlags,
-          reference: reference ?? null,
+          reference: legacyReference ?? null,
         })
         : null
       const unitReport = {
@@ -2402,8 +2460,11 @@ export const buildCompositeReport = (attempt: any) => {
         score,
         metrics,
         qualityFlags,
+        quality: resultSnapshot?.quality,
         finishedAt: session?.finishedAt,
         reference,
+        references: resultSnapshot?.references ?? [],
+        assessmentContext: resultSnapshot?.assessmentContext ?? null,
         singleTaskReport,
       }
       Object.defineProperty(unitReport, '__frozenMetricDefinitions', {

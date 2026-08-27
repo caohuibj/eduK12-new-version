@@ -8,6 +8,9 @@ import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { ExportFieldBuilder, exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
+import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
+import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { getFrozenPackageSlotLabels } from './report-package-label'
 import { readContextFormAnswers } from '../assessment-context'
 import {
@@ -78,6 +81,15 @@ const frozenReportFor = (assignment: any) => {
   }
 }
 
+const isV2CognitiveAssignment = (assignment: any): boolean => Boolean(
+  assignment?.config
+  && getCognitiveV2TaskDefinition(
+    assignment.config.testType,
+    assignment.config.engineVersion,
+    assignment.config.scoringVersion,
+  ),
+)
+
 const includeFrozenMetric = (definition: any, detail: CompositeExportDetail) => {
   if (!definition || (definition.valueType !== 'number' && definition.valueType !== 'integer')) return false
   return detail === 'full' || definition.export?.summary !== false
@@ -143,7 +155,14 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
               definition: true,
             },
           },
-          cognitiveAssignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
+          cognitiveAssignment: {
+            select: {
+              title: true,
+              profile: true,
+              resolvedReportSnapshotEncrypted: true,
+              config: { select: { testType: true, engineVersion: true, scoringVersion: true } },
+            },
+          },
         },
       },
       attempts: {
@@ -226,7 +245,11 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       const childPrefix = slotPrefix('C', index)
       const title = packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')
       const frozenReport = frozenReportFor(item.cognitiveAssignment)
-      const showProductIndex = frozenReport?.reportDefinition?.showProductIndex !== false
+      // v2 result snapshots deliberately have no generic score. Determine the
+      // column from the frozen assignment contract so an empty export has the
+      // same schema as a populated export.
+      const showProductIndex = !isV2CognitiveAssignment(item.cognitiveAssignment)
+        && frozenReport?.reportDefinition?.showProductIndex !== false
       if (showProductIndex) builder.add(`${childPrefix}score`, `[${title}] 测评得分`, 'numeric', 12, 2)
       builder.add(`${childPrefix}quality`, `[${title}] 数据质量`, 'string', 80)
       builder.add(`${childPrefix}profile`, `[${title}] Profile`, 'string', 80)
@@ -319,20 +342,31 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         const childPrefix = slotPrefix('C', index)
         const assignment = session?.assignment || item.cognitiveAssignment
         if (session) {
-          const score = safeCognitiveValue<number>(session.scoreEncrypted)
-          const quality = safeCognitiveValue<Record<string, unknown>>(session.qualityFlagsEncrypted) || {}
-          const metrics = safeCognitiveValue<Record<string, unknown>>(session.metricsEncrypted) || {}
+          const resultSnapshot: CognitiveResultSnapshot | null = session.resultSnapshotEncrypted
+            ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
+            : null
+          const score = resultSnapshot ? null : safeCognitiveValue<number>(session.scoreEncrypted)
+          const quality = resultSnapshot?.quality.flags
+            ?? safeCognitiveValue<Record<string, unknown>>(session.qualityFlagsEncrypted)
+            ?? {}
+          const metrics = resultSnapshot?.metrics
+            ?? safeCognitiveValue<Record<string, unknown>>(session.metricsEncrypted)
+            ?? {}
           const frozenReport = frozenReportFor(assignment)
-          if (frozenReport?.reportDefinition?.showProductIndex !== false) row[`${childPrefix}score`] = score
-          row[`${childPrefix}quality`] = quality.interpretable === false ? 'insufficient' : quality.interpretable === true ? 'interpretable' : null
-          row[`${childPrefix}profile`] = frozenReport?.profile ?? assignment?.profile ?? null
+          const showProductIndex = !isV2CognitiveAssignment(item.cognitiveAssignment)
+            && frozenReport?.reportDefinition?.showProductIndex !== false
+          if (showProductIndex && !resultSnapshot) row[`${childPrefix}score`] = score
+          row[`${childPrefix}quality`] = resultSnapshot
+            ? resultSnapshot.quality.state
+            : quality.interpretable === false ? 'insufficient' : quality.interpretable === true ? 'interpretable' : null
+          row[`${childPrefix}profile`] = resultSnapshot?.profile ?? frozenReport?.profile ?? assignment?.profile ?? null
           row[`${childPrefix}profile_definition_version`] = frozenReport?.profileDefinitionVersion ?? null
           row[`${childPrefix}metric_definition_version`] = frozenReport?.metricDefinitionVersion ?? null
           row[`${childPrefix}quality_definition_version`] = frozenReport?.qualityDefinitionVersion ?? null
-          row[`${childPrefix}test_type`] = session.testType ?? null
-          row[`${childPrefix}engine_version`] = session.engineVersion ?? null
-          row[`${childPrefix}scoring_version`] = session.scoringVersion ?? null
-          row[`${childPrefix}config_version`] = session.configVersion ?? null
+          row[`${childPrefix}test_type`] = resultSnapshot?.testType ?? session.testType ?? null
+          row[`${childPrefix}engine_version`] = resultSnapshot?.engineVersion ?? session.engineVersion ?? null
+          row[`${childPrefix}scoring_version`] = resultSnapshot?.scoringVersion ?? session.scoringVersion ?? null
+          row[`${childPrefix}config_version`] = resultSnapshot?.configVersion ?? session.configVersion ?? null
           row[`${childPrefix}randomization_algorithm_version`] = frozenReport?.randomizationAlgorithmVersion ?? null
           row[`${childPrefix}report_definition_version`] = frozenReport?.reportDefinitionVersion ?? null
           if (frozenReport) {

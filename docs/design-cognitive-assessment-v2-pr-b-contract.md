@@ -21,7 +21,7 @@ The raw context snapshot remains encrypted and parent-scoped. Standalone cogniti
 - Do not add new cognitive tasks in PR-B.
 - Do not introduce cross-task composite scores or a unified 0–100 cognitive index.
 - Keep research-complete internal data separate from the user-facing projection.
-- A published task must have a complete, versioned protocol, scorer, metrics, quality definition, references, report definition, and publication validation result.
+- A published task must have a complete, versioned protocol, scorer, metrics, quality definition, reference applicability declaration, report definition, and publication validation result.
 - A task without an applicable reference may remain Published, but its report must say that no eligible reference was available and must not imply a normative comparison.
 
 ## Runtime contract
@@ -43,9 +43,9 @@ TaskDefinition
 
 The protocol signature is a canonical SHA-256 digest of measurement-critical protocol fields. A session stores the resolved protocol and config snapshot plus the signature before its first trial. Every stored trial uses the versioned TrialEnvelope; expected answers and correctness labels are never accepted from the client as authoritative inputs.
 
-The scorer is deterministic and pure with respect to its input snapshot: no database access, network access, current time, or hidden randomness. It produces metric values, quality outcomes, reference applicability, interpretation data, and a report projection from the frozen session/trial inputs.
+The scorer is deterministic and pure with respect to its input snapshot: no database access, network access, current time, or hidden randomness. It produces metric values and quality outcomes. The shared reference adapter and report projector then consume those outputs together with the frozen session/context snapshot.
 
-Metrics declare category, direction, visibility, and report role. Visibility is explicit (`headline`, `user`, `detail`, `research_only`, or `hidden`); direction is explicit (`higher_is_better`, `lower_is_better`, `target_range`, or `descriptive`).
+Metrics declare category, direction, visibility, and report role. Visibility is explicit (`headline`, `user`, `detail`, `research_only`, or `hidden`); direction is explicit (`higher_is_better`, `lower_is_better`, `target_range`, `descriptive`, or `signed`).
 
 Quality has exactly three user-relevant outcomes:
 
@@ -63,7 +63,9 @@ Reference applicability is metric-specific and direction-aware. Reported literat
 
 ## Migration and verification scope
 
-All existing cognitive definitions are brought under the v2 contract: the 9 Published definitions and approximately 15 Draft definitions. This is a direct upgrade of the current test data; no new task is introduced and no legacy compatibility layer is required.
+All existing cognitive definitions are brought under the v2 contract: the current registry audit covers 9 Published definitions and 19 Draft definitions. This is a direct upgrade of the current task catalog; no new task is introduced. New sessions use v2 snapshots/envelopes/results, while old in-progress or completed sessions remain readable through the existing legacy path.
+
+The current repository does not activate a cognitive literature reference set. Existing literature files are retained as disabled provenance because their metric/protocol/age-band equivalence has not been audited. The shared adapter is nevertheless wired and tested with explicit fixture references; no literature mean, SD, percentile, or population match is fabricated for production results.
 
 The implementation must include:
 

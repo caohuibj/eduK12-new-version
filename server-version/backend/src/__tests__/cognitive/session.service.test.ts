@@ -34,6 +34,7 @@ import {
 } from '../../modules/cognitive/session.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { hashResolvedConfig } from '../../modules/cognitive/profile-freeze'
+import { parseSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
 
 const PUBLISHED_ASSIGNMENT = {
   id: 'asg-1',
@@ -225,9 +226,13 @@ describe('createSession data', () => {
     // participantSnapshot 密文非明文
     expect(createData.participantSnapshotEncrypted).not.toContain('Student 1')
     expect(decryptCognitivePayload<{ nickname: string | null }>(createData.participantSnapshotEncrypted).nickname).toBe('Student 1')
-    // configSnapshot 密文非明文，decrypt 后等于 validated config
+    // configSnapshot 密文非明文，decrypt 后为完整的 v2 measurement snapshot
     expect(createData.configSnapshotEncrypted).not.toContain('trialCount')
-    expect(decryptCognitivePayload<Record<string, unknown>>(createData.configSnapshotEncrypted).trialCount).toBe(3)
+    const snapshot = parseSessionConfigSnapshot(
+      decryptCognitivePayload<unknown>(createData.configSnapshotEncrypted),
+    )
+    expect(snapshot.config).toMatchObject({ trialCount: 3 })
+    expect(snapshot.protocolSignature).toMatch(/^[0-9a-f]{64}$/)
     expect(createData.randomSeed).toMatch(/^[0-9a-f]{32}$/)
     // version 字段与 config row 一致
     expect(createData.configVersion).toBe('1.0.0')
@@ -255,11 +260,14 @@ describe('createSession data', () => {
 
     await createSession('student-1', 'asg-1')
     const createData = mockPrisma.cognitiveSession.create.mock.calls[0][0].data
-    expect(createData.configSnapshotEncrypted).toBe(frozenCipher)
-    expect(decryptCognitivePayload<Record<string, unknown>>(createData.configSnapshotEncrypted).trialCount).toBe(8)
+    expect(createData.configSnapshotEncrypted).not.toBe(frozenCipher)
+    const snapshot = parseSessionConfigSnapshot(
+      decryptCognitivePayload<unknown>(createData.configSnapshotEncrypted),
+    )
+    expect(snapshot.config).toMatchObject({ trialCount: 8 })
 
     await createSession('student-1', 'asg-1')
-    expect(mockPrisma.cognitiveSession.create.mock.calls[1][0].data.configSnapshotEncrypted).toBe(frozenCipher)
+    expect(mockPrisma.cognitiveSession.create.mock.calls[1][0].data.configSnapshotEncrypted).not.toBe(frozenCipher)
   })
 
   it('returns the existing IN_PROGRESS session without creating a new one', async () => {

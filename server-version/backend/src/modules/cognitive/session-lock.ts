@@ -37,6 +37,7 @@ export interface LockedSessionRow {
   scoreEncrypted: string | null
   metricsEncrypted: string | null
   qualityFlagsEncrypted: string | null
+  resultSnapshotEncrypted: string | null
   configVersion: string
   configSnapshotEncrypted: string
   engineVersion: string
@@ -66,6 +67,7 @@ interface RawSessionRow {
   score_encrypted: string | null
   metrics_encrypted: string | null
   quality_flags_encrypted: string | null
+  result_snapshot_encrypted: string | null
   config_version: string
   config_snapshot_encrypted: string
   engine_version: string
@@ -90,7 +92,7 @@ export const lockSession = async (
       id, user_id, participant_key, participant_snapshot_encrypted, assignment_id,
       composite_attempt_id, composite_item_id, recovery_token_hash, anonymous_code,
       config_id, test_type, attempt_no, status, started_at, finished_at,
-      score_encrypted, metrics_encrypted, quality_flags_encrypted, config_version,
+      score_encrypted, metrics_encrypted, quality_flags_encrypted, result_snapshot_encrypted, config_version,
       config_snapshot_encrypted, engine_version, scoring_version, random_seed,
       completion_key, created_at, updated_at
     FROM cognitive_sessions
@@ -118,6 +120,7 @@ export const lockSession = async (
     scoreEncrypted: r.score_encrypted,
     metricsEncrypted: r.metrics_encrypted,
     qualityFlagsEncrypted: r.quality_flags_encrypted,
+    resultSnapshotEncrypted: r.result_snapshot_encrypted,
     configVersion: r.config_version,
     configSnapshotEncrypted: r.config_snapshot_encrypted,
     engineVersion: r.engine_version,

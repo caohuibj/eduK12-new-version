@@ -451,21 +451,39 @@ const fixedLabel = (entry: AssessmentReferenceEntry): string => (
   entry.evidenceLevel === 'literature_beta' ? '文献 Beta 参考' : entry.referenceKind === 'criterion_threshold' ? '来源定义阈值' : entry.referenceKind === 'descriptive_sample' ? '文献描述性样本' : '群体参考分布'
 )
 
-export const resolveScaleReference = (input: {
-  policy: ScaleReferencePolicy
+export interface AssessmentReferenceSelection {
+  scoreKey: string
+  referenceVersion: string
+  referenceKind: ReferenceKind
+}
+
+export interface AssessmentReferenceScoreLike {
+  key: string
+  value: number | null
+  status?: string
+}
+
+/**
+ * Shared reference resolver for Scale and Cognitive instruments.
+ *
+ * Matching, unavailable reasons, percentile derivation and provenance rules
+ * intentionally live here so consumers cannot drift into task-local copies.
+ */
+export const resolveAssessmentReference = (input: {
+  instrumentType: 'scale' | 'cognitive'
+  selections: AssessmentReferenceSelection[]
   references: AssessmentReferenceSetDefinition[]
   instrumentKey: string
   instrumentVersion: string
   scoringVersion: string
-  score: ScaleScoreValue
+  score: AssessmentReferenceScoreLike
   context?: ReferenceContext
 }): ResolvedScaleReference[] => {
-  if (input.policy.type === 'none') return []
   const context = input.context ?? {}
-  return input.policy.selections
+  return input.selections
     .filter((selection) => selection.scoreKey === input.score.key)
     .map((selection) => {
-      const set = input.references.find((candidate) => candidate.instrumentType === 'scale' && candidate.instrumentKey === input.instrumentKey && candidate.referenceVersion === selection.referenceVersion)
+      const set = input.references.find((candidate) => candidate.instrumentType === input.instrumentType && candidate.instrumentKey === input.instrumentKey && candidate.referenceVersion === selection.referenceVersion)
       if (!set) return unavailable(selection, 'not_found')
       if (set.status !== 'ACTIVE') return unavailable(selection, 'inactive', '该 reference 尚未激活，不用于结果解释。')
       const entries = set.entries.filter((candidate) => candidate.scoreKey === selection.scoreKey && candidate.referenceKind === selection.referenceKind)
@@ -534,4 +552,26 @@ export const resolveScaleReference = (input: {
         disclaimer,
       }
     })
+}
+
+export const resolveScaleReference = (input: {
+  policy: ScaleReferencePolicy
+  references: AssessmentReferenceSetDefinition[]
+  instrumentKey: string
+  instrumentVersion: string
+  scoringVersion: string
+  score: ScaleScoreValue
+  context?: ReferenceContext
+}): ResolvedScaleReference[] => {
+  if (input.policy.type === 'none') return []
+  return resolveAssessmentReference({
+    instrumentType: 'scale',
+    selections: input.policy.selections,
+    references: input.references,
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    scoringVersion: input.scoringVersion,
+    score: input.score,
+    context: input.context,
+  })
 }

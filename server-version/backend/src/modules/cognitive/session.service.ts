@@ -13,6 +13,12 @@ import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
 import { resolveCognitiveReferenceForResult } from './reference'
 import { buildCognitiveSingleTaskReport } from './single-task-report'
+import { getCognitiveV2TaskDefinition } from './v2/registry'
+import {
+  createSessionConfigSnapshot,
+  sessionConfigFromStoredValue,
+} from './v2/session-snapshot'
+import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -20,7 +26,7 @@ import { buildCognitiveSingleTaskReport } from './single-task-report'
  * 边界（D4 §3 / §19）：不写 Trial、不评分、不返回 score/metrics；
  * 普通登录会话仍沿用课程成员资格；公开/综合测评匿名会话由 public.service 负责凭证和入口校验；不建 server timer；
  * 不引 Redis lock / websocket / heartbeat / fingerprint / device binding；
- * 不加新 migration。
+ * 数据库变更由版本化 Prisma migration 管理。
  *
  * D6.1：
  * - P1：createSession 先找 existing IN_PROGRESS（resume 现有 attempt，不重新检查资格），
@@ -47,6 +53,50 @@ interface StartableContext {
     configVersion: string
     engineVersion: string
     scoringVersion: string
+  }
+}
+
+/**
+ * New sessions persist the complete v2 measurement snapshot in the existing
+ * encrypted config column. The raw assignment snapshot remains the source
+ * used to construct it; legacy sessions continue to be readable below.
+ */
+export const createCognitiveSessionConfigSnapshot = (input: {
+  testType: string
+  configVersion: string
+  engineVersion: string
+  scoringVersion: string
+  config: unknown
+}): string => {
+  const definition = getCognitiveV2TaskDefinition(
+    input.testType,
+    input.engineVersion,
+    input.scoringVersion,
+  )
+  if (!definition) throw new Error(`No Cognitive v2 definition for ${input.testType}/${input.engineVersion}/${input.scoringVersion}`)
+  const snapshot = createSessionConfigSnapshot({
+    definition,
+    configVersion: input.configVersion,
+    config: input.config,
+  })
+  return encryptCognitivePayload(snapshot)
+}
+
+/** Decode either a v2 session snapshot or the legacy raw config snapshot. */
+export const readCognitiveSessionConfig = <TConfig = Record<string, unknown>>(encrypted: string): {
+  config: TConfig
+  snapshot: ReturnType<typeof sessionConfigFromStoredValue<TConfig>>['snapshot']
+} => sessionConfigFromStoredValue<TConfig>(decryptCognitivePayload<unknown>(encrypted))
+
+const v2ResultFromSnapshot = (encrypted: string) => {
+  const snapshot = parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(encrypted))
+  return {
+    metrics: snapshot.metrics,
+    quality: snapshot.quality,
+    qualityFlags: snapshot.quality.flags,
+    references: snapshot.references,
+    report: snapshot.report,
+    assessmentContext: snapshot.assessmentContext,
   }
 }
 
@@ -157,7 +207,9 @@ const toRunnerPayload = (session: {
   anonymousCode?: string | null
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
-  const validatedConfig = decryptCognitivePayload<unknown>(session.configSnapshotEncrypted)
+  const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const validatedConfig = storedConfig.config
+  const snapshot = storedConfig.snapshot
   const report = frozenReport ?? readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
   const entry = report ? null : requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
   return {
@@ -170,6 +222,7 @@ const toRunnerPayload = (session: {
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
     config: validatedConfig,
+    ...(snapshot ? { protocol: snapshot.protocol, protocolSignature: snapshot.protocolSignature } : {}),
     randomSeed: session.randomSeed,
     profile: report?.profile ?? null,
     reportCaveats: report?.reportCaveats ?? [],
@@ -220,7 +273,13 @@ export const createSession = async (userId: string, assignmentId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
+  const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+    testType: ctx.config.testType,
+    configVersion: ctx.config.configVersion,
+    engineVersion: ctx.config.engineVersion,
+    scoringVersion: ctx.config.scoringVersion,
+    config: ctx.validatedConfig,
+  })
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
@@ -274,6 +333,16 @@ export const getSession = async (userId: string, sessionId: string) => {
   if (session.status === 'COMPLETED') {
     // D6 后：完成态返回 decrypted result。
     const runnerPayload = toRunnerPayload(session)
+    const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+    if (storedConfig.snapshot) {
+      if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
+      return {
+        ...runnerPayload,
+        status: session.status,
+        finishedAt: session.finishedAt,
+        result: v2ResultFromSnapshot(session.resultSnapshotEncrypted),
+      }
+    }
     const score = session.scoreEncrypted
       ? decryptCognitivePayload<number>(session.scoreEncrypted)
       : null
@@ -356,6 +425,16 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   const runnerPayload = toRunnerPayload(session, nextTrialIndex, true)
   if (session.status !== 'COMPLETED') return runnerPayload
 
+  const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  if (storedConfig.snapshot) {
+    if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
+    return {
+      ...runnerPayload,
+      finishedAt: session.finishedAt,
+      result: v2ResultFromSnapshot(session.resultSnapshotEncrypted),
+    }
+  }
+
   const score = session.scoreEncrypted ? decryptCognitivePayload<number>(session.scoreEncrypted) : null
   const metrics = session.metricsEncrypted
     ? decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted)
@@ -426,7 +505,13 @@ export const restartSession = async (userId: string, sessionId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = ctx.configSnapshotEncrypted
+  const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+    testType: ctx.config.testType,
+    configVersion: ctx.config.configVersion,
+    engineVersion: ctx.config.engineVersion,
+    scoringVersion: ctx.config.scoringVersion,
+    config: ctx.validatedConfig,
+  })
   const randomSeed = randomBytes(16).toString('hex')
 
   try {

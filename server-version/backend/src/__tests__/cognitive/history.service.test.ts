@@ -27,6 +27,7 @@ const session = (overrides: Record<string, unknown> = {}) => ({
   finishedAt: new Date('2026-08-20T00:00:00Z'),
   scoreEncrypted: encryptCognitivePayload(88),
   qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
+  resultSnapshotEncrypted: null,
   assignment: { title: 'Reaction pilot' },
   ...overrides,
 })
@@ -57,9 +58,11 @@ describe('cognitive history service', () => {
       where: {
         userId: 'student-1',
         status: 'COMPLETED',
-        scoreEncrypted: { not: null },
-        qualityFlagsEncrypted: { not: null },
         compositeAttemptId: null,
+        OR: [
+          { scoreEncrypted: { not: null }, qualityFlagsEncrypted: { not: null } },
+          { resultSnapshotEncrypted: { not: null } },
+        ],
       },
       select: expect.not.objectContaining({ metricsEncrypted: true }),
     }))
@@ -96,9 +99,41 @@ describe('cognitive history service', () => {
 
     const [item] = (await listMyHistory('student-1', { page: 1, pageSize: 20, skip: 0, take: 20 })).list
 
-    expect(item).toMatchObject({ title: 'stroop 测评', score: 30, qualityState: 'insufficient' })
+    expect(item).toMatchObject({ title: 'stroop 测评', score: 30, qualityState: 'limited' })
     expect(item).not.toHaveProperty('metrics')
     expect(item).not.toHaveProperty('qualityFlags')
+  })
+
+  it('lists v2 results without inventing a product score', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([session({
+      id: 'v2-session',
+      scoreEncrypted: null,
+      qualityFlagsEncrypted: encryptCognitivePayload({ interrupted: true }),
+      resultSnapshotEncrypted: encryptCognitivePayload({
+        schemaVersion: 1,
+        completedAt: '2026-08-20T00:00:00.000Z',
+        testType: 'reaction',
+        configVersion: '1.0.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        protocolSignature: 'a'.repeat(64),
+        profile: 'standard',
+        metrics: { meanRtMs: 350 },
+        quality: { state: 'limited', flags: { interrupted: true }, reasons: ['中断'] },
+        references: [],
+        report: {},
+        assessmentContext: null,
+      }),
+    })])
+
+    const [item] = (await listMyHistory('student-1', {
+      page: 1,
+      pageSize: 20,
+      skip: 0,
+      take: 20,
+    })).list
+
+    expect(item).toMatchObject({ sessionId: 'v2-session', score: null, qualityState: 'limited' })
   })
 
   it('omits undecryptable rows from list and total instead of failing the page', async () => {

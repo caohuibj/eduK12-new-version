@@ -80,7 +80,14 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
     throw FORBIDDEN('Invalid recovery credential')
   }
   assertWindow(token)
-  const { config, snapshotEncrypted } = validateAssignment(token.assignment)
+  const { config, parsedConfig } = validateAssignment(token.assignment)
+  const sessionConfigSnapshotEncrypted = sessionService.createCognitiveSessionConfigSnapshot({
+    testType: config.testType,
+    configVersion: config.configVersion,
+    engineVersion: config.engineVersion,
+    scoringVersion: config.scoringVersion,
+    config: parsedConfig,
+  })
   const credential = createRecoveryCredential()
   const created = await prisma.$transaction(async (tx) => {
     const claimed = await tx.cognitiveAccessToken.updateMany({
@@ -102,7 +109,7 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
         attemptNo: 1,
         status: 'IN_PROGRESS',
         configVersion: config.configVersion,
-        configSnapshotEncrypted: snapshotEncrypted,
+        configSnapshotEncrypted: sessionConfigSnapshotEncrypted,
         engineVersion: config.engineVersion,
         scoringVersion: config.scoringVersion,
         randomSeed: randomBytes(16).toString('hex'),

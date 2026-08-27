@@ -16,6 +16,7 @@
     "restore:db": "node ../scripts/backup/restore-db.mjs",
     "smoke:restore": "node ../scripts/backup/smoke-restore.mjs",
     "generate:simulated-reference": "tsx src/modules/cognitive/reference-data/generate-simulated-reference.ts",
+    "cognitive:audit": "tsx src/scripts/cognitive-audit.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",

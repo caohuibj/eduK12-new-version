@@ -29,7 +29,7 @@ const NO_REFERENCE_REPORT = {
   referenceMode: 'none' as const,
 }
 
-const COGNITIVE_SEEDS: CognitiveSeed[] = [
+export const COGNITIVE_SEEDS: CognitiveSeed[] = [
   {
     testType: 'fake',
     configVersion: '1.0.0',

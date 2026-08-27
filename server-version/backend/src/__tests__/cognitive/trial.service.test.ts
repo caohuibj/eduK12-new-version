@@ -16,7 +16,10 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { appendTrial } from '../../modules/cognitive/trial.service'
-import { decryptCognitivePayload, hashTrialPayload } from '../../modules/cognitive/cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload, hashTrialPayload } from '../../modules/cognitive/cognitive.security'
+import { createSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
 
 // D6.1：appendTrial 在 $transaction + FOR UPDATE 行锁内读取 session（$queryRaw 返回 raw 行）。
 const SESSION = {
@@ -34,6 +37,7 @@ const SESSION = {
   scoreEncrypted: null,
   metricsEncrypted: null,
   qualityFlagsEncrypted: null,
+  resultSnapshotEncrypted: null,
   configVersion: '1.0.0',
   configSnapshotEncrypted: 'y',
   engineVersion: '1.0.0',
@@ -59,6 +63,7 @@ const rawRow = (s: any = SESSION) => ({
   score_encrypted: s.scoreEncrypted,
   metrics_encrypted: s.metricsEncrypted,
   quality_flags_encrypted: s.qualityFlagsEncrypted,
+  result_snapshot_encrypted: s.resultSnapshotEncrypted,
   config_version: s.configVersion,
   config_snapshot_encrypted: s.configSnapshotEncrypted,
   engine_version: s.engineVersion,
@@ -168,5 +173,59 @@ describe('appendTrial persistence (locked)', () => {
     )
     const result = await appendTrial('student-1', 'session-1', { trialIndex: 2, payload: { correct: true, rtMs: 400 } })
     expect(result.trialIndex).toBe(2)
+  })
+
+  it('persists a v2 trial envelope and never accepts client scoring fields', async () => {
+    const definition = getCognitiveV2TaskDefinition('fake', '1.0.0', '1.0.0')
+    if (!definition) throw new Error('fake v2 definition missing')
+    const snapshot = createSessionConfigSnapshot({
+      definition,
+      configVersion: '1.0.0',
+      config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+    })
+    mockPrisma.$queryRaw.mockResolvedValue([
+      rawRow({
+        ...SESSION,
+        configSnapshotEncrypted: encryptCognitivePayload(snapshot),
+      }),
+    ])
+    mockPrisma.cognitiveTrial.create.mockImplementation(async ({ data }: any) =>
+      TRIAL({ trialIndex: data.trialIndex, payloadEncrypted: data.payloadEncrypted, payloadHash: data.payloadHash })
+    )
+
+    const envelope = createTrialEnvelope({
+      trialIndex: 0,
+      phase: 'test',
+      payload: { correct: true, rtMs: 420 },
+      startedAtPerfMs: 100,
+      endedAtPerfMs: 520,
+    })
+    const result = await appendTrial('student-1', 'session-1', { trialIndex: 0, payload: envelope })
+    expect(result.trialIndex).toBe(0)
+    const data = mockPrisma.cognitiveTrial.create.mock.calls[0][0].data
+    expect(decryptCognitivePayload(data.payloadEncrypted)).toEqual(envelope)
+    expect(data.payloadHash).toBe(hashTrialPayload(envelope))
+
+    await expect(appendTrial('student-1', 'session-1', {
+      trialIndex: 1,
+      payload: createTrialEnvelope({
+        trialIndex: 1,
+        phase: 'test',
+        payload: { correct: true, rtMs: 420, score: 100 },
+        startedAtPerfMs: 600,
+        endedAtPerfMs: 1020,
+      }),
+    })).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('fails closed when the encrypted session config is corrupt', async () => {
+    mockPrisma.$queryRaw.mockResolvedValue([
+      rawRow({ ...SESSION, configSnapshotEncrypted: '00:00:00' }),
+    ])
+    await expect(appendTrial('student-1', 'session-1', {
+      trialIndex: 0,
+      payload: { correct: true, rtMs: 420 },
+    })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.cognitiveTrial.create).not.toHaveBeenCalled()
   })
 })

@@ -19,6 +19,9 @@ import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { readFrozenReport } from './profile-freeze'
 import { buildZipStore } from './export-zip'
 import * as XLSX from 'xlsx'
+import { getCognitiveV2TaskDefinition } from './v2/registry'
+import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
+import type { CognitiveResultSnapshot } from './v2/types'
 
 export type CognitiveExportDetail = 'summary' | 'full' | 'research'
 export type CognitiveExportFormat = 'csv' | 'sav' | 'xlsx' | 'zip'
@@ -65,6 +68,7 @@ interface CognitiveExportSession {
   scoreEncrypted: string | null
   metricsEncrypted: string | null
   qualityFlagsEncrypted: string | null
+  resultSnapshotEncrypted: string | null
   user: {
     id: string
     nickname: string | null
@@ -76,10 +80,12 @@ interface CognitiveExportSession {
   }>
 }
 
-interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'scoreEncrypted' | 'metricsEncrypted' | 'qualityFlagsEncrypted' | 'trials'> {
-  score: number
+interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'scoreEncrypted' | 'metricsEncrypted' | 'qualityFlagsEncrypted' | 'resultSnapshotEncrypted' | 'trials'> {
+  score: number | null
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
+  qualityState: 'interpretable' | 'limited' | 'invalid'
+  resultSnapshot: CognitiveResultSnapshot | null
   trials: Array<{ trialIndex: number; payload: unknown }>
 }
 
@@ -298,6 +304,34 @@ const getSessions = async (
 }
 
 const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportSession => {
+  if (session.resultSnapshotEncrypted) {
+    const resultSnapshot = parseCognitiveResultSnapshot(
+      decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
+    )
+    return {
+      id: session.id,
+      userId: session.userId,
+      anonymousCode: session.anonymousCode,
+      attemptNo: session.attemptNo,
+      testType: session.testType,
+      configVersion: session.configVersion,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      startedAt: session.startedAt,
+      finishedAt: session.finishedAt,
+      user: session.user,
+      score: null,
+      metrics: resultSnapshot.metrics,
+      qualityFlags: resultSnapshot.quality.flags,
+      qualityState: resultSnapshot.quality.state,
+      resultSnapshot,
+      trials: (session.trials || []).map((trial) => ({
+        trialIndex: trial.trialIndex,
+        payload: decryptCognitivePayload<unknown>(trial.payloadEncrypted),
+      })),
+    }
+  }
+
   if (!session.scoreEncrypted || !session.metricsEncrypted || !session.qualityFlagsEncrypted) {
     throw new Error(`认知测评会话 ${session.id} 缺少已完成结果`)
   }
@@ -317,6 +351,10 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
     score: decryptCognitivePayload<number>(session.scoreEncrypted),
     metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
     qualityFlags: decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted),
+    qualityState: decryptCognitivePayload<Record<string, unknown>>(session.qualityFlagsEncrypted).interpretable === false
+      ? 'limited'
+      : 'interpretable',
+    resultSnapshot: null,
     trials: (session.trials || []).map((trial) => ({
       trialIndex: trial.trialIndex,
       payload: decryptCognitivePayload<unknown>(trial.payloadEncrypted),
@@ -343,6 +381,7 @@ const addBaseFields = (builder: ExportFieldBuilder, anonymize: boolean, includeP
   builder.add('A_report_definition_version', '报告定义版本', 'string', 20)
   builder.add('A_randomization_algorithm_version', '随机化算法版本', 'string', 40)
   builder.add('A_quality_interpretable', '结果可解释', 'numeric', 4, 0)
+  builder.add('A_quality_state', '结果质量状态', 'string', 16)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 8, 0)
   builder.add('A_date', '完成日期', 'date', 24)
 }
@@ -360,9 +399,15 @@ const reportContextFor = (assignment: Awaited<ReturnType<typeof getAssignment>>,
     randomizationAlgorithmVersion: frozen
       ? frozen.randomizationAlgorithmVersion ?? null
       : entry?.randomizationAlgorithmVersion ?? null,
-    metricDefinitions: frozen?.metricDefinitions ?? entry?.metricDefinitions ?? {},
-    qualityDefinitions: frozen?.qualityDefinitions ?? entry?.qualityDefinitions ?? {},
-    showProductIndex: (frozen?.reportDefinition ?? entry?.reportDefinition)?.showProductIndex !== false,
+    metricDefinitions: session.resultSnapshot
+      ? (getCognitiveV2TaskDefinition(session.testType, session.engineVersion, session.scoringVersion)?.metrics ?? {})
+      : (frozen?.metricDefinitions ?? entry?.metricDefinitions ?? {}),
+    qualityDefinitions: session.resultSnapshot
+      ? (getCognitiveV2TaskDefinition(session.testType, session.engineVersion, session.scoringVersion)?.quality ?? {})
+      : (frozen?.qualityDefinitions ?? entry?.qualityDefinitions ?? {}),
+    showProductIndex: session.resultSnapshot
+      ? false
+      : (frozen?.reportDefinition ?? entry?.reportDefinition)?.showProductIndex !== false,
   }
 }
 
@@ -459,7 +504,8 @@ const fillBaseRow = (
   row.A_quality_definition_version = context.qualityDefinitionVersion
   row.A_report_definition_version = context.reportDefinitionVersion
   row.A_randomization_algorithm_version = context.randomizationAlgorithmVersion
-  row.A_quality_interpretable = session.qualityFlags.interpretable === false ? 0 : 1
+  row.A_quality_interpretable = session.qualityState === 'interpretable' ? 1 : 0
+  row.A_quality_state = session.qualityState
   row.A_duration_s = session.finishedAt
     ? Math.round((session.finishedAt.getTime() - session.startedAt.getTime()) / 1000)
     : null
@@ -517,7 +563,7 @@ export async function getCognitiveExportData(
   const builder = new ExportFieldBuilder()
   const includeProductIndex = decodedSessions.length === 0
     ? assignment.config?.testType !== 'bart'
-    : decodedSessions.some((session) => reportContextFor(assignment, session).showProductIndex)
+    : decodedSessions.some((session) => !session.resultSnapshot && reportContextFor(assignment, session).showProductIndex)
 
   addBaseFields(builder, anonymize, includeProductIndex)
   for (const session of decodedSessions) addSessionFields(builder, session, detail, assignment)
@@ -606,7 +652,7 @@ export const buildCognitiveResearchPackage = (
       A_assignment_id: assignment.id,
       A_test_type: session.testType,
       A_attempt: session.attemptNo,
-      ...(context.showProductIndex ? { A_score: session.score } : {}),
+      ...(!session.resultSnapshot && context.showProductIndex && session.score !== null ? { A_score: session.score } : {}),
       A_profile: context.profile,
       A_config_version: session.configVersion,
       A_engine_version: session.engineVersion,
@@ -615,7 +661,8 @@ export const buildCognitiveResearchPackage = (
       A_quality_definition_version: context.qualityDefinitionVersion,
       A_report_definition_version: context.reportDefinitionVersion,
       A_randomization_algorithm_version: context.randomizationAlgorithmVersion,
-      A_quality_interpretable: session.qualityFlags.interpretable === false ? 0 : 1,
+      A_quality_interpretable: session.qualityState === 'interpretable' ? 1 : 0,
+      A_quality_state: session.qualityState,
       A_finished_at: session.finishedAt?.toISOString() ?? null,
     }
   })
