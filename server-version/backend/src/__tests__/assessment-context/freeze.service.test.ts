@@ -5,7 +5,9 @@ process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 import {
   buildAssessmentContext,
   hashAssessmentContext,
+  readContextFormAnswer,
   type AssessmentContextV1,
+  writeContextFormAnswer,
 } from '../../modules/assessment-context'
 import {
   encryptAssessmentContext,
@@ -49,8 +51,8 @@ const questionnaireRow = (id: string, birthYearMonth: string, sexAtBirth?: strin
   contextFrozenAt: null as Date | null,
   questionnaire: { formItems: contextItems },
   formAnswers: [
-    { formItemId: 'birth-month', value: birthYearMonth },
-    ...(sexAtBirth ? [{ formItemId: 'sex', value: sexAtBirth }] : []),
+    { formItemId: 'birth-month', value: writeContextFormAnswer('birthYearMonth', birthYearMonth) },
+    ...(sexAtBirth ? [{ formItemId: 'sex', value: writeContextFormAnswer('sexAtBirth', sexAtBirth) }] : []),
   ],
 })
 
@@ -71,7 +73,7 @@ const compositeRow = (id: string, birthYearMonth: string) => ({
       formOptions: item.options ?? null,
     })),
   },
-  formAnswers: [{ itemId: 'birth-month', value: birthYearMonth }],
+  formAnswers: [{ itemId: 'birth-month', value: writeContextFormAnswer('birthYearMonth', birthYearMonth) }],
 })
 
 const makeDb = (questionnaireRows: Record<string, any> = {}, compositeRows: Record<string, any> = {}) => {
@@ -117,6 +119,8 @@ describe('parent-scoped AssessmentContext freeze', () => {
     expect(second.context.values).toMatchObject({ birthYearMonth: '2012-08', sexAtBirth: 'male', ageMonthsAtFreeze: 168 })
     expect(firstRow.contextSnapshotHash).toBe(first.hash)
     expect(secondRow.contextSnapshotHash).toBe(second.hash)
+    expect(firstRow.formAnswers[0].value).not.toBe('2014-02')
+    expect(readContextFormAnswer('birthYearMonth', firstRow.formAnswers[0].value)).toBe('2014-02')
 
     const repeated = await freezeQuestionnaireAssessmentContext(db, 'qa-1', new Date('2027-01-01T00:00:00Z'))
     expect(repeated).toMatchObject({ hash: first.hash, alreadyFrozen: true, context: first.context })

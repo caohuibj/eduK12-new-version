@@ -10,7 +10,7 @@ import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
-import { validateContextAnswer, validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
+import { readContextFormAnswer, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
   freezeQuestionnaireAssessmentContext,
@@ -1145,6 +1145,7 @@ export const questionnaireController = {
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
 
+        const storedValue = writeContextFormAnswer(formItem.contextKey, valueToStore)
         const formAnswer = await tx.questionnaireFormAnswer.upsert({
           where: {
             questionnaireAssessmentId_formItemId: {
@@ -1155,15 +1156,15 @@ export const questionnaireController = {
           create: {
             questionnaireAssessmentId: assessmentId,
             formItemId,
-            value: valueToStore,
+            value: storedValue,
           },
           update: {
-            value: valueToStore,
+            value: storedValue,
           },
         })
 
         await refreshQuestionnaireProgress(tx, assessmentId)
-        return { kind: 'saved' as const, formAnswer }
+        return { kind: 'saved' as const, formAnswer, contextKey: formItem.contextKey }
       })
 
       if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
@@ -1176,7 +1177,10 @@ export const questionnaireController = {
 
       logger.info('保存表单答案', { assessmentId, formItemId, userId })
 
-      return success(res, outcome.formAnswer, '表单答案保存成功')
+      return success(res, {
+        ...outcome.formAnswer,
+        value: readContextFormAnswer(outcome.contextKey, outcome.formAnswer.value),
+      }, '表单答案保存成功')
     } catch (err) {
       logger.error('保存表单答案错误', err)
       return error(res, '保存表单答案失败')
@@ -1236,6 +1240,7 @@ export const questionnaireController = {
         }
 
         for (const answer of answers) {
+          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
           await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
@@ -1246,10 +1251,10 @@ export const questionnaireController = {
             create: {
               questionnaireAssessmentId: assessmentId,
               formItemId: answer.formItemId,
-              value: answer.value,
+              value: writeContextFormAnswer(item?.contextKey, answer.value),
             },
             update: {
-              value: answer.value,
+              value: writeContextFormAnswer(item?.contextKey, answer.value),
             },
           })
         }

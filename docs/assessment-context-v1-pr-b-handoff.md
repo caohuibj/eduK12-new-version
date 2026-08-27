@@ -16,6 +16,8 @@ QuestionnaireAssessment / CompositeAssessmentAttempt
 
 人口学字段只能通过父级表单的显式 `contextKey` 进入上下文。普通未绑定表单仍可保存为背景资料，但不会参与 reference 匹配。
 
+带 `contextKey` 的父级表单答案从首次写入起使用现有数据加密能力加密保存；服务端读取时通过共享 helper 解密，不能把数据库中的值当作明文使用。`contextSnapshotHash` 是服务端密钥保护的 HMAC 指纹，不是裸 SHA-256；PR-B 只消费该指纹，不自行重算或保存人口学原始值。
+
 ## 2. 契约
 
 共享模块：`backend/src/modules/assessment-context`

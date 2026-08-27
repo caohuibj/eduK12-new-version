@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { createHash } from 'node:crypto'
+
+process.env.ASSESSMENT_CONTEXT_HASH_KEY = 'b'.repeat(64)
 import {
   ageMonthsAt,
   buildAssessmentContext,
@@ -62,7 +65,9 @@ describe('AssessmentContextV1', () => {
       frozenAt: new Date('2026-08-01T00:00:00Z'),
     })
     const second = { ...first, values: { ageYearsAtFreeze: 12, ageMonthsAtFreeze: 150, birthYearMonth: '2014-02' } }
-    expect(hashAssessmentContext(first)).toBe(hashAssessmentContext(second))
+    const keyedHash = hashAssessmentContext(first)
+    expect(keyedHash).toBe(hashAssessmentContext(second))
+    expect(keyedHash).not.toBe(createHash('sha256').update(JSON.stringify(first)).digest('hex'))
   })
 
   it('allows optional context fields to freeze without a value', () => {

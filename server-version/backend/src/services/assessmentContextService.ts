@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import {
   buildAssessmentContext,
   hashAssessmentContext,
+  readContextFormAnswers,
   validateContextFormItems,
   type AssessmentContextV1,
   type ContextFormAnswer,
@@ -66,7 +67,9 @@ const lockCompositeAssessmentAttempt = async (db: DatabaseClient, attemptId: str
 
 const buildOrThrow = (items: Array<Record<string, unknown>>, answers: Array<Record<string, unknown>>, frozenAt: Date): AssessmentContextV1 => {
   try {
-    return buildAssessmentContext({ items: toContextItems(items), answers: toContextAnswers(answers), frozenAt })
+    const contextItems = toContextItems(items)
+    const contextAnswers = readContextFormAnswers(contextItems, toContextAnswers(answers))
+    return buildAssessmentContext({ items: contextItems, answers: contextAnswers, frozenAt })
   } catch (error) {
     throw new AssessmentContextServiceError(error instanceof Error ? error.message : '人口学上下文无效', 409)
   }

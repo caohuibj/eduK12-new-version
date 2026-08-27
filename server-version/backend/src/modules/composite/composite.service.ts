@@ -21,7 +21,7 @@ import {
 } from '../scale/scale-workflow.service'
 import { validateScaleDefinition } from '../scale/scale-definition'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
-import { validateContextAnswer, validateContextFormItem, validateContextFormItems } from '../assessment-context'
+import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
 import {
   freezeCompositeAttemptContext,
   isAssessmentContextServiceError,
@@ -1992,7 +1992,14 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   await findAttempt(attemptId, context)
   await finalizeAttemptIfReady(attemptId)
   const attempt = await findAttempt(attemptId, context)
-  const maps = attemptCompletedItemMaps(attempt)
+  const readableFormAnswers = readContextFormAnswers(
+    attempt.compositeAssessment.items
+      .filter((item: any) => item.type === 'FORM')
+      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+    attempt.formAnswers,
+  )
+  const readableAttempt = { ...attempt, formAnswers: readableFormAnswers }
+  const maps = attemptCompletedItemMaps(readableAttempt)
   const { scaleMap, cognitiveMap, formMap } = maps
   const completed = (item: any) => isAttemptItemCompleted(item, maps)
   const completedItems = countAttemptCompletedItems(attempt, maps)
@@ -2118,10 +2125,11 @@ export const saveAttempt = async (
       }
       const existing = await tx.compositeFormAnswer.findUnique({ where: { attemptId_itemId: { attemptId, itemId: draft.itemId } }, select: { completed: true } })
       if (!existing || existing.completed === false) {
+        const storedValue = writeContextFormAnswer(item.contextKey, draft.value)
         await tx.compositeFormAnswer.upsert({
           where: { attemptId_itemId: { attemptId, itemId: draft.itemId } },
-          create: { attemptId, itemId: draft.itemId, value: draft.value, completed: false },
-          update: { value: draft.value, completed: false },
+          create: { attemptId, itemId: draft.itemId, value: storedValue, completed: false },
+          update: { value: storedValue, completed: false },
         })
       }
       await tx.compositeAssessmentAttempt.update({ where: { id: attemptId }, data: { lastSavedAt: new Date() } })
@@ -2167,7 +2175,8 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
       const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
       if (values.some((candidate) => !allowed.has(candidate)) || new Set(values).size !== values.length) throw compositeBadRequest('表单选项无效')
     }
-    await tx.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value, completed: true }, update: { value, completed: true } })
+    const storedValue = writeContextFormAnswer(item.contextKey, value)
+    await tx.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value: storedValue, completed: true }, update: { value: storedValue, completed: true } })
   })
   return getAttemptState(attempt.id, context)
 }
@@ -2273,7 +2282,13 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
-  const formMap = new Map<string, any>(attempt.formAnswers.map((item: any) => [item.itemId, item]))
+  const readableFormAnswers = readContextFormAnswers(
+    attempt.compositeAssessment.items
+      .filter((item: any) => item.type === 'FORM')
+      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+    attempt.formAnswers,
+  )
+  const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)

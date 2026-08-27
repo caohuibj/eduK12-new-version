@@ -31,7 +31,7 @@ import {
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
 import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
-import { validateContextAnswer } from '../modules/assessment-context'
+import { validateContextAnswer, writeContextFormAnswer } from '../modules/assessment-context'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 
 const publicScaleRunner = (scale: any) => {
@@ -1204,6 +1204,7 @@ export const publicQuestionnaireController = {
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
 
+        const storedValue = writeContextFormAnswer(formItem.contextKey, String(valueToStore))
         await tx.questionnaireFormAnswer.upsert({
           where: {
             questionnaireAssessmentId_formItemId: {
@@ -1214,10 +1215,10 @@ export const publicQuestionnaireController = {
           create: {
             questionnaireAssessmentId: questionnaireAssessment.id,
             formItemId,
-            value: String(valueToStore),
+            value: storedValue,
           },
           update: {
-            value: String(valueToStore),
+            value: storedValue,
           },
         })
 

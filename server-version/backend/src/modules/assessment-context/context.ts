@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { createHmac } from 'node:crypto'
 import { z } from 'zod'
 
 export const assessmentContextKeySchema = z.enum([
@@ -233,7 +233,21 @@ const sortKeys = (value: unknown): unknown => {
 
 export const stableContextJson = (context: AssessmentContextV1): string => JSON.stringify(sortKeys(context))
 
-export const hashAssessmentContext = (context: AssessmentContextV1): string => createHash('sha256').update(stableContextJson(context)).digest('hex')
+const CONTEXT_HASH_DOMAIN = 'eduK12-assessment-context-hash-v1'
+
+const contextHashKey = (): Buffer => {
+  const configuredKey = process.env.ASSESSMENT_CONTEXT_HASH_KEY || process.env.DATA_ENCRYPTION_KEY
+  if (!configuredKey || !/^[0-9a-fA-F]{64}$/.test(configuredKey)) {
+    throw new Error('ASSESSMENT_CONTEXT_HASH_KEY or DATA_ENCRYPTION_KEY must be a 64-character hex key')
+  }
+  // Derive a domain-specific HMAC key so the fallback DATA_ENCRYPTION_KEY is
+  // not reused directly for this fingerprint purpose.
+  return createHmac('sha256', Buffer.from(configuredKey, 'hex')).update(CONTEXT_HASH_DOMAIN).digest()
+}
+
+export const hashAssessmentContext = (context: AssessmentContextV1): string => (
+  createHmac('sha256', contextHashKey()).update(stableContextJson(context), 'utf8').digest('hex')
+)
 
 export const contextKeyToStorage = (key: AssessmentContextKey): string => key
 

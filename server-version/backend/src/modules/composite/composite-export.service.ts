@@ -9,6 +9,7 @@ import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { ExportFieldBuilder, exportCognitiveToCSV, scalarExportValue } from '../cognitive/export.service'
 import { getFrozenPackageSlotLabels } from './report-package-label'
+import { readContextFormAnswers } from '../assessment-context'
 import {
   assertExportLimits,
   cleanupExpiredExportFiles,
@@ -258,6 +259,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
   for (const attempt of template.attempts as any[]) {
+    const readableFormAnswers = readContextFormAnswers(formItems, attempt.formAnswers)
     const row: Record<string, unknown> = {
       U_id: attempt.anonymousCode || (attempt.userId ? `U${attempt.userId.substring(0, 8)}` : 'ANONYMOUS'),
       A_attempt_id: attempt.id,
@@ -270,7 +272,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
 
     for (let index = 0; index < formItems.length; index += 1) {
       const item = formItems[index]
-      row[`F${String(index + 1).padStart(3, '0')}_value`] = attempt.formAnswers.find((answer: any) => answer.itemId === item.id)?.value ?? null
+      row[`F${String(index + 1).padStart(3, '0')}_value`] = readableFormAnswers.find((answer: any) => answer.itemId === item.id)?.value ?? null
     }
 
     for (let index = 0; index < template.items.length; index += 1) {

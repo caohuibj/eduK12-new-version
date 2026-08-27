@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { saveToFile, SavVariable, VariableType, VariableMeasure } from 'sav-writer'
 import { readScaleAnswers, readScaleResult } from '../modules/scale/scale-workflow.service'
+import { readContextFormAnswers } from '../modules/assessment-context'
 
 // ==================== 类型定义 ====================
 
@@ -628,7 +629,8 @@ async function getQuestionnaireExportDataV2(
       CONTEXT_SNAPSHOT_HASH: assessment.contextSnapshotHash ?? null,
     }
     if (!anonymize) row.U_name = assessment.user?.nickname || assessment.user?.username || null
-    const formAnswerMap = new Map(assessment.formAnswers.map((answer) => [answer.formItemId, answer.value]))
+    const readableFormAnswers = readContextFormAnswers(questionnaire.formItems, assessment.formAnswers)
+    const formAnswerMap = new Map(readableFormAnswers.map((answer) => [answer.formItemId, answer.value]))
     questionnaire.formItems.forEach((formItem) => {
       const fieldName = formFieldMap.get(formItem.id)
       if (fieldName) row[fieldName] = formAnswerMap.get(formItem.id) ?? null

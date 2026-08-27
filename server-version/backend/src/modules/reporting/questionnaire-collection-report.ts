@@ -1,4 +1,5 @@
 import { buildFormBackgroundReport, buildScaleUnitReport } from './scale-unit-report'
+import { readContextFormAnswers } from '../assessment-context'
 
 /** Collection-only questionnaire projection; it never creates a combined score. */
 export const buildQuestionnaireCollectionReport = (qa: any): any => {
@@ -51,7 +52,8 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
 
   const formItems = [...(qa.questionnaire?.formItems || [])]
     .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
-  const formAnswers = new Map((qa.formAnswers || []).map((answer: any) => [answer.formItemId, answer.value]))
+  const readableFormAnswers = readContextFormAnswers(formItems, qa.formAnswers || [])
+  const formAnswers = new Map(readableFormAnswers.map((answer: any) => [answer.formItemId, answer.value]))
   const backgroundValues = formItems.map((item: any) => buildFormBackgroundReport({
     itemId: item.id,
     label: item.label,
