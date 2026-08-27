@@ -3,19 +3,40 @@ import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
+import { config } from '../config'
 
 const router = Router()
 
 const publicUploadIpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinUploadIpLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
 })
 
 const publicUploadTokenLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: config.publicCheckinUploadTokenLimit,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const token = req.params.token
+    return typeof token === 'string' && /^ck_[a-z0-9]{16}$/.test(token)
+      ? `checkin-token:${token}`
+      : 'checkin-token:invalid'
+  },
+})
+
+const publicSubmitIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: config.publicCheckinSubmitIpLimit,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+const publicSubmitTokenLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: config.publicCheckinSubmitTokenLimit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   keyGenerator: (req) => {
@@ -34,7 +55,7 @@ router.get('/public/:token', checkinController.getPublicCheckin)
 router.post('/public/:token/upload', publicUploadIpLimiter, publicUploadTokenLimiter, checkinController.uploadPublicImage)
 
 // 公开提交打卡（通过令牌）
-router.post('/public/:token/submit', checkinController.submitPublicCheckin)
+router.post('/public/:token/submit', publicSubmitIpLimiter, publicSubmitTokenLimiter, checkinController.submitPublicCheckin)
 
 // ==================== 需要登录的路由 ====================
 // 注意：特定路由必须在通用路由之前

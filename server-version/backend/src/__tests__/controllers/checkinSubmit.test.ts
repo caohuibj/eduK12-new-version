@@ -5,16 +5,23 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     checkin: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
-    checkinSubmission: { findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
+    checkinSubmission: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     storedAsset: { findMany: vi.fn() },
-    assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn() },
+    assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn(), count: vi.fn() },
+    $executeRaw: vi.fn(),
     $transaction: vi.fn(),
   },
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
-import { checkinController, publicUploadStagingEntityId, validatePublicSubmissionImages } from '../../controllers/checkinController'
+import {
+  checkinController,
+  publicUploadStagingEntityId,
+  stagePublicUploadAsset,
+  validatePublicSubmissionImages,
+  PublicUploadSessionAlreadySubmittedError,
+} from '../../controllers/checkinController'
 import { Messages } from '../../constants'
 
 const makeReq = (overrides: any = {}) => ({
@@ -46,6 +53,9 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.assetReference.deleteMany.mockResolvedValue({ count: 0 })
     mockPrisma.assetReference.upsert.mockResolvedValue({})
     mockPrisma.assetReference.findMany.mockResolvedValue([])
+    mockPrisma.assetReference.count.mockResolvedValue(0)
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.$executeRaw.mockResolvedValue(0)
     mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
 
@@ -189,6 +199,48 @@ describe('logged-in checkin submit endTime', () => {
             field: 'staging',
           },
         },
+      }),
+    }))
+  })
+
+  it('rejects uploads after the session has already submitted', async () => {
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue({ id: 'submission-1' })
+
+    await expect(stagePublicUploadAsset({
+      assetId: 'asset-1',
+      checkinId: 'ck-1',
+      sessionId: 'session_abcdefghijklmnop',
+      db: mockPrisma as any,
+    })).rejects.toBeInstanceOf(PublicUploadSessionAlreadySubmittedError)
+
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockPrisma.assetReference.count).not.toHaveBeenCalled()
+    expect(mockPrisma.assetReference.upsert).not.toHaveBeenCalled()
+  })
+
+  it('checks the submitted state and image cap while holding the session lock', async () => {
+    mockPrisma.assetReference.count.mockResolvedValue(8)
+
+    await stagePublicUploadAsset({
+      assetId: 'asset-1',
+      checkinId: 'ck-1',
+      sessionId: 'session_abcdefghijklmnop',
+      db: mockPrisma as any,
+    })
+
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockPrisma.checkinSubmission.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+      where: { checkinId_sessionId: { checkinId: 'ck-1', sessionId: 'session_abcdefghijklmnop' } },
+    }))
+    expect(mockPrisma.assetReference.count).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ entityId: 'ck-1:session_abcdefghijklmnop' }),
+    }))
+    expect(mockPrisma.assetReference.upsert).toHaveBeenCalledWith(expect.objectContaining({
+      create: expect.objectContaining({
+        assetId: 'asset-1',
+        entityType: 'CheckinUploadSession',
+        entityId: 'ck-1:session_abcdefghijklmnop',
+        field: 'staging',
       }),
     }))
   })

@@ -253,4 +253,67 @@ describe('CheckinTokenService', () => {
       expect(sessionIds.size).toBe(100)
     })
   })
+
+  describe('session capability', () => {
+    it('binds a server-issued session to the exact check-in token', () => {
+      const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      const issued = checkinTokenService.createSessionCapability({
+        checkinId: 'checkin-capability-test',
+        tokenId: 'token-capability-test',
+        tokenExpiresAt,
+      })
+
+      expect(issued.sessionId).toMatch(/^session_[a-z0-9]{16}$/)
+      expect(issued.capability).toMatch(/^v1\.\d+\.[A-Za-z0-9_-]{40,100}$/)
+      expect(issued.expiresAt).toBeLessThanOrEqual(Math.floor(tokenExpiresAt.getTime() / 1000))
+      expect(checkinTokenService.verifySessionCapability({
+        checkinId: 'checkin-capability-test',
+        tokenId: 'token-capability-test',
+        sessionId: issued.sessionId,
+        capability: issued.capability,
+        tokenExpiresAt,
+      })).toBe(true)
+
+      expect(checkinTokenService.verifySessionCapability({
+        checkinId: 'checkin-capability-test',
+        tokenId: 'token-capability-test',
+        sessionId: checkinTokenService.generateSessionId(),
+        capability: issued.capability,
+        tokenExpiresAt,
+      })).toBe(false)
+      expect(checkinTokenService.verifySessionCapability({
+        checkinId: 'other-checkin',
+        tokenId: 'token-capability-test',
+        sessionId: issued.sessionId,
+        capability: issued.capability,
+        tokenExpiresAt,
+      })).toBe(false)
+      expect(checkinTokenService.verifySessionCapability({
+        checkinId: 'checkin-capability-test',
+        tokenId: 'other-token',
+        sessionId: issued.sessionId,
+        capability: issued.capability,
+        tokenExpiresAt,
+      })).toBe(false)
+    })
+
+    it('caps the session lifetime at 24 hours and rejects malformed capabilities', () => {
+      const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      const issued = checkinTokenService.createSessionCapability({
+        checkinId: 'checkin-capability-ttl',
+        tokenId: 'token-capability-ttl',
+        tokenExpiresAt,
+      })
+      const now = Math.floor(Date.now() / 1000)
+
+      expect(issued.expiresAt - now).toBeLessThanOrEqual(24 * 60 * 60)
+      expect(checkinTokenService.verifySessionCapability({
+        checkinId: 'checkin-capability-ttl',
+        tokenId: 'token-capability-ttl',
+        sessionId: issued.sessionId,
+        capability: 'not-a-capability',
+        tokenExpiresAt,
+      })).toBe(false)
+    })
+  })
 })
