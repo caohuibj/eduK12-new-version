@@ -12,6 +12,7 @@ import {
 } from '../../modules/scale/scale-definition'
 import {
   registerScaleCustomScorer,
+  missingRequiredScaleItemCodes,
   scoreScale,
   unregisterScaleCustomScorer,
 } from '../../modules/scale/scale-scoring'
@@ -121,6 +122,13 @@ describe('ScaleDefinitionV2 and generic scorer', () => {
     const output = scoreScale(definition, { A: 0, B: 1, C: 2 })
     expect(output.scores[0]).toMatchObject({ value: 3, range: { min: 0, max: 9 } })
     expect(output.itemScores[0]).toMatchObject({ responseValue: 0, baseScore: 0, score: 0 })
+  })
+
+  it('identifies missing required items without treating optional items as workflow blockers', () => {
+    const definition = makeDefinition()
+    definition.items[2].required = false
+
+    expect(missingRequiredScaleItemCodes(definition, [{ itemCode: 'A' }])).toEqual(['B'])
   })
 
   it('supports mean, non-contiguous reverse, explicit maps and item-specific response sets', () => {

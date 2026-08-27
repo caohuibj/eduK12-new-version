@@ -30,7 +30,7 @@ import {
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
-import { validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -954,6 +954,9 @@ export const publicQuestionnaireController = {
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
+        if (missingRequiredItems.length > 0) return { kind: 'missing-required' as const, count: missingRequiredItems.length }
         const scaleResult = await buildScaleResultForRecord({ scale: assessment.scale, answers: stored.answers })
         const completedAt = new Date()
         const totalTime = completedAt.getTime() - assessment.startedAt.getTime()
@@ -980,6 +983,7 @@ export const publicQuestionnaireController = {
       if (result.kind === 'not-found') return notFound(res, '量表测评不存在')
       if (result.kind === 'forbidden') return error(res, '量表测评不属于当前会话', 403)
       if (result.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员', -1, 500)
+      if (result.kind === 'missing-required') return error(res, `还有 ${result.count} 道必答题未作答`, -1, 409)
       if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
       return success(res, { completed: true, progress: result.progress ?? null })
     } catch (err) {

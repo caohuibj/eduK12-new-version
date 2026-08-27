@@ -20,7 +20,7 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { validateScaleDefinition } from '../scale/scale-definition'
-import { ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
+import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { logger } from '../../utils/logger'
 import { canUseReportPackage, canUseScale } from '../../services/materialGrant'
 import {
@@ -2126,6 +2126,9 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
     const decoded = readScaleAnswers(locked.answers)
     if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
     const answers = decoded.answers
+    const definition = scaleDefinitionFromRecord(item.scale)
+    const missingRequiredItems = missingRequiredScaleItemCodes(definition, answers)
+    if (missingRequiredItems.length > 0) throw compositeBadRequest(`还有 ${missingRequiredItems.length} 道必答题未作答`)
     const result = await buildScaleResultForRecord({
       scale: item.scale,
       answers,

@@ -17,6 +17,7 @@ import {
   type ScaleDefinitionV2,
 } from '../modules/scale/scale-definition'
 import { getScalePackage, validateScalePackage } from '../modules/scale/scale-package.registry'
+import { canStudentAccessScale } from '../modules/scale/scale-access'
 import {
   buildScaleResultForRecord,
   encryptScaleAnswers,
@@ -27,7 +28,7 @@ import {
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
-import { getScaleCustomScorerKeys, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 
 // ==================== Validation Schemas ====================
 
@@ -366,6 +367,9 @@ export const scaleController = {
       }
 
       let runner = null
+      if (req.user?.role === UserRole.STUDENT && !(await canStudentAccessScale(scale, req.user.userId))) {
+        return notFound(res, '量表不存在')
+      }
       if (scale.definition) {
         try {
           runner = scaleRunnerFromRecord(scale)
@@ -657,9 +661,12 @@ export const scaleController = {
       const { scaleId } = req.params
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
-        select: { id: true, code: true, name: true, description: true, instruction: true, estimatedTime: true, status: true, instrumentVersion: true, instrumentClass: true, definition: true },
+        select: { id: true, code: true, name: true, description: true, instruction: true, estimatedTime: true, status: true, visibility: true, instrumentVersion: true, instrumentClass: true, definition: true },
       })
       if (!scale) return notFound(res, '量表不存在')
+      if (req.user?.role === UserRole.STUDENT && !(await canStudentAccessScale(scale, userId!))) {
+        return notFound(res, '量表不存在')
+      }
       if (scale.status !== 'PUBLISHED') return error(res, '量表未发布')
       const definition = scaleDefinitionFromRecord(scale)
       const runner = scaleRunnerFromRecord(scale)
@@ -757,6 +764,9 @@ export const scaleController = {
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
+        if (missingRequiredItems.length > 0) return { kind: 'missing-required' as const, count: missingRequiredItems.length }
         const result = await buildScaleResultForRecord({ scale: assessment.scale, answers: stored.answers })
         const completedAt = new Date()
         const totalTime = completedAt.getTime() - new Date(assessment.startedAt).getTime()
@@ -786,6 +796,7 @@ export const scaleController = {
       if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (transactionResult.kind === 'ended') return error(res, '测评已结束')
       if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
+      if (transactionResult.kind === 'missing-required') return error(res, `还有 ${transactionResult.count} 道必答题未作答`, -1, 409)
       return success(res, transactionResult.assessment, '测评已完成')
     } catch (err) {
       logger.error('完成 v2 量表测评错误', err)
@@ -1069,17 +1080,15 @@ export const scaleController = {
         anonymize  // 返回实际使用的脱敏状态
       }
 
-      // 根据格式返回文件路径
+      // 只向客户端返回可下载的文件名，不暴露服务器文件系统路径。
       if (files.csvPath) {
         result.fileName = path.basename(files.csvPath)
-        result.csvPath = files.csvPath
       }
       if (files.savPath) {
         result.fileName = path.basename(files.savPath)
-        result.savPath = files.savPath
       }
       if (files.spsPath) {
-        result.spsPath = files.spsPath
+        result.additionalFileNames = [path.basename(files.spsPath)]
       }
 
       return success(res, result, '导出成功')

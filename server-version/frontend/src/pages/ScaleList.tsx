@@ -209,18 +209,19 @@ const ScaleList: React.FC = () => {
           })
         
         // 如果是 spss 格式，还需要下载 SPS 文件
-        if (response.data.spsPath) {
-          const spsFileName = response.data.fileName.replace('.csv', '.sps')
-          sessionFetch(`/api/scales/exports/${spsFileName}`)
+        if (Array.isArray(response.data.additionalFileNames)) {
+          response.data.additionalFileNames.forEach((fileName: string) => {
+            sessionFetch(`/api/scales/exports/${fileName}`)
             .then(res => res.blob())
             .then(blob => {
               const url = window.URL.createObjectURL(blob)
               const a = document.createElement('a')
               a.href = url
-              a.download = spsFileName
+              a.download = fileName
               a.click()
               window.URL.revokeObjectURL(url)
             })
+          })
         }
         
         const formatLabel = exportOptions.format === 'sav' ? 'SAV' : 

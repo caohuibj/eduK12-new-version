@@ -575,3 +575,14 @@ export const validateScaleAnswer = (
 ): void => {
   validateAnswers(definition, [answer])
 }
+
+/** Return required definition items that are absent from the submitted answers. */
+export const missingRequiredScaleItemCodes = (
+  definition: ScaleDefinitionV2,
+  answers: ReadonlyArray<Pick<ScaleAnswer, 'itemCode'>>,
+): string[] => {
+  const answeredItems = new Set(answers.map((answer) => answer.itemCode))
+  return definition.items
+    .filter((item) => item.required && !answeredItems.has(item.itemCode))
+    .map((item) => item.itemCode)
+}
