@@ -391,12 +391,21 @@ const isExpectedAssetScope = (
   publicRoute: boolean,
 ): boolean => {
   if (publicRoute) {
-    return asset.accessScope === 'PUBLIC_CHECKIN' && asset.scopeId === context.checkinId
+    // Public hydration is currently only used for a Checkin. The parent
+    // reference is checked separately; these scope checks make sure a
+    // course asset cannot be exposed through an unrelated public record.
+    if (context.entityType !== 'Checkin' || !context.checkinId) return false
+    if (asset.accessScope === 'PUBLIC_CHECKIN') return asset.scopeId === context.checkinId
+    if (asset.accessScope === 'COURSE') return !context.courseId || asset.scopeId === context.courseId
+    return true
   }
   if (asset.accessScope === 'COURSE') {
     return !context.courseId || asset.scopeId === context.courseId
   }
-  if (asset.accessScope === 'PUBLIC_CHECKIN') return false
+  if (asset.accessScope === 'PUBLIC_CHECKIN') {
+    return context.entityType === 'CheckinSubmission'
+      && Boolean(context.checkinId && asset.scopeId === context.checkinId)
+  }
   return true
 }
 
@@ -471,8 +480,9 @@ export const canReadPrivateAsset = async (asset: {
   accessScope: string
   scopeId: string | null
 }, actor: { userId?: string; role?: UserRole } = {}): Promise<boolean> => {
-  // Public check-in assets are deliberately only served through the public
-  // route, where the matching check-in token is checked on every request.
+  // Public check-in assets cannot obtain a private URL directly. A private
+  // capability may still be issued by an authorized parent hydration (for
+  // example, an authenticated CheckinSubmission response).
   if (asset.accessScope === 'PUBLIC_CHECKIN') return false
   if (actor.role === UserRole.ADMIN) return true
   if (asset.ownerId && asset.ownerId === actor.userId) return true
@@ -515,15 +525,32 @@ const validatePublicCheckinAsset = async (assetId: string, token: string | undef
   const validation = await checkinTokenService.validateToken(token, { ignoreUsageLimit: true })
   if (!validation.valid || !validation.checkin) return null
   const asset = await prisma.storedAsset.findUnique({ where: { id: assetId } })
-  if (!asset || asset.deletedAt || asset.accessScope !== 'PUBLIC_CHECKIN' || asset.scopeId !== validation.checkin.id) return null
-  return asset
+  if (!asset || asset.deletedAt) return null
+
+  // Anonymous participant uploads are scoped directly to the check-in.
+  // Teacher media retain PRIVATE/COURSE scope and are public only when the
+  // check-in has an exact AssetReference to them.
+  if (asset.accessScope === 'PUBLIC_CHECKIN') {
+    return asset.scopeId === validation.checkin.id ? asset : null
+  }
+  if (asset.accessScope === 'COURSE' && asset.scopeId !== validation.checkin.courseId) return null
+
+  const reference = await prisma.assetReference.findFirst({
+    where: {
+      assetId: asset.id,
+      entityType: 'Checkin',
+      entityId: validation.checkin.id,
+    },
+    select: { id: true },
+  })
+  return reference ? asset : null
 }
 
 export const issuePublicAssetUrl = async (req: Request, res: Response) => {
   const asset = await validatePublicCheckinAsset(req.params.id, req.header('X-Checkin-Token'))
   if (!asset) return unauthorized(res, '无效的签到访问令牌')
-  const url = await getSignedAssetUrl(asset.id, true)
-  if (!url) return notFound(res, '文件不存在')
+  const expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS
+  const url = signedPath(asset.id, expiresAt, true)
   return res.json({ code: 0, message: '操作成功', data: { assetId: asset.id, url, expiresIn: ASSET_URL_TTL_SECONDS } })
 }
 
@@ -537,13 +564,7 @@ export const serveAsset = async (req: Request, res: Response) => {
 
   const asset = await prisma.storedAsset.findUnique({ where: { id: req.params.id } })
   if (!asset || asset.deletedAt) return notFound(res, '文件不存在')
-  if (publicRoute && asset.accessScope !== 'PUBLIC_CHECKIN') {
-    return unauthorized(res, '该文件不允许公开访问')
-  }
-  if (!publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') {
-    return unauthorized(res, '该文件只能通过签到令牌访问')
-  }
-  if (publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') {
+  if (publicRoute) {
     const valid = await validatePublicCheckinAsset(asset.id, req.header('X-Checkin-Token'))
     if (!valid) return unauthorized(res, '无效的签到访问令牌')
   }

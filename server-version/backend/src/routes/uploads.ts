@@ -90,6 +90,9 @@ router.get('/images', async (req, res) => {
     const assetWhere = {
       mimeType: { startsWith: 'image/' },
       deletedAt: null,
+      // Anonymous check-in uploads are temporary/submission-scoped assets,
+      // not part of a teacher's reusable media library.
+      accessScope: { not: 'PUBLIC_CHECKIN' },
       ...(req.user?.role === UserRole.TEACHER ? { ownerId: req.user.userId } : {}),
     }
     const assets = await prisma.storedAsset.findMany({ where: assetWhere, orderBy: { createdAt: 'desc' } })

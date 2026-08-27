@@ -249,14 +249,15 @@ async function migrateJsonReferences(report) {
         course: { select: { creatorId: true } },
       },
     }),
-    prisma.checkin.findMany({ select: { id: true, images: true, documents: true, videos: true, creatorId: true, courseId: true, allowAnonymous: true } }),
+    prisma.checkin.findMany({ select: { id: true, images: true, documents: true, videos: true, creatorId: true, courseId: true } }),
     prisma.checkinSubmission.findMany({
       select: {
         id: true,
         images: true,
         studentId: true,
+        isAnonymous: true,
         checkinId: true,
-        checkin: { select: { allowAnonymous: true, courseId: true } },
+        checkin: { select: { courseId: true } },
       },
     }),
   ])
@@ -283,9 +284,31 @@ async function migrateJsonReferences(report) {
     if (typeof value.assetId === 'string' && value.assetId) {
       const existing = await prisma.storedAsset.findUnique({
         where: { id: value.assetId },
-        select: { id: true, ownerId: true, accessScope: true, scopeId: true, deletedAt: true },
+        select: { id: true, objectKey: true, ownerId: true, accessScope: true, scopeId: true, deletedAt: true },
       })
       if (!existingAssetMatchesScope(existing, { ownerId, accessScope, scopeId })) {
+        // Older runs incorrectly changed teacher-authored anonymous check-in
+        // media to PUBLIC_CHECKIN. Copy those local assets into the correct
+        // course-scoped identity and rewrite only this parent reference. The
+        // old asset is retained if another entity (such as a submission) still
+        // references it.
+        if (accessScope === 'COURSE' && existing?.accessScope === 'PUBLIC_CHECKIN' && existing.objectKey) {
+          const replacement = await ensureAsset({
+            source: existing.objectKey,
+            originalName: value.fileName || value.name || path.basename(existing.objectKey),
+            ownerId,
+            accessScope,
+            scopeId,
+          })
+          if (replacement) {
+            await reference(replacement.id, entityType, entityId, field)
+            await prisma.assetReference.deleteMany({
+              where: { assetId: value.assetId, entityType, entityId, field },
+            })
+            report.migrated += 1
+            return { ...value, assetId: replacement.id }
+          }
+        }
         report.skipped += 1
         return value
       }
@@ -329,8 +352,11 @@ async function migrateJsonReferences(report) {
     }
   }
   for (const row of checkins) {
-    const accessScope = row.allowAnonymous ? 'PUBLIC_CHECKIN' : 'COURSE'
-    const scopeId = row.allowAnonymous ? row.id : row.courseId
+    // Teacher-authored check-in media remain course assets. Public access is
+    // granted by the check-in token plus its exact AssetReference, not by
+    // changing the asset's storage scope.
+    const accessScope = 'COURSE'
+    const scopeId = row.courseId
     const updates = {}
     for (const [field, value] of [['images', row.images], ['documents', row.documents], ['videos', row.videos]]) {
       updates[field] = await walk(value, 'Checkin', row.id, field, row.creatorId, scopeId, accessScope)
@@ -340,8 +366,8 @@ async function migrateJsonReferences(report) {
     }
   }
   for (const row of submissions) {
-    const accessScope = row.checkin.allowAnonymous ? 'PUBLIC_CHECKIN' : 'COURSE'
-    const scopeId = row.checkin.allowAnonymous ? row.checkinId : row.checkin.courseId
+    const accessScope = row.isAnonymous ? 'PUBLIC_CHECKIN' : 'COURSE'
+    const scopeId = row.isAnonymous ? row.checkinId : row.checkin.courseId
     const images = await walk(
       row.images,
       'CheckinSubmission',

@@ -23,6 +23,11 @@ objects. A production run requires a separately reviewed provider copy
 adapter and an isolated rollback copy of the original objects. Do not point
 the local script at a production database or production storage.
 
-Public check-in assets are scoped to their check-in and require both the
-short-lived asset signature and `X-Checkin-Token` at delivery. Anonymous
-submissions may contain only asset IDs issued for that same check-in.
+Teacher-authored check-in media keep their `COURSE` (or `PRIVATE`) scope and
+are publicly deliverable only when the check-in has an exact
+`AssetReference`, together with a short-lived signature and
+`X-Checkin-Token`. Anonymous participant uploads use `PUBLIC_CHECKIN` scope,
+have a `CheckinUploadSession` staging reference bound to the server-issued
+session ID, are limited to nine images per session, and are promoted to the
+`CheckinSubmission` reference inside the submit transaction. Abandoned staging
+references and unreferenced blobs are eligible for the 24-hour cleanup path.

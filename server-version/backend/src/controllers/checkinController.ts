@@ -111,19 +111,75 @@ const publicSubmissionImageSchema = z.object({
   assetId: z.string().min(1).max(100),
 }).strict()
 
+export const PUBLIC_UPLOAD_REFERENCE_ENTITY = 'CheckinUploadSession'
+export const PUBLIC_UPLOAD_REFERENCE_FIELD = 'staging'
+export const MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION = 9
+export const PUBLIC_UPLOAD_STAGING_TTL_MS = 24 * 60 * 60 * 1000
+
+const publicSessionIdSchema = z.string().regex(/^session_[a-z0-9]{16}$/, '会话标识无效')
+
 const publicSubmissionSchema = z.object({
   content: z.string().max(1000).optional(),
-  images: z.array(publicSubmissionImageSchema).max(9).optional().default([]),
-  sessionId: z.string().min(1).max(100),
+  images: z.array(publicSubmissionImageSchema).max(MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION).optional().default([]),
+  sessionId: publicSessionIdSchema,
 })
 
-const validatePublicSubmissionImages = async (images: unknown, checkinId: string) => {
-  const result = z.array(publicSubmissionImageSchema).max(9).safeParse(images || [])
+export const publicUploadStagingEntityId = (checkinId: string, sessionId: string): string => `${checkinId}:${sessionId}`
+
+export class PublicUploadSessionLimitError extends Error {
+  constructor() {
+    super(`每个匿名签到会话最多上传${MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION}张图片`)
+    this.name = 'PublicUploadSessionLimitError'
+  }
+}
+
+let lastPublicUploadCleanupAt = 0
+
+/** Remove abandoned anonymous upload references and their unreferenced blobs. */
+export const cleanupStalePublicUploadAssets = async (): Promise<void> => {
+  const now = Date.now()
+  if (now - lastPublicUploadCleanupAt < 5 * 60 * 1000) return
+  lastPublicUploadCleanupAt = now
+
+  const cutoff = new Date(now - PUBLIC_UPLOAD_STAGING_TTL_MS)
+  await prisma.assetReference.deleteMany({
+    where: {
+      entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+      field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+      createdAt: { lt: cutoff },
+    },
+  })
+
+  const staleAssets = await prisma.storedAsset.findMany({
+    where: {
+      accessScope: 'PUBLIC_CHECKIN',
+      deletedAt: null,
+      createdAt: { lt: cutoff },
+      references: { none: {} },
+    },
+    select: { id: true, objectKey: true, provider: true },
+  })
+  await Promise.all(staleAssets.map((asset) => discardUnreferencedAsset(asset)))
+}
+
+const runPublicUploadCleanup = async (): Promise<void> => {
+  try {
+    await cleanupStalePublicUploadAssets()
+  } catch (cleanupError) {
+    // Cleanup is best effort and must not make a valid upload unavailable.
+    logger.warn('匿名上传暂存清理失败', { errorType: cleanupError instanceof Error ? cleanupError.name : 'unknown' })
+  }
+}
+
+export const validatePublicSubmissionImages = async (images: unknown, checkinId: string, sessionId: string) => {
+  const result = z.array(publicSubmissionImageSchema).max(MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION).safeParse(images || [])
   if (!result.success) return null
 
   const assetIds = [...new Set(result.data.map((item) => item.assetId))]
   if (assetIds.length !== result.data.length) return null
   if (!assetIds.length) return result.data
+
+  const stagingEntityId = publicUploadStagingEntityId(checkinId, sessionId)
 
   const assets = await prisma.storedAsset.findMany({
     where: {
@@ -131,6 +187,13 @@ const validatePublicSubmissionImages = async (images: unknown, checkinId: string
       accessScope: 'PUBLIC_CHECKIN',
       scopeId: checkinId,
       deletedAt: null,
+      references: {
+        some: {
+          entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+          entityId: stagingEntityId,
+          field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+        },
+      },
     },
     select: { id: true },
   })
@@ -1356,16 +1419,19 @@ export const checkinController = {
           endTime: true,
           createdAt: true,
           allowViewOthers: true,
+          courseId: true,
         },
       })
 
       if (!checkin) {
         return notFound(res, '打卡不存在')
       }
-      const publicCheckin = await hydrateAssetReferences(checkin, true, {
+      const { courseId, ...publicCheckinData } = checkin
+      const publicCheckin = await hydrateAssetReferences(publicCheckinData, true, {
         entityType: 'Checkin',
         entityId: checkin.id,
         checkinId: checkin.id,
+        courseId,
         parentAccess: true,
       })
 
@@ -1429,28 +1495,51 @@ export const checkinController = {
       if (!file) {
         return error(res, '请选择图片文件')
       }
+      const sessionResult = publicSessionIdSchema.safeParse(req.body?.sessionId)
+      if (!sessionResult.success) {
+        return error(res, '会话标识无效')
+      }
+      const sessionId = sessionResult.data
+      const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
+
+      await runPublicUploadCleanup()
 
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
         mimeType: detectedMimeType,
-        ownerId: validation.token?.createdBy,
         accessScope: 'PUBLIC_CHECKIN',
         scopeId: validation.checkin.id,
       })
       try {
         await prisma.$transaction(async (tx) => {
+          // Serialize uploads for one browser session so the per-session cap
+          // cannot be bypassed by parallel requests.
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${stagingEntityId}))`
+          const stagedCount = await tx.assetReference.count({
+            where: {
+              entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+              entityId: stagingEntityId,
+              field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+            },
+          })
+          if (stagedCount >= MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION) {
+            throw new PublicUploadSessionLimitError()
+          }
           await attachAssetReference({
             assetId: asset.id,
-            entityType: 'Checkin',
-            entityId: validation.checkin.id,
-            field: 'public-image',
+            entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+            entityId: stagingEntityId,
+            field: PUBLIC_UPLOAD_REFERENCE_FIELD,
           }, tx)
         })
       } catch (referenceError) {
         await discardUnreferencedAsset(asset)
+        if (referenceError instanceof PublicUploadSessionLimitError) {
+          return error(res, `每个会话最多上传${MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION}张图片`, -1, 409)
+        }
         throw referenceError
       }
 
@@ -1509,7 +1598,10 @@ export const checkinController = {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
 
-      const validatedImages = await validatePublicSubmissionImages(images, validation.checkin.id)
+      await runPublicUploadCleanup()
+
+      const stagingEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
+      const validatedImages = await validatePublicSubmissionImages(images, validation.checkin.id, sessionId)
       if (!validatedImages) {
         return error(res, '图片凭据无效或不属于当前签到')
       }
@@ -1526,7 +1618,16 @@ export const checkinController = {
             },
           },
         })
-        if (existingSubmission) return { kind: 'existing' as const }
+        if (existingSubmission) {
+          await tx.assetReference.deleteMany({
+            where: {
+              entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+              entityId: stagingEntityId,
+              field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+            },
+          })
+          return { kind: 'existing' as const }
+        }
 
         const claimed = await checkinTokenService.claimSubmissionSlot(validation.token.id, tx)
         if (!claimed) return { kind: 'over-limit' as const }
@@ -1543,6 +1644,13 @@ export const checkinController = {
           },
         })
         await syncSubmissionAssetReferences(submission.id, validatedImages, tx)
+        await tx.assetReference.deleteMany({
+          where: {
+            entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+            entityId: stagingEntityId,
+            field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+          },
+        })
         return { kind: 'created' as const, submission }
       })
 

@@ -1,16 +1,37 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 
 const router = Router()
 
+const publicUploadIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+const publicUploadTokenLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const token = req.params.token
+    return typeof token === 'string' && /^ck_[a-z0-9]{16}$/.test(token)
+      ? `checkin-token:${token}`
+      : 'checkin-token:invalid'
+  },
+})
+
 // ==================== 公开路由（无需登录）====================
 // 公开获取打卡详情（通过令牌）
 router.get('/public/:token', checkinController.getPublicCheckin)
 
 // 公开上传图片（通过令牌）
-router.post('/public/:token/upload', checkinController.uploadPublicImage)
+router.post('/public/:token/upload', publicUploadIpLimiter, publicUploadTokenLimiter, checkinController.uploadPublicImage)
 
 // 公开提交打卡（通过令牌）
 router.post('/public/:token/submit', checkinController.submitPublicCheckin)

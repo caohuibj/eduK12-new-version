@@ -194,6 +194,7 @@ const PublicCheckin: React.FC = () => {
   const uploadImage = async (file: File): Promise<{ assetId: string }> => {
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('sessionId', sessionId)
 
     const response = await fetch(`/api/checkins/public/${token}/upload`, {
       method: 'POST',

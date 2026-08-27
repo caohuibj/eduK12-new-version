@@ -7,7 +7,7 @@ const { mockPrisma, mockCheckinValidate } = vi.hoisted(() => ({
   mockPrisma: {
     storedAsset: { findUnique: vi.fn(), findMany: vi.fn() },
     course: { findUnique: vi.fn() },
-    assetReference: { findMany: vi.fn() },
+    assetReference: { findMany: vi.fn(), findFirst: vi.fn() },
   },
   mockCheckinValidate: vi.fn(),
 }))
@@ -103,6 +103,7 @@ describe('stored asset access boundary', () => {
     vi.clearAllMocks()
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset())
     mockPrisma.course.findUnique.mockResolvedValue(null)
+    mockPrisma.assetReference.findFirst.mockResolvedValue(null)
   })
 
   it('issues a short-lived URL only to the asset owner', async () => {
@@ -162,7 +163,33 @@ describe('stored asset access boundary', () => {
     expect(crossScopeResponse.statusCode).toBe(401)
   })
 
-  it('does not expose public check-in assets through the private route', async () => {
+  it('allows a public token to read a course-scoped asset referenced by that check-in', async () => {
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({
+      ownerId: 'teacher-1',
+      accessScope: 'COURSE',
+      scopeId: 'course-1',
+    }))
+    mockCheckinValidate.mockResolvedValue({
+      valid: true,
+      checkin: { id: 'checkin-1', courseId: 'course-1' },
+    })
+    mockPrisma.assetReference.findFirst.mockResolvedValue({ id: 'reference-1' })
+    const res = makeRes()
+
+    await issuePublicAssetUrl(request({ user: undefined }), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.url).toContain('/api/public/assets/asset-1/content')
+    expect(mockPrisma.assetReference.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        assetId: 'asset-1',
+        entityType: 'Checkin',
+        entityId: 'checkin-1',
+      }),
+    }))
+  })
+
+  it('does not issue public check-in assets through the private URL endpoint', async () => {
     const publicAsset = privateAsset({
       ownerId: 'teacher-1',
       accessScope: 'PUBLIC_CHECKIN',
@@ -173,12 +200,74 @@ describe('stored asset access boundary', () => {
     const issueResponse = makeRes()
     await issuePrivateAssetUrl(request(), issueResponse)
     expect(issueResponse.statusCode).toBe(403)
+  })
 
-    const expiresAt = Math.floor(Date.now() / 1000) + 60
-    const privateUrl = new URL(assetStorageInternals.signedPath('asset-1', expiresAt), 'http://localhost')
+  it('serves an anonymous submission asset through an authorized private hydration capability', async () => {
+    const publicAsset = privateAsset({
+      ownerId: null,
+      accessScope: 'PUBLIC_CHECKIN',
+      scopeId: 'checkin-1',
+    })
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{
+      id: 'asset-1',
+      accessScope: 'PUBLIC_CHECKIN',
+      scopeId: 'checkin-1',
+    }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
+
+    const hydrated = await hydrateAssetReferences({ images: [{ assetId: 'asset-1' }] }, false, {
+      entityType: 'CheckinSubmission',
+      entityId: 'submission-1',
+      checkinId: 'checkin-1',
+      courseId: 'course-1',
+      parentAccess: true,
+    }) as { images: Array<{ url: string }> }
+    const privateUrl = new URL(hydrated.images[0].url, 'http://localhost')
+
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(publicAsset)
     const contentResponse = makeRes()
     await serveAsset(request({ query: Object.fromEntries(privateUrl.searchParams) }), contentResponse)
-    expect(contentResponse.statusCode).toBe(401)
+    await contentResponse.finished
+
+    expect(contentResponse.statusCode).toBe(200)
+  })
+
+  it('hydrates teacher check-in media on the public route when the scope and reference match', async () => {
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{
+      id: 'asset-1',
+      accessScope: 'COURSE',
+      scopeId: 'course-1',
+    }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
+
+    const hydrated = await hydrateAssetReferences({ images: [{ assetId: 'asset-1' }] }, true, {
+      entityType: 'Checkin',
+      entityId: 'checkin-1',
+      checkinId: 'checkin-1',
+      courseId: 'course-1',
+      parentAccess: true,
+    }) as { images: Array<{ url: string }> }
+
+    expect(hydrated.images[0].url).toContain('/api/public/assets/asset-1/content')
+  })
+
+  it('does not allow a course asset from another course on the public route', async () => {
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{
+      id: 'asset-1',
+      accessScope: 'COURSE',
+      scopeId: 'other-course',
+    }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
+
+    const hydrated = await hydrateAssetReferences({ images: [{ assetId: 'asset-1' }] }, true, {
+      entityType: 'Checkin',
+      entityId: 'checkin-1',
+      checkinId: 'checkin-1',
+      courseId: 'course-1',
+      parentAccess: true,
+    }) as { images: Array<{ url: string | null }> }
+
+    expect(hydrated.images[0].url).toBeNull()
   })
 
   it('rejects invalid or expired signed content URLs', async () => {

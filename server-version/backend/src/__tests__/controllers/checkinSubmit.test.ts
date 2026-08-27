@@ -14,7 +14,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
-import { checkinController } from '../../controllers/checkinController'
+import { checkinController, publicUploadStagingEntityId, validatePublicSubmissionImages } from '../../controllers/checkinController'
 import { Messages } from '../../constants'
 
 const makeReq = (overrides: any = {}) => ({
@@ -167,5 +167,29 @@ describe('logged-in checkin submit endTime', () => {
     expect(res.statusCode).toBe(400)
     expect(res.body.message).toBe('图片引用无效')
     expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('binds anonymous image credentials to the exact upload session', async () => {
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{ id: 'asset-1' }])
+    const sessionId = 'session_abcdefghijklmnop'
+
+    const images = await validatePublicSubmissionImages(
+      [{ assetId: 'asset-1' }],
+      'ck-1',
+      sessionId,
+    )
+
+    expect(images).toEqual([{ assetId: 'asset-1' }])
+    expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        references: {
+          some: {
+            entityType: 'CheckinUploadSession',
+            entityId: publicUploadStagingEntityId('ck-1', sessionId),
+            field: 'staging',
+          },
+        },
+      }),
+    }))
   })
 })
