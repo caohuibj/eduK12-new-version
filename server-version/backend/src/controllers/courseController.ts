@@ -37,6 +37,71 @@ const getPaginationParams = (req: Request) => {
   return { page, pageSize, skip: (page - 1) * pageSize }
 }
 
+/**
+ * AssetReference is intentionally polymorphic, so Prisma cannot cascade
+ * references when a course removes its assignments/check-ins. Collect every
+ * descendant id and clean the references in the same transaction as the
+ * course delete.
+ */
+const deleteCourseWithAssetReferences = async (courseId: string) => {
+  await prisma.$transaction(async (tx) => {
+    const assignments = await tx.assignment.findMany({
+      where: { courseId },
+      select: { id: true },
+    })
+    const checkins = await tx.checkin.findMany({
+      where: { courseId },
+      select: { id: true },
+    })
+
+    const assignmentIds = assignments.map(({ id }) => id)
+    const checkinIds = checkins.map(({ id }) => id)
+    const submissions = checkinIds.length > 0
+      ? await tx.checkinSubmission.findMany({
+        where: { checkinId: { in: checkinIds } },
+        select: { id: true },
+      })
+      : []
+
+    await tx.assetReference.deleteMany({
+      where: {
+        entityType: 'Course',
+        entityId: courseId,
+      },
+    })
+
+    if (assignmentIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'Assignment',
+          entityId: { in: assignmentIds },
+        },
+      })
+    }
+
+    if (checkinIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'Checkin',
+          entityId: { in: checkinIds },
+        },
+      })
+    }
+
+    const submissionIds = submissions.map(({ id }) => id)
+    if (submissionIds.length > 0) {
+      await tx.assetReference.deleteMany({
+        where: {
+          entityType: 'CheckinSubmission',
+          entityId: { in: submissionIds },
+        },
+      })
+    }
+
+    await tx.course.delete({ where: { id: courseId } })
+  })
+}
+
 export const courseController = {
   // 获取课程列表 - 添加缓存优化
   async list(req: Request, res: Response) {
@@ -371,15 +436,13 @@ export const courseController = {
       // 权限检查
       if (userRole === UserRole.ADMIN) {
         // 管理员可以删除任何课程
-        await prisma.course.delete({
-          where: { id }
-        })
+        await deleteCourseWithAssetReferences(id)
         // 清除相关缓存
-      cache.clearPattern(`courses:list:`)
-      cache.delete(`course:${id}`)
-      logger.debug('Course cache cleared after delete', { courseId: id })
+        cache.clearPattern(`courses:list:`)
+        cache.delete(`course:${id}`)
+        logger.debug('Course cache cleared after delete', { courseId: id })
 
-      return success(res, {
+        return success(res, {
           deletedStudents: course._count.students
         }, hasStudents ? '课程已删除（包含学生数据）' : '课程已删除')
       }
@@ -399,9 +462,7 @@ export const courseController = {
       }
 
       // 满足条件，可以删除
-      await prisma.course.delete({
-        where: { id }
-      })
+      await deleteCourseWithAssetReferences(id)
 
       // 清除相关缓存
       cache.clearPattern(`courses:list:`)
@@ -876,12 +937,27 @@ export const courseController = {
         scopeId: id,
       })
 
-      // 更新课程封面
-      await prisma.course.update({
-        where: { id },
-        data: { coverAssetId: asset.id, coverUrl: null }
+      // Keep the course pointer and its reference in one transaction. The
+      // previous cover reference is removed only after the new pointer is
+      // ready, so an asset cannot be detached from a live course by a
+      // partially completed upload.
+      await prisma.$transaction(async (tx) => {
+        await tx.course.update({
+          where: { id },
+          data: { coverAssetId: asset.id, coverUrl: null }
+        })
+        if (course.coverAssetId && course.coverAssetId !== asset.id) {
+          await tx.assetReference.deleteMany({
+            where: {
+              assetId: course.coverAssetId,
+              entityType: 'Course',
+              entityId: id,
+              field: 'cover',
+            },
+          })
+        }
+        await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' }, tx)
       })
-      await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' })
 
       return success(res, { coverUrl: await getSignedAssetUrl(asset.id) }, '封面上传成功')
     } catch (err) {

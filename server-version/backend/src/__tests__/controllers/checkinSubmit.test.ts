@@ -7,7 +7,8 @@ const { mockPrisma } = vi.hoisted(() => ({
     courseStudent: { findFirst: vi.fn() },
     checkinSubmission: { findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
     storedAsset: { findMany: vi.fn() },
-    assetReference: { deleteMany: vi.fn(), upsert: vi.fn() },
+    assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn() },
+    $transaction: vi.fn(),
   },
 }))
 
@@ -44,6 +45,8 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.storedAsset.findMany.mockResolvedValue([])
     mockPrisma.assetReference.deleteMany.mockResolvedValue({ count: 0 })
     mockPrisma.assetReference.upsert.mockResolvedValue({})
+    mockPrisma.assetReference.findMany.mockResolvedValue([])
+    mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
 
   it('rejects a submit after endTime', async () => {
@@ -115,6 +118,7 @@ describe('logged-in checkin submit endTime', () => {
     })
     mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
     mockPrisma.storedAsset.findMany.mockResolvedValue([{ id: 'asset-1' }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
     mockPrisma.checkinSubmission.create.mockResolvedValue({ id: 'sub-asset' })
     const res = makeRes()
 

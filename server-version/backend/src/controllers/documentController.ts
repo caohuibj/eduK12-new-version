@@ -84,30 +84,34 @@ export const documentController = {
       const { title } = req.body
 
       try {
+        const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType || file.mimetype
         const asset = await storeAsset({
           buffer: file.buffer,
           originalName: file.originalname,
-          mimeType: file.mimetype,
+          mimeType: detectedMimeType,
           ownerId: userId,
         })
 
         // 保存到数据库
-        const document = await prisma.document.create({
-          data: {
-            title: title || file.originalname.replace(/\.pdf$/i, ''),
-            filePath: asset.objectKey,
-            fileName: file.originalname,
-            fileSize: file.size,
-            teacherId: userId,
-            assetId: asset.id,
-          },
-          include: {
-            teacher: {
-              select: { id: true, nickname: true, username: true }
+        const document = await prisma.$transaction(async (tx) => {
+          const created = await tx.document.create({
+            data: {
+              title: title || file.originalname.replace(/\.pdf$/i, ''),
+              filePath: asset.objectKey,
+              fileName: file.originalname,
+              fileSize: file.size,
+              teacherId: userId,
+              assetId: asset.id,
+            },
+            include: {
+              teacher: {
+                select: { id: true, nickname: true, username: true }
+              }
             }
-          }
+          })
+          await attachAssetReference({ assetId: asset.id, entityType: 'Document', entityId: created.id, field: 'file' }, tx)
+          return created
         })
-        await attachAssetReference({ assetId: asset.id, entityType: 'Document', entityId: document.id, field: 'file' })
 
         return success(res, {
           ...document,

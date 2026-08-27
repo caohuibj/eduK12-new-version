@@ -8,9 +8,25 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import multer from 'multer'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
-import { attachAssetReference, getSignedAssetUrl, hydrateAssetReferences, storeAsset } from '../services/assetStorage'
+import {
+  AssetDatabase,
+  AssetReferenceValidationError,
+  attachAssetReference,
+  discardUnreferencedAsset,
+  getSignedAssetUrl,
+  hydrateAssetReferences,
+  storeAsset,
+  syncAssetReferences,
+  validateAssetReferencesForCourse,
+} from '../services/assetStorage'
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
+
+const attachmentSchema = z.union([
+  z.string().min(1).max(2048),
+  z.record(z.unknown()),
+])
+const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createCheckinSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -18,9 +34,9 @@ const createCheckinSchema = z.object({
   description: z.string().optional(),
   content: z.string().optional(),
   tags: z.array(z.string().max(20)).max(10).optional().default([]),
-  videos: z.array(z.any()).optional().nullable().default([]),
-  images: z.array(z.any()).optional().nullable().default([]),
-  documents: z.array(z.any()).optional().nullable().default([]),
+  videos: attachmentsSchema.optional().nullable().default([]),
+  images: attachmentsSchema.optional().nullable().default([]),
+  documents: attachmentsSchema.optional().nullable().default([]),
   endTime: z.string().optional(),
   allowViewOthers: z.boolean().optional().default(false),
 })
@@ -30,9 +46,9 @@ const updateCheckinSchema = z.object({
   description: z.string().optional(),
   content: z.string().optional(),
   tags: z.array(z.string().max(20)).max(10).optional().default([]),
-  videos: z.array(z.any()).optional().nullable(),
-  images: z.array(z.any()).optional().nullable(),
-  documents: z.array(z.any()).optional().nullable(),
+  videos: attachmentsSchema.optional().nullable(),
+  images: attachmentsSchema.optional().nullable(),
+  documents: attachmentsSchema.optional().nullable(),
   endTime: z.string().optional(),
   allowViewOthers: z.boolean().optional(),
 })
@@ -124,8 +140,9 @@ const validatePublicSubmissionImages = async (images: unknown, checkinId: string
 const syncSubmissionAssetReferences = async (
   submissionId: string,
   images: Array<string | SubmissionAssetImage>,
+  db: AssetDatabase = prisma,
 ) => {
-  await prisma.assetReference.deleteMany({
+  await db.assetReference.deleteMany({
     where: { entityType: 'CheckinSubmission', entityId: submissionId, field: 'images' },
   })
 
@@ -135,7 +152,7 @@ const syncSubmissionAssetReferences = async (
       entityType: 'CheckinSubmission',
       entityId: submissionId,
       field: 'images',
-    })),
+    }, db)),
   )
 }
 
@@ -251,7 +268,12 @@ export const checkinController = {
       ])
 
       const hydratedCheckins = await Promise.all(
-        checkins.map((checkin) => hydrateAssetReferences(checkin, false)),
+        checkins.map((checkin) => hydrateAssetReferences(checkin, false, {
+          entityType: 'Checkin',
+          entityId: checkin.id,
+          courseId: checkin.courseId,
+          parentAccess: true,
+        })),
       )
       return success(res, buildPaginatedResult(hydratedCheckins, total, pagination))
     } catch (err) {
@@ -289,43 +311,73 @@ export const checkinController = {
         return forbidden(res, '无权限在此课程创建打卡')
       }
 
-      const checkin = await prisma.checkin.create({
-        data: {
+      const assetValues = {
+        videos: videos || [],
+        images: images || [],
+        documents: documents || [],
+      }
+      const checkin = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
           courseId,
-          title,
-          description,
-          content,
-          videos: videos as any,
-          images: images as any,
-          documents: documents as any,
-          endTime: endTime ? new Date(endTime) : null,
-          allowViewOthers: allowViewOthers ?? false,
-          tags: tags || [],
-          creatorId: userId,
-        },
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-            }
+          ownerId: userId,
+          role: req.user?.role,
+          db: tx,
+        })
+
+        const created = await tx.checkin.create({
+          data: {
+            courseId,
+            title,
+            description,
+            content,
+            videos: videos as any,
+            images: images as any,
+            documents: documents as any,
+            endTime: endTime ? new Date(endTime) : null,
+            allowViewOthers: allowViewOthers ?? false,
+            tags: tags || [],
+            creatorId: userId,
           },
-          creator: {
-            select: {
-              id: true,
-              nickname: true,
-            }
-          },
-          _count: {
-            select: {
-              submissions: true
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+              }
+            },
+            creator: {
+              select: {
+                id: true,
+                nickname: true,
+              }
+            },
+            _count: {
+              select: {
+                submissions: true
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Checkin',
+          entityId: created.id,
+          values: assetValues,
+          db: tx,
+        })
+        return created
       })
 
-      return success(res, await hydrateAssetReferences(checkin, false), '打卡创建成功')
+      return success(res, await hydrateAssetReferences(checkin, false, {
+        entityType: 'Checkin',
+        entityId: checkin.id,
+        courseId,
+        parentAccess: true,
+      }), '打卡创建成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('创建打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -401,7 +453,12 @@ export const checkinController = {
 
       const { course: courseWithAccess, ...checkinData } = checkin
       const { shares: _shares, ...course } = courseWithAccess
-      const hydrated = await hydrateAssetReferences({ ...checkinData, course }, false)
+      const hydrated = await hydrateAssetReferences({ ...checkinData, course }, false, {
+        entityType: 'Checkin',
+        entityId: checkin.id,
+        courseId: checkin.course.id,
+        parentAccess: true,
+      })
       return success(res, hydrated)
     } catch (err) {
       logger.error('获取打卡详情错误', err)
@@ -443,42 +500,72 @@ export const checkinController = {
 
       const { title, description, content, videos, images, documents, endTime, allowViewOthers, tags } = result.data
 
-      const updatedCheckin = await prisma.checkin.update({
-        where: { id },
-        data: {
-          title,
-          description,
-          content,
-          videos: videos as any,
-          images: images as any,
-          documents: documents as any,
-          endTime: endTime ? new Date(endTime) : undefined,
-          allowViewOthers,
-          tags: tags || [],
-        },
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-            }
+      const assetValues = {
+        videos: videos === undefined ? checkin.videos : videos || [],
+        images: images === undefined ? checkin.images : images || [],
+        documents: documents === undefined ? checkin.documents : documents || [],
+      }
+      const updatedCheckin = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
+          courseId: checkin.courseId,
+          ownerId: userId!,
+          role: userRole,
+          db: tx,
+        })
+
+        const saved = await tx.checkin.update({
+          where: { id },
+          data: {
+            title,
+            description,
+            content,
+            videos: videos === undefined ? undefined : videos as any,
+            images: images === undefined ? undefined : images as any,
+            documents: documents === undefined ? undefined : documents as any,
+            endTime: endTime ? new Date(endTime) : undefined,
+            allowViewOthers,
+            tags: tags || [],
           },
-          creator: {
-            select: {
-              id: true,
-              nickname: true,
-            }
-          },
-          _count: {
-            select: {
-              submissions: true
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+              }
+            },
+            creator: {
+              select: {
+                id: true,
+                nickname: true,
+              }
+            },
+            _count: {
+              select: {
+                submissions: true
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Checkin',
+          entityId: id,
+          values: assetValues,
+          db: tx,
+        })
+        return saved
       })
 
-      return success(res, await hydrateAssetReferences(updatedCheckin, false), '打卡更新成功')
+      return success(res, await hydrateAssetReferences(updatedCheckin, false, {
+        entityType: 'Checkin',
+        entityId: id,
+        courseId: checkin.courseId,
+        parentAccess: true,
+      }), '打卡更新成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('更新打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -511,8 +598,23 @@ export const checkinController = {
         return forbidden(res, '无权限删除此打卡')
       }
 
-      await prisma.checkin.delete({
-        where: { id }
+      await prisma.$transaction(async (tx) => {
+        await tx.assetReference.deleteMany({
+          where: { entityType: 'Checkin', entityId: id },
+        })
+        const submissions = await tx.checkinSubmission.findMany({
+          where: { checkinId: id },
+          select: { id: true },
+        })
+        if (submissions.length) {
+          await tx.assetReference.deleteMany({
+            where: {
+              entityType: 'CheckinSubmission',
+              entityId: { in: submissions.map((submission) => submission.id) },
+            },
+          })
+        }
+        await tx.checkin.delete({ where: { id } })
       })
 
       return success(res, null, '打卡已删除')
@@ -561,39 +663,34 @@ export const checkinController = {
         return error(res, '图片凭据无效或不属于当前课程')
       }
 
-      // 检查是否已提交
-      const existing = await prisma.checkinSubmission.findFirst({
-        where: {
-          checkinId: id,
-          studentId: userId
-        }
-      })
-
-      if (existing) {
-        // 更新
-        const updated = await prisma.checkinSubmission.update({
-          where: { id: existing.id },
-          data: {
-            content,
-            images: validatedImages,
-          }
+      const submission = await prisma.$transaction(async (tx) => {
+        const existing = await tx.checkinSubmission.findFirst({
+          where: { checkinId: id, studentId: userId },
         })
-        await syncSubmissionAssetReferences(updated.id, validatedImages)
-        return success(res, await hydrateAssetReferences(updated, false), '打卡更新成功')
-      }
-
-      // 创建新提交
-      const submission = await prisma.checkinSubmission.create({
-        data: {
-          checkinId: id,
-          studentId: userId,
-          content,
-          images: validatedImages,
-        }
+        const saved = existing
+          ? await tx.checkinSubmission.update({
+            where: { id: existing.id },
+            data: { content, images: validatedImages },
+          })
+          : await tx.checkinSubmission.create({
+            data: {
+              checkinId: id,
+              studentId: userId,
+              content,
+              images: validatedImages,
+            },
+          })
+        await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
+        return { saved, wasExisting: Boolean(existing) }
       })
 
-      await syncSubmissionAssetReferences(submission.id, validatedImages)
-      return success(res, await hydrateAssetReferences(submission, false), '打卡成功')
+      return success(res, await hydrateAssetReferences(submission.saved, false, {
+        entityType: 'CheckinSubmission',
+        entityId: submission.saved.id,
+        courseId: checkin.courseId,
+        checkinId: id,
+        parentAccess: true,
+      }), submission.wasExisting ? '打卡更新成功' : '打卡成功')
     } catch (err) {
       logger.error('提交打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -686,7 +783,13 @@ export const checkinController = {
         }
       })
 
-      return success(res, submission ? await hydrateAssetReferences(submission, false) : null)
+      return success(res, submission ? await hydrateAssetReferences(submission, false, {
+        entityType: 'CheckinSubmission',
+        entityId: submission.id,
+        courseId: checkin.courseId,
+        checkinId: id,
+        parentAccess: true,
+      }) : null)
     } catch (err) {
       logger.error('获取我的打卡提交错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -740,9 +843,23 @@ export const checkinController = {
         submission: checkin.submissions.length > 0 ? checkin.submissions[0] : undefined
       }))
 
-      const hydratedCheckins = await Promise.all(
-        formattedCheckins.map((checkin) => hydrateAssetReferences(checkin, false)),
-      )
+      const hydratedCheckins = await Promise.all(formattedCheckins.map(async (checkin) => {
+        const hydrated = await hydrateAssetReferences(checkin, false, {
+          entityType: 'Checkin',
+          entityId: checkin.id,
+          courseId: checkin.courseId,
+          parentAccess: true,
+        })
+        if (!checkin.submission) return hydrated
+        const hydratedSubmission = await hydrateAssetReferences(checkin.submission, false, {
+          entityType: 'CheckinSubmission',
+          entityId: checkin.submission.id,
+          courseId: checkin.courseId,
+          checkinId: checkin.id,
+          parentAccess: true,
+        })
+        return { ...(hydrated as Record<string, unknown>), submission: hydratedSubmission }
+      }))
 
       return success(res, {
         list: hydratedCheckins,
@@ -766,6 +883,7 @@ export const checkinController = {
         include: {
           course: {
             select: {
+              id: true,
               title: true,
               creatorId: true,
             }
@@ -801,7 +919,13 @@ export const checkinController = {
 
       // 格式化返回数据，确保 images 是字符串数组
       const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false)),
+        submissions.map((submission) => hydrateAssetReferences(submission, false, {
+          entityType: 'CheckinSubmission',
+          entityId: submission.id,
+          courseId: checkin.courseId,
+          checkinId: id,
+          parentAccess: true,
+        })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -903,7 +1027,13 @@ export const checkinController = {
 
       // 格式化返回数据，确保 images 是字符串数组
       const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false)),
+        submissions.map((submission) => hydrateAssetReferences(submission, false, {
+          entityType: 'CheckinSubmission',
+          entityId: submission.id,
+          courseId: checkin.course.id,
+          checkinId: id,
+          parentAccess: true,
+        })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -1232,7 +1362,12 @@ export const checkinController = {
       if (!checkin) {
         return notFound(res, '打卡不存在')
       }
-      const publicCheckin = await hydrateAssetReferences(checkin, true)
+      const publicCheckin = await hydrateAssetReferences(checkin, true, {
+        entityType: 'Checkin',
+        entityId: checkin.id,
+        checkinId: checkin.id,
+        parentAccess: true,
+      })
 
       // 生成会话ID（用于防重复提交）
       const sessionId = checkinTokenService.generateSessionId()
@@ -1305,7 +1440,19 @@ export const checkinController = {
         accessScope: 'PUBLIC_CHECKIN',
         scopeId: validation.checkin.id,
       })
-      await attachAssetReference({ assetId: asset.id, entityType: 'Checkin', entityId: validation.checkin.id, field: 'public-image' })
+      try {
+        await prisma.$transaction(async (tx) => {
+          await attachAssetReference({
+            assetId: asset.id,
+            entityType: 'Checkin',
+            entityId: validation.checkin.id,
+            field: 'public-image',
+          }, tx)
+        })
+      } catch (referenceError) {
+        await discardUnreferencedAsset(asset)
+        throw referenceError
+      }
 
       logger.info('匿名用户上传图片', {
         assetId: asset.id,
@@ -1395,19 +1542,13 @@ export const checkinController = {
             isAnonymous: true,
           },
         })
+        await syncSubmissionAssetReferences(submission.id, validatedImages, tx)
         return { kind: 'created' as const, submission }
       })
 
       if (result.kind === 'existing') return error(res, '您已经提交过了')
       if (result.kind === 'over-limit') return error(res, '访问令牌已达到匿名提交上限', -1, 409)
       const submission = result.submission
-
-      await Promise.all(validatedImages.map((image) => attachAssetReference({
-        assetId: image.assetId,
-        entityType: 'CheckinSubmission',
-        entityId: submission.id,
-        field: 'images',
-      })))
 
       logger.info('匿名用户提交打卡', {
         submissionId: submission.id,

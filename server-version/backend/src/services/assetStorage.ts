@@ -3,11 +3,12 @@ import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
 import path from 'node:path'
 import { Request, Response } from 'express'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { config } from '../config'
-import { UserRole } from '../types'
+import { CourseStudentStatus, UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
-import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS } from '../utils/cos'
+import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS, deleteFromCOS } from '../utils/cos'
 
 export const ASSET_URL_TTL_SECONDS = 10 * 60
 // objectKey is always relative to the upload root (for example
@@ -17,6 +18,29 @@ const ASSET_ROOT = path.resolve(config.uploadDir)
 const ASSET_SIGNING_SECRET = config.assetSigningSecret
 
 export type AssetProvider = 'local' | 'cos'
+export type AssetDatabase = typeof prisma | Prisma.TransactionClient
+
+export type AssetUrlAudience = 'private' | 'public'
+
+export interface AssetHydrationContext {
+  entityType: string
+  entityId: string
+  parentAccess: boolean
+  courseId?: string
+  checkinId?: string
+}
+
+export interface AssetReferenceInput {
+  assetId: string
+  field: string
+}
+
+export class AssetReferenceValidationError extends Error {
+  constructor(message = '附件凭据无效或不属于当前课程') {
+    super(message)
+    this.name = 'AssetReferenceValidationError'
+  }
+}
 
 export interface StoreAssetInput {
   buffer: Buffer
@@ -94,7 +118,11 @@ export const storeAsset = async (input: StoreAssetInput) => {
       },
     })
   } catch (error) {
-    if (provider === 'local') await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    if (provider === 'local') {
+      await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    } else {
+      await deleteFromCOS(objectKey).catch(() => undefined)
+    }
     throw error
   }
 }
@@ -154,7 +182,11 @@ export const storeAssetFromFile = async (input: StoreAssetFileInput) => {
       },
     })
   } catch (error) {
-    if (provider === 'local') await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    if (provider === 'local') {
+      await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    } else {
+      await deleteFromCOS(objectKey).catch(() => undefined)
+    }
     throw error
   }
 }
@@ -164,7 +196,7 @@ export const attachAssetReference = async (params: {
   entityType: string
   entityId: string
   field: string
-}) => prisma.assetReference.upsert({
+}, db: AssetDatabase = prisma) => db.assetReference.upsert({
   where: {
     assetId_entityType_entityId_field: {
       assetId: params.assetId,
@@ -177,23 +209,167 @@ export const attachAssetReference = async (params: {
   update: {},
 })
 
-export const createAssetSignature = (assetId: string, expiresAt: number): string => {
-  return crypto.createHmac('sha256', ASSET_SIGNING_SECRET).update(`${assetId}.${expiresAt}`).digest('base64url')
+/**
+ * Compensation for an asset created immediately before a parent transaction.
+ * It is intentionally conservative: if a reference appeared concurrently,
+ * leave the asset intact for the normal lifecycle/GC path.
+ */
+export const discardUnreferencedAsset = async (asset: {
+  id: string
+  objectKey: string
+  provider: string
+}): Promise<boolean> => {
+  let deleted = false
+  try {
+    const result = await prisma.storedAsset.deleteMany({
+      where: {
+        id: asset.id,
+        references: { none: {} },
+      },
+    })
+    deleted = result.count === 1
+  } catch {
+    return false
+  }
+  if (!deleted) return false
+
+  if (asset.provider === 'local') {
+    await fsPromises.rm(localPathFor(asset.objectKey), { force: true }).catch(() => undefined)
+  } else {
+    await deleteFromCOS(asset.objectKey).catch(() => undefined)
+  }
+  return true
 }
 
-export const verifyAssetSignature = (assetId: string, expiresAt: number, signature: string): boolean => {
+const collectAssetReferencesInto = (
+  value: unknown,
+  field: string,
+  result: AssetReferenceInput[],
+): void => {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectAssetReferencesInto(item, `${field}.${index}`, result))
+    return
+  }
+  if (!value || typeof value !== 'object' || value instanceof Date || Buffer.isBuffer(value)) return
+
+  const record = value as Record<string, unknown>
+  if (typeof record.assetId === 'string' && record.assetId.trim()) {
+    result.push({ assetId: record.assetId, field: field || 'asset' })
+    return
+  }
+
+  Object.entries(record).forEach(([key, item]) => {
+    collectAssetReferencesInto(item, field ? `${field}.${key}` : key, result)
+  })
+}
+
+export const collectAssetReferences = (value: unknown, field = ''): AssetReferenceInput[] => {
+  const result: AssetReferenceInput[] = []
+  collectAssetReferencesInto(value, field, result)
+  return result
+}
+
+export const syncAssetReferences = async (params: {
+  entityType: string
+  entityId: string
+  values: Record<string, unknown>
+  db?: AssetDatabase
+}): Promise<void> => {
+  const db = params.db || prisma
+  const references = Object.entries(params.values)
+    .flatMap(([field, value]) => collectAssetReferences(value, field))
+    .filter((reference, index, all) => all.findIndex((candidate) => (
+      candidate.assetId === reference.assetId && candidate.field === reference.field
+    )) === index)
+
+  await db.assetReference.deleteMany({
+    where: { entityType: params.entityType, entityId: params.entityId },
+  })
+
+  for (const reference of references) {
+    await attachAssetReference({
+      assetId: reference.assetId,
+      entityType: params.entityType,
+      entityId: params.entityId,
+      field: reference.field,
+    }, db)
+  }
+}
+
+export const validateAssetReferencesForCourse = async (params: {
+  values: Record<string, unknown>
+  courseId: string
+  ownerId: string
+  role?: UserRole
+  db?: AssetDatabase
+}): Promise<AssetReferenceInput[]> => {
+  const references = Object.entries(params.values)
+    .flatMap(([field, value]) => collectAssetReferences(value, field))
+  const assetIds = [...new Set(references.map((reference) => reference.assetId))]
+  if (!assetIds.length) return references
+
+  const db = params.db || prisma
+  const assets = await db.storedAsset.findMany({
+    where: { id: { in: assetIds } },
+    select: {
+      id: true,
+      ownerId: true,
+      accessScope: true,
+      scopeId: true,
+      deletedAt: true,
+    },
+  })
+  const assetsById = new Map(assets.map((asset) => [asset.id, asset]))
+  if (assetsById.size !== assetIds.length) throw new AssetReferenceValidationError()
+
+  for (const assetId of assetIds) {
+    const asset = assetsById.get(assetId)
+    if (!asset || asset.deletedAt) throw new AssetReferenceValidationError()
+
+    const isAdmin = params.role === UserRole.ADMIN
+    if (!isAdmin && asset.ownerId !== params.ownerId) {
+      throw new AssetReferenceValidationError('只能引用自己上传的附件')
+    }
+    if (asset.accessScope === 'PUBLIC_CHECKIN') {
+      throw new AssetReferenceValidationError()
+    }
+    if (asset.accessScope === 'COURSE' && asset.scopeId !== params.courseId) {
+      throw new AssetReferenceValidationError()
+    }
+  }
+
+  return references
+}
+
+export const createAssetSignature = (
+  assetId: string,
+  expiresAt: number,
+  audience: AssetUrlAudience = 'private',
+): string => {
+  return crypto.createHmac('sha256', ASSET_SIGNING_SECRET)
+    .update(`${audience}.${assetId}.${expiresAt}`)
+    .digest('base64url')
+}
+
+export const verifyAssetSignature = (
+  assetId: string,
+  expiresAt: number,
+  signature: string,
+  audience: AssetUrlAudience = 'private',
+): boolean => {
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= Math.floor(Date.now() / 1000)) return false
   if (!/^[A-Za-z0-9_-]{40,100}$/.test(signature)) return false
-  const expected = createAssetSignature(assetId, expiresAt)
+  const expected = createAssetSignature(assetId, expiresAt, audience)
   const expectedBuffer = Buffer.from(expected)
   const suppliedBuffer = Buffer.from(signature)
   return expectedBuffer.length === suppliedBuffer.length && crypto.timingSafeEqual(expectedBuffer, suppliedBuffer)
 }
 
 const signedPath = (assetId: string, expiresAt: number, publicRoute = false): string => {
+  const audience: AssetUrlAudience = publicRoute ? 'public' : 'private'
   const query = new URLSearchParams({
     expires: String(expiresAt),
-    signature: createAssetSignature(assetId, expiresAt),
+    signature: createAssetSignature(assetId, expiresAt, audience),
   })
   return `/api/${publicRoute ? 'public/' : ''}assets/${encodeURIComponent(assetId)}/content?${query.toString()}`
 }
@@ -202,60 +378,132 @@ export const getSignedAssetUrl = async (assetId: string, publicRoute = false): P
   const asset = await prisma.storedAsset.findUnique({ where: { id: assetId } })
   if (!asset || asset.deletedAt) return null
   if (publicRoute && asset.accessScope !== 'PUBLIC_CHECKIN') return null
+  if (!publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') return null
   const expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS
   // The client always receives an application URL. COS credentials and COS
   // URLs remain server-side and are generated only while serving the asset.
   return signedPath(asset.id, expiresAt, publicRoute)
 }
 
-/**
- * Replace asset references in JSON attachment fields with short-lived
- * application URLs while preserving the original metadata and assetId.
- * Legacy strings are deliberately left unchanged during the migration window.
- */
-export const hydrateAssetReferences = async (value: unknown, publicRoute = false): Promise<unknown> => {
-  if (Array.isArray(value)) {
-    return Promise.all(value.map((item) => hydrateAssetReferences(item, publicRoute)))
+const isExpectedAssetScope = (
+  asset: { accessScope: string; scopeId: string | null },
+  context: AssetHydrationContext,
+  publicRoute: boolean,
+): boolean => {
+  if (publicRoute) {
+    return asset.accessScope === 'PUBLIC_CHECKIN' && asset.scopeId === context.checkinId
   }
-  if (!value || typeof value !== 'object') return value
-  if (value instanceof Date || Buffer.isBuffer(value)) return value
-
-  const record = value as Record<string, unknown>
-  if (typeof record.assetId === 'string' && record.assetId) {
-    const url = await getSignedAssetUrl(record.assetId, publicRoute)
-    return { ...record, url }
+  if (asset.accessScope === 'COURSE') {
+    return !context.courseId || asset.scopeId === context.courseId
   }
-
-  const entries = await Promise.all(
-    Object.entries(record).map(async ([key, item]) => [key, await hydrateAssetReferences(item, publicRoute)] as const),
-  )
-  return Object.fromEntries(entries)
+  if (asset.accessScope === 'PUBLIC_CHECKIN') return false
+  return true
 }
 
-const canReadPrivateAsset = async (asset: {
+const getHydratableAssets = async (
+  assetIds: string[],
+  publicRoute: boolean,
+  context?: AssetHydrationContext,
+): Promise<Map<string, { id: string }>> => {
+  if (!context?.parentAccess || !assetIds.length) return new Map()
+
+  const [assets, references] = await Promise.all([
+    prisma.storedAsset.findMany({
+      where: { id: { in: assetIds }, deletedAt: null },
+      select: { id: true, accessScope: true, scopeId: true },
+    }),
+    prisma.assetReference.findMany({
+      where: {
+        entityType: context.entityType,
+        entityId: context.entityId,
+        assetId: { in: assetIds },
+      },
+      select: { assetId: true },
+    }),
+  ])
+  const referencedIds = new Set(references.map((reference) => reference.assetId))
+  const result = new Map<string, { id: string }>()
+
+  for (const asset of assets) {
+    if (!referencedIds.has(asset.id)) continue
+    if (!isExpectedAssetScope(asset, context, publicRoute)) continue
+    result.set(asset.id, { id: asset.id })
+  }
+
+  return result
+}
+
+/**
+ * Replace asset references in JSON attachment fields with short-lived
+ * URLs. A parent access decision and an AssetReference row are both required;
+ * a bare client-supplied assetId can never obtain a URL from this function.
+ * Legacy strings are deliberately left unchanged during the migration window.
+ */
+export const hydrateAssetReferences = async (
+  value: unknown,
+  publicRoute = false,
+  context?: AssetHydrationContext,
+): Promise<unknown> => {
+  const assetIds = [...new Set(collectAssetReferences(value).map((reference) => reference.assetId))]
+  const hydratableAssets = await getHydratableAssets(assetIds, publicRoute, context)
+  const expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS
+
+  const visit = (current: unknown): unknown => {
+    if (Array.isArray(current)) return current.map((item) => visit(item))
+    if (!current || typeof current !== 'object') return current
+    if (current instanceof Date || Buffer.isBuffer(current)) return current
+
+    const record = current as Record<string, unknown>
+    if (typeof record.assetId === 'string' && record.assetId) {
+      const url = hydratableAssets.has(record.assetId)
+        ? signedPath(record.assetId, expiresAt, publicRoute)
+        : null
+      return { ...record, url }
+    }
+    return Object.fromEntries(Object.entries(record).map(([key, item]) => [key, visit(item)]))
+  }
+
+  return visit(value)
+}
+
+export const canReadPrivateAsset = async (asset: {
   ownerId: string | null
   accessScope: string
   scopeId: string | null
-}, req: Request): Promise<boolean> => {
-  if (req.user?.role === UserRole.ADMIN) return true
-  if (asset.ownerId && asset.ownerId === req.user?.userId) return true
+}, actor: { userId?: string; role?: UserRole } = {}): Promise<boolean> => {
+  // Public check-in assets are deliberately only served through the public
+  // route, where the matching check-in token is checked on every request.
+  if (asset.accessScope === 'PUBLIC_CHECKIN') return false
+  if (actor.role === UserRole.ADMIN) return true
+  if (asset.ownerId && asset.ownerId === actor.userId) return true
   if (asset.accessScope === 'PUBLIC') return true
-  if (asset.accessScope !== 'COURSE' || !asset.scopeId || !req.user?.userId) return false
+  if (asset.accessScope !== 'COURSE' || !asset.scopeId || !actor.userId) return false
 
   const course = await prisma.course.findUnique({
     where: { id: asset.scopeId },
     select: {
       creatorId: true,
-      students: { where: { studentId: req.user.userId }, select: { id: true } },
+      shares: { select: { sharedTo: true } },
+      students: {
+        where: {
+          studentId: actor.userId,
+          status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+        },
+        select: { id: true },
+      },
     },
   })
-  return !!course && (course.creatorId === req.user.userId || course.students.length > 0)
+  return !!course && (
+    course.creatorId === actor.userId
+    || (course.shares || []).some((share) => share.sharedTo === actor.userId)
+    || course.students.length > 0
+  )
 }
 
 export const issuePrivateAssetUrl = async (req: Request, res: Response) => {
   const asset = await prisma.storedAsset.findUnique({ where: { id: req.params.id } })
   if (!asset || asset.deletedAt) return notFound(res, '文件不存在')
-  if (!(await canReadPrivateAsset(asset, req))) return forbidden(res, '无权限访问此文件')
+  if (!(await canReadPrivateAsset(asset, req.user))) return forbidden(res, '无权限访问此文件')
   const url = await getSignedAssetUrl(asset.id)
   if (!url) return notFound(res, '文件不存在')
   return res.json({ code: 0, message: '操作成功', data: { assetId: asset.id, url, expiresIn: ASSET_URL_TTL_SECONDS } })
@@ -280,15 +528,20 @@ export const issuePublicAssetUrl = async (req: Request, res: Response) => {
 }
 
 export const serveAsset = async (req: Request, res: Response) => {
+  const publicRoute = req.baseUrl.includes('/public/assets')
   const expiresAt = Number(req.query.expires)
   const signature = typeof req.query.signature === 'string' ? req.query.signature : ''
-  if (!verifyAssetSignature(req.params.id, expiresAt, signature)) return unauthorized(res, '文件访问签名无效或已过期')
+  if (!verifyAssetSignature(req.params.id, expiresAt, signature, publicRoute ? 'public' : 'private')) {
+    return unauthorized(res, '文件访问签名无效或已过期')
+  }
 
   const asset = await prisma.storedAsset.findUnique({ where: { id: req.params.id } })
   if (!asset || asset.deletedAt) return notFound(res, '文件不存在')
-  const publicRoute = req.baseUrl.includes('/public/assets')
   if (publicRoute && asset.accessScope !== 'PUBLIC_CHECKIN') {
     return unauthorized(res, '该文件不允许公开访问')
+  }
+  if (!publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') {
+    return unauthorized(res, '该文件只能通过签到令牌访问')
   }
   if (publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') {
     const valid = await validatePublicCheckinAsset(asset.id, req.header('X-Checkin-Token'))

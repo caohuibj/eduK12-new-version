@@ -55,7 +55,9 @@ services:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # Do not silently downgrade secure cookies in a production-mode
+      # container. Set false explicitly for local HTTP and true for HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly (false for local HTTP, true for HTTPS)}
       # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
       # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）

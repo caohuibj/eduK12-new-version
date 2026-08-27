@@ -3,7 +3,12 @@ import { UserRole } from '@prisma/client'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
-    course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
+    $transaction: vi.fn(),
+    course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn(), delete: vi.fn() },
+    assignment: { findMany: vi.fn() },
+    checkin: { findMany: vi.fn() },
+    checkinSubmission: { findMany: vi.fn() },
+    assetReference: { deleteMany: vi.fn() },
     courseStudent: { findMany: vi.fn(), findFirst: vi.fn() },
     courseShare: { findMany: vi.fn() },
   },
@@ -37,6 +42,7 @@ const makeRes = () => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
 })
 
 describe('course isLibrary', () => {
@@ -208,5 +214,35 @@ describe('course isLibrary', () => {
     expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({ course: { isLibrary: false } }),
     }))
+  })
+
+  it('removes polymorphic asset references before deleting a course', async () => {
+    mockPrisma.course.findUnique.mockResolvedValue({
+      id: 'course-1',
+      creatorId: 'admin-1',
+      status: 'PUBLISHED',
+      _count: { students: 0 },
+    })
+    mockPrisma.assignment.findMany.mockResolvedValue([{ id: 'assignment-1' }])
+    mockPrisma.checkin.findMany.mockResolvedValue([{ id: 'checkin-1' }])
+    mockPrisma.checkinSubmission.findMany.mockResolvedValue([{ id: 'submission-1' }])
+
+    const res = makeRes()
+    await courseController.delete(makeReq() as any, res)
+
+    expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith({
+      where: { entityType: 'Course', entityId: 'course-1' },
+    })
+    expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith({
+      where: { entityType: 'Assignment', entityId: { in: ['assignment-1'] } },
+    })
+    expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith({
+      where: { entityType: 'Checkin', entityId: { in: ['checkin-1'] } },
+    })
+    expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith({
+      where: { entityType: 'CheckinSubmission', entityId: { in: ['submission-1'] } },
+    })
+    expect(mockPrisma.course.delete).toHaveBeenCalledWith({ where: { id: 'course-1' } })
+    expect(res.statusCode).toBe(200)
   })
 })

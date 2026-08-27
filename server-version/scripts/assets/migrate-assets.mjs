@@ -35,9 +35,25 @@ function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex')
 }
 
+async function sha256File(filePath) {
+  const hash = crypto.createHash('sha256')
+  const stream = fs.createReadStream(filePath)
+  for await (const chunk of stream) hash.update(chunk)
+  return hash.digest('hex')
+}
+
 function safeFileName(name) {
   const base = path.basename(name || 'asset.bin').replace(/[^a-zA-Z0-9._-]/g, '_')
   return base || 'asset.bin'
+}
+
+function assetIdentity({ ownerId, accessScope, scopeId }) {
+  return `${accessScope}:${scopeId || ''}:${ownerId || ''}`
+}
+
+function migratedObjectKey(digest, originalName, identity) {
+  const identityDigest = sha256(Buffer.from(identity)).slice(0, 16)
+  return `assets/migrated/${digest}-${identityDigest}-${safeFileName(originalName)}`
 }
 
 function mimeTypeFor(name) {
@@ -74,43 +90,69 @@ function localLegacyPath(value) {
   return candidate
 }
 
+const assetCache = new Map()
+const assetInFlight = new Map()
+
 async function ensureAsset({ source, originalName, ownerId, accessScope = 'PRIVATE', scopeId }) {
   const sourcePath = localLegacyPath(source)
   if (!sourcePath || !fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) return null
-  const buffer = await fsPromises.readFile(sourcePath)
-  if (!buffer.length) return null
-  const digest = sha256(buffer)
-  const existing = await prisma.storedAsset.findFirst({
-    where: {
-      sha256: digest,
-      deletedAt: null,
-      accessScope,
-      scopeId: scopeId || null,
-      ownerId: ownerId || null,
-    },
-  })
-  if (existing) return existing
+  const stat = await fsPromises.stat(sourcePath)
+  if (stat.size <= 0) return null
+  const digest = await sha256File(sourcePath)
+  const identity = assetIdentity({ ownerId, accessScope, scopeId })
+  const cacheKey = `${digest}:${identity}`
+  const cached = assetCache.get(cacheKey)
+  if (cached) return cached
+  const inFlight = assetInFlight.get(cacheKey)
+  if (inFlight) return inFlight
 
-  const objectKey = `assets/migrated/${digest}-${safeFileName(originalName || path.basename(sourcePath))}`
-  const target = path.resolve(assetRoot, objectKey.replace(/^assets\//, ''))
-  if (target !== assetRoot && !target.startsWith(`${assetRoot}${path.sep}`)) fail('calculated asset path escaped asset root')
-  await fsPromises.mkdir(path.dirname(target), { recursive: true, mode: 0o700 })
-  if (!fs.existsSync(target)) await fsPromises.copyFile(sourcePath, target)
-  await fsPromises.chmod(target, 0o600)
+  const work = (async () => {
+    const existing = await prisma.storedAsset.findFirst({
+      where: {
+        sha256: digest,
+        deletedAt: null,
+        accessScope,
+        scopeId: scopeId || null,
+        ownerId: ownerId || null,
+      },
+    })
+    if (existing) {
+      assetCache.set(cacheKey, existing)
+      return existing
+    }
 
-  return prisma.storedAsset.create({
-    data: {
-      objectKey,
-      provider: 'local',
-      mimeType: mimeTypeFor(originalName || sourcePath),
-      sizeBytes: buffer.length,
-      sha256: digest,
-      originalName: originalName || path.basename(sourcePath),
-      ownerId,
-      accessScope,
-      scopeId,
-    },
-  })
+    // Include the ownership/scope identity in the key. Equal content used by
+    // two courses must not collide on StoredAsset.objectKey.
+    const objectKey = migratedObjectKey(digest, originalName || path.basename(sourcePath), identity)
+    const target = path.resolve(assetRoot, objectKey.replace(/^assets\//, ''))
+    if (target !== assetRoot && !target.startsWith(`${assetRoot}${path.sep}`)) fail('calculated asset path escaped asset root')
+    await fsPromises.mkdir(path.dirname(target), { recursive: true, mode: 0o700 })
+    if (!fs.existsSync(target)) await fsPromises.copyFile(sourcePath, target)
+    await fsPromises.chmod(target, 0o600)
+
+    const created = await prisma.storedAsset.create({
+      data: {
+        objectKey,
+        provider: 'local',
+        mimeType: mimeTypeFor(originalName || sourcePath),
+        sizeBytes: stat.size,
+        sha256: digest,
+        originalName: originalName || path.basename(sourcePath),
+        ownerId,
+        accessScope,
+        scopeId,
+      },
+    })
+    assetCache.set(cacheKey, created)
+    return created
+  })()
+
+  assetInFlight.set(cacheKey, work)
+  try {
+    return await work
+  } finally {
+    assetInFlight.delete(cacheKey)
+  }
 }
 
 async function reference(assetId, entityType, entityId, field) {
@@ -119,6 +161,14 @@ async function reference(assetId, entityType, entityId, field) {
     create: { assetId, entityType, entityId, field },
     update: {},
   })
+}
+
+function existingAssetMatchesScope(asset, { ownerId, accessScope, scopeId }) {
+  if (!asset || asset.deletedAt) return false
+  if (asset.accessScope !== accessScope) return false
+  if (scopeId && asset.scopeId !== scopeId) return false
+  if (ownerId && asset.ownerId && asset.ownerId !== ownerId) return false
+  return true
 }
 
 async function migrateCourses(report) {
@@ -189,7 +239,16 @@ async function migrateVideos(report) {
 
 async function migrateJsonReferences(report) {
   const [assignments, checkins, submissions] = await Promise.all([
-    prisma.assignment.findMany({ select: { id: true, images: true, documents: true, videos: true, courseId: true } }),
+    prisma.assignment.findMany({
+      select: {
+        id: true,
+        images: true,
+        documents: true,
+        videos: true,
+        courseId: true,
+        course: { select: { creatorId: true } },
+      },
+    }),
     prisma.checkin.findMany({ select: { id: true, images: true, documents: true, videos: true, creatorId: true, courseId: true, allowAnonymous: true } }),
     prisma.checkinSubmission.findMany({
       select: {
@@ -213,11 +272,23 @@ async function migrateJsonReferences(report) {
       return value
     }
     if (Array.isArray(value)) {
-      return Promise.all(value.map((item, index) => walk(item, entityType, entityId, `${field}.${index}`, ownerId, scopeId, accessScope)))
+      const migrated = []
+      for (const [index, item] of value.entries()) {
+        migrated.push(await walk(item, entityType, entityId, `${field}.${index}`, ownerId, scopeId, accessScope))
+      }
+      return migrated
     }
     if (!value || typeof value !== 'object') return value
 
     if (typeof value.assetId === 'string' && value.assetId) {
+      const existing = await prisma.storedAsset.findUnique({
+        where: { id: value.assetId },
+        select: { id: true, ownerId: true, accessScope: true, scopeId: true, deletedAt: true },
+      })
+      if (!existingAssetMatchesScope(existing, { ownerId, accessScope, scopeId })) {
+        report.skipped += 1
+        return value
+      }
       await reference(value.assetId, entityType, entityId, field)
       return value
     }
@@ -238,17 +309,20 @@ async function migrateJsonReferences(report) {
       }
     }
 
-    const entries = await Promise.all(Object.entries(value).map(async ([key, item]) => [
-      key,
-      await walk(item, entityType, entityId, `${field}.${key}`, ownerId, scopeId, accessScope),
-    ]))
+    const entries = []
+    for (const [key, item] of Object.entries(value)) {
+      entries.push([
+        key,
+        await walk(item, entityType, entityId, `${field}.${key}`, ownerId, scopeId, accessScope),
+      ])
+    }
     return Object.fromEntries(entries)
   }
 
   for (const row of assignments) {
     const updates = {}
     for (const [field, value] of [['images', row.images], ['documents', row.documents], ['videos', row.videos]]) {
-      updates[field] = await walk(value, 'Assignment', row.id, field, undefined, row.courseId, 'COURSE')
+      updates[field] = await walk(value, 'Assignment', row.id, field, row.course.creatorId, row.courseId, 'COURSE')
     }
     if (JSON.stringify(updates.images) !== JSON.stringify(row.images) || JSON.stringify(updates.documents) !== JSON.stringify(row.documents) || JSON.stringify(updates.videos) !== JSON.stringify(row.videos)) {
       await prisma.assignment.update({ where: { id: row.id }, data: updates })

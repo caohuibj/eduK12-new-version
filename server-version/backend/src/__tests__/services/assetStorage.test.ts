@@ -5,8 +5,9 @@ import { UserRole } from '@prisma/client'
 
 const { mockPrisma, mockCheckinValidate } = vi.hoisted(() => ({
   mockPrisma: {
-    storedAsset: { findUnique: vi.fn() },
+    storedAsset: { findUnique: vi.fn(), findMany: vi.fn() },
     course: { findUnique: vi.fn() },
+    assetReference: { findMany: vi.fn() },
   },
   mockCheckinValidate: vi.fn(),
 }))
@@ -33,6 +34,7 @@ import {
   issuePrivateAssetUrl,
   issuePublicAssetUrl,
   serveAsset,
+  hydrateAssetReferences,
 } from '../../services/assetStorage'
 
 const makeRes = () => {
@@ -160,6 +162,25 @@ describe('stored asset access boundary', () => {
     expect(crossScopeResponse.statusCode).toBe(401)
   })
 
+  it('does not expose public check-in assets through the private route', async () => {
+    const publicAsset = privateAsset({
+      ownerId: 'teacher-1',
+      accessScope: 'PUBLIC_CHECKIN',
+      scopeId: 'checkin-1',
+    })
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(publicAsset)
+
+    const issueResponse = makeRes()
+    await issuePrivateAssetUrl(request(), issueResponse)
+    expect(issueResponse.statusCode).toBe(403)
+
+    const expiresAt = Math.floor(Date.now() / 1000) + 60
+    const privateUrl = new URL(assetStorageInternals.signedPath('asset-1', expiresAt), 'http://localhost')
+    const contentResponse = makeRes()
+    await serveAsset(request({ query: Object.fromEntries(privateUrl.searchParams) }), contentResponse)
+    expect(contentResponse.statusCode).toBe(401)
+  })
+
   it('rejects invalid or expired signed content URLs', async () => {
     const res = makeRes()
 
@@ -178,6 +199,54 @@ describe('stored asset access boundary', () => {
     expect(url.searchParams.get('expires')).toBe(String(expiresAt))
     expect(url.searchParams.get('signature')).toMatch(/^[A-Za-z0-9_-]{40,100}$/)
     expect(assetStorageInternals.signedPath('asset-2', expiresAt)).not.toBe(signed)
+  })
+
+  it('binds signed content URLs to their public/private audience', async () => {
+    const expiresAt = Math.floor(Date.now() / 1000) + 60
+    const privateUrl = new URL(assetStorageInternals.signedPath('asset-1', expiresAt), 'http://localhost')
+    const publicRouteResponse = makeRes()
+
+    await serveAsset(request({
+      baseUrl: '/api/public/assets',
+      query: Object.fromEntries(privateUrl.searchParams),
+    }), publicRouteResponse)
+
+    expect(publicRouteResponse.statusCode).toBe(401)
+    expect(mockPrisma.storedAsset.findUnique).not.toHaveBeenCalled()
+
+    const publicUrl = new URL(assetStorageInternals.signedPath('asset-1', expiresAt, true), 'http://localhost')
+    const privateRouteResponse = makeRes()
+    await serveAsset(request({ query: Object.fromEntries(publicUrl.searchParams) }), privateRouteResponse)
+
+    expect(privateRouteResponse.statusCode).toBe(401)
+    expect(mockPrisma.storedAsset.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('hydrates only asset references bound to the authorized parent record', async () => {
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{
+      id: 'asset-1',
+      accessScope: 'PRIVATE',
+      scopeId: null,
+    }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
+
+    const hydrated = await hydrateAssetReferences({ images: [{ assetId: 'asset-1' }] }, false, {
+      entityType: 'Assignment',
+      entityId: 'assignment-1',
+      courseId: 'course-1',
+      parentAccess: true,
+    }) as { images: Array<{ assetId: string; url: string }> }
+
+    expect(hydrated.images[0].url).toContain('/api/assets/asset-1/content')
+
+    mockPrisma.assetReference.findMany.mockResolvedValue([])
+    const unbound = await hydrateAssetReferences({ images: [{ assetId: 'asset-1' }] }, false, {
+      entityType: 'Assignment',
+      entityId: 'assignment-2',
+      courseId: 'course-1',
+      parentAccess: true,
+    }) as { images: Array<{ url: string | null }> }
+    expect(unbound.images[0].url).toBeNull()
   })
 
   it('serves local assets with an explicit MIME type and nosniff protection', async () => {

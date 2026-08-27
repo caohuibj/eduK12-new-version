@@ -8,7 +8,18 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
-import { hydrateAssetReferences } from '../services/assetStorage'
+import {
+  AssetReferenceValidationError,
+  hydrateAssetReferences,
+  syncAssetReferences,
+  validateAssetReferencesForCourse,
+} from '../services/assetStorage'
+
+const attachmentSchema = z.union([
+  z.string().min(1).max(2048),
+  z.record(z.unknown()),
+])
+const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
@@ -16,9 +27,9 @@ const createAssignmentSchema = z.object({
   description: z.string().optional(),
   deadline: z.string().optional(), // 接受任何字符串格式，后端再转换
   questions: z.array(z.any()).optional(),
-  videos: z.array(z.any()).optional(), // 改为any支持新结构
-  documents: z.array(z.any()).optional(),
-  images: z.array(z.any()).optional(),
+  videos: attachmentsSchema.optional(),
+  documents: attachmentsSchema.optional(),
+  images: attachmentsSchema.optional(),
   tags: z.array(z.string().max(20, '标签最多20个字符')).max(10, '最多10个标签').optional().default([]),
   content: z.string().optional(),
 })
@@ -29,9 +40,9 @@ const updateAssignmentSchema = z.object({
   deadline: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
   questions: z.array(z.any()).optional(),
-  videos: z.array(z.any()).optional(),
-  documents: z.array(z.any()).optional(),
-  images: z.array(z.any()).optional(),
+  videos: attachmentsSchema.optional(),
+  documents: attachmentsSchema.optional(),
+  images: attachmentsSchema.optional(),
   tags: z.array(z.string().max(20, '标签最多20个字符')).max(10, '最多10个标签').optional(),
   content: z.string().optional(),
 })
@@ -149,7 +160,12 @@ export const assignmentController = {
       }
 
       const hydratedAssignments = await Promise.all(
-        formattedAssignments.map((assignment) => hydrateAssetReferences(assignment, false)),
+        formattedAssignments.map((assignment) => hydrateAssetReferences(assignment, false, {
+          entityType: 'Assignment',
+          entityId: assignment.id,
+          courseId: assignment.courseId,
+          parentAccess: true,
+        })),
       )
       return success(res, buildPaginatedResult(hydratedAssignments, total, pagination))
     } catch (err) {
@@ -213,33 +229,63 @@ export const assignmentController = {
         }
       }
 
-      const assignment = await prisma.assignment.create({
-        data: {
+      const assetValues = {
+        videos: videos || [],
+        images: images || [],
+        documents: documents || [],
+      }
+      const assignment = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
           courseId,
-          title,
-          description,
-          content: content || null,
-          deadline: deadlineDate,
-          status: AssignmentStatus.PUBLISHED,
-          questions: questions || [],
-          tags: tags || [],
-          videos: videos || [],
-          images: images || [],
-          documents: documents || [],
-        },
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-              courseCode: true,
+          ownerId: userId,
+          role: req.user?.role,
+          db: tx,
+        })
+
+        const created = await tx.assignment.create({
+          data: {
+            courseId,
+            title,
+            description,
+            content: content || null,
+            deadline: deadlineDate,
+            status: AssignmentStatus.PUBLISHED,
+            questions: questions || [],
+            tags: tags || [],
+            videos: (videos || []) as any,
+            images: (images || []) as any,
+            documents: (documents || []) as any,
+          },
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+                courseCode: true,
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Assignment',
+          entityId: created.id,
+          values: assetValues,
+          db: tx,
+        })
+        return created
       })
 
-      return success(res, await hydrateAssetReferences(assignment, false), '作业创建成功')
+      return success(res, await hydrateAssetReferences(assignment, false, {
+        entityType: 'Assignment',
+        entityId: assignment.id,
+        courseId,
+        parentAccess: true,
+      }), '作业创建成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('创建作业错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -314,7 +360,12 @@ export const assignmentController = {
         ...assignment,
         course,
         mySubmission,
-      }, false))
+      }, false, {
+        entityType: 'Assignment',
+        entityId: assignment.id,
+        courseId: assignment.course.id,
+        parentAccess: true,
+      }))
     } catch (err) {
       logger.error('获取作业详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -363,22 +414,51 @@ export const assignmentController = {
         }
       }
 
-      const updated = await prisma.assignment.update({
-        where: { id },
-        data: updateData,
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-              courseCode: true,
+      const assetValues = {
+        videos: result.data.videos === undefined ? assignment.videos : result.data.videos,
+        images: result.data.images === undefined ? assignment.images : result.data.images,
+        documents: result.data.documents === undefined ? assignment.documents : result.data.documents,
+      }
+      const updated = await prisma.$transaction(async (tx) => {
+        await validateAssetReferencesForCourse({
+          values: assetValues,
+          courseId: assignment.courseId,
+          ownerId: userId!,
+          role: userRole,
+          db: tx,
+        })
+        const saved = await tx.assignment.update({
+          where: { id },
+          data: updateData,
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+                courseCode: true,
+              }
             }
           }
-        }
+        })
+        await syncAssetReferences({
+          entityType: 'Assignment',
+          entityId: id,
+          values: assetValues,
+          db: tx,
+        })
+        return saved
       })
 
-      return success(res, await hydrateAssetReferences(updated, false), '作业更新成功')
+      return success(res, await hydrateAssetReferences(updated, false, {
+        entityType: 'Assignment',
+        entityId: id,
+        courseId: assignment.courseId,
+        parentAccess: true,
+      }), '作业更新成功')
     } catch (err) {
+      if (err instanceof AssetReferenceValidationError) {
+        return error(res, err.message)
+      }
       logger.error('更新作业错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -411,8 +491,11 @@ export const assignmentController = {
         return forbidden(res, '无权限删除此作业')
       }
 
-      await prisma.assignment.delete({
-        where: { id }
+      await prisma.$transaction(async (tx) => {
+        await tx.assetReference.deleteMany({
+          where: { entityType: 'Assignment', entityId: id },
+        })
+        await tx.assignment.delete({ where: { id } })
       })
 
       return success(res, null, '作业已删除')

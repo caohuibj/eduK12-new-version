@@ -179,7 +179,16 @@ router.delete('/images/:filename', async (req, res) => {
     const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
     if (asset) {
       if (!canManageAsset(req, asset.ownerId)) return error(res, '无权限删除此图片', -1, 403)
-      await prisma.storedAsset.update({ where: { id: asset.id }, data: { deletedAt: new Date() } })
+      const deleted = await prisma.storedAsset.updateMany({
+        where: {
+          id: asset.id,
+          references: { none: {} },
+        },
+        data: { deletedAt: new Date() },
+      })
+      if (deleted.count !== 1) {
+        return error(res, '文件仍被课程内容引用，请先移除引用', -1, 409)
+      }
       if (asset.provider === 'local') {
         await fs.promises.rm(getLocalAssetPath(asset.objectKey), { force: true }).catch(() => undefined)
       }

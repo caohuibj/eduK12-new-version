@@ -179,11 +179,13 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         mimeType: 'video/mp4',
         ownerId: teacherId,
       })
-      await prisma.video.update({
-        where: { id: videoId },
-        data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
+      await prisma.$transaction(async (tx) => {
+        await tx.video.update({
+          where: { id: videoId },
+          data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
+        })
+        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' }, tx)
       })
-      await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' })
     }
 
     await job.progress(10)
@@ -258,10 +260,6 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         ownerId: teacherId,
       }),
     ])
-    await Promise.all([
-      attachAssetReference({ assetId: processedAsset.id, entityType: 'Video', entityId: videoId, field: 'processed' }),
-      attachAssetReference({ assetId: thumbnailAsset.id, entityType: 'Video', entityId: videoId, field: 'thumbnail' }),
-    ])
     const processedUrl = await getSignedAssetUrl(processedAsset.id)
     const thumbnailUrl = await getSignedAssetUrl(thumbnailAsset.id)
 
@@ -271,20 +269,24 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     const duration = await getVideoDuration(outputPath)
     const fileSize = (await fs.stat(outputPath)).size
 
-    // 更新数据库
-    await prisma.video.update({
-      where: { id: videoId },
-      data: {
-        status: 'COMPLETED',
-        processedUrl: null,
-        thumbnailUrl: null,
-        processedAssetId: processedAsset.id,
-        thumbnailAssetId: thumbnailAsset.id,
-        resolution: PROCESSING_CONFIG.resolution,
-        duration,
-        fileSize,
-        processedAt: new Date()
-      }
+    // Update the video and attach both derivatives atomically.
+    await prisma.$transaction(async (tx) => {
+      await tx.video.update({
+        where: { id: videoId },
+        data: {
+          status: 'COMPLETED',
+          processedUrl: null,
+          thumbnailUrl: null,
+          processedAssetId: processedAsset.id,
+          thumbnailAssetId: thumbnailAsset.id,
+          resolution: PROCESSING_CONFIG.resolution,
+          duration,
+          fileSize,
+          processedAt: new Date()
+        }
+      })
+      await attachAssetReference({ assetId: processedAsset.id, entityType: 'Video', entityId: videoId, field: 'processed' }, tx)
+      await attachAssetReference({ assetId: thumbnailAsset.id, entityType: 'Video', entityId: videoId, field: 'thumbnail' }, tx)
     })
 
     await job.progress(100)

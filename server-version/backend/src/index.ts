@@ -62,20 +62,34 @@ const publicAssessmentLimiter = rateLimit({
 const server = createServer(app)
 
 const requestMetricCounts = new Map<string, number>()
+const MAX_REQUEST_METRIC_KEYS = 10_000
+const OTHER_REQUEST_METRIC_KEY = 'OTHER|/__other__|OTHER'
 const normalizeMetricPath = (req: express.Request): string => {
   const routePath = req.route?.path
   if (routePath) return `${req.baseUrl}${routePath}`
-  return req.path
+  const normalized = req.path
     .replace(/\/ck_[A-Za-z0-9_-]+/g, '/:token')
     .replace(/\/[0-9a-f]{8,}(?=\/|$)/gi, '/:id')
     .replace(/\/[^/]{32,}(?=\/|$)/g, '/:id')
+  // Express does not expose a route template for unmatched requests. Keep
+  // those requests in one bounded bucket so attacker-controlled 404 paths
+  // cannot grow this process-local map without limit.
+  return normalized === req.path && !req.route
+    ? (req.path.startsWith('/api/') ? '/api/:unmatched' : '/:unmatched')
+    : normalized
 }
 
 app.use((req, res, next) => {
   const startedAt = process.hrtime.bigint()
   res.once('finish', () => {
     const pathLabel = normalizeMetricPath(req)
-    const key = `${req.method}|${pathLabel}|${res.statusCode}`
+    let key = `${req.method}|${pathLabel}|${res.statusCode}`
+    // Reserve one slot for the aggregate bucket. Once the cap is reached,
+    // new route/status combinations are counted there instead of growing the
+    // process-local map indefinitely.
+    if (!requestMetricCounts.has(key) && requestMetricCounts.size >= MAX_REQUEST_METRIC_KEYS - 1) {
+      key = OTHER_REQUEST_METRIC_KEY
+    }
     requestMetricCounts.set(key, (requestMetricCounts.get(key) || 0) + 1)
     const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000
     if (durationMs > 10_000) logger.warn('HTTP request exceeded latency threshold', { method: req.method, path: pathLabel, durationMs: Math.round(durationMs) })

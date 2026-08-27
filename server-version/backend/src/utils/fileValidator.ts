@@ -10,6 +10,7 @@ const FILE_SIGNATURES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
   'image/gif': [0x47, 0x49, 0x46, 0x38], // GIF87a or GIF89a
   'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header
+  'application/pdf': [0x25, 0x50, 0x44, 0x46, 0x2D], // %PDF-
   // 视频
   'video/mp4': [0x00, 0x00, 0x00], // MP4 有多种变体
   'video/webm': [0x1A, 0x45, 0xDF, 0xA3], // EBML header
@@ -60,6 +61,10 @@ export const detectMimeType = (buffer: Buffer): string | null => {
   // 检查 WebP
   if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46) {
     return 'image/webp'
+  }
+  // PDF
+  if (buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46 && buffer[4] === 0x2D) {
+    return 'application/pdf'
   }
   // 检查 WebM
   if (buffer[0] === 0x1A && buffer[1] === 0x45 && buffer[2] === 0xDF && buffer[3] === 0xA3) {

@@ -104,6 +104,7 @@ export class SocketService {
               expiresAt: true,
               teacherApproved: true,
               tokenVersion: true,
+              mustChangePassword: true,
             },
           })
 
@@ -114,6 +115,10 @@ export class SocketService {
 
           if (payload.tokenVersion !== user!.tokenVersion) {
             return next(new Error('Socket认证令牌已失效'))
+          }
+
+          if (user!.mustChangePassword) {
+            return next(new Error('首次登录必须先修改密码'))
           }
 
           socket.data.authenticated = true
@@ -163,12 +168,14 @@ export class SocketService {
           expiresAt: true,
           teacherApproved: true,
           tokenVersion: true,
+          mustChangePassword: true,
         },
       })
 
       if (
         !user ||
         inactiveAccountMessage(user) ||
+        user.mustChangePassword ||
         user.tokenVersion !== socket.data.tokenVersion
       ) {
         socket.data.authenticated = false

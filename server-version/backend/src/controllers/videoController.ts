@@ -127,29 +127,34 @@ export const videoController = {
       })
       const processingInput = `file://${getLocalAssetPath(originalAsset.objectKey)}`
 
-      // 创建数据库记录
-      const video = await prisma.video.create({
-        data: {
-          title,
-          filePath: originalAsset.objectKey,
-          fileName: file.originalname,
-          fileSize: file.size,
-          mimeType: detectedMimeType,
-          teacherId: userId,
-          originalAssetId: originalAsset.id,
-          status: 'PENDING',
-        },
-        include: {
-          teacher: {
-            select: {
-              id: true,
-              nickname: true,
-              username: true,
+      // Keep the video pointer and asset reference atomic. The asset itself
+      // is already stored, so a failed transaction leaves only an unreachable
+      // asset for later garbage collection, never a half-linked video.
+      const video = await prisma.$transaction(async (tx) => {
+        const created = await tx.video.create({
+          data: {
+            title,
+            filePath: originalAsset.objectKey,
+            fileName: file.originalname,
+            fileSize: file.size,
+            mimeType: detectedMimeType,
+            teacherId: userId,
+            originalAssetId: originalAsset.id,
+            status: 'PENDING',
+          },
+          include: {
+            teacher: {
+              select: {
+                id: true,
+                nickname: true,
+                username: true,
+              }
             }
           }
-        }
+        })
+        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
+        return created
       })
-      await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: video.id, field: 'original' })
 
       // 添加到视频处理队列
       await videoQueue.add('transcode', {
