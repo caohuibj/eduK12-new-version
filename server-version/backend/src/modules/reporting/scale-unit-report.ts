@@ -1,5 +1,5 @@
 import { safeDecrypt } from '../../utils/encryption'
-import type { ScaleResultV2 } from '../scale/scale-result'
+import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 
 /**
  * A scale report is a per-instrument projection. It deliberately does not
@@ -75,24 +75,17 @@ const emptyResultProjection = (input: BuildScaleUnitReportInput): ScaleUnitRepor
   interpretations: [],
 })
 
-const isScaleResultV2 = (value: unknown): value is ScaleResultV2 => (
-  Boolean(value)
-  && typeof value === 'object'
-  && !Array.isArray(value)
-  && (value as ScaleResultV2).schemaVersion === 2
-  && Array.isArray((value as ScaleResultV2).scores)
-  && Array.isArray((value as ScaleResultV2).references)
-  && Array.isArray((value as ScaleResultV2).interpretations)
-)
-
 /** Build the same v2 DTO for standalone, questionnaire and composite contexts. */
 export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUnitReport => {
   const decoded = decodeReportField<ScaleResultV2>(input.result)
   if (!decoded.ok) return { ...emptyResultProjection(input), decryptError: true }
   if (decoded.value === null) return emptyResultProjection(input)
-  if (!isScaleResultV2(decoded.value)) return { ...emptyResultProjection(input), decryptError: true }
-
-  const result = decoded.value
+  let result: ScaleResultV2
+  try {
+    result = parseScaleResultV2(decoded.value)
+  } catch {
+    return { ...emptyResultProjection(input), decryptError: true }
+  }
   return {
     ...baseFor(input),
     result,

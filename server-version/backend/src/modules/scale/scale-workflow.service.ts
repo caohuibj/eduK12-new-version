@@ -7,7 +7,7 @@ import {
   type ScaleDefinitionV2,
 } from './scale-definition'
 import { getScalePackage } from './scale-package.registry'
-import { buildScaleResult, type ScaleResultV2 } from './scale-result'
+import { buildScaleResult, parseScaleResultV2, type ScaleResultV2 } from './scale-result'
 import type { ScaleAnswer } from './scale-scoring'
 import {
   validateReferenceSetDefinition,
@@ -23,11 +23,11 @@ export class ScaleDefinitionUnavailableError extends Error {
 }
 
 type ScaleRecordForDefinition = {
-  code?: string
-  instrumentVersion?: string
+  code?: string | null
+  instrumentVersion?: string | null
   definition?: unknown
   definitionHash?: string | null
-  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
 }
 
 export const scaleDefinitionFromRecord = (scale: ScaleRecordForDefinition): ScaleDefinitionV2 => {
@@ -82,31 +82,14 @@ export const readScaleAnswers = (value: unknown): { answers: ScaleAnswer[]; decr
 export const encryptScaleAnswers = (answers: ScaleAnswer[]): string => encryptField(answers)
 export const encryptScaleResult = (result: ScaleResultV2): string => encryptField(result)
 
-const isScaleResultV2 = (value: unknown): value is ScaleResultV2 => {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-  const result = value as Partial<ScaleResultV2>
-  const instrument = result.instrument
-  const method = result.method
-  const quality = result.quality
-  return result.schemaVersion === 2
-    && Boolean(instrument && typeof instrument === 'object' && typeof instrument.scaleId === 'string' && typeof instrument.code === 'string' && typeof instrument.name === 'string' && typeof instrument.instrumentVersion === 'string')
-    && Boolean(method && typeof method === 'object' && typeof method.scaleId === 'string' && typeof method.instrumentVersion === 'string' && typeof method.scoringVersion === 'string' && typeof method.reportVersion === 'string' && typeof method.definitionHash === 'string' && Array.isArray(method.referenceVersions) && (method.assessmentContext === null || (typeof method.assessmentContext === 'object' && method.assessmentContext !== null && method.assessmentContext.schemaVersion === 1 && typeof method.assessmentContext.snapshotHash === 'string')))
-    && Boolean(quality && typeof quality === 'object' && (quality.status === 'interpretable' || quality.status === 'limited' || quality.status === 'invalid') && Array.isArray(quality.flags))
-    && Array.isArray(result.itemScores)
-    && Array.isArray(result.scores)
-    && Array.isArray(result.references)
-    && Array.isArray(result.interpretations)
-    && Array.isArray(result.caveats)
-    && typeof result.disclaimer === 'string'
-}
-
 export const readScaleResult = (value: unknown): { result: ScaleResultV2 | null; decryptError: boolean } => {
   const parsed = readJsonField<ScaleResultV2>(value)
   if (parsed.decryptError || parsed.value === null) return { result: null, decryptError: parsed.decryptError }
-  if (!isScaleResultV2(parsed.value)) {
+  try {
+    return { result: parseScaleResultV2(parsed.value), decryptError: false }
+  } catch {
     return { result: null, decryptError: true }
   }
-  return { result: parsed.value, decryptError: false }
 }
 
 const scaleMetadataForResponse = (scale: unknown): unknown => {

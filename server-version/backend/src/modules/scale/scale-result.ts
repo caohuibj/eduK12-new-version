@@ -1,5 +1,6 @@
 import {
   hashScaleDefinition,
+  scaleDirectionSchema,
   type ScaleDefinitionV2,
   type ScaleInterpretationDefinition,
 } from './scale-definition'
@@ -15,6 +16,7 @@ import {
   type ReferenceContext,
   type ResolvedScaleReference,
 } from '../assessment-reference/reference'
+import { z } from 'zod'
 
 export interface ScaleResultV2 {
   schemaVersion: 2
@@ -54,6 +56,168 @@ export interface ScaleInterpretationResult {
   limitations: string[]
   referenceVersion: string | null
 }
+
+const scaleResponseValueSchema = z.union([z.string(), z.number().finite()])
+
+const scaleItemScoreSchema = z.object({
+  itemCode: z.string().min(1),
+  responseValue: scaleResponseValueSchema,
+  baseScore: z.number().finite(),
+  score: z.number().finite(),
+  responseTimeMs: z.number().finite().nonnegative().optional(),
+  answeredAt: z.string().optional(),
+  changeCount: z.number().int().nonnegative().optional(),
+}).passthrough()
+
+const scaleScoreSchema = z.object({
+  key: z.string().min(1),
+  type: z.enum(['total', 'dimension']),
+  label: z.string().min(1),
+  description: z.string().optional(),
+  direction: scaleDirectionSchema,
+  canonical: z.boolean(),
+  displayPrecision: z.number().int().min(0).max(6),
+  value: z.number().finite().nullable(),
+  range: z.object({
+    min: z.number().finite(),
+    max: z.number().finite(),
+  }).passthrough().nullable(),
+  expectedItems: z.array(z.string().min(1)),
+  answeredItems: z.array(z.string().min(1)),
+  status: z.enum(['calculated', 'limited', 'not_calculable']),
+  prorated: z.boolean(),
+}).passthrough()
+
+const scaleQualitySchema = z.object({
+  status: z.enum(['interpretable', 'limited', 'invalid']),
+  flags: z.array(z.enum(['missing_items', 'insufficient_items', 'score_not_calculable'])),
+}).passthrough()
+
+const scaleAssessmentContextSchema = z.object({
+  schemaVersion: z.literal(1),
+  snapshotHash: z.string().min(1),
+}).strict().nullable()
+
+const scaleResultV2Schema = z.object({
+  schemaVersion: z.literal(2),
+  instrument: z.object({
+    scaleId: z.string().min(1),
+    code: z.string().min(1),
+    name: z.string().min(1),
+    instrumentVersion: z.string().min(1),
+  }).passthrough(),
+  method: z.object({
+    scaleId: z.string().min(1),
+    instrumentVersion: z.string().min(1),
+    scoringVersion: z.string().min(1),
+    reportVersion: z.string().min(1),
+    definitionHash: z.string().min(1),
+    referenceVersions: z.array(z.string().min(1)),
+    assessmentContext: scaleAssessmentContextSchema,
+  }).passthrough(),
+  quality: scaleQualitySchema,
+  itemScores: z.array(scaleItemScoreSchema),
+  scores: z.array(scaleScoreSchema).min(1),
+  references: z.array(z.record(z.unknown())),
+  interpretations: z.array(z.object({
+    scoreKey: z.string().min(1),
+    headline: z.string().min(1),
+    label: z.string().nullable(),
+    interpretation: z.string(),
+    guidance: z.array(z.object({
+      category: z.enum(['reflection', 'strategy', 'environment', 'support']),
+      text: z.string().min(1),
+    }).passthrough()),
+    limitations: z.array(z.string()),
+    referenceVersion: z.string().nullable(),
+  }).passthrough()),
+  caveats: z.array(z.string()),
+  disclaimer: z.string().min(1),
+}).passthrough().superRefine((result, context) => {
+  if (result.instrument.scaleId !== result.method.scaleId) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['method', 'scaleId'],
+      message: 'method.scaleId must match instrument.scaleId',
+    })
+  }
+  if (result.instrument.instrumentVersion !== result.method.instrumentVersion) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['method', 'instrumentVersion'],
+      message: 'method.instrumentVersion must match instrument.instrumentVersion',
+    })
+  }
+  const keys = new Set<string>()
+  result.scores.forEach((score, index) => {
+    if (keys.has(score.key)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scores', index, 'key'],
+        message: 'score keys must be unique',
+      })
+    }
+    keys.add(score.key)
+    if (score.status === 'not_calculable' && score.value !== null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scores', index, 'value'],
+        message: 'not_calculable scores must have a null value',
+      })
+    }
+    if (score.status !== 'not_calculable' && score.value === null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scores', index, 'value'],
+        message: `${score.status} scores must have a numeric value`,
+      })
+    }
+  })
+  const canonicalScores = result.scores.filter((score) => score.canonical)
+  const expectedQualityStatus = canonicalScores.some((score) => score.status === 'not_calculable')
+    ? 'invalid'
+    : canonicalScores.some((score) => score.status === 'limited')
+      ? 'limited'
+      : 'interpretable'
+  if (result.quality.status !== expectedQualityStatus) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'status'],
+      message: `quality.status must be ${expectedQualityStatus} for canonical score statuses`,
+    })
+  }
+  if (expectedQualityStatus === 'invalid' && !result.quality.flags.includes('score_not_calculable')) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'flags'],
+      message: 'invalid quality must include score_not_calculable',
+    })
+  }
+  if (
+    expectedQualityStatus === 'limited'
+    && !result.quality.flags.includes('missing_items')
+    && !result.quality.flags.includes('insufficient_items')
+  ) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'flags'],
+      message: 'limited quality must include missing_items or insufficient_items',
+    })
+  }
+})
+
+/**
+ * Parse the persisted v2 result at the boundary shared by reports and
+ * cross-source analysis. Keeping this contract in the scale module prevents
+ * each consumer from accepting a different subset of ScaleResultV2.
+ */
+export const parseScaleResultV2 = (value: unknown): ScaleResultV2 => (
+  scaleResultV2Schema.parse(value) as unknown as ScaleResultV2
+)
+
+export const isScaleResultV2 = (value: unknown): value is ScaleResultV2 => (
+  scaleResultV2Schema.safeParse(value).success
+)
 
 const unique = (values: string[]): string[] => values.filter((value, index) => values.indexOf(value) === index)
 

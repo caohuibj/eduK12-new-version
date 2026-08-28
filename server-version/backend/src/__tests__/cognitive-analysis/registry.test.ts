@@ -259,6 +259,16 @@ describe('Round 2 cognitive analysis registries', () => {
     ).toThrow(/unresolved task: attention_stability_v1\/1.0.0\/not-implemented/)
   })
 
+  it('requires every PUBLISHED protocol task to pass the Cognitive v2 publication gate', () => {
+    const base = listAnalysisProtocolDefinitions().find((protocol) => protocol.key === 'attention_stability_v1')
+    if (!base) throw new Error('missing attention stability protocol')
+    expect(() => validateAnalysisProtocolDefinitions([{
+      ...base,
+      version: '2.0.0',
+      status: 'PUBLISHED',
+    }])).toThrow(/not publishable in Cognitive v2: attention_stability_v1\/2\.0\.0\/patterncompare/)
+  })
+
   it('scopes PR11 recommendation rules to multi-source protocols and requires a version bump before publish', () => {
     const cognitiveOnly = listAnalysisProtocolDefinitions().find((protocol) => protocol.scaleSlots.length === 0)
     const multisource = listAnalysisProtocolDefinitions().find((protocol) => protocol.scaleSlots.length > 0)
