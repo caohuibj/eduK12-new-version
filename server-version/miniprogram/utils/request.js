@@ -1,6 +1,4 @@
-// 生产环境使用域名，开发环境可改为服务器IP
-const BASE_URL = 'https://eduk12.top'
-// const BASE_URL = 'http://140.143.146.97:3001'  // 开发调试用
+const { BASE_URL } = require('../config/env')
 
 function request(options) {
   return new Promise((resolve, reject) => {

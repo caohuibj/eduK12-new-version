@@ -22,6 +22,11 @@ export const RESOURCE_LIMITS = {
 
   // 单个视频处理超时（秒）- 30分钟
   videoTimeout: parseInt(process.env.VIDEO_TIMEOUT || '1800'),
+
+  // Export jobs share one authoritative dataset build and are deliberately
+  // serialized by default to keep memory bounded.
+  exportConcurrency: Math.max(1, Math.min(4, parseInt(process.env.EXPORT_CONCURRENCY || '1'))),
+  exportTimeout: parseInt(process.env.EXPORT_TIMEOUT || '1800'),
 }
 
 // 视频处理队列
@@ -54,6 +59,17 @@ export const imageQueue = new Queue('image processing', {
   },
 })
 
+export const exportQueue = new Queue('assessment export processing', {
+  redis: redisConfig,
+  defaultJobOptions: {
+    attempts: 2,
+    backoff: { type: 'fixed', delay: 5000 },
+    removeOnComplete: 100,
+    removeOnFail: 100,
+    timeout: RESOURCE_LIMITS.exportTimeout * 1000,
+  },
+})
+
 // 队列事件监听 - 视频
 videoQueue.on('completed', (job, result) => {
   logger.info(`✅ 视频处理完成: ${job.id}`, { videoId: result?.videoId })
@@ -80,9 +96,13 @@ imageQueue.on('stalled', (job) => {
   logger.warn(`⚠️ 图片处理停滞: ${job.id}`, { imageId: job.data?.imageId })
 })
 
+exportQueue.on('failed', (job, err) => {
+  logger.error(`❌ 测评导出失败: ${job.id}`, { error: err.message, batchId: job.data?.batchId })
+})
+
 // 优雅关闭
 export const closeQueues = async () => {
-  await Promise.all([videoQueue.close(), imageQueue.close()])
+  await Promise.all([videoQueue.close(), imageQueue.close(), exportQueue.close()])
   logger.info('队列已关闭')
 }
 
@@ -102,6 +122,12 @@ export const checkQueueHealth = async () => {
       imageQueue.getFailedCount(),
     ]),
   ])
+  const exportCounts = await Promise.all([
+    exportQueue.getWaitingCount(),
+    exportQueue.getActiveCount(),
+    exportQueue.getCompletedCount(),
+    exportQueue.getFailedCount(),
+  ])
 
   return {
     video: {
@@ -117,6 +143,13 @@ export const checkQueueHealth = async () => {
       completed: imageCounts[2],
       failed: imageCounts[3],
       total: imageCounts[0] + imageCounts[1] + imageCounts[2] + imageCounts[3],
+    },
+    export: {
+      waiting: exportCounts[0],
+      active: exportCounts[1],
+      completed: exportCounts[2],
+      failed: exportCounts[3],
+      total: exportCounts[0] + exportCounts[1] + exportCounts[2] + exportCounts[3],
     },
   }
 }

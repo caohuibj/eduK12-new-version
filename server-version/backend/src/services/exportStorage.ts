@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { prisma } from '../config/database'
+import { exportRoot, validateStorageKey } from './exportArtifactService'
 
 const parsePositiveInt = (name: string, fallback: number): number => {
   const value = Number(process.env[name])
@@ -52,6 +54,43 @@ export const cleanupExpiredExportFiles = (
     const stat = fs.statSync(filePath)
     if (stat.mtimeMs < cutoff) fs.unlinkSync(filePath)
   }
+}
+
+/**
+ * Remove only files named by expired ExportArtifact metadata. Directory scans
+ * are intentionally not used for artifact cleanup: an operator can safely
+ * keep unrelated legacy exports without them being guessed or deleted.
+ */
+export const cleanupExpiredExportArtifacts = async (
+  db: typeof prisma = prisma,
+  now = new Date(),
+): Promise<{ deletedArtifacts: number; deletedFiles: number; invalidPaths: number }> => {
+  const rows = await db.exportArtifact.findMany({
+    where: { expiresAt: { lte: now } },
+    select: { id: true, storageKey: true },
+  })
+  let deletedFiles = 0
+  let invalidPaths = 0
+  const deletedIds: string[] = []
+  for (const row of rows) {
+    try {
+      const filePath = validateStorageKey(row.storageKey)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+        deletedFiles += 1
+      }
+    } catch {
+      invalidPaths += 1
+      // Invalid metadata is still removed; it cannot authorize a download and
+      // must not be allowed to poison future cleanup runs.
+    }
+    deletedIds.push(row.id)
+  }
+  if (deletedIds.length > 0) await db.exportArtifact.deleteMany({ where: { id: { in: deletedIds } } })
+  // Touch the root to make the configured storage location explicit for
+  // callers/metrics without recursively scanning it.
+  void exportRoot()
+  return { deletedArtifacts: deletedIds.length, deletedFiles, invalidPaths }
 }
 
 export const ensureExportFileWithinLimit = (filePath: string): void => {

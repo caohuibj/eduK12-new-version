@@ -18,7 +18,7 @@ import { videoQueue } from '../config/queue'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
-import { attachAssetReference, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
 
 const VIDEO_PROCESSING_FAILURE_MESSAGE = '视频处理失败，请稍后重试或联系管理员'
 
@@ -120,6 +120,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
   }
 
   const tempDir = path.join('/tmp', `video-${videoId}`)
+  const derivativeAssets: Array<{ id: string; objectKey: string; provider: string }> = []
 
   try {
     // 更新状态为处理中
@@ -246,20 +247,23 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤6：上传存储
     logger.info(`[${videoId}] 步骤 6/6: 上传存储...`)
-    const [processedAsset, thumbnailAsset] = await Promise.all([
-      storeAssetFromFile({
-        filePath: outputPath,
-        originalName: `${videoId}-processed.mp4`,
-        mimeType: 'video/mp4',
-        ownerId: teacherId,
-      }),
-      storeAssetFromFile({
-        filePath: thumbnailPath,
-        originalName: `${videoId}-thumbnail.jpg`,
-        mimeType: 'image/jpeg',
-        ownerId: teacherId,
-      }),
-    ])
+    // Keep a precise list of assets created by this job. If the parent
+    // transaction later fails, only these unreferenced derivatives are
+    // compensated; pre-existing originals and other jobs are untouched.
+    const processedAsset = await storeAssetFromFile({
+      filePath: outputPath,
+      originalName: `${videoId}-processed.mp4`,
+      mimeType: 'video/mp4',
+      ownerId: teacherId,
+    })
+    derivativeAssets.push(processedAsset)
+    const thumbnailAsset = await storeAssetFromFile({
+      filePath: thumbnailPath,
+      originalName: `${videoId}-thumbnail.jpg`,
+      mimeType: 'image/jpeg',
+      ownerId: teacherId,
+    })
+    derivativeAssets.push(thumbnailAsset)
     const processedUrl = await getSignedAssetUrl(processedAsset.id)
     const thumbnailUrl = await getSignedAssetUrl(thumbnailAsset.id)
 
@@ -300,6 +304,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   } catch (error: any) {
     logger.error(`❌ 视频处理失败: ${videoId}`, error)
+    await Promise.all(derivativeAssets.map((asset) => discardUnreferencedAsset(asset)))
     // Never persist ffmpeg, filesystem, URL, or dependency details; the
     // status endpoint is visible to teachers.
     await markVideoFailed(videoId, VIDEO_PROCESSING_FAILURE_MESSAGE)

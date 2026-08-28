@@ -19,7 +19,7 @@ interface ExportOptions {
   includeLabels?: boolean       // 是否包含变量标签
 }
 
-interface ExportField {
+export interface ExportField {
   name: string       // 字段名（拼音）
   label: string      // 字段标签（中文）
   type: 'numeric' | 'string' | 'date'
@@ -27,7 +27,7 @@ interface ExportField {
   decimals?: number  // 小数位数
 }
 
-interface ExportData {
+export interface ExportData {
   fields: ExportField[]
   rows: Record<string, any>[]
 }
@@ -55,8 +55,30 @@ const FIELD_RULES = {
   MAX_LENGTH: 8,
 }
 
-// 字段名缓存，用于去重
+// Legacy callers can still clear/use the module cache, but every export run
+// receives its own context so concurrent exports never influence one another.
 const fieldNameCache = new Map<string, number>()
+export type FieldNameContext = Map<string, number>
+export const createFieldNameContext = (): FieldNameContext => new Map<string, number>()
+
+/** Date-only ranges are interpreted as UTC half-open intervals. */
+export const utcHalfOpenDateFilter = (dateRange?: ExportOptions['dateRange']): { gte?: Date; lt?: Date } | null => {
+  if (!dateRange?.start && !dateRange?.end) return null
+  const filter: { gte?: Date; lt?: Date } = {}
+  if (dateRange.start) {
+    const start = new Date(`${dateRange.start}T00:00:00.000Z`)
+    if (Number.isNaN(start.getTime())) throw new Error('开始日期无效')
+    filter.gte = start
+  }
+  if (dateRange.end) {
+    const end = new Date(`${dateRange.end}T00:00:00.000Z`)
+    if (Number.isNaN(end.getTime())) throw new Error('结束日期无效')
+    end.setUTCDate(end.getUTCDate() + 1)
+    filter.lt = end
+  }
+  if (filter.gte && filter.lt && filter.gte >= filter.lt) throw new Error('日期范围无效')
+  return filter
+}
 
 // ==================== 字段命名服务 ====================
 
@@ -66,7 +88,7 @@ const fieldNameCache = new Map<string, number>()
  * @param prefix 字段前缀
  * @returns 拼音字段名
  */
-export function toPinyinFieldName(chinese: string, prefix: string = ''): string {
+export function toPinyinFieldName(chinese: string, prefix: string = '', context: FieldNameContext = fieldNameCache): string {
   // 转换为拼音
   const pinyinStr = pinyin(chinese, {
     pattern: 'pinyin',
@@ -84,14 +106,14 @@ export function toPinyinFieldName(chinese: string, prefix: string = ''): string 
   const fullName = prefix + fieldName
   
   // 去重处理
-  const count = fieldNameCache.get(fullName) || 0
+  const count = context.get(fullName) || 0
   if (count > 0) {
     const uniqueName = fullName + (count + 1)
-    fieldNameCache.set(fullName, count + 1)
+    context.set(fullName, count + 1)
     return uniqueName.substring(0, FIELD_RULES.MAX_LENGTH + prefix.length + 2)
   }
   
-  fieldNameCache.set(fullName, 1)
+  context.set(fullName, 1)
   return fullName
 }
 
@@ -118,7 +140,7 @@ export async function getScaleExportData(
     dateRange
   } = options
 
-  clearFieldNameCache()
+  const fieldNameContext = createFieldNameContext()
 
   // The v2 definition is the only source for item order, response values and
   // score keys. Export never re-runs reverse scoring or another scorer.
@@ -153,12 +175,8 @@ export async function getScaleExportData(
     where.status = 'COMPLETED'
   }
 
-  if (dateRange?.start) {
-    where.completedAt = { ...where.completedAt, gte: new Date(dateRange.start) }
-  }
-  if (dateRange?.end) {
-    where.completedAt = { ...where.completedAt, lte: new Date(dateRange.end + 'T23:59:59') }
-  }
+  const dateFilter = utcHalfOpenDateFilter(dateRange)
+  if (dateFilter) where.completedAt = { ...where.completedAt, ...dateFilter }
 
   // 获取测评记录
   const assessments = await prisma.assessment.findMany({
@@ -189,9 +207,9 @@ export async function getScaleExportData(
   // Each item has response value, transformed item score and response time.
   const itemFieldMap = new Map<string, { response: string; score: string; responseTime: string }>()
   for (const item of definitionItems) {
-    const responseField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}V_`)
-    const scoreField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}S_`)
-    const responseTimeField = toPinyinFieldName(item.itemCode, 'RT_')
+    const responseField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}V_`, fieldNameContext)
+    const scoreField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}S_`, fieldNameContext)
+    const responseTimeField = toPinyinFieldName(item.itemCode, 'RT_', fieldNameContext)
     itemFieldMap.set(item.itemCode, { response: responseField, score: scoreField, responseTime: responseTimeField })
     fields.push({
       name: responseField,
@@ -211,7 +229,7 @@ export async function getScaleExportData(
 
   const scoreFieldMap = new Map<string, string>()
   for (const score of definitionScores) {
-    const fieldName = toPinyinFieldName(score.key, 'SCORE_')
+    const fieldName = toPinyinFieldName(score.key, 'SCORE_', fieldNameContext)
     scoreFieldMap.set(score.key, fieldName)
     fields.push({
       name: fieldName,
@@ -295,12 +313,7 @@ export async function exportToCSV(scaleId: string, options: ExportOptions = {}):
  * 导出为 SPSS .sav 格式
  * 由于 npm 上的 sav-writer 库可能不可用，这里提供 CSV + SPS 语法方案
  */
-export async function exportToSPSS(
-  scaleId: string,
-  options: ExportOptions = {}
-): Promise<{ csvContent: string; spsContent: string }> {
-  const { fields, rows } = await getScaleExportData(scaleId, options)
-
+export function exportDataToSPSS(fields: ExportField[], rows: Record<string, any>[]): { csvContent: string; spsContent: string } {
   const csvContent = serializeCsv(fields, rows)
 
   // 生成 SPSS 语法文件 (.sps)
@@ -339,20 +352,9 @@ export async function exportToSPSS(
   spsLines.push(labelDefs.join('\n'))
   spsLines.push('.')
 
-  // 添加值标签（性别）
-  spsLines.push('')
-  spsLines.push('VALUE LABELS')
-  spsLines.push('  U_gender')
-  spsLines.push('  0 "未知"')
-  spsLines.push('  1 "男"')
-  spsLines.push('  2 "女".')
-  spsLines.push('')
-
-  // 添加缺失值定义
-  spsLines.push('MISSING VALUES')
-  const numericFields = fields.filter(f => f.type === 'numeric')
-  spsLines.push('  ' + numericFields.map(f => f.name).join(' ') + ' (999).')
-  spsLines.push('')
+  // Empty CSV cells are imported as system-missing values. Do not invent
+  // variables or sentinel codes: every statement must refer only to fields
+  // that are present in this export's schema.
 
   spsLines.push('EXECUTE.')
 
@@ -360,6 +362,14 @@ export async function exportToSPSS(
     csvContent,
     spsContent: spsLines.join('\n')
   }
+}
+
+export async function exportToSPSS(
+  scaleId: string,
+  options: ExportOptions = {}
+): Promise<{ csvContent: string; spsContent: string }> {
+  const { fields, rows } = await getScaleExportData(scaleId, options)
+  return exportDataToSPSS(fields, rows)
 }
 
 /**
@@ -403,7 +413,8 @@ export async function exportToSav(
 export async function saveExportFiles(
   scaleId: string,
   options: ExportOptions = {},
-  format: 'csv' | 'sav' | 'spss' = 'csv'
+  format: 'csv' | 'sav' | 'spss' = 'csv',
+  precomputedData?: ExportData,
 ): Promise<{ csvPath?: string; savPath?: string; spsPath?: string }> {
   // 使用 __dirname 确保路径正确（相对于 dist/services 目录）
   const exportDir = path.join(__dirname, '../../exports')
@@ -416,19 +427,21 @@ export async function saveExportFiles(
 
   const result: { csvPath?: string; savPath?: string; spsPath?: string } = {}
 
+  const exportData = precomputedData || await getScaleExportData(scaleId, options)
+
   if (format === 'csv') {
     // 纯 CSV 格式
-    const csvContent = await exportToCSV(scaleId, options)
+    const csvContent = serializeCsv(exportData.fields, exportData.rows)
     const csvPath = path.join(exportDir, `${baseFileName}.csv`)
     fs.writeFileSync(csvPath, '\uFEFF' + csvContent, 'utf-8')
     result.csvPath = csvPath
   } else if (format === 'sav') {
     // 原生 SAV 格式
-    const savPath = await exportToSav(scaleId, options)
+    const savPath = await writeSavFile(path.join(exportDir, `${baseFileName}.sav`), exportData)
     result.savPath = savPath
   } else if (format === 'spss') {
     // CSV + SPS 格式（兼容旧版）
-    const { csvContent, spsContent } = await exportToSPSS(scaleId, options)
+    const { csvContent, spsContent } = exportDataToSPSS(exportData.fields, exportData.rows)
     
     const csvPath = path.join(exportDir, `${baseFileName}.csv`)
     const spsPath = path.join(exportDir, `${baseFileName}.sps`)
@@ -441,6 +454,38 @@ export async function saveExportFiles(
   }
 
   return result
+}
+
+const writeSavFile = async (savPath: string, exportData: ExportData): Promise<string> => {
+  const variables: SavVariable[] = exportData.fields.map(field => ({
+    name: field.name,
+    label: field.label,
+    type: field.type === 'string' ? VariableType.String : VariableType.Numeric,
+    width: field.type === 'string' ? (field.width || 20) : 8,
+    decimal: field.decimals || 0,
+    columns: field.width || 8,
+    measure: field.type === 'string' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
+  }))
+  saveToFile(savPath, exportData.rows, variables)
+  return savPath
+}
+
+/** Write one already-built dataset to an explicit artifact path. */
+export const writeExportDataFile = async (
+  filePath: string,
+  exportData: ExportData,
+  format: 'csv' | 'sav' | 'sps',
+): Promise<void> => {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
+  if (format === 'csv') {
+    fs.writeFileSync(filePath, '\uFEFF' + serializeCsv(exportData.fields, exportData.rows), 'utf8')
+    return
+  }
+  if (format === 'sps') {
+    fs.writeFileSync(filePath, exportDataToSPSS(exportData.fields, exportData.rows).spsContent, 'utf8')
+    return
+  }
+  await writeSavFile(filePath, exportData)
 }
 
 // ==================== 问卷导出服务 ====================
@@ -473,7 +518,7 @@ async function getQuestionnaireExportDataV2(
     dateRange,
   } = options
 
-  clearFieldNameCache()
+  const fieldNameContext = createFieldNameContext()
   const questionnaire = await prisma.questionnaire.findUnique({
     where: { id: questionnaireId },
     include: {
@@ -492,8 +537,8 @@ async function getQuestionnaireExportDataV2(
 
   const where: any = { questionnaireId, progress: { gte: minProgress } }
   if (!includeProgress) where.status = 'COMPLETED'
-  if (dateRange?.start) where.completedAt = { ...where.completedAt, gte: new Date(dateRange.start) }
-  if (dateRange?.end) where.completedAt = { ...where.completedAt, lte: new Date(`${dateRange.end}T23:59:59`) }
+  const dateFilter = utcHalfOpenDateFilter(dateRange)
+  if (dateFilter) where.completedAt = { ...where.completedAt, ...dateFilter }
 
   const assessments = await prisma.questionnaireAssessment.findMany({
     where,
@@ -525,7 +570,7 @@ async function getQuestionnaireExportDataV2(
 
   const formFieldMap = new Map<string, string>()
   questionnaire.formItems.forEach((formItem, index) => {
-    const fieldName = toPinyinFieldName(formItem.label.substring(0, 8), `F${index + 1}_`)
+    const fieldName = toPinyinFieldName(formItem.label.substring(0, 8), `F${index + 1}_`, fieldNameContext)
     formFieldMap.set(formItem.id, fieldName)
     fields.push({ name: fieldName, label: `[表单] ${formItem.label}`, type: 'string', width: 20 })
   })
@@ -563,9 +608,9 @@ async function getQuestionnaireExportDataV2(
     const responseTimeFields = new Map<string, string>()
     const scoreFields = new Map<string, string>()
     items.forEach((item) => {
-      const responseField = toPinyinFieldName(item.itemCode, `${prefix}Q_V_`)
-      const scoreField = toPinyinFieldName(item.itemCode, `${prefix}Q_S_`)
-      const responseTimeField = toPinyinFieldName(item.itemCode, `${prefix}RT_`)
+      const responseField = toPinyinFieldName(item.itemCode, `${prefix}Q_V_`, fieldNameContext)
+      const scoreField = toPinyinFieldName(item.itemCode, `${prefix}Q_S_`, fieldNameContext)
+      const responseTimeField = toPinyinFieldName(item.itemCode, `${prefix}RT_`, fieldNameContext)
       responseFields.set(item.itemCode, responseField)
       itemScoreFields.set(item.itemCode, scoreField)
       responseTimeFields.set(item.itemCode, responseTimeField)
@@ -574,7 +619,7 @@ async function getQuestionnaireExportDataV2(
       fields.push({ name: responseTimeField, label: `[${scale.name}] ${item.itemCode} 作答时间(毫秒)`, type: 'numeric', width: 10, decimals: 0 })
     })
     scores.forEach((score) => {
-      const scoreField = toPinyinFieldName(score.key, `${prefix}SCORE_`)
+      const scoreField = toPinyinFieldName(score.key, `${prefix}SCORE_`, fieldNameContext)
       scoreFields.set(score.key, scoreField)
       fields.push({ name: scoreField, label: `[${scale.name}] ${score.key} ${score.label}冻结得分`, type: 'numeric', width: 12, decimals: 6 })
     })
@@ -702,7 +747,8 @@ export async function exportQuestionnaireToSav(
 export async function saveQuestionnaireExportFiles(
   questionnaireId: string,
   options: ExportOptions = {},
-  format: 'csv' | 'sav' = 'csv'
+  format: 'csv' | 'sav' = 'csv',
+  precomputedData?: ExportData,
 ): Promise<{ csvPath?: string; savPath?: string }> {
   const exportDir = path.join(__dirname, '../../exports')
   if (!fs.existsSync(exportDir)) {
@@ -714,13 +760,14 @@ export async function saveQuestionnaireExportFiles(
 
   const result: { csvPath?: string; savPath?: string } = {}
 
+  const exportData = precomputedData || await getQuestionnaireExportData(questionnaireId, options)
   if (format === 'csv') {
-    const csvContent = await exportQuestionnaireToCSV(questionnaireId, options)
+    const csvContent = serializeCsv(exportData.fields, exportData.rows)
     const csvPath = path.join(exportDir, `${baseFileName}.csv`)
     fs.writeFileSync(csvPath, '\uFEFF' + csvContent, 'utf-8')
     result.csvPath = csvPath
   } else if (format === 'sav') {
-    const savPath = await exportQuestionnaireToSav(questionnaireId, options)
+    const savPath = await writeSavFile(path.join(exportDir, `${baseFileName}.sav`), exportData)
     result.savPath = savPath
   }
 

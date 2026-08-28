@@ -208,6 +208,16 @@ export const validateScaleDefinition = (
 
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
+  if (options.forPublish) {
+    if (definition.display.randomizeItems) {
+      issues.push({ path: 'display.randomizeItems', message: 'PR25 暂不支持发布题目随机化，请关闭该选项', severity: 'error' })
+    }
+    definition.items.forEach((item, index) => {
+      if (item.randomizeOptions) {
+        issues.push({ path: `items.${index}.randomizeOptions`, message: 'PR25 暂不支持发布选项随机化，请关闭该选项', severity: 'error' })
+      }
+    })
+  }
   const itemCodes = new Set<string>()
   const responseSetKeys = new Set<string>()
   const scoreKeys = new Set<string>()

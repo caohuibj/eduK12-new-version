@@ -1,13 +1,24 @@
 import { buildFormBackgroundReport, buildScaleUnitReport } from './scale-unit-report'
 import { readContextFormAnswers } from '../assessment-context'
+import { safeDecrypt } from '../../utils/encryption'
+import { isFormAnswerComplete } from '../../services/questionnaireFormAnswerState'
+
+const readStoredAggregate = (qa: any): any => {
+  if (qa?.aggregateReportEncrypted) {
+    const decrypted = safeDecrypt<any>(qa.aggregateReportEncrypted)
+    if (decrypted !== null && decrypted !== undefined) return decrypted
+  }
+  return qa?.aggregateReport ?? null
+}
 
 /** Collection-only questionnaire projection; it never creates a combined score. */
 export const buildQuestionnaireCollectionReport = (qa: any): any => {
   const questionnaireScales = [...(qa.questionnaire?.questionnaireScales || [])]
     .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
   const assessments = Array.isArray(qa.scaleAssessments) ? qa.scaleAssessments : []
-  const storedScaleReports = Array.isArray(qa.aggregateReport?.scaleReports)
-    ? qa.aggregateReport.scaleReports
+  const storedAggregate = readStoredAggregate(qa)
+  const storedScaleReports = Array.isArray(storedAggregate?.scaleReports)
+    ? storedAggregate.scaleReports
     : []
   const seen = new Set<string>()
   const reportFor = (input: {
@@ -53,7 +64,10 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
   const formItems = [...(qa.questionnaire?.formItems || [])]
     .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
   const readableFormAnswers = readContextFormAnswers(formItems, qa.formAnswers || [])
-  const formAnswers = new Map(readableFormAnswers.map((answer: any) => [answer.formItemId, answer.value]))
+  const formItemById = new Map(formItems.map((item: any) => [item.id, item]))
+  const formAnswers = new Map(readableFormAnswers
+    .filter((answer: any) => isFormAnswerComplete(formItemById.get(answer.formItemId) || {}, answer))
+    .map((answer: any) => [answer.formItemId, answer.value]))
   const backgroundValues = formItems.map((item: any) => buildFormBackgroundReport({
     itemId: item.id,
     label: item.label,

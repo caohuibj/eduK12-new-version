@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, ArrowRight, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
+import { normalizeApiError } from '../../utils/normalizeApiError'
 
 interface Question {
   id: string
@@ -39,12 +40,30 @@ const ClassroomControl: React.FC = () => {
   const [stats, setStats] = useState<any>(null)
   const [closing, setClosing] = useState(false)
   const [activeTab, setActiveTab] = useState<string>('control')
+  const [connectionNotice, setConnectionNotice] = useState<string | null>(null)
+  const [statsUnknown, setStatsUnknown] = useState(false)
+
+  const refreshStats = useCallback(async () => {
+    if (!id || !currentQuestion?.id) return
+    try {
+      const response = await apiClient.get<{ stats?: any }>(`/classrooms/${id}/questions/${currentQuestion.id}/stats`)
+      if (response.code !== 0 || !response.data?.stats) throw new Error(response.message || '统计暂不可用')
+      setStats(response.data.stats)
+      setAnswerCount(response.data.stats.answerCount ?? 0)
+      setOnlineCount(response.data.stats.onlineCount ?? response.data.stats.totalSessions ?? 0)
+      setStatsUnknown(false)
+    } catch (err) {
+      setStatsUnknown(true)
+      setConnectionNotice(normalizeApiError(err).message)
+    }
+  }, [currentQuestion?.id, id])
 
   // Socket 连接
-  const { isConnected, on, off, emit } = useClassroomSocket({
+  const { isConnected, connectionState, manualRetry, on, off, emit } = useClassroomSocket({
     classroomId: id!,
     role: 'teacher',
     autoConnect: !authLoading && !!user,
+    onHttpFallback: refreshStats,
   })
 
   // 获取课堂信息
@@ -82,6 +101,7 @@ const ClassroomControl: React.FC = () => {
     on('broadcast:stats', (data) => {
       setAnswerCount(data.answerCount)
       setStats(data)
+      setStatsUnknown(false)
     })
 
     // 在线人数
@@ -118,7 +138,9 @@ const ClassroomControl: React.FC = () => {
 
     // 下一题
     on('broadcast:next', (data) => {
-      setCurrentQuestion(null)
+      if (!data?.expectedQuestionId || data.expectedQuestionId === currentQuestion?.id) {
+        setCurrentQuestion(null)
+      }
     })
 
     return () => {
@@ -129,7 +151,7 @@ const ClassroomControl: React.FC = () => {
       off('broadcast:finished')
       off('broadcast:next')
     }
-  }, [isConnected, on, off])
+  }, [currentQuestion?.id, isConnected, on, off])
 
   // 开始答题
   const handleStartQuestion = () => {
@@ -177,26 +199,28 @@ const ClassroomControl: React.FC = () => {
   const handleNextQuestion = () => {
     if (!classroom) return
 
-    emit('teacher:next', {})
+    emit('teacher:next', { expectedQuestionId: currentQuestion?.id || null })
   }
 
   // 关闭课堂
-  const handleCloseClassroom = async () => {
+  const handleCloseClassroom = () => {
     if (!classroom || closing) return
-
-    if (!confirm('确定要关闭课堂吗？关闭后将无法继续答题。')) {
+    if (!isConnected) {
+      setConnectionNotice('Socket 未连接，无法关闭课堂；请重试')
       return
     }
 
     setClosing(true)
-
-    // Socket 处理器会自动更新课堂状态，无需再调用 API
-    emit('teacher:close', {})
-
-    // 延迟跳转，等待 Socket 事件处理完成
-    setTimeout(() => {
-      navigate('/teacher/classrooms')
-    }, 500)
+    // The server ACK is emitted only after the transaction succeeds.
+    emit('teacher:close', {}, (payload) => {
+      const result = payload as { ok?: boolean; message?: string } | undefined
+      if (result?.ok) {
+        navigate('/teacher/classrooms')
+      } else {
+        setClosing(false)
+        setConnectionNotice(result?.message || '关闭课堂失败，请重试')
+      }
+    })
   }
 
   if (loading) {
@@ -226,6 +250,13 @@ const ClassroomControl: React.FC = () => {
                 <Users className="w-4 h-4" />
                 在线: {onlineCount} 人
               </span>
+              {connectionState !== 'CONNECTED' && (
+                <span className="flex items-center gap-2 text-amber-600">
+                  {connectionState === 'FAILED' ? '连接失败' : connectionState === 'RECONNECTING' ? '正在重连' : '连接未就绪'}
+                  <button type="button" onClick={manualRetry} className="underline">重试</button>
+                </span>
+              )}
+              {statsUnknown && <span className="text-amber-600">统计暂不可用</span>}
             </div>
           </div>
 
@@ -278,11 +309,7 @@ const ClassroomControl: React.FC = () => {
                 二维码
               </button>
               <button
-                onClick={() => {
-                  if (confirm('确定要关闭课堂吗？关闭后将无法继续答题。')) {
-                    handleCloseClassroom()
-                  }
-                }}
+                onClick={handleCloseClassroom}
                 disabled={classroom.status === 'ENDED' || closing}
                 className={`${
                   activeTab === 'close'
@@ -300,6 +327,7 @@ const ClassroomControl: React.FC = () => {
 
       {/* 主要内容区 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {connectionNotice && <div role="alert" className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{connectionNotice}</div>}
         {/* 编辑题目 Tab */}
         {activeTab === 'edit' && (
           <div className="bg-white rounded-lg shadow p-6">

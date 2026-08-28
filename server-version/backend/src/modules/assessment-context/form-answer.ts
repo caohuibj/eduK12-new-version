@@ -23,7 +23,7 @@ export const readContextFormAnswer = (
 }
 
 type StoredFormAnswer = {
-  value: string
+  value: string | null
   formItemId?: string
   itemId?: string
 }
@@ -38,6 +38,8 @@ export const readContextFormAnswers = <T extends StoredFormAnswer>(
     const itemId = answer.formItemId ?? answer.itemId
     const contextKey = itemId ? contextKeyByItemId.get(itemId) : null
     if (!contextKey) return answer
-    return { ...answer, value: readContextFormAnswer(contextKey, answer.value) }
+    return answer.value === null
+      ? answer
+      : { ...answer, value: readContextFormAnswer(contextKey, answer.value) }
   })
 }

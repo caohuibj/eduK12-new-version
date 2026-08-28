@@ -36,6 +36,27 @@ CREATE INDEX "assessment_reference_sets_instrument_type_instrument_key_status_id
 -- production scale results in this local-only migration, so old scale
 -- assessments are removed instead of being read through a compatibility
 -- adapter.
+-- Re-assert the local-only assumption at migration time. A read-only
+-- preflight is useful for the operator, but this guard is the final boundary
+-- against deleting data if the database changes between preflight and deploy.
+DO $$
+DECLARE
+  assessment_count BIGINT;
+  scale_count BIGINT;
+  scale_item_count BIGINT;
+  dimension_count BIGINT;
+BEGIN
+  SELECT COUNT(*) INTO assessment_count FROM "assessments";
+  SELECT COUNT(*) INTO scale_count FROM "scales";
+  SELECT COUNT(*) INTO scale_item_count FROM "scale_items";
+  SELECT COUNT(*) INTO dimension_count FROM "dimensions";
+  IF assessment_count > 0 OR scale_count > 0 OR scale_item_count > 0 OR dimension_count > 0 THEN
+    RAISE EXCEPTION
+      'scale v2 migration refused: legacy data is not empty (assessments=%, scales=%, scale_items=%, dimensions=%)',
+      assessment_count, scale_count, scale_item_count, dimension_count;
+  END IF;
+END $$;
+
 UPDATE "scales"
 SET "status" = 'DRAFT',
     "visibility" = 'HIDDEN',

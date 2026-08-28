@@ -3,6 +3,8 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
 import { questionnaireResumeHeaders } from '../../utils/questionnaireResume'
+import { normalizeApiError } from '../../utils/normalizeApiError'
+import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 
 type ResponseValue = string | number
 
@@ -115,6 +117,9 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const [formAnswer, setFormAnswer] = useState<string | string[]>('')
   const [submitting, setSubmitting] = useState(false)
+  const [recoveryState, setRecoveryState] = useState<'recovering' | 'ready' | 'recoverFailed' | 'retrying'>('recovering')
+  const [runnerError, setRunnerError] = useState<string | null>(null)
+  const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   const freezeContextBeforeScale = async (): Promise<{ status: 'frozen'; frozenAt: string }> => {
     const response = await fetch(`/api/public/assessments/${sessionId}/context/freeze`, {
@@ -137,6 +142,13 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   useEffect(() => {
     if (sessionId) {
       fetchAssessment()
+    } else {
+      // A public runner cannot recover without the session locator. Keep the
+      // state explicit so a malformed/deep link never remains in an endless
+      // loading state or renders an empty answer set.
+      setLoading(false)
+      setRecoveryState('recoverFailed')
+      setRunnerError('缺少测评会话，请从问卷链接重新进入')
     }
   }, [sessionId])
 
@@ -145,9 +157,11 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     itemStartTimeRef.current = Date.now()
   }, [scaleIndex])
 
-  const fetchAssessment = async () => {
+  const fetchAssessment = async (retry = false) => {
     try {
       setLoading(true)
+      setRecoveryState(retry ? 'retrying' : 'recovering')
+      setRunnerError(null)
       
       const response = await fetch(`/api/public/assessments/${sessionId}`, {
         headers: questionnaireResumeHeaders(token, sessionId),
@@ -174,6 +188,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         }
       }
       setData(nextData)
+      setRecoveryState('ready')
       
       // 根据当前项类型处理
       if (nextData.currentFormItem) {
@@ -186,7 +201,8 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       
     } catch (err) {
       console.error('获取测评失败', err)
-      message.error('获取测评失败')
+      setRecoveryState('recoverFailed')
+      setRunnerError(normalizeApiError(err).message)
     } finally {
       setLoading(false)
     }
@@ -197,24 +213,25 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       const response = await fetch(`/api/public/assessments/${sessionId}/scale/${assessmentId}`, {
         headers: questionnaireResumeHeaders(token, sessionId),
       })
-      if (response.ok) {
-        const result = await response.json()
-        if (result.data.answers) {
-          const existingAnswers: Record<string, ResponseValue> = {}
-          result.data.answers.forEach((a: any) => {
-            existingAnswers[a.itemCode] = a.responseValue
-          })
-          setAnswers(existingAnswers)
-        }
+      await ensureResponseOk(response, '获取已有答案失败')
+      const result = await response.json()
+      if (result.data.answers) {
+        const existingAnswers: Record<string, ResponseValue> = {}
+        result.data.answers.forEach((a: any) => {
+          existingAnswers[a.itemCode] = a.responseValue
+        })
+        setAnswers(existingAnswers)
       }
     } catch (err) {
       console.error('获取已有答案失败', err)
+      setRecoveryState('recoverFailed')
+      setRunnerError(normalizeApiError(err).message)
     }
   }
 
   // 处理量表题目答案选择
   const handleSelectAnswer = async (value: ResponseValue) => {
-    if (!data?.currentScale) return
+    if (!data?.currentScale || savingAnswerRef.current || submitting || recoveryState !== 'ready') return
 
     const items = data.currentScale.definition.items
     const item = items[scaleIndex]
@@ -223,35 +240,31 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     // 计算作答时间（毫秒）
     const responseTime = Date.now() - itemStartTimeRef.current
 
-    // 更新本地状态
-    setAnswers({ ...answers, [item.itemCode]: value })
-
-    // 提交答案（包含作答时间）
     try {
-      const response = await fetch(`/api/public/assessments/${sessionId}/answers`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...questionnaireResumeHeaders(token, sessionId),
-        },
-        body: JSON.stringify({
-          scaleAssessmentId: data.currentScale.scaleAssessmentId,
-          itemCode: item.itemCode,
-          responseValue: value,
-          responseTimeMs: responseTime,
-        }),
+      await runSave(async () => {
+        const response = await fetch(`/api/public/assessments/${sessionId}/answers`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            ...questionnaireResumeHeaders(token, sessionId),
+          },
+          body: JSON.stringify({
+            scaleAssessmentId: data.currentScale!.scaleAssessmentId,
+            itemCode: item.itemCode,
+            responseValue: value,
+            responseTimeMs: responseTime,
+          }),
+        })
+        await ensureResponseOk(response, '提交答案失败')
+        setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
+        setRunnerError(null)
+        if (scaleIndex < items.length - 1) {
+          setScaleIndex((index) => index === scaleIndex ? index + 1 : index)
+        }
       })
-      await ensureResponseOk(response, '提交答案失败')
-      
-      // 如果不是最后一题，自动跳到下一题
-      if (scaleIndex < items.length - 1) {
-        setTimeout(() => {
-          setScaleIndex((index) => index + 1)
-        }, 200)
-      }
     } catch (err) {
       console.error('提交答案失败', err)
-      message.error('提交答案失败')
+      setRunnerError(normalizeApiError(err).message)
     }
   }
 
@@ -269,7 +282,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   }
 
   // 提交表单答案并进入下一项
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (action: 'answer' | 'skip' = 'answer') => {
     if (!data?.currentFormItem) return
 
     const formItem = data.currentFormItem
@@ -278,10 +291,12 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       ? formAnswer.length === 0 
       : !formAnswer.trim()
     
-    if (formItem.required && isEmpty) {
+    if (action === 'answer' && formItem.required && isEmpty) {
       message.warning('此题为必填项')
+      setRunnerError('此题为必填项')
       return
     }
+    if (action === 'skip' && (formItem.required || formItem.contextKey)) return
 
     try {
       setSubmitting(true)
@@ -300,15 +315,18 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         },
         body: JSON.stringify({
           formItemId: formItem.id,
-          value: valueToSubmit,
+          ...(action === 'skip' ? { action: 'skip' } : { action: 'answer', value: valueToSubmit }),
         }),
       })
       await ensureResponseOk(response, '提交失败')
 
       // 进入下一个内容项
       await moveToNextItem()
+      setRunnerError(null)
     } catch (err: any) {
-      message.error(err.message || '提交失败')
+      const normalized = normalizeApiError(err)
+      setRunnerError(normalized.message)
+      message.error(normalized.message)
     } finally {
       setSubmitting(false)
     }
@@ -316,15 +334,17 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
   // 完成量表并进入下一项
   const handleCompleteScale = async () => {
-    if (!data?.currentScale) return
+    if (!data?.currentScale || submitting || savingAnswerRef.current || recoveryState !== 'ready') return
 
     const items = data.currentScale.definition.items
     const unanswered = items.filter((item) => item.required && answers[item.itemCode] === undefined)
     if (unanswered.length > 0) {
-      if (!confirm(`还有 ${unanswered.length} 道题目未作答，确定要提交吗？`)) {
-        return
-      }
+      const firstMissingIndex = items.findIndex((item) => item.required && answers[item.itemCode] === undefined)
+      if (firstMissingIndex >= 0) setScaleIndex(firstMissingIndex)
+      setRunnerError(`还有 ${unanswered.length} 道必答题未作答，请完成后再提交`)
+      return
     }
+    setRunnerError(null)
 
     try {
       setSubmitting(true)
@@ -344,7 +364,9 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       // 进入下一个内容项
       await moveToNextItem()
     } catch (err: any) {
-      message.error(err.message || '提交失败')
+      const normalized = normalizeApiError(err)
+      setRunnerError(normalized.message)
+      message.error(normalized.message)
     } finally {
       setSubmitting(false)
     }
@@ -404,6 +426,19 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     )
   }
 
+  if (recoveryState === 'recoverFailed' && !data) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Result
+          status="error"
+          title="恢复测评失败"
+          subTitle={runnerError || '无法恢复当前测评状态，请重试'}
+          extra={<Button type="primary" onClick={() => void fetchAssessment(true)}>重试</Button>}
+        />
+      </div>
+    )
+  }
+
   if (!data) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -416,12 +451,21 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     )
   }
 
+  const runnerBusy = submitting || savingAnswer || recoveryState !== 'ready'
+
   // 渲染表单题目
   if (data.currentFormItem) {
     const formItem = data.currentFormItem
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-3xl mx-auto">
+          {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
+          {recoveryState === 'recoverFailed' && (
+            <div role="alert" className="mb-4 flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <span>恢复失败，暂时不能继续作答。</span>
+              <Button size="small" onClick={() => void fetchAssessment(true)}>重试</Button>
+            </div>
+          )}
           {/* 整体进度 */}
           <Card className="mb-4">
             <div className="flex justify-between items-center mb-2">
@@ -463,6 +507,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               <Input
                 value={formAnswer}
                 onChange={(e) => setFormAnswer(e.target.value)}
+                disabled={runnerBusy}
                 placeholder={formItem.placeholder || '请输入'}
                 size="large"
               />
@@ -472,6 +517,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               <Input.TextArea
                 value={formAnswer}
                 onChange={(e) => setFormAnswer(e.target.value)}
+                disabled={runnerBusy}
                 placeholder={formItem.placeholder || '请输入'}
                 rows={5}
                 size="large"
@@ -483,6 +529,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
                 type="month"
                 value={typeof formAnswer === 'string' ? formAnswer : ''}
                 onChange={(e) => setFormAnswer(e.target.value)}
+                disabled={runnerBusy}
                 size="large"
               />
             )}
@@ -501,6 +548,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
                     <button
                       key={option.value}
                       onClick={() => setFormAnswer(option.value)}
+                      disabled={runnerBusy}
                       className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                         formAnswer === option.value
                           ? 'border-blue-500 bg-blue-50 text-blue-600'
@@ -528,6 +576,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
                       <button
                         key={option.value}
                         onClick={() => {
+                          if (runnerBusy) return
                           if (isSelected) {
                             setFormAnswer(currentAnswers.filter(v => v !== option.value))
                           } else {
@@ -560,13 +609,22 @@ const PublicQuestionnaireAssessment: React.FC = () => {
             <Button
               type="primary"
               size="large"
-              onClick={handleFormSubmit}
+              onClick={() => void handleFormSubmit()}
               loading={submitting}
-              disabled={formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim())}
+              disabled={runnerBusy || (formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()))}
               icon={<CheckCircle className="w-4 h-4 mr-1" />}
             >
               {submitting ? '提交中...' : '提交并继续'}
             </Button>
+            {!formItem.required && !formItem.contextKey && (
+              <Button
+                className="ml-3"
+                onClick={() => void handleFormSubmit('skip')}
+                disabled={runnerBusy}
+              >
+                跳过
+              </Button>
+            )}
           </div>
 
           {/* 内容导航 */}
@@ -621,6 +679,13 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-3xl mx-auto">
+        {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
+        {recoveryState === 'recoverFailed' && (
+          <div role="alert" className="mb-4 flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <span>恢复失败，暂时不能继续作答。</span>
+            <Button size="small" onClick={() => void fetchAssessment(true)}>重试</Button>
+          </div>
+        )}
         {/* 进度条 */}
         <Card className="mb-4">
           <div className="flex justify-between items-center mb-2">
@@ -656,7 +721,8 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               {currentItem.options.map((option) => (
                 <button
                   key={`${typeof option.value}:${String(option.value)}`}
-                  onClick={() => handleAnswer(option.value)}
+                  onClick={() => void handleAnswer(option.value)}
+                  disabled={runnerBusy}
                   className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                     answers[currentItem.itemCode] === option.value
                       ? 'border-blue-500 bg-blue-50 text-blue-600'
@@ -673,7 +739,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
           <div className="flex justify-between mt-8">
             <Button
               onClick={handlePrevious}
-              disabled={scaleIndex === 0}
+              disabled={scaleIndex === 0 || runnerBusy}
             >
               上一题
             </Button>
@@ -683,6 +749,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
                 type="primary"
                 onClick={handleCompleteScale}
                 loading={submitting}
+                disabled={runnerBusy}
                 icon={<CheckCircle className="w-4 h-4 mr-1" />}
               >
                 {submitting ? '提交中...' : `完成量表${data.questionnaireAssessment.currentIndex + 1 < data.totalItems ? '（进入下一个内容）' : '（完成测评）'}`}
@@ -691,6 +758,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
               <Button
                 type="primary"
                 onClick={handleNext}
+                disabled={runnerBusy}
               >
                 下一题
               </Button>
@@ -705,6 +773,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
                 <button
                   key={item.itemCode}
                   onClick={() => setScaleIndex(index)}
+                  disabled={runnerBusy}
                   className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
                     scaleIndex === index
                       ? 'bg-blue-500 text-white'

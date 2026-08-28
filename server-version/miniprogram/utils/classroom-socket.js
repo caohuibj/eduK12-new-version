@@ -17,7 +17,8 @@ class ClassroomSocket {
   connect() {
     return new Promise((resolve, reject) => {
       // 构建WebSocket URL
-      const baseUrl = 'wss://your-domain.com/classroom'
+      const { SOCKET_URL } = require('../config/env')
+      const baseUrl = SOCKET_URL
       let url = `${baseUrl}?classroomId=${this.classroomId}&role=${this.role}`
       
       if (this.studentId) {
