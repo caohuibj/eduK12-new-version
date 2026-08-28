@@ -26,8 +26,10 @@ describe('questionnaire form answer validation', () => {
     expect(validateQuestionnaireFormAnswer({ id: 'd', type: 'year_month', required: true, options: null }, '2026-08')).toBeNull()
   })
 
-  it('allows an optional blank text answer', () => {
-    expect(validateQuestionnaireFormAnswer({ id: 't', type: 'text_input', required: false, options: null }, '   ')).toBeNull()
+  it('rejects optional blank answers so they must use explicit skip', () => {
+    expect(validateQuestionnaireFormAnswer({ id: 't', type: 'text_input', required: false, options: null }, '   ')).toContain('选择跳过')
+    expect(validateQuestionnaireFormAnswer({ id: 'm', type: 'multiple_choice', required: false, options }, [])).toContain('选择跳过')
+    expect(validateQuestionnaireFormAnswer({ id: 'm', type: 'multiple_choice', required: false, options }, '[]')).toContain('选择跳过')
   })
 
   it('stores fill and text answers in their trimmed form', () => {

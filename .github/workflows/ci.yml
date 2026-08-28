@@ -84,6 +84,8 @@ jobs:
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
+      - name: guarded migration idempotency after seeded data
+        run: npm run db:migrate:guarded
       - name: build (tsc)
         run: npm run build
       - name: full regression

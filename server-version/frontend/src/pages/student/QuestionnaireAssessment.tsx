@@ -241,8 +241,8 @@ const QuestionnaireAssessment: React.FC = () => {
       ? formAnswer.length === 0 
       : !formAnswer.trim()
 
-    if (action === 'answer' && formItem.required && isEmpty) {
-      setRunnerError('此题为必填项')
+    if (action === 'answer' && isEmpty) {
+      setRunnerError(formItem.required ? '此题为必填项' : '请填写答案或选择跳过')
       return
     }
     if (action === 'skip' && (formItem.required || formItem.contextKey)) return
