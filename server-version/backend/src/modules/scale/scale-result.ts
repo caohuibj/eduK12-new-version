@@ -158,7 +158,52 @@ const scaleResultV2Schema = z.object({
       })
     }
     keys.add(score.key)
+    if (score.status === 'not_calculable' && score.value !== null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scores', index, 'value'],
+        message: 'not_calculable scores must have a null value',
+      })
+    }
+    if (score.status !== 'not_calculable' && score.value === null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scores', index, 'value'],
+        message: `${score.status} scores must have a numeric value`,
+      })
+    }
   })
+  const canonicalScores = result.scores.filter((score) => score.canonical)
+  const expectedQualityStatus = canonicalScores.some((score) => score.status === 'not_calculable')
+    ? 'invalid'
+    : canonicalScores.some((score) => score.status === 'limited')
+      ? 'limited'
+      : 'interpretable'
+  if (result.quality.status !== expectedQualityStatus) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'status'],
+      message: `quality.status must be ${expectedQualityStatus} for canonical score statuses`,
+    })
+  }
+  if (expectedQualityStatus === 'invalid' && !result.quality.flags.includes('score_not_calculable')) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'flags'],
+      message: 'invalid quality must include score_not_calculable',
+    })
+  }
+  if (
+    expectedQualityStatus === 'limited'
+    && !result.quality.flags.includes('missing_items')
+    && !result.quality.flags.includes('insufficient_items')
+  ) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['quality', 'flags'],
+      message: 'limited quality must include missing_items or insufficient_items',
+    })
+  }
 })
 
 /**

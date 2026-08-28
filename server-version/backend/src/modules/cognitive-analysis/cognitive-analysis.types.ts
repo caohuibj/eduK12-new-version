@@ -182,12 +182,15 @@ export interface RecommendationRuleContext {
 }
 
 export const COGNITIVE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.0.1'
-export const MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.1'
+/** Historical PR10 snapshots remain readable, but new multisource builds use the bumped semantics version. */
+export const LEGACY_MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.1'
+export const MULTISOURCE_ANALYSIS_VERSION = 'cognitive-evidence-domain-v1.1.2'
 export const COGNITIVE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v1'
 export const MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION = 'cognitive-package-analysis-v2'
 
 export type CognitivePackageAnalysisVersion =
   | typeof COGNITIVE_ANALYSIS_VERSION
+  | typeof LEGACY_MULTISOURCE_ANALYSIS_VERSION
   | typeof MULTISOURCE_ANALYSIS_VERSION
 
 export type CognitivePackageAnalysisReportSchemaVersion =

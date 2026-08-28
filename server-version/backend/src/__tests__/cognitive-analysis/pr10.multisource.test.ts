@@ -7,6 +7,8 @@ import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.secur
 import { freezeAssignmentProfile } from '../../modules/cognitive/profile-freeze'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import {
+  LEGACY_MULTISOURCE_ANALYSIS_VERSION,
+  MULTISOURCE_ANALYSIS_VERSION,
   buildFrozenReportPackageSnapshot,
   buildPackageCognitiveAnalysis,
   getAnalysisProtocolDefinition,
@@ -15,10 +17,12 @@ import {
 import {
   buildPackageAnalysisForAttempt,
   buildPackageAnalysisInputFingerprint,
+  readCompletionPackageAnalysisSnapshot,
+  type CompositeAnalysisSnapshotRow,
   type PackageAnalysisAttemptInput,
 } from '../../modules/composite/composite-analysis-snapshot.service'
 import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
-import { buildScaleResult } from '../../modules/scale/scale-result'
+import { buildScaleResult, parseScaleResultV2 } from '../../modules/scale/scale-result'
 
 const completeAdexiResult = () => buildScaleResult({
   scaleId: 'scale-adexi',
@@ -163,7 +167,7 @@ describe('PR10 multi-source package analysis', () => {
   it('combines Go/No-Go and ADEXI without an age or teacher-answering gate', () => {
     const built = buildPackageAnalysisForAttempt(makeAttempt())
     expect(built?.scaleResults).toHaveLength(1)
-    expect(built?.analysis.analysisVersion).toBe('cognitive-evidence-domain-v1.1.1')
+    expect(built?.analysis.analysisVersion).toBe(MULTISOURCE_ANALYSIS_VERSION)
     expect(built?.analysis.reportSchemaVersion).toBe('cognitive-package-analysis-v2')
     const scaleEvidence = built?.analysis.evidence.find((item) => item.sourceType === 'scale_dimension')
     expect(scaleEvidence).toMatchObject({
@@ -242,6 +246,11 @@ describe('PR10 multi-source package analysis', () => {
     const limitedAttempt = makeAttempt()
     const limitedResult = limitedAttempt.scaleAssessments?.[0]?.result
     if (!limitedResult || typeof limitedResult !== 'object') throw new Error('missing scale result')
+    const limitedScore = (limitedResult as {
+      scores: Array<{ key: string; value: number | null; status: string }>
+    }).scores.find((score) => score.key === 'inhibition')
+    if (!limitedScore) throw new Error('missing inhibition score')
+    limitedScore.status = 'limited'
     ;(limitedResult as { quality: unknown }).quality = { status: 'limited', flags: ['missing_items'] }
     const limited = buildPackageAnalysisForAttempt(limitedAttempt)
     expect(limited?.scaleResults[0]).toMatchObject({
@@ -272,6 +281,17 @@ describe('PR10 multi-source package analysis', () => {
       qualityFlags: { interpretable: false, score_not_calculable: true },
     })
     expect(invalid?.analysis.qualitySummary.excludedModules).toContain('adexi_inhibition')
+  })
+
+  it('rejects ScaleResultV2 score and quality semantic contradictions', () => {
+    const result = completeAdexiResult()
+    const score = result.scores.find((candidate) => candidate.key === 'inhibition')
+    if (!score) throw new Error('missing inhibition score')
+    score.status = 'not_calculable'
+    score.value = 17
+    result.quality = { status: 'interpretable', flags: [] }
+
+    expect(() => parseScaleResultV2(result)).toThrow(/not_calculable scores must have a null value/)
   })
 
   it('rejects malformed ScaleResultV2 and mismatched frozen provenance', () => {
@@ -327,5 +347,55 @@ describe('PR10 multi-source package analysis', () => {
       },
       moduleResults: [],
     })).toThrow()
+  })
+
+  it('reads a legacy multisource snapshot without labeling it as the new algorithm version', async () => {
+    const built = buildPackageAnalysisForAttempt(makeAttempt())
+    if (!built) throw new Error('missing PR10 analysis')
+    const legacyAnalysis = structuredClone(built.analysis)
+    legacyAnalysis.analysisVersion = LEGACY_MULTISOURCE_ANALYSIS_VERSION
+    legacyAnalysis.provenance.analysisVersion = LEGACY_MULTISOURCE_ANALYSIS_VERSION
+    legacyAnalysis.evidence.forEach((item) => {
+      item.provenance.analysisVersion = LEGACY_MULTISOURCE_ANALYSIS_VERSION
+    })
+    const expectation = {
+      attemptId: 'attempt-pr10',
+      assessmentId: 'composite-pr10',
+      packageKey: legacyAnalysis.packageKey,
+      packageVersion: legacyAnalysis.packageVersion,
+      profile: legacyAnalysis.profile,
+      packageSnapshotVersion: legacyAnalysis.provenance.packageSnapshotVersion,
+      analysisProtocolKey: legacyAnalysis.analysisProtocolKey,
+      analysisProtocolVersion: legacyAnalysis.analysisProtocolVersion,
+      analysisProtocolSnapshotVersion: legacyAnalysis.provenance.analysisProtocolSnapshotVersion,
+      packageReportDefinitionVersion: legacyAnalysis.provenance.packageReportDefinitionVersion,
+      domainDefinitionVersion: legacyAnalysis.provenance.domainDefinitionVersion,
+      evidenceMappingVersion: legacyAnalysis.provenance.evidenceMappingVersion,
+      recommendationRuleVersion: legacyAnalysis.provenance.recommendationRuleVersion,
+    }
+    const row: CompositeAnalysisSnapshotRow = {
+      id: 'snapshot-legacy-pr10',
+      attemptId: expectation.attemptId,
+      packageKey: expectation.packageKey,
+      packageVersion: expectation.packageVersion,
+      analysisDefinitionVersion: expectation.analysisProtocolVersion,
+      analysisVersion: LEGACY_MULTISOURCE_ANALYSIS_VERSION,
+      reportSchemaVersion: legacyAnalysis.reportSchemaVersion,
+      inputFingerprint: 'f'.repeat(64),
+      generationReason: 'COMPLETION',
+      generatedBy: null,
+      payloadEncrypted: encryptCognitivePayload(legacyAnalysis),
+      createdAt: new Date('2026-08-25T00:00:00Z'),
+    }
+    const snapshot = await readCompletionPackageAnalysisSnapshot({
+      compositeAnalysisSnapshot: {
+        findUnique: async (_args: unknown) => null,
+        upsert: async (_args: unknown) => row,
+        findFirst: async (_args: unknown) => row,
+      },
+    }, expectation.attemptId, expectation)
+
+    expect(snapshot?.payload.analysisVersion).toBe(LEGACY_MULTISOURCE_ANALYSIS_VERSION)
+    expect(snapshot?.payload.analysisVersion).not.toBe(MULTISOURCE_ANALYSIS_VERSION)
   })
 })
