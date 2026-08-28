@@ -120,6 +120,8 @@ export interface FrozenScaleModuleResult {
   mappingVersion: string
   respondentType: 'participant_self_report'
   valueSelector: 'dimensionScore'
+  /** Three-state quality from the authoritative ScaleResultV2. */
+  qualityState?: 'interpretable' | 'limited' | 'invalid'
   qualityFlags: Record<string, unknown>
   provenance?: Record<string, string>
 }

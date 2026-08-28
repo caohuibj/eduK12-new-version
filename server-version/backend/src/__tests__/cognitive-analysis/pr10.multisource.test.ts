@@ -18,6 +18,19 @@ import {
   type PackageAnalysisAttemptInput,
 } from '../../modules/composite/composite-analysis-snapshot.service'
 import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
+import { buildScaleResult } from '../../modules/scale/scale-result'
+
+const completeAdexiResult = () => buildScaleResult({
+  scaleId: 'scale-adexi',
+  instrumentKey: 'adexi_v1',
+  name: 'ADEXI',
+  instrumentVersion: '2.0.0',
+  definition: ADEXI_V2_DEFINITION,
+  answers: ADEXI_V2_DEFINITION.items.map((item) => ({
+    itemCode: item.itemCode,
+    responseValue: 'sometimes',
+  })),
+})
 
 const makeAttempt = (): PackageAnalysisAttemptInput => {
   const packageDefinition = getReportPackageDefinition('inhibitory_control_multisource_v1', '1.0.0')
@@ -140,11 +153,7 @@ const makeAttempt = (): PackageAnalysisAttemptInput => {
       compositeItemId: 'item-adexi',
       scaleId: 'scale-adexi',
       status: 'COMPLETED',
-      result: {
-        schemaVersion: 2,
-        scores: [{ key: 'inhibition', value: 17 }],
-        method: { assessmentContext: null },
-      },
+      result: completeAdexiResult(),
       completedAt: new Date('2026-08-25T00:00:00Z'),
     }],
   }
@@ -163,6 +172,10 @@ describe('PR10 multi-source package analysis', () => {
       interpretation: 'self_report',
       directionClass: 'unknown',
       interpretable: true,
+    })
+    expect(built?.scaleResults[0]).toMatchObject({
+      qualityState: 'interpretable',
+      qualityFlags: { interpretable: true },
     })
     expect(built?.analysis.crossSourceFindings).toMatchObject([{
       construct: 'response_inhibition',
@@ -199,7 +212,7 @@ describe('PR10 multi-source package analysis', () => {
     })).not.toBe(built.inputFingerprint)
   })
 
-  it('hashes the complete frozen scale definition rather than only id/code', () => {
+  it('uses the STANDARD code package as authority for the frozen scale definition', () => {
     const firstAttempt = makeAttempt()
     const secondAttempt = makeAttempt()
     const secondScale = secondAttempt.compositeAssessment.items[1]?.scale
@@ -210,10 +223,9 @@ describe('PR10 multi-source package analysis', () => {
     const definition = getReportPackageDefinition('inhibitory_control_multisource_v1', '1.0.0')
     const protocol = definition && getAnalysisProtocolDefinition(definition.key, definition.version)
     if (!definition || !protocol) throw new Error('missing PR10 package')
-    const first = buildFrozenReportPackageSnapshot(definition, protocol, firstAttempt.compositeAssessment.items)
-    const second = buildFrozenReportPackageSnapshot(definition, protocol, secondAttempt.compositeAssessment.items)
-    expect(first.analysisProtocolSnapshot.scaleMeasurements?.[0].scaleDefinitionHash)
-      .not.toBe(second.analysisProtocolSnapshot.scaleMeasurements?.[0].scaleDefinitionHash)
+    buildFrozenReportPackageSnapshot(definition, protocol, firstAttempt.compositeAssessment.items)
+    expect(() => buildFrozenReportPackageSnapshot(definition, protocol, secondAttempt.compositeAssessment.items))
+      .toThrow(/协议量表冻结内容不匹配/)
   })
 
   it('rejects a scale result that does not match the frozen scale measurement', () => {
@@ -224,6 +236,62 @@ describe('PR10 multi-source package analysis', () => {
       moduleResults: built.moduleResults,
       scaleResults: [{ ...built.scaleResults[0], scaleCode: 'other_scale' }],
     })).toThrow(/measurement 不匹配/)
+  })
+
+  it('preserves limited and invalid ScaleResultV2 quality in evidence and exclusions', () => {
+    const limitedAttempt = makeAttempt()
+    const limitedResult = limitedAttempt.scaleAssessments?.[0]?.result
+    if (!limitedResult || typeof limitedResult !== 'object') throw new Error('missing scale result')
+    ;(limitedResult as { quality: unknown }).quality = { status: 'limited', flags: ['missing_items'] }
+    const limited = buildPackageAnalysisForAttempt(limitedAttempt)
+    expect(limited?.scaleResults[0]).toMatchObject({
+      qualityState: 'limited',
+      qualityFlags: { interpretable: false, missing_items: true },
+    })
+    expect(limited?.analysis.evidence.find((item) => item.sourceType === 'scale_dimension')).toMatchObject({
+      interpretable: false,
+      value: null,
+      qualityFlags: ['missing_items'],
+    })
+    expect(limited?.analysis.qualitySummary.excludedModules).toContain('adexi_inhibition')
+
+    const invalidAttempt = makeAttempt()
+    const invalidResult = invalidAttempt.scaleAssessments?.[0]?.result
+    if (!invalidResult || typeof invalidResult !== 'object') throw new Error('missing scale result')
+    const invalidScore = (invalidResult as {
+      scores: Array<{ key: string; value: number | null; status: string }>
+    }).scores.find((score) => score.key === 'inhibition')
+    if (!invalidScore) throw new Error('missing inhibition score')
+    invalidScore.value = null
+    invalidScore.status = 'not_calculable'
+    ;(invalidResult as { quality: unknown }).quality = { status: 'invalid', flags: ['score_not_calculable'] }
+    const invalid = buildPackageAnalysisForAttempt(invalidAttempt)
+    expect(invalid?.scaleResults[0]).toMatchObject({
+      qualityState: 'invalid',
+      dimensionScore: null,
+      qualityFlags: { interpretable: false, score_not_calculable: true },
+    })
+    expect(invalid?.analysis.qualitySummary.excludedModules).toContain('adexi_inhibition')
+  })
+
+  it('rejects malformed ScaleResultV2 and mismatched frozen provenance', () => {
+    const malformedAttempt = makeAttempt()
+    const malformed = malformedAttempt.scaleAssessments?.[0]
+    if (!malformed) throw new Error('missing scale assessment')
+    malformed.result = { schemaVersion: 2, scores: [{ key: 'inhibition', value: 17 }] }
+    expect(() => buildPackageAnalysisForAttempt(malformedAttempt)).toThrow(/ScaleResultV2 格式无效/)
+
+    const definitionHashAttempt = makeAttempt()
+    const definitionHashResult = definitionHashAttempt.scaleAssessments?.[0]?.result
+    if (!definitionHashResult || typeof definitionHashResult !== 'object') throw new Error('missing scale result')
+    ;(definitionHashResult as { method: { definitionHash: string } }).method.definitionHash = '0'.repeat(64)
+    expect(() => buildPackageAnalysisForAttempt(definitionHashAttempt)).toThrow(/provenance.*method\.definitionHash/)
+
+    const scoringVersionAttempt = makeAttempt()
+    const scoringVersionResult = scoringVersionAttempt.scaleAssessments?.[0]?.result
+    if (!scoringVersionResult || typeof scoringVersionResult !== 'object') throw new Error('missing scale result')
+    ;(scoringVersionResult as { method: { scoringVersion: string } }).method.scoringVersion = '9.9.9'
+    expect(() => buildPackageAnalysisForAttempt(scoringVersionAttempt)).toThrow(/provenance.*method\.scoringVersion/)
   })
 
   it('does not use a prior completed scale result when the selected result is incomplete', () => {

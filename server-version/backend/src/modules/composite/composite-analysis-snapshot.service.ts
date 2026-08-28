@@ -6,6 +6,7 @@ import {
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
 import { sessionConfigFromStoredValue } from '../cognitive/v2/session-snapshot'
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
+import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 import { safeDecrypt } from '../../utils/encryption'
 import { buildPackageCognitiveAnalysis } from '../cognitive-analysis/package-analysis.engine'
 import { readFrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
@@ -224,6 +225,7 @@ const scaleResultForFingerprint = (result: FrozenScaleModuleResult) => ({
   mappingVersion: result.mappingVersion,
   respondentType: result.respondentType,
   valueSelector: result.valueSelector,
+  qualityState: result.qualityState ?? null,
   qualityFlags: result.qualityFlags,
   provenance: result.provenance ?? null,
 })
@@ -638,22 +640,51 @@ const readScaleDimensionScore = (
   assessment: NonNullable<PackageAnalysisAttemptInput['scaleAssessments']>[number],
   dimensionCode: string,
   slotKey: string,
-): number => {
-  const decodedResult: Record<string, any> | null = typeof assessment.result === 'string'
-    ? safeDecrypt<Record<string, any>>(assessment.result)
+): { result: ScaleResultV2; dimensionScore: number | null } => {
+  const decodedResult: Record<string, unknown> | null = typeof assessment.result === 'string'
+    ? safeDecrypt<Record<string, unknown>>(assessment.result)
     : assessment.result && typeof assessment.result === 'object' && !Array.isArray(assessment.result)
-      ? assessment.result as Record<string, any>
+      ? assessment.result as Record<string, unknown>
       : null
-  if (decodedResult && typeof decodedResult === 'object' && decodedResult.schemaVersion === 2) {
-    const score = Array.isArray(decodedResult.scores)
-      ? decodedResult.scores.find((candidate: any) => candidate?.key === dimensionCode)
-      : undefined
-    if (!score || typeof score.value !== 'number' || !Number.isFinite(score.value)) {
-      throw new Error(`报告包槽位量表 score 不可用：${slotKey}/${dimensionCode}`)
-    }
-    return score.value
+  let result: ScaleResultV2
+  try {
+    result = parseScaleResultV2(decodedResult)
+  } catch {
+    throw new Error(`报告包槽位量表 ScaleResultV2 格式无效：${slotKey}`)
   }
-  throw new Error(`报告包槽位量表 ScaleResultV2 格式无效：${slotKey}`)
+  const score = result.scores.find((candidate) => candidate.key === dimensionCode)
+  if (!score || score.type !== 'dimension') {
+    throw new Error(`报告包槽位量表 score 不可用：${slotKey}/${dimensionCode}`)
+  }
+  return { result, dimensionScore: score.value }
+}
+
+const validateScaleResultProvenance = (
+  result: ScaleResultV2,
+  measurement: FrozenScaleSlotMeasurement,
+  slotKey: string,
+): void => {
+  const mismatches = [
+    result.instrument.scaleId !== measurement.scaleId ? 'instrument.scaleId' : null,
+    result.instrument.code !== measurement.scaleCode ? 'instrument.code' : null,
+    result.method.scaleId !== measurement.scaleId ? 'method.scaleId' : null,
+    measurement.instrumentVersion !== undefined
+      && result.instrument.instrumentVersion !== measurement.instrumentVersion
+      ? 'instrument.instrumentVersion'
+      : null,
+    measurement.instrumentVersion !== undefined
+      && result.method.instrumentVersion !== measurement.instrumentVersion
+      ? 'method.instrumentVersion'
+      : null,
+    measurement.scoringVersion !== undefined
+      && result.method.scoringVersion !== measurement.scoringVersion
+      ? 'method.scoringVersion'
+      : null,
+    result.method.definitionHash !== measurement.scaleDefinitionHash ? 'method.definitionHash' : null,
+  ].filter((field): field is string => field !== null)
+  if (mismatches.length > 0) {
+    throw new Error(`报告包槽位量表 provenance 与冻结量表不匹配：${slotKey}/${mismatches.join(',')}`)
+  }
 }
 
 const buildFrozenModuleResults = (
@@ -840,12 +871,24 @@ const buildFrozenScaleResults = (
     if (item.scale?.code && item.scale.code !== measurement.scaleCode) {
       throw new Error(`报告包槽位量表 code 不匹配：${slot.key}`)
     }
+    if (
+      item.scale?.instrumentVersion
+      && measurement.instrumentVersion
+      && item.scale.instrumentVersion !== measurement.instrumentVersion
+    ) {
+      throw new Error(`报告包槽位量表 instrumentVersion 不匹配：${slot.key}`)
+    }
 
     const assessment = selectLatestScaleAssessment(scaleAssessments, item.id, measurement.scaleId)
     if (!assessment || assessment.status !== 'COMPLETED') {
       throw new Error(`报告包槽位量表测评尚未完成：${slot.key}`)
     }
-    const dimensionScore = readScaleDimensionScore(assessment, measurement.dimensionCode, slot.key)
+    const parsed = readScaleDimensionScore(assessment, measurement.dimensionCode, slot.key)
+    validateScaleResultProvenance(parsed.result, measurement, slot.key)
+    const qualityFlags = Object.fromEntries([
+      ['interpretable', parsed.result.quality.status === 'interpretable'],
+      ...parsed.result.quality.flags.map((flag) => [flag, true]),
+    ]) as Record<string, boolean>
 
     return {
       slotKey: slot.key,
@@ -855,13 +898,14 @@ const buildFrozenScaleResults = (
       scaleCode: measurement.scaleCode,
       dimensionCode: measurement.dimensionCode,
       scaleDefinitionHash: measurement.scaleDefinitionHash,
-      dimensionScore,
+      dimensionScore: parsed.dimensionScore,
       profile: packageSnapshot.profile,
       mappingKey: measurement.mappingKey,
       mappingVersion: measurement.mappingVersion,
       respondentType: measurement.respondentType,
       valueSelector: measurement.valueSelector,
-      qualityFlags: { interpretable: true },
+      qualityState: parsed.result.quality.status,
+      qualityFlags,
       provenance: {
         sourceType: 'scale_assessment',
         compositeItemId: item.id,

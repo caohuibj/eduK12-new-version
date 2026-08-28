@@ -97,6 +97,33 @@ const qualityStateFor = (
   return qualityState ?? (interpretable ? 'interpretable' : 'limited')
 }
 
+type ScaleQualityState = NonNullable<FrozenScaleModuleResult['qualityState']>
+
+const isScaleQualityState = (value: unknown): value is ScaleQualityState =>
+  value === 'interpretable' || value === 'limited' || value === 'invalid'
+
+const scaleQualityStateFor = (
+  result: FrozenScaleModuleResult,
+  label: string,
+): ScaleQualityState => {
+  const qualityState = result.qualityState
+  if (qualityState !== undefined && !isScaleQualityState(qualityState)) {
+    fail(`冻结量表 qualityState 无效：${label}`)
+  }
+  const interpretable = result.qualityFlags.interpretable
+  if (typeof interpretable !== 'boolean') {
+    fail(`冻结量表 interpretable quality flag 无效：${label}`)
+  }
+  if (qualityState !== undefined && interpretable !== (qualityState === 'interpretable')) {
+    fail(`冻结量表 qualityState 与 interpretable quality flag 不一致：${label}`)
+  }
+  const resolved = qualityState ?? (interpretable ? 'interpretable' : 'limited')
+  if (resolved === 'interpretable' && result.dimensionScore === null) {
+    fail(`冻结量表 interpretable 结果缺少 dimensionScore：${label}`)
+  }
+  return resolved
+}
+
 const SHA256_PATTERN = /^[a-f0-9]{64}$/
 
 const PR7_BUILT_IN_PACKAGE_CONTRACTS = new Map<string, {
@@ -394,6 +421,12 @@ const validatePackageSnapshot = (
     const dimensionCode = requireNonEmptyString(rawMeasurement.dimensionCode, `冻结量表测量 dimensionCode：${slotKey}`)
     const scaleDefinitionHash = requireNonEmptyString(rawMeasurement.scaleDefinitionHash, `冻结量表测量 definition hash：${slotKey}`)
     if (!SHA256_PATTERN.test(scaleDefinitionHash)) fail(`冻结量表测量 definition hash 无效：${slotKey}`)
+    const instrumentVersion = rawMeasurement.instrumentVersion === undefined
+      ? undefined
+      : requireNonEmptyString(rawMeasurement.instrumentVersion, `冻结量表测量 instrumentVersion：${slotKey}`)
+    const scoringVersion = rawMeasurement.scoringVersion === undefined
+      ? undefined
+      : requireNonEmptyString(rawMeasurement.scoringVersion, `冻结量表测量 scoringVersion：${slotKey}`)
     const mappingKey = requireNonEmptyString(rawMeasurement.mappingKey, `冻结量表测量 mappingKey：${slotKey}`)
     const mappingVersion = requireNonEmptyString(rawMeasurement.mappingVersion, `冻结量表测量 mappingVersion：${slotKey}`)
     const mappingDomain = requireNonEmptyString(rawMeasurement.mappingDomain, `冻结量表测量 mappingDomain：${slotKey}`)
@@ -432,6 +465,8 @@ const validatePackageSnapshot = (
       slotKey,
       scaleId,
       scaleCode,
+      ...(instrumentVersion !== undefined ? { instrumentVersion } : {}),
+      ...(scoringVersion !== undefined ? { scoringVersion } : {}),
       dimensionCode,
       scaleDefinitionHash,
       mappingKey,
@@ -600,6 +635,7 @@ const validateScaleResults = (
     for (const [qualityKey, value] of Object.entries(result.qualityFlags)) {
       if (typeof value !== 'boolean') fail(`冻结量表 quality flag 不是 boolean：${slotKey}/${qualityKey}`)
     }
+    scaleQualityStateFor(result, slotKey)
     if (result.provenance !== undefined) {
       if (!isRecord(result.provenance)) fail(`冻结量表 provenance 格式无效：${slotKey}`)
       validateProvenance(result.provenance, slotKey, true)
@@ -979,12 +1015,13 @@ const buildScaleEvidence = (
       && result.mappingVersion === measurement.mappingVersion
       && result.respondentType === slot.respondentType
       && result.valueSelector === slot.valueSelector
+    const qualityState = scaleQualityStateFor(result, slot.key)
     const qualityFlags = [
       ...activeQualityFlags(result.qualityFlags),
       ...(scaleMatches ? [] : ['frozenMappingMismatch']),
     ].sort()
     const interpretable = scaleMatches
-      && result.qualityFlags.interpretable === true
+      && qualityState === 'interpretable'
       && result.dimensionScore !== null
     const provenance: Record<string, string> = {
       ...(result.provenance ?? {}),
@@ -1284,7 +1321,10 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
     })
     .map((slot) => slot.key),
     ...scaleSlots
-      .filter((slot) => scaleResultsBySlot.get(slot.key)?.qualityFlags.interpretable !== true)
+      .filter((slot) => {
+        const result = scaleResultsBySlot.get(slot.key)
+        return result ? scaleQualityStateFor(result, slot.key) !== 'interpretable' : true
+      })
       .map((slot) => slot.key),
   ]
   const hasUndirectedEvidence = evidence.some(

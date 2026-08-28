@@ -7,7 +7,8 @@ import type {
   EvidenceRole,
 } from './cognitive-analysis.types'
 import { getScaleDimensionEvidenceMapping } from './scale-evidence-mapping.registry'
-import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
+import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
+import { scaleDefinitionFromRecord } from '../scale/scale-workflow.service'
 
 export interface FrozenProtocolSlotMeasurement {
   slotKey: string
@@ -19,6 +20,9 @@ export interface FrozenScaleSlotMeasurement {
   slotKey: string
   scaleId: string
   scaleCode: string
+  /** Added by PR23; omitted only by pre-PR23 historical snapshots. */
+  instrumentVersion?: string
+  scoringVersion?: string
   dimensionCode: string
   scaleDefinitionHash: string
   mappingKey: string
@@ -55,6 +59,7 @@ export interface ProtocolCompositeItem {
     visibility?: string | null
     instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
     instrumentVersion?: string | null
+    definitionHash?: string | null
     definition?: unknown
     estimatedTime?: number | null
     instruction?: string | null
@@ -80,19 +85,27 @@ function fail(message: string): never {
   throw new Error(message)
 }
 
-const buildScaleDefinitionHash = (
+const scaleDefinitionFor = (
   scale: NonNullable<ProtocolCompositeItem['scale']>,
-): string => {
+  slotKey: string,
+): ScaleDefinitionV2 => {
   if (scale.definition === undefined || scale.definition === null) {
-    fail('协议量表缺少 ScaleDefinitionV2')
+    fail(`协议量表缺少 ScaleDefinitionV2：${slotKey}`)
   }
+  const authoritativeDefinition = scaleDefinitionFromRecord(scale)
   const validation = validateScaleDefinition(scale.definition, {
     instrumentClass: scale.instrumentClass ?? undefined,
   })
   if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
-    fail('协议量表 v2 definition 不完整')
+    fail(`协议量表 v2 definition 不完整：${slotKey}`)
   }
-  return hashScaleDefinition(validation.definition)
+  if (
+    scale.instrumentClass === 'STANDARD'
+    && hashScaleDefinition(validation.definition) !== hashScaleDefinition(authoritativeDefinition)
+  ) {
+    fail(`协议量表冻结内容不匹配：${slotKey}`)
+  }
+  return validation.definition
 }
 
 const readProfile = (value: string | null | undefined): CognitiveAnalysisProfile => {
@@ -152,22 +165,19 @@ export const validateProtocolCompositeItems = (
       const scaleSlot = slot
       const scale = item.scale
       const scaleId = item.scaleId ?? scale?.id
+      const instrumentVersion = scale?.instrumentVersion
       if (
         !scale
         || !scaleId
+        || !instrumentVersion
         || scale.id !== undefined && scale.id !== null && scale.id !== scaleId
         || scale.status !== undefined && scale.status !== null && scale.status !== 'PUBLISHED'
         || scale.code !== scaleSlot.expectedScaleCode
       ) {
         fail(`协议量表版本不匹配：${scaleSlot.key}`)
       }
-      const v2Validation = scale.definition !== undefined && scale.definition !== null
-        ? validateScaleDefinition(scale.definition, { instrumentClass: scale.instrumentClass ?? undefined })
-        : undefined
-      if (!v2Validation || !v2Validation.definition || v2Validation.issues.some((issue) => issue.severity === 'error')) {
-        fail(`协议量表 v2 definition 不完整：${scaleSlot.key}`)
-      }
-      const dimension = v2Validation.definition.scoring.scores.find((candidate) => candidate.key === scaleSlot.expectedDimensionCode)
+      const scaleDefinition = scaleDefinitionFor(scale, scaleSlot.key)
+      const dimension = scaleDefinition.scoring.scores.find((candidate) => candidate.key === scaleSlot.expectedDimensionCode)
       if (!dimension) fail(`协议量表 score key 不匹配：${scaleSlot.key}`)
       const expectedMeasurement = expectedScaleBySlot.get(scaleSlot.key)
       const mapping = expectedMeasurement
@@ -199,11 +209,13 @@ export const validateProtocolCompositeItems = (
       ) {
         fail(`协议量表 Evidence mapping 不匹配：${scaleSlot.key}`)
       }
-      const scaleDefinitionHash = buildScaleDefinitionHash(scale)
+      const scaleDefinitionHash = hashScaleDefinition(scaleDefinition)
       const measurement: FrozenScaleSlotMeasurement = {
         slotKey: scaleSlot.key,
         scaleId,
         scaleCode: scaleSlot.expectedScaleCode,
+        instrumentVersion,
+        scoringVersion: scaleDefinition.scoring.scoringVersion,
         dimensionCode: scaleSlot.expectedDimensionCode,
         scaleDefinitionHash,
         mappingKey: scaleSlot.mappingKey,
@@ -219,6 +231,10 @@ export const validateProtocolCompositeItems = (
         expectedMeasurement &&
         (expectedMeasurement.scaleId !== measurement.scaleId
           || expectedMeasurement.scaleCode !== measurement.scaleCode
+          || expectedMeasurement.instrumentVersion !== undefined
+            && expectedMeasurement.instrumentVersion !== measurement.instrumentVersion
+          || expectedMeasurement.scoringVersion !== undefined
+            && expectedMeasurement.scoringVersion !== measurement.scoringVersion
           || expectedMeasurement.dimensionCode !== measurement.dimensionCode
           || expectedMeasurement.scaleDefinitionHash !== measurement.scaleDefinitionHash
           || expectedMeasurement.mappingKey !== measurement.mappingKey

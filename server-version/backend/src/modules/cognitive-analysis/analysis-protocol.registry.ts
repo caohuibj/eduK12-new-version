@@ -1,4 +1,6 @@
 import { getCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
+import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
+import { assertTaskCanPublish } from '../cognitive/v2/publication-gate'
 import type {
   AnalysisProtocolDefinition,
   CognitiveAnalysisProfile,
@@ -282,6 +284,20 @@ export const validateAnalysisProtocolDefinitions = (
           entry.reportDefinitionVersion !== slot.reportDefinitionVersion
         ) {
           throw new Error(`PUBLISHED analysis protocol task definition mismatch: ${key}/${slot.testType}`)
+        }
+        const v2Definition = getCognitiveV2TaskDefinition(
+          slot.testType,
+          slot.engineVersion,
+          slot.scoringVersion,
+        )
+        if (!v2Definition) {
+          throw new Error(`PUBLISHED analysis protocol has no Cognitive v2 definition: ${key}/${slot.testType}`)
+        }
+        try {
+          assertTaskCanPublish(v2Definition)
+        } catch (error) {
+          const reason = error instanceof Error ? `: ${error.message}` : ''
+          throw new Error(`PUBLISHED analysis protocol task is not publishable in Cognitive v2: ${key}/${slot.testType}${reason}`)
         }
       }
     }
