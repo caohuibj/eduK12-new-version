@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 import {
   assertProtocolSignature,
+  assertTaskCanPublish,
+  assertTaskContractValid,
   buildQualityAssessment,
   computeConfigSnapshotHash,
   computeProtocolSignature,
@@ -192,5 +194,50 @@ describe('Cognitive Assessment v2 contracts', () => {
     task.report = { ...task.report, userMetrics: ['unknown'] }
     const issues = validateTaskDefinition(task)
     expect(issues.some((candidate) => candidate.path === 'report.unknown')).toBe(true)
+  })
+
+  it('separates structural contract validation from publication status', () => {
+    const draft = { ...definition(), publication: { ...definition().publication, status: 'DRAFT' as const } }
+    expect(() => assertTaskContractValid(draft)).not.toThrow()
+    expect(() => assertTaskCanPublish(draft)).toThrow(/publication\.status must be PUBLISHED/)
+
+    const invalidRequiresFlag = {
+      ...definition(),
+      metrics: {
+        ...definition().metrics,
+        accuracy: { ...definition().metrics.accuracy, requiresQualityFlags: ['missingQualityFlag'] },
+      },
+    }
+    expect(validateTaskDefinition(invalidRequiresFlag).some((candidate) => (
+      candidate.path === 'metrics.accuracy.requiresQualityFlags.0'
+    ))).toBe(true)
+  })
+
+  it('omits a metric from all user report layers while its declared quality gate is active', () => {
+    const task = definition()
+    task.metrics = {
+      ...task.metrics,
+      userAccuracy: { ...task.metrics.userAccuracy, requiresQualityFlags: ['insufficientTrials'] },
+    }
+    const report = projectThreeLayerReport({
+      testType: task.testType,
+      configVersion: '1.0.0',
+      protocolSignature: computeProtocolSignature(protocol),
+      engineVersion: task.engineVersion,
+      scoringVersion: task.scoringVersion,
+      profile: 'standard',
+      definition: task.report,
+      metrics: { accuracy: 0.75, userAccuracy: 0.75, detailAccuracy: 0.75 },
+      score: {
+        metrics: { accuracy: 0.75, userAccuracy: 0.75, detailAccuracy: 0.75 },
+        quality: { state: 'limited', flags: { insufficientTrials: true }, reasons: ['试次不足'] },
+        audit: { trialCount: 1, scorerVersion: '1.0.0' },
+      },
+      metricDefinitions: task.metrics,
+      qualityDefinitions: task.quality,
+    })
+    expect(report.headline.map((metric) => metric.key)).toEqual(['accuracy'])
+    expect(report.user).toEqual([])
+    expect(report.detail.map((metric) => metric.key)).toEqual(['detailAccuracy'])
   })
 })

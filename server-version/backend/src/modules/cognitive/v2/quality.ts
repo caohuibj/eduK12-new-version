@@ -1,4 +1,4 @@
-import type { QualityAssessment, QualityDefinition, QualityState } from './types'
+import type { MetricDefinition, QualityAssessment, QualityDefinition, QualityState } from './types'
 
 const stateRank: Record<QualityState, number> = {
   interpretable: 0,
@@ -31,6 +31,12 @@ export const buildQualityAssessment = (input: {
     .map(([key]) => input.reasons?.[key] ?? input.definitions[key]?.description ?? key)
   return { state, flags: { ...input.flags }, reasons }
 }
+
+/** A metric stays in the frozen/internal result but is not user-interpretable while a declared gate is active. */
+export const metricIsQualityGated = (
+  metric: Pick<MetricDefinition, 'requiresQualityFlags'>,
+  quality: Pick<QualityAssessment, 'flags'>,
+): boolean => (metric.requiresQualityFlags ?? []).some((key) => quality.flags[key] === true)
 
 export const isQualityStateAtLeast = (state: QualityState, minimum: QualityState): boolean =>
   stateRank[state] >= stateRank[minimum]

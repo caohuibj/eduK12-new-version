@@ -29,9 +29,11 @@ const durationFromPayload = (payload: Record<string, unknown>): number => {
 }
 
 /**
- * The runner owns transport timing; the task still owns the observable raw
- * response fields. The server validates this envelope and never treats its
- * phase/flags as an answer key or a score.
+ * v1 is a transport wrapper around the task's observable raw response. The
+ * current runner derives envelope timing/events from that response when
+ * available; these fields are not an independent authoritative telemetry
+ * stream. The server validates the envelope and never treats its phase/flags
+ * as an answer key or a score.
  */
 export const wrapCognitiveTrial = (input: {
   trialIndex: number

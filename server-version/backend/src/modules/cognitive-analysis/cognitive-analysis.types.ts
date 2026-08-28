@@ -90,6 +90,11 @@ export interface FrozenCognitiveModuleResult {
   engineVersion: string
   scoringVersion: string
   metrics: Record<string, unknown>
+  /**
+   * Three-state v2 quality contract. Legacy frozen results omit this field
+   * and continue to derive their state from qualityFlags.interpretable.
+   */
+  qualityState?: 'interpretable' | 'limited' | 'invalid'
   qualityFlags: Record<string, unknown>
   frozenReport: FrozenReportSnapshot
   metricInterpretations?: Record<string, CognitiveMetricInterpretation>

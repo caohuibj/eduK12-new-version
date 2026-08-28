@@ -15,7 +15,7 @@ import { isCompositeWrapper, rejectWrapperForStandaloneUse } from './assignment.
 import { canInstantiateConfig, grantedResourceIds } from '../../services/materialGrant'
 import { config as appConfig } from '../../config'
 import { assertTaskCanPublish } from './v2/publication-gate'
-import { getCognitiveV2TaskDefinition } from './v2/registry'
+import { buildCognitiveV2TaskDefinition } from './v2/registry'
 
 export { CognitiveServiceError }
 
@@ -411,10 +411,11 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
   // that satisfies the v2 protocol/metric/report contract. This is intentionally
   // checked at publish time as well as at runtime so a later registry edit
   // cannot make an invalid definition distributable.
-  const v2Definition = getCognitiveV2TaskDefinition(
-    config.testType,
-    config.engineVersion,
-    config.scoringVersion,
+  // The persisted config status is authoritative for assignment publication;
+  // registry listing defaults may intentionally keep framework fixtures Draft.
+  const v2Definition = buildCognitiveV2TaskDefinition(
+    entry,
+    config.status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT',
   )
   if (!v2Definition) throw BAD_REQUEST('No Cognitive v2 definition for this task version')
   try {

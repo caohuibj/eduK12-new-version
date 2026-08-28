@@ -6,6 +6,7 @@ import type {
   ReportDefinition,
   QualityState,
 } from './types'
+import { metricIsQualityGated } from './quality'
 
 export interface ReportMetricView {
   key: string
@@ -76,9 +77,15 @@ const projectKeys = (
   visibility: MetricDefinition['visibility'],
   definitions: Record<string, MetricDefinition>,
   profile: CognitiveProfile | null,
+  quality: Pick<CognitiveScoreResult['quality'], 'flags'>,
 ): string[] => keys.filter((key) => {
   const definition = definitions[key]
-  return Boolean(definition && definition.visibility === visibility && visibleForProfile(definition, profile))
+  return Boolean(
+    definition
+      && definition.visibility === visibility
+      && visibleForProfile(definition, profile)
+      && !metricIsQualityGated(definition, quality),
+  )
 })
 
 const conclusionFor = (state: QualityState): string => {
@@ -106,9 +113,9 @@ export const projectThreeLayerReport = (input: {
     active,
     effect: input.qualityDefinitions[key]?.effect ?? 'limited',
   }))
-  const headlineKeys = projectKeys(input.definition.headlineMetrics, 'headline', input.metricDefinitions, input.profile)
-  const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile)
-  const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile)
+  const headlineKeys = projectKeys(input.definition.headlineMetrics, 'headline', input.metricDefinitions, input.profile, input.score.quality)
+  const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile, input.score.quality)
+  const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
   return {
     title: input.definition.title,
     qualityState: input.score.quality.state,

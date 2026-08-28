@@ -8,7 +8,7 @@ import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import * as cognitiveSessionService from '../cognitive/session.service'
-import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
+import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from '../cognitive/v2/result-snapshot'
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
@@ -49,7 +49,7 @@ import type {
 } from './composite.schema'
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
 import { assertTaskCanPublish } from '../cognitive/v2/publication-gate'
-import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
+import { buildCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -358,7 +358,10 @@ const validateCognitiveConfig = (config: any) => {
     const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
     const parsed = entry.configSchema.safeParse(config.config)
     if (!parsed.success) throw compositeBadRequest('认知任务配置不符合当前版本规范')
-    const definition = getCognitiveV2TaskDefinition(config.testType, config.engineVersion, config.scoringVersion)
+    const definition = buildCognitiveV2TaskDefinition(
+      entry,
+      config.status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT',
+    )
     if (!definition) throw compositeBadRequest('认知任务缺少 Cognitive v2 definition')
     try {
       assertTaskCanPublish(definition)
@@ -1898,7 +1901,7 @@ const cognitiveRunnerPayload = (session: any) => {
         metrics: resultSnapshot.metrics,
         quality: resultSnapshot.quality,
         qualityFlags: resultSnapshot.quality.flags,
-        references: resultSnapshot.references,
+        references: referencesForCognitiveResult(resultSnapshot),
         report: resultSnapshot.report,
         assessmentContext: resultSnapshot.assessmentContext,
       }
@@ -2401,6 +2404,7 @@ export const buildCompositeReport = (attempt: any) => {
       const resultSnapshot = session?.resultSnapshotEncrypted
         ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
         : null
+      const resultReferences = resultSnapshot ? referencesForCognitiveResult(resultSnapshot) : []
       const score = resultSnapshot
         ? null
         : session?.scoreEncrypted
@@ -2433,7 +2437,7 @@ export const buildCompositeReport = (attempt: any) => {
           configVersion: session.configVersion,
         })
         : undefined
-      const reference = resultSnapshot ? resultSnapshot.references[0] : legacyReference
+      const reference = resultSnapshot ? resultReferences[0] : legacyReference
       const singleTaskReport = resultSnapshot
         ? resultSnapshot.report
         : session && score !== null
@@ -2463,7 +2467,7 @@ export const buildCompositeReport = (attempt: any) => {
         quality: resultSnapshot?.quality,
         finishedAt: session?.finishedAt,
         reference,
-        references: resultSnapshot?.references ?? [],
+        references: resultReferences,
         assessmentContext: resultSnapshot?.assessmentContext ?? null,
         singleTaskReport,
       }

@@ -18,7 +18,7 @@ import {
   createSessionConfigSnapshot,
   sessionConfigFromStoredValue,
 } from './v2/session-snapshot'
-import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
+import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -94,7 +94,7 @@ const v2ResultFromSnapshot = (encrypted: string) => {
     metrics: snapshot.metrics,
     quality: snapshot.quality,
     qualityFlags: snapshot.quality.flags,
-    references: snapshot.references,
+    references: referencesForCognitiveResult(snapshot),
     report: snapshot.report,
     assessmentContext: snapshot.assessmentContext,
   }

@@ -310,7 +310,7 @@ export interface ResolvedScaleReference {
   referenceKind: ReferenceKind
   evidenceLevel: Exclude<ReferenceEvidenceLevel, 'none'> | null
   status: 'available' | 'unavailable'
-  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data'
+  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data' | 'quality_limited'
   label: string
   value: number | null
   mean: number | null

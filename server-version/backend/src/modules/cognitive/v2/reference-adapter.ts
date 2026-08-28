@@ -1,6 +1,7 @@
 import { resolveAssessmentReference, validateReferenceSetDefinition, type AssessmentReferenceSetDefinition, type ReferenceContext, type ResolvedScaleReference } from '../../assessment-reference/reference'
 import type { AssessmentContextV1 } from '../../assessment-context'
-import type { MetricDirection, TaskDefinition } from './types'
+import { metricIsQualityGated } from './quality'
+import type { MetricDirection, QualityAssessment, TaskDefinition } from './types'
 
 export interface CognitiveMetricReference extends ResolvedScaleReference {
   metricKey: string
@@ -31,39 +32,66 @@ const normalizedValue = (value: unknown): number | null => (
   typeof value === 'number' && Number.isFinite(value) ? value : null
 )
 
+const qualityLimitedReference = (reference: ResolvedScaleReference): ResolvedScaleReference => ({
+  ...reference,
+  evidenceLevel: null,
+  status: 'unavailable',
+  unavailableReason: 'quality_limited',
+  label: '参考暂不可用',
+  value: null,
+  mean: null,
+  sd: null,
+  z: null,
+  t: null,
+  percentile: null,
+  criterionBand: null,
+  meanDifference: null,
+  source: null,
+  population: null,
+  instrumentVersion: null,
+  scoringVersion: null,
+  limitations: [],
+  disclaimer: '本指标受数据质量限制，当前未使用人口参考。',
+})
+
 /** Resolve each explicitly declared metric mapping through PR-A's shared core. */
 export const resolveCognitiveMetricReferences = <TConfig, TTrial>(input: {
   definition: TaskDefinition<TConfig, TTrial>
   metrics: Record<string, unknown>
   references: AssessmentReferenceSetDefinition[]
   context?: AssessmentContextV1 | null
-}): CognitiveMetricReference[] => input.definition.references.flatMap((mapping) => {
-  const metric = input.definition.metrics[mapping.metricKey]
-  if (!metric) return []
-  const value = normalizedValue(input.metrics[mapping.metricKey])
-  const resolved = resolveAssessmentReference({
-    instrumentType: 'cognitive',
-    selections: [{
-      scoreKey: mapping.metricKey,
-      referenceVersion: mapping.referenceVersion,
-      referenceKind: mapping.referenceKind,
-    }],
-    references: input.references,
-    instrumentKey: input.definition.testType,
-    instrumentVersion: mapping.instrumentVersion,
-    scoringVersion: mapping.scoringVersion,
-    score: { key: mapping.metricKey, value, status: value === null ? 'not_calculable' : 'calculated' },
-    context: toReferenceContext(input.context),
+  quality?: QualityAssessment | null
+}): CognitiveMetricReference[] => {
+  if (input.quality?.state === 'invalid') return []
+  return input.definition.references.flatMap((mapping) => {
+    const metric = input.definition.metrics[mapping.metricKey]
+    if (!metric) return []
+    const qualityGated = input.quality ? metricIsQualityGated(metric, input.quality) : false
+    const value = normalizedValue(input.metrics[mapping.metricKey])
+    const resolved = resolveAssessmentReference({
+      instrumentType: 'cognitive',
+      selections: [{
+        scoreKey: mapping.metricKey,
+        referenceVersion: mapping.referenceVersion,
+        referenceKind: mapping.referenceKind,
+      }],
+      references: input.references,
+      instrumentKey: input.definition.testType,
+      instrumentVersion: mapping.instrumentVersion,
+      scoringVersion: mapping.scoringVersion,
+      score: { key: mapping.metricKey, value, status: value === null ? 'not_calculable' : 'calculated' },
+      context: toReferenceContext(input.context),
+    })
+    return resolved.map((reference) => ({
+      ...(qualityGated ? qualityLimitedReference(reference) : reference),
+      metricKey: mapping.metricKey,
+      direction: mapping.direction,
+      relativePosition: !qualityGated && reference.status === 'available'
+        ? relativePositionFor(mapping.direction, reference.value, reference.mean, reference.criterionBand)
+        : null,
+    }))
   })
-  return resolved.map((reference) => ({
-    ...reference,
-    metricKey: mapping.metricKey,
-    direction: mapping.direction,
-    relativePosition: reference.status === 'available'
-      ? relativePositionFor(mapping.direction, reference.value, reference.mean, reference.criterionBand)
-      : null,
-  }))
-})
+}
 
 /**
  * Convert a Prisma AssessmentReferenceSet row into the shared JSON contract.

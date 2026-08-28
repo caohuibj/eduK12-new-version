@@ -48,6 +48,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   }
 
   const metricKeys = new Set(Object.keys(definition.metrics))
+  const qualityKeys = new Set(Object.keys(definition.quality))
   for (const [key, metric] of Object.entries(definition.metrics)) {
     if (metric.key !== key) issues.push(issue(`metrics.${key}.key`, 'metric key must match its registry key'))
     if (!metric.label || !metric.category || !metric.construct || !metric.description) issues.push(issue(`metrics.${key}`, 'metric label/category/construct/description are required'))
@@ -55,6 +56,11 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (!validDirections.has(metric.direction)) issues.push(issue(`metrics.${key}.direction`, 'metric direction is invalid'))
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
+    for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
+      if (!qualityKeys.has(qualityKey)) {
+        issues.push(issue(`metrics.${key}.requiresQualityFlags.${index}`, `${qualityKey} is not declared in quality definitions`))
+      }
+    }
   }
 
   const assertVisibility = (keys: string[], visibility: MetricDefinition['visibility'], path: string) => {
@@ -96,7 +102,14 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   return issues
 }
 
-export const assertTaskCanPublish = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
+export const assertTaskContractValid = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
   const errors = validateTaskDefinition(definition).filter((candidate) => candidate.severity === 'error')
   if (errors.length > 0) throw new Error(`Cognitive task publication gate failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
+}
+
+export const assertTaskCanPublish = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
+  assertTaskContractValid(definition)
+  if (definition.publication.status !== 'PUBLISHED') {
+    throw new Error(`Cognitive task publication gate failed: publication.status must be PUBLISHED (received ${definition.publication.status})`)
+  }
 }

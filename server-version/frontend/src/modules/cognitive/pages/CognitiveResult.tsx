@@ -104,7 +104,11 @@ const CognitiveResult: React.FC = () => {
       : v2Report.qualityState === 'limited'
         ? '数据质量：受限解释'
         : '数据质量：无效，暂不解释'
-    const referenceRows = (result.references ?? []).filter((reference) => reference && typeof reference === 'object') as Array<Record<string, unknown>>
+    // The server omits references for invalid results. Keep the projection
+    // boundary defensive so a stale/cached payload cannot reveal them either.
+    const referenceRows = v2Report.qualityState === 'invalid'
+      ? []
+      : (result.references ?? []).filter((reference) => reference && typeof reference === 'object') as Array<Record<string, unknown>>
 
     return (
       <div>

@@ -269,4 +269,47 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(await screen.findByText('冻结建议')).toBeTruthy()
     expect(screen.queryByText('在需要快速响应时先减少外部干扰。')).toBeNull()
   })
+
+  it('does not reveal references carried by an invalid v2 result payload', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({
+      code: 0,
+      message: 'ok',
+      data: {
+        sessionId: 's1',
+        testType: 'reaction',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        configVersion: '1.1.0',
+        attemptNo: 1,
+        status: 'COMPLETED',
+        config: {},
+        randomSeed: 'seed',
+        result: {
+          metrics: { medianRtMs: 350 },
+          qualityFlags: { corruptedPayload: true },
+          quality: { state: 'invalid', flags: { corruptedPayload: true }, reasons: ['数据损坏'] },
+          references: [{ metricKey: 'medianRtMs', status: 'available', label: '不应显示的参考' }],
+          report: {
+            title: '简单反应时',
+            qualityState: 'invalid',
+            conclusion: '本次数据未达到可解释条件，暂不提供表现结论。',
+            headline: [],
+            user: [],
+            detail: [],
+            quality: [{ key: 'corruptedPayload', label: '数据损坏', active: true, effect: 'invalid' }],
+            method: {
+              testType: 'reaction', engineVersion: '1.0.0', scoringVersion: '1.1.0',
+              configVersion: '1.1.0', protocolSignature: 'a'.repeat(64), profile: null,
+            },
+            disclaimer: '仅用于测试。',
+            practicalTips: [],
+          },
+        },
+      },
+    })
+    renderAt()
+    expect(await screen.findByText('简单反应时')).toBeTruthy()
+    expect(screen.queryByText('不应显示的参考')).toBeNull()
+    expect(screen.queryByText('参考信息')).toBeNull()
+  })
 })

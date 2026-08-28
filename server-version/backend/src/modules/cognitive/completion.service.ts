@@ -16,7 +16,7 @@ import { readCognitiveSessionConfig } from './session.service'
 import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
 import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport } from './v2/report'
-import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
+import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot } from './v2/types'
 
 /**
@@ -112,7 +112,7 @@ const v2ResponseFromSnapshot = (snapshot: CognitiveResultSnapshot) => ({
   metrics: snapshot.metrics,
   quality: snapshot.quality,
   qualityFlags: snapshot.quality.flags,
-  references: snapshot.references,
+  references: referencesForCognitiveResult(snapshot),
   report: snapshot.report,
   assessmentContext: snapshot.assessmentContext,
 })
@@ -157,13 +157,18 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     throw err
   }
 
-  const references = await loadCognitiveReferenceSets(tx, session.testType)
-  const resolvedReferences = resolveCognitiveMetricReferences({
-    definition,
-    metrics: scored.metrics,
-    references,
-    context: contextState.context,
-  })
+  const references = scored.quality.state === 'invalid'
+    ? []
+    : await loadCognitiveReferenceSets(tx, session.testType)
+  const resolvedReferences = scored.quality.state === 'invalid'
+    ? []
+    : resolveCognitiveMetricReferences({
+        definition,
+        metrics: scored.metrics,
+        references,
+        context: contextState.context,
+        quality: scored.quality,
+      })
   const report = projectThreeLayerReport({
     testType: session.testType,
     configVersion: session.configVersion,

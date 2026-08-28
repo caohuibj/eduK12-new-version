@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COGNITIVE_SEEDS } from '../../../prisma/seeds/cognitive'
 import {
-  assertTaskCanPublish,
+  assertTaskContractValid,
   createSessionConfigSnapshot,
   createTrialEnvelope,
   listCognitiveV2TaskDefinitions,
@@ -74,7 +74,7 @@ describe('Cognitive v2 Draft contract smoke fixtures', () => {
         endedAtPerfMs: 25,
       })
       expect(parseTrialEnvelope(envelope).payload).toEqual(payload)
-      expect(() => assertTaskCanPublish(definition)).not.toThrow()
+      expect(() => assertTaskContractValid(definition)).not.toThrow()
     }
   })
 })

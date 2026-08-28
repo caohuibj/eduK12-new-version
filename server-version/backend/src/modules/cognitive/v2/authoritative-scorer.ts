@@ -1,6 +1,6 @@
 import { parseTrialEnvelope } from './trial-envelope'
 import { assertProtocolSignature, computeConfigSnapshotHash } from './canonical'
-import { assertTaskCanPublish } from './publication-gate'
+import { assertTaskContractValid } from './publication-gate'
 import { parseSessionConfigSnapshot } from './session-snapshot'
 import type {
   CognitiveScoreResult,
@@ -23,7 +23,7 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
   trials: unknown[]
   randomSeed: string
 }): CognitiveScoreResult => {
-  assertTaskCanPublish(input.definition)
+  assertTaskContractValid(input.definition)
   validateSessionConfigSnapshot(input.session)
   if (input.session.testType !== input.definition.testType
     || input.session.engineVersion !== input.definition.engineVersion

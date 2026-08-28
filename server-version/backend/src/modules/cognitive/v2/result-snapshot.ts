@@ -29,3 +29,8 @@ export const cognitiveResultSnapshotSchema = z.object({
 export const parseCognitiveResultSnapshot = (value: unknown): CognitiveResultSnapshot => (
   cognitiveResultSnapshotSchema.parse(value) as CognitiveResultSnapshot
 )
+
+/** Invalid results never expose normative/reference material at a read boundary. */
+export const referencesForCognitiveResult = (
+  snapshot: CognitiveResultSnapshot,
+): CognitiveResultSnapshot['references'] => snapshot.quality.state === 'invalid' ? [] : snapshot.references

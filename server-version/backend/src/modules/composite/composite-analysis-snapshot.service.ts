@@ -792,7 +792,10 @@ const buildFrozenModuleResults = (
       engineVersion: session.engineVersion,
       scoringVersion: session.scoringVersion,
       metrics,
-      qualityFlags,
+      ...(v2Snapshot ? { qualityState: v2Snapshot.quality.state } : {}),
+      qualityFlags: v2Snapshot
+        ? { ...qualityFlags, interpretable: v2Snapshot.quality.state === 'interpretable' }
+        : qualityFlags,
       frozenReport,
       provenance: {
         sourceType: 'cognitive_session',

@@ -72,6 +72,31 @@ const requireNonEmptyString = (value: unknown, label: string): string => {
 const isCognitiveProfile = (value: unknown): value is CognitiveAnalysisProfile =>
   value === 'standard' || value === 'research'
 
+type CognitiveQualityState = NonNullable<FrozenCognitiveModuleResult['qualityState']>
+
+const isCognitiveQualityState = (value: unknown): value is CognitiveQualityState =>
+  value === 'interpretable' || value === 'limited' || value === 'invalid'
+
+const COMPATIBILITY_QUALITY_KEYS = new Set(['interpretable', 'legacyUninterpretable'])
+
+const qualityStateFor = (
+  result: FrozenCognitiveModuleResult,
+  label: string,
+): CognitiveQualityState => {
+  const qualityState = result.qualityState
+  if (qualityState !== undefined && !isCognitiveQualityState(qualityState)) {
+    fail(`冻结任务 qualityState 无效：${label}`)
+  }
+  const interpretable = result.qualityFlags.interpretable
+  if (typeof interpretable !== 'boolean') {
+    fail(`冻结任务 interpretable quality flag 无效：${label}`)
+  }
+  if (qualityState !== undefined && interpretable !== (qualityState === 'interpretable')) {
+    fail(`冻结任务 qualityState 与 interpretable quality flag 不一致：${label}`)
+  }
+  return qualityState ?? (interpretable ? 'interpretable' : 'limited')
+}
+
 const SHA256_PATTERN = /^[a-f0-9]{64}$/
 
 const PR7_BUILT_IN_PACKAGE_CONTRACTS = new Map<string, {
@@ -496,9 +521,7 @@ const validateModuleResults = (
     if (!isRecord(result.metrics) || !isRecord(result.qualityFlags)) {
       fail(`冻结任务 metrics/qualityFlags 格式无效：${slotKey}`)
     }
-    if (typeof result.qualityFlags.interpretable !== 'boolean') {
-      fail(`冻结任务 interpretable quality flag 无效：${slotKey}`)
-    }
+    qualityStateFor(result, slotKey)
     if (
       result.provenance !== undefined &&
       !isRecord(result.provenance)
@@ -517,7 +540,7 @@ const validateModuleResults = (
     for (const [qualityKey, value] of Object.entries(result.qualityFlags)) {
       if (typeof value !== 'boolean') fail(`冻结任务 quality flag 不是 boolean：${slotKey}/${qualityKey}`)
       if (
-        qualityKey !== 'interpretable' &&
+        !COMPATIBILITY_QUALITY_KEYS.has(qualityKey) &&
         !Object.prototype.hasOwnProperty.call(result.frozenReport.qualityDefinitions, qualityKey)
       ) {
         fail(`冻结任务包含未知 quality flag：${slotKey}/${qualityKey}`)
@@ -823,7 +846,7 @@ const buildEvidence = (
     if (mappings.length === 0) {
       fail(`冻结任务没有匹配的 Evidence mapping：${slot.key}`)
     }
-    const qualityInterpretable = result.qualityFlags.interpretable === true
+    const qualityInterpretable = qualityStateFor(result, slot.key) === 'interpretable'
     const qualityFlags = activeQualityFlags(result.qualityFlags)
     const measurement = measurementsBySlot.get(slot.key)
     if (!measurement) return fail(`内部错误：找不到冻结任务测量 ${slot.key}`)
@@ -1075,7 +1098,10 @@ const buildDomainResults = (
 ): CognitiveDomainResult[] => {
   const excludedSlots = new Set(
     slots
-      .filter((slot) => modulesBySlot.get(slot.key)?.qualityFlags.interpretable !== true)
+      .filter((slot) => {
+        const result = modulesBySlot.get(slot.key)
+        return result ? qualityStateFor(result, slot.key) !== 'interpretable' : true
+      })
       .map((slot) => slot.key),
   )
   return protocol.outputDomains.map((domain) => {
@@ -1252,7 +1278,10 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
   const cognitiveDomains = buildDomainResults(protocol, evidence, modulesBySlot, slots)
   const excludedModules = [
     ...slots
-    .filter((slot) => modulesBySlot.get(slot.key)?.qualityFlags.interpretable !== true)
+    .filter((slot) => {
+      const result = modulesBySlot.get(slot.key)
+      return result ? qualityStateFor(result, slot.key) !== 'interpretable' : true
+    })
     .map((slot) => slot.key),
     ...scaleSlots
       .filter((slot) => scaleResultsBySlot.get(slot.key)?.qualityFlags.interpretable !== true)

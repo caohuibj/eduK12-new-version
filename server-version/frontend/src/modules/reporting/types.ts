@@ -30,7 +30,7 @@ export interface ScaleReferenceValue {
   referenceKind: 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample'
   evidenceLevel: 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm' | null
   status: 'available' | 'unavailable'
-  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data'
+  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data' | 'quality_limited'
   label: string
   value: number | null
   mean: number | null

@@ -94,4 +94,37 @@ describe('Cognitive v2 shared reference and context adapter', () => {
     })
     expect(result[0].disclaimer).toContain('Beta')
   })
+
+  it('returns no references for an invalid result', () => {
+    const result = resolveCognitiveMetricReferences({
+      definition: definition(),
+      metrics: { medianRtMs: 350 },
+      references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
+      context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      quality: { state: 'invalid', flags: { corruptedPayload: true }, reasons: ['数据损坏'] },
+    })
+    expect(result).toEqual([])
+  })
+
+  it('marks a reference unavailable when its metric-specific quality gate is active', () => {
+    const task = definition()
+    task.metrics = {
+      ...task.metrics,
+      medianRtMs: { ...task.metrics.medianRtMs, requiresQualityFlags: ['insufficientTrials'] },
+    }
+    const result = resolveCognitiveMetricReferences({
+      definition: task,
+      metrics: { medianRtMs: 350 },
+      references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
+      context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      quality: { state: 'limited', flags: { insufficientTrials: true }, reasons: ['试次不足'] },
+    })
+    expect(result[0]).toMatchObject({
+      status: 'unavailable',
+      unavailableReason: 'quality_limited',
+      value: null,
+      source: null,
+      relativePosition: null,
+    })
+  })
 })
