@@ -48,8 +48,8 @@ import type {
   UpdateCompositeInput,
 } from './composite.schema'
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
-import { assertTaskCanPublish } from '../cognitive/v2/publication-gate'
-import { buildCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
+import { assertTaskCanPublish, assertTaskContractValid } from '../cognitive/v2/publication-gate'
+import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -353,20 +353,24 @@ export const materializeReportPackage = async (
   })
 }
 
-const validateCognitiveConfig = (config: any) => {
+const validateCognitiveConfig = (config: any, requirePublication = false) => {
   try {
     const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
     const parsed = entry.configSchema.safeParse(config.config)
     if (!parsed.success) throw compositeBadRequest('认知任务配置不符合当前版本规范')
-    const definition = buildCognitiveV2TaskDefinition(
-      entry,
-      config.status === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT',
+    const definition = getCognitiveV2TaskDefinition(
+      config.testType,
+      config.engineVersion,
+      config.scoringVersion,
     )
     if (!definition) throw compositeBadRequest('认知任务缺少 Cognitive v2 definition')
     try {
-      assertTaskCanPublish(definition)
+      if (requirePublication) assertTaskCanPublish(definition)
+      else assertTaskContractValid(definition)
     } catch {
-      throw compositeBadRequest('认知任务未通过 Cognitive v2 publication gate')
+      throw compositeBadRequest(requirePublication
+        ? '认知任务未通过 Cognitive v2 publication gate'
+        : '认知任务不符合 Cognitive v2 contract')
     }
     return parsed.data
   } catch (err) {
@@ -1342,11 +1346,11 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       throw compositeBadRequest('综合测评包含未发布认知任务')
     }
     if (item.type === 'COGNITIVE') {
-      validateCognitiveConfig(item.cognitiveAssignment.config)
       assertCognitiveAssignmentOnCompositeCourse(item.cognitiveAssignment, composite)
       if (!composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
         throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
       }
+      validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
     if (item.type === 'FORM') {
       if (!item.formType || !item.formLabel) {

@@ -56,6 +56,19 @@ describe('Cognitive v2 shared reference and context adapter', () => {
     expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'missing_context' })
   })
 
+  it('enforces requiredContext even when the reference population is unconstrained', () => {
+    const result = resolveCognitiveMetricReferences({
+      definition: definition(),
+      metrics: { medianRtMs: 350 },
+      references: [referenceSet([entry({ description: 'all participants' })])],
+      context: null,
+    })
+
+    expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'missing_context' })
+    expect(result[0].value).toBeNull()
+    expect(result[0].source).toBeNull()
+  })
+
   it('returns no_population_match for a complete but out-of-range context', () => {
     const result = resolveCognitiveMetricReferences({
       definition: definition(),

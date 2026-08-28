@@ -45,16 +45,28 @@ import {
 import type { AnalysisProtocolDefinition } from '../../modules/cognitive-analysis/cognitive-analysis.types'
 
 const TEACHER = UserRole.TEACHER
-const fakeConfig = {
-  id: 'config-fake',
-  testType: 'fake',
-  configVersion: '1.0.0',
-  name: 'Fake',
+const reactionConfig = {
+  id: 'config-reaction',
+  testType: 'reaction',
+  configVersion: '1.1.0',
+  name: 'Reaction Time',
   instruction: null,
   status: 'PUBLISHED',
   engineVersion: '1.0.0',
-  scoringVersion: '1.0.0',
-  config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+  scoringVersion: '1.1.0',
+  config: {
+    totalTrials: 20,
+    foreperiodMinMs: 700,
+    foreperiodMaxMs: 1500,
+    timeoutMs: 2000,
+    readyDurationMs: 1000,
+    report: {
+      reportVersion: '1.1.0',
+      referenceMode: 'simulated',
+      referenceVersion: 'lit-sim-k12-v0.2',
+      referenceBand: 'K7-9',
+    },
+  },
 }
 
 const protocol: AnalysisProtocolDefinition = {
@@ -67,18 +79,18 @@ const protocol: AnalysisProtocolDefinition = {
   profiles: ['standard', 'research'],
   estimatedMinutes: { standard: [1, 2], research: [2, 3] },
   cognitiveSlots: [{
-    key: 'fake',
-    label: 'Fake',
+    key: 'reaction',
+    label: 'Reaction Time',
     position: 0,
     required: true,
-    testType: 'fake',
-    configVersion: '1.0.0',
+    testType: 'reaction',
+    configVersion: '1.1.0',
     engineVersion: '1.0.0',
-    scoringVersion: '1.0.0',
-    profileDefinitionVersion: '1.0.0',
-    metricDefinitionVersion: '1.0.0',
-    qualityDefinitionVersion: '1.0.0',
-    reportDefinitionVersion: '1.0.0',
+    scoringVersion: '1.1.0',
+    profileDefinitionVersion: '1.1.0',
+    metricDefinitionVersion: '1.1.0',
+    qualityDefinitionVersion: '1.1.0',
+    reportDefinitionVersion: '1.1.0',
   }],
   scaleSlots: [],
   outputDomains: ['processing_speed'],
@@ -88,10 +100,10 @@ const protocol: AnalysisProtocolDefinition = {
 }
 
 const frozenAssignment = (profile: 'standard' | 'research' = 'standard') => {
-  const entry = requireCognitiveRegistryEntry('fake', '1.0.0', '1.0.0')
+  const entry = requireCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')
   const freeze = freezeDataForWrite(freezeAssignmentProfile({
     entry,
-    baseConfig: fakeConfig.config,
+    baseConfig: reactionConfig.config,
     profile,
   }))
   return {
@@ -99,9 +111,9 @@ const frozenAssignment = (profile: 'standard' | 'research' = 'standard') => {
     courseId: 'course-1',
     createdBy: 'teacher-1',
     status: 'PUBLISHED',
-    title: 'Fake',
-    configId: fakeConfig.id,
-    config: fakeConfig,
+    title: 'Reaction Time',
+    configId: reactionConfig.id,
+    config: reactionConfig,
     ...freeze,
   }
 }
@@ -141,7 +153,7 @@ beforeEach(() => {
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.compositeAssessmentItem.deleteMany.mockResolvedValue({ count: 1 })
-  mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(fakeConfig)
+  mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(reactionConfig)
   mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
   mockPrisma.cognitiveAssignment.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
     id: 'assignment-protocol',
@@ -273,7 +285,7 @@ describe('Composite analysis protocol publish freeze', () => {
       protocolKey: protocol.key,
       protocolVersion: protocol.version,
       profile: 'standard',
-      cognitiveMeasurements: [{ slotKey: 'fake', resolvedConfigHash: assignment.resolvedConfigHash }],
+      cognitiveMeasurements: [{ slotKey: 'reaction', resolvedConfigHash: assignment.resolvedConfigHash }],
     })
     expect(published).not.toHaveProperty('analysisProtocolSnapshotEncrypted')
   })
@@ -324,7 +336,7 @@ describe('Composite analysis protocol publish freeze', () => {
   it.each([
     ['optional item', { required: false }],
     ['wrong position', { position: 1 }],
-    ['wrong config version', { cognitiveAssignment: { config: { ...fakeConfig, configVersion: '9.9.9' } } }],
+    ['wrong config version', { cognitiveAssignment: { config: { ...reactionConfig, configVersion: '9.9.9' } } }],
   ])('rejects a protocol with %s', async (_label, itemOverride) => {
     const assignment = frozenAssignment('standard')
     const assignmentOverride = 'cognitiveAssignment' in itemOverride

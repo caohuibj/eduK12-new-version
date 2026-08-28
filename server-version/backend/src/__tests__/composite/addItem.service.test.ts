@@ -189,6 +189,19 @@ describe('publishComposite cognitive course match', () => {
     await expect(publishComposite('teacher-a', TEACHER, 'composite-1'))
       .rejects.toMatchObject({ statusCode: 400, message: '认知任务必须与综合测评属于同一课程' })
   })
+
+  it('refuses a database-published cognitive config whose v2 definition is Draft', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
+      items: [{
+        type: 'COGNITIVE',
+        cognitiveAssignment: assignment(),
+      }],
+    }))
+
+    await expect(publishComposite('teacher-a', TEACHER, 'composite-1'))
+      .rejects.toMatchObject({ statusCode: 400, message: '认知任务未通过 Cognitive v2 publication gate' })
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
+  })
 })
 
 describe('updateComposite course change with cognitive items', () => {
