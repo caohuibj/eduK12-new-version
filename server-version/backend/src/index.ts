@@ -137,9 +137,14 @@ app.get('/health', (req, res) => {
 app.get('/ready', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`
-    res.json({ status: 'ok', timestamp: new Date().toISOString() })
+    const socketRedisState = socketService.getRedisState()
+    const socketReady = socketRedisState !== 'failed' || !config.socketRedisRequired
+    if (!socketReady) {
+      return res.status(503).json({ status: 'unready', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
+    }
+    res.json({ status: 'ok', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
   } catch {
-    res.status(503).json({ status: 'unready', timestamp: new Date().toISOString() })
+    res.status(503).json({ status: 'unready', dependencies: { database: 'failed' }, timestamp: new Date().toISOString() })
   }
 })
 
@@ -163,6 +168,11 @@ app.get('/metrics', async (_req, res) => {
     `process_heap_total_bytes ${memory.heapTotal}`,
     '# HELP ptool_api_requests_total Completed API requests by normalized route and status.',
     '# TYPE ptool_api_requests_total counter',
+    '# HELP ptool_socket_redis_state Socket Redis adapter state (1 for current state).',
+    '# TYPE ptool_socket_redis_state gauge',
+    `ptool_socket_redis_state{state="ready"} ${socketService.getRedisState() === 'ready' ? 1 : 0}`,
+    `ptool_socket_redis_state{state="degraded"} ${socketService.getRedisState() === 'degraded' ? 1 : 0}`,
+    `ptool_socket_redis_state{state="failed"} ${socketService.getRedisState() === 'failed' ? 1 : 0}`,
   ]
   for (const [key, count] of requestMetricCounts) {
     const [method, route, status] = key.split('|')

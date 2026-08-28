@@ -38,6 +38,7 @@ jobs:
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      REDIS_URL: redis://localhost:6379
     services:
       postgres:
         image: postgres:14-alpine
@@ -49,6 +50,15 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -79,7 +89,7 @@ jobs:
         run: npm test
 
   frontend:
-    name: frontend (lint + typecheck + cognitive tests + build)
+    name: frontend (lint + typecheck + full tests + build)
     runs-on: ubuntu-latest
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -99,8 +109,8 @@ jobs:
         run: npm run lint
       - name: typecheck
         run: npm run typecheck
-      - name: cognitive frontend tests
-        run: npm run test:cognitive
+      - name: full frontend tests
+        run: npm test
       - name: build (vite)
         run: npm run build
 

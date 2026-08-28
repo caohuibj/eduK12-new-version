@@ -170,19 +170,18 @@ const QuestionnaireList: React.FC = () => {
       })
       
       if (response.code === 0) {
-        // 使用 fetch 下载文件（带认证）
-        // 下载文件
-        const fileUrl = `/api/questionnaires/exports/${response.data.fileName}`
-        sessionFetch(fileUrl)
-          .then(res => res.blob())
-          .then(blob => {
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = response.data.fileName
-            a.click()
-            window.URL.revokeObjectURL(url)
-          })
+        const artifacts = Array.isArray(response.data.artifacts) ? response.data.artifacts : []
+        await Promise.all(artifacts.map(async (artifact: { downloadUrl: string; fileName: string }) => {
+          const downloadResponse = await sessionFetch(artifact.downloadUrl)
+          if (!downloadResponse.ok) throw new Error('导出文件下载失败')
+          const blob = await downloadResponse.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = artifact.fileName
+          a.click()
+          window.URL.revokeObjectURL(url)
+        }))
         
         const formatLabel = exportOptions.format === 'sav' ? 'SAV' : 'CSV'
         alert(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${response.data.fieldCount}\n\n文件已开始下载...`)

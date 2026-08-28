@@ -194,35 +194,18 @@ const ScaleList: React.FC = () => {
       })
       
       if (response.code === 0) {
-        // 使用 fetch 下载文件（带认证）
-        // 下载主文件
-        const mainUrl = `/api/scales/exports/${response.data.fileName}`
-        sessionFetch(mainUrl)
-          .then(res => res.blob())
-          .then(blob => {
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = response.data.fileName
-            a.click()
-            window.URL.revokeObjectURL(url)
-          })
-        
-        // 如果是 spss 格式，还需要下载 SPS 文件
-        if (Array.isArray(response.data.additionalFileNames)) {
-          response.data.additionalFileNames.forEach((fileName: string) => {
-            sessionFetch(`/api/scales/exports/${fileName}`)
-            .then(res => res.blob())
-            .then(blob => {
-              const url = window.URL.createObjectURL(blob)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = fileName
-              a.click()
-              window.URL.revokeObjectURL(url)
-            })
-          })
-        }
+        const artifacts = Array.isArray(response.data.artifacts) ? response.data.artifacts : []
+        await Promise.all(artifacts.map(async (artifact: { downloadUrl: string; fileName: string }) => {
+          const downloadResponse = await sessionFetch(artifact.downloadUrl)
+          if (!downloadResponse.ok) throw new Error('导出文件下载失败')
+          const blob = await downloadResponse.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = artifact.fileName
+          a.click()
+          window.URL.revokeObjectURL(url)
+        }))
         
         const formatLabel = exportOptions.format === 'sav' ? 'SAV' : 
                            exportOptions.format === 'spss' ? 'CSV+SPS' : 'CSV'

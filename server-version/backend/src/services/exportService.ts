@@ -32,6 +32,22 @@ interface ExportData {
   rows: Record<string, any>[]
 }
 
+/** Spreadsheet-safe CSV cell. A leading formula character is prefixed with
+ * an apostrophe before normal RFC4180 quoting so Excel/Sheets treats it as
+ * text rather than executable formula input. */
+export function spreadsheetSafeCell(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  if (typeof value !== 'string') return String(value)
+  const safe = /^[=+\-@]/.test(value) ? `'${value}` : value
+  return `"${safe.replace(/"/g, '""')}"`
+}
+
+export function serializeCsv(fields: ExportField[], rows: Record<string, any>[]): string {
+  const lines = [fields.map((field) => field.name).join(',')]
+  for (const row of rows) lines.push(fields.map((field) => spreadsheetSafeCell(row[field.name])).join(','))
+  return lines.join('\n')
+}
+
 // 字段命名规则
 const FIELD_RULES = {
   USER_PREFIX: 'U_',
@@ -272,25 +288,7 @@ export async function getScaleExportData(
  */
 export async function exportToCSV(scaleId: string, options: ExportOptions = {}): Promise<string> {
   const { fields, rows } = await getScaleExportData(scaleId, options)
-
-  // 构建 CSV 内容
-  const header = fields.map(f => f.name).join(',')
-  const lines = [header]
-
-  for (const row of rows) {
-    const values = fields.map(f => {
-      const value = row[f.name]
-      if (value === null || value === undefined) return ''
-      if (typeof value === 'string') {
-        // 正确转义双引号：将 " 替换为 ""
-        return `"${value.replace(/"/g, '""')}"`
-      }
-      return String(value)
-    })
-    lines.push(values.join(','))
-  }
-
-  return lines.join('\n')
+  return serializeCsv(fields, rows)
 }
 
 /**
@@ -303,24 +301,7 @@ export async function exportToSPSS(
 ): Promise<{ csvContent: string; spsContent: string }> {
   const { fields, rows } = await getScaleExportData(scaleId, options)
 
-  // 生成 CSV 内容
-  const header = fields.map(f => f.name).join(',')
-  const lines = [header]
-
-  for (const row of rows) {
-    const values = fields.map(f => {
-      const value = row[f.name]
-      if (value === null || value === undefined) return ''
-      if (typeof value === 'string') {
-        // 正确转义双引号：将 " 替换为 ""
-        return `"${value.replace(/"/g, '""')}"`
-      }
-      return String(value)
-    })
-    lines.push(values.join(','))
-  }
-
-  const csvContent = lines.join('\n')
+  const csvContent = serializeCsv(fields, rows)
 
   // 生成 SPSS 语法文件 (.sps)
   const spsLines: string[] = [
@@ -677,23 +658,7 @@ export async function exportQuestionnaireToCSV(
 ): Promise<string> {
   const { fields, rows } = await getQuestionnaireExportData(questionnaireId, options)
 
-  const header = fields.map(f => f.name).join(',')
-  const lines = [header]
-
-  for (const row of rows) {
-    const values = fields.map(f => {
-      const value = row[f.name]
-      if (value === null || value === undefined) return ''
-      if (typeof value === 'string') {
-        // 正确转义双引号：将 " 替换为 ""
-        return `"${value.replace(/"/g, '""')}"`
-      }
-      return String(value)
-    })
-    lines.push(values.join(','))
-  }
-
-  return lines.join('\n')
+  return serializeCsv(fields, rows)
 }
 
 /**

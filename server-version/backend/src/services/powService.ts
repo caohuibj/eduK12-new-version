@@ -1,25 +1,21 @@
-/**
- * POW (Proof of Work) 防机器人服务
- * 
- * 功能：
- * - 生成挑战
- * - 验证 POW 计算
- * - 防止机器人滥用
+/** Redis-backed proof-of-work challenge store.
+ *
+ * Production never falls back to process-local state: if Redis is unavailable
+ * challenge issuance/verification fails closed. Development and tests retain
+ * a small in-memory fallback so the public flow remains usable offline.
  */
-
 import crypto from 'crypto'
 import { customAlphabet } from 'nanoid'
 import NodeCache from 'node-cache'
+import { createClient, type RedisClientType } from 'redis'
 import { logger } from '../utils/logger'
+import { getRedisUrl } from '../config/redis'
 
-// 生成随机挑战字符串
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 32)
-
-// 使用内存缓存存储挑战（生产环境可替换为 Redis）
-const challengeCache = new NodeCache({
-  stdTTL: 300, // 挑战有效期 5 分钟
-  checkperiod: 60, // 每60秒检查一次过期
-})
+const TTL_SECONDS = 300
+const challengeCache = new NodeCache({ stdTTL: TTL_SECONDS, checkperiod: 60 })
+let redisClient: RedisClientType | null = null
+let redisConnectPromise: Promise<RedisClientType | null> | null = null
 
 export interface POWChallenge {
   challenge: string
@@ -27,92 +23,75 @@ export interface POWChallenge {
   timestamp: number
 }
 
+async function getRedis(): Promise<RedisClientType | null> {
+  if (redisClient?.isReady) return redisClient
+  if (!redisConnectPromise) {
+    redisConnectPromise = (async () => {
+      try {
+        const client = createClient({ url: getRedisUrl() }) as RedisClientType
+        client.on('error', () => logger.warn('POW Redis 客户端错误'))
+        await client.connect()
+        redisClient = client
+        return client
+      } catch {
+        redisConnectPromise = null
+        if (process.env.NODE_ENV === 'production') logger.error('POW Redis 不可用，生产环境拒绝使用进程内缓存')
+        return null
+      }
+    })()
+  }
+  return redisConnectPromise
+}
+
+const keyFor = (challenge: string) => `pow:${challenge}`
+
 export const powService = {
-  /**
-   * 生成 POW 挑战
-   */
-  generateChallenge(difficulty: number = 4): POWChallenge {
-    const challenge = nanoid()
-    const timestamp = Date.now()
-
-    // 存储挑战
-    const key = `pow:${challenge}`
-    challengeCache.set(key, { challenge, difficulty, timestamp })
-
-    logger.debug('POW 挑战已生成', { difficulty })
-
-    return {
-      challenge,
-      difficulty,
-      timestamp,
-    }
+  async generateChallenge(difficulty: number = 4): Promise<POWChallenge> {
+    const challenge: POWChallenge = { challenge: nanoid(), difficulty, timestamp: Date.now() }
+    const redis = await getRedis()
+    if (redis) await redis.setEx(keyFor(challenge.challenge), TTL_SECONDS, JSON.stringify(challenge))
+    else if (process.env.NODE_ENV !== 'production') challengeCache.set(keyFor(challenge.challenge), challenge, TTL_SECONDS)
+    else throw new Error('POW 服务暂不可用')
+    return challenge
   },
 
-  /**
-   * 验证 POW 计算
-   */
-  verifyPOW(challenge: string, proof: string, difficulty: number): boolean {
-    // 检查挑战是否存在
-    const key = `pow:${challenge}`
-    const stored = challengeCache.get(key) as POWChallenge | undefined
-
-    if (!stored) {
-      logger.warn('POW 挑战不存在或已过期')
-      return false
+  async getChallenge(challenge: string): Promise<POWChallenge | undefined> {
+    const redis = await getRedis()
+    if (redis) {
+      const raw = await redis.get(keyFor(challenge))
+      if (!raw) return undefined
+      try { return JSON.parse(raw) as POWChallenge } catch { return undefined }
     }
+    if (process.env.NODE_ENV !== 'production') return challengeCache.get(keyFor(challenge)) as POWChallenge | undefined
+    return undefined
+  },
 
-    // 验证难度匹配
-    if (stored.difficulty !== difficulty) {
-      logger.warn('POW 难度不匹配', { expectedDifficulty: stored.difficulty, providedDifficulty: difficulty })
-      return false
-    }
-
-    // 验证 POW：计算哈希并检查前导零
+  async verifyPOW(challenge: string, proof: string, difficulty: number): Promise<boolean> {
     const hash = crypto.createHash('sha256').update(`${challenge}${proof}`).digest('hex')
-    const target = '0'.repeat(difficulty)
-
-    if (!hash.startsWith(target)) {
-      logger.warn('POW 验证失败', { difficulty, proofValid: false })
-      return false
+    if (!hash.startsWith('0'.repeat(difficulty))) return false
+    const redis = await getRedis()
+    if (redis) {
+      // GET+DEL in one Lua script makes a successful challenge single-use
+      // across all backend processes.
+      const raw = await redis.eval('local v=redis.call("GET",KEYS[1]); if v then redis.call("DEL",KEYS[1]); end; return v', { keys: [keyFor(challenge)] }) as string | null
+      if (!raw) return false
+      try {
+        const stored = JSON.parse(raw) as POWChallenge
+        return stored.difficulty === difficulty
+      } catch { return false }
     }
-
-    // 验证成功，删除挑战（防止重放）
-    challengeCache.del(key)
-
-    logger.info('POW 验证成功', { difficulty })
-    return true
-  },
-
-  /**
-   * 检查挑战是否有效
-   */
-  isChallengeValid(challenge: string): boolean {
-    const key = `pow:${challenge}`
-    return challengeCache.has(key)
-  },
-
-  /**
-   * 获取挑战信息
-   */
-  getChallenge(challenge: string): POWChallenge | undefined {
-    const key = `pow:${challenge}`
-    return challengeCache.get(key) as POWChallenge | undefined
-  },
-
-  /**
-   * 计算验证哈希（用于测试）
-   */
-  calculateHash(challenge: string, proof: string): string {
-    return crypto.createHash('sha256').update(`${challenge}${proof}`).digest('hex')
-  },
-
-  /**
-   * 获取缓存统计信息（用于监控）
-   */
-  getStats() {
-    return {
-      totalChallenges: challengeCache.keys().length,
-      stats: challengeCache.getStats(),
+    if (process.env.NODE_ENV !== 'production') {
+      const stored = challengeCache.get(keyFor(challenge)) as POWChallenge | undefined
+      if (!stored || stored.difficulty !== difficulty) return false
+      challengeCache.del(keyFor(challenge))
+      return true
     }
+    return false
   },
+
+  async isChallengeValid(challenge: string): Promise<boolean> { return Boolean(await this.getChallenge(challenge)) },
+
+  calculateHash(challenge: string, proof: string): string { return crypto.createHash('sha256').update(`${challenge}${proof}`).digest('hex') },
+
+  getStats() { return { totalChallenges: challengeCache.keys().length, stats: challengeCache.getStats() } },
 }

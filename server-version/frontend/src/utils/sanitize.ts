@@ -8,8 +8,9 @@ export const sanitizeHtml = (html: string | null | undefined): string => {
   if (!html) return ''
   
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
-    ALLOWED_ATTR: ['class'],
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'a'],
+    ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
+    ALLOWED_URI_REGEXP: /^https:\/\//i,
     KEEP_CONTENT: true
   })
 }

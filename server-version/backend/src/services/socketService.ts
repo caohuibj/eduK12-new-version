@@ -20,6 +20,7 @@ import { UserRole } from '../types'
 import { getCookieValue } from '../utils/authCookies'
 
 type SocketNext = (error?: Error) => void
+export type SocketRedisState = 'ready' | 'degraded' | 'failed'
 
 const getSocketToken = (socket: Socket): string | null => {
   const cookieToken = getCookieValue(socket.handshake.headers.cookie, 'ptool_session')
@@ -31,6 +32,7 @@ export class SocketService {
   private classroomNamespace: any = null
   private redisClient: any = null
   private redisSubscriber: any = null
+  private redisState: SocketRedisState = 'degraded'
 
   /**
    * 初始化 Socket.IO 服务器
@@ -64,9 +66,15 @@ export class SocketService {
 
       this.io.adapter(createAdapter(this.redisClient, this.redisSubscriber))
 
+      this.redisState = 'ready'
       logger.info('Redis Adapter 已配置 - 支持 PM2 集群模式')
-    } catch {
-      logger.error('Redis Adapter 配置失败，回退到单进程模式')
+    } catch (error) {
+      this.redisState = 'failed'
+      logger.error('Redis Adapter 配置失败，回退到单进程模式', { required: config.socketRedisRequired })
+      if (config.socketRedisRequired) {
+        throw new Error('SOCKET_REDIS_REQUIRED=true 且 Redis Adapter 初始化失败')
+      }
+      this.redisState = 'degraded'
     }
 
     // 连接数限制和 Socket JWT 认证中间件
@@ -142,6 +150,8 @@ export class SocketService {
     logger.info('课堂命名空间: /classroom')
     logger.info('Socket最大连接数限制已启用')
   }
+
+  getRedisState(): SocketRedisState { return this.redisState }
 
   /**
    * Re-check the account behind an already-connected privileged socket.

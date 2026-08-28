@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Image as ImageIcon, Video, Quote, Code, Undo, Redo } from 'lucide-react'
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Quote, Code, Undo, Redo } from 'lucide-react'
+import { sanitizeHtml } from '../utils/sanitize'
 
 interface RichTextEditorProps {
   value: string
@@ -20,15 +21,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // 初始化内容
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value || ''
+    // Keep the controlled value in sync when it changes externally, while not
+    // replacing the active selection during local typing.
+    if (editorRef.current && !isFocused && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = sanitizeHtml(value || '')
     }
-  }, [])
+  }, [value, isFocused])
 
   // 处理输入
   const handleInput = () => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML)
+      const safe = sanitizeHtml(editorRef.current.innerHTML)
+      if (safe !== editorRef.current.innerHTML) editorRef.current.innerHTML = safe
+      onChange(safe)
     }
   }
 
@@ -42,47 +47,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // 插入链接
   const insertLink = () => {
     const url = prompt('请输入链接地址:', 'https://')
-    if (url) {
-      execCommand('createLink', url)
-    }
-  }
-
-  // 插入图片
-  const insertImage = () => {
-    const url = prompt('请输入图片地址:', 'https://')
-    if (url) {
-      execCommand('insertImage', url)
-    }
-  }
-
-  // 插入视频（iframe）
-  const insertVideo = () => {
-    const url = prompt('请输入视频链接 (支持B站、YouTube等):', 'https://')
-    if (url) {
-      // 转换为embed链接
-      let embedUrl = url
-      
-      // B站链接转换
-      if (url.includes('bilibili.com')) {
-        const bvidMatch = url.match(/BV[\w]+/)
-        const avidMatch = url.match(/av(\d+)/)
-        if (bvidMatch) {
-          embedUrl = `https://player.bilibili.com/player.html?bvid=${bvidMatch[0]}&page=1`
-        } else if (avidMatch) {
-          embedUrl = `https://player.bilibili.com/player.html?aid=${avidMatch[1]}&page=1`
-        }
-      }
-      // YouTube链接转换
-      else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-        const videoId = url.match(/(?:v=|\/)([\w-]{11})/)?.[1]
-        if (videoId) {
-          embedUrl = `https://www.youtube.com/embed/${videoId}`
-        }
-      }
-      
-      // 插入iframe
-      const iframeHtml = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" allowfullscreen></iframe>`
-      execCommand('insertHTML', iframeHtml)
+    if (!url) return
+    try {
+      const parsed = new URL(url)
+      if (parsed.protocol !== 'https:') return
+      execCommand('createLink', parsed.href)
+    } catch {
+      // Ignore malformed or unsafe URLs.
     }
   }
 
@@ -122,24 +93,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <LinkIcon className="w-4 h-4" />
         </button>
         
-        <button
-          type="button"
-          onClick={insertImage}
-          className="p-1.5 text-gray-600 hover:bg-gray-200 rounded transition-colors"
-          title="插入图片"
-        >
-          <ImageIcon className="w-4 h-4" />
-        </button>
-        
-        <button
-          type="button"
-          onClick={insertVideo}
-          className="p-1.5 text-gray-600 hover:bg-gray-200 rounded transition-colors"
-          title="插入视频"
-        >
-          <Video className="w-4 h-4" />
-        </button>
-
         <div className="flex-1" />
         
         <button

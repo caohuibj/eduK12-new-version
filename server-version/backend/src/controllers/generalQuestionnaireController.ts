@@ -17,6 +17,19 @@ import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
+import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
+
+const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
+
+const generalQuestionnaire = async (id: string, include: any = undefined) => {
+  const model: any = prisma.questionnaire as any
+  if (typeof model.findFirst === 'function') return model.findFirst({ where: { id, type: 'GENERAL' }, ...(include ? { include } : {}) })
+  return model.findUnique({ where: { id }, ...(include ? { include } : {}) })
+}
+
+const canManageGeneral = async (req: Request, questionnaire: any) => (
+  Boolean(questionnaire && await questionnaireAuth.canManageGeneral(actorFromRequest(req), questionnaire))
+)
 
 // ==================== Validation Schemas ====================
 
@@ -198,7 +211,11 @@ export const generalQuestionnaireController = {
     try {
       const { id } = req.params
 
-      const tokens = await tokenService.getTokensByQuestionnaire(id)
+      const questionnaire = await generalQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+
+      const tokens = await tokenService.getTokensByQuestionnaire(id, { reveal: true })
 
       return success(res, {
         list: tokens,
@@ -231,16 +248,14 @@ export const generalQuestionnaireController = {
       const { expiresDays, maxUses } = result.data
 
       // 验证问卷是否存在
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
       // 权限检查
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await questionnaireAuth.canIssueToken(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限操作此问卷')
       }
 
@@ -286,18 +301,17 @@ export const generalQuestionnaireController = {
       const { id, tokenId } = req.params
 
       // 验证问卷权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限操作此问卷')
       }
 
+      if (!(await questionnaireAuth.hasTokenBinding(id, tokenId))) return notFound(res, '令牌不存在')
       await tokenService.disableToken(tokenId)
 
       return success(res, null, '令牌已禁用')
@@ -317,15 +331,13 @@ export const generalQuestionnaireController = {
       const { id } = req.params
 
       // 验证问卷权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await questionnaireAuth.canReadResponses(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限查看此问卷数据')
       }
 
@@ -339,7 +351,6 @@ export const generalQuestionnaireController = {
           token: {
             select: {
               id: true,
-              token: true,
               expiresAt: true,
             },
           },
@@ -369,15 +380,13 @@ export const generalQuestionnaireController = {
       const { id } = req.params
 
       // 验证问卷权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await questionnaireAuth.canExport(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限导出此问卷数据')
       }
 
@@ -417,6 +426,10 @@ export const generalQuestionnaireController = {
   async listScales(req: Request, res: Response) {
     try {
       const { id } = req.params
+
+      const questionnaire = await generalQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
       const scales = await prisma.questionnaireScale.findMany({
         where: { questionnaireId: id },
@@ -461,15 +474,13 @@ export const generalQuestionnaireController = {
       }
 
       // 验证问卷权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限操作此问卷')
       }
 
@@ -532,15 +543,13 @@ export const generalQuestionnaireController = {
       const { id, scaleId } = req.params
 
       // 验证问卷权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限操作此问卷')
       }
 
@@ -575,7 +584,7 @@ export const generalQuestionnaireController = {
     try {
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
+      const questionnaire = await prisma.questionnaire.findFirst({
         where: {
           id,
           type: 'GENERAL',
@@ -624,6 +633,8 @@ export const generalQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+
       return success(res, questionnaire)
     } catch (err) {
       logger.error('获取泛化问卷详情错误', err)
@@ -640,8 +651,8 @@ export const generalQuestionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'GENERAL' },
         include: {
           questionnaireScales: {
             include: {
@@ -656,7 +667,7 @@ export const generalQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限发布此问卷')
       }
 
@@ -705,15 +716,13 @@ export const generalQuestionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限废弃此问卷')
       }
 
@@ -744,8 +753,8 @@ export const generalQuestionnaireController = {
       }
 
       // 查询原问卷
-      const original = await prisma.questionnaire.findUnique({
-        where: { id },
+      const original = await prisma.questionnaire.findFirst({
+        where: { id, type: 'GENERAL' },
         include: {
           formItems: true,
           questionnaireScales: true,
@@ -757,7 +766,7 @@ export const generalQuestionnaireController = {
       }
 
       // 权限检查
-      if (original.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, original))) {
         return forbidden(res, '无权限复制此问卷')
       }
 
@@ -772,6 +781,7 @@ export const generalQuestionnaireController = {
             instruction: original.instruction,
             visibility: 'HIDDEN',
             status: 'DRAFT',
+            type: 'GENERAL',
             estimatedTime: original.estimatedTime,
             creatorId: userId,
           },
@@ -883,8 +893,8 @@ export const generalQuestionnaireController = {
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'GENERAL' },
         include: { formItems: true },
       })
 
@@ -892,7 +902,7 @@ export const generalQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -968,7 +978,7 @@ export const generalQuestionnaireController = {
         return error(res, '表单题目不属于此问卷')
       }
 
-      if (formItem.questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, formItem.questionnaire)) || formItem.questionnaire.type !== 'GENERAL') {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1030,7 +1040,7 @@ export const generalQuestionnaireController = {
         return error(res, '表单题目不属于此问卷')
       }
 
-      if (formItem.questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, formItem.questionnaire)) || formItem.questionnaire.type !== 'GENERAL') {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1074,15 +1084,13 @@ export const generalQuestionnaireController = {
       }
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1090,22 +1098,19 @@ export const generalQuestionnaireController = {
         return error(res, '已发布的问卷不能修改')
       }
 
-      // 批量更新排序
-      await prisma.$transaction(
-        result.data.items.map((item) => {
-          if (item.type === 'form') {
-            return prisma.questionnaireFormItem.update({
-              where: { id: item.id },
-              data: { position: item.position },
-            })
-          } else {
-            return prisma.questionnaireScale.update({
-              where: { id: item.id },
-              data: { position: item.position },
-            })
-          }
-        })
-      )
+      const formIds = result.data.items.filter((item) => item.type === 'form').map((item) => item.id)
+      const scaleIds = result.data.items.filter((item) => item.type === 'scale').map((item) => item.id)
+      const [forms, scales] = await Promise.all([
+        prisma.questionnaireFormItem.findMany({ where: { id: { in: formIds }, questionnaireId: id }, select: { id: true } }),
+        prisma.questionnaireScale.findMany({ where: { id: { in: scaleIds }, questionnaireId: id }, select: { id: true } }),
+      ])
+      if (forms.length !== formIds.length || scales.length !== scaleIds.length) return error(res, '存在不属于此问卷的内容项')
+      await prisma.$transaction(async (tx) => {
+        for (const item of result.data.items) {
+          if (item.type === 'form') await tx.questionnaireFormItem.update({ where: { id: item.id }, data: { position: item.position } })
+          else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
+        }
+      })
 
       logger.info('泛化问卷内容排序更新', { questionnaireId: id, userId })
 
@@ -1137,15 +1142,13 @@ export const generalQuestionnaireController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await generalQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
+      if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 

@@ -42,6 +42,7 @@ model User {
   questionnaireAssessments            QuestionnaireAssessment[]        @relation("UserQuestionnaireAssessments")
   // 访问令牌关联（新增）
   createdAccessTokens                 QuestionnaireAccessToken[]       @relation("TokenCreator")
+  exportArtifacts                     ExportArtifact[]                 @relation("ExportArtifactCreator")
   // 匿名打卡令牌关联
   createdCheckinTokens                CheckinAccessToken[]             @relation("CheckinTokenCreator")
   // 文档库关联
@@ -567,7 +568,11 @@ model QuestionnaireAssessment {
 model QuestionnaireAccessToken {
   id              String   @id @default(uuid())
   questionnaireId String   @map("questionnaire_id")
-  token           String   @unique // 访问令牌
+  // Legacy plaintext is retained nullable during the dual-read/backfill
+  // window. New writes populate tokenHash + tokenEncrypted only.
+  token           String?  @unique // legacy compatibility column
+  tokenHash       String?  @unique @map("token_hash")
+  tokenEncrypted  String?  @map("token_encrypted")
   createdBy       String   @map("created_by")
   expiresAt       DateTime @map("expires_at") // 过期时间
   maxUses         Int      @default(0) @map("max_uses") // 最大访问次数，0表示无限制
@@ -586,6 +591,27 @@ model QuestionnaireAccessToken {
   @@index([expiresAt])
   @@index([isActive, expiresAt]) // 新增：有效令牌查询优化
   @@map("questionnaire_access_tokens")
+}
+
+// Metadata authority for generated exports. The file itself remains on the
+// configured export storage; every download must resolve through this row.
+model ExportArtifact {
+  id           String   @id @default(uuid())
+  resourceType String   @map("resource_type")
+  resourceId   String   @map("resource_id")
+  createdBy    String   @map("created_by")
+  format       String
+  anonymized   Boolean  @default(false)
+  storageKey   String   @map("storage_key")
+  createdAt    DateTime @default(now()) @map("created_at")
+  expiresAt    DateTime @map("expires_at")
+
+  creator User @relation("ExportArtifactCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([resourceType, resourceId])
+  @@index([createdBy])
+  @@index([expiresAt])
+  @@map("export_artifacts")
 }
 
 // 课程-问卷关联表

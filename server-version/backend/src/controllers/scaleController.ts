@@ -30,6 +30,7 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
+import { createExportArtifact, resolveArtifactForDownload } from '../services/exportArtifactService'
 
 // ==================== Validation Schemas ====================
 
@@ -984,14 +985,18 @@ export const scaleController = {
         return error(res, '部分课程不存在')
       }
 
+      // A share grants content visibility, not write access. Teachers may
+      // associate a scale only with courses they own; validate the whole
+      // batch before creating any relation.
+      if (userRole !== UserRole.ADMIN && courses.some((course) => course.creatorId !== userId)) {
+        return forbidden(res, '只能关联自己创建的课程')
+      }
+
       // 批量创建关联（忽略已存在的）
-      const created = await prisma.courseScale.createMany({
-        data: courseIds.map(courseId => ({
-          scaleId,
-          courseId
-        })),
-        skipDuplicates: true
-      })
+      const created = await prisma.$transaction(async (tx) => tx.courseScale.createMany({
+        data: courseIds.map(courseId => ({ scaleId, courseId })),
+        skipDuplicates: true,
+      }))
 
       return success(res, { added: created.count }, '课程关联成功')
     } catch (err) {
@@ -1086,6 +1091,28 @@ export const scaleController = {
         dateRange
       }, format as 'csv' | 'sav' | 'spss')
 
+      const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
+      const addArtifact = async (filePath: string, artifactFormat: string) => {
+        const artifact = await createExportArtifact({
+          resourceType: 'SCALE',
+          resourceId: scaleId,
+          createdBy: userId!,
+          format: artifactFormat,
+          anonymized: anonymize,
+          storageKey: path.basename(filePath),
+        })
+        artifacts.push({
+          id: artifact.id,
+          format: artifactFormat,
+          fileName: path.basename(filePath),
+          expiresAt: artifact.expiresAt.toISOString(),
+          downloadUrl: `/api/scales/exports/${artifact.id}`,
+        })
+      }
+      if (files.csvPath) await addArtifact(files.csvPath, 'csv')
+      if (files.savPath) await addArtifact(files.savPath, 'sav')
+      if (files.spsPath) await addArtifact(files.spsPath, 'sps')
+
       logger.info(`量表数据导出成功: ${scale.name}, 记录数: ${exportData.rows.length}, 格式: ${format}, 脱敏: ${anonymize}`)
 
       const result: any = {
@@ -1097,7 +1124,8 @@ export const scaleController = {
           type: f.type
         })),
         format,
-        anonymize  // 返回实际使用的脱敏状态
+        anonymize,
+        artifacts,
       }
 
       // 只向客户端返回可下载的文件名，不暴露服务器文件系统路径。
@@ -1175,19 +1203,14 @@ export const scaleController = {
   // 下载导出文件
   async downloadExportFile(req: Request, res: Response) {
     try {
-      const { fileName } = req.params
-      // 使用 __dirname 确保路径正确
-      const exportDir = path.join(__dirname, '../../exports')
-      const filePath = path.join(exportDir, fileName)
-
-      logger.info(`下载导出文件: ${filePath}`)
-
-      if (!fs.existsSync(filePath)) {
-        logger.error(`文件不存在: ${filePath}`)
-        return notFound(res, '文件不存在')
-      }
-
-      return res.download(filePath)
+      const artifactId = req.params.artifactId || req.params.fileName
+      const actor = req.user ? { userId: req.user.userId, role: req.user.role } : null
+      if (!actor) return forbidden(res, '未授权')
+      const resolved = await resolveArtifactForDownload(artifactId, actor)
+      if (resolved.reason === 'forbidden') return forbidden(res, '无权限下载此文件')
+      if (!resolved.filePath) return notFound(res, '文件不存在')
+      logger.info('下载导出文件', { artifactId, userId: actor.userId })
+      return res.download(resolved.filePath)
     } catch (err) {
       logger.error('下载导出文件错误', err)
       return error(res, '下载文件失败')
