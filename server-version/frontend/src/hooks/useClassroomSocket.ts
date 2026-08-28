@@ -27,6 +27,7 @@ interface SocketEvents {
   'student:joined'?: (data: any) => void
   'student:submitted'?: (data: any) => void
   'broadcast:question'?: (data: any) => void
+  'teacher:started'?: (data: any) => void
   'broadcast:finished'?: (data: any) => void
   'broadcast:next'?: (data: any) => void
   'broadcast:closed'?: (data: any) => void
@@ -89,6 +90,11 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
   const [connectionState, setConnectionState] = useState<ClassroomSocketState | 'DISCONNECTED'>('DISCONNECTED')
   const socketRef = useRef<Socket | null>(null)
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onHttpFallbackRef = useRef(onHttpFallback)
+
+  useEffect(() => {
+    onHttpFallbackRef.current = onHttpFallback
+  }, [onHttpFallback])
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) {
@@ -155,7 +161,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
       setConnectionState('FAILED')
       clearFallbackTimer()
       fallbackTimerRef.current = setTimeout(() => {
-        if (!socket.connected) void onHttpFallback?.()
+        if (!socket.connected) void onHttpFallbackRef.current?.()
       }, 30_000)
     })
 
@@ -173,7 +179,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
       }
       setError(data?.message || '发生错误')
     })
-  }, [classroomCode, classroomId, onHttpFallback, role])
+  }, [classroomCode, classroomId, role])
 
   const disconnect = useCallback(() => {
     if (socketRef.current) {

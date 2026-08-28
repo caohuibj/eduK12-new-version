@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:guarded": "node scripts/pr24-migration-preflight.mjs && prisma migrate deploy",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
@@ -22,6 +23,7 @@
     "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "test:integration:cognitive": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts",
     "test:integration:composite": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
+    "test:integration:pr26": "vitest run src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts src/__tests__/classroom/classroom-start.postgres.integration.test.ts",
     "test:integration:pr8": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend"
   },

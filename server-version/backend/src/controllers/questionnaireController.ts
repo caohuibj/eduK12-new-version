@@ -10,7 +10,7 @@ import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
-import { readContextFormAnswer, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
+import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
   freezeQuestionnaireAssessmentContext,
@@ -21,6 +21,7 @@ import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownlo
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
+import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -1153,13 +1154,6 @@ export const questionnaireController = {
       const action = result.data.action || 'answer'
       const value = result.data.value
 
-      // 处理多选题答案格式：数组转JSON字符串
-      const valueToStore = action === 'skip'
-        ? null
-        : Array.isArray(value)
-          ? JSON.stringify(value)
-          : value as string
-
       const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
           where: { id: assessmentId },
@@ -1191,11 +1185,21 @@ export const questionnaireController = {
             if (isAssessmentContextServiceError(error)) return { kind: 'context-frozen' as const }
             throw error
           }
-          const contextValue = Array.isArray(value) ? JSON.stringify(value) : String(value ?? '')
-          const validationMessage = validateContextAnswer(formItem, contextValue)
+        }
+
+        if (action === 'answer') {
+          const validationMessage = validateQuestionnaireFormAnswer(formItem, value)
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
 
+        const normalizedValue = action === 'answer' && value !== undefined
+          ? normalizeQuestionnaireFormAnswer(formItem, value)
+          : value
+        const valueToStore = action === 'skip'
+          ? null
+          : Array.isArray(normalizedValue)
+            ? JSON.stringify(normalizedValue)
+            : normalizedValue as string
         const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
         const formAnswer = await tx.questionnaireFormAnswer.upsert({
           where: {
@@ -1296,9 +1300,8 @@ export const questionnaireController = {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
           const action = answer.action || 'answer'
           if (action === 'skip' && (item?.required || item?.contextKey)) return { kind: 'skip-not-allowed' as const }
-          const value = Array.isArray(answer.value) ? JSON.stringify(answer.value) : answer.value
-          if (item?.contextKey && value !== undefined) {
-            const validationMessage = validateContextAnswer(item, value)
+          if (action === 'answer' && item) {
+            const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
             if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
           }
         }
@@ -1306,7 +1309,10 @@ export const questionnaireController = {
         for (const answer of answers) {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
           const action = answer.action || 'answer'
-          const value = action === 'skip' ? null : (Array.isArray(answer.value) ? JSON.stringify(answer.value) : answer.value as string)
+          const normalizedValue = action === 'answer' && answer.value !== undefined
+            ? normalizeQuestionnaireFormAnswer(item || { type: 'unknown' }, answer.value)
+            : answer.value
+          const value = action === 'skip' ? null : (Array.isArray(normalizedValue) ? JSON.stringify(normalizedValue) : normalizedValue as string)
           await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
@@ -1520,6 +1526,18 @@ export const questionnaireController = {
 
       if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
+      }
+
+      // Removing a relation is also a write to the target course. A teacher
+      // may only remove relations from courses they own; CourseShare grants
+      // visibility, never mutation authority.
+      if (userRole !== UserRole.ADMIN) {
+        const course = await prisma.course.findUnique({
+          where: { id: courseId },
+          select: { id: true, creatorId: true },
+        })
+        if (!course) return notFound(res, '课程不存在')
+        if (course.creatorId !== userId) return forbidden(res, '只能修改自己创建的课程关联')
       }
 
       await prisma.courseQuestionnaire.delete({

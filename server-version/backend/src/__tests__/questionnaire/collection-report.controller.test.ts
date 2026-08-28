@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Prisma } from '@prisma/client'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
@@ -136,7 +137,8 @@ describe('collection-only questionnaire completion/report contract', () => {
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'qa-1', status: 'IN_PROGRESS' },
       data: expect.objectContaining({
-        aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v2' }),
+        aggregateReport: Prisma.DbNull,
+        aggregateReportEncrypted: expect.any(String),
       }),
     }))
   })
@@ -151,7 +153,7 @@ describe('collection-only questionnaire completion/report contract', () => {
     expect(res.json).toHaveBeenCalled()
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ scaleReports: expect.any(Array) }) }),
+      data: expect.objectContaining({ aggregateReport: Prisma.DbNull, aggregateReportEncrypted: expect.any(String) }),
     }))
   })
 
@@ -179,7 +181,7 @@ describe('collection-only questionnaire completion/report contract', () => {
 
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ aggregateReport: expect.objectContaining({ reportDefinitionVersion: 'collection-only-v2' }) }),
+      data: expect.objectContaining({ aggregateReport: Prisma.DbNull, aggregateReportEncrypted: expect.any(String) }),
     }))
   })
 

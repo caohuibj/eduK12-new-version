@@ -27,6 +27,18 @@ interface Classroom {
   questions: Question[]
 }
 
+const questionFromSocket = (data: any): Question | null => {
+  if (!data?.questionId) return null
+  return {
+    id: data.questionId,
+    questionIndex: Number(data.questionIndex ?? 0),
+    questionContent: data.questionContent,
+    timeLimit: data.timeLimit ?? null,
+    startedAt: data.startedAt ?? new Date().toISOString(),
+    endedAt: data.endedAt ?? null,
+  }
+}
+
 const ClassroomControl: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -67,12 +79,13 @@ const ClassroomControl: React.FC = () => {
   })
 
   // 获取课堂信息
-  const fetchClassroom = async () => {
+  const fetchClassroom = useCallback(async () => {
     try {
       setLoading(true)
       const response = await apiClient.get<Classroom>(`/classrooms/${id}`)
       if (response.code === 0 && response.data) {
         setClassroom(response.data)
+        setCurrentQuestion(response.data.questions.find((question) => question.startedAt && !question.endedAt) || null)
       } else {
         alert(response.message || '课堂信息缺失')
         navigate('/teacher/classrooms')
@@ -83,11 +96,11 @@ const ClassroomControl: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, navigate])
 
   useEffect(() => {
-    fetchClassroom()
-  }, [id])
+    void fetchClassroom()
+  }, [fetchClassroom])
 
   // 监听 Socket 事件
   useEffect(() => {
@@ -95,6 +108,11 @@ const ClassroomControl: React.FC = () => {
 
     // 教师加入成功
     on('teacher:joined', (data) => {
+      if (data?.status) {
+        setClassroom((previous) => previous ? { ...previous, status: data.status } : previous)
+      }
+      const activeQuestion = questionFromSocket(data?.currentQuestion)
+      setCurrentQuestion(activeQuestion)
     })
 
     // 实时统计
@@ -111,23 +129,30 @@ const ClassroomControl: React.FC = () => {
 
     // 题目开始
     on('broadcast:question', (data) => {
-      setCurrentQuestion({
-        id: data.questionId,
-        questionIndex: data.questionIndex,
-        questionContent: data.questionContent,
-        timeLimit: data.timeLimit,
-        startedAt: new Date().toISOString(),
-        endedAt: null,
-      })
+      const activeQuestion = questionFromSocket(data)
+      if (activeQuestion) setCurrentQuestion(activeQuestion)
+    })
+
+    // A concurrent start may be reconciled by the server before this client
+    // receives its ACK. Keep the compatibility event authoritative as well.
+    on('teacher:started', (data) => {
+      const activeQuestion = questionFromSocket(data)
+      if (!activeQuestion) return
+      setCurrentQuestion(activeQuestion)
+      setClassroom((previous) => previous ? {
+        ...previous,
+        status: 'ACTIVE',
+        questions: previous.questions.map((candidate) => candidate.id === activeQuestion.id ? activeQuestion : candidate),
+      } : previous)
     })
 
     // 答题结束
     on('broadcast:finished', (data) => {
       setCurrentQuestion((prev) => {
-        if (prev) {
+        if (prev && (!data?.questionId || prev.id === data.questionId)) {
           return {
             ...prev,
-            endedAt: new Date().toISOString(),
+            endedAt: data.endedAt || new Date().toISOString(),
           }
         }
         return prev
@@ -148,10 +173,11 @@ const ClassroomControl: React.FC = () => {
       off('broadcast:stats')
       off('broadcast:online')
       off('broadcast:question')
+      off('teacher:started')
       off('broadcast:finished')
       off('broadcast:next')
     }
-  }, [currentQuestion?.id, isConnected, on, off])
+  }, [currentQuestion?.id, fetchClassroom, isConnected, on, off])
 
   // 开始答题
   const handleStartQuestion = () => {
@@ -177,13 +203,28 @@ const ClassroomControl: React.FC = () => {
     emit('teacher:start', {
       questionId: question.id,
       timeLimit: question.timeLimit || 60,
+    }, (payload) => {
+      const result = payload as { ok?: boolean; started?: boolean; message?: string; question?: unknown } | undefined
+      const authoritative = questionFromSocket(result?.question)
+      if (authoritative) {
+        setCurrentQuestion(authoritative)
+        setClassroom((previous) => previous ? {
+          ...previous,
+          status: authoritative.startedAt && !authoritative.endedAt ? 'ACTIVE' : (result?.ok ? 'ACTIVE' : previous.status),
+          questions: previous.questions.map((candidate) => candidate.id === authoritative.id ? authoritative : candidate),
+        } : previous)
+      }
+      if (!result?.ok) {
+        setConnectionNotice(result?.message || '题目开始失败，请重试')
+        return
+      }
+      setConnectionNotice(null)
+      if (result.started) {
+        // 自动打开大屏窗口 only after the server has committed the start.
+        const bigscreenUrl = `/bigscreen/${classroom.id}`
+        window.open(bigscreenUrl, `bigscreen-${classroom.id}`, 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no')
+      }
     })
-
-    setCurrentQuestion(question)
-
-    // 自动打开大屏窗口
-    const bigscreenUrl = `/bigscreen/${classroom.id}`
-    window.open(bigscreenUrl, `bigscreen-${classroom.id}`, 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no')
   }
 
   // 结束答题

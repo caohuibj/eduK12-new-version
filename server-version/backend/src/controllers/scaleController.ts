@@ -1003,6 +1003,17 @@ export const scaleController = {
   async listCourseScales(req: Request, res: Response) {
     try {
       const { scaleId } = req.params
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+
+      const scale = await prisma.scale.findUnique({
+        where: { id: scaleId },
+        select: { id: true, creatorId: true, status: true },
+      })
+      if (!scale) return notFound(res, '量表不存在')
+      if (!userId || !userRole || !(await canUseScale(userId, userRole, scale))) {
+        return forbidden(res, '无权限查看此量表的课程关联')
+      }
 
       const courseScales = await prisma.courseScale.findMany({
         where: { scaleId },
@@ -1013,13 +1024,24 @@ export const scaleController = {
               title: true,
               courseCode: true,
               status: true,
+              creatorId: true,
             }
           }
         }
       })
 
       return success(res, {
-        list: courseScales.map(cs => cs.course),
+        list: courseScales.map(cs => ({
+          id: cs.course.id,
+          title: cs.course.title,
+          status: cs.course.status,
+          // A granted teacher may use the scale but must not enumerate a
+          // course's join code unless they own that course (admins may see
+          // all codes).
+          ...(userRole === UserRole.ADMIN || cs.course.creatorId === userId
+            ? { courseCode: cs.course.courseCode }
+            : {}),
+        })),
         total: courseScales.length,
       })
     } catch (err) {
@@ -1100,6 +1122,15 @@ export const scaleController = {
 
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限修改此量表')
+      }
+
+      if (userRole !== UserRole.ADMIN) {
+        const course = await prisma.course.findUnique({
+          where: { id: courseId },
+          select: { id: true, creatorId: true },
+        })
+        if (!course) return notFound(res, '课程不存在')
+        if (course.creatorId !== userId) return forbidden(res, '只能修改自己创建的课程关联')
       }
 
       await prisma.courseScale.delete({

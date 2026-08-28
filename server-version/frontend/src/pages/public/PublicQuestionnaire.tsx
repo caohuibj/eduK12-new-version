@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result } from 'antd'
 import { SafetyOutlined } from '@ant-design/icons'
 import { completePOW } from '../../utils/powService'
+import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
 import {
-  questionnaireResumeHeaders,
   readQuestionnaireSessionId,
+  readQuestionnaireResumeToken,
   saveQuestionnaireResumeToken,
 } from '../../utils/questionnaireResume'
 
@@ -30,16 +31,9 @@ const PublicQuestionnaire: React.FC = () => {
       setLoading(true)
       
       // 获取问卷信息（GET 请求，无需 POW）
-      const response = await fetch(`/api/public/questionnaires/${token}`, {
-        headers: questionnaireResumeHeaders(token, readQuestionnaireSessionId(token)),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || '访问失败')
-      }
-
-      const data = await response.json()
+      const sessionId = readQuestionnaireSessionId(token)
+      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      const data = await client.get<{ questionnaire: any }>(`/questionnaires/${token}`)
       setQuestionnaire(data.data.questionnaire)
       
     } catch (err: any) {
@@ -64,25 +58,12 @@ const PublicQuestionnaire: React.FC = () => {
       // 2. 开始测评
       const sessionId = readQuestionnaireSessionId(token)
 
-      const response = await fetch(`/api/public/questionnaires/${token}/start`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...questionnaireResumeHeaders(token, sessionId),
-        },
-        body: JSON.stringify({ 
+      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      const data = await client.post<{ sessionId: string; resumeToken?: string }>(`/questionnaires/${token}/start`, {
           sessionId,
           challenge: powResult.challenge,
           proof: powResult.proof
         })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || '开始测评失败')
-      }
-
-      const data = await response.json()
       
       if (token && data.data.resumeToken) {
         saveQuestionnaireResumeToken(token, data.data.sessionId, data.data.resumeToken)

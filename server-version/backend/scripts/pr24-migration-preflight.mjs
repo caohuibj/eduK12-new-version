@@ -8,6 +8,17 @@ const tables = ['assessments', 'scales', 'scale_items', 'dimensions']
 try {
   const counts = {}
   for (const table of tables) {
+    const existsRows = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = ${table}
+      ) AS exists
+    `
+    if (!existsRows[0]?.exists) {
+      counts[table] = 0
+      continue
+    }
     const rows = await prisma.$queryRawUnsafe(`SELECT COUNT(*)::int AS count FROM "${table}"`)
     counts[table] = Number(rows[0]?.count || 0)
   }

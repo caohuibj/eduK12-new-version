@@ -46,6 +46,9 @@ export const createPublicCapabilityClient = (capability: string, options: { base
       if (!payload || typeof payload !== 'object' || typeof (payload as any).code !== 'number' || typeof (payload as any).message !== 'string') {
         throw new PublicCapabilityError('服务响应格式无效', response.status)
       }
+      if ((payload as any).code !== 0) {
+        throw new PublicCapabilityError((payload as any).message, response.status, (payload as any).code)
+      }
       return payload as ApiResponse<T>
     } catch (error) {
       if (error instanceof PublicCapabilityError) throw error
