@@ -20,7 +20,7 @@ router.post('/assessments/:id/complete', authenticate, questionnaireController.c
 router.get('/assessments/:id/report', authenticate, questionnaireController.getReport)
 
 // 下载导出文件（必须在 /:id 之前）
-router.get('/exports/:fileName', authenticate, questionnaireController.downloadExportFile)
+router.get('/exports/:artifactId', authenticate, questionnaireController.downloadExportFile)
 
 // 获取问卷详情
 router.get('/:id', authenticate, questionnaireController.detail)

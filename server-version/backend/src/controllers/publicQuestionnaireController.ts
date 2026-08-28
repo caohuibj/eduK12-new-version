@@ -56,7 +56,7 @@ export const publicQuestionnaireController = {
    */
   async getPOWChallenge(req: Request, res: Response) {
     try {
-      const challenge = powService.generateChallenge(4) // 难度4
+      const challenge = await powService.generateChallenge(4) // 难度4
       
       return success(res, {
         challenge: challenge.challenge,
@@ -203,11 +203,11 @@ export const publicQuestionnaireController = {
       if (typeof challenge !== 'string' || typeof proof !== 'string' || !challenge || !proof) {
         return error(res, '缺少 POW 验证信息', -1, 400)
       }
-      const storedChallenge = powService.getChallenge(challenge)
+      const storedChallenge = await powService.getChallenge(challenge)
       if (!storedChallenge) {
         return error(res, 'POW 挑战已过期，请刷新页面重试', -1, 400)
       }
-      const powValid = powService.verifyPOW(challenge, proof, storedChallenge.difficulty)
+      const powValid = await powService.verifyPOW(challenge, proof, storedChallenge.difficulty)
       if (!powValid) {
         return error(res, 'POW 验证失败', -1, 400)
       }
@@ -478,7 +478,7 @@ export const publicQuestionnaireController = {
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
         const created = await prisma.$transaction(async (tx) => {
-          const claimed = await tokenService.claimAccess(tokenId, tx)
+          const claimed = await tokenService.claimAccess(tokenId, tx, validation.token!.questionnaireId)
           if (!claimed) return null
 
           const assessment = await tx.questionnaireAssessment.create({

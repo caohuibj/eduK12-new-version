@@ -32,6 +32,7 @@ const configSchema = z.object({
   cognitiveModuleEnabled: z.boolean(),
   // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
   materialGrantsEnabled: z.boolean(),
+  socketRedisRequired: z.boolean(),
   // Cognitive 参与者假名化密钥（64 位十六进制；生产环境必需，独立于 DATA_ENCRYPTION_KEY）
   dataPseudonymKey: z.string().optional(),
   // COS 配置 (可选)
@@ -115,6 +116,7 @@ const rawConfig = {
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
+  socketRedisRequired: parseBooleanEnv('SOCKET_REDIS_REQUIRED', false),
   // Cognitive 参与者假名化密钥（生产环境必需）
   dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)

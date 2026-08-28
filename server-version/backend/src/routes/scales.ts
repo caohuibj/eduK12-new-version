@@ -7,7 +7,7 @@ const router = Router()
 // ==================== 导出文件下载（放在最前面避免路由冲突） ====================
 
 // 下载导出文件
-router.get('/exports/:fileName', authenticate, scaleController.downloadExportFile)
+router.get('/exports/:artifactId', authenticate, scaleController.downloadExportFile)
 
 // ==================== 公开接口（需要登录） ====================
 

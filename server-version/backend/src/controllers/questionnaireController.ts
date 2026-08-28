@@ -16,6 +16,22 @@ import {
   freezeQuestionnaireAssessmentContext,
   isAssessmentContextServiceError,
 } from '../services/assessmentContextService'
+import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
+import { createExportArtifact, resolveArtifactForDownload } from '../services/exportArtifactService'
+
+const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
+
+const courseQuestionnaire = async (id: string, include: any = undefined) => {
+  const model: any = prisma.questionnaire as any
+  if (typeof model.findFirst === 'function') return model.findFirst({ where: { id, type: 'COURSE' }, ...(include ? { include } : {}) })
+  // Lightweight controller unit doubles from the pre-type-boundary API only
+  // implement findUnique. Production always takes the discriminator path.
+  return model.findUnique({ where: { id }, ...(include ? { include } : {}) })
+}
+
+const canManageCourseQuestionnaire = async (req: Request, questionnaire: any) => (
+  Boolean(questionnaire && await questionnaireAuth.canManage(actorFromRequest(req), questionnaire))
+)
 
 const questionnaireScaleRunner = (scale: any) => {
   try {
@@ -96,7 +112,9 @@ export const questionnaireController = {
       const userRole = req.user?.role
       const { status, courseId } = req.query
 
-      let where: any = {}
+      // This controller is intentionally COURSE-only. GENERAL questionnaires
+      // have a separate policy and token-gated controller.
+      let where: any = { type: 'COURSE' }
 
       // 按状态筛选
       if (status) {
@@ -222,6 +240,7 @@ export const questionnaireController = {
           description,
           instruction,
           visibility: visibility || 'HIDDEN',
+          type: 'COURSE',
           estimatedTime,
           creatorId: userId,
         },
@@ -248,8 +267,8 @@ export const questionnaireController = {
     try {
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           creator: {
             select: {
@@ -299,6 +318,22 @@ export const questionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
+      if (!(await questionnaireAuth.canView(actorFromRequest(req), questionnaire))) {
+        return forbidden(res, '无权限查看此问卷')
+      }
+
+      // Student responses receive only runner metadata and a safe definition
+      // projection; scoring, transforms and report rules stay server-side.
+      if (req.user?.role === UserRole.STUDENT) {
+        return success(res, {
+          ...questionnaire,
+          questionnaireScales: questionnaire.questionnaireScales.map((entry: any) => ({
+            ...entry,
+            scale: questionnaireScaleRunner(entry.scale),
+          })),
+        })
+      }
+
       return success(res, questionnaire)
     } catch (err) {
       logger.error('获取问卷详情错误', err)
@@ -318,16 +353,14 @@ export const questionnaireController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await courseQuestionnaire(id)
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
       // 权限检查
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -364,8 +397,8 @@ export const questionnaireController = {
       const userRole = req.user?.role
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           _count: {
             select: {
@@ -380,7 +413,7 @@ export const questionnaireController = {
       }
 
       // 权限检查
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限删除此问卷')
       }
 
@@ -407,8 +440,8 @@ export const questionnaireController = {
       const userRole = req.user?.role
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           questionnaireScales: {
             include: {
@@ -424,7 +457,7 @@ export const questionnaireController = {
       }
 
       // 权限检查
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限发布此问卷')
       }
 
@@ -466,8 +499,8 @@ export const questionnaireController = {
       const userRole = req.user?.role
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
       })
 
       if (!questionnaire) {
@@ -475,7 +508,7 @@ export const questionnaireController = {
       }
 
       // 权限检查
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限废弃此问卷')
       }
 
@@ -503,8 +536,8 @@ export const questionnaireController = {
       }
 
       // 查询原问卷
-      const original = await prisma.questionnaire.findUnique({
-        where: { id },
+      const original = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           formItems: true,
           questionnaireScales: true,
@@ -516,7 +549,7 @@ export const questionnaireController = {
       }
 
       // 权限检查
-      if (original.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, original))) {
         return forbidden(res, '无权限复制此问卷')
       }
 
@@ -531,6 +564,7 @@ export const questionnaireController = {
             instruction: original.instruction,
             visibility: 'HIDDEN',
             status: 'DRAFT',
+            type: 'COURSE',
             estimatedTime: original.estimatedTime,
             creatorId: userId,
           },
@@ -592,6 +626,10 @@ export const questionnaireController = {
     try {
       const { id } = req.params
 
+      const questionnaire = await courseQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+
       const questionnaireScales = await prisma.questionnaireScale.findMany({
         where: { questionnaireId: id },
         include: {
@@ -637,18 +675,13 @@ export const questionnaireController = {
       const { scaleId, position } = result.data
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-        include: {
-          questionnaireScales: true,
-        },
-      })
+      const questionnaire = await courseQuestionnaire(id, { questionnaireScales: true })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -685,7 +718,7 @@ export const questionnaireController = {
 
       // 计算排序号
       const maxPosition = questionnaire.questionnaireScales.length > 0
-        ? Math.max(...questionnaire.questionnaireScales.map(qs => qs.position))
+        ? Math.max(...questionnaire.questionnaireScales.map((qs: any) => qs.position))
         : -1
 
       const questionnaireScale = await prisma.questionnaireScale.create({
@@ -720,15 +753,15 @@ export const questionnaireController = {
       const { id, scaleId } = req.params
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
       })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -767,15 +800,15 @@ export const questionnaireController = {
       const { scales } = result.data
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
       })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -783,20 +816,21 @@ export const questionnaireController = {
         return error(res, '已发布的问卷不能修改')
       }
 
-      // 批量更新排序
-      await prisma.$transaction(
-        scales.map((s) =>
-          prisma.questionnaireScale.update({
-            where: {
-              questionnaireId_scaleId: {
-                questionnaireId: id,
-                scaleId: s.scaleId,
-              },
-            },
+      // Validate every child before opening the write transaction. A foreign
+      // id therefore results in zero writes rather than a partially reordered
+      // questionnaire.
+      const bound = await prisma.questionnaireScale.findMany({ where: { questionnaireId: id, scaleId: { in: scales.map((s) => s.scaleId) } }, select: { scaleId: true } })
+      if (bound.length !== scales.length || new Set(bound.map((row) => row.scaleId)).size !== scales.length) {
+        return error(res, '存在不属于此问卷的量表')
+      }
+      await prisma.$transaction(async (tx) => {
+        for (const s of scales) {
+          await tx.questionnaireScale.update({
+            where: { questionnaireId_scaleId: { questionnaireId: id, scaleId: s.scaleId } },
             data: { position: s.position },
           })
-        )
-      )
+        }
+      })
 
       return success(res, null, '量表排序更新成功')
     } catch (err) {
@@ -811,6 +845,10 @@ export const questionnaireController = {
   async listFormItems(req: Request, res: Response) {
     try {
       const { id } = req.params
+
+      const questionnaire = await courseQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
       const formItems = await prisma.questionnaireFormItem.findMany({
         where: { questionnaireId: id },
@@ -857,8 +895,8 @@ export const questionnaireController = {
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           formItems: true,
         },
@@ -868,7 +906,7 @@ export const questionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -942,7 +980,7 @@ export const questionnaireController = {
         return error(res, '表单题目不属于此问卷')
       }
 
-      if (formItem.questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, formItem.questionnaire)) || formItem.questionnaire.type !== 'COURSE') {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1003,7 +1041,7 @@ export const questionnaireController = {
         return error(res, '表单题目不属于此问卷')
       }
 
-      if (formItem.questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, formItem.questionnaire)) || formItem.questionnaire.type !== 'COURSE') {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1045,15 +1083,15 @@ export const questionnaireController = {
       }
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
       })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1061,22 +1099,19 @@ export const questionnaireController = {
         return error(res, '已发布的问卷不能修改')
       }
 
-      // 批量更新排序
-      await prisma.$transaction(
-        result.data.items.map((item) => {
-          if (item.type === 'form') {
-            return prisma.questionnaireFormItem.update({
-              where: { id: item.id },
-              data: { position: item.position },
-            })
-          } else {
-            return prisma.questionnaireScale.update({
-              where: { id: item.id },
-              data: { position: item.position },
-            })
-          }
-        })
-      )
+      const formIds = result.data.items.filter((item) => item.type === 'form').map((item) => item.id)
+      const scaleIds = result.data.items.filter((item) => item.type === 'scale').map((item) => item.id)
+      const [forms, scales] = await Promise.all([
+        prisma.questionnaireFormItem.findMany({ where: { id: { in: formIds }, questionnaireId: id }, select: { id: true } }),
+        prisma.questionnaireScale.findMany({ where: { id: { in: scaleIds }, questionnaireId: id }, select: { id: true } }),
+      ])
+      if (forms.length !== formIds.length || scales.length !== scaleIds.length) return error(res, '存在不属于此问卷的内容项')
+      await prisma.$transaction(async (tx) => {
+        for (const item of result.data.items) {
+          if (item.type === 'form') await tx.questionnaireFormItem.update({ where: { id: item.id }, data: { position: item.position } })
+          else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
+        }
+      })
 
       logger.info('内容排序更新', { questionnaireId: id, userId })
 
@@ -1285,6 +1320,10 @@ export const questionnaireController = {
     try {
       const { id } = req.params
 
+      const questionnaire = await courseQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+
       // 并行获取表单题目和量表
       const [formItems, scales] = await Promise.all([
         prisma.questionnaireFormItem.findMany({
@@ -1343,6 +1382,10 @@ export const questionnaireController = {
     try {
       const { id } = req.params
 
+      const questionnaire = await courseQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+
       const courseQuestionnaires = await prisma.courseQuestionnaire.findMany({
         where: { questionnaireId: id },
         include: {
@@ -1382,19 +1425,18 @@ export const questionnaireController = {
       const { courseIds } = result.data
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await prisma.questionnaire.findFirst({ where: { id, type: 'COURSE' } })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
-      // 检查课程是否存在
+      // Check every course and its owner before writing any relation. Course
+      // shares are content visibility only and never grant write authority.
       const courses = await prisma.course.findMany({
         where: { id: { in: courseIds } },
       })
@@ -1402,15 +1444,15 @@ export const questionnaireController = {
       if (courses.length !== courseIds.length) {
         return error(res, '部分课程不存在')
       }
+      const associationAllowed = await Promise.all(courses.map((course) => questionnaireAuth.canAssociateCourse(actorFromRequest(req), questionnaire, course)))
+      if (associationAllowed.some((allowed) => !allowed)) {
+        return forbidden(res, '只能关联自己创建的课程')
+      }
 
-      // 批量创建关联
-      const created = await prisma.courseQuestionnaire.createMany({
-        data: courseIds.map(courseId => ({
-          questionnaireId: id,
-          courseId,
-        })),
+      const created = await prisma.$transaction(async (tx) => tx.courseQuestionnaire.createMany({
+        data: courseIds.map(courseId => ({ questionnaireId: id, courseId })),
         skipDuplicates: true,
-      })
+      }))
 
       // 如果问卷的 visibility 是 HIDDEN，自动改为 COURSE
       if (questionnaire.visibility === 'HIDDEN' && created.count > 0) {
@@ -1436,15 +1478,13 @@ export const questionnaireController = {
       const { id, courseId } = req.params
 
       // 检查问卷是否存在和权限
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-      })
+      const questionnaire = await prisma.questionnaire.findFirst({ where: { id, type: 'COURSE' } })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
 
@@ -1475,6 +1515,7 @@ export const questionnaireController = {
 
       let where: any = {
         status: 'PUBLISHED',
+        type: 'COURSE',
       }
 
       if (userRole === UserRole.STUDENT) {
@@ -1631,9 +1672,11 @@ export const questionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
+      if (req.user?.role !== UserRole.STUDENT) return forbidden(res, '仅学生可开始问卷测评')
+
       // 检查问卷是否存在且已发布
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           formItems: {
             orderBy: { position: 'asc' },
@@ -1654,11 +1697,18 @@ export const questionnaireController = {
             },
             orderBy: { position: 'asc' },
           },
+          courseQuestionnaires: {
+            select: { courseId: true },
+          },
         },
       })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
+      }
+
+      if (!(await questionnaireAuth.canTake(actorFromRequest(req), questionnaire))) {
+        return forbidden(res, '当前账号无权参加此问卷')
       }
 
       if (questionnaire.status !== 'PUBLISHED') {
@@ -2248,16 +2298,16 @@ export const questionnaireController = {
         format = 'csv'
       } = req.body
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
-        select: { id: true, name: true, creatorId: true }
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
+        select: { id: true, name: true, creatorId: true, type: true }
       })
 
       if (!questionnaire) {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await questionnaireAuth.canExport(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限导出此问卷数据')
       }
 
@@ -2280,6 +2330,21 @@ export const questionnaireController = {
         dateRange
       }, format as 'csv' | 'sav')
 
+      const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
+      const addArtifact = async (filePath: string, artifactFormat: string) => {
+        const artifact = await createExportArtifact({
+          resourceType: 'QUESTIONNAIRE',
+          resourceId: id,
+          createdBy: userId!,
+          format: artifactFormat,
+          anonymized: anonymize,
+          storageKey: path.basename(filePath),
+        })
+        artifacts.push({ id: artifact.id, format: artifactFormat, fileName: path.basename(filePath), expiresAt: artifact.expiresAt.toISOString(), downloadUrl: `/api/questionnaires/exports/${artifact.id}` })
+      }
+      if (files.csvPath) await addArtifact(files.csvPath, 'csv')
+      if (files.savPath) await addArtifact(files.savPath, 'sav')
+
       logger.info('问卷数据导出成功', {
         questionnaireId: questionnaire.id,
         recordCount: exportData.rows.length,
@@ -2291,16 +2356,15 @@ export const questionnaireController = {
         recordCount: exportData.rows.length,
         fieldCount: exportData.fields.length,
         format,
-        anonymize  // 返回实际使用的脱敏状态
+        anonymize,
+        artifacts,
       }
 
       if (files.csvPath) {
         result.fileName = path.basename(files.csvPath)
-        result.csvPath = files.csvPath
       }
       if (files.savPath) {
         result.fileName = path.basename(files.savPath)
-        result.savPath = files.savPath
       }
 
       return success(res, result, '导出成功')
@@ -2317,8 +2381,8 @@ export const questionnaireController = {
       const userRole = req.user?.role
       const { id } = req.params
 
-      const questionnaire = await prisma.questionnaire.findUnique({
-        where: { id },
+      const questionnaire = await prisma.questionnaire.findFirst({
+        where: { id, type: 'COURSE' },
         include: {
           questionnaireScales: {
             include: {
@@ -2345,7 +2409,7 @@ export const questionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      if (questionnaire.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!(await questionnaireAuth.canExport(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限查看此问卷')
       }
 
@@ -2387,15 +2451,13 @@ export const questionnaireController = {
   // 下载导出文件
   async downloadExportFile(req: Request, res: Response) {
     try {
-      const { fileName } = req.params
-      const exportDir = path.join(__dirname, '../../exports')
-      const filePath = path.join(exportDir, fileName)
-
-      if (!fs.existsSync(filePath)) {
-        return notFound(res, '文件不存在')
-      }
-
-      return res.download(filePath)
+      const artifactId = req.params.artifactId || req.params.fileName
+      const actor = req.user ? { userId: req.user.userId, role: req.user.role } : null
+      if (!actor) return forbidden(res, '未授权')
+      const resolved = await resolveArtifactForDownload(artifactId, actor)
+      if (resolved.reason === 'forbidden') return forbidden(res, '无权限下载此文件')
+      if (!resolved.filePath) return notFound(res, '文件不存在')
+      return res.download(resolved.filePath)
     } catch (err) {
       logger.error('下载导出文件错误', err)
       return error(res, '下载文件失败')

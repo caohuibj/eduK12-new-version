@@ -12,6 +12,8 @@ import { prisma } from '../config/database'
 import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
 import { Prisma } from '@prisma/client'
+import { createHash } from 'crypto'
+import { decryptField, encryptField } from '../utils/encryption'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
@@ -34,6 +36,23 @@ export const tokenService = {
     return `qn_${nanoid()}`
   },
 
+  hashToken(token: string): string {
+    return createHash('sha256').update(token, 'utf8').digest('hex')
+  },
+
+  encryptToken(token: string): string {
+    return encryptField({ token })
+  },
+
+  decryptToken(value: string): string | null {
+    try {
+      const payload = decryptField<{ token?: unknown }>(value)
+      return typeof payload.token === 'string' ? payload.token : null
+    } catch {
+      return null
+    }
+  },
+
   /**
    * 创建新的访问令牌
    */
@@ -50,7 +69,9 @@ export const tokenService = {
     const accessToken = await prisma.questionnaireAccessToken.create({
       data: {
         questionnaireId,
-        token,
+        token: null,
+        tokenHash: this.hashToken(token),
+        tokenEncrypted: this.encryptToken(token),
         createdBy,
         expiresAt,
         maxUses,
@@ -75,7 +96,9 @@ export const tokenService = {
       maxUses,
     })
 
-    return accessToken
+    // The raw bearer is returned once to the caller that just created it. It
+    // is never persisted or logged in plaintext.
+    return { ...accessToken, token }
   },
 
   /**
@@ -83,12 +106,31 @@ export const tokenService = {
    */
   async validateToken(tokenString: string, options: { allowOverLimit?: boolean } = {}): Promise<TokenValidation> {
     // 查询令牌
-    const accessToken = await prisma.questionnaireAccessToken.findUnique({
-      where: { token: tokenString },
-      include: {
-        questionnaire: true,
-      },
+    const tokenHash = this.hashToken(tokenString)
+    // New rows are looked up by a deterministic hash. The legacy lookup is
+    // retained only for rows that have not gone through backfill yet.
+    let accessToken = await prisma.questionnaireAccessToken.findUnique({
+      where: { tokenHash },
+      include: { questionnaire: true },
     })
+    if (!accessToken) {
+      accessToken = await prisma.questionnaireAccessToken.findUnique({
+        where: { token: tokenString },
+        include: { questionnaire: true },
+      })
+      if (accessToken?.tokenHash && accessToken.tokenHash !== tokenHash) accessToken = null
+    }
+
+    // Questionnaire bearer tokens are exclusively for GENERAL public flows;
+    // a COURSE id must never become reachable through the public resolver.
+    if (accessToken && accessToken.questionnaire?.type && accessToken.questionnaire.type !== 'GENERAL') {
+      return {
+        valid: false,
+        expired: false,
+        overLimit: false,
+        disabled: false,
+      }
+    }
 
     if (!accessToken) {
       return {
@@ -172,7 +214,7 @@ export const tokenService = {
    * 真正开始一次公开问卷时占用名额。预览 GET 不调用。
    * maxUses=0 表示不限制。并发下用条件更新避免超额。
    */
-  async claimAccess(tokenId: string, db: typeof prisma | Prisma.TransactionClient = prisma): Promise<boolean> {
+  async claimAccess(tokenId: string, db: typeof prisma | Prisma.TransactionClient = prisma, questionnaireId?: string): Promise<boolean> {
     const claimed = await db.$executeRaw`
       UPDATE "questionnaire_access_tokens"
       SET "used_count" = "used_count" + 1
@@ -180,6 +222,7 @@ export const tokenService = {
         AND "is_active" = true
         AND "expires_at" > NOW()
         AND ("max_uses" = 0 OR "used_count" < "max_uses")
+        ${questionnaireId ? Prisma.sql`AND "questionnaire_id" = ${questionnaireId}` : Prisma.empty}
     `
     return Number(claimed) > 0
   },
@@ -187,13 +230,13 @@ export const tokenService = {
   /**
    * 记录访问（增加 usedCount）
    */
-  async recordAccess(tokenId: string): Promise<void> {
+  async recordAccess(tokenId: string, questionnaireId?: string): Promise<void> {
     const token = await prisma.questionnaireAccessToken.findUnique({
       where: { id: tokenId },
-      select: { token: true, maxUses: true, usedCount: true },
+      select: { token: true, maxUses: true, usedCount: true, questionnaireId: true },
     })
 
-    if (!token) return
+    if (!token || (questionnaireId && token.questionnaireId !== questionnaireId)) return
 
     // 更新访问计数
     const newUsedCount = token.usedCount + 1
@@ -225,8 +268,8 @@ export const tokenService = {
   /**
    * 获取问卷的所有令牌
    */
-  async getTokensByQuestionnaire(questionnaireId: string) {
-    return await prisma.questionnaireAccessToken.findMany({
+  async getTokensByQuestionnaire(questionnaireId: string, options: { reveal?: boolean } = {}) {
+    const rows = await prisma.questionnaireAccessToken.findMany({
       where: { questionnaireId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -239,14 +282,21 @@ export const tokenService = {
         },
       },
     })
+    return rows.map((row) => ({
+      ...row,
+      // Never expose a legacy plaintext value unless the caller has already
+      // passed the owner/admin authorization gate. New rows are decrypted
+      // only for that same explicitly authorized management view.
+      token: options.reveal ? (row.token || (row.tokenEncrypted ? this.decryptToken(row.tokenEncrypted) : null)) : undefined,
+    }))
   },
 
   /**
    * 获取令牌详情
    */
-  async getTokenById(tokenId: string) {
-    return await prisma.questionnaireAccessToken.findUnique({
-      where: { id: tokenId },
+  async getTokenById(tokenId: string, questionnaireId?: string, options: { reveal?: boolean } = {}) {
+    const row = await prisma.questionnaireAccessToken.findFirst({
+      where: { id: tokenId, ...(questionnaireId ? { questionnaireId } : {}) },
       include: {
         questionnaire: {
           select: {
@@ -269,6 +319,11 @@ export const tokenService = {
         },
       },
     })
+    if (!row) return null
+    return {
+      ...row,
+      token: options.reveal ? (row.token || (row.tokenEncrypted ? this.decryptToken(row.tokenEncrypted) : null)) : undefined,
+    }
   },
 
   /**

@@ -17,6 +17,7 @@ import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
+import { randomInt } from 'crypto'
 import { StatsAggregator } from '../services/statsAggregator'
 import { userCanManageClassroom } from '../middleware/classroomAccess'
 import {
@@ -48,7 +49,7 @@ async function generateClassroomCode(): Promise<string> {
 
   while (exists) {
     // 生成6位随机数字
-    code = Math.floor(100000 + Math.random() * 900000).toString()
+    code = randomInt(100000, 1000000).toString()
 
     // 检查是否已存在
     const existing = await prisma.classroom.findUnique({
