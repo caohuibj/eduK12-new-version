@@ -45,7 +45,9 @@ export const validateQuestionnaireFormAnswer = (
     const values = parseMultipleValue(value)
     if (!values) return `${label} 的答案格式无效`
     const uniqueValues = [...new Set(values)]
-    if (item.required && uniqueValues.length === 0) return `${label} 为必填项`
+    if (uniqueValues.length === 0) {
+      return item.required ? `${label} 为必填项` : `${label} 不能为空，请选择跳过`
+    }
     const allowed = optionValues(item)
     if (uniqueValues.some((entry) => !allowed.has(entry))) return `${label} 的选项值无效`
     return item.contextKey
@@ -55,7 +57,7 @@ export const validateQuestionnaireFormAnswer = (
 
   if (typeof value !== 'string') return `${label} 的答案格式无效`
   const trimmed = value.trim()
-  if (!trimmed) return item.required ? `${label} 为必填项` : null
+  if (!trimmed) return item.required ? `${label} 为必填项` : `${label} 不能为空，请选择跳过`
 
   if (item.type === 'single_choice') {
     if (!optionValues(item).has(value)) return `${label} 的选项值无效`

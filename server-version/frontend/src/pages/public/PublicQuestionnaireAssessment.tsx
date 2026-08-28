@@ -261,9 +261,10 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       ? formAnswer.length === 0 
       : !formAnswer.trim()
     
-    if (action === 'answer' && formItem.required && isEmpty) {
-      message.warning('此题为必填项')
-      setRunnerError('此题为必填项')
+    if (action === 'answer' && isEmpty) {
+      const warning = formItem.required ? '此题为必填项' : '请填写答案或选择跳过'
+      message.warning(warning)
+      setRunnerError(warning)
       return
     }
     if (action === 'skip' && (formItem.required || formItem.contextKey)) return
@@ -331,43 +332,50 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   // 移动到下一个内容项
   const moveToNextItem = async () => {
     setRecoveryState('recovering')
-    // 重新获取测评状态
-    const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-      .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
-    
-    if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
-        result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
-      // 所有内容完成
-      await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-        .post(`/assessments/${sessionId}/complete`)
-      navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
-    } else {
-      // 切换到下一项
-      let nextData = result.data as QuestionnaireAssessmentData
-      const nextScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
-      if (nextScaleAssessmentId) {
-        const frozen = await freezeContextBeforeScale()
-        nextData = {
-          ...nextData,
-          questionnaireAssessment: {
-            ...nextData.questionnaireAssessment,
-            context: { status: 'frozen', frozenAt: frozen.frozenAt },
-          },
-        }
-        await fetchExistingAnswers(nextScaleAssessmentId)
-      }
-      setData(nextData)
-      setRecoveryState('ready')
-      setScaleIndex(0)
-      if (!nextData.currentScale?.scaleAssessmentId) setAnswers({})
-      setFormAnswer('')
+    try {
+      // 重新获取测评状态
+      const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
       
-      if (nextData.currentFormItem) {
-        // 下一项是表单题目
+      if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
+          result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
+        // 所有内容完成
+        await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+          .post(`/assessments/${sessionId}/complete`)
+        navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
+      } else {
+        // 切换到下一个内容项
+        let nextData = result.data as QuestionnaireAssessmentData
+        const nextScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
+        if (nextScaleAssessmentId) {
+          const frozen = await freezeContextBeforeScale()
+          nextData = {
+            ...nextData,
+            questionnaireAssessment: {
+              ...nextData.questionnaireAssessment,
+              context: { status: 'frozen', frozenAt: frozen.frozenAt },
+            },
+          }
+          await fetchExistingAnswers(nextScaleAssessmentId)
+        }
+        setData(nextData)
+        setRecoveryState('ready')
+        setScaleIndex(0)
+        if (!nextData.currentScale?.scaleAssessmentId) setAnswers({})
         setFormAnswer('')
-      } else if (nextData.currentScale?.scaleAssessmentId) {
-        // 下一项是量表；答案已在切换到 ready 之前载入。
+
+        if (nextData.currentFormItem) {
+          // 下一项是表单题目
+          setFormAnswer('')
+        } else if (nextData.currentScale?.scaleAssessmentId) {
+          // 下一项是量表；答案已在切换到 ready 之前载入。
+        }
       }
+    } catch (err) {
+      console.error('切换测评题目失败', err)
+      setRecoveryState('recoverFailed')
+      setRunnerError(normalizeApiError(err).message)
+      throw err
     }
   }
 
