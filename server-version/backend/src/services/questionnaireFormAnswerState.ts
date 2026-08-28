@@ -1,4 +1,5 @@
 import { QuestionnaireFormAnswerStatus } from '@prisma/client'
+import { validateQuestionnaireFormAnswer } from './questionnaireFormAnswerValidation'
 
 export type FormAnswerState = {
   status?: QuestionnaireFormAnswerStatus | string | null
@@ -20,20 +21,33 @@ const hasValue = (value: string | null | undefined): boolean => (
 )
 
 export const isFormAnswerComplete = (
-  item: { required?: boolean; contextKey?: string | null },
+  item: { id?: string; type?: string; options?: unknown; required?: boolean; contextKey?: string | null },
   answer: FormAnswerState | null | undefined,
 ): boolean => {
   const status = answerStatus(answer)
-  if (status === QuestionnaireFormAnswerStatus.ANSWERED) return hasValue(answer?.value)
+  if (status === QuestionnaireFormAnswerStatus.ANSWERED) {
+    if (!hasValue(answer?.value)) return false
+    // Context values are encrypted at rest during completion checks; their
+    // shape is validated before storage and must not be revalidated against
+    // the ciphertext here.
+    return item.contextKey || !item.type
+      ? true
+      : !validateQuestionnaireFormAnswer({ ...item, id: item.id ?? 'formItem' }, answer?.value)
+  }
   return status === QuestionnaireFormAnswerStatus.SKIPPED && item.required === false && !item.contextKey
 }
 
 export const isFormAnswerRequiredComplete = (
-  item: { required?: boolean; contextKey?: string | null },
+  item: { id?: string; type?: string; options?: unknown; required?: boolean; contextKey?: string | null },
   answer: FormAnswerState | null | undefined,
 ): boolean => {
   const status = answerStatus(answer)
-  if (status === QuestionnaireFormAnswerStatus.ANSWERED) return hasValue(answer?.value)
+  if (status === QuestionnaireFormAnswerStatus.ANSWERED) {
+    if (!hasValue(answer?.value)) return false
+    return item.contextKey || !item.type
+      ? true
+      : !validateQuestionnaireFormAnswer({ ...item, id: item.id ?? 'formItem' }, answer?.value)
+  }
   // Completion requires an explicit decision for every slot. Optional,
   // non-context fields may use SKIPPED; required and context fields may not.
   return status === QuestionnaireFormAnswerStatus.SKIPPED

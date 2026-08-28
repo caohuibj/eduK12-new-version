@@ -160,7 +160,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
-    command: npx prisma migrate deploy
+    command: npm run db:migrate:guarded
     depends_on:
       postgres:
         condition: service_healthy

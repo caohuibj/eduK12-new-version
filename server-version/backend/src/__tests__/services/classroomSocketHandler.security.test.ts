@@ -18,10 +18,11 @@ const {
     refreshAuthenticatedSocket: vi.fn(),
   },
   mockPrisma: {
-    classroom: { findUnique: vi.fn() },
-    classroomQuestion: { findFirst: vi.fn(), updateMany: vi.fn() },
+    classroom: { findUnique: vi.fn(), update: vi.fn() },
+    classroomQuestion: { findFirst: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn() },
     classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
-    classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), count: vi.fn(), findMany: vi.fn() },
+    classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), count: vi.fn(), findMany: vi.fn(), deleteMany: vi.fn() },
+    $transaction: vi.fn(),
   },
   mockFindClassroomAccess: vi.fn(),
   mockCanManageClassroom: vi.fn(),
@@ -366,6 +367,53 @@ describe('classroom socket authorization boundary', () => {
       select: { id: true },
     })
     expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
+  })
+
+  it('uses compare-and-set and returns the winning question for a same-question race', async () => {
+    const handler = new ClassroomSocketHandler()
+    const socket = makeSocket({
+      authenticated: true,
+      userId: 'teacher-1',
+      userRole: 'TEACHER',
+      classroomId: 'classroom-1',
+    })
+    const classroom = { id: 'classroom-1', status: 'PREPARING', creatorId: 'teacher-1' }
+    const candidate = {
+      id: 'question-1',
+      classroomId: 'classroom-1',
+      questionContent: { question: 'Q1' },
+      questionIndex: 1,
+      timeLimit: 60,
+      startedAt: null,
+      endedAt: null,
+    }
+    const winner = { ...candidate, startedAt: new Date('2026-08-28T00:00:00.000Z'), endedAt: null }
+    const tx = {
+      classroomQuestion: {
+        findFirst: vi.fn().mockResolvedValueOnce(null),
+        findUnique: vi.fn().mockResolvedValue(winner),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+      },
+      classroom: { update: vi.fn() },
+      classroomAnswer: { deleteMany: vi.fn() },
+    }
+    tx.classroomQuestion.findFirst.mockResolvedValueOnce(candidate)
+    mockFindClassroomAccess.mockResolvedValue(classroom)
+    mockPrisma.$transaction.mockImplementation(async (callback: (client: typeof tx) => Promise<unknown>) => callback(tx))
+    const ack = vi.fn()
+
+    await (handler as any).handleTeacherStart(socket, { questionId: 'question-1', timeLimit: 60 }, ack)
+
+    expect(tx.classroomQuestion.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ startedAt: null, endedAt: null }),
+    }))
+    expect(ack).toHaveBeenCalledWith(expect.objectContaining({
+      ok: true,
+      started: false,
+      alreadyActive: true,
+      question: expect.objectContaining({ questionId: 'question-1' }),
+    }))
+    expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
 })

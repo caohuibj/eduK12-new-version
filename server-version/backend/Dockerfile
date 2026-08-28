@@ -37,6 +37,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 COPY tsconfig.json ./
 COPY vitest.config.ts ./
+COPY scripts/pr24-migration-preflight.mjs ./scripts/pr24-migration-preflight.mjs
 COPY src ./src
 RUN npm run build
 
@@ -80,5 +81,5 @@ FROM build AS ops
 WORKDIR /app
 # 继承 build 阶段的完整 node_modules（含 prisma CLI 与 tsx）
 # compose 通过 profiles: ["ops"] + command 调用：
-#   migrate -> npx prisma migrate deploy
+#   migrate -> npm run db:migrate:guarded
 #   seed    -> npm run db:seed

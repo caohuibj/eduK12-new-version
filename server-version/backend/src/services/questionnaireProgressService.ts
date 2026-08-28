@@ -126,9 +126,10 @@ export const refreshQuestionnaireProgress = async (
       progress: 100,
       completedAt,
       totalTime,
-      // Keep the legacy JSON column during the application backfill window;
-      // all new authoritative reads prefer the encrypted column.
-      aggregateReport: storedCollectionReport as any,
+      // New completions must never dual-write the legacy plaintext column.
+      // The nullable column remains only for the application-level backfill
+      // and dual-read compatibility window.
+      aggregateReport: Prisma.DbNull,
       aggregateReportEncrypted: encryptField(storedCollectionReport),
     },
   })

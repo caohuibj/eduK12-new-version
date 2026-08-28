@@ -30,4 +30,10 @@ describe('questionnaire form answer state', () => {
     expect(isFormAnswerComplete({ required: false }, pending)).toBe(false)
     expect(isFormAnswerRequiredComplete({ required: false }, pending)).toBe(false)
   })
+
+  it('does not count an empty multiple-choice JSON array as answered', () => {
+    const item = { id: 'm', type: 'multiple_choice', required: true, options: [{ value: 'a', label: 'A' }] }
+    expect(isFormAnswerComplete(item, { status: 'ANSWERED', value: '[]' })).toBe(false)
+    expect(isFormAnswerRequiredComplete(item, { status: 'ANSWERED', value: '[]' })).toBe(false)
+  })
 })

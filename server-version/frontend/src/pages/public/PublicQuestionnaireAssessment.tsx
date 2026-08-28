@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
-import { questionnaireResumeHeaders } from '../../utils/questionnaireResume'
+import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
+import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 
@@ -73,19 +74,6 @@ interface QuestionnaireAssessmentData {
   sessionId: string
 }
 
-const ensureResponseOk = async (response: Response, fallbackMessage: string): Promise<void> => {
-  if (response.ok) return
-
-  let message = fallbackMessage
-  try {
-    const result = await response.json() as { message?: unknown }
-    if (typeof result.message === 'string' && result.message) message = result.message
-  } catch {
-    // Keep the safe fallback when the server response is not JSON.
-  }
-  throw new Error(message)
-}
-
 const parseFormOptions = (options: FormItem['options']): FormOption[] => {
   if (Array.isArray(options)) return options
   if (typeof options !== 'string') return []
@@ -117,21 +105,14 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const [formAnswer, setFormAnswer] = useState<string | string[]>('')
   const [submitting, setSubmitting] = useState(false)
+  const [answersLoading, setAnswersLoading] = useState(false)
   const [recoveryState, setRecoveryState] = useState<'recovering' | 'ready' | 'recoverFailed' | 'retrying'>('recovering')
   const [runnerError, setRunnerError] = useState<string | null>(null)
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   const freezeContextBeforeScale = async (): Promise<{ status: 'frozen'; frozenAt: string }> => {
-    const response = await fetch(`/api/public/assessments/${sessionId}/context/freeze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...questionnaireResumeHeaders(token, sessionId),
-      },
-      body: JSON.stringify({}),
-    })
-    await ensureResponseOk(response, '人口学上下文冻结失败')
-    const result = await response.json() as { data?: { status: 'frozen'; frozenAt: string } }
+    const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      .post<{ status: 'frozen'; frozenAt: string }>(`/assessments/${sessionId}/context/freeze`, {})
     if (!result.data) throw new Error('人口学上下文冻结失败')
     return result.data
   }
@@ -163,12 +144,8 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       setRecoveryState(retry ? 'retrying' : 'recovering')
       setRunnerError(null)
       
-      const response = await fetch(`/api/public/assessments/${sessionId}`, {
-        headers: questionnaireResumeHeaders(token, sessionId),
-      })
-      await ensureResponseOk(response, '获取测评失败')
-
-      const result = await response.json()
+      const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
       
       if (result.data.questionnaireAssessment.status === 'COMPLETED') {
         // 已完成，跳转到结果页
@@ -177,7 +154,8 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       }
 
       let nextData = result.data as QuestionnaireAssessmentData
-      if (nextData.currentScale?.scaleAssessmentId) {
+      const currentScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
+      if (currentScaleAssessmentId) {
         const frozen = await freezeContextBeforeScale()
         nextData = {
           ...nextData,
@@ -186,6 +164,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
             context: { status: 'frozen', frozenAt: frozen.frozenAt },
           },
         }
+        await fetchExistingAnswers(currentScaleAssessmentId)
       }
       setData(nextData)
       setRecoveryState('ready')
@@ -195,8 +174,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         // 当前是表单题目
         setFormAnswer('')
       } else if (nextData.currentScale?.scaleAssessmentId) {
-        // 当前是量表
-        fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
+        // 当前是量表；答案已在恢复状态切换为 ready 之前载入。
       }
       
     } catch (err) {
@@ -209,23 +187,22 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   }
 
   const fetchExistingAnswers = async (assessmentId: string) => {
+    setAnswersLoading(true)
     try {
-      const response = await fetch(`/api/public/assessments/${sessionId}/scale/${assessmentId}`, {
-        headers: questionnaireResumeHeaders(token, sessionId),
-      })
-      await ensureResponseOk(response, '获取已有答案失败')
-      const result = await response.json()
-      if (result.data.answers) {
-        const existingAnswers: Record<string, ResponseValue> = {}
-        result.data.answers.forEach((a: any) => {
-          existingAnswers[a.itemCode] = a.responseValue
-        })
-        setAnswers(existingAnswers)
+      const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .get<{ answers?: Array<{ itemCode: string; responseValue: ResponseValue }> }>(`/assessments/${sessionId}/scale/${assessmentId}`)
+      const existingAnswers: Record<string, ResponseValue> = {}
+      for (const answer of result.data.answers ?? []) {
+        existingAnswers[answer.itemCode] = answer.responseValue
       }
+      setAnswers(existingAnswers)
     } catch (err) {
       console.error('获取已有答案失败', err)
       setRecoveryState('recoverFailed')
       setRunnerError(normalizeApiError(err).message)
+      throw err
+    } finally {
+      setAnswersLoading(false)
     }
   }
 
@@ -242,20 +219,13 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
     try {
       await runSave(async () => {
-        const response = await fetch(`/api/public/assessments/${sessionId}/answers`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            ...questionnaireResumeHeaders(token, sessionId),
-          },
-          body: JSON.stringify({
+        await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+          .patch(`/assessments/${sessionId}/answers`, {
             scaleAssessmentId: data.currentScale!.scaleAssessmentId,
             itemCode: item.itemCode,
             responseValue: value,
             responseTimeMs: responseTime,
-          }),
-        })
-        await ensureResponseOk(response, '提交答案失败')
+          })
         setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
         setRunnerError(null)
         if (scaleIndex < items.length - 1) {
@@ -307,18 +277,11 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         : formAnswer
       
       // 保存表单答案
-      const response = await fetch(`/api/public/assessments/${sessionId}/form-answer`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...questionnaireResumeHeaders(token, sessionId),
-        },
-        body: JSON.stringify({
+      await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .post(`/assessments/${sessionId}/form-answer`, {
           formItemId: formItem.id,
           ...(action === 'skip' ? { action: 'skip' } : { action: 'answer', value: valueToSubmit }),
-        }),
-      })
-      await ensureResponseOk(response, '提交失败')
+        })
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -349,17 +312,10 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     try {
       setSubmitting(true)
       // 完成当前量表
-      const response = await fetch(`/api/public/assessments/${sessionId}/scale/complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...questionnaireResumeHeaders(token, sessionId),
-        },
-        body: JSON.stringify({
+      await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .post(`/assessments/${sessionId}/scale/complete`, {
           scaleAssessmentId: data.currentScale.scaleAssessmentId,
-        }),
-      })
-      await ensureResponseOk(response, '提交失败')
+        })
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -374,26 +330,22 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
   // 移动到下一个内容项
   const moveToNextItem = async () => {
+    setRecoveryState('recovering')
     // 重新获取测评状态
-    const response = await fetch(`/api/public/assessments/${sessionId}`, {
-      headers: questionnaireResumeHeaders(token, sessionId),
-    })
-    await ensureResponseOk(response, '获取测评失败')
-    const result = await response.json()
+    const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
     
     if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
         result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
       // 所有内容完成
-      const completeResponse = await fetch(`/api/public/assessments/${sessionId}/complete`, {
-        method: 'POST',
-        headers: questionnaireResumeHeaders(token, sessionId),
-      })
-      await ensureResponseOk(completeResponse, '完成测评失败')
+      await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .post(`/assessments/${sessionId}/complete`)
       navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
     } else {
       // 切换到下一项
       let nextData = result.data as QuestionnaireAssessmentData
-      if (nextData.currentScale?.scaleAssessmentId) {
+      const nextScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
+      if (nextScaleAssessmentId) {
         const frozen = await freezeContextBeforeScale()
         nextData = {
           ...nextData,
@@ -402,18 +354,19 @@ const PublicQuestionnaireAssessment: React.FC = () => {
             context: { status: 'frozen', frozenAt: frozen.frozenAt },
           },
         }
+        await fetchExistingAnswers(nextScaleAssessmentId)
       }
       setData(nextData)
+      setRecoveryState('ready')
       setScaleIndex(0)
-      setAnswers({})
+      if (!nextData.currentScale?.scaleAssessmentId) setAnswers({})
       setFormAnswer('')
       
       if (nextData.currentFormItem) {
         // 下一项是表单题目
         setFormAnswer('')
       } else if (nextData.currentScale?.scaleAssessmentId) {
-        // 下一项是量表
-        fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
+        // 下一项是量表；答案已在切换到 ready 之前载入。
       }
     }
   }
@@ -451,7 +404,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     )
   }
 
-  const runnerBusy = submitting || savingAnswer || recoveryState !== 'ready'
+  const runnerBusy = submitting || savingAnswer || answersLoading || recoveryState !== 'ready'
 
   // 渲染表单题目
   if (data.currentFormItem) {

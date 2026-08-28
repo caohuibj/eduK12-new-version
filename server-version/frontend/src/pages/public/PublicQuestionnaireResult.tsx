@@ -4,7 +4,8 @@ import { Card, Spin, Result, Button } from 'antd'
 import { Clock, FileText } from 'lucide-react'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
-import { questionnaireResumeHeaders } from '../../utils/questionnaireResume'
+import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
+import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -24,11 +25,8 @@ const PublicQuestionnaireResult: React.FC = () => {
     if (!sessionId) return
     try {
       setLoading(true)
-      const response = await fetch(`/api/public/assessments/${sessionId}/report`, {
-        headers: questionnaireResumeHeaders(token, sessionId),
-      })
-      if (!response.ok) throw new Error('获取报告失败')
-      const data = await response.json()
+      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      const data = await client.get<CollectionQuestionnaireResponse>(`/assessments/${sessionId}/report`)
       setReport(data.data)
     } catch (err: any) {
       setError(err.message || '获取报告失败')

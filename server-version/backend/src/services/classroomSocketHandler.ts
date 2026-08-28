@@ -82,6 +82,23 @@ const answerText = (answer: unknown): string | null => {
   return text ? text : null
 }
 
+/** The teacher control surface receives this small, authoritative snapshot. */
+const classroomQuestionPayload = (question: any): Record<string, unknown> | null => {
+  if (!question) return null
+  return {
+    questionId: question.id,
+    questionContent: question.questionContent,
+    timeLimit: question.timeLimit,
+    questionIndex: question.questionIndex,
+    startedAt: question.startedAt instanceof Date
+      ? question.startedAt.toISOString()
+      : question.startedAt ?? null,
+    endedAt: question.endedAt instanceof Date
+      ? question.endedAt.toISOString()
+      : question.endedAt ?? null,
+  }
+}
+
 export class ClassroomSocketHandler {
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
   private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
@@ -95,8 +112,8 @@ export class ClassroomSocketHandler {
       socket.on('teacher:join', (data: unknown) => {
         void this.handleTeacherJoin(socket, data)
       })
-      socket.on('teacher:start', (data: unknown) => {
-        void this.handleTeacherStart(socket, data)
+      socket.on('teacher:start', (data: unknown, ack?: SocketAck) => {
+        void this.handleTeacherStart(socket, data, ack)
       })
       socket.on('teacher:next', (data: unknown) => {
         void this.handleTeacherNext(socket, data)
@@ -285,6 +302,22 @@ export class ClassroomSocketHandler {
       socket.data.clientRole = 'teacher'
       this.startManagerRevalidation(socket)
 
+      const activeQuestion = await prisma.classroomQuestion.findFirst({
+        where: {
+          classroomId: classroom.id,
+          startedAt: { not: null },
+          endedAt: null,
+        },
+        select: {
+          id: true,
+          questionContent: true,
+          timeLimit: true,
+          questionIndex: true,
+          startedAt: true,
+          endedAt: true,
+        },
+      })
+
       logger.info('教师加入课堂', {
         classroomId: classroom.id,
         status: classroom.status,
@@ -293,6 +326,7 @@ export class ClassroomSocketHandler {
       socket.emit('teacher:joined', {
         classroomId: classroom.id,
         status: classroom.status,
+        currentQuestion: classroomQuestionPayload(activeQuestion),
       })
     } catch {
       logger.error('处理教师加入课堂错误')
@@ -554,72 +588,186 @@ export class ClassroomSocketHandler {
     }
   }
 
-  private async handleTeacherStart(socket: Socket, data: unknown): Promise<void> {
+  private async handleTeacherStart(socket: Socket, data: unknown, ack?: SocketAck): Promise<void> {
+    const acknowledge = (payload: Record<string, unknown>): void => {
+      ack?.(payload)
+    }
+
     try {
       const classroom = await this.authorizeManagerAction(socket, 'teacher')
       if (!classroom) {
+        acknowledge({ ok: false, message: '无权限访问此课堂' })
         return
       }
 
       const questionId = readString(data, 'questionId')
       if (!questionId) {
         this.emitError(socket, '缺少题目信息')
+        acknowledge({ ok: false, message: '缺少题目信息' })
         return
       }
 
       if (classroom.status !== 'PREPARING' && classroom.status !== 'ACTIVE') {
         this.emitError(socket, '课堂当前不可开始答题')
+        acknowledge({ ok: false, message: '课堂当前不可开始答题' })
         return
       }
 
       const requestedTimeLimit = readFiniteNumber(data, 'timeLimit')
-      let question
+      type StartOutcome =
+        | { kind: 'started'; question: any }
+        | { kind: 'already-active'; question: any }
+        | { kind: 'conflict'; question: any }
+        | { kind: 'question-not-found' }
+        | { kind: 'race-lost' }
+
+      let outcome: StartOutcome
       try {
-        question = await prisma.$transaction(async (tx) => {
+        outcome = await prisma.$transaction(async (tx): Promise<StartOutcome> => {
           const active = await tx.classroomQuestion.findFirst({
             where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
-            select: { id: true },
+            select: {
+              id: true,
+              questionContent: true,
+              timeLimit: true,
+              questionIndex: true,
+              startedAt: true,
+              endedAt: true,
+            },
           })
-          if (active && active.id !== questionId) throw Object.assign(new Error('题目正在进行中'), { code: 'ACTIVE_QUESTION' })
+          if (active && active.id !== questionId) return { kind: 'conflict', question: active }
 
-          const candidate = await tx.classroomQuestion.findFirst({ where: { id: questionId, classroomId: classroom.id } })
-          if (!candidate) throw Object.assign(new Error('题目不存在'), { code: 'QUESTION_NOT_FOUND' })
-          if (candidate.startedAt && !candidate.endedAt) throw Object.assign(new Error('题目正在进行中'), { code: 'ACTIVE_QUESTION' })
+          const candidate = await tx.classroomQuestion.findFirst({
+            where: { id: questionId, classroomId: classroom.id },
+            select: {
+              id: true,
+              classroomId: true,
+              questionContent: true,
+              timeLimit: true,
+              questionIndex: true,
+              startedAt: true,
+              endedAt: true,
+            },
+          })
+          if (!candidate) return { kind: 'question-not-found' }
+          if (candidate.startedAt && !candidate.endedAt) return { kind: 'already-active', question: candidate }
           const timeLimit = Math.max(1, Math.min(3600, Math.floor(requestedTimeLimit ?? candidate.timeLimit ?? 60)))
-          if (candidate.endedAt) await tx.classroomAnswer.deleteMany({ where: { classroomId: classroom.id, questionId: candidate.id } })
           const startedAt = new Date()
-          const updated = await tx.classroomQuestion.update({ where: { id: candidate.id }, data: { startedAt, endedAt: null, timeLimit } })
+          // Compare-and-set on both lifecycle timestamps. This makes two
+          // same-question starts idempotent instead of resetting the winner's
+          // start time or timer.
+          const updated = await tx.classroomQuestion.updateMany({
+            where: {
+              id: candidate.id,
+              classroomId: classroom.id,
+              startedAt: candidate.startedAt,
+              endedAt: candidate.endedAt,
+            },
+            data: { startedAt, endedAt: null, timeLimit },
+          })
+          if (updated.count !== 1) {
+            const current = await tx.classroomQuestion.findUnique({
+              where: { id: candidate.id },
+              select: {
+                id: true,
+                questionContent: true,
+                timeLimit: true,
+                questionIndex: true,
+                startedAt: true,
+                endedAt: true,
+              },
+            })
+            if (current?.startedAt && !current.endedAt) return { kind: 'already-active', question: current }
+            const currentActive = await tx.classroomQuestion.findFirst({
+              where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
+              select: {
+                id: true,
+                questionContent: true,
+                timeLimit: true,
+                questionIndex: true,
+                startedAt: true,
+                endedAt: true,
+              },
+            })
+            return currentActive
+              ? { kind: 'conflict', question: currentActive }
+              : { kind: 'race-lost' }
+          }
+          if (candidate.endedAt) {
+            await tx.classroomAnswer.deleteMany({ where: { classroomId: classroom.id, questionId: candidate.id } })
+          }
           await tx.classroom.update({ where: { id: classroom.id }, data: { status: 'ACTIVE', startedAt } })
-          return updated
+          const persisted = await tx.classroomQuestion.findUnique({
+            where: { id: candidate.id },
+            select: {
+              id: true,
+              questionContent: true,
+              timeLimit: true,
+              questionIndex: true,
+              startedAt: true,
+              endedAt: true,
+            },
+          })
+          return persisted ? { kind: 'started', question: persisted } : { kind: 'race-lost' }
         })
       } catch (startError: any) {
-        if (startError?.code === 'QUESTION_NOT_FOUND') {
-          this.emitError(socket, '题目不存在')
-          return
-        }
-        if (startError?.code === 'ACTIVE_QUESTION' || startError?.code === 'P2002') {
+        if (startError?.code === 'P2002') {
           const authoritative = await prisma.classroomQuestion.findFirst({
             where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
+            select: {
+              id: true,
+              questionContent: true,
+              timeLimit: true,
+              questionIndex: true,
+              startedAt: true,
+              endedAt: true,
+            },
           })
           if (authoritative) {
-            socket.emit('teacher:started', {
-              questionId: authoritative.id,
-              questionContent: authoritative.questionContent,
-              timeLimit: authoritative.timeLimit,
-              questionIndex: authoritative.questionIndex,
-              authoritative: true,
-            })
+            const question = classroomQuestionPayload(authoritative)
+            if (question) socket.emit('teacher:started', { ...question, authoritative: true })
+            acknowledge({ ok: authoritative.id === questionId, started: false, authoritative: true, question })
             return
           }
         }
         throw startError
       }
 
+      if (outcome.kind === 'question-not-found') {
+        this.emitError(socket, '题目不存在')
+        acknowledge({ ok: false, message: '题目不存在' })
+        return
+      }
+
+      if (outcome.kind === 'conflict' || outcome.kind === 'race-lost') {
+        const authoritative = outcome.kind === 'conflict'
+          ? outcome.question
+          : await prisma.classroomQuestion.findFirst({
+            where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
+            select: {
+              id: true,
+              questionContent: true,
+              timeLimit: true,
+              questionIndex: true,
+              startedAt: true,
+              endedAt: true,
+            },
+          })
+        const question = classroomQuestionPayload(authoritative)
+        if (question) socket.emit('teacher:started', { ...question, authoritative: true })
+        acknowledge({ ok: false, message: '题目正在进行中', code: 'ACTIVE_QUESTION', authoritative: true, question })
+        return
+      }
+
+      if (outcome.kind === 'already-active') {
+        const question = classroomQuestionPayload(outcome.question)
+        acknowledge({ ok: true, started: false, alreadyActive: true, authoritative: true, question })
+        return
+      }
+
+      const question = outcome.question
       const broadcastData = {
-        questionId: question.id,
-        questionContent: question.questionContent,
-        timeLimit: question.timeLimit,
-        questionIndex: question.questionIndex,
+        ...classroomQuestionPayload(question),
       }
 
       socketService.broadcastToRoom(
@@ -639,9 +787,11 @@ export class ClassroomSocketHandler {
         questionId: question.id,
         timeLimit: question.timeLimit || requestedTimeLimit || 60,
       })
+      acknowledge({ ok: true, started: true, question: classroomQuestionPayload(question) })
     } catch {
       logger.error('处理教师开始答题错误')
       this.emitError(socket, '开始答题失败')
+      acknowledge({ ok: false, message: '开始答题失败' })
     }
   }
 

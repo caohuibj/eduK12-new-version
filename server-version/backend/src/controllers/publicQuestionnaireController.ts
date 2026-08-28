@@ -31,7 +31,8 @@ import {
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
 import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
-import { validateContextAnswer, writeContextFormAnswer } from '../modules/assessment-context'
+import { writeContextFormAnswer } from '../modules/assessment-context'
+import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 
@@ -1179,13 +1180,6 @@ export const publicQuestionnaireController = {
         return error(res, '缺少必要参数')
       }
 
-      // 处理多选题答案格式：数组转JSON字符串
-      const valueToStore = action === 'skip'
-        ? null
-        : Array.isArray(value)
-          ? JSON.stringify(value)
-          : String(value)
-
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
         const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
           where: { sessionId },
@@ -1215,12 +1209,18 @@ export const publicQuestionnaireController = {
         if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
           if (formItem.contextKey) return { kind: 'context-frozen' as const }
         }
-        if (formItem.contextKey) {
-          const contextValue = Array.isArray(value) ? JSON.stringify(value) : String(value ?? '')
-          const validationMessage = validateContextAnswer(formItem, contextValue)
+        if (action === 'answer') {
+          const validationMessage = validateQuestionnaireFormAnswer(formItem, value)
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
-
+        const normalizedValue = action === 'answer' && value !== undefined
+          ? normalizeQuestionnaireFormAnswer(formItem, value)
+          : value
+        const valueToStore = action === 'skip'
+          ? null
+          : Array.isArray(normalizedValue)
+            ? JSON.stringify(normalizedValue)
+            : String(normalizedValue)
         const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
         await tx.questionnaireFormAnswer.upsert({
           where: {

@@ -43,7 +43,11 @@ const report = {
 beforeEach(() => {
   vi.clearAllMocks()
   mockClient.get.mockResolvedValue({ code: 0, data: report })
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: report }) }))
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => ({ code: 0, message: 'ok', data: report }),
+  }))
 })
 
 describe('Questionnaire Scale report UI matrix', () => {
