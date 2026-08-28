@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { normalizeApiError } from '../../utils/normalizeApiError'
+import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 
 type ResponseValue = string | number
 
@@ -46,10 +48,10 @@ const ScaleAssessment: React.FC = () => {
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
-  const [savingAnswer, setSavingAnswer] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const itemStartTimeRef = useRef<number>(Date.now())
-  const savingAnswerRef = useRef(false)
+  const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   useEffect(() => {
     itemStartTimeRef.current = Date.now()
@@ -77,44 +79,50 @@ const ScaleAssessment: React.FC = () => {
   }, [scaleId])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
-    if (!scale || !assessment || savingAnswerRef.current) return
+    if (!scale || !assessment || savingAnswerRef.current || submitting) return
     const items = scale.definition.items
     const itemIndex = currentIndex
     const item = items[itemIndex]
     if (!item) return
     const responseTimeMs = Date.now() - itemStartTimeRef.current
-    savingAnswerRef.current = true
-    setSavingAnswer(true)
     try {
-      const response = await apiClient.patch(`/scales/assessments/${assessment.id}/answers`, {
-        itemCode: item.itemCode,
-        responseValue: value,
-        responseTimeMs,
+      await runSave(async () => {
+        const response = await apiClient.patch(`/scales/assessments/${assessment.id}/answers`, {
+          itemCode: item.itemCode,
+          responseValue: value,
+          responseTimeMs,
+        })
+        if (response.code !== 0) throw new Error(response.message || '提交答案失败')
+        setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
+        if (itemIndex < items.length - 1) {
+          setCurrentIndex((index) => index === itemIndex ? itemIndex + 1 : index)
+        }
+        setCompletionNotice(null)
       })
-      if (response.code !== 0) throw new Error(response.message || '提交答案失败')
-      setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
-      if (itemIndex < items.length - 1) {
-        setCurrentIndex((index) => index === itemIndex ? itemIndex + 1 : index)
-      }
     } catch (err) {
+      const normalized = normalizeApiError(err)
+      setCompletionNotice(normalized.message)
       console.error('提交答案失败', err)
-    } finally {
-      savingAnswerRef.current = false
-      setSavingAnswer(false)
     }
   }
 
   const handleComplete = async () => {
     if (!assessment || !scale || savingAnswerRef.current) return
     const unanswered = scale.definition.items.filter((item) => item.required && answers[item.itemCode] === undefined)
-    if (unanswered.length > 0 && !window.confirm(`还有 ${unanswered.length} 道必答题未作答，确定要提交吗？`)) return
+    if (unanswered.length > 0) {
+      const firstMissingIndex = scale.definition.items.findIndex((item) => item.required && answers[item.itemCode] === undefined)
+      if (firstMissingIndex >= 0) setCurrentIndex(firstMissingIndex)
+      setCompletionNotice(`还有 ${unanswered.length} 道必答题未作答，请完成后再提交`)
+      return
+    }
+    setCompletionNotice(null)
     try {
       setSubmitting(true)
       const response = await apiClient.post(`/scales/assessments/${assessment.id}/complete`)
       if (response.code !== 0) throw new Error(response.message || '提交失败')
       navigate(`/student/scales/result/${assessment.id}`)
     } catch (err) {
-      window.alert((err as { message?: string }).message || '提交失败')
+      setCompletionNotice(normalizeApiError(err).message)
     } finally {
       setSubmitting(false)
     }
@@ -136,6 +144,7 @@ const ScaleAssessment: React.FC = () => {
         <div className="flex justify-between text-sm text-gray-600 mb-2"><span>答题进度</span><span>{answeredCount} / {items.length}</span></div>
         <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${progress}%` }} /></div>
       </div>
+      {completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}
       {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="text-sm text-gray-500 mb-2">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
@@ -145,7 +154,7 @@ const ScaleAssessment: React.FC = () => {
             <button
               key={valueKey(option.value)}
               onClick={() => void handleSelectAnswer(option.value)}
-              disabled={savingAnswer}
+              disabled={savingAnswer || submitting}
               className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
             >
               {option.label}
@@ -154,18 +163,18 @@ const ScaleAssessment: React.FC = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
+        <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
         {currentIndex === items.length - 1 ? (
           <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : '完成测评'}</button>
         ) : (
-          <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
+          <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
         )}
       </div>
       <div className="mt-6 bg-white rounded-lg shadow p-4">
         <div className="text-sm text-gray-600 mb-3">题目导航</div>
         <div className="flex flex-wrap gap-2">
           {items.map((item, index) => (
-            <button key={item.itemCode} onClick={() => setCurrentIndex(index)} disabled={savingAnswer} className={`w-8 h-8 rounded text-sm font-medium disabled:cursor-wait disabled:opacity-60 ${currentIndex === index ? 'bg-primary text-white' : answers[item.itemCode] !== undefined ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{index + 1}</button>
+          <button key={item.itemCode} onClick={() => setCurrentIndex(index)} disabled={savingAnswer || submitting} className={`w-8 h-8 rounded text-sm font-medium disabled:cursor-wait disabled:opacity-60 ${currentIndex === index ? 'bg-primary text-white' : answers[item.itemCode] !== undefined ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{index + 1}</button>
           ))}
         </div>
       </div>

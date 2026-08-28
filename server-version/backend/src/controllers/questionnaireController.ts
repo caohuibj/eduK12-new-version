@@ -17,7 +17,10 @@ import {
   isAssessmentContextServiceError,
 } from '../services/assessmentContextService'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
-import { createExportArtifact, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
+import { utcHalfOpenDateFilter } from '../services/exportService'
+import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -48,12 +51,14 @@ const assessmentContextState = (row: { contextSnapshotEncrypted?: string | null;
   frozenAt: row.contextFrozenAt?.toISOString() ?? null,
 })
 
-const scaleItemCountForScale = (scale: { definition?: unknown }): number => {
+const scaleItemCountForScale = (scale: { definition?: unknown; itemCount?: number | null }): number => {
+  if (typeof scale.itemCount === 'number') return scale.itemCount
   const definition = scale.definition as any
   return Array.isArray(definition?.items) ? definition.items.length : 0
 }
 
-const scaleDimensionCount = (scale: { definition?: unknown }): number => {
+const scaleDimensionCount = (scale: { definition?: unknown; dimensionCount?: number | null }): number => {
+  if (typeof scale.dimensionCount === 'number') return scale.dimensionCount
   const definition = scale.definition as any
   return Array.isArray(definition?.scoring?.scores)
     ? definition.scoring.scores.filter((score: any) => score.type === 'dimension').length
@@ -1130,10 +1135,13 @@ export const questionnaireController = {
 
       const saveFormAnswerSchema = z.object({
         formItemId: z.string().min(1, '表单题目ID不能为空'),
-        value: z.union([
-          z.string(),              // 单选、填空：单个值
-          z.array(z.string())      // 多选：数组
-        ]),
+        action: z.enum(['answer', 'skip']).optional(),
+        value: z.union([z.string(), z.array(z.string())]).optional(),
+      }).superRefine((input, ctx) => {
+        const action = input.action || 'answer'
+        if (action === 'answer' && input.value === undefined) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: '回答值不能为空', path: ['value'] })
+        }
       })
 
       const result = saveFormAnswerSchema.safeParse(req.body)
@@ -1141,12 +1149,16 @@ export const questionnaireController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { formItemId, value } = result.data
+      const { formItemId } = result.data
+      const action = result.data.action || 'answer'
+      const value = result.data.value
 
       // 处理多选题答案格式：数组转JSON字符串
-      const valueToStore = Array.isArray(value) 
-        ? JSON.stringify(value)  // 多选：数组转字符串
-        : value;                  // 单选、填空：直接存储
+      const valueToStore = action === 'skip'
+        ? null
+        : Array.isArray(value)
+          ? JSON.stringify(value)
+          : value as string
 
       const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
@@ -1168,6 +1180,10 @@ export const questionnaireController = {
         const formItem = qa.questionnaire.formItems.find(fi => fi.id === formItemId)
         if (!formItem) return { kind: 'form-not-found' as const }
 
+        if (action === 'skip' && (formItem.required || formItem.contextKey)) {
+          return { kind: 'skip-not-allowed' as const }
+        }
+
         if (formItem.contextKey) {
           try {
             assertContextMutable(Boolean(qa.contextSnapshotEncrypted || qa.contextSnapshotHash))
@@ -1175,12 +1191,12 @@ export const questionnaireController = {
             if (isAssessmentContextServiceError(error)) return { kind: 'context-frozen' as const }
             throw error
           }
-          const contextValue = Array.isArray(value) ? JSON.stringify(value) : value
+          const contextValue = Array.isArray(value) ? JSON.stringify(value) : String(value ?? '')
           const validationMessage = validateContextAnswer(formItem, contextValue)
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
 
-        const storedValue = writeContextFormAnswer(formItem.contextKey, valueToStore)
+        const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
         const formAnswer = await tx.questionnaireFormAnswer.upsert({
           where: {
             questionnaireAssessmentId_formItemId: {
@@ -1192,9 +1208,11 @@ export const questionnaireController = {
             questionnaireAssessmentId: assessmentId,
             formItemId,
             value: storedValue,
+            status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
           },
           update: {
             value: storedValue,
+            status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
           },
         })
 
@@ -1207,6 +1225,7 @@ export const questionnaireController = {
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
+      if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (outcome.kind === 'invalid-context-answer') return error(res, outcome.message)
 
@@ -1214,7 +1233,9 @@ export const questionnaireController = {
 
       return success(res, {
         ...outcome.formAnswer,
-        value: readContextFormAnswer(outcome.contextKey, outcome.formAnswer.value),
+        value: outcome.formAnswer.value === null
+          ? null
+          : readContextFormAnswer(outcome.contextKey, outcome.formAnswer.value),
       }, '表单答案保存成功')
     } catch (err) {
       logger.error('保存表单答案错误', err)
@@ -1231,7 +1252,12 @@ export const questionnaireController = {
       const saveFormAnswersSchema = z.object({
         answers: z.array(z.object({
           formItemId: z.string(),
-          value: z.string(),
+          action: z.enum(['answer', 'skip']).optional(),
+          value: z.union([z.string(), z.array(z.string())]).optional(),
+        }).superRefine((input, ctx) => {
+          if ((input.action || 'answer') === 'answer' && input.value === undefined) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: '回答值不能为空', path: ['value'] })
+          }
         })),
       })
 
@@ -1268,14 +1294,19 @@ export const questionnaireController = {
         }
         for (const answer of answers) {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
-          if (item?.contextKey) {
-            const validationMessage = validateContextAnswer(item, answer.value)
+          const action = answer.action || 'answer'
+          if (action === 'skip' && (item?.required || item?.contextKey)) return { kind: 'skip-not-allowed' as const }
+          const value = Array.isArray(answer.value) ? JSON.stringify(answer.value) : answer.value
+          if (item?.contextKey && value !== undefined) {
+            const validationMessage = validateContextAnswer(item, value)
             if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
           }
         }
 
         for (const answer of answers) {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
+          const action = answer.action || 'answer'
+          const value = action === 'skip' ? null : (Array.isArray(answer.value) ? JSON.stringify(answer.value) : answer.value as string)
           await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
@@ -1286,10 +1317,12 @@ export const questionnaireController = {
             create: {
               questionnaireAssessmentId: assessmentId,
               formItemId: answer.formItemId,
-              value: writeContextFormAnswer(item?.contextKey, answer.value),
+              value: value === null ? null : writeContextFormAnswer(item?.contextKey, value),
+              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
             },
             update: {
-              value: writeContextFormAnswer(item?.contextKey, answer.value),
+              value: value === null ? null : writeContextFormAnswer(item?.contextKey, value),
+              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
             },
           })
         }
@@ -1303,6 +1336,7 @@ export const questionnaireController = {
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
+      if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (outcome.kind === 'invalid-context-answer') return error(res, outcome.message)
 
@@ -1579,8 +1613,10 @@ export const questionnaireController = {
               scale: {
                 select: {
                   id: true,
+                  code: true,
                   name: true,
-                definition: true,
+                  itemCount: true,
+                  dimensionCount: true,
                 instrumentClass: true,
                 instrumentVersion: true,
                 },
@@ -1588,7 +1624,7 @@ export const questionnaireController = {
             },
             orderBy: { position: 'asc' },
           },
-          formItems: true,  // 添加表单题目查询
+          formItems: { select: { id: true } },
           courseQuestionnaires: {
             include: {
               course: {
@@ -1597,6 +1633,13 @@ export const questionnaireController = {
                   title: true,
                 },
               },
+            },
+          },
+          _count: {
+            select: {
+              formItems: true,
+              questionnaireScales: true,
+              assessments: true,
             },
           },
         },
@@ -1611,34 +1654,38 @@ export const questionnaireController = {
           userId,
           questionnaireId: { in: questionnaires.map(q => q.id) },
         },
-        select: { id: true, questionnaireId: true, status: true, completedAt: true },
+        select: { id: true, questionnaireId: true, status: true, startedAt: true, progress: true, completedAt: true },
       })
 
       // 建立映射：questionnaireId -> assessment
-      const assessmentMap = new Map<string, { id: string; status: string; completedAt: Date | null }>()
-      allAssessments.forEach(a => {
-        const existing = assessmentMap.get(a.questionnaireId)
-        // 优先保留已完成的，否则保留进行中的
-        if (!existing || a.status === 'COMPLETED') {
-          assessmentMap.set(a.questionnaireId, { id: a.id, status: a.status, completedAt: a.completedAt })
-        }
+      const assessmentsByQuestionnaire = new Map<string, typeof allAssessments>()
+      allAssessments.forEach((assessment) => {
+        const bucket = assessmentsByQuestionnaire.get(assessment.questionnaireId) || []
+        bucket.push(assessment)
+        assessmentsByQuestionnaire.set(assessment.questionnaireId, bucket)
       })
 
       // 计算总题数（表单题目 + 量表题目）
       const questionnairesWithStatus = questionnaires.map(qn => {
         // 量表题目数量
         const scaleItemCountValue = qn.questionnaireScales.reduce(
-          (sum, qs) => sum + scaleItemCountForScale(qs.scale),
+          (sum, qs) => sum + (qs.scale.itemCount ?? scaleItemCountForScale(qs.scale)),
           0,
         )
         
         // 表单题目数量
-        const formItemCount = qn.formItems ? qn.formItems.length : 0
+        const formItemCount = qn._count?.formItems ?? (qn.formItems ? qn.formItems.length : 0)
         
         // 总题目数 = 表单 + 量表
         const totalItems = formItemCount + scaleItemCountValue
         
-        const assessment = assessmentMap.get(qn.id)
+        const attempts = assessmentsByQuestionnaire.get(qn.id) || []
+        const activeAttempt = attempts
+          .filter((attempt) => attempt.status === 'IN_PROGRESS')
+          .sort((left, right) => left.id.localeCompare(right.id))[0] || null
+        const latestCompletedAttempt = attempts
+          .filter((attempt) => attempt.status === 'COMPLETED')
+          .sort((left, right) => (right.completedAt?.getTime() || 0) - (left.completedAt?.getTime() || 0))[0] || null
         return {
           id: qn.id,
           code: qn.code,
@@ -1647,12 +1694,30 @@ export const questionnaireController = {
           instruction: qn.instruction,
           estimatedTime: qn.estimatedTime,
           scaleCount: qn.questionnaireScales.length,
+          formItemCount,
+          scaleSummaries: qn.questionnaireScales.map((qs) => ({
+            id: qs.scale.id,
+            name: qs.scale.name,
+            itemCount: qs.scale.itemCount ?? scaleItemCountForScale(qs.scale),
+            dimensionCount: qs.scale.dimensionCount ?? scaleDimensionCount(qs.scale),
+          })),
           totalItems,
           courses: qn.courseQuestionnaires.map(cq => cq.course),
-          completed: assessment?.status === 'COMPLETED',
-          inProgress: assessment?.status === 'IN_PROGRESS',
-          completedAt: assessment?.completedAt || null,
-          assessmentId: assessment?.id || null,
+          completed: Boolean(latestCompletedAttempt),
+          inProgress: Boolean(activeAttempt),
+          completedAt: latestCompletedAttempt?.completedAt || null,
+          assessmentId: latestCompletedAttempt?.id || activeAttempt?.id || null,
+          activeAttempt: activeAttempt ? {
+            id: activeAttempt.id,
+            startedAt: activeAttempt.startedAt,
+            progress: activeAttempt.progress,
+          } : null,
+          latestCompletedAttempt: latestCompletedAttempt ? {
+            id: latestCompletedAttempt.id,
+            completedAt: latestCompletedAttempt.completedAt,
+          } : null,
+          attemptCount: attempts.length,
+          retakeAllowed: !activeAttempt,
         }
       })
 
@@ -1667,7 +1732,7 @@ export const questionnaireController = {
   },
 
   // 开始/继续问卷测评
-  async startAssessment(req: Request, res: Response) {
+  async startAssessment(req: Request, res: Response): Promise<any> {
     try {
       const userId = req.user?.userId
       const { id } = req.params
@@ -1753,7 +1818,7 @@ export const questionnaireController = {
           const item = contentItems[i]
           if (item.type === 'form') {
             const answer = formAnswerMap.get(item.data.id)
-            if (!answer && (item.data.required !== false || Boolean(item.data.contextKey))) {
+            if (!isFormAnswerComplete(item.data, answer)) {
               currentIndex = i
               currentItem = item
               break
@@ -1869,6 +1934,16 @@ export const questionnaireController = {
           })),
         })
 
+        await tx.questionnaireFormAnswer.createMany({
+          data: questionnaire.formItems.map((item) => ({
+            questionnaireAssessmentId: created.id,
+            formItemId: item.id,
+            value: null,
+            status: 'PENDING' as const,
+          })),
+          skipDuplicates: true,
+        })
+
         return created
       })
 
@@ -1903,7 +1978,9 @@ export const questionnaireController = {
           scaleAssessments: scaleAssessments.map(sa => ({ id: sa.id, scaleId: sa.scaleId })),
         }, '开始问卷测评')
       } else {
-        const firstScaleAssessment = scaleAssessments[0]
+        // Bind the child attempt by scaleId; array order is not a stable
+        // authority when a questionnaire contains multiple scales.
+        const firstScaleAssessment = scaleAssessments.find((sa) => sa.scaleId === firstItem?.data.scaleId)
         return success(res, {
           questionnaireAssessment: {
             id: qa.id,
@@ -1928,7 +2005,17 @@ export const questionnaireController = {
           scaleAssessments: scaleAssessments.map(sa => ({ id: sa.id, scaleId: sa.scaleId })),
         }, '开始问卷测评')
       }
-    } catch (err) {
+    } catch (err: any) {
+      // The partial unique index is authoritative under concurrent starts. A
+      // losing insert re-reads through the normal resume path so every caller
+      // receives the same winning assessment instead of a duplicate/error.
+      if (err?.code === 'P2002') {
+        const winner = await prisma.questionnaireAssessment.findFirst({
+          where: { questionnaireId: req.params.id, userId: req.user?.userId, status: 'IN_PROGRESS' },
+          select: { id: true },
+        })
+        if (winner) return questionnaireController.startAssessment(req, res)
+      }
       logger.error('开始问卷测评错误', err)
       return error(res, '开始问卷测评失败')
     }
@@ -2025,7 +2112,7 @@ export const questionnaireController = {
         const item = contentItems[i]
         if (item.type === 'form') {
           const answer = formAnswerMap.get(item.data.id)
-          if (!answer && (item.data.required !== false || Boolean(item.data.contextKey))) {
+          if (!isFormAnswerComplete(item.data, answer)) {
             currentIndex = i
             currentItem = item
             break
@@ -2183,15 +2270,14 @@ export const questionnaireController = {
         if (qa.scaleAssessments.some((assessment) => assessment.status !== 'COMPLETED')) {
           return { kind: 'incomplete-scales' as const }
         }
-        const answeredFormItemIds = new Set(qa.formAnswers.map((answer) => answer.formItemId))
-        if (qa.questionnaire.formItems.some((item) => (item.required !== false || Boolean(item.contextKey)) && !answeredFormItemIds.has(item.id))) {
-          return { kind: 'incomplete-forms' as const }
-        }
+        const formAnswerMap = new Map(qa.formAnswers.map((answer) => [answer.formItemId, answer]))
+        const missingForms = qa.questionnaire.formItems.filter((item) => !isFormAnswerRequiredComplete(item, formAnswerMap.get(item.id)))
+        if (missingForms.length > 0) return { kind: 'incomplete-forms' as const, count: missingForms.length }
 
         const progress = await refreshQuestionnaireProgress(tx, qa.id)
-        if (!progress) return { kind: 'incomplete-forms' as const }
+        if (!progress) return { kind: 'incomplete-forms' as const, count: 0 }
         if (progress.status !== 'IN_PROGRESS' && !progress.completed) return { kind: 'closed' as const }
-        if (!progress.completed) return { kind: 'incomplete-forms' as const }
+        if (!progress.completed) return { kind: 'incomplete-forms' as const, count: 0 }
         return {
           kind: 'completed' as const,
           questionnaireId: qa.questionnaireId,
@@ -2205,7 +2291,7 @@ export const questionnaireController = {
       if (result.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (result.kind === 'closed') return error(res, '测评已关闭，不能继续提交', -1, 409)
       if (result.kind === 'incomplete-scales') return error(res, '还有量表未完成')
-      if (result.kind === 'incomplete-forms') return error(res, '还有表单题目未完成')
+      if (result.kind === 'incomplete-forms') return error(res, `还有 ${result.count} 道必答表单题未完成`, -1, 409)
 
       return success(res, {
         questionnaireId: result.questionnaireId,
@@ -2314,6 +2400,31 @@ export const questionnaireController = {
       // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
 
+      const countWhere: any = { questionnaireId: id, progress: { gte: minProgress } }
+      if (!includeProgress) countWhere.status = 'COMPLETED'
+      const countDateFilter = utcHalfOpenDateFilter(dateRange)
+      if (countDateFilter) countWhere.completedAt = countDateFilter
+      const recordCount = await prisma.questionnaireAssessment.count({ where: countWhere })
+      if (recordCount > EXPORT_ASYNC_RECORD_THRESHOLD) {
+        const queued = await enqueueExportJob({
+          resourceType: 'QUESTIONNAIRE',
+          resourceId: id,
+          createdBy: userId!,
+          anonymized: anonymize,
+          format,
+          options: { anonymize, includeProgress, minProgress, dateRange },
+        })
+        return success(res, {
+          status: 'PROCESSING',
+          recordCount,
+          fieldCount: null,
+          format,
+          anonymize,
+          batchId: queued.batchId,
+          artifacts: queued.artifacts,
+        }, '导出任务已创建')
+      }
+
       const { exportService } = await import('../services/exportService')
 
       const exportData = await exportService.getQuestionnaireExportData(id, {
@@ -2328,7 +2439,7 @@ export const questionnaireController = {
         includeProgress,
         minProgress,
         dateRange
-      }, format as 'csv' | 'sav')
+      }, format as 'csv' | 'sav', exportData)
 
       const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
       const addArtifact = async (filePath: string, artifactFormat: string) => {
@@ -2461,6 +2572,20 @@ export const questionnaireController = {
     } catch (err) {
       logger.error('下载导出文件错误', err)
       return error(res, '下载文件失败')
+    }
+  },
+
+  async exportArtifactStatus(req: Request, res: Response) {
+    try {
+      const actor = req.user ? { userId: req.user.userId, role: req.user.role } : null
+      if (!actor) return forbidden(res, '未授权')
+      const result = await getExportArtifactStatus(req.params.artifactId, actor)
+      if (result.reason === 'not-found') return notFound(res, '导出任务不存在')
+      if (result.reason === 'forbidden') return forbidden(res, '无权限查看此导出任务')
+      return success(res, result.artifact)
+    } catch (err) {
+      logger.error('获取导出任务状态错误', err)
+      return error(res, '获取导出任务状态失败')
     }
   },
 }

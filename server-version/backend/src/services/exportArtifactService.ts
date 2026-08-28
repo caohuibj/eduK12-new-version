@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../config/database'
-import { Prisma, UserRole } from '@prisma/client'
+import { ExportArtifactStatus, Prisma, UserRole } from '@prisma/client'
 
 export type ExportResourceType = 'SCALE' | 'QUESTIONNAIRE'
 export type ExportActor = { userId: string; role: UserRole }
@@ -22,6 +22,13 @@ export const validateStorageKey = (storageKey: string): string => {
   return resolved
 }
 
+const extensionForFormat = (format: string): string => {
+  const normalized = format.toLowerCase()
+  if (normalized === 'spss') return '.sps'
+  if (normalized === 'csv' || normalized === 'sav' || normalized === 'sps') return `.${normalized}`
+  throw new Error('导出格式无效')
+}
+
 export async function createExportArtifact(params: {
   resourceType: ExportResourceType
   resourceId: string
@@ -30,8 +37,14 @@ export async function createExportArtifact(params: {
   anonymized: boolean
   storageKey: string
   expiresAt?: Date
+  status?: ExportArtifactStatus
+  batchId?: string
+  errorCode?: string
 }, db: typeof prisma | Prisma.TransactionClient = prisma) {
-  validateStorageKey(params.storageKey)
+  const storagePath = validateStorageKey(params.storageKey)
+  if (path.extname(storagePath).toLowerCase() !== extensionForFormat(params.format)) {
+    throw new Error('导出文件扩展名与格式不一致')
+  }
   const expiresAt = params.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000)
   return db.exportArtifact.create({
     data: {
@@ -42,6 +55,9 @@ export async function createExportArtifact(params: {
       anonymized: params.anonymized,
       storageKey: params.storageKey,
       expiresAt,
+      status: params.status,
+      batchId: params.batchId,
+      errorCode: params.errorCode,
     },
   })
 }
@@ -58,6 +74,7 @@ export async function authorizeExportDownload(actor: ExportActor, artifact: { cr
 export async function resolveArtifactForDownload(artifactId: string, actor: ExportActor) {
   const artifact = await prisma.exportArtifact.findUnique({ where: { id: artifactId } })
   if (!artifact) return { artifact: null, filePath: null, reason: 'not-found' as const }
+  if (artifact.status !== ExportArtifactStatus.READY) return { artifact: null, filePath: null, reason: artifact.status === ExportArtifactStatus.PROCESSING ? 'processing' as const : 'failed' as const }
   const resource = artifact.resourceType === 'SCALE'
     ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
     : await prisma.questionnaire.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
@@ -70,4 +87,26 @@ export async function resolveArtifactForDownload(artifactId: string, actor: Expo
   }
   if (!fs.existsSync(filePath)) return { artifact: null, filePath: null, reason: 'missing' as const }
   return { artifact, filePath, reason: null }
+}
+
+export async function getExportArtifactStatus(artifactId: string, actor: ExportActor) {
+  const artifact = await prisma.exportArtifact.findUnique({ where: { id: artifactId } })
+  if (!artifact) return { artifact: null, reason: 'not-found' as const }
+  const resource = artifact.resourceType === 'SCALE'
+    ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
+    : await prisma.questionnaire.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
+  if (!(await authorizeExportDownload(actor, artifact, resource))) return { artifact: null, reason: 'forbidden' as const }
+  return {
+    artifact: {
+      id: artifact.id,
+      status: artifact.status,
+      batchId: artifact.batchId,
+      errorCode: artifact.errorCode,
+      format: artifact.format,
+      fileName: path.basename(artifact.storageKey),
+      expiresAt: artifact.expiresAt,
+      downloadUrl: `/api/${artifact.resourceType === 'SCALE' ? 'scales' : 'questionnaires'}/exports/${artifact.id}`,
+    },
+    reason: null,
+  }
 }

@@ -8,6 +8,7 @@ const router = Router()
 
 // 下载导出文件
 router.get('/exports/:artifactId', authenticate, scaleController.downloadExportFile)
+router.get('/exports/:artifactId/status', authenticate, scaleController.exportArtifactStatus)
 
 // ==================== 公开接口（需要登录） ====================
 

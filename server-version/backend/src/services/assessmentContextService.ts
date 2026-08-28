@@ -10,7 +10,10 @@ import {
 } from '../modules/assessment-context'
 import { assessmentContextHashMatches, decryptAssessmentContext, encryptAssessmentContext } from '../modules/assessment-context/security'
 
-type DatabaseClient = typeof import('../config/database').prisma | Prisma.TransactionClient
+// Production callers must pass the transaction client so context freezing,
+// answer writes and child completion share one database snapshot. Unit tests
+// may still provide a structural double through `as any`.
+type DatabaseClient = Prisma.TransactionClient
 
 export class AssessmentContextServiceError extends Error {
   constructor(message: string, public readonly statusCode = 400) {

@@ -1,6 +1,8 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
+import { encryptField } from '../utils/encryption'
+import { isFormAnswerComplete } from './questionnaireFormAnswerState'
 
 type DatabaseClient = typeof prisma | Prisma.TransactionClient
 
@@ -56,9 +58,11 @@ export const refreshQuestionnaireProgress = async (
   const completedScales = qa.scaleAssessments.filter(
     (assessment) => scaleIds.has(assessment.scaleId) && assessment.status === 'COMPLETED',
   ).length
-  const answeredFormItemIds = new Set(qa.formAnswers.filter((answer) => formItemIds.has(answer.formItemId)).map((answer) => answer.formItemId))
+  const formAnswerByItem = new Map(qa.formAnswers
+    .filter((answer) => formItemIds.has(answer.formItemId))
+    .map((answer) => [answer.formItemId, answer]))
   const completedForms = qa.questionnaire.formItems.filter((item) => (
-    (item.required === false && !item.contextKey) || answeredFormItemIds.has(item.id)
+    isFormAnswerComplete(item, formAnswerByItem.get(item.id))
   )).length
   const totalItems = scaleIds.size + formItemIds.size
   const completedItems = completedScales + completedForms
@@ -109,6 +113,7 @@ export const refreshQuestionnaireProgress = async (
   }
 
   const collectionReport = buildQuestionnaireCollectionReport(qa)
+  const storedCollectionReport = collectionReportForStorage(collectionReport)
   const completedAt = new Date()
   const totalTime = completedAt.getTime() - new Date(qa.startedAt).getTime()
 
@@ -121,7 +126,10 @@ export const refreshQuestionnaireProgress = async (
       progress: 100,
       completedAt,
       totalTime,
-      aggregateReport: collectionReportForStorage(collectionReport) as any,
+      // Keep the legacy JSON column during the application backfill window;
+      // all new authoritative reads prefer the encrypted column.
+      aggregateReport: storedCollectionReport as any,
+      aggregateReportEncrypted: encryptField(storedCollectionReport),
     },
   })
 

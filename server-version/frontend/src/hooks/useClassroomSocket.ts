@@ -14,7 +14,11 @@ interface UseClassroomSocketOptions {
   classroomCode?: string
   role: 'teacher' | 'student' | 'bigscreen'
   autoConnect?: boolean
+  /** Optional read-only fallback used after reconnect_failed. */
+  onHttpFallback?: () => void | Promise<void>
 }
+
+export type ClassroomSocketState = 'CONNECTED' | 'RECONNECTING' | 'FAILED' | 'MANUAL_RETRY'
 
 interface SocketEvents {
   'teacher:joined'?: (data: any) => void
@@ -77,11 +81,14 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     classroomCode,
     role,
     autoConnect = true,
+    onHttpFallback,
   } = options
 
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [connectionState, setConnectionState] = useState<ClassroomSocketState | 'DISCONNECTED'>('DISCONNECTED')
   const socketRef = useRef<Socket | null>(null)
+  const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) {
@@ -101,6 +108,10 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     })
 
     const socket = socketRef.current
+    const clearFallbackTimer = () => {
+      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current)
+      fallbackTimerRef.current = null
+    }
 
     socket.on('student:joined', (data) => {
       if (role === 'student') {
@@ -110,7 +121,9 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
 
     socket.on('connect', () => {
       setIsConnected(true)
+      setConnectionState('CONNECTED')
       setError(null)
+      clearFallbackTimer()
 
       if (role === 'teacher') {
         if (classroomId) {
@@ -134,10 +147,21 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     socket.on('connect_error', (err) => {
       setError('连接失败: ' + err.message)
       setIsConnected(false)
+      setConnectionState('RECONNECTING')
+    })
+
+    socket.io.on('reconnect_attempt', () => setConnectionState('RECONNECTING'))
+    socket.io.on('reconnect_failed', () => {
+      setConnectionState('FAILED')
+      clearFallbackTimer()
+      fallbackTimerRef.current = setTimeout(() => {
+        if (!socket.connected) void onHttpFallback?.()
+      }, 30_000)
     })
 
     socket.on('disconnect', (reason) => {
       setIsConnected(false)
+      setConnectionState(reason === 'io client disconnect' ? 'DISCONNECTED' : 'RECONNECTING')
       if (reason === 'io server disconnect') {
         socket.connect()
       }
@@ -149,7 +173,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
       }
       setError(data?.message || '发生错误')
     })
-  }, [classroomCode, classroomId, role])
+  }, [classroomCode, classroomId, onHttpFallback, role])
 
   const disconnect = useCallback(() => {
     if (socketRef.current) {
@@ -158,7 +182,10 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
       }
       socketRef.current.disconnect()
       socketRef.current = null
+      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current)
+      fallbackTimerRef.current = null
       setIsConnected(false)
+      setConnectionState('DISCONNECTED')
     }
   }, [role])
 
@@ -180,13 +207,24 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     }
   }, [])
 
-  const emit = useCallback((event: string, data?: unknown) => {
+  const emit = useCallback((event: string, data?: unknown, ack?: (payload?: unknown) => void) => {
     if (socketRef.current && isConnected) {
-      socketRef.current.emit(event, data)
+      socketRef.current.emit(event, data, ack)
     } else {
       console.warn('无法发送事件 "' + event + '"：socket 未连接')
     }
   }, [isConnected])
+
+  const manualRetry = useCallback(() => {
+    setConnectionState('MANUAL_RETRY')
+    if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current)
+    fallbackTimerRef.current = null
+    if (socketRef.current) {
+      socketRef.current.connect()
+    } else {
+      connect()
+    }
+  }, [connect])
 
   useEffect(() => {
     if (autoConnect) {
@@ -201,6 +239,8 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
   return {
     isConnected,
     error,
+    connectionState,
+    manualRetry,
     connect,
     disconnect,
     on,

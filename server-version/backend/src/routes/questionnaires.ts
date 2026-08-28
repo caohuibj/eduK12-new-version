@@ -21,6 +21,7 @@ router.get('/assessments/:id/report', authenticate, questionnaireController.getR
 
 // 下载导出文件（必须在 /:id 之前）
 router.get('/exports/:artifactId', authenticate, questionnaireController.downloadExportFile)
+router.get('/exports/:artifactId/status', authenticate, questionnaireController.exportArtifactStatus)
 
 // 获取问卷详情
 router.get('/:id', authenticate, questionnaireController.detail)

@@ -20,6 +20,10 @@ interface Questionnaire {
   inProgress: boolean
   completedAt: string | null
   assessmentId: string | null
+  activeAttempt?: { id: string; startedAt: string; progress: number } | null
+  latestCompletedAttempt?: { id: string; completedAt: string | null } | null
+  attemptCount?: number
+  retakeAllowed?: boolean
 }
 
 const StudentQuestionnaires: React.FC = () => {
@@ -71,7 +75,9 @@ const StudentQuestionnaires: React.FC = () => {
               key={qn.id}
               className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
-                if (qn.completed && qn.assessmentId) {
+                if (qn.inProgress) {
+                  navigate(`/student/questionnaires/${qn.id}`)
+                } else if (qn.completed && qn.assessmentId) {
                   navigate(`/student/questionnaires/result/${qn.assessmentId}`)
                 } else {
                   navigate(`/student/questionnaires/${qn.id}`)
@@ -89,7 +95,7 @@ const StudentQuestionnaires: React.FC = () => {
                           已完成
                         </span>
                       )}
-                      {qn.inProgress && !qn.completed && (
+                      {qn.inProgress && (
                         <span className="flex items-center text-amber-600 text-sm">
                           <PlayCircle className="w-4 h-4 mr-1" />
                           进行中

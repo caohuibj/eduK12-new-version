@@ -87,6 +87,43 @@ const PublicCognitiveAssignment = React.lazy(() => import('./modules/cognitive/p
 const BigScreen = React.lazy(() => import('./pages/bigscreen/BigScreen'))
 import FirstLoginPasswordChange from './pages/FirstLoginPasswordChange'
 
+class RouteErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; message: string }
+> {
+  state = { hasError: false, message: '' }
+
+  static getDerivedStateFromError(error: unknown) {
+    return {
+      hasError: true,
+      message: error instanceof Error ? error.message : '页面暂时无法加载',
+    }
+  }
+
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
+    console.error('路由渲染错误', error, info)
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+        <div role="alert" className="max-w-md rounded-lg bg-white p-6 text-center shadow">
+          <h1 className="text-xl font-semibold text-gray-900">页面加载失败</h1>
+          <p className="mt-2 text-sm text-gray-600">{this.state.message}</p>
+          <button
+            type="button"
+            className="mt-4 rounded bg-primary px-4 py-2 text-white"
+            onClick={() => this.setState({ hasError: false, message: '' })}
+          >
+            重试
+          </button>
+        </div>
+      </div>
+    )
+  }
+}
+
 // Protected Route for Teachers/Admins
 const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({
   children,
@@ -775,7 +812,9 @@ function App() {
     <CapabilitiesProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AppRoutes />
+          <RouteErrorBoundary>
+            <AppRoutes />
+          </RouteErrorBoundary>
         </BrowserRouter>
       </AuthProvider>
     </CapabilitiesProvider>

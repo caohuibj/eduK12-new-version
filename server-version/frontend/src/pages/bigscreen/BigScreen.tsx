@@ -46,6 +46,15 @@ const BigScreen: React.FC = () => {
   const wordCloudRef = useRef<HTMLDivElement>(null)
   const wordCloudInstance = useRef<echarts.ECharts | null>(null)
 
+  // Instances are created lazily when their canvas first appears, then kept
+  // across data updates and disposed exactly once when this page unmounts.
+  useEffect(() => () => {
+    chartInstance.current?.dispose()
+    wordCloudInstance.current?.dispose()
+    chartInstance.current = null
+    wordCloudInstance.current = null
+  }, [])
+
   // Socket 连接
   const { isConnected, on, off, emit } = useClassroomSocket({
     classroomId,
@@ -150,14 +159,27 @@ const BigScreen: React.FC = () => {
       setCountdown(null)
     })
 
+    // `next` is a UI clear event only. Ignore an old event once a newer
+    // question is already displayed on this screen.
+    on('broadcast:next', (data) => {
+      const expectedQuestionId = data?.expectedQuestionId
+      if (!expectedQuestionId || expectedQuestionId === currentQuestion?.questionId) {
+        setCurrentQuestion(null)
+        setStats(null)
+        setIsFinished(false)
+        setCountdown(null)
+      }
+    })
+
     return () => {
       off('bigscreen:joined')
       off('broadcast:question')
       off('broadcast:stats')
       off('broadcast:online')
       off('broadcast:finished')
+      off('broadcast:next')
     }
-  }, [isConnected, on, off])
+  }, [currentQuestion?.questionId, isConnected, on, off])
 
   // 倒计时逻辑
   useEffect(() => {
@@ -189,9 +211,10 @@ const BigScreen: React.FC = () => {
       return
     }
 
-    if (!chartInstance.current) {
-      chartInstance.current = echarts.init(chartRef.current)
-    }
+    if (!chartInstance.current) chartInstance.current = echarts.init(chartRef.current)
+    const instance = chartInstance.current
+    const resize = () => instance.resize()
+    window.addEventListener('resize', resize)
 
     // 兼容两种格式：{ value, label } 和 { key, text }
     const options = currentQuestion.questionContent.options || []
@@ -312,12 +335,9 @@ const BigScreen: React.FC = () => {
       ],
     }
 
-    chartInstance.current.setOption(option)
+    instance.setOption(option)
+    return () => window.removeEventListener('resize', resize)
 
-    return () => {
-      chartInstance.current?.dispose()
-      chartInstance.current = null
-    }
   }, [currentQuestion, stats, isFinished])
 
   // 初始化/更新词云
@@ -342,9 +362,10 @@ const BigScreen: React.FC = () => {
     }
 
 
-    if (!wordCloudInstance.current) {
-      wordCloudInstance.current = echarts.init(wordCloudRef.current)
-    }
+    if (!wordCloudInstance.current) wordCloudInstance.current = echarts.init(wordCloudRef.current)
+    const instance = wordCloudInstance.current
+    const resize = () => instance.resize()
+    window.addEventListener('resize', resize)
 
     // 优先使用后端分词结果，降级到前端简单分词
     let data: Array<{ name: string; value: number }>
@@ -412,12 +433,9 @@ const BigScreen: React.FC = () => {
       ],
     }
 
-    wordCloudInstance.current.setOption(option)
+    instance.setOption(option)
+    return () => window.removeEventListener('resize', resize)
 
-    return () => {
-      wordCloudInstance.current?.dispose()
-      wordCloudInstance.current = null
-    }
   }, [currentQuestion, stats])
 
   if (!isConnected && !isHistoryMode) {

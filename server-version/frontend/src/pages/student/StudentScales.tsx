@@ -15,8 +15,13 @@ interface Scale {
   } | null
   itemCount: number
   completed: boolean
+  inProgress?: boolean
   completedAt: string | null
   assessmentId: string | null
+  activeAttempt?: { id: string; startedAt: string; progress: number } | null
+  latestCompletedAttempt?: { id: string; completedAt: string | null } | null
+  attemptCount?: number
+  retakeAllowed?: boolean
 }
 
 const StudentScales: React.FC = () => {
@@ -68,7 +73,9 @@ const StudentScales: React.FC = () => {
               key={scale.id}
               className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
-                if (scale.completed && scale.assessmentId) {
+                if (scale.inProgress) {
+                  navigate(`/student/scales/${scale.id}`)
+                } else if (scale.completed && scale.assessmentId) {
                   navigate(`/student/scales/result/${scale.assessmentId}`)
                 } else {
                   navigate(`/student/scales/${scale.id}`)
@@ -80,6 +87,9 @@ const StudentScales: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="text-lg font-medium text-gray-900">{scale.name}</h3>
+                      {scale.inProgress && (
+                        <span className="text-blue-600 text-sm">进行中</span>
+                      )}
                       {scale.completed && (
                         <span className="flex items-center text-green-600 text-sm">
                           <CheckCircle className="w-4 h-4 mr-1" />

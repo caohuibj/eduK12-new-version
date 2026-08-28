@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle, FileText, Layers } from 'lucide-react'
+import { normalizeApiError } from '../../utils/normalizeApiError'
+import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 
 type ResponseValue = string | number
 
@@ -76,6 +78,10 @@ const QuestionnaireAssessment: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const [formAnswer, setFormAnswer] = useState<string | string[]>('')
   const [submitting, setSubmitting] = useState(false)
+  const [runnerError, setRunnerError] = useState<string | null>(null)
+  const [answersLoading, setAnswersLoading] = useState(false)
+  const [answersLoadFailed, setAnswersLoadFailed] = useState(false)
+  const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   const freezeContextBeforeScale = async (assessmentId: string) => {
     const response = await apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/questionnaires/assessments/${assessmentId}/context/freeze`)
@@ -98,10 +104,12 @@ const QuestionnaireAssessment: React.FC = () => {
   const startAssessment = async () => {
     try {
       // 先检查是否已经完成过该问卷
-      const availableResponse = await apiClient.get<{ list: Array<{ id: string; completed: boolean; assessmentId: string | null }> }>('/questionnaires/available')
+      const availableResponse = await apiClient.get<{ list: Array<{ id: string; completed: boolean; inProgress?: boolean; assessmentId: string | null }> }>('/questionnaires/available')
       if (availableResponse.code === 0) {
         const existingRecord = availableResponse.data.list.find(q => q.id === questionnaireId)
-        if (existingRecord && existingRecord.completed && existingRecord.assessmentId) {
+        // An active attempt is authoritative even when a prior completed
+        // attempt is also present; the POST below resumes that active row.
+        if (existingRecord && !existingRecord.inProgress && existingRecord.completed && existingRecord.assessmentId) {
           // 已完成，直接跳转到结果页
           navigate(`/student/questionnaires/result/${existingRecord.assessmentId}`)
           return
@@ -150,6 +158,7 @@ const QuestionnaireAssessment: React.FC = () => {
         }
       }
     } catch (err) {
+      setRunnerError(normalizeApiError(err).message)
       console.error('开始问卷测评失败', err)
     } finally {
       setLoading(false)
@@ -158,8 +167,11 @@ const QuestionnaireAssessment: React.FC = () => {
 
   const fetchExistingAnswers = async (assessmentId: string) => {
     try {
+      setAnswersLoading(true)
+      setAnswersLoadFailed(false)
       const response = await apiClient.get(`/scales/assessments/${assessmentId}`)
-      if (response.code === 0 && response.data.answers) {
+      if (response.code !== 0) throw new Error(response.message || '获取已有答案失败')
+      if (response.data.answers) {
         const existingAnswers: Record<string, ResponseValue> = {}
         response.data.answers.forEach((a: any) => {
           existingAnswers[a.itemCode] = a.responseValue
@@ -167,13 +179,17 @@ const QuestionnaireAssessment: React.FC = () => {
         setAnswers(existingAnswers)
       }
     } catch (err) {
+      setAnswersLoadFailed(true)
+      setRunnerError(normalizeApiError(err).message)
       console.error('获取已有答案失败', err)
+    } finally {
+      setAnswersLoading(false)
     }
   }
 
   // 处理量表题目答案选择
   const handleSelectAnswer = async (value: ResponseValue) => {
-    if (!data?.currentScale) return
+    if (!data?.currentScale || savingAnswerRef.current || submitting) return
 
     const items = data.currentScale.definition.items
     const item = items[scaleIndex]
@@ -182,24 +198,22 @@ const QuestionnaireAssessment: React.FC = () => {
     // 计算作答时间（毫秒）
     const responseTime = Date.now() - itemStartTimeRef.current
 
-    // 更新本地状态
-    setAnswers({ ...answers, [item.itemCode]: value })
-
-    // 提交答案（包含作答时间）
     try {
-      await apiClient.patch(`/scales/assessments/${data.currentScale.scaleAssessmentId}/answers`, {
-        itemCode: item.itemCode,
-        responseValue: value,
-        responseTimeMs: responseTime,
+      await runSave(async () => {
+        const response = await apiClient.patch(`/scales/assessments/${data.currentScale!.scaleAssessmentId}/answers`, {
+          itemCode: item.itemCode,
+          responseValue: value,
+          responseTimeMs: responseTime,
+        })
+        if (response.code !== 0) throw new Error(response.message || '提交答案失败')
+        setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
+        setRunnerError(null)
+        if (scaleIndex < items.length - 1) {
+          setScaleIndex((index) => index === scaleIndex ? index + 1 : index)
+        }
       })
-      
-      // 如果不是最后一题，自动跳到下一题
-      if (scaleIndex < items.length - 1) {
-        setTimeout(() => {
-          setScaleIndex((index) => index + 1)
-        }, 200)
-      }
     } catch (err) {
+      setRunnerError(normalizeApiError(err).message)
       console.error('提交答案失败', err)
     }
   }
@@ -218,7 +232,7 @@ const QuestionnaireAssessment: React.FC = () => {
   }
 
   // 提交表单答案并进入下一项
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (action: 'answer' | 'skip' = 'answer') => {
     if (!data?.currentFormItem) return
 
     const formItem = data.currentFormItem
@@ -226,30 +240,33 @@ const QuestionnaireAssessment: React.FC = () => {
     const isEmpty = Array.isArray(formAnswer) 
       ? formAnswer.length === 0 
       : !formAnswer.trim()
-    
-    if (formItem.required && isEmpty) {
-      alert('此题为必填项')
+
+    if (action === 'answer' && formItem.required && isEmpty) {
+      setRunnerError('此题为必填项')
       return
     }
+    if (action === 'skip' && (formItem.required || formItem.contextKey)) return
 
     try {
       setSubmitting(true)
-      
+
       // 处理多选题答案格式：数组转JSON字符串
       const valueToSubmit: string = Array.isArray(formAnswer) 
         ? JSON.stringify(formAnswer) 
         : formAnswer
       
       // 保存表单答案
-      await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/form-answers`, {
+      const response = await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/form-answers`, {
         formItemId: formItem.id,
-        value: valueToSubmit,
+        ...(action === 'skip' ? { action: 'skip' } : { action: 'answer', value: valueToSubmit }),
       })
+      if (response.code !== 0) throw new Error(response.message || '提交失败')
 
       // 进入下一个内容项
       await moveToNextItem()
+      setRunnerError(null)
     } catch (err: any) {
-      alert(err.message || '提交失败')
+      setRunnerError(normalizeApiError(err).message)
     } finally {
       setSubmitting(false)
     }
@@ -257,25 +274,28 @@ const QuestionnaireAssessment: React.FC = () => {
 
   // 完成量表并进入下一项
   const handleCompleteScale = async () => {
-    if (!data?.currentScale) return
+    if (!data?.currentScale || submitting || savingAnswerRef.current) return
 
     const items = data.currentScale.definition.items
     const unanswered = items.filter((item) => item.required && answers[item.itemCode] === undefined)
     if (unanswered.length > 0) {
-      if (!confirm(`还有 ${unanswered.length} 道题目未作答，确定要提交吗？`)) {
-        return
-      }
+      const firstMissingIndex = items.findIndex((item) => item.required && answers[item.itemCode] === undefined)
+      if (firstMissingIndex >= 0) setScaleIndex(firstMissingIndex)
+      setRunnerError(`还有 ${unanswered.length} 道必答题未作答，请完成后再提交`)
+      return
     }
+    setRunnerError(null)
 
     try {
       setSubmitting(true)
       // 完成当前量表
-      await apiClient.post(`/scales/assessments/${data.currentScale.scaleAssessmentId}/complete`)
+      const response = await apiClient.post(`/scales/assessments/${data.currentScale.scaleAssessmentId}/complete`)
+      if (response.code !== 0) throw new Error(response.message || '提交失败')
 
       // 进入下一个内容项
       await moveToNextItem()
     } catch (err: any) {
-      alert(err.message || '提交失败')
+      setRunnerError(normalizeApiError(err).message)
     } finally {
       setSubmitting(false)
     }
@@ -290,38 +310,41 @@ const QuestionnaireAssessment: React.FC = () => {
       `/questionnaires/assessments/${data.questionnaireAssessment.id}`
     )
 
-    if (statusResponse.code === 0) {
-      const qa = statusResponse.data.questionnaireAssessment
-      
-      if (qa.status === 'COMPLETED' || qa.currentIndex >= statusResponse.data.totalItems) {
-        // 所有内容完成
-        await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/complete`)
-        navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)
-      } else {
-        // 切换到下一项
-        let nextData = statusResponse.data
-        if (statusResponse.data.currentScale?.scaleAssessmentId) {
-          const frozen = await freezeContextBeforeScale(data.questionnaireAssessment.id)
-          nextData = {
-            ...statusResponse.data,
-            questionnaireAssessment: {
-              ...statusResponse.data.questionnaireAssessment,
-              context: { status: 'frozen', frozenAt: frozen.frozenAt },
-            },
-          }
+    if (statusResponse.code !== 0 || !statusResponse.data) {
+      throw new Error(statusResponse.message || '获取测评状态失败')
+    }
+
+    const qa = statusResponse.data.questionnaireAssessment
+
+    if (qa.status === 'COMPLETED' || qa.currentIndex >= statusResponse.data.totalItems) {
+      // 所有内容完成
+      const completionResponse = await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/complete`)
+      if (completionResponse.code !== 0) throw new Error(completionResponse.message || '完成测评失败')
+      navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)
+    } else {
+      // 切换到下一项
+      let nextData = statusResponse.data
+      if (statusResponse.data.currentScale?.scaleAssessmentId) {
+        const frozen = await freezeContextBeforeScale(data.questionnaireAssessment.id)
+        nextData = {
+          ...statusResponse.data,
+          questionnaireAssessment: {
+            ...statusResponse.data.questionnaireAssessment,
+            context: { status: 'frozen', frozenAt: frozen.frozenAt },
+          },
         }
-        setData(nextData)
-        setScaleIndex(0)
-        setAnswers({})
+      }
+      setData(nextData)
+      setScaleIndex(0)
+      setAnswers({})
+      setFormAnswer('')
+
+      if (nextData.currentFormItem) {
+        // 下一项是表单题目
         setFormAnswer('')
-        
-        if (nextData.currentFormItem) {
-          // 下一项是表单题目
-          setFormAnswer('')
-        } else if (nextData.currentScale?.scaleAssessmentId) {
-          // 下一项是量表
-          fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
-        }
+      } else if (nextData.currentScale?.scaleAssessmentId) {
+        // 下一项是量表
+        fetchExistingAnswers(nextData.currentScale.scaleAssessmentId)
       }
     }
   }
@@ -342,11 +365,14 @@ const QuestionnaireAssessment: React.FC = () => {
     )
   }
 
+  const runnerBusy = submitting || savingAnswer || answersLoading || answersLoadFailed
+
   // 渲染表单题目
   if (data.currentFormItem) {
     const formItem = data.currentFormItem
     return (
       <div className="max-w-2xl mx-auto">
+        {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
         {/* 整体进度 */}
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -389,6 +415,7 @@ const QuestionnaireAssessment: React.FC = () => {
               type="text"
               value={formAnswer}
               onChange={(e) => setFormAnswer(e.target.value)}
+              disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
             />
@@ -398,6 +425,7 @@ const QuestionnaireAssessment: React.FC = () => {
             <textarea
               value={formAnswer}
               onChange={(e) => setFormAnswer(e.target.value)}
+              disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
               rows={5}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
@@ -409,6 +437,7 @@ const QuestionnaireAssessment: React.FC = () => {
               type="month"
               value={typeof formAnswer === 'string' ? formAnswer : ''}
               onChange={(e) => setFormAnswer(e.target.value)}
+              disabled={runnerBusy}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
             />
           )}
@@ -423,6 +452,7 @@ const QuestionnaireAssessment: React.FC = () => {
                 <button
                   key={option.value}
                   onClick={() => setFormAnswer(option.value)}
+                  disabled={runnerBusy}
                   className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                     formAnswer === option.value
                       ? 'border-primary bg-primary/5 text-primary'
@@ -445,6 +475,7 @@ const QuestionnaireAssessment: React.FC = () => {
                   <button
                     key={option.value}
                     onClick={() => {
+                      if (runnerBusy) return
                       if (isSelected) {
                         setFormAnswer(currentAnswers.filter(v => v !== option.value))
                       } else {
@@ -474,13 +505,23 @@ const QuestionnaireAssessment: React.FC = () => {
         {/* 导航 */}
         <div className="flex justify-end">
           <button
-            onClick={handleFormSubmit}
-            disabled={submitting || (formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()))}
+            onClick={() => void handleFormSubmit()}
+            disabled={runnerBusy || (formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()))}
             className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
           >
             <CheckCircle className="w-5 h-5 mr-1" />
             {submitting ? '提交中...' : '提交并继续'}
           </button>
+          {!formItem.required && !formItem.contextKey && (
+            <button
+              type="button"
+              onClick={() => void handleFormSubmit('skip')}
+              disabled={runnerBusy}
+              className="ml-3 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg disabled:opacity-50"
+            >
+              跳过
+            </button>
+          )}
         </div>
 
         {/* 内容导航 */}
@@ -529,6 +570,16 @@ const QuestionnaireAssessment: React.FC = () => {
 
     return (
       <div className="max-w-2xl mx-auto">
+        {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
+        {answersLoadFailed && data.currentScale?.scaleAssessmentId && (
+          <button
+            type="button"
+            className="mb-4 px-3 py-1.5 text-sm border border-gray-300 rounded"
+            onClick={() => void fetchExistingAnswers(data.currentScale!.scaleAssessmentId)}
+          >
+            重试加载答案
+          </button>
+        )}
         {/* 整体进度 */}
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -574,7 +625,8 @@ const QuestionnaireAssessment: React.FC = () => {
             {(currentItem?.options || []).map((option) => (
               <button
                 key={`${typeof option.value}:${String(option.value)}`}
-                onClick={() => handleSelectAnswer(option.value)}
+                onClick={() => void handleSelectAnswer(option.value)}
+                disabled={runnerBusy}
                 className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                   selectedValue === option.value
                     ? 'border-primary bg-primary/5 text-primary'
@@ -591,7 +643,7 @@ const QuestionnaireAssessment: React.FC = () => {
         <div className="flex justify-between">
           <button
             onClick={handlePrevious}
-            disabled={scaleIndex === 0}
+            disabled={scaleIndex === 0 || runnerBusy}
             className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
@@ -601,7 +653,7 @@ const QuestionnaireAssessment: React.FC = () => {
           {scaleIndex === items.length - 1 ? (
             <button
               onClick={handleCompleteScale}
-              disabled={submitting}
+              disabled={runnerBusy}
               className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
             >
               <CheckCircle className="w-5 h-5 mr-1" />
@@ -610,6 +662,7 @@ const QuestionnaireAssessment: React.FC = () => {
           ) : (
             <button
               onClick={handleNext}
+              disabled={runnerBusy}
               className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
             >
               下一题
@@ -626,6 +679,7 @@ const QuestionnaireAssessment: React.FC = () => {
               <button
                 key={item.itemCode}
                 onClick={() => setScaleIndex(index)}
+                disabled={runnerBusy}
                 className={`w-8 h-8 rounded text-sm font-medium ${
                   scaleIndex === index
                     ? 'bg-primary text-white'

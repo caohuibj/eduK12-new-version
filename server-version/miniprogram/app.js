@@ -1,8 +1,11 @@
+const { BASE_URL } = require('./config/env')
+
 App({
   globalData: {
     userInfo: null,
     token: null,
-    baseUrl: 'https://api.eduk12.top'
+    // Read-only build-time configuration; do not expose a runtime host setter.
+    baseUrl: BASE_URL,
   },
   
   onLaunch() {

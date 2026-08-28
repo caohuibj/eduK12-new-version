@@ -329,6 +329,18 @@ enum AssessmentStatus {
   ABANDONED // 已放弃
 }
 
+enum QuestionnaireFormAnswerStatus {
+  PENDING
+  ANSWERED
+  SKIPPED
+}
+
+enum ExportArtifactStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
 enum ScaleVisibility {
   HIDDEN // 未关联不可见（默认）
   COURSE // 关联课程后可见
@@ -385,6 +397,8 @@ model Scale {
   instrumentVersion String               @default("2.0.0") @map("instrument_version")
   definition        Json? // ScaleDefinitionV2；运行时唯一计分来源
   definitionHash    String?              @map("definition_hash")
+  itemCount         Int                  @default(0) @map("item_count")
+  dimensionCount    Int                  @default(0) @map("dimension_count")
   estimatedTime     Int?                 @map("estimated_time") // 预计用时（分钟）
   instruction       String? // 指导语
   creatorId         String               @map("creator_id") // 创建者ID
@@ -543,6 +557,7 @@ model QuestionnaireAssessment {
   completedAt              DateTime?        @map("completed_at")
   totalTime                Int?             @map("total_time") // 总用时（毫秒）
   aggregateReport          Json?            @map("aggregate_report") // 聚合报告（加密存储）
+  aggregateReportEncrypted String?          @map("aggregate_report_encrypted")
   contextSnapshotEncrypted String?          @map("context_snapshot_encrypted")
   contextSnapshotHash      String?          @map("context_snapshot_hash")
   contextFrozenAt          DateTime?        @map("context_frozen_at")
@@ -603,6 +618,9 @@ model ExportArtifact {
   format       String
   anonymized   Boolean  @default(false)
   storageKey   String   @map("storage_key")
+  status       ExportArtifactStatus @default(READY)
+  batchId      String?  @map("batch_id")
+  errorCode    String?  @map("error_code")
   createdAt    DateTime @default(now()) @map("created_at")
   expiresAt    DateTime @map("expires_at")
 
@@ -611,6 +629,8 @@ model ExportArtifact {
   @@index([resourceType, resourceId])
   @@index([createdBy])
   @@index([expiresAt])
+  @@index([status, createdAt])
+  @@index([batchId])
   @@map("export_artifacts")
 }
 
@@ -660,7 +680,8 @@ model QuestionnaireFormAnswer {
   id                        String   @id @default(uuid())
   questionnaireAssessmentId String   @map("questionnaire_assessment_id")
   formItemId                String   @map("form_item_id")
-  value                     String // 用户填写的答案值
+  value                     String? // 用户填写的答案值；SKIPPED/PENDING 可为空
+  status                    QuestionnaireFormAnswerStatus @default(PENDING)
   createdAt                 DateTime @default(now()) @map("created_at")
 
   // 关联

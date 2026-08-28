@@ -17,6 +17,9 @@ import { legacyUploadGuard } from './middleware/legacyUploadGuard'
 // 导入 Worker (启动视频处理队列)
 // 使用优化版本 (支持硬件负担最小模式)
 import './workers/videoProcessorOptimized'
+// Assessment exports are processed asynchronously above the configured record
+// threshold; the worker builds one dataset and materializes all formats.
+import './workers/exportProcessor'
 // 图片处理队列
 import './workers/imageProcessor'
 // 中文分词服务（单例模式，服务启动时自动初始化）
@@ -24,6 +27,7 @@ import './services/wordSegmentation'
 // Redis缓存服务
 import { cacheService } from './services/cacheService'
 import { closeQueues } from './config/queue'
+import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -250,6 +254,18 @@ cacheService.initialize().catch(err => {
   logger.warn('Redis缓存服务初始化失败，继续运行（无缓存）', err)
 })
 
+// ExportArtifact cleanup is metadata-driven: only exact expired objects are
+// removed, never an exploratory directory scan. Keep one bounded hourly task
+// per backend process and make shutdown cancel it.
+const exportCleanupTimer = setInterval(() => {
+  void cleanupExpiredExportArtifacts().then((result) => {
+    if (result.deletedArtifacts > 0 || result.invalidPaths > 0) {
+      logger.info('过期导出产物清理完成', result)
+    }
+  }).catch((err) => logger.warn('过期导出产物清理失败', err))
+}, 60 * 60 * 1000)
+exportCleanupTimer.unref?.()
+
 // 启动服务器
 server.listen(config.port, () => {
   logger.info(`🚀 Server running on port ${config.port}`)
@@ -271,6 +287,7 @@ let shutdownStarted = false
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
+  clearInterval(exportCleanupTimer)
   logger.info(`${signal} signal received: closing HTTP server`)
   
   // 设置强制退出超时（5秒）

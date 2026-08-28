@@ -30,7 +30,9 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
-import { createExportArtifact, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
+import { utcHalfOpenDateFilter } from '../services/exportService'
 
 // ==================== Validation Schemas ====================
 
@@ -70,6 +72,13 @@ const answerPreviewSchema = z.object({
 const definitionIssuesMessage = (issues: Array<{ path: string; message: string }>): string => (
   issues.slice(0, 5).map((issue) => `${issue.path}: ${issue.message}`).join('；')
 )
+
+const definitionSummary = (definition: unknown): { itemCount: number; dimensionCount: number } => {
+  const value = definition && typeof definition === 'object' ? definition as any : null
+  const items = Array.isArray(value?.items) ? value.items : []
+  const scores = Array.isArray(value?.scoring?.scores) ? value.scoring.scores : []
+  return { itemCount: items.length, dimensionCount: scores.filter((score: any) => score?.type === 'dimension').length }
+}
 
 // ==================== Controller ====================
 
@@ -160,6 +169,7 @@ export const scaleController = {
 
       const { code, name, description, visibility, estimatedTime, instruction, tags } = result.data
       const definition = createCustomScaleDefinition()
+      const summary = definitionSummary(definition)
 
       // 检查编码是否已存在
       const existingScale = await prisma.scale.findUnique({
@@ -180,6 +190,7 @@ export const scaleController = {
           instrumentVersion: '2.0.0',
           definition: definition as any,
           definitionHash: hashScaleDefinition(definition),
+          ...summary,
           estimatedTime,
           instruction,
           creatorId: userId,
@@ -234,7 +245,7 @@ export const scaleController = {
       }
       const updated = await prisma.scale.update({
         where: { id },
-        data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition) },
+        data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition), ...definitionSummary(validation.definition) },
       })
       return success(res, { ...updated, definition: validation.definition }, 'definition 保存成功')
     } catch (err) {
@@ -322,7 +333,7 @@ export const scaleController = {
       }
       const updated = await prisma.scale.update({
         where: { id },
-        data: { status: 'PUBLISHED', definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition) },
+        data: { status: 'PUBLISHED', definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition), ...definitionSummary(validation.definition) },
       })
       return success(res, updated, '量表发布成功')
     } catch (err) {
@@ -606,7 +617,15 @@ export const scaleController = {
 
       const scales = await prisma.scale.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          description: true,
+          visibility: true,
+          estimatedTime: true,
+          itemCount: true,
+          dimensionCount: true,
           courseScales: {
             include: {
               course: {
@@ -623,33 +642,60 @@ export const scaleController = {
         }
       })
 
-      // 优化：批量查询所有已完成的测评（消除 N+1 查询）
-      const completedAssessments = await prisma.assessment.findMany({
+      // 批量查询所有尝试（消除 N+1 查询）。PR25 只限制同时一个
+      // IN_PROGRESS 尝试，历史完成/放弃记录仍用于稳定的列表 DTO。
+      const assessments = await prisma.assessment.findMany({
         where: {
           userId,
-          status: 'COMPLETED',
-          scaleId: { in: scales.map(s => s.id) }
+          scaleId: { in: scales.map(s => s.id) },
+          questionnaireAssessmentId: null,
+          compositeAttemptId: null,
         },
-        select: { id: true, scaleId: true, completedAt: true }
+        select: { id: true, scaleId: true, status: true, startedAt: true, progress: true, completedAt: true }
       })
 
-      const completedMap = new Map(
-        completedAssessments.map(a => [a.scaleId, { id: a.id, completedAt: a.completedAt }])
-      )
+      const assessmentsByScale = new Map<string, typeof assessments>()
+      assessments.forEach((assessment) => {
+        const bucket = assessmentsByScale.get(assessment.scaleId) || []
+        bucket.push(assessment)
+        assessmentsByScale.set(assessment.scaleId, bucket)
+      })
 
-      const scalesWithStatus = scales.map(scale => ({
-        id: scale.id,
-        code: scale.code,
-        name: scale.name,
-        description: scale.description,
-        visibility: scale.visibility,
-        estimatedTime: scale.estimatedTime,
-        courses: scale.courseScales.map(cs => cs.course),
-        itemCount: Array.isArray((scale.definition as any)?.items) ? (scale.definition as any).items.length : 0,
-        completed: completedMap.has(scale.id),
-        completedAt: completedMap.get(scale.id)?.completedAt || null,
-        assessmentId: completedMap.get(scale.id)?.id || null,
-      }))
+      const scalesWithStatus = scales.map(scale => {
+        const attempts = assessmentsByScale.get(scale.id) || []
+        const activeAttempt = attempts
+          .filter((attempt) => attempt.status === 'IN_PROGRESS')
+          .sort((left, right) => left.id.localeCompare(right.id))[0] || null
+        const latestCompletedAttempt = attempts
+          .filter((attempt) => attempt.status === 'COMPLETED')
+          .sort((left, right) => (right.completedAt?.getTime() || 0) - (left.completedAt?.getTime() || 0))[0] || null
+        return {
+          id: scale.id,
+          code: scale.code,
+          name: scale.name,
+          description: scale.description,
+          visibility: scale.visibility,
+          estimatedTime: scale.estimatedTime,
+          courses: scale.courseScales.map(cs => cs.course),
+          itemCount: scale.itemCount,
+          dimensionCount: scale.dimensionCount,
+          completed: Boolean(latestCompletedAttempt),
+          inProgress: Boolean(activeAttempt),
+          completedAt: latestCompletedAttempt?.completedAt || null,
+          assessmentId: activeAttempt?.id || latestCompletedAttempt?.id || null,
+          activeAttempt: activeAttempt ? {
+            id: activeAttempt.id,
+            startedAt: activeAttempt.startedAt,
+            progress: activeAttempt.progress,
+          } : null,
+          latestCompletedAttempt: latestCompletedAttempt ? {
+            id: latestCompletedAttempt.id,
+            completedAt: latestCompletedAttempt.completedAt,
+          } : null,
+          attemptCount: attempts.length,
+          retakeAllowed: !activeAttempt,
+        }
+      })
 
       return success(res, {
         list: scalesWithStatus,
@@ -679,7 +725,15 @@ export const scaleController = {
       const definition = scaleDefinitionFromRecord(scale)
       const runner = scaleRunnerFromRecord(scale)
 
-      const existing = await prisma.assessment.findFirst({ where: { scaleId, userId, status: 'IN_PROGRESS' } })
+      const existing = await prisma.assessment.findFirst({
+        where: {
+          scaleId,
+          userId,
+          status: 'IN_PROGRESS',
+          questionnaireAssessmentId: null,
+          compositeAttemptId: null,
+        },
+      })
       if (existing) {
         const stored = readScaleAnswers(existing.answers)
         if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
@@ -689,9 +743,32 @@ export const scaleController = {
         }, '继续未完成的测评')
       }
 
-      const assessment = await prisma.assessment.create({
-        data: { scaleId, userId: userId!, status: 'IN_PROGRESS', progress: 0, answers: encryptField([]), startedAt: new Date() },
-      })
+      let assessment
+      try {
+        assessment = await prisma.assessment.create({
+          data: { scaleId, userId: userId!, status: 'IN_PROGRESS', progress: 0, answers: encryptField([]), startedAt: new Date() },
+        })
+      } catch (err: any) {
+        // The partial unique index is the final concurrency boundary. If a
+        // competing request won the insert, return that authoritative row.
+        if (err?.code !== 'P2002') throw err
+        assessment = await prisma.assessment.findFirst({
+          where: {
+            scaleId,
+            userId,
+            status: 'IN_PROGRESS',
+            questionnaireAssessmentId: null,
+            compositeAttemptId: null,
+          },
+        })
+        if (!assessment) throw err
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
+        return success(res, {
+          assessment: scaleAssessmentForResponse(assessment),
+          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
+        }, '继续未完成的测评')
+      }
       return success(res, {
         assessment: scaleAssessmentForResponse(assessment),
         scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
@@ -1072,6 +1149,31 @@ export const scaleController = {
       // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
 
+      const countWhere: any = { scaleId, progress: { gte: minProgress } }
+      if (!includeProgress) countWhere.status = 'COMPLETED'
+      const countDateFilter = utcHalfOpenDateFilter(dateRange)
+      if (countDateFilter) countWhere.completedAt = countDateFilter
+      const recordCount = await prisma.assessment.count({ where: countWhere })
+      if (recordCount > EXPORT_ASYNC_RECORD_THRESHOLD) {
+        const queued = await enqueueExportJob({
+          resourceType: 'SCALE',
+          resourceId: scaleId,
+          createdBy: userId!,
+          anonymized: anonymize,
+          format,
+          options: { anonymize, includeProgress, minProgress, dateRange },
+        })
+        return success(res, {
+          status: 'PROCESSING',
+          recordCount,
+          fieldCount: null,
+          format,
+          anonymize,
+          batchId: queued.batchId,
+          artifacts: queued.artifacts,
+        }, '导出任务已创建')
+      }
+
       // 动态导入导出服务
       const { exportService } = await import('../services/exportService')
 
@@ -1089,7 +1191,7 @@ export const scaleController = {
         includeProgress,
         minProgress,
         dateRange
-      }, format as 'csv' | 'sav' | 'spss')
+      }, format as 'csv' | 'sav' | 'spss', exportData)
 
       const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
       const addArtifact = async (filePath: string, artifactFormat: string) => {
@@ -1214,6 +1316,20 @@ export const scaleController = {
     } catch (err) {
       logger.error('下载导出文件错误', err)
       return error(res, '下载文件失败')
+    }
+  },
+
+  async exportArtifactStatus(req: Request, res: Response) {
+    try {
+      const actor = req.user ? { userId: req.user.userId, role: req.user.role } : null
+      if (!actor) return forbidden(res, '未授权')
+      const result = await getExportArtifactStatus(req.params.artifactId, actor)
+      if (result.reason === 'not-found') return notFound(res, '导出任务不存在')
+      if (result.reason === 'forbidden') return forbidden(res, '无权限查看此导出任务')
+      return success(res, result.artifact)
+    } catch (err) {
+      logger.error('获取导出任务状态错误', err)
+      return error(res, '获取导出任务状态失败')
     }
   },
 

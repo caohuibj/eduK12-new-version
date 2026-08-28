@@ -819,7 +819,7 @@ export const classroomController = {
 
       // 获取会话总数
       const totalSessions = await prisma.classroomSession.count({
-        where: { classroomId },
+        where: { classroomId, leftAt: null },
       })
 
       // 统计每个选项的选择人数（单选题/多选题）
