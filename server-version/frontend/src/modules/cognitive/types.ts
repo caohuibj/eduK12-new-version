@@ -38,6 +38,31 @@ export interface CognitiveReportMetricView {
   formatted: string
 }
 
+export interface CognitiveV2ReportMetricView extends CognitiveReportMetricView {
+  category: string
+  direction: 'higher_is_better' | 'lower_is_better' | 'target_range' | 'descriptive' | 'signed'
+}
+
+export interface CognitiveV2Report {
+  title: string
+  qualityState: 'interpretable' | 'limited' | 'invalid'
+  conclusion: string
+  headline: CognitiveV2ReportMetricView[]
+  user: CognitiveV2ReportMetricView[]
+  detail: CognitiveV2ReportMetricView[]
+  quality: Array<{ key: string; label: string; active: boolean; effect: 'none' | 'limited' | 'invalid' }>
+  method: {
+    testType: string
+    engineVersion: string
+    scoringVersion: string
+    configVersion: string
+    protocolSignature: string
+    profile: 'experience' | 'standard' | 'research' | null
+  }
+  disclaimer: string
+  practicalTips: string[]
+}
+
 export interface CognitiveSingleTaskReport {
   testType: string
   profile: 'experience' | 'standard' | 'research' | null
@@ -65,9 +90,13 @@ export interface CognitiveSingleTaskReport {
 }
 
 export interface CognitiveResult {
-  score: number
+  score?: number
   metrics: Record<string, unknown>
   qualityFlags: Record<string, unknown>
+  quality?: { state: 'interpretable' | 'limited' | 'invalid'; flags: Record<string, boolean>; reasons: string[] }
+  references?: Array<Record<string, unknown>>
+  report?: CognitiveV2Report | Record<string, unknown>
+  assessmentContext?: { schemaVersion: 1; snapshotHash: string } | null
   reference?: CognitiveReference
   singleTaskReport?: CognitiveSingleTaskReport | null
 }
@@ -105,8 +134,8 @@ export interface CognitiveHistoryItem {
   engineVersion: string
   scoringVersion: string
   finishedAt: string | null
-  score: number
-  qualityState: 'interpretable' | 'insufficient'
+  score: number | null
+  qualityState: 'interpretable' | 'limited' | 'invalid'
 }
 
 export interface CognitiveHistoryPage {
@@ -142,6 +171,17 @@ export interface CognitiveSession {
   configVersion: string
   engineVersion: string
   scoringVersion: string
+  protocolSignature?: string
+  protocol?: {
+    schemaVersion: 1
+    key: string
+    version: string
+    clock: 'performance'
+    randomizationAlgorithmVersion: string
+    trialEnvelopeVersion: 1
+    phases: Array<{ key: 'test' | 'learning' | 'delayed'; persists: boolean; required: boolean }>
+    measurementCriticalConfigPaths: string[]
+  }
   config: Record<string, unknown>
   randomSeed: string
   profile?: 'experience' | 'standard' | 'research' | null

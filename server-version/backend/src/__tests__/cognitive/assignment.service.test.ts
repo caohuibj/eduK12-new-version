@@ -30,6 +30,7 @@ import {
   updateDraftAssignment,
   publishAssignment,
   archiveAssignment,
+  ensureTeacherPublishedAssignment,
 } from '../../modules/cognitive/assignment.service'
 
 beforeAll(() => {
@@ -51,6 +52,26 @@ const config = {
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
   config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+}
+const publishedV2Config = {
+  ...config,
+  testType: 'reaction',
+  configVersion: '1.1.0',
+  name: 'Reaction Time 1.1.0',
+  scoringVersion: '1.1.0',
+  config: {
+    totalTrials: 20,
+    foreperiodMinMs: 700,
+    foreperiodMaxMs: 1500,
+    timeoutMs: 2000,
+    readyDurationMs: 1000,
+    report: {
+      reportVersion: '1.1.0',
+      referenceMode: 'simulated',
+      referenceVersion: 'lit-sim-k12-v0.2',
+      referenceBand: 'K7-9',
+    },
+  },
 }
 const assignment = {
   id: 'asg-1',
@@ -110,6 +131,30 @@ describe('listPublishedConfigs', () => {
     expect(mockPrisma.cognitiveTestConfig.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { status: 'PUBLISHED' },
     }))
+  })
+
+  it('hides database-published configs whose v2 definition is still Draft', async () => {
+    mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      id: 'fake-config',
+      testType: 'fake',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      status: 'PUBLISHED',
+    }])
+
+    await expect(listPublishedConfigs('admin-1', ADMIN)).resolves.toEqual([])
+  })
+
+  it('keeps a database-published config whose exact v2 definition is Published', async () => {
+    mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      id: 'reaction-config',
+      testType: 'reaction',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.1.0',
+      status: 'PUBLISHED',
+    }])
+
+    await expect(listPublishedConfigs('admin-1', ADMIN)).resolves.toHaveLength(1)
   })
 })
 
@@ -343,7 +388,7 @@ describe('publishAssignment / archiveAssignment', () => {
       .mockResolvedValueOnce({ ...assignment, course })
       .mockResolvedValueOnce({ ...assignment, status: 'PUBLISHED', publishedAt: new Date() })
     mockPrisma.course.findUnique.mockResolvedValue(course)
-    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedV2Config)
     mockPrisma.cognitiveAssignment.updateMany.mockResolvedValue({ count: 1 })
 
     const result = await publishAssignment('teacher-1', TEACHER, 'asg-1')
@@ -361,7 +406,7 @@ describe('publishAssignment / archiveAssignment', () => {
       .mockResolvedValueOnce({ ...assignment, profile: 'experience', course })
       .mockResolvedValueOnce({ ...assignment, status: 'PUBLISHED', profile: 'experience' })
     mockPrisma.course.findUnique.mockResolvedValue(course)
-    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedV2Config)
     mockPrisma.cognitiveAssignment.updateMany.mockResolvedValue({ count: 1 })
 
     await publishAssignment('teacher-1', TEACHER, 'asg-1')
@@ -369,7 +414,7 @@ describe('publishAssignment / archiveAssignment', () => {
     expect(data.resolvedConfigHash).toMatch(/^[a-f0-9]{64}$/)
     expect(data.resolvedConfigSnapshotEncrypted).toEqual(expect.any(String))
     expect(data.resolvedReportSnapshotEncrypted).toEqual(expect.any(String))
-    expect(data.profileDefinitionVersion).toBe('1.0.0')
+    expect(data.profileDefinitionVersion).toBe('1.1.0')
   })
 
   it('rejects updating profile after publish', async () => {
@@ -382,12 +427,42 @@ describe('publishAssignment / archiveAssignment', () => {
   it('rejects publishing a draft without a profile', async () => {
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, profile: null, course })
     mockPrisma.course.findUnique.mockResolvedValue(course)
-    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedV2Config)
     await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({
       statusCode: 400,
       message: '发布前必须选择 Profile',
     })
     expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('rejects a database-published config when its exact v2 definition is Draft', async () => {
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, course })
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+
+    await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({
+      statusCode: 400,
+      message: expect.stringMatching(/publication\.status must be PUBLISHED/),
+    })
+    expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('rejects new report-package materialization for a database-published but v2-Draft config', async () => {
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
+
+    await expect(ensureTeacherPublishedAssignment(mockPrisma as any, {
+      userId: 'teacher-1',
+      courseId: 'course-1',
+      configId: 'config-1',
+      title: 'Fake package slot',
+      instruction: null,
+      profile: 'standard',
+    })).rejects.toMatchObject({
+      statusCode: 400,
+      message: expect.stringMatching(/publication\.status must be PUBLISHED/),
+    })
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
   })
 
   it('rejects publishing a non-DRAFT', async () => {

@@ -2,6 +2,7 @@ import { prisma } from '../../config/database'
 import { logger } from '../../utils/logger'
 import { decryptCognitivePayload } from './cognitive.security'
 import type { PaginationParams } from '../../utils/pagination'
+import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 
 type HistoryRow = {
   sessionId: string
@@ -13,8 +14,8 @@ type HistoryRow = {
   engineVersion: string
   scoringVersion: string
   finishedAt: Date | null
-  score: number
-  qualityState: 'interpretable' | 'insufficient'
+  score: number | null
+  qualityState: 'interpretable' | 'limited' | 'invalid'
 }
 
 /** 学生自己的已完成记录；不返回 raw trial、密文或详细 metrics。 */
@@ -22,9 +23,11 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
   const where = {
     userId,
     status: 'COMPLETED' as const,
-    scoreEncrypted: { not: null },
-    qualityFlagsEncrypted: { not: null },
     compositeAttemptId: null,
+    OR: [
+      { scoreEncrypted: { not: null }, qualityFlagsEncrypted: { not: null } },
+      { resultSnapshotEncrypted: { not: null } },
+    ],
   }
   const sessions = await prisma.cognitiveSession.findMany({
     where,
@@ -40,6 +43,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
       finishedAt: true,
       scoreEncrypted: true,
       qualityFlagsEncrypted: true,
+      resultSnapshotEncrypted: true,
       assignment: { select: { title: true } },
     },
   })
@@ -47,6 +51,26 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
   const displayable: HistoryRow[] = []
   for (const session of sessions) {
     try {
+      if (session.resultSnapshotEncrypted) {
+        const snapshot = parseCognitiveResultSnapshot(
+          decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
+        )
+        displayable.push({
+          sessionId: session.id,
+          assignmentId: session.assignmentId,
+          title: session.assignment?.title ?? `${session.testType} 测评`,
+          testType: session.testType,
+          attemptNo: session.attemptNo,
+          configVersion: session.configVersion,
+          engineVersion: session.engineVersion,
+          scoringVersion: session.scoringVersion,
+          finishedAt: session.finishedAt,
+          score: null,
+          qualityState: snapshot.quality.state,
+        })
+        continue
+      }
+      if (!session.scoreEncrypted || !session.qualityFlagsEncrypted) throw new Error('completed legacy history result is incomplete')
       const score = decryptCognitivePayload<number>(session.scoreEncrypted as string)
       const qualityFlags = decryptCognitivePayload<Record<string, unknown>>(
         session.qualityFlagsEncrypted as string
@@ -62,7 +86,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
         scoringVersion: session.scoringVersion,
         finishedAt: session.finishedAt,
         score,
-        qualityState: qualityFlags.interpretable === false ? 'insufficient' : 'interpretable',
+        qualityState: qualityFlags.interpretable === false ? 'limited' : 'interpretable',
       })
     } catch {
       logger.warn('Skipping undecryptable cognitive history session', {

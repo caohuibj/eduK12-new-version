@@ -63,10 +63,10 @@ const protocol = {
   profiles: ['standard', 'research'] as const,
   estimatedMinutes: { standard: [10, 15] as [number, number], research: [20, 30] as [number, number] },
   cognitiveSlots: [{
-    key: 'fake', label: 'Fake', position: 0, required: true as const, testType: 'fake',
-    configVersion: '1.0.0', engineVersion: '1.0.0', scoringVersion: '1.0.0',
-    profileDefinitionVersion: '1.0.0', metricDefinitionVersion: '1.0.0',
-    qualityDefinitionVersion: '1.0.0', reportDefinitionVersion: '1.0.0',
+    key: 'reaction', label: 'Reaction Time', position: 0, required: true as const, testType: 'reaction',
+    configVersion: '1.1.0', engineVersion: '1.0.0', scoringVersion: '1.1.0',
+    profileDefinitionVersion: '1.1.0', metricDefinitionVersion: '1.1.0',
+    qualityDefinitionVersion: '1.1.0', reportDefinitionVersion: '1.1.0',
   }],
   scaleSlots: [],
   outputDomains: ['processing_speed' as const],
@@ -88,17 +88,24 @@ const packageDefinition = {
   audience: ['participant', 'teacher', 'researcher'] as const,
 }
 
-const fakeConfig = {
-  trialCount: 3,
-  trialDurationMs: 1000,
-  allowPractice: false,
-  maxRtMs: 60000,
+const reactionConfig = {
+  totalTrials: 20,
+  foreperiodMinMs: 700,
+  foreperiodMaxMs: 1500,
+  timeoutMs: 2000,
+  readyDurationMs: 1000,
+  report: {
+    reportVersion: '1.1.0',
+    referenceMode: 'simulated',
+    referenceVersion: 'lit-sim-k12-v0.2',
+    referenceBand: 'K7-9',
+  },
 }
 
 const frozenAssignment = () => {
-  const entry = getCognitiveRegistryEntry('fake', '1.0.0', '1.0.0')
-  if (!entry) throw new Error('fake registry entry missing')
-  return freezeDataForWrite(freezeAssignmentProfile({ entry, baseConfig: fakeConfig, profile: 'standard' }))
+  const entry = getCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')
+  if (!entry) throw new Error('reaction registry entry missing')
+  return freezeDataForWrite(freezeAssignmentProfile({ entry, baseConfig: reactionConfig, profile: 'standard' }))
 }
 
 const packageItem = () => ({
@@ -119,13 +126,13 @@ const packageItem = () => ({
     configId: 'config-1',
     config: {
       id: 'config-1',
-      testType: 'fake',
-      configVersion: '1.0.0',
+      testType: 'reaction',
+      configVersion: '1.1.0',
       status: 'PUBLISHED',
       engineVersion: '1.0.0',
-      scoringVersion: '1.0.0',
-      config: fakeConfig,
-      name: 'Fake',
+      scoringVersion: '1.1.0',
+      config: reactionConfig,
+      name: 'Reaction Time',
       instruction: '说明',
     },
     ...frozenAssignment(),
@@ -251,8 +258,8 @@ beforeEach(() => {
   mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'composite-1', reportPackageKey: packageDefinition.key })
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({
-    id: 'config-1', testType: 'fake', configVersion: '1.0.0', status: 'PUBLISHED',
-    engineVersion: '1.0.0', scoringVersion: '1.0.0', config: fakeConfig,
+    id: 'config-1', testType: 'reaction', configVersion: '1.1.0', status: 'PUBLISHED',
+    engineVersion: '1.0.0', scoringVersion: '1.1.0', config: reactionConfig,
   })
 })
 
@@ -304,7 +311,7 @@ describe('ReportPackage composite boundary', () => {
     const packageSnapshot = readFrozenReportPackageSnapshot(update.data.reportPackageSnapshotEncrypted)
     expect(packageSnapshot.packageKey).toBe(packageDefinition.key)
     expect(packageSnapshot.profile).toBe('standard')
-    expect(packageSnapshot.packageDefinition.slots[0].label).toBe('Fake')
+    expect(packageSnapshot.packageDefinition.slots[0].label).toBe('Reaction Time')
     const protocolSnapshot = readFrozenAnalysisProtocolSnapshot(update.data.analysisProtocolSnapshotEncrypted)
     expect(protocolSnapshot.protocolKey).toBe(protocol.key)
   })
@@ -480,6 +487,6 @@ describe('ReportPackage composite boundary', () => {
       formAnswers: [],
     })
 
-    expect(report.unitReports[0].label).toBe('Fake')
+    expect(report.unitReports[0].label).toBe('Reaction Time')
   })
 })

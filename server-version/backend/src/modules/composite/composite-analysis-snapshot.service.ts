@@ -4,6 +4,8 @@ import {
   encryptCognitivePayload,
 } from '../cognitive/cognitive.security'
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
+import { sessionConfigFromStoredValue } from '../cognitive/v2/session-snapshot'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import { safeDecrypt } from '../../utils/encryption'
 import { buildPackageCognitiveAnalysis } from '../cognitive-analysis/package-analysis.engine'
 import { readFrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
@@ -119,6 +121,7 @@ export interface PackageAnalysisAttemptInput {
     scoreEncrypted?: string | null
     metricsEncrypted?: string | null
     qualityFlagsEncrypted?: string | null
+    resultSnapshotEncrypted?: string | null
     attemptNo?: number
   }>
 }
@@ -738,34 +741,46 @@ const buildFrozenModuleResults = (
     ) {
       throw new Error(`报告包槽位 Session 版本不匹配：${slot.key}`)
     }
-    const sessionConfig = decryptCognitivePayload<unknown>(
+    const storedSessionConfig = decryptCognitivePayload<unknown>(
       requireCipher(session.configSnapshotEncrypted, `报告包槽位 Session 配置快照：${slot.key}`),
     )
+    const sessionConfig = sessionConfigFromStoredValue(storedSessionConfig).config
     if (hashResolvedConfig(sessionConfig) !== measurement.resolvedConfigHash) {
       throw new Error(`报告包槽位 Session 配置 hash 不匹配：${slot.key}`)
     }
 
-    // COMPLETED sessions must contain all three encrypted result columns.
-    // Score is validated for integrity even though PR7 consumes metrics and
-    // quality flags only; the score is never copied into the package payload.
-    const score = decryptCognitivePayload<unknown>(
-      requireCipher(session.scoreEncrypted, `报告包槽位 score：${slot.key}`),
-    )
-    if (typeof score !== 'number' || !Number.isFinite(score)) {
-      throw new Error(`报告包槽位 score 格式无效：${slot.key}`)
+    const v2Snapshot = session.resultSnapshotEncrypted
+      ? parseCognitiveResultSnapshot(
+        decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
+      )
+      : null
+    // v2 deliberately has no generic product/index score. The package engine
+    // consumes metrics and quality flags only; legacy sessions still require
+    // and validate their historical score column.
+    if (!v2Snapshot) {
+      const score = decryptCognitivePayload<unknown>(
+        requireCipher(session.scoreEncrypted, `报告包槽位 score：${slot.key}`),
+      )
+      if (typeof score !== 'number' || !Number.isFinite(score)) {
+        throw new Error(`报告包槽位 score 格式无效：${slot.key}`)
+      }
     }
-    const metrics = requireRecord(
-      decryptCognitivePayload<unknown>(
-        requireCipher(session.metricsEncrypted, `报告包槽位 metrics：${slot.key}`),
-      ),
-      `报告包槽位 metrics：${slot.key}`,
-    )
-    const qualityFlags = requireRecord(
-      decryptCognitivePayload<unknown>(
-        requireCipher(session.qualityFlagsEncrypted, `报告包槽位 qualityFlags：${slot.key}`),
-      ),
-      `报告包槽位 qualityFlags：${slot.key}`,
-    )
+    const metrics = v2Snapshot
+      ? v2Snapshot.metrics
+      : requireRecord(
+        decryptCognitivePayload<unknown>(
+          requireCipher(session.metricsEncrypted, `报告包槽位 metrics：${slot.key}`),
+        ),
+        `报告包槽位 metrics：${slot.key}`,
+      )
+    const qualityFlags = v2Snapshot
+      ? v2Snapshot.quality.flags
+      : requireRecord(
+        decryptCognitivePayload<unknown>(
+          requireCipher(session.qualityFlagsEncrypted, `报告包槽位 qualityFlags：${slot.key}`),
+        ),
+        `报告包槽位 qualityFlags：${slot.key}`,
+      )
 
     return {
       slotKey: slot.key,
@@ -777,7 +792,10 @@ const buildFrozenModuleResults = (
       engineVersion: session.engineVersion,
       scoringVersion: session.scoringVersion,
       metrics,
-      qualityFlags,
+      ...(v2Snapshot ? { qualityState: v2Snapshot.quality.state } : {}),
+      qualityFlags: v2Snapshot
+        ? { ...qualityFlags, interpretable: v2Snapshot.quality.state === 'interpretable' }
+        : qualityFlags,
       frozenReport,
       provenance: {
         sourceType: 'cognitive_session',

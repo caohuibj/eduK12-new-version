@@ -230,6 +230,70 @@ describe('PR8 package analysis snapshot service', () => {
     expect(buildPackageAnalysisForAttempt(collectionOnly)).toBeNull()
   })
 
+  it('adapts a v2 three-state quality result to the legacy package-engine boundary', () => {
+    const session = attempt.cognitiveSessions[0]
+    if (!session?.metricsEncrypted) throw new Error('missing cognitive metrics fixture')
+    const v2Snapshot = {
+      schemaVersion: 1 as const,
+      completedAt: '2026-08-27T00:00:00.000Z',
+      testType: session.testType,
+      configVersion: session.configVersion,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      protocolSignature: 'a'.repeat(64),
+      profile: 'standard' as const,
+      metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
+      quality: { state: 'invalid' as const, flags: {}, reasons: ['fixture invalid result'] },
+      references: [],
+      report: {},
+      assessmentContext: null,
+    }
+    attempt.cognitiveSessions[0] = {
+      ...session,
+      scoreEncrypted: null,
+      resultSnapshotEncrypted: encryptCognitivePayload(v2Snapshot),
+    }
+
+    const built = buildPackageAnalysisForAttempt(attempt)
+    expect(built?.moduleResults[0]).toMatchObject({
+      qualityState: 'invalid',
+      qualityFlags: { interpretable: false },
+    })
+    expect(built?.analysis.qualitySummary.excludedModules).toContain('reaction')
+  })
+
+  it('preserves a v2 limited quality state and its compatibility flag in package evidence', () => {
+    const session = attempt.cognitiveSessions[0]
+    if (!session?.metricsEncrypted) throw new Error('missing cognitive metrics fixture')
+    const v2Snapshot = {
+      schemaVersion: 1 as const,
+      completedAt: '2026-08-27T00:00:00.000Z',
+      testType: session.testType,
+      configVersion: session.configVersion,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      protocolSignature: 'a'.repeat(64),
+      profile: 'standard' as const,
+      metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
+      quality: { state: 'limited' as const, flags: { legacyUninterpretable: true }, reasons: ['fixture limited result'] },
+      references: [],
+      report: {},
+      assessmentContext: null,
+    }
+    attempt.cognitiveSessions[0] = {
+      ...session,
+      scoreEncrypted: null,
+      resultSnapshotEncrypted: encryptCognitivePayload(v2Snapshot),
+    }
+
+    const built = buildPackageAnalysisForAttempt(attempt)
+    expect(built?.moduleResults[0]).toMatchObject({
+      qualityState: 'limited',
+      qualityFlags: { legacyUninterpretable: true, interpretable: false },
+    })
+    expect(built?.analysis.qualitySummary.excludedModules).toContain('reaction')
+  })
+
   it('hashes canonical plaintext semantics independent of module/object order', () => {
     const built = buildPackageAnalysisForAttempt(attempt)
     if (!built) throw new Error('missing package fixture')

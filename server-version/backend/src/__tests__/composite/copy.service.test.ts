@@ -34,7 +34,7 @@ import {
   startUserAttempt,
   updateComposite,
 } from '../../modules/composite/composite.service'
-import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
@@ -242,7 +242,7 @@ describe('copyComposite', () => {
   })
 
   it('copies a frozen cognitive snapshot into composite child sessions', async () => {
-    const frozenCipher = 'frozen-cipher'
+    const frozenCipher = encryptCognitivePayload(publishedConfig.config)
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue({
       id: 'comp-1',
       status: 'PUBLISHED',
@@ -276,9 +276,17 @@ describe('copyComposite', () => {
     mockPrisma.cognitiveSession.create.mockResolvedValue({ id: 'sess-1' })
 
     await startUserAttempt('student-1', 'comp-1')
-    expect(mockPrisma.cognitiveSession.create).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ configSnapshotEncrypted: frozenCipher }),
-    }))
+    const created = mockPrisma.cognitiveSession.create.mock.calls[0][0]
+    const snapshot = decryptCognitivePayload<Record<string, unknown>>(created.data.configSnapshotEncrypted)
+    expect(snapshot).toMatchObject({
+      schemaVersion: 1,
+      testType: 'fake',
+      configVersion: '1.0.0',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      config: publishedConfig.config,
+    })
+    expect(snapshot.protocolSignature).toMatch(/^[0-9a-f]{64}$/)
   })
 
   it('rejects a library course as the copy target', async () => {

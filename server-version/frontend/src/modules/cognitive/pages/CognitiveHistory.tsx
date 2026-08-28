@@ -70,10 +70,16 @@ const CognitiveHistory: React.FC = () => {
                     {item.finishedAt ? new Date(item.finishedAt).toLocaleString('zh-CN') : '完成时间未知'}
                   </p>
                 </div>
-                  <div className="text-2xl font-bold text-primary">{Math.round(item.score)}</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {item.score === null ? '查看结果' : Math.round(item.score)}
+                  </div>
               </div>
               <p className="text-xs text-gray-400 mt-3">
-                {item.qualityState === 'interpretable' ? '数据质量：可解释' : '数据质量：不足以稳定解释'}
+                {item.qualityState === 'interpretable'
+                  ? '数据质量：可解释'
+                  : item.qualityState === 'limited'
+                    ? '数据质量：受限解释'
+                    : '数据质量：无效，暂不解释'}
               </p>
             </button>
           ))}

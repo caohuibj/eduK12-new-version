@@ -3,6 +3,10 @@ import { encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
+import { readCognitiveSessionConfig } from './session.service'
+import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
+import { parseTrialEnvelope } from './v2/trial-envelope'
+import { isEncrypted } from '../../utils/encryption'
 
 /**
  * D5 — Append-only Trial API 服务。
@@ -10,7 +14,7 @@ import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
  * 边界（D5 §3 / §17）：只做单 trial append；
  * 不做 update/delete/bulk/history、不做 Completion/Scoring/metrics/quality flags；
  * 不接受 client-provided payloadHash / encrypted payload；
- * 不引 Redis queue / offline sync；不加新 migration。
+ * 不引 Redis queue / offline sync；数据库变更由版本化 Prisma migration 管理。
  *
  * D6.1（P0 并发修复）：整个 append 在 DB transaction + Session 行锁（FOR UPDATE）内执行，
  * 锁内 校验状态 → trialSchema → hash+encrypt → 查重 → insert，杜绝
@@ -56,11 +60,51 @@ const appendTrialWithPrincipal = async (
       session.scoringVersion
     )
 
-    const parsed = entry.trialSchema.safeParse(input.payload)
-    if (!parsed.success) throw BAD_REQUEST('Invalid trial payload for this test type')
+    // v2 sessions persist the complete envelope. Legacy sessions retain the
+    // previous raw-payload path so old in-progress attempts remain resumable.
+    let persistedPayload: unknown
+    let v2Snapshot = false
+    try {
+      const storedConfig = isEncrypted(session.configSnapshotEncrypted)
+        ? readCognitiveSessionConfig(session.configSnapshotEncrypted)
+        : null
+      v2Snapshot = Boolean(storedConfig?.snapshot)
+      if (storedConfig?.snapshot) {
+        const envelope = parseTrialEnvelope(input.payload)
+        if (envelope.trialIndex !== input.trialIndex) throw BAD_REQUEST('Trial envelope index does not match the request index')
+        if (!storedConfig.snapshot.protocol.phases.some((phase) => phase.key === envelope.phase && phase.persists)) {
+          throw BAD_REQUEST('Trial envelope phase is not part of the frozen protocol')
+        }
+        const parsedPayload = entry.trialSchema.safeParse(envelope.payload)
+        if (!parsedPayload.success) throw BAD_REQUEST('Invalid trial payload for this test type')
+        if (parsedPayload.data && typeof parsedPayload.data === 'object' && !Array.isArray(parsedPayload.data)) {
+          const declaredPhase = (parsedPayload.data as { phase?: unknown }).phase
+          if ((declaredPhase === 'learning' || declaredPhase === 'delayed') && declaredPhase !== envelope.phase) {
+            throw BAD_REQUEST('Trial payload phase does not match the envelope phase')
+          }
+        }
+        persistedPayload = { ...envelope, payload: parsedPayload.data }
+        // Composite context is frozen before the first persisted cognitive
+        // trial. Standalone sessions intentionally resolve to empty context.
+        await ensureCognitiveAssessmentContext(tx, session)
+      }
+    } catch (err) {
+      if (err && typeof err === 'object' && 'statusCode' in err) throw err
+      if (v2Snapshot) throw BAD_REQUEST('Invalid v2 trial envelope')
+      // An encrypted session config is always expected to be a valid frozen
+      // config (legacy raw config or the v2 snapshot). Do not let a corrupt
+      // ciphertext silently fall through to the legacy payload path.
+      if (isEncrypted(session.configSnapshotEncrypted)) throw BAD_REQUEST('Invalid cognitive session config snapshot')
+    }
 
-    const payloadHash = hashTrialPayload(parsed.data)
-    const payloadEncrypted = encryptCognitivePayload(parsed.data)
+    if (!v2Snapshot) {
+      const parsed = entry.trialSchema.safeParse(input.payload)
+      if (!parsed.success) throw BAD_REQUEST('Invalid trial payload for this test type')
+      persistedPayload = parsed.data
+    }
+
+    const payloadHash = hashTrialPayload(persistedPayload)
+    const payloadEncrypted = encryptCognitivePayload(persistedPayload)
 
     // 锁内查重（无需依赖 P2002）：同 index 同 hash → replay；异 hash → 409 绝不覆盖。
     const existing = await tx.cognitiveTrial.findUnique({

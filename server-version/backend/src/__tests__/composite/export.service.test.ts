@@ -404,6 +404,48 @@ describe('composite export service', () => {
     expect(data.rows[0]).not.toHaveProperty('C001_score')
   })
 
+  it('exports v2 metrics and three-state quality without a generic score', async () => {
+    const template: any = makeTemplate(false)
+    template.items[0].cognitiveAssignment = {
+      title: 'v2 反应时任务',
+      profile: 'standard',
+      resolvedReportSnapshotEncrypted: null,
+      config: { testType: 'reaction', engineVersion: '1.0.0', scoringVersion: '1.1.0' },
+    }
+    template.attempts[0].cognitiveSessions[0] = {
+      ...template.attempts[0].cognitiveSessions[0],
+      scoreEncrypted: null,
+      metricsEncrypted: encryptCognitivePayload({}),
+      qualityFlagsEncrypted: encryptCognitivePayload({}),
+      resultSnapshotEncrypted: encryptCognitivePayload({
+        schemaVersion: 1,
+        completedAt: '2026-08-20T10:01:00.000Z',
+        testType: 'reaction',
+        configVersion: '1.1.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        protocolSignature: 'a'.repeat(64),
+        profile: 'standard',
+        metrics: { medianRtMs: 350, missRate: 0 },
+        quality: { state: 'interpretable', flags: {}, reasons: [] },
+        references: [],
+        report: { qualityState: 'interpretable' },
+        assessmentContext: null,
+      }),
+    }
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(template)
+
+    const data = await compositeExportService.getExportData('composite-1', { detail: 'summary' })
+
+    expect(data.fields.some((field) => field.name === 'C001_score')).toBe(false)
+    expect(data.rows[0]).toMatchObject({
+      C001_quality: 'interpretable',
+      C001_test_type: 'reaction',
+      C001_config_version: '1.1.0',
+      C001_M_medianrtms: 350,
+    })
+  })
+
   it('uses the frozen package slot label instead of a live wrapper title', async () => {
     const template: any = makeTemplate(false)
     template.reportPackageKey = 'attention_stability_v1'

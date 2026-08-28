@@ -10,6 +10,14 @@ import { loadFrozenMeasurementContext } from './profile-freeze'
 import { buildCognitiveSingleTaskReport } from './single-task-report'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
+import { getCognitiveV2TaskDefinition } from './v2/registry'
+import { runAuthoritativeScorer } from './v2/authoritative-scorer'
+import { readCognitiveSessionConfig } from './session.service'
+import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
+import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
+import { projectThreeLayerReport } from './v2/report'
+import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
+import type { CognitiveResultSnapshot } from './v2/types'
 
 /**
  * D6 — Completion / Scoring 服务。
@@ -100,6 +108,124 @@ const decryptResult = (session: {
   }
 }
 
+const v2ResponseFromSnapshot = (snapshot: CognitiveResultSnapshot) => ({
+  metrics: snapshot.metrics,
+  quality: snapshot.quality,
+  qualityFlags: snapshot.quality.flags,
+  references: referencesForCognitiveResult(snapshot),
+  report: snapshot.report,
+  assessmentContext: snapshot.assessmentContext,
+})
+
+const buildV2CompletedPayload = (
+  session: { id: string },
+  snapshot: CognitiveResultSnapshot,
+) => ({
+  sessionId: session.id,
+  status: 'COMPLETED' as const,
+  finishedAt: new Date(snapshot.completedAt),
+  ...v2ResponseFromSnapshot(snapshot),
+  result: v2ResponseFromSnapshot(snapshot),
+})
+
+const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typeof readCognitiveSessionConfig>['snapshot']) => {
+  if (!snapshot) throw new Error('v2 session snapshot is required')
+  const definition = getCognitiveV2TaskDefinition(
+    session.testType,
+    session.engineVersion,
+    session.scoringVersion,
+  )
+  if (!definition) throw new Error(`No Cognitive v2 definition for ${session.testType}/${session.engineVersion}/${session.scoringVersion}`)
+
+  const contextState = await ensureCognitiveAssessmentContext(tx, session)
+  const trials = await tx.cognitiveTrial.findMany({
+    where: { sessionId: session.id },
+    orderBy: { trialIndex: 'asc' },
+  })
+  const storedTrials = trials.map((trial: { payloadEncrypted: string }) => decryptCognitivePayload<unknown>(trial.payloadEncrypted))
+
+  let scored
+  try {
+    scored = runAuthoritativeScorer({
+      definition,
+      session: snapshot,
+      trials: storedTrials,
+      randomSeed: session.randomSeed,
+    })
+  } catch (err) {
+    if (err instanceof CognitiveScoringInputError) throw BAD_REQUEST(err.message)
+    throw err
+  }
+
+  const references = scored.quality.state === 'invalid'
+    ? []
+    : await loadCognitiveReferenceSets(tx, session.testType)
+  const resolvedReferences = scored.quality.state === 'invalid'
+    ? []
+    : resolveCognitiveMetricReferences({
+        definition,
+        metrics: scored.metrics,
+        references,
+        context: contextState.context,
+        quality: scored.quality,
+      })
+  const report = projectThreeLayerReport({
+    testType: session.testType,
+    configVersion: session.configVersion,
+    protocolSignature: snapshot.protocolSignature,
+    engineVersion: session.engineVersion,
+    scoringVersion: session.scoringVersion,
+    profile: (await loadFrozenMeasurementContext(tx, session.assignmentId)).profile,
+    definition: definition.report,
+    metrics: scored.metrics,
+    score: scored,
+    metricDefinitions: definition.metrics,
+    qualityDefinitions: definition.quality,
+  })
+  const resultSnapshot: CognitiveResultSnapshot = parseCognitiveResultSnapshot({
+    schemaVersion: 1,
+    completedAt: new Date().toISOString(),
+    testType: session.testType,
+    configVersion: session.configVersion,
+    engineVersion: session.engineVersion,
+    scoringVersion: session.scoringVersion,
+    protocolSignature: snapshot.protocolSignature,
+    profile: report.method.profile,
+    metrics: scored.metrics,
+    quality: scored.quality,
+    references: resolvedReferences as unknown as Array<Record<string, unknown>>,
+    report: report as unknown as Record<string, unknown>,
+    assessmentContext: contextState.reference,
+  })
+
+  const resultSnapshotEncrypted = encryptCognitivePayload(resultSnapshot)
+  const metricsEncrypted = encryptCognitivePayload(scored.metrics)
+  // Keep the legacy compatibility column as a boolean flag map for existing
+  // composite/export readers; the complete three-state quality object lives
+  // in resultSnapshotEncrypted.
+  const qualityFlagsEncrypted = encryptCognitivePayload(scored.quality.flags)
+  const finishedAt = new Date(resultSnapshot.completedAt)
+  const { count } = await tx.cognitiveSession.updateMany({
+    where: { id: session.id, status: 'IN_PROGRESS' },
+    data: {
+      status: 'COMPLETED',
+      finishedAt,
+      scoreEncrypted: null,
+      metricsEncrypted,
+      qualityFlagsEncrypted,
+      resultSnapshotEncrypted,
+    },
+  })
+  if (count === 0) {
+    const reloaded = await tx.cognitiveSession.findUnique({ where: { id: session.id } })
+    if (reloaded?.status === 'COMPLETED' && reloaded.resultSnapshotEncrypted) {
+      return buildV2CompletedPayload(reloaded, parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(reloaded.resultSnapshotEncrypted)))
+    }
+    throw CONFLICT('Session cannot be completed in its current state')
+  }
+  return buildV2CompletedPayload(session, resultSnapshot)
+}
+
 const completeSessionWithPrincipal = async (userId: string | null, sessionId: string, recoveryTokenHash?: string) => {
   return prisma.$transaction(async (tx) => {
     // 行锁：串行化 complete 与 append/restart，保证评分数据集冻结。
@@ -121,6 +247,14 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
 
     // COMPLETED：幂等返回已存结果（不要求 completionKey）。
     if (session.status === 'COMPLETED') {
+      const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+      if (storedConfig.snapshot) {
+        if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
+        const snapshot = parseCognitiveResultSnapshot(
+          decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
+        )
+        return buildV2CompletedPayload(session, snapshot)
+      }
       const { score, metrics, qualityFlags, finishedAt } = decryptResult(session)
       const config = decryptCognitivePayload<Record<string, unknown>>(session.configSnapshotEncrypted)
       return buildCompletedPayload(tx, session, score, metrics, qualityFlags, finishedAt, config)
@@ -130,6 +264,11 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
     }
 
     // IN_PROGRESS → 继续评分。
+
+    const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+    if (storedConfig.snapshot) {
+      return completeV2Session(tx, session, storedConfig.snapshot)
+    }
 
     // 用 frozen version 查 Registry，缺失 = 服务端配置错误，绝不静默换最新 scorer。
     const entry = requireCognitiveRegistryEntry(

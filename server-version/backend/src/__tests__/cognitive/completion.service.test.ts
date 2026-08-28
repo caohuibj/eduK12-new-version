@@ -18,6 +18,10 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { completeSession } from '../../modules/cognitive/completion.service'
 import { encryptCognitivePayload, decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { createSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
+import { parseCognitiveResultSnapshot } from '../../modules/cognitive/v2/result-snapshot'
 
 const FAKE_CONFIG = { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }
 
@@ -37,6 +41,7 @@ const sessionRow = (overrides: any = {}) => ({
   scoreEncrypted: null,
   metricsEncrypted: null,
   qualityFlagsEncrypted: null,
+  resultSnapshotEncrypted: null,
   configVersion: '1.0.0',
   configSnapshotEncrypted: encryptCognitivePayload(FAKE_CONFIG),
   engineVersion: '1.0.0',
@@ -63,6 +68,7 @@ const rawRow = (s: any = sessionRow()) => ({
   score_encrypted: s.scoreEncrypted,
   metrics_encrypted: s.metricsEncrypted,
   quality_flags_encrypted: s.qualityFlagsEncrypted,
+  result_snapshot_encrypted: s.resultSnapshotEncrypted,
   config_version: s.configVersion,
   config_snapshot_encrypted: s.configSnapshotEncrypted,
   engine_version: s.engineVersion,
@@ -130,6 +136,49 @@ describe('completeSession happy path', () => {
     // decrypt 后 == 写入值
     expect(decryptCognitivePayload<number>(update.data.scoreEncrypted)).toBeCloseTo(66.67, 2)
     expect(decryptCognitivePayload<Record<string, unknown>>(update.data.metricsEncrypted).correctCount).toBe(2)
+  })
+})
+
+describe('completeSession Cognitive v2 path', () => {
+  it('scores frozen envelopes into an encrypted result snapshot without a generic score', async () => {
+    const definition = getCognitiveV2TaskDefinition('fake', '1.0.0', '1.0.0')
+    if (!definition) throw new Error('fake v2 definition missing')
+    const snapshot = createSessionConfigSnapshot({
+      definition,
+      configVersion: '1.0.0',
+      config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+    })
+    const v2Session = sessionRow({
+      testType: 'fake',
+      configVersion: '1.0.0',
+      engineVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      configSnapshotEncrypted: encryptCognitivePayload(snapshot),
+    })
+    mockPrisma.$queryRaw.mockResolvedValue([rawRow(v2Session)])
+    withTrials([
+      { trialIndex: 0, payload: createTrialEnvelope({ trialIndex: 0, phase: 'test', payload: { correct: true, rtMs: 400 }, startedAtPerfMs: 0, endedAtPerfMs: 400 }) },
+      { trialIndex: 1, payload: createTrialEnvelope({ trialIndex: 1, phase: 'test', payload: { correct: true, rtMs: 500 }, startedAtPerfMs: 500, endedAtPerfMs: 1000 }) },
+      { trialIndex: 2, payload: createTrialEnvelope({ trialIndex: 2, phase: 'test', payload: { correct: false, rtMs: 600 }, startedAtPerfMs: 1100, endedAtPerfMs: 1700 }) },
+    ])
+    mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 1 })
+
+    const result = await completeSession('student-1', 'session-1')
+
+    expect(result.status).toBe('COMPLETED')
+    expect(result).not.toHaveProperty('score')
+    expect(result.metrics).toMatchObject({ trialCount: 3, correctCount: 2, meanRtMs: 500 })
+    expect(result.quality).toMatchObject({ state: 'interpretable', flags: {} })
+    expect(result.report).toMatchObject({ qualityState: 'interpretable' })
+
+    const update = mockPrisma.cognitiveSession.updateMany.mock.calls[0][0]
+    expect(update.data.scoreEncrypted).toBeNull()
+    expect(update.data.resultSnapshotEncrypted).toBeTruthy()
+    const stored = parseCognitiveResultSnapshot(
+      decryptCognitivePayload<unknown>(update.data.resultSnapshotEncrypted),
+    )
+    expect(stored.metrics).toMatchObject({ correctCount: 2 })
+    expect(stored.protocolSignature).toBe(snapshot.protocolSignature)
   })
 })
 

@@ -8,6 +8,7 @@ import {
 } from './session-ledger'
 import { initialRunnerState, runnerReducer, type RunnerAction } from './runner.state'
 import type { RunnerError, RunnerState } from './runner.types'
+import { wrapCognitiveTrial } from './trial-envelope'
 
 /**
  * Runner 核心 hook（Stage B v1.1 §20/§21）。
@@ -93,7 +94,11 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       const nextIndex = stateRef.current.trialIndex
       dispatch({ type: 'TRIAL_SUBMIT_START' })
       try {
-        const response = await api.appendTrial(sessionId, nextIndex, payload)
+        const session = stateRef.current.session
+        const submittedPayload = session?.protocolSignature
+          ? wrapCognitiveTrial({ trialIndex: nextIndex, payload })
+          : payload
+        const response = await api.appendTrial(sessionId, nextIndex, submittedPayload)
         if (response.code !== 0) {
           dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(response) })
           return false
@@ -129,8 +134,8 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       const d = response.data as CognitiveSession & Partial<CognitiveResult>
       const result: CognitiveResult | null =
         d.result ??
-        (typeof d.score === 'number'
-          ? { score: d.score, metrics: d.metrics ?? {}, qualityFlags: d.qualityFlags ?? {}, reference: d.reference }
+        ((typeof d.score === 'number' || d.metrics !== undefined || d.quality !== undefined)
+          ? { score: d.score, metrics: d.metrics ?? {}, qualityFlags: d.qualityFlags ?? {}, quality: d.quality, references: d.references, report: d.report, assessmentContext: d.assessmentContext, reference: d.reference }
           : null)
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })

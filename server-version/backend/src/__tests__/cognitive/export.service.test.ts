@@ -191,6 +191,40 @@ describe('cognitive export service', () => {
     expect(pack.sessionRows[0]).not.toHaveProperty('A_score')
   })
 
+  it('exports a v2 result snapshot with three-state quality and no generic score', async () => {
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([{
+      ...session(),
+      scoreEncrypted: null,
+      metricsEncrypted: encryptCognitivePayload({}),
+      qualityFlagsEncrypted: encryptCognitivePayload({}),
+      resultSnapshotEncrypted: encryptCognitivePayload({
+        schemaVersion: 1,
+        completedAt: '2026-08-20T10:01:00.000Z',
+        testType: 'reaction',
+        configVersion: '1.1.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.1.0',
+        protocolSignature: 'a'.repeat(64),
+        profile: 'standard',
+        metrics: { medianRtMs: 350, missRate: 0 },
+        quality: { state: 'limited', flags: { interrupted: true }, reasons: ['存在中断'] },
+        references: [],
+        report: { qualityState: 'limited' },
+        assessmentContext: null,
+      }),
+    }])
+
+    const data = await getCognitiveExportData('assignment-1', { detail: 'summary', anonymize: true })
+
+    expect(data.fields.map((field) => field.name)).not.toContain('A_score')
+    expect(data.rows[0]).toMatchObject({
+      A_quality_state: 'limited',
+      A_quality_interpretable: 0,
+      M_median_rt_ms: 350,
+      Q_interrupted: 1,
+    })
+  })
+
   it('exports every raw trial value in full mode', async () => {
     mockPrisma.cognitiveSession.findMany.mockResolvedValue([session(true)])
 
