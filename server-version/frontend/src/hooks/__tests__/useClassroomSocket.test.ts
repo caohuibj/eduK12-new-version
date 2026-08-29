@@ -41,4 +41,17 @@ describe('useClassroomSocket fallback lifecycle', () => {
     expect(mockIo).toHaveBeenCalledTimes(1)
     unmount()
   })
+
+  it('does not disconnect an anonymous student socket on logged-in expiry', () => {
+    const studentSocket = makeSocket()
+    mockIo.mockReturnValue(studentSocket)
+    const { unmount } = renderHook(() => useClassroomSocket({ classroomCode: 'ABC123', role: 'student' }))
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('auth:expired'))
+    })
+
+    expect(studentSocket.disconnect).not.toHaveBeenCalled()
+    unmount()
+  })
 })

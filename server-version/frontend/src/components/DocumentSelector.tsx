@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, FileText, Upload, Search, Check, AlertCircle } from 'lucide-react'
 import apiClient from '../api/client'
-import { ensureCsrfToken } from '../api/client'
-import axios from 'axios'
+import { sessionAxios } from '../api/client'
 import type { Document } from '../types'
 
 export interface DocumentItem {
@@ -132,12 +131,10 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       formData.append('document', uploadFile)
       formData.append('title', uploadTitle.trim())
 
-      const csrfToken = await ensureCsrfToken()
-      const response = await axios.post('/api/documents/upload', formData, {
+      const response = await sessionAxios.post('/documents/upload', formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
-          ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {

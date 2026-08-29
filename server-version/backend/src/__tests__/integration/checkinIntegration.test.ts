@@ -20,6 +20,7 @@ describe('匿名打卡功能集成测试', () => {
   let checkinId: string
   let normalCheckinId: string
   let tokenId: string
+  let bearerToken: string
   let sessionId: string
 
   beforeAll(async () => {
@@ -141,16 +142,21 @@ describe('匿名打卡功能集成测试', () => {
       expect(token.token).toMatch(/^ck_[a-z0-9]{16}$/)
       expect(token.maxUses).toBe(10)
       tokenId = token.id
+      bearerToken = token.token
+
+      const storedToken = await prisma.checkinAccessToken.findUnique({
+        where: { id: tokenId },
+      })
+      expect(storedToken?.token).toBeNull()
+      expect(storedToken?.tokenHash).toBe(checkinTokenService.hashToken(bearerToken))
+      expect(storedToken?.tokenEncrypted).toEqual(expect.any(String))
+      expect(checkinTokenService.decryptToken(storedToken!.tokenEncrypted!)).toBe(bearerToken)
     })
   })
 
   describe('3. 匿名用户通过令牌访问打卡', () => {
     it('应该成功验证有效令牌', async () => {
-      const token = await prisma.checkinAccessToken.findUnique({
-        where: { id: tokenId },
-      })
-
-      const validation = await checkinTokenService.validateToken(token!.token)
+      const validation = await checkinTokenService.validateToken(bearerToken)
 
       expect(validation.valid).toBe(true)
       expect(validation.checkin).toBeDefined()

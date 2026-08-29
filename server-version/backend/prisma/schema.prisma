@@ -239,37 +239,42 @@ model CheckinSubmission {
 }
 
 model Video {
-  id               String       @id @default(uuid())
-  title            String
-  filePath         String       @map("file_path")
-  fileName         String       @map("file_name")
-  fileSize         Int          @map("file_size")
-  mimeType         String       @map("mime_type")
-  teacherId        String       @map("teacher_id")
-  usageCount       Int          @default(0) @map("usage_count")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-  deletedAt        DateTime?    @map("deleted_at")
-  isDeleted        Boolean      @default(false) @map("is_deleted")
-  tags             String[]     @default([])
-  duration         Int?
-  errorMessage     String?      @map("error_message")
-  originalUrl      String?      @map("original_url")
-  originalCosUrl   String?      @map("original_cos_url") // 原始文件COS URL（低频存储）
-  originalCosKey   String?      @map("original_cos_key") // 原始文件COS Key
-  processedAt      DateTime?    @map("processed_at")
-  processedUrl     String?      @map("processed_url")
-  resolution       String?
-  status           VideoStatus  @default(PENDING)
-  thumbnailUrl     String?      @map("thumbnail_url")
-  originalAssetId  String?      @map("original_asset_id")
-  processedAssetId String?      @map("processed_asset_id")
-  thumbnailAssetId String?      @map("thumbnail_asset_id")
-  teacher          User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  originalAsset    StoredAsset? @relation("VideoOriginalAsset", fields: [originalAssetId], references: [id], onDelete: SetNull)
-  processedAsset   StoredAsset? @relation("VideoProcessedAsset", fields: [processedAssetId], references: [id], onDelete: SetNull)
-  thumbnailAsset   StoredAsset? @relation("VideoThumbnailAsset", fields: [thumbnailAssetId], references: [id], onDelete: SetNull)
+  id                  String       @id @default(uuid())
+  title               String
+  filePath            String       @map("file_path")
+  fileName            String       @map("file_name")
+  fileSize            Int          @map("file_size")
+  mimeType            String       @map("mime_type")
+  teacherId           String       @map("teacher_id")
+  usageCount          Int          @default(0) @map("usage_count")
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+  deletedAt           DateTime?    @map("deleted_at")
+  isDeleted           Boolean      @default(false) @map("is_deleted")
+  tags                String[]     @default([])
+  duration            Int?
+  errorMessage        String?      @map("error_message")
+  // The queue job identity and start time make PROCESSING recoverable after a
+  // worker crash or a stalled Bull job.
+  processingJobId     String?      @map("processing_job_id")
+  processingStartedAt DateTime?    @map("processing_started_at")
+  originalUrl         String?      @map("original_url")
+  originalCosUrl      String?      @map("original_cos_url") // 原始文件COS URL（低频存储）
+  originalCosKey      String?      @map("original_cos_key") // 原始文件COS Key
+  processedAt         DateTime?    @map("processed_at")
+  processedUrl        String?      @map("processed_url")
+  resolution          String?
+  status              VideoStatus  @default(PENDING)
+  thumbnailUrl        String?      @map("thumbnail_url")
+  originalAssetId     String?      @map("original_asset_id")
+  processedAssetId    String?      @map("processed_asset_id")
+  thumbnailAssetId    String?      @map("thumbnail_asset_id")
+  teacher             User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  originalAsset       StoredAsset? @relation("VideoOriginalAsset", fields: [originalAssetId], references: [id], onDelete: SetNull)
+  processedAsset      StoredAsset? @relation("VideoProcessedAsset", fields: [processedAssetId], references: [id], onDelete: SetNull)
+  thumbnailAsset      StoredAsset? @relation("VideoThumbnailAsset", fields: [thumbnailAssetId], references: [id], onDelete: SetNull)
 
+  @@index([status, processingStartedAt])
   @@map("videos")
 }
 
@@ -1077,18 +1082,22 @@ model ClassroomAnswer {
 
 // 打卡访问令牌表
 model CheckinAccessToken {
-  id          String              @id @default(uuid())
-  checkinId   String              @map("checkin_id")
-  token       String              @unique
-  createdBy   String              @map("created_by")
-  expiresAt   DateTime            @map("expires_at")
-  maxUses     Int                 @default(0) @map("max_uses")
-  usedCount   Int                 @default(0) @map("used_count")
-  isActive    Boolean             @default(true) @map("is_active")
-  createdAt   DateTime            @default(now()) @map("created_at")
-  checkin     Checkin             @relation(fields: [checkinId], references: [id], onDelete: Cascade)
-  creator     User                @relation("CheckinTokenCreator", fields: [createdBy], references: [id])
-  submissions CheckinSubmission[]
+  id             String              @id @default(uuid())
+  checkinId      String              @map("checkin_id")
+  // Legacy plaintext is retained nullable only during the resumable
+  // application-level backfill window. New writes use hash + encryption.
+  token          String?             @unique
+  tokenHash      String?             @unique @map("token_hash")
+  tokenEncrypted String?             @map("token_encrypted")
+  createdBy      String              @map("created_by")
+  expiresAt      DateTime            @map("expires_at")
+  maxUses        Int                 @default(0) @map("max_uses")
+  usedCount      Int                 @default(0) @map("used_count")
+  isActive       Boolean             @default(true) @map("is_active")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  checkin        Checkin             @relation(fields: [checkinId], references: [id], onDelete: Cascade)
+  creator        User                @relation("CheckinTokenCreator", fields: [createdBy], references: [id])
+  submissions    CheckinSubmission[]
 
   @@index([checkinId])
   @@index([expiresAt])

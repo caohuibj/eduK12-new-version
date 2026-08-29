@@ -11,6 +11,17 @@ const axiosClient = axios.create({
   },
 })
 
+// Multipart uploads use the same session/CSRF/expiry handling as JSON calls,
+// but keep the Axios error object so upload screens can inspect response data.
+export const sessionAxios = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+  headers: {
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+  },
+})
+
 const readCookie = (name: string): string | null => {
   if (typeof document === 'undefined') return null
   const encodedName = `${encodeURIComponent(name)}=`
@@ -31,13 +42,23 @@ export const ensureCsrfToken = async (): Promise<string | null> => {
 }
 
 export const sessionFetch = async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
+  const requestStartedAt = Date.now()
   const method = (init.method || 'GET').toUpperCase()
   const headers = new Headers(init.headers)
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
     const csrfToken = await ensureCsrfToken()
     if (csrfToken) headers.set('X-CSRF-Token', csrfToken)
   }
-  return fetch(input, { ...init, headers, credentials: 'same-origin' })
+  const response = await fetch(input, { ...init, headers, credentials: 'same-origin' })
+  if (response.status === 401) {
+    const requestUrl = typeof input === 'string'
+      ? input
+      : input instanceof URL
+        ? input.toString()
+        : input.url
+    notifyAuthExpired(requestUrl, requestStartedAt)
+  }
+  return response
 }
 
 /**
@@ -47,7 +68,7 @@ export const sessionFetch = async (input: RequestInfo | URL, init: RequestInit =
  */
 export const shouldInvalidateSession = (error: {
   response?: { status?: number }
-  config?: { url?: string }
+  config?: { url?: string; authRequestStartedAt?: number }
 }): boolean => {
   if (error.response?.status !== 401) return false
 
@@ -64,39 +85,50 @@ export const shouldInvalidateSession = (error: {
   return true
 }
 
-// 请求拦截器 - 使用 Cookie 会话并为写请求添加 CSRF
-axiosClient.interceptors.request.use(
-  async (config) => {
-    const method = (config.method || 'get').toUpperCase()
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && typeof window !== 'undefined') {
-      const csrfToken = await ensureCsrfToken()
-      if (csrfToken) {
-        config.headers = config.headers || {}
-        config.headers['X-CSRF-Token'] = csrfToken
-      }
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+const notifyAuthExpired = (url?: string, requestStartedAt?: number): void => {
+  if (typeof window === 'undefined') return
+  if (!shouldInvalidateSession({ response: { status: 401 }, config: { url } })) return
+  window.dispatchEvent(new CustomEvent('auth:expired', {
+    detail: {
+      message: '登录已过期，请重新登录',
+      requestStartedAt,
+    },
+  }))
+}
 
-// 响应拦截器 - 处理错误
-axiosClient.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  (error) => {
-    if (shouldInvalidateSession(error)) {
-      // Report expiry to AuthContext; navigation belongs to route guards.
-      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('auth:expired', {
-        detail: { message: '登录已过期，请重新登录' }
-      }))
-    }
-    return Promise.reject(error.response?.data || error.message)
-  }
-)
+const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosError: boolean): void => {
+  client.interceptors.request.use(
+    async (config) => {
+      ;(config as typeof config & { authRequestStartedAt?: number }).authRequestStartedAt = Date.now()
+      const method = (config.method || 'get').toUpperCase()
+      if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && typeof window !== 'undefined') {
+        const csrfToken = await ensureCsrfToken()
+        if (csrfToken) {
+          config.headers = config.headers || {}
+          config.headers['X-CSRF-Token'] = csrfToken
+        }
+      }
+      return config
+    },
+    (error) => Promise.reject(error),
+  )
+
+  client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error?.response?.status === 401) {
+        notifyAuthExpired(error.config?.url, error.config?.authRequestStartedAt)
+      }
+      return Promise.reject(
+        preserveAxiosError ? error : (error.response?.data || error.message),
+      )
+    },
+  )
+}
+
+// Cookie session and CSRF handling is shared by JSON and multipart requests.
+installSessionInterceptors(axiosClient, false)
+installSessionInterceptors(sessionAxios, true)
 
 const parseApiResponse = <T>(value: unknown): ApiResponse<T> => {
   if (

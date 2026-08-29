@@ -14,9 +14,27 @@ import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
 import { Prisma } from '@prisma/client'
 import { config } from '../config'
+import { decryptToken, encryptToken, hashToken } from './checkinTokenCrypto'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
+
+const serializeToken = (row: any, reveal: boolean) => ({
+  id: row.id,
+  checkinId: row.checkinId,
+  ...(reveal
+    ? { token: row.token || (row.tokenEncrypted ? decryptToken(row.tokenEncrypted) : null) }
+    : {}),
+  createdBy: row.createdBy,
+  expiresAt: row.expiresAt,
+  maxUses: row.maxUses,
+  usedCount: row.usedCount,
+  isActive: row.isActive,
+  createdAt: row.createdAt,
+  ...(row.checkin ? { checkin: row.checkin } : {}),
+  ...(row.creator ? { creator: row.creator } : {}),
+  ...(row._count ? { _count: row._count } : {}),
+})
 
 export const PUBLIC_CHECKIN_SESSION_TTL_SECONDS = 24 * 60 * 60
 
@@ -68,6 +86,12 @@ export const checkinTokenService = {
     return `ck_${nanoid()}`
   },
 
+  hashToken,
+
+  encryptToken,
+
+  decryptToken,
+
   /**
    * 创建新的访问令牌
    */
@@ -84,7 +108,9 @@ export const checkinTokenService = {
     const accessToken = await prisma.checkinAccessToken.create({
       data: {
         checkinId,
-        token,
+        token: null,
+        tokenHash: hashToken(token),
+        tokenEncrypted: encryptToken(token),
         createdBy,
         expiresAt,
         maxUses,
@@ -110,7 +136,9 @@ export const checkinTokenService = {
       maxUses,
     })
 
-    return accessToken
+    // Return the bearer to the authorized creator at creation time. It is not
+    // present in the database row and is never logged.
+    return { ...serializeToken(accessToken, false), token }
   },
 
   /**
@@ -118,12 +146,23 @@ export const checkinTokenService = {
    */
   async validateToken(tokenString: string, options: { ignoreUsageLimit?: boolean } = {}): Promise<CheckinTokenValidation> {
     // 查询令牌
-    const accessToken = await prisma.checkinAccessToken.findUnique({
-      where: { token: tokenString },
+    const tokenHash = hashToken(tokenString)
+    let accessToken = await prisma.checkinAccessToken.findUnique({
+      where: { tokenHash },
       include: {
         checkin: true,
       },
     })
+
+    if (!accessToken) {
+      // Compatibility read for rows that predate the additive migration and
+      // have not yet been processed by the resumable backfill.
+      accessToken = await prisma.checkinAccessToken.findUnique({
+        where: { token: tokenString },
+        include: { checkin: true },
+      })
+      if (accessToken?.tokenHash && accessToken.tokenHash !== tokenHash) accessToken = null
+    }
 
     if (!accessToken) {
       return {
@@ -255,8 +294,8 @@ export const checkinTokenService = {
   /**
    * 获取打卡的所有令牌
    */
-  async getTokensByCheckin(checkinId: string) {
-    return await prisma.checkinAccessToken.findMany({
+  async getTokensByCheckin(checkinId: string, options: { reveal?: boolean } = {}) {
+    const rows = await prisma.checkinAccessToken.findMany({
       where: { checkinId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -274,13 +313,14 @@ export const checkinTokenService = {
         },
       },
     })
+    return rows.map((row) => serializeToken(row, options.reveal === true))
   },
 
   /**
    * 获取令牌详情
    */
-  async getTokenById(tokenId: string) {
-    return await prisma.checkinAccessToken.findUnique({
+  async getTokenById(tokenId: string, options: { reveal?: boolean } = {}) {
+    const row = await prisma.checkinAccessToken.findUnique({
       where: { id: tokenId },
       include: {
         checkin: {
@@ -305,6 +345,7 @@ export const checkinTokenService = {
         },
       },
     })
+    return row ? serializeToken(row, options.reveal === true) : null
   },
 
   /**

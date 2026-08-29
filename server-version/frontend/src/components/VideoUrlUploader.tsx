@@ -2,7 +2,7 @@
  * 视频链接上传组件
  * 支持：输入视频URL，后端下载并处理
  */
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { message, Input, Button, Card, Progress, Space, Typography, Alert } from 'antd'
 import { CloudDownloadOutlined, LinkOutlined, LoadingOutlined } from '@ant-design/icons'
 import { sessionFetch } from '../api/client'
@@ -20,6 +20,16 @@ export const VideoUrlUploader: React.FC<VideoUrlUploaderProps> = ({ onSuccess })
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState<'idle' | 'downloading' | 'processing' | 'completed' | 'failed'>('idle')
   const [videoId, setVideoId] = useState<string | null>(null)
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
+      pollTimerRef.current = null
+    }
+  }, [])
 
   // 提交视频链接
   const handleSubmit = async () => {
@@ -82,34 +92,49 @@ export const VideoUrlUploader: React.FC<VideoUrlUploaderProps> = ({ onSuccess })
 
   // 轮询处理状态
   const pollStatus = async (id: string) => {
+    const scheduleCheck = (check: () => void, delay: number) => {
+      if (!mountedRef.current) return
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
+      pollTimerRef.current = setTimeout(() => {
+        pollTimerRef.current = null
+        check()
+      }, delay)
+    }
+
     const checkStatus = async () => {
+      if (!mountedRef.current) return
       try {
-      const response = await sessionFetch(`/api/videos/${id}/status`)
+        const response = await sessionFetch(`/api/videos/${id}/status`)
         const data = await response.json()
+
+        if (!mountedRef.current) return
 
         if (data.code === 0) {
           setProgress(data.data.progress || 0)
           
           switch (data.data.status) {
             case 'COMPLETED':
+              pollTimerRef.current = null
               setStatus('completed')
               message.success('视频处理完成！')
               return
             case 'FAILED':
+              pollTimerRef.current = null
               setStatus('failed')
               message.error(`处理失败: ${data.data.errorMessage}`)
               return
             case 'PROCESSING':
               // 继续轮询
-              setTimeout(checkStatus, 2000)
+              scheduleCheck(() => { void checkStatus() }, 2000)
               break
             default:
-              setTimeout(checkStatus, 2000)
+              scheduleCheck(() => { void checkStatus() }, 2000)
           }
         }
       } catch (err) {
+        if (!mountedRef.current) return
         console.error('获取状态失败:', err)
-        setTimeout(checkStatus, 5000)
+        scheduleCheck(() => { void checkStatus() }, 5000)
       }
     }
 

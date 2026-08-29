@@ -49,16 +49,19 @@ export function getRedisUrl(): string {
  * Bull Queue（底层 ioredis）连接选项。
  * ioredis 接受 Redis 连接 URL 字符串，无需拆成 host/port。
  *
- * 注意：按 Milestone D v1.2 收口（D0-9.1），生产环境缺 Redis 配置时
- * getRedisUrl() 会显式抛出；但 Bull 队列按既有系统行为处理（保留回退地址），
- * 因此此处 catch 后回退，避免队列模块在 import 时直接崩溃导致整个后端无法启动。
+ * 生产环境缺 Redis 配置时必须 fail closed。否则 Bull 会把队列连接到
+ * 本机 localhost，导致 API、worker 和 Socket 使用不同的 Redis 状态。
+ * 非生产环境仍保留 localhost fallback，方便单进程开发和单元测试。
  */
 export function getBullRedisOptions(): string {
   try {
     return getRedisUrl()
   } catch {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[redis] Bull 队列在 production 中需要显式 Redis 配置')
+    }
     logger.warn(
-      '[redis] Bull 队列使用回退 Redis 地址（生产环境应显式配置 REDIS_URL）'
+      '[redis] Bull 队列使用开发环境回退 Redis 地址'
     )
     return DEV_FALLBACK
   }

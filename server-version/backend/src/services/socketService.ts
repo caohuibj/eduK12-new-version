@@ -33,6 +33,52 @@ export class SocketService {
   private redisClient: any = null
   private redisSubscriber: any = null
   private redisState: SocketRedisState = 'degraded'
+  private redisClientsClosing = false
+
+  private bindRedisLifecycle(client: any, role: 'publisher' | 'subscriber'): void {
+    client.on('error', () => {
+      if (this.redisClientsClosing) return
+      this.redisState = 'failed'
+      logger.error('Redis Adapter 客户端连接异常', { role })
+    })
+    client.on('end', () => {
+      if (this.redisClientsClosing) return
+      this.redisState = 'failed'
+      logger.error('Redis Adapter 客户端连接已结束', { role })
+    })
+    client.on('ready', () => {
+      if (this.redisClient?.isReady && this.redisSubscriber?.isReady) {
+        this.redisState = 'ready'
+      }
+    })
+  }
+
+  private async closeRedisClients(): Promise<void> {
+    const clients = [this.redisClient, this.redisSubscriber].filter(Boolean)
+    this.redisClient = null
+    this.redisSubscriber = null
+    this.redisClientsClosing = true
+
+    await Promise.allSettled(clients.map(async (client: any) => {
+      try {
+        if (client.isOpen && typeof client.quit === 'function') {
+          await client.quit()
+        } else if (typeof client.disconnect === 'function') {
+          client.disconnect()
+        }
+      } catch {
+        // Shutdown is best effort; another client and the HTTP server still
+        // need their own close attempt.
+        try {
+          client.disconnect?.()
+        } catch {
+          // Ignore a client that has already ended.
+        }
+      }
+    }))
+
+    this.redisClientsClosing = false
+  }
 
   /**
    * 初始化 Socket.IO 服务器
@@ -60,6 +106,8 @@ export class SocketService {
 
       this.redisClient = createClient({ url: redisUrl })
       this.redisSubscriber = createClient({ url: redisUrl })
+      this.bindRedisLifecycle(this.redisClient, 'publisher')
+      this.bindRedisLifecycle(this.redisSubscriber, 'subscriber')
 
       await this.redisClient.connect()
       await this.redisSubscriber.connect()
@@ -68,9 +116,10 @@ export class SocketService {
 
       this.redisState = 'ready'
       logger.info('Redis Adapter 已配置 - 支持 PM2 集群模式')
-    } catch (error) {
+    } catch {
       this.redisState = 'failed'
-      logger.error('Redis Adapter 配置失败，回退到单进程模式', { required: config.socketRedisRequired })
+      await this.closeRedisClients()
+      logger.error('Redis Adapter 配置失败', { required: config.socketRedisRequired })
       if (config.socketRedisRequired) {
         throw new Error('SOCKET_REDIS_REQUIRED=true 且 Redis Adapter 初始化失败')
       }
@@ -263,27 +312,21 @@ export class SocketService {
    * 关闭 Socket.IO 服务器
    */
   async close(): Promise<void> {
-    try {
-      if (this.redisClient) {
-        await this.redisClient.quit()
-        logger.info('Redis 客户端已关闭')
-      }
-      if (this.redisSubscriber) {
-        await this.redisSubscriber.quit()
-        logger.info('Redis 订阅者已关闭')
-      }
+    const io = this.io
+    this.io = null
+    this.classroomNamespace = null
 
-      if (this.io) {
-        await new Promise<void>((resolve) => {
-          this.io!.close(() => {
-            logger.info('Socket.IO 服务已关闭')
-            resolve()
-          })
+    const closeIo = io
+      ? new Promise<void>((resolve) => {
+        io.close(() => {
+          logger.info('Socket.IO 服务已关闭')
+          resolve()
         })
-      }
-    } catch {
-      logger.error('关闭 Socket.IO 服务错误')
-    }
+      })
+      : Promise.resolve()
+
+    await Promise.allSettled([this.closeRedisClients(), closeIo])
+    this.redisState = 'degraded'
   }
 
   /**

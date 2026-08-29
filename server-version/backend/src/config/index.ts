@@ -116,7 +116,10 @@ const rawConfig = {
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
-  socketRedisRequired: parseBooleanEnv('SOCKET_REDIS_REQUIRED', false),
+  // Socket.IO room broadcasts are not safe to run in a multi-process
+  // deployment without the Redis adapter.  Production therefore requires it
+  // by default; development and test keep the single-process fallback.
+  socketRedisRequired: parseBooleanEnv('SOCKET_REDIS_REQUIRED', process.env.NODE_ENV === 'production'),
   // Cognitive 参与者假名化密钥（生产环境必需）
   dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)

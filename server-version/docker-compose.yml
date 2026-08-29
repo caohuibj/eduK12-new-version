@@ -67,6 +67,7 @@ services:
       # Cognitive 参与者假名化密钥（仅当 COGNITIVE_MODULE_ENABLED=true 时生产必需，64 位十六进制；与 DATA_ENCRYPTION_KEY 独立）
       DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
       REDIS_URL: redis://redis:6379
+      SOCKET_REDIS_REQUIRED: ${SOCKET_REDIS_REQUIRED:-true}
       UPLOAD_DIR: /app/uploads
       ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
       ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:-false}
@@ -161,6 +162,23 @@ services:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
       NODE_ENV: production
     command: npm run db:migrate:guarded
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  checkin-token-backfill:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ops
+    container_name: ptool-checkin-token-backfill
+    profiles: ["ops"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      NODE_ENV: production
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set for encrypted token backfills}
+    command: npm run db:backfill:checkin-tokens
     depends_on:
       postgres:
         condition: service_healthy

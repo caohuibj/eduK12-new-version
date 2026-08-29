@@ -1393,7 +1393,10 @@ export const checkinController = {
       // 导入令牌服务
       const { checkinTokenService } = await import('../services/checkinTokenService')
 
-      const tokens = await checkinTokenService.getTokensByCheckin(checkinId)
+      // The owner check above is the authorization gate for the explicit
+      // management view. The service returns a DTO and never exposes hash or
+      // ciphertext columns.
+      const tokens = await checkinTokenService.getTokensByCheckin(checkinId, { reveal: true })
 
       return success(res, tokens)
     } catch (err) {
