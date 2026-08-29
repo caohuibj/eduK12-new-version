@@ -122,7 +122,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '2mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use('/api', csrfProtection)
 
@@ -292,6 +292,9 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const startServer = async (): Promise<void> => {
+  if (config.nodeEnv === 'production' && !config.assetMigrationComplete) {
+    throw new Error('ASSET_MIGRATION_COMPLETE=true is required before starting production')
+  }
   await socketService.initialize(server)
 
   // 初始化课堂 Socket.IO 事件处理器

@@ -8,7 +8,7 @@ import { prisma } from '../config/database'
 import { config } from '../config'
 import { CourseStudentStatus, UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
-import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS, deleteFromCOS } from '../utils/cos'
+import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS, uploadToCOS, deleteFromCOS } from '../utils/cos'
 
 export const ASSET_URL_TTL_SECONDS = 10 * 60
 // objectKey is always relative to the upload root (for example
@@ -157,10 +157,7 @@ export const storeAssetFromFile = async (input: StoreAssetFileInput) => {
 
   try {
     if (provider === 'cos') {
-      // The COS SDK adapter currently accepts buffers. This branch is only
-      // used when COS is explicitly configured; local development remains
-      // streaming and does not require a COS service.
-      await uploadBufferToCOS(await fsPromises.readFile(input.filePath), objectKey)
+      await uploadToCOS(input.filePath, objectKey)
     } else {
       await fsPromises.mkdir(path.dirname(localPath), { recursive: true, mode: 0o700 })
       await fsPromises.copyFile(input.filePath, localPath)

@@ -1,19 +1,17 @@
+import crypto from 'node:crypto'
 import { prisma } from '../config/database'
+
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
 
 // 生成8位字母数字教师码
 export const generateTeacherCode = async (): Promise<string> => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let code: string
   let exists = true
   let attempts = 0
   const maxAttempts = 100
 
   do {
-    // 生成8位随机字符
-    code = ''
-    for (let i = 0; i < 8; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
+    code = Array.from(crypto.randomBytes(8), (byte) => CROCKFORD[byte & 31]).join('')
 
     // 检查是否已存在
     const existing = await prisma.teacherCode.findUnique({

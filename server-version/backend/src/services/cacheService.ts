@@ -16,6 +16,11 @@ export interface RateLimitResult {
   retryAfterSeconds: number
 }
 
+export interface RateLimitState {
+  count: number
+  retryAfterSeconds: number
+}
+
 const CACHE_CONFIG = {
   // 默认缓存时间（秒）
   defaultTTL: parseInt(process.env.CACHE_TTL || '300'), // 5分钟
@@ -213,6 +218,23 @@ class CacheService {
         remaining: Math.max(0, limit - count),
         retryAfterSeconds,
       }
+    } catch {
+      return null
+    }
+  }
+
+  /** Read a fixed-window counter without consuming another token. */
+  async getRateLimitState(key: string): Promise<RateLimitState | null> {
+    if (!this.isConnected || !this.client) return null
+    try {
+      const [value, ttl] = await Promise.all([
+        this.client.get(key),
+        this.client.ttl(key),
+      ])
+      const count = Number(value || 0)
+      const retryAfterSeconds = Number(ttl)
+      if (!Number.isFinite(count) || count < 0 || !Number.isFinite(retryAfterSeconds)) return null
+      return { count, retryAfterSeconds: retryAfterSeconds > 0 ? retryAfterSeconds : 0 }
     } catch {
       return null
     }

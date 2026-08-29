@@ -12,9 +12,10 @@ import {
   canAccessCourseRoster,
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
-import { attachAssetReference, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
 import path from 'node:path'
+import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
   title: z.string().min(1, '课程标题不能为空'),
@@ -402,6 +403,37 @@ export const courseController = {
     }
   },
 
+  // Rotate the join code after a leak or roster change. The update is
+  // ownership-checked and serialized on the course row so an old code stops
+  // working as soon as the new code is committed.
+  async rotateCourseCode(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const userRole = req.user?.role
+      const { id } = req.params
+      const course = await prisma.course.findUnique({ where: { id }, select: { id: true, creatorId: true } })
+      if (!course) return notFound(res, '课程不存在')
+      if (course.creatorId !== userId && userRole !== UserRole.ADMIN) {
+        return forbidden(res, '无权限轮换此课程码')
+      }
+
+      const updated = await prisma.$transaction(async (tx) => {
+        if (typeof (tx as any).$executeRaw === 'function') {
+          await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${id} FOR UPDATE`
+        }
+        const newCourseCode = await generateCourseCode(tx)
+        return tx.course.update({ where: { id }, data: { courseCode: newCourseCode }, select: { id: true, courseCode: true } })
+      })
+
+      cache.clearPattern(`courses:list:`)
+      cache.delete(`course:${id}`)
+      return success(res, updated, '课程码已轮换，请通知学生使用新课程码')
+    } catch (err) {
+      logger.error('轮换课程码错误', err)
+      return error(res, '轮换课程码失败')
+    }
+  },
+
   // 删除课程
   async delete(req: Request, res: Response) {
     try {
@@ -496,52 +528,52 @@ export const courseController = {
         return error(res, '课程号不存在')
       }
 
-      if (course.status !== CourseStatus.PUBLISHED) {
-        return error(res, '该课程未发布或已完结')
-      }
+      if (!isCourseJoinable(course)) return error(res, courseJoinabilityMessage(course))
 
-      // 检查是否正在招募
-      if (course.isLibrary) {
-        return error(res, '库课程不能加入')
-      }
-
-      if (!course.isRecruiting) {
-        return error(res, '该课程已停止招募，无法加入')
-      }
-
-      // 检查是否已经是课程成员
-      const existing = await prisma.courseStudent.findUnique({
-        where: {
-          courseId_studentId: {
-            courseId: course.id,
-            studentId: userId!
-          }
+      await prisma.$transaction(async (tx) => {
+        // The final check is serialized with stop-recruiting/end-course.
+        if (typeof (tx as any).$executeRaw === 'function') {
+          await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
-      })
-
-      if (existing) {
-        if (existing.status === CourseStudentStatus.ACTIVE || existing.status === CourseStudentStatus.APPROVED) {
-          return error(res, '您已经是该课程的学员')
+        const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
+        if (!lockedCourse || !isCourseJoinable(lockedCourse)) {
+          throw new CourseNotJoinableError(lockedCourse ? courseJoinabilityMessage(lockedCourse) : '课程号不存在')
         }
-        // 更新状态
-        await prisma.courseStudent.update({
-          where: { id: existing.id },
-          data: { status: CourseStudentStatus.ACTIVE }
+
+        const existing = await tx.courseStudent.findUnique({
+          where: {
+            courseId_studentId: {
+              courseId: lockedCourse.id,
+              studentId: userId!,
+            },
+          },
         })
-        return success(res, null, '加入课程成功')
-      }
 
-      // 创建课程学生关系
-      await prisma.courseStudent.create({
-        data: {
-          courseId: course.id,
-          studentId: userId!,
-          status: CourseStudentStatus.ACTIVE,
+        if (existing) {
+          if (existing.status === CourseStudentStatus.ACTIVE || existing.status === CourseStudentStatus.APPROVED) {
+            throw new Error('您已经是该课程的学员')
+          }
+          await tx.courseStudent.update({
+            where: { id: existing.id },
+            data: { status: CourseStudentStatus.ACTIVE },
+          })
+          return
         }
+
+        await tx.courseStudent.create({
+          data: {
+            courseId: lockedCourse.id,
+            studentId: userId!,
+            status: CourseStudentStatus.ACTIVE,
+          },
+        })
       })
 
       return success(res, null, '加入课程成功')
     } catch (err) {
+      if (err instanceof CourseNotJoinableError || (err instanceof Error && err.message === '您已经是该课程的学员')) {
+        return error(res, err.message)
+      }
       logger.error('加入课程错误', err)
       return error(res, '加入课程失败')
     }
@@ -622,17 +654,7 @@ export const courseController = {
         return error(res, '课程码无效')
       }
 
-      if (course.status === 'COMPLETED' || course.endedAt) {
-        return error(res, '课程已结束，无法加入')
-      }
-
-      if (course.isLibrary) {
-        return error(res, '库课程不能加入')
-      }
-
-      if (!course.isRecruiting) {
-        return error(res, '该课程已停止招募，无法加入')
-      }
+      if (!isCourseJoinable(course)) return error(res, courseJoinabilityMessage(course))
 
       return success(res, {
         courseId: course.id,
@@ -928,10 +950,15 @@ export const courseController = {
         return error(res, '请选择图片文件')
       }
 
+      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType
+      if (!detectedMimeType || !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(detectedMimeType)) {
+        return error(res, '图片内容类型无效')
+      }
+
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
-        mimeType: file.mimetype,
+        mimeType: detectedMimeType,
         ownerId: userId,
         accessScope: 'COURSE',
         scopeId: id,
@@ -941,23 +968,39 @@ export const courseController = {
       // previous cover reference is removed only after the new pointer is
       // ready, so an asset cannot be detached from a live course by a
       // partially completed upload.
-      await prisma.$transaction(async (tx) => {
-        await tx.course.update({
-          where: { id },
-          data: { coverAssetId: asset.id, coverUrl: null }
-        })
-        if (course.coverAssetId && course.coverAssetId !== asset.id) {
-          await tx.assetReference.deleteMany({
-            where: {
-              assetId: course.coverAssetId,
-              entityType: 'Course',
-              entityId: id,
-              field: 'cover',
-            },
+      try {
+        await prisma.$transaction(async (tx) => {
+          if (typeof (tx as any).$executeRaw === 'function') {
+            await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${id} FOR UPDATE`
+          }
+          const currentCourse = await tx.course.findUnique({
+            where: { id },
+            select: { coverAssetId: true },
           })
-        }
-        await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' }, tx)
-      })
+          if (!currentCourse) throw new Error('课程不存在')
+          await tx.course.update({
+            where: { id },
+            data: { coverAssetId: asset.id, coverUrl: null }
+          })
+          if (currentCourse.coverAssetId && currentCourse.coverAssetId !== asset.id) {
+            await tx.assetReference.deleteMany({
+              where: {
+                assetId: currentCourse.coverAssetId,
+                entityType: 'Course',
+                entityId: id,
+                field: 'cover',
+              },
+            })
+          }
+          await attachAssetReference({ assetId: asset.id, entityType: 'Course', entityId: id, field: 'cover' }, tx)
+        })
+      } catch (transactionError) {
+        // The StoredAsset was created before the parent transaction. Remove it
+        // only when no concurrent reference appeared; otherwise let normal GC
+        // handle it conservatively.
+        await discardUnreferencedAsset(asset).catch(() => undefined)
+        throw transactionError
+      }
 
       return success(res, { coverUrl: await getSignedAssetUrl(asset.id) }, '封面上传成功')
     } catch (err) {

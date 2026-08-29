@@ -26,6 +26,7 @@ const configSchema = z.object({
   // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
   // and verified.
   legacyUploadsEnabled: z.boolean(),
+  assetMigrationComplete: z.boolean(),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
@@ -111,6 +112,7 @@ const rawConfig = {
   publicCheckinSubmitIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_IP_LIMIT', 600),
   publicCheckinSubmitTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT', 120),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
+  assetMigrationComplete: parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）

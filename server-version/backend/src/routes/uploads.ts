@@ -9,7 +9,7 @@ import { config } from '../config'
 import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS } from '../utils/cos'
 import { logger } from '../utils/logger'
-import { getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { detectMimeType } from '../utils/fileValidator'
@@ -69,14 +69,8 @@ const imageUpload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error('只支持 JPG、PNG、GIF、WebP 格式的图片'))
-    }
-  }
+  // Client MIME is only a hint; the route checks magic bytes after Multer.
+  fileFilter: (_req, _file, cb) => cb(null, true),
 })
 
 const canManageAsset = (req: Request, ownerId: string | null): boolean =>
@@ -325,10 +319,11 @@ router.put('/images/:filename', async (req, res) => {
     return error(res, '重命名失败')
   }
 })
-// Upload into the unified StoredAsset catalog. The current disk middleware is
-// retained as a staging layer for compatibility; the staged file is removed
-// before the request completes.
+// Upload into the unified StoredAsset catalog using bounded memory storage.
+// The 10 MB route limit keeps this compatibility endpoint below the ordinary
+// API body ceiling while the bytes are validated before persistence.
 router.post('/image', imageUpload.single('image'), async (req, res) => {
+  let asset: Awaited<ReturnType<typeof storeAsset>> | undefined
   try {
     const file = req.file
     if (!file) {
@@ -339,25 +334,30 @@ router.post('/image', imageUpload.single('image'), async (req, res) => {
       return error(res, '图片内容类型无效')
     }
 
-    const asset = await storeAsset({
+    const storedAsset = await storeAsset({
       buffer: file.buffer,
       originalName: file.originalname,
       mimeType: detectedMimeType,
       ownerId: req.user?.userId,
     })
+    asset = storedAsset
+
+    const url = await getSignedAssetUrl(storedAsset.id)
+    if (!url) throw new Error('图片签名 URL 生成失败')
 
     return success(res, {
-      id: asset.id,
-      assetId: asset.id,
-      filename: asset.id,
-      name: asset.originalName || file.originalname,
-      size: asset.sizeBytes,
-      createdAt: asset.createdAt,
-      url: await getSignedAssetUrl(asset.id),
-      storage: asset.provider,
+      id: storedAsset.id,
+      assetId: storedAsset.id,
+      filename: storedAsset.id,
+      name: storedAsset.originalName || file.originalname,
+      size: storedAsset.sizeBytes,
+      createdAt: storedAsset.createdAt,
+      url,
+      storage: storedAsset.provider,
       status: 'completed',
     }, '图片上传成功')
   } catch (err) {
+    if (asset) await discardUnreferencedAsset(asset).catch(() => undefined)
     logger.error('上传图片错误', err)
     return error(res, '上传失败')
   }

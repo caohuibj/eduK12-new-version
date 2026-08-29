@@ -4,7 +4,7 @@ import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
-import { attachAssetReference, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 
 export const documentController = {
   // 获取文档列表（添加分页和缓存优化）
@@ -83,25 +83,30 @@ export const documentController = {
 
       const { title } = req.body
 
+      let asset: Awaited<ReturnType<typeof storeAsset>> | undefined
       try {
-        const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType || file.mimetype
-        const asset = await storeAsset({
+        const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType
+        if (detectedMimeType !== 'application/pdf') {
+          return error(res, '文档内容类型无效')
+        }
+        const storedAsset = await storeAsset({
           buffer: file.buffer,
           originalName: file.originalname,
           mimeType: detectedMimeType,
           ownerId: userId,
         })
+        asset = storedAsset
 
         // 保存到数据库
         const document = await prisma.$transaction(async (tx) => {
           const created = await tx.document.create({
             data: {
               title: title || file.originalname.replace(/\.pdf$/i, ''),
-              filePath: asset.objectKey,
+              filePath: storedAsset.objectKey,
               fileName: file.originalname,
               fileSize: file.size,
               teacherId: userId,
-              assetId: asset.id,
+              assetId: storedAsset.id,
             },
             include: {
               teacher: {
@@ -109,15 +114,16 @@ export const documentController = {
               }
             }
           })
-          await attachAssetReference({ assetId: asset.id, entityType: 'Document', entityId: created.id, field: 'file' }, tx)
+          await attachAssetReference({ assetId: storedAsset.id, entityType: 'Document', entityId: created.id, field: 'file' }, tx)
           return created
         })
 
         return success(res, {
           ...document,
-          url: await getSignedAssetUrl(asset.id),
+          url: await getSignedAssetUrl(storedAsset.id),
         }, '文档上传成功')
       } catch (uploadError) {
+        if (asset) await discardUnreferencedAsset(asset).catch(() => undefined)
         logger.error('上传到COS失败', uploadError)
         return error(res, '文档上传失败')
       }

@@ -14,7 +14,7 @@ try {
   logger.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
 }
 
-import { videoQueue } from '../config/queue'
+import { videoQueue, RESOURCE_LIMITS } from '../config/queue'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
@@ -54,8 +54,8 @@ const PROCESSING_CONFIG = {
   // 音频码率
   audioBitrate: '96k',
 
-  // 全局并发处理数（关键优化：限制为1）
-  concurrency: 1,
+  // Keep the worker aligned with the queue-level bounded concurrency.
+  concurrency: RESOURCE_LIMITS.videoConcurrency,
 
   // 启用压缩优化 - 如果原文件比处理后小，保留原文件
   smartCompression: true,

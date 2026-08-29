@@ -7,7 +7,7 @@ import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
-import { attachAssetReference, getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
 import { markVideoFailed } from '../services/videoProcessingState'
 
 const updateVideoSchema = z.object({
@@ -127,6 +127,8 @@ export const videoController = {
 
   // 上传视频 - 异步处理版本
   async upload(req: Request, res: Response) {
+    let originalAsset: Awaited<ReturnType<typeof storeAssetFromFile>> | undefined
+    let originalAssetLinked = false
     try {
       const userId = req.user?.userId
       if (!userId) {
@@ -143,16 +145,24 @@ export const videoController = {
         return error(res, '请输入视频标题')
       }
 
-      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType || file.mimetype
+      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType
+      if (!detectedMimeType || !['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'].includes(detectedMimeType)) {
+        return error(res, '视频内容类型无效')
+      }
 
-      const originalAsset = await storeAsset({
-        buffer: file.buffer,
+      if (!file.path) {
+        return error(res, '无法读取上传文件')
+      }
+
+      const storedOriginalAsset = await storeAssetFromFile({
+        filePath: file.path,
         originalName: file.originalname,
         mimeType: detectedMimeType,
         ownerId: userId,
         provider: 'local',
       })
-      const processingInput = `file://${getLocalAssetPath(originalAsset.objectKey)}`
+      originalAsset = storedOriginalAsset
+      const processingInput = `file://${getLocalAssetPath(storedOriginalAsset.objectKey)}`
 
       // Keep the video pointer and asset reference atomic. The asset itself
       // is already stored, so a failed transaction leaves only an unreachable
@@ -161,12 +171,12 @@ export const videoController = {
         const created = await tx.video.create({
           data: {
             title,
-            filePath: originalAsset.objectKey,
+            filePath: storedOriginalAsset.objectKey,
             fileName: file.originalname,
             fileSize: file.size,
             mimeType: detectedMimeType,
             teacherId: userId,
-            originalAssetId: originalAsset.id,
+            originalAssetId: storedOriginalAsset.id,
             status: 'PENDING',
           },
           include: {
@@ -179,9 +189,10 @@ export const videoController = {
             }
           }
         })
-        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
+        await attachAssetReference({ assetId: storedOriginalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
         return created
       })
+      originalAssetLinked = true
 
       // 添加到视频处理队列
       try {
@@ -214,6 +225,9 @@ export const videoController = {
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
+      if (originalAsset && !originalAssetLinked) {
+        await discardUnreferencedAsset(originalAsset).catch(() => undefined)
+      }
       logger.error('上传视频错误', err)
       return error(res, '上传视频失败')
     }
