@@ -21,6 +21,7 @@ import {
 } from '../services/assetStorage'
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
+import { hashIdempotencyKey } from '../utils/idempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -33,11 +34,11 @@ const createCheckinSchema = z.object({
   title: z.string().min(1, '打卡标题不能为空'),
   description: z.string().optional(),
   content: z.string().optional(),
-  tags: z.array(z.string().max(20)).max(10).optional().default([]),
+  tags: z.array(z.string().max(20)).max(10).optional(),
   videos: attachmentsSchema.optional().nullable().default([]),
   images: attachmentsSchema.optional().nullable().default([]),
   documents: attachmentsSchema.optional().nullable().default([]),
-  endTime: z.string().optional(),
+  endTime: z.union([z.string(), z.null()]).optional(),
   allowViewOthers: z.boolean().optional().default(false),
 })
 
@@ -45,13 +46,24 @@ const updateCheckinSchema = z.object({
   title: z.string().min(1, '打卡标题不能为空').optional(),
   description: z.string().optional(),
   content: z.string().optional(),
-  tags: z.array(z.string().max(20)).max(10).optional().default([]),
+  tags: z.array(z.string().max(20)).max(10).optional(),
   videos: attachmentsSchema.optional().nullable(),
   images: attachmentsSchema.optional().nullable(),
   documents: attachmentsSchema.optional().nullable(),
-  endTime: z.string().optional(),
+  endTime: z.union([z.string(), z.null()]).optional(),
   allowViewOthers: z.boolean().optional(),
 })
+
+const parseCheckinEndTime = (value: string | null | undefined): Date | null | undefined => {
+  if (value === undefined) return undefined
+  if (value === null || value.trim() === '') {
+    if (value === '') throw new Error('截止时间格式无效')
+    return null
+  }
+  const parsed = new Date(value)
+  if (!Number.isFinite(parsed.getTime())) throw new Error('截止时间格式无效')
+  return parsed
+}
 
 const isLegacyUploadReference = (value: string): boolean => {
   if (!/^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@%/_-]+$/.test(value)) return false
@@ -60,7 +72,7 @@ const isLegacyUploadReference = (value: string): boolean => {
 
 const submitCheckinSchema = z.object({
   content: z.string().optional(),
-  tags: z.array(z.string().max(20)).max(10).optional().default([]),
+  tags: z.array(z.string().max(20)).max(10).optional(),
   // During the asset migration, accept only old local upload references or a
   // server-issued asset capability. Client-supplied URLs are never trusted.
   images: z.array(z.union([
@@ -289,14 +301,8 @@ const publicImageUpload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error('只支持 JPG、PNG、GIF、WebP 格式的图片'))
-    }
-  }
+  // Client MIME is only a hint; detectAcceptedImageMimeType validates bytes.
+  fileFilter: (_req, _file, cb) => cb(null, true),
 })
 
 const acceptedImageMimeTypes = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
@@ -424,6 +430,12 @@ export const checkinController = {
       }
 
       const { courseId, title, description, content, videos, images, documents, endTime, allowViewOthers, tags } = result.data
+      let parsedEndTime: Date | null = null
+      try {
+        parsedEndTime = parseCheckinEndTime(endTime) || null
+      } catch (endTimeError) {
+        return error(res, endTimeError instanceof Error ? endTimeError.message : '截止时间格式无效')
+      }
 
       // 检查课程
       const course = await prisma.course.findUnique({
@@ -462,9 +474,9 @@ export const checkinController = {
             videos: videos as any,
             images: images as any,
             documents: documents as any,
-            endTime: endTime ? new Date(endTime) : null,
+            endTime: parsedEndTime,
             allowViewOthers: allowViewOthers ?? false,
-            tags: tags || [],
+            tags: tags ?? [],
             creatorId: userId,
           },
           include: {
@@ -627,6 +639,12 @@ export const checkinController = {
       }
 
       const { title, description, content, videos, images, documents, endTime, allowViewOthers, tags } = result.data
+      let parsedEndTime: Date | null | undefined
+      try {
+        parsedEndTime = parseCheckinEndTime(endTime)
+      } catch (endTimeError) {
+        return error(res, endTimeError instanceof Error ? endTimeError.message : '截止时间格式无效')
+      }
 
       const assetValues = {
         videos: videos === undefined ? checkin.videos : videos || [],
@@ -651,9 +669,9 @@ export const checkinController = {
             videos: videos === undefined ? undefined : videos as any,
             images: images === undefined ? undefined : images as any,
             documents: documents === undefined ? undefined : documents as any,
-            endTime: endTime ? new Date(endTime) : undefined,
+            endTime: parsedEndTime,
             allowViewOthers,
-            tags: tags || [],
+            tags: tags === undefined ? undefined : tags,
           },
           include: {
             course: {
@@ -768,6 +786,12 @@ export const checkinController = {
       }
 
       const { content, images } = result.data
+      let idempotencyKeyHash: string | undefined
+      try {
+        idempotencyKeyHash = hashIdempotencyKey(typeof req.header === 'function' ? req.header('Idempotency-Key') : undefined)
+      } catch (idempotencyError) {
+        return error(res, idempotencyError instanceof Error ? idempotencyError.message : 'Idempotency-Key 无效')
+      }
 
       // 检查打卡
       const checkin = await prisma.checkin.findUnique({
@@ -782,6 +806,24 @@ export const checkinController = {
         return forbidden(res, '您不是该课程的学员')
       }
 
+      // Replay an already committed idempotent request even if the retry
+      // arrives after the check-in deadline. A new payload still goes through
+      // the normal expiry and asset validation below.
+      if (idempotencyKeyHash) {
+        const committedRetry = await prisma.checkinSubmission.findFirst({
+          where: { checkinId: id, studentId: userId, idempotencyKeyHash },
+        })
+        if (committedRetry) {
+          return success(res, await hydrateAssetReferences(committedRetry, false, {
+            entityType: 'CheckinSubmission',
+            entityId: committedRetry.id,
+            courseId: checkin.courseId,
+            checkinId: id,
+            parentAccess: true,
+          }), '打卡成功')
+        }
+      }
+
       if (checkin.endTime && new Date() > checkin.endTime) {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
@@ -792,13 +834,25 @@ export const checkinController = {
       }
 
       const submission = await prisma.$transaction(async (tx) => {
-        const existing = await tx.checkinSubmission.findFirst({
-          where: { checkinId: id, studentId: userId },
-        })
+        if (typeof (tx as any).$executeRaw === 'function') {
+          await (tx as any).$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`checkin-submission:${id}:${userId}`}))`
+        }
+        const existing = typeof tx.checkinSubmission.findUnique === 'function'
+          ? await tx.checkinSubmission.findUnique({
+            where: { checkinId_studentId: { checkinId: id, studentId: userId } },
+          })
+          : await tx.checkinSubmission.findFirst({ where: { checkinId: id, studentId: userId } })
+        if (idempotencyKeyHash && existing?.idempotencyKeyHash === idempotencyKeyHash) {
+          return { saved: existing, wasExisting: true }
+        }
         const saved = existing
           ? await tx.checkinSubmission.update({
             where: { id: existing.id },
-            data: { content, images: validatedImages },
+            data: {
+              content,
+              images: validatedImages,
+              ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+            },
           })
           : await tx.checkinSubmission.create({
             data: {
@@ -806,6 +860,7 @@ export const checkinController = {
               studentId: userId,
               content,
               images: validatedImages,
+              ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
             },
           })
         await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
@@ -860,7 +915,10 @@ export const checkinController = {
         scopeId: checkin.courseId,
       })
       const url = await getSignedAssetUrl(asset.id)
-      if (!url) return error(res, '图片上传失败')
+      if (!url) {
+        await discardUnreferencedAsset(asset)
+        return error(res, '图片上传失败')
+      }
 
       logger.info('学生上传打卡图片', {
         assetId: asset.id,
@@ -1265,11 +1323,7 @@ export const checkinController = {
         }
       })
 
-      // 创建 Excel
-      const XLSX = await import('xlsx')
-      const ws = XLSX.utils.json_to_sheet(exportData)
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, '打卡提交数据')
+      // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
 
       // 设置响应头
       const fileName = `${checkin.course.title}_${checkin.title}_打卡数据.xlsx`
@@ -1277,7 +1331,7 @@ export const checkinController = {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
 
       // 发送文件
-      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '打卡提交数据': exportData })
       res.send(buffer)
     } catch (err) {
       logger.error('导出打卡错误', err)
@@ -1533,6 +1587,9 @@ export const checkinController = {
    * 公开上传图片（匿名用户，通过令牌访问）
    */
   async uploadPublicImage(req: Request, res: Response) {
+    let uploadedAsset: Awaited<ReturnType<typeof storeAsset>> | undefined
+    let stagingReferenceCreated = false
+    let stagingReferenceEntityId: string | undefined
     try {
       const { token } = req.params
 
@@ -1575,6 +1632,7 @@ export const checkinController = {
         return error(res, '会话标识无效')
       }
       const sessionId = sessionResult.data
+      stagingReferenceEntityId = publicUploadStagingEntityId(validation.checkin.id, sessionId)
       if (!checkinTokenService.verifySessionCapability({
         checkinId: validation.checkin.id,
         tokenId: validation.token!.id,
@@ -1596,6 +1654,7 @@ export const checkinController = {
         accessScope: 'PUBLIC_CHECKIN',
         scopeId: validation.checkin.id,
       })
+      uploadedAsset = asset
       try {
         await prisma.$transaction(async (tx) => stagePublicUploadAsset({
           assetId: asset.id,
@@ -1603,8 +1662,10 @@ export const checkinController = {
           sessionId,
           db: tx,
         }))
+        stagingReferenceCreated = true
       } catch (referenceError) {
         await discardUnreferencedAsset(asset)
+        uploadedAsset = undefined
         if (referenceError instanceof PublicUploadSessionLimitError) {
           return error(res, `每个会话最多上传${MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION}张图片`, -1, 409)
         }
@@ -1614,6 +1675,11 @@ export const checkinController = {
         throw referenceError
       }
 
+      const publicUrl = await getSignedAssetUrl(asset.id, true)
+      if (!publicUrl) {
+        throw new Error('公开资产签名 URL 生成失败')
+      }
+
       logger.info('匿名用户上传图片', {
         assetId: asset.id,
         checkinId: validation.checkin.id,
@@ -1621,9 +1687,22 @@ export const checkinController = {
 
       return success(res, {
         assetId: asset.id,
-        url: await getSignedAssetUrl(asset.id, true),
+        url: publicUrl,
       }, '上传成功')
     } catch (err) {
+      if (uploadedAsset) {
+        if (stagingReferenceCreated && stagingReferenceEntityId) {
+          await prisma.assetReference.deleteMany({
+            where: {
+              entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
+              entityId: stagingReferenceEntityId,
+              field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+              assetId: uploadedAsset.id,
+            },
+          }).catch(() => undefined)
+        }
+        await discardUnreferencedAsset(uploadedAsset).catch(() => undefined)
+      }
       logger.error('公开上传图片错误', err)
       return error(res, '上传失败')
     }

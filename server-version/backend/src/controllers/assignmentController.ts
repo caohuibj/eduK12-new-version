@@ -6,7 +6,8 @@ import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
-import * as XLSX from 'xlsx'
+import { workbookBuffer } from '../utils/excelWorkbook'
+import { hashIdempotencyKey } from '../utils/idempotency'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 import {
   AssetReferenceValidationError,
@@ -46,6 +47,38 @@ const updateAssignmentSchema = z.object({
   tags: z.array(z.string().max(20, '标签最多20个字符')).max(10, '最多10个标签').optional(),
   content: z.string().optional(),
 })
+
+export const parseAssignmentDeadline = (value: string | undefined): Date | null | undefined => {
+  if (value === undefined) return undefined
+  if (typeof value !== 'string' || value.trim() === '') throw new Error('截止日期格式无效')
+  const parsed = new Date(value)
+  if (!Number.isFinite(parsed.getTime())) throw new Error('截止日期格式无效')
+
+  const now = Date.now()
+  if (parsed.getTime() < now - 60_000) throw new Error('截止日期不能早于当前时间')
+  const maxDate = new Date()
+  maxDate.setFullYear(maxDate.getFullYear() + 10)
+  if (parsed.getTime() > maxDate.getTime()) throw new Error('截止日期不能超过10年')
+  return parsed
+}
+
+const isUniqueConstraintError = (error: unknown): boolean => (
+  Boolean(error && typeof error === 'object' && (error as { code?: string }).code === 'P2002')
+)
+
+const withSubmissionTransaction = async <T>(callback: (tx: any) => Promise<T>): Promise<T> => {
+  const transaction = (prisma as any).$transaction
+  // The fallback only supports lightweight controller unit mocks. Real
+  // Prisma clients always take the transaction path below.
+  return typeof transaction === 'function' ? transaction.call(prisma, callback) : callback(prisma)
+}
+
+const findExistingSubmission = async (tx: any, assignmentId: string, studentId: string) => {
+  if (typeof tx.submission.findUnique === 'function') {
+    return tx.submission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId } } })
+  }
+  return tx.submission.findFirst({ where: { assignmentId, studentId } })
+}
 
 const submitSchema = z.object({
   content: z.string().optional(),
@@ -204,29 +237,11 @@ export const assignmentController = {
         return forbidden(res, '无权限在此课程创建作业')
       }
 
-      // 处理 deadline 格式 - 添加严格验证
-      let deadlineDate = null
-      if (deadline) {
-        try {
-          deadlineDate = new Date(deadline)
-          // 验证日期有效性
-          if (isNaN(deadlineDate.getTime())) {
-            return error(res, '截止日期格式无效')
-          }
-          // 验证日期不能早于当前时间（允许1分钟误差）
-          const now = new Date()
-          if (deadlineDate.getTime() < now.getTime() - 60000) {
-            return error(res, '截止日期不能早于当前时间')
-          }
-          // 验证日期不能超过10年
-          const maxDate = new Date()
-          maxDate.setFullYear(maxDate.getFullYear() + 10)
-          if (deadlineDate.getTime() > maxDate.getTime()) {
-            return error(res, '截止日期不能超过10年')
-          }
-        } catch {
-          return error(res, '截止日期格式无效')
-        }
+      let deadlineDate: Date | null = null
+      try {
+        deadlineDate = parseAssignmentDeadline(deadline) || null
+      } catch (deadlineError) {
+        return error(res, deadlineError instanceof Error ? deadlineError.message : '截止日期格式无效')
       }
 
       const assetValues = {
@@ -405,13 +420,12 @@ export const assignmentController = {
       }
 
       const updateData: any = { ...result.data }
-      if (result.data.deadline) {
-        try {
-          const deadlineDate = new Date(result.data.deadline)
-          updateData.deadline = isNaN(deadlineDate.getTime()) ? null : deadlineDate
-        } catch {
-          updateData.deadline = null
+      try {
+        if (result.data.deadline !== undefined) {
+          updateData.deadline = parseAssignmentDeadline(result.data.deadline)
         }
+      } catch (deadlineError) {
+        return error(res, deadlineError instanceof Error ? deadlineError.message : '截止日期格式无效')
       }
 
       const assetValues = {
@@ -521,6 +535,12 @@ export const assignmentController = {
       }
 
       const { content, answers } = result.data
+      let idempotencyKeyHash: string | undefined
+      try {
+        idempotencyKeyHash = hashIdempotencyKey(typeof req.header === 'function' ? req.header('Idempotency-Key') : undefined)
+      } catch (idempotencyError) {
+        return error(res, idempotencyError instanceof Error ? idempotencyError.message : 'Idempotency-Key 无效')
+      }
 
       // 检查作业是否存在
       const assignment = await prisma.assignment.findUnique({
@@ -535,6 +555,18 @@ export const assignmentController = {
         return forbidden(res, '您不是该课程的学员')
       }
 
+      // A client may retry after the original request committed but the
+      // assignment has since closed. Replay the committed idempotent result
+      // before applying current publication/deadline gates.
+      if (idempotencyKeyHash) {
+        const committedRetry = await prisma.submission.findFirst({
+          where: { assignmentId: id, studentId: userId, idempotencyKeyHash },
+        })
+        if (committedRetry) {
+          return success(res, committedRetry, '作业提交成功')
+        }
+      }
+
       if (assignment.status !== AssignmentStatus.PUBLISHED) {
         return error(res, '作业未发布')
       }
@@ -543,57 +575,72 @@ export const assignmentController = {
         return error(res, Messages.ASSIGNMENT.DEADLINE_PASSED)
       }
 
-      // 检查是否已提交
-      const existing = await prisma.submission.findFirst({
-        where: {
-          assignmentId: id,
-          studentId: userId
+      const submissionResult = await withSubmissionTransaction(async (tx) => {
+        const lockKey = `assignment-submission:${id}:${userId}`
+        if (typeof tx.$executeRaw === 'function') {
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`
         }
-      })
 
-      if (existing) {
-        // 获取当前版本号
-        const latestHistory = await prisma.submissionHistory.findFirst({
+        // Use the composite unique key so the lock and the database invariant
+        // agree. A legacy client racing this code is handled by the P2002
+        // retry below and still receives an idempotent success.
+        let existing = await findExistingSubmission(tx, id, userId)
+
+        if (!existing) {
+          try {
+            const created = await tx.submission.create({
+              data: {
+                assignmentId: id,
+                studentId: userId,
+                content,
+                answers: answers || {},
+                status: SubmissionStatus.SUBMITTED,
+                ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+              },
+            })
+            return { submission: created, wasExisting: false }
+          } catch (createError) {
+            if (!isUniqueConstraintError(createError)) throw createError
+            existing = await findExistingSubmission(tx, id, userId)
+            if (!existing) throw createError
+          }
+        }
+
+        // A retry carrying the same explicit key is an idempotent success,
+        // not another history version. Requests without a key retain the
+        // existing versioning behavior for intentional resubmissions.
+        if (idempotencyKeyHash && existing.idempotencyKeyHash === idempotencyKeyHash) {
+          return { submission: existing, wasExisting: true }
+        }
+
+        const latestHistory = await tx.submissionHistory.findFirst({
           where: { submissionId: existing.id },
-          orderBy: { version: 'desc' }
+          orderBy: { version: 'desc' },
         })
         const newVersion = latestHistory ? latestHistory.version + 1 : 1
-
-        // 记录历史版本
-        await prisma.submissionHistory.create({
+        await tx.submissionHistory.create({
           data: {
             submissionId: existing.id,
             content: existing.content,
-            answers: existing.answers as any, // Prisma JsonValue 类型兼容
+            answers: existing.answers as any,
             version: newVersion,
-          }
+          },
         })
 
-        // 更新提交
-        const updated = await prisma.submission.update({
+        const updated = await tx.submission.update({
           where: { id: existing.id },
           data: {
             content,
             answers: answers || {},
             submittedAt: new Date(),
             status: SubmissionStatus.SUBMITTED,
-          }
+            ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+          },
         })
-        return success(res, updated, '作业更新成功')
-      }
-
-      // 创建新提交
-      const submission = await prisma.submission.create({
-        data: {
-          assignmentId: id,
-          studentId: userId,
-          content,
-          answers: answers || {},
-          status: SubmissionStatus.SUBMITTED,
-        }
+        return { submission: updated, wasExisting: true }
       })
 
-      return success(res, submission, '作业提交成功')
+      return success(res, submissionResult.submission, submissionResult.wasExisting ? '作业更新成功' : '作业提交成功')
     } catch (err) {
       logger.error('提交作业错误', err)
       return error(res, '提交作业失败')
@@ -874,10 +921,7 @@ export const assignmentController = {
         return baseRecord
       })
 
-      // 创建 Excel
-      const ws = XLSX.utils.json_to_sheet(exportData)
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, '作业提交数据')
+      // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
 
       // 设置响应头
       const fileName = `${assignment.title}_提交数据.xlsx`
@@ -885,7 +929,7 @@ export const assignmentController = {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
 
       // 发送文件
-      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+      const buffer = await workbookBuffer({ '作业提交数据': exportData })
       res.send(buffer)
     } catch (err) {
       logger.error('导出数据错误', err)

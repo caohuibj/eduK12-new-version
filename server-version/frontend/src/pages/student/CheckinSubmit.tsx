@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, ZoomIn, FileText } from 'lucide-react'
 import apiClient from '../../api/client'
@@ -7,6 +7,7 @@ import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, Doc
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import PdfViewer from '../../components/PdfViewer'
+import { createIdempotencyKey } from '../../utils/idempotency'
 
 interface OtherSubmission {
   id: string
@@ -48,6 +49,7 @@ const CheckinSubmit: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
+  const submitIdempotencyKeyRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (checkinId) {
@@ -135,6 +137,8 @@ const CheckinSubmit: React.FC = () => {
 
     setSubmitting(true)
     try {
+      const idempotencyKey = submitIdempotencyKeyRef.current || createIdempotencyKey()
+      submitIdempotencyKeyRef.current = idempotencyKey
       const response = await apiClient.post(`/checkins/${checkinId}/submit`, {
         content,
         // The URL is display metadata; the API accepts only legacy references
@@ -142,12 +146,16 @@ const CheckinSubmit: React.FC = () => {
         images: images.map((image) => (
           typeof image === 'string' ? image : { assetId: image.assetId }
         )),
+      }, {
+        headers: { 'Idempotency-Key': idempotencyKey },
       })
 
       if (response.code === 0) {
+        submitIdempotencyKeyRef.current = null
         alert('打卡成功！')
         fetchCheckinDetail()
       } else {
+        submitIdempotencyKeyRef.current = null
         alert(response.message || '打卡失败')
       }
     } catch {

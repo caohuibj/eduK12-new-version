@@ -233,7 +233,7 @@ const QuestionnaireAssessment: React.FC = () => {
 
   // 提交表单答案并进入下一项
   const handleFormSubmit = async (action: 'answer' | 'skip' = 'answer') => {
-    if (!data?.currentFormItem) return
+    if (!data?.currentFormItem || submitting || savingAnswerRef.current) return
 
     const formItem = data.currentFormItem
     // 必填验证：字符串类型检查trim，数组类型检查长度
@@ -246,6 +246,7 @@ const QuestionnaireAssessment: React.FC = () => {
       return
     }
     if (action === 'skip' && (formItem.required || formItem.contextKey)) return
+    savingAnswerRef.current = true
 
     try {
       setSubmitting(true)
@@ -268,6 +269,7 @@ const QuestionnaireAssessment: React.FC = () => {
     } catch (err: any) {
       setRunnerError(normalizeApiError(err).message)
     } finally {
+      savingAnswerRef.current = false
       setSubmitting(false)
     }
   }
@@ -285,6 +287,7 @@ const QuestionnaireAssessment: React.FC = () => {
       return
     }
     setRunnerError(null)
+    savingAnswerRef.current = true
 
     try {
       setSubmitting(true)
@@ -297,6 +300,7 @@ const QuestionnaireAssessment: React.FC = () => {
     } catch (err: any) {
       setRunnerError(normalizeApiError(err).message)
     } finally {
+      savingAnswerRef.current = false
       setSubmitting(false)
     }
   }

@@ -172,6 +172,7 @@ model Submission {
   status       SubmissionStatus    @default(SUBMITTED)
   submittedAt  DateTime            @default(now()) @map("submitted_at")
   reviewedAt   DateTime?           @map("reviewed_at")
+  idempotencyKeyHash String?       @map("idempotency_key_hash")
   assignment   Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   student      User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
   history      SubmissionHistory[]
@@ -189,6 +190,7 @@ model SubmissionHistory {
   createdAt    DateTime   @default(now()) @map("created_at")
   submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
+  @@unique([submissionId, version])
   @@map("submission_histories")
 }
 
@@ -223,6 +225,7 @@ model CheckinSubmission {
   content     String?
   images      Json?
   createdAt   DateTime            @default(now()) @map("created_at")
+  idempotencyKeyHash String?      @map("idempotency_key_hash")
   isAnonymous Boolean             @default(false) @map("is_anonymous")
   sessionId   String?             @map("session_id")
   tokenId     String?             @map("token_id")
