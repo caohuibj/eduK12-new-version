@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     checkin: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
     checkinSubmission: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+    checkinSubmissionIdempotencyReceipt: { findFirst: vi.fn(), create: vi.fn() },
     storedAsset: { findMany: vi.fn() },
     assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     $executeRaw: vi.fn(),
@@ -55,7 +56,9 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.assetReference.upsert.mockResolvedValue({})
     mockPrisma.assetReference.findMany.mockResolvedValue([])
     mockPrisma.assetReference.count.mockResolvedValue(0)
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
     mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst.mockResolvedValue(null)
     mockPrisma.$executeRaw.mockResolvedValue(0)
     mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
@@ -151,6 +154,80 @@ describe('logged-in checkin submit endTime', () => {
 
     expect(res.statusCode).toBe(409)
     expect(res.body.message).toBe('Idempotency-Key 已用于其他提交内容')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('replays an older key from its immutable receipt after a newer submit', async () => {
+    const oldKeyHash = hashIdempotencyKey('checkin-old-key')
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst.mockResolvedValue({
+      idempotencyKeyHash: oldKeyHash,
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today A', images: [] }),
+      response: {
+        id: 'sub-1',
+        checkinId: 'ck-1',
+        studentId: 'student-1',
+        content: 'today A',
+        images: [],
+      },
+    })
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue({
+      id: 'sub-1',
+      content: 'today B',
+      images: [],
+      idempotencyKeyHash: hashIdempotencyKey('checkin-new-key'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today B', images: [] }),
+    })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A' },
+      header: vi.fn().mockReturnValue('checkin-old-key'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.content).toBe('today A')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('re-checks the receipt inside the transaction after a delayed retry acquires the lock', async () => {
+    const oldKeyHash = hashIdempotencyKey('checkin-delayed-key')
+    const receipt = {
+      idempotencyKeyHash: oldKeyHash,
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today A', images: [] }),
+      response: { id: 'sub-1', content: 'today A', images: [] },
+    }
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(receipt)
+    mockPrisma.checkinSubmission.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue({
+        id: 'sub-1',
+        content: 'today B',
+        images: [],
+        idempotencyKeyHash: hashIdempotencyKey('checkin-new-key'),
+      })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A' },
+      header: vi.fn().mockReturnValue('checkin-delayed-key'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.content).toBe('today A')
     expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
     expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
   })

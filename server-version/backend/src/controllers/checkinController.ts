@@ -22,6 +22,11 @@ import {
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
+import {
+  checkinSubmissionSnapshot,
+  createCheckinIdempotencyReceipt,
+  findCheckinIdempotencyReceipt,
+} from '../utils/submissionIdempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -826,6 +831,26 @@ export const checkinController = {
       // arrives after the check-in deadline. A new payload still goes through
       // the normal expiry and asset validation below.
       if (idempotencyKeyHash) {
+        const committedReceipt = await findCheckinIdempotencyReceipt(
+          prisma,
+          id,
+          userId,
+          idempotencyKeyHash,
+        )
+        if (committedReceipt) {
+          if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
+          const receiptResponse = committedReceipt.response as Record<string, any>
+          return success(res, await hydrateAssetReferences(receiptResponse, false, {
+            entityType: 'CheckinSubmission',
+            entityId: receiptResponse.id,
+            courseId: checkin.courseId,
+            checkinId: id,
+            parentAccess: true,
+          }), '打卡成功')
+        }
+
         const committedRetry = await prisma.checkinSubmission.findFirst({
           where: { checkinId: id, studentId: userId, idempotencyKeyHash },
         })
@@ -858,6 +883,25 @@ export const checkinController = {
         if (typeof (tx as any).$executeRaw === 'function') {
           await (tx as any).$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`checkin-submission:${id}:${userId}`}))`
         }
+
+        // Re-check the immutable receipt after acquiring the per-student
+        // transaction lock so an older delayed key can only replay its
+        // original payload, never overwrite a newer submission.
+        if (idempotencyKeyHash) {
+          const committedReceipt = await findCheckinIdempotencyReceipt(
+            tx,
+            id,
+            userId,
+            idempotencyKeyHash,
+          )
+          if (committedReceipt) {
+            if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+              throw new IdempotencyPayloadMismatchError()
+            }
+            return { saved: committedReceipt.response, wasExisting: true }
+          }
+        }
+
         const existing = typeof tx.checkinSubmission.findUnique === 'function'
           ? await tx.checkinSubmission.findUnique({
             where: { checkinId_studentId: { checkinId: id, studentId: userId } },
@@ -868,6 +912,16 @@ export const checkinController = {
             || hashIdempotencyPayload(checkinSubmissionPayload(existing))
           if (existingPayloadHash !== idempotencyPayloadHash) {
             throw new IdempotencyPayloadMismatchError()
+          }
+          if (idempotencyKeyHash && idempotencyPayloadHash) {
+            await createCheckinIdempotencyReceipt(tx, {
+              checkinId: id,
+              studentId: userId,
+              submissionId: existing.id,
+              idempotencyKeyHash,
+              idempotencyPayloadHash,
+              response: checkinSubmissionSnapshot(existing),
+            })
           }
           return { saved: existing, wasExisting: true }
         }
@@ -890,8 +944,18 @@ export const checkinController = {
               images: validatedImages,
               ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
             },
-          })
+        })
         await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
+        if (idempotencyKeyHash && idempotencyPayloadHash) {
+          await createCheckinIdempotencyReceipt(tx, {
+            checkinId: id,
+            studentId: userId,
+            submissionId: saved.id,
+            idempotencyKeyHash,
+            idempotencyPayloadHash,
+            response: checkinSubmissionSnapshot(saved),
+          })
+        }
         return { saved, wasExisting: Boolean(existing) }
       })
 

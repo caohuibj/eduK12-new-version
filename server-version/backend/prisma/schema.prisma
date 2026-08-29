@@ -177,9 +177,31 @@ model Submission {
   assignment   Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   student      User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
   history      SubmissionHistory[]
+  idempotencyReceipts SubmissionIdempotencyReceipt[]
 
   @@unique([assignmentId, studentId])
   @@map("submissions")
+}
+
+// Immutable receipt for every keyed assignment submission.  The mutable
+// Submission row keeps only the latest key for compatibility, while receipts
+// preserve older keys so a delayed retry can be replayed without overwriting
+// a newer submission.
+model SubmissionIdempotencyReceipt {
+  id                    String     @id @default(uuid())
+  assignmentId          String     @map("assignment_id")
+  studentId             String     @map("student_id")
+  submissionId          String     @map("submission_id")
+  idempotencyKeyHash    String     @map("idempotency_key_hash")
+  idempotencyPayloadHash String     @map("idempotency_payload_hash")
+  response              Json
+  createdAt             DateTime   @default(now()) @map("created_at")
+  submission            Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique(name: "submission_idempotency_receipt_scope_key", [assignmentId, studentId, idempotencyKeyHash])
+  @@index([submissionId])
+  @@index([createdAt])
+  @@map("submission_idempotency_receipts")
 }
 
 model SubmissionHistory {
@@ -234,6 +256,7 @@ model CheckinSubmission {
   checkin     Checkin             @relation(fields: [checkinId], references: [id], onDelete: Cascade)
   student     User?               @relation(fields: [studentId], references: [id], onDelete: Cascade)
   accessToken CheckinAccessToken? @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  idempotencyReceipts CheckinSubmissionIdempotencyReceipt[]
 
   @@unique([checkinId, studentId])
   @@unique([checkinId, sessionId])
@@ -241,6 +264,26 @@ model CheckinSubmission {
   @@index([sessionId])
   @@index([tokenId])
   @@map("checkin_submissions")
+}
+
+// Immutable receipt for keyed, authenticated check-in submissions.  Public
+// anonymous submissions do not use this table because they are session
+// claimed by their access token instead of an Idempotency-Key.
+model CheckinSubmissionIdempotencyReceipt {
+  id                    String           @id @default(uuid())
+  checkinId             String           @map("checkin_id")
+  studentId             String           @map("student_id")
+  submissionId          String           @map("submission_id")
+  idempotencyKeyHash    String           @map("idempotency_key_hash")
+  idempotencyPayloadHash String           @map("idempotency_payload_hash")
+  response              Json
+  createdAt             DateTime         @default(now()) @map("created_at")
+  submission            CheckinSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique(name: "checkin_submission_idempotency_receipt_scope_key", [checkinId, studentId, idempotencyKeyHash])
+  @@index([submissionId])
+  @@index([createdAt])
+  @@map("checkin_submission_idempotency_receipts")
 }
 
 model Video {

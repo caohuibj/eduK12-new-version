@@ -6,7 +6,11 @@ import type { Assignment, Submission, MediaItem, DocumentItem } from '../../type
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import PdfViewer from '../../components/PdfViewer'
 import { sanitizeHtml } from '../../utils/sanitize'
-import { createIdempotencyKey, fingerprintIdempotencyPayload } from '../../utils/idempotency'
+import {
+  createIdempotencyKey,
+  fingerprintIdempotencyPayload,
+  shouldClearIdempotencyKey,
+} from '../../utils/idempotency'
 
 const AssignmentSubmit: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>()
@@ -147,10 +151,10 @@ const AssignmentSubmit: React.FC = () => {
         alert(response.message || '提交失败')
       }
     } catch (error: any) {
-      // Axios rejects non-2xx API responses with the parsed response body;
-      // those are definitive failures, not transport retries. Do not keep a
-      // key that the server rejected for a validation/conflict response.
-      if (error && typeof error.code === 'number') {
+      // Only an explicit, non-retryable 4xx rejection invalidates this key.
+      // Network errors, timeouts and 5xx responses may follow a committed
+      // write, so retain the key for an idempotent retry of the same payload.
+      if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
       alert(error.message || '提交失败')

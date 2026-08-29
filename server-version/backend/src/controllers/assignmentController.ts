@@ -15,6 +15,11 @@ import {
   syncAssetReferences,
   validateAssetReferencesForCourse,
 } from '../services/assetStorage'
+import {
+  assignmentSubmissionSnapshot,
+  createAssignmentIdempotencyReceipt,
+  findAssignmentIdempotencyReceipt,
+} from '../utils/submissionIdempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -575,6 +580,19 @@ export const assignmentController = {
       // assignment has since closed. Replay the committed idempotent result
       // before applying current publication/deadline gates.
       if (idempotencyKeyHash) {
+        const committedReceipt = await findAssignmentIdempotencyReceipt(
+          prisma,
+          id,
+          userId,
+          idempotencyKeyHash,
+        )
+        if (committedReceipt) {
+          if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
+          return success(res, committedReceipt.response, '作业提交成功')
+        }
+
         const committedRetry = await prisma.submission.findFirst({
           where: { assignmentId: id, studentId: userId, idempotencyKeyHash },
         })
@@ -602,6 +620,24 @@ export const assignmentController = {
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`
         }
 
+        // Re-check the immutable receipt after acquiring the per-student
+        // transaction lock.  This closes the race where a delayed retry was
+        // already in flight while a newer keyed submission committed.
+        if (idempotencyKeyHash) {
+          const committedReceipt = await findAssignmentIdempotencyReceipt(
+            tx,
+            id,
+            userId,
+            idempotencyKeyHash,
+          )
+          if (committedReceipt) {
+            if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+              throw new IdempotencyPayloadMismatchError()
+            }
+            return { submission: committedReceipt.response, wasExisting: true }
+          }
+        }
+
         // Use the composite unique key so the lock and the database invariant
         // agree. A legacy client racing this code is handled by the P2002
         // retry below and still receives an idempotent success.
@@ -619,6 +655,16 @@ export const assignmentController = {
                 ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
               },
             })
+            if (idempotencyKeyHash && idempotencyPayloadHash) {
+              await createAssignmentIdempotencyReceipt(tx, {
+                assignmentId: id,
+                studentId: userId,
+                submissionId: created.id,
+                idempotencyKeyHash,
+                idempotencyPayloadHash,
+                response: assignmentSubmissionSnapshot(created),
+              })
+            }
             return { submission: created, wasExisting: false }
           } catch (createError) {
             if (!isUniqueConstraintError(createError)) throw createError
@@ -635,6 +681,16 @@ export const assignmentController = {
             || hashIdempotencyPayload(assignmentSubmissionPayload(existing))
           if (existingPayloadHash !== idempotencyPayloadHash) {
             throw new IdempotencyPayloadMismatchError()
+          }
+          if (idempotencyKeyHash && idempotencyPayloadHash) {
+            await createAssignmentIdempotencyReceipt(tx, {
+              assignmentId: id,
+              studentId: userId,
+              submissionId: existing.id,
+              idempotencyKeyHash,
+              idempotencyPayloadHash,
+              response: assignmentSubmissionSnapshot(existing),
+            })
           }
           return { submission: existing, wasExisting: true }
         }
@@ -665,6 +721,16 @@ export const assignmentController = {
               : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
           },
         })
+        if (idempotencyKeyHash && idempotencyPayloadHash) {
+          await createAssignmentIdempotencyReceipt(tx, {
+            assignmentId: id,
+            studentId: userId,
+            submissionId: updated.id,
+            idempotencyKeyHash,
+            idempotencyPayloadHash,
+            response: assignmentSubmissionSnapshot(updated),
+          })
+        }
         return { submission: updated, wasExisting: true }
       })
 
