@@ -23,28 +23,5 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('/node_modules/')) {
-            if (
-              id.includes('/node_modules/react/') ||
-              id.includes('/node_modules/react-dom/') ||
-              id.includes('/node_modules/react-router')
-            ) {
-              return 'vendor-react'
-            }
-            if (id.includes('/node_modules/antd/') || id.includes('/node_modules/@ant-design/')) {
-              return 'vendor-antd'
-            }
-            return 'vendor'
-          }
-
-          if (id.includes('/src/modules/cognitive/')) return 'cognitive'
-          if (id.includes('/src/modules/reporting/') || id.includes('/src/modules/composite/')) return 'reports'
-          return undefined
-        },
-      },
-    },
   },
 })
