@@ -22,7 +22,9 @@ export async function backfillCheckinTokens(
     // Conditional update makes concurrent operators harmless: only the
     // process that still sees this plaintext value clears it.
     const data = {
-      tokenHash: row.tokenHash || hashToken(row.token),
+      // Recompute even when a legacy hash is present: a stale/corrupt hash
+      // must not be preserved when the plaintext is removed.
+      tokenHash: hashToken(row.token),
       tokenEncrypted: row.tokenEncrypted || encryptToken(row.token),
       token: null,
     }

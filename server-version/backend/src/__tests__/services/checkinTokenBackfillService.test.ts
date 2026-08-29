@@ -13,7 +13,7 @@ describe('check-in token backfill', () => {
       .mockResolvedValueOnce({
         id: 'legacy-token',
         token: 'ck_abcdefghijklmnop',
-        tokenHash: null,
+        tokenHash: 'stale-hash',
         tokenEncrypted: null,
       })
       .mockResolvedValueOnce(null)
