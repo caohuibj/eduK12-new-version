@@ -7,7 +7,7 @@ import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { workbookBuffer } from '../utils/excelWorkbook'
-import { hashIdempotencyKey } from '../utils/idempotency'
+import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
 import {
   AssetReferenceValidationError,
@@ -78,6 +78,18 @@ const findExistingSubmission = async (tx: any, assignmentId: string, studentId: 
     return tx.submission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId } } })
   }
   return tx.submission.findFirst({ where: { assignmentId, studentId } })
+}
+
+const assignmentSubmissionPayload = (submission: { content?: unknown; answers?: unknown }) => ({
+  content: submission.content ?? null,
+  answers: submission.answers ?? {},
+})
+
+class IdempotencyPayloadMismatchError extends Error {
+  constructor() {
+    super('Idempotency-Key 已用于其他提交内容')
+    this.name = 'IdempotencyPayloadMismatchError'
+  }
 }
 
 const submitSchema = z.object({
@@ -535,12 +547,16 @@ export const assignmentController = {
       }
 
       const { content, answers } = result.data
+      const normalizedAnswers = answers || {}
       let idempotencyKeyHash: string | undefined
       try {
         idempotencyKeyHash = hashIdempotencyKey(typeof req.header === 'function' ? req.header('Idempotency-Key') : undefined)
       } catch (idempotencyError) {
         return error(res, idempotencyError instanceof Error ? idempotencyError.message : 'Idempotency-Key 无效')
       }
+      const idempotencyPayloadHash = idempotencyKeyHash
+        ? hashIdempotencyPayload(assignmentSubmissionPayload({ content, answers: normalizedAnswers }))
+        : undefined
 
       // 检查作业是否存在
       const assignment = await prisma.assignment.findUnique({
@@ -563,6 +579,11 @@ export const assignmentController = {
           where: { assignmentId: id, studentId: userId, idempotencyKeyHash },
         })
         if (committedRetry) {
+          const committedPayloadHash = committedRetry.idempotencyPayloadHash
+            || hashIdempotencyPayload(assignmentSubmissionPayload(committedRetry))
+          if (committedPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
           return success(res, committedRetry, '作业提交成功')
         }
       }
@@ -593,9 +614,9 @@ export const assignmentController = {
                 assignmentId: id,
                 studentId: userId,
                 content,
-                answers: answers || {},
+                answers: normalizedAnswers,
                 status: SubmissionStatus.SUBMITTED,
-                ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+                ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
               },
             })
             return { submission: created, wasExisting: false }
@@ -610,6 +631,11 @@ export const assignmentController = {
         // not another history version. Requests without a key retain the
         // existing versioning behavior for intentional resubmissions.
         if (idempotencyKeyHash && existing.idempotencyKeyHash === idempotencyKeyHash) {
+          const existingPayloadHash = existing.idempotencyPayloadHash
+            || hashIdempotencyPayload(assignmentSubmissionPayload(existing))
+          if (existingPayloadHash !== idempotencyPayloadHash) {
+            throw new IdempotencyPayloadMismatchError()
+          }
           return { submission: existing, wasExisting: true }
         }
 
@@ -631,10 +657,12 @@ export const assignmentController = {
           where: { id: existing.id },
           data: {
             content,
-            answers: answers || {},
+            answers: normalizedAnswers,
             submittedAt: new Date(),
             status: SubmissionStatus.SUBMITTED,
-            ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+            ...(idempotencyKeyHash
+              ? { idempotencyKeyHash, idempotencyPayloadHash }
+              : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
           },
         })
         return { submission: updated, wasExisting: true }
@@ -642,6 +670,9 @@ export const assignmentController = {
 
       return success(res, submissionResult.submission, submissionResult.wasExisting ? '作业更新成功' : '作业提交成功')
     } catch (err) {
+      if (err instanceof IdempotencyPayloadMismatchError) {
+        return error(res, err.message, -1, 409)
+      }
       logger.error('提交作业错误', err)
       return error(res, '提交作业失败')
     }

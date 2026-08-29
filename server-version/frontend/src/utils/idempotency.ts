@@ -9,3 +9,23 @@ export const createIdempotencyKey = (): string => {
   }
   return `submit-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`
 }
+
+/**
+ * Canonicalize a JSON-like payload for the lifetime of a retryable submit.
+ * This is intentionally deterministic rather than secret: the backend also
+ * hashes and persists the payload, while the browser only needs to know when
+ * a user edit makes the previously cached retry key unsafe to reuse.
+ */
+const stableSerialize = (value: unknown): string => {
+  if (value === null || value === undefined) return 'null'
+  if (typeof value === 'string' || typeof value === 'boolean') return JSON.stringify(value)
+  if (typeof value === 'number') return Number.isFinite(value) ? JSON.stringify(value) : 'null'
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(',')}]`
+  if (typeof value === 'object') {
+    const object = value as Record<string, unknown>
+    return `{${Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${stableSerialize(object[key])}`).join(',')}}`
+  }
+  return 'null'
+}
+
+export const fingerprintIdempotencyPayload = (payload: unknown): string => stableSerialize(payload)

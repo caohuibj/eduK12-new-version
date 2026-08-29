@@ -21,7 +21,7 @@ import {
 } from '../services/assetStorage'
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
-import { hashIdempotencyKey } from '../utils/idempotency'
+import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -80,6 +80,18 @@ const submitCheckinSchema = z.object({
     z.object({ assetId: z.string().min(1).max(100) }).strict(),
   ])).max(9).optional(),
 })
+
+const checkinSubmissionPayload = (submission: { content?: unknown; images?: unknown }) => ({
+  content: submission.content ?? null,
+  images: submission.images ?? [],
+})
+
+class IdempotencyPayloadMismatchError extends Error {
+  constructor() {
+    super('Idempotency-Key 已用于其他提交内容')
+    this.name = 'IdempotencyPayloadMismatchError'
+  }
+}
 
 type SubmissionAssetImage = { assetId: string }
 
@@ -786,12 +798,16 @@ export const checkinController = {
       }
 
       const { content, images } = result.data
+      const requestedImages = images || []
       let idempotencyKeyHash: string | undefined
       try {
         idempotencyKeyHash = hashIdempotencyKey(typeof req.header === 'function' ? req.header('Idempotency-Key') : undefined)
       } catch (idempotencyError) {
         return error(res, idempotencyError instanceof Error ? idempotencyError.message : 'Idempotency-Key 无效')
       }
+      const idempotencyPayloadHash = idempotencyKeyHash
+        ? hashIdempotencyPayload(checkinSubmissionPayload({ content, images: requestedImages }))
+        : undefined
 
       // 检查打卡
       const checkin = await prisma.checkin.findUnique({
@@ -814,6 +830,11 @@ export const checkinController = {
           where: { checkinId: id, studentId: userId, idempotencyKeyHash },
         })
         if (committedRetry) {
+          const committedPayloadHash = committedRetry.idempotencyPayloadHash
+            || hashIdempotencyPayload(checkinSubmissionPayload(committedRetry))
+          if (committedPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
           return success(res, await hydrateAssetReferences(committedRetry, false, {
             entityType: 'CheckinSubmission',
             entityId: committedRetry.id,
@@ -828,7 +849,7 @@ export const checkinController = {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
 
-      const validatedImages = await validateStudentSubmissionImages(images, checkin.courseId, userId)
+      const validatedImages = await validateStudentSubmissionImages(requestedImages, checkin.courseId, userId)
       if (!validatedImages) {
         return error(res, '图片凭据无效或不属于当前课程')
       }
@@ -843,6 +864,11 @@ export const checkinController = {
           })
           : await tx.checkinSubmission.findFirst({ where: { checkinId: id, studentId: userId } })
         if (idempotencyKeyHash && existing?.idempotencyKeyHash === idempotencyKeyHash) {
+          const existingPayloadHash = existing.idempotencyPayloadHash
+            || hashIdempotencyPayload(checkinSubmissionPayload(existing))
+          if (existingPayloadHash !== idempotencyPayloadHash) {
+            throw new IdempotencyPayloadMismatchError()
+          }
           return { saved: existing, wasExisting: true }
         }
         const saved = existing
@@ -851,7 +877,9 @@ export const checkinController = {
             data: {
               content,
               images: validatedImages,
-              ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+              ...(idempotencyKeyHash
+                ? { idempotencyKeyHash, idempotencyPayloadHash }
+                : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
             },
           })
           : await tx.checkinSubmission.create({
@@ -860,7 +888,7 @@ export const checkinController = {
               studentId: userId,
               content,
               images: validatedImages,
-              ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}),
+              ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
             },
           })
         await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
@@ -875,6 +903,9 @@ export const checkinController = {
         parentAccess: true,
       }), submission.wasExisting ? '打卡更新成功' : '打卡成功')
     } catch (err) {
+      if (err instanceof IdempotencyPayloadMismatchError) {
+        return error(res, err.message, -1, 409)
+      }
       logger.error('提交打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
     }

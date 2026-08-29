@@ -4,11 +4,16 @@ import { cacheService } from '../services/cacheService'
 
 const WINDOW_SECONDS = 15 * 60
 const ACCOUNT_FAILURE_LIMIT = 10
+// A higher account-wide budget catches distributed credential stuffing while
+// keeping the lower account+IP budget in place so one attacker cannot cheaply
+// lock an account for everyone else.
+const ACCOUNT_GLOBAL_FAILURE_LIMIT = 50
 const IP_REQUEST_LIMIT = 300
 
 export interface LoginRateLimitContext {
   accountKey: string
   failureKey: string
+  globalFailureKey: string
   ipKey: string
 }
 
@@ -22,6 +27,7 @@ export const getLoginRateLimitContext = (req: Request, username?: string): Login
   return {
     accountKey,
     failureKey: `${accountKey}:failures:${digest(clientIp(req))}`,
+    globalFailureKey: `${accountKey}:failures:global`,
     ipKey: `auth:login:ip:${digest(clientIp(req))}`,
   }
 }
@@ -55,6 +61,16 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
     return
   }
 
+  const accountGlobalFailure = await cacheService.getRateLimitState(context.globalFailureKey)
+  if (!accountGlobalFailure) {
+    res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
+    return
+  }
+  if (accountGlobalFailure.count >= ACCOUNT_GLOBAL_FAILURE_LIMIT) {
+    res.status(429).json({ code: -1, message: '登录尝试次数过多，请15分钟后再试' })
+    return
+  }
+
   ;(req as Request & { loginRateLimitContext?: LoginRateLimitContext }).loginRateLimitContext = context
   next()
 }
@@ -62,11 +78,17 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
 export const recordLoginFailure = async (req: Request): Promise<void> => {
   const request = req as Request & { loginRateLimitContext?: LoginRateLimitContext }
   const context = request.loginRateLimitContext || getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
-  await cacheService.consumeRateLimit(context.failureKey, ACCOUNT_FAILURE_LIMIT, WINDOW_SECONDS)
+  await Promise.all([
+    cacheService.consumeRateLimit(context.failureKey, ACCOUNT_FAILURE_LIMIT, WINDOW_SECONDS),
+    cacheService.consumeRateLimit(context.globalFailureKey, ACCOUNT_GLOBAL_FAILURE_LIMIT, WINDOW_SECONDS),
+  ])
 }
 
 export const clearLoginFailures = async (req: Request): Promise<void> => {
   const request = req as Request & { loginRateLimitContext?: LoginRateLimitContext }
   const context = request.loginRateLimitContext || getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
-  await cacheService.del(context.failureKey)
+  await Promise.all([
+    cacheService.del(context.failureKey),
+    cacheService.del(context.globalFailureKey),
+  ])
 }

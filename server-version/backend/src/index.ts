@@ -143,10 +143,28 @@ app.get('/ready', async (_req, res) => {
     await prisma.$queryRaw`SELECT 1`
     const socketRedisState = socketService.getRedisState()
     const socketReady = socketRedisState !== 'failed' || !config.socketRedisRequired
-    if (!socketReady) {
-      return res.status(503).json({ status: 'unready', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
+    const cacheRedisState = cacheService.getStatus().connected ? 'ready' : 'failed'
+    const cacheRedisReady = cacheRedisState === 'ready' || config.nodeEnv !== 'production'
+    if (!socketReady || !cacheRedisReady) {
+      return res.status(503).json({
+        status: 'unready',
+        dependencies: {
+          database: 'ready',
+          socketRedis: socketRedisState,
+          cacheRedis: cacheRedisState,
+        },
+        timestamp: new Date().toISOString(),
+      })
     }
-    res.json({ status: 'ok', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
+    res.json({
+      status: 'ok',
+      dependencies: {
+        database: 'ready',
+        socketRedis: socketRedisState,
+        cacheRedis: cacheRedisState,
+      },
+      timestamp: new Date().toISOString(),
+    })
   } catch {
     res.status(503).json({ status: 'unready', dependencies: { database: 'failed' }, timestamp: new Date().toISOString() })
   }
@@ -301,11 +319,14 @@ const startServer = async (): Promise<void> => {
   classroomSocketHandler.initialize()
   logger.info('课堂 Socket.IO 事件处理器已初始化')
 
-  // 缓存不可用时继续提供无缓存服务；Socket Redis 的 required 语义由
-  // initialize() 和 /ready 单独负责。
-  cacheService.initialize().catch(err => {
-    logger.warn('Redis缓存服务初始化失败，继续运行（无缓存）', err)
-  })
+  // Login and course-code verification fail closed when CacheService Redis is
+  // unavailable.  Initialize it before opening the HTTP listener and make
+  // production startup fail closed; initialize() itself catches connection
+  // errors, so the explicit status check is required as well.
+  await cacheService.initialize()
+  if (config.nodeEnv === 'production' && !cacheService.getStatus().connected) {
+    throw new Error('CacheService Redis 初始化失败，生产环境拒绝接收流量')
+  }
 
   // ExportArtifact cleanup is metadata-driven: only exact expired objects are
   // removed, never an exploratory directory scan. Keep one bounded hourly task

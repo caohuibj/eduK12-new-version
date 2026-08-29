@@ -536,8 +536,20 @@ export const courseController = {
           await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
         const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
-        if (!lockedCourse || !isCourseJoinable(lockedCourse)) {
-          throw new CourseNotJoinableError(lockedCourse ? courseJoinabilityMessage(lockedCourse) : '课程号不存在')
+        // The initial lookup only identifies the row to lock.  A teacher may
+        // rotate the code while this request is waiting for that row lock;
+        // accepting the refreshed row without comparing the submitted code
+        // would make the old code valid after rotation.
+        if (
+          !lockedCourse
+          || lockedCourse.courseCode !== courseCode
+          || !isCourseJoinable(lockedCourse)
+        ) {
+          throw new CourseNotJoinableError(
+            !lockedCourse || lockedCourse.courseCode !== courseCode
+              ? '课程号不存在'
+              : courseJoinabilityMessage(lockedCourse),
+          )
         }
 
         const existing = await tx.courseStudent.findUnique({

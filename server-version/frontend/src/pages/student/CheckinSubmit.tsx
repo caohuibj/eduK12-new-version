@@ -7,7 +7,7 @@ import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, Doc
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import PdfViewer from '../../components/PdfViewer'
-import { createIdempotencyKey } from '../../utils/idempotency'
+import { createIdempotencyKey, fingerprintIdempotencyPayload } from '../../utils/idempotency'
 
 interface OtherSubmission {
   id: string
@@ -49,7 +49,8 @@ const CheckinSubmit: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
-  const submitIdempotencyKeyRef = useRef<string | null>(null)
+  const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
+  const submitInFlightRef = useRef(false)
 
   useEffect(() => {
     if (checkinId) {
@@ -133,20 +134,26 @@ const CheckinSubmit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!checkin) return
+    if (!checkin || submitInFlightRef.current) return
 
+    submitInFlightRef.current = true
     setSubmitting(true)
     try {
-      const idempotencyKey = submitIdempotencyKeyRef.current || createIdempotencyKey()
-      submitIdempotencyKeyRef.current = idempotencyKey
-      const response = await apiClient.post(`/checkins/${checkinId}/submit`, {
+      const payload = {
         content,
         // The URL is display metadata; the API accepts only legacy references
         // or the server-issued asset ID.
         images: images.map((image) => (
           typeof image === 'string' ? image : { assetId: image.assetId }
         )),
-      }, {
+      }
+      const fingerprint = fingerprintIdempotencyPayload(payload)
+      const cached = submitIdempotencyKeyRef.current
+      const idempotencyKey = cached && cached.fingerprint === fingerprint
+        ? cached.key
+        : createIdempotencyKey()
+      submitIdempotencyKeyRef.current = { key: idempotencyKey, fingerprint }
+      const response = await apiClient.post(`/checkins/${checkinId}/submit`, payload, {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
 
@@ -158,9 +165,15 @@ const CheckinSubmit: React.FC = () => {
         submitIdempotencyKeyRef.current = null
         alert(response.message || '打卡失败')
       }
-    } catch {
+    } catch (error: any) {
+      // Axios rejects non-2xx API responses with the parsed response body;
+      // those are definitive failures, not transport retries.
+      if (error && typeof error.code === 'number') {
+        submitIdempotencyKeyRef.current = null
+      }
       alert('打卡失败')
     } finally {
+      submitInFlightRef.current = false
       setSubmitting(false)
     }
   }

@@ -173,6 +173,7 @@ model Submission {
   submittedAt  DateTime            @default(now()) @map("submitted_at")
   reviewedAt   DateTime?           @map("reviewed_at")
   idempotencyKeyHash String?       @map("idempotency_key_hash")
+  idempotencyPayloadHash String?   @map("idempotency_payload_hash")
   assignment   Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   student      User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
   history      SubmissionHistory[]
@@ -226,6 +227,7 @@ model CheckinSubmission {
   images      Json?
   createdAt   DateTime            @default(now()) @map("created_at")
   idempotencyKeyHash String?      @map("idempotency_key_hash")
+  idempotencyPayloadHash String?  @map("idempotency_payload_hash")
   isAnonymous Boolean             @default(false) @map("is_anonymous")
   sessionId   String?             @map("session_id")
   tokenId     String?             @map("token_id")
