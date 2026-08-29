@@ -1,15 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { isCourseJoinable } from '../../utils/courseEnrollment'
+import { integrationDatabaseUrl } from './integration-env'
 
 /**
  * Real PostgreSQL coverage for the enrollment/rotate-code race.  The test is
  * opt-in so the normal unit suite never touches a developer database; CI
  * supplies one of the integration URLs used by the other release gates.
  */
-const DB_URL = process.env.RELEASE_INTEGRATION_DATABASE_URL
-  || process.env.PR26_INTEGRATION_DATABASE_URL
-  || process.env.COGNITIVE_INTEGRATION_DB_URL
+const DB_URL = integrationDatabaseUrl(
+  'RELEASE_INTEGRATION_DATABASE_URL',
+  'PR26_INTEGRATION_DATABASE_URL',
+  'COGNITIVE_INTEGRATION_DB_URL',
+)
 const suite = DB_URL ? describe : describe.skip
 
 let prisma: PrismaClient

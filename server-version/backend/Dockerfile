@@ -38,8 +38,16 @@ RUN npx prisma generate
 COPY tsconfig.json ./
 COPY vitest.config.ts ./
 COPY scripts/pr24-migration-preflight.mjs ./scripts/pr24-migration-preflight.mjs
+COPY scripts/release-data-preflight.mjs ./scripts/release-data-preflight.mjs
+COPY scripts/assert-release-test-report.mjs ./scripts/assert-release-test-report.mjs
 COPY src ./src
 RUN npm run build
+
+# Prune development-only tooling before transferring dependencies into the
+# long-running image.  This keeps the runtime copy small and avoids a costly
+# recursive ownership rewrite over the complete build-time node_modules tree.
+FROM build AS prod-deps
+RUN npm prune --omit=dev
 
 # ---------- Stage 3: runtime（生产运行，仅 production 依赖） ----------
 FROM node:20-bookworm-slim AS runtime
@@ -60,17 +68,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 复用 build 阶段已编译好的 node_modules（同源 ABI，native 二进制可直接用）
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY package*.json ./
-
-# 仅保留 production 依赖（移除 tsx / prisma CLI / typescript / vitest 等）
-RUN npm prune --omit=dev
 
 # The long-running API and workers do not need root. Keep the mounted upload
 # volume writable by the application user while leaving the image immutable.
-RUN mkdir -p /app/uploads /app/.local && chown -R node:node /app
+RUN mkdir -p /app/uploads /app/.local && chown node:node /app/uploads /app/.local
 USER node
 
 EXPOSE 3000

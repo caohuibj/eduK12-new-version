@@ -44,14 +44,35 @@ export async function backfillCheckinTokens(
   }
 
   const remaining = await db.checkinAccessToken.count({ where: { token: { not: null } } })
-  if (remaining === 0 && typeof (db as any).$executeRaw === 'function') {
-    // The migration installs this check as NOT VALID so legacy rows can be
-    // backfilled safely. Once no plaintext remains, validate it to make the
-    // invariant explicit for future writes and for the release record.
-    await (db as any).$executeRaw`
-      ALTER TABLE "checkin_access_tokens"
-      VALIDATE CONSTRAINT "checkin_access_tokens_token_must_be_null"
+  if (
+    remaining === 0
+    && typeof (db as any).$queryRaw === 'function'
+    && typeof (db as any).$executeRawUnsafe === 'function'
+  ) {
+    // Both constraints are installed as NOT VALID so deployment can first
+    // migrate historical rows. Validate only constraints that exist, which
+    // keeps this resumable runner compatible with databases upgraded from a
+    // release before the protected-fields constraint was introduced.
+    const rows = await (db as any).$queryRaw`
+      SELECT conname
+      FROM pg_constraint
+      WHERE conrelid = 'checkin_access_tokens'::regclass
+        AND conname IN (
+          'checkin_access_tokens_token_must_be_null',
+          'checkin_access_tokens_protected_fields_present'
+        )
     `
+    const present = new Set((rows as Array<{ conname?: unknown }>).map((row) => row?.conname).filter((name): name is string => typeof name === 'string'))
+    for (const constraint of [
+      'checkin_access_tokens_token_must_be_null',
+      'checkin_access_tokens_protected_fields_present',
+    ]) {
+      if (present.has(constraint)) {
+        await (db as any).$executeRawUnsafe(
+          `ALTER TABLE "checkin_access_tokens" VALIDATE CONSTRAINT "${constraint}"`,
+        )
+      }
+    }
   }
   return { processed, remaining }
 }

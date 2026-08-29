@@ -32,4 +32,22 @@ describe('check-in token backfill', () => {
     const encrypted = update.mock.calls[0][0].data.tokenEncrypted
     expect(checkinTokenService.decryptToken(encrypted)).toBe('ck_abcdefghijklmnop')
   })
+
+  it('validates every installed token protection constraint after the backfill', async () => {
+    const findFirst = vi.fn().mockResolvedValue(null)
+    const count = vi.fn().mockResolvedValue(0)
+    const queryRaw = vi.fn().mockResolvedValue([
+      { conname: 'checkin_access_tokens_token_must_be_null' },
+      { conname: 'checkin_access_tokens_protected_fields_present' },
+    ])
+    const executeRawUnsafe = vi.fn().mockResolvedValue(0)
+    const db = { checkinAccessToken: { findFirst, count }, $queryRaw: queryRaw, $executeRawUnsafe: executeRawUnsafe } as any
+
+    await expect(backfillCheckinTokens(db)).resolves.toEqual({ processed: 0, remaining: 0 })
+    expect(executeRawUnsafe).toHaveBeenCalledTimes(2)
+    expect(executeRawUnsafe.mock.calls.map(([sql]) => sql)).toEqual([
+      'ALTER TABLE "checkin_access_tokens" VALIDATE CONSTRAINT "checkin_access_tokens_token_must_be_null"',
+      'ALTER TABLE "checkin_access_tokens" VALIDATE CONSTRAINT "checkin_access_tokens_protected_fields_present"',
+    ])
+  })
 })

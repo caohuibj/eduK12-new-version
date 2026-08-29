@@ -1,12 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
+import { integrationDatabaseUrl } from '../integration/integration-env'
 
 /**
  * Opt-in PostgreSQL coverage for the completion storage invariant. The test
  * creates and removes its own tiny fixture and never touches the developer
  * database unless PR26_INTEGRATION_DATABASE_URL is explicitly supplied.
  */
-const DB_URL = process.env.PR26_INTEGRATION_DATABASE_URL
+const DB_URL = integrationDatabaseUrl('PR26_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
 
 let prisma: PrismaClient

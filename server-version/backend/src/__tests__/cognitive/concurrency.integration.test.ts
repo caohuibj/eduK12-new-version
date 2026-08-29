@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { integrationDatabaseUrl } from '../integration/integration-env'
 
 /**
  * D6.1 — 真实 DB 并发集成测试（append vs complete / append vs restart /
@@ -23,9 +24,13 @@ import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
  *   4) restart vs restart：并发双 restart 至多一个成功创建新 attempt。
  */
 
-const DB_URL = process.env.COGNITIVE_INTEGRATION_DB_URL
-const hasDb = typeof DB_URL === 'string' && DB_URL.length > 0
+const DB_URL = integrationDatabaseUrl('COGNITIVE_INTEGRATION_DB_URL')
+const hasDb = Boolean(DB_URL)
 const suite = hasDb ? describe : describe.skip
+const configuredRounds = Number.parseInt(process.env.COGNITIVE_CONCURRENCY_ROUNDS || '20', 10)
+const CONCURRENCY_ROUNDS = Number.isFinite(configuredRounds)
+  ? Math.min(100, Math.max(20, configuredRounds))
+  : 20
 
 let prisma: PrismaClient
 let appendTrial: (userId: string, sessionId: string, input: { trialIndex: number; payload?: unknown }) => Promise<any>
@@ -145,7 +150,7 @@ suite('cognitive concurrency integration (real DB)', () => {
 
   it('P0: complete vs append — never COMPLETED with a trial appended during scoring', async () => {
     // 多轮独立 assignment 提高碰撞机会
-    for (let round = 0; round < 3; round++) {
+    for (let round = 0; round < CONCURRENCY_ROUNDS; round++) {
       const { assignmentId } = await freshPublishedAssignment()
       const sessionId = await newSession(assignmentId)
       await appendAll(sessionId) // 0,1,2 已就绪，评分本可成功
@@ -175,10 +180,10 @@ suite('cognitive concurrency integration (real DB)', () => {
         expect(comp.statusCode).toBe(400)
       }
     }
-  }, 60000)
+  }, 120000)
 
   it('P0: append vs restart — trial never lands in a session already ABANDONED at write time', async () => {
-    for (let round = 0; round < 3; round++) {
+    for (let round = 0; round < CONCURRENCY_ROUNDS; round++) {
       const { assignmentId } = await freshPublishedAssignment()
       const sessionId = await newSession(assignmentId)
 
@@ -210,35 +215,37 @@ suite('cognitive concurrency integration (real DB)', () => {
         expect(newTrials.some((t) => t.trialIndex === 0)).toBe(false)
       }
     }
-  }, 60000)
+  }, 120000)
 
   it('P0: complete vs complete — idempotent, single state transition', async () => {
-    const { assignmentId } = await freshPublishedAssignment()
-    const sessionId = await newSession(assignmentId)
-    await appendAll(sessionId)
+    for (let round = 0; round < CONCURRENCY_ROUNDS; round++) {
+      const { assignmentId } = await freshPublishedAssignment()
+      const sessionId = await newSession(assignmentId)
+      await appendAll(sessionId)
 
-    const [c1, c2] = await Promise.all([
-      ok(completeSession(userId, sessionId)),
-      ok(completeSession(userId, sessionId)),
-    ])
+      const [c1, c2] = await Promise.all([
+        ok(completeSession(userId, sessionId)),
+        ok(completeSession(userId, sessionId)),
+      ])
 
-    expect(c1.ok).toBe(true)
-    expect(c2.ok).toBe(true)
-    expect(c1.value.status).toBe('COMPLETED')
-    expect(c2.value.status).toBe('COMPLETED')
-    // v2 sessions intentionally no longer expose a generic score. Compare
-    // the authoritative metric snapshot returned by both idempotent calls.
-    expect(c1.value.metrics).toEqual(c2.value.metrics)
+      expect(c1.ok).toBe(true)
+      expect(c2.ok).toBe(true)
+      expect(c1.value.status).toBe('COMPLETED')
+      expect(c2.value.status).toBe('COMPLETED')
+      // v2 sessions intentionally no longer expose a generic score. Compare
+      // the authoritative metric snapshot returned by both idempotent calls.
+      expect(c1.value.metrics).toEqual(c2.value.metrics)
 
-    const row = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
-    expect(row?.status).toBe('COMPLETED')
-    expect(row?.scoreEncrypted).toBeNull()
-    expect(row?.metricsEncrypted).toBeTruthy()
-    expect(row?.qualityFlagsEncrypted).toBeTruthy()
-  }, 60000)
+      const row = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
+      expect(row?.status).toBe('COMPLETED')
+      expect(row?.scoreEncrypted).toBeNull()
+      expect(row?.metricsEncrypted).toBeTruthy()
+      expect(row?.qualityFlagsEncrypted).toBeTruthy()
+    }
+  }, 120000)
 
   it('P0: restart vs restart — at most one new attempt is created', async () => {
-    for (let round = 0; round < 3; round++) {
+    for (let round = 0; round < CONCURRENCY_ROUNDS; round++) {
       const { assignmentId } = await freshPublishedAssignment()
       const sessionId = await newSession(assignmentId)
 
@@ -260,5 +267,5 @@ suite('cognitive concurrency integration (real DB)', () => {
       expect(successCount).toBeGreaterThanOrEqual(1)
       expect(successCount).toBeLessThanOrEqual(2)
     }
-  }, 60000)
+  }, 120000)
 })

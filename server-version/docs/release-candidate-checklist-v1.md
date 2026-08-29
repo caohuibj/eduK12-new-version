@@ -27,3 +27,13 @@
 - [ ] `v1.0.0` tag created and pushed
 
 The three unchecked items are repository release operations, not unverified product behavior; they require the authorized GitHub review/release step.
+
+## Fix-2 数据库与本地门禁
+
+- [ ] 生产备份和恢复演练完成并留存证据
+- [ ] guarded migration 完成，打卡令牌回填 `remaining=0`
+- [ ] `npm run db:release:preflight` 全部危险计数为 0
+- [ ] 本地发布门禁使用一次性 PostgreSQL/Redis 并确认资源已清理
+- [ ] Actions 额度恢复后，对 exact release SHA 补跑正式 CI
+
+本地门禁的执行方式和证据字段见 [`release-verify-local.md`](./release-verify-local.md)。

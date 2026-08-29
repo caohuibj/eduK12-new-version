@@ -2,6 +2,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import type { CognitivePackageAnalysisResult } from '../../modules/cognitive-analysis/cognitive-analysis.types'
 import type { CompletionSnapshotExpectation } from '../../modules/composite/composite-analysis-snapshot.service'
+import { integrationDatabaseUrl } from '../integration/integration-env'
+import { hashScaleDefinition, validateScaleDefinition } from '../../modules/scale/scale-definition'
 
 /**
  * PR8 real PostgreSQL checks. The suite is opt-in so the normal unit-test
@@ -9,7 +11,7 @@ import type { CompletionSnapshotExpectation } from '../../modules/composite/comp
  *
  *   PR8_INTEGRATION_DATABASE_URL=postgresql://... npm run test:integration:pr8
  */
-const DB_URL = process.env.PR8_INTEGRATION_DATABASE_URL
+const DB_URL = integrationDatabaseUrl('PR8_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
 
 let prisma: PrismaClient
@@ -354,13 +356,23 @@ const createScaleAndFormCompletionFixture = async () => {
     },
     referencePolicy: { type: 'none' },
   }
+  const validatedScale = validateScaleDefinition(scaleDefinition, { instrumentClass: 'CUSTOM_DESCRIPTIVE' })
+  if (!validatedScale.definition || validatedScale.issues.some((issue) => issue.severity === 'error')) {
+    throw new Error(`PR8 fixture scale definition is invalid: ${validatedScale.issues.map((issue) => issue.message).join('; ')}`)
+  }
+  const frozenScaleDefinition = validatedScale.definition
   const scale = await prisma.scale.create({
     data: {
       code: `PR8-SCALE-${suffix}`,
       name: 'PR8 scale fixture',
       status: 'PUBLISHED',
       visibility: 'COURSE',
-      definition: scaleDefinition,
+      instrumentClass: 'CUSTOM_DESCRIPTIVE',
+      instrumentVersion: '2.0.0',
+      definition: frozenScaleDefinition,
+      definitionHash: hashScaleDefinition(frozenScaleDefinition),
+      itemCount: frozenScaleDefinition.items.length,
+      dimensionCount: 0,
       creatorId: userId,
     },
   })
