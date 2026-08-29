@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react'
 import { authApi } from '../api/auth'
 import type { User } from '../types'
 
@@ -15,15 +15,29 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUserState] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const authEpochRef = useRef(0)
+  const lastAuthTransitionAtRef = useRef(0)
+
+  const setUser = (nextUser: User | null) => {
+    authEpochRef.current += 1
+    lastAuthTransitionAtRef.current = Date.now()
+    setUserState(nextUser)
+  }
 
   useEffect(() => {
-    const handleAuthExpired = () => {
+    const handleAuthExpired = (event: Event) => {
+      const requestStartedAt = Number((event as CustomEvent<{ requestStartedAt?: number }>).detail?.requestStartedAt || 0)
+      // A protected request that started before a newer login must not sign
+      // that newer session out when its late 401 finally arrives.
+      if (requestStartedAt > 0 && requestStartedAt < lastAuthTransitionAtRef.current) return
+      authEpochRef.current += 1
+      lastAuthTransitionAtRef.current = Date.now()
       // A 401 from login/public capability endpoints is not reported by the
       // transport as session expiry. For an authenticated API request, clear
       // the in-memory identity so ProtectedRoute can redirect normally.
-      setUser((currentUser) => currentUser ? null : currentUser)
+      setUserState(null)
     }
 
     window.addEventListener('auth:expired', handleAuthExpired)
@@ -32,9 +46,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const initAuth = async () => {
+      const requestEpoch = authEpochRef.current
       try {
         const response = await authApi.me()
-        if (response.code === 0 && response.data) setUser(response.data)
+        if (requestEpoch === authEpochRef.current && response.code === 0 && response.data) {
+          lastAuthTransitionAtRef.current = Date.now()
+          setUserState(response.data)
+        }
       } catch {
         // An absent or expired HttpOnly cookie simply means signed out.
       }
@@ -44,27 +62,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [])
 
   const login = async (username: string, password: string) => {
+    const requestEpoch = ++authEpochRef.current
     await authApi.csrf()
     const response = await authApi.login({ username, password })
+    if (requestEpoch !== authEpochRef.current) return
     if (response.code === 0 && response.data) {
-      setUser(response.data.user)
+      lastAuthTransitionAtRef.current = Date.now()
+      setUserState(response.data.user)
     } else {
       throw new Error(response.message || '登录失败')
     }
   }
 
   const setAuthenticatedUser = (userData: User) => {
-    setUser(userData)
+    authEpochRef.current += 1
+    lastAuthTransitionAtRef.current = Date.now()
+    setUserState(userData)
   }
 
   const logout = async () => {
+    authEpochRef.current += 1
+    lastAuthTransitionAtRef.current = Date.now()
     try {
       await authApi.csrf()
       await authApi.logout()
     } catch {
       // Clearing local state is still safe if the session has already expired.
     }
-    setUser(null)
+    setUserState(null)
   }
 
   return (

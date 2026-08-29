@@ -27,8 +27,7 @@ const FILE_SIGNATURES: Record<string, number[]> = {
 export const validateFileMagic = (buffer: Buffer, mimeType: string): boolean => {
   const signature = FILE_SIGNATURES[mimeType]
   if (!signature) {
-    // 未知类型，默认通过（后续可以配置为拒绝）
-    return true
+    return false
   }
 
   // 检查文件头是否匹配魔数
@@ -51,15 +50,15 @@ export const detectMimeType = (buffer: Buffer): string | null => {
     return 'image/jpeg'
   }
   // 检查 PNG
-  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E) {
+  if (buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))) {
     return 'image/png'
   }
-  // 检查 GIF
-  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+  // GIF87a or GIF89a
+  if (buffer.subarray(0, 6).toString('ascii') === 'GIF87a' || buffer.subarray(0, 6).toString('ascii') === 'GIF89a') {
     return 'image/gif'
   }
   // 检查 WebP
-  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46) {
+  if (buffer.subarray(0, 4).toString('ascii') === 'RIFF' && buffer.subarray(8, 12).toString('ascii') === 'WEBP') {
     return 'image/webp'
   }
   // PDF
@@ -75,13 +74,14 @@ export const detectMimeType = (buffer: Buffer): string | null => {
     return 'video/ogg'
   }
   // MP4 和 MOV 检查 (ftyp 标记)
-  if (buffer[4] === 0x66 && buffer[5] === 0x74 && buffer[6] === 0x79 && buffer[7] === 0x70) {
+  if (buffer.subarray(4, 8).toString('ascii') === 'ftyp') {
     // 检查具体类型
     const brand = buffer.slice(8, 12).toString('ascii')
     if (brand.startsWith('qt')) {
       return 'video/quicktime'
     }
-    return 'video/mp4'
+    // ISO-BMFF brands include mp4, isom, iso2, avc1, dash, and 3gp.
+    if (/^(mp4|isom|iso[2-9]|avc1|dash|3gp)/i.test(brand)) return 'video/mp4'
   }
 
   return null
@@ -114,12 +114,19 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
     const fs = require('fs')
     let buffer: Buffer
     if (Buffer.isBuffer(req.file.buffer)) {
-      buffer = req.file.buffer.subarray(0, 8)
+      buffer = req.file.buffer.subarray(0, 16)
     } else if (req.file.path) {
-      const fd = fs.openSync(req.file.path, 'r')
-      buffer = Buffer.alloc(8)
-      fs.readSync(fd, buffer, 0, 8, 0)
-      fs.closeSync(fd)
+      let fd: number | undefined
+      try {
+        fd = fs.openSync(req.file.path, 'r')
+        buffer = Buffer.alloc(16)
+        fs.readSync(fd, buffer, 0, 16, 0)
+      } catch {
+        if (req.file.path) fs.rmSync(req.file.path, { force: true })
+        return res.status(400).json({ code: -1, message: '无法读取上传文件' })
+      } finally {
+        if (fd !== undefined) fs.closeSync(fd)
+      }
     } else {
       return res.status(400).json({ code: -1, message: '无法读取上传文件' })
     }
@@ -129,7 +136,7 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
 
     if (!detectedType) {
       // 删除可疑文件
-      if (req.file.path) fs.unlinkSync(req.file.path)
+      if (req.file.path) fs.rmSync(req.file.path, { force: true })
       return res.status(400).json({
         code: -1,
         message: '无法识别文件类型，可能是不支持的格式或恶意文件'
@@ -138,7 +145,7 @@ export const validateUploadedFile = (allowedTypes: string[]) => {
 
     // 检查是否在允许列表中
     if (!allowedTypes.includes(detectedType)) {
-      if (req.file.path) fs.unlinkSync(req.file.path)
+      if (req.file.path) fs.rmSync(req.file.path, { force: true })
       return res.status(400).json({
         code: -1,
         message: `文件类型不匹配，检测到 ${detectedType}，但不在允许列表中`

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import { buildCompositeAnalysisExport } from '../../modules/composite/composite-analysis-export.service'
 import type { CompositeAnalysisExportContext } from '../../modules/composite/composite-analysis-export.service'
 
@@ -122,9 +122,9 @@ const makeContext = (audience: 'participant' | 'teacher' | 'researcher'): Compos
 }
 
 describe('PR11 frozen composite analysis exports', () => {
-  it('keeps participant and teacher JSON within their existing safe projection', () => {
-    const participant = buildCompositeAnalysisExport(makeContext('participant'), 'json')
-    const teacher = buildCompositeAnalysisExport(makeContext('teacher'), 'json')
+  it('keeps participant and teacher JSON within their existing safe projection', async () => {
+    const participant = await buildCompositeAnalysisExport(makeContext('participant'), 'json')
+    const teacher = await buildCompositeAnalysisExport(makeContext('teacher'), 'json')
     const participantJson = participant.body.toString('utf8')
     const teacherJson = teacher.body.toString('utf8')
 
@@ -138,14 +138,14 @@ describe('PR11 frozen composite analysis exports', () => {
 
     const participantContext = makeContext('participant')
     participantContext.snapshot.generationReason = 'REANALYSIS'
-    const participantZip = buildCompositeAnalysisExport(participantContext, 'zip')
+    const participantZip = await buildCompositeAnalysisExport(participantContext, 'zip')
     expect(zipEntry(participantZip.body, 'README.txt')).not.toContain('REANALYSIS')
   })
 
-  it('exports researcher evidence, preserves zero/structured values and neutralizes CSV formulas', () => {
+  it('exports researcher evidence, preserves zero/structured values and neutralizes CSV formulas', async () => {
     const context = makeContext('researcher')
-    const zip = buildCompositeAnalysisExport(context, 'zip')
-    const xlsx = buildCompositeAnalysisExport(context, 'xlsx')
+    const zip = await buildCompositeAnalysisExport(context, 'zip')
+    const xlsx = await buildCompositeAnalysisExport(context, 'xlsx')
 
     expect(centralDirectoryNames(zip.body)).toEqual([
       'analysis.json',
@@ -156,15 +156,19 @@ describe('PR11 frozen composite analysis exports', () => {
     ])
     expect(zipEntry(zip.body, 'domain_evidence.csv')).toContain("'=1+1")
     expect(zip.body.toString('utf8')).not.toContain('payloadEncrypted')
-    const workbook = XLSX.read(xlsx.body, { type: 'buffer' })
-    expect(workbook.SheetNames).toEqual(['Analysis', 'DomainEvidence', 'Findings', 'Recommendations', 'Provenance'])
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.load(xlsx.body)
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(['Analysis', 'DomainEvidence', 'Findings', 'Recommendations', 'Provenance'])
     expect(xlsx.body.toString('utf8')).not.toContain('payloadEncrypted')
 
-    const domainSheet = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets.DomainEvidence)
+    const domainSheet = workbook.getWorksheet('DomainEvidence')!
+    const headers = (domainSheet.getRow(1).values as unknown[]).slice(1) as string[]
+    const firstRow = domainSheet.getRow(2).values as unknown[]
+    const domainRecord = Object.fromEntries(headers.map((header, index) => [header, firstRow[index + 1]]))
 
-    expect(domainSheet[0]).toMatchObject({ row_type: 'evidence', source_result_id: 'source-1', value_json: expect.stringContaining('"zero":0') })
+    expect(domainRecord).toMatchObject({ row_type: 'evidence', source_result_id: 'source-1', value_json: expect.stringContaining('"zero":0') })
 
-    const teacherZip = buildCompositeAnalysisExport(makeContext('teacher'), 'zip')
+    const teacherZip = await buildCompositeAnalysisExport(makeContext('teacher'), 'zip')
     expect(zipEntry(teacherZip.body, 'domain_evidence.csv')).toContain('source_summary')
   })
 })

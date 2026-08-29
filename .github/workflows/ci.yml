@@ -36,6 +36,7 @@ jobs:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -75,6 +76,8 @@ jobs:
           cache-dependency-path: server-version/backend/package-lock.json
       - name: npm ci
         run: npm ci
+      - name: dependency audit (high and critical)
+        run: npm audit --audit-level=high
       - name: prisma generate
         run: npx prisma generate
       - name: prisma migrate deploy
@@ -108,6 +111,8 @@ jobs:
           cache-dependency-path: server-version/frontend/package-lock.json
       - name: npm ci
         run: npm ci
+      - name: dependency audit (high and critical)
+        run: npm audit --audit-level=high
       - name: lint
         run: npm run lint
       - name: typecheck
@@ -124,6 +129,9 @@ jobs:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+      ASSET_MIGRATION_COMPLETE: 'true'
+      COOKIE_SECURE: 'false'
       DB_USER: ci-ptool
       DB_PASSWORD: ci-ptool-password
       DB_NAME: ptool
@@ -146,3 +154,37 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
         run: docker compose build backend frontend
+      - name: scan backend image (high and critical)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: server-version-backend:latest
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+      - name: scan frontend image (high and critical)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: server-version-frontend:latest
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+  codeql:
+    name: codeql (javascript/typescript SAST)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+      - name: analyze with CodeQL
+        uses: github/codeql-action/analyze@v3

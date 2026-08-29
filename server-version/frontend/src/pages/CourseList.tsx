@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
-import axios from 'axios'
+import { sessionAxios } from '../api/client'
 import type { Course, CourseShare, User } from '../types'
 
 const CourseList: React.FC = () => {
@@ -314,7 +314,7 @@ const CourseList: React.FC = () => {
       formData.append('cover', coverFile)
 
       const csrfToken = await ensureCsrfToken()
-      const response = await axios.post(`/api/courses/${courseId}/cover`, formData, {
+      const response = await sessionAxios.post(`/courses/${courseId}/cover`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

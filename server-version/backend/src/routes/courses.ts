@@ -2,6 +2,8 @@ import { Router } from 'express'
 import { courseController } from '../controllers/courseController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
+import { validateUploadedFile } from '../utils/fileValidator'
+import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
 
@@ -10,18 +12,25 @@ const coverUpload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
   },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error('只支持 JPG、PNG、WebP、GIF 格式的图片'))
-    }
-  }
+  // Client MIME is only a hint; validateUploadedFile checks magic bytes.
+  fileFilter: (_req, _file, cb) => cb(null, true),
+})
+
+const allowedCoverTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const courseCodeVerifyLimiter = createRedisRateLimiter({
+  name: 'course-code-ip',
+  limit: 60,
+  windowSeconds: 15 * 60,
+})
+const courseCodeVerifyCodeLimiter = createRedisRateLimiter({
+  name: 'course-code-value',
+  limit: 20,
+  windowSeconds: 15 * 60,
+  key: (req) => typeof req.body?.courseCode === 'string' ? req.body.courseCode : 'invalid',
 })
 
 // 公开接口
-router.post('/verify-code', courseController.verifyCourseCode)
+router.post('/verify-code', courseCodeVerifyLimiter, courseCodeVerifyCodeLimiter, courseController.verifyCourseCode)
 
 // 需要认证的接口
 router.get('/', authenticate, courseController.list)
@@ -33,11 +42,12 @@ router.get('/shared-to-me', authenticate, courseController.getSharedToMe)
 router.get('/:id', authenticate, courseController.detail)
 router.put('/:id', authenticate, requireTeacher, courseController.update)
 router.patch('/:id', authenticate, requireTeacher, courseController.update)
+router.post('/:id/rotate-code', authenticate, requireTeacher, courseController.rotateCourseCode)
 router.delete('/:id', authenticate, requireTeacher, courseController.delete)
 router.post('/join', authenticate, courseController.join)
 
 // 上传课程封面
-router.post('/:id/cover', authenticate, requireTeacher, coverUpload.single('cover'), courseController.uploadCover)
+router.post('/:id/cover', authenticate, requireTeacher, coverUpload.single('cover'), validateUploadedFile(allowedCoverTypes), courseController.uploadCover)
 
 // 结束课程
 router.post('/:id/end', authenticate, requireTeacher, courseController.endCourse)

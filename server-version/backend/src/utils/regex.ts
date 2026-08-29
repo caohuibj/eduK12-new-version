@@ -21,8 +21,9 @@ export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
 // 日期时间格式：YYYY-MM-DD HH:mm:ss
 export const DATETIME_REGEX = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
 
-// 课程码：6位字母数字
-export const COURSE_CODE_REGEX = /^[A-Z0-9]{6}$/
+// 课程码：兼容历史 6/9 位码，并接受新的 12 位 Crockford Base32 码。
+// 入口仍以数据库精确匹配为准；该正则只用于客户端/共享校验工具。
+export const COURSE_CODE_REGEX = /^(?:[A-Z0-9]{6}|[A-Z0-9]{9}|[0-9ABCDEFGHJKMNPQRSTVWXYZ]{12})$/i
 
 // UUID 格式
 export const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    $transaction: vi.fn(),
+    $executeRaw: vi.fn(),
     course: { findUnique: vi.fn() },
     user: { findUnique: vi.fn(), create: vi.fn() },
     courseStudent: { create: vi.fn() },
@@ -34,7 +36,10 @@ const makeRes = () => {
 }
 
 describe('studentRegister library course', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
+  })
 
   it('rejects registering into a library course', async () => {
     mockPrisma.course.findUnique.mockResolvedValue({
@@ -50,6 +55,30 @@ describe('studentRegister library course', () => {
     } as any, res)
     expect(res.statusCode).toBe(400)
     expect(res.body.message).toBe('库课程不能加入')
+    expect(mockPrisma.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a stale course code after rotation while registration is locking the row', async () => {
+    const oldCourse = {
+      id: 'course-1',
+      courseCode: 'OLD-CODE',
+      status: 'PUBLISHED',
+      endedAt: null,
+      isRecruiting: true,
+      isLibrary: false,
+    }
+    const rotatedCourse = { ...oldCourse, courseCode: 'NEW-CODE' }
+    mockPrisma.course.findUnique
+      .mockResolvedValueOnce(oldCourse)
+      .mockResolvedValueOnce(rotatedCourse)
+
+    const res = makeRes()
+    await authController.studentRegister({
+      body: { courseCode: 'OLD-CODE', username: 'stu01', password: 'Demo2026', nickname: '学生甲' },
+    } as any, res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('课程码无效')
     expect(mockPrisma.user.create).not.toHaveBeenCalled()
   })
 })

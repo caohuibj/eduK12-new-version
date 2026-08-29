@@ -173,7 +173,7 @@ const makeSnapshotAndResults = (): {
 }
 
 describe('PR11 engine to projected export chain', () => {
-  it('keeps a clear behavioral difficulty watch through 1.1.0 engine, projection and CSV export', () => {
+  it('keeps a clear behavioral difficulty watch through 1.1.0 engine, projection and CSV export', async () => {
     const { packageSnapshot, moduleResults, scaleResults } = makeSnapshotAndResults()
     const analysis = buildPackageCognitiveAnalysis({
       packageSnapshot,
@@ -210,7 +210,7 @@ describe('PR11 engine to projected export chain', () => {
       expect.objectContaining({ ruleId: 'clear_difficulty_watch', construct: 'domain' }),
     ]))
 
-    const exported = buildCompositeAnalysisExport({
+    const exported = await buildCompositeAnalysisExport({
       attemptId: 'attempt-pr11',
       assessmentId: 'assessment-pr11',
       assessmentName: 'PR11 fixture',

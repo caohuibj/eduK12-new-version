@@ -1,28 +1,11 @@
 import { Router } from 'express'
-import rateLimit from 'express-rate-limit'
 import { authController } from '../controllers/authController'
 import { authenticate, requireAdmin } from '../middleware/auth'
 import { issueCsrfToken } from '../utils/authCookies'
+import { loginRateLimit } from '../middleware/loginRateLimit'
+import rateLimit from 'express-rate-limit'
 
 const router = Router()
-
-// 登录限流配置：15分钟内最多5次
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15分钟
-  max: 5, // 最多5次
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    res.status(429).json({
-      code: -1,
-      message: '登录尝试次数过多，请15分钟后再试'
-    })
-  },
-  skip: (req) => {
-    // 开发环境可以跳过限流
-    return process.env.NODE_ENV === 'development'
-  }
-})
 
 // 注册及公开验证限流，避免批量账号创建和验证码枚举
 const registrationLimiter = rateLimit({
@@ -40,7 +23,7 @@ const registrationLimiter = rateLimit({
 })
 
 // 公开接口
-router.post('/login', loginLimiter, authController.login)
+router.post('/login', loginRateLimit, authController.login)
 router.post('/register', registrationLimiter, authController.register)
 router.post('/student-register', registrationLimiter, authController.studentRegister)
 router.post('/verify-teacher-code', registrationLimiter, authController.verifyTeacherCode)

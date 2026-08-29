@@ -122,7 +122,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '2mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.use('/api', csrfProtection)
 
@@ -143,10 +143,28 @@ app.get('/ready', async (_req, res) => {
     await prisma.$queryRaw`SELECT 1`
     const socketRedisState = socketService.getRedisState()
     const socketReady = socketRedisState !== 'failed' || !config.socketRedisRequired
-    if (!socketReady) {
-      return res.status(503).json({ status: 'unready', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
+    const cacheRedisState = cacheService.getStatus().connected ? 'ready' : 'failed'
+    const cacheRedisReady = cacheRedisState === 'ready' || config.nodeEnv !== 'production'
+    if (!socketReady || !cacheRedisReady) {
+      return res.status(503).json({
+        status: 'unready',
+        dependencies: {
+          database: 'ready',
+          socketRedis: socketRedisState,
+          cacheRedis: cacheRedisState,
+        },
+        timestamp: new Date().toISOString(),
+      })
     }
-    res.json({ status: 'ok', dependencies: { database: 'ready', socketRedis: socketRedisState }, timestamp: new Date().toISOString() })
+    res.json({
+      status: 'ok',
+      dependencies: {
+        database: 'ready',
+        socketRedis: socketRedisState,
+        cacheRedis: cacheRedisState,
+      },
+      timestamp: new Date().toISOString(),
+    })
   } catch {
     res.status(503).json({ status: 'unready', dependencies: { database: 'failed' }, timestamp: new Date().toISOString() })
   }
@@ -240,54 +258,17 @@ app.use(notFoundHandler)
 // 错误处理
 app.use(errorHandler)
 
-// 初始化 Socket.IO 服务（异步）
-socketService.initialize(server).then(() => {
-  // 初始化课堂 Socket.IO 事件处理器
-  classroomSocketHandler.initialize()
-  logger.info('课堂 Socket.IO 事件处理器已初始化')
-}).catch(err => {
-  logger.error('Socket.IO 服务初始化失败', err)
-})
-
-// 初始化 Redis 缓存服务
-cacheService.initialize().catch(err => {
-  logger.warn('Redis缓存服务初始化失败，继续运行（无缓存）', err)
-})
-
-// ExportArtifact cleanup is metadata-driven: only exact expired objects are
-// removed, never an exploratory directory scan. Keep one bounded hourly task
-// per backend process and make shutdown cancel it.
-const exportCleanupTimer = setInterval(() => {
-  void cleanupExpiredExportArtifacts().then((result) => {
-    if (result.deletedArtifacts > 0 || result.invalidPaths > 0) {
-      logger.info('过期导出产物清理完成', result)
-    }
-  }).catch((err) => logger.warn('过期导出产物清理失败', err))
-}, 60 * 60 * 1000)
-exportCleanupTimer.unref?.()
-
-// 启动服务器
-server.listen(config.port, () => {
-  logger.info(`🚀 Server running on port ${config.port}`)
-  logger.info(`📁 Upload directory: ${config.uploadDir}`)
-  logger.info(`📁 Upload directory absolute: ${require('path').resolve(config.uploadDir)}`)
-  logger.info(`🌐 Environment: ${config.nodeEnv}`)
-  logger.info(`🔌 Socket.IO enabled`)
-  
-  // 通知 PM2 进程已就绪（配合 wait_ready 配置）
-  if (process.send) {
-    process.send('ready')
-    logger.info('✅ PM2 ready signal sent')
-  }
-})
-
-// 优雅关闭（增加超时保护）
+// The HTTP listener is deliberately started only after required dependencies
+// have initialized. This keeps PM2/Docker from declaring a process ready while
+// classroom broadcasts are silently running without cross-process delivery.
+let exportCleanupTimer: ReturnType<typeof setInterval> | null = null
+let serverListening = false
 let shutdownStarted = false
 
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
-  clearInterval(exportCleanupTimer)
+  if (exportCleanupTimer) clearInterval(exportCleanupTimer)
   logger.info(`${signal} signal received: closing HTTP server`)
   
   // 设置强制退出超时（5秒）
@@ -296,17 +277,25 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
     process.exit(exitCode || 1)
   }, 5000)
   
-  server.close(async () => {
-    logger.info('HTTP server closed')
-    await Promise.allSettled([
-      socketService.close(),
-      closeQueues(),
-      cacheService.close(),
-      prisma.$disconnect(),
-    ])
-    clearTimeout(forceExit)
-    process.exit(exitCode)
-  })
+  if (serverListening) {
+    await new Promise<void>((resolve) => {
+      server.close((error) => {
+        if (error) logger.warn('关闭 HTTP server 时发生错误', error)
+        else logger.info('HTTP server closed')
+        serverListening = false
+        resolve()
+      })
+    })
+  }
+
+  await Promise.allSettled([
+    socketService.close(),
+    closeQueues(),
+    cacheService.close(),
+    prisma.$disconnect(),
+  ])
+  clearTimeout(forceExit)
+  process.exit(exitCode)
 }
 
 process.on('SIGTERM', () => { void gracefulShutdown('SIGTERM') })
@@ -318,4 +307,67 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason) => {
   logger.error('未处理的 Promise rejection，服务将退出', reason)
   void gracefulShutdown('unhandledRejection', 1)
+})
+
+const startServer = async (): Promise<void> => {
+  if (config.nodeEnv === 'production' && !config.assetMigrationComplete) {
+    throw new Error('ASSET_MIGRATION_COMPLETE=true is required before starting production')
+  }
+  await socketService.initialize(server)
+
+  // 初始化课堂 Socket.IO 事件处理器
+  classroomSocketHandler.initialize()
+  logger.info('课堂 Socket.IO 事件处理器已初始化')
+
+  // Login and course-code verification fail closed when CacheService Redis is
+  // unavailable.  Initialize it before opening the HTTP listener and make
+  // production startup fail closed; initialize() itself catches connection
+  // errors, so the explicit status check is required as well.
+  await cacheService.initialize()
+  if (config.nodeEnv === 'production' && !cacheService.getStatus().connected) {
+    throw new Error('CacheService Redis 初始化失败，生产环境拒绝接收流量')
+  }
+
+  // ExportArtifact cleanup is metadata-driven: only exact expired objects are
+  // removed, never an exploratory directory scan. Keep one bounded hourly task
+  // per backend process and make shutdown cancel it.
+  exportCleanupTimer = setInterval(() => {
+    void cleanupExpiredExportArtifacts().then((result) => {
+      if (result.deletedArtifacts > 0 || result.invalidPaths > 0) {
+        logger.info('过期导出产物清理完成', result)
+      }
+    }).catch((err) => logger.warn('过期导出产物清理失败', err))
+  }, 60 * 60 * 1000)
+  exportCleanupTimer.unref?.()
+
+  await new Promise<void>((resolve, reject) => {
+    const onError = (error: Error) => {
+      server.off('listening', onListening)
+      reject(error)
+    }
+    const onListening = () => {
+      server.off('error', onError)
+      serverListening = true
+      logger.info(`🚀 Server running on port ${config.port}`)
+      logger.info(`📁 Upload directory: ${config.uploadDir}`)
+      logger.info(`📁 Upload directory absolute: ${require('path').resolve(config.uploadDir)}`)
+      logger.info(`🌐 Environment: ${config.nodeEnv}`)
+      logger.info(`🔌 Socket.IO enabled`)
+
+      // 通知 PM2 进程已就绪（配合 wait_ready 配置）
+      if (process.send) {
+        process.send('ready')
+        logger.info('✅ PM2 ready signal sent')
+      }
+      resolve()
+    }
+    server.once('error', onError)
+    server.once('listening', onListening)
+    server.listen(config.port)
+  })
+}
+
+void startServer().catch((error) => {
+  logger.error('服务启动失败，进程将退出', error)
+  void gracefulShutdown('startup failure', 1)
 })

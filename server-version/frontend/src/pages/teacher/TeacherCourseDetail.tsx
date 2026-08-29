@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, Brain, Edit, UserCog, Settings, ClipboardCheck } from 'lucide-react'
+import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, Brain, Edit, UserCog, Settings, ClipboardCheck, RefreshCw } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Course, Assignment, Checkin } from '../../types'
 
@@ -122,6 +122,19 @@ const TeacherCourseDetail: React.FC = () => {
     return new Date(deadline) < new Date()
   }
 
+  const rotateCourseCode = async () => {
+    if (!courseId || !window.confirm('轮换后旧课程码会立即失效，确定继续吗？')) return
+    try {
+      const response = await apiClient.post(`/courses/${courseId}/rotate-code`)
+      if (response.code === 0) {
+        setCourse((current) => current ? { ...current, courseCode: response.data.courseCode } : current)
+        alert('课程码已轮换，请把新课程码发给学生。')
+      }
+    } catch (error: any) {
+      alert(error?.message || '课程码轮换失败')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -199,7 +212,20 @@ const TeacherCourseDetail: React.FC = () => {
                 <Users className="w-4 h-4" />
                 <span>{course.studentCount || 0} 名学员</span>
               </div>
-              <div>课程码: {course.courseCode}</div>
+              <div className="flex items-center gap-2">
+                <span>课程码: {course.courseCode}</span>
+                {!course.isLibrary && (
+                  <button
+                    type="button"
+                    onClick={rotateCourseCode}
+                    className="inline-flex items-center gap-1 text-primary hover:text-primary/80"
+                    title="轮换课程码"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>轮换</span>
+                  </button>
+                )}
+              </div>
               <div>状态: {course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</div>
             </div>
           </div>

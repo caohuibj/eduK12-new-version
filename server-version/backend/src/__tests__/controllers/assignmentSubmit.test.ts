@@ -14,6 +14,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { assignmentController } from '../../controllers/assignmentController'
 import { Messages } from '../../constants'
+import { hashIdempotencyKey, hashIdempotencyPayload } from '../../utils/idempotency'
 
 const makeReq = (overrides: any = {}) => ({
   user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
@@ -90,6 +91,57 @@ describe('assignment submit deadline', () => {
 
     expect(res.body.code).toBe(0)
     expect(mockPrisma.submission.create).toHaveBeenCalledOnce()
+  })
+
+  it('returns an idempotent success for a retried request with the same key', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      id: 'asg-1',
+      courseId: 'course-1',
+      status: AssignmentStatus.PUBLISHED,
+      deadline: null,
+    })
+    mockPrisma.submission.findFirst.mockResolvedValue({
+      id: 'sub-1',
+      content: 'done',
+      answers: {},
+      idempotencyKeyHash: hashIdempotencyKey('assignment-retry-1'),
+    })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      header: vi.fn().mockReturnValue('assignment-retry-1'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(mockPrisma.submissionHistory.create).not.toHaveBeenCalled()
+    expect(mockPrisma.submission.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects reusing a key for a changed payload', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      id: 'asg-1',
+      courseId: 'course-1',
+      status: AssignmentStatus.PUBLISHED,
+      deadline: null,
+    })
+    mockPrisma.submission.findFirst.mockResolvedValue({
+      id: 'sub-1',
+      content: 'answer A',
+      answers: {},
+      idempotencyKeyHash: hashIdempotencyKey('assignment-retry-1'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'answer A', answers: {} }),
+    })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      body: { content: 'answer B' },
+      header: vi.fn().mockReturnValue('assignment-retry-1'),
+    }), res)
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toBe('Idempotency-Key 已用于其他提交内容')
+    expect(mockPrisma.submission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.submissionHistory.create).not.toHaveBeenCalled()
   })
 
   it('rejects a student who is not a member of the assignment course', async () => {

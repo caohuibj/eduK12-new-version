@@ -9,6 +9,8 @@ import { Messages } from '../constants'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
 import { setSessionCookie, clearSessionCookie } from '../utils/authCookies'
+import { clearLoginFailures, recordLoginFailure } from '../middleware/loginRateLimit'
+import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const loginSchema = z.object({
   username: z.string().min(1, '用户名不能为空'),
@@ -39,41 +41,51 @@ export const authController = {
     try {
       const result = loginSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        await recordLoginFailure(req)
+        return unauthorized(res, '用户名或密码错误')
       }
 
       const { username, password } = result.data
+      const failedLogin = async () => {
+        await recordLoginFailure(req)
+        // Do not disclose whether a username exists, is disabled, frozen, or
+        // awaiting approval. The limiter still records the attempt by the
+        // hashed account+IP key.
+        return unauthorized(res, '用户名或密码错误')
+      }
 
       const user = await prisma.user.findUnique({
         where: { username }
       })
 
       if (!user) {
-        return unauthorized(res, '用户名或密码错误')
+        return failedLogin()
       }
 
       if (!user.isActive) {
-        return unauthorized(res, '账号已被禁用')
+        return failedLogin()
       }
 
       // 检查账号是否被冻结
       if (user.isFrozen) {
-        return unauthorized(res, '账号已被冻结，请联系教师')
+        return failedLogin()
       }
 
       // 检查账号是否过期
       if (user.expiresAt && user.expiresAt < new Date()) {
-        return unauthorized(res, '账号已过期，请联系管理员')
+        return failedLogin()
       }
 
       const isValid = await comparePassword(password, user.passwordHash)
       if (!isValid) {
-        return unauthorized(res, '用户名或密码错误')
+        return failedLogin()
       }
 
       if (user.role === UserRole.TEACHER && !user.teacherApproved) {
-        return unauthorized(res, '账号正在等待管理员审核，审核通过后即可登录')
+        return failedLogin()
       }
+
+      await clearLoginFailures(req)
 
       const token = generateToken({
         userId: user.id,
@@ -99,7 +111,8 @@ export const authController = {
       }, '登录成功')
     } catch (err) {
       logger.error('登录错误', err)
-      return error(res, Messages.USER.LOGIN_FAILED)
+      await recordLoginFailure(req)
+      return unauthorized(res, '用户名或密码错误')
     }
   },
 
@@ -255,13 +268,7 @@ export const authController = {
         return error(res, '课程码无效')
       }
 
-      if (course.status === 'COMPLETED' || course.endedAt) {
-        return error(res, '课程已结束，无法加入')
-      }
-
-      if (course.isLibrary) {
-        return error(res, '库课程不能加入')
-      }
+      if (!isCourseJoinable(course)) return error(res, courseJoinabilityMessage(course))
 
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
@@ -276,19 +283,41 @@ export const authController = {
       const hashedPassword = await hashPassword(password)
       // 账号创建和课程关系创建必须原子完成，避免留下无法加入课程的孤立账号。
       const user = await prisma.$transaction(async (tx) => {
+        // Re-check under a row lock. Stopping recruitment or ending a course
+        // concurrently must win over this registration attempt.
+        if (typeof (tx as any).$executeRaw === 'function') {
+          await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
+        }
+        const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
+        // The initial lookup only identifies the row to lock.  A teacher may
+        // rotate the code while this request is waiting for that row lock;
+        // accepting the refreshed row without comparing the submitted code
+        // would make the old code valid after rotation.
+        if (
+          !lockedCourse
+          || lockedCourse.courseCode !== courseCode
+          || !isCourseJoinable(lockedCourse)
+        ) {
+          throw new CourseNotJoinableError(
+            !lockedCourse || lockedCourse.courseCode !== courseCode
+              ? '课程码无效'
+              : courseJoinabilityMessage(lockedCourse),
+          )
+        }
+
         const createdUser = await tx.user.create({
           data: {
             username,
             passwordHash: hashedPassword,
             role: UserRole.STUDENT,
             nickname,
-            expiresAt: course.endedAt || null,
+            expiresAt: lockedCourse.endedAt || null,
           }
         })
 
         await tx.courseStudent.create({
           data: {
-            courseId: course.id,
+            courseId: lockedCourse.id,
             studentId: createdUser.id,
             status: 'ACTIVE',
           }
@@ -318,6 +347,7 @@ export const authController = {
         }
       }, '注册成功，已加入课程')
     } catch (err) {
+      if (err instanceof CourseNotJoinableError) return error(res, err.message)
       logger.error('学生注册错误', err)
       return error(res, Messages.COMMON.FAILED)
     }

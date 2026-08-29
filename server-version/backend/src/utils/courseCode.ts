@@ -1,35 +1,30 @@
+import crypto from 'node:crypto'
 import { prisma } from '../config/database'
+import type { PrismaClient } from '@prisma/client'
 
-// 生成3位随机大写字母
-const generateRandomLetters = (): string => {
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let result = ''
-  for (let i = 0; i < 3; i++) {
-    result += letters.charAt(Math.floor(Math.random() * letters.length))
-  }
-  return result
+// Crockford Base32 avoids ambiguous I/L/O/U and gives 60 bits of entropy in
+// twelve characters. Existing legacy course codes remain valid for lookup.
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
+export const COURSE_CODE_LENGTH = 12
+
+const randomCourseCode = (): string => {
+  const bytes = crypto.randomBytes(COURSE_CODE_LENGTH)
+  return Array.from(bytes, (byte) => CROCKFORD[byte & 31]).join('')
 }
 
-// 生成课程码: YYMMDD + 3位大写字母 (如 260205ABC)
-export const generateCourseCode = async (): Promise<string> => {
-  const now = new Date()
-  // 获取年月日，格式 YYMMDD
-  const year = now.getFullYear().toString().slice(-2)
-  const month = (now.getMonth() + 1).toString().padStart(2, '0')
-  const day = now.getDate().toString().padStart(2, '0')
-  const datePrefix = `${year}${month}${day}`
+type CourseCodeDatabase = Pick<PrismaClient, 'course'>
 
+export const generateCourseCode = async (db: CourseCodeDatabase = prisma): Promise<string> => {
   let code: string
   let exists = true
   let attempts = 0
-  const maxAttempts = 100
+  const maxAttempts = 20
 
   do {
-    // 格式: YYMMDD + 3位大写字母
-    code = `${datePrefix}${generateRandomLetters()}`
+    code = randomCourseCode()
 
     // 检查是否已存在
-    const existing = await prisma.course.findUnique({
+    const existing = await db.course.findUnique({
       where: { courseCode: code }
     })
 
@@ -38,7 +33,7 @@ export const generateCourseCode = async (): Promise<string> => {
   } while (exists && attempts < maxAttempts)
 
   if (attempts >= maxAttempts) {
-    throw new Error('无法生成唯一课程号，今日课程数量已达上限')
+    throw new Error('无法生成唯一课程号，请稍后重试')
   }
 
   return code

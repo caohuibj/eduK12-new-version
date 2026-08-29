@@ -38,9 +38,13 @@ describe('redis config (D0-9.1)', () => {
     expect(() => getRedisUrl()).toThrow(/拒绝回退到 localhost/)
   })
 
-  it('getBullRedisOptions never throws (Bull keeps existing fallback)', () => {
+  it('getBullRedisOptions fails closed in production without Redis config', () => {
     process.env.NODE_ENV = 'production'
-    expect(() => getBullRedisOptions()).not.toThrow()
+    expect(() => getBullRedisOptions()).toThrow(/production 中需要显式 Redis 配置/)
+  })
+
+  it('getBullRedisOptions retains localhost fallback outside production', () => {
+    process.env.NODE_ENV = 'development'
     expect(getBullRedisOptions()).toBe('redis://localhost:6379')
   })
 

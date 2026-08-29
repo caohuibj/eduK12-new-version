@@ -96,6 +96,24 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     onHttpFallbackRef.current = onHttpFallback
   }, [onHttpFallback])
 
+  useEffect(() => {
+    // Student classroom sessions are anonymous/capability-authenticated and
+    // must not be disconnected by an unrelated logged-in API expiry event.
+    if (role === 'student') return
+
+    const handleAuthExpired = () => {
+      socketRef.current?.disconnect()
+      socketRef.current = null
+      if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current)
+      fallbackTimerRef.current = null
+      setIsConnected(false)
+      setConnectionState('DISCONNECTED')
+    }
+
+    window.addEventListener('auth:expired', handleAuthExpired)
+    return () => window.removeEventListener('auth:expired', handleAuthExpired)
+  }, [role])
+
   const connect = useCallback(() => {
     if (socketRef.current?.connected) {
       return

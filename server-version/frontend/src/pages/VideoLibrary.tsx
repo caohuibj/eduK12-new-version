@@ -3,7 +3,7 @@ import { Plus, Search, Video as VideoIcon, Trash2, Edit, Upload, X, FileVideo, A
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
-import axios from 'axios'
+import { sessionAxios } from '../api/client'
 import type { Video } from '../types'
 import SecureVideoPlayer from '../components/SecureVideoPlayer'
 
@@ -153,7 +153,7 @@ const VideoLibrary: React.FC = () => {
       formData.append('title', item.title)
 
       const csrfToken = await ensureCsrfToken()
-      const response = await axios.post('/api/videos/upload', formData, {
+      const response = await sessionAxios.post('/videos/upload', formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -269,7 +269,7 @@ const VideoLibrary: React.FC = () => {
       formData.append('title', videoTitle.trim())
 
       const csrfToken = await ensureCsrfToken()
-      const response = await axios.post('/api/videos/upload', formData, {
+      const response = await sessionAxios.post('/videos/upload', formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -37,38 +37,33 @@ interface DocumentViewerProps {
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents, className = '' }) => {
   // 防止下载的保护措施
   useEffect(() => {
+    const hasProtectedDocument = documents.some((doc) => !doc.allowDownload)
+    if (!hasProtectedDocument) return undefined
+
     const preventDefault = (e: Event) => {
       e.preventDefault()
       alert('教师已禁用下载，仅支持在线阅读')
       return false
     }
 
-    // 为所有不允许下载的文档添加保护
-    documents.forEach(doc => {
-      if (!doc.allowDownload) {
-        // 阻止右键菜单
-        document.addEventListener('contextmenu', preventDefault)
-        
-        // 阻止快捷键
-        const handleKeydown = (e: KeyboardEvent) => {
-          if (
-            (e.ctrlKey && e.key === 's') ||  // Ctrl+S
-            e.key === 'F12' ||  // F12
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||  // Ctrl+Shift+I
-            (e.ctrlKey && e.key === 'u')  // Ctrl+U
-          ) {
-            e.preventDefault()
-            alert('教师已禁用下载，仅支持在线阅读')
-          }
-        }
-        document.addEventListener('keydown', handleKeydown)
-
-        return () => {
-          document.removeEventListener('contextmenu', preventDefault)
-          document.removeEventListener('keydown', handleKeydown)
-        }
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey && e.key === 's') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+        (e.ctrlKey && e.key === 'u')
+      ) {
+        e.preventDefault()
+        alert('教师已禁用下载，仅支持在线阅读')
       }
-    })
+    }
+
+    document.addEventListener('contextmenu', preventDefault)
+    document.addEventListener('keydown', handleKeydown)
+    return () => {
+      document.removeEventListener('contextmenu', preventDefault)
+      document.removeEventListener('keydown', handleKeydown)
+    }
   }, [documents])
 
   if (!documents || documents.length === 0) {

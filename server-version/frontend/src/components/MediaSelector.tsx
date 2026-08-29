@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, Video, Image as ImageIcon, Link as LinkIcon, Upload, Search, Check, FileVideo, AlertCircle, FileText } from 'lucide-react'
 import apiClient from '../api/client'
-import { ensureCsrfToken } from '../api/client'
-import axios from 'axios'
+import { ensureCsrfToken, sessionAxios } from '../api/client'
 import type { Video as VideoType, Document as DocumentType } from '../types'
 
 export interface MediaItem {
@@ -256,7 +255,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         formData.append('document', uploadFile)
         formData.append('title', uploadTitle.trim())
 
-        const response = await axios.post('/api/documents/upload', formData, {
+        const response = await sessionAxios.post('/documents/upload', formData, {
           withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -286,7 +285,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         // 上传图片
         formData.append('image', uploadFile)
 
-        const response = await axios.post('/api/uploads/image', formData, {
+        const response = await sessionAxios.post('/uploads/image', formData, {
           withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -318,7 +317,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         formData.append('video', uploadFile)
         formData.append('title', uploadTitle.trim())
 
-        const response = await axios.post('/api/videos/upload', formData, {
+        const response = await sessionAxios.post('/videos/upload', formData, {
           withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data',

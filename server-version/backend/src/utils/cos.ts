@@ -23,15 +23,14 @@ export const uploadToCOS = async (
   storageClass: StorageClass = 'STANDARD'
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    // 读取文件为 Buffer
-    const fileBuffer = fs.readFileSync(filePath)
-    
     cos.putObject(
       {
         Bucket: config.cosBucket!,
         Region: config.cosRegion!,
         Key: key,
-        Body: fileBuffer,
+        // The SDK accepts a readable stream; avoid materialising large videos
+        // in a Node Buffer before sending them to object storage.
+        Body: fs.createReadStream(filePath),
         StorageClass: storageClass,
       } as any,
       (err, data) => {

@@ -3,7 +3,7 @@ import { Plus, Search, FileText, Trash2, Upload, X, AlertCircle, Eye, ChevronLef
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
-import axios from 'axios'
+import { sessionAxios } from '../api/client'
 import type { Document } from '../types'
 
 const DocumentLibrary: React.FC = () => {
@@ -107,7 +107,7 @@ const DocumentLibrary: React.FC = () => {
       formData.append('title', documentTitle.trim())
 
       const csrfToken = await ensureCsrfToken()
-      const response = await axios.post('/api/documents/upload', formData, {
+      const response = await sessionAxios.post('/documents/upload', formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -4,12 +4,13 @@ import { UserRole } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(),
+    $executeRaw: vi.fn(),
     course: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn(), delete: vi.fn() },
     assignment: { findMany: vi.fn() },
     checkin: { findMany: vi.fn() },
     checkinSubmission: { findMany: vi.fn() },
     assetReference: { deleteMany: vi.fn() },
-    courseStudent: { findMany: vi.fn(), findFirst: vi.fn() },
+    courseStudent: { findMany: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     courseShare: { findMany: vi.fn() },
   },
 }))
@@ -94,6 +95,31 @@ describe('course isLibrary', () => {
     }) as any, res)
     expect(res.statusCode).toBe(400)
     expect(res.body.message).toBe('库课程不能加入')
+  })
+
+  it('rejects a stale course code after rotation while the join transaction is locking the row', async () => {
+    const oldCourse = {
+      id: 'course-1',
+      courseCode: 'OLD-CODE',
+      status: 'PUBLISHED',
+      endedAt: null,
+      isRecruiting: true,
+      isLibrary: false,
+    }
+    const rotatedCourse = { ...oldCourse, courseCode: 'NEW-CODE' }
+    mockPrisma.course.findUnique
+      .mockResolvedValueOnce(oldCourse)
+      .mockResolvedValueOnce(rotatedCourse)
+
+    const res = makeRes()
+    await courseController.join(makeReq({
+      user: { userId: 'student-1', role: UserRole.STUDENT },
+      body: { courseCode: 'OLD-CODE' },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('课程号不存在')
+    expect(mockPrisma.courseStudent.findUnique).not.toHaveBeenCalled()
   })
 
   it('hides library course detail from students', async () => {

@@ -14,13 +14,13 @@ try {
   logger.warn('[VideoProcessor] canvas 模块不可用，水印功能将被禁用')
 }
 
-import { videoQueue } from '../config/queue'
+import { videoQueue, RESOURCE_LIMITS } from '../config/queue'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
-
-const VIDEO_PROCESSING_FAILURE_MESSAGE = '视频处理失败，请稍后重试或联系管理员'
+import { markVideoFailed, markVideoProcessing } from '../services/videoProcessingState'
+import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery } from '../services/videoProcessingRecovery'
 
 // 处理策略类型
 interface ProcessingStrategy {
@@ -54,8 +54,8 @@ const PROCESSING_CONFIG = {
   // 音频码率
   audioBitrate: '96k',
 
-  // 全局并发处理数（关键优化：限制为1）
-  concurrency: 1,
+  // Keep the worker aligned with the queue-level bounded concurrency.
+  concurrency: RESOURCE_LIMITS.videoConcurrency,
 
   // 启用压缩优化 - 如果原文件比处理后小，保留原文件
   smartCompression: true,
@@ -87,15 +87,17 @@ function determineProcessingStrategy(videoInfo: VideoValidationResult): Processi
 }
 
 // 检查 FFmpeg 是否可用
-let ffmpegAvailable = false
-ffmpeg.getAvailableCodecs((err) => {
-  ffmpegAvailable = !err
-  if (ffmpegAvailable) {
-    logger.info('✅ FFmpeg 已就绪')
-    logger.info(`📊 视频处理配置: ${JSON.stringify(PROCESSING_CONFIG, null, 2)}`)
-  } else {
-    logger.warn('⚠️ FFmpeg 未安装，视频处理功能将不可用')
-  }
+const ffmpegAvailability = new Promise<boolean>((resolve) => {
+  ffmpeg.getAvailableCodecs((err) => {
+    const available = !err
+    if (available) {
+      logger.info('✅ FFmpeg 已就绪')
+      logger.info(`📊 视频处理配置: ${JSON.stringify(PROCESSING_CONFIG, null, 2)}`)
+    } else {
+      logger.warn('⚠️ FFmpeg 未安装，视频处理功能将不可用')
+    }
+    resolve(available)
+  })
 })
 
 // 统一的视频处理器（支持本地上传和URL下载）
@@ -113,24 +115,28 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   logger.info(`🎬 开始处理视频: ${videoId} (${isUrlMode ? 'URL下载' : '本地上传'})`)
 
-  // 如果 FFmpeg 不可用，直接标记为失败
-  if (!ffmpegAvailable) {
-    await markVideoFailed(videoId, 'VIDEO_PROCESSOR_UNAVAILABLE')
-    throw new Error('FFmpeg 未安装')
-  }
-
   const tempDir = path.join('/tmp', `video-${videoId}`)
   const derivativeAssets: Array<{ id: string; objectKey: string; provider: string }> = []
 
   try {
+    // Await the asynchronous probe so the first queued job cannot race the
+    // availability check and be failed before FFmpeg reports ready.
+    if (!(await ffmpegAvailability)) {
+      throw new Error('FFmpeg 未安装')
+    }
+
     // 更新状态为处理中
-    await prisma.video.update({
-      where: { id: videoId },
-      data: {
-        status: 'PROCESSING',
-        ...(isUrlMode && { originalUrl: videoUrl })
-      }
-    })
+    const claimed = await markVideoProcessing(videoId, String(job.id))
+    if (!claimed) {
+      logger.warn('视频处理任务未能取得视频行所有权，跳过过期任务', { videoId, jobId: job.id })
+      return { videoId, skipped: true }
+    }
+    if (isUrlMode) {
+      await prisma.video.update({
+        where: { id: videoId },
+        data: { originalUrl: videoUrl },
+      })
+    }
 
     await job.progress(5)
 
@@ -180,11 +186,13 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         mimeType: 'video/mp4',
         ownerId: teacherId,
       })
+      derivativeAssets.push(originalAsset)
       await prisma.$transaction(async (tx) => {
-        await tx.video.update({
-          where: { id: videoId },
+        const updated = await tx.video.updateMany({
+          where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
           data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
         })
+        if (updated.count !== 1) throw new Error('视频处理任务已失效')
         await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' }, tx)
       })
     }
@@ -275,8 +283,8 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // Update the video and attach both derivatives atomically.
     await prisma.$transaction(async (tx) => {
-      await tx.video.update({
-        where: { id: videoId },
+      const updated = await tx.video.updateMany({
+        where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
         data: {
           status: 'COMPLETED',
           processedUrl: null,
@@ -286,9 +294,13 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           resolution: PROCESSING_CONFIG.resolution,
           duration,
           fileSize,
-          processedAt: new Date()
-        }
+          processedAt: new Date(),
+          errorMessage: null,
+          processingJobId: null,
+          processingStartedAt: null,
+        },
       })
+      if (updated.count !== 1) throw new Error('视频处理任务已失效')
       await attachAssetReference({ assetId: processedAsset.id, entityType: 'Video', entityId: videoId, field: 'processed' }, tx)
       await attachAssetReference({ assetId: thumbnailAsset.id, entityType: 'Video', entityId: videoId, field: 'thumbnail' }, tx)
     })
@@ -304,25 +316,37 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   } catch (error: any) {
     logger.error(`❌ 视频处理失败: ${videoId}`, error)
-    await Promise.all(derivativeAssets.map((asset) => discardUnreferencedAsset(asset)))
-    // Never persist ffmpeg, filesystem, URL, or dependency details; the
-    // status endpoint is visible to teachers.
-    await markVideoFailed(videoId, VIDEO_PROCESSING_FAILURE_MESSAGE)
+    const cleanupResults = await Promise.allSettled(derivativeAssets.map((asset) => discardUnreferencedAsset(asset)))
+    for (const result of cleanupResults) {
+      if (result.status === 'rejected') logger.warn('视频失败清理资源失败', { videoId })
+    }
+    // Bull retries non-terminal attempts. Persist FAILED only for the final
+    // attempt; otherwise the next attempt may not reclaim the row.
+    if (isFinalVideoAttempt(job)) {
+      try {
+        const recorded = await markVideoFailed(videoId, String(job.id))
+        if (!recorded) logger.warn('视频最终失败状态未更新（任务可能已被其他流程处理）', { videoId, jobId: job.id })
+      } catch {
+        // The queue-level failed listener and the stale sweep provide a later
+        // conditional retry if this database write is temporarily unavailable.
+        logger.error('视频最终失败状态写入异常', { videoId, jobId: job.id })
+      }
+    }
     await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
     throw error
   }
 })
 
-// 标记视频处理失败
-async function markVideoFailed(videoId: string, errorMessage: string): Promise<void> {
-  await prisma.video.update({
-    where: { id: videoId },
-    data: {
-      status: 'FAILED',
-      errorMessage
-    }
+registerVideoProcessingRecovery()
+const reconcileStaleVideos = () => {
+  void reconcileStaleProcessingVideos().catch(() => {
+    logger.error('视频 PROCESSING 回收检查失败')
   })
 }
+const staleVideoReconciliationTimer = setTimeout(reconcileStaleVideos, 10_000)
+const staleVideoReconciliationInterval = setInterval(reconcileStaleVideos, 60_000)
+staleVideoReconciliationTimer.unref?.()
+staleVideoReconciliationInterval.unref?.()
 
 /**
  * 生成底部居中水印

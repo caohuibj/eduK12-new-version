@@ -7,11 +7,38 @@ import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
-import { attachAssetReference, getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+import { markVideoFailed } from '../services/videoProcessingState'
 
 const updateVideoSchema = z.object({
   title: z.string().min(1, '视频标题不能为空'),
 })
+
+/**
+ * Associate a freshly-created video with its Bull job. The worker has a
+ * short startup delay, but a busy event loop or a fast queue can still let it
+ * claim the row first. Treat that same-job claim (and an already terminal
+ * result) as success instead of falsely marking a valid upload failed.
+ */
+const associateProcessingJob = async (videoId: string, jobId: string): Promise<void> => {
+  const associated = await prisma.video.updateMany({
+    where: { id: videoId, status: 'PENDING', processingJobId: null },
+    data: { processingJobId: jobId },
+  })
+  if (associated.count === 1) return
+
+  const current = await prisma.video.findUnique({
+    where: { id: videoId },
+    select: { status: true, processingJobId: true },
+  })
+  if (
+    current?.processingJobId === jobId
+    || current?.status === 'COMPLETED'
+    || current?.status === 'FAILED'
+  ) return
+
+  throw new Error('视频处理任务关联失败')
+}
 
 export const videoController = {
   // 获取视频列表（添加分页优化）
@@ -100,6 +127,8 @@ export const videoController = {
 
   // 上传视频 - 异步处理版本
   async upload(req: Request, res: Response) {
+    let originalAsset: Awaited<ReturnType<typeof storeAssetFromFile>> | undefined
+    let originalAssetLinked = false
     try {
       const userId = req.user?.userId
       if (!userId) {
@@ -116,16 +145,24 @@ export const videoController = {
         return error(res, '请输入视频标题')
       }
 
-      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType || file.mimetype
+      const detectedMimeType = (file as Express.Multer.File & { detectedMimeType?: string }).detectedMimeType
+      if (!detectedMimeType || !['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'].includes(detectedMimeType)) {
+        return error(res, '视频内容类型无效')
+      }
 
-      const originalAsset = await storeAsset({
-        buffer: file.buffer,
+      if (!file.path) {
+        return error(res, '无法读取上传文件')
+      }
+
+      const storedOriginalAsset = await storeAssetFromFile({
+        filePath: file.path,
         originalName: file.originalname,
         mimeType: detectedMimeType,
         ownerId: userId,
         provider: 'local',
       })
-      const processingInput = `file://${getLocalAssetPath(originalAsset.objectKey)}`
+      originalAsset = storedOriginalAsset
+      const processingInput = `file://${getLocalAssetPath(storedOriginalAsset.objectKey)}`
 
       // Keep the video pointer and asset reference atomic. The asset itself
       // is already stored, so a failed transaction leaves only an unreachable
@@ -134,12 +171,12 @@ export const videoController = {
         const created = await tx.video.create({
           data: {
             title,
-            filePath: originalAsset.objectKey,
+            filePath: storedOriginalAsset.objectKey,
             fileName: file.originalname,
             fileSize: file.size,
             mimeType: detectedMimeType,
             teacherId: userId,
-            originalAssetId: originalAsset.id,
+            originalAssetId: storedOriginalAsset.id,
             status: 'PENDING',
           },
           include: {
@@ -152,24 +189,31 @@ export const videoController = {
             }
           }
         })
-        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
+        await attachAssetReference({ assetId: storedOriginalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
         return created
       })
+      originalAssetLinked = true
 
       // 添加到视频处理队列
-      await videoQueue.add('transcode', {
-        videoId: video.id,
-        originalUrl: processingInput,
-        teacherId: userId,
-      }, {
-        delay: 1000, // 延迟1秒确保文件写入完成
-        priority: 1,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 5000,
-        },
-      })
+      try {
+        const job = await videoQueue.add('transcode', {
+          videoId: video.id,
+          originalUrl: processingInput,
+          teacherId: userId,
+        }, {
+          delay: 1000, // 延迟1秒确保文件写入完成
+          priority: 1,
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 5000,
+          },
+        })
+        await associateProcessingJob(video.id, String(job.id))
+      } catch (queueError) {
+        await markVideoFailed(video.id).catch(() => undefined)
+        throw queueError
+      }
 
       logger.info(`视频已加入处理队列: ${video.id}`)
 
@@ -181,6 +225,9 @@ export const videoController = {
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
+      if (originalAsset && !originalAssetLinked) {
+        await discardUnreferencedAsset(originalAsset).catch(() => undefined)
+      }
       logger.error('上传视频错误', err)
       return error(res, '上传视频失败')
     }
@@ -244,24 +291,30 @@ export const videoController = {
       })
 
       // The worker consumes the named transcode job and detects URL mode from videoUrl.
-      await videoQueue.add('transcode', {
-        videoId: video.id,
-        videoUrl: urlResult.data, // 视频链接
-        teacherId: userId,
-        watermarkText: watermarkText || '慧育空间教学专属视频',
-        downloadOptions: {
-          maxFileSize: 2 * 1024 * 1024 * 1024,  // 2GB
-          timeout: 15 * 60 * 1000,              // 15分钟
-        }
-      }, {
-        delay: 1000,
-        priority: 1,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 10000,
-        },
-      })
+      try {
+        const job = await videoQueue.add('transcode', {
+          videoId: video.id,
+          videoUrl: urlResult.data, // 视频链接
+          teacherId: userId,
+          watermarkText: watermarkText || '慧育空间教学专属视频',
+          downloadOptions: {
+            maxFileSize: 2 * 1024 * 1024 * 1024,  // 2GB
+            timeout: 15 * 60 * 1000,              // 15分钟
+          }
+        }, {
+          delay: 1000,
+          priority: 1,
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 10000,
+          },
+        })
+        await associateProcessingJob(video.id, String(job.id))
+      } catch (queueError) {
+        await markVideoFailed(video.id).catch(() => undefined)
+        throw queueError
+      }
 
       logger.info(`视频链接已加入处理队列: ${video.id}`)
 
@@ -310,8 +363,9 @@ export const videoController = {
       // 获取队列中的任务进度
       let progress = 0
       if (video.status === 'PROCESSING') {
-        const jobs = await videoQueue.getJobs(['active', 'waiting'])
-        const job = jobs.find(j => j.data.videoId === id)
+        const job = video.processingJobId
+          ? await videoQueue.getJob(video.processingJobId)
+          : (await videoQueue.getJobs(['active', 'waiting', 'delayed'])).find(j => j.data.videoId === id)
         if (job) {
           progress = job.progress() as number || 0
         }

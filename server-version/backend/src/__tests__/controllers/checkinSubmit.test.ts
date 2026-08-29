@@ -23,6 +23,7 @@ import {
   PublicUploadSessionAlreadySubmittedError,
 } from '../../controllers/checkinController'
 import { Messages } from '../../constants'
+import { hashIdempotencyKey, hashIdempotencyPayload } from '../../utils/idempotency'
 
 const makeReq = (overrides: any = {}) => ({
   user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
@@ -103,6 +104,55 @@ describe('logged-in checkin submit endTime', () => {
 
     expect(res.body.code).toBe(0)
     expect(mockPrisma.checkinSubmission.create).toHaveBeenCalledOnce()
+  })
+
+  it('returns an idempotent success for a retried request with the same key', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue({
+      id: 'sub-1',
+      content: 'today',
+      images: [],
+      idempotencyKeyHash: hashIdempotencyKey('checkin-retry-1'),
+    })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      header: vi.fn().mockReturnValue('checkin-retry-1'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects reusing a key for a changed payload', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue({
+      id: 'sub-1',
+      content: 'today A',
+      images: [],
+      idempotencyKeyHash: hashIdempotencyKey('checkin-retry-1'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today A', images: [] }),
+    })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today B' },
+      header: vi.fn().mockReturnValue('checkin-retry-1'),
+    }), res)
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toBe('Idempotency-Key 已用于其他提交内容')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
   })
 
   it('rejects a student who is not a member of the checkin course', async () => {

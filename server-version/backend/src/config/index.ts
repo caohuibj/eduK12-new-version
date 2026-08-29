@@ -26,6 +26,7 @@ const configSchema = z.object({
   // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
   // and verified.
   legacyUploadsEnabled: z.boolean(),
+  assetMigrationComplete: z.boolean(),
   // 数据加密密钥 (可选，生产环境必需)
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
@@ -111,12 +112,16 @@ const rawConfig = {
   publicCheckinSubmitIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_IP_LIMIT', 600),
   publicCheckinSubmitTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT', 120),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
+  assetMigrationComplete: parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
-  socketRedisRequired: parseBooleanEnv('SOCKET_REDIS_REQUIRED', false),
+  // Socket.IO room broadcasts are not safe to run in a multi-process
+  // deployment without the Redis adapter.  Production therefore requires it
+  // by default; development and test keep the single-process fallback.
+  socketRedisRequired: parseBooleanEnv('SOCKET_REDIS_REQUIRED', process.env.NODE_ENV === 'production'),
   // Cognitive 参与者假名化密钥（生产环境必需）
   dataPseudonymKey: process.env.DATA_PSEUDONYM_KEY,
   // COS 配置 (可选)
