@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import { workbookBuffer } from '../../utils/excelWorkbook'
 import { buildZipStore } from '../cognitive/export-zip'
 import { exportCognitiveToCSV, type CognitiveExportField } from '../cognitive/export.service'
 import type { FrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
@@ -413,15 +413,12 @@ const csvFor = (table: AnalysisTable): string => {
   return exportCognitiveToCSV({ fields, rows: table.rows })
 }
 
-const xlsxFor = (tables: Record<string, AnalysisTable>): Buffer => {
-  const workbook = XLSX.utils.book_new()
-  for (const [name, table] of Object.entries(tables)) {
-    const worksheet = XLSX.utils.json_to_sheet(table.rows, { header: table.headers })
-    XLSX.utils.book_append_sheet(workbook, worksheet, name)
-  }
-  const output = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
-  return Buffer.isBuffer(output) ? output : Buffer.from(output as string)
-}
+const xlsxFor = async (tables: Record<string, AnalysisTable>): Promise<Buffer> => (
+  workbookBuffer(Object.fromEntries(Object.entries(tables).map(([name, table]) => [
+    name,
+    { rows: table.rows, headers: table.headers },
+  ])))
+)
 
 const readmeFor = (context: CompositeAnalysisExportContext): string => [
   'eduK12 composite analysis export v1',
@@ -440,10 +437,10 @@ const readmeFor = (context: CompositeAnalysisExportContext): string => [
   'Results are descriptive only. They do not provide diagnosis, causal inference, disciplinary advice, IQ, percentile, or an overall score.',
 ].join('\n') + '\n'
 
-export const buildCompositeAnalysisExport = (
+export const buildCompositeAnalysisExport = async (
   context: CompositeAnalysisExportContext,
   format: CompositeAnalysisExportFormat,
-): CompositeAnalysisExportResult => {
+): Promise<CompositeAnalysisExportResult> => {
   const analysis = packageReportFor(context)
   const document = documentFor(context, analysis)
   const domainEvidence = domainEvidenceTableFor(analysis)
@@ -465,7 +462,7 @@ export const buildCompositeAnalysisExport = (
     return {
       fileName: 'analysis.xlsx',
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      body: xlsxFor({
+      body: await xlsxFor({
         Analysis: analysisTable,
         DomainEvidence: domainEvidence,
         Findings: findings,

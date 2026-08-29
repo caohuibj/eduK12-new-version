@@ -6,6 +6,7 @@ import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
+import { sanitizeText } from '../../utils/sanitize'
 
 interface Question {
   questionId: string
@@ -26,6 +27,10 @@ interface Stats {
     wordFrequency?: Record<string, number>
   }
 }
+
+// ECharts 5 is retained for the peer-compatible wordcloud plugin. Its HTML
+// tooltip renderer must never receive classroom-authored labels verbatim.
+const safeChartText = (value: unknown): string => sanitizeText(String(value ?? ''))
 
 const BigScreen: React.FC = () => {
   const { classroomId } = useParams<{ classroomId: string }>()
@@ -222,7 +227,7 @@ const BigScreen: React.FC = () => {
     const totalCount = stats?.answerCount || 1
 
 
-    const categories = options.map((opt: any) => opt.value || opt.key)
+    const categories = options.map((opt: any) => safeChartText(opt.value || opt.key))
     const data = options.map((opt: any) => optionStats[opt.value || opt.key] || 0)
     const percentages = options.map((opt: any) => {
       const count = optionStats[opt.value || opt.key] || 0
@@ -249,8 +254,8 @@ const BigScreen: React.FC = () => {
         formatter: (params: any) => {
           const idx = params[0].dataIndex
           const opt = options[idx]
-          const optValue = opt.value || opt.key
-          const optLabel = opt.label || opt.text
+          const optValue = safeChartText(opt.value || opt.key)
+          const optLabel = safeChartText(opt.label || opt.text)
           return `${optValue}. ${optLabel}<br/>` +
                  `选择人数: ${data[idx]} 人<br/>` +
                  `占比: ${percentages[idx]}%`
@@ -374,12 +379,12 @@ const BigScreen: React.FC = () => {
       // 使用后端分词结果
       if (wordCloud.topWords && wordCloud.topWords.length > 0) {
         data = wordCloud.topWords.map((item: any) => ({
-          name: item.word,
+          name: safeChartText(item.word),
           value: item.count,
         }))
       } else if (wordCloud.wordFrequency) {
         data = Object.entries(wordCloud.wordFrequency)
-          .map(([name, value]) => ({ name, value: value as number }))
+          .map(([name, value]) => ({ name: safeChartText(name), value: value as number }))
           .sort((a, b) => b.value - a.value)
           .slice(0, 50)
       } else {
@@ -389,7 +394,7 @@ const BigScreen: React.FC = () => {
       // 降级方案：前端简单分词
       const wordFrequency: Record<string, number> = {}
       textAnswers.forEach((answer) => {
-        const words = answer.text.split(/\s+/)
+        const words = safeChartText(answer.text).split(/\s+/)
         words.forEach((word) => {
           if (word.trim()) {
             wordFrequency[word.trim()] = (wordFrequency[word.trim()] || 0) + 1

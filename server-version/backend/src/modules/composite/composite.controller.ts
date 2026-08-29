@@ -36,12 +36,12 @@ const recoveryFromRequest = (req: Request): string => {
   return value
 }
 
-const sendAnalysisExport = (
+const sendAnalysisExport = async (
   res: Response,
   context: Awaited<ReturnType<typeof service.getAnalysisExportForParticipant>>,
   format: 'json' | 'zip' | 'xlsx',
-): Response => {
-  const file = buildCompositeAnalysisExport(context, format)
+): Promise<Response> => {
+  const file = await buildCompositeAnalysisExport(context, format)
   res.setHeader('Content-Type', file.contentType)
   res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`)
   res.setHeader('Content-Length', String(file.body.length))
@@ -241,7 +241,7 @@ export const compositeController = {
       if (!req.user) return unauthorized(res)
       const query = compositeParticipantAnalysisExportQuerySchema.parse(req.query)
       const context = await service.getAnalysisExportForParticipant(req.params.attemptId, { userId: req.user.userId })
-      return sendAnalysisExport(res, context, query.format)
+      return await sendAnalysisExport(res, context, query.format)
     } catch (err) { return handleError(res, err) }
   },
 
@@ -307,7 +307,7 @@ export const compositeController = {
         req.params.attemptId,
         query.snapshotId,
       )
-      return sendAnalysisExport(res, context, query.format)
+      return await sendAnalysisExport(res, context, query.format)
     } catch (err) { return handleError(res, err) }
   },
 
@@ -410,7 +410,7 @@ export const compositeController = {
         req.params.attemptId,
         { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
       )
-      return sendAnalysisExport(res, context, query.format)
+      return await sendAnalysisExport(res, context, query.format)
     } catch (err) { return handleError(res, err) }
   },
 }

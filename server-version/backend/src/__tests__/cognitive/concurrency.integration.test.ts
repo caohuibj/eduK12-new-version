@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { PrismaClient } from '@prisma/client'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
 
 /**
  * D6.1 — 真实 DB 并发集成测试（append vs complete / append vs restart /
@@ -80,13 +81,21 @@ const newSession = async (assignmentId: string) => {
   return payload.sessionId
 }
 
+const envelope = (trialIndex: number, payload: unknown) => createTrialEnvelope({
+  trialIndex,
+  phase: 'test',
+  payload,
+  startedAtPerfMs: trialIndex * 1000,
+  endedAtPerfMs: trialIndex * 1000 + 400,
+})
+
 const appendAll = async (sessionId: string) => {
   for (const [trialIndex, payload] of [
     [0, { correct: true, rtMs: 400 }],
     [1, { correct: true, rtMs: 500 }],
     [2, { correct: false, rtMs: 600 }],
   ] as const) {
-    await appendTrial(userId, sessionId, { trialIndex, payload })
+    await appendTrial(userId, sessionId, { trialIndex, payload: envelope(trialIndex, payload) })
   }
 }
 
@@ -143,7 +152,7 @@ suite('cognitive concurrency integration (real DB)', () => {
 
       const [comp, app] = await Promise.all([
         ok(completeSession(userId, sessionId)),
-        ok(appendTrial(userId, sessionId, { trialIndex: 3, payload: { correct: true, rtMs: 100 } })),
+        ok(appendTrial(userId, sessionId, { trialIndex: 3, payload: envelope(3, { correct: true, rtMs: 100 }) })),
       ])
 
       const row = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
@@ -174,7 +183,7 @@ suite('cognitive concurrency integration (real DB)', () => {
       const sessionId = await newSession(assignmentId)
 
       const [app, rst] = await Promise.all([
-        ok(appendTrial(userId, sessionId, { trialIndex: 0, payload: { correct: true, rtMs: 400 } })),
+        ok(appendTrial(userId, sessionId, { trialIndex: 0, payload: envelope(0, { correct: true, rtMs: 400 }) })),
         ok(restartSession(userId, sessionId)),
       ])
 
@@ -217,11 +226,13 @@ suite('cognitive concurrency integration (real DB)', () => {
     expect(c2.ok).toBe(true)
     expect(c1.value.status).toBe('COMPLETED')
     expect(c2.value.status).toBe('COMPLETED')
-    expect(c1.value.score).toBeCloseTo(c2.value.score, 6)
+    // v2 sessions intentionally no longer expose a generic score. Compare
+    // the authoritative metric snapshot returned by both idempotent calls.
+    expect(c1.value.metrics).toEqual(c2.value.metrics)
 
     const row = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
     expect(row?.status).toBe('COMPLETED')
-    expect(row?.scoreEncrypted).toBeTruthy()
+    expect(row?.scoreEncrypted).toBeNull()
     expect(row?.metricsEncrypted).toBeTruthy()
     expect(row?.qualityFlagsEncrypted).toBeTruthy()
   }, 60000)

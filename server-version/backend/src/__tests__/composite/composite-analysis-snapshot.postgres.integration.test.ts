@@ -306,29 +306,65 @@ const markSessionCompleted = async (session: any) => {
 const createScaleAndFormCompletionFixture = async () => {
   const suffix = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
   const courseId = await createCourseWithMembership(suffix)
+  const scaleDefinition = {
+    schemaVersion: 2,
+    respondentType: 'participant_self_report',
+    source: { title: 'PR8 fixture scale' },
+    license: { status: 'self_authored', redistribution: 'allowed' },
+    display: { randomizeItems: false },
+    responseSets: [{
+      key: 'likert',
+      options: [1, 2, 3, 4, 5].map((value) => ({ value, label: String(value), score: value })),
+    }],
+    items: [{
+      itemCode: 'PR8-1',
+      content: 'PR8 item',
+      type: 'single',
+      required: true,
+      sortOrder: 0,
+      responseSetKey: 'likert',
+      randomizeOptions: false,
+    }],
+    scoring: {
+      scoringVersion: '1.0.0',
+      itemRules: [{ itemCode: 'PR8-1', transform: { type: 'identity' } }],
+      defaultMissingPolicy: { type: 'complete_required' },
+      scores: [{
+        key: 'total',
+        type: 'total',
+        label: 'Total',
+        direction: 'higher_is_better',
+        canonical: true,
+        source: { type: 'items', items: [{ itemCode: 'PR8-1', weight: 1 }], aggregation: 'sum' },
+      }],
+    },
+    report: {
+      reportVersion: '1.0.0',
+      primaryScoreKeys: ['total'],
+      scoreOrder: ['total'],
+      interpretations: [{
+        scoreKey: 'total',
+        headline: 'Total score',
+        summary: 'PR8 integration fixture',
+        bands: [],
+        guidance: [],
+      }],
+      limitations: [],
+      disclaimer: 'PR8 integration fixture only',
+    },
+    referencePolicy: { type: 'none' },
+  }
   const scale = await prisma.scale.create({
     data: {
       code: `PR8-SCALE-${suffix}`,
       name: 'PR8 scale fixture',
       status: 'PUBLISHED',
       visibility: 'COURSE',
-      config: { points: 5 },
+      definition: scaleDefinition,
       creatorId: userId,
     },
   })
   createdScaleIds.push(scale.id)
-  const dimension = await prisma.dimension.create({
-    data: { scaleId: scale.id, code: 'PR8', name: 'PR8 dimension' },
-  })
-  const scaleItem = await prisma.scaleItem.create({
-    data: {
-      scaleId: scale.id,
-      itemCode: 'PR8-1',
-      content: 'PR8 item',
-      options: [{ value: 1, label: '1' }, { value: 2, label: '2' }, { value: 3, label: '3' }, { value: 4, label: '4' }, { value: 5, label: '5' }],
-    },
-  })
-  await prisma.itemDimension.create({ data: { itemId: scaleItem.id, dimensionId: dimension.id } })
   const composite = await prisma.compositeAssessment.create({
     data: {
       code: `PR8-COLLECTION-${suffix}`,
@@ -363,7 +399,7 @@ const createScaleAndFormCompletionFixture = async () => {
   return {
     attemptId: started.attempt.id,
     scaleItemId: scaleItemRow.id,
-    scaleQuestionId: scaleItem.id,
+    scaleQuestionId: 'PR8-1',
     formItemId: formItemRow.id,
   }
 }
@@ -602,7 +638,7 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     const afterAnswer = await compositeService.saveScaleAnswer(
       fixture.attemptId,
       fixture.scaleItemId,
-      { itemId: fixture.scaleQuestionId, value: 3 },
+      { itemCode: fixture.scaleQuestionId, responseValue: 3 },
       { userId },
     )
     expect(afterAnswer.status).toBe('IN_PROGRESS')

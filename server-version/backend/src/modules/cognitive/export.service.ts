@@ -18,7 +18,7 @@ import { isCompositeWrapper } from './assignment.access'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { readFrozenReport } from './profile-freeze'
 import { buildZipStore } from './export-zip'
-import * as XLSX from 'xlsx'
+import { writeWorkbookFile } from '../../utils/excelWorkbook'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot } from './v2/types'
@@ -752,13 +752,8 @@ export const buildCognitiveResearchPackage = (
   return { sessionRows, metricRows, trialRows, dictionaryRows, manifest, readme }
 }
 
-const writeXlsxWorkbook = (sheets: Record<string, Array<Record<string, unknown>>>, filePath: string) => {
-  const workbook = XLSX.utils.book_new()
-  for (const [name, rows] of Object.entries(sheets)) {
-    const sheet = XLSX.utils.json_to_sheet(rows)
-    XLSX.utils.book_append_sheet(workbook, sheet, name.slice(0, 31))
-  }
-  XLSX.writeFile(workbook, filePath)
+const writeXlsxWorkbook = async (sheets: Record<string, Array<Record<string, unknown>>>, filePath: string) => {
+  await writeWorkbookFile(sheets, filePath)
   ensureExportFileWithinLimit(filePath)
 }
 
@@ -803,7 +798,7 @@ export async function saveCognitiveExportFiles(
 
   if (format === 'xlsx') {
     const xlsxPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, 'research', 'xlsx'))
-    writeXlsxWorkbook({
+    await writeXlsxWorkbook({
       Summary: exportData.rows,
       Sessions: pack.sessionRows,
       Metrics: pack.metricRows,
@@ -816,7 +811,7 @@ export async function saveCognitiveExportFiles(
 
   const zipPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, 'research', 'zip'))
   const dictionaryPath = path.join(EXPORT_DIR, `dict-${path.basename(zipPath, '.zip')}.xlsx`)
-  writeXlsxWorkbook({ Dictionary: pack.dictionaryRows }, dictionaryPath)
+  await writeXlsxWorkbook({ Dictionary: pack.dictionaryRows }, dictionaryPath)
   const dictionaryBytes = fs.readFileSync(dictionaryPath)
   fs.unlinkSync(dictionaryPath)
   const zip = buildZipStore([

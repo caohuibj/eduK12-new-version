@@ -70,7 +70,7 @@ services:
       SOCKET_REDIS_REQUIRED: ${SOCKET_REDIS_REQUIRED:-true}
       UPLOAD_DIR: /app/uploads
       ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
-      ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:-false}
+      ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:?ASSET_MIGRATION_COMPLETE must be set explicitly after asset/token migration}
       ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:?ASSET_SIGNING_SECRET must be set}
       # Public check-in limits use a 15-minute window. Keep IP ceilings wider
       # than the shared-link ceilings so a school NAT is not a class-size cap.
@@ -99,6 +99,7 @@ services:
       VIDEO_PRESET: ${VIDEO_PRESET:-ultrafast}
       VIDEO_CRF: ${VIDEO_CRF:-28}
       VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
+      VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
     volumes:
       - uploads_data:/app/uploads
       - credential_handoff_data:/app/.local
