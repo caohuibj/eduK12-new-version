@@ -157,7 +157,12 @@ const CheckinSubmit: React.FC = () => {
         ? cached.key
         : createIdempotencyKey()
       submitIdempotencyKeyRef.current = { key: idempotencyKey, fingerprint }
-      const response = await apiClient.post(`/checkins/${checkinId}/submit`, payload, {
+      const response = await apiClient.post(`/checkins/${checkinId}/submit`, {
+        ...payload,
+        // Keep revision outside the payload fingerprint so retries of the
+        // same content retain their key and fail closed on a stale read.
+        expectedRevision: submission?.revision ?? 0,
+      }, {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
 

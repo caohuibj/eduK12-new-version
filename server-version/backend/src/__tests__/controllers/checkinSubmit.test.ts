@@ -28,7 +28,7 @@ import { hashIdempotencyKey, hashIdempotencyPayload } from '../../utils/idempote
 
 const makeReq = (overrides: any = {}) => ({
   user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
-  body: { content: 'today' },
+  body: { content: 'today', expectedRevision: 0 },
   params: { id: 'ck-1' },
   query: {},
   ...overrides,
@@ -246,6 +246,37 @@ describe('logged-in checkin submit endTime', () => {
 
     expect(res.body.code).toBe(0)
     expect(res.body.data.content).toBe('today A')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a late keyed first request after another key creates the submission', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    const winningSubmission = {
+      id: 'sub-1',
+      content: 'today B',
+      images: [],
+      revision: 1,
+      idempotencyKeyHash: hashIdempotencyKey('checkin-winning-key'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today B', images: [] }),
+    }
+    mockPrisma.checkinSubmission.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue(winningSubmission)
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(winningSubmission)
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A', expectedRevision: 0 },
+      header: vi.fn().mockReturnValue('checkin-late-key'),
+    }), res)
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toBe('提交版本已过期，请刷新后重试')
     expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
     expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
   })

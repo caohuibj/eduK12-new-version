@@ -19,7 +19,7 @@ import { hashIdempotencyKey, hashIdempotencyPayload } from '../../utils/idempote
 
 const makeReq = (overrides: any = {}) => ({
   user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
-  body: { content: 'done' },
+  body: { content: 'done', expectedRevision: 0 },
   params: { id: 'asg-1' },
   query: {},
   ...overrides,
@@ -241,6 +241,36 @@ describe('assignment submit deadline', () => {
 
     expect(res.body.code).toBe(0)
     expect(res.body.data.content).toBe('answer A')
+    expect(mockPrisma.submission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.submissionHistory.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a late keyed first request after another key creates the submission', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      id: 'asg-1',
+      courseId: 'course-1',
+      status: AssignmentStatus.PUBLISHED,
+      deadline: null,
+    })
+    mockPrisma.submission.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue({
+      id: 'sub-1',
+      content: 'answer B',
+      answers: {},
+      revision: 1,
+      idempotencyKeyHash: hashIdempotencyKey('assignment-winning-key'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'answer B', answers: {} }),
+      })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      body: { content: 'answer A', expectedRevision: 0 },
+      header: vi.fn().mockReturnValue('assignment-late-key'),
+    }), res)
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toBe('提交版本已过期，请刷新后重试')
     expect(mockPrisma.submission.update).not.toHaveBeenCalled()
     expect(mockPrisma.submissionHistory.create).not.toHaveBeenCalled()
   })

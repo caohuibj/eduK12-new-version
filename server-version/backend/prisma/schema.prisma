@@ -166,6 +166,10 @@ model Submission {
   id           String              @id @default(uuid())
   assignmentId String              @map("assignment_id")
   studentId    String              @map("student_id")
+  // Monotonic optimistic-concurrency revision.  A keyed submit must carry
+  // the revision it read so a delayed request can never overwrite a newer
+  // commit after the idempotency receipt window has been missed.
+  revision     Int                 @default(0)
   content      String?
   answers      Json?
   comment      String?
@@ -245,6 +249,8 @@ model CheckinSubmission {
   id          String              @id @default(uuid())
   checkinId   String              @map("checkin_id")
   studentId   String?             @map("student_id")
+  // Monotonic optimistic-concurrency revision for authenticated submissions.
+  revision    Int                 @default(0)
   content     String?
   images      Json?
   createdAt   DateTime            @default(now()) @map("created_at")

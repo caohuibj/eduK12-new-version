@@ -97,9 +97,44 @@ class IdempotencyPayloadMismatchError extends Error {
   }
 }
 
+class SubmissionRevisionConflictError extends Error {
+  constructor() {
+    super('提交版本已过期，请刷新后重试')
+    this.name = 'SubmissionRevisionConflictError'
+  }
+}
+
+const submissionRevision = (submission: { revision?: unknown } | null | undefined): number => (
+  typeof submission?.revision === 'number'
+    && Number.isInteger(submission.revision)
+    && submission.revision >= 0
+    ? submission.revision
+    : 0
+)
+
+/**
+ * Keyed browser submissions carry the revision they read. Older clients that
+ * omit it are treated as revision zero, which is safe for first writes and
+ * rejects updates once a migrated row has advanced. Unkeyed legacy requests
+ * retain their historical behaviour unless they explicitly provide a
+ * revision.
+ */
+const assertSubmissionRevision = (
+  existing: { revision?: unknown },
+  expectedRevision: number | undefined,
+  hasIdempotencyKey: boolean,
+) => {
+  const requestedRevision = expectedRevision ?? (hasIdempotencyKey ? 0 : undefined)
+  if (requestedRevision === undefined) return
+  if (submissionRevision(existing) !== requestedRevision) {
+    throw new SubmissionRevisionConflictError()
+  }
+}
+
 const submitSchema = z.object({
   content: z.string().optional(),
   answers: z.record(z.string()).optional(),
+  expectedRevision: z.number().int().nonnegative().optional(),
 })
 
 const gradeSchema = z.object({
@@ -551,7 +586,7 @@ export const assignmentController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { content, answers } = result.data
+      const { content, answers, expectedRevision } = result.data
       const normalizedAnswers = answers || {}
       let idempotencyKeyHash: string | undefined
       try {
@@ -644,11 +679,16 @@ export const assignmentController = {
         let existing = await findExistingSubmission(tx, id, userId)
 
         if (!existing) {
+          const requestedRevision = expectedRevision ?? (idempotencyKeyHash ? 0 : undefined)
+          if (requestedRevision !== undefined && requestedRevision !== 0) {
+            throw new SubmissionRevisionConflictError()
+          }
           try {
             const created = await tx.submission.create({
               data: {
                 assignmentId: id,
                 studentId: userId,
+                revision: 1,
                 content,
                 answers: normalizedAnswers,
                 status: SubmissionStatus.SUBMITTED,
@@ -695,6 +735,12 @@ export const assignmentController = {
           return { submission: existing, wasExisting: true }
         }
 
+        // The advisory transaction lock serializes writers; this revision
+        // check makes the serialized order observable to clients as an OCC
+        // conflict instead of allowing a late first request to overwrite a
+        // newer keyed submission that has no receipt yet.
+        assertSubmissionRevision(existing, expectedRevision, Boolean(idempotencyKeyHash))
+
         const latestHistory = await tx.submissionHistory.findFirst({
           where: { submissionId: existing.id },
           orderBy: { version: 'desc' },
@@ -716,6 +762,7 @@ export const assignmentController = {
             answers: normalizedAnswers,
             submittedAt: new Date(),
             status: SubmissionStatus.SUBMITTED,
+            revision: { increment: 1 },
             ...(idempotencyKeyHash
               ? { idempotencyKeyHash, idempotencyPayloadHash }
               : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
@@ -742,6 +789,9 @@ export const assignmentController = {
       return success(res, submissionResult.submission, message)
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
+        return error(res, err.message, -1, 409)
+      }
+      if (err instanceof SubmissionRevisionConflictError) {
         return error(res, err.message, -1, 409)
       }
       logger.error('提交作业错误', err)

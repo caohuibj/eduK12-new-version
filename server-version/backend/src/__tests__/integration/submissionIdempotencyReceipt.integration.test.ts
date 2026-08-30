@@ -18,6 +18,8 @@ let userId = ''
 let courseId = ''
 let assignmentId = ''
 let checkinId = ''
+let raceAssignmentId = ''
+let raceCheckinId = ''
 
 const invoke = async (controller: any, id: string, body: unknown, key: string) => {
   const req = {
@@ -71,6 +73,14 @@ suite('submission idempotency receipts (real PostgreSQL)', () => {
       data: { courseId, creatorId: userId, title: `receipt-checkin-${suffix}` },
     })
     checkinId = checkin.id
+    const raceAssignment = await prisma.assignment.create({
+      data: { courseId, title: `receipt-race-assignment-${suffix}`, status: 'PUBLISHED' },
+    })
+    raceAssignmentId = raceAssignment.id
+    const raceCheckin = await prisma.checkin.create({
+      data: { courseId, creatorId: userId, title: `receipt-race-checkin-${suffix}` },
+    })
+    raceCheckinId = raceCheckin.id
   })
 
   afterAll(async () => {
@@ -83,11 +93,11 @@ suite('submission idempotency receipts (real PostgreSQL)', () => {
   })
 
   it('replays an old assignment key without overwriting a newer payload', async () => {
-    const first = await invoke(assignmentController, assignmentId, { content: 'answer A' }, 'receipt-assignment-k1')
+    const first = await invoke(assignmentController, assignmentId, { content: 'answer A', expectedRevision: 0 }, 'receipt-assignment-k1')
     expect(first.statusCode).toBe(200)
-    const second = await invoke(assignmentController, assignmentId, { content: 'answer B' }, 'receipt-assignment-k2')
+    const second = await invoke(assignmentController, assignmentId, { content: 'answer B', expectedRevision: 1 }, 'receipt-assignment-k2')
     expect(second.statusCode).toBe(200)
-    const delayed = await invoke(assignmentController, assignmentId, { content: 'answer A' }, 'receipt-assignment-k1')
+    const delayed = await invoke(assignmentController, assignmentId, { content: 'answer A', expectedRevision: 1 }, 'receipt-assignment-k1')
     expect(delayed.statusCode).toBe(200)
     expect(delayed.body.data.content).toBe('answer A')
 
@@ -99,11 +109,11 @@ suite('submission idempotency receipts (real PostgreSQL)', () => {
   })
 
   it('replays an old check-in key without overwriting a newer payload', async () => {
-    const first = await invoke(checkinController, checkinId, { content: 'today A', images: [] }, 'receipt-checkin-k1')
+    const first = await invoke(checkinController, checkinId, { content: 'today A', images: [], expectedRevision: 0 }, 'receipt-checkin-k1')
     expect(first.statusCode).toBe(200)
-    const second = await invoke(checkinController, checkinId, { content: 'today B', images: [] }, 'receipt-checkin-k2')
+    const second = await invoke(checkinController, checkinId, { content: 'today B', images: [], expectedRevision: 1 }, 'receipt-checkin-k2')
     expect(second.statusCode).toBe(200)
-    const delayed = await invoke(checkinController, checkinId, { content: 'today A', images: [] }, 'receipt-checkin-k1')
+    const delayed = await invoke(checkinController, checkinId, { content: 'today A', images: [], expectedRevision: 1 }, 'receipt-checkin-k1')
     expect(delayed.statusCode).toBe(200)
     expect(delayed.body.data.content).toBe('today A')
 
@@ -112,5 +122,57 @@ suite('submission idempotency receipts (real PostgreSQL)', () => {
     })
     expect(row?.content).toBe('today B')
     expect(await prisma.checkinSubmissionIdempotencyReceipt.count({ where: { checkinId, studentId: userId } })).toBe(2)
+  })
+
+  it('rejects a delayed first assignment key after a newer key wins creation', async () => {
+    const winning = await invoke(
+      assignmentController,
+      raceAssignmentId,
+      { content: 'answer B', expectedRevision: 0 },
+      'receipt-race-assignment-k2',
+    )
+    expect(winning.statusCode).toBe(200)
+
+    const delayed = await invoke(
+      assignmentController,
+      raceAssignmentId,
+      { content: 'answer A', expectedRevision: 0 },
+      'receipt-race-assignment-k1',
+    )
+    expect(delayed.statusCode).toBe(409)
+    expect(delayed.body.message).toBe('提交版本已过期，请刷新后重试')
+
+    const row = await prisma.submission.findUnique({
+      where: { assignmentId_studentId: { assignmentId: raceAssignmentId, studentId: userId } },
+    })
+    expect(row?.content).toBe('answer B')
+    expect(row?.revision).toBe(1)
+    expect(await prisma.submissionIdempotencyReceipt.count({ where: { assignmentId: raceAssignmentId, studentId: userId } })).toBe(1)
+  })
+
+  it('rejects a delayed first check-in key after a newer key wins creation', async () => {
+    const winning = await invoke(
+      checkinController,
+      raceCheckinId,
+      { content: 'today B', images: [], expectedRevision: 0 },
+      'receipt-race-checkin-k2',
+    )
+    expect(winning.statusCode).toBe(200)
+
+    const delayed = await invoke(
+      checkinController,
+      raceCheckinId,
+      { content: 'today A', images: [], expectedRevision: 0 },
+      'receipt-race-checkin-k1',
+    )
+    expect(delayed.statusCode).toBe(409)
+    expect(delayed.body.message).toBe('提交版本已过期，请刷新后重试')
+
+    const row = await prisma.checkinSubmission.findUnique({
+      where: { checkinId_studentId: { checkinId: raceCheckinId, studentId: userId } },
+    })
+    expect(row?.content).toBe('today B')
+    expect(row?.revision).toBe(1)
+    expect(await prisma.checkinSubmissionIdempotencyReceipt.count({ where: { checkinId: raceCheckinId, studentId: userId } })).toBe(1)
   })
 })

@@ -134,8 +134,15 @@ const AssignmentSubmit: React.FC = () => {
         ? cached.key
         : createIdempotencyKey()
       submitIdempotencyKeyRef.current = { key: idempotencyKey, fingerprint }
-      const response = await apiClient.post(`/assignments/${assignmentId}/submit`, {
+      const requestPayload = {
         ...payload,
+        // Revision is a concurrency guard, not part of the logical payload
+        // fingerprint. A retry of the same content keeps its key and fails
+        // closed if another writer advanced the submission in the meantime.
+        expectedRevision: submission?.revision ?? 0,
+      }
+      const response = await apiClient.post(`/assignments/${assignmentId}/submit`, {
+        ...requestPayload,
       }, {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
