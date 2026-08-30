@@ -898,7 +898,7 @@ export const checkinController = {
             if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
               throw new IdempotencyPayloadMismatchError()
             }
-            return { saved: committedReceipt.response, wasExisting: true }
+            return { saved: committedReceipt.response, wasExisting: true, replayed: true }
           }
         }
 
@@ -965,13 +965,16 @@ export const checkinController = {
         courseId: checkin.courseId,
         checkinId: id,
         parentAccess: true,
-      }), submission.wasExisting ? '打卡更新成功' : '打卡成功')
+      }), submission.replayed ? '打卡成功' : submission.wasExisting ? '打卡更新成功' : '打卡成功')
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }
       logger.error('提交打卡错误', err)
-      return error(res, Messages.COMMON.FAILED)
+      // The transaction may already be committed when response hydration or
+      // signing fails. Return a 5xx so the client retains its key and retries
+      // the same payload instead of generating a new write.
+      return error(res, Messages.COMMON.FAILED, -1, 500)
     }
   },
 

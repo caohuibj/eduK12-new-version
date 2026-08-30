@@ -95,6 +95,24 @@ describe('assignment submit deadline', () => {
     expect(mockPrisma.submission.create).toHaveBeenCalledOnce()
   })
 
+  it('returns 5xx for an unexpected write failure so a keyed retry is retained', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      id: 'asg-1',
+      courseId: 'course-1',
+      status: AssignmentStatus.PUBLISHED,
+      deadline: null,
+    })
+    mockPrisma.submission.findFirst.mockResolvedValue(null)
+    mockPrisma.submission.create.mockRejectedValue(new Error('database unavailable'))
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      header: vi.fn().mockReturnValue('assignment-server-error'),
+    }), res)
+
+    expect(res.statusCode).toBe(500)
+  })
+
   it('returns an idempotent success for a retried request with the same key', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',

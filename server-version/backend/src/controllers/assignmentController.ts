@@ -634,7 +634,7 @@ export const assignmentController = {
             if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
               throw new IdempotencyPayloadMismatchError()
             }
-            return { submission: committedReceipt.response, wasExisting: true }
+            return { submission: committedReceipt.response, wasExisting: true, replayed: true }
           }
         }
 
@@ -734,13 +734,21 @@ export const assignmentController = {
         return { submission: updated, wasExisting: true }
       })
 
-      return success(res, submissionResult.submission, submissionResult.wasExisting ? '作业更新成功' : '作业提交成功')
+      const message = submissionResult.replayed
+        ? '作业提交成功'
+        : submissionResult.wasExisting
+          ? '作业更新成功'
+          : '作业提交成功'
+      return success(res, submissionResult.submission, message)
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }
       logger.error('提交作业错误', err)
-      return error(res, '提交作业失败')
+      // An unknown failure may occur after the database write is committed
+      // (for example while constructing the response). Mark it as a 5xx so
+      // clients retain the idempotency key and safely retry the same payload.
+      return error(res, '提交作业失败', -1, 500)
     }
   },
 

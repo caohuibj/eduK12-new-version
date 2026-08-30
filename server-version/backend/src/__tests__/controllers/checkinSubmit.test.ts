@@ -109,6 +109,24 @@ describe('logged-in checkin submit endTime', () => {
     expect(mockPrisma.checkinSubmission.create).toHaveBeenCalledOnce()
   })
 
+  it('returns 5xx for an unexpected write or hydration failure so a keyed retry is retained', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.checkinSubmission.create.mockRejectedValue(new Error('database unavailable'))
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      header: vi.fn().mockReturnValue('checkin-server-error'),
+    }), res)
+
+    expect(res.statusCode).toBe(500)
+  })
+
   it('returns an idempotent success for a retried request with the same key', async () => {
     mockPrisma.checkin.findUnique.mockResolvedValue({
       id: 'ck-1',
