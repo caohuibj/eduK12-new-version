@@ -37,6 +37,47 @@ export type QuestionnaireProgressResult = {
   collectionReport: any | null
 }
 
+type IncrementalQuestionnaireAssessment = {
+  id: string
+  status: string
+  progress: number
+  completedScales: number
+  completedForms: number
+}
+
+export type IncrementalQuestionnaireProgressResult = {
+  completedScales: number
+  completedForms: number
+  progress: number
+}
+
+/**
+ * Update the cached form counter without materialising the questionnaire graph.
+ * The caller must have already validated and persisted the affected answer in
+ * the same serializable transaction. `increment` is deliberately expressed as
+ * a Prisma field operation so concurrent answers cannot lose a counter update.
+ */
+export const applyQuestionnaireProgressDelta = async (
+  db: DatabaseClient,
+  assessment: IncrementalQuestionnaireAssessment,
+  completedFormsDelta: number,
+  totalItems: number,
+): Promise<IncrementalQuestionnaireProgressResult> => {
+  const completedScales = Math.max(0, assessment.completedScales)
+  const completedForms = Math.max(0, assessment.completedForms + completedFormsDelta)
+  const completedItems = completedScales + completedForms
+  const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))
+
+  const data: Prisma.QuestionnaireAssessmentUpdateManyMutationInput = { progress }
+  if (completedFormsDelta !== 0) data.completedForms = { increment: completedFormsDelta }
+  await db.questionnaireAssessment.updateMany({
+    where: { id: assessment.id, status: 'IN_PROGRESS' },
+    data,
+  })
+
+  return { completedScales, completedForms, progress }
+}
+
 /**
  * Recomputes cached questionnaire progress from child rows and performs the
  * final state transition conditionally.  This function must be called from a

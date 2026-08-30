@@ -70,6 +70,9 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
   it('does not submit an optional blank answer and requires an explicit skip', async () => {
     mockClient.get.mockResolvedValue(response(formData(false)))
     mockClient.post.mockResolvedValue(response(null))
+    mockClient.patch.mockImplementation(async (_url: string, body: { answers: Array<{ checkpointSequence: number }> }) => (
+      response({ acceptedSequences: body.answers.map((answer) => answer.checkpointSequence) })
+    ))
     const user = userEvent.setup()
 
     renderPage()
@@ -81,9 +84,11 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     expect(mockClient.post).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: /跳\s*过/ }))
-    await waitFor(() => expect(mockClient.post).toHaveBeenCalledWith(
-      '/assessments/session-1/form-answer',
-      { formItemId: 'form-item-1', action: 'skip' },
+    await waitFor(() => expect(mockClient.patch).toHaveBeenCalledWith(
+      '/assessments/session-1/form-answers/batch',
+      expect.objectContaining({
+        answers: [expect.objectContaining({ formItemId: 'form-item-1', action: 'skip', checkpointSequence: expect.any(Number) })],
+      }),
     ))
   })
 
@@ -92,6 +97,9 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
       .mockResolvedValueOnce(response(formData(false)))
       .mockRejectedValueOnce(new Error('temporary network failure'))
     mockClient.post.mockResolvedValue(response(null))
+    mockClient.patch.mockImplementation(async (_url: string, body: { answers: Array<{ checkpointSequence: number }> }) => (
+      response({ acceptedSequences: body.answers.map((answer) => answer.checkpointSequence) })
+    ))
     const user = userEvent.setup()
 
     renderPage()

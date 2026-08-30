@@ -6,9 +6,23 @@ import {
   readSessionLedger,
   writeSessionLedger,
 } from './session-ledger'
-import { initialRunnerState, runnerReducer, type RunnerAction } from './runner.state'
+import { initialRunnerState, runnerReducer } from './runner.state'
 import type { RunnerError, RunnerState } from './runner.types'
 import { wrapCognitiveTrial } from './trial-envelope'
+import { checkpointScheduler } from '../../../services/persistence/checkpointScheduler'
+import type { CheckpointBatch } from '../../../services/persistence/checkpointTypes'
+import { useCheckpointLifecycle } from '../../../services/persistence/flushLifecycle'
+
+interface CognitiveCheckpointPayload {
+  trialIndex: number
+  payload: unknown
+}
+
+const cognitiveBatchSize = () => {
+  const configured = Number(import.meta.env.VITE_COGNITIVE_BATCH_SIZE)
+  if (!Number.isFinite(configured)) return 5
+  return Math.min(10, Math.max(1, Math.floor(configured)))
+}
 
 /**
  * Runner 核心 hook（Stage B v1.1 §20/§21）。
@@ -43,6 +57,28 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
 
+  const cognitiveCheckpointTransport = useCallback(async (batch: CheckpointBatch<CognitiveCheckpointPayload>) => {
+    if (api.appendTrials) {
+      const response = await api.appendTrials(sessionId, batch.records.map((record) => record.payload))
+      if (response.code !== 0) throw new Error(response.message || '试次提交失败')
+      return {
+        acceptedSequences: batch.records.map((record) => record.sequence),
+      }
+    }
+
+    for (const record of batch.records) {
+      const response = await api.appendTrial(sessionId, record.payload.trialIndex, record.payload.payload)
+      if (response.code !== 0) throw new Error(response.message || '试次提交失败')
+    }
+    return { acceptedSequences: batch.records.map((record) => record.sequence) }
+  }, [api, sessionId])
+
+  const flushCognitiveCheckpoints = useCallback(async () => {
+    await checkpointScheduler.flush('cognitive', sessionId)
+  }, [sessionId])
+
+  useCheckpointLifecycle(flushCognitiveCheckpoints, Boolean(sessionId))
+
   const load = useCallback(async () => {
     dispatch({ type: 'LOADING' })
     try {
@@ -52,6 +88,11 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         return
       }
       const session: CognitiveSession = response.data
+
+      checkpointScheduler.register('cognitive', sessionId, cognitiveCheckpointTransport, {
+        maxBatchSize: cognitiveBatchSize(),
+        maxWaitMs: 2000,
+      })
 
       if (session.status === 'COMPLETED') {
         dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
@@ -66,20 +107,31 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         dispatch({ type: 'RUNNER_UNSUPPORTED' })
         return
       }
-      // 优先使用本地账本；匿名恢复跨设备时，服务端提供的 nextTrialIndex 是已保存试次计数，
-      // 不需要猜测或重复提交旧试次。
       const ledger = readSessionLedger(sessionId)
-      if (!ledger && session.nextTrialIndex === undefined) {
+      const pending = await checkpointScheduler.pending('cognitive', sessionId)
+      const pendingNextTrialIndex = pending.reduce((nextIndex, record) => {
+        const payload = record.payload as CognitiveCheckpointPayload
+        return Math.max(nextIndex, payload.trialIndex + 1)
+      }, 0)
+      if (!ledger && session.nextTrialIndex === undefined && pendingNextTrialIndex === 0) {
         dispatch({ type: 'RECOVERY_REQUIRED' })
         return
       }
-      const trialIndex = ledger ? ledger.trialIndex + 1 : session.nextTrialIndex!
+      // 优先使用本地账本；未 ACK 的 durable checkpoint 也属于本地可证明进度。
+      const trialIndex = Math.max(
+        ledger ? ledger.trialIndex + 1 : 0,
+        session.nextTrialIndex ?? 0,
+        pendingNextTrialIndex,
+      )
       writeSessionLedger(sessionId, { status: session.status, trialIndex: trialIndex - 1 })
       dispatch({ type: 'SESSION_LOADED', session, trialIndex })
+      void checkpointScheduler.flush('cognitive', sessionId).catch((err) => {
+        dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(err) })
+      })
     } catch (err) {
       dispatch({ type: 'SESSION_ERROR', error: friendlyError(err) })
     }
-  }, [api, sessionId])
+  }, [api, cognitiveCheckpointTransport, sessionId])
 
   useEffect(() => {
     void load()
@@ -98,12 +150,16 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         const submittedPayload = session?.protocolSignature
           ? wrapCognitiveTrial({ trialIndex: nextIndex, payload })
           : payload
-        const response = await api.appendTrial(sessionId, nextIndex, submittedPayload)
-        if (response.code !== 0) {
-          dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(response) })
-          return false
-        }
-        // 只有 append 成功后才写账本（可证明进度）
+        await checkpointScheduler.enqueue({
+          scopeType: 'cognitive',
+          scopeId: sessionId,
+          payload: { trialIndex: nextIndex, payload: submittedPayload },
+        }, cognitiveCheckpointTransport, {
+          maxBatchSize: cognitiveBatchSize(),
+          maxWaitMs: 2000,
+        })
+        // durable append 成功后即可恢复；服务端 ACK 在后台批量到达，
+        // complete 会再次强制 flush，确保评分前所有 trial 已落库。
         writeSessionLedger(sessionId, { status: 'IN_PROGRESS', trialIndex: nextIndex })
         dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
         return true
@@ -118,12 +174,15 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         return false
       }
     },
-    [api, sessionId]
+    [cognitiveCheckpointTransport, sessionId]
   )
 
   const complete = useCallback(async () => {
     dispatch({ type: 'COMPLETE_START' })
     try {
+      await checkpointScheduler.flush('cognitive', sessionId)
+      const pending = await checkpointScheduler.pending('cognitive', sessionId)
+      if (pending.length > 0) throw new Error('试次仍在同步，请稍后重试')
       const response = await api.completeSession(sessionId)
       if (response.code !== 0 || !response.data) {
         dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(response) })

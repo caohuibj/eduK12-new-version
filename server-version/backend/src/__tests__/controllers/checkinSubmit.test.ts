@@ -316,7 +316,7 @@ describe('logged-in checkin submit endTime', () => {
     })
     mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
     mockPrisma.storedAsset.findMany.mockResolvedValue([{ id: 'asset-1' }])
-    mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
+    mockPrisma.assetReference.findMany.mockResolvedValue([])
     mockPrisma.checkinSubmission.create.mockResolvedValue({ id: 'sub-asset' })
     const res = makeRes()
 

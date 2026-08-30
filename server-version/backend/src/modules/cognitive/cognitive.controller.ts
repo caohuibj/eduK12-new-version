@@ -18,12 +18,14 @@ import {
   createSessionSchema,
   restartSessionSchema,
   appendTrialSchema,
+  appendTrialsSchema,
   completeSessionSchema,
   cognitiveExportQuerySchema,
   cognitiveExportRequestSchema,
   cognitivePublicTokenSchema,
   cognitivePublicStartSchema,
   cognitivePublicTrialSchema,
+  cognitivePublicTrialsSchema,
   cognitivePublicRecoverySchema,
 } from './cognitive.schema'
 import { z } from 'zod'
@@ -246,6 +248,16 @@ export const cognitiveController = {
     }
   },
 
+  async appendPublicTrials(req: Request, res: Response) {
+    try {
+      const input = cognitivePublicTrialsSchema.parse(req.body)
+      const trials = await publicCognitiveService.appendTrials(req.params.id, input.recoveryToken, input.trials)
+      return success(res, { saved: trials.length, trials }, '试次已记录')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
   async completePublicSession(req: Request, res: Response) {
     try {
       const input = cognitivePublicRecoverySchema.parse(req.body)
@@ -406,6 +418,17 @@ export const cognitiveController = {
       const input = appendTrialSchema.parse(req.body)
       const data = await trialService.appendTrial(req.user.userId, req.params.id, input)
       return success(res, data, '试次已记录')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async appendTrials(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = appendTrialsSchema.parse(req.body)
+      const trials = await trialService.appendTrials(req.user.userId, req.params.id, input.trials)
+      return success(res, { saved: trials.length, trials }, '试次已记录')
     } catch (err) {
       return handleError(res, err)
     }

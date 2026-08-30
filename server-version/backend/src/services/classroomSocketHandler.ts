@@ -18,6 +18,7 @@ import { prisma } from '../config/database'
 import { config } from '../config'
 import { logger } from '../utils/logger'
 import { StatsAggregator } from './statsAggregator'
+import { ClassroomStatsScheduler } from './classroomStatsScheduler'
 import {
   generateClassroomResumeToken,
   verifyClassroomResumeToken,
@@ -102,6 +103,9 @@ const classroomQuestionPayload = (question: any): Record<string, unknown> | null
 export class ClassroomSocketHandler {
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
   private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly statsScheduler = new ClassroomStatsScheduler(
+    (classroomId, questionId) => this.broadcastStats(classroomId, questionId),
+  )
 
   initialize(): void {
     const namespace = socketService.getClassroomNamespace()
@@ -837,7 +841,7 @@ export class ClassroomSocketHandler {
         'broadcast:finished',
         { questionId }
       )
-      await this.broadcastStats(classroomId, questionId)
+      this.statsScheduler.schedule(classroomId, questionId)
 
       logger.info('答题计时结束', { classroomId, questionId })
     } catch {
@@ -937,23 +941,9 @@ export class ClassroomSocketHandler {
             'broadcast:finished',
             { questionId: question.id }
           )
-          await this.broadcastStats(classroomId, question.id)
+          this.statsScheduler.schedule(classroomId, question.id)
         }
         this.emitError(socket, '答题已结束，无法提交答案')
-        return
-      }
-
-      const existingAnswer = await prisma.classroomAnswer.findUnique({
-        where: {
-          questionId_sessionId: {
-            questionId: question.id,
-            sessionId: session.id,
-          },
-        },
-        select: { id: true },
-      })
-      if (existingAnswer) {
-        this.emitError(socket, '您已提交过答案')
         return
       }
 
@@ -974,7 +964,7 @@ export class ClassroomSocketHandler {
         questionId: question.id,
         success: true,
       })
-      await this.broadcastStats(classroomId, question.id)
+      this.statsScheduler.schedule(classroomId, question.id)
     } catch (error: any) {
       if (error?.code === 'P2002') {
         this.emitError(socket, '您已提交过答案')
@@ -1043,7 +1033,7 @@ export class ClassroomSocketHandler {
           'broadcast:finished',
           { questionId: question.id }
         )
-        await this.broadcastStats(classroom.id, question.id)
+        this.statsScheduler.schedule(classroom.id, question.id)
       }
 
       logger.info('教师结束答题', {
@@ -1114,7 +1104,7 @@ export class ClassroomSocketHandler {
           'broadcast:finished',
           { questionId: question.id }
         )
-        await this.broadcastStats(classroom.id, question.id)
+        this.statsScheduler.schedule(classroom.id, question.id)
       }
 
       logger.info('大屏结束答题', {

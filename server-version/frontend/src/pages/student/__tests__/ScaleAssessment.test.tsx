@@ -61,86 +61,102 @@ const assessment = {
   answers: [],
 }
 
-const renderPage = () => render(
+let assessmentForTest = assessment
+
+const renderPage = (id = `assessment-${Date.now()}-${Math.random()}`) => {
+  assessmentForTest = { ...assessment, id, answers: [] }
+  return render(
   <MemoryRouter initialEntries={['/student/scales/scale-1']}>
     <Routes>
       <Route path="/student/scales/:scaleId" element={<ScaleAssessment />} />
       <Route path="/student/scales/result/:assessmentId" element={<div>RESULT_PAGE</div>} />
     </Routes>
   </MemoryRouter>,
-)
+  )
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
   mockPost.mockImplementation((path: string) => (
     path === '/scales/scale-1/assessments'
-      ? Promise.resolve({ code: 0, data: { assessment, scale } })
+      ? Promise.resolve({ code: 0, data: { assessment: assessmentForTest, scale } })
       : Promise.resolve({ code: 0 })
   ))
-  mockPatch.mockResolvedValue({ code: 0 })
+  mockPatch.mockImplementation((_path: string, body: { answers?: Array<{ checkpointId: string; checkpointSequence: number }> }) => Promise.resolve({
+    code: 0,
+    data: {
+      acceptedIds: body.answers?.map((answer) => answer.checkpointId) || [],
+      acceptedSequences: body.answers?.map((answer) => answer.checkpointSequence) || [],
+    },
+  }))
 })
 
 describe('ScaleAssessment answer navigation', () => {
-  it('submits the current answer and advances only after the save succeeds', async () => {
-    let resolvePatch!: (value: { code: number }) => void
+  it('appends locally and advances before the batched network flush', async () => {
+    let resolvePatch!: (value: { code: number; data?: { acceptedIds: string[]; acceptedSequences: number[] } }) => void
     mockPatch.mockReturnValueOnce(new Promise((resolve) => {
       resolvePatch = resolve
     }))
     const user = userEvent.setup()
-    renderPage()
+    const id = `assessment-batch-${Date.now()}`
+    renderPage(id)
 
     expect(await screen.findByText('第一题内容')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '选项 A' }))
 
-    expect(mockPatch).toHaveBeenCalledWith(
-      '/scales/assessments/assessment-1/answers',
-      expect.objectContaining({
-        itemCode: 'item-1',
-        responseValue: 'never',
-        responseTimeMs: expect.any(Number),
-      }),
-    )
-    expect(screen.getByText('第一题内容')).toBeInTheDocument()
-    expect(screen.queryByText('第二题内容')).not.toBeInTheDocument()
-
-    resolvePatch({ code: 0 })
+    expect(mockPatch).not.toHaveBeenCalled()
     expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '选项 C' }))
+    await user.click(screen.getByRole('button', { name: '完成测评' }))
+    await waitFor(() => expect(mockPatch).toHaveBeenCalledWith(
+      `/scales/assessments/${id}/answers/batch`,
+      expect.objectContaining({
+        answers: expect.arrayContaining([
+          expect.objectContaining({ itemCode: 'item-1', responseValue: 'never' }),
+        ]),
+      }),
+    ))
+    const body = mockPatch.mock.calls[0][1] as { answers: Array<{ checkpointId: string; checkpointSequence: number }> }
+    resolvePatch({
+      code: 0,
+      data: {
+        acceptedIds: body.answers.map((answer) => answer.checkpointId),
+        acceptedSequences: body.answers.map((answer) => answer.checkpointSequence),
+      },
+    })
+    expect(await screen.findByText('RESULT_PAGE')).toBeInTheDocument()
   })
 
-  it('stays on the current question when saving fails', async () => {
+  it('keeps the pending checkpoint when the batch flush fails', async () => {
     mockPatch.mockResolvedValueOnce({ code: 500, message: '保存失败' })
     const user = userEvent.setup()
-    renderPage()
+    renderPage(`assessment-failure-${Date.now()}`)
 
     expect(await screen.findByText('第一题内容')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '选项 A' }))
 
-    await waitFor(() => expect(mockPatch).toHaveBeenCalledTimes(1))
-    await waitFor(() => expect(screen.getByRole('button', { name: '选项 A' })).toBeEnabled())
-    expect(screen.getByText('第一题内容')).toBeInTheDocument()
-    expect(screen.queryByText('第二题内容')).not.toBeInTheDocument()
+    expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '选项 C' }))
+    await user.click(screen.getByRole('button', { name: '完成测评' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('保存失败'))
+    expect(screen.getByText('第二题内容')).toBeInTheDocument()
   })
 
-  it('blocks duplicate answer saves while the current answer is pending', async () => {
-    let resolvePatch!: (value: { code: number }) => void
-    mockPatch.mockReturnValueOnce(new Promise((resolve) => {
-      resolvePatch = resolve
-    }))
+  it('does not issue one network request per answer', async () => {
     const user = userEvent.setup()
-    renderPage()
+    renderPage(`assessment-one-request-${Date.now()}`)
 
     expect(await screen.findByText('第一题内容')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '选项 A' }))
-    await user.click(screen.getByRole('button', { name: '选项 B' }))
 
-    expect(mockPatch).toHaveBeenCalledTimes(1)
-    resolvePatch({ code: 0 })
     expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+    expect(mockPatch).not.toHaveBeenCalled()
   })
 
   it('keeps the last question visible and only completes after an explicit click', async () => {
     const user = userEvent.setup()
-    renderPage()
+    renderPage(`assessment-complete-${Date.now()}`)
 
     expect(await screen.findByText('第一题内容')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '选项 A' }))
@@ -153,8 +169,9 @@ describe('ScaleAssessment answer navigation', () => {
     expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments')
 
     await user.click(screen.getByRole('button', { name: '完成测评' }))
+    await waitFor(() => expect(mockPatch).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2))
-    expect(mockPost).toHaveBeenLastCalledWith('/scales/assessments/assessment-1/complete')
+    expect(mockPost).toHaveBeenLastCalledWith(expect.stringMatching(/^\/scales\/assessments\/assessment-complete-\d+\/complete$/))
     expect(await screen.findByText('RESULT_PAGE')).toBeInTheDocument()
   })
 })

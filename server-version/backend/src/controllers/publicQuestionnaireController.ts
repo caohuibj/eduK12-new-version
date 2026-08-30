@@ -35,6 +35,8 @@ import { writeContextFormAnswer } from '../modules/assessment-context'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
+import { applyQuestionnaireProgressDelta } from '../services/questionnaireProgressService'
+import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -903,7 +905,13 @@ export const publicQuestionnaireController = {
               },
             },
             questionnaireAssessment: {
-              select: { id: true, sessionId: true, status: true },
+              select: {
+                id: true,
+                sessionId: true,
+                status: true,
+                contextSnapshotEncrypted: true,
+                contextSnapshotHash: true,
+              },
             },
           },
         })
@@ -935,7 +943,9 @@ export const publicQuestionnaireController = {
           return { kind: 'invalid-answer' as const }
         }
 
-        await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
+        if (!assessment.questionnaireAssessment.contextSnapshotEncrypted || !assessment.questionnaireAssessment.contextSnapshotHash) {
+          await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
+        }
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
@@ -965,6 +975,138 @@ export const publicQuestionnaireController = {
       return success(res, { saved: true })
     } catch (err) {
       logger.error('提交答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, '提交答案失败')
+    }
+  },
+
+  /**
+   * 批量提交量表答案。公开恢复凭据只绑定一个 session，批量写入
+   * 仍在同一个 serializable transaction 中完成，并返回显式 checkpoint ACK。
+   */
+  async submitAnswers(req: Request, res: Response) {
+    try {
+      const { sessionId } = req.params
+      const schema = z.object({
+        checkpointSequence: z.number().int().positive().optional(),
+        answers: z.array(z.object({
+          checkpointId: z.string().min(1).optional(),
+          checkpointSequence: z.number().int().positive().optional(),
+          scaleAssessmentId: z.string().min(1),
+          itemCode: z.string().min(1),
+          responseValue: z.union([z.string(), z.number().finite()]),
+          responseTimeMs: z.number().finite().nonnegative().optional(),
+        })).min(1).max(10),
+      })
+      const parsed = schema.safeParse(req.body)
+      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+      const { answers } = parsed.data
+      const scaleAssessmentId = answers[0].scaleAssessmentId
+      if (answers.some((answer) => answer.scaleAssessmentId !== scaleAssessmentId)) {
+        return error(res, '一次批量请求只能包含同一量表测评的答案', -1, 400)
+      }
+
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const assessment = await tx.assessment.findUnique({
+          where: { id: scaleAssessmentId },
+          include: {
+            scale: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                instrumentVersion: true,
+                instrumentClass: true,
+                definition: true,
+              },
+            },
+            questionnaireAssessment: {
+              select: {
+                id: true,
+                sessionId: true,
+                status: true,
+                contextSnapshotEncrypted: true,
+                contextSnapshotHash: true,
+              },
+            },
+          },
+        })
+
+        if (!assessment) return { kind: 'not-found' as const }
+        if (!assessment.questionnaireAssessment || assessment.questionnaireAssessment.sessionId !== sessionId) {
+          return { kind: 'forbidden' as const }
+        }
+        if (assessment.status === 'COMPLETED' || assessment.questionnaireAssessment.status === 'COMPLETED') {
+          return { kind: 'completed' as const }
+        }
+        if (assessment.status !== 'IN_PROGRESS' || assessment.questionnaireAssessment.status !== 'IN_PROGRESS') {
+          return { kind: 'closed' as const }
+        }
+
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const normalizedAnswers = answers.map((answer) => ({
+          itemCode: answer.itemCode,
+          responseValue: answer.responseValue,
+          ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
+          answeredAt: new Date().toISOString(),
+        }))
+        for (const answer of normalizedAnswers) {
+          try {
+            validateScaleAnswer(definition, answer)
+          } catch {
+            return { kind: 'invalid-answer' as const }
+          }
+        }
+
+        if (!assessment.questionnaireAssessment.contextSnapshotEncrypted || !assessment.questionnaireAssessment.contextSnapshotHash) {
+          await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
+        }
+
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const nextAnswers = [...stored.answers]
+        for (const answer of normalizedAnswers) {
+          const existingIndex = nextAnswers.findIndex((candidate) => candidate.itemCode === answer.itemCode)
+          const previous = existingIndex >= 0 ? nextAnswers[existingIndex] : undefined
+          const isReplay = previous
+            && previous.responseValue === answer.responseValue
+            && previous.responseTimeMs === answer.responseTimeMs
+          const nextAnswer = isReplay
+            ? previous
+            : { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
+          if (existingIndex >= 0) nextAnswers[existingIndex] = nextAnswer
+          else nextAnswers.push(nextAnswer)
+        }
+        const progress = definition.items.length === 0
+          ? 100
+          : Math.round((new Set(nextAnswers.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
+        const updated = await tx.assessment.updateMany({
+          where: { id: scaleAssessmentId, status: 'IN_PROGRESS', questionnaireAssessmentId: assessment.questionnaireAssessment.id },
+          data: { answers: encryptScaleAnswers(nextAnswers), progress },
+        })
+        if (updated.count !== 1) return { kind: 'closed' as const }
+        return {
+          kind: 'saved' as const,
+          acceptedIds: answers.flatMap((answer) => answer.checkpointId ? [answer.checkpointId] : []),
+          acceptedSequences: answers.flatMap((answer) => answer.checkpointSequence ? [answer.checkpointSequence] : []),
+          progress,
+        }
+      })
+
+      if (result.kind === 'not-found') return notFound(res, '量表测评不存在')
+      if (result.kind === 'forbidden') return error(res, '量表测评不属于当前会话', 403)
+      if (result.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (result.kind === 'invalid-answer') return error(res, '回答值不属于该题目的响应集', -1, 400)
+      if (result.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员', -1, 500)
+      return success(res, {
+        saved: answers.length,
+        progress: result.progress,
+        acceptedIds: result.acceptedIds,
+        acceptedSequences: result.acceptedSequences,
+      })
+    } catch (err) {
+      logger.error('批量提交公开量表答案错误', err)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, '提交答案失败')
     }
@@ -1187,6 +1329,7 @@ export const publicQuestionnaireController = {
             questionnaire: {
               include: {
                 formItems: true,
+                questionnaireScales: { select: { id: true } },
               },
             },
           },
@@ -1213,6 +1356,16 @@ export const publicQuestionnaireController = {
           const validationMessage = validateQuestionnaireFormAnswer(formItem, value)
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
+        const previousFormAnswer = await tx.questionnaireFormAnswer.findUnique({
+          where: {
+            questionnaireAssessmentId_formItemId: {
+              questionnaireAssessmentId: questionnaireAssessment.id,
+              formItemId,
+            },
+          },
+          select: { status: true, value: true },
+        })
+        const wasComplete = isFormAnswerComplete(formItem, previousFormAnswer)
         const normalizedValue = action === 'answer' && value !== undefined
           ? normalizeQuestionnaireFormAnswer(formItem, value)
           : value
@@ -1222,7 +1375,7 @@ export const publicQuestionnaireController = {
             ? JSON.stringify(normalizedValue)
             : String(normalizedValue)
         const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
-        await tx.questionnaireFormAnswer.upsert({
+        const formAnswer = await tx.questionnaireFormAnswer.upsert({
           where: {
             questionnaireAssessmentId_formItemId: {
               questionnaireAssessmentId: questionnaireAssessment.id,
@@ -1241,8 +1394,14 @@ export const publicQuestionnaireController = {
           },
         })
 
-        await refreshQuestionnaireProgress(tx, questionnaireAssessment.id)
-        return { kind: 'saved' as const }
+        const isComplete = isFormAnswerComplete(formItem, formAnswer)
+        const progress = await applyQuestionnaireProgressDelta(
+          tx,
+          questionnaireAssessment,
+          Number(isComplete) - Number(wasComplete),
+          questionnaireAssessment.questionnaire.formItems.length + questionnaireAssessment.questionnaire.questionnaireScales.length,
+        )
+        return { kind: 'saved' as const, progress }
       })
 
       if (result.kind === 'not-found') {
@@ -1265,10 +1424,146 @@ export const publicQuestionnaireController = {
       if (result.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (result.kind === 'invalid-context-answer') return error(res, result.message)
 
-      return success(res, { formItemId, value }, '答案已保存')
+      return success(res, {
+        formItemId,
+        value,
+        progress: result.progress.progress,
+        completedForms: result.progress.completedForms,
+      }, '答案已保存')
     } catch (err) {
       logger.error('提交表单答案错误', err)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, '提交失败')
+    }
+  },
+
+  /**
+   * 批量提交表单题目答案。公开恢复凭据只绑定一个 session，批量写入
+   * 仍在同一个 serializable transaction 中完成，并返回显式 checkpoint ACK。
+   */
+  async submitFormAnswers(req: Request, res: Response) {
+    try {
+      const { sessionId } = req.params
+      const schema = z.object({
+        checkpointSequence: z.number().int().positive().optional(),
+        answers: z.array(z.object({
+          checkpointId: z.string().min(1).optional(),
+          checkpointSequence: z.number().int().positive().optional(),
+          formItemId: z.string().min(1),
+          action: z.enum(['answer', 'skip']).optional(),
+          value: z.union([z.string(), z.array(z.string())]).optional(),
+        }).superRefine((input, ctx) => {
+          if ((input.action || 'answer') === 'answer' && input.value === undefined) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: '回答值不能为空', path: ['value'] })
+          }
+        })).min(1).max(10),
+      })
+      const parsed = schema.safeParse(req.body)
+      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+      const { answers } = parsed.data
+
+      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
+          where: { sessionId },
+          include: {
+            questionnaire: {
+              include: {
+                formItems: true,
+                questionnaireScales: { select: { id: true } },
+              },
+            },
+          },
+        })
+        if (!questionnaireAssessment) return { kind: 'not-found' as const }
+        if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
+        if (questionnaireAssessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
+
+        const itemsById = new Map(questionnaireAssessment.questionnaire.formItems.map((item) => [item.id, item]))
+        if (answers.some((answer) => !itemsById.has(answer.formItemId))) return { kind: 'form-not-found' as const }
+        if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
+          if (answers.some((answer) => itemsById.get(answer.formItemId)?.contextKey)) return { kind: 'context-frozen' as const }
+        }
+        for (const answer of answers) {
+          const item = itemsById.get(answer.formItemId)!
+          const action = answer.action || 'answer'
+          if (action === 'skip' && (item.required || item.contextKey)) return { kind: 'skip-not-allowed' as const }
+          if (action === 'answer') {
+            const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
+            if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
+          }
+        }
+
+        const existingAnswers = await tx.questionnaireFormAnswer.findMany({
+          where: {
+            questionnaireAssessmentId: questionnaireAssessment.id,
+            formItemId: { in: [...new Set(answers.map((answer) => answer.formItemId))] },
+          },
+          select: { formItemId: true, status: true, value: true },
+        })
+        const currentAnswers = new Map(existingAnswers.map((answer) => [answer.formItemId, answer]))
+        let completedFormsDelta = 0
+        for (const answer of answers) {
+          const item = itemsById.get(answer.formItemId)!
+          const action = answer.action || 'answer'
+          const wasComplete = isFormAnswerComplete(item, currentAnswers.get(answer.formItemId))
+          const normalizedValue = action === 'answer' && answer.value !== undefined
+            ? normalizeQuestionnaireFormAnswer(item, answer.value)
+            : answer.value
+          const value = action === 'skip' ? null : (Array.isArray(normalizedValue) ? JSON.stringify(normalizedValue) : String(normalizedValue))
+          const storedValue = value === null ? null : writeContextFormAnswer(item.contextKey, value)
+          const formAnswer = await tx.questionnaireFormAnswer.upsert({
+            where: {
+              questionnaireAssessmentId_formItemId: {
+                questionnaireAssessmentId: questionnaireAssessment.id,
+                formItemId: answer.formItemId,
+              },
+            },
+            create: {
+              questionnaireAssessmentId: questionnaireAssessment.id,
+              formItemId: answer.formItemId,
+              value: storedValue,
+              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
+            },
+            update: {
+              value: storedValue,
+              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
+            },
+          })
+          const isComplete = isFormAnswerComplete(item, formAnswer)
+          completedFormsDelta += Number(isComplete) - Number(wasComplete)
+          currentAnswers.set(answer.formItemId, formAnswer)
+        }
+
+        const progress = await applyQuestionnaireProgressDelta(
+          tx,
+          questionnaireAssessment,
+          completedFormsDelta,
+          questionnaireAssessment.questionnaire.formItems.length + questionnaireAssessment.questionnaire.questionnaireScales.length,
+        )
+        return {
+          kind: 'saved' as const,
+          progress,
+          acceptedIds: answers.flatMap((answer) => answer.checkpointId ? [answer.checkpointId] : []),
+          acceptedSequences: answers.flatMap((answer) => answer.checkpointSequence ? [answer.checkpointSequence] : []),
+        }
+      })
+
+      if (result.kind === 'not-found') return notFound(res, '测评不存在')
+      if (result.kind === 'form-not-found') return error(res, '表单题目不存在')
+      if (result.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
+      if (result.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
+      if (result.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (result.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
+      if (result.kind === 'invalid-context-answer') return error(res, result.message)
+      return success(res, {
+        saved: answers.length,
+        progress: result.progress.progress,
+        completedForms: result.progress.completedForms,
+        acceptedIds: result.acceptedIds,
+        acceptedSequences: result.acceptedSequences,
+      }, '答案已保存')
+    } catch (err) {
+      logger.error('批量提交表单答案错误', err)
       return error(res, '提交失败')
     }
   },

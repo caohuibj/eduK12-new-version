@@ -35,6 +35,7 @@ router.post('/:id/assessments', authenticate, questionnaireController.startAsses
 router.post('/assessments/:assessmentId/form-answers', authenticate, questionnaireController.saveFormAnswer)
 
 // 批量保存表单答案
+router.patch('/assessments/:assessmentId/form-answers/batch', authenticate, questionnaireController.saveFormAnswers)
 router.post('/assessments/:assessmentId/form-answers/batch', authenticate, questionnaireController.saveFormAnswers)
 
 // ==================== 管理端接口（教师和管理员） ====================

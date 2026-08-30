@@ -626,6 +626,7 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
       await markSessionCompleted(session.testType === 'reaction' ? restartedReaction : session)
     }
 
+    await compositeService.finalizeCompositeAttemptIfReady(fixture.attemptId)
     const state = await compositeService.getAttemptState(fixture.attemptId, { userId })
     expect(state).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 3, totalItems: 3 })
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(1)
@@ -637,8 +638,10 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     const fixture = await createPackageCompletionFixture(true)
     for (const session of fixture.sessions) await markSessionCompleted(session)
 
-    await expect(compositeService.getAttemptState(fixture.attemptId, { userId }))
+    await expect(compositeService.finalizeCompositeAttemptIfReady(fixture.attemptId))
       .rejects.toThrow('报告包')
+    await expect(compositeService.getAttemptState(fixture.attemptId, { userId }))
+      .resolves.toMatchObject({ status: 'IN_PROGRESS' })
     expect((await prisma.compositeAssessmentAttempt.findUnique({ where: { id: fixture.attemptId } }))?.status)
       .toBe('IN_PROGRESS')
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
@@ -653,14 +656,14 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
       { itemCode: fixture.scaleQuestionId, responseValue: 3 },
       { userId },
     )
-    expect(afterAnswer.status).toBe('IN_PROGRESS')
+    expect(afterAnswer).toMatchObject({ saved: true })
 
     const afterScale = await compositeService.completeScale(
       fixture.attemptId,
       fixture.scaleItemId,
       { userId },
     )
-    expect(afterScale.status).toBe('IN_PROGRESS')
+    expect(afterScale).toMatchObject({ completed: true })
 
     const completed = await compositeService.saveFormAnswer(
       fixture.attemptId,
@@ -668,7 +671,9 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
       'fixture answer',
       { userId },
     )
-    expect(completed).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 2, totalItems: 2 })
+    expect(completed).toMatchObject({ saved: true, finalized: true })
+    const completedState = await compositeService.getAttemptState(fixture.attemptId, { userId })
+    expect(completedState).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 2, totalItems: 2 })
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
   })
 })

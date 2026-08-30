@@ -8,7 +8,7 @@ import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
-import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { applyQuestionnaireProgressDelta, refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
@@ -1161,6 +1161,7 @@ export const questionnaireController = {
             questionnaire: {
               include: {
                 formItems: true,
+                questionnaireScales: { select: { id: true } },
               },
             },
           },
@@ -1192,6 +1193,17 @@ export const questionnaireController = {
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
 
+        const previousFormAnswer = await tx.questionnaireFormAnswer.findUnique({
+          where: {
+            questionnaireAssessmentId_formItemId: {
+              questionnaireAssessmentId: assessmentId,
+              formItemId,
+            },
+          },
+          select: { status: true, value: true },
+        })
+        const wasComplete = isFormAnswerComplete(formItem, previousFormAnswer)
+
         const normalizedValue = action === 'answer' && value !== undefined
           ? normalizeQuestionnaireFormAnswer(formItem, value)
           : value
@@ -1220,8 +1232,14 @@ export const questionnaireController = {
           },
         })
 
-        await refreshQuestionnaireProgress(tx, assessmentId)
-        return { kind: 'saved' as const, formAnswer, contextKey: formItem.contextKey }
+        const isComplete = isFormAnswerComplete(formItem, formAnswer)
+        const progress = await applyQuestionnaireProgressDelta(
+          tx,
+          qa,
+          Number(isComplete) - Number(wasComplete),
+          qa.questionnaire.formItems.length + qa.questionnaire.questionnaireScales.length,
+        )
+        return { kind: 'saved' as const, formAnswer, contextKey: formItem.contextKey, progress }
       })
 
       if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
@@ -1240,6 +1258,8 @@ export const questionnaireController = {
         value: outcome.formAnswer.value === null
           ? null
           : readContextFormAnswer(outcome.contextKey, outcome.formAnswer.value),
+        progress: outcome.progress.progress,
+        completedForms: outcome.progress.completedForms,
       }, '表单答案保存成功')
     } catch (err) {
       logger.error('保存表单答案错误', err)
@@ -1254,7 +1274,10 @@ export const questionnaireController = {
       const { assessmentId } = req.params
 
       const saveFormAnswersSchema = z.object({
+        checkpointSequence: z.number().int().positive().optional(),
         answers: z.array(z.object({
+          checkpointId: z.string().min(1).optional(),
+          checkpointSequence: z.number().int().positive().optional(),
           formItemId: z.string(),
           action: z.enum(['answer', 'skip']).optional(),
           value: z.union([z.string(), z.array(z.string())]).optional(),
@@ -1262,7 +1285,7 @@ export const questionnaireController = {
           if ((input.action || 'answer') === 'answer' && input.value === undefined) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: '回答值不能为空', path: ['value'] })
           }
-        })),
+        })).min(1).max(10),
       })
 
       const result = saveFormAnswersSchema.safeParse(req.body)
@@ -1277,7 +1300,10 @@ export const questionnaireController = {
           where: { id: assessmentId },
           include: {
             questionnaire: {
-              include: { formItems: true },
+              include: {
+                formItems: true,
+                questionnaireScales: { select: { id: true } },
+              },
             },
           },
         })
@@ -1306,14 +1332,26 @@ export const questionnaireController = {
           }
         }
 
+        const existingAnswers = await tx.questionnaireFormAnswer.findMany({
+          where: {
+            questionnaireAssessmentId: assessmentId,
+            formItemId: { in: [...new Set(answers.map((answer) => answer.formItemId))] },
+          },
+          select: { formItemId: true, status: true, value: true },
+        })
+        const currentAnswers = new Map(existingAnswers.map((answer) => [answer.formItemId, answer]))
+        let completedFormsDelta = 0
+
         for (const answer of answers) {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
           const action = answer.action || 'answer'
+          if (!item) return { kind: 'form-not-found' as const }
+          const wasComplete = isFormAnswerComplete(item, currentAnswers.get(answer.formItemId))
           const normalizedValue = action === 'answer' && answer.value !== undefined
-            ? normalizeQuestionnaireFormAnswer(item || { type: 'unknown' }, answer.value)
+            ? normalizeQuestionnaireFormAnswer(item, answer.value)
             : answer.value
           const value = action === 'skip' ? null : (Array.isArray(normalizedValue) ? JSON.stringify(normalizedValue) : normalizedValue as string)
-          await tx.questionnaireFormAnswer.upsert({
+          const formAnswer = await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
                 questionnaireAssessmentId: assessmentId,
@@ -1331,10 +1369,23 @@ export const questionnaireController = {
               status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
             },
           })
+          const isComplete = isFormAnswerComplete(item, formAnswer)
+          completedFormsDelta += Number(isComplete) - Number(wasComplete)
+          currentAnswers.set(answer.formItemId, formAnswer)
         }
 
-        await refreshQuestionnaireProgress(tx, assessmentId)
-        return { kind: 'saved' as const }
+        const progress = await applyQuestionnaireProgressDelta(
+          tx,
+          qa,
+          completedFormsDelta,
+          qa.questionnaire.formItems.length + qa.questionnaire.questionnaireScales.length,
+        )
+        return {
+          kind: 'saved' as const,
+          progress,
+          acceptedIds: answers.flatMap((answer) => answer.checkpointId ? [answer.checkpointId] : []),
+          acceptedSequences: answers.flatMap((answer) => answer.checkpointSequence ? [answer.checkpointSequence] : []),
+        }
       })
 
       if (outcome.kind === 'not-found') return notFound(res, '问卷测评不存在')
@@ -1348,7 +1399,13 @@ export const questionnaireController = {
 
       logger.info('批量保存表单答案', { assessmentId, count: answers.length, userId })
 
-      return success(res, { saved: answers.length }, '表单答案保存成功')
+      return success(res, {
+        saved: answers.length,
+        progress: outcome.progress.progress,
+        completedForms: outcome.progress.completedForms,
+        acceptedIds: outcome.acceptedIds,
+        acceptedSequences: outcome.acceptedSequences,
+      }, '表单答案保存成功')
     } catch (err) {
       logger.error('批量保存表单答案错误', err)
       return error(res, '保存表单答案失败')

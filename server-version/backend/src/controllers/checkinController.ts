@@ -336,17 +336,41 @@ const syncSubmissionAssetReferences = async (
   images: Array<string | SubmissionAssetImage>,
   db: AssetDatabase = prisma,
 ) => {
-  await db.assetReference.deleteMany({
-    where: { entityType: 'CheckinSubmission', entityId: submissionId, field: 'images' },
-  })
+  const desired = images
+    .filter(isSubmissionAssetImage)
+    .map((image) => ({ assetId: image.assetId, field: 'images' }))
+  const existing = typeof db.assetReference.findMany === 'function'
+    ? (await db.assetReference.findMany({
+      where: { entityType: 'CheckinSubmission', entityId: submissionId, field: 'images' },
+      select: { assetId: true, field: true },
+    }) || [])
+    : []
+  const desiredKeys = new Set(desired.map((reference) => `${reference.assetId}:${reference.field}`))
+  const staleAssetIds = existing
+    .filter((reference: { assetId: string; field: string }) => !desiredKeys.has(`${reference.assetId}:${reference.field}`))
+    .map((reference: { assetId: string }) => reference.assetId)
 
+  if (staleAssetIds.length > 0) {
+    await db.assetReference.deleteMany({
+      where: {
+        entityType: 'CheckinSubmission',
+        entityId: submissionId,
+        field: 'images',
+        assetId: { in: staleAssetIds },
+      },
+    })
+  }
+
+  const existingKeys = new Set(existing.map((reference: { assetId: string; field: string }) => `${reference.assetId}:${reference.field}`))
   await Promise.all(
-    images.filter(isSubmissionAssetImage).map((image) => attachAssetReference({
-      assetId: image.assetId,
-      entityType: 'CheckinSubmission',
-      entityId: submissionId,
-      field: 'images',
-    }, db)),
+    desired
+      .filter((reference) => !existingKeys.has(`${reference.assetId}:${reference.field}`))
+      .map((reference) => attachAssetReference({
+        assetId: reference.assetId,
+        entityType: 'CheckinSubmission',
+        entityId: submissionId,
+        field: reference.field,
+      }, db)),
   )
 }
 

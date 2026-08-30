@@ -13,6 +13,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import {
+  applyQuestionnaireProgressDelta,
   refreshQuestionnaireProgress,
   withSerializableQuestionnaireTransaction,
 } from '../../services/questionnaireProgressService'
@@ -50,6 +51,7 @@ const makeQa = (overrides: Record<string, unknown> = {}) => ({
 describe('questionnaire progress consistency', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     mockPrisma.questionnaireAssessment.updateMany.mockResolvedValue({ count: 1 })
   })
 
@@ -120,5 +122,35 @@ describe('questionnaire progress consistency', () => {
     })).resolves.toBe('ok')
 
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2)
+  })
+
+  it('uses an atomic field increment for a newly completed form', async () => {
+    const result = await applyQuestionnaireProgressDelta(
+      mockPrisma as any,
+      { id: 'qa-1', status: 'IN_PROGRESS', progress: 0, completedScales: 1, completedForms: 0 },
+      1,
+      2,
+    )
+
+    expect(result).toEqual({ completedScales: 1, completedForms: 1, progress: 100 })
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith({
+      where: { id: 'qa-1', status: 'IN_PROGRESS' },
+      data: { completedForms: { increment: 1 }, progress: 100 },
+    })
+  })
+
+  it('does not write a counter delta when an existing form is edited', async () => {
+    const result = await applyQuestionnaireProgressDelta(
+      mockPrisma as any,
+      { id: 'qa-1', status: 'IN_PROGRESS', progress: 50, completedScales: 0, completedForms: 1 },
+      0,
+      2,
+    )
+
+    expect(result).toEqual({ completedScales: 0, completedForms: 1, progress: 50 })
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith({
+      where: { id: 'qa-1', status: 'IN_PROGRESS' },
+      data: { progress: 50 },
+    })
   })
 })

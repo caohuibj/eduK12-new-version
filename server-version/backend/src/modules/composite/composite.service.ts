@@ -1694,6 +1694,10 @@ const createAttempt = async (
   credential?: ReturnType<typeof createRecoveryCredential>,
   attemptNo = 1,
 ) => {
+  const completedItems = composite.items.filter((item: any) => !item.required && !item.contextKey).length
+  const progress = composite.items.length === 0
+    ? 100
+    : Math.round((completedItems / composite.items.length) * 100)
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
@@ -1703,6 +1707,8 @@ const createAttempt = async (
       participantKey: credential?.participantKey ?? `user:${userId}`,
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
+      completedItems,
+      progress,
     },
   })
   await createChildRecords(db, attempt, composite.items, userId)
@@ -2031,6 +2037,29 @@ const isAttemptItemCompleted = (
 const countAttemptCompletedItems = (attempt: any, maps = attemptCompletedItemMaps(attempt)) =>
   attempt.compositeAssessment.items.filter((item: any) => isAttemptItemCompleted(item, maps)).length
 
+const markCompositeItemCompleted = async (tx: Db, attemptId: string, increment: boolean) => {
+  const current = await tx.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: { status: true, completedItems: true, compositeAssessmentId: true },
+  })
+  if (!current || current.status !== 'IN_PROGRESS') return false
+  const totalItems = await tx.compositeAssessmentItem.count({ where: { compositeAssessmentId: current.compositeAssessmentId } })
+  const completedItems = increment
+    ? Math.min(totalItems, current.completedItems + 1)
+    : current.completedItems
+  if (increment) {
+    await tx.compositeAssessmentAttempt.updateMany({
+      where: { id: attemptId, status: 'IN_PROGRESS' },
+      data: {
+        completedItems,
+        progress: totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 100,
+        lastSavedAt: new Date(),
+      },
+    })
+  }
+  return totalItems > 0 && completedItems >= totalItems
+}
+
 /**
  * Parent Attempt finalization and reanalysis are serialized on the Attempt
  * row. Child modules commit their own frozen result rows first; this check
@@ -2039,7 +2068,7 @@ const countAttemptCompletedItems = (attempt: any, maps = attemptCompletedItemMap
  * changes, so any analysis/encryption/DB failure rolls completion back as one
  * transaction.
  */
-const finalizeAttemptIfReady = async (attemptId: string) => prisma.$transaction(async (tx: Db) => {
+export const finalizeCompositeAttemptIfReady = async (attemptId: string) => prisma.$transaction(async (tx: Db) => {
   await lockCompositeAttempt(tx, attemptId)
   const attempt = await loadAttemptForFinalization(tx, attemptId)
   const maps = attemptCompletedItemMaps(attempt)
@@ -2106,8 +2135,6 @@ const finalizeAttemptIfReady = async (attemptId: string) => prisma.$transaction(
 })
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
-  await findAttempt(attemptId, context)
-  await finalizeAttemptIfReady(attemptId)
   const attempt = await findAttempt(attemptId, context)
   const readableFormAnswers = readContextFormAnswers(
     attempt.compositeAssessment.items
@@ -2259,7 +2286,7 @@ export const saveAttempt = async (
 export const saveFormAnswer = async (attemptId: string, itemId: string, value: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
   if (item.type !== 'FORM') throw compositeBadRequest('当前模块不是表单')
-  await prisma.$transaction(async (tx: Db) => {
+  const shouldFinalize = await prisma.$transaction(async (tx: Db) => {
     await lockCompositeAttempt(tx, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
@@ -2292,10 +2319,16 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
       const values = item.formType === 'multiple_choice' ? value.split(',').filter(Boolean) : (value ? [value] : [])
       if (values.some((candidate) => !allowed.has(candidate)) || new Set(values).size !== values.length) throw compositeBadRequest('表单选项无效')
     }
+    const existing = await tx.compositeFormAnswer.findUnique({
+      where: { attemptId_itemId: { attemptId, itemId } },
+      select: { completed: true },
+    })
     const storedValue = writeContextFormAnswer(item.contextKey, value)
     await tx.compositeFormAnswer.upsert({ where: { attemptId_itemId: { attemptId, itemId } }, create: { attemptId, itemId, value: storedValue, completed: true }, update: { value: storedValue, completed: true } })
+    return markCompositeItemCompleted(tx, attemptId, !existing?.completed)
   })
-  return getAttemptState(attempt.id, context)
+  if (shouldFinalize) await finalizeCompositeAttemptIfReady(attempt.id)
+  return { saved: true, finalized: shouldFinalize }
 }
 
 export const saveScaleAnswer = async (
@@ -2327,7 +2360,15 @@ export const saveScaleAnswer = async (
     await lockCompositeAttempt(tx, attemptId)
     const locked = await lockScaleAssessment(tx, assessment.id)
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
-    await freezeCompositeAttemptContext(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: { status: true, contextSnapshotEncrypted: true, contextSnapshotHash: true },
+    })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
+    if (!current.contextSnapshotEncrypted || !current.contextSnapshotHash) {
+      await freezeCompositeAttemptContext(tx, attemptId)
+    }
     const decoded = readScaleAnswers(locked.answers)
     if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
     const answers = decoded.answers
@@ -2350,7 +2391,7 @@ export const saveScaleAnswer = async (
       },
     })
   })
-  return getAttemptState(attempt.id, context)
+  return { saved: true }
 }
 
 export const completeScale = async (attemptId: string, itemId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
@@ -2358,14 +2399,26 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
   if (item.type !== 'SCALE') throw compositeBadRequest('当前模块不是量表')
   const assessment = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === itemId)
   if (!assessment) throw compositeNotFound('量表测评记录不存在')
-  if (assessment.status === 'COMPLETED') return getAttemptState(attempt.id, context)
-  const didComplete = await prisma.$transaction(async (tx: Db) => {
+  const result = await prisma.$transaction(async (tx: Db) => {
     await lockCompositeAttempt(tx, attemptId)
     const locked = await lockScaleAssessment(tx, assessment.id)
-    if (locked.status === 'COMPLETED') return false
+    if (locked.status === 'COMPLETED') {
+      return { didComplete: false, shouldFinalize: await markCompositeItemCompleted(tx, attemptId, false) }
+    }
     if (locked.status !== 'IN_PROGRESS') throw compositeBadRequest('量表模块已结束')
     if (!item.scale?.definition) throw compositeBadRequest('量表尚未安装有效的 v2 definition')
-    const contextSnapshot = await freezeCompositeAttemptContext(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: { status: true, contextSnapshotEncrypted: true, contextSnapshotHash: true },
+    })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.status !== 'IN_PROGRESS') throw compositeBadRequest('综合测评已结束')
+    const contextSnapshot = current.contextSnapshotEncrypted && current.contextSnapshotHash
+      ? readCompositeAttemptContext(current)
+      : await freezeCompositeAttemptContext(tx, attemptId)
+    if (('decryptError' in contextSnapshot && contextSnapshot.decryptError) || !contextSnapshot.context || !contextSnapshot.hash) {
+      throw compositeBadRequest('人口学上下文无法读取，请联系管理员')
+    }
     const decoded = readScaleAnswers(locked.answers)
     if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
     const answers = decoded.answers
@@ -2390,10 +2443,10 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
         totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
       },
     })
-    return true
+    return { didComplete: true, shouldFinalize: await markCompositeItemCompleted(tx, attemptId, true) }
   })
-  if (!didComplete) return getAttemptState(attempt.id, context)
-  return getAttemptState(attempt.id, context)
+  if (result.shouldFinalize) await finalizeCompositeAttemptIfReady(attempt.id)
+  return { completed: true, finalized: result.shouldFinalize }
 }
 
 export const buildCompositeReport = (attempt: any) => {
