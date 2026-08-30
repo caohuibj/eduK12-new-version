@@ -10,6 +10,7 @@ import PdfViewer from '../../components/PdfViewer'
 import {
   createIdempotencyKey,
   fingerprintIdempotencyPayload,
+  submissionErrorMessage,
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
@@ -181,7 +182,7 @@ const CheckinSubmit: React.FC = () => {
       if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert('打卡失败')
+      alert(submissionErrorMessage(error, '打卡失败'))
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)

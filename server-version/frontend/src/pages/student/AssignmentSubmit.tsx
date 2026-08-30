@@ -9,6 +9,7 @@ import { sanitizeHtml } from '../../utils/sanitize'
 import {
   createIdempotencyKey,
   fingerprintIdempotencyPayload,
+  submissionErrorMessage,
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
@@ -164,7 +165,7 @@ const AssignmentSubmit: React.FC = () => {
       if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert(error.message || '提交失败')
+      alert(submissionErrorMessage(error, '提交失败'))
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)

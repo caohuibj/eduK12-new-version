@@ -45,3 +45,10 @@ export const shouldClearIdempotencyKey = (error: unknown): boolean => {
   if (status === 408 || status === 425 || status === 429) return false
   return status >= 400 && status < 500
 }
+
+/** Preserve an API-provided conflict message while keeping a safe fallback. */
+export const submissionErrorMessage = (error: unknown, fallback: string): string => {
+  if (!error || typeof error !== 'object') return fallback
+  const message = (error as { message?: unknown }).message
+  return typeof message === 'string' && message.trim().length > 0 ? message : fallback
+}
