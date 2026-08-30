@@ -6,7 +6,12 @@ import type { Assignment, Submission, MediaItem, DocumentItem } from '../../type
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import PdfViewer from '../../components/PdfViewer'
 import { sanitizeHtml } from '../../utils/sanitize'
-import { createIdempotencyKey, fingerprintIdempotencyPayload } from '../../utils/idempotency'
+import {
+  createIdempotencyKey,
+  fingerprintIdempotencyPayload,
+  submissionErrorMessage,
+  shouldClearIdempotencyKey,
+} from '../../utils/idempotency'
 
 const AssignmentSubmit: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>()
@@ -130,8 +135,15 @@ const AssignmentSubmit: React.FC = () => {
         ? cached.key
         : createIdempotencyKey()
       submitIdempotencyKeyRef.current = { key: idempotencyKey, fingerprint }
-      const response = await apiClient.post(`/assignments/${assignmentId}/submit`, {
+      const requestPayload = {
         ...payload,
+        // Revision is a concurrency guard, not part of the logical payload
+        // fingerprint. A retry of the same content keeps its key and fails
+        // closed if another writer advanced the submission in the meantime.
+        expectedRevision: submission?.revision ?? 0,
+      }
+      const response = await apiClient.post(`/assignments/${assignmentId}/submit`, {
+        ...requestPayload,
       }, {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
@@ -147,13 +159,13 @@ const AssignmentSubmit: React.FC = () => {
         alert(response.message || '提交失败')
       }
     } catch (error: any) {
-      // Axios rejects non-2xx API responses with the parsed response body;
-      // those are definitive failures, not transport retries. Do not keep a
-      // key that the server rejected for a validation/conflict response.
-      if (error && typeof error.code === 'number') {
+      // Only an explicit, non-retryable 4xx rejection invalidates this key.
+      // Network errors, timeouts and 5xx responses may follow a committed
+      // write, so retain the key for an idempotent retry of the same payload.
+      if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert(error.message || '提交失败')
+      alert(submissionErrorMessage(error, '提交失败'))
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)

@@ -7,7 +7,12 @@ import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, Doc
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import PdfViewer from '../../components/PdfViewer'
-import { createIdempotencyKey, fingerprintIdempotencyPayload } from '../../utils/idempotency'
+import {
+  createIdempotencyKey,
+  fingerprintIdempotencyPayload,
+  submissionErrorMessage,
+  shouldClearIdempotencyKey,
+} from '../../utils/idempotency'
 
 interface OtherSubmission {
   id: string
@@ -153,7 +158,12 @@ const CheckinSubmit: React.FC = () => {
         ? cached.key
         : createIdempotencyKey()
       submitIdempotencyKeyRef.current = { key: idempotencyKey, fingerprint }
-      const response = await apiClient.post(`/checkins/${checkinId}/submit`, payload, {
+      const response = await apiClient.post(`/checkins/${checkinId}/submit`, {
+        ...payload,
+        // Keep revision outside the payload fingerprint so retries of the
+        // same content retain their key and fail closed on a stale read.
+        expectedRevision: submission?.revision ?? 0,
+      }, {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
 
@@ -166,12 +176,13 @@ const CheckinSubmit: React.FC = () => {
         alert(response.message || '打卡失败')
       }
     } catch (error: any) {
-      // Axios rejects non-2xx API responses with the parsed response body;
-      // those are definitive failures, not transport retries.
-      if (error && typeof error.code === 'number') {
+      // Only an explicit, non-retryable 4xx rejection invalidates this key.
+      // Hydration failures after commit, network errors, timeouts and 5xx
+      // responses must retain it for a safe retry of the same payload.
+      if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert('打卡失败')
+      alert(submissionErrorMessage(error, '打卡失败'))
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)

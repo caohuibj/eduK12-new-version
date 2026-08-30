@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     checkin: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
     checkinSubmission: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+    checkinSubmissionIdempotencyReceipt: { findFirst: vi.fn(), create: vi.fn() },
     storedAsset: { findMany: vi.fn() },
     assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     $executeRaw: vi.fn(),
@@ -27,7 +28,7 @@ import { hashIdempotencyKey, hashIdempotencyPayload } from '../../utils/idempote
 
 const makeReq = (overrides: any = {}) => ({
   user: { userId: 'student-1', username: 's1', role: UserRole.STUDENT },
-  body: { content: 'today' },
+  body: { content: 'today', expectedRevision: 0 },
   params: { id: 'ck-1' },
   query: {},
   ...overrides,
@@ -55,7 +56,9 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.assetReference.upsert.mockResolvedValue({})
     mockPrisma.assetReference.findMany.mockResolvedValue([])
     mockPrisma.assetReference.count.mockResolvedValue(0)
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
     mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst.mockResolvedValue(null)
     mockPrisma.$executeRaw.mockResolvedValue(0)
     mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
@@ -106,6 +109,24 @@ describe('logged-in checkin submit endTime', () => {
     expect(mockPrisma.checkinSubmission.create).toHaveBeenCalledOnce()
   })
 
+  it('returns 5xx for an unexpected write or hydration failure so a keyed retry is retained', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue(null)
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(null)
+    mockPrisma.checkinSubmission.create.mockRejectedValue(new Error('database unavailable'))
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      header: vi.fn().mockReturnValue('checkin-server-error'),
+    }), res)
+
+    expect(res.statusCode).toBe(500)
+  })
+
   it('returns an idempotent success for a retried request with the same key', async () => {
     mockPrisma.checkin.findUnique.mockResolvedValue({
       id: 'ck-1',
@@ -151,6 +172,111 @@ describe('logged-in checkin submit endTime', () => {
 
     expect(res.statusCode).toBe(409)
     expect(res.body.message).toBe('Idempotency-Key 已用于其他提交内容')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('replays an older key from its immutable receipt after a newer submit', async () => {
+    const oldKeyHash = hashIdempotencyKey('checkin-old-key')
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst.mockResolvedValue({
+      idempotencyKeyHash: oldKeyHash,
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today A', images: [] }),
+      response: {
+        id: 'sub-1',
+        checkinId: 'ck-1',
+        studentId: 'student-1',
+        content: 'today A',
+        images: [],
+      },
+    })
+    mockPrisma.checkinSubmission.findFirst.mockResolvedValue({
+      id: 'sub-1',
+      content: 'today B',
+      images: [],
+      idempotencyKeyHash: hashIdempotencyKey('checkin-new-key'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today B', images: [] }),
+    })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A' },
+      header: vi.fn().mockReturnValue('checkin-old-key'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.content).toBe('today A')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('re-checks the receipt inside the transaction after a delayed retry acquires the lock', async () => {
+    const oldKeyHash = hashIdempotencyKey('checkin-delayed-key')
+    const receipt = {
+      idempotencyKeyHash: oldKeyHash,
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today A', images: [] }),
+      response: { id: 'sub-1', content: 'today A', images: [] },
+    }
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(receipt)
+    mockPrisma.checkinSubmission.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue({
+        id: 'sub-1',
+        content: 'today B',
+        images: [],
+        idempotencyKeyHash: hashIdempotencyKey('checkin-new-key'),
+      })
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A' },
+      header: vi.fn().mockReturnValue('checkin-delayed-key'),
+    }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.content).toBe('today A')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a late keyed first request after another key creates the submission', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({
+      id: 'ck-1',
+      courseId: 'course-1',
+      endTime: null,
+    })
+    const winningSubmission = {
+      id: 'sub-1',
+      content: 'today B',
+      images: [],
+      revision: 1,
+      idempotencyKeyHash: hashIdempotencyKey('checkin-winning-key'),
+      idempotencyPayloadHash: hashIdempotencyPayload({ content: 'today B', images: [] }),
+    }
+    mockPrisma.checkinSubmission.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue(winningSubmission)
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue(winningSubmission)
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: 'today A', expectedRevision: 0 },
+      header: vi.fn().mockReturnValue('checkin-late-key'),
+    }), res)
+
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toBe('提交版本已过期，请刷新后重试')
     expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
     expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
   })

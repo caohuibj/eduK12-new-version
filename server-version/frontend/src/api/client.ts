@@ -1,6 +1,14 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import type { ApiResponse } from '../types'
 
+export interface ApiClientError extends Error {
+  /** HTTP status is preserved for callers that need retry classification. */
+  status?: number
+  /** Parsed API envelope, when the server returned JSON. */
+  data?: unknown
+  code?: number | string
+}
+
 const axiosClient = axios.create({
   baseURL: '/api',
   withCredentials: true,
@@ -96,6 +104,26 @@ const notifyAuthExpired = (url?: string, requestStartedAt?: number): void => {
   }))
 }
 
+export const normalizeApiError = (error: any): ApiClientError => {
+  const responseData = error?.response?.data
+  const dataObject = responseData && typeof responseData === 'object'
+    ? responseData as Record<string, unknown>
+    : {}
+  const message = typeof dataObject.message === 'string'
+    ? dataObject.message
+    : typeof error?.message === 'string'
+      ? error.message
+      : '网络请求失败'
+  const normalized: ApiClientError = {
+    ...dataObject,
+    name: error?.name || 'ApiClientError',
+    message,
+    status: typeof error?.response?.status === 'number' ? error.response.status : undefined,
+    data: responseData,
+  }
+  return normalized
+}
+
 const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosError: boolean): void => {
   client.interceptors.request.use(
     async (config) => {
@@ -120,7 +148,7 @@ const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosErr
         notifyAuthExpired(error.config?.url, error.config?.authRequestStartedAt)
       }
       return Promise.reject(
-        preserveAxiosError ? error : (error.response?.data || error.message),
+        preserveAxiosError ? error : normalizeApiError(error),
       )
     },
   )

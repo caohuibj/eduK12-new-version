@@ -29,3 +29,26 @@ const stableSerialize = (value: unknown): string => {
 }
 
 export const fingerprintIdempotencyPayload = (payload: unknown): string => stableSerialize(payload)
+
+/**
+ * Decide whether a failed keyed submission is a definitive client-side
+ * rejection.  A missing status means the request may have reached the server
+ * (for example a network error or malformed response), so the same key must
+ * be retained for a safe retry.  Request timeouts and rate limits are also
+ * retryable because the server may have committed the write or may accept it
+ * once the transient limit clears.
+ */
+export const shouldClearIdempotencyKey = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') return false
+  const status = (error as { status?: unknown }).status
+  if (typeof status !== 'number' || !Number.isInteger(status)) return false
+  if (status === 408 || status === 425 || status === 429) return false
+  return status >= 400 && status < 500
+}
+
+/** Preserve an API-provided conflict message while keeping a safe fallback. */
+export const submissionErrorMessage = (error: unknown, fallback: string): string => {
+  if (!error || typeof error !== 'object') return fallback
+  const message = (error as { message?: unknown }).message
+  return typeof message === 'string' && message.trim().length > 0 ? message : fallback
+}

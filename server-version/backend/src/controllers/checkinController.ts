@@ -22,6 +22,11 @@ import {
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
+import {
+  checkinSubmissionSnapshot,
+  createCheckinIdempotencyReceipt,
+  findCheckinIdempotencyReceipt,
+} from '../utils/submissionIdempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -79,6 +84,7 @@ const submitCheckinSchema = z.object({
     z.string().min(1).max(2048).refine(isLegacyUploadReference, '图片引用无效'),
     z.object({ assetId: z.string().min(1).max(100) }).strict(),
   ])).max(9).optional(),
+  expectedRevision: z.number().int().nonnegative().optional(),
 })
 
 const checkinSubmissionPayload = (submission: { content?: unknown; images?: unknown }) => ({
@@ -90,6 +96,34 @@ class IdempotencyPayloadMismatchError extends Error {
   constructor() {
     super('Idempotency-Key 已用于其他提交内容')
     this.name = 'IdempotencyPayloadMismatchError'
+  }
+}
+
+class SubmissionRevisionConflictError extends Error {
+  constructor() {
+    super('提交版本已过期，请刷新后重试')
+    this.name = 'SubmissionRevisionConflictError'
+  }
+}
+
+const submissionRevision = (submission: { revision?: unknown } | null | undefined): number => (
+  typeof submission?.revision === 'number'
+    && Number.isInteger(submission.revision)
+    && submission.revision >= 0
+    ? submission.revision
+    : 0
+)
+
+/** See the assignment submit controller for the OCC compatibility rules. */
+const assertSubmissionRevision = (
+  existing: { revision?: unknown },
+  expectedRevision: number | undefined,
+  hasIdempotencyKey: boolean,
+) => {
+  const requestedRevision = expectedRevision ?? (hasIdempotencyKey ? 0 : undefined)
+  if (requestedRevision === undefined) return
+  if (submissionRevision(existing) !== requestedRevision) {
+    throw new SubmissionRevisionConflictError()
   }
 }
 
@@ -797,7 +831,7 @@ export const checkinController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { content, images } = result.data
+      const { content, images, expectedRevision } = result.data
       const requestedImages = images || []
       let idempotencyKeyHash: string | undefined
       try {
@@ -826,6 +860,26 @@ export const checkinController = {
       // arrives after the check-in deadline. A new payload still goes through
       // the normal expiry and asset validation below.
       if (idempotencyKeyHash) {
+        const committedReceipt = await findCheckinIdempotencyReceipt(
+          prisma,
+          id,
+          userId,
+          idempotencyKeyHash,
+        )
+        if (committedReceipt) {
+          if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
+          const receiptResponse = committedReceipt.response as Record<string, any>
+          return success(res, await hydrateAssetReferences(receiptResponse, false, {
+            entityType: 'CheckinSubmission',
+            entityId: receiptResponse.id,
+            courseId: checkin.courseId,
+            checkinId: id,
+            parentAccess: true,
+          }), '打卡成功')
+        }
+
         const committedRetry = await prisma.checkinSubmission.findFirst({
           where: { checkinId: id, studentId: userId, idempotencyKeyHash },
         })
@@ -858,6 +912,25 @@ export const checkinController = {
         if (typeof (tx as any).$executeRaw === 'function') {
           await (tx as any).$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`checkin-submission:${id}:${userId}`}))`
         }
+
+        // Re-check the immutable receipt after acquiring the per-student
+        // transaction lock so an older delayed key can only replay its
+        // original payload, never overwrite a newer submission.
+        if (idempotencyKeyHash) {
+          const committedReceipt = await findCheckinIdempotencyReceipt(
+            tx,
+            id,
+            userId,
+            idempotencyKeyHash,
+          )
+          if (committedReceipt) {
+            if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+              throw new IdempotencyPayloadMismatchError()
+            }
+            return { saved: committedReceipt.response, wasExisting: true, replayed: true }
+          }
+        }
+
         const existing = typeof tx.checkinSubmission.findUnique === 'function'
           ? await tx.checkinSubmission.findUnique({
             where: { checkinId_studentId: { checkinId: id, studentId: userId } },
@@ -869,7 +942,28 @@ export const checkinController = {
           if (existingPayloadHash !== idempotencyPayloadHash) {
             throw new IdempotencyPayloadMismatchError()
           }
+          if (idempotencyKeyHash && idempotencyPayloadHash) {
+            await createCheckinIdempotencyReceipt(tx, {
+              checkinId: id,
+              studentId: userId,
+              submissionId: existing.id,
+              idempotencyKeyHash,
+              idempotencyPayloadHash,
+              response: checkinSubmissionSnapshot(existing),
+            })
+          }
           return { saved: existing, wasExisting: true }
+        }
+        if (!existing) {
+          const requestedRevision = expectedRevision ?? (idempotencyKeyHash ? 0 : undefined)
+          if (requestedRevision !== undefined && requestedRevision !== 0) {
+            throw new SubmissionRevisionConflictError()
+          }
+        } else {
+          // The advisory transaction lock serializes writers; compare the
+          // client-observed revision while holding it so a late first request
+          // cannot overwrite a newer keyed check-in with no receipt yet.
+          assertSubmissionRevision(existing, expectedRevision, Boolean(idempotencyKeyHash))
         }
         const saved = existing
           ? await tx.checkinSubmission.update({
@@ -877,6 +971,7 @@ export const checkinController = {
             data: {
               content,
               images: validatedImages,
+              revision: { increment: 1 },
               ...(idempotencyKeyHash
                 ? { idempotencyKeyHash, idempotencyPayloadHash }
                 : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
@@ -886,12 +981,23 @@ export const checkinController = {
             data: {
               checkinId: id,
               studentId: userId,
+              revision: 1,
               content,
               images: validatedImages,
               ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
             },
-          })
+        })
         await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
+        if (idempotencyKeyHash && idempotencyPayloadHash) {
+          await createCheckinIdempotencyReceipt(tx, {
+            checkinId: id,
+            studentId: userId,
+            submissionId: saved.id,
+            idempotencyKeyHash,
+            idempotencyPayloadHash,
+            response: checkinSubmissionSnapshot(saved),
+          })
+        }
         return { saved, wasExisting: Boolean(existing) }
       })
 
@@ -901,13 +1007,19 @@ export const checkinController = {
         courseId: checkin.courseId,
         checkinId: id,
         parentAccess: true,
-      }), submission.wasExisting ? '打卡更新成功' : '打卡成功')
+      }), submission.replayed ? '打卡成功' : submission.wasExisting ? '打卡更新成功' : '打卡成功')
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }
+      if (err instanceof SubmissionRevisionConflictError) {
+        return error(res, err.message, -1, 409)
+      }
       logger.error('提交打卡错误', err)
-      return error(res, Messages.COMMON.FAILED)
+      // The transaction may already be committed when response hydration or
+      // signing fails. Return a 5xx so the client retains its key and retries
+      // the same payload instead of generating a new write.
+      return error(res, Messages.COMMON.FAILED, -1, 500)
     }
   },
 

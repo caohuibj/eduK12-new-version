@@ -1,12 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
+import { integrationDatabaseUrl } from '../integration/integration-env'
 
 /**
  * Real PostgreSQL race coverage for teacher:start. Enable with
  * PR26_INTEGRATION_DATABASE_URL; the fixture is fully isolated and cleaned
  * up after the assertion.
  */
-const DB_URL = process.env.PR26_INTEGRATION_DATABASE_URL
+const DB_URL = integrationDatabaseUrl('PR26_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
 
 let prisma: PrismaClient

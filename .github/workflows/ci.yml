@@ -38,8 +38,11 @@ jobs:
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      COGNITIVE_MODULE_ENABLED: 'true'
       REDIS_URL: redis://localhost:6379
     services:
       postgres:
@@ -87,12 +90,25 @@ jobs:
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
+      - name: backfill and validate check-in token protection
+        run: npm run db:backfill:checkin-tokens
       - name: guarded migration idempotency after seeded data
         run: npm run db:migrate:guarded
+      - name: read-only release data preflight
+        run: npm run db:release:preflight
       - name: build (tsc)
         run: npm run build
       - name: full regression
-        run: npm test
+        run: npm test -- --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+      - name: critical integration suites must not skip
+        run: >-
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
+          src/__tests__/cognitive/concurrency.integration.test.ts
+          src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
+          src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+          src/__tests__/classroom/classroom-start.postgres.integration.test.ts
+          src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
+          src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)

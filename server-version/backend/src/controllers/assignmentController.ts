@@ -15,6 +15,11 @@ import {
   syncAssetReferences,
   validateAssetReferencesForCourse,
 } from '../services/assetStorage'
+import {
+  assignmentSubmissionSnapshot,
+  createAssignmentIdempotencyReceipt,
+  findAssignmentIdempotencyReceipt,
+} from '../utils/submissionIdempotency'
 
 const attachmentSchema = z.union([
   z.string().min(1).max(2048),
@@ -92,9 +97,44 @@ class IdempotencyPayloadMismatchError extends Error {
   }
 }
 
+class SubmissionRevisionConflictError extends Error {
+  constructor() {
+    super('提交版本已过期，请刷新后重试')
+    this.name = 'SubmissionRevisionConflictError'
+  }
+}
+
+const submissionRevision = (submission: { revision?: unknown } | null | undefined): number => (
+  typeof submission?.revision === 'number'
+    && Number.isInteger(submission.revision)
+    && submission.revision >= 0
+    ? submission.revision
+    : 0
+)
+
+/**
+ * Keyed browser submissions carry the revision they read. Older clients that
+ * omit it are treated as revision zero, which is safe for first writes and
+ * rejects updates once a migrated row has advanced. Unkeyed legacy requests
+ * retain their historical behaviour unless they explicitly provide a
+ * revision.
+ */
+const assertSubmissionRevision = (
+  existing: { revision?: unknown },
+  expectedRevision: number | undefined,
+  hasIdempotencyKey: boolean,
+) => {
+  const requestedRevision = expectedRevision ?? (hasIdempotencyKey ? 0 : undefined)
+  if (requestedRevision === undefined) return
+  if (submissionRevision(existing) !== requestedRevision) {
+    throw new SubmissionRevisionConflictError()
+  }
+}
+
 const submitSchema = z.object({
   content: z.string().optional(),
   answers: z.record(z.string()).optional(),
+  expectedRevision: z.number().int().nonnegative().optional(),
 })
 
 const gradeSchema = z.object({
@@ -546,7 +586,7 @@ export const assignmentController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { content, answers } = result.data
+      const { content, answers, expectedRevision } = result.data
       const normalizedAnswers = answers || {}
       let idempotencyKeyHash: string | undefined
       try {
@@ -575,6 +615,19 @@ export const assignmentController = {
       // assignment has since closed. Replay the committed idempotent result
       // before applying current publication/deadline gates.
       if (idempotencyKeyHash) {
+        const committedReceipt = await findAssignmentIdempotencyReceipt(
+          prisma,
+          id,
+          userId,
+          idempotencyKeyHash,
+        )
+        if (committedReceipt) {
+          if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+            return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
+          }
+          return success(res, committedReceipt.response, '作业提交成功')
+        }
+
         const committedRetry = await prisma.submission.findFirst({
           where: { assignmentId: id, studentId: userId, idempotencyKeyHash },
         })
@@ -602,23 +655,56 @@ export const assignmentController = {
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`
         }
 
+        // Re-check the immutable receipt after acquiring the per-student
+        // transaction lock.  This closes the race where a delayed retry was
+        // already in flight while a newer keyed submission committed.
+        if (idempotencyKeyHash) {
+          const committedReceipt = await findAssignmentIdempotencyReceipt(
+            tx,
+            id,
+            userId,
+            idempotencyKeyHash,
+          )
+          if (committedReceipt) {
+            if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
+              throw new IdempotencyPayloadMismatchError()
+            }
+            return { submission: committedReceipt.response, wasExisting: true, replayed: true }
+          }
+        }
+
         // Use the composite unique key so the lock and the database invariant
         // agree. A legacy client racing this code is handled by the P2002
         // retry below and still receives an idempotent success.
         let existing = await findExistingSubmission(tx, id, userId)
 
         if (!existing) {
+          const requestedRevision = expectedRevision ?? (idempotencyKeyHash ? 0 : undefined)
+          if (requestedRevision !== undefined && requestedRevision !== 0) {
+            throw new SubmissionRevisionConflictError()
+          }
           try {
             const created = await tx.submission.create({
               data: {
                 assignmentId: id,
                 studentId: userId,
+                revision: 1,
                 content,
                 answers: normalizedAnswers,
                 status: SubmissionStatus.SUBMITTED,
                 ...(idempotencyKeyHash ? { idempotencyKeyHash, idempotencyPayloadHash } : {}),
               },
             })
+            if (idempotencyKeyHash && idempotencyPayloadHash) {
+              await createAssignmentIdempotencyReceipt(tx, {
+                assignmentId: id,
+                studentId: userId,
+                submissionId: created.id,
+                idempotencyKeyHash,
+                idempotencyPayloadHash,
+                response: assignmentSubmissionSnapshot(created),
+              })
+            }
             return { submission: created, wasExisting: false }
           } catch (createError) {
             if (!isUniqueConstraintError(createError)) throw createError
@@ -636,8 +722,24 @@ export const assignmentController = {
           if (existingPayloadHash !== idempotencyPayloadHash) {
             throw new IdempotencyPayloadMismatchError()
           }
+          if (idempotencyKeyHash && idempotencyPayloadHash) {
+            await createAssignmentIdempotencyReceipt(tx, {
+              assignmentId: id,
+              studentId: userId,
+              submissionId: existing.id,
+              idempotencyKeyHash,
+              idempotencyPayloadHash,
+              response: assignmentSubmissionSnapshot(existing),
+            })
+          }
           return { submission: existing, wasExisting: true }
         }
+
+        // The advisory transaction lock serializes writers; this revision
+        // check makes the serialized order observable to clients as an OCC
+        // conflict instead of allowing a late first request to overwrite a
+        // newer keyed submission that has no receipt yet.
+        assertSubmissionRevision(existing, expectedRevision, Boolean(idempotencyKeyHash))
 
         const latestHistory = await tx.submissionHistory.findFirst({
           where: { submissionId: existing.id },
@@ -660,21 +762,43 @@ export const assignmentController = {
             answers: normalizedAnswers,
             submittedAt: new Date(),
             status: SubmissionStatus.SUBMITTED,
+            revision: { increment: 1 },
             ...(idempotencyKeyHash
               ? { idempotencyKeyHash, idempotencyPayloadHash }
               : { idempotencyKeyHash: null, idempotencyPayloadHash: null }),
           },
         })
+        if (idempotencyKeyHash && idempotencyPayloadHash) {
+          await createAssignmentIdempotencyReceipt(tx, {
+            assignmentId: id,
+            studentId: userId,
+            submissionId: updated.id,
+            idempotencyKeyHash,
+            idempotencyPayloadHash,
+            response: assignmentSubmissionSnapshot(updated),
+          })
+        }
         return { submission: updated, wasExisting: true }
       })
 
-      return success(res, submissionResult.submission, submissionResult.wasExisting ? '作业更新成功' : '作业提交成功')
+      const message = submissionResult.replayed
+        ? '作业提交成功'
+        : submissionResult.wasExisting
+          ? '作业更新成功'
+          : '作业提交成功'
+      return success(res, submissionResult.submission, message)
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }
+      if (err instanceof SubmissionRevisionConflictError) {
+        return error(res, err.message, -1, 409)
+      }
       logger.error('提交作业错误', err)
-      return error(res, '提交作业失败')
+      // An unknown failure may occur after the database write is committed
+      // (for example while constructing the response). Mark it as a 5xx so
+      // clients retain the idempotency key and safely retry the same payload.
+      return error(res, '提交作业失败', -1, 500)
     }
   },
 

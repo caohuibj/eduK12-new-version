@@ -1,10 +1,11 @@
 # ============================================================
 # eduK12 / PTool — Docker Baseline (Milestone C / 2A)
 # steady-state: postgres | redis | backend | frontend
-# one-shot   : migrate / seed (profiles: ["ops"])
+# one-shot   : migrate / seed / release-preflight (profiles: ["ops"])
 #
 # 运行前：复制 .env.example -> .env 并填写数据库、JWT、加密、CORS 和 seed 凭据
 #   docker compose --profile ops run --rm migrate
+#   docker compose --profile ops run --rm release-preflight
 #   docker compose --profile ops run --rm seed   # 首次/明确需要时
 #   docker compose up -d backend frontend
 # ============================================================
@@ -180,6 +181,28 @@ services:
       NODE_ENV: production
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set for encrypted token backfills}
     command: npm run db:backfill:checkin-tokens
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # Run the read-only release data gate against the same uploads volume used
+  # by the backend. The read-only mount is intentional: this service must
+  # never alter production assets while checking for legacy files.
+  release-preflight:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ops
+    container_name: ptool-release-preflight
+    profiles: ["ops"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      NODE_ENV: production
+      UPLOAD_DIR: /app/uploads
+    command: npm run db:release:preflight
+    volumes:
+      - uploads_data:/app/uploads:ro
     depends_on:
       postgres:
         condition: service_healthy

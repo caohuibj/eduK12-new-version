@@ -95,6 +95,7 @@ export interface Submission {
   id: string
   assignmentId: string
   studentId: string
+  revision: number
   student?: User
   content?: string
   answers?: Record<string, string>
@@ -134,6 +135,7 @@ export interface CheckinSubmission {
   id: string
   checkinId: string
   studentId: string
+  revision: number
   student?: User
   content?: string
   images?: CheckinSubmissionImage[]
