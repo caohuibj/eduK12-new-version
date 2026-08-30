@@ -76,8 +76,13 @@ const submissionImageSchema = config.legacyUploadsEnabled
   ])
   : z.object({ assetId: z.string().min(1).max(100) }).strict()
 
+const utf8ByteLimitedString = (limit: number, message: string) => z.string().refine(
+  (value) => Buffer.byteLength(value, 'utf8') <= limit,
+  { message },
+)
+
 const submitCheckinSchema = z.object({
-  content: z.string().max(200_000, '提交内容不能超过200KB').optional(),
+  content: utf8ByteLimitedString(200_000, '提交内容不能超过200KB').optional(),
   tags: z.array(z.string().max(20)).max(10).optional(),
   // During the asset migration, accept only old local upload references or a
   // server-issued asset capability. Client-supplied URLs are never trusted.
@@ -180,7 +185,7 @@ export const PUBLIC_UPLOAD_STAGING_TTL_MS = 24 * 60 * 60 * 1000
 const publicSessionIdSchema = z.string().regex(/^session_[a-z0-9]{16}$/, '会话标识无效')
 
 const publicSubmissionSchema = z.object({
-  content: z.string().max(1000).optional(),
+  content: utf8ByteLimitedString(1000, '提交内容不能超过1KB').optional(),
   images: z.array(publicSubmissionImageSchema).max(MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION).optional().default([]),
   sessionId: publicSessionIdSchema,
 })

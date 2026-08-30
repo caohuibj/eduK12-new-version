@@ -1,6 +1,13 @@
 -- Public bearer values for composite and cognitive links must not remain in
 -- plaintext.  Keep the legacy column nullable only until the explicit,
 -- resumable application backfill has completed.
+--
+-- IMPORTANT: PostgreSQL NOT VALID skips checking existing rows only.  The
+-- token_must_be_null and protected_fields_present checks still run for every
+-- subsequent INSERT/UPDATE.  Before applying this migration in production,
+-- drain/stop every old API, worker, and public-traffic writer; then run the
+-- backup -> migration -> public-token backfill -> constraint/preflight gate
+-- sequence documented in DEPLOYMENT-GUIDE.md and release-verify-local.md.
 ALTER TABLE "composite_assessment_access_tokens"
   ADD COLUMN "token_hash" TEXT,
   ADD COLUMN "token_encrypted" TEXT;

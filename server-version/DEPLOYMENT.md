@@ -1,6 +1,16 @@
 # PTool 部署指南
 
-> **重要**: 请始终使用 `deploy.sh` 脚本进行部署，避免手动操作导致部署到错误目录。
+> **当前生产流程（2026-08-30，PR #30+）**：生产环境唯一支持的拓扑是
+> `server-version/docker-compose.yml`。本文中 PM2、宿主机 Nginx 和
+> `deploy.sh` 段落是历史内容，相关脚本已停用，不得执行。请使用
+> [`DEPLOYMENT-CHECKLIST.md`](./DEPLOYMENT-CHECKLIST.md) 的 Compose 正式发布流程。
+
+> **迁移停写要求**：`NOT VALID` 约束仍会检查后续写入。升级前必须在入口/负载均衡
+> 处 drain public traffic，停止旧 backend、worker/queue consumer 和 frontend；
+> 然后严格执行：**备份 → guarded migration → questionnaire/check-in/composite/
+> cognitive 四类 public-token backfill → 四类 `remaining=0` → release-preflight
+> （八个约束已验证）→ 构建/启动新版本 → 每类已启用 public workflow 各一次 smoke
+> → 恢复流量**。
 
 ---
 

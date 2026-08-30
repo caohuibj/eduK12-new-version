@@ -109,6 +109,18 @@ describe('logged-in checkin submit endTime', () => {
     expect(mockPrisma.checkinSubmission.create).toHaveBeenCalledOnce()
   })
 
+  it('enforces the submission content limit in UTF-8 bytes', async () => {
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: '中'.repeat(70_000) },
+    }), res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('提交内容不能超过200KB')
+    expect(mockPrisma.checkin.findUnique).not.toHaveBeenCalled()
+  })
+
   it('returns 5xx for an unexpected write or hydration failure so a keyed retry is retained', async () => {
     mockPrisma.checkin.findUnique.mockResolvedValue({
       id: 'ck-1',

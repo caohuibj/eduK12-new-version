@@ -135,14 +135,19 @@ const assertSubmissionRevision = (
   }
 }
 
-const submissionAnswersSchema = z.record(z.string().max(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
+const utf8ByteLimitedString = (limit: number, message: string) => z.string().refine(
+  (value) => Buffer.byteLength(value, 'utf8') <= limit,
+  { message },
+)
+
+const submissionAnswersSchema = z.record(utf8ByteLimitedString(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
   if (Buffer.byteLength(JSON.stringify(value), 'utf8') > 256_000) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: '答案总大小不能超过256KB' })
   }
 })
 
 const submitSchema = z.object({
-  content: z.string().max(200_000, '提交内容不能超过200KB').optional(),
+  content: utf8ByteLimitedString(200_000, '提交内容不能超过200KB').optional(),
   answers: submissionAnswersSchema.refine((value) => Object.keys(value).length <= 200, '答案数量不能超过200项').optional(),
   expectedRevision: z.number().int().nonnegative().optional(),
 })

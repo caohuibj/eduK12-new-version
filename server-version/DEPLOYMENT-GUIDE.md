@@ -1,5 +1,15 @@
 # 云服务器部署方案
 
+> **当前生产发布安全顺序（PR #30 及以后）**：本项目唯一支持的生产拓扑是
+> `docker compose`。迁移会添加 `NOT VALID` 约束；它不会检查历史行，但仍会拦截
+> 后续写入。因此升级时必须先在入口/负载均衡处停止并排空旧 backend、worker 和
+> public traffic，再停止旧 `backend`/`frontend` 容器。然后按下面顺序执行：
+> **备份 → guarded migration → 四类 public bearer token 回填 → 确认四类
+> `remaining=0` → `release-preflight`（八个 token 约束全部已验证）→ 构建并启动
+> 新版本 → 每个已启用 public workflow 各做一次 smoke → 恢复入口流量**。
+> 在回填和 preflight 完成前，不得重新启动旧版本服务。旧的宿主机/PM2 部署脚本
+> 和本文末尾的旧示例仅供历史参考，不得执行。
+
 ## 1. 服务器配置建议
 
 ### 最低配置（20-30并发，功能验证）
@@ -66,13 +76,18 @@ chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 # 使用 SCP 或 Git 克隆
 scp -r server-version root@your-server-ip:/opt/
 
-# 6. 启动服务
+# 6. 首次启动（没有旧流量；升级请改用“更新部署”顺序）
 cd /opt/server-version
 cp .env.example .env
 # 编辑 .env 文件：填写 DB_*、完整且已 percent-encode 的 DATABASE_URL、JWT/加密密钥、CORS 和管理员凭据
+docker compose up -d postgres redis
+docker compose build backend frontend migrate checkin-token-backfill release-preflight
 docker compose --profile ops run --rm migrate
-docker compose --profile ops run --rm seed
+docker compose --profile ops run --rm seed  # 首次/明确需要时
+docker compose --profile ops run --rm checkin-token-backfill
+docker compose --profile ops run --rm release-preflight
 docker compose up -d backend frontend
+# smoke questionnaire/check-in/composite/cognitive 中已启用的每类 public link，确认后再恢复入口流量
 
 # 7. 配置安全组
 # 阿里云控制台 -> 安全组 -> 添加规则
@@ -81,13 +96,10 @@ docker compose up -d backend frontend
 
 ### 方式二：轻量应用服务器（更简单）
 
-```bash
-# 1. 购买轻量应用服务器（Docker 镜像）
-# 2. 直接上传项目并填写 .env
-# 3. 执行 docker compose --profile ops run --rm migrate
-# 4. 执行 docker compose --profile ops run --rm seed
-# 5. 执行 docker compose up -d backend frontend
-```
+1. 购买轻量应用服务器（Docker 镜像）。
+2. 直接上传项目并填写 `.env`。
+3. 首次部署按“方式一”第 6 步；升级按“更新部署”的 drain/stop → 备份 →
+   migration → 四类 token backfill → preflight → build/start → smoke 顺序。
 
 ## 4. 腾讯云部署步骤
 
@@ -137,10 +149,16 @@ docker exec -i ptool-postgres psql -U ptool ptool < backup.sql
 
 # 更新部署
 git pull
-docker compose down
+# 先在入口/负载均衡处 drain，并停止所有旧 API/worker/public traffic；不要让旧代码
+# 在 NOT VALID 约束已创建而 token 尚未回填的窗口继续写数据库。
+docker compose stop frontend backend
+docker exec ptool-postgres pg_dump -U <DB_USER> <DB_NAME> > backup-$(date -u +%Y%m%dT%H%M%SZ).sql
+docker compose build backend frontend migrate checkin-token-backfill release-preflight
 docker compose --profile ops run --rm migrate
-docker compose --profile ops run --rm seed
-docker compose up -d --build backend frontend
+docker compose --profile ops run --rm checkin-token-backfill
+docker compose --profile ops run --rm release-preflight
+docker compose up -d backend frontend
+# 完成四类 public workflow smoke 后，才恢复入口/负载均衡流量。
 ```
 
 ## 7. 性能优化（初期可跳过）
@@ -186,11 +204,8 @@ docker-compose restart backend
 # 拉取最新代码
 git pull
 
-# 重新构建并启动
-docker compose down
-docker compose --profile ops run --rm migrate
-docker compose --profile ops run --rm seed
-docker compose up -d --build backend frontend
+# 按上面的“更新部署”安全顺序执行：drain/stop → backup → migrate →
+# public-token backfill → release-preflight → build/start → public smoke → reopen。
 ```
 
 ## 9. 一键部署脚本

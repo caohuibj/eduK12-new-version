@@ -3,6 +3,11 @@
 # Reproducible local release gate.  All database and Redis state is created
 # in uniquely named, short-lived Docker resources; this script never calls
 # `docker compose down` and therefore cannot stop the developer stack.
+#
+# Production sequencing is intentionally documented, not performed, here:
+# drain/stop old API, workers, and public traffic before migration; backup;
+# migrate; backfill all four public-token tables; validate/preflight; then
+# build/start the new SHA and smoke-test public workflows before reopening.
 
 set -Eeuo pipefail
 
@@ -113,6 +118,8 @@ if [ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all -- "$BAC
   fail 'untracked files are present in backend/frontend build contexts; exact checkout is required'
   exit 1
 fi
+
+log 'production prerequisite reminder: drain/stop old API/workers/public traffic before applying NOT VALID token migrations; this gate never touches ptool-*'
 
 git -C "$REPO_ROOT" diff --check >"$REPORT_DIR/git-diff-check.log"
 node --version >"$REPORT_DIR/tool-versions.log"

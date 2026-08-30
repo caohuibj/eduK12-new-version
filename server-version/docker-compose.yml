@@ -8,6 +8,11 @@
 #   docker compose --profile ops run --rm release-preflight
 #   docker compose --profile ops run --rm seed   # 首次/明确需要时
 #   docker compose up -d backend frontend
+#
+# 升级安全顺序：入口 drain + 停止旧 backend/worker/frontend（不要停止
+# postgres/redis） -> 备份 -> migrate -> checkin-token-backfill（四类 public
+# token） -> release-preflight（八个约束） -> 同一 SHA build/start -> public
+# workflow smoke -> 恢复入口流量。NOT VALID 仍会检查迁移后的写入。
 # ============================================================
 
 services:

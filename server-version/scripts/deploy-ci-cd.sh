@@ -11,6 +11,9 @@ cat >&2 <<'NOTICE'
 此宿主机 CI/CD 部署脚本已停用。
 生产发布必须通过受控的 Docker Compose 流程完成；请参阅
 server-version/docker-compose.yml 和部署文档，先执行本地发布门禁，再按版本发布。
+正式升级顺序必须是 drain/stop 旧 backend、worker 和 public traffic -> 备份 ->
+guarded migration -> 四类 public-token backfill -> release-preflight -> 新版本
+build/start -> public workflow smoke -> 恢复流量。
 本脚本不会操作 PM2、宿主机 PostgreSQL、Redis 或 Nginx。
 NOTICE
 exit 1

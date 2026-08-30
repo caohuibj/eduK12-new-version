@@ -4,7 +4,7 @@
 
 set -e
 
-echo '此宿主机本地部署脚本已停用；请使用 server-version/docker-compose.yml 的本地 Compose 入口。' >&2
+echo '此宿主机本地部署脚本已停用；请使用 server-version/docker-compose.yml 的本地 Compose 入口。升级发布必须先 drain/stop 旧 backend、worker 和 public traffic，再执行备份、迁移、四类 public-token backfill、release-preflight 和 smoke。' >&2
 exit 1
 
 : <<'LEGACY_SCRIPT'

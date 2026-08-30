@@ -30,9 +30,11 @@ The three unchecked items are repository release operations, not unverified prod
 
 ## Fix-2 数据库与本地门禁
 
+- [ ] 入口/负载均衡已 drain，所有旧 backend、worker/queue consumer 和 frontend 已停止（必须早于 migration）
 - [ ] 生产备份和恢复演练完成并留存证据
 - [ ] guarded migration 完成，四类公开令牌回填均为 `remaining=0`
-- [ ] 使用 `release-preflight` service（`uploads_data:/app/uploads:ro`）执行 `db:release:preflight`，全部危险计数为 0
+- [ ] 使用 `release-preflight` service（`uploads_data:/app/uploads:ro`）执行 `db:release:preflight`，八个 public-token 约束均已验证，全部危险计数为 0
+- [ ] 新版本启动后，对每个已启用的 questionnaire/check-in/composite/cognitive public workflow 各完成一次 smoke，再恢复入口流量
 - [ ] 本地发布门禁使用一次性 PostgreSQL/Redis 并确认资源已清理
 - [ ] Actions 额度恢复后，对 exact release SHA 补跑正式 CI
 
