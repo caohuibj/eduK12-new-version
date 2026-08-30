@@ -189,7 +189,8 @@ run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-relea
   src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
   src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
   src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
-  src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
+  src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
+  src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
 
 run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint
 run_logged frontend-typecheck.log npm --prefix "$FRONTEND_DIR" run typecheck
