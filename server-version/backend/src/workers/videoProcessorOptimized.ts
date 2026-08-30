@@ -215,12 +215,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤3：生成底部居中水印
     logger.info(`[${videoId}] 步骤 3/6: 生成水印...`)
-    await generateBottomCenterWatermarkFile(cornerWatermarkPath, targetWidth)
+    const watermarkAvailable = await generateBottomCenterWatermarkFile(cornerWatermarkPath, targetWidth)
     await job.progress(30)
 
     // 步骤4：转码 + 添加水印 (核心步骤)
     logger.info(`[${videoId}] 步骤 4/6: 转码 (${strategy.resolution}, preset: ${strategy.preset}, crf: ${strategy.crf})...`)
-    await transcodeVideoOptimized(inputPath, outputPath, cornerWatermarkPath, strategy, (progress) => {
+    await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, strategy, (progress) => {
       const jobProgress = 30 + Math.floor(progress * 0.4)
       job.progress(jobProgress).catch(() => { })
     })
@@ -237,7 +237,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         resolution: strategy.resolution,
         reason: '压缩后文件变大，改用仅水印模式'
       }
-      await transcodeVideoOptimized(inputPath, outputPath, cornerWatermarkPath, watermarkOnlyStrategy, (progress) => {
+      await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, watermarkOnlyStrategy, (progress) => {
         const jobProgress = 70 + Math.floor(progress * 0.1)
         job.progress(jobProgress).catch(() => { })
       })
@@ -351,11 +351,11 @@ staleVideoReconciliationInterval.unref?.()
 /**
  * 生成底部居中水印
  */
-async function generateBottomCenterWatermark(videoWidth: number): Promise<Buffer> {
-  // 如果 canvas 不可用，返回空 Buffer
+async function generateBottomCenterWatermark(videoWidth: number): Promise<Buffer | null> {
+  // 如果 canvas 不可用，跳过水印步骤；空 PNG 会让 FFmpeg 的 overlay 失败。
   if (!createCanvas) {
     logger.warn('[VideoProcessor] canvas 不可用，跳过水印生成')
-    return Buffer.from('')
+    return null
   }
   
   const text = '慧育空间专属教学资料'
@@ -392,11 +392,13 @@ async function generateBottomCenterWatermark(videoWidth: number): Promise<Buffer
 async function generateBottomCenterWatermarkFile(
   watermarkPath: string,
   videoWidth: number
-): Promise<void> {
+): Promise<boolean> {
   try {
     const watermarkBuffer = await generateBottomCenterWatermark(videoWidth)
+    if (!watermarkBuffer) return false
     await fs.writeFile(watermarkPath, watermarkBuffer)
     logger.debug('底部居中水印生成成功')
+    return true
   } catch (error) {
     logger.error('水印生成失败:', error)
     throw error
@@ -406,7 +408,7 @@ async function generateBottomCenterWatermarkFile(
 function transcodeVideoOptimized(
   input: string,
   output: string,
-  cornerWatermark: string,
+  cornerWatermark: string | null,
   strategy: ProcessingStrategy,
   onProgress?: (progress: number) => void
 ): Promise<void> {
@@ -440,10 +442,7 @@ function transcodeVideoOptimized(
 
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
 
-    const fs = require('fs')
-    const hasCornerWatermark = cornerWatermark && fs.existsSync(cornerWatermark)
-
-    if (hasCornerWatermark) {
+    if (cornerWatermark) {
       cmd.complexFilter([
         `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,` +
         `pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,` +

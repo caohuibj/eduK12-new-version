@@ -188,7 +188,7 @@ run_logged backend-migrate.log npm --prefix "$BACKEND_DIR" run db:migrate:guarde
 ADMIN_USERNAME='release_verify_admin' ADMIN_PASSWORD='release_verify_admin_password_2026' \
   run_logged backend-seed.log npm --prefix "$BACKEND_DIR" run db:seed
 run_logged backend-migrate-idempotent.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
-run_logged backend-token-backfill.log npm --prefix "$BACKEND_DIR" run db:backfill:checkin-tokens
+run_logged backend-token-backfill.log npm --prefix "$BACKEND_DIR" run db:backfill:public-tokens
 run_logged backend-data-preflight.log npm --prefix "$BACKEND_DIR" run db:release:preflight
 log 'verifying a missing uploads directory fails the release preflight closed'
 set +e

@@ -9,6 +9,7 @@ import { Spin, message, Card, Button, Result, Input, Upload, Image } from 'antd'
 import { CheckCircleOutlined, UploadOutlined, CameraOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { sanitizeHtml } from '../../utils/sanitize'
+import { isSafeExternalMediaUrl } from '../../utils/mediaUtils'
 
 type PublicAssetSource = string | {
   assetId?: string
@@ -35,9 +36,42 @@ interface CheckinData {
   allowViewOthers: boolean
 }
 
+const isSafeLegacyUploadReference = (value: string): boolean => {
+  if (!/^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@%/_-]+$/.test(value)) return false
+  try {
+    const decoded = decodeURIComponent(value)
+    return /^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@/_-]+$/.test(decoded)
+      && !decoded.includes('\\')
+      && !/[\u0000-\u001f\u007f]/.test(decoded)
+      && !decoded.split('/').some((segment) => segment === '.' || segment === '..')
+  } catch {
+    return false
+  }
+}
+
+const isSafeSignedPublicAssetUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value, window.location.origin)
+    if (parsed.origin !== window.location.origin || !parsed.pathname.startsWith('/api/public/assets/')) return false
+    return /^\/api\/public\/assets\/[A-Za-z0-9_-]{1,100}\/content$/.test(parsed.pathname)
+      && /^\d+$/.test(parsed.searchParams.get('expires') || '')
+      && /^[A-Za-z0-9_-]{40,100}$/.test(parsed.searchParams.get('signature') || '')
+  } catch {
+    return false
+  }
+}
+
+const isSafePublicMediaUrl = (value: string): boolean => (
+  isSafeSignedPublicAssetUrl(value)
+  || isSafeLegacyUploadReference(value)
+  || isSafeExternalMediaUrl(value)
+)
+
 const sourceUrl = (source: PublicAssetSource | undefined): string => {
-  if (typeof source === 'string') return source
-  return source?.url || source?.processedUrl || source?.originalUrl || (source?.fileName ? `/uploads/videos/${source.fileName}` : '')
+  const candidates = typeof source === 'string'
+    ? [source]
+    : [source?.url, source?.processedUrl, source?.originalUrl, source?.fileName ? `/uploads/videos/${source.fileName}` : undefined]
+  return candidates.find((candidate): candidate is string => Boolean(candidate && isSafePublicMediaUrl(candidate))) || ''
 }
 
 const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string | undefined): string => {

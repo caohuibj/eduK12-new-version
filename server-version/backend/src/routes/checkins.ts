@@ -4,8 +4,18 @@ import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 import { config } from '../config'
+import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
+
+// Share the same per-student budget as assignment submissions so a client
+// cannot multiply receipt growth across the two endpoints.
+const studentSubmissionLimiter = createRedisRateLimiter({
+  name: 'student-submissions',
+  limit: 60,
+  windowSeconds: 15 * 60,
+  key: (req) => `student:${req.user?.userId || 'unknown'}`,
+})
 
 const publicUploadIpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -77,7 +87,7 @@ router.post(
   submissionImageUpload.single('image'),
   checkinController.uploadStudentSubmissionImage,
 )
-router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), checkinController.submit)
+router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), studentSubmissionLimiter, checkinController.submit)
 router.get('/:id/export', authenticate, requireTeacher, checkinController.export)
 router.get('/:id/submissions', authenticate, requireTeacher, checkinController.submissions)
 router.get('/:id/others-submissions', authenticate, requireRole(UserRole.STUDENT), checkinController.othersSubmissions)

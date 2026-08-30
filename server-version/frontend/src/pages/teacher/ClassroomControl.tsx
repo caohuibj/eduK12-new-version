@@ -63,7 +63,7 @@ const ClassroomControl: React.FC = () => {
       setStats(response.data.stats)
       setAnswerCount(response.data.stats.answerCount ?? 0)
       setOnlineCount(response.data.stats.onlineCount ?? response.data.stats.totalSessions ?? 0)
-      setStatsUnknown(false)
+      setStatsUnknown(Boolean(response.data.stats.unsupportedType))
     } catch (err) {
       setStatsUnknown(true)
       setConnectionNotice(normalizeApiError(err).message)
@@ -119,7 +119,7 @@ const ClassroomControl: React.FC = () => {
     on('broadcast:stats', (data) => {
       setAnswerCount(data.answerCount)
       setStats(data)
-      setStatsUnknown(false)
+      setStatsUnknown(Boolean(data.unsupportedType))
     })
 
     // 在线人数

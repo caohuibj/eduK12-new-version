@@ -19,7 +19,10 @@ interface QuestionStats {
   totalSessions: number
   submissionRate: number
   stats: any
+  unsupportedType?: boolean
 }
+
+const SUPPORTED_QUESTION_TYPES = new Set(['single_choice', 'multiple_choice', 'fill_blank', 'text_input'])
 
 export class StatsAggregator {
   /**
@@ -44,8 +47,12 @@ export class StatsAggregator {
         return null
       }
 
-      const questionContent = question.questionContent as any
-      const questionType = questionContent.type || 'unknown'
+      const questionContent = question.questionContent && typeof question.questionContent === 'object' && !Array.isArray(question.questionContent)
+        ? question.questionContent as Record<string, unknown>
+        : {}
+      const questionType = typeof questionContent.type === 'string' && questionContent.type
+        ? questionContent.type
+        : 'unknown'
       const totalAnswers = question.answers.length
       const totalSessions = question.classroom.sessions.length
       const submissionRate = totalSessions > 0 ? (totalAnswers / totalSessions) * 100 : 0
@@ -55,6 +62,7 @@ export class StatsAggregator {
       // 根据题目类型统计
       switch (questionType) {
         case 'single_choice':
+        case 'multiple_choice':
           stats = await this.aggregateSingleChoice(question)
           break
         case 'fill_blank':
@@ -64,7 +72,11 @@ export class StatsAggregator {
           stats = await this.aggregateTextInput(question)
           break
         default:
-          logger.warn(`未知题目类型: ${questionType}`)
+          // Keep the aggregate useful even when an old/malformed question
+          // uses a type this service does not understand. The caller can
+          // surface the flag to the teacher instead of silently showing zero.
+          stats = { total: totalAnswers, unsupportedType: true }
+          logger.warn('未知题目类型', { questionType })
       }
 
       return {
@@ -74,6 +86,7 @@ export class StatsAggregator {
         totalSessions,
         submissionRate,
         stats,
+        unsupportedType: !SUPPORTED_QUESTION_TYPES.has(questionType),
       }
     } catch (error) {
       logger.error('获取题目统计信息错误', error)
@@ -97,10 +110,17 @@ export class StatsAggregator {
 
     answers.forEach((answer: any) => {
       const answerData = answer.answer as any
-      const value = answerData.value
-      if (value !== undefined) {
-        optionCounts[value] = (optionCounts[value] || 0) + 1
-      }
+      const value = answerData && typeof answerData === 'object' && !Array.isArray(answerData) && 'value' in answerData
+        ? answerData.value
+        : answerData
+      const values = Array.isArray(value)
+        ? value
+        : typeof value === 'string' && value.includes(',')
+          ? value.split(',').map((item) => item.trim()).filter(Boolean)
+          : [value]
+      values.forEach((item) => {
+        if (typeof item === 'string' && item) optionCounts[item] = (optionCounts[item] || 0) + 1
+      })
     })
 
     // 计算百分比
@@ -245,7 +265,10 @@ export class StatsAggregator {
       const classroom = await prisma.classroom.findUnique({
         where: { id: classroomId },
         include: {
-          sessions: true,
+          sessions: {
+            where: { leftAt: null },
+            select: { id: true },
+          },
           questions: {
             orderBy: { questionIndex: 'asc' },
           },

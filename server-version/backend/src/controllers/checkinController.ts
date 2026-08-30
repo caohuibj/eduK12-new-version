@@ -21,6 +21,8 @@ import {
 } from '../services/assetStorage'
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
+import { createAttachmentSchema, isLegacyUploadReference } from '../utils/attachmentSchema'
+import { MAX_TOKEN_USES } from '../constants'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 import {
   checkinSubmissionSnapshot,
@@ -28,10 +30,7 @@ import {
   findCheckinIdempotencyReceipt,
 } from '../utils/submissionIdempotency'
 
-const attachmentSchema = z.union([
-  z.string().min(1).max(2048),
-  z.record(z.unknown()),
-])
+const attachmentSchema = createAttachmentSchema(config.legacyUploadsEnabled)
 const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createCheckinSchema = z.object({
@@ -70,22 +69,26 @@ const parseCheckinEndTime = (value: string | null | undefined): Date | null | un
   return parsed
 }
 
-const isLegacyUploadReference = (value: string): boolean => {
-  if (!/^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@%/_-]+$/.test(value)) return false
-  return !value.split('/').includes('..')
-}
+const submissionImageSchema = config.legacyUploadsEnabled
+  ? z.union([
+    z.object({ assetId: z.string().min(1).max(100) }).strict(),
+    z.string().min(1).max(2048).refine(isLegacyUploadReference, '图片引用无效'),
+  ])
+  : z.object({ assetId: z.string().min(1).max(100) }).strict()
 
 const submitCheckinSchema = z.object({
-  content: z.string().optional(),
+  content: z.string().max(200_000, '提交内容不能超过200KB').optional(),
   tags: z.array(z.string().max(20)).max(10).optional(),
   // During the asset migration, accept only old local upload references or a
   // server-issued asset capability. Client-supplied URLs are never trusted.
-  images: z.array(z.union([
-    z.string().min(1).max(2048).refine(isLegacyUploadReference, '图片引用无效'),
-    z.object({ assetId: z.string().min(1).max(100) }).strict(),
-  ])).max(9).optional(),
+  images: z.array(submissionImageSchema).max(9).optional(),
   expectedRevision: z.number().int().nonnegative().optional(),
 })
+
+const createCheckinTokenSchema = z.object({
+  expiresAt: z.string().datetime('有效期格式无效'),
+  maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),
+}).strict()
 
 const checkinSubmissionPayload = (submission: { content?: unknown; images?: unknown }) => ({
   content: submission.content ?? null,
@@ -606,35 +609,6 @@ export const checkinController = {
         }
       } else if (!canAccessCourseContent(checkin.course, req.user?.userId, req.user?.role)) {
         return forbidden(res, '您没有权限访问此打卡')
-      }
-
-      // 回填视频URL：当videos中url为空但id存在时，从videos表补充有效URL
-      if (checkin.videos && Array.isArray(checkin.videos)) {
-        const videosNeedingUpdate = (checkin.videos as any[]).filter((v: any) => v.id && !v.url)
-        if (videosNeedingUpdate.length > 0) {
-          const videoIds = videosNeedingUpdate.map((v: any) => v.id)
-          const videoRecords = await prisma.video.findMany({
-            where: { id: { in: videoIds } },
-            select: { id: true, processedUrl: true, originalUrl: true, fileName: true }
-          })
-          const videoMap = new Map(videoRecords.map(v => [v.id, v]))
-          
-          checkin.videos = (checkin.videos as any[]).map((v: any) => {
-            if (v.id && !v.url) {
-              const record = videoMap.get(v.id)
-              if (record) {
-                return {
-                  ...v,
-                  url: record.processedUrl || record.originalUrl || (record.fileName ? `/uploads/videos/${record.fileName}` : ''),
-                  processedUrl: record.processedUrl || v.processedUrl,
-                  originalUrl: record.originalUrl || v.originalUrl,
-                  fileName: record.fileName || v.fileName,
-                }
-              }
-            }
-            return v
-          }) as any
-        }
       }
 
       const { course: courseWithAccess, ...checkinData } = checkin
@@ -1518,7 +1492,9 @@ export const checkinController = {
     try {
       const userId = req.user?.userId
       const { id: checkinId } = req.params
-      const { expiresAt, maxUses } = req.body
+      const parsed = createCheckinTokenSchema.safeParse(req.body)
+      if (!parsed.success) return error(res, parsed.error.errors[0]?.message || '令牌参数无效')
+      const { expiresAt, maxUses } = parsed.data
 
       // 验证打卡是否存在
       const checkin = await prisma.checkin.findUnique({
@@ -1548,7 +1524,7 @@ export const checkinController = {
         checkinId,
         createdBy: userId!,
         expiresAt: new Date(expiresAt),
-        maxUses: maxUses || 0,
+        maxUses,
       })
 
       logger.info('教师创建打卡令牌', {

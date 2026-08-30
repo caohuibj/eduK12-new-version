@@ -1,3 +1,5 @@
+import { prisma } from '../config/database'
+
 /**
  * Helpers shared by assignment and authenticated check-in submission
  * controllers.  Idempotency receipts deliberately contain a JSON snapshot of
@@ -107,4 +109,25 @@ export const createCheckinIdempotencyReceipt = async (
   const delegate = db?.checkinSubmissionIdempotencyReceipt
   if (!delegate || typeof delegate.create !== 'function') return null
   return delegate.create({ data: values })
+}
+
+// Idempotency is a retry safety window, not an immutable audit log. Keeping a
+// bounded retention period prevents attackers (or a buggy client) from
+// growing the receipt tables forever by minting a fresh key per request.
+export const IDEMPOTENCY_RECEIPT_RETENTION_DAYS = 30
+
+export const cleanupExpiredSubmissionIdempotencyReceipts = async (
+  db: any = prisma,
+  now = new Date(),
+): Promise<{ assignment: number; checkin: number }> => {
+  const cutoff = new Date(now.getTime() - IDEMPOTENCY_RECEIPT_RETENTION_DAYS * 24 * 60 * 60 * 1000)
+  const [assignment, checkin] = await Promise.all([
+    typeof db?.submissionIdempotencyReceipt?.deleteMany === 'function'
+      ? db.submissionIdempotencyReceipt.deleteMany({ where: { createdAt: { lt: cutoff } } })
+      : { count: 0 },
+    typeof db?.checkinSubmissionIdempotencyReceipt?.deleteMany === 'function'
+      ? db.checkinSubmissionIdempotencyReceipt.deleteMany({ where: { createdAt: { lt: cutoff } } })
+      : { count: 0 },
+  ])
+  return { assignment: Number(assignment.count || 0), checkin: Number(checkin.count || 0) }
 }

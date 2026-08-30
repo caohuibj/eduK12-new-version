@@ -3,6 +3,7 @@ import { X, Video, Image as ImageIcon, Link as LinkIcon, Upload, Search, Check, 
 import apiClient from '../api/client'
 import { ensureCsrfToken, sessionAxios } from '../api/client'
 import type { Video as VideoType, Document as DocumentType } from '../types'
+import { isSafeExternalMediaUrl } from '../utils/mediaUtils'
 
 export interface MediaItem {
   type: 'library' | 'external' | 'upload'
@@ -170,16 +171,23 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   }
 
   const handleSelectExternal = () => {
-    if (!externalUrl.trim()) return
+    const trimmedUrl = externalUrl.trim()
+    if (!trimmedUrl) return
+    if (!isSafeExternalMediaUrl(trimmedUrl)) {
+      setUploadError('请输入有效的 HTTPS 视频链接，不支持 iframe 或 HTML 嵌入代码')
+      return
+    }
+    setUploadError('')
     
     // Detect source from URL
     let source = 'external'
-    if (externalUrl.includes('bilibili.com')) source = 'bilibili'
-    else if (externalUrl.includes('youtube.com')) source = 'youtube'
+    const hostname = new URL(trimmedUrl).hostname.toLowerCase()
+    if (hostname === 'bilibili.com' || hostname.endsWith('.bilibili.com') || hostname === 'b23.tv') source = 'bilibili'
+    else if (hostname === 'youtube.com' || hostname.endsWith('.youtube.com') || hostname === 'youtu.be') source = 'youtube'
     
     onSelect({
       type: 'external',
-      url: externalUrl.trim(),
+      url: trimmedUrl,
       title: externalTitle.trim() || '外部视频',
       source,
     })
@@ -274,6 +282,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           onSelect({
             type: 'library',
             id: uploadedDoc.id,
+            assetId: uploadedDoc.assetId,
             url: uploadedDoc.url || '',
             title: uploadedDoc.title,
           })
@@ -535,7 +544,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                   value={externalUrl}
                   onChange={(e) => setExternalUrl(e.target.value)}
                   className="input w-full h-24"
-                  placeholder="支持B站、YouTube等视频链接，或直接粘贴iframe嵌入代码"
+                  placeholder="支持 B 站、YouTube 等 HTTPS 视频链接"
                 />
               </div>
               <div>
@@ -549,8 +558,14 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 />
               </div>
               <p className="text-sm text-gray-500">
-                提示：支持B站、YouTube等平台链接，系统将自动解析
+                提示：仅接受 HTTPS 链接；不支持 iframe 或 HTML 嵌入代码
               </p>
+              {uploadError && (
+                <div className="flex items-start space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
             </div>
           )}
 

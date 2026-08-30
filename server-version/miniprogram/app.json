@@ -14,9 +14,7 @@
     "pages/questionnaire/anonymous/list",
     "pages/profile/index/index",
     "pages/password/index/index",
-    "pages/webview/index",
-    "pages/classroom/join/join",
-    "pages/classroom/answer/answer"
+    "pages/webview/index"
   ],
   "window": {
     "backgroundTextStyle": "dark",

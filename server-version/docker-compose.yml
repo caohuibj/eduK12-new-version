@@ -88,6 +88,7 @@ services:
       EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
       EXPORT_MAX_BYTES: ${EXPORT_MAX_BYTES:-52428800}
       EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-24}
+      EXPORT_DIR: /app/exports
       # COS 可选；留空则不启用远程存储
       COS_SECRET_ID: ${COS_SECRET_ID:-}
       COS_SECRET_KEY: ${COS_SECRET_KEY:-}
@@ -103,6 +104,7 @@ services:
       VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
     volumes:
       - uploads_data:/app/uploads
+      - exports_data:/app/exports
       - credential_handoff_data:/app/.local
     depends_on:
       postgres:
@@ -125,9 +127,10 @@ services:
   backend-volume-init:
     image: server-version-backend:latest
     user: root
-    command: ["sh", "-ec", "chown -R node:node /app/uploads /app/.local && chmod 750 /app/uploads && chmod 700 /app/.local"]
+    command: ["sh", "-ec", "chown -R node:node /app/uploads /app/exports /app/.local && chmod 750 /app/uploads /app/exports && chmod 700 /app/.local"]
     volumes:
       - uploads_data:/app/uploads
+      - exports_data:/app/exports
       - credential_handoff_data:/app/.local
     restart: "no"
 
@@ -169,6 +172,8 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # Backfill all public bearer-token tables (legacy service name retained for
+  # compatibility with existing operator commands).
   checkin-token-backfill:
     build:
       context: ./backend
@@ -230,4 +235,5 @@ volumes:
   postgres_data:
   redis_data:
   uploads_data:
+  exports_data:
   credential_handoff_data:

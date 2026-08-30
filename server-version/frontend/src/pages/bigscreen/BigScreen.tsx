@@ -17,6 +17,7 @@ interface Question {
 
 interface Stats {
   questionId: string
+  unsupportedType?: boolean
   answerCount: number
   totalSessions: number
   submissionRate: number
@@ -506,6 +507,9 @@ const BigScreen: React.FC = () => {
                   <span>提交率: {stats.submissionRate.toFixed(1)}%</span>
                 </div>
               </>
+            )}
+            {stats?.unsupportedType && (
+              <span className="text-amber-300">该题型暂不支持统计</span>
             )}
           </div>
           <button

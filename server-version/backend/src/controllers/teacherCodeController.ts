@@ -4,10 +4,15 @@ import { success, error, notFound } from '../utils/response'
 import { generateTeacherCode } from '../utils/teacherCode'
 import { z } from 'zod'
 import { logger } from '../utils/logger'
+import { MAX_TOKEN_USES } from '../constants'
 
 const createCodeSchema = z.object({
-  maxUses: z.number().int().min(1).default(1),
+  maxUses: z.number().int().min(1).max(MAX_TOKEN_USES).default(1),
   expiresAt: z.string().datetime().optional(),
+})
+
+const verifyCodeSchema = z.object({
+  code: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
 })
 
 export const teacherCodeController = {
@@ -109,11 +114,9 @@ export const teacherCodeController = {
   // 验证教师码（内部使用）
   async verify(req: Request, res: Response) {
     try {
-      const { code } = req.body
-
-      if (!code) {
-        return error(res, '请输入教师码')
-      }
+      const result = verifyCodeSchema.safeParse(req.body)
+      if (!result.success) return error(res, result.error.errors[0]?.message || '教师码格式无效')
+      const { code } = result.data
 
       const teacherCode = await prisma.teacherCode.findUnique({
         where: { code }

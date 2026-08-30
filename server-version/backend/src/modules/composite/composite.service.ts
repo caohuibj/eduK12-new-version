@@ -3,8 +3,14 @@ import { nanoid } from 'nanoid'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
+import { MAX_TOKEN_USES } from '../../constants'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
+import {
+  decryptPublicAccessToken,
+  encryptPublicAccessToken,
+  hashPublicAccessToken,
+} from '../../services/publicAccessTokenCrypto'
 import { encryptCognitivePayload, decryptCognitivePayload, getParticipantKey } from '../cognitive/cognitive.security'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import * as cognitiveSessionService from '../cognitive/session.service'
@@ -1477,6 +1483,7 @@ const assertCompositeWindow = (composite: { opensAt: Date | null; expiresAt: Dat
 
 export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number) => {
   assertTeacher(role)
+  if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw compositeBadRequest('最大参与次数无效')
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
@@ -1486,21 +1493,46 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
   if (composite.expiresAt && expiry.getTime() > composite.expiresAt.getTime()) {
     throw compositeBadRequest('公开链接有效期不能晚于综合测评有效期')
   }
+  const rawToken = createAccessToken()
   const record = await prisma.compositeAssessmentAccessToken.create({
-    data: { compositeAssessmentId: compositeId, token: createAccessToken(), createdBy: userId, expiresAt: expiry, maxUses },
+    data: {
+      compositeAssessmentId: compositeId,
+      token: null,
+      tokenHash: hashPublicAccessToken(rawToken),
+      tokenEncrypted: encryptPublicAccessToken(rawToken),
+      createdBy: userId,
+      expiresAt: expiry,
+      maxUses,
+    },
   })
-  return { id: record.id, token: record.token, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount }
+  return { id: record.id, token: rawToken, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount }
 }
 
 export const listAccessTokens = async (userId: string, role: UserRole, compositeId: string) => {
   assertTeacher(role)
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
-  return prisma.compositeAssessmentAccessToken.findMany({
+  const records = await prisma.compositeAssessmentAccessToken.findMany({
     where: { compositeAssessmentId: compositeId },
     orderBy: { createdAt: 'desc' },
-    select: { id: true, token: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true },
+    select: {
+      id: true,
+      token: true,
+      tokenEncrypted: true,
+      expiresAt: true,
+      maxUses: true,
+      usedCount: true,
+      isActive: true,
+      createdAt: true,
+    },
   })
+  return records.map(({ token, tokenEncrypted, ...record }) => ({
+    ...record,
+    // Management callers may still need to copy an existing link. Decrypt
+    // only in this already-authorized owner/admin path; it is never stored in
+    // the database or emitted by public resolvers.
+    token: token || (tokenEncrypted ? decryptPublicAccessToken(tokenEncrypted) : null),
+  }))
 }
 
 export const disableAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {
@@ -1716,8 +1748,9 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 }
 
 const findPublicToken = async (tokenValue: string) => {
-  const token = await prisma.compositeAssessmentAccessToken.findUnique({
-    where: { token: tokenValue },
+  const tokenHash = hashPublicAccessToken(tokenValue)
+  let token = await prisma.compositeAssessmentAccessToken.findUnique({
+    where: { tokenHash },
     include: {
       compositeAssessment: {
         include: {
@@ -1744,6 +1777,39 @@ const findPublicToken = async (tokenValue: string) => {
       },
     },
   })
+  if (!token) {
+    // Keep a bounded compatibility window for rows not yet processed by the
+    // explicit backfill. New rows never use this plaintext lookup path.
+    token = await prisma.compositeAssessmentAccessToken.findUnique({
+      where: { token: tokenValue },
+      include: {
+        compositeAssessment: {
+          include: {
+            course: { select: { isLibrary: true } },
+            items: {
+              orderBy: { position: 'asc' },
+              include: {
+                scale: {
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    description: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
+                  },
+                },
+                cognitiveAssignment: { include: { config: true } },
+              },
+            },
+          },
+        },
+      },
+    })
+    if (token?.tokenHash && token.tokenHash !== tokenHash) token = null
+  }
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')

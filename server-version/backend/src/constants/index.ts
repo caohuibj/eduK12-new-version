@@ -39,3 +39,8 @@ export const RATE_LIMIT = {
   API_WINDOW_MS: 60 * 1000,         // 1分钟
   API_MAX_REQUESTS: 100,
 } as const
+
+// PostgreSQL Prisma `Int` upper bound. Keeping the limit explicit prevents
+// invalid quota values from reaching the database and makes the 0=unlimited
+// contract consistent across all public-link/token endpoints.
+export const MAX_TOKEN_USES = 2_147_483_647

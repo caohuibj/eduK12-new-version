@@ -19,9 +19,9 @@ npm run release:verify:local
 npm run db:release:preflight
 ```
 
-输出 JSON 计数并在以下任一项非零时返回失败：失败迁移、明文打卡令牌、缺失令牌哈希/密文、重复作业历史版本、legacy `/uploads` 引用、资产根目录外文件，以及未验证的打卡令牌约束。`UPLOAD_DIR` 缺失、不可读或不是目录时也会 fail-closed，而不是报告零个 legacy 文件。该命令可使用只读数据库账号执行；`UPLOAD_DIR` 用于检查本地资产目录。
+输出 JSON 计数并在以下任一项非零时返回失败：失败迁移、四类公开令牌仍有明文或缺失哈希/密文、重复作业历史版本、幂等回执表缺失、legacy `/uploads` 引用、资产根目录外文件，以及未验证的公开令牌约束。`UPLOAD_DIR` 缺失、不可读或不是目录时也会 fail-closed，而不是报告零个 legacy 文件。该命令可使用只读数据库账号执行；`UPLOAD_DIR` 用于检查本地资产目录。
 
-生产发布顺序仍为：备份 → guarded migration → `npm run db:backfill:checkin-tokens` → 确认 `remaining=0` → 使用挂载 `uploads_data:/app/uploads:ro` 的 `release-preflight` ops service 执行 `npm run db:release:preflight` → 验证新旧链接和 legacy `/uploads` 已关闭。标准执行方式为：
+生产发布顺序仍为：备份 → guarded migration → `npm run db:backfill:public-tokens`（旧的 `db:backfill:checkin-tokens` 别名仍可用）→ 确认四类令牌均 `remaining=0` → 使用挂载 `uploads_data:/app/uploads:ro` 的 `release-preflight` ops service 执行 `npm run db:release:preflight` → 验证新旧链接和 legacy `/uploads` 已关闭。标准执行方式为：
 
 ```bash
 docker compose --profile ops run --rm release-preflight

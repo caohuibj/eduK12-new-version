@@ -9,6 +9,8 @@ import { z } from 'zod'
 import { workbookBuffer } from '../utils/excelWorkbook'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import { config } from '../config'
+import { createAttachmentSchema } from '../utils/attachmentSchema'
 import {
   AssetReferenceValidationError,
   hydrateAssetReferences,
@@ -21,10 +23,7 @@ import {
   findAssignmentIdempotencyReceipt,
 } from '../utils/submissionIdempotency'
 
-const attachmentSchema = z.union([
-  z.string().min(1).max(2048),
-  z.record(z.unknown()),
-])
+const attachmentSchema = createAttachmentSchema(config.legacyUploadsEnabled)
 const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createAssignmentSchema = z.object({
@@ -112,6 +111,11 @@ const submissionRevision = (submission: { revision?: unknown } | null | undefine
     : 0
 )
 
+// Keep the append-only history useful without allowing a single student to
+// exhaust storage by repeatedly resubmitting the same assignment forever.
+// The mutable Submission row remains the source of truth for the latest value.
+export const MAX_SUBMISSION_HISTORY_VERSIONS = 100
+
 /**
  * Keyed browser submissions carry the revision they read. Older clients that
  * omit it are treated as revision zero, which is safe for first writes and
@@ -131,9 +135,15 @@ const assertSubmissionRevision = (
   }
 }
 
+const submissionAnswersSchema = z.record(z.string().max(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
+  if (Buffer.byteLength(JSON.stringify(value), 'utf8') > 256_000) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: '答案总大小不能超过256KB' })
+  }
+})
+
 const submitSchema = z.object({
-  content: z.string().optional(),
-  answers: z.record(z.string()).optional(),
+  content: z.string().max(200_000, '提交内容不能超过200KB').optional(),
+  answers: submissionAnswersSchema.refine((value) => Object.keys(value).length <= 200, '答案数量不能超过200项').optional(),
   expectedRevision: z.number().int().nonnegative().optional(),
 })
 
@@ -754,6 +764,14 @@ export const assignmentController = {
             version: newVersion,
           },
         })
+        if (newVersion > MAX_SUBMISSION_HISTORY_VERSIONS && typeof tx.submissionHistory.deleteMany === 'function') {
+          await tx.submissionHistory.deleteMany({
+            where: {
+              submissionId: existing.id,
+              version: { lt: newVersion - MAX_SUBMISSION_HISTORY_VERSIONS + 1 },
+            },
+          })
+        }
 
         const updated = await tx.submission.update({
           where: { id: existing.id },
