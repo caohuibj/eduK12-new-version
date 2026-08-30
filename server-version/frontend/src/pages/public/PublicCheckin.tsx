@@ -36,13 +36,18 @@ interface CheckinData {
   allowViewOthers: boolean
 }
 
+const containsControlCharacter = (value: string): boolean => [...value].some((character) => {
+  const codePoint = character.codePointAt(0) ?? 0
+  return codePoint < 0x20 || codePoint === 0x7f
+})
+
 const isSafeLegacyUploadReference = (value: string): boolean => {
   if (!/^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@%/_-]+$/.test(value)) return false
   try {
     const decoded = decodeURIComponent(value)
     return /^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@/_-]+$/.test(decoded)
       && !decoded.includes('\\')
-      && !/[\u0000-\u001f\u007f]/.test(decoded)
+      && !containsControlCharacter(decoded)
       && !decoded.split('/').some((segment) => segment === '.' || segment === '..')
   } catch {
     return false
