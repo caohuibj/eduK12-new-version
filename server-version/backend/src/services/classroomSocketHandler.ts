@@ -975,7 +975,11 @@ export class ClassroomSocketHandler {
         success: true,
       })
       await this.broadcastStats(classroomId, question.id)
-    } catch {
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        this.emitError(socket, '您已提交过答案')
+        return
+      }
       logger.error('处理学生提交答案错误')
       this.emitError(socket, '提交答案失败')
     }
@@ -1135,11 +1139,23 @@ export class ClassroomSocketHandler {
         return
       }
 
+      const expectedQuestionId = readString(data, 'expectedQuestionId') || readString(data, 'questionId')
+      if (expectedQuestionId) {
+        const expectedQuestion = await prisma.classroomQuestion.findFirst({
+          where: { id: expectedQuestionId, classroomId: classroom.id },
+          select: { id: true },
+        })
+        if (!expectedQuestion) {
+          this.emitError(socket, '题目不存在或不属于当前课堂')
+          return
+        }
+      }
+
       socketService.broadcastToRoom(
         'classroom:' + classroom.id,
         'broadcast:next',
         {
-          expectedQuestionId: readString(data, 'expectedQuestionId') || readString(data, 'questionId') || null,
+          expectedQuestionId: expectedQuestionId || null,
         }
       )
       logger.info('教师切换下一题', { classroomId: classroom.id })
@@ -1299,6 +1315,7 @@ export class ClassroomSocketHandler {
     ])
 
     const content = question.questionContent as any
+    const supportedQuestionTypes = ['single_choice', 'multiple_choice', 'fill_blank', 'text_input']
     let optionStats: Record<string, number> | null = null
     if (
       content &&
@@ -1385,6 +1402,12 @@ export class ClassroomSocketHandler {
 
     return {
       questionId,
+      unsupportedType: !(
+        content
+        && typeof content === 'object'
+        && !Array.isArray(content)
+        && supportedQuestionTypes.includes(content.type)
+      ),
       answerCount,
       totalSessions,
       submissionRate: totalSessions > 0

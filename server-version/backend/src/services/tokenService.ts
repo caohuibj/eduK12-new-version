@@ -14,9 +14,27 @@ import { logger } from '../utils/logger'
 import { Prisma } from '@prisma/client'
 import { createHash } from 'crypto'
 import { decryptField, encryptField } from '../utils/encryption'
+import { MAX_TOKEN_USES } from '../constants'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
 const nanoid = customAlphabet('abcdefghjkmnpqrstuvwxyz23456789', 16)
+
+/**
+ * Keep lookup hashes/ciphertexts inside the service boundary.  Authorized
+ * management views may recover the bearer for copy-link workflows, but the
+ * protected columns themselves are never part of an API response.
+ */
+export const serializeQuestionnaireAccessToken = (row: any, reveal = false) => {
+  const {
+    token: legacyToken,
+    tokenHash: _tokenHash,
+    tokenEncrypted,
+    ...safe
+  } = row || {}
+  return reveal
+    ? { ...safe, token: legacyToken || (tokenEncrypted ? tokenService.decryptToken(tokenEncrypted) : null) }
+    : safe
+}
 
 export interface TokenValidation {
   valid: boolean
@@ -64,6 +82,13 @@ export const tokenService = {
   }) {
     const { questionnaireId, createdBy, expiresAt, maxUses = 0 } = params
 
+    if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) {
+      throw new Error('maxUses must be an integer between 0 and 2147483647')
+    }
+    if (!(expiresAt instanceof Date) || !Number.isFinite(expiresAt.getTime())) {
+      throw new Error('expiresAt must be a valid date')
+    }
+
     const token = this.generateToken()
 
     const accessToken = await prisma.questionnaireAccessToken.create({
@@ -98,7 +123,7 @@ export const tokenService = {
 
     // The raw bearer is returned once to the caller that just created it. It
     // is never persisted or logged in plaintext.
-    return { ...accessToken, token }
+    return { ...serializeQuestionnaireAccessToken(accessToken, true), token }
   },
 
   /**
@@ -282,13 +307,7 @@ export const tokenService = {
         },
       },
     })
-    return rows.map((row) => ({
-      ...row,
-      // Never expose a legacy plaintext value unless the caller has already
-      // passed the owner/admin authorization gate. New rows are decrypted
-      // only for that same explicitly authorized management view.
-      token: options.reveal ? (row.token || (row.tokenEncrypted ? this.decryptToken(row.tokenEncrypted) : null)) : undefined,
-    }))
+    return rows.map((row) => serializeQuestionnaireAccessToken(row, options.reveal === true))
   },
 
   /**
@@ -320,10 +339,7 @@ export const tokenService = {
       },
     })
     if (!row) return null
-    return {
-      ...row,
-      token: options.reveal ? (row.token || (row.tokenEncrypted ? this.decryptToken(row.tokenEncrypted) : null)) : undefined,
-    }
+    return serializeQuestionnaireAccessToken(row, options.reveal === true)
   },
 
   /**

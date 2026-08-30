@@ -83,6 +83,18 @@ export function isExternalUrl(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://')
 }
 
+/** External media is rendered by the browser, so only HTTPS URLs without
+ * embedded credentials are accepted. Raw iframe/HTML snippets are rejected
+ * before they can enter assignment or check-in JSON. */
+export function isSafeExternalMediaUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === 'https:' && !parsed.username && !parsed.password && Boolean(parsed.hostname)
+  } catch {
+    return false
+  }
+}
+
 /**
  * 标准化图片URL
  * 规则：

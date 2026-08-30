@@ -5,6 +5,7 @@ process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
 const { mockPrisma, mockCache } = vi.hoisted(() => ({
   mockPrisma: {
+    $queryRaw: vi.fn().mockResolvedValue([{ id: 'qa-1' }]),
     questionnaireAssessment: {
       findUnique: vi.fn(),
       update: vi.fn(),

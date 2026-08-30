@@ -109,6 +109,18 @@ describe('logged-in checkin submit endTime', () => {
     expect(mockPrisma.checkinSubmission.create).toHaveBeenCalledOnce()
   })
 
+  it('enforces the submission content limit in UTF-8 bytes', async () => {
+    const res = makeRes()
+
+    await checkinController.submit(makeReq({
+      body: { content: '中'.repeat(70_000) },
+    }), res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('提交内容不能超过200KB')
+    expect(mockPrisma.checkin.findUnique).not.toHaveBeenCalled()
+  })
+
   it('returns 5xx for an unexpected write or hydration failure so a keyed retry is retained', async () => {
     mockPrisma.checkin.findUnique.mockResolvedValue({
       id: 'ck-1',
@@ -351,7 +363,10 @@ describe('logged-in checkin submit endTime', () => {
     await checkinController.submit(makeReq({ body: { images: ['../../etc/passwd'] } }), res)
 
     expect(res.statusCode).toBe(400)
-    expect(res.body.message).toBe('图片引用无效')
+    // The migration-window schema returns the domain message; once legacy
+    // uploads are disabled, the strict object schema returns Zod's type
+    // message. Both modes must reject the untrusted string reference.
+    expect(['图片引用无效', 'Expected object, received string']).toContain(res.body.message)
     expect(mockPrisma.checkinSubmission.create).not.toHaveBeenCalled()
   })
 

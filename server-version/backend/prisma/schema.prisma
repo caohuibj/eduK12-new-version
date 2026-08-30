@@ -934,7 +934,11 @@ model CompositeFormAnswer {
 model CompositeAssessmentAccessToken {
   id                    String   @id @default(uuid())
   compositeAssessmentId String   @map("composite_assessment_id")
-  token                 String   @unique
+  // Legacy plaintext is nullable during the resumable application backfill.
+  // New rows persist only a deterministic lookup hash and encrypted bearer.
+  token                 String?  @unique
+  tokenHash             String?  @unique @map("token_hash")
+  tokenEncrypted        String?  @map("token_encrypted")
   createdBy             String   @map("created_by")
   expiresAt             DateTime @map("expires_at")
   maxUses               Int      @default(0) @map("max_uses")
@@ -948,6 +952,7 @@ model CompositeAssessmentAccessToken {
 
   @@index([compositeAssessmentId])
   @@index([isActive, expiresAt])
+  @@index([token])
   @@map("composite_assessment_access_tokens")
 }
 
@@ -1307,7 +1312,11 @@ model CognitiveSession {
 model CognitiveAccessToken {
   id           String   @id @default(uuid())
   assignmentId String   @map("assignment_id")
-  token        String   @unique
+  // Legacy plaintext is nullable during the resumable application backfill.
+  // New rows persist only a deterministic lookup hash and encrypted bearer.
+  token        String?  @unique
+  tokenHash    String?  @unique @map("token_hash")
+  tokenEncrypted String? @map("token_encrypted")
   createdBy    String   @map("created_by")
   expiresAt    DateTime @map("expires_at")
   maxUses      Int      @default(0) @map("max_uses")
@@ -1321,6 +1330,7 @@ model CognitiveAccessToken {
 
   @@index([assignmentId])
   @@index([isActive, expiresAt])
+  @@index([token])
   @@map("cognitive_access_tokens")
 }
 

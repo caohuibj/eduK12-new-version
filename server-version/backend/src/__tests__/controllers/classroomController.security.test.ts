@@ -7,6 +7,9 @@ const {
 } = vi.hoisted(() => ({
   mockPrisma: {
     classroom: { findUnique: vi.fn() },
+    classroomQuestion: { findFirst: vi.fn() },
+    classroomAnswer: { count: vi.fn(), findMany: vi.fn() },
+    classroomSession: { count: vi.fn() },
   },
   mockLookupLimit: vi.fn(),
   mockFailedLimit: vi.fn(),
@@ -130,5 +133,31 @@ describe('public classroom code boundary', () => {
     expect(res.body.message).toBe('课堂不存在或当前不可加入')
     expect(mockPrisma.classroom.findUnique).not.toHaveBeenCalled()
     expect(mockFailedLimit).toHaveBeenCalledWith('127.0.0.1', 'bad')
+  })
+
+  it('normalizes wrapped and multi-select answers in historical stats', async () => {
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({
+      id: 'question-1',
+      classroomId: 'classroom-1',
+      questionIndex: 1,
+      timeLimit: 60,
+      questionContent: {
+        type: 'multiple_choice',
+        options: [{ value: 'A', label: 'A' }, { value: 'B', label: 'B' }],
+      },
+    })
+    mockPrisma.classroomAnswer.count.mockResolvedValue(2)
+    mockPrisma.classroomSession.count.mockResolvedValue(2)
+    mockPrisma.classroomAnswer.findMany.mockResolvedValue([
+      { answer: { value: ['A', 'B'] } },
+      { answer: { value: 'A,B' } },
+    ])
+    const res = makeRes()
+
+    await classroomController.getQuestionStats({ params: { classroomId: 'classroom-1', questionId: 'question-1' } } as any, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.stats.optionStats).toEqual({ A: 2, B: 2 })
+    expect(res.body.data.stats.unsupportedType).toBe(false)
   })
 })

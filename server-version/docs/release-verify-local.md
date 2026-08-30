@@ -1,5 +1,11 @@
 # 本地发布门禁（Fix-2）
 
+> 这是隔离证据门禁，不是生产部署脚本。它只创建带有
+> `eduk12-release-verify-*` 前缀的一次性 PostgreSQL/Redis 资源，绝不会停止或重启
+> `ptool-*`。生产 operator 仍必须在运行 migration **之前**完成入口 drain，并停止
+> 所有旧 backend、worker/queue consumer 和 frontend；`NOT VALID` 只跳过历史行扫描，
+> 仍会拦截旧服务对明文 token 行的后续 UPDATE/INSERT。
+
 GitHub Actions 暂不可用时，使用候选提交的完整 checkout 执行一次隔离验证：
 
 ```bash
@@ -19,9 +25,19 @@ npm run release:verify:local
 npm run db:release:preflight
 ```
 
-输出 JSON 计数并在以下任一项非零时返回失败：失败迁移、明文打卡令牌、缺失令牌哈希/密文、重复作业历史版本、legacy `/uploads` 引用、资产根目录外文件，以及未验证的打卡令牌约束。`UPLOAD_DIR` 缺失、不可读或不是目录时也会 fail-closed，而不是报告零个 legacy 文件。该命令可使用只读数据库账号执行；`UPLOAD_DIR` 用于检查本地资产目录。
+输出 JSON 计数并在以下任一项非零时返回失败：失败迁移、四类公开令牌仍有明文或缺失哈希/密文、重复作业历史版本、幂等回执表缺失、legacy `/uploads` 引用、资产根目录外文件，以及未验证的公开令牌约束。`UPLOAD_DIR` 缺失、不可读或不是目录时也会 fail-closed，而不是报告零个 legacy 文件。该命令可使用只读数据库账号执行；`UPLOAD_DIR` 用于检查本地资产目录。
 
-生产发布顺序仍为：备份 → guarded migration → `npm run db:backfill:checkin-tokens` → 确认 `remaining=0` → 使用挂载 `uploads_data:/app/uploads:ro` 的 `release-preflight` ops service 执行 `npm run db:release:preflight` → 验证新旧链接和 legacy `/uploads` 已关闭。标准执行方式为：
+生产发布顺序为：
+
+1. 在入口/负载均衡处 drain public traffic，并停止旧 backend、worker/queue consumer 和 frontend；确认旧版本不再写数据库。
+2. 备份数据库（并完成可读性/恢复检查）。
+3. 在同一份新版本 checkout 上执行 guarded migration。
+4. 执行 `npm run db:backfill:public-tokens`（旧的 `db:backfill:checkin-tokens` 别名仍可用），确认 questionnaire、check-in、composite、cognitive 四类均 `remaining=0`。
+5. 使用挂载 `uploads_data:/app/uploads:ro` 的 `release-preflight` ops service 执行 `npm run db:release:preflight`；要求八个 public-token 约束全部已验证，且所有危险计数均为 `0`。
+6. 使用同一 SHA 构建并启动新 backend/frontend；在恢复入口流量前，对每个已启用的 questionnaire、check-in、composite、cognitive public workflow 各 smoke 一条新/旧链接，并确认 legacy `/uploads` 已关闭。
+7. 恢复入口/负载均衡流量，观察健康检查、错误率、队列和数据库写入。
+
+标准 preflight 执行方式为：
 
 ```bash
 docker compose --profile ops run --rm release-preflight

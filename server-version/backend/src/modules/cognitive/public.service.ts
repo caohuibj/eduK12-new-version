@@ -1,7 +1,13 @@
 import { randomBytes } from 'crypto'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { MAX_TOKEN_USES } from '../../constants'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
+import {
+  decryptPublicAccessToken,
+  encryptPublicAccessToken,
+  hashPublicAccessToken,
+} from '../../services/publicAccessTokenCrypto'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { hashResolvedConfig } from './profile-freeze'
@@ -18,10 +24,20 @@ const assertWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: numb
 }
 
 const loadToken = async (value: string) => {
-  const token = await prisma.cognitiveAccessToken.findUnique({
-    where: { token: value },
+  const tokenHash = hashPublicAccessToken(value)
+  let token = await prisma.cognitiveAccessToken.findUnique({
+    where: { tokenHash },
     include: { assignment: { include: { config: true, course: true } } },
   })
+  if (!token) {
+    // Compatibility lookup for legacy rows during the explicit backfill
+    // window. New rows have token=NULL and are resolved by tokenHash.
+    token = await prisma.cognitiveAccessToken.findUnique({
+      where: { token: value },
+      include: { assignment: { include: { config: true, course: true } } },
+    })
+    if (token?.tokenHash && token.tokenHash !== tokenHash) token = null
+  }
   if (!token) throw NOT_FOUND('Public link not found')
   if (token.assignment.status !== 'PUBLISHED' || token.assignment.config.status !== 'PUBLISHED') {
     throw FORBIDDEN('Cognitive assignment is not publicly available')
@@ -129,6 +145,7 @@ export const completeSession = async (sessionId: string, recoveryToken: string) 
   completionService.completeSessionForPublic(sessionId, hashRecoveryToken(recoveryToken))
 
 export const createAccessTokenForAssignment = async (userId: string, role: UserRole, assignmentId: string, expiresAt: string, maxUses: number) => {
+  if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw BAD_REQUEST('maxUses is invalid')
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId }, include: { course: { select: { isLibrary: true } } } })
   if (!assignment) throw NOT_FOUND('Cognitive assignment not found')
   if (role !== UserRole.ADMIN && (role !== UserRole.TEACHER || assignment.createdBy !== userId)) throw FORBIDDEN('Not the creator of this assignment')
@@ -136,15 +153,43 @@ export const createAccessTokenForAssignment = async (userId: string, role: UserR
   if (isCompositeWrapper(assignment) || assignment.course?.isLibrary) throw BAD_REQUEST('此认知任务仅用于综合测评，不能单独作答或公开分发')
   const expiry = new Date(expiresAt)
   if (expiry.getTime() <= Date.now()) throw BAD_REQUEST('expiresAt must be in the future')
-  const record = await prisma.cognitiveAccessToken.create({ data: { assignmentId, token: createAccessToken(), createdBy: userId, expiresAt: expiry, maxUses } })
-  return { id: record.id, token: record.token, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount }
+  const rawToken = createAccessToken()
+  const record = await prisma.cognitiveAccessToken.create({
+    data: {
+      assignmentId,
+      token: null,
+      tokenHash: hashPublicAccessToken(rawToken),
+      tokenEncrypted: encryptPublicAccessToken(rawToken),
+      createdBy: userId,
+      expiresAt: expiry,
+      maxUses,
+    },
+  })
+  return { id: record.id, token: rawToken, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount }
 }
 
 export const listAccessTokens = async (userId: string, role: UserRole, assignmentId: string) => {
   const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('Cognitive assignment not found')
   if (role !== UserRole.ADMIN && (role !== UserRole.TEACHER || assignment.createdBy !== userId)) throw FORBIDDEN('Not the creator of this assignment')
-  return prisma.cognitiveAccessToken.findMany({ where: { assignmentId }, orderBy: { createdAt: 'desc' }, select: { id: true, token: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true } })
+  const records = await prisma.cognitiveAccessToken.findMany({
+    where: { assignmentId },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      token: true,
+      tokenEncrypted: true,
+      expiresAt: true,
+      maxUses: true,
+      usedCount: true,
+      isActive: true,
+      createdAt: true,
+    },
+  })
+  return records.map(({ token, tokenEncrypted, ...record }) => ({
+    ...record,
+    token: token || (tokenEncrypted ? decryptPublicAccessToken(tokenEncrypted) : null),
+  }))
 }
 
 export const disableAccessToken = async (userId: string, role: UserRole, assignmentId: string, tokenId: string) => {

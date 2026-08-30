@@ -32,8 +32,13 @@ const tableExists = async (table) => {
 
 const requiredTables = [
   '_prisma_migrations',
+  'questionnaire_access_tokens',
   'checkin_access_tokens',
+  'composite_assessment_access_tokens',
+  'cognitive_access_tokens',
   'submission_histories',
+  'submission_idempotency_receipts',
+  'checkin_submission_idempotency_receipts',
   'courses',
   'assignments',
   'checkins',
@@ -106,6 +111,51 @@ const run = async () => {
       FROM "checkin_access_tokens"
       WHERE token IS NULL AND token_encrypted IS NULL
     `),
+    plaintext_questionnaire_tokens: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "questionnaire_access_tokens"
+      WHERE token IS NOT NULL
+    `),
+    missing_questionnaire_token_hash: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "questionnaire_access_tokens"
+      WHERE token IS NULL AND token_hash IS NULL
+    `),
+    missing_questionnaire_token_encrypted: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "questionnaire_access_tokens"
+      WHERE token IS NULL AND token_encrypted IS NULL
+    `),
+    plaintext_composite_tokens: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "composite_assessment_access_tokens"
+      WHERE token IS NOT NULL
+    `),
+    missing_composite_token_hash: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "composite_assessment_access_tokens"
+      WHERE token IS NULL AND token_hash IS NULL
+    `),
+    missing_composite_token_encrypted: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "composite_assessment_access_tokens"
+      WHERE token IS NULL AND token_encrypted IS NULL
+    `),
+    plaintext_cognitive_tokens: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "cognitive_access_tokens"
+      WHERE token IS NOT NULL
+    `),
+    missing_cognitive_token_hash: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "cognitive_access_tokens"
+      WHERE token IS NULL AND token_hash IS NULL
+    `),
+    missing_cognitive_token_encrypted: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "cognitive_access_tokens"
+      WHERE token IS NULL AND token_encrypted IS NULL
+    `),
     duplicate_submission_history_versions: await countRows(`
       SELECT COUNT(*)::int AS count
       FROM (
@@ -117,35 +167,35 @@ const run = async () => {
     `),
     legacy_course_asset_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "courses"
-      WHERE COALESCE(cover_url, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(cover_url, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_assignment_asset_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "assignments"
-      WHERE COALESCE(images::text, '') ILIKE '%/uploads/%'
-         OR COALESCE(documents::text, '') ILIKE '%/uploads/%'
-         OR COALESCE(videos::text, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(images::text, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(documents::text, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(videos::text, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_checkin_asset_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "checkins"
-      WHERE COALESCE(images::text, '') ILIKE '%/uploads/%'
-         OR COALESCE(documents::text, '') ILIKE '%/uploads/%'
-         OR COALESCE(videos::text, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(images::text, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(documents::text, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(videos::text, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_video_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "videos"
-      WHERE COALESCE(file_path, '') ILIKE '%/uploads/%'
-         OR COALESCE(original_url, '') ILIKE '%/uploads/%'
-         OR COALESCE(processed_url, '') ILIKE '%/uploads/%'
-         OR COALESCE(thumbnail_url, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(file_path, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(original_url, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(processed_url, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(thumbnail_url, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_document_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "documents"
-      WHERE COALESCE(file_path, '') ILIKE '%/uploads/%'
-         OR COALESCE(cos_url, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(file_path, '') ~* '(^|[" ])/?uploads/'
+         OR COALESCE(cos_url, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_submission_references: await countRows(`
       SELECT COUNT(*)::int AS count FROM "checkin_submissions"
-      WHERE COALESCE(images::text, '') ILIKE '%/uploads/%'
+      WHERE COALESCE(images::text, '') ~* '(^|[" ])/?uploads/'
     `),
     legacy_files_outside_asset_root: await countFilesOutsideAssetRoot(),
     unvalidated_checkin_token_constraints: await countRows(`
@@ -167,6 +217,47 @@ const run = async () => {
           'checkin_access_tokens_protected_fields_present'
         )
     `),
+    unvalidated_public_token_constraints: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM pg_constraint
+      WHERE conrelid IN (
+        'questionnaire_access_tokens'::regclass,
+        'checkin_access_tokens'::regclass,
+        'composite_assessment_access_tokens'::regclass,
+        'cognitive_access_tokens'::regclass
+      )
+        AND conname IN (
+          'questionnaire_access_tokens_token_must_be_null',
+          'questionnaire_access_tokens_protected_fields_present',
+          'checkin_access_tokens_token_must_be_null',
+          'checkin_access_tokens_protected_fields_present',
+          'composite_assessment_access_tokens_token_must_be_null',
+          'composite_assessment_access_tokens_protected_fields_present',
+          'cognitive_access_tokens_token_must_be_null',
+          'cognitive_access_tokens_protected_fields_present'
+        )
+        AND convalidated = false
+    `),
+    missing_public_token_constraints: await countRows(`
+      SELECT (8 - COUNT(*))::int AS count
+      FROM pg_constraint
+      WHERE conrelid IN (
+        'questionnaire_access_tokens'::regclass,
+        'checkin_access_tokens'::regclass,
+        'composite_assessment_access_tokens'::regclass,
+        'cognitive_access_tokens'::regclass
+      )
+        AND conname IN (
+          'questionnaire_access_tokens_token_must_be_null',
+          'questionnaire_access_tokens_protected_fields_present',
+          'checkin_access_tokens_token_must_be_null',
+          'checkin_access_tokens_protected_fields_present',
+          'composite_assessment_access_tokens_token_must_be_null',
+          'composite_assessment_access_tokens_protected_fields_present',
+          'cognitive_access_tokens_token_must_be_null',
+          'cognitive_access_tokens_protected_fields_present'
+        )
+    `),
   }
 
   const blockingFields = [
@@ -174,6 +265,15 @@ const run = async () => {
     'plaintext_checkin_tokens',
     'missing_checkin_token_hash',
     'missing_checkin_token_encrypted',
+    'plaintext_questionnaire_tokens',
+    'missing_questionnaire_token_hash',
+    'missing_questionnaire_token_encrypted',
+    'plaintext_composite_tokens',
+    'missing_composite_token_hash',
+    'missing_composite_token_encrypted',
+    'plaintext_cognitive_tokens',
+    'missing_cognitive_token_hash',
+    'missing_cognitive_token_encrypted',
     'duplicate_submission_history_versions',
     'legacy_course_asset_references',
     'legacy_assignment_asset_references',
@@ -184,6 +284,8 @@ const run = async () => {
     'legacy_files_outside_asset_root',
     'unvalidated_checkin_token_constraints',
     'missing_checkin_token_constraints',
+    'unvalidated_public_token_constraints',
+    'missing_public_token_constraints',
   ]
   const blocking = blockingFields.filter((field) => metrics[field] > 0)
   const result = { ok: blocking.length === 0, metrics }

@@ -835,26 +835,23 @@ export const classroomController = {
 
           const optionCounts: Record<string, number> = {}
           answers.forEach((a) => {
-            const answerValue = a.answer
-            
-            if (Array.isArray(answerValue)) {
-              answerValue.forEach((option) => {
+            const rawValue = a.answer
+            const answerValue = rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)
+              && Object.prototype.hasOwnProperty.call(rawValue, 'value')
+              ? (rawValue as Record<string, unknown>).value
+              : rawValue
+            const values = Array.isArray(answerValue)
+              ? answerValue
+              : typeof answerValue === 'string' && answerValue.includes(',')
+                ? answerValue.split(',').map((option) => option.trim()).filter(Boolean)
+                : [answerValue]
+
+            values.forEach((option) => {
                 if (typeof option === 'string') {
-                  optionCounts[option] = (optionCounts[option] || 0) + 1
+                  const normalized = option.trim()
+                  if (normalized) optionCounts[normalized] = (optionCounts[normalized] || 0) + 1
                 }
               })
-            } else if (typeof answerValue === 'string') {
-              if (answerValue.includes(',')) {
-                answerValue.split(',').forEach((option) => {
-                  const trimmed = option.trim()
-                  if (trimmed) {
-                    optionCounts[trimmed] = (optionCounts[trimmed] || 0) + 1
-                  }
-                })
-              } else {
-                optionCounts[answerValue] = (optionCounts[answerValue] || 0) + 1
-              }
-            }
           })
 
           optionStats = optionCounts
@@ -900,15 +897,33 @@ export const classroomController = {
             take: 100,
           })
 
-          textAnswers = answers.map((a) => ({
-            text: a.answer as string,
-            timestamp: a.submittedAt.getTime(),
-          }))
+          textAnswers = answers
+            .map((a) => {
+              const rawValue = a.answer
+              const value = rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)
+                && Object.prototype.hasOwnProperty.call(rawValue, 'value')
+                ? (rawValue as Record<string, unknown>).value
+                : rawValue
+              if (typeof value !== 'string' && typeof value !== 'number') return null
+              const text = String(value).trim()
+              return text ? { text, timestamp: a.submittedAt.getTime() } : null
+            })
+            .filter((answer): answer is { text: string; timestamp: number } => !!answer)
         }
       }
 
       const stats = {
         questionId,
+        questionType: question.questionContent && typeof question.questionContent === 'object' && !Array.isArray(question.questionContent)
+          && typeof (question.questionContent as any).type === 'string'
+          ? (question.questionContent as any).type
+          : 'unknown',
+        unsupportedType: !(
+          question.questionContent
+          && typeof question.questionContent === 'object'
+          && !Array.isArray(question.questionContent)
+          && ['single_choice', 'multiple_choice', 'fill_blank', 'text_input'].includes((question.questionContent as any).type)
+        ),
         answerCount,
         totalSessions,
         submissionRate: totalSessions > 0 ? (answerCount / totalSessions) * 100 : 0,

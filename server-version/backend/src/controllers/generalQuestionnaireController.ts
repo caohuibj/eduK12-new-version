@@ -11,13 +11,14 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
-import { tokenService } from '../services/tokenService'
+import { serializeQuestionnaireAccessToken, tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
+import { MAX_TOKEN_USES } from '../constants'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -43,7 +44,7 @@ const createQuestionnaireSchema = z.object({
 
 const createTokenSchema = z.object({
   expiresDays: z.number().int().min(1).max(365).default(30),
-  maxUses: z.number().int().min(0).default(0), // 0表示无限制
+  maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0), // 0表示无限制
 })
 
 // ==================== Controller ====================
@@ -635,7 +636,10 @@ export const generalQuestionnaireController = {
 
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
-      return success(res, questionnaire)
+      return success(res, {
+        ...questionnaire,
+        accessTokens: questionnaire.accessTokens.map((token: any) => serializeQuestionnaireAccessToken(token, true)),
+      })
     } catch (err) {
       logger.error('获取泛化问卷详情错误', err)
       return error(res, '获取问卷详情失败')
@@ -845,6 +849,13 @@ export const generalQuestionnaireController = {
   async listFormItems(req: Request, res: Response) {
     try {
       const { id } = req.params
+
+      // Form items are questionnaire configuration, not a public resource.
+      // Keep the same object/type authorization boundary as the other
+      // general-questionnaire endpoints before querying by the foreign key.
+      const questionnaire = await generalQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
       const formItems = await prisma.questionnaireFormItem.findMany({
         where: { questionnaireId: id },

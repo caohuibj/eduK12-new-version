@@ -14,6 +14,7 @@ import { customAlphabet } from 'nanoid'
 import { logger } from '../utils/logger'
 import { Prisma } from '@prisma/client'
 import { config } from '../config'
+import { MAX_TOKEN_USES } from '../constants'
 import { decryptToken, encryptToken, hashToken } from './checkinTokenCrypto'
 
 // 使用字母数字字符集生成令牌（排除容易混淆的字符）
@@ -102,6 +103,13 @@ export const checkinTokenService = {
     maxUses?: number
   }) {
     const { checkinId, createdBy, expiresAt, maxUses = 0 } = params
+
+    if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) {
+      throw new Error('maxUses must be an integer between 0 and 2147483647')
+    }
+    if (!(expiresAt instanceof Date) || !Number.isFinite(expiresAt.getTime())) {
+      throw new Error('expiresAt must be a valid date')
+    }
 
     const token = this.generateToken()
 

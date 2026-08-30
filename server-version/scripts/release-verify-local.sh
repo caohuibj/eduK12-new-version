@@ -3,6 +3,11 @@
 # Reproducible local release gate.  All database and Redis state is created
 # in uniquely named, short-lived Docker resources; this script never calls
 # `docker compose down` and therefore cannot stop the developer stack.
+#
+# Production sequencing is intentionally documented, not performed, here:
+# drain/stop old API, workers, and public traffic before migration; backup;
+# migrate; backfill all four public-token tables; validate/preflight; then
+# build/start the new SHA and smoke-test public workflows before reopening.
 
 set -Eeuo pipefail
 
@@ -114,6 +119,8 @@ if [ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all -- "$BAC
   exit 1
 fi
 
+log 'production prerequisite reminder: drain/stop old API/workers/public traffic before applying NOT VALID token migrations; this gate never touches ptool-*'
+
 git -C "$REPO_ROOT" diff --check >"$REPORT_DIR/git-diff-check.log"
 node --version >"$REPORT_DIR/tool-versions.log"
 npm --version >>"$REPORT_DIR/tool-versions.log"
@@ -188,7 +195,7 @@ run_logged backend-migrate.log npm --prefix "$BACKEND_DIR" run db:migrate:guarde
 ADMIN_USERNAME='release_verify_admin' ADMIN_PASSWORD='release_verify_admin_password_2026' \
   run_logged backend-seed.log npm --prefix "$BACKEND_DIR" run db:seed
 run_logged backend-migrate-idempotent.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
-run_logged backend-token-backfill.log npm --prefix "$BACKEND_DIR" run db:backfill:checkin-tokens
+run_logged backend-token-backfill.log npm --prefix "$BACKEND_DIR" run db:backfill:public-tokens
 run_logged backend-data-preflight.log npm --prefix "$BACKEND_DIR" run db:release:preflight
 log 'verifying a missing uploads directory fails the release preflight closed'
 set +e

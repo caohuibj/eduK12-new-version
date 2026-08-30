@@ -8,6 +8,9 @@ set -e  # 遇错即停
 cat >&2 <<'NOTICE'
 此脚本已停用：生产环境必须使用 server-version/docker-compose.yml。
 请勿在宿主机安装 PostgreSQL、Redis 或 PM2；请按 Docker Compose 部署文档操作。
+升级时必须先 drain/stop 旧 backend、worker 和 public traffic，再按
+备份 -> guarded migration -> 四类 public-token backfill -> release-preflight
+-> 新版本 build/start -> 每类已启用 public workflow smoke -> 恢复流量执行。
 NOTICE
 exit 1
 

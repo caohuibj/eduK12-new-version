@@ -28,6 +28,7 @@ import './services/wordSegmentation'
 import { cacheService } from './services/cacheService'
 import { closeQueues } from './config/queue'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
+import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -262,6 +263,7 @@ app.use(errorHandler)
 // have initialized. This keeps PM2/Docker from declaring a process ready while
 // classroom broadcasts are silently running without cross-process delivery.
 let exportCleanupTimer: ReturnType<typeof setInterval> | null = null
+let submissionReceiptCleanupTimer: ReturnType<typeof setInterval> | null = null
 let serverListening = false
 let shutdownStarted = false
 
@@ -269,6 +271,7 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
   if (exportCleanupTimer) clearInterval(exportCleanupTimer)
+  if (submissionReceiptCleanupTimer) clearInterval(submissionReceiptCleanupTimer)
   logger.info(`${signal} signal received: closing HTTP server`)
   
   // 设置强制退出超时（5秒）
@@ -339,6 +342,20 @@ const startServer = async (): Promise<void> => {
     }).catch((err) => logger.warn('过期导出产物清理失败', err))
   }, 60 * 60 * 1000)
   exportCleanupTimer.unref?.()
+
+  // Idempotency keys are retained for a bounded retry window. Cleanup is
+  // metadata-only and runs on every backend instance; the indexed createdAt
+  // predicate keeps the query bounded as the tables grow.
+  const cleanupSubmissionReceipts = () => {
+    void cleanupExpiredSubmissionIdempotencyReceipts().then((result) => {
+      if (result.assignment > 0 || result.checkin > 0) {
+        logger.info('过期提交幂等回执清理完成', result)
+      }
+    }).catch((err) => logger.warn('过期提交幂等回执清理失败', err))
+  }
+  cleanupSubmissionReceipts()
+  submissionReceiptCleanupTimer = setInterval(cleanupSubmissionReceipts, 60 * 60 * 1000)
+  submissionReceiptCleanupTimer.unref?.()
 
   await new Promise<void>((resolve, reject) => {
     const onError = (error: Error) => {

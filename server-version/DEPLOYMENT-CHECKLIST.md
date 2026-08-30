@@ -1,4 +1,56 @@
-# PTool v1.0 部署准备清单
+# PTool 部署检查清单
+
+> **当前生产流程（2026-08-30，PR #30+）**：下面的原始 v1.0 主机/PM2 内容已
+> 过时，保留仅作历史记录，禁止照做。生产环境只使用
+> `server-version/docker-compose.yml`，并遵循本节的停写窗口。
+
+## 当前 Compose 正式发布流程
+
+### 发布前与停写窗口
+
+- [ ] 已确认目标提交 SHA，并完成本地 exact-SHA 发布门禁；Hosted CI 因额度暂不可用时，留存本地门禁报告
+- [ ] 已在入口/负载均衡处停止并排空 public traffic
+- [ ] 已停止所有旧 backend、worker/queue consumer 和 frontend 实例；旧版本不得继续写入数据库
+- [ ] 已确认数据库、上传、Redis 和凭据交接卷的备份策略与恢复联系人
+
+### 数据库与 token 迁移（同一份新版本 checkout）
+
+- [ ] 先完成数据库备份并验证备份文件可读
+- [ ] 执行 `docker compose --profile ops run --rm migrate`（guarded migration）
+- [ ] 执行 `docker compose --profile ops run --rm checkin-token-backfill`
+- [ ] questionnaire、check-in、composite、cognitive 四类 public bearer token 的 `remaining` 均为 `0`
+- [ ] 执行 `docker compose --profile ops run --rm release-preflight`
+- [ ] preflight 成功，八个 public-token 约束均已验证（`unvalidated=0`、`missing=0`），所有危险计数为 `0`
+
+### 新版本启动与恢复流量
+
+- [ ] 使用同一提交构建并启动 `backend`、`frontend`；不要复用旧版本镜像
+- [ ] 对每个已启用的 questionnaire、check-in、composite、cognitive public workflow 各 smoke 一条新/旧链接
+- [ ] 确认 `/uploads` legacy 引用已关闭、管理员登录和健康检查正常
+- [ ] 先恢复入口/负载均衡流量，再观察错误率、队列和数据库写入
+
+升级时的最小命令顺序：
+
+```bash
+cd /opt/ptool/server-version
+# 已在入口 drain 后执行；只停止应用，不停止 postgres/redis：
+docker compose stop frontend backend
+docker exec ptool-postgres pg_dump -U <DB_USER> <DB_NAME> > backup-$(date -u +%Y%m%dT%H%M%SZ).sql
+docker compose build backend frontend migrate checkin-token-backfill release-preflight
+docker compose --profile ops run --rm migrate
+docker compose --profile ops run --rm checkin-token-backfill
+docker compose --profile ops run --rm release-preflight
+docker compose up -d backend frontend
+# 完成上述 public workflow smoke 后恢复入口流量。
+```
+
+`NOT VALID` 只跳过历史行扫描，仍会拦截迁移后对旧明文 token 行的 UPDATE/INSERT；
+所以 **drain/stop 必须发生在 migrate 之前**。本地 `release-verify-local.sh` 使用
+隔离容器，永远不会替生产环境执行停写或替 operator 排空流量。
+
+---
+
+## 历史 v1.0 内容（禁止执行）
 
 **版本**: v1.0.0-stable  
 **日期**: 2025-02-07  

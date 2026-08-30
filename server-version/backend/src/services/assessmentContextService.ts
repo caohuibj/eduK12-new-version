@@ -12,7 +12,8 @@ import { assessmentContextHashMatches, decryptAssessmentContext, encryptAssessme
 
 // Production callers must pass the transaction client so context freezing,
 // answer writes and child completion share one database snapshot. Unit tests
-// may still provide a structural double through `as any`.
+// may still provide a structural double through `as any`, but it must expose
+// the transaction lock primitive as well.
 type DatabaseClient = Prisma.TransactionClient
 
 export class AssessmentContextServiceError extends Error {
@@ -44,10 +45,9 @@ export const validateContextConfiguration = (items: Array<Record<string, unknown
 )
 
 const lockQuestionnaireAssessment = async (db: DatabaseClient, assessmentId: string): Promise<void> => {
-  // Lightweight controller/unit-test Prisma doubles do not expose $queryRaw.
-  // Real Prisma clients always do, so production transactions still acquire
-  // the parent-row lock before reading or freezing the context.
-  if (typeof (db as { $queryRaw?: unknown }).$queryRaw !== 'function') return
+  if (typeof (db as { $queryRaw?: unknown }).$queryRaw !== 'function') {
+    throw new AssessmentContextServiceError('冻结人口学上下文必须使用事务客户端', 500)
+  }
   const rows = await db.$queryRaw<Array<{ id: string }>>`
     SELECT "id"
     FROM "questionnaire_assessments"
@@ -58,7 +58,9 @@ const lockQuestionnaireAssessment = async (db: DatabaseClient, assessmentId: str
 }
 
 const lockCompositeAssessmentAttempt = async (db: DatabaseClient, attemptId: string): Promise<void> => {
-  if (typeof (db as { $queryRaw?: unknown }).$queryRaw !== 'function') return
+  if (typeof (db as { $queryRaw?: unknown }).$queryRaw !== 'function') {
+    throw new AssessmentContextServiceError('冻结人口学上下文必须使用事务客户端', 500)
+  }
   const rows = await db.$queryRaw<Array<{ id: string }>>`
     SELECT "id"
     FROM "composite_assessment_attempts"

@@ -95,6 +95,30 @@ describe('assignment submit deadline', () => {
     expect(mockPrisma.submission.create).toHaveBeenCalledOnce()
   })
 
+  it('enforces the submission content limit in UTF-8 bytes', async () => {
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      body: { content: '中'.repeat(70_000) },
+    }), res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('提交内容不能超过200KB')
+    expect(mockPrisma.assignment.findUnique).not.toHaveBeenCalled()
+  })
+
+  it('enforces the individual answer limit in UTF-8 bytes', async () => {
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({
+      body: { answers: { question1: '中'.repeat(4_000) } },
+    }), res)
+
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('单个答案不能超过10KB')
+    expect(mockPrisma.assignment.findUnique).not.toHaveBeenCalled()
+  })
+
   it('returns 5xx for an unexpected write failure so a keyed retry is retained', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MAX_TOKEN_USES } from '../../constants'
 
 const dateTime = z.string().datetime()
 const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
@@ -95,7 +96,7 @@ export const reorderCompositeItemsSchema = z.object({
 
 export const createCompositeTokenSchema = z.object({
   expiresAt: dateTime,
-  maxUses: z.number().int().min(0).default(0),
+  maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),
 }).strict()
 
 export const compositeExportQuerySchema = z.object({

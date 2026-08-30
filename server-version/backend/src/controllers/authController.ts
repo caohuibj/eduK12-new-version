@@ -18,14 +18,14 @@ const loginSchema = z.object({
 })
 
 const teacherRegisterSchema = z.object({
-  teacherCode: z.string().min(1, '教师码不能为空'),
+  teacherCode: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(1, '真实姓名不能为空'),
 })
 
 const verifyTeacherCodeSchema = z.object({
-  teacherCode: z.string().min(1, '教师码不能为空'),
+  teacherCode: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
 })
 
 const studentRegisterSchema = z.object({

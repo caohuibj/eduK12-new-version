@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MAX_TOKEN_USES } from '../../constants'
 
 /**
  * Cognitive 跨阶段共享 schema/helper（D2 Step 6）。
@@ -117,7 +118,7 @@ export type CognitiveExportRequest = z.infer<typeof cognitiveExportRequestSchema
 // 公开认知测评：入口令牌和恢复凭证均由服务端生成，客户端只能提交恢复凭证。
 export const cognitivePublicTokenSchema = z.object({
   expiresAt: z.string().datetime(),
-  maxUses: z.number().int().min(0).default(0),
+  maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),
 }).strict()
 
 export const cognitivePublicStartSchema = z.object({
