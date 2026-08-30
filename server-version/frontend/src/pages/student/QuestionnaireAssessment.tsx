@@ -343,6 +343,7 @@ const QuestionnaireAssessment: React.FC = () => {
       await checkpointScheduler.flush('questionnaire', data.questionnaireAssessment.id)
       const pending = await checkpointScheduler.pending('questionnaire', data.questionnaireAssessment.id)
       if (pending.length > 0) throw new Error('表单答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('questionnaire', data.questionnaireAssessment.id)
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -375,6 +376,7 @@ const QuestionnaireAssessment: React.FC = () => {
       await checkpointScheduler.flush('scale', data.currentScale.scaleAssessmentId)
       const pending = await checkpointScheduler.pending('scale', data.currentScale.scaleAssessmentId)
       if (pending.length > 0) throw new Error('量表答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('scale', data.currentScale.scaleAssessmentId)
       // 完成当前量表
       const response = await apiClient.post(`/scales/assessments/${data.currentScale.scaleAssessmentId}/complete`)
       if (response.code !== 0) throw new Error(response.message || '提交失败')
@@ -406,6 +408,7 @@ const QuestionnaireAssessment: React.FC = () => {
 
     if (qa.status === 'COMPLETED' || qa.currentIndex >= statusResponse.data.totalItems) {
       // 所有内容完成
+      await checkpointScheduler.purgeExpired('questionnaire', data.questionnaireAssessment.id)
       const completionResponse = await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/complete`)
       if (completionResponse.code !== 0) throw new Error(completionResponse.message || '完成测评失败')
       navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)

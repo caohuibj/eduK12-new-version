@@ -360,6 +360,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       await checkpointScheduler.flush('questionnaire', sessionId || data.questionnaireAssessment.id)
       const pending = await checkpointScheduler.pending('questionnaire', sessionId || data.questionnaireAssessment.id)
       if (pending.length > 0) throw new Error('表单答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('questionnaire', sessionId || data.questionnaireAssessment.id)
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -394,6 +395,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       await checkpointScheduler.flush('scale', data.currentScale.scaleAssessmentId)
       const pending = await checkpointScheduler.pending('scale', data.currentScale.scaleAssessmentId)
       if (pending.length > 0) throw new Error('量表答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('scale', data.currentScale.scaleAssessmentId)
       // 完成当前量表
       await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
         .post(`/assessments/${sessionId}/scale/complete`, {
@@ -423,6 +425,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
           result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
         // 所有内容完成
+        await checkpointScheduler.purgeExpired('questionnaire', result.data.questionnaireAssessment.id)
         await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
           .post(`/assessments/${sessionId}/complete`)
         navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)

@@ -54,6 +54,14 @@ const isExpired = (record: PendingCheckpoint) => (
   !Number.isFinite(record.createdAt) || Date.now() - record.createdAt > CHECKPOINT_TTL_MS
 )
 
+const sweepExpiredRecords = async (database: IDBDatabase) => {
+  const transaction = database.transaction(PENDING_STORE, 'readwrite')
+  const store = transaction.objectStore(PENDING_STORE)
+  const records = await requestResult<Array<PendingCheckpoint>>(store.getAll())
+  records.filter(isExpired).forEach((record) => store.delete(record.id))
+  await transactionDone(transaction)
+}
+
 class MemoryCheckpointStore implements CheckpointStore {
   private readonly records = new Map<string, PendingCheckpoint>()
   private readonly nextSequences = new Map<string, number>()
@@ -98,16 +106,28 @@ class MemoryCheckpointStore implements CheckpointStore {
   async count(scopeType: CheckpointScopeType, scopeId: string) {
     return (await this.list(scopeType, scopeId)).length
   }
+
+  async purgeExpired(scopeType?: CheckpointScopeType, scopeId?: string) {
+    const expiredIds = Array.from(this.records.values())
+      .filter((record) => (scopeType === undefined || record.scopeType === scopeType)
+        && (scopeId === undefined || record.scopeId === scopeId)
+        && isExpired(record))
+      .map((record) => record.id)
+    await this.remove(expiredIds)
+  }
 }
 
 export class IndexedDbCheckpointStore implements CheckpointStore {
-  private readonly fallback = new MemoryCheckpointStore()
   private databasePromise: Promise<IDBDatabase> | null = null
-  private fallbackMode = false
 
   private async database() {
     if (!this.databasePromise) {
-      this.databasePromise = openDatabase().catch((error) => {
+      this.databasePromise = openDatabase().then(async (database) => {
+        // Run a global sweep when this store first opens. A scope that is never
+        // revisited must not retain student answer payloads indefinitely.
+        await sweepExpiredRecords(database)
+        return database
+      }).catch((error) => {
         this.databasePromise = null
         throw error
       })
@@ -116,7 +136,6 @@ export class IndexedDbCheckpointStore implements CheckpointStore {
   }
 
   async append<TPayload>(input: AppendCheckpointInput<TPayload>) {
-    if (this.fallbackMode) return this.fallback.append(input)
     try {
       const database = await this.database()
       const scopeKey = checkpointScopeKey(input.scopeType, input.scopeId)
@@ -137,14 +156,16 @@ export class IndexedDbCheckpointStore implements CheckpointStore {
       transaction.objectStore(PENDING_STORE).put(record)
       await transactionDone(transaction)
       return record
-    } catch {
-      this.fallbackMode = true
-      return this.fallback.append(input)
+    } catch (error) {
+      // Never replace an opened IndexedDB with a new empty memory store. If a
+      // storage operation fails, callers must fail closed so completion cannot
+      // proceed while durable records are no longer observable.
+      this.databasePromise = null
+      throw error
     }
   }
 
   async list<TPayload>(scopeType: CheckpointScopeType, scopeId: string) {
-    if (this.fallbackMode) return this.fallback.list<TPayload>(scopeType, scopeId)
     try {
       const database = await this.database()
       const transaction = database.transaction(PENDING_STORE, 'readonly')
@@ -159,36 +180,28 @@ export class IndexedDbCheckpointStore implements CheckpointStore {
         return sorted.filter((record) => !expiredIds.includes(record.id))
       }
       return sorted
-    } catch {
-      this.fallbackMode = true
-      return this.fallback.list<TPayload>(scopeType, scopeId)
+    } catch (error) {
+      this.databasePromise = null
+      throw error
     }
   }
 
   async remove(ids: string[]) {
     if (ids.length === 0) return
-    if (this.fallbackMode) {
-      await this.fallback.remove(ids)
-      return
-    }
     try {
       const database = await this.database()
       const transaction = database.transaction(PENDING_STORE, 'readwrite')
       const store = transaction.objectStore(PENDING_STORE)
       ids.forEach((id) => store.delete(id))
       await transactionDone(transaction)
-    } catch {
-      this.fallbackMode = true
-      await this.fallback.remove(ids)
+    } catch (error) {
+      this.databasePromise = null
+      throw error
     }
   }
 
   async incrementAttempts(ids: string[]) {
     if (ids.length === 0) return
-    if (this.fallbackMode) {
-      await this.fallback.incrementAttempts(ids)
-      return
-    }
     try {
       const database = await this.database()
       const transaction = database.transaction(PENDING_STORE, 'readwrite')
@@ -198,14 +211,32 @@ export class IndexedDbCheckpointStore implements CheckpointStore {
         if (record) store.put({ ...record, attempts: record.attempts + 1 })
       }
       await transactionDone(transaction)
-    } catch {
-      this.fallbackMode = true
-      await this.fallback.incrementAttempts(ids)
+    } catch (error) {
+      this.databasePromise = null
+      throw error
     }
   }
 
   async count(scopeType: CheckpointScopeType, scopeId: string) {
     return (await this.list(scopeType, scopeId)).length
+  }
+
+  async purgeExpired(scopeType?: CheckpointScopeType, scopeId?: string) {
+    try {
+      const database = await this.database()
+      const transaction = database.transaction(PENDING_STORE, 'readwrite')
+      const store = transaction.objectStore(PENDING_STORE)
+      const records = await requestResult<Array<PendingCheckpoint>>(store.getAll())
+      records
+        .filter((record) => (scopeType === undefined || record.scopeType === scopeType)
+          && (scopeId === undefined || record.scopeId === scopeId)
+          && isExpired(record))
+        .forEach((record) => store.delete(record.id))
+      await transactionDone(transaction)
+    } catch (error) {
+      this.databasePromise = null
+      throw error
+    }
   }
 }
 

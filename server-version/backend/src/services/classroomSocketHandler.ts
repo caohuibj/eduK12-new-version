@@ -841,7 +841,7 @@ export class ClassroomSocketHandler {
         'broadcast:finished',
         { questionId }
       )
-      this.statsScheduler.schedule(classroomId, questionId)
+      await this.flushQuestionStatsAuthoritatively(classroomId, questionId)
 
       logger.info('答题计时结束', { classroomId, questionId })
     } catch {
@@ -941,7 +941,7 @@ export class ClassroomSocketHandler {
             'broadcast:finished',
             { questionId: question.id }
           )
-          this.statsScheduler.schedule(classroomId, question.id)
+          await this.flushQuestionStatsAuthoritatively(classroomId, question.id)
         }
         this.emitError(socket, '答题已结束，无法提交答案')
         return
@@ -1033,7 +1033,7 @@ export class ClassroomSocketHandler {
           'broadcast:finished',
           { questionId: question.id }
         )
-        this.statsScheduler.schedule(classroom.id, question.id)
+        await this.flushQuestionStatsAuthoritatively(classroom.id, question.id)
       }
 
       logger.info('教师结束答题', {
@@ -1104,7 +1104,7 @@ export class ClassroomSocketHandler {
           'broadcast:finished',
           { questionId: question.id }
         )
-        this.statsScheduler.schedule(classroom.id, question.id)
+        await this.flushQuestionStatsAuthoritatively(classroom.id, question.id)
       }
 
       logger.info('大屏结束答题', {
@@ -1434,6 +1434,20 @@ export class ClassroomSocketHandler {
       'broadcast:stats',
       stats
     )
+  }
+
+  private async flushQuestionStatsAuthoritatively(
+    classroomId: string,
+    questionId: string,
+  ): Promise<void> {
+    try {
+      await this.statsScheduler.flush(classroomId, questionId)
+    } catch (error) {
+      // The answer/end transaction is already authoritative. A failed stats
+      // rebuild is retried by the scheduler and must not turn a successful end
+      // action into a client-visible failure.
+      logger.error('课堂结束时统计重建失败', { classroomId, questionId, error })
+    }
   }
 
   private async broadcastOnlineCount(classroomId: string): Promise<void> {

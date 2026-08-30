@@ -170,6 +170,7 @@ const ScaleAssessment: React.FC = () => {
       await checkpointScheduler.flush('scale', assessment.id)
       const pending = await checkpointScheduler.pending('scale', assessment.id)
       if (pending.length > 0) throw new Error('答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('scale', assessment.id)
       const response = await apiClient.post(`/scales/assessments/${assessment.id}/complete`)
       if (response.code !== 0) throw new Error(response.message || '提交失败')
       navigate(`/student/scales/result/${assessment.id}`)

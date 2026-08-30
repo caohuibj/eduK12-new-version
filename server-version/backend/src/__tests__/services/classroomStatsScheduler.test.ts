@@ -36,4 +36,47 @@ describe('ClassroomStatsScheduler', () => {
     expect(rebuild).toHaveBeenCalledTimes(1)
     expect(scheduler.size).toBe(0)
   })
+
+  it('uses a max wait so continuous submissions still refresh during the stream', async () => {
+    vi.useFakeTimers()
+    try {
+      const rebuild = vi.fn(async () => undefined)
+      const scheduler = new ClassroomStatsScheduler(rebuild, 300, 500)
+
+      scheduler.schedule('classroom-1', 'question-1')
+      await vi.advanceTimersByTimeAsync(200)
+      scheduler.schedule('classroom-1', 'question-1')
+      await vi.advanceTimersByTimeAsync(200)
+      scheduler.schedule('classroom-1', 'question-1')
+
+      await vi.advanceTimersByTimeAsync(99)
+      expect(rebuild).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(1)
+      expect(rebuild).toHaveBeenCalledTimes(1)
+      expect(scheduler.size).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('retries a failed rebuild instead of losing the pending question', async () => {
+    vi.useFakeTimers()
+    try {
+      const rebuild = vi.fn()
+        .mockRejectedValueOnce(new Error('temporary stats failure'))
+        .mockResolvedValue(undefined)
+      const scheduler = new ClassroomStatsScheduler(rebuild, 300, 500)
+      scheduler.schedule('classroom-1', 'question-1')
+
+      await expect(scheduler.flush('classroom-1', 'question-1')).rejects.toThrow('temporary stats failure')
+      expect(scheduler.size).toBe(1)
+      await vi.advanceTimersByTimeAsync(999)
+      expect(rebuild).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(rebuild).toHaveBeenCalledTimes(2)
+      expect(scheduler.size).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

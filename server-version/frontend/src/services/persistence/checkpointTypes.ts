@@ -35,6 +35,7 @@ export interface CheckpointStore {
   remove(ids: string[]): Promise<void>
   incrementAttempts(ids: string[]): Promise<void>
   count(scopeType: CheckpointScopeType, scopeId: string): Promise<number>
+  purgeExpired(scopeType?: CheckpointScopeType, scopeId?: string): Promise<void>
 }
 
 export const checkpointScopeKey = (scopeType: CheckpointScopeType, scopeId: string) => `${scopeType}:${scopeId}`
@@ -43,4 +44,3 @@ export const checkpointId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   return `checkpoint-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
-
