@@ -33,6 +33,27 @@ describe('check-in token backfill', () => {
     expect(checkinTokenService.decryptToken(encrypted)).toBe('ck_abcdefghijklmnop')
   })
 
+  it('re-encrypts plaintext even when a legacy ciphertext is already present', async () => {
+    const staleCiphertext = checkinTokenService.encryptToken('ck_different-token')
+    const update = vi.fn().mockResolvedValue({})
+    const findFirst = vi.fn()
+      .mockResolvedValueOnce({
+        id: 'legacy-token-with-ciphertext',
+        token: 'ck_current-token',
+        tokenHash: 'stale-hash',
+        tokenEncrypted: staleCiphertext,
+      })
+      .mockResolvedValueOnce(null)
+    const count = vi.fn().mockResolvedValue(0)
+    const db = { checkinAccessToken: { findFirst, update, count } } as any
+
+    await expect(backfillCheckinTokens(db)).resolves.toEqual({ processed: 1, remaining: 0 })
+
+    const data = update.mock.calls[0][0].data
+    expect(data.tokenEncrypted).not.toBe(staleCiphertext)
+    expect(checkinTokenService.decryptToken(data.tokenEncrypted)).toBe('ck_current-token')
+  })
+
   it('validates every installed token protection constraint after the backfill', async () => {
     const findFirst = vi.fn().mockResolvedValue(null)
     const count = vi.fn().mockResolvedValue(0)

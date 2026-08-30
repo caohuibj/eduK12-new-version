@@ -11,6 +11,8 @@ SERVER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$SERVER_DIR/.." && pwd)"
 BACKEND_DIR="$SERVER_DIR/backend"
 FRONTEND_DIR="$SERVER_DIR/frontend"
+BACKEND_CONTEXT_REL="${BACKEND_DIR#"$REPO_ROOT"/}"
+FRONTEND_CONTEXT_REL="${FRONTEND_DIR#"$REPO_ROOT"/}"
 RUN_ID="$(date -u +%Y%m%d-%H%M%S)-$$"
 REPORT_DIR="${RELEASE_VERIFY_OUTPUT_DIR:-${TMPDIR:-/tmp}/eduk12-release-verify-$RUN_ID}"
 mkdir -p "$REPORT_DIR"
@@ -34,6 +36,7 @@ fail() { printf '[release-verify] ERROR: %s\n' "$*" >&2; return 1; }
 cleanup() {
   local original_status=$?
   local cleanup_status=0
+  local image_cleanup_status=0
   set +e
   if command -v docker >/dev/null 2>&1; then
     docker rm -f "$PG_NAME" "$REDIS_NAME" >/dev/null 2>&1 || true
@@ -46,6 +49,8 @@ cleanup() {
     if docker ps -a --format '{{.Names}}' | grep -Fxq "$REDIS_NAME"; then cleanup_status=1; fi
     if docker volume ls --format '{{.Name}}' | grep -Fxq "$PG_VOLUME"; then cleanup_status=1; fi
     if docker volume ls --format '{{.Name}}' | grep -Fxq "$REDIS_VOLUME"; then cleanup_status=1; fi
+    if docker image inspect "$BACKEND_IMAGE" >/dev/null 2>&1; then cleanup_status=1; image_cleanup_status=1; fi
+    if docker image inspect "$FRONTEND_IMAGE" >/dev/null 2>&1; then cleanup_status=1; image_cleanup_status=1; fi
   fi
 
   if [ "$original_status" -ne 0 ]; then EXIT_CODE="$original_status"; fi
@@ -68,6 +73,7 @@ cleanup() {
   RELEASE_VERIFY_REPORT_DIR="$REPORT_DIR" \
   RELEASE_VERIFY_BACKEND_IMAGE_ID="${BACKEND_IMAGE_ID:-}" \
   RELEASE_VERIFY_FRONTEND_IMAGE_ID="${FRONTEND_IMAGE_ID:-}" \
+  RELEASE_VERIFY_IMAGE_CLEANUP_STATUS="$image_cleanup_status" \
   node --input-type=module - <<'NODE'
 import fs from 'node:fs'
 const output = {
@@ -79,6 +85,7 @@ const output = {
   exitCode: Number(process.env.RELEASE_VERIFY_EXIT_CODE || 1),
   reportDirectory: process.env.RELEASE_VERIFY_REPORT_DIR,
   temporaryResourcesClean: Number(process.env.RELEASE_VERIFY_CLEANUP_STATUS || 1) === 0,
+  temporaryImagesClean: Number(process.env.RELEASE_VERIFY_IMAGE_CLEANUP_STATUS || 1) === 0,
   imageIds: {
     backend: process.env.RELEASE_VERIFY_BACKEND_IMAGE_ID || null,
     frontend: process.env.RELEASE_VERIFY_FRONTEND_IMAGE_ID || null,
@@ -100,6 +107,10 @@ BRANCH="$(git -C "$REPO_ROOT" branch --show-current)"
 if [ -z "$BRANCH" ]; then fail 'detached HEAD is not accepted for a release verification'; exit 1; fi
 if [ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=no)" ]; then
   fail 'tracked working-tree changes are present; commit or stash them before verification'
+  exit 1
+fi
+if [ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all -- "$BACKEND_CONTEXT_REL" "$FRONTEND_CONTEXT_REL")" ]; then
+  fail 'untracked files are present in backend/frontend build contexts; exact checkout is required'
   exit 1
 fi
 
@@ -179,6 +190,17 @@ ADMIN_USERNAME='release_verify_admin' ADMIN_PASSWORD='release_verify_admin_passw
 run_logged backend-migrate-idempotent.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
 run_logged backend-token-backfill.log npm --prefix "$BACKEND_DIR" run db:backfill:checkin-tokens
 run_logged backend-data-preflight.log npm --prefix "$BACKEND_DIR" run db:release:preflight
+log 'verifying a missing uploads directory fails the release preflight closed'
+set +e
+UPLOAD_DIR="$REPORT_DIR/missing-upload-dir" npm --prefix "$BACKEND_DIR" run db:release:preflight \
+  >"$REPORT_DIR/backend-data-preflight-missing-dir.log" 2>&1
+MISSING_UPLOAD_PREFLIGHT_STATUS=$?
+set -e
+printf 'exit_code=%s\n' "$MISSING_UPLOAD_PREFLIGHT_STATUS" >>"$REPORT_DIR/backend-data-preflight-missing-dir.log"
+if [ "$MISSING_UPLOAD_PREFLIGHT_STATUS" -eq 0 ]; then
+  fail 'release preflight unexpectedly passed with a missing uploads directory'
+  exit 1
+fi
 run_logged backend-build.log npm --prefix "$BACKEND_DIR" run build
 run_logged backend-audit.log npm --prefix "$BACKEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
 
@@ -225,6 +247,18 @@ run_logged compose-monitoring-config.log docker compose --project-name "eduk12-r
 log 'building temporary production runtime images'
 run_logged backend-image-build.log docker build --target runtime --tag "$BACKEND_IMAGE" "$BACKEND_DIR"
 run_logged frontend-image-build.log docker build --tag "$FRONTEND_IMAGE" "$FRONTEND_DIR"
+run_logged backend-runtime-smoke.log docker run --rm --user node --entrypoint sh "$BACKEND_IMAGE" -ec '
+set -eu
+test "$(id -u)" -ne 0
+for directory in /app/uploads /app/.local /app/exports; do
+  test -d "$directory"
+  test -w "$directory"
+  marker="$directory/.release-verify-write-test"
+  printf "release-verify" >"$marker"
+  test -s "$marker"
+  rm -f "$marker"
+done
+'
 BACKEND_IMAGE_ID="$(docker image inspect --format '{{.Id}}' "$BACKEND_IMAGE")"
 FRONTEND_IMAGE_ID="$(docker image inspect --format '{{.Id}}' "$FRONTEND_IMAGE")"
 printf 'backend=%s\nfrontend=%s\n' "$BACKEND_IMAGE_ID" "$FRONTEND_IMAGE_ID" >"$REPORT_DIR/image-ids.txt"

@@ -32,7 +32,7 @@ The three unchecked items are repository release operations, not unverified prod
 
 - [ ] 生产备份和恢复演练完成并留存证据
 - [ ] guarded migration 完成，打卡令牌回填 `remaining=0`
-- [ ] `npm run db:release:preflight` 全部危险计数为 0
+- [ ] 使用 `release-preflight` service（`uploads_data:/app/uploads:ro`）执行 `db:release:preflight`，全部危险计数为 0
 - [ ] 本地发布门禁使用一次性 PostgreSQL/Redis 并确认资源已清理
 - [ ] Actions 额度恢复后，对 exact release SHA 补跑正式 CI
 

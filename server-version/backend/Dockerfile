@@ -75,7 +75,10 @@ COPY package*.json ./
 
 # The long-running API and workers do not need root. Keep the mounted upload
 # volume writable by the application user while leaving the image immutable.
-RUN mkdir -p /app/uploads /app/.local && chown node:node /app/uploads /app/.local
+RUN mkdir -p /app/uploads /app/.local /app/exports \
+    && chown node:node /app/uploads /app/.local /app/exports \
+    && chmod 750 /app/uploads /app/exports \
+    && chmod 700 /app/.local
 USER node
 
 EXPOSE 3000

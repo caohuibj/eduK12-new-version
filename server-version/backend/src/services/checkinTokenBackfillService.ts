@@ -25,7 +25,10 @@ export async function backfillCheckinTokens(
       // Recompute even when a legacy hash is present: a stale/corrupt hash
       // must not be preserved when the plaintext is removed.
       tokenHash: hashToken(row.token),
-      tokenEncrypted: row.tokenEncrypted || encryptToken(row.token),
+      // Re-encrypt every legacy plaintext value instead of trusting an
+      // existing ciphertext.  A stale/corrupt ciphertext may otherwise
+      // survive after the bearer is removed and become unrecoverable.
+      tokenEncrypted: encryptToken(row.token),
       token: null,
     }
     if (typeof (db.checkinAccessToken as any).updateMany === 'function') {

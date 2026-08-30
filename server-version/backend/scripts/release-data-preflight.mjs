@@ -42,8 +42,20 @@ const requiredTables = [
   'checkin_submissions',
 ]
 
+const assertUploadDirectory = async () => {
+  let uploadStats
+  try {
+    uploadStats = await fs.promises.stat(uploadDir)
+  } catch {
+    throw new Error('UPLOAD_DIR is missing or not readable')
+  }
+  if (!uploadStats.isDirectory()) {
+    throw new Error('UPLOAD_DIR must be a directory')
+  }
+}
+
 const countFilesOutsideAssetRoot = async () => {
-  if (!fs.existsSync(uploadDir)) return 0
+  await assertUploadDirectory()
   const assetRoot = path.resolve(uploadDir, 'assets')
   let total = 0
   const visit = async (directory) => {
