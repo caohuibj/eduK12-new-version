@@ -1,15 +1,18 @@
 import type { ApiResponse } from '../types'
+import { parseRetryAfterMs } from '../utils/normalizeApiError'
 
 export class PublicCapabilityError extends Error {
   status: number
   code: number | string | null
   retryable: boolean
-  constructor(message: string, status = 0, code: number | string | null = null) {
+  retryAfterMs: number | null
+  constructor(message: string, status = 0, code: number | string | null = null, retryAfterMs: number | null = null) {
     super(message)
     this.name = 'PublicCapabilityError'
     this.status = status
     this.code = code
-    this.retryable = status === 408 || status === 429 || status >= 500
+    this.retryable = status === 0 || status === 408 || status === 429 || status >= 500
+    this.retryAfterMs = retryAfterMs
   }
 }
 
@@ -24,7 +27,7 @@ const parseError = async (response: Response): Promise<PublicCapabilityError> =>
   } catch {
     // Keep the status-based message for non-JSON errors.
   }
-  return new PublicCapabilityError(message, response.status, code)
+  return new PublicCapabilityError(message, response.status, code, parseRetryAfterMs(response.headers.get('retry-after')))
 }
 
 export const createPublicCapabilityClient = (capability: string, options: { baseUrl?: string; timeoutMs?: number } = {}) => {

@@ -37,7 +37,7 @@ describe('classroom answer log sanitization', () => {
         { id: 'answer-1', answer: '学生的秘密回答' },
       ],
       classroom: {
-        sessions: [{ id: 'session-1' }],
+        sessions: [{ id: 'session-1', leftAt: null }],
       },
     })
     mockWordSegmentation.calculateWordFrequency.mockResolvedValue({
@@ -56,5 +56,35 @@ describe('classroom answer log sanitization', () => {
       mockLogger.error.mock.calls,
     ])
     expect(allLogs).not.toContain('学生的秘密回答')
+  })
+
+  it('only uses active classroom sessions for the submission-rate denominator', async () => {
+    mockPrisma.classroomQuestion.findUnique.mockImplementation(async (args: any) => ({
+      id: 'question-1',
+      questionContent: { type: 'fill_blank' },
+      answers: [{ id: 'answer-1', answer: '当前学生的回答' }],
+      classroom: {
+        sessions: args.include.classroom.include.sessions.where.leftAt === null
+          ? [{ id: 'active-session', leftAt: null }]
+          : [
+              { id: 'active-session', leftAt: null },
+              { id: 'departed-session', leftAt: new Date('2026-08-29T00:00:00.000Z') },
+            ],
+      },
+    }))
+
+    const result = await new StatsAggregator().getQuestionStats('question-1')
+
+    expect(result?.totalSessions).toBe(1)
+    expect(result?.submissionRate).toBe(100)
+    expect(mockPrisma.classroomQuestion.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+      include: expect.objectContaining({
+        classroom: {
+          include: {
+            sessions: { where: { leftAt: null } },
+          },
+        },
+      }),
+    }))
   })
 })

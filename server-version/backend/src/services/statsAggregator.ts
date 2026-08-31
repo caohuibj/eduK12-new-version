@@ -36,7 +36,12 @@ export class StatsAggregator {
         include: {
           classroom: {
             include: {
-              sessions: true,
+              sessions: {
+                // Only students who are currently in the classroom belong in
+                // the live submission-rate denominator. Historical answers
+                // remain available for the answer aggregates below.
+                where: { leftAt: null },
+              },
             },
           },
           answers: true,

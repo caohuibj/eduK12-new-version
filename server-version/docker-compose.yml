@@ -59,6 +59,10 @@ services:
       PORT: 3000
       # Supply a complete URL with percent-encoded user/password credentials.
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      # Applied by backend/src/config/databasePool.ts when DATABASE_URL does not
+      # already contain the corresponding Prisma query parameter.
+      PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
+      PRISMA_POOL_TIMEOUT: ${PRISMA_POOL_TIMEOUT:-30}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       # Do not silently downgrade secure cookies in a production-mode

@@ -28,6 +28,7 @@ import {
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
+import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-concurrency'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
@@ -77,6 +78,7 @@ const scaleBatchAnswerSchema = z.object({
     itemCode: z.string().min(1),
     responseValue: z.union([z.string(), z.number().finite()]),
     responseTimeMs: z.number().finite().nonnegative().optional(),
+    expectedRevision: z.number().int().nonnegative().optional(),
   })).min(1).max(10),
 })
 
@@ -797,7 +799,10 @@ export const scaleController = {
       const itemCode = typeof req.body?.itemCode === 'string' ? req.body.itemCode : ''
       const responseValue = req.body?.responseValue as string | number
       const responseTimeMs = req.body?.responseTimeMs ?? req.body?.responseTime
+      const expectedRevisionResult = z.number().int().nonnegative().optional().safeParse(req.body?.expectedRevision)
       if (!itemCode || (typeof responseValue !== 'string' && typeof responseValue !== 'number')) return error(res, 'itemCode 和 responseValue 不能为空')
+      if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
+      const expectedRevision = expectedRevisionResult.data
 
       const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
@@ -825,24 +830,35 @@ export const scaleController = {
         }
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
-        const answers = [...stored.answers]
-        const existingIndex = answers.findIndex((candidate) => candidate.itemCode === itemCode)
-        const previous = existingIndex >= 0 ? answers[existingIndex] : undefined
-        const nextAnswer = { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
-        if (existingIndex >= 0) answers[existingIndex] = nextAnswer
-        else answers.push(nextAnswer)
+        const merged = mergeScaleAnswersWithRevision(stored.answers, [{ ...answer, expectedRevision }])
+        if (merged.kind === 'stale') return { kind: 'stale-answer' as const }
+        const answers = merged.answers
         const progress = definition.items.length === 0 ? 100 : Math.round((new Set(answers.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
         const updated = await tx.assessment.updateMany({
-          where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
-          data: { answers: encryptScaleAnswers(answers), progress },
+          where: { id: assessmentId, userId, status: 'IN_PROGRESS', answersRevision: assessment.answersRevision ?? 0 },
+          data: {
+            answers: encryptScaleAnswers(answers),
+            progress,
+            ...(merged.changedCount > 0 ? { answersRevision: { increment: merged.changedCount } } : {}),
+          },
         })
-        if (updated.count !== 1) return { kind: 'ended' as const }
-        return { kind: 'saved' as const, assessment: scaleAssessmentForResponse({ ...assessment, answers, progress, result: null }) }
+        if (updated.count !== 1) return { kind: 'stale-answer' as const }
+        return {
+          kind: 'saved' as const,
+          assessment: scaleAssessmentForResponse({
+            ...assessment,
+            answers,
+            answersRevision: (assessment.answersRevision ?? 0) + merged.changedCount,
+            progress,
+            result: null,
+          }),
+        }
       })
 
       if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')
       if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (transactionResult.kind === 'ended') return error(res, '测评已结束')
+      if (transactionResult.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
       if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
       if (transactionResult.kind === 'invalid-answer') return error(res, transactionResult.message)
       return success(res, transactionResult.assessment, '答案已保存')
@@ -878,6 +894,7 @@ export const scaleController = {
           responseValue: input.responseValue,
           responseTimeMs: input.responseTimeMs,
           answeredAt: new Date().toISOString(),
+          expectedRevision: input.expectedRevision,
         }))
         for (const answer of answers) {
           try {
@@ -896,29 +913,21 @@ export const scaleController = {
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
-        const merged = [...stored.answers]
-        for (const answer of answers) {
-          const existingIndex = merged.findIndex((candidate) => candidate.itemCode === answer.itemCode)
-          const previous = existingIndex >= 0 ? merged[existingIndex] : undefined
-          const isReplay = Boolean(
-            previous
-            && Object.is(previous.responseValue, answer.responseValue)
-            && previous.responseTimeMs === answer.responseTimeMs,
-          )
-          const nextAnswer = isReplay
-            ? previous!
-            : { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
-          if (existingIndex >= 0) merged[existingIndex] = nextAnswer
-          else merged.push(nextAnswer)
-        }
+        const mergedResult = mergeScaleAnswersWithRevision(stored.answers, answers)
+        if (mergedResult.kind === 'stale') return { kind: 'stale-answer' as const }
+        const merged = mergedResult.answers
         const progress = definition.items.length === 0
           ? 100
           : Math.round((new Set(merged.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
         const updated = await tx.assessment.updateMany({
-          where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
-          data: { answers: encryptScaleAnswers(merged), progress },
+          where: { id: assessmentId, userId, status: 'IN_PROGRESS', answersRevision: assessment.answersRevision ?? 0 },
+          data: {
+            answers: encryptScaleAnswers(merged),
+            progress,
+            ...(mergedResult.changedCount > 0 ? { answersRevision: { increment: mergedResult.changedCount } } : {}),
+          },
         })
-        if (updated.count !== 1) return { kind: 'ended' as const }
+        if (updated.count !== 1) return { kind: 'stale-answer' as const }
         return {
           kind: 'saved' as const,
           progress,
@@ -930,6 +939,7 @@ export const scaleController = {
       if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')
       if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (transactionResult.kind === 'ended') return error(res, '测评已结束')
+      if (transactionResult.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
       if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
       if (transactionResult.kind === 'invalid-answer') return error(res, transactionResult.message)
       return success(res, {

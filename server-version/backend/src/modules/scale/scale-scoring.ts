@@ -17,6 +17,8 @@ export interface ScaleAnswer {
   responseTimeMs?: number
   answeredAt?: string
   changeCount?: number
+  /** Monotonic revision for this item; old encrypted rows default to zero. */
+  revision?: number
 }
 
 export interface ScoredItem {

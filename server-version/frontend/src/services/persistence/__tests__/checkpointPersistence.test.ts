@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CHECKPOINT_TTL_MS, IndexedDbCheckpointStore, createMemoryCheckpointStore } from '../indexedDbStore'
 import { CheckpointScheduler, CheckpointTransportError } from '../checkpointScheduler'
+import type { CheckpointBatch } from '../checkpointTypes'
 
 class FakeRequest<T = unknown> {
   result!: T
@@ -209,6 +210,7 @@ describe('durable checkpoint persistence', () => {
     const pending = await store.list('cognitive', 'session-1')
     expect(pending).toHaveLength(1)
     expect(pending[0].attempts).toBe(1)
+    scheduler.block('cognitive', 'session-1')
   })
 
   it('surfaces structured transport failures and blocks a conflicted scope', async () => {
@@ -228,6 +230,83 @@ describe('durable checkpoint persistence', () => {
     await expect(
       scheduler.enqueue({ scopeType: 'cognitive', scopeId: 'session-2', payload: { trialIndex: 5 } }, transport),
     ).rejects.toBe(conflict)
+  })
+
+  it('does not retry a permanent transport failure', async () => {
+    vi.useFakeTimers()
+    try {
+      const store = createMemoryCheckpointStore()
+      const scheduler = new CheckpointScheduler(store)
+      const transport = vi.fn().mockRejectedValue(new CheckpointTransportError('invalid answer', { status: 422 }))
+      await scheduler.enqueue(
+        { scopeType: 'scale', scopeId: 'assessment-422', payload: { itemCode: 'q1' } },
+        transport,
+        { maxWaitMs: 0, retryJitterRatio: 0 },
+      )
+
+      await expect(scheduler.flush('scale', 'assessment-422')).rejects.toThrow('invalid answer')
+      expect(scheduler.isBlocked('scale', 'assessment-422')).toBe(true)
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(transport).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('retries transient failures with exponential backoff', async () => {
+    vi.useFakeTimers()
+    try {
+      const store = createMemoryCheckpointStore()
+      const scheduler = new CheckpointScheduler(store)
+      const transport = vi.fn()
+        .mockRejectedValueOnce(new CheckpointTransportError('overloaded', { status: 503 }))
+        .mockRejectedValueOnce(new CheckpointTransportError('still overloaded', { status: 503 }))
+        .mockImplementation(async (batch: CheckpointBatch<unknown>) => ({ acceptedIds: batch.records.map((record) => record.id) }))
+      await scheduler.enqueue(
+        { scopeType: 'scale', scopeId: 'assessment-retry', payload: { itemCode: 'q1' } },
+        transport,
+        { maxWaitMs: 0, retryBaseDelayMs: 1000, retryMaxDelayMs: 10_000, retryJitterRatio: 0 },
+      )
+
+      await expect(scheduler.flush('scale', 'assessment-retry')).rejects.toThrow('overloaded')
+      expect(transport).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(999)
+      expect(transport).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(transport).toHaveBeenCalledTimes(2)
+      await vi.advanceTimersByTimeAsync(1999)
+      expect(transport).toHaveBeenCalledTimes(2)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(transport).toHaveBeenCalledTimes(3)
+      expect(await store.count('scale', 'assessment-retry')).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('honors Retry-After as the minimum retry delay', async () => {
+    vi.useFakeTimers()
+    try {
+      const store = createMemoryCheckpointStore()
+      const scheduler = new CheckpointScheduler(store)
+      const transport = vi.fn()
+        .mockRejectedValueOnce(new CheckpointTransportError('rate limited', { status: 429, retryAfterMs: 5000 }))
+        .mockImplementation(async (batch: CheckpointBatch<unknown>) => ({ acceptedIds: batch.records.map((record) => record.id) }))
+      await scheduler.enqueue(
+        { scopeType: 'questionnaire', scopeId: 'qa-retry-after', payload: { formItemId: 'q1' } },
+        transport,
+        { maxWaitMs: 0, retryBaseDelayMs: 1000, retryJitterRatio: 0 },
+      )
+
+      await expect(scheduler.flush('questionnaire', 'qa-retry-after')).rejects.toThrow('rate limited')
+      await vi.advanceTimersByTimeAsync(4999)
+      expect(transport).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(transport).toHaveBeenCalledTimes(2)
+      expect(await store.count('questionnaire', 'qa-retry-after')).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

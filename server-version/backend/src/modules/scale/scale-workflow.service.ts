@@ -75,6 +75,7 @@ export const readScaleAnswers = (value: unknown): { answers: ScaleAnswer[]; decr
     && !Array.isArray(answer)
     && typeof answer.itemCode === 'string'
     && (typeof answer.responseValue === 'string' || typeof answer.responseValue === 'number')
+    && (answer.revision === undefined || (Number.isInteger(answer.revision) && answer.revision >= 0))
   ))
   return valid ? { answers: parsed.value as ScaleAnswer[], decryptError: false } : { answers: [], decryptError: true }
 }

@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import type { ApiResponse } from '../types'
+import { parseRetryAfterMs } from '../utils/normalizeApiError'
 
 export interface ApiClientError extends Error {
   /** HTTP status is preserved for callers that need retry classification. */
@@ -7,6 +8,8 @@ export interface ApiClientError extends Error {
   /** Parsed API envelope, when the server returned JSON. */
   data?: unknown
   code?: number | string
+  retryable?: boolean
+  retryAfterMs?: number
 }
 
 const axiosClient = axios.create({
@@ -120,6 +123,10 @@ export const normalizeApiError = (error: any): ApiClientError => {
     message,
     status: typeof error?.response?.status === 'number' ? error.response.status : undefined,
     data: responseData,
+    retryable: typeof error?.response?.status === 'number'
+      ? error.response.status === 408 || error.response.status === 425 || error.response.status === 429 || error.response.status >= 500
+      : true,
+    retryAfterMs: parseRetryAfterMs(error?.response?.headers?.['retry-after']) ?? undefined,
   }
   return normalized
 }

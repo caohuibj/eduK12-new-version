@@ -31,4 +31,19 @@ describe('public capability client', () => {
     await expect(createPublicCapabilityClient('resume-secret').get('/assessments/session-1'))
       .rejects.toMatchObject({ message: '能力已失效', code: -1 })
   })
+
+  it('marks network failures retryable and preserves Retry-After', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    await expect(createPublicCapabilityClient('resume-secret').get('/assessments/session-1'))
+      .rejects.toMatchObject({ status: 0, retryable: true })
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      headers: new Headers({ 'retry-after': '3' }),
+      clone: () => ({ json: vi.fn().mockResolvedValue({ code: -1, message: '请求过于频繁' }) }),
+    }))
+    await expect(createPublicCapabilityClient('resume-secret').get('/assessments/session-1'))
+      .rejects.toMatchObject({ status: 429, retryable: true, retryAfterMs: 3000 })
+  })
 })

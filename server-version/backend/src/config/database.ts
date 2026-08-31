@@ -1,16 +1,21 @@
 import { PrismaClient } from '@prisma/client'
 import { logger } from '../utils/logger'
+import { buildDatabaseUrl } from './databasePool'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// 连接池配置 - 2C4G服务器优化
-// 通过 PRISMA_CONNECTION_POOL_SIZE 环境变量设置连接池大小
+// 连接池配置 - 运行时把环境变量合并进 Prisma datasource URL。
+// 已显式配置在 DATABASE_URL 中的参数优先，避免部署脚本被静默覆盖。
+export { buildDatabaseUrl } from './databasePool'
+
+const databaseUrl = buildDatabaseUrl(process.env.DATABASE_URL)
 const prismaConfig = {
   log: process.env.NODE_ENV === 'development' 
     ? ([{ level: 'query', emit: 'stdout' }, { level: 'error', emit: 'stdout' }, { level: 'warn', emit: 'stdout' }] as const)
     : ([{ level: 'error', emit: 'stdout' }] as const),
+  ...(databaseUrl ? { datasources: { db: { url: databaseUrl } } } : {}),
 }
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient(prismaConfig as any)

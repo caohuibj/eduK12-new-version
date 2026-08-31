@@ -3,12 +3,14 @@
 ## 📋 已完成的优化
 
 ### 1. ✅ 增加数据库连接池
-- 当前配置：30个连接
-- 配置位置：`.env` 文件
+- backend 启动时会把连接池配置实际注入 Prisma datasource
+- 默认连接池：10；默认等待超时：30 秒
+- 已写在 `DATABASE_URL` 中的参数优先于环境变量
 - 配置参数：
   ```env
-  DATABASE_URL="postgresql://...?connection_limit=30&pool_timeout=30"
-  PRISMA_CONNECTION_POOL_SIZE=30
+  DATABASE_URL="postgresql://...?schema=public"
+  PRISMA_CONNECTION_POOL_SIZE=10
+  PRISMA_POOL_TIMEOUT=30
   ```
 
 ---
@@ -124,17 +126,11 @@ const courses = await prisma.course.findMany({
 
 ### 3. 添加查询超时
 
-在 `prisma/schema.prisma` 中配置：
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // 添加查询超时（毫秒）
-  connect_timeout = 10
-  // 添加语句超时（毫秒）
-  pool_timeout = 30
-}
-```
+Prisma 的 `connection_limit` 和 `pool_timeout` 是 datasource URL 参数，
+由 `src/config/databasePool.ts` 在运行时补齐；不要把它们写成
+`schema.prisma` datasource 的字段。生产部署可在 `DATABASE_URL` 中显式
+指定值，或通过 `PRISMA_CONNECTION_POOL_SIZE` / `PRISMA_POOL_TIMEOUT`
+统一配置。
 
 ---
 

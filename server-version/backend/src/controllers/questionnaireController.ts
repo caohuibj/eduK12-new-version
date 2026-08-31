@@ -22,6 +22,7 @@ import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exp
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
+import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -1138,6 +1139,7 @@ export const questionnaireController = {
         formItemId: z.string().min(1, '表单题目ID不能为空'),
         action: z.enum(['answer', 'skip']).optional(),
         value: z.union([z.string(), z.array(z.string())]).optional(),
+        expectedRevision: z.number().int().nonnegative().optional(),
       }).superRefine((input, ctx) => {
         const action = input.action || 'answer'
         if (action === 'answer' && input.value === undefined) {
@@ -1200,9 +1202,8 @@ export const questionnaireController = {
               formItemId,
             },
           },
-          select: { status: true, value: true },
+          select: { formItemId: true, status: true, value: true, revision: true },
         })
-        const wasComplete = isFormAnswerComplete(formItem, previousFormAnswer)
 
         const normalizedValue = action === 'answer' && value !== undefined
           ? normalizeQuestionnaireFormAnswer(formItem, value)
@@ -1212,25 +1213,50 @@ export const questionnaireController = {
           : Array.isArray(normalizedValue)
             ? JSON.stringify(normalizedValue)
             : normalizedValue as string
-        const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
-        const formAnswer = await tx.questionnaireFormAnswer.upsert({
-          where: {
-            questionnaireAssessmentId_formItemId: {
-              questionnaireAssessmentId: assessmentId,
-              formItemId,
-            },
-          },
-          create: {
-            questionnaireAssessmentId: assessmentId,
+        const previousForRevision = previousFormAnswer
+          ? {
+              ...previousFormAnswer,
+              value: previousFormAnswer.value === null
+                ? null
+                : readContextFormAnswer(formItem.contextKey, previousFormAnswer.value),
+            }
+          : undefined
+        const answerStatus = action === 'skip' ? 'SKIPPED' as const : 'ANSWERED' as const
+        const prepared = prepareFormAnswerChanges(
+          previousForRevision ? [previousForRevision] : [],
+          [{
             formItemId,
-            value: storedValue,
-            status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
-          },
-          update: {
-            value: storedValue,
-            status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
-          },
-        })
+            value: valueToStore,
+            status: answerStatus,
+            expectedRevision: result.data.expectedRevision,
+          }],
+        )
+        if (prepared.kind === 'stale') return { kind: 'stale-answer' as const }
+        const change = prepared.changes[0]
+        const wasComplete = isFormAnswerComplete(formItem, change.previous)
+        const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
+        const formAnswer = change.replay && previousFormAnswer
+          ? previousFormAnswer
+          : await tx.questionnaireFormAnswer.upsert({
+              where: {
+                questionnaireAssessmentId_formItemId: {
+                  questionnaireAssessmentId: assessmentId,
+                  formItemId,
+                },
+              },
+              create: {
+                questionnaireAssessmentId: assessmentId,
+                formItemId,
+                value: storedValue,
+                status: answerStatus,
+                revision: change.next.revision ?? 1,
+              },
+              update: {
+                value: storedValue,
+                status: answerStatus,
+                revision: { increment: 1 },
+              },
+            })
 
         const isComplete = isFormAnswerComplete(formItem, formAnswer)
         const progress = await applyQuestionnaireProgressDelta(
@@ -1246,6 +1272,7 @@ export const questionnaireController = {
       if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
       if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
@@ -1281,6 +1308,7 @@ export const questionnaireController = {
           formItemId: z.string(),
           action: z.enum(['answer', 'skip']).optional(),
           value: z.union([z.string(), z.array(z.string())]).optional(),
+          expectedRevision: z.number().int().nonnegative().optional(),
         }).superRefine((input, ctx) => {
           if ((input.action || 'answer') === 'answer' && input.value === undefined) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: '回答值不能为空', path: ['value'] })
@@ -1337,20 +1365,46 @@ export const questionnaireController = {
             questionnaireAssessmentId: assessmentId,
             formItemId: { in: [...new Set(answers.map((answer) => answer.formItemId))] },
           },
-          select: { formItemId: true, status: true, value: true },
+          select: { formItemId: true, status: true, value: true, revision: true },
         })
-        const currentAnswers = new Map(existingAnswers.map((answer) => [answer.formItemId, answer]))
-        let completedFormsDelta = 0
-
-        for (const answer of answers) {
+        const revisionAnswers = existingAnswers.map((answer) => {
           const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
+          return {
+            ...answer,
+            value: answer.value === null
+              ? null
+              : readContextFormAnswer(item?.contextKey, answer.value),
+          }
+        })
+        const preparedInputs = answers.map((answer) => {
+          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
+          if (!item) return null
           const action = answer.action || 'answer'
-          if (!item) return { kind: 'form-not-found' as const }
-          const wasComplete = isFormAnswerComplete(item, currentAnswers.get(answer.formItemId))
+          const answerStatus = action === 'skip' ? 'SKIPPED' as const : 'ANSWERED' as const
           const normalizedValue = action === 'answer' && answer.value !== undefined
             ? normalizeQuestionnaireFormAnswer(item, answer.value)
             : answer.value
-          const value = action === 'skip' ? null : (Array.isArray(normalizedValue) ? JSON.stringify(normalizedValue) : normalizedValue as string)
+          const value = action === 'skip'
+            ? null
+            : (Array.isArray(normalizedValue) ? JSON.stringify(normalizedValue) : normalizedValue as string)
+          return {
+            formItemId: answer.formItemId,
+            value,
+            status: answerStatus,
+            expectedRevision: answer.expectedRevision,
+          }
+        }).filter((answer): answer is NonNullable<typeof answer> => answer !== null)
+        const prepared = prepareFormAnswerChanges(revisionAnswers, preparedInputs)
+        if (prepared.kind === 'stale') return { kind: 'stale-answer' as const }
+        let completedFormsDelta = 0
+
+        for (const change of prepared.changes) {
+          const answer = change.input
+          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
+          if (!item) return { kind: 'form-not-found' as const }
+          if (change.replay) continue
+          const wasComplete = isFormAnswerComplete(item, change.previous)
+          const value = answer.value
           const formAnswer = await tx.questionnaireFormAnswer.upsert({
             where: {
               questionnaireAssessmentId_formItemId: {
@@ -1361,17 +1415,18 @@ export const questionnaireController = {
             create: {
               questionnaireAssessmentId: assessmentId,
               formItemId: answer.formItemId,
-              value: value === null ? null : writeContextFormAnswer(item?.contextKey, value),
-              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
+              value: value === null ? null : writeContextFormAnswer(item.contextKey, value),
+              status: answer.status,
+              revision: change.next.revision ?? 1,
             },
             update: {
-              value: value === null ? null : writeContextFormAnswer(item?.contextKey, value),
-              status: action === 'skip' ? 'SKIPPED' : 'ANSWERED',
+              value: value === null ? null : writeContextFormAnswer(item.contextKey, value),
+              status: answer.status,
+              revision: { increment: 1 },
             },
           })
           const isComplete = isFormAnswerComplete(item, formAnswer)
           completedFormsDelta += Number(isComplete) - Number(wasComplete)
-          currentAnswers.set(answer.formItemId, formAnswer)
         }
 
         const progress = await applyQuestionnaireProgressDelta(
@@ -1392,6 +1447,7 @@ export const questionnaireController = {
       if (outcome.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
+      if (outcome.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
       if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
       if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
@@ -1920,6 +1976,7 @@ export const questionnaireController = {
                 context: assessmentContextState(existingQA),
               },
               currentFormItem: currentItem.data,
+              currentFormAnswerRevision: formAnswerMap.get(currentItem.data.id)?.revision ?? 0,
               currentScale: null,
               totalItems: contentItems.length,
               contentItems: contentItems.map((item, idx) => ({
@@ -2041,6 +2098,7 @@ export const questionnaireController = {
             context: assessmentContextState(qa),
           },
           currentFormItem: firstItem.data,
+          currentFormAnswerRevision: 0,
           currentScale: null,
           totalItems: contentItems.length,
           contentItems: contentItems.map((item, idx) => ({
@@ -2244,6 +2302,9 @@ export const questionnaireController = {
           totalItems: contentItems.length,
         },
         currentFormItem: currentItem?.type === 'form' ? currentItem.data : null,
+        currentFormAnswerRevision: currentItem?.type === 'form'
+          ? formAnswerMap.get(currentItem.data.id)?.revision ?? 0
+          : null,
         currentScale: currentItem?.type === 'scale' ? {
           ...questionnaireScaleRunner(currentItem.data.scale),
           scaleAssessmentId: saMap.get(currentItem.data.scaleId)?.id,
