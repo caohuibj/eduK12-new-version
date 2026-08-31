@@ -197,6 +197,87 @@ suite('public questionnaire form answers (real PostgreSQL)', () => {
     expect(stored.every((answer) => answer.revision === 1 && answer.status === 'ANSWERED')).toBe(true)
   })
 
+  it('updates the pre-created PENDING row in place and preserves its identity', async () => {
+    const pending = await prisma.questionnaireFormAnswer.create({
+      data: {
+        questionnaireAssessmentId: assessmentId,
+        formItemId: firstFormItemId,
+        value: null,
+        status: 'PENDING',
+        revision: 0,
+      },
+    })
+
+    const first = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [{ formItemId: firstFormItemId, value: 'existing row answer', expectedRevision: 0 }],
+    })
+    expect(first.statusCode).toBe(200)
+
+    const answered = await prisma.questionnaireFormAnswer.findUnique({
+      where: { id: pending.id },
+    })
+    expect(answered).toMatchObject({
+      id: pending.id,
+      questionnaireAssessmentId: assessmentId,
+      formItemId: firstFormItemId,
+      value: 'existing row answer',
+      status: 'ANSWERED',
+      revision: 1,
+    })
+    expect(answered?.createdAt).toEqual(pending.createdAt)
+
+    const second = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [{ formItemId: firstFormItemId, value: 'existing row update', expectedRevision: 1 }],
+    })
+    expect(second.statusCode).toBe(200)
+
+    const updated = await prisma.questionnaireFormAnswer.findUnique({
+      where: { id: pending.id },
+    })
+    expect(updated).toMatchObject({
+      id: pending.id,
+      value: 'existing row update',
+      status: 'ANSWERED',
+      revision: 2,
+    })
+    expect(updated?.createdAt).toEqual(pending.createdAt)
+
+    const assessment = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId } })
+    expect(assessment?.completedForms).toBe(1)
+  })
+
+  it('persists only the final value when one batch repeats an item', async () => {
+    const pending = await prisma.questionnaireFormAnswer.create({
+      data: {
+        questionnaireAssessmentId: assessmentId,
+        formItemId: firstFormItemId,
+        value: null,
+        status: 'PENDING',
+        revision: 0,
+      },
+    })
+
+    const response = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [
+        { formItemId: firstFormItemId, value: 'first value', expectedRevision: 0 },
+        { formItemId: firstFormItemId, value: 'final value', expectedRevision: 1 },
+      ],
+    })
+    expect(response.statusCode).toBe(200)
+
+    const stored = await prisma.questionnaireFormAnswer.findUnique({ where: { id: pending.id } })
+    expect(stored).toMatchObject({
+      id: pending.id,
+      value: 'final value',
+      status: 'ANSWERED',
+      revision: 2,
+    })
+    expect(stored?.createdAt).toEqual(pending.createdAt)
+
+    const assessment = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId } })
+    expect(assessment?.completedForms).toBe(1)
+  })
+
   it('rejects a stale batch before writing any item in the batch', async () => {
     const initial = await invoke(publicQuestionnaireController.submitFormAnswers, {
       answers: [{ formItemId: firstFormItemId, value: 'original', expectedRevision: 0 }],

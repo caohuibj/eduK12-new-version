@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { logger } from '../utils/logger'
 import { buildDatabaseUrl } from './databasePool'
+import { recordPrismaCall, recordPrismaError } from '../services/runtimeObservability'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
+  prismaObservabilityClient?: PrismaClient
 }
 
 // 连接池配置 - 运行时把环境变量合并进 Prisma datasource URL。
@@ -19,6 +21,22 @@ const prismaConfig = {
 }
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient(prismaConfig as any)
+
+if (globalForPrisma.prismaObservabilityClient !== prisma) {
+  prisma.$use(async (params, next) => {
+    const startedAt = process.hrtime.bigint()
+    try {
+      return await next(params)
+    } catch (error: any) {
+      recordPrismaError(error?.code)
+      recordPrismaError(error?.meta?.code)
+      throw error
+    } finally {
+      recordPrismaCall(params.model, params.action, Number(process.hrtime.bigint() - startedAt) / 1_000_000)
+    }
+  })
+  globalForPrisma.prismaObservabilityClient = prisma
+}
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 

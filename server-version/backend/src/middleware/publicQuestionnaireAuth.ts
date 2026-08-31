@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { prisma } from '../config/database'
 import { unauthorized } from '../utils/response'
 import { hashQuestionnaireResumeToken, questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
+import { measureRequestPhase } from '../services/runtimeObservability'
 
 export const getQuestionnaireResumeToken = (req: Request): string | null => {
   const value = req.headers.authorization
@@ -21,14 +22,14 @@ export const requireQuestionnaireResume = async (req: Request, res: Response, ne
     const token = getQuestionnaireResumeToken(req)
     if (!token) return unauthorized(res, '缺少测评恢复凭据')
 
-    const assessment = await prisma.questionnaireAssessment.findUnique({
+    const assessment = await measureRequestPhase('resume_auth', () => prisma.questionnaireAssessment.findUnique({
       where: { resumeTokenHash: hashQuestionnaireResumeToken(token) },
       select: {
         id: true,
         sessionId: true,
         resumeTokenExpiresAt: true,
       },
-    })
+    }))
 
     if (
       !assessment ||

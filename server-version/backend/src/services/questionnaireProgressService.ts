@@ -3,6 +3,7 @@ import { prisma } from '../config/database'
 import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
 import { encryptField } from '../utils/encryption'
 import { isFormAnswerComplete } from './questionnaireFormAnswerState'
+import { measureRequestPhase, recordRequestPhase } from './runtimeObservability'
 
 type DatabaseClient = typeof prisma | Prisma.TransactionClient
 
@@ -227,9 +228,19 @@ export const withSerializableQuestionnaireTransaction = async <T>(
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
-      return await prisma.$transaction(callback, {
+      const requestedAt = process.hrtime.bigint()
+      return await measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
+        const acquiredAt = process.hrtime.bigint()
+        recordRequestPhase(
+          'transaction_acquisition',
+          Number(acquiredAt - requestedAt) / 1_000_000,
+          requestedAt,
+          acquiredAt,
+        )
+        return callback(tx)
+      }, {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-      })
+      }))
     } catch (err: any) {
       if (!isSerializationConflict(err) || attempt === maxAttempts) throw err
       await waitBeforeRetry(attempt)
@@ -251,15 +262,23 @@ export const withQuestionnaireAnswerTransaction = async <T>(
   sessionId: string,
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
-  return prisma.$transaction(async (tx) => {
-    await tx.$queryRaw<Array<{ id: string }>>`
+  const requestedAt = process.hrtime.bigint()
+  return measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
+    const acquiredAt = process.hrtime.bigint()
+    recordRequestPhase(
+      'transaction_acquisition',
+      Number(acquiredAt - requestedAt) / 1_000_000,
+      requestedAt,
+      acquiredAt,
+    )
+    await measureRequestPhase('row_lock_wait', () => tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id"
       FROM "questionnaire_assessments"
       WHERE "session_id" = ${sessionId}
       FOR UPDATE
-    `
+    `)
     return callback(tx)
   }, {
     isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-  })
+  }))
 }

@@ -39,6 +39,7 @@ import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/
 import { applyQuestionnaireProgressDelta } from '../services/questionnaireProgressService'
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
 import { persistFormAnswerBatch } from '../services/questionnaire-form-answer-batch'
+import { measureRequestPhase, recordRequestPhase } from '../services/runtimeObservability'
 import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
@@ -238,7 +239,7 @@ export const publicQuestionnaireController = {
       let resumeToken: string | null = null
       let sessionIdToUse = uuidv4()
       if (suppliedResumeToken) {
-        const resumeAssessment = await prisma.questionnaireAssessment.findUnique({
+        const resumeAssessment = await measureRequestPhase('resume_auth', () => prisma.questionnaireAssessment.findUnique({
           where: { resumeTokenHash: hashQuestionnaireResumeToken(suppliedResumeToken) },
           select: {
             id: true,
@@ -248,7 +249,7 @@ export const publicQuestionnaireController = {
             status: true,
             resumeTokenExpiresAt: true,
           },
-        })
+        }))
 
         if (
           !resumeAssessment ||
@@ -266,7 +267,7 @@ export const publicQuestionnaireController = {
 
       if (suppliedResumeToken) {
         // 优化：一次查询获取完整数据，避免重复查询
-        const existingAssessment = await prisma.questionnaireAssessment.findFirst({
+        const existingAssessment = await measureRequestPhase('assessment_lookup', () => prisma.questionnaireAssessment.findFirst({
           where: {
             sessionId: sessionIdToUse,
             questionnaireId,
@@ -306,7 +307,7 @@ export const publicQuestionnaireController = {
             },
             formAnswers: true,
           },
-        })
+        }))
 
         // The capability lookup above already bound this row to the public
         // token and session. Rotate the opaque capability on every resume.
@@ -451,7 +452,7 @@ export const publicQuestionnaireController = {
       // 如果没有进行中的测评，创建新的
       if (!questionnaireAssessment) {
         // 获取问卷及其量表和表单题目
-        const questionnaire = await prisma.questionnaire.findUnique({
+        const questionnaire = await measureRequestPhase('definition_lookup', () => prisma.questionnaire.findUnique({
           where: { id: questionnaireId },
           include: {
             formItems: {
@@ -477,7 +478,7 @@ export const publicQuestionnaireController = {
               orderBy: { position: 'asc' },
             },
           },
-        })
+        }))
 
         if (!questionnaire) {
           return notFound(res, '问卷不存在')
@@ -485,7 +486,15 @@ export const publicQuestionnaireController = {
 
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
-        const created = await prisma.$transaction(async (tx) => {
+        const transactionRequestedAt = process.hrtime.bigint()
+        const created = await measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
+          const transactionAcquiredAt = process.hrtime.bigint()
+          recordRequestPhase(
+            'transaction_acquisition',
+            Number(transactionAcquiredAt - transactionRequestedAt) / 1_000_000,
+            transactionRequestedAt,
+            transactionAcquiredAt,
+          )
           const claimed = await tokenService.claimAccess(tokenId, tx, validation.token!.questionnaireId)
           if (!claimed) return null
 
@@ -531,7 +540,7 @@ export const publicQuestionnaireController = {
           )
 
           return { assessment, resumeToken: issuedResumeToken }
-        })
+        }))
 
         if (!created) {
           return error(res, '链接访问次数已达上限', 403)
@@ -1228,7 +1237,7 @@ export const publicQuestionnaireController = {
       const { sessionId } = req.params
 
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
-        const qa = await tx.questionnaireAssessment.findUnique({
+        const qa = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           include: {
             questionnaire: {
@@ -1269,7 +1278,7 @@ export const publicQuestionnaireController = {
             },
             formAnswers: true,
           },
-        })
+        }))
 
         if (!qa) return { kind: 'not-found' as const }
 
@@ -1295,7 +1304,7 @@ export const publicQuestionnaireController = {
         const missingForms = qa.questionnaire.formItems.filter((item) => !isFormAnswerRequiredComplete(item, formAnswerMap.get(item.id)))
         if (missingForms.length > 0) return { kind: 'incomplete-forms' as const, count: missingForms.length }
 
-        const progress = await refreshQuestionnaireProgress(tx, qa.id)
+        const progress = await measureRequestPhase('progress_mutation', () => refreshQuestionnaireProgress(tx, qa.id))
         if (!progress?.completed) return { kind: 'incomplete-forms' as const, count: 0 }
         return {
           kind: 'completed' as const,
@@ -1345,7 +1354,7 @@ export const publicQuestionnaireController = {
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
 
       const result = await withQuestionnaireAnswerTransaction(sessionId, async (tx) => {
-        const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
+        const questionnaireAssessment = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           include: {
             questionnaire: {
@@ -1355,7 +1364,7 @@ export const publicQuestionnaireController = {
               },
             },
           },
-        })
+        }))
 
         if (!questionnaireAssessment) return { kind: 'not-found' as const }
         if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
@@ -1378,7 +1387,7 @@ export const publicQuestionnaireController = {
           const validationMessage = validateQuestionnaireFormAnswer(formItem, value)
           if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
         }
-        const previousFormAnswer = await tx.questionnaireFormAnswer.findUnique({
+        const previousFormAnswer = await measureRequestPhase('existing_answer_lookup', () => tx.questionnaireFormAnswer.findUnique({
           where: {
             questionnaireAssessmentId_formItemId: {
               questionnaireAssessmentId: questionnaireAssessment.id,
@@ -1386,7 +1395,7 @@ export const publicQuestionnaireController = {
             },
           },
           select: { formItemId: true, status: true, value: true, revision: true },
-        })
+        }))
         const normalizedValue = action === 'answer' && value !== undefined
           ? normalizeQuestionnaireFormAnswer(formItem, value)
           : value
@@ -1419,7 +1428,7 @@ export const publicQuestionnaireController = {
         const storedValue = valueToStore === null ? null : writeContextFormAnswer(formItem.contextKey, valueToStore)
         const formAnswer = change.replay && previousFormAnswer
           ? previousFormAnswer
-          : await tx.questionnaireFormAnswer.upsert({
+          : await measureRequestPhase('answer_mutation', () => tx.questionnaireFormAnswer.upsert({
               where: {
                 questionnaireAssessmentId_formItemId: {
                   questionnaireAssessmentId: questionnaireAssessment.id,
@@ -1438,15 +1447,15 @@ export const publicQuestionnaireController = {
                 status: answerStatus,
                 revision: { increment: 1 },
               },
-            })
+          }))
 
         const isComplete = isFormAnswerComplete(formItem, formAnswer)
-        const progress = await applyQuestionnaireProgressDelta(
+        const progress = await measureRequestPhase('progress_mutation', () => applyQuestionnaireProgressDelta(
           tx,
           questionnaireAssessment,
           Number(isComplete) - Number(wasComplete),
           questionnaireAssessment.questionnaire.formItems.length + questionnaireAssessment.questionnaire.questionnaireScales.length,
-        )
+        ))
         return { kind: 'saved' as const, progress }
       })
 
@@ -1511,7 +1520,7 @@ export const publicQuestionnaireController = {
       const { answers } = parsed.data
 
       const result = await withQuestionnaireAnswerTransaction(sessionId, async (tx) => {
-        const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
+        const questionnaireAssessment = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           select: {
             id: true,
@@ -1533,13 +1542,13 @@ export const publicQuestionnaireController = {
               },
             },
           },
-        })
+        }))
         if (!questionnaireAssessment) return { kind: 'not-found' as const }
         if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
         if (questionnaireAssessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
         const requestedFormItemIds = [...new Set(answers.map((answer) => answer.formItemId))]
-        const formItems = await tx.questionnaireFormItem.findMany({
+        const formItems = await measureRequestPhase('definition_lookup', () => tx.questionnaireFormItem.findMany({
           where: {
             questionnaireId: questionnaireAssessment.questionnaireId,
             id: { in: requestedFormItemIds },
@@ -1552,7 +1561,7 @@ export const publicQuestionnaireController = {
             options: true,
             contextKey: true,
           },
-        })
+        }))
         const itemsById = new Map(formItems.map((item) => [item.id, item]))
         if (answers.some((answer) => !itemsById.has(answer.formItemId))) return { kind: 'form-not-found' as const }
         if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
@@ -1568,13 +1577,13 @@ export const publicQuestionnaireController = {
           }
         }
 
-        const existingAnswers = await tx.questionnaireFormAnswer.findMany({
+        const existingAnswers = await measureRequestPhase('existing_answer_lookup', () => tx.questionnaireFormAnswer.findMany({
           where: {
             questionnaireAssessmentId: questionnaireAssessment.id,
             formItemId: { in: [...new Set(answers.map((answer) => answer.formItemId))] },
           },
           select: { formItemId: true, status: true, value: true, revision: true },
-        })
+        }))
         const revisionAnswers = existingAnswers.map((answer) => {
           const item = itemsById.get(answer.formItemId)
           return {
@@ -1626,7 +1635,7 @@ export const publicQuestionnaireController = {
           completedFormsDelta += Number(isComplete) - Number(wasComplete)
         }
 
-        await persistFormAnswerBatch(
+        await measureRequestPhase('answer_mutation', () => persistFormAnswerBatch(
           tx,
           questionnaireAssessment.id,
           [...mutationByItem.values()].map((change) => {
@@ -1638,14 +1647,14 @@ export const publicQuestionnaireController = {
               revision: change.next.revision ?? 1,
             }
           }),
-        )
+        ))
 
-        const progress = await applyQuestionnaireProgressDelta(
+        const progress = await measureRequestPhase('progress_mutation', () => applyQuestionnaireProgressDelta(
           tx,
           questionnaireAssessment,
           completedFormsDelta,
           questionnaireAssessment.questionnaire._count.formItems + questionnaireAssessment.questionnaire._count.questionnaireScales,
-        )
+        ))
         return {
           kind: 'saved' as const,
           progress,
