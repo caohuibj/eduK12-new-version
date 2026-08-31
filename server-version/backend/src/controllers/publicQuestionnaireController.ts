@@ -18,7 +18,7 @@ import { logger } from '../utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
-import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { refreshQuestionnaireProgress, withQuestionnaireAnswerTransaction, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
 import { getQuestionnaireResumeToken } from '../middleware/publicQuestionnaireAuth'
 import { hashQuestionnaireResumeToken } from '../services/questionnaireResumeTokenService'
 import {
@@ -999,7 +999,7 @@ export const publicQuestionnaireController = {
 
   /**
    * 批量提交量表答案。公开恢复凭据只绑定一个 session，批量写入
-   * 仍在同一个 serializable transaction 中完成，并返回显式 checkpoint ACK。
+   * 仍在同一个按 assessment 串行化的 transaction 中完成，并返回显式 checkpoint ACK。
    */
   async submitAnswers(req: Request, res: Response) {
     try {
@@ -1343,7 +1343,7 @@ export const publicQuestionnaireController = {
       const expectedRevisionResult = z.number().int().nonnegative().optional().safeParse(expectedRevision)
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireAnswerTransaction(sessionId, async (tx) => {
         const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           include: {
@@ -1509,7 +1509,7 @@ export const publicQuestionnaireController = {
       if (!parsed.success) return error(res, parsed.error.errors[0].message)
       const { answers } = parsed.data
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireAnswerTransaction(sessionId, async (tx) => {
         const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           include: {

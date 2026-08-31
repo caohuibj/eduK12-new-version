@@ -15,6 +15,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import {
   applyQuestionnaireProgressDelta,
   refreshQuestionnaireProgress,
+  withQuestionnaireAnswerTransaction,
   withSerializableQuestionnaireTransaction,
 } from '../../services/questionnaireProgressService'
 
@@ -122,6 +123,19 @@ describe('questionnaire progress consistency', () => {
     })).resolves.toBe('ok')
 
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2)
+  })
+
+  it('locks only the current assessment for ordinary answer transactions', async () => {
+    const executeRaw = vi.fn().mockResolvedValue(0)
+    const transactionCallback = vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback({ $executeRaw: executeRaw }))
+    mockPrisma.$transaction.mockImplementation(transactionCallback)
+
+    await expect(withQuestionnaireAnswerTransaction('session-1', async (tx) => tx)).resolves.toEqual({ $executeRaw: executeRaw })
+
+    expect(executeRaw).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'ReadCommitted',
+    })
   })
 
   it('uses an atomic field increment for a newly completed form', async () => {

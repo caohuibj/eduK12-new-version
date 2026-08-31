@@ -208,6 +208,16 @@ export const withSerializableQuestionnaireTransaction = async <T>(
 ): Promise<T> => {
   const maxAttempts = 3
 
+  const waitBeforeRetry = (attempt: number) => new Promise<void>((resolve) => {
+    // A small exponential backoff with jitter prevents concurrent clients
+    // from retrying the same SSI conflict in lockstep and immediately
+    // exhausting all attempts again. The transaction semantics are unchanged:
+    // only PostgreSQL's explicit serialization failure is retried.
+    const baseDelayMs = 25 * (2 ** (attempt - 1))
+    const jitterMs = Math.floor(Math.random() * baseDelayMs)
+    setTimeout(resolve, baseDelayMs + jitterMs)
+  })
+
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       return await prisma.$transaction(callback, {
@@ -215,8 +225,34 @@ export const withSerializableQuestionnaireTransaction = async <T>(
       })
     } catch (err: any) {
       if (err?.code !== 'P2034' || attempt === maxAttempts) throw err
+      await waitBeforeRetry(attempt)
     }
   }
 
   throw new Error('questionnaire transaction retry exhausted')
+}
+
+/**
+ * Run an ordinary form-answer mutation with a row lock on its assessment.
+ *
+ * Completion/finalization still uses Serializable above.  A normal answer
+ * only needs to serialize writers for the same assessment, however; keeping
+ * unrelated students in separate READ COMMITTED transactions avoids SSI
+ * false conflicts on the shared questionnaire definition and answer indexes.
+ */
+export const withQuestionnaireAnswerTransaction = async <T>(
+  sessionId: string,
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
+  return prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        SELECT "id"
+        FROM "questionnaire_assessments"
+        WHERE "session_id" = ${sessionId}
+        FOR UPDATE
+      `
+      return callback(tx)
+    }, {
+      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+    })
 }
