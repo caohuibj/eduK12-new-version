@@ -484,6 +484,7 @@ model Assessment {
   userId                    String?          @map("user_id") // 改为可选，支持匿名测评
   status                    AssessmentStatus @default(IN_PROGRESS)
   answers                   Json? // 答案数组（加密存储）
+  answersRevision           Int              @default(0) @map("answers_revision") // 量表答案 OCC 版本
   result                    Json? // 加密的完整 ScaleResultV2
   progress                  Int              @default(0) // 进度百分比
   startedAt                 DateTime         @default(now()) @map("started_at")
@@ -741,6 +742,7 @@ model QuestionnaireFormAnswer {
   formItemId                String   @map("form_item_id")
   value                     String? // 用户填写的答案值；SKIPPED/PENDING 可为空
   status                    QuestionnaireFormAnswerStatus @default(PENDING)
+  revision                  Int      @default(0) // 单题答案 OCC 版本
   createdAt                 DateTime @default(now()) @map("created_at")
 
   // 关联

@@ -222,4 +222,46 @@ describe('Scale v2 controller boundaries', () => {
     const stored = readScaleAnswers(mockPrisma.assessment.updateMany.mock.calls[0][0].data.answers)
     expect(stored.answers[0]).toMatchObject({ itemCode: item.itemCode, responseValue, changeCount: 4 })
   })
+
+  it('rejects a stale batch for the same item without writing it', async () => {
+    const definition = ADEXI_V2_PACKAGE.definition
+    const item = definition.items[0]
+    const responseSet = definition.responseSets.find((set) => set.key === item.responseSetKey)
+    const currentValue = responseSet?.options[0]?.value
+    const nextValue = responseSet?.options.find((option) => option.value !== currentValue)?.value
+    mockPrisma.assessment.findUnique.mockResolvedValue({
+      id: 'assessment-1',
+      userId: 'student-1',
+      status: 'IN_PROGRESS',
+      answers: encryptScaleAnswers([{ itemCode: item.itemCode, responseValue: currentValue, revision: 2 }]),
+      answersRevision: 2,
+      scale: {
+        id: 'scale-1',
+        code: 'adexi_v1',
+        name: 'ADEXI',
+        instrumentVersion: '2.0.0',
+        instrumentClass: 'STANDARD',
+        definition,
+      },
+      questionnaireAssessmentId: null,
+      questionnaireAssessment: null,
+    })
+    const res = makeRes()
+
+    await scaleController.submitAnswersBatchV2(makeReq({
+      params: { assessmentId: 'assessment-1' },
+      body: {
+        answers: [{
+          checkpointId: 'checkpoint-stale',
+          checkpointSequence: 1,
+          itemCode: item.itemCode,
+          responseValue: nextValue,
+          expectedRevision: 1,
+        }],
+      },
+    }) as any, res)
+
+    expect(res.statusCode).toBe(409)
+    expect(mockPrisma.assessment.updateMany).not.toHaveBeenCalled()
+  })
 })

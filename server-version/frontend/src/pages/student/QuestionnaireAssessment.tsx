@@ -4,7 +4,7 @@ import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle, FileText, Layers } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
-import { checkpointScheduler } from '../../services/persistence/checkpointScheduler'
+import { checkpointScheduler, CheckpointTransportError } from '../../services/persistence/checkpointScheduler'
 import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
 
@@ -68,18 +68,21 @@ interface QuestionnaireAssessmentData {
   totalItems: number
   contentItems: ContentItem[]
   scaleAssessments?: Array<{ id: string; scaleId: string }>
+  currentFormAnswerRevision?: number | null
 }
 
 interface QuestionnaireCheckpointPayload {
   formItemId: string
   action: 'answer' | 'skip'
   value?: string
+  expectedRevision: number
 }
 
 interface QuestionnaireScaleCheckpointPayload {
   itemCode: string
   responseValue: ResponseValue
   responseTimeMs: number
+  expectedRevision: number
 }
 
 const QuestionnaireAssessment: React.FC = () => {
@@ -96,46 +99,78 @@ const QuestionnaireAssessment: React.FC = () => {
   const [runnerError, setRunnerError] = useState<string | null>(null)
   const [answersLoading, setAnswersLoading] = useState(false)
   const [answersLoadFailed, setAnswersLoadFailed] = useState(false)
+  const formAnswerRevisionsRef = useRef<Record<string, number>>({})
+  const scaleAnswerRevisionsRef = useRef<Record<string, number>>({})
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   const questionnaireCheckpointTransport = useCallback(async (batch: CheckpointBatch<QuestionnaireCheckpointPayload>) => {
-    const response = await apiClient.patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(
-      `/questionnaires/assessments/${batch.scopeId}/form-answers/batch`,
-      {
-        checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
-        answers: batch.records.map((record) => ({
-          ...record.payload,
-          checkpointId: record.id,
-          checkpointSequence: record.sequence,
-        })),
-      },
-    )
-    if (response.code !== 0) throw new Error(response.message || '提交表单答案失败')
-    return response.data || {}
+    try {
+      const response = await apiClient.patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(
+        `/questionnaires/assessments/${batch.scopeId}/form-answers/batch`,
+        {
+          checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
+          answers: batch.records.map((record) => ({
+            ...record.payload,
+            checkpointId: record.id,
+            checkpointSequence: record.sequence,
+          })),
+        },
+      )
+      if (response.code !== 0) throw new CheckpointTransportError(response.message || '提交表单答案失败', { code: response.code, retryable: false })
+      return response.data || {}
+    } catch (error) {
+      if (error instanceof CheckpointTransportError) throw error
+      const normalized = normalizeApiError(error)
+      throw new CheckpointTransportError(normalized.message, {
+        status: normalized.status ?? undefined,
+        code: normalized.code ?? undefined,
+        retryable: normalized.retryable,
+        retryAfterMs: normalized.retryAfterMs ?? undefined,
+      })
+    }
   }, [])
 
   const scaleCheckpointTransport = useCallback(async (batch: CheckpointBatch<QuestionnaireScaleCheckpointPayload>) => {
-    const response = await apiClient.patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(
-      `/scales/assessments/${batch.scopeId}/answers/batch`,
-      {
-        checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
-        answers: batch.records.map((record) => ({
-          ...record.payload,
-          checkpointId: record.id,
-          checkpointSequence: record.sequence,
-        })),
-      },
-    )
-    if (response.code !== 0) throw new Error(response.message || '提交量表答案失败')
-    return response.data || {}
+    try {
+      const response = await apiClient.patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(
+        `/scales/assessments/${batch.scopeId}/answers/batch`,
+        {
+          checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
+          answers: batch.records.map((record) => ({
+            ...record.payload,
+            checkpointId: record.id,
+            checkpointSequence: record.sequence,
+          })),
+        },
+      )
+      if (response.code !== 0) throw new CheckpointTransportError(response.message || '提交量表答案失败', { code: response.code, retryable: false })
+      return response.data || {}
+    } catch (error) {
+      if (error instanceof CheckpointTransportError) throw error
+      const normalized = normalizeApiError(error)
+      throw new CheckpointTransportError(normalized.message, {
+        status: normalized.status ?? undefined,
+        code: normalized.code ?? undefined,
+        retryable: normalized.retryable,
+        retryAfterMs: normalized.retryAfterMs ?? undefined,
+      })
+    }
   }, [])
 
   const registerQuestionnairePersistence = useCallback((assessmentId: string) => {
-    checkpointScheduler.register('questionnaire', assessmentId, questionnaireCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+    checkpointScheduler.register('questionnaire', assessmentId, questionnaireCheckpointTransport, {
+      maxBatchSize: 10,
+      maxWaitMs: 12000,
+      onError: (error) => setRunnerError(normalizeApiError(error).message),
+    })
   }, [questionnaireCheckpointTransport])
 
   const registerScalePersistence = useCallback((assessmentId: string) => {
-    checkpointScheduler.register('scale', assessmentId, scaleCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+    checkpointScheduler.register('scale', assessmentId, scaleCheckpointTransport, {
+      maxBatchSize: 10,
+      maxWaitMs: 12000,
+      onError: (error) => setRunnerError(normalizeApiError(error).message),
+    })
   }, [scaleCheckpointTransport])
 
   const flushCheckpoints = useCallback(async () => {
@@ -183,6 +218,9 @@ const QuestionnaireAssessment: React.FC = () => {
 
       if (response.code === 0) {
         const questionnaireAssessmentId = response.data.questionnaireAssessment.id
+        formAnswerRevisionsRef.current = response.data.currentFormItem
+          ? { [response.data.currentFormItem.id]: response.data.currentFormAnswerRevision ?? 0 }
+          : {}
         registerQuestionnairePersistence(questionnaireAssessmentId)
         void checkpointScheduler.flush('questionnaire', questionnaireAssessmentId).catch((err) => {
           setRunnerError(normalizeApiError(err).message)
@@ -241,14 +279,21 @@ const QuestionnaireAssessment: React.FC = () => {
       if (response.code !== 0) throw new Error(response.message || '获取已有答案失败')
       if (response.data.answers) {
         const existingAnswers: Record<string, ResponseValue> = {}
+        const revisions: Record<string, number> = {}
         response.data.answers.forEach((a: any) => {
           existingAnswers[a.itemCode] = a.responseValue
+          revisions[a.itemCode] = a.revision ?? 0
         })
         const pending = await checkpointScheduler.pending('scale', assessmentId)
         pending.forEach((record) => {
           const payload = record.payload as QuestionnaireScaleCheckpointPayload
           existingAnswers[payload.itemCode] = payload.responseValue
+          revisions[payload.itemCode] = Math.max(
+            revisions[payload.itemCode] ?? 0,
+            (payload.expectedRevision ?? revisions[payload.itemCode] ?? 0) + 1,
+          )
         })
+        scaleAnswerRevisionsRef.current = revisions
         setAnswers(existingAnswers)
       }
     } catch (err) {
@@ -280,8 +325,10 @@ const QuestionnaireAssessment: React.FC = () => {
             itemCode: item.itemCode,
             responseValue: value,
             responseTimeMs: responseTime,
+            expectedRevision: scaleAnswerRevisionsRef.current[item.itemCode] ?? 0,
           },
         }, scaleCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+        scaleAnswerRevisionsRef.current[item.itemCode] = (scaleAnswerRevisionsRef.current[item.itemCode] ?? 0) + 1
         setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
         setRunnerError(null)
         if (scaleIndex < items.length - 1) {
@@ -337,9 +384,13 @@ const QuestionnaireAssessment: React.FC = () => {
         scopeId: data.questionnaireAssessment.id,
         payload: {
           formItemId: formItem.id,
+          expectedRevision: data.currentFormAnswerRevision ?? 0,
           ...(action === 'skip' ? { action: 'skip' as const } : { action: 'answer' as const, value: valueToSubmit }),
         },
       }, questionnaireCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+      setData((previous) => previous
+        ? { ...previous, currentFormAnswerRevision: (previous.currentFormAnswerRevision ?? 0) + 1 }
+        : previous)
       await checkpointScheduler.flush('questionnaire', data.questionnaireAssessment.id)
       const pending = await checkpointScheduler.pending('questionnaire', data.questionnaireAssessment.id)
       if (pending.length > 0) throw new Error('表单答案仍在同步，请稍后重试')
