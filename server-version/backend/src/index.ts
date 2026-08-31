@@ -29,6 +29,7 @@ import { cacheService } from './services/cacheService'
 import { closeQueues } from './config/queue'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
+import { requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -66,41 +67,7 @@ const publicAssessmentLimiter = rateLimit({
 // 创建 HTTP 服务器
 const server = createServer(app)
 
-const requestMetricCounts = new Map<string, number>()
-const MAX_REQUEST_METRIC_KEYS = 10_000
-const OTHER_REQUEST_METRIC_KEY = 'OTHER|/__other__|OTHER'
-const normalizeMetricPath = (req: express.Request): string => {
-  const routePath = req.route?.path
-  if (routePath) return `${req.baseUrl}${routePath}`
-  const normalized = req.path
-    .replace(/\/ck_[A-Za-z0-9_-]+/g, '/:token')
-    .replace(/\/[0-9a-f]{8,}(?=\/|$)/gi, '/:id')
-    .replace(/\/[^/]{32,}(?=\/|$)/g, '/:id')
-  // Express does not expose a route template for unmatched requests. Keep
-  // those requests in one bounded bucket so attacker-controlled 404 paths
-  // cannot grow this process-local map without limit.
-  return normalized === req.path && !req.route
-    ? (req.path.startsWith('/api/') ? '/api/:unmatched' : '/:unmatched')
-    : normalized
-}
-
-app.use((req, res, next) => {
-  const startedAt = process.hrtime.bigint()
-  res.once('finish', () => {
-    const pathLabel = normalizeMetricPath(req)
-    let key = `${req.method}|${pathLabel}|${res.statusCode}`
-    // Reserve one slot for the aggregate bucket. Once the cap is reached,
-    // new route/status combinations are counted there instead of growing the
-    // process-local map indefinitely.
-    if (!requestMetricCounts.has(key) && requestMetricCounts.size >= MAX_REQUEST_METRIC_KEYS - 1) {
-      key = OTHER_REQUEST_METRIC_KEY
-    }
-    requestMetricCounts.set(key, (requestMetricCounts.get(key) || 0) + 1)
-    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000
-    if (durationMs > 10_000) logger.warn('HTTP request exceeded latency threshold', { method: req.method, path: pathLabel, durationMs: Math.round(durationMs) })
-  })
-  next()
-})
+app.use(requestObservabilityMiddleware)
 
 // 信任反向代理 - hop 数由部署拓扑显式配置，避免错误解析客户端 IP。
 app.set('trust proxy', config.trustProxyHops)
@@ -175,33 +142,14 @@ app.get('/ready', async (_req, res) => {
 // the Compose network in production; the endpoint intentionally contains no
 // request payload, account, or assessment data.
 app.get('/metrics', async (_req, res) => {
-  const memory = process.memoryUsage()
   const lines = [
-    '# HELP process_uptime_seconds Process uptime in seconds.',
-    '# TYPE process_uptime_seconds gauge',
-    `process_uptime_seconds ${process.uptime()}`,
-    '# HELP process_resident_memory_bytes Resident memory size in bytes.',
-    '# TYPE process_resident_memory_bytes gauge',
-    `process_resident_memory_bytes ${memory.rss}`,
-    '# HELP process_heap_used_bytes V8 heap used in bytes.',
-    '# TYPE process_heap_used_bytes gauge',
-    `process_heap_used_bytes ${memory.heapUsed}`,
-    '# HELP process_heap_total_bytes V8 heap total in bytes.',
-    '# TYPE process_heap_total_bytes gauge',
-    `process_heap_total_bytes ${memory.heapTotal}`,
-    '# HELP ptool_api_requests_total Completed API requests by normalized route and status.',
-    '# TYPE ptool_api_requests_total counter',
+    ...runtimeMetricLines(),
     '# HELP ptool_socket_redis_state Socket Redis adapter state (1 for current state).',
     '# TYPE ptool_socket_redis_state gauge',
     `ptool_socket_redis_state{state="ready"} ${socketService.getRedisState() === 'ready' ? 1 : 0}`,
     `ptool_socket_redis_state{state="degraded"} ${socketService.getRedisState() === 'degraded' ? 1 : 0}`,
     `ptool_socket_redis_state{state="failed"} ${socketService.getRedisState() === 'failed' ? 1 : 0}`,
   ]
-  for (const [key, count] of requestMetricCounts) {
-    const [method, route, status] = key.split('|')
-    const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-    lines.push(`ptool_api_requests_total{method="${escape(method)}",route="${escape(route)}",status="${escape(status)}"} ${count}`)
-  }
   const backupStatusFile = process.env.BACKUP_STATUS_FILE
   if (backupStatusFile) {
     try {
