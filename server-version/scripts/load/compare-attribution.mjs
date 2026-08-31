@@ -33,7 +33,13 @@ const resourceNumber = (value) => {
   return match ? Number(match[0]) : null
 }
 
-const averageContainerCpu = (stage, name) => {
+const backendContainerName = (stage) => (stage.resources || [])
+  .map((sample) => sample.name)
+  .find((name) => typeof name === 'string' && /backend/i.test(name)) || null
+
+const averageContainerCpu = (stage) => {
+  const name = backendContainerName(stage)
+  if (!name) return null
   const values = (stage.resources || [])
     .filter((sample) => sample.name === name)
     .map((sample) => resourceNumber(sample.cpuPercent))
@@ -90,7 +96,7 @@ const main = () => {
         maxMs: previous.latencyMs?.max ?? null,
         throughputRps: previous.throughputRps ?? null,
         errorRate: previous.errorRate ?? null,
-        backendCpuPercent: averageContainerCpu(previous, 'ptool-backend'),
+        backendCpuPercent: averageContainerCpu(previous),
       },
       candidate: {
         p50Ms: current.latencyMs?.p50 ?? null,
@@ -99,7 +105,7 @@ const main = () => {
         maxMs: current.latencyMs?.max ?? null,
         throughputRps: current.throughputRps ?? null,
         errorRate: current.errorRate ?? null,
-        backendCpuPercent: averageContainerCpu(current, 'ptool-backend'),
+        backendCpuPercent: averageContainerCpu(current),
       },
       relativeChangePercent: {
         p50: relativeChangePercent(current.latencyMs?.p50, previous.latencyMs?.p50),
@@ -109,7 +115,10 @@ const main = () => {
       },
       slowRequestAttribution: slowRequestAttribution(current),
       dominantSlowPhase: topPhase(current),
-      metricsAvailable: Boolean(current.observability?.available && previous.observability?.available),
+      metricsAvailable: {
+        baseline: Boolean(previous.observability?.available),
+        candidate: Boolean(current.observability?.available),
+      },
     }
   })
 
@@ -119,6 +128,7 @@ const main = () => {
   const meanP95Change = mean(p95Changes)
   const overheadPass = meanP50Change !== null && meanP95Change !== null
     && Math.abs(meanP50Change) < 5 && Math.abs(meanP95Change) < 5
+  const candidateMetricsPass = stages.every((stage) => stage.metricsAvailable.candidate)
   const dominantByStage = stages
     .filter((stage) => stage.dominantSlowPhase)
     .map((stage) => ({ concurrency: stage.concurrency, ...stage.dominantSlowPhase }))
@@ -127,9 +137,11 @@ const main = () => {
     meanP50Change === null || meanP95Change === null
       ? 'Instrumentation overhead could not be determined because one or more reports lacked comparable latency data.'
       : `Mean candidate latency change was p50 ${meanP50Change.toFixed(2)}% and p95 ${meanP95Change.toFixed(2)}%; the <5% overhead gate ${overheadPass ? 'passes' : 'does not pass'}.`,
-    dominantByStage.length === 0
-      ? 'No slow-request attribution samples were available; no causal phase conclusion is supported.'
-      : `The largest observed slow-request attribution per stage is ${dominantByStage.map((item) => `${item.concurrency} VU=${item.dominantPhase} (${item.threshold}, ${item.count})`).join(', ')}.`,
+    !candidateMetricsPass
+      ? 'Candidate runtime metrics were unavailable for at least one stage; no causal phase conclusion is supported.'
+      : dominantByStage.length === 0
+        ? 'No candidate slow-request attribution samples were available; no causal phase conclusion is supported.'
+        : `The largest observed candidate slow-request attribution per stage is ${dominantByStage.map((item) => `${item.concurrency} VU=${item.dominantPhase} (${item.threshold}, ${item.count})`).join(', ')}.`,
   ].join(' ')
 
   const report = {
@@ -144,12 +156,17 @@ const main = () => {
       thresholdPercent: 5,
       pass: overheadPass,
     },
+    observability: {
+      candidateAvailable: candidateMetricsPass,
+      baselineAvailable: stages.every((stage) => stage.metricsAvailable.baseline),
+      baselineMayBeUnavailable: true,
+    },
     conclusion,
   }
   fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, { mode: 0o600 })
   console.log(`[attribution] report=${outputPath}`)
   console.log(`[attribution] ${conclusion}`)
-  if (!overheadPass || stages.some((stage) => !stage.metricsAvailable)) process.exitCode = 1
+  if (!overheadPass || !candidateMetricsPass) process.exitCode = 1
 }
 
 try {

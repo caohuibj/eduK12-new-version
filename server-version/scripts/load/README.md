@@ -86,6 +86,7 @@ For the PR35 attribution gate, run the same scenario against the baseline and
 instrumented deployments with stages `1,5,10,25,50,100`, a 30–60 second
 warm-up, a 60–180 second steady-state window, and three independent runs per
 deployment. Compare p50/p95/p99, throughput, errors, CPU and runtime metrics;
-use the per-stage `observability.delta` slow-request samples for the explicit
-attribution conclusion. A report without both sides of this A/B comparison is
-not evidence of instrumentation overhead or causal attribution.
+use the candidate's per-stage `observability.delta` slow-request samples for
+the explicit attribution conclusion. A pre-PR35 baseline may have no
+`/metrics` endpoint; that does not invalidate the latency overhead comparison,
+but candidate metrics must be available for a causal attribution conclusion.
