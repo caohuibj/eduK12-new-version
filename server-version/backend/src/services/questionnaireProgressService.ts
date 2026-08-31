@@ -343,6 +343,11 @@ export const withSerializableQuestionnaireTransaction = async <T>(
         return callback(tx)
       }, {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        // Completion is a short, bounded mutation. Allow a burst to wait for
+        // a pool slot long enough to satisfy the 200-user completion gate,
+        // while still failing rather than holding a transaction indefinitely.
+        maxWait: 10_000,
+        timeout: 15_000,
       }))
     } catch (err: any) {
       if (!isSerializationConflict(err) || attempt === maxAttempts) throw err
