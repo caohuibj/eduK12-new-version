@@ -180,6 +180,28 @@ export const applyQuestionnaireProgressDelta = async (
 }
 
 /**
+ * Establish a write lock before reading the completion graph.  PostgreSQL's
+ * Serializable predicate tracking otherwise lets a burst of independent
+ * completions all read the same questionnaire definition before updating
+ * different assessment rows, which can produce avoidable SSI aborts.  The
+ * production transaction clients expose `$queryRaw`; structural unit doubles
+ * may omit it and retain the previous read-only behaviour.
+ */
+const lockQuestionnaireAssessmentForProgress = async (
+  db: DatabaseClient,
+  questionnaireAssessmentId: string,
+): Promise<boolean> => {
+  if (typeof (db as { $queryRaw?: unknown }).$queryRaw !== 'function') return true
+  const rows = await db.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "questionnaire_assessments"
+    WHERE "id" = ${questionnaireAssessmentId}
+    FOR UPDATE
+  `
+  return Boolean(rows[0])
+}
+
+/**
  * Recomputes cached questionnaire progress from child rows and performs the
  * final state transition conditionally.  This function must be called from a
  * serializable transaction when it follows a child completion/write.
@@ -189,6 +211,8 @@ export const refreshQuestionnaireProgress = async (
   questionnaireAssessmentId: string,
   loadedAssessment?: QuestionnaireProgressSnapshot,
 ): Promise<QuestionnaireProgressResult | null> => {
+  if (!await lockQuestionnaireAssessmentForProgress(db, questionnaireAssessmentId)) return null
+
   const qa = loadedAssessment?.id === questionnaireAssessmentId
     ? loadedAssessment
     : await db.questionnaireAssessment.findUnique({
