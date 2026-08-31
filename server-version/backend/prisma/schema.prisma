@@ -55,6 +55,9 @@ model User {
   // 综合测评模块关联
   createdCompositeAssessments         CompositeAssessment[]            @relation("CompositeAssessmentCreator")
   compositeAssessmentAttempts         CompositeAssessmentAttempt[]     @relation("CompositeAttemptUser")
+  subjectCompositeAttempts            CompositeAssessmentAttempt[]     @relation("CompositeAttemptSubject")
+  respondentCompositeAttempts         CompositeAssessmentAttempt[]     @relation("CompositeAttemptRespondent")
+  assessmentEpisodes                  AssessmentEpisode[]              @relation("AssessmentEpisodeSubject")
   createdCompositeAccessTokens        CompositeAssessmentAccessToken[] @relation("CompositeTokenCreator")
   generatedCompositeAnalysisSnapshots CompositeAnalysisSnapshot[]      @relation("CompositeAnalysisSnapshotGenerator")
   createdCognitiveAccessTokens        CognitiveAccessToken[]           @relation("CognitiveTokenCreator")
@@ -796,6 +799,7 @@ model CompositeAssessment {
   analysisProtocolKey               String?                   @map("analysis_protocol_key")
   analysisProtocolVersion           String?                   @map("analysis_protocol_version")
   analysisProtocolSnapshotEncrypted String?                   @map("analysis_protocol_snapshot_encrypted")
+  analysisEngineKey                 String?                   @map("analysis_engine_key")
   // PR6B package boundary. The legacy analysisProtocol* fields remain readable
   // for historical composites; new package instances use these frozen fields.
   reportPackageKey                  String?                   @map("report_package_key")
@@ -815,10 +819,33 @@ model CompositeAssessment {
   attempts     CompositeAssessmentAttempt[]
 
   @@index([courseId, status])
+  @@index([analysisEngineKey])
   @@index([createdBy, status])
   @@index([copyable, status])
   @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
   @@map("composite_assessments")
+}
+
+// A logical subject/context/time window. v1 only stores the relationship; it
+// deliberately does not perform self-report/other-report synthesis.
+model AssessmentEpisode {
+  id            String    @id @default(uuid())
+  subjectUserId String?   @map("subject_user_id")
+  subjectKey    String?   @map("subject_key")
+  contextKey    String?   @map("context_key")
+  startedAt     DateTime  @default(now()) @map("started_at")
+  endedAt       DateTime? @map("ended_at")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  subject User?                          @relation("AssessmentEpisodeSubject", fields: [subjectUserId], references: [id], onDelete: SetNull)
+  attempts CompositeAssessmentAttempt[]
+
+  @@index([subjectUserId, startedAt])
+  @@index([subjectKey, startedAt])
+  @@index([contextKey, startedAt])
+  @@map("assessment_episodes")
 }
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
@@ -857,6 +884,12 @@ model CompositeAssessmentAttempt {
   id                       String                           @id @default(uuid())
   compositeAssessmentId    String                           @map("composite_assessment_id")
   userId                   String?                          @map("user_id")
+  subjectUserId            String?                          @map("subject_user_id")
+  subjectKey               String?                          @map("subject_key")
+  respondentUserId         String?                          @map("respondent_user_id")
+  respondentKey            String?                          @map("respondent_key")
+  respondentType           String?                          @map("respondent_type")
+  assessmentEpisodeId      String?                          @map("assessment_episode_id")
   accessTokenId            String?                          @map("access_token_id")
   recoveryTokenHash        String?                          @unique @map("recovery_token_hash")
   participantKey           String                           @map("participant_key")
@@ -875,6 +908,9 @@ model CompositeAssessmentAttempt {
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  subject             User?                           @relation("CompositeAttemptSubject", fields: [subjectUserId], references: [id], onDelete: SetNull)
+  respondent          User?                           @relation("CompositeAttemptRespondent", fields: [respondentUserId], references: [id], onDelete: SetNull)
+  assessmentEpisode   AssessmentEpisode?              @relation(fields: [assessmentEpisodeId], references: [id], onDelete: SetNull)
   accessToken         CompositeAssessmentAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
   scaleAssessments    Assessment[]                    @relation("CompositeAttemptAssessments")
   cognitiveSessions   CognitiveSession[]              @relation("CompositeAttemptCognitiveSessions")
@@ -884,6 +920,11 @@ model CompositeAssessmentAttempt {
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@index([compositeAssessmentId, status])
   @@index([userId, status])
+  @@index([subjectUserId, startedAt])
+  @@index([subjectKey, startedAt])
+  @@index([respondentUserId, startedAt])
+  @@index([respondentKey, startedAt])
+  @@index([assessmentEpisodeId, startedAt])
   @@index([participantKey])
   @@index([accessTokenId])
   @@map("composite_assessment_attempts")

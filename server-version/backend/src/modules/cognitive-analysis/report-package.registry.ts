@@ -9,6 +9,14 @@ import type {
   CognitiveAnalysisProfile,
   ScaleProtocolSlotDefinition,
 } from './cognitive-analysis.types'
+import {
+  listMentalHealthBundleReportPackages,
+  validateMentalHealthBundleDefinitions,
+} from '../mental-health-bundle/mental-health-bundle.registry'
+import {
+  MENTAL_HEALTH_ANALYSIS_ENGINE_KEY,
+} from '../mental-health-bundle/mental-health-bundle.types'
+import type { MentalHealthBundleDefinition } from '../mental-health-bundle/mental-health-bundle.types'
 
 export type ReportPackageAudience = 'participant' | 'teacher' | 'researcher'
 
@@ -21,8 +29,13 @@ export interface ReportPackageDefinition {
   profiles: CognitiveAnalysisProfile[]
   estimatedMinutes: AnalysisProtocolDefinition['estimatedMinutes']
   slots: Array<CognitiveProtocolSlotDefinition | ScaleProtocolSlotDefinition>
+  /** Defaults to cognitive-v1 for historical package definitions. */
+  analysisEngineKey?: 'cognitive-v1' | typeof MENTAL_HEALTH_ANALYSIS_ENGINE_KEY
   analysisProtocolKey: string
   analysisProtocolVersion: string
+  /** Mental-health packages retain their own bundle definition beside the
+   * legacy protocol-shaped package fields for shared persistence. */
+  bundleDefinition?: unknown
   reportDefinitionVersion: string
   audience: ReportPackageAudience[]
   disabledReason?: string
@@ -31,6 +44,7 @@ export interface ReportPackageDefinition {
 const REPORT_PACKAGE_DEFINITION_VERSION = 'report-package-v1'
 
 const packageFromProtocol = (protocol: AnalysisProtocolDefinition): ReportPackageDefinition => ({
+  analysisEngineKey: 'cognitive-v1',
   key: protocol.key,
   version: protocol.version,
   status: protocol.status,
@@ -52,8 +66,10 @@ const packageFromProtocol = (protocol: AnalysisProtocolDefinition): ReportPackag
   ...(protocol.disabledReason ? { disabledReason: protocol.disabledReason } : {}),
 })
 
-const PACKAGE_DEFINITIONS: ReportPackageDefinition[] = listAnalysisProtocolDefinitions()
-  .map(packageFromProtocol)
+const PACKAGE_DEFINITIONS: ReportPackageDefinition[] = [
+  ...listAnalysisProtocolDefinitions().map(packageFromProtocol),
+  ...listMentalHealthBundleReportPackages(),
+]
 
 const packageResourceId = (key: string, version: string) => `${key}@${version}`
 
@@ -67,16 +83,41 @@ export const validateReportPackageDefinitions = (definitions: ReportPackageDefin
     const resourceId = packageKey(definition)
     if (keys.has(resourceId)) throw new Error(`Duplicate report package: ${resourceId}`)
     keys.add(resourceId)
-    if (definition.status === 'PUBLISHED') {
-      if (!definition.analysisProtocolKey || !definition.analysisProtocolVersion) {
-        throw new Error(`Published report package has no analysis protocol: ${resourceId}`)
+    if (definition.analysisEngineKey === MENTAL_HEALTH_ANALYSIS_ENGINE_KEY) {
+      if (!definition.bundleDefinition || typeof definition.bundleDefinition !== 'object') {
+        throw new Error(`Mental health report package has no Bundle definition: ${resourceId}`)
       }
-      const protocol = getAnalysisProtocolDefinition(
-        definition.analysisProtocolKey,
-        definition.analysisProtocolVersion,
-      )
-      if (!protocol || protocol.status !== 'PUBLISHED') {
-        throw new Error(`Published report package has unresolved protocol: ${resourceId}`)
+      const bundle = definition.bundleDefinition as MentalHealthBundleDefinition
+      try {
+        validateMentalHealthBundleDefinitions([bundle])
+      } catch (error) {
+        throw new Error(`Invalid mental health Bundle definition: ${resourceId}/${error instanceof Error ? error.message : 'unknown error'}`)
+      }
+      if (
+        bundle.key !== definition.key
+        || bundle.version !== definition.version
+        || bundle.status !== definition.status
+      ) {
+        throw new Error(`Mental health report package and Bundle identity/status mismatch: ${resourceId}`)
+      }
+    } else if (definition.bundleDefinition !== undefined) {
+      throw new Error(`Non-mental health report package cannot carry a Bundle definition: ${resourceId}`)
+    }
+    if (definition.status === 'PUBLISHED') {
+      if (definition.analysisEngineKey === MENTAL_HEALTH_ANALYSIS_ENGINE_KEY) {
+        // validateMentalHealthBundleDefinitions above is the publication gate
+        // for exact forms, rights, references, Chinese evidence, and safety.
+      } else {
+        if (!definition.analysisProtocolKey || !definition.analysisProtocolVersion) {
+          throw new Error(`Published report package has no analysis protocol: ${resourceId}`)
+        }
+        const protocol = getAnalysisProtocolDefinition(
+          definition.analysisProtocolKey,
+          definition.analysisProtocolVersion,
+        )
+        if (!protocol || protocol.status !== 'PUBLISHED') {
+          throw new Error(`Published report package has unresolved protocol: ${resourceId}`)
+        }
       }
     }
     if (definition.profiles.length === 0 || (definition.profiles as string[]).includes('experience')) {
@@ -101,8 +142,16 @@ const cloneDefinition = (definition: ReportPackageDefinition): ReportPackageDefi
     standard: [...definition.estimatedMinutes.standard],
     research: [...definition.estimatedMinutes.research],
   },
-  slots: definition.slots.map((slot) => ({ ...slot })),
+  slots: definition.slots.map((slot) => ({
+    ...slot,
+    ...('evidenceMappings' in slot && slot.evidenceMappings
+      ? { evidenceMappings: slot.evidenceMappings.map((mapping) => ({ ...mapping })) }
+      : {}),
+  })),
   audience: [...definition.audience],
+  ...(definition.bundleDefinition && typeof definition.bundleDefinition === 'object'
+    ? { bundleDefinition: JSON.parse(JSON.stringify(definition.bundleDefinition)) }
+    : {}),
 })
 
 const BY_RESOURCE_ID = new Map(PACKAGE_DEFINITIONS.map((definition) => [packageKey(definition), definition]))

@@ -3,9 +3,11 @@ import type {
   CognitivePackageAnalysisResult,
   EvidenceItem,
 } from '../cognitive-analysis'
+import { isMentalHealthPackageAnalysis } from '../cognitive-analysis/package-analysis.dispatcher'
 import type {
   CompositePackageReport,
   CompositeParticipantDomain,
+  CompositeMentalHealthPackageReport,
   CompositeReportAudience,
   CompositeReportProjectionInput,
   CompositeSafeRecommendation,
@@ -436,8 +438,47 @@ const basePackageReport = (
   limitations: stringArray(input.snapshot.payload.limitations),
 })
 
+const buildMentalHealthPackageReport = (
+  input: CompositeReportProjectionInput,
+  analysis: Extract<NonNullable<CompositeReportProjectionInput['snapshot']['payload']>, { analysisEngineKey: 'mental-health-rule-v1' }>,
+): CompositeMentalHealthPackageReport => {
+  const metadata = snapshotMetadata(input, input.audience === 'researcher')
+  const report = analysis.report
+  return {
+    audience: input.audience,
+    packageName: input.packageSnapshot.packageDefinition.name,
+    packageKey: analysis.packageKey,
+    packageVersion: analysis.packageVersion,
+    profile: analysis.profile,
+    qualitySummary: analysis.qualitySummary,
+    limitations: [...analysis.limitations],
+    outcomeCode: analysis.outcomeCode,
+    actionTier: analysis.actionTier,
+    conclusion: report.conclusion,
+    mainConstruct: report.mainConstruct,
+    consistency: report.consistency,
+    facets: report.facets.map((facet) => ({ ...facet, evidenceRefs: input.audience === 'researcher' ? [...facet.evidenceRefs] : [] })),
+    context: report.context.map((context) => ({ ...context, evidenceRefs: input.audience === 'researcher' ? [...context.evidenceRefs] : [] })),
+    nextSteps: [...report.nextSteps],
+    ...(input.audience === 'researcher' ? {
+      bundleReportFacts: analysis.bundleReportFacts,
+      snapshotId: metadata.id,
+      snapshotCreatedAt: metadata.createdAt,
+      generationReason: metadata.generationReason,
+      inputFingerprint: metadata.inputFingerprint,
+    } : input.audience === 'teacher' ? {
+      snapshotId: metadata.id,
+      snapshotCreatedAt: metadata.createdAt,
+      generationReason: metadata.generationReason,
+    } : {}),
+  }
+}
+
 const buildPackageReport = (input: CompositeReportProjectionInput): CompositePackageReport => {
   const analysis = input.snapshot.payload
+  if (isMentalHealthPackageAnalysis(analysis)) {
+    return buildMentalHealthPackageReport(input, analysis)
+  }
   const base = basePackageReport(input)
   const domains = analysis.cognitiveDomains.map(participantDomain)
 

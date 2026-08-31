@@ -8,14 +8,20 @@ import { sessionConfigFromStoredValue } from '../cognitive/v2/session-snapshot'
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 import { safeDecrypt } from '../../utils/encryption'
-import { buildPackageCognitiveAnalysis } from '../cognitive-analysis/package-analysis.engine'
+import {
+  dispatchPackageAnalysis,
+  isMentalHealthPackageAnalysis,
+  packageAnalysisEngineKeyFor,
+  type PackageAnalysisResult,
+} from '../cognitive-analysis/package-analysis.dispatcher'
 import { readFrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
+import { buildMentalHealthBundleScaleResults } from '../mental-health-bundle/mental-health-bundle.attempt'
 import { logger } from '../../utils/logger'
 import type {
-  CognitivePackageAnalysisResult,
   FrozenCognitiveModuleResult,
   FrozenScaleModuleResult,
 } from '../cognitive-analysis/cognitive-analysis.types'
+import type { FrozenBundleScaleEvidence } from '../mental-health-bundle'
 import type { FrozenReportPackageSnapshot } from '../cognitive-analysis/report-package-freeze'
 import type {
   FrozenScaleSlotMeasurement,
@@ -30,6 +36,7 @@ export interface PackageAnalysisFingerprintInput {
   analysisVersion: string
   reportSchemaVersion: string
   scaleResults?: FrozenScaleModuleResult[]
+  bundleScaleResults?: FrozenBundleScaleEvidence[]
 }
 
 export interface CompositeAnalysisSnapshotRow {
@@ -48,7 +55,7 @@ export interface CompositeAnalysisSnapshotRow {
 }
 
 export interface DecryptedCompositeAnalysisSnapshot extends Omit<CompositeAnalysisSnapshotRow, 'payloadEncrypted'> {
-  payload: CognitivePackageAnalysisResult
+  payload: PackageAnalysisResult
 }
 
 export interface CompletionSnapshotExpectation {
@@ -65,6 +72,7 @@ export interface CompletionSnapshotExpectation {
   domainDefinitionVersion: string
   evidenceMappingVersion: string
   recommendationRuleVersion: string
+  analysisEngineKey?: 'cognitive-v1' | 'mental-health-rule-v1'
 }
 
 export interface PackageAnalysisAttemptInput {
@@ -75,6 +83,7 @@ export interface PackageAnalysisAttemptInput {
     reportPackageVersion?: string | null
     reportPackageProfile?: string | null
     reportPackageSnapshotEncrypted?: string | null
+    analysisEngineKey?: 'cognitive-v1' | 'mental-health-rule-v1' | null
     items: Array<{
       id: string
       type: string
@@ -125,14 +134,21 @@ export interface PackageAnalysisAttemptInput {
     resultSnapshotEncrypted?: string | null
     attemptNo?: number
   }>
+  subjectUserId?: string | null
+  subjectKey?: string | null
+  respondentUserId?: string | null
+  respondentKey?: string | null
+  respondentType?: string | null
+  assessmentEpisodeId?: string | null
 }
 
 export interface BuiltPackageAnalysis {
   packageSnapshot: FrozenReportPackageSnapshot
   moduleResults: FrozenCognitiveModuleResult[]
   scaleResults: FrozenScaleModuleResult[]
-  analysis: CognitivePackageAnalysisResult
+  analysis: PackageAnalysisResult
   inputFingerprint: string
+  bundleScaleResults?: FrozenBundleScaleEvidence[]
 }
 
 export interface PersistedPackageAnalysisSnapshot {
@@ -193,6 +209,8 @@ const protocolSnapshotForFingerprint = (snapshot: FrozenReportPackageSnapshot) =
   profile: snapshot.profile,
   packageDefinition: snapshot.packageDefinition,
   analysisProtocolSnapshot: snapshot.analysisProtocolSnapshot,
+  analysisEngineKey: snapshot.analysisEngineKey ?? snapshot.packageDefinition.analysisEngineKey ?? 'cognitive-v1',
+  bundleDefinitionSnapshot: snapshot.bundleDefinitionSnapshot ?? null,
 })
 
 const moduleResultForFingerprint = (result: FrozenCognitiveModuleResult) => ({
@@ -230,6 +248,30 @@ const scaleResultForFingerprint = (result: FrozenScaleModuleResult) => ({
   provenance: result.provenance ?? null,
 })
 
+const bundleScaleResultForFingerprint = (result: FrozenBundleScaleEvidence) => ({
+  slotKey: result.slotKey,
+  sourceResultId: result.sourceResultId,
+  compositeItemId: result.compositeItemId ?? null,
+  scaleId: result.scaleId,
+  scaleCode: result.scaleCode,
+  instrumentVersion: result.instrumentVersion,
+  scoreKey: result.scoreKey,
+  value: result.value,
+  scoreStatus: result.scoreStatus,
+  classification: result.classification,
+  profile: result.profile,
+  mappingKey: result.mappingKey,
+  mappingVersion: result.mappingVersion,
+  role: result.role,
+  construct: result.construct,
+  facet: result.facet ?? null,
+  direction: result.direction,
+  respondentType: result.respondentType,
+  qualityState: result.qualityState,
+  qualityFlags: result.qualityFlags,
+  provenance: result.provenance,
+})
+
 /**
  * Hash the canonical plaintext semantics used by the analysis engine.
  * Randomized encrypted envelopes, timestamps, and raw trials are deliberately
@@ -259,6 +301,13 @@ export const buildPackageAnalysisInputFingerprint = (
       return leftPosition - rightPosition || compareStrings(left.slotKey, right.slotKey)
     })
     .map(scaleResultForFingerprint)
+  const bundleScaleResults = [...(input.bundleScaleResults ?? [])]
+    .sort((left, right) => {
+      const leftPosition = moduleOrder.get(left.slotKey) ?? Number.MAX_SAFE_INTEGER
+      const rightPosition = moduleOrder.get(right.slotKey) ?? Number.MAX_SAFE_INTEGER
+      return leftPosition - rightPosition || compareStrings(left.mappingKey, right.mappingKey)
+    })
+    .map(bundleScaleResultForFingerprint)
 
   const semanticInput = {
     packageSnapshot: protocolSnapshotForFingerprint(input.packageSnapshot),
@@ -266,6 +315,7 @@ export const buildPackageAnalysisInputFingerprint = (
     reportSchemaVersion: input.reportSchemaVersion,
     modules,
     scaleResults,
+    bundleScaleResults,
   }
 
   return createHash('sha256')
@@ -301,7 +351,7 @@ const requireProvenanceString = (
 }
 
 const validateProvenanceContract = (
-  payload: CognitivePackageAnalysisResult,
+  payload: PackageAnalysisResult,
   expected: CompletionSnapshotExpectation,
 ): void => {
   const provenance = isRecord(payload.provenance)
@@ -310,6 +360,11 @@ const validateProvenanceContract = (
   for (const [key, value] of Object.entries(expectedProvenance(expected))) {
     if (requireProvenanceString(provenance, key) !== value) {
       throw new Error(`分析快照 provenance 元数据不匹配：${key}`)
+    }
+  }
+  if (expected.analysisEngineKey) {
+    if (requireProvenanceString(provenance, 'analysisEngineKey') !== expected.analysisEngineKey) {
+      throw new Error('分析快照 provenance engine 不匹配')
     }
   }
 
@@ -374,7 +429,7 @@ const validateProvenanceContract = (
 
 const validatePayloadMetadata = (
   row: CompositeAnalysisSnapshotRow,
-  payload: CognitivePackageAnalysisResult,
+  payload: PackageAnalysisResult,
   expected: CompletionSnapshotExpectation,
 ): void => {
   if (!isRecord(payload)) throw new Error('分析快照 payload 格式无效')
@@ -393,6 +448,10 @@ const validatePayloadMetadata = (
   ) {
     throw new Error('分析快照 payload 版本元数据不匹配')
   }
+  if (expected.analysisEngineKey) {
+    const actualEngine = isMentalHealthPackageAnalysis(payload) ? 'mental-health-rule-v1' : 'cognitive-v1'
+    if (actualEngine !== expected.analysisEngineKey) throw new Error('分析快照 payload engine 不匹配')
+  }
   validateProvenanceContract(payload, expected)
 }
 
@@ -410,7 +469,7 @@ export const persistOrGetPackageAnalysisSnapshot = async (
   db: SnapshotDb,
   input: {
     attemptId: string
-    analysis: CognitivePackageAnalysisResult
+    analysis: PackageAnalysisResult
     inputFingerprint: string
     generationReason: CompositeAnalysisSnapshotGenerationReason
     generatedBy?: string | null
@@ -472,7 +531,7 @@ export const readCompletionPackageAnalysisSnapshot = async (
   })
   if (!row) return null
 
-  const payload = decryptCognitivePayload<CognitivePackageAnalysisResult>(row.payloadEncrypted)
+  const payload = decryptCognitivePayload<PackageAnalysisResult>(row.payloadEncrypted)
   validatePayloadMetadata(row, payload, expected)
   const { payloadEncrypted: _payloadEncrypted, ...metadata } = row
   return { ...metadata, payload }
@@ -506,7 +565,7 @@ export const readPackageAnalysisSnapshot = async (
   if (!row) return null
 
   try {
-    const payload = decryptCognitivePayload<CognitivePackageAnalysisResult>(row.payloadEncrypted)
+    const payload = decryptCognitivePayload<PackageAnalysisResult>(row.payloadEncrypted)
     validatePayloadMetadata(row, payload, input.expected)
     const { payloadEncrypted: _payloadEncrypted, ...metadata } = row
     return { ...metadata, payload }
@@ -574,6 +633,7 @@ export const buildCompletionSnapshotExpectation = (input: {
   ) {
     throw new Error('报告包冻结快照缺少分析 provenance 版本')
   }
+  const engineKey = packageAnalysisEngineKeyFor(input.packageSnapshot)
   return {
     attemptId: input.attemptId,
     assessmentId: input.assessmentId,
@@ -588,6 +648,7 @@ export const buildCompletionSnapshotExpectation = (input: {
     domainDefinitionVersion: protocolDefinition.domainDefinitionVersion,
     evidenceMappingVersion: protocolDefinition.evidenceMappingVersion,
     recommendationRuleVersion: protocolDefinition.recommendationRuleVersion,
+    ...(engineKey === 'mental-health-rule-v1' ? { analysisEngineKey: engineKey } : {}),
   }
 }
 
@@ -951,9 +1012,43 @@ export const buildPackageAnalysisForAttempt = (
   if (attempt.compositeAssessment.items.length !== expectedItemCount) {
     throw new Error('综合测评实例槽位数量与冻结报告包不匹配')
   }
+  const engineKey = packageAnalysisEngineKeyFor(packageSnapshot)
+  if (engineKey === 'mental-health-rule-v1') {
+    const bundleScaleResults = buildMentalHealthBundleScaleResults(attempt, packageSnapshot)
+    const analysis = dispatchPackageAnalysis({
+      packageSnapshot,
+      bundleScaleResults,
+      attemptId: attempt.id,
+      assessmentId: attempt.compositeAssessmentId,
+      subject: { userId: attempt.subjectUserId ?? null, subjectKey: attempt.subjectKey ?? null },
+      respondent: {
+        userId: attempt.respondentUserId ?? null,
+        respondentKey: attempt.respondentKey ?? null,
+        respondentType: attempt.respondentType ?? undefined,
+      },
+      assessmentEpisodeId: attempt.assessmentEpisodeId ?? null,
+    })
+    const inputFingerprint = buildPackageAnalysisInputFingerprint({
+      packageSnapshot,
+      moduleResults: [],
+      scaleResults: [],
+      bundleScaleResults,
+      analysisVersion: analysis.analysisVersion,
+      reportSchemaVersion: analysis.reportSchemaVersion,
+    })
+    return {
+      packageSnapshot,
+      moduleResults: [],
+      scaleResults: [],
+      bundleScaleResults,
+      analysis,
+      inputFingerprint,
+    }
+  }
+
   const moduleResults = buildFrozenModuleResults(attempt, packageSnapshot)
   const scaleResults = buildFrozenScaleResults(attempt, packageSnapshot)
-  const analysis = buildPackageCognitiveAnalysis({
+  const analysis = dispatchPackageAnalysis({
     packageSnapshot,
     moduleResults,
     scaleResults,

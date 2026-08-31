@@ -30,6 +30,7 @@ export const listReportPackageCatalog = async (userId: string, role: UserRole) =
       profiles: definition.profiles,
       estimatedMinutes: definition.estimatedMinutes,
       reportDefinitionVersion: definition.reportDefinitionVersion,
+      analysisEngineKey: definition.analysisEngineKey ?? 'cognitive-v1',
       analysisProtocolKey: definition.analysisProtocolKey,
       analysisProtocolVersion: definition.analysisProtocolVersion,
       audience: definition.audience,
@@ -51,6 +52,9 @@ export const listReportPackageCatalog = async (userId: string, role: UserRole) =
           expectedDimensionCode: slot.expectedDimensionCode,
           respondentType: slot.respondentType,
           valueSelector: slot.valueSelector,
+          ...('evidenceMappings' in slot && slot.evidenceMappings
+            ? { evidenceMappings: slot.evidenceMappings.map((mapping) => ({ ...mapping })) }
+            : {}),
         }),
       })),
       granted: isAdmin || granted.has(reportPackageResourceId(definition.key, definition.version)),

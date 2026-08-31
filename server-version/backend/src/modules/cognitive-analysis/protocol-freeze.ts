@@ -5,6 +5,7 @@ import type {
   CognitiveAnalysisProfile,
   CognitiveDomainKey,
   EvidenceRole,
+  ScaleProtocolEvidenceMappingDefinition,
 } from './cognitive-analysis.types'
 import { getScaleDimensionEvidenceMapping } from './scale-evidence-mapping.registry'
 import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -31,8 +32,15 @@ export interface FrozenScaleSlotMeasurement {
   mappingFacet: string
   mappingRole: EvidenceRole
   mappingDirectionClass: 'more_difficulty' | 'more_strength'
-  respondentType: 'participant_self_report'
-  valueSelector: 'dimensionScore'
+  respondentType: string
+  valueSelector: 'dimensionScore' | 'score'
+  /** All semantic outputs extracted from this one ScaleResultV2. */
+  evidenceMappings?: FrozenScaleEvidenceMapping[]
+}
+
+export interface FrozenScaleEvidenceMapping extends ScaleProtocolEvidenceMappingDefinition {
+  role: string
+  direction?: string
 }
 
 export interface FrozenAnalysisProtocolSnapshot {

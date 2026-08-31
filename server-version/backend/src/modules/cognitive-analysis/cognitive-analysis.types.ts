@@ -118,8 +118,8 @@ export interface FrozenScaleModuleResult {
   profile: CognitiveAnalysisProfile
   mappingKey: string
   mappingVersion: string
-  respondentType: 'participant_self_report'
-  valueSelector: 'dimensionScore'
+  respondentType: string
+  valueSelector: 'dimensionScore' | 'score'
   /** Three-state quality from the authoritative ScaleResultV2. */
   qualityState?: 'interpretable' | 'limited' | 'invalid'
   qualityFlags: Record<string, unknown>
@@ -258,6 +258,25 @@ export interface CognitiveProtocolSlotDefinition {
   reportDefinitionVersion: string
 }
 
+/**
+ * Generic Scale-to-analysis mapping. Cognitive v1 uses the legacy top-level
+ * mapping fields below; mental-health Bundles may attach several mappings to
+ * one Scale slot so a single ScaleResultV2 can expose total and facet scores.
+ */
+export interface ScaleProtocolEvidenceMappingDefinition {
+  mappingKey: string
+  mappingVersion: string
+  scaleCode: string
+  scoreKey: string
+  role: string
+  construct: string
+  facet?: string
+  direction?: string
+  classificationCodes?: string[]
+  safetyTriggerCodes?: string[]
+  feedbackBlockKey?: string
+}
+
 export interface ScaleProtocolSlotDefinition {
   key: string
   label: string
@@ -267,8 +286,11 @@ export interface ScaleProtocolSlotDefinition {
   mappingVersion: string
   expectedScaleCode: string
   expectedDimensionCode: string
-  respondentType: 'participant_self_report'
-  valueSelector: 'dimensionScore'
+  respondentType: string
+  valueSelector: 'dimensionScore' | 'score'
+  /** Optional multi-score mappings. Cognitive v1 leaves this absent. */
+  evidenceMappings?: ScaleProtocolEvidenceMappingDefinition[]
+  expectedInstrumentVersion?: string
 }
 
 export interface AnalysisProtocolDefinition {

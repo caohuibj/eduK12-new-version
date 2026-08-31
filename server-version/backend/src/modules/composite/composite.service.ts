@@ -60,6 +60,7 @@ import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
   buildFrozenReportPackageSnapshot,
+  buildFrozenMentalHealthBundlePackageSnapshot,
   encryptFrozenReportPackageSnapshot,
   getReportPackageDefinition,
   readFrozenReportPackageSnapshot,
@@ -340,19 +341,66 @@ export const materializeReportPackage = async (
   db: Db,
   input: {
     compositeId: string
-    courseId: string
+    courseId?: string | null
     userId: string
     profile: CognitiveAnalysisProfile
     packageDefinition: ReportPackageDefinition
   },
 ) => {
+  if (input.packageDefinition.analysisEngineKey === 'mental-health-rule-v1') {
+    const bundle = input.packageDefinition.bundleDefinition as {
+      scaleSlots?: Array<{
+        key: string
+        label: string
+        position: number
+        expectedScaleCode: string
+        expectedInstrumentVersion?: string
+        mappings: Array<{ scoreKey: string }>
+      }>
+    } | undefined
+    if (!bundle?.scaleSlots?.length) throw compositeBadRequest('Mental health 报告包缺少 Scale slots')
+    for (const slot of [...bundle.scaleSlots].sort((left, right) => left.position - right.position)) {
+      const scale = await db.scale.findUnique({
+        where: { code: slot.expectedScaleCode },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          status: true,
+          instrumentClass: true,
+          instrumentVersion: true,
+          definition: true,
+          definitionHash: true,
+        },
+      })
+      if (!scale || scale.status !== 'PUBLISHED') throw compositeBadRequest(`Bundle 量表不可用：${slot.label}`)
+      if (slot.expectedInstrumentVersion && scale.instrumentVersion !== slot.expectedInstrumentVersion) {
+        throw compositeBadRequest(`Bundle 量表 instrumentVersion 不匹配：${slot.label}`)
+      }
+      const definition = scaleDefinitionFromRecord(scale)
+      const scoreKeys = new Set(definition.scoring.scores.map((score) => score.key))
+      if (slot.mappings.some((mapping) => !scoreKeys.has(mapping.scoreKey))) {
+        throw compositeBadRequest(`Bundle 量表 score key 不可用：${slot.label}`)
+      }
+      await db.compositeAssessmentItem.create({
+        data: {
+          compositeAssessmentId: input.compositeId,
+          type: 'SCALE',
+          position: slot.position,
+          required: true,
+          scaleId: scale.id,
+        },
+      })
+    }
+    return
+  }
   const protocol = requirePublishedAnalysisProtocol(
     input.packageDefinition.analysisProtocolKey,
     input.packageDefinition.analysisProtocolVersion,
   )
   await materializeAnalysisProtocol(db, {
     compositeId: input.compositeId,
-    courseId: input.courseId,
+    courseId: input.courseId as string,
     userId: input.userId,
     profile: input.profile,
     protocol,
@@ -613,7 +661,8 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
       throw compositeBadRequest('报告包不支持该 Profile')
     }
   }
-  const protocol = packageDefinition
+  const isMentalHealthPackage = packageDefinition?.analysisEngineKey === 'mental-health-rule-v1'
+  const protocol = packageDefinition && !isMentalHealthPackage
     ? requirePublishedAnalysisProtocol(packageDefinition.analysisProtocolKey, packageDefinition.analysisProtocolVersion)
     : null
   if (protocol) {
@@ -634,16 +683,17 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
         expiresAt: parseDate(input.expiresAt),
         maxAttempts: input.maxAttempts,
         publicEnabled: input.publicEnabled,
-        analysisProtocolKey: protocol?.key ?? null,
-        analysisProtocolVersion: protocol?.version ?? null,
+        analysisProtocolKey: packageDefinition?.analysisProtocolKey ?? null,
+        analysisProtocolVersion: packageDefinition?.analysisProtocolVersion ?? null,
         analysisProtocolSnapshotEncrypted: null,
+        analysisEngineKey: packageDefinition?.analysisEngineKey ?? null,
         reportPackageKey: packageDefinition?.key ?? null,
         reportPackageVersion: packageDefinition?.version ?? null,
         reportPackageProfile: packageSelection?.profile ?? null,
         reportPackageSnapshotEncrypted: null,
       },
     })
-    if (packageDefinition && packageSelection && input.courseId) {
+    if (packageDefinition && packageSelection) {
       await materializeReportPackage(tx, {
         compositeId: composite.id,
         courseId: input.courseId,
@@ -853,10 +903,12 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
   }
   if (packageDefinition && hasPackageSnapshot) {
     try {
-      const protocol = requirePublishedAnalysisProtocol(
-        packageDefinition.analysisProtocolKey,
-        packageDefinition.analysisProtocolVersion,
-      )
+      const protocol = packageDefinition.analysisEngineKey === 'mental-health-rule-v1'
+        ? undefined
+        : requirePublishedAnalysisProtocol(
+          packageDefinition.analysisProtocolKey,
+          packageDefinition.analysisProtocolVersion,
+        )
       validateFrozenReportPackageSnapshot(
         readFrozenReportPackageSnapshot(source.reportPackageSnapshotEncrypted as string),
         packageDefinition,
@@ -891,12 +943,19 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
   if (hasProtocolSnapshot) {
     try {
       const snapshot = readFrozenAnalysisProtocolSnapshot(source.analysisProtocolSnapshotEncrypted as string)
-      validateFrozenAnalysisProtocolSnapshot(
-        snapshot,
-        source.analysisProtocolKey as string,
-        source.analysisProtocolVersion as string,
-        source.items,
-      )
+      if (packageDefinition?.analysisEngineKey === 'mental-health-rule-v1') {
+        const packageSnapshot = readFrozenReportPackageSnapshot(source.reportPackageSnapshotEncrypted as string)
+        if (JSON.stringify(snapshot) !== JSON.stringify(packageSnapshot.analysisProtocolSnapshot)) {
+          throw new Error('来源报告包内部冻结协议与 Bundle 快照不一致')
+        }
+      } else {
+        validateFrozenAnalysisProtocolSnapshot(
+          snapshot,
+          source.analysisProtocolKey as string,
+          source.analysisProtocolVersion as string,
+          source.items,
+        )
+      }
     } catch (err) {
       throw compositeBadRequest(err instanceof Error ? err.message : '来源综合分析协议快照不可用')
     }
@@ -983,6 +1042,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         reportPackageVersion: source.reportPackageVersion ?? null,
         reportPackageProfile: source.reportPackageProfile ?? null,
         reportPackageSnapshotEncrypted: source.reportPackageSnapshotEncrypted ?? null,
+        analysisEngineKey: source.analysisEngineKey ?? null,
         items: { create: itemData as any },
       },
       include: { items: { orderBy: { position: 'asc' } } },
@@ -1146,6 +1206,7 @@ export const setCompositeAnalysisProtocol = async (
         analysisProtocolKey: null,
         analysisProtocolVersion: null,
         analysisProtocolSnapshotEncrypted: null,
+        ...(composite.analysisEngineKey ? { analysisEngineKey: null } : {}),
       },
     })
     return withoutAnalysisProtocolCipher(updated)
@@ -1168,6 +1229,7 @@ export const setCompositeAnalysisProtocol = async (
         analysisProtocolKey: protocol.key,
         analysisProtocolVersion: protocol.version,
         analysisProtocolSnapshotEncrypted: null,
+        analysisEngineKey: 'cognitive-v1',
       },
     })
     await materializeAnalysisProtocol(tx, {
@@ -1200,21 +1262,26 @@ export const setCompositeReportPackage = async (
     return withoutAnalysisProtocolCipher(composite)
   }
 
-  assertCognitiveModuleEnabled()
-  if (!composite.courseId) throw compositeBadRequest('报告包必须绑定课程')
   const definition = requirePublishedReportPackage(selection.key, selection.version)
   if (!definition.profiles.includes(selection.profile)) throw compositeBadRequest('报告包不支持该 Profile')
   if (!await canUseReportPackage(userId, role, definition.key, definition.version)) {
     throw compositeForbidden('没有该报告包的授权')
   }
+  const isMentalHealthPackage = definition.analysisEngineKey === 'mental-health-rule-v1'
+  if (!isMentalHealthPackage) {
+    assertCognitiveModuleEnabled()
+    if (!composite.courseId) throw compositeBadRequest('报告包必须绑定课程')
+  }
   if (!composite.reportPackageKey && composite.items.length > 0) {
     throw compositeConflict('请选择空白草稿启用报告包，或先移除现有模块')
   }
 
-  const protocol = requirePublishedAnalysisProtocol(
-    definition.analysisProtocolKey,
-    definition.analysisProtocolVersion,
-  )
+  const protocol = isMentalHealthPackage
+    ? null
+    : requirePublishedAnalysisProtocol(
+      definition.analysisProtocolKey,
+      definition.analysisProtocolVersion,
+    )
   return prisma.$transaction(async (tx: Db) => {
     if (composite.reportPackageKey) {
       await tx.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: id } })
@@ -1228,14 +1295,15 @@ export const setCompositeReportPackage = async (
         reportPackageSnapshotEncrypted: null,
         // Keep the internal protocol reference for the existing frozen task
         // machinery; it is never exposed as the teacher-facing mode.
-        analysisProtocolKey: protocol.key,
-        analysisProtocolVersion: protocol.version,
+        analysisProtocolKey: definition.analysisProtocolKey,
+        analysisProtocolVersion: definition.analysisProtocolVersion,
         analysisProtocolSnapshotEncrypted: null,
+        analysisEngineKey: definition.analysisEngineKey ?? 'cognitive-v1',
       },
     })
     await materializeReportPackage(tx, {
       compositeId: id,
-      courseId: composite.courseId as string,
+      courseId: composite.courseId,
       userId,
       profile: selection.profile,
       packageDefinition: definition,
@@ -1396,13 +1464,22 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       if (!definition.profiles.includes(composite.reportPackageProfile as CognitiveAnalysisProfile)) {
         throw compositeBadRequest('报告包 Profile 不匹配')
       }
-      const protocol = requirePublishedAnalysisProtocol(
-        definition.analysisProtocolKey,
-        definition.analysisProtocolVersion,
-      )
+      const isMentalHealthPackage = definition.analysisEngineKey === 'mental-health-rule-v1'
+      const protocol = isMentalHealthPackage
+        ? undefined
+        : requirePublishedAnalysisProtocol(
+          definition.analysisProtocolKey,
+          definition.analysisProtocolVersion,
+        )
       const packageSnapshot = hasPackageSnapshot
         ? readFrozenReportPackageSnapshot(composite.reportPackageSnapshotEncrypted as string)
-        : buildFrozenReportPackageSnapshot(definition, protocol, composite.items)
+        : isMentalHealthPackage
+          ? buildFrozenMentalHealthBundlePackageSnapshot(
+            definition,
+            composite.items,
+            composite.reportPackageProfile as CognitiveAnalysisProfile,
+          )
+          : buildFrozenReportPackageSnapshot(definition, protocol as AnalysisProtocolDefinition, composite.items)
       validateFrozenReportPackageSnapshot(packageSnapshot, definition, protocol, composite.items)
       if (packageSnapshot.profile !== composite.reportPackageProfile) {
         throw compositeBadRequest('报告包快照 Profile 与实例不匹配')
@@ -1701,6 +1778,12 @@ const createAttempt = async (
       accessTokenId,
       recoveryTokenHash: credential?.hash ?? null,
       participantKey: credential?.participantKey ?? `user:${userId}`,
+      subjectUserId: userId,
+      subjectKey: userId ? getParticipantKey(userId) : null,
+      respondentUserId: userId,
+      respondentKey: userId ? getParticipantKey(userId) : (credential?.participantKey ?? null),
+      respondentType: userId ? 'participant_self_report' : 'anonymous_self_report',
+      assessmentEpisodeId: null,
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
     },

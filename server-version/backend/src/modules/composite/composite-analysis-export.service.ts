@@ -8,6 +8,10 @@ import {
 } from './composite-report.projector'
 import type {
   CompositePackageReport,
+  CompositeMentalHealthPackageReport,
+  CompositeParticipantPackageReport,
+  CompositeResearcherPackageReport,
+  CompositeTeacherPackageReport,
   CompositeReportAudience,
 } from './composite-report.types'
 
@@ -68,6 +72,12 @@ interface AnalysisExportDocument {
 
 const safeString = (value: unknown): string => typeof value === 'string' ? value : ''
 
+const isMentalHealthReport = (
+  analysis: CompositePackageReport,
+): analysis is CompositeMentalHealthPackageReport => (
+  'outcomeCode' in analysis && 'mainConstruct' in analysis && 'nextSteps' in analysis
+)
+
 const isoDate = (value: Date | string): string => value instanceof Date ? value.toISOString() : String(value)
 
 const jsonCell = (value: unknown): string | null => {
@@ -125,7 +135,9 @@ const documentFor = (
   }
 }
 
-const safeDomainRows = (analysis: Exclude<CompositePackageReport, { audience: 'researcher' }>): AnalysisTable => {
+const safeDomainRows = (
+  analysis: CompositeParticipantPackageReport | CompositeTeacherPackageReport,
+): AnalysisTable => {
   const headers = [
     'row_type',
     'domain',
@@ -217,7 +229,7 @@ const safeDomainRows = (analysis: Exclude<CompositePackageReport, { audience: 'r
   return { headers, rows, numericHeaders: ['evidence_count'] }
 }
 
-const researcherDomainRows = (analysis: Extract<CompositePackageReport, { audience: 'researcher' }>): AnalysisTable => {
+const researcherDomainRows = (analysis: CompositeResearcherPackageReport): AnalysisTable => {
   const headers = [
     'row_type',
     'domain',
@@ -272,10 +284,103 @@ const researcherDomainRows = (analysis: Extract<CompositePackageReport, { audien
   return { headers, rows, numericHeaders: ['evidence_count'] }
 }
 
-const domainEvidenceTableFor = (analysis: CompositePackageReport): AnalysisTable =>
-  analysis.audience === 'researcher' ? researcherDomainRows(analysis) : safeDomainRows(analysis)
+const mentalHealthEvidenceRows = (analysis: CompositeMentalHealthPackageReport): AnalysisTable => {
+  if (analysis.audience !== 'researcher' || !analysis.bundleReportFacts) {
+    return {
+      headers: [
+        'row_type',
+        'construct',
+        'outcome_code',
+        'action_tier',
+        'consistency',
+        'interpretable_evidence_count',
+        'excluded_evidence_count',
+        'quality_state',
+      ],
+      rows: [{
+        row_type: 'bundle_summary',
+        construct: analysis.mainConstruct,
+        outcome_code: analysis.outcomeCode,
+        action_tier: analysis.actionTier,
+        consistency: analysis.consistency,
+        interpretable_evidence_count: analysis.qualitySummary.interpretableModules,
+        excluded_evidence_count: analysis.qualitySummary.excludedModules.length,
+        quality_state: analysis.outcomeCode === 'INSUFFICIENT_QUALITY' ? 'invalid' : 'role_restricted',
+      }],
+      numericHeaders: ['interpretable_evidence_count', 'excluded_evidence_count'],
+    }
+  }
+
+  const headers = [
+    'row_type',
+    'evidence_id',
+    'source_result_id',
+    'slot_key',
+    'scale_id',
+    'scale_code',
+    'instrument_version',
+    'score_key',
+    'value',
+    'score_status',
+    'classification',
+    'role',
+    'construct',
+    'facet',
+    'direction',
+    'quality_state',
+    'quality_flags',
+    'interpretable',
+    'provenance_json',
+  ]
+  const rows = analysis.bundleReportFacts.evidence.map((evidence) => ({
+    row_type: 'bundle_evidence',
+    evidence_id: evidence.id,
+    source_result_id: evidence.sourceResultId,
+    slot_key: evidence.slotKey,
+    scale_id: evidence.scaleId,
+    scale_code: evidence.scaleCode,
+    instrument_version: evidence.instrumentVersion,
+    score_key: evidence.scoreKey,
+    value: evidence.value,
+    score_status: evidence.scoreStatus,
+    classification: evidence.classification,
+    role: evidence.role,
+    construct: evidence.construct,
+    facet: evidence.facet ?? null,
+    direction: evidence.direction,
+    quality_state: evidence.qualityState,
+    quality_flags: evidence.qualityFlags.join('|'),
+    interpretable: evidence.interpretable,
+    provenance_json: jsonCell(evidence.provenance),
+  }))
+  return { headers, rows, numericHeaders: ['value'] }
+}
+
+const domainEvidenceTableFor = (analysis: CompositePackageReport): AnalysisTable => {
+  if (isMentalHealthReport(analysis)) return mentalHealthEvidenceRows(analysis)
+  return analysis.audience === 'researcher' ? researcherDomainRows(analysis) : safeDomainRows(analysis)
+}
 
 const findingsTableFor = (analysis: CompositePackageReport): AnalysisTable => {
+  if (isMentalHealthReport(analysis)) {
+    if (analysis.audience !== 'researcher' || !analysis.bundleReportFacts) {
+      return { headers: ['scope', 'availability'], rows: [] }
+    }
+    const rows = [
+      ...analysis.bundleReportFacts.facetFindings,
+      ...analysis.bundleReportFacts.contextFindings,
+    ].map((finding) => ({
+      scope: finding.role,
+      key: finding.key,
+      evidence_refs: finding.evidenceRefs.join('|'),
+      feedback_block_key: finding.feedbackBlockKey,
+      available: finding.available,
+    }))
+    return {
+      headers: ['scope', 'key', 'evidence_refs', 'feedback_block_key', 'available'],
+      rows,
+    }
+  }
   if (analysis.audience !== 'researcher') {
     return {
       headers: ['scope', 'availability'],
@@ -296,6 +401,13 @@ const findingsTableFor = (analysis: CompositePackageReport): AnalysisTable => {
 }
 
 const recommendationsTableFor = (analysis: CompositePackageReport): AnalysisTable => {
+  if (isMentalHealthReport(analysis)) {
+    const rows = analysis.nextSteps.map((text) => ({
+      priority: analysis.actionTier,
+      text,
+    }))
+    return { headers: ['priority', 'text'], rows }
+  }
   if (analysis.audience !== 'researcher') {
     return {
       headers: ['priority', 'text'],
@@ -337,6 +449,16 @@ const analysisTableFor = (
     { key: 'quality_excluded_modules', value: analysis.qualitySummary.excludedModules.join('|') },
     { key: 'quality_warnings', value: analysis.qualitySummary.warnings.join('|') },
   ]
+
+  if (isMentalHealthReport(analysis)) {
+    rows.push(
+      { key: 'outcome_code', value: analysis.outcomeCode },
+      { key: 'action_tier', value: analysis.actionTier },
+      { key: 'main_construct', value: analysis.mainConstruct },
+      { key: 'consistency', value: analysis.consistency },
+      { key: 'conclusion', value: analysis.conclusion },
+    )
+  }
 
   if (context.audience !== 'participant') {
     rows.push(
@@ -395,7 +517,11 @@ const provenanceTableFor = (
       { key: 'report_schema_version', value: context.snapshot.reportSchemaVersion },
     )
     rows.push({ key: 'input_fingerprint', value: context.snapshot.inputFingerprint })
-    const provenance = analysis.audience === 'researcher' ? analysis.provenance : {}
+    const provenance = isMentalHealthReport(analysis)
+      ? (analysis.bundleReportFacts?.provenance ?? {})
+      : analysis.audience === 'researcher'
+        ? analysis.provenance
+        : {}
     for (const [key, value] of Object.entries(provenance)) {
       rows.push({ key, value })
     }
