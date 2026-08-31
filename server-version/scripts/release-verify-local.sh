@@ -213,7 +213,7 @@ run_logged backend-build.log npm --prefix "$BACKEND_DIR" run build
 run_logged backend-audit.log npm --prefix "$BACKEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
 
 BACKEND_TEST_REPORT="$REPORT_DIR/backend-vitest.json"
-run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
+run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
 run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-release-test-report.mjs" "$BACKEND_TEST_REPORT" \
   src/__tests__/cognitive/concurrency.integration.test.ts \
   src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
