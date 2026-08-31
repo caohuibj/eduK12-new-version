@@ -1485,7 +1485,7 @@ export const publicQuestionnaireController = {
 
   /**
    * 批量提交表单题目答案。公开恢复凭据只绑定一个 session，批量写入
-   * 仍在同一个 serializable transaction 中完成，并返回显式 checkpoint ACK。
+   * 仍在同一个按 assessment 串行化的 transaction 中完成，并返回显式 checkpoint ACK。
    */
   async submitFormAnswers(req: Request, res: Response) {
     try {

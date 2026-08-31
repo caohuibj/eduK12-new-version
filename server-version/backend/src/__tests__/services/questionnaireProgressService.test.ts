@@ -125,17 +125,37 @@ describe('questionnaire progress consistency', () => {
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2)
   })
 
+  it('retries raw-query serialization failures reported as PostgreSQL 40001', async () => {
+    mockPrisma.$transaction
+      .mockRejectedValueOnce({ code: 'P2010', meta: { code: '40001' } })
+      .mockResolvedValueOnce('ok')
+
+    await expect(withSerializableQuestionnaireTransaction(async () => 'ok')).resolves.toBe('ok')
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2)
+  })
+
   it('locks only the current assessment for ordinary answer transactions', async () => {
-    const executeRaw = vi.fn().mockResolvedValue(0)
-    const transactionCallback = vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback({ $executeRaw: executeRaw }))
+    const queryRaw = vi.fn().mockResolvedValue([{ id: 'qa-1' }])
+    const transactionCallback = vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback({ $queryRaw: queryRaw }))
     mockPrisma.$transaction.mockImplementation(transactionCallback)
 
-    await expect(withQuestionnaireAnswerTransaction('session-1', async (tx) => tx)).resolves.toEqual({ $executeRaw: executeRaw })
+    await expect(withQuestionnaireAnswerTransaction('session-1', async (tx) => tx)).resolves.toEqual({ $queryRaw: queryRaw })
 
-    expect(executeRaw).toHaveBeenCalledTimes(1)
+    expect(queryRaw).toHaveBeenCalledTimes(1)
     expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
       isolationLevel: 'ReadCommitted',
     })
+  })
+
+  it('does not hide an assessment-lock failure or invoke the answer callback', async () => {
+    const queryRaw = vi.fn().mockRejectedValue(new Error('lock query failed'))
+    const callback = vi.fn()
+    mockPrisma.$transaction.mockImplementation(async (transaction: (tx: unknown) => Promise<unknown>) => (
+      transaction({ $queryRaw: queryRaw })
+    ))
+
+    await expect(withQuestionnaireAnswerTransaction('session-1', callback)).rejects.toThrow('lock query failed')
+    expect(callback).not.toHaveBeenCalled()
   })
 
   it('uses an atomic field increment for a newly completed form', async () => {

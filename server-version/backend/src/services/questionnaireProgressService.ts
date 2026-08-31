@@ -207,6 +207,13 @@ export const withSerializableQuestionnaireTransaction = async <T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
   const maxAttempts = 3
+  const isSerializationConflict = (err: any): boolean => (
+    err?.code === 'P2034'
+    // Prisma exposes serialization failures raised by a raw query as P2010;
+    // the PostgreSQL SQLSTATE remains available in the nested metadata.
+    || err?.code === '40001'
+    || err?.meta?.code === '40001'
+  )
 
   const waitBeforeRetry = (attempt: number) => new Promise<void>((resolve) => {
     // A small exponential backoff with jitter prevents concurrent clients
@@ -224,7 +231,7 @@ export const withSerializableQuestionnaireTransaction = async <T>(
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
       })
     } catch (err: any) {
-      if (err?.code !== 'P2034' || attempt === maxAttempts) throw err
+      if (!isSerializationConflict(err) || attempt === maxAttempts) throw err
       await waitBeforeRetry(attempt)
     }
   }
@@ -245,14 +252,14 @@ export const withQuestionnaireAnswerTransaction = async <T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
   return prisma.$transaction(async (tx) => {
-      await tx.$executeRaw`
-        SELECT "id"
-        FROM "questionnaire_assessments"
-        WHERE "session_id" = ${sessionId}
-        FOR UPDATE
-      `
-      return callback(tx)
-    }, {
-      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-    })
+    await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id"
+      FROM "questionnaire_assessments"
+      WHERE "session_id" = ${sessionId}
+      FOR UPDATE
+    `
+    return callback(tx)
+  }, {
+    isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+  })
 }
