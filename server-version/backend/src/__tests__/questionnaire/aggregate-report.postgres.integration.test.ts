@@ -80,7 +80,9 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
     const assessments = await prisma.questionnaireAssessment.createManyAndReturn({
       data: Array.from({ length: 200 }, () => ({
         questionnaireId,
-        userId,
+        // Anonymous rows may share a questionnaire; the production partial
+        // unique index intentionally permits multiple NULL user IDs.
+        userId: null,
         status: 'IN_PROGRESS' as const,
         progress: 0,
       })),
