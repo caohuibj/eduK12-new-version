@@ -24,4 +24,3 @@ export const useCheckpointLifecycle = (flush: () => Promise<void>, enabled = tru
     return installCheckpointLifecycle(() => flushRef.current())
   }, [enabled])
 }
-
