@@ -12,6 +12,7 @@ const suite = DB_URL ? describe : describe.skip
 
 let prisma: PrismaClient
 let refreshQuestionnaireProgress: typeof import('../../services/questionnaireProgressService')['refreshQuestionnaireProgress']
+let withSerializableQuestionnaireTransaction: typeof import('../../services/questionnaireProgressService')['withSerializableQuestionnaireTransaction']
 let decryptField: typeof import('../../utils/encryption')['decryptField']
 let assessmentId = ''
 let questionnaireId = ''
@@ -23,7 +24,9 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     const database = await import('../../config/database')
     prisma = database.prisma
-    refreshQuestionnaireProgress = (await import('../../services/questionnaireProgressService')).refreshQuestionnaireProgress
+    const progressService = await import('../../services/questionnaireProgressService')
+    refreshQuestionnaireProgress = progressService.refreshQuestionnaireProgress
+    withSerializableQuestionnaireTransaction = progressService.withSerializableQuestionnaireTransaction
     decryptField = (await import('../../utils/encryption')).decryptField
 
     const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -72,4 +75,38 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
       reportDefinitionVersion: 'collection-only-v2',
     })
   })
+
+  it('completes 200 independent assessments concurrently without duplicate terminal writes', async () => {
+    const assessments = await prisma.questionnaireAssessment.createManyAndReturn({
+      data: Array.from({ length: 200 }, () => ({
+        questionnaireId,
+        userId,
+        status: 'IN_PROGRESS' as const,
+        progress: 0,
+      })),
+      select: { id: true },
+    })
+    const startedAt = Date.now()
+    try {
+      const results = await Promise.all(assessments.map(({ id }) => withSerializableQuestionnaireTransaction(
+        (tx) => refreshQuestionnaireProgress(tx, id),
+      )))
+
+      expect(Date.now() - startedAt).toBeLessThan(10_000)
+      expect(results).toHaveLength(200)
+      expect(results.every((result) => result?.completed && result.status === 'COMPLETED')).toBe(true)
+
+      const completedRows = await prisma.questionnaireAssessment.count({
+        where: { id: { in: assessments.map(({ id }) => id) }, status: 'COMPLETED' },
+      })
+      expect(completedRows).toBe(200)
+      const reports = await prisma.questionnaireAssessment.findMany({
+        where: { id: { in: assessments.map(({ id }) => id) } },
+        select: { aggregateReport: true, aggregateReportEncrypted: true },
+      })
+      expect(reports.every((row) => row.aggregateReport === null && typeof row.aggregateReportEncrypted === 'string')).toBe(true)
+    } finally {
+      await prisma.questionnaireAssessment.deleteMany({ where: { id: { in: assessments.map(({ id }) => id) } } })
+    }
+  }, 60000)
 })

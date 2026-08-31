@@ -16,6 +16,16 @@ import { assessmentContextHashMatches, decryptAssessmentContext, encryptAssessme
 // the transaction lock primitive as well.
 type DatabaseClient = Prisma.TransactionClient
 
+export type QuestionnaireContextSnapshot = {
+  id: string
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  questionnaire: {
+    formItems: Array<unknown>
+  }
+  formAnswers: Array<unknown>
+}
+
 export class AssessmentContextServiceError extends Error {
   constructor(message: string, public readonly statusCode = 400) {
     super(message)
@@ -80,17 +90,11 @@ const buildOrThrow = (items: Array<Record<string, unknown>>, answers: Array<Reco
   }
 }
 
-export const freezeQuestionnaireAssessmentContext = async (
+const freezeLockedQuestionnaireAssessmentContext = async (
   db: DatabaseClient,
-  assessmentId: string,
+  assessment: QuestionnaireContextSnapshot,
   frozenAt = new Date(),
 ): Promise<{ context: AssessmentContextV1; hash: string; alreadyFrozen: boolean }> => {
-  await lockQuestionnaireAssessment(db, assessmentId)
-  const assessment = await db.questionnaireAssessment.findUnique({
-    where: { id: assessmentId },
-    include: { questionnaire: { include: { formItems: { orderBy: { position: 'asc' } } } }, formAnswers: true },
-  })
-  if (!assessment) throw new AssessmentContextServiceError('问卷测评不存在', 404)
   if (assessment.contextSnapshotEncrypted && assessment.contextSnapshotHash) {
     try {
       const context = decryptAssessmentContext(assessment.contextSnapshotEncrypted)
@@ -103,11 +107,11 @@ export const freezeQuestionnaireAssessmentContext = async (
   const context = buildOrThrow(assessment.questionnaire.formItems as unknown as Array<Record<string, unknown>>, assessment.formAnswers as unknown as Array<Record<string, unknown>>, frozenAt)
   const hash = hashAssessmentContext(context)
   const updated = await db.questionnaireAssessment.updateMany({
-    where: { id: assessmentId, contextSnapshotEncrypted: null, contextSnapshotHash: null },
+    where: { id: assessment.id, contextSnapshotEncrypted: null, contextSnapshotHash: null },
     data: { contextSnapshotEncrypted: encryptAssessmentContext(context), contextSnapshotHash: hash, contextFrozenAt: frozenAt },
   })
   if (updated.count === 1) return { context, hash, alreadyFrozen: false }
-  const current = await db.questionnaireAssessment.findUnique({ where: { id: assessmentId } })
+  const current = await db.questionnaireAssessment.findUnique({ where: { id: assessment.id } })
   if (!current?.contextSnapshotEncrypted || !current.contextSnapshotHash) throw new AssessmentContextServiceError('人口学上下文冻结失败，请重试', 409)
   try {
     const context = decryptAssessmentContext(current.contextSnapshotEncrypted)
@@ -116,6 +120,35 @@ export const freezeQuestionnaireAssessmentContext = async (
   } catch {
     throw new AssessmentContextServiceError('人口学上下文无法读取，请联系管理员', 500)
   }
+}
+
+export const freezeQuestionnaireAssessmentContext = async (
+  db: DatabaseClient,
+  assessmentId: string,
+  frozenAt = new Date(),
+): Promise<{ context: AssessmentContextV1; hash: string; alreadyFrozen: boolean }> => {
+  await lockQuestionnaireAssessment(db, assessmentId)
+  const assessment = await db.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    include: { questionnaire: { include: { formItems: { orderBy: { position: 'asc' } } } }, formAnswers: true },
+  })
+  if (!assessment) throw new AssessmentContextServiceError('问卷测评不存在', 404)
+  return freezeLockedQuestionnaireAssessmentContext(db, assessment, frozenAt)
+}
+
+/**
+ * Freeze a snapshot that was loaded inside the same transaction. The helper
+ * still takes the assessment row lock before using the snapshot; completion
+ * callers therefore retain the serialization boundary without reloading the
+ * questionnaire graph a second time.
+ */
+export const freezeQuestionnaireAssessmentContextFromSnapshot = async (
+  db: DatabaseClient,
+  assessment: QuestionnaireContextSnapshot,
+  frozenAt = new Date(),
+): Promise<{ context: AssessmentContextV1; hash: string; alreadyFrozen: boolean }> => {
+  await lockQuestionnaireAssessment(db, assessment.id)
+  return freezeLockedQuestionnaireAssessmentContext(db, assessment, frozenAt)
 }
 
 export const freezeCompositeAttemptContext = async (

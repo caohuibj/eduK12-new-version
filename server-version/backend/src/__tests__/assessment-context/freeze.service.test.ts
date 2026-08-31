@@ -16,6 +16,7 @@ import {
 import {
   freezeCompositeAttemptContext,
   freezeQuestionnaireAssessmentContext,
+  freezeQuestionnaireAssessmentContextFromSnapshot,
   readQuestionnaireAssessmentContext,
 } from '../../services/assessmentContextService'
 
@@ -125,6 +126,17 @@ describe('parent-scoped AssessmentContext freeze', () => {
     const repeated = await freezeQuestionnaireAssessmentContext(db, 'qa-1', new Date('2027-01-01T00:00:00Z'))
     expect(repeated).toMatchObject({ hash: first.hash, alreadyFrozen: true, context: first.context })
     expect(assessmentContextHashMatches(first.context, first.hash)).toBe(true)
+  })
+
+  it('freezes a transaction-loaded snapshot without reloading the questionnaire graph', async () => {
+    const row = questionnaireRow('qa-snapshot', '2014-02', 'female')
+    const db = makeDb({ 'qa-snapshot': row })
+
+    const result = await freezeQuestionnaireAssessmentContextFromSnapshot(db, row, frozenAt)
+
+    expect(result).toMatchObject({ alreadyFrozen: false, hash: expect.any(String) })
+    expect(db.questionnaireAssessment.findUnique).not.toHaveBeenCalled()
+    expect(row.contextSnapshotHash).toBe(result.hash)
   })
 
   it('freezes a composite attempt with one parent snapshot and refuses incomplete required context', async () => {

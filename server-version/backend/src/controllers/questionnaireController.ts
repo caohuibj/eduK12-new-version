@@ -8,12 +8,13 @@ import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
-import { applyQuestionnaireProgressDelta, refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { applyQuestionnaireProgressDelta, questionnaireProgressSelect, refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction, type QuestionnaireProgressSnapshot } from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
   freezeQuestionnaireAssessmentContext,
+  freezeQuestionnaireAssessmentContextFromSnapshot,
   isAssessmentContextServiceError,
 } from '../services/assessmentContextService'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
@@ -2017,12 +2018,22 @@ export const questionnaireController = {
 
         // 所有项目都已完成，使用条件状态转换完成问卷，避免重复生成报告。
         const completionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
-          const frozen = await freezeQuestionnaireAssessmentContext(tx, existingQA.id)
-          const completion = await refreshQuestionnaireProgress(tx, existingQA.id)
+          // The resume lookup is outside the mutation transaction. Reload the
+          // authoritative minimal graph inside Serializable before freezing or
+          // completing so a concurrent answer cannot be hidden by a stale
+          // start/resume snapshot.
+          const completionSnapshot = await tx.questionnaireAssessment.findUnique({
+            where: { id: existingQA.id },
+            select: questionnaireProgressSelect,
+          }) as QuestionnaireProgressSnapshot | null
+          if (!completionSnapshot) return { completion: null, contextState: assessmentContextState(existingQA) }
+          const frozen = await freezeQuestionnaireAssessmentContextFromSnapshot(tx, completionSnapshot)
+          const completion = await refreshQuestionnaireProgress(tx, existingQA.id, completionSnapshot)
           return { completion, contextState: { status: 'frozen' as const, frozenAt: frozen.context.frozenAt } }
         })
 
         // 所有项目都已完成，返回已完成状态
+        if (!completionResult.completion?.completed) return error(res, '测评状态已变化，请刷新后重试', -1, 409)
         return success(res, {
           questionnaireAssessment: {
             id: existingQA.id,
@@ -2273,8 +2284,16 @@ export const questionnaireController = {
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && qa.status !== 'COMPLETED') {
         completion = await withSerializableQuestionnaireTransaction(async (tx) => {
-          await freezeQuestionnaireAssessmentContext(tx, qa.id)
-          return refreshQuestionnaireProgress(tx, qa.id)
+          // This GET loaded `qa` outside the mutation transaction. Reload the
+          // minimal authoritative snapshot inside Serializable instead of
+          // using an observation that may be stale after a concurrent answer.
+          const completionSnapshot = await tx.questionnaireAssessment.findUnique({
+            where: { id: qa.id },
+            select: questionnaireProgressSelect,
+          }) as QuestionnaireProgressSnapshot | null
+          if (!completionSnapshot) return null
+          await freezeQuestionnaireAssessmentContextFromSnapshot(tx, completionSnapshot)
+          return refreshQuestionnaireProgress(tx, qa.id, completionSnapshot)
         })
 
         logger.info('问卷测评自动完成', {
@@ -2347,46 +2366,8 @@ export const questionnaireController = {
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
           where: { id },
-          include: {
-            questionnaire: {
-              include: {
-                formItems: { orderBy: { position: 'asc' } },
-                questionnaireScales: {
-                  include: {
-                    scale: {
-                      select: {
-                        id: true,
-                        code: true,
-                        name: true,
-                        status: true,
-                        instrumentClass: true,
-                        instrumentVersion: true,
-                        definition: true,
-                      },
-                    },
-                  },
-                  orderBy: { position: 'asc' },
-                },
-              },
-            },
-            scaleAssessments: {
-              include: {
-                scale: {
-                  select: {
-                    id: true,
-                    code: true,
-                    name: true,
-                    status: true,
-                    instrumentClass: true,
-                    instrumentVersion: true,
-                    definition: true,
-                  },
-                },
-              },
-            },
-            formAnswers: true,
-          },
-        })
+          select: questionnaireProgressSelect,
+        }) as QuestionnaireProgressSnapshot | null
 
         if (!qa) return { kind: 'not-found' as const }
         if (qa.userId !== userId) return { kind: 'forbidden' as const }
@@ -2401,7 +2382,7 @@ export const questionnaireController = {
           }
         }
 
-        await freezeQuestionnaireAssessmentContext(tx, qa.id)
+        await freezeQuestionnaireAssessmentContextFromSnapshot(tx, qa)
 
         if (qa.scaleAssessments.some((assessment) => assessment.status !== 'COMPLETED')) {
           return { kind: 'incomplete-scales' as const }
@@ -2410,7 +2391,7 @@ export const questionnaireController = {
         const missingForms = qa.questionnaire.formItems.filter((item) => !isFormAnswerRequiredComplete(item, formAnswerMap.get(item.id)))
         if (missingForms.length > 0) return { kind: 'incomplete-forms' as const, count: missingForms.length }
 
-        const progress = await refreshQuestionnaireProgress(tx, qa.id)
+        const progress = await refreshQuestionnaireProgress(tx, qa.id, qa)
         if (!progress) return { kind: 'incomplete-forms' as const, count: 0 }
         if (progress.status !== 'IN_PROGRESS' && !progress.completed) return { kind: 'closed' as const }
         if (!progress.completed) return { kind: 'incomplete-forms' as const, count: 0 }

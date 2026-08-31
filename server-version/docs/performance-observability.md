@@ -12,9 +12,14 @@ tokens, questionnaire content, identifiers, SQL text, or request bodies.
 - `ptool_api_requests_total`: compatibility counter retained for existing
   availability alerts and dashboards.
 - `ptool_assessment_phase_duration_seconds`: `resume_auth`,
-  `transaction_acquisition`, `transaction`, `row_lock_wait`,
+  `transaction_acquisition`, `transaction`, `row_lock_roundtrip`,
   `assessment_lookup`, `definition_lookup`, `existing_answer_lookup`,
   `answer_mutation`, `progress_mutation`, and residual `response` time.
+- `ptool_slow_requests_total`: requests above `500ms`, `1s`, and `2s`,
+  classified at request finalization by the largest exclusive phase. The
+  `dominant_phase` label uses `transaction_other` for uncovered time inside
+  the transaction envelope and `response_other` for uninstrumented request
+  time. An aborted client connection is recorded with HTTP status `499`.
 - `ptool_prisma_call_duration_seconds`: Prisma middleware wall time labelled
   only by model and action. Raw SQL is represented as `model="raw"`; query
   text is never recorded.
@@ -45,8 +50,11 @@ Use the same versioned fixture and workload for each comparison. For each of
 3. repeat the run three times;
 4. record p50, p95, p99, maximum latency, throughput, error rate, and the
    process metrics above;
-5. classify requests above 500 ms, 1 s, and 2 s by the dominant measured
-   phase, while checking the event-loop, Prisma, and container CPU metrics.
+5. classify requests above 500 ms, 1 s, and 2 s using the delta of
+   `ptool_slow_requests_total`, while checking the event-loop, Prisma, and
+   container CPU metrics. This counter is request-correlated at finalization;
+   independent phase histograms alone must not be used to infer per-request
+   causality.
 
 The report must end with an explicit attribution conclusion. Examples include
 event-loop delay, transaction acquisition/pool contention, database query

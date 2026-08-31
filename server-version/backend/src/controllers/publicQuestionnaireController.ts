@@ -18,7 +18,7 @@ import { logger } from '../utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
-import { refreshQuestionnaireProgress, withQuestionnaireAnswerTransaction, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import { questionnaireProgressSelect, refreshQuestionnaireProgress, withQuestionnaireAnswerTransaction, withSerializableQuestionnaireTransaction, type QuestionnaireProgressSnapshot } from '../services/questionnaireProgressService'
 import { getQuestionnaireResumeToken } from '../middleware/publicQuestionnaireAuth'
 import { hashQuestionnaireResumeToken } from '../services/questionnaireResumeTokenService'
 import {
@@ -34,7 +34,7 @@ import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-con
 import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 import { readContextFormAnswer, writeContextFormAnswer } from '../modules/assessment-context'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
-import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
+import { freezeQuestionnaireAssessmentContext, freezeQuestionnaireAssessmentContextFromSnapshot, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { applyQuestionnaireProgressDelta } from '../services/questionnaireProgressService'
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
@@ -360,10 +360,18 @@ export const publicQuestionnaireController = {
           // 检查是否所有内容都已完成
           if (currentIndex === -1 || !currentItem) {
             // 所有内容已完成，使用条件状态转换避免重复生成报告。
-            await withSerializableQuestionnaireTransaction(async (tx) => {
-              await freezeQuestionnaireAssessmentContext(tx, questionnaireAssessment!.id)
-              return refreshQuestionnaireProgress(tx, questionnaireAssessment!.id)
+            const completion = await withSerializableQuestionnaireTransaction(async (tx) => {
+              // Re-read inside Serializable; the resume/start lookup above is
+              // outside the mutation transaction and may be stale.
+              const completionSnapshot = await tx.questionnaireAssessment.findUnique({
+                where: { id: questionnaireAssessment!.id },
+                select: questionnaireProgressSelect,
+              }) as QuestionnaireProgressSnapshot | null
+              if (!completionSnapshot) return null
+              await freezeQuestionnaireAssessmentContextFromSnapshot(tx, completionSnapshot)
+              return refreshQuestionnaireProgress(tx, questionnaireAssessment!.id, completionSnapshot)
             })
+            if (!completion?.completed) return error(res, '测评状态已变化，请刷新后重试', -1, 409)
 
             logger.info('问卷测评在startAssessment中自动完成', {
               questionnaireAssessmentId: questionnaireAssessment.id,
@@ -768,8 +776,17 @@ export const publicQuestionnaireController = {
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && questionnaireAssessment.status !== 'COMPLETED') {
         const completionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
-          const frozen = await freezeQuestionnaireAssessmentContext(tx, questionnaireAssessment.id)
-          const completion = await refreshQuestionnaireProgress(tx, questionnaireAssessment.id)
+          // The outer GET is intentionally outside the mutation transaction.
+          // Reload a minimal authoritative snapshot inside Serializable rather
+          // than carrying a potentially stale cache/HTTP snapshot across the
+          // transaction boundary.
+          const completionSnapshot = await tx.questionnaireAssessment.findUnique({
+            where: { id: questionnaireAssessment.id },
+            select: questionnaireProgressSelect,
+          }) as QuestionnaireProgressSnapshot | null
+          if (!completionSnapshot) return { completion: null, contextState: assessmentContextState(questionnaireAssessment) }
+          const frozen = await freezeQuestionnaireAssessmentContextFromSnapshot(tx, completionSnapshot)
+          const completion = await refreshQuestionnaireProgress(tx, questionnaireAssessment.id, completionSnapshot)
           return { completion, contextState: { status: 'frozen' as const, frozenAt: frozen.context.frozenAt } }
         })
         if (completionResult.completion?.completed) {
@@ -1239,46 +1256,8 @@ export const publicQuestionnaireController = {
       const result = await withSerializableQuestionnaireTransaction(async (tx) => {
         const qa = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
-          include: {
-            questionnaire: {
-              include: {
-                formItems: {
-                  orderBy: { position: 'asc' },
-                },
-                questionnaireScales: {
-                  include: {
-                    scale: {
-                      select: {
-                        id: true,
-                        code: true,
-                        name: true,
-                        instrumentClass: true,
-                        instrumentVersion: true,
-                        definition: true,
-                      },
-                    },
-                  },
-                  orderBy: { position: 'asc' },
-                },
-              },
-            },
-            scaleAssessments: {
-              include: {
-                scale: {
-                  select: {
-                    id: true,
-                    code: true,
-                    name: true,
-                    instrumentClass: true,
-                    instrumentVersion: true,
-                    definition: true,
-                  },
-                },
-              },
-            },
-            formAnswers: true,
-          },
-        }))
+          select: questionnaireProgressSelect,
+        })) as QuestionnaireProgressSnapshot | null
 
         if (!qa) return { kind: 'not-found' as const }
 
@@ -1294,7 +1273,7 @@ export const publicQuestionnaireController = {
 
         if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
-        await freezeQuestionnaireAssessmentContext(tx, qa.id)
+        await freezeQuestionnaireAssessmentContextFromSnapshot(tx, qa)
 
         const incompleteScales = qa.scaleAssessments.filter(
           (sa) => sa.status !== 'COMPLETED'
@@ -1304,7 +1283,7 @@ export const publicQuestionnaireController = {
         const missingForms = qa.questionnaire.formItems.filter((item) => !isFormAnswerRequiredComplete(item, formAnswerMap.get(item.id)))
         if (missingForms.length > 0) return { kind: 'incomplete-forms' as const, count: missingForms.length }
 
-        const progress = await measureRequestPhase('progress_mutation', () => refreshQuestionnaireProgress(tx, qa.id))
+        const progress = await measureRequestPhase('progress_mutation', () => refreshQuestionnaireProgress(tx, qa.id, qa))
         if (!progress?.completed) return { kind: 'incomplete-forms' as const, count: 0 }
         return {
           kind: 'completed' as const,

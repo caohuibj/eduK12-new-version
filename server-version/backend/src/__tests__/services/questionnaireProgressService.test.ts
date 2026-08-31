@@ -84,6 +84,25 @@ describe('questionnaire progress consistency', () => {
     expect(mockPrisma.questionnaireAssessment.updateMany.mock.calls[0][0].data).not.toHaveProperty('completedScales', 100)
   })
 
+  it('reuses an authoritative snapshot when completion already loaded the graph', async () => {
+    const qa = makeQa({
+      questionnaire: {
+        name: '问卷',
+        formItems: [{ id: 'form-1', type: 'text_input', label: '年级', required: true, position: 0 }],
+        questionnaireScales: [],
+      },
+    })
+
+    const result = await refreshQuestionnaireProgress(mockPrisma as any, 'qa-1', qa as any)
+
+    expect(result).toMatchObject({ completedScales: 0, completedForms: 0, progress: 0, completed: false })
+    expect(mockPrisma.questionnaireAssessment.findUnique).not.toHaveBeenCalled()
+    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'qa-1', status: 'IN_PROGRESS' },
+      data: { completedScales: 0, completedForms: 0, progress: 0 },
+    }))
+  })
+
   it('does not perform a second completion transition for an already completed row', async () => {
     mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(makeQa({
       status: 'COMPLETED',
