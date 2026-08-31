@@ -1,14 +1,15 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { Prisma } from '@prisma/client'
 import type { PrismaClient } from '@prisma/client'
+import { readContextFormAnswer } from '../../modules/assessment-context'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 
 /**
  * Opt-in PostgreSQL coverage for the public questionnaire answer transaction.
  * The fixture is isolated and removed after the suite; no developer database
- * is used unless PR26_INTEGRATION_DATABASE_URL is explicitly supplied.
+ * is used unless PR34_INTEGRATION_DATABASE_URL is explicitly supplied.
  */
-const DB_URL = integrationDatabaseUrl('PR26_INTEGRATION_DATABASE_URL')
+const DB_URL = integrationDatabaseUrl('PR34_INTEGRATION_DATABASE_URL', 'PR26_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
 
 type CapturedResponse = {
@@ -24,6 +25,7 @@ let assessmentId = ''
 let sessionId = ''
 let firstFormItemId = ''
 let secondFormItemId = ''
+let contextFormItemId = ''
 
 const invoke = async (
   handler: (req: any, res: any) => Promise<unknown>,
@@ -91,6 +93,19 @@ suite('public questionnaire form answers (real PostgreSQL)', () => {
       },
     })
     secondFormItemId = secondFormItem.id
+
+    const contextFormItem = await prisma.questionnaireFormItem.create({
+      data: {
+        questionnaireId,
+        type: 'single_choice',
+        label: 'Sex at birth',
+        required: true,
+        position: 2,
+        options: [{ value: 'female', label: 'Female' }],
+        contextKey: 'sexAtBirth',
+      },
+    })
+    contextFormItemId = contextFormItem.id
 
     sessionId = `pr26-form-session-${suffix}`
     const assessment = await prisma.questionnaireAssessment.create({
@@ -180,6 +195,51 @@ suite('public questionnaire form answers (real PostgreSQL)', () => {
     })
     expect(stored).toHaveLength(2)
     expect(stored.every((answer) => answer.revision === 1 && answer.status === 'ANSWERED')).toBe(true)
+  })
+
+  it('rejects a stale batch before writing any item in the batch', async () => {
+    const initial = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [{ formItemId: firstFormItemId, value: 'original', expectedRevision: 0 }],
+    })
+    expect(initial.statusCode).toBe(200)
+
+    const stale = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [
+        { formItemId: firstFormItemId, value: 'replacement', expectedRevision: 0 },
+        { formItemId: secondFormItemId, value: 'must not be persisted', expectedRevision: 0 },
+      ],
+    })
+    expect(stale.statusCode).toBe(409)
+
+    const stored = await prisma.questionnaireFormAnswer.findMany({
+      where: { questionnaireAssessmentId: assessmentId },
+    })
+    expect(stored).toHaveLength(1)
+    expect(stored[0]).toMatchObject({
+      formItemId: firstFormItemId,
+      value: 'original',
+      status: 'ANSWERED',
+      revision: 1,
+    })
+  })
+
+  it('persists context-bound values encrypted at rest in the bulk path', async () => {
+    const response = await invoke(publicQuestionnaireController.submitFormAnswers, {
+      answers: [{ formItemId: contextFormItemId, value: 'female', expectedRevision: 0 }],
+    })
+    expect(response.statusCode).toBe(200)
+
+    const stored = await prisma.questionnaireFormAnswer.findUnique({
+      where: {
+        questionnaireAssessmentId_formItemId: {
+          questionnaireAssessmentId: assessmentId,
+          formItemId: contextFormItemId,
+        },
+      },
+    })
+    expect(stored).toMatchObject({ status: 'ANSWERED', revision: 1 })
+    expect(stored?.value).not.toBe('female')
+    expect(readContextFormAnswer('sexAtBirth', stored?.value ?? '')).toBe('female')
   })
 
   it('never completes without the answer when answer and completion race', async () => {

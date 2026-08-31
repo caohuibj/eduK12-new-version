@@ -38,6 +38,7 @@ import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError }
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { applyQuestionnaireProgressDelta } from '../services/questionnaireProgressService'
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
+import { persistFormAnswerBatch } from '../services/questionnaire-form-answer-batch'
 import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
@@ -1512,11 +1513,23 @@ export const publicQuestionnaireController = {
       const result = await withQuestionnaireAnswerTransaction(sessionId, async (tx) => {
         const questionnaireAssessment = await tx.questionnaireAssessment.findUnique({
           where: { sessionId },
-          include: {
+          select: {
+            id: true,
+            status: true,
+            progress: true,
+            completedScales: true,
+            completedForms: true,
+            questionnaireId: true,
+            contextSnapshotEncrypted: true,
+            contextSnapshotHash: true,
             questionnaire: {
-              include: {
-                formItems: true,
-                questionnaireScales: { select: { id: true } },
+              select: {
+                _count: {
+                  select: {
+                    formItems: true,
+                    questionnaireScales: true,
+                  },
+                },
               },
             },
           },
@@ -1525,7 +1538,22 @@ export const publicQuestionnaireController = {
         if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
         if (questionnaireAssessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
-        const itemsById = new Map(questionnaireAssessment.questionnaire.formItems.map((item) => [item.id, item]))
+        const requestedFormItemIds = [...new Set(answers.map((answer) => answer.formItemId))]
+        const formItems = await tx.questionnaireFormItem.findMany({
+          where: {
+            questionnaireId: questionnaireAssessment.questionnaireId,
+            id: { in: requestedFormItemIds },
+          },
+          select: {
+            id: true,
+            type: true,
+            label: true,
+            required: true,
+            options: true,
+            contextKey: true,
+          },
+        })
+        const itemsById = new Map(formItems.map((item) => [item.id, item]))
         if (answers.some((answer) => !itemsById.has(answer.formItemId))) return { kind: 'form-not-found' as const }
         if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
           if (answers.some((answer) => itemsById.get(answer.formItemId)?.contextKey)) return { kind: 'context-frozen' as const }
@@ -1576,42 +1604,47 @@ export const publicQuestionnaireController = {
         }).filter((answer): answer is NonNullable<typeof answer> => answer !== null)
         const prepared = prepareFormAnswerChanges(revisionAnswers, preparedInputs)
         if (prepared.kind === 'stale') return { kind: 'stale-answer' as const }
+
+        // Duplicate item IDs are legal at the wire level for compatibility.
+        // OCC preparation processes them in order; persist only the final state
+        // for each item so one SQL statement never targets the same unique key
+        // twice. The final state still carries every revision increment.
+        const finalChangeByItem = new Map(
+          prepared.changes.map((change) => [change.input.formItemId, change]),
+        )
+        const mutationByItem = new Map(
+          prepared.changes
+            .filter((change) => !change.replay)
+            .map((change) => [change.input.formItemId, change]),
+        )
         let completedFormsDelta = 0
-        for (const change of prepared.changes) {
-          const answer = change.input
-          const item = itemsById.get(answer.formItemId)!
-          if (change.replay) continue
-          const wasComplete = isFormAnswerComplete(item, change.previous)
-          const storedValue = answer.value === null ? null : writeContextFormAnswer(item.contextKey, answer.value)
-          const formAnswer = await tx.questionnaireFormAnswer.upsert({
-            where: {
-              questionnaireAssessmentId_formItemId: {
-                questionnaireAssessmentId: questionnaireAssessment.id,
-                formItemId: answer.formItemId,
-              },
-            },
-            create: {
-              questionnaireAssessmentId: questionnaireAssessment.id,
-              formItemId: answer.formItemId,
-              value: storedValue,
-              status: answer.status,
-              revision: change.next.revision ?? 1,
-            },
-            update: {
-              value: storedValue,
-              status: answer.status,
-              revision: { increment: 1 },
-            },
-          })
-          const isComplete = isFormAnswerComplete(item, formAnswer)
+        for (const [formItemId, change] of finalChangeByItem) {
+          const item = itemsById.get(formItemId)!
+          const firstChange = prepared.changes.find((candidate) => candidate.input.formItemId === formItemId)!
+          const wasComplete = isFormAnswerComplete(item, firstChange.previous)
+          const isComplete = isFormAnswerComplete(item, change.next)
           completedFormsDelta += Number(isComplete) - Number(wasComplete)
         }
+
+        await persistFormAnswerBatch(
+          tx,
+          questionnaireAssessment.id,
+          [...mutationByItem.values()].map((change) => {
+            const item = itemsById.get(change.input.formItemId)!
+            return {
+              formItemId: change.input.formItemId,
+              value: change.next.value === null ? null : writeContextFormAnswer(item.contextKey, change.next.value),
+              status: change.next.status === 'SKIPPED' ? 'SKIPPED' as const : 'ANSWERED' as const,
+              revision: change.next.revision ?? 1,
+            }
+          }),
+        )
 
         const progress = await applyQuestionnaireProgressDelta(
           tx,
           questionnaireAssessment,
           completedFormsDelta,
-          questionnaireAssessment.questionnaire.formItems.length + questionnaireAssessment.questionnaire.questionnaireScales.length,
+          questionnaireAssessment.questionnaire._count.formItems + questionnaireAssessment.questionnaire._count.questionnaireScales,
         )
         return {
           kind: 'saved' as const,
