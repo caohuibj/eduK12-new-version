@@ -310,7 +310,11 @@ export const refreshQuestionnaireProgress = async (
 export const withSerializableQuestionnaireTransaction = async <T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
-  const maxAttempts = 3
+  // A completion burst for one questionnaire can create transient SSI
+  // conflicts even when each student owns a different assessment row. Keep
+  // the retry bounded, but give a burst enough waves to drain through the
+  // database pool before returning a failure.
+  const maxAttempts = 5
   const isSerializationConflict = (err: any): boolean => (
     err?.code === 'P2034'
     // Prisma exposes serialization failures raised by a raw query as P2010;
