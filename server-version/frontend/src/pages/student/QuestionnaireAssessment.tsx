@@ -7,6 +7,7 @@ import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 import { checkpointScheduler, CheckpointTransportError } from '../../services/persistence/checkpointScheduler'
 import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
+import { runWithCompletionRetry } from '../../services/completionRetry'
 
 type ResponseValue = string | number
 
@@ -212,9 +213,9 @@ const QuestionnaireAssessment: React.FC = () => {
         }
       }
 
-      const response = await apiClient.post<QuestionnaireAssessmentData>(
+      const response = await runWithCompletionRetry(() => apiClient.post<QuestionnaireAssessmentData>(
         `/questionnaires/${questionnaireId}/assessments`
-      )
+      ))
 
       if (response.code === 0) {
         const questionnaireAssessmentId = response.data.questionnaireAssessment.id
@@ -234,7 +235,7 @@ const QuestionnaireAssessment: React.FC = () => {
         // 如果问卷已完成（所有内容为空），完成问卷并跳转
         if (response.data.contentItems?.length === 0 || 
             response.data.questionnaireAssessment.currentIndex >= response.data.totalItems) {
-          await apiClient.post(`/questionnaires/assessments/${response.data.questionnaireAssessment.id}/complete`)
+          await runWithCompletionRetry(() => apiClient.post(`/questionnaires/assessments/${response.data.questionnaireAssessment.id}/complete`))
           navigate(`/student/questionnaires/result/${response.data.questionnaireAssessment.id}`)
           return
         }
@@ -447,9 +448,9 @@ const QuestionnaireAssessment: React.FC = () => {
     if (!data) return
 
     // 重新获取测评状态
-    const statusResponse = await apiClient.get<QuestionnaireAssessmentData>(
+    const statusResponse = await runWithCompletionRetry(() => apiClient.get<QuestionnaireAssessmentData>(
       `/questionnaires/assessments/${data.questionnaireAssessment.id}`
-    )
+    ))
 
     if (statusResponse.code !== 0 || !statusResponse.data) {
       throw new Error(statusResponse.message || '获取测评状态失败')
@@ -460,7 +461,7 @@ const QuestionnaireAssessment: React.FC = () => {
     if (qa.status === 'COMPLETED' || qa.currentIndex >= statusResponse.data.totalItems) {
       // 所有内容完成
       await checkpointScheduler.purgeExpired('questionnaire', data.questionnaireAssessment.id)
-      const completionResponse = await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/complete`)
+      const completionResponse = await runWithCompletionRetry(() => apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/complete`))
       if (completionResponse.code !== 0) throw new Error(completionResponse.message || '完成测评失败')
       navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)
     } else {

@@ -16,6 +16,9 @@ import {
   applyQuestionnaireProgressDelta,
   refreshQuestionnaireProgress,
   withQuestionnaireAnswerTransaction,
+  withQuestionnaireAssessmentAnswerTransaction,
+  withQuestionnaireCompletionTransaction,
+  withScaleAnswerTransaction,
   withSerializableQuestionnaireTransaction,
 } from '../../services/questionnaireProgressService'
 
@@ -153,12 +156,52 @@ describe('questionnaire progress consistency', () => {
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(2)
   })
 
+  it('uses the bounded Serializable policy for questionnaire completion', async () => {
+    mockPrisma.$transaction.mockResolvedValue('ok')
+
+    await expect(withQuestionnaireCompletionTransaction(async () => 'ok')).resolves.toBe('ok')
+
+    expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'Serializable',
+      maxWait: 2_000,
+      timeout: 10_000,
+    })
+  })
+
   it('locks only the current assessment for ordinary answer transactions', async () => {
     const queryRaw = vi.fn().mockResolvedValue([{ id: 'qa-1' }])
     const transactionCallback = vi.fn(async (callback: (tx: unknown) => Promise<unknown>) => callback({ $queryRaw: queryRaw }))
     mockPrisma.$transaction.mockImplementation(transactionCallback)
 
     await expect(withQuestionnaireAnswerTransaction('session-1', async (tx) => tx)).resolves.toEqual({ $queryRaw: queryRaw })
+
+    expect(queryRaw).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'ReadCommitted',
+    })
+  })
+
+  it('locks the own Scale assessment for ordinary Scale answer transactions', async () => {
+    const queryRaw = vi.fn().mockResolvedValue([{ id: 'assessment-1' }])
+    mockPrisma.$transaction.mockImplementation(async (transaction: (tx: unknown) => Promise<unknown>) => (
+      transaction({ $queryRaw: queryRaw })
+    ))
+
+    await expect(withScaleAnswerTransaction('assessment-1', async (tx) => tx)).resolves.toEqual({ $queryRaw: queryRaw })
+
+    expect(queryRaw).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'ReadCommitted',
+    })
+  })
+
+  it('locks the parent QuestionnaireAssessment for authenticated form answers', async () => {
+    const queryRaw = vi.fn().mockResolvedValue([{ id: 'qa-1' }])
+    mockPrisma.$transaction.mockImplementation(async (transaction: (tx: unknown) => Promise<unknown>) => (
+      transaction({ $queryRaw: queryRaw })
+    ))
+
+    await expect(withQuestionnaireAssessmentAnswerTransaction('qa-1', async (tx) => tx)).resolves.toEqual({ $queryRaw: queryRaw })
 
     expect(queryRaw).toHaveBeenCalledTimes(1)
     expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {

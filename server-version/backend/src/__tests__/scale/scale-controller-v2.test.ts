@@ -4,6 +4,7 @@ import { UserRole } from '@prisma/client'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(),
+    $queryRaw: vi.fn().mockResolvedValue([]),
     scale: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
     materialGrant: { findUnique: vi.fn() },

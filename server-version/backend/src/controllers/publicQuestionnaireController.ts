@@ -11,14 +11,23 @@
 
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, notFound, unauthorized } from '../utils/response'
+import { success, error, notFound, unauthorized, completionBusy } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { powService } from '../services/powService'
 import { logger } from '../utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { questionnaireResumeTokenService } from '../services/questionnaireResumeTokenService'
-import { questionnaireProgressSelect, refreshQuestionnaireProgress, withQuestionnaireAnswerTransaction, withSerializableQuestionnaireTransaction, type QuestionnaireProgressSnapshot } from '../services/questionnaireProgressService'
+import {
+  questionnaireProgressSelect,
+  refreshQuestionnaireProgress,
+  withQuestionnaireAnswerTransaction,
+  withQuestionnaireCompletionTransaction,
+  withQuestionnaireSerializableTransaction,
+  withScaleAnswerTransaction,
+  withScaleCompletionTransaction,
+  type QuestionnaireProgressSnapshot,
+} from '../services/questionnaireProgressService'
 import { getQuestionnaireResumeToken } from '../middleware/publicQuestionnaireAuth'
 import { hashQuestionnaireResumeToken } from '../services/questionnaireResumeTokenService'
 import {
@@ -40,6 +49,8 @@ import { applyQuestionnaireProgressDelta } from '../services/questionnaireProgre
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
 import { persistFormAnswerBatch } from '../services/questionnaire-form-answer-batch'
 import { measureRequestPhase, recordRequestPhase } from '../services/runtimeObservability'
+import { cacheService } from '../services/cacheService'
+import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
 import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
@@ -266,48 +277,87 @@ export const publicQuestionnaireController = {
       }
 
       if (suppliedResumeToken) {
-        // 优化：一次查询获取完整数据，避免重复查询
-        const existingAssessment = await measureRequestPhase('assessment_lookup', () => prisma.questionnaireAssessment.findFirst({
+        // Read attempt state separately from the immutable questionnaire
+        // content. The old nested include reloaded every form item and scale
+        // definition for every resume request.
+        const existingAssessmentRow = await measureRequestPhase('assessment_lookup', () => prisma.questionnaireAssessment.findFirst({
           where: {
             sessionId: sessionIdToUse,
             questionnaireId,
             tokenId,
           },
-          include: {
-            questionnaire: {
-              include: {
-                formItems: {
-                  orderBy: { position: 'asc' },
-                },
-                questionnaireScales: {
-                  include: {
-                    scale: {
-                      select: {
-                        id: true,
-                        code: true,
-                        name: true,
-                        description: true,
-                        instruction: true,
-                        estimatedTime: true,
-                        status: true,
-                        instrumentClass: true,
-                        instrumentVersion: true,
-                        definition: true,
-                      },
-                    },
-                  },
-                  orderBy: { position: 'asc' },
-                },
-              },
-            },
+          select: {
+            id: true,
+            status: true,
+            progress: true,
+            contextSnapshotEncrypted: true,
+            contextSnapshotHash: true,
+            contextFrozenAt: true,
+            questionnaire: { select: { id: true } },
             scaleAssessments: {
-              include: {
-                scale: true,
+              select: {
+                id: true,
+                scaleId: true,
+                userId: true,
+                status: true,
+                answers: true,
+                answersRevision: true,
+                result: true,
+                progress: true,
+                startedAt: true,
+                completedAt: true,
+                totalTime: true,
+                questionnaireAssessmentId: true,
+                compositeAttemptId: true,
+                compositeItemId: true,
+                scale: {
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    description: true,
+                    status: true,
+                    visibility: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definitionHash: true,
+                    itemCount: true,
+                    dimensionCount: true,
+                    estimatedTime: true,
+                    instruction: true,
+                    creatorId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    tags: true,
+                  },
+                },
+              },
+              orderBy: { startedAt: 'asc' },
+            },
+            formAnswers: {
+              select: {
+                formItemId: true,
+                value: true,
+                status: true,
+                revision: true,
               },
             },
-            formAnswers: true,
           },
         }))
+        const existingContent = existingAssessmentRow
+          ? await measureRequestPhase('definition_lookup', () => (
+              cacheService.getQuestionnaireStartContent(questionnaireId)
+            ))
+          : null
+        const existingAssessment = existingAssessmentRow && existingContent
+          ? {
+              ...existingAssessmentRow,
+              questionnaire: {
+                id: questionnaireId,
+                ...existingContent,
+              },
+            }
+          : null
 
         // The capability lookup above already bound this row to the public
         // token and session. Rotate the opaque capability on every resume.
@@ -360,7 +410,7 @@ export const publicQuestionnaireController = {
           // 检查是否所有内容都已完成
           if (currentIndex === -1 || !currentItem) {
             // 所有内容已完成，使用条件状态转换避免重复生成报告。
-            const completion = await withSerializableQuestionnaireTransaction(async (tx) => {
+            const completion = await withQuestionnaireCompletionTransaction(async (tx) => {
               // Re-read inside Serializable; the resume/start lookup above is
               // outside the mutation transaction and may be stale.
               const completionSnapshot = await tx.questionnaireAssessment.findUnique({
@@ -459,38 +509,13 @@ export const publicQuestionnaireController = {
 
       // 如果没有进行中的测评，创建新的
       if (!questionnaireAssessment) {
-        // 获取问卷及其量表和表单题目
-        const questionnaire = await measureRequestPhase('definition_lookup', () => prisma.questionnaire.findUnique({
-          where: { id: questionnaireId },
-          include: {
-            formItems: {
-              orderBy: { position: 'asc' },
-            },
-            questionnaireScales: {
-              include: {
-                scale: {
-                  select: {
-                    id: true,
-                    code: true,
-                    name: true,
-                    description: true,
-                    instruction: true,
-                    estimatedTime: true,
-                    status: true,
-                    instrumentClass: true,
-                    instrumentVersion: true,
-                    definition: true,
-                  },
-                },
-              },
-              orderBy: { position: 'asc' },
-            },
-          },
-        }))
-
-        if (!questionnaire) {
-          return notFound(res, '问卷不存在')
-        }
+        // Token validation already loaded and bound the parent questionnaire.
+        // Only the immutable content graph is fetched here, through a
+        // coalesced cache read, so a public start burst does not repeat the
+        // same definition join for every anonymous session.
+        const startContent = await measureRequestPhase('definition_lookup', () => (
+          cacheService.getQuestionnaireStartContent(questionnaireId)
+        ))
 
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
@@ -522,7 +547,7 @@ export const publicQuestionnaireController = {
           })
 
           await tx.assessment.createMany({
-            data: questionnaire.questionnaireScales.map((qs) => ({
+            data: startContent.questionnaireScales.map((qs) => ({
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
               progress: 0,
@@ -532,7 +557,7 @@ export const publicQuestionnaireController = {
           })
 
           await tx.questionnaireFormAnswer.createMany({
-            data: questionnaire.formItems.map((item) => ({
+            data: startContent.formItems.map((item) => ({
               questionnaireAssessmentId: assessment.id,
               formItemId: item.id,
               value: null,
@@ -564,8 +589,8 @@ export const publicQuestionnaireController = {
 
         // 合并表单题目和量表，按 position 排序
         const contentItems = [
-          ...questionnaire.formItems.map(fi => ({ type: 'form' as const, position: fi.position, data: fi })),
-          ...questionnaire.questionnaireScales.map(qs => ({ type: 'scale' as const, position: qs.position, data: qs })),
+          ...startContent.formItems.map(fi => ({ type: 'form' as const, position: fi.position, data: fi })),
+          ...startContent.questionnaireScales.map(qs => ({ type: 'scale' as const, position: qs.position, data: qs })),
         ].sort((a, b) => a.position - b.position)
 
         // 返回第一个内容项
@@ -596,7 +621,7 @@ export const publicQuestionnaireController = {
           }, '开始测评')
         } else {
           // 第一个是量表
-          const firstScale = questionnaire.questionnaireScales.find(qs => qs.scaleId === firstItem?.data.scaleId)
+          const firstScale = startContent.questionnaireScales.find(qs => qs.scaleId === firstItem?.data.scaleId)
           const firstAssessment = await prisma.assessment.findFirst({
             where: {
               questionnaireAssessmentId: questionnaireAssessment.id,
@@ -631,6 +656,7 @@ export const publicQuestionnaireController = {
         }
       }
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       logger.error('开始匿名测评错误', err)
       return error(res, '开始测评失败')
     }
@@ -702,12 +728,13 @@ export const publicQuestionnaireController = {
         return notFound(res, '测评不存在')
       }
 
-      // 使用缓存获取问卷的量表和表单题目列表
-      const { cacheService } = await import('../services/cacheService')
-      const [questionnaireScales, formItems] = await Promise.all([
-        cacheService.getQuestionnaireScales(questionnaireAssessment.questionnaire.id),
-        cacheService.getQuestionnaireFormItems(questionnaireAssessment.questionnaire.id),
-      ])
+      // Reuse the same coalesced projection as start/resume. This keeps the
+      // status endpoint from maintaining two independently stale cache keys
+      // for the same questionnaire content.
+      const startContent = await measureRequestPhase('definition_lookup', () => (
+        cacheService.getQuestionnaireStartContent(questionnaireAssessment.questionnaire.id)
+      ))
+      const { questionnaireScales, formItems } = startContent
 
       // 建立 scaleId -> scaleAssessment 的映射
       const saMap = new Map(
@@ -775,7 +802,7 @@ export const publicQuestionnaireController = {
 
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && questionnaireAssessment.status !== 'COMPLETED') {
-        const completionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const completionResult = await withQuestionnaireCompletionTransaction(async (tx) => {
           // The outer GET is intentionally outside the mutation transaction.
           // Reload a minimal authoritative snapshot inside Serializable rather
           // than carrying a potentially stale cache/HTTP snapshot across the
@@ -847,6 +874,7 @@ export const publicQuestionnaireController = {
 
       return success(res, responseData)
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('获取匿名测评状态错误', err)
       return error(res, '获取测评状态失败')
@@ -856,7 +884,7 @@ export const publicQuestionnaireController = {
   async freezeContext(req: Request, res: Response) {
     try {
       const { sessionId } = req.params
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireSerializableTransaction(async (tx) => {
         const assessment = await tx.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true, status: true } })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
@@ -927,7 +955,7 @@ export const publicQuestionnaireController = {
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
       const expectedRevision = expectedRevisionResult.data
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withScaleAnswerTransaction(scaleAssessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: scaleAssessmentId },
           include: {
@@ -1051,7 +1079,7 @@ export const publicQuestionnaireController = {
         return error(res, '一次批量请求只能包含同一量表测评的答案', -1, 400)
       }
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withScaleAnswerTransaction(scaleAssessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: scaleAssessmentId },
           include: {
@@ -1167,7 +1195,7 @@ export const publicQuestionnaireController = {
       const { sessionId } = req.params
       const { scaleAssessmentId } = req.body
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withScaleCompletionTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: scaleAssessmentId },
           include: {
@@ -1253,7 +1281,7 @@ export const publicQuestionnaireController = {
     try {
       const { sessionId } = req.params
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireCompletionTransaction(async (tx) => {
         const qa = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
           select: questionnaireProgressSelect,
@@ -1311,6 +1339,7 @@ export const publicQuestionnaireController = {
         ...result.collectionReport,
       }, result.kind === 'completed' ? '问卷测评已完成' : '问卷测评已完成')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('完成问卷测评错误', err)
       return error(res, '完成问卷测评失败')

@@ -7,6 +7,8 @@ export type RequestObservationPhase =
   | 'resume_auth'
   | 'transaction_acquisition'
   | 'transaction'
+  | 'completion_queue_wait'
+  | 'serialization_backoff'
   | 'row_lock_roundtrip'
   | 'assessment_lookup'
   | 'definition_lookup'
@@ -51,6 +53,9 @@ const httpRequestHistograms = new Map<string, LabeledHistogram>()
 const phaseHistograms = new Map<string, LabeledHistogram>()
 const prismaCallHistograms = new Map<string, LabeledHistogram>()
 const slowRequestCounts = new Map<string, LabeledCounter>()
+const serializableAttemptCounts = new Map<string, LabeledCounter>()
+const serializationConflictCounts = new Map<string, LabeledCounter>()
+const completionAdmissionRejectionCounts = new Map<string, LabeledCounter>()
 const prismaErrorCounts = new Map<string, number>()
 
 const SLOW_REQUEST_THRESHOLDS = [
@@ -62,6 +67,8 @@ const SLOW_REQUEST_THRESHOLDS = [
 let activeRequests = 0
 let gcEvents = 0
 let gcDurationMs = 0
+let completionAdmissionActive = 0
+let completionAdmissionQueue = 0
 
 const eventLoopDelay = monitorEventLoopDelay({ resolution: 20 })
 eventLoopDelay.enable()
@@ -138,6 +145,10 @@ const boundedCounter = (
   if (store.size >= MAX_METRIC_KEYS - 1) {
     const otherLabels = { ...labels }
     if ('route' in otherLabels) otherLabels.route = OTHER_ROUTE
+    if ('operation' in otherLabels) otherLabels.operation = OTHER_ROUTE
+    if ('attempt' in otherLabels) otherLabels.attempt = OTHER_ROUTE
+    if ('code' in otherLabels) otherLabels.code = OTHER_ROUTE
+    if ('reason' in otherLabels) otherLabels.reason = OTHER_ROUTE
     const otherKey = keyFor(otherLabels)
     const other = store.get(otherKey)
     if (other) return other
@@ -153,6 +164,34 @@ const boundedCounter = (
 
 const incrementSlowRequestCount = (labels: Record<string, string>): void => {
   boundedCounter(slowRequestCounts, labels).count += 1
+}
+
+const incrementCounter = (store: Map<string, LabeledCounter>, labels: Record<string, string>): void => {
+  boundedCounter(store, labels).count += 1
+}
+
+/** Record one bounded Serializable transaction attempt. */
+export const recordSerializableAttempt = (operation: string, attempt: number): void => {
+  if (!operation || operation.length > 64 || !Number.isSafeInteger(attempt) || attempt < 1) return
+  incrementCounter(serializableAttemptCounts, { operation, attempt: String(attempt) })
+}
+
+/** Record a PostgreSQL/Prisma serialization conflict without query text. */
+export const recordSerializationConflict = (operation: string, code: string): void => {
+  if (!operation || operation.length > 64 || !code || code.length > 32) return
+  incrementCounter(serializationConflictCounts, { operation, code })
+}
+
+/** Record an admission rejection reason for the bounded completion queue. */
+export const recordCompletionAdmissionRejection = (reason: string): void => {
+  if (!reason || reason.length > 32) return
+  incrementCounter(completionAdmissionRejectionCounts, { reason })
+}
+
+/** Publish the current process-local completion admission state as gauges. */
+export const setCompletionAdmissionState = (active: number, queued: number): void => {
+  completionAdmissionActive = Math.max(0, Math.floor(active))
+  completionAdmissionQueue = Math.max(0, Math.floor(queued))
 }
 
 const escapeLabel = (value: string): string => value
@@ -457,6 +496,21 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_slow_requests_total Requests above latency thresholds classified by exclusive dominant phase.',
     '# TYPE ptool_slow_requests_total counter',
     ...[...slowRequestCounts.values()].map(({ labels, count }) => `ptool_slow_requests_total{${labelsText(labels)}} ${count}`),
+    '# HELP ptool_serializable_attempts_total Serializable transaction attempts by operation and attempt number.',
+    '# TYPE ptool_serializable_attempts_total counter',
+    ...[...serializableAttemptCounts.values()].map(({ labels, count }) => `ptool_serializable_attempts_total{${labelsText(labels)}} ${count}`),
+    '# HELP ptool_serialization_conflicts_total Serializable transaction conflicts by operation and code.',
+    '# TYPE ptool_serialization_conflicts_total counter',
+    ...[...serializationConflictCounts.values()].map(({ labels, count }) => `ptool_serialization_conflicts_total{${labelsText(labels)}} ${count}`),
+    '# HELP ptool_completion_admission_rejections_total Completion admission rejections by reason.',
+    '# TYPE ptool_completion_admission_rejections_total counter',
+    ...[...completionAdmissionRejectionCounts.values()].map(({ labels, count }) => `ptool_completion_admission_rejections_total{${labelsText(labels)}} ${count}`),
+    '# HELP ptool_questionnaire_completion_admission_active Active questionnaire completion operations in this process.',
+    '# TYPE ptool_questionnaire_completion_admission_active gauge',
+    `ptool_questionnaire_completion_admission_active ${completionAdmissionActive}`,
+    '# HELP ptool_questionnaire_completion_admission_queue Queued questionnaire completion operations in this process.',
+    '# TYPE ptool_questionnaire_completion_admission_queue gauge',
+    `ptool_questionnaire_completion_admission_queue ${completionAdmissionQueue}`,
     '# HELP ptool_prisma_call_duration_seconds Prisma call wall-clock latency by model and action.',
     '# TYPE ptool_prisma_call_duration_seconds histogram',
     ...histogramLines('ptool_prisma_call_duration_seconds', prismaCallHistograms),
@@ -473,9 +527,14 @@ export const resetRuntimeObservabilityForTests = (): void => {
   phaseHistograms.clear()
   prismaCallHistograms.clear()
   slowRequestCounts.clear()
+  serializableAttemptCounts.clear()
+  serializationConflictCounts.clear()
+  completionAdmissionRejectionCounts.clear()
   prismaErrorCounts.clear()
   activeRequests = 0
   gcEvents = 0
   gcDurationMs = 0
+  completionAdmissionActive = 0
+  completionAdmissionQueue = 0
   eventLoopDelay.reset()
 }

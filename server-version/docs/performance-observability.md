@@ -13,6 +13,7 @@ tokens, questionnaire content, identifiers, SQL text, or request bodies.
   availability alerts and dashboards.
 - `ptool_assessment_phase_duration_seconds`: `resume_auth`,
   `transaction_acquisition`, `transaction`, `row_lock_roundtrip`,
+  `completion_queue_wait`, `serialization_backoff`,
   `assessment_lookup`, `definition_lookup`, `existing_answer_lookup`,
   `answer_mutation`, `progress_mutation`, and residual `response` time.
 - `ptool_slow_requests_total`: requests above `500ms`, `1s`, and `2s`,
@@ -25,6 +26,16 @@ tokens, questionnaire content, identifiers, SQL text, or request bodies.
   text is never recorded.
 - `ptool_prisma_errors_total`: bounded Prisma/SQL error codes, including
   `P2028`, `P2034`, and PostgreSQL `40001` when surfaced by Prisma.
+- `ptool_serializable_attempts_total`: bounded retry-attempt counts labelled
+  by `operation` (`questionnaire_completion`, `questionnaire_mutation`, or
+  `scale_completion`) and attempt number.
+- `ptool_serialization_conflicts_total`: bounded `P2034`/`40001` conflict
+  counts labelled by operation and database error code.
+- `ptool_completion_admission_rejections_total`: bounded completion admission
+  rejections labelled by `queue_full` or `timeout`.
+- `ptool_questionnaire_completion_admission_active` and
+  `ptool_questionnaire_completion_admission_queue`: process-local active and
+  queued questionnaire completion operations.
 - `ptool_nodejs_event_loop_utilization`,
   `ptool_nodejs_event_loop_delay_seconds`,
   `ptool_nodejs_active_requests`, `process_resident_memory_bytes`,
@@ -35,6 +46,17 @@ mutation phases. The residual `response` phase is calculated from the union of
 all measured monotonic intervals, so nested spans are not subtracted twice.
 It represents uninstrumented application/response overhead and should not be
 treated as an exact socket-write duration.
+
+Questionnaire completion is admitted through a process-local bounded queue
+before opening a Serializable Prisma transaction. The defaults are eight
+active completions, a queue of 64, and a 1.5-second queue budget. They can be
+tuned for an A/B run with `QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT` (for
+example 5, 8, 10, 12, or 16),
+`QUESTIONNAIRE_COMPLETION_ADMISSION_QUEUE`, and
+`QUESTIONNAIRE_COMPLETION_ADMISSION_TIMEOUT_MS`. A full or expired queue
+returns HTTP `503` with `code=COMPLETION_BUSY` and `Retry-After: 1`; it does
+not change assessment state. The limit is per backend process, so multi-process
+deployments must compare the aggregate active gauge across processes.
 
 Labels are bounded in memory. Unmatched routes and excess model/action
 cardinality are aggregated into `__other__` buckets; route templates from

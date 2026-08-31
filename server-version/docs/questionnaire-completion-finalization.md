@@ -16,6 +16,17 @@ the Serializable transaction:
   collection report, and bounded PostgreSQL serialization retries remain in
   place.
 
+Ordinary form and Scale answers do not use the completion policy. They run at
+`READ COMMITTED` while locking only their own QuestionnaireAssessment or
+Assessment row. Questionnaire completion and Scale completion retain separate
+`SERIALIZABLE` policies. Questionnaire completion additionally passes through
+a bounded process-local admission queue; a full or expired queue returns the
+retryable `503 COMPLETION_BUSY` response without changing assessment state.
+
+Completion queue wait, Serializable retry backoff, attempt number, conflict
+code, admission rejection reason, and active/queued admission gauges are
+exported through `/metrics` for capacity comparisons.
+
 The projection intentionally excludes scale definitions and unrelated
 relations from the completion-only path. Public GET/start paths may still load
 the separate response projection needed to render the current scale; that

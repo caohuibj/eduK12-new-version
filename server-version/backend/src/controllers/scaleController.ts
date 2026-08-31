@@ -9,7 +9,11 @@ import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField } from '../utils/encryption'
 import { canUseScale, scaleSource, scaleWhereForViewer } from '../services/materialGrant'
-import { refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction } from '../services/questionnaireProgressService'
+import {
+  refreshQuestionnaireProgress,
+  withScaleAnswerTransaction,
+  withScaleCompletionTransaction,
+} from '../services/questionnaireProgressService'
 import {
   createCustomScaleDefinition,
   hashScaleDefinition,
@@ -804,7 +808,7 @@ export const scaleController = {
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
       const expectedRevision = expectedRevisionResult.data
 
-      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const transactionResult = await withScaleAnswerTransaction(assessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
@@ -876,7 +880,7 @@ export const scaleController = {
       const parsed = scaleBatchAnswerSchema.safeParse(req.body)
       if (!parsed.success) return error(res, parsed.error.errors[0].message)
 
-      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const transactionResult = await withScaleAnswerTransaction(assessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
@@ -959,7 +963,7 @@ export const scaleController = {
     try {
       const userId = req.user?.userId
       const { assessmentId } = req.params
-      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const transactionResult = await withScaleCompletionTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: { scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } } },

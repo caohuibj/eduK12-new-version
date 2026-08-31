@@ -133,6 +133,11 @@ const attributionMetricNames = (name) => name === 'ptool_slow_requests_total'
   || name === 'ptool_prisma_call_duration_seconds_sum'
   || name === 'ptool_assessment_phase_duration_seconds_count'
   || name === 'ptool_assessment_phase_duration_seconds_sum'
+  || name === 'ptool_serializable_attempts_total'
+  || name === 'ptool_serialization_conflicts_total'
+  || name === 'ptool_completion_admission_rejections_total'
+  || name === 'ptool_questionnaire_completion_admission_active'
+  || name === 'ptool_questionnaire_completion_admission_queue'
 
 const readMetricsSnapshot = async (metricsUrl, timeoutMs = DEFAULT_METRICS_TIMEOUT_MS) => {
   if (!metricsUrl) return { available: false, samples: [] }

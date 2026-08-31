@@ -35,6 +35,40 @@ const CACHE_CONFIG = {
   statsTTL: 60, // 1分钟
 }
 
+export type QuestionnaireStartContent = {
+  formItems: Array<{
+    id: string
+    questionnaireId: string
+    type: string
+    label: string
+    placeholder: string | null
+    required: boolean
+    position: number
+    options: unknown
+    contextKey: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+  }>
+  questionnaireScales: Array<{
+    id: string
+    questionnaireId: string
+    scaleId: string
+    position: number
+    scale: {
+      id: string
+      code: string
+      name: string
+      description: string | null
+      estimatedTime: number | null
+      instruction: string | null
+      status: string
+      instrumentClass: string
+      instrumentVersion: string
+      definition: unknown
+    }
+  }>
+}
+
 const RATE_LIMIT_SCRIPT = `
 local count = redis.call('INCR', KEYS[1])
 if count == 1 then
@@ -50,6 +84,8 @@ return { count, ttl }
 class CacheService {
   private client: any = null
   private isConnected: boolean = false
+  private readonly inFlight = new Map<string, Promise<unknown>>()
+  private cacheWriteEpoch = 0
 
   /**
    * 初始化 Redis 客户端
@@ -126,6 +162,7 @@ class CacheService {
    * 删除缓存
    */
   async del(key: string): Promise<void> {
+    this.cacheWriteEpoch += 1
     if (!this.isConnected || !this.client) {
       return
     }
@@ -141,6 +178,10 @@ class CacheService {
    * 批量删除缓存（按模式）
    */
   async delPattern(pattern: string): Promise<void> {
+    // A mutation can race with an origin read that started before the
+    // invalidation. Advance the epoch even when Redis is unavailable so that
+    // that read cannot populate a stale value after the delete completes.
+    this.cacheWriteEpoch += 1
     if (!this.isConnected || !this.client) {
       return
     }
@@ -171,14 +212,28 @@ class CacheService {
       return cachedValue
     }
 
+    // A start burst can miss Redis on every request at the same time. Share
+    // the origin read inside this process so one cache miss does not become a
+    // database connection burst. The promise is removed after completion so
+    // errors never poison future requests.
+    const pending = this.inFlight.get(key)
+    if (pending) return pending as Promise<T>
+
+    const writeEpoch = this.cacheWriteEpoch
+    const request = (async () => {
+      const value = await fetchFunction()
+      if (this.cacheWriteEpoch === writeEpoch) await this.set(key, value, ttl)
+      return value
+    })()
+    this.inFlight.set(key, request)
+
     // 缓存未命中，执行函数获取数据
-    logger.debug(`[CacheService] 缓存未命中: ${key}`)
-    const value = await fetchFunction()
-
-    // 设置缓存
-    await this.set(key, value, ttl)
-
-    return value
+    try {
+      logger.debug(`[CacheService] 缓存未命中: ${key}`)
+      return await request
+    } finally {
+      if (this.inFlight.get(key) === request) this.inFlight.delete(key)
+    }
   }
 
 
@@ -315,6 +370,63 @@ class CacheService {
         where: { questionnaireId },
         orderBy: { position: 'asc' }
       })
+    }, CACHE_CONFIG.defaultTTL)
+  }
+
+  /**
+   * Read the immutable content envelope used by questionnaire start/resume.
+   * Authorization and attempt state stay outside this cache; only published
+   * questionnaire content is shared. Keeping the projection explicit avoids
+   * pulling unrelated questionnaire/scale columns into every start request.
+   */
+  async getQuestionnaireStartContent(questionnaireId: string): Promise<QuestionnaireStartContent> {
+    const key = `questionnaire:${questionnaireId}:start-content:v1`
+    return this.getOrSet(key, async () => {
+      const { prisma } = await import('../config/database')
+      const [formItems, questionnaireScales] = await Promise.all([
+        prisma.questionnaireFormItem.findMany({
+          where: { questionnaireId },
+          select: {
+            id: true,
+            questionnaireId: true,
+            type: true,
+            label: true,
+            placeholder: true,
+            required: true,
+            position: true,
+            options: true,
+            contextKey: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: { position: 'asc' },
+        }),
+        prisma.questionnaireScale.findMany({
+          where: { questionnaireId },
+          select: {
+            id: true,
+            questionnaireId: true,
+            scaleId: true,
+            position: true,
+            scale: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                description: true,
+                estimatedTime: true,
+                instruction: true,
+                status: true,
+                instrumentClass: true,
+                instrumentVersion: true,
+                definition: true,
+              },
+            },
+          },
+          orderBy: { position: 'asc' },
+        }),
+      ])
+      return { formItems, questionnaireScales }
     }, CACHE_CONFIG.defaultTTL)
   }
 

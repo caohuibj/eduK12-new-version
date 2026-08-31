@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound } from '../utils/response'
+import { success, error, forbidden, notFound, completionBusy } from '../utils/response'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
@@ -8,7 +8,15 @@ import { z } from 'zod'
 import * as path from 'path'
 import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
-import { applyQuestionnaireProgressDelta, questionnaireProgressSelect, refreshQuestionnaireProgress, withSerializableQuestionnaireTransaction, type QuestionnaireProgressSnapshot } from '../services/questionnaireProgressService'
+import {
+  applyQuestionnaireProgressDelta,
+  questionnaireProgressSelect,
+  refreshQuestionnaireProgress,
+  withQuestionnaireAssessmentAnswerTransaction,
+  withQuestionnaireCompletionTransaction,
+  withQuestionnaireSerializableTransaction,
+  type QuestionnaireProgressSnapshot,
+} from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
@@ -24,6 +32,8 @@ import { utcHalfOpenDateFilter } from '../services/exportService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
+import { cacheService } from '../services/cacheService'
+import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -390,6 +400,7 @@ export const questionnaireController = {
           },
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, updated, '问卷更新成功')
     } catch (err) {
@@ -433,6 +444,7 @@ export const questionnaireController = {
       await prisma.questionnaire.delete({
         where: { id },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, null, '问卷已删除')
     } catch (err) {
@@ -492,6 +504,7 @@ export const questionnaireController = {
         where: { id },
         data: { status: 'PUBLISHED' },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, updated, '问卷发布成功')
     } catch (err) {
@@ -524,6 +537,7 @@ export const questionnaireController = {
         where: { id },
         data: { status: 'DEPRECATED' },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, updated, '问卷已废弃')
     } catch (err) {
@@ -745,6 +759,7 @@ export const questionnaireController = {
           },
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, questionnaireScale, '量表添加成功')
     } catch (err) {
@@ -785,6 +800,7 @@ export const questionnaireController = {
           },
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, null, '量表已移除')
     } catch (err) {
@@ -839,6 +855,7 @@ export const questionnaireController = {
           })
         }
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, null, '量表排序更新成功')
     } catch (err) {
@@ -939,6 +956,7 @@ export const questionnaireController = {
           contextKey: contextKey ?? null,
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目', { questionnaireId: id, formItemId: formItem.id, userId })
 
@@ -1018,6 +1036,7 @@ export const questionnaireController = {
         where: { id: itemId },
         data: updateData,
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('更新表单题目', { questionnaireId: id, formItemId: itemId, userId })
 
@@ -1060,6 +1079,7 @@ export const questionnaireController = {
       await prisma.questionnaireFormItem.delete({
         where: { id: itemId },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('删除表单题目', { questionnaireId: id, formItemId: itemId, userId })
 
@@ -1120,6 +1140,7 @@ export const questionnaireController = {
           else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
         }
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('内容排序更新', { questionnaireId: id, userId })
 
@@ -1157,7 +1178,7 @@ export const questionnaireController = {
       const action = result.data.action || 'answer'
       const value = result.data.value
 
-      const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const outcome = await withQuestionnaireAssessmentAnswerTransaction(assessmentId, async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
           where: { id: assessmentId },
           include: {
@@ -1324,7 +1345,7 @@ export const questionnaireController = {
 
       const { answers } = result.data
 
-      const outcome = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const outcome = await withQuestionnaireAssessmentAnswerTransaction(assessmentId, async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
           where: { id: assessmentId },
           include: {
@@ -1871,45 +1892,38 @@ export const questionnaireController = {
 
       if (req.user?.role !== UserRole.STUDENT) return forbidden(res, '仅学生可开始问卷测评')
 
-      // 检查问卷是否存在且已发布
-      const questionnaire = await prisma.questionnaire.findFirst({
+      // Keep authorization on a small, uncached parent projection. Published
+      // content is immutable and is loaded separately through the shared
+      // start-content cache below.
+      const questionnaireMetadata = await prisma.questionnaire.findFirst({
         where: { id, type: 'COURSE' },
-        include: {
-          formItems: {
-            orderBy: { position: 'asc' },
-          },
-          questionnaireScales: {
-            include: {
-              scale: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  status: true,
-                  instrumentClass: true,
-                  instrumentVersion: true,
-                  definition: true,
-                },
-              },
-            },
-            orderBy: { position: 'asc' },
-          },
+        select: {
+          id: true,
+          type: true,
+          creatorId: true,
+          status: true,
+          visibility: true,
           courseQuestionnaires: {
             select: { courseId: true },
           },
         },
       })
 
-      if (!questionnaire) {
+      if (!questionnaireMetadata) {
         return notFound(res, '问卷不存在')
       }
 
-      if (!(await questionnaireAuth.canTake(actorFromRequest(req), questionnaire))) {
+      if (!(await questionnaireAuth.canTake(actorFromRequest(req), questionnaireMetadata))) {
         return forbidden(res, '当前账号无权参加此问卷')
       }
 
-      if (questionnaire.status !== 'PUBLISHED') {
+      if (questionnaireMetadata.status !== 'PUBLISHED') {
         return error(res, '问卷未发布')
+      }
+
+      const questionnaire = {
+        ...questionnaireMetadata,
+        ...(await cacheService.getQuestionnaireStartContent(id)),
       }
 
       // 合并表单题目和量表，按 position 排序
@@ -1918,25 +1932,85 @@ export const questionnaireController = {
         ...questionnaire.questionnaireScales.map(qs => ({ type: 'scale' as const, position: qs.position, data: qs })),
       ].sort((a, b) => a.position - b.position)
 
-      // 检查是否有进行中的问卷测评
-      const existingQA = await prisma.questionnaireAssessment.findFirst({
+      // Check only attempt state here. The immutable questionnaire content is
+      // already in the start-content cache above; joining it again would
+      // multiply definition and form-item reads during a resume burst.
+      const existingQARow = await prisma.questionnaireAssessment.findFirst({
         where: {
           questionnaireId: id,
           userId,
           status: 'IN_PROGRESS',
         },
-        include: {
+        select: {
+          id: true,
+          status: true,
+          progress: true,
+          contextSnapshotEncrypted: true,
+          contextSnapshotHash: true,
+          contextFrozenAt: true,
+          questionnaire: { select: { id: true } },
           scaleAssessments: {
-            include: {
-              scale: true,
+            select: {
+              id: true,
+              scaleId: true,
+              userId: true,
+              status: true,
+              answers: true,
+              answersRevision: true,
+              result: true,
+              progress: true,
+              startedAt: true,
+              completedAt: true,
+              totalTime: true,
+              questionnaireAssessmentId: true,
+              compositeAttemptId: true,
+              compositeItemId: true,
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  status: true,
+                  visibility: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definitionHash: true,
+                  itemCount: true,
+                  dimensionCount: true,
+                  estimatedTime: true,
+                  instruction: true,
+                  creatorId: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  tags: true,
+                },
+              },
             },
             orderBy: {
               startedAt: 'asc',
             },
           },
-          formAnswers: true,
+          formAnswers: {
+            select: {
+              formItemId: true,
+              value: true,
+              status: true,
+              revision: true,
+            },
+          },
         },
       })
+      const existingQA = existingQARow
+        ? {
+            ...existingQARow,
+            questionnaire: {
+              id: questionnaire.id,
+              formItems: questionnaire.formItems,
+              questionnaireScales: questionnaire.questionnaireScales,
+            },
+          }
+        : null
 
       if (existingQA) {
         // 构建已完成的表单答案映射
@@ -2017,7 +2091,7 @@ export const questionnaireController = {
         }
 
         // 所有项目都已完成，使用条件状态转换完成问卷，避免重复生成报告。
-        const completionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const completionResult = await withQuestionnaireCompletionTransaction(async (tx) => {
           // The resume lookup is outside the mutation transaction. Reload the
           // authoritative minimal graph inside Serializable before freezing or
           // completing so a concurrent answer cannot be hidden by a stale
@@ -2160,6 +2234,7 @@ export const questionnaireController = {
         })
         if (winner) return questionnaireController.startAssessment(req, res)
       }
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       logger.error('开始问卷测评错误', err)
       return error(res, '开始问卷测评失败')
     }
@@ -2170,7 +2245,7 @@ export const questionnaireController = {
     try {
       const userId = req.user?.userId
       const { id } = req.params
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireSerializableTransaction(async (tx) => {
         const assessment = await tx.questionnaireAssessment.findUnique({ where: { id }, select: { userId: true, status: true } })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
@@ -2283,7 +2358,7 @@ export const questionnaireController = {
 
       // 如果所有内容都完成了，保存单项报告集合并更新问卷测评状态
       if (allCompleted && qa.status !== 'COMPLETED') {
-        completion = await withSerializableQuestionnaireTransaction(async (tx) => {
+        completion = await withQuestionnaireCompletionTransaction(async (tx) => {
           // This GET loaded `qa` outside the mutation transaction. Reload the
           // minimal authoritative snapshot inside Serializable instead of
           // using an observation that may be stale after a concurrent answer.
@@ -2351,6 +2426,7 @@ export const questionnaireController = {
         }),
       })
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('获取问卷测评状态错误', err)
       return error(res, '获取问卷测评状态失败')
@@ -2363,7 +2439,7 @@ export const questionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
-      const result = await withSerializableQuestionnaireTransaction(async (tx) => {
+      const result = await withQuestionnaireCompletionTransaction(async (tx) => {
         const qa = await tx.questionnaireAssessment.findUnique({
           where: { id },
           select: questionnaireProgressSelect,
@@ -2417,6 +2493,7 @@ export const questionnaireController = {
         ...result.collectionReport,
       }, '问卷测评已完成')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('完成问卷测评错误', err)
       return error(res, '完成问卷测评失败')

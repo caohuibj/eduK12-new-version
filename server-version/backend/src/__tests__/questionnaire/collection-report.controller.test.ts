@@ -16,6 +16,7 @@ const { mockPrisma, mockCache } = vi.hoisted(() => ({
   mockCache: {
     getQuestionnaireScales: vi.fn(),
     getQuestionnaireFormItems: vi.fn(),
+    getQuestionnaireStartContent: vi.fn(),
   },
 }))
 
@@ -120,6 +121,10 @@ beforeEach(() => {
   }))
   mockCache.getQuestionnaireScales.mockResolvedValue([{ id: 'questionnaire-scale-1', scaleId: 'scale-1', position: 1, scale }])
   mockCache.getQuestionnaireFormItems.mockResolvedValue([{ id: 'form-1', label: '年级', position: 0 }])
+  mockCache.getQuestionnaireStartContent.mockResolvedValue({
+    questionnaireScales: [{ id: 'questionnaire-scale-1', scaleId: 'scale-1', position: 1, scale }],
+    formItems: [{ id: 'form-1', label: '年级', position: 0 }],
+  })
 })
 
 describe('collection-only questionnaire completion/report contract', () => {
