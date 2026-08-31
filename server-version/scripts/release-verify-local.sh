@@ -217,6 +217,7 @@ run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-relea
   src/__tests__/cognitive/concurrency.integration.test.ts \
   src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
   src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
+  src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
   src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
   src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
   src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
