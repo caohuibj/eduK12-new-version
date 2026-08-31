@@ -4,9 +4,13 @@ import {
   measureRequestPhase,
   recordPrismaCall,
   recordPrismaError,
+  recordCompletionAdmissionRejection,
+  recordSerializableAttempt,
+  recordSerializationConflict,
   requestObservabilityMiddleware,
   resetRuntimeObservabilityForTests,
   runtimeMetricLines,
+  setCompletionAdmissionState,
 } from '../../services/runtimeObservability'
 
 const metricText = () => runtimeMetricLines().join('\n')
@@ -118,5 +122,21 @@ describe('runtime observability', () => {
     expect(metrics).toContain('ptool_prisma_errors_total{code="P2034"} 1')
     expect(metrics).toContain('ptool_prisma_errors_total{code="40001"} 1')
     expect(metrics).not.toContain('SELECT')
+  })
+
+  it('records completion admission and Serializable retry signals', () => {
+    recordSerializableAttempt('questionnaire_completion', 1)
+    recordSerializableAttempt('questionnaire_completion', 2)
+    recordSerializationConflict('questionnaire_completion', 'P2034')
+    recordCompletionAdmissionRejection('queue_full')
+    setCompletionAdmissionState(2, 3)
+
+    const metrics = metricText()
+    expect(metrics).toContain('ptool_serializable_attempts_total{operation="questionnaire_completion",attempt="1"} 1')
+    expect(metrics).toContain('ptool_serializable_attempts_total{operation="questionnaire_completion",attempt="2"} 1')
+    expect(metrics).toContain('ptool_serialization_conflicts_total{operation="questionnaire_completion",code="P2034"} 1')
+    expect(metrics).toContain('ptool_completion_admission_rejections_total{reason="queue_full"} 1')
+    expect(metrics).toContain('ptool_questionnaire_completion_admission_active 2')
+    expect(metrics).toContain('ptool_questionnaire_completion_admission_queue 3')
   })
 })

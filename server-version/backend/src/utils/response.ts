@@ -29,3 +29,15 @@ export const forbidden = (res: Response, message: string = '无权限') => {
 export const notFound = (res: Response, message: string = '资源不存在') => {
   return error(res, message, -1, 404)
 }
+
+/** A bounded completion queue is full or expired; clients may retry safely. */
+export const completionBusy = (res: Response, retryAfterSeconds = 1) => {
+  const retryAfter = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+    ? Math.ceil(retryAfterSeconds)
+    : 1
+  res.setHeader('Retry-After', String(retryAfter))
+  return res.status(503).json({
+    code: 'COMPLETION_BUSY',
+    message: '测评完成请求繁忙，请稍后重试',
+  })
+}

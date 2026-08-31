@@ -13,7 +13,7 @@ const completionBurstSize = Math.max(1, Number.parseInt(process.env.PR26_COMPLET
 
 let prisma: PrismaClient
 let refreshQuestionnaireProgress: typeof import('../../services/questionnaireProgressService')['refreshQuestionnaireProgress']
-let withSerializableQuestionnaireTransaction: typeof import('../../services/questionnaireProgressService')['withSerializableQuestionnaireTransaction']
+let withQuestionnaireCompletionTransaction: typeof import('../../services/questionnaireProgressService')['withQuestionnaireCompletionTransaction']
 let decryptField: typeof import('../../utils/encryption')['decryptField']
 let assessmentId = ''
 let questionnaireId = ''
@@ -27,7 +27,7 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
     prisma = database.prisma
     const progressService = await import('../../services/questionnaireProgressService')
     refreshQuestionnaireProgress = progressService.refreshQuestionnaireProgress
-    withSerializableQuestionnaireTransaction = progressService.withSerializableQuestionnaireTransaction
+    withQuestionnaireCompletionTransaction = progressService.withQuestionnaireCompletionTransaction
     decryptField = (await import('../../utils/encryption')).decryptField
 
     const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -95,10 +95,10 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
       // turning the test into an artificial 200-connection spike. The gate is
       // 200 completion attempts inside the same ten-second window.
       const batchSize = Math.min(20, assessments.length)
-      const results: Array<Awaited<ReturnType<typeof withSerializableQuestionnaireTransaction>>> = []
+      const results: Array<Awaited<ReturnType<typeof withQuestionnaireCompletionTransaction>>> = []
       for (let offset = 0; offset < assessments.length; offset += batchSize) {
         const batch = await Promise.all(assessments.slice(offset, offset + batchSize).map(({ id }) => (
-          withSerializableQuestionnaireTransaction((tx) => refreshQuestionnaireProgress(tx, id))
+          withQuestionnaireCompletionTransaction((tx) => refreshQuestionnaireProgress(tx, id))
         )))
         results.push(...batch)
       }

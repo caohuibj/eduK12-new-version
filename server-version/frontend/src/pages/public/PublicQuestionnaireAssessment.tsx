@@ -9,6 +9,7 @@ import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 import { checkpointScheduler, CheckpointTransportError } from '../../services/persistence/checkpointScheduler'
 import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
+import { runWithCompletionRetry } from '../../services/completionRetry'
 
 type ResponseValue = string | number
 
@@ -235,8 +236,8 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       setRecoveryState(retry ? 'retrying' : 'recovering')
       setRunnerError(null)
       
-      const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
+      const result = await runWithCompletionRetry(() => createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`))
       
       if (result.data.questionnaireAssessment.status === 'COMPLETED') {
         // 已完成，跳转到结果页
@@ -470,15 +471,15 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     setRecoveryState('recovering')
     try {
       // 重新获取测评状态
-      const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`)
+      const result = await runWithCompletionRetry(() => createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+        .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`))
       
       if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
           result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
         // 所有内容完成
         await checkpointScheduler.purgeExpired('questionnaire', result.data.questionnaireAssessment.id)
-        await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-          .post(`/assessments/${sessionId}/complete`)
+        await runWithCompletionRetry(() => createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+          .post(`/assessments/${sessionId}/complete`))
         navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
       } else {
         // 切换到下一个内容项

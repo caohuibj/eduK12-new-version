@@ -3,7 +3,13 @@ import { prisma } from '../config/database'
 import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
 import { encryptField } from '../utils/encryption'
 import { isFormAnswerComplete } from './questionnaireFormAnswerState'
-import { measureRequestPhase, recordRequestPhase } from './runtimeObservability'
+import { questionnaireCompletionAdmission, isQuestionnaireCompletionAdmissionBusyError } from './questionnaireCompletionAdmission'
+import {
+  measureRequestPhase,
+  recordRequestPhase,
+  recordSerializableAttempt,
+  recordSerializationConflict,
+} from './runtimeObservability'
 
 type DatabaseClient = typeof prisma | Prisma.TransactionClient
 
@@ -306,33 +312,43 @@ export const refreshQuestionnaireProgress = async (
   return resultFor(current, false, current.completedAt, current.totalTime, null)
 }
 
-/** Run a mutation at serializable isolation and retry PostgreSQL conflicts. */
-export const withSerializableQuestionnaireTransaction = async <T>(
-  callback: (tx: Prisma.TransactionClient) => Promise<T>,
-): Promise<T> => {
-  // A completion burst for one questionnaire can create transient SSI
-  // conflicts even when each student owns a different assessment row. Keep
-  // the retry bounded while allowing a few waves to drain through the pool.
-  const maxAttempts = 5
-  const isSerializationConflict = (err: any): boolean => (
-    err?.code === 'P2034'
-    // Prisma exposes serialization failures raised by a raw query as P2010;
-    // the PostgreSQL SQLSTATE remains available in the nested metadata.
-    || err?.code === '40001'
-    || err?.meta?.code === '40001'
-  )
+type SerializableOperation = 'questionnaire_completion' | 'questionnaire_mutation' | 'scale_completion'
 
-  const waitBeforeRetry = (attempt: number) => new Promise<void>((resolve) => {
-    // A small exponential backoff with jitter prevents concurrent clients
-    // from retrying the same SSI conflict in lockstep and immediately
-    // exhausting all attempts again. The transaction semantics are unchanged:
-    // only PostgreSQL's explicit serialization failure is retried.
-    const baseDelayMs = 25 * (2 ** (attempt - 1))
-    const jitterMs = Math.floor(Math.random() * baseDelayMs)
-    setTimeout(resolve, baseDelayMs + jitterMs)
-  })
+type SerializableTransactionOptions = {
+  operation: SerializableOperation
+  maxAttempts?: number
+  maxWait?: number
+  timeout?: number
+}
+
+const isSerializationConflict = (err: any): boolean => (
+  err?.code === 'P2034'
+  // Prisma exposes serialization failures raised by a raw query as P2010;
+  // the PostgreSQL SQLSTATE remains available in the nested metadata.
+  || err?.code === '40001'
+  || err?.meta?.code === '40001'
+)
+
+const serializationErrorCode = (err: any): string => (
+  err?.code === 'P2034' ? 'P2034' : err?.code === '40001' || err?.meta?.code === '40001' ? '40001' : 'unknown'
+)
+
+const waitBeforeRetry = (attempt: number) => new Promise<void>((resolve) => {
+  // A small exponential backoff with jitter prevents concurrent clients from
+  // retrying the same SSI conflict in lockstep.
+  const baseDelayMs = 25 * (2 ** (attempt - 1))
+  const jitterMs = Math.floor(Math.random() * baseDelayMs)
+  setTimeout(resolve, baseDelayMs + jitterMs)
+})
+
+const runSerializableTransaction = async <T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+  options: SerializableTransactionOptions,
+): Promise<T> => {
+  const maxAttempts = options.maxAttempts ?? 5
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    recordSerializableAttempt(options.operation, attempt)
     try {
       const requestedAt = process.hrtime.bigint()
       return await measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
@@ -346,20 +362,125 @@ export const withSerializableQuestionnaireTransaction = async <T>(
         return callback(tx)
       }, {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-        // Completion is a short, bounded mutation. Allow a burst to wait for
-        // a pool slot long enough to satisfy the 200-user completion gate,
-        // while still failing rather than holding a transaction indefinitely.
-        maxWait: 10_000,
-        timeout: 15_000,
+        maxWait: options.maxWait ?? 2_000,
+        timeout: options.timeout ?? 10_000,
       }))
     } catch (err: any) {
-      if (!isSerializationConflict(err) || attempt === maxAttempts) throw err
-      await waitBeforeRetry(attempt)
+      if (!isSerializationConflict(err)) throw err
+      recordSerializationConflict(options.operation, serializationErrorCode(err))
+      if (attempt === maxAttempts) throw err
+      await measureRequestPhase('serialization_backoff', () => waitBeforeRetry(attempt))
     }
   }
 
   throw new Error('questionnaire transaction retry exhausted')
 }
+
+/** Finalization policy: Serializable, bounded retry, and bounded admission. */
+export const withQuestionnaireCompletionTransaction = async <T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
+  const requestedAt = process.hrtime.bigint()
+  try {
+    return await questionnaireCompletionAdmission.run(async () => {
+      const admittedAt = process.hrtime.bigint()
+      recordRequestPhase(
+        'completion_queue_wait',
+        Number(admittedAt - requestedAt) / 1_000_000,
+        requestedAt,
+        admittedAt,
+      )
+      return runSerializableTransaction(callback, {
+        operation: 'questionnaire_completion',
+        maxAttempts: 5,
+        maxWait: 2_000,
+        timeout: 10_000,
+      })
+    })
+  } catch (err) {
+    if (isQuestionnaireCompletionAdmissionBusyError(err)) {
+      const rejectedAt = process.hrtime.bigint()
+      recordRequestPhase(
+        'completion_queue_wait',
+        Number(rejectedAt - requestedAt) / 1_000_000,
+        requestedAt,
+        rejectedAt,
+      )
+    }
+    throw err
+  }
+}
+
+/** Serializable questionnaire mutation that is not terminal completion. */
+export const withQuestionnaireSerializableTransaction = async <T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => runSerializableTransaction(callback, {
+  operation: 'questionnaire_mutation',
+  maxAttempts: 3,
+  maxWait: 2_000,
+  timeout: 10_000,
+})
+
+/** Scale completion keeps Serializable semantics without using questionnaire admission. */
+export const withScaleCompletionTransaction = async <T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => runSerializableTransaction(callback, {
+  operation: 'scale_completion',
+  maxAttempts: 5,
+  maxWait: 2_000,
+  timeout: 10_000,
+})
+
+/** Backward-compatible name for existing isolated integration callers. */
+export const withSerializableQuestionnaireTransaction = withQuestionnaireSerializableTransaction
+
+const runReadCommittedLockedTransaction = async <T>(
+  lock: (tx: Prisma.TransactionClient) => Promise<void>,
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
+  const requestedAt = process.hrtime.bigint()
+  return measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
+    const acquiredAt = process.hrtime.bigint()
+    recordRequestPhase(
+      'transaction_acquisition',
+      Number(acquiredAt - requestedAt) / 1_000_000,
+      requestedAt,
+      acquiredAt,
+    )
+    await lock(tx)
+    return callback(tx)
+  }, {
+    isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+  }))
+}
+
+/** Run an ordinary scale answer mutation with a lock on its own Assessment row. */
+export const withScaleAnswerTransaction = async <T>(
+  assessmentId: string,
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => runReadCommittedLockedTransaction(
+  (tx) => measureRequestPhase('row_lock_roundtrip', () => tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "assessments"
+    WHERE "id" = ${assessmentId}
+    FOR UPDATE
+  `).then(() => undefined),
+  callback,
+)
+
+/** Run an authenticated questionnaire form answer mutation with a parent-row lock. */
+export const withQuestionnaireAssessmentAnswerTransaction = async <T>(
+  assessmentId: string,
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => runReadCommittedLockedTransaction(
+  (tx) => measureRequestPhase('row_lock_roundtrip', () => tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "questionnaire_assessments"
+    WHERE "id" = ${assessmentId}
+    FOR UPDATE
+  `).then(() => undefined),
+  callback,
+)
 
 /**
  * Run an ordinary form-answer mutation with a row lock on its assessment.
@@ -372,24 +493,12 @@ export const withSerializableQuestionnaireTransaction = async <T>(
 export const withQuestionnaireAnswerTransaction = async <T>(
   sessionId: string,
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
-): Promise<T> => {
-  const requestedAt = process.hrtime.bigint()
-  return measureRequestPhase('transaction', () => prisma.$transaction(async (tx) => {
-    const acquiredAt = process.hrtime.bigint()
-    recordRequestPhase(
-      'transaction_acquisition',
-      Number(acquiredAt - requestedAt) / 1_000_000,
-      requestedAt,
-      acquiredAt,
-    )
-    await measureRequestPhase('row_lock_roundtrip', () => tx.$queryRaw<Array<{ id: string }>>`
+): Promise<T> => runReadCommittedLockedTransaction(
+  (tx) => measureRequestPhase('row_lock_roundtrip', () => tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id"
       FROM "questionnaire_assessments"
       WHERE "session_id" = ${sessionId}
       FOR UPDATE
-    `)
-    return callback(tx)
-  }, {
-    isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-  }))
-}
+    `).then(() => undefined),
+  callback,
+)

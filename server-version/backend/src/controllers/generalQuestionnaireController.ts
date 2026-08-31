@@ -19,6 +19,7 @@ import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
 import { MAX_TOKEN_USES } from '../constants'
+import { cacheService } from '../services/cacheService'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -520,6 +521,7 @@ export const generalQuestionnaireController = {
           position: position ?? 0,
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加量表到泛化问卷', {
         questionnaireId: id,
@@ -563,6 +565,7 @@ export const generalQuestionnaireController = {
           },
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('从泛化问卷移除量表', {
         questionnaireId: id,
@@ -698,6 +701,7 @@ export const generalQuestionnaireController = {
         where: { id },
         data: { status: 'PUBLISHED' },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('发布泛化问卷', {
         questionnaireId: id,
@@ -734,6 +738,7 @@ export const generalQuestionnaireController = {
         where: { id },
         data: { status: 'DEPRECATED' },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       return success(res, updated, '问卷已废弃')
     } catch (err) {
@@ -938,6 +943,7 @@ export const generalQuestionnaireController = {
           contextKey: contextKey ?? null,
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目到泛化问卷', { questionnaireId: id, formItemId: formItem.id, userId })
 
@@ -1018,6 +1024,7 @@ export const generalQuestionnaireController = {
         where: { id: itemId },
         data: updateData,
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('更新泛化问卷表单题目', { questionnaireId: id, formItemId: itemId, userId })
 
@@ -1062,6 +1069,7 @@ export const generalQuestionnaireController = {
       await prisma.questionnaireFormItem.delete({
         where: { id: itemId },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('删除泛化问卷表单题目', { questionnaireId: id, formItemId: itemId, userId })
 
@@ -1122,6 +1130,7 @@ export const generalQuestionnaireController = {
           else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
         }
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('泛化问卷内容排序更新', { questionnaireId: id, userId })
 
@@ -1176,6 +1185,7 @@ export const generalQuestionnaireController = {
           },
         },
       })
+      await cacheService.clearQuestionnaireCache(id)
 
       logger.info('更新泛化问卷', { questionnaireId: id, userId })
 
