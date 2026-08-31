@@ -9,9 +9,11 @@ import { integrationDatabaseUrl } from '../integration/integration-env'
  */
 const DB_URL = integrationDatabaseUrl('PR26_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
+const completionBurstSize = Math.max(1, Number.parseInt(process.env.PR26_COMPLETION_BURST_SIZE || '200', 10))
 
 let prisma: PrismaClient
 let refreshQuestionnaireProgress: typeof import('../../services/questionnaireProgressService')['refreshQuestionnaireProgress']
+let withSerializableQuestionnaireTransaction: typeof import('../../services/questionnaireProgressService')['withSerializableQuestionnaireTransaction']
 let decryptField: typeof import('../../utils/encryption')['decryptField']
 let assessmentId = ''
 let questionnaireId = ''
@@ -23,7 +25,9 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     const database = await import('../../config/database')
     prisma = database.prisma
-    refreshQuestionnaireProgress = (await import('../../services/questionnaireProgressService')).refreshQuestionnaireProgress
+    const progressService = await import('../../services/questionnaireProgressService')
+    refreshQuestionnaireProgress = progressService.refreshQuestionnaireProgress
+    withSerializableQuestionnaireTransaction = progressService.withSerializableQuestionnaireTransaction
     decryptField = (await import('../../utils/encryption')).decryptField
 
     const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -72,4 +76,48 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
       reportDefinitionVersion: 'collection-only-v2',
     })
   })
+
+  it('completes 200 independent assessments concurrently without duplicate terminal writes', async () => {
+    const assessments = await prisma.questionnaireAssessment.createManyAndReturn({
+      data: Array.from({ length: completionBurstSize }, () => ({
+        questionnaireId,
+        // Anonymous rows may share a questionnaire; the production partial
+        // unique index intentionally permits multiple NULL user IDs.
+        userId: null,
+        status: 'IN_PROGRESS' as const,
+        progress: 0,
+      })),
+      select: { id: true },
+    })
+    const startedAt = Date.now()
+    try {
+      // Keep the number of active DB transactions above the pool size without
+      // turning the test into an artificial 200-connection spike. The gate is
+      // 200 completion attempts inside the same ten-second window.
+      const batchSize = Math.min(20, assessments.length)
+      const results: Array<Awaited<ReturnType<typeof withSerializableQuestionnaireTransaction>>> = []
+      for (let offset = 0; offset < assessments.length; offset += batchSize) {
+        const batch = await Promise.all(assessments.slice(offset, offset + batchSize).map(({ id }) => (
+          withSerializableQuestionnaireTransaction((tx) => refreshQuestionnaireProgress(tx, id))
+        )))
+        results.push(...batch)
+      }
+
+      expect(Date.now() - startedAt).toBeLessThan(10_000)
+      expect(results).toHaveLength(completionBurstSize)
+      expect(results.every((result) => result?.completed && result.status === 'COMPLETED')).toBe(true)
+
+      const completedRows = await prisma.questionnaireAssessment.count({
+        where: { id: { in: assessments.map(({ id }) => id) }, status: 'COMPLETED' },
+      })
+      expect(completedRows).toBe(completionBurstSize)
+      const reports = await prisma.questionnaireAssessment.findMany({
+        where: { id: { in: assessments.map(({ id }) => id) } },
+        select: { aggregateReport: true, aggregateReportEncrypted: true },
+      })
+      expect(reports.every((row) => row.aggregateReport === null && typeof row.aggregateReportEncrypted === 'string')).toBe(true)
+    } finally {
+      await prisma.questionnaireAssessment.deleteMany({ where: { id: { in: assessments.map(({ id }) => id) } } })
+    }
+  }, 60000)
 })

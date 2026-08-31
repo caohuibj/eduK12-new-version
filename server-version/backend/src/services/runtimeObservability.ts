@@ -7,7 +7,7 @@ export type RequestObservationPhase =
   | 'resume_auth'
   | 'transaction_acquisition'
   | 'transaction'
-  | 'row_lock_wait'
+  | 'row_lock_roundtrip'
   | 'assessment_lookup'
   | 'definition_lookup'
   | 'existing_answer_lookup'
@@ -36,6 +36,11 @@ type LabeledHistogram = {
   histogram: Histogram
 }
 
+type LabeledCounter = {
+  labels: Record<string, string>
+  count: number
+}
+
 const observationStorage = new AsyncLocalStorage<RequestObservation>()
 const HTTP_BUCKETS_MS = [5, 10, 25, 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000, 30_000]
 const MAX_METRIC_KEYS = 10_000
@@ -45,7 +50,14 @@ const finiteMilliseconds = (value: number): number => Number.isFinite(value) && 
 const httpRequestHistograms = new Map<string, LabeledHistogram>()
 const phaseHistograms = new Map<string, LabeledHistogram>()
 const prismaCallHistograms = new Map<string, LabeledHistogram>()
+const slowRequestCounts = new Map<string, LabeledCounter>()
 const prismaErrorCounts = new Map<string, number>()
+
+const SLOW_REQUEST_THRESHOLDS = [
+  { milliseconds: 500, label: '500ms' },
+  { milliseconds: 1_000, label: '1s' },
+  { milliseconds: 2_000, label: '2s' },
+] as const
 
 let activeRequests = 0
 let gcEvents = 0
@@ -115,6 +127,34 @@ const observeLabeledHistogram = (
   observeHistogram(boundedHistogram(store, labels), durationMs)
 }
 
+const boundedCounter = (
+  store: Map<string, LabeledCounter>,
+  labels: Record<string, string>,
+): LabeledCounter => {
+  const key = keyFor(labels)
+  const current = store.get(key)
+  if (current) return current
+
+  if (store.size >= MAX_METRIC_KEYS - 1) {
+    const otherLabels = { ...labels }
+    if ('route' in otherLabels) otherLabels.route = OTHER_ROUTE
+    const otherKey = keyFor(otherLabels)
+    const other = store.get(otherKey)
+    if (other) return other
+    const entry = { labels: otherLabels, count: 0 }
+    store.set(otherKey, entry)
+    return entry
+  }
+
+  const entry = { labels, count: 0 }
+  store.set(key, entry)
+  return entry
+}
+
+const incrementSlowRequestCount = (labels: Record<string, string>): void => {
+  boundedCounter(slowRequestCounts, labels).count += 1
+}
+
 const escapeLabel = (value: string): string => value
   .replace(/\\/g, '\\\\')
   .replace(/"/g, '\\"')
@@ -136,18 +176,17 @@ const normalizeMetricPath = (req: Request): string => {
   return req.path.startsWith('/api/') ? '/api/:unmatched' : '/:unmatched'
 }
 
-const coveredPhaseDurationMs = (observation: RequestObservation): number => {
-  // Phases are nested (for example, lookups are inside a transaction). Merge
-  // their monotonic intervals before calculating the residual so the same
-  // wall-clock time is never subtracted twice.
-  const intervals = observation.phases
-    .map(({ startedAt, endedAt }) => ({
-      startedAt: startedAt < observation.startedAt ? observation.startedAt : startedAt,
-      endedAt,
-    }))
-    .filter(({ startedAt, endedAt }) => endedAt > startedAt)
-    .sort((a, b) => (a.startedAt < b.startedAt ? -1 : a.startedAt > b.startedAt ? 1 : 0))
+type MonotonicInterval = { startedAt: bigint; endedAt: bigint }
 
+const phaseIntervals = (observation: RequestObservation, requestEndedAt: bigint): MonotonicInterval[] => observation.phases
+  .map(({ startedAt, endedAt }) => ({
+    startedAt: startedAt < observation.startedAt ? observation.startedAt : startedAt,
+    endedAt: endedAt > requestEndedAt ? requestEndedAt : endedAt,
+  }))
+  .filter(({ startedAt, endedAt }) => endedAt > startedAt)
+  .sort((a, b) => (a.startedAt < b.startedAt ? -1 : a.startedAt > b.startedAt ? 1 : 0))
+
+const unionDurationNs = (intervals: MonotonicInterval[]): bigint => {
   let coveredNs = 0n
   let currentStart: bigint | null = null
   let currentEnd: bigint | null = null
@@ -164,7 +203,63 @@ const coveredPhaseDurationMs = (observation: RequestObservation): number => {
     }
   }
   if (currentStart !== null && currentEnd !== null) coveredNs += currentEnd - currentStart
-  return Number(coveredNs) / 1_000_000
+  return coveredNs
+}
+
+const coveredPhaseDurationMs = (observation: RequestObservation, requestEndedAt: bigint): number => (
+  Number(unionDurationNs(phaseIntervals(observation, requestEndedAt))) / 1_000_000
+)
+
+const exclusivePhaseAttribution = (
+  observation: RequestObservation,
+  requestEndedAt: bigint,
+): Map<string, number> => {
+  const phases = observation.phases.map((phase) => ({
+    ...phase,
+    startedAt: phase.startedAt < observation.startedAt ? observation.startedAt : phase.startedAt,
+    endedAt: phase.endedAt > requestEndedAt ? requestEndedAt : phase.endedAt,
+  })).filter((phase) => phase.endedAt > phase.startedAt)
+  const boundaries = new Set<bigint>([observation.startedAt, requestEndedAt])
+  for (const phase of phases) {
+    boundaries.add(phase.startedAt)
+    boundaries.add(phase.endedAt)
+  }
+  const orderedBoundaries = [...boundaries].sort((left, right) => (left < right ? -1 : left > right ? 1 : 0))
+  const attribution = new Map<string, number>()
+
+  // Partition the request timeline into disjoint intervals. When phases are
+  // nested, the shortest active interval is the most specific one, so the
+  // outer transaction envelope contributes only its uncovered time under
+  // `transaction_other`.
+  for (let index = 0; index < orderedBoundaries.length - 1; index += 1) {
+    const startedAt = orderedBoundaries[index]
+    const endedAt = orderedBoundaries[index + 1]
+    if (endedAt <= startedAt) continue
+    const midpoint = startedAt + ((endedAt - startedAt) / 2n)
+    const active = phases.filter((phase) => phase.startedAt <= midpoint && midpoint < phase.endedAt)
+    const selected = active.sort((left, right) => {
+      const leftLength = left.endedAt - left.startedAt
+      const rightLength = right.endedAt - right.startedAt
+      if (leftLength !== rightLength) return leftLength < rightLength ? -1 : 1
+      return left.phase.localeCompare(right.phase)
+    })[0]
+    const label = selected?.phase === 'transaction' ? 'transaction_other' : selected?.phase || 'response_other'
+    const durationMs = Number(endedAt - startedAt) / 1_000_000
+    attribution.set(label, (attribution.get(label) || 0) + durationMs)
+  }
+  return attribution
+}
+
+const dominantPhaseFor = (attribution: Map<string, number>): string => {
+  let dominant = 'response_other'
+  let dominantDuration = -1
+  for (const [phase, durationMs] of attribution.entries()) {
+    if (durationMs > dominantDuration) {
+      dominant = phase
+      dominantDuration = durationMs
+    }
+  }
+  return dominant
 }
 
 /** Attach a request-scoped, non-sensitive performance context. */
@@ -175,13 +270,15 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
   }
   activeRequests += 1
   let finalized = false
+  let responseFinished = false
 
-  const finalize = (): void => {
+  const finalize = (aborted: boolean): void => {
     if (finalized) return
     finalized = true
-    const durationMs = Number(process.hrtime.bigint() - observation.startedAt) / 1_000_000
+    const requestEndedAt = process.hrtime.bigint()
+    const durationMs = Number(requestEndedAt - observation.startedAt) / 1_000_000
     const route = normalizeMetricPath(req)
-    const status = String(res.statusCode || 499)
+    const status = aborted ? '499' : String(res.statusCode ?? 200)
     observeLabeledHistogram(httpRequestHistograms, {
       method: req.method,
       route,
@@ -191,8 +288,18 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
     for (const phase of observation.phases) {
       observeLabeledHistogram(phaseHistograms, { phase: phase.phase, route }, phase.durationMs)
     }
-    const responseDurationMs = Math.max(0, durationMs - coveredPhaseDurationMs(observation))
+    const responseDurationMs = Math.max(0, durationMs - coveredPhaseDurationMs(observation, requestEndedAt))
     observeLabeledHistogram(phaseHistograms, { phase: 'response', route }, responseDurationMs)
+    const dominantPhase = dominantPhaseFor(exclusivePhaseAttribution(observation, requestEndedAt))
+    for (const threshold of SLOW_REQUEST_THRESHOLDS) {
+      if (durationMs > threshold.milliseconds) {
+        incrementSlowRequestCount({
+          route,
+          threshold: threshold.label,
+          dominant_phase: dominantPhase,
+        })
+      }
+    }
     activeRequests = Math.max(0, activeRequests - 1)
 
     if (durationMs > 10_000) {
@@ -206,8 +313,15 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
       })
     }
   }
-  res.once('finish', finalize)
-  res.once('close', finalize)
+  res.once('finish', () => {
+    responseFinished = true
+    finalize(false)
+  })
+  res.once('close', () => {
+    // `close` can fire without `finish` when the client disconnects. Node's
+    // default statusCode is 200 in that case, so explicitly record 499.
+    finalize(!responseFinished && !res.writableFinished)
+  })
 
   observationStorage.run(observation, () => next())
 }
@@ -340,6 +454,9 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_assessment_phase_duration_seconds Instrumented assessment phase latency.',
     '# TYPE ptool_assessment_phase_duration_seconds histogram',
     ...histogramLines('ptool_assessment_phase_duration_seconds', phaseHistograms),
+    '# HELP ptool_slow_requests_total Requests above latency thresholds classified by exclusive dominant phase.',
+    '# TYPE ptool_slow_requests_total counter',
+    ...[...slowRequestCounts.values()].map(({ labels, count }) => `ptool_slow_requests_total{${labelsText(labels)}} ${count}`),
     '# HELP ptool_prisma_call_duration_seconds Prisma call wall-clock latency by model and action.',
     '# TYPE ptool_prisma_call_duration_seconds histogram',
     ...histogramLines('ptool_prisma_call_duration_seconds', prismaCallHistograms),
@@ -355,6 +472,7 @@ export const resetRuntimeObservabilityForTests = (): void => {
   httpRequestHistograms.clear()
   phaseHistograms.clear()
   prismaCallHistograms.clear()
+  slowRequestCounts.clear()
   prismaErrorCounts.clear()
   activeRequests = 0
   gcEvents = 0

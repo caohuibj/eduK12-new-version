@@ -20,6 +20,7 @@ const DEFAULT_TIMEOUT_MS = 15_000
 const DEFAULT_MAX_P95_MS = 1_000
 const DEFAULT_MAX_ERROR_RATE = 0.01
 const DEFAULT_RESOURCE_SAMPLE_INTERVAL_MS = 5_000
+const DEFAULT_METRICS_TIMEOUT_MS = 5_000
 
 const usage = () => `Usage:
   node scripts/load/persistence-capacity.mjs --scenario-file <file> [options]
@@ -33,6 +34,7 @@ Options:
   --duration-seconds <n>        Duration per stage (default: 60)
   --warmup-seconds <n>          Warmup duration per stage (default: 10)
   --timeout-ms <n>              Per-request timeout (default: 15000)
+  --metrics-url <url>           Backend Prometheus endpoint for attribution
   --max-p95-ms <n>              Gate threshold (default: 1000)
   --max-error-rate <n>          Gate threshold as a ratio (default: 0.01)
   --containers <list>           Explicit Docker container names to sample
@@ -88,6 +90,7 @@ const parseArgs = (args) => {
     durationSeconds,
     warmupSeconds,
     timeoutMs,
+    metricsUrl: readOption(args, '--metrics-url'),
     maxP95Ms,
     maxErrorRate,
     cooldownMs,
@@ -95,6 +98,67 @@ const parseArgs = (args) => {
     containers,
     targetLabel: readOption(args, '--target-label', 'unspecified'),
   }
+}
+
+const metricLinePattern = /^([a-zA-Z_:][a-zA-Z0-9_:]*)(?:\{([^}]*)\})?\s+([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?|[+-]?Inf|NaN)(?:\s+\d+)?$/
+
+const parseMetricLabels = (input = '') => {
+  const labels = {}
+  const pattern = /([a-zA-Z_][a-zA-Z0-9_]*)="((?:\\.|[^"\\])*)"/g
+  for (const match of input.matchAll(pattern)) {
+    labels[match[1]] = match[2]
+      .replace(/\\n/g, '\n')
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\')
+  }
+  return labels
+}
+
+const metricsToSamples = (text) => text.split('\n').flatMap((line) => {
+  const match = line.match(metricLinePattern)
+  if (!match) return []
+  const value = Number(match[3])
+  return Number.isFinite(value) ? [{ name: match[1], labels: parseMetricLabels(match[2]), value }] : []
+})
+
+const attributionMetricNames = (name) => name === 'ptool_slow_requests_total'
+  || name === 'ptool_nodejs_event_loop_utilization'
+  || name === 'ptool_nodejs_event_loop_delay_seconds'
+  || name === 'ptool_nodejs_active_requests'
+  || name === 'process_resident_memory_bytes'
+  || name === 'process_heap_used_bytes'
+  || name === 'process_heap_total_bytes'
+  || name === 'ptool_prisma_errors_total'
+  || name === 'ptool_prisma_call_duration_seconds_count'
+  || name === 'ptool_prisma_call_duration_seconds_sum'
+  || name === 'ptool_assessment_phase_duration_seconds_count'
+  || name === 'ptool_assessment_phase_duration_seconds_sum'
+
+const readMetricsSnapshot = async (metricsUrl, timeoutMs = DEFAULT_METRICS_TIMEOUT_MS) => {
+  if (!metricsUrl) return { available: false, samples: [] }
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const response = await fetch(metricsUrl, { signal: controller.signal, headers: { Accept: 'text/plain' } })
+    if (!response.ok) return { available: false, status: response.status, samples: [] }
+    const samples = metricsToSamples(await response.text()).filter((sample) => attributionMetricNames(sample.name))
+    return { available: true, status: response.status, fetchedAt: new Date().toISOString(), samples }
+  } catch (error) {
+    return { available: false, error: error?.name === 'AbortError' ? 'timeout' : 'network', samples: [] }
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+const sampleKey = (sample) => `${sample.name}\u0000${JSON.stringify(sample.labels, Object.keys(sample.labels).sort())}`
+
+const diffMetrics = (before, after) => {
+  const previous = new Map((before?.samples || []).map((sample) => [sampleKey(sample), sample]))
+  return (after?.samples || []).flatMap((sample) => {
+    const prior = previous.get(sampleKey(sample))
+    const delta = prior ? sample.value - prior.value : sample.value
+    return delta > 0 ? [{ ...sample, delta }] : []
+  })
 }
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -307,6 +371,7 @@ const runStage = async ({ stage, scenario, options, weighted }) => {
     })))
   }
 
+  const metricsBefore = await readMetricsSnapshot(options.metricsUrl)
   const metrics = emptyMetrics()
   const startedAt = new Date().toISOString()
   const started = performance.now()
@@ -323,6 +388,7 @@ const runStage = async ({ stage, scenario, options, weighted }) => {
   const elapsedMs = performance.now() - started
   clearInterval(sampler)
   sample()
+  const metricsAfter = await readMetricsSnapshot(options.metricsUrl)
 
   return {
     concurrency: stage.concurrency,
@@ -332,6 +398,12 @@ const runStage = async ({ stage, scenario, options, weighted }) => {
     endedAt: new Date().toISOString(),
     ...summarizeMetrics(metrics, elapsedMs, options),
     resources,
+    observability: {
+      available: metricsBefore.available && metricsAfter.available,
+      before: metricsBefore,
+      after: metricsAfter,
+      delta: diffMetrics(metricsBefore, metricsAfter),
+    },
   }
 }
 
@@ -340,6 +412,7 @@ const main = async () => {
   const scenario = JSON.parse(fs.readFileSync(options.scenarioFile, 'utf8'))
   validateScenario(scenario, options)
   options.baseUrl = new URL(options.baseUrl || scenario.baseUrl).toString()
+  if (options.metricsUrl) options.metricsUrl = new URL(options.metricsUrl, options.baseUrl).toString()
   const weighted = weightedSteps(scenario.steps)
   const scenarioStages = Array.isArray(scenario.stages) ? scenario.stages : []
   const stages = options.stages.map((concurrency, index) => {

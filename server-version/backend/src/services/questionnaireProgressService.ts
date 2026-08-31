@@ -7,24 +7,124 @@ import { measureRequestPhase, recordRequestPhase } from './runtimeObservability'
 
 type DatabaseClient = typeof prisma | Prisma.TransactionClient
 
-const questionnaireProgressInclude = {
+export type QuestionnaireProgressSnapshot = {
+  id: string
+  questionnaireId: string
+  userId?: string | null
+  sessionId?: string | null
+  status: string
+  progress: number
+  completedScales: number
+  completedForms: number
+  startedAt: Date
+  completedAt: Date | null
+  totalTime: number | null
+  aggregateReport: unknown
+  aggregateReportEncrypted: string | null
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  contextFrozenAt: Date | null
   questionnaire: {
-    include: {
+    name?: string | null
+    formItems: Array<{
+      id: string
+      type: string
+      label: string
+      required: boolean
+      options: unknown
+      position: number
+      contextKey?: string | null
+    }>
+    questionnaireScales: Array<{
+      id: string
+      scaleId: string
+      position?: number | null
+      scale?: { code?: string | null; name?: string | null } | null
+    }>
+  }
+  scaleAssessments: Array<{
+    id: string
+    scaleId: string
+    status: string
+    result?: unknown
+    completedAt?: Date | null
+    totalTime?: number | null
+    scale?: { code?: string | null; name?: string | null } | null
+  }>
+  formAnswers: Array<{
+    formItemId: string
+    value: string | null
+    status?: string | null
+  }>
+}
+
+/**
+ * Minimal authoritative projection used by completion/progress paths. Keep
+ * the report/result fields needed by collection reporting, but do not load
+ * scale definitions, encrypted answer revisions, or unrelated relations.
+ */
+export const questionnaireProgressSelect = {
+  id: true,
+  questionnaireId: true,
+  userId: true,
+  sessionId: true,
+  status: true,
+  progress: true,
+  completedScales: true,
+  completedForms: true,
+  startedAt: true,
+  completedAt: true,
+  totalTime: true,
+  aggregateReport: true,
+  aggregateReportEncrypted: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  contextFrozenAt: true,
+  questionnaire: {
+    select: {
+      name: true,
       formItems: {
+        select: {
+          id: true,
+          type: true,
+          label: true,
+          required: true,
+          options: true,
+          position: true,
+          contextKey: true,
+        },
         orderBy: { position: 'asc' as const },
       },
       questionnaireScales: {
-        include: {
-          scale: true,
+        select: {
+          id: true,
+          scaleId: true,
+          position: true,
+          scale: { select: { code: true, name: true } },
         },
         orderBy: { position: 'asc' as const },
       },
     },
   },
   scaleAssessments: {
-    include: { scale: true },
+    select: {
+      id: true,
+      scaleId: true,
+      status: true,
+      result: true,
+      completedAt: true,
+      totalTime: true,
+      scale: { select: { code: true, name: true } },
+    },
+    orderBy: { startedAt: 'asc' as const },
   },
-  formAnswers: true,
+  formAnswers: {
+    select: {
+      formItemId: true,
+      value: true,
+      status: true,
+    },
+  },
 } as const
 
 export type QuestionnaireProgressResult = {
@@ -87,11 +187,14 @@ export const applyQuestionnaireProgressDelta = async (
 export const refreshQuestionnaireProgress = async (
   db: DatabaseClient,
   questionnaireAssessmentId: string,
+  loadedAssessment?: QuestionnaireProgressSnapshot,
 ): Promise<QuestionnaireProgressResult | null> => {
-  const qa = await db.questionnaireAssessment.findUnique({
-    where: { id: questionnaireAssessmentId },
-    include: questionnaireProgressInclude,
-  })
+  const qa = loadedAssessment?.id === questionnaireAssessmentId
+    ? loadedAssessment
+    : await db.questionnaireAssessment.findUnique({
+        where: { id: questionnaireAssessmentId },
+        select: questionnaireProgressSelect,
+      }) as QuestionnaireProgressSnapshot | null
 
   if (!qa) return null
 
@@ -146,8 +249,8 @@ export const refreshQuestionnaireProgress = async (
 
     const current = await db.questionnaireAssessment.findUnique({
       where: { id: questionnaireAssessmentId },
-      include: questionnaireProgressInclude,
-    })
+      select: questionnaireProgressSelect,
+    }) as QuestionnaireProgressSnapshot | null
     if (!current) return null
     return current.status === 'COMPLETED'
       ? resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
@@ -194,8 +297,8 @@ export const refreshQuestionnaireProgress = async (
   // report in the caller.
   const current = await db.questionnaireAssessment.findUnique({
     where: { id: questionnaireAssessmentId },
-    include: questionnaireProgressInclude,
-  })
+    select: questionnaireProgressSelect,
+  }) as QuestionnaireProgressSnapshot | null
   if (!current) return null
   if (current.status === 'COMPLETED') {
     return resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
@@ -207,7 +310,10 @@ export const refreshQuestionnaireProgress = async (
 export const withSerializableQuestionnaireTransaction = async <T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
-  const maxAttempts = 3
+  // A completion burst for one questionnaire can create transient SSI
+  // conflicts even when each student owns a different assessment row. Keep
+  // the retry bounded while allowing a few waves to drain through the pool.
+  const maxAttempts = 5
   const isSerializationConflict = (err: any): boolean => (
     err?.code === 'P2034'
     // Prisma exposes serialization failures raised by a raw query as P2010;
@@ -240,6 +346,11 @@ export const withSerializableQuestionnaireTransaction = async <T>(
         return callback(tx)
       }, {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        // Completion is a short, bounded mutation. Allow a burst to wait for
+        // a pool slot long enough to satisfy the 200-user completion gate,
+        // while still failing rather than holding a transaction indefinitely.
+        maxWait: 10_000,
+        timeout: 15_000,
       }))
     } catch (err: any) {
       if (!isSerializationConflict(err) || attempt === maxAttempts) throw err
@@ -271,7 +382,7 @@ export const withQuestionnaireAnswerTransaction = async <T>(
       requestedAt,
       acquiredAt,
     )
-    await measureRequestPhase('row_lock_wait', () => tx.$queryRaw<Array<{ id: string }>>`
+    await measureRequestPhase('row_lock_roundtrip', () => tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id"
       FROM "questionnaire_assessments"
       WHERE "session_id" = ${sessionId}

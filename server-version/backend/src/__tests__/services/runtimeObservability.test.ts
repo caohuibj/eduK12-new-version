@@ -64,6 +64,48 @@ describe('runtime observability', () => {
     expect(metrics).toContain('phase="response"')
   })
 
+  it('classifies slow requests by the exclusive dominant phase', async () => {
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      path: '/api/assessments/session-123/answer',
+      baseUrl: '/api',
+      route: { path: '/assessments/:sessionId/answer' },
+    } as any
+    let phaseWork: Promise<void> | undefined
+
+    requestObservabilityMiddleware(request, response, () => {
+      phaseWork = measureRequestPhase('transaction', async () => {
+        await measureRequestPhase('answer_mutation', async () => {
+          await new Promise((resolve) => setTimeout(resolve, 550))
+        })
+      })
+    })
+    await phaseWork
+    response.emit('finish')
+
+    const metrics = metricText()
+    expect(metrics).toContain('ptool_slow_requests_total{route="/api/assessments/:sessionId/answer",threshold="500ms",dominant_phase="answer_mutation"} 1')
+    expect(metrics).not.toContain('threshold="1s"')
+  })
+
+  it('records a client disconnect as HTTP 499 instead of the default 200', () => {
+    const response = Object.assign(new EventEmitter(), { statusCode: 200, writableFinished: false }) as any
+    const request = {
+      method: 'GET',
+      path: '/api/assessments/disconnected',
+      baseUrl: '',
+      route: undefined,
+    } as any
+
+    requestObservabilityMiddleware(request, response, () => undefined)
+    response.emit('close')
+
+    const metrics = metricText()
+    expect(metrics).toContain('ptool_http_request_duration_seconds_count{method="GET",route="/api/:unmatched",status="499"} 1')
+    expect(metrics).not.toContain('route="/api/:unmatched",status="200"')
+  })
+
   it('records bounded Prisma call timings and error codes without query text', () => {
     recordPrismaCall('QuestionnaireAssessment', 'findUnique', 12)
     recordPrismaCall(undefined, '$queryRaw', 30)

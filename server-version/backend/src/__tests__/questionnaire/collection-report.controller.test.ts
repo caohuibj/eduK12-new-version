@@ -181,6 +181,13 @@ describe('collection-only questionnaire completion/report contract', () => {
     await publicQuestionnaireController.getAssessment({ params: { sessionId: 'session-1' } } as any, res)
 
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
+    expect(mockPrisma.questionnaireAssessment.findUnique).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      where: { id: 'qa-1' },
+      select: expect.objectContaining({
+        contextSnapshotEncrypted: true,
+        questionnaire: expect.objectContaining({ select: expect.objectContaining({ formItems: expect.any(Object) }) }),
+      }),
+    }))
     expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ aggregateReport: Prisma.DbNull, aggregateReportEncrypted: expect.any(String) }),
     }))
