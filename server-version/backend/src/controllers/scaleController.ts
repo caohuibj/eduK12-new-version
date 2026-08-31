@@ -69,6 +69,17 @@ const answerPreviewSchema = z.object({
   })),
 })
 
+const scaleBatchAnswerSchema = z.object({
+  checkpointSequence: z.number().int().positive().optional(),
+  answers: z.array(z.object({
+    checkpointId: z.string().min(1).optional(),
+    checkpointSequence: z.number().int().positive().optional(),
+    itemCode: z.string().min(1),
+    responseValue: z.union([z.string(), z.number().finite()]),
+    responseTimeMs: z.number().finite().nonnegative().optional(),
+  })).min(1).max(10),
+})
+
 const definitionIssuesMessage = (issues: Array<{ path: string; message: string }>): string => (
   issues.slice(0, 5).map((issue) => `${issue.path}: ${issue.message}`).join('；')
 )
@@ -791,7 +802,10 @@ export const scaleController = {
       const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
-          include: { scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
+          include: {
+            scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
+            questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
+          },
         })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
@@ -803,9 +817,12 @@ export const scaleController = {
         } catch (err) {
           return { kind: 'invalid-answer' as const, message: err instanceof Error ? err.message : '回答不合法' }
         }
-        const contextSnapshot = assessment.questionnaireAssessmentId
-          ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
-          : null
+        if (
+          assessment.questionnaireAssessmentId
+          && (!assessment.questionnaireAssessment?.contextSnapshotEncrypted || !assessment.questionnaireAssessment?.contextSnapshotHash)
+        ) {
+          await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+        }
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const answers = [...stored.answers]
@@ -831,6 +848,98 @@ export const scaleController = {
       return success(res, transactionResult.assessment, '答案已保存')
     } catch (err) {
       logger.error('提交 v2 量表答案错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, err instanceof Error ? err.message : '提交答案失败')
+    }
+  },
+
+  async submitAnswersBatchV2(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const { assessmentId } = req.params
+      const parsed = scaleBatchAnswerSchema.safeParse(req.body)
+      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+
+      const transactionResult = await withSerializableQuestionnaireTransaction(async (tx) => {
+        const assessment = await tx.assessment.findUnique({
+          where: { id: assessmentId },
+          include: {
+            scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
+            questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
+          },
+        })
+        if (!assessment) return { kind: 'not-found' as const }
+        if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+        if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+
+        const definition = scaleDefinitionFromRecord(assessment.scale)
+        const answers = parsed.data.answers.map((input) => ({
+          itemCode: input.itemCode,
+          responseValue: input.responseValue,
+          responseTimeMs: input.responseTimeMs,
+          answeredAt: new Date().toISOString(),
+        }))
+        for (const answer of answers) {
+          try {
+            validateScaleAnswer(definition, answer)
+          } catch (err) {
+            return { kind: 'invalid-answer' as const, message: err instanceof Error ? err.message : '回答不合法' }
+          }
+        }
+
+        if (
+          assessment.questionnaireAssessmentId
+          && (!assessment.questionnaireAssessment?.contextSnapshotEncrypted || !assessment.questionnaireAssessment?.contextSnapshotHash)
+        ) {
+          await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
+        }
+
+        const stored = readScaleAnswers(assessment.answers)
+        if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const merged = [...stored.answers]
+        for (const answer of answers) {
+          const existingIndex = merged.findIndex((candidate) => candidate.itemCode === answer.itemCode)
+          const previous = existingIndex >= 0 ? merged[existingIndex] : undefined
+          const isReplay = Boolean(
+            previous
+            && Object.is(previous.responseValue, answer.responseValue)
+            && previous.responseTimeMs === answer.responseTimeMs,
+          )
+          const nextAnswer = isReplay
+            ? previous!
+            : { ...answer, changeCount: (previous?.changeCount ?? -1) + 1 }
+          if (existingIndex >= 0) merged[existingIndex] = nextAnswer
+          else merged.push(nextAnswer)
+        }
+        const progress = definition.items.length === 0
+          ? 100
+          : Math.round((new Set(merged.map((candidate) => candidate.itemCode)).size / definition.items.length) * 100)
+        const updated = await tx.assessment.updateMany({
+          where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
+          data: { answers: encryptScaleAnswers(merged), progress },
+        })
+        if (updated.count !== 1) return { kind: 'ended' as const }
+        return {
+          kind: 'saved' as const,
+          progress,
+          acceptedIds: parsed.data.answers.flatMap((answer) => answer.checkpointId ? [answer.checkpointId] : []),
+          acceptedSequences: parsed.data.answers.flatMap((answer) => answer.checkpointSequence ? [answer.checkpointSequence] : []),
+        }
+      })
+
+      if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')
+      if (transactionResult.kind === 'forbidden') return forbidden(res, '无权限操作此测评')
+      if (transactionResult.kind === 'ended') return error(res, '测评已结束')
+      if (transactionResult.kind === 'decrypt-error') return error(res, '测评答案无法读取，请联系管理员')
+      if (transactionResult.kind === 'invalid-answer') return error(res, transactionResult.message)
+      return success(res, {
+        saved: parsed.data.answers.length,
+        progress: transactionResult.progress,
+        acceptedIds: transactionResult.acceptedIds,
+        acceptedSequences: transactionResult.acceptedSequences,
+      }, '答案已保存')
+    } catch (err) {
+      logger.error('批量提交 v2 量表答案错误', err)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       return error(res, err instanceof Error ? err.message : '提交答案失败')
     }

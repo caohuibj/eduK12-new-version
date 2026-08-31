@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
@@ -6,6 +6,9 @@ import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
 import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
+import { checkpointScheduler } from '../../services/persistence/checkpointScheduler'
+import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
+import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
 
 type ResponseValue = string | number
 
@@ -74,6 +77,19 @@ interface QuestionnaireAssessmentData {
   sessionId: string
 }
 
+interface QuestionnaireCheckpointPayload {
+  formItemId: string
+  action: 'answer' | 'skip'
+  value?: string
+}
+
+interface QuestionnaireScaleCheckpointPayload {
+  scaleAssessmentId: string
+  itemCode: string
+  responseValue: ResponseValue
+  responseTimeMs: number
+}
+
 const parseFormOptions = (options: FormItem['options']): FormOption[] => {
   if (Array.isArray(options)) return options
   if (typeof options !== 'string') return []
@@ -109,6 +125,46 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   const [recoveryState, setRecoveryState] = useState<'recovering' | 'ready' | 'recoverFailed' | 'retrying'>('recovering')
   const [runnerError, setRunnerError] = useState<string | null>(null)
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
+
+  const questionnaireCheckpointTransport = useCallback(async (batch: CheckpointBatch<QuestionnaireCheckpointPayload>) => {
+    const response = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      .patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(`/assessments/${batch.scopeId}/form-answers/batch`, {
+        checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
+        answers: batch.records.map((record) => ({
+          ...record.payload,
+          checkpointId: record.id,
+          checkpointSequence: record.sequence,
+        })),
+      })
+    return response.data || {}
+  }, [sessionId, token])
+
+  const scaleCheckpointTransport = useCallback(async (batch: CheckpointBatch<QuestionnaireScaleCheckpointPayload>) => {
+    const response = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      .patch<{ acceptedIds?: string[]; acceptedSequences?: number[] }>(`/assessments/${batch.scopeId}/answers/batch`, {
+        checkpointSequence: batch.records[batch.records.length - 1]?.sequence,
+        answers: batch.records.map((record) => ({
+          ...record.payload,
+          checkpointId: record.id,
+          checkpointSequence: record.sequence,
+        })),
+      })
+    return response.data || {}
+  }, [sessionId, token])
+
+  const registerQuestionnairePersistence = useCallback((assessmentId: string) => {
+    checkpointScheduler.register('questionnaire', assessmentId, questionnaireCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+  }, [questionnaireCheckpointTransport])
+
+  const registerScalePersistence = useCallback((assessmentId: string) => {
+    checkpointScheduler.register('scale', assessmentId, scaleCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+  }, [scaleCheckpointTransport])
+
+  const flushCheckpoints = useCallback(async () => {
+    await checkpointScheduler.flushAll()
+  }, [])
+
+  useCheckpointLifecycle(flushCheckpoints, Boolean(data))
 
   const freezeContextBeforeScale = async (): Promise<{ status: 'frozen'; frozenAt: string }> => {
     const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
@@ -154,8 +210,14 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       }
 
       let nextData = result.data as QuestionnaireAssessmentData
+      const questionnaireScopeId = sessionId || nextData.questionnaireAssessment.id
+      registerQuestionnairePersistence(questionnaireScopeId)
+      void checkpointScheduler.flush('questionnaire', questionnaireScopeId).catch((err) => {
+        setRunnerError(normalizeApiError(err).message)
+      })
       const currentScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
       if (currentScaleAssessmentId) {
+        registerScalePersistence(currentScaleAssessmentId)
         const frozen = await freezeContextBeforeScale()
         nextData = {
           ...nextData,
@@ -187,6 +249,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   }
 
   const fetchExistingAnswers = async (assessmentId: string) => {
+    registerScalePersistence(assessmentId)
     setAnswersLoading(true)
     try {
       const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
@@ -195,6 +258,11 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       for (const answer of result.data.answers ?? []) {
         existingAnswers[answer.itemCode] = answer.responseValue
       }
+      const pending = await checkpointScheduler.pending('scale', assessmentId)
+      pending.forEach((record) => {
+        const payload = record.payload as QuestionnaireScaleCheckpointPayload
+        existingAnswers[payload.itemCode] = payload.responseValue
+      })
       setAnswers(existingAnswers)
     } catch (err) {
       console.error('获取已有答案失败', err)
@@ -219,13 +287,16 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
     try {
       await runSave(async () => {
-        await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-          .patch(`/assessments/${sessionId}/answers`, {
+        await checkpointScheduler.enqueue({
+          scopeType: 'scale',
+          scopeId: data.currentScale!.scaleAssessmentId,
+          payload: {
             scaleAssessmentId: data.currentScale!.scaleAssessmentId,
             itemCode: item.itemCode,
             responseValue: value,
             responseTimeMs: responseTime,
-          })
+          },
+        }, scaleCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
         setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
         setRunnerError(null)
         if (scaleIndex < items.length - 1) {
@@ -278,12 +349,18 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         ? JSON.stringify(formAnswer) 
         : formAnswer
       
-      // 保存表单答案
-      await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-        .post(`/assessments/${sessionId}/form-answer`, {
+      await checkpointScheduler.enqueue({
+        scopeType: 'questionnaire',
+        scopeId: sessionId || data.questionnaireAssessment.id,
+        payload: {
           formItemId: formItem.id,
-          ...(action === 'skip' ? { action: 'skip' } : { action: 'answer', value: valueToSubmit }),
-        })
+          ...(action === 'skip' ? { action: 'skip' as const } : { action: 'answer' as const, value: valueToSubmit }),
+        },
+      }, questionnaireCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
+      await checkpointScheduler.flush('questionnaire', sessionId || data.questionnaireAssessment.id)
+      const pending = await checkpointScheduler.pending('questionnaire', sessionId || data.questionnaireAssessment.id)
+      if (pending.length > 0) throw new Error('表单答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('questionnaire', sessionId || data.questionnaireAssessment.id)
 
       // 进入下一个内容项
       await moveToNextItem()
@@ -315,6 +392,10 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
     try {
       setSubmitting(true)
+      await checkpointScheduler.flush('scale', data.currentScale.scaleAssessmentId)
+      const pending = await checkpointScheduler.pending('scale', data.currentScale.scaleAssessmentId)
+      if (pending.length > 0) throw new Error('量表答案仍在同步，请稍后重试')
+      await checkpointScheduler.purgeExpired('scale', data.currentScale.scaleAssessmentId)
       // 完成当前量表
       await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
         .post(`/assessments/${sessionId}/scale/complete`, {
@@ -344,6 +425,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       if (result.data.questionnaireAssessment.status === 'COMPLETED' ||
           result.data.questionnaireAssessment.currentIndex >= result.data.totalItems) {
         // 所有内容完成
+        await checkpointScheduler.purgeExpired('questionnaire', result.data.questionnaireAssessment.id)
         await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
           .post(`/assessments/${sessionId}/complete`)
         navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)
@@ -352,6 +434,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
         let nextData = result.data as QuestionnaireAssessmentData
         const nextScaleAssessmentId = nextData.currentScale?.scaleAssessmentId
         if (nextScaleAssessmentId) {
+          registerScalePersistence(nextScaleAssessmentId)
           const frozen = await freezeContextBeforeScale()
           nextData = {
             ...nextData,

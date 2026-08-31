@@ -87,6 +87,12 @@ export interface CompositeAttemptState {
   context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
 }
 
+export interface CompositeMutationAck {
+  saved?: boolean
+  completed?: boolean
+  finalized?: boolean
+}
+
 export interface CompositePublicInfo {
   id: string
   name: string

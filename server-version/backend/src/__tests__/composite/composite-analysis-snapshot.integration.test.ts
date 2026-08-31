@@ -28,6 +28,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import {
+  finalizeCompositeAttemptIfReady,
   getAttemptState,
   getDefaultPackageAnalysisSnapshot,
   reanalyzePackageAttempt,
@@ -97,6 +98,7 @@ beforeEach(() => {
 
 describe('PR8 Attempt finalization boundary', () => {
   it('completes collection-only attempts without creating an analysis snapshot', async () => {
+    await finalizeCompositeAttemptIfReady('attempt-1')
     const result = await getAttemptState('attempt-1', { userId: 'student-1' })
 
     expect(result).toMatchObject({
@@ -122,7 +124,8 @@ describe('PR8 Attempt finalization boundary', () => {
       },
     })
 
-    await expect(getAttemptState('attempt-1', { userId: 'student-1' })).rejects.toThrow()
+    await expect(finalizeCompositeAttemptIfReady('attempt-1')).rejects.toThrow()
+    await expect(getAttemptState('attempt-1', { userId: 'student-1' })).resolves.toMatchObject({ status: 'IN_PROGRESS' })
     expect(stateRef.current.status).toBe('IN_PROGRESS')
     expect(mockPrisma.compositeAnalysisSnapshot.upsert).not.toHaveBeenCalled()
     expect(mockPrisma.compositeAssessmentAttempt.update).not.toHaveBeenCalled()

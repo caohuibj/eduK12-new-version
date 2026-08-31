@@ -33,6 +33,7 @@ vi.mock('../../modules/composite/composite-analysis-snapshot.service', async (im
 }))
 
 import {
+  finalizeCompositeAttemptIfReady,
   getAttemptState,
   reanalyzePackageAttempt,
 } from '../../modules/composite/composite.service'
@@ -147,6 +148,7 @@ beforeEach(() => {
 
 describe('PR8 package completion transaction', () => {
   it('writes the completion snapshot before marking the Attempt completed and is idempotent', async () => {
+    await finalizeCompositeAttemptIfReady('attempt-1')
     const result = await getAttemptState('attempt-1', { userId: 'student-1' })
 
     expect(result.status).toBe('COMPLETED')
@@ -159,7 +161,7 @@ describe('PR8 package completion transaction', () => {
     expect(mockPrisma.compositeAssessmentAttempt.update.mock.invocationCallOrder[0])
       .toBeGreaterThan(mockPrisma.compositeAnalysisSnapshot.upsert.mock.invocationCallOrder[0])
 
-    await getAttemptState('attempt-1', { userId: 'student-1' })
+    await finalizeCompositeAttemptIfReady('attempt-1')
     expect(mockPrisma.compositeAnalysisSnapshot.upsert).toHaveBeenCalledTimes(1)
   })
 

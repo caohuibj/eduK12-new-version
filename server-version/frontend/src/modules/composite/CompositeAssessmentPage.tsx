@@ -180,7 +180,7 @@ const CompositeAssessmentPage: React.FC = () => {
         responseValue: value,
         responseTimeMs: Math.max(0, Date.now() - scaleItemStartTimeRef.current),
       })
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '答案保存失败')
+      if (response.code !== 0) throw new Error(response.message || '答案保存失败')
       if (scaleIndex < items.length - 1) setScaleIndex((index) => index + 1)
     } catch (err) {
       setError((err as { message?: string }).message || '答案保存失败')
@@ -192,8 +192,8 @@ const CompositeAssessmentPage: React.FC = () => {
     try {
       setSubmitting(true)
       const response = await api.completeScale(state.id, state.currentItem.id)
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '量表提交失败')
-      applyState(await freezeBeforeMeasurement(response.data))
+      if (response.code !== 0) throw new Error(response.message || '量表提交失败')
+      await loadAttempt(state.id)
     } catch (err) {
       setError((err as { message?: string }).message || '量表提交失败')
     } finally {
@@ -206,10 +206,10 @@ const CompositeAssessmentPage: React.FC = () => {
     try {
       setSubmitting(true)
       const response = await api.formAnswer(state.id, state.currentItem.id, formValue)
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '表单提交失败')
-      // Context is owned by the parent attempt. Freeze it once the next
-      // module begins, so all later scale/cognitive modules share one snapshot.
-      applyState(await freezeBeforeMeasurement(response.data))
+      if (response.code !== 0) throw new Error(response.message || '表单提交失败')
+      // The write endpoint returns an ACK. Reload once at the module boundary
+      // so navigation uses authoritative parent and child state.
+      await loadAttempt(state.id)
     } catch (err) {
       setError((err as { message?: string }).message || '表单提交失败')
     } finally {

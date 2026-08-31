@@ -131,6 +131,21 @@ export const cognitivePublicTrialSchema = z.object({
   payload: z.any(),
 }).strict()
 
+export const appendTrialsSchema = z.object({
+  trials: z.array(z.object({
+    trialIndex: z.number().int().min(0),
+    payload: z.any(),
+  }).strict()).min(1).max(10),
+}).strict()
+
+export const cognitivePublicTrialsSchema = z.object({
+  recoveryToken: z.string().min(20).max(200),
+  trials: z.array(z.object({
+    trialIndex: z.number().int().min(0),
+    payload: z.any(),
+  }).strict()).min(1).max(10),
+}).strict()
+
 export const cognitivePublicRecoverySchema = z.object({
   recoveryToken: z.string().min(20).max(200),
 }).strict()

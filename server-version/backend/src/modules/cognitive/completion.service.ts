@@ -227,7 +227,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
 }
 
 const completeSessionWithPrincipal = async (userId: string | null, sessionId: string, recoveryTokenHash?: string) => {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // 行锁：串行化 complete 与 append/restart，保证评分数据集冻结。
     const session = await lockSession(tx, sessionId)
     if (!session) throw NOT_FOUND('CognitiveSession not found')
@@ -349,6 +349,19 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
       validatedConfig as Record<string, unknown>,
     )
   })
+
+  // Composite parent completion is deliberately outside the child-session
+  // transaction: the cognitive result is already durable, while the parent
+  // finalization can safely retry through its own serialized transaction.
+  const compositeLink = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    select: { compositeAttemptId: true },
+  })
+  if (compositeLink?.compositeAttemptId) {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await finalizeCompositeAttemptIfReady(compositeLink.compositeAttemptId)
+  }
+  return result
 }
 
 export const completeSession = async (userId: string, sessionId: string) =>

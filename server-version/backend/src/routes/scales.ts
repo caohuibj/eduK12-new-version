@@ -27,6 +27,7 @@ router.get('/tags', authenticate, scaleController.getTags)
 router.post('/:scaleId/assessments', authenticate, requireStudent, scaleController.startAssessmentV2)
 
 // 提交答案
+router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, scaleController.submitAnswersBatchV2)
 router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, scaleController.submitAnswerV2)
 
 // 完成测评

@@ -141,6 +141,12 @@ export const getSession = async (sessionId: string, recoveryToken: string) =>
 export const appendTrial = async (sessionId: string, recoveryToken: string, input: { trialIndex: number; payload?: unknown }) =>
   trialService.appendTrialForPublic(sessionId, hashRecoveryToken(recoveryToken), input)
 
+export const appendTrials = async (
+  sessionId: string,
+  recoveryToken: string,
+  inputs: Array<{ trialIndex: number; payload?: unknown }>,
+) => trialService.appendTrialsForPublic(sessionId, hashRecoveryToken(recoveryToken), inputs)
+
 export const completeSession = async (sessionId: string, recoveryToken: string) =>
   completionService.completeSessionForPublic(sessionId, hashRecoveryToken(recoveryToken))
 
