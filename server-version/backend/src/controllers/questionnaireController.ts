@@ -32,6 +32,8 @@ import { utcHalfOpenDateFilter } from '../services/exportService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-concurrency'
+import { measureRequestPhase } from '../services/runtimeObservability'
+import { persistFormAnswerBatch, questionnaireFormItemAnswerSelect } from '../services/questionnaire-form-answer-batch'
 import { cacheService } from '../services/cacheService'
 import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
 
@@ -1344,53 +1346,98 @@ export const questionnaireController = {
       }
 
       const { answers } = result.data
+      const requestedFormItemIds = [...new Set(answers.map((answer) => answer.formItemId))]
 
-      const outcome = await withQuestionnaireAssessmentAnswerTransaction(assessmentId, async (tx) => {
-        const qa = await tx.questionnaireAssessment.findUnique({
-          where: { id: assessmentId },
-          include: {
-            questionnaire: {
-              include: {
-                formItems: true,
-                questionnaireScales: { select: { id: true } },
+      // Form definitions are immutable for a published course questionnaire.
+      // Read only the requested answer fields before taking the assessment row
+      // lock so validation and JSON normalization do not extend the write
+      // transaction.
+      const answerDefinitions = await measureRequestPhase('definition_lookup', () => prisma.questionnaireAssessment.findUnique({
+        where: { id: assessmentId },
+        select: {
+          questionnaire: {
+            select: {
+              formItems: {
+                where: { id: { in: requestedFormItemIds } },
+                select: questionnaireFormItemAnswerSelect,
+              },
+              _count: {
+                select: {
+                  formItems: true,
+                  questionnaireScales: true,
+                },
               },
             },
           },
-        })
+        },
+      }))
+
+      if (!answerDefinitions) return notFound(res, '问卷测评不存在')
+
+      const formItemsById = new Map(answerDefinitions.questionnaire.formItems.map((item) => [item.id, item]))
+      if (answers.some((answer) => !formItemsById.has(answer.formItemId))) {
+        return error(res, '表单题目不存在')
+      }
+
+      let validationFailure:
+        | { kind: 'skip-not-allowed' }
+        | { kind: 'invalid-context-answer'; message: string }
+        | null = null
+      for (const answer of answers) {
+        const item = formItemsById.get(answer.formItemId)!
+        const action = answer.action || 'answer'
+        if (action === 'skip' && (item.required || item.contextKey)) {
+          validationFailure = { kind: 'skip-not-allowed' }
+          break
+        }
+        if (action === 'answer') {
+          const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
+          if (validationMessage) {
+            validationFailure = { kind: 'invalid-context-answer', message: validationMessage }
+            break
+          }
+        }
+      }
+
+      const totalItems = answerDefinitions.questionnaire._count.formItems
+        + answerDefinitions.questionnaire._count.questionnaireScales
+
+      const outcome = await withQuestionnaireAssessmentAnswerTransaction(assessmentId, async (tx) => {
+        const qa = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
+          where: { id: assessmentId },
+          select: {
+            id: true,
+            userId: true,
+            status: true,
+            progress: true,
+            completedScales: true,
+            completedForms: true,
+            contextSnapshotEncrypted: true,
+            contextSnapshotHash: true,
+          },
+        }))
 
         if (!qa) return { kind: 'not-found' as const }
         if (qa.userId !== userId) return { kind: 'forbidden' as const }
         if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
         if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
 
-        const formItemIds = new Set(qa.questionnaire.formItems.map((item) => item.id))
-        if (answers.some((answer) => !formItemIds.has(answer.formItemId))) {
-          return { kind: 'form-not-found' as const }
-        }
-
         if (qa.contextSnapshotEncrypted || qa.contextSnapshotHash) {
-          const contextIds = new Set(qa.questionnaire.formItems.filter((item) => item.contextKey).map((item) => item.id))
-          if (answers.some((answer) => contextIds.has(answer.formItemId))) return { kind: 'context-frozen' as const }
-        }
-        for (const answer of answers) {
-          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
-          const action = answer.action || 'answer'
-          if (action === 'skip' && (item?.required || item?.contextKey)) return { kind: 'skip-not-allowed' as const }
-          if (action === 'answer' && item) {
-            const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
-            if (validationMessage) return { kind: 'invalid-context-answer' as const, message: validationMessage }
+          if (answers.some((answer) => formItemsById.get(answer.formItemId)?.contextKey)) {
+            return { kind: 'context-frozen' as const }
           }
         }
+        if (validationFailure) return validationFailure
 
-        const existingAnswers = await tx.questionnaireFormAnswer.findMany({
+        const existingAnswers = await measureRequestPhase('existing_answer_lookup', () => tx.questionnaireFormAnswer.findMany({
           where: {
             questionnaireAssessmentId: assessmentId,
-            formItemId: { in: [...new Set(answers.map((answer) => answer.formItemId))] },
+            formItemId: { in: requestedFormItemIds },
           },
           select: { formItemId: true, status: true, value: true, revision: true },
-        })
+        }))
         const revisionAnswers = existingAnswers.map((answer) => {
-          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
+          const item = formItemsById.get(answer.formItemId)
           return {
             ...answer,
             value: answer.value === null
@@ -1399,8 +1446,7 @@ export const questionnaireController = {
           }
         })
         const preparedInputs = answers.map((answer) => {
-          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
-          if (!item) return null
+          const item = formItemsById.get(answer.formItemId)!
           const action = answer.action || 'answer'
           const answerStatus = action === 'skip' ? 'SKIPPED' as const : 'ANSWERED' as const
           const normalizedValue = action === 'answer' && answer.value !== undefined
@@ -1415,48 +1461,51 @@ export const questionnaireController = {
             status: answerStatus,
             expectedRevision: answer.expectedRevision,
           }
-        }).filter((answer): answer is NonNullable<typeof answer> => answer !== null)
+        })
         const prepared = prepareFormAnswerChanges(revisionAnswers, preparedInputs)
         if (prepared.kind === 'stale') return { kind: 'stale-answer' as const }
+
+        // Prepare duplicate item IDs in order, but write only the final state
+        // for each unique key. This preserves every local revision increment
+        // while keeping one SQL statement independent of batch size.
+        const finalChangeByItem = new Map(
+          prepared.changes.map((change) => [change.input.formItemId, change]),
+        )
+        const mutationByItem = new Map(
+          prepared.changes
+            .filter((change) => !change.replay)
+            .map((change) => [change.input.formItemId, change]),
+        )
         let completedFormsDelta = 0
 
-        for (const change of prepared.changes) {
-          const answer = change.input
-          const item = qa.questionnaire.formItems.find((candidate) => candidate.id === answer.formItemId)
-          if (!item) return { kind: 'form-not-found' as const }
-          if (change.replay) continue
-          const wasComplete = isFormAnswerComplete(item, change.previous)
-          const value = answer.value
-          const formAnswer = await tx.questionnaireFormAnswer.upsert({
-            where: {
-              questionnaireAssessmentId_formItemId: {
-                questionnaireAssessmentId: assessmentId,
-                formItemId: answer.formItemId,
-              },
-            },
-            create: {
-              questionnaireAssessmentId: assessmentId,
-              formItemId: answer.formItemId,
-              value: value === null ? null : writeContextFormAnswer(item.contextKey, value),
-              status: answer.status,
-              revision: change.next.revision ?? 1,
-            },
-            update: {
-              value: value === null ? null : writeContextFormAnswer(item.contextKey, value),
-              status: answer.status,
-              revision: { increment: 1 },
-            },
-          })
-          const isComplete = isFormAnswerComplete(item, formAnswer)
+        for (const [formItemId, change] of finalChangeByItem) {
+          const item = formItemsById.get(formItemId)!
+          const firstChange = prepared.changes.find((candidate) => candidate.input.formItemId === formItemId)!
+          const wasComplete = isFormAnswerComplete(item, firstChange.previous)
+          const isComplete = isFormAnswerComplete(item, change.next)
           completedFormsDelta += Number(isComplete) - Number(wasComplete)
         }
 
-        const progress = await applyQuestionnaireProgressDelta(
+        await measureRequestPhase('answer_mutation', () => persistFormAnswerBatch(
+          tx,
+          qa.id,
+          [...mutationByItem.values()].map((change) => {
+            const item = formItemsById.get(change.input.formItemId)!
+            return {
+              formItemId: change.input.formItemId,
+              value: change.next.value === null ? null : writeContextFormAnswer(item.contextKey, change.next.value),
+              status: change.next.status === 'SKIPPED' ? 'SKIPPED' as const : 'ANSWERED' as const,
+              revision: change.next.revision ?? 1,
+            }
+          }),
+        ))
+
+        const progress = await measureRequestPhase('progress_mutation', () => applyQuestionnaireProgressDelta(
           tx,
           qa,
           completedFormsDelta,
-          qa.questionnaire.formItems.length + qa.questionnaire.questionnaireScales.length,
-        )
+          totalItems,
+        ))
         return {
           kind: 'saved' as const,
           progress,
@@ -1470,7 +1519,6 @@ export const questionnaireController = {
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
-      if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
       if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (outcome.kind === 'invalid-context-answer') return error(res, outcome.message)

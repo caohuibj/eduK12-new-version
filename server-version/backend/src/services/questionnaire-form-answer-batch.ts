@@ -1,6 +1,21 @@
 import { Prisma } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 
+/**
+ * The only form-item fields needed while validating and persisting an answer.
+ * Keep this projection shared by authenticated and public batch paths so a
+ * batch never loads presentation-only or timestamp columns into its write
+ * transaction.
+ */
+export const questionnaireFormItemAnswerSelect = {
+  id: true,
+  type: true,
+  label: true,
+  required: true,
+  options: true,
+  contextKey: true,
+} as const
+
 export type BulkFormAnswerMutation = {
   formItemId: string
   value: string | null
