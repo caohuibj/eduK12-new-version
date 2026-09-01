@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound, completionBusy } from '../utils/response'
+import { success, error, forbidden, notFound, completionBusy, instrumentError, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
@@ -36,6 +36,10 @@ import { measureRequestPhase } from '../services/runtimeObservability'
 import { persistFormAnswerBatch, questionnaireFormItemAnswerSelect } from '../services/questionnaire-form-answer-batch'
 import { cacheService } from '../services/cacheService'
 import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
+import * as formSectionService from '../services/questionnaire-form-section.service'
+import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
+import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -342,11 +346,24 @@ export const questionnaireController = {
         return forbidden(res, '无权限查看此问卷')
       }
 
+      await formSectionService.ensureQuestionnaireFormSections(questionnaire.id)
+      const [formSections, contentUnits] = await Promise.all([
+        formSectionService.listQuestionnaireFormSections(questionnaire.id),
+        formSectionService.listQuestionnaireContentUnits(questionnaire.id),
+      ])
+      const finalOnlyEnvelope = {
+        ...questionnaire,
+        deliveryMode: 'FINAL_ONLY' as const,
+        attemptEpoch: 1,
+        formSections,
+        units: contentUnits,
+      }
+
       // Student responses receive only runner metadata and a safe definition
       // projection; scoring, transforms and report rules stay server-side.
       if (req.user?.role === UserRole.STUDENT) {
         return success(res, {
-          ...questionnaire,
+          ...finalOnlyEnvelope,
           questionnaireScales: questionnaire.questionnaireScales.map((entry: any) => ({
             ...entry,
             scale: questionnaireScaleRunner(entry.scale),
@@ -354,7 +371,7 @@ export const questionnaireController = {
         })
       }
 
-      return success(res, questionnaire)
+      return success(res, finalOnlyEnvelope)
     } catch (err) {
       logger.error('获取问卷详情错误', err)
       return error(res, '获取问卷详情失败')
@@ -499,7 +516,26 @@ export const questionnaireController = {
         }
       }
 
-      const contextIssues = validateContextFormItems(questionnaire.formItems, questionnaire.questionnaireScales.map((item) => item.position))
+      const sections = await formSectionService.ensureQuestionnaireFormSections(id)
+      const contentUnits = await formSectionService.listQuestionnaireContentUnits(id)
+      const contextSections = sections.filter((section) => (
+        section.contextSection || section.items.some((item) => item.contextKey)
+      ))
+      if (contextSections.length > 1) return error(res, '同一问卷只能有一个上下文区段')
+      if (contextSections[0] && (
+        contentUnits[0]?.type !== 'form-section' || contentUnits[0].id !== contextSections[0].id
+      )) {
+        return error(res, '人口学上下文区段必须是第一个内容单元')
+      }
+      const sectionByItem = new Map(sections.flatMap((section) => section.items.map((item) => [item.id, section] as const)))
+      const contextItems = questionnaire.formItems.map((item) => ({
+        ...item,
+        position: sectionByItem.get(item.id)?.position ?? item.position,
+      }))
+      const measurementPositions = contentUnits
+        .filter((unit) => !(contextSections[0]?.id === unit.id && unit.type === 'form-section'))
+        .map((unit) => unit.position)
+      const contextIssues = validateContextFormItems(contextItems, measurementPositions)
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       const updated = await prisma.questionnaire.update({
@@ -868,6 +904,146 @@ export const questionnaireController = {
 
   // ==================== 表单题目管理 ====================
 
+  async listFormSections(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+      return success(res, { list: await formSectionService.listQuestionnaireFormSections(req.params.id) })
+    } catch (err) {
+      logger.error('获取表单区段列表错误', err)
+      return error(res, '获取表单区段列表失败')
+    }
+  },
+
+  async createFormSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status === 'PUBLISHED') return error(res, '已发布的问卷不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).optional(),
+        position: z.number().int().min(0).optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body)
+      return success(res, await formSectionService.createQuestionnaireFormSection(req.params.id, input), '表单区段创建成功')
+    } catch (err) {
+      logger.error('创建表单区段错误', err)
+      return error(res, '创建表单区段失败')
+    }
+  },
+
+  async updateFormSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status === 'PUBLISHED') return error(res, '已发布的问卷不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).nullable().optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body)
+      return success(res, await formSectionService.updateQuestionnaireFormSection(req.params.id, req.params.sectionId, input), '表单区段已更新')
+    } catch (err) {
+      logger.error('更新表单区段错误', err)
+      return error(res, '更新表单区段失败')
+    }
+  },
+
+  async reorderFormSections(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status === 'PUBLISHED') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ sectionIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body)
+      return success(res, { list: await formSectionService.reorderQuestionnaireFormSections(req.params.id, input.sectionIds) }, '表单区段排序已更新')
+    } catch (err) {
+      logger.error('排序表单区段错误', err)
+      return error(res, '排序表单区段失败')
+    }
+  },
+
+  async reorderFormSectionItems(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status === 'PUBLISHED') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ itemIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body)
+      return success(res, { list: await formSectionService.reorderQuestionnaireFormSectionItems(req.params.id, req.params.sectionId, input.itemIds) }, '区段字段排序已更新')
+    } catch (err) {
+      logger.error('排序区段字段错误', err)
+      return error(res, '排序区段字段失败')
+    }
+  },
+
+  async assignFormItemToSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await courseQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status === 'PUBLISHED') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ sectionPosition: z.number().int().min(0).optional() }).strict().parse(req.body || {})
+      return success(res, { list: await formSectionService.assignQuestionnaireFormItemToSection(req.params.id, req.params.sectionId, req.params.itemId, input.sectionPosition) }, '字段已加入区段')
+    } catch (err) {
+      logger.error('分配区段字段错误', err)
+      return error(res, '分配区段字段失败')
+    }
+  },
+
+  async submitFinalFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const data = await formSectionService.submitQuestionnaireFormSectionFinalForUser(
+        req.params.assessmentId,
+        req.user.userId,
+        { sectionId: req.params.sectionId, ...input },
+      )
+      return success(res, data, data.replayed ? '表单区段提交已确认' : '表单区段提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('最终提交表单区段错误', err)
+      return error(res, '提交表单区段失败')
+    }
+  },
+
+  async submitFinalScale(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = finalScaleSubmitSchema.parse(req.body)
+      const data = await (await import('../modules/scale/scale-final-submit.service')).submitQuestionnaireScaleFinal(
+        req.params.assessmentId,
+        req.params.scaleAssessmentId,
+        input,
+        { userId: req.user.userId },
+      )
+      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('最终提交问卷量表错误', err)
+      return error(res, '提交量表失败')
+    }
+  },
+
+  async restartAssessment(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await formSectionService.restartQuestionnaireAssessment(req.params.id, { userId: req.user.userId })
+      return success(res, data, '问卷测评已重启')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('重启问卷测评错误', err)
+      return error(res, err instanceof Error ? err.message : '重启问卷测评失败')
+    }
+  },
+
   // 获取表单题目列表
   async listFormItems(req: Request, res: Response) {
     try {
@@ -1101,11 +1277,16 @@ export const questionnaireController = {
 
       const reorderSchema = z.object({
         items: z.array(z.object({
-          type: z.enum(['form', 'scale']),
+          type: z.enum(['form', 'scale', 'form-section', 'SCALE', 'FORM_SECTION', 'FORM']),
           id: z.string(),
-          position: z.number().int(),
-        })),
-      })
+          position: z.number().int().min(0),
+        })).optional(),
+        units: z.array(z.object({
+          type: z.enum(['scale', 'form-section', 'SCALE', 'FORM_SECTION']),
+          id: z.string(),
+          position: z.number().int().min(0),
+        })).optional(),
+      }).strict().refine((value) => Boolean(value.items || value.units), { message: '缺少内容排序列表' })
 
       const result = reorderSchema.safeParse(req.body)
       if (!result.success) {
@@ -1129,24 +1310,12 @@ export const questionnaireController = {
         return error(res, '已发布的问卷不能修改')
       }
 
-      const formIds = result.data.items.filter((item) => item.type === 'form').map((item) => item.id)
-      const scaleIds = result.data.items.filter((item) => item.type === 'scale').map((item) => item.id)
-      const [forms, scales] = await Promise.all([
-        prisma.questionnaireFormItem.findMany({ where: { id: { in: formIds }, questionnaireId: id }, select: { id: true } }),
-        prisma.questionnaireScale.findMany({ where: { id: { in: scaleIds }, questionnaireId: id }, select: { id: true } }),
-      ])
-      if (forms.length !== formIds.length || scales.length !== scaleIds.length) return error(res, '存在不属于此问卷的内容项')
-      await prisma.$transaction(async (tx) => {
-        for (const item of result.data.items) {
-          if (item.type === 'form') await tx.questionnaireFormItem.update({ where: { id: item.id }, data: { position: item.position } })
-          else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
-        }
-      })
+      await formSectionService.reorderQuestionnaireContentUnits(id, (result.data.units ?? result.data.items) as any)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('内容排序更新', { questionnaireId: id, userId })
 
-      return success(res, null, '内容排序更新成功')
+      return success(res, { units: await formSectionService.listQuestionnaireContentUnits(id) }, '内容排序更新成功')
     } catch (err) {
       logger.error('内容排序错误', err)
       return error(res, '内容排序失败')
@@ -1551,6 +1720,8 @@ export const questionnaireController = {
       if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
+      const units = await formSectionService.listQuestionnaireContentUnits(id)
+
       // 并行获取表单题目和量表
       const [formItems, scales] = await Promise.all([
         prisma.questionnaireFormItem.findMany({
@@ -1594,6 +1765,7 @@ export const questionnaireController = {
 
       return success(res, {
         list: contents,
+        units,
         total: contents.length,
       })
     } catch (err) {
@@ -1973,6 +2145,11 @@ export const questionnaireController = {
         return error(res, '问卷未发布')
       }
 
+      // Every newly entered attempt uses the final-only unit model. Existing
+      // rows are mapped by migration; this call only fills sections for form
+      // items added after the migration.
+      await formSectionService.ensureQuestionnaireFormSections(id)
+
       const questionnaire = {
         ...questionnaireMetadata,
         ...(await cacheService.getQuestionnaireStartContent(id)),
@@ -1997,6 +2174,8 @@ export const questionnaireController = {
           id: true,
           status: true,
           progress: true,
+          deliveryMode: true,
+          attemptEpoch: true,
           contextSnapshotEncrypted: true,
           contextSnapshotHash: true,
           contextFrozenAt: true,
@@ -2064,6 +2243,15 @@ export const questionnaireController = {
           }
         : null
 
+      if (existingQA?.deliveryMode === 'FINAL_ONLY') {
+        const finalState = await formSectionService.getQuestionnaireFinalAttemptState(existingQA.id)
+        if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(existingQA.id)
+          return success(res, await formSectionService.getQuestionnaireFinalAttemptState(existingQA.id), '问卷测评已完成')
+        }
+        return success(res, finalState, '继续问卷测评')
+      }
+
       if (existingQA) {
         // 构建已完成的表单答案映射
         const formAnswerMap = new Map(existingQA.formAnswers.map(fa => [fa.formItemId, fa]))
@@ -2100,6 +2288,8 @@ export const questionnaireController = {
                 status: existingQA.status,
                 progress: existingQA.progress,
                 currentIndex,
+                deliveryMode: 'LEGACY',
+                attemptEpoch: existingQA.attemptEpoch,
                 context: assessmentContextState(existingQA),
               },
               currentFormItem: currentItem.data,
@@ -2122,6 +2312,8 @@ export const questionnaireController = {
                 status: existingQA.status,
                 progress: existingQA.progress,
                 currentIndex,
+                deliveryMode: 'LEGACY',
+                attemptEpoch: existingQA.attemptEpoch,
                 context: assessmentContextState(existingQA),
               },
               currentFormItem: null,
@@ -2166,6 +2358,8 @@ export const questionnaireController = {
             status: completionResult.completion?.completed ? 'COMPLETED' : existingQA.status,
             progress: completionResult.completion?.completed ? 100 : completionResult.completion?.progress ?? existingQA.progress,
             currentIndex: contentItems.length,
+            deliveryMode: 'LEGACY',
+            attemptEpoch: existingQA.attemptEpoch,
             context: completionResult.contextState,
           },
           currentFormItem: null,
@@ -2188,6 +2382,8 @@ export const questionnaireController = {
             questionnaireId: id,
             userId: userId!,
             status: 'IN_PROGRESS',
+            deliveryMode: 'FINAL_ONLY',
+            attemptEpoch: 1,
             progress: 0,
           },
         })
@@ -2197,6 +2393,8 @@ export const questionnaireController = {
             scaleId: qs.scaleId,
             userId: userId!,
             status: 'IN_PROGRESS',
+            deliveryMode: 'FINAL_ONLY',
+            attemptEpoch: created.attemptEpoch,
             progress: 0,
             answers: encryptScaleAnswers([]),
             questionnaireAssessmentId: created.id,
@@ -2213,8 +2411,31 @@ export const questionnaireController = {
           skipDuplicates: true,
         })
 
+        const sections = await tx.questionnaireFormSection.findMany({
+          where: { questionnaireId: id },
+          select: { id: true },
+        })
+        if (sections.length > 0) {
+          await tx.questionnaireFormSectionAttempt.createMany({
+            data: sections.map((section) => ({
+              questionnaireAssessmentId: created.id,
+              sectionId: section.id,
+              attemptEpoch: created.attemptEpoch,
+            })),
+          })
+        }
+
         return created
       })
+
+      if (qa.deliveryMode === 'FINAL_ONLY') {
+        const finalState = await formSectionService.getQuestionnaireFinalAttemptState(qa.id)
+        if (finalState.totalItems === 0) {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(qa.id)
+          return success(res, await formSectionService.getQuestionnaireFinalAttemptState(qa.id), '问卷测评已完成')
+        }
+        return success(res, finalState, '开始问卷测评')
+      }
 
       // 查询刚创建的量表测评记录
       const scaleAssessments = await prisma.assessment.findMany({
@@ -2365,6 +2586,15 @@ export const questionnaireController = {
         return forbidden(res, '无权限查看此测评')
       }
 
+      if (qa.deliveryMode === 'FINAL_ONLY') {
+        const finalState = await formSectionService.getQuestionnaireFinalAttemptState(qa.id)
+        if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(qa.id)
+          return success(res, await formSectionService.getQuestionnaireFinalAttemptState(qa.id))
+        }
+        return success(res, finalState)
+      }
+
       // 合并表单题目和量表，按 position 排序
       const contentItems = [
         ...qa.questionnaire.formItems.map(fi => ({ type: 'form' as const, position: fi.position, data: fi })),
@@ -2436,6 +2666,8 @@ export const questionnaireController = {
           status: completion?.completed ? 'COMPLETED' : qa.status,
           progress: completion?.completed ? 100 : progress,
           currentIndex: allCompleted ? contentItems.length : currentIndex,
+          deliveryMode: qa.deliveryMode,
+          attemptEpoch: qa.attemptEpoch,
           startedAt: qa.startedAt,
           completedAt: completion?.completedAt ?? qa.completedAt,
           totalTime: completion?.totalTime ?? qa.totalTime,

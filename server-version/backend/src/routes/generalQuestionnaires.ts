@@ -39,7 +39,16 @@ router.put('/:id/form-items/:itemId', generalQuestionnaireController.updateFormI
 router.delete('/:id/form-items/:itemId', generalQuestionnaireController.removeFormItem)
 
 // 统一排序（表单题目和量表混合排序）
+router.get('/:id/content', generalQuestionnaireController.listContent)
 router.post('/:id/content/reorder', generalQuestionnaireController.reorderContent)
+
+// 表单区段管理
+router.get('/:id/form-sections', generalQuestionnaireController.listFormSections)
+router.post('/:id/form-sections', generalQuestionnaireController.createFormSection)
+router.put('/:id/form-sections/:sectionId', generalQuestionnaireController.updateFormSection)
+router.post('/:id/form-sections/reorder', generalQuestionnaireController.reorderFormSections)
+router.post('/:id/form-sections/:sectionId/items/reorder', generalQuestionnaireController.reorderFormSectionItems)
+router.post('/:id/form-sections/:sectionId/items/:itemId', generalQuestionnaireController.assignFormItemToSection)
 
 // 访问令牌管理
 router.get('/:id/tokens', generalQuestionnaireController.listTokens)

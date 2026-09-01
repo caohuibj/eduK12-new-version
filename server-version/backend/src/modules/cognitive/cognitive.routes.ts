@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
 import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
 import { UserRole } from '../../types'
+import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 /**
  * Cognitive 路由（D3 起）。
@@ -42,11 +43,14 @@ router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveC
 router.get('/sessions/:id', authenticate, cognitiveController.getSession)
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
+// Final-only Cognitive submit: the complete trial sequence is persisted once.
+router.post('/sessions/:id/submit', authenticate, requireRole(UserRole.STUDENT), cognitiveController.submitSessionFinal)
+
 // D5 — Append-only Trial
-router.post('/sessions/:id/trials/batch', authenticate, requireRole(UserRole.STUDENT), cognitiveController.appendTrials)
-router.post('/sessions/:id/trials', authenticate, requireRole(UserRole.STUDENT), cognitiveController.appendTrial)
+router.post('/sessions/:id/trials/batch', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/sessions/:id/trials', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 
 // D6 — Completion / Scoring
-router.post('/sessions/:id/complete', authenticate, requireRole(UserRole.STUDENT), cognitiveController.completeSession)
+router.post('/sessions/:id/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 
 export default router

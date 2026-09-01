@@ -18,6 +18,10 @@ export const error = (res: Response, message: string = '操作失败', code: num
   return res.status(statusCode).json(response)
 }
 
+export const instrumentError = (res: Response, code: string, message: string, statusCode = 409) => (
+  res.status(statusCode).json({ code, message })
+)
+
 export const unauthorized = (res: Response, message: string = '未授权') => {
   return error(res, message, -1, 401)
 }

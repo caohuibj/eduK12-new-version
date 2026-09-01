@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
-import { success, error, notFound, unauthorized } from '../../utils/response'
+import { success, error, notFound, unauthorized, instrumentError } from '../../utils/response'
 import * as service from './composite.service'
 import {
   addCompositeItemSchema,
@@ -18,6 +18,7 @@ import {
   createCompositeTokenSchema,
   listCompositeAttemptsQuerySchema,
   publicRecoverySchema,
+  reorderCompositeContentUnitsSchema,
   reorderCompositeItemsSchema,
   setCompositeReportPackageSchema,
   updateCompositeSchema,
@@ -29,6 +30,19 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { listReportPackageCatalog } from '../cognitive-analysis'
 import { buildCompositeAnalysisExport } from './composite-export.service'
+import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
+import { finalQuestionnaireFormSectionSubmitSchema } from '../../services/questionnaire-final-submit.schema'
+import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import {
+  assignCompositeFormItemToSection,
+  createCompositeFormSection,
+  listCompositeFormItems,
+  listCompositeFormSections,
+  reorderCompositeFormSectionItems,
+  reorderCompositeFormSections,
+  updateCompositeFormSection,
+  submitCompositeFormSectionFinal,
+} from './final-submit.service'
 
 const recoveryFromRequest = (req: Request): string => {
   const value = req.headers['x-recovery-token']
@@ -119,6 +133,130 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async listFormSections(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      return success(res, { list: await listCompositeFormSections(req.params.id) })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async listFormItems(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      return success(res, { list: await listCompositeFormItems(req.params.id) })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async listContent(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      return success(res, { units: await service.listCompositeContentUnits(req.params.id) })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async reorderContent(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = reorderCompositeContentUnitsSchema.parse(req.body || {})
+      const units = await service.reorderCompositeContentUnits(
+        req.user.userId,
+        req.user.role,
+        req.params.id,
+        input.units,
+      )
+      return success(res, { units }, '内容单元顺序已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async createFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const composite = await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      if (composite.status !== 'DRAFT') return error(res, '已发布的综合测评不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).optional(),
+        position: z.number().int().min(0).optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body || {})
+      return success(res, await createCompositeFormSection(req.params.id, input), '表单区段创建成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async updateFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const composite = await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      if (composite.status !== 'DRAFT') return error(res, '已发布的综合测评不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).nullable().optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body || {})
+      return success(res, await updateCompositeFormSection(req.params.id, req.params.sectionId, input), '表单区段已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async reorderFormSections(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const composite = await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      if (composite.status !== 'DRAFT') return error(res, '已发布的综合测评不能修改')
+      const input = z.object({ sectionIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body || {})
+      return success(res, { list: await reorderCompositeFormSections(req.params.id, input.sectionIds) }, '表单区段顺序已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async reorderFormSectionItems(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const composite = await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      if (composite.status !== 'DRAFT') return error(res, '已发布的综合测评不能修改')
+      const input = z.object({ itemIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body || {})
+      return success(res, { list: await reorderCompositeFormSectionItems(req.params.id, req.params.sectionId, input.itemIds) }, '区段字段顺序已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async assignFormItemToSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const composite = await service.getCompositeForTeacher(req.user.userId, req.user.role, req.params.id)
+      if (composite.status !== 'DRAFT') return error(res, '已发布的综合测评不能修改')
+      const input = z.object({ sectionPosition: z.number().int().min(0).optional() }).strict().parse(req.body || {})
+      return success(res, { list: await assignCompositeFormItemToSection(req.params.id, req.params.sectionId, req.params.itemId, input.sectionPosition) }, '字段已加入区段')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
   async removeItem(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -183,6 +321,14 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async restartAttempt(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await service.restartUserAttempt(req.user.userId, req.params.attemptId)
+      return success(res, data, '综合测评已重启')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async getAttempt(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -227,6 +373,41 @@ export const compositeController = {
       const input = compositeFormAnswerSchema.parse(req.body)
       return success(res, await service.saveFormAnswer(req.params.attemptId, req.params.itemId, input.value, { userId: req.user.userId }), '表单已保存')
     } catch (err) { return handleError(res, err) }
+  },
+
+  async submitFinalFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const data = await submitCompositeFormSectionFinal({
+        attemptId: req.params.attemptId,
+        sectionId: req.params.sectionId,
+        ...input,
+        userId: req.user.userId,
+      })
+      return success(res, data, data.replayed ? '表单区段提交已确认' : '表单区段提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async submitFinalScale(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const input = finalScaleSubmitSchema.parse(req.body)
+      const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
+      const data = await submitCompositeScaleFinal(
+        req.params.attemptId,
+        req.params.itemId,
+        input,
+        { userId: req.user.userId },
+      )
+      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
   },
 
   async report(req: Request, res: Response) {
@@ -359,6 +540,13 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async publicRestart(req: Request, res: Response) {
+    try {
+      const data = await service.restartPublicAttempt(req.params.attemptId, hashRecoveryToken(recoveryFromRequest(req)))
+      return success(res, data, '匿名综合测评已重启')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async publicAttempt(req: Request, res: Response) {
     try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
   },
@@ -397,6 +585,40 @@ export const compositeController = {
       const input = compositeFormAnswerSchema.parse(answerBody)
       return success(res, await service.saveFormAnswer(req.params.attemptId, req.params.itemId, input.value, { recoveryTokenHash: hashRecoveryToken(recoveryToken) }), '表单已保存')
     } catch (err) { return handleError(res, err) }
+  },
+
+  async publicSubmitFinalFormSection(req: Request, res: Response) {
+    try {
+      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const data = await submitCompositeFormSectionFinal({
+        attemptId: req.params.attemptId,
+        sectionId: req.params.sectionId,
+        ...input,
+        recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)),
+        userId: null,
+      })
+      return success(res, data, data.replayed ? '匿名表单区段提交已确认' : '匿名表单区段提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async publicSubmitFinalScale(req: Request, res: Response) {
+    try {
+      const input = finalScaleSubmitSchema.parse(req.body)
+      const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
+      const data = await submitCompositeScaleFinal(
+        req.params.attemptId,
+        req.params.itemId,
+        input,
+        { userId: null, recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
+      )
+      return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
   },
 
   async publicReport(req: Request, res: Response) {

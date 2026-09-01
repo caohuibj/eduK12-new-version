@@ -2,17 +2,21 @@ import { Router } from 'express'
 import { compositeController } from './composite.controller'
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
+import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 const router = Router()
 
 // 学生端（必须在 /:id 之前）
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getAttempt)
-router.post('/attempts/:attemptId/context/freeze', authenticate, requireRole(UserRole.STUDENT), compositeController.freezeContext)
-router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUDENT), compositeController.saveAttempt)
-router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), compositeController.saveScaleAnswer)
-router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), compositeController.completeScale)
-router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), compositeController.saveFormAnswer)
+router.post('/attempts/:attemptId/restart', authenticate, requireRole(UserRole.STUDENT), compositeController.restartAttempt)
+router.post('/attempts/:attemptId/context/freeze', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/attempts/:attemptId/form-sections/:sectionId/submit', authenticate, requireRole(UserRole.STUDENT), compositeController.submitFinalFormSection)
+router.post('/attempts/:attemptId/items/:itemId/scale/submit', authenticate, requireRole(UserRole.STUDENT), compositeController.submitFinalScale)
+router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.get('/attempts/:attemptId/report', authenticate, requireRole(UserRole.STUDENT), compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
@@ -28,6 +32,15 @@ router.get('/:id', authenticate, requireTeacher, compositeController.detail)
 router.patch('/:id', authenticate, requireTeacher, compositeController.update)
 router.put('/:id/report-package', authenticate, requireTeacher, compositeController.setReportPackage)
 router.post('/:id/items', authenticate, requireTeacher, compositeController.addItem)
+router.get('/:id/content', authenticate, requireTeacher, compositeController.listContent)
+router.post('/:id/content/reorder', authenticate, requireTeacher, compositeController.reorderContent)
+router.get('/:id/form-sections', authenticate, requireTeacher, compositeController.listFormSections)
+router.get('/:id/form-items', authenticate, requireTeacher, compositeController.listFormItems)
+router.post('/:id/form-sections', authenticate, requireTeacher, compositeController.createFormSection)
+router.put('/:id/form-sections/:sectionId', authenticate, requireTeacher, compositeController.updateFormSection)
+router.post('/:id/form-sections/reorder', authenticate, requireTeacher, compositeController.reorderFormSections)
+router.post('/:id/form-sections/:sectionId/items/reorder', authenticate, requireTeacher, compositeController.reorderFormSectionItems)
+router.post('/:id/form-sections/:sectionId/items/:itemId', authenticate, requireTeacher, compositeController.assignFormItemToSection)
 router.delete('/:id/items/:itemId', authenticate, requireTeacher, compositeController.removeItem)
 router.post('/:id/items/reorder', authenticate, requireTeacher, compositeController.reorderItems)
 router.post('/:id/publish', authenticate, requireTeacher, compositeController.publish)

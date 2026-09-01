@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound } from '../utils/response'
+import { success, error, forbidden, notFound, instrumentError } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
@@ -38,6 +38,8 @@ import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError }
 import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
+import { restartStandaloneScaleAssessment, submitScaleAssessmentFinal, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
+import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 
 // ==================== Validation Schemas ====================
 
@@ -726,6 +728,36 @@ export const scaleController = {
 
   // ==================== Scale Assessment v2 workflow ====================
 
+  async submitFinalAssessment(req: Request, res: Response) {
+    try {
+      const input = finalScaleSubmitSchema.safeParse(req.body)
+      if (!input.success) return error(res, input.error.errors[0].message)
+      const data = await submitScaleAssessmentFinal({
+        assessmentId: req.params.assessmentId,
+        userId: req.user?.userId ?? null,
+        ...input.data,
+      })
+      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+    } catch (err) {
+      if (isFinalScaleSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('最终提交量表错误', err)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      return error(res, err instanceof Error ? err.message : '提交量表失败')
+    }
+  },
+
+  async restartAssessmentV2(req: Request, res: Response) {
+    try {
+      if (!req.user?.userId) return forbidden(res, '请先登录')
+      const data = await restartStandaloneScaleAssessment(req.params.assessmentId, req.user.userId)
+      return success(res, data, '量表测评已重启')
+    } catch (err) {
+      if (isFinalScaleSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('重启量表测评错误', err)
+      return error(res, err instanceof Error ? err.message : '重启量表测评失败')
+    }
+  },
+
   async startAssessmentV2(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -756,14 +788,23 @@ export const scaleController = {
         if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
         return success(res, {
           assessment: scaleAssessmentForResponse(existing),
-          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
+          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
         }, '继续未完成的测评')
       }
 
       let assessment
       try {
         assessment = await prisma.assessment.create({
-          data: { scaleId, userId: userId!, status: 'IN_PROGRESS', progress: 0, answers: encryptField([]), startedAt: new Date() },
+          data: {
+            scaleId,
+            userId: userId!,
+            status: 'IN_PROGRESS',
+            deliveryMode: 'FINAL_ONLY',
+            attemptEpoch: 1,
+            progress: 0,
+            answers: encryptField([]),
+            startedAt: new Date(),
+          },
         })
       } catch (err: any) {
         // The partial unique index is the final concurrency boundary. If a
@@ -783,12 +824,12 @@ export const scaleController = {
         if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
         return success(res, {
           assessment: scaleAssessmentForResponse(assessment),
-          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
+          scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
         }, '继续未完成的测评')
       }
       return success(res, {
         assessment: scaleAssessmentForResponse(assessment),
-        scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner },
+        scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
       }, '测评已开始')
     } catch (err) {
       logger.error('开始 v2 量表测评错误', err)

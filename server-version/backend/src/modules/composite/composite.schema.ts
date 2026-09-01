@@ -94,6 +94,14 @@ export const reorderCompositeItemsSchema = z.object({
   items: z.array(z.object({ id: z.string().min(1), position: z.number().int().min(0) }).strict()).min(1),
 }).strict()
 
+export const reorderCompositeContentUnitsSchema = z.object({
+  units: z.array(z.object({
+    type: z.enum(['scale', 'cognitive', 'form-section', 'SCALE', 'COGNITIVE', 'FORM_SECTION']),
+    id: z.string().min(1),
+    position: z.number().int().min(0),
+  }).strict()).min(1),
+}).strict()
+
 export const createCompositeTokenSchema = z.object({
   expiresAt: dateTime,
   maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),

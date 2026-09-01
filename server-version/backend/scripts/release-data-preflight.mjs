@@ -45,6 +45,10 @@ const requiredTables = [
   'videos',
   'documents',
   'checkin_submissions',
+  'questionnaire_form_sections',
+  'questionnaire_form_section_attempts',
+  'composite_form_sections',
+  'composite_form_section_attempts',
 ]
 
 const assertUploadDirectory = async () => {

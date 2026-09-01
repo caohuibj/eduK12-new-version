@@ -204,8 +204,11 @@ const toRunnerPayload = (session: {
   scoringVersion: string
   configSnapshotEncrypted: string
   randomSeed: string
+  deliveryMode?: string
+  submittedAt?: Date | null
   anonymousCode?: string | null
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
+  compositeAttempt?: { contextSnapshotHash?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
   const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config
@@ -217,7 +220,9 @@ const toRunnerPayload = (session: {
     assignmentId: session.assignmentId,
     testType: session.testType,
     attemptNo: session.attemptNo,
+    attemptEpoch: session.attemptNo,
     status: session.status,
+    deliveryMode: session.deliveryMode ?? 'FINAL_ONLY',
     configVersion: session.configVersion,
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
@@ -229,7 +234,10 @@ const toRunnerPayload = (session: {
     metricDefinitions: report?.metricDefinitions ?? entry?.metricDefinitions,
     qualityDefinitions: report?.qualityDefinitions ?? entry?.qualityDefinitions,
     reportDefinition: report?.reportDefinition ?? entry?.reportDefinition,
+    ...(snapshot ? { definitionHash: snapshot.configHash } : {}),
+    contextSnapshotHash: session.compositeAttempt?.contextSnapshotHash ?? null,
     ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
+    ...(session.submittedAt ? { submittedAt: session.submittedAt } : {}),
     ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
   }
 }
@@ -293,6 +301,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
         testType: ctx.config.testType,
         attemptNo,
         status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
         configVersion: ctx.config.configVersion,
         configSnapshotEncrypted,
         engineVersion: ctx.config.engineVersion,
@@ -320,6 +329,7 @@ export const getSession = async (userId: string, sessionId: string) => {
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
+      compositeAttempt: { select: { contextSnapshotHash: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -406,7 +416,7 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { recoveryTokenHash: true, userId: true } },
+      compositeAttempt: { select: { recoveryTokenHash: true, userId: true, contextSnapshotHash: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -484,6 +494,9 @@ export const restartSession = async (userId: string, sessionId: string) => {
   const session = await prisma.cognitiveSession.findUnique({ where: { id: sessionId } })
   if (!session) throw NOT_FOUND('CognitiveSession not found')
   if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
+  if (session.compositeAttemptId) {
+    throw CONFLICT('综合测评中的认知任务必须重启整个综合测评')
+  }
   if (session.status !== 'IN_PROGRESS' || !session.assignmentId) {
     throw BAD_REQUEST('Only an IN_PROGRESS session with an assignment can be restarted')
   }
@@ -543,6 +556,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
           testType: locked.testType,
           attemptNo: newAttemptNo,
           status: 'IN_PROGRESS',
+          deliveryMode: 'FINAL_ONLY',
           configVersion: locked.configVersion,
           configSnapshotEncrypted,
           engineVersion: locked.engineVersion,
