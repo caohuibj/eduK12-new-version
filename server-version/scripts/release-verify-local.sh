@@ -172,6 +172,7 @@ export PR8_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export PR26_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export PR34_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export PR38_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+export INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export RELEASE_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export REDIS_URL="redis://127.0.0.1:${REDIS_PORT}"
 export JWT_SECRET='release-verify-jwt-secret-123456789012345678901234'
@@ -221,6 +222,7 @@ run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-relea
   src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
   src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
   src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts \
+  src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts \
   src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
   src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
   src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts

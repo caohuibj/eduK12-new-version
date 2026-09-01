@@ -18,7 +18,6 @@ let prisma: PrismaClient
 let persistOrGetPackageAnalysisSnapshot: typeof import('../../modules/composite/composite-analysis-snapshot.service')['persistOrGetPackageAnalysisSnapshot']
 let readCompletionPackageAnalysisSnapshot: typeof import('../../modules/composite/composite-analysis-snapshot.service')['readCompletionPackageAnalysisSnapshot']
 let compositeService: typeof import('../../modules/composite/composite.service')
-let cognitiveSessionService: typeof import('../../modules/cognitive/session.service')
 let encryptCognitivePayload: typeof import('../../modules/cognitive/cognitive.security')['encryptCognitivePayload']
 let getCognitiveRegistryEntry: typeof import('../../modules/cognitive/cognitive.registry')['getCognitiveRegistryEntry']
 let freezeAssignmentProfile: typeof import('../../modules/cognitive/profile-freeze')['freezeAssignmentProfile']
@@ -26,6 +25,8 @@ let buildFrozenReportPackageSnapshot: typeof import('../../modules/cognitive-ana
 let getAnalysisProtocolDefinition: typeof import('../../modules/cognitive-analysis/analysis-protocol.registry')['getAnalysisProtocolDefinition']
 let getReportPackageDefinition: typeof import('../../modules/cognitive-analysis/report-package.registry')['getReportPackageDefinition']
 let listCognitiveEvidenceMappingsForTask: typeof import('../../modules/cognitive-analysis/evidence-mapping.registry')['listCognitiveEvidenceMappingsForTask']
+let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
+let submitCompositeFormSectionFinal: typeof import('../../modules/composite/final-submit.service')['submitCompositeFormSectionFinal']
 let userId: string
 let assessmentId: string
 let attemptId: string
@@ -413,6 +414,8 @@ const createScaleAndFormCompletionFixture = async () => {
     scaleItemId: scaleItemRow.id,
     scaleQuestionId: 'PR8-1',
     formItemId: formItemRow.id,
+    attemptState: started.attempt,
+    scaleDefinitionHash: hashScaleDefinition(frozenScaleDefinition),
   }
 }
 
@@ -426,7 +429,6 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     persistOrGetPackageAnalysisSnapshot = snapshotService.persistOrGetPackageAnalysisSnapshot
     readCompletionPackageAnalysisSnapshot = snapshotService.readCompletionPackageAnalysisSnapshot
     compositeService = await import('../../modules/composite/composite.service')
-    cognitiveSessionService = await import('../../modules/cognitive/session.service')
     const cognitiveSecurity = await import('../../modules/cognitive/cognitive.security')
     const cognitiveRegistry = await import('../../modules/cognitive/cognitive.registry')
     const profileFreeze = await import('../../modules/cognitive/profile-freeze')
@@ -438,6 +440,8 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     getAnalysisProtocolDefinition = analysisRegistry.getAnalysisProtocolDefinition
     getReportPackageDefinition = analysisRegistry.getReportPackageDefinition
     listCognitiveEvidenceMappingsForTask = analysisRegistry.listCognitiveEvidenceMappingsForTask
+    submitScaleAssessmentFinal = (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal
+    submitCompositeFormSectionFinal = (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal
     const db = await import('../../config/database')
     prisma = db.prisma
 
@@ -605,32 +609,36 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     const originalReaction = fixture.sessions.find((session) => session.testType === 'reaction')
     if (!originalReaction) throw new Error('PR8 package fixture reaction Session missing')
 
-    await cognitiveSessionService.restartSession(userId, originalReaction.id)
+    const restartedAttempt = await compositeService.restartUserAttempt(userId, fixture.attemptId)
     const restartedReaction = await prisma.cognitiveSession.findFirst({
       where: {
-        compositeAttemptId: fixture.attemptId,
+        compositeAttemptId: restartedAttempt.attempt.id,
         compositeItemId: originalReaction.compositeItemId,
         status: 'IN_PROGRESS',
       },
       orderBy: { attemptNo: 'desc' },
     })
     expect(restartedReaction).toMatchObject({
-      compositeAttemptId: fixture.attemptId,
+      compositeAttemptId: restartedAttempt.attempt.id,
       compositeItemId: originalReaction.compositeItemId,
-      participantKey: originalReaction.participantKey,
+      participantKey: expect.not.stringContaining(originalReaction.participantKey),
       attemptNo: 2,
     })
     if (!restartedReaction) throw new Error('PR8 restarted reaction Session missing')
 
-    for (const session of fixture.sessions) {
+    const restartedSessions = await prisma.cognitiveSession.findMany({
+      where: { compositeAttemptId: restartedAttempt.attempt.id },
+      orderBy: { attemptNo: 'asc' },
+    })
+    for (const session of restartedSessions) {
       await markSessionCompleted(session.testType === 'reaction' ? restartedReaction : session)
     }
 
-    await compositeService.finalizeCompositeAttemptIfReady(fixture.attemptId)
-    const state = await compositeService.getAttemptState(fixture.attemptId, { userId })
+    await compositeService.finalizeCompositeAttemptIfReady(restartedAttempt.attempt.id)
+    const state = await compositeService.getAttemptState(restartedAttempt.attempt.id, { userId })
     expect(state).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 3, totalItems: 3 })
-    expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(1)
-    expect((await prisma.compositeAssessmentAttempt.findUnique({ where: { id: fixture.attemptId } }))?.status)
+    expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: restartedAttempt.attempt.id } })).toBe(1)
+    expect((await prisma.compositeAssessmentAttempt.findUnique({ where: { id: restartedAttempt.attempt.id } }))?.status)
       .toBe('COMPLETED')
   })
 
@@ -650,28 +658,32 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
   it('finalizes a collection-only Attempt through the real scale and form completion paths', async () => {
     const fixture = await createScaleAndFormCompletionFixture()
 
-    const afterAnswer = await compositeService.saveScaleAnswer(
-      fixture.attemptId,
-      fixture.scaleItemId,
-      { itemCode: fixture.scaleQuestionId, responseValue: 3 },
-      { userId },
-    )
-    expect(afterAnswer).toMatchObject({ saved: true })
+    const scaleAssessment = fixture.attemptState.currentItem?.scaleAssessmentId
+    if (!scaleAssessment) throw new Error('PR8 scale assessment missing from final-only attempt state')
+    const afterScale = await submitScaleAssessmentFinal({
+      assessmentId: scaleAssessment,
+      submissionId: `pr8-scale-submit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.scaleDefinitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: fixture.scaleQuestionId, responseValue: 3 }],
+      userId,
+    })
+    expect(afterScale).toMatchObject({ replayed: false, assessment: { status: 'COMPLETED' } })
 
-    const afterScale = await compositeService.completeScale(
-      fixture.attemptId,
-      fixture.scaleItemId,
-      { userId },
-    )
-    expect(afterScale).toMatchObject({ completed: true })
-
-    const completed = await compositeService.saveFormAnswer(
-      fixture.attemptId,
-      fixture.formItemId,
-      'fixture answer',
-      { userId },
-    )
-    expect(completed).toMatchObject({ saved: true, finalized: true })
+    const section = fixture.attemptState.formSections[0]
+    if (!section) throw new Error('PR8 form section missing from final-only attempt state')
+    const completed = await submitCompositeFormSectionFinal({
+      attemptId: fixture.attemptId,
+      sectionId: section.id,
+      submissionId: `pr8-form-submit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      attemptEpoch: 1,
+      definitionHash: section.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ formItemId: fixture.formItemId, value: 'fixture answer' }],
+      userId,
+    })
+    expect(completed).toMatchObject({ replayed: false, parent: { status: 'COMPLETED' } })
     const completedState = await compositeService.getAttemptState(fixture.attemptId, { userId })
     expect(completedState).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 2, totalItems: 2 })
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
