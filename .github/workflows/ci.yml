@@ -38,6 +38,8 @@ jobs:
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -106,6 +108,8 @@ jobs:
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
           src/__tests__/classroom/classroom-start.postgres.integration.test.ts
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
