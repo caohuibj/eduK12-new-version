@@ -70,4 +70,11 @@ describe('Cognitive v2 assessment context boundary', () => {
       { compositeAttemptId: 'attempt-1' },
     )).rejects.toThrow(/missing the frozen assessment context/)
   })
+
+  it('allows a context-free composite task to remain context-free', async () => {
+    await expect(readCognitiveAssessmentContext(
+      dbFor({ contextSnapshotEncrypted: null, contextSnapshotHash: null }),
+      { compositeAttemptId: 'attempt-1', requiresFrozenContext: false },
+    )).resolves.toEqual({ context: null, reference: null })
+  })
 })

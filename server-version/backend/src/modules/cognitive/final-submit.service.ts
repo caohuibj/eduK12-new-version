@@ -2,18 +2,19 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
   assertAttemptEpoch,
+  assertCanonicalSubmissionPayloadSize,
   assertDefinitionHash,
   assertFinalOnly,
-  assertSubmissionPayloadSize,
+  assertFinalSubmitStatus,
   assertSubmissionReplay,
-  computeSubmissionPayloadHash,
   FINAL_SUBMISSION_MAX_BYTES,
   InstrumentFinalSubmitError,
   isInstrumentFinalSubmitError,
+  prepareCanonicalSubmission,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { loadFrozenMeasurementContext } from './profile-freeze'
-import { encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { lockSession } from './session-lock'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
@@ -24,6 +25,11 @@ import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './
 import { projectThreeLayerReport } from './v2/report'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot, TrialEnvelope } from './v2/types'
+import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import {
+  refreshCompositeFinalOnlyProgress,
+  withFinalOnlyCompletionTransaction,
+} from '../../services/questionnaireProgressService'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -106,6 +112,12 @@ const assertPrincipal = (session: any, input: FinalCognitiveSubmitInput): void =
   }
 }
 
+const compositeRequiresFrozenContext = (compositeAssessment: any): boolean => Boolean(
+  compositeAssessment?.formSections?.some((section: any) => (
+    Boolean(section.contextSection) || section.items?.some((item: any) => Boolean(item.contextKey))
+  )),
+)
+
 const normalizedTrials = (definition: any, values: unknown[]): TrialEnvelope[] => {
   if (values.length === 0 || values.length > 1000) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '试次数量不符合要求', 400)
@@ -132,21 +144,33 @@ const prepareCognitivePayload = (
   session: any,
   input: FinalCognitiveSubmitInput,
 ): PreparedCognitivePayload => {
-  const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const storedConfig = measureRequestPhaseSync(
+    'final_submit_definition_prepare',
+    () => readCognitiveSessionConfig(session.configSnapshotEncrypted),
+  )
   if (!storedConfig.snapshot) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '该认知记录不是最终提交模式，请重启后重新作答', 409)
   }
   const snapshot = storedConfig.snapshot
   assertDefinitionHash(snapshot.configHash, input.definitionHash)
-  const definition = getCognitiveV2TaskDefinition(
-    session.testType,
-    session.engineVersion,
-    session.scoringVersion,
+  const definition = measureRequestPhaseSync(
+    'final_submit_definition_prepare',
+    () => getCognitiveV2TaskDefinition(
+      session.testType,
+      session.engineVersion,
+      session.scoringVersion,
+    ),
   )
   if (!definition) throw new Error(`No Cognitive v2 definition for ${session.testType}/${session.engineVersion}/${session.scoringVersion}`)
-  const trials = normalizedTrials(definition, input.trials)
-  assertSubmissionPayloadSize({ trials }, FINAL_SUBMISSION_MAX_BYTES.cognitive, '认知提交数据')
-  return { snapshot, definition, trials, payloadHash: computeSubmissionPayloadHash({ trials }) }
+  const trials = measureRequestPhaseSync(
+    'final_submit_payload_validation',
+    () => normalizedTrials(definition, input.trials),
+  )
+  const canonical = measureRequestPhaseSync('final_submit_serialization', () => (
+    measureRequestPhaseSync('final_submit_payload_hash', () => prepareCanonicalSubmission({ trials }))
+  ))
+  assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.cognitive, '认知提交数据')
+  return { snapshot, definition, trials, payloadHash: canonical.hash }
 }
 
 const prepareFinalCognitiveData = async (
@@ -155,29 +179,9 @@ const prepareFinalCognitiveData = async (
   preparedPayload: PreparedCognitivePayload = prepareCognitivePayload(session, input),
 ): Promise<FinalizedCognitiveData> => {
   const { snapshot, definition, trials, payloadHash } = preparedPayload
-  let scored
-  try {
-    // This is intentionally outside the write transaction. It validates the
-    // frozen protocol, trial continuity, payload schemas and score in one
-    // deterministic pass before any row is mutated.
-    scored = runAuthoritativeScorer({
-      definition,
-      session: snapshot,
-      trials,
-      randomSeed: session.randomSeed,
-    })
-  } catch (error) {
-    if (error instanceof InstrumentFinalSubmitError) throw error
-    throw new InstrumentFinalSubmitError(
-      'SUBMISSION_PAYLOAD_CONFLICT',
-      error instanceof Error ? error.message : '认知试次不满足完成条件',
-      400,
-    )
-  }
-
   let contextState
   try {
-    contextState = await readCognitiveAssessmentContext(prisma, session)
+    contextState = await measureRequestPhase('final_submit_context_read', () => readCognitiveAssessmentContext(prisma, session))
   } catch (error) {
     throw new InstrumentFinalSubmitError(
       'STALE_ATTEMPT',
@@ -190,9 +194,30 @@ const prepareFinalCognitiveData = async (
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评上下文版本已过期，请重启后重新作答', 409)
   }
 
+  let scored
+  try {
+    // This is intentionally outside the write transaction. It validates the
+    // frozen protocol, trial continuity, payload schemas and score in one
+    // deterministic pass before any row is mutated.
+    scored = await measureRequestPhase('final_submit_scoring', async () => runAuthoritativeScorer({
+      definition,
+      session: snapshot,
+      trials,
+      preparedTrials: trials,
+      randomSeed: session.randomSeed,
+    }))
+  } catch (error) {
+    if (error instanceof InstrumentFinalSubmitError) throw error
+    throw new InstrumentFinalSubmitError(
+      'SUBMISSION_PAYLOAD_CONFLICT',
+      error instanceof Error ? error.message : '认知试次不满足完成条件',
+      400,
+    )
+  }
+
   const references = scored.quality.state === 'invalid'
     ? []
-    : await loadCognitiveReferenceSets(prisma as any, session.testType)
+    : await measureRequestPhase('final_submit_db_query', () => loadCognitiveReferenceSets(prisma as any, session.testType))
   const resolvedReferences = scored.quality.state === 'invalid'
     ? []
     : resolveCognitiveMetricReferences({
@@ -202,7 +227,7 @@ const prepareFinalCognitiveData = async (
         context: contextState.context,
         quality: scored.quality,
       })
-  const freeze = await loadFrozenMeasurementContext(prisma, session.assignmentId)
+  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, session.assignmentId))
   const report = projectThreeLayerReport({
     testType: session.testType,
     configVersion: session.configVersion,
@@ -232,24 +257,22 @@ const prepareFinalCognitiveData = async (
     assessmentContext: contextState.reference,
   })
 
-  return {
-    payloadHash,
-    trials,
+  const encrypted = await measureRequestPhase('final_submit_encryption', async () => ({
     persistedTrials: trials.map((trial) => ({
       trialIndex: trial.trialIndex,
       payloadEncrypted: encryptCognitivePayload(trial),
       payloadHash: hashTrialPayload(trial),
     })),
-    resultSnapshot,
     resultSnapshotEncrypted: encryptCognitivePayload(resultSnapshot),
     metricsEncrypted: encryptCognitivePayload(scored.metrics),
     qualityFlagsEncrypted: encryptCognitivePayload(scored.quality.flags),
-  }
+  }))
+  return { payloadHash, trials, ...encrypted, resultSnapshot }
 }
 
 const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const session = await prisma.cognitiveSession.findUnique({
+  const session = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
     select: {
       id: true,
@@ -269,22 +292,58 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
       resultSnapshotEncrypted: true,
       submissionId: true,
       submissionPayloadHash: true,
-      compositeAttempt: { select: { userId: true, recoveryTokenHash: true } },
+      compositeAttempt: {
+        select: {
+          userId: true,
+          recoveryTokenHash: true,
+          status: true,
+          deliveryMode: true,
+          attemptEpoch: true,
+          contextSnapshotHash: true,
+          compositeAssessment: {
+            select: {
+              formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
+            },
+          },
+        },
+      },
     },
-  })
+  }))
   if (!session) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
   assertPrincipal(session, input)
   assertFinalOnly(session.deliveryMode)
   assertAttemptEpoch(session.attemptNo, input.attemptEpoch)
-
-  const payload = prepareCognitivePayload(session, input)
+  assertFinalSubmitStatus(session.status, '认知测评')
+  if (session.compositeAttempt) {
+    assertFinalOnly(session.compositeAttempt.deliveryMode)
+    assertFinalSubmitStatus(session.compositeAttempt.status, '上级测评')
+    assertAttemptEpoch(session.compositeAttempt.attemptEpoch, input.attemptEpoch)
+    if (session.compositeAttempt.status === 'COMPLETED' && session.status !== 'COMPLETED') {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
+    }
+  }
+  const requiresFrozenContext = compositeRequiresFrozenContext(session.compositeAttempt?.compositeAssessment)
+  const currentContextHash = session.compositeAttempt?.contextSnapshotHash ?? null
+  if (requiresFrozenContext && currentContextHash === null) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+  }
+  if ((input.contextSnapshotHash ?? null) !== currentContextHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
+  }
+  const sessionForPreparation = { ...session, requiresFrozenContext }
+  const payload = measureRequestPhaseSync('final_submit_non_db_compute', () => prepareCognitivePayload(sessionForPreparation, input))
   if (session.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(session, submissionId, payload.payloadHash)
     if (replay === 'replay') {
       if (!session.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
       const snapshot = parseCognitiveResultSnapshot(
-        (await import('./cognitive.security')).decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
+        decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
       )
+      const compositeAttemptId = session.compositeAttemptId
+      if (compositeAttemptId) {
+        const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+        await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(compositeAttemptId))
+      }
       return {
         submissionId,
         replayed: true,
@@ -297,31 +356,60 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
   // Context reads, reference resolution, scoring and report generation stay
   // outside the write transaction. The transaction below only persists the
   // already-prepared result after it re-checks the authoritative session row.
-  const prepared = await prepareFinalCognitiveData(session, input, payload)
-  const committed = await prisma.$transaction(async (tx) => {
-    // Embedded Cognitive always uses parent → child locking. Standalone
-    // sessions have no parent and lock only the session row.
-    if (session.compositeAttemptId) await lockCompositeParent(tx, session.compositeAttemptId)
+  const prepared = await prepareFinalCognitiveData(sessionForPreparation, input, payload)
+  const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    // FINAL_ONLY embedded writes always lock child → parent. Parent
+    // finalization runs after this transaction and never reverses the order.
     const current = await lockSession(tx, input.sessionId)
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
     assertAttemptEpoch(current.attemptNo, input.attemptEpoch)
+    assertFinalSubmitStatus(current.status, '认知测评')
+    if (current.compositeAttemptId) await lockCompositeParent(tx, current.compositeAttemptId)
+    if (current.compositeAttemptId) {
+      const parent = await tx.compositeAssessmentAttempt.findUnique({
+        where: { id: current.compositeAttemptId },
+        select: {
+          status: true,
+          deliveryMode: true,
+          attemptEpoch: true,
+          contextSnapshotHash: true,
+          compositeAssessment: {
+            select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+          },
+        },
+      })
+      if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+      assertFinalOnly(parent.deliveryMode)
+      assertFinalSubmitStatus(parent.status, '上级测评')
+      assertAttemptEpoch(parent.attemptEpoch, input.attemptEpoch)
+      if (parent.status === 'COMPLETED' && current.status !== 'COMPLETED') {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
+      }
+      const currentRequiresFrozenContext = compositeRequiresFrozenContext(parent?.compositeAssessment)
+      if (currentRequiresFrozenContext && !parent?.contextSnapshotHash) {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+      }
+      if ((input.contextSnapshotHash ?? null) !== (parent?.contextSnapshotHash ?? null)) {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
+      }
+    }
     const replay = assertSubmissionReplay(current, submissionId, prepared.payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
       if (!current.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
       const snapshot = parseCognitiveResultSnapshot(
         // The result is already durable; replay never re-runs a write.
-        (await import('./cognitive.security')).decryptCognitivePayload<unknown>(current.resultSnapshotEncrypted),
+        decryptCognitivePayload<unknown>(current.resultSnapshotEncrypted),
       )
-      return { replayed: true, payloadHash: prepared.payloadHash, response: responseFromSnapshot(current.id, snapshot) }
-    }
-    if (current.compositeAttemptId) {
-      const parent = await tx.compositeAssessmentAttempt.findUnique({
-        where: { id: current.compositeAttemptId },
-        select: { contextSnapshotHash: true },
-      })
-      if ((input.contextSnapshotHash ?? null) !== (parent?.contextSnapshotHash ?? null)) {
-        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
+      const parent = current.compositeAttemptId
+        ? await refreshCompositeFinalOnlyProgress(tx, current.compositeAttemptId)
+        : null
+      return {
+        replayed: true,
+        payloadHash: prepared.payloadHash,
+        response: responseFromSnapshot(current.id, snapshot),
+        parent,
+        shouldFinalize: Boolean(parent?.terminalCandidate),
       }
     }
     if (current.status !== 'IN_PROGRESS') {
@@ -366,18 +454,25 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
       },
     })
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评状态已变化，请重试', 409)
+    const parent = current.compositeAttemptId
+      ? await refreshCompositeFinalOnlyProgress(tx, current.compositeAttemptId)
+      : null
     return {
       replayed: false,
       payloadHash: prepared.payloadHash,
       response: responseFromSnapshot(current.id, prepared.resultSnapshot),
+      parent,
+      shouldFinalize: Boolean(parent?.terminalCandidate),
     }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+  })
 
-  if (session.compositeAttemptId) {
+  const compositeAttemptId = session.compositeAttemptId
+  if (committed.shouldFinalize && compositeAttemptId) {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await finalizeCompositeAttemptIfReady(session.compositeAttemptId)
+    await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(compositeAttemptId))
   }
-  return { submissionId, ...committed }
+  const { parent: _parent, shouldFinalize: _shouldFinalize, ...response } = committed
+  return { submissionId, ...response }
 }
 
 export const submitCognitiveSessionFinal = (userId: string, input: Omit<FinalCognitiveSubmitInput, 'userId'>) =>

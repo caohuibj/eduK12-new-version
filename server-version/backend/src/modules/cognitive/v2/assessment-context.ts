@@ -62,9 +62,9 @@ export const ensureCognitiveAssessmentContext = async (
 
 export const readCognitiveAssessmentContext = async (
   db: ContextDb,
-  session: { compositeAttemptId: string | null },
+  session: { compositeAttemptId: string | null; requiresFrozenContext?: boolean },
 ): Promise<CognitiveAssessmentContextState> => {
-  if (!session.compositeAttemptId) return { context: null, reference: null }
+  if (!session.compositeAttemptId || session.requiresFrozenContext === false) return { context: null, reference: null }
   if (!db.compositeAssessmentAttempt) throw new Error('Composite assessment context store is unavailable')
   const row = await db.compositeAssessmentAttempt.findUnique({
     where: { id: session.compositeAttemptId },

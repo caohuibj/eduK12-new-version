@@ -5,6 +5,9 @@ const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 16
 const AUTH_TAG_LENGTH = 16
 
+let cachedEncryptionKeySource: string | undefined
+let cachedEncryptionKey: Buffer | undefined
+
 // 32 字节密钥表示为 64 个十六进制字符（数据加密密钥 / 假名化密钥统一校验）。
 // 仅校验长度不足以排除非 hex 字符（如 64 个 'z'），必须用正则确保 Buffer.from(key,'hex') 得到预期密钥。
 export const HEX_32_BYTE_KEY = /^[0-9a-fA-F]{64}$/
@@ -17,11 +20,16 @@ const getEncryptionKey = (): Buffer => {
   }
   
   // 密钥应该是64个十六进制字符（32字节）
-  if (key.length !== 64) {
+  if (!HEX_32_BYTE_KEY.test(key)) {
     throw new Error('DATA_ENCRYPTION_KEY must be 64 hex characters (32 bytes)')
   }
+
+  if (cachedEncryptionKeySource === key && cachedEncryptionKey) return cachedEncryptionKey
   
-  return Buffer.from(key, 'hex')
+  const decoded = Buffer.from(key, 'hex')
+  cachedEncryptionKeySource = key
+  cachedEncryptionKey = decoded
+  return decoded
 }
 
 /**

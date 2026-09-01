@@ -8,14 +8,20 @@ import {
   assertAttemptEpoch,
   assertDefinitionHash,
   assertFinalOnly,
-  assertSubmissionPayloadSize,
+  assertFinalSubmitStatus,
+  assertCanonicalSubmissionPayloadSize,
   assertSubmissionReplay,
-  computeSubmissionPayloadHash,
+  prepareCanonicalSubmission,
   FINAL_SUBMISSION_MAX_BYTES,
   isInstrumentFinalSubmitError,
   InstrumentFinalSubmitError,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
+import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import {
+  refreshCompositeFinalOnlyProgress,
+  withFinalOnlyCompletionTransaction,
+} from '../../services/questionnaireProgressService'
 
 export type FinalScaleAnswerInput = {
   itemCode: string
@@ -101,17 +107,46 @@ const contextForAssessment = (assessment: any) => {
   return { context: null, hash: null, decryptError: false }
 }
 
-const contextHashInTransaction = async (tx: Prisma.TransactionClient, assessment: { questionnaireAssessmentId?: string | null; compositeAttemptId?: string | null }) => {
+const parentStateInTransaction = async (
+  tx: Prisma.TransactionClient,
+  assessment: { questionnaireAssessmentId?: string | null; compositeAttemptId?: string | null },
+) => {
   if (assessment.questionnaireAssessmentId) {
-    const parent = await tx.questionnaireAssessment.findUnique({ where: { id: assessment.questionnaireAssessmentId }, select: { contextSnapshotHash: true } })
-    return parent?.contextSnapshotHash ?? null
+    return tx.questionnaireAssessment.findUnique({
+      where: { id: assessment.questionnaireAssessmentId },
+      select: {
+        status: true,
+        deliveryMode: true,
+        attemptEpoch: true,
+        contextSnapshotHash: true,
+        questionnaire: {
+          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+        },
+      },
+    })
   }
   if (assessment.compositeAttemptId) {
-    const parent = await tx.compositeAssessmentAttempt.findUnique({ where: { id: assessment.compositeAttemptId }, select: { contextSnapshotHash: true } })
-    return parent?.contextSnapshotHash ?? null
+    return tx.compositeAssessmentAttempt.findUnique({
+      where: { id: assessment.compositeAttemptId },
+      select: {
+        status: true,
+        deliveryMode: true,
+        attemptEpoch: true,
+        contextSnapshotHash: true,
+        compositeAssessment: {
+          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+        },
+      },
+    })
   }
   return null
 }
+
+const hasContextSection = (parent: any): boolean => Boolean(
+  parent?.formSections?.some((section: any) => (
+    Boolean(section.contextSection) || section.items?.some((item: any) => Boolean(item.contextKey))
+  )),
+)
 
 const parentProgressUpdate = async (tx: Prisma.TransactionClient, assessment: any) => {
   if (assessment.questionnaireAssessmentId && assessment.questionnaireAssessment) {
@@ -120,52 +155,73 @@ const parentProgressUpdate = async (tx: Prisma.TransactionClient, assessment: an
       select: {
         id: true,
         status: true,
+        attemptEpoch: true,
+        progress: true,
         completedScales: true,
         completedForms: true,
-        questionnaire: { select: { questionnaireScales: { select: { id: true } }, formSections: { select: { id: true } } } },
+        questionnaire: { select: { questionnaireScales: { select: { scaleId: true } }, formSections: { select: { id: true } } } },
+        scaleAssessments: { select: { scaleId: true, status: true, attemptEpoch: true } },
+        formSectionAttempts: { select: { sectionId: true, status: true, attemptEpoch: true } },
       },
     })
-    if (!parent || parent.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评已结束', 409)
-    const totalUnits = parent.questionnaire.questionnaireScales.length + parent.questionnaire.formSections.length
-    const completedScales = (parent.completedScales ?? 0) + 1
-    const completedForms = parent.completedForms ?? 0
+    if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+    if (parent.status !== 'IN_PROGRESS') {
+      return { parent: { parentId: parent.id, progress: parent.progress }, terminalCandidate: false }
+    }
+    const scaleIds = new Set(parent.questionnaire.questionnaireScales.map((item) => item.scaleId))
+    const completedScales = new Set(parent.scaleAssessments
+      .filter((child) => scaleIds.has(child.scaleId)
+        && child.attemptEpoch === parent.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.scaleId)).size
+    const sectionIds = new Set(parent.questionnaire.formSections.map((section) => section.id))
+    const completedForms = new Set(parent.formSectionAttempts
+      .filter((attempt) => sectionIds.has(attempt.sectionId)
+        && attempt.attemptEpoch === parent.attemptEpoch
+        && attempt.status === 'COMPLETED')
+      .map((attempt) => attempt.sectionId)).size
+    const totalUnits = scaleIds.size + sectionIds.size
     const completedUnits = completedScales + completedForms
     await tx.questionnaireAssessment.update({
       where: { id: parent.id, status: 'IN_PROGRESS' },
       data: {
-        completedScales: { increment: 1 },
+        completedScales,
+        completedForms,
         progress: totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100)),
       },
     })
-    return { parentId: parent.id, progress: totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100)) }
+    return {
+      parent: {
+        parentId: parent.id,
+        progress: totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100)),
+      },
+      terminalCandidate: totalUnits > 0 && completedUnits >= totalUnits,
+    }
   }
   if (assessment.compositeAttemptId && assessment.compositeAttempt) {
-    const parent = await tx.compositeAssessmentAttempt.findUnique({
-      where: { id: assessment.compositeAttemptId },
-      select: {
-        id: true,
-        status: true,
-        completedItems: true,
-        compositeAssessment: { select: { items: { select: { type: true } }, formSections: { select: { id: true } } } },
-      },
-    })
-    if (!parent || parent.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评已结束', 409)
-    const totalUnits = parent.compositeAssessment.items.filter((item: any) => item.type !== 'FORM').length
-      + parent.compositeAssessment.formSections.length
-    const completedItems = (parent.completedItems ?? 0) + 1
-    const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedItems / totalUnits) * 100))
-    await tx.compositeAssessmentAttempt.update({
-      where: { id: parent.id, status: 'IN_PROGRESS' },
-      data: { completedItems: { increment: 1 }, progress, lastSavedAt: new Date() },
-    })
-    return { parentId: parent.id, progress }
+    const progress = await refreshCompositeFinalOnlyProgress(tx, assessment.compositeAttemptId)
+    return {
+      parent: { parentId: progress.parentId, progress: progress.progress },
+      terminalCandidate: progress.terminalCandidate,
+    }
   }
   return null
 }
 
+const finalizeLinkedParent = async (assessment: any): Promise<void> => {
+  if (assessment.compositeAttemptId) {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
+  }
+  if (assessment.questionnaireAssessmentId) {
+    const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
+    await finalizeQuestionnaireAttemptIfReady(assessment.questionnaireAssessmentId)
+  }
+}
+
 export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const assessment = await prisma.assessment.findUnique({
+  const assessment = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
     include: {
       scale: {
@@ -178,11 +234,13 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
           sessionId: true,
           resumeTokenHash: true,
           status: true,
+          deliveryMode: true,
+          attemptEpoch: true,
           completedScales: true,
           completedForms: true,
           contextSnapshotEncrypted: true,
           contextSnapshotHash: true,
-          questionnaire: { select: { questionnaireScales: { select: { id: true, position: true } }, formSections: { select: { id: true, position: true } } } },
+          questionnaire: { select: { questionnaireScales: { select: { id: true, scaleId: true, position: true } }, formSections: { select: { id: true, position: true, contextSection: true, items: { select: { contextKey: true } } } } } },
         },
       },
       compositeAttempt: {
@@ -191,32 +249,59 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
           userId: true,
           recoveryTokenHash: true,
           status: true,
+          deliveryMode: true,
+          attemptEpoch: true,
           completedItems: true,
           contextSnapshotEncrypted: true,
           contextSnapshotHash: true,
-          compositeAssessment: { select: { items: { select: { type: true } }, formSections: { select: { id: true } } } },
+          compositeAssessment: { select: { items: { select: { type: true } }, formSections: { select: { id: true, contextSection: true, items: { select: { contextKey: true } } } } } },
         },
       },
     },
-  })
+  }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
   assertPrincipal(assessment, input)
   assertFinalOnly(assessment.deliveryMode)
+  assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
+  assertFinalSubmitStatus(assessment.status, '量表测评')
+  const parentAttempt = assessment.questionnaireAssessment ?? assessment.compositeAttempt
+  if (parentAttempt) {
+    assertFinalOnly(parentAttempt.deliveryMode)
+    assertFinalSubmitStatus(parentAttempt.status, '上级测评')
+    assertAttemptEpoch(parentAttempt.attemptEpoch, input.attemptEpoch)
+    if (parentAttempt.status === 'COMPLETED' && assessment.status !== 'COMPLETED') {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
+    }
+  }
+  const contextParent = assessment.questionnaireAssessment ?? assessment.compositeAttempt
+  const contextHash = contextParent?.contextSnapshotHash ?? null
+  if (hasContextSection(assessment.questionnaireAssessment?.questionnaire || assessment.compositeAttempt?.compositeAssessment) && contextHash === null) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+  }
+  if ((input.contextSnapshotHash ?? null) !== contextHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文版本已变化，请重试', 409)
+  }
 
-  const definition = scaleDefinitionFromRecord(assessment.scale)
+  const definition = await measureRequestPhase('final_submit_definition_prepare', async () => scaleDefinitionFromRecord(assessment.scale))
   const actualDefinitionHash = hashScaleDefinition(definition)
   assertDefinitionHash(actualDefinitionHash, input.definitionHash)
-  const answers = normalizedAnswers(definition, input.answers)
+  const answers = await measureRequestPhase('final_submit_payload_validation', async () => normalizedAnswers(definition, input.answers))
   const missingRequiredItems = missingRequiredScaleItemCodes(definition, answers)
   if (missingRequiredItems.length > 0) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `还有 ${missingRequiredItems.length} 道必答题未作答`, 409)
   }
   const payload = { answers }
-  assertSubmissionPayloadSize(payload, FINAL_SUBMISSION_MAX_BYTES.scale, '量表提交数据')
-  const payloadHash = computeSubmissionPayloadHash(payload)
+  const canonical = measureRequestPhaseSync('final_submit_non_db_compute', () => (
+    measureRequestPhaseSync('final_submit_serialization', () => (
+      measureRequestPhaseSync('final_submit_payload_hash', () => prepareCanonicalSubmission(payload))
+    ))
+  ))
+  assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.scale, '量表提交数据')
+  const payloadHash = canonical.hash
   if (assessment.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(assessment, submissionId, payloadHash)
     if (replay === 'replay') {
+      await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(assessment))
       return {
         submissionId,
         payloadHash,
@@ -226,21 +311,23 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
       }
     }
   }
-  const context = contextForAssessment(assessment)
+  const context = measureRequestPhaseSync('final_submit_context_read', () => contextForAssessment(assessment))
   if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-  const result = await buildScaleResultForRecord({
+  const result = await measureRequestPhase('final_submit_scoring', () => buildScaleResultForRecord({
     scale: assessment.scale as ScaleRecord,
     answers,
     participantContext: context.context?.values,
     participantContextHash: context.hash,
-  })
-  const encryptedAnswers = encryptScaleAnswers(answers)
-  const encryptedResult = encryptScaleResult(result)
+  }))
+  const { encryptedAnswers, encryptedResult } = await measureRequestPhase('final_submit_encryption', async () => ({
+    encryptedAnswers: encryptScaleAnswers(answers),
+    encryptedResult: encryptScaleResult(result),
+  }))
 
-  const committed = await prisma.$transaction(async (tx) => {
+  const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    await lockAssessment(tx, input.assessmentId)
     if (assessment.questionnaireAssessmentId) await lockParent(tx, 'questionnaire_assessments', assessment.questionnaireAssessmentId)
     if (assessment.compositeAttemptId) await lockParent(tx, 'composite_assessment_attempts', assessment.compositeAttemptId)
-    await lockAssessment(tx, input.assessmentId)
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
       select: {
@@ -263,13 +350,41 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
     assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
-    const replay = assertSubmissionReplay(current, submissionId, payloadHash)
-    if (replay === 'replay' && current.status === 'COMPLETED') {
-      return { assessment: scaleAssessmentForResponse(current), replay: true, parent: null }
+    assertFinalSubmitStatus(current.status, '量表测评')
+    const parentState = await parentStateInTransaction(tx, current)
+    if ((current.questionnaireAssessmentId || current.compositeAttemptId) && !parentState) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
     }
-    const currentContextHash = await contextHashInTransaction(tx, current)
+    if (parentState) {
+      assertFinalOnly(parentState.deliveryMode)
+      assertFinalSubmitStatus(parentState.status, '上级测评')
+      assertAttemptEpoch(parentState.attemptEpoch, input.attemptEpoch)
+      if (parentState.status === 'COMPLETED' && current.status !== 'COMPLETED') {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
+      }
+    }
+    const currentContextHash = parentState?.contextSnapshotHash ?? null
+    const parentDefinition = parentState && 'questionnaire' in parentState
+      ? parentState.questionnaire
+      : parentState && 'compositeAssessment' in parentState
+        ? parentState.compositeAssessment
+        : null
+    const requiresContext = hasContextSection(parentDefinition)
+    if (requiresContext && currentContextHash === null) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+    }
     if ((input.contextSnapshotHash ?? null) !== currentContextHash) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文版本已变化，请重启后重新作答', 409)
+    }
+    const replay = assertSubmissionReplay(current, submissionId, payloadHash)
+    if (replay === 'replay' && current.status === 'COMPLETED') {
+      const parentProgress = await parentProgressUpdate(tx, assessment)
+      return {
+        assessment: scaleAssessmentForResponse(current),
+        replay: true,
+        parent: parentProgress?.parent ?? null,
+        shouldFinalize: parentProgress?.terminalCandidate ?? false,
+      }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
     const completedAt = new Date()
@@ -289,21 +404,17 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
       },
     })
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
-    const parent = await parentProgressUpdate(tx, assessment)
+    const parentProgress = await parentProgressUpdate(tx, assessment)
     return {
       assessment: scaleAssessmentForResponse({ ...current, status: 'COMPLETED', answers, result, progress: 100, completedAt, totalTime, submissionId, submissionPayloadHash: payloadHash, submissionCompletedAt: completedAt }),
       replay: false,
-      parent,
+      parent: parentProgress?.parent ?? null,
+      shouldFinalize: parentProgress?.terminalCandidate ?? false,
     }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+  })
 
-  if (committed.parent?.parentId && assessment.compositeAttemptId) {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await finalizeCompositeAttemptIfReady(committed.parent.parentId)
-  }
-  if (committed.parent?.parentId && assessment.questionnaireAssessmentId) {
-    const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
-    await finalizeQuestionnaireAttemptIfReady(committed.parent.parentId)
+  if (committed.shouldFinalize) {
+    await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(assessment))
   }
   return {
     submissionId,

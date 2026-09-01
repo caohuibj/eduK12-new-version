@@ -3,7 +3,12 @@ import { prisma } from '../config/database'
 import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
 import { encryptField } from '../utils/encryption'
 import { isFormAnswerComplete } from './questionnaireFormAnswerState'
-import { questionnaireCompletionAdmission, isQuestionnaireCompletionAdmissionBusyError } from './questionnaireCompletionAdmission'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  questionnaireCompletionAdmission,
+  toCompletionAdmissionBusyError,
+} from './questionnaireCompletionAdmission'
+import { InstrumentFinalSubmitError } from './instrumentFinalSubmit'
 import {
   measureRequestPhase,
   recordRequestPhase,
@@ -457,6 +462,142 @@ const runReadCommittedLockedTransaction = async <T>(
   }, {
     isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
   }))
+}
+
+/**
+ * FINAL_ONLY completion transaction.
+ *
+ * Final-only child writes and parent promotion use a short READ COMMITTED
+ * transaction. Heavy report/analysis work is prepared before entering this
+ * boundary; the callback is responsible for taking the authoritative parent
+ * lock and rechecking the child fingerprint.
+ */
+export const withFinalOnlyCompletionTransaction = async <T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
+  const requestedAt = process.hrtime.bigint()
+  let callbackFinishedAt: bigint | null = null
+  try {
+    const result = await measureRequestPhase('transaction', () => measureRequestPhase(
+      'final_submit_transaction_wall_time',
+      () => prisma.$transaction(async (tx) => {
+        const acquiredAt = process.hrtime.bigint()
+        recordRequestPhase(
+          'final_submit_transaction_wait',
+          Number(acquiredAt - requestedAt) / 1_000_000,
+          requestedAt,
+          acquiredAt,
+        )
+        const value = await callback(tx)
+        callbackFinishedAt = process.hrtime.bigint()
+        return value
+      }, {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        maxWait: 2_000,
+        timeout: 10_000,
+      }),
+    ))
+    const committedAt = process.hrtime.bigint()
+    if (callbackFinishedAt !== null && committedAt > callbackFinishedAt) {
+      recordRequestPhase(
+        'final_submit_commit',
+        Number(committedAt - callbackFinishedAt) / 1_000_000,
+        callbackFinishedAt,
+        committedAt,
+      )
+    }
+    return result
+  } catch (error) {
+    throw toCompletionAdmissionBusyError(error, 1)
+  }
+}
+
+export type FinalOnlyCompositeProgressHint = {
+  parentId: string
+  status: string
+  progress: number
+  completedItems: number
+  totalItems: number
+  terminalCandidate: boolean
+}
+
+/**
+ * Recompute the FINAL_ONLY Composite progress cache from the current child
+ * rows.  The cache is only a trigger hint; the finalizer performs the same
+ * epoch-aware check before promoting the parent to COMPLETED.
+ */
+export const refreshCompositeFinalOnlyProgress = async (
+  db: Prisma.TransactionClient,
+  attemptId: string,
+): Promise<FinalOnlyCompositeProgressHint> => {
+  const parent = await measureRequestPhase('final_submit_db_compute', () => measureRequestPhase('final_submit_db_query', () => db.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: {
+      id: true,
+      status: true,
+      deliveryMode: true,
+      attemptEpoch: true,
+      progress: true,
+      completedItems: true,
+      compositeAssessment: {
+        select: {
+          items: { select: { id: true, type: true, required: true, contextKey: true } },
+          formSections: { select: { id: true } },
+        },
+      },
+      scaleAssessments: { select: { compositeItemId: true, status: true, attemptEpoch: true } },
+      cognitiveSessions: { select: { compositeItemId: true, status: true, attemptNo: true } },
+      formSectionAttempts: { select: { sectionId: true, status: true, attemptEpoch: true } },
+    },
+  })))
+  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+
+  const items = parent.compositeAssessment.items.filter((item) => item.type !== 'FORM')
+  const itemIds = new Set(items
+    .map((item) => item.id))
+  const completedItemIds = new Set([
+    ...items
+      .filter((item) => !item.required && !item.contextKey)
+      .map((item) => item.id),
+    ...parent.scaleAssessments
+      .filter((child) => itemIds.has(child.compositeItemId ?? '')
+        && child.attemptEpoch === parent.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.compositeItemId as string),
+    ...parent.cognitiveSessions
+      .filter((child) => itemIds.has(child.compositeItemId ?? '')
+        && child.attemptNo === parent.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.compositeItemId as string),
+  ])
+  const sectionIds = new Set(parent.compositeAssessment.formSections.map((section) => section.id))
+  const completedSectionIds = new Set(parent.formSectionAttempts
+    .filter((section) => sectionIds.has(section.sectionId)
+      && section.attemptEpoch === parent.attemptEpoch
+      && section.status === 'COMPLETED')
+    .map((section) => section.sectionId))
+  const totalItems = itemIds.size + sectionIds.size
+  const completedItems = completedItemIds.size + completedSectionIds.size
+  const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))
+  const terminalCandidate = parent.deliveryMode === 'FINAL_ONLY'
+    && totalItems > 0
+    && completedItems >= totalItems
+
+  if (parent.status === 'IN_PROGRESS' && parent.deliveryMode === 'FINAL_ONLY') {
+    await db.compositeAssessmentAttempt.update({
+      where: { id: parent.id, status: 'IN_PROGRESS' },
+      data: { completedItems, progress, lastSavedAt: new Date() },
+    })
+  }
+
+  return {
+    parentId: parent.id,
+    status: parent.status,
+    progress: parent.status === 'IN_PROGRESS' ? progress : parent.progress,
+    completedItems: parent.status === 'IN_PROGRESS' ? completedItems : parent.completedItems,
+    totalItems,
+    terminalCandidate: parent.status === 'IN_PROGRESS' && terminalCandidate,
+  }
 }
 
 /** Run an ordinary scale answer mutation with a lock on its own Assessment row. */

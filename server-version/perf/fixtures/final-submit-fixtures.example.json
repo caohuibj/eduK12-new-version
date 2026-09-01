@@ -1,0 +1,130 @@
+{
+  "scale": [
+    {
+      "fixtureId": "perf-scale-independent-0001",
+      "instrument": "scale",
+      "parentKey": "perf-parent-scale-0001",
+      "method": "POST",
+      "path": "/api/scales/assessments/REPLACE_SCALE_ASSESSMENT_ID/submit",
+      "body": {
+        "submissionId": "perf-scale-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_SCALE_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": [
+          { "itemCode": "REPLACE_SCALE_ITEM_CODE", "responseValue": 1 }
+        ]
+      }
+    }
+  ],
+  "formSection": [
+    {
+      "fixtureId": "perf-form-independent-0001",
+      "instrument": "form",
+      "parentKey": "perf-parent-form-0001",
+      "method": "POST",
+      "path": "/api/questionnaires/assessments/REPLACE_QUESTIONNAIRE_ASSESSMENT_ID/form-sections/REPLACE_FORM_SECTION_ID/submit",
+      "body": {
+        "submissionId": "perf-form-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_FORM_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": []
+      }
+    }
+  ],
+  "cognitive": [
+    {
+      "fixtureId": "perf-cognitive-independent-0001",
+      "instrument": "cognitive",
+      "parentKey": "perf-parent-cognitive-0001",
+      "method": "POST",
+      "path": "/api/cognitive/sessions/REPLACE_COGNITIVE_SESSION_ID/submit",
+      "body": {
+        "submissionId": "perf-cognitive-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_COGNITIVE_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "trials": []
+      }
+    }
+  ],
+  "sameParent": [
+    {
+      "fixtureId": "perf-same-parent-child-0001",
+      "instrument": "scale",
+      "parentKey": "perf-parent-contention-0001",
+      "method": "POST",
+      "path": "/api/composite-assessments/attempts/REPLACE_CONTENTION_ATTEMPT_ID/items/REPLACE_CONTENTION_SCALE_ITEM_1_ID/scale/submit",
+      "body": {
+        "submissionId": "perf-contention-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_CONTENTION_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": [
+          { "itemCode": "REPLACE_CONTENTION_ITEM_CODE_1", "responseValue": 1 }
+        ]
+      }
+    },
+    {
+      "fixtureId": "perf-same-parent-child-0002",
+      "instrument": "form",
+      "parentKey": "perf-parent-contention-0001",
+      "method": "POST",
+      "path": "/api/composite-assessments/attempts/REPLACE_CONTENTION_ATTEMPT_ID/form-sections/REPLACE_CONTENTION_SECTION_ID/submit",
+      "body": {
+        "submissionId": "perf-contention-submit-00000002",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_CONTENTION_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": []
+      }
+    }
+  ],
+  "mixed": [
+    {
+      "fixtureId": "perf-mixed-scale-0001",
+      "instrument": "scale",
+      "parentKey": "perf-parent-mixed-scale-0001",
+      "method": "POST",
+      "path": "/api/scales/assessments/REPLACE_MIXED_SCALE_ASSESSMENT_ID/submit",
+      "body": {
+        "submissionId": "perf-mixed-scale-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_MIXED_SCALE_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": [
+          { "itemCode": "REPLACE_MIXED_SCALE_ITEM_CODE", "responseValue": 1 }
+        ]
+      }
+    },
+    {
+      "fixtureId": "perf-mixed-form-0001",
+      "instrument": "form",
+      "parentKey": "perf-parent-mixed-form-0001",
+      "method": "POST",
+      "path": "/api/questionnaires/assessments/REPLACE_MIXED_QUESTIONNAIRE_ASSESSMENT_ID/form-sections/REPLACE_MIXED_FORM_SECTION_ID/submit",
+      "body": {
+        "submissionId": "perf-mixed-form-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_MIXED_FORM_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "answers": []
+      }
+    },
+    {
+      "fixtureId": "perf-mixed-cognitive-0001",
+      "instrument": "cognitive",
+      "parentKey": "perf-parent-mixed-cognitive-0001",
+      "method": "POST",
+      "path": "/api/cognitive/sessions/REPLACE_MIXED_COGNITIVE_SESSION_ID/submit",
+      "body": {
+        "submissionId": "perf-mixed-cognitive-submit-00000001",
+        "attemptEpoch": 1,
+        "definitionHash": "REPLACE_MIXED_COGNITIVE_DEFINITION_HASH",
+        "contextSnapshotHash": null,
+        "trials": []
+      }
+    }
+  ]
+}

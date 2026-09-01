@@ -6,6 +6,10 @@ const { mockPrisma } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       updateMany: vi.fn(),
     },
+    compositeAssessmentAttempt: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
     $transaction: vi.fn(),
   },
 }))
@@ -18,6 +22,8 @@ import {
   withQuestionnaireAnswerTransaction,
   withQuestionnaireAssessmentAnswerTransaction,
   withQuestionnaireCompletionTransaction,
+  withFinalOnlyCompletionTransaction,
+  refreshCompositeFinalOnlyProgress,
   withScaleAnswerTransaction,
   withSerializableQuestionnaireTransaction,
 } from '../../services/questionnaireProgressService'
@@ -166,6 +172,56 @@ describe('questionnaire progress consistency', () => {
       maxWait: 2_000,
       timeout: 10_000,
     })
+  })
+
+  it('maps final-only transaction capacity failures to completion busy', async () => {
+    mockPrisma.$transaction.mockRejectedValue({ code: 'P2024' })
+
+    await expect(withFinalOnlyCompletionTransaction(async () => 'ok')).rejects.toMatchObject({
+      code: 'COMPLETION_BUSY',
+      reason: 'database_busy',
+      retryAfterSeconds: 1,
+    })
+    expect(mockPrisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'ReadCommitted',
+      maxWait: 2_000,
+      timeout: 10_000,
+    })
+  })
+
+  it('recomputes composite progress from current-epoch child statuses', async () => {
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      id: 'attempt-1',
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      attemptEpoch: 2,
+      progress: 0,
+      completedItems: 0,
+      compositeAssessment: {
+        items: [
+          { id: 'scale-item', type: 'SCALE', required: true, contextKey: null },
+          { id: 'cognitive-item', type: 'COGNITIVE', required: true, contextKey: null },
+        ],
+        formSections: [{ id: 'form-section' }],
+      },
+      scaleAssessments: [
+        { compositeItemId: 'scale-item', status: 'COMPLETED', attemptEpoch: 1 },
+        { compositeItemId: 'scale-item', status: 'COMPLETED', attemptEpoch: 2 },
+      ],
+      cognitiveSessions: [{ compositeItemId: 'cognitive-item', status: 'IN_PROGRESS', attemptNo: 2 }],
+      formSectionAttempts: [{ sectionId: 'form-section', status: 'COMPLETED', attemptEpoch: 2 }],
+    })
+    mockPrisma.compositeAssessmentAttempt.update.mockResolvedValue({})
+
+    await expect(refreshCompositeFinalOnlyProgress(mockPrisma as any, 'attempt-1')).resolves.toMatchObject({
+      completedItems: 2,
+      totalItems: 3,
+      progress: 67,
+      terminalCandidate: false,
+    })
+    expect(mockPrisma.compositeAssessmentAttempt.update).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ completedItems: 2, progress: 67 }),
+    }))
   })
 
   it('locks only the current assessment for ordinary answer transactions', async () => {

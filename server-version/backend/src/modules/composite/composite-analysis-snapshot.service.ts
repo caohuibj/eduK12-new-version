@@ -70,6 +70,10 @@ export interface CompletionSnapshotExpectation {
 export interface PackageAnalysisAttemptInput {
   id: string
   compositeAssessmentId: string
+  /** FINAL_ONLY parent epoch used to exclude retired child rows. */
+  attemptEpoch?: number
+  /** Keep legacy completion/reanalysis selection semantics unchanged. */
+  deliveryMode?: string
   compositeAssessment: {
     reportPackageKey?: string | null
     reportPackageVersion?: string | null
@@ -105,6 +109,7 @@ export interface PackageAnalysisAttemptInput {
     scaleId: string
     status: string
     result?: unknown
+    attemptEpoch?: number
     attemptNo?: number
     completedAt?: Date | string | null
     startedAt?: Date | string | null
@@ -414,6 +419,8 @@ export const persistOrGetPackageAnalysisSnapshot = async (
     inputFingerprint: string
     generationReason: CompositeAnalysisSnapshotGenerationReason
     generatedBy?: string | null
+    /** FINAL_ONLY callers prepare encryption before taking the parent lock. */
+    payloadEncrypted?: string
   },
 ): Promise<PersistedPackageAnalysisSnapshot> => {
   const uniqueKey = {
@@ -436,7 +443,7 @@ export const persistOrGetPackageAnalysisSnapshot = async (
     return { row: existing, created: false }
   }
 
-  const payloadEncrypted = encryptCognitivePayload(input.analysis)
+  const payloadEncrypted = input.payloadEncrypted ?? encryptCognitivePayload(input.analysis)
   const row = await db.compositeAnalysisSnapshot.upsert({
     where: uniqueKey,
     create: {
@@ -604,9 +611,11 @@ const requireCipher = (value: string | null | undefined, label: string): string 
 const selectLatestSession = (
   sessions: PackageAnalysisAttemptInput['cognitiveSessions'],
   itemId: string,
+  attemptEpoch?: number,
 ) => {
   const candidates = sessions
-    .filter((session) => session.compositeItemId === itemId)
+    .filter((session) => session.compositeItemId === itemId
+      && (attemptEpoch === undefined || session.attemptNo === attemptEpoch))
     .sort((left, right) =>
       (right.attemptNo ?? 0) - (left.attemptNo ?? 0)
       || compareStrings(left.id, right.id),
@@ -624,12 +633,15 @@ const selectLatestScaleAssessment = (
   assessments: NonNullable<PackageAnalysisAttemptInput['scaleAssessments']>,
   itemId: string,
   scaleId: string,
+  attemptEpoch?: number,
 ) => {
   const candidates = assessments
     .filter((assessment) =>
-      assessment.compositeItemId === itemId && assessment.scaleId === scaleId)
+      assessment.compositeItemId === itemId
+      && assessment.scaleId === scaleId
+      && (attemptEpoch === undefined || assessment.attemptEpoch === attemptEpoch))
     .sort((left, right) =>
-      (right.attemptNo ?? 0) - (left.attemptNo ?? 0)
+      (right.attemptEpoch ?? right.attemptNo ?? 0) - (left.attemptEpoch ?? left.attemptNo ?? 0)
       || dateValue(right.completedAt ?? right.startedAt) - dateValue(left.completedAt ?? left.startedAt)
       || compareStrings(left.id, right.id),
     )
@@ -757,7 +769,11 @@ const buildFrozenModuleResults = (
       throw new Error(`报告包槽位报告 hash 不匹配：${slot.key}`)
     }
 
-    const session = selectLatestSession(attempt.cognitiveSessions, item.id)
+    const session = selectLatestSession(
+      attempt.cognitiveSessions,
+      item.id,
+      attempt.deliveryMode === 'FINAL_ONLY' ? attempt.attemptEpoch : undefined,
+    )
     if (!session || session.status !== 'COMPLETED') {
       throw new Error(`报告包槽位认知 Session 尚未完成：${slot.key}`)
     }
@@ -879,7 +895,12 @@ const buildFrozenScaleResults = (
       throw new Error(`报告包槽位量表 instrumentVersion 不匹配：${slot.key}`)
     }
 
-    const assessment = selectLatestScaleAssessment(scaleAssessments, item.id, measurement.scaleId)
+    const assessment = selectLatestScaleAssessment(
+      scaleAssessments,
+      item.id,
+      measurement.scaleId,
+      attempt.deliveryMode === 'FINAL_ONLY' ? attempt.attemptEpoch : undefined,
+    )
     if (!assessment || assessment.status !== 'COMPLETED') {
       throw new Error(`报告包槽位量表测评尚未完成：${slot.key}`)
     }

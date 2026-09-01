@@ -15,6 +15,23 @@ export type RequestObservationPhase =
   | 'existing_answer_lookup'
   | 'answer_mutation'
   | 'progress_mutation'
+  | 'final_submit_admission'
+  | 'final_submit_definition_prepare'
+  | 'final_submit_payload_validation'
+  | 'final_submit_payload_hash'
+  | 'final_submit_context_read'
+  | 'final_submit_scoring'
+  | 'final_submit_serialization'
+  | 'final_submit_encryption'
+  | 'final_submit_transaction_wait'
+  | 'final_submit_transaction_wall_time'
+  | 'final_submit_row_lock_wait'
+  | 'final_submit_db_compute'
+  | 'final_submit_db_query'
+  | 'final_submit_non_db_compute'
+  | 'final_submit_commit'
+  | 'final_submit_parent_finalization'
+  | 'final_submit_retry_backoff'
   | 'response'
 
 type Histogram = {
@@ -389,6 +406,20 @@ export const measureRequestPhase = async <T>(
   const startedAt = process.hrtime.bigint()
   try {
     return await operation()
+  } finally {
+    const endedAt = process.hrtime.bigint()
+    recordRequestPhase(phase, Number(endedAt - startedAt) / 1_000_000, startedAt, endedAt)
+  }
+}
+
+/** Measure a synchronous CPU phase without forcing callers to become async. */
+export const measureRequestPhaseSync = <T>(
+  phase: RequestObservationPhase,
+  operation: () => T,
+): T => {
+  const startedAt = process.hrtime.bigint()
+  try {
+    return operation()
   } finally {
     const endedAt = process.hrtime.bigint()
     recordRequestPhase(phase, Number(endedAt - startedAt) / 1_000_000, startedAt, endedAt)

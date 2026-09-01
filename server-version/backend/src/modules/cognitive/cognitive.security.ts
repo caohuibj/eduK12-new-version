@@ -16,6 +16,11 @@ import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encrypt
 const ENVELOPE_VERSION = 1
 const INTEGRITY_DOMAIN = 'cognitive-trial-integrity-v1'
 
+let cachedPseudonymKeySource: string | undefined
+let cachedPseudonymKey: Buffer | undefined
+let cachedIntegrityKeySource: string | undefined
+let cachedIntegrityKey: Buffer | undefined
+
 export interface CognitiveEnvelope<T> {
   version: number
   value: T
@@ -30,7 +35,10 @@ const getPseudonymKey = (): Buffer => {
   if (!key || !HEX_32_BYTE_KEY.test(key)) {
     throw new Error('DATA_PSEUDONYM_KEY must be exactly 64 hex characters (32 bytes)')
   }
-  return Buffer.from(key, 'hex')
+  if (cachedPseudonymKeySource === key && cachedPseudonymKey) return cachedPseudonymKey
+  cachedPseudonymKeySource = key
+  cachedPseudonymKey = Buffer.from(key, 'hex')
+  return cachedPseudonymKey
 }
 
 // 从 DATA_ENCRYPTION_KEY 派生 trial 完整性密钥（domain separation），不新增环境变量。
@@ -39,9 +47,12 @@ const getIntegrityKey = (): Buffer => {
   if (!encKey || !HEX_32_BYTE_KEY.test(encKey)) {
     throw new Error('DATA_ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes)')
   }
-  return createHmac('sha256', Buffer.from(encKey, 'hex'))
+  if (cachedIntegrityKeySource === encKey && cachedIntegrityKey) return cachedIntegrityKey
+  cachedIntegrityKeySource = encKey
+  cachedIntegrityKey = createHmac('sha256', Buffer.from(encKey, 'hex'))
     .update(INTEGRITY_DOMAIN)
     .digest()
+  return cachedIntegrityKey
 }
 
 // 递归稳定规范化：对象键排序 + 无空白，保证 payloadHash 与字段顺序无关。

@@ -21,6 +21,8 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
   definition: TaskDefinition<TConfig, TTrial>
   session: SessionConfigSnapshot<TConfig>
   trials: unknown[]
+  /** Final-only submitters already parsed the envelope and payload schema. */
+  preparedTrials?: TrialEnvelope<TTrial>[]
   randomSeed: string
 }): CognitiveScoreResult => {
   assertTaskContractValid(input.definition)
@@ -30,12 +32,11 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
     || input.session.scoringVersion !== input.definition.scoringVersion) {
     throw new Error('Session snapshot version does not match the authoritative task definition')
   }
-  const trials = input.trials.map((trial, index) => {
-    const envelope = parseTrialEnvelope<TTrial>(trial)
+  const validateEnvelope = (envelope: TrialEnvelope<TTrial>, index: number, parsePayload: boolean) => {
     if (envelope.trialIndex !== index) throw new Error('Trial envelopes must be ordered and contiguous for scoring')
     const phase = input.session.protocol.phases.find((candidate) => candidate.key === envelope.phase)
     if (!phase || !phase.persists) throw new Error(`Trial envelope phase ${envelope.phase} is not persisted by the frozen protocol`)
-    const payload = input.definition.trialSchema.parse(envelope.payload)
+    const payload = parsePayload ? input.definition.trialSchema.parse(envelope.payload) : envelope.payload
     if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
       const declaredPhase = (payload as { phase?: unknown }).phase
       if ((declaredPhase === 'learning' || declaredPhase === 'delayed') && declaredPhase !== envelope.phase) {
@@ -43,7 +44,10 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
       }
     }
     return { ...envelope, payload } as TrialEnvelope<TTrial>
-  })
+  }
+  const trials = input.preparedTrials
+    ? input.preparedTrials.map((trial, index) => validateEnvelope(trial, index, false))
+    : input.trials.map((trial, index) => validateEnvelope(parseTrialEnvelope<TTrial>(trial), index, true))
   const result = input.definition.scorer({
     config: input.definition.configSchema.parse(input.session.config),
     session: input.session,
