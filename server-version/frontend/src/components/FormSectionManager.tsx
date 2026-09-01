@@ -171,7 +171,7 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
                       <span className="mr-2 text-xs text-gray-400">{index + 1}.</span>
                       {unit.label}
                       <span className="ml-2 text-xs text-gray-400">
-                        {unit.type.toLowerCase() === 'form-section' ? `表单区段 · ${unit.itemCount} 个字段` : unit.type.toLowerCase() === 'cognitive' ? '认知任务' : '心理量表'}
+                        {unit.type.toLowerCase().replace(/_/g, '-') === 'form-section' ? `表单区段 · ${unit.itemCount} 个字段` : unit.type.toLowerCase() === 'cognitive' ? '认知任务' : '心理量表'}
                       </span>
                     </span>
                     {!readOnly && (

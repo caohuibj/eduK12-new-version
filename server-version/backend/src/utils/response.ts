@@ -19,7 +19,7 @@ export const error = (res: Response, message: string = '操作失败', code: num
 }
 
 export const instrumentError = (res: Response, code: string, message: string, statusCode = 409) => (
-  res.status(statusCode).json({ code, message })
+  res.status(statusCode).json({ code, message, data: null })
 )
 
 export const unauthorized = (res: Response, message: string = '未授权') => {
