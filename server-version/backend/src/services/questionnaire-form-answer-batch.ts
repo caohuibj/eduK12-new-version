@@ -18,6 +18,7 @@ export const questionnaireFormItemAnswerSelect = {
 
 export type BulkFormAnswerMutation = {
   formItemId: string
+  formSectionAttemptId?: string | null
   value: string | null
   status: 'ANSWERED' | 'SKIPPED'
   revision: number
@@ -42,6 +43,7 @@ export const persistFormAnswerBatch = async (
     ${uuidv4()},
     ${questionnaireAssessmentId},
     ${mutation.formItemId},
+    ${mutation.formSectionAttemptId ?? null},
     ${mutation.value},
     ${mutation.status}::"QuestionnaireFormAnswerStatus",
     ${mutation.revision}
@@ -52,6 +54,7 @@ export const persistFormAnswerBatch = async (
       "id",
       "questionnaire_assessment_id",
       "form_item_id",
+      "form_section_attempt_id",
       "value",
       "status",
       "revision"
@@ -61,6 +64,7 @@ export const persistFormAnswerBatch = async (
     DO UPDATE SET
       "value" = EXCLUDED."value",
       "status" = EXCLUDED."status",
-      "revision" = EXCLUDED."revision"
+      "revision" = EXCLUDED."revision",
+      "form_section_attempt_id" = EXCLUDED."form_section_attempt_id"
   `)
 }

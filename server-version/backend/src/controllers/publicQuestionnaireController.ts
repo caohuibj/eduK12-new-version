@@ -11,7 +11,7 @@
 
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, notFound, unauthorized, completionBusy } from '../utils/response'
+import { success, error, notFound, unauthorized, completionBusy, instrumentError } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { powService } from '../services/powService'
 import { logger } from '../utils/logger'
@@ -51,6 +51,10 @@ import { persistFormAnswerBatch, questionnaireFormItemAnswerSelect } from '../se
 import { measureRequestPhase, recordRequestPhase } from '../services/runtimeObservability'
 import { cacheService } from '../services/cacheService'
 import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
+import * as formSectionService from '../services/questionnaire-form-section.service'
+import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
+import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
@@ -141,7 +145,11 @@ export const publicQuestionnaireController = {
         }
       }
 
-      // 获取问卷详情（包含表单题目和量表）
+      // Ensure every final-only form field belongs to a submission section
+      // before exposing the immutable public definition.
+      await formSectionService.ensureQuestionnaireFormSections(validation.questionnaire!.id)
+
+      // 获取问卷详情（包含表单题目、量表和提交区段）
       const questionnaire = await prisma.questionnaire.findUnique({
         where: { id: validation.questionnaire!.id },
         include: {
@@ -167,6 +175,10 @@ export const publicQuestionnaireController = {
             },
             orderBy: { position: 'asc' },
           },
+          formSections: {
+            orderBy: { position: 'asc' },
+            include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+          },
         },
       })
 
@@ -174,23 +186,14 @@ export const publicQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      // 混合排序表单题目和量表
-      const contentItems = [
-        ...(questionnaire.formItems || []).map((fi: any) => ({
-          type: 'form' as const,
-          position: fi.position,
-          id: fi.id,
-          label: fi.label,
-          completed: false,
-        })),
-        ...(questionnaire.questionnaireScales || []).map((qs: any) => ({
-          type: 'scale' as const,
-          position: qs.position,
-          id: qs.scale.id,
-          label: qs.scale.name,
-          completed: false,
-        })),
-      ].sort((a, b) => a.position - b.position)
+      const units = await formSectionService.listQuestionnaireContentUnits(questionnaire.id)
+      const contentItems = units.map((unit) => ({
+        type: unit.type === 'form-section' ? 'form-section' as const : 'scale' as const,
+        position: unit.position,
+        id: unit.id,
+        label: unit.label,
+        completed: false,
+      }))
 
       return success(res, {
         questionnaire: {
@@ -201,6 +204,11 @@ export const publicQuestionnaireController = {
           estimatedTime: questionnaire.estimatedTime,
           contentItems,
           totalItems: contentItems.length,
+          deliveryMode: 'FINAL_ONLY' as const,
+          attemptEpoch: 1,
+          definitionHash: formSectionService.finalQuestionnaireDefinitionHash(questionnaire),
+          units: units.map((unit, index) => ({ ...unit, index })),
+          formSections: questionnaire.formSections,
         },
         tokenId: validation.token!.id,
       })
@@ -242,6 +250,10 @@ export const publicQuestionnaireController = {
 
       const questionnaireId = validation.questionnaire!.id
       const tokenId = validation.token!.id
+
+      // Ensure newly-created form items are represented by a section before
+      // creating or resuming a final-only attempt.
+      await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
       // it can identify an existing assessment; otherwise always create a new
@@ -289,6 +301,8 @@ export const publicQuestionnaireController = {
           select: {
             id: true,
             status: true,
+            deliveryMode: true,
+            attemptEpoch: true,
             progress: true,
             contextSnapshotEncrypted: true,
             contextSnapshotHash: true,
@@ -369,6 +383,16 @@ export const publicQuestionnaireController = {
             validation.token!.expiresAt,
           )
           if (!resumeToken) return unauthorized(res, '测评恢复凭据无效或已过期')
+          if (existingAssessment.deliveryMode === 'FINAL_ONLY') {
+            const finalState = await formSectionService.getQuestionnaireFinalAttemptState(existingAssessment.id)
+            if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+              await formSectionService.finalizeQuestionnaireAttemptIfReady(existingAssessment.id)
+            }
+            return success(res, {
+              ...(await formSectionService.getQuestionnaireFinalAttemptState(existingAssessment.id)),
+              resumeToken,
+            }, finalState.questionnaireAssessment.status === 'COMPLETED' ? '测评已完成' : '继续测评')
+          }
           // 断点续答：找到当前应该进行的内容项
           if (questionnaireAssessment) {
           const saMap = new Map(
@@ -434,6 +458,8 @@ export const publicQuestionnaireController = {
                 status: 'COMPLETED',
                 progress: 100,
                 currentIndex: contentItems.length,
+                deliveryMode: 'LEGACY',
+                attemptEpoch: questionnaireAssessment.attemptEpoch,
                 context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: null,
@@ -459,6 +485,8 @@ export const publicQuestionnaireController = {
                 status: questionnaireAssessment.status,
                 progress: questionnaireAssessment.progress,
                 currentIndex,
+                deliveryMode: 'LEGACY',
+                attemptEpoch: questionnaireAssessment.attemptEpoch,
                 context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: currentItem.data,
@@ -483,6 +511,8 @@ export const publicQuestionnaireController = {
                 status: questionnaireAssessment.status,
                 progress: questionnaireAssessment.progress,
                 currentIndex,
+                deliveryMode: 'LEGACY',
+                attemptEpoch: questionnaireAssessment.attemptEpoch,
                 context: assessmentContextState(questionnaireAssessment),
               },
               currentFormItem: null,
@@ -538,6 +568,8 @@ export const publicQuestionnaireController = {
               sessionId: sessionIdToUse,
               userId: null, // 匿名
               status: 'IN_PROGRESS',
+              deliveryMode: 'FINAL_ONLY',
+              attemptEpoch: 1,
               progress: 0,
             },
             include: {
@@ -550,6 +582,8 @@ export const publicQuestionnaireController = {
             data: startContent.questionnaireScales.map((qs) => ({
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
+              deliveryMode: 'FINAL_ONLY',
+              attemptEpoch: assessment.attemptEpoch,
               progress: 0,
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
@@ -566,6 +600,20 @@ export const publicQuestionnaireController = {
             skipDuplicates: true,
           })
 
+          const sections = await tx.questionnaireFormSection.findMany({
+            where: { questionnaireId },
+            select: { id: true },
+          })
+          if (sections.length > 0) {
+            await tx.questionnaireFormSectionAttempt.createMany({
+              data: sections.map((section) => ({
+                questionnaireAssessmentId: assessment.id,
+                sectionId: section.id,
+                attemptEpoch: assessment.attemptEpoch,
+              })),
+            })
+          }
+
           const issuedResumeToken = await questionnaireResumeTokenService.issue(
             assessment.id,
             validation.token!.expiresAt,
@@ -581,6 +629,17 @@ export const publicQuestionnaireController = {
 
         questionnaireAssessment = created.assessment
         resumeToken = created.resumeToken
+
+        if (questionnaireAssessment.deliveryMode === 'FINAL_ONLY') {
+          const finalState = await formSectionService.getQuestionnaireFinalAttemptState(questionnaireAssessment.id)
+          if (finalState.totalItems === 0) {
+            await formSectionService.finalizeQuestionnaireAttemptIfReady(questionnaireAssessment.id)
+          }
+          return success(res, {
+            ...(await formSectionService.getQuestionnaireFinalAttemptState(questionnaireAssessment.id)),
+            resumeToken,
+          }, '开始测评')
+        }
 
         logger.info('创建匿名测评', {
           questionnaireAssessmentId: questionnaireAssessment.id,
@@ -676,6 +735,8 @@ export const publicQuestionnaireController = {
           select: {
             id: true,
             status: true,
+            deliveryMode: true,
+            attemptEpoch: true,
             progress: true,
             startedAt: true,
             completedAt: true,
@@ -726,6 +787,15 @@ export const publicQuestionnaireController = {
 
       if (!questionnaireAssessment) {
         return notFound(res, '测评不存在')
+      }
+
+      if (questionnaireAssessment.deliveryMode === 'FINAL_ONLY') {
+        let finalState = await formSectionService.getQuestionnaireFinalAttemptState(questionnaireAssessment.id)
+        if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(questionnaireAssessment.id)
+          finalState = await formSectionService.getQuestionnaireFinalAttemptState(questionnaireAssessment.id)
+        }
+        return success(res, { ...finalState, sessionId })
       }
 
       // Reuse the same coalesced projection as start/resume. This keeps the
@@ -838,6 +908,8 @@ export const publicQuestionnaireController = {
           status: questionnaireAssessment.status,
           progress,
           currentIndex: allCompleted ? contentItems.length : currentIndex,
+          deliveryMode: questionnaireAssessment.deliveryMode,
+          attemptEpoch: questionnaireAssessment.attemptEpoch,
           startedAt: questionnaireAssessment.startedAt,
           completedAt: questionnaireAssessment.completedAt,
           totalTime: questionnaireAssessment.totalTime,
@@ -901,6 +973,25 @@ export const publicQuestionnaireController = {
     }
   },
 
+  async submitFinalFormSection(req: Request, res: Response) {
+    try {
+      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const resumeToken = getQuestionnaireResumeToken(req)
+      if (!resumeToken) return unauthorized(res, '缺少测评恢复凭证')
+      const data = await formSectionService.submitQuestionnaireFormSectionFinalForPublic(
+        req.params.sessionId,
+        { sectionId: req.params.sectionId, ...input },
+        hashQuestionnaireResumeToken(resumeToken),
+      )
+      return success(res, data, data.replayed ? '匿名表单区段提交已确认' : '匿名表单区段提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('最终提交匿名表单区段错误', err)
+      return error(res, '提交表单区段失败')
+    }
+  },
+
   /**
    * 获取量表测评详情（包括已有答案）
    * GET /api/public/assessments/:sessionId/scale/:scaleAssessmentId
@@ -936,6 +1027,43 @@ export const publicQuestionnaireController = {
     } catch (err) {
       logger.error('获取量表测评详情错误', err)
       return error(res, '获取量表测评详情失败')
+    }
+  },
+
+  async submitFinalScale(req: Request, res: Response) {
+    try {
+      const resumeToken = getQuestionnaireResumeToken(req)
+      if (!resumeToken) return unauthorized(res, '缺少测评恢复凭据')
+      const input = finalScaleSubmitSchema.parse(req.body)
+      const { submitQuestionnaireScaleFinalForPublic } = await import('../modules/scale/scale-final-submit.service')
+      const data = await submitQuestionnaireScaleFinalForPublic(
+        req.params.sessionId,
+        req.params.scaleAssessmentId,
+        input,
+        hashQuestionnaireResumeToken(resumeToken),
+      )
+      return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('最终提交匿名量表错误', err)
+      return error(res, '提交量表失败')
+    }
+  },
+
+  async restartAssessment(req: Request, res: Response) {
+    try {
+      const resumeToken = getQuestionnaireResumeToken(req)
+      if (!resumeToken) return unauthorized(res, '缺少测评恢复凭据')
+      const data = await formSectionService.restartQuestionnaireAssessment(req.params.sessionId, {
+        resumeTokenHash: hashQuestionnaireResumeToken(resumeToken),
+      })
+      return success(res, data, '匿名问卷测评已重启')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      logger.error('重启匿名问卷测评错误', err)
+      return error(res, err instanceof Error ? err.message : '重启问卷测评失败')
     }
   },
 

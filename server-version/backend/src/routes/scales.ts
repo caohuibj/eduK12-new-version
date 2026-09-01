@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
+import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
 const router = Router()
 
@@ -27,11 +28,13 @@ router.get('/tags', authenticate, scaleController.getTags)
 router.post('/:scaleId/assessments', authenticate, requireStudent, scaleController.startAssessmentV2)
 
 // 提交答案
-router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, scaleController.submitAnswersBatchV2)
-router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, scaleController.submitAnswerV2)
+router.post('/assessments/:assessmentId/submit', authenticate, requireStudent, scaleController.submitFinalAssessment)
+router.post('/assessments/:assessmentId/restart', authenticate, requireStudent, scaleController.restartAssessmentV2)
+router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, legacyWriteDisabled)
+router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, legacyWriteDisabled)
 
 // 完成测评
-router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, scaleController.completeAssessmentV2)
+router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, legacyWriteDisabled)
 
 // 获取测评结果
 router.get('/assessments/:assessmentId', authenticate, requireStudent, scaleController.getAssessmentV2)

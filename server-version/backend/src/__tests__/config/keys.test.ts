@@ -16,10 +16,12 @@ const SAVED = [
   'DATA_PSEUDONYM_KEY',
   'COGNITIVE_MODULE_ENABLED',
 ] as const
+let savedValues: Partial<Record<(typeof SAVED)[number], string | undefined>>
 
 describe('config — data key hex validation (production, Cognitive flag)', () => {
   beforeEach(() => {
     vi.resetModules()
+    savedValues = Object.fromEntries(SAVED.map((key) => [key, process.env[key]]))
     for (const k of SAVED) delete process.env[k]
     process.env.NODE_ENV = 'production'
     process.env.JWT_SECRET = 'production-test-secret-needs-at-least-32-chars'
@@ -31,7 +33,11 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
   })
 
   afterEach(() => {
-    for (const k of SAVED) delete process.env[k]
+    for (const k of SAVED) {
+      const value = savedValues[k]
+      if (value === undefined) delete process.env[k]
+      else process.env[k] = value
+    }
   })
 
   it('loads when COGNITIVE_MODULE_ENABLED=false and pseudonym key missing', async () => {

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { questionnaireController } from '../controllers/questionnaireController'
 import { authenticate, requireTeacher } from '../middleware/auth'
+import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
 const router = Router()
 
@@ -11,10 +12,14 @@ router.get('/available', authenticate, questionnaireController.available)
 
 // 获取问卷测评状态（必须在 /:id 之前）
 router.get('/assessments/:id', authenticate, questionnaireController.getAssessment)
-router.post('/assessments/:id/context/freeze', authenticate, questionnaireController.freezeContext)
+router.post('/assessments/:id/restart', authenticate, questionnaireController.restartAssessment)
+router.post('/assessments/:id/context/freeze', authenticate, legacyWriteDisabled)
+
+router.post('/assessments/:assessmentId/form-sections/:sectionId/submit', authenticate, questionnaireController.submitFinalFormSection)
+router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/submit', authenticate, questionnaireController.submitFinalScale)
 
 // 完成问卷测评
-router.post('/assessments/:id/complete', authenticate, questionnaireController.completeAssessment)
+router.post('/assessments/:id/complete', authenticate, legacyWriteDisabled)
 
 // 获取聚合报告
 router.get('/assessments/:id/report', authenticate, questionnaireController.getReport)
@@ -32,11 +37,11 @@ router.post('/:id/assessments', authenticate, questionnaireController.startAsses
 // ==================== 表单答案 ====================
 
 // 保存单个表单答案
-router.post('/assessments/:assessmentId/form-answers', authenticate, questionnaireController.saveFormAnswer)
+router.post('/assessments/:assessmentId/form-answers', authenticate, legacyWriteDisabled)
 
 // 批量保存表单答案
-router.patch('/assessments/:assessmentId/form-answers/batch', authenticate, questionnaireController.saveFormAnswers)
-router.post('/assessments/:assessmentId/form-answers/batch', authenticate, questionnaireController.saveFormAnswers)
+router.patch('/assessments/:assessmentId/form-answers/batch', authenticate, legacyWriteDisabled)
+router.post('/assessments/:assessmentId/form-answers/batch', authenticate, legacyWriteDisabled)
 
 // ==================== 管理端接口（教师和管理员） ====================
 
@@ -87,6 +92,12 @@ router.post('/:id/scales/reorder', authenticate, requireTeacher, questionnaireCo
 
 // 获取表单题目列表
 router.get('/:id/form-items', authenticate, requireTeacher, questionnaireController.listFormItems)
+router.get('/:id/form-sections', authenticate, requireTeacher, questionnaireController.listFormSections)
+router.post('/:id/form-sections', authenticate, requireTeacher, questionnaireController.createFormSection)
+router.put('/:id/form-sections/:sectionId', authenticate, requireTeacher, questionnaireController.updateFormSection)
+router.post('/:id/form-sections/reorder', authenticate, requireTeacher, questionnaireController.reorderFormSections)
+router.post('/:id/form-sections/:sectionId/items/reorder', authenticate, requireTeacher, questionnaireController.reorderFormSectionItems)
+router.post('/:id/form-sections/:sectionId/items/:itemId', authenticate, requireTeacher, questionnaireController.assignFormItemToSection)
 
 // 获取问卷所有内容项（表单题目和量表混合列表）
 router.get('/:id/content', authenticate, requireTeacher, questionnaireController.listContent)

@@ -1,14 +1,18 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
+import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 const router = Router()
 
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
-router.post('/attempts/:attemptId/context/freeze', compositeController.publicFreezeContext)
-router.post('/attempts/:attemptId/save', compositeController.publicSave)
-router.post('/attempts/:attemptId/items/:itemId/scale/answer', compositeController.publicScaleAnswer)
-router.post('/attempts/:attemptId/items/:itemId/scale/complete', compositeController.publicCompleteScale)
-router.post('/attempts/:attemptId/items/:itemId/form-answer', compositeController.publicFormAnswer)
+router.post('/attempts/:attemptId/restart', compositeController.publicRestart)
+router.post('/attempts/:attemptId/context/freeze', legacyWriteDisabled)
+router.post('/attempts/:attemptId/form-sections/:sectionId/submit', compositeController.publicSubmitFinalFormSection)
+router.post('/attempts/:attemptId/items/:itemId/scale/submit', compositeController.publicSubmitFinalScale)
+router.post('/attempts/:attemptId/save', legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/scale/answer', legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/scale/complete', legacyWriteDisabled)
+router.post('/attempts/:attemptId/items/:itemId/form-answer', legacyWriteDisabled)
 router.get('/attempts/:attemptId/report', compositeController.publicReport)
 router.get('/attempts/:attemptId/analysis-export', compositeController.publicAnalysisExport)
 router.get('/:token', compositeController.publicInfo)

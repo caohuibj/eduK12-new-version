@@ -18,7 +18,7 @@ export interface AuthenticatedRequest extends Express.Request {
 
 // API Response
 export interface ApiResponse<T = any> {
-  code: number
+  code: number | string
   message: string
   data?: T
 }

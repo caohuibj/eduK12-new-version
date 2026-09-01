@@ -198,7 +198,7 @@ export interface TeacherCode {
 }
 
 export interface ApiResponse<T = any> {
-  code: number
+  code: number | string
   message: string
   data: T
 }

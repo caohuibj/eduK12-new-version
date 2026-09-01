@@ -167,6 +167,10 @@ export interface CognitiveSession {
   assignmentId: string | null
   testType: string
   attemptNo: number
+  attemptEpoch?: number
+  deliveryMode?: 'FINAL_ONLY' | 'LEGACY'
+  definitionHash?: string | null
+  contextSnapshotHash?: string | null
   status: CognitiveSessionStatus
   configVersion: string
   engineVersion: string

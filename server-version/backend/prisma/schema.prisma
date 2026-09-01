@@ -163,25 +163,25 @@ model Assignment {
 }
 
 model Submission {
-  id           String              @id @default(uuid())
-  assignmentId String              @map("assignment_id")
-  studentId    String              @map("student_id")
+  id                     String                         @id @default(uuid())
+  assignmentId           String                         @map("assignment_id")
+  studentId              String                         @map("student_id")
   // Monotonic optimistic-concurrency revision.  A keyed submit must carry
   // the revision it read so a delayed request can never overwrite a newer
   // commit after the idempotency receipt window has been missed.
-  revision     Int                 @default(0)
-  content      String?
-  answers      Json?
-  comment      String?
-  status       SubmissionStatus    @default(SUBMITTED)
-  submittedAt  DateTime            @default(now()) @map("submitted_at")
-  reviewedAt   DateTime?           @map("reviewed_at")
-  idempotencyKeyHash String?       @map("idempotency_key_hash")
-  idempotencyPayloadHash String?   @map("idempotency_payload_hash")
-  assignment   Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  student      User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  history      SubmissionHistory[]
-  idempotencyReceipts SubmissionIdempotencyReceipt[]
+  revision               Int                            @default(0)
+  content                String?
+  answers                Json?
+  comment                String?
+  status                 SubmissionStatus               @default(SUBMITTED)
+  submittedAt            DateTime                       @default(now()) @map("submitted_at")
+  reviewedAt             DateTime?                      @map("reviewed_at")
+  idempotencyKeyHash     String?                        @map("idempotency_key_hash")
+  idempotencyPayloadHash String?                        @map("idempotency_payload_hash")
+  assignment             Assignment                     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student                User                           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  history                SubmissionHistory[]
+  idempotencyReceipts    SubmissionIdempotencyReceipt[]
 
   @@unique([assignmentId, studentId])
   @@map("submissions")
@@ -192,15 +192,15 @@ model Submission {
 // preserve older keys so a delayed retry can be replayed without overwriting
 // a newer submission.
 model SubmissionIdempotencyReceipt {
-  id                    String     @id @default(uuid())
-  assignmentId          String     @map("assignment_id")
-  studentId             String     @map("student_id")
-  submissionId          String     @map("submission_id")
-  idempotencyKeyHash    String     @map("idempotency_key_hash")
+  id                     String     @id @default(uuid())
+  assignmentId           String     @map("assignment_id")
+  studentId              String     @map("student_id")
+  submissionId           String     @map("submission_id")
+  idempotencyKeyHash     String     @map("idempotency_key_hash")
   idempotencyPayloadHash String     @map("idempotency_payload_hash")
-  response              Json
-  createdAt             DateTime   @default(now()) @map("created_at")
-  submission            Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  response               Json
+  createdAt              DateTime   @default(now()) @map("created_at")
+  submission             Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@unique(name: "submission_idempotency_receipt_scope_key", [assignmentId, studentId, idempotencyKeyHash])
   @@index([submissionId])
@@ -246,23 +246,23 @@ model Checkin {
 }
 
 model CheckinSubmission {
-  id          String              @id @default(uuid())
-  checkinId   String              @map("checkin_id")
-  studentId   String?             @map("student_id")
+  id                     String                                @id @default(uuid())
+  checkinId              String                                @map("checkin_id")
+  studentId              String?                               @map("student_id")
   // Monotonic optimistic-concurrency revision for authenticated submissions.
-  revision    Int                 @default(0)
-  content     String?
-  images      Json?
-  createdAt   DateTime            @default(now()) @map("created_at")
-  idempotencyKeyHash String?      @map("idempotency_key_hash")
-  idempotencyPayloadHash String?  @map("idempotency_payload_hash")
-  isAnonymous Boolean             @default(false) @map("is_anonymous")
-  sessionId   String?             @map("session_id")
-  tokenId     String?             @map("token_id")
-  checkin     Checkin             @relation(fields: [checkinId], references: [id], onDelete: Cascade)
-  student     User?               @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  accessToken CheckinAccessToken? @relation(fields: [tokenId], references: [id], onDelete: Cascade)
-  idempotencyReceipts CheckinSubmissionIdempotencyReceipt[]
+  revision               Int                                   @default(0)
+  content                String?
+  images                 Json?
+  createdAt              DateTime                              @default(now()) @map("created_at")
+  idempotencyKeyHash     String?                               @map("idempotency_key_hash")
+  idempotencyPayloadHash String?                               @map("idempotency_payload_hash")
+  isAnonymous            Boolean                               @default(false) @map("is_anonymous")
+  sessionId              String?                               @map("session_id")
+  tokenId                String?                               @map("token_id")
+  checkin                Checkin                               @relation(fields: [checkinId], references: [id], onDelete: Cascade)
+  student                User?                                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  accessToken            CheckinAccessToken?                   @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  idempotencyReceipts    CheckinSubmissionIdempotencyReceipt[]
 
   @@unique([checkinId, studentId])
   @@unique([checkinId, sessionId])
@@ -276,15 +276,15 @@ model CheckinSubmission {
 // anonymous submissions do not use this table because they are session
 // claimed by their access token instead of an Idempotency-Key.
 model CheckinSubmissionIdempotencyReceipt {
-  id                    String           @id @default(uuid())
-  checkinId             String           @map("checkin_id")
-  studentId             String           @map("student_id")
-  submissionId          String           @map("submission_id")
-  idempotencyKeyHash    String           @map("idempotency_key_hash")
-  idempotencyPayloadHash String           @map("idempotency_payload_hash")
-  response              Json
-  createdAt             DateTime         @default(now()) @map("created_at")
-  submission            CheckinSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  id                     String            @id @default(uuid())
+  checkinId              String            @map("checkin_id")
+  studentId              String            @map("student_id")
+  submissionId           String            @map("submission_id")
+  idempotencyKeyHash     String            @map("idempotency_key_hash")
+  idempotencyPayloadHash String            @map("idempotency_payload_hash")
+  response               Json
+  createdAt              DateTime          @default(now()) @map("created_at")
+  submission             CheckinSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@unique(name: "checkin_submission_idempotency_receipt_scope_key", [checkinId, studentId, idempotencyKeyHash])
   @@index([submissionId])
@@ -388,6 +388,11 @@ enum AssessmentStatus {
   ABANDONED // 已放弃
 }
 
+enum InstrumentDeliveryMode {
+  LEGACY
+  FINAL_ONLY
+}
+
 enum QuestionnaireFormAnswerStatus {
   PENDING
   ANSWERED
@@ -479,21 +484,26 @@ model Scale {
 
 // 测评记录表
 model Assessment {
-  id                        String           @id @default(uuid())
-  scaleId                   String           @map("scale_id")
-  userId                    String?          @map("user_id") // 改为可选，支持匿名测评
-  status                    AssessmentStatus @default(IN_PROGRESS)
+  id                        String                 @id @default(uuid())
+  scaleId                   String                 @map("scale_id")
+  userId                    String?                @map("user_id") // 改为可选，支持匿名测评
+  status                    AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode              InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  attemptEpoch              Int                    @default(1) @map("attempt_epoch")
+  submissionId              String?                @unique @map("submission_id")
+  submissionPayloadHash     String?                @map("submission_payload_hash")
+  submissionCompletedAt     DateTime?              @map("submission_completed_at")
   answers                   Json? // 答案数组（加密存储）
-  answersRevision           Int              @default(0) @map("answers_revision") // 量表答案 OCC 版本
+  answersRevision           Int                    @default(0) @map("answers_revision") // 量表答案 OCC 版本
   result                    Json? // 加密的完整 ScaleResultV2
-  progress                  Int              @default(0) // 进度百分比
-  startedAt                 DateTime         @default(now()) @map("started_at")
-  completedAt               DateTime?        @map("completed_at") // 完成时间
-  totalTime                 Int?             @map("total_time") // 总用时（毫秒）
+  progress                  Int                    @default(0) // 进度百分比
+  startedAt                 DateTime               @default(now()) @map("started_at")
+  completedAt               DateTime?              @map("completed_at") // 完成时间
+  totalTime                 Int?                   @map("total_time") // 总用时（毫秒）
   // 聚合问卷模块关联（可选，单体量表测评时为空）
-  questionnaireAssessmentId String?          @map("questionnaire_assessment_id")
-  compositeAttemptId        String?          @map("composite_attempt_id")
-  compositeItemId           String?          @map("composite_item_id")
+  questionnaireAssessmentId String?                @map("questionnaire_assessment_id")
+  compositeAttemptId        String?                @map("composite_attempt_id")
+  compositeItemId           String?                @map("composite_item_id")
 
   // 关联
   scale                   Scale                       @relation(fields: [scaleId], references: [id], onDelete: Cascade)
@@ -577,6 +587,7 @@ model Questionnaire {
   creator              User                       @relation("QuestionnaireCreator", fields: [creatorId], references: [id])
   questionnaireScales  QuestionnaireScale[]
   formItems            QuestionnaireFormItem[] // 新增：表单题目关联
+  formSections         QuestionnaireFormSection[]
   assessments          QuestionnaireAssessment[]
   courseQuestionnaires CourseQuestionnaire[]
   accessTokens         QuestionnaireAccessToken[] // 新增：访问令牌关联
@@ -600,34 +611,57 @@ model QuestionnaireScale {
   @@map("questionnaire_scales")
 }
 
+// 一个表单区段是一个独立的最终提交单元；字段仍保留在区段内排序。
+model QuestionnaireFormSection {
+  id              String   @id @default(uuid())
+  questionnaireId String   @map("questionnaire_id")
+  title           String   @default("表单")
+  description     String?
+  position        Int      @default(0)
+  contextSection  Boolean  @default(false) @map("context_section")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  questionnaire Questionnaire                     @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  items         QuestionnaireFormItem[]
+  attempts      QuestionnaireFormSectionAttempt[]
+
+  @@unique([questionnaireId, position])
+  @@index([questionnaireId])
+  @@map("questionnaire_form_sections")
+}
+
 // 问卷测评记录表
 model QuestionnaireAssessment {
-  id                       String           @id @default(uuid())
-  questionnaireId          String           @map("questionnaire_id")
-  userId                   String?          @map("user_id") // 改为可选，支持匿名测评
-  tokenId                  String?          @map("token_id") // 访问令牌ID（匿名测评时使用）
-  sessionId                String?          @unique @map("session_id") // 匿名会话标识
-  resumeTokenHash          String?          @unique @map("resume_token_hash") // 服务端恢复凭据哈希
-  resumeTokenExpiresAt     DateTime?        @map("resume_token_expires_at")
-  status                   AssessmentStatus @default(IN_PROGRESS)
-  progress                 Int              @default(0) // 总体进度
-  completedScales          Int              @default(0) @map("completed_scales") // 已完成量表数量（缓存）
-  completedForms           Int              @default(0) @map("completed_forms") // 已完成表单数量（缓存）
-  startedAt                DateTime         @default(now()) @map("started_at")
-  completedAt              DateTime?        @map("completed_at")
-  totalTime                Int?             @map("total_time") // 总用时（毫秒）
-  aggregateReport          Json?            @map("aggregate_report") // 聚合报告（加密存储）
-  aggregateReportEncrypted String?          @map("aggregate_report_encrypted")
-  contextSnapshotEncrypted String?          @map("context_snapshot_encrypted")
-  contextSnapshotHash      String?          @map("context_snapshot_hash")
-  contextFrozenAt          DateTime?        @map("context_frozen_at")
+  id                       String                 @id @default(uuid())
+  questionnaireId          String                 @map("questionnaire_id")
+  userId                   String?                @map("user_id") // 改为可选，支持匿名测评
+  tokenId                  String?                @map("token_id") // 访问令牌ID（匿名测评时使用）
+  sessionId                String?                @unique @map("session_id") // 匿名会话标识
+  resumeTokenHash          String?                @unique @map("resume_token_hash") // 服务端恢复凭据哈希
+  resumeTokenExpiresAt     DateTime?              @map("resume_token_expires_at")
+  status                   AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode             InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  attemptEpoch             Int                    @default(1) @map("attempt_epoch")
+  progress                 Int                    @default(0) // 总体进度
+  completedScales          Int                    @default(0) @map("completed_scales") // 已完成量表数量（缓存）
+  completedForms           Int                    @default(0) @map("completed_forms") // 已完成表单数量（缓存）
+  startedAt                DateTime               @default(now()) @map("started_at")
+  completedAt              DateTime?              @map("completed_at")
+  totalTime                Int?                   @map("total_time") // 总用时（毫秒）
+  aggregateReport          Json?                  @map("aggregate_report") // 聚合报告（加密存储）
+  aggregateReportEncrypted String?                @map("aggregate_report_encrypted")
+  contextSnapshotEncrypted String?                @map("context_snapshot_encrypted")
+  contextSnapshotHash      String?                @map("context_snapshot_hash")
+  contextFrozenAt          DateTime?              @map("context_frozen_at")
 
   // 关联
-  questionnaire    Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
-  user             User?                     @relation("UserQuestionnaireAssessments", fields: [userId], references: [id], onDelete: Cascade)
-  token            QuestionnaireAccessToken? @relation(fields: [tokenId], references: [id], onDelete: Cascade)
-  scaleAssessments Assessment[]
-  formAnswers      QuestionnaireFormAnswer[] // 新增：表单答案关联
+  questionnaire       Questionnaire                     @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  user                User?                             @relation("UserQuestionnaireAssessments", fields: [userId], references: [id], onDelete: Cascade)
+  token               QuestionnaireAccessToken?         @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  scaleAssessments    Assessment[]
+  formAnswers         QuestionnaireFormAnswer[] // 新增：表单答案关联
+  formSectionAttempts QuestionnaireFormSectionAttempt[]
 
   // 性能优化索引
   @@index([userId, status])
@@ -671,18 +705,18 @@ model QuestionnaireAccessToken {
 // Metadata authority for generated exports. The file itself remains on the
 // configured export storage; every download must resolve through this row.
 model ExportArtifact {
-  id           String   @id @default(uuid())
-  resourceType String   @map("resource_type")
-  resourceId   String   @map("resource_id")
-  createdBy    String   @map("created_by")
+  id           String               @id @default(uuid())
+  resourceType String               @map("resource_type")
+  resourceId   String               @map("resource_id")
+  createdBy    String               @map("created_by")
   format       String
-  anonymized   Boolean  @default(false)
-  storageKey   String   @map("storage_key")
+  anonymized   Boolean              @default(false)
+  storageKey   String               @map("storage_key")
   status       ExportArtifactStatus @default(READY)
-  batchId      String?  @map("batch_id")
-  errorCode    String?  @map("error_code")
-  createdAt    DateTime @default(now()) @map("created_at")
-  expiresAt    DateTime @map("expires_at")
+  batchId      String?              @map("batch_id")
+  errorCode    String?              @map("error_code")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  expiresAt    DateTime             @map("expires_at")
 
   creator User @relation("ExportArtifactCreator", fields: [createdBy], references: [id], onDelete: Restrict)
 
@@ -720,6 +754,8 @@ model QuestionnaireFormItem {
   placeholder     String? // 占位提示文字
   required        Boolean  @default(true) // 是否必填
   position        Int      @default(0) // 统一排序位置（与量表共享排序空间）
+  sectionId       String?  @map("section_id")
+  sectionPosition Int?     @map("section_position")
   options         Json? // 单选选项列表 [{value: "male", label: "男"}]
   contextKey      String?  @map("context_key")
   createdAt       DateTime @default(now()) @map("created_at")
@@ -727,30 +763,56 @@ model QuestionnaireFormItem {
 
   // 关联
   questionnaire Questionnaire             @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  section       QuestionnaireFormSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
   answers       QuestionnaireFormAnswer[]
 
   @@unique([questionnaireId, contextKey])
   // 性能优化索引
   @@index([questionnaireId, position])
+  @@index([sectionId, sectionPosition])
   @@map("questionnaire_form_items")
+}
+
+model QuestionnaireFormSectionAttempt {
+  id                        String           @id @default(uuid())
+  questionnaireAssessmentId String           @map("questionnaire_assessment_id")
+  sectionId                 String           @map("section_id")
+  status                    AssessmentStatus @default(IN_PROGRESS)
+  attemptEpoch              Int              @default(1) @map("attempt_epoch")
+  submissionId              String?          @unique @map("submission_id")
+  submissionPayloadHash     String?          @map("submission_payload_hash")
+  submittedAt               DateTime?        @map("submitted_at")
+  createdAt                 DateTime         @default(now()) @map("created_at")
+  updatedAt                 DateTime         @updatedAt @map("updated_at")
+
+  questionnaireAssessment QuestionnaireAssessment   @relation(fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
+  section                 QuestionnaireFormSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  answers                 QuestionnaireFormAnswer[]
+
+  @@unique([questionnaireAssessmentId, sectionId])
+  @@index([questionnaireAssessmentId, status])
+  @@map("questionnaire_form_section_attempts")
 }
 
 // 表单答案表
 model QuestionnaireFormAnswer {
-  id                        String   @id @default(uuid())
-  questionnaireAssessmentId String   @map("questionnaire_assessment_id")
-  formItemId                String   @map("form_item_id")
+  id                        String                        @id @default(uuid())
+  questionnaireAssessmentId String                        @map("questionnaire_assessment_id")
+  formItemId                String                        @map("form_item_id")
+  formSectionAttemptId      String?                       @map("form_section_attempt_id")
   value                     String? // 用户填写的答案值；SKIPPED/PENDING 可为空
   status                    QuestionnaireFormAnswerStatus @default(PENDING)
-  revision                  Int      @default(0) // 单题答案 OCC 版本
-  createdAt                 DateTime @default(now()) @map("created_at")
+  revision                  Int                           @default(0) // 单题答案 OCC 版本
+  createdAt                 DateTime                      @default(now()) @map("created_at")
 
   // 关联
-  questionnaireAssessment QuestionnaireAssessment @relation(fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
-  formItem                QuestionnaireFormItem   @relation(fields: [formItemId], references: [id], onDelete: Cascade)
+  questionnaireAssessment QuestionnaireAssessment          @relation(fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
+  formItem                QuestionnaireFormItem            @relation(fields: [formItemId], references: [id], onDelete: Cascade)
+  formSectionAttempt      QuestionnaireFormSectionAttempt? @relation(fields: [formSectionAttemptId], references: [id], onDelete: SetNull)
 
   @@unique([questionnaireAssessmentId, formItemId])
   @@index([questionnaireAssessmentId])
+  @@index([formSectionAttemptId])
   @@map("questionnaire_form_answers")
 }
 
@@ -813,6 +875,7 @@ model CompositeAssessment {
   copiedFrom   CompositeAssessment?             @relation("CompositeCopySource", fields: [copiedFromId], references: [id], onDelete: SetNull)
   copies       CompositeAssessment[]            @relation("CompositeCopySource")
   items        CompositeAssessmentItem[]
+  formSections CompositeFormSection[]
   accessTokens CompositeAssessmentAccessToken[]
   attempts     CompositeAssessmentAttempt[]
 
@@ -837,6 +900,8 @@ model CompositeAssessmentItem {
   formPlaceholder       String?                     @map("form_placeholder")
   formOptions           Json?                       @map("form_options")
   contextKey            String?                     @map("context_key")
+  formSectionId         String?                     @map("form_section_id")
+  formSectionPosition   Int?                        @map("form_section_position")
   createdAt             DateTime                    @default(now()) @map("created_at")
   updatedAt             DateTime                    @updatedAt @map("updated_at")
 
@@ -846,12 +911,33 @@ model CompositeAssessmentItem {
   scaleAssessments    Assessment[]          @relation("CompositeScaleAssessments")
   cognitiveSessions   CognitiveSession[]    @relation("CompositeCognitiveSessions")
   formAnswers         CompositeFormAnswer[]
+  formSection         CompositeFormSection? @relation(fields: [formSectionId], references: [id], onDelete: SetNull)
 
   @@unique([compositeAssessmentId, position])
   @@unique([compositeAssessmentId, contextKey])
   @@index([scaleId])
   @@index([cognitiveAssignmentId])
+  @@index([formSectionId, formSectionPosition])
   @@map("composite_assessment_items")
+}
+
+model CompositeFormSection {
+  id                    String   @id @default(uuid())
+  compositeAssessmentId String   @map("composite_assessment_id")
+  title                 String   @default("表单")
+  description           String?
+  position              Int      @default(0)
+  contextSection        Boolean  @default(false) @map("context_section")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  compositeAssessment CompositeAssessment           @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  items               CompositeAssessmentItem[]
+  attempts            CompositeFormSectionAttempt[]
+
+  @@unique([compositeAssessmentId, position])
+  @@index([compositeAssessmentId])
+  @@map("composite_form_sections")
 }
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
@@ -865,6 +951,8 @@ model CompositeAssessmentAttempt {
   anonymousCode            String?                          @map("anonymous_code")
   attemptNo                Int                              @default(1) @map("attempt_no")
   status                   CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  deliveryMode             InstrumentDeliveryMode           @default(FINAL_ONLY) @map("delivery_mode")
+  attemptEpoch             Int                              @default(1) @map("attempt_epoch")
   progress                 Int                              @default(0)
   completedItems           Int                              @default(0) @map("completed_items")
   startedAt                DateTime                         @default(now()) @map("started_at")
@@ -881,6 +969,7 @@ model CompositeAssessmentAttempt {
   scaleAssessments    Assessment[]                    @relation("CompositeAttemptAssessments")
   cognitiveSessions   CognitiveSession[]              @relation("CompositeAttemptCognitiveSessions")
   formAnswers         CompositeFormAnswer[]
+  formSectionAttempts CompositeFormSectionAttempt[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
 
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
@@ -917,20 +1006,44 @@ model CompositeAnalysisSnapshot {
 }
 
 model CompositeFormAnswer {
-  id        String   @id @default(uuid())
-  attemptId String   @map("attempt_id")
-  itemId    String   @map("item_id")
-  value     String
-  completed Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                   String   @id @default(uuid())
+  attemptId            String   @map("attempt_id")
+  itemId               String   @map("item_id")
+  formSectionAttemptId String?  @map("form_section_attempt_id")
+  value                String
+  completed            Boolean  @default(true)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
-  attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  item    CompositeAssessmentItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  attempt            CompositeAssessmentAttempt   @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  item               CompositeAssessmentItem      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  formSectionAttempt CompositeFormSectionAttempt? @relation(fields: [formSectionAttemptId], references: [id], onDelete: SetNull)
 
   @@unique([attemptId, itemId])
   @@index([attemptId])
+  @@index([formSectionAttemptId])
   @@map("composite_form_answers")
+}
+
+model CompositeFormSectionAttempt {
+  id                    String                           @id @default(uuid())
+  attemptId             String                           @map("attempt_id")
+  sectionId             String                           @map("section_id")
+  status                CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  attemptEpoch          Int                              @default(1) @map("attempt_epoch")
+  submissionId          String?                          @unique @map("submission_id")
+  submissionPayloadHash String?                          @map("submission_payload_hash")
+  submittedAt           DateTime?                        @map("submitted_at")
+  createdAt             DateTime                         @default(now()) @map("created_at")
+  updatedAt             DateTime                         @updatedAt @map("updated_at")
+
+  attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  section CompositeFormSection       @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  answers CompositeFormAnswer[]
+
+  @@unique([attemptId, sectionId])
+  @@index([attemptId, status])
+  @@map("composite_form_section_attempts")
 }
 
 model CompositeAssessmentAccessToken {
@@ -1285,6 +1398,10 @@ model CognitiveSession {
   scoringVersion               String                 @map("scoring_version")
   randomSeed                   String                 @map("random_seed")
   completionKey                String?                @map("completion_key")
+  deliveryMode                 InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  submissionId                 String?                @unique @map("submission_id")
+  submissionPayloadHash        String?                @map("submission_payload_hash")
+  submittedAt                  DateTime?              @map("submitted_at")
   createdAt                    DateTime               @default(now()) @map("created_at")
   updatedAt                    DateTime               @updatedAt @map("updated_at")
 
@@ -1312,19 +1429,19 @@ model CognitiveSession {
 
 // 单个认知任务的公开链接。公开参与始终 userId=NULL，不能仅靠“导出脱敏”冒充匿名。
 model CognitiveAccessToken {
-  id           String   @id @default(uuid())
-  assignmentId String   @map("assignment_id")
+  id             String   @id @default(uuid())
+  assignmentId   String   @map("assignment_id")
   // Legacy plaintext is nullable during the resumable application backfill.
   // New rows persist only a deterministic lookup hash and encrypted bearer.
-  token        String?  @unique
-  tokenHash    String?  @unique @map("token_hash")
-  tokenEncrypted String? @map("token_encrypted")
-  createdBy    String   @map("created_by")
-  expiresAt    DateTime @map("expires_at")
-  maxUses      Int      @default(0) @map("max_uses")
-  usedCount    Int      @default(0) @map("used_count")
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
+  token          String?  @unique
+  tokenHash      String?  @unique @map("token_hash")
+  tokenEncrypted String?  @map("token_encrypted")
+  createdBy      String   @map("created_by")
+  expiresAt      DateTime @map("expires_at")
+  maxUses        Int      @default(0) @map("max_uses")
+  usedCount      Int      @default(0) @map("used_count")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   assignment CognitiveAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   creator    User                @relation("CognitiveTokenCreator", fields: [createdBy], references: [id])

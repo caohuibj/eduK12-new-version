@@ -392,7 +392,12 @@ export const withQuestionnaireCompletionTransaction = async <T>(
       )
       return runSerializableTransaction(callback, {
         operation: 'questionnaire_completion',
-        maxAttempts: 5,
+        // Completion remains explicitly bounded, but the high-contention
+        // PostgreSQL gate exercises bursts of independent assessments. Five
+        // attempts can still exhaust on transient SSI conflicts before the
+        // queue has drained; eight keeps the policy bounded while allowing a
+        // short jittered tail to settle.
+        maxAttempts: 8,
         maxWait: 2_000,
         timeout: 10_000,
       })

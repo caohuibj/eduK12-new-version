@@ -353,7 +353,7 @@ describe('restartSession', () => {
     expect(result.status).toBe('IN_PROGRESS')
   })
 
-  it('restarts a composite wrapper while preserving its Attempt/item linkage', async () => {
+  it('requires restarting the whole composite wrapper', async () => {
     const compositeSession = sessionRow({
       participantKey: 'user-key:attempt-1:item-1',
       compositeAttemptId: 'attempt-1',
@@ -361,25 +361,9 @@ describe('restartSession', () => {
       anonymousCode: null,
     })
     mockPrisma.cognitiveSession.findUnique.mockResolvedValue(compositeSession)
-    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...PUBLISHED_ASSIGNMENT, listedStandalone: false })
-    mockPrisma.cognitiveSession.count.mockResolvedValue(1)
-    mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 1 })
-    mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: any) => sessionRow(data))
-    mockPrisma.$queryRaw.mockResolvedValue([rawRow(compositeSession)])
-
-    const result = await restartSession('student-1', 'session-1')
-
-    expect(result.attemptNo).toBe(2)
-    expect(mockPrisma.cognitiveSession.count).toHaveBeenCalledWith({
-      where: { assignmentId: 'asg-1', participantKey: compositeSession.participantKey },
-    })
-    expect(mockPrisma.cognitiveSession.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        participantKey: compositeSession.participantKey,
-        compositeAttemptId: 'attempt-1',
-        compositeItemId: 'item-1',
-      }),
-    })
+    await expect(restartSession('student-1', 'session-1')).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.cognitiveSession.count).not.toHaveBeenCalled()
+    expect(mockPrisma.cognitiveSession.create).not.toHaveBeenCalled()
   })
 
   it('D6.1: rejects restart when the locked row is no longer IN_PROGRESS', async () => {

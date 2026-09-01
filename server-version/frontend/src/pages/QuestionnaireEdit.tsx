@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../api/client'
-import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3 } from 'lucide-react'
+import { Save, Plus, Trash2, ChevronLeft, Layers, FileText, Edit3 } from 'lucide-react'
 import { ScaleSelector } from '../components/ScaleSelector'
 import type { Scale } from '../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../modules/assessment-context/options'
+import FormSectionManager from '../components/FormSectionManager'
 
 // 表单题目类型
 interface FormItem {
@@ -356,44 +357,6 @@ const QuestionnaireEdit: React.FC = () => {
     }
   }
 
-  // 统一排序
-  const handleReorderContent = async (items: ContentItem[]) => {
-    try {
-      const response = await apiClient.post(`/questionnaires/${id}/content/reorder`, {
-        items: items.map((item, index) => ({
-          type: item.type,
-          id: item.data.id,
-          position: index,
-        })),
-      })
-      if (response.code === 0) {
-        fetchContent()
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '排序失败')
-    }
-  }
-
-  // 移动内容项
-  const handleMoveItem = (index: number, direction: 'up' | 'down') => {
-    const allItems: ContentItem[] = [
-      ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
-      ...questionnaireScales.map(qs => ({ type: 'scale' as const, id: qs.id, position: qs.position, data: qs })),
-    ].sort((a, b) => a.position - b.position)
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= allItems.length) return
-
-    // 交换位置
-    const temp = allItems[index].position
-    allItems[index].position = allItems[newIndex].position
-    allItems[newIndex].position = temp
-
-    handleReorderContent(allItems.sort((a, b) => a.position - b.position))
-  }
-
   const handleAddCourses = async () => {
     if (selectedCourses.length === 0) return
 
@@ -637,6 +600,7 @@ const QuestionnaireEdit: React.FC = () => {
           {/* 内容列表 */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium mb-4">问卷内容</h3>
+            <p className="mb-3 text-xs text-gray-500">量表与表单区段的统一顺序请在下方“表单区段”管理器中调整；这里仅编辑或移除内容。</p>
             {allContentItems.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <p>暂无内容</p>
@@ -650,7 +614,6 @@ const QuestionnaireEdit: React.FC = () => {
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 group"
                   >
                     <div className="flex items-center gap-3">
-                      <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
                       <span className="text-sm text-gray-500 w-8">{index + 1}.</span>
                       <span className={`px-2 py-1 text-xs rounded ${
                         item.type === 'form' 
@@ -679,22 +642,6 @@ const QuestionnaireEdit: React.FC = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleMoveItem(index, 'up')}
-                        disabled={index === 0}
-                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        title="上移"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => handleMoveItem(index, 'down')}
-                        disabled={index === allContentItems.length - 1}
-                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        title="下移"
-                      >
-                        ↓
-                      </button>
                       {item.type === 'form' && (
                         <button
                           onClick={() => handleEditFormItem(item.data as FormItem)}
@@ -725,6 +672,12 @@ const QuestionnaireEdit: React.FC = () => {
               </div>
             )}
           </div>
+          {!isNew && id && (
+            <FormSectionManager
+              basePath={`/questionnaires/${id}`}
+              readOnly={questionnaire.status === 'PUBLISHED'}
+            />
+          )}
         </div>
       )}
 

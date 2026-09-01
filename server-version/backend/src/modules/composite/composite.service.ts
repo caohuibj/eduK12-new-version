@@ -27,7 +27,7 @@ import {
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
-import { validateScaleDefinition } from '../scale/scale-definition'
+import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
 import {
@@ -56,6 +56,8 @@ import type {
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
 import { assertTaskCanPublish, assertTaskContractValid } from '../cognitive/v2/publication-gate'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
+import { computeSubmissionPayloadHash } from '../../services/instrumentFinalSubmit'
+import { withQuestionnaireCompletionTransaction } from '../../services/questionnaireProgressService'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -166,6 +168,10 @@ const loadComposite = async (id: string, includeItems = false) => {
                 },
                 cognitiveAssignment: { include: { config: true } },
               },
+            },
+            formSections: {
+              orderBy: { position: 'asc' as const },
+              include: { items: { orderBy: [{ formSectionPosition: 'asc' as const }, { position: 'asc' as const }] } },
             },
           }
         : {}),
@@ -726,9 +732,15 @@ export const listComposites = async (userId: string, role: UserRole) => {
 
 export const getCompositeForTeacher = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
+  const { ensureCompositeFormSections, listCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(id)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
   const counts = await loadAttemptCountsByCompositeIds([composite.id])
+  const [contentUnits, formSections] = await Promise.all([
+    listCompositeContentUnits(composite.id),
+    listCompositeFormSections(composite.id),
+  ])
   return {
     id: composite.id,
     code: composite.code,
@@ -763,6 +775,9 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
         }
       : null,
     items: composite.items.map((item: any) => mapItemForTeacher(item, getFrozenPackageSlotLabels(composite))),
+    deliveryMode: 'FINAL_ONLY' as const,
+    formSections,
+    units: contentUnits,
     attemptCounts: counts.get(composite.id) ?? emptyAttemptCounts(),
   }
 }
@@ -1284,44 +1299,182 @@ export const removeItem = async (userId: string, role: UserRole, compositeId: st
   await prisma.compositeAssessmentItem.delete({ where: { id: itemId } })
 }
 
+type CompositeContentUnitInput = {
+  type: 'scale' | 'cognitive' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+  id: string
+  position: number
+}
+
+const canonicalCompositeContentUnitType = (type: CompositeContentUnitInput['type']) => {
+  if (type === 'scale' || type === 'SCALE') return 'scale' as const
+  if (type === 'cognitive' || type === 'COGNITIVE') return 'cognitive' as const
+  return 'form-section' as const
+}
+
+const compositeSectionHasContext = (section: any) => (
+  Boolean(section.contextSection) || Boolean(section.items?.some((item: any) => item.contextKey))
+)
+
+const assertCompositeContentUnitOrder = (units: Array<{ type: string; id: string }>, sections: any[]) => {
+  const contextSections = sections.filter(compositeSectionHasContext)
+  if (contextSections.length > 1) throw compositeBadRequest('同一综合测评只能有一个上下文区段')
+  if (contextSections[0] && (units[0]?.type !== 'form-section' || units[0].id !== contextSections[0].id)) {
+    throw compositeBadRequest('人口学上下文区段必须是第一个内容单元')
+  }
+}
+
+export const listCompositeContentUnits = async (compositeId: string) => {
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(compositeId)
+  const composite = await loadComposite(compositeId, true)
+  const packageSlotLabels = getFrozenPackageSlotLabels(composite)
+  return [
+    ...composite.items
+      .filter((item: any) => item.type !== 'FORM')
+      .map((item: any) => ({
+        type: item.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+        id: item.id,
+        position: item.position,
+        label: resolveCompositeItemLabel(item, packageSlotLabels),
+        itemCount: 1,
+        contextSection: false,
+      })),
+    ...(composite.formSections ?? []).map((section: any) => ({
+      type: 'form-section' as const,
+      id: section.id,
+      position: section.position,
+      label: section.title,
+      itemCount: section.items.length,
+      contextSection: compositeSectionHasContext(section),
+    })),
+  ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+}
+
+export const reorderCompositeContentUnits = async (
+  userId: string,
+  role: UserRole,
+  compositeId: string,
+  input: CompositeContentUnitInput[],
+) => {
+  assertTeacher(role)
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(compositeId)
+  const composite = await loadComposite(compositeId, true)
+  assertOwner(composite, userId, role)
+  assertDraft(composite)
+  assertCollectionOnlyEditing(composite)
+
+  const sections = composite.formSections ?? []
+  const childItems = composite.items.filter((item: any) => item.type !== 'FORM')
+  const expected = new Map<string, string>([
+    ...childItems.map((item: any) => [
+      `${item.type === 'SCALE' ? 'scale' : 'cognitive'}:${item.id}`,
+      item.type === 'SCALE' ? 'scale' : 'cognitive',
+    ] as const),
+    ...sections.map((section: any) => [`form-section:${section.id}`, 'form-section'] as const),
+  ])
+  if (input.length !== expected.size) throw compositeBadRequest('必须同时提交全部内容单元的排序')
+  if (input.some((item) => !Number.isInteger(item.position) || item.position < 0)) {
+    throw compositeBadRequest('内容排序位置必须是非负整数')
+  }
+  const ordered = [...input].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+  if (new Set(ordered.map((item) => item.position)).size !== ordered.length) throw compositeBadRequest('内容排序位置不能重复')
+  const seen = new Set<string>()
+  const normalized = ordered.map((item) => {
+    const type = canonicalCompositeContentUnitType(item.type)
+    const key = `${type}:${item.id}`
+    if (seen.has(key) || expected.get(key) !== type) throw compositeBadRequest('内容单元排序数据无效')
+    seen.add(key)
+    return { type, id: item.id }
+  })
+  if (seen.size !== expected.size || [...expected.keys()].some((key) => !seen.has(key))) {
+    throw compositeBadRequest('内容单元排序列表与综合测评内容不一致')
+  }
+  assertCompositeContentUnitOrder(normalized, sections)
+
+  // Form item positions remain frozen for legacy report/package label reads.
+  // New free-composition units use an isolated position range shared by child
+  // modules and sections, so a section can move across a Scale/Cognitive item
+  // without colliding with the physical FORM rows.
+  const unitBase = Math.max(
+    1000,
+    ...composite.items.map((item: any) => item.position),
+    ...sections.map((section: any) => section.position),
+    ...input.map((item) => item.position),
+  ) + expected.size + 1
+  const itemTemporaryBase = unitBase + expected.size + composite.items.length + 1
+  const sectionTemporaryBase = unitBase + expected.size + sections.length + 1
+  await prisma.$transaction(async (tx) => {
+    for (const [index, item] of childItems.entries()) {
+      await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { position: itemTemporaryBase + index } })
+    }
+    for (const [index, section] of sections.entries()) {
+      await tx.compositeFormSection.update({ where: { id: section.id }, data: { position: sectionTemporaryBase + index } })
+    }
+    for (const [index, unit] of normalized.entries()) {
+      const position = unitBase + index
+      if (unit.type === 'form-section') {
+        await tx.compositeFormSection.update({ where: { id: unit.id }, data: { position } })
+      } else {
+        await tx.compositeAssessmentItem.update({ where: { id: unit.id }, data: { position } })
+      }
+    }
+  })
+  return listCompositeContentUnits(compositeId)
+}
+
 export const reorderItems = async (userId: string, role: UserRole, compositeId: string, items: Array<{ id: string; position: number }>) => {
   assertTeacher(role)
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(compositeId)
   const composite = await loadComposite(compositeId, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
   assertCollectionOnlyEditing(composite)
   if (items.length !== composite.items.length) throw compositeBadRequest('必须同时提交全部模块的排序')
-  const known = new Set(composite.items.map((item: any) => item.id))
+  const known = new Map(composite.items.map((item: any) => [item.id, item]))
   const itemIds = new Set<string>()
   const positions = new Set<number>()
   for (const item of items) {
-    if (!known.has(item.id) || itemIds.has(item.id) || positions.has(item.position)) throw compositeBadRequest('模块排序数据无效')
+    if (!known.has(item.id) || itemIds.has(item.id) || positions.has(item.position) || item.position < 0) {
+      throw compositeBadRequest('模块排序数据无效')
+    }
     itemIds.add(item.id)
     positions.add(item.position)
   }
-  if (itemIds.size !== known.size || positions.size !== composite.items.length) throw compositeBadRequest('模块排序数据无效')
+  if (itemIds.size !== known.size) throw compositeBadRequest('模块排序数据无效')
 
-  // position 有唯一索引，直接交换两个位置会在事务中途碰撞。先整体移到临时区，再写入最终位置。
-  const temporaryStart = Math.max(
-    0,
-    ...composite.items.map((item: any) => item.position),
-    ...items.map((item) => item.position),
-  ) + composite.items.length + 1
-  await prisma.$transaction(async (tx) => {
-    for (let index = 0; index < composite.items.length; index += 1) {
-      await tx.compositeAssessmentItem.update({
-        where: { id: composite.items[index].id },
-        data: { position: temporaryStart + index },
-      })
+  const ordered = [...items].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+  const sectionIds = new Set<string>()
+  const seenSections = new Set<string>()
+  const unitInputs: CompositeContentUnitInput[] = []
+  let activeSectionId: string | null = null
+  for (const entry of ordered) {
+    const item = known.get(entry.id) as any
+    if (item.type === 'FORM') {
+      if (!item.formSectionId) throw compositeBadRequest('表单字段尚未分配到区段')
+      if (activeSectionId !== item.formSectionId) {
+        if (seenSections.has(item.formSectionId)) throw compositeBadRequest('同一区段的字段必须连续排列')
+        activeSectionId = item.formSectionId
+        seenSections.add(item.formSectionId)
+        sectionIds.add(item.formSectionId)
+        unitInputs.push({ type: 'form-section', id: item.formSectionId, position: entry.position })
+      }
+      continue
     }
-    for (const item of items) {
-      await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { position: item.position } })
-    }
-  })
+    activeSectionId = null
+    unitInputs.push({ type: item.type === 'SCALE' ? 'scale' : 'cognitive', id: item.id, position: entry.position })
+  }
+  for (const section of composite.formSections ?? []) {
+    if (!sectionIds.has(section.id)) unitInputs.push({ type: 'form-section', id: section.id, position: section.position })
+  }
+  return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
 export const publishComposite = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(id)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
@@ -1329,17 +1482,35 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
+  const contextSections = (composite.formSections ?? []).filter(compositeSectionHasContext)
+  if (contextSections.length > 1) throw compositeBadRequest('同一综合测评只能有一个上下文区段')
+  const contentUnits = [
+    ...composite.items
+      .filter((item: any) => item.type !== 'FORM')
+      .map((item: any) => ({ type: item.type === 'SCALE' ? 'scale' : 'cognitive', id: item.id, position: item.position })),
+    ...(composite.formSections ?? []).map((section: any) => ({ type: 'form-section', id: section.id, position: section.position })),
+  ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+  if (contextSections[0] && (
+    contentUnits[0]?.type !== 'form-section' || contentUnits[0].id !== contextSections[0].id
+  )) {
+    throw compositeBadRequest('人口学上下文区段必须是第一个内容单元')
+  }
+  const sectionByItem = new Map<string, any>(
+    (composite.formSections ?? []).flatMap((section: any) => section.items.map((item: any) => [item.id, section] as const)),
+  )
   const contextIssues = validateContextFormItems(
     composite.items.filter((item: any) => item.type === 'FORM').map((item: any) => ({
       id: item.id,
       type: item.formType,
       label: item.formLabel,
       required: item.required,
-      position: item.position,
+      position: sectionByItem.get(item.id)?.position ?? item.position,
       contextKey: item.contextKey,
       options: item.formOptions,
     })),
-    composite.items.filter((item: any) => item.type !== 'FORM').map((item: any) => item.position),
+    contentUnits
+      .filter((unit) => !(contextSections[0]?.id === unit.id && unit.type === 'form-section'))
+      .map((unit) => unit.position),
   )
   if (contextIssues.length > 0) throw compositeBadRequest(contextIssues[0].message)
 
@@ -1551,7 +1722,24 @@ export const listAvailableForStudent = async (userId: string) => {
   const list = await prisma.compositeAssessment.findMany({
     where: { status: 'PUBLISHED', courseId: { in: courseIds }, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
-    include: { course: { select: { id: true, title: true, courseCode: true, isLibrary: true } }, items: { orderBy: { position: 'asc' }, select: { type: true, position: true, scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } }, formLabel: true } } },
+    include: {
+      course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+      items: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          position: true,
+          scale: { select: { name: true } },
+          cognitiveAssignment: { select: { title: true } },
+          formLabel: true,
+        },
+      },
+      formSections: {
+        orderBy: { position: 'asc' },
+        include: { items: { select: { id: true, contextKey: true } } },
+      },
+    },
   })
   const supportedList = config.cognitiveModuleEnabled
     ? list
@@ -1583,13 +1771,35 @@ export const listAvailableForStudent = async (userId: string) => {
     // `attempts` is ordered newest-first, so this is the most recent completed
     // attempt even when a newer attempt is currently in progress.
     const latestCompletedAttempt = compositeAttempts.find((attempt) => attempt.status === 'COMPLETED') ?? null
+    const sections = item.formSections ?? []
+    const units = [
+      ...item.items
+        .filter((child: any) => child.type !== 'FORM')
+        .map((child: any) => ({
+          type: child.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+          id: child.id,
+          position: child.position,
+          label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)),
+          itemCount: 1,
+          contextSection: false,
+        })),
+      ...sections.map((section: any) => ({
+        type: 'form-section' as const,
+        id: section.id,
+        position: section.position,
+        label: section.title,
+        itemCount: section.items.length,
+        contextSection: compositeSectionHasContext(section),
+      })),
+    ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
     return {
       id: item.id,
       code: item.code,
       name: item.name,
       description: item.description,
       instruction: item.instruction,
-      estimatedModules: item.items.length,
+      deliveryMode: 'FINAL_ONLY' as const,
+      estimatedModules: units.length,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,
@@ -1599,6 +1809,8 @@ export const listAvailableForStudent = async (userId: string) => {
       canStartNewAttempt: availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
       canContinue,
       items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
+      units,
+      formSections: sections,
       attempt: latestAttempt,
       latestCompletedAttempt,
     }
@@ -1653,8 +1865,9 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       compositeItemId: item.id,
       configId: config.id,
       testType: config.testType,
-      attemptNo: 1,
+      attemptNo: attempt.attemptEpoch ?? 1,
       status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
       configVersion: config.configVersion,
       configSnapshotEncrypted,
       engineVersion: config.engineVersion,
@@ -1674,6 +1887,8 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           scaleId: item.scaleId,
           userId,
           status: 'IN_PROGRESS',
+          deliveryMode: 'FINAL_ONLY',
+          attemptEpoch: attempt.attemptEpoch ?? 1,
           progress: 0,
           answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
@@ -1693,11 +1908,19 @@ const createAttempt = async (
   accessTokenId: string | null,
   credential?: ReturnType<typeof createRecoveryCredential>,
   attemptNo = 1,
+  attemptEpoch = 1,
 ) => {
-  const completedItems = composite.items.filter((item: any) => !item.required && !item.contextKey).length
-  const progress = composite.items.length === 0
+  const finalOnly = composite.deliveryMode !== 'LEGACY'
+  const formSections = finalOnly ? (composite.formSections ?? []) : []
+  const totalUnits = finalOnly
+    ? composite.items.filter((item: any) => item.type !== 'FORM').length + formSections.length
+    : composite.items.length
+  const completedItems = finalOnly
+    ? 0
+    : composite.items.filter((item: any) => !item.required && !item.contextKey).length
+  const progress = totalUnits === 0
     ? 100
-    : Math.round((completedItems / composite.items.length) * 100)
+    : Math.round((completedItems / totalUnits) * 100)
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
@@ -1707,15 +1930,28 @@ const createAttempt = async (
       participantKey: credential?.participantKey ?? `user:${userId}`,
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
+      deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
+      attemptEpoch,
       completedItems,
       progress,
     },
   })
+  if (finalOnly && formSections.length > 0) {
+    await db.compositeFormSectionAttempt.createMany({
+      data: formSections.map((section: any) => ({
+        attemptId: attempt.id,
+        sectionId: section.id,
+        attemptEpoch,
+      })),
+    })
+  }
   await createChildRecords(db, attempt, composite.items, userId)
   return attempt
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(compositeId)
   const composite = await loadComposite(compositeId, true)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
@@ -1753,6 +1989,58 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
   throw compositeConflict('无法创建综合测评记录，请稍后重试')
 }
 
+/**
+ * Replace an in-progress Composite attempt with a clean final-only attempt.
+ * The retired attempt remains available to reporting/audit code; its child
+ * rows are never deleted.
+ */
+export const restartUserAttempt = async (userId: string, attemptId: string) => {
+  const existing = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: { id: true, userId: true, compositeAssessmentId: true },
+  })
+  if (!existing) throw compositeNotFound('综合测评记录不存在')
+  if (existing.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
+
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(existing.compositeAssessmentId)
+  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  assertSupportedComposite(composite)
+  await assertStudentEligibility(composite, userId)
+
+  const next = await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        id: true,
+        userId: true,
+        compositeAssessmentId: true,
+        status: true,
+        attemptNo: true,
+        attemptEpoch: true,
+      },
+    })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
+    if (current.status !== 'IN_PROGRESS') throw compositeConflict('只有进行中的综合测评可以重启')
+    await tx.compositeAssessmentAttempt.update({
+      where: { id: current.id },
+      data: { status: 'ABANDONED', completedAt: new Date() },
+    })
+    return createAttempt(
+      tx,
+      composite,
+      userId,
+      null,
+      undefined,
+      current.attemptNo + 1,
+      current.attemptEpoch + 1,
+    )
+  })
+  return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
+}
+
 const findPublicToken = async (tokenValue: string) => {
   const tokenHash = hashPublicAccessToken(tokenValue)
   let token = await prisma.compositeAssessmentAccessToken.findUnique({
@@ -1778,6 +2066,10 @@ const findPublicToken = async (tokenValue: string) => {
               },
               cognitiveAssignment: { include: { config: true } },
             },
+          },
+          formSections: {
+            orderBy: { position: 'asc' },
+            include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
           },
         },
       },
@@ -1810,6 +2102,10 @@ const findPublicToken = async (tokenValue: string) => {
                 cognitiveAssignment: { include: { config: true } },
               },
             },
+            formSections: {
+              orderBy: { position: 'asc' },
+              include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
+            },
           },
         },
       },
@@ -1828,21 +2124,58 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
   assertTokenWindow(token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
-  const packageSlotLabels = getFrozenPackageSlotLabels(composite)
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(composite.id)
+  const current = await loadComposite(composite.id, true)
+  const packageSlotLabels = getFrozenPackageSlotLabels(current)
+  const units = [
+    ...current.items
+      .filter((item: any) => item.type !== 'FORM')
+      .map((item: any) => ({
+        type: item.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+        id: item.id,
+        position: item.position,
+        label: resolveCompositeItemLabel(item, packageSlotLabels),
+        itemCount: 1,
+        contextSection: false,
+      })),
+    ...(current.formSections ?? []).map((section: any) => ({
+      type: 'form-section' as const,
+      id: section.id,
+      position: section.position,
+      label: section.title,
+      itemCount: section.items.length,
+      contextSection: compositeSectionHasContext(section),
+    })),
+  ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
   return {
-    id: composite.id,
-    name: composite.name,
-    description: composite.description,
-    instruction: composite.instruction,
+    id: current.id,
+    name: current.name,
+    description: current.description,
+    instruction: current.instruction,
     expiresAt: token.expiresAt,
     maxUses: token.maxUses,
     usedCount: token.usedCount,
-    items: composite.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
+    deliveryMode: 'FINAL_ONLY' as const,
+    attemptEpoch: 1,
+    items: current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
+    units,
+    formSections: (current.formSections ?? []).map((section: any) => ({
+      id: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      position: section.position,
+      contextSection: Boolean(section.contextSection),
+      items: section.items ?? [],
+    })),
   }
 }
 
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string) => {
   const token = await findPublicToken(tokenValue)
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(token.compositeAssessment.id)
+  const composite = await loadComposite(token.compositeAssessment.id, true)
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
     const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
@@ -1858,9 +2191,79 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
       data: { usedCount: { increment: 1 } },
     })
     if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
-    return createAttempt(tx, token.compositeAssessment, null, token.id, credential)
+    return createAttempt(tx, composite, null, token.id, credential)
   })
   return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
+}
+
+/** Restart an anonymous attempt using only the server-issued recovery hash. */
+export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash: string) => {
+  const existing = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: {
+      id: true,
+      userId: true,
+      recoveryTokenHash: true,
+      accessTokenId: true,
+      compositeAssessmentId: true,
+    },
+  })
+  if (!existing) throw compositeNotFound('综合测评记录不存在')
+  if (existing.userId !== null || existing.recoveryTokenHash !== recoveryTokenHash) {
+    throw compositeForbidden('恢复凭证无权重启此综合测评')
+  }
+  const accessToken = existing.accessTokenId
+    ? await prisma.compositeAssessmentAccessToken.findUnique({
+        where: { id: existing.accessTokenId },
+        select: { isActive: true, expiresAt: true },
+      })
+    : null
+  if (!accessToken || !accessToken.isActive || accessToken.expiresAt.getTime() <= Date.now()) {
+    throw compositeForbidden('公开链接已失效')
+  }
+
+  const { ensureCompositeFormSections } = await import('./final-submit.service')
+  await ensureCompositeFormSections(existing.compositeAssessmentId)
+  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  assertSupportedComposite(composite)
+  if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
+  const credential = createRecoveryCredential()
+
+  const next = await prisma.$transaction(async (tx: Db) => {
+    await lockCompositeAttempt(tx, attemptId)
+    const current = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        id: true,
+        userId: true,
+        recoveryTokenHash: true,
+        accessTokenId: true,
+        status: true,
+        attemptNo: true,
+        attemptEpoch: true,
+        compositeAssessmentId: true,
+      },
+    })
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    if (current.userId !== null || current.recoveryTokenHash !== recoveryTokenHash) {
+      throw compositeForbidden('恢复凭证无权重启此综合测评')
+    }
+    if (current.status !== 'IN_PROGRESS') throw compositeConflict('只有进行中的综合测评可以重启')
+    await tx.compositeAssessmentAttempt.update({
+      where: { id: current.id },
+      data: { status: 'ABANDONED', completedAt: new Date() },
+    })
+    return createAttempt(
+      tx,
+      composite,
+      null,
+      current.accessTokenId,
+      credential,
+      current.attemptNo + 1,
+      current.attemptEpoch + 1,
+    )
+  })
+  return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
 const loadAttemptWithChildren = async (attemptId: string) => {
@@ -1887,6 +2290,10 @@ const loadAttemptWithChildren = async (attemptId: string) => {
               cognitiveAssignment: { include: { config: true } },
             },
           },
+          formSections: {
+            orderBy: { position: 'asc' as const },
+            include: { items: { orderBy: [{ formSectionPosition: 'asc' as const }, { position: 'asc' as const }] } },
+          },
         },
       },
       scaleAssessments: { include: { scale: true } },
@@ -1900,6 +2307,7 @@ const loadAttemptWithChildren = async (attemptId: string) => {
         },
       },
       formAnswers: true,
+      formSectionAttempts: true,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
@@ -1932,11 +2340,16 @@ const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
               scale: { select: { id: true, code: true, status: true } },
             },
           },
+          formSections: {
+            orderBy: { position: 'asc' as const },
+            include: { items: true },
+          },
         },
       },
       scaleAssessments: true,
       cognitiveSessions: true,
       formAnswers: true,
+      formSectionAttempts: true,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
@@ -1966,7 +2379,7 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
   })
 }
 
-const cognitiveRunnerPayload = (session: any) => {
+const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null) => {
   const storedConfig = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted)
   const config = storedConfig.config
   const resultSnapshot = session.status === 'COMPLETED' && session.resultSnapshotEncrypted
@@ -1993,6 +2406,10 @@ const cognitiveRunnerPayload = (session: any) => {
     assignmentId: session.assignmentId,
     testType: session.testType,
     attemptNo: session.attemptNo,
+    attemptEpoch: session.attemptNo,
+    deliveryMode: session.deliveryMode ?? 'FINAL_ONLY',
+    definitionHash: storedConfig.snapshot?.configHash ?? null,
+    contextSnapshotHash: contextSnapshotHash ?? session.compositeAttempt?.contextSnapshotHash ?? null,
     status: session.status,
     configVersion: session.configVersion,
     engineVersion: session.engineVersion,
@@ -2022,20 +2439,26 @@ const attemptCompletedItemMaps = (attempt: any) => ({
   scaleMap: latestChildrenByItem(attempt.scaleAssessments),
   cognitiveMap: latestChildrenByItem(attempt.cognitiveSessions),
   formMap: latestChildrenByItem(attempt.formAnswers),
+  sectionMap: new Map<string, any>((attempt.formSectionAttempts ?? []).map((section: any) => [section.sectionId, section])),
 })
 
 const isAttemptItemCompleted = (
   item: any,
   maps: ReturnType<typeof attemptCompletedItemMaps>,
+  finalOnly = false,
 ) => {
   if (!item.required && !item.contextKey) return true
   if (item.type === 'SCALE') return maps.scaleMap.get(item.id)?.status === 'COMPLETED'
   if (item.type === 'COGNITIVE') return maps.cognitiveMap.get(item.id)?.status === 'COMPLETED'
+  if (finalOnly) return maps.sectionMap.get(item.formSectionId)?.status === 'COMPLETED'
   return maps.formMap.get(item.id)?.completed !== false && maps.formMap.has(item.id)
 }
 
 const countAttemptCompletedItems = (attempt: any, maps = attemptCompletedItemMaps(attempt)) =>
-  attempt.compositeAssessment.items.filter((item: any) => isAttemptItemCompleted(item, maps)).length
+  attempt.deliveryMode === 'FINAL_ONLY'
+    ? attempt.compositeAssessment.items.filter((item: any) => item.type !== 'FORM' && isAttemptItemCompleted(item, maps)).length
+      + (attempt.formSectionAttempts ?? []).filter((section: any) => section.status === 'COMPLETED').length
+    : attempt.compositeAssessment.items.filter((item: any) => isAttemptItemCompleted(item, maps)).length
 
 const markCompositeItemCompleted = async (tx: Db, attemptId: string, increment: boolean) => {
   const current = await tx.compositeAssessmentAttempt.findUnique({
@@ -2068,12 +2491,15 @@ const markCompositeItemCompleted = async (tx: Db, attemptId: string, increment: 
  * changes, so any analysis/encryption/DB failure rolls completion back as one
  * transaction.
  */
-export const finalizeCompositeAttemptIfReady = async (attemptId: string) => prisma.$transaction(async (tx: Db) => {
+export const finalizeCompositeAttemptIfReady = async (attemptId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
   await lockCompositeAttempt(tx, attemptId)
   const attempt = await loadAttemptForFinalization(tx, attemptId)
   const maps = attemptCompletedItemMaps(attempt)
   const completedItems = countAttemptCompletedItems(attempt, maps)
-  const totalItems = attempt.compositeAssessment.items.length
+  const totalItems = attempt.deliveryMode === 'FINAL_ONLY'
+    ? attempt.compositeAssessment.items.filter((item: any) => item.type !== 'FORM').length
+      + (attempt.compositeAssessment.formSections ?? []).length
+    : attempt.compositeAssessment.items.length
   const progress = totalItems ? Math.round((completedItems / totalItems) * 100) : 100
   const shouldComplete = totalItems > 0 && completedItems === totalItems
 
@@ -2144,14 +2570,70 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   )
   const readableAttempt = { ...attempt, formAnswers: readableFormAnswers }
   const maps = attemptCompletedItemMaps(readableAttempt)
-  const { scaleMap, cognitiveMap, formMap } = maps
-  const completed = (item: any) => isAttemptItemCompleted(item, maps)
+  const { scaleMap, cognitiveMap, formMap, sectionMap } = maps
+  const finalOnly = attempt.deliveryMode === 'FINAL_ONLY'
+  const completed = (item: any) => isAttemptItemCompleted(item, maps, finalOnly)
   const completedItems = countAttemptCompletedItems(attempt, maps)
-  const currentIndex = attempt.compositeAssessment.items.findIndex((item: any) => !completed(item))
-  const current = currentIndex >= 0 ? attempt.compositeAssessment.items[currentIndex] : null
+  const sections = (attempt.compositeAssessment.formSections ?? []).slice().sort((left: any, right: any) => left.position - right.position)
+  const units = finalOnly
+    ? [
+        ...attempt.compositeAssessment.items
+          .filter((item: any) => item.type !== 'FORM')
+          .map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item })),
+        ...sections.map((section: any) => ({ id: section.id, type: 'FORM_SECTION', position: section.position, required: true, section })),
+      ].sort((left: any, right: any) => left.position - right.position)
+    : attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item }))
+  const currentIndex = units.findIndex((unit: any) => unit.type === 'FORM_SECTION'
+    ? sectionMap.get(unit.id)?.status !== 'COMPLETED'
+    : !completed(unit.item))
+  const currentUnit = currentIndex >= 0 ? units[currentIndex] : null
+  const current = currentUnit?.item ?? null
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   let currentItem: any = null
-  if (current?.type === 'FORM') {
+  if (currentUnit?.type === 'FORM_SECTION') {
+    const section = currentUnit.section
+    const sectionAnswers = section.items.map((item: any) => ({
+      id: item.id,
+      formItemId: item.id,
+      type: item.formType,
+      label: packageSlotLabels.get(item.position) ?? item.formLabel,
+      placeholder: item.formPlaceholder,
+      options: item.formOptions,
+      required: item.required,
+      contextKey: item.contextKey ?? null,
+      value: formMap.get(item.id)?.value ?? null,
+    }))
+    currentItem = {
+      id: section.id,
+      type: 'FORM_SECTION',
+      position: section.position,
+      required: true,
+      formSectionId: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      contextSection: Boolean(section.contextSection),
+      definitionHash: computeSubmissionPayloadHash({
+        sectionId: section.id,
+        title: section.title,
+        description: section.description ?? null,
+        position: section.position,
+        contextSection: Boolean(section.contextSection),
+        items: section.items.map((item: any) => ({
+          id: item.id,
+          formType: item.formType,
+          formLabel: item.formLabel,
+          placeholder: item.formPlaceholder ?? null,
+          required: item.required !== false,
+          formOptions: item.formOptions,
+          contextKey: item.contextKey ?? null,
+          position: item.position,
+          formSectionPosition: item.formSectionPosition ?? null,
+        })),
+      }),
+      status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
+      answers: sectionAnswers,
+    }
+  } else if (current?.type === 'FORM') {
     currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, form: { type: current.formType, label: packageSlotLabels.get(current.position) ?? current.formLabel, placeholder: current.formPlaceholder, options: current.formOptions, contextKey: current.contextKey ?? null }, value: formMap.get(current.id)?.value ?? null }
   } else if (current?.type === 'SCALE') {
     const assessment = scaleMap.get(current.id)
@@ -2159,8 +2641,10 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       ? { ...current.scale, name: packageSlotLabels.get(current.position) ?? current.scale.name }
       : current.scale
     let runnerScale = scale
+    let definitionHash: string | undefined
     if (scale) {
       try {
+        definitionHash = hashScaleDefinition(scaleDefinitionFromRecord(scale))
         const { definition: _definition, ...metadata } = scale
         runnerScale = { ...metadata, definition: scaleRunnerFromRecord(scale) }
       } catch {
@@ -2177,11 +2661,12 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       scaleAssessmentId: assessment?.id,
       scale: runnerScale,
       answers: decodedAnswers.answers,
+      definitionHash,
       ...(decodedAnswers.decryptError ? { decryptError: true } : {}),
     }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session) : null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash) : null }
   }
   return {
     id: attempt.id,
@@ -2189,10 +2674,18 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     name: attempt.compositeAssessment.name,
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
+    deliveryMode: attempt.deliveryMode,
+    attemptEpoch: attempt.attemptEpoch,
+    definitionHash: computeSubmissionPayloadHash({
+      assessmentId: attempt.compositeAssessment.id,
+      items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
+      formSections: sections.map((section: any) => ({ id: section.id, position: section.position, itemIds: section.items.map((item: any) => item.id) })),
+    }),
+    contextSnapshotHash: attempt.contextSnapshotHash ?? null,
     progress: attempt.progress,
     completedItems,
-    totalItems: attempt.compositeAssessment.items.length,
-    currentIndex: currentIndex < 0 ? attempt.compositeAssessment.items.length : currentIndex,
+    totalItems: units.length,
+    currentIndex: currentIndex < 0 ? units.length : currentIndex,
     startedAt: attempt.startedAt,
     lastSavedAt: attempt.lastSavedAt,
     completedAt: attempt.completedAt,
@@ -2200,8 +2693,46 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     context: {
       status: attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
       frozenAt: attempt.contextFrozenAt?.toISOString?.() ?? null,
+      snapshotHash: attempt.contextSnapshotHash ?? null,
     },
     items: attempt.compositeAssessment.items.map((item: any, index: number) => ({ id: item.id, type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels), completed: completed(item), index })),
+    units: units.map((unit: any, index: number) => ({
+      id: unit.id,
+      type: unit.type,
+      position: unit.position,
+      required: unit.required,
+      label: unit.type === 'FORM_SECTION' ? unit.section.title : resolveCompositeItemLabel(unit.item, packageSlotLabels),
+      completed: unit.type === 'FORM_SECTION' ? sectionMap.get(unit.id)?.status === 'COMPLETED' : completed(unit.item),
+      index,
+      ...(unit.type === 'FORM_SECTION' ? { formSectionId: unit.id } : { itemId: unit.id }),
+    })),
+    formSections: sections.map((section: any) => ({
+      id: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      position: section.position,
+      contextSection: Boolean(section.contextSection),
+      definitionHash: computeSubmissionPayloadHash({
+        sectionId: section.id,
+        title: section.title,
+        description: section.description ?? null,
+        position: section.position,
+        contextSection: Boolean(section.contextSection),
+        items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
+      }),
+      status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
+      submittedAt: sectionMap.get(section.id)?.submittedAt ?? null,
+      items: section.items.map((item: any) => ({
+        id: item.id,
+        type: item.formType,
+        label: packageSlotLabels.get(item.position) ?? item.formLabel,
+        placeholder: item.formPlaceholder,
+        options: item.formOptions,
+        required: item.required !== false,
+        contextKey: item.contextKey ?? null,
+        value: formMap.get(item.id)?.value ?? null,
+      })),
+    })),
     currentItem,
   }
 }

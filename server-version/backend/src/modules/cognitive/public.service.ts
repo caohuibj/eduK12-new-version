@@ -14,6 +14,8 @@ import { hashResolvedConfig } from './profile-freeze'
 import * as sessionService from './session.service'
 import * as trialService from './trial.service'
 import * as completionService from './completion.service'
+import * as finalSubmitService from './final-submit.service'
+import { lockSession } from './session-lock'
 import { BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND } from './cognitive.errors'
 import { isCompositeWrapper } from './assignment.access'
 
@@ -124,6 +126,7 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
         testType: config.testType,
         attemptNo: 1,
         status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
         configVersion: config.configVersion,
         configSnapshotEncrypted: sessionConfigSnapshotEncrypted,
         engineVersion: config.engineVersion,
@@ -149,6 +152,97 @@ export const appendTrials = async (
 
 export const completeSession = async (sessionId: string, recoveryToken: string) =>
   completionService.completeSessionForPublic(sessionId, hashRecoveryToken(recoveryToken))
+
+export const submitSessionFinal = async (
+  sessionId: string,
+  recoveryToken: string,
+  input: Omit<Parameters<typeof finalSubmitService.submitCognitiveSessionFinalForPublic>[0], 'sessionId'>,
+) => finalSubmitService.submitCognitiveSessionFinalForPublic(
+  { sessionId, ...input },
+  hashRecoveryToken(recoveryToken),
+)
+
+/**
+ * Replace an anonymous legacy/in-progress session with a fresh final-only
+ * attempt. The old row and its trials remain readable for historical reports;
+ * only the new recovery credential can write the replacement session.
+ */
+export const restartPublicSession = async (sessionId: string, recoveryToken: string) => {
+  const recoveryTokenHash = hashRecoveryToken(recoveryToken)
+  const current = await prisma.cognitiveSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      assignment: { include: { config: true, course: true } },
+      accessToken: true,
+    },
+  })
+  if (!current) throw NOT_FOUND('CognitiveSession not found')
+  if (current.userId !== null || current.recoveryTokenHash !== recoveryTokenHash) {
+    throw FORBIDDEN('Recovery credential does not own this session')
+  }
+  if (current.compositeAttemptId) {
+    throw CONFLICT('综合测评中的认知任务必须重启整个综合测评')
+  }
+  if (current.status !== 'IN_PROGRESS') throw BAD_REQUEST('Only an IN_PROGRESS session can be restarted')
+  if (!current.assignment || !current.accessToken) throw BAD_REQUEST('Public session is missing its access link')
+  if (!current.accessToken.isActive || current.accessToken.expiresAt.getTime() < Date.now()) {
+    throw FORBIDDEN('Public link is disabled or expired')
+  }
+  if (current.assignment.status !== 'PUBLISHED' || current.assignment.config.status !== 'PUBLISHED') {
+    throw FORBIDDEN('Cognitive assignment is not publicly available')
+  }
+  if (isCompositeWrapper(current.assignment) || current.assignment.course?.isLibrary) {
+    throw FORBIDDEN('此认知任务仅用于综合测评，不能单独作答或公开分发')
+  }
+
+  const validated = validateAssignment(current.assignment)
+  const used = await prisma.cognitiveSession.count({
+    where: { assignmentId: current.assignmentId, participantKey: current.participantKey },
+  })
+  if (used >= current.assignment.maxAttempts) throw CONFLICT('Maximum attempts reached for this assignment')
+
+  const credential = createRecoveryCredential()
+  const created = await prisma.$transaction(async (tx) => {
+    const locked = await lockSession(tx, sessionId)
+    if (!locked) throw NOT_FOUND('CognitiveSession not found')
+    if (locked.status !== 'IN_PROGRESS') throw CONFLICT('Session is no longer IN_PROGRESS')
+
+    const retiredAt = new Date()
+    const retired = await tx.cognitiveSession.updateMany({
+      where: { id: sessionId, status: 'IN_PROGRESS' },
+      data: { status: 'ABANDONED', finishedAt: retiredAt },
+    })
+    if (retired.count !== 1) throw CONFLICT('Session is no longer IN_PROGRESS')
+
+    return tx.cognitiveSession.create({
+      data: {
+        userId: null,
+        participantKey: locked.participantKey,
+        participantSnapshotEncrypted: locked.participantSnapshotEncrypted,
+        assignmentId: locked.assignmentId,
+        accessTokenId: current.accessTokenId,
+        recoveryTokenHash: credential.hash,
+        anonymousCode: locked.anonymousCode,
+        configId: validated.config.id,
+        testType: validated.config.testType,
+        attemptNo: locked.attemptNo + 1,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        configVersion: validated.config.configVersion,
+        configSnapshotEncrypted: validated.snapshotEncrypted,
+        engineVersion: validated.config.engineVersion,
+        scoringVersion: validated.config.scoringVersion,
+        randomSeed: randomBytes(16).toString('hex'),
+      },
+    })
+  })
+
+  return {
+    session: await sessionService.getPublicSession(credential.hash, created.id),
+    recoveryToken: credential.token,
+    anonymousCode: created.anonymousCode,
+  }
+}
 
 export const createAccessTokenForAssignment = async (userId: string, role: UserRole, assignmentId: string, expiresAt: string, maxUses: number) => {
   if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw BAD_REQUEST('maxUses is invalid')

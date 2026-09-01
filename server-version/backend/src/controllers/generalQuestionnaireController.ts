@@ -10,7 +10,7 @@
 
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound } from '../utils/response'
+import { success, error, forbidden, notFound, instrumentError } from '../utils/response'
 import { serializeQuestionnaireAccessToken, tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
 import { UserRole } from '../types'
@@ -20,6 +20,8 @@ import { validateContextFormItem, validateContextFormItems } from '../modules/as
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
 import { MAX_TOKEN_USES } from '../constants'
 import { cacheService } from '../services/cacheService'
+import * as formSectionService from '../services/questionnaire-form-section.service'
+import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -639,8 +641,18 @@ export const generalQuestionnaireController = {
 
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
+      await formSectionService.ensureQuestionnaireFormSections(id)
+      const [formSections, units] = await Promise.all([
+        formSectionService.listQuestionnaireFormSections(id),
+        formSectionService.listQuestionnaireContentUnits(id),
+      ])
+
       return success(res, {
         ...questionnaire,
+        deliveryMode: 'FINAL_ONLY' as const,
+        attemptEpoch: 1,
+        formSections,
+        units,
         accessTokens: questionnaire.accessTokens.map((token: any) => serializeQuestionnaireAccessToken(token, true)),
       })
     } catch (err) {
@@ -694,7 +706,26 @@ export const generalQuestionnaireController = {
         }
       }
 
-      const contextIssues = validateContextFormItems(questionnaire.formItems, questionnaire.questionnaireScales.map((item) => item.position))
+      const sections = await formSectionService.ensureQuestionnaireFormSections(id)
+      const units = await formSectionService.listQuestionnaireContentUnits(id)
+      const contextSections = sections.filter((section) => (
+        section.contextSection || section.items.some((item) => item.contextKey)
+      ))
+      if (contextSections.length > 1) return error(res, '同一问卷只能有一个上下文区段')
+      if (contextSections[0] && (
+        units[0]?.type !== 'form-section' || units[0].id !== contextSections[0].id
+      )) {
+        return error(res, '人口学上下文区段必须是第一个内容单元')
+      }
+      const sectionByItem = new Map(sections.flatMap((section) => section.items.map((item) => [item.id, section] as const)))
+      const contextItems = questionnaire.formItems.map((item) => ({
+        ...item,
+        position: sectionByItem.get(item.id)?.position ?? item.position,
+      }))
+      const measurementPositions = units
+        .filter((unit) => !(contextSections[0]?.id === unit.id && unit.type === 'form-section'))
+        .map((unit) => unit.position)
+      const contextIssues = validateContextFormItems(contextItems, measurementPositions)
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       const updated = await prisma.questionnaire.update({
@@ -846,6 +877,130 @@ export const generalQuestionnaireController = {
   },
 
   // ==================== 表单题目管理 ====================
+
+  async listFormSections(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+      return success(res, { list: await formSectionService.listQuestionnaireFormSections(req.params.id) })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('获取泛化问卷表单区段错误', err)
+      return error(res, '获取表单区段列表失败')
+    }
+  },
+
+  async createFormSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status !== 'DRAFT') return error(res, '已发布的问卷不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).optional(),
+        position: z.number().int().min(0).optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body || {})
+      return success(res, await formSectionService.createQuestionnaireFormSection(req.params.id, input), '表单区段创建成功')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('创建泛化问卷表单区段错误', err)
+      return error(res, '创建表单区段失败')
+    }
+  },
+
+  async updateFormSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status !== 'DRAFT') return error(res, '已发布的问卷不能修改')
+      const input = z.object({
+        title: z.string().max(200).optional(),
+        description: z.string().max(2000).nullable().optional(),
+        contextSection: z.boolean().optional(),
+      }).strict().parse(req.body || {})
+      return success(res, await formSectionService.updateQuestionnaireFormSection(req.params.id, req.params.sectionId, input), '表单区段已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('更新泛化问卷表单区段错误', err)
+      return error(res, '更新表单区段失败')
+    }
+  },
+
+  async reorderFormSections(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status !== 'DRAFT') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ sectionIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body || {})
+      return success(res, { list: await formSectionService.reorderQuestionnaireFormSections(req.params.id, input.sectionIds) }, '表单区段排序已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('排序泛化问卷表单区段错误', err)
+      return error(res, '排序表单区段失败')
+    }
+  },
+
+  async reorderFormSectionItems(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status !== 'DRAFT') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ itemIds: z.array(z.string().min(1)).min(1) }).strict().parse(req.body || {})
+      return success(res, { list: await formSectionService.reorderQuestionnaireFormSectionItems(req.params.id, req.params.sectionId, input.itemIds) }, '区段字段排序已更新')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('排序泛化问卷区段字段错误', err)
+      return error(res, '排序区段字段失败')
+    }
+  },
+
+  async assignFormItemToSection(req: Request, res: Response) {
+    try {
+      const questionnaire = await generalQuestionnaire(req.params.id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限修改此问卷')
+      if (questionnaire.status !== 'DRAFT') return error(res, '已发布的问卷不能修改')
+      const input = z.object({ sectionPosition: z.number().int().min(0).optional() }).strict().parse(req.body || {})
+      return success(res, { list: await formSectionService.assignQuestionnaireFormItemToSection(req.params.id, req.params.sectionId, req.params.itemId, input.sectionPosition) }, '字段已加入区段')
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('分配泛化问卷区段字段错误', err)
+      return error(res, '分配区段字段失败')
+    }
+  },
+
+  async listContent(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      const questionnaire = await generalQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+      const units = await formSectionService.listQuestionnaireContentUnits(id)
+      const [formItems, scales] = await Promise.all([
+        prisma.questionnaireFormItem.findMany({ where: { questionnaireId: id }, orderBy: { position: 'asc' } }),
+        prisma.questionnaireScale.findMany({
+          where: { questionnaireId: id },
+          include: { scale: { select: { id: true, code: true, name: true, status: true, definition: true, instrumentClass: true, instrumentVersion: true } } },
+          orderBy: { position: 'asc' },
+        }),
+      ])
+      const list = [
+        ...formItems.map((item) => ({ type: 'form' as const, id: item.id, position: item.position, data: item })),
+        ...scales.map((item) => ({ type: 'scale' as const, id: item.id, position: item.position, data: item })),
+      ].sort((left, right) => left.position - right.position)
+      return success(res, { list, units, total: list.length })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      logger.error('获取泛化问卷内容错误', err)
+      return error(res, '获取问卷内容列表失败')
+    }
+  },
 
   /**
    * 获取表单题目列表
@@ -1094,8 +1249,13 @@ export const generalQuestionnaireController = {
           type: z.enum(['form', 'scale']),
           id: z.string(),
           position: z.number().int(),
-        })),
-      })
+        })).optional(),
+        units: z.array(z.object({
+          type: z.enum(['scale', 'form-section', 'SCALE', 'FORM_SECTION']),
+          id: z.string(),
+          position: z.number().int().min(0),
+        })).optional(),
+      }).strict().refine((value) => Boolean(value.items || value.units), { message: '缺少内容排序列表' })
 
       const result = reorderSchema.safeParse(req.body)
       if (!result.success) {
@@ -1117,25 +1277,15 @@ export const generalQuestionnaireController = {
         return error(res, '已发布的问卷不能修改')
       }
 
-      const formIds = result.data.items.filter((item) => item.type === 'form').map((item) => item.id)
-      const scaleIds = result.data.items.filter((item) => item.type === 'scale').map((item) => item.id)
-      const [forms, scales] = await Promise.all([
-        prisma.questionnaireFormItem.findMany({ where: { id: { in: formIds }, questionnaireId: id }, select: { id: true } }),
-        prisma.questionnaireScale.findMany({ where: { id: { in: scaleIds }, questionnaireId: id }, select: { id: true } }),
-      ])
-      if (forms.length !== formIds.length || scales.length !== scaleIds.length) return error(res, '存在不属于此问卷的内容项')
-      await prisma.$transaction(async (tx) => {
-        for (const item of result.data.items) {
-          if (item.type === 'form') await tx.questionnaireFormItem.update({ where: { id: item.id }, data: { position: item.position } })
-          else await tx.questionnaireScale.update({ where: { id: item.id }, data: { position: item.position } })
-        }
-      })
+      const input = result.data.units ?? result.data.items ?? []
+      await formSectionService.reorderQuestionnaireContentUnits(id, input as any)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('泛化问卷内容排序更新', { questionnaireId: id, userId })
 
-      return success(res, null, '内容排序更新成功')
+      return success(res, { units: await formSectionService.listQuestionnaireContentUnits(id) }, '内容排序更新成功')
     } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('内容排序错误', err)
       return error(res, '内容排序失败')
     }

@@ -14,8 +14,13 @@ import {
   CheckpointTransportError,
   checkpointScheduler,
 } from '../../../services/persistence/checkpointScheduler'
-import type { CheckpointBatch } from '../../../services/persistence/checkpointTypes'
+import { checkpointId, type CheckpointBatch } from '../../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../../services/persistence/flushLifecycle'
+import {
+  createFinalDraftMeta,
+  finalDraftStore,
+} from '../../../services/persistence/finalDraftStore'
+import { saveCognitiveRecoveryCredential } from './recovery-credential'
 
 interface CognitiveCheckpointPayload {
   trialIndex: number
@@ -48,11 +53,24 @@ const friendlyError = (err: unknown): RunnerError => {
   return { code, message: msg }
 }
 
+const finalDraftErrorStatus = (error: unknown) => {
+  const value = error as { status?: number; statusCode?: number; code?: number | string }
+  const status = checkpointErrorStatus(error) ?? value?.status ?? value?.statusCode
+  const code = String(value?.code ?? '')
+  return status === 409
+    || code === 'STALE_ATTEMPT'
+    || code === 'DEFINITION_MISMATCH'
+    || code === 'SUBMISSION_PAYLOAD_CONFLICT'
+    ? 'CONFLICT' as const
+    : 'RETRY_PENDING' as const
+}
+
 export interface CognitiveSessionController {
   state: RunnerState
   start: () => void
   appendTrial: (payload: Record<string, unknown>) => Promise<boolean>
   complete: () => Promise<void>
+  restart: () => Promise<CognitiveSession | null>
   reload: () => void
 }
 
@@ -76,7 +94,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       if (response.code !== 0) {
         throw new CheckpointTransportError(response.message || '试次提交失败', {
           code: response.code,
-          status: response.code >= 400 && response.code <= 599 ? response.code : undefined,
+          status: typeof response.code === 'number' && response.code >= 400 && response.code <= 599 ? response.code : undefined,
         })
       }
       return {
@@ -89,7 +107,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       if (response.code !== 0) {
         throw new CheckpointTransportError(response.message || '试次提交失败', {
           code: response.code,
-          status: response.code >= 400 && response.code <= 599 ? response.code : undefined,
+          status: typeof response.code === 'number' && response.code >= 400 && response.code <= 599 ? response.code : undefined,
         })
       }
     }
@@ -100,7 +118,10 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
     await checkpointScheduler.flush('cognitive', sessionId)
   }, [sessionId])
 
-  useCheckpointLifecycle(flushCognitiveCheckpoints, Boolean(sessionId))
+  useCheckpointLifecycle(
+    flushCognitiveCheckpoints,
+    Boolean(sessionId) && state.session?.deliveryMode !== 'FINAL_ONLY',
+  )
 
   const load = useCallback(async () => {
     dispatch({ type: 'LOADING' })
@@ -111,6 +132,53 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         return
       }
       const session: CognitiveSession = response.data
+
+      if (session.deliveryMode === 'FINAL_ONLY') {
+        if (!api.submitFinal || !session.definitionHash) {
+          dispatch({ type: 'SESSION_ERROR', error: { code: 'DEFINITION_MISMATCH', message: '该认知测评缺少可恢复的冻结定义，请重启后重试' } })
+          return
+        }
+        try {
+          const draftKey = `cognitive:${session.sessionId}`
+          const meta = await finalDraftStore.ensure(createFinalDraftMeta({
+            draftKey,
+            instrument: 'cognitive',
+            attemptId: session.sessionId,
+            attemptEpoch: session.attemptEpoch ?? session.attemptNo,
+            definitionHash: session.definitionHash,
+            contextSnapshotHash: session.contextSnapshotHash ?? null,
+            deliveryMode: 'final_only',
+            submissionId: checkpointId(),
+          }))
+          if (meta.status === 'CONFLICT') {
+            dispatch({ type: 'RECOVERY_REQUIRED' })
+            return
+          }
+          if (session.status === 'COMPLETED') {
+            await finalDraftStore.delete(draftKey)
+            dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
+            return
+          }
+          if (session.status !== 'IN_PROGRESS') {
+            dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
+            return
+          }
+          const trials = await finalDraftStore.listTrials(draftKey)
+          const nextTrialIndex = trials.reduce((max, trial) => Math.max(max, trial.trialIndex + 1), 0)
+          dispatch({ type: 'SESSION_LOADED', session, trialIndex: nextTrialIndex })
+        } catch (error) {
+          dispatch({ type: 'SESSION_ERROR', error: friendlyError(error) })
+        }
+        return
+      }
+
+      // Historical attempts remain readable, but every legacy write endpoint
+      // is disabled. Let the UI offer an explicit restart instead of loading
+      // the old runner and attempting a write that can never succeed.
+      if (session.deliveryMode === 'LEGACY') {
+        dispatch({ type: 'LEGACY_READ_ONLY', session })
+        return
+      }
 
       checkpointScheduler.register('cognitive', sessionId, cognitiveCheckpointTransport, {
         maxBatchSize: cognitiveBatchSize(),
@@ -174,6 +242,18 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         const submittedPayload = session?.protocolSignature
           ? wrapCognitiveTrial({ trialIndex: nextIndex, payload })
           : payload
+        if (session?.deliveryMode === 'FINAL_ONLY') {
+          const draftKey = `cognitive:${session.sessionId}`
+          await finalDraftStore.putTrial({
+            draftKey,
+            trialIndex: nextIndex,
+            payload: submittedPayload,
+            createdAt: Date.now(),
+          })
+          await finalDraftStore.setStatus(draftKey, 'DRAFT')
+          dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
+          return true
+        }
         await checkpointScheduler.enqueue({
           scopeType: 'cognitive',
           scopeId: sessionId,
@@ -204,7 +284,50 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
 
   const complete = useCallback(async () => {
     dispatch({ type: 'COMPLETE_START' })
+    let finalDraftKey: string | null = null
     try {
+      const session = stateRef.current.session
+      if (session?.deliveryMode === 'FINAL_ONLY') {
+        if (!api.submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
+        const draftKey = `cognitive:${session.sessionId}`
+        finalDraftKey = draftKey
+        const meta = await finalDraftStore.get(draftKey)
+        if (!meta) throw new Error('本地认知草稿不存在，请重启测评')
+        const trials = await finalDraftStore.listTrials(draftKey)
+        if (trials.length === 0) throw new Error('尚未记录任何认知试次')
+        await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+        const response = await api.submitFinal(session.sessionId, {
+          submissionId: meta.submissionId,
+          attemptEpoch: meta.attemptEpoch,
+          definitionHash: meta.definitionHash,
+          contextSnapshotHash: meta.contextSnapshotHash,
+          trials: trials.map((trial) => trial.payload),
+        })
+        if (response.code !== 0 || !response.data) {
+          const responseError = new Error(response.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
+          responseError.code = response.code
+          if (typeof response.code === 'number') responseError.status = response.code
+          throw responseError
+        }
+        const resultData = (response.data as any).response ?? (response.data as any)
+        const result: CognitiveResult | null = resultData.result
+          ?? (((resultData as any).metrics !== undefined || (resultData as any).quality !== undefined)
+            ? {
+                score: (resultData as any).score,
+                metrics: (resultData as any).metrics ?? {},
+                qualityFlags: (resultData as any).qualityFlags ?? {},
+                quality: (resultData as any).quality,
+                references: (resultData as any).references,
+                report: (resultData as any).report,
+                assessmentContext: (resultData as any).assessmentContext,
+              }
+            : null)
+        if (!result) throw new Error('服务器未返回认知测评结果')
+        await finalDraftStore.setStatus(draftKey, 'COMPLETED')
+        await finalDraftStore.delete(draftKey)
+        dispatch({ type: 'COMPLETE_SUCCESS', result })
+        return
+      }
       await checkpointScheduler.flush('cognitive', sessionId)
       const pending = await checkpointScheduler.pending('cognitive', sessionId)
       if (pending.length > 0) throw new Error('试次仍在同步，请稍后重试')
@@ -225,6 +348,17 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })
     } catch (err) {
+      if (finalDraftKey) {
+        const draftStatus = finalDraftErrorStatus(err)
+        await finalDraftStore.setStatus(finalDraftKey, draftStatus, {
+          code: String((err as { code?: number | string })?.code ?? ''),
+          message: friendlyError(err).message,
+        }).catch(() => undefined)
+        if (draftStatus === 'CONFLICT') {
+          dispatch({ type: 'FINAL_SUBMIT_CONFLICT', error: friendlyError(err) })
+          return
+        }
+      }
       dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(err) })
     }
   }, [api, sessionId])
@@ -233,9 +367,22 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
     void load()
   }, [load])
 
+  const restart = useCallback(async (): Promise<CognitiveSession | null> => {
+    if (!api.restartSession) throw new Error('该认知测评不支持重启')
+    const response = await api.restartSession(sessionId)
+    if (response.code !== 0 || !response.data) throw new Error(response.message || '重启认知测评失败')
+    const payload = response.data as CognitiveSession | { session: CognitiveSession; recoveryToken: string | null }
+    const nextSession = 'session' in payload ? payload.session : payload
+    if (!nextSession?.sessionId) throw new Error('重启响应缺少新测评记录')
+    if ('recoveryToken' in payload && payload.recoveryToken) {
+      saveCognitiveRecoveryCredential(nextSession.sessionId, payload.recoveryToken)
+    }
+    return nextSession
+  }, [api, sessionId])
+
   // 让 appendTrial 读取最新的 trialIndex（避免闭包陈旧）
   const stateRef = useRef(state)
   stateRef.current = state
 
-  return { state, start, appendTrial, complete, reload }
+  return { state, start, appendTrial, complete, restart, reload }
 }

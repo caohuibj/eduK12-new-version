@@ -138,6 +138,19 @@ export const appendTrialsSchema = z.object({
   }).strict()).min(1).max(10),
 }).strict()
 
+/** Final-only Cognitive submit: persist and score the complete trial sequence once. */
+export const finalCognitiveSubmitSchema = z.object({
+  submissionId: z.string().min(16).max(200),
+  attemptEpoch: z.number().int().min(1),
+  definitionHash: z.string().min(1).max(200),
+  contextSnapshotHash: z.string().min(1).max(200).nullable().optional(),
+  trials: z.array(z.unknown()).min(1).max(1000),
+}).strict()
+
+export const finalCognitivePublicSubmitSchema = finalCognitiveSubmitSchema.extend({
+  recoveryToken: z.string().min(20).max(200),
+}).strict()
+
 export const cognitivePublicTrialsSchema = z.object({
   recoveryToken: z.string().min(20).max(200),
   trials: z.array(z.object({

@@ -5,6 +5,7 @@ import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3,
 import { ScaleSelector } from '../../components/ScaleSelector'
 import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
+import FormSectionManager from '../../components/FormSectionManager'
 
 // 表单题目类型
 interface FormItem {
@@ -316,43 +317,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     })
   }
 
-  // 统一排序
-  const handleReorderContent = async (items: ContentItem[]) => {
-    try {
-      const response = await apiClient.post(`/general-questionnaires/${id}/content/reorder`, {
-        items: items.map((item, index) => ({
-          type: item.type,
-          id: item.data.id,
-          position: index,
-        })),
-      })
-      if (response.code === 0) {
-        fetchContent()
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '排序失败')
-    }
-  }
-
-  // 移动内容项
-  const handleMoveItem = (index: number, direction: 'up' | 'down') => {
-    const allItems: ContentItem[] = [
-      ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
-      ...questionnaireScales.map(qs => ({ type: 'scale' as const, id: qs.id, position: qs.position, data: qs })),
-    ].sort((a, b) => a.position - b.position)
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= allItems.length) return
-
-    const temp = allItems[index].position
-    allItems[index].position = allItems[newIndex].position
-    allItems[newIndex].position = temp
-
-    handleReorderContent(allItems.sort((a, b) => a.position - b.position))
-  }
-
   // 发布问卷
   const handlePublish = async () => {
     if (questionnaireScales.length === 0 && formItems.length === 0) {
@@ -636,22 +600,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleMoveItem(index, 'up')}
-                        disabled={index === 0}
-                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        title="上移"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => handleMoveItem(index, 'down')}
-                        disabled={index === allContentItems.length - 1}
-                        className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        title="下移"
-                      >
-                        ↓
-                      </button>
                       {item.type === 'form' && (
                         <button
                           onClick={() => handleEditFormItem(item.data as FormItem)}
@@ -684,6 +632,13 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               </div>
             )}
           </div>
+
+          {id && (
+            <FormSectionManager
+              basePath={`/general-questionnaires/${id}`}
+              readOnly={questionnaire.status !== 'DRAFT'}
+            />
+          )}
         </div>
       )}
 

@@ -1,0 +1,1154 @@
+import { Prisma } from '@prisma/client'
+import { v4 as uuidv4 } from 'uuid'
+import { prisma } from '../config/database'
+import {
+  buildAssessmentContext,
+  hashAssessmentContext,
+  readContextFormAnswers,
+  type AssessmentContextV1,
+} from '../modules/assessment-context'
+import { writeContextFormAnswer } from '../modules/assessment-context'
+import {
+  normalizeQuestionnaireFormAnswer,
+  validateQuestionnaireFormAnswer,
+} from './questionnaireFormAnswerValidation'
+import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
+import { encryptField } from '../utils/encryption'
+import {
+  freezeQuestionnaireAssessmentContextFromSnapshot,
+  isAssessmentContextServiceError,
+  readQuestionnaireAssessmentContext,
+} from './assessmentContextService'
+import {
+  assertAttemptEpoch,
+  assertDefinitionHash,
+  assertFinalOnly,
+  assertSubmissionPayloadSize,
+  assertSubmissionReplay,
+  computeSubmissionPayloadHash,
+  FINAL_SUBMISSION_MAX_BYTES,
+  InstrumentFinalSubmitError,
+  validateSubmissionId,
+} from './instrumentFinalSubmit'
+import { persistFormAnswerBatch, type BulkFormAnswerMutation } from './questionnaire-form-answer-batch'
+import { withQuestionnaireCompletionTransaction } from './questionnaireProgressService'
+import {
+  readScaleAnswers,
+  scaleDefinitionFromRecord,
+  scaleAssessmentForResponse,
+  encryptScaleAnswers,
+  scaleRunnerFromRecord,
+} from '../modules/scale/scale-workflow.service'
+import { hashScaleDefinition } from '../modules/scale/scale-definition'
+import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
+
+type SectionItem = {
+  id: string
+  type: string
+  label: string
+  placeholder: string | null
+  required: boolean
+  options: unknown
+  contextKey: string | null
+  position: number
+  sectionPosition: number | null
+}
+
+type SectionRow = {
+  id: string
+  title: string
+  description: string | null
+  position: number
+  contextSection: boolean
+  items: SectionItem[]
+}
+
+type SectionSubmitInput = {
+  questionnaireAssessmentId: string
+  sectionId: string
+  submissionId: string
+  attemptEpoch: number
+  definitionHash: string
+  contextSnapshotHash?: string | null
+  answers: Array<{ formItemId: string; value: string | string[] | null }>
+  userId?: string | null
+  sessionId?: string
+  resumeTokenHash?: string
+}
+
+const orderedSectionItems = (items: SectionItem[]): SectionItem[] => [...items].sort(
+  (left, right) => (left.sectionPosition ?? left.position) - (right.sectionPosition ?? right.position),
+)
+
+export const questionnaireFormSectionDefinitionHash = (section: SectionRow): string => computeSubmissionPayloadHash({
+  sectionId: section.id,
+  title: section.title,
+  description: section.description,
+  position: section.position,
+  contextSection: section.contextSection,
+  items: orderedSectionItems(section.items).map((item) => ({
+    id: item.id,
+    type: item.type,
+    label: item.label,
+    placeholder: item.placeholder,
+    required: item.required,
+    options: item.options,
+    contextKey: item.contextKey,
+    position: item.position,
+    sectionPosition: item.sectionPosition,
+  })),
+})
+
+const mapSection = (section: any): SectionRow => ({
+  id: section.id,
+  title: section.title,
+  description: section.description ?? null,
+  position: section.position,
+  contextSection: Boolean(section.contextSection),
+  items: orderedSectionItems((section.items ?? []).map((item: any) => ({
+    id: item.id,
+    type: item.type,
+    label: item.label,
+    placeholder: item.placeholder ?? null,
+    required: item.required !== false,
+    options: item.options,
+    contextKey: item.contextKey ?? null,
+    position: item.position,
+    sectionPosition: item.sectionPosition ?? null,
+  }))),
+})
+
+const contentTypesForQuestionnaire = (questionnaire: any) => [
+  ...(questionnaire.formItems ?? []).map((item: any) => ({ type: 'FORM', position: item.position, item })),
+  ...(questionnaire.questionnaireScales ?? []).map((item: any) => ({ type: 'SCALE', position: item.position, item })),
+].sort((left, right) => left.position - right.position)
+
+/**
+ * Backfill sections for newly-created form items. Existing rows are mapped by
+ * the migration; this helper keeps the editor/start path safe for items added
+ * after that migration without changing the mixed Form/Scale order.
+ */
+export const ensureQuestionnaireFormSections = async (questionnaireId: string): Promise<SectionRow[]> => {
+  const current = await prisma.questionnaire.findUnique({
+    where: { id: questionnaireId },
+    select: {
+      formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
+      questionnaireScales: { orderBy: { position: 'asc' }, select: { id: true, position: true } },
+      formSections: { select: { id: true, position: true } },
+    },
+  })
+  if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷不存在', 404)
+  const unassigned = current.formItems.filter((item) => !item.sectionId)
+  if (unassigned.length > 0) {
+    await prisma.$transaction(async (tx) => {
+      const latest = await tx.questionnaire.findUnique({
+        where: { id: questionnaireId },
+        select: {
+          formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
+          questionnaireScales: { orderBy: { position: 'asc' }, select: { id: true, position: true } },
+          formSections: { select: { id: true, position: true } },
+        },
+      })
+      if (!latest) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷不存在', 404)
+      const missing = latest.formItems.filter((item) => !item.sectionId)
+      if (missing.length === 0) return
+
+      const missingIds = new Set(missing.map((item) => item.id))
+      const runs: typeof missing[] = []
+      let run: typeof missing = []
+      for (const content of contentTypesForQuestionnaire(latest)) {
+        if (content.type === 'FORM' && missingIds.has(content.item.id)) {
+          run.push(content.item)
+        } else if (content.type !== 'FORM' && run.length > 0) {
+          runs.push(run)
+          run = []
+        }
+      }
+      if (run.length > 0) runs.push(run)
+
+      const occupied = new Set(latest.formSections.map((section) => section.position))
+      const maximumPosition = Math.max(
+        -1,
+        ...latest.formItems.map((item) => item.position),
+        ...latest.questionnaireScales.map((item) => item.position),
+      )
+      for (const [runIndex, items] of runs.entries()) {
+        let position = items[0].position
+        if (occupied.has(position)) position = maximumPosition + runIndex + 1
+        occupied.add(position)
+        const section = await tx.questionnaireFormSection.create({
+          data: {
+            questionnaireId,
+            title: '表单',
+            position,
+            contextSection: items.some((item) => Boolean(item.contextKey)),
+          },
+        })
+        for (const [sectionPosition, item] of items.entries()) {
+          await tx.questionnaireFormItem.update({
+            where: { id: item.id },
+            data: { sectionId: section.id, sectionPosition },
+          })
+        }
+      }
+    })
+  }
+
+  const sections = await prisma.questionnaireFormSection.findMany({
+    where: { questionnaireId },
+    orderBy: { position: 'asc' },
+    include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+  })
+  return sections.map(mapSection)
+}
+
+const finalQuestionnaireUnits = (questionnaire: any) => [
+  ...(questionnaire.questionnaireScales ?? []).map((item: any) => ({
+    id: item.id,
+    type: 'SCALE' as const,
+    position: item.position,
+    item,
+  })),
+  ...(questionnaire.formSections ?? []).map((section: any) => ({
+    id: section.id,
+    type: 'FORM_SECTION' as const,
+    position: section.position,
+    section,
+  })),
+].sort((left, right) => left.position - right.position)
+
+const isFirstQuestionnaireContentSection = (questionnaire: any, sectionId: string): boolean => {
+  const firstUnit = finalQuestionnaireUnits(questionnaire)[0]
+  return firstUnit?.type === 'FORM_SECTION' && firstUnit.id === sectionId
+}
+
+export const finalQuestionnaireDefinitionHash = (questionnaire: any) => computeSubmissionPayloadHash({
+  questionnaireId: questionnaire.id,
+  scales: (questionnaire.questionnaireScales ?? []).map((item: any) => ({ id: item.id, scaleId: item.scaleId, position: item.position })),
+  formSections: (questionnaire.formSections ?? []).map((section: any) => ({
+    id: section.id,
+    position: section.position,
+    title: section.title,
+    description: section.description ?? null,
+    contextSection: Boolean(section.contextSection),
+    items: (section.items ?? []).map((item: any) => ({
+      id: item.id,
+      type: item.type,
+      label: item.label,
+      placeholder: item.placeholder ?? null,
+      required: item.required !== false,
+      options: item.options,
+      contextKey: item.contextKey ?? null,
+      position: item.position,
+      sectionPosition: item.sectionPosition ?? null,
+    })),
+  })),
+})
+
+/**
+ * Response projection used by final-only Questionnaire start/get endpoints.
+ * It deliberately reads answers only at an instrument boundary: individual
+ * field changes are local IndexedDB state and never reach this endpoint.
+ */
+export const getQuestionnaireFinalAttemptState = async (assessmentId: string) => {
+  const assessment = await prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    include: {
+      questionnaire: {
+        include: {
+          questionnaireScales: {
+            orderBy: { position: 'asc' },
+            include: { scale: true },
+          },
+          formSections: {
+            orderBy: { position: 'asc' },
+            include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+          },
+        },
+      },
+      scaleAssessments: { include: { scale: true }, orderBy: { startedAt: 'asc' } },
+      formAnswers: true,
+      formSectionAttempts: true,
+    },
+  })
+  if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  assertFinalOnly(assessment.deliveryMode)
+
+  const sections = assessment.questionnaire.formSections ?? []
+  const readableAnswers = readContextFormAnswers(
+    sections.flatMap((section: any) => section.items.map((item: any) => ({ id: item.id, contextKey: item.contextKey ?? null }))),
+    assessment.formAnswers,
+  )
+  const answerMap = new Map(readableAnswers.map((answer: any) => [answer.formItemId, answer]))
+  const scaleMap = new Map(assessment.scaleAssessments.map((child: any) => [child.scaleId, child]))
+  const sectionAttemptMap = new Map<string, any>(assessment.formSectionAttempts.map((attempt: any) => [attempt.sectionId, attempt]))
+  const units = finalQuestionnaireUnits(assessment.questionnaire)
+  const completed = (unit: any) => unit.type === 'SCALE'
+    ? scaleMap.get(unit.item.scaleId)?.status === 'COMPLETED'
+    : sectionAttemptMap.get(unit.section.id)?.status === 'COMPLETED'
+  const completedItems = units.filter(completed).length
+  const currentIndex = units.findIndex((unit) => !completed(unit))
+  const effectiveCurrentIndex = currentIndex < 0 ? units.length : currentIndex
+  const current = currentIndex >= 0 ? units[currentIndex] : null
+
+  const sectionResponse = (section: any) => {
+    const definition = mapSection(section)
+    const sectionAttempt = sectionAttemptMap.get(section.id)
+    return {
+      id: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      position: section.position,
+      contextSection: Boolean(section.contextSection),
+      definitionHash: questionnaireFormSectionDefinitionHash(definition),
+      status: sectionAttempt?.status ?? 'IN_PROGRESS',
+      submittedAt: sectionAttempt?.submittedAt ?? null,
+      items: definition.items.map((item) => ({
+        id: item.id,
+        formItemId: item.id,
+        type: item.type,
+        label: item.label,
+        placeholder: (section.items.find((candidate: any) => candidate.id === item.id) as any)?.placeholder ?? null,
+        options: item.options,
+        required: item.required,
+        contextKey: item.contextKey,
+        value: answerMap.get(item.id)?.value ?? null,
+      })),
+    }
+  }
+  const formSections = sections.map(sectionResponse)
+
+  let currentScale: any = null
+  let currentFormSection: any = null
+  if (current?.type === 'SCALE') {
+    const child = scaleMap.get(current.item.scaleId)
+    const definition = scaleDefinitionFromRecord(current.item.scale)
+    const stored = readScaleAnswers(child?.answers)
+    currentScale = {
+      ...scaleRunnerFromRecord(current.item.scale),
+      scaleAssessmentId: child?.id,
+      definitionHash: hashScaleDefinition(definition),
+      assessment: child ? scaleAssessmentForResponse(child) : null,
+      ...(stored.decryptError ? { decryptError: true } : {}),
+    }
+  } else if (current?.type === 'FORM_SECTION') {
+    currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
+  }
+
+  const totalItems = units.length
+  const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))
+  return {
+    questionnaireAssessment: {
+      id: assessment.id,
+      status: assessment.status,
+      progress: assessment.status === 'COMPLETED' ? 100 : progress,
+      currentIndex: assessment.status === 'COMPLETED' ? totalItems : effectiveCurrentIndex,
+      deliveryMode: 'FINAL_ONLY' as const,
+      attemptEpoch: assessment.attemptEpoch,
+      startedAt: assessment.startedAt,
+      completedAt: assessment.completedAt,
+      totalTime: assessment.totalTime,
+      context: {
+        status: assessment.contextSnapshotEncrypted && assessment.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+        frozenAt: assessment.contextFrozenAt?.toISOString?.() ?? null,
+        snapshotHash: assessment.contextSnapshotHash ?? null,
+      },
+    },
+    questionnaire: {
+      id: assessment.questionnaire.id,
+      name: assessment.questionnaire.name,
+      instruction: assessment.questionnaire.instruction,
+    },
+    definitionHash: finalQuestionnaireDefinitionHash(assessment.questionnaire),
+    contextSnapshotHash: assessment.contextSnapshotHash ?? null,
+    currentFormItem: null,
+    currentFormSection,
+    currentScale,
+    totalItems,
+    contentItems: units.map((unit, index) => ({
+      type: unit.type === 'SCALE' ? 'scale' as const : 'form-section' as const,
+      position: unit.position,
+      id: unit.id,
+      label: unit.type === 'SCALE' ? unit.item.scale.name : unit.section.title,
+      completed: completed(unit),
+      index,
+    })),
+    units: units.map((unit, index) => ({
+      type: unit.type,
+      id: unit.id,
+      position: unit.position,
+      label: unit.type === 'SCALE' ? unit.item.scale.name : unit.section.title,
+      completed: completed(unit),
+      index,
+    })),
+    formSections,
+    scaleAssessments: assessment.scaleAssessments.map((child: any) => ({
+      id: child.id,
+      scaleId: child.scaleId,
+      status: child.status,
+      progress: child.progress,
+      scaleName: assessment.questionnaire.questionnaireScales.find((item: any) => item.scaleId === child.scaleId)?.scale.name ?? '未知量表',
+    })),
+    sessionId: assessment.sessionId,
+  }
+}
+
+export const listQuestionnaireFormSections = async (questionnaireId: string) => {
+  const sections = await ensureQuestionnaireFormSections(questionnaireId)
+  return sections.map((section) => ({
+    ...section,
+    definitionHash: questionnaireFormSectionDefinitionHash(section),
+  }))
+}
+
+export type QuestionnaireContentUnitType = 'scale' | 'form-section'
+
+export type QuestionnaireContentUnitInput = {
+  type: QuestionnaireContentUnitType | 'form' | 'SCALE' | 'FORM_SECTION' | 'FORM'
+  id: string
+  position: number
+}
+
+export type QuestionnaireContentUnit = {
+  type: QuestionnaireContentUnitType
+  id: string
+  position: number
+  label: string
+  itemCount: number
+  contextSection: boolean
+}
+
+const contentUnitSort = <T extends { position: number; id: string }>(left: T, right: T) => (
+  left.position - right.position || left.id.localeCompare(right.id)
+)
+
+const sectionHasContext = (section: { contextSection?: boolean; items?: Array<{ contextKey?: string | null }> }) => (
+  Boolean(section.contextSection) || Boolean(section.items?.some((item) => item.contextKey))
+)
+
+const assertQuestionnaireContextUnitOrder = (
+  units: Array<{ type: QuestionnaireContentUnitType; id: string }>,
+  sections: Array<{ id: string; contextSection?: boolean; items?: Array<{ contextKey?: string | null }> }>,
+) => {
+  const contextSections = sections.filter(sectionHasContext)
+  if (contextSections.length > 1) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '同一问卷只能有一个上下文区段', 400)
+  }
+  const contextSection = contextSections[0]
+  if (contextSection && (units[0]?.type !== 'form-section' || units[0].id !== contextSection.id)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容单元', 400)
+  }
+}
+
+const normalizeQuestionnaireContentUnits = async (
+  questionnaireId: string,
+  input: QuestionnaireContentUnitInput[],
+): Promise<{ units: Array<{ type: QuestionnaireContentUnitType; id: string }>; sections: SectionRow[] }> => {
+  const sections = await ensureQuestionnaireFormSections(questionnaireId)
+  const scales = await prisma.questionnaireScale.findMany({
+    where: { questionnaireId },
+    select: { id: true, scaleId: true, position: true },
+  })
+  const formItems = sections.flatMap((section) => section.items.map((item) => ({
+    id: item.id,
+    sectionId: section.id,
+    position: item.position,
+  })))
+  const knownSections = new Map(sections.map((section) => [section.id, section]))
+  const knownScales = new Map(scales.map((scale) => [scale.id, scale]))
+  const knownForms = new Map(formItems.map((item) => [item.id, item]))
+  if (input.some((item) => !Number.isInteger(item.position) || item.position < 0)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容排序位置必须是非负整数', 400)
+  }
+  const orderedInput = [...input].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+  if (new Set(orderedInput.map((item) => item.position)).size !== orderedInput.length) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容排序位置不能重复', 400)
+  }
+
+  const canonicalType = (type: QuestionnaireContentUnitInput['type']): 'scale' | 'form-section' | 'form' => {
+    if (type === 'scale' || type === 'SCALE') return 'scale'
+    if (type === 'form-section' || type === 'FORM_SECTION') return 'form-section'
+    return 'form'
+  }
+  const oldFormInput = orderedInput.some((item) => canonicalType(item.type) === 'form')
+  const units: Array<{ type: QuestionnaireContentUnitType; id: string }> = []
+
+  if (oldFormInput) {
+    if (orderedInput.some((item) => canonicalType(item.type) !== 'form' && canonicalType(item.type) !== 'scale')) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '旧表单排序格式不能与区段排序混用', 400)
+    }
+    if (orderedInput.length !== formItems.length + scales.length) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容排序列表与问卷内容不一致', 400)
+    }
+    const seenFormIds = new Set<string>()
+    const seenScaleIds = new Set<string>()
+    const seenSections = new Set<string>()
+    let activeSectionId: string | null = null
+    const inferredPositions = new Map<string, number>()
+    for (const entry of orderedInput) {
+      if (canonicalType(entry.type) === 'scale') {
+        if (!knownScales.has(entry.id) || seenScaleIds.has(entry.id)) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表排序列表与问卷内容不一致', 400)
+        }
+        seenScaleIds.add(entry.id)
+        activeSectionId = null
+        inferredPositions.set(`scale:${entry.id}`, entry.position)
+        continue
+      }
+      const form = knownForms.get(entry.id)
+      if (!form || seenFormIds.has(entry.id)) {
+        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '表单排序列表与问卷内容不一致', 400)
+      }
+      seenFormIds.add(entry.id)
+      if (activeSectionId !== form.sectionId) {
+        if (seenSections.has(form.sectionId)) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '同一区段的字段必须连续排列', 400)
+        }
+        activeSectionId = form.sectionId
+        seenSections.add(form.sectionId)
+        inferredPositions.set(`form-section:${form.sectionId}`, entry.position)
+      }
+    }
+    if (seenFormIds.size !== formItems.length || seenScaleIds.size !== scales.length) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容排序列表与问卷内容不一致', 400)
+    }
+    // Empty sections have no representation in the legacy physical-item list;
+    // retain their current relative place instead of silently dropping them.
+    for (const section of sections) {
+      if (!inferredPositions.has(`form-section:${section.id}`)) inferredPositions.set(`form-section:${section.id}`, section.position)
+    }
+    for (const scale of scales) {
+      if (!inferredPositions.has(`scale:${scale.id}`)) inferredPositions.set(`scale:${scale.id}`, scale.position)
+    }
+    return {
+      units: [...inferredPositions.entries()]
+        .sort((left, right) => left[1] - right[1] || left[0].localeCompare(right[0]))
+        .map(([key]) => {
+          const [type, id] = key.split(':')
+          return { type: type === 'scale' ? 'scale' as const : 'form-section' as const, id }
+        }),
+      sections,
+    }
+  }
+
+  if (orderedInput.length !== sections.length + scales.length) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容单元排序列表与问卷内容不一致', 400)
+  }
+  const seen = new Set<string>()
+  for (const entry of orderedInput) {
+    const type = canonicalType(entry.type)
+    const key = `${type}:${entry.id}`
+    if (type === 'scale' && !knownScales.has(entry.id)) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表排序列表与问卷内容不一致', 400)
+    }
+    if (type === 'form-section' && !knownSections.has(entry.id)) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段排序列表与问卷内容不一致', 400)
+    }
+    if (type === 'form' || seen.has(key)) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容单元排序数据无效', 400)
+    }
+    seen.add(key)
+    units.push({ type, id: entry.id })
+  }
+  const expected = new Set([
+    ...scales.map((scale) => `scale:${scale.id}`),
+    ...sections.map((section) => `form-section:${section.id}`),
+  ])
+  if (seen.size !== expected.size || [...expected].some((key) => !seen.has(key))) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '内容单元排序列表与问卷内容不一致', 400)
+  }
+  return { units, sections }
+}
+
+export const listQuestionnaireContentUnits = async (questionnaireId: string): Promise<QuestionnaireContentUnit[]> => {
+  const sections = await ensureQuestionnaireFormSections(questionnaireId)
+  const scales = await prisma.questionnaireScale.findMany({
+    where: { questionnaireId },
+    orderBy: { position: 'asc' },
+    include: { scale: { select: { name: true } } },
+  })
+  return [
+    ...scales.map((scale) => ({
+      type: 'scale' as const,
+      id: scale.id,
+      position: scale.position,
+      label: scale.scale.name,
+      itemCount: 1,
+      contextSection: false,
+    })),
+    ...sections.map((section) => ({
+      type: 'form-section' as const,
+      id: section.id,
+      position: section.position,
+      label: section.title,
+      itemCount: section.items.length,
+      contextSection: sectionHasContext(section),
+    })),
+  ].sort(contentUnitSort)
+}
+
+export const reorderQuestionnaireContentUnits = async (
+  questionnaireId: string,
+  input: QuestionnaireContentUnitInput[],
+) => {
+  const normalized = await normalizeQuestionnaireContentUnits(questionnaireId, input)
+  assertQuestionnaireContextUnitOrder(normalized.units, normalized.sections)
+  const scales = await prisma.questionnaireScale.findMany({ where: { questionnaireId }, select: { id: true } })
+  const scaleIds = new Set(scales.map((scale) => scale.id))
+  const sectionOffset = Math.max(
+    1000,
+    ...normalized.sections.map((section) => section.position),
+    ...input.map((item) => item.position),
+  ) + normalized.units.length + 1
+  await prisma.$transaction(async (tx) => {
+    for (const [index, section] of normalized.sections.entries()) {
+      await tx.questionnaireFormSection.update({ where: { id: section.id }, data: { position: sectionOffset + index } })
+    }
+    for (const [index, unit] of normalized.units.entries()) {
+      if (unit.type === 'form-section') {
+        await tx.questionnaireFormSection.update({ where: { id: unit.id }, data: { position: index } })
+      } else if (scaleIds.has(unit.id)) {
+        await tx.questionnaireScale.update({ where: { id: unit.id }, data: { position: index } })
+      }
+    }
+  })
+  return listQuestionnaireContentUnits(questionnaireId)
+}
+
+/**
+ * Retire an in-progress attempt and create a clean FINAL_ONLY attempt while
+ * retaining every historical answer. The caller supplies either the logged-in
+ * owner or the already-hashed anonymous resume capability; the check is
+ * repeated after the row lock so a restart cannot race another state change.
+ */
+export const restartQuestionnaireAssessment = async (
+  assessmentId: string,
+  context: { userId?: string; resumeTokenHash?: string },
+) => {
+  const existing = await prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    select: { id: true, userId: true, sessionId: true, resumeTokenHash: true, resumeTokenExpiresAt: true },
+  })
+  if (!existing) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  if (context.userId !== undefined) {
+    if (!existing.userId || existing.userId !== context.userId) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此问卷测评', 403)
+    }
+  } else if (!context.resumeTokenHash || existing.userId !== null || existing.resumeTokenHash !== context.resumeTokenHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权重启此问卷测评', 403)
+  }
+
+  const questionnaireId = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId }, select: { questionnaireId: true } })
+  if (!questionnaireId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  await ensureQuestionnaireFormSections(questionnaireId.questionnaireId)
+
+  const created = await prisma.$transaction(async (tx) => {
+    const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "questionnaire_assessments" WHERE "id" = ${assessmentId} FOR UPDATE
+    `
+    if (!lockedRows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+
+    const current = await tx.questionnaireAssessment.findUnique({
+      where: { id: assessmentId },
+      include: {
+        questionnaire: {
+          select: {
+            id: true,
+            questionnaireScales: { select: { scaleId: true } },
+            formItems: { select: { id: true } },
+            formSections: { select: { id: true } },
+          },
+        },
+        token: { select: { expiresAt: true, isActive: true } },
+      },
+    })
+    if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+    if (context.userId !== undefined) {
+      if (!current.userId || current.userId !== context.userId) {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此问卷测评', 403)
+      }
+    } else if (!context.resumeTokenHash || current.userId !== null || current.resumeTokenHash !== context.resumeTokenHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权重启此问卷测评', 403)
+    }
+    if (current.status !== 'IN_PROGRESS') {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '只有进行中的问卷测评可以重启', 409)
+    }
+    if (context.resumeTokenHash && (!current.token?.isActive || questionnaireResumeTokenService.isExpired(current.resumeTokenExpiresAt))) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评恢复凭证已过期', 401)
+    }
+
+    const isPublic = context.userId === undefined
+    const newSessionId = isPublic ? uuidv4() : null
+    const retiredAt = new Date()
+    await tx.questionnaireAssessment.update({
+      where: { id: current.id },
+      data: { status: 'ABANDONED', completedAt: retiredAt },
+    })
+    const next = await tx.questionnaireAssessment.create({
+      data: {
+        questionnaireId: current.questionnaireId,
+        userId: isPublic ? null : context.userId,
+        tokenId: isPublic ? current.tokenId : null,
+        sessionId: newSessionId,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        attemptEpoch: current.attemptEpoch + 1,
+        progress: 0,
+      },
+    })
+    if (current.questionnaire.questionnaireScales.length > 0) {
+      await tx.assessment.createMany({
+        data: current.questionnaire.questionnaireScales.map((scale) => ({
+          scaleId: scale.scaleId,
+          userId: isPublic ? null : context.userId,
+          status: 'IN_PROGRESS' as const,
+          deliveryMode: 'FINAL_ONLY' as const,
+          attemptEpoch: next.attemptEpoch,
+          progress: 0,
+          answers: encryptScaleAnswers([]),
+          questionnaireAssessmentId: next.id,
+        })),
+      })
+    }
+    if (current.questionnaire.formItems.length > 0) {
+      await tx.questionnaireFormAnswer.createMany({
+        data: current.questionnaire.formItems.map((item) => ({
+          questionnaireAssessmentId: next.id,
+          formItemId: item.id,
+          value: null,
+          status: 'PENDING' as const,
+        })),
+        skipDuplicates: true,
+      })
+    }
+    if (current.questionnaire.formSections.length > 0) {
+      await tx.questionnaireFormSectionAttempt.createMany({
+        data: current.questionnaire.formSections.map((section) => ({
+          questionnaireAssessmentId: next.id,
+          sectionId: section.id,
+          attemptEpoch: next.attemptEpoch,
+        })),
+      })
+    }
+
+    const resumeToken = isPublic
+      ? await questionnaireResumeTokenService.issue(
+          next.id,
+          current.token?.expiresAt ?? new Date(),
+          tx,
+        )
+      : null
+    return { id: next.id, sessionId: newSessionId, resumeToken }
+  })
+
+  return {
+    ...(await getQuestionnaireFinalAttemptState(created.id)),
+    sessionId: created.sessionId,
+    resumeToken: created.resumeToken,
+  }
+}
+
+export const createQuestionnaireFormSection = async (
+  questionnaireId: string,
+  input: { title?: string; description?: string; position?: number; contextSection?: boolean },
+) => {
+  await ensureQuestionnaireFormSections(questionnaireId)
+  const current = await prisma.questionnaire.findUnique({
+    where: { id: questionnaireId },
+    select: {
+      formItems: { select: { position: true } },
+      questionnaireScales: { select: { position: true } },
+      formSections: { select: { position: true } },
+    },
+  })
+  if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷不存在', 404)
+  const defaultPosition = Math.max(
+    -1,
+    ...current.formItems.map((item) => item.position),
+    ...current.questionnaireScales.map((item) => item.position),
+    ...current.formSections.map((section) => section.position),
+  ) + 1
+  const section = await prisma.questionnaireFormSection.create({
+    data: {
+      questionnaireId,
+      title: input.title?.trim() || '表单',
+      description: input.description?.trim() || null,
+      position: input.position ?? defaultPosition,
+      contextSection: input.contextSection ?? false,
+    },
+    include: { items: true },
+  })
+  return { ...mapSection(section), definitionHash: questionnaireFormSectionDefinitionHash(mapSection(section)) }
+}
+
+export const updateQuestionnaireFormSection = async (
+  questionnaireId: string,
+  sectionId: string,
+  input: { title?: string; description?: string | null; contextSection?: boolean },
+) => {
+  const existing = await prisma.questionnaireFormSection.findFirst({ where: { id: sectionId, questionnaireId }, include: { items: true } })
+  if (!existing) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
+  if (input.contextSection) {
+    const contextItems = existing.items.filter((item) => item.contextKey)
+    if (contextItems.length === 0) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '没有人口学字段的区段不能作为上下文区段', 400)
+    const questionnaire = await prisma.questionnaire.findUnique({
+      where: { id: questionnaireId },
+      select: {
+        questionnaireScales: { select: { id: true, position: true } },
+        formSections: { select: { id: true, position: true } },
+      },
+    })
+    if (!questionnaire || !isFirstQuestionnaireContentSection(questionnaire, sectionId)) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 400)
+    }
+  }
+  const updated = await prisma.questionnaireFormSection.update({
+    where: { id: sectionId },
+    data: {
+      ...(input.title === undefined ? {} : { title: input.title.trim() || '表单' }),
+      ...(input.description === undefined ? {} : { description: input.description?.trim() || null }),
+      ...(input.contextSection === undefined ? {} : { contextSection: input.contextSection }),
+    },
+    include: { items: true },
+  })
+  const mapped = mapSection(updated)
+  return { ...mapped, definitionHash: questionnaireFormSectionDefinitionHash(mapped) }
+}
+
+export const reorderQuestionnaireFormSections = async (questionnaireId: string, sectionIds: string[]) => {
+  const sections = await prisma.questionnaireFormSection.findMany({ where: { questionnaireId }, select: { id: true } })
+  if (new Set(sectionIds).size !== sectionIds.length || sections.length !== sectionIds.length || sections.some((section) => !sectionIds.includes(section.id))) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段排序列表与问卷内容不一致', 400)
+  }
+  await prisma.$transaction(async (tx) => {
+    const offset = sections.length + 1000
+    for (const [index, id] of sectionIds.entries()) {
+      await tx.questionnaireFormSection.update({ where: { id }, data: { position: offset + index } })
+    }
+    for (const [index, id] of sectionIds.entries()) {
+      await tx.questionnaireFormSection.update({ where: { id }, data: { position: index } })
+    }
+  })
+  return listQuestionnaireFormSections(questionnaireId)
+}
+
+export const reorderQuestionnaireFormSectionItems = async (
+  questionnaireId: string,
+  sectionId: string,
+  itemIds: string[],
+) => {
+  const section = await prisma.questionnaireFormSection.findFirst({ where: { id: sectionId, questionnaireId }, include: { items: { select: { id: true } } } })
+  if (!section || new Set(itemIds).size !== itemIds.length || section.items.length !== itemIds.length || section.items.some((item) => !itemIds.includes(item.id))) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段字段排序列表不一致', 400)
+  }
+  await prisma.$transaction(async (tx) => {
+    for (const [index, id] of itemIds.entries()) {
+      await tx.questionnaireFormItem.update({ where: { id }, data: { sectionPosition: 1000 + index } })
+    }
+    for (const [index, id] of itemIds.entries()) {
+      await tx.questionnaireFormItem.update({ where: { id }, data: { sectionPosition: index } })
+    }
+  })
+  return listQuestionnaireFormSections(questionnaireId)
+}
+
+export const assignQuestionnaireFormItemToSection = async (
+  questionnaireId: string,
+  sectionId: string,
+  itemId: string,
+  sectionPosition?: number,
+) => {
+  const [section, item, questionnaire] = await Promise.all([
+    prisma.questionnaireFormSection.findFirst({ where: { id: sectionId, questionnaireId } }),
+    prisma.questionnaireFormItem.findFirst({ where: { id: itemId, questionnaireId }, select: { id: true, sectionId: true, contextKey: true } }),
+    prisma.questionnaire.findUnique({
+      where: { id: questionnaireId },
+      select: {
+        questionnaireScales: { select: { id: true, position: true } },
+        formSections: { select: { id: true, position: true } },
+      },
+    }),
+  ])
+  if (!section || !item) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '区段或字段不存在', 404)
+  const nextPosition = sectionPosition ?? await prisma.questionnaireFormItem.count({ where: { sectionId } })
+  if ((section.contextSection || item.contextKey) && (!questionnaire || !isFirstQuestionnaireContentSection(questionnaire, sectionId))) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 400)
+  }
+  await prisma.$transaction(async (tx) => {
+    await tx.questionnaireFormItem.update({ where: { id: itemId }, data: { sectionId, sectionPosition: nextPosition } })
+    if (item.contextKey && !section.contextSection) {
+      await tx.questionnaireFormSection.update({ where: { id: sectionId }, data: { contextSection: true } })
+    }
+    if (item.contextKey && item.sectionId && item.sectionId !== sectionId) {
+      const remainingContext = await tx.questionnaireFormItem.count({
+        where: { sectionId: item.sectionId, contextKey: { not: null }, id: { not: itemId } },
+      })
+      if (remainingContext === 0) {
+        await tx.questionnaireFormSection.update({ where: { id: item.sectionId }, data: { contextSection: false } })
+      }
+    }
+  })
+  return listQuestionnaireFormSections(questionnaireId)
+}
+
+const lockQuestionnaireAssessment = async (tx: Prisma.TransactionClient, id: string) => {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "questionnaire_assessments" WHERE "id" = ${id} FOR UPDATE
+  `
+  if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+}
+
+const normalizeSectionAnswers = (section: SectionRow, values: SectionSubmitInput['answers']) => {
+  const itemMap = new Map(section.items.map((item) => [item.id, item]))
+  const provided = new Map<string, string | string[] | null>()
+  for (const answer of values) {
+    const item = itemMap.get(answer.formItemId)
+    if (!item) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '提交中包含不属于该区段的字段', 400)
+    if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '同一字段不能重复提交', 400)
+    provided.set(answer.formItemId, answer.value)
+  }
+
+  const normalized = orderedSectionItems(section.items).map((item) => {
+    const value = provided.has(item.id) ? provided.get(item.id)! : null
+    if (value === null) {
+      if (item.required) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `${item.label} 为必填项`, 400)
+      return { item, normalizedValue: null, storedValue: null, status: 'SKIPPED' as const }
+    }
+    const validation = validateQuestionnaireFormAnswer(item, value)
+    if (validation) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', validation, 400)
+    const valueAfterNormalization = normalizeQuestionnaireFormAnswer(item, value) as string | string[]
+    const serialized = Array.isArray(valueAfterNormalization) ? JSON.stringify(valueAfterNormalization) : valueAfterNormalization
+    return {
+      item,
+      normalizedValue: valueAfterNormalization,
+      storedValue: writeContextFormAnswer(item.contextKey, serialized),
+      status: 'ANSWERED' as const,
+    }
+  })
+  return {
+    normalized,
+    payloadAnswers: normalized.map((entry) => ({ formItemId: entry.item.id, value: entry.normalizedValue })),
+  }
+}
+
+const contextSnapshotForSection = (
+  assessmentId: string,
+  section: SectionRow,
+  normalized: ReturnType<typeof normalizeSectionAnswers>['normalized'],
+): { id: string; contextSnapshotEncrypted: string | null; contextSnapshotHash: string | null; questionnaire: { formItems: Array<unknown> }; formAnswers: Array<unknown> } => {
+  const contextItems = section.items.filter((item) => item.contextKey)
+  const contextAnswers = normalized
+    .filter((entry) => Boolean(entry.item.contextKey) && entry.storedValue !== null)
+    .map((entry) => ({ formItemId: entry.item.id, value: entry.storedValue }))
+  return {
+    id: assessmentId,
+    contextSnapshotEncrypted: null,
+    contextSnapshotHash: null,
+    questionnaire: { formItems: contextItems },
+    formAnswers: contextAnswers,
+  }
+}
+
+const finalizeQuestionnaireIfReady = async (assessmentId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
+  await lockQuestionnaireAssessment(tx, assessmentId)
+  const assessment = await tx.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    include: {
+      questionnaire: {
+        include: {
+          formItems: true,
+          formSections: { include: { items: true } },
+          questionnaireScales: { include: { scale: true } },
+        },
+      },
+      scaleAssessments: { include: { scale: true } },
+      formAnswers: true,
+      formSectionAttempts: true,
+    },
+  })
+  if (!assessment) return null
+  if (assessment.status === 'COMPLETED') return { status: assessment.status, progress: assessment.progress, completedAt: assessment.completedAt }
+  if (assessment.status !== 'IN_PROGRESS' || assessment.deliveryMode !== 'FINAL_ONLY') return { status: assessment.status, progress: assessment.progress, completedAt: assessment.completedAt }
+
+  const completedScales = assessment.scaleAssessments.filter((child) => child.status === 'COMPLETED').length
+  const completedForms = assessment.formSectionAttempts.filter((section) => section.status === 'COMPLETED').length
+  const totalUnits = assessment.questionnaire.questionnaireScales.length + assessment.questionnaire.formSections.length
+  const completedUnits = completedScales + completedForms
+  const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100))
+  if (completedUnits < totalUnits) {
+    await tx.questionnaireAssessment.update({ where: { id: assessmentId }, data: { completedScales, completedForms, progress } })
+    return { status: 'IN_PROGRESS', progress, completedAt: null }
+  }
+
+  const completedAt = new Date()
+  const report = buildQuestionnaireCollectionReport(assessment as any)
+  await tx.questionnaireAssessment.update({
+    where: { id: assessmentId },
+    data: {
+      status: 'COMPLETED',
+      completedScales,
+      completedForms,
+      progress: 100,
+      completedAt,
+      totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
+      aggregateReport: Prisma.DbNull,
+      aggregateReportEncrypted: encryptField(collectionReportForStorage(report)),
+    },
+  })
+  return { status: 'COMPLETED', progress: 100, completedAt }
+})
+
+const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) => {
+  const submissionId = validateSubmissionId(input.submissionId)
+  const assessment = await prisma.questionnaireAssessment.findUnique({
+    where: { id: input.questionnaireAssessmentId },
+    select: {
+      id: true,
+      questionnaireId: true,
+      userId: true,
+      sessionId: true,
+      status: true,
+      deliveryMode: true,
+      attemptEpoch: true,
+      completedScales: true,
+      completedForms: true,
+      contextSnapshotEncrypted: true,
+      contextSnapshotHash: true,
+      resumeTokenHash: true,
+      questionnaire: {
+        select: {
+          questionnaireScales: { select: { id: true, position: true } },
+          formSections: { orderBy: { position: 'asc' }, include: { items: true } },
+        },
+      },
+    },
+  })
+  if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  if (input.userId !== null && input.userId !== undefined) {
+    if (assessment.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此问卷测评', 403)
+  } else if (!input.sessionId || assessment.sessionId !== input.sessionId || assessment.userId !== null || !input.resumeTokenHash || assessment.resumeTokenHash !== input.resumeTokenHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权操作此问卷测评', 403)
+  }
+  assertFinalOnly(assessment.deliveryMode)
+  assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
+  const section = assessment.questionnaire.formSections.find((candidate) => candidate.id === input.sectionId)
+  if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
+  const mappedSection = mapSection(section)
+  assertDefinitionHash(questionnaireFormSectionDefinitionHash(mappedSection), input.definitionHash)
+  if (mappedSection.contextSection && !isFirstQuestionnaireContentSection(assessment.questionnaire, mappedSection.id)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 409)
+  }
+  const normalizedResult = normalizeSectionAnswers(mappedSection, input.answers)
+  assertSubmissionPayloadSize({ answers: normalizedResult.payloadAnswers }, FINAL_SUBMISSION_MAX_BYTES.formSection, '问卷区段提交数据')
+  const payloadHash = computeSubmissionPayloadHash({ answers: normalizedResult.payloadAnswers })
+
+  const committed = await prisma.$transaction(async (tx) => {
+    await lockQuestionnaireAssessment(tx, assessment.id)
+    const current = await tx.questionnaireAssessment.findUnique({
+      where: { id: assessment.id },
+      select: {
+        id: true,
+        status: true,
+        deliveryMode: true,
+        attemptEpoch: true,
+        completedScales: true,
+        completedForms: true,
+        contextSnapshotEncrypted: true,
+        contextSnapshotHash: true,
+      },
+    })
+    if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+    assertFinalOnly(current.deliveryMode)
+    assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
+
+    let sectionAttempt = await tx.questionnaireFormSectionAttempt.findUnique({
+      where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id } },
+    })
+    if (!sectionAttempt) {
+      sectionAttempt = await tx.questionnaireFormSectionAttempt.create({
+        data: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id, attemptEpoch: input.attemptEpoch },
+      })
+    }
+    const replay = assertSubmissionReplay(sectionAttempt, submissionId, payloadHash)
+    if (replay === 'replay' && sectionAttempt.status === 'COMPLETED') {
+      return {
+        replayed: true,
+        sectionAttemptId: sectionAttempt.id,
+        contextSnapshotHash: current.contextSnapshotHash,
+        progress: Math.max(0, Math.min(100, Math.round(((current.completedScales + current.completedForms) / Math.max(1, assessment.questionnaire.questionnaireScales.length + assessment.questionnaire.formSections.length)) * 100))),
+      }
+    }
+    if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评已结束', 409)
+    if ((input.contextSnapshotHash ?? null) !== (current.contextSnapshotHash ?? null)) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷上下文版本已变化，请重试', 409)
+    }
+    if (sectionAttempt.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束', 409)
+
+    const itemIds = normalizedResult.normalized.map((entry) => entry.item.id)
+    const existingAnswers = await tx.questionnaireFormAnswer.findMany({
+      where: { questionnaireAssessmentId: assessment.id, formItemId: { in: itemIds } },
+      select: { formItemId: true, revision: true },
+    })
+    const revisions = new Map(existingAnswers.map((answer) => [answer.formItemId, answer.revision]))
+    const mutations: BulkFormAnswerMutation[] = normalizedResult.normalized.map((entry) => ({
+      formItemId: entry.item.id,
+      formSectionAttemptId: sectionAttempt!.id,
+      value: entry.storedValue,
+      status: entry.status,
+      revision: (revisions.get(entry.item.id) ?? -1) + 1,
+    }))
+    await persistFormAnswerBatch(tx, assessment.id, mutations)
+    const updatedSection = await tx.questionnaireFormSectionAttempt.updateMany({
+      where: { id: sectionAttempt.id, status: 'IN_PROGRESS', attemptEpoch: input.attemptEpoch },
+      data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: new Date() },
+    })
+    if (updatedSection.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段状态已变化，请重试', 409)
+
+    const completedForms = Math.min(assessment.questionnaire.formSections.length, (current.completedForms ?? 0) + 1)
+    const totalUnits = assessment.questionnaire.questionnaireScales.length + assessment.questionnaire.formSections.length
+    const completedUnits = (current.completedScales ?? 0) + completedForms
+    const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100))
+    await tx.questionnaireAssessment.updateMany({
+      where: { id: assessment.id, status: 'IN_PROGRESS' },
+      data: { completedForms, progress },
+    })
+
+    let contextSnapshotHash = current.contextSnapshotHash
+    if (mappedSection.contextSection && !current.contextSnapshotHash) {
+      try {
+        const frozen = await freezeQuestionnaireAssessmentContextFromSnapshot(
+          tx,
+          contextSnapshotForSection(assessment.id, mappedSection, normalizedResult.normalized),
+        )
+        contextSnapshotHash = frozen.hash
+      } catch (error) {
+        if (isAssessmentContextServiceError(error)) {
+          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', error.message, error.statusCode)
+        }
+        throw error
+      }
+    }
+    return { replayed: false, sectionAttemptId: sectionAttempt.id, contextSnapshotHash, progress, payloadHash }
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+
+  const parent = await finalizeQuestionnaireIfReady(assessment.id)
+  return { submissionId, sectionId: input.sectionId, ...committed, parent }
+}
+
+export const submitQuestionnaireFormSectionFinalForUser = (
+  assessmentId: string,
+  userId: string,
+  input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
+) => submitQuestionnaireFormSectionFinal({ ...input, questionnaireAssessmentId: assessmentId, userId })
+
+export const submitQuestionnaireFormSectionFinalForPublic = async (
+  sessionId: string,
+  input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
+  resumeTokenHash: string,
+) => {
+  const assessment = await prisma.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true } })
+  if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  return submitQuestionnaireFormSectionFinal({ ...input, questionnaireAssessmentId: assessment.id, userId: null, sessionId, resumeTokenHash })
+}
+
+export const finalizeQuestionnaireAttemptIfReady = finalizeQuestionnaireIfReady
