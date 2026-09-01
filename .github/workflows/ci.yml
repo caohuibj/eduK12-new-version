@@ -38,7 +38,10 @@ jobs:
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      UPLOAD_DIR: /tmp/eduk12-ci-uploads
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
@@ -94,6 +97,8 @@ jobs:
         run: npm run db:backfill:checkin-tokens
       - name: guarded migration idempotency after seeded data
         run: npm run db:migrate:guarded
+      - name: prepare release preflight upload directory
+        run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
         run: npm run db:release:preflight
       - name: build (tsc)
@@ -106,6 +111,8 @@ jobs:
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
           src/__tests__/classroom/classroom-start.postgres.integration.test.ts
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
@@ -171,7 +178,7 @@ jobs:
       - name: build production images
         run: docker compose build backend frontend
       - name: scan backend image (high and critical)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: server-version-backend:latest
           format: table
@@ -180,7 +187,7 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
       - name: scan frontend image (high and critical)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: server-version-frontend:latest
           format: table
@@ -204,3 +211,9 @@ jobs:
           languages: javascript-typescript
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
+        with:
+          # This repository has not enabled GitHub code scanning yet. Keep the
+          # local SAST analysis and SARIF generation, but do not fail while
+          # uploading results to an unavailable code-scanning endpoint.
+          upload: never
+          upload-database: false
