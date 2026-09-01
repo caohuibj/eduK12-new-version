@@ -41,6 +41,7 @@ jobs:
       PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      UPLOAD_DIR: /tmp/eduk12-ci-uploads
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
@@ -96,6 +97,8 @@ jobs:
         run: npm run db:backfill:checkin-tokens
       - name: guarded migration idempotency after seeded data
         run: npm run db:migrate:guarded
+      - name: prepare release preflight upload directory
+        run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
         run: npm run db:release:preflight
       - name: build (tsc)
@@ -208,3 +211,9 @@ jobs:
           languages: javascript-typescript
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
+        with:
+          # This repository has not enabled GitHub code scanning yet. Keep the
+          # local SAST analysis and SARIF generation, but do not fail while
+          # uploading results to an unavailable code-scanning endpoint.
+          upload: never
+          upload-database: false

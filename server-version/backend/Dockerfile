@@ -65,6 +65,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librsvg2-2 \
     fonts-liberation \
     ca-certificates \
+    && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 复用 build 阶段已编译好的 node_modules（同源 ABI，native 二进制可直接用）
@@ -72,6 +73,11 @@ COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY package*.json ./
+
+# npm is needed by the build and ops stages, but the long-running API only
+# executes Node. Removing the bundled package manager also keeps its own
+# transitive dependency tree out of the production attack surface.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 # The long-running API and workers do not need root. Keep the mounted upload
 # volume writable by the application user while leaving the image immutable.
