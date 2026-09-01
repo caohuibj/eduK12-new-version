@@ -1355,6 +1355,7 @@ export const questionnaireController = {
       const answerDefinitions = await measureRequestPhase('definition_lookup', () => prisma.questionnaireAssessment.findUnique({
         where: { id: assessmentId },
         select: {
+          userId: true,
           questionnaire: {
             select: {
               formItems: {
@@ -1373,28 +1374,29 @@ export const questionnaireController = {
       }))
 
       if (!answerDefinitions) return notFound(res, '问卷测评不存在')
+      if (answerDefinitions.userId !== userId) return forbidden(res, '无权限操作此测评')
 
       const formItemsById = new Map(answerDefinitions.questionnaire.formItems.map((item) => [item.id, item]))
-      if (answers.some((answer) => !formItemsById.has(answer.formItemId))) {
-        return error(res, '表单题目不存在')
-      }
+      const hasUnknownFormItem = answers.some((answer) => !formItemsById.has(answer.formItemId))
 
       let validationFailure:
         | { kind: 'skip-not-allowed' }
         | { kind: 'invalid-context-answer'; message: string }
         | null = null
-      for (const answer of answers) {
-        const item = formItemsById.get(answer.formItemId)!
-        const action = answer.action || 'answer'
-        if (action === 'skip' && (item.required || item.contextKey)) {
-          validationFailure = { kind: 'skip-not-allowed' }
-          break
-        }
-        if (action === 'answer') {
-          const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
-          if (validationMessage) {
-            validationFailure = { kind: 'invalid-context-answer', message: validationMessage }
+      if (!hasUnknownFormItem) {
+        for (const answer of answers) {
+          const item = formItemsById.get(answer.formItemId)!
+          const action = answer.action || 'answer'
+          if (action === 'skip' && (item.required || item.contextKey)) {
+            validationFailure = { kind: 'skip-not-allowed' }
             break
+          }
+          if (action === 'answer') {
+            const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
+            if (validationMessage) {
+              validationFailure = { kind: 'invalid-context-answer', message: validationMessage }
+              break
+            }
           }
         }
       }
@@ -1421,6 +1423,7 @@ export const questionnaireController = {
         if (qa.userId !== userId) return { kind: 'forbidden' as const }
         if (qa.status === 'COMPLETED') return { kind: 'completed' as const }
         if (qa.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
+        if (hasUnknownFormItem) return { kind: 'form-not-found' as const }
 
         if (qa.contextSnapshotEncrypted || qa.contextSnapshotHash) {
           if (answers.some((answer) => formItemsById.get(answer.formItemId)?.contextKey)) {
@@ -1519,6 +1522,7 @@ export const questionnaireController = {
       if (outcome.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (outcome.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (outcome.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
+      if (outcome.kind === 'form-not-found') return error(res, '表单题目不存在')
       if (outcome.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (outcome.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (outcome.kind === 'invalid-context-answer') return error(res, outcome.message)

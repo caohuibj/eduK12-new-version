@@ -1554,26 +1554,26 @@ export const publicQuestionnaireController = {
       if (!answerDefinitions) return notFound(res, '测评不存在')
 
       const formItemsById = new Map(answerDefinitions.questionnaire.formItems.map((item) => [item.id, item]))
-      if (answers.some((answer) => !formItemsById.has(answer.formItemId))) {
-        return error(res, '表单题目不存在')
-      }
+      const hasUnknownFormItem = answers.some((answer) => !formItemsById.has(answer.formItemId))
 
       let validationFailure:
         | { kind: 'skip-not-allowed' }
         | { kind: 'invalid-context-answer'; message: string }
         | null = null
-      for (const answer of answers) {
-        const item = formItemsById.get(answer.formItemId)!
-        const action = answer.action || 'answer'
-        if (action === 'skip' && (item.required || item.contextKey)) {
-          validationFailure = { kind: 'skip-not-allowed' }
-          break
-        }
-        if (action === 'answer') {
-          const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
-          if (validationMessage) {
-            validationFailure = { kind: 'invalid-context-answer', message: validationMessage }
+      if (!hasUnknownFormItem) {
+        for (const answer of answers) {
+          const item = formItemsById.get(answer.formItemId)!
+          const action = answer.action || 'answer'
+          if (action === 'skip' && (item.required || item.contextKey)) {
+            validationFailure = { kind: 'skip-not-allowed' }
             break
+          }
+          if (action === 'answer') {
+            const validationMessage = validateQuestionnaireFormAnswer(item, answer.value)
+            if (validationMessage) {
+              validationFailure = { kind: 'invalid-context-answer', message: validationMessage }
+              break
+            }
           }
         }
       }
@@ -1597,6 +1597,7 @@ export const publicQuestionnaireController = {
         if (!questionnaireAssessment) return { kind: 'not-found' as const }
         if (questionnaireAssessment.status === 'COMPLETED') return { kind: 'completed' as const }
         if (questionnaireAssessment.status !== 'IN_PROGRESS') return { kind: 'closed' as const }
+        if (hasUnknownFormItem) return { kind: 'form-not-found' as const }
 
         if (questionnaireAssessment.contextSnapshotEncrypted || questionnaireAssessment.contextSnapshotHash) {
           if (answers.some((answer) => formItemsById.get(answer.formItemId)?.contextKey)) {
@@ -1694,6 +1695,7 @@ export const publicQuestionnaireController = {
       if (result.kind === 'completed') return error(res, '测评已完成，不能继续修改答案', -1, 409)
       if (result.kind === 'closed') return error(res, '测评已关闭，不能继续修改答案', -1, 409)
       if (result.kind === 'stale-answer') return error(res, '答案已在其他设备更新，请刷新测评后重试', -1, 409)
+      if (result.kind === 'form-not-found') return error(res, '表单题目不存在')
       if (result.kind === 'skip-not-allowed') return error(res, '必答题或人口学题目不能跳过', -1, 400)
       if (result.kind === 'context-frozen') return error(res, '人口学表单已冻结，不能继续修改答案', -1, 409)
       if (result.kind === 'invalid-context-answer') return error(res, result.message)

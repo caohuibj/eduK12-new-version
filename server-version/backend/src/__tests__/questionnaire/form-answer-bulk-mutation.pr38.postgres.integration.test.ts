@@ -216,6 +216,31 @@ suite('PR38 Questionnaire form-answer bulk mutation (real PostgreSQL)', () => {
     expect(transactionLatencies.every((latency) => Number.isFinite(latency))).toBe(true)
   })
 
+  it('checks assessment ownership before exposing form-item membership', async () => {
+    const otherUser = await prisma.user.create({
+      data: {
+        username: `pr38-form-bulk-foreign-${Date.now()}`,
+        passwordHash: 'test-only',
+        role: 'STUDENT',
+      },
+    })
+    const foreignAssessment = await prisma.questionnaireAssessment.create({
+      data: { questionnaireId, userId: otherUser.id, status: 'IN_PROGRESS' },
+    })
+
+    try {
+      const response = await invoke(
+        questionnaireController.saveFormAnswers,
+        { assessmentId: foreignAssessment.id },
+        { answers: [{ formItemId: 'pr38-not-a-form-item', value: 'must-not-probe' }] },
+      )
+      expect(response.statusCode).toBe(403)
+    } finally {
+      await prisma.questionnaireAssessment.delete({ where: { id: foreignAssessment.id } })
+      await prisma.user.delete({ where: { id: otherUser.id } })
+    }
+  })
+
   it('keeps identical replay idempotent and persists duplicate item input once', async () => {
     const first = await invoke(
       questionnaireController.saveFormAnswers,
