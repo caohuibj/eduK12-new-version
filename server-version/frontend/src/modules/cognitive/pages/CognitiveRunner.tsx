@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -32,11 +32,32 @@ const CognitiveRunner: React.FC = () => {
   )
   const controller = useCognitiveSession(sessionId ?? '', sessionApi)
   const { state } = controller
+  const [restarting, setRestarting] = useState(false)
+  const [restartError, setRestartError] = useState<string | null>(null)
 
   // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
   // Memory（自适应）不依赖固定总数，完成信号由其自身推进逻辑在 Session 3 处理。
   const config = (state.session?.config ?? {}) as Record<string, unknown>
   const total = (config?.trialCount ?? config?.totalTrials ?? 0) as number
+
+  const handleRestart = async () => {
+    setRestarting(true)
+    setRestartError(null)
+    try {
+      const next = await controller.restart()
+      if (!next) throw new Error('重启响应缺少新测评记录')
+      const query = new URLSearchParams()
+      if (isPublic) query.set('public', '1')
+      const returnTo = searchParams.get('returnTo')
+      if (returnTo) query.set('returnTo', returnTo)
+      const suffix = query.toString() ? `?${query.toString()}` : ''
+      navigate(`${isPublic ? '/public' : '/student'}/cognitive/sessions/${next.sessionId}${suffix}`, { replace: true })
+    } catch (error) {
+      setRestartError((error as { message?: string })?.message || '重启失败，请稍后重试')
+    } finally {
+      setRestarting(false)
+    }
+  }
 
   if (state.status === 'COMPLETED') {
     // 完成态：结果页只读展示，不重新评分
@@ -58,6 +79,20 @@ const CognitiveRunner: React.FC = () => {
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         <span className="ml-3 text-gray-500">加载中...</span>
+      </div>
+    )
+  }
+
+  if (state.status === 'LEGACY_READ_ONLY') {
+    return (
+      <div className="card p-8 max-w-2xl text-center">
+        <p className="text-xl font-semibold text-amber-700 mb-2">这是旧版进行中的认知测评</p>
+        <p className="text-gray-600 mb-3">历史内容仍可读取，但旧版逐试次写入已停用。重启会保留历史记录，并创建新的整份提交测评。</p>
+        <p className="text-sm text-gray-500 mb-6">当前尝试 #{state.session?.attemptNo ?? '—'}</p>
+        {(restartError || state.error) && <p role="alert" className="text-red-500 text-sm mb-4">{restartError || state.error?.message}</p>}
+        <button onClick={() => void handleRestart()} disabled={restarting} className="btn-primary">
+          {restarting ? '重启中...' : '重启并继续作答'}
+        </button>
       </div>
     )
   }
@@ -97,16 +132,24 @@ const CognitiveRunner: React.FC = () => {
   }
 
   if (state.status === 'RECOVERY_REQUIRED') {
+    const returnTo = safeInternalReturnTo(searchParams.get('returnTo'), '/student/cognitive')
+    const hasParentReturn = Boolean(searchParams.get('returnTo'))
     return (
       <div className="card p-8 text-center">
         <p className="text-xl font-semibold text-amber-600 mb-2">无法恢复测评进度</p>
         <p className="text-gray-600 mb-2">
-          检测到未完成的测评，但无法确认已提交进度。请勿刷新或重复提交。
+          检测到未完成的测评，但无法确认已提交进度，请勿刷新或重复提交。本地草稿仍会保留。
         </p>
-        <p className="text-gray-500 mb-6">请联系老师处理</p>
-        <button onClick={() => navigate('/student/cognitive')} className="btn-secondary">
-          返回列表
-        </button>
+        <p className="text-gray-500 mb-6">{hasParentReturn ? '请返回上层综合测评并从那里重启。' : '可以创建新的整份提交测评。'}</p>
+        {(restartError || state.error) && <p role="alert" className="text-red-500 text-sm mb-4">{restartError || state.error?.message}</p>}
+        <div className="flex justify-center gap-3">
+          <button onClick={() => navigate(returnTo)} className="btn-secondary">
+            {hasParentReturn ? '返回上层测评' : '返回列表'}
+          </button>
+          {!hasParentReturn && <button onClick={() => void handleRestart()} disabled={restarting} className="btn-primary">
+            {restarting ? '重启中...' : '重启并继续作答'}
+          </button>}
+        </div>
       </div>
     )
   }

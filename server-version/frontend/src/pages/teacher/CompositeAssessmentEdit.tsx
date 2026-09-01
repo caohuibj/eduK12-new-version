@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronDown, ChevronUp, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
 import apiClient from '../../api/client'
 import { sessionFetch } from '../../api/client'
 import { compositeApi } from '../../modules/composite/api'
@@ -14,6 +14,7 @@ import type {
 } from '../../modules/composite/types'
 import { contextOptionsForKey, contextValueHint, parseDelimitedOptions, serializeDelimitedOptions } from '../../modules/assessment-context/options'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
+import FormSectionManager from '../../components/FormSectionManager'
 
 const pad = (value: number) => String(value).padStart(2, '0')
 
@@ -511,6 +512,7 @@ const CompositeAssessmentEdit: React.FC = () => {
       </div>}
       <div className="card p-6 mb-5">
         <h2 className="font-semibold mb-4">测评顺序</h2>
+        <p className="mb-3 text-xs text-gray-500">量表、认知任务和表单区段的统一顺序请在下方“表单区段”管理器中调整；这里仅移除模块。</p>
         {detail.items?.length ? (
           <div className="space-y-2">
             {detail.items.map((item: any, index: number) => (
@@ -522,12 +524,6 @@ const CompositeAssessmentEdit: React.FC = () => {
                 </div>
                 {isDraft && !protocolLocked && (
                   <div className="flex items-center gap-1">
-                    <button onClick={() => void moveItem(index, -1)} disabled={index === 0} className="text-gray-500 disabled:text-gray-200" aria-label="上移">
-                      <ChevronUp className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => void moveItem(index, 1)} disabled={index === detail.items.length - 1} className="text-gray-500 disabled:text-gray-200" aria-label="下移">
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
                     <button onClick={() => void removeItem(item.id)} className="text-red-500 ml-1" aria-label="移除">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -543,6 +539,12 @@ const CompositeAssessmentEdit: React.FC = () => {
           <p className="text-xs text-blue-700 mt-3">固定协议的任务、必答属性和顺序不可单独修改。</p>
         )}
       </div>
+      {detail && (
+        <FormSectionManager
+          basePath={`/composite-assessments/${id}`}
+          readOnly={!isDraft || protocolLocked}
+        />
+      )}
       {isDraft && !protocolLocked && (
         <div className="card p-6 mb-5">
           <h2 className="font-semibold mb-4">添加模块</h2>

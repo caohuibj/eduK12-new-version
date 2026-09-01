@@ -3,9 +3,17 @@ import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
+  restartSession?: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession | { session: CognitiveSession; recoveryToken: string | null }>>
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
   appendTrials?: (sessionId: string, trials: Array<{ trialIndex: number; payload: unknown }>) => ReturnType<typeof apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>>
   completeSession: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession>>
+  submitFinal?: (sessionId: string, input: {
+    submissionId: string
+    attemptEpoch: number
+    definitionHash: string
+    contextSnapshotHash?: string | null
+    trials: unknown[]
+  }) => ReturnType<typeof apiClient.post<any>>
 }
 
 /**
@@ -97,14 +105,17 @@ export const cognitiveApi = {
     ),
   completeSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/complete`, {}),
+  submitFinal: (sessionId: string, input: Parameters<NonNullable<CognitiveSessionApi['submitFinal']>>[1]) => apiClient.post<any>(`/cognitive/sessions/${sessionId}/submit`, input),
 }
 
 /** 公开匿名认知会话 API。恢复凭证只作为请求凭证，不写入 URL 路径。 */
 export const publicCognitiveApi = (recoveryToken: string): CognitiveSessionApi => ({
   getSession: (sessionId) => apiClient.get<CognitiveSession>(`/public/cognitive/sessions/${sessionId}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  restartSession: (sessionId) => apiClient.post<{ session: CognitiveSession; recoveryToken: string | null }>(`/public/cognitive/sessions/${sessionId}/restart`, { recoveryToken }),
   appendTrial: (sessionId, trialIndex, payload) => apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>(`/public/cognitive/sessions/${sessionId}/trials`, { recoveryToken, trialIndex, payload }),
   appendTrials: (sessionId, trials) => apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>(`/public/cognitive/sessions/${sessionId}/trials/batch`, { recoveryToken, trials }),
   completeSession: (sessionId) => apiClient.post<CognitiveSession>(`/public/cognitive/sessions/${sessionId}/complete`, { recoveryToken }),
+  submitFinal: (sessionId, input) => apiClient.post<any>(`/public/cognitive/sessions/${sessionId}/submit`, { ...input, recoveryToken }),
 })
 
 export const publicCognitiveAssignmentApi = {

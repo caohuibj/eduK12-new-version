@@ -3,13 +3,14 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Spin, message, Progress, Card, Button, Input, Result } from 'antd'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
 import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
-import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
+import { readQuestionnaireResumeToken, saveQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 import { checkpointScheduler, CheckpointTransportError } from '../../services/persistence/checkpointScheduler'
 import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
 import { runWithCompletionRetry } from '../../services/completionRetry'
+import FinalQuestionnaireAssessment, { type FinalQuestionnaireData } from '../../components/FinalQuestionnaireAssessment'
 
 type ResponseValue = string | number
 
@@ -40,6 +41,7 @@ interface Scale {
     display: { randomizeItems: boolean }
     items: ScaleRunnerItem[]
   }
+  definitionHash?: string
 }
 
 // 表单题目类型
@@ -70,13 +72,20 @@ interface QuestionnaireAssessmentData {
     progress: number
     currentIndex: number
     context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
+    deliveryMode?: 'FINAL_ONLY' | 'LEGACY'
+    attemptEpoch?: number
   }
   currentFormItem: FormItem | null
-  currentScale: (Scale & { scaleAssessmentId: string }) | null
-  contentItems: ContentItem[]
+  currentScale: (Scale & { scaleAssessmentId: string; definitionHash?: string }) | null
+  contentItems: Array<ContentItem | { type: 'form-section'; position: number; id: string; label: string; completed: boolean }>
   totalItems: number
   sessionId: string
   currentFormAnswerRevision?: number | null
+  currentFormSection?: FinalQuestionnaireData['currentFormSection']
+  definitionHash?: string
+  contextSnapshotHash?: string | null
+  units?: FinalQuestionnaireData['units']
+  formSections?: FinalQuestionnaireData['formSections']
 }
 
 interface QuestionnaireCheckpointPayload {
@@ -200,7 +209,7 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     await checkpointScheduler.flushAll()
   }, [])
 
-  useCheckpointLifecycle(flushCheckpoints, Boolean(data))
+  useCheckpointLifecycle(flushCheckpoints, Boolean(data) && data?.questionnaireAssessment.deliveryMode !== 'FINAL_ONLY')
 
   const freezeContextBeforeScale = async (): Promise<{ status: 'frozen'; frozenAt: string }> => {
     const result = await createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
@@ -246,6 +255,11 @@ const PublicQuestionnaireAssessment: React.FC = () => {
       }
 
       let nextData = result.data as QuestionnaireAssessmentData
+      if (nextData.questionnaireAssessment.deliveryMode === 'FINAL_ONLY') {
+        setData(nextData)
+        setRecoveryState('ready')
+        return
+      }
       formAnswerRevisionsRef.current = nextData.currentFormItem
         ? { [nextData.currentFormItem.id]: nextData.currentFormAnswerRevision ?? 0 }
         : {}
@@ -518,6 +532,30 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     }
   }
 
+  const reloadFinalAttempt = async () => {
+    if (!sessionId) return
+    const result = await runWithCompletionRetry(() => createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      .get<QuestionnaireAssessmentData>(`/assessments/${sessionId}`))
+    if (!result.data) throw new Error(result.message || '获取问卷状态失败')
+    setData(result.data)
+    setRecoveryState('ready')
+  }
+
+  const restartLegacyAttempt = async () => {
+    if (!sessionId || !token) return
+    try {
+      setRecoveryState('retrying')
+      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      const response = await client.post<{ sessionId: string; resumeToken: string | null }>(`/assessments/${sessionId}/restart`, {})
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '重启问卷测评失败')
+      if (response.data.resumeToken) saveQuestionnaireResumeToken(token, response.data.sessionId, response.data.resumeToken)
+      navigate(`/public/questionnaire/${token}/assessment?sessionId=${response.data.sessionId}`)
+    } catch (err) {
+      setRecoveryState('recoverFailed')
+      setRunnerError(normalizeApiError(err).message)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -548,6 +586,37 @@ const PublicQuestionnaireAssessment: React.FC = () => {
           subTitle="该测评已失效或已过期"
         />
       </div>
+    )
+  }
+
+  if (data.questionnaireAssessment.status === 'COMPLETED') {
+    return <Result status="success" title="问卷测评已完成" extra={<Button type="primary" onClick={() => navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)}>查看结果</Button>} />
+  }
+
+  if (data.questionnaireAssessment.deliveryMode === 'LEGACY') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Result
+          status="warning"
+          title="这是旧版进行中的问卷"
+          subTitle={runnerError || '旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整段提交测评。'}
+          extra={<Button type="primary" loading={recoveryState === 'retrying'} onClick={() => void restartLegacyAttempt()}>重启并继续作答</Button>}
+        />
+      </div>
+    )
+  }
+
+  if (data.questionnaireAssessment.deliveryMode === 'FINAL_ONLY' && sessionId) {
+    return (
+      <FinalQuestionnaireAssessment
+        data={data as unknown as FinalQuestionnaireData}
+        publicMode
+        post={(path, body) => createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId)).post(path, body)}
+        onReload={reloadFinalAttempt}
+        onExit={() => navigate(`/public/questionnaire/${token}`)}
+        onCompleted={() => navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)}
+        onRestart={restartLegacyAttempt}
+      />
     )
   }
 

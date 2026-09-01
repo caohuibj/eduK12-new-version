@@ -4,6 +4,7 @@ import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAttemptState, CompositeCurrentItem, CompositePublicInfo } from './types'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
+import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) => `composite:recovery:attempt:${attemptId}`
@@ -42,7 +43,10 @@ const CompositeAssessmentPage: React.FC = () => {
   )
 
   const freezeBeforeMeasurement = async (next: CompositeAttemptState, credential = recoveryToken): Promise<CompositeAttemptState> => {
-    if (next.status === 'COMPLETED' || !next.currentItem || next.currentItem.type === 'FORM' || next.context?.status === 'frozen') return next
+    // Final-only attempts freeze context only when their first context section
+    // is submitted. Loading or starting one must not resurrect the legacy
+    // "freeze before the first measurement" write.
+    if (next.deliveryMode === 'FINAL_ONLY' || next.status === 'COMPLETED' || !next.currentItem || next.currentItem.type === 'FORM' || next.currentItem.type === 'FORM_SECTION' || next.context?.status === 'frozen') return next
     const client = publicMode ? publicCompositeApi(credential) : compositeApi
     const frozen = await client.freezeContext(next.id)
     if (frozen.code !== 0 || !frozen.data) throw new Error(frozen.message || '人口学上下文冻结失败')
@@ -62,7 +66,7 @@ const CompositeAssessmentPage: React.FC = () => {
     const item = next.currentItem
     if (item?.type === 'SCALE') {
       const nextAnswers: Record<string, string | number> = {}
-      ;(item.answers || []).forEach((answer) => { nextAnswers[answer.itemCode] = answer.responseValue })
+      ;(item.answers || []).forEach((answer) => { if (answer.itemCode && answer.responseValue !== undefined) nextAnswers[answer.itemCode] = answer.responseValue })
       setScaleAnswers(nextAnswers)
       setScaleIndex(0)
     } else if (item?.type === 'FORM') {
@@ -119,6 +123,33 @@ const CompositeAssessmentPage: React.FC = () => {
     }
   }
 
+  const restartLegacyAttempt = async () => {
+    if (!state) return
+    try {
+      setSubmitting(true)
+      setError(null)
+      const response = publicMode
+        ? await publicCompositeApi(recoveryToken).restart(state.id)
+        : await compositeApi.restart(state.id)
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '重启综合测评失败')
+      const nextId = response.data.attempt.id
+      if (publicMode) {
+        const nextCredential = response.data.recoveryToken || recoveryToken
+        if (nextCredential) {
+          setRecoveryToken(nextCredential)
+          store(tokenKey(token), nextCredential)
+          store(attemptKey(nextId), nextCredential)
+        }
+        navigate(`/public/composite/attempts/${nextId}`)
+      } else {
+        navigate(`/student/composite/attempts/${nextId}`)
+      }
+    } catch (err) {
+      setError((err as { message?: string }).message || '重启综合测评失败')
+      setSubmitting(false)
+    }
+  }
+
   useEffect(() => {
     let cancelled = false
     const initialise = async () => {
@@ -157,6 +188,10 @@ const CompositeAssessmentPage: React.FC = () => {
 
   const saveAndExit = async () => {
     if (!attemptId) return
+    if (state?.deliveryMode === 'FINAL_ONLY') {
+      navigate(publicMode ? '/' : '/student')
+      return
+    }
     try {
       const draft = state?.currentItem?.type === 'FORM'
         ? { itemId: state.currentItem.id, value: formValue }
@@ -264,6 +299,34 @@ const CompositeAssessmentPage: React.FC = () => {
 
   if (state.status === 'COMPLETED') {
     return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">综合测评已完成</h1><button onClick={() => goReport(state.id)} className="btn-primary">查看个人报告</button></div>
+  }
+
+  if (state.deliveryMode === 'LEGACY') {
+    return (
+      <div className="max-w-xl mx-auto rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
+        <h1 className="text-xl font-semibold text-amber-900 mb-2">这是旧版进行中的综合测评</h1>
+        <p className="text-sm text-amber-800 mb-5">旧版内容仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整单元提交测评。</p>
+        {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
+        <button onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary">{submitting ? '重启中...' : '重启并继续作答'}</button>
+      </div>
+    )
+  }
+
+  if (state.deliveryMode === 'FINAL_ONLY') {
+    return (
+      <FinalCompositeAssessment
+        state={state}
+        publicMode={publicMode}
+        recoveryToken={recoveryToken}
+        submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
+        submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
+        onReload={() => loadAttempt(state.id, recoveryToken)}
+        onExit={() => navigate(publicMode ? '/' : '/student')}
+        onCompleted={() => goReport(state.id)}
+        onEnterCognitive={enterCognitive}
+        onRestart={restartLegacyAttempt}
+      />
+    )
   }
 
   const current = state.currentItem

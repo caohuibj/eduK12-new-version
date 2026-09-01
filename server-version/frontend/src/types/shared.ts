@@ -33,7 +33,7 @@ export interface PaginatedResponse<T> {
 
 // API 响应类型
 export interface ApiResponse<T = any> {
-  code: number
+  code: number | string
   data: T
   message: string
 }

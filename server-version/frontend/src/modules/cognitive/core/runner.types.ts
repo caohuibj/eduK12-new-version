@@ -36,6 +36,7 @@ export type RunnerStatus =
   | 'SUBMITTING_TRIAL'
   | 'COMPLETING'
   | 'COMPLETED'
+  | 'LEGACY_READ_ONLY'
   | 'UNSUPPORTED'
   | 'ERROR'
   | 'RECOVERY_REQUIRED'

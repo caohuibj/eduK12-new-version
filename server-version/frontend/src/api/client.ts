@@ -169,7 +169,7 @@ const parseApiResponse = <T>(value: unknown): ApiResponse<T> => {
   if (
     !value ||
     typeof value !== 'object' ||
-    typeof (value as { code?: unknown }).code !== 'number' ||
+    (typeof (value as { code?: unknown }).code !== 'number' && typeof (value as { code?: unknown }).code !== 'string') ||
     typeof (value as { message?: unknown }).message !== 'string'
   ) {
     throw new Error('服务响应格式无效')

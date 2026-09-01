@@ -1,0 +1,278 @@
+import React, { useEffect, useState } from 'react'
+import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
+import type { ApiResponse } from '../types'
+import type { CompositeAttemptState, CompositeCurrentItem } from '../modules/composite/types'
+import { checkpointId } from '../services/persistence/checkpointTypes'
+import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
+import { normalizeApiError } from '../utils/normalizeApiError'
+
+type ResponseValue = string | number
+type FormValue = string | string[] | null
+
+export interface FinalCompositeAssessmentProps {
+  state: CompositeAttemptState
+  publicMode?: boolean
+  recoveryToken?: string
+  submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: FormValue }> }) => Promise<ApiResponse<unknown>>
+  submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }> }) => Promise<ApiResponse<unknown>>
+  onReload: () => Promise<void>
+  onExit: () => void
+  onCompleted: () => void
+  onEnterCognitive: (item: CompositeCurrentItem) => void
+  onRestart?: () => Promise<void> | void
+}
+
+const parseOptions = (options: unknown) => {
+  if (Array.isArray(options)) return options as Array<{ value: string; label: string }>
+  if (typeof options !== 'string') return []
+  try {
+    const parsed: unknown = JSON.parse(options)
+    return Array.isArray(parsed)
+      ? parsed.filter((option): option is { value: string; label: string } => Boolean(option) && typeof option === 'object' && typeof (option as any).value === 'string' && typeof (option as any).label === 'string')
+      : []
+  } catch {
+    return []
+  }
+}
+
+const emptyValue = (value: FormValue | undefined) => value === null || value === undefined || (Array.isArray(value) ? value.length === 0 : !String(value).trim())
+
+const responseError = (response: ApiResponse<unknown>) => {
+  const error = new Error(response.message || '提交失败') as Error & { status?: number; code?: number | string }
+  error.code = response.code
+  if (typeof response.code === 'number') error.status = response.code
+  return error
+}
+
+const errorStatus = (error: unknown) => {
+  const normalized = normalizeApiError(error)
+  const code = String(normalized.code ?? '')
+  return normalized.status === 409 || code === '409' || code === 'STALE_ATTEMPT' || code === 'DEFINITION_MISMATCH' || code === 'SUBMISSION_PAYLOAD_CONFLICT'
+    ? 'CONFLICT' as const
+    : 'RETRY_PENDING' as const
+}
+
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onRestart }) => {
+  const item = state.currentItem
+  const [sectionIndex, setSectionIndex] = useState(0)
+  const [scaleIndex, setScaleIndex] = useState(0)
+  const [formValues, setFormValues] = useState<Record<string, FormValue>>({})
+  const [scaleValues, setScaleValues] = useState<Record<string, ResponseValue>>({})
+  const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
+  const [loadingDraft, setLoadingDraft] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [requiresRestart, setRequiresRestart] = useState(false)
+
+  const isSection = item?.type === 'FORM_SECTION'
+  const sectionId = isSection ? item?.formSectionId || item.id : null
+  const scaleId = item?.type === 'SCALE' ? item.scaleAssessmentId || null : null
+  const draftKey = sectionId
+    ? `composite-form-section:${state.id}:${sectionId}`
+    : scaleId
+      ? `composite-scale:${scaleId}`
+      : null
+  const unitKey = `${state.id}:${item?.type || 'complete'}:${item?.id || ''}`
+
+  useEffect(() => {
+    setSectionIndex(0)
+    setScaleIndex(0)
+    setError(null)
+  }, [unitKey])
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      setLoadingDraft(true)
+      if (!draftKey || !item) {
+        if (!cancelled) setLoadingDraft(false)
+        return
+      }
+      try {
+        const definitionHash = item.definitionHash
+        if (!definitionHash) throw new Error('综合测评内容缺少冻结定义，请重启测评')
+        const nextMeta = await finalDraftStore.ensure(createFinalDraftMeta({
+          draftKey,
+          instrument: sectionId ? 'composite-form-section' : 'scale',
+          attemptId: sectionId ? state.id : scaleId!,
+          attemptEpoch: state.attemptEpoch ?? 1,
+          definitionHash,
+          contextSnapshotHash: state.contextSnapshotHash ?? state.context?.snapshotHash ?? null,
+          deliveryMode: 'final_only',
+          submissionId: checkpointId(),
+        }))
+        const storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        if (cancelled) return
+        const nextForm: Record<string, FormValue> = {}
+        const nextScale: Record<string, ResponseValue> = {}
+        storedAnswers.forEach((answer) => {
+          if (sectionId) nextForm[answer.itemKey] = answer.value as FormValue
+          else {
+            const value = answer.value as { responseValue?: ResponseValue } | ResponseValue
+            nextScale[answer.itemKey] = typeof value === 'object' && value !== null && 'responseValue' in value
+              ? value.responseValue as ResponseValue
+              : value as ResponseValue
+          }
+        })
+        if (sectionId && storedAnswers.length === 0) {
+          ;(item.formAnswers || item.answers || []).forEach((answer: any) => {
+            if (answer.formItemId) nextForm[answer.formItemId] = answer.value ?? null
+          })
+        }
+        if (!sectionId && storedAnswers.length === 0) {
+          ;(item.answers || []).forEach((answer: any) => {
+            if (answer.itemCode && answer.responseValue !== undefined) nextScale[answer.itemCode] = answer.responseValue
+          })
+        }
+        setMeta(nextMeta)
+        setFormValues(nextForm)
+        setScaleValues(nextScale)
+        setRequiresRestart(nextMeta.status === 'CONFLICT')
+        setError(nextMeta.status === 'CONFLICT' ? (nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评') : null)
+      } catch (cause) {
+        if (!cancelled) {
+          setRequiresRestart((cause as { code?: string })?.code === 'FINAL_DRAFT_IDENTITY_CONFLICT')
+          setError(normalizeApiError(cause).message)
+        }
+      } finally {
+        if (!cancelled) setLoadingDraft(false)
+      }
+    }
+    void load()
+    return () => { cancelled = true }
+  }, [draftKey, unitKey, item, sectionId, scaleId, state.id, state.attemptEpoch, state.contextSnapshotHash, state.context?.snapshotHash])
+
+  useEffect(() => {
+    if (state.status === 'COMPLETED') onCompleted()
+  }, [state.status, onCompleted])
+
+  const saveForm = async (itemId: string, value: FormValue) => {
+    if (!draftKey || submitting) return
+    setFormValues((previous) => ({ ...previous, [itemId]: value }))
+    try {
+      await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
+      setError(null)
+    } catch (cause) {
+      setError(normalizeApiError(cause).message)
+    }
+  }
+
+  const saveScale = async (itemCode: string, value: ResponseValue) => {
+    if (!draftKey || submitting) return
+    setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
+    try {
+      await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
+      setError(null)
+      if (item?.scale?.definition?.items && scaleIndex < item.scale.definition.items.length - 1) setScaleIndex((index) => index + 1)
+    } catch (cause) {
+      setError(normalizeApiError(cause).message)
+    }
+  }
+
+  const submitSection = async () => {
+    if (!item || item.type !== 'FORM_SECTION' || !sectionId || !draftKey || !meta || submitting) return
+    const formAnswers = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)).map((answer) => ({
+      formItemId: answer.formItemId!,
+      type: answer.type || 'text_input',
+      label: answer.label || '',
+      placeholder: answer.placeholder || null,
+      options: answer.options || null,
+      required: true,
+      contextKey: answer.contextKey || null,
+      value: answer.value ?? null,
+    }))
+    const missing = formAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
+    if (missing.length > 0) {
+      setSectionIndex(Math.max(0, formAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
+      setError(`还有 ${missing.length} 个必填字段未完成`)
+      return
+    }
+    try {
+      setSubmitting(true)
+      setError(null)
+      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const response = await submitFormSection(state.id, sectionId, {
+        submissionId: meta.submissionId,
+        attemptEpoch: meta.attemptEpoch,
+        definitionHash: meta.definitionHash,
+        contextSnapshotHash: meta.contextSnapshotHash,
+        answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: formValues[answer.formItemId] ?? null })),
+      })
+      if (response.code !== 0) throw responseError(response)
+      await finalDraftStore.setStatus(draftKey, 'COMPLETED')
+      await finalDraftStore.delete(draftKey)
+      await onReload()
+    } catch (cause) {
+      const status = errorStatus(cause)
+      const nextMeta = await finalDraftStore.setStatus(draftKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
+      if (nextMeta) setMeta(nextMeta)
+      setRequiresRestart(status === 'CONFLICT')
+      setError(normalizeApiError(cause).message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const submitScaleNow = async () => {
+    if (!item || item.type !== 'SCALE' || !item.scaleAssessmentId || !draftKey || !meta || submitting) return
+    const items = item.scale?.definition?.items || []
+    const missing = items.filter((question) => question.required && scaleValues[question.itemCode] === undefined)
+    if (missing.length > 0) {
+      setScaleIndex(Math.max(0, items.findIndex((question) => question.required && scaleValues[question.itemCode] === undefined)))
+      setError(`还有 ${missing.length} 道必答题未作答`)
+      return
+    }
+    try {
+      setSubmitting(true)
+      setError(null)
+      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const response = await submitScale(state.id, item.id, {
+        submissionId: meta.submissionId,
+        attemptEpoch: meta.attemptEpoch,
+        definitionHash: meta.definitionHash,
+        contextSnapshotHash: meta.contextSnapshotHash,
+        answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
+      })
+      if (response.code !== 0) throw responseError(response)
+      await finalDraftStore.setStatus(draftKey, 'COMPLETED')
+      await finalDraftStore.delete(draftKey)
+      await onReload()
+    } catch (cause) {
+      const status = errorStatus(cause)
+      const nextMeta = await finalDraftStore.setStatus(draftKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
+      if (nextMeta) setMeta(nextMeta)
+      setRequiresRestart(status === 'CONFLICT')
+      setError(normalizeApiError(cause).message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loadingDraft) return <div className="flex items-center justify-center h-64 text-gray-500">正在恢复本地草稿...</div>
+  if (state.status === 'COMPLETED') return null
+
+  const units = state.units || state.items
+  const contextText = state.context?.status === 'frozen' ? '上下文已冻结，后续模块共享同一快照。' : '答案只保存在本地草稿中，完成单元时一次提交。'
+  const scaleItems = item?.type === 'SCALE' ? item.scale?.definition?.items || [] : []
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="flex items-center justify-between mb-4"><div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">完成单元：{state.completedItems} / {state.totalItems}（{state.progress}%）</p></div><button type="button" onClick={onExit} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button></div>
+      <div className="w-full bg-gray-200 rounded-full h-2 mb-4"><div className="bg-primary h-2 rounded-full" style={{ width: `${state.progress}%` }} /></div>
+      {publicMode && recoveryToken && <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mb-4">匿名恢复凭证已保存；请继续保管。</p>}
+      <p className="text-sm text-gray-500 mb-4">{contextText} 浏览器重开后可以继续恢复。</p>
+      {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
+      {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
+
+      {item?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{units[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">认知测验会逐试次写入本地，完成时一次提交全部试次。</p><button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary">开始/继续认知任务</button></div>}
+
+      {item?.type === 'FORM_SECTION' && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{item.title || '表单'}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {(item.formAnswers || item.answers || []).length}</span></div>{item.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{item.description}</p>}{(() => { const fields = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)) as any[]; const field = fields[sectionIndex]; if (!field) return <p className="text-gray-500">该区段没有字段。</p>; const value = formValues[field.formItemId]; const options = parseOptions(field.options); return <div><h3 className="text-lg font-medium mb-4">{field.label}{field.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>{field.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}{field.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}{field.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}{(!['single_choice', 'multiple_choice', 'year_month'].includes(field.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting} placeholder={field.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}<div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < fields.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div></div> })()}</div>}
+
+      {item?.type === 'SCALE' && item.scale && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{item.scale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {scaleItems.length}</span></div>{(() => { const question = scaleItems[scaleIndex]; if (!question) return <p className="text-gray-500">量表题目为空。</p>; return <div><h3 className="text-lg font-medium mb-5">{question.content}{question.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{question.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScale(question.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[question.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScaleNow()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div> })()}</div>}
+
+      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">提交单元</p><div className="flex flex-wrap gap-2">{units.map((unit) => <span key={`${unit.type}-${unit.id}`} className={`px-3 py-1 rounded text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{unit.index + 1}. {unit.label || unit.type}</span>)}</div></div>
+    </div>
+  )
+}
+
+export default FinalCompositeAssessment

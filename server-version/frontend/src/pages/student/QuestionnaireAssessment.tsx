@@ -8,6 +8,7 @@ import { checkpointScheduler, CheckpointTransportError } from '../../services/pe
 import type { CheckpointBatch } from '../../services/persistence/checkpointTypes'
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
 import { runWithCompletionRetry } from '../../services/completionRetry'
+import FinalQuestionnaireAssessment, { type FinalQuestionnaireData } from '../../components/FinalQuestionnaireAssessment'
 
 type ResponseValue = string | number
 
@@ -63,13 +64,21 @@ interface QuestionnaireAssessmentData {
     progress: number
     currentIndex: number
     context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
+    deliveryMode?: 'FINAL_ONLY' | 'LEGACY'
+    attemptEpoch?: number
   }
   currentFormItem: FormItem | null
-  currentScale: (Scale & { scaleAssessmentId: string }) | null
+  currentScale: (Scale & { scaleAssessmentId: string; definitionHash?: string }) | null
   totalItems: number
-  contentItems: ContentItem[]
+  contentItems: Array<ContentItem | { type: 'form-section'; position: number; id: string; label: string; completed: boolean }>
   scaleAssessments?: Array<{ id: string; scaleId: string }>
   currentFormAnswerRevision?: number | null
+  currentFormSection?: FinalQuestionnaireData['currentFormSection']
+  definitionHash?: string
+  contextSnapshotHash?: string | null
+  units?: FinalQuestionnaireData['units']
+  formSections?: FinalQuestionnaireData['formSections']
+  sessionId?: string
 }
 
 interface QuestionnaireCheckpointPayload {
@@ -178,7 +187,7 @@ const QuestionnaireAssessment: React.FC = () => {
     await checkpointScheduler.flushAll()
   }, [])
 
-  useCheckpointLifecycle(flushCheckpoints, Boolean(data))
+  useCheckpointLifecycle(flushCheckpoints, Boolean(data) && data?.questionnaireAssessment.deliveryMode !== 'FINAL_ONLY')
 
   const freezeContextBeforeScale = async (assessmentId: string) => {
     const response = await apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/questionnaires/assessments/${assessmentId}/context/freeze`)
@@ -222,6 +231,13 @@ const QuestionnaireAssessment: React.FC = () => {
         formAnswerRevisionsRef.current = response.data.currentFormItem
           ? { [response.data.currentFormItem.id]: response.data.currentFormAnswerRevision ?? 0 }
           : {}
+        if (response.data.questionnaireAssessment.deliveryMode === 'FINAL_ONLY') {
+          setData(response.data)
+          if (response.data.questionnaireAssessment.status === 'COMPLETED') {
+            navigate(`/student/questionnaires/result/${response.data.questionnaireAssessment.id}`)
+          }
+          return
+        }
         registerQuestionnairePersistence(questionnaireAssessmentId)
         void checkpointScheduler.flush('questionnaire', questionnaireAssessmentId).catch((err) => {
           setRunnerError(normalizeApiError(err).message)
@@ -493,6 +509,28 @@ const QuestionnaireAssessment: React.FC = () => {
     }
   }
 
+  const reloadFinalAttempt = async () => {
+    if (!data) return
+    const response = await runWithCompletionRetry(() => apiClient.get<QuestionnaireAssessmentData>(
+      `/questionnaires/assessments/${data.questionnaireAssessment.id}`,
+    ))
+    if (response.code !== 0 || !response.data) throw new Error(response.message || '获取问卷状态失败')
+    setData(response.data)
+  }
+
+  const restartLegacyAttempt = async () => {
+    if (!data) return
+    try {
+      setSubmitting(true)
+      const response = await apiClient.post(`/questionnaires/assessments/${data.questionnaireAssessment.id}/restart`, {})
+      if (response.code !== 0) throw new Error(response.message || '重启问卷测评失败')
+      window.location.reload()
+    } catch (err) {
+      setRunnerError(normalizeApiError(err).message)
+      setSubmitting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -506,6 +544,40 @@ const QuestionnaireAssessment: React.FC = () => {
       <div className="text-center py-12">
         <p className="text-gray-500">问卷不存在或未发布</p>
       </div>
+    )
+  }
+
+  if (data.questionnaireAssessment.status === 'COMPLETED') {
+    return (
+      <div className="text-center py-12">
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+        <p className="text-gray-700 mb-4">问卷测评已完成</p>
+        <button onClick={() => navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)} className="btn-primary">查看结果</button>
+      </div>
+    )
+  }
+
+  if (data.questionnaireAssessment.deliveryMode === 'LEGACY') {
+    return (
+      <div className="max-w-xl mx-auto rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
+        <h1 className="text-xl font-semibold text-amber-900 mb-2">这是旧版进行中的问卷</h1>
+        <p className="text-sm text-amber-800 mb-5">旧版答案仍可用于查看和报告，但不能继续写入。重启会保留历史记录，并创建新的整段提交测评。</p>
+        {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
+        <button onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary">{submitting ? '重启中...' : '重启并继续作答'}</button>
+      </div>
+    )
+  }
+
+  if (data.questionnaireAssessment.deliveryMode === 'FINAL_ONLY') {
+    return (
+      <FinalQuestionnaireAssessment
+        data={data as unknown as FinalQuestionnaireData}
+        post={(path, body) => apiClient.post(path, body)}
+        onReload={reloadFinalAttempt}
+        onExit={() => navigate('/student')}
+        onCompleted={() => navigate(`/student/questionnaires/result/${data.questionnaireAssessment.id}`)}
+        onRestart={restartLegacyAttempt}
+      />
     )
   }
 

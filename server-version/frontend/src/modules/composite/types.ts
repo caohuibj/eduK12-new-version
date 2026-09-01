@@ -2,7 +2,7 @@ import type { CognitiveSession } from '../cognitive/types'
 import type { FormBackgroundReport } from '../reporting/types'
 import type { SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 
-export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM'
+export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM' | 'FORM_SECTION'
 
 export interface CompositeItemSummary {
   id: string
@@ -61,10 +61,47 @@ export interface CompositeCurrentItem {
   type: CompositeItemType
   position: number
   required: boolean
+  formSectionId?: string
+  title?: string
+  description?: string | null
+  contextSection?: boolean
+  definitionHash?: string
+  status?: string
+  formSection?: {
+    id: string
+    title: string
+    description: string | null
+    contextSection: boolean
+    definitionHash: string
+    status: string
+    items: Array<{
+      id: string
+      type: string
+      label: string
+      placeholder: string | null
+      options: Array<{ value: string; label: string }> | string | null
+      required: boolean
+      contextKey: string | null
+      value: string | string[] | null
+    }>
+  }
   form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
   scale?: CompositeScale
   scaleAssessmentId?: string
-  answers?: Array<{ itemCode: string; responseValue: CompositeScaleResponseValue; responseTimeMs?: number; changeCount?: number }>
+  answers?: Array<{
+    itemCode?: string
+    responseValue?: CompositeScaleResponseValue
+    responseTimeMs?: number
+    changeCount?: number
+    formItemId?: string
+    type?: string
+    label?: string
+    placeholder?: string | null
+    options?: Array<{ value: string; label: string }> | string | null
+    value?: string | string[] | null
+    contextKey?: string | null
+  }>
+  formAnswers?: Array<{ formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | string[] | null }>
   cognitiveSession?: CognitiveSession
 }
 
@@ -84,7 +121,13 @@ export interface CompositeAttemptState {
   anonymousCode: string | null
   items: CompositeItemSummary[]
   currentItem: CompositeCurrentItem | null
-  context?: { status: 'collecting' | 'frozen'; frozenAt: string | null }
+  context?: { status: 'collecting' | 'frozen'; frozenAt: string | null; snapshotHash?: string | null }
+  deliveryMode?: 'FINAL_ONLY' | 'LEGACY'
+  attemptEpoch?: number
+  definitionHash?: string
+  contextSnapshotHash?: string | null
+  units?: Array<{ id: string; type: CompositeItemType; position: number; required: boolean; label: string; completed: boolean; index: number; formSectionId?: string; itemId?: string }>
+  formSections?: Array<NonNullable<CompositeCurrentItem['formSection']> & { position: number; submittedAt: string | null }>
 }
 
 export interface CompositeMutationAck {

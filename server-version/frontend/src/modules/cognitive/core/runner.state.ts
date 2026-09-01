@@ -16,6 +16,7 @@ import type { CognitiveTaskContext, RunnerError, RunnerState } from './runner.ty
 export type RunnerAction =
   | { type: 'LOADING' }
   | { type: 'SESSION_LOADED'; session: NonNullable<RunnerState['session']>; trialIndex: number }
+  | { type: 'LEGACY_READ_ONLY'; session: NonNullable<RunnerState['session']> }
   | { type: 'SESSION_ERROR'; error: RunnerError }
   | { type: 'RUNNER_UNSUPPORTED' }
   | { type: 'RECOVERY_REQUIRED' }
@@ -26,6 +27,7 @@ export type RunnerAction =
   | { type: 'TRIAL_CONFLICT' }
   | { type: 'COMPLETE_START' }
   | { type: 'COMPLETE_SUCCESS'; result: CognitiveResult }
+  | { type: 'FINAL_SUBMIT_CONFLICT'; error: RunnerError }
   | { type: 'COMPLETE_FAILED'; error: RunnerError }
 
 export const initialRunnerState: RunnerState = {
@@ -78,6 +80,16 @@ export function runnerReducer(state: RunnerState, action: RunnerAction): RunnerS
     }
     case 'SESSION_ERROR':
       return { ...state, status: 'ERROR', session: null, taskContext: null, error: action.error }
+    case 'LEGACY_READ_ONLY':
+      return {
+        ...state,
+        status: 'LEGACY_READ_ONLY',
+        session: action.session,
+        taskContext: buildTaskContext(action.session),
+        trialIndex: 0,
+        error: null,
+        result: null,
+      }
     case 'RUNNER_UNSUPPORTED':
       return { ...state, status: 'UNSUPPORTED', error: { code: 'UNSUPPORTED', message: '该测评类型或版本暂不支持' } }
     case 'RECOVERY_REQUIRED':
@@ -106,6 +118,8 @@ export function runnerReducer(state: RunnerState, action: RunnerAction): RunnerS
       return state.status === 'RUNNING' ? { ...state, status: 'COMPLETING' } : state
     case 'COMPLETE_SUCCESS':
       return { ...state, status: 'COMPLETED', result: action.result, error: null }
+    case 'FINAL_SUBMIT_CONFLICT':
+      return { ...state, status: 'RECOVERY_REQUIRED', error: action.error }
     case 'COMPLETE_FAILED':
       return state.status === 'COMPLETING' ? { ...state, status: 'RUNNING', error: action.error } : state
     default:
