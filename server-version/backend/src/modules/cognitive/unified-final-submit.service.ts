@@ -368,12 +368,29 @@ export const submitUnifiedCognitiveSessionFinal = async (
   })
 
   const canonicalResult = admission.compositeAttemptId && prepared.runtime.runtimeCapabilities.aggregateEligible
-    ? projectCognitiveCanonicalUnitResult({
-        snapshot: resultSnapshot,
-        runtime: prepared.runtime,
-        contextHash: contextState.reference?.snapshotHash ?? null,
-        referenceBindings: prepared.snapshot.referenceBindings ?? [],
-      })
+    ? (() => {
+        if (
+          admission.assignmentId
+          && (
+            !freeze.resolvedConfigHash
+            || !/^[0-9a-f]{64}$/.test(freeze.resolvedConfigHash)
+            || freeze.resolvedConfigHash !== prepared.snapshot.configHash
+          )
+        ) {
+          throw new InstrumentFinalSubmitError(
+            'DEFINITION_MISMATCH',
+            '认知会话冻结配置与分发冻结配置不匹配，请重启后重试',
+            409,
+          )
+        }
+        return projectCognitiveCanonicalUnitResult({
+          snapshot: resultSnapshot,
+          runtime: prepared.runtime,
+          contextHash: contextState.reference?.snapshotHash ?? null,
+          referenceBindings: prepared.snapshot.referenceBindings ?? [],
+          resolvedConfigHash: freeze.resolvedConfigHash ?? prepared.snapshot.configHash,
+        })
+      })()
     : null
   const completedAt = new Date(resultSnapshot.completedAt)
   const encrypted = await measureRequestPhase('final_submit_encryption', async () => ({

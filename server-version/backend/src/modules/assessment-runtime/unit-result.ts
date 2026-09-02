@@ -55,6 +55,8 @@ export interface CanonicalUnitResultCoreV1 {
     instrumentVersion: string
     protocolSignature?: string
     profileKey?: string | null
+    /** Present for Cognitive aggregate results; optional for legacy/Scale payloads. */
+    resolvedConfigHash?: string | null
   }
 }
 
@@ -189,6 +191,7 @@ const baseCore = (runtime: CompiledInstrumentRuntimeV1, input: {
   contextHash: string | null
   protocolSignature?: string
   profileKey?: string | null
+  resolvedConfigHash?: string | null
 }): CanonicalUnitResultCoreV1 => ({
   schemaVersion: 1,
   unitType: input.unitType,
@@ -209,6 +212,7 @@ const baseCore = (runtime: CompiledInstrumentRuntimeV1, input: {
     instrumentVersion: runtime.instrumentVersion,
     ...(input.protocolSignature ? { protocolSignature: input.protocolSignature } : {}),
     ...(input.profileKey === undefined ? {} : { profileKey: input.profileKey }),
+    ...(input.resolvedConfigHash === undefined ? {} : { resolvedConfigHash: input.resolvedConfigHash }),
   },
 })
 
@@ -257,7 +261,11 @@ export const projectCognitiveCanonicalUnitResult = (input: {
   runtime: CompiledInstrumentRuntimeV1
   contextHash: string | null
   referenceBindings?: ReferenceBindingSnapshot[]
+  resolvedConfigHash: string
 }): CanonicalUnitResultCoreV1 => {
+  if (!/^[0-9a-f]{64}$/.test(input.resolvedConfigHash)) {
+    throw new Error('Cognitive resolved config hash must be a lowercase SHA-256 hex digest')
+  }
   const allowed = new Set(input.runtime.aggregateProjection.allowedMetricKeys)
   const metricEntries = Object.entries(input.snapshot.metrics)
   for (const [key] of metricEntries) {
@@ -291,6 +299,7 @@ export const projectCognitiveCanonicalUnitResult = (input: {
     contextHash: input.contextHash,
     protocolSignature: input.snapshot.protocolSignature,
     profileKey: input.snapshot.profile,
+    resolvedConfigHash: input.resolvedConfigHash,
   })
 }
 
@@ -366,6 +375,7 @@ const canonicalUnitResultCoreSchema = z.object({
     instrumentVersion: z.string().min(1),
     protocolSignature: z.string().optional(),
     profileKey: z.string().nullable().optional(),
+    resolvedConfigHash: z.string().regex(/^[0-9a-f]{64}$/).nullable().optional(),
   }).strict(),
 }).strict()
 

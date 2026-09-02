@@ -217,13 +217,18 @@ describe('V32-1 canonical unit result and collection facts', () => {
       report: {},
       assessmentContext: null,
     } as CognitiveResultSnapshot
-    const core = projectCognitiveCanonicalUnitResult({ snapshot, runtime, contextHash: null })
+    const resolvedConfigHash = 'a'.repeat(64)
+    const core = projectCognitiveCanonicalUnitResult({ snapshot, runtime, contextHash: null, resolvedConfigHash })
     expect(core.metrics).toEqual([{ key: 'accuracy', value: 0.9 }])
+    expect(core.scientificProvenance).toMatchObject({ resolvedConfigHash })
     expect(JSON.stringify(core)).not.toContain('trial')
+    expect(() => projectCognitiveCanonicalUnitResult({ snapshot, runtime, contextHash: null, resolvedConfigHash: 'invalid' }))
+      .toThrow(/resolved config hash/)
     expect(() => projectCognitiveCanonicalUnitResult({
       snapshot: { ...snapshot, metrics: { rawTrialResponse: 'secret' } },
       runtime,
       contextHash: null,
+      resolvedConfigHash,
     })).toThrow(/not declared/)
     expect(() => projectCognitiveCanonicalUnitResult({
       snapshot: {
@@ -239,6 +244,7 @@ describe('V32-1 canonical unit result and collection facts', () => {
       },
       runtime,
       contextHash: null,
+      resolvedConfigHash,
     })).toThrow(/not declared/)
   })
 
