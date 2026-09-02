@@ -31,7 +31,7 @@ import {
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedCognitiveSessionFinal } from './unified-final-submit.service'
-import type { UnifiedCognitiveAdmission } from './unified-final-submit.service'
+import { UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from './cognitive-admission.service'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -274,29 +274,18 @@ const prepareFinalCognitiveData = async (
 
 const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  const child = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
+    where: { id: input.sessionId },
+    select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
+  }))
+  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
+  if (child.runtimeGeneration === 'UNIFIED_V1') {
+    return submitUnifiedCognitiveSessionFinal(input, child)
+  }
   const session = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
     select: {
-      id: true,
-      userId: true,
-      compositeAttemptId: true,
-      compositeItemId: true,
-      recoveryTokenHash: true,
-      testType: true,
-      attemptNo: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      compiledRuntimeHash: true,
-      configVersion: true,
-      configSnapshotEncrypted: true,
-      engineVersion: true,
-      scoringVersion: true,
-      randomSeed: true,
-      assignmentId: true,
-      resultSnapshotEncrypted: true,
-      submissionId: true,
-      submissionPayloadHash: true,
+      ...UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
       compositeAttempt: {
         select: {
           userId: true,
@@ -317,9 +306,6 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
     },
   }))
   if (!session) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
-  if (session.runtimeGeneration === 'UNIFIED_V1') {
-    return submitUnifiedCognitiveSessionFinal(input, session as UnifiedCognitiveAdmission)
-  }
   assertPrincipal(session, input)
   assertFinalOnly(session.deliveryMode)
   assertAttemptEpoch(session.attemptNo, input.attemptEpoch)

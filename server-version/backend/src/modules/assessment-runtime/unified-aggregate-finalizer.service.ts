@@ -73,6 +73,189 @@ const snapshotHeaderSelect = {
   compiledRuntimeHash: true,
 } as const
 
+const unifiedParentHeaderSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  progress: true,
+  aggregateInputHash: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+} as const
+
+const compositeParentHeaderSelect = {
+  ...unifiedParentHeaderSelect,
+  compiledBundleRuntimeHash: true,
+} as const
+
+const compositeParentGraphSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  progress: true,
+  aggregateInputHash: true,
+  compiledBundleRuntimeHash: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+  compositeAssessment: {
+    select: {
+      id: true,
+      reportPackageKey: true,
+      reportPackageVersion: true,
+      reportPackageProfile: true,
+      reportPackageSnapshotEncrypted: true,
+      items: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          position: true,
+          required: true,
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
+          cognitiveAssignment: {
+            select: {
+              id: true,
+              profile: true,
+              resolvedConfigHash: true,
+              resolvedReportSnapshotEncrypted: true,
+              config: { select: { testType: true, configVersion: true, engineVersion: true, scoringVersion: true } },
+            },
+          },
+        },
+      },
+      formSections: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          position: true,
+          contextSection: true,
+          items: {
+            orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
+            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, contextKey: true, required: true, position: true, formSectionPosition: true },
+          },
+        },
+      },
+    },
+  },
+}
+
+const questionnaireParentGraphSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  progress: true,
+  aggregateInputHash: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+  questionnaire: {
+    select: {
+      id: true,
+      name: true,
+      questionnaireScales: {
+        orderBy: { position: 'asc' },
+        select: { id: true, scaleId: true, position: true, scale: { select: { id: true, code: true, name: true, instrumentVersion: true } } },
+      },
+      formSections: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          position: true,
+          contextSection: true,
+          items: {
+            orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }],
+            select: { id: true, type: true, label: true, placeholder: true, required: true, options: true, contextKey: true, position: true, sectionPosition: true },
+          },
+        },
+      },
+    },
+  },
+}
+
+type UnifiedParentHeader = {
+  id: string
+  status: string
+  deliveryMode: string
+  runtimeGeneration: string | null
+  attemptEpoch: number
+  startedAt: Date
+  completedAt: Date | null
+  progress: number
+  aggregateInputHash: string | null
+  compiledBundleRuntimeHash?: string | null
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  frozenActiveSlotSetEncrypted: string | null
+  frozenActiveSlotSetHash: string | null
+}
+
+type TerminalProbe =
+  | { kind: 'missing' }
+  | { kind: 'terminal'; result: CompletionResult }
+  | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; completeness: ReturnType<typeof evaluateCompleteness> }
+  | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; completeness: ReturnType<typeof evaluateCompleteness> }
+
+const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt'>): CompletionResult => ({
+  status: parent.status,
+  progress: parent.status === 'COMPLETED' ? 100 : parent.progress,
+  completedAt: parent.completedAt,
+})
+
+const probeUnifiedParent = async (input: {
+  parentId: string
+  composite: boolean
+}): Promise<TerminalProbe> => {
+  const parent = await measureRequestPhase('aggregate.probe_ms', async () => (
+    input.composite
+      ? prisma.compositeAssessmentAttempt.findUnique({
+          where: { id: input.parentId },
+          select: compositeParentHeaderSelect,
+        })
+      : prisma.questionnaireAssessment.findUnique({
+          where: { id: input.parentId },
+          select: unifiedParentHeaderSelect,
+        })
+  )) as UnifiedParentHeader | null
+  if (!parent) return { kind: 'missing' }
+  if (parent.status !== 'IN_PROGRESS') return { kind: 'terminal', result: terminalFromParent(parent) }
+
+  const frozenSlots = readFrozenSlotSet(parent)
+  const headers = await loadSnapshotHeaders({
+    parentId: input.parentId,
+    attemptEpoch: parent.attemptEpoch,
+    composite: input.composite,
+  })
+  const completeness = measureRequestPhaseSync('aggregate.compute_per_parent', () => (
+    evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })
+  ))
+  if (completeness.invalidSlotKeys.length > 0) {
+    throw aggregateInputError(`存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
+  }
+  if (!completeness.ready) return { kind: 'incomplete', parent, frozenSlots, headers, completeness }
+  return { kind: 'ready', parent, frozenSlots, headers, completeness }
+}
+
 const snapshotPayloadSelect = {
   ...snapshotHeaderSelect,
   canonicalResultEncrypted: true,
@@ -571,73 +754,19 @@ const updateIncompleteQuestionnaire = async (
 }
 
 const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<CompletionResult | null> => {
+  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true })
+  if (probe.kind === 'missing') return null
+  if (probe.kind === 'terminal') return probe.result
+  if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
+
   const parent = await measureRequestPhase('aggregate.load_ms', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: {
-      id: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      startedAt: true,
-      completedAt: true,
-      progress: true,
-      aggregateInputHash: true,
-      compiledBundleRuntimeHash: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      compositeAssessment: {
-        select: {
-          id: true,
-          reportPackageKey: true,
-          reportPackageVersion: true,
-          reportPackageProfile: true,
-          reportPackageSnapshotEncrypted: true,
-          items: {
-            orderBy: { position: 'asc' },
-            select: {
-              id: true,
-              type: true,
-              position: true,
-              required: true,
-              scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
-              cognitiveAssignment: {
-                select: {
-                  id: true,
-                  profile: true,
-                  resolvedConfigHash: true,
-                  resolvedReportSnapshotEncrypted: true,
-                  config: { select: { testType: true, configVersion: true, engineVersion: true, scoringVersion: true } },
-                },
-              },
-            },
-          },
-          formSections: {
-            orderBy: { position: 'asc' },
-            select: {
-              id: true,
-              title: true,
-              description: true,
-              position: true,
-              contextSection: true,
-              items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }], select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, contextKey: true, required: true, position: true, formSectionPosition: true } },
-            },
-          },
-        },
-      },
-    },
+    select: compositeParentGraphSelect as any,
   })) as any
   if (!parent) return null
-  if (parent.status !== 'IN_PROGRESS') return { status: parent.status, progress: parent.status === 'COMPLETED' ? 100 : parent.progress, completedAt: parent.completedAt }
+  if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
 
-  const frozenSlots = readFrozenSlotSet(parent)
-  const headers = await loadSnapshotHeaders({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true })
-  const completeness = measureRequestPhaseSync('aggregate.compute_per_parent', () => evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch }))
-  if (completeness.invalidSlotKeys.length > 0) throw aggregateInputError(`存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
-  if (!completeness.ready) return updateIncompleteComposite(parent, completeness)
-
+  const { frozenSlots, headers } = probe
   const context = readAggregateContext(parent, true)
   const completed = await decryptCompletedPayloads({
     parentId: attemptId,
@@ -842,54 +971,21 @@ const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCo
 }
 
 const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<CompletionResult | null> => {
+  const probe = await probeUnifiedParent({ parentId: assessmentId, composite: false })
+  if (probe.kind === 'missing') return null
+  if (probe.kind === 'terminal') return probe.result
+  if (probe.kind === 'incomplete') {
+    return updateIncompleteQuestionnaire(probe.parent, probe.completeness, probe.frozenSlots.slots, probe.headers)
+  }
+
   const parent = await measureRequestPhase('aggregate.load_ms', () => prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
-    select: {
-      id: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      startedAt: true,
-      completedAt: true,
-      progress: true,
-      aggregateInputHash: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      questionnaire: {
-        select: {
-          id: true,
-          name: true,
-          questionnaireScales: {
-            orderBy: { position: 'asc' },
-            select: { id: true, scaleId: true, position: true, scale: { select: { id: true, code: true, name: true, instrumentVersion: true } } },
-          },
-          formSections: {
-            orderBy: { position: 'asc' },
-            select: {
-              id: true,
-              title: true,
-              description: true,
-              position: true,
-              contextSection: true,
-              items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }], select: { id: true, type: true, label: true, placeholder: true, required: true, options: true, contextKey: true, position: true, sectionPosition: true } },
-            },
-          },
-        },
-      },
-    },
+    select: questionnaireParentGraphSelect as any,
   })) as any
   if (!parent) return null
-  if (parent.status !== 'IN_PROGRESS') return { status: parent.status, progress: parent.status === 'COMPLETED' ? 100 : parent.progress, completedAt: parent.completedAt }
+  if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
 
-  const frozenSlots = readFrozenSlotSet(parent)
-  const headers = await loadSnapshotHeaders({ parentId: assessmentId, attemptEpoch: parent.attemptEpoch, composite: false })
-  const completeness = measureRequestPhaseSync('aggregate.compute_per_parent', () => evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch }))
-  if (completeness.invalidSlotKeys.length > 0) throw aggregateInputError(`存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
-  if (!completeness.ready) return updateIncompleteQuestionnaire(parent, completeness, frozenSlots.slots, headers)
-
+  const { frozenSlots, headers } = probe
   const context = readAggregateContext(parent, false)
   const completed = await decryptCompletedPayloads({
     parentId: assessmentId,

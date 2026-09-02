@@ -899,7 +899,7 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
         data: { canonicalResultEncrypted: encryptUnifiedRuntimePayload(forged) },
       })
 
-      await expect(submitScaleAssessmentFinal({
+      const scaleSubmitted = await submitScaleAssessmentFinal({
         assessmentId: fixture.scaleAssessmentId,
         submissionId: `v32-2-package-scale-${randomUUID()}`,
         attemptEpoch: 1,
@@ -907,15 +907,25 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
         contextSnapshotHash: null,
         answers: ADEXI_V2_DEFINITION.items.map((item) => ({ itemCode: item.itemCode, responseValue: 'never' })),
         userId: fixture.userId,
-      })).rejects.toMatchObject({ code: 'DEFINITION_MISMATCH', statusCode: 409 })
+      })
+      expect(scaleSubmitted).toMatchObject({ replayed: false, assessment: { status: 'COMPLETED' }, parent: null })
 
       expect(await db!.assessment.findUnique({ where: { id: fixture.scaleAssessmentId }, select: { status: true, submissionId: true } }))
         .toMatchObject({ status: 'COMPLETED', submissionId: expect.any(String) })
       expect(await db!.compositeAssessmentAttempt.findUnique({
         where: { id: fixture.attemptId },
-        select: { status: true, progress: true, completedItems: true },
-      })).toEqual({ status: 'IN_PROGRESS', progress: 50, completedItems: 1 })
+        select: { status: true },
+      })).toEqual({ status: 'IN_PROGRESS' })
       expect(await db!.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
+
+      await expect(finalizeCompositeAttemptUnifiedIfReady(fixture.attemptId)).rejects.toMatchObject({
+        code: 'DEFINITION_MISMATCH',
+        statusCode: 409,
+      })
+      expect(await db!.compositeAssessmentAttempt.findUnique({
+        where: { id: fixture.attemptId },
+        select: { status: true },
+      })).toEqual({ status: 'IN_PROGRESS' })
 
       await db!.assessmentUnitSnapshot.update({
         where: { id: cognitiveSnapshot.id },

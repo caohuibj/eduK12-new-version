@@ -64,6 +64,7 @@ import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unif
 import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
 import { runnerDefinition } from '../modules/scale/scale-definition'
 import { ensureScaleAdmissionAtDelivery } from '../modules/scale/scale-admission.service'
+import { ensureQuestionnaireFormAdmissionAtDelivery } from '../modules/assessment-runtime/form-admission.service'
 
 export type SectionItem = {
   id: string
@@ -410,6 +411,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   const current = currentIndex >= 0 ? units[currentIndex] : null
   if (current?.type === 'FORM_SECTION') {
     currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
+    await ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mapQuestionnaireSection(current.section))
   } else if (current?.type === 'SCALE') {
     const child = scaleMap.get(current.item.scaleId)
     if (!child?.id || !child.runtimeSnapshotEncrypted) {
@@ -541,7 +543,18 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   })
   if (!runtime) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   assertFinalOnly(runtime.deliveryMode)
-  if (runtime.runtimeGeneration === 'UNIFIED_V1') return getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+  if (runtime.runtimeGeneration === 'UNIFIED_V1') {
+    let state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+    if (
+      state.questionnaireAssessment.status === 'IN_PROGRESS'
+      && state.totalItems > 0
+      && state.completedItems >= state.totalItems
+    ) {
+      await finalizeQuestionnaireIfReady(assessmentId)
+      state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+    }
+    return state
+  }
 
   const assessment = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },

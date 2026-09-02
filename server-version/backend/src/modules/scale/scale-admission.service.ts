@@ -3,10 +3,14 @@ import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from 
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
   createFrozenUnitAdmission,
-  decryptFrozenUnitAdmission,
   frozenAdmissionPersistence,
   type FrozenUnitAdmissionV1,
 } from '../assessment-runtime/admission-snapshot'
+import {
+  assertAdmissionParentBinding as assertSharedAdmissionParentBinding,
+  persistAdmissionOnce,
+  readStoredUnitAdmission,
+} from '../assessment-runtime/unit-admission'
 import { getFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
 
 const COMPILED_RUNTIME_HASH = /^[0-9a-f]{64}$/
@@ -105,7 +109,7 @@ const readRequiredScaleSlot = (input: {
 export const createStandaloneScaleAdmission = (input: {
   attemptEpoch: number
   userId: string | null
-  scale: FrozenUnitAdmissionV1['scale']
+  scale: NonNullable<FrozenUnitAdmissionV1['scale']>
 }): FrozenUnitAdmissionV1 => createFrozenUnitAdmission({
   attemptEpoch: input.attemptEpoch,
   scale: input.scale,
@@ -117,52 +121,32 @@ export const createStandaloneScaleAdmission = (input: {
 export const standaloneAdmissionPersistence = (input: {
   attemptEpoch: number
   userId: string | null
-  scale: FrozenUnitAdmissionV1['scale']
+  scale: NonNullable<FrozenUnitAdmissionV1['scale']>
 }) => frozenAdmissionPersistence(createStandaloneScaleAdmission(input))
 
-const persistAdmission = async (assessmentId: string, snapshot: FrozenUnitAdmissionV1): Promise<FrozenUnitAdmissionV1> => {
-  const persisted = frozenAdmissionPersistence(snapshot)
-  const updated = await prisma.assessment.updateMany({
-    where: { id: assessmentId, frozenAdmissionSnapshotHash: null },
-    data: persisted,
+const persistAdmission = async (assessmentId: string, snapshot: FrozenUnitAdmissionV1): Promise<FrozenUnitAdmissionV1> => (
+  persistAdmissionOnce({
+    snapshot,
+    writeIfEmpty: (persisted) => prisma.assessment.updateMany({
+      where: { id: assessmentId, frozenAdmissionSnapshotHash: null },
+      data: persisted,
+    }),
+    read: () => prisma.assessment.findUnique({
+      where: { id: assessmentId },
+      select: {
+        frozenAdmissionSnapshotEncrypted: true,
+        frozenAdmissionSnapshotHash: true,
+      },
+    }),
+    missingMessage: '量表测评记录不存在',
+    unreadableMessage: '量表准入快照无法读取，请重启后重新作答',
   })
-  if (updated.count === 1) return snapshot
-  const current = await prisma.assessment.findUnique({
-    where: { id: assessmentId },
-    select: {
-      frozenAdmissionSnapshotEncrypted: true,
-      frozenAdmissionSnapshotHash: true,
-    },
-  })
-  if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
-  const stored = readStoredScaleAdmission(current)
-  if (stored) return stored
-  throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照无法读取，请重启后重新作答', 409)
-}
+)
 
 export const assertAdmissionParentBinding = (
   child: Pick<ScaleAdmissionChildRow, 'questionnaireAssessmentId' | 'compositeAttemptId'>,
   admission: FrozenUnitAdmissionV1,
-): void => {
-  if (child.questionnaireAssessmentId && child.compositeAttemptId) {
-    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
-  }
-  if (child.questionnaireAssessmentId) {
-    if (admission.parent?.kind !== 'questionnaire' || admission.parent.parentId !== child.questionnaireAssessmentId) {
-      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
-    }
-    return
-  }
-  if (child.compositeAttemptId) {
-    if (admission.parent?.kind !== 'composite' || admission.parent.parentId !== child.compositeAttemptId) {
-      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
-    }
-    return
-  }
-  if (admission.parent !== null) {
-    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
-  }
-}
+): void => assertSharedAdmissionParentBinding(child, admission)
 
 export const ensureScaleAdmissionAtDelivery = async (assessmentId: string): Promise<FrozenUnitAdmissionV1> => {
   const child = await prisma.assessment.findUnique({
@@ -176,18 +160,11 @@ export const ensureScaleAdmissionAtDelivery = async (assessmentId: string): Prom
   return activateScaleAdmission(child)
 }
 
-export const readStoredScaleAdmission = (row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>): FrozenUnitAdmissionV1 | null => {
-  if (!row.frozenAdmissionSnapshotEncrypted || !row.frozenAdmissionSnapshotHash) return null
-  try {
-    return decryptFrozenUnitAdmission(row.frozenAdmissionSnapshotEncrypted, row.frozenAdmissionSnapshotHash)
-  } catch (error) {
-    throw new InstrumentFinalSubmitError(
-      'STALE_ATTEMPT',
-      error instanceof Error ? error.message : '量表准入快照无法读取，请重启后重新作答',
-      409,
-    )
-  }
-}
+export const readStoredScaleAdmission = (
+  row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>,
+): FrozenUnitAdmissionV1 | null => (
+  readStoredUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答')
+)
 
 export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredScaleAdmission(row)

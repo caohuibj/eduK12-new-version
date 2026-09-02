@@ -123,6 +123,74 @@ describe('V32-3 frozen unit admission contract', () => {
       compositeAttemptId: null,
     }, standalone)).toThrow(/上级绑定不匹配/)
   })
+
+  it('keeps Scale hashes stable when Cognitive/Form identities are absent', () => {
+    const snapshot = createFrozenUnitAdmission({ attemptEpoch: 1, scale, frozenAt })
+    expect(snapshot).not.toHaveProperty('cognitive')
+    expect(snapshot).not.toHaveProperty('formSection')
+    expect(snapshot.scale).toEqual(scale)
+  })
+
+  it('round-trips Cognitive and Form identities without a Scale field', () => {
+    const cognitive = createFrozenUnitAdmission({
+      attemptEpoch: 1,
+      cognitive: {
+        testType: 'gonogo',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        configHash: 'a'.repeat(64),
+      },
+      principal: { userId: 'user-1' },
+      parent: {
+        kind: 'composite',
+        parentId: 'attempt-1',
+        slotKey: 'cognitive:item-1',
+        sourceDefinitionHash: 'b'.repeat(64),
+        compiledRuntimeHash: 'c'.repeat(64),
+      },
+      frozenAt,
+    })
+    expect(cognitive.scale).toBeUndefined()
+    expect(cognitive.cognitive?.testType).toBe('gonogo')
+    expect(parseFrozenUnitAdmission(cognitive)).toEqual(cognitive)
+
+    const form = createFrozenUnitAdmission({
+      attemptEpoch: 1,
+      formSection: {
+        id: 'section-1',
+        identityHash: 'form-hash',
+        kind: 'questionnaire',
+        definition: { id: 'section-1', title: '背景', items: [] },
+      },
+      principal: { userId: 'user-1' },
+      parent: {
+        kind: 'questionnaire',
+        parentId: 'parent-1',
+        slotKey: 'form-section:section-1',
+        sourceDefinitionHash: 'b'.repeat(64),
+        compiledRuntimeHash: 'd'.repeat(64),
+      },
+      frozenAt,
+    })
+    expect(form.scale).toBeUndefined()
+    expect(form.formSection?.kind).toBe('questionnaire')
+    expect(parseFrozenUnitAdmission(form)).toEqual(form)
+  })
+
+  it('rejects admissions that are missing or combining instrument identities', () => {
+    expect(() => createFrozenUnitAdmission({ attemptEpoch: 1, frozenAt })).toThrow(/exactly one instrument identity/)
+    expect(() => createFrozenUnitAdmission({
+      attemptEpoch: 1,
+      scale,
+      cognitive: {
+        testType: 'gonogo',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        configHash: 'a'.repeat(64),
+      },
+      frozenAt,
+    })).toThrow(/exactly one instrument identity/)
+  })
 })
 
 describe('V32-3 frozen reference batch load', () => {

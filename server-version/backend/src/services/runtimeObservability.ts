@@ -33,6 +33,7 @@ export type RequestObservationPhase =
   | 'final_submit_parent_finalization'
   | 'final_submit_retry_backoff'
   | 'aggregate.load_ms'
+  | 'aggregate.probe_ms'
   | 'aggregate.decrypt_ms'
   | 'aggregate.evidence_ms'
   | 'aggregate.compute_ms'

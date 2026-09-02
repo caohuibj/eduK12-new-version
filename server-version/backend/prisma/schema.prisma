@@ -815,6 +815,8 @@ model QuestionnaireFormSectionAttempt {
   submissionId              String?          @unique @map("submission_id")
   submissionPayloadHash     String?          @map("submission_payload_hash")
   submittedAt               DateTime?        @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?   @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?   @map("frozen_admission_snapshot_hash")
   createdAt                 DateTime         @default(now()) @map("created_at")
   updatedAt                 DateTime         @updatedAt @map("updated_at")
 
@@ -1079,6 +1081,8 @@ model CompositeFormSectionAttempt {
   submissionId          String?                          @unique @map("submission_id")
   submissionPayloadHash String?                          @map("submission_payload_hash")
   submittedAt           DateTime?                        @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?               @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?               @map("frozen_admission_snapshot_hash")
   createdAt             DateTime                         @default(now()) @map("created_at")
   updatedAt             DateTime                         @updatedAt @map("updated_at")
 
@@ -1449,6 +1453,8 @@ model CognitiveSession {
   submissionId                 String?                @unique @map("submission_id")
   submissionPayloadHash        String?                @map("submission_payload_hash")
   submittedAt                  DateTime?              @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?            @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?            @map("frozen_admission_snapshot_hash")
   createdAt                    DateTime               @default(now()) @map("created_at")
   updatedAt                    DateTime               @updatedAt @map("updated_at")
 
