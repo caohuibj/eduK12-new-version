@@ -2,7 +2,7 @@
 #
 # 触发：
 #   push feature/* / main
-#   pull_request → main
+#   pull_request → main / stacked feature branches
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
@@ -26,6 +26,7 @@ on:
   pull_request:
     branches:
       - main
+      - 'refactor/unified-runtime-v32-unit'
   workflow_dispatch:
 
 jobs:
