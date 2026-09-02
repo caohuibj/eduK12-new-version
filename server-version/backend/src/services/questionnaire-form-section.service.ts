@@ -47,9 +47,7 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
 import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
-import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
-import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
+import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
 export type SectionItem = {
   id: string
@@ -714,32 +712,6 @@ export const restartQuestionnaireAssessment = async (
       data: { status: 'ABANDONED', completedAt: retiredAt },
     })
     const nextAttemptEpoch = current.attemptEpoch + 1
-    const scaleRuntimeSnapshots = await Promise.all(current.questionnaire.questionnaireScales.map(async (entry: any) => {
-      if (entry.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
-      const definition = scaleDefinitionFromRecord(entry.scale)
-      return {
-        entry,
-        snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
-          instrumentKey: entry.scale.code,
-          instrumentVersion: entry.scale.instrumentVersion,
-          definition,
-        }),
-      }
-    }))
-    const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
-      attemptEpoch: nextAttemptEpoch,
-      scales: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({
-        questionnaireScaleId: entry.id,
-        code: entry.scale.code,
-        instrumentVersion: entry.scale.instrumentVersion,
-        sourceDefinitionHash: snapshot.sourceDefinitionHash,
-        compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
-      })),
-      formSections: current.questionnaire.formSections.map((section: any) => ({
-        sectionId: section.id,
-        definitionHash: formSectionIdentityHash(mapQuestionnaireSection(section)),
-      })),
-    })
     const next = await tx.questionnaireAssessment.create({
       data: {
         questionnaireId: current.questionnaireId,
@@ -748,23 +720,17 @@ export const restartQuestionnaireAssessment = async (
         sessionId: newSessionId,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
-        runtimeGeneration: 'UNIFIED_V1',
-        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
-        frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
         attemptEpoch: nextAttemptEpoch,
         progress: 0,
       },
     })
     if (current.questionnaire.questionnaireScales.length > 0) {
       await tx.assessment.createMany({
-        data: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({
+        data: current.questionnaire.questionnaireScales.map((entry: any) => ({
           scaleId: entry.scaleId,
           userId: isPublic ? null : context.userId,
           status: 'IN_PROGRESS' as const,
           deliveryMode: 'FINAL_ONLY' as const,
-          runtimeGeneration: 'UNIFIED_V1' as const,
-          runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
-          compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
           attemptEpoch: next.attemptEpoch,
           progress: 0,
           answers: encryptScaleAnswers([]),

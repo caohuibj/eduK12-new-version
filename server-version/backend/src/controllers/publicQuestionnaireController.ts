@@ -56,12 +56,9 @@ import {
 } from '../services/questionnaireCompletionAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
-import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import { z } from 'zod'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
-import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
-import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -257,9 +254,10 @@ export const publicQuestionnaireController = {
       const questionnaireId = validation.questionnaire!.id
       const tokenId = validation.token!.id
 
-      // Ensure newly-created form items are represented by a section before
-      // creating or resuming a final-only attempt.
-      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
+      // V32-1 provides the unified unit primitives, but parent activation is
+      // deliberately held until V32-2 also owns parent finalization. Keep the
+      // existing FINAL_ONLY parent/child protocol functional at this boundary.
+      await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
       // it can identify an existing assessment; otherwise always create a new
@@ -552,6 +550,9 @@ export const publicQuestionnaireController = {
         const startContent = await measureRequestPhase('definition_lookup', () => (
           cacheService.getQuestionnaireStartContent(questionnaireId)
         ))
+        if (startContent.questionnaireScales.some((qs) => qs.scale.status !== 'PUBLISHED')) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
+        }
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
         const transactionRequestedAt = process.hrtime.bigint()
@@ -574,7 +575,6 @@ export const publicQuestionnaireController = {
               userId: null, // 匿名
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
-              runtimeGeneration: 'UNIFIED_V1',
               attemptEpoch: 1,
               progress: 0,
             },
@@ -584,53 +584,16 @@ export const publicQuestionnaireController = {
             },
           })
 
-          const scaleRuntimeSnapshots = await Promise.all(startContent.questionnaireScales.map(async (qs: any) => {
-            if (qs.scale.status !== 'PUBLISHED') throw new Error('问卷中的量表已不再可用')
-            const definition = scaleDefinitionFromRecord(qs.scale)
-            return {
-              qs,
-              snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
-                instrumentKey: qs.scale.code,
-                instrumentVersion: qs.scale.instrumentVersion,
-                definition,
-              }),
-            }
-          }))
           await tx.assessment.createMany({
-            data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+            data: startContent.questionnaireScales.map((qs) => ({
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
-              runtimeGeneration: 'UNIFIED_V1' as const,
-              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
-              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
               attemptEpoch: assessment.attemptEpoch,
               progress: 0,
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
             })),
-          })
-
-          const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
-            attemptEpoch: assessment.attemptEpoch,
-            scales: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
-              questionnaireScaleId: qs.id,
-              code: qs.scale.code,
-              instrumentVersion: qs.scale.instrumentVersion,
-              sourceDefinitionHash: snapshot.sourceDefinitionHash,
-              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
-            })),
-            formSections: frozenFormSections.map((section) => ({
-              sectionId: section.id,
-              definitionHash: formSectionIdentityHash(section),
-            })),
-          })
-          await tx.questionnaireAssessment.update({
-            where: { id: assessment.id },
-            data: {
-              frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
-              frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
-            },
           })
 
           await tx.questionnaireFormAnswer.createMany({
@@ -759,6 +722,7 @@ export const publicQuestionnaireController = {
       }
     } catch (err) {
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('开始匿名测评错误', err)
       return error(res, '开始测评失败')
     }

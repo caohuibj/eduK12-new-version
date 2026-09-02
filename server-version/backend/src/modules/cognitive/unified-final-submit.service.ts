@@ -400,6 +400,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
       where: { id: input.sessionId },
       select: {
         id: true,
+        compositeAttemptId: true,
         status: true,
         deliveryMode: true,
         attemptNo: true,
@@ -444,15 +445,26 @@ export const submitUnifiedCognitiveSessionFinal = async (
       }
       throw error
     }
+    const updateWhere: Record<string, unknown> = {
+      id: current.id,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptNo: input.attemptEpoch,
+      submissionId: null,
+    }
+    if (current.compositeAttemptId) {
+      updateWhere.compositeAttempt = {
+        is: {
+          status: 'IN_PROGRESS',
+          deliveryMode: 'FINAL_ONLY',
+          runtimeGeneration: 'UNIFIED_V1',
+          attemptEpoch: input.attemptEpoch,
+        },
+      }
+    }
     const updated = await tx.cognitiveSession.updateMany({
-      where: {
-        id: current.id,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
-        runtimeGeneration: 'UNIFIED_V1',
-        attemptNo: input.attemptEpoch,
-        submissionId: null,
-      },
+      where: updateWhere as any,
       data: {
         status: 'COMPLETED',
         finishedAt: completedAt,
