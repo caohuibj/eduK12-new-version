@@ -35,7 +35,10 @@ import { prepareFormAnswerChanges } from '../services/questionnaire-form-answer-
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { persistFormAnswerBatch, questionnaireFormItemAnswerSelect } from '../services/questionnaire-form-answer-batch'
 import { cacheService } from '../services/cacheService'
-import { isQuestionnaireCompletionAdmissionBusyError } from '../services/questionnaireCompletionAdmission'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  isTransientCompletionDatabaseError,
+} from '../services/questionnaireCompletionAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
@@ -1006,6 +1009,8 @@ export const questionnaireController = {
       )
       return success(res, data, data.replayed ? '表单区段提交已确认' : '表单区段提交成功')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('最终提交表单区段错误', err)
@@ -1025,6 +1030,8 @@ export const questionnaireController = {
       )
       return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('最终提交问卷量表错误', err)

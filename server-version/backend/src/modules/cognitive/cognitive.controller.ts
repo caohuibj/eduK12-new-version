@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { success, error, unauthorized, notFound, instrumentError } from '../../utils/response'
+import { success, error, unauthorized, notFound, completionBusy, instrumentError } from '../../utils/response'
 import { UserRole } from '../../types'
 import * as assignmentService from './assignment.service'
 import * as catalogService from './catalog.service'
@@ -37,6 +37,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { isAllowedCognitiveExportFileName } from './export.service'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  isTransientCompletionDatabaseError,
+} from '../../services/questionnaireCompletionAdmission'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
@@ -258,6 +262,8 @@ export const cognitiveController = {
       )
       return success(res, data, data.replayed ? '匿名认知测评提交已确认' : '匿名认知测评已完成')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
     }
@@ -445,6 +451,8 @@ export const cognitiveController = {
       })
       return success(res, data, data.replayed ? '认知测评提交已确认' : '认知测评已完成')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
     }

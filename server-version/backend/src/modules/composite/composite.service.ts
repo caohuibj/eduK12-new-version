@@ -57,7 +57,11 @@ import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.servic
 import { assertTaskCanPublish, assertTaskContractValid } from '../cognitive/v2/publication-gate'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { computeSubmissionPayloadHash } from '../../services/instrumentFinalSubmit'
-import { withQuestionnaireCompletionTransaction } from '../../services/questionnaireProgressService'
+import {
+  withFinalOnlyCompletionTransaction,
+  withQuestionnaireCompletionTransaction,
+} from '../../services/questionnaireProgressService'
+import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -1916,7 +1920,7 @@ const createAttempt = async (
     ? composite.items.filter((item: any) => item.type !== 'FORM').length + formSections.length
     : composite.items.length
   const completedItems = finalOnly
-    ? 0
+    ? composite.items.filter((item: any) => item.type !== 'FORM' && !item.required && !item.contextKey).length
     : composite.items.filter((item: any) => !item.required && !item.contextKey).length
   const progress = totalUnits === 0
     ? 100
@@ -2165,7 +2169,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
       title: section.title,
       description: section.description ?? null,
       position: section.position,
-      contextSection: Boolean(section.contextSection),
+      contextSection: compositeSectionHasContext(section),
       items: section.items ?? [],
     })),
   }
@@ -2491,7 +2495,7 @@ const markCompositeItemCompleted = async (tx: Db, attemptId: string, increment: 
  * changes, so any analysis/encryption/DB failure rolls completion back as one
  * transaction.
  */
-export const finalizeCompositeAttemptIfReady = async (attemptId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
+const finalizeCompositeAttemptLegacyIfReady = async (attemptId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
   await lockCompositeAttempt(tx, attemptId)
   const attempt = await loadAttemptForFinalization(tx, attemptId)
   const maps = attemptCompletedItemMaps(attempt)
@@ -2560,6 +2564,281 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string) => with
   return latest
 })
 
+type CompositeCompletionCandidate = {
+  id: string
+  status: string
+  deliveryMode: string
+  progress: number
+  completedItems: number
+  attemptEpoch: number
+  startedAt: Date
+  completedAt: Date | null
+  contextSnapshotHash: string | null
+  compositeAssessment: {
+    items: Array<{ id: string; type: string; required: boolean; contextKey: string | null }>
+    formSections: Array<{ id: string }>
+  }
+  scaleAssessments: Array<{
+    id: string
+    compositeItemId: string | null
+    status: string
+    attemptEpoch: number
+    submissionId: string | null
+    submissionPayloadHash: string | null
+  }>
+  cognitiveSessions: Array<{
+    id: string
+    compositeItemId: string | null
+    status: string
+    attemptNo: number
+    submissionId: string | null
+    submissionPayloadHash: string | null
+  }>
+  formSectionAttempts: Array<{
+    id: string
+    sectionId: string
+    status: string
+    attemptEpoch: number
+    submissionId: string | null
+    submissionPayloadHash: string | null
+  }>
+}
+
+const compositeCompletionCandidateSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  progress: true,
+  completedItems: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  contextSnapshotHash: true,
+  compositeAssessment: {
+    select: {
+      items: { select: { id: true, type: true, required: true, contextKey: true } },
+      formSections: { select: { id: true } },
+    },
+  },
+  scaleAssessments: {
+    select: { id: true, compositeItemId: true, status: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true },
+  },
+  cognitiveSessions: {
+    select: { id: true, compositeItemId: true, status: true, attemptNo: true, submissionId: true, submissionPayloadHash: true },
+  },
+  formSectionAttempts: {
+    select: { id: true, sectionId: true, status: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true },
+  },
+} as const
+
+const loadCompositeCompletionCandidate = async (attemptId: string) => measureRequestPhase(
+  'final_submit_db_query',
+  () => prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: compositeCompletionCandidateSelect,
+  }) as Promise<CompositeCompletionCandidate | null>,
+)
+
+const compositeCompletionCounts = (candidate: CompositeCompletionCandidate) => {
+  const items = candidate.compositeAssessment.items.filter((item) => item.type !== 'FORM')
+  const itemIds = new Set(items
+    .map((item) => item.id))
+  const completedItemIds = new Set([
+    ...items
+      .filter((item) => !item.required && !item.contextKey)
+      .map((item) => item.id),
+    ...candidate.scaleAssessments
+      .filter((child) => itemIds.has(child.compositeItemId ?? '')
+        && child.attemptEpoch === candidate.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.compositeItemId as string),
+    ...candidate.cognitiveSessions
+      .filter((child) => itemIds.has(child.compositeItemId ?? '')
+        && child.attemptNo === candidate.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.compositeItemId as string),
+  ])
+  const sectionIds = new Set(candidate.compositeAssessment.formSections.map((section) => section.id))
+  const completedSectionIds = new Set(candidate.formSectionAttempts
+    .filter((section) => sectionIds.has(section.sectionId)
+      && section.attemptEpoch === candidate.attemptEpoch
+      && section.status === 'COMPLETED')
+    .map((section) => section.sectionId))
+  const totalItems = itemIds.size + sectionIds.size
+  const completedItems = completedItemIds.size + completedSectionIds.size
+  const progress = totalItems === 0 ? 100 : Math.min(100, Math.round((completedItems / totalItems) * 100))
+  return { totalItems, completedItems, progress, ready: totalItems > 0 && completedItems >= totalItems }
+}
+
+const compositeCompletionFingerprint = (
+  candidate: CompositeCompletionCandidate,
+  packageInputFingerprint: string | null = null,
+): string => computeSubmissionPayloadHash({
+  attemptEpoch: candidate.attemptEpoch,
+  contextSnapshotHash: candidate.contextSnapshotHash,
+  packageInputFingerprint,
+  scales: candidate.scaleAssessments
+    .filter((child) => child.attemptEpoch === candidate.attemptEpoch)
+    .map((child) => ({
+      id: child.id,
+      compositeItemId: child.compositeItemId,
+      attemptEpoch: child.attemptEpoch,
+      status: child.status,
+      submissionId: child.submissionId,
+      submissionPayloadHash: child.submissionPayloadHash,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id)),
+  cognitive: candidate.cognitiveSessions
+    .filter((child) => child.attemptNo === candidate.attemptEpoch)
+    .map((child) => ({
+      id: child.id,
+      compositeItemId: child.compositeItemId,
+      attemptNo: child.attemptNo,
+      status: child.status,
+      submissionId: child.submissionId,
+      submissionPayloadHash: child.submissionPayloadHash,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id)),
+  formSections: candidate.formSectionAttempts
+    .filter((section) => section.attemptEpoch === candidate.attemptEpoch)
+    .map((section) => ({
+      id: section.id,
+      sectionId: section.sectionId,
+      attemptEpoch: section.attemptEpoch,
+      status: section.status,
+      submissionId: section.submissionId,
+      submissionPayloadHash: section.submissionPayloadHash,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id)),
+})
+
+const finalOnlyRetryBackoff = async (retry: number): Promise<void> => {
+  const delayMs = Math.min(25, 5 * (2 ** retry))
+  await measureRequestPhase('final_submit_retry_backoff', () => new Promise<void>((resolve) => {
+    setTimeout(resolve, delayMs)
+  }))
+}
+
+const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
+  for (let retry = 0; retry < 3; retry += 1) {
+    const candidate = await loadCompositeCompletionCandidate(attemptId)
+    if (!candidate) throw compositeNotFound('综合测评记录不存在')
+    if (candidate.status === 'COMPLETED' || candidate.status !== 'IN_PROGRESS') {
+      return { status: candidate.status, progress: candidate.progress, completedAt: candidate.completedAt }
+    }
+
+    const counts = compositeCompletionCounts(candidate)
+    if (!counts.ready) {
+      const progressResult = await withFinalOnlyCompletionTransaction(async (tx) => {
+        await measureRequestPhase('final_submit_row_lock_wait', () => lockCompositeAttempt(tx, attemptId))
+        const current = await tx.compositeAssessmentAttempt.findUnique({
+          where: { id: attemptId },
+          select: compositeCompletionCandidateSelect,
+        }) as CompositeCompletionCandidate | null
+        if (!current) throw compositeNotFound('综合测评记录不存在')
+        if (current.status !== 'IN_PROGRESS') return { status: current.status, progress: current.progress, completedAt: current.completedAt }
+        const currentCounts = compositeCompletionCounts(current)
+        if (currentCounts.ready) return { needsPreparation: true as const }
+        await tx.compositeAssessmentAttempt.update({
+          where: { id: attemptId },
+          data: { completedItems: currentCounts.completedItems, progress: currentCounts.progress, lastSavedAt: new Date() },
+        })
+        return { status: 'IN_PROGRESS', progress: currentCounts.progress, completedAt: null }
+      })
+      if (progressResult && 'needsPreparation' in progressResult) {
+        if (retry < 2) await finalOnlyRetryBackoff(retry)
+        continue
+      }
+      return progressResult
+    }
+
+    // Package analysis and encryption are CPU/crypto work and must not run
+    // while the parent row is locked.
+    const fullAttempt = await measureRequestPhase('final_submit_db_query', () => loadAttemptForFinalization(prisma, attemptId))
+    const packageAnalysis = measureRequestPhaseSync(
+      'final_submit_serialization',
+      () => buildPackageAnalysisForAttempt(fullAttempt),
+    )
+    const payloadEncrypted = packageAnalysis
+      ? await measureRequestPhase('final_submit_encryption', async () => encryptCognitivePayload(packageAnalysis.analysis))
+      : undefined
+    const expectedFingerprint = measureRequestPhaseSync(
+      'final_submit_payload_hash',
+      () => compositeCompletionFingerprint(candidate, packageAnalysis?.inputFingerprint ?? null),
+    )
+
+    const completionResult = await withFinalOnlyCompletionTransaction(async (tx) => {
+      await measureRequestPhase('final_submit_row_lock_wait', () => lockCompositeAttempt(tx, attemptId))
+      const current = await tx.compositeAssessmentAttempt.findUnique({
+        where: { id: attemptId },
+        select: compositeCompletionCandidateSelect,
+      }) as CompositeCompletionCandidate | null
+      if (!current) throw compositeNotFound('综合测评记录不存在')
+      if (current.status === 'COMPLETED' || current.status !== 'IN_PROGRESS') {
+        return { status: current.status, progress: current.progress, completedAt: current.completedAt }
+      }
+      const currentFingerprint = measureRequestPhaseSync(
+        'final_submit_payload_hash',
+        () => compositeCompletionFingerprint(current, packageAnalysis?.inputFingerprint ?? null),
+      )
+      if (currentFingerprint !== expectedFingerprint) {
+        return { retry: true as const }
+      }
+      const currentCounts = compositeCompletionCounts(current)
+      if (!currentCounts.ready) {
+        await tx.compositeAssessmentAttempt.update({
+          where: { id: attemptId },
+          data: { completedItems: currentCounts.completedItems, progress: currentCounts.progress, lastSavedAt: new Date() },
+        })
+        return { status: 'IN_PROGRESS', progress: currentCounts.progress, completedAt: null }
+      }
+      if (packageAnalysis) {
+        const persisted = await persistOrGetPackageAnalysisSnapshot(tx, {
+          attemptId,
+          analysis: packageAnalysis.analysis,
+          inputFingerprint: packageAnalysis.inputFingerprint,
+          generationReason: 'COMPLETION',
+          payloadEncrypted,
+        })
+        if (!persisted.created && persisted.row.generationReason !== 'COMPLETION') {
+          throw new Error('综合测评完成时的分析快照已被其他生成原因占用')
+        }
+      }
+      const completedAt = new Date()
+      await tx.compositeAssessmentAttempt.update({
+        where: { id: attemptId },
+        data: {
+          status: 'COMPLETED',
+          progress: 100,
+          completedItems: currentCounts.completedItems,
+          completedAt,
+          totalTime: Math.max(0, completedAt.getTime() - new Date(current.startedAt).getTime()),
+          lastSavedAt: completedAt,
+        },
+      })
+      return { status: 'COMPLETED', progress: 100, completedAt }
+    })
+    if (completionResult && 'retry' in completionResult) {
+      if (retry < 2) await finalOnlyRetryBackoff(retry)
+      continue
+    }
+    return completionResult
+  }
+
+  const latest = await loadCompositeCompletionCandidate(attemptId)
+  if (!latest) throw compositeNotFound('综合测评记录不存在')
+  return { status: latest.status, progress: latest.progress, completedAt: latest.completedAt }
+}
+
+export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
+  const route = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: { deliveryMode: true },
+  })
+  if (!route || route.deliveryMode !== 'FINAL_ONLY') return finalizeCompositeAttemptLegacyIfReady(attemptId)
+  return finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
+}
+
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const attempt = await findAttempt(attemptId, context)
   const readableFormAnswers = readContextFormAnswers(
@@ -2611,13 +2890,13 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       formSectionId: section.id,
       title: section.title,
       description: section.description ?? null,
-      contextSection: Boolean(section.contextSection),
+      contextSection: compositeSectionHasContext(section),
       definitionHash: computeSubmissionPayloadHash({
         sectionId: section.id,
         title: section.title,
         description: section.description ?? null,
         position: section.position,
-        contextSection: Boolean(section.contextSection),
+        contextSection: compositeSectionHasContext(section),
         items: section.items.map((item: any) => ({
           id: item.id,
           formType: item.formType,
@@ -2711,13 +2990,13 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       title: section.title,
       description: section.description ?? null,
       position: section.position,
-      contextSection: Boolean(section.contextSection),
+      contextSection: compositeSectionHasContext(section),
       definitionHash: computeSubmissionPayloadHash({
         sectionId: section.id,
         title: section.title,
         description: section.description ?? null,
         position: section.position,
-        contextSection: Boolean(section.contextSection),
+        contextSection: compositeSectionHasContext(section),
         items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
       }),
       status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',

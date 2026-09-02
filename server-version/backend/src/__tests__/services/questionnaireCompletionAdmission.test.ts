@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   QuestionnaireCompletionAdmission,
   QuestionnaireCompletionAdmissionBusyError,
+  toCompletionAdmissionBusyError,
 } from '../../services/questionnaireCompletionAdmission'
 
 const nextTick = () => new Promise<void>((resolve) => setImmediate(resolve))
@@ -108,5 +109,18 @@ describe('questionnaire completion admission', () => {
     await expect(independent.run(async () => 'usable')).resolves.toBe('usable')
     releaseFirst()
     await expect(first).resolves.toBeUndefined()
+  })
+
+  it.each([
+    { code: 'P2024' },
+    { code: 'P2034' },
+    { code: 'P2010', meta: { code: '40001' } },
+    { code: '40001' },
+  ])('maps transient database error $code to retryable completion busy', (error) => {
+    expect(toCompletionAdmissionBusyError(error)).toMatchObject({
+      code: 'COMPLETION_BUSY',
+      reason: 'database_busy',
+      retryAfterSeconds: 1,
+    })
   })
 })

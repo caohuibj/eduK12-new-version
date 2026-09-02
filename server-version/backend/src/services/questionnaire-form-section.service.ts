@@ -21,17 +21,23 @@ import {
 } from './assessmentContextService'
 import {
   assertAttemptEpoch,
+  assertCanonicalSubmissionPayloadSize,
   assertDefinitionHash,
   assertFinalOnly,
-  assertSubmissionPayloadSize,
+  assertFinalSubmitStatus,
   assertSubmissionReplay,
   computeSubmissionPayloadHash,
   FINAL_SUBMISSION_MAX_BYTES,
   InstrumentFinalSubmitError,
+  prepareCanonicalSubmission,
   validateSubmissionId,
 } from './instrumentFinalSubmit'
 import { persistFormAnswerBatch, type BulkFormAnswerMutation } from './questionnaire-form-answer-batch'
-import { withQuestionnaireCompletionTransaction } from './questionnaireProgressService'
+import {
+  withFinalOnlyCompletionTransaction,
+  withQuestionnaireCompletionTransaction,
+} from './questionnaireProgressService'
+import { measureRequestPhase, measureRequestPhaseSync } from './runtimeObservability'
 import {
   readScaleAnswers,
   scaleDefinitionFromRecord,
@@ -99,13 +105,8 @@ export const questionnaireFormSectionDefinitionHash = (section: SectionRow): str
   })),
 })
 
-const mapSection = (section: any): SectionRow => ({
-  id: section.id,
-  title: section.title,
-  description: section.description ?? null,
-  position: section.position,
-  contextSection: Boolean(section.contextSection),
-  items: orderedSectionItems((section.items ?? []).map((item: any) => ({
+const mapSection = (section: any): SectionRow => {
+  const items = orderedSectionItems((section.items ?? []).map((item: any) => ({
     id: item.id,
     type: item.type,
     label: item.label,
@@ -115,8 +116,16 @@ const mapSection = (section: any): SectionRow => ({
     contextKey: item.contextKey ?? null,
     position: item.position,
     sectionPosition: item.sectionPosition ?? null,
-  }))),
-})
+  })))
+  return {
+    id: section.id,
+    title: section.title,
+    description: section.description ?? null,
+    position: section.position,
+    contextSection: Boolean(section.contextSection) || items.some((item) => Boolean(item.contextKey)),
+    items,
+  }
+}
 
 const contentTypesForQuestionnaire = (questionnaire: any) => [
   ...(questionnaire.formItems ?? []).map((item: any) => ({ type: 'FORM', position: item.position, item })),
@@ -230,7 +239,7 @@ export const finalQuestionnaireDefinitionHash = (questionnaire: any) => computeS
     position: section.position,
     title: section.title,
     description: section.description ?? null,
-    contextSection: Boolean(section.contextSection),
+    contextSection: Boolean(section.contextSection) || (section.items ?? []).some((item: any) => Boolean(item.contextKey)),
     items: (section.items ?? []).map((item: any) => ({
       id: item.id,
       type: item.type,
@@ -299,7 +308,7 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       title: section.title,
       description: section.description ?? null,
       position: section.position,
-      contextSection: Boolean(section.contextSection),
+      contextSection: definition.contextSection,
       definitionHash: questionnaireFormSectionDefinitionHash(definition),
       status: sectionAttempt?.status ?? 'IN_PROGRESS',
       submittedAt: sectionAttempt?.submittedAt ?? null,
@@ -898,6 +907,13 @@ const lockQuestionnaireAssessment = async (tx: Prisma.TransactionClient, id: str
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
 }
 
+const lockQuestionnaireFormSectionAttempt = async (tx: Prisma.TransactionClient, id: string) => {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "questionnaire_form_section_attempts" WHERE "id" = ${id} FOR UPDATE
+  `
+  if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
+}
+
 const normalizeSectionAnswers = (section: SectionRow, values: SectionSubmitInput['answers']) => {
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   const provided = new Map<string, string | string[] | null>()
@@ -949,7 +965,7 @@ const contextSnapshotForSection = (
   }
 }
 
-const finalizeQuestionnaireIfReady = async (assessmentId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
+const finalizeQuestionnaireLegacyIfReady = async (assessmentId: string) => withQuestionnaireCompletionTransaction(async (tx) => {
   await lockQuestionnaireAssessment(tx, assessmentId)
   const assessment = await tx.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
@@ -998,9 +1014,295 @@ const finalizeQuestionnaireIfReady = async (assessmentId: string) => withQuestio
   return { status: 'COMPLETED', progress: 100, completedAt }
 })
 
+type QuestionnaireCompletionCandidate = {
+  id: string
+  status: string
+  deliveryMode: string
+  progress: number
+  completedScales: number
+  completedForms: number
+  attemptEpoch: number
+  startedAt: Date
+  completedAt: Date | null
+  contextSnapshotHash: string | null
+  questionnaire: {
+    questionnaireScales: Array<{ id: string; scaleId: string }>
+    formSections: Array<{ id: string }>
+  }
+  scaleAssessments: Array<{
+    id: string
+    scaleId: string
+    status: string
+    attemptEpoch: number
+    submissionId: string | null
+    submissionPayloadHash: string | null
+  }>
+  formSectionAttempts: Array<{
+    id: string
+    sectionId: string
+    status: string
+    attemptEpoch: number
+    submissionId: string | null
+    submissionPayloadHash: string | null
+  }>
+}
+
+const questionnaireCompletionCandidateSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  progress: true,
+  completedScales: true,
+  completedForms: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  contextSnapshotHash: true,
+  questionnaire: {
+    select: {
+      questionnaireScales: { select: { id: true, scaleId: true } },
+      formSections: { select: { id: true } },
+    },
+  },
+  scaleAssessments: {
+    select: { id: true, scaleId: true, status: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true },
+  },
+  formSectionAttempts: {
+    select: { id: true, sectionId: true, status: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true },
+  },
+} as const
+
+const loadQuestionnaireCompletionCandidate = async (assessmentId: string) => measureRequestPhase(
+  'final_submit_db_query',
+  () => prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    select: questionnaireCompletionCandidateSelect,
+  }) as Promise<QuestionnaireCompletionCandidate | null>,
+)
+
+const questionnaireCompletionCounts = (candidate: QuestionnaireCompletionCandidate) => {
+  const scaleIds = new Set(candidate.questionnaire.questionnaireScales.map((scale) => scale.scaleId))
+  const completedScaleIds = new Set(candidate.scaleAssessments
+    .filter((child) => scaleIds.has(child.scaleId)
+      && child.attemptEpoch === candidate.attemptEpoch
+      && child.status === 'COMPLETED')
+    .map((child) => child.scaleId))
+  const sectionIds = new Set(candidate.questionnaire.formSections.map((section) => section.id))
+  const completedSectionIds = new Set(candidate.formSectionAttempts
+    .filter((section) => sectionIds.has(section.sectionId)
+      && section.attemptEpoch === candidate.attemptEpoch
+      && section.status === 'COMPLETED')
+    .map((section) => section.sectionId))
+  const completedScales = completedScaleIds.size
+  const completedForms = completedSectionIds.size
+  const totalUnits = scaleIds.size + sectionIds.size
+  const completedUnits = completedScales + completedForms
+  const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100))
+  return {
+    completedScales,
+    completedForms,
+    totalUnits,
+    completedUnits,
+    progress,
+    ready: totalUnits > 0 && completedUnits >= totalUnits,
+  }
+}
+
+const questionnaireProgressHint = (current: any, extraSectionId?: string) => {
+  const scaleIds = new Set((current.questionnaire.questionnaireScales ?? []).map((scale: any) => scale.scaleId))
+  const completedScales = new Set((current.scaleAssessments ?? [])
+    .filter((child: any) => scaleIds.has(child.scaleId)
+      && child.attemptEpoch === current.attemptEpoch
+      && child.status === 'COMPLETED')
+    .map((child: any) => child.scaleId)).size
+  const sectionIds = new Set((current.questionnaire.formSections ?? []).map((section: any) => section.id))
+  const completedFormIds = new Set((current.formSectionAttempts ?? [])
+    .filter((section: any) => sectionIds.has(section.sectionId)
+      && section.attemptEpoch === current.attemptEpoch
+      && section.status === 'COMPLETED')
+    .map((section: any) => section.sectionId))
+  if (extraSectionId) completedFormIds.add(extraSectionId)
+  const completedForms = completedFormIds.size
+  const totalUnits = scaleIds.size + sectionIds.size
+  const completedUnits = completedScales + completedForms
+  const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100))
+  return {
+    completedScales,
+    completedForms,
+    progress,
+    terminalCandidate: totalUnits > 0 && completedUnits >= totalUnits,
+  }
+}
+
+const questionnaireCompletionFingerprint = (candidate: QuestionnaireCompletionCandidate): string => computeSubmissionPayloadHash({
+  attemptEpoch: candidate.attemptEpoch,
+  contextSnapshotHash: candidate.contextSnapshotHash,
+  scales: candidate.scaleAssessments
+    .filter((child) => child.attemptEpoch === candidate.attemptEpoch)
+    .map((child) => ({
+      id: child.id,
+      scaleId: child.scaleId,
+      attemptEpoch: child.attemptEpoch,
+      status: child.status,
+      submissionId: child.submissionId,
+      submissionPayloadHash: child.submissionPayloadHash,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id)),
+  formSections: candidate.formSectionAttempts
+    .filter((section) => section.attemptEpoch === candidate.attemptEpoch)
+    .map((section) => ({
+      id: section.id,
+      sectionId: section.sectionId,
+      status: section.status,
+      attemptEpoch: section.attemptEpoch,
+      submissionId: section.submissionId,
+      submissionPayloadHash: section.submissionPayloadHash,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id)),
+})
+
+const loadQuestionnaireFinalizationGraph = async (assessmentId: string) => measureRequestPhase(
+  'final_submit_db_query',
+  () => prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    include: {
+      questionnaire: {
+        include: {
+          formItems: true,
+          formSections: { include: { items: true } },
+          questionnaireScales: { include: { scale: true } },
+        },
+      },
+      scaleAssessments: { include: { scale: true } },
+      formAnswers: true,
+      formSectionAttempts: true,
+    },
+  }),
+)
+
+const finalOnlyRetryBackoff = async (retry: number): Promise<void> => {
+  const delayMs = Math.min(25, 5 * (2 ** retry))
+  await measureRequestPhase('final_submit_retry_backoff', () => new Promise<void>((resolve) => {
+    setTimeout(resolve, delayMs)
+  }))
+}
+
+const finalizeQuestionnaireFinalOnlyIfReady = async (assessmentId: string) => {
+  for (let retry = 0; retry < 3; retry += 1) {
+    const candidate = await loadQuestionnaireCompletionCandidate(assessmentId)
+    if (!candidate) return null
+    if (candidate.status === 'COMPLETED' || candidate.status !== 'IN_PROGRESS') {
+      return { status: candidate.status, progress: candidate.progress, completedAt: candidate.completedAt }
+    }
+
+    const counts = questionnaireCompletionCounts(candidate)
+    if (!counts.ready) {
+      const progressResult = await withFinalOnlyCompletionTransaction(async (tx) => {
+        await measureRequestPhase('final_submit_row_lock_wait', () => lockQuestionnaireAssessment(tx, assessmentId))
+        const current = await tx.questionnaireAssessment.findUnique({
+          where: { id: assessmentId },
+          select: questionnaireCompletionCandidateSelect,
+        }) as QuestionnaireCompletionCandidate | null
+        if (!current) return null
+        if (current.status !== 'IN_PROGRESS') return { status: current.status, progress: current.progress, completedAt: current.completedAt }
+        const currentCounts = questionnaireCompletionCounts(current)
+        if (currentCounts.ready) return { needsPreparation: true as const }
+        await tx.questionnaireAssessment.update({
+          where: { id: assessmentId },
+          data: {
+            completedScales: currentCounts.completedScales,
+            completedForms: currentCounts.completedForms,
+            progress: currentCounts.progress,
+          },
+        })
+        return { status: 'IN_PROGRESS', progress: currentCounts.progress, completedAt: null }
+      })
+      if (progressResult && 'needsPreparation' in progressResult) {
+        if (retry < 2) await finalOnlyRetryBackoff(retry)
+        continue
+      }
+      return progressResult
+    }
+
+    // Reports and encryption are intentionally outside the parent-row lock.
+    const graph = await loadQuestionnaireFinalizationGraph(assessmentId)
+    if (!graph) return null
+    const report = measureRequestPhaseSync('final_submit_serialization', () => buildQuestionnaireCollectionReport(graph as any))
+    const aggregateReportEncrypted = measureRequestPhaseSync(
+      'final_submit_encryption',
+      () => encryptField(collectionReportForStorage(report)),
+    )
+    const expectedFingerprint = measureRequestPhaseSync(
+      'final_submit_payload_hash',
+      () => questionnaireCompletionFingerprint(candidate),
+    )
+
+    const completionResult = await withFinalOnlyCompletionTransaction(async (tx) => {
+      await measureRequestPhase('final_submit_row_lock_wait', () => lockQuestionnaireAssessment(tx, assessmentId))
+      const current = await tx.questionnaireAssessment.findUnique({
+        where: { id: assessmentId },
+        select: questionnaireCompletionCandidateSelect,
+      }) as QuestionnaireCompletionCandidate | null
+      if (!current) return null
+      if (current.status === 'COMPLETED' || current.status !== 'IN_PROGRESS') {
+        return { status: current.status, progress: current.progress, completedAt: current.completedAt }
+      }
+      const currentFingerprint = measureRequestPhaseSync(
+        'final_submit_payload_hash',
+        () => questionnaireCompletionFingerprint(current),
+      )
+      if (currentFingerprint !== expectedFingerprint) return { retry: true as const }
+      const currentCounts = questionnaireCompletionCounts(current)
+      if (!currentCounts.ready) {
+        await tx.questionnaireAssessment.update({
+          where: { id: assessmentId },
+          data: {
+            completedScales: currentCounts.completedScales,
+            completedForms: currentCounts.completedForms,
+            progress: currentCounts.progress,
+          },
+        })
+        return { status: 'IN_PROGRESS', progress: currentCounts.progress, completedAt: null }
+      }
+      const completedAt = new Date()
+      await tx.questionnaireAssessment.update({
+        where: { id: assessmentId },
+        data: {
+          status: 'COMPLETED',
+          completedScales: currentCounts.completedScales,
+          completedForms: currentCounts.completedForms,
+          progress: 100,
+          completedAt,
+          totalTime: Math.max(0, completedAt.getTime() - new Date(current.startedAt).getTime()),
+          aggregateReport: Prisma.DbNull,
+          aggregateReportEncrypted,
+        },
+      })
+      return { status: 'COMPLETED', progress: 100, completedAt }
+    })
+    if (completionResult && 'retry' in completionResult) {
+      if (retry < 2) await finalOnlyRetryBackoff(retry)
+      continue
+    }
+    return completionResult
+  }
+
+  const latest = await loadQuestionnaireCompletionCandidate(assessmentId)
+  return latest ? { status: latest.status, progress: latest.progress, completedAt: latest.completedAt } : null
+}
+
+const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
+  const route = await prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    select: { deliveryMode: true },
+  })
+  if (!route || route.deliveryMode !== 'FINAL_ONLY') return finalizeQuestionnaireLegacyIfReady(assessmentId)
+  return finalizeQuestionnaireFinalOnlyIfReady(assessmentId)
+}
+
 const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const assessment = await prisma.questionnaireAssessment.findUnique({
+  const assessment = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireAssessment.findUnique({
     where: { id: input.questionnaireAssessmentId },
     select: {
       id: true,
@@ -1015,6 +1317,10 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
       contextSnapshotEncrypted: true,
       contextSnapshotHash: true,
       resumeTokenHash: true,
+      formSectionAttempts: {
+        where: { sectionId: input.sectionId },
+        select: { sectionId: true, status: true, attemptEpoch: true },
+      },
       questionnaire: {
         select: {
           questionnaireScales: { select: { id: true, position: true } },
@@ -1022,7 +1328,7 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
         },
       },
     },
-  })
+  }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   if (input.userId !== null && input.userId !== undefined) {
     if (assessment.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此问卷测评', 403)
@@ -1031,18 +1337,64 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
   }
   assertFinalOnly(assessment.deliveryMode)
   assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
+  assertFinalSubmitStatus(assessment.status, '问卷测评')
+  const admissionSectionAttempt = assessment.formSectionAttempts[0]
+  if (admissionSectionAttempt) {
+    assertFinalSubmitStatus(admissionSectionAttempt.status, '表单区段')
+    assertAttemptEpoch(admissionSectionAttempt.attemptEpoch, input.attemptEpoch)
+  }
+  if (assessment.status === 'COMPLETED' && admissionSectionAttempt?.status !== 'COMPLETED') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评已结束，请重启后重新作答', 409)
+  }
   const section = assessment.questionnaire.formSections.find((candidate) => candidate.id === input.sectionId)
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
   const mappedSection = mapSection(section)
-  assertDefinitionHash(questionnaireFormSectionDefinitionHash(mappedSection), input.definitionHash)
+  const actualDefinitionHash = measureRequestPhaseSync(
+    'final_submit_definition_prepare',
+    () => questionnaireFormSectionDefinitionHash(mappedSection),
+  )
+  assertDefinitionHash(actualDefinitionHash, input.definitionHash)
   if (mappedSection.contextSection && !isFirstQuestionnaireContentSection(assessment.questionnaire, mappedSection.id)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 409)
   }
-  const normalizedResult = normalizeSectionAnswers(mappedSection, input.answers)
-  assertSubmissionPayloadSize({ answers: normalizedResult.payloadAnswers }, FINAL_SUBMISSION_MAX_BYTES.formSection, '问卷区段提交数据')
-  const payloadHash = computeSubmissionPayloadHash({ answers: normalizedResult.payloadAnswers })
+  const questionnaireHasContext = assessment.questionnaire.formSections.some(sectionHasContext)
+  if (questionnaireHasContext && !mappedSection.contextSection && !assessment.contextSnapshotHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+  }
+  if ((input.contextSnapshotHash ?? null) !== (assessment.contextSnapshotHash ?? null)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷上下文版本已变化，请重试', 409)
+  }
+  const normalizedResult = measureRequestPhaseSync(
+    'final_submit_payload_validation',
+    () => normalizeSectionAnswers(mappedSection, input.answers),
+  )
+  const canonical = measureRequestPhaseSync('final_submit_non_db_compute', () => (
+    measureRequestPhaseSync('final_submit_serialization', () => (
+      measureRequestPhaseSync('final_submit_payload_hash', () => prepareCanonicalSubmission({ answers: normalizedResult.payloadAnswers }))
+    ))
+  ))
+  assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.formSection, '问卷区段提交数据')
+  const payloadHash = canonical.hash
 
-  const committed = await prisma.$transaction(async (tx) => {
+  let sectionAttempt = await prisma.questionnaireFormSectionAttempt.findUnique({
+    where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id } },
+  })
+  if (!sectionAttempt) {
+    try {
+      sectionAttempt = await prisma.questionnaireFormSectionAttempt.create({
+        data: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id, attemptEpoch: input.attemptEpoch },
+      })
+    } catch (error) {
+      if ((error as { code?: string })?.code !== 'P2002') throw error
+      sectionAttempt = await prisma.questionnaireFormSectionAttempt.findUnique({
+        where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id } },
+      })
+    }
+  }
+  if (!sectionAttempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
+
+  const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    await measureRequestPhase('final_submit_row_lock_wait', () => lockQuestionnaireFormSectionAttempt(tx, sectionAttempt!.id))
     await lockQuestionnaireAssessment(tx, assessment.id)
     const current = await tx.questionnaireAssessment.findUnique({
       where: { id: assessment.id },
@@ -1055,34 +1407,48 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
         completedForms: true,
         contextSnapshotEncrypted: true,
         contextSnapshotHash: true,
+        questionnaire: {
+          select: {
+            questionnaireScales: { select: { scaleId: true } },
+            formSections: { select: { id: true, contextSection: true, items: { select: { contextKey: true } } } },
+          },
+        },
+        scaleAssessments: { select: { scaleId: true, status: true, attemptEpoch: true } },
+        formSectionAttempts: { select: { sectionId: true, status: true, attemptEpoch: true } },
       },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
     assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
+    assertFinalSubmitStatus(current.status, '问卷测评')
 
-    let sectionAttempt = await tx.questionnaireFormSectionAttempt.findUnique({
-      where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id } },
-    })
-    if (!sectionAttempt) {
-      sectionAttempt = await tx.questionnaireFormSectionAttempt.create({
-        data: { questionnaireAssessmentId: assessment.id, sectionId: mappedSection.id, attemptEpoch: input.attemptEpoch },
-      })
+    const lockedSectionAttempt = await tx.questionnaireFormSectionAttempt.findUnique({ where: { id: sectionAttempt!.id } })
+    if (!lockedSectionAttempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
+    assertAttemptEpoch(lockedSectionAttempt.attemptEpoch, input.attemptEpoch)
+    const currentHasContext = current.questionnaire.formSections.some(sectionHasContext)
+    if (currentHasContext && !mappedSection.contextSection && !current.contextSnapshotHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
     }
-    const replay = assertSubmissionReplay(sectionAttempt, submissionId, payloadHash)
-    if (replay === 'replay' && sectionAttempt.status === 'COMPLETED') {
-      return {
-        replayed: true,
-        sectionAttemptId: sectionAttempt.id,
-        contextSnapshotHash: current.contextSnapshotHash,
-        progress: Math.max(0, Math.min(100, Math.round(((current.completedScales + current.completedForms) / Math.max(1, assessment.questionnaire.questionnaireScales.length + assessment.questionnaire.formSections.length)) * 100))),
-      }
-    }
-    if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评已结束', 409)
     if ((input.contextSnapshotHash ?? null) !== (current.contextSnapshotHash ?? null)) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷上下文版本已变化，请重试', 409)
     }
-    if (sectionAttempt.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束', 409)
+    const replay = assertSubmissionReplay(lockedSectionAttempt, submissionId, payloadHash)
+    if (replay === 'replay' && lockedSectionAttempt.status === 'COMPLETED') {
+      const hint = questionnaireProgressHint(current)
+      await tx.questionnaireAssessment.updateMany({
+        where: { id: assessment.id, status: 'IN_PROGRESS' },
+        data: { completedScales: hint.completedScales, completedForms: hint.completedForms, progress: hint.progress },
+      })
+      return {
+        replayed: true,
+        sectionAttemptId: lockedSectionAttempt.id,
+        contextSnapshotHash: current.contextSnapshotHash,
+        progress: hint.progress,
+        terminalCandidate: hint.terminalCandidate,
+      }
+    }
+    if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评已结束', 409)
+    if (lockedSectionAttempt.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束', 409)
 
     const itemIds = normalizedResult.normalized.map((entry) => entry.item.id)
     const existingAnswers = await tx.questionnaireFormAnswer.findMany({
@@ -1092,34 +1458,31 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
     const revisions = new Map(existingAnswers.map((answer) => [answer.formItemId, answer.revision]))
     const mutations: BulkFormAnswerMutation[] = normalizedResult.normalized.map((entry) => ({
       formItemId: entry.item.id,
-      formSectionAttemptId: sectionAttempt!.id,
+      formSectionAttemptId: lockedSectionAttempt.id,
       value: entry.storedValue,
       status: entry.status,
       revision: (revisions.get(entry.item.id) ?? -1) + 1,
     }))
     await persistFormAnswerBatch(tx, assessment.id, mutations)
     const updatedSection = await tx.questionnaireFormSectionAttempt.updateMany({
-      where: { id: sectionAttempt.id, status: 'IN_PROGRESS', attemptEpoch: input.attemptEpoch },
+      where: { id: lockedSectionAttempt.id, status: 'IN_PROGRESS', attemptEpoch: input.attemptEpoch },
       data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: new Date() },
     })
     if (updatedSection.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段状态已变化，请重试', 409)
 
-    const completedForms = Math.min(assessment.questionnaire.formSections.length, (current.completedForms ?? 0) + 1)
-    const totalUnits = assessment.questionnaire.questionnaireScales.length + assessment.questionnaire.formSections.length
-    const completedUnits = (current.completedScales ?? 0) + completedForms
-    const progress = totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / totalUnits) * 100))
+    const hint = questionnaireProgressHint(current, mappedSection.id)
     await tx.questionnaireAssessment.updateMany({
       where: { id: assessment.id, status: 'IN_PROGRESS' },
-      data: { completedForms, progress },
+      data: { completedScales: hint.completedScales, completedForms: hint.completedForms, progress: hint.progress },
     })
 
     let contextSnapshotHash = current.contextSnapshotHash
     if (mappedSection.contextSection && !current.contextSnapshotHash) {
       try {
-        const frozen = await freezeQuestionnaireAssessmentContextFromSnapshot(
+        const frozen = await measureRequestPhase('final_submit_context_read', () => freezeQuestionnaireAssessmentContextFromSnapshot(
           tx,
           contextSnapshotForSection(assessment.id, mappedSection, normalizedResult.normalized),
-        )
+        ))
         contextSnapshotHash = frozen.hash
       } catch (error) {
         if (isAssessmentContextServiceError(error)) {
@@ -1128,11 +1491,21 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
         throw error
       }
     }
-    return { replayed: false, sectionAttemptId: sectionAttempt.id, contextSnapshotHash, progress, payloadHash }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+    return {
+      replayed: false,
+      sectionAttemptId: lockedSectionAttempt.id,
+      contextSnapshotHash,
+      progress: hint.progress,
+      payloadHash,
+      terminalCandidate: hint.terminalCandidate,
+    }
+  })
 
-  const parent = await finalizeQuestionnaireIfReady(assessment.id)
-  return { submissionId, sectionId: input.sectionId, ...committed, parent }
+  const { terminalCandidate: shouldFinalize, ...response } = committed
+  const parent = shouldFinalize
+    ? await measureRequestPhase('final_submit_parent_finalization', () => finalizeQuestionnaireIfReady(assessment.id))
+    : { status: 'IN_PROGRESS', progress: response.progress, completedAt: null }
+  return { submissionId, sectionId: input.sectionId, ...response, parent }
 }
 
 export const submitQuestionnaireFormSectionFinalForUser = (

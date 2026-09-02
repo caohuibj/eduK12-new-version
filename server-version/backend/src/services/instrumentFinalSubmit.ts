@@ -29,6 +29,12 @@ export class InstrumentFinalSubmitError extends Error {
   }
 }
 
+export type CanonicalSubmission = {
+  json: string
+  bytes: number
+  hash: string
+}
+
 /**
  * Final-submit hashes must be stable across retries and independent of JSON
  * property insertion order. Array order is intentionally preserved because it
@@ -52,9 +58,21 @@ const stableValue = (value: unknown): unknown => {
 
 export const stableSubmissionJson = (payload: unknown): string => JSON.stringify(stableValue(payload))
 
-export const computeSubmissionPayloadHash = (payload: unknown): string => (
-  createHash('sha256').update(stableSubmissionJson(payload), 'utf8').digest('hex')
-)
+/**
+ * Canonicalize a final-submit payload once and reuse the result for the size
+ * guard and idempotency hash.  Final submits can contain hundreds of answers
+ * or trials, so repeating the deep sort/stringify pass is measurable CPU.
+ */
+export const prepareCanonicalSubmission = (payload: unknown): CanonicalSubmission => {
+  const json = stableSubmissionJson(payload)
+  return {
+    json,
+    bytes: Buffer.byteLength(json, 'utf8'),
+    hash: createHash('sha256').update(json, 'utf8').digest('hex'),
+  }
+}
+
+export const computeSubmissionPayloadHash = (payload: unknown): string => prepareCanonicalSubmission(payload).hash
 
 /**
  * The Express body limit is a final safety net. These smaller limits keep a
@@ -66,8 +84,15 @@ export const assertSubmissionPayloadSize = (
   maxBytes: number,
   label = '提交数据',
 ): void => {
-  const bytes = Buffer.byteLength(stableSubmissionJson(payload), 'utf8')
-  if (bytes > maxBytes) {
+  assertCanonicalSubmissionPayloadSize(prepareCanonicalSubmission(payload), maxBytes, label)
+}
+
+export const assertCanonicalSubmissionPayloadSize = (
+  canonical: Pick<CanonicalSubmission, 'bytes'>,
+  maxBytes: number,
+  label = '提交数据',
+): void => {
+  if (canonical.bytes > maxBytes) {
     throw new InstrumentFinalSubmitError(
       'SUBMISSION_PAYLOAD_TOO_LARGE',
       `${label}过大，请减少内容后重试（最大 ${Math.floor(maxBytes / 1024)}KB）`,
@@ -96,6 +121,21 @@ export const assertFinalOnly = (deliveryMode: InstrumentDeliveryMode | string | 
 export const assertAttemptEpoch = (actual: number, requested: number): void => {
   if (!Number.isInteger(requested) || requested < 1 || actual !== requested) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评尝试已过期，请重启后重新作答', 409)
+  }
+}
+
+/**
+ * Admission only permits an active attempt or an already-completed attempt
+ * carrying the same idempotent submission. Completed attempts still proceed
+ * to canonicalization so replay can verify the payload, while terminal states
+ * are rejected before scoring, encryption, or other heavy preparation.
+ */
+export const assertFinalSubmitStatus = (
+  status: string | null | undefined,
+  label = '测评',
+): void => {
+  if (status !== 'IN_PROGRESS' && status !== 'COMPLETED') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', `${label}已结束，请重启后重新作答`, 409)
   }
 }
 

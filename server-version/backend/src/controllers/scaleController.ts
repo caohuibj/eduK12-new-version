@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound, instrumentError } from '../utils/response'
+import { success, error, forbidden, notFound, completionBusy, instrumentError } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
@@ -40,6 +40,10 @@ import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exp
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { restartStandaloneScaleAssessment, submitScaleAssessmentFinal, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  isTransientCompletionDatabaseError,
+} from '../services/questionnaireCompletionAdmission'
 
 // ==================== Validation Schemas ====================
 
@@ -739,6 +743,8 @@ export const scaleController = {
       })
       return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isFinalScaleSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('最终提交量表错误', err)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)

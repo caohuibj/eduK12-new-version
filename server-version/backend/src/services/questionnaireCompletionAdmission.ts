@@ -3,7 +3,7 @@ import {
   setCompletionAdmissionState,
 } from './runtimeObservability'
 
-export type CompletionAdmissionReason = 'queue_full' | 'timeout'
+export type CompletionAdmissionReason = 'queue_full' | 'timeout' | 'database_busy'
 
 export type CompletionAdmissionOptions = {
   maxConcurrent: number
@@ -49,6 +49,26 @@ export const isQuestionnaireCompletionAdmissionBusyError = (
   error instanceof QuestionnaireCompletionAdmissionBusyError
   || (Boolean(error) && (error as { code?: unknown }).code === 'COMPLETION_BUSY')
 )
+
+export const isTransientCompletionDatabaseError = (error: unknown): boolean => {
+  const candidate = error as { code?: unknown; meta?: { code?: unknown } } | null
+  return candidate?.code === 'P2024'
+    || candidate?.code === 'P2034'
+    || candidate?.code === '40001'
+    || candidate?.meta?.code === '40001'
+}
+
+export const toCompletionAdmissionBusyError = (
+  error: unknown,
+  retryAfterSeconds = 1,
+): QuestionnaireCompletionAdmissionBusyError => {
+  if (error instanceof QuestionnaireCompletionAdmissionBusyError) return error
+  if (isTransientCompletionDatabaseError(error)) {
+    recordCompletionAdmissionRejection('database_busy')
+    return new QuestionnaireCompletionAdmissionBusyError('database_busy', retryAfterSeconds)
+  }
+  throw error
+}
 
 type QueuedOperation<T> = {
   operation: () => Promise<T>

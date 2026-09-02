@@ -13,7 +13,8 @@ export const success = <T>(res: Response, data: T, message: string = '操作成�
 export const error = (res: Response, message: string = '操作失败', code: number = -1, statusCode: number = 400) => {
   const response: ApiResponse = {
     code,
-    message
+    message,
+    data: null,
   }
   return res.status(statusCode).json(response)
 }
@@ -43,5 +44,6 @@ export const completionBusy = (res: Response, retryAfterSeconds = 1) => {
   return res.status(503).json({
     code: 'COMPLETION_BUSY',
     message: '测评完成请求繁忙，请稍后重试',
+    data: null,
   })
 }
