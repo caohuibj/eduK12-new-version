@@ -45,6 +45,13 @@ export interface CompositeAnalysisSnapshotRow {
   generatedBy: string | null
   payloadEncrypted: string
   createdAt: Date
+  /** V32-2 closed-aggregate identity; nullable for historical snapshots. */
+  aggregateInputHash?: string | null
+  hashScheme?: string | null
+  compiledBundleRuntimeHash?: string | null
+  attemptEpoch?: number | null
+  contextHash?: string | null
+  runtimeGeneration?: string | null
 }
 
 export interface DecryptedCompositeAnalysisSnapshot extends Omit<CompositeAnalysisSnapshotRow, 'payloadEncrypted'> {
@@ -556,6 +563,12 @@ export const listPackageAnalysisSnapshotMetadata = async (
       generationReason: true,
       generatedBy: true,
       createdAt: true,
+      aggregateInputHash: true,
+      hashScheme: true,
+      compiledBundleRuntimeHash: true,
+      attemptEpoch: true,
+      contextHash: true,
+      runtimeGeneration: true,
     },
   })
   return rows.map(({ payloadEncrypted: _payloadEncrypted, ...metadata }) => metadata)

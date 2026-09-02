@@ -126,40 +126,6 @@ const scaleQualityStateFor = (
 
 const SHA256_PATTERN = /^[a-f0-9]{64}$/
 
-const PR7_BUILT_IN_PACKAGE_CONTRACTS = new Map<string, {
-  protocolKey: string
-  protocolVersion: string
-  packageReportDefinitionVersion: string
-  domainDefinitionVersion: string
-  evidenceMappingVersion: string
-  recommendationRuleVersion: string
-}>([
-  'attention_stability_v1',
-  'inhibitory_control_v1',
-  'working_memory_v1',
-  'executive_control_v1',
-  'learning_reasoning_v1',
-  'k12_core_profile_v1',
-].map((key) => [`${key}@1.0.0`, {
-  protocolKey: key,
-  protocolVersion: '1.0.0',
-  packageReportDefinitionVersion: 'report-package-v1',
-  domainDefinitionVersion: '1.0.0',
-  evidenceMappingVersion: '1.0.0',
-  recommendationRuleVersion: LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
-}]))
-
-const PR10_MULTISOURCE_PACKAGE_KEY = 'inhibitory_control_multisource_v1'
-const PR10_MULTISOURCE_PACKAGE_VERSION = '1.0.0'
-const PR10_BUILT_IN_PACKAGE_CONTRACT = {
-  protocolKey: PR10_MULTISOURCE_PACKAGE_KEY,
-  protocolVersion: PR10_MULTISOURCE_PACKAGE_VERSION,
-  packageReportDefinitionVersion: 'report-package-v1',
-  domainDefinitionVersion: '1.0.0',
-  evidenceMappingVersion: '1.0.0',
-  recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
-}
-
 const validateCognitiveSlot = (value: unknown, label: string): CognitiveProtocolSlotDefinition => {
   if (!isRecord(value)) fail(`${label} 格式无效`)
   const slot = value as Record<string, unknown>
@@ -251,20 +217,9 @@ const validatePackageSnapshot = (
   if (packageDefinition.key !== packageKey || packageDefinition.version !== packageVersion) {
     fail('冻结报告包外层与包定义的 key/version 不匹配')
   }
-  const builtInContract = PR7_BUILT_IN_PACKAGE_CONTRACTS.get(`${packageKey}@${packageVersion}`)
-    ?? (packageKey === PR10_MULTISOURCE_PACKAGE_KEY && packageVersion === PR10_MULTISOURCE_PACKAGE_VERSION
-      ? PR10_BUILT_IN_PACKAGE_CONTRACT
-      : fail('报告包不是支持的内置精确版本'))
-  const isMultisource = packageKey === PR10_MULTISOURCE_PACKAGE_KEY
-  if (isMultisource && snapshot.snapshotVersion !== 2) fail('跨来源报告包必须使用版本 2 快照')
-  if (!isMultisource && snapshot.snapshotVersion !== 1) fail('认知-only 报告包必须使用版本 1 快照')
-  if (
-    packageDefinition.analysisProtocolKey !== builtInContract.protocolKey ||
-    packageDefinition.analysisProtocolVersion !== builtInContract.protocolVersion ||
-    packageDefinition.reportDefinitionVersion !== builtInContract.packageReportDefinitionVersion
-  ) {
-    fail('冻结报告包的 protocol/report definition 版本不匹配')
-  }
+  requireNonEmptyString(packageDefinition.analysisProtocolKey, '冻结报告包 analysisProtocolKey')
+  requireNonEmptyString(packageDefinition.analysisProtocolVersion, '冻结报告包 analysisProtocolVersion')
+  requireNonEmptyString(packageDefinition.reportDefinitionVersion, '冻结报告包 reportDefinitionVersion')
   if (!Array.isArray(packageDefinition.profiles) || !packageDefinition.profiles.includes(snapshot.profile)) {
     fail('冻结报告包不允许该 Profile')
   }
@@ -274,14 +229,14 @@ const validatePackageSnapshot = (
   const packageCognitiveSlots: CognitiveProtocolSlotDefinition[] = []
   const packageScaleSlots: ScaleProtocolSlotDefinition[] = []
   for (const [index, slot] of packageDefinition.slots.entries()) {
-    if (!isRecord(slot)) fail(`PR7 不接受含 scale slot 的报告包：slots[${index}]`)
+    if (!isRecord(slot)) fail(`冻结报告包 slots[${index}] 格式无效`)
     const rawSlot = slot as unknown as Record<string, unknown>
     if (typeof rawSlot.testType === 'string') {
       packageCognitiveSlots.push(validateCognitiveSlot(rawSlot, `冻结报告包 slots[${index}]`))
-    } else if (isMultisource && typeof rawSlot.expectedScaleCode === 'string') {
+    } else if (typeof rawSlot.expectedScaleCode === 'string') {
       packageScaleSlots.push(validateScaleSlot(rawSlot, `冻结报告包 slots[${index}]`))
     } else {
-      fail(`PR7 不接受含 scale slot 的报告包：slots[${index}]`)
+      fail(`冻结报告包 slots[${index}] 槽位类型无效`)
     }
   }
   const sortedPackageSlots = sortedByPosition([...packageCognitiveSlots, ...packageScaleSlots])
@@ -314,8 +269,20 @@ const validatePackageSnapshot = (
   }
   if (!Array.isArray(protocol.cognitiveSlots)) fail('冻结分析协议 cognitiveSlots 格式无效')
   if (!Array.isArray(protocol.scaleSlots)) fail('冻结分析协议 scaleSlots 格式无效')
-  if (isMultisource && protocol.scaleSlots.length === 0) fail('跨来源报告包缺少 scale slot')
-  if (!isMultisource && protocol.scaleSlots.length > 0) fail('PR7 不接受含 scale slot 的分析协议')
+  const isMultisource = protocol.scaleSlots.length > 0
+  const expectedSnapshotVersion = isMultisource ? 2 : 1
+  if (snapshot.snapshotVersion !== expectedSnapshotVersion) {
+    fail(`冻结报告包 snapshotVersion 应为 ${expectedSnapshotVersion}`)
+  }
+  if (protocolSnapshot.snapshotVersion !== expectedSnapshotVersion) {
+    fail(`冻结分析协议 snapshotVersion 应为 ${expectedSnapshotVersion}`)
+  }
+  if (
+    packageDefinition.analysisProtocolKey !== protocol.key
+    || packageDefinition.analysisProtocolVersion !== protocol.version
+  ) {
+    fail('冻结报告包与分析协议的 key/version 不匹配')
+  }
   const protocolCognitiveSlots = sortedByPosition(
     protocol.cognitiveSlots.map((slot, index) =>
       validateCognitiveSlot(slot, `冻结分析协议 cognitiveSlots[${index}]`)),
@@ -343,26 +310,24 @@ const validatePackageSnapshot = (
     fail('冻结分析协议槽位 position 必须从 0 连续排列')
   }
   if (
-    protocol.domainDefinitionVersion !== builtInContract.domainDefinitionVersion ||
     !hasCognitiveDomainDefinitionVersion(protocol.domainDefinitionVersion)
   ) {
     fail('冻结分析协议引用不支持的 Domain definition 版本')
   }
   if (
-    protocol.evidenceMappingVersion !== builtInContract.evidenceMappingVersion ||
     !hasCognitiveEvidenceMappingVersion(protocol.evidenceMappingVersion)
   ) {
     fail('冻结分析协议引用不支持的 Evidence mapping 版本')
   }
-  const supportedRecommendationRuleVersions = isMultisource
-    ? new Set([
-        builtInContract.recommendationRuleVersion,
-        COGNITIVE_RECOMMENDATION_RULE_VERSION,
-        LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
-      ])
-    : new Set([LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION])
+  const supportedRecommendationRuleVersions = new Set([
+    COGNITIVE_RECOMMENDATION_RULE_VERSION,
+    LEGACY_COGNITIVE_RECOMMENDATION_RULE_VERSION,
+  ])
   if (!supportedRecommendationRuleVersions.has(protocol.recommendationRuleVersion)) {
     fail('冻结分析协议引用不支持的 recommendation rule 版本')
+  }
+  if (!isMultisource && protocol.recommendationRuleVersion === COGNITIVE_RECOMMENDATION_RULE_VERSION) {
+    fail('当前 recommendation rule 版本需要至少一个 scale slot')
   }
   if (!Array.isArray(protocol.outputDomains) || protocol.outputDomains.length === 0) {
     fail('冻结分析协议 outputDomains 格式无效')
@@ -719,7 +684,7 @@ const readMetricInterpretation = (
     fail(`Evidence directionClass 无效：${result.slotKey}/${metricKey}`)
   }
   if (explicit.interpretation === 'self_report') {
-    fail(`PR7 不接受 self_report Evidence：${result.slotKey}/${metricKey}`)
+    fail(`认知任务 Evidence 不接受 self_report：${result.slotKey}/${metricKey}`)
   }
   if (explicit.interpretation === 'descriptive' && explicit.directionClass !== 'unknown') {
     fail(`descriptive Evidence 必须使用 unknown directionClass：${result.slotKey}/${metricKey}`)
@@ -1209,10 +1174,10 @@ const buildDomainResults = (
 }
 
 const buildCrossSourceFindings = (
-  packageKey: string,
+  hasScaleSource: boolean,
   evidence: EvidenceItem[],
 ): CognitivePackageAnalysisResult['crossSourceFindings'] => {
-  if (packageKey !== PR10_MULTISOURCE_PACKAGE_KEY) return []
+  if (!hasScaleSource) return []
   const behavioral = evidence.find((item) =>
     item.sourceType === 'cognitive_metric'
     && item.construct === 'response_inhibition'
@@ -1221,6 +1186,7 @@ const buildCrossSourceFindings = (
     item.sourceType === 'scale_dimension'
     && item.construct === 'response_inhibition'
     && item.metricKey === 'inhibition')
+  if (!behavioral && !selfReport) return []
   const refs = [behavioral?.id, selfReport?.id].filter((value): value is string => Boolean(value))
   const behavioralAvailable = behavioral?.interpretable === true
   const selfReportAvailable = selfReport?.interpretable === true
@@ -1263,14 +1229,14 @@ const buildCrossSourceFindings = (
 }
 
 const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackageAnalysisResult => {
-  if (!isRecord(input)) fail('PR7 引擎输入格式无效')
+  if (!isRecord(input)) fail('报告包引擎输入格式无效')
   const {
     packageDefinition,
     protocol,
     measurementsBySlot,
     scaleMeasurementsBySlot,
   } = validatePackageSnapshot(input.packageSnapshot)
-  const isMultisource = packageDefinition.key === PR10_MULTISOURCE_PACKAGE_KEY
+  const isMultisource = protocol.scaleSlots.length > 0
   const analysisVersion = isMultisource ? MULTISOURCE_ANALYSIS_VERSION : COGNITIVE_ANALYSIS_VERSION
   const reportSchemaVersion = isMultisource
     ? MULTISOURCE_ANALYSIS_REPORT_SCHEMA_VERSION
@@ -1356,7 +1322,7 @@ const buildResult = (input: BuildPackageCognitiveAnalysisInput): CognitivePackag
     provenance.assessmentId = requireNonEmptyString(input.assessmentId, 'assessmentId')
   }
 
-  const crossSourceFindings = buildCrossSourceFindings(packageDefinition.key, evidence)
+  const crossSourceFindings = buildCrossSourceFindings(isMultisource, evidence)
   // PR7 cognitive-only packages keep their historical no-recommendation
   // behavior. PR11 rules are enabled only by the versioned multisource
   // protocol; a frozen 1.0.0 multisource protocol remains stable as well.
@@ -1427,11 +1393,11 @@ export function buildPackageCognitiveAnalysis(
       })
     }
     if (!isRecord(inputOrSnapshot) || !('packageSnapshot' in inputOrSnapshot)) {
-      fail('PR7 引擎只接受冻结报告包快照和冻结任务结果')
+      fail('报告包引擎只接受冻结报告包快照和冻结任务结果')
     }
     return buildResult(inputOrSnapshot as BuildPackageCognitiveAnalysisInput)
   } catch (error) {
     if (error instanceof CognitivePackageAnalysisInputError) throw error
-    throw new CognitivePackageAnalysisInputError('PR7 冻结输入格式无效')
+    throw new CognitivePackageAnalysisInputError('冻结报告包输入格式无效')
   }
 }

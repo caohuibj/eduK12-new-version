@@ -432,5 +432,16 @@ export const submitUnifiedScaleAssessmentFinal = async (
       parent: null,
     }
   })
-  return { submissionId, payloadHash, ...committed }
+  const parent = admission.questionnaireAssessmentId
+    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
+        const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
+        return finalizeQuestionnaireAttemptIfReady(admission.questionnaireAssessmentId as string)
+      })
+    : admission.compositeAttemptId
+      ? await measureRequestPhase('final_submit_parent_finalization', async () => {
+          const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+          return finalizeCompositeAttemptIfReady(admission.compositeAttemptId as string)
+        })
+      : null
+  return { submissionId, payloadHash, ...committed, parent }
 }

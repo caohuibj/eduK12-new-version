@@ -58,6 +58,9 @@ import * as formSectionService from '../services/questionnaire-form-section.serv
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
+import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
+import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import { z } from 'zod'
 
 const publicScaleRunner = (scale: any) => {
@@ -254,10 +257,9 @@ export const publicQuestionnaireController = {
       const questionnaireId = validation.questionnaire!.id
       const tokenId = validation.token!.id
 
-      // V32-1 provides the unified unit primitives, but parent activation is
-      // deliberately held until V32-2 also owns parent finalization. Keep the
-      // existing FINAL_ONLY parent/child protocol functional at this boundary.
-      await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
+      // V32-2 owns the closed aggregate finalizer, so new FINAL_ONLY attempts
+      // are activated with the immutable unit runtime and frozen slot set.
+      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
       // it can identify an existing assessment; otherwise always create a new
@@ -575,6 +577,7 @@ export const publicQuestionnaireController = {
               userId: null, // 匿名
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1',
               attemptEpoch: 1,
               progress: 0,
             },
@@ -584,16 +587,53 @@ export const publicQuestionnaireController = {
             },
           })
 
+          const scaleRuntimeSnapshots = await Promise.all(startContent.questionnaireScales.map(async (qs: any) => {
+            if (qs.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
+            const definition = scaleDefinitionFromRecord(qs.scale)
+            return {
+              qs,
+              snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
+                instrumentKey: qs.scale.code,
+                instrumentVersion: qs.scale.instrumentVersion,
+                definition,
+              }),
+            }
+          }))
           await tx.assessment.createMany({
-            data: startContent.questionnaireScales.map((qs) => ({
+            data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1' as const,
+              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
               attemptEpoch: assessment.attemptEpoch,
               progress: 0,
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
             })),
+          })
+
+          const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
+            attemptEpoch: assessment.attemptEpoch,
+            scales: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+              questionnaireScaleId: qs.id,
+              code: qs.scale.code,
+              instrumentVersion: qs.scale.instrumentVersion,
+              sourceDefinitionHash: snapshot.sourceDefinitionHash,
+              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+            })),
+            formSections: frozenFormSections.map((section) => ({
+              sectionId: section.id,
+              definitionHash: formSectionIdentityHash(section),
+            })),
+          })
+          await tx.questionnaireAssessment.update({
+            where: { id: assessment.id },
+            data: {
+              frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+              frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
+            },
           })
 
           await tx.questionnaireFormAnswer.createMany({
@@ -1420,6 +1460,40 @@ export const publicQuestionnaireController = {
     try {
       const { sessionId } = req.params
 
+      // V32-2 completion is driven by the closed aggregate. Keep this route
+      // outside the legacy Serializable transaction so a unified attempt does
+      // not re-read raw scale answers or form-answer rows.
+      const route = await prisma.questionnaireAssessment.findUnique({
+        where: { sessionId },
+        select: { id: true, runtimeGeneration: true },
+      })
+      if (!route) return notFound(res, '测评不存在')
+      if (route.runtimeGeneration === 'UNIFIED_V1') {
+        const completion = await formSectionService.finalizeQuestionnaireAttemptIfReady(route.id)
+        if (!completion) return notFound(res, '测评不存在')
+        if (completion.status !== 'COMPLETED') {
+          return error(res, '问卷测评尚未完成', -1, 409)
+        }
+        const completed = await prisma.questionnaireAssessment.findUnique({
+          where: { id: route.id },
+          select: {
+            questionnaireId: true,
+            completedAt: true,
+            totalTime: true,
+            aggregateReport: true,
+            aggregateReportEncrypted: true,
+            questionnaire: { select: { name: true } },
+          },
+        })
+        if (!completed) return notFound(res, '测评不存在')
+        return success(res, {
+          questionnaireId: completed.questionnaireId,
+          completedAt: completed.completedAt,
+          totalTime: completed.totalTime,
+          ...buildQuestionnaireCollectionReport(completed),
+        }, '问卷测评已完成')
+      }
+
       const result = await withQuestionnaireCompletionTransaction(async (tx) => {
         const qa = await measureRequestPhase('assessment_lookup', () => tx.questionnaireAssessment.findUnique({
           where: { sessionId },
@@ -1480,6 +1554,7 @@ export const publicQuestionnaireController = {
     } catch (err) {
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('完成问卷测评错误', err)
       return error(res, '完成问卷测评失败')
     }

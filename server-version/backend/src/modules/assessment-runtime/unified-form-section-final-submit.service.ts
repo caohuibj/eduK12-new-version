@@ -302,7 +302,11 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
     })
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, ...progress }
   }))
-  return { submissionId, sectionId: input.sectionId, ...committed, parent: { status: 'IN_PROGRESS', progress: committed.progress, completedAt: null } }
+  const parent = await measureRequestPhase('final_submit_parent_finalization', async () => {
+    const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
+    return finalizeQuestionnaireAttemptIfReady(admission.id)
+  })
+  return { submissionId, sectionId: input.sectionId, ...committed, parent }
 }
 
 const ensureCompositeSectionAttempt = async (attemptId: string, sectionId: string, attemptEpoch: number) => {
@@ -425,7 +429,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     })
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, ...progress }
   }))
-  return { submissionId, sectionId: input.sectionId, ...committed, parent: { status: 'IN_PROGRESS', progress: committed.progress, completedAt: null } }
+  const parent = await measureRequestPhase('final_submit_parent_finalization', async () => {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    return finalizeCompositeAttemptIfReady(admission.id)
+  })
+  return { submissionId, sectionId: input.sectionId, ...committed, parent }
 }
 
 const withQuestionnaireFormUnitTransaction = async <T>(callback: (tx: Prisma.TransactionClient) => Promise<T>) => (

@@ -589,7 +589,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
       db!.assessmentUnitSnapshot.count({ where: { compositeAttemptId: fixture.attempt.id, sourceAttemptId: fixture.session.id } }),
     ])
     expect(session).toMatchObject({ status: 'COMPLETED', runtimeGeneration: 'UNIFIED_V1', submissionId: input.submissionId })
-    expect(parent).toMatchObject({ status: 'IN_PROGRESS', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1 })
+    expect(parent).toMatchObject({ status: 'COMPLETED', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, progress: 100 })
     expect(rawCount).toBe(1)
     expect(snapshotCount).toBe(1)
 

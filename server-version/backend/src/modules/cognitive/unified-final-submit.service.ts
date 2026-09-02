@@ -515,5 +515,11 @@ export const submitUnifiedCognitiveSessionFinal = async (
     return { replayed: false, response: responseFromSnapshot(current.id, resultSnapshot) }
   })
 
-  return { submissionId, payloadHash: prepared.payloadHash, ...committed }
+  const parent = admission.compositeAttemptId
+    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
+        const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+        return finalizeCompositeAttemptIfReady(admission.compositeAttemptId as string)
+      })
+    : null
+  return { submissionId, payloadHash: prepared.payloadHash, ...committed, parent }
 }

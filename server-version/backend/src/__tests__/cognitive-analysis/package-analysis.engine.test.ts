@@ -601,9 +601,9 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
       ...snapshot,
       packageDefinition: {
         ...snapshot.packageDefinition,
-        reportDefinitionVersion: '9.9.9',
+        reportDefinitionVersion: '',
       },
-    }, modules), /protocol\/report definition/)
+    }, modules), /reportDefinitionVersion/)
 
     expectInputError(() => buildPackageCognitiveAnalysis({
       ...snapshot,
@@ -622,7 +622,7 @@ describe('PR7 package-scoped cognitive evidence and domain engine', () => {
         ...snapshot.packageDefinition,
         slots: [null] as never,
       },
-    }, modules), /scale slot/)
+    }, modules), /slots\[0\].*格式无效/)
 
     const malformedReport = structuredClone(modules)
     malformedReport[0].frozenReport = { metricDefinitions: null } as never
