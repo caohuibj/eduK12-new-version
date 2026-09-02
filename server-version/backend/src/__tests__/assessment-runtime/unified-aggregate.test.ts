@@ -86,6 +86,31 @@ describe('V32-2 closed aggregate input', () => {
     expect(evaluateCompleteness({ slots, snapshots: [stale], attemptEpoch: 1 }).missingSlotKeys).toEqual(['form-section:section-1'])
   })
 
+  it('does not treat skipped or not-applicable headers as current terminal input', () => {
+    const skipped = {
+      ...completedScale,
+      id: 'snapshot-skipped',
+      terminalState: 'SKIPPED' as const,
+      payloadKind: 'NONE' as const,
+    }
+    const notApplicable = {
+      ...completedScale,
+      id: 'snapshot-not-applicable',
+      terminalState: 'NOT_APPLICABLE' as const,
+      payloadKind: 'UNIT_RESULT' as const,
+    }
+
+    for (const snapshot of [skipped, notApplicable]) {
+      expect(evaluateCompleteness({ slots, snapshots: [snapshot], attemptEpoch: 1 })).toMatchObject({
+        ready: false,
+        completedSlotCount: 0,
+        missingSlotKeys: ['form-section:section-1'],
+        invalidSlotKeys: ['scale:scale-1'],
+        progress: 0,
+      })
+    }
+  })
+
   it('produces a deterministic aggregate identity independent of input order', () => {
     const frozen = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots })
     const first = buildAggregateInputHash({

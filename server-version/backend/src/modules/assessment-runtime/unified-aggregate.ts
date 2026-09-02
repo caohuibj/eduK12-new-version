@@ -32,12 +32,6 @@ export type AggregateCompleteness = {
   progress: number
 }
 
-const terminalStates = new Set<AggregateSnapshotHeader['terminalState']>([
-  'COMPLETED',
-  'SKIPPED',
-  'NOT_APPLICABLE',
-])
-
 const expectedPayloadKind = (slot: FrozenActiveSlotV1): AggregateSnapshotHeader['payloadKind'] => (
   slot.unitType === 'FORM_SECTION' ? 'COLLECTION_FACTS' : 'UNIT_RESULT'
 )
@@ -67,9 +61,11 @@ export const evaluateCompleteness = (input: {
     if (
       snapshot.attemptEpoch !== input.attemptEpoch
       || snapshot.unitType !== slot.unitType
-      || !terminalStates.has(snapshot.terminalState)
+      // V32-2 has no skip/applicability policy yet. Keep the enum values as
+      // schema capability, but only a required COMPLETED snapshot carrying
+      // its unit payload may satisfy the closed aggregate contract.
+      || snapshot.terminalState !== 'COMPLETED'
       || snapshot.payloadKind !== expectedPayloadKind(slot)
-      || snapshot.terminalState !== 'COMPLETED' && snapshot.payloadKind !== 'NONE'
     ) {
       invalidSlotKeys.add(snapshot.slotKey)
     }

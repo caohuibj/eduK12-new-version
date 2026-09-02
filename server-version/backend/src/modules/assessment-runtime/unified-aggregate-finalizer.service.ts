@@ -393,6 +393,8 @@ const buildCompositePackageAnalysis = (input: {
       || config.configVersion !== protocolSlot.configVersion
       || config.engineVersion !== protocolSlot.engineVersion
       || config.scoringVersion !== protocolSlot.scoringVersion
+      || assignment.resolvedConfigHash !== measurement.resolvedConfigHash
+      || payload.envelope.core.scientificProvenance.resolvedConfigHash !== measurement.resolvedConfigHash
       || hashResolvedConfig(frozenReport) !== measurement.resolvedReportHash
       || payload.envelope.core.instrumentKey !== protocolSlot.testType
       || payload.envelope.core.instrumentVersion !== protocolSlot.engineVersion
@@ -605,6 +607,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
                 select: {
                   id: true,
                   profile: true,
+                  resolvedConfigHash: true,
                   resolvedReportSnapshotEncrypted: true,
                   config: { select: { testType: true, configVersion: true, engineVersion: true, scoringVersion: true } },
                 },
