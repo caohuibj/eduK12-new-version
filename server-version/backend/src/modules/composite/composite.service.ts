@@ -96,6 +96,14 @@ import {
   projectCompositeCollectionReport,
   projectCompositeReport,
 } from './composite-report.projector'
+import {
+  freezeCompositeActiveSlotSet,
+  formSectionIdentityHash,
+} from '../assessment-runtime/attempt-runtime'
+import {
+  encryptFrozenActiveSlotSet,
+} from '../assessment-runtime/slot-set'
+import { freezeScaleRuntimeAtAttemptStart, encryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import type {
   CompositeReportAudience,
   CompositeSnapshotMetadata,
@@ -1319,6 +1327,30 @@ const compositeSectionHasContext = (section: any) => (
   Boolean(section.contextSection) || Boolean(section.items?.some((item: any) => item.contextKey))
 )
 
+const compositeFormSectionRuntimeDefinition = (section: any) => {
+  const items = [...(section.items ?? [])]
+    .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
+    .map((item: any) => ({
+      id: item.id,
+      formType: item.formType,
+      formLabel: item.formLabel,
+      placeholder: item.formPlaceholder ?? null,
+      required: item.required !== false,
+      formOptions: item.formOptions,
+      contextKey: item.contextKey ?? null,
+      position: item.position,
+      formSectionPosition: item.formSectionPosition ?? null,
+    }))
+  return {
+    id: section.id,
+    title: section.title,
+    description: section.description ?? null,
+    position: section.position,
+    contextSection: compositeSectionHasContext(section),
+    items,
+  }
+}
+
 const assertCompositeContentUnitOrder = (units: Array<{ type: string; id: string }>, sections: any[]) => {
   const contextSections = sections.filter(compositeSectionHasContext)
   if (contextSections.length > 1) throw compositeBadRequest('同一综合测评只能有一个上下文区段')
@@ -1852,7 +1884,17 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       throw compositeBadRequest('认知任务冻结的 Profile 配置不可用')
     }
   }
-  const configSnapshotEncrypted = cognitiveSessionService.createCognitiveSessionConfigSnapshot({
+  const unifiedSnapshot = attempt.deliveryMode === 'FINAL_ONLY'
+    ? await cognitiveSessionService.createUnifiedCognitiveSessionConfigSnapshot({
+        db,
+        testType: config.testType,
+        configVersion: config.configVersion,
+        engineVersion: config.engineVersion,
+        scoringVersion: config.scoringVersion,
+        config: sessionConfig,
+      })
+    : null
+  const configSnapshotEncrypted = unifiedSnapshot?.encrypted ?? cognitiveSessionService.createCognitiveSessionConfigSnapshot({
     testType: config.testType,
     configVersion: config.configVersion,
     engineVersion: config.engineVersion,
@@ -1878,14 +1920,29 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       scoringVersion: config.scoringVersion,
       randomSeed: randomBytes(16).toString('hex'),
       anonymousCode: anonymous ? attempt.anonymousCode : null,
+      ...(unifiedSnapshot ? {
+        runtimeGeneration: 'UNIFIED_V1' as const,
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
+      } : {}),
     },
   })
 }
 
 const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null) => {
+  const runtime = {
+    scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
+    cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
+  }
   for (const item of items) {
     if (!item.required) continue
     if (item.type === 'SCALE') {
+      const frozenScale = attempt.deliveryMode === 'FINAL_ONLY'
+        ? await freezeScaleRuntimeAtAttemptStart(db, {
+            instrumentKey: item.scale.code,
+            instrumentVersion: item.scale.instrumentVersion,
+            definition: scaleDefinitionFromRecord(item.scale),
+          })
+        : null
       await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -1897,12 +1954,38 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
+          ...(frozenScale ? {
+            runtimeGeneration: 'UNIFIED_V1' as const,
+            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(frozenScale),
+            compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+          } : {}),
         },
       })
+      if (frozenScale) {
+        runtime.scales.push({
+          compositeItemId: item.id,
+          code: item.scale.code,
+          instrumentVersion: item.scale.instrumentVersion,
+          sourceDefinitionHash: frozenScale.sourceDefinitionHash,
+          compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+        })
+      }
     } else if (item.type === 'COGNITIVE') {
-      await createCognitiveChild(db, attempt, item, userId)
+      const session = await createCognitiveChild(db, attempt, item, userId)
+      if (attempt.deliveryMode === 'FINAL_ONLY') {
+        const snapshot = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted).snapshot
+        if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
+        runtime.cognitive.push({
+          compositeItemId: item.id,
+          testType: item.cognitiveAssignment.config.testType,
+          instrumentVersion: snapshot.compiledRuntime.instrumentVersion,
+          sourceDefinitionHash: snapshot.compiledRuntime.sourceDefinitionHash,
+          compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+        })
+      }
     }
   }
+  return runtime
 }
 
 const createAttempt = async (
@@ -1935,6 +2018,7 @@ const createAttempt = async (
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
       deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
+      runtimeGeneration: finalOnly ? 'UNIFIED_V1' : null,
       attemptEpoch,
       completedItems,
       progress,
@@ -1949,7 +2033,25 @@ const createAttempt = async (
       })),
     })
   }
-  await createChildRecords(db, attempt, composite.items, userId)
+  const runtime = await createChildRecords(db, attempt, composite.items, userId)
+  if (finalOnly) {
+    const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
+      attemptEpoch,
+      scales: runtime.scales,
+      cognitive: runtime.cognitive,
+      formSections: formSections.map((section: any) => ({
+        sectionId: section.id,
+        definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
+      })),
+    })
+    await db.compositeAssessmentAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
+      },
+    })
+  }
   return attempt
 }
 
@@ -2891,24 +2993,26 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       title: section.title,
       description: section.description ?? null,
       contextSection: compositeSectionHasContext(section),
-      definitionHash: computeSubmissionPayloadHash({
-        sectionId: section.id,
-        title: section.title,
-        description: section.description ?? null,
-        position: section.position,
-        contextSection: compositeSectionHasContext(section),
-        items: section.items.map((item: any) => ({
-          id: item.id,
-          formType: item.formType,
-          formLabel: item.formLabel,
-          placeholder: item.formPlaceholder ?? null,
-          required: item.required !== false,
-          formOptions: item.formOptions,
-          contextKey: item.contextKey ?? null,
-          position: item.position,
-          formSectionPosition: item.formSectionPosition ?? null,
-        })),
-      }),
+      definitionHash: finalOnly && attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section))
+        : computeSubmissionPayloadHash({
+            sectionId: section.id,
+            title: section.title,
+            description: section.description ?? null,
+            position: section.position,
+            contextSection: compositeSectionHasContext(section),
+            items: section.items.map((item: any) => ({
+              id: item.id,
+              formType: item.formType,
+              formLabel: item.formLabel,
+              placeholder: item.formPlaceholder ?? null,
+              required: item.required !== false,
+              formOptions: item.formOptions,
+              contextKey: item.contextKey ?? null,
+              position: item.position,
+              formSectionPosition: item.formSectionPosition ?? null,
+            })),
+          }),
       status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
       answers: sectionAnswers,
     }
@@ -2991,14 +3095,16 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       description: section.description ?? null,
       position: section.position,
       contextSection: compositeSectionHasContext(section),
-      definitionHash: computeSubmissionPayloadHash({
-        sectionId: section.id,
-        title: section.title,
-        description: section.description ?? null,
-        position: section.position,
-        contextSection: compositeSectionHasContext(section),
-        items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
-      }),
+      definitionHash: finalOnly && attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section))
+        : computeSubmissionPayloadHash({
+            sectionId: section.id,
+            title: section.title,
+            description: section.description ?? null,
+            position: section.position,
+            contextSection: compositeSectionHasContext(section),
+            items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
+          }),
       status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
       submittedAt: sectionMap.get(section.id)?.submittedAt ?? null,
       items: section.items.map((item: any) => ({

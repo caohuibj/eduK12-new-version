@@ -39,6 +39,7 @@ import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownlo
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { restartStandaloneScaleAssessment, submitScaleAssessmentFinal, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
+import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import {
   isQuestionnaireCompletionAdmissionBusyError,
@@ -799,6 +800,11 @@ export const scaleController = {
       }
 
       let assessment
+      const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(prisma as any, {
+        instrumentKey: scale.code,
+        instrumentVersion: scale.instrumentVersion,
+        definition,
+      })
       try {
         assessment = await prisma.assessment.create({
           data: {
@@ -806,6 +812,9 @@ export const scaleController = {
             userId: userId!,
             status: 'IN_PROGRESS',
             deliveryMode: 'FINAL_ONLY',
+            runtimeGeneration: 'UNIFIED_V1',
+            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+            compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
             attemptEpoch: 1,
             progress: 0,
             answers: encryptField([]),

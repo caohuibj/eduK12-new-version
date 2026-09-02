@@ -22,6 +22,12 @@ import { writeWorkbookFile } from '../../utils/excelWorkbook'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot } from './v2/types'
+import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import {
+  parseUnifiedCognitiveRawSubmissionPayload,
+  UNIFIED_COGNITIVE_RAW_ENCODING_VERSION,
+  UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION,
+} from './unified-raw-submission'
 
 export type CognitiveExportDetail = 'summary' | 'full' | 'research'
 export type CognitiveExportFormat = 'csv' | 'sav' | 'xlsx' | 'zip'
@@ -69,6 +75,7 @@ interface CognitiveExportSession {
   metricsEncrypted: string | null
   qualityFlagsEncrypted: string | null
   resultSnapshotEncrypted: string | null
+  runtimeGeneration: 'UNIFIED_V1' | null
   user: {
     id: string
     nickname: string | null
@@ -77,6 +84,13 @@ interface CognitiveExportSession {
   trials?: Array<{
     trialIndex: number
     payloadEncrypted: string
+  }>
+  rawSubmissions?: Array<{
+    attemptEpoch: number
+    trialCount: number
+    payloadEncrypted: string
+    payloadSchemaVersion: number
+    encodingVersion: string
   }>
 }
 
@@ -272,10 +286,16 @@ const getSessions = async (
   assertExportLimits({ records: recordCount })
 
   if (detail === 'full' || detail === 'research') {
-    const trialCount = await prisma.cognitiveTrial.count({
-      where: { session: { is: where } },
-    })
-    assertExportLimits({ trials: trialCount })
+    const [legacyTrialCount, unifiedTrialCount] = await Promise.all([
+      prisma.cognitiveTrial.count({
+        where: { session: { is: where } },
+      }),
+      prisma.cognitiveRawSubmission.aggregate({
+        where: { session: { is: where } },
+        _sum: { trialCount: true },
+      }),
+    ])
+    assertExportLimits({ trials: legacyTrialCount + (unifiedTrialCount._sum.trialCount ?? 0) })
     const sessions = await prisma.cognitiveSession.findMany({
       where,
       include: {
@@ -283,6 +303,17 @@ const getSessions = async (
         trials: {
           select: { trialIndex: true, payloadEncrypted: true },
           orderBy: { trialIndex: 'asc' },
+          take: EXPORT_MAX_TRIALS + 1,
+        },
+        rawSubmissions: {
+          select: {
+            attemptEpoch: true,
+            trialCount: true,
+            payloadEncrypted: true,
+            payloadSchemaVersion: true,
+            encodingVersion: true,
+          },
+          orderBy: { attemptEpoch: 'asc' },
           take: EXPORT_MAX_TRIALS + 1,
         },
       },
@@ -303,6 +334,33 @@ const getSessions = async (
   return sessions as unknown as CognitiveExportSession[]
 }
 
+const decodeSessionTrials = (session: CognitiveExportSession): Array<{ trialIndex: number; payload: unknown }> => {
+  if (session.runtimeGeneration === 'UNIFIED_V1') {
+    // Summary exports intentionally omit the raw submission relation; they
+    // only need the completed result snapshot and must not decrypt trial data.
+    if (!session.rawSubmissions) return []
+    const raw = session.rawSubmissions?.find((entry) => entry.attemptEpoch === session.attemptNo)
+    if (!raw) throw new Error(`统一认知测评会话 ${session.id} 缺少原始提交记录`)
+    if (
+      raw.payloadSchemaVersion !== UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION
+      || raw.encodingVersion !== UNIFIED_COGNITIVE_RAW_ENCODING_VERSION
+    ) {
+      throw new Error(`统一认知测评会话 ${session.id} 的原始提交编码版本不受支持`)
+    }
+    const payload = parseUnifiedCognitiveRawSubmissionPayload(
+      decryptUnifiedRuntimePayload<unknown>(raw.payloadEncrypted),
+    )
+    if (payload.attemptEpoch !== session.attemptNo || payload.trials.length !== raw.trialCount) {
+      throw new Error(`统一认知测评会话 ${session.id} 的原始提交元数据不一致`)
+    }
+    return payload.trials.map((trial) => ({ trialIndex: trial.trialIndex, payload: trial.payload }))
+  }
+  return (session.trials || []).map((trial) => ({
+    trialIndex: trial.trialIndex,
+    payload: decryptCognitivePayload<unknown>(trial.payloadEncrypted),
+  }))
+}
+
 const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportSession => {
   if (session.resultSnapshotEncrypted) {
     const resultSnapshot = parseCognitiveResultSnapshot(
@@ -314,6 +372,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
       anonymousCode: session.anonymousCode,
       attemptNo: session.attemptNo,
       testType: session.testType,
+      runtimeGeneration: session.runtimeGeneration,
       configVersion: session.configVersion,
       engineVersion: session.engineVersion,
       scoringVersion: session.scoringVersion,
@@ -325,10 +384,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
       qualityFlags: resultSnapshot.quality.flags,
       qualityState: resultSnapshot.quality.state,
       resultSnapshot,
-      trials: (session.trials || []).map((trial) => ({
-        trialIndex: trial.trialIndex,
-        payload: decryptCognitivePayload<unknown>(trial.payloadEncrypted),
-      })),
+      trials: decodeSessionTrials(session),
     }
   }
 
@@ -342,6 +398,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
     anonymousCode: session.anonymousCode,
     attemptNo: session.attemptNo,
     testType: session.testType,
+    runtimeGeneration: session.runtimeGeneration,
     configVersion: session.configVersion,
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
@@ -355,10 +412,7 @@ const decodeSession = (session: CognitiveExportSession): DecodedCognitiveExportS
       ? 'limited'
       : 'interpretable',
     resultSnapshot: null,
-    trials: (session.trials || []).map((trial) => ({
-      trialIndex: trial.trialIndex,
-      payload: decryptCognitivePayload<unknown>(trial.payloadEncrypted),
-    })),
+    trials: decodeSessionTrials(session),
   }
 }
 

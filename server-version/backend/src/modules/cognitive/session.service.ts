@@ -19,6 +19,8 @@ import {
   sessionConfigFromStoredValue,
 } from './v2/session-snapshot'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
+import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
+import { freezeExactReferenceBindings, type ExactReferenceDb } from '../assessment-runtime/reference-binding'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -80,6 +82,48 @@ export const createCognitiveSessionConfigSnapshot = (input: {
     config: input.config,
   })
   return encryptCognitivePayload(snapshot)
+}
+
+/**
+ * Create the unified final-only snapshot at attempt start. The existing
+ * encrypted config column remains the single Cognitive snapshot store; the
+ * evolved snapshot carries the serializable runtime identity and the exact
+ * reference bindings used by the attempt.
+ */
+export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
+  testType: string
+  configVersion: string
+  engineVersion: string
+  scoringVersion: string
+  config: unknown
+  db?: ExactReferenceDb
+}): Promise<{ encrypted: string; compiledRuntime: ReturnType<typeof compileCognitiveRuntime> }> => {
+  const definition = getCognitiveV2TaskDefinition(
+    input.testType,
+    input.engineVersion,
+    input.scoringVersion,
+  )
+  if (!definition) throw new Error(`No Cognitive v2 definition for ${input.testType}/${input.engineVersion}/${input.scoringVersion}`)
+  const compiledRuntime = compileCognitiveRuntime({
+    definition,
+    instrumentVersion: input.engineVersion,
+  })
+  const referenceBindings = await freezeExactReferenceBindings(input.db ?? (prisma as unknown as ExactReferenceDb), {
+    instrumentType: 'COGNITIVE',
+    instrumentKey: definition.testType,
+    selections: compiledRuntime.referenceBindingDefinition.selections,
+  })
+  const snapshot = createSessionConfigSnapshot({
+    definition,
+    configVersion: input.configVersion,
+    config: input.config,
+    runtime: {
+      runtimeGeneration: 'UNIFIED_V1',
+      compiledRuntime,
+      referenceBindings,
+    },
+  })
+  return { encrypted: encryptCognitivePayload(snapshot), compiledRuntime }
 }
 
 /** Decode either a v2 session snapshot or the legacy raw config snapshot. */
@@ -281,7 +325,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+  const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
     testType: ctx.config.testType,
     configVersion: ctx.config.configVersion,
     engineVersion: ctx.config.engineVersion,
@@ -303,10 +347,12 @@ export const createSession = async (userId: string, assignmentId: string) => {
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         configVersion: ctx.config.configVersion,
-        configSnapshotEncrypted,
+        configSnapshotEncrypted: unifiedSnapshot.encrypted,
         engineVersion: ctx.config.engineVersion,
         scoringVersion: ctx.config.scoringVersion,
         randomSeed,
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
       },
     })
     return toRunnerPayload(session, undefined, false, ctx.frozenReport)
@@ -518,7 +564,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
-  const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+  const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
     testType: ctx.config.testType,
     configVersion: ctx.config.configVersion,
     engineVersion: ctx.config.engineVersion,
@@ -558,11 +604,13 @@ export const restartSession = async (userId: string, sessionId: string) => {
           status: 'IN_PROGRESS',
           deliveryMode: 'FINAL_ONLY',
           configVersion: locked.configVersion,
-          configSnapshotEncrypted,
+          configSnapshotEncrypted: unifiedSnapshot.encrypted,
           engineVersion: locked.engineVersion,
           scoringVersion: locked.scoringVersion,
           randomSeed,
           anonymousCode: locked.anonymousCode,
+          runtimeGeneration: 'UNIFIED_V1',
+          compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
         },
       })
     }).then((created) => toRunnerPayload(created, undefined, false, ctx.frozenReport))

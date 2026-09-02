@@ -103,7 +103,13 @@ const scaleMetadataForResponse = (scale: unknown): unknown => {
 export const scaleAssessmentForResponse = (assessment: any): any => {
   const answers = readScaleAnswers(assessment?.answers)
   const result = readScaleResult(assessment?.result)
-  const { answers: _encryptedAnswers, result: _encryptedResult, scale, ...metadata } = assessment ?? {}
+  const {
+    answers: _encryptedAnswers,
+    result: _encryptedResult,
+    runtimeSnapshotEncrypted: _runtimeSnapshotEncrypted,
+    scale,
+    ...metadata
+  } = assessment ?? {}
   return {
     ...metadata,
     ...(scale !== undefined ? { scale: scaleMetadataForResponse(scale) } : {}),

@@ -264,6 +264,9 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
     }
 
     // IN_PROGRESS → 继续评分。
+    if (session.runtimeGeneration === 'UNIFIED_V1') {
+      throw BAD_REQUEST('统一认知测评必须通过最终提交接口完成')
+    }
 
     const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
     if (storedConfig.snapshot) {

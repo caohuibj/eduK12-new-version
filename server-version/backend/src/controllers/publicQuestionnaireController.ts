@@ -59,6 +59,9 @@ import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionn
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import { z } from 'zod'
+import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
+import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -256,7 +259,7 @@ export const publicQuestionnaireController = {
 
       // Ensure newly-created form items are represented by a section before
       // creating or resuming a final-only attempt.
-      await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
+      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
       // it can identify an existing assessment; otherwise always create a new
@@ -549,7 +552,6 @@ export const publicQuestionnaireController = {
         const startContent = await measureRequestPhase('definition_lookup', () => (
           cacheService.getQuestionnaireStartContent(questionnaireId)
         ))
-
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
         const transactionRequestedAt = process.hrtime.bigint()
@@ -572,6 +574,7 @@ export const publicQuestionnaireController = {
               userId: null, // 匿名
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1',
               attemptEpoch: 1,
               progress: 0,
             },
@@ -581,16 +584,53 @@ export const publicQuestionnaireController = {
             },
           })
 
+          const scaleRuntimeSnapshots = await Promise.all(startContent.questionnaireScales.map(async (qs: any) => {
+            if (qs.scale.status !== 'PUBLISHED') throw new Error('问卷中的量表已不再可用')
+            const definition = scaleDefinitionFromRecord(qs.scale)
+            return {
+              qs,
+              snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
+                instrumentKey: qs.scale.code,
+                instrumentVersion: qs.scale.instrumentVersion,
+                definition,
+              }),
+            }
+          }))
           await tx.assessment.createMany({
-            data: startContent.questionnaireScales.map((qs) => ({
+            data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
               scaleId: qs.scaleId,
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1' as const,
+              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
               attemptEpoch: assessment.attemptEpoch,
               progress: 0,
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
             })),
+          })
+
+          const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
+            attemptEpoch: assessment.attemptEpoch,
+            scales: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+              questionnaireScaleId: qs.id,
+              code: qs.scale.code,
+              instrumentVersion: qs.scale.instrumentVersion,
+              sourceDefinitionHash: snapshot.sourceDefinitionHash,
+              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+            })),
+            formSections: frozenFormSections.map((section) => ({
+              sectionId: section.id,
+              definitionHash: formSectionIdentityHash(section),
+            })),
+          })
+          await tx.questionnaireAssessment.update({
+            where: { id: assessment.id },
+            data: {
+              frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+              frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
+            },
           })
 
           await tx.questionnaireFormAnswer.createMany({

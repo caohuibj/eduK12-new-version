@@ -99,13 +99,6 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
   }
   assertWindow(token)
   const { config, parsedConfig } = validateAssignment(token.assignment)
-  const sessionConfigSnapshotEncrypted = sessionService.createCognitiveSessionConfigSnapshot({
-    testType: config.testType,
-    configVersion: config.configVersion,
-    engineVersion: config.engineVersion,
-    scoringVersion: config.scoringVersion,
-    config: parsedConfig,
-  })
   const credential = createRecoveryCredential()
   const created = await prisma.$transaction(async (tx) => {
     const claimed = await tx.cognitiveAccessToken.updateMany({
@@ -113,6 +106,14 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
       data: { usedCount: { increment: 1 } },
     })
     if (claimed.count !== 1) throw CONFLICT('Public link reached its maximum uses')
+    const unifiedSnapshot = await sessionService.createUnifiedCognitiveSessionConfigSnapshot({
+      db: tx as any,
+      testType: config.testType,
+      configVersion: config.configVersion,
+      engineVersion: config.engineVersion,
+      scoringVersion: config.scoringVersion,
+      config: parsedConfig,
+    })
     return tx.cognitiveSession.create({
       data: {
         userId: null,
@@ -128,10 +129,12 @@ export const startPublicSession = async (tokenValue: string, recoveryToken?: str
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         configVersion: config.configVersion,
-        configSnapshotEncrypted: sessionConfigSnapshotEncrypted,
+        configSnapshotEncrypted: unifiedSnapshot.encrypted,
         engineVersion: config.engineVersion,
         scoringVersion: config.scoringVersion,
         randomSeed: randomBytes(16).toString('hex'),
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
       },
     })
   })
@@ -214,6 +217,15 @@ export const restartPublicSession = async (sessionId: string, recoveryToken: str
     })
     if (retired.count !== 1) throw CONFLICT('Session is no longer IN_PROGRESS')
 
+    const unifiedSnapshot = await sessionService.createUnifiedCognitiveSessionConfigSnapshot({
+      db: tx as any,
+      testType: validated.config.testType,
+      configVersion: validated.config.configVersion,
+      engineVersion: validated.config.engineVersion,
+      scoringVersion: validated.config.scoringVersion,
+      config: validated.parsedConfig,
+    })
+
     return tx.cognitiveSession.create({
       data: {
         userId: null,
@@ -229,10 +241,12 @@ export const restartPublicSession = async (sessionId: string, recoveryToken: str
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         configVersion: validated.config.configVersion,
-        configSnapshotEncrypted: validated.snapshotEncrypted,
+        configSnapshotEncrypted: unifiedSnapshot.encrypted,
         engineVersion: validated.config.engineVersion,
         scoringVersion: validated.config.scoringVersion,
         randomSeed: randomBytes(16).toString('hex'),
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
       },
     })
   })

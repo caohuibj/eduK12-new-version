@@ -17,7 +17,7 @@ import {
   withQuestionnaireSerializableTransaction,
   type QuestionnaireProgressSnapshot,
 } from '../services/questionnaireProgressService'
-import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
+import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord, scaleDefinitionFromRecord } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
@@ -43,6 +43,9 @@ import * as formSectionService from '../services/questionnaire-form-section.serv
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
+import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
+import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
 
@@ -2155,7 +2158,7 @@ export const questionnaireController = {
       // Every newly entered attempt uses the final-only unit model. Existing
       // rows are mapped by migration; this call only fills sections for form
       // items added after the migration.
-      await formSectionService.ensureQuestionnaireFormSections(id)
+      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(id)
 
       const questionnaire = {
         ...questionnaireMetadata,
@@ -2390,22 +2393,60 @@ export const questionnaireController = {
             userId: userId!,
             status: 'IN_PROGRESS',
             deliveryMode: 'FINAL_ONLY',
+            runtimeGeneration: 'UNIFIED_V1',
             attemptEpoch: 1,
             progress: 0,
           },
         })
 
+        const scaleRuntimeSnapshots = await Promise.all(questionnaire.questionnaireScales.map(async (qs: any) => {
+          if (qs.scale.status !== 'PUBLISHED') throw new Error('问卷中的量表已不再可用')
+          const definition = scaleDefinitionFromRecord(qs.scale)
+          return {
+            qs,
+            snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
+              instrumentKey: qs.scale.code,
+              instrumentVersion: qs.scale.instrumentVersion,
+              definition,
+            }),
+          }
+        }))
         await tx.assessment.createMany({
-          data: questionnaire.questionnaireScales.map(qs => ({
+          data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
             scaleId: qs.scaleId,
             userId: userId!,
             status: 'IN_PROGRESS',
             deliveryMode: 'FINAL_ONLY',
+            runtimeGeneration: 'UNIFIED_V1' as const,
+            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+            compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
             attemptEpoch: created.attemptEpoch,
             progress: 0,
             answers: encryptScaleAnswers([]),
             questionnaireAssessmentId: created.id,
           })),
+        })
+
+        const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
+          attemptEpoch: created.attemptEpoch,
+          scales: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+            questionnaireScaleId: qs.id,
+            code: qs.scale.code,
+            instrumentVersion: qs.scale.instrumentVersion,
+            sourceDefinitionHash: snapshot.sourceDefinitionHash,
+            compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+          })),
+          formSections: frozenFormSections.map((section) => ({
+            sectionId: section.id,
+            definitionHash: formSectionIdentityHash(section),
+          })),
+        })
+        await tx.questionnaireAssessment.update({
+          where: { id: created.id },
+          data: {
+            frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+            frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
+          },
         })
 
         await tx.questionnaireFormAnswer.createMany({
