@@ -685,10 +685,14 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     })
     expect(completed).toMatchObject({
       replayed: false,
-      parent: { status: 'IN_PROGRESS', progress: 100 },
+      // V32-1 persists terminal unit facts only. Parent progress/finalization
+      // is intentionally derived by the V32-2 aggregate runtime.
+      parent: { status: 'IN_PROGRESS', progress: 50 },
     })
     const completedState = await compositeService.getAttemptState(fixture.attemptId, { userId })
-    expect(completedState).toMatchObject({ status: 'IN_PROGRESS', progress: 100, completedItems: 2, totalItems: 2 })
+    // V32-1 does not mutate the parent progress cache from a child commit;
+    // V32-2 will derive this value from the terminal unit facts.
+    expect(completedState).toMatchObject({ status: 'IN_PROGRESS', progress: 0, completedItems: 2, totalItems: 2 })
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
   })
 })
