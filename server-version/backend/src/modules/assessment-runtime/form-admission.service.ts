@@ -2,13 +2,11 @@ import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
-  mapQuestionnaireSection,
-  type SectionRow,
-} from '../../services/questionnaire-form-section.service'
-import {
   mapCompositeSection,
+  mapQuestionnaireSection,
   type CompositeSection,
-} from '../composite/final-submit.service'
+  type SectionRow,
+} from './form-section-definition'
 import {
   createFrozenUnitAdmission,
   type FrozenFormAdmissionIdentityV1,

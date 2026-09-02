@@ -53,6 +53,26 @@ describe('Unified runtime architecture boundaries', () => {
     expect(source('services/questionnaire-form-section.service.ts')).toMatch(/finalizeQuestionnaireIfReady/)
     expect(source('modules/composite/composite.service.ts')).toMatch(/finalizeCompositeAttemptIfReady/)
     expect(source('modules/assessment-runtime/unified-aggregate-finalizer.service.ts')).toMatch(/probeUnifiedParent/)
+
+    const formAdmission = source('modules/assessment-runtime/form-admission.service.ts')
+    expect(formAdmission).not.toMatch(/questionnaire-form-section\.service/)
+    expect(formAdmission).not.toMatch(/composite\/final-submit\.service/)
+    expect(formAdmission).toMatch(/form-section-definition/)
+
+    const questionnaireSubmit = source('services/questionnaire-form-section.service.ts')
+    const questionnaireBody = questionnaireSubmit.slice(
+      questionnaireSubmit.indexOf('const submitQuestionnaireFormSectionFinal'),
+      questionnaireSubmit.indexOf('export const submitQuestionnaireFormSectionFinalForUser'),
+    )
+    expect(questionnaireBody.indexOf('submitUnifiedQuestionnaireFormSectionFinal')).toBeGreaterThan(-1)
+    expect(questionnaireBody.indexOf('submitUnifiedQuestionnaireFormSectionFinal'))
+      .toBeLessThan(questionnaireBody.indexOf('formSections:'))
+
+    const compositeSubmit = source('modules/composite/final-submit.service.ts')
+    const compositeBody = compositeSubmit.slice(compositeSubmit.indexOf('export const submitCompositeFormSectionFinal'))
+    expect(compositeBody.indexOf('submitUnifiedCompositeFormSectionFinal')).toBeGreaterThan(-1)
+    expect(compositeBody.indexOf('submitUnifiedCompositeFormSectionFinal'))
+      .toBeLessThan(compositeBody.indexOf('formSections:'))
   })
 
   it('keeps the unified raw submission boundary strict and encrypted', () => {

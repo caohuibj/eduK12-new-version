@@ -236,7 +236,7 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
     }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
-      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash, progress: 0 }
+      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
 
@@ -297,7 +297,7 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
     })
-    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, progress: 0 }
+    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
@@ -352,7 +352,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
-      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash, progress: 0 }
+      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
     await persistCompositeFormSection(tx, input.attemptId, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
@@ -404,7 +404,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
     })
-    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, progress: 0 }
+    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
