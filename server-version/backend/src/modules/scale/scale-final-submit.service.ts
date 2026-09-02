@@ -23,7 +23,7 @@ import {
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
-import type { UnifiedScaleAdmission } from './unified-final-submit.service'
+import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence } from './scale-admission.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 
 export type FinalScaleAnswerInput = {
@@ -224,6 +224,14 @@ const finalizeLinkedParent = async (assessment: any): Promise<void> => {
 
 export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
+    where: { id: input.assessmentId },
+    select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+  }))
+  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+  if (child.runtimeGeneration === 'UNIFIED_V1') {
+    return submitUnifiedScaleAssessmentFinal(input, child)
+  }
   const assessment = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
     include: {
@@ -267,9 +275,6 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
     },
   }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
-  if (assessment.runtimeGeneration === 'UNIFIED_V1') {
-    return submitUnifiedScaleAssessmentFinal(input, assessment as UnifiedScaleAdmission)
-  }
   assertPrincipal(assessment, input)
   assertFinalOnly(assessment.deliveryMode)
   assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
@@ -529,6 +534,7 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
           select: {
             id: true,
             code: true,
+            name: true,
             instrumentVersion: true,
             instrumentClass: true,
             definition: true,
@@ -570,6 +576,16 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
         runtimeGeneration: 'UNIFIED_V1',
         runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
         compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
+        ...standaloneAdmissionPersistence({
+          attemptEpoch: current.attemptEpoch + 1,
+          userId,
+          scale: {
+            id: current.scale.id,
+            code: current.scale.code,
+            name: current.scale.name,
+            instrumentVersion: current.scale.instrumentVersion,
+          },
+        }),
         attemptEpoch: current.attemptEpoch + 1,
         progress: 0,
         answers: encryptScaleAnswers([]),

@@ -522,6 +522,8 @@ model Assessment {
   result                    Json? // 加密的完整 ScaleResultV2
   runtimeSnapshotEncrypted  String?                @map("runtime_snapshot_encrypted")
   compiledRuntimeHash       String?                @map("compiled_runtime_hash")
+  frozenAdmissionSnapshotEncrypted String?         @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?         @map("frozen_admission_snapshot_hash")
   progress                  Int                    @default(0) // 进度百分比
   startedAt                 DateTime               @default(now()) @map("started_at")
   completedAt               DateTime?              @map("completed_at") // 完成时间

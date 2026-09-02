@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
   assertAttemptEpoch,
   assertCanonicalSubmissionPayloadSize,
@@ -16,6 +15,7 @@ import {
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
 import { buildScaleResult, type ScaleResultV2 } from './scale-result'
+import type { ReferenceContext } from '../assessment-reference/reference'
 import { encryptScaleAnswers, encryptScaleResult, scaleAssessmentForResponse } from './scale-workflow.service'
 import {
   decryptFrozenScaleRuntimeSnapshot,
@@ -28,9 +28,13 @@ import {
 } from '../assessment-runtime/unit-result'
 import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
 import { loadFrozenReferenceSets } from '../assessment-runtime/reference-binding'
-import { getFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey } from '../assessment-runtime/slot-set'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
+import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
+import {
+  activateScaleAdmission,
+  type ScaleAdmissionChildRow,
+} from './scale-admission.service'
 
 export type UnifiedScaleFinalSubmitInput = {
   assessmentId: string
@@ -50,80 +54,17 @@ export type UnifiedScaleFinalSubmitInput = {
   recoveryTokenHash?: string
 }
 
-export type UnifiedScaleAdmission = {
-  id: string
-  userId: string | null
-  status: string
-  deliveryMode: string
-  runtimeGeneration: 'UNIFIED_V1' | null
-  runtimeSnapshotEncrypted: string | null
-  compiledRuntimeHash: string | null
-  attemptEpoch: number
-  startedAt: Date
-  submissionId: string | null
-  submissionPayloadHash: string | null
-  questionnaireAssessmentId: string | null
-  compositeAttemptId: string | null
-  compositeItemId: string | null
-  scale: {
-    id: string
-    code: string
-    name: string
-    instrumentVersion: string
-  }
-  questionnaireAssessment?: {
-    id: string
-    userId: string | null
-    sessionId: string | null
-    resumeTokenHash: string | null
-    status: string
-    deliveryMode: string
-    attemptEpoch: number
-    contextSnapshotEncrypted: string | null
-    contextSnapshotHash: string | null
-    frozenActiveSlotSetEncrypted: string | null
-    frozenActiveSlotSetHash: string | null
-    questionnaire: {
-      questionnaireScales: Array<{ id: string; scaleId: string }>
-      formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
-    }
-  } | null
-  compositeAttempt?: {
-    id: string
-    userId: string | null
-    recoveryTokenHash: string | null
-    status: string
-    deliveryMode: string
-    attemptEpoch: number
-    contextSnapshotEncrypted: string | null
-    contextSnapshotHash: string | null
-    frozenActiveSlotSetEncrypted: string | null
-    frozenActiveSlotSetHash: string | null
-    compositeAssessment: {
-      formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
-    }
-  } | null
-}
+export type UnifiedScaleAdmission = ScaleAdmissionChildRow
 
-const hasContextSection = (parent: UnifiedScaleAdmission['questionnaireAssessment'] | UnifiedScaleAdmission['compositeAttempt']): boolean => Boolean(
-  parent && ('questionnaire' in parent
-    ? parent.questionnaire.formSections.some((section: { contextSection: boolean; items: Array<{ contextKey: string | null }> }) => (
-        Boolean(section.contextSection) || section.items.some((item: { contextKey: string | null }) => Boolean(item.contextKey))
-      ))
-    : parent.compositeAssessment.formSections.some((section: { contextSection: boolean; items: Array<{ contextKey: string | null }> }) => (
-        Boolean(section.contextSection) || section.items.some((item: { contextKey: string | null }) => Boolean(item.contextKey))
-      ))),
-)
-
-const assertPrincipal = (assessment: UnifiedScaleAdmission, input: UnifiedScaleFinalSubmitInput): void => {
-  if (input.userId && assessment.userId === input.userId) return
-  if (input.questionnaireSessionId && assessment.questionnaireAssessment?.sessionId === input.questionnaireSessionId) {
-    if (input.userId && assessment.questionnaireAssessment.userId === input.userId) return
-    if (!input.userId && input.recoveryTokenHash && assessment.questionnaireAssessment.resumeTokenHash === input.recoveryTokenHash) return
+const assertPrincipal = (child: ScaleAdmissionChildRow, admission: FrozenUnitAdmissionV1, input: UnifiedScaleFinalSubmitInput): void => {
+  if (input.userId && (child.userId === input.userId || admission.principal.userId === input.userId)) return
+  if (input.questionnaireSessionId && admission.principal.questionnaireSessionId === input.questionnaireSessionId) {
+    if (input.userId && admission.principal.userId === input.userId) return
+    if (!input.userId && input.recoveryTokenHash && admission.principal.recoveryTokenHash === input.recoveryTokenHash) return
   }
-  if (input.compositeAttemptId && assessment.compositeAttemptId === input.compositeAttemptId) {
-    if (!input.userId && input.recoveryTokenHash && assessment.compositeAttempt?.recoveryTokenHash === input.recoveryTokenHash) return
-    if (input.userId && assessment.compositeAttempt?.userId === input.userId) return
+  if (input.compositeAttemptId && child.compositeAttemptId === input.compositeAttemptId) {
+    if (!input.userId && input.recoveryTokenHash && admission.principal.recoveryTokenHash === input.recoveryTokenHash) return
+    if (input.userId && (child.userId === input.userId || admission.principal.userId === input.userId)) return
   }
   throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此量表测评', 403)
 }
@@ -157,84 +98,71 @@ const normalizeAnswers = (
   })
 }
 
-const contextFor = (assessment: UnifiedScaleAdmission) => {
-  if (assessment.questionnaireAssessment) return readQuestionnaireAssessmentContext(assessment.questionnaireAssessment)
-  if (assessment.compositeAttempt) return readCompositeAttemptContext(assessment.compositeAttempt)
-  return { context: null, hash: null, decryptError: false }
-}
-
-const assertAdmission = (assessment: UnifiedScaleAdmission, input: UnifiedScaleFinalSubmitInput): void => {
-  if (assessment.runtimeGeneration !== 'UNIFIED_V1' || !assessment.runtimeSnapshotEncrypted) {
+const assertFrozenAdmission = (
+  child: ScaleAdmissionChildRow,
+  admission: FrozenUnitAdmissionV1,
+  input: UnifiedScaleFinalSubmitInput,
+): void => {
+  if (child.runtimeGeneration !== 'UNIFIED_V1' || !child.runtimeSnapshotEncrypted) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时快照缺失，请重启后重新作答', 409)
   }
-  assertPrincipal(assessment, input)
-  assertFinalOnly(assessment.deliveryMode)
-  assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
-  assertFinalSubmitStatus(assessment.status, '量表测评')
-  const parent = assessment.questionnaireAssessment ?? assessment.compositeAttempt
-  if (parent) {
-    assertFinalOnly(parent.deliveryMode)
-    assertFinalSubmitStatus(parent.status, '上级测评')
-    assertAttemptEpoch(parent.attemptEpoch, input.attemptEpoch)
-    if (parent.status === 'COMPLETED' && assessment.status !== 'COMPLETED') {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
-    }
+  if (admission.attemptEpoch !== child.attemptEpoch) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照与当前作答轮次不匹配', 409)
   }
-  const contextHash = parent?.contextSnapshotHash ?? null
-  if (hasContextSection(parent) && contextHash === null) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+  if (
+    admission.scale.id !== child.scale.id
+    || admission.scale.code !== child.scale.code
+    || admission.scale.instrumentVersion !== child.scale.instrumentVersion
+  ) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照身份不匹配', 409)
   }
-  if ((input.contextSnapshotHash ?? null) !== contextHash) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文版本已变化，请重试', 409)
-  }
-  assertParentSlotBinding(assessment)
-}
-
-const slotKeyFor = (assessment: UnifiedScaleAdmission): string | null => {
-  if (assessment.questionnaireAssessmentId) {
-    const binding = assessment.questionnaireAssessment?.questionnaire.questionnaireScales.find((item) => item.scaleId === assessment.scale.id)
-    return binding ? questionnaireScaleSlotKey(binding.id) : null
-  }
-  if (assessment.compositeAttemptId && assessment.compositeItemId) return compositeItemSlotKey(assessment.compositeItemId, 'SCALE')
-  return null
-}
-
-const assertParentSlotBinding = (assessment: UnifiedScaleAdmission): ReturnType<typeof getFrozenActiveSlot> | null => {
-  const parent = assessment.questionnaireAssessment ?? assessment.compositeAttempt
-  if (!parent) return null
-  const slotKey = slotKeyFor(assessment)
-  if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
-  let slot
-  try {
-    slot = getFrozenActiveSlot({
-      encrypted: parent.frozenActiveSlotSetEncrypted,
-      storedHash: parent.frozenActiveSlotSetHash,
-      attemptEpoch: assessment.attemptEpoch,
-      slotKey,
-    })
-  } catch (error) {
+  if (admission.governance.status === 'HOLD') {
     throw new InstrumentFinalSubmitError(
-      'DEFINITION_MISMATCH',
-      error instanceof Error ? error.message : '量表冻结单元不可用',
+      'STALE_ATTEMPT',
+      admission.governance.holdReason ?? '量表准入处于 HOLD，无法提交',
       409,
     )
   }
-  if (
-    slot.unitType !== 'SCALE'
-    || !slot.required
-    || slot.sourceDefinitionIdentity.key !== assessment.scale.code
-    || slot.sourceDefinitionIdentity.version !== assessment.scale.instrumentVersion
-  ) {
-    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元身份不匹配', 409)
+  assertPrincipal(child, admission, input)
+  assertFinalOnly(child.deliveryMode)
+  assertAttemptEpoch(child.attemptEpoch, input.attemptEpoch)
+  assertFinalSubmitStatus(child.status, '量表测评')
+  if ((child.questionnaireAssessmentId || child.compositeAttemptId) && !admission.parent) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
   }
-  return slot
+  if ((input.contextSnapshotHash ?? null) !== (admission.contextSnapshotHash ?? null)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文版本已变化，请重试', 409)
+  }
+}
+
+const assertRuntimeAgainstAdmission = (
+  child: ScaleAdmissionChildRow,
+  admission: FrozenUnitAdmissionV1,
+  snapshot: FrozenScaleRuntimeSnapshotV1,
+  input: UnifiedScaleFinalSubmitInput,
+): void => {
+  if (snapshot.instrumentKey !== child.scale.code || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表运行时身份不匹配', 409)
+  }
+  if (child.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表编译运行时不匹配', 409)
+  }
+  if (admission.parent) {
+    if (
+      admission.parent.sourceDefinitionHash !== snapshot.sourceDefinitionHash
+      || admission.parent.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash
+    ) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时不匹配', 409)
+    }
+  }
+  assertDefinitionHash(snapshot.legacyDefinitionHash, input.definitionHash)
 }
 
 const buildResult = async (
-  assessment: UnifiedScaleAdmission,
+  child: ScaleAdmissionChildRow,
   snapshot: FrozenScaleRuntimeSnapshotV1,
   answers: ScaleAnswer[],
-  context: ReturnType<typeof contextFor>,
+  admission: FrozenUnitAdmissionV1,
 ): Promise<ScaleResultV2> => {
   let references: Awaited<ReturnType<typeof loadFrozenReferenceSets>> = []
   if (snapshot.referenceBindings.length > 0) {
@@ -245,44 +173,48 @@ const buildResult = async (
     }))
   }
   return buildScaleResult({
-    scaleId: assessment.scale.id,
-    instrumentKey: assessment.scale.code,
-    name: assessment.scale.name,
-    instrumentVersion: assessment.scale.instrumentVersion,
+    scaleId: child.scale.id,
+    instrumentKey: child.scale.code,
+    name: child.scale.name,
+    instrumentVersion: child.scale.instrumentVersion,
     definition: snapshot.definition,
     answers,
     referenceSets: references,
-    participantContext: context.context?.values,
-    participantContextHash: context.hash,
+    participantContext: admission.contextValues ? admission.contextValues as ReferenceContext : undefined,
+    participantContextHash: admission.contextSnapshotHash,
   })
 }
 
+const txAdmissionSelect = {
+  id: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  compiledRuntimeHash: true,
+  attemptEpoch: true,
+  startedAt: true,
+  submissionId: true,
+  submissionPayloadHash: true,
+  questionnaireAssessmentId: true,
+  compositeAttemptId: true,
+  frozenAdmissionSnapshotHash: true,
+  answers: true,
+  result: true,
+  progress: true,
+  completedAt: true,
+  totalTime: true,
+} as const
+
 export const submitUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput,
-  admission: UnifiedScaleAdmission,
+  child: ScaleAdmissionChildRow,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  assertAdmission(admission, input)
+  const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child))
+  assertFrozenAdmission(child, admission, input)
   const snapshot = measureRequestPhaseSync('final_submit_definition_prepare', () => {
-    const parsed = decryptFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted as string)
-    if (parsed.instrumentKey !== admission.scale.code || parsed.instrumentVersion !== admission.scale.instrumentVersion) {
-      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表运行时身份不匹配', 409)
-    }
-    if (admission.compiledRuntimeHash !== parsed.compiledRuntime.compiledRuntimeHash) {
-      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表编译运行时不匹配', 409)
-    }
-    const slot = assertParentSlotBinding(admission)
-    const slotCompiledRuntimeHash = slot?.sourceBinding.compiledRuntimeHash
-    if (
-      slot
-      && (
-        slot.sourceDefinitionIdentity.hash !== parsed.sourceDefinitionHash
-        || (slotCompiledRuntimeHash !== undefined && slotCompiledRuntimeHash !== parsed.compiledRuntime.compiledRuntimeHash)
-      )
-    ) {
-      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时不匹配', 409)
-    }
-    assertDefinitionHash(parsed.legacyDefinitionHash, input.definitionHash)
+    const parsed = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted as string)
+    assertRuntimeAgainstAdmission(child, admission, parsed, input)
     return parsed
   })
   const answers = measureRequestPhaseSync('final_submit_payload_validation', () => normalizeAnswers(snapshot.definition, input.answers))
@@ -295,28 +227,26 @@ export const submitUnifiedScaleAssessmentFinal = async (
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.scale, '量表提交数据')
   const payloadHash = canonical.hash
 
-  if (admission.status === 'COMPLETED') {
-    const replay = assertSubmissionReplay(admission, submissionId, payloadHash)
+  if (child.status === 'COMPLETED') {
+    const replay = assertSubmissionReplay(child, submissionId, payloadHash)
     if (replay === 'replay') {
       return {
         submissionId,
         payloadHash,
         replayed: true,
-        assessment: scaleAssessmentForResponse(admission),
+        assessment: scaleAssessmentForResponse(child),
         parent: null,
       }
     }
   }
 
-  const context = measureRequestPhaseSync('final_submit_context_read', () => contextFor(admission))
-  if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-  const result = await measureRequestPhase('final_submit_scoring', () => buildResult(admission, snapshot, answers, context))
+  const result = await measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission))
   const unitResult = snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible
-    && Boolean(admission.questionnaireAssessmentId || admission.compositeAttemptId)
+    && Boolean(child.questionnaireAssessmentId || child.compositeAttemptId)
     ? projectScaleCanonicalUnitResult({
         result,
         runtime: snapshot.compiledRuntime,
-        contextHash: context.hash,
+        contextHash: admission.contextSnapshotHash,
         referenceBindings: snapshot.referenceBindings,
       })
     : null
@@ -330,7 +260,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
           completedAt,
           persistenceProvenance: {
             sourceType: 'ASSESSMENT',
-            sourceAttemptId: admission.id,
+            sourceAttemptId: child.id,
             sourceSubmissionId: submissionId,
           },
         }))
@@ -340,7 +270,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
-      include: { scale: { select: { id: true, code: true, name: true, instrumentVersion: true } } },
+      select: txAdmissionSelect,
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
@@ -349,9 +279,12 @@ export const submitUnifiedScaleAssessmentFinal = async (
     if (current.runtimeGeneration !== 'UNIFIED_V1' || current.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时身份已变化，请重启后重试', 409)
     }
+    if (current.frozenAdmissionSnapshotHash && current.frozenAdmissionSnapshotHash !== admission.snapshotHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照已变化，请重试', 409)
+    }
     const replay = assertSubmissionReplay(current, submissionId, payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
-      return { replayed: true, assessment: scaleAssessmentForResponse(current), parent: null }
+      return { replayed: true, assessment: scaleAssessmentForResponse({ ...current, scale: child.scale }), parent: null }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
@@ -384,11 +317,13 @@ export const submitUnifiedScaleAssessmentFinal = async (
       },
     })
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
+    const slotKey = admission.parent?.slotKey
     if (encrypted.canonicalResult && current.questionnaireAssessmentId) {
+      if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
         questionnaireAssessmentId: current.questionnaireAssessmentId,
         attemptEpoch: input.attemptEpoch,
-        slotKey: slotKeyFor(admission) as string,
+        slotKey,
         unitType: 'SCALE',
         payloadKind: 'UNIT_RESULT',
         sourceType: 'ASSESSMENT',
@@ -400,10 +335,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
         completedAt,
       })
     } else if (encrypted.canonicalResult && current.compositeAttemptId) {
+      if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
         compositeAttemptId: current.compositeAttemptId,
         attemptEpoch: input.attemptEpoch,
-        slotKey: slotKeyFor(admission) as string,
+        slotKey,
         unitType: 'SCALE',
         payloadKind: 'UNIT_RESULT',
         sourceType: 'ASSESSMENT',
@@ -419,6 +355,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
       replayed: false,
       assessment: scaleAssessmentForResponse({
         ...current,
+        scale: child.scale,
         status: 'COMPLETED',
         answers,
         result,
@@ -432,15 +369,15 @@ export const submitUnifiedScaleAssessmentFinal = async (
       parent: null,
     }
   })
-  const parent = admission.questionnaireAssessmentId
+  const parent = child.questionnaireAssessmentId
     ? await measureRequestPhase('final_submit_parent_finalization', async () => {
         const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
-        return finalizeQuestionnaireAttemptIfReady(admission.questionnaireAssessmentId as string)
+        return finalizeQuestionnaireAttemptIfReady(child.questionnaireAssessmentId as string)
       })
-    : admission.compositeAttemptId
+    : child.compositeAttemptId
       ? await measureRequestPhase('final_submit_parent_finalization', async () => {
           const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-          return finalizeCompositeAttemptIfReady(admission.compositeAttemptId as string)
+          return finalizeCompositeAttemptIfReady(child.compositeAttemptId as string)
         })
       : null
   return { submissionId, payloadHash, ...committed, parent }
