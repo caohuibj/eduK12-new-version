@@ -56,7 +56,7 @@ import {
 } from '../services/questionnaireCompletionAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
-import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import { z } from 'zod'
 
@@ -254,8 +254,9 @@ export const publicQuestionnaireController = {
       const questionnaireId = validation.questionnaire!.id
       const tokenId = validation.token!.id
 
-      // Ensure newly-created form items are represented by a section before
-      // creating or resuming a final-only attempt.
+      // V32-1 provides the unified unit primitives, but parent activation is
+      // deliberately held until V32-2 also owns parent finalization. Keep the
+      // existing FINAL_ONLY parent/child protocol functional at this boundary.
       await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
@@ -549,7 +550,9 @@ export const publicQuestionnaireController = {
         const startContent = await measureRequestPhase('definition_lookup', () => (
           cacheService.getQuestionnaireStartContent(questionnaireId)
         ))
-
+        if (startContent.questionnaireScales.some((qs) => qs.scale.status !== 'PUBLISHED')) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
+        }
         // 名额占用、问卷记录、量表子记录和恢复凭据必须是同一事务。
         // 任一步失败都回滚名额，避免出现“已占用但没有测评记录”的孤儿状态。
         const transactionRequestedAt = process.hrtime.bigint()
@@ -719,6 +722,7 @@ export const publicQuestionnaireController = {
       }
     } catch (err) {
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('开始匿名测评错误', err)
       return error(res, '开始测评失败')
     }

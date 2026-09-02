@@ -47,8 +47,9 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
 import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
+import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
-type SectionItem = {
+export type SectionItem = {
   id: string
   type: string
   label: string
@@ -60,7 +61,7 @@ type SectionItem = {
   sectionPosition: number | null
 }
 
-type SectionRow = {
+export type SectionRow = {
   id: string
   title: string
   description: string | null
@@ -69,7 +70,7 @@ type SectionRow = {
   items: SectionItem[]
 }
 
-type SectionSubmitInput = {
+export type SectionSubmitInput = {
   questionnaireAssessmentId: string
   sectionId: string
   submissionId: string
@@ -105,7 +106,7 @@ export const questionnaireFormSectionDefinitionHash = (section: SectionRow): str
   })),
 })
 
-const mapSection = (section: any): SectionRow => {
+export const mapQuestionnaireSection = (section: any): SectionRow => {
   const items = orderedSectionItems((section.items ?? []).map((item: any) => ({
     id: item.id,
     type: item.type,
@@ -208,7 +209,7 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
     orderBy: { position: 'asc' },
     include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
   })
-  return sections.map(mapSection)
+  return sections.map(mapQuestionnaireSection)
 }
 
 const finalQuestionnaireUnits = (questionnaire: any) => [
@@ -301,7 +302,7 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   const current = currentIndex >= 0 ? units[currentIndex] : null
 
   const sectionResponse = (section: any) => {
-    const definition = mapSection(section)
+    const definition = mapQuestionnaireSection(section)
     const sectionAttempt = sectionAttemptMap.get(section.id)
     return {
       id: section.id,
@@ -309,7 +310,9 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       description: section.description ?? null,
       position: section.position,
       contextSection: definition.contextSection,
-      definitionHash: questionnaireFormSectionDefinitionHash(definition),
+      definitionHash: assessment.runtimeGeneration === 'UNIFIED_V1'
+        ? formSectionIdentityHash(definition)
+        : questionnaireFormSectionDefinitionHash(definition),
       status: sectionAttempt?.status ?? 'IN_PROGRESS',
       submittedAt: sectionAttempt?.submittedAt ?? null,
       items: definition.items.map((item) => ({
@@ -663,9 +666,24 @@ export const restartQuestionnaireAssessment = async (
         questionnaire: {
           select: {
             id: true,
-            questionnaireScales: { select: { scaleId: true } },
+            questionnaireScales: {
+              select: {
+                id: true,
+                scaleId: true,
+                scale: {
+                  select: {
+                    id: true,
+                    code: true,
+                    status: true,
+                    instrumentClass: true,
+                    instrumentVersion: true,
+                    definition: true,
+                  },
+                },
+              },
+            },
             formItems: { select: { id: true } },
-            formSections: { select: { id: true } },
+            formSections: { select: { id: true, title: true, description: true, position: true, contextSection: true, items: true } },
           },
         },
         token: { select: { expiresAt: true, isActive: true } },
@@ -693,6 +711,7 @@ export const restartQuestionnaireAssessment = async (
       where: { id: current.id },
       data: { status: 'ABANDONED', completedAt: retiredAt },
     })
+    const nextAttemptEpoch = current.attemptEpoch + 1
     const next = await tx.questionnaireAssessment.create({
       data: {
         questionnaireId: current.questionnaireId,
@@ -701,14 +720,14 @@ export const restartQuestionnaireAssessment = async (
         sessionId: newSessionId,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
-        attemptEpoch: current.attemptEpoch + 1,
+        attemptEpoch: nextAttemptEpoch,
         progress: 0,
       },
     })
     if (current.questionnaire.questionnaireScales.length > 0) {
       await tx.assessment.createMany({
-        data: current.questionnaire.questionnaireScales.map((scale) => ({
-          scaleId: scale.scaleId,
+        data: current.questionnaire.questionnaireScales.map((entry: any) => ({
+          scaleId: entry.scaleId,
           userId: isPublic ? null : context.userId,
           status: 'IN_PROGRESS' as const,
           deliveryMode: 'FINAL_ONLY' as const,
@@ -787,7 +806,8 @@ export const createQuestionnaireFormSection = async (
     },
     include: { items: true },
   })
-  return { ...mapSection(section), definitionHash: questionnaireFormSectionDefinitionHash(mapSection(section)) }
+  const mapped = mapQuestionnaireSection(section)
+  return { ...mapped, definitionHash: questionnaireFormSectionDefinitionHash(mapped) }
 }
 
 export const updateQuestionnaireFormSection = async (
@@ -820,7 +840,7 @@ export const updateQuestionnaireFormSection = async (
     },
     include: { items: true },
   })
-  const mapped = mapSection(updated)
+  const mapped = mapQuestionnaireSection(updated)
   return { ...mapped, definitionHash: questionnaireFormSectionDefinitionHash(mapped) }
 }
 
@@ -914,7 +934,7 @@ const lockQuestionnaireFormSectionAttempt = async (tx: Prisma.TransactionClient,
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
 }
 
-const normalizeSectionAnswers = (section: SectionRow, values: SectionSubmitInput['answers']) => {
+export const normalizeQuestionnaireSectionAnswers = (section: SectionRow, values: SectionSubmitInput['answers']) => {
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   const provided = new Map<string, string | string[] | null>()
   for (const answer of values) {
@@ -950,7 +970,7 @@ const normalizeSectionAnswers = (section: SectionRow, values: SectionSubmitInput
 const contextSnapshotForSection = (
   assessmentId: string,
   section: SectionRow,
-  normalized: ReturnType<typeof normalizeSectionAnswers>['normalized'],
+  normalized: ReturnType<typeof normalizeQuestionnaireSectionAnswers>['normalized'],
 ): { id: string; contextSnapshotEncrypted: string | null; contextSnapshotHash: string | null; questionnaire: { formItems: Array<unknown> }; formAnswers: Array<unknown> } => {
   const contextItems = section.items.filter((item) => item.contextKey)
   const contextAnswers = normalized
@@ -1311,11 +1331,14 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
       sessionId: true,
       status: true,
       deliveryMode: true,
+      runtimeGeneration: true,
       attemptEpoch: true,
       completedScales: true,
       completedForms: true,
       contextSnapshotEncrypted: true,
       contextSnapshotHash: true,
+      frozenActiveSlotSetEncrypted: true,
+      frozenActiveSlotSetHash: true,
       resumeTokenHash: true,
       formSectionAttempts: {
         where: { sectionId: input.sectionId },
@@ -1330,6 +1353,10 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
     },
   }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  if (assessment.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedQuestionnaireFormSectionFinal } = await import('../modules/assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedQuestionnaireFormSectionFinal(input, assessment)
+  }
   if (input.userId !== null && input.userId !== undefined) {
     if (assessment.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此问卷测评', 403)
   } else if (!input.sessionId || assessment.sessionId !== input.sessionId || assessment.userId !== null || !input.resumeTokenHash || assessment.resumeTokenHash !== input.resumeTokenHash) {
@@ -1348,7 +1375,7 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
   }
   const section = assessment.questionnaire.formSections.find((candidate) => candidate.id === input.sectionId)
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
-  const mappedSection = mapSection(section)
+  const mappedSection = mapQuestionnaireSection(section)
   const actualDefinitionHash = measureRequestPhaseSync(
     'final_submit_definition_prepare',
     () => questionnaireFormSectionDefinitionHash(mappedSection),
@@ -1366,7 +1393,7 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
   }
   const normalizedResult = measureRequestPhaseSync(
     'final_submit_payload_validation',
-    () => normalizeSectionAnswers(mappedSection, input.answers),
+    () => normalizeQuestionnaireSectionAnswers(mappedSection, input.answers),
   )
   const canonical = measureRequestPhaseSync('final_submit_non_db_compute', () => (
     measureRequestPhaseSync('final_submit_serialization', () => (

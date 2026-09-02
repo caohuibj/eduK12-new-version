@@ -96,6 +96,9 @@ import {
   projectCompositeCollectionReport,
   projectCompositeReport,
 } from './composite-report.projector'
+import {
+  formSectionIdentityHash,
+} from '../assessment-runtime/attempt-runtime'
 import type {
   CompositeReportAudience,
   CompositeSnapshotMetadata,
@@ -1318,6 +1321,30 @@ const canonicalCompositeContentUnitType = (type: CompositeContentUnitInput['type
 const compositeSectionHasContext = (section: any) => (
   Boolean(section.contextSection) || Boolean(section.items?.some((item: any) => item.contextKey))
 )
+
+const compositeFormSectionRuntimeDefinition = (section: any) => {
+  const items = [...(section.items ?? [])]
+    .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
+    .map((item: any) => ({
+      id: item.id,
+      formType: item.formType,
+      formLabel: item.formLabel,
+      placeholder: item.formPlaceholder ?? null,
+      required: item.required !== false,
+      formOptions: item.formOptions,
+      contextKey: item.contextKey ?? null,
+      position: item.position,
+      formSectionPosition: item.formSectionPosition ?? null,
+    }))
+  return {
+    id: section.id,
+    title: section.title,
+    description: section.description ?? null,
+    position: section.position,
+    contextSection: compositeSectionHasContext(section),
+    items,
+  }
+}
 
 const assertCompositeContentUnitOrder = (units: Array<{ type: string; id: string }>, sections: any[]) => {
   const contextSections = sections.filter(compositeSectionHasContext)
@@ -2891,24 +2918,26 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       title: section.title,
       description: section.description ?? null,
       contextSection: compositeSectionHasContext(section),
-      definitionHash: computeSubmissionPayloadHash({
-        sectionId: section.id,
-        title: section.title,
-        description: section.description ?? null,
-        position: section.position,
-        contextSection: compositeSectionHasContext(section),
-        items: section.items.map((item: any) => ({
-          id: item.id,
-          formType: item.formType,
-          formLabel: item.formLabel,
-          placeholder: item.formPlaceholder ?? null,
-          required: item.required !== false,
-          formOptions: item.formOptions,
-          contextKey: item.contextKey ?? null,
-          position: item.position,
-          formSectionPosition: item.formSectionPosition ?? null,
-        })),
-      }),
+      definitionHash: finalOnly && attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section))
+        : computeSubmissionPayloadHash({
+            sectionId: section.id,
+            title: section.title,
+            description: section.description ?? null,
+            position: section.position,
+            contextSection: compositeSectionHasContext(section),
+            items: section.items.map((item: any) => ({
+              id: item.id,
+              formType: item.formType,
+              formLabel: item.formLabel,
+              placeholder: item.formPlaceholder ?? null,
+              required: item.required !== false,
+              formOptions: item.formOptions,
+              contextKey: item.contextKey ?? null,
+              position: item.position,
+              formSectionPosition: item.formSectionPosition ?? null,
+            })),
+          }),
       status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
       answers: sectionAnswers,
     }
@@ -2991,14 +3020,16 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       description: section.description ?? null,
       position: section.position,
       contextSection: compositeSectionHasContext(section),
-      definitionHash: computeSubmissionPayloadHash({
-        sectionId: section.id,
-        title: section.title,
-        description: section.description ?? null,
-        position: section.position,
-        contextSection: compositeSectionHasContext(section),
-        items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
-      }),
+      definitionHash: finalOnly && attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section))
+        : computeSubmissionPayloadHash({
+            sectionId: section.id,
+            title: section.title,
+            description: section.description ?? null,
+            position: section.position,
+            contextSection: compositeSectionHasContext(section),
+            items: section.items.map((item: any) => ({ id: item.id, formType: item.formType, formLabel: item.formLabel, placeholder: item.formPlaceholder ?? null, required: item.required !== false, formOptions: item.formOptions, contextKey: item.contextKey ?? null, position: item.position, formSectionPosition: item.formSectionPosition ?? null })),
+          }),
       status: sectionMap.get(section.id)?.status ?? 'IN_PROGRESS',
       submittedAt: sectionMap.get(section.id)?.submittedAt ?? null,
       items: section.items.map((item: any) => ({

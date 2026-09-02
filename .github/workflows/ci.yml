@@ -2,7 +2,7 @@
 #
 # 触发：
 #   push feature/* / main
-#   pull_request → main
+#   pull_request → main / stacked feature branches
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
@@ -26,6 +26,7 @@ on:
   pull_request:
     branches:
       - main
+      - 'refactor/unified-runtime-v32-unit'
   workflow_dispatch:
 
 jobs:
@@ -40,6 +41,7 @@ jobs:
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
@@ -115,6 +117,7 @@ jobs:
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
           src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+          src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts
           src/__tests__/classroom/classroom-start.postgres.integration.test.ts
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts

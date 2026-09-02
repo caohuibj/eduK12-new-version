@@ -393,6 +393,29 @@ enum InstrumentDeliveryMode {
   FINAL_ONLY
 }
 
+enum RuntimeGeneration {
+  LEGACY
+  UNIFIED_V1
+}
+
+enum AssessmentUnitType {
+  SCALE
+  COGNITIVE
+  FORM_SECTION
+}
+
+enum AssessmentUnitTerminalState {
+  COMPLETED
+  SKIPPED
+  NOT_APPLICABLE
+}
+
+enum AssessmentUnitPayloadKind {
+  UNIT_RESULT
+  COLLECTION_FACTS
+  NONE
+}
+
 enum QuestionnaireFormAnswerStatus {
   PENDING
   ANSWERED
@@ -489,6 +512,7 @@ model Assessment {
   userId                    String?                @map("user_id") // 改为可选，支持匿名测评
   status                    AssessmentStatus       @default(IN_PROGRESS)
   deliveryMode              InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration         RuntimeGeneration?     @map("runtime_generation")
   attemptEpoch              Int                    @default(1) @map("attempt_epoch")
   submissionId              String?                @unique @map("submission_id")
   submissionPayloadHash     String?                @map("submission_payload_hash")
@@ -496,6 +520,8 @@ model Assessment {
   answers                   Json? // 答案数组（加密存储）
   answersRevision           Int                    @default(0) @map("answers_revision") // 量表答案 OCC 版本
   result                    Json? // 加密的完整 ScaleResultV2
+  runtimeSnapshotEncrypted  String?                @map("runtime_snapshot_encrypted")
+  compiledRuntimeHash       String?                @map("compiled_runtime_hash")
   progress                  Int                    @default(0) // 进度百分比
   startedAt                 DateTime               @default(now()) @map("started_at")
   completedAt               DateTime?              @map("completed_at") // 完成时间
@@ -642,6 +668,7 @@ model QuestionnaireAssessment {
   resumeTokenExpiresAt     DateTime?              @map("resume_token_expires_at")
   status                   AssessmentStatus       @default(IN_PROGRESS)
   deliveryMode             InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration        RuntimeGeneration?     @map("runtime_generation")
   attemptEpoch             Int                    @default(1) @map("attempt_epoch")
   progress                 Int                    @default(0) // 总体进度
   completedScales          Int                    @default(0) @map("completed_scales") // 已完成量表数量（缓存）
@@ -654,6 +681,8 @@ model QuestionnaireAssessment {
   contextSnapshotEncrypted String?                @map("context_snapshot_encrypted")
   contextSnapshotHash      String?                @map("context_snapshot_hash")
   contextFrozenAt          DateTime?              @map("context_frozen_at")
+  frozenActiveSlotSetEncrypted String?             @map("frozen_active_slot_set_encrypted")
+  frozenActiveSlotSetHash      String?             @map("frozen_active_slot_set_hash")
 
   // 关联
   questionnaire       Questionnaire                     @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
@@ -662,6 +691,7 @@ model QuestionnaireAssessment {
   scaleAssessments    Assessment[]
   formAnswers         QuestionnaireFormAnswer[] // 新增：表单答案关联
   formSectionAttempts QuestionnaireFormSectionAttempt[]
+  unitSnapshots       AssessmentUnitSnapshot[] @relation("QuestionnaireAssessmentUnitSnapshots")
 
   // 性能优化索引
   @@index([userId, status])
@@ -952,6 +982,7 @@ model CompositeAssessmentAttempt {
   attemptNo                Int                              @default(1) @map("attempt_no")
   status                   CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
   deliveryMode             InstrumentDeliveryMode           @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration        RuntimeGeneration?               @map("runtime_generation")
   attemptEpoch             Int                              @default(1) @map("attempt_epoch")
   progress                 Int                              @default(0)
   completedItems           Int                              @default(0) @map("completed_items")
@@ -962,6 +993,8 @@ model CompositeAssessmentAttempt {
   contextSnapshotEncrypted String?                          @map("context_snapshot_encrypted")
   contextSnapshotHash      String?                          @map("context_snapshot_hash")
   contextFrozenAt          DateTime?                        @map("context_frozen_at")
+  frozenActiveSlotSetEncrypted String?                       @map("frozen_active_slot_set_encrypted")
+  frozenActiveSlotSetHash      String?                       @map("frozen_active_slot_set_hash")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
@@ -971,6 +1004,7 @@ model CompositeAssessmentAttempt {
   formAnswers         CompositeFormAnswer[]
   formSectionAttempts CompositeFormSectionAttempt[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
+  unitSnapshots       AssessmentUnitSnapshot[] @relation("CompositeAssessmentUnitSnapshots")
 
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@index([compositeAssessmentId, status])
@@ -1399,6 +1433,8 @@ model CognitiveSession {
   randomSeed                   String                 @map("random_seed")
   completionKey                String?                @map("completion_key")
   deliveryMode                 InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration            RuntimeGeneration?      @map("runtime_generation")
+  compiledRuntimeHash          String?                @map("compiled_runtime_hash")
   submissionId                 String?                @unique @map("submission_id")
   submissionPayloadHash        String?                @map("submission_payload_hash")
   submittedAt                  DateTime?              @map("submitted_at")
@@ -1412,6 +1448,7 @@ model CognitiveSession {
   compositeItem    CompositeAssessmentItem?    @relation("CompositeCognitiveSessions", fields: [compositeItemId], references: [id], onDelete: Restrict)
   accessToken      CognitiveAccessToken?       @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
   trials           CognitiveTrial[]
+  rawSubmissions   CognitiveRawSubmission[]
 
   // 同一分发下，按稳定匿名标识 participantKey + 尝试次数保证唯一；
   // assignmentId 为 NULL 的内部直测会话依赖应用层保证（见 v1.2 P0-4）。
@@ -1467,4 +1504,58 @@ model CognitiveTrial {
   @@unique([sessionId, trialIndex])
   @@index([sessionId])
   @@map("cognitive_trials")
+}
+
+// Unified Cognitive final submissions persist the normalized trial sequence as
+// one strict encrypted payload. Legacy CognitiveTrial rows remain readable for
+// historical and legacy-generation sessions.
+model CognitiveRawSubmission {
+  id                   String   @id @default(uuid())
+  sessionId            String   @map("session_id")
+  attemptEpoch         Int      @map("attempt_epoch")
+  trialCount           Int      @map("trial_count")
+  payloadEncrypted     String   @map("payload_encrypted")
+  payloadSchemaVersion Int      @map("payload_schema_version")
+  encodingVersion      String   @map("encoding_version")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  session CognitiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, attemptEpoch], map: "cognitive_raw_submissions_session_epoch_key")
+  @@index([sessionId])
+  @@map("cognitive_raw_submissions")
+}
+
+// Immutable terminal fact for an active questionnaire/composite slot. The
+// encrypted payload is either a CanonicalUnitResult envelope or a report-safe
+// FormSectionCollectionFacts projection; raw answers never cross this boundary.
+model AssessmentUnitSnapshot {
+  id                        String                       @id @default(uuid())
+  questionnaireAssessmentId String?                      @map("questionnaire_assessment_id")
+  compositeAttemptId        String?                      @map("composite_attempt_id")
+  attemptEpoch              Int                          @map("attempt_epoch")
+  slotKey                   String                       @map("slot_key")
+  unitType                  AssessmentUnitType           @map("unit_type")
+  terminalState             AssessmentUnitTerminalState  @map("terminal_state")
+  payloadKind               AssessmentUnitPayloadKind    @map("payload_kind")
+  sourceType                String                       @map("source_type")
+  sourceAttemptId           String                       @map("source_attempt_id")
+  sourceSubmissionId        String?                      @map("source_submission_id")
+  sourceDefinitionHash      String?                      @map("source_definition_hash")
+  compiledRuntimeHash       String?                      @map("compiled_runtime_hash")
+  canonicalResultEncrypted  String?                      @map("canonical_result_encrypted")
+  collectionFactsEncrypted  String?                      @map("collection_facts_encrypted")
+  completedAt               DateTime                     @map("completed_at")
+  createdAt                 DateTime                     @default(now()) @map("created_at")
+
+  questionnaireAssessment QuestionnaireAssessment?     @relation("QuestionnaireAssessmentUnitSnapshots", fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
+  compositeAttempt        CompositeAssessmentAttempt? @relation("CompositeAssessmentUnitSnapshots", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
+
+  @@unique([questionnaireAssessmentId, attemptEpoch, slotKey], map: "assessment_unit_snapshots_questionnaire_slot_key")
+  @@unique([compositeAttemptId, attemptEpoch, slotKey], map: "assessment_unit_snapshots_composite_slot_key")
+  @@unique([questionnaireAssessmentId, attemptEpoch, sourceAttemptId], map: "assessment_unit_snapshots_questionnaire_source_key")
+  @@unique([compositeAttemptId, attemptEpoch, sourceAttemptId], map: "assessment_unit_snapshots_composite_source_key")
+  @@index([questionnaireAssessmentId, attemptEpoch, terminalState], map: "assessment_unit_snapshots_questionnaire_terminal_idx")
+  @@index([compositeAttemptId, attemptEpoch, terminalState], map: "assessment_unit_snapshots_composite_terminal_idx")
+  @@map("assessment_unit_snapshots")
 }

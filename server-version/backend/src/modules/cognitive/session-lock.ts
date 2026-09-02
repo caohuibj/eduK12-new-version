@@ -33,6 +33,8 @@ export interface LockedSessionRow {
   attemptNo: number
   status: string
   deliveryMode: string
+  runtimeGeneration: string | null
+  compiledRuntimeHash: string | null
   submissionId: string | null
   submissionPayloadHash: string | null
   submittedAt: Date | null
@@ -67,6 +69,8 @@ interface RawSessionRow {
   attempt_no: number
   status: string
   delivery_mode: string
+  runtime_generation: string | null
+  compiled_runtime_hash: string | null
   submission_id: string | null
   submission_payload_hash: string | null
   submitted_at: Date | null
@@ -99,7 +103,7 @@ export const lockSession = async (
     SELECT
       id, user_id, participant_key, participant_snapshot_encrypted, assignment_id,
       composite_attempt_id, composite_item_id, recovery_token_hash, anonymous_code,
-      config_id, test_type, attempt_no, status, delivery_mode, submission_id,
+      config_id, test_type, attempt_no, status, delivery_mode, runtime_generation, compiled_runtime_hash, submission_id,
       submission_payload_hash, submitted_at, started_at, finished_at,
       score_encrypted, metrics_encrypted, quality_flags_encrypted, result_snapshot_encrypted, config_version,
       config_snapshot_encrypted, engine_version, scoring_version, random_seed,
@@ -125,6 +129,8 @@ export const lockSession = async (
     attemptNo: r.attempt_no,
     status: r.status,
     deliveryMode: r.delivery_mode,
+    runtimeGeneration: r.runtime_generation,
+    compiledRuntimeHash: r.compiled_runtime_hash,
     submissionId: r.submission_id,
     submissionPayloadHash: r.submission_payload_hash,
     submittedAt: r.submitted_at,

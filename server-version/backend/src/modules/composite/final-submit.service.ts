@@ -26,7 +26,7 @@ import {
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
 
-type CompositeSectionItem = {
+export type CompositeSectionItem = {
   id: string
   formType: string
   formLabel: string
@@ -38,7 +38,7 @@ type CompositeSectionItem = {
   formSectionPosition: number | null
 }
 
-type CompositeSection = {
+export type CompositeSection = {
   id: string
   title: string
   description: string | null
@@ -47,7 +47,7 @@ type CompositeSection = {
   items: CompositeSectionItem[]
 }
 
-type SectionSubmitInput = {
+export type SectionSubmitInput = {
   attemptId: string
   sectionId: string
   submissionId: string
@@ -63,7 +63,7 @@ const orderedItems = (items: CompositeSectionItem[]) => [...items].sort(
   (left, right) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position),
 )
 
-const mapSection = (section: any): CompositeSection => {
+export const mapCompositeSection = (section: any): CompositeSection => {
   const items = orderedItems((section.items ?? []).map((item: any) => ({
     id: item.id,
     formType: item.formType,
@@ -194,7 +194,7 @@ export const ensureCompositeFormSections = async (compositeId: string): Promise<
     orderBy: { position: 'asc' },
     include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
   })
-  return sections.map(mapSection)
+  return sections.map(mapCompositeSection)
 }
 
 export const listCompositeFormSections = async (compositeId: string) => {
@@ -247,7 +247,7 @@ export const createCompositeFormSection = async (
     },
     include: { items: true },
   })
-  const mapped = mapSection(section)
+  const mapped = mapCompositeSection(section)
   return { ...mapped, definitionHash: compositeFormSectionDefinitionHash(mapped) }
 }
 
@@ -282,7 +282,7 @@ export const updateCompositeFormSection = async (
     },
     include: { items: true },
   })
-  const mapped = mapSection(updated)
+  const mapped = mapCompositeSection(updated)
   return { ...mapped, definitionHash: compositeFormSectionDefinitionHash(mapped) }
 }
 
@@ -362,7 +362,7 @@ const lockCompositeFormSectionAttempt = async (tx: Prisma.TransactionClient, sec
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
 }
 
-const normalizeAnswers = (section: CompositeSection, values: SectionSubmitInput['answers']) => {
+export const normalizeCompositeSectionAnswers = (section: CompositeSection, values: SectionSubmitInput['answers']) => {
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   const provided = new Map<string, string | string[] | null>()
   for (const answer of values) {
@@ -387,7 +387,7 @@ const normalizeAnswers = (section: CompositeSection, values: SectionSubmitInput[
   return { normalized, payloadAnswers: normalized.map((entry) => ({ formItemId: entry.item.id, value: entry.normalizedValue })) }
 }
 
-const persistCompositeFormSection = async (
+export const persistCompositeFormSection = async (
   tx: Prisma.TransactionClient,
   attemptId: string,
   sectionAttemptId: string,
@@ -418,10 +418,13 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
       recoveryTokenHash: true,
       status: true,
       deliveryMode: true,
+      runtimeGeneration: true,
       attemptEpoch: true,
       completedItems: true,
       contextSnapshotEncrypted: true,
       contextSnapshotHash: true,
+      frozenActiveSlotSetEncrypted: true,
+      frozenActiveSlotSetHash: true,
       formSectionAttempts: {
         where: { sectionId: input.sectionId },
         select: { sectionId: true, status: true, attemptEpoch: true },
@@ -435,6 +438,10 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
     },
   }))
   if (!attempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  if (attempt.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedCompositeFormSectionFinal(input, attempt)
+  }
   if (input.userId !== null && input.userId !== undefined) {
     if (attempt.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评', 403)
   } else if (attempt.userId !== null || !input.recoveryTokenHash || attempt.recoveryTokenHash !== input.recoveryTokenHash) {
@@ -453,7 +460,7 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
   }
   const section = attempt.compositeAssessment.formSections.find((candidate) => candidate.id === input.sectionId)
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
-  const mappedSection = mapSection(section)
+  const mappedSection = mapCompositeSection(section)
   const actualDefinitionHash = measureRequestPhaseSync(
     'final_submit_definition_prepare',
     () => compositeFormSectionDefinitionHash(mappedSection),
@@ -470,7 +477,7 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
   }
   const normalizedResult = measureRequestPhaseSync(
     'final_submit_payload_validation',
-    () => normalizeAnswers(mappedSection, input.answers),
+    () => normalizeCompositeSectionAnswers(mappedSection, input.answers),
   )
   const canonical = measureRequestPhaseSync('final_submit_non_db_compute', () => (
     measureRequestPhaseSync('final_submit_serialization', () => (

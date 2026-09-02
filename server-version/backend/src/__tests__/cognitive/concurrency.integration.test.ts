@@ -83,6 +83,14 @@ const freshPublishedAssignment = async (maxAttempts = 10) => {
 
 const newSession = async (assignmentId: string) => {
   const payload = await createSession(userId, assignmentId)
+  // V32-1 creates new final-only sessions as UNIFIED_V1, whose contract is
+  // one-shot final submit and one CognitiveRawSubmission row. This suite
+  // covers the legacy append/complete/restart protocol, so explicitly model
+  // a pre-V32 session before exercising CognitiveTrial writes.
+  await prisma.cognitiveSession.update({
+    where: { id: payload.sessionId },
+    data: { runtimeGeneration: null, compiledRuntimeHash: null },
+  })
   return payload.sessionId
 }
 

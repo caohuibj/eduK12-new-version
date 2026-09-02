@@ -17,7 +17,7 @@ import {
   withQuestionnaireSerializableTransaction,
   type QuestionnaireProgressSnapshot,
 } from '../services/questionnaireProgressService'
-import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord } from '../modules/scale/scale-workflow.service'
+import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord, scaleDefinitionFromRecord } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
@@ -41,7 +41,7 @@ import {
 } from '../services/questionnaireCompletionAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
-import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
@@ -2152,14 +2152,18 @@ export const questionnaireController = {
         return error(res, '问卷未发布')
       }
 
-      // Every newly entered attempt uses the final-only unit model. Existing
-      // rows are mapped by migration; this call only fills sections for form
-      // items added after the migration.
+      // V32-1 provides the unified unit primitives, but parent activation is
+      // deliberately held until V32-2 also owns parent finalization. Keep the
+      // existing FINAL_ONLY parent/child protocol functional at this boundary.
       await formSectionService.ensureQuestionnaireFormSections(id)
 
       const questionnaire = {
         ...questionnaireMetadata,
         ...(await cacheService.getQuestionnaireStartContent(id)),
+      }
+
+      if (questionnaire.questionnaireScales.some((qs) => qs.scale.status !== 'PUBLISHED')) {
+        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
       }
 
       // 合并表单题目和量表，按 position 排序
@@ -2396,7 +2400,7 @@ export const questionnaireController = {
         })
 
         await tx.assessment.createMany({
-          data: questionnaire.questionnaireScales.map(qs => ({
+          data: questionnaire.questionnaireScales.map((qs) => ({
             scaleId: qs.scaleId,
             userId: userId!,
             status: 'IN_PROGRESS',
@@ -2515,6 +2519,7 @@ export const questionnaireController = {
         if (winner) return questionnaireController.startAssessment(req, res)
       }
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('开始问卷测评错误', err)
       return error(res, '开始问卷测评失败')
     }

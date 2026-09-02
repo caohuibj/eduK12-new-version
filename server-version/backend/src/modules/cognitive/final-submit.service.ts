@@ -30,6 +30,8 @@ import {
   refreshCompositeFinalOnlyProgress,
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
+import { submitUnifiedCognitiveSessionFinal } from './unified-final-submit.service'
+import type { UnifiedCognitiveAdmission } from './unified-final-submit.service'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -278,11 +280,14 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
       id: true,
       userId: true,
       compositeAttemptId: true,
+      compositeItemId: true,
       recoveryTokenHash: true,
       testType: true,
       attemptNo: true,
       status: true,
       deliveryMode: true,
+      runtimeGeneration: true,
+      compiledRuntimeHash: true,
       configVersion: true,
       configSnapshotEncrypted: true,
       engineVersion: true,
@@ -300,6 +305,8 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
           deliveryMode: true,
           attemptEpoch: true,
           contextSnapshotHash: true,
+          frozenActiveSlotSetEncrypted: true,
+          frozenActiveSlotSetHash: true,
           compositeAssessment: {
             select: {
               formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
@@ -310,6 +317,9 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
     },
   }))
   if (!session) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
+  if (session.runtimeGeneration === 'UNIFIED_V1') {
+    return submitUnifiedCognitiveSessionFinal(input, session as UnifiedCognitiveAdmission)
+  }
   assertPrincipal(session, input)
   assertFinalOnly(session.deliveryMode)
   assertAttemptEpoch(session.attemptNo, input.attemptEpoch)

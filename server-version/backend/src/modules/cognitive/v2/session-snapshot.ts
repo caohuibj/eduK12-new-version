@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { computeConfigSnapshotHash, computeProtocolSignature, assertProtocolSignature } from './canonical'
 import type { ProtocolDefinition, SessionConfigSnapshot, TaskDefinition } from './types'
+import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from '../../assessment-runtime/canonical'
+import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
+import { parseCompiledInstrumentRuntime } from '../../assessment-runtime/compiler'
 
 const protocolPhaseSchema = z.object({
   key: z.enum(['test', 'learning', 'delayed']),
@@ -28,6 +31,17 @@ export const sessionConfigSnapshotSchema = z.object({
   scoringVersion: z.string().min(1),
   config: z.unknown(),
   configHash: z.string().regex(/^[0-9a-f]{64}$/),
+  hashScheme: z.literal(CANONICAL_JSON_SHA256_V1).optional(),
+  runtimeGeneration: z.literal('UNIFIED_V1').optional(),
+  compiledRuntime: z.record(z.unknown()).optional(),
+  referenceBindings: z.array(z.object({
+    referenceKey: z.string().min(1),
+    referenceVersion: z.string().min(1),
+    referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
+    scoreKey: z.string().min(1).optional(),
+    referenceKind: z.string().min(1).optional(),
+    profileKey: z.string().min(1).optional(),
+  }).strict()).optional(),
   protocol: protocolDefinitionSchema,
   protocolSignature: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
@@ -36,6 +50,11 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   definition: TaskDefinition<TConfig, TTrial>
   configVersion: string
   config: unknown
+  runtime?: {
+    runtimeGeneration: 'UNIFIED_V1'
+    compiledRuntime: CompiledInstrumentRuntimeV1
+    referenceBindings?: ReferenceBindingSnapshot[]
+  }
   frozenAt?: Date
 }): SessionConfigSnapshot<TConfig> => {
   const validatedConfig = input.definition.configSchema.parse(input.config)
@@ -49,7 +68,13 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
     engineVersion: input.definition.engineVersion,
     scoringVersion: input.definition.scoringVersion,
     config: validatedConfig,
-    configHash: computeConfigSnapshotHash(validatedConfig),
+    configHash: input.runtime ? canonicalHash(validatedConfig) : computeConfigSnapshotHash(validatedConfig),
+    ...(input.runtime ? {
+      hashScheme: CANONICAL_JSON_SHA256_V1,
+      runtimeGeneration: input.runtime.runtimeGeneration,
+      compiledRuntime: input.runtime.compiledRuntime,
+      referenceBindings: input.runtime.referenceBindings ?? [],
+    } : {}),
     protocol: input.definition.protocol,
     protocolSignature: computeProtocolSignature(input.definition.protocol),
   }
@@ -58,8 +83,44 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
 
 export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> => {
   const parsed = sessionConfigSnapshotSchema.parse(value) as SessionConfigSnapshot<TConfig>
-  if (computeConfigSnapshotHash(parsed.config) !== parsed.configHash) {
+  const expectedConfigHash = parsed.hashScheme === CANONICAL_JSON_SHA256_V1
+    ? canonicalHash(parsed.config)
+    : computeConfigSnapshotHash(parsed.config)
+  if (expectedConfigHash !== parsed.configHash) {
     throw new Error('config snapshot hash mismatch')
+  }
+  const hasUnifiedMetadata = Boolean(parsed.hashScheme || parsed.runtimeGeneration || parsed.compiledRuntime || parsed.referenceBindings)
+  if (hasUnifiedMetadata) {
+    if (parsed.hashScheme !== CANONICAL_JSON_SHA256_V1 || parsed.runtimeGeneration !== 'UNIFIED_V1' || !parsed.compiledRuntime) {
+      throw new Error('unified cognitive session snapshot metadata is incomplete')
+    }
+    const compiledRuntime = parseCompiledInstrumentRuntime(parsed.compiledRuntime)
+    if (compiledRuntime.instrumentType !== 'COGNITIVE'
+      || compiledRuntime.instrumentKey !== parsed.testType
+      || compiledRuntime.instrumentVersion !== parsed.engineVersion
+      || compiledRuntime.scorerVersion !== parsed.scoringVersion) {
+      throw new Error('unified cognitive compiled runtime identity does not match the session snapshot')
+    }
+    const referenceBindings = parsed.referenceBindings ?? []
+    const expectedSelections = compiledRuntime.referenceBindingDefinition.selections
+    if (referenceBindings.length !== expectedSelections.length) {
+      throw new Error('unified cognitive session reference bindings do not match the compiled runtime')
+    }
+    expectedSelections.forEach((selection, index) => {
+      const binding = referenceBindings[index]
+      if (
+        !binding
+        || binding.referenceKey !== selection.referenceKey
+        || binding.referenceVersion !== selection.referenceVersion
+        || binding.scoreKey !== selection.scoreKey
+        || binding.referenceKind !== selection.referenceKind
+      ) {
+        throw new Error('unified cognitive session reference binding identity mismatch')
+      }
+    })
+    if (compiledRuntime.referenceBindingDefinition.required && referenceBindings.length === 0) {
+      throw new Error('unified cognitive session snapshot is missing reference bindings')
+    }
   }
   assertProtocolSignature(parsed)
   return parsed

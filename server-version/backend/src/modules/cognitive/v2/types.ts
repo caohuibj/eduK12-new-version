@@ -4,6 +4,7 @@ import type {
   ReferenceEvidenceLevel,
   ReferenceKind,
 } from '../../assessment-reference/reference'
+import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
 
 export const COGNITIVE_V2_SCHEMA_VERSION = 1 as const
 export const COGNITIVE_V2_TRIAL_ENVELOPE_VERSION = 1 as const
@@ -116,6 +117,10 @@ export interface SessionConfigSnapshot<TConfig = unknown> {
   scoringVersion: string
   config: TConfig
   configHash: string
+  hashScheme?: 'CANONICAL_JSON_SHA256_V1'
+  runtimeGeneration?: 'UNIFIED_V1'
+  compiledRuntime?: CompiledInstrumentRuntimeV1
+  referenceBindings?: ReferenceBindingSnapshot[]
   protocol: ProtocolDefinition
   protocolSignature: string
 }

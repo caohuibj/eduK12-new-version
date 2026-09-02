@@ -22,6 +22,9 @@ import {
   refreshCompositeFinalOnlyProgress,
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
+import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
+import type { UnifiedScaleAdmission } from './unified-final-submit.service'
+import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 
 export type FinalScaleAnswerInput = {
   itemCode: string
@@ -240,6 +243,8 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
           completedForms: true,
           contextSnapshotEncrypted: true,
           contextSnapshotHash: true,
+          frozenActiveSlotSetEncrypted: true,
+          frozenActiveSlotSetHash: true,
           questionnaire: { select: { questionnaireScales: { select: { id: true, scaleId: true, position: true } }, formSections: { select: { id: true, position: true, contextSection: true, items: { select: { contextKey: true } } } } } },
         },
       },
@@ -254,12 +259,17 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
           completedItems: true,
           contextSnapshotEncrypted: true,
           contextSnapshotHash: true,
+          frozenActiveSlotSetEncrypted: true,
+          frozenActiveSlotSetHash: true,
           compositeAssessment: { select: { items: { select: { type: true } }, formSections: { select: { id: true, contextSection: true, items: { select: { contextKey: true } } } } } },
         },
       },
     },
   }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+  if (assessment.runtimeGeneration === 'UNIFIED_V1') {
+    return submitUnifiedScaleAssessmentFinal(input, assessment as UnifiedScaleAdmission)
+  }
   assertPrincipal(assessment, input)
   assertFinalOnly(assessment.deliveryMode)
   assertAttemptEpoch(assessment.attemptEpoch, input.attemptEpoch)
@@ -515,6 +525,16 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
         attemptEpoch: true,
         questionnaireAssessmentId: true,
         compositeAttemptId: true,
+        scale: {
+          select: {
+            id: true,
+            code: true,
+            instrumentVersion: true,
+            instrumentClass: true,
+            definition: true,
+            status: true,
+          },
+        },
       },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
@@ -525,6 +545,16 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
     if (current.status !== 'IN_PROGRESS') {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '只有进行中的量表测评可以重启', 409)
     }
+
+    if (current.scale.status !== 'PUBLISHED') {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表已不再可用于新测评', 409)
+    }
+    const definition = scaleDefinitionFromRecord(current.scale)
+    const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
+      instrumentKey: current.scale.code,
+      instrumentVersion: current.scale.instrumentVersion,
+      definition,
+    })
 
     const retiredAt = new Date()
     await tx.assessment.update({
@@ -537,6 +567,9 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
         userId,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+        compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
         attemptEpoch: current.attemptEpoch + 1,
         progress: 0,
         answers: encryptScaleAnswers([]),

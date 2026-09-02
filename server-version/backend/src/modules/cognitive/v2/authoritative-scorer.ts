@@ -1,7 +1,6 @@
-import { parseTrialEnvelope } from './trial-envelope'
 import { assertProtocolSignature, computeConfigSnapshotHash } from './canonical'
-import { assertTaskContractValid } from './publication-gate'
 import { parseSessionConfigSnapshot } from './session-snapshot'
+import { validateAndNormalizeTrial } from './trial-normalizer'
 import type {
   CognitiveScoreResult,
   SessionConfigSnapshot,
@@ -13,7 +12,12 @@ export const validateSessionConfigSnapshot = <TConfig>(snapshot: SessionConfigSn
   parseSessionConfigSnapshot(snapshot)
   if (snapshot.schemaVersion !== 1) throw new Error('Unsupported cognitive session snapshot schema')
   if (!snapshot.frozenAt || !Number.isFinite(Date.parse(snapshot.frozenAt))) throw new Error('Invalid session snapshot frozenAt')
-  if (computeConfigSnapshotHash(snapshot.config) !== snapshot.configHash) throw new Error('config snapshot hash mismatch')
+  const expectedConfigHash = snapshot.hashScheme === 'CANONICAL_JSON_SHA256_V1'
+    ? undefined
+    : computeConfigSnapshotHash(snapshot.config)
+  if (expectedConfigHash !== undefined && expectedConfigHash !== snapshot.configHash) {
+    throw new Error('config snapshot hash mismatch')
+  }
   assertProtocolSignature(snapshot)
 }
 
@@ -25,7 +29,6 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
   preparedTrials?: TrialEnvelope<TTrial>[]
   randomSeed: string
 }): CognitiveScoreResult => {
-  assertTaskContractValid(input.definition)
   validateSessionConfigSnapshot(input.session)
   if (input.session.testType !== input.definition.testType
     || input.session.engineVersion !== input.definition.engineVersion
@@ -47,7 +50,11 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
   }
   const trials = input.preparedTrials
     ? input.preparedTrials.map((trial, index) => validateEnvelope(trial, index, false))
-    : input.trials.map((trial, index) => validateEnvelope(parseTrialEnvelope<TTrial>(trial), index, true))
+    : input.trials.map((trial, index) => validateEnvelope(
+        validateAndNormalizeTrial({ definition: input.definition, value: trial }),
+        index,
+        false,
+      ))
   const result = input.definition.scorer({
     config: input.definition.configSchema.parse(input.session.config),
     session: input.session,

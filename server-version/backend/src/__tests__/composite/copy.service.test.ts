@@ -8,7 +8,7 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
+    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     cognitiveSession: { create: vi.fn() },
     $queryRaw: vi.fn(),
     compositeAssessmentAccessToken: { findUnique: vi.fn(), create: vi.fn() },

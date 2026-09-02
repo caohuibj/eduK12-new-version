@@ -5,12 +5,16 @@ const { mockPrisma } = vi.hoisted(() => ({
     cognitiveAssignment: { findUnique: vi.fn() },
     cognitiveSession: { count: vi.fn(), findMany: vi.fn() },
     cognitiveTrial: { count: vi.fn() },
+    cognitiveRawSubmission: { aggregate: vi.fn() },
   },
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { createUnifiedCognitiveRawSubmissionPayload } from '../../modules/cognitive/unified-raw-submission'
 import {
   buildCognitiveResearchPackage,
   exportCognitiveToCSV,
@@ -84,6 +88,7 @@ beforeEach(() => {
   mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment)
   mockPrisma.cognitiveSession.count.mockResolvedValue(0)
   mockPrisma.cognitiveTrial.count.mockResolvedValue(0)
+  mockPrisma.cognitiveRawSubmission.aggregate.mockResolvedValue({ _sum: { trialCount: null } })
 })
 
 describe('cognitive export service', () => {
@@ -249,6 +254,59 @@ describe('cognitive export service', () => {
     expect(csv).toContain('T001_rt_ms')
     expect(csv).toContain('320')
     expect(csv).toContain('380')
+  })
+
+  it('exports unified raw submissions in full mode without consulting legacy trial rows', async () => {
+    const trials = [0, 1].map((trialIndex) => createTrialEnvelope({
+      trialIndex,
+      phase: 'test',
+      startedAtPerfMs: trialIndex * 10,
+      endedAtPerfMs: trialIndex * 10 + 5,
+      payload: { rtMs: trialIndex === 0 ? 320 : 380, foreperiodMs: 500 + trialIndex * 200 },
+    }))
+    const rawPayload = createUnifiedCognitiveRawSubmissionPayload({ attemptEpoch: 1, trials })
+    mockPrisma.cognitiveSession.findMany.mockResolvedValue([{
+      ...session(),
+      runtimeGeneration: 'UNIFIED_V1',
+      scoreEncrypted: null,
+      metricsEncrypted: null,
+      qualityFlagsEncrypted: null,
+      resultSnapshotEncrypted: encryptCognitivePayload({
+        schemaVersion: 1,
+        completedAt: '2026-08-20T10:01:00.000Z',
+        testType: 'reaction',
+        configVersion: '1.0.0',
+        engineVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        protocolSignature: 'a'.repeat(64),
+        profile: 'standard',
+        metrics: { meanRtMs: 350 },
+        quality: { state: 'interpretable', flags: {}, reasons: [] },
+        references: [],
+        report: {},
+        assessmentContext: null,
+      }),
+      rawSubmissions: [{
+        attemptEpoch: 1,
+        trialCount: trials.length,
+        payloadEncrypted: encryptUnifiedRuntimePayload(rawPayload),
+        payloadSchemaVersion: 1,
+        encodingVersion: 'CANONICAL_JSON_SHA256_V1',
+      }],
+    }])
+    mockPrisma.cognitiveRawSubmission.aggregate.mockResolvedValue({ _sum: { trialCount: 2 } })
+
+    const data = await getCognitiveExportData('assignment-1', { detail: 'full', anonymize: true })
+
+    expect(data.trialCount).toBe(2)
+    expect(data.fields.map((field) => field.name)).toEqual(expect.arrayContaining([
+      'T001_rt_ms',
+      'T002_rt_ms',
+      'T001_foreperiod_ms',
+    ]))
+    expect(data.rows[0]).toMatchObject({ T001_rt_ms: 320, T002_rt_ms: 380 })
+    expect(mockPrisma.cognitiveTrial.count).toHaveBeenCalled()
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls[0][0].include).toHaveProperty('rawSubmissions')
   })
 
   it('keeps the server-issued anonymous code in anonymous exports', async () => {

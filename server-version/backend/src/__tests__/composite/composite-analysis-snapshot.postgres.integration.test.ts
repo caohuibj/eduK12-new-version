@@ -655,7 +655,7 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
   })
 
-  it('finalizes a collection-only Attempt through the real scale and form completion paths', async () => {
+  it('completes collection units and finalizes the legacy FINAL_ONLY parent', async () => {
     const fixture = await createScaleAndFormCompletionFixture()
 
     const scaleAssessment = fixture.attemptState.currentItem?.scaleAssessmentId
@@ -683,7 +683,10 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
       answers: [{ formItemId: fixture.formItemId, value: 'fixture answer' }],
       userId,
     })
-    expect(completed).toMatchObject({ replayed: false, parent: { status: 'COMPLETED' } })
+    expect(completed).toMatchObject({
+      replayed: false,
+      parent: { status: 'COMPLETED', progress: 100 },
+    })
     const completedState = await compositeService.getAttemptState(fixture.attemptId, { userId })
     expect(completedState).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 2, totalItems: 2 })
     expect(await prisma.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
