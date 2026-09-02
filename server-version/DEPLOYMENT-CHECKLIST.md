@@ -40,7 +40,7 @@ docker compose build backend frontend migrate checkin-token-backfill release-pre
 docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm checkin-token-backfill
 docker compose --profile ops run --rm release-preflight
-docker compose up -d backend frontend
+docker compose up -d backend worker frontend
 # 完成上述 public workflow smoke 后恢复入口流量。
 ```
 

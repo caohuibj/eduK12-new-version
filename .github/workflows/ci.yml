@@ -179,11 +179,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: validate compose
-        run: docker compose config > /tmp/eduk12-compose-config.yml
+        run: docker compose config --format json > /tmp/eduk12-compose-config.json
+      - name: assert API/worker isolation topology
+        run: node scripts/assert-compose-worker-topology.mjs /tmp/eduk12-compose-config.json
       - name: validate monitoring compose
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
-        run: docker compose build backend frontend
+        run: docker compose build backend worker frontend
       - name: scan backend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:

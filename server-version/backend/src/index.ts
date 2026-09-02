@@ -4,6 +4,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { createServer } from 'http'
 import { config } from './config'
+import { startBackgroundWorkers } from './config/backgroundWorkers'
 import { prisma } from './config/database'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { authenticate, requireAdmin } from './middleware/auth'
@@ -14,16 +15,6 @@ import { requestId } from './middleware/requestId'
 import { csrfProtection } from './middleware/csrf'
 import { legacyUploadGuard } from './middleware/legacyUploadGuard'
 
-// 导入 Worker (启动视频处理队列)
-// 使用优化版本 (支持硬件负担最小模式)
-import './workers/videoProcessorOptimized'
-// Assessment exports are processed asynchronously above the configured record
-// threshold; the worker builds one dataset and materializes all formats.
-import './workers/exportProcessor'
-// 图片处理队列
-import './workers/imageProcessor'
-// 中文分词服务（单例模式，服务启动时自动初始化）
-import './services/wordSegmentation'
 // Redis缓存服务
 import { cacheService } from './services/cacheService'
 import { closeQueues } from './config/queue'
@@ -278,6 +269,11 @@ const startServer = async (): Promise<void> => {
   if (config.nodeEnv === 'production' && !cacheService.getStatus().connected) {
     throw new Error('CacheService Redis 初始化失败，生产环境拒绝接收流量')
   }
+
+  // Video/image/export consumers share this process Prisma pool. Skip them on
+  // assessment-only or test processes so FINAL_ONLY submit is not queued behind
+  // stale-video reconciliation. Producers still enqueue through config/queue.
+  await startBackgroundWorkers(config.backgroundWorkersEnabled)
 
   // ExportArtifact cleanup is metadata-driven: only exact expired objects are
   // removed, never an exploratory directory scan. Keep one bounded hourly task

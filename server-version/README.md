@@ -40,7 +40,7 @@ docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm seed
 
 # 4. 启动服务
-docker compose up -d backend frontend
+docker compose up -d backend worker frontend
 
 # 5. 查看日志
 docker compose logs -f

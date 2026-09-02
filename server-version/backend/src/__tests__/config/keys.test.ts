@@ -15,6 +15,7 @@ const SAVED = [
   'DATA_ENCRYPTION_KEY',
   'DATA_PSEUDONYM_KEY',
   'COGNITIVE_MODULE_ENABLED',
+  'BACKGROUND_WORKERS_ENABLED',
 ] as const
 let savedValues: Partial<Record<(typeof SAVED)[number], string | undefined>>
 
@@ -64,5 +65,22 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     process.env.COGNITIVE_MODULE_ENABLED = 'false'
     process.env.DATA_ENCRYPTION_KEY = INVALID_HEX
     await expect(import('../../config')).rejects.toThrow(/DATA_ENCRYPTION_KEY/)
+  })
+
+  it('defaults background workers on in production', async () => {
+    delete process.env.BACKGROUND_WORKERS_ENABLED
+    const mod = await import('../../config')
+    expect(mod.config.backgroundWorkersEnabled).toBe(true)
+  })
+
+  it('disables background workers when BACKGROUND_WORKERS_ENABLED=false', async () => {
+    process.env.BACKGROUND_WORKERS_ENABLED = 'false'
+    const mod = await import('../../config')
+    expect(mod.config.backgroundWorkersEnabled).toBe(false)
+  })
+
+  it('rejects empty BACKGROUND_WORKERS_ENABLED the same way as other booleans', async () => {
+    process.env.BACKGROUND_WORKERS_ENABLED = ''
+    await expect(import('../../config')).rejects.toThrow(/BACKGROUND_WORKERS_ENABLED/)
   })
 })

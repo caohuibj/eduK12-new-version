@@ -30,7 +30,7 @@ docker compose --env-file "${GATE_ENV_FILE}" config >/dev/null
 docker compose --env-file "${GATE_ENV_FILE}" build backend frontend migrate seed
 docker compose --env-file "${GATE_ENV_FILE}" --profile ops run --rm migrate
 docker compose --env-file "${GATE_ENV_FILE}" --profile ops run --rm seed
-docker compose --env-file "${GATE_ENV_FILE}" up -d --force-recreate backend frontend
+docker compose --env-file "${GATE_ENV_FILE}" up -d --force-recreate backend worker frontend
 
 for _ in $(seq 1 60); do
   backend_health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' ptool-backend 2>/dev/null || true)"
