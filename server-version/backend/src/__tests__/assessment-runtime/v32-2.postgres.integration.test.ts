@@ -72,6 +72,8 @@ type CompositePackageFixture = {
   scaleAssessmentId: string
   cognitiveDefinitionHash: string
   scaleDefinitionHash: string
+  cognitiveConfigOwned: boolean
+  scaleOwned: boolean
 }
 
 const scaleDefinition = (): ScaleDefinitionV2 => ({
@@ -500,10 +502,10 @@ const destroyCompositePackageFixture = async (fixture: CompositePackageFixture) 
   await db.compositeAssessmentAttempt.deleteMany({ where: { id: fixture.attemptId } })
   await db.compositeAssessment.deleteMany({ where: { id: fixture.compositeId } })
   await db.cognitiveAssignment.deleteMany({ where: { id: fixture.cognitiveAssignmentId } })
-  await db.scale.deleteMany({ where: { id: fixture.scaleId } })
+  if (fixture.scaleOwned) await db.scale.deleteMany({ where: { id: fixture.scaleId } })
   await db.courseStudent.deleteMany({ where: { courseId: fixture.courseId } })
   await db.course.deleteMany({ where: { id: fixture.courseId } })
-  await db.cognitiveTestConfig.deleteMany({ where: { id: fixture.cognitiveConfigId } })
+  if (fixture.cognitiveConfigOwned) await db.cognitiveTestConfig.deleteMany({ where: { id: fixture.cognitiveConfigId } })
   await db.user.deleteMany({ where: { id: fixture.userId } })
 }
 
@@ -556,7 +558,10 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
     },
   })
   await db.courseStudent.create({ data: { courseId: ids.courseId, studentId: ids.userId, status: 'ACTIVE' } })
-  const config = await db.cognitiveTestConfig.create({
+  const existingConfig = await db.cognitiveTestConfig.findUnique({
+    where: { testType_configVersion: { testType: 'gonogo', configVersion: '1.0.0' } },
+  })
+  const config = existingConfig ?? await db.cognitiveTestConfig.create({
     data: {
       id: ids.cognitiveConfigId,
       testType: 'gonogo',
@@ -570,6 +575,13 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
       publishedAt: new Date(),
     },
   })
+  if (
+    config.testType !== 'gonogo'
+    || config.configVersion !== '1.0.0'
+    || config.status !== 'PUBLISHED'
+    || config.engineVersion !== '1.0.0'
+    || config.scoringVersion !== '1.0.0'
+  ) throw new Error('V32-2 Go/No-Go package config is not the published 1.0.0 runtime')
   const assignment = await db.cognitiveAssignment.create({
     data: {
       id: ids.cognitiveAssignmentId,
@@ -589,7 +601,8 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
       publishedAt: new Date(),
     },
   })
-  await db.scale.create({
+  const existingScale = await db.scale.findUnique({ where: { code: 'adexi_v1' } })
+  const scale = existingScale ?? await db.scale.create({
     data: {
       id: ids.scaleId,
       code: 'adexi_v1',
@@ -605,6 +618,12 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
       dimensionCount: ADEXI_V2_DEFINITION.scoring.scores.length,
     },
   })
+  if (
+    scale.code !== 'adexi_v1'
+    || scale.instrumentClass !== 'STANDARD'
+    || scale.instrumentVersion !== '2.0.0'
+    || scale.definitionHash !== scaleDefinitionHash
+  ) throw new Error('V32-2 ADEXI package scale is not the expected v2 definition')
 
   const cognitiveItem = {
     id: ids.cognitiveItemId,
@@ -632,11 +651,14 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
     type: 'SCALE' as const,
     position: 1,
     required: true,
-    scaleId: ids.scaleId,
+    scaleId: scale.id,
     scale: {
-      id: ids.scaleId,
+      id: scale.id,
       code: 'adexi_v1',
       name: 'ADEXI package fixture',
+      // The package snapshot models the published resource contract. The CI
+      // seed keeps the code-owned package row DRAFT, so the fixture reuses its
+      // immutable definition without mutating that shared seed row.
       status: 'PUBLISHED',
       visibility: 'HIDDEN',
       instrumentClass: 'STANDARD' as const,
@@ -680,7 +702,7 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
       type: 'SCALE',
       position: 1,
       required: true,
-      scaleId: ids.scaleId,
+      scaleId: scale.id,
     },
   })
 
@@ -702,6 +724,8 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
     scaleAssessmentId: assessment.id,
     cognitiveDefinitionHash: freeze.resolvedConfigHash,
     scaleDefinitionHash,
+    cognitiveConfigOwned: !existingConfig,
+    scaleOwned: !existingScale,
   }
 }
 
@@ -726,7 +750,7 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
     getAnalysisProtocolDefinition = (await import('../../modules/cognitive-analysis/analysis-protocol.registry')).getAnalysisProtocolDefinition
     getReportPackageDefinition = (await import('../../modules/cognitive-analysis/report-package.registry')).getReportPackageDefinition
     readCognitiveSessionConfig = (await import('../../modules/cognitive/session.service')).readCognitiveSessionConfig
-  })
+  }, 30_000)
 
   afterAll(async () => {
     await db?.$disconnect()
