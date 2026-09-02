@@ -33,7 +33,10 @@ describe('Unified runtime architecture boundaries', () => {
     expect(scale).not.toMatch(/frozenActiveSlotSetEncrypted/)
     expect(scale).not.toMatch(/include:\s*\{\s*scale/)
     expect(scale).toMatch(/activateScaleAdmission/)
+    expect(scale).toMatch(/assertAdmissionParentBinding/)
     expect(scaleFinal).toMatch(/UNIFIED_SCALE_CHILD_ADMISSION_SELECT/)
+    expect(source('services/questionnaire-form-section.service.ts')).toMatch(/ensureScaleAdmissionAtDelivery/)
+    expect(source('modules/composite/composite.service.ts')).toMatch(/ensureScaleAdmissionAtDelivery/)
   })
 
   it('keeps the unified raw submission boundary strict and encrypted', () => {

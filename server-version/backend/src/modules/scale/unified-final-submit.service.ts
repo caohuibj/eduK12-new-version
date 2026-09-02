@@ -15,7 +15,6 @@ import {
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
 import { buildScaleResult, type ScaleResultV2 } from './scale-result'
-import type { ReferenceContext } from '../assessment-reference/reference'
 import { encryptScaleAnswers, encryptScaleResult, scaleAssessmentForResponse } from './scale-workflow.service'
 import {
   decryptFrozenScaleRuntimeSnapshot,
@@ -33,6 +32,7 @@ import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
 import {
   activateScaleAdmission,
+  assertAdmissionParentBinding,
   type ScaleAdmissionChildRow,
 } from './scale-admission.service'
 
@@ -127,9 +127,7 @@ const assertFrozenAdmission = (
   assertFinalOnly(child.deliveryMode)
   assertAttemptEpoch(child.attemptEpoch, input.attemptEpoch)
   assertFinalSubmitStatus(child.status, '量表测评')
-  if ((child.questionnaireAssessmentId || child.compositeAttemptId) && !admission.parent) {
-    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
-  }
+  assertAdmissionParentBinding(child, admission)
   if ((input.contextSnapshotHash ?? null) !== (admission.contextSnapshotHash ?? null)) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文版本已变化，请重试', 409)
   }
@@ -180,7 +178,7 @@ const buildResult = async (
     definition: snapshot.definition,
     answers,
     referenceSets: references,
-    participantContext: admission.contextValues ? admission.contextValues as ReferenceContext : undefined,
+    participantContext: admission.contextValues ?? undefined,
     participantContextHash: admission.contextSnapshotHash,
   })
 }
@@ -297,10 +295,10 @@ export const submitUnifiedScaleAssessmentFinal = async (
       submissionId: null,
     }
     if (current.questionnaireAssessmentId) {
-      where.questionnaireAssessment = { is: { status: 'IN_PROGRESS', attemptEpoch: input.attemptEpoch, runtimeGeneration: 'UNIFIED_V1' } }
+      where.questionnaireAssessment = { is: { status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', attemptEpoch: input.attemptEpoch, runtimeGeneration: 'UNIFIED_V1' } }
     }
     if (current.compositeAttemptId) {
-      where.compositeAttempt = { is: { status: 'IN_PROGRESS', attemptEpoch: input.attemptEpoch, runtimeGeneration: 'UNIFIED_V1' } }
+      where.compositeAttempt = { is: { status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', attemptEpoch: input.attemptEpoch, runtimeGeneration: 'UNIFIED_V1' } }
     }
     const updated = await tx.assessment.updateMany({
       where: where as any,

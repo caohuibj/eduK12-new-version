@@ -63,6 +63,7 @@ import {
 import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unified-aggregate'
 import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
 import { runnerDefinition } from '../modules/scale/scale-definition'
+import { ensureScaleAdmissionAtDelivery } from '../modules/scale/scale-admission.service'
 
 export type SectionItem = {
   id: string
@@ -423,6 +424,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
         || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
       ) throw new Error('Scale runtime identity mismatch')
+      await ensureScaleAdmissionAtDelivery(child.id)
       currentScale = {
         id: current.item.scale.id,
         name: current.item.scale.name,
@@ -431,7 +433,8 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
         definitionHash: runtime.legacyDefinitionHash,
         definition: runnerDefinition(runtime.definition),
       }
-    } catch {
+    } catch (error) {
+      if (error instanceof InstrumentFinalSubmitError) throw error
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
   }

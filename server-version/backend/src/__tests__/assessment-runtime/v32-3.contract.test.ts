@@ -8,6 +8,7 @@ import {
 } from '../../modules/assessment-runtime/admission-snapshot'
 import { loadFrozenReferenceSets, referenceSetHash } from '../../modules/assessment-runtime/reference-binding'
 import { validateReferenceSetDefinition } from '../../modules/assessment-reference/reference'
+import { assertAdmissionParentBinding } from '../../modules/scale/scale-admission.service'
 
 process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY || 'a'.repeat(64)
 
@@ -84,6 +85,43 @@ describe('V32-3 frozen unit admission contract', () => {
   it('rejects a stored hash mismatch on decrypt', () => {
     const snapshot = createFrozenUnitAdmission({ attemptEpoch: 1, scale, frozenAt })
     expect(() => decryptFrozenUnitAdmission(encryptFrozenUnitAdmission(snapshot), 'd'.repeat(64))).toThrow(/stored hash/)
+  })
+
+  it('binds frozen parent kind and parentId to the child foreign keys', () => {
+    const questionnaire = createFrozenUnitAdmission({
+      attemptEpoch: 1,
+      scale,
+      parent: {
+        kind: 'questionnaire',
+        parentId: 'parent-1',
+        slotKey: 'scale:binding-1',
+        sourceDefinitionHash: 'b'.repeat(64),
+        compiledRuntimeHash: 'c'.repeat(64),
+      },
+      frozenAt,
+    })
+    expect(() => assertAdmissionParentBinding({
+      questionnaireAssessmentId: 'parent-1',
+      compositeAttemptId: null,
+    }, questionnaire)).not.toThrow()
+    expect(() => assertAdmissionParentBinding({
+      questionnaireAssessmentId: 'parent-2',
+      compositeAttemptId: null,
+    }, questionnaire)).toThrow(/上级绑定不匹配/)
+    expect(() => assertAdmissionParentBinding({
+      questionnaireAssessmentId: null,
+      compositeAttemptId: 'composite-1',
+    }, questionnaire)).toThrow(/上级绑定不匹配/)
+
+    const standalone = createFrozenUnitAdmission({ attemptEpoch: 1, scale, frozenAt })
+    expect(() => assertAdmissionParentBinding({
+      questionnaireAssessmentId: null,
+      compositeAttemptId: null,
+    }, standalone)).not.toThrow()
+    expect(() => assertAdmissionParentBinding({
+      questionnaireAssessmentId: 'parent-1',
+      compositeAttemptId: null,
+    }, standalone)).toThrow(/上级绑定不匹配/)
   })
 })
 

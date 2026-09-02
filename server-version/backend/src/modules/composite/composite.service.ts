@@ -28,6 +28,7 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
+import { ensureScaleAdmissionAtDelivery } from '../scale/scale-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
 import {
@@ -56,7 +57,7 @@ import type {
 import { ensureTeacherPublishedAssignment } from '../cognitive/assignment.service'
 import { assertTaskCanPublish, assertTaskContractValid } from '../cognitive/v2/publication-gate'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
-import { computeSubmissionPayloadHash } from '../../services/instrumentFinalSubmit'
+import { computeSubmissionPayloadHash, isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
   withFinalOnlyCompletionTransaction,
   withQuestionnaireCompletionTransaction,
@@ -2851,6 +2852,7 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
+      await ensureScaleAdmissionAtDelivery(child.id)
       currentItem = {
         id: item.id,
         type: 'SCALE',
@@ -2868,7 +2870,8 @@ const getUnifiedCompositeAttemptState = async (
           definition: runnerDefinition(runtime.definition),
         },
       }
-    } catch {
+    } catch (error) {
+      if (isInstrumentFinalSubmitError(error)) throw error
       throw compositeConflict('量表冻结运行时不可用，请重启测评')
     }
   } else if (currentUnit?.type === 'COGNITIVE') {

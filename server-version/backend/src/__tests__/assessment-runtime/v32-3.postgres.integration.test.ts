@@ -68,6 +68,7 @@ let db: PrismaClient | null = null
 let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
 let activateScaleAdmission: typeof import('../../modules/scale/scale-admission.service')['activateScaleAdmission']
 let UNIFIED_SCALE_CHILD_ADMISSION_SELECT: typeof import('../../modules/scale/scale-admission.service')['UNIFIED_SCALE_CHILD_ADMISSION_SELECT']
+let getQuestionnaireFinalAttemptState: typeof import('../../services/questionnaire-form-section.service')['getQuestionnaireFinalAttemptState']
 
 const createdUserIds: string[] = []
 const createdScaleIds: string[] = []
@@ -86,6 +87,7 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
     const admission = await import('../../modules/scale/scale-admission.service')
     activateScaleAdmission = admission.activateScaleAdmission
     UNIFIED_SCALE_CHILD_ADMISSION_SELECT = admission.UNIFIED_SCALE_CHILD_ADMISSION_SELECT
+    getQuestionnaireFinalAttemptState = (await import('../../services/questionnaire-form-section.service')).getQuestionnaireFinalAttemptState
   }, 30_000)
 
   afterAll(async () => {
@@ -134,6 +136,81 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
       definition,
     })
     return { userId, scale, definition, definitionHash, runtime }
+  }
+
+  const createQuestionnaireChild = async (suffix: string, deliveryMode: 'FINAL_ONLY' | 'LEGACY' = 'FINAL_ONLY') => {
+    const fixture = await createUserAndScale(suffix)
+    const questionnaireId = `v32-3-q-${suffix}`
+    const questionnaireScaleId = `v32-3-qs-${suffix}`
+    const parentId = `v32-3-parent-${suffix}`
+    const assessmentId = `v32-3-child-${suffix}`
+    await db!.questionnaire.create({
+      data: {
+        id: questionnaireId,
+        code: `v32-3-${suffix}`,
+        name: 'V32-3 fixture questionnaire',
+        type: 'GENERAL',
+        status: 'PUBLISHED',
+        creatorId: fixture.userId,
+      },
+    })
+    createdQuestionnaireIds.push(questionnaireId)
+    await db!.questionnaireScale.create({
+      data: {
+        id: questionnaireScaleId,
+        questionnaireId,
+        scaleId: fixture.scale.id,
+        position: 0,
+      },
+    })
+    const slotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [{
+        questionnaireScaleId,
+        code: fixture.scale.code,
+        instrumentVersion: fixture.scale.instrumentVersion,
+        sourceDefinitionHash: fixture.runtime.sourceDefinitionHash,
+        compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
+      }],
+      formSections: [],
+    })
+    await db!.questionnaireAssessment.create({
+      data: {
+        id: parentId,
+        questionnaireId,
+        userId: fixture.userId,
+        status: 'IN_PROGRESS',
+        deliveryMode,
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        progress: 0,
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
+        frozenActiveSlotSetHash: slotSet.snapshotHash,
+      },
+    })
+    createdParentIds.push(parentId)
+    await db!.assessment.create({
+      data: {
+        id: assessmentId,
+        scaleId: fixture.scale.id,
+        userId: fixture.userId,
+        questionnaireAssessmentId: parentId,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(fixture.runtime),
+        compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
+        attemptEpoch: 1,
+        progress: 0,
+      },
+    })
+    createdAssessmentIds.push(assessmentId)
+    const child = await db!.assessment.findUnique({
+      where: { id: assessmentId },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    })
+    if (!child) throw new Error('V32-3 child fixture is missing')
+    return { ...fixture, questionnaireId, questionnaireScaleId, parentId, assessmentId, child }
   }
 
   it('persists a standalone frozen admission on first submit and reuses it on replay', async () => {
@@ -231,93 +308,22 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
 
   it('keeps parent lifecycle on CAS and rejects submit after the parent is no longer in progress', async () => {
     const suffix = randomUUID()
-    const fixture = await createUserAndScale(suffix)
-    const questionnaireId = `v32-3-q-${suffix}`
-    const questionnaireScaleId = `v32-3-qs-${suffix}`
-    const parentId = `v32-3-parent-${suffix}`
-    const assessmentId = `v32-3-child-${suffix}`
-    await db!.questionnaire.create({
-      data: {
-        id: questionnaireId,
-        code: `v32-3-${suffix}`,
-        name: 'V32-3 fixture questionnaire',
-        type: 'GENERAL',
-        status: 'PUBLISHED',
-        creatorId: fixture.userId,
-      },
-    })
-    createdQuestionnaireIds.push(questionnaireId)
-    await db!.questionnaireScale.create({
-      data: {
-        id: questionnaireScaleId,
-        questionnaireId,
-        scaleId: fixture.scale.id,
-        position: 0,
-      },
-    })
-    const slotSet = freezeQuestionnaireActiveSlotSet({
-      attemptEpoch: 1,
-      scales: [{
-        questionnaireScaleId,
-        code: fixture.scale.code,
-        instrumentVersion: fixture.scale.instrumentVersion,
-        sourceDefinitionHash: fixture.runtime.sourceDefinitionHash,
-        compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
-      }],
-      formSections: [],
-    })
-    await db!.questionnaireAssessment.create({
-      data: {
-        id: parentId,
-        questionnaireId,
-        userId: fixture.userId,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
-        runtimeGeneration: 'UNIFIED_V1',
-        attemptEpoch: 1,
-        progress: 0,
-        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
-        frozenActiveSlotSetHash: slotSet.snapshotHash,
-      },
-    })
-    createdParentIds.push(parentId)
-    await db!.assessment.create({
-      data: {
-        id: assessmentId,
-        scaleId: fixture.scale.id,
-        userId: fixture.userId,
-        questionnaireAssessmentId: parentId,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
-        runtimeGeneration: 'UNIFIED_V1',
-        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(fixture.runtime),
-        compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
-        attemptEpoch: 1,
-        progress: 0,
-      },
-    })
-    createdAssessmentIds.push(assessmentId)
-
-    const child = await db!.assessment.findUnique({
-      where: { id: assessmentId },
-      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
-    })
-    if (!child) throw new Error('V32-3 child fixture is missing')
-    const admission = await activateScaleAdmission(child)
+    const fixture = await createQuestionnaireChild(suffix)
+    const admission = await activateScaleAdmission(fixture.child)
     expect(admission.parent).toMatchObject({
       kind: 'questionnaire',
-      parentId,
-      slotKey: `scale:${questionnaireScaleId}`,
+      parentId: fixture.parentId,
+      slotKey: `scale:${fixture.questionnaireScaleId}`,
       compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
     })
 
     await db!.questionnaireAssessment.update({
-      where: { id: parentId },
+      where: { id: fixture.parentId },
       data: { status: 'COMPLETED' },
     })
 
     await expect(submitScaleAssessmentFinal({
-      assessmentId,
+      assessmentId: fixture.assessmentId,
       submissionId: `v32-3-cas-${suffix}`,
       attemptEpoch: 1,
       definitionHash: fixture.definitionHash,
@@ -327,12 +333,72 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
     })).rejects.toMatchObject({ code: 'STALE_ATTEMPT', statusCode: 409 })
 
     expect(await db!.assessment.findUnique({
-      where: { id: assessmentId },
+      where: { id: fixture.assessmentId },
       select: { status: true, submissionId: true, frozenAdmissionSnapshotHash: true },
     })).toMatchObject({
       status: 'IN_PROGRESS',
       submissionId: null,
       frozenAdmissionSnapshotHash: admission.snapshotHash,
+    })
+  })
+
+  it('hard-rejects a UNIFIED parent that is not FINAL_ONLY before freezing admission', async () => {
+    const suffix = randomUUID()
+    const fixture = await createQuestionnaireChild(suffix, 'LEGACY')
+    await expect(activateScaleAdmission(fixture.child)).rejects.toMatchObject({
+      code: 'LEGACY_WRITE_DISABLED',
+      statusCode: 410,
+    })
+    await expect(submitScaleAssessmentFinal({
+      assessmentId: fixture.assessmentId,
+      submissionId: `v32-3-legacy-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }],
+      userId: fixture.userId,
+    })).rejects.toMatchObject({ code: 'LEGACY_WRITE_DISABLED', statusCode: 410 })
+    expect(await db!.assessment.findUnique({
+      where: { id: fixture.assessmentId },
+      select: { frozenAdmissionSnapshotHash: true, status: true },
+    })).toEqual({ frozenAdmissionSnapshotHash: null, status: 'IN_PROGRESS' })
+  })
+
+  it('freezes questionnaire Scale admission when the current unit is delivered', async () => {
+    const suffix = randomUUID()
+    const fixture = await createQuestionnaireChild(suffix)
+    expect(await db!.assessment.findUnique({
+      where: { id: fixture.assessmentId },
+      select: { frozenAdmissionSnapshotHash: true },
+    })).toEqual({ frozenAdmissionSnapshotHash: null })
+
+    const state = await getQuestionnaireFinalAttemptState(fixture.parentId)
+    expect(state.currentScale).toMatchObject({
+      scaleAssessmentId: fixture.assessmentId,
+      definitionHash: fixture.definitionHash,
+    })
+    const stored = await db!.assessment.findUnique({
+      where: { id: fixture.assessmentId },
+      select: { frozenAdmissionSnapshotHash: true },
+    })
+    expect(stored?.frozenAdmissionSnapshotHash).toMatch(/^[0-9a-f]{64}$/)
+
+    const submitted = await submitScaleAssessmentFinal({
+      assessmentId: fixture.assessmentId,
+      submissionId: `v32-3-delivery-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }],
+      userId: fixture.userId,
+    })
+    expect(submitted.replayed).toBe(false)
+    expect(await db!.assessment.findUnique({
+      where: { id: fixture.assessmentId },
+      select: { status: true, frozenAdmissionSnapshotHash: true },
+    })).toMatchObject({
+      status: 'COMPLETED',
+      frozenAdmissionSnapshotHash: stored?.frozenAdmissionSnapshotHash,
     })
   })
 })

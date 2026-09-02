@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database'
-import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
   createFrozenUnitAdmission,
@@ -140,6 +140,42 @@ const persistAdmission = async (assessmentId: string, snapshot: FrozenUnitAdmiss
   throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照无法读取，请重启后重新作答', 409)
 }
 
+export const assertAdmissionParentBinding = (
+  child: Pick<ScaleAdmissionChildRow, 'questionnaireAssessmentId' | 'compositeAttemptId'>,
+  admission: FrozenUnitAdmissionV1,
+): void => {
+  if (child.questionnaireAssessmentId && child.compositeAttemptId) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
+  }
+  if (child.questionnaireAssessmentId) {
+    if (admission.parent?.kind !== 'questionnaire' || admission.parent.parentId !== child.questionnaireAssessmentId) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
+    }
+    return
+  }
+  if (child.compositeAttemptId) {
+    if (admission.parent?.kind !== 'composite' || admission.parent.parentId !== child.compositeAttemptId) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
+    }
+    return
+  }
+  if (admission.parent !== null) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照上级绑定不匹配', 409)
+  }
+}
+
+export const ensureScaleAdmissionAtDelivery = async (assessmentId: string): Promise<FrozenUnitAdmissionV1> => {
+  const child = await prisma.assessment.findUnique({
+    where: { id: assessmentId },
+    select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+  })
+  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+  if (child.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时版本不匹配，请重启测评', 409)
+  }
+  return activateScaleAdmission(child)
+}
+
 export const readStoredScaleAdmission = (row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>): FrozenUnitAdmissionV1 | null => {
   if (!row.frozenAdmissionSnapshotEncrypted || !row.frozenAdmissionSnapshotHash) return null
   try {
@@ -156,6 +192,7 @@ export const readStoredScaleAdmission = (row: Pick<ScaleAdmissionChildRow, 'froz
 export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredScaleAdmission(row)
   if (stored) return stored
+  assertFinalOnly(row.deliveryMode)
 
   if (row.questionnaireAssessmentId) {
     const parent = await prisma.questionnaireAssessment.findUnique({
@@ -180,6 +217,8 @@ export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promi
       },
     })
     if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    assertFinalOnly(parent.deliveryMode)
+    assertAttemptEpoch(parent.attemptEpoch, row.attemptEpoch)
     const binding = parent.questionnaire.questionnaireScales.find((item) => item.scaleId === row.scale.id)
     if (!binding) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = questionnaireScaleSlotKey(binding.id)
@@ -237,6 +276,8 @@ export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promi
       },
     })
     if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    assertFinalOnly(parent.deliveryMode)
+    assertAttemptEpoch(parent.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'SCALE')
     const slot = readRequiredScaleSlot({
