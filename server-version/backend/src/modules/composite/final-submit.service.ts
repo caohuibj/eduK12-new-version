@@ -14,7 +14,6 @@ import {
   assertFinalOnly,
   assertFinalSubmitStatus,
   assertSubmissionReplay,
-  computeSubmissionPayloadHash,
   FINAL_SUBMISSION_MAX_BYTES,
   InstrumentFinalSubmitError,
   prepareCanonicalSubmission,
@@ -26,25 +25,19 @@ import {
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
 
-export type CompositeSectionItem = {
-  id: string
-  formType: string
-  formLabel: string
-  placeholder: string | null
-  required: boolean
-  formOptions: unknown
-  contextKey: string | null
-  position: number
-  formSectionPosition: number | null
-}
+import {
+  compositeFormSectionDefinitionHash,
+  mapCompositeSection,
+  orderedCompositeFormSectionItems,
+  type CompositeSection,
+  type CompositeSectionItem,
+} from '../assessment-runtime/form-section-definition'
 
-export type CompositeSection = {
-  id: string
-  title: string
-  description: string | null
-  position: number
-  contextSection: boolean
-  items: CompositeSectionItem[]
+export {
+  compositeFormSectionDefinitionHash,
+  mapCompositeSection,
+  type CompositeSection,
+  type CompositeSectionItem,
 }
 
 export type SectionSubmitInput = {
@@ -59,50 +52,7 @@ export type SectionSubmitInput = {
   recoveryTokenHash?: string
 }
 
-const orderedItems = (items: CompositeSectionItem[]) => [...items].sort(
-  (left, right) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position),
-)
-
-export const mapCompositeSection = (section: any): CompositeSection => {
-  const items = orderedItems((section.items ?? []).map((item: any) => ({
-    id: item.id,
-    formType: item.formType,
-    formLabel: item.formLabel,
-    placeholder: item.formPlaceholder ?? null,
-    required: item.required !== false,
-    formOptions: item.formOptions,
-    contextKey: item.contextKey ?? null,
-    position: item.position,
-    formSectionPosition: item.formSectionPosition ?? null,
-  })))
-  return {
-    id: section.id,
-    title: section.title,
-    description: section.description ?? null,
-    position: section.position,
-    contextSection: Boolean(section.contextSection) || items.some((item) => Boolean(item.contextKey)),
-    items,
-  }
-}
-
-export const compositeFormSectionDefinitionHash = (section: CompositeSection): string => computeSubmissionPayloadHash({
-  sectionId: section.id,
-  title: section.title,
-  description: section.description,
-  position: section.position,
-  contextSection: section.contextSection,
-  items: orderedItems(section.items).map((item) => ({
-    id: item.id,
-    formType: item.formType,
-    formLabel: item.formLabel,
-    placeholder: item.placeholder,
-    required: item.required,
-    formOptions: item.formOptions,
-    contextKey: item.contextKey,
-    position: item.position,
-    formSectionPosition: item.formSectionPosition,
-  })),
-})
+const orderedItems = orderedCompositeFormSectionItems
 
 const contentTypesForComposite = (items: any[]) => [...items]
   .sort((left, right) => left.position - right.position)
@@ -410,6 +360,15 @@ export const persistCompositeFormSection = async (
 
 export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: input.attemptId },
+    select: { id: true, runtimeGeneration: true },
+  }))
+  if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  if (route.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedCompositeFormSectionFinal(input)
+  }
   const attempt = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
     select: {
@@ -438,10 +397,6 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
     },
   }))
   if (!attempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
-  if (attempt.runtimeGeneration === 'UNIFIED_V1') {
-    const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedCompositeFormSectionFinal(input, attempt)
-  }
   if (input.userId !== null && input.userId !== undefined) {
     if (attempt.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评', 403)
   } else if (attempt.userId !== null || !input.recoveryTokenHash || attempt.recoveryTokenHash !== input.recoveryTokenHash) {

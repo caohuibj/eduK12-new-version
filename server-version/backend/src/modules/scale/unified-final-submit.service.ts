@@ -110,7 +110,8 @@ const assertFrozenAdmission = (
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照与当前作答轮次不匹配', 409)
   }
   if (
-    admission.scale.id !== child.scale.id
+    !admission.scale
+    || admission.scale.id !== child.scale.id
     || admission.scale.code !== child.scale.code
     || admission.scale.instrumentVersion !== child.scale.instrumentVersion
   ) {
@@ -367,16 +368,5 @@ export const submitUnifiedScaleAssessmentFinal = async (
       parent: null,
     }
   })
-  const parent = child.questionnaireAssessmentId
-    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
-        const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
-        return finalizeQuestionnaireAttemptIfReady(child.questionnaireAssessmentId as string)
-      })
-    : child.compositeAttemptId
-      ? await measureRequestPhase('final_submit_parent_finalization', async () => {
-          const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-          return finalizeCompositeAttemptIfReady(child.compositeAttemptId as string)
-        })
-      : null
-  return { submissionId, payloadHash, ...committed, parent }
+  return { submissionId, payloadHash, ...committed, parent: null }
 }

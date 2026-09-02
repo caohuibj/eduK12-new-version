@@ -64,26 +64,20 @@ import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unif
 import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
 import { runnerDefinition } from '../modules/scale/scale-definition'
 import { ensureScaleAdmissionAtDelivery } from '../modules/scale/scale-admission.service'
+import { ensureQuestionnaireFormAdmissionAtDelivery } from '../modules/assessment-runtime/form-admission.service'
+import {
+  mapQuestionnaireSection,
+  orderedQuestionnaireFormSectionItems,
+  questionnaireFormSectionDefinitionHash,
+  type SectionItem,
+  type SectionRow,
+} from '../modules/assessment-runtime/form-section-definition'
 
-export type SectionItem = {
-  id: string
-  type: string
-  label: string
-  placeholder: string | null
-  required: boolean
-  options: unknown
-  contextKey: string | null
-  position: number
-  sectionPosition: number | null
-}
-
-export type SectionRow = {
-  id: string
-  title: string
-  description: string | null
-  position: number
-  contextSection: boolean
-  items: SectionItem[]
+export {
+  mapQuestionnaireSection,
+  questionnaireFormSectionDefinitionHash,
+  type SectionItem,
+  type SectionRow,
 }
 
 export type SectionSubmitInput = {
@@ -99,50 +93,7 @@ export type SectionSubmitInput = {
   resumeTokenHash?: string
 }
 
-const orderedSectionItems = (items: SectionItem[]): SectionItem[] => [...items].sort(
-  (left, right) => (left.sectionPosition ?? left.position) - (right.sectionPosition ?? right.position),
-)
-
-export const questionnaireFormSectionDefinitionHash = (section: SectionRow): string => computeSubmissionPayloadHash({
-  sectionId: section.id,
-  title: section.title,
-  description: section.description,
-  position: section.position,
-  contextSection: section.contextSection,
-  items: orderedSectionItems(section.items).map((item) => ({
-    id: item.id,
-    type: item.type,
-    label: item.label,
-    placeholder: item.placeholder,
-    required: item.required,
-    options: item.options,
-    contextKey: item.contextKey,
-    position: item.position,
-    sectionPosition: item.sectionPosition,
-  })),
-})
-
-export const mapQuestionnaireSection = (section: any): SectionRow => {
-  const items = orderedSectionItems((section.items ?? []).map((item: any) => ({
-    id: item.id,
-    type: item.type,
-    label: item.label,
-    placeholder: item.placeholder ?? null,
-    required: item.required !== false,
-    options: item.options,
-    contextKey: item.contextKey ?? null,
-    position: item.position,
-    sectionPosition: item.sectionPosition ?? null,
-  })))
-  return {
-    id: section.id,
-    title: section.title,
-    description: section.description ?? null,
-    position: section.position,
-    contextSection: Boolean(section.contextSection) || items.some((item) => Boolean(item.contextKey)),
-    items,
-  }
-}
+const orderedSectionItems = orderedQuestionnaireFormSectionItems
 
 const contentTypesForQuestionnaire = (questionnaire: any) => [
   ...(questionnaire.formItems ?? []).map((item: any) => ({ type: 'FORM', position: item.position, item })),
@@ -410,6 +361,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   const current = currentIndex >= 0 ? units[currentIndex] : null
   if (current?.type === 'FORM_SECTION') {
     currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
+    await ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mapQuestionnaireSection(current.section))
   } else if (current?.type === 'SCALE') {
     const child = scaleMap.get(current.item.scaleId)
     if (!child?.id || !child.runtimeSnapshotEncrypted) {
@@ -541,7 +493,18 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   })
   if (!runtime) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   assertFinalOnly(runtime.deliveryMode)
-  if (runtime.runtimeGeneration === 'UNIFIED_V1') return getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+  if (runtime.runtimeGeneration === 'UNIFIED_V1') {
+    let state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+    if (
+      state.questionnaireAssessment.status === 'IN_PROGRESS'
+      && state.totalItems > 0
+      && state.completedItems >= state.totalItems
+    ) {
+      await finalizeQuestionnaireIfReady(assessmentId)
+      state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+    }
+    return state
+  }
 
   const assessment = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
@@ -1640,6 +1603,15 @@ const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
 
 const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  const route = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireAssessment.findUnique({
+    where: { id: input.questionnaireAssessmentId },
+    select: { id: true, runtimeGeneration: true },
+  }))
+  if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  if (route.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedQuestionnaireFormSectionFinal } = await import('../modules/assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedQuestionnaireFormSectionFinal(input)
+  }
   const assessment = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireAssessment.findUnique({
     where: { id: input.questionnaireAssessmentId },
     select: {
@@ -1671,10 +1643,6 @@ const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) =>
     },
   }))
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  if (assessment.runtimeGeneration === 'UNIFIED_V1') {
-    const { submitUnifiedQuestionnaireFormSectionFinal } = await import('../modules/assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedQuestionnaireFormSectionFinal(input, assessment)
-  }
   if (input.userId !== null && input.userId !== undefined) {
     if (assessment.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此问卷测评', 403)
   } else if (!input.sessionId || assessment.sessionId !== input.sessionId || assessment.userId !== null || !input.resumeTokenHash || assessment.resumeTokenHash !== input.resumeTokenHash) {

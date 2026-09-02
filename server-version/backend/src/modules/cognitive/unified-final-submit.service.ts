@@ -18,7 +18,7 @@ import { loadFrozenMeasurementContext } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
-import { readCognitiveAssessmentContext } from './v2/assessment-context'
+
 import { validateAndNormalizeTrials } from './v2/trial-normalizer'
 import { runAuthoritativeScorer } from './v2/authoritative-scorer'
 import { resolveCognitiveMetricReferences } from './v2/reference-adapter'
@@ -34,7 +34,13 @@ import {
   projectCognitiveCanonicalUnitResult,
 } from '../assessment-runtime/unit-result'
 import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
-import { compositeItemSlotKey, getFrozenActiveSlot } from '../assessment-runtime/slot-set'
+import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
+import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
+import { assertAdmissionParentBinding } from '../assessment-runtime/unit-admission'
+import {
+  activateCognitiveAdmission,
+  type CognitiveAdmissionChildRow,
+} from './cognitive-admission.service'
 import {
   createUnifiedCognitiveRawSubmissionPayload,
   UNIFIED_COGNITIVE_RAW_ENCODING_VERSION,
@@ -52,41 +58,7 @@ export type UnifiedCognitiveFinalSubmitInput = {
   recoveryTokenHash?: string
 }
 
-export type UnifiedCognitiveAdmission = {
-  id: string
-  userId: string | null
-  compositeAttemptId: string | null
-  compositeItemId: string | null
-  recoveryTokenHash: string | null
-  testType: string
-  attemptNo: number
-  status: string
-  deliveryMode: string
-  runtimeGeneration: 'UNIFIED_V1' | null
-  compiledRuntimeHash: string | null
-  configVersion: string
-  configSnapshotEncrypted: string
-  engineVersion: string
-  scoringVersion: string
-  randomSeed: string
-  assignmentId: string | null
-  resultSnapshotEncrypted: string | null
-  submissionId: string | null
-  submissionPayloadHash: string | null
-  compositeAttempt?: {
-    userId: string | null
-    recoveryTokenHash: string | null
-    status: string
-    deliveryMode: string
-    attemptEpoch: number
-    contextSnapshotHash: string | null
-    frozenActiveSlotSetEncrypted: string | null
-    frozenActiveSlotSetHash: string | null
-    compositeAssessment: {
-      formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
-    }
-  } | null
-}
+export type UnifiedCognitiveAdmission = CognitiveAdmissionChildRow
 
 const responseFromSnapshot = (sessionId: string, snapshot: CognitiveResultSnapshot) => {
   const result = {
@@ -106,78 +78,72 @@ const responseFromSnapshot = (sessionId: string, snapshot: CognitiveResultSnapsh
   }
 }
 
-const assertPrincipal = (session: UnifiedCognitiveAdmission, input: UnifiedCognitiveFinalSubmitInput): void => {
-  if (input.userId !== null && input.userId !== undefined) {
-    if (session.userId !== input.userId) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此认知测评', 403)
-    }
-    return
-  }
-  const sessionCredentialMatches = Boolean(
-    input.recoveryTokenHash && input.recoveryTokenHash === session.recoveryTokenHash,
-  )
-  const parentCredentialMatches = Boolean(
-    input.recoveryTokenHash
-      && session.compositeAttempt?.userId === null
-      && input.recoveryTokenHash === session.compositeAttempt.recoveryTokenHash,
-  )
-  if (session.userId !== null || (!sessionCredentialMatches && !parentCredentialMatches)) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权操作此认知测评', 403)
-  }
+const assertPrincipal = (
+  session: UnifiedCognitiveAdmission,
+  admission: FrozenUnitAdmissionV1,
+  input: UnifiedCognitiveFinalSubmitInput,
+): void => {
+  if (input.userId && (session.userId === input.userId || admission.principal.userId === input.userId)) return
+  if (!input.userId && input.recoveryTokenHash && (
+    admission.principal.recoveryTokenHash === input.recoveryTokenHash
+    || session.recoveryTokenHash === input.recoveryTokenHash
+  )) return
+  throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此认知测评', 403)
 }
 
-const requiresFrozenContext = (session: UnifiedCognitiveAdmission): boolean => Boolean(
-  session.compositeAttempt?.compositeAssessment.formSections.some((section) => (
-    section.contextSection || section.items.some((item) => Boolean(item.contextKey))
-  )),
-)
+const contextStateFromAdmission = (admission: FrozenUnitAdmissionV1) => ({
+  context: admission.contextValues
+    ? { schemaVersion: 1 as const, frozenAt: admission.frozenAt, values: admission.contextValues }
+    : null,
+  reference: admission.contextSnapshotHash
+    ? { schemaVersion: 1 as const, snapshotHash: admission.contextSnapshotHash }
+    : null,
+})
 
-const assertAdmission = (session: UnifiedCognitiveAdmission, input: UnifiedCognitiveFinalSubmitInput): void => {
+const assertFrozenAdmission = (
+  session: UnifiedCognitiveAdmission,
+  admission: FrozenUnitAdmissionV1,
+  input: UnifiedCognitiveFinalSubmitInput,
+): void => {
   if (session.runtimeGeneration !== 'UNIFIED_V1' || !session.compiledRuntimeHash) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时快照缺失，请重启后重新作答', 409)
   }
-  assertPrincipal(session, input)
+  if (admission.attemptEpoch !== session.attemptNo) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知准入快照与当前作答轮次不匹配', 409)
+  }
+  if (
+    !admission.cognitive
+    || admission.cognitive.testType !== session.testType
+    || admission.cognitive.engineVersion !== session.engineVersion
+    || admission.cognitive.scoringVersion !== session.scoringVersion
+  ) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知准入快照身份不匹配', 409)
+  }
+  if (admission.governance.status === 'HOLD') {
+    throw new InstrumentFinalSubmitError(
+      'STALE_ATTEMPT',
+      admission.governance.holdReason ?? '认知准入处于 HOLD，无法提交',
+      409,
+    )
+  }
+  assertPrincipal(session, admission, input)
   assertFinalOnly(session.deliveryMode)
   assertAttemptEpoch(session.attemptNo, input.attemptEpoch)
   assertFinalSubmitStatus(session.status, '认知测评')
-  if (session.compositeAttempt) {
-    assertFinalOnly(session.compositeAttempt.deliveryMode)
-    assertFinalSubmitStatus(session.compositeAttempt.status, '上级测评')
-    assertAttemptEpoch(session.compositeAttempt.attemptEpoch, input.attemptEpoch)
-    if (session.compositeAttempt.status === 'COMPLETED' && session.status !== 'COMPLETED') {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评已结束，请重启后重新作答', 409)
-    }
-  }
-  const contextHash = session.compositeAttempt?.contextSnapshotHash ?? null
-  if (requiresFrozenContext(session) && contextHash === null) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
-  }
-  if ((input.contextSnapshotHash ?? null) !== contextHash) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
-  }
-  if (session.compositeAttempt && session.compositeItemId) {
-    let slot
-    try {
-      slot = getFrozenActiveSlot({
-        encrypted: session.compositeAttempt.frozenActiveSlotSetEncrypted,
-        storedHash: session.compositeAttempt.frozenActiveSlotSetHash,
-        attemptEpoch: input.attemptEpoch,
-        slotKey: compositeItemSlotKey(session.compositeItemId, 'COGNITIVE'),
-      })
-    } catch (error) {
-      throw new InstrumentFinalSubmitError(
-        'DEFINITION_MISMATCH',
-        error instanceof Error ? error.message : '认知冻结单元不可用',
-        409,
-      )
-    }
-    if (
-      slot.unitType !== 'COGNITIVE'
-      || !slot.required
-      || slot.sourceDefinitionIdentity.key !== session.testType
-    ) {
+  assertAdmissionParentBinding({
+    questionnaireAssessmentId: null,
+    compositeAttemptId: session.compositeAttemptId,
+  }, admission)
+  if (session.compositeAttemptId && session.compositeItemId) {
+    if (admission.parent?.slotKey !== compositeItemSlotKey(session.compositeItemId, 'COGNITIVE')) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知冻结单元身份不匹配', 409)
     }
+  }
+  if (admission.requiresContext && admission.contextSnapshotHash === null) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+  }
+  if ((input.contextSnapshotHash ?? null) !== (admission.contextSnapshotHash ?? null)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
   }
 }
 
@@ -202,7 +168,11 @@ const normalizeSubmission = (
   }
 }
 
-const prepareRuntime = (session: UnifiedCognitiveAdmission, input: UnifiedCognitiveFinalSubmitInput) => {
+const prepareRuntime = (
+  session: UnifiedCognitiveAdmission,
+  admission: FrozenUnitAdmissionV1,
+  input: UnifiedCognitiveFinalSubmitInput,
+) => {
   const stored = readCognitiveSessionConfig(session.configSnapshotEncrypted)
   if (!stored.snapshot || stored.snapshot.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时快照不可用，请重启后重新作答', 409)
@@ -218,27 +188,13 @@ const prepareRuntime = (session: UnifiedCognitiveAdmission, input: UnifiedCognit
   ) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知编译运行时身份已变化，请重启后重试', 409)
   }
-  if (session.compositeAttempt && session.compositeItemId) {
-    let slot
-    try {
-      slot = getFrozenActiveSlot({
-        encrypted: session.compositeAttempt.frozenActiveSlotSetEncrypted,
-        storedHash: session.compositeAttempt.frozenActiveSlotSetHash,
-        attemptEpoch: input.attemptEpoch,
-        slotKey: compositeItemSlotKey(session.compositeItemId, 'COGNITIVE'),
-      })
-    } catch (error) {
-      throw new InstrumentFinalSubmitError(
-        'DEFINITION_MISMATCH',
-        error instanceof Error ? error.message : '认知冻结单元不可用',
-        409,
-      )
-    }
-    const slotCompiledRuntimeHash = slot.sourceBinding.compiledRuntimeHash
+  if (admission.cognitive && admission.cognitive.configHash !== snapshot.configHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知准入快照身份不匹配', 409)
+  }
+  if (admission.parent) {
     if (
-      slot.sourceDefinitionIdentity.hash !== runtime.sourceDefinitionHash
-      || slot.sourceDefinitionIdentity.version !== runtime.instrumentVersion
-      || (slotCompiledRuntimeHash !== undefined && slotCompiledRuntimeHash !== runtime.compiledRuntimeHash)
+      admission.parent.sourceDefinitionHash !== runtime.sourceDefinitionHash
+      || admission.parent.compiledRuntimeHash !== runtime.compiledRuntimeHash
     ) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知冻结单元运行时不匹配', 409)
     }
@@ -263,41 +219,30 @@ const prepareRuntime = (session: UnifiedCognitiveAdmission, input: UnifiedCognit
 
 export const submitUnifiedCognitiveSessionFinal = async (
   input: UnifiedCognitiveFinalSubmitInput,
-  admission: UnifiedCognitiveAdmission,
+  child: UnifiedCognitiveAdmission,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  assertAdmission(admission, input)
-  const prepared = measureRequestPhaseSync('final_submit_definition_prepare', () => prepareRuntime(admission, input))
+  const admission = await measureRequestPhase('final_submit_admission', () => activateCognitiveAdmission(child))
+  assertFrozenAdmission(child, admission, input)
+  const prepared = measureRequestPhaseSync('final_submit_definition_prepare', () => prepareRuntime(child, admission, input))
 
-  if (admission.status === 'COMPLETED') {
-    const replay = assertSubmissionReplay(admission, submissionId, prepared.payloadHash)
+  if (child.status === 'COMPLETED') {
+    const replay = assertSubmissionReplay(child, submissionId, prepared.payloadHash)
     if (replay === 'replay') {
-      if (!admission.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
+      if (!child.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
       const snapshot = parseCognitiveResultSnapshot(
-        decryptCognitivePayload<unknown>(admission.resultSnapshotEncrypted),
+        decryptCognitivePayload<unknown>(child.resultSnapshotEncrypted),
       )
       return {
         submissionId,
         payloadHash: prepared.payloadHash,
         replayed: true,
-        response: responseFromSnapshot(admission.id, snapshot),
+        response: responseFromSnapshot(child.id, snapshot),
       }
     }
   }
 
-  let contextState
-  try {
-    contextState = await measureRequestPhase('final_submit_context_read', () => readCognitiveAssessmentContext(
-      prisma,
-      { compositeAttemptId: admission.compositeAttemptId, requiresFrozenContext: requiresFrozenContext(admission) },
-    ))
-  } catch (error) {
-    throw new InstrumentFinalSubmitError(
-      'STALE_ATTEMPT',
-      error instanceof Error ? error.message : '认知测评上下文无法读取',
-      409,
-    )
-  }
+  const contextState = contextStateFromAdmission(admission)
   if ((input.contextSnapshotHash ?? null) !== (contextState.reference?.snapshotHash ?? null)) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评上下文版本已过期，请重试', 409)
   }
@@ -309,7 +254,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
       session: prepared.snapshot,
       trials: prepared.trials,
       preparedTrials: prepared.trials,
-      randomSeed: admission.randomSeed,
+      randomSeed: child.randomSeed,
     }))
   } catch (error) {
     if (error instanceof InstrumentFinalSubmitError) throw error
@@ -338,7 +283,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
           context: contextState.context,
           quality: scored.quality,
         })
-  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, admission.assignmentId))
+  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, child.assignmentId))
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
     completedAt: new Date().toISOString(),
@@ -367,10 +312,10 @@ export const submitUnifiedCognitiveSessionFinal = async (
     assessmentContext: contextState.reference,
   })
 
-  const canonicalResult = admission.compositeAttemptId && prepared.runtime.runtimeCapabilities.aggregateEligible
+  const canonicalResult = child.compositeAttemptId && prepared.runtime.runtimeCapabilities.aggregateEligible
     ? (() => {
         if (
-          admission.assignmentId
+          child.assignmentId
           && (
             !freeze.resolvedConfigHash
             || !/^[0-9a-f]{64}$/.test(freeze.resolvedConfigHash)
@@ -405,7 +350,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
           completedAt,
           persistenceProvenance: {
             sourceType: 'COGNITIVE_SESSION',
-            sourceAttemptId: admission.id,
+            sourceAttemptId: child.id,
             sourceSubmissionId: submissionId,
           },
         }))
@@ -423,6 +368,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
         attemptNo: true,
         runtimeGeneration: true,
         compiledRuntimeHash: true,
+        frozenAdmissionSnapshotHash: true,
         submissionId: true,
         submissionPayloadHash: true,
         resultSnapshotEncrypted: true,
@@ -434,6 +380,9 @@ export const submitUnifiedCognitiveSessionFinal = async (
     assertFinalSubmitStatus(current.status, '认知测评')
     if (current.runtimeGeneration !== 'UNIFIED_V1' || current.compiledRuntimeHash !== prepared.runtime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时身份已变化，请重试', 409)
+    }
+    if (current.frozenAdmissionSnapshotHash && current.frozenAdmissionSnapshotHash !== admission.snapshotHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知准入快照已变化，请重试', 409)
     }
     const replay = assertSubmissionReplay(current, submissionId, prepared.payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
@@ -496,11 +445,12 @@ export const submitUnifiedCognitiveSessionFinal = async (
     })
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评状态已变化，请重试', 409)
 
-    if (encrypted.canonicalResult && admission.compositeAttemptId && admission.compositeItemId) {
+    if (encrypted.canonicalResult && child.compositeAttemptId && child.compositeItemId) {
+      const slotKey = admission.parent?.slotKey ?? compositeItemSlotKey(child.compositeItemId, 'COGNITIVE')
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
-        compositeAttemptId: admission.compositeAttemptId,
+        compositeAttemptId: child.compositeAttemptId,
         attemptEpoch: input.attemptEpoch,
-        slotKey: compositeItemSlotKey(admission.compositeItemId, 'COGNITIVE'),
+        slotKey,
         unitType: 'COGNITIVE',
         payloadKind: 'UNIT_RESULT',
         sourceType: 'COGNITIVE_SESSION',
@@ -515,11 +465,5 @@ export const submitUnifiedCognitiveSessionFinal = async (
     return { replayed: false, response: responseFromSnapshot(current.id, resultSnapshot) }
   })
 
-  const parent = admission.compositeAttemptId
-    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
-        const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-        return finalizeCompositeAttemptIfReady(admission.compositeAttemptId as string)
-      })
-    : null
-  return { submissionId, payloadHash: prepared.payloadHash, ...committed, parent }
+  return { submissionId, payloadHash: prepared.payloadHash, ...committed, parent: null }
 }

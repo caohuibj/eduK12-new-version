@@ -31,6 +31,7 @@ let encryptFrozenReportPackageSnapshot: typeof import('../../modules/cognitive-a
 let getAnalysisProtocolDefinition: typeof import('../../modules/cognitive-analysis/analysis-protocol.registry')['getAnalysisProtocolDefinition']
 let getReportPackageDefinition: typeof import('../../modules/cognitive-analysis/report-package.registry')['getReportPackageDefinition']
 let readCognitiveSessionConfig: typeof import('../../modules/cognitive/session.service')['readCognitiveSessionConfig']
+let getQuestionnaireFinalAttemptState: typeof import('../../services/questionnaire-form-section.service')['getQuestionnaireFinalAttemptState']
 
 type Fixture = {
   userId: string
@@ -750,6 +751,7 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
     getAnalysisProtocolDefinition = (await import('../../modules/cognitive-analysis/analysis-protocol.registry')).getAnalysisProtocolDefinition
     getReportPackageDefinition = (await import('../../modules/cognitive-analysis/report-package.registry')).getReportPackageDefinition
     readCognitiveSessionConfig = (await import('../../modules/cognitive/session.service')).readCognitiveSessionConfig
+    getQuestionnaireFinalAttemptState = (await import('../../services/questionnaire-form-section.service')).getQuestionnaireFinalAttemptState
   }, 30_000)
 
   afterAll(async () => {
@@ -805,6 +807,40 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
 
       const replay = await finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId)
       expect(replay).toMatchObject({ status: 'COMPLETED', progress: 100 })
+      expect(await db!.assessmentUnitSnapshot.count({ where: { questionnaireAssessmentId: fixture.parentId } })).toBe(2)
+    } finally {
+      await destroyFixture(fixture)
+    }
+  }, 30_000)
+
+  it('converges concurrent GET reconciliation to one COMPLETED parent without duplicating snapshots', async () => {
+    const fixture = await createFixture()
+    try {
+      await addScaleSnapshot(fixture, encryptUnifiedRuntimePayload(canonicalScaleEnvelope(fixture)))
+      await addFormSnapshot(fixture)
+      expect(await db!.questionnaireAssessment.findUnique({
+        where: { id: fixture.parentId },
+        select: { status: true },
+      })).toEqual({ status: 'IN_PROGRESS' })
+
+      const outcomes = await Promise.all([
+        getQuestionnaireFinalAttemptState(fixture.parentId),
+        getQuestionnaireFinalAttemptState(fixture.parentId),
+      ])
+      expect(outcomes).toHaveLength(2)
+      expect(outcomes.every((outcome) => outcome.questionnaireAssessment.status === 'COMPLETED')).toBe(true)
+      expect(outcomes.every((outcome) => outcome.questionnaireAssessment.progress === 100)).toBe(true)
+
+      const row = await db!.questionnaireAssessment.findUnique({
+        where: { id: fixture.parentId },
+        select: { status: true, progress: true, aggregateInputHash: true, aggregateReportEncrypted: true },
+      })
+      expect(row).toMatchObject({
+        status: 'COMPLETED',
+        progress: 100,
+        aggregateInputHash: expect.stringMatching(/^[0-9a-f]{64}$/),
+      })
+      expect(row?.aggregateReportEncrypted).toEqual(expect.any(String))
       expect(await db!.assessmentUnitSnapshot.count({ where: { questionnaireAssessmentId: fixture.parentId } })).toBe(2)
     } finally {
       await destroyFixture(fixture)
@@ -899,7 +935,7 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
         data: { canonicalResultEncrypted: encryptUnifiedRuntimePayload(forged) },
       })
 
-      await expect(submitScaleAssessmentFinal({
+      const scaleSubmitted = await submitScaleAssessmentFinal({
         assessmentId: fixture.scaleAssessmentId,
         submissionId: `v32-2-package-scale-${randomUUID()}`,
         attemptEpoch: 1,
@@ -907,15 +943,25 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
         contextSnapshotHash: null,
         answers: ADEXI_V2_DEFINITION.items.map((item) => ({ itemCode: item.itemCode, responseValue: 'never' })),
         userId: fixture.userId,
-      })).rejects.toMatchObject({ code: 'DEFINITION_MISMATCH', statusCode: 409 })
+      })
+      expect(scaleSubmitted).toMatchObject({ replayed: false, assessment: { status: 'COMPLETED' }, parent: null })
 
       expect(await db!.assessment.findUnique({ where: { id: fixture.scaleAssessmentId }, select: { status: true, submissionId: true } }))
         .toMatchObject({ status: 'COMPLETED', submissionId: expect.any(String) })
       expect(await db!.compositeAssessmentAttempt.findUnique({
         where: { id: fixture.attemptId },
-        select: { status: true, progress: true, completedItems: true },
-      })).toEqual({ status: 'IN_PROGRESS', progress: 50, completedItems: 1 })
+        select: { status: true },
+      })).toEqual({ status: 'IN_PROGRESS' })
       expect(await db!.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
+
+      await expect(finalizeCompositeAttemptUnifiedIfReady(fixture.attemptId)).rejects.toMatchObject({
+        code: 'DEFINITION_MISMATCH',
+        statusCode: 409,
+      })
+      expect(await db!.compositeAssessmentAttempt.findUnique({
+        where: { id: fixture.attemptId },
+        select: { status: true },
+      })).toEqual({ status: 'IN_PROGRESS' })
 
       await db!.assessmentUnitSnapshot.update({
         where: { id: cognitiveSnapshot.id },

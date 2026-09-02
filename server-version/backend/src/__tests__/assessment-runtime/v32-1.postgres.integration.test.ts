@@ -24,6 +24,7 @@ let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-s
 let freezeScaleRuntimeAtAttemptStart: typeof import('../../modules/assessment-runtime/runtime-snapshot')['freezeScaleRuntimeAtAttemptStart']
 let encryptFrozenScaleRuntimeSnapshot: typeof import('../../modules/assessment-runtime/runtime-snapshot')['encryptFrozenScaleRuntimeSnapshot']
 let submitCognitiveSessionFinal: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinal']
+let getAttemptState: typeof import('../../modules/composite/composite.service')['getAttemptState']
 let submitUnifiedCognitiveSessionFinal: typeof import('../../modules/cognitive/unified-final-submit.service')['submitUnifiedCognitiveSessionFinal']
 let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createUnifiedCognitiveSessionConfigSnapshot']
 let readCognitiveSessionConfig: typeof import('../../modules/cognitive/session.service')['readCognitiveSessionConfig']
@@ -121,6 +122,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
     freezeScaleRuntimeAtAttemptStart = runtimeSnapshot.freezeScaleRuntimeAtAttemptStart
     encryptFrozenScaleRuntimeSnapshot = runtimeSnapshot.encryptFrozenScaleRuntimeSnapshot
     submitCognitiveSessionFinal = (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal
+    getAttemptState = (await import('../../modules/composite/composite.service')).getAttemptState
     submitUnifiedCognitiveSessionFinal = (await import('../../modules/cognitive/unified-final-submit.service')).submitUnifiedCognitiveSessionFinal
     const cognitiveSession = await import('../../modules/cognitive/session.service')
     createUnifiedCognitiveSessionConfigSnapshot = cognitiveSession.createUnifiedCognitiveSessionConfigSnapshot
@@ -392,7 +394,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
     const columns = await db!.$queryRaw<Array<{ column_name: string }>>(Prisma.sql`
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name IN ('assessments', 'questionnaire_assessments', 'composite_assessment_attempts', 'cognitive_sessions', 'cognitive_raw_submissions', 'assessment_unit_snapshots')
+      WHERE table_name IN ('assessments', 'questionnaire_assessments', 'composite_assessment_attempts', 'cognitive_sessions', 'cognitive_raw_submissions', 'assessment_unit_snapshots', 'questionnaire_form_section_attempts', 'composite_form_section_attempts')
     `)
     const columnNames = columns.map((row) => row.column_name)
     expect(columnNames).toEqual(expect.arrayContaining([
@@ -404,6 +406,8 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
       'payload_encrypted',
       'canonical_result_encrypted',
       'collection_facts_encrypted',
+      'frozen_admission_snapshot_encrypted',
+      'frozen_admission_snapshot_hash',
     ]))
 
     const enumRows = await db!.$queryRaw<Array<{ typname: string; enumlabel: string }>>(Prisma.sql`
@@ -581,6 +585,13 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
     const submitted = await submitCognitiveSessionFinal(fixture.userId, input)
     expect(submitted.replayed).toBe(false)
     expect(submitted.response).toMatchObject({ sessionId: fixture.session.id, status: 'COMPLETED' })
+    expect(await db!.compositeAssessmentAttempt.findUnique({
+      where: { id: fixture.attempt.id },
+      select: { status: true },
+    })).toEqual({ status: 'IN_PROGRESS' })
+
+    const reconciled = await getAttemptState(fixture.attempt.id, { userId: fixture.userId })
+    expect(reconciled).toMatchObject({ status: 'COMPLETED', progress: 100 })
 
     const [session, parent, rawCount, snapshotCount] = await Promise.all([
       db!.cognitiveSession.findUnique({ where: { id: fixture.session.id } }),
@@ -699,5 +710,13 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
     expect(sectionAttempt).toMatchObject({ status: 'COMPLETED', submissionId: input.submissionId, attemptEpoch: 1 })
     expect(answerCount).toBe(1)
     expect(snapshotCount).toBe(1)
+    expect(await db!.compositeAssessmentAttempt.findUnique({
+      where: { id: fixture.attempt.id },
+      select: { status: true },
+    })).toEqual({ status: 'IN_PROGRESS' })
+    expect(await getAttemptState(fixture.attempt.id, { userId: fixture.userId })).toMatchObject({
+      status: 'COMPLETED',
+      progress: 100,
+    })
   })
 })

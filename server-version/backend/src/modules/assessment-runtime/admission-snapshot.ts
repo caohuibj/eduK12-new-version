@@ -7,17 +7,35 @@ export const FROZEN_UNIT_ADMISSION_SCHEMA_VERSION = 1 as const
 
 export type FrozenAdmissionGovernanceStatus = 'READY' | 'HOLD'
 
+export type FrozenScaleAdmissionIdentityV1 = {
+  id: string
+  code: string
+  name: string
+  instrumentVersion: string
+}
+
+export type FrozenCognitiveAdmissionIdentityV1 = {
+  testType: string
+  engineVersion: string
+  scoringVersion: string
+  configHash: string
+}
+
+export type FrozenFormAdmissionIdentityV1 = {
+  id: string
+  identityHash: string
+  kind: 'questionnaire' | 'composite'
+  definition: Record<string, unknown>
+}
+
 export interface FrozenUnitAdmissionV1 {
   schemaVersion: typeof FROZEN_UNIT_ADMISSION_SCHEMA_VERSION
   runtimeGeneration: 'UNIFIED_V1'
   frozenAt: string
   attemptEpoch: number
-  scale: {
-    id: string
-    code: string
-    name: string
-    instrumentVersion: string
-  }
+  scale?: FrozenScaleAdmissionIdentityV1
+  cognitive?: FrozenCognitiveAdmissionIdentityV1
+  formSection?: FrozenFormAdmissionIdentityV1
   principal: {
     userId: string | null
     questionnaireSessionId: string | null
@@ -40,19 +58,28 @@ export interface FrozenUnitAdmissionV1 {
   snapshotHash: string
 }
 
-const unsignedAdmission = (input: Omit<FrozenUnitAdmissionV1, 'snapshotHash'>) => ({
-  schemaVersion: input.schemaVersion,
-  runtimeGeneration: input.runtimeGeneration,
-  frozenAt: input.frozenAt,
-  attemptEpoch: input.attemptEpoch,
-  scale: input.scale,
-  principal: input.principal,
-  parent: input.parent,
-  requiresContext: input.requiresContext,
-  contextSnapshotHash: input.contextSnapshotHash,
-  contextValues: input.contextValues,
-  governance: input.governance,
-})
+const identityCount = (input: Pick<FrozenUnitAdmissionV1, 'scale' | 'cognitive' | 'formSection'>): number => (
+  [input.scale, input.cognitive, input.formSection].filter(Boolean).length
+)
+
+const unsignedAdmission = (input: Omit<FrozenUnitAdmissionV1, 'snapshotHash'>) => {
+  const unsigned: Record<string, unknown> = {
+    schemaVersion: input.schemaVersion,
+    runtimeGeneration: input.runtimeGeneration,
+    frozenAt: input.frozenAt,
+    attemptEpoch: input.attemptEpoch,
+    principal: input.principal,
+    parent: input.parent,
+    requiresContext: input.requiresContext,
+    contextSnapshotHash: input.contextSnapshotHash,
+    contextValues: input.contextValues,
+    governance: input.governance,
+  }
+  if (input.scale) unsigned.scale = input.scale
+  if (input.cognitive) unsigned.cognitive = input.cognitive
+  if (input.formSection) unsigned.formSection = input.formSection
+  return unsigned
+}
 
 const frozenUnitAdmissionSchema = z.object({
   schemaVersion: z.literal(1),
@@ -64,7 +91,19 @@ const frozenUnitAdmissionSchema = z.object({
     code: z.string().min(1),
     name: z.string().min(1),
     instrumentVersion: z.string().min(1),
-  }).strict(),
+  }).strict().optional(),
+  cognitive: z.object({
+    testType: z.string().min(1),
+    engineVersion: z.string().min(1),
+    scoringVersion: z.string().min(1),
+    configHash: z.string().regex(/^[0-9a-f]{64}$/),
+  }).strict().optional(),
+  formSection: z.object({
+    id: z.string().min(1),
+    identityHash: z.string().min(1),
+    kind: z.enum(['questionnaire', 'composite']),
+    definition: z.record(z.unknown()),
+  }).strict().optional(),
   principal: z.object({
     userId: z.string().min(1).nullable(),
     questionnaireSessionId: z.string().min(1).nullable(),
@@ -85,11 +124,20 @@ const frozenUnitAdmissionSchema = z.object({
     holdReason: z.string().min(1).nullable(),
   }).strict(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
-}).strict()
+}).strict().superRefine((value, ctx) => {
+  if (identityCount(value) !== 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Frozen unit admission requires exactly one instrument identity',
+    })
+  }
+})
 
 export const createFrozenUnitAdmission = (input: {
   attemptEpoch: number
-  scale: FrozenUnitAdmissionV1['scale']
+  scale?: FrozenUnitAdmissionV1['scale']
+  cognitive?: FrozenUnitAdmissionV1['cognitive']
+  formSection?: FrozenUnitAdmissionV1['formSection']
   principal?: Partial<FrozenUnitAdmissionV1['principal']>
   parent?: FrozenUnitAdmissionV1['parent']
   requiresContext?: boolean
@@ -103,12 +151,17 @@ export const createFrozenUnitAdmission = (input: {
   if (input.governance?.status === 'HOLD' && !input.governance.holdReason) {
     throw new Error('HOLD admission requires holdReason')
   }
+  if (identityCount(input) !== 1) {
+    throw new Error('Frozen unit admission requires exactly one instrument identity')
+  }
   const unsigned = unsignedAdmission({
     schemaVersion: 1,
     runtimeGeneration: 'UNIFIED_V1',
     frozenAt: frozenAt.toISOString(),
     attemptEpoch: input.attemptEpoch,
     scale: input.scale,
+    cognitive: input.cognitive,
+    formSection: input.formSection,
     principal: {
       userId: input.principal?.userId ?? null,
       questionnaireSessionId: input.principal?.questionnaireSessionId ?? null,
@@ -123,7 +176,7 @@ export const createFrozenUnitAdmission = (input: {
       holdReason: input.governance?.holdReason ?? null,
     },
   })
-  return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
+  return { ...unsigned, snapshotHash: canonicalHash(unsigned) } as FrozenUnitAdmissionV1
 }
 
 export const hashFrozenUnitAdmission = (snapshot: FrozenUnitAdmissionV1): string => (

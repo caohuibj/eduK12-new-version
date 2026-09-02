@@ -29,6 +29,8 @@ import {
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { ensureScaleAdmissionAtDelivery } from '../scale/scale-admission.service'
+import { ensureCognitiveAdmissionAtDelivery } from '../cognitive/cognitive-admission.service'
+import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
 import {
@@ -2825,6 +2827,7 @@ const getUnifiedCompositeAttemptState = async (
   if (currentUnit?.type === 'FORM_SECTION') {
     const section = formSections.find((candidate: any) => candidate.id === currentUnit.id)
     if (section) {
+      await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section))
       currentItem = {
         id: section.id,
         type: 'FORM_SECTION',
@@ -2881,6 +2884,7 @@ const getUnifiedCompositeAttemptState = async (
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
     try {
+      await ensureCognitiveAdmissionAtDelivery(child.id)
       currentItem = {
         id: currentUnit.item.id,
         type: 'COGNITIVE',
@@ -2888,7 +2892,8 @@ const getUnifiedCompositeAttemptState = async (
         required: currentUnit.item.required,
         cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash),
       }
-    } catch {
+    } catch (error) {
+      if (isInstrumentFinalSubmitError(error)) throw error
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
   }
@@ -3329,7 +3334,14 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     select: { userId: true, recoveryTokenHash: true, deliveryMode: true, runtimeGeneration: true },
   })
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
-  if (runtime.runtimeGeneration === 'UNIFIED_V1') return getUnifiedCompositeAttemptState(attemptId, context)
+  if (runtime.runtimeGeneration === 'UNIFIED_V1') {
+    let state = await getUnifiedCompositeAttemptState(attemptId, context)
+    if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
+      await finalizeCompositeAttemptIfReady(attemptId)
+      state = await getUnifiedCompositeAttemptState(attemptId, context)
+    }
+    return state
+  }
 
   const attempt = await findAttempt(attemptId, context)
   const readableFormAnswers = readContextFormAnswers(

@@ -401,4 +401,101 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
       frozenAdmissionSnapshotHash: stored?.frozenAdmissionSnapshotHash,
     })
   })
+
+  it('leaves the parent in progress after a non-last child submit and completes it on GET after the last child', async () => {
+    const suffix = randomUUID()
+    const first = await createQuestionnaireChild(`${suffix}-a`)
+    const secondScale = await createUserAndScale(`${suffix}-b`)
+    const secondQuestionnaireScaleId = `v32-3-qs-${suffix}-b`
+    const secondAssessmentId = `v32-3-child-${suffix}-b`
+    await db!.questionnaireScale.create({
+      data: {
+        id: secondQuestionnaireScaleId,
+        questionnaireId: first.questionnaireId,
+        scaleId: secondScale.scale.id,
+        position: 1,
+      },
+    })
+    const slotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [
+        {
+          questionnaireScaleId: first.questionnaireScaleId,
+          code: first.scale.code,
+          instrumentVersion: first.scale.instrumentVersion,
+          sourceDefinitionHash: first.runtime.sourceDefinitionHash,
+          compiledRuntimeHash: first.runtime.compiledRuntime.compiledRuntimeHash,
+        },
+        {
+          questionnaireScaleId: secondQuestionnaireScaleId,
+          code: secondScale.scale.code,
+          instrumentVersion: secondScale.scale.instrumentVersion,
+          sourceDefinitionHash: secondScale.runtime.sourceDefinitionHash,
+          compiledRuntimeHash: secondScale.runtime.compiledRuntime.compiledRuntimeHash,
+        },
+      ],
+      formSections: [],
+    })
+    await db!.questionnaireAssessment.update({
+      where: { id: first.parentId },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
+        frozenActiveSlotSetHash: slotSet.snapshotHash,
+      },
+    })
+    await db!.assessment.create({
+      data: {
+        id: secondAssessmentId,
+        scaleId: secondScale.scale.id,
+        userId: first.userId,
+        questionnaireAssessmentId: first.parentId,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(secondScale.runtime),
+        compiledRuntimeHash: secondScale.runtime.compiledRuntime.compiledRuntimeHash,
+        attemptEpoch: 1,
+        progress: 0,
+      },
+    })
+    createdAssessmentIds.push(secondAssessmentId)
+
+    await submitScaleAssessmentFinal({
+      assessmentId: first.assessmentId,
+      submissionId: `v32-3-first-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: first.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }],
+      userId: first.userId,
+    })
+    expect(await db!.questionnaireAssessment.findUnique({
+      where: { id: first.parentId },
+      select: { status: true },
+    })).toEqual({ status: 'IN_PROGRESS' })
+    const afterFirst = await getQuestionnaireFinalAttemptState(first.parentId)
+    expect(afterFirst.questionnaireAssessment.status).toBe('IN_PROGRESS')
+    expect(afterFirst.completedItems).toBe(1)
+    expect(afterFirst.totalItems).toBe(2)
+
+    await submitScaleAssessmentFinal({
+      assessmentId: secondAssessmentId,
+      submissionId: `v32-3-last-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: secondScale.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }],
+      userId: first.userId,
+    })
+    expect(await db!.questionnaireAssessment.findUnique({
+      where: { id: first.parentId },
+      select: { status: true },
+    })).toEqual({ status: 'IN_PROGRESS' })
+    const afterLast = await getQuestionnaireFinalAttemptState(first.parentId)
+    expect(afterLast.questionnaireAssessment).toMatchObject({ status: 'COMPLETED', progress: 100 })
+    expect(await db!.questionnaireAssessment.findUnique({
+      where: { id: first.parentId },
+      select: { status: true, progress: true },
+    })).toEqual({ status: 'COMPLETED', progress: 100 })
+  })
 })

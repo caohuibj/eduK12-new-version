@@ -12,8 +12,6 @@ import {
   assertAttemptEpoch,
   assertCanonicalSubmissionPayloadSize,
   assertDefinitionHash,
-  assertFinalOnly,
-  assertFinalSubmitStatus,
   assertSubmissionReplay,
   FINAL_SUBMISSION_MAX_BYTES,
   InstrumentFinalSubmitError,
@@ -22,13 +20,11 @@ import {
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { persistFormAnswerBatch, type BulkFormAnswerMutation } from '../../services/questionnaire-form-answer-batch'
 import {
-  mapQuestionnaireSection,
   normalizeQuestionnaireSectionAnswers,
   type SectionRow,
   type SectionSubmitInput as QuestionnaireSectionSubmitInput,
 } from '../../services/questionnaire-form-section.service'
 import {
-  mapCompositeSection,
   normalizeCompositeSectionAnswers,
   persistCompositeFormSection,
   type SectionSubmitInput as CompositeSectionSubmitInput,
@@ -37,9 +33,18 @@ import {
 import { encryptUnifiedRuntimePayload } from './security'
 import { createFormSectionCollectionFacts } from './form-facts'
 import { insertCompletedUnitSnapshot } from './persistence'
-import { formSectionSlotKey, getFrozenActiveSlot } from './slot-set'
+import { formSectionSlotKey } from './slot-set'
 import { canonicalJsonBytes } from './canonical'
-import { formSectionIdentityHash } from './attempt-runtime'
+import type { FrozenUnitAdmissionV1 } from './admission-snapshot'
+import { assertAdmissionParentBinding } from './unit-admission'
+import {
+  activateStoredOrCatalogCompositeFormAdmission,
+  activateStoredOrCatalogQuestionnaireFormAdmission,
+  ensureCompositeSectionAttempt,
+  ensureQuestionnaireSectionAttempt,
+  loadCompositeFormDefinition,
+  loadQuestionnaireFormDefinition,
+} from './form-admission.service'
 
 type NormalizedSectionEntry = {
   item: {
@@ -125,86 +130,78 @@ const compositeContextItems = (section: CompositeSection) => section.items.map((
   contextKey: item.contextKey,
 }))
 
-const assertFormSectionSlotBinding = (admission: any, sectionId: string, sectionIdentityHash: string) => {
-  try {
-    const slot = getFrozenActiveSlot({
-      encrypted: admission.frozenActiveSlotSetEncrypted,
-      storedHash: admission.frozenActiveSlotSetHash,
-      attemptEpoch: admission.attemptEpoch,
-      slotKey: formSectionSlotKey(sectionId),
-    })
-    if (
-      slot.unitType !== 'FORM_SECTION'
-      || !slot.required
-      || slot.sourceDefinitionIdentity.key !== sectionId
-      || slot.sourceDefinitionIdentity.version !== 'FORM_SECTION_V1'
-      || slot.sourceDefinitionIdentity.hash !== sectionIdentityHash
-    ) {
-      throw new Error('表单区段冻结单元身份不匹配')
+const assertFormPrincipal = (
+  admission: FrozenUnitAdmissionV1,
+  input: { userId?: string | null; sessionId?: string; recoveryTokenHash?: string; resumeTokenHash?: string },
+  kind: 'questionnaire' | 'composite',
+): void => {
+  if (input.userId && admission.principal.userId === input.userId) return
+  const recovery = input.recoveryTokenHash ?? input.resumeTokenHash
+  if (!input.userId && recovery && admission.principal.recoveryTokenHash === recovery) {
+    if (kind === 'questionnaire' && input.sessionId && admission.principal.questionnaireSessionId !== input.sessionId) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权操作此问卷测评', 403)
     }
-  } catch (error) {
+    return
+  }
+  throw new InstrumentFinalSubmitError(
+    'STALE_ATTEMPT',
+    kind === 'questionnaire' ? '无权限操作此问卷测评' : '无权限操作此综合测评',
+    403,
+  )
+}
+
+const assertFormFrozenAdmission = (
+  admission: FrozenUnitAdmissionV1,
+  input: {
+    sectionId: string
+    attemptEpoch: number
+    definitionHash: string
+    contextSnapshotHash?: string | null
+    userId?: string | null
+    sessionId?: string
+    recoveryTokenHash?: string
+    resumeTokenHash?: string
+  },
+  parent: { questionnaireAssessmentId?: string | null; compositeAttemptId?: string | null },
+  kind: 'questionnaire' | 'composite',
+): void => {
+  if (!admission.formSection || admission.formSection.id !== input.sectionId || admission.formSection.kind !== kind) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '表单区段准入快照身份不匹配', 409)
+  }
+  if (admission.attemptEpoch !== input.attemptEpoch) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段准入快照与当前作答轮次不匹配', 409)
+  }
+  if (admission.governance.status === 'HOLD') {
     throw new InstrumentFinalSubmitError(
-      'DEFINITION_MISMATCH',
-      error instanceof Error ? error.message : '表单区段冻结单元不可用',
+      'STALE_ATTEMPT',
+      admission.governance.holdReason ?? '表单区段准入处于 HOLD，无法提交',
       409,
     )
   }
-}
-
-const progressAfterFormSection = (input: {
-  completedScales: number
-  completedForms: number
-  totalUnits: number
-  sectionWasInProgress: boolean
-}) => {
-  const completedForms = input.completedForms + (input.sectionWasInProgress ? 1 : 0)
-  const completedUnits = input.completedScales + completedForms
-  return {
-    completedForms,
-    progress: input.totalUnits === 0 ? 100 : Math.min(100, Math.round((completedUnits / input.totalUnits) * 100)),
+  assertFormPrincipal(admission, input, kind)
+  assertAdmissionParentBinding(parent, admission)
+  assertDefinitionHash(admission.formSection.identityHash, input.definitionHash)
+  if ((input.contextSnapshotHash ?? null) !== (admission.contextSnapshotHash ?? null)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上下文版本已变化，请重试', 409)
   }
-}
-
-const ensureQuestionnaireSectionAttempt = async (assessmentId: string, sectionId: string, attemptEpoch: number) => {
-  let attempt = await prisma.questionnaireFormSectionAttempt.findUnique({
-    where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessmentId, sectionId } },
-  })
-  if (!attempt) {
-    try {
-      attempt = await prisma.questionnaireFormSectionAttempt.create({
-        data: { questionnaireAssessmentId: assessmentId, sectionId, attemptEpoch },
-      })
-    } catch (error) {
-      if ((error as { code?: string })?.code !== 'P2002') throw error
-      attempt = await prisma.questionnaireFormSectionAttempt.findUnique({
-        where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessmentId, sectionId } },
-      })
-    }
-  }
-  if (!attempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
-  return attempt
 }
 
 export const submitUnifiedQuestionnaireFormSectionFinal = async (
   input: QuestionnaireSectionSubmitInput,
-  admission: any,
+  _parent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  if (admission.runtimeGeneration !== 'UNIFIED_V1') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷运行时版本不支持统一提交', 409)
-  if (input.userId !== null && input.userId !== undefined) {
-    if (admission.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此问卷测评', 403)
-  } else if (!input.sessionId || admission.sessionId !== input.sessionId || admission.userId !== null || !input.resumeTokenHash || admission.resumeTokenHash !== input.resumeTokenHash) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权操作此问卷测评', 403)
-  }
-  assertFinalOnly(admission.deliveryMode)
-  assertAttemptEpoch(admission.attemptEpoch, input.attemptEpoch)
-  assertFinalSubmitStatus(admission.status, '问卷测评')
-  const section = admission.questionnaire.formSections.find((candidate: any) => candidate.id === input.sectionId)
-  if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
-  const mappedSection = mapQuestionnaireSection(section)
-  const sectionIdentityHash = formSectionIdentityHash(mappedSection)
-  assertDefinitionHash(sectionIdentityHash, input.definitionHash)
-  assertFormSectionSlotBinding(admission, mappedSection.id, sectionIdentityHash)
+  const child = await ensureQuestionnaireSectionAttempt(input.questionnaireAssessmentId, input.sectionId, input.attemptEpoch)
+  const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogQuestionnaireFormAdmission({
+    parentId: input.questionnaireAssessmentId,
+    sectionId: input.sectionId,
+    child,
+  }))
+  assertFormFrozenAdmission(admission, input, {
+    questionnaireAssessmentId: input.questionnaireAssessmentId,
+    compositeAttemptId: null,
+  }, 'questionnaire')
+  const mappedSection = loadQuestionnaireFormDefinition(admission)
   const normalized = measureRequestPhaseSync(
     'final_submit_payload_validation',
     () => normalizeQuestionnaireSectionAnswers(mappedSection, input.answers),
@@ -212,29 +209,34 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
   const canonical = canonicalSubmission({ answers: normalized.payloadAnswers })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.formSection, '问卷区段提交数据')
   const payloadHash = canonical.hash
-  const sectionAttempt = await ensureQuestionnaireSectionAttempt(admission.id, mappedSection.id, input.attemptEpoch)
   const context = mappedSection.contextSection && !admission.contextSnapshotHash
     ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], questionnaireContextItems(mappedSection))
     : null
   const factsEncrypted = encryptUnifiedRuntimePayload(formFactsFor(mappedSection.id, normalized.normalized as NormalizedSectionEntry[]))
-  const mappedSectionBytes = canonicalJsonBytes(mappedSection)
-  const sourceDefinitionHash = mappedSectionBytes.length > 0
-    ? createHash('sha256').update(mappedSectionBytes).digest('hex')
-    : input.definitionHash
+  const slotKey = admission.parent?.slotKey ?? formSectionSlotKey(mappedSection.id)
+  const sourceDefinitionHash = admission.parent?.sourceDefinitionHash ?? admission.formSection!.identityHash
+  void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withQuestionnaireFormUnitTransaction(async (tx) => {
-    const currentSection = await tx.questionnaireFormSectionAttempt.findUnique({ where: { id: sectionAttempt.id } })
+    const currentSection = await tx.questionnaireFormSectionAttempt.findUnique({
+      where: { id: child.id },
+      select: {
+        id: true,
+        status: true,
+        attemptEpoch: true,
+        submissionId: true,
+        submissionPayloadHash: true,
+        frozenAdmissionSnapshotHash: true,
+      },
+    })
     if (!currentSection) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
     assertAttemptEpoch(currentSection.attemptEpoch, input.attemptEpoch)
+    if (currentSection.frozenAdmissionSnapshotHash && currentSection.frozenAdmissionSnapshotHash !== admission.snapshotHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段准入快照已变化，请重试', 409)
+    }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
-      const progress = progressAfterFormSection({
-        completedScales: admission.completedScales,
-        completedForms: admission.completedForms,
-        totalUnits: admission.questionnaire.questionnaireScales.length + admission.questionnaire.formSections.length,
-        sectionWasInProgress: false,
-      })
-      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash, ...progress }
+      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
 
@@ -245,12 +247,12 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
       status: entry.status,
       revision: 0,
     }))
-    await persistFormAnswerBatch(tx, admission.id, mutations)
+    await persistFormAnswerBatch(tx, input.questionnaireAssessmentId, mutations)
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {
       const updatedContext = await tx.questionnaireAssessment.updateMany({
         where: {
-          id: admission.id,
+          id: input.questionnaireAssessmentId,
           status: 'IN_PROGRESS',
           runtimeGeneration: 'UNIFIED_V1',
           attemptEpoch: input.attemptEpoch,
@@ -270,10 +272,11 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
         attemptEpoch: input.attemptEpoch,
         questionnaireAssessment: {
           is: {
-            id: admission.id,
+            id: input.questionnaireAssessmentId,
             status: 'IN_PROGRESS',
             runtimeGeneration: 'UNIFIED_V1',
             attemptEpoch: input.attemptEpoch,
+            deliveryMode: 'FINAL_ONLY',
             ...(contextSnapshotHash === null ? { contextSnapshotHash: null } : { contextSnapshotHash }),
           },
         },
@@ -282,9 +285,9 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
     } as any)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评状态已变化，请重试', 409)
     await insertCompletedUnitSnapshot(tx, {
-      questionnaireAssessmentId: admission.id,
+      questionnaireAssessmentId: input.questionnaireAssessmentId,
       attemptEpoch: input.attemptEpoch,
-      slotKey: formSectionSlotKey(mappedSection.id),
+      slotKey,
       unitType: 'FORM_SECTION',
       payloadKind: 'COLLECTION_FACTS',
       sourceType: 'QUESTIONNAIRE_FORM_SECTION',
@@ -294,55 +297,27 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
     })
-    const progress = progressAfterFormSection({
-      completedScales: admission.completedScales,
-      completedForms: admission.completedForms,
-      totalUnits: admission.questionnaire.questionnaireScales.length + admission.questionnaire.formSections.length,
-      sectionWasInProgress: true,
-    })
-    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, ...progress }
+    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
-  const parent = await measureRequestPhase('final_submit_parent_finalization', async () => {
-    const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
-    return finalizeQuestionnaireAttemptIfReady(admission.id)
-  })
-  return { submissionId, sectionId: input.sectionId, ...committed, parent }
-}
-
-const ensureCompositeSectionAttempt = async (attemptId: string, sectionId: string, attemptEpoch: number) => {
-  let attempt = await prisma.compositeFormSectionAttempt.findUnique({ where: { attemptId_sectionId: { attemptId, sectionId } } })
-  if (!attempt) {
-    try {
-      attempt = await prisma.compositeFormSectionAttempt.create({ data: { attemptId, sectionId, attemptEpoch } })
-    } catch (error) {
-      if ((error as { code?: string })?.code !== 'P2002') throw error
-      attempt = await prisma.compositeFormSectionAttempt.findUnique({ where: { attemptId_sectionId: { attemptId, sectionId } } })
-    }
-  }
-  if (!attempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
-  return attempt
+  return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
 
 export const submitUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
-  admission: any,
+  _parent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  if (admission.runtimeGeneration !== 'UNIFIED_V1') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '综合测评运行时版本不支持统一提交', 409)
-  if (input.userId !== null && input.userId !== undefined) {
-    if (admission.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评', 403)
-  } else if (admission.userId !== null || !input.recoveryTokenHash || admission.recoveryTokenHash !== input.recoveryTokenHash) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权操作此综合测评', 403)
-  }
-  assertFinalOnly(admission.deliveryMode)
-  assertAttemptEpoch(admission.attemptEpoch, input.attemptEpoch)
-  assertFinalSubmitStatus(admission.status, '综合测评')
-  const section = admission.compositeAssessment.formSections.find((candidate: any) => candidate.id === input.sectionId)
-  if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
-  const mappedSection = mapCompositeSection(section)
-  const sectionIdentityHash = formSectionIdentityHash(mappedSection)
-  assertDefinitionHash(sectionIdentityHash, input.definitionHash)
-  assertFormSectionSlotBinding(admission, mappedSection.id, sectionIdentityHash)
+  const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch)
+  const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogCompositeFormAdmission({
+    parentId: input.attemptId,
+    sectionId: input.sectionId,
+    child,
+  }))
+  assertFormFrozenAdmission(admission, input, {
+    questionnaireAssessmentId: null,
+    compositeAttemptId: input.attemptId,
+  }, 'composite')
+  const mappedSection = loadCompositeFormDefinition(admission)
   const normalized = measureRequestPhaseSync(
     'final_submit_payload_validation',
     () => normalizeCompositeSectionAnswers(mappedSection, input.answers),
@@ -350,34 +325,42 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   const canonical = canonicalSubmission({ answers: normalized.payloadAnswers })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.formSection, '综合测评区段提交数据')
   const payloadHash = canonical.hash
-  const sectionAttempt = await ensureCompositeSectionAttempt(admission.id, mappedSection.id, input.attemptEpoch)
   const context = mappedSection.contextSection && !admission.contextSnapshotHash
     ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], compositeContextItems(mappedSection))
     : null
   const factsEncrypted = encryptUnifiedRuntimePayload(formFactsFor(mappedSection.id, normalized.normalized as NormalizedSectionEntry[]))
-  const sourceDefinitionHash = createHash('sha256').update(canonicalJsonBytes(mappedSection)).digest('hex')
+  const slotKey = admission.parent?.slotKey ?? formSectionSlotKey(mappedSection.id)
+  const sourceDefinitionHash = admission.parent?.sourceDefinitionHash ?? admission.formSection!.identityHash
+  void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
-    const currentSection = await tx.compositeFormSectionAttempt.findUnique({ where: { id: sectionAttempt.id } })
+    const currentSection = await tx.compositeFormSectionAttempt.findUnique({
+      where: { id: child.id },
+      select: {
+        id: true,
+        status: true,
+        attemptEpoch: true,
+        submissionId: true,
+        submissionPayloadHash: true,
+        frozenAdmissionSnapshotHash: true,
+      },
+    })
     if (!currentSection) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段记录不存在', 404)
     assertAttemptEpoch(currentSection.attemptEpoch, input.attemptEpoch)
+    if (currentSection.frozenAdmissionSnapshotHash && currentSection.frozenAdmissionSnapshotHash !== admission.snapshotHash) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段准入快照已变化，请重试', 409)
+    }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
-      const progress = progressAfterFormSection({
-        completedScales: admission.completedItems,
-        completedForms: 0,
-        totalUnits: admission.compositeAssessment.items.filter((item: any) => item.type !== 'FORM').length + admission.compositeAssessment.formSections.length,
-        sectionWasInProgress: false,
-      })
-      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash, ...progress }
+      return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
-    await persistCompositeFormSection(tx, admission.id, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
+    await persistCompositeFormSection(tx, input.attemptId, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {
       await tx.compositeAssessmentAttempt.updateMany({
         where: {
-          id: admission.id,
+          id: input.attemptId,
           status: 'IN_PROGRESS',
           runtimeGeneration: 'UNIFIED_V1',
           attemptEpoch: input.attemptEpoch,
@@ -396,10 +379,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
         attemptEpoch: input.attemptEpoch,
         attempt: {
           is: {
-            id: admission.id,
+            id: input.attemptId,
             status: 'IN_PROGRESS',
             runtimeGeneration: 'UNIFIED_V1',
             attemptEpoch: input.attemptEpoch,
+            deliveryMode: 'FINAL_ONLY',
             ...(contextSnapshotHash === null ? { contextSnapshotHash: null } : { contextSnapshotHash }),
           },
         },
@@ -408,9 +392,9 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     } as any)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评状态已变化，请重试', 409)
     await insertCompletedUnitSnapshot(tx, {
-      compositeAttemptId: admission.id,
+      compositeAttemptId: input.attemptId,
       attemptEpoch: input.attemptEpoch,
-      slotKey: formSectionSlotKey(mappedSection.id),
+      slotKey,
       unitType: 'FORM_SECTION',
       payloadKind: 'COLLECTION_FACTS',
       sourceType: 'COMPOSITE_FORM_SECTION',
@@ -420,20 +404,9 @@ export const submitUnifiedCompositeFormSectionFinal = async (
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
     })
-    const totalUnits = admission.compositeAssessment.items.filter((item: any) => item.type !== 'FORM').length + admission.compositeAssessment.formSections.length
-    const progress = progressAfterFormSection({
-      completedScales: admission.completedItems,
-      completedForms: 0,
-      totalUnits,
-      sectionWasInProgress: true,
-    })
-    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash, ...progress }
+    return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
-  const parent = await measureRequestPhase('final_submit_parent_finalization', async () => {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    return finalizeCompositeAttemptIfReady(admission.id)
-  })
-  return { submissionId, sectionId: input.sectionId, ...committed, parent }
+  return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
 
 const withQuestionnaireFormUnitTransaction = async <T>(callback: (tx: Prisma.TransactionClient) => Promise<T>) => (
