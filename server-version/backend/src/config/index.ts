@@ -3,6 +3,7 @@ import { z } from 'zod'
 import path from 'path'
 import { HEX_32_BYTE_KEY } from '../utils/encryption'
 import { logger } from '../utils/logger'
+import { resolveBackgroundWorkersEnabled } from './backgroundWorkers'
 
 dotenv.config()
 
@@ -33,6 +34,8 @@ const configSchema = z.object({
   cognitiveModuleEnabled: z.boolean(),
   // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
   materialGrantsEnabled: z.boolean(),
+  // Consume video/image/export Bull jobs in this process. Default on except NODE_ENV=test.
+  backgroundWorkersEnabled: z.boolean(),
   socketRedisRequired: z.boolean(),
   // Cognitive 参与者假名化密钥（64 位十六进制；生产环境必需，独立于 DATA_ENCRYPTION_KEY）
   dataPseudonymKey: z.string().optional(),
@@ -118,6 +121,7 @@ const rawConfig = {
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
+  backgroundWorkersEnabled: resolveBackgroundWorkersEnabled(),
   // Socket.IO room broadcasts are not safe to run in a multi-process
   // deployment without the Redis adapter.  Production therefore requires it
   // by default; development and test keep the single-process fallback.
