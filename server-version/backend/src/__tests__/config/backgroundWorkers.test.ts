@@ -20,8 +20,11 @@ describe('resolveBackgroundWorkersEnabled', () => {
     expect(resolveBackgroundWorkersEnabled({ NODE_ENV: 'production', BACKGROUND_WORKERS_ENABLED: 'false' })).toBe(false)
   })
 
-  it('rejects non-boolean values', () => {
+  it('rejects non-boolean values including empty string', () => {
     expect(() => resolveBackgroundWorkersEnabled({ BACKGROUND_WORKERS_ENABLED: 'yes' })).toThrow(
+      /BACKGROUND_WORKERS_ENABLED/,
+    )
+    expect(() => resolveBackgroundWorkersEnabled({ BACKGROUND_WORKERS_ENABLED: '' })).toThrow(
       /BACKGROUND_WORKERS_ENABLED/,
     )
   })

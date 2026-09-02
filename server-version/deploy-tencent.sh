@@ -148,7 +148,7 @@ $SSH_CMD << 'EOF'
   sudo docker-compose down 2>/dev/null || true
   sudo docker-compose --profile ops run --rm migrate
   sudo docker-compose --profile ops run --rm seed
-  sudo docker-compose up -d backend frontend
+  sudo docker-compose up -d backend worker frontend
 EOF
 
 # 6. 检查状态

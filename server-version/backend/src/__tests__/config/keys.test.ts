@@ -78,4 +78,9 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     const mod = await import('../../config')
     expect(mod.config.backgroundWorkersEnabled).toBe(false)
   })
+
+  it('rejects empty BACKGROUND_WORKERS_ENABLED the same way as other booleans', async () => {
+    process.env.BACKGROUND_WORKERS_ENABLED = ''
+    await expect(import('../../config')).rejects.toThrow(/BACKGROUND_WORKERS_ENABLED/)
+  })
 })

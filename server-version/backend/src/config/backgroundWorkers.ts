@@ -11,7 +11,7 @@ export const resolveBackgroundWorkersEnabled = (
   env: NodeJS.ProcessEnv = process.env,
 ): boolean => {
   const raw = env.BACKGROUND_WORKERS_ENABLED
-  if (raw === undefined || raw === '') return env.NODE_ENV !== 'test'
+  if (raw === undefined) return env.NODE_ENV !== 'test'
   if (raw === 'true') return true
   if (raw === 'false') return false
   throw new Error(`❌ BACKGROUND_WORKERS_ENABLED must be 'true' or 'false' (got '${raw}')`)

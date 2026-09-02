@@ -135,7 +135,7 @@ docker compose "${COMPOSE_ARGS[@]}" config >/dev/null
 docker compose "${COMPOSE_ARGS[@]}" build backend frontend migrate seed
 docker compose "${COMPOSE_ARGS[@]}" --profile ops run --rm migrate
 docker compose "${COMPOSE_ARGS[@]}" --profile ops run --rm seed
-docker compose "${COMPOSE_ARGS[@]}" up -d --force-recreate backend frontend
+docker compose "${COMPOSE_ARGS[@]}" up -d --force-recreate backend worker frontend
 
 backend_container=""
 frontend_container=""

@@ -7,13 +7,58 @@
 #   docker compose --profile ops run --rm migrate
 #   docker compose --profile ops run --rm release-preflight
 #   docker compose --profile ops run --rm seed   # 首次/明确需要时
-#   docker compose up -d backend frontend
+#   docker compose up -d backend worker frontend
 #
 # 升级安全顺序：入口 drain + 停止旧 backend/worker/frontend（不要停止
 # postgres/redis） -> 备份 -> migrate -> checkin-token-backfill（四类 public
 # token） -> release-preflight（八个约束） -> 同一 SHA build/start -> public
 # workflow smoke -> 恢复入口流量。NOT VALID 仍会检查迁移后的写入。
 # ============================================================
+
+x-app-environment: &app-environment
+  NODE_ENV: production
+  PORT: 3000
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+  PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
+  PRISMA_POOL_TIMEOUT: ${PRISMA_POOL_TIMEOUT:-30}
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+  JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+  COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly (false for local HTTP, true for HTTPS)}
+  DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
+  ASSESSMENT_CONTEXT_HASH_KEY: ${ASSESSMENT_CONTEXT_HASH_KEY:-}
+  COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
+  DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
+  REDIS_URL: redis://redis:6379
+  SOCKET_REDIS_REQUIRED: ${SOCKET_REDIS_REQUIRED:-true}
+  UPLOAD_DIR: /app/uploads
+  ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
+  ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:?ASSET_MIGRATION_COMPLETE must be set explicitly after asset/token migration}
+  ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:?ASSET_SIGNING_SECRET must be set}
+  PUBLIC_CHECKIN_UPLOAD_IP_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_IP_LIMIT:-1800}
+  PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT:-600}
+  PUBLIC_CHECKIN_SUBMIT_IP_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_IP_LIMIT:-600}
+  PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT:-120}
+  CREDENTIAL_HANDOFF_DIR: /app/.local
+  CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
+  CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
+  TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
+  EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}
+  EXPORT_MAX_TRIALS: ${EXPORT_MAX_TRIALS:-100000}
+  EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
+  EXPORT_MAX_BYTES: ${EXPORT_MAX_BYTES:-52428800}
+  EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-24}
+  EXPORT_DIR: /app/exports
+  COS_SECRET_ID: ${COS_SECRET_ID:-}
+  COS_SECRET_KEY: ${COS_SECRET_KEY:-}
+  COS_BUCKET: ${COS_BUCKET:-}
+  COS_REGION: ${COS_REGION:-}
+  COS_DOMAIN: ${COS_DOMAIN:-}
+  VIDEO_LOW_POWER_MODE: ${VIDEO_LOW_POWER_MODE:-true}
+  VIDEO_RESOLUTION: ${VIDEO_RESOLUTION:-480p}
+  VIDEO_PRESET: ${VIDEO_PRESET:-ultrafast}
+  VIDEO_CRF: ${VIDEO_CRF:-28}
+  VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
+  VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
 
 services:
   postgres:
@@ -55,62 +100,8 @@ services:
       target: runtime
     container_name: ptool-backend
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      # Supply a complete URL with percent-encoded user/password credentials.
-      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
-      # Applied by backend/src/config/databasePool.ts when DATABASE_URL does not
-      # already contain the corresponding Prisma query parameter.
-      PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
-      PRISMA_POOL_TIMEOUT: ${PRISMA_POOL_TIMEOUT:-30}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      # Do not silently downgrade secure cookies in a production-mode
-      # container. Set false explicitly for local HTTP and true for HTTPS.
-      COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly (false for local HTTP, true for HTTPS)}
-      # 生产环境必需（config/index.ts 强制校验 64 位十六进制）
-      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
-      # AssessmentContext 快照指纹密钥；留空时由 backend 从 DATA_ENCRYPTION_KEY 派生域隔离 HMAC 密钥
-      ASSESSMENT_CONTEXT_HASH_KEY: ${ASSESSMENT_CONTEXT_HASH_KEY:-}
-      # Cognitive 模块开关（Release v1 默认开启；legacy-only 环境可显式设为 false）
-      COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
-      # Cognitive 参与者假名化密钥（仅当 COGNITIVE_MODULE_ENABLED=true 时生产必需，64 位十六进制；与 DATA_ENCRYPTION_KEY 独立）
-      DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
-      REDIS_URL: redis://redis:6379
-      SOCKET_REDIS_REQUIRED: ${SOCKET_REDIS_REQUIRED:-true}
-      UPLOAD_DIR: /app/uploads
-      ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-local}
-      ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:?ASSET_MIGRATION_COMPLETE must be set explicitly after asset/token migration}
-      ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:?ASSET_SIGNING_SECRET must be set}
-      # Public check-in limits use a 15-minute window. Keep IP ceilings wider
-      # than the shared-link ceilings so a school NAT is not a class-size cap.
-      PUBLIC_CHECKIN_UPLOAD_IP_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_IP_LIMIT:-1800}
-      PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT:-600}
-      PUBLIC_CHECKIN_SUBMIT_IP_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_IP_LIMIT:-600}
-      PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT:-120}
-      CREDENTIAL_HANDOFF_DIR: /app/.local
-      CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
-      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
-      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
-      EXPORT_MAX_RECORDS: ${EXPORT_MAX_RECORDS:-10000}
-      EXPORT_MAX_TRIALS: ${EXPORT_MAX_TRIALS:-100000}
-      EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
-      EXPORT_MAX_BYTES: ${EXPORT_MAX_BYTES:-52428800}
-      EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-24}
-      EXPORT_DIR: /app/exports
-      # COS 可选；留空则不启用远程存储
-      COS_SECRET_ID: ${COS_SECRET_ID:-}
-      COS_SECRET_KEY: ${COS_SECRET_KEY:-}
-      COS_BUCKET: ${COS_BUCKET:-}
-      COS_REGION: ${COS_REGION:-}
-      COS_DOMAIN: ${COS_DOMAIN:-}
-      # 视频处理低配优化（沿用 baseline 默认）
-      VIDEO_LOW_POWER_MODE: ${VIDEO_LOW_POWER_MODE:-true}
-      VIDEO_RESOLUTION: ${VIDEO_RESOLUTION:-480p}
-      VIDEO_PRESET: ${VIDEO_PRESET:-ultrafast}
-      VIDEO_CRF: ${VIDEO_CRF:-28}
-      VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
-      VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
+      <<: *app-environment
+      BACKGROUND_WORKERS_ENABLED: ${BACKGROUND_WORKERS_ENABLED:-false}
     volumes:
       - uploads_data:/app/uploads
       - exports_data:/app/exports
@@ -142,6 +133,34 @@ services:
       - exports_data:/app/exports
       - credential_handoff_data:/app/.local
     restart: "no"
+
+  # Consume video/image/export Bull jobs. Canonical API sets
+  # BACKGROUND_WORKERS_ENABLED=false so FINAL_ONLY submit does not share this
+  # process's Prisma pool with transcode/export.
+  worker:
+    image: server-version-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: ptool-worker
+    command: ["node", "dist/workers/main.js"]
+    environment:
+      <<: *app-environment
+      BACKGROUND_WORKERS_ENABLED: "true"
+      PRISMA_CONNECTION_POOL_SIZE: ${WORKER_PRISMA_CONNECTION_POOL_SIZE:-4}
+    volumes:
+      - uploads_data:/app/uploads
+      - exports_data:/app/exports
+      - credential_handoff_data:/app/.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend-volume-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
   frontend:
     build:

@@ -86,7 +86,7 @@ docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm seed  # 首次/明确需要时
 docker compose --profile ops run --rm checkin-token-backfill
 docker compose --profile ops run --rm release-preflight
-docker compose up -d backend frontend
+docker compose up -d backend worker frontend
 # smoke questionnaire/check-in/composite/cognitive 中已启用的每类 public link，确认后再恢复入口流量
 
 # 7. 配置安全组
@@ -157,7 +157,7 @@ docker compose build backend frontend migrate checkin-token-backfill release-pre
 docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm checkin-token-backfill
 docker compose --profile ops run --rm release-preflight
-docker compose up -d backend frontend
+docker compose up -d backend worker frontend
 # 完成四类 public workflow smoke 后，才恢复入口/负载均衡流量。
 ```
 
@@ -250,7 +250,7 @@ fi
 docker compose down 2>/dev/null || true
 docker compose --profile ops run --rm migrate
 docker compose --profile ops run --rm seed
-docker compose up -d backend frontend
+docker compose up -d backend worker frontend
 
 # 等待服务启动
 sleep 10
