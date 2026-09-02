@@ -32,6 +32,14 @@ export type RequestObservationPhase =
   | 'final_submit_commit'
   | 'final_submit_parent_finalization'
   | 'final_submit_retry_backoff'
+  | 'aggregate.load_ms'
+  | 'aggregate.decrypt_ms'
+  | 'aggregate.evidence_ms'
+  | 'aggregate.compute_ms'
+  | 'aggregate.encrypt_ms'
+  | 'aggregate.persist_ms'
+  | 'aggregate.cas_loser'
+  | 'aggregate.compute_per_parent'
   | 'response'
 
 type Histogram = {

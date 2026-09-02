@@ -241,9 +241,10 @@ const createPackageCompletionFixture = async (malformedSnapshot = false) => {
       reportPackageKey: packageDefinition.key,
       reportPackageVersion: packageDefinition.version,
       reportPackageProfile: 'standard',
-      reportPackageSnapshotEncrypted: malformedSnapshot
-        ? encryptCognitivePayload({ malformed: true })
-        : encryptCognitivePayload(packageSnapshot),
+      // Start with a valid snapshot so V32-2 activation can freeze the
+      // attempt. The malformed-snapshot case corrupts it immediately after
+      // creation and then exercises the historical completion route below.
+      reportPackageSnapshotEncrypted: encryptCognitivePayload(packageSnapshot),
     },
   })
   createdCompositeAssessmentIds.push(composite.id)
@@ -261,6 +262,19 @@ const createPackageCompletionFixture = async (malformedSnapshot = false) => {
     itemRows.push(row)
   }
   const started = await compositeService.startUserAttempt(userId, composite.id)
+  // This PR8 fixture writes legacy encrypted Session fields directly. Keep
+  // its attempt on the pre-V32-2 completion route; production-created
+  // attempts remain UNIFIED_V1 by default.
+  await prisma.compositeAssessmentAttempt.update({
+    where: { id: started.attempt.id },
+    data: { runtimeGeneration: null },
+  })
+  if (malformedSnapshot) {
+    await prisma.compositeAssessment.update({
+      where: { id: composite.id },
+      data: { reportPackageSnapshotEncrypted: encryptCognitivePayload({ malformed: true }) },
+    })
+  }
   const sessions = await prisma.cognitiveSession.findMany({
     where: { compositeAttemptId: started.attempt.id },
     orderBy: { attemptNo: 'asc' },
@@ -610,6 +624,10 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     if (!originalReaction) throw new Error('PR8 package fixture reaction Session missing')
 
     const restartedAttempt = await compositeService.restartUserAttempt(userId, fixture.attemptId)
+    await prisma.compositeAssessmentAttempt.update({
+      where: { id: restartedAttempt.attempt.id },
+      data: { runtimeGeneration: null },
+    })
     const restartedReaction = await prisma.cognitiveSession.findFirst({
       where: {
         compositeAttemptId: restartedAttempt.attempt.id,

@@ -7,7 +7,7 @@ const source = (relativePath: string): string => readFileSync(
   'utf8',
 )
 
-describe('V32-1 architecture boundaries', () => {
+describe('Unified runtime architecture boundaries', () => {
   it('keeps the authoritative scorer pure and free of publication/database gates', () => {
     const scorer = source('modules/cognitive/v2/authoritative-scorer.ts')
 
@@ -15,13 +15,14 @@ describe('V32-1 architecture boundaries', () => {
     expect(scorer).not.toMatch(/\bprisma\b|encryptField|decryptField|isEncrypted/)
   })
 
-  it('keeps unified unit submitters independent from parent finalization', () => {
+  it('keeps unified unit submitters free of legacy parent coordination', () => {
     const cognitive = source('modules/cognitive/unified-final-submit.service.ts')
     const scale = source('modules/scale/unified-final-submit.service.ts')
     const form = source('modules/assessment-runtime/unified-form-section-final-submit.service.ts')
 
     for (const submitter of [cognitive, scale, form]) {
-      expect(submitter).not.toMatch(/finalizeCompositeAttemptIfReady|finalizeQuestionnaireAttemptIfReady|refreshCompositeFinalOnlyProgress/)
+      expect(submitter).not.toMatch(/refreshCompositeFinalOnlyProgress/)
+      expect(submitter).not.toMatch(/SELECT[\s\S]*FOR UPDATE/i)
     }
     expect(cognitive.match(/cognitiveRawSubmission\.create/g) ?? []).toHaveLength(1)
     expect(cognitive).not.toMatch(/CognitiveTrial|cognitiveTrial/)

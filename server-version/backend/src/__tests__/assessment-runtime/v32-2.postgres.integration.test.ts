@@ -1,0 +1,548 @@
+import { randomUUID } from 'node:crypto'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { Prisma, PrismaClient } from '@prisma/client'
+import { integrationDatabaseUrl } from '../integration/integration-env'
+import { hashScaleDefinition, type ScaleDefinitionV2 } from '../../modules/scale/scale-definition'
+import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
+import { encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
+import { freezeCompositeActiveSlotSet, freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../../modules/assessment-runtime/attempt-runtime'
+import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
+import { createCanonicalUnitResultEnvelope, type CanonicalUnitResultCoreV1 } from '../../modules/assessment-runtime/unit-result'
+import { createFormSectionCollectionFacts } from '../../modules/assessment-runtime/form-facts'
+import { decryptField } from '../../utils/encryption'
+
+const databaseUrl = integrationDatabaseUrl('V32_2_INTEGRATION_DATABASE_URL')
+const suite = databaseUrl ? describe : describe.skip
+
+let db: PrismaClient | null = null
+let finalizeQuestionnaireAttemptUnifiedIfReady: typeof import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')['finalizeQuestionnaireAttemptUnifiedIfReady']
+let finalizeCompositeAttemptUnifiedIfReady: typeof import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')['finalizeCompositeAttemptUnifiedIfReady']
+let mapCompositeSection: typeof import('../../modules/composite/final-submit.service')['mapCompositeSection']
+
+type Fixture = {
+  userId: string
+  questionnaireId: string
+  scaleId: string
+  questionnaireScaleId: string
+  sectionId: string
+  formItemId: string
+  assessmentId: string
+  sectionAttemptId: string
+  parentId: string
+  scaleCode: string
+  runtime: ReturnType<typeof createFrozenScaleRuntimeSnapshot>
+  sectionDefinition: Record<string, unknown>
+  sectionDefinitionHash: string
+}
+
+type CompositeFixture = {
+  userId: string
+  compositeId: string
+  sectionId: string
+  formItemId: string
+  attemptId: string
+  sectionAttemptId: string
+  sectionDefinitionHash: string
+}
+
+const scaleDefinition = (): ScaleDefinitionV2 => ({
+  schemaVersion: 2,
+  respondentType: 'participant_self_report',
+  source: { title: 'V32-2 integration fixture', citation: 'v32-2.postgres.integration.test' },
+  license: { status: 'self_authored', redistribution: 'allowed' },
+  display: { randomizeItems: false },
+  responseSets: [{
+    key: 'default',
+    options: [
+      { value: 'no', label: '否', score: 0 },
+      { value: 'yes', label: '是', score: 1 },
+    ],
+  }],
+  items: [{
+    itemCode: 'v32-2-item-1',
+    content: 'V32-2 fixture item',
+    type: 'single',
+    required: true,
+    sortOrder: 0,
+    responseSetKey: 'default',
+    randomizeOptions: false,
+  }],
+  scoring: {
+    scoringVersion: '2.0.0',
+    itemRules: [{ itemCode: 'v32-2-item-1', transform: { type: 'identity' } }],
+    defaultMissingPolicy: { type: 'complete_required' },
+    scores: [{
+      key: 'total',
+      type: 'total',
+      label: '总分',
+      direction: 'descriptive',
+      canonical: true,
+      displayPrecision: 2,
+      source: { type: 'items', items: [{ itemCode: 'v32-2-item-1', weight: 1 }], aggregation: 'sum' },
+    }],
+  },
+  report: {
+    reportVersion: '2.0.0',
+    primaryScoreKeys: ['total'],
+    scoreOrder: ['total'],
+    interpretations: [{
+      scoreKey: 'total',
+      headline: '总分',
+      source: { type: 'score_only' },
+      summary: 'V32-2 fixture result',
+      bands: [],
+      guidance: [],
+    }],
+    limitations: [],
+    disclaimer: 'V32-2 fixture only.',
+  },
+  referencePolicy: { type: 'none' },
+})
+
+const makeSectionDefinition = (input: { sectionId: string; itemId: string }) => ({
+  id: input.sectionId,
+  title: 'V32-2 form section',
+  description: null,
+  position: 1,
+  contextSection: false,
+  items: [{
+    id: input.itemId,
+    type: 'text_input',
+    label: '年级',
+    placeholder: null,
+    required: true,
+    options: null,
+    contextKey: null,
+    position: 0,
+    sectionPosition: 0,
+  }],
+})
+
+const createFixture = async (): Promise<Fixture> => {
+  if (!db) throw new Error('V32-2 database is not connected')
+  const suffix = randomUUID()
+  const ids = {
+    userId: `v32-2-user-${suffix}`,
+    questionnaireId: `v32-2-questionnaire-${suffix}`,
+    scaleId: `v32-2-scale-${suffix}`,
+    questionnaireScaleId: `v32-2-questionnaire-scale-${suffix}`,
+    sectionId: `v32-2-section-${suffix}`,
+    formItemId: `v32-2-form-item-${suffix}`,
+    assessmentId: `v32-2-assessment-${suffix}`,
+    sectionAttemptId: `v32-2-section-attempt-${suffix}`,
+    parentId: `v32-2-parent-${suffix}`,
+  }
+  const scaleCode = `V32-2-FIXTURE-SCALE-${suffix}`
+  const definition = scaleDefinition()
+  const runtime = createFrozenScaleRuntimeSnapshot({
+    instrumentKey: scaleCode,
+    instrumentVersion: '2.0.0',
+    definition,
+  })
+  const sectionDefinition = makeSectionDefinition({ sectionId: ids.sectionId, itemId: ids.formItemId })
+  const sectionDefinitionHash = formSectionIdentityHash(sectionDefinition)
+
+  await db.user.create({ data: { id: ids.userId, username: `v32-2-${suffix}`, passwordHash: 'v32-2-fixture-only' } })
+  await db.scale.create({
+    data: {
+      id: ids.scaleId,
+      code: scaleCode,
+      name: 'V32-2 fixture scale',
+      creatorId: ids.userId,
+      status: 'PUBLISHED',
+      visibility: 'PUBLIC',
+      instrumentClass: 'CUSTOM_DESCRIPTIVE',
+      instrumentVersion: '2.0.0',
+      definition: definition as Prisma.InputJsonValue,
+      definitionHash: hashScaleDefinition(definition),
+      itemCount: 1,
+      dimensionCount: 1,
+    },
+  })
+  await db.questionnaire.create({
+    data: {
+      id: ids.questionnaireId,
+      code: `v32-2-${suffix}`,
+      name: 'V32-2 fixture questionnaire',
+      type: 'GENERAL',
+      status: 'PUBLISHED',
+      creatorId: ids.userId,
+    },
+  })
+  await db.questionnaireScale.create({
+    data: {
+      id: ids.questionnaireScaleId,
+      questionnaireId: ids.questionnaireId,
+      scaleId: ids.scaleId,
+      position: 0,
+    },
+  })
+  await db.questionnaireFormSection.create({
+    data: {
+      id: ids.sectionId,
+      questionnaireId: ids.questionnaireId,
+      title: sectionDefinition.title as string,
+      position: 1,
+      contextSection: false,
+    },
+  })
+  await db.questionnaireFormItem.create({
+    data: {
+      id: ids.formItemId,
+      questionnaireId: ids.questionnaireId,
+      sectionId: ids.sectionId,
+      sectionPosition: 0,
+      type: 'text_input',
+      label: '年级',
+      position: 0,
+      required: true,
+    },
+  })
+  await db.questionnaireAssessment.create({
+    data: {
+      id: ids.parentId,
+      questionnaireId: ids.questionnaireId,
+      userId: ids.userId,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: 1,
+      progress: 0,
+    },
+  })
+  await db.assessment.create({
+    data: {
+      id: ids.assessmentId,
+      scaleId: ids.scaleId,
+      userId: ids.userId,
+      questionnaireAssessmentId: ids.parentId,
+      status: 'COMPLETED',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: 1,
+      runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtime),
+      compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      progress: 100,
+    },
+  })
+  await db.questionnaireFormSectionAttempt.create({
+    data: {
+      id: ids.sectionAttemptId,
+      questionnaireAssessmentId: ids.parentId,
+      sectionId: ids.sectionId,
+      status: 'COMPLETED',
+      attemptEpoch: 1,
+    },
+  })
+  const slotSet = freezeQuestionnaireActiveSlotSet({
+    attemptEpoch: 1,
+    scales: [{
+      questionnaireScaleId: ids.questionnaireScaleId,
+      code: scaleCode,
+      instrumentVersion: '2.0.0',
+      sourceDefinitionHash: runtime.sourceDefinitionHash,
+      compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+    }],
+    formSections: [{ sectionId: ids.sectionId, definitionHash: sectionDefinitionHash }],
+  })
+  await db.questionnaireAssessment.update({
+    where: { id: ids.parentId },
+    data: {
+      frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
+      frozenActiveSlotSetHash: slotSet.snapshotHash,
+    },
+  })
+  return { ...ids, scaleCode, runtime, sectionDefinition, sectionDefinitionHash }
+}
+
+const canonicalScaleEnvelope = (fixture: Fixture) => {
+  const core: CanonicalUnitResultCoreV1 = {
+    schemaVersion: 1,
+    unitType: 'SCALE',
+    instrumentKey: fixture.runtime.instrumentKey,
+    instrumentVersion: fixture.runtime.instrumentVersion,
+    sourceDefinitionHash: fixture.runtime.sourceDefinitionHash,
+    compilerVersion: fixture.runtime.compiledRuntime.compilerVersion,
+    compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
+    scorerKey: fixture.runtime.compiledRuntime.scorerKey ?? 'scale.default',
+    scorerVersion: fixture.runtime.compiledRuntime.scorerVersion,
+    quality: { status: 'interpretable', flags: [] },
+    metrics: [{ key: 'total', value: 1, unit: 'score', quality: 'calculated' }],
+    facts: [],
+    references: [],
+    contextHash: null,
+    scientificProvenance: {
+      instrumentKey: fixture.runtime.instrumentKey,
+      instrumentVersion: fixture.runtime.instrumentVersion,
+    },
+  }
+  return createCanonicalUnitResultEnvelope({
+    core,
+    completedAt: new Date('2026-09-01T00:00:00.000Z'),
+    persistenceProvenance: {
+      sourceType: 'ASSESSMENT',
+      sourceAttemptId: fixture.assessmentId,
+      sourceSubmissionId: 'v32-2-scale-submission',
+    },
+  })
+}
+
+const addScaleSnapshot = async (fixture: Fixture, encrypted: string) => {
+  if (!db) throw new Error('V32-2 database is not connected')
+  await db.assessmentUnitSnapshot.create({
+    data: {
+      questionnaireAssessmentId: fixture.parentId,
+      attemptEpoch: 1,
+      slotKey: `scale:${fixture.questionnaireScaleId}`,
+      unitType: 'SCALE',
+      terminalState: 'COMPLETED',
+      payloadKind: 'UNIT_RESULT',
+      sourceType: 'ASSESSMENT',
+      sourceAttemptId: fixture.assessmentId,
+      sourceSubmissionId: 'v32-2-scale-submission',
+      sourceDefinitionHash: fixture.runtime.sourceDefinitionHash,
+      compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
+      canonicalResultEncrypted: encrypted,
+      completedAt: new Date('2026-09-01T00:00:00.000Z'),
+    },
+  })
+}
+
+const addFormSnapshot = async (fixture: Fixture) => {
+  if (!db) throw new Error('V32-2 database is not connected')
+  const facts = createFormSectionCollectionFacts({
+    sectionKey: fixture.sectionId,
+    items: [{ key: fixture.formItemId, label: '年级', value: '三年级' }],
+  })
+  await db.assessmentUnitSnapshot.create({
+    data: {
+      questionnaireAssessmentId: fixture.parentId,
+      attemptEpoch: 1,
+      slotKey: `form-section:${fixture.sectionId}`,
+      unitType: 'FORM_SECTION',
+      terminalState: 'COMPLETED',
+      payloadKind: 'COLLECTION_FACTS',
+      sourceType: 'QUESTIONNAIRE_FORM_SECTION',
+      sourceAttemptId: fixture.sectionAttemptId,
+      sourceSubmissionId: 'v32-2-form-submission',
+      sourceDefinitionHash: fixture.sectionDefinitionHash,
+      collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts),
+      completedAt: new Date('2026-09-01T00:00:00.000Z'),
+    },
+  })
+}
+
+const destroyFixture = async (fixture: Fixture) => {
+  if (!db) return
+  await db.assessmentUnitSnapshot.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+  await db.assessment.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+  await db.questionnaireFormSectionAttempt.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+  await db.questionnaireFormAnswer.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+  await db.questionnaireAssessment.deleteMany({ where: { id: fixture.parentId } })
+  await db.questionnaire.deleteMany({ where: { id: fixture.questionnaireId } })
+  await db.scale.deleteMany({ where: { id: fixture.scaleId } })
+  await db.user.deleteMany({ where: { id: fixture.userId } })
+}
+
+const createCompositeFixture = async (): Promise<CompositeFixture> => {
+  if (!db) throw new Error('V32-2 database is not connected')
+  const suffix = randomUUID()
+  const ids = {
+    userId: `v32-2-composite-user-${suffix}`,
+    compositeId: `v32-2-composite-${suffix}`,
+    sectionId: `v32-2-composite-section-${suffix}`,
+    formItemId: `v32-2-composite-form-item-${suffix}`,
+    attemptId: `v32-2-composite-attempt-${suffix}`,
+    sectionAttemptId: `v32-2-composite-section-attempt-${suffix}`,
+  }
+  await db.user.create({ data: { id: ids.userId, username: `v32-2-composite-${suffix}`, passwordHash: 'v32-2-fixture-only' } })
+  await db.compositeAssessment.create({
+    data: {
+      id: ids.compositeId,
+      code: `v32-2-composite-${suffix}`,
+      name: 'V32-2 composite fixture',
+      status: 'PUBLISHED',
+      createdBy: ids.userId,
+    },
+  })
+  await db.compositeFormSection.create({
+    data: {
+      id: ids.sectionId,
+      compositeAssessmentId: ids.compositeId,
+      title: 'V32-2 composite form section',
+      position: 0,
+      contextSection: false,
+    },
+  })
+  await db.compositeAssessmentItem.create({
+    data: {
+      id: ids.formItemId,
+      compositeAssessmentId: ids.compositeId,
+      type: 'FORM',
+      position: 0,
+      required: true,
+      formType: 'text_input',
+      formLabel: '年级',
+      formSectionId: ids.sectionId,
+      formSectionPosition: 0,
+    },
+  })
+  await db.compositeAssessmentAttempt.create({
+    data: {
+      id: ids.attemptId,
+      compositeAssessmentId: ids.compositeId,
+      userId: ids.userId,
+      participantKey: `v32-2-composite-participant-${suffix}`,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: 1,
+      progress: 0,
+      completedItems: 0,
+    },
+  })
+  await db.compositeFormSectionAttempt.create({
+    data: {
+      id: ids.sectionAttemptId,
+      attemptId: ids.attemptId,
+      sectionId: ids.sectionId,
+      status: 'COMPLETED',
+      attemptEpoch: 1,
+    },
+  })
+  const storedSection = await db.compositeFormSection.findUnique({ where: { id: ids.sectionId }, include: { items: true } })
+  if (!storedSection) throw new Error('V32-2 composite section is missing')
+  const sectionDefinitionHash = formSectionIdentityHash(mapCompositeSection(storedSection))
+  const slotSet = freezeCompositeActiveSlotSet({ attemptEpoch: 1, scales: [], cognitive: [], formSections: [{ sectionId: ids.sectionId, definitionHash: sectionDefinitionHash }] })
+  await db.compositeAssessmentAttempt.update({
+    where: { id: ids.attemptId },
+    data: {
+      frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
+      frozenActiveSlotSetHash: slotSet.snapshotHash,
+    },
+  })
+  const facts = createFormSectionCollectionFacts({ sectionKey: ids.sectionId, items: [{ key: ids.formItemId, label: '年级', value: '三年级' }] })
+  await db.assessmentUnitSnapshot.create({
+    data: {
+      compositeAttemptId: ids.attemptId,
+      attemptEpoch: 1,
+      slotKey: `form-section:${ids.sectionId}`,
+      unitType: 'FORM_SECTION',
+      terminalState: 'COMPLETED',
+      payloadKind: 'COLLECTION_FACTS',
+      sourceType: 'COMPOSITE_FORM_SECTION',
+      sourceAttemptId: ids.sectionAttemptId,
+      sourceSubmissionId: `v32-2-composite-form-${suffix}`,
+      sourceDefinitionHash: sectionDefinitionHash,
+      collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts),
+      completedAt: new Date('2026-09-01T00:00:00.000Z'),
+    },
+  })
+  return { ...ids, sectionDefinitionHash }
+}
+
+const destroyCompositeFixture = async (fixture: CompositeFixture) => {
+  if (!db) return
+  await db.assessmentUnitSnapshot.deleteMany({ where: { compositeAttemptId: fixture.attemptId } })
+  await db.compositeAssessmentAttempt.deleteMany({ where: { id: fixture.attemptId } })
+  await db.compositeAssessment.deleteMany({ where: { id: fixture.compositeId } })
+  await db.user.deleteMany({ where: { id: fixture.userId } })
+}
+
+suite('V32-2 closed aggregate PostgreSQL integration', () => {
+  beforeAll(async () => {
+    process.env.DATABASE_URL = databaseUrl!
+    process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+    db = new PrismaClient({ datasources: { db: { url: databaseUrl! } } })
+    await db.$connect()
+    finalizeQuestionnaireAttemptUnifiedIfReady = (await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')).finalizeQuestionnaireAttemptUnifiedIfReady
+    finalizeCompositeAttemptUnifiedIfReady = (await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')).finalizeCompositeAttemptUnifiedIfReady
+    mapCompositeSection = (await import('../../modules/composite/final-submit.service')).mapCompositeSection
+  })
+
+  afterAll(async () => {
+    await db?.$disconnect()
+    db = null
+  })
+
+  it('uses headers for incomplete progress without decrypting completed payloads', async () => {
+    const fixture = await createFixture()
+    try {
+      await addScaleSnapshot(fixture, 'not-a-unified-encrypted-payload')
+      const result = await finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId)
+      expect(result).toMatchObject({ status: 'IN_PROGRESS', progress: 50, completedAt: null })
+      expect(await db!.questionnaireAssessment.findUnique({ where: { id: fixture.parentId }, select: { status: true, progress: true } })).toEqual({ status: 'IN_PROGRESS', progress: 50 })
+    } finally {
+      await destroyFixture(fixture)
+    }
+  }, 30_000)
+
+  it('converges Questionnaire completion through one CAS and stores only a collection report', async () => {
+    const fixture = await createFixture()
+    try {
+      await addScaleSnapshot(fixture, encryptUnifiedRuntimePayload(canonicalScaleEnvelope(fixture)))
+      await addFormSnapshot(fixture)
+      const outcomes = await Promise.all([
+        finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId),
+        finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId),
+      ])
+      expect(outcomes).toHaveLength(2)
+      expect(outcomes.every((outcome) => outcome?.status === 'COMPLETED')).toBe(true)
+
+      const row = await db!.questionnaireAssessment.findUnique({
+        where: { id: fixture.parentId },
+        select: { status: true, progress: true, completedScales: true, completedForms: true, aggregateReport: true, aggregateReportEncrypted: true, aggregateInputHash: true },
+      })
+      expect(row).toMatchObject({
+        status: 'COMPLETED',
+        progress: 100,
+        completedScales: 1,
+        completedForms: 1,
+        aggregateReport: null,
+        aggregateInputHash: expect.stringMatching(/^[0-9a-f]{64}$/),
+      })
+      expect(row?.aggregateReportEncrypted).toEqual(expect.any(String))
+      const report = decryptField<Record<string, unknown>>(row!.aggregateReportEncrypted!)
+      expect(report).toMatchObject({
+        reportDefinitionVersion: 'collection-only-v2',
+        totalDimensions: 1,
+      })
+      expect((report as any).scaleReports[0]).toMatchObject({ scaleId: fixture.scaleId, result: null, scores: [{ key: 'total', value: 1 }] })
+      expect((report as any).scaleReports[0].itemScores).toBeUndefined()
+      expect((report as any).backgroundValues).toMatchObject([{ itemId: fixture.formItemId, value: '三年级' }])
+
+      const replay = await finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId)
+      expect(replay).toMatchObject({ status: 'COMPLETED', progress: 100 })
+      expect(await db!.assessmentUnitSnapshot.count({ where: { questionnaireAssessmentId: fixture.parentId } })).toBe(2)
+    } finally {
+      await destroyFixture(fixture)
+    }
+  }, 30_000)
+
+  it('converges a Composite collection aggregate from facts without reading raw form answers', async () => {
+    const fixture = await createCompositeFixture()
+    try {
+      const outcomes = await Promise.all([
+        finalizeCompositeAttemptUnifiedIfReady(fixture.attemptId),
+        finalizeCompositeAttemptUnifiedIfReady(fixture.attemptId),
+      ])
+      expect(outcomes.every((outcome) => outcome?.status === 'COMPLETED')).toBe(true)
+      const row = await db!.compositeAssessmentAttempt.findUnique({
+        where: { id: fixture.attemptId },
+        select: { status: true, progress: true, completedItems: true, aggregateInputHash: true },
+      })
+      expect(row).toMatchObject({
+        status: 'COMPLETED',
+        progress: 100,
+        completedItems: 1,
+        aggregateInputHash: expect.stringMatching(/^[0-9a-f]{64}$/),
+      })
+      const state = await (await import('../../modules/composite/composite.service')).getAttemptState(fixture.attemptId, { userId: fixture.userId })
+      expect(state).toMatchObject({ status: 'COMPLETED', progress: 100, completedItems: 1, currentIndex: 1, currentItem: null })
+      expect(await db!.compositeAnalysisSnapshot.count({ where: { attemptId: fixture.attemptId } })).toBe(0)
+    } finally {
+      await destroyCompositeFixture(fixture)
+    }
+  }, 30_000)
+})

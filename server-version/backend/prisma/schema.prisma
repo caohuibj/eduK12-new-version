@@ -659,30 +659,31 @@ model QuestionnaireFormSection {
 
 // 问卷测评记录表
 model QuestionnaireAssessment {
-  id                       String                 @id @default(uuid())
-  questionnaireId          String                 @map("questionnaire_id")
-  userId                   String?                @map("user_id") // 改为可选，支持匿名测评
-  tokenId                  String?                @map("token_id") // 访问令牌ID（匿名测评时使用）
-  sessionId                String?                @unique @map("session_id") // 匿名会话标识
-  resumeTokenHash          String?                @unique @map("resume_token_hash") // 服务端恢复凭据哈希
-  resumeTokenExpiresAt     DateTime?              @map("resume_token_expires_at")
-  status                   AssessmentStatus       @default(IN_PROGRESS)
-  deliveryMode             InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration        RuntimeGeneration?     @map("runtime_generation")
-  attemptEpoch             Int                    @default(1) @map("attempt_epoch")
-  progress                 Int                    @default(0) // 总体进度
-  completedScales          Int                    @default(0) @map("completed_scales") // 已完成量表数量（缓存）
-  completedForms           Int                    @default(0) @map("completed_forms") // 已完成表单数量（缓存）
-  startedAt                DateTime               @default(now()) @map("started_at")
-  completedAt              DateTime?              @map("completed_at")
-  totalTime                Int?                   @map("total_time") // 总用时（毫秒）
-  aggregateReport          Json?                  @map("aggregate_report") // 聚合报告（加密存储）
-  aggregateReportEncrypted String?                @map("aggregate_report_encrypted")
-  contextSnapshotEncrypted String?                @map("context_snapshot_encrypted")
-  contextSnapshotHash      String?                @map("context_snapshot_hash")
-  contextFrozenAt          DateTime?              @map("context_frozen_at")
-  frozenActiveSlotSetEncrypted String?             @map("frozen_active_slot_set_encrypted")
-  frozenActiveSlotSetHash      String?             @map("frozen_active_slot_set_hash")
+  id                           String                 @id @default(uuid())
+  questionnaireId              String                 @map("questionnaire_id")
+  userId                       String?                @map("user_id") // 改为可选，支持匿名测评
+  tokenId                      String?                @map("token_id") // 访问令牌ID（匿名测评时使用）
+  sessionId                    String?                @unique @map("session_id") // 匿名会话标识
+  resumeTokenHash              String?                @unique @map("resume_token_hash") // 服务端恢复凭据哈希
+  resumeTokenExpiresAt         DateTime?              @map("resume_token_expires_at")
+  status                       AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode                 InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration            RuntimeGeneration?     @map("runtime_generation")
+  attemptEpoch                 Int                    @default(1) @map("attempt_epoch")
+  progress                     Int                    @default(0) // 总体进度
+  completedScales              Int                    @default(0) @map("completed_scales") // 已完成量表数量（缓存）
+  completedForms               Int                    @default(0) @map("completed_forms") // 已完成表单数量（缓存）
+  startedAt                    DateTime               @default(now()) @map("started_at")
+  completedAt                  DateTime?              @map("completed_at")
+  totalTime                    Int?                   @map("total_time") // 总用时（毫秒）
+  aggregateReport              Json?                  @map("aggregate_report") // 聚合报告（加密存储）
+  aggregateReportEncrypted     String?                @map("aggregate_report_encrypted")
+  aggregateInputHash           String?                @map("aggregate_input_hash")
+  contextSnapshotEncrypted     String?                @map("context_snapshot_encrypted")
+  contextSnapshotHash          String?                @map("context_snapshot_hash")
+  contextFrozenAt              DateTime?              @map("context_frozen_at")
+  frozenActiveSlotSetEncrypted String?                @map("frozen_active_slot_set_encrypted")
+  frozenActiveSlotSetHash      String?                @map("frozen_active_slot_set_hash")
 
   // 关联
   questionnaire       Questionnaire                     @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
@@ -691,7 +692,7 @@ model QuestionnaireAssessment {
   scaleAssessments    Assessment[]
   formAnswers         QuestionnaireFormAnswer[] // 新增：表单答案关联
   formSectionAttempts QuestionnaireFormSectionAttempt[]
-  unitSnapshots       AssessmentUnitSnapshot[] @relation("QuestionnaireAssessmentUnitSnapshots")
+  unitSnapshots       AssessmentUnitSnapshot[]          @relation("QuestionnaireAssessmentUnitSnapshots")
 
   // 性能优化索引
   @@index([userId, status])
@@ -972,29 +973,31 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
-  id                       String                           @id @default(uuid())
-  compositeAssessmentId    String                           @map("composite_assessment_id")
-  userId                   String?                          @map("user_id")
-  accessTokenId            String?                          @map("access_token_id")
-  recoveryTokenHash        String?                          @unique @map("recovery_token_hash")
-  participantKey           String                           @map("participant_key")
-  anonymousCode            String?                          @map("anonymous_code")
-  attemptNo                Int                              @default(1) @map("attempt_no")
-  status                   CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
-  deliveryMode             InstrumentDeliveryMode           @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration        RuntimeGeneration?               @map("runtime_generation")
-  attemptEpoch             Int                              @default(1) @map("attempt_epoch")
-  progress                 Int                              @default(0)
-  completedItems           Int                              @default(0) @map("completed_items")
-  startedAt                DateTime                         @default(now()) @map("started_at")
-  lastSavedAt              DateTime                         @default(now()) @map("last_saved_at")
-  completedAt              DateTime?                        @map("completed_at")
-  totalTime                Int?                             @map("total_time")
-  contextSnapshotEncrypted String?                          @map("context_snapshot_encrypted")
-  contextSnapshotHash      String?                          @map("context_snapshot_hash")
-  contextFrozenAt          DateTime?                        @map("context_frozen_at")
-  frozenActiveSlotSetEncrypted String?                       @map("frozen_active_slot_set_encrypted")
-  frozenActiveSlotSetHash      String?                       @map("frozen_active_slot_set_hash")
+  id                           String                           @id @default(uuid())
+  compositeAssessmentId        String                           @map("composite_assessment_id")
+  userId                       String?                          @map("user_id")
+  accessTokenId                String?                          @map("access_token_id")
+  recoveryTokenHash            String?                          @unique @map("recovery_token_hash")
+  participantKey               String                           @map("participant_key")
+  anonymousCode                String?                          @map("anonymous_code")
+  attemptNo                    Int                              @default(1) @map("attempt_no")
+  status                       CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  deliveryMode                 InstrumentDeliveryMode           @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration            RuntimeGeneration?               @map("runtime_generation")
+  attemptEpoch                 Int                              @default(1) @map("attempt_epoch")
+  progress                     Int                              @default(0)
+  completedItems               Int                              @default(0) @map("completed_items")
+  startedAt                    DateTime                         @default(now()) @map("started_at")
+  lastSavedAt                  DateTime                         @default(now()) @map("last_saved_at")
+  completedAt                  DateTime?                        @map("completed_at")
+  totalTime                    Int?                             @map("total_time")
+  contextSnapshotEncrypted     String?                          @map("context_snapshot_encrypted")
+  contextSnapshotHash          String?                          @map("context_snapshot_hash")
+  contextFrozenAt              DateTime?                        @map("context_frozen_at")
+  aggregateInputHash           String?                          @map("aggregate_input_hash")
+  compiledBundleRuntimeHash    String?                          @map("compiled_bundle_runtime_hash")
+  frozenActiveSlotSetEncrypted String?                          @map("frozen_active_slot_set_encrypted")
+  frozenActiveSlotSetHash      String?                          @map("frozen_active_slot_set_hash")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
@@ -1004,7 +1007,7 @@ model CompositeAssessmentAttempt {
   formAnswers         CompositeFormAnswer[]
   formSectionAttempts CompositeFormSectionAttempt[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
-  unitSnapshots       AssessmentUnitSnapshot[] @relation("CompositeAssessmentUnitSnapshots")
+  unitSnapshots       AssessmentUnitSnapshot[]        @relation("CompositeAssessmentUnitSnapshots")
 
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@index([compositeAssessmentId, status])
@@ -1029,6 +1032,12 @@ model CompositeAnalysisSnapshot {
   generationReason          CompositeAnalysisSnapshotGenerationReason @map("generation_reason")
   generatedBy               String?                                   @map("generated_by")
   payloadEncrypted          String                                    @map("payload_encrypted")
+  aggregateInputHash        String?                                   @map("aggregate_input_hash")
+  hashScheme                String?                                   @map("hash_scheme")
+  compiledBundleRuntimeHash String?                                   @map("compiled_bundle_runtime_hash")
+  attemptEpoch              Int?                                      @map("attempt_epoch")
+  contextHash               String?                                   @map("context_hash")
+  runtimeGeneration         RuntimeGeneration?                        @map("runtime_generation")
   createdAt                 DateTime                                  @default(now()) @map("created_at")
 
   attempt   CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
@@ -1433,7 +1442,7 @@ model CognitiveSession {
   randomSeed                   String                 @map("random_seed")
   completionKey                String?                @map("completion_key")
   deliveryMode                 InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration            RuntimeGeneration?      @map("runtime_generation")
+  runtimeGeneration            RuntimeGeneration?     @map("runtime_generation")
   compiledRuntimeHash          String?                @map("compiled_runtime_hash")
   submissionId                 String?                @unique @map("submission_id")
   submissionPayloadHash        String?                @map("submission_payload_hash")
@@ -1530,25 +1539,25 @@ model CognitiveRawSubmission {
 // encrypted payload is either a CanonicalUnitResult envelope or a report-safe
 // FormSectionCollectionFacts projection; raw answers never cross this boundary.
 model AssessmentUnitSnapshot {
-  id                        String                       @id @default(uuid())
-  questionnaireAssessmentId String?                      @map("questionnaire_assessment_id")
-  compositeAttemptId        String?                      @map("composite_attempt_id")
-  attemptEpoch              Int                          @map("attempt_epoch")
-  slotKey                   String                       @map("slot_key")
-  unitType                  AssessmentUnitType           @map("unit_type")
-  terminalState             AssessmentUnitTerminalState  @map("terminal_state")
-  payloadKind               AssessmentUnitPayloadKind    @map("payload_kind")
-  sourceType                String                       @map("source_type")
-  sourceAttemptId           String                       @map("source_attempt_id")
-  sourceSubmissionId        String?                      @map("source_submission_id")
-  sourceDefinitionHash      String?                      @map("source_definition_hash")
-  compiledRuntimeHash       String?                      @map("compiled_runtime_hash")
-  canonicalResultEncrypted  String?                      @map("canonical_result_encrypted")
-  collectionFactsEncrypted  String?                      @map("collection_facts_encrypted")
-  completedAt               DateTime                     @map("completed_at")
-  createdAt                 DateTime                     @default(now()) @map("created_at")
+  id                        String                      @id @default(uuid())
+  questionnaireAssessmentId String?                     @map("questionnaire_assessment_id")
+  compositeAttemptId        String?                     @map("composite_attempt_id")
+  attemptEpoch              Int                         @map("attempt_epoch")
+  slotKey                   String                      @map("slot_key")
+  unitType                  AssessmentUnitType          @map("unit_type")
+  terminalState             AssessmentUnitTerminalState @map("terminal_state")
+  payloadKind               AssessmentUnitPayloadKind   @map("payload_kind")
+  sourceType                String                      @map("source_type")
+  sourceAttemptId           String                      @map("source_attempt_id")
+  sourceSubmissionId        String?                     @map("source_submission_id")
+  sourceDefinitionHash      String?                     @map("source_definition_hash")
+  compiledRuntimeHash       String?                     @map("compiled_runtime_hash")
+  canonicalResultEncrypted  String?                     @map("canonical_result_encrypted")
+  collectionFactsEncrypted  String?                     @map("collection_facts_encrypted")
+  completedAt               DateTime                    @map("completed_at")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
 
-  questionnaireAssessment QuestionnaireAssessment?     @relation("QuestionnaireAssessmentUnitSnapshots", fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
+  questionnaireAssessment QuestionnaireAssessment?    @relation("QuestionnaireAssessmentUnitSnapshots", fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
   compositeAttempt        CompositeAssessmentAttempt? @relation("CompositeAssessmentUnitSnapshots", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
 
   @@unique([questionnaireAssessmentId, attemptEpoch, slotKey], map: "assessment_unit_snapshots_questionnaire_slot_key")

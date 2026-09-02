@@ -98,7 +98,22 @@ import {
 } from './composite-report.projector'
 import {
   formSectionIdentityHash,
+  freezeCompositeActiveSlotSet,
 } from '../assessment-runtime/attempt-runtime'
+import {
+  decryptFrozenScaleRuntimeSnapshot,
+  encryptFrozenScaleRuntimeSnapshot,
+  freezeScaleRuntimeAtAttemptStart,
+} from '../assessment-runtime/runtime-snapshot'
+import { compiledBundleRuntimeHashForSnapshot, evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
+import {
+  compositeItemSlotKey,
+  decryptFrozenActiveSlotSet,
+  encryptFrozenActiveSlotSet,
+  formSectionSlotKey,
+  type FrozenActiveSlotV1,
+} from '../assessment-runtime/slot-set'
+import { runnerDefinition } from '../scale/scale-definition'
 import type {
   CompositeReportAudience,
   CompositeSnapshotMetadata,
@@ -1879,7 +1894,17 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       throw compositeBadRequest('认知任务冻结的 Profile 配置不可用')
     }
   }
-  const configSnapshotEncrypted = cognitiveSessionService.createCognitiveSessionConfigSnapshot({
+  const unifiedSnapshot = attempt.runtimeGeneration === 'UNIFIED_V1'
+    ? await cognitiveSessionService.createUnifiedCognitiveSessionConfigSnapshot({
+        db,
+        testType: config.testType,
+        configVersion: config.configVersion,
+        engineVersion: config.engineVersion,
+        scoringVersion: config.scoringVersion,
+        config: sessionConfig,
+      })
+    : null
+  const configSnapshotEncrypted = unifiedSnapshot?.encrypted ?? cognitiveSessionService.createCognitiveSessionConfigSnapshot({
     testType: config.testType,
     configVersion: config.configVersion,
     engineVersion: config.engineVersion,
@@ -1905,14 +1930,29 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       scoringVersion: config.scoringVersion,
       randomSeed: randomBytes(16).toString('hex'),
       anonymousCode: anonymous ? attempt.anonymousCode : null,
+      ...(unifiedSnapshot ? {
+        runtimeGeneration: 'UNIFIED_V1' as const,
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
+      } : {}),
     },
   })
 }
 
 const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null) => {
+  const runtime = {
+    scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
+    cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
+  }
   for (const item of items) {
     if (!item.required) continue
     if (item.type === 'SCALE') {
+      const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? await freezeScaleRuntimeAtAttemptStart(db, {
+            instrumentKey: item.scale.code,
+            instrumentVersion: item.scale.instrumentVersion,
+            definition: scaleDefinitionFromRecord(item.scale),
+          })
+        : null
       await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -1924,12 +1964,38 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
+          ...(frozenScale ? {
+            runtimeGeneration: 'UNIFIED_V1' as const,
+            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(frozenScale),
+            compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+          } : {}),
         },
       })
+      if (frozenScale) {
+        runtime.scales.push({
+          compositeItemId: item.id,
+          code: item.scale.code,
+          instrumentVersion: item.scale.instrumentVersion,
+          sourceDefinitionHash: frozenScale.sourceDefinitionHash,
+          compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+        })
+      }
     } else if (item.type === 'COGNITIVE') {
-      await createCognitiveChild(db, attempt, item, userId)
+      const session = await createCognitiveChild(db, attempt, item, userId)
+      if (attempt.runtimeGeneration === 'UNIFIED_V1') {
+        const snapshot = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted).snapshot
+        if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
+        runtime.cognitive.push({
+          compositeItemId: item.id,
+          testType: item.cognitiveAssignment.config.testType,
+          instrumentVersion: snapshot.compiledRuntime.instrumentVersion,
+          sourceDefinitionHash: snapshot.compiledRuntime.sourceDefinitionHash,
+          compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+        })
+      }
     }
   }
+  return runtime
 }
 
 const createAttempt = async (
@@ -1943,11 +2009,25 @@ const createAttempt = async (
 ) => {
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
+  const packageFields = finalOnly
+    ? [composite.reportPackageKey, composite.reportPackageVersion, composite.reportPackageProfile, composite.reportPackageSnapshotEncrypted]
+    : []
+  if (packageFields.some((value: unknown) => value !== null && value !== undefined) && packageFields.some((value: unknown) => value === null || value === undefined)) {
+    throw compositeBadRequest('综合测评报告包冻结信息不完整')
+  }
+  const packageSnapshot = finalOnly && composite.reportPackageSnapshotEncrypted
+    ? readFrozenReportPackageSnapshot(composite.reportPackageSnapshotEncrypted)
+    : null
+  if (packageSnapshot && (
+    packageSnapshot.packageKey !== composite.reportPackageKey
+    || packageSnapshot.packageVersion !== composite.reportPackageVersion
+    || packageSnapshot.profile !== composite.reportPackageProfile
+  )) throw compositeBadRequest('综合测评报告包实例与冻结快照不匹配')
   const totalUnits = finalOnly
-    ? composite.items.filter((item: any) => item.type !== 'FORM').length + formSections.length
+    ? composite.items.filter((item: any) => item.type !== 'FORM' && item.required).length + formSections.length
     : composite.items.length
   const completedItems = finalOnly
-    ? composite.items.filter((item: any) => item.type !== 'FORM' && !item.required && !item.contextKey).length
+    ? 0
     : composite.items.filter((item: any) => !item.required && !item.contextKey).length
   const progress = totalUnits === 0
     ? 100
@@ -1962,6 +2042,8 @@ const createAttempt = async (
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
       deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
+      runtimeGeneration: finalOnly ? 'UNIFIED_V1' : null,
+      compiledBundleRuntimeHash: packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null,
       attemptEpoch,
       completedItems,
       progress,
@@ -1976,7 +2058,25 @@ const createAttempt = async (
       })),
     })
   }
-  await createChildRecords(db, attempt, composite.items, userId)
+  const runtime = await createChildRecords(db, attempt, composite.items, userId)
+  if (finalOnly) {
+    const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
+      attemptEpoch,
+      scales: runtime.scales,
+      cognitive: runtime.cognitive,
+      formSections: formSections.map((section: any) => ({
+        sectionId: section.id,
+        definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
+      })),
+    })
+    await db.compositeAssessmentAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
+      },
+    })
+  }
   return attempt
 }
 
@@ -2491,6 +2591,356 @@ const countAttemptCompletedItems = (attempt: any, maps = attemptCompletedItemMap
       + (attempt.formSectionAttempts ?? []).filter((section: any) => section.status === 'COMPLETED').length
     : attempt.compositeAssessment.items.filter((item: any) => isAttemptItemCompleted(item, maps)).length
 
+const unifiedCompositeProgressSnapshot = (
+  row: { slotKey: string; terminalState: string },
+  slots: Map<string, FrozenActiveSlotV1>,
+  attemptEpoch: number,
+): AggregateSnapshotHeader => {
+  const slot = slots.get(row.slotKey)
+  return {
+    slotKey: row.slotKey,
+    attemptEpoch,
+    unitType: slot?.unitType ?? 'FORM_SECTION',
+    terminalState: row.terminalState as AggregateSnapshotHeader['terminalState'],
+    payloadKind: slot?.unitType === 'FORM_SECTION' ? 'COLLECTION_FACTS' : 'UNIT_RESULT',
+    sourceType: 'PROGRESS_HEADER',
+    sourceAttemptId: 'PROGRESS_HEADER',
+  }
+}
+
+const getUnifiedCompositeAttemptState = async (
+  attemptId: string,
+  context: { userId?: string; recoveryTokenHash?: string },
+) => {
+  const attempt = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: {
+      id: true,
+      userId: true,
+      recoveryTokenHash: true,
+      status: true,
+      deliveryMode: true,
+      runtimeGeneration: true,
+      attemptEpoch: true,
+      startedAt: true,
+      lastSavedAt: true,
+      completedAt: true,
+      anonymousCode: true,
+      contextSnapshotEncrypted: true,
+      contextSnapshotHash: true,
+      contextFrozenAt: true,
+      frozenActiveSlotSetEncrypted: true,
+      frozenActiveSlotSetHash: true,
+      compositeAssessment: {
+        select: {
+          id: true,
+          name: true,
+          instruction: true,
+          reportPackageSnapshotEncrypted: true,
+          reportPackageKey: true,
+          reportPackageVersion: true,
+          reportPackageProfile: true,
+          items: {
+            orderBy: { position: 'asc' },
+            select: {
+              id: true,
+              type: true,
+              position: true,
+              required: true,
+              scaleId: true,
+              formSectionId: true,
+              formType: true,
+              formLabel: true,
+              formPlaceholder: true,
+              formOptions: true,
+              contextKey: true,
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  description: true,
+                  instruction: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                  definitionHash: true,
+                },
+              },
+              cognitiveAssignment: { select: { id: true, title: true } },
+            },
+          },
+          formSections: {
+            orderBy: { position: 'asc' },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              position: true,
+              contextSection: true,
+              items: {
+                orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
+                select: {
+                  id: true,
+                  formType: true,
+                  formLabel: true,
+                  formPlaceholder: true,
+                  formOptions: true,
+                  contextKey: true,
+                  required: true,
+                  position: true,
+                  formSectionPosition: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      scaleAssessments: {
+        orderBy: { startedAt: 'asc' },
+        select: {
+          id: true,
+          compositeItemId: true,
+          scaleId: true,
+          status: true,
+          progress: true,
+          runtimeSnapshotEncrypted: true,
+          compiledRuntimeHash: true,
+        },
+      },
+      cognitiveSessions: {
+        select: {
+          id: true,
+          assignmentId: true,
+          compositeItemId: true,
+          testType: true,
+          attemptNo: true,
+          status: true,
+          configVersion: true,
+          configSnapshotEncrypted: true,
+          engineVersion: true,
+          scoringVersion: true,
+          randomSeed: true,
+          deliveryMode: true,
+          runtimeGeneration: true,
+          compiledRuntimeHash: true,
+        },
+      },
+    },
+  }) as any
+  if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  const authorized = context.userId
+    ? attempt.userId === context.userId
+    : Boolean(context.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === context.recoveryTokenHash)
+  if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
+    throw compositeConflict('综合测评运行时版本不匹配，请重启测评')
+  }
+  assertSupportedComposite(attempt.compositeAssessment)
+
+  let frozenSlotSet
+  try {
+    if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
+    frozenSlotSet = decryptFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    if (
+      frozenSlotSet.snapshotHash !== attempt.frozenActiveSlotSetHash
+      || frozenSlotSet.attemptEpoch !== attempt.attemptEpoch
+      || frozenSlotSet.runtimeGeneration !== 'UNIFIED_V1'
+    ) throw new Error('FrozenActiveSlotSet identity mismatch')
+  } catch {
+    throw compositeConflict('综合测评冻结内容不可用，请重启测评')
+  }
+
+  // Progress is closed over the frozen slot set and terminal headers only.
+  // No answer, result, trial, or encrypted participant payload is selected.
+  const snapshotRows = await prisma.assessmentUnitSnapshot.findMany({
+    where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch },
+    select: { slotKey: true, terminalState: true },
+  })
+  const slotsByKey = new Map(frozenSlotSet.slots.map((slot: FrozenActiveSlotV1) => [slot.slotKey, slot]))
+  const headers = snapshotRows.map((row) => unifiedCompositeProgressSnapshot(row, slotsByKey, attempt.attemptEpoch))
+  const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: attempt.attemptEpoch })
+  if (completeness.invalidSlotKeys.length > 0) throw compositeBadRequest('综合测评进度快照不可用，请重启测评')
+  const headerByKey = new Map(headers.map((header) => [header.slotKey, header]))
+  const slotKeyForItem = (item: any): string | null => item.type === 'SCALE' || item.type === 'COGNITIVE'
+    ? compositeItemSlotKey(item.id, item.type)
+    : item.type === 'FORM' && item.formSectionId
+      ? formSectionSlotKey(item.formSectionId)
+      : null
+  const completedSlot = (slotKey: string | null) => Boolean(slotKey && headerByKey.get(slotKey)?.terminalState === 'COMPLETED')
+  const completedItem = (item: any) => {
+    // Optional non-context modules are intentionally not materialized as
+    // active slots. Preserve the legacy completion projection for them while
+    // deriving every required unit exclusively from snapshot headers.
+    if (!item.required && !item.contextKey) return true
+    return completedSlot(slotKeyForItem(item))
+  }
+  const sections = (attempt.compositeAssessment.formSections ?? []).slice().sort((left: any, right: any) => left.position - right.position)
+  const units = [
+    ...attempt.compositeAssessment.items
+      .filter((item: any) => item.type !== 'FORM' && item.required)
+      .map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item })),
+    ...sections.map((section: any) => ({ id: section.id, type: 'FORM_SECTION', position: section.position, required: true, section })),
+  ].sort((left: any, right: any) => left.position - right.position || left.id.localeCompare(right.id))
+  const unitCompleted = (unit: any) => unit.type === 'FORM_SECTION'
+    ? completedSlot(formSectionSlotKey(unit.id))
+    : completedItem(unit.item)
+  const completedItems = units.filter(unitCompleted).length
+  const currentIndex = units.findIndex((unit: any) => !unitCompleted(unit))
+  const effectiveCurrentIndex = currentIndex < 0 ? units.length : currentIndex
+  const currentUnit = currentIndex >= 0 ? units[currentIndex] : null
+  const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
+
+  const formSections = sections.map((section: any) => {
+    const sectionDefinition = compositeFormSectionRuntimeDefinition(section)
+    const slot = slotsByKey.get(formSectionSlotKey(section.id))
+    const sectionCompleted = completedSlot(formSectionSlotKey(section.id))
+    const answers = section.items.map((item: any) => ({
+      id: item.id,
+      formItemId: item.id,
+      type: item.formType,
+      label: packageSlotLabels.get(item.position) ?? item.formLabel,
+      placeholder: item.formPlaceholder,
+      options: item.formOptions,
+      required: item.required !== false,
+      contextKey: item.contextKey ?? null,
+      value: null,
+    }))
+    return {
+      id: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      position: section.position,
+      contextSection: compositeSectionHasContext(section),
+      definitionHash: slot?.sourceDefinitionIdentity.hash ?? formSectionIdentityHash(sectionDefinition),
+      status: sectionCompleted ? 'COMPLETED' : 'IN_PROGRESS',
+      submittedAt: null,
+      items: answers,
+      answers,
+    }
+  })
+
+  let currentItem: any = null
+  if (currentUnit?.type === 'FORM_SECTION') {
+    const section = formSections.find((candidate: any) => candidate.id === currentUnit.id)
+    if (section) {
+      currentItem = {
+        id: section.id,
+        type: 'FORM_SECTION',
+        position: section.position,
+        required: true,
+        formSectionId: section.id,
+        title: section.title,
+        description: section.description,
+        contextSection: section.contextSection,
+        definitionHash: section.definitionHash,
+        status: section.status,
+        answers: section.items,
+      }
+    }
+  } else if (currentUnit?.type === 'SCALE') {
+    const item = currentUnit.item
+    const child = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === item.id)
+    const slot = slotsByKey.get(compositeItemSlotKey(item.id, 'SCALE'))
+    if (!child?.id || !child.runtimeSnapshotEncrypted || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    try {
+      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      if (
+        runtime.instrumentKey !== item.scale?.code
+        || runtime.instrumentVersion !== item.scale?.instrumentVersion
+        || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
+        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
+      ) throw new Error('Scale runtime identity mismatch')
+      currentItem = {
+        id: item.id,
+        type: 'SCALE',
+        position: item.position,
+        required: item.required,
+        scaleAssessmentId: child.id,
+        definitionHash: runtime.legacyDefinitionHash,
+        answers: [],
+        scale: {
+          id: item.scale.id,
+          name: packageSlotLabels.get(item.position) ?? item.scale.name,
+          instruction: item.scale.instruction ?? null,
+          description: item.scale.description ?? null,
+          instrumentVersion: item.scale.instrumentVersion,
+          definition: runnerDefinition(runtime.definition),
+        },
+      }
+    } catch {
+      throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    }
+  } else if (currentUnit?.type === 'COGNITIVE') {
+    const child = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === currentUnit.item.id)
+    const slot = slotsByKey.get(compositeItemSlotKey(currentUnit.item.id, 'COGNITIVE'))
+    if (!child || !slot || child.runtimeGeneration !== 'UNIFIED_V1' || child.compiledRuntimeHash !== (slot.sourceBinding as Record<string, unknown>).compiledRuntimeHash) {
+      throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
+    }
+    try {
+      currentItem = {
+        id: currentUnit.item.id,
+        type: 'COGNITIVE',
+        position: currentUnit.item.position,
+        required: currentUnit.item.required,
+        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash),
+      }
+    } catch {
+      throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
+    }
+  }
+
+  const definitionHash = computeSubmissionPayloadHash({
+    assessmentId: attempt.compositeAssessment.id,
+    items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
+    formSections: sections.map((section: any) => ({ id: section.id, position: section.position, itemIds: section.items.map((item: any) => item.id) })),
+  })
+  return {
+    id: attempt.id,
+    assessmentId: attempt.compositeAssessment.id,
+    name: attempt.compositeAssessment.name,
+    instruction: attempt.compositeAssessment.instruction,
+    status: attempt.status,
+    deliveryMode: attempt.deliveryMode,
+    attemptEpoch: attempt.attemptEpoch,
+    definitionHash,
+    contextSnapshotHash: attempt.contextSnapshotHash ?? null,
+    progress: attempt.status === 'COMPLETED' ? 100 : completeness.progress,
+    completedItems,
+    totalItems: units.length,
+    currentIndex: attempt.status === 'COMPLETED' ? units.length : effectiveCurrentIndex,
+    startedAt: attempt.startedAt,
+    lastSavedAt: attempt.lastSavedAt,
+    completedAt: attempt.completedAt,
+    anonymousCode: attempt.anonymousCode,
+    context: {
+      status: attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+      frozenAt: attempt.contextFrozenAt?.toISOString?.() ?? null,
+      snapshotHash: attempt.contextSnapshotHash ?? null,
+    },
+    items: attempt.compositeAssessment.items.map((item: any, index: number) => ({
+      id: item.id,
+      type: item.type,
+      position: item.position,
+      label: resolveCompositeItemLabel(item, packageSlotLabels),
+      completed: completedItem(item),
+      index,
+    })),
+    units: units.map((unit: any, index: number) => ({
+      id: unit.id,
+      type: unit.type,
+      position: unit.position,
+      required: unit.required,
+      label: unit.type === 'FORM_SECTION' ? unit.section.title : resolveCompositeItemLabel(unit.item, packageSlotLabels),
+      completed: unitCompleted(unit),
+      index,
+      ...(unit.type === 'FORM_SECTION' ? { formSectionId: unit.id } : { itemId: unit.id }),
+    })),
+    formSections,
+    currentItem,
+  }
+}
+
 const markCompositeItemCompleted = async (tx: Db, attemptId: string, increment: boolean) => {
   const current = await tx.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
@@ -2860,13 +3310,24 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
 export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
   const route = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { deliveryMode: true },
+    select: { deliveryMode: true, runtimeGeneration: true },
   })
+  if (route?.runtimeGeneration === 'UNIFIED_V1') {
+    const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
+    return finalizeCompositeAttemptUnifiedIfReady(attemptId)
+  }
   if (!route || route.deliveryMode !== 'FINAL_ONLY') return finalizeCompositeAttemptLegacyIfReady(attemptId)
   return finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
 }
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const runtime = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: { userId: true, recoveryTokenHash: true, deliveryMode: true, runtimeGeneration: true },
+  })
+  if (!runtime) throw compositeNotFound('综合测评记录不存在')
+  if (runtime.runtimeGeneration === 'UNIFIED_V1') return getUnifiedCompositeAttemptState(attemptId, context)
+
   const attempt = await findAttempt(attemptId, context)
   const readableFormAnswers = readContextFormAnswers(
     attempt.compositeAssessment.items

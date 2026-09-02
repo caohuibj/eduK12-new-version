@@ -47,7 +47,22 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
 import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
-import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
+import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
+import {
+  decryptFrozenScaleRuntimeSnapshot,
+  encryptFrozenScaleRuntimeSnapshot,
+  freezeScaleRuntimeAtAttemptStart,
+} from '../modules/assessment-runtime/runtime-snapshot'
+import {
+  decryptFrozenActiveSlotSet,
+  encryptFrozenActiveSlotSet,
+  formSectionSlotKey,
+  questionnaireScaleSlotKey,
+  type FrozenActiveSlotV1,
+} from '../modules/assessment-runtime/slot-set'
+import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unified-aggregate'
+import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
+import { runnerDefinition } from '../modules/scale/scale-definition'
 
 export type SectionItem = {
   id: string
@@ -227,6 +242,262 @@ const finalQuestionnaireUnits = (questionnaire: any) => [
   })),
 ].sort((left, right) => left.position - right.position)
 
+const unifiedProgressSnapshot = (row: { slotKey: string; terminalState: string }, slots: Map<string, FrozenActiveSlotV1>, attemptEpoch: number): AggregateSnapshotHeader => {
+  const slot = slots.get(row.slotKey)
+  return {
+    slotKey: row.slotKey,
+    attemptEpoch,
+    unitType: slot?.unitType ?? 'FORM_SECTION',
+    terminalState: row.terminalState as AggregateSnapshotHeader['terminalState'],
+    payloadKind: slot?.unitType === 'FORM_SECTION' ? 'COLLECTION_FACTS' : 'UNIT_RESULT',
+    sourceType: 'PROGRESS_HEADER',
+    sourceAttemptId: 'PROGRESS_HEADER',
+  }
+}
+
+const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) => {
+  const assessment = await prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    select: {
+      id: true,
+      status: true,
+      deliveryMode: true,
+      runtimeGeneration: true,
+      attemptEpoch: true,
+      progress: true,
+      startedAt: true,
+      completedAt: true,
+      totalTime: true,
+      sessionId: true,
+      contextSnapshotEncrypted: true,
+      contextSnapshotHash: true,
+      contextFrozenAt: true,
+      frozenActiveSlotSetEncrypted: true,
+      frozenActiveSlotSetHash: true,
+      questionnaire: {
+        select: {
+          id: true,
+          name: true,
+          instruction: true,
+          questionnaireScales: {
+            orderBy: { position: 'asc' },
+            select: {
+              id: true,
+              scaleId: true,
+              position: true,
+              scale: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  instruction: true,
+                  instrumentClass: true,
+                  instrumentVersion: true,
+                  definition: true,
+                  definitionHash: true,
+                },
+              },
+            },
+          },
+          formSections: {
+            orderBy: { position: 'asc' },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              position: true,
+              contextSection: true,
+              items: {
+                orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }],
+                select: {
+                  id: true,
+                  type: true,
+                  label: true,
+                  placeholder: true,
+                  required: true,
+                  options: true,
+                  contextKey: true,
+                  position: true,
+                  sectionPosition: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      scaleAssessments: {
+        orderBy: { startedAt: 'asc' },
+        select: { id: true, scaleId: true, status: true, progress: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+      },
+    },
+  }) as any
+  if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  assertFinalOnly(assessment.deliveryMode)
+  if (assessment.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷运行时版本不匹配，请重启测评', 409)
+  }
+
+  let frozenSlotSet: ReturnType<typeof decryptFrozenActiveSlotSet>
+  try {
+    if (!assessment.frozenActiveSlotSetEncrypted || !assessment.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
+    frozenSlotSet = decryptFrozenActiveSlotSet(assessment.frozenActiveSlotSetEncrypted)
+    if (frozenSlotSet.snapshotHash !== assessment.frozenActiveSlotSetHash || frozenSlotSet.attemptEpoch !== assessment.attemptEpoch) {
+      throw new Error('FrozenActiveSlotSet identity mismatch')
+    }
+  } catch {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷冻结内容不可用，请重启测评', 409)
+  }
+
+  // This is the only progress query. It intentionally selects no payload,
+  // answer, trial, or child result column.
+  const rows = await prisma.assessmentUnitSnapshot.findMany({
+    where: { questionnaireAssessmentId: assessment.id, attemptEpoch: assessment.attemptEpoch },
+    select: { slotKey: true, terminalState: true },
+  })
+  const slotsByKey = new Map(frozenSlotSet.slots.map((slot: FrozenActiveSlotV1) => [slot.slotKey, slot]))
+  const headers = rows.map((row) => unifiedProgressSnapshot(row, slotsByKey, assessment.attemptEpoch))
+  const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: assessment.attemptEpoch })
+  if (completeness.invalidSlotKeys.length > 0) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷进度快照不可用，请重启测评', 409)
+  }
+
+  const sections = assessment.questionnaire.formSections ?? []
+  const headerByKey = new Map(headers.map((header) => [header.slotKey, header]))
+  const scaleMap = new Map<string, any>(assessment.scaleAssessments.map((child: any) => [child.scaleId, child] as [string, any]))
+  const units = finalQuestionnaireUnits(assessment.questionnaire)
+  const completed = (unit: any) => {
+    const slotKey = unit.type === 'SCALE'
+      ? questionnaireScaleSlotKey(unit.item.id)
+      : formSectionSlotKey(unit.section.id)
+    return headerByKey.get(slotKey)?.terminalState === 'COMPLETED'
+  }
+  const completedItems = units.filter(completed).length
+  const currentIndex = units.findIndex((unit) => !completed(unit))
+  const effectiveCurrentIndex = currentIndex < 0 ? units.length : currentIndex
+
+  const formSections: any[] = sections.map((section: any) => {
+    const definition = mapQuestionnaireSection(section)
+    const slot = slotsByKey.get(formSectionSlotKey(section.id))
+    const sectionCompleted = completed({ type: 'FORM_SECTION', section })
+    return {
+      id: section.id,
+      title: section.title,
+      description: section.description ?? null,
+      position: section.position,
+      contextSection: definition.contextSection,
+      definitionHash: slot?.sourceDefinitionIdentity.hash ?? formSectionIdentityHash(definition),
+      status: sectionCompleted ? 'COMPLETED' : 'IN_PROGRESS',
+      submittedAt: null,
+      // Individual values belong to the local final-only draft. The server
+      // progress projection must not reread questionnaire_form_answers.
+      items: definition.items.map((item) => ({
+        id: item.id,
+        formItemId: item.id,
+        type: item.type,
+        label: item.label,
+        placeholder: (section.items.find((candidate: any) => candidate.id === item.id) as any)?.placeholder ?? null,
+        options: item.options,
+        required: item.required,
+        contextKey: item.contextKey,
+        value: null,
+      })),
+    }
+  })
+
+  let currentScale: any = null
+  let currentFormSection: any = null
+  const current = currentIndex >= 0 ? units[currentIndex] : null
+  if (current?.type === 'FORM_SECTION') {
+    currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
+  } else if (current?.type === 'SCALE') {
+    const child = scaleMap.get(current.item.scaleId)
+    if (!child?.id || !child.runtimeSnapshotEncrypted) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
+    }
+    try {
+      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      const slot = slotsByKey.get(questionnaireScaleSlotKey(current.item.id))
+      if (
+        runtime.instrumentKey !== current.item.scale.code
+        || runtime.instrumentVersion !== current.item.scale.instrumentVersion
+        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
+        || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
+      ) throw new Error('Scale runtime identity mismatch')
+      currentScale = {
+        id: current.item.scale.id,
+        name: current.item.scale.name,
+        instruction: current.item.scale.instruction ?? null,
+        scaleAssessmentId: child.id,
+        definitionHash: runtime.legacyDefinitionHash,
+        definition: runnerDefinition(runtime.definition),
+      }
+    } catch {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
+    }
+  }
+
+  const scaleAssessments = assessment.scaleAssessments.map((child: any) => {
+    const questionnaireScale = assessment.questionnaire.questionnaireScales.find((item: any) => item.scaleId === child.scaleId)
+    const isCompleted = questionnaireScale ? completed({ type: 'SCALE', item: questionnaireScale }) : false
+    return {
+      id: child.id,
+      scaleId: child.scaleId,
+      status: isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
+      progress: isCompleted ? 100 : 0,
+      scaleName: questionnaireScale?.scale.name ?? '未知量表',
+    }
+  })
+  return {
+    questionnaireAssessment: {
+      id: assessment.id,
+      status: assessment.status,
+      progress: assessment.status === 'COMPLETED' ? 100 : completeness.progress,
+      currentIndex: assessment.status === 'COMPLETED' ? units.length : effectiveCurrentIndex,
+      deliveryMode: 'FINAL_ONLY' as const,
+      attemptEpoch: assessment.attemptEpoch,
+      startedAt: assessment.startedAt,
+      completedAt: assessment.completedAt,
+      totalTime: assessment.totalTime,
+      context: {
+        status: assessment.contextSnapshotEncrypted && assessment.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+        frozenAt: assessment.contextFrozenAt?.toISOString?.() ?? null,
+        snapshotHash: assessment.contextSnapshotHash ?? null,
+      },
+    },
+    questionnaire: {
+      id: assessment.questionnaire.id,
+      name: assessment.questionnaire.name,
+      instruction: assessment.questionnaire.instruction,
+    },
+    definitionHash: finalQuestionnaireDefinitionHash(assessment.questionnaire),
+    contextSnapshotHash: assessment.contextSnapshotHash ?? null,
+    currentFormItem: null,
+    currentFormSection,
+    currentScale,
+    totalItems: units.length,
+    contentItems: units.map((unit, index) => ({
+      type: unit.type === 'SCALE' ? 'scale' as const : 'form-section' as const,
+      position: unit.position,
+      id: unit.id,
+      label: unit.type === 'SCALE' ? unit.item.scale.name : unit.section.title,
+      completed: completed(unit),
+      index,
+    })),
+    units: units.map((unit, index) => ({
+      type: unit.type,
+      id: unit.id,
+      position: unit.position,
+      label: unit.type === 'SCALE' ? unit.item.scale.name : unit.section.title,
+      completed: completed(unit),
+      index,
+    })),
+    formSections,
+    scaleAssessments,
+    sessionId: assessment.sessionId,
+    completedItems,
+  }
+}
+
 const isFirstQuestionnaireContentSection = (questionnaire: any, sectionId: string): boolean => {
   const firstUnit = finalQuestionnaireUnits(questionnaire)[0]
   return firstUnit?.type === 'FORM_SECTION' && firstUnit.id === sectionId
@@ -261,6 +532,14 @@ export const finalQuestionnaireDefinitionHash = (questionnaire: any) => computeS
  * field changes are local IndexedDB state and never reach this endpoint.
  */
 export const getQuestionnaireFinalAttemptState = async (assessmentId: string) => {
+  const runtime = await prisma.questionnaireAssessment.findUnique({
+    where: { id: assessmentId },
+    select: { deliveryMode: true, runtimeGeneration: true },
+  })
+  if (!runtime) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  assertFinalOnly(runtime.deliveryMode)
+  if (runtime.runtimeGeneration === 'UNIFIED_V1') return getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+
   const assessment = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
     include: {
@@ -652,7 +931,7 @@ export const restartQuestionnaireAssessment = async (
 
   const questionnaireId = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId }, select: { questionnaireId: true } })
   if (!questionnaireId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  await ensureQuestionnaireFormSections(questionnaireId.questionnaireId)
+  const frozenFormSections = await ensureQuestionnaireFormSections(questionnaireId.questionnaireId)
 
   const created = await prisma.$transaction(async (tx) => {
     const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`
@@ -712,6 +991,32 @@ export const restartQuestionnaireAssessment = async (
       data: { status: 'ABANDONED', completedAt: retiredAt },
     })
     const nextAttemptEpoch = current.attemptEpoch + 1
+    const scaleRuntimeSnapshots = await Promise.all(current.questionnaire.questionnaireScales.map(async (entry: any) => {
+      if (entry.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
+      const definition = scaleDefinitionFromRecord(entry.scale)
+      return {
+        entry,
+        snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
+          instrumentKey: entry.scale.code,
+          instrumentVersion: entry.scale.instrumentVersion,
+          definition,
+        }),
+      }
+    }))
+    const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: nextAttemptEpoch,
+      scales: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({
+        questionnaireScaleId: entry.id,
+        code: entry.scale.code,
+        instrumentVersion: entry.scale.instrumentVersion,
+        sourceDefinitionHash: snapshot.sourceDefinitionHash,
+        compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+      })),
+      formSections: frozenFormSections.map((section) => ({
+        sectionId: section.id,
+        definitionHash: formSectionIdentityHash(section),
+      })),
+    })
     const next = await tx.questionnaireAssessment.create({
       data: {
         questionnaireId: current.questionnaireId,
@@ -720,17 +1025,23 @@ export const restartQuestionnaireAssessment = async (
         sessionId: newSessionId,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
         attemptEpoch: nextAttemptEpoch,
         progress: 0,
       },
     })
     if (current.questionnaire.questionnaireScales.length > 0) {
       await tx.assessment.createMany({
-        data: current.questionnaire.questionnaireScales.map((entry: any) => ({
+        data: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({
           scaleId: entry.scaleId,
           userId: isPublic ? null : context.userId,
           status: 'IN_PROGRESS' as const,
           deliveryMode: 'FINAL_ONLY' as const,
+          runtimeGeneration: 'UNIFIED_V1' as const,
+          runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+          compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
           attemptEpoch: next.attemptEpoch,
           progress: 0,
           answers: encryptScaleAnswers([]),
@@ -1314,8 +1625,12 @@ const finalizeQuestionnaireFinalOnlyIfReady = async (assessmentId: string) => {
 const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
   const route = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
-    select: { deliveryMode: true },
+    select: { deliveryMode: true, runtimeGeneration: true },
   })
+  if (route?.runtimeGeneration === 'UNIFIED_V1') {
+    const { finalizeQuestionnaireAttemptUnifiedIfReady } = await import('../modules/assessment-runtime/unified-aggregate-finalizer.service')
+    return finalizeQuestionnaireAttemptUnifiedIfReady(assessmentId)
+  }
   if (!route || route.deliveryMode !== 'FINAL_ONLY') return finalizeQuestionnaireLegacyIfReady(assessmentId)
   return finalizeQuestionnaireFinalOnlyIfReady(assessmentId)
 }
