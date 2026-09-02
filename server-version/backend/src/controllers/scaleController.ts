@@ -40,6 +40,7 @@ import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exp
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { restartStandaloneScaleAssessment, submitScaleAssessmentFinal, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { standaloneAdmissionPersistence } from '../modules/scale/scale-admission.service'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import {
   isQuestionnaireCompletionAdmissionBusyError,
@@ -815,6 +816,16 @@ export const scaleController = {
             runtimeGeneration: 'UNIFIED_V1',
             runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
             compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
+            ...standaloneAdmissionPersistence({
+              attemptEpoch: 1,
+              userId: userId!,
+              scale: {
+                id: scale.id,
+                code: scale.code,
+                name: scale.name,
+                instrumentVersion: scale.instrumentVersion,
+              },
+            }),
             attemptEpoch: 1,
             progress: 0,
             answers: encryptField([]),

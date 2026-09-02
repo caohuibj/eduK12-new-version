@@ -18,6 +18,7 @@ describe('Unified runtime architecture boundaries', () => {
   it('keeps unified unit submitters free of legacy parent coordination', () => {
     const cognitive = source('modules/cognitive/unified-final-submit.service.ts')
     const scale = source('modules/scale/unified-final-submit.service.ts')
+    const scaleFinal = source('modules/scale/scale-final-submit.service.ts')
     const form = source('modules/assessment-runtime/unified-form-section-final-submit.service.ts')
 
     for (const submitter of [cognitive, scale, form]) {
@@ -26,6 +27,16 @@ describe('Unified runtime architecture boundaries', () => {
     }
     expect(cognitive.match(/cognitiveRawSubmission\.create/g) ?? []).toHaveLength(1)
     expect(cognitive).not.toMatch(/CognitiveTrial|cognitiveTrial/)
+    expect(scale).not.toMatch(/getFrozenActiveSlot/)
+    expect(scale).not.toMatch(/readQuestionnaireAssessmentContext/)
+    expect(scale).not.toMatch(/readCompositeAttemptContext/)
+    expect(scale).not.toMatch(/frozenActiveSlotSetEncrypted/)
+    expect(scale).not.toMatch(/include:\s*\{\s*scale/)
+    expect(scale).toMatch(/activateScaleAdmission/)
+    expect(scale).toMatch(/assertAdmissionParentBinding/)
+    expect(scaleFinal).toMatch(/UNIFIED_SCALE_CHILD_ADMISSION_SELECT/)
+    expect(source('services/questionnaire-form-section.service.ts')).toMatch(/ensureScaleAdmissionAtDelivery/)
+    expect(source('modules/composite/composite.service.ts')).toMatch(/ensureScaleAdmissionAtDelivery/)
   })
 
   it('keeps the unified raw submission boundary strict and encrypted', () => {

@@ -19,6 +19,12 @@ export type ExactReferenceDb = {
   }
 }
 
+export type FrozenReferenceDb = {
+  assessmentReferenceSet: {
+    findMany: (args: unknown) => Promise<ExactReferenceRow[]>
+  }
+}
+
 const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition => {
   const validation = validateReferenceSetDefinition({
     ...(row.definition && typeof row.definition === 'object' ? row.definition : {}),
@@ -96,25 +102,36 @@ export const freezeExactReferenceBindings = async (
 }
 
 export const loadFrozenReferenceSets = async (
-  db: ExactReferenceDb,
+  db: FrozenReferenceDb,
   input: {
     instrumentType: 'SCALE' | 'COGNITIVE'
     instrumentKey: string
     bindings: ReferenceBindingSnapshot[]
   },
 ): Promise<AssessmentReferenceSetDefinition[]> => {
-  const definitions: AssessmentReferenceSetDefinition[] = []
+  if (input.bindings.length === 0) return []
   for (const binding of input.bindings) {
     if (binding.referenceKey !== input.instrumentKey) {
       throw new Error(`Frozen reference key ${binding.referenceKey} does not match ${input.instrumentKey}`)
     }
-    const loaded = await loadExactReferenceSet(db, {
+  }
+  const versions = [...new Set(input.bindings.map((binding) => binding.referenceVersion))]
+  const rows = await db.assessmentReferenceSet.findMany({
+    where: {
       instrumentType: input.instrumentType,
       instrumentKey: input.instrumentKey,
-      referenceVersion: binding.referenceVersion,
-    })
-    if (loaded.hash !== binding.referenceHash) throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} hash mismatch`)
-    definitions.push(loaded.definition)
-  }
-  return definitions
+      referenceVersion: { in: versions },
+    },
+  })
+  const byVersion = new Map(rows.map((row) => [row.referenceVersion, row]))
+  return input.bindings.map((binding) => {
+    const row = byVersion.get(binding.referenceVersion)
+    if (!row) throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} was not found`)
+    const definition = toDefinition(row)
+    const hash = referenceSetHash(definition)
+    if (hash !== binding.referenceHash) {
+      throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} hash mismatch`)
+    }
+    return definition
+  })
 }
