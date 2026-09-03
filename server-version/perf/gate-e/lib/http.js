@@ -3,6 +3,10 @@ import { check, sleep } from 'k6';
 import {
   isDurableSuccessStatus,
   recordEventualOutcome,
+  fixturesUsed,
+  freshCompletions,
+  idempotentReplays,
+  missingFixtures,
 } from './eventual-success.js';
 
 const baseUrl = String(__ENV.BASE_URL || 'http://127.0.0.1:3300').replace(/\/$/, '');
@@ -21,20 +25,37 @@ export function pickFreshRequest(requests, index) {
   return null;
 }
 
+function parseReplayFlag(body) {
+  if (!body) return false;
+  try {
+    const parsed = typeof body === 'string' ? JSON.parse(body) : body;
+    const data = parsed && parsed.data ? parsed.data : parsed;
+    return Boolean(data && data.replayed === true);
+  } catch (_err) {
+    return false;
+  }
+}
+
 /**
  * Attempt one logical submit. Optional capacity retries on 503 only (not 429).
  * Returns whether eventual durable success was observed.
+ * Fresh-write rule: only the first success for a unique submissionId counts as
+ * fresh_completion; replayed:true is idempotent_replay (INVALID for E2 fresh curve
+ * unless it came from a capacity retry of the same logical submit).
  */
 export function runLogicalSubmit(request, tags = {}) {
   if (!request) {
+    missingFixtures.add(1, tags);
     recordEventualOutcome({ ok: false, status: 0, tags: { ...tags, reason: 'missing_fixture' } });
     check(false, { 'fixture present': (value) => value === true });
     return false;
   }
 
+  fixturesUsed.add(1, tags);
   const maxAttempts = Number(__ENV.CAPACITY_RETRY_ATTEMPTS || 4);
   const started = Date.now();
   let lastStatus = 0;
+  let sawFreshCompletion = false;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const path = String(request.path || '');
@@ -56,11 +77,37 @@ export function runLogicalSubmit(request, tags = {}) {
     lastStatus = response.status;
 
     if (isDurableSuccessStatus(response.status)) {
+      const replayed = parseReplayFlag(response.body);
+      if (replayed) {
+        idempotentReplays.add(1, tags);
+        // Capacity-retry replay of the same submissionId after a prior fresh write
+        // in this logical submit is OK; otherwise it is pool reuse / INVALID.
+        if (!sawFreshCompletion && attempt === 1) {
+          recordEventualOutcome({
+            ok: true,
+            latencyMs: Date.now() - started,
+            status: response.status,
+            tags: { ...tags, replayed: 'true' },
+          });
+          check(response, { 'eventual durable success': () => true });
+          return true;
+        }
+        recordEventualOutcome({
+          ok: true,
+          latencyMs: Date.now() - started,
+          status: response.status,
+          tags: { ...tags, replayed: 'retry' },
+        });
+        check(response, { 'eventual durable success': () => true });
+        return true;
+      }
+      freshCompletions.add(1, tags);
+      sawFreshCompletion = true;
       recordEventualOutcome({
         ok: true,
         latencyMs: Date.now() - started,
         status: response.status,
-        tags,
+        tags: { ...tags, replayed: 'false' },
       });
       check(response, { 'eventual durable success': () => true });
       return true;

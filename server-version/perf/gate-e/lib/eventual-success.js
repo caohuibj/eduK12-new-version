@@ -13,6 +13,12 @@ export const capacityBusy503 = new Counter('gate_e_capacity_busy_503');
 export const eventualSuccessRate = new Rate('gate_e_eventual_success_rate');
 export const eventualLatency = new Trend('gate_e_eventual_latency_ms', true);
 
+/** Fresh-write accounting (client-side). */
+export const fixturesUsed = new Counter('gate_e_fixtures_used');
+export const freshCompletions = new Counter('gate_e_fresh_completions');
+export const idempotentReplays = new Counter('gate_e_idempotent_replays');
+export const missingFixtures = new Counter('gate_e_missing_fixtures');
+
 export function recordEventualOutcome(options) {
   const {
     ok,

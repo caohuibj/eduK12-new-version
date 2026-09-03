@@ -62,3 +62,10 @@ VUS=50 DURATION=30s FFMPEG_CONCURRENCY=0 k6 run k6-e5-bundle-mixed.js
 
 Work A (public limiter / nginx buffering / auth+body metrics) should be deployed
 on the branch under test before interpreting E1 429 vs 503 mix.
+
+## E2 fresh-write (Gate-E.1)
+
+- Fixtures must be **parent-bound UNIFIED_V1** scale assessments (see `backend/scripts/gate47-seed-fixtures.ts`).
+- Each logical submit consumes one unfinished assessment / unique attempt / unique `submissionId`.
+- Hard accounting: HTTP fresh completions ≈ DB `COMPLETED` delta ≈ `assessment_unit_snapshots` delta ≈ fixtures used.
+- Prior E5 FFmpeg numbers are **INVALID** (no real FFmpeg; media is maintenance-only, not Gate-E mainline).
