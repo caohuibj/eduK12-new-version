@@ -12,6 +12,11 @@ import {
   SCALE_EVIDENCE_ENGINE_VERSION,
   runScaleEvidenceV1,
 } from './engines/scale-evidence-v1'
+import {
+  MENTAL_HEALTH_RULE_ENGINE_KEY,
+  MENTAL_HEALTH_RULE_ENGINE_VERSION,
+  runMentalHealthRuleV1,
+} from './engines/mental-health-rule-v1'
 
 /**
  * Register product engines used by PUBLISHED/DRAFT Bundle definitions.
@@ -29,6 +34,11 @@ export const registerProductBundleEngines = (
     SCALE_EVIDENCE_ENGINE_KEY,
     SCALE_EVIDENCE_ENGINE_VERSION,
     runScaleEvidenceV1,
+  )
+  registry.register(
+    MENTAL_HEALTH_RULE_ENGINE_KEY,
+    MENTAL_HEALTH_RULE_ENGINE_VERSION,
+    runMentalHealthRuleV1,
   )
   return registry
 }

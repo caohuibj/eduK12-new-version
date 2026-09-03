@@ -130,3 +130,22 @@ export type {
   ScaleEvidenceScoreObservationV1,
 } from './engines/scale-evidence-v1'
 export { WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1 } from './bundles/wellbeing-who5-youth-self-zh-cn-v1'
+
+export {
+  MENTAL_HEALTH_FEEDBACK_VERSION,
+  MENTAL_HEALTH_RULE_ENGINE_KEY,
+  MENTAL_HEALTH_RULE_ENGINE_VERSION,
+  MENTAL_HEALTH_RULE_PAYLOAD_SCHEMA,
+  rollupEvidenceQuality,
+  runMentalHealthRuleV1,
+} from './engines/mental-health-rule-v1'
+export type {
+  MentalHealthActionTierV1,
+  MentalHealthCoreRuleV1,
+  MentalHealthDetailRuleV1,
+  MentalHealthFeedbackBlockV1,
+  MentalHealthOutcomeCodeV1,
+  MentalHealthRulePayloadV1,
+  MentalHealthRuleSetV1,
+  MentalHealthSafetyRuleV1,
+} from './engines/mental-health-rule-v1'
