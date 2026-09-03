@@ -149,3 +149,22 @@ export type {
   MentalHealthRuleSetV1,
   MentalHealthSafetyRuleV1,
 } from './engines/mental-health-rule-v1'
+
+export {
+  BUNDLE_CONTEXT_DEFINITION_SCHEMA,
+  buildBundleContextFactsFromValues,
+  contextSnapshotHashIgnoresFrozenAt,
+  decryptBundleContextFacts,
+  encryptBundleContextFacts,
+  freezeBundleContext,
+  hashBundleContextDefinition,
+  normalizeBundleContextValues,
+  parseBundleContextDefinition,
+  validateBundleContextDefinition,
+} from './context'
+export type {
+  BundleContextDefinitionV1,
+  BundleContextFieldDefinitionV1,
+  BundleContextFreezeStateV1,
+  BundleContextValueTypeV1,
+} from './context'
