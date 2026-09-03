@@ -74,3 +74,13 @@ export {
 } from './compatibility'
 export type { FrozenRuntimeSnapshotRead } from './compatibility'
 export { compileBundleRuntimeFromFrozenRead } from './compile'
+
+export {
+  BundleAnalysisEngineRegistry,
+  createBundleAnalysisEngineRegistry,
+} from './registry'
+export type {
+  BundleAnalysisEngineV1,
+  BundleEngineInputV1,
+  BundleEngineResultV1,
+} from './registry'
