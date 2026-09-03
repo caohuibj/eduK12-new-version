@@ -32,15 +32,17 @@ export type RequestObservationPhase =
   | 'final_submit_commit'
   | 'final_submit_parent_finalization'
   | 'final_submit_retry_backoff'
-  | 'aggregate.load_ms'
-  | 'aggregate.probe_ms'
-  | 'aggregate.decrypt_ms'
-  | 'aggregate.evidence_ms'
-  | 'aggregate.compute_ms'
-  | 'aggregate.encrypt_ms'
-  | 'aggregate.persist_ms'
+  | 'aggregate.parent_probe_db'
+  | 'aggregate.header_db'
+  | 'aggregate.definition_db'
+  | 'aggregate.payload_db'
+  | 'aggregate.decrypt_parse'
+  | 'aggregate.validate'
+  | 'aggregate.analysis'
+  | 'aggregate.report'
+  | 'aggregate.encrypt'
+  | 'aggregate.persist'
   | 'aggregate.cas_loser'
-  | 'aggregate.compute_per_parent'
   | 'response'
 
 type Histogram = {
@@ -95,6 +97,8 @@ let gcEvents = 0
 let gcDurationMs = 0
 let completionAdmissionActive = 0
 let completionAdmissionQueue = 0
+const boundedAdmissionGateStates = new Map<string, { active: number; queued: number }>()
+const boundedAdmissionRejectionCounts = new Map<string, LabeledCounter>()
 
 const eventLoopDelay = monitorEventLoopDelay({ resolution: 20 })
 eventLoopDelay.enable()
@@ -218,6 +222,31 @@ export const recordCompletionAdmissionRejection = (reason: string): void => {
 export const setCompletionAdmissionState = (active: number, queued: number): void => {
   completionAdmissionActive = Math.max(0, Math.floor(active))
   completionAdmissionQueue = Math.max(0, Math.floor(queued))
+}
+
+const normalizeGateName = (gate: string): string | null => {
+  if (!gate || gate.length > 64) return null
+  return gate
+}
+
+/** Record a labelled rejection for any BoundedAdmissionGate instance. */
+export const recordBoundedAdmissionRejection = (gate: string, reason: string): void => {
+  const normalizedGate = normalizeGateName(gate)
+  if (!normalizedGate || !reason || reason.length > 32) return
+  incrementCounter(boundedAdmissionRejectionCounts, { gate: normalizedGate, reason })
+}
+
+/** Publish active/queued gauges for a named BoundedAdmissionGate. */
+export const setBoundedAdmissionGateState = (gate: string, active: number, queued: number): void => {
+  const normalizedGate = normalizeGateName(gate)
+  if (!normalizedGate) return
+  if (boundedAdmissionGateStates.size >= MAX_METRIC_KEYS - 1 && !boundedAdmissionGateStates.has(normalizedGate)) {
+    return
+  }
+  boundedAdmissionGateStates.set(normalizedGate, {
+    active: Math.max(0, Math.floor(active)),
+    queued: Math.max(0, Math.floor(queued)),
+  })
 }
 
 const escapeLabel = (value: string): string => value
@@ -551,6 +580,15 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_questionnaire_completion_admission_queue Queued questionnaire completion operations in this process.',
     '# TYPE ptool_questionnaire_completion_admission_queue gauge',
     `ptool_questionnaire_completion_admission_queue ${completionAdmissionQueue}`,
+    '# HELP ptool_bounded_admission_active Active operations admitted by a named BoundedAdmissionGate.',
+    '# TYPE ptool_bounded_admission_active gauge',
+    ...[...boundedAdmissionGateStates.entries()].map(([gate, state]) => `ptool_bounded_admission_active{gate="${escapeLabel(gate)}"} ${state.active}`),
+    '# HELP ptool_bounded_admission_queue Queued operations waiting on a named BoundedAdmissionGate.',
+    '# TYPE ptool_bounded_admission_queue gauge',
+    ...[...boundedAdmissionGateStates.entries()].map(([gate, state]) => `ptool_bounded_admission_queue{gate="${escapeLabel(gate)}"} ${state.queued}`),
+    '# HELP ptool_bounded_admission_rejections_total BoundedAdmissionGate rejections by gate and reason.',
+    '# TYPE ptool_bounded_admission_rejections_total counter',
+    ...[...boundedAdmissionRejectionCounts.values()].map(({ labels, count }) => `ptool_bounded_admission_rejections_total{${labelsText(labels)}} ${count}`),
     '# HELP ptool_prisma_call_duration_seconds Prisma call wall-clock latency by model and action.',
     '# TYPE ptool_prisma_call_duration_seconds histogram',
     ...histogramLines('ptool_prisma_call_duration_seconds', prismaCallHistograms),
@@ -570,6 +608,8 @@ export const resetRuntimeObservabilityForTests = (): void => {
   serializableAttemptCounts.clear()
   serializationConflictCounts.clear()
   completionAdmissionRejectionCounts.clear()
+  boundedAdmissionRejectionCounts.clear()
+  boundedAdmissionGateStates.clear()
   prismaErrorCounts.clear()
   activeRequests = 0
   gcEvents = 0

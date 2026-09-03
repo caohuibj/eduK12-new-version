@@ -36,6 +36,18 @@ tokens, questionnaire content, identifiers, SQL text, or request bodies.
 - `ptool_questionnaire_completion_admission_active` and
   `ptool_questionnaire_completion_admission_queue`: process-local active and
   queued questionnaire completion operations.
+- `ptool_bounded_admission_active`, `ptool_bounded_admission_queue`, and
+  `ptool_bounded_admission_rejections_total`: labelled gauges/counters for the
+  generic `BoundedAdmissionGate` primitive (`gate` is a low-cardinality name
+  such as `questionnaire_completion`). Questionnaire completion remains a thin
+  wrapper over this primitive and keeps the legacy gauges above.
+- Aggregate finalization phases (low cardinality): `aggregate.parent_probe_db`,
+  `aggregate.header_db`, `aggregate.definition_db`, `aggregate.payload_db`,
+  `aggregate.decrypt_parse`, `aggregate.validate`, `aggregate.analysis`,
+  `aggregate.report`, `aggregate.encrypt`, `aggregate.persist`, and
+  `aggregate.cas_loser`. `aggregate.payload_db` is the snapshot payload
+  `findMany`; decrypt/parse is measured separately so the old mislabeled
+  `aggregate.decrypt_ms` wrapping DB I/O is gone.
 - `ptool_nodejs_event_loop_utilization`,
   `ptool_nodejs_event_loop_delay_seconds`,
   `ptool_nodejs_active_requests`, `process_resident_memory_bytes`,
