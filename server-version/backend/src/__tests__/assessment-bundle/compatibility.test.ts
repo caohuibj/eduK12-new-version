@@ -150,6 +150,29 @@ describe('compatibility reader', () => {
     }))).toBe('UNSUPPORTED_SNAPSHOT')
   })
 
+  it('rejects legacy package whose nested protocol omits protocolVersion', () => {
+    const broken = {
+      ...legacyPackageV1,
+      analysisProtocolSnapshot: {
+        ...legacyProtocolV1,
+        protocolVersion: undefined,
+      },
+    }
+    expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload(broken))))
+      .toBe('UNSUPPORTED_SNAPSHOT')
+  })
+
+  it('rejects legacy package v2 whose nested protocol omits scaleMeasurements', () => {
+    const inner = { ...legacyPackageV2.analysisProtocolSnapshot }
+    delete (inner as { scaleMeasurements?: unknown }).scaleMeasurements
+    const broken = {
+      ...legacyPackageV2,
+      analysisProtocolSnapshot: inner,
+    }
+    expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload(broken))))
+      .toBe('UNSUPPORTED_SNAPSHOT')
+  })
+
   it('rejects unsupported families after a single decrypt', () => {
     expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload({ hello: 'world' }))))
       .toBe('UNSUPPORTED_SNAPSHOT')

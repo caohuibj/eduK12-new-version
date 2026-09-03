@@ -77,43 +77,19 @@ const requireLegacyProfile = (value: unknown): 'standard' | 'research' => {
   return value
 }
 
-const parseLegacyReportPackage = (record: Record<string, unknown>): Extract<FrozenRuntimeSnapshotRead, { family: 'LEGACY_REPORT_PACKAGE' }> => {
+/**
+ * Shared legacy protocol field validation used by both standalone protocol
+ * snapshots and nested analysisProtocolSnapshot inside report packages.
+ */
+const parseLegacyProtocolRecord = (record: Record<string, unknown>): FrozenAnalysisProtocolSnapshot => {
   const snapshotVersion = requireSnapshotVersion(record.snapshotVersion)
-  const protocol = requireObject(record.analysisProtocolSnapshot, 'analysisProtocolSnapshot')
-  if (typeof protocol.protocolKey !== 'string' || protocol.protocolDefinition == null || !Array.isArray(protocol.cognitiveMeasurements)) {
-    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy report package 内层 protocol 结构无效')
+  if (!Array.isArray(record.cognitiveMeasurements)) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy analysis protocol 缺少 cognitiveMeasurements')
   }
-  const profile = requireLegacyProfile(record.profile)
-  const innerVersion = protocol.snapshotVersion
-  const innerProfile = protocol.profile
-  if (innerVersion !== snapshotVersion) {
-    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol snapshotVersion 不一致')
-  }
-  if (innerProfile !== profile) {
-    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol profile 不一致')
-  }
-  const snapshot: FrozenReportPackageSnapshot = {
-    snapshotVersion,
-    packageKey: requireString(record.packageKey, 'packageKey'),
-    packageVersion: requireString(record.packageVersion, 'packageVersion'),
-    profile,
-    packageDefinition: requireObject(record.packageDefinition, 'packageDefinition') as unknown as FrozenReportPackageSnapshot['packageDefinition'],
-    analysisProtocolSnapshot: protocol as unknown as FrozenReportPackageSnapshot['analysisProtocolSnapshot'],
-  }
-  return {
-    family: 'LEGACY_REPORT_PACKAGE',
-    snapshotVersion: snapshot.snapshotVersion,
-    snapshot,
-    unavailable: { ...LEGACY_UNAVAILABLE },
-  }
-}
-
-const parseLegacyAnalysisProtocol = (record: Record<string, unknown>): Extract<FrozenRuntimeSnapshotRead, { family: 'LEGACY_ANALYSIS_PROTOCOL' }> => {
-  const snapshotVersion = requireSnapshotVersion(record.snapshotVersion)
   if (snapshotVersion === 2 && !Array.isArray(record.scaleMeasurements)) {
     return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy analysis protocol v2 缺少 scaleMeasurements')
   }
-  const snapshot: FrozenAnalysisProtocolSnapshot = {
+  return {
     snapshotVersion,
     protocolKey: requireString(record.protocolKey, 'protocolKey'),
     protocolVersion: requireString(record.protocolVersion, 'protocolVersion'),
@@ -124,6 +100,38 @@ const parseLegacyAnalysisProtocol = (record: Record<string, unknown>): Extract<F
       ? { scaleMeasurements: record.scaleMeasurements as FrozenAnalysisProtocolSnapshot['scaleMeasurements'] }
       : {}),
   }
+}
+
+const parseLegacyReportPackage = (record: Record<string, unknown>): Extract<FrozenRuntimeSnapshotRead, { family: 'LEGACY_REPORT_PACKAGE' }> => {
+  const snapshotVersion = requireSnapshotVersion(record.snapshotVersion)
+  const protocol = parseLegacyProtocolRecord(
+    requireObject(record.analysisProtocolSnapshot, 'analysisProtocolSnapshot'),
+  )
+  const profile = requireLegacyProfile(record.profile)
+  if (protocol.snapshotVersion !== snapshotVersion) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol snapshotVersion 不一致')
+  }
+  if (protocol.profile !== profile) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol profile 不一致')
+  }
+  const snapshot: FrozenReportPackageSnapshot = {
+    snapshotVersion,
+    packageKey: requireString(record.packageKey, 'packageKey'),
+    packageVersion: requireString(record.packageVersion, 'packageVersion'),
+    profile,
+    packageDefinition: requireObject(record.packageDefinition, 'packageDefinition') as unknown as FrozenReportPackageSnapshot['packageDefinition'],
+    analysisProtocolSnapshot: protocol,
+  }
+  return {
+    family: 'LEGACY_REPORT_PACKAGE',
+    snapshotVersion: snapshot.snapshotVersion,
+    snapshot,
+    unavailable: { ...LEGACY_UNAVAILABLE },
+  }
+}
+
+const parseLegacyAnalysisProtocol = (record: Record<string, unknown>): Extract<FrozenRuntimeSnapshotRead, { family: 'LEGACY_ANALYSIS_PROTOCOL' }> => {
+  const snapshot = parseLegacyProtocolRecord(record)
   return {
     family: 'LEGACY_ANALYSIS_PROTOCOL',
     snapshotVersion: snapshot.snapshotVersion,

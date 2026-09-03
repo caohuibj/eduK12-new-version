@@ -80,9 +80,13 @@ describe('AssessmentBundleDefinitionV1', () => {
       ...observerBundle(),
       respondentTypes: ['SELF'],
     }))).toBe('INVALID_RESPONDENT_POPULATION')
-    expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
+    // Generic contract: integrated does not force adult / minAge>=18.
+    expect(validateAssessmentBundleDefinition(cognitiveSelfBundle({
       category: 'integrated',
       population: { subjectPopulation: 'youth' },
+    })).population.subjectPopulation).toBe('youth')
+    expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
+      population: { subjectPopulation: 'youth', subjectMinAgeYears: 18, subjectMaxAgeYears: 10 },
     })))).toBe('INVALID_RESPONDENT_POPULATION')
     expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
       initiationModes: ['PARENT_SELF_SERVE'],

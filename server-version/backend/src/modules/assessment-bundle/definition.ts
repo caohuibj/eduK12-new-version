@@ -21,9 +21,6 @@ const assertRespondentPopulation = (definition: AssessmentBundleDefinitionV1) =>
     bundleContractFail('INVALID_RESPONDENT_POPULATION', `${definition.category} Bundle 只能使用 SELF respondent`)
   }
 
-  if (definition.category === 'integrated' && definition.population.subjectPopulation !== 'adult') {
-    bundleContractFail('INVALID_RESPONDENT_POPULATION', 'integrated Bundle 的 subjectPopulation 必须是 adult')
-  }
   if (modes.has('PARENT_SELF_SERVE') && !respondents.has('PARENT')) {
     bundleContractFail('INVALID_RESPONDENT_POPULATION', 'PARENT_SELF_SERVE 需要 PARENT respondentType')
   }
@@ -35,9 +32,6 @@ const assertRespondentPopulation = (definition: AssessmentBundleDefinitionV1) =>
   const maxAge = definition.population.subjectMaxAgeYears
   if (minAge !== undefined && maxAge !== undefined && minAge > maxAge) {
     bundleContractFail('INVALID_RESPONDENT_POPULATION', 'subjectMinAgeYears 不能大于 subjectMaxAgeYears')
-  }
-  if (definition.category === 'integrated' && minAge !== undefined && minAge < 18) {
-    bundleContractFail('INVALID_RESPONDENT_POPULATION', 'integrated Bundle 不得把最低年龄设在 18 岁以下')
   }
 }
 
