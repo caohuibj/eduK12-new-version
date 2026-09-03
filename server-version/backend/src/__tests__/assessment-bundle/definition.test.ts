@@ -43,7 +43,14 @@ describe('AssessmentBundleDefinitionV1', () => {
         ...cognitiveSelfBundle().slots[0],
         unitType: 'QUESTIONNAIRE' as 'FORM',
       }],
-    })))).toBe('UNKNOWN_SLOT_TYPE')
+    })))).toBe('INVALID_DEFINITION')
+    expect(failCode(() => validateAssessmentBundleDefinition({
+      ...cognitiveSelfBundle(),
+      slots: [{
+        ...cognitiveSelfBundle().slots[0],
+        valueSelectors: 'total' as unknown as string[],
+      }],
+    }))).toBe('INVALID_DEFINITION')
 
     expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
       slots: [
@@ -56,13 +63,13 @@ describe('AssessmentBundleDefinitionV1', () => {
   it('requires exact engine key/version', () => {
     expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
       engine: { key: 'mystery-engine-v1' as 'cognitive-domain-v1', version: '1.0.0' },
-    })))).toBe('ENGINE_REQUIRED')
+    })))).toBe('INVALID_DEFINITION')
     expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
       engine: { key: 'cognitive-domain-v1', version: '' },
-    })))).toBe('ENGINE_REQUIRED')
+    })))).toBe('INVALID_DEFINITION')
     expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
       engine: { key: 'cognitive-domain-v1', version: '^1.0.0' },
-    })))).toBe('ENGINE_REQUIRED')
+    })))).toBe('INVALID_DEFINITION')
   })
 
   it('rejects invalid respondent/population combinations', () => {

@@ -51,6 +51,7 @@ const legacyPackageV2 = {
   analysisProtocolSnapshot: {
     ...legacyProtocolV1,
     snapshotVersion: 2 as const,
+    profile: 'research' as const,
     protocolKey: 'inhibitory_control_multisource_v1',
     scaleMeasurements: [{
       slotKey: 'adexi_inhibition',
@@ -129,14 +130,24 @@ describe('compatibility reader', () => {
     }
     expect(classifyDecryptedRuntimeSnapshot(poisoned)).toBe('ASSESSMENT_BUNDLE')
     expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload(poisoned))))
-      .toBe('SNAPSHOT_HASH_MISMATCH')
-    const withLegacyKeys = parseFrozenRuntimeSnapshot(encryptCognitivePayload({
+      .toBe('UNSUPPORTED_SNAPSHOT')
+    expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload({
       ...valid,
-      packageKey: 'attention_stability_v1',
-      packageDefinition: { key: 'attention_stability_v1' },
-      analysisProtocolSnapshot: legacyProtocolV1,
-    }))
-    expect(withLegacyKeys.family).toBe('ASSESSMENT_BUNDLE')
+      snapshotHash: 'e'.repeat(64),
+    })))).toBe('SNAPSHOT_HASH_MISMATCH')
+  })
+
+  it('rejects invalid legacy profiles and ambiguous package+protocol objects', () => {
+    expect(failCode(() => parseFrozenRuntimeSnapshot(encryptCognitivePayload({
+      ...legacyPackageV1,
+      profile: 'corrupted',
+    })))).toBe('UNSUPPORTED_SNAPSHOT')
+    expect(failCode(() => classifyDecryptedRuntimeSnapshot({
+      ...legacyPackageV1,
+      protocolKey: 'attention_stability_v1',
+      protocolDefinition: { key: 'attention_stability_v1' },
+      cognitiveMeasurements: [],
+    }))).toBe('UNSUPPORTED_SNAPSHOT')
   })
 
   it('rejects unsupported families after a single decrypt', () => {

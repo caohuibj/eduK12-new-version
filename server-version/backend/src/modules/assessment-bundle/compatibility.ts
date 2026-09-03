@@ -62,9 +62,19 @@ export const classifyDecryptedRuntimeSnapshot = (value: unknown): FrozenRuntimeS
     && record.protocolDefinition != null
     && Array.isArray(record.cognitiveMeasurements)
 
+  if (hasPackage && hasProtocol) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy snapshot 同时匹配 package 与 protocol 结构')
+  }
   if (hasPackage) return 'LEGACY_REPORT_PACKAGE'
   if (hasProtocol) return 'LEGACY_ANALYSIS_PROTOCOL'
   return bundleContractFail('UNSUPPORTED_SNAPSHOT', '无法识别快照族')
+}
+
+const requireLegacyProfile = (value: unknown): 'standard' | 'research' => {
+  if (value !== 'standard' && value !== 'research') {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', `legacy profile 无效: ${String(value)}`)
+  }
+  return value
 }
 
 const parseLegacyReportPackage = (record: Record<string, unknown>): Extract<FrozenRuntimeSnapshotRead, { family: 'LEGACY_REPORT_PACKAGE' }> => {
@@ -73,11 +83,20 @@ const parseLegacyReportPackage = (record: Record<string, unknown>): Extract<Froz
   if (typeof protocol.protocolKey !== 'string' || protocol.protocolDefinition == null || !Array.isArray(protocol.cognitiveMeasurements)) {
     return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy report package 内层 protocol 结构无效')
   }
+  const profile = requireLegacyProfile(record.profile)
+  const innerVersion = protocol.snapshotVersion
+  const innerProfile = protocol.profile
+  if (innerVersion !== snapshotVersion) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol snapshotVersion 不一致')
+  }
+  if (innerProfile !== profile) {
+    return bundleContractFail('UNSUPPORTED_SNAPSHOT', 'legacy package 与内层 protocol profile 不一致')
+  }
   const snapshot: FrozenReportPackageSnapshot = {
     snapshotVersion,
     packageKey: requireString(record.packageKey, 'packageKey'),
     packageVersion: requireString(record.packageVersion, 'packageVersion'),
-    profile: record.profile === 'research' ? 'research' : 'standard',
+    profile,
     packageDefinition: requireObject(record.packageDefinition, 'packageDefinition') as unknown as FrozenReportPackageSnapshot['packageDefinition'],
     analysisProtocolSnapshot: protocol as unknown as FrozenReportPackageSnapshot['analysisProtocolSnapshot'],
   }
@@ -98,7 +117,7 @@ const parseLegacyAnalysisProtocol = (record: Record<string, unknown>): Extract<F
     snapshotVersion,
     protocolKey: requireString(record.protocolKey, 'protocolKey'),
     protocolVersion: requireString(record.protocolVersion, 'protocolVersion'),
-    profile: record.profile === 'research' ? 'research' : 'standard',
+    profile: requireLegacyProfile(record.profile),
     protocolDefinition: requireObject(record.protocolDefinition, 'protocolDefinition') as unknown as FrozenAnalysisProtocolSnapshot['protocolDefinition'],
     cognitiveMeasurements: record.cognitiveMeasurements as FrozenAnalysisProtocolSnapshot['cognitiveMeasurements'],
     ...(snapshotVersion === 2

@@ -1,7 +1,8 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../cognitive/cognitive.security'
-import { cloneAssessmentBundleDefinition, hashAssessmentBundleDefinition, validateAssessmentBundleDefinition } from './definition'
+import { cloneAssessmentBundleDefinition, hashAssessmentBundleDefinition, parseAssessmentBundleDefinition } from './definition'
 import { bundleContractFail } from './errors'
+import { frozenAssessmentBundleSnapshotSchema, parseContract } from './schema'
 import {
   ASSESSMENT_BUNDLE_SNAPSHOT_FAMILY,
   ASSESSMENT_BUNDLE_SNAPSHOT_VERSION,
@@ -71,64 +72,67 @@ export const buildFrozenAssessmentBundleSnapshot = (
 }
 
 export const validateFrozenAssessmentBundleSnapshot = (
-  snapshot: FrozenAssessmentBundleSnapshotV3,
+  snapshot: FrozenAssessmentBundleSnapshotV3 | unknown,
   expectedDefinition?: AssessmentBundleDefinitionV1,
 ): FrozenAssessmentBundleSnapshotV3 => {
-  if (snapshot.snapshotFamily !== ASSESSMENT_BUNDLE_SNAPSHOT_FAMILY) {
-    bundleContractFail('UNSUPPORTED_SNAPSHOT', `不是 Assessment Bundle snapshot: ${String(snapshot.snapshotFamily)}`)
+  const parsed = parseContract(frozenAssessmentBundleSnapshotSchema, snapshot, 'UNSUPPORTED_SNAPSHOT')
+  parseAssessmentBundleDefinition(parsed.bundleDefinition)
+  if (parsed.snapshotFamily !== ASSESSMENT_BUNDLE_SNAPSHOT_FAMILY) {
+    bundleContractFail('UNSUPPORTED_SNAPSHOT', `不是 Assessment Bundle snapshot: ${String(parsed.snapshotFamily)}`)
   }
-  if (snapshot.snapshotVersion !== ASSESSMENT_BUNDLE_SNAPSHOT_VERSION) {
-    bundleContractFail('UNSUPPORTED_SNAPSHOT', `不支持的 Bundle snapshotVersion: ${String(snapshot.snapshotVersion)}`)
+  if (parsed.snapshotVersion !== ASSESSMENT_BUNDLE_SNAPSHOT_VERSION) {
+    bundleContractFail('UNSUPPORTED_SNAPSHOT', `不支持的 Bundle snapshotVersion: ${String(parsed.snapshotVersion)}`)
   }
-  if (snapshot.hashScheme !== BUNDLE_SNAPSHOT_HASH_SCHEME) {
+  if (parsed.hashScheme !== BUNDLE_SNAPSHOT_HASH_SCHEME) {
     bundleContractFail('UNSUPPORTED_SNAPSHOT', 'Bundle snapshot hashScheme 不匹配')
   }
-  validateAssessmentBundleDefinition(snapshot.bundleDefinition)
   if (
-    snapshot.bundleKey !== snapshot.bundleDefinition.bundleKey
-    || snapshot.bundleVersion !== snapshot.bundleDefinition.bundleVersion
+    parsed.bundleKey !== parsed.bundleDefinition.bundleKey
+    || parsed.bundleVersion !== parsed.bundleDefinition.bundleVersion
   ) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'snapshot identity 与 bundleDefinition 不一致')
   }
-  if (snapshot.engine.key !== snapshot.bundleDefinition.engine.key
-    || snapshot.engine.version !== snapshot.bundleDefinition.engine.version) {
+  if (parsed.engine.key !== parsed.bundleDefinition.engine.key
+    || parsed.engine.version !== parsed.bundleDefinition.engine.version) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'snapshot engine 与 definition 不一致')
   }
-  const expectedDefinitionHash = hashAssessmentBundleDefinition(snapshot.bundleDefinition)
-  if (snapshot.bundleDefinitionHash !== expectedDefinitionHash) {
+  const expectedDefinitionHash = hashAssessmentBundleDefinition(parsed.bundleDefinition)
+  if (parsed.bundleDefinitionHash !== expectedDefinitionHash) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'bundleDefinitionHash 不匹配')
   }
-  const expectedBindings = slotBindingsFromDefinition(snapshot.bundleDefinition)
-  if (canonicalHash(snapshot.slotBindings) !== canonicalHash(expectedBindings)) {
+  const expectedBindings = slotBindingsFromDefinition(parsed.bundleDefinition)
+  if (canonicalHash(parsed.slotBindings) !== canonicalHash(expectedBindings)) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'slotBindings 与 definition 不一致')
   }
-  if (snapshot.rightsSnapshotHash !== null) {
+  if (
+    parsed.reportDefinitionKey !== parsed.bundleDefinition.reportDefinitionKey
+    || parsed.reportDefinitionVersion !== parsed.bundleDefinition.reportDefinitionVersion
+  ) {
+    bundleContractFail('SNAPSHOT_TAMPERED', 'snapshot report definition 与 bundleDefinition 不一致')
+  }
+  if (parsed.rightsSnapshotHash !== null) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'commit 2 不得写入 rightsSnapshotHash')
   }
   if (expectedDefinition) {
-    const expected = validateAssessmentBundleDefinition(expectedDefinition)
+    const expected = parseAssessmentBundleDefinition(expectedDefinition)
     if (
-      expected.bundleKey !== snapshot.bundleKey
-      || expected.bundleVersion !== snapshot.bundleVersion
-      || hashAssessmentBundleDefinition(expected) !== snapshot.bundleDefinitionHash
+      expected.bundleKey !== parsed.bundleKey
+      || expected.bundleVersion !== parsed.bundleVersion
+      || hashAssessmentBundleDefinition(expected) !== parsed.bundleDefinitionHash
     ) {
       bundleContractFail('SNAPSHOT_TAMPERED', 'snapshot 与提供的 definition 不匹配')
     }
   }
-  const expectedHash = hashFrozenAssessmentBundleSnapshot(snapshot)
-  if (snapshot.snapshotHash !== expectedHash) {
+  const expectedHash = hashFrozenAssessmentBundleSnapshot(parsed)
+  if (parsed.snapshotHash !== expectedHash) {
     bundleContractFail('SNAPSHOT_HASH_MISMATCH', 'FrozenAssessmentBundleSnapshotV3 hash 不匹配')
   }
-  return snapshot
+  return parsed
 }
 
-export const parseFrozenAssessmentBundleSnapshot = (value: unknown): FrozenAssessmentBundleSnapshotV3 => {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    bundleContractFail('UNSUPPORTED_SNAPSHOT', 'Bundle snapshot 不是对象')
-  }
-  const snapshot = value as FrozenAssessmentBundleSnapshotV3
-  return validateFrozenAssessmentBundleSnapshot(snapshot)
-}
+export const parseFrozenAssessmentBundleSnapshot = (value: unknown): FrozenAssessmentBundleSnapshotV3 => (
+  validateFrozenAssessmentBundleSnapshot(value)
+)
 
 export const encryptFrozenAssessmentBundleSnapshot = (
   snapshot: FrozenAssessmentBundleSnapshotV3,

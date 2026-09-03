@@ -44,12 +44,15 @@ export {
   cloneAssessmentBundleDefinition,
   hashAssessmentBundleDefinition,
   isBundleEngineKey,
+  parseAssessmentBundleDefinition,
   validateAssessmentBundleCatalog,
   validateAssessmentBundleDefinition,
 } from './definition'
 export {
   buildBundleContextFacts,
+  buildBundleReportFacts,
   contextFactToEvidenceSource,
+  deriveEvidenceSourceHashes,
   hashBundleContextFacts,
   hashBundleReportFacts,
   validateBundleContextFacts,

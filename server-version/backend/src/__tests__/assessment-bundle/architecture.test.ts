@@ -1,24 +1,20 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+const moduleDir = resolve(__dirname, '../../modules/assessment-bundle')
+
 const source = (relativePath: string): string => readFileSync(
-  resolve(__dirname, '../../modules/assessment-bundle', relativePath),
+  resolve(moduleDir, relativePath),
   'utf8',
 )
 
+const moduleFiles = (): string[] => readdirSync(moduleDir).filter((name) => name.endsWith('.ts'))
+
 describe('assessment-bundle architecture', () => {
   it('stays a contract layer and does not open a second runtime', () => {
-    const files = [
-      'definition.ts',
-      'evidence.ts',
-      'snapshot.ts',
-      'compatibility.ts',
-      'compile.ts',
-      'types.ts',
-      'index.ts',
-    ]
-    const joined = files.map(source).join('\n')
+    const joined = moduleFiles().map(source).join('\n')
+    expect(moduleFiles().length).toBeGreaterThan(0)
     expect(joined).not.toMatch(/from ['"]@prisma\/client['"]/)
     expect(joined).not.toMatch(/from ['"].*questionnaire-form-section/)
     expect(joined).not.toMatch(/from ['"].*composite\.service/)

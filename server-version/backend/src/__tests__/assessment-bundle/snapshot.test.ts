@@ -68,6 +68,23 @@ describe('FrozenAssessmentBundleSnapshotV3', () => {
     }))).toBe('UNSUPPORTED_SNAPSHOT')
   })
 
+  it('rejects report definition dual-authority and unknown v3 fields', () => {
+    const snapshot = buildFrozenAssessmentBundleSnapshot(cognitiveSelfBundle())
+    const mismatched = {
+      ...snapshot,
+      reportDefinitionKey: 'report-other-v1',
+    }
+    const hashed = {
+      ...mismatched,
+      snapshotHash: hashFrozenAssessmentBundleSnapshot(mismatched),
+    }
+    expect(failCode(() => parseFrozenAssessmentBundleSnapshot(hashed))).toBe('SNAPSHOT_TAMPERED')
+    expect(failCode(() => parseFrozenAssessmentBundleSnapshot({
+      ...snapshot,
+      packageKey: 'attention_stability_v1',
+    }))).toBe('UNSUPPORTED_SNAPSHOT')
+  })
+
   it('compiles through the existing V3.2 bundle runtime', () => {
     const snapshot = buildFrozenAssessmentBundleSnapshot(cognitiveSelfBundle())
     const compiled = compileBundleRuntimeFromFrozenRead({

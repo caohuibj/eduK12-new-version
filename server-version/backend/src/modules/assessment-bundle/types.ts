@@ -163,6 +163,8 @@ export interface BundleContextFactsV1 {
   contextDefinitionKey: string
   contextDefinitionVersion: string
   contextDefinitionHash: string
+  /** Freeze-time metadata. Not part of contextSnapshotHash. */
+  frozenAt: string
   contextSnapshotHash: string
   facts: BundleContextFactV1[]
 }
