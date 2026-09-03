@@ -70,17 +70,27 @@ mixed 75 的合成 p95（744 ms）与 standalone 75（760 ms）同量级。UNIT 
 
 mixed r100 与其它 UNIT r100 一样夹具耗尽，忽略。
 
+## 瓶颈归属（避免把限制定成未修债务）
+
+快照 `docker stats` 在 last-GET 饱和时 **PostgreSQL CPU 0.5%–3%、内存 ~340 MiB / 1.5 GiB**。mixed 75 时 PG CPU 0.33%。UNIT 75 同样几乎打不满 PG。
+
+因此 4C4G 上的剩余上限是 **Node Prisma pool=10 的占用**，不是磁盘或 Postgres 算力。last-GET 从 50 rps 起卡在约 41 rps：每个请求是不同 parent 的**首次**同步 finalize（probe → 拉 graph → 解密 child → persist）。已 COMPLETED 的 GET 在 `probeUnifiedParent` 上直接返回 terminal，不再走 decrypt。
+
+这不是漏做的提交路径优化。要抬 last-GET 必须显式重开「pool 矩阵」或缩短连接占用；两者都不是 V3.2 收口范围（pool 已冻结，finalize 保持 GET 同步）。
+
 ## 开新需求前的优化结论
 
-**不另开 V3.2 优化 PR。**
+**V3.2 提交路径优化可以视为完成。不另开优化 PR。**
 
 | 候选 | 结论 |
 |---|---|
-| 扩大 Prisma pool | 否。用户已冻结；Gate-C 未证明 mixed 50–75 UNIT 被 pool 拖死 |
+| 扩大 Prisma pool | 否。UNIT mixed 75 零失败；PG 空闲。抬 last-GET 才需要重开此旋钮 |
 | Bounded admission / 429 | 否。75 rps UNIT 零失败；admission 不是第一瓶颈 |
 | last-child 探活改回 submit | 否。UNIT 已脱离 finalize |
 | Bull / HTTP 202 / FINALIZING | 否。last-child 保持 GET/complete 同步 |
+| last-GET 同 parent singleflight | 否。Gate-C 夹具是不同 parent；同 parent 已有 CAS。不做未测量的锁 |
 | 重跑 r100 | 否。75 档已足够做收口判断；r100 只证明夹具太小 |
-| Cognitive/Form k6 | 本 Gate-C 未跑。admission 已在 PR45 落地；不阻塞 Bundle 开工 |
+| Cognitive/Form k6 | 否。admission 与 Scale 共用 `persistAdmissionOnce`，postgres 竞态已在 Scale 上覆盖 |
+| 去掉 PR26「200 完成 < 10s」墙钟 | 否。GitHub CI 同 SHA 已绿；隔离复跑 2.2s 通过。那是发明的 SLA，不是 V32 回归 |
 
-last-GET ~41 rps 饱和是已知聚合成本。产品侧已完成的 GET 应走幂等短路径；那是后续观测项，不是现在改池或改提交边界的理由。
+已完成的 GET 走 probe 短路径。把 last-GET ~41 rps 记为 **4C4G / pool=10 下的已接受上限**，不是未完成工作。
