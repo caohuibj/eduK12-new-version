@@ -56,6 +56,18 @@ const assertSlotsAndRights = (definition: AssessmentBundleDefinitionV1) => {
     if (slot.unitType === 'FORM' && slot.valueSelectors && slot.valueSelectors.length > 0) {
       bundleContractFail('UNKNOWN_SLOT_TYPE', `FORM slot 不得携带 valueSelectors: ${slot.slotKey}`)
     }
+    if (slot.valueSelectors) {
+      const seenSelectors = new Set<string>()
+      for (const selector of slot.valueSelectors) {
+        if (seenSelectors.has(selector)) {
+          bundleContractFail(
+            'SOURCE_VALUE_SELECTOR_DUPLICATE',
+            `valueSelector 重复: ${slot.slotKey}/${selector}`,
+          )
+        }
+        seenSelectors.add(selector)
+      }
+    }
   }
 
   if (definition.rightsRequirements.required && definition.rightsRequirements.instrumentKeys.length === 0) {

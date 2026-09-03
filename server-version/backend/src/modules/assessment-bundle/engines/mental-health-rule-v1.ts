@@ -5,6 +5,7 @@
  * Low WHO-5/SDQ/TEXI/ADEXI scores are never treated as crisis by themselves.
  */
 
+import { canonicalHash } from '../../assessment-runtime/canonical'
 import type {
   BundleAnalysisEngineV1,
   BundleEngineInputV1,
@@ -127,13 +128,25 @@ export interface MentalHealthRulePayloadV1 {
   safetyTriggered: boolean
 }
 
-const usableEvidence = (item: EvidenceItemV1 | undefined): item is EvidenceItemV1 => (
+/** FACET/CONTEXT: present + interpretable; band not required. */
+const presentInterpretableEvidence = (item: EvidenceItemV1 | undefined): item is EvidenceItemV1 => (
   Boolean(
     item
     && item.quality === 'interpretable'
-    && item.value.state === 'present'
+    && item.value.state === 'present',
+  )
+)
+
+/** CORE/SAFETY: present + interpretable + criterion band. */
+const bandedInterpretableEvidence = (item: EvidenceItemV1 | undefined): item is EvidenceItemV1 => (
+  Boolean(
+    presentInterpretableEvidence(item)
     && item.criterionBandKey,
   )
+)
+
+export const hashMentalHealthRuleSet = (ruleSet: MentalHealthRuleSetV1): string => (
+  canonicalHash(ruleSet)
 )
 
 const feedbackText = (
@@ -145,33 +158,93 @@ const feedbackText = (
   return block?.text ?? null
 }
 
-const validateRuleSet = (ruleSet: MentalHealthRuleSetV1): void => {
+export const validateMentalHealthRuleSet = (ruleSet: MentalHealthRuleSetV1): MentalHealthRuleSetV1 => {
   if (!ruleSet.ruleSetKey || !ruleSet.ruleSetVersion || !ruleSet.feedbackVersion) {
     bundleContractFail('RULE_SET_INVALID', 'mental-health ruleSet identity 缺失')
   }
-  const ruleIds = new Set<string>()
-  for (const rule of [
-    ...ruleSet.coreRules,
-    ...ruleSet.facetRules,
-    ...ruleSet.contextRules,
-    ...ruleSet.safetyRules,
-  ]) {
-    if (ruleIds.has(rule.ruleId)) {
-      bundleContractFail('RULE_SET_INVALID', `ruleId 重复: ${rule.ruleId}`)
+
+  const feedbackKeys = new Set<string>()
+  for (const block of ruleSet.feedbackBlocks) {
+    if (feedbackKeys.has(block.key)) {
+      bundleContractFail('RULE_SET_INVALID', `feedbackBlocks.key 重复: ${block.key}`)
     }
-    ruleIds.add(rule.ruleId)
+    feedbackKeys.add(block.key)
   }
+
+  const ruleIds = new Set<string>()
+  const assertRuleId = (ruleId: string) => {
+    if (ruleIds.has(ruleId)) {
+      bundleContractFail('RULE_SET_INVALID', `ruleId 重复: ${ruleId}`)
+    }
+    ruleIds.add(ruleId)
+  }
+  const assertFeedbackRef = (ruleId: string, key: string) => {
+    if (!feedbackKeys.has(key)) {
+      bundleContractFail('RULE_SET_INVALID', `规则引用不存在的 feedbackBlockKey: ${ruleId}/${key}`)
+    }
+  }
+
+  if (ruleSet.coreRules.length === 0) {
+    bundleContractFail('RULE_SET_INVALID', 'CORE rules 不得为空（空 CORE 会匹配一切）')
+  }
+
+  let sharedEvidenceKeySet: string | null = null
+  for (const rule of ruleSet.coreRules) {
+    assertRuleId(rule.ruleId)
+    assertFeedbackRef(rule.ruleId, rule.feedbackBlockKey)
+    if (!rule.requiredEvidence || rule.requiredEvidence.length < 1) {
+      bundleContractFail('RULE_SET_INVALID', `CORE requiredEvidence.length 必须 >= 1: ${rule.ruleId}`)
+    }
+    const pairs = new Set<string>()
+    for (const entry of rule.requiredEvidence) {
+      const pair = `${entry.evidenceKey}\0${entry.criterionBandKey}`
+      if (pairs.has(pair)) {
+        bundleContractFail(
+          'RULE_SET_INVALID',
+          `CORE (evidenceKey, criterionBandKey) 重复: ${rule.ruleId}/${entry.evidenceKey}/${entry.criterionBandKey}`,
+        )
+      }
+      pairs.add(pair)
+    }
+    const evidenceKeySet = [...new Set(rule.requiredEvidence.map((entry) => entry.evidenceKey))].sort().join('\0')
+    if (sharedEvidenceKeySet === null) sharedEvidenceKeySet = evidenceKeySet
+    else if (sharedEvidenceKeySet !== evidenceKeySet) {
+      bundleContractFail('RULE_SET_INVALID', '所有 CORE 规则必须共享同一 evidence-key 集合')
+    }
+  }
+
   for (const rule of ruleSet.facetRules) {
+    assertRuleId(rule.ruleId)
+    assertFeedbackRef(rule.ruleId, rule.feedbackBlockKey)
     if (rule.tier !== 'FACET') {
       bundleContractFail('RULE_SET_INVALID', `facetRules 必须使用 FACET tier: ${rule.ruleId}`)
     }
   }
   for (const rule of ruleSet.contextRules) {
+    assertRuleId(rule.ruleId)
+    assertFeedbackRef(rule.ruleId, rule.feedbackBlockKey)
     if (rule.tier !== 'CONTEXT') {
       bundleContractFail('RULE_SET_INVALID', `contextRules 必须使用 CONTEXT tier: ${rule.ruleId}`)
     }
   }
+  for (const rule of ruleSet.safetyRules) {
+    assertRuleId(rule.ruleId)
+    assertFeedbackRef(rule.ruleId, rule.feedbackBlockKey)
+    if (!rule.triggerBandKeys || rule.triggerBandKeys.length === 0) {
+      bundleContractFail('RULE_SET_INVALID', `SAFETY triggerBandKeys 不得为空: ${rule.ruleId}`)
+    }
+    const bands = new Set<string>()
+    for (const band of rule.triggerBandKeys) {
+      if (bands.has(band)) {
+        bundleContractFail('RULE_SET_INVALID', `SAFETY triggerBandKeys 重复: ${rule.ruleId}/${band}`)
+      }
+      bands.add(band)
+    }
+  }
+  return ruleSet
 }
+
+const validateRuleSet = validateMentalHealthRuleSet
 
 const evidenceByKey = (evidence: EvidenceItemV1[]): Map<string, EvidenceItemV1> => {
   const map = new Map<string, EvidenceItemV1>()
@@ -190,7 +263,7 @@ const matchCoreRule = (
 ): MentalHealthCoreRuleV1 | null => (
   rules.find((rule) => rule.requiredEvidence.every((required) => {
     const item = byKey.get(required.evidenceKey)
-    return usableEvidence(item) && item.criterionBandKey === required.criterionBandKey
+    return bandedInterpretableEvidence(item) && item.criterionBandKey === required.criterionBandKey
   })) ?? null
 )
 
@@ -205,6 +278,22 @@ const buildPayload = (input: BundleEngineInputV1): MentalHealthRulePayloadV1 => 
   }
   validateRuleSet(ruleSet)
 
+  const ref = input.snapshot.ruleSetRef
+  if (!ref) {
+    return bundleContractFail('RULE_SET_REQUIRED', 'snapshot.ruleSetRef 缺失')
+  }
+  const ruleSetHash = hashMentalHealthRuleSet(ruleSet)
+  if (
+    ref.key !== ruleSet.ruleSetKey
+    || ref.version !== ruleSet.ruleSetVersion
+    || ref.hash !== ruleSetHash
+  ) {
+    return bundleContractFail(
+      'RULE_SET_INVALID',
+      `ruleSet 与 snapshot.ruleSetRef 不完全匹配: expected ${ref.key}@${ref.version}`,
+    )
+  }
+
   const byKey = evidenceByKey(input.evidence)
   const productionSafetyEnabled = input.snapshot.bundleDefinition.safetyCapability.productionTriggerEnabled === true
 
@@ -216,7 +305,7 @@ const buildPayload = (input: BundleEngineInputV1): MentalHealthRulePayloadV1 => 
     const active = Boolean(
       productionSafetyEnabled
       && roleOk
-      && usableEvidence(item)
+      && bandedInterpretableEvidence(item)
       && bandHit,
     )
     return {
@@ -229,8 +318,7 @@ const buildPayload = (input: BundleEngineInputV1): MentalHealthRulePayloadV1 => 
   const activeSafety = safetySignals.some((signal) => signal.active)
 
   const requiredKeys = primaryCoreKeys(ruleSet)
-  const primaryAvailable = requiredKeys.length === 0
-    || requiredKeys.every((key) => usableEvidence(byKey.get(key)))
+  const primaryAvailable = requiredKeys.every((key) => bandedInterpretableEvidence(byKey.get(key)))
 
   const matchedRule = (!activeSafety && primaryAvailable)
     ? matchCoreRule(ruleSet.coreRules, byKey)
@@ -257,7 +345,7 @@ const buildPayload = (input: BundleEngineInputV1): MentalHealthRulePayloadV1 => 
   }
 
   const facetFindings = ruleSet.facetRules.map((rule) => {
-    const available = usableEvidence(byKey.get(rule.evidenceKey))
+    const available = presentInterpretableEvidence(byKey.get(rule.evidenceKey))
     return {
       ruleId: rule.ruleId,
       tier: 'FACET' as const,
@@ -268,7 +356,7 @@ const buildPayload = (input: BundleEngineInputV1): MentalHealthRulePayloadV1 => 
   })
 
   const contextFindings = ruleSet.contextRules.map((rule) => {
-    const available = usableEvidence(byKey.get(rule.evidenceKey))
+    const available = presentInterpretableEvidence(byKey.get(rule.evidenceKey))
     return {
       ruleId: rule.ruleId,
       tier: 'CONTEXT' as const,

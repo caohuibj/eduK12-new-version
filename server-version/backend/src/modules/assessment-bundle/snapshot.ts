@@ -1,13 +1,19 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../cognitive/cognitive.security'
+import {
+  hashBundleContextDefinition,
+  parseBundleContextDefinition,
+  type BundleContextDefinitionV1,
+} from './context'
 import { cloneAssessmentBundleDefinition, hashAssessmentBundleDefinition, parseAssessmentBundleDefinition } from './definition'
 import { bundleContractFail } from './errors'
-import { frozenAssessmentBundleSnapshotSchema, parseContract } from './schema'
+import { HEX_HASH, frozenAssessmentBundleSnapshotSchema, parseContract } from './schema'
 import {
   ASSESSMENT_BUNDLE_SNAPSHOT_FAMILY,
   ASSESSMENT_BUNDLE_SNAPSHOT_VERSION,
   BUNDLE_SNAPSHOT_HASH_SCHEME,
   type AssessmentBundleDefinitionV1,
+  type BundleRuleSetRefV1,
   type FrozenAssessmentBundleSnapshotV3,
   type FrozenBundleSlotBindingV3,
 } from './types'
@@ -23,6 +29,7 @@ const snapshotHashInput = (snapshot: Omit<FrozenAssessmentBundleSnapshotV3, 'sna
   slotBindings: snapshot.slotBindings,
   contextDefinitionHash: snapshot.contextDefinitionHash,
   rightsSnapshotHash: snapshot.rightsSnapshotHash,
+  ruleSetRef: snapshot.ruleSetRef,
   reportDefinitionKey: snapshot.reportDefinitionKey,
   reportDefinitionVersion: snapshot.reportDefinitionVersion,
   hashScheme: snapshot.hashScheme,
@@ -46,8 +53,70 @@ const slotBindingsFromDefinition = (definition: AssessmentBundleDefinitionV1): F
     }))
 )
 
+const resolveContextDefinitionHash = (
+  definition: AssessmentBundleDefinitionV1,
+  contextDefinition?: BundleContextDefinitionV1 | null,
+): string | null => {
+  const declaresContext = definition.contextDefinitionKey !== null
+  if (!declaresContext) {
+    if (contextDefinition) {
+      bundleContractFail(
+        'SNAPSHOT_TAMPERED',
+        'Bundle 未声明 Context 时不得写入 ContextDefinition',
+      )
+    }
+    return null
+  }
+  if (!contextDefinition) {
+    return bundleContractFail(
+      'CONTEXT_DEFINITION_REQUIRED',
+      'Bundle 声明了 Context key/version，冻结 snapshot 必须提供 ContextDefinition',
+    )
+  }
+  const validated = parseBundleContextDefinition(contextDefinition)
+  if (
+    validated.contextDefinitionKey !== definition.contextDefinitionKey
+    || validated.contextDefinitionVersion !== definition.contextDefinitionVersion
+  ) {
+    bundleContractFail(
+      'CONTEXT_DEFINITION_VERSION_MISMATCH',
+      `ContextDefinition 与 Bundle 声明不一致: expected ${definition.contextDefinitionKey}@${definition.contextDefinitionVersion}`,
+    )
+  }
+  return hashBundleContextDefinition(validated)
+}
+
+const resolveRuleSetRef = (
+  definition: AssessmentBundleDefinitionV1,
+  ruleSetRef?: BundleRuleSetRefV1 | null,
+): BundleRuleSetRefV1 | null => {
+  const isMentalHealth = definition.engine.key === 'mental-health-rule-v1'
+  if (!isMentalHealth) {
+    if (ruleSetRef) {
+      bundleContractFail('SNAPSHOT_TAMPERED', '非 mental-health 引擎不得写入 ruleSetRef')
+    }
+    return null
+  }
+  if (!ruleSetRef) {
+    return bundleContractFail('RULE_SET_REQUIRED', 'mental-health-rule-v1 冻结 snapshot 必须提供 ruleSetRef')
+  }
+  const ref = ruleSetRef
+  if (!HEX_HASH.test(ref.hash) || !ref.key || !ref.version) {
+    bundleContractFail('RULE_SET_INVALID', 'ruleSetRef 非法')
+  }
+  return {
+    key: ref.key,
+    version: ref.version,
+    hash: ref.hash,
+  }
+}
+
 export const buildFrozenAssessmentBundleSnapshot = (
   definition: AssessmentBundleDefinitionV1,
+  options?: {
+    contextDefinition?: BundleContextDefinitionV1 | null
+    ruleSetRef?: BundleRuleSetRefV1 | null
+  },
 ): FrozenAssessmentBundleSnapshotV3 => {
   const validated = cloneAssessmentBundleDefinition(definition)
   const withoutHash = {
@@ -59,8 +128,9 @@ export const buildFrozenAssessmentBundleSnapshot = (
     bundleDefinitionHash: hashAssessmentBundleDefinition(validated),
     engine: { ...validated.engine },
     slotBindings: slotBindingsFromDefinition(validated),
-    contextDefinitionHash: null,
+    contextDefinitionHash: resolveContextDefinitionHash(validated, options?.contextDefinition),
     rightsSnapshotHash: null,
+    ruleSetRef: resolveRuleSetRef(validated, options?.ruleSetRef ?? null),
     reportDefinitionKey: validated.reportDefinitionKey,
     reportDefinitionVersion: validated.reportDefinitionVersion,
     hashScheme: BUNDLE_SNAPSHOT_HASH_SCHEME,
@@ -113,6 +183,23 @@ export const validateFrozenAssessmentBundleSnapshot = (
   if (parsed.rightsSnapshotHash !== null) {
     bundleContractFail('SNAPSHOT_TAMPERED', 'commit 2 不得写入 rightsSnapshotHash')
   }
+
+  const declaresContext = parsed.bundleDefinition.contextDefinitionKey !== null
+  if (!declaresContext && parsed.contextDefinitionHash !== null) {
+    bundleContractFail('SNAPSHOT_TAMPERED', '未声明 Context 时 contextDefinitionHash 必须为 null')
+  }
+  if (declaresContext && parsed.contextDefinitionHash === null) {
+    bundleContractFail('SNAPSHOT_TAMPERED', '声明 Context 时 contextDefinitionHash 不得为 null')
+  }
+
+  const isMentalHealth = parsed.engine.key === 'mental-health-rule-v1'
+  if (!isMentalHealth && parsed.ruleSetRef !== null) {
+    bundleContractFail('SNAPSHOT_TAMPERED', '非 mental-health 引擎 ruleSetRef 必须为 null')
+  }
+  if (isMentalHealth && parsed.ruleSetRef === null) {
+    bundleContractFail('SNAPSHOT_TAMPERED', 'mental-health-rule-v1 必须冻结 ruleSetRef')
+  }
+
   if (expectedDefinition) {
     const expected = parseAssessmentBundleDefinition(expectedDefinition)
     if (
@@ -141,3 +228,20 @@ export const encryptFrozenAssessmentBundleSnapshot = (
 export const decryptFrozenAssessmentBundleSnapshot = (encrypted: string): FrozenAssessmentBundleSnapshotV3 => (
   parseFrozenAssessmentBundleSnapshot(decryptCognitivePayload<unknown>(encrypted))
 )
+
+/**
+ * Verify a Context freeze state's definitionHash matches the Bundle snapshot.
+ * Used by later ReportFacts / freeze orchestration.
+ */
+export const assertContextDefinitionHashMatchesSnapshot = (input: {
+  snapshot: FrozenAssessmentBundleSnapshotV3
+  contextDefinitionHash: string | null
+}): void => {
+  const expected = input.snapshot.contextDefinitionHash
+  if (expected !== input.contextDefinitionHash) {
+    bundleContractFail(
+      'CONTEXT_DEFINITION_VERSION_MISMATCH',
+      'state.contextDefinitionHash 必须等于 snapshot.contextDefinitionHash',
+    )
+  }
+}

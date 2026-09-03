@@ -32,6 +32,7 @@ export type {
   EvidenceRoleV1,
   EvidenceSourceV1,
   FactPresenceV1,
+  BundleRuleSetRefV1,
   FrozenAssessmentBundleSnapshotV3,
   FrozenBundleSlotBindingV3,
   FrozenRuntimeSnapshotFamily,
@@ -61,6 +62,7 @@ export {
   validateEvidenceSource,
 } from './evidence'
 export {
+  assertContextDefinitionHashMatchesSnapshot,
   buildFrozenAssessmentBundleSnapshot,
   decryptFrozenAssessmentBundleSnapshot,
   encryptFrozenAssessmentBundleSnapshot,
@@ -136,8 +138,10 @@ export {
   MENTAL_HEALTH_RULE_ENGINE_KEY,
   MENTAL_HEALTH_RULE_ENGINE_VERSION,
   MENTAL_HEALTH_RULE_PAYLOAD_SCHEMA,
+  hashMentalHealthRuleSet,
   rollupEvidenceQuality,
   runMentalHealthRuleV1,
+  validateMentalHealthRuleSet,
 } from './engines/mental-health-rule-v1'
 export type {
   MentalHealthActionTierV1,

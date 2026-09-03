@@ -62,7 +62,7 @@ const gonogoSource = (
   slotKey: 'gonogo',
   expectedInstrumentKey: 'gonogo',
   expectedInstrumentVersion: overrides.configVersion ?? '1.0.0',
-  sourceResultHash: overrides.sourceResultHash ?? HASH_A,
+  ...(overrides.sourceResultHash ? { sourceResultHash: overrides.sourceResultHash } : {}),
   result: cognitiveResult({
     testType: 'gonogo',
     configVersion: overrides.configVersion ?? '1.0.0',
@@ -82,7 +82,7 @@ const sstSource = (
   slotKey: 'sst',
   expectedInstrumentKey: 'sst',
   expectedInstrumentVersion: overrides.configVersion ?? '1.0.0',
-  sourceResultHash: overrides.sourceResultHash ?? HASH_B,
+  ...(overrides.sourceResultHash ? { sourceResultHash: overrides.sourceResultHash } : {}),
   result: cognitiveResult({
     testType: 'sst',
     configVersion: overrides.configVersion ?? '1.0.0',

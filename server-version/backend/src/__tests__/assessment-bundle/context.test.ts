@@ -95,7 +95,7 @@ describe('Bundle Context definition / freeze / encryption', () => {
     const replay = freezeBundleContext({
       definition: def,
       values: { grade: '8', consent: true },
-      frozenAt: '2026-09-03T99:00:00.000Z',
+      frozenAt: '2026-09-03T09:00:00.000Z',
       previous: first.state,
     })
     expect(replay.idempotentReplay).toBe(true)
@@ -160,4 +160,27 @@ describe('Bundle Context definition / freeze / encryption', () => {
     const decrypted = decryptBundleContextFacts(encrypted)
     expect(decrypted).toEqual(facts)
   })
+  it('rejects non-strict frozenAt and mismatched previous.state.frozenAt', () => {
+    const def = definition()
+    expect(failCode(() => freezeBundleContext({
+      definition: def,
+      values: { grade: '8', consent: true },
+      frozenAt: '2026-09-03T99:00:00.000Z',
+    }))).toBe('CONTEXT_VALUE_INVALID')
+
+    const first = freezeBundleContext({
+      definition: def,
+      values: { grade: '8', consent: true },
+      frozenAt: '2026-09-03T01:00:00.000Z',
+    })
+    expect(failCode(() => freezeBundleContext({
+      definition: def,
+      values: { grade: '8', consent: true },
+      previous: {
+        ...first.state,
+        frozenAt: '2026-09-03T02:00:00.000Z',
+      },
+    }))).toBe('CONTEXT_CIPHERTEXT_INVALID')
+  })
+
 })

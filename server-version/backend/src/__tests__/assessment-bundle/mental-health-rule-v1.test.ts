@@ -4,6 +4,7 @@ import {
   MENTAL_HEALTH_RULE_ENGINE_KEY,
   MENTAL_HEALTH_RULE_ENGINE_VERSION,
   createProductBundleAnalysisEngineRegistry,
+  hashMentalHealthRuleSet,
   projectBundleScaleSource,
   projectScaleEvidenceItems,
   type AssessmentBundleDefinitionV1,
@@ -188,7 +189,7 @@ const scaleResultFor = (input: {
       scoreKey: input.scoreKey,
       status: 'available',
       referenceVersion: `${input.code}-ref`,
-      referenceKind: 'criterion',
+      referenceKind: 'criterion_threshold',
       criterionBand: {
         key: input.bandKey,
         label: 'ignored label',
@@ -208,14 +209,14 @@ const projectedEvidence = (input: {
   scoreKey: string
   value: number
   bandKey: string | null
-  hash: string
+  hash?: string
   role?: EvidenceItemV1['role']
 }): EvidenceItemV1 => {
   const source = projectBundleScaleSource({
     slotKey: input.slotKey,
     expectedInstrumentKey: input.code,
     expectedInstrumentVersion: '1.0.0',
-    sourceResultHash: input.hash,
+    ...(input.hash ? { sourceResultHash: input.hash } : {}),
     result: scaleResultFor(input),
   })
   const [item] = projectScaleEvidenceItems({
@@ -238,7 +239,16 @@ const buildInput = (input: {
       productionTriggerEnabled: Boolean(input.productionTriggerEnabled),
     },
   })
-  const snapshot = buildFrozenAssessmentBundleSnapshot(definition)
+  const activeRuleSet = input.ruleSet === undefined ? ruleSet() : input.ruleSet
+  const snapshot = buildFrozenAssessmentBundleSnapshot(definition, activeRuleSet
+    ? {
+      ruleSetRef: {
+        key: activeRuleSet.ruleSetKey,
+        version: activeRuleSet.ruleSetVersion,
+        hash: hashMentalHealthRuleSet(activeRuleSet),
+      },
+    }
+    : undefined)
   return {
     snapshot,
     compiledRuntime: compileBundleRuntimeFromFrozenRead({
@@ -249,7 +259,7 @@ const buildInput = (input: {
     evidence: input.evidence,
     contextFacts: null,
     aggregateInputHash: null,
-    ruleSet: input.ruleSet === undefined ? ruleSet() : input.ruleSet,
+    ruleSet: activeRuleSet,
   }
 }
 
@@ -265,7 +275,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'percentage',
         value: 72,
         bandKey: 'who5.percentage.adequate',
-        hash: HASH_A,
       }),
       projectedEvidence({
         slotKey: 'sdq',
@@ -273,7 +282,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'total',
         value: 8,
         bandKey: 'sdq.total.normal',
-        hash: HASH_B,
       }),
     ]
     const result = registry.dispatch(buildInput({ evidence }))
@@ -300,7 +308,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'percentage',
         value: 72,
         bandKey: 'who5.percentage.adequate',
-        hash: HASH_A,
       }),
       projectedEvidence({
         slotKey: 'sdq',
@@ -308,7 +315,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'total',
         value: 20,
         bandKey: 'sdq.total.borderline',
-        hash: HASH_B,
       }),
     ]
     const payload = registry.dispatch(buildInput({ evidence })).payload as MentalHealthRulePayloadV1
@@ -326,7 +332,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'percentage',
         value: 8,
         bandKey: 'who5.percentage.low',
-        hash: HASH_A,
       }),
       projectedEvidence({
         slotKey: 'sdq',
@@ -334,7 +339,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'total',
         value: 22,
         bandKey: 'sdq.total.borderline',
-        hash: HASH_B,
       }),
     ]
     const lowPayload = registry.dispatch(buildInput({ evidence: lowScores })).payload as MentalHealthRulePayloadV1
@@ -388,7 +392,6 @@ describe('mental-health-rule-v1', () => {
         scoreKey: 'percentage',
         value: 72,
         bandKey: 'who5.percentage.adequate',
-        hash: HASH_A,
       }),
     ]
     const payload = registry.dispatch(buildInput({ evidence: onlyWho5 })).payload as MentalHealthRulePayloadV1

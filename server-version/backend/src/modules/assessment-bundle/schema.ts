@@ -15,7 +15,8 @@ export const EXACT_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/
 export const BUNDLE_KEY = /^[a-z][a-z0-9_]*$/
 export const SLOT_KEY = /^[a-z][a-z0-9_.]*$/
 export const CONSTRUCT_KEY = /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$/
-export const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+/** Strict UTC instant: valid calendar clock (rejects T99 etc.). */
+export const ISO_INSTANT = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?Z$/
 
 const hexHash = z.string().regex(HEX_HASH)
 const exactVersion = z.string().regex(EXACT_VERSION)
@@ -134,6 +135,11 @@ export const frozenAssessmentBundleSnapshotSchema = z.object({
   slotBindings: z.array(slotBindingSchema).min(1),
   contextDefinitionHash: hexHash.nullable(),
   rightsSnapshotHash: hexHash.nullable(),
+  ruleSetRef: z.object({
+    key: nonEmpty,
+    version: exactVersion,
+    hash: hexHash,
+  }).strict().nullable(),
   reportDefinitionKey: nonEmpty,
   reportDefinitionVersion: exactVersion,
   hashScheme: z.literal(BUNDLE_SNAPSHOT_HASH_SCHEME),

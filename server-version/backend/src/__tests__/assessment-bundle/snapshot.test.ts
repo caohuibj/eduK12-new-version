@@ -9,6 +9,10 @@ import {
 } from '../../modules/assessment-bundle/snapshot'
 import { compileBundleRuntimeFromFrozenRead } from '../../modules/assessment-bundle/compile'
 import { BundleContractError } from '../../modules/assessment-bundle/errors'
+import {
+  hashBundleContextDefinition,
+  validateBundleContextDefinition,
+} from '../../modules/assessment-bundle/context'
 import { cognitiveSelfBundle, formSlotBundle } from './fixtures'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
@@ -97,4 +101,32 @@ describe('FrozenAssessmentBundleSnapshotV3', () => {
     expect(compiled.sourceDefinitionHash).toBe(snapshot.snapshotHash)
     expect(compiled.compiledRuntimeHash).toMatch(/^[0-9a-f]{64}$/)
   })
+  it('binds ContextDefinition hash when Bundle declares Context; null otherwise', () => {
+    const without = buildFrozenAssessmentBundleSnapshot(cognitiveSelfBundle())
+    expect(without.contextDefinitionHash).toBeNull()
+    expect(without.ruleSetRef).toBeNull()
+
+    const contextDefinition = validateBundleContextDefinition({
+      schemaVersion: 1,
+      contextDefinitionKey: 'bundle-context-demo-v1',
+      contextDefinitionVersion: '1.0.0',
+      fields: [{ contextKey: 'grade', required: true, valueType: 'enum', enumValues: ['7', '8'] }],
+    })
+    const withContext = buildFrozenAssessmentBundleSnapshot(
+      cognitiveSelfBundle({
+        contextDefinitionKey: 'bundle-context-demo-v1',
+        contextDefinitionVersion: '1.0.0',
+      }),
+      { contextDefinition },
+    )
+    expect(withContext.contextDefinitionHash).toBe(hashBundleContextDefinition(contextDefinition))
+
+    expect(failCode(() => buildFrozenAssessmentBundleSnapshot(
+      cognitiveSelfBundle({
+        contextDefinitionKey: 'bundle-context-demo-v1',
+        contextDefinitionVersion: '1.0.0',
+      }),
+    ))).toBe('CONTEXT_DEFINITION_REQUIRED')
+  })
+
 })

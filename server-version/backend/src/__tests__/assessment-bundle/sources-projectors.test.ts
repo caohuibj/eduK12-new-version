@@ -76,7 +76,7 @@ const scaleResult = (overrides: Record<string, unknown> = {}) => ({
       scoreKey: 'percentage',
       status: 'available',
       referenceVersion: 'who5-ref-1',
-      referenceKind: 'criterion',
+      referenceKind: 'criterion_threshold',
       criterionBand: {
         key: 'who5.percentage.descriptive',
         label: 'Descriptive',
@@ -113,20 +113,19 @@ const cognitiveResult = (overrides: Record<string, unknown> = {}) => ({
 })
 
 describe('authoritative Bundle source projectors', () => {
-  it('projects ScaleResultV2 with criterionBand.key and rejects inventable identity/hash', () => {
+  it('projects ScaleResultV2 with criterionBand.key and binds hash from authoritative result', () => {
     const source = projectBundleScaleSource({
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult(),
     })
     expect(source).toMatchObject({
       slotKey: 'who5',
       instrumentKey: 'who5',
-      sourceResultHash: HASH_A,
       qualityState: 'interpretable',
     })
+    expect(source.sourceResultHash).toMatch(/^[0-9a-f]{64}$/)
     expect(source.scores.find((row) => row.scoreKey === 'percentage')?.criterionBandKey)
       .toBe('who5.percentage.descriptive')
     expect(source.scores.find((row) => row.scoreKey === 'raw_total')?.criterionBandKey).toBeNull()
@@ -143,9 +142,67 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '9.9.9',
-      sourceResultHash: HASH_A,
       result: scaleResult(),
     }))).toBe('SOURCE_IDENTITY_MISMATCH')
+  })
+
+  it('rejects a valid SHA that belongs to a different result', () => {
+    const resultA = scaleResult()
+    const resultB = scaleResult({
+      scores: [
+        {
+          key: 'raw_total',
+          type: 'total',
+          label: 'Raw',
+          direction: 'higher_is_better',
+          canonical: true,
+          displayPrecision: 0,
+          value: 3,
+          range: { min: 0, max: 25 },
+          expectedItems: ['i1'],
+          answeredItems: ['i1'],
+          status: 'calculated',
+          prorated: false,
+        },
+      ],
+      references: [],
+    })
+    const hashA = projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      result: resultA,
+    }).sourceResultHash
+    expect(failCode(() => projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      sourceResultHash: hashA,
+      result: resultB,
+    }))).toBe('SOURCE_RESULT_HASH_MISMATCH')
+  })
+
+  it('fail-closes Scale bands unless referenceKind is criterion_threshold', () => {
+    const wrongKind = projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      result: scaleResult({
+        references: [{
+          scoreKey: 'percentage',
+          status: 'available',
+          referenceVersion: 'who5-ref-1',
+          referenceKind: 'descriptive_sample',
+          criterionBand: {
+            key: 'who5.percentage.descriptive',
+            label: 'Descriptive',
+            minInclusive: 0,
+            maxInclusive: 100,
+          },
+        }],
+      }),
+    })
+    expect(wrongKind.scores.find((row) => row.scoreKey === 'percentage')?.criterionBandKey).toBeNull()
   })
 
   it('inherits Scale invariants: not_calculable nulls band; invalid strips bands; duplicate scoreKey rejects', () => {
@@ -153,7 +210,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult({
         quality: { status: 'invalid', flags: ['score_not_calculable'] },
         scores: [
@@ -193,7 +249,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult({
         quality: { status: 'invalid', flags: ['score_not_calculable'] },
         scores: [
@@ -236,7 +291,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult({
         scores: [
           {
@@ -289,7 +343,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'gonogo',
       expectedInstrumentKey: 'gonogo',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: cognitiveResult(),
     })
     expect(withoutNorms.hasReferenceNorms).toBe(false)
@@ -299,21 +352,43 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'gonogo',
       expectedInstrumentKey: 'gonogo',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_B,
       result: cognitiveResult({
-        references: [{ status: 'available', referenceVersion: 'ref-1', metricKey: 'commissionRate' }],
+        references: [{
+          status: 'available',
+          referenceKind: 'normative_distribution',
+          referenceVersion: 'ref-1',
+          metricKey: 'commissionRate',
+        }],
       }),
     })
     expect(withNorms.hasReferenceNorms).toBe(true)
+
+    const wrongKind = projectBundleCognitiveSource({
+      slotKey: 'gonogo',
+      expectedInstrumentKey: 'gonogo',
+      expectedInstrumentVersion: '1.0.0',
+      result: cognitiveResult({
+        references: [{
+          status: 'available',
+          referenceKind: 'descriptive_sample',
+          referenceVersion: 'ref-1',
+          metricKey: 'commissionRate',
+        }],
+      }),
+    })
+    expect(wrongKind.hasReferenceNorms).toBe(false)
 
     const invalid = projectBundleCognitiveSource({
       slotKey: 'gonogo',
       expectedInstrumentKey: 'gonogo',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: cognitiveResult({
         quality: { state: 'invalid', flags: {}, reasons: ['bad'] },
-        references: [{ status: 'available', referenceVersion: 'ref-1' }],
+        references: [{
+          status: 'available',
+          referenceKind: 'normative_distribution',
+          referenceVersion: 'ref-1',
+        }],
       }),
     })
     expect(invalid.hasReferenceNorms).toBe(false)
@@ -324,7 +399,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'gonogo',
       expectedInstrumentKey: 'gonogo',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: cognitiveResult(),
     })
     expect(failCode(() => assertUniqueCognitiveSources([cognitive, { ...cognitive }])))
@@ -334,7 +408,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult(),
     })
     expect(failCode(() => assertUniqueScaleSources([scale, { ...scale }])))
@@ -354,7 +427,6 @@ describe('authoritative Bundle source projectors', () => {
       slotKey: 'who5',
       expectedInstrumentKey: 'who5',
       expectedInstrumentVersion: '1.0.0',
-      sourceResultHash: HASH_A,
       result: scaleResult(),
     })
     const evidence = projectScaleEvidenceItems({

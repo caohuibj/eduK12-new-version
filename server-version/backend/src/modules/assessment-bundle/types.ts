@@ -199,6 +199,12 @@ export interface BundleReportFactsV1 {
   }
 }
 
+export interface BundleRuleSetRefV1 {
+  key: string
+  version: string
+  hash: string
+}
+
 export interface FrozenBundleSlotBindingV3 {
   slotKey: string
   unitType: BundleSlotUnitTypeV1
@@ -220,6 +226,8 @@ export interface FrozenAssessmentBundleSnapshotV3 {
   slotBindings: FrozenBundleSlotBindingV3[]
   contextDefinitionHash: string | null
   rightsSnapshotHash: string | null
+  /** Mental-health rule-set freeze ref; null for non-MH engines. */
+  ruleSetRef: BundleRuleSetRefV1 | null
   reportDefinitionKey: string
   reportDefinitionVersion: string
   hashScheme: typeof BUNDLE_SNAPSHOT_HASH_SCHEME

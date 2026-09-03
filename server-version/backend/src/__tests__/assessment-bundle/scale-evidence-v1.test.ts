@@ -81,7 +81,7 @@ const scaleResult = (overrides: Record<string, unknown> = {}) => ({
       scoreKey: 'percentage',
       status: 'available',
       referenceVersion: 'who5-ref-1',
-      referenceKind: 'criterion',
+      referenceKind: 'criterion_threshold',
       criterionBand: {
         key: 'who5.percentage.descriptive',
         label: 'Descriptive band label must be ignored',
@@ -106,7 +106,7 @@ const who5Source = (
   slotKey: 'who5',
   expectedInstrumentKey: 'who5',
   expectedInstrumentVersion: overrides.expectedInstrumentVersion ?? '1.0.0',
-  sourceResultHash: overrides.sourceResultHash ?? HASH_A,
+  ...(overrides.sourceResultHash ? { sourceResultHash: overrides.sourceResultHash } : {}),
   result: scaleResult(overrides.resultOverrides),
 })
 

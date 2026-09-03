@@ -3,10 +3,14 @@
  * Engines read these only — never raw trials/answers, never Prisma.
  * Deliberately smaller than CognitiveResultSnapshot / ScaleResultV2.
  *
- * Callers must project via projectBundle*Source helpers — do not freely invent
- * sourceResultHash / metrics / quality / criterionBandKey / hasReferenceNorms.
+ * sourceResultHash MUST come from validated authoritative persistence:
+ * - preferred: parseCanonicalUnitResultEnvelope → envelope.resultHash
+ * - otherwise: canonicalHash(validated result) (same CANONICAL_JSON_SHA256_V1)
+ * Bare caller hashes are never trusted without verification against the result.
  */
 
+import { canonicalHash } from '../assessment-runtime/canonical'
+import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
@@ -51,16 +55,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
   Boolean(value && typeof value === 'object' && !Array.isArray(value))
 )
 
-const assertAuthoritativeResultHash = (sourceResultHash: string): string => {
-  if (typeof sourceResultHash !== 'string' || !HEX_HASH.test(sourceResultHash)) {
-    bundleContractFail(
-      'SOURCE_RESULT_HASH',
-      'sourceResultHash 必须是小写 SHA-256（64 hex），且由权威冻结结果绑定',
-    )
-  }
-  return sourceResultHash
-}
-
 const assertInstrumentIdentity = (input: {
   expectedInstrumentKey: string
   expectedInstrumentVersion: string
@@ -79,11 +73,78 @@ const assertInstrumentIdentity = (input: {
   }
 }
 
+/**
+ * Bind sourceResultHash from authoritative persistence.
+ * Prefer a validated CanonicalUnitResultEnvelope; otherwise recompute via
+ * canonicalHash(validatedResult) — the same V3.2 algorithm, never a second hash scheme.
+ */
+const bindAuthoritativeSourceResultHash = (input: {
+  unitType: 'SCALE' | 'COGNITIVE'
+  instrumentKey: string
+  instrumentVersion: string
+  validatedResult: unknown
+  claimedHash?: string
+  canonicalEnvelope?: unknown
+}): string => {
+  if (input.canonicalEnvelope !== undefined) {
+    let envelope
+    try {
+      envelope = parseCanonicalUnitResultEnvelope(input.canonicalEnvelope)
+    } catch (error) {
+      return bundleContractFail(
+        'SOURCE_RESULT_HASH',
+        `CanonicalUnitResultEnvelope 无效: ${error instanceof Error ? error.message : 'parse failed'}`,
+      )
+    }
+    if (envelope.core.unitType !== input.unitType) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH',
+        `envelope unitType 必须是 ${input.unitType}，got ${envelope.core.unitType}`,
+      )
+    }
+    if (
+      envelope.core.instrumentKey !== input.instrumentKey
+      || envelope.core.instrumentVersion !== input.instrumentVersion
+    ) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        `envelope identity 与结果不匹配: envelope ${envelope.core.instrumentKey}@${envelope.core.instrumentVersion} vs result ${input.instrumentKey}@${input.instrumentVersion}`,
+      )
+    }
+    if (input.claimedHash !== undefined && input.claimedHash !== envelope.resultHash) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        'caller sourceResultHash 与 CanonicalUnitResultEnvelope.resultHash 不一致',
+      )
+    }
+    return envelope.resultHash
+  }
+
+  const computed = canonicalHash(input.validatedResult)
+  if (input.claimedHash !== undefined) {
+    if (typeof input.claimedHash !== 'string' || !HEX_HASH.test(input.claimedHash)) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH',
+        'sourceResultHash 必须是小写 SHA-256（64 hex），且由权威冻结结果绑定',
+      )
+    }
+    if (input.claimedHash !== computed) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        'sourceResultHash 不属于该权威结果（可能属于另一结果）',
+      )
+    }
+  }
+  return computed
+}
+
 const hasUsableCognitiveReferenceNorms = (snapshot: CognitiveResultSnapshot): boolean => {
   if (snapshot.quality.state === 'invalid') return false
   return snapshot.references.some((entry) => {
     if (!isRecord(entry)) return false
-    return entry.status === 'available'
+    if (entry.status !== 'available') return false
+    if (entry.referenceKind !== 'normative_distribution') return false
+    return true
   })
 }
 
@@ -98,7 +159,11 @@ const criterionBandKeyFromScaleResult = (
 
   const reference = result.references.find((candidate) => {
     if (!isRecord(candidate)) return false
-    return candidate.scoreKey === scoreKey && candidate.status === 'available'
+    return (
+      candidate.scoreKey === scoreKey
+      && candidate.status === 'available'
+      && candidate.referenceKind === 'criterion_threshold'
+    )
   })
   if (!reference || !isRecord(reference)) return null
   const band = isRecord(reference.criterionBand) ? reference.criterionBand : null
@@ -108,17 +173,18 @@ const criterionBandKeyFromScaleResult = (
 
 /**
  * Project a validated CognitiveResultSnapshot into the narrow Bundle source.
- * hasReferenceNorms is derived from frozen references — never a bare caller flag.
+ * hasReferenceNorms requires available + referenceKind === 'normative_distribution'.
  */
 export const projectBundleCognitiveSource = (input: {
   slotKey: string
   expectedInstrumentKey: string
   expectedInstrumentVersion: string
-  /** Authoritative lowercase SHA-256 (e.g. CanonicalUnitResultEnvelope.resultHash). */
-  sourceResultHash: string
   result: unknown
+  /** Optional claimed hash — must match authoritative binding when provided. */
+  sourceResultHash?: string
+  /** Preferred: validated CanonicalUnitResultEnvelope (resultHash taken from it). */
+  canonicalEnvelope?: unknown
 }): BundleFrozenCognitiveSourceV1 => {
-  const sourceResultHash = assertAuthoritativeResultHash(input.sourceResultHash)
   const snapshot = parseCognitiveResultSnapshot(input.result)
   assertInstrumentIdentity({
     expectedInstrumentKey: input.expectedInstrumentKey,
@@ -126,6 +192,15 @@ export const projectBundleCognitiveSource = (input: {
     actualKey: snapshot.testType,
     actualVersion: snapshot.configVersion,
     label: 'Cognitive',
+  })
+
+  const sourceResultHash = bindAuthoritativeSourceResultHash({
+    unitType: 'COGNITIVE',
+    instrumentKey: snapshot.testType,
+    instrumentVersion: snapshot.configVersion,
+    validatedResult: snapshot,
+    claimedHash: input.sourceResultHash,
+    canonicalEnvelope: input.canonicalEnvelope,
   })
 
   return {
@@ -141,17 +216,18 @@ export const projectBundleCognitiveSource = (input: {
 
 /**
  * Project a validated ScaleResultV2 into the narrow Bundle source.
- * Callers cannot invent criterionBandKey / quality / score values.
+ * Criterion bands require available + referenceKind === 'criterion_threshold'.
  */
 export const projectBundleScaleSource = (input: {
   slotKey: string
   expectedInstrumentKey: string
   expectedInstrumentVersion: string
-  /** Authoritative lowercase SHA-256 (e.g. CanonicalUnitResultEnvelope.resultHash). */
-  sourceResultHash: string
   result: unknown
+  /** Optional claimed hash — must match authoritative binding when provided. */
+  sourceResultHash?: string
+  /** Preferred: validated CanonicalUnitResultEnvelope (resultHash taken from it). */
+  canonicalEnvelope?: unknown
 }): BundleFrozenScaleSourceV1 => {
-  const sourceResultHash = assertAuthoritativeResultHash(input.sourceResultHash)
   const result = parseScaleResultV2(input.result)
   assertInstrumentIdentity({
     expectedInstrumentKey: input.expectedInstrumentKey,
@@ -159,6 +235,15 @@ export const projectBundleScaleSource = (input: {
     actualKey: result.instrument.code,
     actualVersion: result.instrument.instrumentVersion,
     label: 'Scale',
+  })
+
+  const sourceResultHash = bindAuthoritativeSourceResultHash({
+    unitType: 'SCALE',
+    instrumentKey: result.instrument.code,
+    instrumentVersion: result.instrument.instrumentVersion,
+    validatedResult: result,
+    claimedHash: input.sourceResultHash,
+    canonicalEnvelope: input.canonicalEnvelope,
   })
 
   const seenScoreKeys = new Set<string>()

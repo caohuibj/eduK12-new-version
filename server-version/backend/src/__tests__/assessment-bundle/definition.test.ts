@@ -99,4 +99,13 @@ describe('AssessmentBundleDefinitionV1', () => {
     expect(hashAssessmentBundleDefinition(cognitiveSelfBundle()))
       .not.toBe(hashAssessmentBundleDefinition(cognitiveSelfBundle({ name: 'other' })))
   })
+  it('rejects duplicate valueSelectors at definition validation', () => {
+    expect(failCode(() => validateAssessmentBundleDefinition(cognitiveSelfBundle({
+      slots: [{
+        ...cognitiveSelfBundle().slots[0],
+        valueSelectors: ['commissionRate', 'commissionRate'],
+      }],
+    })))).toBe('SOURCE_VALUE_SELECTOR_DUPLICATE')
+  })
+
 })

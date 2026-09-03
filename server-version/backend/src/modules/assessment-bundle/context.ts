@@ -13,7 +13,7 @@ import {
   validateBundleContextFacts,
 } from './evidence'
 import { bundleContractFail } from './errors'
-import { EXACT_VERSION, HEX_HASH, parseContract } from './schema'
+import { EXACT_VERSION, HEX_HASH, ISO_INSTANT, parseContract } from './schema'
 import { z } from 'zod'
 import {
   BUNDLE_CONTEXT_FACTS_SCHEMA_VERSION,
@@ -48,6 +48,19 @@ export interface BundleContextFreezeStateV1 {
   contextSnapshotHash: string
   contextSnapshotEncrypted: string
   frozenAt: string
+}
+
+
+const normalizeFrozenAt = (value?: string | Date): string => {
+  const raw = value instanceof Date
+    ? value.toISOString()
+    : (value ?? new Date().toISOString())
+  // Canonicalize to millisecond precision UTC when Date was provided.
+  const candidate = value instanceof Date ? raw : raw
+  if (!ISO_INSTANT.test(candidate) || Number.isNaN(Date.parse(candidate))) {
+    bundleContractFail('CONTEXT_VALUE_INVALID', `frozenAt 必须是严格 UTC datetime，收到: ${candidate}`)
+  }
+  return candidate
 }
 
 const CONTEXT_KEY = /^[a-z][a-z0-9_]*$/
@@ -179,9 +192,7 @@ export const buildBundleContextFactsFromValues = (input: {
   frozenAt?: string | Date
 }): BundleContextFactsV1 => {
   const definition = validateBundleContextDefinition(input.definition)
-  const frozenAt = input.frozenAt instanceof Date
-    ? input.frozenAt.toISOString()
-    : (input.frozenAt ?? new Date().toISOString())
+  const frozenAt = normalizeFrozenAt(input.frozenAt)
   return buildBundleContextFacts({
     contextDefinitionKey: definition.contextDefinitionKey,
     contextDefinitionVersion: definition.contextDefinitionVersion,
@@ -251,6 +262,9 @@ export const freezeBundleContext = (input: {
     const previousFacts = decryptBundleContextFacts(input.previous.contextSnapshotEncrypted)
     if (previousFacts.contextSnapshotHash !== input.previous.contextSnapshotHash) {
       bundleContractFail('CONTEXT_CIPHERTEXT_INVALID', '已冻结 Context 密文与 hash 不一致')
+    }
+    if (input.previous.frozenAt !== previousFacts.frozenAt) {
+      bundleContractFail('CONTEXT_CIPHERTEXT_INVALID', 'previous.state.frozenAt 必须等于解密 previousFacts.frozenAt')
     }
 
     const candidate = buildBundleContextFactsFromValues({
