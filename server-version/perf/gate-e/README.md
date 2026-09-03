@@ -24,11 +24,14 @@ are present.
 - Fresh fixture **per logical submit**; prepare disposable ledgered fixtures.
 - FinalDraft / harness retries **503 only** — never 429.
 
-## Round-1 sweep
+## Round-1 sweep / Scale CLOSED
 
-- Prisma pool = 10
-- UNIT × Aggregate permits: `{6,7,8} × {2,3}` only
-- Profiles E1–E5 below
+- Prisma pool = **10** (do not raise)
+- Locked operating envelope: **UNIT=7**, **Aggregate=3**, pool=10
+- **Tested stable Scale FINAL rate:** ≤**150** fresh FINAL/s (not "150 concurrent users")
+- Overload ~**175/s+**: non-deterministic UNIT saturation; intentional 503; not production SLO
+- E5 out of Assessment capacity mainline
+- Profiles E1–E5 below (E1 uses start-token audience split; next after E1 is E3)
 
 ## Commands
 
@@ -38,10 +41,16 @@ export BASE_URL=http://127.0.0.1:3300
 export FIXTURE_FILE=/tmp/eduk12-gate47-fixtures/final-submit-fixtures.json
 export EXPECTED_STATUSES=200,409,503
 
-# E1 Public NAT
+# E1 Public NAT / shared-link GET budgets (audience ≠ class size)
+# E1a: same NAT IP, different start tokens
+TOKEN_MODE=distinct PEAK=500 k6 run k6-e1a-nat-distinct-tokens.js
+# E1b: same NAT IP, same start token (levels 60/250/500) + abuse negative
+TOKEN_MODE=shared PEAK=60 k6 run k6-e1b-shared-token-get.js
+TOKEN_MODE=shared PEAK=250 k6 run k6-e1b-shared-token-get.js
+TOKEN_MODE=shared PEAK=500 k6 run k6-e1b-shared-token-get.js
+ABUSE=1 PEAK=200 ITERATIONS=200 k6 run k6-e1b-shared-token-get.js
+# Legacy FINAL-submit NAT stub (not the E1a/E1b GET acceptance)
 NAT_PEAK=100 GROUP=scale k6 run k6-e1-public-nat.js
-NAT_PEAK=250 GROUP=scale k6 run k6-e1-public-nat.js
-NAT_PEAK=500 GROUP=scale k6 run k6-e1-public-nat.js
 
 # E2 Scale open-loop (offered arrival ≈ target; read eventual success KPIs)
 TARGET_SUCCESS_RATE=25 DURATION=30s k6 run k6-e2-scale-open-loop.js
@@ -78,3 +87,9 @@ on the branch under test before interpreting E1 429 vs 503 mix.
 - Each logical submit consumes one unfinished assessment / unique attempt / unique `submissionId`.
 - Hard accounting: HTTP fresh completions ≈ DB `COMPLETED` delta ≈ `assessment_unit_snapshots` delta ≈ fixtures used.
 - Prior E5 FFmpeg numbers are **INVALID** (no real FFmpeg; media is maintenance-only, not Gate-E mainline).
+
+## E1 start-token audience split
+
+- `PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE` (default 60) → **IP** GET/FINAL only (`N × G|F × NAT`).
+- `PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE` (default 500) → **start-token** GET/FINAL (`A × G|F`).
+- Class size ≠ shared-link audience. Explicit `PUBLIC_ASSESSMENT_TOKEN_*_LIMIT` still overrides.

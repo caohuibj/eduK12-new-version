@@ -42,7 +42,8 @@ Separate **GET** vs **FINAL** budgets (same window, different counters):
 
 | Symbol | Env | Default | Meaning |
 |--------|-----|---------|---------|
-| `N` | `PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE` | 60 | Students per class wave |
+| `N` | `PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE` | 60 | Students per class wave (**IP budgets only**) |
+| `A` | `PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE` | 500 | Shared-link audience (**start-token budgets**; ≠ class size) |
 | `G` | `PUBLIC_ASSESSMENT_GETS_PER_STUDENT` | 40 | Resume/poll/report GETs per student |
 | `F` | `PUBLIC_ASSESSMENT_FINALS_PER_STUDENT` | 8 | Start + finals + restart per student |
 | `NAT` | `PUBLIC_ASSESSMENT_NAT_SHARE_FACTOR` | 50 | Concurrent classes behind one NAT |
@@ -53,8 +54,8 @@ Derived ceilings (overridable by explicit `*_LIMIT` envs when set):
 |-------|---------|-------------------|
 | IP GET | `N × G × NAT` | `PUBLIC_ASSESSMENT_IP_GET_LIMIT` |
 | IP FINAL | `N × F × NAT` | `PUBLIC_ASSESSMENT_IP_FINAL_LIMIT` |
-| Start-token GET | `N × G` | `PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT` |
-| Start-token FINAL | `N × F` | `PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT` |
+| Start-token GET | `A × G` (= 20000) | `PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT` |
+| Start-token FINAL | `A × F` (= 4000) | `PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT` |
 | Recovery GET | `G` | `PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT` |
 | Recovery FINAL | `F` | `PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT` |
 
@@ -95,8 +96,8 @@ not count as eventual success via FinalDraft retry).
 
 | ID | Profile | Shape |
 |----|---------|-------|
-| **E1** | Public NAT | Concurrent VUs behind one IP: **100 / 250 / 500** — assert limiter dimensions (IP high ceiling vs token/recovery) and 429 vs 503 mix |
-| **E2** | Scale open-loop | Target **25 / 50 / 75 / 100** successful/s (not merely offered RPS) |
+| **E1** | Public NAT + shared-link | **E1a** different start-tokens / same NAT IP; **E1b** same start-token levels **60 / 250 / 500** + abuse 429 negative. Class size ≠ start-token audience. |
+| **E2** | Scale open-loop | Target **25 / 50 / 75 / 100** successful/s (not merely offered RPS) — see **Scale CLOSED** below |
 | **E3** | Cognitive payload | Body sizes: **small / normal / near-1.5MiB** finals |
 | **E4** | Aggregate | **Many-parent** stampede + **same-parent** concurrent last-GET |
 | **E5** | Bundle mixed + FFmpeg | Mixed classroom traffic with FFmpeg concurrency **0 / 1 / 2** |
@@ -113,6 +114,25 @@ Harness lives under `server-version/perf/` (Gate-E README + scenario stubs).
 Full E1–E5 may continue after Work A lands; stubs must already emit eventual-success KPIs.
 
 ---
+
+
+
+---
+
+## Scale CLOSED (document only — no more Scale load)
+
+Lock-in from E2.1–E2.3b on isolation stack (pool=10, fresh UNIFIED_V1):
+
+| Knob | Locked value | Notes |
+|------|--------------|-------|
+| UNIT | **7** (QUEUE=14, TIMEOUT=500ms) | Recommended production UNIT |
+| Aggregate | **3** (QUEUE=4, TIMEOUT=250ms) | Agg=2 did **not** stabilize 175 |
+| Prisma pool | **10** | Do **not** raise; Work C frozen |
+
+- **Tested stable Scale FINAL rate:** **≤150 fresh FINAL/s** (eventual success). Call this a tested stable Scale FINAL rate — **not** "150 concurrent users".
+- **Overload region:** ~**175/s+** — non-deterministic UNIT saturation; intentional 503 expected; **not** a production SLO.
+- **E5** stays **out** of Assessment capacity mainline (media/FFmpeg is not Gate-E Assessment capacity evidence).
+- No further Scale open-loop load for Gate-E unless a new plan re-opens it. Next profile after E1 is **E3 Cognitive**.
 
 ## Work C — Evidence-driven follow-ups (after Gate-E)
 

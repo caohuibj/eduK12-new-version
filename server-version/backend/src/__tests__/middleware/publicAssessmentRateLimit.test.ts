@@ -83,12 +83,16 @@ describe('publicAssessmentRateLimit helpers', () => {
   })
 
   it('derives formula-based public assessment ceilings larger than the legacy 600 cap', () => {
-    expect(config.publicAssessmentIpGetLimit).toBeGreaterThanOrEqual(60 * 40 * 50)
-    expect(config.publicAssessmentIpFinalLimit).toBeGreaterThanOrEqual(60 * 8 * 50)
-    expect(config.publicAssessmentTokenGetLimit).toBeGreaterThanOrEqual(60 * 40)
-    expect(config.publicAssessmentTokenFinalLimit).toBeGreaterThanOrEqual(60 * 8)
-    expect(config.publicAssessmentRecoveryGetLimit).toBeGreaterThanOrEqual(40)
-    expect(config.publicAssessmentRecoveryFinalLimit).toBeGreaterThanOrEqual(8)
+    // Class size still drives IP NAT budgets; start-token audience is independent.
+    expect(config.publicAssessmentExpectedClassSize).toBe(60)
+    expect(config.publicAssessmentExpectedStartTokenAudience).toBe(500)
+    expect(config.publicAssessmentIpGetLimit).toBe(60 * 40 * 50)
+    expect(config.publicAssessmentIpFinalLimit).toBe(60 * 8 * 50)
+    // Token budgets use audience × per-student (not class size × per-student).
+    expect(config.publicAssessmentTokenGetLimit).toBe(500 * 40)
+    expect(config.publicAssessmentTokenFinalLimit).toBe(500 * 8)
+    expect(config.publicAssessmentRecoveryGetLimit).toBe(40)
+    expect(config.publicAssessmentRecoveryFinalLimit).toBe(8)
     expect(config.publicAssessmentWindowMs).toBe(15 * 60 * 1000)
   })
 })

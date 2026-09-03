@@ -24,6 +24,10 @@ const configSchema = z.object({
   publicCheckinSubmitIpLimit: z.number().int().min(1).max(10000),
   publicCheckinSubmitTokenLimit: z.number().int().min(1).max(10000),
   publicAssessmentWindowMs: z.number().int().min(60_000).max(3_600_000),
+  // Classroom NAT sizing (IP budgets). Distinct from shared-link start-token audience.
+  publicAssessmentExpectedClassSize: z.number().int().min(1).max(100_000),
+  // Shared public start-link audience (token budgets). Not the same as class size.
+  publicAssessmentExpectedStartTokenAudience: z.number().int().min(1).max(100_000),
   publicAssessmentIpGetLimit: z.number().int().min(1).max(5_000_000),
   publicAssessmentIpFinalLimit: z.number().int().min(1).max(5_000_000),
   publicAssessmentTokenGetLimit: z.number().int().min(1).max(5_000_000),
@@ -94,7 +98,7 @@ const parseBoundedInteger = (name: string, fallback: number, min: number, max: n
   return parsed
 }
 
-/** Derive public-assessment ceilings from class-size formula unless an explicit limit is set. */
+/** Derive public-assessment ceilings from class-size (IP) / start-token-audience (token) formulas unless an explicit limit is set. */
 const resolvePublicAssessmentLimit = (
   explicitName: string,
   formulaValue: number,
@@ -124,7 +128,13 @@ const parseBooleanEnv = (name: string, fallback: boolean): boolean => {
 const projectRoot = path.resolve(__dirname, '..')
 
 
+// Class size drives IP NAT budgets only. Shared-link audience is separate:
+// one public start-token may be opened by far more students than one classroom.
 const publicAssessmentExpectedClassSize = parsePositiveInteger('PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE', 60)
+const publicAssessmentExpectedStartTokenAudience = parsePositiveInteger(
+  'PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE',
+  500,
+)
 const publicAssessmentGetsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_GETS_PER_STUDENT', 40)
 const publicAssessmentFinalsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_FINALS_PER_STUDENT', 8)
 const publicAssessmentNatShareFactor = parsePositiveInteger('PUBLIC_ASSESSMENT_NAT_SHARE_FACTOR', 50)
@@ -149,13 +159,17 @@ const rawConfig = {
   assetSigningSecret: process.env.ASSET_SIGNING_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-asset-signing-secret-not-for-production'),
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
-  // Public check-in limits use a 15-minute window. Token limits are shared by
-  // the whole class link; IP limits are intentionally wider for school NATs.
+  // Public check-in limits use a 15-minute window.
+  // Assessment IP limits use class_size × per_student × NAT (school NAT share).
+  // Assessment start-token limits use start_token_audience × per_student
+  // (shared-link audience ≠ classroom size).
   publicCheckinUploadIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_IP_LIMIT', 1800),
   publicCheckinUploadTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT', 600),
   publicCheckinSubmitIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_IP_LIMIT', 600),
   publicCheckinSubmitTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT', 120),
   publicAssessmentWindowMs: parseBoundedInteger('PUBLIC_ASSESSMENT_WINDOW_MS', 15 * 60 * 1000, 60_000, 3_600_000),
+  publicAssessmentExpectedClassSize,
+  publicAssessmentExpectedStartTokenAudience,
   publicAssessmentIpGetLimit: resolvePublicAssessmentLimit(
     'PUBLIC_ASSESSMENT_IP_GET_LIMIT',
     publicAssessmentExpectedClassSize * publicAssessmentGetsPerStudent * publicAssessmentNatShareFactor,
@@ -166,11 +180,11 @@ const rawConfig = {
   ),
   publicAssessmentTokenGetLimit: resolvePublicAssessmentLimit(
     'PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT',
-    publicAssessmentExpectedClassSize * publicAssessmentGetsPerStudent,
+    publicAssessmentExpectedStartTokenAudience * publicAssessmentGetsPerStudent,
   ),
   publicAssessmentTokenFinalLimit: resolvePublicAssessmentLimit(
     'PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT',
-    publicAssessmentExpectedClassSize * publicAssessmentFinalsPerStudent,
+    publicAssessmentExpectedStartTokenAudience * publicAssessmentFinalsPerStudent,
   ),
   publicAssessmentRecoveryGetLimit: resolvePublicAssessmentLimit(
     'PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT',
