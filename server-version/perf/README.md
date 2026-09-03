@@ -63,3 +63,10 @@ For every run record:
 ## Suggested sequence
 
 Run the single-VU baseline first, then independent capacity, same-parent contention, burst, and mixed load. Save raw k6 output and metric snapshots outside this source tree unless a sanitized result is intentionally added to the PR description. Clean up the disposable fixtures and test resources at the end, and explicitly note anything that could not be removed.
+
+## Gate-E
+
+Eventual-success capacity profiles (public NAT, open-loop scale, cognitive
+payload, aggregate, bundle+FFmpeg) live in [`gate-e/`](gate-e/README.md).
+Plan: [`../docs/gate-e-capacity-plan.md`](../docs/gate-e-capacity-plan.md).
+

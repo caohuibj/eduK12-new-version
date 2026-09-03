@@ -5,6 +5,7 @@ import { unauthorized, forbidden } from '../utils/response'
 import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken } from '../utils/authCookies'
+import { measureRequestPhase } from '../services/runtimeObservability'
 
 // Extend Express Request
 declare global {
@@ -26,10 +27,10 @@ const ACCOUNT_STATUS_SELECT = {
 } as const
 
 const loadAccountStatus = async (userId: string) => {
-  return prisma.user.findUnique({
+  return measureRequestPhase('auth_account_lookup', () => prisma.user.findUnique({
     where: { id: userId },
     select: ACCOUNT_STATUS_SELECT,
-  })
+  }))
 }
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {

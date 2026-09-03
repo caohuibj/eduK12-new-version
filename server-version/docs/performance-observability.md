@@ -12,6 +12,7 @@ tokens, questionnaire content, identifiers, SQL text, or request bodies.
 - `ptool_api_requests_total`: compatibility counter retained for existing
   availability alerts and dashboards.
 - `ptool_assessment_phase_duration_seconds`: `resume_auth`,
+  `auth_account_lookup`, `request_body_receive_parse`,
   `transaction_acquisition`, `transaction`, `row_lock_roundtrip`,
   `completion_queue_wait`, `serialization_backoff`,
   `assessment_lookup`, `definition_lookup`, `existing_answer_lookup`,

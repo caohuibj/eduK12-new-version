@@ -5,6 +5,8 @@ import { logger } from '../utils/logger'
 
 export type RequestObservationPhase =
   | 'resume_auth'
+  | 'auth_account_lookup'
+  | 'request_body_receive_parse'
   | 'transaction_acquisition'
   | 'transaction'
   | 'completion_queue_wait'
