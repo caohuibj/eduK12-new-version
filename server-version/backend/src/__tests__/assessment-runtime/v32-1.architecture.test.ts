@@ -91,6 +91,9 @@ describe('Unified runtime architecture boundaries', () => {
 
     expect(questionnaire).toMatch(/patchQuestionnaireStateAfterFinalize/)
     expect(composite).toMatch(/patchCompositeStateAfterFinalize/)
+    // Incomplete finalize must not pretend the runner reached 终态.
+    expect(questionnaire).toMatch(/if \(finalized\.status !== 'COMPLETED'\)/)
+    expect(composite).toMatch(/if \(finalized\.status !== 'COMPLETED'\)/)
     // Must not reassign state from a second full unified projection after finalize.
     expect(questionnaire).not.toMatch(
       /finalizeQuestionnaireIfReady\([\s\S]{0,120}?state\s*=\s*await\s*getUnifiedQuestionnaireFinalAttemptState/,
