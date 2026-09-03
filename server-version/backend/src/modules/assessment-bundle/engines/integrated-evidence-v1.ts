@@ -181,20 +181,24 @@ const buildPayload = (input: BundleEngineInputV1): IntegratedEvidencePayloadV1 =
   const gonogoSelectors = gonogoSlot?.valueSelectors?.length
     ? gonogoSlot.valueSelectors
     : ['commissionRate']
+  let missingRequiredSelector = false
   for (const metricKey of gonogoSelectors) {
+    const hasKey = Object.prototype.hasOwnProperty.call(gonogo.metrics, metricKey)
     const raw = gonogo.metrics[metricKey]
     const value = (typeof raw === 'number' || typeof raw === 'string' || typeof raw === 'boolean')
       ? raw
-      : raw === null || raw === undefined
-        ? null
-        : null
+      : null
+    if (!hasKey || value === null) missingRequiredSelector = true
     methods.push({
       method: 'cognitive_gonogo',
       slotKey: gonogo.slotKey,
       instrumentKey: gonogo.instrumentKey,
       selectorKey: metricKey,
       value,
-      quality: gonogo.qualityState,
+      // Required selector missing → unavailable, never interpretable-with-null.
+      quality: (!hasKey || value === null)
+        ? 'unavailable'
+        : gonogo.qualityState,
       role: 'PRIMARY',
     })
   }
@@ -204,15 +208,21 @@ const buildPayload = (input: BundleEngineInputV1): IntegratedEvidencePayloadV1 =
     : adexi.scores.map((score) => score.scoreKey)
   for (const scoreKey of adexiSelectors) {
     const score = adexi.scores.find((row) => row.scoreKey === scoreKey)
+    if (!score || score.value === null || score.value === undefined) missingRequiredSelector = true
     methods.push({
       method: 'scale_adexi',
       slotKey: adexi.slotKey,
       instrumentKey: adexi.instrumentKey,
       selectorKey: scoreKey,
       value: score?.value ?? null,
-      quality: adexi.qualityState,
+      quality: (!score || score.value === null || score.value === undefined)
+        ? 'unavailable'
+        : adexi.qualityState,
       role: 'SUPPORTING',
     })
+  }
+  if (missingRequiredSelector) {
+    limitations.push('Required valueSelector missing from frozen source — insufficient / UNAVAILABLE')
   }
 
   complementaryNotes.push(
@@ -220,6 +230,7 @@ const buildPayload = (input: BundleEngineInputV1): IntegratedEvidencePayloadV1 =
   )
 
   const anyInvalid = methods.some((row) => row.quality === 'invalid')
+  const anyUnavailable = methods.some((row) => row.quality === 'unavailable')
   const anyInterpretable = methods.some((row) => row.quality === 'interpretable')
   const hasNorms = Boolean(gonogo.hasReferenceNorms)
   if (!hasNorms) {
@@ -227,7 +238,7 @@ const buildPayload = (input: BundleEngineInputV1): IntegratedEvidencePayloadV1 =
   }
 
   const status: IntegratedEvidenceStatusV1 = (
-    anyInvalid || !anyInterpretable
+    missingRequiredSelector || anyInvalid || anyUnavailable || !anyInterpretable
       ? 'insufficient_quality'
       : 'complementary_descriptive'
   )
@@ -246,40 +257,59 @@ const buildPayload = (input: BundleEngineInputV1): IntegratedEvidencePayloadV1 =
   }
 }
 
+const toLowerConstructSegment = (value: string): string => (
+  value
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/[^a-zA-Z0-9_]+/g, '_')
+    .toLowerCase()
+    .replace(/^[^a-z]+/, 'm_')
+)
+
 /**
  * Project integrated methods into EvidenceItemV1 with safe roles only.
+ * Prefer passing frozen source hashes — missing hash fails closed (no zero-hash fallback).
  */
 export const projectIntegratedEvidenceItems = (
   payload: IntegratedEvidencePayloadV1,
   hashes: { gonogo?: string; adexi?: string },
 ): EvidenceItemV1[] => {
-  const items: EvidenceItemV1[] = payload.methods.map((row) => {
+  const items: EvidenceItemV1[] = []
+  for (const row of payload.methods) {
+    const hash = row.method === 'cognitive_gonogo' ? hashes.gonogo : hashes.adexi
+    if (!hash || !/^[0-9a-f]{64}$/.test(hash)) {
+      throw new Error(
+        `integrated-evidence-v1 refuse zero-hash fallback: missing frozen sourceResultHash for ${row.method}/${row.slotKey}`,
+      )
+    }
     const value: FactPresenceV1 = row.value === null
       ? { state: 'missing' }
       : { state: 'present', value: row.value }
+    const selectorSeg = toLowerConstructSegment(row.selectorKey)
+    const instrumentSeg = toLowerConstructSegment(row.instrumentKey)
+    const slotSeg = toLowerConstructSegment(row.slotKey)
     const source = row.method === 'cognitive_gonogo'
       ? {
           kind: 'COGNITIVE_METRIC' as const,
           slotKey: row.slotKey,
           metricKey: row.selectorKey,
-          sourceResultHash: hashes.gonogo ?? '0'.repeat(64),
+          sourceResultHash: hash,
         }
       : {
           kind: 'SCALE_SCORE' as const,
           slotKey: row.slotKey,
           scoreKey: row.selectorKey,
-          sourceResultHash: hashes.adexi ?? '0'.repeat(64),
+          sourceResultHash: hash,
         }
-    return {
-      evidenceKey: `${row.slotKey}.${row.selectorKey}.${row.role.toLowerCase()}`,
-      constructKey: `${row.instrumentKey}.${row.selectorKey}`.toLowerCase().replace(/[^a-z0-9_.]+/g, '_'),
+    items.push({
+      evidenceKey: `${slotSeg}.${instrumentSeg}.${selectorSeg}.${row.role.toLowerCase()}`,
+      constructKey: `${instrumentSeg}.${selectorSeg}`,
       source,
       value,
       quality: row.quality,
       criterionBandKey: null,
       role: row.role,
-    }
-  })
+    })
+  }
   assertEvidenceRolesSafeForIntegrated(items)
   return items
 }
@@ -300,6 +330,21 @@ export const runIntegratedEvidenceV1: BundleAnalysisEngineV1 = (
     return {
       kind: 'UNAVAILABLE',
       reason: payload.limitations.find((row) => /age/i.test(row)) ?? 'age rejected',
+    }
+  }
+  if (payload.status === 'missing_sources') {
+    return {
+      kind: 'UNAVAILABLE',
+      reason: payload.limitations.find((row) => /missing/i.test(row)) ?? 'missing sources',
+    }
+  }
+  if (
+    payload.status === 'insufficient_quality'
+    && payload.limitations.some((row) => /Required valueSelector missing/i.test(row))
+  ) {
+    return {
+      kind: 'UNAVAILABLE',
+      reason: 'required valueSelector missing from frozen source',
     }
   }
 

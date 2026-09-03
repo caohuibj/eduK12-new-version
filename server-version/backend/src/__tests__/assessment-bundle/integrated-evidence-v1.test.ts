@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import {
+  INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
   INTEGRATED_EVIDENCE_ENGINE_KEY,
   INTEGRATED_EVIDENCE_ENGINE_VERSION,
   INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
   assertEvidenceRolesSafeForIntegrated,
   assertIntegratedAdultAge,
   createProductBundleAnalysisEngineRegistry,
+  buildBundleContextFacts,
   hashBundleContextDefinition,
   projectBundleCognitiveSource,
   projectBundleScaleSource,
   projectIntegratedEvidenceItems,
-  type BundleContextDefinitionV1,
   type BundleEngineInputV1,
   type BundleFrozenCognitiveSourceV1,
   type BundleFrozenScaleSourceV1,
@@ -20,14 +21,7 @@ import { compileBundleRuntimeFromFrozenRead } from '../../modules/assessment-bun
 import { buildFrozenAssessmentBundleSnapshot } from '../../modules/assessment-bundle/snapshot'
 import { HASH_A, HASH_B } from './fixtures'
 
-const adultAgeContextDefinition: BundleContextDefinitionV1 = {
-  schemaVersion: 1,
-  contextDefinitionKey: 'integrated-adult-age-v1',
-  contextDefinitionVersion: '1.0.0',
-  fields: [
-    { contextKey: 'subject_age_years', required: true, valueType: 'number' },
-  ],
-}
+const adultAgeContextDefinition = INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1
 
 const cognitiveResult = (metrics: Record<string, unknown>) => ({
   schemaVersion: 1 as const,
@@ -116,33 +110,15 @@ const adexiSource = (): BundleFrozenScaleSourceV1 => projectBundleScaleSource({
 
 const ageContext = (age: number | null) => {
   const definitionHash = hashBundleContextDefinition(adultAgeContextDefinition)
-  if (age === null) {
-    return {
-      schemaVersion: 1 as const,
-      contextDefinitionKey: 'integrated-adult-age-v1',
-      contextDefinitionVersion: '1.0.0',
-      contextDefinitionHash: definitionHash,
-      frozenAt: '2026-09-02T12:00:00.000Z',
-      contextSnapshotHash: HASH_B,
-      facts: [
-        { contextKey: 'subject_age_years', value: { state: 'missing' as const } },
-      ],
-    }
-  }
-  return {
-    schemaVersion: 1 as const,
+  return buildBundleContextFacts({
     contextDefinitionKey: 'integrated-adult-age-v1',
     contextDefinitionVersion: '1.0.0',
     contextDefinitionHash: definitionHash,
     frozenAt: '2026-09-02T12:00:00.000Z',
-    contextSnapshotHash: HASH_B,
-    facts: [
-      {
-        contextKey: 'subject_age_years',
-        value: { state: 'present' as const, value: age },
-      },
-    ],
-  }
+    facts: age === null
+      ? [{ contextKey: 'subject_age_years', value: { state: 'missing' as const } }]
+      : [{ contextKey: 'subject_age_years', value: { state: 'present' as const, value: age } }],
+  })
 }
 
 const buildInput = (age: number | null, withSources = true): BundleEngineInputV1 => {
@@ -211,9 +187,22 @@ describe('integrated-evidence-v1 + adult gonogo-adexi bundle', () => {
   it('reports missing sources when units absent', () => {
     const registry = createProductBundleAnalysisEngineRegistry()
     const result = registry.dispatch(buildInput(25, false))
+    expect(result.kind).toBe('UNAVAILABLE')
+    if (result.kind !== 'UNAVAILABLE') return
+    expect(result.reason).toMatch(/missing/i)
+  })
+
+  it('exports production integrated-adult-age-v1@1.0.0 context definition', () => {
+    expect(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1.contextDefinitionKey).toBe('integrated-adult-age-v1')
+    expect(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1.contextDefinitionVersion).toBe('1.0.0')
+  })
+
+  it('refuses zero-hash fallback when projecting integrated evidence', () => {
+    const registry = createProductBundleAnalysisEngineRegistry()
+    const result = registry.dispatch(buildInput(25, true))
     expect(result.kind).toBe('COMPUTED')
     if (result.kind !== 'COMPUTED') return
     const payload = result.payload as IntegratedEvidencePayloadV1
-    expect(payload.status).toBe('missing_sources')
+    expect(() => projectIntegratedEvidenceItems(payload, {})).toThrow(/refuse zero-hash|missing frozen/i)
   })
 })

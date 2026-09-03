@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { authorizationFail } from './errors'
+import { isValidContentLocaleTag } from '../scale/content-locale'
 import {
   INSTRUMENT_AUTHORIZATION_SCHEMA,
   type InstrumentAuthorizationAuditEventV1,
@@ -44,6 +45,15 @@ export const instrumentAuthorizationRecordSchema = z.object({
 }).strict().superRefine((record, ctx) => {
   if (Date.parse(record.validTo) <= Date.parse(record.validFrom)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'validTo 必须晚于 validFrom', path: ['validTo'] })
+  }
+  for (const [index, locale] of record.scope.locales.entries()) {
+    if (!isValidContentLocaleTag(locale)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `invalid contentLocale/locale tag: ${locale}`,
+        path: ['scope', 'locales', index],
+      })
+    }
   }
   const hasAsset = record.evidenceAssetId !== null
   const hasSha = record.evidenceSha256 !== null

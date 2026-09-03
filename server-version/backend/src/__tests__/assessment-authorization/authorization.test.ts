@@ -13,6 +13,7 @@ import {
   parseInstrumentAuthorizationRecord,
   resolveAttemptDeadline,
   resolveEffectiveAuthorization,
+  revokeAuthorizationLineage,
   revokeInstrumentAuthorization,
 } from '../../modules/assessment-authorization'
 import type { AssessmentBundleDefinitionV1 } from '../../modules/assessment-bundle/types'
@@ -345,4 +346,77 @@ describe('instrument authorization overlay', () => {
       actorRole: 'ADMIN',
     })).not.toThrow()
   })
+
+
+  it('product revoke after amend stops prior APPROVED from remaining effective', () => {
+    const draft = createInstrumentAuthorizationDraft({
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      grantor: 'WHO',
+      grantee: 'eduK12',
+      scope: {
+        electronicAdministration: true,
+        scoring: true,
+        translation: true,
+        display: true,
+        territories: ['CN'],
+        locales: ['zh-CN'],
+        commercialNature: 'NON_COMMERCIAL',
+      },
+      validFrom: '2026-01-01T00:00:00.000Z',
+      validTo: '2027-01-01T00:00:00.000Z',
+      basis: 'test',
+      createdByUserId: 'admin-1',
+    })
+    const withEvidence = attachAuthorizationEvidence({
+      record: draft,
+      evidenceAssetId: 'asset-1',
+      evidenceSha256: 'a'.repeat(64),
+      actorUserId: 'admin-1',
+    })
+    const approved = approveInstrumentAuthorization({
+      record: withEvidence.record,
+      actorUserId: 'admin-2',
+    }).record
+    expect(approved.status).toBe('APPROVED')
+    expect(approved.version).toBe(1)
+
+    const amended = amendApprovedInstrumentAuthorization({
+      previous: approved,
+      patch: { basis: 'amended scope note' },
+      actorUserId: 'admin-1',
+    }).record
+    expect(amended.status).toBe('DRAFT')
+    expect(amended.version).toBe(2)
+
+    // Without lineage revoke, v1 APPROVED would still resolve as effective.
+    const before = resolveEffectiveAuthorization({
+      authorizations: [approved, amended],
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      nowIso: '2026-06-01T00:00:00.000Z',
+    })
+    expect(before?.version).toBe(1)
+    expect(before?.status).toBe('APPROVED')
+
+    const revoked = revokeAuthorizationLineage({
+      lineage: [approved, amended],
+      actorUserId: 'admin-1',
+      note: 'revoke latest after amend',
+    })
+    expect(revoked.records.every((row) => row.status === 'REVOKED')).toBe(true)
+
+    const after = resolveEffectiveAuthorization({
+      authorizations: revoked.records,
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      nowIso: '2026-06-01T00:00:00.000Z',
+    })
+    // Newest row is REVOKED; no eligible APPROVED remains.
+    expect(after === null || after.status === 'REVOKED' || !['APPROVED', 'EVIDENCE_PENDING'].includes(after.status)).toBe(true)
+    if (after && (after.status === 'APPROVED' || after.status === 'EVIDENCE_PENDING')) {
+      throw new Error('expected no effective APPROVED after lineage revoke')
+    }
+  })
+
 })

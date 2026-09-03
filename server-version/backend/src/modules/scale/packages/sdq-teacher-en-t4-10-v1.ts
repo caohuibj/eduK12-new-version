@@ -13,6 +13,7 @@
  */
 import type { ScaleDefinitionV2 } from '../scale-definition'
 import type { ScaleGoldenCase } from './adexi-v2'
+import { SDQ_TEACHER_SCORER_KEY } from './sdq-teacher-impact-scorer'
 import {
   SDQ_REVERSE_ITEM_NUMBERS,
   SDQ_SUBSCALE_ITEMS,
@@ -68,6 +69,19 @@ const impactOptions = [
   { value: 'a_great_deal', label: 'A great deal', score: 2 },
 ] as const
 
+/** Overall difficulties gate — Goodman: if No, impact score = 0. */
+const overallImpactOptions = [
+  { value: 'no', label: 'No', score: 0 },
+  { value: 'yes_minor', label: 'Yes - minor difficulties', score: 0 },
+  { value: 'yes_definite', label: 'Yes - definite difficulties', score: 0 },
+  { value: 'yes_severe', label: 'Yes - severe difficulties', score: 0 },
+] as const
+
+const overallItem = {
+  code: 'SDQ-IMPACT-OVERALL',
+  content: 'Overall, do you think that this child has difficulties in any of the following areas: emotions, concentration, behaviour or being able to get on with other people?',
+} as const
+
 const impactItems = [
   { code: 'SDQ-IMPACT-DISTRESS', content: 'Do the difficulties upset or distress the child?' },
   { code: 'SDQ-IMPACT-PEER', content: "Do the difficulties interfere with the child's everyday life in PEER RELATIONSHIPS?" },
@@ -100,6 +114,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
   display: { randomizeItems: false },
   responseSets: [
     { key: 'sdq_not_somewhat_certainly_en', options: [...symptomOptions] },
+    { key: 'sdq_impact_overall_en', options: [...overallImpactOptions] },
     { key: 'sdq_impact_0_2_en', options: [...impactOptions] },
   ],
   items: [
@@ -112,18 +127,28 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
       responseSetKey: 'sdq_not_somewhat_certainly_en',
       randomizeOptions: false,
     })),
+    {
+      itemCode: overallItem.code,
+      content: overallItem.content,
+      type: 'single' as const,
+      required: true,
+      sortOrder: 25,
+      responseSetKey: 'sdq_impact_overall_en',
+      randomizeOptions: false,
+    },
     ...impactItems.map((row, index) => ({
       itemCode: row.code,
       content: row.content,
       type: 'single' as const,
       required: true,
-      sortOrder: 25 + index,
+      sortOrder: 26 + index,
       responseSetKey: 'sdq_impact_0_2_en',
       randomizeOptions: false,
     })),
   ],
   scoring: {
     scoringVersion: '1.0.0',
+    scorerKey: SDQ_TEACHER_SCORER_KEY,
     itemRules: [
       ...symptomCodes.map((itemCode, index) => ({
         itemCode,
@@ -131,6 +156,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
           ? { type: 'reverse' as const }
           : { type: 'identity' as const },
       })),
+      { itemCode: overallItem.code, transform: { type: 'identity' as const } },
       ...impactItems.map((row) => ({
         itemCode: row.code,
         transform: { type: 'identity' as const },
@@ -146,6 +172,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 0,
+        range: { min: 0, max: 10 },
         missingPolicy: { type: 'complete_required' },
         source: symptomItemSource(SDQ_SUBSCALE_ITEMS.emotional),
       },
@@ -157,6 +184,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 0,
+        range: { min: 0, max: 10 },
         missingPolicy: { type: 'complete_required' },
         source: symptomItemSource(SDQ_SUBSCALE_ITEMS.conduct),
       },
@@ -168,6 +196,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 0,
+        range: { min: 0, max: 10 },
         missingPolicy: { type: 'complete_required' },
         source: symptomItemSource(SDQ_SUBSCALE_ITEMS.hyperactivity),
       },
@@ -179,6 +208,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 0,
+        range: { min: 0, max: 10 },
         missingPolicy: { type: 'complete_required' },
         source: symptomItemSource(SDQ_SUBSCALE_ITEMS.peer),
       },
@@ -190,6 +220,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_better',
         canonical: false,
         displayPrecision: 0,
+        range: { min: 0, max: 10 },
         missingPolicy: { type: 'complete_required' },
         source: symptomItemSource(SDQ_SUBSCALE_ITEMS.prosocial),
       },
@@ -201,6 +232,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 0,
+        range: { min: 0, max: 40 },
         missingPolicy: { type: 'complete_required' },
         source: {
           type: 'scores',
@@ -221,6 +253,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         direction: 'higher_is_worse',
         canonical: false,
         displayPrecision: 0,
+        range: { min: 0, max: 6 },
         missingPolicy: { type: 'complete_required' },
         source: {
           type: 'items',
@@ -315,6 +348,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_GOLDEN_CASES: ScaleGoldenCase[] = [
     name: 'symptoms-all-certainly-impact-zero',
     answers: [
       ...allCertainly,
+      { itemCode: 'SDQ-IMPACT-OVERALL', responseValue: 'yes_minor' },
       { itemCode: 'SDQ-IMPACT-DISTRESS', responseValue: 'not_at_all' },
       { itemCode: 'SDQ-IMPACT-PEER', responseValue: 'not_at_all' },
       { itemCode: 'SDQ-IMPACT-CLASSROOM', responseValue: 'not_at_all' },
@@ -337,6 +371,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_GOLDEN_CASES: ScaleGoldenCase[] = [
     name: 'symptoms-somewhat-impact-great',
     answers: [
       ...symptomCodes.map((itemCode) => ({ itemCode, responseValue: 'somewhat_true' })),
+      { itemCode: 'SDQ-IMPACT-OVERALL', responseValue: 'yes_definite' },
       { itemCode: 'SDQ-IMPACT-DISTRESS', responseValue: 'a_great_deal' },
       { itemCode: 'SDQ-IMPACT-PEER', responseValue: 'a_great_deal' },
       { itemCode: 'SDQ-IMPACT-CLASSROOM', responseValue: 'a_medium_amount' },
@@ -351,6 +386,30 @@ export const SDQ_TEACHER_EN_T4_10_V1_GOLDEN_CASES: ScaleGoldenCase[] = [
         prosocial: 5,
         total_difficulties: 20,
         impact: 5,
+      },
+      totalScoreKeys: ['emotional', 'conduct', 'hyperactivity', 'peer', 'prosocial', 'total_difficulties', 'impact'],
+    },
+  },
+  {
+    // Goodman gate: overall=No forces impact=0 even when impact items are elevated.
+    name: 'overall-no-gates-impact-to-zero',
+    answers: [
+      ...symptomCodes.map((itemCode) => ({ itemCode, responseValue: 'somewhat_true' })),
+      { itemCode: 'SDQ-IMPACT-OVERALL', responseValue: 'no' },
+      { itemCode: 'SDQ-IMPACT-DISTRESS', responseValue: 'a_great_deal' },
+      { itemCode: 'SDQ-IMPACT-PEER', responseValue: 'a_great_deal' },
+      { itemCode: 'SDQ-IMPACT-CLASSROOM', responseValue: 'a_great_deal' },
+    ],
+    expected: {
+      quality: 'interpretable',
+      scores: {
+        emotional: 5,
+        conduct: 5,
+        hyperactivity: 5,
+        peer: 5,
+        prosocial: 5,
+        total_difficulties: 20,
+        impact: 0,
       },
       totalScoreKeys: ['emotional', 'conduct', 'hyperactivity', 'peer', 'prosocial', 'total_difficulties', 'impact'],
     },

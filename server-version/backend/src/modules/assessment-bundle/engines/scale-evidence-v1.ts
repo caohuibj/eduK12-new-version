@@ -16,6 +16,14 @@ import type {
   FrozenBundleSlotBindingV3,
 } from '../types'
 
+const toLowerConstructSegment = (value: string): string => (
+  value
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/[^a-zA-Z0-9_]+/g, '_')
+    .toLowerCase()
+    .replace(/^[^a-z]+/, 'm_')
+)
+
 export const SCALE_EVIDENCE_ENGINE_KEY = 'scale-evidence-v1' as const
 export const SCALE_EVIDENCE_ENGINE_VERSION = '1.0.0' as const
 export const SCALE_EVIDENCE_PAYLOAD_SCHEMA = 'scale-evidence-payload-v1' as const
@@ -85,17 +93,20 @@ export const projectScaleEvidenceItems = (input: {
   const selected = selectScaleScores(input.source, input.scoreKeys)
   const prefix = input.constructKeyPrefix ?? input.source.instrumentKey
   const role = input.role ?? 'PRIMARY'
+  const prefixSeg = toLowerConstructSegment(prefix)
   return selected.map((score) => {
+    const scoreSeg = toLowerConstructSegment(score.scoreKey)
+    const slotSeg = toLowerConstructSegment(input.source.slotKey)
     let quality: EvidenceQualityStateV1
     if (input.source.qualityState === 'invalid') quality = 'invalid'
-    else if (score.status === 'not_calculable') quality = 'invalid'
+    // Required scoreKey missing / null → unavailable (not interpretable-with-null).
+    else if (score.status === 'not_calculable' || score.value === null) quality = 'unavailable'
     else if (score.status === 'limited' || input.source.qualityState === 'limited') quality = 'limited'
-    else if (score.value === null) quality = 'limited'
     else quality = 'interpretable'
 
     return {
-      evidenceKey: `${input.source.slotKey}.${prefix}.${score.scoreKey}.primary`,
-      constructKey: `${prefix}.${score.scoreKey}`,
+      evidenceKey: `${slotSeg}.${prefixSeg}.${scoreSeg}.primary`,
+      constructKey: `${prefixSeg}.${scoreSeg}`,
       source: {
         kind: 'SCALE_SCORE',
         slotKey: input.source.slotKey,

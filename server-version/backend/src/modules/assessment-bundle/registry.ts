@@ -6,6 +6,7 @@ import type {
   BundleFrozenScaleSourceV1,
 } from './sources'
 import type { MentalHealthRuleSetV1 } from './engines/mental-health-rule-v1'
+import { validateBundleContextFacts } from './evidence'
 import type {
   BundleContextFactsV1,
   EvidenceItemV1,
@@ -101,7 +102,11 @@ export class BundleAnalysisEngineRegistry {
   dispatch(input: BundleEngineInputV1): BundleEngineResultV1 {
     const { key, version } = input.snapshot.engine
     const engine = this.resolve(key, version)
-    return engine(input)
+    // Same parsed object for engine + Evidence + ReportFacts — hash must match facts content.
+    const contextFacts = input.contextFacts
+      ? validateBundleContextFacts(input.contextFacts)
+      : null
+    return engine({ ...input, contextFacts })
   }
 }
 

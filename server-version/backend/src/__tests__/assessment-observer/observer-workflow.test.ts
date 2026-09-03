@@ -6,6 +6,7 @@ import {
   assertCannotViewOtherParent,
   assertCannotViewTeacherRawAnswers,
   listParentSelfServeCatalog,
+  parentAcceptTeacherAssignedConsent,
   parentSelfServeObserver,
   parentShareSelfServeToCourseLead,
   projectObserverForViewer,
@@ -84,10 +85,19 @@ describe('observer assignment / self-serve / share / projection', () => {
       relationship,
       consentVersion: 'attempt-v1',
     })
-    expect(assigned.path).toBe('TEACHER_ASSIGN_PARENT')
-    expect(assigned.respondentType).toBe('PARENT')
-    expect(assigned.visibility).toBe('ASSIGNING_TEACHER')
-    expect(assigned.subjectUserId).not.toBe(assigned.respondentUserId)
+    expect(assigned.assignment.path).toBe('TEACHER_ASSIGN_PARENT')
+    expect(assigned.assignment.respondentType).toBe('PARENT')
+    expect(assigned.assignment.visibility).toBe('ASSIGNING_TEACHER')
+    expect(assigned.assignment.subjectUserId).not.toBe(assigned.assignment.respondentUserId)
+    expect(assigned.consentRequired.acceptedAt).toBeNull()
+    expect(assigned.episode.subjectUserId).toBe('student-1')
+
+    const accepted = parentAcceptTeacherAssignedConsent({
+      consentRequired: assigned.consentRequired,
+      parentUserId: 'parent-1',
+    })
+    expect(accepted.acceptedAt).toBeTruthy()
+    expect(accepted.consentId).not.toBe(assigned.consentRequired.consentId)
 
     const selfServe = parentSelfServeObserver({
       catalogEntry: parentCatalog,
@@ -118,9 +128,13 @@ describe('observer assignment / self-serve / share / projection', () => {
       parentUserId: 'parent-1',
       courseLeadUserId: 'teacher-1',
       courseLeadIsAuthorizedForSubject: true,
+      consentVersion: 'share-v1',
     })
-    expect(shared.visibility).toBe('SHARED_COURSE_LEAD')
-    expect(shared.shareTargets).toContain('teacher-1')
+    expect(shared.assignment.visibility).toBe('SHARED_COURSE_LEAD')
+    expect(shared.assignment.shareTargets).toContain('teacher-1')
+    expect(shared.assignment.consentId).not.toBe(selfServe.consentId)
+    expect(shared.previousAssignment.consentId).toBe(selfServe.consentId)
+    expect(shared.shareConsent.visibilityScope).toBe('SHARED_COURSE_LEAD')
   })
 
   it('filters parent self-serve catalog to PUBLISHED parent-capable entries', () => {
@@ -148,7 +162,7 @@ describe('observer assignment / self-serve / share / projection', () => {
       viewerRole: 'PARENT',
       assignment: selfServe,
       relationship,
-      respondentProjection: { summary: 'ok', total: 12 },
+      respondentProjection: { quality: 'interpretable', limitations: [] },
     })
     expect(view.audience).toBe('parent_respondent')
 
@@ -157,14 +171,14 @@ describe('observer assignment / self-serve / share / projection', () => {
       viewerRole: 'PARENT',
       assignment: selfServe,
       relationship,
-      respondentProjection: { summary: 'ok' },
+      respondentProjection: { quality: 'interpretable' },
     }))).toBe('OBSERVER_VIEW')
 
     expect(failCode(() => projectObserverForViewer({
       viewerUserId: 'teacher-2',
       viewerRole: 'TEACHER',
       assignment: selfServe,
-      respondentProjection: { summary: 'private' },
+      respondentProjection: { quality: 'private' },
     }))).toBe('OBSERVER_VIEW')
 
     expect(failCode(() => projectObserverForViewer({
@@ -174,6 +188,27 @@ describe('observer assignment / self-serve / share / projection', () => {
       relationship,
       respondentProjection: { rawAnswers: { a: 1 } },
     }))).toBe('OBSERVER_LEAK')
+
+    // Subject-bound IDOR: relationship for different student
+    const otherRel = approveParentRelationship({
+      relationship: createPendingParentRelationship({
+        parentUserId: 'parent-1',
+        studentUserId: 'student-2',
+        inviteCodeId: 'invite-2',
+      }),
+      actorUserId: 'teacher-1',
+      actorRole: 'TEACHER',
+      inviteCourseCreatorUserId: 'teacher-1',
+      consentVersion: 'rel-consent-2',
+      consentHash: 'b'.repeat(64),
+    })
+    expect(failCode(() => projectObserverForViewer({
+      viewerUserId: 'parent-1',
+      viewerRole: 'PARENT',
+      assignment: selfServe,
+      relationship: otherRel,
+      respondentProjection: { quality: 'interpretable' },
+    }))).toBe('OBSERVER_VIEW')
 
     expect(failCode(() => assertCannotViewChildSelfReport('PARENT'))).toBe('OBSERVER_FORBIDDEN_VIEW')
     expect(failCode(() => assertCannotViewOtherParent({
@@ -219,10 +254,11 @@ describe('observer assignment / self-serve / share / projection', () => {
         parentUserId: 'parent-1',
         relationship,
         consentVersion: 'attempt-v1',
-      }),
+      }).assignment,
       parentUserId: 'parent-1',
       courseLeadUserId: 'teacher-1',
       courseLeadIsAuthorizedForSubject: true,
+      consentVersion: 'share-v1',
     }))).toBe('OBSERVER_SHARE')
   })
 })

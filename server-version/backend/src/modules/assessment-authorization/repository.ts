@@ -10,8 +10,10 @@ import { authorizationFail } from './errors'
 import {
   amendApprovedInstrumentAuthorization,
   approveInstrumentAuthorization,
+  attachAuthorizationEvidence,
   createInstrumentAuthorizationDraft,
   hashInstrumentAuthorizationRecord,
+  revokeAuthorizationLineage,
   revokeInstrumentAuthorization,
 } from './records'
 import { parseInstrumentAuthorizationRecord } from './records-schema'
@@ -266,6 +268,78 @@ export class PrismaAuthorizationRepository {
     actorUserId: string
     note: string
     now?: string
+  }): Promise<{
+    record: InstrumentAuthorizationRecordV1
+    audit: InstrumentAuthorizationAuditEventV1
+    lineage: InstrumentAuthorizationRecordV1[]
+  }> {
+    return this.prisma.$transaction(async (tx) => {
+      const rows = await tx.instrumentAuthorization.findMany({
+        where: { authorizationKey: input.authorizationId },
+        orderBy: { version: 'desc' },
+      })
+      if (rows.length === 0) {
+        return authorizationFail('AUTH_STATE', 'authorization not found')
+      }
+      const lineage = rows.map(rowToDomain)
+      const revoked = revokeAuthorizationLineage({
+        lineage,
+        actorUserId: input.actorUserId,
+        note: input.note,
+        now: input.now,
+      })
+      const updatedDomain: InstrumentAuthorizationRecordV1[] = []
+      let latestAudit: InstrumentAuthorizationAuditEventV1 | null = null
+      for (const record of revoked.records) {
+        const row = rows.find((candidate) => candidate.version === record.version)
+        if (!row) {
+          return authorizationFail('AUTH_STATE', `lineage version row missing: v${record.version}`)
+        }
+        if (record.status === 'REVOKED' && row.status !== 'REVOKED') {
+          const updated = await tx.instrumentAuthorization.update({
+            where: { id: row.id },
+            data: {
+              status: 'REVOKED',
+              recordHash: hashInstrumentAuthorizationRecord(record),
+              updatedAt: new Date(record.updatedAt),
+            },
+          })
+          updatedDomain.push(rowToDomain(updated))
+        } else {
+          updatedDomain.push(record)
+        }
+      }
+      for (const audit of revoked.audits) {
+        const row = rows.find((candidate) => candidate.version === audit.authorizationVersion)
+        if (!row) continue
+        await appendAuditRow(tx, audit, row.id)
+        latestAudit = audit
+      }
+      if (!latestAudit) {
+        // Entire lineage already REVOKED — still emit a revoke audit on latest.
+        const fallback = revokeInstrumentAuthorization({
+          record: lineage[0]!,
+          actorUserId: input.actorUserId,
+          note: input.note,
+          now: input.now,
+        })
+        latestAudit = fallback.audit
+        await appendAuditRow(tx, latestAudit, rows[0]!.id)
+      }
+      return {
+        record: updatedDomain[0]!,
+        audit: latestAudit,
+        lineage: updatedDomain,
+      }
+    })
+  }
+
+  async attachEvidence(input: {
+    authorizationId: string
+    evidenceAssetId: string
+    evidenceSha256: string
+    actorUserId: string
+    now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
     return this.prisma.$transaction(async (tx) => {
       const currentRow = await tx.instrumentAuthorization.findFirst({
@@ -275,22 +349,25 @@ export class PrismaAuthorizationRepository {
       if (!currentRow) {
         return authorizationFail('AUTH_STATE', 'authorization not found')
       }
-      const revoked = revokeInstrumentAuthorization({
+      const attached = attachAuthorizationEvidence({
         record: rowToDomain(currentRow),
+        evidenceAssetId: input.evidenceAssetId,
+        evidenceSha256: input.evidenceSha256,
         actorUserId: input.actorUserId,
-        note: input.note,
         now: input.now,
       })
       const updated = await tx.instrumentAuthorization.update({
         where: { id: currentRow.id },
         data: {
-          status: revoked.record.status,
-          recordHash: hashInstrumentAuthorizationRecord(revoked.record),
-          updatedAt: new Date(revoked.record.updatedAt),
+          evidenceAssetId: attached.record.evidenceAssetId,
+          evidenceSha256: attached.record.evidenceSha256,
+          status: attached.record.status,
+          recordHash: hashInstrumentAuthorizationRecord(attached.record),
+          updatedAt: new Date(attached.record.updatedAt),
         },
       })
-      await appendAuditRow(tx, revoked.audit, updated.id)
-      return { record: rowToDomain(updated), audit: revoked.audit }
+      await appendAuditRow(tx, attached.audit, updated.id)
+      return { record: rowToDomain(updated), audit: attached.audit }
     })
   }
 }

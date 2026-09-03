@@ -265,3 +265,51 @@ export const attachAuthorizationEvidence = (input: {
 export const sha256Hex = (bytes: Buffer | string): string => (
   createHash('sha256').update(bytes).digest('hex')
 )
+
+
+/**
+ * Product revoke of the latest version must stop older APPROVED rows in the same
+ * authorizationId lineage from remaining effective after amend → revoke-latest.
+ * Returns revoked rows (newest first) + audits.
+ */
+export const revokeAuthorizationLineage = (input: {
+  lineage: InstrumentAuthorizationRecordV1[]
+  actorUserId: string
+  note: string
+  now?: string
+}): {
+  records: InstrumentAuthorizationRecordV1[]
+  audits: InstrumentAuthorizationAuditEventV1[]
+} => {
+  const now = input.now ?? new Date().toISOString()
+  const byVersion = [...input.lineage]
+    .map((row) => validateInstrumentAuthorizationRecord(row))
+    .sort((a, b) => b.version - a.version)
+  if (byVersion.length === 0) {
+    authorizationFail('AUTH_STATE', 'authorization lineage empty')
+  }
+  const authorizationId = byVersion[0]!.authorizationId
+  for (const row of byVersion) {
+    if (row.authorizationId !== authorizationId) {
+      authorizationFail('AUTH_STATE', 'lineage must share authorizationId')
+    }
+  }
+  const records: InstrumentAuthorizationRecordV1[] = []
+  const audits: InstrumentAuthorizationAuditEventV1[] = []
+  for (const row of byVersion) {
+    if (row.status === 'REVOKED') {
+      records.push(row)
+      continue
+    }
+    // Revoke every non-REVOKED version so prior APPROVED cannot stay effective.
+    const revoked = revokeInstrumentAuthorization({
+      record: row,
+      actorUserId: input.actorUserId,
+      note: input.note,
+      now,
+    })
+    records.push(revoked.record)
+    audits.push(revoked.audit)
+  }
+  return { records, audits }
+}

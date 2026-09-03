@@ -20,7 +20,7 @@ Extracted text: `*.pdftotext.txt` via `pdftotext -layout`.
 
 ### TEXI
 - Thorell et al. (2020), *Child Neuropsychology*, PMID 32090688 — ages 13–19; two factors Working Memory + Inhibition; free instrument at chexi.se.
-- Subscale item map (aligned with published factor structure / ADEXI family coding): WM items 1,2,5,7,8,9,11,12; Inhibition items 3,4,6,10,13–20. Scores = **mean** of completed subscale items (paper reports subscale means). Descriptive only; **no mainland norms**.
+- Subscale item map (aligned with published factor structure / ADEXI family coding): WM items 1,2,5,7,8,9,11,12,13; Inhibition items 3,4,6,10,14–20. Scores = **mean** of completed subscale items (paper reports subscale means). Descriptive only; **no mainland norms**.
 - English item wording cross-checked against chexi.se official parent/teacher PDF where attached PDF OCR mixed self-report bleed into items 9–10.
 
 ## Authorization

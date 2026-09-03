@@ -237,6 +237,8 @@ export const assertParentCanViewRespondentProjection = (input: {
   relationship: ParentStudentRelationshipRecordV1
   parentUserId: string
   respondentUserId: string
+  /** Subject-bound IDOR fix: relationship.studentUserId must equal assignment.subjectUserId. */
+  subjectUserId?: string | null
 }): void => {
   if (input.relationship.parentUserId !== input.parentUserId) {
     identityFail('RELATIONSHIP_VIEW', '非本关系家长')
@@ -246,6 +248,13 @@ export const assertParentCanViewRespondentProjection = (input: {
   }
   if (input.respondentUserId !== input.parentUserId) {
     identityFail('RELATIONSHIP_VIEW', '家长只能查看自己作为 respondent 的投影')
+  }
+  if (
+    input.subjectUserId !== undefined
+    && input.subjectUserId !== null
+    && input.relationship.studentUserId !== input.subjectUserId
+  ) {
+    identityFail('RELATIONSHIP_VIEW', 'relationship.studentUserId 必须等于 assignment.subjectUserId')
   }
 }
 
@@ -269,7 +278,9 @@ export const createAttemptConsent = (input: {
   purpose: string
   visibilityScope: string
   shareTargets?: string[]
-  acceptedAt?: string
+  /** When omitted and pending=true, acceptedAt is null (teacher assign awaiting parent acceptance). */
+  acceptedAt?: string | null
+  pending?: boolean
 }): AssessmentAttemptConsentRecordV1 => {
   if (input.subjectUserId && input.respondentUserId) {
     assertSubjectRespondentSeparation({
@@ -278,7 +289,10 @@ export const createAttemptConsent = (input: {
       respondentType: input.respondentType,
     })
   }
-  const acceptedAt = input.acceptedAt ?? new Date().toISOString()
+  const pending = input.pending === true || input.acceptedAt === null
+  const acceptedAt = pending
+    ? null
+    : (input.acceptedAt ?? new Date().toISOString())
   const consentHash = canonicalHash({
     consentVersion: input.consentVersion,
     purpose: input.purpose,
@@ -287,6 +301,7 @@ export const createAttemptConsent = (input: {
     subjectUserId: input.subjectUserId,
     respondentUserId: input.respondentUserId,
     respondentType: input.respondentType,
+    pending,
   })
   return {
     consentId: randomUUID(),
@@ -300,6 +315,33 @@ export const createAttemptConsent = (input: {
     shareTargets: [...(input.shareTargets ?? [])],
     acceptedAt,
     revokedAt: null,
+  }
+}
+
+/** Parent accepts a previously pending teacher-assigned consent. */
+export const acceptPendingAttemptConsent = (input: {
+  pending: AssessmentAttemptConsentRecordV1
+  acceptedAt?: string
+}): AssessmentAttemptConsentRecordV1 => {
+  if (input.pending.revokedAt) {
+    identityFail('CONSENT_STATE', '已撤销 consent 不可接受')
+  }
+  const acceptedAt = input.acceptedAt ?? new Date().toISOString()
+  return {
+    ...input.pending,
+    consentId: randomUUID(), // append-only new acceptance row
+    acceptedAt,
+    consentHash: canonicalHash({
+      consentVersion: input.pending.consentVersion,
+      purpose: input.pending.purpose,
+      visibilityScope: input.pending.visibilityScope,
+      shareTargets: input.pending.shareTargets,
+      subjectUserId: input.pending.subjectUserId,
+      respondentUserId: input.pending.respondentUserId,
+      respondentType: input.pending.respondentType,
+      pending: false,
+      priorConsentId: input.pending.consentId,
+    }),
   }
 }
 

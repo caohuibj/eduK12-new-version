@@ -58,10 +58,10 @@ const itemContents = [
   'Puts things off until the last minute',
 ] as const
 
-/** Working Memory factor items (1-based) — Thorell et al. 2020 two-factor structure */
-export const TEXI_WORKING_MEMORY_ITEMS = [1, 2, 5, 7, 8, 9, 11, 12] as const
-/** Inhibition factor includes adolescent-specific initiation/completion/procrastination items */
-export const TEXI_INHIBITION_ITEMS = [3, 4, 6, 10, 13, 14, 15, 16, 17, 18, 19, 20] as const
+/** Working Memory factor items (1-based) — official TEXI subscales PDF: includes item 13 */
+export const TEXI_WORKING_MEMORY_ITEMS = [1, 2, 5, 7, 8, 9, 11, 12, 13] as const
+/** Inhibition factor: items 3,4,6,10,14–20 (initiation/completion/procrastination) */
+export const TEXI_INHIBITION_ITEMS = [3, 4, 6, 10, 14, 15, 16, 17, 18, 19, 20] as const
 
 export const makeTexiItemCode = (index: number): string => `TEXI-${String(index).padStart(2, '0')}`
 
@@ -108,7 +108,7 @@ const buildDefinition = (respondentType: 'parent_observer' | 'teacher_observer')
         key: 'working_memory',
         type: 'dimension',
         label: 'Working Memory (mean)',
-        description: 'Thorell et al. 2020 Working Memory factor mean (items 1,2,5,7,8,9,11,12); higher = more reported difficulty.',
+        description: 'Official TEXI Working Memory factor mean (items 1,2,5,7,8,9,11,12,13); higher = more reported difficulty.',
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 2,
@@ -119,7 +119,7 @@ const buildDefinition = (respondentType: 'parent_observer' | 'teacher_observer')
         key: 'inhibition',
         type: 'dimension',
         label: 'Inhibition (mean)',
-        description: 'Thorell et al. 2020 Inhibition factor mean (items 3,4,6,10,13–20); higher = more reported difficulty.',
+        description: 'Official TEXI Inhibition factor mean (items 3,4,6,10,14–20); higher = more reported difficulty.',
         direction: 'higher_is_worse',
         canonical: true,
         displayPrecision: 2,
@@ -214,6 +214,23 @@ export const TEXI_EN_V1_GOLDEN_CASES: ScaleGoldenCase[] = [
     expected: {
       quality: 'interpretable',
       scores: { working_memory: 3, inhibition: 3, total_mean: 3 },
+      totalScoreKeys: ['working_memory', 'inhibition', 'total_mean'],
+    },
+  },
+  {
+    // Asymmetric: only item 13 (WM per official subscales PDF) elevated — Inhibition unchanged.
+    name: 'only-item-13-elevated',
+    answers: itemCodes.map((itemCode) => ({
+      itemCode,
+      responseValue: itemCode === makeTexiItemCode(13) ? '5' : '1',
+    })),
+    expected: {
+      quality: 'interpretable',
+      scores: {
+        working_memory: 13 / 9,
+        inhibition: 1,
+        total_mean: 1.2,
+      },
       totalScoreKeys: ['working_memory', 'inhibition', 'total_mean'],
     },
   },

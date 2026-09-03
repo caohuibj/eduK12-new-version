@@ -74,7 +74,26 @@ export const instrumentAuthorizationController = {
         actorUserId: req.user.userId,
         note: String(req.body?.note ?? 'revoked'),
       })
-      return success(res, { record: revoked.record, audit: revoked.audit }, '授权已撤销')
+      return success(res, {
+        record: revoked.record,
+        audit: revoked.audit,
+        lineage: revoked.lineage,
+      }, '授权谱系已撤销')
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
+  async attachEvidence(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const attached = await repository.attachEvidence({
+        authorizationId: String(req.params.authorizationId),
+        evidenceAssetId: String(req.body?.evidenceAssetId ?? ''),
+        evidenceSha256: String(req.body?.evidenceSha256 ?? ''),
+        actorUserId: req.user.userId,
+      })
+      return success(res, { record: attached.record, audit: attached.audit }, '授权证据已挂接')
     } catch (err) {
       return handleError(res, err)
     }

@@ -9,7 +9,9 @@ import {
   assertSubjectRespondentSeparation,
   createAttemptConsent,
   createEpisode,
+  acceptPendingAttemptConsent,
 } from '../assessment-identity'
+import type { AssessmentAttemptConsentRecordV1 } from '../assessment-identity/types'
 import type { ParentStudentRelationshipRecordV1 } from '../assessment-identity/types'
 import { AssessmentObserverError, observerFail } from './errors'
 import type {
@@ -109,6 +111,13 @@ const buildAssignment = (input: {
  * Path 1: Teacher assigns an independent observer task to an approved parent.
  * Visibility opens to assigning teacher (pre-consent captured on attempt consent).
  */
+export type TeacherAssignObserverResultV1 = {
+  episode: { episodeId: string; initiationMode: string; subjectUserId: string }
+  /** Pending consent awaiting parent acceptance — acceptedAt is null. */
+  consentRequired: AssessmentAttemptConsentRecordV1
+  assignment: ObserverAssignmentRecordV1
+}
+
 export const teacherAssignObserverToParent = (input: {
   catalogEntry: ObserverBundleCatalogEntryV1
   teacherUserId: string
@@ -121,7 +130,7 @@ export const teacherAssignObserverToParent = (input: {
   relationship: ParentStudentRelationshipRecordV1
   consentVersion: string
   now?: string
-}): ObserverAssignmentRecordV1 => {
+}): TeacherAssignObserverResultV1 => {
   assertRosterTeacher({
     actorUserId: input.teacherUserId,
     actorRole: input.teacherRole,
@@ -150,7 +159,8 @@ export const teacherAssignObserverToParent = (input: {
     initiationMode: 'TEACHER_CAMPAIGN',
     courseId: input.courseId,
   })
-  const consent = createAttemptConsent({
+  // Do NOT set parent acceptedAt=now — parent acceptance creates accepted consent later.
+  const consentRequired = createAttemptConsent({
     subjectUserId: input.subjectUserId,
     respondentUserId: input.parentUserId,
     respondentType: 'PARENT',
@@ -158,9 +168,10 @@ export const teacherAssignObserverToParent = (input: {
     purpose: 'teacher_assigned_parent_observer',
     visibilityScope: 'ASSIGNING_TEACHER',
     shareTargets: [input.teacherUserId],
-    acceptedAt: now,
+    pending: true,
+    acceptedAt: null,
   })
-  return buildAssignment({
+  const assignment = buildAssignment({
     path: 'TEACHER_ASSIGN_PARENT',
     bundleKey: input.catalogEntry.bundleKey,
     bundleVersion: input.catalogEntry.bundleVersion,
@@ -172,8 +183,34 @@ export const teacherAssignObserverToParent = (input: {
     courseId: input.courseId,
     visibility: 'ASSIGNING_TEACHER',
     shareTargets: [input.teacherUserId],
-    consentId: consent.consentId,
+    consentId: consentRequired.consentId,
     now,
+  })
+  return {
+    episode: {
+      episodeId: episode.episodeId,
+      initiationMode: episode.initiationMode,
+      subjectUserId: input.subjectUserId,
+    },
+    consentRequired,
+    assignment,
+  }
+}
+
+export const parentAcceptTeacherAssignedConsent = (input: {
+  consentRequired: AssessmentAttemptConsentRecordV1
+  parentUserId: string
+  now?: string
+}): AssessmentAttemptConsentRecordV1 => {
+  if (input.consentRequired.respondentUserId !== input.parentUserId) {
+    observerFail('OBSERVER_CONSENT', '只有被分配家长可接受 consent')
+  }
+  if (input.consentRequired.acceptedAt) {
+    observerFail('OBSERVER_CONSENT', 'consent 已接受')
+  }
+  return acceptPendingAttemptConsent({
+    pending: input.consentRequired,
+    acceptedAt: input.now ?? new Date().toISOString(),
   })
 }
 
@@ -297,13 +334,22 @@ export const teacherSelfReportObserver = (input: {
  * authorized course lead (teacher). Does not grant access to other parents or
  * child self-report / cross-informant composites.
  */
+export type ParentShareResultV1 = {
+  /** Prior private assignment retained (append-only history). */
+  previousAssignment: ObserverAssignmentRecordV1
+  assignment: ObserverAssignmentRecordV1
+  /** New share consent version — do not keep PRIVATE consentId while mutating visibility. */
+  shareConsent: AssessmentAttemptConsentRecordV1
+}
+
 export const parentShareSelfServeToCourseLead = (input: {
   assignment: ObserverAssignmentRecordV1
   parentUserId: string
   courseLeadUserId: string
   courseLeadIsAuthorizedForSubject: boolean
+  consentVersion: string
   now?: string
-}): ObserverAssignmentRecordV1 => {
+}): ParentShareResultV1 => {
   if (input.assignment.path !== 'PARENT_SELF_SERVE') {
     observerFail('OBSERVER_SHARE', '仅家长自助结果可显式分享给课程负责人')
   }
@@ -318,13 +364,30 @@ export const parentShareSelfServeToCourseLead = (input: {
   }
   const now = input.now ?? new Date().toISOString()
   const shareTargets = Array.from(new Set([...input.assignment.shareTargets, input.courseLeadUserId]))
-  return {
+  const shareConsent = createAttemptConsent({
+    subjectUserId: input.assignment.subjectUserId,
+    respondentUserId: input.parentUserId,
+    respondentType: 'PARENT',
+    consentVersion: input.consentVersion,
+    purpose: 'parent_share_to_course_lead',
+    visibilityScope: 'SHARED_COURSE_LEAD',
+    shareTargets,
+    acceptedAt: now,
+  })
+  const assignment: ObserverAssignmentRecordV1 = {
     ...input.assignment,
+    assignmentId: randomUUID(),
     visibility: 'SHARED_COURSE_LEAD',
     shareTargets,
+    consentId: shareConsent.consentId,
     courseId: input.assignment.courseId,
-    createdAt: input.assignment.createdAt,
-    // preserve identity; share is a visibility mutation
+    createdAt: now,
+    path: 'PARENT_SHARE_TO_COURSE_LEAD',
+  }
+  return {
+    previousAssignment: input.assignment,
+    assignment,
+    shareConsent,
   }
 }
 
@@ -332,24 +395,32 @@ export const parentShareSelfServeToCourseLead = (input: {
  * Parent may only view own respondent projection — never child self-report,
  * other parents, teacher raw answers, or cross-informant reports.
  */
+/** Allowlist-only observer projection fields — never recursive blacklist on arbitrary Record. */
+export const OBSERVER_PROJECTION_ALLOWLIST = [
+  'bundleKey',
+  'bundleVersion',
+  'quality',
+  'scores',
+  'engineSummary',
+  'limitations',
+  'recommendations',
+  'identity',
+  'audience',
+] as const
+
 export const projectObserverForViewer = (
   input: ObserverAudienceProjectionRequestV1 & {
     relationship?: ParentStudentRelationshipRecordV1 | null
-    forbidPayloadKeys?: string[]
+    allowlistKeys?: readonly string[]
   },
 ): Record<string, unknown> => {
-  const forbidden = new Set(input.forbidPayloadKeys ?? [
-    'rawAnswers',
-    'childSelfReport',
-    'otherParentProjection',
-    'teacherRawAnswers',
-    'crossInformantReport',
-    'selfParentTeacherAverage',
-  ])
-  for (const key of Object.keys(input.respondentProjection)) {
-    if (forbidden.has(key)) {
-      observerFail('OBSERVER_LEAK', `投影不得包含禁止字段: ${key}`)
+  const allow = new Set(input.allowlistKeys ?? OBSERVER_PROJECTION_ALLOWLIST)
+  const scrubbed: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(input.respondentProjection)) {
+    if (!allow.has(key)) {
+      observerFail('OBSERVER_LEAK', `投影字段不在 allowlist: ${key}`)
     }
+    scrubbed[key] = value
   }
 
   const { assignment, viewerUserId, viewerRole } = input
@@ -364,6 +435,7 @@ export const projectObserverForViewer = (
         relationship,
         parentUserId: viewerUserId,
         respondentUserId: assignment.respondentUserId,
+        subjectUserId: assignment.subjectUserId,
       })
     } catch (error) {
       if (error instanceof AssessmentIdentityError) {
@@ -374,7 +446,10 @@ export const projectObserverForViewer = (
     if (assignment.respondentUserId !== viewerUserId) {
       observerFail('OBSERVER_VIEW', '家长只能查看自己作为 respondent 的投影')
     }
-    return { ...input.respondentProjection, audience: 'parent_respondent' }
+    if (relationship.studentUserId !== assignment.subjectUserId) {
+      observerFail('OBSERVER_VIEW', 'relationship.studentUserId 必须等于 assignment.subjectUserId')
+    }
+    return { ...scrubbed, audience: 'parent_respondent' }
   }
 
   if (viewerRole === 'TEACHER' || viewerRole === 'ADMIN') {
@@ -389,7 +464,7 @@ export const projectObserverForViewer = (
     if (!allowed) {
       observerFail('OBSERVER_VIEW', '教师无权查看该 observer 投影（默认私有或未分享）')
     }
-    return { ...input.respondentProjection, audience: 'teacher_shared' }
+    return { ...scrubbed, audience: 'teacher_shared' }
   }
 
   return observerFail('OBSERVER_VIEW', '学生或其他角色不得查看 observer 投影')

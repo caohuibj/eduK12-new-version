@@ -9,7 +9,7 @@ import {
   assertContextDefinitionHashMatchesSnapshot,
   validateFrozenAssessmentBundleSnapshot,
 } from './snapshot'
-import { buildBundleReportFacts, validateBundleReportFacts } from './evidence'
+import { buildBundleReportFacts, validateBundleContextFacts, validateBundleReportFacts } from './evidence'
 import { bundleContractFail } from './errors'
 import type { BundleAnalysisEngineRegistry, BundleEngineInputV1 } from './registry'
 import { rollupEvidenceQuality } from './engines/mental-health-rule-v1'
@@ -56,9 +56,11 @@ export const projectCognitiveEvidenceItems = (input: {
   return input.metricKeys.map((metricKey) => {
     const raw = input.source.metrics[metricKey]
     const value = asScalar(raw)
+    const hasMetric = Object.prototype.hasOwnProperty.call(input.source.metrics, metricKey)
     let quality: EvidenceQualityStateV1
     if (input.source.qualityState === 'invalid') quality = 'invalid'
-    else if (value === null) quality = input.source.qualityState === 'limited' ? 'limited' : 'unavailable'
+    // Required selector missing → UNAVAILABLE (never interpretable-with-null).
+    else if (!hasMetric || value === null) quality = 'unavailable'
     else if (input.source.qualityState === 'limited') quality = 'limited'
     else quality = 'interpretable'
     const metricSeg = toConstructSegment(metricKey)
@@ -166,10 +168,14 @@ export const projectBundleReportFacts = (input: {
   const { engineInput } = input
   const snapshot = engineInput.snapshot
 
-  if (engineInput.contextFacts) {
+  // Validate context facts content hash (not only definitionHash) before any engine dispatch.
+  const contextFacts = engineInput.contextFacts
+    ? validateBundleContextFacts(engineInput.contextFacts)
+    : null
+  if (contextFacts) {
     assertContextDefinitionHashMatchesSnapshot({
       snapshot,
-      contextDefinitionHash: engineInput.contextFacts.contextDefinitionHash,
+      contextDefinitionHash: contextFacts.contextDefinitionHash,
     })
     if (snapshot.contextDefinitionHash === null) {
       bundleContractFail('CONTEXT_DEFINITION_VERSION_MISMATCH', 'contextFacts 存在但 snapshot.contextDefinitionHash 为 null')
@@ -181,9 +187,10 @@ export const projectBundleReportFacts = (input: {
     bundleContractFail('COMPILED_RUNTIME_HASH', 'compiledRuntime.compiledRuntimeHash 必须是权威小写 SHA-256')
   }
 
-  const evidence = collectEvidenceFromSources(engineInput)
-  // Dispatch MH/engine with the same authoritative evidence set written into ReportFacts.
-  const engineResult = input.registry.dispatch({ ...engineInput, evidence })
+  // Same parsed contextFacts object for Evidence + engine + ReportFacts.
+  const normalizedInput = { ...engineInput, contextFacts }
+  const evidence = collectEvidenceFromSources(normalizedInput)
+  const engineResult = input.registry.dispatch({ ...normalizedInput, evidence })
   const enginePayload = toEnginePayload(snapshot, engineResult)
 
   const qualityNotes: string[] = []
@@ -212,7 +219,7 @@ export const projectBundleReportFacts = (input: {
       'HTML/Markdown 导出非权威；以 BundleReportFactsV1 为准。',
     ],
     recommendations: input.recommendations ?? [],
-    contextSnapshotHash: engineInput.contextFacts?.contextSnapshotHash ?? null,
+    contextSnapshotHash: contextFacts?.contextSnapshotHash ?? null,
     provenance: {
       compiledBundleRuntimeHash,
       aggregateInputHash: engineInput.aggregateInputHash,

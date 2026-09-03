@@ -56,7 +56,8 @@ export interface AssessmentAttemptConsentRecordV1 {
   purpose: string
   visibilityScope: string
   shareTargets: string[]
-  acceptedAt: string
+  /** null while awaiting parent acceptance (teacher assign). */
+  acceptedAt: string | null
   revokedAt: string | null
 }
 

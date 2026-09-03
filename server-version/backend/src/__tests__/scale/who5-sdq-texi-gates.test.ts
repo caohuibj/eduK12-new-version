@@ -163,6 +163,8 @@ describe('WHO-5 / SDQ / TEXI scale packages and gates', () => {
   it('locks SDQ teacher English T4-10 and keeps zh-CN translation blocked', () => {
     const pkg = getScalePackage('sdq_teacher_zh_cn', '1.0.0')
     expect(pkg).toBeTruthy()
+    expect(pkg!.definition.items.some((row) => row.itemCode === 'SDQ-IMPACT-OVERALL')).toBe(true)
+    expect(pkg!.definition.scoring.scorerKey).toBe('sdq.teacher.t4_10.v1')
     expect(pkg!.definition.items[0].content).toContain("Considerate of other people's feelings")
     expect(pkg!.definition.responseSets[0].options.map((o) => o.label)).toEqual([
       'Not True',
@@ -219,6 +221,13 @@ describe('WHO-5 / SDQ / TEXI scale packages and gates', () => {
     )
     expect(scored.scores.find((row) => row.key === 'working_memory')?.value).toBe(3)
     expect(scored.scores.find((row) => row.key === 'inhibition')?.value).toBe(3)
+    expect(parent!.definition.scoring.scores.find((s) => s.key === 'working_memory')?.source).toMatchObject({
+      type: 'items',
+    })
+    const wmItems = (parent!.definition.scoring.scores.find((s) => s.key === 'working_memory')!.source as { items: Array<{ itemCode: string }> }).items.map((i) => i.itemCode)
+    expect(wmItems).toContain('TEXI-13')
+    const inhItems = (parent!.definition.scoring.scores.find((s) => s.key === 'inhibition')!.source as { items: Array<{ itemCode: string }> }).items.map((i) => i.itemCode)
+    expect(inhItems).not.toContain('TEXI-13')
 
     expect(isTexiLocalizationManifestSigned(TEXI_LOCALIZATION_MANIFEST_PENDING)).toBe(false)
     expect(TEXI_LOCALIZATION_MANIFEST_PENDING.itemCodes).toHaveLength(20)

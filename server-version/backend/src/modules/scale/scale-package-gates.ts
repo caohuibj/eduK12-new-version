@@ -1,12 +1,15 @@
 /**
  * Scale package publication gates for WHO-5 / SDQ / TEXI.
- * Uses durable authorization from Prep 9.1 — never invents item text.
+ * Uses the same durable rights evaluator as Prep 9.1 (resolveEffectiveAuthorization
+ * + electronic/scoring/translation/display) — no weaker copies.
  */
 import {
+  assertLocaleTerritoryMatch,
   evaluateAuthorizationOverlayStatus,
   resolveEffectiveAuthorization,
   type InstrumentAuthorizationRecordV1,
 } from '../assessment-authorization'
+import { assertContentLocaleCompatible } from './content-locale'
 import { getBlockedScalePackage } from './packages/blocked-observer-packages'
 import { SDQ_TEACHER_ZH_CN_TRANSLATION_PENDING } from './packages/sdq-teacher-en-t4-10-v1'
 import { isTexiLocalizationManifestSigned } from './localization/texi-localization-manifest'
@@ -19,6 +22,74 @@ export interface ScalePackageGateResultV1 {
   blocked: boolean
   errors: string[]
   warnings: string[]
+}
+
+const ELIGIBLE = new Set(['APPROVED', 'EVIDENCE_PENDING'])
+
+/**
+ * Shared durable rights check — same semantics as evaluateBundlePublication rights gate.
+ */
+export const evaluateDurableInstrumentRights = (input: {
+  instrumentKey: string
+  instrumentVersion: string
+  authorizations: InstrumentAuthorizationRecordV1[]
+  locale: string
+  territory: string
+  nowIso?: string
+  requireElectronicAdministration?: boolean
+  requireScoring?: boolean
+  requireTranslation?: boolean
+  requireDisplay?: boolean
+}): { ok: boolean; errors: string[]; warnings: string[] } => {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const nowIso = input.nowIso ?? new Date().toISOString()
+  const requireElectronic = input.requireElectronicAdministration !== false
+  const requireScoring = input.requireScoring !== false
+  const requireTranslation = input.requireTranslation === true
+  const requireDisplay = input.requireDisplay !== false
+
+  const effective = resolveEffectiveAuthorization({
+    authorizations: input.authorizations,
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    nowIso,
+  })
+  if (!effective || !ELIGIBLE.has(effective.status)) {
+    errors.push(
+      `${input.instrumentKey}@${input.instrumentVersion} requires APPROVED|EVIDENCE_PENDING authorization`,
+    )
+    return { ok: false, errors, warnings }
+  }
+  const overlay = evaluateAuthorizationOverlayStatus(effective, nowIso)
+  if (overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT') {
+    errors.push(`${input.instrumentKey}@${input.instrumentVersion} authorization ${overlay}`)
+  }
+  if (Date.parse(nowIso) < Date.parse(effective.validFrom) || Date.parse(nowIso) > Date.parse(effective.validTo)) {
+    errors.push(`${input.instrumentKey}@${input.instrumentVersion} outside validFrom/validTo`)
+  }
+  const scope = assertLocaleTerritoryMatch({
+    record: effective,
+    locale: input.locale,
+    territory: input.territory,
+  })
+  if (!scope.ok) errors.push(scope.message ?? 'SCOPE_MISMATCH')
+  if (requireElectronic && !effective.scope.electronicAdministration) {
+    errors.push(`${input.instrumentKey}: electronicAdministration required`)
+  }
+  if (requireScoring && !effective.scope.scoring) {
+    errors.push(`${input.instrumentKey}: scoring required`)
+  }
+  if (requireTranslation && !effective.scope.translation) {
+    errors.push(`${input.instrumentKey}: translation required`)
+  }
+  if (requireDisplay && !effective.scope.display) {
+    errors.push(`${input.instrumentKey}: display required`)
+  }
+  if (effective.status === 'EVIDENCE_PENDING') {
+    warnings.push(`${input.instrumentKey}: EVIDENCE_PENDING — warn only`)
+  }
+  return { ok: errors.length === 0, errors, warnings }
 }
 
 export const evaluateWho5ScalePackageGate = (input: {
@@ -50,29 +121,33 @@ export const evaluateWho5ScalePackageGate = (input: {
   if (input.deploymentCommercialNature !== 'NON_COMMERCIAL') {
     errors.push('WHO-5 仅 NON_COMMERCIAL 可发布')
   }
-  const nowIso = input.nowIso ?? new Date().toISOString()
+  const localeGate = assertContentLocaleCompatible({
+    instrumentKey,
+    requestedLocale: input.locale,
+  })
+  errors.push(...localeGate.errors)
+  const rights = evaluateDurableInstrumentRights({
+    instrumentKey,
+    instrumentVersion,
+    authorizations: input.authorizations,
+    locale: input.locale,
+    territory: input.territory,
+    nowIso: input.nowIso,
+    requireElectronicAdministration: true,
+    requireScoring: true,
+    requireDisplay: true,
+    requireTranslation: false,
+  })
+  errors.push(...rights.errors)
+  warnings.push(...rights.warnings)
   const effective = resolveEffectiveAuthorization({
     authorizations: input.authorizations,
     instrumentKey,
     instrumentVersion,
-    nowIso,
+    nowIso: input.nowIso ?? new Date().toISOString(),
   })
-  if (!effective || (effective.status !== 'APPROVED' && effective.status !== 'EVIDENCE_PENDING')) {
-    errors.push('WHO-5 requires APPROVED|EVIDENCE_PENDING authorization')
-  } else {
-    const overlay = evaluateAuthorizationOverlayStatus(effective, nowIso)
-    if (overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT') {
-      errors.push(`WHO-5 authorization ${overlay}`)
-    }
-    if (effective.scope.commercialNature !== 'NON_COMMERCIAL') {
-      errors.push('WHO-5 authorization commercialNature must be NON_COMMERCIAL')
-    }
-    if (!effective.scope.locales.includes(input.locale) || !effective.scope.territories.includes(input.territory)) {
-      errors.push('WHO-5 locale/territory mismatch')
-    }
-    if (effective.status === 'EVIDENCE_PENDING') {
-      warnings.push('WHO-5 EVIDENCE_PENDING — warn only')
-    }
+  if (effective && effective.scope.commercialNature !== 'NON_COMMERCIAL') {
+    errors.push('WHO-5 authorization commercialNature must be NON_COMMERCIAL')
   }
   return {
     instrumentKey,
@@ -87,7 +162,7 @@ export const evaluateWho5ScalePackageGate = (input: {
 /**
  * SDQ electronic administration/scoring must bind approved authorization.
  * Parent zh-Hans content is landed; teacher zh-CN still pending signed translation
- * (English T4-10 source is locked in-package).
+ * (English T4-10 source is locked in-package; product key sdq_teacher_zh_cn retained).
  */
 export const evaluateSdqElectronicAdminGate = (input: {
   instrumentKey: string
@@ -112,6 +187,13 @@ export const evaluateSdqElectronicAdminGate = (input: {
     }
   }
 
+  const localeGate = assertContentLocaleCompatible({
+    instrumentKey: input.instrumentKey,
+    requestedLocale: input.locale,
+    allowEnglishSourceForZhCnKey: input.allowEnglishTeacherSource === true && input.locale === 'en',
+  })
+  errors.push(...localeGate.errors)
+
   if (
     input.instrumentKey === 'sdq_teacher_zh_cn'
     && input.locale === 'zh-CN'
@@ -121,33 +203,20 @@ export const evaluateSdqElectronicAdminGate = (input: {
     errors.push(...SDQ_TEACHER_ZH_CN_TRANSLATION_PENDING.notes)
   }
 
-  const nowIso = input.nowIso ?? new Date().toISOString()
-  const effective = resolveEffectiveAuthorization({
-    authorizations: input.authorizations,
+  const rights = evaluateDurableInstrumentRights({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    nowIso,
+    authorizations: input.authorizations,
+    locale: input.locale,
+    territory: input.territory,
+    nowIso: input.nowIso,
+    requireElectronicAdministration: true,
+    requireScoring: true,
+    requireDisplay: true,
+    requireTranslation: input.locale === 'zh-CN' && input.instrumentKey === 'sdq_teacher_zh_cn',
   })
-  if (!effective || (effective.status !== 'APPROVED' && effective.status !== 'EVIDENCE_PENDING')) {
-    errors.push('SDQ electronic admin/scoring requires APPROVED|EVIDENCE_PENDING authorization')
-  } else {
-    if (!effective.scope.electronicAdministration) errors.push('SDQ requires electronicAdministration=true')
-    if (!effective.scope.scoring) errors.push('SDQ requires scoring=true')
-    if (!effective.scope.locales.includes(input.locale) || !effective.scope.territories.includes(input.territory)) {
-      errors.push('SDQ locale/territory mismatch')
-    }
-    const overlay = evaluateAuthorizationOverlayStatus(effective, nowIso)
-    if (overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT') {
-      errors.push(`SDQ authorization ${overlay}`)
-    }
-    if (effective.status === 'EVIDENCE_PENDING') {
-      warnings.push('SDQ EVIDENCE_PENDING — warn only')
-    }
-  }
-
-  if (gate?.reasons.includes('ZH_CN_TRANSLATION_PENDING_SIGNED_MANIFEST') && input.locale === 'zh-CN') {
-    // already added above; keep blocked flag true for zh-CN teacher
-  }
+  errors.push(...rights.errors)
+  warnings.push(...rights.warnings)
 
   const blockedForLocale = (
     input.instrumentKey === 'sdq_teacher_zh_cn' && input.locale === 'zh-CN'
@@ -163,10 +232,18 @@ export const evaluateSdqElectronicAdminGate = (input: {
   }
 }
 
+/**
+ * TEXI localization still needs signed manifest + durable rights
+ * (electronic/scoring/translation/display as required).
+ */
 export const evaluateTexiLocalizationGate = (input: {
   instrumentKey: string
   instrumentVersion: string
   localizationManifest: unknown
+  authorizations?: InstrumentAuthorizationRecordV1[]
+  locale?: string
+  territory?: string
+  nowIso?: string
 }): ScalePackageGateResultV1 => {
   const gate = getBlockedScalePackage(input.instrumentKey, input.instrumentVersion)
   const errors: string[] = []
@@ -184,6 +261,33 @@ export const evaluateTexiLocalizationGate = (input: {
     errors.push('TEXI localization manifest missing or unsigned')
     if (gate) errors.push(`package gate: ${gate.reasons.join(',')}`)
   }
+  const locale = input.locale ?? 'zh-CN'
+  const localeGate = assertContentLocaleCompatible({
+    instrumentKey: input.instrumentKey,
+    requestedLocale: locale,
+  })
+  errors.push(...localeGate.errors)
+
+  if (input.authorizations) {
+    const rights = evaluateDurableInstrumentRights({
+      instrumentKey: input.instrumentKey,
+      instrumentVersion: input.instrumentVersion,
+      authorizations: input.authorizations,
+      locale,
+      territory: input.territory ?? 'CN',
+      nowIso: input.nowIso,
+      requireElectronicAdministration: true,
+      requireScoring: true,
+      requireTranslation: true,
+      requireDisplay: true,
+    })
+    errors.push(...rights.errors)
+    warnings.push(...rights.warnings)
+  } else {
+    // Caller may probe unsigned-manifest fail-closed before rights are attached.
+    warnings.push('TEXI durable authorization records not supplied to localization gate')
+  }
+
   return {
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,

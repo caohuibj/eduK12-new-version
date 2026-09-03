@@ -1,3 +1,5 @@
+import { registerScaleCustomScorer } from './scale-scoring'
+import { SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer } from './packages/sdq-teacher-impact-scorer'
 import { ADEXI_V2_PACKAGE, type ScaleGoldenCase } from './packages/adexi-v2'
 import { WHO5_ZH_CN_V1_PACKAGE } from './packages/who5-zh-cn-v1'
 import { SDQ_PARENT_ZH_CN_V1_PACKAGE } from './packages/sdq-parent-zh-cn-v1'
@@ -15,6 +17,8 @@ export interface ScalePackageV2 {
   references: AssessmentReferenceSetDefinition[]
   goldenCases: ScaleGoldenCase[]
 }
+
+registerScaleCustomScorer(SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer)
 
 const packages: ScalePackageV2[] = [
   ADEXI_V2_PACKAGE,
