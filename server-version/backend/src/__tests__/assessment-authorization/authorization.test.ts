@@ -419,4 +419,36 @@ describe('instrument authorization overlay', () => {
     }
   })
 
+
+  it('EVIDENCE_PENDING first attach OK; post-APPROVED evidence change mints new version', () => {
+    const created = draft()
+    const pending = approveInstrumentAuthorization({
+      record: created,
+      actorUserId: 'admin-1',
+      selfApprovalDeclaration: 'I confirm self-approval of this authorization scope.',
+    }).record
+    expect(pending.status).toBe('EVIDENCE_PENDING')
+
+    const first = attachAuthorizationEvidence({
+      record: pending,
+      evidenceAssetId: 'asset-1',
+      evidenceSha256: 'a'.repeat(64),
+      actorUserId: 'admin-1',
+    })
+    expect(first.mintedNewVersion).toBe(false)
+    expect(first.record.status).toBe('APPROVED')
+    expect(first.record.version).toBe(1)
+
+    const replaced = attachAuthorizationEvidence({
+      record: first.record,
+      evidenceAssetId: 'asset-2',
+      evidenceSha256: 'b'.repeat(64),
+      actorUserId: 'admin-1',
+    })
+    expect(replaced.mintedNewVersion).toBe(true)
+    expect(replaced.record.version).toBe(2)
+    expect(replaced.record.evidenceAssetId).toBe('asset-2')
+    expect(replaced.record.status).toBe('APPROVED')
+  })
+
 })

@@ -504,3 +504,50 @@ export const listParentSelfServeCatalog = (
     && entry.initiationModes.includes('PARENT_SELF_SERVE')
   ))
 )
+
+/**
+ * Gate attempt start / FINAL submit for teacher-assigned observer paths.
+ * Pending parent consent (acceptedAt == null) forbids start and FINAL submit.
+ * Authoritative: callers must pass the current consent record.
+ */
+export const assertTeacherAssignedConsentAcceptedForAttempt = (input: {
+  consent: AssessmentAttemptConsentRecordV1
+  action: 'START' | 'FINAL_SUBMIT'
+}): void => {
+  if (input.consent.purpose !== 'teacher_assigned_parent_observer') {
+    return
+  }
+  if (!input.consent.acceptedAt) {
+    observerFail(
+      'OBSERVER_CONSENT_PENDING',
+      input.action === 'START'
+        ? 'pending teacher-assigned consent: attempt start forbidden until parent accepts'
+        : 'pending teacher-assigned consent: FINAL submit forbidden until parent accepts',
+    )
+  }
+  if (input.consent.revokedAt) {
+    observerFail('OBSERVER_CONSENT', 'consent revoked')
+  }
+}
+
+export const canStartTeacherAssignedObserverAttempt = (
+  consent: AssessmentAttemptConsentRecordV1,
+): boolean => {
+  try {
+    assertTeacherAssignedConsentAcceptedForAttempt({ consent, action: 'START' })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const canFinalSubmitTeacherAssignedObserverAttempt = (
+  consent: AssessmentAttemptConsentRecordV1,
+): boolean => {
+  try {
+    assertTeacherAssignedConsentAcceptedForAttempt({ consent, action: 'FINAL_SUBMIT' })
+    return true
+  } catch {
+    return false
+  }
+}

@@ -69,6 +69,8 @@ model User {
   assessmentEpisodesInitiated   AssessmentEpisode[]         @relation("EpisodeInitiator")
   attemptConsentsAsSubject      AssessmentAttemptConsent[]  @relation("ConsentSubject")
   attemptConsentsAsRespondent   AssessmentAttemptConsent[]  @relation("ConsentRespondent")
+  safetyCasesAsSubject          SafetyCase[]                @relation("SafetyCaseSubject")
+  safetyCasesAsPrimaryOwner     SafetyCase[]                @relation("SafetyCasePrimaryOwner")
 
   @@map("users")
 }
@@ -1784,4 +1786,120 @@ model AssessmentAttemptConsent {
   @@index([subjectUserId, acceptedAt])
   @@index([respondentUserId, acceptedAt])
   @@map("assessment_attempt_consents")
+}
+
+enum SafetyPolicyStatus {
+  DRAFT
+  APPROVED
+  RETIRED
+}
+
+enum SafetyCaseStatus {
+  OPEN
+  ACKNOWLEDGED
+  IN_PROGRESS
+  ESCALATED
+  DISPOSED
+  REFERRED
+}
+
+enum SafetyCaseEventType {
+  CREATED
+  ACKNOWLEDGED
+  ACTION_RECORDED
+  ESCALATED
+  DISPOSED
+  REFERRED
+  WAKEUP_SCHEDULED
+  WAKEUP_FIRED
+  RECONCILED
+  WAKEUP_DUPLICATE_NOOP
+}
+
+model SafetyPolicyTemplate {
+  id                           String             @id @default(uuid())
+  policyKey                    String             @map("policy_key")
+  policyVersion                String             @map("policy_version")
+  status                       SafetyPolicyStatus @default(DRAFT)
+  name                         String
+  acknowledgeWithinMs          Int                @map("acknowledge_within_ms")
+  disposeWithinMs              Int                @map("dispose_within_ms")
+  escalationChainJson          Json               @map("escalation_chain_json")
+  productionTriggerEnabled     Boolean            @default(false) @map("production_trigger_enabled")
+  testOnlyAuthoritativeFixture Boolean            @default(false) @map("test_only_authoritative_fixture")
+  createdByUserId              String             @map("created_by_user_id")
+  approvedByUserId             String?            @map("approved_by_user_id")
+  createdAt                    DateTime           @default(now()) @map("created_at")
+  updatedAt                    DateTime           @updatedAt @map("updated_at")
+
+  @@unique([policyKey, policyVersion])
+  @@map("safety_policy_templates")
+}
+
+model SafetyCase {
+  id                   String          @id @default(uuid())
+  policyKey            String          @map("policy_key")
+  policyVersion        String          @map("policy_version")
+  status               SafetyCaseStatus @default(OPEN)
+  subjectUserId        String          @map("subject_user_id")
+  primaryOwnerUserId   String          @map("primary_owner_user_id")
+  backupOwnerUserIds   String[]        @map("backup_owner_user_ids")
+  triggerSourceKind    String          @map("trigger_source_kind")
+  triggerSourceHash    String          @map("trigger_source_hash")
+  triggerSourceRecordId String?        @map("trigger_source_record_id")
+  triggerBundleKey     String?         @map("trigger_bundle_key")
+  triggerBundleVersion String?         @map("trigger_bundle_version")
+  triggerNotesJson     Json?           @map("trigger_notes_json")
+  idempotencyKey       String          @unique @map("idempotency_key")
+  priorCaseId          String?         @map("prior_case_id")
+  acknowledgedAt       DateTime?       @map("acknowledged_at")
+  disposedAt           DateTime?       @map("disposed_at")
+  ackDueAt             DateTime        @map("ack_due_at")
+  disposeDueAt         DateTime        @map("dispose_due_at")
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+
+  subject      User              @relation("SafetyCaseSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  primaryOwner User              @relation("SafetyCasePrimaryOwner", fields: [primaryOwnerUserId], references: [id], onDelete: Restrict)
+  priorCase    SafetyCase?       @relation("SafetyCasePrior", fields: [priorCaseId], references: [id], onDelete: Restrict)
+  childCases   SafetyCase[]      @relation("SafetyCasePrior")
+  events       SafetyCaseEvent[]
+  wakeups      SafetyWakeupLedger[]
+
+  @@index([subjectUserId, status])
+  @@index([primaryOwnerUserId, status])
+  @@map("safety_cases")
+}
+
+model SafetyCaseEvent {
+  id          String              @id @default(uuid())
+  caseId      String              @map("case_id")
+  type        SafetyCaseEventType
+  actorUserId String              @map("actor_user_id")
+  at          DateTime
+  note        String
+  wakeupJobId String?             @map("wakeup_job_id")
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  safetyCase SafetyCase @relation(fields: [caseId], references: [id], onDelete: Restrict)
+
+  @@index([caseId, at])
+  @@index([wakeupJobId])
+  @@map("safety_case_events")
+}
+
+model SafetyWakeupLedger {
+  id           String   @id @default(uuid())
+  wakeupJobId  String   @unique @map("wakeup_job_id")
+  caseId       String   @map("case_id")
+  kind         String
+  fireAt       DateTime @map("fire_at")
+  status       String
+  createdAt    DateTime @default(now()) @map("created_at")
+  processedAt  DateTime? @map("processed_at")
+
+  safetyCase SafetyCase @relation(fields: [caseId], references: [id], onDelete: Restrict)
+
+  @@index([caseId, status])
+  @@map("safety_wakeup_ledger")
 }

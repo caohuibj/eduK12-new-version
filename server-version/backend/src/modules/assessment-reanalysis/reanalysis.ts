@@ -1,15 +1,28 @@
+import { randomUUID } from 'node:crypto'
+import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   buildFrozenAssessmentBundleSnapshot,
+  compileBundleRuntimeFromFrozenRead,
+  createProductBundleAnalysisEngineRegistry,
+  hashBundleContextDefinition,
+  projectBundleReportFacts,
   validateAssessmentBundleDefinition,
+  validateBundleContextDefinition,
   validateBundleContextFacts,
   type AssessmentBundleDefinitionV1,
+  type BundleAnalysisEngineRegistry,
   type BundleContextDefinitionV1,
   type FrozenAssessmentBundleSnapshotV3,
 } from '../assessment-bundle'
 import { reanalysisFail } from './errors'
-import type { BundleReanalysisRequestV1, BundleReanalysisResultV1 } from './types'
+import type {
+  BundleReanalysisHistoryEntryV1,
+  BundleReanalysisRequestV1,
+  BundleReanalysisResultV1,
+} from './types'
 
 const EXACT = /^[0-9]+\.[0-9]+\.[0-9]+$/
+const HEX = /^[0-9a-f]{64}$/
 
 export const validateReanalysisRequest = (
   value: BundleReanalysisRequestV1 | unknown,
@@ -24,14 +37,98 @@ export const validateReanalysisRequest = (
     reanalysisFail('REANALYSIS_SOURCE', 'frozen unit sources required')
   }
   if (!req.actorUserId?.trim()) reanalysisFail('REANALYSIS_INPUT', 'actorUserId required')
+  if (req.aggregateInputHash != null && !HEX.test(req.aggregateInputHash)) {
+    reanalysisFail('REANALYSIS_INPUT', 'aggregateInputHash must be 64 hex or null')
+  }
   return req
 }
 
 /**
+ * Recompute reanalysis provenance from frozen sources + context + compiled runtime.
+ * Caller-supplied aggregateInputHash must match when provided.
+ */
+export const computeReanalysisAggregateInputHash = (input: {
+  snapshotHash: string
+  compiledBundleRuntimeHash: string
+  cognitiveSources: Array<{ slotKey: string; sourceResultHash: string }>
+  scaleSources: Array<{ slotKey: string; sourceResultHash: string }>
+  contextSnapshotHash: string | null
+}): string => canonicalHash({
+  hashScheme: 'bundle-reanalysis-aggregate-v1',
+  snapshotHash: input.snapshotHash,
+  compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
+  contextSnapshotHash: input.contextSnapshotHash,
+  sources: [
+    ...input.cognitiveSources.map((row) => ({
+      unitType: 'COGNITIVE' as const,
+      slotKey: row.slotKey,
+      sourceResultHash: row.sourceResultHash,
+    })),
+    ...input.scaleSources.map((row) => ({
+      unitType: 'SCALE' as const,
+      slotKey: row.slotKey,
+      sourceResultHash: row.sourceResultHash,
+    })),
+  ].sort((a, b) => (
+    a.slotKey < b.slotKey ? -1 : a.slotKey > b.slotKey ? 1 : a.unitType < b.unitType ? -1 : a.unitType > b.unitType ? 1 : 0
+  )),
+})
+
+const matchUniqueSlotSource = <T extends {
+  slotKey: string
+  instrumentKey: string
+  instrumentVersion: string
+}>(input: {
+  slotKey: string
+  instrumentKey: string
+  instrumentVersion: string
+  unitType: 'COGNITIVE' | 'SCALE'
+  sources: T[]
+}): { ok: true; source: T } | { ok: false; reason: BundleReanalysisResultV1 & { ok: false } } => {
+  const matches = input.sources.filter((row) => row.slotKey === input.slotKey)
+  if (matches.length === 0) {
+    return {
+      ok: false,
+      reason: {
+        ok: false,
+        reason: 'MISSING_REQUIRED_SOURCE',
+        message: `missing frozen ${input.unitType} source for slot ${input.slotKey}`,
+      },
+    }
+  }
+  if (matches.length > 1) {
+    return {
+      ok: false,
+      reason: {
+        ok: false,
+        reason: 'DUPLICATE_SOURCE_SLOT',
+        message: `duplicate frozen ${input.unitType} sources for slot ${input.slotKey}`,
+      },
+    }
+  }
+  const source = matches[0]!
+  if (
+    source.instrumentKey !== input.instrumentKey
+    || source.instrumentVersion !== input.instrumentVersion
+  ) {
+    return {
+      ok: false,
+      reason: {
+        ok: false,
+        reason: 'INCOMPATIBLE_SOURCE_VERSION',
+        message: `${input.unitType.toLowerCase()} slot ${input.slotKey} frozen ${source.instrumentKey}@${source.instrumentVersion} incompatible with target ${input.instrumentKey}@${input.instrumentVersion}`,
+      },
+    }
+  }
+  return { ok: true, source }
+}
+
+/**
  * Explicit Bundle reanalysis by { targetBundleKey, targetBundleVersion }.
- * - Reuses original frozen unit results + Context only
- * - Missing required Context → reject
- * - Always new snapshot; never overwrite old
+ * - Require ALL COGNITIVE/SCALE slots have unique matching frozen sources
+ * - Context key/version/hash must match via hashBundleContextDefinition
+ * - Build engine input from frozen sources + context → dispatch registry
+ * - Regenerate BundleReportFacts; always emit a new history entry (never overwrite)
  * - safetyTriggered ⇒ openNewSafetyCase (caller creates new case; never auto-close old)
  * - No raw answer/trial reads
  */
@@ -48,8 +145,11 @@ export const runExplicitBundleReanalysis = (input: {
     contextDefinitionVersion: string,
   ) => BundleContextDefinitionV1 | null
   priorSnapshot?: FrozenAssessmentBundleSnapshotV3 | null
+  /** Optional registry override (tests); defaults to product registry. */
+  registry?: BundleAnalysisEngineRegistry
   /** Whether the newly projected analysis would open safety (test fixture / signal). */
   safetyTriggered?: boolean
+  now?: string
 }): BundleReanalysisResultV1 => {
   const request = validateReanalysisRequest(input.request)
   const definition = input.resolveTargetDefinition(
@@ -75,40 +175,59 @@ export const runExplicitBundleReanalysis = (input: {
   }
 
   const validated = validateAssessmentBundleDefinition(definition)
+  const cognitiveSlots = validated.slots.filter((slot) => slot.unitType === 'COGNITIVE')
+  const scaleSlots = validated.slots.filter((slot) => slot.unitType === 'SCALE')
 
-  // Target version must declare compatible source versions with frozen units.
-  for (const slot of validated.slots) {
-    if (slot.unitType === 'COGNITIVE') {
-      const source = request.frozenCognitiveSources.find((row) => row.slotKey === slot.slotKey)
-      if (!source) continue
-      if (
-        source.instrumentKey !== slot.instrumentKey
-        || source.instrumentVersion !== slot.instrumentVersion
-      ) {
-        return {
-          ok: false,
-          reason: 'INCOMPATIBLE_SOURCE_VERSION',
-          message: `cognitive slot ${slot.slotKey} frozen ${source.instrumentKey}@${source.instrumentVersion} incompatible with target ${slot.instrumentKey}@${slot.instrumentVersion}`,
-        }
+  // Reject unknown / extra source slots not declared by the target Bundle.
+  const declaredCognitive = new Set(cognitiveSlots.map((slot) => slot.slotKey))
+  const declaredScale = new Set(scaleSlots.map((slot) => slot.slotKey))
+  for (const source of request.frozenCognitiveSources) {
+    if (!declaredCognitive.has(source.slotKey)) {
+      return {
+        ok: false,
+        reason: 'UNKNOWN_SOURCE_SLOT',
+        message: `unknown cognitive source slot ${source.slotKey}`,
       }
     }
-    if (slot.unitType === 'SCALE') {
-      const source = request.frozenScaleSources.find((row) => row.slotKey === slot.slotKey)
-      if (!source) continue
-      if (
-        source.instrumentKey !== slot.instrumentKey
-        || source.instrumentVersion !== slot.instrumentVersion
-      ) {
-        return {
-          ok: false,
-          reason: 'INCOMPATIBLE_SOURCE_VERSION',
-          message: `scale slot ${slot.slotKey} frozen ${source.instrumentKey}@${source.instrumentVersion} incompatible with target ${slot.instrumentKey}@${slot.instrumentVersion}`,
-        }
+  }
+  for (const source of request.frozenScaleSources) {
+    if (!declaredScale.has(source.slotKey)) {
+      return {
+        ok: false,
+        reason: 'UNKNOWN_SOURCE_SLOT',
+        message: `unknown scale source slot ${source.slotKey}`,
       }
     }
   }
 
-  let contextDefinition: BundleContextDefinitionV1 | null | undefined
+  const matchedCognitive = []
+  for (const slot of cognitiveSlots) {
+    const matched = matchUniqueSlotSource({
+      slotKey: slot.slotKey,
+      instrumentKey: slot.instrumentKey,
+      instrumentVersion: slot.instrumentVersion,
+      unitType: 'COGNITIVE',
+      sources: request.frozenCognitiveSources,
+    })
+    if (!matched.ok) return matched.reason
+    matchedCognitive.push(matched.source)
+  }
+
+  const matchedScale = []
+  for (const slot of scaleSlots) {
+    const matched = matchUniqueSlotSource({
+      slotKey: slot.slotKey,
+      instrumentKey: slot.instrumentKey,
+      instrumentVersion: slot.instrumentVersion,
+      unitType: 'SCALE',
+      sources: request.frozenScaleSources,
+    })
+    if (!matched.ok) return matched.reason
+    matchedScale.push(matched.source)
+  }
+
+  let contextDefinition: BundleContextDefinitionV1 | null = null
+  let contextFacts = null as ReturnType<typeof validateBundleContextFacts> | null
   if (validated.contextDefinitionKey && validated.contextDefinitionVersion) {
     if (!request.frozenContextFacts) {
       return {
@@ -128,17 +247,39 @@ export const runExplicitBundleReanalysis = (input: {
         message: 'frozen Context definition key/version does not match target Bundle declaration',
       }
     }
-    contextDefinition = input.resolveContextDefinition?.(
+    const resolved = input.resolveContextDefinition?.(
       validated.contextDefinitionKey,
       validated.contextDefinitionVersion,
     ) ?? null
-    if (!contextDefinition) {
+    if (!resolved) {
       return {
         ok: false,
         reason: 'MISSING_REQUIRED_CONTEXT',
         message: 'ContextDefinition not available for target Bundle',
       }
     }
+    const validatedContext = validateBundleContextDefinition(resolved)
+    // key/version/hash must all match — definition-only freeze is NOT enough.
+    const expectedHash = hashBundleContextDefinition(validatedContext)
+    if (facts.contextDefinitionHash !== expectedHash) {
+      return {
+        ok: false,
+        reason: 'CONTEXT_DEFINITION_MISMATCH',
+        message: 'frozen Context definition hash does not match resolved ContextDefinition (same version, different hash)',
+      }
+    }
+    if (
+      validatedContext.contextDefinitionKey !== facts.contextDefinitionKey
+      || validatedContext.contextDefinitionVersion !== facts.contextDefinitionVersion
+    ) {
+      return {
+        ok: false,
+        reason: 'CONTEXT_DEFINITION_MISMATCH',
+        message: 'resolved ContextDefinition key/version does not match frozen facts',
+      }
+    }
+    contextDefinition = validatedContext
+    contextFacts = facts
   }
 
   const newSnapshot = buildFrozenAssessmentBundleSnapshot(
@@ -146,17 +287,80 @@ export const runExplicitBundleReanalysis = (input: {
     contextDefinition ? { contextDefinition } : undefined,
   )
 
-  if (input.priorSnapshot && newSnapshot.snapshotHash === input.priorSnapshot.snapshotHash) {
-    // Same definition hash is possible if target equals prior; still return a new object.
-    // Callers must persist as a new analysis row — never overwrite.
+  const compiledRuntime = compileBundleRuntimeFromFrozenRead({
+    family: 'ASSESSMENT_BUNDLE',
+    snapshotVersion: 3,
+    snapshot: newSnapshot,
+  })
+
+  const recomputedAggregateHash = computeReanalysisAggregateInputHash({
+    snapshotHash: newSnapshot.snapshotHash,
+    compiledBundleRuntimeHash: compiledRuntime.compiledRuntimeHash,
+    cognitiveSources: matchedCognitive,
+    scaleSources: matchedScale,
+    contextSnapshotHash: contextFacts?.contextSnapshotHash ?? null,
+  })
+
+  if (request.aggregateInputHash != null && request.aggregateInputHash !== recomputedAggregateHash) {
+    return {
+      ok: false,
+      reason: 'AGGREGATE_INPUT_HASH_MISMATCH',
+      message: 'request.aggregateInputHash does not match recomputed reanalysis provenance',
+    }
+  }
+
+  const registry = input.registry ?? createProductBundleAnalysisEngineRegistry()
+  const engineInput = {
+    snapshot: newSnapshot,
+    compiledRuntime,
+    evidence: [] as never[],
+    contextFacts,
+    aggregateInputHash: recomputedAggregateHash,
+    cognitiveSources: matchedCognitive,
+    scaleSources: matchedScale,
+  }
+  const reportFacts = projectBundleReportFacts({
+    registry,
+    engineInput,
+  })
+  const engineResult = reportFacts.enginePayload.kind === 'COMPUTED'
+    ? { kind: 'COMPUTED' as const, payload: reportFacts.enginePayload.payload }
+    : { kind: 'UNAVAILABLE' as const, reason: reportFacts.enginePayload.reason }
+
+  const now = input.now ?? new Date().toISOString()
+  const analysisInstanceId = request.analysisInstanceId?.trim() || randomUUID()
+  const history: BundleReanalysisHistoryEntryV1 = {
+    historyId: randomUUID(),
+    createdAt: now,
+    actorUserId: request.actorUserId,
+    targetBundleKey: request.targetBundleKey,
+    targetBundleVersion: request.targetBundleVersion,
+    priorSnapshotHash: input.priorSnapshot?.snapshotHash ?? null,
+    newSnapshotHash: newSnapshot.snapshotHash,
+    reportFactsHash: canonicalHash({
+      identity: reportFacts.identity,
+      provenance: reportFacts.provenance,
+      enginePayload: reportFacts.enginePayload,
+      quality: reportFacts.quality,
+    }),
+    aggregateInputHash: recomputedAggregateHash,
+    analysisInstanceId,
   }
 
   const safetyTriggered = input.safetyTriggered === true
   return {
     ok: true,
-    request,
+    request: {
+      ...request,
+      aggregateInputHash: recomputedAggregateHash,
+      analysisInstanceId,
+    },
     newSnapshot,
     priorSnapshotHash: input.priorSnapshot?.snapshotHash ?? null,
+    reportFacts,
+    engineResult,
+    aggregateInputHash: recomputedAggregateHash,
+    history,
     safetyTriggered,
     openNewSafetyCase: safetyTriggered,
   }

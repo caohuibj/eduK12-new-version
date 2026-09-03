@@ -229,6 +229,11 @@ export const revokeInstrumentAuthorization = (input: {
   }
 }
 
+/**
+ * Attach evidence bytes (sha256 from StoredAsset — never trust client-declared hash alone).
+ * - EVIDENCE_PENDING → first attach on same version OK → APPROVED
+ * - post-APPROVED evidence change → mint a NEW authorization version (append-only)
+ */
 export const attachAuthorizationEvidence = (input: {
   record: InstrumentAuthorizationRecordV1
   evidenceAssetId: string
@@ -238,12 +243,48 @@ export const attachAuthorizationEvidence = (input: {
 }): {
   record: InstrumentAuthorizationRecordV1
   audit: InstrumentAuthorizationAuditEventV1
+  mintedNewVersion: boolean
 } => {
   const current = validateInstrumentAuthorizationRecord(input.record)
   if (!HEX.test(input.evidenceSha256)) {
     authorizationFail('AUTH_EVIDENCE_INVALID', 'evidenceSha256 必须是 64 hex')
   }
   const now = input.now ?? new Date().toISOString()
+
+  // Post-APPROVED evidence replacement must mint a new version.
+  if (
+    current.status === 'APPROVED'
+    && current.evidenceAssetId
+    && (
+      current.evidenceAssetId !== input.evidenceAssetId
+      || current.evidenceSha256 !== input.evidenceSha256
+    )
+  ) {
+    const next = validateInstrumentAuthorizationRecord({
+      ...current,
+      version: current.version + 1,
+      evidenceAssetId: input.evidenceAssetId,
+      evidenceSha256: input.evidenceSha256,
+      status: 'APPROVED',
+      updatedAt: now,
+    })
+    return {
+      record: next,
+      audit: appendAudit(
+        next,
+        'ATTACH_EVIDENCE',
+        input.actorUserId,
+        `evidence replaced — minted v${next.version} from v${current.version}`,
+        now,
+      ),
+      mintedNewVersion: true,
+    }
+  }
+
+  if (current.status !== 'EVIDENCE_PENDING' && current.status !== 'APPROVED' && current.status !== 'DRAFT') {
+    authorizationFail('AUTH_STATE', `cannot attach evidence in status ${current.status}`)
+  }
+
   const nextStatus: InstrumentAuthorizationStatusV1 = (
     current.status === 'EVIDENCE_PENDING' || current.status === 'APPROVED'
       ? 'APPROVED'
@@ -259,6 +300,7 @@ export const attachAuthorizationEvidence = (input: {
   return {
     record: next,
     audit: appendAudit(next, 'ATTACH_EVIDENCE', input.actorUserId, 'evidence attached', now),
+    mintedNewVersion: false,
   }
 }
 

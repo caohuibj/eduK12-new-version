@@ -5,14 +5,17 @@ import {
   applySafetyWakeup,
   assertCanViewSafetyCase,
   assertReanalysisDoesNotAutoClose,
+  buildSafetyIdempotencyKey,
   buildTestOnlyAuthoritativeTrigger,
   buildTestOnlySafetyPolicy,
   createSafetyCaseAtomic,
   createSafetyPolicyDraft,
   disposeSafetyCase,
   evaluateSafetyTrigger,
+  processSafetyWakeupDelivery,
   projectSafetyStaffView,
   projectSafetySubjectGuidance,
+  rescheduleSafetyWakeupsAfterRestart,
   scheduleSafetyWakeups,
 } from '../../modules/assessment-safety'
 
@@ -29,13 +32,14 @@ const failCode = (run: () => unknown): string => {
   }
 }
 
-describe('SafetyCase policy / case / wakeup', () => {
+describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
   it('creates atomically and is idempotent on duplicate complete', () => {
     const policy = buildTestOnlySafetyPolicy()
     const trigger = evaluateSafetyTrigger({
       policy,
       sourceKind: 'BUNDLE_REPORT_FACTS',
       sourceHash: HASH,
+      sourceRecordId: 'snap-1',
       authoritativeSafetySignal: false,
       testFixtureForceTrigger: true,
     })
@@ -48,9 +52,16 @@ describe('SafetyCase policy / case / wakeup', () => {
       primaryOwnerUserId: 'teacher-1',
       backupOwnerUserIds: ['teacher-2'],
       actorUserId: 'system:finalizer',
+      now: '2026-09-03T06:00:00.000Z',
     })
     expect(first.created).toBe(true)
     expect(first.safetyCase.status).toBe('OPEN')
+    expect(first.safetyCase.ackDueAt).toBe(
+      new Date(Date.parse('2026-09-03T06:00:00.000Z') + policy.acknowledgeWithinMs).toISOString(),
+    )
+    expect(first.safetyCase.disposeDueAt).toBe(
+      new Date(Date.parse('2026-09-03T06:00:00.000Z') + policy.disposeWithinMs).toISOString(),
+    )
 
     const second = createSafetyCaseAtomic({
       policy,
@@ -76,7 +87,6 @@ describe('SafetyCase policy / case / wakeup', () => {
       notes: ['WHO-5 low score'],
     })).toBeNull()
 
-    // Non-test policy with productionTriggerEnabled=false never fires.
     const prodDraft = createSafetyPolicyDraft({
       policyKey: 'prod_noop',
       policyVersion: '1.0.0',
@@ -122,59 +132,205 @@ describe('SafetyCase policy / case / wakeup', () => {
     expect(guidance.caseVisible).toBe(false)
   })
 
-  it('supports confirm / dispose / escalate wakeups without auto-closing on reanalysis', () => {
+  it('schedules from persisted deadlines and restart does not drift SLA start', () => {
     const policy = buildTestOnlySafetyPolicy()
-    const trigger = buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH })
     const created = createSafetyCaseAtomic({
       policy,
-      trigger,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: ['teacher-2'],
+      actorUserId: 'system',
+      now: '2026-09-03T06:00:00.000Z',
+    })
+    const scheduled = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    expect(scheduled.jobs).toHaveLength(2)
+    expect(scheduled.payloads.every((p) => {
+      const keys = Object.keys(p).sort().join(',')
+      return keys === 'caseId,kind,wakeupJobId'
+    })).toBe(true)
+    expect(scheduled.jobs[0]!.fireAt).toBe(created.safetyCase.ackDueAt)
+    expect(scheduled.jobs[1]!.fireAt).toBe(created.safetyCase.disposeDueAt)
+
+    const restarted = rescheduleSafetyWakeupsAfterRestart({
+      safetyCase: created.safetyCase,
+      policy,
+      now: '2026-09-03T10:00:00.000Z', // much later — must not slide
+    })
+    expect(restarted.jobs[0]!.fireAt).toBe(created.safetyCase.ackDueAt)
+    expect(restarted.jobs[1]!.fireAt).toBe(created.safetyCase.disposeDueAt)
+  })
+
+  it('duplicate Bull delivery no-ops; ACK/DISPOSE before fire cancel escalation', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const created = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH }),
       subjectUserId: 'student-1',
       primaryOwnerUserId: 'teacher-1',
       backupOwnerUserIds: ['teacher-2'],
       actorUserId: 'system',
     })
-    const jobs = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
-    expect(jobs).toHaveLength(2)
+    const { payloads } = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    const ackPayload = payloads[0]!
 
-    const acked = acknowledgeSafetyCase({
+    // Early fire while still OPEN → escalate
+    const first = applySafetyWakeup({
       safetyCase: created.safetyCase,
-      actorUserId: 'teacher-1',
-      note: 'seen',
+      payload: ackPayload,
     })
+    expect(first.event?.type).toBe('ESCALATED')
+    expect(first.safetyCase.status).toBe('ESCALATED')
+
+    // Duplicate delivery of same wakeupJobId → no-op
+    const dup = applySafetyWakeup({
+      safetyCase: first.safetyCase,
+      payload: ackPayload,
+      existingLedger: first.ledger,
+      priorEscalationForJob: first.event,
+    })
+    expect(dup.event).toBeNull()
+    expect(dup.job.status).toBe('DUPLICATE_NOOP')
+
+    // ACK after enqueue before fire
+    const created2 = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_B, sourceRecordId: 'snap-2' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: ['teacher-2'],
+      actorUserId: 'system',
+    })
+    const scheduled2 = scheduleSafetyWakeups({ safetyCase: created2.safetyCase, policy })
+    const acked = acknowledgeSafetyCase({
+      safetyCase: created2.safetyCase,
+      actorUserId: 'teacher-1',
+      note: 'seen before fire',
+    })
+    const ackNoop = applySafetyWakeup({
+      safetyCase: acked.safetyCase,
+      payload: scheduled2.payloads[0]!,
+    })
+    expect(ackNoop.event).toBeNull()
     expect(acked.safetyCase.status).toBe('ACKNOWLEDGED')
 
-    const wakeupNoop = applySafetyWakeup({
-      safetyCase: acked.safetyCase,
-      job: jobs[0]!,
-    })
-    expect(wakeupNoop.event).toBeNull()
-
-    const disposed = disposeSafetyCase({
-      safetyCase: acked.safetyCase,
-      actorUserId: 'teacher-1',
-      note: 'resolved with school counselor',
-    })
-    expect(disposed.safetyCase.status).toBe('DISPOSED')
-
-    // New reanalysis trigger → new case; old remains DISPOSED.
-    const priorStatus = assertReanalysisDoesNotAutoClose({
-      priorCase: disposed.safetyCase,
-      newAnalysisTriggered: true,
-    })
-    expect(priorStatus).toBe('DISPOSED')
-
-    const reanalysis = createSafetyCaseAtomic({
+    // DISPOSE before fire
+    const created3 = createSafetyCaseAtomic({
       policy,
-      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_B }),
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_B, sourceRecordId: 'snap-3' }),
       subjectUserId: 'student-1',
       primaryOwnerUserId: 'teacher-1',
       backupOwnerUserIds: ['teacher-2'],
       actorUserId: 'system',
-      priorCaseId: disposed.safetyCase.caseId,
+    })
+    const scheduled3 = scheduleSafetyWakeups({ safetyCase: created3.safetyCase, policy })
+    const disposed = disposeSafetyCase({
+      safetyCase: created3.safetyCase,
+      actorUserId: 'teacher-1',
+      note: 'resolved before fire',
+    })
+    const disposeNoop = applySafetyWakeup({
+      safetyCase: disposed.safetyCase,
+      payload: scheduled3.payloads[1]!,
+    })
+    expect(disposeNoop.event).toBeNull()
+    expect(disposeNoop.job.status).toBe('CANCELLED')
+  })
+
+  it('same-hash reanalysis opens new case; cross-subject uniqueness holds', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const keyA = buildSafetyIdempotencyKey({
+      subjectUserId: 'student-1',
+      sourceKind: 'BUNDLE_REPORT_FACTS',
+      sourceHash: HASH,
+      sourceRecordId: 'analysis-1',
+      policyKey: policy.policyKey,
+      policyVersion: policy.policyVersion,
+    })
+    const keyReanalysis = buildSafetyIdempotencyKey({
+      subjectUserId: 'student-1',
+      sourceKind: 'BUNDLE_REPORT_FACTS',
+      sourceHash: HASH, // same hash
+      sourceRecordId: 'analysis-2', // different instance
+      policyKey: policy.policyKey,
+      policyVersion: policy.policyVersion,
+    })
+    const keyOtherSubject = buildSafetyIdempotencyKey({
+      subjectUserId: 'student-2',
+      sourceKind: 'BUNDLE_REPORT_FACTS',
+      sourceHash: HASH,
+      sourceRecordId: 'analysis-1',
+      policyKey: policy.policyKey,
+      policyVersion: policy.policyVersion,
+    })
+    expect(keyA).not.toBe(keyReanalysis)
+    expect(keyA).not.toBe(keyOtherSubject)
+
+    const first = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'analysis-1' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+    })
+    const reanalysis = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'analysis-2' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+      priorCaseId: first.safetyCase.caseId,
     })
     expect(reanalysis.created).toBe(true)
-    expect(reanalysis.safetyCase.caseId).not.toBe(disposed.safetyCase.caseId)
-    expect(reanalysis.safetyCase.priorCaseId).toBe(disposed.safetyCase.caseId)
-    expect(disposed.safetyCase.status).toBe('DISPOSED')
+    expect(reanalysis.safetyCase.caseId).not.toBe(first.safetyCase.caseId)
+    expect(assertReanalysisDoesNotAutoClose({
+      priorCase: first.safetyCase,
+      newAnalysisTriggered: true,
+    })).toBe('OPEN')
+
+    const other = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'analysis-1' }),
+      subjectUserId: 'student-2',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+    })
+    expect(other.created).toBe(true)
+    expect(other.safetyCase.idempotencyKey).not.toBe(first.safetyCase.idempotencyKey)
+  })
+
+  it('worker process rejects non-ID payloads and loads case by id', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const created = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+    })
+    const { payloads } = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    const store = new Map([[created.safetyCase.caseId, created.safetyCase]])
+    const result = processSafetyWakeupDelivery({
+      loadCase: (id) => store.get(id) ?? null,
+      loadLedger: () => null,
+      loadPriorEscalation: () => null,
+      payload: payloads[0]!,
+    })
+    expect(result.applied?.event?.type).toBe('ESCALATED')
+
+    expect(failCode(() => processSafetyWakeupDelivery({
+      loadCase: () => created.safetyCase,
+      loadLedger: () => null,
+      loadPriorEscalation: () => null,
+      payload: {
+        ...payloads[0]!,
+        // @ts-expect-error intentional smuggle
+        safetyCase: created.safetyCase,
+      } as never,
+    }))).toBe('SAFETY_INPUT')
   })
 })

@@ -29,6 +29,19 @@ const appendEvent = (
   wakeupJobId,
 })
 
+export const computeSafetyDeadlines = (input: {
+  createdAt: string
+  acknowledgeWithinMs: number
+  disposeWithinMs: number
+}): { ackDueAt: string; disposeDueAt: string } => {
+  const createdMs = Date.parse(input.createdAt)
+  if (!Number.isFinite(createdMs)) safetyFail('SAFETY_DATETIME', 'createdAt must be UTC ISO')
+  return {
+    ackDueAt: new Date(createdMs + input.acknowledgeWithinMs).toISOString(),
+    disposeDueAt: new Date(createdMs + input.disposeWithinMs).toISOString(),
+  }
+}
+
 export const assertCanViewSafetyCase = (input: {
   safetyCase: SafetyCaseRecordV1
   viewerUserId: string
@@ -45,6 +58,8 @@ export const assertCanViewSafetyCase = (input: {
 
 /**
  * Atomic case create. Duplicate complete (same idempotency key) returns existing case.
+ * Idempotency includes subject + sourceRecordId so same-hash reanalysis / cross-subject
+ * invocations do not collide.
  */
 export const createSafetyCaseAtomic = (input: {
   policy: SafetyPolicyTemplateV1
@@ -68,8 +83,10 @@ export const createSafetyCaseAtomic = (input: {
   if (!ISO.test(now)) safetyFail('SAFETY_DATETIME', 'now must be UTC ISO')
 
   const idempotencyKey = buildSafetyIdempotencyKey({
+    subjectUserId: input.subjectUserId,
     sourceKind: input.trigger.sourceKind,
     sourceHash: input.trigger.sourceHash,
+    sourceRecordId: input.trigger.sourceRecordId,
     policyKey: policy.policyKey,
     policyVersion: policy.policyVersion,
   })
@@ -91,6 +108,12 @@ export const createSafetyCaseAtomic = (input: {
     }
   }
 
+  const deadlines = computeSafetyDeadlines({
+    createdAt: now,
+    acknowledgeWithinMs: policy.acknowledgeWithinMs,
+    disposeWithinMs: policy.disposeWithinMs,
+  })
+
   const safetyCase: SafetyCaseRecordV1 = {
     schemaVersion: 1,
     caseId: newSafetyId(),
@@ -100,12 +123,18 @@ export const createSafetyCaseAtomic = (input: {
     subjectUserId: input.subjectUserId,
     primaryOwnerUserId: owners.primaryOwnerUserId,
     backupOwnerUserIds: owners.backupOwnerUserIds,
-    trigger: { ...input.trigger, notes: [...input.trigger.notes] },
+    trigger: {
+      ...input.trigger,
+      notes: [...input.trigger.notes],
+      sourceRecordId: input.trigger.sourceRecordId ?? null,
+    },
     idempotencyKey,
     createdAt: now,
     updatedAt: now,
     acknowledgedAt: null,
     disposedAt: null,
+    ackDueAt: deadlines.ackDueAt,
+    disposeDueAt: deadlines.disposeDueAt,
     priorCaseId: input.priorCaseId ?? null,
   }
   return {
@@ -221,7 +250,6 @@ export const assertReanalysisDoesNotAutoClose = (input: {
   priorCase: SafetyCaseRecordV1
   newAnalysisTriggered: boolean
 }): SafetyCaseStatusV1 => {
-  // Explicit no-op on prior status.
   void input.newAnalysisTriggered
   return input.priorCase.status
 }

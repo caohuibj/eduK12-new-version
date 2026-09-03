@@ -7,13 +7,20 @@ import {
   hashBundleContextDefinition,
   projectBundleCognitiveSource,
   projectBundleScaleSource,
+  validateBundleContextDefinition,
 } from '../../modules/assessment-bundle'
 import {
   ReanalysisContractError,
   assertNoRawReanalysisInput,
+  computeReanalysisAggregateInputHash,
   runExplicitBundleReanalysis,
 } from '../../modules/assessment-reanalysis'
-import { assertReanalysisDoesNotAutoClose, buildTestOnlySafetyPolicy, buildTestOnlyAuthoritativeTrigger, createSafetyCaseAtomic } from '../../modules/assessment-safety'
+import {
+  assertReanalysisDoesNotAutoClose,
+  buildTestOnlySafetyPolicy,
+  buildTestOnlyAuthoritativeTrigger,
+  createSafetyCaseAtomic,
+} from '../../modules/assessment-safety'
 
 const HASH_A = 'a'.repeat(64)
 const HASH_B = 'b'.repeat(64)
@@ -99,58 +106,71 @@ const scaleResult = () => ({
   disclaimer: 'fixture',
 })
 
-describe('explicit Bundle reanalysis by target version', () => {
-  it('builds a new snapshot from frozen sources + Context and never reads raw', () => {
+const frozenSources = () => ({
+  cognitive: [
+    projectBundleCognitiveSource({
+      slotKey: 'gonogo',
+      expectedInstrumentKey: 'gonogo',
+      expectedInstrumentVersion: '1.0.0',
+      result: cognitiveResult({ commissionRate: 0.1, dPrime: 2.0 }),
+    }),
+  ],
+  scale: [
+    projectBundleScaleSource({
+      slotKey: 'adexi',
+      expectedInstrumentKey: 'adexi_v1',
+      expectedInstrumentVersion: '2.0.0',
+      result: scaleResult(),
+    }),
+  ],
+})
+
+const contextFacts = () => buildBundleContextFacts({
+  contextDefinitionKey: 'integrated-adult-age-v1',
+  contextDefinitionVersion: '1.0.0',
+  contextDefinitionHash: hashBundleContextDefinition(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1),
+  frozenAt: '2026-09-02T12:00:00.000Z',
+  facts: [{ contextKey: 'subject_age_years', value: { state: 'present', value: 22 } }],
+})
+
+const resolveTarget = (key: string, version: string) => (
+  key === INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1.bundleKey
+  && version === INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1.bundleVersion
+    ? INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1
+    : null
+)
+
+const resolveContext = (key: string, version: string) => (
+  key === 'integrated-adult-age-v1' && version === '1.0.0'
+    ? INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1
+    : null
+)
+
+describe('explicit Bundle reanalysis by target version (Prep 15.1)', () => {
+  it('dispatches registry, regenerates ReportFacts, and never reads raw', () => {
     expect(failCode(() => assertNoRawReanalysisInput({ rawAnswers: { a: 1 } }))).toBe('REANALYSIS_FORBIDDEN')
 
     const prior = buildFrozenAssessmentBundleSnapshot(
       INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
       { contextDefinition: INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1 },
     )
-    const contextFacts = buildBundleContextFacts({
-      contextDefinitionKey: 'integrated-adult-age-v1',
-      contextDefinitionVersion: '1.0.0',
-      contextDefinitionHash: hashBundleContextDefinition(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1),
-      frozenAt: '2026-09-02T12:00:00.000Z',
-      facts: [{ contextKey: 'subject_age_years', value: { state: 'present', value: 22 } }],
-    })
+    const sources = frozenSources()
+    const facts = contextFacts()
 
     const result = runExplicitBundleReanalysis({
       request: {
         schemaVersion: 1,
         targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
         targetBundleVersion: '1.0.0',
-        frozenCognitiveSources: [
-          projectBundleCognitiveSource({
-            slotKey: 'gonogo',
-            expectedInstrumentKey: 'gonogo',
-            expectedInstrumentVersion: '1.0.0',
-            result: cognitiveResult({ commissionRate: 0.1, dPrime: 2.0 }),
-          }),
-        ],
-        frozenScaleSources: [
-          projectBundleScaleSource({
-            slotKey: 'adexi',
-            expectedInstrumentKey: 'adexi_v1',
-            expectedInstrumentVersion: '2.0.0',
-            result: scaleResult(),
-          }),
-        ],
-        frozenContextFacts: contextFacts,
-        aggregateInputHash: HASH_A,
+        frozenCognitiveSources: sources.cognitive,
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: facts,
+        aggregateInputHash: null,
         actorUserId: 'admin-1',
+        analysisInstanceId: 'analysis-1',
       },
-      resolveTargetDefinition: (key, version) => (
-        key === INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1.bundleKey
-        && version === INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1.bundleVersion
-          ? INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1
-          : null
-      ),
-      resolveContextDefinition: (key, version) => (
-        key === 'integrated-adult-age-v1' && version === '1.0.0'
-          ? INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1
-          : null
-      ),
+      resolveTargetDefinition: resolveTarget,
+      resolveContextDefinition: resolveContext,
       priorSnapshot: prior,
       safetyTriggered: false,
     })
@@ -159,10 +179,18 @@ describe('explicit Bundle reanalysis by target version', () => {
     if (!result.ok) return
     expect(result.newSnapshot.bundleKey).toBe(prior.bundleKey)
     expect(result.newSnapshot).not.toBe(prior)
+    expect(result.reportFacts.identity.snapshotHash).toBe(result.newSnapshot.snapshotHash)
+    expect(result.reportFacts.provenance.aggregateInputHash).toBe(result.aggregateInputHash)
+    expect(result.history.historyId).toBeTruthy()
+    expect(result.history.newSnapshotHash).toBe(result.newSnapshot.snapshotHash)
     expect(result.openNewSafetyCase).toBe(false)
+    expect(HEX_OK(result.aggregateInputHash)).toBe(true)
   })
 
-  it('rejects missing required Context and opens a new SafetyCase on reanalysis trigger', () => {
+  it('rejects missing / duplicate / unknown / incompatible slots and empty sources', () => {
+    const facts = contextFacts()
+    const sources = frozenSources()
+
     const missing = runExplicitBundleReanalysis({
       request: {
         schemaVersion: 1,
@@ -170,7 +198,7 @@ describe('explicit Bundle reanalysis by target version', () => {
         targetBundleVersion: '1.0.0',
         frozenCognitiveSources: [],
         frozenScaleSources: [],
-        frozenContextFacts: null,
+        frozenContextFacts: facts,
         aggregateInputHash: null,
         actorUserId: 'admin-1',
       },
@@ -178,48 +206,130 @@ describe('explicit Bundle reanalysis by target version', () => {
       resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
     })
     expect(missing.ok).toBe(false)
-    if (missing.ok) return
-    expect(missing.reason).toBe('MISSING_REQUIRED_CONTEXT')
+    if (!missing.ok) expect(missing.reason).toBe('MISSING_REQUIRED_SOURCE')
+
+    const duplicate = runExplicitBundleReanalysis({
+      request: {
+        schemaVersion: 1,
+        targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
+        targetBundleVersion: '1.0.0',
+        frozenCognitiveSources: [...sources.cognitive, ...sources.cognitive],
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: facts,
+        aggregateInputHash: null,
+        actorUserId: 'admin-1',
+      },
+      resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+      resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
+    })
+    expect(duplicate.ok).toBe(false)
+    if (!duplicate.ok) expect(duplicate.reason).toBe('DUPLICATE_SOURCE_SLOT')
+
+    const unknown = runExplicitBundleReanalysis({
+      request: {
+        schemaVersion: 1,
+        targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
+        targetBundleVersion: '1.0.0',
+        frozenCognitiveSources: [
+          ...sources.cognitive,
+          { ...sources.cognitive[0]!, slotKey: 'extra-unknown' },
+        ],
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: facts,
+        aggregateInputHash: null,
+        actorUserId: 'admin-1',
+      },
+      resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+      resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
+    })
+    expect(unknown.ok).toBe(false)
+    if (!unknown.ok) expect(unknown.reason).toBe('UNKNOWN_SOURCE_SLOT')
+
+    const incompatible = runExplicitBundleReanalysis({
+      request: {
+        schemaVersion: 1,
+        targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
+        targetBundleVersion: '1.0.0',
+        frozenCognitiveSources: [
+          { ...sources.cognitive[0]!, instrumentVersion: '9.9.9' },
+        ],
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: facts,
+        aggregateInputHash: null,
+        actorUserId: 'admin-1',
+      },
+      resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+      resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
+    })
+    expect(incompatible.ok).toBe(false)
+    if (!incompatible.ok) expect(incompatible.reason).toBe('INCOMPATIBLE_SOURCE_VERSION')
+  })
+
+  it('rejects same-version different context hash and opens new SafetyCase on trigger', () => {
+    const sources = frozenSources()
+    const validated = validateBundleContextDefinition(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1)
+    const wrongHashFacts = buildBundleContextFacts({
+      contextDefinitionKey: validated.contextDefinitionKey,
+      contextDefinitionVersion: validated.contextDefinitionVersion,
+      contextDefinitionHash: HASH_B, // same key@version, different hash
+      frozenAt: '2026-09-02T12:00:00.000Z',
+      facts: [{ contextKey: 'subject_age_years', value: { state: 'present', value: 22 } }],
+    })
+
+    const mismatch = runExplicitBundleReanalysis({
+      request: {
+        schemaVersion: 1,
+        targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
+        targetBundleVersion: '1.0.0',
+        frozenCognitiveSources: sources.cognitive,
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: wrongHashFacts,
+        aggregateInputHash: null,
+        actorUserId: 'admin-1',
+      },
+      resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+      resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
+    })
+    expect(mismatch.ok).toBe(false)
+    if (!mismatch.ok) expect(mismatch.reason).toBe('CONTEXT_DEFINITION_MISMATCH')
 
     const policy = buildTestOnlySafetyPolicy()
     const priorCase = createSafetyCaseAtomic({
       policy,
-      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_A }),
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_A, sourceRecordId: 'prior-1' }),
       subjectUserId: 'student-1',
       primaryOwnerUserId: 'teacher-1',
       backupOwnerUserIds: [],
       actorUserId: 'system',
     }).safetyCase
 
-    const contextFacts = buildBundleContextFacts({
-      contextDefinitionKey: 'integrated-adult-age-v1',
-      contextDefinitionVersion: '1.0.0',
-      contextDefinitionHash: hashBundleContextDefinition(INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1),
-      frozenAt: '2026-09-02T12:00:00.000Z',
-      facts: [{ contextKey: 'subject_age_years', value: { state: 'present', value: 30 } }],
-    })
-    const result = runExplicitBundleReanalysis({
+    const ok = runExplicitBundleReanalysis({
       request: {
         schemaVersion: 1,
         targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
         targetBundleVersion: '1.0.0',
-        frozenCognitiveSources: [],
-        frozenScaleSources: [],
-        frozenContextFacts: contextFacts,
-        aggregateInputHash: HASH_B,
+        frozenCognitiveSources: sources.cognitive,
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: contextFacts(),
+        aggregateInputHash: null,
         actorUserId: 'admin-1',
+        analysisInstanceId: 'reanalysis-2',
       },
       resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
       resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
       safetyTriggered: true,
     })
-    expect(result.ok).toBe(true)
-    if (!result.ok) return
-    expect(result.openNewSafetyCase).toBe(true)
+    expect(ok.ok).toBe(true)
+    if (!ok.ok) return
+    expect(ok.openNewSafetyCase).toBe(true)
+    expect(ok.history.analysisInstanceId).toBe('reanalysis-2')
 
     const newCase = createSafetyCaseAtomic({
       policy,
-      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH_B }),
+      trigger: buildTestOnlyAuthoritativeTrigger({
+        sourceHash: HASH_A, // same content hash
+        sourceRecordId: 'reanalysis-2',
+      }),
       subjectUserId: 'student-1',
       primaryOwnerUserId: 'teacher-1',
       backupOwnerUserIds: [],
@@ -231,5 +341,30 @@ describe('explicit Bundle reanalysis by target version', () => {
       newAnalysisTriggered: true,
     })).toBe('OPEN')
     expect(newCase.safetyCase.caseId).not.toBe(priorCase.caseId)
+    expect(newCase.safetyCase.idempotencyKey).not.toBe(priorCase.idempotencyKey)
+  })
+
+  it('rejects mismatched caller aggregateInputHash', () => {
+    const sources = frozenSources()
+    const bad = runExplicitBundleReanalysis({
+      request: {
+        schemaVersion: 1,
+        targetBundleKey: 'integrated_gonogo_adexi_adult_zh_cn_v1',
+        targetBundleVersion: '1.0.0',
+        frozenCognitiveSources: sources.cognitive,
+        frozenScaleSources: sources.scale,
+        frozenContextFacts: contextFacts(),
+        aggregateInputHash: HASH_A,
+        actorUserId: 'admin-1',
+      },
+      resolveTargetDefinition: () => INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+      resolveContextDefinition: () => INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1,
+    })
+    expect(bad.ok).toBe(false)
+    if (!bad.ok) expect(bad.reason).toBe('AGGREGATE_INPUT_HASH_MISMATCH')
   })
 })
+
+const HEX_OK = (value: string): boolean => /^[0-9a-f]{64}$/.test(value)
+
+void computeReanalysisAggregateInputHash

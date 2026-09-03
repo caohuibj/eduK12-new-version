@@ -12,6 +12,9 @@ import {
   projectObserverForViewer,
   teacherAssignObserverToParent,
   teacherSelfReportObserver,
+  assertTeacherAssignedConsentAcceptedForAttempt,
+  canStartTeacherAssignedObserverAttempt,
+  canFinalSubmitTeacherAssignedObserverAttempt,
   type ObserverBundleCatalogEntryV1,
 } from '../../modules/assessment-observer'
 import {
@@ -261,4 +264,39 @@ describe('observer assignment / self-serve / share / projection', () => {
       consentVersion: 'share-v1',
     }))).toBe('OBSERVER_SHARE')
   })
+
+  it('pending teacher-assigned consent gates attempt start / FINAL submit', () => {
+    const relationship = activeRelationship()
+    const assigned = teacherAssignObserverToParent({
+      catalogEntry: parentCatalog,
+      teacherUserId: 'teacher-1',
+      teacherRole: 'TEACHER',
+      courseId: 'course-1',
+      courseCreatorUserId: 'teacher-1',
+      subjectUserId: 'student-1',
+      subjectOnRoster: true,
+      parentUserId: 'parent-1',
+      relationship,
+      consentVersion: 'attempt-v1',
+    })
+    expect(assigned.consentRequired.acceptedAt).toBeNull()
+    expect(canStartTeacherAssignedObserverAttempt(assigned.consentRequired)).toBe(false)
+    expect(canFinalSubmitTeacherAssignedObserverAttempt(assigned.consentRequired)).toBe(false)
+    expect(failCode(() => assertTeacherAssignedConsentAcceptedForAttempt({
+      consent: assigned.consentRequired,
+      action: 'START',
+    }))).toBe('OBSERVER_CONSENT_PENDING')
+    expect(failCode(() => assertTeacherAssignedConsentAcceptedForAttempt({
+      consent: assigned.consentRequired,
+      action: 'FINAL_SUBMIT',
+    }))).toBe('OBSERVER_CONSENT_PENDING')
+
+    const accepted = parentAcceptTeacherAssignedConsent({
+      consentRequired: assigned.consentRequired,
+      parentUserId: 'parent-1',
+    })
+    expect(canStartTeacherAssignedObserverAttempt(accepted)).toBe(true)
+    expect(canFinalSubmitTeacherAssignedObserverAttempt(accepted)).toBe(true)
+  })
+
 })

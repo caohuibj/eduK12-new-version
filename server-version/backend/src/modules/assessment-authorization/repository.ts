@@ -337,10 +337,11 @@ export class PrismaAuthorizationRepository {
   async attachEvidence(input: {
     authorizationId: string
     evidenceAssetId: string
-    evidenceSha256: string
+    /** Optional client-declared hash — must match StoredAsset.sha256 when provided. */
+    evidenceSha256?: string
     actorUserId: string
     now?: string
-  }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
+  }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1; mintedNewVersion: boolean }> {
     return this.prisma.$transaction(async (tx) => {
       const currentRow = await tx.instrumentAuthorization.findFirst({
         where: { authorizationKey: input.authorizationId },
@@ -349,13 +350,28 @@ export class PrismaAuthorizationRepository {
       if (!currentRow) {
         return authorizationFail('AUTH_STATE', 'authorization not found')
       }
+      const asset = await tx.storedAsset.findUnique({ where: { id: input.evidenceAssetId } })
+      if (!asset || asset.deletedAt) {
+        return authorizationFail('AUTH_EVIDENCE_INVALID', 'StoredAsset not found for evidence')
+      }
+      // Authoritative hash is from StoredAsset — reject client-declared mismatch.
+      if (input.evidenceSha256 && input.evidenceSha256 !== asset.sha256) {
+        return authorizationFail('AUTH_EVIDENCE_INVALID', 'client-declared evidenceSha256 does not match StoredAsset.sha256')
+      }
       const attached = attachAuthorizationEvidence({
         record: rowToDomain(currentRow),
         evidenceAssetId: input.evidenceAssetId,
-        evidenceSha256: input.evidenceSha256,
+        evidenceSha256: asset.sha256,
         actorUserId: input.actorUserId,
         now: input.now,
       })
+      if (attached.mintedNewVersion) {
+        const created = await tx.instrumentAuthorization.create({
+          data: domainToCreateData(attached.record, randomUUID()),
+        })
+        await appendAuditRow(tx, attached.audit, created.id)
+        return { record: rowToDomain(created), audit: attached.audit, mintedNewVersion: true }
+      }
       const updated = await tx.instrumentAuthorization.update({
         where: { id: currentRow.id },
         data: {
@@ -367,7 +383,7 @@ export class PrismaAuthorizationRepository {
         },
       })
       await appendAuditRow(tx, attached.audit, updated.id)
-      return { record: rowToDomain(updated), audit: attached.audit }
+      return { record: rowToDomain(updated), audit: attached.audit, mintedNewVersion: false }
     })
   }
 }

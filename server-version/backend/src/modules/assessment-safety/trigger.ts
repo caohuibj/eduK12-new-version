@@ -20,6 +20,8 @@ export const evaluateSafetyTrigger = (input: {
   sourceHash: string
   bundleKey?: string | null
   bundleVersion?: string | null
+  /** Required for subject/analysis uniqueness — e.g. analysisSnapshotId / sourceRecordId. */
+  sourceRecordId?: string | null
   /** From BundleReportFacts Evidence.role=SAFETY or engine SAFETY_ESCALATION — not raw. */
   authoritativeSafetySignal: boolean
   /** Explicit test-only fixture flag. */
@@ -48,6 +50,7 @@ export const evaluateSafetyTrigger = (input: {
     sourceHash: input.sourceHash,
     bundleKey: input.bundleKey ?? null,
     bundleVersion: input.bundleVersion ?? null,
+    sourceRecordId: input.sourceRecordId?.trim() || null,
     safetyFlag: true,
     notes: [
       ...(input.notes ?? []),
@@ -56,9 +59,26 @@ export const evaluateSafetyTrigger = (input: {
   }
 }
 
+/**
+ * Idempotency must include subject + analysis-instance identity so that:
+ * - same content hash across different subjects does not collide
+ * - same hash reanalysis with a different analysisSnapshotId opens a NEW case
+ */
 export const buildSafetyIdempotencyKey = (input: {
+  subjectUserId: string
   sourceKind: SafetyTriggerSourceKindV1
   sourceHash: string
+  sourceRecordId: string | null | undefined
   policyKey: string
   policyVersion: string
-}): string => `${input.sourceKind}:${input.sourceHash}:${input.policyKey}@${input.policyVersion}`
+}): string => {
+  if (!input.subjectUserId.trim()) safetyFail('SAFETY_INPUT', 'subjectUserId required for idempotency')
+  const recordId = input.sourceRecordId?.trim() || 'missing-source-record'
+  return [
+    `subject:${input.subjectUserId}`,
+    input.sourceKind,
+    input.sourceHash,
+    `record:${recordId}`,
+    `${input.policyKey}@${input.policyVersion}`,
+  ].join('|')
+}

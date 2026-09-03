@@ -36,11 +36,13 @@ export const buildTestOnlyAuthoritativeTrigger = (input: {
   sourceHash: string
   bundleKey?: string
   bundleVersion?: string
+  sourceRecordId?: string | null
 }): SafetyTriggerSignalV1 => ({
   sourceKind: 'BUNDLE_REPORT_FACTS',
   sourceHash: input.sourceHash,
   bundleKey: input.bundleKey ?? 'test_only_safety_bundle_v1',
   bundleVersion: input.bundleVersion ?? '1.0.0',
+  sourceRecordId: input.sourceRecordId ?? 'test-source-record-1',
   safetyFlag: true,
   notes: ['test-only authoritative fixture signal — not a production Bundle'],
 })
