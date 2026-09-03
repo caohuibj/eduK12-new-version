@@ -44,6 +44,7 @@ import compositeRoutes from './modules/composite/composite.routes'
 import compositePublicRoutes from './modules/composite/composite.public.routes'
 import capabilitiesRoutes from './routes/capabilities'
 import materialGrantRoutes from './routes/materialGrants'
+import instrumentAuthorizationRoutes from './routes/instrumentAuthorizations'
 import assetRoutes, { publicAssetRouter } from './routes/assets'
 
 const app = express()
@@ -164,6 +165,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)
+app.use('/api/admin/instrument-authorizations', authenticate, requireAdmin, instrumentAuthorizationRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/assignments', assignmentRoutes)
 app.use('/api/checkins', checkinRoutes)
