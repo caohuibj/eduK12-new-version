@@ -1,6 +1,8 @@
-# Handoff：下周直接执行
+# Handoff：同机续作
 
-把本文整份贴进新对话即可开工。先读本文和同目录其它文档，不要重开 V3.2 性能工作，不要 cherry-pick 冻结分支。
+本文假设还能访问原来的本地仓库。若在**另一台只有 GitHub 的电脑**上开工，改用 [05-fresh-clone-handoff.md](./05-fresh-clone-handoff.md)，不要找 `/Users/Qiang` 或 `/tmp`。
+
+同机续作：把本文整份贴进新对话即可。不要重开 V3.2 性能工作，不要 cherry-pick 冻结分支。
 
 ## 0. 立刻要做的第一件事
 
@@ -41,7 +43,7 @@ git rev-parse --short HEAD origin/main
 - 禁止 `docker compose down -v` 作用于共享 runtime。不要删 `server-version_*` / `ptool-*` 持久卷。
 - DB 集成测试用隔离 PostgreSQL，不连 `ptool-postgres`。
 - 不发明生产 SLA；不扩 Prisma pool；不加 429 admission；不把 finalize 塞回 UNIT submit。
-- 禁止整分支 cherry-pick `feat/mental-health-bundle-v1`（本地冻结参考，未推远端）。
+- 禁止整分支 cherry-pick `feat/mental-health-bundle-v1`（远端只读参考分支 `origin/feat/mental-health-bundle-v1`，不要给它开 PR）。
 - 题目/翻译/评分规则不得编造；源文件没有就阻断该 package，不要假数据。
 - 不实现 History Engine、Cross-Informant 综合/平均分、实时 LLM、诊断。
 
