@@ -10,6 +10,7 @@ V3.2（PR41–45）只交付了 UNIFIED 作答 / 交卷 / 聚合底座。Bundle 
 | [01-gate-c-closeout.md](./01-gate-c-closeout.md) | Gate-C 测量与开新需求前的优化结论 |
 | [02-frozen-branch-inventory.md](./02-frozen-branch-inventory.md) | `feat/mental-health-bundle-v1` 的 REUSE/ADAPT/REIMPLEMENT/IGNORE |
 | [03-implementation-plan.md](./03-implementation-plan.md) | 本分支遵循的产品实施计划 |
+| [04-next-session-handoff.md](./04-next-session-handoff.md) | 下周执行：Commit 3 目标与剩余 commit 检验标准 |
 
 ## 固定约束
 
