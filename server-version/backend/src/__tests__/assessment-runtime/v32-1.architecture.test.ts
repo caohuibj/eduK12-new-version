@@ -61,7 +61,7 @@ describe('Unified runtime architecture boundaries', () => {
 
     const questionnaireSubmit = source('services/questionnaire-form-section.service.ts')
     const questionnaireBody = questionnaireSubmit.slice(
-      questionnaireSubmit.indexOf('const submitQuestionnaireFormSectionFinal'),
+      questionnaireSubmit.indexOf('const submitQuestionnaireFormSectionFinalImpl'),
       questionnaireSubmit.indexOf('export const submitQuestionnaireFormSectionFinalForUser'),
     )
     expect(questionnaireBody.indexOf('submitUnifiedQuestionnaireFormSectionFinal')).toBeGreaterThan(-1)
@@ -69,7 +69,7 @@ describe('Unified runtime architecture boundaries', () => {
       .toBeLessThan(questionnaireBody.indexOf('formSections:'))
 
     const compositeSubmit = source('modules/composite/final-submit.service.ts')
-    const compositeBody = compositeSubmit.slice(compositeSubmit.indexOf('export const submitCompositeFormSectionFinal'))
+    const compositeBody = compositeSubmit.slice(compositeSubmit.indexOf('const submitCompositeFormSectionFinalImpl'))
     expect(compositeBody.indexOf('submitUnifiedCompositeFormSectionFinal')).toBeGreaterThan(-1)
     expect(compositeBody.indexOf('submitUnifiedCompositeFormSectionFinal'))
       .toBeLessThan(compositeBody.indexOf('formSections:'))
@@ -83,5 +83,20 @@ describe('Unified runtime architecture boundaries', () => {
     expect(raw).toContain('.strict()')
     expect(security).toContain('isEncrypted')
     expect(security).not.toContain('safeDecrypt')
+  })
+
+  it('reconcile-once: terminal GET patches finalize result instead of rebuilding full state', () => {
+    const questionnaire = source('services/questionnaire-form-section.service.ts')
+    const composite = source('modules/composite/composite.service.ts')
+
+    expect(questionnaire).toMatch(/patchQuestionnaireStateAfterFinalize/)
+    expect(composite).toMatch(/patchCompositeStateAfterFinalize/)
+    // Must not reassign state from a second full unified projection after finalize.
+    expect(questionnaire).not.toMatch(
+      /finalizeQuestionnaireIfReady\([\s\S]{0,120}?state\s*=\s*await\s*getUnifiedQuestionnaireFinalAttemptState/,
+    )
+    expect(composite).not.toMatch(
+      /finalizeCompositeAttemptIfReady\([\s\S]{0,120}?state\s*=\s*await\s*getUnifiedCompositeAttemptState/,
+    )
   })
 })

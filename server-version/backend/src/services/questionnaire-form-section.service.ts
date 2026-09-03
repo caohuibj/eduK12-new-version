@@ -246,8 +246,6 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
                   instruction: true,
                   instrumentClass: true,
                   instrumentVersion: true,
-                  definition: true,
-                  definitionHash: true,
                 },
               },
             },
@@ -280,7 +278,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       },
       scaleAssessments: {
         orderBy: { startedAt: 'asc' },
-        select: { id: true, scaleId: true, status: true, progress: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+        select: { id: true, scaleId: true, status: true, progress: true },
       },
     },
   }) as any
@@ -365,16 +363,24 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
     await ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mapQuestionnaireSection(current.section))
   } else if (current?.type === 'SCALE') {
     const child = scaleMap.get(current.item.scaleId)
-    if (!child?.id || !child.runtimeSnapshotEncrypted) {
+    if (!child?.id) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
+    }
+    // Lazy current-unit projection: only the unfinished Scale loads its frozen runtime.
+    const runtimeChild = await prisma.assessment.findUnique({
+      where: { id: child.id },
+      select: { id: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+    })
+    if (!runtimeChild?.runtimeSnapshotEncrypted) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      const runtime = decryptFrozenScaleRuntimeSnapshot(runtimeChild.runtimeSnapshotEncrypted)
       const slot = slotsByKey.get(questionnaireScaleSlotKey(current.item.id))
       if (
         runtime.instrumentKey !== current.item.scale.code
         || runtime.instrumentVersion !== current.item.scale.instrumentVersion
-        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
+        || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
         || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
       ) throw new Error('Scale runtime identity mismatch')
       await ensureScaleAdmissionAtDelivery(child.id)
@@ -487,6 +493,24 @@ export const finalQuestionnaireDefinitionHash = (questionnaire: any) => computeS
  * It deliberately reads answers only at an instrument boundary: individual
  * field changes are local IndexedDB state and never reach this endpoint.
  */
+
+const patchQuestionnaireStateAfterFinalize = (
+  state: Awaited<ReturnType<typeof getUnifiedQuestionnaireFinalAttemptState>>,
+  finalized: { status: string; progress: number; completedAt: Date | string | null },
+) => ({
+  ...state,
+  questionnaireAssessment: {
+    ...state.questionnaireAssessment,
+    status: finalized.status,
+    progress: finalized.status === 'COMPLETED' ? 100 : finalized.progress,
+    completedAt: finalized.completedAt,
+    currentIndex: state.totalItems,
+  },
+  currentFormSection: null,
+  currentScale: null,
+  completedItems: state.totalItems,
+})
+
 export const getQuestionnaireFinalAttemptState = async (assessmentId: string) => {
   const runtime = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
@@ -495,14 +519,17 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   if (!runtime) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   assertFinalOnly(runtime.deliveryMode)
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
-    let state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+    const state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
     if (
       state.questionnaireAssessment.status === 'IN_PROGRESS'
       && state.totalItems > 0
       && state.completedItems >= state.totalItems
     ) {
-      await finalizeQuestionnaireIfReady(assessmentId)
-      state = await getUnifiedQuestionnaireFinalAttemptState(assessmentId)
+      // Reconcile-once: finalize mutates parent status/progress/completedAt only.
+      // Do not rebuild the full runner projection a second time.
+      const finalized = await finalizeQuestionnaireIfReady(assessmentId)
+      if (!finalized) return state
+      return patchQuestionnaireStateAfterFinalize(state, finalized)
     }
     return state
   }
