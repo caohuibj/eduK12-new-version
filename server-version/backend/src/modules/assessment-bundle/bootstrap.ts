@@ -7,6 +7,11 @@ import {
   COGNITIVE_DOMAIN_ENGINE_VERSION,
   runCognitiveDomainV1,
 } from './engines/cognitive-domain-v1'
+import {
+  SCALE_EVIDENCE_ENGINE_KEY,
+  SCALE_EVIDENCE_ENGINE_VERSION,
+  runScaleEvidenceV1,
+} from './engines/scale-evidence-v1'
 
 /**
  * Register product engines used by PUBLISHED/DRAFT Bundle definitions.
@@ -19,6 +24,11 @@ export const registerProductBundleEngines = (
     COGNITIVE_DOMAIN_ENGINE_KEY,
     COGNITIVE_DOMAIN_ENGINE_VERSION,
     runCognitiveDomainV1,
+  )
+  registry.register(
+    SCALE_EVIDENCE_ENGINE_KEY,
+    SCALE_EVIDENCE_ENGINE_VERSION,
+    runScaleEvidenceV1,
   )
   return registry
 }

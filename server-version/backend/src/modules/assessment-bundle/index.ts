@@ -108,3 +108,17 @@ export {
   createProductBundleAnalysisEngineRegistry,
   registerProductBundleEngines,
 } from './bootstrap'
+
+export {
+  SCALE_EVIDENCE_ENGINE_KEY,
+  SCALE_EVIDENCE_ENGINE_VERSION,
+  SCALE_EVIDENCE_PAYLOAD_SCHEMA,
+  projectScaleEvidenceItems,
+  runScaleEvidenceV1,
+  selectScaleScores,
+} from './engines/scale-evidence-v1'
+export type {
+  ScaleEvidencePayloadV1,
+  ScaleEvidenceScoreObservationV1,
+} from './engines/scale-evidence-v1'
+export { WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1 } from './bundles/wellbeing-who5-youth-self-zh-cn-v1'
