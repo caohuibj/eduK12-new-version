@@ -6,6 +6,10 @@ const BUSY_CODES = new Set([
   'ADMISSION_BUSY',
 ])
 
+const BASE_DELAY_MS = 1_000
+/** High safety cap — still honor larger Retry-After up to this bound. */
+const SAFETY_CAP_MS = 30_000
+
 /** Whitelist: 503/502/504, known busy codes, or network failures only. */
 export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
   const normalized = normalizeApiError(error)
@@ -17,8 +21,8 @@ export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
 }
 
 /**
- * Attempt-aware jitter capped at 5s. Prefer Retry-After when present.
- * Spread roughly 1–5s so concurrent clients do not align.
+ * delay = max(Retry-AfterMs, exponentialBackoff(attempt)) + full jitter
+ * Retry-After is a floor (not a hard 1s concentrate). Safety-capped at 30s.
  */
 export const finalDraftCapacityRetryDelayMs = (
   attempt: number,
@@ -27,20 +31,15 @@ export const finalDraftCapacityRetryDelayMs = (
 ): number => {
   const safeAttempt = Number.isFinite(attempt) && attempt >= 1 ? Math.floor(attempt) : 1
   const retryFloor = retryAfterMs !== null && Number.isFinite(retryAfterMs) && retryAfterMs >= 0
-    ? Math.min(5_000, Math.max(0, retryAfterMs))
+    ? Math.min(SAFETY_CAP_MS, Math.max(0, retryAfterMs))
     : 0
-  // Attempt-aware windows (~1-2 / 1.5-3 / 2.5-4.5 / 3-5s), never above 5s.
-  const windows: Array<[number, number]> = [
-    [1_000, 2_000],
-    [1_500, 3_000],
-    [2_500, 4_500],
-    [3_000, 5_000],
-  ]
-  const [lo, hi] = windows[Math.min(safeAttempt - 1, windows.length - 1)]
+  const exponential = Math.min(SAFETY_CAP_MS, BASE_DELAY_MS * (2 ** (safeAttempt - 1)))
   const sampledRaw = random()
   const sampled = Number.isFinite(sampledRaw) ? Math.min(1, Math.max(0, sampledRaw)) : 0
-  const jittered = lo + Math.floor(sampled * (hi - lo + 1))
-  return Math.min(5_000, Math.max(jittered, retryFloor))
+  // Full jitter added on top of the floored backoff so Retry-After=1 does not
+  // pin every client to ~1s across attempts.
+  const jitter = Math.floor(sampled * (exponential + 1))
+  return Math.min(SAFETY_CAP_MS, Math.max(retryFloor, exponential) + jitter)
 }
 
 export type CapacityRetryOptions<T> = {

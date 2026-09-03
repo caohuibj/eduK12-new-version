@@ -16,6 +16,9 @@ import {
   scoreScale,
   unregisterScaleCustomScorer,
 } from '../../modules/scale/scale-scoring'
+import { buildScaleResult } from '../../modules/scale/scale-result'
+import { buildScaleBundleBridge } from '../../modules/assessment-bundle/sources'
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { readScaleResult, scaleAssessmentForResponse, scaleDefinitionFromRecord } from '../../modules/scale/scale-workflow.service'
 
 const makeDefinition = (): ScaleDefinitionV2 => ({
@@ -89,6 +92,23 @@ const messages = (issues: Array<{ message: string }>) => issues.map((issue) => i
 describe('ScaleDefinitionV2 and generic scorer', () => {
   afterEach(() => {
     unregisterScaleCustomScorer('scale-v2-test-scorer')
+  })
+
+  it('omits undefined answeredAt so Bundle bridge canonicalHash succeeds', () => {
+    const definition = makeDefinition()
+    const answers = allAnswers('sometimes')
+    const scored = scoreScale(definition, answers)
+    expect(Object.prototype.hasOwnProperty.call(scored.itemScores[0], 'answeredAt')).toBe(false)
+    const result = buildScaleResult({
+      scaleId: 'scale-1',
+      instrumentKey: 'scale-v2-test',
+      name: '测试量表',
+      instrumentVersion: '1.0.0',
+      definition,
+      answers,
+    })
+    expect(() => canonicalHash(result)).not.toThrow()
+    expect(() => buildScaleBundleBridge(result)).not.toThrow()
   })
 
   it('maps semantic 1–5 responses to scores and keeps the response separate', () => {

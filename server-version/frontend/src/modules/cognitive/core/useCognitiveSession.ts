@@ -289,7 +289,8 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
     try {
       const session = stateRef.current.session
       if (session?.deliveryMode === 'FINAL_ONLY') {
-        if (!api.submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
+        const submitFinal = api.submitFinal
+        if (!submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
         const draftKey = `cognitive:${session.sessionId}`
         finalDraftKey = draftKey
         const meta = await finalDraftStore.get(draftKey)
@@ -305,7 +306,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             }).catch(() => undefined)
           },
           operation: async () => {
-            const next = await api.submitFinal(session.sessionId, {
+            const next = await submitFinal(session.sessionId, {
               submissionId: meta.submissionId,
               attemptEpoch: meta.attemptEpoch,
               definitionHash: meta.definitionHash,

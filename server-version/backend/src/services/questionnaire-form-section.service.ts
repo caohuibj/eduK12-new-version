@@ -1857,26 +1857,48 @@ const submitQuestionnaireFormSectionFinalImpl = async (input: SectionSubmitInput
   })
 
   const { terminalCandidate: shouldFinalize, ...response } = committed
-  const parent = shouldFinalize
-    ? await measureRequestPhase('final_submit_parent_finalization', () => finalizeQuestionnaireIfReady(assessment.id))
-    : { status: 'IN_PROGRESS', progress: response.progress, completedAt: null }
-  return { submissionId, sectionId: input.sectionId, ...response, parent }
+  return {
+    submissionId,
+    sectionId: input.sectionId,
+    ...response,
+    shouldFinalize,
+    finalizeQuestionnaireAssessmentId: shouldFinalize ? assessment.id : null,
+  }
 }
 
-export const submitQuestionnaireFormSectionFinalForUser = (
+const finalizeQuestionnaireAfterUnitSubmit = async <T>(result: T): Promise<any> => {
+  if (!result || typeof result !== 'object' || !('shouldFinalize' in (result as object))) return result
+  const record = result as T & {
+    shouldFinalize?: boolean
+    finalizeQuestionnaireAssessmentId?: string | null
+    progress?: number
+  }
+  const { shouldFinalize, finalizeQuestionnaireAssessmentId, ...response } = record as any
+  const parent = shouldFinalize && finalizeQuestionnaireAssessmentId
+    ? await measureRequestPhase('final_submit_parent_finalization', () => finalizeQuestionnaireIfReady(finalizeQuestionnaireAssessmentId))
+    : { status: 'IN_PROGRESS', progress: response.progress ?? 0, completedAt: null }
+  return { ...response, parent }
+}
+
+export const submitQuestionnaireFormSectionFinalForUser = async (
   assessmentId: string,
   userId: string,
   input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
-) => withUnitSubmitAdmission(() => submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessmentId, userId }))
+) => finalizeQuestionnaireAfterUnitSubmit(
+  await withUnitSubmitAdmission(() => submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessmentId, userId })),
+)
 
-export const submitQuestionnaireFormSectionFinalForPublic = (
+export const submitQuestionnaireFormSectionFinalForPublic = async (
   sessionId: string,
   input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
   resumeTokenHash: string,
-) => withUnitSubmitAdmission(async () => {
-  const assessment = await prisma.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true } })
-  if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  return submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessment.id, userId: null, sessionId, resumeTokenHash })
-})
+) => {
+  const result = await withUnitSubmitAdmission(async () => {
+    const assessment = await prisma.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true } })
+    if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+    return submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessment.id, userId: null, sessionId, resumeTokenHash })
+  })
+  return finalizeQuestionnaireAfterUnitSubmit(result)
+}
 
 export const finalizeQuestionnaireAttemptIfReady = finalizeQuestionnaireIfReady

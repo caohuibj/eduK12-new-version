@@ -105,3 +105,16 @@
 - 计划：`server-version/docs/gate-d-capacity-plan.md`
 - 脚本：`server-version/perf/`
 - 跑机产物：`/tmp/eduk12-gate47-test-results/`（未入库）
+
+---
+
+## 9. Post-review fix notes
+
+Prior A/B measured code SHA **`1b6df8b`**. Subsequent commits on this PR branch may include docs plus post-review hardening and do **not** invalidate the tables above.
+
+Follow-up fixes after review (same PR, not yet Gate-D re-run):
+
+- Frontend: narrow `api.submitFinal` outside the capacity-retry closure (`useCognitiveSession`).
+- Frontend capacity retry: treat `Retry-After` as a **minimum floor**, apply exponential backoff + full jitter, safety-cap at 30s (no longer concentrates all retries near 1s when Retry-After=1).
+- Backend: UNIT admission wraps only unit persist/score; parent aggregate finalization runs **after** the UNIT permit is released (Scale / Cognitive / Form). Aggregate keeps its own `withAggregateFinalizationAdmission`.
+- Backend regression: Scale Bundle bridge `canonicalHash(ScaleResultV2)` failed when optional `itemScores[].answeredAt` was `undefined`; scoring now omits undefined optionals.

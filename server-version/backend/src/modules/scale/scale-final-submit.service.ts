@@ -317,13 +317,14 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
   if (assessment.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(assessment, submissionId, payloadHash)
     if (replay === 'replay') {
-      await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(assessment))
       return {
         submissionId,
         payloadHash,
         replayed: true,
         assessment: scaleAssessmentForResponse(assessment),
         parent: null,
+        shouldFinalize: true,
+        finalizeAssessment: assessment,
       }
     }
   }
@@ -429,20 +430,32 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     }
   })
 
-  if (committed.shouldFinalize) {
-    await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(assessment))
-  }
   return {
     submissionId,
     payloadHash,
     replayed: committed.replay,
     assessment: committed.assessment,
     parent: committed.parent,
+    shouldFinalize: committed.shouldFinalize,
+    finalizeAssessment: assessment,
   }
 }
 
-export const submitScaleAssessmentFinal = (input: FinalScaleSubmitInput) => (
-  withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(input))
+/** UNIT gate covers persist/score only; parent aggregate runs after release. */
+const finalizeParentAfterUnitSubmit = async <T>(result: T): Promise<Omit<T, 'shouldFinalize' | 'finalizeAssessment'>> => {
+  const record = result as T & { shouldFinalize?: boolean; finalizeAssessment?: unknown }
+  if (record?.shouldFinalize && record.finalizeAssessment) {
+    await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(record.finalizeAssessment))
+  }
+  if (result && typeof result === 'object') {
+    const { shouldFinalize: _s, finalizeAssessment: _f, ...rest } = record as any
+    return rest
+  }
+  return result as Omit<T, 'shouldFinalize' | 'finalizeAssessment'>
+}
+
+export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) => (
+  finalizeParentAfterUnitSubmit(await withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(input)))
 )
 
 const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessment.findUnique({
@@ -454,62 +467,71 @@ const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessmen
   },
 })
 
-export const submitQuestionnaireScaleFinal = (
+export const submitQuestionnaireScaleFinal = async (
   questionnaireAssessmentId: string,
   scaleAssessmentId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'questionnaireSessionId' | 'compositeAttemptId'>,
   context: { userId: string },
-) => withUnitSubmitAdmission(async () => {
-  const child = await questionnaireChild(scaleAssessmentId)
-  if (!child || child.questionnaireAssessmentId !== questionnaireAssessmentId || child.questionnaireAssessment?.userId !== context.userId) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前问卷', 403)
-  }
-  return submitScaleAssessmentFinalImpl({
-    ...input,
-    assessmentId: scaleAssessmentId,
-    userId: context.userId,
-    questionnaireSessionId: child.questionnaireAssessment.sessionId ?? undefined,
+) => {
+  const result = await withUnitSubmitAdmission(async () => {
+    const child = await questionnaireChild(scaleAssessmentId)
+    if (!child || child.questionnaireAssessmentId !== questionnaireAssessmentId || child.questionnaireAssessment?.userId !== context.userId) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前问卷', 403)
+    }
+    return submitScaleAssessmentFinalImpl({
+      ...input,
+      assessmentId: scaleAssessmentId,
+      userId: context.userId,
+      questionnaireSessionId: child.questionnaireAssessment.sessionId ?? undefined,
+    })
   })
-})
+  return finalizeParentAfterUnitSubmit(result)
+}
 
-export const submitQuestionnaireScaleFinalForPublic = (
+export const submitQuestionnaireScaleFinalForPublic = async (
   sessionId: string,
   scaleAssessmentId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'questionnaireSessionId' | 'compositeAttemptId' | 'recoveryTokenHash'>,
   resumeTokenHash: string,
-) => withUnitSubmitAdmission(async () => {
-  const child = await questionnaireChild(scaleAssessmentId)
-  if (!child || child.questionnaireAssessmentId === null || child.questionnaireAssessment?.sessionId !== sessionId) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前会话', 403)
-  }
-  return submitScaleAssessmentFinalImpl({
-    ...input,
-    assessmentId: scaleAssessmentId,
-    userId: null,
-    questionnaireSessionId: sessionId,
-    recoveryTokenHash: resumeTokenHash,
+) => {
+  const result = await withUnitSubmitAdmission(async () => {
+    const child = await questionnaireChild(scaleAssessmentId)
+    if (!child || child.questionnaireAssessmentId === null || child.questionnaireAssessment?.sessionId !== sessionId) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前会话', 403)
+    }
+    return submitScaleAssessmentFinalImpl({
+      ...input,
+      assessmentId: scaleAssessmentId,
+      userId: null,
+      questionnaireSessionId: sessionId,
+      recoveryTokenHash: resumeTokenHash,
+    })
   })
-})
+  return finalizeParentAfterUnitSubmit(result)
+}
 
-export const submitCompositeScaleFinal = (
+export const submitCompositeScaleFinal = async (
   attemptId: string,
   itemId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'compositeAttemptId' | 'questionnaireSessionId'>,
   context: { userId?: string | null; recoveryTokenHash?: string },
-) => withUnitSubmitAdmission(async () => {
-  const child = await prisma.assessment.findFirst({
-    where: { compositeAttemptId: attemptId, compositeItemId: itemId },
-    select: { id: true },
+) => {
+  const result = await withUnitSubmitAdmission(async () => {
+    const child = await prisma.assessment.findFirst({
+      where: { compositeAttemptId: attemptId, compositeItemId: itemId },
+      select: { id: true },
+    })
+    if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
+    return submitScaleAssessmentFinalImpl({
+      ...input,
+      assessmentId: child.id,
+      userId: context.userId,
+      compositeAttemptId: attemptId,
+      recoveryTokenHash: context.recoveryTokenHash,
+    })
   })
-  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
-  return submitScaleAssessmentFinalImpl({
-    ...input,
-    assessmentId: child.id,
-    userId: context.userId,
-    compositeAttemptId: attemptId,
-    recoveryTokenHash: context.recoveryTokenHash,
-  })
-})
+  return finalizeParentAfterUnitSubmit(result)
+}
 
 /**
  * Restart a standalone in-progress assessment without deleting its answers.

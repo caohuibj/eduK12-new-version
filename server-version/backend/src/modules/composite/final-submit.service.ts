@@ -538,16 +538,25 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   })
 
   const { terminalCandidate: shouldFinalize, ...response } = committed
-  const parent = shouldFinalize
-    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
-      const { finalizeCompositeAttemptIfReady } = await import('./composite.service')
-      return finalizeCompositeAttemptIfReady(attempt.id)
-    })
-    : { status: 'IN_PROGRESS', progress: response.progress, completedAt: null }
-  return { submissionId, sectionId: input.sectionId, ...response, parent }
+  return {
+    submissionId,
+    sectionId: input.sectionId,
+    ...response,
+    shouldFinalize,
+    finalizeCompositeAttemptId: shouldFinalize ? attempt.id : null,
+  }
 }
 
-
-export const submitCompositeFormSectionFinal = (input: SectionSubmitInput) => (
-  withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
-)
+/** UNIT gate covers form persist only; composite aggregate finalizes after release. */
+export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput): Promise<any> => {
+  const result = await withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
+  if (!result || typeof result !== 'object' || !('shouldFinalize' in result)) return result
+  const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
+  const parent = shouldFinalize && finalizeCompositeAttemptId
+    ? await measureRequestPhase('final_submit_parent_finalization', async () => {
+      const { finalizeCompositeAttemptIfReady } = await import('./composite.service')
+      return finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId)
+    })
+    : { status: 'IN_PROGRESS', progress: response.progress ?? 0, completedAt: null }
+  return { ...response, parent }
+}

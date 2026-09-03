@@ -85,6 +85,43 @@ describe('Unified runtime architecture boundaries', () => {
     expect(security).not.toContain('safeDecrypt')
   })
 
+  it('releases UNIT admission before parent aggregate finalization', () => {
+    const scaleFinal = source('modules/scale/scale-final-submit.service.ts')
+    const cognitiveFinal = source('modules/cognitive/final-submit.service.ts')
+    const questionnaireForm = source('services/questionnaire-form-section.service.ts')
+    const compositeForm = source('modules/composite/final-submit.service.ts')
+
+    const scaleImpl = scaleFinal.slice(
+      scaleFinal.indexOf('const submitScaleAssessmentFinalImpl'),
+      scaleFinal.indexOf('const finalizeParentAfterUnitSubmit'),
+    )
+    expect(scaleImpl).not.toMatch(/finalizeLinkedParent|finalizeQuestionnaireAttemptIfReady|finalizeCompositeAttemptIfReady/)
+    expect(scaleFinal).toMatch(/finalizeParentAfterUnitSubmit\(await withUnitSubmitAdmission/)
+
+    const cognitiveImpl = cognitiveFinal.slice(
+      cognitiveFinal.indexOf('const submitWithPrincipalImpl'),
+      cognitiveFinal.indexOf('const submitWithPrincipal ='),
+    )
+    expect(cognitiveImpl).not.toMatch(/finalizeCompositeAttemptIfReady/)
+    expect(cognitiveFinal).toMatch(/withUnitSubmitAdmission\(\(\) => submitWithPrincipalImpl/)
+    expect(cognitiveFinal).toMatch(/finalizeCompositeAttemptIfReady/)
+
+    const questionnaireImpl = questionnaireForm.slice(
+      questionnaireForm.indexOf('const submitQuestionnaireFormSectionFinalImpl'),
+      questionnaireForm.indexOf('const finalizeQuestionnaireAfterUnitSubmit'),
+    )
+    expect(questionnaireImpl).not.toMatch(/finalizeQuestionnaireIfReady\(/)
+    expect(questionnaireForm).toMatch(/finalizeQuestionnaireAfterUnitSubmit\([\s\S]*withUnitSubmitAdmission/)
+
+    const compositeImpl = compositeForm.slice(
+      compositeForm.indexOf('const submitCompositeFormSectionFinalImpl'),
+      compositeForm.indexOf('export const submitCompositeFormSectionFinal'),
+    )
+    expect(compositeImpl).not.toMatch(/finalizeCompositeAttemptIfReady/)
+    expect(compositeForm).toMatch(/withUnitSubmitAdmission\(\(\) => submitCompositeFormSectionFinalImpl/)
+    expect(compositeForm).toMatch(/finalizeCompositeAttemptIfReady/)
+  })
+
   it('reconcile-once: terminal GET patches finalize result instead of rebuilding full state', () => {
     const questionnaire = source('services/questionnaire-form-section.service.ts')
     const composite = source('modules/composite/composite.service.ts')

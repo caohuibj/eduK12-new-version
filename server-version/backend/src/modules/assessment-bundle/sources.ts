@@ -56,6 +56,20 @@ export interface BundleFrozenScaleSourceV1 {
   scores: BundleFrozenScaleScoreV1[]
 }
 
+/** Drop undefined keys so canonicalHash can hash ScaleResultV2 / Cognitive snapshots. */
+const stripUndefinedDeep = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(stripUndefinedDeep)
+  if (!value || typeof value !== 'object') return value
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return value
+  const out: Record<string, unknown> = {}
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (entry === undefined) continue
+    out[key] = stripUndefinedDeep(entry)
+  }
+  return out
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> => (
   Boolean(value && typeof value === 'object' && !Array.isArray(value))
 )
@@ -171,7 +185,7 @@ const bindAuthoritativeSourceResultHashes = (input: {
   claimedHash?: string
   canonicalEnvelope?: unknown
 }): { sourceResultHash: string; envelopeResultHash: string | null } => {
-  const sourceResultHash = canonicalHash(input.validatedResult)
+  const sourceResultHash = canonicalHash(stripUndefinedDeep(input.validatedResult))
 
   if (input.claimedHash !== undefined) {
     if (typeof input.claimedHash !== 'string' || !HEX_HASH.test(input.claimedHash)) {
