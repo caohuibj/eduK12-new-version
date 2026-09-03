@@ -9,7 +9,7 @@
  */
 
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
+import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
@@ -442,4 +442,97 @@ export const validateBundleEngineSourceSet = (input: {
   if (input.cognitiveSources) assertUniqueCognitiveSources(input.cognitiveSources)
   if (input.scaleSources) assertUniqueScaleSources(input.scaleSources)
   if (input.slots) assertUniqueValueSelectors(input.slots)
+}
+
+
+/**
+ * Build Bundle scale source from Canonical envelope.bundleBridge only.
+ * Bundle v3 must not reread Assessment.result or live definition graphs.
+ */
+export const projectBundleScaleSourceFromCanonicalBridge = (input: {
+  slotKey: string
+  expectedInstrumentKey: string
+  expectedInstrumentVersion: string
+  envelope: CanonicalUnitResultEnvelopeV1
+}): BundleFrozenScaleSourceV1 => {
+  const bridge = input.envelope.bundleBridge
+  if (!bridge?.scores) {
+    return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 缺少 Scale bundleBridge：${input.slotKey}`)
+  }
+  assertInstrumentIdentity({
+    expectedInstrumentKey: input.expectedInstrumentKey,
+    expectedInstrumentVersion: input.expectedInstrumentVersion,
+    actualKey: input.envelope.core.instrumentKey,
+    actualVersion: input.envelope.core.instrumentVersion,
+    label: 'Scale',
+  })
+  return {
+    slotKey: input.slotKey,
+    instrumentKey: input.envelope.core.instrumentKey,
+    instrumentVersion: input.envelope.core.instrumentVersion,
+    sourceResultHash: bridge.sourceResultHash,
+    envelopeResultHash: input.envelope.resultHash,
+    qualityState: input.envelope.core.quality.status,
+    scores: bridge.scores.map((score) => ({ ...score })),
+  }
+}
+
+export const projectBundleCognitiveSourceFromCanonicalBridge = (input: {
+  slotKey: string
+  expectedInstrumentKey: string
+  expectedInstrumentVersion: string
+  envelope: CanonicalUnitResultEnvelopeV1
+}): BundleFrozenCognitiveSourceV1 => {
+  const bridge = input.envelope.bundleBridge
+  if (!bridge || bridge.metrics === undefined || typeof bridge.hasReferenceNorms !== 'boolean') {
+    return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 缺少 Cognitive bundleBridge：${input.slotKey}`)
+  }
+  assertInstrumentIdentity({
+    expectedInstrumentKey: input.expectedInstrumentKey,
+    expectedInstrumentVersion: input.expectedInstrumentVersion,
+    actualKey: input.envelope.core.instrumentKey,
+    actualVersion: input.envelope.core.instrumentVersion,
+    label: 'Cognitive',
+  })
+  return {
+    slotKey: input.slotKey,
+    instrumentKey: input.envelope.core.instrumentKey,
+    instrumentVersion: input.envelope.core.instrumentVersion,
+    sourceResultHash: bridge.sourceResultHash,
+    envelopeResultHash: input.envelope.resultHash,
+    metrics: { ...bridge.metrics },
+    qualityState: input.envelope.core.quality.status,
+    hasReferenceNorms: bridge.hasReferenceNorms,
+  }
+}
+
+/** Capture Scale Bundle bridge fields while ScaleResultV2 is still in memory. */
+export const buildScaleBundleBridge = (result: ScaleResultV2): NonNullable<CanonicalUnitResultEnvelopeV1['bundleBridge']> => {
+  const projected = projectBundleScaleSource({
+    slotKey: '_bridge',
+    expectedInstrumentKey: result.instrument.code,
+    expectedInstrumentVersion: result.instrument.instrumentVersion,
+    result,
+  })
+  return {
+    sourceResultHash: projected.sourceResultHash,
+    scores: projected.scores,
+  }
+}
+
+/** Capture Cognitive Bundle bridge fields while CognitiveResultSnapshot is still in memory. */
+export const buildCognitiveBundleBridge = (
+  snapshot: CognitiveResultSnapshot,
+): NonNullable<CanonicalUnitResultEnvelopeV1['bundleBridge']> => {
+  const projected = projectBundleCognitiveSource({
+    slotKey: '_bridge',
+    expectedInstrumentKey: snapshot.testType,
+    expectedInstrumentVersion: snapshot.configVersion,
+    result: snapshot,
+  })
+  return {
+    sourceResultHash: projected.sourceResultHash,
+    metrics: projected.metrics,
+    hasReferenceNorms: projected.hasReferenceNorms,
+  }
 }

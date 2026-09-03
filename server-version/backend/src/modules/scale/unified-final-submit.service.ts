@@ -30,6 +30,7 @@ import { loadFrozenReferenceSets } from '../assessment-runtime/reference-binding
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
+import { buildScaleBundleBridge } from '../assessment-bundle/sources'
 import {
   activateScaleAdmission,
   assertAdmissionParentBinding,
@@ -262,6 +263,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
             sourceAttemptId: child.id,
             sourceSubmissionId: submissionId,
           },
+          bundleBridge: buildScaleBundleBridge(result),
         }))
       : null,
   }))

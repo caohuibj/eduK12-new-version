@@ -8,6 +8,7 @@ import {
   InstrumentFinalSubmitError,
 } from '../../services/instrumentFinalSubmit'
 import { isTransientCompletionDatabaseError, toCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
+import { withAggregateFinalizationAdmission } from '../../services/aggregateFinalizationAdmission'
 import {
   measureRequestPhase,
   measureRequestPhaseSync,
@@ -1121,22 +1122,26 @@ const persistQuestionnaireCompletion = async (input: {
   }
 }
 
-export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string) => {
-  try {
-    return await finalizeCompositeUnifiedImpl(attemptId)
-  } catch (error) {
-    if (error instanceof InstrumentFinalSubmitError) throw error
-    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
-    throw aggregateInputError(error instanceof Error ? error.message : '综合测评聚合失败')
-  }
-}
+export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string) => (
+  withAggregateFinalizationAdmission(async () => {
+    try {
+      return await finalizeCompositeUnifiedImpl(attemptId)
+    } catch (error) {
+      if (error instanceof InstrumentFinalSubmitError) throw error
+      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+      throw aggregateInputError(error instanceof Error ? error.message : '综合测评聚合失败')
+    }
+  })
+)
 
-export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: string) => {
-  try {
-    return await finalizeQuestionnaireUnifiedImpl(assessmentId)
-  } catch (error) {
-    if (error instanceof InstrumentFinalSubmitError) throw error
-    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
-    throw aggregateInputError(error instanceof Error ? error.message : '问卷聚合失败')
-  }
-}
+export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: string) => (
+  withAggregateFinalizationAdmission(async () => {
+    try {
+      return await finalizeQuestionnaireUnifiedImpl(assessmentId)
+    } catch (error) {
+      if (error instanceof InstrumentFinalSubmitError) throw error
+      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+      throw aggregateInputError(error instanceof Error ? error.message : '问卷聚合失败')
+    }
+  })
+)

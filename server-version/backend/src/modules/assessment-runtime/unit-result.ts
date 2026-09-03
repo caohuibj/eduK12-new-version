@@ -60,6 +60,21 @@ export interface CanonicalUnitResultCoreV1 {
   }
 }
 
+/** Additive Bundle v3 bridge computed at UNIT submit while full result is in memory. */
+export interface CanonicalBundleBridgeV1 {
+  sourceResultHash: string
+  /** Scale scores with frozen criterionBandKey; omitted for Cognitive. */
+  scores?: Array<{
+    scoreKey: string
+    value: number | null
+    status: 'calculated' | 'limited' | 'not_calculable'
+    criterionBandKey: string | null
+  }>
+  /** Cognitive metrics map; omitted for Scale. */
+  metrics?: Record<string, unknown>
+  hasReferenceNorms?: boolean
+}
+
 export interface CanonicalUnitResultEnvelopeV1 {
   core: CanonicalUnitResultCoreV1
   resultHash: string
@@ -70,6 +85,8 @@ export interface CanonicalUnitResultEnvelopeV1 {
     sourceAttemptId: string
     sourceSubmissionId?: string
   }
+  /** Optional PR46 Bundle narrow-source bridge; never reread Assessment.result. */
+  bundleBridge?: CanonicalBundleBridgeV1
 }
 
 const assertJsonValue = (value: unknown): JsonValue => {
@@ -307,6 +324,7 @@ export const createCanonicalUnitResultEnvelope = (input: {
   core: CanonicalUnitResultCoreV1
   completedAt: Date | string
   persistenceProvenance: CanonicalUnitResultEnvelopeV1['persistenceProvenance']
+  bundleBridge?: CanonicalBundleBridgeV1
 }): CanonicalUnitResultEnvelopeV1 => {
   const completedAt = input.completedAt instanceof Date ? input.completedAt.toISOString() : input.completedAt
   if (Number.isNaN(Date.parse(completedAt))) throw new Error('Invalid canonical unit result completedAt')
@@ -316,6 +334,7 @@ export const createCanonicalUnitResultEnvelope = (input: {
     hashScheme: CANONICAL_JSON_SHA256_V1,
     completedAt,
     persistenceProvenance: input.persistenceProvenance,
+    ...(input.bundleBridge ? { bundleBridge: input.bundleBridge } : {}),
   }
 }
 
@@ -379,6 +398,18 @@ const canonicalUnitResultCoreSchema = z.object({
   }).strict(),
 }).strict()
 
+const canonicalBundleBridgeSchema = z.object({
+  sourceResultHash: z.string().regex(/^[0-9a-f]{64}$/),
+  scores: z.array(z.object({
+    scoreKey: z.string().min(1),
+    value: z.number().finite().nullable(),
+    status: z.enum(['calculated', 'limited', 'not_calculable']),
+    criterionBandKey: z.string().min(1).nullable(),
+  }).strict()).optional(),
+  metrics: z.record(z.unknown()).optional(),
+  hasReferenceNorms: z.boolean().optional(),
+}).strict()
+
 const canonicalUnitResultEnvelopeSchema = z.object({
   core: canonicalUnitResultCoreSchema,
   resultHash: z.string().regex(/^[0-9a-f]{64}$/),
@@ -389,6 +420,7 @@ const canonicalUnitResultEnvelopeSchema = z.object({
     sourceAttemptId: z.string().min(1),
     sourceSubmissionId: z.string().min(1).optional(),
   }).strict(),
+  bundleBridge: canonicalBundleBridgeSchema.optional(),
 }).strict()
 
 export const parseCanonicalUnitResultEnvelope = (value: unknown): CanonicalUnitResultEnvelopeV1 => {

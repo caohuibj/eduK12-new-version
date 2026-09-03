@@ -41,6 +41,7 @@ import {
   activateCognitiveAdmission,
   type CognitiveAdmissionChildRow,
 } from './cognitive-admission.service'
+import { buildCognitiveBundleBridge } from '../assessment-bundle/sources'
 import {
   createUnifiedCognitiveRawSubmissionPayload,
   UNIFIED_COGNITIVE_RAW_ENCODING_VERSION,
@@ -353,6 +354,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
             sourceAttemptId: child.id,
             sourceSubmissionId: submissionId,
           },
+          bundleBridge: buildCognitiveBundleBridge(resultSnapshot),
         }))
       : null,
   }))
