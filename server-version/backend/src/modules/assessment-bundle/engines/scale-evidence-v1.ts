@@ -3,7 +3,12 @@ import type {
   BundleEngineInputV1,
   BundleEngineResultV1,
 } from '../registry'
-import type { BundleFrozenScaleScoreV1, BundleFrozenScaleSourceV1 } from '../sources'
+import {
+  assertUniqueScaleSources,
+  assertUniqueValueSelectors,
+  type BundleFrozenScaleScoreV1,
+  type BundleFrozenScaleSourceV1,
+} from '../sources'
 import type {
   EvidenceItemV1,
   EvidenceQualityStateV1,
@@ -89,7 +94,7 @@ export const projectScaleEvidenceItems = (input: {
     else quality = 'interpretable'
 
     return {
-      evidenceKey: `${prefix}.${score.scoreKey}.primary`,
+      evidenceKey: `${input.source.slotKey}.${prefix}.${score.scoreKey}.primary`,
       constructKey: `${prefix}.${score.scoreKey}`,
       source: {
         kind: 'SCALE_SCORE',
@@ -128,6 +133,8 @@ const qualityForScore = (
 const buildPayload = (input: BundleEngineInputV1): ScaleEvidencePayloadV1 => {
   const sources = input.scaleSources ?? []
   const scaleSlots = input.snapshot.slotBindings.filter((slot) => slot.unitType === 'SCALE')
+  assertUniqueScaleSources(sources)
+  assertUniqueValueSelectors(scaleSlots)
   const scores: ScaleEvidenceScoreObservationV1[] = []
   const slotAssessments: ScaleEvidencePayloadV1['slotAssessments'] = []
   const limitations = [

@@ -3,7 +3,11 @@ import type {
   BundleEngineInputV1,
   BundleEngineResultV1,
 } from '../registry'
-import type { BundleFrozenCognitiveSourceV1 } from '../sources'
+import {
+  assertUniqueCognitiveSources,
+  assertUniqueValueSelectors,
+  type BundleFrozenCognitiveSourceV1,
+} from '../sources'
 import type { EvidenceQualityStateV1, FrozenBundleSlotBindingV3 } from '../types'
 
 export const COGNITIVE_DOMAIN_ENGINE_KEY = 'cognitive-domain-v1' as const
@@ -151,6 +155,8 @@ const selectorsFor = (slot: FrozenBundleSlotBindingV3): string[] => {
 const buildPayload = (input: BundleEngineInputV1): CognitiveDomainPayloadV1 => {
   const sources = input.cognitiveSources ?? []
   const cognitiveSlots = input.snapshot.slotBindings.filter((slot) => slot.unitType === 'COGNITIVE')
+  assertUniqueCognitiveSources(sources)
+  assertUniqueValueSelectors(cognitiveSlots)
   const slotAssessments = cognitiveSlots.map((slot) => assessSlot(slot, findSource(sources, slot)))
   const facets: CognitiveDomainFacetObservationV1[] = []
   const classifications: CognitiveDomainPayloadV1['classifications'] = []

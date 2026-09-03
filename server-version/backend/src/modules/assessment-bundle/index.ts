@@ -92,6 +92,14 @@ export type {
   BundleFrozenSourceQualityV1,
 } from './sources'
 export {
+  assertUniqueCognitiveSources,
+  assertUniqueScaleSources,
+  assertUniqueValueSelectors,
+  projectBundleCognitiveSource,
+  projectBundleScaleSource,
+  validateBundleEngineSourceSet,
+} from './sources'
+export {
   COGNITIVE_DOMAIN_ENGINE_KEY,
   COGNITIVE_DOMAIN_ENGINE_VERSION,
   COGNITIVE_DOMAIN_PAYLOAD_SCHEMA,

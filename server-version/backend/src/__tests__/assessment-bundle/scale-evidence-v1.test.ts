@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
   createProductBundleAnalysisEngineRegistry,
+  projectBundleScaleSource,
   projectScaleEvidenceItems,
   selectScaleScores,
   validateEvidenceSource,
@@ -25,19 +26,88 @@ const failCode = (run: () => unknown): string => {
   }
 }
 
-const who5Source = (
-  overrides: Partial<BundleFrozenScaleSourceV1> = {},
-): BundleFrozenScaleSourceV1 => ({
-  slotKey: 'who5',
-  instrumentKey: 'who5',
-  instrumentVersion: '1.0.0',
-  sourceResultHash: HASH_A,
-  qualityState: 'interpretable',
+const scaleResult = (overrides: Record<string, unknown> = {}) => ({
+  schemaVersion: 2 as const,
+  instrument: {
+    scaleId: 'scale-who5',
+    code: 'who5',
+    name: 'WHO-5',
+    instrumentVersion: '1.0.0',
+    ...(overrides.instrument as object | undefined),
+  },
+  method: {
+    scaleId: 'scale-who5',
+    instrumentVersion: '1.0.0',
+    scoringVersion: '1.0.0',
+    reportVersion: '1.0.0',
+    definitionHash: HASH_A,
+    referenceVersions: ['who5-ref-1'],
+    assessmentContext: null,
+  },
+  quality: { status: 'interpretable' as const, flags: [] as Array<'missing_items' | 'insufficient_items' | 'score_not_calculable'> },
+  itemScores: [],
   scores: [
-    { scoreKey: 'raw_total', value: 18, status: 'calculated', criterionBandKey: null },
-    { scoreKey: 'percentage', value: 72, status: 'calculated', criterionBandKey: 'who5.percentage.descriptive' },
+    {
+      key: 'raw_total',
+      type: 'total' as const,
+      label: 'Raw',
+      direction: 'higher_is_better' as const,
+      canonical: true,
+      displayPrecision: 0,
+      value: 18,
+      range: { min: 0, max: 25 },
+      expectedItems: ['i1'],
+      answeredItems: ['i1'],
+      status: 'calculated' as const,
+      prorated: false,
+    },
+    {
+      key: 'percentage',
+      type: 'dimension' as const,
+      label: 'Pct',
+      direction: 'higher_is_better' as const,
+      canonical: false,
+      displayPrecision: 0,
+      value: 72,
+      range: { min: 0, max: 100 },
+      expectedItems: ['i1'],
+      answeredItems: ['i1'],
+      status: 'calculated' as const,
+      prorated: false,
+    },
   ],
+  references: [
+    {
+      scoreKey: 'percentage',
+      status: 'available',
+      referenceVersion: 'who5-ref-1',
+      referenceKind: 'criterion',
+      criterionBand: {
+        key: 'who5.percentage.descriptive',
+        label: 'Descriptive band label must be ignored',
+        minInclusive: 0,
+        maxInclusive: 100,
+      },
+    },
+  ],
+  interpretations: [],
+  caveats: [],
+  disclaimer: 'fixture',
   ...overrides,
+})
+
+const who5Source = (
+  overrides: {
+    sourceResultHash?: string
+    expectedInstrumentVersion?: string
+    resultOverrides?: Record<string, unknown>
+  } = {},
+): BundleFrozenScaleSourceV1 => projectBundleScaleSource({
+  slotKey: 'who5',
+  expectedInstrumentKey: 'who5',
+  expectedInstrumentVersion: overrides.expectedInstrumentVersion ?? '1.0.0',
+  sourceResultHash: overrides.sourceResultHash ?? HASH_A,
+  result: scaleResult(overrides.resultOverrides),
 })
 
 const buildWho5Input = (
@@ -70,7 +140,6 @@ describe('scale-evidence-v1 + multi-score Scale selectors', () => {
       .toEqual(['raw_total', 'percentage'])
     expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1.limitations.some((text) => text.includes('commit 10')))
       .toBe(true)
-    // Structural stub only — no item text inventory on the Bundle definition.
     expect(JSON.stringify(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)).not.toMatch(/itemText|items\s*:/)
   })
 
@@ -88,9 +157,12 @@ describe('scale-evidence-v1 + multi-score Scale selectors', () => {
     })
     expect(evidence).toHaveLength(2)
     expect(evidence.every((item) => item.source.kind === 'SCALE_SCORE')).toBe(true)
+    expect(evidence.map((item) => item.evidenceKey)).toEqual([
+      'who5.who5.raw_total.primary',
+      'who5.who5.percentage.primary',
+    ])
     expect(JSON.stringify(evidence)).not.toMatch(/itemScores|interpretations|disclaimer|ScaleResultV2/)
 
-    // Observer fixture already uses multi score selectors on one slot.
     expect(observerBundle().slots[0].valueSelectors).toEqual(['total', 'emotional'])
   })
 
@@ -106,7 +178,6 @@ describe('scale-evidence-v1 + multi-score Scale selectors', () => {
       .toBe('who5.percentage.descriptive')
     expect(payload.scores.find((score) => score.scoreKey === 'raw_total')?.criterionBandKey)
       .toBeNull()
-    // No label-based classification fields on the payload.
     expect(JSON.stringify(payload.scores)).not.toMatch(/"label"|displayLabel/)
   })
 
@@ -134,10 +205,22 @@ describe('scale-evidence-v1 + multi-score Scale selectors', () => {
     expect(missingPayload.slotAssessments[0]?.status).toBe('missing')
     expect(missingPayload.scores).toHaveLength(0)
 
-    const mismatched = registry.dispatch(buildWho5Input([
-      who5Source({ instrumentVersion: '2.0.0' }),
-    ]))
+    expect(failCode(() => who5Source({
+      expectedInstrumentVersion: '2.0.0',
+    }))).toBe('SOURCE_IDENTITY_MISMATCH')
+
+    const mismatchedHand: BundleFrozenScaleSourceV1 = {
+      ...who5Source(),
+      instrumentVersion: '2.0.0',
+    }
+    const mismatched = registry.dispatch(buildWho5Input([mismatchedHand]))
     const mismatchedPayload = mismatched.payload as ScaleEvidencePayloadV1
     expect(mismatchedPayload.slotAssessments[0]?.status).toBe('version_mismatch')
+  })
+
+  it('fail-closes on duplicate scale slot sources', () => {
+    const registry = createProductBundleAnalysisEngineRegistry()
+    expect(failCode(() => registry.dispatch(buildWho5Input([who5Source(), who5Source()]))))
+      .toBe('SOURCE_SLOT_DUPLICATE')
   })
 })
