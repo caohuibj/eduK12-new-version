@@ -189,6 +189,155 @@ describe('V32-1 canonical unit result and collection facts', () => {
     expect(envelope.resultHash).toBe(canonicalHash(core))
   })
 
+  it('round-trips bundleBridge with additive bundleBridgeHash without folding into resultHash', () => {
+    const result = {
+      schemaVersion: 2,
+      instrument: {
+        scaleId: 'scale-1',
+        code: 'who5',
+        name: 'WHO-5',
+        instrumentVersion: '1.0.0',
+      },
+      method: {
+        scaleId: 'scale-1',
+        instrumentVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        reportVersion: '1.0.0',
+        definitionHash: 'def',
+        referenceVersions: [],
+        assessmentContext: null,
+      },
+      quality: { status: 'interpretable', flags: [] },
+      itemScores: [],
+      scores: [{
+        key: 'total',
+        type: 'total',
+        label: 'Total',
+        direction: 'higher_is_better',
+        canonical: true,
+        displayPrecision: 1,
+        value: 12,
+        range: { min: 0, max: 20 },
+        expectedItems: ['q1'],
+        answeredItems: ['q1'],
+        status: 'calculated',
+        prorated: false,
+      }],
+      references: [],
+    } as unknown as ScaleResultV2
+    const core = projectScaleCanonicalUnitResult({
+      result,
+      runtime: scaleRuntime(),
+      contextHash: 'context-hash',
+    })
+    const bridge = {
+      sourceResultHash: 'b'.repeat(64),
+      scores: [{
+        scoreKey: 'total',
+        value: 12,
+        status: 'calculated' as const,
+        criterionBandKey: 'who5.total.band',
+      }],
+    }
+    const envelope = createCanonicalUnitResultEnvelope({
+      core,
+      completedAt: '2026-09-01T00:00:00.000Z',
+      persistenceProvenance: { sourceType: 'ASSESSMENT', sourceAttemptId: 'assessment-bridge' },
+      bundleBridge: bridge,
+    })
+    expect(envelope.resultHash).toBe(canonicalHash(core))
+    expect(envelope.bundleBridgeHash).toBe(canonicalHash(bridge))
+    expect(envelope.bundleBridgeHash).not.toBe(envelope.resultHash)
+    expect(parseCanonicalUnitResultEnvelope(envelope)).toEqual(envelope)
+    expect(createCanonicalUnitResultEnvelope({
+      core,
+      completedAt: '2026-09-01T00:00:00.000Z',
+      persistenceProvenance: { sourceType: 'ASSESSMENT', sourceAttemptId: 'assessment-bridge' },
+    })).not.toHaveProperty('bundleBridgeHash')
+  })
+
+  it('rejects bridge tampering when core/resultHash stay valid', () => {
+    const core = projectScaleCanonicalUnitResult({
+      result: {
+        schemaVersion: 2,
+        instrument: {
+          scaleId: 'scale-1',
+          code: 'who5',
+          name: 'WHO-5',
+          instrumentVersion: '1.0.0',
+        },
+        method: {
+          scaleId: 'scale-1',
+          instrumentVersion: '1.0.0',
+          scoringVersion: '1.0.0',
+          reportVersion: '1.0.0',
+          definitionHash: 'def',
+          referenceVersions: [],
+          assessmentContext: null,
+        },
+        quality: { status: 'interpretable', flags: [] },
+        itemScores: [],
+        scores: [{
+          key: 'total',
+          type: 'total',
+          label: 'Total',
+          direction: 'higher_is_better',
+          canonical: true,
+          displayPrecision: 1,
+          value: 12,
+          range: { min: 0, max: 20 },
+          expectedItems: ['q1'],
+          answeredItems: ['q1'],
+          status: 'calculated',
+          prorated: false,
+        }],
+        references: [],
+      } as unknown as ScaleResultV2,
+      runtime: scaleRuntime(),
+      contextHash: null,
+    })
+    const envelope = createCanonicalUnitResultEnvelope({
+      core,
+      completedAt: '2026-09-01T00:00:00.000Z',
+      persistenceProvenance: { sourceType: 'ASSESSMENT', sourceAttemptId: 'assessment-tamper' },
+      bundleBridge: {
+        sourceResultHash: 'c'.repeat(64),
+        scores: [{
+          scoreKey: 'total',
+          value: 12,
+          status: 'calculated',
+          criterionBandKey: 'who5.total.band',
+        }],
+      },
+    })
+    expect(canonicalHash(envelope.core)).toBe(envelope.resultHash)
+
+    const tamperedBand = {
+      ...envelope,
+      bundleBridge: {
+        ...envelope.bundleBridge!,
+        scores: envelope.bundleBridge!.scores!.map((score) => ({
+          ...score,
+          criterionBandKey: 'tampered.band',
+        })),
+      },
+    }
+    expect(canonicalHash(tamperedBand.core)).toBe(tamperedBand.resultHash)
+    expect(() => parseCanonicalUnitResultEnvelope(tamperedBand)).toThrow(/bundleBridgeHash/)
+
+    const hashWithoutBridge = {
+      ...envelope,
+      bundleBridge: undefined,
+    }
+    expect(() => parseCanonicalUnitResultEnvelope(hashWithoutBridge)).toThrow(/without bundleBridge/)
+
+    const bridgeWithoutHash = {
+      ...envelope,
+      bundleBridgeHash: undefined,
+    }
+    expect(() => parseCanonicalUnitResultEnvelope(bridgeWithoutHash)).toThrow(/missing bundleBridgeHash/)
+  })
+
   it('rejects undeclared cognitive metrics and keeps trial data out of the projection', () => {
     const runtime = {
       ...scaleRuntime(),

@@ -69,6 +69,14 @@ describe('CanonicalUnitResult Bundle bridge', () => {
     expect(sources).not.toMatch(/\bprisma\b/)
   })
 
+  it('keeps additive bundleBridgeHash provenance out of core resultHash', () => {
+    const unitResult = readFileSync(resolve(__dirname, '../../modules/assessment-runtime/unit-result.ts'), 'utf8')
+    expect(unitResult).toMatch(/bundleBridgeHash/)
+    expect(unitResult).toMatch(/canonicalHash\(bundleBridge\)/)
+    expect(unitResult).toMatch(/resultHash = canonicalHash\(input\.core\)/)
+    expect(unitResult).toMatch(/bundleBridgeHash mismatch/)
+  })
+
   it('keeps Bundle engines free of Prisma and Assessment.result', () => {
     const enginesDir = resolve(__dirname, '../../modules/assessment-bundle/engines')
     for (const name of readdirSync(enginesDir)) {

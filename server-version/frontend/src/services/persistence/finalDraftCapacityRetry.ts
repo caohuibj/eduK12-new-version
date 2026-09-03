@@ -21,8 +21,9 @@ export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
 }
 
 /**
- * delay = max(Retry-AfterMs, exponentialBackoff(attempt)) + full jitter
- * Retry-After is a floor (not a hard 1s concentrate). Safety-capped at 30s.
+ * delay = max(Retry-AfterMs, exponentialBackoff(attempt)) + jitter
+ * Floor-preserving jittered exponential backoff: Retry-After is a floor
+ * (not a hard 1s concentrate). Safety-capped at 30s.
  */
 export const finalDraftCapacityRetryDelayMs = (
   attempt: number,
@@ -36,8 +37,8 @@ export const finalDraftCapacityRetryDelayMs = (
   const exponential = Math.min(SAFETY_CAP_MS, BASE_DELAY_MS * (2 ** (safeAttempt - 1)))
   const sampledRaw = random()
   const sampled = Number.isFinite(sampledRaw) ? Math.min(1, Math.max(0, sampledRaw)) : 0
-  // Full jitter added on top of the floored backoff so Retry-After=1 does not
-  // pin every client to ~1s across attempts.
+  // Jitter added on top of the floored exponential backoff so Retry-After=1
+  // does not pin every client to ~1s across attempts.
   const jitter = Math.floor(sampled * (exponential + 1))
   return Math.min(SAFETY_CAP_MS, Math.max(retryFloor, exponential) + jitter)
 }

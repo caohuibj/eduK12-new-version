@@ -87,6 +87,11 @@ export interface CanonicalUnitResultEnvelopeV1 {
   }
   /** Optional PR46 Bundle narrow-source bridge; never reread Assessment.result. */
   bundleBridge?: CanonicalBundleBridgeV1
+  /**
+   * Additive provenance over bundleBridge only.
+   * Present iff bundleBridge is present; never folded into resultHash.
+   */
+  bundleBridgeHash?: string
 }
 
 const assertJsonValue = (value: unknown): JsonValue => {
@@ -320,6 +325,21 @@ export const projectCognitiveCanonicalUnitResult = (input: {
   })
 }
 
+
+/** Drop undefined keys so bridge hashing matches the JSON-domain value we store. */
+const stripUndefinedDeep = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(stripUndefinedDeep)
+  if (!value || typeof value !== 'object') return value
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return value
+  const out: Record<string, unknown> = {}
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (entry === undefined) continue
+    out[key] = stripUndefinedDeep(entry)
+  }
+  return out
+}
+
 export const createCanonicalUnitResultEnvelope = (input: {
   core: CanonicalUnitResultCoreV1
   completedAt: Date | string
@@ -328,13 +348,26 @@ export const createCanonicalUnitResultEnvelope = (input: {
 }): CanonicalUnitResultEnvelopeV1 => {
   const completedAt = input.completedAt instanceof Date ? input.completedAt.toISOString() : input.completedAt
   if (Number.isNaN(Date.parse(completedAt))) throw new Error('Invalid canonical unit result completedAt')
+  // resultHash stays core-only; bridge gets its own additive provenance hash.
+  const resultHash = canonicalHash(input.core)
+  if (!input.bundleBridge) {
+    return {
+      core: input.core,
+      resultHash,
+      hashScheme: CANONICAL_JSON_SHA256_V1,
+      completedAt,
+      persistenceProvenance: input.persistenceProvenance,
+    }
+  }
+  const bundleBridge = stripUndefinedDeep(input.bundleBridge) as CanonicalBundleBridgeV1
   return {
     core: input.core,
-    resultHash: canonicalHash(input.core),
+    resultHash,
     hashScheme: CANONICAL_JSON_SHA256_V1,
     completedAt,
     persistenceProvenance: input.persistenceProvenance,
-    ...(input.bundleBridge ? { bundleBridge: input.bundleBridge } : {}),
+    bundleBridge,
+    bundleBridgeHash: canonicalHash(bundleBridge),
   }
 }
 
@@ -421,11 +454,21 @@ const canonicalUnitResultEnvelopeSchema = z.object({
     sourceSubmissionId: z.string().min(1).optional(),
   }).strict(),
   bundleBridge: canonicalBundleBridgeSchema.optional(),
+  bundleBridgeHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
 }).strict()
 
 export const parseCanonicalUnitResultEnvelope = (value: unknown): CanonicalUnitResultEnvelopeV1 => {
   const envelope = canonicalUnitResultEnvelopeSchema.parse(value) as CanonicalUnitResultEnvelopeV1
   if (canonicalHash(envelope.core) !== envelope.resultHash) throw new Error('Canonical unit result hash mismatch')
   if (!envelope.completedAt || Number.isNaN(Date.parse(envelope.completedAt))) throw new Error('Invalid canonical unit result completedAt')
+  const hasBridge = envelope.bundleBridge !== undefined
+  const hasBridgeHash = envelope.bundleBridgeHash !== undefined
+  if (hasBridge) {
+    if (!hasBridgeHash) throw new Error('Canonical unit result missing bundleBridgeHash')
+    const expected = canonicalHash(stripUndefinedDeep(envelope.bundleBridge))
+    if (expected !== envelope.bundleBridgeHash) throw new Error('Canonical unit result bundleBridgeHash mismatch')
+  } else if (hasBridgeHash) {
+    throw new Error('Canonical unit result bundleBridgeHash present without bundleBridge')
+  }
   return envelope
 }

@@ -1,8 +1,8 @@
 # Gate-D 压力测试结果｜PR #47 vs `main`
 
-**状态**：已推到 PR 分支 · **尚未 merge**  
+**状态**：已推到 PR 分支 · **尚未 merge**（overload / burst hardening；生产默认调参前仍待 open-loop eventual-success gate）  
 **写入**：2026-09-03 03:07 PT（跑数）· 文档整理稍后补强  
-**架构师意见**：可以合（burst insurance 达标）；成功写库口径 steady 50/75 与 real-client jitter 为可选后续。
+**架构师意见（历史）**：burst insurance 达标可继续推进；成功写库口径 steady 50/75 与 real-client jitter 仍为可选后续，**不视为已批准用本表直接合入生产默认调参**。
 
 ---
 
@@ -75,7 +75,7 @@
 
 ---
 
-## 6. 正确性侧（合前）
+## 6. 正确性侧（本轮跑数时）
 
 | 检查 | 结果 |
 |---|---|
@@ -95,7 +95,8 @@
 | 成功写库口径 steady 50/75 | **本轮未钉** — 可选后续 |
 | Real-client FinalDraft jitter 突发 | **本轮未跑** — 可选后续 |
 
-**结论：PR #47 可以合**；本轮 Gate-D 已证明门禁设计意图。
+**结论：本轮 Gate-D 证明的是 overload protection / fast-fail（突发延迟下降 + 可控 503），不是 `479c504` 头上的 successful-finalization 吞吐提升。**  
+PR #47 应继续作为 **overload / burst hardening** 推进；在补上 open-loop eventual-success gate 之前，**不要把本表当成生产默认调参 / 合入依据的完整验证**。
 
 ---
 
@@ -108,13 +109,16 @@
 
 ---
 
-## 9. Post-review fix notes
+## 9. Post-review fix notes / scope of the tables
 
-Prior A/B measured code SHA **`1b6df8b`**. Subsequent commits on this PR branch may include docs plus post-review hardening and do **not** invalidate the tables above.
+Historical A/B measured code SHA **`1b6df8b`**. The capacity tables above remain valid as a record of that run and prove **overload protection / fast-fail**, **not** a successful-finalization throughput improvement for current head **`479c504`** (or later).
 
-Follow-up fixes after review (same PR, not yet Gate-D re-run):
+Subsequent commits on this PR branch (UNIT-scope permit release, capacity-retry floor/backoff wording, docs, additive `bundleBridgeHash` provenance, etc.) mean these capacity tables are **not** a full validation of the current head. Do **not** destroy or rewrite the architect tables in §§3–7; treat them as historical evidence for `1b6df8b`.
+
+Follow-up fixes after review (same PR, not yet Gate-D / open-loop re-run):
 
 - Frontend: narrow `api.submitFinal` outside the capacity-retry closure (`useCognitiveSession`).
-- Frontend capacity retry: treat `Retry-After` as a **minimum floor**, apply exponential backoff + full jitter, safety-cap at 30s (no longer concentrates all retries near 1s when Retry-After=1).
+- Frontend capacity retry: treat `Retry-After` as a **minimum floor**, apply **floor-preserving jittered exponential backoff**, safety-cap at 30s (no longer concentrates all retries near 1s when Retry-After=1). Algorithm unchanged; comments/docs only renamed away from misleading "full jitter".
 - Backend: UNIT admission wraps only unit persist/score; parent aggregate finalization runs **after** the UNIT permit is released (Scale / Cognitive / Form). Aggregate keeps its own `withAggregateFinalizationAdmission`.
 - Backend regression: Scale Bundle bridge `canonicalHash(ScaleResultV2)` failed when optional `itemScores[].answeredAt` was `undefined`; scoring now omits undefined optionals.
+- Backend provenance: when `bundleBridge` is present, envelopes also carry additive `bundleBridgeHash` (core `resultHash` unchanged).
