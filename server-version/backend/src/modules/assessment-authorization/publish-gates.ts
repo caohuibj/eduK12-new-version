@@ -24,6 +24,7 @@ export const evaluateAuthorizationOverlayStatus = (
   if (record.status === 'REVOKED') return 'REVOKED'
   if (record.status === 'DRAFT') return 'DRAFT'
   if (Date.parse(nowIso) > Date.parse(record.validTo)) return 'EXPIRED'
+  if (Date.parse(nowIso) < Date.parse(record.validFrom)) return 'DRAFT'
   return record.status
 }
 
@@ -42,10 +43,102 @@ export const assertLocaleTerritoryMatch = (input: {
   }
 }
 
+const ELIGIBLE_RIGHTS_STATUSES = new Set(['APPROVED', 'EVIDENCE_PENDING'])
+
+/**
+ * Resolve the effective authorization for one instrumentKey@version lineage.
+ * Newer DRAFT must not kill an active APPROVED/EVIDENCE_PENDING version.
+ * Do not fold some(EXPIRED) over all history — only the effective row matters.
+ */
+export const resolveEffectiveAuthorization = (input: {
+  authorizations: InstrumentAuthorizationRecordV1[]
+  instrumentKey: string
+  instrumentVersion: string
+  nowIso: string
+}): InstrumentAuthorizationRecordV1 | null => {
+  const lineage = input.authorizations
+    .filter((row) => (
+      row.instrumentKey === input.instrumentKey
+      && row.instrumentVersion === input.instrumentVersion
+    ))
+    .sort((a, b) => b.version - a.version)
+
+  if (lineage.length === 0) return null
+
+  // Prefer the newest eligible (APPROVED | EVIDENCE_PENDING) that is in validity window
+  // and not overlay-EXPIRED/REVOKED.
+  for (const row of lineage) {
+    const overlay = evaluateAuthorizationOverlayStatus(row, input.nowIso)
+    if (!ELIGIBLE_RIGHTS_STATUSES.has(row.status)) continue
+    if (overlay === 'EXPIRED' || overlay === 'REVOKED') continue
+    if (overlay === 'DRAFT') continue
+    if (Date.parse(input.nowIso) < Date.parse(row.validFrom)) continue
+    if (Date.parse(input.nowIso) > Date.parse(row.validTo)) continue
+    return row
+  }
+
+  // Fall back to newest row for diagnostics (caller may treat as ineligible).
+  return lineage[0] ?? null
+}
+
+export type PublicationProofsV1 = {
+  scientificOk?: boolean
+  languageOk?: boolean
+  reportOk?: boolean
+  safetyOk?: boolean
+  goldenOk?: boolean
+}
+
+const evaluateRequiredBooleanGate = (input: {
+  gate: PublicationGateResultV1['gate']
+  required: boolean
+  proof: boolean | undefined
+  pendingLabel: string
+  failLabel: string
+  okLabel: string
+}): PublicationGateResultV1 => {
+  if (!input.required) {
+    return {
+      gate: input.gate,
+      ok: true,
+      severity: 'warning',
+      message: `${input.gate} not required`,
+      evaluation: 'not_required',
+    }
+  }
+  if (input.proof === undefined) {
+    return {
+      gate: input.gate,
+      ok: false,
+      severity: 'error',
+      message: input.pendingLabel,
+      evaluation: 'pending',
+    }
+  }
+  if (input.proof !== true) {
+    return {
+      gate: input.gate,
+      ok: false,
+      severity: 'error',
+      message: input.failLabel,
+      evaluation: 'failed',
+    }
+  }
+  return {
+    gate: input.gate,
+    ok: true,
+    severity: 'error',
+    message: input.okLabel,
+    evaluation: 'passed',
+  }
+}
+
 /**
  * Unified Publish validation: science/rights/language/report/safety/golden.
  * EVIDENCE_PENDING warns but does not block already-approved publish.
  * WHO-5 is publishable only when commercialNature is NON_COMMERCIAL.
+ * Required gates fail-closed: undefined proof ≠ pass; preview shows pending.
+ * Code-definition DRAFT cannot become environment PUBLISHED via overlay.
  */
 export const evaluateBundlePublication = (input: {
   definition: AssessmentBundleDefinitionV1
@@ -59,6 +152,11 @@ export const evaluateBundlePublication = (input: {
   reportOk?: boolean
   safetyOk?: boolean
   goldenOk?: boolean
+  /** When true, rights also require electronicAdministration/scoring/translation/display as needed. */
+  requireElectronicAdministration?: boolean
+  requireScoring?: boolean
+  requireTranslation?: boolean
+  requireDisplay?: boolean
 }): PublicationDecisionV1 => {
   const nowIso = input.nowIso ?? new Date().toISOString()
   const gates: PublicationGateResultV1[] = []
@@ -71,61 +169,104 @@ export const evaluateBundlePublication = (input: {
     if (!gate.ok && gate.severity === 'warning') warnings.push(gate.message)
   }
 
-  push({
+  const req = input.definition.publicationRequirements
+
+  push(evaluateRequiredBooleanGate({
     gate: 'scientific',
-    ok: input.scientificOk !== false,
-    severity: 'error',
-    message: input.scientificOk === false ? 'scientific gate failed' : 'scientific gate ok',
-  })
-  push({
+    required: req.scientificGate,
+    proof: input.scientificOk,
+    pendingLabel: 'scientific gate pending/not evaluated',
+    failLabel: 'scientific gate failed',
+    okLabel: 'scientific gate ok',
+  }))
+  push(evaluateRequiredBooleanGate({
     gate: 'language',
-    ok: input.languageOk !== false,
-    severity: 'error',
-    message: input.languageOk === false ? 'language gate failed' : 'language gate ok',
-  })
-  push({
+    required: req.languageGate,
+    proof: input.languageOk,
+    pendingLabel: 'language gate pending/not evaluated',
+    failLabel: 'language gate failed',
+    okLabel: 'language gate ok',
+  }))
+  push(evaluateRequiredBooleanGate({
     gate: 'report',
-    ok: input.reportOk !== false,
-    severity: 'error',
-    message: input.reportOk === false ? 'report gate failed' : 'report gate ok',
-  })
-  push({
-    gate: 'safety',
-    ok: input.definition.safetyCapability.productionTriggerEnabled
-      ? input.safetyOk === true
-      : input.safetyOk !== false,
-    severity: 'error',
-    message: 'safety gate evaluated',
-  })
-  push({
+    required: req.reportGate,
+    proof: input.reportOk,
+    pendingLabel: 'report gate pending/not evaluated',
+    failLabel: 'report gate failed',
+    okLabel: 'report gate ok',
+  }))
+  push(evaluateRequiredBooleanGate({
     gate: 'golden',
-    ok: input.goldenOk !== false,
-    severity: 'error',
-    message: input.goldenOk === false ? 'golden/negative gate failed' : 'golden gate ok',
-  })
+    required: true,
+    proof: input.goldenOk,
+    pendingLabel: 'golden/negative gate pending/not evaluated',
+    failLabel: 'golden/negative gate failed',
+    okLabel: 'golden gate ok',
+  }))
+
+  const safetyRequired = req.safetyGate || input.definition.safetyCapability.productionTriggerEnabled
+  push(evaluateRequiredBooleanGate({
+    gate: 'safety',
+    required: safetyRequired,
+    proof: input.safetyOk,
+    pendingLabel: 'safety gate pending/not evaluated',
+    failLabel: 'safety gate failed',
+    okLabel: 'safety gate ok',
+  }))
 
   let rightsOk = true
-  if (input.definition.rightsRequirements.required || input.definition.publicationRequirements.rightsGate) {
-    for (const instrumentKey of (
+  const requireElectronic = input.requireElectronicAdministration !== false
+  const requireScoring = input.requireScoring !== false
+  const requireTranslation = input.requireTranslation === true
+  const requireDisplay = input.requireDisplay !== false
+
+  if (input.definition.rightsRequirements.required || req.rightsGate) {
+    const instrumentKeys = (
       input.definition.rightsRequirements.instrumentKeys.length > 0
         ? input.definition.rightsRequirements.instrumentKeys
         : input.definition.slots.map((slot) => slot.instrumentKey)
-    )) {
-      const matches = input.authorizations.filter((row) => row.instrumentKey === instrumentKey)
-      if (matches.length === 0) {
+    )
+    // Exact instrument versions from slots when present.
+    const versionByKey = new Map<string, string>()
+    for (const slot of input.definition.slots) {
+      versionByKey.set(slot.instrumentKey, slot.instrumentVersion)
+    }
+
+    for (const instrumentKey of instrumentKeys) {
+      const instrumentVersion = versionByKey.get(instrumentKey)
+        ?? input.authorizations.find((row) => row.instrumentKey === instrumentKey)?.instrumentVersion
+      if (!instrumentVersion) {
         rightsOk = false
         errors.push(`missing authorization for ${instrumentKey}`)
         continue
       }
-      const latest = matches.sort((a, b) => b.version - a.version)[0]
-      const overlay = evaluateAuthorizationOverlayStatus(latest, nowIso)
-      if (overlay === 'EXPIRED' || overlay === 'REVOKED') {
+
+      const effective = resolveEffectiveAuthorization({
+        authorizations: input.authorizations,
+        instrumentKey,
+        instrumentVersion,
+        nowIso,
+      })
+      if (!effective) {
         rightsOk = false
-        errors.push(`${instrumentKey} authorization ${overlay}`)
+        errors.push(`missing authorization for ${instrumentKey}@${instrumentVersion}`)
         continue
       }
+
+      const overlay = evaluateAuthorizationOverlayStatus(effective, nowIso)
+      if (!ELIGIBLE_RIGHTS_STATUSES.has(effective.status) || overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT') {
+        rightsOk = false
+        errors.push(`${instrumentKey}@${instrumentVersion} authorization ${overlay}`)
+        continue
+      }
+      if (Date.parse(nowIso) < Date.parse(effective.validFrom) || Date.parse(nowIso) > Date.parse(effective.validTo)) {
+        rightsOk = false
+        errors.push(`${instrumentKey}@${instrumentVersion} outside validFrom/validTo`)
+        continue
+      }
+
       const scope = assertLocaleTerritoryMatch({
-        record: latest,
+        record: effective,
         locale: input.locale,
         territory: input.territory,
       })
@@ -134,18 +275,48 @@ export const evaluateBundlePublication = (input: {
         errors.push(scope.message ?? 'SCOPE_MISMATCH')
         continue
       }
-      if (overlay === 'EVIDENCE_PENDING') {
+
+      if (requireElectronic && !effective.scope.electronicAdministration) {
+        rightsOk = false
+        errors.push(`${instrumentKey}: electronicAdministration required`)
+        continue
+      }
+      if (requireScoring && !effective.scope.scoring) {
+        rightsOk = false
+        errors.push(`${instrumentKey}: scoring required`)
+        continue
+      }
+      if (requireTranslation && !effective.scope.translation) {
+        rightsOk = false
+        errors.push(`${instrumentKey}: translation required`)
+        continue
+      }
+      if (requireDisplay && !effective.scope.display) {
+        rightsOk = false
+        errors.push(`${instrumentKey}: display required`)
+        continue
+      }
+
+      if (overlay === 'EVIDENCE_PENDING' || effective.status === 'EVIDENCE_PENDING') {
         warnings.push(`${instrumentKey}: EVIDENCE_PENDING — warn only, does not block approved publish`)
       }
       if (isWho5Instrument(instrumentKey) || isWho5Instrument(input.definition.bundleKey)) {
         if (
-          latest.scope.commercialNature !== 'NON_COMMERCIAL'
+          effective.scope.commercialNature !== 'NON_COMMERCIAL'
           || input.deploymentCommercialNature !== 'NON_COMMERCIAL'
-          || !input.definition.publicationRequirements.nonCommercialOnly
+          || !req.nonCommercialOnly
         ) {
           rightsOk = false
           errors.push('WHO-5 仅 NON_COMMERCIAL 可发布')
+          continue
         }
+      } else if (
+        effective.scope.commercialNature === 'NON_COMMERCIAL'
+        && input.deploymentCommercialNature === 'COMMERCIAL'
+      ) {
+        rightsOk = false
+        errors.push(`${instrumentKey}: commercialNature mismatch with deployment`)
+        continue
       }
     }
   }
@@ -154,24 +325,64 @@ export const evaluateBundlePublication = (input: {
     ok: rightsOk,
     severity: 'error',
     message: rightsOk ? 'rights gate ok' : 'rights gate failed',
+    evaluation: rightsOk ? 'passed' : 'failed',
   })
 
-  // Blocking overlay statuses stop new starts and force catalog HOLD.
-  const blocking = input.authorizations.some((row) => {
-    const status = evaluateAuthorizationOverlayStatus(row, nowIso)
-    if (status === 'EXPIRED' || status === 'REVOKED') return true
-    const scope = assertLocaleTerritoryMatch({
-      record: row,
-      locale: input.locale,
-      territory: input.territory,
-    })
-    return !scope.ok
-  })
+  // Blocking only from effective eligible rows that are EXPIRED/REVOKED/SCOPE_MISMATCH —
+  // never some(EXPIRED) over entire history including superseded versions.
+  let blocking = false
+  if (input.definition.rightsRequirements.required || req.rightsGate) {
+    const instrumentKeys = (
+      input.definition.rightsRequirements.instrumentKeys.length > 0
+        ? input.definition.rightsRequirements.instrumentKeys
+        : input.definition.slots.map((slot) => slot.instrumentKey)
+    )
+    const versionByKey = new Map<string, string>()
+    for (const slot of input.definition.slots) {
+      versionByKey.set(slot.instrumentKey, slot.instrumentVersion)
+    }
+    for (const instrumentKey of instrumentKeys) {
+      const instrumentVersion = versionByKey.get(instrumentKey)
+      if (!instrumentVersion) {
+        blocking = true
+        continue
+      }
+      const effective = resolveEffectiveAuthorization({
+        authorizations: input.authorizations,
+        instrumentKey,
+        instrumentVersion,
+        nowIso,
+      })
+      if (!effective || !ELIGIBLE_RIGHTS_STATUSES.has(effective.status)) {
+        blocking = true
+        continue
+      }
+      const status = evaluateAuthorizationOverlayStatus(effective, nowIso)
+      if (status === 'EXPIRED' || status === 'REVOKED') {
+        blocking = true
+        continue
+      }
+      const scope = assertLocaleTerritoryMatch({
+        record: effective,
+        locale: input.locale,
+        territory: input.territory,
+      })
+      if (!scope.ok) blocking = true
+    }
+  }
 
-  const publishable = errors.length === 0 && !blocking
-  const catalogStatus = publishable
+  // Code-definition DRAFT cannot become environment PUBLISHED via overlay alone.
+  if (input.definition.status !== 'PUBLISHED') {
+    errors.push(`code definition status is ${input.definition.status}; overlay cannot publish DRAFT/HOLD/RETIRED`)
+  }
+
+  const publishable = errors.length === 0 && !blocking && input.definition.status === 'PUBLISHED'
+  const catalogStatus: PublicationDecisionV1['catalogStatus'] = publishable
     ? 'PUBLISHED'
-    : (blocking ? 'HOLD' : (input.definition.status === 'DRAFT' ? 'DRAFT' : 'HOLD'))
+    : (blocking
+      ? 'HOLD'
+      : (input.definition.status === 'DRAFT' ? 'DRAFT' : 'HOLD'))
+
   return {
     publishable,
     catalogStatus,

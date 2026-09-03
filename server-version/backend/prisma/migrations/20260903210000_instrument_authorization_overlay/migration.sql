@@ -64,4 +64,4 @@ ALTER TABLE "instrument_authorizations"
 ALTER TABLE "instrument_authorization_audits"
   ADD CONSTRAINT "instrument_authorization_audits_authorization_id_fkey"
   FOREIGN KEY ("authorization_id") REFERENCES "instrument_authorizations"("id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
+  ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -7,6 +7,7 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   assertContextDefinitionHashMatchesSnapshot,
+  validateFrozenAssessmentBundleSnapshot,
 } from './snapshot'
 import { buildBundleReportFacts, validateBundleReportFacts } from './evidence'
 import { bundleContractFail } from './errors'
@@ -84,8 +85,7 @@ export const projectCognitiveEvidenceItems = (input: {
 }
 
 const collectEvidenceFromSources = (input: BundleEngineInputV1): EvidenceItemV1[] => {
-  if (input.evidence.length > 0) return input.evidence.map((item) => ({ ...item }))
-
+  // Always build from authoritative projectors — never trust caller-supplied evidence shortcut.
   const collected: EvidenceItemV1[] = []
   for (const slot of input.snapshot.slotBindings) {
     if (slot.unitType === 'SCALE') {
@@ -160,7 +160,6 @@ const toEnginePayload = (
 export const projectBundleReportFacts = (input: {
   registry: BundleAnalysisEngineRegistry
   engineInput: BundleEngineInputV1
-  compiledBundleRuntimeHash: string
   limitations?: string[]
   recommendations?: string[]
 }): BundleReportFactsV1 => {
@@ -177,8 +176,14 @@ export const projectBundleReportFacts = (input: {
     }
   }
 
+  const compiledBundleRuntimeHash = engineInput.compiledRuntime.compiledRuntimeHash
+  if (typeof compiledBundleRuntimeHash !== 'string' || !/^[0-9a-f]{64}$/.test(compiledBundleRuntimeHash)) {
+    bundleContractFail('COMPILED_RUNTIME_HASH', 'compiledRuntime.compiledRuntimeHash 必须是权威小写 SHA-256')
+  }
+
   const evidence = collectEvidenceFromSources(engineInput)
-  const engineResult = input.registry.dispatch(engineInput)
+  // Dispatch MH/engine with the same authoritative evidence set written into ReportFacts.
+  const engineResult = input.registry.dispatch({ ...engineInput, evidence })
   const enginePayload = toEnginePayload(snapshot, engineResult)
 
   const qualityNotes: string[] = []
@@ -209,7 +214,7 @@ export const projectBundleReportFacts = (input: {
     recommendations: input.recommendations ?? [],
     contextSnapshotHash: engineInput.contextFacts?.contextSnapshotHash ?? null,
     provenance: {
-      compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
+      compiledBundleRuntimeHash,
       aggregateInputHash: engineInput.aggregateInputHash,
       contextDefinitionHash: snapshot.contextDefinitionHash,
       ruleSetRef: snapshot.ruleSetRef ? { ...snapshot.ruleSetRef } : null,
@@ -221,7 +226,7 @@ export interface BundleAudienceProjectionV1 {
   audience: BundleReportAudienceV1
   identity: BundleReportFactsV1['identity']
   quality: BundleReportFactsV1['quality']
-  /** Sanitized evidence: no CONTEXT_FACT values for non-admin audiences. */
+  /** Sanitized evidence: CONTEXT_FACT values redacted for student/parent/teacher/admin. */
   evidence: Array<{
     evidenceKey: string
     constructKey: string
@@ -229,7 +234,7 @@ export interface BundleAudienceProjectionV1 {
     quality: EvidenceQualityStateV1
     criterionBandKey: string | null
     role: EvidenceItemV1['role']
-    /** Present values for Cognitive/Scale only (non-admin). Admin may see CONTEXT presence without raw secrets. */
+    /** Cognitive/Scale values may be present; CONTEXT_FACT always redacted on this API. */
     value: EvidenceItemV1['value'] | { state: 'redacted' }
   }>
   engineSummary: {
@@ -291,7 +296,8 @@ export const projectBundleAudienceView = (
   const validated = validateBundleReportFacts(facts)
   const evidence = validated.evidence.map((item) => {
     const sourceKind = item.source.kind
-    if (sourceKind === 'CONTEXT_FACT' && audience !== 'admin') {
+    // Privileged Context read is not this API — redact CONTEXT_FACT for every audience including admin.
+    if (sourceKind === 'CONTEXT_FACT') {
       return {
         evidenceKey: item.evidenceKey,
         constructKey: item.constructKey,
@@ -406,12 +412,25 @@ export const exportHistoricalBundleSnapshot = (input: {
   reportFacts?: BundleReportFactsV1 | null
   exportedAt?: string
 }): BundleHistoricalSnapshotExportV1 => {
+  const snapshot = validateFrozenAssessmentBundleSnapshot(input.snapshot)
   const exportedAt = input.exportedAt ?? new Date().toISOString()
   const reportFacts = input.reportFacts ? validateBundleReportFacts(input.reportFacts) : null
+  if (reportFacts) {
+    if (
+      reportFacts.identity.bundleKey !== snapshot.bundleKey
+      || reportFacts.identity.bundleVersion !== snapshot.bundleVersion
+      || reportFacts.identity.snapshotHash !== snapshot.snapshotHash
+    ) {
+      bundleContractFail(
+        'HISTORICAL_EXPORT_IDENTITY_MISMATCH',
+        'reportFacts 必须精确匹配 snapshot 的 bundleKey/bundleVersion/snapshotHash',
+      )
+    }
+  }
   const body = {
     schema: 'bundle-historical-snapshot-export-v1' as const,
     authoritative: false as const,
-    snapshot: input.snapshot,
+    snapshot,
     reportFacts,
     exportedAt,
   }

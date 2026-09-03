@@ -17,7 +17,7 @@ import {
 } from '../../modules/assessment-bundle'
 import { compileBundleRuntimeFromFrozenRead } from '../../modules/assessment-bundle/compile'
 import { buildFrozenAssessmentBundleSnapshot } from '../../modules/assessment-bundle/snapshot'
-import { HASH_A } from './fixtures'
+import { HASH_A, HASH_B } from './fixtures'
 
 const scaleResult = () => ({
   schemaVersion: 2 as const,
@@ -121,7 +121,6 @@ describe('BundleReportFacts projector / audience / export', () => {
     })
     const facts = projectBundleReportFacts({
       registry: createProductBundleAnalysisEngineRegistry(),
-      compiledBundleRuntimeHash: compiled.compiledRuntimeHash,
       engineInput: {
         snapshot,
         compiledRuntime: compiled,
@@ -169,7 +168,6 @@ describe('BundleReportFacts projector / audience / export', () => {
     })
     const facts = projectBundleReportFacts({
       registry: createProductBundleAnalysisEngineRegistry(),
-      compiledBundleRuntimeHash: compiled.compiledRuntimeHash,
       engineInput: {
         snapshot,
         compiledRuntime: compiled,
@@ -200,7 +198,6 @@ describe('BundleReportFacts projector / audience / export', () => {
     })
     const facts = projectBundleReportFacts({
       registry: createProductBundleAnalysisEngineRegistry(),
-      compiledBundleRuntimeHash: compiled.compiledRuntimeHash,
       engineInput: {
         snapshot,
         compiledRuntime: compiled,
@@ -232,5 +229,139 @@ describe('BundleReportFacts projector / audience / export', () => {
     expect(exported.snapshot.snapshotHash).toBe(snapshot.snapshotHash)
     expect(exported.reportFacts?.identity.snapshotHash).toBe(facts.identity.snapshotHash)
     expect(exported.exportHash).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('ignores caller-supplied evidence shortcut and always projects from sources', () => {
+    const snapshot = buildFrozenAssessmentBundleSnapshot(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)
+    const scaleSources: BundleFrozenScaleSourceV1[] = [
+      projectBundleScaleSource({
+        slotKey: 'who5',
+        expectedInstrumentKey: 'who5',
+        expectedInstrumentVersion: '1.0.0',
+        result: scaleResult(),
+      }),
+    ]
+    const compiled = compileBundleRuntimeFromFrozenRead({
+      family: 'ASSESSMENT_BUNDLE',
+      snapshotVersion: 3,
+      snapshot,
+    })
+    const facts = projectBundleReportFacts({
+      registry: createProductBundleAnalysisEngineRegistry(),
+      engineInput: {
+        snapshot,
+        compiledRuntime: compiled,
+        evidence: [{
+          evidenceKey: 'forged.evidence',
+          constructKey: 'forged.construct',
+          source: {
+            kind: 'SCALE_SCORE',
+            slotKey: 'who5',
+            scoreKey: 'raw_total',
+            sourceResultHash: HASH_A,
+          },
+          value: { state: 'present', value: 999 },
+          quality: 'interpretable',
+          criterionBandKey: null,
+          role: 'PRIMARY',
+        }],
+        contextFacts: null,
+        aggregateInputHash: null,
+        scaleSources,
+      },
+    })
+    expect(facts.evidence.some((item) => item.evidenceKey === 'forged.evidence')).toBe(false)
+    expect(facts.evidence.some((item) => item.source.kind === 'SCALE_SCORE')).toBe(true)
+    expect(facts.provenance.compiledBundleRuntimeHash).toBe(compiled.compiledRuntimeHash)
+  })
+
+  it('redacts CONTEXT_FACT for admin audience and keeps sensitiveContextValues null', () => {
+    const snapshot = buildFrozenAssessmentBundleSnapshot(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)
+    const compiled = compileBundleRuntimeFromFrozenRead({
+      family: 'ASSESSMENT_BUNDLE',
+      snapshotVersion: 3,
+      snapshot,
+    })
+    const facts = projectBundleReportFacts({
+      registry: createProductBundleAnalysisEngineRegistry(),
+      engineInput: {
+        snapshot,
+        compiledRuntime: compiled,
+        evidence: [],
+        contextFacts: null,
+        aggregateInputHash: null,
+        scaleSources: [
+          projectBundleScaleSource({
+            slotKey: 'who5',
+            expectedInstrumentKey: 'who5',
+            expectedInstrumentVersion: '1.0.0',
+            result: scaleResult(),
+          }),
+        ],
+      },
+    })
+    const injected = {
+      ...facts,
+      contextSnapshotHash: HASH_B,
+      evidence: [
+        ...facts.evidence,
+        {
+          evidenceKey: 'context.secret_note',
+          constructKey: 'context.secret_note',
+          source: {
+            kind: 'CONTEXT_FACT' as const,
+            contextKey: 'secret_note',
+            contextSnapshotHash: HASH_B,
+          },
+          value: { state: 'present' as const, value: 'private' },
+          quality: 'interpretable' as const,
+          criterionBandKey: null,
+          role: 'CONTEXT' as const,
+        },
+      ],
+    }
+    const admin = projectBundleAudienceView(injected as typeof facts, 'admin')
+    const contextRow = admin.evidence.find((row) => row.sourceKind === 'CONTEXT_FACT')
+    expect(contextRow?.value).toEqual({ state: 'redacted' })
+    expect(admin.sensitiveContextValues).toBeNull()
+    expect(admin.rawAnswers).toBeNull()
+  })
+
+  it('rejects historical export when reportFacts identity does not match snapshot', () => {
+    const snapshot = buildFrozenAssessmentBundleSnapshot(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)
+    const compiled = compileBundleRuntimeFromFrozenRead({
+      family: 'ASSESSMENT_BUNDLE',
+      snapshotVersion: 3,
+      snapshot,
+    })
+    const facts = projectBundleReportFacts({
+      registry: createProductBundleAnalysisEngineRegistry(),
+      engineInput: {
+        snapshot,
+        compiledRuntime: compiled,
+        evidence: [],
+        contextFacts: null,
+        aggregateInputHash: null,
+        scaleSources: [
+          projectBundleScaleSource({
+            slotKey: 'who5',
+            expectedInstrumentKey: 'who5',
+            expectedInstrumentVersion: '1.0.0',
+            result: scaleResult(),
+          }),
+        ],
+      },
+    })
+    const mismatched = {
+      ...facts,
+      identity: {
+        ...facts.identity,
+        snapshotHash: HASH_B,
+      },
+    }
+    expect(() => exportHistoricalBundleSnapshot({
+      snapshot,
+      reportFacts: mismatched,
+    })).toThrow(/bundleKey|snapshotHash|identity/i)
   })
 })

@@ -7,5 +7,6 @@ router.get('/', instrumentAuthorizationController.list)
 router.post('/', instrumentAuthorizationController.create)
 router.post('/publish-preview/who5', instrumentAuthorizationController.publishPreviewWho5)
 router.post('/:authorizationId/approve', instrumentAuthorizationController.approve)
+router.post('/:authorizationId/revoke', instrumentAuthorizationController.revoke)
 
 export default router

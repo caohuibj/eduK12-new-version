@@ -78,6 +78,8 @@ export interface PublicationGateResultV1 {
   ok: boolean
   severity: 'error' | 'warning'
   message: string
+  /** Fail-closed preview: pending when validator not run; never fake pass. */
+  evaluation?: 'passed' | 'failed' | 'pending' | 'not_required'
 }
 
 export interface PublicationDecisionV1 {

@@ -11,6 +11,8 @@ import {
   type BundleFrozenScaleSourceV1,
 } from '../../modules/assessment-bundle'
 import { HASH_A, HASH_B } from './fixtures'
+import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
 const failCode = (run: () => unknown): string => {
   try {
@@ -420,6 +422,88 @@ describe('authoritative Bundle source projectors', () => {
     expect(failCode(() => assertUniqueValueSelectors([
       { slotKey: 'who5', valueSelectors: ['raw_total', 'raw_total'] },
     ]))).toBe('SOURCE_VALUE_SELECTOR_DUPLICATE')
+  })
+
+  it('uses canonicalHash(result) as sourceResultHash and rejects envelope A + result B', () => {
+    const resultA = scaleResult()
+    const resultB = scaleResult({
+      scores: [
+        {
+          key: 'raw_total',
+          type: 'total',
+          label: 'Raw',
+          direction: 'higher_is_better',
+          canonical: true,
+          displayPrecision: 0,
+          value: 3,
+          range: { min: 0, max: 25 },
+          expectedItems: ['i1'],
+          answeredItems: ['i1'],
+          status: 'calculated',
+          prorated: false,
+        },
+        {
+          key: 'percentage',
+          type: 'dimension',
+          label: 'Pct',
+          direction: 'higher_is_better',
+          canonical: false,
+          displayPrecision: 0,
+          value: 12,
+          range: { min: 0, max: 100 },
+          expectedItems: ['i1'],
+          answeredItems: ['i1'],
+          status: 'calculated',
+          prorated: false,
+        },
+      ],
+    })
+    const envelopeA = createCanonicalUnitResultEnvelope({
+      core: {
+        schemaVersion: 1,
+        unitType: 'SCALE',
+        instrumentKey: 'who5',
+        instrumentVersion: '1.0.0',
+        sourceDefinitionHash: HASH_A,
+        compilerVersion: '1.0.0',
+        compiledRuntimeHash: HASH_A,
+        scorerKey: 'scale.default',
+        scorerVersion: '1.0.0',
+        quality: { status: 'interpretable', flags: [] },
+        metrics: [
+          { key: 'raw_total', value: 18, unit: 'score', quality: 'calculated' },
+          { key: 'percentage', value: 72, unit: 'score', quality: 'calculated' },
+        ],
+        facts: [],
+        references: [],
+        contextHash: null,
+        scientificProvenance: { instrumentKey: 'who5', instrumentVersion: '1.0.0' },
+      },
+      completedAt: '2026-09-03T04:00:00.000Z',
+      persistenceProvenance: {
+        sourceType: 'ASSESSMENT',
+        sourceAttemptId: 'attempt-1',
+      },
+    })
+
+    const matched = projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      result: resultA,
+      canonicalEnvelope: envelopeA,
+    })
+    expect(matched.sourceResultHash).toBe(canonicalHash(resultA))
+    expect(matched.envelopeResultHash).toBe(envelopeA.resultHash)
+    expect(matched.sourceResultHash).not.toBe(envelopeA.resultHash)
+
+    expect(failCode(() => projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      result: resultB,
+      canonicalEnvelope: envelopeA,
+    }))).toBe('SOURCE_RESULT_HASH_MISMATCH')
   })
 
   it('includes slot identity in projected Scale Evidence keys', () => {

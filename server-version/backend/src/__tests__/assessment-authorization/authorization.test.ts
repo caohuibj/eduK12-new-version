@@ -10,9 +10,12 @@ import {
   canStartNewAttempt,
   createInstrumentAuthorizationDraft,
   evaluateBundlePublication,
+  parseInstrumentAuthorizationRecord,
   resolveAttemptDeadline,
+  resolveEffectiveAuthorization,
   revokeInstrumentAuthorization,
 } from '../../modules/assessment-authorization'
+import type { AssessmentBundleDefinitionV1 } from '../../modules/assessment-bundle/types'
 
 const failCode = (run: () => unknown): string => {
   try {
@@ -44,6 +47,18 @@ const draft = (actor = 'admin-1') => createInstrumentAuthorizationDraft({
   createdByUserId: actor,
   now: '2026-09-03T04:00:00.000Z',
 })
+
+const publishedWho5 = (): AssessmentBundleDefinitionV1 => ({
+  ...WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+  status: 'PUBLISHED',
+})
+
+const passingProofs = {
+  scientificOk: true,
+  languageOk: true,
+  reportOk: true,
+  goldenOk: true,
+} as const
 
 describe('instrument authorization overlay', () => {
   it('allows self-approve only with confirmation declaration and appends audit', () => {
@@ -95,22 +110,24 @@ describe('instrument authorization overlay', () => {
     }).record
 
     const ok = evaluateBundlePublication({
-      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      definition: publishedWho5(),
       authorizations: [withEvidence],
       locale: 'zh-CN',
       territory: 'CN',
       deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
     })
     expect(ok.publishable).toBe(true)
     expect(ok.catalogStatus).toBe('PUBLISHED')
     expect(canStartNewAttempt({ decision: ok })).toBe(true)
 
     const commercialBlocked = evaluateBundlePublication({
-      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      definition: publishedWho5(),
       authorizations: [withEvidence],
       locale: 'zh-CN',
       territory: 'CN',
       deploymentCommercialNature: 'COMMERCIAL',
+      ...passingProofs,
     })
     expect(commercialBlocked.publishable).toBe(false)
     expect(commercialBlocked.errors.some((row) => /NON_COMMERCIAL/.test(row))).toBe(true)
@@ -121,22 +138,24 @@ describe('instrument authorization overlay', () => {
       note: 'revoked',
     }).record
     const revokedDecision = evaluateBundlePublication({
-      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      definition: publishedWho5(),
       authorizations: [revoked],
       locale: 'zh-CN',
       territory: 'CN',
       deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
     })
     expect(revokedDecision.publishable).toBe(false)
     expect(revokedDecision.catalogStatus).toBe('HOLD')
     expect(canStartNewAttempt({ decision: revokedDecision })).toBe(false)
 
     const mismatch = evaluateBundlePublication({
-      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      definition: publishedWho5(),
       authorizations: [withEvidence],
       locale: 'en-US',
       territory: 'US',
       deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
     })
     expect(mismatch.publishable).toBe(false)
     expect(mismatch.errors.some((row) => /mismatch|SCOPE/i.test(row))).toBe(true)
@@ -149,14 +168,141 @@ describe('instrument authorization overlay', () => {
     }).record
     expect(pending.status).toBe('EVIDENCE_PENDING')
     const decision = evaluateBundlePublication({
-      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      definition: publishedWho5(),
+      authorizations: [pending],
+      locale: 'zh-CN',
+      territory: 'CN',
+      deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
+    })
+    expect(decision.publishable).toBe(true)
+    expect(decision.warnings.some((row) => /EVIDENCE_PENDING/.test(row))).toBe(true)
+  })
+
+  it('fail-closes required gates when proofs are undefined and never fakes pass', () => {
+    const pending = approveInstrumentAuthorization({
+      record: draft(),
+      actorUserId: 'admin-2',
+    }).record
+    const decision = evaluateBundlePublication({
+      definition: publishedWho5(),
       authorizations: [pending],
       locale: 'zh-CN',
       territory: 'CN',
       deploymentCommercialNature: 'NON_COMMERCIAL',
     })
+    expect(decision.publishable).toBe(false)
+    expect(decision.gates.filter((gate) => gate.evaluation === 'pending').length).toBeGreaterThan(0)
+    expect(decision.errors.some((row) => /pending|not evaluated/i.test(row))).toBe(true)
+  })
+
+  it('cannot publish when code definition is DRAFT even if rights pass', () => {
+    const pending = approveInstrumentAuthorization({
+      record: draft(),
+      actorUserId: 'admin-2',
+    }).record
+    const decision = evaluateBundlePublication({
+      definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      authorizations: [pending],
+      locale: 'zh-CN',
+      territory: 'CN',
+      deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
+    })
+    expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1.status).toBe('DRAFT')
+    expect(decision.publishable).toBe(false)
+    expect(decision.catalogStatus).toBe('DRAFT')
+    expect(decision.errors.some((row) => /code definition status/i.test(row))).toBe(true)
+  })
+
+  it('keeps effective APPROVED alive when a newer DRAFT exists on the same lineage', () => {
+    const approved = approveInstrumentAuthorization({
+      record: draft(),
+      actorUserId: 'admin-2',
+    }).record
+    const withEvidence = attachAuthorizationEvidence({
+      record: approved,
+      evidenceAssetId: 'asset-1',
+      evidenceSha256: 'a'.repeat(64),
+      actorUserId: 'admin-2',
+    }).record
+    const newerDraft = amendApprovedInstrumentAuthorization({
+      previous: withEvidence,
+      patch: { basis: 'pending amendment' },
+      actorUserId: 'admin-2',
+    }).record
+    expect(newerDraft.status).toBe('DRAFT')
+    expect(newerDraft.version).toBe(2)
+
+    const effective = resolveEffectiveAuthorization({
+      authorizations: [withEvidence, newerDraft],
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      nowIso: '2026-09-03T05:00:00.000Z',
+    })
+    expect(effective?.version).toBe(1)
+    expect(effective?.status).toBe('APPROVED')
+
+    const decision = evaluateBundlePublication({
+      definition: publishedWho5(),
+      authorizations: [withEvidence, newerDraft],
+      locale: 'zh-CN',
+      territory: 'CN',
+      deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
+    })
     expect(decision.publishable).toBe(true)
-    expect(decision.warnings.some((row) => /EVIDENCE_PENDING/.test(row))).toBe(true)
+  })
+
+  it('does not HOLD everything merely because some historical row is EXPIRED', () => {
+    const approved = approveInstrumentAuthorization({
+      record: draft(),
+      actorUserId: 'admin-2',
+    }).record
+    const withEvidence = attachAuthorizationEvidence({
+      record: approved,
+      evidenceAssetId: 'asset-1',
+      evidenceSha256: 'a'.repeat(64),
+      actorUserId: 'admin-2',
+    }).record
+    const expiredHistorical = {
+      ...withEvidence,
+      authorizationId: '00000000-0000-4000-8000-000000000099',
+      version: 1,
+      status: 'APPROVED' as const,
+      validFrom: '2020-01-01T00:00:00.000Z',
+      validTo: '2021-01-01T00:00:00.000Z',
+    }
+    const decision = evaluateBundlePublication({
+      definition: publishedWho5(),
+      authorizations: [expiredHistorical, withEvidence],
+      locale: 'zh-CN',
+      territory: 'CN',
+      deploymentCommercialNature: 'NON_COMMERCIAL',
+      nowIso: '2026-09-03T05:00:00.000Z',
+      ...passingProofs,
+    })
+    expect(decision.publishable).toBe(true)
+  })
+
+  it('rejects DRAFT authorizations for rights eligibility', () => {
+    const created = draft()
+    const decision = evaluateBundlePublication({
+      definition: publishedWho5(),
+      authorizations: [created],
+      locale: 'zh-CN',
+      territory: 'CN',
+      deploymentCommercialNature: 'NON_COMMERCIAL',
+      ...passingProofs,
+    })
+    expect(decision.publishable).toBe(false)
+    expect(decision.errors.some((row) => /DRAFT/i.test(row))).toBe(true)
+  })
+
+  it('parses records through strict Zod schema', () => {
+    const created = draft()
+    expect(parseInstrumentAuthorizationRecord(created).authorizationId).toBe(created.authorizationId)
+    expect(failCode(() => parseInstrumentAuthorizationRecord({ ...created, schemaVersion: 99 }))).toBe('AUTH_RECORD_INVALID')
   })
 
   it('keeps in-flight attempts finishable only until frozen deadline', () => {

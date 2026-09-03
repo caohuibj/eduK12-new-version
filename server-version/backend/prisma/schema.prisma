@@ -1627,7 +1627,7 @@ model InstrumentAuthorizationAudit {
   recordHash            String   @map("record_hash")
   createdAt             DateTime @default(now()) @map("created_at")
 
-  authorization InstrumentAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+  authorization InstrumentAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Restrict)
 
   @@index([authorizationId, at])
   @@map("instrument_authorization_audits")

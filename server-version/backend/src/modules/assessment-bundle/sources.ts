@@ -3,10 +3,9 @@
  * Engines read these only — never raw trials/answers, never Prisma.
  * Deliberately smaller than CognitiveResultSnapshot / ScaleResultV2.
  *
- * sourceResultHash MUST come from validated authoritative persistence:
- * - preferred: parseCanonicalUnitResultEnvelope → envelope.resultHash
- * - otherwise: canonicalHash(validated result) (same CANONICAL_JSON_SHA256_V1)
- * Bare caller hashes are never trusted without verification against the result.
+ * sourceResultHash MUST be canonicalHash(validated ScaleResultV2 / CognitiveResultSnapshot).
+ * envelope.resultHash (CanonicalUnitResultCore hash) is stored separately as envelopeResultHash.
+ * Never dual-identity one field. Bare caller hashes are verified against the result hash only.
  */
 
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -24,7 +23,10 @@ export interface BundleFrozenCognitiveSourceV1 {
   slotKey: string
   instrumentKey: string
   instrumentVersion: string
+  /** Always canonicalHash(validated CognitiveResultSnapshot). Never envelope.resultHash. */
   sourceResultHash: string
+  /** Optional separate identity for CanonicalUnitResultEnvelope.resultHash (core hash). */
+  envelopeResultHash: string | null
   metrics: Record<string, unknown>
   qualityState: BundleFrozenSourceQualityV1
   /**
@@ -46,7 +48,10 @@ export interface BundleFrozenScaleSourceV1 {
   slotKey: string
   instrumentKey: string
   instrumentVersion: string
+  /** Always canonicalHash(validated ScaleResultV2). Never envelope.resultHash. */
   sourceResultHash: string
+  /** Optional separate identity for CanonicalUnitResultEnvelope.resultHash (core hash). */
+  envelopeResultHash: string | null
   qualityState: BundleFrozenSourceQualityV1
   scores: BundleFrozenScaleScoreV1[]
 }
@@ -73,54 +78,101 @@ const assertInstrumentIdentity = (input: {
   }
 }
 
+const jsonEqual = (left: unknown, right: unknown): boolean => {
+  if (Object.is(left, right)) return true
+  if (left === null || right === null) return left === right
+  if (typeof left !== typeof right) return false
+  if (typeof left !== 'object') return false
+  // Numbers already handled by Object.is (incl. NaN). Compare via canonical JSON for nested values.
+  try {
+    return canonicalHash(left) === canonicalHash(right)
+  } catch {
+    return false
+  }
+}
+
 /**
- * Bind sourceResultHash from authoritative persistence.
- * Prefer a validated CanonicalUnitResultEnvelope; otherwise recompute via
- * canonicalHash(validatedResult) — the same V3.2 algorithm, never a second hash scheme.
+ * Prove a validated frozen result matches an envelope (same-instrument A+B rejection).
+ * Compares quality + metrics/scores; does not dual-bind envelope.resultHash as sourceResultHash.
  */
-const bindAuthoritativeSourceResultHash = (input: {
+const assertResultMatchesEnvelope = (input: {
+  unitType: 'SCALE' | 'COGNITIVE'
+  validatedResult: ScaleResultV2 | CognitiveResultSnapshot
+  envelope: ReturnType<typeof parseCanonicalUnitResultEnvelope>
+}): void => {
+  const envelope = input.envelope
+  if (input.unitType === 'SCALE') {
+    const result = input.validatedResult as ScaleResultV2
+    if (result.quality.status !== envelope.core.quality.status) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        `envelope quality 与 ScaleResult 不一致: envelope ${envelope.core.quality.status} vs result ${result.quality.status}`,
+      )
+    }
+    const scoresByKey = new Map(result.scores.map((score) => [score.key, score]))
+    for (const metric of envelope.core.metrics) {
+      const score = scoresByKey.get(metric.key)
+      if (!score) {
+        bundleContractFail(
+          'SOURCE_RESULT_HASH_MISMATCH',
+          `envelope metric ${metric.key} 在 ScaleResult 中不存在（envelope A + result B）`,
+        )
+      } else {
+        if (!jsonEqual(score.value, metric.value)) {
+          bundleContractFail(
+            'SOURCE_RESULT_HASH_MISMATCH',
+            `envelope metric ${metric.key} 与 ScaleResult 值不匹配（envelope A + result B）`,
+          )
+        }
+        if (metric.quality !== undefined && metric.quality !== score.status) {
+          bundleContractFail(
+            'SOURCE_RESULT_HASH_MISMATCH',
+            `envelope metric ${metric.key} quality 与 ScaleResult status 不匹配`,
+          )
+        }
+      }
+    }
+    return
+  }
+
+  const snapshot = input.validatedResult as CognitiveResultSnapshot
+  if (snapshot.quality.state !== envelope.core.quality.status) {
+    bundleContractFail(
+      'SOURCE_RESULT_HASH_MISMATCH',
+      `envelope quality 与 CognitiveResult 不一致: envelope ${envelope.core.quality.status} vs result ${snapshot.quality.state}`,
+    )
+  }
+  for (const metric of envelope.core.metrics) {
+    if (!(metric.key in snapshot.metrics)) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        `envelope metric ${metric.key} 在 CognitiveResult 中不存在（envelope A + result B）`,
+      )
+    }
+    if (!jsonEqual(snapshot.metrics[metric.key], metric.value)) {
+      bundleContractFail(
+        'SOURCE_RESULT_HASH_MISMATCH',
+        `envelope metric ${metric.key} 与 CognitiveResult 值不匹配（envelope A + result B）`,
+      )
+    }
+  }
+}
+
+/**
+ * Bind sourceResultHash from the validated frozen result only.
+ * sourceResultHash := canonicalHash(ScaleResultV2 | CognitiveResultSnapshot).
+ * envelope.resultHash (hash of CanonicalUnitResultCore) is a separate field — never dual-identity.
+ */
+const bindAuthoritativeSourceResultHashes = (input: {
   unitType: 'SCALE' | 'COGNITIVE'
   instrumentKey: string
   instrumentVersion: string
-  validatedResult: unknown
+  validatedResult: ScaleResultV2 | CognitiveResultSnapshot
   claimedHash?: string
   canonicalEnvelope?: unknown
-}): string => {
-  if (input.canonicalEnvelope !== undefined) {
-    let envelope
-    try {
-      envelope = parseCanonicalUnitResultEnvelope(input.canonicalEnvelope)
-    } catch (error) {
-      return bundleContractFail(
-        'SOURCE_RESULT_HASH',
-        `CanonicalUnitResultEnvelope 无效: ${error instanceof Error ? error.message : 'parse failed'}`,
-      )
-    }
-    if (envelope.core.unitType !== input.unitType) {
-      bundleContractFail(
-        'SOURCE_RESULT_HASH',
-        `envelope unitType 必须是 ${input.unitType}，got ${envelope.core.unitType}`,
-      )
-    }
-    if (
-      envelope.core.instrumentKey !== input.instrumentKey
-      || envelope.core.instrumentVersion !== input.instrumentVersion
-    ) {
-      bundleContractFail(
-        'SOURCE_RESULT_HASH_MISMATCH',
-        `envelope identity 与结果不匹配: envelope ${envelope.core.instrumentKey}@${envelope.core.instrumentVersion} vs result ${input.instrumentKey}@${input.instrumentVersion}`,
-      )
-    }
-    if (input.claimedHash !== undefined && input.claimedHash !== envelope.resultHash) {
-      bundleContractFail(
-        'SOURCE_RESULT_HASH_MISMATCH',
-        'caller sourceResultHash 与 CanonicalUnitResultEnvelope.resultHash 不一致',
-      )
-    }
-    return envelope.resultHash
-  }
+}): { sourceResultHash: string; envelopeResultHash: string | null } => {
+  const sourceResultHash = canonicalHash(input.validatedResult)
 
-  const computed = canonicalHash(input.validatedResult)
   if (input.claimedHash !== undefined) {
     if (typeof input.claimedHash !== 'string' || !HEX_HASH.test(input.claimedHash)) {
       bundleContractFail(
@@ -128,14 +180,48 @@ const bindAuthoritativeSourceResultHash = (input: {
         'sourceResultHash 必须是小写 SHA-256（64 hex），且由权威冻结结果绑定',
       )
     }
-    if (input.claimedHash !== computed) {
+    if (input.claimedHash !== sourceResultHash) {
       bundleContractFail(
         'SOURCE_RESULT_HASH_MISMATCH',
         'sourceResultHash 不属于该权威结果（可能属于另一结果）',
       )
     }
   }
-  return computed
+
+  if (input.canonicalEnvelope === undefined) {
+    return { sourceResultHash, envelopeResultHash: null }
+  }
+
+  let envelope
+  try {
+    envelope = parseCanonicalUnitResultEnvelope(input.canonicalEnvelope)
+  } catch (error) {
+    return bundleContractFail(
+      'SOURCE_RESULT_HASH',
+      `CanonicalUnitResultEnvelope 无效: ${error instanceof Error ? error.message : 'parse failed'}`,
+    )
+  }
+  if (envelope.core.unitType !== input.unitType) {
+    bundleContractFail(
+      'SOURCE_RESULT_HASH',
+      `envelope unitType 必须是 ${input.unitType}，got ${envelope.core.unitType}`,
+    )
+  }
+  if (
+    envelope.core.instrumentKey !== input.instrumentKey
+    || envelope.core.instrumentVersion !== input.instrumentVersion
+  ) {
+    bundleContractFail(
+      'SOURCE_RESULT_HASH_MISMATCH',
+      `envelope identity 与结果不匹配: envelope ${envelope.core.instrumentKey}@${envelope.core.instrumentVersion} vs result ${input.instrumentKey}@${input.instrumentVersion}`,
+    )
+  }
+  assertResultMatchesEnvelope({
+    unitType: input.unitType,
+    validatedResult: input.validatedResult,
+    envelope,
+  })
+  return { sourceResultHash, envelopeResultHash: envelope.resultHash }
 }
 
 const hasUsableCognitiveReferenceNorms = (snapshot: CognitiveResultSnapshot): boolean => {
@@ -194,7 +280,7 @@ export const projectBundleCognitiveSource = (input: {
     label: 'Cognitive',
   })
 
-  const sourceResultHash = bindAuthoritativeSourceResultHash({
+  const hashes = bindAuthoritativeSourceResultHashes({
     unitType: 'COGNITIVE',
     instrumentKey: snapshot.testType,
     instrumentVersion: snapshot.configVersion,
@@ -207,7 +293,8 @@ export const projectBundleCognitiveSource = (input: {
     slotKey: input.slotKey,
     instrumentKey: snapshot.testType,
     instrumentVersion: snapshot.configVersion,
-    sourceResultHash,
+    sourceResultHash: hashes.sourceResultHash,
+    envelopeResultHash: hashes.envelopeResultHash,
     metrics: { ...snapshot.metrics },
     qualityState: snapshot.quality.state,
     hasReferenceNorms: hasUsableCognitiveReferenceNorms(snapshot),
@@ -237,7 +324,7 @@ export const projectBundleScaleSource = (input: {
     label: 'Scale',
   })
 
-  const sourceResultHash = bindAuthoritativeSourceResultHash({
+  const hashes = bindAuthoritativeSourceResultHashes({
     unitType: 'SCALE',
     instrumentKey: result.instrument.code,
     instrumentVersion: result.instrument.instrumentVersion,
@@ -279,7 +366,8 @@ export const projectBundleScaleSource = (input: {
     slotKey: input.slotKey,
     instrumentKey: result.instrument.code,
     instrumentVersion: result.instrument.instrumentVersion,
-    sourceResultHash,
+    sourceResultHash: hashes.sourceResultHash,
+    envelopeResultHash: hashes.envelopeResultHash,
     qualityState: result.quality.status,
     scores,
   }
