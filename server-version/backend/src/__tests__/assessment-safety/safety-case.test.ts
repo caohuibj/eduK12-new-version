@@ -13,6 +13,7 @@ import {
   disposeSafetyCase,
   evaluateSafetyTrigger,
   processSafetyWakeupDelivery,
+  processWakeupAtomically,
   projectSafetyStaffView,
   projectSafetySubjectGuidance,
   rescheduleSafetyWakeupsAfterRestart,
@@ -174,10 +175,11 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
     const { payloads } = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
     const ackPayload = payloads[0]!
 
-    // Early fire while still OPEN → escalate
+    // Fire at persisted deadline while still OPEN → escalate
     const first = applySafetyWakeup({
       safetyCase: created.safetyCase,
       payload: ackPayload,
+      now: created.safetyCase.ackDueAt,
     })
     expect(first.event?.type).toBe('ESCALATED')
     expect(first.safetyCase.status).toBe('ESCALATED')
@@ -188,6 +190,7 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
       payload: ackPayload,
       existingLedger: first.ledger,
       priorEscalationForJob: first.event,
+      now: created.safetyCase.ackDueAt,
     })
     expect(dup.event).toBeNull()
     expect(dup.job.status).toBe('DUPLICATE_NOOP')
@@ -210,6 +213,7 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
     const ackNoop = applySafetyWakeup({
       safetyCase: acked.safetyCase,
       payload: scheduled2.payloads[0]!,
+      now: created2.safetyCase.ackDueAt,
     })
     expect(ackNoop.event).toBeNull()
     expect(acked.safetyCase.status).toBe('ACKNOWLEDGED')
@@ -232,6 +236,7 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
     const disposeNoop = applySafetyWakeup({
       safetyCase: disposed.safetyCase,
       payload: scheduled3.payloads[1]!,
+      now: created3.safetyCase.disposeDueAt,
     })
     expect(disposeNoop.event).toBeNull()
     expect(disposeNoop.job.status).toBe('CANCELLED')
@@ -319,6 +324,7 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
       loadLedger: () => null,
       loadPriorEscalation: () => null,
       payload: payloads[0]!,
+      now: created.safetyCase.ackDueAt,
     })
     expect(result.applied?.event?.type).toBe('ESCALATED')
 
@@ -332,5 +338,88 @@ describe('SafetyCase policy / case / wakeup (Prep 15.1)', () => {
         safetyCase: created.safetyCase,
       } as never,
     }))).toBe('SAFETY_INPUT')
+  })
+})
+
+describe('SafetyCase Prep 17.1 wakeup concurrency / restart', () => {
+  it('uses deterministic wakeupJobId; restart reuses same logical IDs', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const created = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'det-1' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+      now: '2026-09-03T06:00:00.000Z',
+    })
+    const first = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    const second = rescheduleSafetyWakeupsAfterRestart({
+      safetyCase: created.safetyCase,
+      policy,
+      now: '2026-09-03T12:00:00.000Z',
+    })
+    expect(first.payloads[0]!.wakeupJobId).toBe(second.payloads[0]!.wakeupJobId)
+    expect(first.payloads[1]!.wakeupJobId).toBe(second.payloads[1]!.wakeupJobId)
+    expect(first.payloads[0]!.wakeupJobId).toMatch(/^[a-f0-9]{64}$/)
+    expect(first.payloads[0]!.wakeupJobId).not.toBe(first.payloads[1]!.wakeupJobId)
+  })
+
+  it('now < fireAt is TOO_EARLY no-op (Bull delay is not authority)', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const created = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'early-1' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+      now: '2026-09-03T06:00:00.000Z',
+    })
+    const { payloads } = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    const early = applySafetyWakeup({
+      safetyCase: created.safetyCase,
+      payload: payloads[0]!,
+      now: '2026-09-03T06:00:00.000Z', // before ackDueAt
+    })
+    expect(early.event).toBeNull()
+    expect(early.job.status).toBe('TOO_EARLY')
+    expect(early.safetyCase.status).toBe('OPEN')
+  })
+
+  it('processWakeupAtomically: concurrent same wakeupJobId → one ESCALATED only', () => {
+    const policy = buildTestOnlySafetyPolicy()
+    const created = createSafetyCaseAtomic({
+      policy,
+      trigger: buildTestOnlyAuthoritativeTrigger({ sourceHash: HASH, sourceRecordId: 'race-1' }),
+      subjectUserId: 'student-1',
+      primaryOwnerUserId: 'teacher-1',
+      backupOwnerUserIds: [],
+      actorUserId: 'system',
+      now: '2026-09-03T06:00:00.000Z',
+    })
+    const { payloads } = scheduleSafetyWakeups({ safetyCase: created.safetyCase, policy })
+    const payload = payloads[0]!
+    const claimed = new Set<string>()
+    const cases = new Map([[created.safetyCase.caseId, created.safetyCase]])
+    const fireNow = created.safetyCase.ackDueAt // at deadline
+
+    const run = () => processWakeupAtomically({
+      payload,
+      now: fireNow,
+      loadCase: (id) => cases.get(id) ?? null,
+      claimLedger: ({ wakeupJobId }) => {
+        if (claimed.has(wakeupJobId)) return false
+        claimed.add(wakeupJobId)
+        return true
+      },
+    })
+
+    const results = [run(), run(), run()]
+    const winners = results.filter((row) => row.claimed && row.applied?.event?.type === 'ESCALATED')
+    const losers = results.filter((row) => !row.claimed)
+    expect(winners).toHaveLength(1)
+    expect(losers).toHaveLength(2)
+    expect(losers.every((row) => row.applied?.event === null)).toBe(true)
   })
 })

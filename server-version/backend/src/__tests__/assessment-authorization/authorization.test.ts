@@ -420,7 +420,7 @@ describe('instrument authorization overlay', () => {
   })
 
 
-  it('EVIDENCE_PENDING first attach OK; post-APPROVED evidence change mints new version', () => {
+  it('EVIDENCE_PENDING first attach OK; post-APPROVED evidence change mints DRAFT new version', () => {
     const created = draft()
     const pending = approveInstrumentAuthorization({
       record: created,
@@ -448,7 +448,9 @@ describe('instrument authorization overlay', () => {
     expect(replaced.mintedNewVersion).toBe(true)
     expect(replaced.record.version).toBe(2)
     expect(replaced.record.evidenceAssetId).toBe('asset-2')
-    expect(replaced.record.status).toBe('APPROVED')
+    expect(replaced.record.status).toBe('DRAFT')
+    expect(replaced.record.approvedByUserId).toBeNull()
+    expect(replaced.record.approvedAt).toBeNull()
   })
 
 })

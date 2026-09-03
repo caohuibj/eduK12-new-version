@@ -253,10 +253,11 @@ describe("Commit 16 Bundle release gates (contract; no Docker)", () => {
     expect(re.safetyCase.caseId).not.toBe(a.safetyCase.caseId)
     const { payloads } = scheduleSafetyWakeups({ safetyCase: a.safetyCase, policy })
     expect(Object.keys(payloads[0]!).sort().join(",")).toBe("caseId,kind,wakeupJobId")
-    const first = applySafetyWakeup({ safetyCase: a.safetyCase, payload: payloads[0]! })
+    const first = applySafetyWakeup({ safetyCase: a.safetyCase, payload: payloads[0]!, now: a.safetyCase.ackDueAt })
     const dup = applySafetyWakeup({
       safetyCase: first.safetyCase, payload: payloads[0]!,
       existingLedger: first.ledger, priorEscalationForJob: first.event,
+      now: a.safetyCase.ackDueAt,
     })
     expect(dup.job.status).toBe("DUPLICATE_NOOP")
     const c = createSafetyCaseAtomic({
@@ -266,7 +267,7 @@ describe("Commit 16 Bundle release gates (contract; no Docker)", () => {
     })
     const scheduled = scheduleSafetyWakeups({ safetyCase: c.safetyCase, policy })
     const acked = acknowledgeSafetyCase({ safetyCase: c.safetyCase, actorUserId: "teacher-1" })
-    expect(applySafetyWakeup({ safetyCase: acked.safetyCase, payload: scheduled.payloads[0]! }).event).toBeNull()
+    expect(applySafetyWakeup({ safetyCase: acked.safetyCase, payload: scheduled.payloads[0]!, now: c.safetyCase.ackDueAt }).event).toBeNull()
   })
 
   it("regression: evidence replacement, pre-consent submit, SDQ overall=No", () => {
@@ -287,9 +288,11 @@ describe("Commit 16 Bundle release gates (contract; no Docker)", () => {
       record: pending, evidenceAssetId: "asset-1", evidenceSha256: HASH_A, actorUserId: "admin-1",
     })
     expect(first.mintedNewVersion).toBe(false)
-    expect(attachAuthorizationEvidence({
+    const replaced = attachAuthorizationEvidence({
       record: first.record, evidenceAssetId: "asset-2", evidenceSha256: HASH_B, actorUserId: "admin-1",
-    }).mintedNewVersion).toBe(true)
+    })
+    expect(replaced.mintedNewVersion).toBe(true)
+    expect(replaced.record.status).toBe("DRAFT")
 
     const relationship = approveParentRelationship({
       relationship: createPendingParentRelationship({

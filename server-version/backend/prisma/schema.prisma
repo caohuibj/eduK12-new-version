@@ -1900,6 +1900,7 @@ model SafetyWakeupLedger {
 
   safetyCase SafetyCase @relation(fields: [caseId], references: [id], onDelete: Restrict)
 
+  @@unique([caseId, kind])
   @@index([caseId, status])
   @@map("safety_wakeup_ledger")
 }

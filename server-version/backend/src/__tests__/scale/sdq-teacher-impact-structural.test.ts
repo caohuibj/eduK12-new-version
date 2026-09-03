@@ -6,8 +6,10 @@ import {
 import {
   SDQ_TEACHER_IMPACT_ITEM_CODES,
   SDQ_TEACHER_OVERALL_ITEM,
+  sdqTeacherMissingRequiredItemCodes,
   sdqTeacherT410Scorer,
 } from '../../modules/scale/packages/sdq-teacher-impact-scorer'
+import { missingRequiredScaleItemCodes } from '../../modules/scale/scale-scoring'
 
 const symptomAnswers = () => (
   SDQ_TEACHER_EN_T4_10_V1_DEFINITION.items
@@ -15,7 +17,7 @@ const symptomAnswers = () => (
     .map((item) => ({ itemCode: item.itemCode, responseValue: 'somewhat_true' }))
 )
 
-describe('SDQ teacher impact structural skip (Prep 15.1)', () => {
+describe('SDQ teacher impact structural skip (Prep 15.1 / 17.1)', () => {
   it('overall=No → impact=0 without forging answeredItems for unanswered follow-ups', () => {
     const answers = [
       ...symptomAnswers(),
@@ -33,6 +35,33 @@ describe('SDQ teacher impact structural skip (Prep 15.1)', () => {
       expect(impact!.answeredItems).not.toContain(code)
     }
     expect(impact!.answeredItems).toEqual([])
+  })
+
+  it('overall=No + unanswered follow-ups → quality not limited by skip-induced flags', () => {
+    const answers = [
+      ...symptomAnswers(),
+      { itemCode: SDQ_TEACHER_OVERALL_ITEM, responseValue: 'no' },
+    ]
+    const scored = sdqTeacherT410Scorer({
+      definition: SDQ_TEACHER_EN_T4_10_V1_DEFINITION,
+      answers,
+    })
+    expect(scored.quality.status).toBe('interpretable')
+    expect(scored.quality.flags).not.toContain('missing_items')
+    expect(scored.quality.flags).not.toContain('score_not_calculable')
+    const impact = scored.scores.find((row) => row.key === 'impact')
+    expect(impact!.value).toBe(0)
+    expect(impact!.answeredItems).toEqual([])
+  })
+
+  it('overall=No completeness does not require skipped impact follow-ups', () => {
+    const answers = [
+      ...symptomAnswers(),
+      { itemCode: SDQ_TEACHER_OVERALL_ITEM, responseValue: 'no' },
+    ]
+    const naive = missingRequiredScaleItemCodes(SDQ_TEACHER_EN_T4_10_V1_DEFINITION, answers)
+    expect(naive.sort()).toEqual([...SDQ_TEACHER_IMPACT_ITEM_CODES].sort())
+    expect(sdqTeacherMissingRequiredItemCodes(SDQ_TEACHER_EN_T4_10_V1_DEFINITION, answers)).toEqual([])
   })
 
   it('overall=No golden still scores 0 and keeps only real answeredItems', () => {

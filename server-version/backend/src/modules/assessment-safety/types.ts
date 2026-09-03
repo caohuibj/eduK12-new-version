@@ -121,10 +121,10 @@ export interface SafetyWakeupJobV1 {
   caseId: string
   kind: 'ACK_TIMEOUT' | 'DISPOSE_TIMEOUT'
   fireAt: string
-  status: 'SCHEDULED' | 'FIRED' | 'CANCELLED' | 'DUPLICATE_NOOP'
+  status: 'SCHEDULED' | 'FIRED' | 'CANCELLED' | 'DUPLICATE_NOOP' | 'TOO_EARLY'
 }
 
-/** Durable wakeup ledger row — wakeupJobId is unique. */
+/** Durable wakeup ledger row — wakeupJobId is unique; UNIQUE(caseId, kind) one ACK + one DISPOSE. */
 export interface SafetyWakeupLedgerEntryV1 {
   wakeupJobId: string
   caseId: string

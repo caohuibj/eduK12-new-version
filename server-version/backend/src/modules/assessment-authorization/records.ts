@@ -232,7 +232,7 @@ export const revokeInstrumentAuthorization = (input: {
 /**
  * Attach evidence bytes (sha256 from StoredAsset — never trust client-declared hash alone).
  * - EVIDENCE_PENDING → first attach on same version OK → APPROVED
- * - post-APPROVED evidence change → mint a NEW authorization version (append-only)
+ * - post-APPROVED evidence change → mint a NEW DRAFT version (clear approval; re-approve required)
  */
 export const attachAuthorizationEvidence = (input: {
   record: InstrumentAuthorizationRecordV1
@@ -251,7 +251,8 @@ export const attachAuthorizationEvidence = (input: {
   }
   const now = input.now ?? new Date().toISOString()
 
-  // Post-APPROVED evidence replacement must mint a new version.
+  // Post-APPROVED evidence replacement must mint a NEW DRAFT version
+  // that clears approval fields — explicit re-approve required (no inherit APPROVED).
   if (
     current.status === 'APPROVED'
     && current.evidenceAssetId
@@ -265,7 +266,10 @@ export const attachAuthorizationEvidence = (input: {
       version: current.version + 1,
       evidenceAssetId: input.evidenceAssetId,
       evidenceSha256: input.evidenceSha256,
-      status: 'APPROVED',
+      status: 'DRAFT',
+      approvedByUserId: null,
+      approvedAt: null,
+      selfApprovalDeclaration: null,
       updatedAt: now,
     })
     return {
@@ -274,7 +278,7 @@ export const attachAuthorizationEvidence = (input: {
         next,
         'ATTACH_EVIDENCE',
         input.actorUserId,
-        `evidence replaced — minted v${next.version} from v${current.version}`,
+        `evidence replaced — minted DRAFT v${next.version} from APPROVED v${current.version}; re-approve required`,
         now,
       ),
       mintedNewVersion: true,
