@@ -61,6 +61,15 @@ model User {
   materialGrantsReceived              MaterialGrant[]                  @relation("MaterialGrantTeacher")
   materialGrantsGiven                 MaterialGrant[]                  @relation("MaterialGrantGranter")
 
+  // Unified Assessment Bundle: PARENT / episode / invite / consent
+  parentRelationshipsAsParent   ParentStudentRelationship[] @relation("ParentRelationshipParent")
+  parentRelationshipsAsStudent  ParentStudentRelationship[] @relation("ParentRelationshipStudent")
+  parentInviteCodesCreated      ParentInviteCode[]          @relation("ParentInviteCodeCreator")
+  assessmentEpisodesAsSubject   AssessmentEpisode[]         @relation("EpisodeSubject")
+  assessmentEpisodesInitiated   AssessmentEpisode[]         @relation("EpisodeInitiator")
+  attemptConsentsAsSubject      AssessmentAttemptConsent[]  @relation("ConsentSubject")
+  attemptConsentsAsRespondent   AssessmentAttemptConsent[]  @relation("ConsentRespondent")
+
   @@map("users")
 }
 
@@ -336,6 +345,7 @@ enum UserRole {
   STUDENT
   TEACHER
   ADMIN
+  PARENT
 }
 
 enum CourseStatus {
@@ -532,10 +542,20 @@ model Assessment {
   questionnaireAssessmentId String?                @map("questionnaire_assessment_id")
   compositeAttemptId        String?                @map("composite_attempt_id")
   compositeItemId           String?                @map("composite_item_id")
+  // Additive identity (Commit 11). Historical rows stay null — never infer from userId.
+  subjectUserId             String?                @map("subject_user_id")
+  respondentUserId          String?                @map("respondent_user_id")
+  respondentType            String?                @map("respondent_type")
+  episodeId                 String?                @map("episode_id")
+  assignmentRef             String?                @map("assignment_ref")
+  consentId                 String?                @map("consent_id")
+  contextSnapshotRef        String?                @map("context_snapshot_ref")
 
   // 关联
   scale                   Scale                       @relation(fields: [scaleId], references: [id], onDelete: Cascade)
   user                    User?                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode                 AssessmentEpisode?          @relation(fields: [episodeId], references: [id], onDelete: Restrict)
+  consent                 AssessmentAttemptConsent?   @relation(fields: [consentId], references: [id], onDelete: Restrict)
   questionnaireAssessment QuestionnaireAssessment?    @relation(fields: [questionnaireAssessmentId], references: [id])
   compositeAttempt        CompositeAssessmentAttempt? @relation("CompositeAttemptAssessments", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
   compositeItem           CompositeAssessmentItem?    @relation("CompositeScaleAssessments", fields: [compositeItemId], references: [id], onDelete: Restrict)
@@ -548,6 +568,9 @@ model Assessment {
   @@index([compositeAttemptId])
   @@index([compositeItemId])
   @@index([status, startedAt]) // 新增：统计场景优化
+  @@index([subjectUserId, status])
+  @@index([respondentUserId, status])
+  @@index([episodeId])
   @@map("assessments")
 }
 
@@ -1002,8 +1025,18 @@ model CompositeAssessmentAttempt {
   compiledBundleRuntimeHash    String?                          @map("compiled_bundle_runtime_hash")
   frozenActiveSlotSetEncrypted String?                          @map("frozen_active_slot_set_encrypted")
   frozenActiveSlotSetHash      String?                          @map("frozen_active_slot_set_hash")
+  // Additive identity (Commit 11). Historical rows stay null — never infer from userId.
+  subjectUserId                String?                          @map("subject_user_id")
+  respondentUserId             String?                          @map("respondent_user_id")
+  respondentType               String?                          @map("respondent_type")
+  episodeId                    String?                          @map("episode_id")
+  assignmentRef                String?                          @map("assignment_ref")
+  consentId                    String?                          @map("consent_id")
+  contextSnapshotRef           String?                          @map("context_snapshot_ref")
 
   compositeAssessment CompositeAssessment             @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
+  episode             AssessmentEpisode?              @relation(fields: [episodeId], references: [id], onDelete: Restrict)
+  consent             AssessmentAttemptConsent?       @relation(fields: [consentId], references: [id], onDelete: Restrict)
   user                User?                           @relation("CompositeAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
   accessToken         CompositeAssessmentAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
   scaleAssessments    Assessment[]                    @relation("CompositeAttemptAssessments")
@@ -1018,6 +1051,9 @@ model CompositeAssessmentAttempt {
   @@index([userId, status])
   @@index([participantKey])
   @@index([accessTokenId])
+  @@index([subjectUserId, status])
+  @@index([respondentUserId, status])
+  @@index([episodeId])
   @@map("composite_assessment_attempts")
 }
 
@@ -1633,3 +1669,119 @@ model InstrumentAuthorizationAudit {
   @@map("instrument_authorization_audits")
 }
 
+
+enum ParentRelationshipStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+enum AssessmentEpisodeInitiationMode {
+  TEACHER_CAMPAIGN
+  PARENT_SELF_SERVE
+  STUDENT_SELF
+  ANONYMOUS_SELF
+}
+
+enum ParentInviteCodeStatus {
+  ACTIVE
+  CONSUMED
+  EXPIRED
+  REVOKED
+}
+
+/// Global many-to-many parent↔student relationship. Revocable; never physically deleted.
+model ParentStudentRelationship {
+  id              String                   @id @default(uuid())
+  parentUserId    String                   @map("parent_user_id")
+  studentUserId   String                   @map("student_user_id")
+  status          ParentRelationshipStatus @default(PENDING)
+  inviteCodeId    String?                  @map("invite_code_id")
+  approvedByUserId String?                 @map("approved_by_user_id")
+  approvedAt      DateTime?                @map("approved_at")
+  revokedByUserId String?                  @map("revoked_by_user_id")
+  revokedAt       DateTime?                @map("revoked_at")
+  revokeReason    String?                  @map("revoke_reason")
+  consentVersion  String?                  @map("consent_version")
+  consentHash     String?                  @map("consent_hash")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+
+  parent     User             @relation("ParentRelationshipParent", fields: [parentUserId], references: [id], onDelete: Restrict)
+  student    User             @relation("ParentRelationshipStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  inviteCode ParentInviteCode? @relation(fields: [inviteCodeId], references: [id], onDelete: Restrict)
+
+  @@unique([parentUserId, studentUserId])
+  @@index([studentUserId, status])
+  @@index([parentUserId, status])
+  @@map("parent_student_relationships")
+}
+
+/// Single-use, time-limited invite hashed at rest. Bound to a student-selected course.
+model ParentInviteCode {
+  id                String                 @id @default(uuid())
+  codeHash          String                 @unique @map("code_hash")
+  studentUserId     String                 @map("student_user_id")
+  courseId          String                 @map("course_id")
+  createdByUserId   String                 @map("created_by_user_id")
+  status            ParentInviteCodeStatus @default(ACTIVE)
+  expiresAt         DateTime               @map("expires_at")
+  consumedAt        DateTime?              @map("consumed_at")
+  consumedByParentUserId String?           @map("consumed_by_parent_user_id")
+  createdAt         DateTime               @default(now()) @map("created_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+
+  creator       User                         @relation("ParentInviteCodeCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  relationships ParentStudentRelationship[]
+
+  @@index([studentUserId, status])
+  @@index([courseId, status])
+  @@index([expiresAt])
+  @@map("parent_invite_codes")
+}
+
+model AssessmentEpisode {
+  id                String                           @id @default(uuid())
+  subjectUserId     String?                          @map("subject_user_id")
+  initiatedByUserId String?                          @map("initiated_by_user_id")
+  initiationMode    AssessmentEpisodeInitiationMode  @map("initiation_mode")
+  courseId          String?                          @map("course_id")
+  campaignKey       String?                          @map("campaign_key")
+  label             String?
+  createdAt         DateTime                         @default(now()) @map("created_at")
+  updatedAt         DateTime                         @updatedAt @map("updated_at")
+
+  subject    User? @relation("EpisodeSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  initiator  User? @relation("EpisodeInitiator", fields: [initiatedByUserId], references: [id], onDelete: Restrict)
+  assessments Assessment[]
+  compositeAttempts CompositeAssessmentAttempt[]
+
+  @@index([subjectUserId, createdAt])
+  @@index([courseId, campaignKey])
+  @@map("assessment_episodes")
+}
+
+/// Per-attempt consent; append-only semantics (revoke via new row / status, no physical delete).
+model AssessmentAttemptConsent {
+  id                 String   @id @default(uuid())
+  subjectUserId      String?  @map("subject_user_id")
+  respondentUserId   String?  @map("respondent_user_id")
+  respondentType     String   @map("respondent_type")
+  consentVersion     String   @map("consent_version")
+  consentHash        String   @map("consent_hash")
+  purpose            String
+  visibilityScope    String   @map("visibility_scope")
+  shareTargetsJson   Json?    @map("share_targets_json")
+  acceptedAt         DateTime @map("accepted_at")
+  revokedAt          DateTime? @map("revoked_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  subject    User? @relation("ConsentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  respondent User? @relation("ConsentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
+  assessments Assessment[]
+  compositeAttempts CompositeAssessmentAttempt[]
+
+  @@index([subjectUserId, acceptedAt])
+  @@index([respondentUserId, acceptedAt])
+  @@map("assessment_attempt_consents")
+}
