@@ -63,6 +63,15 @@ VUS=50 DURATION=30s FFMPEG_CONCURRENCY=0 k6 run k6-e5-bundle-mixed.js
 Work A (public limiter / nginx buffering / auth+body metrics) should be deployed
 on the branch under test before interpreting E1 429 vs 503 mix.
 
+
+## E2 implementation notes
+
+- Fixture index **must** use `execution.scenario.iterationInTest` (global). A
+  per-VU module `cursor` collides under `constant-arrival-rate` and falsely
+  inflates `gate_e_idempotent_replays`.
+- Write custom summaries to `GATE_E_SUMMARY_PATH` — do not use `K6_SUMMARY_EXPORT`
+  (k6's built-in overwrites that path with a metrics-only dump).
+
 ## E2 fresh-write (Gate-E.1)
 
 - Fixtures must be **parent-bound UNIFIED_V1** scale assessments (see `backend/scripts/gate47-seed-fixtures.ts`).
