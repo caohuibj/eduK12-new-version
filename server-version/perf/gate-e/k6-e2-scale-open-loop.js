@@ -31,9 +31,9 @@ export const options = {
 let cursor = 0;
 
 export default function () {
-  // Fresh fixture per logical submit: monotonic cursor across VUs is best-effort.
+  // Fresh fixture per logical submit — do not wrap; exhausted pool records failure.
   const index = cursor;
   cursor += 1;
-  const request = pickFreshRequest(requests, index % Math.max(requests.length, 1));
+  const request = pickFreshRequest(requests, index);
   runLogicalSubmit(request, { profile: 'e2_scale_open_loop', target_rate: String(rate) });
 }

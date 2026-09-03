@@ -25,7 +25,7 @@ export const options = {
 
 export default function () {
   const index = (__VU - 1) * 100000 + __ITER;
-  const request = pickFreshRequest(requests, index % Math.max(requests.length, 1));
+  const request = pickFreshRequest(requests, index);
   runLogicalSubmit(request, {
     profile: 'e5_bundle_mixed',
     ffmpeg_concurrency: String(__ENV.FFMPEG_CONCURRENCY || '0'),
