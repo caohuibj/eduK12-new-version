@@ -5,6 +5,9 @@ import { WHO5_ZH_CN_V1_PACKAGE } from './packages/who5-zh-cn-v1'
 import { SDQ_PARENT_ZH_CN_V1_PACKAGE } from './packages/sdq-parent-zh-cn-v1'
 import { SDQ_TEACHER_EN_T4_10_V1_PACKAGE } from './packages/sdq-teacher-en-t4-10-v1'
 import { TEXI_PARENT_EN_V1_PACKAGE, TEXI_TEACHER_EN_V1_PACKAGE } from './packages/texi-en-v1'
+import { SDQ_STUDENT_ZH_CN_V1_PACKAGE } from './packages/sdq-student-zh-cn-v1'
+import { SDQ_TEACHER_ZH_CN_V1_PACKAGE } from './packages/sdq-teacher-zh-cn-v1'
+import { TEXI_PARENT_ZH_CN_V1_PACKAGE, TEXI_TEACHER_ZH_CN_V1_PACKAGE } from './packages/texi-zh-cn-v1'
 import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue, type ScaleDefinitionV2 } from './scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from './scale-scoring'
 import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
@@ -27,6 +30,10 @@ const packages: ScalePackageV2[] = [
   SDQ_TEACHER_EN_T4_10_V1_PACKAGE,
   TEXI_PARENT_EN_V1_PACKAGE,
   TEXI_TEACHER_EN_V1_PACKAGE,
+  SDQ_STUDENT_ZH_CN_V1_PACKAGE,
+  SDQ_TEACHER_ZH_CN_V1_PACKAGE,
+  TEXI_PARENT_ZH_CN_V1_PACKAGE,
+  TEXI_TEACHER_ZH_CN_V1_PACKAGE,
 ]
 
 const packageByKey = new Map(packages.map((scalePackage) => [`${scalePackage.key}:${scalePackage.instrumentVersion}`, scalePackage]))
