@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound, completionBusy, instrumentError } from '../utils/response'
+import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
@@ -46,6 +46,7 @@ import {
   isQuestionnaireCompletionAdmissionBusyError,
   isTransientCompletionDatabaseError,
 } from '../services/questionnaireCompletionAdmission'
+import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 
 // ==================== Validation Schemas ====================
 
@@ -745,6 +746,7 @@ export const scaleController = {
       })
       return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isFinalScaleSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)

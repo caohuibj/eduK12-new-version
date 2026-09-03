@@ -20,6 +20,7 @@ import {
   createFinalDraftMeta,
   finalDraftStore,
 } from '../../../services/persistence/finalDraftStore'
+import { runFinalDraftCapacityRetry } from '../../../services/persistence/finalDraftCapacityRetry'
 import { saveCognitiveRecoveryCredential } from './recovery-credential'
 
 interface CognitiveCheckpointPayload {
@@ -296,19 +297,31 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         const trials = await finalDraftStore.listTrials(draftKey)
         if (trials.length === 0) throw new Error('尚未记录任何认知试次')
         await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
-        const response = await api.submitFinal(session.sessionId, {
-          submissionId: meta.submissionId,
-          attemptEpoch: meta.attemptEpoch,
-          definitionHash: meta.definitionHash,
-          contextSnapshotHash: meta.contextSnapshotHash,
-          trials: trials.map((trial) => trial.payload),
+        const response = await runFinalDraftCapacityRetry({
+          onRetry: async ({ error }) => {
+            await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+              code: String((error as { code?: unknown })?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+              message: friendlyError(error).message,
+            }).catch(() => undefined)
+          },
+          operation: async () => {
+            const next = await api.submitFinal(session.sessionId, {
+              submissionId: meta.submissionId,
+              attemptEpoch: meta.attemptEpoch,
+              definitionHash: meta.definitionHash,
+              contextSnapshotHash: meta.contextSnapshotHash,
+              trials: trials.map((trial) => trial.payload),
+            })
+            if (next.code !== 0 || !next.data) {
+              const responseError = new Error(next.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
+              responseError.code = next.code
+              if (typeof next.code === 'number') responseError.status = next.code
+              if (next.code === 'ASSESSMENT_SUBMIT_BUSY' || next.code === 'COMPLETION_BUSY') responseError.status = 503
+              throw responseError
+            }
+            return next
+          },
         })
-        if (response.code !== 0 || !response.data) {
-          const responseError = new Error(response.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
-          responseError.code = response.code
-          if (typeof response.code === 'number') responseError.status = response.code
-          throw responseError
-        }
         const resultData = (response.data as any).response ?? (response.data as any)
         const result: CognitiveResult | null = resultData.result
           ?? (((resultData as any).metrics !== undefined || (resultData as any).quality !== undefined)

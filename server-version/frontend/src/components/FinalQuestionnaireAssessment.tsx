@@ -6,6 +6,7 @@ import {
   finalDraftStore,
   type FinalDraftMeta,
 } from '../services/persistence/finalDraftStore'
+import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import type { ApiResponse } from '../types'
 
@@ -116,6 +117,7 @@ const apiResponseError = (response: ApiResponse<unknown>) => {
   const error = new Error(response.message || '提交失败') as Error & { status?: number; code?: number | string }
   error.code = response.code
   if (typeof response.code === 'number') error.status = response.code
+  if (response.code === 'ASSESSMENT_SUBMIT_BUSY' || response.code === 'COMPLETION_BUSY') error.status = 503
   return error
 }
 
@@ -249,16 +251,28 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await post(publicMode
-        ? `/assessments/${data.sessionId}/form-sections/${currentSection.id}/submit`
-        : `/questionnaires/assessments/${data.questionnaireAssessment.id}/form-sections/${currentSection.id}/submit`, {
-        submissionId: meta.submissionId,
-        attemptEpoch: meta.attemptEpoch,
-        definitionHash: meta.definitionHash,
-        contextSnapshotHash: meta.contextSnapshotHash,
-        answers,
+      const response = await runFinalDraftCapacityRetry({
+        onRetry: async ({ error }) => {
+          await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
+            code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+            message: normalizeApiError(error).message,
+          }).catch(() => null)
+          setError('提交繁忙，正在自动重试…')
+        },
+        operation: async () => {
+          const next = await post(publicMode
+            ? `/assessments/${data.sessionId}/form-sections/${currentSection.id}/submit`
+            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/form-sections/${currentSection.id}/submit`, {
+            submissionId: meta.submissionId,
+            attemptEpoch: meta.attemptEpoch,
+            definitionHash: meta.definitionHash,
+            contextSnapshotHash: meta.contextSnapshotHash,
+            answers,
+          })
+          if (next.code !== 0) throw apiResponseError(next)
+          return next
+        },
       })
-      if (response.code !== 0) throw apiResponseError(response)
       await finalDraftStore.setStatus(currentKey, 'COMPLETED')
       await finalDraftStore.delete(currentKey)
       await onReload()
@@ -288,16 +302,28 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await post(publicMode
-        ? `/assessments/${data.sessionId}/scale/${currentScale.scaleAssessmentId}/submit`
-        : `/questionnaires/assessments/${data.questionnaireAssessment.id}/scales/${currentScale.scaleAssessmentId}/submit`, {
-        submissionId: meta.submissionId,
-        attemptEpoch: meta.attemptEpoch,
-        definitionHash: meta.definitionHash,
-        contextSnapshotHash: meta.contextSnapshotHash,
-        answers,
+      const response = await runFinalDraftCapacityRetry({
+        onRetry: async ({ error }) => {
+          await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
+            code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+            message: normalizeApiError(error).message,
+          }).catch(() => null)
+          setError('提交繁忙，正在自动重试…')
+        },
+        operation: async () => {
+          const next = await post(publicMode
+            ? `/assessments/${data.sessionId}/scale/${currentScale.scaleAssessmentId}/submit`
+            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/scales/${currentScale.scaleAssessmentId}/submit`, {
+            submissionId: meta.submissionId,
+            attemptEpoch: meta.attemptEpoch,
+            definitionHash: meta.definitionHash,
+            contextSnapshotHash: meta.contextSnapshotHash,
+            answers,
+          })
+          if (next.code !== 0) throw apiResponseError(next)
+          return next
+        },
       })
-      if (response.code !== 0) throw apiResponseError(response)
       await finalDraftStore.setStatus(currentKey, 'COMPLETED')
       await finalDraftStore.delete(currentKey)
       await onReload()

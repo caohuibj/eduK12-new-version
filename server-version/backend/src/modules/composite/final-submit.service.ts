@@ -19,6 +19,7 @@ import {
   prepareCanonicalSubmission,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
   refreshCompositeFinalOnlyProgress,
@@ -358,7 +359,7 @@ export const persistCompositeFormSection = async (
   `)
 }
 
-export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput) => {
+const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
@@ -545,3 +546,8 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
     : { status: 'IN_PROGRESS', progress: response.progress, completedAt: null }
   return { submissionId, sectionId: input.sectionId, ...response, parent }
 }
+
+
+export const submitCompositeFormSectionFinal = (input: SectionSubmitInput) => (
+  withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
+)

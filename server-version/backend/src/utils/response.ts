@@ -35,15 +35,36 @@ export const notFound = (res: Response, message: string = '资源不存在') => 
   return error(res, message, -1, 404)
 }
 
-/** A bounded completion queue is full or expired; clients may retry safely. */
-export const completionBusy = (res: Response, retryAfterSeconds = 1) => {
-  const retryAfter = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
-    ? Math.ceil(retryAfterSeconds)
+const busyEnvelope = (
+  res: Response,
+  input: { code: string; message: string; retryAfterSeconds?: number },
+) => {
+  const retryAfter = Number.isFinite(input.retryAfterSeconds) && (input.retryAfterSeconds ?? 0) > 0
+    ? Math.ceil(input.retryAfterSeconds as number)
     : 1
   res.setHeader('Retry-After', String(retryAfter))
   return res.status(503).json({
-    code: 'COMPLETION_BUSY',
-    message: '测评完成请求繁忙，请稍后重试',
+    code: input.code,
+    message: input.message,
     data: null,
   })
 }
+
+/** A bounded completion queue is full or expired; clients may retry safely. */
+export const completionBusy = (res: Response, retryAfterSeconds = 1) => (
+  busyEnvelope(res, {
+    code: 'COMPLETION_BUSY',
+    message: '测评完成请求繁忙，请稍后重试',
+    retryAfterSeconds,
+  })
+)
+
+/** UNIT FINAL submit admission is full; clients may retry with the same submissionId. */
+export const assessmentSubmitBusy = (res: Response, retryAfterSeconds = 1) => (
+  busyEnvelope(res, {
+    code: 'ASSESSMENT_SUBMIT_BUSY',
+    message: '测评提交繁忙，请稍后重试',
+    retryAfterSeconds,
+  })
+)
+

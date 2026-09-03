@@ -32,6 +32,7 @@ import {
   prepareCanonicalSubmission,
   validateSubmissionId,
 } from './instrumentFinalSubmit'
+import { withUnitSubmitAdmission } from './unitSubmitAdmission'
 import { persistFormAnswerBatch, type BulkFormAnswerMutation } from './questionnaire-form-answer-batch'
 import {
   withFinalOnlyCompletionTransaction,
@@ -1601,7 +1602,7 @@ const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
   return finalizeQuestionnaireFinalOnlyIfReady(assessmentId)
 }
 
-const submitQuestionnaireFormSectionFinal = async (input: SectionSubmitInput) => {
+const submitQuestionnaireFormSectionFinalImpl = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireAssessment.findUnique({
     where: { id: input.questionnaireAssessmentId },
@@ -1825,16 +1826,16 @@ export const submitQuestionnaireFormSectionFinalForUser = (
   assessmentId: string,
   userId: string,
   input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
-) => submitQuestionnaireFormSectionFinal({ ...input, questionnaireAssessmentId: assessmentId, userId })
+) => withUnitSubmitAdmission(() => submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessmentId, userId }))
 
-export const submitQuestionnaireFormSectionFinalForPublic = async (
+export const submitQuestionnaireFormSectionFinalForPublic = (
   sessionId: string,
   input: Omit<SectionSubmitInput, 'questionnaireAssessmentId' | 'userId' | 'sessionId'>,
   resumeTokenHash: string,
-) => {
+) => withUnitSubmitAdmission(async () => {
   const assessment = await prisma.questionnaireAssessment.findUnique({ where: { sessionId }, select: { id: true } })
   if (!assessment) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  return submitQuestionnaireFormSectionFinal({ ...input, questionnaireAssessmentId: assessment.id, userId: null, sessionId, resumeTokenHash })
-}
+  return submitQuestionnaireFormSectionFinalImpl({ ...input, questionnaireAssessmentId: assessment.id, userId: null, sessionId, resumeTokenHash })
+})
 
 export const finalizeQuestionnaireAttemptIfReady = finalizeQuestionnaireIfReady

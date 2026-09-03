@@ -23,6 +23,7 @@ import {
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence } from './scale-admission.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 
@@ -222,7 +223,7 @@ const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   }
 }
 
-export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) => {
+const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
@@ -440,6 +441,10 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
   }
 }
 
+export const submitScaleAssessmentFinal = (input: FinalScaleSubmitInput) => (
+  withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(input))
+)
+
 const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessment.findUnique({
   where: { id: scaleAssessmentId },
   select: {
@@ -449,62 +454,62 @@ const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessmen
   },
 })
 
-export const submitQuestionnaireScaleFinal = async (
+export const submitQuestionnaireScaleFinal = (
   questionnaireAssessmentId: string,
   scaleAssessmentId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'questionnaireSessionId' | 'compositeAttemptId'>,
   context: { userId: string },
-) => {
+) => withUnitSubmitAdmission(async () => {
   const child = await questionnaireChild(scaleAssessmentId)
   if (!child || child.questionnaireAssessmentId !== questionnaireAssessmentId || child.questionnaireAssessment?.userId !== context.userId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前问卷', 403)
   }
-  return submitScaleAssessmentFinal({
+  return submitScaleAssessmentFinalImpl({
     ...input,
     assessmentId: scaleAssessmentId,
     userId: context.userId,
     questionnaireSessionId: child.questionnaireAssessment.sessionId ?? undefined,
   })
-}
+})
 
-export const submitQuestionnaireScaleFinalForPublic = async (
+export const submitQuestionnaireScaleFinalForPublic = (
   sessionId: string,
   scaleAssessmentId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'questionnaireSessionId' | 'compositeAttemptId' | 'recoveryTokenHash'>,
   resumeTokenHash: string,
-) => {
+) => withUnitSubmitAdmission(async () => {
   const child = await questionnaireChild(scaleAssessmentId)
   if (!child || child.questionnaireAssessmentId === null || child.questionnaireAssessment?.sessionId !== sessionId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前会话', 403)
   }
-  return submitScaleAssessmentFinal({
+  return submitScaleAssessmentFinalImpl({
     ...input,
     assessmentId: scaleAssessmentId,
     userId: null,
     questionnaireSessionId: sessionId,
     recoveryTokenHash: resumeTokenHash,
   })
-}
+})
 
-export const submitCompositeScaleFinal = async (
+export const submitCompositeScaleFinal = (
   attemptId: string,
   itemId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'compositeAttemptId' | 'questionnaireSessionId'>,
   context: { userId?: string | null; recoveryTokenHash?: string },
-) => {
+) => withUnitSubmitAdmission(async () => {
   const child = await prisma.assessment.findFirst({
     where: { compositeAttemptId: attemptId, compositeItemId: itemId },
     select: { id: true },
   })
   if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
-  return submitScaleAssessmentFinal({
+  return submitScaleAssessmentFinalImpl({
     ...input,
     assessmentId: child.id,
     userId: context.userId,
     compositeAttemptId: attemptId,
     recoveryTokenHash: context.recoveryTokenHash,
   })
-}
+})
 
 /**
  * Restart a standalone in-progress assessment without deleting its answers.

@@ -32,6 +32,7 @@ import {
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedCognitiveSessionFinal } from './unified-final-submit.service'
 import { UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from './cognitive-admission.service'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -272,7 +273,7 @@ const prepareFinalCognitiveData = async (
   return { payloadHash, trials, ...encrypted, resultSnapshot }
 }
 
-const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
+const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const child = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
@@ -470,6 +471,10 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
   const { parent: _parent, shouldFinalize: _shouldFinalize, ...response } = committed
   return { submissionId, ...response }
 }
+
+const submitWithPrincipal = (input: FinalCognitiveSubmitInput) => (
+  withUnitSubmitAdmission(() => submitWithPrincipalImpl(input))
+)
 
 export const submitCognitiveSessionFinal = (userId: string, input: Omit<FinalCognitiveSubmitInput, 'userId'>) =>
   submitWithPrincipal({ ...input, userId })
