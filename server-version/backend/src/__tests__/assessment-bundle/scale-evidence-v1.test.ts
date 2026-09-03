@@ -129,7 +129,7 @@ const buildWho5Input = (
 }
 
 describe('scale-evidence-v1 + multi-score Scale selectors', () => {
-  it('defines WHO-5 stub with multiple scoreKey selectors and no fabricated items', () => {
+  it('defines WHO-5 Bundle with multiple scoreKey selectors; items live in Scale package not Bundle', () => {
     expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1).toMatchObject({
       bundleKey: 'wellbeing_who5_youth_self_zh_cn_v1',
       category: 'scale_self',
@@ -138,9 +138,10 @@ describe('scale-evidence-v1 + multi-score Scale selectors', () => {
     })
     expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1.slots[0].valueSelectors)
       .toEqual(['raw_total', 'percentage'])
-    expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1.limitations.some((text) => text.includes('commit 10')))
+    expect(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1.limitations.some((text) => /WHO-UCN-MSD-MHE-2024|Chinese PR/i.test(text)))
       .toBe(true)
-    expect(JSON.stringify(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)).not.toMatch(/itemText|items\s*:/)
+    // Bundle definition must not embed Scale item text — that belongs to who5@1.0.0 package.
+    expect(JSON.stringify(WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1)).not.toMatch(/itemText|"items"\s*:/)
   })
 
   it('selects multiple scoreKeys from one Scale administration without copying ScaleResultV2', () => {

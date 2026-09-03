@@ -188,3 +188,10 @@ export type {
   BundleAudienceProjectionV1,
   BundleHistoricalSnapshotExportV1,
 } from './report-facts'
+
+export {
+  SDQ_PARENT_OBSERVER_ZH_CN_V1,
+  SDQ_TEACHER_OBSERVER_ZH_CN_V1,
+  TEXI_PARENT_OBSERVER_ZH_CN_V1,
+  TEXI_TEACHER_OBSERVER_ZH_CN_V1,
+} from './bundles/sdq-texi-observer-stubs'
