@@ -497,19 +497,33 @@ export const finalQuestionnaireDefinitionHash = (questionnaire: any) => computeS
 const patchQuestionnaireStateAfterFinalize = (
   state: Awaited<ReturnType<typeof getUnifiedQuestionnaireFinalAttemptState>>,
   finalized: { status: string; progress: number; completedAt: Date | string | null },
-) => ({
-  ...state,
-  questionnaireAssessment: {
-    ...state.questionnaireAssessment,
-    status: finalized.status,
-    progress: finalized.status === 'COMPLETED' ? 100 : finalized.progress,
-    completedAt: finalized.completedAt,
-    currentIndex: state.totalItems,
-  },
-  currentFormSection: null,
-  currentScale: null,
-  completedItems: state.totalItems,
-})
+) => {
+  // Only promote runner 终态 fields when finalize actually completed.
+  if (finalized.status !== 'COMPLETED') {
+    return {
+      ...state,
+      questionnaireAssessment: {
+        ...state.questionnaireAssessment,
+        status: finalized.status,
+        progress: finalized.progress,
+        completedAt: finalized.completedAt,
+      },
+    }
+  }
+  return {
+    ...state,
+    questionnaireAssessment: {
+      ...state.questionnaireAssessment,
+      status: finalized.status,
+      progress: 100,
+      completedAt: finalized.completedAt,
+      currentIndex: state.totalItems,
+    },
+    currentFormSection: null,
+    currentScale: null,
+    completedItems: state.totalItems,
+  }
+}
 
 export const getQuestionnaireFinalAttemptState = async (assessmentId: string) => {
   const runtime = await prisma.questionnaireAssessment.findUnique({

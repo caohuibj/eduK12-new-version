@@ -632,6 +632,12 @@ const buildCompositePackageAnalysis = (input: {
     const compositeItemId = (slot.sourceBinding as Record<string, unknown>).compositeItemId
     if (typeof compositeItemId === 'string') slotsByItemType.set(`${slot.unitType}:${compositeItemId}`, slot)
   }
+  const cognitiveMeasurementBySlot = new Map(
+    input.packageSnapshot.analysisProtocolSnapshot.cognitiveMeasurements.map((row) => [row.slotKey, row] as const),
+  )
+  const scaleMeasurementBySlot = new Map(
+    (input.packageSnapshot.analysisProtocolSnapshot.scaleMeasurements ?? []).map((row) => [row.slotKey, row] as const),
+  )
 
   const moduleResults: FrozenCognitiveModuleResult[] = protocol.cognitiveSlots.map((protocolSlot: any) => {
     const item = staticCompositeItemFor(itemsByPosType, protocolSlot.position, 'COGNITIVE')
@@ -641,7 +647,7 @@ const buildCompositePackageAnalysis = (input: {
     const config = assignment?.config
     if (!payload?.envelope || !assignment || !config) throw aggregateInputError(`认知槽位 ${protocolSlot.key} 冻结输入缺失`)
     const frozenReport = readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
-    const measurement = input.packageSnapshot.analysisProtocolSnapshot.cognitiveMeasurements.find((candidate) => candidate.slotKey === protocolSlot.key)
+    const measurement = cognitiveMeasurementBySlot.get(protocolSlot.key)
     if (
       !frozenReport
       || !measurement
@@ -680,7 +686,7 @@ const buildCompositePackageAnalysis = (input: {
     const item = staticCompositeItemFor(itemsByPosType, protocolSlot.position, 'SCALE')
     const frozenSlot = frozenCompositeSlotFor(slotsByItemType, item.id, 'SCALE')
     const payload = payloadBySlot.get(frozenSlot.slotKey)
-    const measurement = input.packageSnapshot.analysisProtocolSnapshot.scaleMeasurements?.find((candidate) => candidate.slotKey === protocolSlot.key)
+    const measurement = scaleMeasurementBySlot.get(protocolSlot.key)
     const scale = item.scale
     if (!payload?.envelope || !measurement || !scale) throw aggregateInputError(`量表槽位 ${protocolSlot.key} 冻结输入缺失`)
     const metric = payload.envelope.core.metrics.find((candidate) => candidate.key === measurement.dimensionCode)
@@ -1002,7 +1008,7 @@ const persistCompositeCompletion = async (input: {
         compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
       })
     }
-    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
     throw error
   }
 }
@@ -1190,7 +1196,7 @@ const persistQuestionnaireCompletion = async (input: {
         aggregateInputHash: input.aggregateInputHash,
       })
     }
-    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+    if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
     throw error
   }
 }
@@ -1201,7 +1207,7 @@ export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string) 
       return await finalizeCompositeUnifiedImpl(attemptId)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
-      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
       throw aggregateInputError(error instanceof Error ? error.message : '综合测评聚合失败')
     }
   })
@@ -1213,7 +1219,7 @@ export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: s
       return await finalizeQuestionnaireUnifiedImpl(assessmentId)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
-      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1)
+      if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
       throw aggregateInputError(error instanceof Error ? error.message : '问卷聚合失败')
     }
   })

@@ -6,6 +6,7 @@ import {
   type BoundedAdmissionReason,
 } from './boundedAdmissionGate'
 import {
+  recordBoundedAdmissionRejection,
   recordCompletionAdmissionRejection,
   setCompletionAdmissionState,
 } from './runtimeObservability'
@@ -51,10 +52,12 @@ export const isTransientCompletionDatabaseError = (error: unknown): boolean => {
 export const toCompletionAdmissionBusyError = (
   error: unknown,
   retryAfterSeconds = 1,
+  gate = 'questionnaire_completion',
 ): QuestionnaireCompletionAdmissionBusyError => {
   if (error instanceof QuestionnaireCompletionAdmissionBusyError) return error
   if (isTransientCompletionDatabaseError(error)) {
     recordCompletionAdmissionRejection('database_busy')
+    recordBoundedAdmissionRejection(gate, 'database_busy')
     return new QuestionnaireCompletionAdmissionBusyError('database_busy', retryAfterSeconds)
   }
   throw error

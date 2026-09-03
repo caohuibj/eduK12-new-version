@@ -3334,15 +3334,26 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
 const patchCompositeStateAfterFinalize = (
   state: Awaited<ReturnType<typeof getUnifiedCompositeAttemptState>>,
   finalized: { status: string; progress: number; completedAt: Date | string | null },
-) => ({
-  ...state,
-  status: finalized.status,
-  progress: finalized.status === 'COMPLETED' ? 100 : finalized.progress,
-  completedAt: finalized.completedAt,
-  currentIndex: state.totalItems,
-  currentItem: null,
-  completedItems: state.totalItems,
-})
+) => {
+  // Only promote runner 终态 fields when finalize actually completed.
+  if (finalized.status !== 'COMPLETED') {
+    return {
+      ...state,
+      status: finalized.status,
+      progress: finalized.progress,
+      completedAt: finalized.completedAt,
+    }
+  }
+  return {
+    ...state,
+    status: finalized.status,
+    progress: 100,
+    completedAt: finalized.completedAt,
+    currentIndex: state.totalItems,
+    currentItem: null,
+    completedItems: state.totalItems,
+  }
+}
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const runtime = await prisma.compositeAssessmentAttempt.findUnique({
