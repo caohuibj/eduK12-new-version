@@ -195,3 +195,20 @@ export {
   TEXI_PARENT_OBSERVER_ZH_CN_V1,
   TEXI_TEACHER_OBSERVER_ZH_CN_V1,
 } from './bundles/sdq-texi-observer-stubs'
+
+export {
+  INTEGRATED_ADULT_MIN_AGE_YEARS,
+  INTEGRATED_EVIDENCE_ENGINE_KEY,
+  INTEGRATED_EVIDENCE_ENGINE_VERSION,
+  INTEGRATED_EVIDENCE_PAYLOAD_SCHEMA,
+  assertEvidenceRolesSafeForIntegrated,
+  assertIntegratedAdultAge,
+  projectIntegratedEvidenceItems,
+  runIntegratedEvidenceV1,
+} from './engines/integrated-evidence-v1'
+export type {
+  IntegratedEvidencePayloadV1,
+  IntegratedEvidenceStatusV1,
+  IntegratedMethodObservationV1,
+} from './engines/integrated-evidence-v1'
+export { INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1 } from './bundles/integrated-gonogo-adexi-adult-zh-cn-v1'
