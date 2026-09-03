@@ -23,21 +23,32 @@ export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
 export const finalDraftCapacityRetryDelayMs = (
   attempt: number,
   retryAfterMs: number | null = null,
+  random: () => number = Math.random,
 ): number => {
   const safeAttempt = Number.isFinite(attempt) && attempt >= 1 ? Math.floor(attempt) : 1
   const retryFloor = retryAfterMs !== null && Number.isFinite(retryAfterMs) && retryAfterMs >= 0
     ? Math.min(5_000, Math.max(0, retryAfterMs))
     : 0
-  const base = Math.max(1_000, retryFloor || 1_000)
-  const jitter = Math.random() * 4_000 // up to +4s
-  const attemptBoost = Math.min(safeAttempt - 1, 3) * 250
-  return Math.min(5_000, base + jitter + attemptBoost)
+  // Attempt-aware windows (~1-2 / 1.5-3 / 2.5-4.5 / 3-5s), never above 5s.
+  const windows: Array<[number, number]> = [
+    [1_000, 2_000],
+    [1_500, 3_000],
+    [2_500, 4_500],
+    [3_000, 5_000],
+  ]
+  const [lo, hi] = windows[Math.min(safeAttempt - 1, windows.length - 1)]
+  const sampledRaw = random()
+  const sampled = Number.isFinite(sampledRaw) ? Math.min(1, Math.max(0, sampledRaw)) : 0
+  const jittered = lo + Math.floor(sampled * (hi - lo + 1))
+  return Math.min(5_000, Math.max(jittered, retryFloor))
 }
 
 export type CapacityRetryOptions<T> = {
   maxAttempts?: number
   onRetry?: (info: { attempt: number; delayMs: number; error: unknown }) => void | Promise<void>
   operation: (attempt: number) => Promise<T>
+  random?: () => number
+  sleep?: (milliseconds: number) => Promise<void>
 }
 
 /** Auto-retry capacity failures while callers keep the submit button disabled. */
@@ -51,9 +62,13 @@ export const runFinalDraftCapacityRetry = async <T>(
       return await options.operation(attempt)
     } catch (error) {
       if (!isFinalDraftCapacityRetryable(error) || attempt >= maxAttempts) throw error
-      const delayMs = finalDraftCapacityRetryDelayMs(attempt, normalizeApiError(error).retryAfterMs)
+      const delayMs = finalDraftCapacityRetryDelayMs(
+        attempt,
+        normalizeApiError(error).retryAfterMs,
+        options.random,
+      )
       await options.onRetry?.({ attempt, delayMs, error })
-      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await (options.sleep ?? ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms))))(delayMs)
       attempt += 1
     }
   }

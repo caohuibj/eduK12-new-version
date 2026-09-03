@@ -17,7 +17,7 @@ describe('finalDraftCapacityRetry', () => {
 
   it('caps attempt-aware jitter at 5 seconds', () => {
     for (let attempt = 1; attempt <= 8; attempt += 1) {
-      const delay = finalDraftCapacityRetryDelayMs(attempt, 1200)
+      const delay = finalDraftCapacityRetryDelayMs(attempt, 1200, () => 1)
       expect(delay).toBeGreaterThanOrEqual(1000)
       expect(delay).toBeLessThanOrEqual(5000)
     }
@@ -28,12 +28,16 @@ describe('finalDraftCapacityRetry', () => {
       .mockRejectedValueOnce({ status: 503, code: 'ASSESSMENT_SUBMIT_BUSY', retryAfterMs: 10 })
       .mockResolvedValueOnce({ ok: true })
     const onRetry = vi.fn()
+    const sleep = vi.fn(async () => undefined)
     await expect(runFinalDraftCapacityRetry({
       maxAttempts: 3,
       onRetry,
       operation,
+      sleep,
+      random: () => 0,
     })).resolves.toEqual({ ok: true })
     expect(operation).toHaveBeenCalledTimes(2)
     expect(onRetry).toHaveBeenCalledTimes(1)
+    expect(sleep).toHaveBeenCalledTimes(1)
   })
 })
