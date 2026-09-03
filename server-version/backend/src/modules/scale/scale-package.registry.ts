@@ -1,5 +1,8 @@
 import { ADEXI_V2_PACKAGE, type ScaleGoldenCase } from './packages/adexi-v2'
 import { WHO5_ZH_CN_V1_PACKAGE } from './packages/who5-zh-cn-v1'
+import { SDQ_PARENT_ZH_CN_V1_PACKAGE } from './packages/sdq-parent-zh-cn-v1'
+import { SDQ_TEACHER_EN_T4_10_V1_PACKAGE } from './packages/sdq-teacher-en-t4-10-v1'
+import { TEXI_PARENT_EN_V1_PACKAGE, TEXI_TEACHER_EN_V1_PACKAGE } from './packages/texi-en-v1'
 import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue, type ScaleDefinitionV2 } from './scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from './scale-scoring'
 import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
@@ -13,7 +16,14 @@ export interface ScalePackageV2 {
   goldenCases: ScaleGoldenCase[]
 }
 
-const packages: ScalePackageV2[] = [ADEXI_V2_PACKAGE, WHO5_ZH_CN_V1_PACKAGE]
+const packages: ScalePackageV2[] = [
+  ADEXI_V2_PACKAGE,
+  WHO5_ZH_CN_V1_PACKAGE,
+  SDQ_PARENT_ZH_CN_V1_PACKAGE,
+  SDQ_TEACHER_EN_T4_10_V1_PACKAGE,
+  TEXI_PARENT_EN_V1_PACKAGE,
+  TEXI_TEACHER_EN_V1_PACKAGE,
+]
 
 const packageByKey = new Map(packages.map((scalePackage) => [`${scalePackage.key}:${scalePackage.instrumentVersion}`, scalePackage]))
 
@@ -130,4 +140,11 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
   return { valid: issues.every((issue) => issue.severity !== 'error'), definitionHash: hashScaleDefinition(scalePackage.definition), issues }
 }
 
-export { ADEXI_V2_PACKAGE, WHO5_ZH_CN_V1_PACKAGE }
+export {
+  ADEXI_V2_PACKAGE,
+  WHO5_ZH_CN_V1_PACKAGE,
+  SDQ_PARENT_ZH_CN_V1_PACKAGE,
+  SDQ_TEACHER_EN_T4_10_V1_PACKAGE,
+  TEXI_PARENT_EN_V1_PACKAGE,
+  TEXI_TEACHER_EN_V1_PACKAGE,
+}

@@ -1,16 +1,16 @@
 /**
  * TEXI Simplified Chinese localization manifest contract.
- * Content packages stay blocked until a signed manifest is attached.
- * Do not invent TEXI item text here.
+ * English item codes are now fixed from the authorized source PDF.
+ * Content may not claim zh-CN until a signed manifest is attached.
  */
 import { z } from 'zod'
+import { TEXI_ITEM_CODES, TEXI_SOURCE_VERSION_LABEL, TEXI_SUBJECT_AGE_MAX, TEXI_SUBJECT_AGE_MIN } from '../packages/texi-en-v1'
 
 const HEX = /^[0-9a-f]{64}$/
 const ISO = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?Z$/
 
-export const TEXI_SOURCE_VERSION = 'Thorell et al. 2020 / ages 13-19' as const
-export const TEXI_SUBJECT_AGE_MIN = 13
-export const TEXI_SUBJECT_AGE_MAX = 19
+export const TEXI_SOURCE_VERSION = TEXI_SOURCE_VERSION_LABEL
+export { TEXI_SUBJECT_AGE_MIN, TEXI_SUBJECT_AGE_MAX }
 
 export const texiLocalizationManifestSchema = z.object({
   schemaVersion: z.literal(1),
@@ -33,19 +33,23 @@ export const texiLocalizationManifestSchema = z.object({
 
 export type TexiLocalizationManifestV1 = z.infer<typeof texiLocalizationManifestSchema>
 
-/** Placeholder blocked manifest — unsigned / incomplete on purpose. */
-export const TEXI_LOCALIZATION_MANIFEST_BLOCKED = {
+/** Fixed English item codes from authorized source — unsigned until localization completes. */
+export const TEXI_LOCALIZATION_MANIFEST_PENDING = {
   schemaVersion: 1 as const,
   instrumentKey: 'texi_parent_zh_cn' as const,
   instrumentVersion: '1.0.0',
   fixedSourceVersion: TEXI_SOURCE_VERSION,
-  itemCodes: [] as string[],
+  itemCodes: [...TEXI_ITEM_CODES],
   status: 'BLOCKED_UNSIGNED' as const,
   notes: [
-    'Awaiting official TEXI item codes + signed translation/back-translation/terminology/mainland language review.',
+    'English item codes locked from authorized TEXI Parents and Teachers PDF.',
+    'Awaiting signed translation/back-translation/terminology/mainland language review.',
     'Descriptive only; claimsMainlandNorms must remain false.',
   ],
 }
+
+/** @deprecated alias — prefer TEXI_LOCALIZATION_MANIFEST_PENDING */
+export const TEXI_LOCALIZATION_MANIFEST_BLOCKED = TEXI_LOCALIZATION_MANIFEST_PENDING
 
 export const isTexiLocalizationManifestSigned = (value: unknown): boolean => (
   texiLocalizationManifestSchema.safeParse(value).success

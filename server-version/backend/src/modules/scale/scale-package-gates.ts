@@ -8,6 +8,7 @@ import {
   type InstrumentAuthorizationRecordV1,
 } from '../assessment-authorization'
 import { getBlockedScalePackage } from './packages/blocked-observer-packages'
+import { SDQ_TEACHER_ZH_CN_TRANSLATION_PENDING } from './packages/sdq-teacher-en-t4-10-v1'
 import { isTexiLocalizationManifestSigned } from './localization/texi-localization-manifest'
 import { getScalePackage, validateScalePackage } from './scale-package.registry'
 
@@ -83,7 +84,11 @@ export const evaluateWho5ScalePackageGate = (input: {
   }
 }
 
-/** SDQ electronic administration/scoring must bind approved authorization. */
+/**
+ * SDQ electronic administration/scoring must bind approved authorization.
+ * Parent zh-Hans content is landed; teacher zh-CN still pending signed translation
+ * (English T4-10 source is locked in-package).
+ */
 export const evaluateSdqElectronicAdminGate = (input: {
   instrumentKey: string
   instrumentVersion: string
@@ -91,14 +96,31 @@ export const evaluateSdqElectronicAdminGate = (input: {
   locale: string
   territory: string
   nowIso?: string
+  /** When true, allow teacher package to publish English source under en locale only. */
+  allowEnglishTeacherSource?: boolean
 }): ScalePackageGateResultV1 => {
-  const blocked = getBlockedScalePackage(input.instrumentKey, input.instrumentVersion)
+  const gate = getBlockedScalePackage(input.instrumentKey, input.instrumentVersion)
   const errors: string[] = []
   const warnings: string[] = []
-  if (blocked) {
-    errors.push(`package BLOCKED: ${blocked.reasons.join(',')}`)
-    errors.push(...blocked.notes)
+  const pkg = getScalePackage(input.instrumentKey, input.instrumentVersion)
+  if (!pkg) {
+    errors.push(`SDQ package not registered: ${input.instrumentKey}@${input.instrumentVersion}`)
+  } else {
+    const validation = validateScalePackage(pkg)
+    if (!validation.valid) {
+      errors.push(...validation.issues.filter((i) => i.severity === 'error').map((i) => i.message))
+    }
   }
+
+  if (
+    input.instrumentKey === 'sdq_teacher_zh_cn'
+    && input.locale === 'zh-CN'
+    && !input.allowEnglishTeacherSource
+  ) {
+    errors.push(`SDQ teacher zh-CN translation pending: ${SDQ_TEACHER_ZH_CN_TRANSLATION_PENDING.status}`)
+    errors.push(...SDQ_TEACHER_ZH_CN_TRANSLATION_PENDING.notes)
+  }
+
   const nowIso = input.nowIso ?? new Date().toISOString()
   const effective = resolveEffectiveAuthorization({
     authorizations: input.authorizations,
@@ -118,12 +140,24 @@ export const evaluateSdqElectronicAdminGate = (input: {
     if (overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT') {
       errors.push(`SDQ authorization ${overlay}`)
     }
+    if (effective.status === 'EVIDENCE_PENDING') {
+      warnings.push('SDQ EVIDENCE_PENDING — warn only')
+    }
   }
+
+  if (gate?.reasons.includes('ZH_CN_TRANSLATION_PENDING_SIGNED_MANIFEST') && input.locale === 'zh-CN') {
+    // already added above; keep blocked flag true for zh-CN teacher
+  }
+
+  const blockedForLocale = (
+    input.instrumentKey === 'sdq_teacher_zh_cn' && input.locale === 'zh-CN'
+  )
+
   return {
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    publishable: false,
-    blocked: Boolean(blocked),
+    publishable: errors.length === 0,
+    blocked: blockedForLocale || Boolean(gate && errors.length > 0 && !pkg),
     errors,
     warnings,
   }
@@ -134,20 +168,28 @@ export const evaluateTexiLocalizationGate = (input: {
   instrumentVersion: string
   localizationManifest: unknown
 }): ScalePackageGateResultV1 => {
-  const blocked = getBlockedScalePackage(input.instrumentKey, input.instrumentVersion)
+  const gate = getBlockedScalePackage(input.instrumentKey, input.instrumentVersion)
   const errors: string[] = []
-  if (blocked) {
-    errors.push(`package BLOCKED: ${blocked.reasons.join(',')}`)
+  const warnings: string[] = ['TEXI descriptive only; no mainland norms claims']
+  const pkg = getScalePackage(input.instrumentKey, input.instrumentVersion)
+  if (!pkg) {
+    errors.push(`TEXI package not registered: ${input.instrumentKey}@${input.instrumentVersion}`)
+  } else {
+    const validation = validateScalePackage(pkg)
+    if (!validation.valid) {
+      errors.push(...validation.issues.filter((i) => i.severity === 'error').map((i) => i.message))
+    }
   }
   if (!isTexiLocalizationManifestSigned(input.localizationManifest)) {
     errors.push('TEXI localization manifest missing or unsigned')
+    if (gate) errors.push(`package gate: ${gate.reasons.join(',')}`)
   }
   return {
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    publishable: false,
-    blocked: true,
+    publishable: errors.length === 0,
+    blocked: !isTexiLocalizationManifestSigned(input.localizationManifest),
     errors,
-    warnings: ['TEXI descriptive only; no mainland norms claims'],
+    warnings,
   }
 }
