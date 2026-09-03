@@ -72,6 +72,7 @@ const snapshotHeaderSelect = {
   sourceSubmissionId: true,
   sourceDefinitionHash: true,
   compiledRuntimeHash: true,
+  completedAt: true,
 } as const
 
 const unifiedParentHeaderSelect = {
@@ -88,11 +89,26 @@ const unifiedParentHeaderSelect = {
   contextSnapshotHash: true,
   frozenActiveSlotSetEncrypted: true,
   frozenActiveSlotSetHash: true,
+  completedScales: true,
+  completedForms: true,
 } as const
 
 const compositeParentHeaderSelect = {
-  ...unifiedParentHeaderSelect,
+  id: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  startedAt: true,
+  completedAt: true,
+  progress: true,
+  aggregateInputHash: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
   compiledBundleRuntimeHash: true,
+  completedItems: true,
 } as const
 
 const compositeParentGraphSelect = {
@@ -205,6 +221,9 @@ type UnifiedParentHeader = {
   progress: number
   aggregateInputHash: string | null
   compiledBundleRuntimeHash?: string | null
+  completedItems?: number | null
+  completedScales?: number | null
+  completedForms?: number | null
   contextSnapshotEncrypted: string | null
   contextSnapshotHash: string | null
   frozenActiveSlotSetEncrypted: string | null
@@ -309,7 +328,24 @@ const headerFromRow = (row: any): AggregateSnapshotHeader => ({
   sourceSubmissionId: row.sourceSubmissionId,
   sourceDefinitionHash: row.sourceDefinitionHash,
   compiledRuntimeHash: row.compiledRuntimeHash,
+  completedAt: row.completedAt ?? null,
 })
+
+/** Student completion time = max(required UnitSnapshot.completedAt). */
+const maxRequiredSnapshotCompletedAt = (
+  slots: FrozenActiveSlotV1[],
+  headers: AggregateSnapshotHeader[],
+  fallback: Date,
+): Date => {
+  const requiredKeys = new Set(slots.filter((slot) => slot.required).map((slot) => slot.slotKey))
+  let maxMs = Number.NEGATIVE_INFINITY
+  for (const header of headers) {
+    if (!requiredKeys.has(header.slotKey) || header.terminalState !== 'COMPLETED' || !header.completedAt) continue
+    const ms = header.completedAt instanceof Date ? header.completedAt.getTime() : Date.parse(String(header.completedAt))
+    if (Number.isFinite(ms) && ms > maxMs) maxMs = ms
+  }
+  return Number.isFinite(maxMs) ? new Date(maxMs) : fallback
+}
 
 const withAggregateDefinitionBoundary = <T>(operation: () => T): T => {
   try {
@@ -553,17 +589,22 @@ const metricsRecordFor = (core: CanonicalUnitResultCoreV1): Record<string, unkno
   return result
 }
 
-const staticCompositeItemFor = (items: any[], position: number, type: string) => {
-  const item = items.find((candidate) => candidate.position === position && candidate.type === type && candidate.required === true)
+const staticCompositeItemFor = (
+  itemsByPosType: Map<string, any>,
+  position: number,
+  type: string,
+) => {
+  const item = itemsByPosType.get(`${type}:${position}`)
   if (!item) throw aggregateInputError(`冻结报告包 position ${position} 未绑定必需 ${type} 模块`)
   return item
 }
 
-const frozenCompositeSlotFor = (slots: FrozenActiveSlotV1[], itemId: string, unitType: 'SCALE' | 'COGNITIVE') => {
-  const slot = slots.find((candidate) => (
-    candidate.unitType === unitType
-    && (candidate.sourceBinding as Record<string, unknown>).compositeItemId === itemId
-  ))
+const frozenCompositeSlotFor = (
+  slotsByItemType: Map<string, FrozenActiveSlotV1>,
+  itemId: string,
+  unitType: 'SCALE' | 'COGNITIVE',
+) => {
+  const slot = slotsByItemType.get(`${unitType}:${itemId}`)
   if (!slot) throw aggregateInputError(`模块 ${itemId} 未绑定冻结 ${unitType} 槽位`)
   return slot
 }
@@ -582,10 +623,19 @@ const buildCompositePackageAnalysis = (input: {
   if (moduleItems.length !== protocol.cognitiveSlots.length + protocol.scaleSlots.length) {
     throw aggregateInputError('冻结报告包模块数量与综合测评实例不一致')
   }
+  const itemsByPosType = new Map(
+    moduleItems.map((item) => [`${item.type}:${item.position}`, item] as const),
+  )
+  const slotsByItemType = new Map<string, FrozenActiveSlotV1>()
+  for (const slot of input.frozenSlots) {
+    if (slot.unitType !== 'SCALE' && slot.unitType !== 'COGNITIVE') continue
+    const compositeItemId = (slot.sourceBinding as Record<string, unknown>).compositeItemId
+    if (typeof compositeItemId === 'string') slotsByItemType.set(`${slot.unitType}:${compositeItemId}`, slot)
+  }
 
   const moduleResults: FrozenCognitiveModuleResult[] = protocol.cognitiveSlots.map((protocolSlot: any) => {
-    const item = staticCompositeItemFor(moduleItems, protocolSlot.position, 'COGNITIVE')
-    const frozenSlot = frozenCompositeSlotFor(input.frozenSlots, item.id, 'COGNITIVE')
+    const item = staticCompositeItemFor(itemsByPosType, protocolSlot.position, 'COGNITIVE')
+    const frozenSlot = frozenCompositeSlotFor(slotsByItemType, item.id, 'COGNITIVE')
     const payload = payloadBySlot.get(frozenSlot.slotKey)
     const assignment = item.cognitiveAssignment
     const config = assignment?.config
@@ -627,8 +677,8 @@ const buildCompositePackageAnalysis = (input: {
   })
 
   const scaleResults: FrozenScaleModuleResult[] = protocol.scaleSlots.map((protocolSlot: any) => {
-    const item = staticCompositeItemFor(moduleItems, protocolSlot.position, 'SCALE')
-    const frozenSlot = frozenCompositeSlotFor(input.frozenSlots, item.id, 'SCALE')
+    const item = staticCompositeItemFor(itemsByPosType, protocolSlot.position, 'SCALE')
+    const frozenSlot = frozenCompositeSlotFor(slotsByItemType, item.id, 'SCALE')
     const payload = payloadBySlot.get(frozenSlot.slotKey)
     const measurement = input.packageSnapshot.analysisProtocolSnapshot.scaleMeasurements?.find((candidate) => candidate.slotKey === protocolSlot.key)
     const scale = item.scale
@@ -721,6 +771,13 @@ const readCasLoser = async (input: {
 }
 
 const updateIncompleteComposite = async (parent: any, completeness: ReturnType<typeof evaluateCompleteness>) => {
+  // No-op when authoritative progress counters are unchanged.
+  if (
+    parent.progress === completeness.progress
+    && Number(parent.completedItems ?? -1) === completeness.completedSlotCount
+  ) {
+    return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
+  }
   const updated = await prisma.compositeAssessmentAttempt.updateMany({
     where: parentGuard(parent),
     data: {
@@ -758,10 +815,18 @@ const updateIncompleteQuestionnaire = async (
   const completedForms = slots.filter((slot) => (
     slot.unitType === 'FORM_SECTION' && slot.required && completedSlotKeys.has(slot.slotKey)
   )).length
+  const nextCompletedScales = Math.min(completedScales, completeness.completedSlotCount)
+  if (
+    parent.progress === completeness.progress
+    && Number(parent.completedScales ?? -1) === nextCompletedScales
+    && Number(parent.completedForms ?? -1) === completedForms
+  ) {
+    return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
+  }
   const updated = await prisma.questionnaireAssessment.updateMany({
     where: parentGuard(parent),
     data: {
-      completedScales: Math.min(completedScales, completeness.completedSlotCount),
+      completedScales: nextCompletedScales,
       completedForms,
       progress: completeness.progress,
     },
@@ -856,6 +921,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
   return persistCompositeCompletion({
     parent,
     frozenSlots,
+    headers,
     contextHash: context.hash,
     compiledBundleRuntimeHash,
     aggregateInputHash,
@@ -867,15 +933,32 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
 const persistCompositeCompletion = async (input: {
   parent: any
   frozenSlots: FrozenActiveSlotSetV1
+  headers: AggregateSnapshotHeader[]
   contextHash: string | null
   compiledBundleRuntimeHash: string | null
   aggregateInputHash: string
   packageAnalysis: { analysis: any } | null
   payloadEncrypted: string | null
 }): Promise<CompletionResult> => {
-  const completedAt = new Date()
+  const fallbackCompletedAt = new Date()
+  const completedAt = maxRequiredSnapshotCompletedAt(input.frozenSlots.slots, input.headers, fallbackCompletedAt)
   try {
     return await measureRequestPhase('aggregate.persist', () => prisma.$transaction(async (tx) => {
+      // CAS-first: claim parent completion before durable analysis snapshot write.
+      const updated = await tx.compositeAssessmentAttempt.updateMany({
+        where: parentGuard(input.parent),
+        data: {
+          status: 'COMPLETED',
+          progress: 100,
+          completedItems: input.frozenSlots.slots.filter((slot) => slot.required).length,
+          completedAt,
+          totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()),
+          lastSavedAt: completedAt,
+          aggregateInputHash: input.aggregateInputHash,
+        },
+      })
+      if (updated.count !== 1) throw new AggregateCasLost()
+
       if (input.packageAnalysis && input.payloadEncrypted) {
         const analysis = input.packageAnalysis.analysis
         await tx.compositeAnalysisSnapshot.upsert({
@@ -907,19 +990,6 @@ const persistCompositeCompletion = async (input: {
           update: {},
         })
       }
-      const updated = await tx.compositeAssessmentAttempt.updateMany({
-        where: parentGuard(input.parent),
-        data: {
-          status: 'COMPLETED',
-          progress: 100,
-          completedItems: input.frozenSlots.slots.filter((slot) => slot.required).length,
-          completedAt,
-          totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()),
-          lastSavedAt: completedAt,
-          aggregateInputHash: input.aggregateInputHash,
-        },
-      })
-      if (updated.count !== 1) throw new AggregateCasLost()
       return { status: 'COMPLETED', progress: 100, completedAt }
     }, { isolationLevel: 'ReadCommitted' }))
   } catch (error) {
@@ -1075,6 +1145,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
   return persistQuestionnaireCompletion({
     parent,
     frozenSlots,
+    headers,
     aggregateInputHash,
     aggregateReportEncrypted,
   })
@@ -1083,10 +1154,12 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
 const persistQuestionnaireCompletion = async (input: {
   parent: any
   frozenSlots: FrozenActiveSlotSetV1
+  headers: AggregateSnapshotHeader[]
   aggregateInputHash: string
   aggregateReportEncrypted: string
 }): Promise<CompletionResult> => {
-  const completedAt = new Date()
+  const fallbackCompletedAt = new Date()
+  const completedAt = maxRequiredSnapshotCompletedAt(input.frozenSlots.slots, input.headers, fallbackCompletedAt)
   try {
     return await measureRequestPhase('aggregate.persist', () => prisma.$transaction(async (tx) => {
       const completedScales = input.frozenSlots.slots.filter((slot) => slot.required && slot.unitType === 'SCALE').length
