@@ -1,5 +1,10 @@
 # Handoff：同机续作
 
+> **Updated Commit 17:** Prep 15.1 + Commit 16 + Commit 17 are on `feature/unified-assessment-bundle-v1`.
+> Next human action: two independent reviews using `07-pr46-final-review-checklist.md`. **Do not merge Draft PR #46.**
+> Stale “next is Commit 3” text below is historical; ignore for scheduling.
+
+
 本文假设还能访问原来的本地仓库。若在**另一台只有 GitHub 的电脑**上开工，改用 [05-fresh-clone-handoff.md](./05-fresh-clone-handoff.md)，不要找 `/Users/Qiang` 或 `/tmp`。
 
 同机续作：把本文整份贴进新对话即可。不要重开 V3.2 性能工作，不要 cherry-pick 冻结分支。

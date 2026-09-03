@@ -1,3 +1,4 @@
+<!-- Commit 17: see 07-pr46-final-review-checklist.md; keep Draft PR #46; do not merge. -->
 # 新电脑 / 仅 GitHub 开工 Handoff
 
 给**另一台能访问 GitHub、没有原本地磁盘**的机器和下一个 AI。不要找 `/Users/Qiang`、`/tmp/eduK12-*`、`ptool-*` 或任何原机路径。clone 之后以仓库内文件为准。
