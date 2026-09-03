@@ -1,5 +1,6 @@
 import type { CompiledInstrumentRuntimeV1 } from '../assessment-runtime/types'
 import { bundleContractFail } from './errors'
+import { EXACT_VERSION } from './schema'
 import type {
   BundleContextFactsV1,
   EvidenceItemV1,
@@ -18,17 +19,32 @@ export interface BundleEngineInputV1 {
   aggregateInputHash: string | null
 }
 
-export type BundleEngineResultV1 = {
-  engineKey: string
-  engineVersion: string
-  kind: 'UNAVAILABLE' | 'COMPUTED'
-  reason?: string
-  payload?: unknown
-}
+/**
+ * Engine identity lives only on `snapshot.engine`. Results are a narrow
+ * discriminated union — never restate engineKey/engineVersion here.
+ */
+export type BundleEngineResultV1 =
+  | { kind: 'COMPUTED'; payload: unknown }
+  | { kind: 'UNAVAILABLE'; reason: string }
 
 export type BundleAnalysisEngineV1 = (input: BundleEngineInputV1) => BundleEngineResultV1
 
 const engineResourceId = (key: string, version: string): string => `${key}@${version}`
+
+const assertExactEngineRef = (key: string, version: string): void => {
+  if (typeof key !== 'string' || key.length === 0) {
+    bundleContractFail('INVALID_ENGINE_REF', 'engine key 缺失')
+  }
+  if (typeof version !== 'string' || version.length === 0) {
+    bundleContractFail('INVALID_ENGINE_REF', 'engine version 缺失')
+  }
+  if (!EXACT_VERSION.test(version)) {
+    bundleContractFail(
+      'INVALID_ENGINE_REF',
+      `engine version 必须是精确 x.y.z，拒绝范围/别名: ${version}`,
+    )
+  }
+}
 
 /**
  * Exact {key, version} registry only.
@@ -39,12 +55,7 @@ export class BundleAnalysisEngineRegistry {
   private readonly engines = new Map<string, BundleAnalysisEngineV1>()
 
   register(key: string, version: string, engine: BundleAnalysisEngineV1): void {
-    if (typeof key !== 'string' || key.length === 0) {
-      bundleContractFail('INVALID_ENGINE_REF', 'engine key 缺失')
-    }
-    if (typeof version !== 'string' || version.length === 0) {
-      bundleContractFail('INVALID_ENGINE_REF', 'engine version 缺失')
-    }
+    assertExactEngineRef(key, version)
     const id = engineResourceId(key, version)
     if (this.engines.has(id)) {
       bundleContractFail('DUPLICATE_ENGINE', `engine already registered: ${id}`)
@@ -53,12 +64,7 @@ export class BundleAnalysisEngineRegistry {
   }
 
   resolve(key: string, version: string): BundleAnalysisEngineV1 {
-    if (typeof key !== 'string' || key.length === 0) {
-      bundleContractFail('INVALID_ENGINE_REF', 'engine key 缺失')
-    }
-    if (typeof version !== 'string' || version.length === 0) {
-      bundleContractFail('INVALID_ENGINE_REF', 'engine version 缺失')
-    }
+    assertExactEngineRef(key, version)
     const id = engineResourceId(key, version)
     const hit = this.engines.get(id)
     if (hit) return hit

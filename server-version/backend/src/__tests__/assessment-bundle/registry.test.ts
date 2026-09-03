@@ -4,6 +4,7 @@ import {
   createBundleAnalysisEngineRegistry,
   type BundleAnalysisEngineV1,
   type BundleEngineInputV1,
+  type BundleEngineResultV1,
 } from '../../modules/assessment-bundle/registry'
 import { compileBundleRuntimeFromFrozenRead } from '../../modules/assessment-bundle/compile'
 import { buildFrozenAssessmentBundleSnapshot } from '../../modules/assessment-bundle/snapshot'
@@ -39,13 +40,7 @@ const buildInput = (
   }
 }
 
-const stubEngine = (
-  engineKey: string,
-  engineVersion: string,
-  tag: string,
-): BundleAnalysisEngineV1 => (input) => ({
-  engineKey,
-  engineVersion,
+const stubEngine = (tag: string): BundleAnalysisEngineV1 => (input) => ({
   kind: 'COMPUTED',
   payload: {
     tag,
@@ -58,32 +53,36 @@ const stubEngine = (
 describe('BundleAnalysisEngineRegistry', () => {
   it('resolves and dispatches an exact key@version hit', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('test-stub-engine-v1', '1.0.0', 'hit'))
-    // Product key used only as frozen ref in input; registry lookup is exact string match.
+    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('hit'))
     const productRegistry = createBundleAnalysisEngineRegistry()
-    productRegistry.register('cognitive-domain-v1', '1.0.0', stubEngine('cognitive-domain-v1', '1.0.0', 'cog'))
+    productRegistry.register('cognitive-domain-v1', '1.0.0', stubEngine('cog'))
     const input = buildInput({ key: 'cognitive-domain-v1', version: '1.0.0' })
     const result = productRegistry.dispatch(input)
-    expect(result).toMatchObject({
-      engineKey: 'cognitive-domain-v1',
-      engineVersion: '1.0.0',
+    expect(result).toEqual({
       kind: 'COMPUTED',
-      payload: { tag: 'cog', evidenceCount: 1 },
-    })
+      payload: {
+        tag: 'cog',
+        snapshotHash: input.snapshot.snapshotHash,
+        evidenceCount: 1,
+        aggregateInputHash: null,
+      },
+    } satisfies BundleEngineResultV1)
+    expect(result).not.toHaveProperty('engineKey')
+    expect(result).not.toHaveProperty('engineVersion')
     expect(registry.resolve('test-stub-engine-v1', '1.0.0')).toBeTypeOf('function')
   })
 
   it('rejects unknown engine key and known key with unknown version distinctly', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('test-stub-engine-v1', '1.0.0', 'a'))
+    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('a'))
     expect(failCode(() => registry.resolve('no-such-engine-v1', '1.0.0'))).toBe('UNKNOWN_ENGINE_KEY')
     expect(failCode(() => registry.resolve('test-stub-engine-v1', '9.9.9'))).toBe('UNKNOWN_ENGINE_VERSION')
   })
 
   it('allows multiple versions of the same key and rejects duplicate register', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('test-stub-engine-v1', '1.0.0', 'v100'))
-    registry.register('test-stub-engine-v1', '1.0.1', stubEngine('test-stub-engine-v1', '1.0.1', 'v101'))
+    registry.register('test-stub-engine-v1', '1.0.0', stubEngine('v100'))
+    registry.register('test-stub-engine-v1', '1.0.1', stubEngine('v101'))
     const fakeInput = {
       snapshot: { snapshotHash: 'x'.repeat(64) },
       evidence: [],
@@ -96,16 +95,30 @@ describe('BundleAnalysisEngineRegistry', () => {
     expect(failCode(() => registry.register(
       'test-stub-engine-v1',
       '1.0.0',
-      stubEngine('test-stub-engine-v1', '1.0.0', 'dup'),
+      stubEngine('dup'),
     ))).toBe('DUPLICATE_ENGINE')
   })
 
-  it('does not fall back across semver versions', () => {
+  it('rejects non-exact versions on register and resolve with INVALID_ENGINE_REF', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('cognitive-domain-v1', '1.0.0', 'only-100'))
+    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('only-100'))
     expect(failCode(() => registry.resolve('cognitive-domain-v1', '1.0.1'))).toBe('UNKNOWN_ENGINE_VERSION')
-    expect(failCode(() => registry.resolve('cognitive-domain-v1', '^1.0.0'))).toBe('UNKNOWN_ENGINE_VERSION')
-    expect(failCode(() => registry.resolve('cognitive-domain-v1', 'latest'))).toBe('UNKNOWN_ENGINE_VERSION')
+    expect(failCode(() => registry.resolve('cognitive-domain-v1', '^1.0.0'))).toBe('INVALID_ENGINE_REF')
+    expect(failCode(() => registry.resolve('cognitive-domain-v1', 'latest'))).toBe('INVALID_ENGINE_REF')
+    expect(failCode(() => registry.resolve('cognitive-domain-v1', '1.x'))).toBe('INVALID_ENGINE_REF')
+    expect(failCode(() => registry.register('cognitive-domain-v1', '^1.0.0', stubEngine('bad'))))
+      .toBe('INVALID_ENGINE_REF')
+    expect(failCode(() => registry.register('cognitive-domain-v1', 'latest', stubEngine('bad'))))
+      .toBe('INVALID_ENGINE_REF')
+  })
+
+  it('keeps BundleEngineResultV1 as a discriminated union without identity fields', () => {
+    const computed: BundleEngineResultV1 = { kind: 'COMPUTED', payload: { ok: true } }
+    const unavailable: BundleEngineResultV1 = { kind: 'UNAVAILABLE', reason: 'not_computed' }
+    expect(computed.kind === 'COMPUTED' ? computed.payload : null).toEqual({ ok: true })
+    expect(unavailable.kind === 'UNAVAILABLE' ? unavailable.reason : null).toBe('not_computed')
+    expect(computed).not.toHaveProperty('engineKey')
+    expect(unavailable).not.toHaveProperty('engineVersion')
   })
 
   it('invokes exactly one engine per dispatch', () => {
@@ -113,15 +126,15 @@ describe('BundleAnalysisEngineRegistry', () => {
     const registry = createBundleAnalysisEngineRegistry()
     registry.register('cognitive-domain-v1', '1.0.0', (input) => {
       calls.push('cognitive-domain-v1@1.0.0')
-      return stubEngine('cognitive-domain-v1', '1.0.0', 'a')(input)
+      return stubEngine('a')(input)
     })
     registry.register('cognitive-domain-v1', '2.0.0', (input) => {
       calls.push('cognitive-domain-v1@2.0.0')
-      return stubEngine('cognitive-domain-v1', '2.0.0', 'b')(input)
+      return stubEngine('b')(input)
     })
     registry.register('scale-evidence-v1', '1.0.0', (input) => {
       calls.push('scale-evidence-v1@1.0.0')
-      return stubEngine('scale-evidence-v1', '1.0.0', 'c')(input)
+      return stubEngine('c')(input)
     })
     const input = buildInput({ key: 'cognitive-domain-v1', version: '1.0.0' })
     registry.dispatch(input)
@@ -130,8 +143,7 @@ describe('BundleAnalysisEngineRegistry', () => {
 
   it('does not admit legacy packageKey as an engine entry point', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('cognitive-domain-v1', '1.0.0', 'ok'))
-    // Legacy package keys must not resolve as engines.
+    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('ok'))
     expect(failCode(() => registry.resolve('attention_stability_v1', '1.0.0'))).toBe('UNKNOWN_ENGINE_KEY')
     expect(failCode(() => registry.resolve('inhibitory_control_multisource_v1', '1.0.0')))
       .toBe('UNKNOWN_ENGINE_KEY')
@@ -148,14 +160,17 @@ describe('BundleAnalysisEngineRegistry', () => {
 
   it('is deterministic for the same frozen input', () => {
     const registry = createBundleAnalysisEngineRegistry()
-    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('cognitive-domain-v1', '1.0.0', 'stable'))
+    registry.register('cognitive-domain-v1', '1.0.0', stubEngine('stable'))
     const input = buildInput({ key: 'cognitive-domain-v1', version: '1.0.0' })
     const first = registry.dispatch(input)
     const second = registry.dispatch(input)
     expect(first).toEqual(second)
-    expect(first.payload).toMatchObject({
-      tag: 'stable',
-      snapshotHash: input.snapshot.snapshotHash,
+    expect(first).toMatchObject({
+      kind: 'COMPUTED',
+      payload: {
+        tag: 'stable',
+        snapshotHash: input.snapshot.snapshotHash,
+      },
     })
   })
 })
