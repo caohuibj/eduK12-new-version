@@ -35,6 +35,7 @@ export const cognitiveSelfBundle = (
       instrumentKey: 'sst',
       instrumentVersion: '1.0.0',
       respondentType: 'SELF',
+      valueSelectors: ['ssrtMs'],
     },
   ],
   engine: { key: 'cognitive-domain-v1', version: '1.0.0' },

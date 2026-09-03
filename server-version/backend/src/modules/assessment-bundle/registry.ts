@@ -2,6 +2,10 @@ import type { CompiledInstrumentRuntimeV1 } from '../assessment-runtime/types'
 import { bundleContractFail } from './errors'
 import { EXACT_VERSION } from './schema'
 import type {
+  BundleFrozenCognitiveSourceV1,
+  BundleFrozenScaleSourceV1,
+} from './sources'
+import type {
   BundleContextFactsV1,
   EvidenceItemV1,
   FrozenAssessmentBundleSnapshotV3,
@@ -17,6 +21,10 @@ export interface BundleEngineInputV1 {
   evidence: EvidenceItemV1[]
   contextFacts: BundleContextFactsV1 | null
   aggregateInputHash: string | null
+  /** Frozen Cognitive unit projections keyed by Bundle slot (optional). */
+  cognitiveSources?: BundleFrozenCognitiveSourceV1[]
+  /** Frozen Scale unit projections keyed by Bundle slot (optional). */
+  scaleSources?: BundleFrozenScaleSourceV1[]
 }
 
 /**

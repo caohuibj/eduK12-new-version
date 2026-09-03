@@ -84,3 +84,27 @@ export type {
   BundleEngineInputV1,
   BundleEngineResultV1,
 } from './registry'
+
+export type {
+  BundleFrozenCognitiveSourceV1,
+  BundleFrozenScaleScoreV1,
+  BundleFrozenScaleSourceV1,
+  BundleFrozenSourceQualityV1,
+} from './sources'
+export {
+  COGNITIVE_DOMAIN_ENGINE_KEY,
+  COGNITIVE_DOMAIN_ENGINE_VERSION,
+  COGNITIVE_DOMAIN_PAYLOAD_SCHEMA,
+  runCognitiveDomainV1,
+} from './engines/cognitive-domain-v1'
+export type {
+  CognitiveDomainFacetObservationV1,
+  CognitiveDomainPayloadV1,
+  CognitiveDomainSlotAssessmentV1,
+  CognitiveDomainStatusV1,
+} from './engines/cognitive-domain-v1'
+export { COGNITIVE_RESPONSE_INHIBITION_V1 } from './bundles/cognitive-response-inhibition-v1'
+export {
+  createProductBundleAnalysisEngineRegistry,
+  registerProductBundleEngines,
+} from './bootstrap'
