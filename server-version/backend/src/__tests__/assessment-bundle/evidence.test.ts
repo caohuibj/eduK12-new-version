@@ -102,6 +102,8 @@ describe('EvidenceItemV1', () => {
       provenance: {
         compiledBundleRuntimeHash: HASH_B,
         aggregateInputHash: null,
+        contextDefinitionHash: null,
+        ruleSetRef: null,
       },
     })
     expect(facts.provenance.evidenceSourceHashes).toEqual(deriveEvidenceSourceHashes([item]))

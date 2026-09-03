@@ -169,6 +169,29 @@ export interface BundleContextFactsV1 {
   facts: BundleContextFactV1[]
 }
 
+export interface BundleRuleSetRefV1 {
+  key: string
+  version: string
+  hash: string
+}
+
+export type BundleReportEnginePayloadV1 =
+  | {
+      engineKey: BundleEngineKeyV1
+      engineVersion: string
+      kind: 'UNAVAILABLE'
+      reason: string
+    }
+  | {
+      engineKey: BundleEngineKeyV1
+      engineVersion: string
+      kind: 'COMPUTED'
+      /** Discriminated engine payload (cognitive/scale/MH/…). Not an audience render. */
+      payload: unknown
+    }
+
+export type BundleReportAudienceV1 = 'student' | 'parent' | 'teacher' | 'admin'
+
 export interface BundleReportFactsV1 {
   schemaVersion: 1
   factsSchemaVersion: typeof BUNDLE_REPORT_FACTS_SCHEMA_VERSION
@@ -183,12 +206,7 @@ export interface BundleReportFactsV1 {
     overall: EvidenceQualityStateV1
     notes: string[]
   }
-  enginePayload: {
-    engineKey: BundleEngineKeyV1
-    engineVersion: string
-    kind: 'UNAVAILABLE'
-    reason: 'not_computed'
-  }
+  enginePayload: BundleReportEnginePayloadV1
   limitations: string[]
   recommendations: string[]
   contextSnapshotHash: string | null
@@ -196,13 +214,10 @@ export interface BundleReportFactsV1 {
     compiledBundleRuntimeHash: string
     aggregateInputHash: string | null
     evidenceSourceHashes: string[]
+    /** From FrozenAssessmentBundleSnapshotV3 — 7.1 provenance. */
+    contextDefinitionHash: string | null
+    ruleSetRef: BundleRuleSetRefV1 | null
   }
-}
-
-export interface BundleRuleSetRefV1 {
-  key: string
-  version: string
-  hash: string
 }
 
 export interface FrozenBundleSlotBindingV3 {

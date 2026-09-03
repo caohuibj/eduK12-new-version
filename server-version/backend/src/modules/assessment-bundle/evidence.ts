@@ -93,7 +93,7 @@ const assertReportFactsProvenance = (facts: BundleReportFactsV1) => {
 }
 
 export const validateBundleReportFacts = (facts: BundleReportFactsV1 | unknown): BundleReportFactsV1 => {
-  const parsed = parseContract(bundleReportFactsSchema, facts, 'EVIDENCE_SOURCE_SHAPE')
+  const parsed = parseContract(bundleReportFactsSchema, facts, 'EVIDENCE_SOURCE_SHAPE') as BundleReportFactsV1
   const evidenceKeys = new Set<string>()
   for (const item of parsed.evidence) {
     if (evidenceKeys.has(item.evidenceKey)) {
@@ -106,6 +106,9 @@ export const validateBundleReportFacts = (facts: BundleReportFactsV1 | unknown):
     || parsed.enginePayload.engineVersion !== parsed.identity.engine.version
   ) {
     bundleContractFail('EVIDENCE_SOURCE_SHAPE', 'enginePayload 必须与 identity.engine 一致')
+  }
+  if (parsed.enginePayload.kind === 'COMPUTED' && !('payload' in parsed.enginePayload)) {
+    bundleContractFail('EVIDENCE_SOURCE_SHAPE', 'COMPUTED enginePayload 必须包含 payload')
   }
   assertReportFactsProvenance(parsed)
   return parsed

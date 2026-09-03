@@ -19,6 +19,8 @@ export type {
   BundleInitiationModeV1,
   BundlePopulationConstraintV1,
   BundlePublicationRequirementsV1,
+  BundleReportAudienceV1,
+  BundleReportEnginePayloadV1,
   BundleReportFactsV1,
   BundleRespondentTypeV1,
   BundleRightsRequirementsV1,
@@ -172,3 +174,17 @@ export type {
   BundleContextFreezeStateV1,
   BundleContextValueTypeV1,
 } from './context'
+
+export {
+  exportHistoricalBundleSnapshot,
+  projectAllBundleAudienceViews,
+  projectBundleAudienceView,
+  projectBundleReportFacts,
+  projectCognitiveEvidenceItems,
+  renderBundleReportHtml,
+  renderBundleReportMarkdown,
+} from './report-facts'
+export type {
+  BundleAudienceProjectionV1,
+  BundleHistoricalSnapshotExportV1,
+} from './report-facts'

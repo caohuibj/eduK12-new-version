@@ -209,12 +209,20 @@ export const bundleReportFactsSchema = z.object({
     overall: z.enum(['interpretable', 'limited', 'invalid', 'unavailable']),
     notes: z.array(z.string()),
   }).strict(),
-  enginePayload: z.object({
-    engineKey: z.enum(BUNDLE_ENGINE_KEYS),
-    engineVersion: exactVersion,
-    kind: z.literal('UNAVAILABLE'),
-    reason: z.literal('not_computed'),
-  }).strict(),
+  enginePayload: z.discriminatedUnion('kind', [
+    z.object({
+      engineKey: z.enum(BUNDLE_ENGINE_KEYS),
+      engineVersion: exactVersion,
+      kind: z.literal('UNAVAILABLE'),
+      reason: nonEmpty,
+    }).strict(),
+    z.object({
+      engineKey: z.enum(BUNDLE_ENGINE_KEYS),
+      engineVersion: exactVersion,
+      kind: z.literal('COMPUTED'),
+      payload: z.any(),
+    }).strict(),
+  ]),
   limitations: z.array(z.string()),
   recommendations: z.array(z.string()),
   contextSnapshotHash: hexHash.nullable(),
@@ -222,5 +230,11 @@ export const bundleReportFactsSchema = z.object({
     compiledBundleRuntimeHash: hexHash,
     aggregateInputHash: hexHash.nullable(),
     evidenceSourceHashes: z.array(hexHash),
+    contextDefinitionHash: hexHash.nullable(),
+    ruleSetRef: z.object({
+      key: nonEmpty,
+      version: exactVersion,
+      hash: hexHash,
+    }).strict().nullable(),
   }).strict(),
 }).strict()
