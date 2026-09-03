@@ -27,6 +27,7 @@ const DocumentLibrary = React.lazy(() => import('./pages/DocumentLibrary'))
 const UserList = React.lazy(() => import('./pages/UserList'))
 const TeacherCodeList = React.lazy(() => import('./pages/TeacherCodeList'))
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
+const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
 const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
@@ -564,6 +565,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute roles={['ADMIN']}>
                 <MaterialGrants />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/instrument-authorizations"
+            element={
+              <ProtectedRoute roles={['ADMIN']}>
+                <InstrumentAuthorization />
               </ProtectedRoute>
             }
           />

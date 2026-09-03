@@ -1175,6 +1175,7 @@ model StoredAsset {
   videoProcessed  Video[]          @relation("VideoProcessedAsset")
   videoThumbnails Video[]          @relation("VideoThumbnailAsset")
   references      AssetReference[]
+  instrumentAuthorizationEvidence InstrumentAuthorization[] @relation("InstrumentAuthorizationEvidence")
 
   @@index([ownerId])
   @@index([accessScope, scopeId])
@@ -1576,3 +1577,59 @@ model AssessmentUnitSnapshot {
   @@index([compositeAttemptId, attemptEpoch, terminalState], map: "assessment_unit_snapshots_composite_terminal_idx")
   @@map("assessment_unit_snapshots")
 }
+
+model InstrumentAuthorization {
+  id                       String   @id @default(uuid())
+  authorizationKey         String   @map("authorization_key")
+  version                  Int
+  instrumentKey            String   @map("instrument_key")
+  instrumentVersion        String   @map("instrument_version")
+  grantor                  String
+  grantee                  String
+  electronicAdministration Boolean  @default(true) @map("electronic_administration")
+  scoring                  Boolean  @default(true)
+  translation              Boolean  @default(false)
+  display                  Boolean  @default(true)
+  territories              String[] @default([])
+  locales                  String[] @default([])
+  commercialNature         String   @map("commercial_nature")
+  validFrom                DateTime @map("valid_from")
+  validTo                  DateTime @map("valid_to")
+  basis                    String
+  status                   String
+  evidenceAssetId          String?  @map("evidence_asset_id")
+  evidenceSha256           String?  @map("evidence_sha256")
+  selfApprovalDeclaration  String?  @map("self_approval_declaration")
+  approvedByUserId         String?  @map("approved_by_user_id")
+  approvedAt               DateTime? @map("approved_at")
+  createdByUserId          String   @map("created_by_user_id")
+  recordHash               String   @map("record_hash")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  evidenceAsset StoredAsset? @relation("InstrumentAuthorizationEvidence", fields: [evidenceAssetId], references: [id], onDelete: SetNull)
+  audits        InstrumentAuthorizationAudit[]
+
+  @@unique([authorizationKey, version])
+  @@index([instrumentKey, instrumentVersion, status])
+  @@index([status, validTo])
+  @@map("instrument_authorizations")
+}
+
+model InstrumentAuthorizationAudit {
+  id                    String   @id @default(uuid())
+  authorizationId       String   @map("authorization_id")
+  authorizationVersion  Int      @map("authorization_version")
+  action                String
+  actorUserId           String   @map("actor_user_id")
+  at                    DateTime
+  note                  String
+  recordHash            String   @map("record_hash")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  authorization InstrumentAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+
+  @@index([authorizationId, at])
+  @@map("instrument_authorization_audits")
+}
+
