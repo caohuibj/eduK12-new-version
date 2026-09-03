@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, forbidden, notFound, completionBusy, instrumentError, unauthorized } from '../utils/response'
+import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
@@ -39,6 +39,7 @@ import {
   isQuestionnaireCompletionAdmissionBusyError,
   isTransientCompletionDatabaseError,
 } from '../services/questionnaireCompletionAdmission'
+import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
@@ -1012,6 +1013,7 @@ export const questionnaireController = {
       )
       return success(res, data, data.replayed ? '表单区段提交已确认' : '表单区段提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -1033,6 +1035,7 @@ export const questionnaireController = {
       )
       return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -2558,6 +2561,7 @@ export const questionnaireController = {
         })
         if (winner) return questionnaireController.startAssessment(req, res)
       }
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('开始问卷测评错误', err)
@@ -2762,6 +2766,7 @@ export const questionnaireController = {
         }),
       })
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('获取问卷测评状态错误', err)
@@ -2864,6 +2869,7 @@ export const questionnaireController = {
         ...result.collectionReport,
       }, '问卷测评已完成')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)

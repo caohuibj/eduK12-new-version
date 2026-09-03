@@ -57,3 +57,33 @@ describe('assessment-bundle architecture', () => {
     expect(files.some((path) => path.endsWith(`${join('assessment-bundle', 'registry.ts')}`))).toBe(true)
   })
 })
+
+describe('CanonicalUnitResult Bundle bridge', () => {
+  it('exposes Canonical→Bundle projectors without Assessment.result reread', () => {
+    const sources = readFileSync(resolve(__dirname, '../../modules/assessment-bundle/sources.ts'), 'utf8')
+    expect(sources).toMatch(/projectBundleScaleSourceFromCanonicalBridge/)
+    expect(sources).toMatch(/projectBundleCognitiveSourceFromCanonicalBridge/)
+    expect(sources).toMatch(/buildScaleBundleBridge/)
+    expect(sources).toMatch(/buildCognitiveBundleBridge/)
+    expect(sources).not.toMatch(/assessment\.result/)
+    expect(sources).not.toMatch(/\bprisma\b/)
+  })
+
+  it('keeps additive bundleBridgeHash provenance out of core resultHash', () => {
+    const unitResult = readFileSync(resolve(__dirname, '../../modules/assessment-runtime/unit-result.ts'), 'utf8')
+    expect(unitResult).toMatch(/bundleBridgeHash/)
+    expect(unitResult).toMatch(/canonicalHash\(bundleBridge\)/)
+    expect(unitResult).toMatch(/resultHash = canonicalHash\(input\.core\)/)
+    expect(unitResult).toMatch(/bundleBridgeHash mismatch/)
+  })
+
+  it('keeps Bundle engines free of Prisma and Assessment.result', () => {
+    const enginesDir = resolve(__dirname, '../../modules/assessment-bundle/engines')
+    for (const name of readdirSync(enginesDir)) {
+      if (!name.endsWith('.ts')) continue
+      const body = readFileSync(resolve(enginesDir, name), 'utf8')
+      expect(body).not.toMatch(/\bprisma\b/)
+      expect(body).not.toMatch(/assessment\.result/)
+    }
+  })
+})

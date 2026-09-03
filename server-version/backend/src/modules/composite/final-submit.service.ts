@@ -19,6 +19,7 @@ import {
   prepareCanonicalSubmission,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
   refreshCompositeFinalOnlyProgress,
@@ -358,7 +359,7 @@ export const persistCompositeFormSection = async (
   `)
 }
 
-export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput) => {
+const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
@@ -537,11 +538,25 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
   })
 
   const { terminalCandidate: shouldFinalize, ...response } = committed
-  const parent = shouldFinalize
+  return {
+    submissionId,
+    sectionId: input.sectionId,
+    ...response,
+    shouldFinalize,
+    finalizeCompositeAttemptId: shouldFinalize ? attempt.id : null,
+  }
+}
+
+/** UNIT gate covers form persist only; composite aggregate finalizes after release. */
+export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput): Promise<any> => {
+  const result = await withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
+  if (!result || typeof result !== 'object' || !('shouldFinalize' in result)) return result
+  const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
+  const parent = shouldFinalize && finalizeCompositeAttemptId
     ? await measureRequestPhase('final_submit_parent_finalization', async () => {
       const { finalizeCompositeAttemptIfReady } = await import('./composite.service')
-      return finalizeCompositeAttemptIfReady(attempt.id)
+      return finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId)
     })
-    : { status: 'IN_PROGRESS', progress: response.progress, completedAt: null }
-  return { submissionId, sectionId: input.sectionId, ...response, parent }
+    : { status: 'IN_PROGRESS', progress: response.progress ?? 0, completedAt: null }
+  return { ...response, parent }
 }

@@ -4,6 +4,7 @@ import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeCurrentItem } from '../modules/composite/types'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
+import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
 
 type ResponseValue = string | number
@@ -41,6 +42,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   const error = new Error(response.message || '提交失败') as Error & { status?: number; code?: number | string }
   error.code = response.code
   if (typeof response.code === 'number') error.status = response.code
+  if (response.code === 'ASSESSMENT_SUBMIT_BUSY' || response.code === 'COMPLETION_BUSY') error.status = 503
   return error
 }
 
@@ -191,14 +193,26 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
-      const response = await submitFormSection(state.id, sectionId, {
-        submissionId: meta.submissionId,
-        attemptEpoch: meta.attemptEpoch,
-        definitionHash: meta.definitionHash,
-        contextSnapshotHash: meta.contextSnapshotHash,
-        answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: formValues[answer.formItemId] ?? null })),
+      const response = await runFinalDraftCapacityRetry({
+        onRetry: async ({ error }) => {
+          await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+            code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+            message: normalizeApiError(error).message,
+          }).catch(() => null)
+          setError('提交繁忙，正在自动重试…')
+        },
+        operation: async () => {
+          const next = await submitFormSection(state.id, sectionId, {
+            submissionId: meta.submissionId,
+            attemptEpoch: meta.attemptEpoch,
+            definitionHash: meta.definitionHash,
+            contextSnapshotHash: meta.contextSnapshotHash,
+            answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: formValues[answer.formItemId] ?? null })),
+          })
+          if (next.code !== 0) throw responseError(next)
+          return next
+        },
       })
-      if (response.code !== 0) throw responseError(response)
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
       await onReload()
@@ -226,14 +240,26 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
-      const response = await submitScale(state.id, item.id, {
-        submissionId: meta.submissionId,
-        attemptEpoch: meta.attemptEpoch,
-        definitionHash: meta.definitionHash,
-        contextSnapshotHash: meta.contextSnapshotHash,
-        answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
+      const response = await runFinalDraftCapacityRetry({
+        onRetry: async ({ error }) => {
+          await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+            code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+            message: normalizeApiError(error).message,
+          }).catch(() => null)
+          setError('提交繁忙，正在自动重试…')
+        },
+        operation: async () => {
+          const next = await submitScale(state.id, item.id, {
+            submissionId: meta.submissionId,
+            attemptEpoch: meta.attemptEpoch,
+            definitionHash: meta.definitionHash,
+            contextSnapshotHash: meta.contextSnapshotHash,
+            answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
+          })
+          if (next.code !== 0) throw responseError(next)
+          return next
+        },
       })
-      if (response.code !== 0) throw responseError(response)
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
       await onReload()

@@ -276,9 +276,10 @@ const scoreItems = (definition: ScaleDefinitionV2, answers: Map<string, ScaleAns
       responseValue: answer.responseValue,
       baseScore: option.score,
       score: transformScore(rule?.transform ?? { type: 'identity' }, option.score, responseScores),
-      responseTimeMs: answer.responseTimeMs,
-      answeredAt: answer.answeredAt,
-      changeCount: answer.changeCount,
+      // Omit undefined optionals — canonicalHash rejects undefined keys (Bundle bridge).
+      ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
+      ...(answer.answeredAt === undefined ? {} : { answeredAt: answer.answeredAt }),
+      ...(answer.changeCount === undefined ? {} : { changeCount: answer.changeCount }),
     }]
   })
 }
@@ -296,7 +297,7 @@ const makeScore = (
   key: score.key,
   type: score.type,
   label: score.label,
-  description: score.description,
+  ...(score.description === undefined ? {} : { description: score.description }),
   direction: score.direction,
   canonical: score.canonical,
   displayPrecision: score.displayPrecision,

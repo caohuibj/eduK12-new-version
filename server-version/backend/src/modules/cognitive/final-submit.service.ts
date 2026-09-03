@@ -32,6 +32,7 @@ import {
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedCognitiveSessionFinal } from './unified-final-submit.service'
 import { UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from './cognitive-admission.service'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -272,7 +273,7 @@ const prepareFinalCognitiveData = async (
   return { payloadHash, trials, ...encrypted, resultSnapshot }
 }
 
-const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
+const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const child = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
@@ -335,16 +336,13 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
       const snapshot = parseCognitiveResultSnapshot(
         decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
       )
-      const compositeAttemptId = session.compositeAttemptId
-      if (compositeAttemptId) {
-        const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-        await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(compositeAttemptId))
-      }
       return {
         submissionId,
         replayed: true,
         payloadHash: payload.payloadHash,
         response: responseFromSnapshot(session.id, snapshot),
+        shouldFinalize: Boolean(session.compositeAttemptId),
+        finalizeCompositeAttemptId: session.compositeAttemptId,
       }
     }
   }
@@ -462,13 +460,27 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput) => {
     }
   })
 
-  const compositeAttemptId = session.compositeAttemptId
-  if (committed.shouldFinalize && compositeAttemptId) {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(compositeAttemptId))
+  const { parent: _parent, shouldFinalize, ...response } = committed
+  return {
+    submissionId,
+    ...response,
+    shouldFinalize: Boolean(shouldFinalize),
+    finalizeCompositeAttemptId: shouldFinalize ? session.compositeAttemptId : null,
   }
-  const { parent: _parent, shouldFinalize: _shouldFinalize, ...response } = committed
-  return { submissionId, ...response }
+}
+
+/** UNIT gate covers persist/score only; composite aggregate finalizes after release. */
+const submitWithPrincipal = async (input: FinalCognitiveSubmitInput): Promise<any> => {
+  const result = await withUnitSubmitAdmission(() => submitWithPrincipalImpl(input))
+  if (result && typeof result === 'object' && 'finalizeCompositeAttemptId' in result) {
+    const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
+    if (shouldFinalize && finalizeCompositeAttemptId) {
+      const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+      await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId))
+    }
+    return response
+  }
+  return result
 }
 
 export const submitCognitiveSessionFinal = (userId: string, input: Omit<FinalCognitiveSubmitInput, 'userId'>) =>

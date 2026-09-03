@@ -101,6 +101,10 @@ export {
   assertUniqueValueSelectors,
   projectBundleCognitiveSource,
   projectBundleScaleSource,
+  projectBundleScaleSourceFromCanonicalBridge,
+  projectBundleCognitiveSourceFromCanonicalBridge,
+  buildScaleBundleBridge,
+  buildCognitiveBundleBridge,
   validateBundleEngineSourceSet,
 } from './sources'
 export {

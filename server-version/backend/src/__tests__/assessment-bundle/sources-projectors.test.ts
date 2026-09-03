@@ -4,14 +4,16 @@ import {
   assertUniqueCognitiveSources,
   assertUniqueScaleSources,
   assertUniqueValueSelectors,
+  buildScaleBundleBridge,
   projectBundleCognitiveSource,
   projectBundleScaleSource,
+  projectBundleScaleSourceFromCanonicalBridge,
   projectScaleEvidenceItems,
   type BundleFrozenCognitiveSourceV1,
   type BundleFrozenScaleSourceV1,
 } from '../../modules/assessment-bundle'
 import { HASH_A, HASH_B } from './fixtures'
-import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
+import { createCanonicalUnitResultEnvelope, parseCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
 const failCode = (run: () => unknown): string => {
@@ -522,5 +524,109 @@ describe('authoritative Bundle source projectors', () => {
       'who5.who5.raw_total.primary',
       'who5.who5.percentage.primary',
     ])
+  })
+
+
+  it('round-trips Scale Bundle sources via Canonical envelope.bundleBridge only', () => {
+    const result = scaleResult()
+    const bridge = buildScaleBundleBridge(result as any)
+    const envelope = createCanonicalUnitResultEnvelope({
+      core: {
+        schemaVersion: 1,
+        unitType: 'SCALE',
+        instrumentKey: 'who5',
+        instrumentVersion: '1.0.0',
+        sourceDefinitionHash: HASH_A,
+        compilerVersion: '1.0.0',
+        compiledRuntimeHash: HASH_A,
+        scorerKey: 'scale.default',
+        scorerVersion: '1.0.0',
+        quality: { status: 'interpretable', flags: [] },
+        metrics: [
+          { key: 'raw_total', value: 18, unit: 'score', quality: 'calculated' },
+          { key: 'percentage', value: 72, unit: 'score', quality: 'calculated' },
+        ],
+        facts: [],
+        references: [],
+        contextHash: null,
+        scientificProvenance: { instrumentKey: 'who5', instrumentVersion: '1.0.0' },
+      },
+      completedAt: '2026-09-03T04:00:00.000Z',
+      persistenceProvenance: {
+        sourceType: 'ASSESSMENT',
+        sourceAttemptId: 'attempt-bridge',
+      },
+      bundleBridge: bridge,
+    })
+    const fromLive = projectBundleScaleSource({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      result,
+    })
+    const fromBridge = projectBundleScaleSourceFromCanonicalBridge({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      envelope,
+    })
+    expect(fromBridge.sourceResultHash).toBe(fromLive.sourceResultHash)
+    expect(fromBridge.scores).toEqual(fromLive.scores)
+    expect(fromBridge.envelopeResultHash).toBe(envelope.resultHash)
+    expect(envelope.bundleBridgeHash).toBe(canonicalHash(bridge))
+    expect(envelope.resultHash).toBe(canonicalHash(envelope.core))
+    expect(parseCanonicalUnitResultEnvelope(envelope)).toEqual(envelope)
+    expect(failCode(() => projectBundleScaleSourceFromCanonicalBridge({
+      slotKey: 'who5',
+      expectedInstrumentKey: 'who5',
+      expectedInstrumentVersion: '1.0.0',
+      envelope: { ...envelope, bundleBridge: undefined },
+    }))).toBe('SOURCE_IDENTITY_MISMATCH')
+  })
+
+  it('rejects Canonical envelope when only criterionBandKey is tampered', () => {
+    const result = scaleResult()
+    const bridge = buildScaleBundleBridge(result as any)
+    const envelope = createCanonicalUnitResultEnvelope({
+      core: {
+        schemaVersion: 1,
+        unitType: 'SCALE',
+        instrumentKey: 'who5',
+        instrumentVersion: '1.0.0',
+        sourceDefinitionHash: HASH_A,
+        compilerVersion: '1.0.0',
+        compiledRuntimeHash: HASH_A,
+        scorerKey: 'scale.default',
+        scorerVersion: '1.0.0',
+        quality: { status: 'interpretable', flags: [] },
+        metrics: [
+          { key: 'raw_total', value: 18, unit: 'score', quality: 'calculated' },
+          { key: 'percentage', value: 72, unit: 'score', quality: 'calculated' },
+        ],
+        facts: [],
+        references: [],
+        contextHash: null,
+        scientificProvenance: { instrumentKey: 'who5', instrumentVersion: '1.0.0' },
+      },
+      completedAt: '2026-09-03T04:00:00.000Z',
+      persistenceProvenance: {
+        sourceType: 'ASSESSMENT',
+        sourceAttemptId: 'attempt-bridge-tamper',
+      },
+      bundleBridge: bridge,
+    })
+    const tampered = {
+      ...envelope,
+      bundleBridge: {
+        ...envelope.bundleBridge!,
+        scores: envelope.bundleBridge!.scores!.map((score, index) => (
+          index === 0
+            ? { ...score, criterionBandKey: score.criterionBandKey === null ? 'forged.band' : `forged.${score.criterionBandKey}` }
+            : score
+        )),
+      },
+    }
+    expect(canonicalHash(tampered.core)).toBe(tampered.resultHash)
+    expect(() => parseCanonicalUnitResultEnvelope(tampered)).toThrow(/bundleBridgeHash/)
   })
 })

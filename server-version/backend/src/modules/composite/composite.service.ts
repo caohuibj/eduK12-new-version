@@ -2666,8 +2666,6 @@ const getUnifiedCompositeAttemptState = async (
                   instruction: true,
                   instrumentClass: true,
                   instrumentVersion: true,
-                  definition: true,
-                  definitionHash: true,
                 },
               },
               cognitiveAssignment: { select: { id: true, title: true } },
@@ -2707,8 +2705,6 @@ const getUnifiedCompositeAttemptState = async (
           scaleId: true,
           status: true,
           progress: true,
-          runtimeSnapshotEncrypted: true,
-          compiledRuntimeHash: true,
         },
       },
       cognitiveSessions: {
@@ -2846,14 +2842,20 @@ const getUnifiedCompositeAttemptState = async (
     const item = currentUnit.item
     const child = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === item.id)
     const slot = slotsByKey.get(compositeItemSlotKey(item.id, 'SCALE'))
-    if (!child?.id || !child.runtimeSnapshotEncrypted || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    if (!child?.id || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    // Lazy current-unit: only the unfinished Scale loads its frozen runtime.
+    const runtimeChild = await prisma.assessment.findUnique({
+      where: { id: child.id },
+      select: { id: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+    })
+    if (!runtimeChild?.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      const runtime = decryptFrozenScaleRuntimeSnapshot(runtimeChild.runtimeSnapshotEncrypted)
       if (
         runtime.instrumentKey !== item.scale?.code
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
-        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
+        || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
       await ensureScaleAdmissionAtDelivery(child.id)
       currentItem = {
@@ -3328,6 +3330,31 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
   return finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
 }
 
+
+const patchCompositeStateAfterFinalize = (
+  state: Awaited<ReturnType<typeof getUnifiedCompositeAttemptState>>,
+  finalized: { status: string; progress: number; completedAt: Date | string | null },
+) => {
+  // Only promote runner 终态 fields when finalize actually completed.
+  if (finalized.status !== 'COMPLETED') {
+    return {
+      ...state,
+      status: finalized.status,
+      progress: finalized.progress,
+      completedAt: finalized.completedAt,
+    }
+  }
+  return {
+    ...state,
+    status: finalized.status,
+    progress: 100,
+    completedAt: finalized.completedAt,
+    currentIndex: state.totalItems,
+    currentItem: null,
+    completedItems: state.totalItems,
+  }
+}
+
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const runtime = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
@@ -3335,10 +3362,12 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   })
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
-    let state = await getUnifiedCompositeAttemptState(attemptId, context)
+    const state = await getUnifiedCompositeAttemptState(attemptId, context)
     if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
-      await finalizeCompositeAttemptIfReady(attemptId)
-      state = await getUnifiedCompositeAttemptState(attemptId, context)
+      // Reconcile-once: patch parent completion fields onto the first projection.
+      const finalized = await finalizeCompositeAttemptIfReady(attemptId)
+      if (!finalized) return state
+      return patchCompositeStateAfterFinalize(state, finalized)
     }
     return state
   }

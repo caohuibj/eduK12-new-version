@@ -9,6 +9,7 @@ import type { CheckpointBatch } from '../../services/persistence/checkpointTypes
 import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycle'
 import { checkpointId } from '../../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
+import { runFinalDraftCapacityRetry } from '../../services/persistence/finalDraftCapacityRetry'
 
 type ResponseValue = string | number
 
@@ -284,21 +285,34 @@ const ScaleAssessment: React.FC = () => {
             }
           })
         await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
-        const response = await apiClient.post(`/scales/assessments/${assessment.id}/submit`, {
-          submissionId: meta.submissionId,
-          attemptEpoch: meta.attemptEpoch,
-          definitionHash: meta.definitionHash,
-          ...(meta.contextSnapshotHash ? { contextSnapshotHash: meta.contextSnapshotHash } : {}),
-          answers: finalAnswers,
+        const response = await runFinalDraftCapacityRetry({
+          onRetry: async ({ error }) => {
+            await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+              code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+              message: normalizeApiError(error).message,
+            }).catch(() => null)
+            setCompletionNotice('提交繁忙，正在自动重试…')
+          },
+          operation: async () => {
+            const next = await apiClient.post(`/scales/assessments/${assessment.id}/submit`, {
+              submissionId: meta.submissionId,
+              attemptEpoch: meta.attemptEpoch,
+              definitionHash: meta.definitionHash,
+              ...(meta.contextSnapshotHash ? { contextSnapshotHash: meta.contextSnapshotHash } : {}),
+              answers: finalAnswers,
+            })
+            if (next.code !== 0) {
+              const conflict = String(next.code) === '409' || String(next.code) === 'STALE_ATTEMPT' || String(next.code) === 'SUBMISSION_PAYLOAD_CONFLICT'
+              await finalDraftStore.setStatus(draftKey, conflict ? 'CONFLICT' : 'RETRY_PENDING', { code: String(next.code), message: next.message })
+              const submitError = new Error(next.message || '量表提交失败') as Error & { status?: number; code?: number | string }
+              submitError.code = next.code
+              if (typeof next.code === 'number') submitError.status = next.code
+              if (next.code === 'ASSESSMENT_SUBMIT_BUSY' || next.code === 'COMPLETION_BUSY') submitError.status = 503
+              throw submitError
+            }
+            return next
+          },
         })
-        if (response.code !== 0) {
-          const conflict = String(response.code) === '409' || String(response.code) === 'STALE_ATTEMPT' || String(response.code) === 'SUBMISSION_PAYLOAD_CONFLICT'
-          await finalDraftStore.setStatus(draftKey, conflict ? 'CONFLICT' : 'RETRY_PENDING', { code: String(response.code), message: response.message })
-          const submitError = new Error(response.message || '量表提交失败') as Error & { status?: number; code?: number | string }
-          submitError.code = response.code
-          if (typeof response.code === 'number') submitError.status = response.code
-          throw submitError
-        }
         await finalDraftStore.setStatus(draftKey, 'COMPLETED')
         await finalDraftStore.delete(draftKey)
         navigate(`/student/scales/result/${assessment.id}`)

@@ -4,6 +4,10 @@ import {
   QuestionnaireCompletionAdmissionBusyError,
   toCompletionAdmissionBusyError,
 } from '../../services/questionnaireCompletionAdmission'
+import {
+  resetRuntimeObservabilityForTests,
+  runtimeMetricLines,
+} from '../../services/runtimeObservability'
 
 const nextTick = () => new Promise<void>((resolve) => setImmediate(resolve))
 
@@ -122,5 +126,14 @@ describe('questionnaire completion admission', () => {
       reason: 'database_busy',
       retryAfterSeconds: 1,
     })
+  })
+
+  it('records a labelled gate counter for database_busy', () => {
+    resetRuntimeObservabilityForTests()
+    toCompletionAdmissionBusyError({ code: 'P2024' }, 1, 'aggregate_finalization')
+    const metrics = runtimeMetricLines().join('\n')
+    expect(metrics).toContain(
+      'ptool_bounded_admission_rejections_total{gate="aggregate_finalization",reason="database_busy"} 1',
+    )
   })
 })

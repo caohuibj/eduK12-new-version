@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
-import { success, error, notFound, unauthorized, completionBusy, instrumentError } from '../../utils/response'
+import { success, error, notFound, unauthorized, completionBusy, assessmentSubmitBusy, instrumentError } from '../../utils/response'
 import * as service from './composite.service'
 import {
   addCompositeItemSchema,
@@ -37,6 +37,7 @@ import {
   isQuestionnaireCompletionAdmissionBusyError,
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
+import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
 import {
   assignCompositeFormItemToSection,
   createCompositeFormSection,
@@ -391,6 +392,7 @@ export const compositeController = {
       })
       return success(res, data, data.replayed ? '表单区段提交已确认' : '表单区段提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -411,6 +413,7 @@ export const compositeController = {
       )
       return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -607,6 +610,7 @@ export const compositeController = {
       })
       return success(res, data, data.replayed ? '匿名表单区段提交已确认' : '匿名表单区段提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -626,6 +630,7 @@ export const compositeController = {
       )
       return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)

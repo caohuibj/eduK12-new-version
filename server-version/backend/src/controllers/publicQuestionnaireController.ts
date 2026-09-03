@@ -11,7 +11,7 @@
 
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
-import { success, error, notFound, unauthorized, completionBusy, instrumentError } from '../utils/response'
+import { success, error, notFound, unauthorized, completionBusy, assessmentSubmitBusy, instrumentError } from '../utils/response'
 import { tokenService } from '../services/tokenService'
 import { powService } from '../services/powService'
 import { logger } from '../utils/logger'
@@ -54,6 +54,7 @@ import {
   isQuestionnaireCompletionAdmissionBusyError,
   isTransientCompletionDatabaseError,
 } from '../services/questionnaireCompletionAdmission'
+import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
@@ -761,6 +762,7 @@ export const publicQuestionnaireController = {
         }
       }
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('开始匿名测评错误', err)
@@ -993,6 +995,7 @@ export const publicQuestionnaireController = {
 
       return success(res, responseData)
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       logger.error('获取匿名测评状态错误', err)
@@ -1032,6 +1035,7 @@ export const publicQuestionnaireController = {
       )
       return success(res, data, data.replayed ? '匿名表单区段提交已确认' : '匿名表单区段提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -1093,6 +1097,7 @@ export const publicQuestionnaireController = {
       )
       return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -1552,6 +1557,7 @@ export const publicQuestionnaireController = {
         ...result.collectionReport,
       }, result.kind === 'completed' ? '问卷测评已完成' : '问卷测评已完成')
     } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
       if (isAssessmentContextServiceError(err)) return error(res, err.message, -1, err.statusCode)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
