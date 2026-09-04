@@ -2184,34 +2184,23 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
 
 const findPublicToken = async (tokenValue: string) => {
   const tokenHash = hashPublicAccessToken(tokenValue)
+  // Token/content layering (Work C): the token lookup reads only the token
+  // metadata plus the minimal composite fields required for validation. The
+  // full composite content graph is loaded separately (loadComposite) by the
+  // callers that actually render it, so a public read never loads the content
+  // twice.
   let token = await prisma.compositeAssessmentAccessToken.findUnique({
     where: { tokenHash },
     include: {
       compositeAssessment: {
-        include: {
+        select: {
+          id: true,
+          publicEnabled: true,
+          status: true,
+          opensAt: true,
+          expiresAt: true,
           course: { select: { isLibrary: true } },
-          items: {
-            orderBy: { position: 'asc' },
-            include: {
-              scale: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  description: true,
-                  status: true,
-                  instrumentClass: true,
-                  instrumentVersion: true,
-                  definition: true,
-                },
-              },
-              cognitiveAssignment: { include: { config: true } },
-            },
-          },
-          formSections: {
-            orderBy: { position: 'asc' },
-            include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
-          },
+          items: { select: { type: true } },
         },
       },
     },
@@ -2223,30 +2212,14 @@ const findPublicToken = async (tokenValue: string) => {
       where: { token: tokenValue },
       include: {
         compositeAssessment: {
-          include: {
+          select: {
+            id: true,
+            publicEnabled: true,
+            status: true,
+            opensAt: true,
+            expiresAt: true,
             course: { select: { isLibrary: true } },
-            items: {
-              orderBy: { position: 'asc' },
-              include: {
-                scale: {
-                  select: {
-                    id: true,
-                    code: true,
-                    name: true,
-                    description: true,
-                    status: true,
-                    instrumentClass: true,
-                    instrumentVersion: true,
-                    definition: true,
-                  },
-                },
-                cognitiveAssignment: { include: { config: true } },
-              },
-            },
-            formSections: {
-              orderBy: { position: 'asc' },
-              include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
-            },
+            items: { select: { type: true } },
           },
         },
       },
