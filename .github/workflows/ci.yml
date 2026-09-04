@@ -131,6 +131,7 @@ jobs:
           src/__tests__/classroom/classroom-start.postgres.integration.test.ts
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
+          src/__tests__/hotpath/query-budget.postgres.integration.test.ts
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)

@@ -2,9 +2,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { resetRuntimeObservabilityForTests } from '../../services/runtimeObservability'
-import { freezeCompositeActiveSlotSet, formSectionIdentityHash } from '../../modules/assessment-runtime/attempt-runtime'
+import { freezeCompositeActiveSlotSet, freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../../modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 import { mapCompositeSection } from '../../modules/composite/final-submit.service'
+import { mapQuestionnaireSection } from '../../modules/assessment-runtime/form-section-definition'
+import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
+import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { tokenService } from '../../services/tokenService'
 
 /**
@@ -54,11 +57,13 @@ type ObservedPrismaCall = {
 
 let prisma: PrismaClient
 let questionnaireController: typeof import('../../controllers/questionnaireController')['questionnaireController']
+let generalQuestionnaireController: typeof import('../../controllers/generalQuestionnaireController')['generalQuestionnaireController']
 let publicQuestionnaireController: typeof import('../../controllers/publicQuestionnaireController')['publicQuestionnaireController']
 let compositeService: typeof import('../../modules/composite/composite.service')
 let formSectionService: typeof import('../../services/questionnaire-form-section.service')
 let ensureScaleAdmissionAtDelivery: typeof import('../../modules/scale/scale-admission.service')['ensureScaleAdmissionAtDelivery']
 let ensureCognitiveAdmissionAtDelivery: typeof import('../../modules/cognitive/cognitive-admission.service')['ensureCognitiveAdmissionAtDelivery']
+let ensureQuestionnaireFormAdmissionAtDelivery: typeof import('../../modules/assessment-runtime/form-admission.service')['ensureQuestionnaireFormAdmissionAtDelivery']
 let UNIFIED_SCALE_CHILD_ADMISSION_SELECT: typeof import('../../modules/scale/scale-admission.service')['UNIFIED_SCALE_CHILD_ADMISSION_SELECT']
 let UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT: typeof import('../../modules/cognitive/cognitive-admission.service')['UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT']
 let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createUnifiedCognitiveSessionConfigSnapshot']
@@ -112,11 +117,13 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     const database = await import('../../config/database')
     prisma = database.prisma
     questionnaireController = (await import('../../controllers/questionnaireController')).questionnaireController
+    generalQuestionnaireController = (await import('../../controllers/generalQuestionnaireController')).generalQuestionnaireController
     publicQuestionnaireController = (await import('../../controllers/publicQuestionnaireController')).publicQuestionnaireController
     compositeService = await import('../../modules/composite/composite.service')
     formSectionService = await import('../../services/questionnaire-form-section.service')
     ensureScaleAdmissionAtDelivery = (await import('../../modules/scale/scale-admission.service')).ensureScaleAdmissionAtDelivery
     ensureCognitiveAdmissionAtDelivery = (await import('../../modules/cognitive/cognitive-admission.service')).ensureCognitiveAdmissionAtDelivery
+    ensureQuestionnaireFormAdmissionAtDelivery = (await import('../../modules/assessment-runtime/form-admission.service')).ensureQuestionnaireFormAdmissionAtDelivery
     UNIFIED_SCALE_CHILD_ADMISSION_SELECT = (await import('../../modules/scale/scale-admission.service')).UNIFIED_SCALE_CHILD_ADMISSION_SELECT
     UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT = (await import('../../modules/cognitive/cognitive-admission.service')).UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT
     createUnifiedCognitiveSessionConfigSnapshot = (await import('../../modules/cognitive/session.service')).createUnifiedCognitiveSessionConfigSnapshot
@@ -693,5 +700,282 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     await prisma.compositeAssessmentAttempt.delete({ where: { id: attempt.id } })
     await prisma.compositeAssessment.delete({ where: { id: composite.id } })
     await prisma.cognitiveTestConfig.delete({ where: { id: config.id } })
+  })
+
+  it('sections a new GENERAL questionnaire form item at write time (no orphan)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const general = await prisma.questionnaire.create({
+      data: {
+        code: `WORKC-QB-GENERAL-${suffix}`,
+        name: 'Work C general budget fixture',
+        creatorId: teacherId,
+        type: 'GENERAL',
+        status: 'DRAFT',
+        visibility: 'COURSE',
+      },
+    })
+    extraQuestionnaireIds.push(general.id)
+
+    const response = await invoke(
+      generalQuestionnaireController.addFormItem,
+      { id: general.id },
+      { type: 'text_input', label: 'Work C general item', required: true, position: 0 },
+    )
+    expect(response.statusCode).toBe(200)
+
+    const items = await prisma.questionnaireFormItem.findMany({
+      where: { questionnaireId: general.id },
+      select: { id: true, sectionId: true },
+    })
+    expect(items.length).toBeGreaterThan(0)
+    expect(items.every((item) => Boolean(item.sectionId))).toBe(true)
+
+    const sections = await prisma.questionnaireFormSection.findMany({ where: { questionnaireId: general.id } })
+    expect(sections.length).toBeGreaterThan(0)
+
+    await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: general.id } })
+    await prisma.questionnaireFormSection.deleteMany({ where: { questionnaireId: general.id } })
+    await prisma.questionnaire.delete({ where: { id: general.id } })
+  })
+
+  it('frozen Form admission returns the stored snapshot without re-reading the parent', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const questionnaire = await prisma.questionnaire.create({
+      data: {
+        code: `WORKC-QB-FROZEN-${suffix}`,
+        name: 'Work C frozen admission fixture',
+        creatorId: teacherId,
+        type: 'COURSE',
+        status: 'PUBLISHED',
+        visibility: 'COURSE',
+      },
+    })
+    extraQuestionnaireIds.push(questionnaire.id)
+    const section = await prisma.questionnaireFormSection.create({
+      data: {
+        questionnaireId: questionnaire.id,
+        title: 'Work C frozen section',
+        position: 0,
+        contextSection: false,
+      },
+    })
+    await prisma.questionnaireFormItem.create({
+      data: {
+        questionnaireId: questionnaire.id,
+        type: 'text_input',
+        label: 'Work C frozen answer',
+        required: true,
+        position: 0,
+        sectionId: section.id,
+        sectionPosition: 0,
+      },
+    })
+    const storedSection = await prisma.questionnaireFormSection.findUnique({
+      where: { id: section.id },
+      include: { items: true },
+    })
+    if (!storedSection) throw new Error('Work C frozen section fixture is missing')
+    // Production hot paths receive the mapped definition (no Prisma metadata),
+    // so the frozen slot identity and the admission definition both use it.
+    const mappedSection = mapQuestionnaireSection(storedSection as any)
+    const definitionHash = formSectionIdentityHash(mappedSection)
+    const frozen = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [],
+      formSections: [{ sectionId: section.id, definitionHash }],
+    })
+    const assessment = await prisma.questionnaireAssessment.create({
+      data: {
+        questionnaireId: questionnaire.id,
+        userId: teacherId,
+        sessionId: `workc-qb-frozen-session-${suffix}`,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        progress: 0,
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozen),
+        frozenActiveSlotSetHash: frozen.snapshotHash,
+      },
+    })
+
+    // First delivery activates a fresh admission: the heavy parent read runs
+    // exactly once and the section attempt is created.
+    const { value: first, calls: firstCalls } = await runObserved(() => ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mappedSection))
+    expect(first).toBeTruthy()
+    expect(callCount(firstCalls, 'QuestionnaireAssessment', 'findUnique')).toBe(1)
+
+    // Steady-state fast path: the frozen snapshot is returned directly, so the
+    // heavy parent read is skipped entirely on every subsequent delivery.
+    const { value: second, calls: secondCalls } = await runObserved(() => ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mappedSection))
+    expect(second).toBeTruthy()
+    expect(callCount(secondCalls, 'QuestionnaireAssessment', 'findUnique')).toBe(0)
+
+    await prisma.questionnaireFormSectionAttempt.deleteMany({ where: { questionnaireAssessmentId: assessment.id } })
+    await prisma.questionnaireAssessment.delete({ where: { id: assessment.id } })
+    await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: questionnaire.id } })
+    await prisma.questionnaireFormSection.deleteMany({ where: { questionnaireId: questionnaire.id } })
+    await prisma.questionnaire.delete({ where: { id: questionnaire.id } })
+  })
+
+  it('current-unit scale delivery reuses the loaded child (no re-read on unified attempt-state)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const scaleCode = `workc-qb-current-scale-${suffix}`
+    const definition = {
+      schemaVersion: 2,
+      respondentType: 'participant_self_report',
+      source: { title: 'Work C current-unit scale', citation: 'query-budget.postgres.integration.test' },
+      license: { status: 'self_authored', redistribution: 'allowed' },
+      display: { randomizeItems: false },
+      responseSets: [{
+        key: 'default',
+        options: [
+          { value: 'no', label: '否', score: 0 },
+          { value: 'yes', label: '是', score: 1 },
+        ],
+      }],
+      items: [{
+        itemCode: 'workc-qb-current-item-1',
+        content: 'Work C current-unit item',
+        type: 'single',
+        required: true,
+        sortOrder: 0,
+        responseSetKey: 'default',
+        randomizeOptions: false,
+      }],
+      scoring: {
+        scoringVersion: '2.0.0',
+        itemRules: [{ itemCode: 'workc-qb-current-item-1', transform: { type: 'identity' } }],
+        defaultMissingPolicy: { type: 'complete_required' },
+        scores: [{
+          key: 'total',
+          type: 'total',
+          label: '总分',
+          direction: 'descriptive',
+          canonical: true,
+          displayPrecision: 2,
+          source: { type: 'items', items: [{ itemCode: 'workc-qb-current-item-1', weight: 1 }], aggregation: 'sum' },
+        }],
+      },
+      report: {
+        reportVersion: '2.0.0',
+        primaryScoreKeys: ['total'],
+        scoreOrder: ['total'],
+        interpretations: [{
+          scoreKey: 'total',
+          headline: '总分',
+          source: { type: 'score_only' },
+          summary: 'Work C current-unit result',
+          bands: [],
+          guidance: [],
+        }],
+        limitations: [],
+        disclaimer: 'Work C current-unit fixture only.',
+      },
+      referencePolicy: { type: 'none' },
+    }
+    const runtime = createFrozenScaleRuntimeSnapshot({
+      instrumentKey: scaleCode,
+      instrumentVersion: '2.0.0',
+      definition: definition as any,
+    })
+    const scale = await prisma.scale.create({
+      data: {
+        code: scaleCode,
+        name: 'Work C current-unit scale fixture',
+        creatorId: teacherId,
+        status: 'PUBLISHED',
+        visibility: 'HIDDEN',
+        instrumentClass: 'CUSTOM_DESCRIPTIVE',
+        instrumentVersion: '2.0.0',
+        definition: definition as any,
+        definitionHash: hashScaleDefinition(definition as any),
+        itemCount: 1,
+        dimensionCount: 1,
+      },
+    })
+    const composite = await prisma.compositeAssessment.create({
+      data: {
+        code: `WORKC-QB-CURRENT-${suffix}`,
+        name: 'Work C current-unit budget fixture',
+        createdBy: teacherId,
+        status: 'PUBLISHED',
+      },
+    })
+    const item = await prisma.compositeAssessmentItem.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        type: 'SCALE',
+        position: 0,
+        required: true,
+        scaleId: scale.id,
+      },
+    })
+    const attempt = await prisma.compositeAssessmentAttempt.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        userId: teacherId,
+        participantKey: `workc-qb-current-participant-${suffix}`,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        progress: 0,
+        completedItems: 0,
+      },
+    })
+    const frozen = freezeCompositeActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [{
+        compositeItemId: item.id,
+        code: scaleCode,
+        instrumentVersion: '2.0.0',
+        sourceDefinitionHash: runtime.sourceDefinitionHash,
+        compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      }],
+      cognitive: [],
+      formSections: [],
+    })
+    await prisma.compositeAssessmentAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozen),
+        frozenActiveSlotSetHash: frozen.snapshotHash,
+      },
+    })
+    await prisma.assessment.create({
+      data: {
+        scaleId: scale.id,
+        userId: teacherId,
+        compositeAttemptId: attempt.id,
+        compositeItemId: item.id,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        progress: 0,
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtime),
+        compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      },
+    })
+
+    const { value, calls } = await runObserved(() => compositeService.getAttemptState(attempt.id, { userId: teacherId }))
+    expect(value.status).toBe('IN_PROGRESS')
+    expect(value.currentItem?.type).toBe('SCALE')
+
+    // Load-once completion: the unified attempt-state reader holds the child
+    // row (scaleAssessments in the parent select) and passes it to admission,
+    // so the current-unit delivery performs zero Assessment.findUnique reads.
+    expect(callCount(calls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(1)
+    expect(callCount(calls, 'Assessment', 'findUnique')).toBe(0)
+
+    await prisma.assessment.deleteMany({ where: { compositeAttemptId: attempt.id } })
+    await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeAssessmentAttempt.delete({ where: { id: attempt.id } })
+    await prisma.compositeAssessment.delete({ where: { id: composite.id } })
+    await prisma.scale.delete({ where: { id: scale.id } })
   })
 })

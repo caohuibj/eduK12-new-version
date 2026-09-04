@@ -2874,18 +2874,17 @@ const getUnifiedCompositeAttemptState = async (
     const slot = slotsByKey.get(compositeItemSlotKey(item.id, 'SCALE'))
     if (!child?.id || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     // Lazy current-unit: only the unfinished Scale loads its frozen runtime.
-    const runtimeChild = await prisma.assessment.findUnique({
-      where: { id: child.id },
-      select: { id: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
-    })
-    if (!runtimeChild?.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    // Load-once completion: the unified attempt-state reader already holds the
+    // child row with the full admission select, so the frozen runtime is read
+    // from the loaded child instead of re-querying the same assessment row.
+    if (!child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(runtimeChild.runtimeSnapshotEncrypted)
+      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
       if (
         runtime.instrumentKey !== item.scale?.code
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
-        || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
+        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
       await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
