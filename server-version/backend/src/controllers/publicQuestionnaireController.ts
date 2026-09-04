@@ -193,7 +193,10 @@ export const publicQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      const units = await formSectionService.listQuestionnaireContentUnits(questionnaire.id)
+      const units = await formSectionService.listQuestionnaireContentUnits(
+        questionnaire.id,
+        (questionnaire.formSections ?? []).map(formSectionService.mapQuestionnaireSection),
+      )
       const contentItems = units.map((unit) => ({
         type: unit.type === 'form-section' ? 'form-section' as const : 'scale' as const,
         position: unit.position,

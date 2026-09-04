@@ -692,9 +692,13 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   }
 }
 
-export const listQuestionnaireFormSections = async (questionnaireId: string) => {
-  const sections = await ensureQuestionnaireFormSections(questionnaireId)
-  return sections.map((section) => ({
+export const listQuestionnaireFormSections = async (questionnaireId: string, sections?: SectionRow[]) => {
+  // Pure-read variant: when the caller has already materialized sections via
+  // ensureQuestionnaireFormSections (write-time invariant), pass them in to
+  // avoid a redundant lazy-ensure on the read path. Default keeps the lazy
+  // repair as a safe fallback for direct callers.
+  const resolved = sections ?? (await ensureQuestionnaireFormSections(questionnaireId))
+  return resolved.map((section) => ({
     ...section,
     definitionHash: questionnaireFormSectionDefinitionHash(section),
   }))
@@ -859,8 +863,10 @@ const normalizeQuestionnaireContentUnits = async (
   return { units, sections }
 }
 
-export const listQuestionnaireContentUnits = async (questionnaireId: string): Promise<QuestionnaireContentUnit[]> => {
-  const sections = await ensureQuestionnaireFormSections(questionnaireId)
+export const listQuestionnaireContentUnits = async (questionnaireId: string, sections?: SectionRow[]): Promise<QuestionnaireContentUnit[]> => {
+  // Pure-read variant: accept pre-materialized sections to skip the redundant
+  // lazy-ensure when the caller already holds them (write-time invariant).
+  const resolved = sections ?? (await ensureQuestionnaireFormSections(questionnaireId))
   const scales = await prisma.questionnaireScale.findMany({
     where: { questionnaireId },
     orderBy: { position: 'asc' },
@@ -875,7 +881,7 @@ export const listQuestionnaireContentUnits = async (questionnaireId: string): Pr
       itemCount: 1,
       contextSection: false,
     })),
-    ...sections.map((section) => ({
+    ...resolved.map((section) => ({
       type: 'form-section' as const,
       id: section.id,
       position: section.position,

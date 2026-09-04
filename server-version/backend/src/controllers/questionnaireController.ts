@@ -353,10 +353,13 @@ export const questionnaireController = {
         return forbidden(res, '无权限查看此问卷')
       }
 
-      await formSectionService.ensureQuestionnaireFormSections(questionnaire.id)
+      // Materialize sections once (write-time invariant), then reuse the same
+      // rows for both list projections so the read path performs zero redundant
+      // lazy-ensure / repair queries.
+      const materializedSections = await formSectionService.ensureQuestionnaireFormSections(questionnaire.id)
       const [formSections, contentUnits] = await Promise.all([
-        formSectionService.listQuestionnaireFormSections(questionnaire.id),
-        formSectionService.listQuestionnaireContentUnits(questionnaire.id),
+        formSectionService.listQuestionnaireFormSections(questionnaire.id, materializedSections),
+        formSectionService.listQuestionnaireContentUnits(questionnaire.id, materializedSections),
       ])
       const finalOnlyEnvelope = {
         ...questionnaire,
@@ -524,7 +527,7 @@ export const questionnaireController = {
       }
 
       const sections = await formSectionService.ensureQuestionnaireFormSections(id)
-      const contentUnits = await formSectionService.listQuestionnaireContentUnits(id)
+      const contentUnits = await formSectionService.listQuestionnaireContentUnits(id, sections)
       const contextSections = sections.filter((section) => (
         section.contextSection || section.items.some((item) => item.contextKey)
       ))
@@ -666,6 +669,10 @@ export const questionnaireController = {
 
         return questionnaire
       })
+
+      // Write-time invariant: copied form items must be sectioned immediately so
+      // the copied questionnaire is never served with orphans on GET/start.
+      await formSectionService.ensureQuestionnaireFormSections(newQuestionnaire.id)
 
       logger.info('问卷复制成功', {
         originalId: id,
@@ -1147,6 +1154,9 @@ export const questionnaireController = {
           contextKey: contextKey ?? null,
         },
       })
+      // Write-time invariant: a newly-created form item must immediately belong
+      // to a FormSection rather than relying on read/get/start to backfill it.
+      await formSectionService.ensureQuestionnaireFormSections(id)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目', { questionnaireId: id, formItemId: formItem.id, userId })

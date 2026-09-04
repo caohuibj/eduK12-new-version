@@ -1296,7 +1296,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
   if (composite.items.some((item: any) => item.position === position)) {
     throw compositeConflict('模块排序位置已存在')
   }
-  return prisma.compositeAssessmentItem.create({
+  const item = await prisma.compositeAssessmentItem.create({
     data: {
       compositeAssessmentId: compositeId,
       type: input.type,
@@ -1311,6 +1311,13 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
       contextKey: input.type === 'FORM' ? input.contextKey ?? null : null,
     },
   })
+  // Write-time invariant: a new FORM module must immediately belong to a
+  // CompositeFormSection so GET/start/publish never lazily repair it.
+  if (item.type === 'FORM') {
+    const { ensureCompositeFormSections } = await import('./final-submit.service')
+    await ensureCompositeFormSections(compositeId)
+  }
+  return item
 }
 
 export const removeItem = async (userId: string, role: UserRole, compositeId: string, itemId: string) => {

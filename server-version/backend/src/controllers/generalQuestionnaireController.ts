@@ -641,10 +641,10 @@ export const generalQuestionnaireController = {
 
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
-      await formSectionService.ensureQuestionnaireFormSections(id)
+      const materializedSections = await formSectionService.ensureQuestionnaireFormSections(id)
       const [formSections, units] = await Promise.all([
-        formSectionService.listQuestionnaireFormSections(id),
-        formSectionService.listQuestionnaireContentUnits(id),
+        formSectionService.listQuestionnaireFormSections(id, materializedSections),
+        formSectionService.listQuestionnaireContentUnits(id, materializedSections),
       ])
 
       return success(res, {
@@ -707,7 +707,7 @@ export const generalQuestionnaireController = {
       }
 
       const sections = await formSectionService.ensureQuestionnaireFormSections(id)
-      const units = await formSectionService.listQuestionnaireContentUnits(id)
+      const units = await formSectionService.listQuestionnaireContentUnits(id, sections)
       const contextSections = sections.filter((section) => (
         section.contextSection || section.items.some((item) => item.contextKey)
       ))
@@ -856,6 +856,10 @@ export const generalQuestionnaireController = {
 
         return questionnaire
       })
+
+      // Write-time invariant: copied form items must be sectioned immediately so
+      // the copied questionnaire is never served with orphans on GET/start.
+      await formSectionService.ensureQuestionnaireFormSections(newQuestionnaire.id)
 
       logger.info('泛化问卷复制成功', {
         originalId: id,
@@ -1098,6 +1102,9 @@ export const generalQuestionnaireController = {
           contextKey: contextKey ?? null,
         },
       })
+      // Write-time invariant: a newly-created form item must immediately belong
+      // to a FormSection rather than relying on read/get/start to backfill it.
+      await formSectionService.ensureQuestionnaireFormSections(id)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目到泛化问卷', { questionnaireId: id, formItemId: formItem.id, userId })
