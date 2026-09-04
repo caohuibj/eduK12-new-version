@@ -1,8 +1,9 @@
 # CI / merge gate
 #
 # 触发：
-#   push feature/* / main
-#   pull_request → main / stacked feature branches
+#   push main only (no auto full CI on feature/**)
+#   pull_request → main / stacked feature branches (incl. ready_for_review)
+#   Draft PRs skip heavy jobs until Ready for review
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
@@ -21,17 +22,22 @@ name: CI
 on:
   push:
     branches:
-      - 'feature/**'
       - main
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
       - 'refactor/unified-runtime-v32-unit'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: backend (ci + migrate + build + full regression)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
@@ -128,6 +134,7 @@ jobs:
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -156,6 +163,7 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
@@ -209,6 +217,7 @@ jobs:
 
   codeql:
     name: codeql (javascript/typescript SAST)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       actions: read
