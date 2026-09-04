@@ -23,6 +23,74 @@ const hasContextSection = (sections: Array<{ contextSection: boolean; items: Arr
   sections.some((section) => Boolean(section.contextSection) || section.items.some((item) => Boolean(item.contextKey)))
 )
 
+// Parent rows are loaded once (load-once admission) and shared by the
+// ensure* and activate* steps so a delivery never re-reads the same parent.
+export type QuestionnaireFormAdmissionParent = {
+  id: string
+  userId: string | null
+  sessionId: string | null
+  resumeTokenHash: string | null
+  deliveryMode: string
+  runtimeGeneration: string | null
+  attemptEpoch: number
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  frozenActiveSlotSetEncrypted: string | null
+  frozenActiveSlotSetHash: string | null
+  questionnaire: {
+    formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
+  }
+}
+
+export type CompositeFormAdmissionParent = {
+  id: string
+  userId: string | null
+  recoveryTokenHash: string | null
+  deliveryMode: string
+  runtimeGeneration: string | null
+  attemptEpoch: number
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  frozenActiveSlotSetEncrypted: string | null
+  frozenActiveSlotSetHash: string | null
+  compositeAssessment: {
+    formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
+  }
+}
+
+const QUESTIONNAIRE_FORM_ADMISSION_PARENT_SELECT = {
+  id: true,
+  userId: true,
+  sessionId: true,
+  resumeTokenHash: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+  questionnaire: {
+    select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+  },
+} as const
+
+const COMPOSITE_FORM_ADMISSION_PARENT_SELECT = {
+  id: true,
+  userId: true,
+  recoveryTokenHash: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+  compositeAssessment: {
+    select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+  },
+} as const
+
 const asDefinition = (definition: SectionRow | CompositeSection): Record<string, unknown> => (
   JSON.parse(JSON.stringify(definition)) as Record<string, unknown>
 )
@@ -165,7 +233,7 @@ export const ensureCompositeSectionAttempt = async (
 }
 
 export const activateQuestionnaireFormAdmission = async (input: {
-  parentId: string
+  parent: QuestionnaireFormAdmissionParent
   sectionId: string
   definition: SectionRow
   child: {
@@ -177,26 +245,7 @@ export const activateQuestionnaireFormAdmission = async (input: {
 }): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredFormAdmission(input.child)
   if (stored) return stored
-  const parent = await prisma.questionnaireAssessment.findUnique({
-    where: { id: input.parentId },
-    select: {
-      id: true,
-      userId: true,
-      sessionId: true,
-      resumeTokenHash: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      questionnaire: {
-        select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-      },
-    },
-  })
-  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
+  const parent = input.parent
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷运行时版本不匹配，请重启测评', 409)
   }
@@ -242,7 +291,7 @@ export const activateQuestionnaireFormAdmission = async (input: {
 }
 
 export const activateCompositeFormAdmission = async (input: {
-  parentId: string
+  parent: CompositeFormAdmissionParent
   sectionId: string
   definition: CompositeSection
   child: {
@@ -254,25 +303,7 @@ export const activateCompositeFormAdmission = async (input: {
 }): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredFormAdmission(input.child)
   if (stored) return stored
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: input.parentId },
-    select: {
-      id: true,
-      userId: true,
-      recoveryTokenHash: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      compositeAssessment: {
-        select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-      },
-    },
-  })
-  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  const parent = input.parent
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }
@@ -320,9 +351,12 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
   assessmentId: string,
   section: SectionRow,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const parent = await prisma.questionnaireAssessment.findUnique({
+  // Load-once admission: the parent is read exactly once with the full
+  // admission select and shared by the ensure and activate steps, so a
+  // delivery never re-reads the same questionnaire assessment row.
+  const parent: QuestionnaireFormAdmissionParent | null = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
-    select: { attemptEpoch: true, runtimeGeneration: true },
+    select: QUESTIONNAIRE_FORM_ADMISSION_PARENT_SELECT,
   })
   if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
@@ -330,7 +364,7 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
   }
   const child = await ensureQuestionnaireSectionAttempt(assessmentId, section.id, parent.attemptEpoch)
   return activateQuestionnaireFormAdmission({
-    parentId: assessmentId,
+    parent,
     sectionId: section.id,
     definition: section,
     child,
@@ -341,9 +375,12 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
   attemptId: string,
   section: CompositeSection,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({
+  // Load-once admission: the parent is read exactly once with the full
+  // admission select and shared by the ensure and activate steps, so a
+  // delivery never re-reads the same composite attempt row.
+  const parent: CompositeFormAdmissionParent | null = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { attemptEpoch: true, runtimeGeneration: true },
+    select: COMPOSITE_FORM_ADMISSION_PARENT_SELECT,
   })
   if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
@@ -351,7 +388,7 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
   }
   const child = await ensureCompositeSectionAttempt(attemptId, section.id, parent.attemptEpoch)
   return activateCompositeFormAdmission({
-    parentId: attemptId,
+    parent,
     sectionId: section.id,
     definition: section,
     child,
@@ -384,13 +421,18 @@ export const activateStoredOrCatalogQuestionnaireFormAdmission = async (input: {
 }): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredFormAdmission(input.child)
   if (stored) return stored
+  const parent: QuestionnaireFormAdmissionParent | null = await prisma.questionnaireAssessment.findUnique({
+    where: { id: input.parentId },
+    select: QUESTIONNAIRE_FORM_ADMISSION_PARENT_SELECT,
+  })
+  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   const section = await prisma.questionnaireFormSection.findUnique({
     where: { id: input.sectionId },
     include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
   })
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
   return activateQuestionnaireFormAdmission({
-    parentId: input.parentId,
+    parent,
     sectionId: input.sectionId,
     definition: mapQuestionnaireSection(section),
     child: input.child,
@@ -409,13 +451,18 @@ export const activateStoredOrCatalogCompositeFormAdmission = async (input: {
 }): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredFormAdmission(input.child)
   if (stored) return stored
+  const parent: CompositeFormAdmissionParent | null = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: input.parentId },
+    select: COMPOSITE_FORM_ADMISSION_PARENT_SELECT,
+  })
+  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
   const section = await prisma.compositeFormSection.findUnique({
     where: { id: input.sectionId },
     include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
   })
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
   return activateCompositeFormAdmission({
-    parentId: input.parentId,
+    parent,
     sectionId: input.sectionId,
     definition: mapCompositeSection(section),
     child: input.child,
