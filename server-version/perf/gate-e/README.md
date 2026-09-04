@@ -64,6 +64,7 @@ GROUP=cognitive PAYLOAD_CLASS=normal VUS=10 k6 run k6-e3-cognitive-payload.js
 # E4 Aggregate
 MODE=manyParent PEAK=100 GROUP=mixed k6 run k6-e4-aggregate.js
 MODE=sameParent PEAK=50 GROUP=sameParent k6 run k6-e4-aggregate.js
+# Seed siblings first: SAME_PARENT_SIBLINGS=2|10|50 (default 50; pool must be >= PEAK)
 
 # E5 Bundle mixed (set FFMPEG_CONCURRENCY=0|1|2 on the backend process)
 VUS=50 DURATION=30s FFMPEG_CONCURRENCY=0 k6 run k6-e5-bundle-mixed.js

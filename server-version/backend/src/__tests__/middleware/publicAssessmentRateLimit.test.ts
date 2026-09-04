@@ -71,10 +71,18 @@ describe('publicAssessmentRateLimit helpers', () => {
     }))).toBeNull()
   })
 
-  it('extracts recovery tokens only from valid x-recovery-token headers', () => {
+  it('extracts recovery tokens from x-recovery-token header or parsed body.recoveryToken', () => {
     const recovery = 'recovery-token-value-1234567890'
     expect(extractPublicAssessmentRecoveryToken(req({
       headers: { 'x-recovery-token': recovery },
+    }))).toBe(recovery)
+    expect(extractPublicAssessmentRecoveryToken(req({
+      headers: {},
+      body: { recoveryToken: recovery },
+    }))).toBe(recovery)
+    expect(extractPublicAssessmentRecoveryToken(req({
+      headers: { 'x-recovery-token': recovery },
+      body: { recoveryToken: 'other-recovery-token-abcdefghij' },
     }))).toBe(recovery)
     expect(extractPublicAssessmentRecoveryToken(req({
       headers: { 'x-recovery-token': 'short' },

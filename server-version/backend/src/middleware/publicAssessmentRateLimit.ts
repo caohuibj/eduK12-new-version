@@ -40,11 +40,19 @@ export const extractPublicAssessmentStartToken = (req: Request): string | null =
   return token
 }
 
-/** Per-attempt recovery credential from the public assessment header. */
+/**
+ * Per-attempt recovery credential.
+ * Prefer X-Recovery-Token header; fall back to JSON body.recoveryToken when the
+ * body is already parsed (limiters mount after express.json). Body-only clients
+ * (some composite scale/form mutations) would otherwise skip the recovery budget.
+ */
 export const extractPublicAssessmentRecoveryToken = (req: Request): string | null => {
   const header = req.headers['x-recovery-token']
-  const raw = Array.isArray(header) ? header[0] : header
-  return isValidRecoveryToken(raw) ? raw : null
+  const fromHeader = Array.isArray(header) ? header[0] : header
+  if (isValidRecoveryToken(fromHeader)) return fromHeader
+  const body = req.body as { recoveryToken?: unknown } | undefined
+  const fromBody = body && typeof body === 'object' ? body.recoveryToken : undefined
+  return isValidRecoveryToken(fromBody) ? fromBody : null
 }
 
 const createBudgetLimiter = (options: {

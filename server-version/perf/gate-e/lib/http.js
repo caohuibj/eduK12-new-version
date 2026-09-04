@@ -80,18 +80,21 @@ export function runLogicalSubmit(request, tags = {}) {
       const replayed = parseReplayFlag(response.body);
       if (replayed) {
         idempotentReplays.add(1, tags);
-        // Capacity-retry replay of the same submissionId after a prior fresh write
-        // in this logical submit is OK; otherwise it is pool reuse / INVALID.
+        // First-attempt replayed:true on a "fresh" fixture = pool reuse / pre-completed.
+        // Fail-closed for E2 fresh curve: do NOT inflate eventual success.
         if (!sawFreshCompletion && attempt === 1) {
           recordEventualOutcome({
-            ok: true,
+            ok: false,
             latencyMs: Date.now() - started,
             status: response.status,
-            tags: { ...tags, replayed: 'true' },
+            tags: { ...tags, replayed: 'true', reason: 'first_attempt_replay' },
           });
-          check(response, { 'eventual durable success': () => true });
-          return true;
+          check(response, { 'first-attempt replay invalid for fresh curve': () => false });
+          return false;
         }
+        // Documented retry-after-lost-response: earlier attempt in this logical
+        // submit may have persisted server-side; replayed:true on capacity retry
+        // is durable success for the same submissionId.
         recordEventualOutcome({
           ok: true,
           latencyMs: Date.now() - started,

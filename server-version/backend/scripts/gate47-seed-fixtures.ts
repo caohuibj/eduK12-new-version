@@ -29,6 +29,14 @@ const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
 const SCALE_N = Number(process.env.SCALE_FIXTURE_COUNT || 1200)
 const FORM_N = Number(process.env.FORM_FIXTURE_COUNT || 300)
 const COG_N = Number(process.env.COG_FIXTURE_COUNT || 200)
+/** sameParent sibling slots on one parent (Gate-E supports 2 / 10 / 50). Default 50 for PEAK=50. */
+const SAME_PARENT_SIBLINGS = (() => {
+  const n = Number(process.env.SAME_PARENT_SIBLINGS || 50)
+  if (![2, 10, 50].includes(n)) {
+    throw new Error(`SAME_PARENT_SIBLINGS must be 2, 10, or 50 (got ${process.env.SAME_PARENT_SIBLINGS})`)
+  }
+  return n
+})()
 const JWT_SECRET = process.env.JWT_SECRET!
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'gate47admin'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Gate47AdminPass!'
@@ -441,12 +449,13 @@ async function main() {
     if ((i + 1) % 50 === 0) console.log(`  cognitive ${i + 1}/${COG_N}`)
   }
 
-  // sameParent: reuse first scale + first form against distinct parents is not true same-parent;
-  // create a mini same-parent composite-like contention using two scale assessments is weak.
-  // For Gate-D we provide two form sections on ONE questionnaire assessment for contention.
+  // sameParent: ONE questionnaire assessment (shared parentId) with N form-section
+  // siblings (distinct child/slot/submissionId). N = SAME_PARENT_SIBLINGS (2|10|50).
+  // E4 VUs must index distinct siblings — never all hammer fixture 0.
   const sameParentRequests: any[] = []
   {
     const suffix = `${runId}-same`
+    console.log(`Creating sameParent contention fixtures (siblings=${SAME_PARENT_SIBLINGS})...`)
     const questionnaire = await prisma.questionnaire.create({
       data: {
         code: `G47-Q-SAME-${suffix}`,
@@ -458,7 +467,7 @@ async function main() {
       },
     })
     ledger.questionnaireIds.push(questionnaire.id)
-    for (let s = 0; s < 2; s += 1) {
+    for (let s = 0; s < SAME_PARENT_SIBLINGS; s += 1) {
       const section = await prisma.questionnaireFormSection.create({
         data: {
           questionnaireId: questionnaire.id,
@@ -497,11 +506,13 @@ async function main() {
         fixtureId: `perf-same-parent-child-${String(idx + 1).padStart(4, '0')}`,
         instrument: 'form',
         parentKey: 'perf-parent-contention-0001',
+        parentId: assessment.id,
+        slotIndex: idx,
         method: 'POST',
         path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
         headers,
         body: {
-          submissionId: `g47-same-${runId}-${idx + 1}`,
+          submissionId: `g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
           attemptEpoch: 1,
           definitionHash: mapped.definitionHash,
           contextSnapshotHash: null,
