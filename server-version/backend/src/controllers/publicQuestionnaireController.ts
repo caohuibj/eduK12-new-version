@@ -152,11 +152,10 @@ export const publicQuestionnaireController = {
         }
       }
 
-      // Ensure every final-only form field belongs to a submission section
-      // before exposing the immutable public definition.
-      await formSectionService.ensureQuestionnaireFormSections(validation.questionnaire!.id)
-
-      // 获取问卷详情（包含表单题目、量表和提交区段）
+      // Write-time invariant (Work C): every form item is sectioned at write
+      // time, and the migration backfilled legacy rows, so the questionnaire
+      // query below already loads complete formSections. No read-time lazy
+      // materialization / repair is needed on this hot public path.
       const questionnaire = await prisma.questionnaire.findUnique({
         where: { id: validation.questionnaire!.id },
         include: {
