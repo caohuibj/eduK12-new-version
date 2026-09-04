@@ -29,7 +29,9 @@ import { tokenService } from '../../services/tokenService'
  *   7. Public read path — getQuestionnaireByToken performs zero redundant
  *      ensure and zero materialization writes.
  *   8. Load-once admission — scale/cognitive delivery reads the child once
- *      and the composite parent once (or zero when the parent is passed in).
+ *      and the composite parent once; when the unified attempt-state reader
+ *      passes in both the parent and the already-loaded child, neither is
+ *      re-read.
  */
 const DB_URL = integrationDatabaseUrl(
   'WORKC_QUERY_BUDGET_DATABASE_URL',
@@ -57,6 +59,8 @@ let compositeService: typeof import('../../modules/composite/composite.service')
 let formSectionService: typeof import('../../services/questionnaire-form-section.service')
 let ensureScaleAdmissionAtDelivery: typeof import('../../modules/scale/scale-admission.service')['ensureScaleAdmissionAtDelivery']
 let ensureCognitiveAdmissionAtDelivery: typeof import('../../modules/cognitive/cognitive-admission.service')['ensureCognitiveAdmissionAtDelivery']
+let UNIFIED_SCALE_CHILD_ADMISSION_SELECT: typeof import('../../modules/scale/scale-admission.service')['UNIFIED_SCALE_CHILD_ADMISSION_SELECT']
+let UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT: typeof import('../../modules/cognitive/cognitive-admission.service')['UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT']
 let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createUnifiedCognitiveSessionConfigSnapshot']
 let teacherId = ''
 let questionnaireId = ''
@@ -113,6 +117,8 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     formSectionService = await import('../../services/questionnaire-form-section.service')
     ensureScaleAdmissionAtDelivery = (await import('../../modules/scale/scale-admission.service')).ensureScaleAdmissionAtDelivery
     ensureCognitiveAdmissionAtDelivery = (await import('../../modules/cognitive/cognitive-admission.service')).ensureCognitiveAdmissionAtDelivery
+    UNIFIED_SCALE_CHILD_ADMISSION_SELECT = (await import('../../modules/scale/scale-admission.service')).UNIFIED_SCALE_CHILD_ADMISSION_SELECT
+    UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT = (await import('../../modules/cognitive/cognitive-admission.service')).UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT
     createUnifiedCognitiveSessionConfigSnapshot = (await import('../../modules/cognitive/session.service')).createUnifiedCognitiveSessionConfigSnapshot
 
     prisma.$use(async (params, next) => {
@@ -218,11 +224,11 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     ))
     expect(value.statusCode).toBe(200)
 
-    // The write-time invariant means ensureQuestionnaireFormSections finds no
-    // orphans, so it performs exactly one findUnique (read) + one findMany
-    // (materialization). Both list projections must reuse those rows instead of
-    // re-running the lazy ensure.
-    expect(callCount(calls, 'Questionnaire', 'findUnique')).toBe(1)
+    // The write-time invariant means the pure read finds no orphans, so it
+    // performs exactly one QuestionnaireFormSection.findMany (materialization).
+    // Both list projections must reuse those rows instead of re-running the
+    // lazy ensure. The parent questionnaire is read once via findFirst.
+    expect(callCount(calls, 'Questionnaire', 'findFirst')).toBe(1)
     expect(callCount(calls, 'QuestionnaireFormSection', 'findMany')).toBe(1)
     expect(callCount(calls, 'QuestionnaireScale', 'findMany')).toBe(1)
 
@@ -532,6 +538,17 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     expect(callCount(secondCalls, 'Assessment', 'findUnique')).toBe(1)
     expect(callCount(secondCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(0)
 
+    // With both the parent and the already-loaded child passed in (unified
+    // attempt-state reader), neither the parent nor the child is re-read.
+    const childC = await prisma.assessment.findUnique({
+      where: { id: (await createChild()).id },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    })
+    if (!childC) throw new Error('Work C scale child fixture is missing')
+    const { calls: thirdCalls } = await runObserved(() => ensureScaleAdmissionAtDelivery(childC.id, parent as any, childC as any))
+    expect(callCount(thirdCalls, 'Assessment', 'findUnique')).toBe(0)
+    expect(callCount(thirdCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(0)
+
     await prisma.assessment.deleteMany({ where: { compositeAttemptId: attempt.id } })
     await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })
     await prisma.compositeAssessmentAttempt.delete({ where: { id: attempt.id } })
@@ -659,6 +676,17 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     const { calls: secondCalls } = await runObserved(() => ensureCognitiveAdmissionAtDelivery(sessionB.id, parent as any))
     expect(callCount(secondCalls, 'CognitiveSession', 'findUnique')).toBe(1)
     expect(callCount(secondCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(0)
+
+    // With both the parent and the already-loaded child passed in (unified
+    // attempt-state reader), neither the parent nor the child is re-read.
+    const sessionC = await prisma.cognitiveSession.findUnique({
+      where: { id: (await createChild()).id },
+      select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
+    })
+    if (!sessionC) throw new Error('Work C cognitive child fixture is missing')
+    const { calls: thirdCalls } = await runObserved(() => ensureCognitiveAdmissionAtDelivery(sessionC.id, parent as any, sessionC as any))
+    expect(callCount(thirdCalls, 'CognitiveSession', 'findUnique')).toBe(0)
+    expect(callCount(thirdCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(0)
 
     await prisma.cognitiveSession.deleteMany({ where: { compositeAttemptId: attempt.id } })
     await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })

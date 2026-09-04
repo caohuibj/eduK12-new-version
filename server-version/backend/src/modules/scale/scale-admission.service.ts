@@ -170,16 +170,20 @@ export const assertAdmissionParentBinding = (
 export const ensureScaleAdmissionAtDelivery = async (
   assessmentId: string,
   parent?: CompositeScaleAdmissionParent,
+  child?: ScaleAdmissionChildRow,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const child = await prisma.assessment.findUnique({
+  // Load-once completion: the unified attempt-state reader already holds the
+  // child row (with the full admission select) and passes it in, so a
+  // current-unit delivery never re-reads the same scale assessment row.
+  const loaded = child ?? await prisma.assessment.findUnique({
     where: { id: assessmentId },
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
   })
-  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
-  if (child.runtimeGeneration !== 'UNIFIED_V1') {
+  if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+  if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时版本不匹配，请重启测评', 409)
   }
-  return activateScaleAdmission(child, parent)
+  return activateScaleAdmission(loaded, parent)
 }
 
 export const readStoredScaleAdmission = (

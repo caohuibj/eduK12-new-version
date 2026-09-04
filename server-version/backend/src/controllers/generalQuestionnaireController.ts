@@ -854,12 +854,13 @@ export const generalQuestionnaireController = {
           })
         }
 
+        // Atomic materialize-on-write: copied form items are sectioned inside
+        // the same transaction so the copy is never served with orphans on
+        // GET/start.
+        await formSectionService.ensureQuestionnaireFormSections(questionnaire.id, tx)
+
         return questionnaire
       })
-
-      // Write-time invariant: copied form items must be sectioned immediately so
-      // the copied questionnaire is never served with orphans on GET/start.
-      await formSectionService.ensureQuestionnaireFormSections(newQuestionnaire.id)
 
       logger.info('泛化问卷复制成功', {
         originalId: id,
@@ -1090,21 +1091,25 @@ export const generalQuestionnaireController = {
         ? Math.max(...questionnaire.formItems.map(fi => fi.position))
         : -1
 
-      const formItem = await prisma.questionnaireFormItem.create({
-        data: {
-          questionnaireId: id,
-          type,
-          label,
-          placeholder: placeholder || null,
-          required: required ?? true,
-          position: position !== undefined ? position : maxPosition + 1,
-          options: options ? JSON.parse(JSON.stringify(options)) : null,
-          contextKey: contextKey ?? null,
-        },
+      // Atomic materialize-on-write: the item create and its section assignment
+      // share one transaction so a crash can never leave an orphan form item
+      // that GET/start would otherwise have to lazily repair.
+      const formItem = await prisma.$transaction(async (tx) => {
+        const created = await tx.questionnaireFormItem.create({
+          data: {
+            questionnaireId: id,
+            type,
+            label,
+            placeholder: placeholder || null,
+            required: required ?? true,
+            position: position !== undefined ? position : maxPosition + 1,
+            options: options ? JSON.parse(JSON.stringify(options)) : null,
+            contextKey: contextKey ?? null,
+          },
+        })
+        await formSectionService.ensureQuestionnaireFormSections(id, tx)
+        return created
       })
-      // Write-time invariant: a newly-created form item must immediately belong
-      // to a FormSection rather than relying on read/get/start to backfill it.
-      await formSectionService.ensureQuestionnaireFormSections(id)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目到泛化问卷', { questionnaireId: id, formItemId: formItem.id, userId })

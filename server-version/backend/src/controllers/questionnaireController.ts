@@ -353,10 +353,10 @@ export const questionnaireController = {
         return forbidden(res, '无权限查看此问卷')
       }
 
-      // Materialize sections once (write-time invariant), then reuse the same
-      // rows for both list projections so the read path performs zero redundant
+      // Pure-read materialization (write-time invariant): reuse the same rows
+      // for both list projections so the read path performs zero redundant
       // lazy-ensure / repair queries.
-      const materializedSections = await formSectionService.ensureQuestionnaireFormSections(questionnaire.id)
+      const materializedSections = await formSectionService.readQuestionnaireFormSections(questionnaire.id)
       const [formSections, contentUnits] = await Promise.all([
         formSectionService.listQuestionnaireFormSections(questionnaire.id, materializedSections),
         formSectionService.listQuestionnaireContentUnits(questionnaire.id, materializedSections),
@@ -674,12 +674,13 @@ export const questionnaireController = {
           })
         }
 
+        // Atomic materialize-on-write: copied form items are sectioned inside
+        // the same transaction so the copy is never served with orphans on
+        // GET/start.
+        await formSectionService.ensureQuestionnaireFormSections(questionnaire.id, tx)
+
         return questionnaire
       })
-
-      // Write-time invariant: copied form items must be sectioned immediately so
-      // the copied questionnaire is never served with orphans on GET/start.
-      await formSectionService.ensureQuestionnaireFormSections(newQuestionnaire.id)
 
       logger.info('问卷复制成功', {
         originalId: id,
@@ -1149,21 +1150,25 @@ export const questionnaireController = {
         ? Math.max(...questionnaire.formItems.map(fi => fi.position))
         : -1
 
-      const formItem = await prisma.questionnaireFormItem.create({
-        data: {
-          questionnaireId: id,
-          type,
-          label,
-          placeholder: placeholder || null,
-          required: required ?? true,
-          position: position !== undefined ? position : maxPosition + 1,
-          options: options ? JSON.parse(JSON.stringify(options)) : null,
-          contextKey: contextKey ?? null,
-        },
+      // Atomic materialize-on-write: the item create and its section assignment
+      // share one transaction so a crash can never leave an orphan form item
+      // that GET/start would otherwise have to lazily repair.
+      const formItem = await prisma.$transaction(async (tx) => {
+        const created = await tx.questionnaireFormItem.create({
+          data: {
+            questionnaireId: id,
+            type,
+            label,
+            placeholder: placeholder || null,
+            required: required ?? true,
+            position: position !== undefined ? position : maxPosition + 1,
+            options: options ? JSON.parse(JSON.stringify(options)) : null,
+            contextKey: contextKey ?? null,
+          },
+        })
+        await formSectionService.ensureQuestionnaireFormSections(id, tx)
+        return created
       })
-      // Write-time invariant: a newly-created form item must immediately belong
-      // to a FormSection rather than relying on read/get/start to backfill it.
-      await formSectionService.ensureQuestionnaireFormSections(id)
       await cacheService.clearQuestionnaireCache(id)
 
       logger.info('添加表单题目', { questionnaireId: id, formItemId: formItem.id, userId })
@@ -2177,7 +2182,8 @@ export const questionnaireController = {
 
       // V32-2 owns the closed aggregate finalizer, so new FINAL_ONLY attempts
       // are activated with the immutable unit runtime and frozen slot set.
-      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(id)
+      // Pure-read (write-time invariant): the start path never lazily repairs.
+      const frozenFormSections = await formSectionService.readQuestionnaireFormSections(id)
 
       const questionnaire = {
         ...questionnaireMetadata,

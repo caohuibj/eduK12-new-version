@@ -1030,6 +1030,12 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
       },
       include: { items: { orderBy: { position: 'asc' } } },
     })
+    // Atomic materialize-on-write: copied FORM modules are sectioned inside the
+    // same transaction so the copy is never served with orphans on GET/start.
+    if (itemData.some((item) => item.type === 'FORM')) {
+      const { ensureCompositeFormSections } = await import('./final-submit.service')
+      await ensureCompositeFormSections(copied.id, tx)
+    }
     return withoutAnalysisProtocolCipher(copied)
   })
 }
@@ -1299,27 +1305,31 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
   if (composite.items.some((item: any) => item.position === position)) {
     throw compositeConflict('模块排序位置已存在')
   }
-  const item = await prisma.compositeAssessmentItem.create({
-    data: {
-      compositeAssessmentId: compositeId,
-      type: input.type,
-      position,
-      required: input.required,
-      scaleId: input.type === 'SCALE' ? input.scaleId : null,
-      cognitiveAssignmentId: input.type === 'COGNITIVE' ? input.cognitiveAssignmentId : null,
-      formType: input.type === 'FORM' ? input.formType : null,
-      formLabel: input.type === 'FORM' ? input.formLabel : null,
-      formPlaceholder: input.type === 'FORM' ? input.formPlaceholder ?? null : null,
-      formOptions: input.type === 'FORM' ? (input.formOptions as any) ?? null : null,
-      contextKey: input.type === 'FORM' ? input.contextKey ?? null : null,
-    },
+  // Atomic materialize-on-write: the item create and its section assignment
+  // share one transaction so a crash can never leave an orphan FORM module
+  // that GET/start/publish would otherwise have to lazily repair.
+  const item = await prisma.$transaction(async (tx) => {
+    const created = await tx.compositeAssessmentItem.create({
+      data: {
+        compositeAssessmentId: compositeId,
+        type: input.type,
+        position,
+        required: input.required,
+        scaleId: input.type === 'SCALE' ? input.scaleId : null,
+        cognitiveAssignmentId: input.type === 'COGNITIVE' ? input.cognitiveAssignmentId : null,
+        formType: input.type === 'FORM' ? input.formType : null,
+        formLabel: input.type === 'FORM' ? input.formLabel : null,
+        formPlaceholder: input.type === 'FORM' ? input.formPlaceholder ?? null : null,
+        formOptions: input.type === 'FORM' ? (input.formOptions as any) ?? null : null,
+        contextKey: input.type === 'FORM' ? input.contextKey ?? null : null,
+      },
+    })
+    if (created.type === 'FORM') {
+      const { ensureCompositeFormSections } = await import('./final-submit.service')
+      await ensureCompositeFormSections(compositeId, tx)
+    }
+    return created
   })
-  // Write-time invariant: a new FORM module must immediately belong to a
-  // CompositeFormSection so GET/start/publish never lazily repair it.
-  if (item.type === 'FORM') {
-    const { ensureCompositeFormSections } = await import('./final-submit.service')
-    await ensureCompositeFormSections(compositeId)
-  }
   return item
 }
 
@@ -2100,8 +2110,10 @@ const createAttempt = async (
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(compositeId)
+  // Pure-read (write-time invariant): the student start path never lazily
+  // repairs sections on a published composite.
+  const { readCompositeFormSections } = await import('./final-submit.service')
+  await readCompositeFormSections(compositeId)
   const composite = await loadComposite(compositeId, true)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
@@ -2152,8 +2164,8 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   if (!existing) throw compositeNotFound('综合测评记录不存在')
   if (existing.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
 
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(existing.compositeAssessmentId)
+  const { readCompositeFormSections } = await import('./final-submit.service')
+  await readCompositeFormSections(existing.compositeAssessmentId)
   const composite = await loadComposite(existing.compositeAssessmentId, true)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
@@ -2247,8 +2259,10 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
   assertTokenWindow(token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(composite.id)
+  // Pure-read (write-time invariant): the public info path never lazily
+  // repairs sections on a published composite.
+  const { readCompositeFormSections } = await import('./final-submit.service')
+  await readCompositeFormSections(composite.id)
   const current = await loadComposite(composite.id, true)
   const packageSlotLabels = getFrozenPackageSlotLabels(current)
   const units = [
@@ -2296,8 +2310,10 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
 
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string) => {
   const token = await findPublicToken(tokenValue)
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(token.compositeAssessment.id)
+  // Pure-read (write-time invariant): the public start path never lazily
+  // repairs sections on a published composite.
+  const { readCompositeFormSections } = await import('./final-submit.service')
+  await readCompositeFormSections(token.compositeAssessment.id)
   const composite = await loadComposite(token.compositeAssessment.id, true)
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -2345,8 +2361,8 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
     throw compositeForbidden('公开链接已失效')
   }
 
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(existing.compositeAssessmentId)
+  const { readCompositeFormSections } = await import('./final-submit.service')
+  await readCompositeFormSections(existing.compositeAssessmentId)
   const composite = await loadComposite(existing.compositeAssessmentId, true)
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
@@ -2689,17 +2705,34 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
     orderBy: { startedAt: 'asc' },
     select: {
       id: true,
+      userId: true,
       compositeItemId: true,
+      compositeAttemptId: true,
+      questionnaireAssessmentId: true,
       scaleId: true,
       status: true,
       progress: true,
+      deliveryMode: true,
+      runtimeGeneration: true,
+      runtimeSnapshotEncrypted: true,
+      compiledRuntimeHash: true,
+      frozenAdmissionSnapshotEncrypted: true,
+      frozenAdmissionSnapshotHash: true,
+      attemptEpoch: true,
+      startedAt: true,
+      submissionId: true,
+      submissionPayloadHash: true,
+      scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
     },
   },
   cognitiveSessions: {
     select: {
       id: true,
+      userId: true,
       assignmentId: true,
       compositeItemId: true,
+      compositeAttemptId: true,
+      recoveryTokenHash: true,
       testType: true,
       attemptNo: true,
       status: true,
@@ -2711,6 +2744,11 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       deliveryMode: true,
       runtimeGeneration: true,
       compiledRuntimeHash: true,
+      resultSnapshotEncrypted: true,
+      submissionId: true,
+      submissionPayloadHash: true,
+      frozenAdmissionSnapshotEncrypted: true,
+      frozenAdmissionSnapshotHash: true,
     },
   },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
@@ -2849,7 +2887,7 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
-      await ensureScaleAdmissionAtDelivery(child.id, attempt)
+      await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: item.id,
         type: 'SCALE',
@@ -2878,7 +2916,7 @@ const getUnifiedCompositeAttemptState = async (
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
     try {
-      await ensureCognitiveAdmissionAtDelivery(child.id, attempt)
+      await ensureCognitiveAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: currentUnit.item.id,
         type: 'COGNITIVE',

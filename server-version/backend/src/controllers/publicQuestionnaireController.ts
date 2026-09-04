@@ -262,7 +262,9 @@ export const publicQuestionnaireController = {
 
       // V32-2 owns the closed aggregate finalizer, so new FINAL_ONLY attempts
       // are activated with the immutable unit runtime and frozen slot set.
-      const frozenFormSections = await formSectionService.ensureQuestionnaireFormSections(questionnaireId)
+      // Pure-read (write-time invariant): the public start/resume path never
+      // lazily repairs sections on a published questionnaire.
+      const frozenFormSections = await formSectionService.readQuestionnaireFormSections(questionnaireId)
 
       // sessionId is only a locator. A resume capability is required before
       // it can identify an existing assessment; otherwise always create a new

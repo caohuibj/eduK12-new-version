@@ -27,6 +27,7 @@ let getReportPackageDefinition: typeof import('../../modules/cognitive-analysis/
 let listCognitiveEvidenceMappingsForTask: typeof import('../../modules/cognitive-analysis/evidence-mapping.registry')['listCognitiveEvidenceMappingsForTask']
 let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
 let submitCompositeFormSectionFinal: typeof import('../../modules/composite/final-submit.service')['submitCompositeFormSectionFinal']
+let ensureCompositeFormSections: typeof import('../../modules/composite/final-submit.service')['ensureCompositeFormSections']
 let userId: string
 let assessmentId: string
 let attemptId: string
@@ -422,6 +423,10 @@ const createScaleAndFormCompletionFixture = async () => {
       formLabel: 'PR8 background',
     },
   })
+  // Write-time invariant: the production addItem path sections FORM modules in
+  // the same transaction. This fixture creates items directly, so it must
+  // materialize the section before the pure-read start path can serve it.
+  await ensureCompositeFormSections(composite.id)
   const started = await compositeService.startUserAttempt(userId, composite.id)
   return {
     attemptId: started.attempt.id,
@@ -456,6 +461,7 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     listCognitiveEvidenceMappingsForTask = analysisRegistry.listCognitiveEvidenceMappingsForTask
     submitScaleAssessmentFinal = (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal
     submitCompositeFormSectionFinal = (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal
+    ensureCompositeFormSections = (await import('../../modules/composite/final-submit.service')).ensureCompositeFormSections
     const db = await import('../../config/database')
     prisma = db.prisma
 

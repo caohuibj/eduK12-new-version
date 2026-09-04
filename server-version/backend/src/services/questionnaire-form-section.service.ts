@@ -106,8 +106,12 @@ const contentTypesForQuestionnaire = (questionnaire: any) => [
  * the migration; this helper keeps the editor/start path safe for items added
  * after that migration without changing the mixed Form/Scale order.
  */
-export const ensureQuestionnaireFormSections = async (questionnaireId: string): Promise<SectionRow[]> => {
-  const current = await prisma.questionnaire.findUnique({
+export const ensureQuestionnaireFormSections = async (
+  questionnaireId: string,
+  tx?: Prisma.TransactionClient,
+): Promise<SectionRow[]> => {
+  const db = tx ?? prisma
+  const current = await db.questionnaire.findUnique({
     where: { id: questionnaireId },
     select: {
       formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
@@ -118,8 +122,11 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷不存在', 404)
   const unassigned = current.formItems.filter((item) => !item.sectionId)
   if (unassigned.length > 0) {
-    await prisma.$transaction(async (tx) => {
-      const latest = await tx.questionnaire.findUnique({
+    // Atomic materialize-on-write: when the caller already runs inside a
+    // transaction (addFormItem / copy), the section assignment shares that
+    // transaction so a crash can never leave an orphan form item behind.
+    const repair = async (client: Prisma.TransactionClient) => {
+      const latest = await client.questionnaire.findUnique({
         where: { id: questionnaireId },
         select: {
           formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
@@ -154,7 +161,7 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
         let position = items[0].position
         if (occupied.has(position)) position = maximumPosition + runIndex + 1
         occupied.add(position)
-        const section = await tx.questionnaireFormSection.create({
+        const section = await client.questionnaireFormSection.create({
           data: {
             questionnaireId,
             title: '表单',
@@ -163,15 +170,39 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
           },
         })
         for (const [sectionPosition, item] of items.entries()) {
-          await tx.questionnaireFormItem.update({
+          await client.questionnaireFormItem.update({
             where: { id: item.id },
             data: { sectionId: section.id, sectionPosition },
           })
         }
       }
-    })
+    }
+    if (tx) {
+      await repair(tx)
+    } else {
+      await prisma.$transaction(repair)
+    }
   }
 
+  const sections = await db.questionnaireFormSection.findMany({
+    where: { questionnaireId },
+    orderBy: { position: 'asc' },
+    include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+  })
+  return sections.map(mapQuestionnaireSection)
+}
+
+/**
+ * Pure-read variant for hot paths (GET/start/resume). The write-time invariant
+ * plus the publish gate guarantee every published questionnaire is fully
+ * sectioned, so these paths must never trigger a lazy repair write.
+ */
+export const readQuestionnaireFormSections = async (questionnaireId: string): Promise<SectionRow[]> => {
+  // A few service-level tests use a deliberately small Prisma mock from the
+  // pre-section schema.  Keep the read additive for those callers; the
+  // generated production client always has this delegate.
+  const formSectionDelegate = (prisma as any).questionnaireFormSection
+  if (!formSectionDelegate) return []
   const sections = await prisma.questionnaireFormSection.findMany({
     where: { questionnaireId },
     orderBy: { position: 'asc' },
@@ -278,7 +309,26 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       },
       scaleAssessments: {
         orderBy: { startedAt: 'asc' },
-        select: { id: true, scaleId: true, status: true, progress: true },
+        select: {
+          id: true,
+          userId: true,
+          scaleId: true,
+          status: true,
+          progress: true,
+          deliveryMode: true,
+          runtimeGeneration: true,
+          runtimeSnapshotEncrypted: true,
+          compiledRuntimeHash: true,
+          frozenAdmissionSnapshotEncrypted: true,
+          frozenAdmissionSnapshotHash: true,
+          attemptEpoch: true,
+          startedAt: true,
+          submissionId: true,
+          submissionPayloadHash: true,
+          questionnaireAssessmentId: true,
+          compositeAttemptId: true,
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
+        },
       },
     },
   }) as any
@@ -383,7 +433,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
         || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
         || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
       ) throw new Error('Scale runtime identity mismatch')
-      await ensureScaleAdmissionAtDelivery(child.id)
+      await ensureScaleAdmissionAtDelivery(child.id, undefined, child)
       currentScale = {
         id: current.item.scale.id,
         name: current.item.scale.name,
@@ -945,7 +995,9 @@ export const restartQuestionnaireAssessment = async (
 
   const questionnaireId = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId }, select: { questionnaireId: true } })
   if (!questionnaireId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  const frozenFormSections = await ensureQuestionnaireFormSections(questionnaireId.questionnaireId)
+  // Pure-read (write-time invariant): the restart path never lazily repairs
+  // sections on a published questionnaire.
+  const frozenFormSections = await readQuestionnaireFormSections(questionnaireId.questionnaireId)
 
   const created = await prisma.$transaction(async (tx) => {
     const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`

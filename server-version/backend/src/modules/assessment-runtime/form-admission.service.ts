@@ -351,6 +351,24 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
   assessmentId: string,
   section: SectionRow,
 ): Promise<FrozenUnitAdmissionV1> => {
+  // Steady-state fast path: when the section attempt already carries a frozen
+  // admission snapshot, return it directly. The heavy parent read (which pulls
+  // the full questionnaire definition) is only needed to activate a fresh
+  // admission, so an already-admitted delivery never re-reads the parent.
+  const existing = await prisma.questionnaireFormSectionAttempt.findUnique({
+    where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: assessmentId, sectionId: section.id } },
+    select: {
+      id: true,
+      attemptEpoch: true,
+      frozenAdmissionSnapshotEncrypted: true,
+      frozenAdmissionSnapshotHash: true,
+    },
+  })
+  if (existing) {
+    const stored = readStoredFormAdmission(existing)
+    if (stored) return stored
+  }
+
   // Load-once admission: the parent is read exactly once with the full
   // admission select and shared by the ensure and activate steps, so a
   // delivery never re-reads the same questionnaire assessment row.
@@ -362,7 +380,7 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷运行时版本不匹配，请重启测评', 409)
   }
-  const child = await ensureQuestionnaireSectionAttempt(assessmentId, section.id, parent.attemptEpoch)
+  const child = existing ?? await ensureQuestionnaireSectionAttempt(assessmentId, section.id, parent.attemptEpoch)
   return activateQuestionnaireFormAdmission({
     parent,
     sectionId: section.id,
@@ -376,6 +394,24 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
   section: CompositeSection,
   parent?: CompositeFormAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
+  // Steady-state fast path: when the section attempt already carries a frozen
+  // admission snapshot, return it directly. The heavy parent read (which pulls
+  // the full composite definition) is only needed to activate a fresh
+  // admission, so an already-admitted delivery never re-reads the parent.
+  const existing = await prisma.compositeFormSectionAttempt.findUnique({
+    where: { attemptId_sectionId: { attemptId, sectionId: section.id } },
+    select: {
+      id: true,
+      attemptEpoch: true,
+      frozenAdmissionSnapshotEncrypted: true,
+      frozenAdmissionSnapshotHash: true,
+    },
+  })
+  if (existing) {
+    const stored = readStoredFormAdmission(existing)
+    if (stored) return stored
+  }
+
   // Load-once admission: the parent is read exactly once with the full
   // admission select and shared by the ensure and activate steps, so a
   // delivery never re-reads the same composite attempt row. Callers that
@@ -389,7 +425,7 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
   if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }
-  const child = await ensureCompositeSectionAttempt(attemptId, section.id, loaded.attemptEpoch)
+  const child = existing ?? await ensureCompositeSectionAttempt(attemptId, section.id, loaded.attemptEpoch)
   return activateCompositeFormAdmission({
     parent: loaded,
     sectionId: section.id,

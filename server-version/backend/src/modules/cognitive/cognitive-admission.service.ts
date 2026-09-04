@@ -135,16 +135,20 @@ export const readStoredCognitiveAdmission = (
 export const ensureCognitiveAdmissionAtDelivery = async (
   sessionId: string,
   parent?: CompositeCognitiveAdmissionParent,
+  child?: CognitiveAdmissionChildRow,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const child = await prisma.cognitiveSession.findUnique({
+  // Load-once completion: the unified attempt-state reader already holds the
+  // child row (with the full admission select) and passes it in, so a
+  // current-unit delivery never re-reads the same cognitive session row.
+  const loaded = child ?? await prisma.cognitiveSession.findUnique({
     where: { id: sessionId },
     select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
   })
-  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
-  if (child.runtimeGeneration !== 'UNIFIED_V1') {
+  if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
+  if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知运行时版本不匹配，请重启测评', 409)
   }
-  return activateCognitiveAdmission(child, parent)
+  return activateCognitiveAdmission(loaded, parent)
 }
 
 export const activateCognitiveAdmission = async (
