@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto'
 import { nanoid } from 'nanoid'
-import { UserRole } from '@prisma/client'
+import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
 import { MAX_TOKEN_USES } from '../../constants'
@@ -738,6 +738,9 @@ export const listComposites = async (userId: string, role: UserRole) => {
       reportPackageProfile: _ignoredPackageProfile,
       ...rest
     } = item
+    // Parse the package labels once per composite and reuse for every child
+    // instead of re-parsing the frozen report package on each mapped item.
+    const packageSlotLabels = getFrozenPackageSlotLabels(item)
     return {
       ...rest,
       reportPackage: reportPackageSummary(item),
@@ -749,7 +752,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
         : null,
       canSetCopyable: canSetCopyableFor(item, role),
       itemCount: item.items.length,
-      items: item.items.map((child: any) => mapItemForTeacher(child, getFrozenPackageSlotLabels(item))),
+      items: item.items.map((child: any) => mapItemForTeacher(child, packageSlotLabels)),
       attemptCounts: counts.get(item.id) ?? emptyAttemptCounts(),
     }
   })
@@ -1535,6 +1538,12 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   assertOwner(composite, userId, role)
   assertDraft(composite)
   if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
+  // Publish gate (Work C): fail closed when any FORM module is not bound to a
+  // section. The write-time invariant guarantees every FORM item is sectioned
+  // on create/copy/import, so a published composite must never carry an orphan
+  // that the participant read path would otherwise have to lazily materialize.
+  const orphanFormItems = composite.items.filter((item: any) => item.type === 'FORM' && !item.formSectionId)
+  if (orphanFormItems.length > 0) throw compositeBadRequest('综合测评包含未归属区段的表单模块，发布失败')
   await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
@@ -2591,123 +2600,126 @@ const unifiedCompositeProgressSnapshot = (
   }
 }
 
-const getUnifiedCompositeAttemptState = async (
-  attemptId: string,
-  context: { userId?: string; recoveryTokenHash?: string },
-) => {
-  const attempt = await prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: attemptId },
+// Load-once attempt-state: the parent row is read exactly once (in
+// getAttemptState) with this full select and shared by the unified state
+// projection and the ensure*AtDelivery steps, so a state read never
+// re-reads the same composite attempt row for routing, projection, or
+// admission.
+const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
+  id: true,
+  userId: true,
+  recoveryTokenHash: true,
+  status: true,
+  deliveryMode: true,
+  runtimeGeneration: true,
+  attemptEpoch: true,
+  startedAt: true,
+  lastSavedAt: true,
+  completedAt: true,
+  anonymousCode: true,
+  contextSnapshotEncrypted: true,
+  contextSnapshotHash: true,
+  contextFrozenAt: true,
+  frozenActiveSlotSetEncrypted: true,
+  frozenActiveSlotSetHash: true,
+  compositeAssessment: {
     select: {
       id: true,
-      userId: true,
-      recoveryTokenHash: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      startedAt: true,
-      lastSavedAt: true,
-      completedAt: true,
-      anonymousCode: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      contextFrozenAt: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      compositeAssessment: {
+      name: true,
+      instruction: true,
+      reportPackageSnapshotEncrypted: true,
+      reportPackageKey: true,
+      reportPackageVersion: true,
+      reportPackageProfile: true,
+      items: {
+        orderBy: { position: 'asc' },
         select: {
           id: true,
-          name: true,
-          instruction: true,
-          reportPackageSnapshotEncrypted: true,
-          reportPackageKey: true,
-          reportPackageVersion: true,
-          reportPackageProfile: true,
-          items: {
-            orderBy: { position: 'asc' },
+          type: true,
+          position: true,
+          required: true,
+          scaleId: true,
+          formSectionId: true,
+          formType: true,
+          formLabel: true,
+          formPlaceholder: true,
+          formOptions: true,
+          contextKey: true,
+          scale: {
             select: {
               id: true,
-              type: true,
-              position: true,
-              required: true,
-              scaleId: true,
-              formSectionId: true,
+              code: true,
+              name: true,
+              description: true,
+              instruction: true,
+              instrumentClass: true,
+              instrumentVersion: true,
+            },
+          },
+          cognitiveAssignment: { select: { id: true, title: true } },
+        },
+      },
+      formSections: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          position: true,
+          contextSection: true,
+          items: {
+            orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
+            select: {
+              id: true,
               formType: true,
               formLabel: true,
               formPlaceholder: true,
               formOptions: true,
               contextKey: true,
-              scale: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  description: true,
-                  instruction: true,
-                  instrumentClass: true,
-                  instrumentVersion: true,
-                },
-              },
-              cognitiveAssignment: { select: { id: true, title: true } },
-            },
-          },
-          formSections: {
-            orderBy: { position: 'asc' },
-            select: {
-              id: true,
-              title: true,
-              description: true,
+              required: true,
               position: true,
-              contextSection: true,
-              items: {
-                orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
-                select: {
-                  id: true,
-                  formType: true,
-                  formLabel: true,
-                  formPlaceholder: true,
-                  formOptions: true,
-                  contextKey: true,
-                  required: true,
-                  position: true,
-                  formSectionPosition: true,
-                },
-              },
+              formSectionPosition: true,
             },
           },
-        },
-      },
-      scaleAssessments: {
-        orderBy: { startedAt: 'asc' },
-        select: {
-          id: true,
-          compositeItemId: true,
-          scaleId: true,
-          status: true,
-          progress: true,
-        },
-      },
-      cognitiveSessions: {
-        select: {
-          id: true,
-          assignmentId: true,
-          compositeItemId: true,
-          testType: true,
-          attemptNo: true,
-          status: true,
-          configVersion: true,
-          configSnapshotEncrypted: true,
-          engineVersion: true,
-          scoringVersion: true,
-          randomSeed: true,
-          deliveryMode: true,
-          runtimeGeneration: true,
-          compiledRuntimeHash: true,
         },
       },
     },
-  }) as any
-  if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  },
+  scaleAssessments: {
+    orderBy: { startedAt: 'asc' },
+    select: {
+      id: true,
+      compositeItemId: true,
+      scaleId: true,
+      status: true,
+      progress: true,
+    },
+  },
+  cognitiveSessions: {
+    select: {
+      id: true,
+      assignmentId: true,
+      compositeItemId: true,
+      testType: true,
+      attemptNo: true,
+      status: true,
+      configVersion: true,
+      configSnapshotEncrypted: true,
+      engineVersion: true,
+      scoringVersion: true,
+      randomSeed: true,
+      deliveryMode: true,
+      runtimeGeneration: true,
+      compiledRuntimeHash: true,
+    },
+  },
+} satisfies Prisma.CompositeAssessmentAttemptSelect
+
+const getUnifiedCompositeAttemptState = async (
+  attempt: any,
+  context: { userId?: string; recoveryTokenHash?: string },
+) => {
+  const attemptId = attempt.id
   const authorized = context.userId
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === context.recoveryTokenHash)
@@ -2803,7 +2815,7 @@ const getUnifiedCompositeAttemptState = async (
   if (currentUnit?.type === 'FORM_SECTION') {
     const section = formSections.find((candidate: any) => candidate.id === currentUnit.id)
     if (section) {
-      await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section))
+      await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section), attempt)
       currentItem = {
         id: section.id,
         type: 'FORM_SECTION',
@@ -2837,7 +2849,7 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
-      await ensureScaleAdmissionAtDelivery(child.id)
+      await ensureScaleAdmissionAtDelivery(child.id, attempt)
       currentItem = {
         id: item.id,
         type: 'SCALE',
@@ -2866,7 +2878,7 @@ const getUnifiedCompositeAttemptState = async (
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
     try {
-      await ensureCognitiveAdmissionAtDelivery(child.id)
+      await ensureCognitiveAdmissionAtDelivery(child.id, attempt)
       currentItem = {
         id: currentUnit.item.id,
         type: 'COGNITIVE',
@@ -3336,13 +3348,17 @@ const patchCompositeStateAfterFinalize = (
 }
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  // Load-once: the parent row is read exactly once with the full unified
+  // select and shared by the unified state projection and the
+  // ensure*AtDelivery steps. The legacy path (rare, pre-UNIFIED_V1 attempts)
+  // re-reads through findAttempt below.
   const runtime = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { userId: true, recoveryTokenHash: true, deliveryMode: true, runtimeGeneration: true },
-  })
+    select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT,
+  }) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
-    const state = await getUnifiedCompositeAttemptState(attemptId, context)
+    const state = await getUnifiedCompositeAttemptState(runtime, context)
     if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
       // Reconcile-once: patch parent completion fields onto the first projection.
       const finalized = await finalizeCompositeAttemptIfReady(attemptId)

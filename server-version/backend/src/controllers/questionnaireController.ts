@@ -527,6 +527,13 @@ export const questionnaireController = {
       }
 
       const sections = await formSectionService.ensureQuestionnaireFormSections(id)
+      // Publish gate (Work C): fail closed when any form item is not bound to
+      // a section. The write-time invariant guarantees every item is sectioned
+      // on create/copy/import, so a published questionnaire must never carry an
+      // orphan that the read path would otherwise have to lazily materialize.
+      const sectionedItemIds = new Set(sections.flatMap((section) => section.items.map((item) => item.id)))
+      const orphanItems = questionnaire.formItems.filter((item) => !sectionedItemIds.has(item.id))
+      if (orphanItems.length > 0) return error(res, '问卷包含未归属区段的表单题目，发布失败')
       const contentUnits = await formSectionService.listQuestionnaireContentUnits(id, sections)
       const contextSections = sections.filter((section) => (
         section.contextSection || section.items.some((item) => item.contextKey)

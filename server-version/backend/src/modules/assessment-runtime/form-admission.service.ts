@@ -374,21 +374,24 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
 export const ensureCompositeFormAdmissionAtDelivery = async (
   attemptId: string,
   section: CompositeSection,
+  parent?: CompositeFormAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
   // Load-once admission: the parent is read exactly once with the full
   // admission select and shared by the ensure and activate steps, so a
-  // delivery never re-reads the same composite attempt row.
-  const parent: CompositeFormAdmissionParent | null = await prisma.compositeAssessmentAttempt.findUnique({
+  // delivery never re-reads the same composite attempt row. Callers that
+  // already hold the parent (e.g. the unified attempt-state reader) pass it
+  // in to skip the redundant read.
+  const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: COMPOSITE_FORM_ADMISSION_PARENT_SELECT,
   })
-  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
-  if (parent.runtimeGeneration !== 'UNIFIED_V1') {
+  if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }
-  const child = await ensureCompositeSectionAttempt(attemptId, section.id, parent.attemptEpoch)
+  const child = await ensureCompositeSectionAttempt(attemptId, section.id, loaded.attemptEpoch)
   return activateCompositeFormAdmission({
-    parent,
+    parent: loaded,
     sectionId: section.id,
     definition: section,
     child,

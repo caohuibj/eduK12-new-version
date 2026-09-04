@@ -59,6 +59,25 @@ export type ScaleAdmissionChildRow = {
   scale: { id: string; code: string; name: string; instrumentVersion: string }
 }
 
+// Composite parent rows are loaded once (load-once admission) and shared by
+// the ensure* and activate* steps so a delivery never re-reads the same
+// composite attempt row. The unified attempt-state reader holds an already
+// loaded superset row and passes it in to skip the redundant read.
+export type CompositeScaleAdmissionParent = {
+  id: string
+  userId: string | null
+  recoveryTokenHash: string | null
+  deliveryMode: string
+  attemptEpoch: number
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  frozenActiveSlotSetEncrypted: string | null
+  frozenActiveSlotSetHash: string | null
+  compositeAssessment: {
+    formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
+  }
+}
+
 const hasContextSection = (sections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>): boolean => (
   sections.some((section) => Boolean(section.contextSection) || section.items.some((item) => Boolean(item.contextKey)))
 )
@@ -148,7 +167,10 @@ export const assertAdmissionParentBinding = (
   admission: FrozenUnitAdmissionV1,
 ): void => assertSharedAdmissionParentBinding(child, admission)
 
-export const ensureScaleAdmissionAtDelivery = async (assessmentId: string): Promise<FrozenUnitAdmissionV1> => {
+export const ensureScaleAdmissionAtDelivery = async (
+  assessmentId: string,
+  parent?: CompositeScaleAdmissionParent,
+): Promise<FrozenUnitAdmissionV1> => {
   const child = await prisma.assessment.findUnique({
     where: { id: assessmentId },
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
@@ -157,7 +179,7 @@ export const ensureScaleAdmissionAtDelivery = async (assessmentId: string): Prom
   if (child.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时版本不匹配，请重启测评', 409)
   }
-  return activateScaleAdmission(child)
+  return activateScaleAdmission(child, parent)
 }
 
 export const readStoredScaleAdmission = (
@@ -166,7 +188,10 @@ export const readStoredScaleAdmission = (
   readStoredUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答')
 )
 
-export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promise<FrozenUnitAdmissionV1> => {
+export const activateScaleAdmission = async (
+  row: ScaleAdmissionChildRow,
+  parent?: CompositeScaleAdmissionParent,
+): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredScaleAdmission(row)
   if (stored) return stored
   assertFinalOnly(row.deliveryMode)
@@ -235,7 +260,7 @@ export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promi
   }
 
   if (row.compositeAttemptId) {
-    const parent = await prisma.compositeAssessmentAttempt.findUnique({
+    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: row.compositeAttemptId },
       select: {
         id: true,
@@ -252,41 +277,41 @@ export const activateScaleAdmission = async (row: ScaleAdmissionChildRow): Promi
         },
       },
     })
-    if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
-    assertFinalOnly(parent.deliveryMode)
-    assertAttemptEpoch(parent.attemptEpoch, row.attemptEpoch)
+    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    assertFinalOnly(loaded.deliveryMode)
+    assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'SCALE')
     const slot = readRequiredScaleSlot({
-      encrypted: parent.frozenActiveSlotSetEncrypted,
-      storedHash: parent.frozenActiveSlotSetHash,
+      encrypted: loaded.frozenActiveSlotSetEncrypted,
+      storedHash: loaded.frozenActiveSlotSetHash,
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
     })
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
-    const requiresContext = hasContextSection(parent.compositeAssessment.formSections)
-    if (requiresContext && parent.contextSnapshotHash === null) {
+    const requiresContext = hasContextSection(loaded.compositeAssessment.formSections)
+    if (requiresContext && loaded.contextSnapshotHash === null) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
     }
-    const context = readCompositeAttemptContext(parent)
+    const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
     return persistAdmission(row.id, createFrozenUnitAdmission({
       attemptEpoch: row.attemptEpoch,
       scale: row.scale,
       principal: {
-        userId: row.userId ?? parent.userId,
-        recoveryTokenHash: parent.recoveryTokenHash,
+        userId: row.userId ?? loaded.userId,
+        recoveryTokenHash: loaded.recoveryTokenHash,
       },
       parent: {
         kind: 'composite',
-        parentId: parent.id,
+        parentId: loaded.id,
         slotKey,
         sourceDefinitionHash: slot.sourceDefinitionIdentity.hash,
         compiledRuntimeHash,
       },
       requiresContext,
-      contextSnapshotHash: parent.contextSnapshotHash,
+      contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
     }))
   }

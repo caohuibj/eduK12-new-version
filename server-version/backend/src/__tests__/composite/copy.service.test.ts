@@ -393,7 +393,25 @@ describe('copyComposite', () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({
       status: 'DRAFT',
       copyable: false,
-      items: [{ type: 'FORM', formType: 'text_input', formLabel: '年级' }],
+      items: [{
+        id: 'form-1',
+        type: 'FORM',
+        position: 0,
+        required: true,
+        formType: 'text_input',
+        formLabel: '年级',
+        formPlaceholder: null,
+        formOptions: null,
+        formSectionId: 'section-1',
+      }],
+      formSections: [{
+        id: 'section-1',
+        title: '基本信息',
+        description: null,
+        position: 0,
+        contextSection: false,
+        items: [{ id: 'form-1', formSectionId: 'section-1' }],
+      }],
     }))
     mockPrisma.course.findUnique.mockResolvedValue(libraryCourse)
     mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
@@ -401,6 +419,20 @@ describe('copyComposite', () => {
     expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ status: 'PUBLISHED' }),
     }))
+  })
+
+  it('rejects ADMIN publishing a draft with an orphan FORM module', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({
+      status: 'DRAFT',
+      copyable: false,
+      items: [{ id: 'form-1', type: 'FORM', position: 0, required: true, formType: 'text_input', formLabel: '年级', formSectionId: null }],
+    }))
+    mockPrisma.course.findUnique.mockResolvedValue(libraryCourse)
+    await expect(publishComposite('admin-1', ADMIN, 'source-1')).rejects.toMatchObject({
+      statusCode: 400,
+      message: '综合测评包含未归属区段的表单模块，发布失败',
+    })
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
   })
 
   it('forbids ADMIN from copying onto another teacher’s course', async () => {
