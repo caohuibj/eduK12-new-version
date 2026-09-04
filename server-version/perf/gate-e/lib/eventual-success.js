@@ -10,8 +10,39 @@ export const eventualSuccess = new Counter('gate_e_eventual_success');
 export const eventualFailure = new Counter('gate_e_eventual_failure');
 export const rateLimited429 = new Counter('gate_e_rate_limited_429');
 export const capacityBusy503 = new Counter('gate_e_capacity_busy_503');
+/** 503 broken down by response code (unit/aggregate/busy-unexpected). */
+export const busy503Unit = new Counter('gate_e_busy_503_unit');
+export const busy503Aggregate = new Counter('gate_e_busy_503_aggregate');
+export const unexpected503 = new Counter('gate_e_busy_503_unexpected');
 export const eventualSuccessRate = new Rate('gate_e_eventual_success_rate');
 export const eventualLatency = new Trend('gate_e_eventual_latency_ms', true);
+
+/**
+ * Classify a 503 response body code into one of the three capacity buckets.
+ * @param {string|object|null} body response body (string or parsed JSON)
+ * @returns {'unit'|'aggregate'|'unexpected'}
+ */
+export function classify503Code(body) {
+  if (!body) return 'unexpected';
+  let parsed = body;
+  if (typeof body === 'string') {
+    try { parsed = JSON.parse(body); } catch (_err) { return 'unexpected'; }
+  }
+  const code = parsed && typeof parsed === 'object' ? parsed.code : null;
+  if (code === 'ASSESSMENT_SUBMIT_BUSY') return 'unit';
+  if (code === 'COMPLETION_BUSY') return 'aggregate';
+  return 'unexpected';
+}
+
+/** Record a 503 response with its code classification. */
+export function record503(body, tags = {}) {
+  const cls = classify503Code(body);
+  capacityBusy503.add(1, tags);
+  if (cls === 'unit') busy503Unit.add(1, tags);
+  else if (cls === 'aggregate') busy503Aggregate.add(1, tags);
+  else unexpected503.add(1, tags);
+  return cls;
+}
 
 /** Fresh-write accounting (client-side). */
 export const fixturesUsed = new Counter('gate_e_fixtures_used');

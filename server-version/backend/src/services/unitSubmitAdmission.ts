@@ -36,12 +36,14 @@ export const isUnitSubmitAdmissionBusyError = (
 /**
  * Process-local UNIT FINAL submit admission.
  *
- * Gate-D candidate defaults (not production constants): permits 8 / queue 16 /
- * wait 500ms. Override via UNIT_SUBMIT_ADMISSION_* env vars for A/B runs.
+ * F1 (Gate-E): baseline default lowered to 7 to match the stable 3C5G1T
+ * envelope; queue 16 / wait 500ms unchanged. Override via
+ * UNIT_SUBMIT_ADMISSION_* env vars for A/B runs; unset env shows U7 in
+ * runtime metrics / startup config.
  */
 export const unitSubmitAdmission = new BoundedAdmissionGate({
   name: 'unit_submit',
-  maxConcurrent: configuredInteger('UNIT_SUBMIT_ADMISSION_LIMIT', 8),
+  maxConcurrent: configuredInteger('UNIT_SUBMIT_ADMISSION_LIMIT', 7),
   maxQueue: configuredInteger('UNIT_SUBMIT_ADMISSION_QUEUE', 16, true),
   maxWaitMs: configuredInteger('UNIT_SUBMIT_ADMISSION_TIMEOUT_MS', 500),
   retryAfterSeconds: configuredInteger('UNIT_SUBMIT_RETRY_AFTER_SECONDS', 1),
