@@ -55,6 +55,13 @@ export function handleSummary(data) {
   const fail = count('gate_e_eventual_failure');
   const state = data.state || {};
   const testRun = state.testRunDurationMs ? state.testRunDurationMs / 1000 : 0;
+  // v3.0 spec §10-12: load-generator accounting + two success rates.
+  const started = count('iterations');
+  const dropped = count('dropped_iterations');
+  const scheduled = Math.round(rate * testRun);
+  const fresh = count('gate_e_fresh_completions');
+  const startedRate = started > 0 ? fresh / started : 0;
+  const offeredRate = scheduled > 0 ? fresh / scheduled : 0;
   const summary = {
     profile: `E2 Scale fresh OL ${rate}/s`,
     target_rate: rate,
@@ -62,8 +69,16 @@ export function handleSummary(data) {
     success,
     fail,
     success_rate: success + fail > 0 ? success / (success + fail) : 0,
+    // load-generator accounting (spec §10-11)
+    scheduled_arrivals: scheduled,
+    started_iterations: started,
+    dropped_iterations: dropped,
+    start_rate: startedRate,
+    // two success rates (spec §12)
+    started_success_rate: startedRate,
+    offered_success_rate: offeredRate,
     students_per_s: testRun > 0 ? success / testRun : 0,
-    fresh_completions: count('gate_e_fresh_completions'),
+    fresh_completions: fresh,
     idempotent_replays: count('gate_e_idempotent_replays'),
     fixtures_used: count('gate_e_fixtures_used'),
     missing_fixtures: count('gate_e_missing_fixtures'),
