@@ -9,13 +9,20 @@ import { mapQuestionnaireSection } from '../../modules/assessment-runtime/form-s
 import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { tokenService } from '../../services/tokenService'
+import { hashPublicAccessToken, encryptPublicAccessToken } from '../../services/publicAccessTokenCrypto'
 
 /**
- * Work C — Runtime Hot-Path Convergence: Query Budget measurement contracts.
+ * Work C — Runtime Hot-Path Convergence: Prisma-operation Query Budget
+ * contracts (logical query budget).
  *
  * The suite is opt-in and runs against a dedicated PostgreSQL database. It
  * observes every Prisma call through a $use middleware and asserts that the
- * hot paths touched by Work C stay within a fixed query budget:
+ * hot paths touched by Work C stay within a fixed query budget. Note that this
+ * measures Prisma model/action call counts (a logical budget), not raw
+ * PostgreSQL round-trips: a single findUnique with nested includes may still
+ * issue multiple SQL statements. It is the right tool for catching the
+ * service-level read amplification Work C removes; compare true round-trips
+ * with the performance harness / Prisma query events / PG metrics.
  *
  *   1. Write-time invariant — a newly-created form item (course/general) is
  *      immediately assigned to a FormSection, so GET/start never lazily repair.
@@ -31,10 +38,13 @@ import { tokenService } from '../../services/tokenService'
  *      once and shared by routing, projection and admission.
  *   7. Public read path — getQuestionnaireByToken performs zero redundant
  *      ensure and zero materialization writes.
- *   8. Load-once admission — scale/cognitive delivery reads the child once
- *      and the composite parent once; when the unified attempt-state reader
- *      passes in both the parent and the already-loaded child, neither is
- *      re-read.
+ *   8. Narrow parent + lazy current-unit — scale/cognitive delivery reads the
+ *      current child exactly once (shared by runtime validation and admission)
+ *      while the parent projection carries only cheap child summaries.
+ *   9. Publish fail-closed — publish asserts the stored invariant and never
+ *      repairs an orphan form item.
+ *  10. Public composite read path — info/start perform no redundant section
+ *      read and no materialization writes.
  */
 const DB_URL = integrationDatabaseUrl(
   'WORKC_QUERY_BUDGET_DATABASE_URL',
@@ -966,16 +976,205 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     expect(value.status).toBe('IN_PROGRESS')
     expect(value.currentItem?.type).toBe('SCALE')
 
-    // Load-once completion: the unified attempt-state reader holds the child
-    // row (scaleAssessments in the parent select) and passes it to admission,
-    // so the current-unit delivery performs zero Assessment.findUnique reads.
+    // Narrow parent + lazy current-unit: the parent projection carries only
+    // cheap child summaries, so the current-unit delivery performs exactly one
+    // authoritative Assessment.findUnique (shared by runtime validation and
+    // admission) and never re-reads the composite parent.
     expect(callCount(calls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(1)
-    expect(callCount(calls, 'Assessment', 'findUnique')).toBe(0)
+    expect(callCount(calls, 'Assessment', 'findUnique')).toBe(1)
 
     await prisma.assessment.deleteMany({ where: { compositeAttemptId: attempt.id } })
     await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })
     await prisma.compositeAssessmentAttempt.delete({ where: { id: attempt.id } })
     await prisma.compositeAssessment.delete({ where: { id: composite.id } })
     await prisma.scale.delete({ where: { id: scale.id } })
+  })
+
+  it('public composite info performs no redundant section reads (pure-read)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const composite = await prisma.compositeAssessment.create({
+      data: {
+        code: `WORKC-QB-PUBINFO-${suffix}`,
+        name: 'Work C public info fixture',
+        createdBy: teacherId,
+        status: 'PUBLISHED',
+        publicEnabled: true,
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    })
+    await prisma.compositeFormSection.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        title: 'Work C public section',
+        position: 0,
+        contextSection: false,
+      },
+    })
+    const rawToken = `workc-qb-pubinfo-token-${suffix}`
+    await prisma.compositeAssessmentAccessToken.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        token: null,
+        tokenHash: hashPublicAccessToken(rawToken),
+        tokenEncrypted: encryptPublicAccessToken(rawToken),
+        createdBy: teacherId,
+        expiresAt: new Date(Date.now() + 60_000),
+        maxUses: 0,
+        usedCount: 0,
+        isActive: true,
+      },
+    })
+
+    const { value, calls } = await runObserved(() => compositeService.getPublicCompositeInfo(rawToken))
+    expect(value.id).toBe(composite.id)
+    // Token lookup + full composite graph read are the only reads; the public
+    // info path performs no explicit section read and no materialization writes.
+    expect(callCount(calls, 'CompositeAssessmentAccessToken', 'findUnique')).toBe(1)
+    expect(callCount(calls, 'CompositeAssessment', 'findUnique')).toBe(1)
+    expect(callCount(calls, 'CompositeFormSection', 'findMany')).toBe(0)
+    expect(callCount(calls, 'CompositeFormSection', 'create')).toBe(0)
+    expect(callCount(calls, 'CompositeFormSection', 'update')).toBe(0)
+
+    await prisma.compositeAssessmentAccessToken.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeFormSection.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeAssessment.delete({ where: { id: composite.id } })
+  })
+
+  it('public composite start performs no redundant section reads (pure-read)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const composite = await prisma.compositeAssessment.create({
+      data: {
+        code: `WORKC-QB-PUBSTART-${suffix}`,
+        name: 'Work C public start fixture',
+        createdBy: teacherId,
+        status: 'PUBLISHED',
+        publicEnabled: true,
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    })
+    await prisma.compositeFormSection.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        title: 'Work C public start section',
+        position: 0,
+        contextSection: false,
+      },
+    })
+    const rawToken = `workc-qb-pubstart-token-${suffix}`
+    await prisma.compositeAssessmentAccessToken.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        token: null,
+        tokenHash: hashPublicAccessToken(rawToken),
+        tokenEncrypted: encryptPublicAccessToken(rawToken),
+        createdBy: teacherId,
+        expiresAt: new Date(Date.now() + 60_000),
+        maxUses: 0,
+        usedCount: 0,
+        isActive: true,
+      },
+    })
+
+    const { value, calls } = await runObserved(() => compositeService.startPublicAttempt(rawToken))
+    expect(value.attempt.id).toBeTruthy()
+    // The public start path performs no explicit section read and no
+    // materialization writes; the full composite graph is loaded once for the
+    // attempt and once for the returned state.
+    expect(callCount(calls, 'CompositeFormSection', 'findMany')).toBe(0)
+    expect(callCount(calls, 'CompositeFormSection', 'create')).toBe(0)
+    expect(callCount(calls, 'CompositeFormSection', 'update')).toBe(0)
+
+    await prisma.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeAssessmentAccessToken.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeFormSection.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeAssessment.delete({ where: { id: composite.id } })
+  })
+
+  it('composite publish fails closed on an orphan FORM item (no repair)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const composite = await prisma.compositeAssessment.create({
+      data: {
+        code: `WORKC-QB-PUBFAIL-${suffix}`,
+        name: 'Work C publish fail fixture',
+        createdBy: teacherId,
+        status: 'DRAFT',
+      },
+    })
+    // Manually insert an orphan FORM item (formSectionId NULL) to simulate
+    // pre-Work-C / direct-DB data that bypassed the write-time invariant.
+    await prisma.compositeAssessmentItem.create({
+      data: {
+        compositeAssessmentId: composite.id,
+        type: 'FORM',
+        position: 0,
+        required: true,
+        formType: 'text_input',
+        formLabel: 'Work C orphan item',
+      },
+    })
+
+    let error: any
+    const { calls } = await runObserved(async () => {
+      try {
+        await compositeService.publishComposite(teacherId, 'TEACHER', composite.id)
+      } catch (err) {
+        error = err
+      }
+    })
+    expect(error?.statusCode).toBe(400)
+    // Publish must fail closed and must not repair the orphan: no section
+    // materialization and the orphan item stays unbound.
+    expect(callCount(calls, 'CompositeFormSection', 'create')).toBe(0)
+    expect(callCount(calls, 'CompositeFormSection', 'update')).toBe(0)
+    const stored = await prisma.compositeAssessmentItem.findFirst({ where: { compositeAssessmentId: composite.id } })
+    expect(stored?.formSectionId).toBeNull()
+
+    await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })
+    await prisma.compositeAssessment.delete({ where: { id: composite.id } })
+  })
+
+  it('questionnaire publish fails closed on an orphan form item (no repair)', async () => {
+    resetRuntimeObservabilityForTests()
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const questionnaire = await prisma.questionnaire.create({
+      data: {
+        code: `WORKC-QB-QPUBFAIL-${suffix}`,
+        name: 'Work C questionnaire publish fail fixture',
+        creatorId: teacherId,
+        type: 'COURSE',
+        status: 'DRAFT',
+        visibility: 'COURSE',
+      },
+    })
+    extraQuestionnaireIds.push(questionnaire.id)
+    // Manually insert an orphan form item (sectionId NULL).
+    await prisma.questionnaireFormItem.create({
+      data: {
+        questionnaireId: questionnaire.id,
+        type: 'text_input',
+        label: 'Work C orphan questionnaire item',
+        required: true,
+        position: 0,
+      },
+    })
+
+    let response: CapturedResponse | undefined
+    const { calls } = await runObserved(async () => {
+      response = await invoke(questionnaireController.publish, { id: questionnaire.id })
+    })
+    expect(response?.statusCode).toBe(400)
+    // Publish must fail closed and must not repair the orphan: no section
+    // materialization and the orphan item stays unbound.
+    expect(callCount(calls, 'QuestionnaireFormSection', 'create')).toBe(0)
+    expect(callCount(calls, 'QuestionnaireFormSection', 'update')).toBe(0)
+    const stored = await prisma.questionnaireFormItem.findFirst({ where: { questionnaireId: questionnaire.id } })
+    expect(stored?.sectionId).toBeNull()
+
+    await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: questionnaire.id } })
+    await prisma.questionnaireFormSection.deleteMany({ where: { questionnaireId: questionnaire.id } })
+    await prisma.questionnaire.delete({ where: { id: questionnaire.id } })
   })
 })

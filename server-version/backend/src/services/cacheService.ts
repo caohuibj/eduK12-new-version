@@ -131,12 +131,14 @@ class CacheService {
       const value = await this.client.get(key)
       // High-frequency hot path: hit/miss must not produce INFO (string
       // interpolation + stdout + docker logging). Keep lifecycle INFO and
-      // failure WARN/ERROR; per-access outcome goes to DEBUG only.
+      // failure WARN/ERROR; per-access outcome goes to DEBUG only and never
+      // interpolates the key (template interpolation still allocates even when
+      // the DEBUG level is disabled).
       if (!value) {
-        logger.debug(`[CacheService] 缓存未命中: ${key}`)
+        logger.debug('[CacheService] 缓存未命中')
         return null
       }
-      logger.debug(`[CacheService] 缓存命中: ${key}`)
+      logger.debug('[CacheService] 缓存命中')
       return JSON.parse(value) as T
     } catch (error) {
       logger.error('[CacheService] 获取缓存失败')
@@ -155,7 +157,7 @@ class CacheService {
 
     try {
       await this.client.setEx(key, ttl, JSON.stringify(value))
-      logger.debug(`[CacheService] 缓存已设置: ${key}, TTL: ${ttl}秒`)
+      logger.debug('[CacheService] 缓存已设置')
     } catch (error) {
       logger.error('[CacheService] 设置缓存失败')
     }
@@ -211,7 +213,7 @@ class CacheService {
     // 尝试从缓存获取
     const cachedValue = await this.get<T>(key)
     if (cachedValue !== null) {
-      logger.debug(`[CacheService] 缓存命中: ${key}`)
+      logger.debug('[CacheService] 缓存命中')
       return cachedValue
     }
 
@@ -232,7 +234,7 @@ class CacheService {
 
     // 缓存未命中，执行函数获取数据
     try {
-      logger.debug(`[CacheService] 缓存未命中: ${key}`)
+      logger.debug('[CacheService] 缓存未命中')
       return await request
     } finally {
       if (this.inFlight.get(key) === request) this.inFlight.delete(key)

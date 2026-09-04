@@ -28,8 +28,8 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
-import { ensureScaleAdmissionAtDelivery } from '../scale/scale-admission.service'
-import { ensureCognitiveAdmissionAtDelivery } from '../cognitive/cognitive-admission.service'
+import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
@@ -1542,8 +1542,11 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
 
 export const publishComposite = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
-  const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(id)
+  // Publish validates, it never repairs. The write-time invariant guarantees
+  // every FORM module is sectioned on create/copy/import, so a published
+  // composite must never carry an orphan that the participant read path would
+  // otherwise have to lazily materialize. loadComposite already includes
+  // formSections + items, so the orphan gate below is a pure in-memory assert.
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
   assertDraft(composite)
@@ -2111,9 +2114,8 @@ const createAttempt = async (
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
   // Pure-read (write-time invariant): the student start path never lazily
-  // repairs sections on a published composite.
-  const { readCompositeFormSections } = await import('./final-submit.service')
-  await readCompositeFormSections(compositeId)
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(compositeId, true)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
@@ -2164,8 +2166,9 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   if (!existing) throw compositeNotFound('综合测评记录不存在')
   if (existing.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
 
-  const { readCompositeFormSections } = await import('./final-submit.service')
-  await readCompositeFormSections(existing.compositeAssessmentId)
+  // Pure-read (write-time invariant): the student restart path never lazily
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(existing.compositeAssessmentId, true)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
@@ -2260,9 +2263,8 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
   // Pure-read (write-time invariant): the public info path never lazily
-  // repairs sections on a published composite.
-  const { readCompositeFormSections } = await import('./final-submit.service')
-  await readCompositeFormSections(composite.id)
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
   const current = await loadComposite(composite.id, true)
   const packageSlotLabels = getFrozenPackageSlotLabels(current)
   const units = [
@@ -2311,9 +2313,8 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string) => {
   const token = await findPublicToken(tokenValue)
   // Pure-read (write-time invariant): the public start path never lazily
-  // repairs sections on a published composite.
-  const { readCompositeFormSections } = await import('./final-submit.service')
-  await readCompositeFormSections(token.compositeAssessment.id)
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(token.compositeAssessment.id, true)
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -2361,8 +2362,9 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
     throw compositeForbidden('公开链接已失效')
   }
 
-  const { readCompositeFormSections } = await import('./final-submit.service')
-  await readCompositeFormSections(existing.compositeAssessmentId)
+  // Pure-read (write-time invariant): the public restart path never lazily
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(existing.compositeAssessmentId, true)
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
@@ -2714,14 +2716,8 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       progress: true,
       deliveryMode: true,
       runtimeGeneration: true,
-      runtimeSnapshotEncrypted: true,
-      compiledRuntimeHash: true,
-      frozenAdmissionSnapshotEncrypted: true,
-      frozenAdmissionSnapshotHash: true,
       attemptEpoch: true,
       startedAt: true,
-      submissionId: true,
-      submissionPayloadHash: true,
       scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
     },
   },
@@ -2737,18 +2733,11 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       attemptNo: true,
       status: true,
       configVersion: true,
-      configSnapshotEncrypted: true,
       engineVersion: true,
       scoringVersion: true,
       randomSeed: true,
       deliveryMode: true,
       runtimeGeneration: true,
-      compiledRuntimeHash: true,
-      resultSnapshotEncrypted: true,
-      submissionId: true,
-      submissionPayloadHash: true,
-      frozenAdmissionSnapshotEncrypted: true,
-      frozenAdmissionSnapshotHash: true,
     },
   },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
@@ -2870,14 +2859,18 @@ const getUnifiedCompositeAttemptState = async (
     }
   } else if (currentUnit?.type === 'SCALE') {
     const item = currentUnit.item
-    const child = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === item.id)
+    const summary = attempt.scaleAssessments.find((candidate: any) => candidate.compositeItemId === item.id)
     const slot = slotsByKey.get(compositeItemSlotKey(item.id, 'SCALE'))
-    if (!child?.id || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
-    // Lazy current-unit: only the unfinished Scale loads its frozen runtime.
-    // Load-once completion: the unified attempt-state reader already holds the
-    // child row with the full admission select, so the frozen runtime is read
-    // from the loaded child instead of re-querying the same assessment row.
-    if (!child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    if (!summary?.id || !slot) throw compositeConflict('量表冻结运行时不可用，请重启测评')
+    // Lazy current-unit: only the unfinished Scale loads its frozen runtime
+    // and admission fields. The parent projection carries only cheap child
+    // summaries, so the current unit does exactly one authoritative child read
+    // which is then shared by runtime validation and admission.
+    const child = await prisma.assessment.findUnique({
+      where: { id: summary.id },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    })
+    if (!child || !child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
       const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
       if (
@@ -2909,9 +2902,18 @@ const getUnifiedCompositeAttemptState = async (
       throw compositeConflict('量表冻结运行时不可用，请重启测评')
     }
   } else if (currentUnit?.type === 'COGNITIVE') {
-    const child = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === currentUnit.item.id)
+    const summary = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === currentUnit.item.id)
     const slot = slotsByKey.get(compositeItemSlotKey(currentUnit.item.id, 'COGNITIVE'))
-    if (!child || !slot || child.runtimeGeneration !== 'UNIFIED_V1' || child.compiledRuntimeHash !== (slot.sourceBinding as Record<string, unknown>).compiledRuntimeHash) {
+    if (!summary || !slot) throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
+    // Lazy current-unit: only the unfinished Cognitive session loads its full
+    // row. The parent projection carries only cheap child summaries, so the
+    // current unit does exactly one authoritative child read which is then
+    // shared by runtime validation and admission.
+    const child = await prisma.cognitiveSession.findUnique({
+      where: { id: summary.id },
+      select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
+    })
+    if (!child || child.runtimeGeneration !== 'UNIFIED_V1' || child.compiledRuntimeHash !== (slot.sourceBinding as Record<string, unknown>).compiledRuntimeHash) {
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
     try {

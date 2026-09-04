@@ -706,7 +706,15 @@ export const generalQuestionnaireController = {
         }
       }
 
-      const sections = await formSectionService.ensureQuestionnaireFormSections(id)
+      // Publish validates, it never repairs. The write-time invariant
+      // guarantees every form item is sectioned on create/copy/import, so a
+      // published questionnaire must never carry an orphan that the read path
+      // would otherwise have to lazily materialize. The pure read below is
+      // used only to assert the stored invariant (no section is created here).
+      const sections = await formSectionService.readQuestionnaireFormSections(id)
+      const sectionedItemIds = new Set(sections.flatMap((section) => section.items.map((item) => item.id)))
+      const orphanItems = questionnaire.formItems.filter((item) => !sectionedItemIds.has(item.id))
+      if (orphanItems.length > 0) return error(res, '问卷包含未归属区段的表单题目，发布失败')
       const units = await formSectionService.listQuestionnaireContentUnits(id, sections)
       const contextSections = sections.filter((section) => (
         section.contextSection || section.items.some((item) => item.contextKey)

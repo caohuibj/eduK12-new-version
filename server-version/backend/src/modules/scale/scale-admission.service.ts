@@ -180,6 +180,16 @@ export const ensureScaleAdmissionAtDelivery = async (
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
   })
   if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+  // Identity assertion (Work C): when a caller supplies an already-loaded child
+  // or parent, verify the structural relationship that the old DB query used to
+  // guarantee implicitly. A mismatched pairing would otherwise persist a frozen
+  // admission snapshot under the wrong parent binding.
+  if (child && child.id !== assessmentId) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表记录与请求身份不匹配', 409)
+  }
+  if (parent && loaded.compositeAttemptId !== parent.id) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表上级记录与请求身份不匹配', 409)
+  }
   if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时版本不匹配，请重启测评', 409)
   }

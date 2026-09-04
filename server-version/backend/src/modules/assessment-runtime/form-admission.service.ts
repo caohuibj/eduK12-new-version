@@ -422,6 +422,12 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
     select: COMPOSITE_FORM_ADMISSION_PARENT_SELECT,
   })
   if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  // Identity assertion (Work C): when a caller supplies an already-loaded
+  // parent, verify it matches the attemptId so a mismatched pairing can never
+  // persist a frozen admission under the wrong parent binding.
+  if (parent && parent.id !== attemptId) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '综合测评上级记录与请求身份不匹配', 409)
+  }
   if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }

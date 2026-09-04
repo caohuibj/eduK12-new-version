@@ -64,7 +64,7 @@ import {
 import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unified-aggregate'
 import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
 import { runnerDefinition } from '../modules/scale/scale-definition'
-import { ensureScaleAdmissionAtDelivery } from '../modules/scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../modules/scale/scale-admission.service'
 import { ensureQuestionnaireFormAdmissionAtDelivery } from '../modules/assessment-runtime/form-admission.service'
 import {
   mapQuestionnaireSection,
@@ -317,14 +317,8 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
           progress: true,
           deliveryMode: true,
           runtimeGeneration: true,
-          runtimeSnapshotEncrypted: true,
-          compiledRuntimeHash: true,
-          frozenAdmissionSnapshotEncrypted: true,
-          frozenAdmissionSnapshotHash: true,
           attemptEpoch: true,
           startedAt: true,
-          submissionId: true,
-          submissionPayloadHash: true,
           questionnaireAssessmentId: true,
           compositeAttemptId: true,
           scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
@@ -412,25 +406,28 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
     currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
     await ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mapQuestionnaireSection(current.section))
   } else if (current?.type === 'SCALE') {
-    const child = scaleMap.get(current.item.scaleId)
-    if (!child?.id) {
+    const summary = scaleMap.get(current.item.scaleId)
+    if (!summary?.id) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
-    // Lazy current-unit projection: only the unfinished Scale loads its frozen runtime.
-    const runtimeChild = await prisma.assessment.findUnique({
-      where: { id: child.id },
-      select: { id: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+    // Lazy current-unit projection: only the unfinished Scale loads its frozen
+    // runtime and admission fields. The parent projection carries only cheap
+    // child summaries, so the current unit does exactly one authoritative child
+    // read which is then shared by runtime validation and admission.
+    const child = await prisma.assessment.findUnique({
+      where: { id: summary.id },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     })
-    if (!runtimeChild?.runtimeSnapshotEncrypted) {
+    if (!child?.runtimeSnapshotEncrypted) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(runtimeChild.runtimeSnapshotEncrypted)
+      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
       const slot = slotsByKey.get(questionnaireScaleSlotKey(current.item.id))
       if (
         runtime.instrumentKey !== current.item.scale.code
         || runtime.instrumentVersion !== current.item.scale.instrumentVersion
-        || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
+        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
         || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
       ) throw new Error('Scale runtime identity mismatch')
       await ensureScaleAdmissionAtDelivery(child.id, undefined, child)
