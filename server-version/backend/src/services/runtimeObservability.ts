@@ -5,6 +5,8 @@ import { logger } from '../utils/logger'
 
 export type RequestObservationPhase =
   | 'resume_auth'
+  | 'auth_account_lookup'
+  | 'request_body_receive_parse'
   | 'transaction_acquisition'
   | 'transaction'
   | 'completion_queue_wait'
@@ -384,9 +386,16 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
     }
     const responseDurationMs = Math.max(0, durationMs - coveredPhaseDurationMs(observation, requestEndedAt))
     observeLabeledHistogram(phaseHistograms, { phase: 'response', route }, responseDurationMs)
-    const dominantPhase = dominantPhaseFor(exclusivePhaseAttribution(observation, requestEndedAt))
+    // Defer the exclusive dominant-phase attribution until a request is actually
+    // slow (>= 500ms). It allocates Sets/Maps and sorts phase boundaries, so
+    // computing it on every request adds avoidable CPU + GC pressure on the hot
+    // path; the result is only consumed by the slow-request thresholds below.
+    let dominantPhase: string | null = null
     for (const threshold of SLOW_REQUEST_THRESHOLDS) {
       if (durationMs > threshold.milliseconds) {
+        if (dominantPhase === null) {
+          dominantPhase = dominantPhaseFor(exclusivePhaseAttribution(observation, requestEndedAt))
+        }
         incrementSlowRequestCount({
           route,
           threshold: threshold.label,

@@ -13,6 +13,9 @@ describe('finalDraftCapacityRetry', () => {
     expect(isFinalDraftCapacityRetryable({ status: null, message: 'Network Error', retryable: true })).toBe(true)
     expect(isFinalDraftCapacityRetryable({ status: 409, code: 'STALE_ATTEMPT' })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 400, code: 'SUBMISSION_PAYLOAD_CONFLICT' })).toBe(false)
+    // Gate-E A1: public limiter 429 must NOT enter FinalDraft capacity retry.
+    expect(isFinalDraftCapacityRetryable({ status: 429 })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 429, code: 'RATE_LIMITED' })).toBe(false)
   })
 
   it('uses Retry-After as a floor and grows with attempt + jitter', () => {

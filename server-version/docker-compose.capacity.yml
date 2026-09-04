@@ -1,0 +1,77 @@
+# ============================================================
+# Gate-E / capacity overlay (scaffold)
+#
+# Use with an isolated project name and CAPACITY_PREFIX so containers
+# never collide with steady-state ptool-* names or volumes.
+#
+# Example:
+#   export CAPACITY_PREFIX=eduk12-gate47
+#   export COMPOSE_PROJECT_NAME=eduk12-gate47
+#   docker compose -f docker-compose.yml -f docker-compose.capacity.yml \
+#     --env-file .env.capacity config
+#
+# Placeholders below are intentionally conservative. Pin cpuset only when
+# the host layout is known (uncomment and set CAPACITY_*_CPUSET).
+# Never `docker compose down -v` against shared ptool-* volumes.
+# ============================================================
+
+services:
+  postgres:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-postgres
+    # cpu / memory placeholders (Compose classic fields; adjust per host)
+    cpus: ${CAPACITY_POSTGRES_CPUS:-2.0}
+    mem_limit: ${CAPACITY_POSTGRES_MEM_LIMIT:-2g}
+    # cpuset: ${CAPACITY_POSTGRES_CPUSET:-0-1}
+    ports: []
+
+  redis:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-redis
+    cpus: ${CAPACITY_REDIS_CPUS:-0.5}
+    mem_limit: ${CAPACITY_REDIS_MEM_LIMIT:-512m}
+    # cpuset: ${CAPACITY_REDIS_CPUSET:-2}
+    ports: []
+
+  backend:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-backend
+    cpus: ${CAPACITY_BACKEND_CPUS:-4.0}
+    mem_limit: ${CAPACITY_BACKEND_MEM_LIMIT:-3g}
+    # cpuset: ${CAPACITY_BACKEND_CPUSET:-0-3}
+    environment:
+      BACKGROUND_WORKERS_ENABLED: ${BACKGROUND_WORKERS_ENABLED:-false}
+      # Gate-E locked envelope (also defaulted in baseline x-app-environment)
+      UNIT_SUBMIT_ADMISSION_LIMIT: ${UNIT_SUBMIT_ADMISSION_LIMIT:-7}
+      AGGREGATE_FINALIZATION_ADMISSION_LIMIT: ${AGGREGATE_FINALIZATION_ADMISSION_LIMIT:-3}
+      PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
+    ports:
+      - "${CAPACITY_BACKEND_HOST_PORT:-3300}:3000"
+
+  backend-volume-init:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-backend-volume-init
+
+  worker:
+    # Capacity Assessment mainline is API-only; keep worker off unless explicitly profiled.
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-worker
+    profiles: ["capacity-worker"]
+    cpus: ${CAPACITY_WORKER_CPUS:-1.0}
+    mem_limit: ${CAPACITY_WORKER_MEM_LIMIT:-1g}
+    # cpuset: ${CAPACITY_WORKER_CPUSET:-4}
+
+  frontend:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-frontend
+    cpus: ${CAPACITY_FRONTEND_CPUS:-1.0}
+    mem_limit: ${CAPACITY_FRONTEND_MEM_LIMIT:-512m}
+    # cpuset: ${CAPACITY_FRONTEND_CPUSET:-5}
+    ports:
+      - "${CAPACITY_FRONTEND_HTTP_PORT:-3380}:80"
+
+  migrate:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-migrate
+
+  checkin-token-backfill:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-checkin-token-backfill
+
+  release-preflight:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-release-preflight
+
+  seed:
+    container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-seed

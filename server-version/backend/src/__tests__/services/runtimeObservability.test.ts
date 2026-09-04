@@ -146,4 +146,30 @@ describe('runtime observability', () => {
     expect(metrics).toContain('ptool_bounded_admission_active{gate="unit_submit"} 4')
     expect(metrics).toContain('ptool_bounded_admission_queue{gate="unit_submit"} 5')
   })
+
+
+  it('records auth_account_lookup and request_body_receive_parse phases', async () => {
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      path: '/api/auth/me',
+      baseUrl: '',
+      route: { path: '/api/auth/me' },
+    } as any
+    let phaseWork: Promise<void> | undefined
+
+    requestObservabilityMiddleware(request, response, () => {
+      phaseWork = (async () => {
+        await measureRequestPhase('auth_account_lookup', async () => undefined)
+        await measureRequestPhase('request_body_receive_parse', async () => undefined)
+      })()
+    })
+    await phaseWork
+    response.emit('finish')
+
+    const metrics = metricText()
+    expect(metrics).toContain('phase="auth_account_lookup"')
+    expect(metrics).toContain('phase="request_body_receive_parse"')
+  })
+
 })

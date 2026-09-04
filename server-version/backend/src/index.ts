@@ -1,5 +1,5 @@
 import express from 'express'
-import { rateLimit } from 'express-rate-limit'
+import { publicAssessmentRateLimiters } from './middleware/publicAssessmentRateLimit'
 import cors from 'cors'
 import helmet from 'helmet'
 import { createServer } from 'http'
@@ -20,7 +20,7 @@ import { cacheService } from './services/cacheService'
 import { closeQueues } from './config/queue'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
-import { requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
+import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -49,13 +49,6 @@ import assetRoutes, { publicAssetRouter } from './routes/assets'
 
 const app = express()
 
-const publicAssessmentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 600,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-})
-
 // 创建 HTTP 服务器
 const server = createServer(app)
 
@@ -82,8 +75,49 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
-app.use(express.json({ limit: '2mb' }))
-app.use(express.urlencoded({ extended: true, limit: '1mb' }))
+const jsonBodyParser = express.json({ limit: '2mb' })
+const urlencodedBodyParser = express.urlencoded({ extended: true, limit: '1mb' })
+app.use((req, res, next) => {
+  const startedAt = process.hrtime.bigint()
+  jsonBodyParser(req, res, (error) => {
+    const endedAt = process.hrtime.bigint()
+    const method = String(req.method || 'GET').toUpperCase()
+    if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
+      recordRequestPhase(
+        'request_body_receive_parse',
+        Number(endedAt - startedAt) / 1_000_000,
+        startedAt,
+        endedAt,
+      )
+    }
+    if (error) {
+      next(error)
+      return
+    }
+    next()
+  })
+})
+app.use((req, res, next) => {
+  // json parser already consumed JSON bodies; urlencoded only runs for form posts.
+  if (req.is('application/json')) {
+    next()
+    return
+  }
+  const startedAt = process.hrtime.bigint()
+  urlencodedBodyParser(req, res, (error) => {
+    const endedAt = process.hrtime.bigint()
+    const method = String(req.method || 'GET').toUpperCase()
+    if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && req.is('application/x-www-form-urlencoded')) {
+      recordRequestPhase(
+        'request_body_receive_parse',
+        Number(endedAt - startedAt) / 1_000_000,
+        startedAt,
+        endedAt,
+      )
+    }
+    next(error)
+  })
+})
 app.use('/api', csrfProtection)
 
 // 静态文件服务 - 使用绝对路径
@@ -182,17 +216,17 @@ app.use('/api/public/assets', publicAssetRouter)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
 app.use('/api/composite-assessments', compositeRoutes)
-app.use('/api/public/composite-assessments', publicAssessmentLimiter, compositePublicRoutes)
+app.use('/api/public/composite-assessments', ...publicAssessmentRateLimiters, compositePublicRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
 
 // 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
 if (config.cognitiveModuleEnabled) {
   app.use('/api/cognitive', cognitiveRoutes)
-  app.use('/api/public/cognitive', publicAssessmentLimiter, cognitivePublicRoutes)
+  app.use('/api/public/cognitive', ...publicAssessmentRateLimiters, cognitivePublicRoutes)
 }
 
-app.use('/api/public', publicAssessmentLimiter, publicRoutes)
+app.use('/api/public', ...publicAssessmentRateLimiters, publicRoutes)
 
 // 404 处理
 app.use(notFoundHandler)

@@ -23,6 +23,17 @@ const configSchema = z.object({
   publicCheckinUploadTokenLimit: z.number().int().min(1).max(10000),
   publicCheckinSubmitIpLimit: z.number().int().min(1).max(10000),
   publicCheckinSubmitTokenLimit: z.number().int().min(1).max(10000),
+  publicAssessmentWindowMs: z.number().int().min(60_000).max(3_600_000),
+  // Classroom NAT sizing (IP budgets). Distinct from shared-link start-token audience.
+  publicAssessmentExpectedClassSize: z.number().int().min(1).max(100_000),
+  // Shared public start-link audience (token budgets). Not the same as class size.
+  publicAssessmentExpectedStartTokenAudience: z.number().int().min(1).max(100_000),
+  publicAssessmentIpGetLimit: z.number().int().min(1).max(5_000_000),
+  publicAssessmentIpFinalLimit: z.number().int().min(1).max(5_000_000),
+  publicAssessmentTokenGetLimit: z.number().int().min(1).max(5_000_000),
+  publicAssessmentTokenFinalLimit: z.number().int().min(1).max(5_000_000),
+  publicAssessmentRecoveryGetLimit: z.number().int().min(1).max(5_000_000),
+  publicAssessmentRecoveryFinalLimit: z.number().int().min(1).max(5_000_000),
   // Keep legacy static uploads available only during the reversible migration
   // window. Set ASSET_MIGRATION_COMPLETE=true after all references are copied
   // and verified.
@@ -75,6 +86,34 @@ const parsePositiveInteger = (name: string, fallback: number): number => {
   return parsed
 }
 
+
+const parseBoundedInteger = (name: string, fallback: number, min: number, max: number): number => {
+  const value = process.env[name]
+  if (value === undefined || value === '') return fallback
+
+  const parsed = Number(value)
+  if (!Number.isSafeInteger(parsed) || parsed < min || parsed > max) {
+    throw new Error(`❌ ${name} must be an integer between ${min} and ${max} (got '${value}')`)
+  }
+  return parsed
+}
+
+/** Derive public-assessment ceilings from class-size (IP) / start-token-audience (token) formulas unless an explicit limit is set. */
+const resolvePublicAssessmentLimit = (
+  explicitName: string,
+  formulaValue: number,
+): number => {
+  const explicit = process.env[explicitName]
+  if (explicit !== undefined && explicit !== '') {
+    return parseBoundedInteger(explicitName, formulaValue, 1, 5_000_000)
+  }
+  if (!Number.isSafeInteger(formulaValue) || formulaValue < 1) {
+    throw new Error(`❌ Derived ${explicitName} must be a positive integer (got ${formulaValue})`)
+  }
+  return Math.min(5_000_000, formulaValue)
+}
+
+
 // 严格布尔环境变量解析：仅接受 'true'/'false'，缺省回落 fallback。
 // 不允许使用 z.coerce.boolean()（因为 Boolean('false') === true，会误判）。
 const parseBooleanEnv = (name: string, fallback: boolean): boolean => {
@@ -87,6 +126,23 @@ const parseBooleanEnv = (name: string, fallback: boolean): boolean => {
 
 // 获取项目根目录（backend目录）
 const projectRoot = path.resolve(__dirname, '..')
+
+
+// Class size drives IP NAT budgets only. Shared-link audience is separate:
+// one public start-token may be opened by far more students than one classroom.
+const publicAssessmentExpectedClassSize = parsePositiveInteger('PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE', 60)
+const publicAssessmentExpectedStartTokenAudience = parsePositiveInteger(
+  'PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE',
+  500,
+)
+const publicAssessmentGetsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_GETS_PER_STUDENT', 40)
+const publicAssessmentFinalsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_FINALS_PER_STUDENT', 8)
+const publicAssessmentNatShareFactor = parsePositiveInteger('PUBLIC_ASSESSMENT_NAT_SHARE_FACTOR', 50)
+// F3 (Gate-E): a single public bundle may legally finalize > 8 units across its
+// children; the recovery FINAL ceiling must cover that bundle width plus a
+// restart/idempotent-retry headroom instead of hard-binding finalsPerStudent.
+// Env override keeps production tunable.
+const publicAssessmentRecoveryBundleMultiplier = parsePositiveInteger('PUBLIC_ASSESSMENT_RECOVERY_BUNDLE_MULTIPLIER', 4)
 
 const rawConfig = {
   port: parsePort(),
@@ -108,12 +164,42 @@ const rawConfig = {
   assetSigningSecret: process.env.ASSET_SIGNING_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-asset-signing-secret-not-for-production'),
   // 使用绝对路径，避免PM2等工作目录问题
   uploadDir: process.env.UPLOAD_DIR || path.join(projectRoot, 'uploads'),
-  // Public check-in limits use a 15-minute window. Token limits are shared by
-  // the whole class link; IP limits are intentionally wider for school NATs.
+  // Public check-in limits use a 15-minute window.
+  // Assessment IP limits use class_size × per_student × NAT (school NAT share).
+  // Assessment start-token limits use start_token_audience × per_student
+  // (shared-link audience ≠ classroom size).
   publicCheckinUploadIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_IP_LIMIT', 1800),
   publicCheckinUploadTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT', 600),
   publicCheckinSubmitIpLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_IP_LIMIT', 600),
   publicCheckinSubmitTokenLimit: parsePositiveInteger('PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT', 120),
+  publicAssessmentWindowMs: parseBoundedInteger('PUBLIC_ASSESSMENT_WINDOW_MS', 15 * 60 * 1000, 60_000, 3_600_000),
+  publicAssessmentExpectedClassSize,
+  publicAssessmentExpectedStartTokenAudience,
+  publicAssessmentIpGetLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_IP_GET_LIMIT',
+    publicAssessmentExpectedClassSize * publicAssessmentGetsPerStudent * publicAssessmentNatShareFactor,
+  ),
+  publicAssessmentIpFinalLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_IP_FINAL_LIMIT',
+    publicAssessmentExpectedClassSize * publicAssessmentFinalsPerStudent * publicAssessmentNatShareFactor,
+  ),
+  publicAssessmentTokenGetLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT',
+    publicAssessmentExpectedStartTokenAudience * publicAssessmentGetsPerStudent,
+  ),
+  publicAssessmentTokenFinalLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT',
+    publicAssessmentExpectedStartTokenAudience * publicAssessmentFinalsPerStudent,
+  ),
+  publicAssessmentRecoveryGetLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT',
+    publicAssessmentGetsPerStudent,
+  ),
+  publicAssessmentRecoveryFinalLimit: resolvePublicAssessmentLimit(
+    'PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT',
+    // F3: cover a full legal (multi-unit) bundle width + restart/idempotent headroom.
+    publicAssessmentFinalsPerStudent * publicAssessmentRecoveryBundleMultiplier,
+  ),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   assetMigrationComplete: parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   // 数据加密密钥 (生产环境必需)
