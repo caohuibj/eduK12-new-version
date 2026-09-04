@@ -29,6 +29,9 @@ const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
 const SCALE_N = Number(process.env.SCALE_FIXTURE_COUNT || 1200)
 const FORM_N = Number(process.env.FORM_FIXTURE_COUNT || 300)
 const COG_N = Number(process.env.COG_FIXTURE_COUNT || 200)
+// v3.0 §34-36: real business scale sizes, not 3-item fake.
+// Small=5 (WHO-5), Typical=25 (SDQ), Large=21 (TEXI) / 20 (ADEXI).
+const SCALE_ITEM_COUNT = Number(process.env.SCALE_ITEM_COUNT || 3)
 const JWT_SECRET = process.env.JWT_SECRET!
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'gate47admin'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Gate47AdminPass!'
@@ -163,7 +166,7 @@ async function main() {
   const headers = authHeaders(token, csrf)
 
   const runId = randomUUID().slice(0, 8)
-  const definition = scaleDefinitionFor(3, `G47-SCALE-${runId}`)
+  const definition = scaleDefinitionFor(SCALE_ITEM_COUNT, `G47-SCALE-${runId}`)
   const definitionHash = hashScaleDefinition(definition)
 
   // One shared published scale for all scale assessments
@@ -197,7 +200,7 @@ async function main() {
       instrumentVersion: '2.0.0',
       definition: definition as unknown as Prisma.InputJsonValue,
       definitionHash,
-      itemCount: 3,
+      itemCount: SCALE_ITEM_COUNT,
       dimensionCount: 1,
     },
   })

@@ -6,12 +6,15 @@ import { SharedArray } from 'k6/data';
 import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http.js';
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
-const fixtures = JSON.parse(open(fixturePath));
 const mode = String(__ENV.MODE || 'manyParent');
 const groupName = __ENV.GROUP || (mode === 'sameParent' ? 'sameParent' : 'mixed');
 const peak = Number(__ENV.PEAK || (mode === 'sameParent' ? 50 : 100));
 
-const requests = new SharedArray('e4-fixtures', () => loadFixtureGroup(fixtures, groupName));
+// MEM FIX: parse fixture file once inside SharedArray (not per-VU module level).
+const requests = new SharedArray('e4-fixtures', () => {
+  const fixtures = JSON.parse(open(fixturePath));
+  return loadFixtureGroup(fixtures, groupName);
+});
 
 export const options = {
   scenarios: {

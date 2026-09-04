@@ -4,6 +4,7 @@ import {
   isDurableSuccessStatus,
   recordEventualOutcome,
   record503,
+  capacityRetries,
   fixturesUsed,
   freshCompletions,
   idempotentReplays,
@@ -11,6 +12,34 @@ import {
 } from './eventual-success.js';
 
 const baseUrl = String(__ENV.BASE_URL || 'http://127.0.0.1:3300').replace(/\/$/, '');
+
+// Retry contract modes (v4 review): 'finaldraft' (exact frontend exponential
+// backoff + jitter), 'fixed' (legacy sleep(Retry-After)), 'off' (no retry).
+const retryMode = String(__ENV.RETRY_MODE || 'finaldraft');
+const maxAttempts = Number(__ENV.CAPACITY_RETRY_ATTEMPTS || 4);
+
+// Frontend isFinalDraftCapacityRetryable: 503/502/504 or network failure.
+// 429 is a hard stop (never retried).
+function isRetryableStatus(status) {
+  const s = Number(status);
+  return s === 503 || s === 502 || s === 504 || s === 0;
+}
+
+// Exact port of frontend finalDraftCapacityRetryDelayMs (attempt is 1-based):
+//   delay = max(Retry-AfterMs, 1000 * 2^(attempt-1)) + jitter(0..exponential)
+//   safety-capped at 30s. Jitter is floor-preserving so Retry-After is a floor,
+//   not a hard 1s concentrate.
+function finalDraftRetryDelayMs(attempt, retryAfterMs) {
+  const SAFETY_CAP_MS = 30000;
+  const BASE_DELAY_MS = 1000;
+  const safeAttempt = Math.max(1, Math.floor(attempt));
+  const retryFloor = (retryAfterMs !== null && isFinite(retryAfterMs) && retryAfterMs >= 0)
+    ? Math.min(SAFETY_CAP_MS, Math.max(0, retryAfterMs)) : 0;
+  const exponential = Math.min(SAFETY_CAP_MS, BASE_DELAY_MS * Math.pow(2, safeAttempt - 1));
+  const sampled = Math.min(1, Math.max(0, Math.random()));
+  const jitter = Math.floor(sampled * (exponential + 1));
+  return Math.min(SAFETY_CAP_MS, Math.max(retryFloor, exponential) + jitter);
+}
 
 export function loadFixtureGroup(fixtures, groupName) {
   const group = fixtures[groupName];
@@ -65,7 +94,6 @@ export function runLogicalSubmit(request, tags = {}) {
   }
 
   fixturesUsed.add(1, tags);
-  const maxAttempts = Number(__ENV.CAPACITY_RETRY_ATTEMPTS || 4);
   const started = Date.now();
   let lastStatus = 0;
   let sawFreshCompletion = false;
@@ -142,10 +170,18 @@ export function runLogicalSubmit(request, tags = {}) {
       return false;
     }
 
-    if (response.status === 503 && attempt < maxAttempts) {
-      record503(response.body, tags);
-      const retryAfter = Number(response.headers['Retry-After'] || response.headers['retry-after'] || 1);
-      sleep(Math.min(30, Math.max(0.2, retryAfter)));
+    if (retryMode !== 'off' && isRetryableStatus(response.status) && attempt < maxAttempts) {
+      if (response.status === 503) record503(response.body, tags);
+      capacityRetries.add(1, tags);
+      const retryAfterSec = Number(response.headers['Retry-After'] || response.headers['retry-after'] || 1);
+      let delaySec;
+      if (retryMode === 'finaldraft') {
+        delaySec = finalDraftRetryDelayMs(attempt, retryAfterSec * 1000) / 1000;
+      } else {
+        // fixed: sleep exactly Retry-After (legacy adversarial behavior)
+        delaySec = Math.min(30, Math.max(0.2, retryAfterSec));
+      }
+      sleep(delaySec);
       continue;
     }
 

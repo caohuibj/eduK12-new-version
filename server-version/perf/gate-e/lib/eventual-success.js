@@ -16,6 +16,8 @@ export const busy503Aggregate = new Counter('gate_e_busy_503_aggregate');
 export const unexpected503 = new Counter('gate_e_busy_503_unexpected');
 export const eventualSuccessRate = new Rate('gate_e_eventual_success_rate');
 export const eventualLatency = new Trend('gate_e_eventual_latency_ms', true);
+/** Number of capacity (503) retries issued for a logical submit (v3.0 §31). */
+export const capacityRetries = new Counter('gate_e_capacity_retries');
 
 /**
  * Classify a 503 response body code into one of the three capacity buckets.

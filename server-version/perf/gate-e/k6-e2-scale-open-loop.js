@@ -9,14 +9,19 @@ import { SharedArray } from 'k6/data';
 import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http.js';
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
-const fixtures = JSON.parse(open(fixturePath));
 const rate = Number(__ENV.TARGET_SUCCESS_RATE || 25);
 const duration = String(__ENV.DURATION || '20s');
 const groupName = __ENV.GROUP || 'scale';
 const preAllocatedVUs = Math.max(1, Number(__ENV.PRE_ALLOCATED_VUS || Math.max(50, rate * 4)) || Math.max(50, rate * 4));
 const maxVUs = Math.max(preAllocatedVUs, Number(__ENV.MAX_VUS || Math.max(100, rate * 8)) || Math.max(preAllocatedVUs, rate * 8));
 
-const requests = new SharedArray('e2-fixtures', () => loadFixtureGroup(fixtures, groupName));
+// MEM FIX: parse the fixture file ONCE inside the SharedArray callback (runs a
+// single time in init) instead of at module level (which re-parses per VU and
+// blew past the 4GiB cgroup limit with large pools).
+const requests = new SharedArray('e2-fixtures', () => {
+  const fixtures = JSON.parse(open(fixturePath));
+  return loadFixtureGroup(fixtures, groupName);
+});
 
 export const options = {
   scenarios: {
