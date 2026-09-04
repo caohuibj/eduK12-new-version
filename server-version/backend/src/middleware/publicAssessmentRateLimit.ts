@@ -87,17 +87,19 @@ const ipKey = (req: Request): string => req.ip || req.socket.remoteAddress || 'u
  * each with separate GET and FINAL budgets.
  */
 export const publicAssessmentRateLimiters: RequestHandler[] = [
+  // F5 (Gate-E): order specific -> coarse so a single recovery abuse does not
+  // burn the shared start-token / IP budgets and co-block unrelated clients.
   createBudgetLimiter({
-    name: 'public-assessment-ip-get',
+    name: 'public-assessment-recovery-get',
     budget: 'get',
-    limit: config.publicAssessmentIpGetLimit,
-    key: ipKey,
+    limit: config.publicAssessmentRecoveryGetLimit,
+    key: extractPublicAssessmentRecoveryToken,
   }),
   createBudgetLimiter({
-    name: 'public-assessment-ip-final',
+    name: 'public-assessment-recovery-final',
     budget: 'final',
-    limit: config.publicAssessmentIpFinalLimit,
-    key: ipKey,
+    limit: config.publicAssessmentRecoveryFinalLimit,
+    key: extractPublicAssessmentRecoveryToken,
   }),
   createBudgetLimiter({
     name: 'public-assessment-token-get',
@@ -112,15 +114,15 @@ export const publicAssessmentRateLimiters: RequestHandler[] = [
     key: extractPublicAssessmentStartToken,
   }),
   createBudgetLimiter({
-    name: 'public-assessment-recovery-get',
+    name: 'public-assessment-ip-get',
     budget: 'get',
-    limit: config.publicAssessmentRecoveryGetLimit,
-    key: extractPublicAssessmentRecoveryToken,
+    limit: config.publicAssessmentIpGetLimit,
+    key: ipKey,
   }),
   createBudgetLimiter({
-    name: 'public-assessment-recovery-final',
+    name: 'public-assessment-ip-final',
     budget: 'final',
-    limit: config.publicAssessmentRecoveryFinalLimit,
-    key: extractPublicAssessmentRecoveryToken,
+    limit: config.publicAssessmentIpFinalLimit,
+    key: ipKey,
   }),
 ]

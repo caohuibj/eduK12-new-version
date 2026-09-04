@@ -4,3 +4,6 @@
 **/.env.backup*
 **/.env.*.backup
 .local/credential-handoff-*.json
+
+# disposable compose validation env (holds local test credentials)
+server-version/compose-validate.env

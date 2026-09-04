@@ -100,7 +100,9 @@ describe('publicAssessmentRateLimit helpers', () => {
     expect(config.publicAssessmentTokenGetLimit).toBe(500 * 40)
     expect(config.publicAssessmentTokenFinalLimit).toBe(500 * 8)
     expect(config.publicAssessmentRecoveryGetLimit).toBe(40)
-    expect(config.publicAssessmentRecoveryFinalLimit).toBe(8)
+    // F3 (Gate-E): recovery FINAL covers a legal multi-unit bundle (+ restart
+    // headroom) instead of hard-binding finalsPerStudent (8 * 4 multiplier).
+    expect(config.publicAssessmentRecoveryFinalLimit).toBe(8 * 4)
     expect(config.publicAssessmentWindowMs).toBe(15 * 60 * 1000)
   })
 })

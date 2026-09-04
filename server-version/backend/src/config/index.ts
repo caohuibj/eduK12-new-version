@@ -138,6 +138,11 @@ const publicAssessmentExpectedStartTokenAudience = parsePositiveInteger(
 const publicAssessmentGetsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_GETS_PER_STUDENT', 40)
 const publicAssessmentFinalsPerStudent = parsePositiveInteger('PUBLIC_ASSESSMENT_FINALS_PER_STUDENT', 8)
 const publicAssessmentNatShareFactor = parsePositiveInteger('PUBLIC_ASSESSMENT_NAT_SHARE_FACTOR', 50)
+// F3 (Gate-E): a single public bundle may legally finalize > 8 units across its
+// children; the recovery FINAL ceiling must cover that bundle width plus a
+// restart/idempotent-retry headroom instead of hard-binding finalsPerStudent.
+// Env override keeps production tunable.
+const publicAssessmentRecoveryBundleMultiplier = parsePositiveInteger('PUBLIC_ASSESSMENT_RECOVERY_BUNDLE_MULTIPLIER', 4)
 
 const rawConfig = {
   port: parsePort(),
@@ -192,7 +197,8 @@ const rawConfig = {
   ),
   publicAssessmentRecoveryFinalLimit: resolvePublicAssessmentLimit(
     'PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT',
-    publicAssessmentFinalsPerStudent,
+    // F3: cover a full legal (multi-unit) bundle width + restart/idempotent headroom.
+    publicAssessmentFinalsPerStudent * publicAssessmentRecoveryBundleMultiplier,
   ),
   legacyUploadsEnabled: !parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
   assetMigrationComplete: parseBooleanEnv('ASSET_MIGRATION_COMPLETE', false),
