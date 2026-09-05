@@ -641,10 +641,10 @@ export const generalQuestionnaireController = {
 
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
-      await formSectionService.ensureQuestionnaireFormSections(id)
+      const materializedSections = await formSectionService.ensureQuestionnaireFormSections(id)
       const [formSections, units] = await Promise.all([
-        formSectionService.listQuestionnaireFormSections(id),
-        formSectionService.listQuestionnaireContentUnits(id),
+        formSectionService.listQuestionnaireFormSections(id, materializedSections),
+        formSectionService.listQuestionnaireContentUnits(id, materializedSections),
       ])
 
       return success(res, {
@@ -706,8 +706,16 @@ export const generalQuestionnaireController = {
         }
       }
 
-      const sections = await formSectionService.ensureQuestionnaireFormSections(id)
-      const units = await formSectionService.listQuestionnaireContentUnits(id)
+      // Publish validates, it never repairs. The write-time invariant
+      // guarantees every form item is sectioned on create/copy/import, so a
+      // published questionnaire must never carry an orphan that the read path
+      // would otherwise have to lazily materialize. The pure read below is
+      // used only to assert the stored invariant (no section is created here).
+      const sections = await formSectionService.readQuestionnaireFormSections(id)
+      const sectionedItemIds = new Set(sections.flatMap((section) => section.items.map((item) => item.id)))
+      const orphanItems = questionnaire.formItems.filter((item) => !sectionedItemIds.has(item.id))
+      if (orphanItems.length > 0) return error(res, '问卷包含未归属区段的表单题目，发布失败')
+      const units = await formSectionService.listQuestionnaireContentUnits(id, sections)
       const contextSections = sections.filter((section) => (
         section.contextSection || section.items.some((item) => item.contextKey)
       ))
@@ -853,6 +861,11 @@ export const generalQuestionnaireController = {
             })),
           })
         }
+
+        // Atomic materialize-on-write: copied form items are sectioned inside
+        // the same transaction so the copy is never served with orphans on
+        // GET/start.
+        await formSectionService.ensureQuestionnaireFormSections(questionnaire.id, tx)
 
         return questionnaire
       })
@@ -1086,17 +1099,24 @@ export const generalQuestionnaireController = {
         ? Math.max(...questionnaire.formItems.map(fi => fi.position))
         : -1
 
-      const formItem = await prisma.questionnaireFormItem.create({
-        data: {
-          questionnaireId: id,
-          type,
-          label,
-          placeholder: placeholder || null,
-          required: required ?? true,
-          position: position !== undefined ? position : maxPosition + 1,
-          options: options ? JSON.parse(JSON.stringify(options)) : null,
-          contextKey: contextKey ?? null,
-        },
+      // Atomic materialize-on-write: the item create and its section assignment
+      // share one transaction so a crash can never leave an orphan form item
+      // that GET/start would otherwise have to lazily repair.
+      const formItem = await prisma.$transaction(async (tx) => {
+        const created = await tx.questionnaireFormItem.create({
+          data: {
+            questionnaireId: id,
+            type,
+            label,
+            placeholder: placeholder || null,
+            required: required ?? true,
+            position: position !== undefined ? position : maxPosition + 1,
+            options: options ? JSON.parse(JSON.stringify(options)) : null,
+            contextKey: contextKey ?? null,
+          },
+        })
+        await formSectionService.ensureQuestionnaireFormSections(id, tx)
+        return created
       })
       await cacheService.clearQuestionnaireCache(id)
 

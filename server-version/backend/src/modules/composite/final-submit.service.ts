@@ -79,14 +79,18 @@ const compositeHasContextSection = (assessment: any): boolean => Boolean(
 )
 
 /** Assign unassigned FORM modules to contiguous sections after migration. */
-export const ensureCompositeFormSections = async (compositeId: string): Promise<CompositeSection[]> => {
+export const ensureCompositeFormSections = async (
+  compositeId: string,
+  tx?: Prisma.TransactionClient,
+): Promise<CompositeSection[]> => {
   // A few service-level tests use a deliberately small Prisma mock from the
   // pre-section schema.  Keep the new read projection additive for those
   // callers; the generated production client always has this delegate.
   const formSectionDelegate = (prisma as any).compositeFormSection
   if (!formSectionDelegate) return []
 
-  const current = await prisma.compositeAssessment.findUnique({
+  const db = tx ?? prisma
+  const current = await db.compositeAssessment.findUnique({
     where: { id: compositeId },
     select: {
       items: { orderBy: { position: 'asc' }, select: { id: true, type: true, position: true, formSectionId: true, contextKey: true } },
@@ -95,8 +99,11 @@ export const ensureCompositeFormSections = async (compositeId: string): Promise<
   })
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评不存在', 404)
   if (current.items.some((item) => item.type === 'FORM' && !item.formSectionId)) {
-    await prisma.$transaction(async (tx) => {
-      const latest = await tx.compositeAssessment.findUnique({
+    // Atomic materialize-on-write: when the caller already runs inside a
+    // transaction (addItem / copy), the section assignment shares that
+    // transaction so a crash can never leave an orphan FORM module behind.
+    const repair = async (client: Prisma.TransactionClient) => {
+      const latest = await client.compositeAssessment.findUnique({
         where: { id: compositeId },
         select: {
           items: { orderBy: { position: 'asc' }, select: { id: true, type: true, position: true, formSectionId: true, contextKey: true } },
@@ -123,7 +130,7 @@ export const ensureCompositeFormSections = async (compositeId: string): Promise<
         let position = items[0].position
         if (occupied.has(position)) position = maximum + runIndex + 1
         occupied.add(position)
-        const section = await tx.compositeFormSection.create({
+        const section = await client.compositeFormSection.create({
           data: {
             compositeAssessmentId: compositeId,
             title: '表单',
@@ -132,14 +139,39 @@ export const ensureCompositeFormSections = async (compositeId: string): Promise<
           },
         })
         for (const [sectionPosition, item] of items.entries()) {
-          await tx.compositeAssessmentItem.update({
+          await client.compositeAssessmentItem.update({
             where: { id: item.id },
             data: { formSectionId: section.id, formSectionPosition: sectionPosition },
           })
         }
       }
-    })
+    }
+    if (tx) {
+      await repair(tx)
+    } else {
+      await prisma.$transaction(repair)
+    }
   }
+  const sections = await db.compositeFormSection.findMany({
+    where: { compositeAssessmentId: compositeId },
+    orderBy: { position: 'asc' },
+    include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
+  })
+  return sections.map(mapCompositeSection)
+}
+
+/**
+ * Pure-read variant for hot paths (student/public start/resume). The
+ * write-time invariant plus the publish gate guarantee every published
+ * composite is fully sectioned, so these paths must never trigger a lazy
+ * repair write.
+ */
+export const readCompositeFormSections = async (compositeId: string): Promise<CompositeSection[]> => {
+  // A few service-level tests use a deliberately small Prisma mock from the
+  // pre-section schema.  Keep the read additive for those callers; the
+  // generated production client always has this delegate.
+  const formSectionDelegate = (prisma as any).compositeFormSection
+  if (!formSectionDelegate) return []
   const sections = await prisma.compositeFormSection.findMany({
     where: { compositeAssessmentId: compositeId },
     orderBy: { position: 'asc' },

@@ -262,6 +262,20 @@ const run = async () => {
           'cognitive_access_tokens_protected_fields_present'
         )
     `),
+    // Work C invariant: every form item must be bound to a section. The
+    // write-time materialize-on-write guarantee makes this an invariant, so any
+    // pre-Work-C / direct-DB orphan (sectionId NULL) blocks the release instead
+    // of being silently repaired by a participant hot path.
+    orphan_questionnaire_form_items: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "questionnaire_form_items"
+      WHERE "section_id" IS NULL
+    `),
+    orphan_composite_form_items: await countRows(`
+      SELECT COUNT(*)::int AS count
+      FROM "composite_assessment_items"
+      WHERE "type" = 'FORM' AND "form_section_id" IS NULL
+    `),
   }
 
   const blockingFields = [
@@ -290,6 +304,8 @@ const run = async () => {
     'missing_checkin_token_constraints',
     'unvalidated_public_token_constraints',
     'missing_public_token_constraints',
+    'orphan_questionnaire_form_items',
+    'orphan_composite_form_items',
   ]
   const blocking = blockingFields.filter((field) => metrics[field] > 0)
   const result = { ok: blocking.length === 0, metrics }

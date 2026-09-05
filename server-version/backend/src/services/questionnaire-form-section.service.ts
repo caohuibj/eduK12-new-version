@@ -64,7 +64,7 @@ import {
 import type { AggregateSnapshotHeader } from '../modules/assessment-runtime/unified-aggregate'
 import { evaluateCompleteness } from '../modules/assessment-runtime/unified-aggregate'
 import { runnerDefinition } from '../modules/scale/scale-definition'
-import { ensureScaleAdmissionAtDelivery } from '../modules/scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../modules/scale/scale-admission.service'
 import { ensureQuestionnaireFormAdmissionAtDelivery } from '../modules/assessment-runtime/form-admission.service'
 import {
   mapQuestionnaireSection,
@@ -106,8 +106,12 @@ const contentTypesForQuestionnaire = (questionnaire: any) => [
  * the migration; this helper keeps the editor/start path safe for items added
  * after that migration without changing the mixed Form/Scale order.
  */
-export const ensureQuestionnaireFormSections = async (questionnaireId: string): Promise<SectionRow[]> => {
-  const current = await prisma.questionnaire.findUnique({
+export const ensureQuestionnaireFormSections = async (
+  questionnaireId: string,
+  tx?: Prisma.TransactionClient,
+): Promise<SectionRow[]> => {
+  const db = tx ?? prisma
+  const current = await db.questionnaire.findUnique({
     where: { id: questionnaireId },
     select: {
       formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
@@ -118,8 +122,11 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷不存在', 404)
   const unassigned = current.formItems.filter((item) => !item.sectionId)
   if (unassigned.length > 0) {
-    await prisma.$transaction(async (tx) => {
-      const latest = await tx.questionnaire.findUnique({
+    // Atomic materialize-on-write: when the caller already runs inside a
+    // transaction (addFormItem / copy), the section assignment shares that
+    // transaction so a crash can never leave an orphan form item behind.
+    const repair = async (client: Prisma.TransactionClient) => {
+      const latest = await client.questionnaire.findUnique({
         where: { id: questionnaireId },
         select: {
           formItems: { orderBy: { position: 'asc' }, select: { id: true, position: true, sectionId: true, contextKey: true } },
@@ -154,7 +161,7 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
         let position = items[0].position
         if (occupied.has(position)) position = maximumPosition + runIndex + 1
         occupied.add(position)
-        const section = await tx.questionnaireFormSection.create({
+        const section = await client.questionnaireFormSection.create({
           data: {
             questionnaireId,
             title: '表单',
@@ -163,15 +170,39 @@ export const ensureQuestionnaireFormSections = async (questionnaireId: string): 
           },
         })
         for (const [sectionPosition, item] of items.entries()) {
-          await tx.questionnaireFormItem.update({
+          await client.questionnaireFormItem.update({
             where: { id: item.id },
             data: { sectionId: section.id, sectionPosition },
           })
         }
       }
-    })
+    }
+    if (tx) {
+      await repair(tx)
+    } else {
+      await prisma.$transaction(repair)
+    }
   }
 
+  const sections = await db.questionnaireFormSection.findMany({
+    where: { questionnaireId },
+    orderBy: { position: 'asc' },
+    include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+  })
+  return sections.map(mapQuestionnaireSection)
+}
+
+/**
+ * Pure-read variant for hot paths (GET/start/resume). The write-time invariant
+ * plus the publish gate guarantee every published questionnaire is fully
+ * sectioned, so these paths must never trigger a lazy repair write.
+ */
+export const readQuestionnaireFormSections = async (questionnaireId: string): Promise<SectionRow[]> => {
+  // A few service-level tests use a deliberately small Prisma mock from the
+  // pre-section schema.  Keep the read additive for those callers; the
+  // generated production client always has this delegate.
+  const formSectionDelegate = (prisma as any).questionnaireFormSection
+  if (!formSectionDelegate) return []
   const sections = await prisma.questionnaireFormSection.findMany({
     where: { questionnaireId },
     orderBy: { position: 'asc' },
@@ -278,7 +309,20 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       },
       scaleAssessments: {
         orderBy: { startedAt: 'asc' },
-        select: { id: true, scaleId: true, status: true, progress: true },
+        select: {
+          id: true,
+          userId: true,
+          scaleId: true,
+          status: true,
+          progress: true,
+          deliveryMode: true,
+          runtimeGeneration: true,
+          attemptEpoch: true,
+          startedAt: true,
+          questionnaireAssessmentId: true,
+          compositeAttemptId: true,
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
+        },
       },
     },
   }) as any
@@ -362,28 +406,31 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
     currentFormSection = formSections.find((section) => section.id === current.section.id) ?? null
     await ensureQuestionnaireFormAdmissionAtDelivery(assessment.id, mapQuestionnaireSection(current.section))
   } else if (current?.type === 'SCALE') {
-    const child = scaleMap.get(current.item.scaleId)
-    if (!child?.id) {
+    const summary = scaleMap.get(current.item.scaleId)
+    if (!summary?.id) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
-    // Lazy current-unit projection: only the unfinished Scale loads its frozen runtime.
-    const runtimeChild = await prisma.assessment.findUnique({
-      where: { id: child.id },
-      select: { id: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true },
+    // Lazy current-unit projection: only the unfinished Scale loads its frozen
+    // runtime and admission fields. The parent projection carries only cheap
+    // child summaries, so the current unit does exactly one authoritative child
+    // read which is then shared by runtime validation and admission.
+    const child = await prisma.assessment.findUnique({
+      where: { id: summary.id },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     })
-    if (!runtimeChild?.runtimeSnapshotEncrypted) {
+    if (!child?.runtimeSnapshotEncrypted) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(runtimeChild.runtimeSnapshotEncrypted)
+      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
       const slot = slotsByKey.get(questionnaireScaleSlotKey(current.item.id))
       if (
         runtime.instrumentKey !== current.item.scale.code
         || runtime.instrumentVersion !== current.item.scale.instrumentVersion
-        || runtime.compiledRuntime.compiledRuntimeHash !== runtimeChild.compiledRuntimeHash
+        || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
         || runtime.sourceDefinitionHash !== slot?.sourceDefinitionIdentity.hash
       ) throw new Error('Scale runtime identity mismatch')
-      await ensureScaleAdmissionAtDelivery(child.id)
+      await ensureScaleAdmissionAtDelivery(child.id, undefined, child)
       currentScale = {
         id: current.item.scale.id,
         name: current.item.scale.name,
@@ -692,9 +739,13 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   }
 }
 
-export const listQuestionnaireFormSections = async (questionnaireId: string) => {
-  const sections = await ensureQuestionnaireFormSections(questionnaireId)
-  return sections.map((section) => ({
+export const listQuestionnaireFormSections = async (questionnaireId: string, sections?: SectionRow[]) => {
+  // Pure-read variant: when the caller has already materialized sections via
+  // ensureQuestionnaireFormSections (write-time invariant), pass them in to
+  // avoid a redundant lazy-ensure on the read path. Default keeps the lazy
+  // repair as a safe fallback for direct callers.
+  const resolved = sections ?? (await ensureQuestionnaireFormSections(questionnaireId))
+  return resolved.map((section) => ({
     ...section,
     definitionHash: questionnaireFormSectionDefinitionHash(section),
   }))
@@ -859,8 +910,10 @@ const normalizeQuestionnaireContentUnits = async (
   return { units, sections }
 }
 
-export const listQuestionnaireContentUnits = async (questionnaireId: string): Promise<QuestionnaireContentUnit[]> => {
-  const sections = await ensureQuestionnaireFormSections(questionnaireId)
+export const listQuestionnaireContentUnits = async (questionnaireId: string, sections?: SectionRow[]): Promise<QuestionnaireContentUnit[]> => {
+  // Pure-read variant: accept pre-materialized sections to skip the redundant
+  // lazy-ensure when the caller already holds them (write-time invariant).
+  const resolved = sections ?? (await ensureQuestionnaireFormSections(questionnaireId))
   const scales = await prisma.questionnaireScale.findMany({
     where: { questionnaireId },
     orderBy: { position: 'asc' },
@@ -875,7 +928,7 @@ export const listQuestionnaireContentUnits = async (questionnaireId: string): Pr
       itemCount: 1,
       contextSection: false,
     })),
-    ...sections.map((section) => ({
+    ...resolved.map((section) => ({
       type: 'form-section' as const,
       id: section.id,
       position: section.position,
@@ -939,7 +992,9 @@ export const restartQuestionnaireAssessment = async (
 
   const questionnaireId = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId }, select: { questionnaireId: true } })
   if (!questionnaireId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
-  const frozenFormSections = await ensureQuestionnaireFormSections(questionnaireId.questionnaireId)
+  // Pure-read (write-time invariant): the restart path never lazily repairs
+  // sections on a published questionnaire.
+  const frozenFormSections = await readQuestionnaireFormSections(questionnaireId.questionnaireId)
 
   const created = await prisma.$transaction(async (tx) => {
     const lockedRows = await tx.$queryRaw<Array<{ id: string }>>`

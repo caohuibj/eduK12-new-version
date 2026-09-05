@@ -65,6 +65,25 @@ export type CognitiveAdmissionChildRow = {
   frozenAdmissionSnapshotHash: string | null
 }
 
+// Composite parent rows are loaded once (load-once admission) and shared by
+// the ensure* and activate* steps so a delivery never re-reads the same
+// composite attempt row. The unified attempt-state reader holds an already
+// loaded superset row and passes it in to skip the redundant read.
+export type CompositeCognitiveAdmissionParent = {
+  id: string
+  userId: string | null
+  recoveryTokenHash: string | null
+  deliveryMode: string
+  attemptEpoch: number
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  frozenActiveSlotSetEncrypted: string | null
+  frozenActiveSlotSetHash: string | null
+  compositeAssessment: {
+    formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
+  }
+}
+
 const hasContextSection = (sections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>): boolean => (
   sections.some((section) => Boolean(section.contextSection) || section.items.some((item) => Boolean(item.contextKey)))
 )
@@ -113,19 +132,39 @@ export const readStoredCognitiveAdmission = (
   readStoredUnitAdmission(row, '认知准入快照无法读取，请重启后重新作答')
 )
 
-export const ensureCognitiveAdmissionAtDelivery = async (sessionId: string): Promise<FrozenUnitAdmissionV1> => {
-  const child = await prisma.cognitiveSession.findUnique({
+export const ensureCognitiveAdmissionAtDelivery = async (
+  sessionId: string,
+  parent?: CompositeCognitiveAdmissionParent,
+  child?: CognitiveAdmissionChildRow,
+): Promise<FrozenUnitAdmissionV1> => {
+  // Load-once completion: the unified attempt-state reader already holds the
+  // child row (with the full admission select) and passes it in, so a
+  // current-unit delivery never re-reads the same cognitive session row.
+  const loaded = child ?? await prisma.cognitiveSession.findUnique({
     where: { id: sessionId },
     select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
   })
-  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
-  if (child.runtimeGeneration !== 'UNIFIED_V1') {
+  if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
+  // Identity assertion (Work C): when a caller supplies an already-loaded child
+  // or parent, verify the structural relationship that the old DB query used to
+  // guarantee implicitly. A mismatched pairing would otherwise persist a frozen
+  // admission snapshot under the wrong parent binding.
+  if (child && child.id !== sessionId) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知记录与请求身份不匹配', 409)
+  }
+  if (parent && loaded.compositeAttemptId !== parent.id) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知上级记录与请求身份不匹配', 409)
+  }
+  if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知运行时版本不匹配，请重启测评', 409)
   }
-  return activateCognitiveAdmission(child)
+  return activateCognitiveAdmission(loaded, parent)
 }
 
-export const activateCognitiveAdmission = async (row: CognitiveAdmissionChildRow): Promise<FrozenUnitAdmissionV1> => {
+export const activateCognitiveAdmission = async (
+  row: CognitiveAdmissionChildRow,
+  parent?: CompositeCognitiveAdmissionParent,
+): Promise<FrozenUnitAdmissionV1> => {
   const stored = readStoredCognitiveAdmission(row)
   if (stored) return stored
   assertFinalOnly(row.deliveryMode)
@@ -138,7 +177,7 @@ export const activateCognitiveAdmission = async (row: CognitiveAdmissionChildRow
   }
 
   if (row.compositeAttemptId) {
-    const parent = await prisma.compositeAssessmentAttempt.findUnique({
+    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: row.compositeAttemptId },
       select: {
         id: true,
@@ -155,16 +194,16 @@ export const activateCognitiveAdmission = async (row: CognitiveAdmissionChildRow
         },
       },
     })
-    if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
-    assertFinalOnly(parent.deliveryMode)
-    assertAttemptEpoch(parent.attemptEpoch, row.attemptNo)
+    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    assertFinalOnly(loaded.deliveryMode)
+    assertAttemptEpoch(loaded.attemptEpoch, row.attemptNo)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知任务未绑定到当前测评单元', 409)
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'COGNITIVE')
     let slot: FrozenActiveSlotV1
     try {
       slot = getFrozenActiveSlot({
-        encrypted: parent.frozenActiveSlotSetEncrypted,
-        storedHash: parent.frozenActiveSlotSetHash,
+        encrypted: loaded.frozenActiveSlotSetEncrypted,
+        storedHash: loaded.frozenActiveSlotSetHash,
         attemptEpoch: row.attemptNo,
         slotKey,
       })
@@ -179,28 +218,28 @@ export const activateCognitiveAdmission = async (row: CognitiveAdmissionChildRow
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知冻结单元身份不匹配', 409)
     }
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
-    const requiresContext = hasContextSection(parent.compositeAssessment.formSections)
-    if (requiresContext && parent.contextSnapshotHash === null) {
+    const requiresContext = hasContextSection(loaded.compositeAssessment.formSections)
+    if (requiresContext && loaded.contextSnapshotHash === null) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
     }
-    const context = readCompositeAttemptContext(parent)
+    const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
     return persistAdmission(row.id, createFrozenUnitAdmission({
       attemptEpoch: row.attemptNo,
       cognitive,
       principal: {
-        userId: row.userId ?? parent.userId,
-        recoveryTokenHash: parent.recoveryTokenHash,
+        userId: row.userId ?? loaded.userId,
+        recoveryTokenHash: loaded.recoveryTokenHash,
       },
       parent: {
         kind: 'composite',
-        parentId: parent.id,
+        parentId: loaded.id,
         slotKey,
         sourceDefinitionHash: slot.sourceDefinitionIdentity.hash,
         compiledRuntimeHash,
       },
       requiresContext,
-      contextSnapshotHash: parent.contextSnapshotHash,
+      contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
     }))
   }
