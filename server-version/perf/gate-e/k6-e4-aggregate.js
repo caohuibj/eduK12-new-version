@@ -8,6 +8,7 @@
  */
 import { SharedArray } from 'k6/data';
 import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http.js';
+import { fixtureIndexForVu, requireFixturePool } from './lib/fixture-pool.js';
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
 const mode = String(__ENV.MODE || 'manyParent');
@@ -20,11 +21,7 @@ const requests = new SharedArray('e4-fixtures', () => {
   return loadFixtureGroup(fixtures, groupName);
 });
 
-if (requests.length < peak) {
-  throw new Error(
-    `E4 fixture pool exhausted: group="${groupName}" pool=${requests.length} peak=${peak}; seed at least one fresh fixture per VU`,
-  );
-}
+requireFixturePool(requests.length, peak);
 
 export const options = {
   scenarios: {
@@ -45,7 +42,7 @@ export default function () {
   // mode hammers different child/submissionId against the SAME parent, instead
   // of every VU reusing requests[0] (same submissionId -> idempotent replay).
   // Fail-closed pool check above guarantees one unique fixture per VU.
-  const index = __VU - 1;
+  const index = fixtureIndexForVu(__VU);
   const request = pickFreshRequest(requests, index);
   runLogicalSubmit(request, {
     profile: 'e4_aggregate',
