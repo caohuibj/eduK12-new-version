@@ -136,14 +136,6 @@ async function upsertUser(username: string, password: string, role: 'ADMIN' | 'S
   })
 }
 
-function authHeaders(token: string, csrf: string) {
-  return {
-    Cookie: `ptool_session=${encodeURIComponent(token)}; ptool_csrf=${encodeURIComponent(csrf)}`,
-    'x-csrf-token': csrf,
-    'Content-Type': 'application/json',
-  }
-}
-
 async function main() {
   mkdirSync(OUT_DIR, { recursive: true })
   const admin = await upsertUser(ADMIN_USERNAME, ADMIN_PASSWORD, 'ADMIN')
@@ -178,7 +170,6 @@ async function main() {
     JWT_SECRET,
     { expiresIn: '7d' },
   )
-  const headers = authHeaders(token, csrf)
 
   const runId = randomUUID().slice(0, 8)
   const definition = scaleDefinitionFor(SCALE_ITEM_COUNT, `G47-SCALE-${runId}`)
@@ -318,7 +309,6 @@ async function main() {
       parentKey: `perf-parent-scale-${String(i + 1).padStart(6, '0')}`,
       method: 'POST',
       path: `/api/scales/assessments/${assessment.id}/submit`,
-      headers,
       body: {
         submissionId,
         attemptEpoch: 1,
@@ -418,7 +408,6 @@ async function main() {
         runtimeGeneration: 'UNIFIED_V1',
         method: 'POST',
         path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
-        headers,
         body,
         itemCount: mapped.items.length,
         bodyBytes: Buffer.byteLength(JSON.stringify(body)),
@@ -515,7 +504,6 @@ async function main() {
       canonicalPayloadBytes: canonicalJsonBytes({ trials }).byteLength,
       method: 'POST',
       path: `/api/cognitive/sessions/${session.id}/submit`,
-      headers,
       body,
     })
     if (Buffer.byteLength(JSON.stringify(body)) >= 1_500_000) {
@@ -585,7 +573,6 @@ async function main() {
         slotIndex: idx,
         method: 'POST',
         path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
-        headers,
         body: {
           submissionId: `g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
           attemptEpoch: 1,
