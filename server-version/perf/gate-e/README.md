@@ -24,14 +24,25 @@ are present.
 - Fresh fixture **per logical submit**; prepare disposable ledgered fixtures.
 - FinalDraft / harness retries **503 only** — never 429.
 
-## Round-1 sweep / Scale CLOSED
+## Post-Work-C calibration protocol
 
-- Prisma pool = **10** (do not raise)
-- Locked operating envelope: **UNIT=7**, **Aggregate=3**, pool=10
-- **Tested stable Scale FINAL rate:** ≤**150** fresh FINAL/s (not "150 concurrent users")
-- Overload ~**175/s+**: non-deterministic UNIT saturation; intentional 503; not production SLO
-- E5 out of Assessment capacity mainline
-- Profiles E1–E5 below (E1 uses start-token audience split; next after E1 is E3)
+The values from the earlier Gate-E round are historical context only. They are
+not the current-main UNIT recommendation. The post-Work-C run must use the
+same disposable fixtures and 2C4G stack for every candidate and report at
+least three runs per calibration point.
+
+- Scale observer-effect control: no scrape, 5s scrape, and 1s scrape at R150
+  (and R200 only if safe).
+- E3 Cognitive: SIZE uses per-vu-iterations at low concurrency; KNEE uses
+  constant-arrival-rate with a 60s steady window; REPLAY is a separate
+  same-child experiment.
+- E4 Aggregate: many-parent, size curve, and same-parent contention are
+  separate workloads. The harness fails closed when the fresh fixture pool is
+  smaller than the peak.
+- Use 5s metrics scraping for the formal gate unless the observer-effect
+  comparison proves a different cadence is safe.
+- Choose UNIT only after E3 and E4 characterization. Do not infer a winner
+  from raw HTTP RPS or from a single run.
 
 ## Commands
 
@@ -58,8 +69,19 @@ TARGET_SUCCESS_RATE=50 DURATION=30s k6 run k6-e2-scale-open-loop.js
 TARGET_SUCCESS_RATE=75 DURATION=30s k6 run k6-e2-scale-open-loop.js
 TARGET_SUCCESS_RATE=100 DURATION=30s k6 run k6-e2-scale-open-loop.js
 
-# E3 Cognitive payload classes
-GROUP=cognitive PAYLOAD_CLASS=normal VUS=10 k6 run k6-e3-cognitive-payload.js
+# E3 Cognitive SIZE — run each class three times at low concurrency
+GROUP=cognitiveSmall VUS=5 ITERATIONS=1 k6 run k6-e3-cognitive-payload.js
+GROUP=cognitiveNormal VUS=5 ITERATIONS=1 k6 run k6-e3-cognitive-payload.js
+GROUP=cognitiveLarge VUS=5 ITERATIONS=1 k6 run k6-e3-cognitive-payload.js
+
+# E3 Cognitive KNEE — sweep RATE=5,10,20,40,60,80; stop after two overload points
+GROUP=cognitiveNormal RATE=20 DURATION=60s WARMUP_SECONDS=10 k6 run k6-e3-cognitive-knee.js
+
+# E3 same-child replay — repeat at VUS=2,5,10,25; this is the only replay workload
+GROUP=cognitiveNormal VUS=25 k6 run k6-e3-cognitive-replay.js
+
+# E3 invalid negative — independent contract, never part of capacity curves
+GROUP=cognitiveNormal k6 run k6-e3-cognitive-negative.js
 
 # E4 Aggregate
 MODE=manyParent PEAK=100 GROUP=mixed k6 run k6-e4-aggregate.js
@@ -69,6 +91,12 @@ MODE=sameParent PEAK=50 GROUP=sameParent k6 run k6-e4-aggregate.js
 # E5 Bundle mixed (set FFMPEG_CONCURRENCY=0|1|2 on the backend process)
 VUS=50 DURATION=30s FFMPEG_CONCURRENCY=0 k6 run k6-e5-bundle-mixed.js
 ```
+
+Before any run, source the seeder's mode-0600 `.auth.env` file (or provide
+equivalent `AUTH_TOKEN`/`CSRF_TOKEN` environment variables). Fixture JSON
+must contain no session credentials. The backend authenticates these final
+submit routes with the session cookie; the harness builds that cookie from the
+environment.
 
 Work A (public limiter / nginx buffering / auth+body metrics) should be deployed
 on the branch under test before interpreting E1 429 vs 503 mix.
@@ -94,3 +122,18 @@ on the branch under test before interpreting E1 429 vs 503 mix.
 - `PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE` (default 60) → **IP** GET/FINAL only (`N × G|F × NAT`).
 - `PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE` (default 500) → **start-token** GET/FINAL (`A × G|F`).
 - Class size ≠ shared-link audience. Explicit `PUBLIC_ASSESSMENT_TOKEN_*_LIMIT` still overrides.
+
+
+## Measurement contract
+
+The capacity collector records lifetime ELU only as a diagnostic. Its formal
+ELU value is derived from deltas of
+`ptool_nodejs_event_loop_active_seconds_total` and
+`ptool_nodejs_event_loop_idle_seconds_total`; the report keeps this distinct
+from event-loop delay. Missing, non-finite, or reset counters are unavailable
+for that interval and must not be treated as zero load.
+
+Every FINAL workload must distinguish rate-limit 429, UNIT queue-full/timeout,
+Aggregate queue-full/timeout, validation 400, business 409, and unexpected 5xx.
+Only fresh durable completions count toward productive FINAL/s. A first-attempt
+idempotent replay fails closed outside the explicit replay experiment.
