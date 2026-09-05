@@ -74,12 +74,13 @@ export default function () {
 }
 
 export function handleSummary(data) {
-  const status = Number(data.metrics?.http_req_failed?.values?.count || 0);
+  const checkRate = Number(data.metrics?.checks?.values?.rate || 0);
   const summary = {
     profile: 'e3_cognitive_negative',
     group: groupName,
     trial_count: invalidBody.trials.length,
-    rejected: status === 0,
+    rejected: checkRate === 1,
+    check_rate: checkRate,
     capacity_benchmark: false,
   };
   return { stdout: `${JSON.stringify(summary, null, 2)}\n` };
