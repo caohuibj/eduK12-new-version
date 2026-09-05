@@ -8,7 +8,10 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from '../src/modules/scale/scale-definition'
-import { createCognitiveSessionConfigSnapshot, readCognitiveSessionConfig } from '../src/modules/cognitive/session.service'
+import {
+  createUnifiedCognitiveSessionConfigSnapshot,
+  readCognitiveSessionConfig,
+} from '../src/modules/cognitive/session.service'
 import { createTrialEnvelope } from '../src/modules/cognitive/v2/trial-envelope'
 import {
   ensureQuestionnaireFormSections,
@@ -391,25 +394,42 @@ async function main() {
     void item
   }
 
-  console.log(`Creating ${COG_N} cognitive sessions...`)
+  console.log(`Creating ${COG_N} Unified Cognitive sessions...`)
   const cognitiveRequests: any[] = []
-  for (let i = 0; i < COG_N; i += 1) {
-    const trialCount = 3
-    const resolvedConfig = {
-      trialCount,
-      trialDurationMs: 1000,
-      allowPractice: false,
-      maxRtMs: 60000,
-    }
-    const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+  const trialCount = Number(process.env.COG_TRIAL_COUNT || 3)
+  if (!Number.isInteger(trialCount) || trialCount < 1 || trialCount > 1000) {
+    throw new Error(`COG_TRIAL_COUNT must be an integer from 1 to 1000 (got ${process.env.COG_TRIAL_COUNT})`)
+  }
+  const resolvedConfig = {
+    trialCount,
+    trialDurationMs: 1000,
+    allowPractice: false,
+    maxRtMs: 60000,
+  }
+  const unifiedCognitiveSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
+    testType: fake.testType,
+    configVersion: fake.configVersion,
+    engineVersion: fake.engineVersion,
+    scoringVersion: fake.scoringVersion,
+    config: resolvedConfig,
+  })
+  const configSnapshotEncrypted = unifiedCognitiveSnapshot.encrypted
+  const snapshot = readCognitiveSessionConfig(configSnapshotEncrypted).snapshot
+  if (!snapshot || snapshot.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new Error('cognitive fixture did not create a Unified Runtime snapshot')
+  }
+  const frozenCognitiveAdmission = createFrozenUnitAdmission({
+    attemptEpoch: 1,
+    cognitive: {
       testType: fake.testType,
-      configVersion: fake.configVersion,
       engineVersion: fake.engineVersion,
       scoringVersion: fake.scoringVersion,
-      config: resolvedConfig,
-    })
-    const snapshot = readCognitiveSessionConfig(configSnapshotEncrypted).snapshot
-    if (!snapshot) throw new Error('cognitive snapshot missing')
+      configHash: snapshot.configHash,
+    },
+    principal: { userId: student.id },
+    parent: null,
+    requiresContext: false,
+  })
     const session = await prisma.cognitiveSession.create({
       data: {
         userId: student.id,
@@ -424,6 +444,9 @@ async function main() {
         engineVersion: fake.engineVersion,
         scoringVersion: fake.scoringVersion,
         randomSeed: `g47-seed-${runId}-${i}`,
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedCognitiveSnapshot.compiledRuntime.compiledRuntimeHash,
+        ...frozenAdmissionPersistence(frozenCognitiveAdmission),
       },
     })
     ledger.cognitiveSessionIds.push(session.id)
@@ -434,21 +457,33 @@ async function main() {
       startedAtPerfMs: trialIndex * 1000,
       endedAtPerfMs: trialIndex * 1000 + 400,
     }))
+    const submissionId = `g47-cog-${runId}-${String(i + 1).padStart(6, '0')}`
+    const body = {
+      submissionId,
+      attemptEpoch: 1,
+      definitionHash: snapshot.configHash,
+      contextSnapshotHash: null,
+      trials,
+    }
     cognitiveRequests.push({
       fixtureId: `perf-cognitive-${String(i + 1).padStart(6, '0')}`,
       instrument: 'cognitive',
       parentKey: `perf-parent-cognitive-${String(i + 1).padStart(6, '0')}`,
+      sessionId: session.id,
+      submissionId,
+      runtimeGeneration: 'UNIFIED_V1',
+      compiledRuntimeHash: unifiedCognitiveSnapshot.compiledRuntime.compiledRuntimeHash,
+      trialCount,
+      bodyBytes: Buffer.byteLength(JSON.stringify(body)),
+      canonicalPayloadBytes: Buffer.byteLength(JSON.stringify({ trials })),
       method: 'POST',
       path: `/api/cognitive/sessions/${session.id}/submit`,
       headers,
-      body: {
-        submissionId: `g47-cog-${runId}-${String(i + 1).padStart(6, '0')}`,
-        attemptEpoch: 1,
-        definitionHash: snapshot.configHash,
-        contextSnapshotHash: null,
-        trials,
-      },
+      body,
     })
+    if (Buffer.byteLength(JSON.stringify(body)) >= 1_500_000) {
+      throw new Error('cognitive fixture unexpectedly reaches the HTTP size limit')
+    }
     if ((i + 1) % 50 === 0) console.log(`  cognitive ${i + 1}/${COG_N}`)
   }
 
