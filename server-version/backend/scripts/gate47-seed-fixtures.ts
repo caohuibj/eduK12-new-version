@@ -12,6 +12,7 @@ import {
   createUnifiedCognitiveSessionConfigSnapshot,
   readCognitiveSessionConfig,
 } from '../src/modules/cognitive/session.service'
+import { canonicalJsonBytes } from '../src/modules/assessment-runtime/canonical'
 import { createTrialEnvelope } from '../src/modules/cognitive/v2/trial-envelope'
 import {
   ensureQuestionnaireFormSections,
@@ -511,7 +512,7 @@ async function main() {
       compiledRuntimeHash: unifiedCognitiveSnapshot.compiledRuntime.compiledRuntimeHash,
       trialCount,
       bodyBytes: Buffer.byteLength(JSON.stringify(body)),
-      canonicalPayloadBytes: Buffer.byteLength(JSON.stringify({ trials })),
+      canonicalPayloadBytes: canonicalJsonBytes({ trials }).byteLength,
       method: 'POST',
       path: `/api/cognitive/sessions/${session.id}/submit`,
       headers,
@@ -605,6 +606,8 @@ async function main() {
   const fixtures = {
     scale: scaleRequests,
     formSection: formRequests,
+    formNormal: formNormalRequests,
+    formLarge: formLargeRequests,
     cognitive: cognitiveRequests,
     sameParent: sameParentRequests,
     mixed,
@@ -627,6 +630,8 @@ async function main() {
     counts: {
       scale: scaleRequests.length,
       formSection: formRequests.length,
+      formNormal: formNormalRequests.length,
+      formLarge: formLargeRequests.length,
       cognitive: cognitiveRequests.length,
       sameParent: sameParentRequests.length,
       mixed: mixed.length,
