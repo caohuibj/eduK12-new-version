@@ -42,7 +42,7 @@ x-app-environment: &app-environment
   CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
   CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
   TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
-  # Gate-E locked operating envelope (UNIT=7 / Aggregate=3 / pool=10). Code fallback UNIT=8 if unset.
+  # Gate-E locked operating envelope (UNIT=7 / Aggregate=3 / pool=10).
   UNIT_SUBMIT_ADMISSION_LIMIT: ${UNIT_SUBMIT_ADMISSION_LIMIT:-7}
   UNIT_SUBMIT_ADMISSION_QUEUE: ${UNIT_SUBMIT_ADMISSION_QUEUE:-16}
   UNIT_SUBMIT_ADMISSION_TIMEOUT_MS: ${UNIT_SUBMIT_ADMISSION_TIMEOUT_MS:-500}
