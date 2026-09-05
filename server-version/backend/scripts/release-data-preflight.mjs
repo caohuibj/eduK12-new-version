@@ -262,19 +262,27 @@ const run = async () => {
           'cognitive_access_tokens_protected_fields_present'
         )
     `),
-    // Work C invariant: every form item must be bound to a section. The
-    // write-time materialize-on-write guarantee makes this an invariant, so any
-    // pre-Work-C / direct-DB orphan (sectionId NULL) blocks the release instead
-    // of being silently repaired by a participant hot path.
+    // Work C invariant: every form item must be bound to a section owned by
+    // the same parent. A non-null foreign key is not sufficient: a direct DB
+    // write can bind an item to a section from another questionnaire/composite.
     orphan_questionnaire_form_items: await countRows(`
       SELECT COUNT(*)::int AS count
-      FROM "questionnaire_form_items"
-      WHERE "section_id" IS NULL
+      FROM "questionnaire_form_items" AS item
+      LEFT JOIN "questionnaire_form_sections" AS section
+        ON section."id" = item."section_id"
+      WHERE item."section_id" IS NULL
+        OR section."questionnaire_id" IS DISTINCT FROM item."questionnaire_id"
     `),
     orphan_composite_form_items: await countRows(`
       SELECT COUNT(*)::int AS count
-      FROM "composite_assessment_items"
-      WHERE "type" = 'FORM' AND "form_section_id" IS NULL
+      FROM "composite_assessment_items" AS item
+      LEFT JOIN "composite_form_sections" AS section
+        ON section."id" = item."form_section_id"
+      WHERE item."type" = 'FORM'
+        AND (
+          item."form_section_id" IS NULL
+          OR section."composite_assessment_id" IS DISTINCT FROM item."composite_assessment_id"
+        )
     `),
   }
 
