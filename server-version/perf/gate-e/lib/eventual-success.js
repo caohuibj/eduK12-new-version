@@ -8,6 +8,9 @@ import { Counter, Rate, Trend } from 'k6/metrics';
  */
 export const eventualSuccess = new Counter('gate_e_eventual_success');
 export const eventualFailure = new Counter('gate_e_eventual_failure');
+export const steadyEventualSuccess = new Counter('gate_e_steady_eventual_success');
+export const steadyEventualFailure = new Counter('gate_e_steady_eventual_failure');
+export const steadyEventualLatency = new Trend('gate_e_steady_eventual_latency_ms', true);
 export const rateLimited429 = new Counter('gate_e_rate_limited_429');
 export const capacityBusy503 = new Counter('gate_e_capacity_busy_503');
 /** 503 broken down by response code (unit/aggregate/busy-unexpected). */
@@ -60,12 +63,16 @@ export function recordEventualOutcome(options) {
     tags = {},
   } = options;
   eventualLatency.add(latencyMs, tags);
+  const steady = tags && tags.phase === 'steady';
+  if (steady) steadyEventualLatency.add(latencyMs);
   if (ok) {
     eventualSuccess.add(1, tags);
+    if (steady) steadyEventualSuccess.add(1);
     eventualSuccessRate.add(1, tags);
     return;
   }
   eventualFailure.add(1, tags);
+  if (steady) steadyEventualFailure.add(1);
   eventualSuccessRate.add(0, tags);
   if (Number(status) === 429) rateLimited429.add(1, tags);
   if (Number(status) === 503) capacityBusy503.add(1, tags);
