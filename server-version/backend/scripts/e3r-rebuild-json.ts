@@ -13,7 +13,7 @@
  */
 import 'dotenv/config'
 import { randomBytes } from 'node:crypto'
-import { createWriteStream, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -111,58 +111,63 @@ async function main() {
     'Content-Type': 'application/json',
   }
 
-  const sessions = await prisma.cognitiveSession.findMany({
-    where: { participantKey: { startsWith: 'e3r-' } },
-    orderBy: { participantKey: 'asc' },
-  })
-  console.log(`loaded ${sessions.length} sessions from DB`)
-  if (sessions.length === 0) throw new Error('no e3r sessions found')
+  mkdirSync(dirname(OUT), { recursive: true })
 
-  // Rebuild config per session from its encrypted snapshot (definitionHash + trialCount).
-  const configOf = new Map<string, Record<string, unknown>>()
-  const defHashOf = new Map<string, string>()
-  for (const s of sessions) {
+  // Stream the pool per class prefix with cursor pagination so the 41,600-row
+  // pool never materialises fully in memory (the OOM that killed the bulk
+  // findMany). Only the fields the fixture needs are selected.
+  interface Row {
+    id: string
+    participantKey: string
+    testType: string
+    randomSeed: string
+    configSnapshotEncrypted: string
+  }
+  const BATCH = 400
+  async function* sessionsByPrefix(prefix: string): AsyncGenerator<Row[]> {
+    let cursor: string | undefined
+    for (;;) {
+      const batch = await prisma.cognitiveSession.findMany({
+        where: { participantKey: { startsWith: prefix } },
+        orderBy: { id: 'asc' },
+        take: BATCH,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        select: {
+          id: true,
+          participantKey: true,
+          testType: true,
+          randomSeed: true,
+          configSnapshotEncrypted: true,
+        },
+      })
+      if (!batch.length) return
+      yield batch
+      cursor = batch[batch.length - 1].id
+    }
+  }
+
+  const buildFixture = (s: Row) => {
+    const match = /^e3r-(nback|cpt|fake)-[0-9a-f]{8}-(\d+)$/.exec(s.participantKey)
+    const testType = (match ? match[1] : s.testType) as 'nback' | 'cpt' | 'fake'
+    let config: Record<string, unknown> = {}
+    let definitionHash: string | null = null
     try {
       const { snapshot } = readCognitiveSessionConfig(s.configSnapshotEncrypted)
       if (snapshot) {
-        configOf.set(s.id, snapshot.config as Record<string, unknown>)
-        defHashOf.set(s.id, snapshot.configHash)
+        config = snapshot.config as Record<string, unknown>
+        definitionHash = snapshot.configHash
       }
     } catch (err) {
       console.warn(`snapshot read failed for ${s.participantKey}: ${(err as Error).message}`)
     }
-  }
-
-  const grouped: Record<string, unknown[]> = {}
-  for (const s of sessions) {
-    const config = configOf.get(s.id) ?? {}
-    const key = s.testType === 'nback'
-      ? 'cognitiveNormal'
-      : s.testType === 'cpt'
-        ? 'cognitiveLarge'
-        : `cognitiveSize_${(config.trialCount as number) ?? 300}`
-    // Stage 3R boundary confirmation only needs the two product classes; the
-    // fake size ladder stays in the DB and can be re-emitted later (Stage 4).
-    if (process.env.E3_INCLUDE_SIZE !== '1' && key.startsWith('cognitiveSize_')) continue
-    if (!grouped[key]) grouped[key] = []
-    grouped[key].push(s)
-  }
-  console.log('group distribution:', Object.fromEntries(Object.entries(grouped).map(([k, v]) => [k, v.length])))
-
-  mkdirSync(dirname(OUT), { recursive: true })
-
-  const buildFixture = (s: (typeof sessions)[number]) => {
-    const match = /^e3r-(nback|cpt|fake)-[0-9a-f]{8}-(\d+)$/.exec(s.participantKey)
-    const testType = (match ? match[1] : s.testType) as 'nback' | 'cpt' | 'fake'
-    const config = configOf.get(s.id)
-    const trialCount = testType === 'nback' ? 100 : testType === 'cpt' ? 180 : (config?.trialCount as number) ?? 300
+    const trialCount = testType === 'nback' ? 100 : testType === 'cpt' ? 180 : (config.trialCount as number) ?? 300
     const build = testType === 'nback' ? buildNbackTrials : testType === 'cpt' ? buildCptTrials : (seed: string) => buildFakeTrials(seed, trialCount)
     const body = {
       submissionId: s.participantKey.replace(/^e3r-/, 'e3r-'),
       attemptEpoch: 1,
-      definitionHash: defHashOf.get(s.id) ?? null,
+      definitionHash,
       contextSnapshotHash: null,
-      trials: build(s.randomSeed, config ?? {}),
+      trials: build(s.randomSeed, config),
     }
     return {
       fixtureId: s.participantKey,
@@ -178,33 +183,57 @@ async function main() {
     }
   }
 
-  const writeBand = async (filePath: string, key: string, fixtures: unknown[]) => {
-    const ws = createWriteStream(filePath)
-    const write = (chunk: string) => new Promise<void>((resolve, reject) => ws.write(chunk, (err) => (err ? reject(err) : resolve())))
-    await write(`{\n"${key}":[`)
-    for (let i = 0; i < fixtures.length; i += 1) {
-      if (i > 0) await write(',')
-      await write(JSON.stringify(fixtures[i]))
-      if ((i + 1) % 500 === 0) console.log(`  ${filePath}: ${i + 1}/${fixtures.length}`)
-    }
-    await write(']\n}\n')
-    await new Promise<void>((resolve, reject) => ws.end((err) => (err ? reject(err) : resolve())))
-    console.log(`wrote ${filePath} (${fixtures.length})`)
+  // Emit per-run band files so each of the 9 boundary runs per class uses a
+  // fresh, disjoint slice of the pool (no FIXTURE_OFFSET collisions, no 600MB
+  // parse). Each run consumes warmup(5/s×10s=50) + steady(rate×30s), with +50
+  // headroom per band to absorb k6 arrival-pacing slack:
+  // NORMAL: 70→2200, 85→2650, 100→3100 per run; LARGE: 40→1300, 55→1750, 70→2200.
+  const bandPlan: Record<string, number[]> = {
+    cognitiveNormal: [2200, 2200, 2200, 2650, 2650, 2650, 3100, 3100, 3100],
+    cognitiveLarge: [1300, 1300, 1300, 1750, 1750, 1750, 2200, 2200, 2200],
   }
-
-  // Emit per-run bands so each of the 3 runs at a rate point uses a fresh,
-  // disjoint slice of the pool (no FIXTURE_OFFSET collisions, no 600MB parse).
-  const bandSize = (total: number, bands: number) => Math.ceil(total / bands)
-  for (const [key, list] of Object.entries(grouped)) {
-    const fixtures = list.map(buildFixture)
-    const bands = key.startsWith('cognitiveSize_') ? 1 : 3
-    const size = bandSize(fixtures.length, bands)
-    for (let b = 0; b < bands; b += 1) {
-      const slice = fixtures.slice(b * size, (b + 1) * size)
-      if (!slice.length) continue
-      const suffix = bands === 1 ? '' : `-band${b + 1}`
-      await writeBand(OUT.replace(/\.json$/, `${suffix}.json`), key, slice)
+  const rateOf = (key: string, bandIdx: number) => {
+    if (key === 'cognitiveNormal') return [70, 70, 70, 85, 85, 85, 100, 100, 100][bandIdx]
+    if (key === 'cognitiveLarge') return [40, 40, 40, 55, 55, 55, 70, 70, 70][bandIdx]
+    return null
+  }
+  async function emitClass(key: string, prefix: string, plan: number[]) {
+    let bandIdx = 0
+    let filled = 0
+    let fixtures: ReturnType<typeof buildFixture>[] = []
+    const flush = () => {
+      if (!fixtures.length) return
+      const rate = rateOf(key, bandIdx)
+      const tag = rate !== null ? `-${rate}s-r${bandIdx + 1}` : `-band${bandIdx + 1}`
+      const filePath = OUT.replace(/\.json$/, `${tag}.json`)
+      writeFileSync(filePath, JSON.stringify({ [key]: fixtures }))
+      console.log(`wrote ${filePath} (${fixtures.length})`)
+      fixtures = []
     }
+    let total = 0
+    let overflow = 0
+    for await (const batch of sessionsByPrefix(prefix)) {
+      for (const s of batch) {
+        if (bandIdx >= plan.length) { overflow += 1; continue }
+        fixtures.push(buildFixture(s))
+        filled += 1
+        total += 1
+        const cap = plan[bandIdx]
+        if (filled >= cap) {
+          flush()
+          bandIdx += 1
+          filled = 0
+        }
+      }
+    }
+    flush()
+    console.log(`${key}: emitted ${total} fixtures across ${bandIdx} bands (pool overflow skipped: ${overflow})`)
+  }
+  await emitClass('cognitiveNormal', 'e3r-nback-', bandPlan.cognitiveNormal)
+  await emitClass('cognitiveLarge', 'e3r-cpt-', bandPlan.cognitiveLarge)
+  // Size ladder (fake) is only needed for Stage 4; keep it out of Stage 3R bands.
+  if (process.env.E3_INCLUDE_SIZE === '1') {
+    await emitClass('cognitiveSize', 'e3r-fake-', [1600])
   }
 }
 

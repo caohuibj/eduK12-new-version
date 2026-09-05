@@ -31,10 +31,13 @@ import { nbackSequence, cptSequence } from '../src/modules/cognitive/randomizati
 
 const prisma = new PrismaClient()
 const OUT = process.env.E3_CLASS_OUT || '/workspace/eduk12-pr49-cloud-results/e3r-cognitive-class-fixtures.json'
-// Pool sizing: NORMAL 3 runs @100/s×30s ≈ 9150 (+warmup 150) → 9600.
-// LARGE 3 runs @70/s×30s ≈ 6450 (+warmup 150) → 6800.
-const N_NORMAL = Number(process.env.E3_NORMAL_COUNT || 9600)
-const N_LARGE = Number(process.env.E3_LARGE_COUNT || 6800)
+// Pool sizing: 9 boundary runs per class, each run consumes
+// warmup(5/s×10s=50) + steady(rate×30s). Peak NORMAL run = 100/s → 3050/run;
+// peak LARGE run = 70/s → 2150/run. Totals: NORMAL 3×2150+3×2600+3×3050
+// = 23400 → 24000 (+warmup headroom). LARGE 3×1250+3×1700+3×2150 = 15300
+// → 16000.
+const N_NORMAL = Number(process.env.E3_NORMAL_COUNT || 24000)
+const N_LARGE = Number(process.env.E3_LARGE_COUNT || 16000)
 const N_SIZE = Number(process.env.E3_SIZE_COUNT || 200)
 const STUDENT_USERNAME = process.env.PERF_STUDENT_USERNAME || 'gate47student'
 const STUDENT_PASSWORD = process.env.PERF_STUDENT_PASSWORD || 'Gate47StudentPass!'
@@ -241,6 +244,11 @@ async function main() {
   console.log('seeding SIZE ladder...')
   for (const trials of SIZE_LADDER) {
     await seedGroup(`cognitiveSize_${trials}`, 'fake', { trialCount: trials, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }, N_SIZE)
+  }
+
+  if (process.env.E3_SKIP_JSON === '1') {
+    console.log('E3_SKIP_JSON=1: DB seeded, skipping fixture JSON emission')
+    return
   }
 
   mkdirSync(dirname(OUT), { recursive: true })
