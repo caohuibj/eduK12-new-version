@@ -20,6 +20,12 @@ const requests = new SharedArray('e4-fixtures', () => {
   return loadFixtureGroup(fixtures, groupName);
 });
 
+if (requests.length < peak) {
+  throw new Error(
+    `E4 fixture pool exhausted: group="${groupName}" pool=${requests.length} peak=${peak}; seed at least one fresh fixture per VU`,
+  );
+}
+
 export const options = {
   scenarios: {
     e4_aggregate: {
@@ -38,8 +44,8 @@ export default function () {
   // F9 (Gate-E): distribute VUs across distinct child fixtures so same-parent
   // mode hammers different child/submissionId against the SAME parent, instead
   // of every VU reusing requests[0] (same submissionId -> idempotent replay).
-  // Modulo guards the case where the sibling pool is smaller than PEAK.
-  const index = (__VU - 1) % (requests.length || 1);
+  // Fail-closed pool check above guarantees one unique fixture per VU.
+  const index = __VU - 1;
   const request = pickFreshRequest(requests, index);
   runLogicalSubmit(request, {
     profile: 'e4_aggregate',
