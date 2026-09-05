@@ -81,8 +81,8 @@ export function handleSummary(data) {
   const metrics = data.metrics || {};
   const values = (name) => (metrics[name] || {}).values || {};
   const count = (name) => Number(values(name).count || 0);
-  const success = count('gate_e_eventual_success');
-  const fail = count('gate_e_eventual_failure');
+  const success = count('gate_e_steady_eventual_success');
+  const fail = count('gate_e_steady_eventual_failure');
   const wall = data.state?.testRunDurationMs ? data.state.testRunDurationMs / 1000 : 0;
   const summary = {
     profile: 'e3_cognitive_knee',
@@ -96,11 +96,11 @@ export function handleSummary(data) {
     fail,
     eventual_success_rate: success + fail > 0 ? success / (success + fail) : 0,
     productive_final_per_s: durationSeconds > 0 ? success / durationSeconds : 0,
-    fresh_completions: count('gate_e_fresh_completions'),
-    idempotent_replays: count('gate_e_idempotent_replays'),
+    fresh_completions: count('gate_e_steady_fresh_completions'),
+    idempotent_replays: count('gate_e_steady_idempotent_replays'),
     missing_fixtures: count('gate_e_missing_fixtures'),
-    p95_ms: Number(values('gate_e_eventual_latency_ms')['p(95)'] || 0),
-    p99_ms: Number(values('gate_e_eventual_latency_ms')['p(99)'] || 0),
+    p95_ms: Number(values('gate_e_steady_eventual_latency_ms')['p(95)'] || 0),
+    p99_ms: Number(values('gate_e_steady_eventual_latency_ms')['p(99)'] || 0),
     '429': count('gate_e_rate_limited_429'),
     '503': count('gate_e_capacity_busy_503'),
     fixture_pool_size: requests.length,
