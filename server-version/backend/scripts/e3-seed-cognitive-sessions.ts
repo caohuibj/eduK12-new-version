@@ -70,12 +70,6 @@ async function main() {
     JWT_SECRET,
     { expiresIn: '7d' },
   )
-  const headers = {
-    Cookie: `ptool_session=${encodeURIComponent(token)}; ptool_csrf=${encodeURIComponent(csrf)}`,
-    'x-csrf-token': csrf,
-    'Content-Type': 'application/json',
-  }
-
   const fake = await prisma.cognitiveTestConfig.findFirst({
     where: { testType: 'fake', status: 'PUBLISHED' },
   })
@@ -177,7 +171,6 @@ async function main() {
         parentKey: `perf-parent-e3-${fixtureClass.key}-${String(i + 1).padStart(6, '0')}`,
         method: 'POST',
         path: `/api/cognitive/sessions/${session.id}/submit`,
-        headers,
         sessionId: session.id,
         submissionId,
         runtimeGeneration: 'UNIFIED_V1',
@@ -208,6 +201,13 @@ async function main() {
   mkdirSync(dirname(OUT), { recursive: true })
   writeFileSync(OUT, JSON.stringify(fixtures))
   writeFileSync(OUT.replace(/\.json$/, '.ledger.json'), JSON.stringify(ledger, null, 2))
+  writeFileSync(OUT.replace(/\.json$/, '.auth.env'), [
+    `PERF_AUTH_TOKEN=${token}`,
+    `PERF_CSRF_TOKEN=${csrf}`,
+    `PERF_STUDENT_USERNAME=${STUDENT_USERNAME}`,
+    `PERF_STUDENT_PASSWORD=${STUDENT_PASSWORD}`,
+    '',
+  ].join('\\n'), { mode: 0o600 })
   console.log(JSON.stringify({
     out: OUT,
     runId: ledger.runId,
