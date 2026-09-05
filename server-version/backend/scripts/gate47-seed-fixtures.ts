@@ -456,6 +456,7 @@ async function main() {
     parent: null,
     requiresContext: false,
   })
+  for (let i = 0; i < COG_N; i += 1) {
     const session = await prisma.cognitiveSession.create({
       data: {
         userId: student.id,
