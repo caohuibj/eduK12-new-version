@@ -1035,6 +1035,15 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
     if (itemData.some((item) => item.type === 'FORM')) {
       const { ensureCompositeFormSections } = await import('./final-submit.service')
       await ensureCompositeFormSections(copied.id, tx)
+      // Re-read the durable rows after materialization. Returning the create()
+      // snapshot here would expose formSectionId=null even though the copied
+      // item is already bound in the same transaction.
+      const materialized = await tx.compositeAssessment.findUnique({
+        where: { id: copied.id },
+        include: { items: { orderBy: { position: 'asc' } } },
+      })
+      if (!materialized) throw compositeNotFound()
+      return withoutAnalysisProtocolCipher(materialized)
     }
     return withoutAnalysisProtocolCipher(copied)
   })
