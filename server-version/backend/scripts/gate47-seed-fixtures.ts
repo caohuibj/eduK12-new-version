@@ -329,21 +329,21 @@ async function main() {
     if ((i + 1) % 200 === 0) console.log(`  scale ${i + 1}/${SCALE_N}`)
   }
 
-  console.log(\`Creating \${FORM_N} Unified questionnaire form-section fixtures...\`)
+  console.log(`Creating ${FORM_N} Unified questionnaire form-section fixtures...`)
   const formClasses = [
     { key: 'formNormal', itemCount: Number(process.env.FORM_NORMAL_ITEM_COUNT || 8), requests: [] as any[] },
     { key: 'formLarge', itemCount: Number(process.env.FORM_LARGE_ITEM_COUNT || 25), requests: [] as any[] },
   ]
   for (const formClass of formClasses) {
     if (!Number.isInteger(formClass.itemCount) || formClass.itemCount < 1 || formClass.itemCount > 200) {
-      throw new Error(\`\${formClass.key} item count must be an integer from 1 to 200\`)
+      throw new Error(`${formClass.key} item count must be an integer from 1 to 200`)
     }
     for (let i = 0; i < FORM_N; i += 1) {
-      const suffix = \`\${runId}-\${formClass.key}-\${String(i + 1).padStart(5, '0')}\`
+      const suffix = `${runId}-${formClass.key}-${String(i + 1).padStart(5, '0')}`
       const questionnaire = await prisma.questionnaire.create({
         data: {
-          code: \`G47-Q-\${suffix}\`,
-          name: \`Gate47 \${formClass.key} questionnaire \${suffix}\`,
+          code: `G47-Q-${suffix}`,
+          name: `Gate47 ${formClass.key} questionnaire ${suffix}`,
           creatorId: admin.id,
           type: 'COURSE',
           status: 'PUBLISHED',
@@ -366,7 +366,7 @@ async function main() {
             sectionId: section.id,
             sectionPosition: itemIndex,
             type: 'text_input',
-            label: \`\${formClass.key} 字段 \${itemIndex + 1}\`,
+            label: `${formClass.key} 字段 ${itemIndex + 1}`,
             required: true,
             position: itemIndex,
           },
@@ -397,8 +397,8 @@ async function main() {
       })
       ledger.questionnaireAssessmentIds.push(assessment.id)
       ledger.formSectionIds.push(mapped.id)
-      const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: \`answer-\${it.id}\` }))
-      const submissionId = \`g47-form-\${runId}-\${formClass.key}-\${String(i + 1).padStart(6, '0')}\`
+      const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: `answer-${it.id}` }))
+      const submissionId = `g47-form-${runId}-${formClass.key}-${String(i + 1).padStart(6, '0')}`
       const body = {
         submissionId,
         attemptEpoch: 1,
@@ -407,23 +407,23 @@ async function main() {
         answers: formAnswers,
       }
       const request = {
-        fixtureId: \`perf-\${formClass.key}-\${String(i + 1).padStart(6, '0')}\`,
+        fixtureId: `perf-${formClass.key}-${String(i + 1).padStart(6, '0')}`,
         fixtureClass: formClass.key,
-        logicalAttempt: \`\${assessment.id}:1:\${submissionId}\`,
+        logicalAttempt: `${assessment.id}:1:${submissionId}`,
         instrument: 'form',
-        parentKey: \`perf-parent-\${formClass.key}-\${String(i + 1).padStart(6, '0')}\`,
+        parentKey: `perf-parent-${formClass.key}-${String(i + 1).padStart(6, '0')}`,
         parentId: assessment.id,
         sectionId: mapped.id,
         runtimeGeneration: 'UNIFIED_V1',
         method: 'POST',
-        path: \`/api/questionnaires/assessments/\${assessment.id}/form-sections/\${mapped.id}/submit\`,
+        path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
         headers,
         body,
         itemCount: mapped.items.length,
         bodyBytes: Buffer.byteLength(JSON.stringify(body)),
       }
       formClass.requests.push(request)
-      if ((i + 1) % 50 === 0) console.log(\`  \${formClass.key} \${i + 1}/\${FORM_N}\`)
+      if ((i + 1) % 50 === 0) console.log(`  ${formClass.key} ${i + 1}/${FORM_N}`)
     }
   }
   const formNormalRequests = formClasses[0].requests
