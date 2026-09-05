@@ -79,6 +79,23 @@ const MAX_METRIC_KEYS = 10_000
 const OTHER_ROUTE = '__other__'
 const finiteMilliseconds = (value: number): number => Number.isFinite(value) && value >= 0 ? value : 0
 
+const safeMemoryUsage = (): NodeJS.MemoryUsage => {
+  try {
+    return process.memoryUsage()
+  } catch {
+    // Some restricted test sandboxes do not expose the libuv RSS probe. Keep
+    // the metric contract stable without turning an observability failure into
+    // a request failure; production nodes should expose the real values.
+    return {
+      rss: 0,
+      heapTotal: 0,
+      heapUsed: 0,
+      external: 0,
+      arrayBuffers: 0,
+    }
+  }
+}
+
 const httpRequestHistograms = new Map<string, LabeledHistogram>()
 const phaseHistograms = new Map<string, LabeledHistogram>()
 const prismaCallHistograms = new Map<string, LabeledHistogram>()
@@ -515,7 +532,7 @@ const requestCounterLines = (): string[] => (
 
 /** Return Prometheus-compatible process, request, phase and Prisma metrics. */
 export const runtimeMetricLines = (): string[] => {
-  const memory = process.memoryUsage()
+  const memory = safeMemoryUsage()
   const eventLoopUtilization = performance.eventLoopUtilization()
   const delayP50Ms = finiteMilliseconds(eventLoopDelay.percentile(50) / 1_000_000)
   const delayP95Ms = finiteMilliseconds(eventLoopDelay.percentile(95) / 1_000_000)
