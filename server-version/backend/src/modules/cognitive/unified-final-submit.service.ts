@@ -212,10 +212,20 @@ const prepareRuntime = (
     () => normalizeSubmission(definition, input.trials),
   )
   const payload = { trials }
-  const bytes = canonicalJsonBytes(payload)
-  const payloadHash = createHash('sha256').update(bytes).digest('hex')
-  assertCanonicalSubmissionPayloadSize({ bytes: bytes.byteLength }, FINAL_SUBMISSION_MAX_BYTES.cognitive, '认知提交数据')
-  return { snapshot, runtime, definition, trials, payloadHash }
+  const canonical = measureRequestPhaseSync('final_submit_serialization', () => {
+    const bytes = canonicalJsonBytes(payload)
+    const payloadHash = measureRequestPhaseSync(
+      'final_submit_payload_hash',
+      () => createHash('sha256').update(bytes).digest('hex'),
+    )
+    return { bytes, payloadHash }
+  })
+  assertCanonicalSubmissionPayloadSize(
+    { bytes: canonical.bytes.byteLength },
+    FINAL_SUBMISSION_MAX_BYTES.cognitive,
+    '认知提交数据',
+  )
+  return { snapshot, runtime, definition, trials, payloadHash: canonical.payloadHash }
 }
 
 export const submitUnifiedCognitiveSessionFinal = async (
