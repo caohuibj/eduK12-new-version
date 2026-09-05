@@ -57,9 +57,10 @@ export class IntervalEluTracker {
       : null;
     this.#previous = current;
 
+    const safeValue = Number.isFinite(value) && value >= 0 && value <= 1 ? value : null;
     return {
-      value: Number.isFinite(value) && value >= 0 && value <= 1 ? value : null,
-      status: value === null ? 'unavailable' : 'ok',
+      value: safeValue,
+      status: safeValue === null ? 'unavailable' : 'ok',
     };
   }
 
