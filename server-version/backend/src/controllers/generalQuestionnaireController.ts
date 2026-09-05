@@ -101,6 +101,7 @@ export const generalQuestionnaireController = {
             select: {
               assessments: true,
               accessTokens: true,
+              formItems: true,
             },
           },
         },
@@ -109,29 +110,22 @@ export const generalQuestionnaireController = {
         },
       })
 
-      // 计算每个问卷的总题数（表单题目 + 量表题目）
-      const questionnairesWithStats = await Promise.all(
-        questionnaires.map(async (qn) => {
-          // ScaleDefinitionV2 是量表题目数量的唯一来源。
-          const scaleItemCount = qn.questionnaireScales.reduce((sum, qs) => {
-            const definition = qs.scale.definition as any
-            return sum + (Array.isArray(definition?.items) ? definition.items.length : 0)
-          }, 0)
-          
-          // 表单题目数量
-          const formItemCount = await prisma.questionnaireFormItem.count({
-            where: {
-              questionnaireId: qn.id,
-            },
-          })
-          
-          return {
-            ...qn,
-            scaleCount: qn.questionnaireScales.length,
-            totalItems: formItemCount + scaleItemCount, // 总题目数 = 表单 + 量表
-          }
-        })
-      )
+      // _count.formItems is loaded with the list query; keep list work O(1)
+      // in Prisma operations as the number of questionnaires grows.
+      const questionnairesWithStats = questionnaires.map((qn) => {
+        const scaleItemCount = qn.questionnaireScales.reduce((sum, qs) => {
+          const definition = qs.scale.definition as any
+          return sum + (Array.isArray(definition?.items) ? definition.items.length : 0)
+        }, 0)
+        const { _count, ...questionnaire } = qn
+        const { formItems: formItemCount, ...counts } = _count
+        return {
+          ...questionnaire,
+          _count: counts,
+          scaleCount: qn.questionnaireScales.length,
+          totalItems: formItemCount + scaleItemCount,
+        }
+      })
 
       return success(res, {
         list: questionnairesWithStats,
