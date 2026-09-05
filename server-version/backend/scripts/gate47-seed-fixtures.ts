@@ -565,12 +565,33 @@ async function main() {
     ledger.questionnaireAssessmentIds.push(assessment.id)
     await ensureQuestionnaireFormSections(questionnaire.id)
     const sections = await listQuestionnaireFormSections(questionnaire.id)
+    const sameParentSlotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [],
+      formSections: sections.map((section) => ({
+        sectionId: section.id,
+        definitionHash: section.definitionHash,
+      })),
+    })
+    await prisma.questionnaireAssessment.update({
+      where: { id: assessment.id },
+      data: {
+        runtimeGeneration: 'UNIFIED_V1',
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(sameParentSlotSet),
+        frozenActiveSlotSetHash: sameParentSlotSet.snapshotHash,
+      },
+    })
+    ledger.formSectionIds.push(...sections.map((section) => section.id))
     for (const [idx, mapped] of sections.entries()) {
       sameParentRequests.push({
         fixtureId: `perf-same-parent-child-${String(idx + 1).padStart(4, '0')}`,
         instrument: 'form',
         parentKey: 'perf-parent-contention-0001',
         parentId: assessment.id,
+        sectionId: mapped.id,
+        logicalAttempt: `${assessment.id}:1:g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
+        runtimeGeneration: 'UNIFIED_V1',
+        itemCount: mapped.items.length,
         slotIndex: idx,
         method: 'POST',
         path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
