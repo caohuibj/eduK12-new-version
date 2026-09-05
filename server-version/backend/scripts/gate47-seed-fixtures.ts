@@ -25,7 +25,10 @@ import {
   createFrozenUnitAdmission,
   frozenAdmissionPersistence,
 } from '../src/modules/assessment-runtime/admission-snapshot'
-import { freezeQuestionnaireActiveSlotSet } from '../src/modules/assessment-runtime/attempt-runtime'
+import {
+  freezeQuestionnaireActiveSlotSet,
+  formSectionIdentityHash,
+} from '../src/modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet, questionnaireScaleSlotKey } from '../src/modules/assessment-runtime/slot-set'
 
 const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
@@ -359,33 +362,45 @@ async function main() {
         position: 0,
       },
     })
+    await ensureQuestionnaireFormSections(questionnaire.id)
+    const sections = await listQuestionnaireFormSections(questionnaire.id)
+    const mapped = sections[0]
+    if (!mapped) throw new Error('missing form section after ensure')
+    const formDefinitionHash = formSectionIdentityHash(mapped)
+    const formSlotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [],
+      formSections: [{ sectionId: mapped.id, definitionHash: formDefinitionHash }],
+    })
     const assessment = await prisma.questionnaireAssessment.create({
       data: {
         questionnaireId: questionnaire.id,
         userId: student.id,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
         attemptEpoch: 1,
         progress: 0,
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(formSlotSet),
+        frozenActiveSlotSetHash: formSlotSet.snapshotHash,
       },
     })
     ledger.questionnaireAssessmentIds.push(assessment.id)
-    await ensureQuestionnaireFormSections(questionnaire.id)
-    const sections = await listQuestionnaireFormSections(questionnaire.id)
-    const mapped = sections[0]
-    if (!mapped) throw new Error('missing form section after ensure')
     const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: `answer-${it.id}` }))
     formRequests.push({
       fixtureId: `perf-form-${String(i + 1).padStart(6, '0')}`,
       instrument: 'form',
       parentKey: `perf-parent-form-${String(i + 1).padStart(6, '0')}`,
+      parentId: assessment.id,
+      sectionId: mapped.id,
+      runtimeGeneration: 'UNIFIED_V1',
       method: 'POST',
       path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
       headers,
       body: {
         submissionId: `g47-form-${runId}-${String(i + 1).padStart(6, '0')}`,
         attemptEpoch: 1,
-        definitionHash: mapped.definitionHash,
+        definitionHash: formDefinitionHash,
         contextSnapshotHash: null,
         answers: formAnswers,
       },
