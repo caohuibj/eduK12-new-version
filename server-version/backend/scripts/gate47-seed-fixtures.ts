@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from '../src/modules/scale/scale-definition'
-import { createCognitiveSessionConfigSnapshot, readCognitiveSessionConfig } from '../src/modules/cognitive/session.service'
+import { createUnifiedCognitiveSessionConfigSnapshot, readCognitiveSessionConfig } from '../src/modules/cognitive/session.service'
 import { createTrialEnvelope } from '../src/modules/cognitive/v2/trial-envelope'
 import {
   ensureQuestionnaireFormSections,
@@ -22,7 +22,7 @@ import {
   createFrozenUnitAdmission,
   frozenAdmissionPersistence,
 } from '../src/modules/assessment-runtime/admission-snapshot'
-import { freezeQuestionnaireActiveSlotSet } from '../src/modules/assessment-runtime/attempt-runtime'
+import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../src/modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet, questionnaireScaleSlotKey } from '../src/modules/assessment-runtime/slot-set'
 
 const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
@@ -364,6 +364,11 @@ async function main() {
         deliveryMode: 'FINAL_ONLY',
         attemptEpoch: 1,
         progress: 0,
+        // Stage 1R: the Form dispatcher enters the Unified submit path only when
+        // runtimeGeneration == UNIFIED_V1 AND the parent carries the frozen
+        // active-slot-set (see submitUnifiedQuestionnaireFormSectionFinal). The
+        // frozen slot set is set below once the section definition hash is known.
+        runtimeGeneration: 'UNIFIED_V1',
       },
     })
     ledger.questionnaireAssessmentIds.push(assessment.id)
@@ -371,6 +376,24 @@ async function main() {
     const sections = await listQuestionnaireFormSections(questionnaire.id)
     const mapped = sections[0]
     if (!mapped) throw new Error('missing form section after ensure')
+    // Stage 1R: freeze the form-section slot using the canonical form identity
+    // hash (formSectionIdentityHash(SectionRow)), which is what the submit path
+    // compares against. The legacy questionnaireFormSectionDefinitionHash is a
+    // different value and would trip DEFINITION_MISMATCH on the Unified guard.
+    const { definitionHash: _mappedHash, ...sectionRow } = mapped as any
+    const formIdHash = formSectionIdentityHash(sectionRow)
+    const formSlotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [],
+      formSections: [{ sectionId: mapped.id, definitionHash: formIdHash }],
+    })
+    await prisma.questionnaireAssessment.update({
+      where: { id: assessment.id },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(formSlotSet),
+        frozenActiveSlotSetHash: formSlotSet.snapshotHash,
+      },
+    })
     const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: `answer-${it.id}` }))
     formRequests.push({
       fixtureId: `perf-form-${String(i + 1).padStart(6, '0')}`,
@@ -382,7 +405,7 @@ async function main() {
       body: {
         submissionId: `g47-form-${runId}-${String(i + 1).padStart(6, '0')}`,
         attemptEpoch: 1,
-        definitionHash: mapped.definitionHash,
+        definitionHash: formIdHash,
         contextSnapshotHash: null,
         answers: formAnswers,
       },
@@ -391,7 +414,7 @@ async function main() {
     void item
   }
 
-  console.log(`Creating ${COG_N} cognitive sessions...`)
+  console.log(`Creating ${COG_N} UNIFIED_V1 cognitive sessions...`)
   const cognitiveRequests: any[] = []
   for (let i = 0; i < COG_N; i += 1) {
     const trialCount = 3
@@ -401,14 +424,21 @@ async function main() {
       allowPractice: false,
       maxRtMs: 60000,
     }
-    const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+    // Stage 1R: use the production UNIFIED config snapshot writer (compiles the
+    // real runtime + reference bindings) instead of the legacy writer, so the
+    // session carries runtimeGeneration == UNIFIED_V1 and a compiledRuntimeHash
+    // that is internally consistent with snapshot.configHash. On first submit the
+    // production path (ensureCognitiveAdmissionAtDelivery -> activateCognitiveAdmission)
+    // derives and persists the frozen admission from these fields.
+    const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
       testType: fake.testType,
       configVersion: fake.configVersion,
       engineVersion: fake.engineVersion,
       scoringVersion: fake.scoringVersion,
       config: resolvedConfig,
+      db: prisma as any,
     })
-    const snapshot = readCognitiveSessionConfig(configSnapshotEncrypted).snapshot
+    const snapshot = readCognitiveSessionConfig(unifiedSnapshot.encrypted).snapshot
     if (!snapshot) throw new Error('cognitive snapshot missing')
     const session = await prisma.cognitiveSession.create({
       data: {
@@ -420,10 +450,12 @@ async function main() {
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         configVersion: fake.configVersion,
-        configSnapshotEncrypted,
+        configSnapshotEncrypted: unifiedSnapshot.encrypted,
         engineVersion: fake.engineVersion,
         scoringVersion: fake.scoringVersion,
         randomSeed: `g47-seed-${runId}-${i}`,
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
       },
     })
     ledger.cognitiveSessionIds.push(session.id)
@@ -499,12 +531,30 @@ async function main() {
         deliveryMode: 'FINAL_ONLY',
         attemptEpoch: 1,
         progress: 0,
+        // Stage 1R: sameParent must be a real UNIFIED_V1 parent (frozen slot set
+        // below), otherwise E4 sibling submits fall back to the legacy path.
+        runtimeGeneration: 'UNIFIED_V1',
       },
     })
     ledger.questionnaireAssessmentIds.push(assessment.id)
     await ensureQuestionnaireFormSections(questionnaire.id)
     const sections = await listQuestionnaireFormSections(questionnaire.id)
+    // Freeze ALL sibling form-section slots on the shared parent (production-
+    // equivalent Unified frozen attempt state), keyed by the canonical hash.
+    const formSections = sections.map((mapped: any) => {
+      const { definitionHash: _h, ...sectionRow } = mapped
+      return { sectionId: mapped.id, definitionHash: formSectionIdentityHash(sectionRow) }
+    })
+    const sameSlotSet = freezeQuestionnaireActiveSlotSet({ attemptEpoch: 1, scales: [], formSections })
+    await prisma.questionnaireAssessment.update({
+      where: { id: assessment.id },
+      data: {
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(sameSlotSet),
+        frozenActiveSlotSetHash: sameSlotSet.snapshotHash,
+      },
+    })
     for (const [idx, mapped] of sections.entries()) {
+      const { definitionHash: _h, ...sectionRow } = mapped as any
       sameParentRequests.push({
         fixtureId: `perf-same-parent-child-${String(idx + 1).padStart(4, '0')}`,
         instrument: 'form',
@@ -517,7 +567,7 @@ async function main() {
         body: {
           submissionId: `g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
           attemptEpoch: 1,
-          definitionHash: mapped.definitionHash,
+          definitionHash: formSectionIdentityHash(sectionRow),
           contextSnapshotHash: null,
           answers: mapped.items.map((it) => ({ formItemId: it.id, value: `same-${it.id}` })),
         },

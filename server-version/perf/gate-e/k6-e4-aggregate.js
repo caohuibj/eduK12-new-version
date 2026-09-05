@@ -8,6 +8,7 @@
  */
 import { SharedArray } from 'k6/data';
 import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http.js';
+import { assertSiblingPoolSufficient } from './lib/e4-pool-guard.cjs';
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
 const mode = String(__ENV.MODE || 'manyParent');
@@ -19,6 +20,10 @@ const requests = new SharedArray('e4-fixtures', () => {
   const fixtures = JSON.parse(open(fixturePath));
   return loadFixtureGroup(fixtures, groupName);
 });
+
+// Stage 1R (fail-closed): refuse to start when the fixture pool is smaller than the
+// requested concurrency. Trailing VUs must NOT be recycled onto reused fixtures.
+assertSiblingPoolSufficient(requests.length, peak);
 
 export const options = {
   scenarios: {
@@ -36,11 +41,10 @@ export const options = {
 
 export default function () {
   // F9 (Gate-E): distribute VUs across distinct child fixtures so same-parent
-  // mode hammers different child/submissionId against the SAME parent, instead
-  // of every VU reusing requests[0] (same submissionId -> idempotent replay).
-  // Modulo guards the case where the sibling pool is smaller than PEAK.
-  const index = (__VU - 1) % (requests.length || 1);
-  const request = pickFreshRequest(requests, index);
+  // mode hammers different child/submissionId against the SAME parent. Stage 1R
+  // removed modulo reuse: the init-time pool guard guarantees requests.length >=
+  // peak, so __VU-1 is always a distinct in-range index (no replay/reuse collapse).
+  const request = pickFreshRequest(requests, __VU - 1);
   runLogicalSubmit(request, {
     profile: 'e4_aggregate',
     mode,
