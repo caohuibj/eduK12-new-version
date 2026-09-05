@@ -23,6 +23,7 @@ import {
   frozenAdmissionPersistence,
 } from '../src/modules/assessment-runtime/admission-snapshot'
 import { FINAL_SUBMISSION_MAX_BYTES } from '../src/services/instrumentFinalSubmit'
+import { canonicalJsonBytes } from '../src/modules/assessment-runtime/canonical'
 
 const prisma = new PrismaClient()
 const OUT = process.env.E3_OUT || '/workspace/eduk12-pr52-cloud-results/e3-cognitive-fixtures.json'
@@ -164,7 +165,7 @@ async function main() {
         trials,
       }
       const bodyBytes = Buffer.byteLength(JSON.stringify(body))
-      const canonicalPayloadBytes = Buffer.byteLength(JSON.stringify({ trials }))
+      const canonicalPayloadBytes = canonicalJsonBytes({ trials }).byteLength
       if (!(bodyBytes < FINAL_SUBMISSION_MAX_BYTES.cognitive)) {
         throw new Error(`${fixtureClass.key} body exceeds FINAL cognitive max`)
       }
