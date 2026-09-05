@@ -8,6 +8,8 @@ import {
   fixturesUsed,
   freshCompletions,
   idempotentReplays,
+  steadyIdempotentReplays,
+  steadyFreshCompletions,
   missingFixtures,
 } from './eventual-success.js';
 
@@ -128,6 +130,7 @@ export function runLogicalSubmit(request, tags = {}) {
       const replayed = parseReplayFlag(response.body);
       if (replayed) {
         idempotentReplays.add(1, tags);
+        if (tags.phase === 'steady') steadyIdempotentReplays.add(1);
         // F7 (Gate-E): a replay on the first attempt means non-fresh /
         // pre-seeded reuse and is fail-closed for an authoritative run. Only a
         // replay that arrives on a later capacity (503) retry of this same
@@ -156,6 +159,7 @@ export function runLogicalSubmit(request, tags = {}) {
         return true;
       }
       freshCompletions.add(1, tags);
+      if (tags.phase === 'steady') steadyFreshCompletions.add(1);
       sawFreshCompletion = true;
       recordEventualOutcome({
         ok: true,
