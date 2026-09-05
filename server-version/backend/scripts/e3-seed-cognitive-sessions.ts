@@ -195,8 +195,20 @@ async function main() {
     fixtures[fixtureClass.key] = requests
   }
 
-  // Backward-compatible combined group; capacity tests should select a class.
+  // Contract proof for fresh throughput: every logical submit owns one child,
+  // submission ID, and fixture record. Replay tests opt out explicitly.
   fixtures.cognitive = classes.flatMap(({ key }) => fixtures[key])
+  const allFixtures = fixtures.cognitive
+  for (const field of ['fixtureId', 'sessionId', 'submissionId', 'logicalAttempt']) {
+    const values = allFixtures.map((fixture) => fixture[field])
+    if (values.some((value) => typeof value !== 'string' || value.length === 0)
+      || new Set(values).size !== values.length) {
+      throw new Error(`E3 fixture uniqueness contract failed for ${field}`)
+    }
+  }
+  if (allFixtures.some((fixture) => fixture.runtimeGeneration !== 'UNIFIED_V1')) {
+    throw new Error('E3 fixture runtimeGeneration contract failed')
+  }
 
   mkdirSync(dirname(OUT), { recursive: true })
   writeFileSync(OUT, JSON.stringify(fixtures))
