@@ -103,7 +103,12 @@ export function runLogicalSubmit(request, tags = {}) {
     const path = String(request.path || '');
     const url = `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
     const headers = merge(request.headers);
-    if (__ENV.AUTH_TOKEN) headers.Authorization = `Bearer ${__ENV.AUTH_TOKEN}`;
+    const authToken = String(__ENV.AUTH_TOKEN || __ENV.PERF_AUTH_TOKEN || '').trim();
+    const csrfToken = String(__ENV.CSRF_TOKEN || __ENV.PERF_CSRF_TOKEN || '').trim();
+    if (authToken) {
+      headers.Cookie = `ptool_session=${encodeURIComponent(authToken)}${csrfToken ? `; ptool_csrf=${encodeURIComponent(csrfToken)}` : ''}`;
+      if (csrfToken) headers['x-csrf-token'] = csrfToken;
+    }
     if (request.body !== undefined && request.body !== null && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
