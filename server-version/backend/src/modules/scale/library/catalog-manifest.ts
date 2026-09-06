@@ -81,6 +81,63 @@ export const scaleCatalogConstructSchema = z.object({
 })
 export type ScaleCatalogConstruct = z.infer<typeof scaleCatalogConstructSchema>
 
+export const respondentTypeSchema = z.enum(['SELF', 'PARENT', 'TEACHER', 'OBSERVER', 'CLINICIAN'])
+export type RespondentType = z.infer<typeof respondentTypeSchema>
+
+/** 该工具的发展人群证据强度：是否有针对目标发展年龄段的心理测量学证据。 */
+export const developmentalEvidenceSchema = z.enum(['ESTABLISHED', 'PARTIAL', 'UNKNOWN'])
+export type DevelopmentalEvidence = z.infer<typeof developmentalEvidenceSchema>
+
+/**
+ * 工具适用人群与作答者（SL1-C2）。年龄用完整岁数（completed years）；
+ * 年级用 1-12（1=小学一年级）。省略某一轴表示“该轴不限”。
+ */
+export const scaleCatalogPopulationSchema = z.object({
+  minAge: z.number().int().min(0).max(100).optional(),
+  maxAge: z.number().int().min(0).max(100).optional(),
+  gradeRange: z.object({
+    minGrade: z.number().int().min(1, 'minGrade 必须在 1-12').max(12, 'minGrade 必须在 1-12'),
+    maxGrade: z.number().int().min(1, 'maxGrade 必须在 1-12').max(12, 'maxGrade 必须在 1-12'),
+  }).strict().optional(),
+  populationNotes: z.string().min(1).optional(),
+  respondentTypes: z.array(respondentTypeSchema).min(1, '至少需要一种作答者类型'),
+  developmentalEvidence: developmentalEvidenceSchema,
+}).strict().superRefine((population, ctx) => {
+  if ((population.minAge === undefined) !== (population.maxAge === undefined)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['minAge'],
+      message: 'minAge 与 maxAge 必须同时给出或同时省略',
+    })
+  }
+  if (population.minAge !== undefined && population.maxAge !== undefined && population.minAge > population.maxAge) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['minAge'],
+      message: 'minAge 不能大于 maxAge',
+    })
+  }
+  if (population.gradeRange && population.gradeRange.minGrade > population.gradeRange.maxGrade) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['gradeRange', 'minGrade'],
+      message: 'minGrade 不能大于 maxGrade',
+    })
+  }
+  const seen = new Set<string>()
+  population.respondentTypes.forEach((respondent, index) => {
+    if (seen.has(respondent)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['respondentTypes', String(index)],
+        message: 'respondentTypes 不能重复',
+      })
+    }
+    seen.add(respondent)
+  })
+})
+export type ScaleCatalogPopulation = z.infer<typeof scaleCatalogPopulationSchema>
+
 /**
  * catalogManifestVersion 是 manifest 内容版本（任何内容变化，如 evidence
  * citation 修订，都必须递增）；schemaVersion 才是契约结构版本。
@@ -91,6 +148,7 @@ export const scaleCatalogManifestV1Schema = z.object({
   catalogStatus: scaleCatalogStatusSchema,
   identity: scaleCatalogIdentitySchema,
   construct: scaleCatalogConstructSchema,
+  population: scaleCatalogPopulationSchema,
 }).strict()
 
 export type ScaleCatalogManifestV1 = z.infer<typeof scaleCatalogManifestV1Schema>

@@ -23,4 +23,11 @@ export const validCatalogManifestBase = (): ScaleCatalogManifestV1 => ({
     constructLevel: 'SPECIFIC_CONSTRUCT',
     constructOverlapTags: ['quality_of_life', 'positive_affect'],
   },
+  population: {
+    minAge: 9,
+    maxAge: 18,
+    gradeRange: { minGrade: 3, maxGrade: 12 },
+    respondentTypes: ['SELF'],
+    developmentalEvidence: 'PARTIAL',
+  },
 })
