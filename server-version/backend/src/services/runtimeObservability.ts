@@ -44,6 +44,8 @@ export type RequestObservationPhase =
   | 'aggregate.report'
   | 'aggregate.encrypt'
   | 'aggregate.persist'
+  | 'aggregate.persist.cas'
+  | 'aggregate.persist.analysis_snapshot'
   | 'aggregate.cas_loser'
   | 'response'
 
@@ -491,6 +493,39 @@ export const recordPrismaError = (code: unknown): void => {
   prismaErrorCounts.set(code, (prismaErrorCounts.get(code) || 0) + 1)
 }
 
+type AggregatePersistAttribution = {
+  reportBytesTotal: number
+  payloadCountTotal: number
+  attemptsTotal: number
+}
+
+const aggregatePersistAttribution = new Map<string, AggregatePersistAttribution>()
+
+/**
+ * Attribute aggregate persist cost to its inputs: encrypted report bytes and
+ * snapshot payload count, per parent kind. Process-wide counters so the A/B
+ * can correlate persist seconds/s against bytes/s without touching payloads.
+ */
+export const recordAggregatePersistAttribution = (input: {
+  kind: 'questionnaire' | 'composite'
+  reportBytes: number
+  payloadCount: number
+}): void => {
+  const current = aggregatePersistAttribution.get(input.kind) ?? { reportBytesTotal: 0, payloadCountTotal: 0, attemptsTotal: 0 }
+  current.reportBytesTotal += Math.max(0, input.reportBytes)
+  current.payloadCountTotal += Math.max(0, input.payloadCount)
+  current.attemptsTotal += 1
+  aggregatePersistAttribution.set(input.kind, current)
+}
+
+const aggregatePersistAttributionLines = (): string[] => (
+  [...aggregatePersistAttribution.entries()].flatMap(([kind, attribution]) => [
+    `ptool_aggregate_persist_report_bytes_total{kind="${escapeLabel(kind)}"} ${attribution.reportBytesTotal}`,
+    `ptool_aggregate_persist_payload_count_total{kind="${escapeLabel(kind)}"} ${attribution.payloadCountTotal}`,
+    `ptool_aggregate_persist_attempts_total{kind="${escapeLabel(kind)}"} ${attribution.attemptsTotal}`,
+  ])
+)
+
 const histogramLines = (
   metricName: string,
   entries: Map<string, LabeledHistogram>,
@@ -604,6 +639,9 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_prisma_errors_total Prisma error codes observed by middleware.',
     '# TYPE ptool_prisma_errors_total counter',
     ...[...prismaErrorCounts.entries()].map(([code, count]) => `ptool_prisma_errors_total{code="${escapeLabel(code)}"} ${count}`),
+    '# HELP ptool_aggregate_persist_report_bytes_total Cumulative encrypted aggregate report bytes fed into persist, by parent kind.',
+    '# TYPE ptool_aggregate_persist_report_bytes_total counter',
+    ...aggregatePersistAttributionLines(),
   ]
   return lines
 }
@@ -620,6 +658,7 @@ export const resetRuntimeObservabilityForTests = (): void => {
   boundedAdmissionRejectionCounts.clear()
   boundedAdmissionGateStates.clear()
   prismaErrorCounts.clear()
+  aggregatePersistAttribution.clear()
   activeRequests = 0
   gcEvents = 0
   gcDurationMs = 0

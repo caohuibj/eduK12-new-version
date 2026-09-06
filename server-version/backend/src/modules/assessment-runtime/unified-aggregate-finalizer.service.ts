@@ -12,6 +12,7 @@ import { withAggregateFinalizationAdmission } from '../../services/aggregateFina
 import {
   measureRequestPhase,
   measureRequestPhaseSync,
+  recordAggregatePersistAttribution,
   recordRequestPhase,
 } from '../../services/runtimeObservability'
 import {
@@ -276,14 +277,25 @@ const probeUnifiedParent = async (input: {
   return { kind: 'ready', parent, frozenSlots, headers, completeness }
 }
 
+// Payload fetch carries only the identity join key and the encrypted blobs;
+// every header field stays authoritative in the probe's header set so the
+// same columns are never transferred twice.
 const snapshotPayloadSelect = {
-  ...snapshotHeaderSelect,
+  id: true,
+  slotKey: true,
   canonicalResultEncrypted: true,
   collectionFactsEncrypted: true,
 } as const
 
-type AggregateSnapshotRow = AggregateSnapshotHeader & {
+type AggregateSnapshotPayloadRow = {
   id: string
+  slotKey: string
+  canonicalResultEncrypted: string | null
+  collectionFactsEncrypted: string | null
+}
+
+/** Authoritative header fields joined with the payload fetched by id. */
+type AggregateSnapshotRow = AggregateSnapshotHeader & {
   canonicalResultEncrypted: string | null
   collectionFactsEncrypted: string | null
 }
@@ -481,14 +493,14 @@ const loadSnapshotPayloads = async (input: {
   attemptEpoch: number
   composite: boolean
   ids: string[]
-}): Promise<AggregateSnapshotRow[]> => {
+}): Promise<AggregateSnapshotPayloadRow[]> => {
   const where = input.composite
     ? { compositeAttemptId: input.parentId, attemptEpoch: input.attemptEpoch, id: { in: input.ids } }
     : { questionnaireAssessmentId: input.parentId, attemptEpoch: input.attemptEpoch, id: { in: input.ids } }
   return measureRequestPhase('aggregate.payload_db', () => prisma.assessmentUnitSnapshot.findMany({
     where,
     select: snapshotPayloadSelect,
-  })) as Promise<AggregateSnapshotRow[]>
+  })) as Promise<AggregateSnapshotPayloadRow[]>
 }
 
 const decryptCompletedPayloads = async (input: {
@@ -499,13 +511,20 @@ const decryptCompletedPayloads = async (input: {
   headers: AggregateSnapshotHeader[]
   contextHash: string | null
 }): Promise<{ payloads: CanonicalPayload[]; entries: AggregateInputHashEntry[] }> => {
+  // The probe's header set is the single authoritative source; payloads are
+  // joined by id and must cover it exactly (missing or divergent rows fail
+  // closed instead of being healed).
+  const headerBySlot = new Map(input.headers.map((header) => [header.slotKey, header]))
+  if (headerBySlot.size !== input.headers.length) {
+    throw aggregateSourceError('快照 header 存在重复槽位')
+  }
   const rows = await loadSnapshotPayloads({
     parentId: input.parentId,
     attemptEpoch: input.attemptEpoch,
     composite: input.composite,
     ids: input.headers.map((header) => header.id as string),
   })
-  const rowsBySlot = new Map(rows.map((row) => [row.slotKey, row]))
+  const payloadById = new Map(rows.map((row) => [row.id, row]))
   const requiredSlots = input.slots.filter((candidate) => candidate.required)
 
   type ParsedSlot = {
@@ -518,9 +537,16 @@ const decryptCompletedPayloads = async (input: {
   const parsed = measureRequestPhaseSync('aggregate.decrypt_parse', () => {
     const out: ParsedSlot[] = []
     for (const slot of requiredSlots) {
-      const rawHeader = input.headers.find((header) => header.slotKey === slot.slotKey)
-      const row = rowsBySlot.get(slot.slotKey)
-      if (!rawHeader || !row) throw aggregateSourceError(`槽位 ${slot.slotKey} 的快照在 payload 查询中消失`)
+      const header = headerBySlot.get(slot.slotKey)
+      if (!header) throw aggregateSourceError(`槽位 ${slot.slotKey} 的快照 header 缺失`)
+      const payload = payloadById.get(header.id as string)
+      if (!payload) throw aggregateSourceError(`槽位 ${slot.slotKey} 的快照在 payload 查询中消失`)
+      if (payload.slotKey !== header.slotKey) throw aggregateSourceError(`槽位 ${slot.slotKey} 的快照 payload 身份不一致`)
+      const row: AggregateSnapshotRow = {
+        ...header,
+        canonicalResultEncrypted: payload.canonicalResultEncrypted,
+        collectionFactsEncrypted: payload.collectionFactsEncrypted,
+      }
       if (slot.unitType === 'FORM_SECTION') {
         const facts = withAggregateDefinitionBoundary(() => {
           if (!row.collectionFactsEncrypted) throw new Error('collection facts 加密载荷缺失')
@@ -875,8 +901,9 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
   let packageSnapshot: FrozenReportPackageSnapshot | null = null
   const assessment = parent.compositeAssessment
   const { compiledBundleRuntimeHash, aggregateInputHash } = measureRequestPhaseSync('aggregate.validate', () => {
+    const slotsByKey = new Map(frozenSlots.slots.map((candidate) => [candidate.slotKey, candidate]))
     for (const section of assessment.formSections) {
-      const slot = frozenSlots.slots.find((candidate) => candidate.slotKey === formSectionSlotKey(section.id))
+      const slot = slotsByKey.get(formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.facts) throw aggregateInputError(`综合测评表单区段 ${section.id} 的 collection facts 缺失`)
       validateCompositeFactsAgainstSection(section, payload.facts)
@@ -933,6 +960,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
     aggregateInputHash,
     packageAnalysis,
     payloadEncrypted,
+    payloadCount: completed.payloads.length,
   })
 }
 
@@ -945,13 +973,19 @@ const persistCompositeCompletion = async (input: {
   aggregateInputHash: string
   packageAnalysis: { analysis: any } | null
   payloadEncrypted: string | null
+  payloadCount: number
 }): Promise<CompletionResult> => {
   const fallbackCompletedAt = new Date()
   const completedAt = maxRequiredSnapshotCompletedAt(input.frozenSlots.slots, input.headers, fallbackCompletedAt)
+  recordAggregatePersistAttribution({
+    kind: 'composite',
+    reportBytes: input.payloadEncrypted ? Buffer.byteLength(input.payloadEncrypted, 'utf8') : 0,
+    payloadCount: input.payloadCount,
+  })
   try {
     return await measureRequestPhase('aggregate.persist', () => prisma.$transaction(async (tx) => {
       // CAS-first: claim parent completion before durable analysis snapshot write.
-      const updated = await tx.compositeAssessmentAttempt.updateMany({
+      const updated = await measureRequestPhase('aggregate.persist.cas', () => tx.compositeAssessmentAttempt.updateMany({
         where: parentGuard(input.parent),
         data: {
           status: 'COMPLETED',
@@ -962,12 +996,13 @@ const persistCompositeCompletion = async (input: {
           lastSavedAt: completedAt,
           aggregateInputHash: input.aggregateInputHash,
         },
-      })
+      }))
       if (updated.count !== 1) throw new AggregateCasLost()
 
       if (input.packageAnalysis && input.payloadEncrypted) {
         const analysis = input.packageAnalysis.analysis
-        await tx.compositeAnalysisSnapshot.upsert({
+        const payloadEncrypted = input.payloadEncrypted
+        await measureRequestPhase('aggregate.persist.analysis_snapshot', () => tx.compositeAnalysisSnapshot.upsert({
           where: {
             attemptId_analysisVersion_inputFingerprint: {
               attemptId: input.parent.id,
@@ -985,7 +1020,7 @@ const persistCompositeCompletion = async (input: {
             inputFingerprint: input.aggregateInputHash,
             generationReason: 'COMPLETION',
             generatedBy: null,
-            payloadEncrypted: input.payloadEncrypted,
+            payloadEncrypted,
             aggregateInputHash: input.aggregateInputHash,
             hashScheme: UNIFIED_AGGREGATE_HASH_SCHEME,
             compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
@@ -994,7 +1029,7 @@ const persistCompositeCompletion = async (input: {
             runtimeGeneration: unifiedRuntimeGeneration,
           },
           update: {},
-        })
+        }))
       }
       return { status: 'COMPLETED', progress: 100, completedAt }
     }, { isolationLevel: 'ReadCommitted' }))
@@ -1102,11 +1137,11 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
   })
   const payloadBySlot = new Map(completed.payloads.map((payload) => [payload.header.slotKey, payload]))
   const { scaleInputs, formInputs, aggregateInputHash } = measureRequestPhaseSync('aggregate.validate', () => {
+    const slotsByKey = new Map(frozenSlots.slots.map((candidate) => [candidate.slotKey, candidate]))
     const nextScaleInputs = parent.questionnaire.questionnaireScales.map((questionnaireScale: any) => {
-      const slot = frozenSlots.slots.find((candidate) => (
-        candidate.slotKey === `scale:${questionnaireScale.id}`
-        && candidate.unitType === 'SCALE'
-      ))
+      // slotKey 格式（scale:<id>）已编码槽位类型，Map 命中即等价于原
+      // slotKey+unitType 复合断言；未命中由下方守卫统一 fail closed。
+      const slot = slotsByKey.get(`scale:${questionnaireScale.id}`)
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.envelope) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的冻结结果缺失`)
       if (
@@ -1124,7 +1159,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
       }
     })
     const nextFormInputs = parent.questionnaire.formSections.map((section: any) => {
-      const slot = frozenSlots.slots.find((candidate) => candidate.slotKey === formSectionSlotKey(section.id))
+      const slot = slotsByKey.get(formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.facts) throw aggregateInputError(`问卷表单区段 ${section.id} 的 collection facts 缺失`)
       validateQuestionnaireFactsAgainstSection(section, payload.facts)
@@ -1154,6 +1189,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
     headers,
     aggregateInputHash,
     aggregateReportEncrypted,
+    payloadCount: completed.payloads.length,
   })
 }
 
@@ -1163,14 +1199,20 @@ const persistQuestionnaireCompletion = async (input: {
   headers: AggregateSnapshotHeader[]
   aggregateInputHash: string
   aggregateReportEncrypted: string
+  payloadCount: number
 }): Promise<CompletionResult> => {
   const fallbackCompletedAt = new Date()
   const completedAt = maxRequiredSnapshotCompletedAt(input.frozenSlots.slots, input.headers, fallbackCompletedAt)
+  recordAggregatePersistAttribution({
+    kind: 'questionnaire',
+    reportBytes: Buffer.byteLength(input.aggregateReportEncrypted, 'utf8'),
+    payloadCount: input.payloadCount,
+  })
   try {
     return await measureRequestPhase('aggregate.persist', () => prisma.$transaction(async (tx) => {
       const completedScales = input.frozenSlots.slots.filter((slot) => slot.required && slot.unitType === 'SCALE').length
       const completedForms = input.frozenSlots.slots.filter((slot) => slot.required && slot.unitType === 'FORM_SECTION').length
-      const updated = await tx.questionnaireAssessment.updateMany({
+      const updated = await measureRequestPhase('aggregate.persist.cas', () => tx.questionnaireAssessment.updateMany({
         where: parentGuard(input.parent),
         data: {
           status: 'COMPLETED',
@@ -1183,7 +1225,7 @@ const persistQuestionnaireCompletion = async (input: {
           aggregateReportEncrypted: input.aggregateReportEncrypted,
           aggregateInputHash: input.aggregateInputHash,
         },
-      })
+      }))
       if (updated.count !== 1) throw new AggregateCasLost()
       return { status: 'COMPLETED', progress: 100, completedAt }
     }, { isolationLevel: 'ReadCommitted' }))
