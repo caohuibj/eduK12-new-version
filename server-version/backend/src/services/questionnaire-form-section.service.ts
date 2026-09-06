@@ -49,6 +49,7 @@ import {
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
 import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
+import type { UnifiedParentHeader } from '../modules/assessment-runtime/unified-aggregate-finalizer.service'
 import {
   decryptFrozenScaleRuntimeSnapshot,
   encryptFrozenScaleRuntimeSnapshot,
@@ -1685,7 +1686,16 @@ const finalizeQuestionnaireFinalOnlyIfReady = async (assessmentId: string) => {
   return latest ? { status: latest.status, progress: latest.progress, completedAt: latest.completedAt } : null
 }
 
-const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
+const finalizeQuestionnaireIfReady = async (
+  assessmentId: string,
+  // O4 load-once dispatch: callers that already loaded the parent header
+  // (the /complete route) pass it in, skipping this dispatch read entirely.
+  preloadedParent?: UnifiedParentHeader,
+) => {
+  if (preloadedParent) {
+    const { finalizeQuestionnaireAttemptUnifiedIfReady } = await import('../modules/assessment-runtime/unified-aggregate-finalizer.service')
+    return finalizeQuestionnaireAttemptUnifiedIfReady(assessmentId, preloadedParent)
+  }
   const route = await prisma.questionnaireAssessment.findUnique({
     where: { id: assessmentId },
     select: { deliveryMode: true, runtimeGeneration: true },

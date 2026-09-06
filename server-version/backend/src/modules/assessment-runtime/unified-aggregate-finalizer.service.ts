@@ -93,6 +93,16 @@ const unifiedParentHeaderSelect = {
   completedForms: true,
 } as const
 
+/**
+ * Load-once dispatch select for the /complete route (O4): one authoritative
+ * read serves existence, ownership, runtime dispatch AND the aggregate
+ * parent probe, replacing the former guard + dispatch + probe triple read.
+ */
+export const unifiedCompletionDispatchSelect = {
+  ...unifiedParentHeaderSelect,
+  userId: true,
+} as const
+
 const compositeParentHeaderSelect = {
   id: true,
   status: true,
@@ -210,7 +220,7 @@ const questionnaireParentGraphSelect = {
   },
 }
 
-type UnifiedParentHeader = {
+export type UnifiedParentHeader = {
   id: string
   status: string
   deliveryMode: string
@@ -245,8 +255,9 @@ const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progre
 const probeUnifiedParent = async (input: {
   parentId: string
   composite: boolean
+  preloadedParent?: UnifiedParentHeader
 }): Promise<TerminalProbe> => {
-  const parent = await measureRequestPhase('aggregate.parent_probe_db', async () => (
+  const parent = input.preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', async () => (
     input.composite
       ? prisma.compositeAssessmentAttempt.findUnique({
           where: { id: input.parentId },
@@ -1075,8 +1086,8 @@ const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCo
   }
 }
 
-const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<CompletionResult | null> => {
-  const probe = await probeUnifiedParent({ parentId: assessmentId, composite: false })
+const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedParent?: UnifiedParentHeader): Promise<CompletionResult | null> => {
+  const probe = await probeUnifiedParent({ parentId: assessmentId, composite: false, preloadedParent })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') {
@@ -1213,10 +1224,10 @@ export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string) 
   })
 )
 
-export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: string) => (
+export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: string, preloadedParent?: UnifiedParentHeader) => (
   withAggregateFinalizationAdmission(async () => {
     try {
-      return await finalizeQuestionnaireUnifiedImpl(assessmentId)
+      return await finalizeQuestionnaireUnifiedImpl(assessmentId, preloadedParent)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
       if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')

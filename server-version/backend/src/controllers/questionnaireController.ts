@@ -41,6 +41,7 @@ import {
 } from '../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import * as formSectionService from '../services/questionnaire-form-section.service'
+import { unifiedCompletionDispatchSelect, type UnifiedParentHeader } from '../modules/assessment-runtime/unified-aggregate-finalizer.service'
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
@@ -2801,14 +2802,20 @@ export const questionnaireController = {
       // V32-2 completion is driven by the closed aggregate. Keep this route
       // outside the legacy Serializable transaction so a unified attempt does
       // not re-read raw scale answers or form-answer rows.
-      const route = await prisma.questionnaireAssessment.findUnique({
+      // O4 load-once dispatch: one authoritative read (parent header + owner)
+      // replaces the former guard probe + route dispatch + finalizer parent
+      // probe triple read.
+      const parent = await prisma.questionnaireAssessment.findUnique({
         where: { id },
-        select: { userId: true, runtimeGeneration: true },
-      })
-      if (!route) return notFound(res, '问卷测评不存在')
-      if (route.userId !== userId) return forbidden(res, '无权限操作此测评')
-      if (route.runtimeGeneration === 'UNIFIED_V1') {
-        const completion = await formSectionService.finalizeQuestionnaireAttemptIfReady(id)
+        select: unifiedCompletionDispatchSelect,
+      }) as (UnifiedParentHeader & { userId: string | null }) | null
+      if (!parent) return notFound(res, '问卷测评不存在')
+      if (parent.runtimeGeneration !== 'UNIFIED_V1') {
+        return instrumentError(res, 'LEGACY_WRITE_DISABLED', '旧的逐题/批量写入接口已停用，请重启测评后使用最终提交', 410)
+      }
+      if (parent.userId !== userId) return forbidden(res, '无权限操作此测评')
+      if (parent.runtimeGeneration === 'UNIFIED_V1') {
+        const completion = await formSectionService.finalizeQuestionnaireAttemptIfReady(id, parent)
         if (!completion) return notFound(res, '问卷测评不存在')
         if (completion.status !== 'COMPLETED') {
           return error(res, '问卷测评尚未完成', -1, 409)
