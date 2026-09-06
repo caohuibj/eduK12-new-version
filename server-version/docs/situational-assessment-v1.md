@@ -1,105 +1,200 @@
-# Situational Assessment V1（Text）— 架构决策与实施方案
+# Situational Assessment V1（Text）— 架构决策与 Pilot-first 实施方案
 
-状态：PR-A 实施中（feat/situational-v1-domain）。本文档记录已锁定的架构决策、
-运行时落点与节点/验收计划；后续 Image / Comic / Video（PR-E / PR-F）在此基础上演进。
+状态：PR-A review-fix（feat/situational-v1-domain，基于 main@e793766）。
+本文档记录已锁定的架构决策、运行时落点、Pilot-first 节点/验收计划与未来
+Research backlog；Image / Comic / Video（PR-E / PR-F）在此基础上演进。
 
-## 1. 已锁定的架构决策（2026-09-06）
+## 1. 科研成熟度模型：两条正交的轴
+
+```text
+Product lifecycle:    DRAFT → PUBLISHED → RETIRED
+Scientific maturity:  PILOT → RESEARCH_GRADE
+```
+
+两条轴互相独立。第一版正式允许 `PUBLISHED + PILOT + referencePolicy=none +
+provisional scoringVersion` 上线——这不是半成品，而是正常产品状态。
+
+Pilot 必须：功能完整、scoring deterministic、scoringVersion 显式、raw evidence
+immutable、result reproducible、report complete、interpretation conservative、
+version/reanalysis 可行。
+
+Pilot 不要求：正式常模、percentile、年龄常模、option × facet empirical
+loading、factor analysis、measurement invariance、formal reliability study、
+convergent/discriminant validity、behavioral signature、situational sensitivity
+model、Matrix Sampling、Video telemetry。这些属于 RESEARCH_GRADE 升级路径
+（见 §7 Research backlog）。
+
+## 2. 已锁定的架构决策
 
 ### Decision A — 单一 provisional option contribution
-- Raw answer 只保存 `sceneKey / channelKey / optionKey`（或 0–100 评分值），**不保存分数**。
-  被冻结的参与者证据永远是"选了什么"，不是"得几分"。
-- `scoring.scoringVersion` 把 optionKey 映射为单一 provisional contribution
-  （trait-expression gradient，如 +1.5 / +0.5 / −0.5 / −1.5）。校准后发布新
-  scoringVersion，基于 immutable 历史回答重算，**response schema 永不变**。
-- 每个 response channel 明确一个 `scoredConstruct`；scene 的
+- Raw response 永远只保存"用户回答了什么"：`sceneKey / channelKey /
+  responseValue`（choice 存 optionKey，CONTINUOUS 存显式 range 内的数值），
+  **不保存分数**。
+- provisional 计分映射由 `scoringVersion` 管理；calibration 后可发布新
+  scoringVersion，基于 immutable 历史回答重算，response schema 永不变。
+- V1 不使用 option × facet 多维 loading matrix；scene 的
   `secondaryConstructs` 仅作科学设计元数据，V1 不自动计分。
-- 将来确有经验依据支持多维 loading 时，通过新 scoringVersion / custom scorer
-  扩展（对齐 Scale 的 `registerScaleCustomScorer` 机制），不预埋 schema。
+- 将来确有经验依据时，通过新 scoringVersion / custom scorer 扩展。
 
-### Decision B — Construct × Channel 独立 metrics
-- 每个已激活且允许发布的 channel 生成独立 metric key
+### Decision B — Canonical 输出 Construct × Channel 独立 metrics
+- 每个已激活且允许发布的 channel 一个独立 metric key
   （如 `bfi2.assertiveness.behavior`、`bfi2.anxiety.emotion`），进
-  `CanonicalUnitResultCoreV1.metrics[]`，由编译期
-  `aggregateProjection.allowedMetricKeys` 白名单把关。
-- Canonical 层不合并通道（would-do / should-do / emotion / appraisal 保持可分），
-  也不输出 raw scene response。
-- Norm–Behavior Gap、Trait–Skill Gap 等派生指标必须由**版本化 scoring /
-  analysis definition** 显式生成；报告层只读取与解释，不临时计算科学分数。
+  `CanonicalUnitResultCoreV1.metrics[]`，由编译期 `allowedMetricKeys` 白名单把关。
+- Canonical 层不合并通道，也不输出 raw scene responses（contract test 强制）。
+- Norm–Behavior Gap 等派生指标必须由版本化 scoring / analysis definition
+  显式生成；报告层只读取与解释，不临时计算科学分数。
 
-### Decision C — Instrument / Module = UNIT
-- 一个 Situational Instrument（或具有独立科学评分/完成语义的 Module）
-  = 一个 UNIT = 1 个 slot = 1 次 FINAL submit = 1 个 CanonicalUnitResult。
-- Scene 是 UNIT 内部的测量原子，每 Scene 1–3 个 response channels。
-- Matrix Sampling 在 UNIT start 时选择并冻结为 **UNIT 内部状态**
-  （frozen situational assignment），**不改 FrozenActiveSlotSet**——
-  90 场景 → 1 slot，避免冻结 slot 集合随场景数膨胀。
-- 不采用一 Scene 一 UNIT，也不采用一 Channel 一 UNIT。
-  （对齐现状：Scale slot = 整份量表；Cognitive slot = 整个 task、
-  一次 FINAL submit 携带全部 trials。）
+### Decision C — Instrument / scientific Module = UNIT
+```text
+1 Situational Instrument / meaningful Module
+= 1 UNIT = 1 slot = N scenes = 1 FINAL submit = 1 CanonicalUnitResult
+```
+Scene 是 UNIT 内部测量原子；每 Scene 1–3 channels。不采用一 Scene 一 UNIT，
+也不采用一 Channel 一 UNIT。
 
-### Decision D — Bundle 集成是 V1 完成条件
-- PR 序列：PR-A Domain+Scoring → PR-B Runtime+Submit → PR-C UI+Report →
-  PR-D Composite/Bundle（V1 completion gate）→ 之后才是 PR-E Image/Comic、
-  PR-F Video。
-- PR-D 只做四件事：Composite 可选 `SITUATIONAL` item type；composite freeze
-  铸 situational slot（一个 instrument 一个 slot）；FINAL submit →
-  CanonicalUnitResult / AssessmentUnitSnapshot；Evidence bridge 只消费
-  canonical aggregate-safe metrics，不读 raw scene responses。
+### Decision D — Channel 三概念正交
+```text
+channelKey   自由字符串 identity：raw response / choiceScores / metrics 均以它为键
+purpose      科学含义枚举：BEHAVIOR_TENDENCY | EMOTION | APPROACH_AVOID |
+             PREFERENCE | APPRAISAL | NORM_JUDGMENT | CONFIDENCE（仅元数据）
+responseType 应答/计分 primitive：SINGLE_CHOICE | CONTINUOUS
+```
+- 三者互不推断；scorer 按 `responseType` 分派，**永远不按 channelKey 或
+  purpose 的名称**（有 orthogonality regression test 强制）。
+- CONTINUOUS primitive 显式携带 `range {min,max}` 与
+  `scoringDirection: POSITIVE | NEGATIVE`（NEGATIVE = min+max−raw 的确定性
+  反向映射）。没有 piecewise / formula / 任意 JS 规则 / IRT / transform graph。
+- Runner payload 包含 CONTINUOUS 的 `range`（渲染滑条所需），但剥离
+  `purpose / scoringDirection / scoredConstruct / contributions / 科学元数据`。
 
-## 2. 运行时落点
+### Decision E — Runtime capability 不跑在代码前面
+`compileSituationRuntime` 的 `runtimeCapabilities` 只声明当前 unified runtime
+已支持的能力。PR-A 阶段全部为 false（standalone/embedded/aggregateEligible/
+supported；collectionFacts 恒为 false——situational 永远产出 UNIT_RESULT）。
+落地对应路径的 PR 翻转对应 flag，绝不提前。
+
+### Decision F — Definition identity 绑定完整定义内容
+`compileSituationRuntime` 的 `sourceDefinitionHash = hashSituationDefinition(
+definition)`：同 key+version 下任何 scene/channel/scoring 内容变化都必须改变
+冻结 identity（contract test 强制）。
+
+## 3. Sampling（Pilot V1 边界）
+
+Pilot V1 固定 `{ strategy: 'ALL' }`：全部声明场景、固定线性呈现。
+Matrix Sampling 已从 Pilot V1 契约中移除（原 FIXED_SCENE_SAMPLE 是"schema
+宣布支持、scorer 不支持"的半实现）。它进入 Research-scale backlog，将来以
+显式 assignment contract 回归：`assignmentVersion + activeSceneKeys +
+activeChannelKeys + sampling provenance`。scorer 永不依赖它无法兑现的
+sampling 语义。
+
+## 4. 节点路线图（Pilot-first）
+
+```text
+PR-A   Domain + Scoring Contract（本 PR）
+  ↓
+PR-B   Standalone Pilot Runtime
+  ↓
+PR-C   Text Pilot Product
+  ↓
+========================================
+PUBLISHED + PILOT  Standalone Launch Gate
+========================================
+  ↓
+PR-D   Composite / Bundle Integration
+  ↓
+========================================
+Situational V1 Architecture Complete
+========================================
+  ↓
+PR-E   Image / Comic        PR-F   Video
+```
+
+**Pilot Launchable ≠ V1 Architecture Complete**：PR-C 完成即可 standalone
+Pilot 上线；PR-D 仍是 V1 architecture-complete 的必要条件。
+
+### PR-B — Standalone Pilot Runtime（范围已收窄）
+只做：Situational unit persistence identity（exact frozen
+definition/runtime/scoringVersion）→ start → resume → all scenes → 客户端
+收集 raw answers → ONE FINAL submit → validate once → score once → canonical
+once → encrypt/write once → idempotency → history/result。
+不做：Matrix Sampling、Bundle、Reference、norm、research workflow、media、
+branching。
+性能纪律（沿 O4 / Unified FINAL）：不重新引入 guard read → route read →
+finalizer reread；不 per-answer durable write；不 per-scene DB write；不新增
+admission semaphore（复用现有 UNIT admission）；one UNIT = one final-submit
+boundary。
+
+### PR-C — Text Pilot Product（= Pilot Launch Gate）
+覆盖：Text Scene Runner（SINGLE_CHOICE + CONTINUOUS、每 Scene 1–3 channels、
+local draft/resume、FINAL submit）、result page、history、export /
+reanalysis-compatible evidence、Pilot wording、browser E2E、mobile regression、
+Computer Use key journey。
+完成即 `PUBLISHED + PILOT` standalone 上线。不等 Bundle / Image / Video /
+Matrix Sampling / reference / formal psychometric study。
+
+### PR-D — Composite / Bundle Integration（范围窄，V1 完成条件）
+只做四件事：Composite item type 支持 `SITUATIONAL`；freeze 铸一个 situational
+slot；terminal `AssessmentUnitSnapshot / CanonicalUnitResult`；Evidence bridge
+只消费 canonical metrics。不 reread raw responses、不做 bundle 专用 scorer、
+不新增跨工具心理 ontology、不做 composite interpretation engine。
+
+## 5. Reference policy
+
+Pilot V1 保持 `referencePolicy = none`。不为"看起来更完整"制造 simulation
+percentile、expert-estimated norm、fake age bands、arbitrary 低/中/高人群
+解释。报告可展示 raw / scaled descriptive Construct × Channel 分数，但不得
+表述"高于同龄人 73% / 正常范围 / 异常 / 诊断"。
+
+Reference 演进路径（本轮不实现 engine）：
+`NONE → LOCAL_PILOT → LOCAL_NORM → VALIDATED_NORM`。
+
+## 6. Report wording
+
+保留"provisional / descriptive / no diagnosis / no norm"原则。报告层可教育性
+解释、可给 reflection guidance；不得把单 scene state response 表述为稳定
+trait；不得用 provisional score 做常模性标签；不得自行产生科学派生分数。
+
+允许："在本组标准化情境中，你较常选择直接表达不同意见的行为方式。"
+避免："你是一个高果断性人格的人。"
+
+## 7. Research backlog（只记录，不实施）
+
+- **R1 Content evidence**：expert review、cognitive interview、construct-scene mapping。
+- **R2 Option calibration**：response frequency、monotonicity、rare options、empirical rescoring。
+- **R3 Scene functioning**：scene discrimination、difficulty/extremity、context effects。
+- **R4 Channel structure**：Behavior / Norm / Emotion / Appraisal 是否真正可分。
+- **R5 Reliability / Generalizability**：cross-scene generalizability、test-retest、
+  alternate forms、Person × Situation variance。
+- **R6 Validity**：BFI-2 / SEL / Taking Charge / observer / educational outcomes。
+- **R7 Population evidence**：grade、age、locale、group consistency / invariance。
+- **R8 Reference**：LOCAL_PILOT → LOCAL_NORM → VALIDATED_NORM。
+- **R9 Research-scale presentation**：Matrix Sampling assignment contract
+  （assignmentVersion / activeSceneKeys / activeChannelKeys / provenance）。
+
+## 8. 运行时落点
 
 新模块 `server-version/backend/src/modules/situational/`（镜像 Scale 模块形态）：
 
 | 文件 | 职责 |
 | --- | --- |
-| `situation-definition.ts` | zod schema（instrument / scene / channel / sampling / scoring / report）、跨字段校验、`hashSituationDefinition`、`runnerSituationDefinition`（客户端投递切片，剥离构念与计分元数据） |
-| `situation-scoring.ts` | 纯函数 scorer：raw responses → `SituationalResultV1{metrics, quality}`；answers ≠ scores；`validateSituationalResponse`、`missingRequiredSituationalResponseKeys` |
+| `situation-definition.ts` | zod schema（instrument/scene/channel/sampling/scoring/report）、跨字段校验、`hashSituationDefinition`、`runnerSituationDefinition` |
+| `situation-scoring.ts` | 纯函数 scorer：raw responses → `SituationalResultV1{metrics, quality}`；responseType 分派；answers ≠ scores |
 | `packages/*.ts` | 代码拥有的内容包（definition + goldenCases），provisional key 版本化 |
-| `situation-package.registry.ts` | 包注册表 + `validateSituationPackage`（定义校验 + hash 稳定性 + runner 构建 + golden cases 执行，发布 gate） |
+| `situation-package.registry.ts` | 包注册表 + `validateSituationPackage`（定义校验 + hash 稳定性 + runner 构建 + golden 执行） |
 
-运行时契约扩展：
-- `assessment-runtime/types.ts`：`RuntimeInstrumentType` 增加 `'SITUATIONAL'`。
-- `assessment-runtime/compiler.ts`：`compileSituationRuntime`——publishedMetrics →
-  metricDefinitions + `aggregateProjection.allowedMetricKeys`；
-  `scorerKey='situational.default'`、`scorerVersion=scoring.scoringVersion`；
-  `referenceBindingDefinition={required:false}`（V1 referencePolicy=none）。
-- `assessment-runtime/unit-result.ts`：`projectSituationCanonicalUnitResult`；
-  core/envelope 的 unitType 联合与 zod 增加 `'SITUATIONAL'`。
+运行时契约扩展：`RuntimeInstrumentType`/`CanonicalUnitResult` unitType 增加
+`SITUATIONAL`；`compileSituationRuntime`（publishedMetrics → metricDefinitions
++ `allowedMetricKeys` 白名单；sourceDefinitionHash = 完整定义内容 hash；
+staged capabilities）；`projectSituationCanonicalUnitResult`（Construct ×
+Channel metrics，canonical 层无 raw responses）。
 
-后续节点（PR-B 及以后）：
-- Prisma `AssessmentUnitType` / `CompositeAssessmentItemType` 增加 `SITUATIONAL`（migration）。
-- `slot-set.ts` / `attempt-runtime.ts`：`situationalSlot()`（slotKey `situational:<id>`）。
-- 提交链镜像 Scale：`situation-admission.service.ts`（activateSituationAdmission +
-  assertAdmissionParentBinding）→ `withUnitSubmitAdmission`（共享
-  UNIT_SUBMIT_ADMISSION_LIMIT=7 / QUEUE=16 / TIMEOUT=500ms 闸门）→ raw answers
-  加密持久化（镜像 CognitiveRawSubmission）→ 纯内存计分 → canonical projection →
-  `AssessmentUnitSnapshot` create-only → `finalizeParentAfterUnitSubmit`。
-- Start 时按 sampling 配置计算并冻结 `frozenSituationalAssignmentEncrypted(+hash)`，
-  resume/submit 校验，fail-closed 抛 STALE_ATTEMPT/DEFINITION_MISMATCH(409)；
-  infrastructure 错误 next(err) 走 5xx。遵守 O4 读纪律，不重新引入重复 parent read。
-- 架构边界：`v32-1.architecture.test.ts` 增加 SITUATIONAL 段（不得引用 legacy
-  coordination / frozen slot 内部；必须匹配 admission 激活与 parent binding 断言）。
+## 9. 验收基线（PR-A）
 
-## 3. 节点与验收（摘要）
-
-| 节点 | 范围 | 验收 |
-| --- | --- | --- |
-| PR-A | 定义/计分契约 + 3 个黄金包 + compiler/projection + 文档 | 定义校验正/负测试；golden scoring fixtures；换 scoringVersion 重算回归（response schema 不变）；tsc 干净；全量 vitest 零回归 |
-| PR-B | Prisma 枚举 + slot/assignment + admission + FINAL submit + 路由 + 观测 + 架构测试 | CI 4 项；定向 postgres 集成（快照 create-only、exactly-once、/complete 含 SITUATIONAL）；并发分类（COMPLETION_BUSY ≠ retry-serialization）；冻结 assignment 409；全量回归。**review STOP gate** |
-| PR-C | Standalone Text UI + Report（student/public 两路径） | frontend CI；浏览器真实路径回归；Computer Use 关键 journey；断点续答恢复 frozen assignment |
-| PR-D | Composite/Bundle 集成（Decision D 四件事） | 混合 slot freeze/submit/aggregate 集成测试；bridge 只达 canonical metrics；report projector 快照；CI 4 项 + 全量回归 |
-| 收口 | correctness closure + 文档 | 不做 anchor reset / k6 curve / capacity 校准（冻结中）；PR-B/D 标 performance-sensitive，仅数量级 smoke sanity（separately verified） |
-
-## 4. V1 边界（不做）
-
-Branching / Sequential Decision；Image/Comic/Video stimulus（schema 仅预留
-`stimulus.type`）；开放式生成题自动计分；answer-driven 自适应；批量题库生产
-（内容走 content lane 并行）；问卷内嵌 situational（QuestionnaireScale 式第三宿主，
-如需作为 V1.x 追加节点）；不碰 #53/#54/#55 冻结内容。
-
-## 5. 性能敏感标注（供 PR-B / PR-D 描述引用）
-
-- submission payload 大小：N scenes × channels 的 raw responses（量级：数十 KB / UNIT）。
-- snapshot 持久化：1 条 `AssessmentUnitSnapshot`（UNIT_RESULT，canonicalResultEncrypted）。
-- aggregate finalization：新增一种 unitType 的 canonical metrics 投影（构造 × channel keys）。
-- admission：与 SCALE/COGNITIVE 共享 UNIT_SUBMIT_ADMISSION_* 闸门，不新增闸门参数。
+- 定义校验 positive/negative；golden scoring fixtures（含跨场景 mean、
+  CONTINUOUS POSITIVE/NEGATIVE、双通道独立 metric）；
+- 换 scoringVersion 重算同 raw responses 得新分、response schema 不变；
+- orthogonality regressions：choice-under-emotion-key、CONFIDENCE+CONTINUOUS、
+  duplicate channelKey、inverted range 拒绝；
+- canonical：whitelist 拒绝、not_calculable/null 语义、无 raw responses；
+- runner payload 不泄露 purpose/scoringDirection/scoredConstruct/contributions；
+- compiled `sourceDefinitionHash` 随定义内容变化；staged capabilities 全 false。
