@@ -58,6 +58,32 @@ export const missingFixtures = new Counter('gate_e_missing_fixtures');
 export const steadyFreshCompletions = new Counter('gate_e_steady_fresh_completions');
 export const steadyIdempotentReplays = new Counter('gate_e_steady_idempotent_replays');
 
+/**
+ * Raw steady eventual-latency samples. k6 v0.52 Trend summaries only expose
+ * avg/min/med/max/p(90)/p(95) - no p(50)/p(99) - so the knee harness computes
+ * its own quantiles from these samples (<= 3050 numbers per run, trivial).
+ */
+const steadyLatencySamples = [];
+export function collectSteadyLatency(ms) {
+  steadyLatencySamples.push(Number(ms) || 0);
+}
+export function steadyLatencyQuantiles() {
+  if (!steadyLatencySamples.length) return null;
+  const s = steadyLatencySamples.slice().sort((a, b) => a - b);
+  const q = (p) => s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))];
+  let sum = 0;
+  for (const v of s) sum += v;
+  return {
+    count: s.length,
+    p50: q(0.5),
+    p90: q(0.9),
+    p95: q(0.95),
+    p99: q(0.99),
+    max: s[s.length - 1],
+    avg: sum / s.length,
+  };
+}
+
 export function recordEventualOutcome(options) {
   const {
     ok,
@@ -67,7 +93,10 @@ export function recordEventualOutcome(options) {
   } = options;
   eventualLatency.add(latencyMs, tags);
   const steady = tags && tags.phase === 'steady';
-  if (steady) steadyEventualLatency.add(latencyMs);
+  if (steady) {
+    steadyEventualLatency.add(latencyMs);
+    collectSteadyLatency(latencyMs);
+  }
   if (ok) {
     eventualSuccess.add(1, tags);
     if (steady) steadyEventualSuccess.add(1);

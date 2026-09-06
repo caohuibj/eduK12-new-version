@@ -39,6 +39,9 @@ const OUT = process.env.E3_CLASS_OUT || '/workspace/eduk12-pr49-cloud-results/e3
 const N_NORMAL = Number(process.env.E3_NORMAL_COUNT || 24000)
 const N_LARGE = Number(process.env.E3_LARGE_COUNT || 16000)
 const N_SIZE = Number(process.env.E3_SIZE_COUNT || 200)
+// Participant-key prefix. Stage 3R pools use 'e3r-'; Stage 4 (capacity curve)
+// uses a disjoint prefix so the rebuild script never mixes pools.
+const PREFIX = process.env.E3_PREFIX || 'e3r-'
 const STUDENT_USERNAME = process.env.PERF_STUDENT_USERNAME || 'gate47student'
 const STUDENT_PASSWORD = process.env.PERF_STUDENT_PASSWORD || 'Gate47StudentPass!'
 const JWT_SECRET = process.env.JWT_SECRET!
@@ -205,23 +208,23 @@ async function main() {
     const trialCount = testType === 'nback' ? 100 : testType === 'cpt' ? 180 : (config.trialCount as number)
     for (let i = 0; i < count; i += 1) {
       const runId = randomUUID().slice(0, 8)
-      const seed = `e3r-${testType}-${runId}-${i}`
+      const seed = `${PREFIX}${testType}-${runId}-${i}`
       const { session, configHash } = await createSession({
         userId: student.id,
         cfg,
         config,
-        participantKey: `e3r-${testType}-${runId}-${i}`,
+        participantKey: `${PREFIX}${testType}-${runId}-${i}`,
         randomSeed: seed,
       })
       const body = {
-        submissionId: `e3r-${testType}-${runId}-${String(i).padStart(6, '0')}`,
+        submissionId: `${PREFIX}${testType}-${runId}-${String(i).padStart(6, '0')}`,
         attemptEpoch: 1,
         definitionHash: configHash,
         contextSnapshotHash: null,
         trials: build(seed, config),
       }
       out.push({
-        fixtureId: `e3r-${testType}-${String(i + 1).padStart(6, '0')}`,
+        fixtureId: `${PREFIX}${testType}-${String(i + 1).padStart(6, '0')}`,
         instrument: 'cognitive',
         parentKey: `perf-e3r-${testType}-${String(i + 1).padStart(6, '0')}`,
         method: 'POST',
@@ -239,11 +242,17 @@ async function main() {
 
   console.log('seeding NORMAL (nback 100)...')
   await seedGroup('cognitiveNormal', 'nback', NBACK_CONFIG, N_NORMAL)
-  console.log('seeding LARGE (cpt 180)...')
-  await seedGroup('cognitiveLarge', 'cpt', CPT_CONFIG, N_LARGE)
-  console.log('seeding SIZE ladder...')
-  for (const trials of SIZE_LADDER) {
-    await seedGroup(`cognitiveSize_${trials}`, 'fake', { trialCount: trials, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }, N_SIZE)
+  // Class-selective reseed: E3_ONLY_NORMAL=1 replays only the nback pool
+  // (Stage 3R NORMAL rerun) without touching the intact cpt/fake pools.
+  if (process.env.E3_ONLY_NORMAL !== '1') {
+    console.log('seeding LARGE (cpt 180)...')
+    await seedGroup('cognitiveLarge', 'cpt', CPT_CONFIG, N_LARGE)
+    console.log('seeding SIZE ladder...')
+    for (const trials of SIZE_LADDER) {
+      await seedGroup(`cognitiveSize_${trials}`, 'fake', { trialCount: trials, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }, N_SIZE)
+    }
+  } else {
+    console.log('E3_ONLY_NORMAL=1: LARGE/SIZE pools left untouched')
   }
 
   if (process.env.E3_SKIP_JSON === '1') {

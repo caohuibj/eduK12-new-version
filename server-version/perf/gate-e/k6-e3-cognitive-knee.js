@@ -8,6 +8,7 @@
 import exec from 'k6/execution';
 import { SharedArray } from 'k6/data';
 import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http.js';
+import { steadyLatencyQuantiles } from './lib/eventual-success.js';
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
 const groupName = __ENV.GROUP || 'cognitiveNormal';
@@ -24,15 +25,21 @@ const secondsFromDuration = (value) => {
   return Number(match[1]) * (match[2] === 'm' ? 60 : 1);
 };
 const durationSeconds = secondsFromDuration(duration);
+// k6 constant-arrival-rate pacing can overshoot the configured warmup count by
+// a few iterations, so warmup and steady use DISJOINT fixture zones: warmup
+// takes indices [0, warmupCap), steady takes [warmupCap, warmupCap+steady).
+// warmupCap = 1.5x the configured warmup (5/s x 10s -> 75) absorbs the slack
+// without ever colliding with steady's fresh slice.
+const warmupCap = Math.ceil(warmupRate * warmupSeconds * 1.5);
 const warmupFixtures = Math.ceil(warmupRate * warmupSeconds);
 const steadyFixtures = Math.ceil(rate * durationSeconds);
 const requests = new SharedArray('e3-knee-fixtures', () => {
   const fixtures = JSON.parse(open(fixturePath));
   return loadFixtureGroup(fixtures, groupName);
 });
-if (requests.length < warmupFixtures + steadyFixtures) {
+if (requests.length < warmupCap + steadyFixtures) {
   throw new Error(
-    `E3 knee fixture pool exhausted: group="${groupName}" pool=${requests.length} required=${warmupFixtures + steadyFixtures}`,
+    `E3 knee fixture pool exhausted: group="${groupName}" pool=${requests.length} required=${warmupCap + steadyFixtures}`,
   );
 }
 
@@ -58,6 +65,10 @@ export const options = {
       tags: { phase: 'steady' },
     },
   },
+  // k6 v0.52 Trend summaries omit p(50)/p(99) by default; expose them so the
+  // Stage 2R accounting can read exact percentiles from the summary instead of
+  // relying on per-VU module state (which k6 does not share with handleSummary).
+  summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(50)', 'p(90)', 'p(95)', 'p(99)'],
   thresholds: {
     gate_e_missing_fixtures: ['count<1'],
   },
@@ -67,7 +78,7 @@ export default function () {
   const isWarmup = exec.scenario.name === 'e3_cognitive_knee_warmup';
   const index = isWarmup
     ? exec.scenario.iterationInTest
-    : warmupFixtures + exec.scenario.iterationInTest;
+    : warmupCap + exec.scenario.iterationInTest;
   const request = pickFreshRequest(requests, index);
   runLogicalSubmit(request, {
     profile: 'e3_cognitive_knee',
@@ -84,15 +95,25 @@ export function handleSummary(data) {
   const success = count('gate_e_steady_eventual_success');
   const fail = count('gate_e_steady_eventual_failure');
   const wall = (data.state && data.state.testRunDurationMs) ? data.state.testRunDurationMs / 1000 : 0;
-  // Stage 2R corrected accounting: for constant-arrival-rate the number of
-  // iterations k6 actually started is completed + dropped. Warmup (50 by
-  // construction) is excluded from steady offered load.
+  // Stage 2R corrected accounting. For constant-arrival-rate, every started
+  // steady iteration records exactly one eventual outcome, so the authoritative
+  // steady started count is success + fail; dropped (arrivals that never got a
+  // VU) is added to give actual offered = started + dropped. iterations_total /
+  // dropped_iterations stay as raw k6 cross-checks.
   const iterationsTotal = count('iterations');
   const droppedTotal = count('dropped_iterations');
-  const startedTotal = iterationsTotal + droppedTotal;
-  const steadyStarted = Math.max(0, startedTotal - warmupFixtures);
+  const steadyStarted = success + fail;
   const steadyDropped = Math.max(0, droppedTotal);
   const latency = values('gate_e_steady_eventual_latency_ms');
+  // Percentiles come from the Trend summary (summaryTrendStats above) so they
+  // are exact across all VUs; the raw-sample quantile module state is VU-local
+  // in k6 and is only used as a fallback when p(50)/p(99) are absent.
+  const q = steadyLatencyQuantiles();
+  // k6's JS dialect has no `??`; use an explicit undefined/null fallback.
+  const lt = (k, fallback) => {
+    const v = latency[k];
+    return (v === undefined || v === null) ? fallback : Number(v);
+  };
   const summary = {
     profile: 'e3_cognitive_knee',
     payload_class: groupName,
@@ -103,10 +124,10 @@ export function handleSummary(data) {
     wall_seconds_including_warmup: wall,
     iterations_total: iterationsTotal,
     dropped_iterations: droppedTotal,
-    started_iterations_total: startedTotal,
     steady_started: steadyStarted,
     steady_dropped: steadyDropped,
     steady_actual_offered: steadyStarted + steadyDropped,
+    steady_offered_configured: rate * durationSeconds,
     success,
     fail,
     eventual_success_rate: success + fail > 0 ? success / (success + fail) : 0,
@@ -115,11 +136,14 @@ export function handleSummary(data) {
     idempotent_replays: count('gate_e_steady_idempotent_replays'),
     missing_fixtures: count('gate_e_missing_fixtures'),
     latency_ms: {
-      p50: Number(latency['p(50)'] || 0),
-      p90: Number(latency['p(90)'] || 0),
-      p95: Number(latency['p(95)'] || 0),
-      p99: Number(latency['p(99)'] || 0),
-      max: Number(latency.max || 0),
+      count: q ? q.count : Number(latency.count || 0),
+      p50: lt('p(50)', q ? q.p50 : 0),
+      p90: lt('p(90)', q ? q.p90 : 0),
+      p95: lt('p(95)', q ? q.p95 : 0),
+      p99: lt('p(99)', q ? q.p99 : 0),
+      max: lt('max', q ? q.max : 0),
+      avg: lt('avg', q ? q.avg : 0),
+      med: lt('med', 0),
     },
     '429': count('gate_e_rate_limited_429'),
     '503': count('gate_e_capacity_busy_503'),

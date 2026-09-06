@@ -1,39 +1,33 @@
 #!/usr/bin/env bash
-# Stage 3R boundary confirmation runner (NORMAL nback-100 / LARGE cpt-180).
+# Stage 4 capacity-curve runner (NORMAL nback-100 / LARGE cpt-180).
 #
-# For each of the 9 runs per class (rate x3 repetitions, 30s steady + 10s warmup):
-#   1. PRE-RUN DRAIN PROOF: UNIT active=0, UNIT queue=0, no stale k6 process,
-#      no in-flight benchmark requests. Aborts (after retries) if not clean.
-#   2. Snapshot: cgroup CPU (cpu.max/cpu.stat), DB durable counters (raw
-#      submissions + session completions for the class prefix).
-#   3. Run k6 constant-arrival-rate against the disjoint band fixture file.
-#   4. Snapshot again; poll drain tail until UNIT active/queue return to 0.
-#   5. Emit one JSON record with Stage 2R corrected accounting per run.
+# Scans offered rate 25..175 step 15 (single 30s steady run per point) and
+# emits Stage 2R corrected accounting per point. Same pre-run drain proof and
+# drain-tail polling as the Stage 3R boundary runner; VU budgets are capped at
+# high rates to stay inside the sandbox cgroup memory ceiling.
 #
 # Reusable env (defaults point at the perf review workspace):
-#   BASE_URL, K6DIR, FIXDIR, SUMMARY_DIR, PGURL
-# Usage: run-e3r3-boundary.sh <normal|large>
-
+#   BASE_URL, K6DIR, FIXDIR, SUMMARY_DIR, PGURL, E3_DB_PREFIX
+# Usage: run-e3s4-curve.sh <normal|large>
 set -uo pipefail
 
-CLASS="${1:?usage: run-e3r3-boundary.sh <normal|large>}"
+CLASS="${1:?usage: run-e3s4-curve.sh <normal|large>}"
 BASE="${BASE_URL:-http://127.0.0.1:3000}"
 K6DIR="${K6DIR:-/data/user/work/eduK12-new-version/server-version/perf/gate-e}"
 FIXDIR="${FIXDIR:-/workspace/eduk12-pr49-cloud-results}"
-SUMDIR="${SUMDIR:-$FIXDIR/e3r3}"
+SUMDIR="${SUMDIR:-$FIXDIR/e3s4}"
 PGURL="${PGURL:-}"
 
 mkdir -p "$SUMDIR"
 
 if [ "$CLASS" = normal ]; then
   GROUP=cognitiveNormal
-  PREFIX=e3r-nback-
-  RATES=(70 70 70 85 85 85 100 100 100)
+  PREFIX="${E3_DB_PREFIX:-e3s4-nback-}"
 else
   GROUP=cognitiveLarge
-  PREFIX=e3r-cpt-
-  RATES=(40 40 40 55 55 55 70 70 70)
+  PREFIX="${E3_DB_PREFIX:-e3s4-cpt-}"
 fi
+RATES=(25 40 55 70 85 100 115 130 145 160 175)
 
 # --- DB env -----------------------------------------------------------------
 if [ -z "$PGURL" ]; then
@@ -60,9 +54,8 @@ inflight() { metric 'ptool_nodejs_active_requests'; }
 stale_k6() { ps aux | grep -E '[k]6 run' | wc -l; }
 
 cg_snapshot() {
-  local stat
+  local stat max
   stat=$(awk -F' ' '{printf "%s=%s;", $1, $2}' /sys/fs/cgroup/cpu.stat 2>/dev/null)
-  local max
   max=$(tr ' ' '/' < /sys/fs/cgroup/cpu.max 2>/dev/null)
   printf 'cpu_max=%s;%s' "$max" "$stat"
 }
@@ -74,11 +67,9 @@ drain_ok() {
 }
 
 wait_drain_tail() {
-  # poll until UNIT active+queue are 0; returns seconds taken
-  local start
+  local start i a q
   start=$(date +%s)
-  local i
-  for i in $(seq 1 60); do
+  for i in $(seq 1 90); do
     a=$(unit_active); q=$(unit_queue)
     [ "${a:-x}" = "0" ] && [ "${q:-x}" = "0" ] && { echo $(( $(date +%s) - start )); return 0; }
     sleep 1
@@ -88,9 +79,9 @@ wait_drain_tail() {
 }
 
 run_one() {
-  local rate="$1" band="$2" tag="$3"
+  local rate="$1" tag="$2"
   local rec="$SUMDIR/$tag.json"
-  local t0 t1 pre ok drain_s
+  local t0 t1 pre drain_s
   t0=$(date +%s)
 
   # 1. pre-run drain proof
@@ -111,19 +102,25 @@ run_one() {
 
   local summary_path="$SUMDIR/$tag-k6.json"
   local k6log="$SUMDIR/$tag-k6.log"
-  # A stale summary from a previous run must never be read into this record if
-  # k6 fails; delete it first so only a genuinely fresh summary is embedded.
+  # A stale summary must never be read into this record if k6 fails.
   rm -f "$summary_path"
+  # VU budget: prealloc min(rate*2, 320), max min(rate*4, 560). High rates need
+  # ~rate x avg-iteration-time VUs to sustain the offered load; the cap bounds
+  # k6 RSS against the 4GiB sandbox cgroup (backend + postgres + fixtures).
+  local pre_vus=320 max_vus=560
+  [ $(( rate * 2 )) -lt 320 ] && pre_vus=$(( rate * 2 ))
+  [ $(( rate * 4 )) -lt 560 ] && max_vus=$(( rate * 4 ))
+  [ "$max_vus" -lt "$pre_vus" ] && max_vus=$pre_vus
   ( cd "$K6DIR" && k6 run \
     -e BASE_URL="$BASE" \
-    -e FIXTURE_FILE="$FIXDIR/$band" \
+    -e FIXTURE_FILE="$FIXDIR/e3s4-cognitive-class-fixtures-${rate}s-r1.json" \
     -e GROUP="$GROUP" \
     -e RATE="$rate" \
     -e DURATION=30s \
     -e WARMUP_SECONDS=10 \
     -e WARMUP_RATE=5 \
-    -e PRE_ALLOCATED_VUS=$(( rate * 2 )) \
-    -e MAX_VUS=$(( rate * 4 )) \
+    -e PRE_ALLOCATED_VUS="$pre_vus" \
+    -e MAX_VUS="$max_vus" \
     -e GATE_E_SUMMARY_PATH="$summary_path" \
     k6-e3-cognitive-knee.js ) > "$k6log" 2>&1
   local k6rc=$?
@@ -137,8 +134,6 @@ run_one() {
 
   local k6json='{}'
   local k6err=''
-  # Only a k6 exit-0 run may contribute a summary; otherwise the record must
-  # not masquerade stale data as a fresh result. Embed the log tail instead.
   if [ "$k6rc" -eq 0 ] && [ -f "$summary_path" ]; then
     k6json=$(cat "$summary_path")
   else
@@ -148,6 +143,7 @@ run_one() {
   cat > "$rec" <<EOF
 {
   "tag": "$tag",
+  "stage": "4",
   "class": "$CLASS",
   "group": "$GROUP",
   "rate": $rate,
@@ -171,17 +167,14 @@ run_one() {
   "k6": $k6json
 }
 EOF
-  echo "DONE $tag rate=$rate band=$band k6rc=$k6rc fresh_delta=$(( raw1 - raw0 )) done_delta=$(( done1 - done0 )) drain=${drain_s}s"
+  echo "DONE $tag rate=$rate k6rc=$k6rc fresh_delta=$(( raw1 - raw0 )) done_delta=$(( done1 - done0 )) drain=${drain_s}s"
 }
 
 # --- main -------------------------------------------------------------------
-echo "Stage 3R $CLASS boundary: group=$GROUP prefix=$PREFIX rates=${RATES[*]}"
-for i in "${!RATES[@]}"; do
-  b=$(( i + 1 ))
-  [ $b -lt ${E3_START:-1} ] && { echo "SKIP $b (E3_START=${E3_START:-1})"; continue; }
-  rate="${RATES[$i]}"
-  band="e3r-cognitive-class-fixtures-${rate}s-r${b}.json"
+echo "Stage 4 $CLASS capacity curve: group=$GROUP prefix=$PREFIX rates=${RATES[*]}"
+for rate in "${RATES[@]}"; do
+  band="e3s4-cognitive-class-fixtures-${rate}s-r1.json"
   [ -f "$FIXDIR/$band" ] || { echo "MISSING band file: $band"; exit 2; }
-  run_one "$rate" "$band" "e3r3-${CLASS}-${rate}s-r${b}"
+  run_one "$rate" "e3s4-${CLASS}-${rate}s-r1"
 done
-echo "Stage 3R $CLASS complete -> $SUMDIR"
+echo "Stage 4 $CLASS complete -> $SUMDIR"
