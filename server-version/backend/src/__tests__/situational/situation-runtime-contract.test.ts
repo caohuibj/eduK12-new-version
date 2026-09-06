@@ -13,8 +13,8 @@ const compileAssertiveness = () => compileSituationRuntime({
 })
 
 const scoreAssertivenessAllStrong = (): SituationalResultV1 => scoreSituational(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition, [
-  { sceneKey: 'AS-01', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'A' },
-  { sceneKey: 'AS-02', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'A' },
+  { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
+  { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'A' },
 ])
 
 describe('compileSituationRuntime', () => {
@@ -76,7 +76,7 @@ describe('projectSituationCanonicalUnitResult', () => {
     const runtime = compileAssertiveness()
     const core = projectSituationCanonicalUnitResult({
       result: scoreSituational(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition, [
-        { sceneKey: 'AS-01', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'A' },
+        { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
       ]),
       runtime,
       contextHash: null,

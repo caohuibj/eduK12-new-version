@@ -34,7 +34,8 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1 = {
     situationFeatures: { negativity: 0.5, duty: 0.5, uncertainty: 0.9 },
     channels: [
       {
-        channelKey: 'APPRAISAL',
+        channelKey: 'appraisal',
+        purpose: 'APPRAISAL',
         responseType: 'SINGLE_CHOICE',
         scoredConstruct: 'bfi2.anxiety',
         prompt: '你第一反应觉得这次谈话更可能是什么？',
@@ -46,8 +47,11 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1 = {
         ],
       },
       {
-        channelKey: 'EMOTION_RATING',
-        responseType: 'RATING_0_100',
+        channelKey: 'emotion',
+        purpose: 'EMOTION',
+        responseType: 'CONTINUOUS',
+        range: { min: 0, max: 100 },
+        scoringDirection: 'POSITIVE',
         scoredConstruct: 'bfi2.anxiety',
         prompt: '如果是你，此刻会有多紧张？（0 = 完全不紧张，100 = 非常紧张）',
       },
@@ -56,17 +60,17 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1 = {
   scoring: {
     scoringVersion: 'sjt-provisional-v1',
     choiceScores: [
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', optionKey: 'A', contribution: -1.0 },
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', optionKey: 'B', contribution: 0 },
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', optionKey: 'C', contribution: 0.5 },
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', optionKey: 'D', contribution: 1.5 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'A', contribution: -1.0 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'B', contribution: 0 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'C', contribution: 0.5 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'D', contribution: 1.5 },
     ],
     publishedMetrics: [
       {
         key: 'bfi2.anxiety.appraisal',
         label: '焦虑 × 情境解释（provisional）',
         construct: 'bfi2.anxiety',
-        channelKey: 'APPRAISAL',
+        channelKey: 'appraisal',
         direction: 'higher_is_more',
         role: 'primary',
         displayPrecision: 2,
@@ -75,7 +79,7 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1 = {
         key: 'bfi2.anxiety.emotion',
         label: '焦虑 × 情绪反应（state，0–100）',
         construct: 'bfi2.anxiety',
-        channelKey: 'EMOTION_RATING',
+        channelKey: 'emotion',
         direction: 'higher_is_more',
         role: 'primary',
         displayPrecision: 1,
@@ -116,30 +120,30 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCase[] =
   {
     name: 'high-threat-high-arousal',
     responses: [
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', responseValue: 'D' },
-      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', responseValue: 80 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'D' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 80 },
     ],
     expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': 1.5, 'bfi2.anxiety.emotion': 80 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
   },
   {
     name: 'low-threat-low-arousal',
     responses: [
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', responseValue: 'A' },
-      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', responseValue: 20 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'A' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 20 },
     ],
     expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': -1.0, 'bfi2.anxiety.emotion': 20 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
   },
   {
     name: 'neutral-appraisal',
     responses: [
-      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', responseValue: 'B' },
-      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', responseValue: 50 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'B' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 50 },
     ],
     expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': 0, 'bfi2.anxiety.emotion': 50 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
   },
   {
     name: 'missing-emotion-rating',
-    responses: [{ sceneKey: 'AN-01', channelKey: 'APPRAISAL', responseValue: 'C' }],
+    responses: [{ sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'C' }],
     expected: { quality: 'invalid', metrics: { 'bfi2.anxiety.appraisal': 0.5, 'bfi2.anxiety.emotion': null }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
   },
 ]

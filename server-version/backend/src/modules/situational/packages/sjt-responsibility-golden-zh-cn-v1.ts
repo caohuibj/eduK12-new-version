@@ -32,7 +32,8 @@ export const SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV
     secondaryConstructs: ['bfi2.productiveness'],
     situationFeatures: { duty: 0.9, deception: 0.4 },
     channels: [{
-      channelKey: 'BEHAVIOR_TENDENCY',
+      channelKey: 'behavior',
+      purpose: 'BEHAVIOR_TENDENCY',
       responseType: 'SINGLE_CHOICE',
       scoredConstruct: 'bfi2.responsibility',
       prompt: '你最可能怎么做？',
@@ -47,16 +48,16 @@ export const SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV
   scoring: {
     scoringVersion: 'sjt-provisional-v1',
     choiceScores: [
-      { sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', optionKey: 'A', contribution: 1.5 },
-      { sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', optionKey: 'B', contribution: 0.5 },
-      { sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', optionKey: 'C', contribution: -0.5 },
-      { sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', optionKey: 'D', contribution: -1.5 },
+      { sceneKey: 'RS-01', channelKey: 'behavior', optionKey: 'A', contribution: 1.5 },
+      { sceneKey: 'RS-01', channelKey: 'behavior', optionKey: 'B', contribution: 0.5 },
+      { sceneKey: 'RS-01', channelKey: 'behavior', optionKey: 'C', contribution: -0.5 },
+      { sceneKey: 'RS-01', channelKey: 'behavior', optionKey: 'D', contribution: -1.5 },
     ],
     publishedMetrics: [{
       key: 'bfi2.responsibility.behavior',
       label: '责任感 × 行为倾向（provisional）',
       construct: 'bfi2.responsibility',
-      channelKey: 'BEHAVIOR_TENDENCY',
+      channelKey: 'behavior',
       direction: 'higher_is_more',
       role: 'primary',
       displayPrecision: 2,
@@ -87,12 +88,12 @@ export const SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV
 export const SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCase[] = [
   {
     name: 'strongest-repair',
-    responses: [{ sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'A' }],
+    responses: [{ sceneKey: 'RS-01', channelKey: 'behavior', responseValue: 'A' }],
     expected: { quality: 'interpretable', metrics: { 'bfi2.responsibility.behavior': 1.5 }, metricKeys: ['bfi2.responsibility.behavior'] },
   },
   {
     name: 'weakest-defer',
-    responses: [{ sceneKey: 'RS-01', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'D' }],
+    responses: [{ sceneKey: 'RS-01', channelKey: 'behavior', responseValue: 'D' }],
     expected: { quality: 'interpretable', metrics: { 'bfi2.responsibility.behavior': -1.5 }, metricKeys: ['bfi2.responsibility.behavior'] },
   },
   {

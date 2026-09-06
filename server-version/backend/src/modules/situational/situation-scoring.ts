@@ -1,19 +1,20 @@
 import {
   situationDefinitionSchema,
-  type SituationalChannelKey,
+  type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
 } from './situation-definition'
 
 /**
  * A frozen participant response. The response value is deliberately not a
- * score: choice channels carry the optionKey, rating channels carry the raw
- * 0–100 value. Provisional contributions live in the definition's
- * `scoring.choiceScores` and are re-derivable from these immutable rows.
+ * score: choice channels carry the optionKey, continuous channels carry the
+ * raw value within the channel range. Provisional contributions and continuous
+ * mappings live in the definition keyed by scoringVersion and are
+ * re-derivable from these immutable rows.
  */
 export interface SituationalResponse {
   sceneKey: string
-  channelKey: SituationalChannelKey
+  channelKey: string
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string
@@ -25,7 +26,7 @@ export interface SituationalMetricValue {
   key: string
   label: string
   construct: string
-  channelKey: SituationalChannelKey
+  channelKey: string
   direction: SituationDefinitionV1['scoring']['publishedMetrics'][number]['direction']
   role: 'primary' | 'secondary'
   displayPrecision: number
@@ -78,7 +79,7 @@ const finite = (value: number): number => {
   return value
 }
 
-const responseKey = (sceneKey: string, channelKey: SituationalChannelKey): string => `${sceneKey}:${channelKey}`
+const responseKey = (sceneKey: string, channelKey: string): string => `${sceneKey}:${channelKey}`
 
 const normalizeResponses = (
   responses: SituationalResponse[] | Record<string, SituationalResponseValue>,
@@ -92,7 +93,7 @@ const normalizeResponses = (
       }
       return {
         sceneKey: key.slice(0, separatorIndex),
-        channelKey: key.slice(separatorIndex + 1) as SituationalChannelKey,
+        channelKey: key.slice(separatorIndex + 1),
         responseValue,
       }
     })
@@ -103,13 +104,13 @@ const validateResponses = (
   responses: SituationalResponse[],
 ): Map<string, SituationalResponse> => {
   const issues: SituationalResponseIssue[] = []
-  const pairByKey = new Map<string, { sceneKey: string; responseType: string; optionKeys: Set<string> }>()
+  const pairByKey = new Map<string, { responseType: string; optionKeys: Set<string>; range: { min: number; max: number } | null }>()
   definition.scenes.forEach((scene) => {
     scene.channels.forEach((channel) => {
       pairByKey.set(responseKey(scene.sceneKey, channel.channelKey), {
-        sceneKey: scene.sceneKey,
         responseType: channel.responseType,
         optionKeys: new Set(channel.responseType === 'SINGLE_CHOICE' ? channel.options.map((option) => option.optionKey) : []),
+        range: channel.responseType === 'CONTINUOUS' ? channel.range : null,
       })
     })
   })
@@ -138,8 +139,14 @@ const validateResponses = (
         issues.push({ path: `${path}.responseValue`, message: `选择通道的回答必须是该通道的选项：${pairKey}` })
         return
       }
-    } else if (typeof response.responseValue !== 'number' || !Number.isFinite(response.responseValue) || response.responseValue < 0 || response.responseValue > 100) {
-      issues.push({ path: `${path}.responseValue`, message: `评分通道的回答必须是 0–100 的数字：${pairKey}` })
+    } else if (
+      typeof response.responseValue !== 'number'
+      || !Number.isFinite(response.responseValue)
+      || !pair.range
+      || response.responseValue < pair.range.min
+      || response.responseValue > pair.range.max
+    ) {
+      issues.push({ path: `${path}.responseValue`, message: `连续通道的回答必须是 ${pair.range?.min ?? '?'}–${pair.range?.max ?? '?'} 内的数字：${pairKey}` })
       return
     }
     answered.set(pairKey, response)
@@ -167,7 +174,7 @@ const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min
   const scene = definition.scenes.find((candidate) => candidate.channels.some((channel) => responseKey(candidate.sceneKey, channel.channelKey) === pairKey))
   const channel = scene?.channels.find((candidate) => responseKey(scene.sceneKey, candidate.channelKey) === pairKey)
   if (!scene || !channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
-  if (channel.responseType === 'RATING_0_100') return { min: 0, max: 100 }
+  if (channel.responseType === 'CONTINUOUS') return { ...channel.range }
   const pairContributions = definition.scoring.choiceScores
     .filter((entry) => responseKey(entry.sceneKey, entry.channelKey) === pairKey)
     .map((entry) => entry.contribution)
@@ -191,12 +198,12 @@ export const scoreSituational = (
   const responses = normalizeResponses(inputResponses)
   const answered = validateResponses(definition, responses)
   const contributions = contributionByKey(definition)
-  // Rating vs choice is dispatched by the channel's responseType, not by its
-  // channelKey: the schema deliberately allows a rating channel under any key.
-  const responseTypeByPair = new Map<string, string>()
+  // Continuous vs choice is dispatched by the channel's responseType, never by
+  // its channelKey or purpose: the schema deliberately allows any combination.
+  const channelByPair = new Map<string, SituationalChannelDefinition>()
   definition.scenes.forEach((scene) => {
     scene.channels.forEach((channel) => {
-      responseTypeByPair.set(responseKey(scene.sceneKey, channel.channelKey), channel.responseType)
+      channelByPair.set(responseKey(scene.sceneKey, channel.channelKey), channel)
     })
   })
 
@@ -226,8 +233,13 @@ export const scoreSituational = (
     const values = answeredResponses.map((pairKey) => {
       const response = answered.get(pairKey)
       if (!response) throw new Error(`metric 期望响应缺失：${pairKey}`)
-      if (responseTypeByPair.get(pairKey) === 'RATING_0_100') {
-        return finite(typeof response.responseValue === 'number' ? response.responseValue : Number.NaN)
+      const channel = channelByPair.get(pairKey)
+      if (!channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
+      if (channel.responseType === 'CONTINUOUS') {
+        const raw = typeof response.responseValue === 'number' ? response.responseValue : Number.NaN
+        return finite(channel.scoringDirection === 'NEGATIVE'
+          ? channel.range.min + channel.range.max - raw
+          : raw)
       }
       const contribution = contributions.get(`${pairKey}:${response.responseValue}`)
       if (contribution === undefined) throw new Error(`选项缺少计分贡献：${pairKey}:${String(response.responseValue)}`)

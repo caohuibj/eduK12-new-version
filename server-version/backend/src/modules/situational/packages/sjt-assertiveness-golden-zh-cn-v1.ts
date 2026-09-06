@@ -49,7 +49,8 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1
       secondaryConstructs: ['bfi2.respectfulness'],
       situationFeatures: { duty: 0.8, sociality: 0.5, adversity: 0.5 },
       channels: [{
-        channelKey: 'BEHAVIOR_TENDENCY',
+        channelKey: 'behavior',
+        purpose: 'BEHAVIOR_TENDENCY',
         responseType: 'SINGLE_CHOICE',
         scoredConstruct: 'bfi2.assertiveness',
         prompt: '如果是你，下一步最可能怎么做？',
@@ -68,7 +69,8 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1
       secondaryConstructs: ['bfi2.respectfulness'],
       situationFeatures: { duty: 0.8, sociality: 0.6, adversity: 0.6 },
       channels: [{
-        channelKey: 'BEHAVIOR_TENDENCY',
+        channelKey: 'behavior',
+        purpose: 'BEHAVIOR_TENDENCY',
         responseType: 'SINGLE_CHOICE',
         scoredConstruct: 'bfi2.assertiveness',
         prompt: '如果是你，此刻最可能怎么做？',
@@ -81,7 +83,7 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1
     choiceScores: ['AS-01', 'AS-02'].flatMap((sceneKey) => (
       assertivenessContributions.map(({ optionKey, contribution }) => ({
         sceneKey,
-        channelKey: 'BEHAVIOR_TENDENCY' as const,
+        channelKey: 'behavior' as const,
         optionKey,
         contribution,
       }))
@@ -90,7 +92,7 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1
       key: 'bfi2.assertiveness.behavior',
       label: '果断性 × 行为倾向（provisional）',
       construct: 'bfi2.assertiveness',
-      channelKey: 'BEHAVIOR_TENDENCY',
+      channelKey: 'behavior',
       direction: 'higher_is_more',
       role: 'primary',
       displayPrecision: 2,
@@ -118,8 +120,8 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1
   referencePolicy: { type: 'none' },
 }
 
-const responsesFor = (optionKey: string, sceneKeys: string[]): Array<{ sceneKey: string; channelKey: 'BEHAVIOR_TENDENCY'; responseValue: string }> => (
-  sceneKeys.map((sceneKey) => ({ sceneKey, channelKey: 'BEHAVIOR_TENDENCY' as const, responseValue: optionKey }))
+const responsesFor = (optionKey: string, sceneKeys: string[]): Array<{ sceneKey: string; channelKey: 'behavior'; responseValue: string }> => (
+  sceneKeys.map((sceneKey) => ({ sceneKey, channelKey: 'behavior' as const, responseValue: optionKey }))
 )
 
 export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCase[] = [
@@ -136,8 +138,8 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCa
   {
     name: 'mixed-gradient',
     responses: [
-      { sceneKey: 'AS-01', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'A' },
-      { sceneKey: 'AS-02', channelKey: 'BEHAVIOR_TENDENCY', responseValue: 'D' },
+      { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
+      { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'D' },
     ],
     expected: { quality: 'interpretable', metrics: { 'bfi2.assertiveness.behavior': 0 }, metricKeys: ['bfi2.assertiveness.behavior'] },
   },

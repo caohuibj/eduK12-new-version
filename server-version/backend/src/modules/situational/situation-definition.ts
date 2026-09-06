@@ -13,13 +13,28 @@ export const situationalDirectionSchema = z.enum([
 ])
 export type SituationalDirection = z.infer<typeof situationalDirectionSchema>
 
-export const situationalChannelKeySchema = z.enum([
+/**
+ * Psychological purpose of a channel — scientific meaning only. It never
+ * influences scoring or response validation; identity is `channelKey` and the
+ * response primitive is `responseType`.
+ */
+export const situationalPurposeSchema = z.enum([
   'BEHAVIOR_TENDENCY',
-  'SHOULD_DO',
+  'EMOTION',
+  'APPROACH_AVOID',
+  'PREFERENCE',
   'APPRAISAL',
-  'EMOTION_RATING',
+  'NORM_JUDGMENT',
+  'CONFIDENCE',
 ])
-export type SituationalChannelKey = z.infer<typeof situationalChannelKeySchema>
+export type SituationalPurpose = z.infer<typeof situationalPurposeSchema>
+
+/**
+ * Response primitive: how the participant answers and how the scorer treats
+ * the raw value. Deliberately orthogonal to `purpose`.
+ */
+export const situationalResponseTypeSchema = z.enum(['SINGLE_CHOICE', 'CONTINUOUS'])
+export type SituationalResponseType = z.infer<typeof situationalResponseTypeSchema>
 
 /**
  * Stimulus presentation is deliberately separated from the response model and
@@ -38,24 +53,37 @@ const choiceOptionSchema = z.object({
 export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
 
 /**
- * A response channel carries exactly one scored target construct. Options are
- * presented without scores (Decision A: the frozen participant response is the
- * optionKey, never a number); provisional contributions live in
- * `scoring.choiceScores` keyed by scoringVersion.
+ * A response channel carries exactly one scored target construct.
+ * - `channelKey` is the free-form identity used by raw responses, choice
+ *   contributions, and published metrics;
+ * - `purpose` is scientific metadata only;
+ * - `responseType` decides the answer and scoring primitive.
+ * Options are presented without scores (Decision A: the frozen participant
+ * response is the optionKey, never a number); provisional contributions live
+ * in `scoring.choiceScores` keyed by scoringVersion.
  */
 export const situationalChannelSchema = z.discriminatedUnion('responseType', [
   z.object({
-    channelKey: situationalChannelKeySchema,
+    channelKey: z.string().min(1),
+    purpose: situationalPurposeSchema,
     responseType: z.literal('SINGLE_CHOICE'),
     scoredConstruct: z.string().min(1),
     prompt: z.string().min(1),
     options: z.array(choiceOptionSchema).min(2),
   }),
   z.object({
-    channelKey: situationalChannelKeySchema,
-    responseType: z.literal('RATING_0_100'),
+    channelKey: z.string().min(1),
+    purpose: situationalPurposeSchema,
+    responseType: z.literal('CONTINUOUS'),
     scoredConstruct: z.string().min(1),
     prompt: z.string().min(1),
+    /** Explicit answer range — the scorer never assumes 0–100. */
+    range: z.object({
+      min: z.number().finite(),
+      max: z.number().finite(),
+    }),
+    /** POSITIVE: higher raw → higher metric. NEGATIVE: deterministic reverse. */
+    scoringDirection: z.enum(['POSITIVE', 'NEGATIVE']),
   }),
 ])
 export type SituationalChannelDefinition = z.infer<typeof situationalChannelSchema>
@@ -94,7 +122,7 @@ export type SituationalSamplingDefinition = z.infer<typeof situationalSamplingSc
 
 const choiceContributionSchema = z.object({
   sceneKey: z.string().min(1),
-  channelKey: situationalChannelKeySchema,
+  channelKey: z.string().min(1),
   optionKey: z.string().min(1),
   contribution: z.number().finite(),
 })
@@ -104,7 +132,7 @@ export const situationalMetricDefinitionSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
   construct: z.string().min(1),
-  channelKey: situationalChannelKeySchema,
+  channelKey: z.string().min(1),
   direction: situationalDirectionSchema,
   role: z.enum(['primary', 'secondary']),
   displayPrecision: z.number().int().min(0).max(6).default(1),
@@ -198,12 +226,15 @@ export const validateSituationDefinition = (
     }
     sceneKeys.add(scene.sceneKey)
     const declaredConstructs = new Set([scene.primaryConstruct, ...scene.secondaryConstructs])
-    const channelKeys = new Set<SituationalChannelKey>()
+    const channelKeys = new Set<string>()
     scene.channels.forEach((channel, channelIndex) => {
       if (channelKeys.has(channel.channelKey)) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.channelKey`, message: '同一场景内通道不能重复', severity: 'error' })
       }
       channelKeys.add(channel.channelKey)
+      if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
+        issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })
+      }
       if (!declaredConstructs.has(channel.scoredConstruct)) {
         issues.push({
           path: `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
@@ -360,7 +391,7 @@ export const runnerSituationDefinition = (definition: SituationDefinitionV1) => 
       prompt: channel.prompt,
       ...(channel.responseType === 'SINGLE_CHOICE'
         ? { options: channel.options.map(({ optionKey, label }) => ({ optionKey, label })) }
-        : {}),
+        : { range: channel.range }),
     })),
   })),
 })
