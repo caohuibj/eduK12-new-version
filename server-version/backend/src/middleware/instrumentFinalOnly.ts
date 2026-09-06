@@ -31,6 +31,10 @@ export const unifiedCompletionGuard: RequestHandler = async (req, res, next) => 
     if (row?.runtimeGeneration === 'UNIFIED_V1') return next()
     return instrumentError(res, 'LEGACY_WRITE_DISABLED', '旧的逐题/批量写入接口已停用，请重启测评后使用最终提交', 410)
   } catch (err) {
-    return instrumentError(res, 'LEGACY_WRITE_DISABLED', '旧的写入接口已停用', 410)
+    // Infrastructure failure (pool exhaustion, timeout, connection reset) must
+    // not be reported as the permanent business state LEGACY_WRITE_DISABLED:
+    // that would suppress retries and hide outages. Delegate to the central
+    // error handler so it classifies as 5xx.
+    return next(err)
   }
 }
