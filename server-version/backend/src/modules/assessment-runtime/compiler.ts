@@ -1,4 +1,5 @@
 import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
+import { situationDefinitionSchema, type SituationDefinitionV1 } from '../situational/situation-definition'
 import type { TaskDefinition } from '../cognitive/v2/types'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from './canonical'
 import { z } from 'zod'
@@ -30,7 +31,7 @@ const compiledQualityDefinitionSchema = z.object({
 const compiledRuntimeSchema = z.object({
   schemaVersion: z.literal(1),
   compilerVersion: z.string().min(1),
-  instrumentType: z.enum(['SCALE', 'COGNITIVE', 'BUNDLE']),
+  instrumentType: z.enum(['SCALE', 'COGNITIVE', 'SITUATIONAL', 'BUNDLE']),
   instrumentKey: z.string().min(1),
   instrumentVersion: z.string().min(1),
   sourceDefinitionHash: z.string().regex(/^[0-9a-f]{64}$/),
@@ -234,6 +235,55 @@ export const compileCognitiveRuntime = (input: {
       required: selections.length > 0,
       selections,
     },
+    runtimeCapabilities: {
+      standalone: true,
+      embedded: true,
+      aggregateEligible: true,
+      collectionFacts: false,
+      supported: true,
+    },
+  }
+  return completeRuntime(base)
+}
+
+export const compileSituationRuntime = (input: {
+  instrumentKey: string
+  instrumentVersion: string
+  definition: SituationDefinitionV1
+  sourceDefinitionHash?: string
+}): CompiledInstrumentRuntimeV1 => {
+  const definition = situationDefinitionSchema.parse(input.definition)
+  const metricDefinitions = compileMetrics(definition.scoring.publishedMetrics.map((metric) => ({
+    key: metric.key,
+    label: metric.label,
+    unit: 'score',
+    valueType: 'number',
+    direction: metric.direction,
+    role: metric.role,
+  })))
+  const qualityDefinitions = compileQuality([
+    { key: 'interpretable', label: '可解释', description: '结果满足情境化测评定义的解释条件。' },
+    { key: 'limited', label: '有限', description: '结果可计算但解释受到数据质量限制。' },
+    { key: 'invalid', label: '无效', description: '结果不满足可解释条件。' },
+  ])
+  const base = {
+    schemaVersion: 1 as const,
+    compilerVersion: UNIFIED_RUNTIME_COMPILER_VERSION,
+    instrumentType: 'SITUATIONAL' as const,
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    sourceDefinitionHash: runtimeIdentity({ ...input, instrumentType: 'SITUATIONAL' }),
+    scorerKey: 'situational.default',
+    scorerVersion: definition.scoring.scoringVersion,
+    metricDefinitions,
+    qualityDefinitions,
+    reportDefinition: definition.report as unknown as JsonObject,
+    aggregateProjection: {
+      allowedMetricKeys: Object.keys(metricDefinitions),
+      allowedFactKeys: ['quality.status', 'quality.flag.*'],
+      allowedReferenceClassifications: [],
+    },
+    referenceBindingDefinition: { required: false, selections: [] },
     runtimeCapabilities: {
       standalone: true,
       embedded: true,
