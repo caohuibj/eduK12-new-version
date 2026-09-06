@@ -1700,12 +1700,31 @@ const finalizeQuestionnaireIfReady = async (assessmentId: string) => {
 
 const submitQuestionnaireFormSectionFinalImpl = async (input: SectionSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  // Unified fast path: one authoritative read resolves the section attempt and
+  // the parent runtime generation, replacing the separate route probe plus the
+  // section-attempt re-read on the steady-state UNIFIED path.
+  const preloadedChild = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireFormSectionAttempt.findUnique({
+    where: { questionnaireAssessmentId_sectionId: { questionnaireAssessmentId: input.questionnaireAssessmentId, sectionId: input.sectionId } },
+    select: {
+      id: true,
+      attemptEpoch: true,
+      frozenAdmissionSnapshotEncrypted: true,
+      frozenAdmissionSnapshotHash: true,
+      questionnaireAssessment: { select: { runtimeGeneration: true } },
+    },
+  }))
+  if (preloadedChild?.questionnaireAssessment.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedQuestionnaireFormSectionFinal } = await import('../modules/assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedQuestionnaireFormSectionFinal(input, preloadedChild)
+  }
   const route = await measureRequestPhase('final_submit_admission', () => prisma.questionnaireAssessment.findUnique({
     where: { id: input.questionnaireAssessmentId },
     select: { id: true, runtimeGeneration: true },
   }))
   if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷测评记录不存在', 404)
   if (route.runtimeGeneration === 'UNIFIED_V1') {
+    // UNIFIED attempt whose section attempt row is not created yet: keep the
+    // lazy ensure path for this cold submit.
     const { submitUnifiedQuestionnaireFormSectionFinal } = await import('../modules/assessment-runtime/unified-form-section-final-submit.service')
     return submitUnifiedQuestionnaireFormSectionFinal(input)
   }

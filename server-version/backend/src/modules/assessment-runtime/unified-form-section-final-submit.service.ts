@@ -18,7 +18,7 @@ import {
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
-import { persistFormAnswerBatch, type BulkFormAnswerMutation } from '../../services/questionnaire-form-answer-batch'
+import { persistExistingFormAnswerBatch, type BulkFormAnswerMutation } from '../../services/questionnaire-form-answer-batch'
 import {
   normalizeQuestionnaireSectionAnswers,
   type SectionRow,
@@ -188,10 +188,19 @@ const assertFormFrozenAdmission = (
 
 export const submitUnifiedQuestionnaireFormSectionFinal = async (
   input: QuestionnaireSectionSubmitInput,
+  preloadedChild?: {
+    id: string
+    attemptEpoch: number
+    frozenAdmissionSnapshotEncrypted: string | null
+    frozenAdmissionSnapshotHash: string | null
+  },
   _parent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const child = await ensureQuestionnaireSectionAttempt(input.questionnaireAssessmentId, input.sectionId, input.attemptEpoch)
+  // Callers that already resolved the section attempt (the dispatcher's
+  // combined child+runtime read) pass it in to skip the re-read; cold callers
+  // fall back to the lazy ensure path.
+  const child = preloadedChild ?? await ensureQuestionnaireSectionAttempt(input.questionnaireAssessmentId, input.sectionId, input.attemptEpoch)
   const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogQuestionnaireFormAdmission({
     parentId: input.questionnaireAssessmentId,
     sectionId: input.sectionId,
@@ -247,7 +256,13 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
       status: entry.status,
       revision: 0,
     }))
-    await persistFormAnswerBatch(tx, input.questionnaireAssessmentId, mutations)
+    // UNIFIED_V1 attempts always carry pre-created PENDING rows; a count
+    // mismatch means the pre-create invariant broke and must fail closed.
+    const updatedAnswers = await measureRequestPhase('form_answer_persist', () =>
+      persistExistingFormAnswerBatch(tx, input.questionnaireAssessmentId, mutations))
+    if (updatedAnswers !== mutations.length) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷答案行缺失，请重启测评后重新作答', 409)
+    }
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {
       const updatedContext = await tx.questionnaireAssessment.updateMany({

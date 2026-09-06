@@ -34,6 +34,7 @@ export type RequestObservationPhase =
   | 'final_submit_commit'
   | 'final_submit_parent_finalization'
   | 'final_submit_retry_backoff'
+  | 'form_answer_persist'
   | 'aggregate.parent_probe_db'
   | 'aggregate.header_db'
   | 'aggregate.definition_db'
@@ -44,6 +45,8 @@ export type RequestObservationPhase =
   | 'aggregate.report'
   | 'aggregate.encrypt'
   | 'aggregate.persist'
+  | 'aggregate.persist.cas'
+  | 'aggregate.persist.analysis_snapshot'
   | 'aggregate.cas_loser'
   | 'response'
 
