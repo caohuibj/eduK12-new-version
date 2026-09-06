@@ -75,4 +75,20 @@ export const validCatalogManifestBase = (): ScaleCatalogManifestV1 => ({
       url: 'https://example.org/study/2011',
     },
   ],
+  referenceApplicability: [
+    {
+      applicabilityId: 'ref-applicability-cn-2020',
+      referenceVersion: 'who5-cn-2020-v1',
+      referenceKind: 'descriptive_sample',
+      respondent: 'SELF',
+      locale: 'zh-CN',
+      territory: 'CN',
+      minAgeMonthsInclusive: 108,
+      maxAgeMonthsExclusive: 216,
+      sampleN: 1200,
+      samplingMethod: 'STRATIFIED',
+      collectionYears: '2019-2020',
+      notes: '描述性样本参考，非中国大陆正式常模。',
+    },
+  ],
 })

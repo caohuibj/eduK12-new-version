@@ -15,6 +15,7 @@
  */
 import { z } from 'zod'
 import { isValidContentLocaleTag } from '../content-locale'
+import type { ReferenceKind } from '../../assessment-reference/reference'
 
 export const SCALE_CATALOG_SCHEMA_VERSION = 1 as const
 
@@ -285,6 +286,60 @@ export const scaleCatalogEvidenceSchema = z.array(scaleEvidenceRecordSchema).sup
 })
 
 /**
+ * Reference applicability metadata（SL1-C5）。
+ * Library 不发明新的 reference engine，也不改变现有 reference scoring 行为：
+ * 这里只描述“某 referenceVersion 适用于谁”，referenceKind 与月龄语义复用
+ * assessment-reference 既有契约，字段命名与 ReferencePopulationMatch 对齐。
+ */
+const REFERENCE_KIND_VALUES = ['normative_distribution', 'criterion_threshold', 'descriptive_sample'] as const satisfies readonly ReferenceKind[]
+export const catalogReferenceKindSchema = z.enum(REFERENCE_KIND_VALUES)
+
+export const samplingMethodSchema = z.enum(['PROBABILITY', 'STRATIFIED', 'CONVENIENCE', 'UNKNOWN', 'OTHER'])
+export type SamplingMethod = z.infer<typeof samplingMethodSchema>
+
+export const scaleReferenceApplicabilityRecordSchema = z.object({
+  applicabilityId: z.string().min(1, 'applicabilityId 不能为空'),
+  referenceVersion: z.string().min(1, 'referenceVersion 不能为空'),
+  referenceKind: catalogReferenceKindSchema,
+  respondent: respondentTypeSchema,
+  locale: z.string().refine(isValidContentLocaleTag, 'locale 必须是合法的语言 tag（如 zh-CN / en）'),
+  territory: z.string().regex(/^[A-Z]{2}$/, 'territory 必须是两位大写国家/地区码（如 CN / GB / US）'),
+  minAgeMonthsInclusive: z.number().int().min(0, '月龄下界必须是非负整数').optional(),
+  maxAgeMonthsExclusive: z.number().int().positive({ message: '月龄上界必须是正整数' }).optional(),
+  sampleN: z.number().int().positive({ message: 'sampleN 必须是正整数' }).optional(),
+  samplingMethod: samplingMethodSchema,
+  collectionYears: z.string().min(1).optional(),
+  notes: z.string().min(1).optional(),
+}).strict().superRefine((record, ctx) => {
+  if (
+    record.minAgeMonthsInclusive !== undefined
+    && record.maxAgeMonthsExclusive !== undefined
+    && record.minAgeMonthsInclusive >= record.maxAgeMonthsExclusive
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['minAgeMonthsInclusive'],
+      message: '月龄下界必须小于不含上界',
+    })
+  }
+})
+export type ScaleReferenceApplicabilityRecord = z.infer<typeof scaleReferenceApplicabilityRecordSchema>
+
+export const scaleCatalogReferenceApplicabilitySchema = z.array(scaleReferenceApplicabilityRecordSchema).superRefine((records, ctx) => {
+  const seen = new Set<string>()
+  records.forEach((record, index) => {
+    if (seen.has(record.applicabilityId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [String(index), 'applicabilityId'],
+        message: 'applicabilityId 不能重复',
+      })
+    }
+    seen.add(record.applicabilityId)
+  })
+})
+
+/**
  * catalogManifestVersion 是 manifest 内容版本（任何内容变化，如 evidence
  * citation 修订，都必须递增）；schemaVersion 才是契约结构版本。
  */
@@ -298,6 +353,7 @@ export const scaleCatalogManifestV1Schema = z.object({
   administration: scaleCatalogAdministrationSchema,
   intendedUse: scaleCatalogIntendedUseSchema,
   evidence: scaleCatalogEvidenceSchema.default([]),
+  referenceApplicability: scaleCatalogReferenceApplicabilitySchema.default([]),
 }).strict()
 
 export type ScaleCatalogManifestV1 = z.infer<typeof scaleCatalogManifestV1Schema>
