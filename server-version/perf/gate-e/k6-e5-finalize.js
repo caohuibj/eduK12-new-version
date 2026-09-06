@@ -24,6 +24,12 @@ const peak = Number(__ENV.PEAK || 10);
 const baseUrl = String(__ENV.BASE_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
 const authToken = String(__ENV.AUTH_TOKEN || __ENV.PERF_AUTH_TOKEN || '').trim();
 const csrfToken = String(__ENV.CSRF_TOKEN || __ENV.PERF_CSRF_TOKEN || '').trim();
+// Measurement integrity: a run without credentials produces 401/403 that k6
+// scores as "other" and can still exit 0. Fail fast here so a misconfigured
+// run yields NO RESULT instead of benchmark evidence that looks like data.
+if (!authToken || !csrfToken) {
+  throw new Error('E5 requires AUTH_TOKEN/PERF_AUTH_TOKEN and CSRF_TOKEN/PERF_CSRF_TOKEN to be set (see perf/README)');
+}
 
 const requests = new SharedArray('e5-finalize', () => {
   const fixtures = JSON.parse(open(fixturePath));

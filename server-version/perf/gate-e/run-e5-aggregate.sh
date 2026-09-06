@@ -22,6 +22,10 @@ if [ -z "$AUTH_TOKEN" ] && [ -f /workspace/eduk12-pr49-cloud-results/e4s2/auth.e
   AUTH_TOKEN=$(grep -E '^PERF_AUTH_TOKEN=' /workspace/eduk12-pr49-cloud-results/e4s2/auth.env | cut -d= -f2-)
   CSRF_TOKEN=$(grep -E '^PERF_CSRF_TOKEN=' /workspace/eduk12-pr49-cloud-results/e4s2/auth.env | cut -d= -f2-)
 fi
+if [ -z "$AUTH_TOKEN" ] || [ -z "$CSRF_TOKEN" ]; then
+  echo "Missing benchmark auth credentials (AUTH_TOKEN/CSRF_TOKEN env or /workspace/eduk12-pr49-cloud-results/e4s2/auth.env); refusing to run: a misconfigured run must produce NO RESULT, not auth-failure data." >&2
+  exit 1
+fi
 mkdir -p "$SUMDIR"
 
 # --- DB env ---------------------------------------------------------------

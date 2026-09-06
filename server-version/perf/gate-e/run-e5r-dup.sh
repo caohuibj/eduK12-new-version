@@ -23,6 +23,10 @@ if [ -z "$AUTH_TOKEN" ] && [ -f "$FIXDIR/e4s2/auth.env" ]; then
   AUTH_TOKEN=$(grep -E '^PERF_AUTH_TOKEN=' "$FIXDIR/e4s2/auth.env" | cut -d= -f2-)
   CSRF_TOKEN=$(grep -E '^PERF_CSRF_TOKEN=' "$FIXDIR/e4s2/auth.env" | cut -d= -f2-)
 fi
+if [ -z "$AUTH_TOKEN" ] || [ -z "$CSRF_TOKEN" ]; then
+  echo 'Missing benchmark auth credentials (AUTH_TOKEN/CSRF_TOKEN env or $FIXDIR/e4s2/auth.env); refusing to run: a misconfigured run must produce NO RESULT, not auth-failure data.' >&2
+  exit 1
+fi
 PGURL="${PGURL:-}"
 if [ -z "$PGURL" ]; then
   PGURL=$(grep -E '^DATABASE_URL=' /data/user/work/eduK12-new-version/server-version/backend/.env | head -1 | cut -d= -f2-)
