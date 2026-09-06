@@ -14,6 +14,7 @@
  * 顶层 .strict()：未定义字段一律 fail-closed。
  */
 import { z } from 'zod'
+import { isValidContentLocaleTag } from '../content-locale'
 
 export const SCALE_CATALOG_SCHEMA_VERSION = 1 as const
 
@@ -230,6 +231,59 @@ export const scaleCatalogIntendedUseSchema = z.object({
 })
 export type ScaleCatalogIntendedUse = z.infer<typeof scaleCatalogIntendedUseSchema>
 
+export const evidenceTypeSchema = z.enum([
+  'CONTENT_VALIDITY',
+  'STRUCTURAL_VALIDITY',
+  'INTERNAL_CONSISTENCY',
+  'TEST_RETEST',
+  'CONVERGENT_DISCRIMINANT',
+  'CRITERION',
+  'CROSS_CULTURAL_VALIDITY',
+  'MEASUREMENT_INVARIANCE',
+  'RESPONSIVENESS',
+])
+export type EvidenceType = z.infer<typeof evidenceTypeSchema>
+
+/** 证据评级是按 population/locale 划分的，不存在全局 validated=true。 */
+export const evidenceRatingSchema = z.enum(['SUFFICIENT', 'MIXED', 'INSUFFICIENT', 'UNKNOWN'])
+export type EvidenceRating = z.infer<typeof evidenceRatingSchema>
+
+/**
+ * 单条科学证据记录（SL1-C4）。citation 必填；population 与 locale 必须显式，
+ * 同一工具在不同人群中可以并存不同 rating 的证据。
+ * locale 复用 content-locale 的 tag 校验，与授权 scope 的语言标签保持一致。
+ */
+export const scaleEvidenceRecordSchema = z.object({
+  evidenceId: z.string().min(1, 'evidenceId 不能为空'),
+  evidenceType: evidenceTypeSchema,
+  population: z.string().min(1, 'population 不能为空'),
+  ageRange: z.string().min(1).optional(),
+  locale: z.string().refine(isValidContentLocaleTag, 'locale 必须是合法的语言 tag（如 zh-CN / en）'),
+  territory: z.string().regex(/^[A-Z]{2}$/, 'territory 必须是两位大写国家/地区码（如 CN / GB / US）'),
+  sampleSize: z.number().int().positive({ message: 'sampleSize 必须是正整数' }).optional(),
+  studyDesign: z.string().min(1, 'studyDesign 不能为空'),
+  rating: evidenceRatingSchema,
+  citation: z.string({ required_error: 'evidence 必须提供 citation' }).min(1, 'evidence 必须提供 citation'),
+  doi: z.string().min(1).optional(),
+  url: z.string().url().optional(),
+  notes: z.string().min(1).optional(),
+}).strict()
+export type ScaleEvidenceRecord = z.infer<typeof scaleEvidenceRecordSchema>
+
+export const scaleCatalogEvidenceSchema = z.array(scaleEvidenceRecordSchema).superRefine((records, ctx) => {
+  const seen = new Set<string>()
+  records.forEach((record, index) => {
+    if (seen.has(record.evidenceId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [String(index), 'evidenceId'],
+        message: 'evidenceId 不能重复',
+      })
+    }
+    seen.add(record.evidenceId)
+  })
+})
+
 /**
  * catalogManifestVersion 是 manifest 内容版本（任何内容变化，如 evidence
  * citation 修订，都必须递增）；schemaVersion 才是契约结构版本。
@@ -243,6 +297,7 @@ export const scaleCatalogManifestV1Schema = z.object({
   population: scaleCatalogPopulationSchema,
   administration: scaleCatalogAdministrationSchema,
   intendedUse: scaleCatalogIntendedUseSchema,
+  evidence: scaleCatalogEvidenceSchema.default([]),
 }).strict()
 
 export type ScaleCatalogManifestV1 = z.infer<typeof scaleCatalogManifestV1Schema>
