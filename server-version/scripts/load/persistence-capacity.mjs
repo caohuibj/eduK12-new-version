@@ -12,6 +12,7 @@
 import fs from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { performance } from 'node:perf_hooks'
+import { IntervalEluTracker } from '../../perf/lib/interval-elu.mjs'
 
 const DEFAULT_STAGES = [100, 150, 200, 250, 300]
 const DEFAULT_DURATION_SECONDS = 60
@@ -123,6 +124,8 @@ const metricsToSamples = (text) => text.split('\n').flatMap((line) => {
 
 const attributionMetricNames = (name) => name === 'ptool_slow_requests_total'
   || name === 'ptool_nodejs_event_loop_utilization'
+  || name === 'ptool_nodejs_event_loop_active_seconds_total'
+  || name === 'ptool_nodejs_event_loop_idle_seconds_total'
   || name === 'ptool_nodejs_event_loop_delay_seconds'
   || name === 'ptool_nodejs_active_requests'
   || name === 'process_resident_memory_bytes'
@@ -156,6 +159,29 @@ const readMetricsSnapshot = async (metricsUrl, timeoutMs = DEFAULT_METRICS_TIMEO
 }
 
 const sampleKey = (sample) => `${sample.name}\u0000${JSON.stringify(sample.labels, Object.keys(sample.labels).sort())}`
+
+const findMetricValue = (snapshot, name, labels = {}) => {
+  const sample = (snapshot?.samples || []).find((candidate) => (
+    candidate.name === name
+    && Object.entries(labels).every(([key, value]) => candidate.labels?.[key] === value)
+  ))
+  return sample?.value ?? null
+}
+
+const deriveIntervalEluAttribution = (before, after) => {
+  const activeBefore = findMetricValue(before, 'ptool_nodejs_event_loop_active_seconds_total')
+  const idleBefore = findMetricValue(before, 'ptool_nodejs_event_loop_idle_seconds_total')
+  const activeAfter = findMetricValue(after, 'ptool_nodejs_event_loop_active_seconds_total')
+  const idleAfter = findMetricValue(after, 'ptool_nodejs_event_loop_idle_seconds_total')
+  const tracker = new IntervalEluTracker()
+  const first = tracker.observe({ active: activeBefore, idle: idleBefore })
+  const second = tracker.observe({ active: activeAfter, idle: idleAfter })
+  return {
+    value: second.value,
+    status: second.status,
+    firstSampleStatus: first.status,
+  }
+}
 
 const diffMetrics = (before, after) => {
   const previous = new Map((before?.samples || []).map((sample) => [sampleKey(sample), sample]))
@@ -408,6 +434,17 @@ const runStage = async ({ stage, scenario, options, weighted }) => {
       before: metricsBefore,
       after: metricsAfter,
       delta: diffMetrics(metricsBefore, metricsAfter),
+      lifetimeElu: {
+        before: findMetricValue(metricsBefore, 'ptool_nodejs_event_loop_utilization'),
+        after: findMetricValue(metricsAfter, 'ptool_nodejs_event_loop_utilization'),
+      },
+      intervalElu: deriveIntervalEluAttribution(metricsBefore, metricsAfter),
+      eventLoopDelaySeconds: {
+        p50: findMetricValue(metricsAfter, 'ptool_nodejs_event_loop_delay_seconds', { quantile: '0.5' }),
+        p95: findMetricValue(metricsAfter, 'ptool_nodejs_event_loop_delay_seconds', { quantile: '0.95' }),
+        p99: findMetricValue(metricsAfter, 'ptool_nodejs_event_loop_delay_seconds', { quantile: '0.99' }),
+        max: findMetricValue(metricsAfter, 'ptool_nodejs_event_loop_delay_seconds', { quantile: 'max' }),
+      },
     },
   }
 }

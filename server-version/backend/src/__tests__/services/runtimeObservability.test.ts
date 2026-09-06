@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events'
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   measureRequestPhase,
+  measureRequestPhaseSync,
   recordPrismaCall,
   recordPrismaError,
   recordBoundedAdmissionRejection,
@@ -170,6 +171,31 @@ describe('runtime observability', () => {
     const metrics = metricText()
     expect(metrics).toContain('phase="auth_account_lookup"')
     expect(metrics).toContain('phase="request_body_receive_parse"')
+  })
+
+  
+  it('attributes unified serialization and payload hashing to bounded existing phases', () => {
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      path: '/api/cognitive/sessions/session-123/submit',
+      baseUrl: '/api/cognitive',
+      route: { path: '/sessions/:sessionId/submit' },
+    } as any
+
+    requestObservabilityMiddleware(request, response, () => {
+      measureRequestPhaseSync('final_submit_serialization', () => {
+        const bytes = Buffer.from(JSON.stringify({ trials: [{ trialIndex: 0 }] }))
+        measureRequestPhaseSync('final_submit_payload_hash', () => bytes.byteLength)
+      })
+    })
+    response.emit('finish')
+
+    const metrics = metricText()
+    expect(metrics).toContain('phase="final_submit_serialization"')
+    expect(metrics).toContain('phase="final_submit_payload_hash"')
+    expect(metrics).not.toContain('trialIndex')
+    expect(metrics).not.toContain('session-123')
   })
 
 })

@@ -8,6 +8,8 @@ import {
   fixturesUsed,
   freshCompletions,
   idempotentReplays,
+  steadyIdempotentReplays,
+  steadyFreshCompletions,
   missingFixtures,
 } from './eventual-success.js';
 
@@ -103,7 +105,12 @@ export function runLogicalSubmit(request, tags = {}) {
     const path = String(request.path || '');
     const url = `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
     const headers = merge(request.headers);
-    if (__ENV.AUTH_TOKEN) headers.Authorization = `Bearer ${__ENV.AUTH_TOKEN}`;
+    const authToken = String(__ENV.AUTH_TOKEN || __ENV.PERF_AUTH_TOKEN || '').trim();
+    const csrfToken = String(__ENV.CSRF_TOKEN || __ENV.PERF_CSRF_TOKEN || '').trim();
+    if (authToken) {
+      headers.Cookie = `ptool_session=${encodeURIComponent(authToken)}${csrfToken ? `; ptool_csrf=${encodeURIComponent(csrfToken)}` : ''}`;
+      if (csrfToken) headers['x-csrf-token'] = csrfToken;
+    }
     if (request.body !== undefined && request.body !== null && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
@@ -123,6 +130,7 @@ export function runLogicalSubmit(request, tags = {}) {
       const replayed = parseReplayFlag(response.body);
       if (replayed) {
         idempotentReplays.add(1, tags);
+        if (tags.phase === 'steady') steadyIdempotentReplays.add(1);
         // F7 (Gate-E): a replay on the first attempt means non-fresh /
         // pre-seeded reuse and is fail-closed for an authoritative run. Only a
         // replay that arrives on a later capacity (503) retry of this same
@@ -151,6 +159,7 @@ export function runLogicalSubmit(request, tags = {}) {
         return true;
       }
       freshCompletions.add(1, tags);
+      if (tags.phase === 'steady') steadyFreshCompletions.add(1);
       sawFreshCompletion = true;
       recordEventualOutcome({
         ok: true,

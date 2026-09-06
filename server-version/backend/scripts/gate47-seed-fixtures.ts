@@ -8,7 +8,13 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from '../src/modules/scale/scale-definition'
-import { createCognitiveSessionConfigSnapshot, readCognitiveSessionConfig } from '../src/modules/cognitive/session.service'
+import {
+  createUnifiedCognitiveSessionConfigSnapshot,
+  readCognitiveSessionConfig,
+} from '../src/modules/cognitive/session.service'
+import { canonicalJsonBytes } from '../src/modules/assessment-runtime/canonical'
+import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
+import { mapQuestionnaireSection } from '../src/modules/assessment-runtime/form-section-definition'
 import { createTrialEnvelope } from '../src/modules/cognitive/v2/trial-envelope'
 import {
   ensureQuestionnaireFormSections,
@@ -22,7 +28,9 @@ import {
   createFrozenUnitAdmission,
   frozenAdmissionPersistence,
 } from '../src/modules/assessment-runtime/admission-snapshot'
-import { freezeQuestionnaireActiveSlotSet } from '../src/modules/assessment-runtime/attempt-runtime'
+import {
+  freezeQuestionnaireActiveSlotSet,
+} from '../src/modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet, questionnaireScaleSlotKey } from '../src/modules/assessment-runtime/slot-set'
 
 const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
@@ -129,14 +137,6 @@ async function upsertUser(username: string, password: string, role: 'ADMIN' | 'S
   })
 }
 
-function authHeaders(token: string, csrf: string) {
-  return {
-    Cookie: `ptool_session=${encodeURIComponent(token)}; ptool_csrf=${encodeURIComponent(csrf)}`,
-    'x-csrf-token': csrf,
-    'Content-Type': 'application/json',
-  }
-}
-
 async function main() {
   mkdirSync(OUT_DIR, { recursive: true })
   const admin = await upsertUser(ADMIN_USERNAME, ADMIN_PASSWORD, 'ADMIN')
@@ -171,7 +171,6 @@ async function main() {
     JWT_SECRET,
     { expiresIn: '7d' },
   )
-  const headers = authHeaders(token, csrf)
 
   const runId = randomUUID().slice(0, 8)
   const definition = scaleDefinitionFor(SCALE_ITEM_COUNT, `G47-SCALE-${runId}`)
@@ -191,6 +190,7 @@ async function main() {
     scaleAssessmentIds: [] as string[],
     questionnaireIds: [] as string[],
     questionnaireAssessmentIds: [] as string[],
+    formSectionIds: [] as string[],
     cognitiveSessionIds: [] as string[],
   }
 
@@ -310,7 +310,6 @@ async function main() {
       parentKey: `perf-parent-scale-${String(i + 1).padStart(6, '0')}`,
       method: 'POST',
       path: `/api/scales/assessments/${assessment.id}/submit`,
-      headers,
       body: {
         submissionId,
         attemptEpoch: 1,
@@ -322,94 +321,153 @@ async function main() {
     if ((i + 1) % 200 === 0) console.log(`  scale ${i + 1}/${SCALE_N}`)
   }
 
-  console.log(`Creating ${FORM_N} questionnaire form-section fixtures...`)
-  const formRequests: any[] = []
-  for (let i = 0; i < FORM_N; i += 1) {
-    const suffix = `${runId}-${String(i + 1).padStart(5, '0')}`
-    const questionnaire = await prisma.questionnaire.create({
-      data: {
-        code: `G47-Q-${suffix}`,
-        name: `Gate47 questionnaire ${suffix}`,
-        creatorId: admin.id,
-        type: 'COURSE',
-        status: 'PUBLISHED',
-        visibility: 'PUBLIC',
-      },
-    })
-    ledger.questionnaireIds.push(questionnaire.id)
-    const section = await prisma.questionnaireFormSection.create({
-      data: {
-        questionnaireId: questionnaire.id,
-        title: '区段 1',
-        position: 0,
-        contextSection: false,
-      },
-    })
-    const item = await prisma.questionnaireFormItem.create({
-      data: {
-        questionnaireId: questionnaire.id,
-        sectionId: section.id,
-        sectionPosition: 0,
-        type: 'text_input',
-        label: '字段 1',
-        required: true,
-        position: 0,
-      },
-    })
-    const assessment = await prisma.questionnaireAssessment.create({
-      data: {
-        questionnaireId: questionnaire.id,
-        userId: student.id,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
+  console.log(`Creating ${FORM_N} Unified questionnaire form-section fixtures...`)
+  const formClasses = [
+    { key: 'formNormal', itemCount: Number(process.env.FORM_NORMAL_ITEM_COUNT || 8), requests: [] as any[] },
+    { key: 'formLarge', itemCount: Number(process.env.FORM_LARGE_ITEM_COUNT || 25), requests: [] as any[] },
+  ].filter((fc) => {
+    const only = (process.env.FORM_CLASSES || '').split(',').filter(Boolean)
+    return only.length === 0 || only.includes(fc.key)
+  })
+  for (const formClass of formClasses) {
+    if (!Number.isInteger(formClass.itemCount) || formClass.itemCount < 1 || formClass.itemCount > 200) {
+      throw new Error(`${formClass.key} item count must be an integer from 1 to 200`)
+    }
+    for (let i = 0; i < FORM_N; i += 1) {
+      const suffix = `${runId}-${formClass.key}-${String(i + 1).padStart(5, '0')}`
+      const questionnaire = await prisma.questionnaire.create({
+        data: {
+          code: `G47-Q-${suffix}`,
+          name: `Gate47 ${formClass.key} questionnaire ${suffix}`,
+          creatorId: admin.id,
+          type: 'COURSE',
+          status: 'PUBLISHED',
+          visibility: 'PUBLIC',
+        },
+      })
+      ledger.questionnaireIds.push(questionnaire.id)
+      const section = await prisma.questionnaireFormSection.create({
+        data: {
+          questionnaireId: questionnaire.id,
+          title: '区段 1',
+          position: 0,
+          contextSection: false,
+        },
+      })
+      for (let itemIndex = 0; itemIndex < formClass.itemCount; itemIndex += 1) {
+        await prisma.questionnaireFormItem.create({
+          data: {
+            questionnaireId: questionnaire.id,
+            sectionId: section.id,
+            sectionPosition: itemIndex,
+            type: 'text_input',
+            label: `${formClass.key} 字段 ${itemIndex + 1}`,
+            required: true,
+            position: itemIndex,
+          },
+        })
+      }
+      await ensureQuestionnaireFormSections(questionnaire.id)
+      const sections = await listQuestionnaireFormSections(questionnaire.id)
+      const mapped = sections[0]
+      if (!mapped) throw new Error('missing form section after ensure')
+      // Use the SAME canonicalization the runtime admission + aggregate finalize
+      // expect (canonicalHash(mapQuestionnaireSection(rawRow))). The mapped
+      // listQuestionnaireFormSections shape canonicalizes differently and caused
+      // every form submit to fail with DEFINITION_MISMATCH (see e4s-fix-defhash).
+      const rawSection = await prisma.questionnaireFormSection.findUnique({
+        where: { id: section.id },
+        include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+      })
+      if (!rawSection) throw new Error('missing raw form section')
+      const formDefinitionHash = canonicalHash(mapQuestionnaireSection(rawSection))
+      const formSlotSet = freezeQuestionnaireActiveSlotSet({
         attemptEpoch: 1,
-        progress: 0,
-      },
-    })
-    ledger.questionnaireAssessmentIds.push(assessment.id)
-    await ensureQuestionnaireFormSections(questionnaire.id)
-    const sections = await listQuestionnaireFormSections(questionnaire.id)
-    const mapped = sections[0]
-    if (!mapped) throw new Error('missing form section after ensure')
-    const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: `answer-${it.id}` }))
-    formRequests.push({
-      fixtureId: `perf-form-${String(i + 1).padStart(6, '0')}`,
-      instrument: 'form',
-      parentKey: `perf-parent-form-${String(i + 1).padStart(6, '0')}`,
-      method: 'POST',
-      path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
-      headers,
-      body: {
-        submissionId: `g47-form-${runId}-${String(i + 1).padStart(6, '0')}`,
+        scales: [],
+        formSections: [{ sectionId: mapped.id, definitionHash: formDefinitionHash }],
+      })
+      const assessment = await prisma.questionnaireAssessment.create({
+        data: {
+          questionnaireId: questionnaire.id,
+          userId: student.id,
+          status: 'IN_PROGRESS',
+          deliveryMode: 'FINAL_ONLY',
+          runtimeGeneration: 'UNIFIED_V1',
+          attemptEpoch: 1,
+          progress: 0,
+          frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(formSlotSet),
+          frozenActiveSlotSetHash: formSlotSet.snapshotHash,
+        },
+      })
+      ledger.questionnaireAssessmentIds.push(assessment.id)
+      ledger.formSectionIds.push(mapped.id)
+      const formAnswers = mapped.items.map((it) => ({ formItemId: it.id, value: `answer-${it.id}` }))
+      const submissionId = `g47-form-${runId}-${formClass.key}-${String(i + 1).padStart(6, '0')}`
+      const body = {
+        submissionId,
         attemptEpoch: 1,
-        definitionHash: mapped.definitionHash,
+        definitionHash: formDefinitionHash,
         contextSnapshotHash: null,
         answers: formAnswers,
-      },
-    })
-    if ((i + 1) % 50 === 0) console.log(`  form ${i + 1}/${FORM_N}`)
-    void item
-  }
-
-  console.log(`Creating ${COG_N} cognitive sessions...`)
-  const cognitiveRequests: any[] = []
-  for (let i = 0; i < COG_N; i += 1) {
-    const trialCount = 3
-    const resolvedConfig = {
-      trialCount,
-      trialDurationMs: 1000,
-      allowPractice: false,
-      maxRtMs: 60000,
+      }
+      const request = {
+        fixtureId: `perf-${formClass.key}-${String(i + 1).padStart(6, '0')}`,
+        fixtureClass: formClass.key,
+        logicalAttempt: `${assessment.id}:1:${submissionId}`,
+        instrument: 'form',
+        parentKey: `perf-parent-${formClass.key}-${String(i + 1).padStart(6, '0')}`,
+        parentId: assessment.id,
+        sectionId: mapped.id,
+        runtimeGeneration: 'UNIFIED_V1',
+        method: 'POST',
+        path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
+        body,
+        itemCount: mapped.items.length,
+        bodyBytes: Buffer.byteLength(JSON.stringify(body)),
+      }
+      formClass.requests.push(request)
+      if ((i + 1) % 50 === 0) console.log(`  ${formClass.key} ${i + 1}/${FORM_N}`)
     }
-    const configSnapshotEncrypted = createCognitiveSessionConfigSnapshot({
+  }
+  const formRequests = formClasses.flatMap((fc: any) => fc.requests || [])
+
+  console.log(`Creating ${COG_N} Unified Cognitive sessions...`)
+  const cognitiveRequests: any[] = []
+  const trialCount = Number(process.env.COG_TRIAL_COUNT || 3)
+  if (!Number.isInteger(trialCount) || trialCount < 1 || trialCount > 1000) {
+    throw new Error(`COG_TRIAL_COUNT must be an integer from 1 to 1000 (got ${process.env.COG_TRIAL_COUNT})`)
+  }
+  const resolvedConfig = {
+    trialCount,
+    trialDurationMs: 1000,
+    allowPractice: false,
+    maxRtMs: 60000,
+  }
+  const unifiedCognitiveSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
+    testType: fake.testType,
+    configVersion: fake.configVersion,
+    engineVersion: fake.engineVersion,
+    scoringVersion: fake.scoringVersion,
+    config: resolvedConfig,
+  })
+  const configSnapshotEncrypted = unifiedCognitiveSnapshot.encrypted
+  const snapshot = readCognitiveSessionConfig(configSnapshotEncrypted).snapshot
+  if (!snapshot || snapshot.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new Error('cognitive fixture did not create a Unified Runtime snapshot')
+  }
+  const frozenCognitiveAdmission = createFrozenUnitAdmission({
+    attemptEpoch: 1,
+    cognitive: {
       testType: fake.testType,
-      configVersion: fake.configVersion,
       engineVersion: fake.engineVersion,
       scoringVersion: fake.scoringVersion,
-      config: resolvedConfig,
-    })
-    const snapshot = readCognitiveSessionConfig(configSnapshotEncrypted).snapshot
-    if (!snapshot) throw new Error('cognitive snapshot missing')
+      configHash: snapshot.configHash,
+    },
+    principal: { userId: student.id },
+    parent: null,
+    requiresContext: false,
+  })
+  for (let i = 0; i < COG_N; i += 1) {
     const session = await prisma.cognitiveSession.create({
       data: {
         userId: student.id,
@@ -424,6 +482,9 @@ async function main() {
         engineVersion: fake.engineVersion,
         scoringVersion: fake.scoringVersion,
         randomSeed: `g47-seed-${runId}-${i}`,
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledRuntimeHash: unifiedCognitiveSnapshot.compiledRuntime.compiledRuntimeHash,
+        ...frozenAdmissionPersistence(frozenCognitiveAdmission),
       },
     })
     ledger.cognitiveSessionIds.push(session.id)
@@ -434,21 +495,32 @@ async function main() {
       startedAtPerfMs: trialIndex * 1000,
       endedAtPerfMs: trialIndex * 1000 + 400,
     }))
+    const submissionId = `g47-cog-${runId}-${String(i + 1).padStart(6, '0')}`
+    const body = {
+      submissionId,
+      attemptEpoch: 1,
+      definitionHash: snapshot.configHash,
+      contextSnapshotHash: null,
+      trials,
+    }
     cognitiveRequests.push({
       fixtureId: `perf-cognitive-${String(i + 1).padStart(6, '0')}`,
       instrument: 'cognitive',
       parentKey: `perf-parent-cognitive-${String(i + 1).padStart(6, '0')}`,
+      sessionId: session.id,
+      submissionId,
+      runtimeGeneration: 'UNIFIED_V1',
+      compiledRuntimeHash: unifiedCognitiveSnapshot.compiledRuntime.compiledRuntimeHash,
+      trialCount,
+      bodyBytes: Buffer.byteLength(JSON.stringify(body)),
+      canonicalPayloadBytes: canonicalJsonBytes({ trials }).byteLength,
       method: 'POST',
       path: `/api/cognitive/sessions/${session.id}/submit`,
-      headers,
-      body: {
-        submissionId: `g47-cog-${runId}-${String(i + 1).padStart(6, '0')}`,
-        attemptEpoch: 1,
-        definitionHash: snapshot.configHash,
-        contextSnapshotHash: null,
-        trials,
-      },
+      body,
     })
+    if (Buffer.byteLength(JSON.stringify(body)) >= 1_500_000) {
+      throw new Error('cognitive fixture unexpectedly reaches the HTTP size limit')
+    }
     if ((i + 1) % 50 === 0) console.log(`  cognitive ${i + 1}/${COG_N}`)
   }
 
@@ -504,16 +576,36 @@ async function main() {
     ledger.questionnaireAssessmentIds.push(assessment.id)
     await ensureQuestionnaireFormSections(questionnaire.id)
     const sections = await listQuestionnaireFormSections(questionnaire.id)
+    const sameParentSlotSet = freezeQuestionnaireActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [],
+      formSections: sections.map((section) => ({
+        sectionId: section.id,
+        definitionHash: section.definitionHash,
+      })),
+    })
+    await prisma.questionnaireAssessment.update({
+      where: { id: assessment.id },
+      data: {
+        runtimeGeneration: 'UNIFIED_V1',
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(sameParentSlotSet),
+        frozenActiveSlotSetHash: sameParentSlotSet.snapshotHash,
+      },
+    })
+    ledger.formSectionIds.push(...sections.map((section) => section.id))
     for (const [idx, mapped] of sections.entries()) {
       sameParentRequests.push({
         fixtureId: `perf-same-parent-child-${String(idx + 1).padStart(4, '0')}`,
         instrument: 'form',
         parentKey: 'perf-parent-contention-0001',
         parentId: assessment.id,
+        sectionId: mapped.id,
+        logicalAttempt: `${assessment.id}:1:g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
+        runtimeGeneration: 'UNIFIED_V1',
+        itemCount: mapped.items.length,
         slotIndex: idx,
         method: 'POST',
         path: `/api/questionnaires/assessments/${assessment.id}/form-sections/${mapped.id}/submit`,
-        headers,
         body: {
           submissionId: `g47-same-${runId}-${String(idx + 1).padStart(4, '0')}`,
           attemptEpoch: 1,
@@ -534,6 +626,8 @@ async function main() {
   const fixtures = {
     scale: scaleRequests,
     formSection: formRequests,
+    formNormal: formClasses.find((fc: any) => fc.key === 'formNormal')?.requests || [],
+    formLarge: formClasses.find((fc: any) => fc.key === 'formLarge')?.requests || [],
     cognitive: cognitiveRequests,
     sameParent: sameParentRequests,
     mixed,
@@ -556,6 +650,8 @@ async function main() {
     counts: {
       scale: scaleRequests.length,
       formSection: formRequests.length,
+      formNormal: formClasses.find((fc: any) => fc.key === 'formNormal')?.requests.length || 0,
+      formLarge: formClasses.find((fc: any) => fc.key === 'formLarge')?.requests.length || 0,
       cognitive: cognitiveRequests.length,
       sameParent: sameParentRequests.length,
       mixed: mixed.length,

@@ -7,17 +7,24 @@ import { loadFixtureGroup, pickFreshRequest, runLogicalSubmit } from './lib/http
 
 const fixturePath = __ENV.FIXTURE_FILE || '../fixtures/final-submit-fixtures.json';
 const fixtures = JSON.parse(open(fixturePath));
-const groupName = __ENV.GROUP || 'cognitive';
+const groupName = __ENV.GROUP || 'cognitiveNormal';
 const vus = Number(__ENV.VUS || 10);
 const iterations = Number(__ENV.ITERATIONS || 1);
 
 const requests = new SharedArray('e3-fixtures', () => {
-  // Grouped fixture file ({ cognitive: [...] }) or flat list ([...]).
+  // Grouped fixture file ({ cognitiveSmall|cognitiveNormal|cognitiveLarge: [...] })
+  // or a legacy flat list.
   const group = loadFixtureGroup(fixtures, groupName);
   if (group.length) return group;
   if (Array.isArray(fixtures)) return fixtures;
   return [];
 });
+
+if (requests.length < vus * iterations) {
+  throw new Error(
+    `E3 fixture pool exhausted: group="${groupName}" pool=${requests.length} required=${vus * iterations}`,
+  );
+}
 
 export const options = {
   scenarios: {

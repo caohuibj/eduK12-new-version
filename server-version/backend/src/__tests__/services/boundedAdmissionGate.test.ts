@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   BoundedAdmissionBusyError,
   BoundedAdmissionGate,
+  configuredInteger,
 } from '../../services/boundedAdmissionGate'
 import {
   resetRuntimeObservabilityForTests,
@@ -117,4 +118,55 @@ describe('BoundedAdmissionGate', () => {
     await expect(first).resolves.toBeUndefined()
     await expect(gate.run(async () => 'usable')).resolves.toBe('usable')
   })
+  
+  it.each([
+    { raw: undefined, allowZero: false, expected: 7 },
+    { raw: '', allowZero: false, expected: 7 },
+    { raw: '4', allowZero: false, expected: 4 },
+    { raw: '0', allowZero: true, expected: 0 },
+  ])('uses the fallback only for unset/empty admission env and parses valid integers', ({
+    raw,
+    allowZero,
+    expected,
+  }) => {
+    const name = 'TEST_ADMISSION_VALUE'
+    const previous = process.env[name]
+    if (raw === undefined) delete process.env[name]
+    else process.env[name] = raw
+    try {
+      expect(configuredInteger(name, 7, allowZero)).toBe(expected)
+    } finally {
+      if (previous === undefined) delete process.env[name]
+      else process.env[name] = previous
+    }
+  })
+
+  it.each(['0', '-1', '4.5', 'abc', 'NaN', 'Infinity'])(
+    'rejects explicit invalid admission value %s',
+    (raw) => {
+      const name = 'TEST_ADMISSION_INVALID'
+      const previous = process.env[name]
+      process.env[name] = raw
+      try {
+        expect(() => configuredInteger(name, 7)).toThrow(/TEST_ADMISSION_INVALID/)
+      } finally {
+        if (previous === undefined) delete process.env[name]
+        else process.env[name] = previous
+      }
+    },
+  )
+
+  it('accepts explicit zero only when allowZero is enabled', () => {
+    const name = 'TEST_ADMISSION_ZERO'
+    const previous = process.env[name]
+    process.env[name] = '0'
+    try {
+      expect(() => configuredInteger(name, 7)).toThrow()
+      expect(configuredInteger(name, 7, true)).toBe(0)
+    } finally {
+      if (previous === undefined) delete process.env[name]
+      else process.env[name] = previous
+    }
+  })
+
 })

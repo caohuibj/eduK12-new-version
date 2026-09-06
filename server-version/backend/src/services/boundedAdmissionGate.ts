@@ -34,11 +34,7 @@ export const configuredInteger = (name: string, fallback: number, allowZero = fa
   const raw = process.env[name]
   if (raw === undefined || raw === '') return fallback
   const parsed = Number(raw)
-  try {
-    return positiveInteger(parsed, name, allowZero)
-  } catch {
-    return fallback
-  }
+  return positiveInteger(parsed, name, allowZero)
 }
 
 export class BoundedAdmissionBusyError extends Error {

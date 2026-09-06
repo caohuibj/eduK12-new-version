@@ -28,7 +28,7 @@ k6 run k6-single-concurrency.js
 
 `BASE_URL` defaults to `http://127.0.0.1:3000`. `EXPECTED_STATUSES` defaults to `200`; set it explicitly when a scenario intentionally measures a controlled `409` or `503`, for example `EXPECTED_STATUSES=200,409,503`. `DURATION`, `VUS`, `MAX_VUS`, and `INTER_REQUEST_SLEEP` are optional scenario controls described below.
 
-Each fixture group is an array of request objects. A request must provide `method`, `path`, and `body`; `headers` and `instrument` are optional. The runner serializes object bodies as JSON, adds `Content-Type` when needed, and adds `Authorization: Bearer ...` only when `AUTH_TOKEN` is set. Requests in the independent-parent scenario must refer to different parent attempts. Requests in the same-parent scenario must refer to the same parent while using distinct child/section requests when the goal is lock contention rather than replay traffic.
+Each fixture group is an array of request objects. A request must provide `method`, `path`, and `body`; `headers` and `instrument` are optional. The runner serializes object bodies as JSON, adds `Content-Type` when needed, and builds the authenticated session cookie from `AUTH_TOKEN`/`CSRF_TOKEN` (or the `PERF_*` equivalents). Keep credentials out of fixture JSON. Requests in the independent-parent scenario must refer to different parent attempts. Requests in the same-parent scenario must refer to the same parent while using distinct child/section requests when the goal is lock contention rather than replay traffic.
 
 ## Scenarios
 
@@ -46,7 +46,7 @@ Override the group when the prepared fixture uses a different name:
 GROUP=formSection VUS=8 DURATION=60s k6 run k6-same-parent-contention.js
 ```
 
-The independent and contention scripts cycle through the supplied request list. Therefore, fixture cardinality and uniqueness are part of the test definition; record them with the result rather than comparing runs with different fixture shapes.
+The independent and contention scripts must consume fresh fixtures one-to-one; a scenario that runs out of fixtures fails closed. Therefore, fixture cardinality and uniqueness are part of the test definition; record them with the result rather than comparing runs with different fixture shapes.
 
 ## Measurements to record
 
@@ -70,3 +70,15 @@ Eventual-success capacity profiles (public NAT, open-loop scale, cognitive
 payload, aggregate, bundle+FFmpeg) live in [`gate-e/`](gate-e/README.md).
 Plan: [`../docs/gate-e-capacity-plan.md`](../docs/gate-e-capacity-plan.md).
 
+
+## Post-Work-C Gate-E
+
+Use the named production-path classes `cognitiveSmall`, `cognitiveNormal`, and
+`cognitiveLarge` for E3. The large class is capped by the business
+`maxTrials=1000` rule, not sized to the HTTP limit. Run the isolated negative
+script for the >1000-trial rejection separately; never include it in capacity
+throughput.
+
+The formal capacity report must distinguish lifetime ELU, interval ELU derived
+from cumulative active/idle counter deltas, and event-loop delay. The collector
+records a null/unavailable interval after its first sample or a counter reset.
