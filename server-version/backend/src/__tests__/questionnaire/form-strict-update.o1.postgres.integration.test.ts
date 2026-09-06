@@ -20,39 +20,50 @@ const suite = DB_URL ? describe : describe.skip
 
 const ITEM_COUNT = 3
 
+type StrictUpdateFixture = {
+  suffix: string
+  userId: string
+  questionnaireId: string
+  sectionId: string
+  formItemIds: string[]
+  parentId: string
+  sectionAttemptId: string
+  sectionDefinitionHash: string
+}
+
 let db: PrismaClient
-let suffix = ''
-let userId = ''
-let questionnaireId = ''
-let sectionId = ''
-let formItemIds: string[] = []
-let parentId = ''
-let sectionAttemptId = ''
-let sectionDefinitionHash = ''
+// Each case builds an independent fixture; every one is tracked so a shared
+// or repeatedly-used integration database never accumulates orphan parents.
+const fixtures: StrictUpdateFixture[] = []
 
-const createFixture = async (): Promise<void> => {
-  suffix = randomUUID()
-  userId = `o1-user-${suffix}`
-  questionnaireId = `o1-questionnaire-${suffix}`
-  sectionId = `o1-section-${suffix}`
-  parentId = `o1-parent-${suffix}`
-  sectionAttemptId = `o1-section-attempt-${suffix}`
+const createFixture = async (): Promise<StrictUpdateFixture> => {
+  const suffix = randomUUID()
+  const fixture: StrictUpdateFixture = {
+    suffix,
+    userId: `o1-user-${suffix}`,
+    questionnaireId: `o1-questionnaire-${suffix}`,
+    sectionId: `o1-section-${suffix}`,
+    formItemIds: [],
+    parentId: `o1-parent-${suffix}`,
+    sectionAttemptId: `o1-section-attempt-${suffix}`,
+    sectionDefinitionHash: '',
+  }
 
-  await db.user.create({ data: { id: userId, username: `o1-${suffix}`, passwordHash: 'test-only', role: 'STUDENT' } })
+  await db.user.create({ data: { id: fixture.userId, username: `o1-${suffix}`, passwordHash: 'test-only', role: 'STUDENT' } })
   await db.questionnaire.create({
     data: {
-      id: questionnaireId,
+      id: fixture.questionnaireId,
       code: `O1-STRICT-${suffix}`,
       name: 'O1 strict form update fixture',
       type: 'GENERAL',
       status: 'PUBLISHED',
-      creatorId: userId,
+      creatorId: fixture.userId,
     },
   })
   await db.questionnaireFormSection.create({
     data: {
-      id: sectionId,
-      questionnaireId,
+      id: fixture.sectionId,
+      questionnaireId: fixture.questionnaireId,
       title: 'O1 form section',
       position: 1,
       contextSection: false,
@@ -62,8 +73,8 @@ const createFixture = async (): Promise<void> => {
     db.questionnaireFormItem.create({
       data: {
         id: `o1-item-${suffix}-${index}`,
-        questionnaireId,
-        sectionId,
+        questionnaireId: fixture.questionnaireId,
+        sectionId: fixture.sectionId,
         sectionPosition: 0,
         type: 'text_input',
         label: `O1 answer ${index + 1}`,
@@ -72,25 +83,25 @@ const createFixture = async (): Promise<void> => {
       },
     })
   )))
-  formItemIds = items.map((item) => item.id)
+  fixture.formItemIds = items.map((item) => item.id)
 
   const storedSection = await db.questionnaireFormSection.findUniqueOrThrow({
-    where: { id: sectionId },
+    where: { id: fixture.sectionId },
     include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
   })
-  sectionDefinitionHash = formSectionIdentityHash(mapQuestionnaireSection(storedSection))
+  fixture.sectionDefinitionHash = formSectionIdentityHash(mapQuestionnaireSection(storedSection))
 
   const slotSet = freezeQuestionnaireActiveSlotSet({
     attemptEpoch: 1,
     scales: [],
     cognitive: [],
-    formSections: [{ sectionId, definitionHash: sectionDefinitionHash }],
+    formSections: [{ sectionId: fixture.sectionId, definitionHash: fixture.sectionDefinitionHash }],
   })
   await db.questionnaireAssessment.create({
     data: {
-      id: parentId,
-      questionnaireId,
-      userId,
+      id: fixture.parentId,
+      questionnaireId: fixture.questionnaireId,
+      userId: fixture.userId,
       status: 'IN_PROGRESS',
       deliveryMode: 'FINAL_ONLY',
       runtimeGeneration: 'UNIFIED_V1',
@@ -102,19 +113,21 @@ const createFixture = async (): Promise<void> => {
   })
   await db.questionnaireFormSectionAttempt.create({
     data: {
-      id: sectionAttemptId,
-      questionnaireAssessmentId: parentId,
-      sectionId,
+      id: fixture.sectionAttemptId,
+      questionnaireAssessmentId: fixture.parentId,
+      sectionId: fixture.sectionId,
       status: 'IN_PROGRESS',
       attemptEpoch: 1,
     },
   })
+  fixtures.push(fixture)
+  return fixture
 }
 
-const preCreatePendingAnswers = async (count: number): Promise<void> => {
+const preCreatePendingAnswers = async (fixture: StrictUpdateFixture, count: number): Promise<void> => {
   await db.questionnaireFormAnswer.createMany({
-    data: formItemIds.slice(0, count).map((formItemId) => ({
-      questionnaireAssessmentId: parentId,
+    data: fixture.formItemIds.slice(0, count).map((formItemId) => ({
+      questionnaireAssessmentId: fixture.parentId,
       formItemId,
       status: 'PENDING' as const,
       revision: 0,
@@ -122,17 +135,17 @@ const preCreatePendingAnswers = async (count: number): Promise<void> => {
   })
 }
 
-const submitFinal = async (): Promise<unknown> => submitUnifiedQuestionnaireFormSectionFinal({
-  questionnaireAssessmentId: parentId,
-  sectionId,
-  submissionId: `o1-submission-${suffix}`,
+const submitFinal = (fixture: StrictUpdateFixture): Promise<unknown> => submitUnifiedQuestionnaireFormSectionFinal({
+  questionnaireAssessmentId: fixture.parentId,
+  sectionId: fixture.sectionId,
+  submissionId: `o1-submission-${fixture.suffix}`,
   attemptEpoch: 1,
-  definitionHash: sectionDefinitionHash,
-  answers: formItemIds.map((formItemId, index) => ({ formItemId, value: `final-${index}` })),
-  userId,
+  definitionHash: fixture.sectionDefinitionHash,
+  answers: fixture.formItemIds.map((formItemId, index) => ({ formItemId, value: `final-${index}` })),
+  userId: fixture.userId,
 })
 
-const snapshotCount = async (): Promise<number> => db.assessmentUnitSnapshot.count({
+const snapshotCount = (parentId: string): Promise<number> => db.assessmentUnitSnapshot.count({
   where: { questionnaireAssessmentId: parentId },
 })
 
@@ -147,44 +160,44 @@ suite('O1 UNIFIED questionnaire FINAL strict answer update (real PostgreSQL)', (
   afterAll(async () => {
     if (!db) return
     try {
-      if (parentId) {
-        await db.assessmentUnitSnapshot.deleteMany({ where: { questionnaireAssessmentId: parentId } })
-        await db.questionnaireFormAnswer.deleteMany({ where: { questionnaireAssessmentId: parentId } })
-        await db.questionnaireFormSectionAttempt.deleteMany({ where: { questionnaireAssessmentId: parentId } })
-        await db.questionnaireAssessment.deleteMany({ where: { id: parentId } })
+      for (const fixture of fixtures) {
+        await db.assessmentUnitSnapshot.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+        await db.questionnaireFormAnswer.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+        await db.questionnaireFormSectionAttempt.deleteMany({ where: { questionnaireAssessmentId: fixture.parentId } })
+        await db.questionnaireAssessment.deleteMany({ where: { id: fixture.parentId } })
+        await db.questionnaire.deleteMany({ where: { id: fixture.questionnaireId } })
+        await db.user.deleteMany({ where: { id: fixture.userId } })
       }
-      if (questionnaireId) await db.questionnaire.deleteMany({ where: { id: questionnaireId } })
-      if (userId) await db.user.deleteMany({ where: { id: userId } })
     } finally {
       await db.$disconnect()
     }
   })
 
   it('updates exactly the pre-created rows, completes the section, and writes one snapshot', async () => {
-    await createFixture()
-    await preCreatePendingAnswers(ITEM_COUNT)
+    const fixture = await createFixture()
+    await preCreatePendingAnswers(fixture, ITEM_COUNT)
 
-    const result = await submitFinal() as { replayed: boolean; sectionAttemptId: string }
+    const result = await submitFinal(fixture) as { replayed: boolean; sectionAttemptId: string }
 
     expect(result.replayed).toBe(false)
-    expect(result.sectionAttemptId).toBe(sectionAttemptId)
+    expect(result.sectionAttemptId).toBe(fixture.sectionAttemptId)
 
-    const sectionAttempt = await db.questionnaireFormSectionAttempt.findUniqueOrThrow({ where: { id: sectionAttemptId } })
+    const sectionAttempt = await db.questionnaireFormSectionAttempt.findUniqueOrThrow({ where: { id: fixture.sectionAttemptId } })
     expect(sectionAttempt.status).toBe('COMPLETED')
     expect(sectionAttempt.submissionPayloadHash).toBeTruthy()
 
     const answers = await db.questionnaireFormAnswer.findMany({
-      where: { questionnaireAssessmentId: parentId },
+      where: { questionnaireAssessmentId: fixture.parentId },
       orderBy: { formItemId: 'asc' },
     })
     expect(answers).toHaveLength(ITEM_COUNT)
     expect(answers.every((answer) => answer.status === 'ANSWERED' && answer.revision === 0)).toBe(true)
     expect(answers.map((answer) => answer.value).sort()).toEqual(['final-0', 'final-1', 'final-2'])
 
-    expect(await snapshotCount()).toBe(1)
-    const snapshot = await db.assessmentUnitSnapshot.findFirstOrThrow({ where: { questionnaireAssessmentId: parentId } })
+    expect(await snapshotCount(fixture.parentId)).toBe(1)
+    const snapshot = await db.assessmentUnitSnapshot.findFirstOrThrow({ where: { questionnaireAssessmentId: fixture.parentId } })
     expect(snapshot).toMatchObject({
-      slotKey: `form-section:${sectionId}`,
+      slotKey: `form-section:${fixture.sectionId}`,
       unitType: 'FORM_SECTION',
       terminalState: 'COMPLETED',
       payloadKind: 'COLLECTION_FACTS',
@@ -192,26 +205,26 @@ suite('O1 UNIFIED questionnaire FINAL strict answer update (real PostgreSQL)', (
   })
 
   it('fails closed without partial FINAL writes when a pre-created row is missing', async () => {
-    await createFixture()
+    const fixture = await createFixture()
     // Invariant intentionally broken: 2 of 3 pre-created rows exist.
-    await preCreatePendingAnswers(ITEM_COUNT - 1)
+    await preCreatePendingAnswers(fixture, ITEM_COUNT - 1)
 
-    await expect(submitFinal()).rejects.toMatchObject({
+    await expect(submitFinal(fixture)).rejects.toMatchObject({
       name: 'InstrumentFinalSubmitError',
       code: 'STALE_ATTEMPT',
       statusCode: 409,
-    })
+    } as Partial<InstrumentFinalSubmitError>)
 
-    const sectionAttempt = await db.questionnaireFormSectionAttempt.findUniqueOrThrow({ where: { id: sectionAttemptId } })
+    const sectionAttempt = await db.questionnaireFormSectionAttempt.findUniqueOrThrow({ where: { id: fixture.sectionAttemptId } })
     expect(sectionAttempt.status).toBe('IN_PROGRESS')
     expect(sectionAttempt.submissionId).toBeNull()
 
-    const answers = await db.questionnaireFormAnswer.findMany({ where: { questionnaireAssessmentId: parentId } })
+    const answers = await db.questionnaireFormAnswer.findMany({ where: { questionnaireAssessmentId: fixture.parentId } })
     expect(answers).toHaveLength(ITEM_COUNT - 1)
     expect(answers.every((answer) => answer.status === 'PENDING' && answer.value === null)).toBe(true)
 
-    expect(await snapshotCount()).toBe(0)
-    const parent = await db.questionnaireAssessment.findUniqueOrThrow({ where: { id: parentId } })
+    expect(await snapshotCount(fixture.parentId)).toBe(0)
+    const parent = await db.questionnaireAssessment.findUniqueOrThrow({ where: { id: fixture.parentId } })
     expect(parent.status).toBe('IN_PROGRESS')
   })
 })
