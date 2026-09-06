@@ -56,7 +56,6 @@ export const createScaleCatalogRegistry = (manifests: readonly unknown[]): Scale
   const diagnostics: CatalogRegistryDiagnostic[] = []
   const entries: ScaleCatalogEntry[] = []
   const entryByKey = new Map<string, ScaleCatalogEntry>()
-  const packageKeyVersions = new Set(listScalePackages().map((pkg) => `${pkg.key}:${pkg.instrumentVersion}`))
   const packageKeys = new Set(listScalePackages().map((pkg) => pkg.key))
 
   manifests.forEach((raw, index) => {
