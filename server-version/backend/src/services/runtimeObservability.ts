@@ -45,8 +45,6 @@ export type RequestObservationPhase =
   | 'aggregate.report'
   | 'aggregate.encrypt'
   | 'aggregate.persist'
-  | 'aggregate.persist.cas'
-  | 'aggregate.persist.analysis_snapshot'
   | 'aggregate.cas_loser'
   | 'response'
 
