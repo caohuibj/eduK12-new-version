@@ -252,6 +252,58 @@ async function main() {
     flush()
     console.log(`${key}: emitted ${total} fixtures across ${bandIdx} bands (pool overflow skipped: ${overflow})`)
   }
+
+  // Stage 4 capacity-curve: a single run happens at each rate, and the runner
+  // reads ONE per-rate file and selects the group via GROUP (cognitiveNormal /
+  // cognitiveLarge). So each band file must carry BOTH groups sliced to the
+  // same size (PLAN_4 sizes are equal for normal and large at each rate). We
+  // replay the two pools in lockstep (nback first, then cpt) so neither class
+  // ever reads the other's fresh slice.
+  async function emitS4() {
+    const normalGen = sessionsByPrefix(`${PREFIX}nback-`)
+    const largeGen = sessionsByPrefix(`${PREFIX}cpt-`)
+    let nBuf: Row[] = []
+    let lBuf: Row[] = []
+    let nIdx = 0
+    let lIdx = 0
+    const pull = async (gen: AsyncGenerator<Row[]>, buf: Row[], idx: number) => {
+      while (idx >= buf.length) {
+        const b = await gen.next()
+        if (b.done) return null
+        buf = b.value
+        idx = 0
+      }
+      return { s: buf[idx], buf, idx: idx + 1 }
+    }
+    for (const { rate, size } of PLAN_4.cognitiveNormal) {
+      let nn = 0
+      let nl = 0
+      const nSl: ReturnType<typeof buildFixture>[] = []
+      const lSl: ReturnType<typeof buildFixture>[] = []
+      for (; nn < size; nn += 1) {
+        const r = await pull(normalGen, nBuf, nIdx)
+        if (!r) break
+        nBuf = r.buf
+        nIdx = r.idx
+        nSl.push(buildFixture(r.s))
+      }
+      for (; nl < size; nl += 1) {
+        const r = await pull(largeGen, lBuf, lIdx)
+        if (!r) break
+        lBuf = r.buf
+        lIdx = r.idx
+        lSl.push(buildFixture(r.s))
+      }
+      const filePath = OUT.replace(/\.json$/, `-${rate}s-r1.json`).replace(/e3r-cognitive-class-fixtures/, 'e3s4-cognitive-class-fixtures')
+      writeFileSync(filePath, JSON.stringify({ cognitiveNormal: nSl, cognitiveLarge: lSl }))
+      console.log(`s4 wrote ${filePath} normal=${nSl.length} large=${lSl.length}`)
+    }
+  }
+
+  if (STAGE === '4') {
+    await emitS4()
+    return
+  }
   await emitClass('cognitiveNormal', `${PREFIX}nback-`, bandPlan.cognitiveNormal)
   // E3_ONLY_NORMAL=1: nback bands only (cpt/fake pools untouched since last
   // rebuild, so their band files remain valid).
