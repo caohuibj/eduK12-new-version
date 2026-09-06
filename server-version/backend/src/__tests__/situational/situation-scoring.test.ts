@@ -110,6 +110,28 @@ describe('situational scoring', () => {
     expect(metric?.value).toBe(1)
   })
 
+  it('dispatches rating vs choice by channel responseType, not by channelKey', () => {
+    const definition: SituationDefinitionV1 = JSON.parse(JSON.stringify(SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION))
+    const emotionChannel = definition.scenes[0]!.channels.find((channel) => channel.channelKey === 'EMOTION_RATING')!
+    emotionChannel.responseType = 'SINGLE_CHOICE'
+    emotionChannel.options = [
+      { optionKey: 'LOW', label: '完全不紧张' },
+      { optionKey: 'HIGH', label: '非常紧张' },
+    ]
+    definition.scoring.choiceScores.push(
+      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', optionKey: 'LOW', contribution: -1 },
+      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', optionKey: 'HIGH', contribution: 1 },
+    )
+    const result = scoreSituational(definition, [
+      { sceneKey: 'AN-01', channelKey: 'APPRAISAL', responseValue: 'D' },
+      { sceneKey: 'AN-01', channelKey: 'EMOTION_RATING', responseValue: 'HIGH' },
+    ])
+    const emotion = result.metrics.find((entry) => entry.key === 'bfi2.anxiety.emotion')
+    expect(emotion?.value).toBe(1)
+    expect(emotion?.status).toBe('calculated')
+    expect(result.quality.status).toBe('interpretable')
+  })
+
   it('re-scores the same immutable responses under a new scoringVersion without schema change', () => {
     const calibrated: SituationDefinitionV1 = JSON.parse(JSON.stringify(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION))
     calibrated.scoring.scoringVersion = 'sjt-calibrated-v2'

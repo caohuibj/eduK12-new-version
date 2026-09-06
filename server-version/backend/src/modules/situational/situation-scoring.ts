@@ -191,6 +191,14 @@ export const scoreSituational = (
   const responses = normalizeResponses(inputResponses)
   const answered = validateResponses(definition, responses)
   const contributions = contributionByKey(definition)
+  // Rating vs choice is dispatched by the channel's responseType, not by its
+  // channelKey: the schema deliberately allows a rating channel under any key.
+  const responseTypeByPair = new Map<string, string>()
+  definition.scenes.forEach((scene) => {
+    scene.channels.forEach((channel) => {
+      responseTypeByPair.set(responseKey(scene.sceneKey, channel.channelKey), channel.responseType)
+    })
+  })
 
   const flags: SituationalQuality['flags'] = []
   const metrics: SituationalMetricValue[] = definition.scoring.publishedMetrics.map((metric): SituationalMetricValue => {
@@ -218,7 +226,7 @@ export const scoreSituational = (
     const values = answeredResponses.map((pairKey) => {
       const response = answered.get(pairKey)
       if (!response) throw new Error(`metric 期望响应缺失：${pairKey}`)
-      if (metric.channelKey === 'EMOTION_RATING') {
+      if (responseTypeByPair.get(pairKey) === 'RATING_0_100') {
         return finite(typeof response.responseValue === 'number' ? response.responseValue : Number.NaN)
       }
       const contribution = contributions.get(`${pairKey}:${response.responseValue}`)
