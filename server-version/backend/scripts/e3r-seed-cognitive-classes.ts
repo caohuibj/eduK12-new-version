@@ -267,4 +267,9 @@ async function main() {
 
 main()
   .catch((err) => { console.error(err); process.exitCode = 1 })
-  .finally(async () => { await prisma.$disconnect() })
+  .finally(async () => {
+    await prisma.$disconnect()
+    // Forced exit: tsx/ESM can leak Prisma handles that keep the event loop
+    // alive after $disconnect, hanging callers that wait on this subprocess.
+    process.exit(process.exitCode || 0)
+  })
