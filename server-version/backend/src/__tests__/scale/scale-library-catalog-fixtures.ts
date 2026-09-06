@@ -30,4 +30,21 @@ export const validCatalogManifestBase = (): ScaleCatalogManifestV1 => ({
     respondentTypes: ['SELF'],
     developmentalEvidence: 'PARTIAL',
   },
+  administration: {
+    itemCount: 5,
+    estimatedMinutes: 3,
+    administrationModes: ['DIGITAL_SELF_ADMINISTERED'],
+    timeFrame: '过去两周',
+    requiredTraining: false,
+    itemOrderLocked: false,
+    responseFormatLocked: true,
+  },
+  intendedUse: {
+    intendedUses: [
+      { use: 'RESEARCH', evidenceStatus: 'SUPPORTED' },
+      { use: 'INDIVIDUAL_REFLECTION', evidenceStatus: 'SUPPORTED' },
+      { use: 'PROGRESS_MONITORING', evidenceStatus: 'EVIDENCE_UNKNOWN' },
+    ],
+    forbiddenUses: ['DIAGNOSIS'],
+  },
 })

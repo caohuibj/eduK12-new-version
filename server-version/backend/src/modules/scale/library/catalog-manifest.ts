@@ -138,6 +138,98 @@ export const scaleCatalogPopulationSchema = z.object({
 })
 export type ScaleCatalogPopulation = z.infer<typeof scaleCatalogPopulationSchema>
 
+export const administrationModeSchema = z.enum([
+  'DIGITAL_SELF_ADMINISTERED',
+  'DIGITAL_SUPERVISED',
+  'PAPER',
+  'INTERVIEWER_ADMINISTERED',
+])
+export type AdministrationMode = z.infer<typeof administrationModeSchema>
+
+/** 施测形态与负担（SL1-C3）。itemCount/estimatedMinutes 是 catalog 参考值，不替代 runtime。 */
+export const scaleCatalogAdministrationSchema = z.object({
+  itemCount: z.number().int().positive({ message: 'itemCount 必须是正整数' }),
+  estimatedMinutes: z.number().int().positive({ message: 'estimatedMinutes 必须是正整数' }),
+  administrationModes: z.array(administrationModeSchema).min(1, '至少需要一种施测方式'),
+  timeFrame: z.string().min(1, 'timeFrame 不能为空'),
+  requiredTraining: z.boolean(),
+  itemOrderLocked: z.boolean(),
+  responseFormatLocked: z.boolean(),
+  layoutConstraints: z.array(z.string().min(1)).default([]),
+}).strict().superRefine((administration, ctx) => {
+  const seen = new Set<string>()
+  administration.administrationModes.forEach((mode, index) => {
+    if (seen.has(mode)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['administrationModes', String(index)],
+        message: 'administrationModes 不能重复',
+      })
+    }
+    seen.add(mode)
+  })
+})
+export type ScaleCatalogAdministration = z.infer<typeof scaleCatalogAdministrationSchema>
+
+export const intendedUseSchema = z.enum([
+  'RESEARCH',
+  'INDIVIDUAL_REFLECTION',
+  'PROGRESS_MONITORING',
+  'PROGRAM_EVALUATION',
+  'SCREENING',
+])
+export type IntendedUse = z.infer<typeof intendedUseSchema>
+
+/** 结构性禁止的用途——与 intendedUse 枚举不相交，一旦声明即为硬约束。 */
+export const forbiddenUseSchema = z.enum([
+  'DIAGNOSIS',
+  'HIGH_STAKES_SELECTION',
+  'SCHOOL_RANKING',
+  'TEACHER_ACCOUNTABILITY',
+  'UNSUPPORTED_GROUP_COMPARISON',
+])
+export type ForbiddenUse = z.infer<typeof forbiddenUseSchema>
+
+/**
+ * 每个可用用途都携带独立的证据状态，避免 validated=true 式的无边界判断：
+ * “研究允许 / 诊断禁止 / 进展监测证据未知”必须可以同时成立。
+ */
+export const intendedUseEvidenceStatusSchema = z.enum(['SUPPORTED', 'EVIDENCE_UNKNOWN', 'NOT_SUPPORTED'])
+export type IntendedUseEvidenceStatus = z.infer<typeof intendedUseEvidenceStatusSchema>
+
+export const scaleCatalogIntendedUseSchema = z.object({
+  intendedUses: z.array(z.object({
+    use: intendedUseSchema,
+    evidenceStatus: intendedUseEvidenceStatusSchema,
+    notes: z.string().min(1).optional(),
+  }).strict()).min(1, '至少需要声明一个可用用途'),
+  forbiddenUses: z.array(forbiddenUseSchema).default([]),
+}).strict().superRefine((intendedUse, ctx) => {
+  const seenUses = new Set<string>()
+  intendedUse.intendedUses.forEach((entry, index) => {
+    if (seenUses.has(entry.use)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['intendedUses', String(index)],
+        message: '同一用途只能声明一条 evidenceStatus',
+      })
+    }
+    seenUses.add(entry.use)
+  })
+  const seenForbidden = new Set<string>()
+  intendedUse.forbiddenUses.forEach((use, index) => {
+    if (seenForbidden.has(use)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['forbiddenUses', String(index)],
+        message: 'forbiddenUses 不能重复',
+      })
+    }
+    seenForbidden.add(use)
+  })
+})
+export type ScaleCatalogIntendedUse = z.infer<typeof scaleCatalogIntendedUseSchema>
+
 /**
  * catalogManifestVersion 是 manifest 内容版本（任何内容变化，如 evidence
  * citation 修订，都必须递增）；schemaVersion 才是契约结构版本。
@@ -149,6 +241,8 @@ export const scaleCatalogManifestV1Schema = z.object({
   identity: scaleCatalogIdentitySchema,
   construct: scaleCatalogConstructSchema,
   population: scaleCatalogPopulationSchema,
+  administration: scaleCatalogAdministrationSchema,
+  intendedUse: scaleCatalogIntendedUseSchema,
 }).strict()
 
 export type ScaleCatalogManifestV1 = z.infer<typeof scaleCatalogManifestV1Schema>
