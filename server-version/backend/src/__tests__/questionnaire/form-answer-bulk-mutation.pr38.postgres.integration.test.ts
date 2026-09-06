@@ -337,7 +337,12 @@ suite('PR38 Questionnaire form-answer bulk mutation (real PostgreSQL)', () => {
     expect(runtimeMetricLines().some((line) => line.startsWith('ptool_serializable_attempts_total{'))).toBe(false)
   })
 
-  it('does not complete when an answer and completion race', async () => {
+  // O4 load-once dispatch: /complete on a legacy (non-UNIFIED) attempt is a
+  // 410 boundary inside the controller — identical to the HTTP behavior since
+  // the completion guard landed. The legacy terminal-predicate and race
+  // coverage these two cases used to exercise is dead via this route; the
+  // UNIFIED equivalents are covered by the v32-2 PostgreSQL suites.
+  it('keeps legacy attempts on the 410 completion boundary even mid answer-save race', async () => {
     const [answer, completion] = await Promise.all([
       invoke(
         questionnaireController.saveFormAnswers,
@@ -348,7 +353,8 @@ suite('PR38 Questionnaire form-answer bulk mutation (real PostgreSQL)', () => {
     ])
 
     expect(answer.statusCode).toBe(200)
-    expect(completion.statusCode).toBe(409)
+    expect(completion.statusCode).toBe(410)
+    expect(completion.body).toMatchObject({ code: 'LEGACY_WRITE_DISABLED' })
     const assessment = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId } })
     expect(assessment?.status).toBe('IN_PROGRESS')
     const stored = await prisma.questionnaireFormAnswer.findUnique({
@@ -362,7 +368,7 @@ suite('PR38 Questionnaire form-answer bulk mutation (real PostgreSQL)', () => {
     expect(stored).toMatchObject({ value: 'race-answer', status: 'ANSWERED', revision: 1 })
   })
 
-  it('keeps completion terminal predicate correct after all bulk answers are saved', async () => {
+  it('keeps legacy attempts on the 410 completion boundary after all bulk answers are saved', async () => {
     const saved = await invoke(
       questionnaireController.saveFormAnswers,
       { assessmentId },
@@ -371,8 +377,8 @@ suite('PR38 Questionnaire form-answer bulk mutation (real PostgreSQL)', () => {
     expect(saved.statusCode).toBe(200)
 
     const completion = await invoke(questionnaireController.completeAssessment, { id: assessmentId })
-    expect(completion.statusCode).toBe(200)
+    expect(completion.statusCode).toBe(410)
     const assessment = await prisma.questionnaireAssessment.findUnique({ where: { id: assessmentId } })
-    expect(assessment).toMatchObject({ status: 'COMPLETED', progress: 100, completedForms: 10 })
+    expect(assessment).toMatchObject({ status: 'IN_PROGRESS' })
   })
 })

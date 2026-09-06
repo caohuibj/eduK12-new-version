@@ -128,25 +128,19 @@ beforeEach(() => {
 })
 
 describe('collection-only questionnaire completion/report contract', () => {
-  it('auth explicit completion stores per-scale reports and omits legacy aggregate fields', async () => {
+  it('auth explicit completion on a legacy attempt stays on the 410 boundary (O4 dispatch)', async () => {
+    // Since the completion guard, legacy attempts are 410 on /complete — the
+    // controller (O4 load-once dispatch) owns that boundary directly now.
+    // The per-scale projection contract below remains covered by the
+    // automatic-completion and public-completion cases.
     const qa = makeQa()
     mockPrisma.questionnaireAssessment.findUnique.mockResolvedValue(qa)
     const res = response()
 
     await questionnaireController.completeAssessment({ params: { id: 'qa-1' }, user: { userId: 'student-1' } } as any, res)
 
-    expect(res.json).toHaveBeenCalled()
-    expect(dataOf(res)).toMatchObject({ backgroundValues: [{ value: '三年级' }], unitReports: [{ scaleId: 'scale-1', caveats: [], disclaimer: expect.any(String) }] })
-    expect(dataOf(res)).not.toHaveProperty('averageScore')
-    expect(dataOf(res)).not.toHaveProperty('overallSummary')
-    expect(dataOf(res)).not.toHaveProperty('aggregateReport')
-    expect(mockPrisma.questionnaireAssessment.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'qa-1', status: 'IN_PROGRESS' },
-      data: expect.objectContaining({
-        aggregateReport: Prisma.DbNull,
-        aggregateReportEncrypted: expect.any(String),
-      }),
-    }))
+    expect(res.status).toHaveBeenCalledWith(410)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'LEGACY_WRITE_DISABLED' }))
   })
 
   it('auth automatic completion follows the same projection', async () => {
