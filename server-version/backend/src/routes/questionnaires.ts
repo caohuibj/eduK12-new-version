@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { questionnaireController } from '../controllers/questionnaireController'
 import { authenticate, requireTeacher } from '../middleware/auth'
-import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
+import { legacyWriteDisabled, unifiedCompletionGuard } from '../middleware/instrumentFinalOnly'
 
 const router = Router()
 
@@ -18,8 +18,8 @@ router.post('/assessments/:id/context/freeze', authenticate, legacyWriteDisabled
 router.post('/assessments/:assessmentId/form-sections/:sectionId/submit', authenticate, questionnaireController.submitFinalFormSection)
 router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/submit', authenticate, questionnaireController.submitFinalScale)
 
-// 完成问卷测评
-router.post('/assessments/:id/complete', authenticate, legacyWriteDisabled)
+// 完成问卷测评 (UNIFIED_V1 only; legacy writes stay disabled)
+router.post('/assessments/:id/complete', authenticate, unifiedCompletionGuard, questionnaireController.completeAssessment)
 
 // 获取聚合报告
 router.get('/assessments/:id/report', authenticate, questionnaireController.getReport)

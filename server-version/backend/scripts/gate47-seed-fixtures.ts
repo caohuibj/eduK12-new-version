@@ -13,6 +13,8 @@ import {
   readCognitiveSessionConfig,
 } from '../src/modules/cognitive/session.service'
 import { canonicalJsonBytes } from '../src/modules/assessment-runtime/canonical'
+import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
+import { mapQuestionnaireSection } from '../src/modules/assessment-runtime/form-section-definition'
 import { createTrialEnvelope } from '../src/modules/cognitive/v2/trial-envelope'
 import {
   ensureQuestionnaireFormSections,
@@ -28,7 +30,6 @@ import {
 } from '../src/modules/assessment-runtime/admission-snapshot'
 import {
   freezeQuestionnaireActiveSlotSet,
-  formSectionIdentityHash,
 } from '../src/modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet, questionnaireScaleSlotKey } from '../src/modules/assessment-runtime/slot-set'
 
@@ -324,7 +325,10 @@ async function main() {
   const formClasses = [
     { key: 'formNormal', itemCount: Number(process.env.FORM_NORMAL_ITEM_COUNT || 8), requests: [] as any[] },
     { key: 'formLarge', itemCount: Number(process.env.FORM_LARGE_ITEM_COUNT || 25), requests: [] as any[] },
-  ]
+  ].filter((fc) => {
+    const only = (process.env.FORM_CLASSES || '').split(',').filter(Boolean)
+    return only.length === 0 || only.includes(fc.key)
+  })
   for (const formClass of formClasses) {
     if (!Number.isInteger(formClass.itemCount) || formClass.itemCount < 1 || formClass.itemCount > 200) {
       throw new Error(`${formClass.key} item count must be an integer from 1 to 200`)
@@ -367,7 +371,16 @@ async function main() {
       const sections = await listQuestionnaireFormSections(questionnaire.id)
       const mapped = sections[0]
       if (!mapped) throw new Error('missing form section after ensure')
-      const formDefinitionHash = formSectionIdentityHash(mapped)
+      // Use the SAME canonicalization the runtime admission + aggregate finalize
+      // expect (canonicalHash(mapQuestionnaireSection(rawRow))). The mapped
+      // listQuestionnaireFormSections shape canonicalizes differently and caused
+      // every form submit to fail with DEFINITION_MISMATCH (see e4s-fix-defhash).
+      const rawSection = await prisma.questionnaireFormSection.findUnique({
+        where: { id: section.id },
+        include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
+      })
+      if (!rawSection) throw new Error('missing raw form section')
+      const formDefinitionHash = canonicalHash(mapQuestionnaireSection(rawSection))
       const formSlotSet = freezeQuestionnaireActiveSlotSet({
         attemptEpoch: 1,
         scales: [],
@@ -416,9 +429,7 @@ async function main() {
       if ((i + 1) % 50 === 0) console.log(`  ${formClass.key} ${i + 1}/${FORM_N}`)
     }
   }
-  const formNormalRequests = formClasses[0].requests
-  const formLargeRequests = formClasses[1].requests
-  const formRequests = [...formNormalRequests, ...formLargeRequests]
+  const formRequests = formClasses.flatMap((fc: any) => fc.requests || [])
 
   console.log(`Creating ${COG_N} Unified Cognitive sessions...`)
   const cognitiveRequests: any[] = []
@@ -615,8 +626,8 @@ async function main() {
   const fixtures = {
     scale: scaleRequests,
     formSection: formRequests,
-    formNormal: formNormalRequests,
-    formLarge: formLargeRequests,
+    formNormal: formClasses.find((fc: any) => fc.key === 'formNormal')?.requests || [],
+    formLarge: formClasses.find((fc: any) => fc.key === 'formLarge')?.requests || [],
     cognitive: cognitiveRequests,
     sameParent: sameParentRequests,
     mixed,
@@ -639,8 +650,8 @@ async function main() {
     counts: {
       scale: scaleRequests.length,
       formSection: formRequests.length,
-      formNormal: formNormalRequests.length,
-      formLarge: formLargeRequests.length,
+      formNormal: formClasses.find((fc: any) => fc.key === 'formNormal')?.requests.length || 0,
+      formLarge: formClasses.find((fc: any) => fc.key === 'formLarge')?.requests.length || 0,
       cognitive: cognitiveRequests.length,
       sameParent: sameParentRequests.length,
       mixed: mixed.length,
