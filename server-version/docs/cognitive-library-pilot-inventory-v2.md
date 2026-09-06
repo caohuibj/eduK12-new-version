@@ -21,7 +21,7 @@
 - **Golden fixture 覆盖**：15/24 有冻结 golden JSON；缺 9 个：patterncompare, flanker, cardsort, digitbackward, picturesequence, pairedassociate, matrix, mentalrotation, tower（均有 scorer 正/负测试，无冻结 fixture）。
 - **Reference 现状**：全部任务无用户可见参考。所有已提交 config `referenceMode='none'`；literature 三套锚（reaction/memory/stroop）全部 disabled（provenance-only）；simulated 数据在 tree 但仅 config 显式开启才可达；`referencePosition` 恒为 null；DB 无 COGNITIVE reference 行。
 - **输入/设备采集现状**：25 个 trial schema 中仅 reaction（逐试次自报 `inputMode: pointer|touch|keyboard`）与 trailmaking（`pointerType: mouse|touch|pen|keyboard|unknown` + `deviceClass: desktop|tablet|phone|unknown`）有输入方式字段；其余 22 个任务 trial schema 无任何输入/设备字段。v2 trial envelope 对全部任务统一采集 `qualityEvents`（visibility_lost/window_blur/resume/runner_restart）。
-- **scientificStatus**：全部 24 个任务 = `PILOT`（无任何任务具备 RESEARCH_GRADE 认证证据）。
+- **scientificStatus**：全部 24 个任务 = `PILOT`（无任何任务具备 RESEARCH_GRADE 认证证据）。**scientificStatus 按 exact task identity（testType/engineVersion/scoringVersion）解析，不绑定 task family**：allowlist（`RESEARCH_GRADE_IDENTITIES`）当前为空，未来新 engine/scoring 版本天然回到 PILOT，不继承旧版本科研资格（review Fix 1）。
 
 ## 2. 总矩阵
 
@@ -340,7 +340,8 @@
 
 ## 4. 与 COG-P2/P3/P5 的衔接
 
-- **COG-P2（Device & Input Provenance V1）**：本 inventory 的「输入采集」列 + RT/细动作敏感度即为 2.1 审计基线。已确认缺口：除 reaction/trailmaking 外 22 个任务无输入方式字段；CPT 等 RT-sensitive 任务同时接受 click 与 keyboard 但不留痕（与 reaction 的自报模式不一致）。原则：RECORD, DO NOT CORRECT。
-- **COG-P3（Scoring Plane Slimming）**：各任务「Scoring Contract 原始事实」+ headline/primary/supporting/quality 划分即为 3.1–3.3 的权威清单；9 个无 golden 任务需先补 golden 才能安全瘦身。
-- **COG-P5（Research Capture → COS）**：各任务「Research Capture 建议」为 capture contract 草案；当前全部任务已通过 v2 raw submission + trials 表留存完整原始 payload，COS 化属存储迁移而非新采集。
+- **COG-P2（Device & Input Provenance V1）**：本 inventory 的「输入采集」列 + RT/细动作敏感度即为 2.1 审计基线。注意（review §6）：interaction family 与 rtSensitivity/fineMotorSensitivity 只是 **COG-P2 的 provisional audit hint**，不是正式 scientific evidence。已确认缺口：除 reaction/trailmaking 外 22 个任务无输入方式字段；CPT 等 RT-sensitive 任务同时接受 click 与 keyboard 但不留痕（与 reaction 的自报模式不一致）。原则：RECORD, DO NOT CORRECT。
+- **COG-P3（Scoring Plane Slimming）**：权威的逐任务 raw-fact 分类在 `modules/cognitive/library/dual-contracts.ts`，按 boundary 分为 **clientObservedFacts（客户端必须记录）/ runtimeReconstructableFacts（seed/config/protocol 可重建）/ serverDerivedFacts（authoritative scorer 派生，永不为客户端真值）** 三类；headline/primary/supporting/quality 划分从 registry 派生。§3 逐任务块中的「Scoring Contract 原始事实」为分类前的清单库存，仅作对照参考。9 个无 golden 任务需先补 golden 才能安全瘦身。
+- **COG-P5（Research Capture → COS）**：capture contract（`dual-contracts.ts`）已区分 **currentlyAvailableFacts（现有 raw payload/envelope/frozen runtime 已能获得）与 futureCaptureFacts（当前未采集、未来科研值得新增）**。**COG-P5 同时包括 storage migration 与 research-capture enrichment：现有 raw payload 中已经存在的事实只做迁移；当前未采集的科研事实由 COG-P2/P5 按最小必要原则新增。**
+- **状态词汇口径（review §9）**：Product status = `DRAFT / PUBLISHED / RETIRED`（v2 publication，工程层）；Scientific maturity = `PILOT / RESEARCH_GRADE`（exact identity scoped，evidence 层，二者独立）；Reference = 复用既有 Reference Core（本 inventory 不建立第二套 reference status）；Research capture = current captured facts + future capture enrichment（见上）。
 - 本 inventory 不引入第二套 domain/版本/参考真值；全部字段可由 §0 所列权威源程序化再导出。

@@ -156,14 +156,22 @@ describe('catalog single-source-of-truth boundaries', () => {
     }
   })
 
-  it('library module never imports publication or reference truth (no second reference status)', () => {
+  it('library never imports publication/reference truth; only dual-contracts may read v2 definitions read-only', () => {
     const source = readLibrarySource()
-    expect(source).not.toMatch(/from\s+['"].*v2\/registry/)
     expect(source).not.toMatch(/from\s+['"].*publication-gate/)
     expect(source).not.toMatch(/from\s+['"].*cognitive\/reference/)
     expect(source).not.toMatch(/from\s+['"].*reference-protocol/)
+    expect(source).not.toMatch(/from\s+['"].*reference-adapter/)
     expect(source).not.toContain('LITERATURE_DESCRIPTIVE')
     expect(source).not.toContain('SOURCE_REVIEWED')
+    // Review Fix 2：只有 dual-contracts 的派生路径允许 read-only 消费 v2 TaskDefinition；
+    // catalog 与 audience projection 不得建立第二份 publication/reference 真值。
+    for (const file of ['catalog.ts', 'catalog-contract.ts', 'audience-projection.ts']) {
+      const content = fs.readFileSync(path.join(LIBRARY_DIR, file), 'utf8')
+      expect(content).not.toMatch(/from\s+['"].*v2\/registry/)
+    }
+    const dual = fs.readFileSync(path.join(LIBRARY_DIR, 'dual-contracts.ts'), 'utf8')
+    expect(dual).toMatch(/getCognitiveV2TaskDefinition/)
   })
 
   it('catalog metadata is not imported by any runtime/scorer/hash path (hash stability by construction)', () => {
@@ -177,11 +185,44 @@ describe('catalog single-source-of-truth boundaries', () => {
 })
 
 describe('dual contract declarations', () => {
-  it('every catalog task has both declarations and no declaration exists for fake', () => {
+  it('every catalog task has both declarations with the review-mandated shapes', () => {
     expect(listScoringContractDeclarations()).toHaveLength(24)
     expect(listResearchCaptureDeclarations()).toHaveLength(24)
     expect(getScoringContractDeclaration('fake')).toBeUndefined()
     expect(getResearchCaptureDeclaration('fake')).toBeUndefined()
+    for (const declaration of listScoringContractDeclarations()) {
+      expect(Object.keys(declaration).sort()).toEqual(
+        ['clientObservedFacts', 'runtimeReconstructableFacts', 'serverDerivedFacts', 'testType'].sort(),
+      )
+      // Review Fix 2：library 不再存在人工 reference eligibility 声明字段
+      expect(Object.keys(declaration)).not.toContain('referenceEligibleMetricKeys')
+      expect(Object.keys(declaration)).not.toContain('requiredRawFacts')
+    }
+    for (const declaration of listResearchCaptureDeclarations()) {
+      expect(Object.keys(declaration).sort()).toEqual(
+        ['currentlyAvailableFacts', 'futureCaptureFacts', 'testType'].sort(),
+      )
+      // Review Fix 4：current 与 future 必须区分（input modality / device / viewport 属 future）
+      expect(declaration.futureCaptureFacts.join(' ')).toMatch(/input modality|pointer|viewport|键入时序|输入法|延迟间隔|排除|事件粒度/)
+    }
+  })
+
+  it('raw fact boundary: representative semantic fixtures (CPT / Stroop / Reaction)', () => {
+    // Review Fix 3：只锁代表边界，不做脆弱的大字符串框架。
+    const cpt = getScoringContractDeclaration('cpt')
+    expect(cpt?.clientObservedFacts.join(' ')).toMatch(/响应有无/)
+    expect(cpt?.runtimeReconstructableFacts.join(' ')).toMatch(/target\/nontarget/)
+    expect(cpt?.serverDerivedFacts.join(' ')).toMatch(/false alarm/)
+
+    const stroop = getScoringContractDeclaration('stroop')
+    expect(stroop?.clientObservedFacts.join(' ')).toMatch(/选择响应/)
+    expect(stroop?.runtimeReconstructableFacts.join(' ')).toMatch(/congruent\/incongruent/)
+    expect(stroop?.serverDerivedFacts.join(' ')).toMatch(/correct\/incorrect/)
+
+    const reaction = getScoringContractDeclaration('reaction')
+    expect(reaction?.clientObservedFacts.join(' ')).toMatch(/rtMs/)
+    expect(reaction?.runtimeReconstructableFacts.join(' ')).toMatch(/foreperiodMs/)
+    expect(reaction?.serverDerivedFacts.join(' ')).toMatch(/premature\/timeout/)
   })
 
   it('derives a valid scoring contract for every real registry version', () => {
@@ -198,11 +239,23 @@ describe('dual contract declarations', () => {
       expect(contract.primaryMetricKeys).toEqual([...entry.reportDefinition.primaryMetrics])
       expect(contract.secondaryMetricKeys).toEqual([...entry.reportDefinition.secondaryMetrics])
       expect(contract.qualityKeys).toEqual(Object.keys(entry.qualityDefinitions))
-      const metricKeys = new Set(Object.keys(entry.metricDefinitions))
-      for (const key of contract.referenceEligibleMetricKeys) {
-        expect(metricKeys.has(key)).toBe(true)
-      }
+      // Review Fix 2：referenceEligible 只能来自 authoritative v2 TaskDefinition
+      const v2Definition = getCognitiveV2TaskDefinition(
+        entry.testType,
+        entry.engineVersion,
+        entry.scoringVersion,
+      )
+      expect(v2Definition).toBeDefined()
+      const expectedReferenceEligible = Object.entries(v2Definition?.metrics ?? {})
+        .filter(([, metric]) => metric.referenceEligible === true)
+        .map(([key]) => key)
+      expect(contract.referenceEligibleMetricKeys).toEqual(expectedReferenceEligible)
     }
+  })
+
+  it('library source contains no manual referenceEligibleMetricKeys array declarations', () => {
+    const source = readLibrarySource()
+    expect(source).not.toMatch(/referenceEligibleMetricKeys:\s*\[['"\s]/)
   })
 
   it('bundleEligible keys come only from the authoritative evidence mapping', () => {

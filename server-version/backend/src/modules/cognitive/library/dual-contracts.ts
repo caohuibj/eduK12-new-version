@@ -1,13 +1,22 @@
 /**
- * COG-P1 Commit 4 — Dual Contract Inventory（Scoring Contract + Research Capture 声明）。
+ * COG-P1 Commit 4（review 修订后）— Dual Contract Inventory。
  *
- * 规则（Pilot-first v2 指令 §11）：
+ * 规则（Pilot-first v2 指令 §11 + PR #60 review Fix 2/3/4）：
  *  - 本文件只做逐 task 的两类数据 contract 声明/盘点，不修改 trial payload、scorer、
  *    DB schema，不新增 FINAL payload，不增加在线 CPU。
- *  - headline / primary / secondary / quality 全部从 cognitive.registry 派生（不复制真值）；
- *    bundleEligible 只能由 evidence-mapping.registry 派生；
- *    referenceEligible 是面向 COG-P4 的声明意图（Pilot Reference 配置对象），
- *    不代表当前存在任何 reference。
+ *  - referenceEligible **只从 authoritative v2 TaskDefinition 派生**
+ *    （metrics[key].referenceEligible，v2/registry.ts:61 计算、publication gate 消费）；
+ *    本文件不再人工维护第二份 eligibility truth。
+ *  - headline / primary / secondary / quality 从 cognitive.registry 派生；
+ *    bundleEligible 只能由 evidence-mapping.registry 派生。
+ *  - raw facts 按 boundary 分三类（Fix 3）：
+ *      clientObservedFacts       客户端真正必须记录、无法由 frozen runtime 重建
+ *      runtimeReconstructableFacts 可由 randomSeed/frozen config/protocol 重建
+ *      serverDerivedFacts        必须由 authoritative scorer 推导，永不为客户端真值
+ *    P1 只做分类，不删除字段；实际瘦身在 COG-P3。
+ *  - research capture 区分 current/future（Fix 4）：
+ *      currentlyAvailableFacts   当前 raw payload / envelope / frozen runtime 已能获得
+ *      futureCaptureFacts        当前未可靠记录、未来科研值得新增（COG-P2/P5 最小必要）
  *  - Research Capture 建议仅用于 COG-P2/P3/P5 的权威实施清单；
  *    当前系统只采集/归档，不做在线分析。
  */
@@ -17,172 +26,302 @@ import {
   requireCatalogForIdentity,
 } from './catalog'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
+import { getCognitiveV2TaskDefinition } from '../v2/registry'
 
 export interface CognitiveScoringContractDeclaration {
   testType: string
-  /** scoring 真正需要的原始事实（来自 trial schema / 冻结 config / seed）。 */
-  requiredRawFacts: string[]
-  /** 面向 COG-P4 Pilot Reference 的声明意图；必须 ⊆ metricDefinitions keys。 */
-  referenceEligibleMetricKeys: string[]
+  /** 客户端真正必须记录的行为事实（不能由 frozen runtime 重建）。 */
+  clientObservedFacts: string[]
+  /** 可由 randomSeed / frozen config / trialIndex / stimulusSetVersion / protocol 重建的事实。 */
+  runtimeReconstructableFacts: string[]
+  /** 必须由 authoritative scorer 推导的事实（correctness/quality/score 等）。 */
+  serverDerivedFacts: string[]
 }
 
 export interface CognitiveResearchCaptureDeclaration {
   testType: string
-  /** 未来科研离线分析建议保存的原始事实（当前不新增任何在线采集）。 */
-  suggestedFacts: string[]
+  /** 当前 raw payload / envelope / frozen runtime 已能获得的事实。 */
+  currentlyAvailableFacts: string[]
+  /** 当前未可靠记录、未来科研值得新增的采集（COG-P2/P5 按最小必要原则）。 */
+  futureCaptureFacts: string[]
 }
 
 const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> = {
   reaction: {
     testType: 'reaction',
-    requiredRawFacts: ['foreperiodMs', 'rtMs', 'premature/timeout flags', 'interrupted', 'inputMode（自报）'],
-    referenceEligibleMetricKeys: ['medianRtMs'],
+    clientObservedFacts: ['raw rtMs', '响应有无（按/未按）', 'inputMode（自报，COG-P2 前为粗粒度）', 'interrupted'],
+    runtimeReconstructableFacts: ['foreperiodMs（seed/config 可权威重建）'],
+    serverDerivedFacts: ['premature/timeout 分类', 'valid/invalid RT 判定', 'metrics（medianRtMs/rtICV 等）', 'quality flags'],
   },
   memory: {
     testType: 'memory',
-    requiredRawFacts: ['逐级呈现序列（seed 可重建）', '键入作答序列', '层级通过/终止原因', 'interrupted'],
-    referenceEligibleMetricKeys: ['maxSpan'],
+    clientObservedFacts: ['逐级键入的作答序列', 'interrupted'],
+    runtimeReconstructableFacts: ['逐级呈现数字序列（seed/config）'],
+    serverDerivedFacts: ['层级通过/终止判定', 'metrics（maxSpan/totalCorrectTrials 等）', 'quality flags'],
   },
   stroop: {
     testType: 'stroop',
-    requiredRawFacts: ['congruent/incongruent 条件', '颜色选择与正确性', 'rtMs + timeout', 'interrupted'],
-    referenceEligibleMetricKeys: ['medianRtCongruent', 'medianRtIncongruent'],
+    clientObservedFacts: ['颜色选择响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['逐试次 congruent/incongruent 条件', '色词刺激映射（seed）', '正确应答（冻结刺激决定）'],
+    serverDerivedFacts: ['correct/incorrect 判定', '条件 RT/accuracy', 'stroopEffectMs', 'quality flags'],
   },
   gonogo: {
     testType: 'gonogo',
-    requiredRawFacts: ['go/nogo 条件', '响应有无与正确性', 'go rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['commissionRate', 'goMedianRtMs'],
+    clientObservedFacts: ['按压与否（响应有无）', 'go raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['go/nogo 条件序列（seed/config）'],
+    serverDerivedFacts: ['hit/omission/commission 判定', 'metrics（commissionRate/dPrime 等）', 'quality flags'],
   },
   cpt: {
     testType: 'cpt',
-    requiredRawFacts: ['target/nontarget 条件', 'hit/false alarm/omission 结果', 'hit rtMs', 'block 序号', 'premature 标记', 'interrupted'],
-    referenceEligibleMetricKeys: ['dPrime', 'omissionRate', 'hitMedianRtMs'],
+    clientObservedFacts: ['响应有无', 'hit raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['target/nontarget 条件与 block 结构（seed/config）'],
+    serverDerivedFacts: ['hit/false alarm/omission 判定', 'metrics（dPrime/omissionRate/rtICV 等）', 'quality flags'],
   },
   nback: {
     testType: 'nback',
-    requiredRawFacts: ['N 水平', '按 N 的 target/nontarget', '匹配响应与正确性', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['dPrimeByN'],
+    clientObservedFacts: ['匹配按键响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['N 水平与 target/nontarget 序列（seed/config）'],
+    serverDerivedFacts: ['按 N 命中/误报判定', 'metrics（dPrimeByN/maxReliableN 等）', 'quality flags'],
   },
   corsi: {
     testType: 'corsi',
-    requiredRawFacts: ['呈现方块序列（seed 可重建）', '点击作答序列', '层级推进/终止', 'interrupted'],
-    referenceEligibleMetricKeys: ['maxSpan', 'totalCorrectTrials'],
+    clientObservedFacts: ['点击的方块序列', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现方块序列（seed）', 'span 层级结构'],
+    serverDerivedFacts: ['序列正误判定', 'metrics（maxSpan/totalCorrectTrials 等）', 'quality flags'],
   },
   sst: {
     testType: 'sst',
-    requiredRawFacts: ['go/stop 条件', 'stop 试次 SSD', 'stop 成功/失败 + rtMs', 'go 正确性 + rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['ssrtMs', 'goMedianRtMs'],
+    clientObservedFacts: ['go 响应与 raw RT', 'stop 试次响应有无', 'interrupted'],
+    runtimeReconstructableFacts: ['go/stop 条件与 SSD 阶梯（冻结 staircase 规则重建）'],
+    serverDerivedFacts: ['stop 成功/失败判定', 'SSRT 估计', 'quality flags'],
   },
   taskswitch: {
     testType: 'taskswitch',
-    requiredRawFacts: ['cue/规则 + switch/repeat 条件', '响应正确性', '有效 rtMs', 'block 结构（pure blocks 科研档）', 'interrupted'],
-    referenceEligibleMetricKeys: ['medianRtSwitch', 'medianRtRepeat'],
+    clientObservedFacts: ['方向/规则响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['cue/规则与 switch/repeat 条件序列（seed/config）'],
+    serverDerivedFacts: ['正确性判定', 'switch cost 计算', 'quality flags'],
   },
   patterncompare: {
     testType: 'patterncompare',
-    requiredRawFacts: ['刺激对身份（seed 可重建）', 'same/different 响应与正确性', 'rtMs / lapse', '限时内完成题数', 'interrupted'],
-    referenceEligibleMetricKeys: ['correctPerMinute', 'medianCorrectRtMs'],
+    clientObservedFacts: ['same/different 选择', 'raw RT / lapse（未响应）', 'interrupted'],
+    runtimeReconstructableFacts: ['刺激对身份与正确应答（seed 生成器）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（correctPerMinute/accuracy 等）', 'quality flags'],
   },
   flanker: {
     testType: 'flanker',
-    requiredRawFacts: ['congruent/incongruent 条件', '方向响应与正确性', '有效 rtMs', 'omission', 'interrupted'],
-    referenceEligibleMetricKeys: ['medianRtCongruent', 'medianRtIncongruent'],
+    clientObservedFacts: ['方向响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['congruent/incongruent 条件序列与正确方向（seed）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（flankerEffectMs 等）', 'quality flags'],
   },
   cardsort: {
     testType: 'cardsort',
-    requiredRawFacts: ['冻结规则序', '实际规则响应', 'switch/repeat 条件', '持续性错误推导事实', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['medianRtSwitch', 'medianRtRepeat'],
+    clientObservedFacts: ['分类选择（实际按下的规则键）', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['冻结规则序（config）'],
+    serverDerivedFacts: ['规则转换点与 switch/repeat 分类', '持续性错误推导', 'metrics/quality'],
   },
   digitbackward: {
     testType: 'digitbackward',
-    requiredRawFacts: ['呈现数字序列', '倒序键入作答', '层级结果', 'interrupted'],
-    referenceEligibleMetricKeys: ['maxSpan', 'sequenceDistance'],
+    clientObservedFacts: ['倒序键入序列', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现数字序列（seed）'],
+    serverDerivedFacts: ['序列正误与层级判定', 'metrics（maxSpan/sequenceDistance 等）', 'quality flags'],
   },
   picturesequence: {
     testType: 'picturesequence',
-    requiredRawFacts: ['项目集身份（seed 可重建）', '逐轮排序提交', '延迟阶段有效性', 'interrupted'],
-    referenceEligibleMetricKeys: ['adjacentPairScore', 'positionScore'],
+    clientObservedFacts: ['逐轮排序提交（实际顺序）', '延迟阶段是否完成', 'interrupted'],
+    runtimeReconstructableFacts: ['项目集身份与目标顺序（seed）'],
+    serverDerivedFacts: ['相邻对/位置得分计算', 'learningGain', 'quality flags'],
   },
   pairedassociate: {
     testType: 'pairedassociate',
-    requiredRawFacts: ['配对呈现（逐轮）', '逐对位置响应', 'criterion 计数', '延迟阶段有效性', 'interrupted'],
-    referenceEligibleMetricKeys: ['immediateAccuracy', 'learningSlope'],
+    clientObservedFacts: ['每对选择的位置', 'interrupted'],
+    runtimeReconstructableFacts: ['配对-位置真值与呈现轮次（seed/config）'],
+    serverDerivedFacts: ['对错判定', 'metrics（learningSlope/trialsToCriterion 等）', 'quality flags'],
   },
   matrix: {
     testType: 'matrix',
-    requiredRawFacts: ['题目身份 + 规则族 + 难度（生成器 seed）', '所选选项与正确性', 'omission', 'interrupted'],
-    referenceEligibleMetricKeys: ['accuracy'],
+    clientObservedFacts: ['所选选项', '作答时长（不限时）', 'interrupted'],
+    runtimeReconstructableFacts: ['题目身份/规则族/难度与唯一正确选项（生成器 seed）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/accuracyByRuleFamily 等）', 'quality flags'],
   },
   mentalrotation: {
     testType: 'mentalrotation',
-    requiredRawFacts: ['角度条件', 'same/mirror 真值', '响应与正确性', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['accuracy', 'medianCorrectRtMs'],
+    clientObservedFacts: ['same/mirror 响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['角度条件与刺激真值（seed）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（angleCost/accuracy 等）', 'quality flags'],
   },
   tower: {
     testType: 'tower',
-    requiredRawFacts: ['题目最短步数（solver）', '逐步移动序列', '规则违反', 'first-move latency', 'interrupted'],
-    referenceEligibleMetricKeys: ['minimumMoveSolveRate', 'excessMoves'],
+    clientObservedFacts: ['逐步移动序列', '首步前时延', 'interrupted'],
+    runtimeReconstructableFacts: ['题目初始/目标布局与最短步数（solver + seed）'],
+    serverDerivedFacts: ['规则违反判定', 'metrics（excessMoves/minimumMoveSolveRate 等）', 'quality flags'],
   },
   trailmaking: {
     testType: 'trailmaking',
-    requiredRawFacts: ['目标序列（A/B）', '逐步正确性 + 时间戳', 'pointerType + deviceClass（自报）', '时限', 'interrupted'],
-    referenceEligibleMetricKeys: ['partACompletionTimeMs', 'meanCorrectStepTimeMs'],
+    clientObservedFacts: ['逐步点击的目标与顺序（含错误尝试）', '逐步时间戳', 'pointerType/deviceClass（自报）', 'interrupted'],
+    runtimeReconstructableFacts: ['目标序列布局（seed）'],
+    serverDerivedFacts: ['步骤正误判定', 'metrics（completionTimeMs/setShiftCostMs 等）', 'quality flags'],
   },
   reversallearning: {
     testType: 'reversallearning',
-    requiredRawFacts: ['阶段（acquisition/reversal）', '逐试次 reward roll（replay contract）', '选择 + 反馈结果', 'criterion 连对计数', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['acquisitionAccuracy', 'reversalAccuracy'],
+    clientObservedFacts: ['每试次二选一选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['reward roll 序列（replay contract，冻结概率不下发）', '阶段结构'],
+    serverDerivedFacts: ['win/loss 反馈结果', '阶段正确率与 criterion 判定', 'metrics/quality'],
   },
   bart: {
     testType: 'bart',
-    requiredRawFacts: ['冻结爆破阈值（服务端）', '逐 balloon 泵压序列', 'explosion/cashout 结果', 'interrupted'],
-    referenceEligibleMetricKeys: ['adjustedPumps'],
+    clientObservedFacts: ['逐次泵压行为', 'cashout 时机', 'interrupted'],
+    runtimeReconstructableFacts: ['冻结爆破阈值（服务端持有，未下发）'],
+    serverDerivedFacts: ['explosion/cashout 结果判定', 'metrics（adjustedPumps 等）', 'quality flags'],
   },
   wordlist: {
     testType: 'wordlist',
-    requiredRawFacts: ['词表身份（冻结词库 + seed）', '逐轮归一化输入', '侵入/重复判定', '延迟阶段有效性', 'interrupted'],
-    referenceEligibleMetricKeys: ['immediateAccuracy'],
+    clientObservedFacts: ['键入的回忆内容', '作答时序', 'interrupted'],
+    runtimeReconstructableFacts: ['词表身份与目标词序（冻结词库 + seed）'],
+    serverDerivedFacts: ['归一化匹配/侵入/重复判定', 'metrics（immediateAccuracy/learningGain 等）', 'quality flags'],
   },
   lexicaldecision: {
     testType: 'lexicaldecision',
-    requiredRawFacts: ['词/伪词身份 + 词频带', 'word/nonword 响应与正确性', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['dPrime', 'medianRtReal', 'medianRtPseudo'],
+    clientObservedFacts: ['word/nonword 响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['词/伪词身份与词频带（冻结词库 + seed）', '正确应答'],
+    serverDerivedFacts: ['正确性判定', 'metrics（dPrime/lexicalityEffectMs 等）', 'quality flags'],
   },
   emotionrecognition: {
     testType: 'emotionrecognition',
-    requiredRawFacts: ['面孔身份（合成集版本）', '目标情绪', '所选情绪', 'rtMs', 'interrupted'],
-    referenceEligibleMetricKeys: ['balancedAccuracy'],
+    clientObservedFacts: ['所选情绪', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['面孔身份与目标情绪（合成集 + seed）', '正确应答'],
+    serverDerivedFacts: ['正确性判定', 'metrics（balancedAccuracy/confusionMatrix）', 'quality flags'],
   },
 }
+
+// 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
+// randomSeed + frozen config + 五族版本号；任务特有事实单独列出。
+const COMMON_CURRENT_CAPTURE = [
+  '完整加密 trial payload（服务端留存）',
+  'trial envelope qualityEvents（visibility_lost/window_blur/resume/runner_restart）',
+  'randomSeed + frozen config + 版本族（engine/scoring/metric/quality/report）',
+]
 
 const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDeclaration> = {
   reaction: {
     testType: 'reaction',
-    suggestedFacts: ['完整 foreperiod 序列', '逐试次 inputMode 事件', 'device class（未来 provenance）', 'visibility 中断事件', '原始 RT 分布'],
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 rtMs/foreperiodMs/inputMode 自报'],
+    futureCaptureFacts: ['真实 input modality（事件级区分 mouse/touch/keyboard）', 'device class provenance', 'viewport/dpr', '更细粒度 visibility-resume 序列'],
   },
-  memory: { testType: 'memory', suggestedFacts: ['逐级作答时序', '复述/停顿模式', '键入事件', 'visibility 事件'] },
-  stroop: { testType: 'stroop', suggestedFacts: ['逐试次色词映射', '完整 RT 分布', '响应侧平衡', 'visibility 事件'] },
-  gonogo: { testType: 'gonogo', suggestedFacts: ['ISI 分布', '错误后减慢事实', '完整 RT 分布', 'visibility 事件'] },
-  cpt: { testType: 'cpt', suggestedFacts: ['逐 block RT 分布', 'vigilance decrement 轨迹', '极短反应原始值', 'visibility 事件'] },
-  nback: { testType: 'nback', suggestedFacts: ['按 N 逐 trial 响应矩阵', '完整 RT 分布', 'lure 试次', 'visibility 事件'] },
-  corsi: { testType: 'corsi', suggestedFacts: ['逐级作答时序', '错误位距分布', 'visibility 事件'] },
-  sst: { testType: 'sst', suggestedFacts: ['完整 SSD 阶梯', '失败 stop RT 分布', '策略性减慢迹象', 'visibility 事件'] },
-  taskswitch: { testType: 'taskswitch', suggestedFacts: ['cue-stimulus 间隔', 'switch 序列结构', '完整 RT 分布', 'visibility 事件'] },
-  patterncompare: { testType: 'patterncompare', suggestedFacts: ['刺激对生成参数', '完整 RT 分布', 'lapse 时点', 'visibility 事件'] },
-  flanker: { testType: 'flanker', suggestedFacts: ['flanker 结构参数', '完整 RT 分布', '序列效应', 'visibility 事件'] },
-  cardsort: { testType: 'cardsort', suggestedFacts: ['规则切换轨迹', '错误类型分解', '完整 RT 分布', 'visibility 事件'] },
-  digitbackward: { testType: 'digitbackward', suggestedFacts: ['作答时序', '错误位距模式', '键入事件', 'visibility 事件'] },
-  picturesequence: { testType: 'picturesequence', suggestedFacts: ['逐轮排序轨迹', '修改行为', '实际延迟间隔', 'visibility 事件'] },
-  pairedassociate: { testType: 'pairedassociate', suggestedFacts: ['逐对学习轨迹', '位置偏差模式', '实际延迟间隔', 'visibility 事件'] },
-  matrix: { testType: 'matrix', suggestedFacts: ['逐题作答时长', '选项排除行为', '规则族×难度正确率', 'visibility 事件'] },
-  mentalrotation: { testType: 'mentalrotation', suggestedFacts: ['角度×RT 轨迹', '镜像错误模式', '响应侧平衡', 'visibility 事件'] },
-  tower: { testType: 'tower', suggestedFacts: ['首步前思考时长分布', '回撤/改步行为', '完整移动轨迹', 'visibility 事件'] },
-  trailmaking: { testType: 'trailmaking', suggestedFacts: ['完整逐步轨迹（含错误尝试目标）', '指针事件粒度', 'viewport/屏幕事实', 'visibility 事件'] },
-  reversallearning: { testType: 'reversallearning', suggestedFacts: ['反馈后选择轨迹', 'win-stay/lose-shift 事实', '完整 RT 分布', 'visibility 事件'] },
-  bart: { testType: 'bart', suggestedFacts: ['逐次泵压间隔', '现金化时机', '爆炸后行为', 'visibility 事件'] },
-  wordlist: { testType: 'wordlist', suggestedFacts: ['逐词召回时序', '语义聚类事实', '输入法中间态', 'visibility 事件'] },
-  lexicaldecision: { testType: 'lexicaldecision', suggestedFacts: ['词频带×RT 分布', '词长效应', '伪词生成器参数', 'visibility 事件'] },
-  emotionrecognition: { testType: 'emotionrecognition', suggestedFacts: ['混淆矩阵轨迹', '类别级偏差事实', '完整 RT 分布', 'visibility 事件'] },
+  memory: {
+    testType: 'memory',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['逐级作答按键时序', '真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  stroop: {
+    testType: 'stroop',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['响应侧与按键映射事实', '真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  gonogo: {
+    testType: 'gonogo',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  cpt: {
+    testType: 'cpt',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality（CPT 同时接受 click 与 keyboard，当前不留痕）', 'device provenance', 'viewport/dpr'],
+  },
+  nback: {
+    testType: 'nback',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  corsi: {
+    testType: 'corsi',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['逐块点击事件粒度', 'device/pointer provenance', 'viewport/dpr'],
+  },
+  sst: {
+    testType: 'sst',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  taskswitch: {
+    testType: 'taskswitch',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  patterncompare: {
+    testType: 'patterncompare',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  flanker: {
+    testType: 'flanker',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  cardsort: {
+    testType: 'cardsort',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  digitbackward: {
+    testType: 'digitbackward',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['逐级键入时序', '真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  picturesequence: {
+    testType: 'picturesequence',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['逐项拖/点中间态', '实际延迟间隔时长', 'device provenance', 'viewport/dpr'],
+  },
+  pairedassociate: {
+    testType: 'pairedassociate',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['位置选择事件粒度', '实际延迟间隔时长', 'device provenance', 'viewport/dpr'],
+  },
+  matrix: {
+    testType: 'matrix',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['选项排除/改选行为', 'device provenance', 'viewport/dpr'],
+  },
+  mentalrotation: {
+    testType: 'mentalrotation',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  tower: {
+    testType: 'tower',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['移动事件粒度与回撤序列核验', 'device/pointer provenance', 'viewport/dpr'],
+  },
+  trailmaking: {
+    testType: 'trailmaking',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 pointerType/deviceClass 自报（当前最全）'],
+    futureCaptureFacts: ['指针事件粒度（per-response modality）', 'viewport/屏幕事实', '更细粒度 visibility 序列'],
+  },
+  reversallearning: {
+    testType: 'reversallearning',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  bart: {
+    testType: 'bart',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['泵压间隔事件粒度（payload 有序列，间隔为离线派生）', 'device provenance', 'viewport/dpr'],
+  },
+  wordlist: {
+    testType: 'wordlist',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['逐词键入时序', '输入法中间态', 'device/keyboard provenance'],
+  },
+  lexicaldecision: {
+    testType: 'lexicaldecision',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  emotionrecognition: {
+    testType: 'emotionrecognition',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
 }
 
 const validateDualContractDeclarations = (): void => {
@@ -191,28 +330,32 @@ const validateDualContractDeclarations = (): void => {
     throw new Error('fake must not have cognitive library dual-contract declarations')
   }
   for (const testType of catalogTestTypes) {
-    if (!SCORING_DECLARATIONS[testType]) {
+    const scoring = SCORING_DECLARATIONS[testType]
+    const capture = RESEARCH_CAPTURE_DECLARATIONS[testType]
+    if (!scoring) {
       throw new Error(`Missing cognitive library scoring contract declaration: ${testType}`)
     }
-    if (!RESEARCH_CAPTURE_DECLARATIONS[testType]) {
+    if (!capture) {
       throw new Error(`Missing cognitive library research capture declaration: ${testType}`)
     }
+    // Review Fix 3/4：三类 raw facts 与两类 capture 事实均不得为空。
+    for (const [name, list] of [
+      ['clientObservedFacts', scoring.clientObservedFacts],
+      ['runtimeReconstructableFacts', scoring.runtimeReconstructableFacts],
+      ['serverDerivedFacts', scoring.serverDerivedFacts],
+      ['currentlyAvailableFacts', capture.currentlyAvailableFacts],
+      ['futureCaptureFacts', capture.futureCaptureFacts],
+    ] as const) {
+      if (list.length === 0) {
+        throw new Error(`Cognitive library declaration ${name} must not be empty: ${testType}`)
+      }
+    }
   }
-  const scoringKeys = Object.keys(SCORING_DECLARATIONS)
-  const captureKeys = Object.keys(RESEARCH_CAPTURE_DECLARATIONS)
-  if (scoringKeys.length !== catalogTestTypes.length) {
+  if (Object.keys(SCORING_DECLARATIONS).length !== catalogTestTypes.length) {
     throw new Error('Cognitive library scoring contract declarations must cover exactly the catalog')
   }
-  if (captureKeys.length !== catalogTestTypes.length) {
+  if (Object.keys(RESEARCH_CAPTURE_DECLARATIONS).length !== catalogTestTypes.length) {
     throw new Error('Cognitive library research capture declarations must cover exactly the catalog')
-  }
-  // 宽松的导入期校验：声明的 referenceEligible key 至少在任务的某个已注册版本中存在。
-  // 严格逐版本校验在 deriveCognitiveScoringContract 中执行。
-  for (const testType of scoringKeys) {
-    const declared = SCORING_DECLARATIONS[testType]
-    if (new Set(declared.referenceEligibleMetricKeys).size !== declared.referenceEligibleMetricKeys.length) {
-      throw new Error(`Duplicate referenceEligible metric key declaration: ${testType}`)
-    }
   }
 }
 
@@ -227,7 +370,9 @@ export interface DerivedCognitiveScoringContract {
   primaryMetricKeys: string[]
   secondaryMetricKeys: string[]
   qualityKeys: string[]
+  /** 只从 authoritative v2 TaskDefinition 派生（metrics[key].referenceEligible === true）。 */
   referenceEligibleMetricKeys: string[]
+  /** 只从 authoritative evidence mapping 派生。 */
   bundleEligibleMetricKeys: string[]
 }
 
@@ -235,8 +380,9 @@ export interface DerivedCognitiveScoringContract {
  * 从权威源派生单个任务版本的 scoring contract：
  *  - headline/primary/secondary ← registry reportDefinition
  *  - quality ← registry qualityDefinitions
- *  - referenceEligible ← 本文件声明（逐版本校验 ⊆ metricDefinitions）
- *  - bundleEligible ← evidence-mapping.registry（唯一权威 task→domain 映射）
+ *  - referenceEligible ← v2 TaskDefinition（read-only getCognitiveV2TaskDefinition，
+ *    不复制 v2 adapter 的 eligibility 计算规则）
+ *  - bundleEligible ← evidence-mapping.registry
  */
 export const deriveCognitiveScoringContract = (
   testType: string,
@@ -261,17 +407,15 @@ export const deriveCognitiveScoringContract = (
     }
   }
 
-  const declaration = SCORING_DECLARATIONS[testType]
-  if (!declaration) {
-    throw new Error(`Missing cognitive library scoring contract declaration: ${testType}`)
+  const v2Definition = getCognitiveV2TaskDefinition(testType, engineVersion, scoringVersion)
+  if (!v2Definition) {
+    throw new Error(
+      `No authoritative v2 task definition for ${testType}/${engineVersion}/${scoringVersion}`,
+    )
   }
-  for (const key of declaration.referenceEligibleMetricKeys) {
-    if (!metricKeys.has(key)) {
-      throw new Error(
-        `Cognitive library referenceEligible metric not defined for ${testType}/${engineVersion}/${scoringVersion}: ${key}`,
-      )
-    }
-  }
+  const referenceEligibleMetricKeys = Object.entries(v2Definition.metrics)
+    .filter(([, metric]) => metric.referenceEligible === true)
+    .map(([key]) => key)
 
   const bundleEligibleMetricKeys = [
     ...new Set(
@@ -290,7 +434,7 @@ export const deriveCognitiveScoringContract = (
     primaryMetricKeys: [...registry.reportDefinition.primaryMetrics],
     secondaryMetricKeys: [...registry.reportDefinition.secondaryMetrics],
     qualityKeys: Object.keys(registry.qualityDefinitions),
-    referenceEligibleMetricKeys: [...declaration.referenceEligibleMetricKeys],
+    referenceEligibleMetricKeys,
     bundleEligibleMetricKeys,
   }
 }
