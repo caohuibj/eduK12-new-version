@@ -32,18 +32,17 @@ fi
 
 mkdir -p "$SUMDIR"
 
-if [ "$CLASS" = normal ]; then
-  GROUP=formNormal
-  RATES=(25 40 55 70 85 100 115)
-else
-  GROUP=formLarge
-  RATES=(25 40 55 70 85 100 115)
-fi
-# RATES env overrides the default rate set for either class (the previous
-# guard made this branch unreachable for every documented invocation).
-if [ -n "${RATES:-}" ]; then
-  RATES=($RATES)
-fi
+case "$CLASS" in
+  normal) GROUP=formNormal ;;
+  large) GROUP=formLarge ;;
+  *)
+    echo "usage: run-e4s-form-curve.sh <normal|large>" >&2
+    exit 2
+    ;;
+esac
+# Rate list (overridable via RATES env) comes from form-rates.sh so the
+# selection semantics stay unit-testable and the sweep cannot collapse.
+RATES=($(bash "$K6DIR/form-rates.sh" "$CLASS"))
 
 # --- DB env -----------------------------------------------------------------
 if [ -z "$PGURL" ]; then

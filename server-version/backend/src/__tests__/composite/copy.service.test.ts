@@ -116,11 +116,11 @@ beforeEach(() => {
   mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => unknown) => fn(mockPrisma))
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
-  mockPrisma.cognitiveAssignment.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
+  mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
   mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedConfig)
   mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
-  mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
+  mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
   mockPrisma.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 0 })
   mockPrisma.$queryRaw.mockResolvedValue([{ id: 'attempt-1' }])
@@ -382,7 +382,7 @@ describe('copyComposite', () => {
         }],
       }))
       .mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
-    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
+    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-grant' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-grant', items: [] })
 
