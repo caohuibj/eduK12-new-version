@@ -1,5 +1,5 @@
 import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
-import { situationDefinitionSchema, type SituationDefinitionV1 } from '../situational/situation-definition'
+import { situationDefinitionSchema, hashSituationDefinition, type SituationDefinitionV1 } from '../situational/situation-definition'
 import type { TaskDefinition } from '../cognitive/v2/types'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from './canonical'
 import { z } from 'zod'
@@ -272,7 +272,9 @@ export const compileSituationRuntime = (input: {
     instrumentType: 'SITUATIONAL' as const,
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    sourceDefinitionHash: runtimeIdentity({ ...input, instrumentType: 'SITUATIONAL' }),
+    // Definition-content identity: changing any scene/channel/scoring detail
+    // must change the frozen definition hash even at the same key+version.
+    sourceDefinitionHash: input.sourceDefinitionHash ?? hashSituationDefinition(definition),
     scorerKey: 'situational.default',
     scorerVersion: definition.scoring.scoringVersion,
     metricDefinitions,
@@ -284,12 +286,15 @@ export const compileSituationRuntime = (input: {
       allowedReferenceClassifications: [],
     },
     referenceBindingDefinition: { required: false, selections: [] },
+    // Staged capabilities: only what the unified runtime supports TODAY.
+    // The PR that lands each path (standalone submit → PR-B, composite/
+    // aggregate → PR-D) flips the corresponding flag — never ahead of code.
     runtimeCapabilities: {
-      standalone: true,
-      embedded: true,
-      aggregateEligible: true,
+      standalone: false,
+      embedded: false,
+      aggregateEligible: false,
       collectionFacts: false,
-      supported: true,
+      supported: false,
     },
   }
   return completeRuntime(base)

@@ -4,7 +4,7 @@ import { createCanonicalUnitResultEnvelope, parseCanonicalUnitResultEnvelope, pr
 import { scoreSituational, type SituationalResultV1 } from '../../modules/situational/situation-scoring'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-anxiety-golden-zh-cn-v1'
-import type { SituationDefinitionV1 } from '../../modules/situational/situation-definition'
+import { hashSituationDefinition, type SituationDefinitionV1 } from '../../modules/situational/situation-definition'
 
 const compileAssertiveness = () => compileSituationRuntime({
   instrumentKey: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,
@@ -28,14 +28,31 @@ describe('compileSituationRuntime', () => {
     expect(runtime.aggregateProjection.allowedFactKeys).toEqual(['quality.status', 'quality.flag.*'])
     expect(runtime.aggregateProjection.allowedReferenceClassifications).toEqual([])
     expect(runtime.referenceBindingDefinition).toEqual({ required: false, selections: [] })
+    // Staged capabilities: PR-A has no standalone submit / composite / aggregate
+    // path yet, so the compiled contract must not claim them.
     expect(runtime.runtimeCapabilities).toEqual({
-      standalone: true,
-      embedded: true,
-      aggregateEligible: true,
+      standalone: false,
+      embedded: false,
+      aggregateEligible: false,
       collectionFacts: false,
-      supported: true,
+      supported: false,
     })
     expect(runtime.compiledRuntimeHash).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('binds sourceDefinitionHash to the full definition content, not just identity', () => {
+    const original = compileAssertiveness()
+    expect(original.sourceDefinitionHash).toBe(hashSituationDefinition(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition))
+
+    const changed = JSON.parse(JSON.stringify(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition)) as SituationDefinitionV1
+    changed.scenes[0]!.channels[0]!.prompt = '改写后的题目措辞'
+    const recompiled = compileSituationRuntime({
+      instrumentKey: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,
+      instrumentVersion: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
+      definition: changed,
+    })
+    expect(recompiled.sourceDefinitionHash).not.toBe(original.sourceDefinitionHash)
+    expect(recompiled.sourceDefinitionHash).toBe(hashSituationDefinition(changed))
   })
 
   it('rejects malformed definitions', () => {
@@ -120,5 +137,20 @@ describe('projectSituationCanonicalUnitResult', () => {
     expect(parsed.core.unitType).toBe('SITUATIONAL')
     expect(parsed.resultHash).toBe(envelope.resultHash)
     expect(parsed.persistenceProvenance.sourceType).toBe('ASSESSMENT')
+  })
+
+  it('never carries raw scene responses in the canonical core (aggregate-safe only)', () => {
+    const runtime = compileAssertiveness()
+    const core = projectSituationCanonicalUnitResult({
+      result: scoreAssertivenessAllStrong(),
+      runtime,
+      contextHash: null,
+    })
+    const serialized = JSON.stringify(core)
+    expect(serialized).not.toContain('AS-01')
+    expect(serialized).not.toContain('AS-02')
+    expect(serialized).not.toContain('optionKey')
+    expect(serialized).not.toContain('responseValue')
+    expect(serialized).not.toContain('sceneKey')
   })
 })
