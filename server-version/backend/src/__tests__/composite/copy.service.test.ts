@@ -116,11 +116,11 @@ beforeEach(() => {
   mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => unknown) => fn(mockPrisma))
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
-  mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+  mockPrisma.cognitiveAssignment.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
   mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
   mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedConfig)
   mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
-  mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+  mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
   mockPrisma.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 0 })
   mockPrisma.$queryRaw.mockResolvedValue([{ id: 'attempt-1' }])
@@ -299,18 +299,19 @@ describe('copyComposite', () => {
   })
 
   it('copies a library template into a teacher DRAFT with a new cognitive wrapper', async () => {
-    mockPrisma.compositeAssessment.findUnique
-      .mockResolvedValueOnce(libraryTemplate())
-      .mockResolvedValue(null)
-    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-1' })
-    mockPrisma.compositeAssessment.create.mockResolvedValue({
+    const createdDraft = {
       id: 'draft-1',
       status: 'DRAFT',
       createdBy: 'teacher-1',
       courseId: 'course-t',
       copyable: false,
       items: [{ type: 'COGNITIVE', cognitiveAssignmentId: 'wrapper-1' }],
-    })
+    }
+    mockPrisma.compositeAssessment.findUnique
+      .mockResolvedValueOnce(libraryTemplate())
+      .mockResolvedValueOnce(null).mockResolvedValue(createdDraft)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-1' })
+    mockPrisma.compositeAssessment.create.mockResolvedValue(createdDraft)
 
     const copied = await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
     expect(copied.status).toBe('DRAFT')
@@ -337,7 +338,7 @@ describe('copyComposite', () => {
   it('reuses an existing wrapper on a second copy of the same config and course', async () => {
     mockPrisma.compositeAssessment.findUnique
       .mockResolvedValueOnce(libraryTemplate())
-      .mockResolvedValue(null)
+      .mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([{
       id: 'wrapper-1',
       listedStandalone: false,
@@ -380,8 +381,8 @@ describe('copyComposite', () => {
           },
         }],
       }))
-      .mockResolvedValue(null)
-    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValue(null)
+      .mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
+    mockPrisma.cognitiveAssignment.findFirst.mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-grant' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-grant', items: [] })
 
@@ -453,7 +454,7 @@ describe('copyComposite', () => {
         courseId: 'course-t',
         items: [{ id: 'form-1', type: 'FORM', position: 0, required: true, formType: 'text_input', formLabel: '年级', formPlaceholder: null, formOptions: null }],
       }))
-      .mockResolvedValue(null)
+      .mockResolvedValueOnce(null).mockResolvedValue({ id: 'self-copy', status: 'DRAFT', createdBy: 'teacher-1' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'self-copy', status: 'DRAFT', createdBy: 'teacher-1' })
 
     const copied = await copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })
@@ -470,7 +471,7 @@ describe('copyComposite', () => {
         courseId: 'course-t',
         items: [{ id: 'form-1', type: 'FORM', position: 0, required: true, formType: 'text_input', formLabel: '年级', formPlaceholder: null, formOptions: null }],
       }))
-      .mockResolvedValue(null)
+      .mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'self-copy', courseId: 'course-t' })
 
     await copyComposite('teacher-1', TEACHER, 'source-1', {})
@@ -498,7 +499,7 @@ describe('copyComposite', () => {
       resolvedConfigSnapshotEncrypted: standardConfigCipher,
       resolvedReportSnapshotEncrypted: experienceReportCipher,
     }
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-exp' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-exp', items: [] })
 
@@ -523,7 +524,7 @@ describe('copyComposite', () => {
       resolvedConfigSnapshotEncrypted: standardConfigCipher,
       resolvedReportSnapshotEncrypted: researchReportCipher,
     }
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-research' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-r', items: [] })
@@ -546,7 +547,7 @@ describe('copyComposite', () => {
 
   it('does not reuse a wrapper when the report snapshot differs', async () => {
     const source = libraryTemplate()
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([{
       id: 'wrapper-old-report',
       listedStandalone: false,
@@ -572,7 +573,7 @@ describe('copyComposite', () => {
       resolvedConfigSnapshotEncrypted: standardConfigCipher,
       resolvedReportSnapshotEncrypted: null,
     }
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     await expect(copyComposite('teacher-1', TEACHER, 'source-1', { courseId: 'course-t' })).rejects.toMatchObject({
       statusCode: 400,
     })
@@ -589,7 +590,7 @@ describe('copyComposite', () => {
       resolvedConfigSnapshotEncrypted: standardConfigCipher,
       resolvedReportSnapshotEncrypted: researchReportCipher,
     }
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-frozen' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-frozen', items: [] })
 
@@ -615,7 +616,7 @@ describe('copyComposite', () => {
       resolvedReportSnapshotEncrypted: null,
       config: publishedConfig,
     }
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValue(null)
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(source).mockResolvedValueOnce(null).mockResolvedValue({ id: 'draft-copy', items: [] })
     mockPrisma.cognitiveAssignment.create.mockResolvedValue({ id: 'wrapper-legacy' })
     mockPrisma.compositeAssessment.create.mockResolvedValue({ id: 'draft-legacy', items: [] })
 
