@@ -38,7 +38,7 @@ jobs:
   backend:
     name: backend (ci + migrate + build + full regression)
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, eduk12-ci]
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -136,7 +136,7 @@ jobs:
   frontend:
     name: frontend (lint + typecheck + full tests + build)
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, eduk12-ci]
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -165,7 +165,7 @@ jobs:
   docker:
     name: docker (compose config + production builds)
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, eduk12-ci]
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
