@@ -107,17 +107,15 @@ export const situationalSceneSchema = z.object({
 export type SituationalSceneDefinition = z.infer<typeof situationalSceneSchema>
 
 /**
- * Matrix sampling selects the active scenes per assignment. It is frozen at
- * UNIT start as internal situational state and never touches the frozen slot
- * set (Decision C).
+ * Presentation scope for the Pilot V1 contract: every declared scene is
+ * presented, fixed linear order. Matrix sampling moves to the research-scale
+ * backlog and will return as an explicit, separately-designed assignment
+ * contract (assignmentVersion + activeSceneKeys + provenance) — the scorer
+ * must never depend on a sampling strategy it cannot honour.
  */
-export const situationalSamplingSchema = z.discriminatedUnion('strategy', [
-  z.object({ strategy: z.literal('ALL') }),
-  z.object({
-    strategy: z.literal('FIXED_SCENE_SAMPLE'),
-    scenesPerAssignment: z.number().int().positive(),
-  }),
-])
+export const situationalSamplingSchema = z.object({
+  strategy: z.literal('ALL'),
+})
 export type SituationalSamplingDefinition = z.infer<typeof situationalSamplingSchema>
 
 const choiceContributionSchema = z.object({
@@ -314,10 +312,6 @@ export const validateSituationDefinition = (
       }
     })
   })
-
-  if (definition.sampling.strategy === 'FIXED_SCENE_SAMPLE' && definition.sampling.scenesPerAssignment > definition.scenes.length) {
-    issues.push({ path: 'sampling.scenesPerAssignment', message: '每份作答的场景数不能超过定义的场景总数', severity: 'error' })
-  }
 
   definition.report.metricOrder.forEach((key, index) => {
     if (!metricKeys.has(key)) issues.push({ path: `report.metricOrder.${index}`, message: `报告引用了不存在的 metric：${key}`, severity: 'error' })

@@ -184,11 +184,12 @@ describe('situation definition schema', () => {
     expect(JSON.stringify(interpretationResult.issues)).toContain('报告缺少 metric 解释：bfi2.assertiveness.behavior')
   })
 
-  it('rejects a fixed scene sample larger than the scene bank', () => {
+  it('rejects any sampling strategy other than ALL (matrix sampling deferred from Pilot V1)', () => {
     const definition = clone(baseDefinition)
-    definition.sampling = { strategy: 'FIXED_SCENE_SAMPLE', scenesPerAssignment: 5 }
+    definition.sampling = { strategy: 'FIXED_SCENE_SAMPLE', scenesPerAssignment: 1 } as unknown as SituationDefinitionV1['sampling']
     const result = validateSituationDefinition(definition)
-    expect(errorPaths(result.issues)).toContain('sampling.scenesPerAssignment')
+    expect(result.definition).toBeUndefined()
+    expect(JSON.stringify(result.issues)).toContain('sampling.strategy')
   })
 
   it('requires provenance, license, disclaimer and a golden fixture for publish', () => {
