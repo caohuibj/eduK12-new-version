@@ -14,7 +14,7 @@ import {
 } from '../../services/instrumentFinalSubmit'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
-import { loadFrozenMeasurementContext } from './profile-freeze'
+import { loadFrozenMeasurementIdentity } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
@@ -284,7 +284,10 @@ export const submitUnifiedCognitiveSessionFinal = async (
           context: contextState.context,
           quality: scored.quality,
         })
-  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, child.assignmentId))
+  // UNIFIED FINAL only consumes the frozen identity (profile + config hash);
+  // the encrypted report snapshot is never read here, so skip its transfer
+  // and decrypt entirely.
+  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementIdentity(prisma, child.assignmentId))
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
     completedAt: new Date().toISOString(),

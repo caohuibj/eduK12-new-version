@@ -99,6 +99,47 @@ export interface FrozenMeasurementContext {
   resolvedConfigHash: string | null
 }
 
+export interface FrozenMeasurementIdentity {
+  profile: CognitiveProfile | null
+  resolvedConfigHash: string | null
+}
+
+/**
+ * Identity-only read for hot paths that never consume the frozen report body
+ * (e.g. UNIFIED FINAL): skips the encrypted report snapshot transfer and its
+ * decrypt/parse entirely. Use loadFrozenMeasurementContext when frozenReport
+ * is actually needed.
+ */
+export const loadFrozenMeasurementIdentity = async (
+  db: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
+  assignmentId: string | null | undefined,
+): Promise<FrozenMeasurementIdentity> => {
+  if (!assignmentId) {
+    return { profile: null, resolvedConfigHash: null }
+  }
+  const assignment = await db.cognitiveAssignment.findUnique({
+    where: { id: assignmentId },
+    select: {
+      profile: true,
+      resolvedConfigHash: true,
+    },
+  } as never) as {
+    profile: string | null
+    resolvedConfigHash: string | null
+  } | null
+  if (!assignment) {
+    return { profile: null, resolvedConfigHash: null }
+  }
+  const profile =
+    assignment.profile === 'experience' || assignment.profile === 'standard' || assignment.profile === 'research'
+      ? assignment.profile
+      : null
+  return {
+    profile,
+    resolvedConfigHash: assignment.resolvedConfigHash,
+  }
+}
+
 /** 读取发布时冻结的 Profile / 报告快照；缺失时保持 null，不得回填 standard。 */
 export const loadFrozenMeasurementContext = async (
   db: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
