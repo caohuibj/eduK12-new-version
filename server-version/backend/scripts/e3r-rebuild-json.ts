@@ -253,12 +253,12 @@ async function main() {
     console.log(`${key}: emitted ${total} fixtures across ${bandIdx} bands (pool overflow skipped: ${overflow})`)
   }
 
-  // Stage 4 capacity-curve: a single run happens at each rate, and the runner
-  // reads ONE per-rate file and selects the group via GROUP (cognitiveNormal /
-  // cognitiveLarge). So each band file must carry BOTH groups sliced to the
-  // same size (PLAN_4 sizes are equal for normal and large at each rate). We
-  // replay the two pools in lockstep (nback first, then cpt) so neither class
-  // ever reads the other's fresh slice.
+  // Stage 4 capacity-curve: a single run happens at each rate. One class runs at
+  // a time (GROUP selects cognitiveNormal / cognitiveLarge), so emit a SINGLE-
+  // GROUP band file per class per rate. Combined files would make k6 parse BOTH
+  // groups (the risky 2x+ transient object graph that OOM-killed the first
+  // sweep). The two pools are replayed in lockstep so each class still gets its
+  // own fresh slice of exactly `size` fixtures.
   async function emitS4() {
     const normalGen = sessionsByPrefix(`${PREFIX}nback-`)
     const largeGen = sessionsByPrefix(`${PREFIX}cpt-`)
@@ -275,6 +275,7 @@ async function main() {
       }
       return { s: buf[idx], buf, idx: idx + 1 }
     }
+    const base = OUT.replace(/\.json$/, '').replace(/e3r-cognitive-class-fixtures/, 'e3s4-cognitive-class-fixtures')
     for (const { rate, size } of PLAN_4.cognitiveNormal) {
       let nn = 0
       let nl = 0
@@ -294,9 +295,9 @@ async function main() {
         lIdx = r.idx
         lSl.push(buildFixture(r.s))
       }
-      const filePath = OUT.replace(/\.json$/, `-${rate}s-r1.json`).replace(/e3r-cognitive-class-fixtures/, 'e3s4-cognitive-class-fixtures')
-      writeFileSync(filePath, JSON.stringify({ cognitiveNormal: nSl, cognitiveLarge: lSl }))
-      console.log(`s4 wrote ${filePath} normal=${nSl.length} large=${lSl.length}`)
+      writeFileSync(`${base}-normal-${rate}s-r1.json`, JSON.stringify({ cognitiveNormal: nSl }))
+      writeFileSync(`${base}-large-${rate}s-r1.json`, JSON.stringify({ cognitiveLarge: lSl }))
+      console.log(`s4 wrote ${base}-normal-${rate}s-r1.json (${nSl.length}) + large (${lSl.length})`)
     }
   }
 

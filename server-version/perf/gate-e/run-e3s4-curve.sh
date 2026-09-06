@@ -113,7 +113,7 @@ run_one() {
   [ "$max_vus" -lt "$pre_vus" ] && max_vus=$pre_vus
   ( cd "$K6DIR" && k6 run \
     -e BASE_URL="$BASE" \
-    -e FIXTURE_FILE="$FIXDIR/e3s4-cognitive-class-fixtures-${rate}s-r1.json" \
+    -e FIXTURE_FILE="$FIXDIR/e3s4-cognitive-class-fixtures-${CLASS}-${rate}s-r1.json" \
     -e GROUP="$GROUP" \
     -e RATE="$rate" \
     -e DURATION=30s \
@@ -173,7 +173,7 @@ EOF
 # --- main -------------------------------------------------------------------
 echo "Stage 4 $CLASS capacity curve: group=$GROUP prefix=$PREFIX rates=${RATES[*]}"
 for rate in "${RATES[@]}"; do
-  band="e3s4-cognitive-class-fixtures-${rate}s-r1.json"
+  band="e3s4-cognitive-class-fixtures-${CLASS}-${rate}s-r1.json"
   [ -f "$FIXDIR/$band" ] || { echo "MISSING band file: $band"; exit 2; }
   run_one "$rate" "e3s4-${CLASS}-${rate}s-r1"
 done
