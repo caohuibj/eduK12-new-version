@@ -54,6 +54,9 @@ export const fixturesUsed = new Counter('gate_e_fixtures_used');
 export const freshCompletions = new Counter('gate_e_fresh_completions');
 export const idempotentReplays = new Counter('gate_e_idempotent_replays');
 export const missingFixtures = new Counter('gate_e_missing_fixtures');
+/** Steady-scenario splits of the fresh/replay counters (no tag dedup needed). */
+export const steadyFreshCompletions = new Counter('gate_e_steady_fresh_completions');
+export const steadyIdempotentReplays = new Counter('gate_e_steady_idempotent_replays');
 
 export function recordEventualOutcome(options) {
   const {

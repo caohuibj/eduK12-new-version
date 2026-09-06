@@ -83,7 +83,16 @@ export function handleSummary(data) {
   const count = (name) => Number(values(name).count || 0);
   const success = count('gate_e_steady_eventual_success');
   const fail = count('gate_e_steady_eventual_failure');
-  const wall = data.state?.testRunDurationMs ? data.state.testRunDurationMs / 1000 : 0;
+  const wall = (data.state && data.state.testRunDurationMs) ? data.state.testRunDurationMs / 1000 : 0;
+  // Stage 2R corrected accounting: for constant-arrival-rate the number of
+  // iterations k6 actually started is completed + dropped. Warmup (50 by
+  // construction) is excluded from steady offered load.
+  const iterationsTotal = count('iterations');
+  const droppedTotal = count('dropped_iterations');
+  const startedTotal = iterationsTotal + droppedTotal;
+  const steadyStarted = Math.max(0, startedTotal - warmupFixtures);
+  const steadyDropped = Math.max(0, droppedTotal);
+  const latency = values('gate_e_steady_eventual_latency_ms');
   const summary = {
     profile: 'e3_cognitive_knee',
     payload_class: groupName,
@@ -92,6 +101,12 @@ export function handleSummary(data) {
     warmup_seconds: warmupSeconds,
     steady_duration_seconds: durationSeconds,
     wall_seconds_including_warmup: wall,
+    iterations_total: iterationsTotal,
+    dropped_iterations: droppedTotal,
+    started_iterations_total: startedTotal,
+    steady_started: steadyStarted,
+    steady_dropped: steadyDropped,
+    steady_actual_offered: steadyStarted + steadyDropped,
     success,
     fail,
     eventual_success_rate: success + fail > 0 ? success / (success + fail) : 0,
@@ -99,10 +114,16 @@ export function handleSummary(data) {
     fresh_completions: count('gate_e_steady_fresh_completions'),
     idempotent_replays: count('gate_e_steady_idempotent_replays'),
     missing_fixtures: count('gate_e_missing_fixtures'),
-    p95_ms: Number(values('gate_e_steady_eventual_latency_ms')['p(95)'] || 0),
-    p99_ms: Number(values('gate_e_steady_eventual_latency_ms')['p(99)'] || 0),
+    latency_ms: {
+      p50: Number(latency['p(50)'] || 0),
+      p90: Number(latency['p(90)'] || 0),
+      p95: Number(latency['p(95)'] || 0),
+      p99: Number(latency['p(99)'] || 0),
+      max: Number(latency.max || 0),
+    },
     '429': count('gate_e_rate_limited_429'),
     '503': count('gate_e_capacity_busy_503'),
+    capacity_retries: count('gate_e_capacity_retries'),
     fixture_pool_size: requests.length,
   };
   const outPath = __ENV.GATE_E_SUMMARY_PATH || '/tmp/gate-e-e3-knee-last.json';

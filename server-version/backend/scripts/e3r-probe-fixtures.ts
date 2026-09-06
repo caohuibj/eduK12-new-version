@@ -104,8 +104,10 @@ async function main() {
   }
 
   // Tail of the pool ordered by id desc = the overflow region bands skip.
+  // Only genuinely fresh (IN_PROGRESS) sessions qualify so a consumed probe
+  // session can never be re-emitted.
   const rows = await prisma.cognitiveSession.findMany({
-    where: { participantKey: { startsWith: 'e3r-nback-' } },
+    where: { participantKey: { startsWith: 'e3r-nback-' }, status: 'IN_PROGRESS' },
     orderBy: { id: 'desc' },
     take: COUNT,
     select: {
