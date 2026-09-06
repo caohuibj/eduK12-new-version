@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createFrozenActiveSlotSet, getFrozenActiveSlot, type FrozenActiveSlotV1 } from '../../modules/assessment-runtime/slot-set'
 import { encryptUnifiedRuntimePayload } from "../../modules/assessment-runtime/security"
 import {
+  assertSnapshotPayloadCoverage,
   buildAggregateInputHash,
   evaluateCompleteness,
 } from '../../modules/assessment-runtime/unified-aggregate'
@@ -173,5 +174,47 @@ describe('slot-key/unitType pairing is not a parser invariant', () => {
       attemptEpoch: 1,
       slotKey: 'scale:scale-1',
     })).toMatchObject({ slotKey: 'scale:scale-1', unitType: 'COGNITIVE' })
+  })
+})
+
+describe('snapshot payload exact coverage (O3 authoritative join)', () => {
+  const fail = (message: string) => new Error(message)
+  const header = (id: string, slotKey: string) => ({ id, slotKey })
+  const payload = (id: string, slotKey: string) => ({ id, slotKey })
+
+  it('fails closed when an OPTIONAL slot header loses its payload row', () => {
+    // Regression: coverage used to be enforced only inside the required-slot
+    // parse loop, so a vanished optional snapshot narrowed the authoritative
+    // set silently. Coverage must be exact across ALL headers.
+    const headers = [header('a', 'scale:required-1'), header('b', 'scale:optional-1')]
+    expect(() => assertSnapshotPayloadCoverage(
+      headers,
+      [payload('a', 'scale:required-1')],
+      fail,
+    )).toThrow('槽位 scale:optional-1 的快照在 payload 查询中消失')
+  })
+
+  it('fails closed when a payload row diverges from its header slotKey', () => {
+    const headers = [header('a', 'scale:s1')]
+    expect(() => assertSnapshotPayloadCoverage(
+      headers,
+      [payload('a', 'form-section:s1')],
+      fail,
+    )).toThrow('槽位 scale:s1 的快照 payload 身份不一致')
+  })
+
+  it('fails closed on duplicate payload ids and passes full exact coverage', () => {
+    const headers = [header('a', 'scale:s1'), header('b', 'form-section:s2')]
+    expect(() => assertSnapshotPayloadCoverage(
+      headers,
+      [payload('a', 'scale:s1'), payload('a', 'form-section:s2')],
+      fail,
+    )).toThrow('快照 payload 查询返回重复 id')
+
+    expect(() => assertSnapshotPayloadCoverage(
+      headers,
+      [payload('a', 'scale:s1'), payload('b', 'form-section:s2')],
+      fail,
+    )).not.toThrow()
   })
 })

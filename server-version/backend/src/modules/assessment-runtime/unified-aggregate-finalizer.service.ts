@@ -51,6 +51,7 @@ import type {
   AggregateSnapshotHeader,
 } from './unified-aggregate'
 import {
+  assertSnapshotPayloadCoverage,
   buildAggregateInputHash,
   compileBundleRuntimeFromSnapshot,
   evaluateCompleteness,
@@ -524,6 +525,14 @@ const decryptCompletedPayloads = async (input: {
     composite: input.composite,
     ids: input.headers.map((header) => header.id as string),
   })
+  // Exact coverage is asserted against the FULL header set — required and
+  // optional slots alike — before any parsing, so a vanished or divergent
+  // optional snapshot aborts finalization instead of silently narrowing.
+  try {
+    assertSnapshotPayloadCoverage(input.headers, rows, aggregateSourceError)
+  } catch (error) {
+    throw error instanceof Error ? error : aggregateSourceError('快照 payload 覆盖校验失败')
+  }
   const payloadById = new Map(rows.map((row) => [row.id, row]))
   const requiredSlots = input.slots.filter((candidate) => candidate.required)
 

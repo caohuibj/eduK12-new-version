@@ -152,3 +152,29 @@ export const compileBundleRuntimeFromSnapshot = (
 export const compiledBundleRuntimeHashForSnapshot = (
   snapshot: FrozenReportPackageSnapshot,
 ): string => compileBundleRuntimeFromSnapshot(snapshot).compiledRuntimeHash
+
+export type AggregateSnapshotPayloadRef = {
+  id: string
+  slotKey: string
+}
+
+/**
+ * The probe's header set is the authoritative source: every snapshot row it
+ * names must be present in the payload fetch with a matching slotKey.
+ * Coverage is enforced across required and optional slots alike — a vanished
+ * or divergent optional snapshot is as much a broken invariant as a missing
+ * required one, so it fails closed instead of being healed.
+ */
+export const assertSnapshotPayloadCoverage = (
+  headers: AggregateSnapshotHeader[],
+  payloadRows: AggregateSnapshotPayloadRef[],
+  fail: (message: string) => Error,
+): void => {
+  const payloadById = new Map(payloadRows.map((row) => [row.id, row]))
+  if (payloadById.size !== payloadRows.length) throw fail('快照 payload 查询返回重复 id')
+  for (const header of headers) {
+    const payload = payloadById.get(header.id as string)
+    if (!payload) throw fail(`槽位 ${header.slotKey} 的快照在 payload 查询中消失`)
+    if (payload.slotKey !== header.slotKey) throw fail(`槽位 ${header.slotKey} 的快照 payload 身份不一致`)
+  }
+}
