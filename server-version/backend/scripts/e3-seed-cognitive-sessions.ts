@@ -26,7 +26,7 @@ import { FINAL_SUBMISSION_MAX_BYTES } from '../src/services/instrumentFinalSubmi
 import { canonicalJsonBytes } from '../src/modules/assessment-runtime/canonical'
 
 const prisma = new PrismaClient()
-const OUT = process.env.E3_OUT || '/workspace/eduk12-pr52-cloud-results/e3-cognitive-fixtures.json'
+const OUT = process.env.E3_OUT || '/workspace/eduk12-pr49-cloud-results/e3-cognitive-fixtures.json'
 const N = Number(process.env.E3_SESSION_COUNT || 250)
 const MAX_TRIALS = 1000
 const STUDENT_USERNAME = process.env.PERF_STUDENT_USERNAME || 'gate47student'

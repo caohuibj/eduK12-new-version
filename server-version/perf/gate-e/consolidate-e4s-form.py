@@ -81,6 +81,9 @@ def main():
         print("usage: consolidate-e4s-form.py <summary_dir> <normal|large> <out_prefix>"); sys.exit(2)
     dirp, cls, out = sys.argv[1], sys.argv[2], sys.argv[3]
     rows = load(dirp, cls)
+    if not rows:
+        print(f"no summaries found for class '{cls}' in {dirp}; nothing to consolidate", file=sys.stderr)
+        sys.exit(1)
     cols = list(rows[0].keys())
     with open(out + ".csv", "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols); w.writeheader()

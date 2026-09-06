@@ -25,6 +25,10 @@ if [ -z "$AUTH_TOKEN" ] && [ -f "$FIXDIR/e4s/auth.env" ]; then
   AUTH_TOKEN=$(grep -E '^PERF_AUTH_TOKEN=' "$FIXDIR/e4s/auth.env" | cut -d= -f2-)
   CSRF_TOKEN=$(grep -E '^PERF_CSRF_TOKEN=' "$FIXDIR/e4s/auth.env" | cut -d= -f2-)
 fi
+if [ -z "$AUTH_TOKEN" ] || [ -z "$CSRF_TOKEN" ]; then
+  echo 'Missing benchmark auth credentials (AUTH_TOKEN/CSRF_TOKEN env or $FIXDIR/e4s/auth.env); refusing to run: a misconfigured run must produce NO RESULT, not auth-failure data.' >&2
+  exit 1
+fi
 
 mkdir -p "$SUMDIR"
 
@@ -35,7 +39,9 @@ else
   GROUP=formLarge
   RATES=(25 40 55 70 85 100 115)
 fi
-if [ -n "${RATES:-}" ] && [[ "$1" != "normal" && "$1" != "large" ]]; then
+# RATES env overrides the default rate set for either class (the previous
+# guard made this branch unreachable for every documented invocation).
+if [ -n "${RATES:-}" ]; then
   RATES=($RATES)
 fi
 
