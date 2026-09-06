@@ -905,7 +905,9 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
     for (const section of assessment.formSections) {
       const slot = slotsByKey.get(formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
-      if (!slot || !payload?.facts) throw aggregateInputError(`综合测评表单区段 ${section.id} 的 collection facts 缺失`)
+      // slotKey 前缀与 unitType 的对应关系不被 FrozenActiveSlotSet parser
+      // 强制（parser 只校验唯一性），Map 命中后必须显式断言槽位类型。
+      if (!slot || slot.unitType !== 'FORM_SECTION' || !payload?.facts) throw aggregateInputError(`综合测评表单区段 ${section.id} 的 collection facts 缺失`)
       validateCompositeFactsAgainstSection(section, payload.facts)
       const expectedDefinitionHash = canonicalHash(compositeSectionDefinition(section))
       if (slot.sourceDefinitionIdentity.hash !== expectedDefinitionHash) {
@@ -1139,11 +1141,11 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
   const { scaleInputs, formInputs, aggregateInputHash } = measureRequestPhaseSync('aggregate.validate', () => {
     const slotsByKey = new Map(frozenSlots.slots.map((candidate) => [candidate.slotKey, candidate]))
     const nextScaleInputs = parent.questionnaire.questionnaireScales.map((questionnaireScale: any) => {
-      // slotKey 格式（scale:<id>）已编码槽位类型，Map 命中即等价于原
-      // slotKey+unitType 复合断言；未命中由下方守卫统一 fail closed。
       const slot = slotsByKey.get(`scale:${questionnaireScale.id}`)
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
-      if (!slot || !payload?.envelope) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的冻结结果缺失`)
+      // 原 lookup 同时断言 slotKey 与 unitType==='SCALE'；slotKey 前缀不构成
+      // parser 强制的类型保证，Map 命中后必须保留显式 fail-closed 断言。
+      if (!slot || slot.unitType !== 'SCALE' || !payload?.envelope) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的冻结结果缺失`)
       if (
         payload.envelope.core.instrumentKey !== questionnaireScale.scale.code
         || payload.envelope.core.instrumentVersion !== questionnaireScale.scale.instrumentVersion
@@ -1161,7 +1163,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string): Promise<C
     const nextFormInputs = parent.questionnaire.formSections.map((section: any) => {
       const slot = slotsByKey.get(formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
-      if (!slot || !payload?.facts) throw aggregateInputError(`问卷表单区段 ${section.id} 的 collection facts 缺失`)
+      if (!slot || slot.unitType !== 'FORM_SECTION' || !payload?.facts) throw aggregateInputError(`问卷表单区段 ${section.id} 的 collection facts 缺失`)
       validateQuestionnaireFactsAgainstSection(section, payload.facts)
       const expectedDefinitionHash = canonicalHash(questionnaireSectionDefinition(section))
       if (slot.sourceDefinitionIdentity.hash !== expectedDefinitionHash) throw aggregateInputError(`问卷表单区段 ${section.id} 定义 hash 不匹配`)

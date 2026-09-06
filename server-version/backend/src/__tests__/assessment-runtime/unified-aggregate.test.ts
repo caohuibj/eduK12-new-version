@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createFrozenActiveSlotSet, type FrozenActiveSlotV1 } from '../../modules/assessment-runtime/slot-set'
+import { createFrozenActiveSlotSet, getFrozenActiveSlot, type FrozenActiveSlotV1 } from '../../modules/assessment-runtime/slot-set'
+import { encryptUnifiedRuntimePayload } from "../../modules/assessment-runtime/security"
 import {
   buildAggregateInputHash,
   evaluateCompleteness,
@@ -141,5 +142,36 @@ describe('V32-2 closed aggregate input', () => {
         { slotKey: completedForm.slotKey, terminalState: completedForm.terminalState, payloadKind: completedForm.payloadKind, collectionFactsHash: 'facts-a', collectionIdentity: { sectionKey: 'section-1', itemKeys: ['item-1'] } },
       ],
     })).not.toBe(first)
+  })
+})
+
+describe('slot-key/unitType pairing is not a parser invariant', () => {
+  it('frozen slot parser accepts a slot whose slotKey prefix contradicts its unitType', () => {
+    process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY ?? 'a'.repeat(64)
+    // The FrozenActiveSlotSet parser enforces slotKey uniqueness only — there
+    // is no prefix→unitType grammar. Aggregate validate loops that resolve
+    // slots via a slotsByKey Map must therefore assert unitType explicitly
+    // after the hit: a mismatched frozen slot must fail closed instead of
+    // resolving as a scale/form slot (see unified-aggregate-finalizer).
+    const mismatched: FrozenActiveSlotV1 = {
+      slotKey: 'scale:scale-1',
+      unitType: 'COGNITIVE',
+      required: true,
+      sourceDefinitionIdentity: { key: 'scale-1', version: '2.0.0', hash },
+      sourceBinding: { questionnaireScaleId: 'scale-1', compiledRuntimeHash: hash },
+    }
+    const set = createFrozenActiveSlotSet({
+      schemaVersion: 1,
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: 1,
+      slots: [mismatched],
+    })
+    const encrypted = encryptUnifiedRuntimePayload(set)
+    expect(getFrozenActiveSlot({
+      encrypted,
+      storedHash: set.snapshotHash,
+      attemptEpoch: 1,
+      slotKey: 'scale:scale-1',
+    })).toMatchObject({ slotKey: 'scale:scale-1', unitType: 'COGNITIVE' })
   })
 })

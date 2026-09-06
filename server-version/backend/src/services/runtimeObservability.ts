@@ -641,6 +641,10 @@ export const runtimeMetricLines = (): string[] => {
     ...[...prismaErrorCounts.entries()].map(([code, count]) => `ptool_prisma_errors_total{code="${escapeLabel(code)}"} ${count}`),
     '# HELP ptool_aggregate_persist_report_bytes_total Cumulative encrypted aggregate report bytes fed into persist, by parent kind.',
     '# TYPE ptool_aggregate_persist_report_bytes_total counter',
+    '# HELP ptool_aggregate_persist_payload_count_total Cumulative snapshot payload count fed into aggregate persist, by parent kind.',
+    '# TYPE ptool_aggregate_persist_payload_count_total counter',
+    '# HELP ptool_aggregate_persist_attempts_total Aggregate persist attempts (including CAS losers), by parent kind.',
+    '# TYPE ptool_aggregate_persist_attempts_total counter',
     ...aggregatePersistAttributionLines(),
   ]
   return lines
