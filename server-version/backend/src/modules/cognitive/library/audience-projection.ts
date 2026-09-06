@@ -15,7 +15,11 @@
  */
 
 import type { CognitiveProfile, RegistryEntry } from '../cognitive.types'
-import { requireCatalogForIdentity, deriveCatalogDomainSummary } from './catalog'
+import {
+  requireCatalogForIdentity,
+  deriveCatalogDomainSummary,
+  resolveScientificStatus,
+} from './catalog'
 import type { CognitiveCatalogDomainFacetSummary } from './catalog'
 import type { CognitiveScientificStatus, CognitiveInteractionFamily, CognitiveSensitivity } from './catalog-contract'
 
@@ -33,7 +37,8 @@ export interface StudentParentCatalogView {
   plainAbilityHint: string
   /** 来自 registry profiles[profile].estimatedMinutes；未提供 profile 时为 null。 */
   estimatedMinutes: [number, number] | null
-  isPilot: boolean
+  /** Review Fix 5：学生/家长不暴露 scientific maturity（isPilot/scientificStatus 已删除）；
+   * 未来结果报告中的"试行参考"属于 Reference status，不是工具科研成熟度。 */
   simpleLimitations: string[]
 }
 
@@ -54,6 +59,7 @@ export interface AdminCatalogView extends TeacherCatalogView {
     qualityDefinitionVersion: string
     reportDefinitionVersion: string
   }
+  /** Review Fix 1：来自 exact-identity resolver（resolveScientificStatus），非 catalog family 字段。 */
   scientificStatus: CognitiveScientificStatus
   interactionFamily: CognitiveInteractionFamily
   rtSensitivity: CognitiveSensitivity
@@ -101,7 +107,6 @@ export const projectCatalogForAudience = (
     educationalPurpose: catalog.educationalPurpose,
     plainAbilityHint: catalog.plainAbilityHint,
     estimatedMinutes: resolveProfileMinutes(registry, input.profile),
-    isPilot: catalog.scientificStatus === 'PILOT',
     simpleLimitations: [...catalog.knownLimitations],
   }
 
@@ -130,7 +135,11 @@ export const projectCatalogForAudience = (
       qualityDefinitionVersion: registry.qualityDefinitionVersion,
       reportDefinitionVersion: registry.reportDefinitionVersion,
     },
-    scientificStatus: catalog.scientificStatus,
+    scientificStatus: resolveScientificStatus(
+      input.testType,
+      input.engineVersion,
+      input.scoringVersion,
+    ),
     interactionFamily: catalog.interactionFamily,
     rtSensitivity: catalog.rtSensitivity,
     fineMotorSensitivity: catalog.fineMotorSensitivity,

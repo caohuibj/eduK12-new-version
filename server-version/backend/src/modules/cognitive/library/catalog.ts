@@ -30,7 +30,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '经典简单反应时范式；主要构念为加工速度（simple response）。',
     knownLimitations: [
       '成绩由感知-决策-动作链路速度决定，不等于学习能力或智力。',
@@ -46,7 +45,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'keypad_sequence',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '数字广度顺背（forward digit span）；主要构念为言语短时存储。',
     knownLimitations: [
       'maxSpan 只描述本次任务容量，不是标准化记忆等级。',
@@ -62,7 +60,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '色词 Stroop 范式；主要构念为语义干扰控制；difference 指标须与条件准确率同读。',
     knownLimitations: [
       '阅读自动化与语言能力是已知混淆。',
@@ -78,7 +75,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Go/No-Go 范式；主要构念为反应抑制（action withholding）。',
     knownLimitations: [
       'Go RT 只解释速度-准确权衡，不能单独代表抑制能力。',
@@ -94,7 +90,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'CPT-X 持续操作范式；主要构念为持续注意（辨别/遗漏/稳定性）。',
     knownLimitations: [
       '时长与负荷影响成绩，跨 profile 不可直接比较。',
@@ -110,7 +105,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'N-Back 范式；主要构念为工作记忆更新；按 N 分层解释。',
     knownLimitations: [
       '不同 N 水平难度差异大，触顶/触底需质量标记提示。',
@@ -126,7 +120,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'click_sequence',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Corsi Block-Tapping 范式；主要构念为视空间短时存储。',
     knownLimitations: [
       '与数字广度分开解释，不合并记忆总分。',
@@ -142,7 +135,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '停止信号任务；主要构念为动作取消（SSRT 估计）。',
     knownLimitations: [
       'SSRT 为模型估计，依赖 p(respond|stop) 处于合理区间。',
@@ -158,7 +150,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '线索化任务转换范式；主要构念为试次级转换代价（difference 指标）。',
     knownLimitations: [
       '转换代价必须与 switch/repeat 准确率同屏阅读。',
@@ -174,7 +165,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'moderate',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Pattern Comparison 加工速度范式；内部自制几何刺激。',
     knownLimitations: [
       '速度指标必须与准确率同读，快速猜测会虚高速度。',
@@ -190,7 +180,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Eriksen Flanker 范式；主要构念为知觉干扰控制。',
     knownLimitations: [
       '干扰效应须与两条件准确率同读。',
@@ -206,7 +195,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '双规则显式转换分类范式；主要构念为规则转换与持续性错误。',
     knownLimitations: [
       '持续性错误由冻结规则推导，不等同临床卡片分类测验。',
@@ -222,7 +210,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'keypad_sequence',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Backward digit span；主要构念为工作记忆操纵（verbal manipulation）。',
     knownLimitations: [
       '与顺背分开呈现，不合并为完整工作记忆。',
@@ -238,7 +225,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'item_ordering',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '图片序列学习；主要构念为序列学习与顺序保持；延迟仅科研档。',
     knownLimitations: [
       '延迟保持缺失不等于低分。',
@@ -254,7 +240,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'position_selection',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '图形-位置配对学习；主要构念为联想学习（learning slope / trials to criterion）。',
     knownLimitations: [
       '延迟正确率缺失不按 0 计。',
@@ -270,7 +255,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'multi_option_selection',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '内部生成矩阵推理题库；主要构念为规则归纳（fluid reasoning 任务表现）。',
     knownLimitations: [
       '正确率不换算 IQ、不与 Raven 等价。',
@@ -286,7 +270,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '心理旋转范式；主要构念为 mental rotation（angle cost）。',
     knownLimitations: [
       '角度代价只在小/大角度都有足够正确反应时解释。',
@@ -302,7 +285,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'click_sequence',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '塔式规划（Tower of London 类）；主要构念为规划与前瞻；solver 校验最短路径。',
     knownLimitations: [
       '解题比例、额外步数与规则违反应分开阅读。',
@@ -318,7 +300,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'click_sequence',
     rtSensitivity: 'moderate',
     fineMotorSensitivity: 'high',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'Trail Making 类视觉搜索 + 集合转换；v1 taxonomy 无对应 domain，standalone 报告。',
     knownLimitations: [
       '完成时间受设备、指针方式与动作速度影响，不做设备校正。',
@@ -334,7 +315,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '概率反转学习；v1 taxonomy 无对应 domain，standalone；强化学习建模留待科研。',
     knownLimitations: [
       '不作人格、风险偏好或决策能力判断。',
@@ -350,7 +330,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'incremental_button',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: 'BART 泵压范式；v1 taxonomy 无对应 domain，standalone；仅描述性指标。',
     knownLimitations: [
       '不作风险偏好、冲动性或人格判断。',
@@ -366,7 +345,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'typed_recall',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'moderate',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '中文词表自由回忆；v1 taxonomy 无对应 domain，standalone；词库不可跨语言共享参考。',
     knownLimitations: [
       '词频与教育暴露影响成绩，不能跨语言/地区直接比较。',
@@ -382,7 +360,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'button_choice',
     rtSensitivity: 'high',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '中文词汇判断；v1 taxonomy 无对应 domain，standalone；与语言/结晶领域分开解释。',
     knownLimitations: [
       '高度依赖语言、词频与阅读暴露。',
@@ -398,7 +375,6 @@ const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
     interactionFamily: 'multi_option_selection',
     rtSensitivity: 'low',
     fineMotorSensitivity: 'low',
-    scientificStatus: 'PILOT',
     adminScientificNotes: '六类情绪面孔分类；v1 taxonomy 无对应 domain，standalone；内部合成面孔。',
     knownLimitations: [
       '合成面孔的文化与年龄适宜性需 pilot 审查。',
@@ -477,6 +453,30 @@ export const requireCatalogForIdentity = (
     )
   }
   return resolved
+}
+
+/**
+ * Review Fix 1 — scientificStatus 是 **exact task identity scoped**：
+ * 只有明确人工批准、进入 allowlist 的 exact identity 才是 RESEARCH_GRADE；
+ * 其余一切注册身份（含未来新 engine/scoring 版本）默认 PILOT，绝不继承旧版本资格。
+ * 未注册/非法身份在 requireCatalogForIdentity 处直接抛错。
+ */
+const identityKeyOf = (testType: string, engineVersion: string, scoringVersion: string): string =>
+  `${testType}/${engineVersion}/${scoringVersion}`
+
+export const RESEARCH_GRADE_IDENTITIES = new Set<string>([
+  // currently empty —— 升级须逐 exact identity 人工科研评审（Pilot-first 指令 §21）。
+])
+
+export const resolveScientificStatus = (
+  testType: string,
+  engineVersion: string,
+  scoringVersion: string,
+): CognitiveScientificStatus => {
+  requireCatalogForIdentity(testType, engineVersion, scoringVersion)
+  return RESEARCH_GRADE_IDENTITIES.has(identityKeyOf(testType, engineVersion, scoringVersion))
+    ? 'RESEARCH_GRADE'
+    : 'PILOT'
 }
 
 export interface CognitiveCatalogDomainFacetSummary {

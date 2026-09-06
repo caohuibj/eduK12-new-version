@@ -7,8 +7,10 @@ import {
   getCatalogEntry,
   listCatalogTestTypes,
   listProductCatalogEntries,
+  RESEARCH_GRADE_IDENTITIES,
   requireCatalogForIdentity,
   resolveCatalogForIdentity,
+  resolveScientificStatus,
   validateCatalogIntegrity,
 } from '../../modules/cognitive/library/catalog'
 import {
@@ -95,7 +97,6 @@ describe('catalog single-source-of-truth boundaries', () => {
       'interactionFamily',
       'rtSensitivity',
       'fineMotorSensitivity',
-      'scientificStatus',
       'adminScientificNotes',
       'knownLimitations',
       'sourceNotes',
@@ -122,12 +123,28 @@ describe('catalog single-source-of-truth boundaries', () => {
     }
   })
 
-  it('scientificStatus only uses PILOT/RESEARCH_GRADE and is independent from publication', () => {
-    for (const entry of listProductCatalogEntries()) {
-      expect(['PILOT', 'RESEARCH_GRADE']).toContain(entry.scientificStatus)
-      expect(entry.scientificStatus).toBe('PILOT')
+  it('resolves scientific status per exact identity; all current identities are PILOT', () => {
+    for (const entry of realRegistryEntries) {
+      expect(resolveScientificStatus(entry.testType, entry.engineVersion, entry.scoringVersion)).toBe('PILOT')
     }
-    // PUBLISHED + PILOT 共存是被允许的合法状态（9 个 v2 PUBLISHED 任务全部 PILOT）
+    expect(() => resolveScientificStatus('fake', '1.0.0', '1.0.0')).toThrow()
+    expect(() => resolveScientificStatus('reaction', '9.9.9', '9.9.9')).toThrow()
+  })
+
+  it('a granted RESEARCH_GRADE identity does not inherit to sibling scorer/engine versions', () => {
+    // Review Fix 1：allowlist 按 exact identity 生效。给 reaction@1.1.0 授予
+    // RESEARCH_GRADE 后，同任务的其他已注册 scoring 版本必须仍是 PILOT。
+    RESEARCH_GRADE_IDENTITIES.add('reaction/1.0.0/1.1.0')
+    try {
+      expect(resolveScientificStatus('reaction', '1.0.0', '1.1.0')).toBe('RESEARCH_GRADE')
+      expect(resolveScientificStatus('reaction', '1.0.0', '1.0.0')).toBe('PILOT')
+    } finally {
+      RESEARCH_GRADE_IDENTITIES.delete('reaction/1.0.0/1.1.0')
+    }
+    expect(resolveScientificStatus('reaction', '1.0.0', '1.1.0')).toBe('PILOT')
+  })
+
+  it('PUBLISHED + PILOT coexistence is a legal state (v2 publication untouched by library)', () => {
     for (const entry of realRegistryEntries) {
       const definition = getCognitiveV2TaskDefinition(
         entry.testType,
@@ -135,8 +152,7 @@ describe('catalog single-source-of-truth boundaries', () => {
         entry.scoringVersion,
       )
       if (definition?.publication.status !== 'PUBLISHED') continue
-      const catalog = getCatalogEntry(entry.testType)
-      expect(catalog?.scientificStatus).toBe('PILOT')
+      expect(resolveScientificStatus(entry.testType, entry.engineVersion, entry.scoringVersion)).toBe('PILOT')
     }
   })
 
@@ -206,7 +222,7 @@ describe('dual contract declarations', () => {
 })
 
 describe('audience projection contract', () => {
-  it('student/parent view contains product info only (no domain/metric/version detail)', () => {
+  it('student/parent view contains product info only (no scientific maturity, no domain/metric/version detail)', () => {
     const view = projectCatalogForAudience('student', {
       testType: 'stroop',
       engineVersion: '1.0.0',
@@ -214,8 +230,9 @@ describe('audience projection contract', () => {
       profile: 'standard',
     })
     expect(view.displayName).toBe('色词 Stroop')
-    expect(view.isPilot).toBe(true)
     expect(view.estimatedMinutes).toEqual([4, 5])
+    expect(Object.keys(view)).not.toContain('isPilot')
+    expect(Object.keys(view)).not.toContain('scientificStatus')
     expect(Object.keys(view)).not.toContain('domainSummary')
     expect(Object.keys(view)).not.toContain('identity')
     expect(Object.keys(view)).not.toContain('keyMetricLabels')
@@ -237,7 +254,7 @@ describe('audience projection contract', () => {
     expect(view.interpretiveBoundary).toContain('不是')
   })
 
-  it('admin view exposes full provenance and scientific status', () => {
+  it('admin view exposes full provenance and identity-scoped scientific status', () => {
     const view = projectCatalogForAudience('admin', {
       testType: 'trailmaking',
       engineVersion: '1.0.0',
@@ -248,6 +265,7 @@ describe('audience projection contract', () => {
       engineVersion: '1.0.0',
       scoringVersion: '1.0.0',
     })
+    // scientificStatus 来自 exact-identity resolver（Fix 1），当前全部 PILOT
     expect(view.scientificStatus).toBe('PILOT')
     expect(view.rtSensitivity).toBe('moderate')
     expect(view.fineMotorSensitivity).toBe('high')

@@ -46,8 +46,6 @@ export interface CognitiveLibraryCatalogEntry {
   rtSensitivity: CognitiveSensitivity
   /** 任务对精细动作/指针操作差异的敏感度。 */
   fineMotorSensitivity: CognitiveSensitivity
-  /** 全部任务当前按事实为 PILOT；升级 RESEARCH_GRADE 须人工科研评审（§21）。 */
-  scientificStatus: CognitiveScientificStatus
   /** 管理员可见的简短科学备注（范式与主要构念的一句话概括）。 */
   adminScientificNotes: string
   /** 已知局限（解释边界；报告与 audience projection 可引用）。 */
@@ -57,3 +55,11 @@ export interface CognitiveLibraryCatalogEntry {
   /** 刺激 rights/provenance 指针（内部生成资产的版本标识或 rights 说明）。 */
   rightsProvenance: string
 }
+
+/**
+ * scientificStatus 是 **exact task identity scoped**（review Fix 1）：
+ * 不绑定 task family。protocol/scorer 发生实质变化的新 engine/scoring 版本
+ * 天然回到 PILOT，不会继承旧版本科研资格。
+ * 解析入口见 catalog.ts 的 resolveScientificStatus（allowlist 为空 → 全部 PILOT）。
+ */
+
