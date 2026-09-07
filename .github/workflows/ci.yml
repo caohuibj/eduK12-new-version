@@ -5,6 +5,10 @@
 #   pull_request → main / stacked feature branches (incl. ready_for_review)
 #   Draft PRs skip heavy jobs until Ready for review
 #
+# 编排（单机 self-hosted，两阶段错峰避免资源竞争）：
+#   阶段 1  backend 独占（全机资源，DB bootstrap / 并发断言无干扰）
+#   阶段 2  frontend + docker + codeql 并行（非时序敏感型互挤，可接受）
+#
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
@@ -116,6 +120,25 @@ jobs:
         run: npm run build
       - name: full regression
         run: npm test -- --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+      - name: capture CI environment snapshot
+        if: always()
+        run: |-
+          {
+            echo "node $(node -v)"
+            echo "cpus $(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo
+            df -h /tmp | tail -1
+            date -u +"timestamp %FT%TZ"
+          } > /tmp/eduk12-ci-env.txt
+      - name: upload vitest report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-vitest-report
+          path: |
+            /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-ci-env.txt
+          if-no-files-found: ignore
       - name: critical integration suites must not skip
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
@@ -135,6 +158,9 @@ jobs:
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
+    # 阶段 2：backend 独占跑完后才启动，避免同机资源竞争把 backend 的
+    # DB bootstrap / 并发性能断言挤进超时临界区。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: [self-hosted, linux, eduk12-ci]
     env:
@@ -164,6 +190,9 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
+    # 阶段 2：镜像构建是持续 I/O 风暴，与 backend 的 PG fsync 正面对撞，
+    # 必须错开。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: [self-hosted, linux, eduk12-ci]
     env:
@@ -221,6 +250,9 @@ jobs:
 
   codeql:
     name: codeql (javascript/typescript SAST)
+    # 阶段 2：analyze 阶段的 JVM（threads/内存）与 backend 的 CPU/内存
+    # 竞争剧烈，错开后在阶段 2 与 frontend/docker 并行。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: [self-hosted, linux, eduk12-ci]
     permissions:
@@ -240,7 +272,7 @@ jobs:
           # cap the CodeQL JVM grows to "most of system memory" and gets
           # OOM-killed mid-analysis.
           ram: 3500
-          threads: 8
+          threads: 12
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
         with:
