@@ -228,11 +228,16 @@ export const validateSituationDefinition = (
   const issues: DefinitionIssue[] = []
 
   const sceneKeys = new Set<string>()
+  const sceneSortOrders = new Set<number>()
   definition.scenes.forEach((scene, sceneIndex) => {
     if (sceneKeys.has(scene.sceneKey)) {
       issues.push({ path: `scenes.${sceneIndex}.sceneKey`, message: '场景编码不能重复', severity: 'error' })
     }
     sceneKeys.add(scene.sceneKey)
+    if (sceneSortOrders.has(scene.sortOrder)) {
+      issues.push({ path: `scenes.${sceneIndex}.sortOrder`, message: `场景 sortOrder 不能重复：${scene.sortOrder}`, severity: 'error' })
+    }
+    sceneSortOrders.add(scene.sortOrder)
     const declaredConstructs = new Set([scene.primaryConstruct, ...scene.secondaryConstructs])
     const channelKeys = new Set<string>()
     scene.channels.forEach((channel, channelIndex) => {

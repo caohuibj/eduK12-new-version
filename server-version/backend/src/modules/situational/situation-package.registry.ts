@@ -19,10 +19,14 @@ const packages: SituationPackageV1[] = [
 ]
 
 const packageIdentityKey = (key: string, instrumentVersion: string): string => JSON.stringify([key, instrumentVersion])
-const packageByKey = new Map(packages.map((situationPackage) => [
-  packageIdentityKey(situationPackage.key, situationPackage.instrumentVersion),
-  situationPackage,
-]))
+const packageByKey = new Map<string, SituationPackageV1>()
+for (const situationPackage of packages) {
+  const identity = packageIdentityKey(situationPackage.key, situationPackage.instrumentVersion)
+  if (packageByKey.has(identity)) {
+    throw new Error(`Duplicate situation package identity: ${situationPackage.key}@${situationPackage.instrumentVersion}`)
+  }
+  packageByKey.set(identity, situationPackage)
+}
 
 export const getSituationPackage = (key: string, instrumentVersion: string): SituationPackageV1 | undefined => (
   packageByKey.get(packageIdentityKey(key, instrumentVersion))

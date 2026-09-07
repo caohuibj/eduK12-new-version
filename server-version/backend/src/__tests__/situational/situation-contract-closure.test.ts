@@ -53,6 +53,12 @@ describe('situational PR-A contract closure', () => {
     expect(errors(optionKey).join('|')).toContain('标识符不能为空白且不能包含冒号')
   })
 
+  it('rejects duplicate scene sortOrder values', () => {
+    const definition = clone(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION)
+    definition.scenes[1]!.sortOrder = definition.scenes[0]!.sortOrder
+    expect(errors(definition).join('|')).toContain('场景 sortOrder 不能重复：0')
+  })
+
   it('rejects duplicate optionKey values within one choice channel', () => {
     const definition = clone(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION)
     const channel = definition.scenes[0]!.channels[0]!
