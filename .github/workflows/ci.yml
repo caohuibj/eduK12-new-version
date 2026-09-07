@@ -236,11 +236,11 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
-          # Runner unit cgroup caps memory at MemoryMax=4G; without an explicit
+          # Runner unit cgroup caps memory at MemoryMax=5G; without an explicit
           # cap the CodeQL JVM grows to "most of system memory" and gets
           # OOM-killed mid-analysis.
-          ram: 2800
-          threads: 4
+          ram: 3500
+          threads: 8
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
         with:
