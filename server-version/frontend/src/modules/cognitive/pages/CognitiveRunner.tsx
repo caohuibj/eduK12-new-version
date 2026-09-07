@@ -32,7 +32,8 @@ const CognitiveRunner: React.FC = () => {
   )
   const controller = useCognitiveSession(sessionId ?? '', sessionApi)
   const { state } = controller
-  useAdministrationProvenance(state.session, state.status)
+  const administrationProvenance = useAdministrationProvenance(state.session, state.status)
+  const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
 
@@ -191,14 +192,14 @@ const CognitiveRunner: React.FC = () => {
           taskContext={state.taskContext}
           trialIndex={state.trialIndex}
           onTrialComplete={controller.appendTrial}
-          onTaskComplete={taskCompletes ? controller.complete : undefined}
+          onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
         />
         {state.error && (
           <p className="text-sm text-red-500 text-center mt-3">{state.error.message}</p>
         )}
         {isLastTrial && state.status !== 'SUBMITTING_TRIAL' && (
           <div className="text-center mt-6">
-            <button onClick={controller.complete} className="btn-primary">
+            <button onClick={() => void completeWithProvenance()} className="btn-primary">
               完成测评
             </button>
           </div>
