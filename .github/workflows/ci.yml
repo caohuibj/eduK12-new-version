@@ -189,6 +189,9 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
       - name: assert API/worker isolation topology
