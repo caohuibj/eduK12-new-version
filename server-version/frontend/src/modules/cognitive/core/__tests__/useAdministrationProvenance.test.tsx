@@ -9,7 +9,7 @@ const { draftStore } = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('../../../../../services/persistence/finalDraftStore', () => ({
+vi.mock('../../../../services/persistence/finalDraftStore', () => ({
   finalDraftStore: draftStore,
 }))
 
