@@ -1,5 +1,6 @@
 import {
   situationDefinitionSchema,
+  validateSituationDefinition,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -182,19 +183,27 @@ const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min
   return { min: Math.min(...pairContributions), max: Math.max(...pairContributions) }
 }
 
+/** The metric score is a mean, so its theoretical range is the mean of each
+ * backing response's theoretical minima/maxima — not the outer envelope. */
 const rangeFor = (definition: SituationDefinitionV1, expectedResponses: string[]): { min: number; max: number } => {
   if (expectedResponses.length === 0) return { min: 0, max: 0 }
-  return expectedResponses.reduce((accumulator, pairKey) => {
-    const range = rangeForPair(definition, pairKey)
-    return { min: Math.min(accumulator.min, range.min), max: Math.max(accumulator.max, range.max) }
-  }, { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY })
+  const pairRanges = expectedResponses.map((pairKey) => rangeForPair(definition, pairKey))
+  return {
+    min: finite(pairRanges.reduce((total, range) => total + range.min, 0) / pairRanges.length),
+    max: finite(pairRanges.reduce((total, range) => total + range.max, 0) / pairRanges.length),
+  }
 }
 
 export const scoreSituational = (
   definitionInput: SituationDefinitionV1,
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
 ): SituationalResultV1 => {
-  const definition = situationDefinitionSchema.parse(definitionInput)
+  const validation = validateSituationDefinition(definitionInput)
+  const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
+  if (!validation.definition || definitionErrors.length > 0) {
+    throw new Error(`情境化测评定义不合法：${definitionErrors.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
+  }
+  const definition = validation.definition
   const responses = normalizeResponses(inputResponses)
   const answered = validateResponses(definition, responses)
   const contributions = contributionByKey(definition)

@@ -253,6 +253,10 @@ export const compileSituationRuntime = (input: {
   sourceDefinitionHash?: string
 }): CompiledInstrumentRuntimeV1 => {
   const definition = situationDefinitionSchema.parse(input.definition)
+  const computedDefinitionHash = hashSituationDefinition(definition)
+  if (input.sourceDefinitionHash !== undefined && input.sourceDefinitionHash !== computedDefinitionHash) {
+    throw new Error('Situational sourceDefinitionHash must match the authoritative definition hash')
+  }
   const metricDefinitions = compileMetrics(definition.scoring.publishedMetrics.map((metric) => ({
     key: metric.key,
     label: metric.label,
@@ -272,9 +276,9 @@ export const compileSituationRuntime = (input: {
     instrumentType: 'SITUATIONAL' as const,
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    // Definition-content identity: changing any scene/channel/scoring detail
-    // must change the frozen definition hash even at the same key+version.
-    sourceDefinitionHash: input.sourceDefinitionHash ?? hashSituationDefinition(definition),
+    // Definition-content identity is authoritative: a caller may provide the
+    // expected hash for verification, but can never override the definition.
+    sourceDefinitionHash: computedDefinitionHash,
     scorerKey: 'situational.default',
     scorerVersion: definition.scoring.scoringVersion,
     metricDefinitions,

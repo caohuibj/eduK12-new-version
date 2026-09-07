@@ -14,6 +14,16 @@ export const situationalDirectionSchema = z.enum([
 export type SituationalDirection = z.infer<typeof situationalDirectionSchema>
 
 /**
+ * Stable opaque identifiers used in composite response keys. `:` is reserved
+ * by the record-form response encoding (`sceneKey:channelKey`) and therefore
+ * cannot appear inside scene/channel/option identities.
+ */
+export const situationalOpaqueKeySchema = z.string().min(1).refine(
+  (value) => value.trim().length > 0 && !value.includes(':'),
+  { message: '标识符不能为空白且不能包含冒号 (:)' },
+)
+
+/**
  * Psychological purpose of a channel — scientific meaning only. It never
  * influences scoring or response validation; identity is `channelKey` and the
  * response primitive is `responseType`.
@@ -47,7 +57,7 @@ export const situationalStimulusSchema = z.discriminatedUnion('type', [
 export type SituationalStimulus = z.infer<typeof situationalStimulusSchema>
 
 const choiceOptionSchema = z.object({
-  optionKey: z.string().min(1),
+  optionKey: situationalOpaqueKeySchema,
   label: z.string().min(1),
 })
 export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
@@ -64,7 +74,7 @@ export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
  */
 export const situationalChannelSchema = z.discriminatedUnion('responseType', [
   z.object({
-    channelKey: z.string().min(1),
+    channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('SINGLE_CHOICE'),
     scoredConstruct: z.string().min(1),
@@ -72,7 +82,7 @@ export const situationalChannelSchema = z.discriminatedUnion('responseType', [
     options: z.array(choiceOptionSchema).min(2),
   }),
   z.object({
-    channelKey: z.string().min(1),
+    channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('CONTINUOUS'),
     scoredConstruct: z.string().min(1),
@@ -93,7 +103,7 @@ export type SituationalChannelDefinition = z.infer<typeof situationalChannelSche
  * one instrument = one UNIT = N scenes, each scene with 1–3 response channels.
  */
 export const situationalSceneSchema = z.object({
-  sceneKey: z.string().min(1),
+  sceneKey: situationalOpaqueKeySchema,
   title: z.string().min(1),
   sortOrder: z.number().int().nonnegative(),
   stimulus: situationalStimulusSchema,
@@ -119,9 +129,9 @@ export const situationalSamplingSchema = z.object({
 export type SituationalSamplingDefinition = z.infer<typeof situationalSamplingSchema>
 
 const choiceContributionSchema = z.object({
-  sceneKey: z.string().min(1),
-  channelKey: z.string().min(1),
-  optionKey: z.string().min(1),
+  sceneKey: situationalOpaqueKeySchema,
+  channelKey: situationalOpaqueKeySchema,
+  optionKey: situationalOpaqueKeySchema,
   contribution: z.number().finite(),
 })
 export type SituationalChoiceContribution = z.infer<typeof choiceContributionSchema>
@@ -130,7 +140,7 @@ export const situationalMetricDefinitionSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
   construct: z.string().min(1),
-  channelKey: z.string().min(1),
+  channelKey: situationalOpaqueKeySchema,
   direction: situationalDirectionSchema,
   role: z.enum(['primary', 'secondary']),
   displayPrecision: z.number().int().min(0).max(6).default(1),
@@ -230,6 +240,19 @@ export const validateSituationDefinition = (
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.channelKey`, message: '同一场景内通道不能重复', severity: 'error' })
       }
       channelKeys.add(channel.channelKey)
+      if (channel.responseType === 'SINGLE_CHOICE') {
+        const optionKeys = new Set<string>()
+        channel.options.forEach((option, optionIndex) => {
+          if (optionKeys.has(option.optionKey)) {
+            issues.push({
+              path: `scenes.${sceneIndex}.channels.${channelIndex}.options.${optionIndex}.optionKey`,
+              message: `同一选择通道内 optionKey 不能重复：${option.optionKey}`,
+              severity: 'error',
+            })
+          }
+          optionKeys.add(option.optionKey)
+        })
+      }
       if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })
       }
@@ -284,7 +307,10 @@ export const validateSituationDefinition = (
   })
 
   // Decision B: every published metric is one construct × channel cell, and
-  // every declared scene channel must feed exactly one published metric.
+  // every declared scene channel must feed exactly one published metric. All
+  // scene channels contributing to one metric must share the same scientific
+  // purpose and response primitive; continuous cells also share range and
+  // direction so the cross-scene mean has one coherent scale.
   const metricKeys = new Set<string>()
   const metricCells = new Set<string>()
   definition.scoring.publishedMetrics.forEach((metric, metricIndex) => {
@@ -297,12 +323,47 @@ export const validateSituationDefinition = (
       issues.push({ path: `scoring.publishedMetrics.${metricIndex}`, message: `同一 construct × channel 只能发布一个 metric：${cellKey}`, severity: 'error' })
     }
     metricCells.add(cellKey)
-    const backed = definition.scenes.some((scene) => scene.channels.some((channel) => (
+    const backingChannels = definition.scenes.flatMap((scene) => scene.channels.filter((channel) => (
       channel.channelKey === metric.channelKey && channel.scoredConstruct === metric.construct
     )))
-    if (!backed) {
+    if (backingChannels.length === 0) {
       issues.push({ path: `scoring.publishedMetrics.${metricIndex}`, message: `metric 没有可计分的场景通道支撑：${cellKey}`, severity: 'error' })
+      return
     }
+    const first = backingChannels[0]!
+    backingChannels.slice(1).forEach((channel) => {
+      if (channel.purpose !== first.purpose) {
+        issues.push({
+          path: `scoring.publishedMetrics.${metricIndex}`,
+          message: `同一 metric 的通道 purpose 必须一致：${cellKey}`,
+          severity: 'error',
+        })
+      }
+      if (channel.responseType !== first.responseType) {
+        issues.push({
+          path: `scoring.publishedMetrics.${metricIndex}`,
+          message: `同一 metric 不能混合不同 responseType：${cellKey}`,
+          severity: 'error',
+        })
+        return
+      }
+      if (channel.responseType === 'CONTINUOUS' && first.responseType === 'CONTINUOUS') {
+        if (channel.range.min !== first.range.min || channel.range.max !== first.range.max) {
+          issues.push({
+            path: `scoring.publishedMetrics.${metricIndex}`,
+            message: `同一 CONTINUOUS metric 的 range 必须一致：${cellKey}`,
+            severity: 'error',
+          })
+        }
+        if (channel.scoringDirection !== first.scoringDirection) {
+          issues.push({
+            path: `scoring.publishedMetrics.${metricIndex}`,
+            message: `同一 CONTINUOUS metric 的 scoringDirection 必须一致：${cellKey}`,
+            severity: 'error',
+          })
+        }
+      }
+    })
   })
   definition.scenes.forEach((scene, sceneIndex) => {
     scene.channels.forEach((channel, channelIndex) => {
@@ -321,8 +382,23 @@ export const validateSituationDefinition = (
       issues.push({ path: 'report.metricOrder', message: `报告缺少 metric：${metric.key}`, severity: 'error' })
     }
   })
-  definition.report.primaryMetricKeys.forEach((key) => {
-    if (!metricKeys.has(key)) issues.push({ path: 'report.primaryMetricKeys', message: `报告主 metric 不存在：${key}`, severity: 'error' })
+  const reportPrimaryKeys = new Set<string>()
+  definition.report.primaryMetricKeys.forEach((key, index) => {
+    if (reportPrimaryKeys.has(key)) {
+      issues.push({ path: `report.primaryMetricKeys.${index}`, message: `报告主 metric 不能重复：${key}`, severity: 'error' })
+    }
+    reportPrimaryKeys.add(key)
+    const metric = definition.scoring.publishedMetrics.find((entry) => entry.key === key)
+    if (!metric) {
+      issues.push({ path: 'report.primaryMetricKeys', message: `报告主 metric 不存在：${key}`, severity: 'error' })
+    } else if (metric.role !== 'primary') {
+      issues.push({ path: 'report.primaryMetricKeys', message: `报告主 metric 必须声明 role=primary：${key}`, severity: 'error' })
+    }
+  })
+  definition.scoring.publishedMetrics.forEach((metric) => {
+    if (metric.role === 'primary' && !reportPrimaryKeys.has(metric.key)) {
+      issues.push({ path: 'report.primaryMetricKeys', message: `role=primary 的 metric 必须进入 report.primaryMetricKeys：${metric.key}`, severity: 'error' })
+    }
   })
   const interpretationKeys = new Set<string>()
   definition.report.interpretations.forEach((interpretation, index) => {
