@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { MAX_TOKEN_USES } from '../../constants'
+import { administrationProvenanceV1Schema } from './administration-provenance'
 
 /**
  * Cognitive 跨阶段共享 schema/helper（D2 Step 6）。
@@ -145,6 +146,7 @@ export const finalCognitiveSubmitSchema = z.object({
   definitionHash: z.string().min(1).max(200),
   contextSnapshotHash: z.string().min(1).max(200).nullable().optional(),
   trials: z.array(z.unknown()).min(1).max(1000),
+  administrationProvenance: administrationProvenanceV1Schema.optional(),
 }).strict()
 
 export const finalCognitivePublicSubmitSchema = finalCognitiveSubmitSchema.extend({
