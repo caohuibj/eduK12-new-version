@@ -62,7 +62,6 @@ const CognitiveRunner: React.FC = () => {
   }
 
   if (state.status === 'COMPLETED') {
-    // 完成态：结果页只读展示，不重新评分
     if (sessionId) {
       const returnTo = searchParams.get('returnTo')
       const target = safeInternalReturnTo(
@@ -182,18 +181,20 @@ const CognitiveRunner: React.FC = () => {
     const taskCompletes = entry.completionMode === 'task'
     const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total && !taskCompletes
     return (
-      <div className="max-w-2xl mx-auto" data-cognitive-task-root="true">
+      <div className="max-w-2xl mx-auto">
         {isPublic && recoveryToken && (
           <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
             匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存它，之后可在其他设备继续作答。
           </p>
         )}
-        <Runner
-          taskContext={state.taskContext}
-          trialIndex={state.trialIndex}
-          onTrialComplete={controller.appendTrial}
-          onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
-        />
+        <div data-cognitive-task-root="true">
+          <Runner
+            taskContext={state.taskContext}
+            trialIndex={state.trialIndex}
+            onTrialComplete={controller.appendTrial}
+            onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
+          />
+        </div>
         {state.error && (
           <p className="text-sm text-red-500 text-center mt-3">{state.error.message}</p>
         )}
