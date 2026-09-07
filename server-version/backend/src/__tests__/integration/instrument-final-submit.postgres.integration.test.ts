@@ -1,8 +1,11 @@
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { canonicalJsonBytes } from '../../modules/assessment-runtime/canonical'
+import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
+import { decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from '../../modules/scale/scale-definition'
 import { createRecoveryCredential } from '../../services/anonymousAccess'
 import { resetRuntimeObservabilityForTests, runtimeMetricLines } from '../../services/runtimeObservability'
@@ -37,6 +40,7 @@ let restartStandaloneScaleAssessment: typeof import('../../modules/scale/scale-f
 let submitCognitiveSessionFinal: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinal']
 let submitCognitiveSessionFinalForPublic: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinalForPublic']
 let createCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createCognitiveSessionConfigSnapshot']
+let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createUnifiedCognitiveSessionConfigSnapshot']
 let readCognitiveSessionConfig: typeof import('../../modules/cognitive/session.service')['readCognitiveSessionConfig']
 let ensureQuestionnaireFormSections: typeof import('../../services/questionnaire-form-section.service')['ensureQuestionnaireFormSections']
 let listQuestionnaireFormSections: typeof import('../../services/questionnaire-form-section.service')['listQuestionnaireFormSections']
@@ -238,6 +242,70 @@ const createCognitiveFixture = async (trialCount: number, anonymous = false) => 
   return { session, input, credential }
 }
 
+const createUnifiedCognitiveFixture = async (trialCount: number, anonymous = false) => {
+  const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: fakeConfigId } })
+  if (!config) throw new Error('fake cognitive config fixture is missing')
+  const resolvedConfig = {
+    trialCount,
+    trialDurationMs: 1000,
+    allowPractice: false,
+    maxRtMs: 60000,
+  }
+  const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
+    testType: config.testType,
+    configVersion: config.configVersion,
+    engineVersion: config.engineVersion,
+    scoringVersion: config.scoringVersion,
+    config: resolvedConfig,
+    db: prisma as any,
+  })
+  const snapshot = readCognitiveSessionConfig(unifiedSnapshot.encrypted).snapshot
+  if (!snapshot || snapshot.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new Error('unified cognitive fixture did not create a unified snapshot')
+  }
+  const credential = anonymous ? createRecoveryCredential() : null
+  const session = await prisma.cognitiveSession.create({
+    data: {
+      userId: anonymous ? null : userId,
+      participantKey: credential?.participantKey ?? ('unified-instrument-final-user-' + randomUUID()),
+      recoveryTokenHash: credential?.hash ?? null,
+      anonymousCode: credential?.anonymousCode ?? null,
+      configId: config.id,
+      testType: config.testType,
+      attemptNo: 1,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      configVersion: config.configVersion,
+      configSnapshotEncrypted: unifiedSnapshot.encrypted,
+      engineVersion: config.engineVersion,
+      scoringVersion: config.scoringVersion,
+      randomSeed: 'unified-instrument-final-seed-' + randomUUID(),
+      runtimeGeneration: 'UNIFIED_V1',
+      compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
+    },
+  })
+  createdSessionIds.push(session.id)
+  const trials = Array.from({ length: trialCount }, (_, trialIndex) => createTrialEnvelope({
+    trialIndex,
+    phase: 'test',
+    payload: { correct: trialIndex % 2 === 0, rtMs: 400 + trialIndex },
+    startedAtPerfMs: trialIndex * 1000,
+    endedAtPerfMs: trialIndex * 1000 + 400,
+  }))
+  return {
+    session,
+    input: {
+      sessionId: session.id,
+      submissionId: 'unified-cognitive-submission-' + randomUUID(),
+      attemptEpoch: 1,
+      definitionHash: snapshot.configHash,
+      contextSnapshotHash: null,
+      trials,
+    },
+    credential,
+  }
+}
+
 const createQuestionnaireFixture = async (sectionSizes: number[], anonymous = false) => {
   const suffix = randomUUID().slice(0, 8)
   const questionnaire = await prisma.questionnaire.create({
@@ -383,6 +451,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
     submitCognitiveSessionFinalForPublic = cognitiveModule.submitCognitiveSessionFinalForPublic
     const cognitiveSessionModule = await import('../../modules/cognitive/session.service')
     createCognitiveSessionConfigSnapshot = cognitiveSessionModule.createCognitiveSessionConfigSnapshot
+    createUnifiedCognitiveSessionConfigSnapshot = cognitiveSessionModule.createUnifiedCognitiveSessionConfigSnapshot
     readCognitiveSessionConfig = cognitiveSessionModule.readCognitiveSessionConfig
     const questionnaireModule = await import('../../services/questionnaire-form-section.service')
     ensureQuestionnaireFormSections = questionnaireModule.ensureQuestionnaireFormSections
@@ -491,6 +560,120 @@ suite('instrument final submit (real PostgreSQL)', () => {
     const replay = await withObserved(() => submitCognitiveSessionFinal(userId, replayFixture.input))
     expect(replay.value.replayed).toBe(true)
     expect(replay.calls.filter((call) => call.model === 'CognitiveTrial' && call.action === 'createMany')).toHaveLength(0)
+  })
+
+  it('persists authenticated unified provenance durably and binds it to replay identity', async () => {
+    const provenance = {
+      schemaVersion: 1 as const,
+      deviceClass: 'PHONE' as const,
+      administrationMode: 'TOUCH' as const,
+    }
+    const fixture = await createUnifiedCognitiveFixture(2)
+    const first = await withObserved(() => submitCognitiveSessionFinal(userId, {
+      ...fixture.input,
+      administrationProvenance: provenance,
+    }))
+    expect(first.value.replayed).toBe(false)
+    expect(first.calls.filter((call) => call.model === 'CognitiveRawSubmission' && call.action === 'create')).toHaveLength(1)
+    expect(first.calls.filter((call) => call.model === 'CognitiveTrial')).toHaveLength(0)
+
+    const [raw, row] = await Promise.all([
+      prisma.cognitiveRawSubmission.findUnique({
+        where: {
+          sessionId_attemptEpoch: {
+            sessionId: fixture.session.id,
+            attemptEpoch: 1,
+          },
+        },
+      }),
+      prisma.cognitiveSession.findUnique({
+        where: { id: fixture.session.id },
+        select: { resultSnapshotEncrypted: true, submissionPayloadHash: true },
+      }),
+    ])
+    expect(raw).not.toBeNull()
+    expect(row?.resultSnapshotEncrypted).toBeTruthy()
+    const rawPayload = decryptUnifiedRuntimePayload<any>(raw!.payloadEncrypted)
+    expect(rawPayload.administrationProvenance).toEqual(provenance)
+    expect(rawPayload.trials).toHaveLength(2)
+    expect(rawPayload.trials.every((trial: any) => !Object.prototype.hasOwnProperty.call(trial, 'administrationProvenance'))).toBe(true)
+
+    const resultSnapshot = decryptCognitivePayload<any>(row!.resultSnapshotEncrypted!)
+    expect(resultSnapshot).not.toHaveProperty('administrationProvenance')
+    expect(resultSnapshot.metrics).toBeDefined()
+    expect(resultSnapshot.quality).toBeDefined()
+    expect(resultSnapshot.report).toBeDefined()
+    expect(row?.submissionPayloadHash).toBe(first.value.payloadHash)
+
+    const replay = await submitCognitiveSessionFinal(userId, {
+      ...fixture.input,
+      administrationProvenance: provenance,
+    })
+    expect(replay.replayed).toBe(true)
+
+    await expectInstrumentError(
+      () => submitCognitiveSessionFinal(userId, {
+        ...fixture.input,
+        administrationProvenance: { ...provenance, administrationMode: 'KEYBOARD_MOUSE' },
+      }),
+      'SUBMISSION_PAYLOAD_CONFLICT',
+    )
+    expect(await prisma.cognitiveRawSubmission.count({
+      where: { sessionId: fixture.session.id },
+    })).toBe(1)
+  })
+
+  it('keeps the historical trials-only hash shape when unified provenance is absent', async () => {
+    const fixture = await createUnifiedCognitiveFixture(1)
+    const result = await submitCognitiveSessionFinal(userId, fixture.input)
+    const expectedHash = createHash('sha256')
+      .update(canonicalJsonBytes({ trials: fixture.input.trials }))
+      .digest('hex')
+    expect(result.replayed).toBe(false)
+    expect(result.payloadHash).toBe(expectedHash)
+
+    const raw = await prisma.cognitiveRawSubmission.findUnique({
+      where: {
+        sessionId_attemptEpoch: {
+          sessionId: fixture.session.id,
+          attemptEpoch: 1,
+        },
+      },
+    })
+    const rawPayload = decryptUnifiedRuntimePayload<any>(raw!.payloadEncrypted)
+    expect(Object.prototype.hasOwnProperty.call(rawPayload, 'administrationProvenance')).toBe(false)
+  })
+
+  it('persists public unified provenance through the recovery final path', async () => {
+    const provenance = {
+      schemaVersion: 1 as const,
+      deviceClass: 'DESKTOP_LAPTOP' as const,
+      administrationMode: 'KEYBOARD_MOUSE' as const,
+    }
+    const fixture = await createUnifiedCognitiveFixture(1, true)
+    if (!fixture.credential) throw new Error('anonymous fixture credential is missing')
+    const result = await submitCognitiveSessionFinalForPublic({
+      ...fixture.input,
+      administrationProvenance: provenance,
+    }, fixture.credential.hash)
+    expect(result.replayed).toBe(false)
+
+    const [raw, row] = await Promise.all([
+      prisma.cognitiveRawSubmission.findUnique({
+        where: {
+          sessionId_attemptEpoch: {
+            sessionId: fixture.session.id,
+            attemptEpoch: 1,
+          },
+        },
+      }),
+      prisma.cognitiveSession.findUnique({
+        where: { id: fixture.session.id },
+        select: { userId: true, status: true },
+      }),
+    ])
+    expect(row).toMatchObject({ userId: null, status: 'COMPLETED' })
+    expect(decryptUnifiedRuntimePayload<any>(raw!.payloadEncrypted).administrationProvenance).toEqual(provenance)
   })
 
   it('accepts anonymous cognitive final submit with only the recovery credential', async () => {
