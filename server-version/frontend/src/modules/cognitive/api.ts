@@ -1,5 +1,6 @@
 import apiClient from '../../api/client'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
+import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
@@ -13,6 +14,7 @@ export interface CognitiveSessionApi {
     definitionHash: string
     contextSnapshotHash?: string | null
     trials: unknown[]
+    administrationProvenance?: AdministrationProvenanceV1
   }) => ReturnType<typeof apiClient.post<any>>
 }
 
@@ -23,11 +25,9 @@ export interface CognitiveSessionApi {
  *  - **必须复用现有 `src/api/client.ts` 的 apiClient**（baseURL=/api、JWT、401 处理、ApiResponse<T>）。
  *  - 禁止：新建 axios 实例 / 重复读取 localStorage token / 复制 Authorization interceptor /
  *    复制 401 logout 逻辑 / 建立第二套 ApiResponse。
- *  - 路径不带 `/api` 前缀（client baseURL 已含）。
  *
  * 禁止为了 Fake UI 新增 backend endpoint（v1.1 §15）。
  */
-
 export const cognitiveApi = {
   listTests: () =>
     apiClient.get<{ list: Array<{
