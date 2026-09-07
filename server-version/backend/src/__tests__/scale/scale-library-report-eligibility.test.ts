@@ -99,7 +99,25 @@ describe('Pilot report / claim eligibility (SL2-C4)', () => {
       }],
     })
     expect(decision.levels.L3_REFERENCED_INTERPRETIVE.eligible).toBe(false)
-    expect(decision.levels.L3_REFERENCED_INTERPRETIVE.reasons.some((reason) => reason.includes('territory=UK'))).toBe(true)
+    expect(decision.levels.L3_REFERENCED_INTERPRETIVE.reasons.some((reason) => reason.includes('UK/TEACHER'))).toBe(true)
+  })
+
+  it('any matching applicability record prevents a conflict when multiple records exist', () => {
+    const manifest = manifestWithMaturity('PILOT')
+    const applicabilityBase = manifest.referenceApplicability[0]
+    const decision = evaluateReportEligibility({
+      definition: declaredDefinition('local_pilot'),
+      references: [pilotReference('local_pilot')],
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      deployment: { territory: 'CN', respondent: 'SELF' },
+      catalogReferenceApplicability: [
+        { ...applicabilityBase, referenceVersion: 'who5-pilot-cn-v1', referenceKind: 'normative_distribution', territory: 'UK', respondent: 'TEACHER' },
+        { ...applicabilityBase, referenceVersion: 'who5-pilot-cn-v1', referenceKind: 'normative_distribution', territory: 'CN', respondent: 'SELF' },
+      ],
+    })
+    expect(decision.levels.L3_REFERENCED_INTERPRETIVE.eligible).toBe(true)
   })
 
   it('Case D: RESEARCH_GRADE with no reference still cannot fabricate percentile', () => {

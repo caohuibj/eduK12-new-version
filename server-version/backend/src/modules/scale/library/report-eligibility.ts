@@ -64,17 +64,19 @@ const referenceConflictWithDeployment = (
 ): string | null => {
   const { deployment, catalogReferenceApplicability } = input
   if (!deployment || !catalogReferenceApplicability) return null
-  const applicable = catalogReferenceApplicability.find((record) => (
+  const records = catalogReferenceApplicability.filter((record) => (
     record.referenceVersion === selection.referenceVersion && record.referenceKind === selection.referenceKind
   ))
-  if (!applicable) return null
-  if (deployment.territory && applicable.territory !== deployment.territory) {
-    return `reference ${selection.referenceVersion} 的 applicability territory=${applicable.territory} 与部署 territory=${deployment.territory} 不匹配`
-  }
-  if (deployment.respondent && applicable.respondent !== deployment.respondent) {
-    return `reference ${selection.referenceVersion} 的 applicability respondent=${applicable.respondent} 与部署 respondent=${deployment.respondent} 不匹配`
-  }
-  return null
+  if (records.length === 0) return null
+  // 同一 selection 可有多条 applicability（不同 territory/respondent/locale）：
+  // 存在任意一条匹配部署上下文即不冲突；全部不匹配才阻断。
+  const hasMatch = records.some((record) => (
+    (!deployment.territory || record.territory === deployment.territory)
+    && (!deployment.respondent || record.respondent === deployment.respondent)
+  ))
+  if (hasMatch) return null
+  const declared = records.map((record) => `${record.territory}/${record.respondent}`).join(', ')
+  return `reference ${selection.referenceVersion} 的 applicability（${declared}）无一匹配部署上下文（territory=${deployment.territory ?? 'any'}, respondent=${deployment.respondent ?? 'any'}）`
 }
 
 export const evaluateReportEligibility = (input: ReportEligibilityInput): ReportEligibilityDecision => {
