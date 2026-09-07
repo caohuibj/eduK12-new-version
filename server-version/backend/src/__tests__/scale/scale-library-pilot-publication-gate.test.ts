@@ -30,6 +30,7 @@ const who5Authorization = (overrides?: { validTo?: string }) => {
     createdByUserId: 'admin-1',
     now: NOW,
   })
+  // 无 evidenceAssetId → approve 产出 EVIDENCE_PENDING（rights 层 warn-only）
   return approveInstrumentAuthorization({ record: draft, actorUserId: 'admin-2', now: NOW }).record
 }
 
@@ -129,6 +130,14 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
     expect(result.decision.publishable).toBe(false)
     expect(result.decision.errors.some((error) => error.includes('[catalogManifest]'))).toBe(true)
     expect(result.reportEligibility.maxEligibleLevel).toBeNull()
+  })
+
+  it('keeps EVIDENCE_PENDING rights warn-only and surfaces the warning (not silently dropped)', () => {
+    // fixture 的 approve 未附 evidence → status=EVIDENCE_PENDING：可发布但必须透出 warning
+    const result = runGate()
+    expect(result.decision.publishable).toBe(true)
+    expect(result.decision.warnings.some((warning) => warning.includes('EVIDENCE_PENDING'))).toBe(true)
+    expect(result.decision.errors).toHaveLength(0)
   })
 
   it('keeps scientific completeness driven by territory: CN applicability removes the local-norm gap', () => {

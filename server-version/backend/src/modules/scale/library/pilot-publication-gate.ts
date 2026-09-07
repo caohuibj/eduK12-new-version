@@ -110,6 +110,8 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     requireDisplay: true,
     requireTranslation: needsTranslation,
   })
+  // EVIDENCE_PENDING 等 rights 级 warn-only 语义必须透传到上层（不丢失、不阻塞）
+  warnings.push(...rights.warnings)
 
   // 5) Content locale（复用既有 contentLocale 纪律）
   const localeGate = assertContentLocaleCompatible({
