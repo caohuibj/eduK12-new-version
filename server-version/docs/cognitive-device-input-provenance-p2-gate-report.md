@@ -1,128 +1,138 @@
-# COG-P2 Device & Input Provenance V1 — Gate Report
+# COG-P2 Device & Input Provenance V1 — Cloud Validation Gate Report
 
 Date: 2026-09-07
-Base: `main@6033384`
-PR: #62 `feat/cognitive-device-input-provenance-v1`
+Base: main@6033384d7db7af3294922b5f07d1a88f8749a3bb
+PR: #62 feat/cognitive-device-input-provenance-v1
 
-## 1. Implemented contract
+## 1. Validation scope and current status
 
-`AdministrationProvenanceV1` is attempt/session-level calibration provenance:
+This report records executed evidence, not a plan.
 
-```text
-schemaVersion: 1
-deviceClass: PHONE | TABLET | DESKTOP_LAPTOP | UNKNOWN
-administrationMode: TOUCH | KEYBOARD_MOUSE | MIXED | UNKNOWN
-```
+Code changes were made only on the COG-P2 branch. No merge was performed. No COG-P3, PR #54, or runtime/scoring performance work was started.
 
-It is not a score, quality metric, report field, reference correction, or Bundle input.
+At report time, the latest code head before this documentation update was:
+1f835485c77260b1d09e7ce0b6d575f66e43f4d9
 
-Policy: **RECORD, DO NOT CORRECT**.
+The latest CI run for that head was run #369, id 34078548290:
+- CodeQL: success
+- backend: queued
+- frontend: queued
+- docker: queued
 
-## 2. Frontend lifecycle
+Therefore the four-job latest-head gate is not complete.
 
-The implementation uses one shared Cognitive session tracker rather than adding device fields to 24 task payload schemas.
+## 2. Cloud environment
 
-- coarse `deviceClass` uses conservative form-factor inference; ambiguous devices remain `UNKNOWN`;
-- `administrationMode` is derived from observed task interaction, not touch capability;
-- pointer modality comes from `PointerEvent.pointerType`;
-- non-editable keyboard interaction is observed separately;
-- start/recovery/result/final-complete controls are outside the task observation root;
-- no response / timeout does not create a modality observation;
-- no event history, raw user-agent, fingerprint, persistent device ID, GPU/canvas/battery/location data is collected.
+Work shell observations:
+- Node: v24.19.0; Node 20.20.2 was available through an npx probe, but no repository-local install could be run.
+- Docker and Docker Compose: unavailable in the Work shell.
+- PostgreSQL client/server and Redis server: unavailable in the Work shell.
+- Chromium application: unavailable in the Work shell.
 
-## 3. Local FINAL_ONLY durability
+The authenticated GitHub connector could inspect and update the PR, but a shell git clone was not authorized in this session. The code/test commits were therefore applied through the authenticated GitHub repository interface. No local repository, node_modules, database, Redis instance, Docker container, or browser app stack was fabricated.
 
-Existing `finalDraftStore` was extended with optional non-identity `instrumentMetadata` and an atomic `setInstrumentMetadata()` merge operation.
+The formal CI workflow targets Node 20, postgres:14-alpine, and redis:7-alpine. Run #357 proved that its backend clean-room services can start on the GitHub runner.
 
-This prevents a refresh/resume from losing earlier TOUCH/KEYBOARD_MOUSE evidence and avoids get→update races with `SUBMITTING` / `RETRY_PENDING` status transitions.
+## 3. Git and PR state
 
-Metadata is not part of local draft identity, so old drafts remain compatible.
+- origin/main: 6033384d7db7af3294922b5f07d1a88f8749a3bb
+- PR head at handoff: 10b4a35fad6674e07b4bf5ffd695cc2c805cfc89
+- PR head after code/test fixes: 1f835485c77260b1d09e7ce0b6d575f66e43f4d9
+- mergeability: true
+- PR state: open, not merged
+- new commits: lint fix; non-blocking metadata persistence fix; frontend persistence test; final-submit provenance input typing; authenticated/public/raw durability tests; frontend event/resume tests; hook-test import fixes; constrained-runner Docker build serialization.
 
-## 4. FINAL submit and replay identity
+The branch remained based directly on origin/main. No force reset, rebase, or unrelated branch-history rewrite was used.
 
-The final request accepts optional strict `administrationProvenance` for authenticated and public submissions.
+## 4. GitHub CI evidence
 
-Historical replay compatibility is intentionally preserved:
+Run #357, id 34074457069, was the first validation run after handoff:
+- backend: success, including npm ci, audit, Prisma generate/migrate, seed, backfill, release preflight, build, full regression, and critical integration no-skip assertion;
+- frontend: failed at lint because administration-provenance.ts used let where const was required; fixed in 7aa92787;
+- CodeQL: success;
+- Docker: failed during the production image build with failed to execute bake: signal: killed after the frontend Vite build transformed 5569 modules. Compose/topology/monitoring configuration checks passed.
 
-```text
-old client / absent provenance:
-canonical({ trials })
+Run #368 for the intermediate code head was superseded by the next commit. CodeQL passed; the other jobs were queued.
 
-new client / provenance present:
-canonical({ trials, administrationProvenance })
-```
+Run #369 is the latest run for the code-fix head at report time. Only CodeQL has completed successfully; the three self-hosted jobs remain queued. No current-head backend/frontend/Docker result is available yet.
 
-The implementation never canonicalizes an absent value as `administrationProvenance: null`.
+The Docker failure was investigated against the source: the frontend Dockerfile is byte-for-byte the same on the PR branch and main. No main workflow run was available, and the connected GitHub capability cannot dispatch a temporary main run, so pre-existing status could not be proven by A/B. A minimal CI-only workaround was added in 1f835485: COMPOSE_BAKE=false and COMPOSE_PARALLEL_LIMIT=1 on the existing production image command. Image definitions and runtime topology are unchanged.
 
-Therefore existing completed submissions retain their historical hash while a new submission cannot replay the same `submissionId` with the same trials but different provenance.
+## 5. Backend COG-P2 gates
 
-## 5. Durable backend storage — implementation deviation
+Implemented coverage on the branch:
+- strict AdministrationProvenanceV1 contract;
+- canonical replay identity with optional provenance;
+- legacy no-provenance canonical shape remains trials-only;
+- authenticated unified FINAL raw-envelope durability;
+- changed-provenance replay conflict;
+- public unified recovery FINAL propagation;
+- result/trial isolation;
+- encrypted raw payload round-trip.
 
-The earlier implementation sketch considered adding nullable `CognitiveSession` columns. Source review showed this would be unnecessary pre-optimization schema work.
+The existing instrument-final-submit.postgres.integration.test.ts was extended rather than creating a separate framework. It asserts one encrypted CognitiveRawSubmission write, no CognitiveTrial provenance duplication, exact decrypted provenance, same-provenance replay, changed-provenance conflict, and legacy hash compatibility.
 
-COG-P2 instead stores the coarse provenance once inside the existing encrypted `CognitiveRawSubmission` FINAL envelope:
+Execution status:
+- clean install/audit: current head pending in run #369; local Work execution blocked;
+- Prisma generate/migrate, seed, backfill, release preflight: current head pending; run #357 baseline succeeded;
+- backend build: current head pending; run #357 baseline succeeded;
+- focused provenance tests: added and included in CI; current result pending;
+- full regression and critical DB integration no-skip gate: current result pending;
+- skipped: no-skip result for the current head is not yet available. Run #357 baseline reported success.
 
-```text
-CognitiveRawSubmission
-  schemaVersion: 1
-  attemptEpoch
-  trials
-  administrationProvenance?   # optional additive field
-```
+## 6. Frontend COG-P2 gates
 
-Rationale:
+Implemented/tested in source:
+- O(1) modality aggregation;
+- touch, mouse, keyboard, mixed, pen/unknown semantics;
+- editable input keydown exclusion;
+- control clicks excluded from measurement modality;
+- event listener cleanup;
+- stored PHONE x TOUCH resume followed by keyboard becomes PHONE x MIXED;
+- final metadata persistence failure is non-blocking and FINAL still submits provenance.
 
-- one existing durable row per final attempt;
-- no extra SELECT / UPDATE / INSERT;
-- no Prisma migration or index;
-- no per-trial duplication;
-- encrypted at rest using the existing unified runtime envelope;
-- independent from future COS Research Capture;
-- old raw submissions without the optional field remain readable.
+Execution status:
+- npm ci/audit, lint, typecheck, full tests, and Vite build for the current head: pending in run #369;
+- initial lint failure was fixed and covered by a follow-up test commit;
+- local Work frontend execution: blocked because no shell clone/dependencies were available.
 
-Future COG-P5 research export/archive can decrypt and project this attempt-level header together with detailed capture. If operational cohort queries later require indexed device fields, that should be justified by real workload before adding database columns/indexes.
+## 7. Browser and IndexedDB smoke
 
-## 6. Legacy task-field boundary
+Not executed in this Work session:
+- desktop mouse and desktop keyboard app smoke;
+- Chromium touch/mobile emulation;
+- IndexedDB refresh/resume;
+- mixed-input browser smoke;
+- cross-context public recovery.
 
-- Reaction `inputMode` remains a legacy task field and is **not** authoritative administration provenance. Its mouse/touch collapse and timeout=`pointer` behavior are not used for calibration cohort membership.
-- Trail Making per-trial `deviceClass` remains a legacy heuristic task field. Future calibration should use `AdministrationProvenanceV1` instead.
-- Trail Making `deviceInfoIncomplete` and `mixedPointerType` are explicitly adapted as non-degrading v2 provenance warnings (`effect: none`), matching their existing scorer semantics: metrics and legacy `interpretable` are unchanged.
+Reason: the Work shell had no runnable application stack because Docker, PostgreSQL, and Redis were unavailable, and the authenticated browser session had no repository/app context. No physical iPhone, Android phone, or tablet smoke was executed. Browser emulation must not be reported as physical-device validation.
 
-No published Reaction trial schema was changed.
+## 8. Durable-storage and architecture review
 
-## 7. Deferred by design
+Static source/diff review confirms:
+- Prisma migration: none;
+- CognitiveSession provenance columns/index: none;
+- second provenance truth: none;
+- per-trial provenance duplication: none;
+- scorer impact: none;
+- report impact: none;
+- Bundle impact: none;
+- raw user-agent, fingerprint, GPU/canvas, persistent device ID, location, IMEI, MAC, or serial capture: none;
+- Trail Making historical device fields were not deleted;
+- Trail Making provenance warnings remain non-degrading;
+- provenance persistence uses the existing encrypted CognitiveRawSubmission FINAL write.
 
-Not part of COG-P2:
+The new integration assertions are designed to prove extra DB query/write count remains zero for provenance, but current-head runtime evidence is pending run #369. No local query-budget test could run in the Work shell.
 
-- device-specific reference/norm correction;
-- fixed touch/Android/browser timing adjustment;
-- detailed platform/browser/viewport/DPR capture;
-- per-response research event history;
-- COS Research Capture (COG-P5);
-- Cognitive scorer/payload optimization (COG-P3 / later performance lane);
-- broad quality-definition migration;
-- PR #54 or the old performance optimization lane.
+## 9. Review closure
 
-## 8. Added automated coverage
+The Copilot concern about IndexedDB metadata failure aborting FINAL was addressed by catching metadata-storage errors and retaining FINAL submission behavior. The original inline thread is outdated after the fix; it remains unresolved pending human review.
 
-Code includes targeted tests for:
+## 10. Remaining blockers and limitations
 
-- mode aggregation, MIXED semantics, pen/unknown handling;
-- conservative device classification and ambiguity;
-- final-draft metadata merge without status/identity corruption;
-- strict backend provenance schema;
-- raw-submission optional provenance round-trip;
-- Trail Making provenance warnings remain non-degrading.
+1. Latest-head run #369 has backend, frontend, and Docker jobs queued; the required 4/4 latest-head CI gate is not green.
+2. Work-shell clean-room execution could not be performed because authenticated shell clone access, Docker, PostgreSQL, Redis, and repository dependencies were unavailable.
+3. Cloud browser / IndexedDB / public-recovery smoke was not executed.
+4. Physical mobile/tablet smoke was not executed; this is an expected non-blocker and must be run separately if needed.
 
-GitHub CI is the executable validation environment available for this Chat-mode implementation. CI results must be attached to the PR before merge.
-
-## 9. Work/local validation still required after execution quota returns
-
-The following cannot be truthfully completed in Chat mode and remain explicit post-CI validation items:
-
-1. real mobile/tablet/desktop hardware smoke (touch, mouse, keyboard, mixed input);
-2. refresh/resume smoke using a real browser IndexedDB implementation;
-3. cross-device public recovery smoke (e.g. touch device → desktop keyboard/mouse) verifying conservative merge semantics;
-4. any repository-local test command or environment-specific integration suite not executed by GitHub CI.
-
-These are validation tasks only; no additional architecture is required unless they expose a defect.
+STOP before merge and wait for human review.
