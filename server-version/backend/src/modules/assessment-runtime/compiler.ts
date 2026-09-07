@@ -1,5 +1,5 @@
 import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
-import { situationDefinitionSchema, hashSituationDefinition, type SituationDefinitionV1 } from '../situational/situation-definition'
+import { hashSituationDefinition, validateSituationDefinition, type SituationDefinitionV1 } from '../situational/situation-definition'
 import type { TaskDefinition } from '../cognitive/v2/types'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from './canonical'
 import { z } from 'zod'
@@ -252,7 +252,12 @@ export const compileSituationRuntime = (input: {
   definition: SituationDefinitionV1
   sourceDefinitionHash?: string
 }): CompiledInstrumentRuntimeV1 => {
-  const definition = situationDefinitionSchema.parse(input.definition)
+  const validation = validateSituationDefinition(input.definition)
+  const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
+  if (!validation.definition || definitionErrors.length > 0) {
+    throw new Error(`Situational definition is invalid: ${definitionErrors.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
+  }
+  const definition = validation.definition
   const computedDefinitionHash = hashSituationDefinition(definition)
   if (input.sourceDefinitionHash !== undefined && input.sourceDefinitionHash !== computedDefinitionHash) {
     throw new Error('Situational sourceDefinitionHash must match the authoritative definition hash')

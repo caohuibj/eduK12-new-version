@@ -69,6 +69,11 @@ describe('situational PR-A contract closure', () => {
       { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
       { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'A' },
     ])).toThrow('情境化测评定义不合法')
+    expect(() => compileSituationRuntime({
+      instrumentKey: 'sjt-assertiveness-golden',
+      instrumentVersion: '1.0.0',
+      definition,
+    })).toThrow('Situational definition is invalid')
   })
 
   it('rejects one metric backed by mixed response primitives', () => {
