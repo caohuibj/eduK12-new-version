@@ -229,6 +229,9 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
