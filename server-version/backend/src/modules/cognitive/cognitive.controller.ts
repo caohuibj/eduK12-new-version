@@ -259,6 +259,7 @@ export const cognitiveController = {
           definitionHash: input.definitionHash,
           contextSnapshotHash: input.contextSnapshotHash,
           trials: input.trials,
+          ...(input.administrationProvenance ? { administrationProvenance: input.administrationProvenance } : {}),
         },
       )
       return success(res, data, data.replayed ? '匿名认知测评提交已确认' : '匿名认知测评已完成')
