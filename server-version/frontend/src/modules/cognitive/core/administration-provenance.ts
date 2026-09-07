@@ -123,7 +123,7 @@ export const createAdministrationProvenanceTracker = (input: {
   deviceClass: CognitiveDeviceClass
   initial?: AdministrationProvenanceV1 | null
 }): AdministrationProvenanceTracker => {
-  let deviceClass = input.initial
+  const deviceClass = input.initial
     ? reconcileDeviceClass(input.initial.deviceClass, input.deviceClass)
     : input.deviceClass
   let seenTouch = input.initial?.administrationMode === 'TOUCH' || input.initial?.administrationMode === 'MIXED'
