@@ -1,6 +1,5 @@
 import {
   situationDefinitionSchema,
-  validateSituationDefinition,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -198,12 +197,11 @@ export const scoreSituational = (
   definitionInput: SituationDefinitionV1,
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
 ): SituationalResultV1 => {
-  const validation = validateSituationDefinition(definitionInput)
-  const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
-  if (!validation.definition || definitionErrors.length > 0) {
-    throw new Error(`情境化测评定义不合法：${definitionErrors.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
-  }
-  const definition = validation.definition
+  // The frozen definition is trusted runtime input: publication/compile gates
+  // own cross-field validation. Keep FINAL scoring free of duplicate governance
+  // work while still parsing the structural schema and validating untrusted
+  // participant responses exactly once here.
+  const definition = situationDefinitionSchema.parse(definitionInput)
   const responses = normalizeResponses(inputResponses)
   const answered = validateResponses(definition, responses)
   const contributions = contributionByKey(definition)

@@ -18,13 +18,21 @@ const packages: SituationPackageV1[] = [
   SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
 ]
 
-const packageByKey = new Map(packages.map((situationPackage) => [`${situationPackage.key}:${situationPackage.instrumentVersion}`, situationPackage]))
+const packageIdentityKey = (key: string, instrumentVersion: string): string => JSON.stringify([key, instrumentVersion])
+const packageByKey = new Map(packages.map((situationPackage) => [
+  packageIdentityKey(situationPackage.key, situationPackage.instrumentVersion),
+  situationPackage,
+]))
 
-export const getSituationPackage = (key: string, instrumentVersion: string): SituationPackageV1 | undefined => packageByKey.get(`${key}:${instrumentVersion}`)
+export const getSituationPackage = (key: string, instrumentVersion: string): SituationPackageV1 | undefined => (
+  packageByKey.get(packageIdentityKey(key, instrumentVersion))
+)
 
 export const listSituationPackages = (): SituationPackageV1[] => [...packages]
 
-export const hasSituationPackage = (key: string, instrumentVersion: string): boolean => packageByKey.has(`${key}:${instrumentVersion}`)
+export const hasSituationPackage = (key: string, instrumentVersion: string): boolean => (
+  packageByKey.has(packageIdentityKey(key, instrumentVersion))
+)
 
 export interface SituationPackageValidation {
   valid: boolean

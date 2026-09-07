@@ -374,7 +374,12 @@ export const validateSituationDefinition = (
     })
   })
 
+  const metricOrderKeys = new Set<string>()
   definition.report.metricOrder.forEach((key, index) => {
+    if (metricOrderKeys.has(key)) {
+      issues.push({ path: `report.metricOrder.${index}`, message: `报告 metricOrder 不能重复：${key}`, severity: 'error' })
+    }
+    metricOrderKeys.add(key)
     if (!metricKeys.has(key)) issues.push({ path: `report.metricOrder.${index}`, message: `报告引用了不存在的 metric：${key}`, severity: 'error' })
   })
   definition.scoring.publishedMetrics.forEach((metric) => {

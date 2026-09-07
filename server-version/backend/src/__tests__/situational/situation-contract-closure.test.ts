@@ -65,10 +65,6 @@ describe('situational PR-A contract closure', () => {
     const definition = clone(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION)
     definition.scenes[1]!.channels[0]!.purpose = 'EMOTION'
     expect(errors(definition).join('|')).toContain('同一 metric 的通道 purpose 必须一致')
-    expect(() => scoreSituational(definition, [
-      { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
-      { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'A' },
-    ])).toThrow('情境化测评定义不合法')
     expect(() => compileSituationRuntime({
       instrumentKey: 'sjt-assertiveness-golden',
       instrumentVersion: '1.0.0',
@@ -114,6 +110,16 @@ describe('situational PR-A contract closure', () => {
     const omitted = clone(SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION)
     omitted.report.primaryMetricKeys = ['bfi2.anxiety.appraisal']
     expect(errors(omitted).join('|')).toContain('role=primary 的 metric 必须进入 report.primaryMetricKeys：bfi2.anxiety.emotion')
+  })
+
+  it('rejects duplicate report metric order entries', () => {
+    const definition = clone(SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION)
+    definition.report.metricOrder = [
+      'bfi2.anxiety.appraisal',
+      'bfi2.anxiety.appraisal',
+      'bfi2.anxiety.emotion',
+    ]
+    expect(errors(definition).join('|')).toContain('报告 metricOrder 不能重复：bfi2.anxiety.appraisal')
   })
 
   it('reports the theoretical range of a cross-scene mean, not the outer envelope', () => {
