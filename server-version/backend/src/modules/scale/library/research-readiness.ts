@@ -59,12 +59,18 @@ const isSatisfied = (rating: ScaleEvidenceRecord['rating']): boolean => (
   rating === 'SUFFICIENT' || rating === 'MIXED'
 )
 
-/** 按 SUFFICIENT > MIXED > 其余评级取最优记录；INSUFFICIENT/UNKNOWN 也要返回，供 gap 消息引用评级。 */
+/** 显式评级优先级：SUFFICIENT > MIXED > INSUFFICIENT > UNKNOWN，保证取证结果与输入顺序无关。 */
+const RATING_PREFERENCE: Record<ScaleEvidenceRecord['rating'], number> = {
+  SUFFICIENT: 0,
+  MIXED: 1,
+  INSUFFICIENT: 2,
+  UNKNOWN: 3,
+}
+
+/** 取该证据类型下评级最优的一条记录；INSUFFICIENT/UNKNOWN 也要返回，供 gap 消息引用评级。 */
 const bestEvidenceFor = (evidence: ScaleEvidenceRecord[], evidenceType: EvidenceType): ScaleEvidenceRecord | undefined => {
   const records = evidence.filter((record) => record.evidenceType === evidenceType)
-  return records.find((record) => record.rating === 'SUFFICIENT')
-    ?? records.find((record) => record.rating === 'MIXED')
-    ?? records[0]
+  return [...records].sort((left, right) => RATING_PREFERENCE[left.rating] - RATING_PREFERENCE[right.rating])[0]
 }
 
 export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInput): ResearchGradeReadinessDecision => {
