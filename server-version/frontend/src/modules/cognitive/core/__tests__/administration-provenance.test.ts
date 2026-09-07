@@ -29,6 +29,16 @@ describe('AdministrationProvenanceV1', () => {
     expect(tracker.snapshot().administrationMode).toBe(expected)
   })
 
+  it('keeps no-response/timeout semantics outside the modality tracker', () => {
+    const tracker = createAdministrationProvenanceTracker({ deviceClass: 'PHONE' })
+    // timeout/miss/omission means no observe() call.
+    expect(tracker.snapshot()).toEqual({
+      schemaVersion: 1,
+      deviceClass: 'PHONE',
+      administrationMode: 'UNKNOWN',
+    })
+  })
+
   it('restores an aggregate mode without inventing detailed history', () => {
     const tracker = createAdministrationProvenanceTracker({
       deviceClass: 'DESKTOP_LAPTOP',
