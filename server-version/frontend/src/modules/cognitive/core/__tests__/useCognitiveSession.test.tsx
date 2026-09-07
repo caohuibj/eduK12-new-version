@@ -86,4 +86,63 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
       expect.objectContaining({ status: 409 }),
     )
   })
+
+  it('does not abort FINAL when provenance metadata storage fails', async () => {
+    const finalSession: CognitiveSession = {
+      ...session,
+      sessionId: 'cognitive-session-final-provenance',
+      deliveryMode: 'FINAL_ONLY',
+      definitionHash: 'definition-1',
+      contextSnapshotHash: null,
+      attemptEpoch: 1,
+    }
+    const finalApi = {
+      ...api,
+      getSession: vi.fn().mockResolvedValue({ code: 0, message: 'ok', data: finalSession }),
+      submitFinal: vi.fn().mockResolvedValue({
+        code: 0,
+        message: 'ok',
+        data: {
+          result: {
+            metrics: {},
+            quality: { state: 'interpretable', flags: {}, reasons: [] },
+            qualityFlags: {},
+            report: {},
+            assessmentContext: null,
+          },
+        },
+      }),
+    }
+    const metadataSpy = vi.spyOn(finalDraftStore, 'setInstrumentMetadata')
+      .mockRejectedValue(new Error('IndexedDB quota exceeded'))
+
+    try {
+      const { result } = renderHook(() => useCognitiveSession(finalSession.sessionId, finalApi))
+
+      await waitFor(() => expect(result.current.state.status).toBe('READY'))
+      await act(async () => {
+        result.current.start()
+        await result.current.appendTrial({ correct: true, rtMs: 420 })
+        await result.current.complete({
+          schemaVersion: 1,
+          deviceClass: 'PHONE',
+          administrationMode: 'TOUCH',
+        })
+      })
+
+      await waitFor(() => expect(result.current.state.status).toBe('COMPLETED'))
+      expect(finalApi.submitFinal).toHaveBeenCalledWith(
+        finalSession.sessionId,
+        expect.objectContaining({
+          administrationProvenance: {
+            schemaVersion: 1,
+            deviceClass: 'PHONE',
+            administrationMode: 'TOUCH',
+          },
+        }),
+      )
+    } finally {
+      metadataSpy.mockRestore()
+    }
+  })
 })
