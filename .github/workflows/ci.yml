@@ -280,7 +280,10 @@ jobs:
           # cap the CodeQL JVM grows to "most of system memory" and gets
           # OOM-killed mid-analysis.
           ram: 3500
-          threads: 12
+          # 12 核机上 threads=12 会在阶段 2 与 frontend/docker 并行时吃满
+          # 全部 CPU，把 frontend 计时类测试饿到超时；8 是三路并行下实测
+          # 全绿的值。
+          threads: 8
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
         with:
