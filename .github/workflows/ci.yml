@@ -71,17 +71,16 @@ jobs:
           POSTGRES_DB: ptool
         ports:
           - 5432:5432
-        # CI 测试库是易失的，关掉崩溃安全换提交吞吐：每次 COMMIT 穿过
-        # Docker→VHDX 的 fsync 是 200 并发完成门（<10s SLA）的真实瓶颈，
-        # 独占整机实测 15.1s，关闭 fsync 后降至往返延迟主导。
+        # 保持与正式 release gate 相同的持久化语义（默认 durability），
+        # 串行执行已实测满足 200 并发完成门（<10s SLA）。
+        # services.postgres.options 是 docker create 参数：这里的 -c 会被
+        # docker 解析为 --cpu-shares（非法值，服务直接起不来）；要给 PG
+        # 传启动参数必须走 services.postgres.command。
         options: >-
           --health-cmd "pg_isready -U ptool -d ptool"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-          -c fsync=off
-          -c synchronous_commit=off
-          -c full_page_writes=off
       redis:
         image: redis:7-alpine
         ports:
@@ -125,7 +124,10 @@ jobs:
       - name: build (tsc)
         run: npm run build
       - name: full regression
-        run: npm test -- --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+        # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
+        # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
+        # 把 200 并发完成门从本地串行的 ~7.6s 放大到 ~15s（实测 FAIL）。
+        run: npm test -- --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
       - name: capture CI environment snapshot
         if: always()
         run: |-
