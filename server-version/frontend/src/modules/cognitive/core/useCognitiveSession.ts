@@ -329,9 +329,10 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         const storedProvenance = readCognitiveAdministrationProvenance(meta.instrumentMetadata)
         const finalProvenance = mergeAdministrationProvenance(storedProvenance, administrationProvenance)
         if (finalProvenance) {
-          meta = await finalDraftStore.setInstrumentMetadata(draftKey, {
+          const persistedMeta = await finalDraftStore.setInstrumentMetadata(draftKey, {
             [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: finalProvenance,
-          }) ?? meta
+          }).catch(() => null)
+          meta = persistedMeta ?? meta
         }
         const trials = await finalDraftStore.listTrials(draftKey)
         if (trials.length === 0) throw new Error('尚未记录任何认知试次')
