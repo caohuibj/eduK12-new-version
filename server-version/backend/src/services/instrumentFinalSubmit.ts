@@ -10,11 +10,13 @@ export type FinalSubmitErrorCode =
   | 'SUBMISSION_ID_INVALID'
   | 'DEFINITION_MISMATCH'
   | 'SUBMISSION_ALREADY_IN_PROGRESS'
+  | 'INSTRUMENT_NOT_AVAILABLE'
 
 export const FINAL_SUBMISSION_MAX_BYTES = {
   formSection: 512 * 1024,
   scale: 512 * 1024,
   cognitive: 1536 * 1024,
+  situational: 512 * 1024,
 } as const
 
 export class InstrumentFinalSubmitError extends Error {

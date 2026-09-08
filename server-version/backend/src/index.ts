@@ -32,6 +32,7 @@ import videoRoutes from './routes/videos'
 import teacherCodeRoutes from './routes/teacherCodes'
 import uploadRoutes from './routes/uploads'
 import scaleRoutes from './routes/scales'
+import situationalRoutes from './routes/situational'
 import questionnaireRoutes from './routes/questionnaires'
 import documentRoutes from './routes/documents'
 import publicRoutes from './routes/public'
@@ -207,6 +208,7 @@ app.use('/api/videos', videoRoutes)
 app.use('/api/teacher-codes', teacherCodeRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use('/api/scales', scaleRoutes)
+app.use('/api/situational', situationalRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/assets', assetRoutes)

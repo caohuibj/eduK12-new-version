@@ -38,6 +38,47 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
   packageByKey.has(packageIdentityKey(key, instrumentVersion))
 )
 
+/**
+ * Participant runtime admission is release-state aware. Development packages
+ * remain in the registry for validation and CI, but only PUBLISHED packages
+ * may be selected for a student-facing attempt.
+ */
+export const selectPublishedSituationPackage = (
+  availablePackages: readonly SituationPackageV1[],
+  key: string,
+  instrumentVersion?: string,
+): SituationPackageV1 | undefined => {
+  const candidates = availablePackages
+    .filter((candidate) => (
+      candidate.key === key
+      && candidate.releaseStatus === 'PUBLISHED'
+      && (instrumentVersion === undefined || candidate.instrumentVersion === instrumentVersion)
+    ))
+    .sort((left, right) => compareSituationalInstrumentVersions(right.instrumentVersion, left.instrumentVersion))
+  return candidates[0]
+}
+
+/** Compare numeric version segments without treating 1.0.10 as older than 1.0.2. */
+export const compareSituationalInstrumentVersions = (left: string, right: string): number => {
+  const leftParts = left.split(/[.-]/u)
+  const rightParts = right.split(/[.-]/u)
+  const length = Math.max(leftParts.length, rightParts.length)
+  for (let index = 0; index < length; index += 1) {
+    const leftPart = leftParts[index]
+    const rightPart = rightParts[index]
+    if (leftPart === undefined) return -1
+    if (rightPart === undefined) return 1
+    const leftNumber = /^\d+$/u.test(leftPart) ? Number(leftPart) : null
+    const rightNumber = /^\d+$/u.test(rightPart) ? Number(rightPart) : null
+    if (leftNumber !== null && rightNumber !== null && leftNumber !== rightNumber) {
+      return leftNumber - rightNumber
+    }
+    const comparison = leftPart.localeCompare(rightPart, 'en')
+    if (comparison !== 0) return comparison
+  }
+  return 0
+}
+
 export interface SituationPackageValidation {
   valid: boolean
   definitionHash: string
