@@ -5,9 +5,11 @@
 #   pull_request → main / stacked feature branches (incl. ready_for_review)
 #   Draft PRs skip heavy jobs until Ready for review
 #
-# 编排（单机 self-hosted，两阶段错峰避免资源竞争）：
-#   阶段 1  backend 独占（全机资源，DB bootstrap / 并发断言无干扰）
-#   阶段 2  frontend + docker + codeql 并行（非时序敏感型互挤，可接受）
+# 编排（双主机 self-hosted，两条 physical serial lane）：
+#   Mac lane:     backend → docker
+#   Windows lane: frontend → codeql
+#   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
+#   这是 CI 调度稳定性优化，不代表 production performance improvement。
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
@@ -42,7 +44,10 @@ jobs:
   backend:
     name: backend (ci + migrate + build + full regression)
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: [self-hosted, linux, eduk12-ci]
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -166,11 +171,13 @@ jobs:
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
-    # 阶段 2：backend 独占跑完后才启动，避免同机资源竞争把 backend 的
-    # DB bootstrap / 并发性能断言挤进超时临界区。backend 失败则跳过本 job。
-    needs: backend
+    # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
+    # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: [self-hosted, linux, eduk12-ci]
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-win-ci
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -198,11 +205,14 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # 阶段 2：镜像构建是持续 I/O 风暴，与 backend 的 PG fsync 正面对撞，
-    # 必须错开。backend 失败则跳过本 job。
+    # Mac lane 的第二个 job：仅在 backend 成功后启动；同一 dedicated runner
+    # 也保证 Docker 不会与 Backend 在同一物理主机重叠运行。
     needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: [self-hosted, linux, eduk12-ci]
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -258,11 +268,14 @@ jobs:
 
   codeql:
     name: codeql (javascript/typescript SAST)
-    # 阶段 2：analyze 阶段的 JVM（threads/内存）与 backend 的 CPU/内存
-    # 竞争剧烈，错开后在阶段 2 与 frontend/docker 并行。backend 失败则跳过本 job。
-    needs: backend
+    # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
+    # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
+    needs: frontend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: [self-hosted, linux, eduk12-ci]
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-win-ci
     permissions:
       actions: read
       contents: read
@@ -280,9 +293,8 @@ jobs:
           # cap the CodeQL JVM grows to "most of system memory" and gets
           # OOM-killed mid-analysis.
           ram: 3500
-          # 12 核机上 threads=12 会在阶段 2 与 frontend/docker 并行时吃满
-          # 全部 CPU，把 frontend 计时类测试饿到超时；8 是三路并行下实测
-          # 全绿的值。
+          # 保持当前已验证的 CodeQL 资源参数；本次只调整 lane 调度，不做
+          # CodeQL 性能调优。
           threads: 8
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
