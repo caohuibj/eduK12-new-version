@@ -71,7 +71,7 @@ describe('Research-grade readiness review (SL2-C5)', () => {
     expect(decision.gaps.some((gap) => gap.includes('TEST_RETEST'))).toBe(true)
   })
 
-  it('counts only SUFFICIENT required evidence and caps MIXED evidence at PARTIAL', () => {
+  it('counts only SUFFICIENT required evidence and keeps all-required MIXED at PARTIAL', () => {
     const mixedOnly = evaluateResearchGradeReadiness({
       intendedUses: ['RESEARCH'],
       deployment,
@@ -93,8 +93,20 @@ describe('Research-grade readiness review (SL2-C5)', () => {
         evidence({ evidenceId: 'e-internal', evidenceType: 'INTERNAL_CONSISTENCY', rating: 'SUFFICIENT' }),
       ],
     })
-    expect(sufficientWithMixed.status).toBe('PARTIAL')
+    expect(sufficientWithMixed.status).toBe('READY')
     expect(sufficientWithMixed.gaps.some((gap) => gap.includes('MIXED'))).toBe(true)
+
+    const optionalMixed = evaluateResearchGradeReadiness({
+      intendedUses: ['RESEARCH'],
+      deployment,
+      evidence: [
+        evidence({ evidenceId: 'e-structural', evidenceType: 'STRUCTURAL_VALIDITY' }),
+        evidence({ evidenceId: 'e-internal', evidenceType: 'INTERNAL_CONSISTENCY' }),
+        evidence({ evidenceId: 'e-content-caveat', evidenceType: 'CONTENT_VALIDITY', rating: 'MIXED' }),
+      ],
+    })
+    expect(optionalMixed.status).toBe('READY')
+    expect(optionalMixed.gaps.some((gap) => gap.includes('optional CONTENT_VALIDITY') && gap.includes('MIXED'))).toBe(true)
 
     const insufficient = evaluateResearchGradeReadiness({
       intendedUses: ['RESEARCH'],

@@ -115,7 +115,7 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
   const evidenceRefs = new Set<string>()
   let requiredTotal = 0
   let requiredSatisfied = 0
-  let hasMixedEvidence = false
+  let hasRequiredMixedEvidence = false
 
   const uniqueUses = [...new Set(input.intendedUses)]
   for (const use of uniqueUses) {
@@ -125,7 +125,7 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
       const record = bestEvidenceFor(input.evidence, evidenceType, input.deployment)
       const mixedRecords = mixedEvidenceFor(input.evidence, evidenceType, input.deployment)
       mixedRecords.forEach((mixedRecord) => evidenceRefs.add(mixedRecord.evidenceId))
-      if (mixedRecords.length > 0) hasMixedEvidence = true
+      if (mixedRecords.length > 0) hasRequiredMixedEvidence = true
       if (record && isSatisfied(record.rating)) {
         requiredSatisfied += 1
         evidenceRefs.add(record.evidenceId)
@@ -144,7 +144,6 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
       const mixedRecords = mixedEvidenceFor(input.evidence, evidenceType, input.deployment)
       mixedRecords.forEach((mixedRecord) => evidenceRefs.add(mixedRecord.evidenceId))
       if (mixedRecords.length > 0) {
-        hasMixedEvidence = true
         gaps.push(`[${use}] optional ${evidenceType}：存在 MIXED 证据，作为 caveat；不将其视为确定性支持`)
       }
       if (record && isSatisfied(record.rating)) {
@@ -155,9 +154,9 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
     }
   }
 
-  const status: ResearchReadinessStatus = requiredSatisfied === requiredTotal && !hasMixedEvidence
+  const status: ResearchReadinessStatus = requiredSatisfied === requiredTotal
     ? 'READY'
-    : requiredSatisfied > 0 || hasMixedEvidence ? 'PARTIAL' : 'NOT_ESTABLISHED'
+    : requiredSatisfied > 0 || hasRequiredMixedEvidence ? 'PARTIAL' : 'NOT_ESTABLISHED'
 
   return { status, strengths, gaps, evidenceRefs: [...evidenceRefs] }
 }
