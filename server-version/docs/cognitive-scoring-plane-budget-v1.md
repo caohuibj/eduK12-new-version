@@ -1,19 +1,19 @@
-# COG-P3 3.1–3.2.1：Scoring Plane、FINAL Budget 与 Exact Identity v1
+# COG-P3 Final Closure：Scoring Plane、FINAL Budget 与 Exact Identity v1
 
-状态：PR Draft · 3.1 ✅ · 3.2 ✅ · 3.2.1 ✅ · 3.3+ NOT STARTED
+状态：PR Ready for Review · 3.1 ✅ · 3.2 ✅ · 3.2.1 ✅ · 3.3 ✅（DEFERRED）· 3.4 ✅（PASS/NO-OP）· 3.5 ✅（DEFERRED）· 3.6 ✅ · 3.7 ✅
 
-本文档记录 COG-P3 的 Commit 3.1 inventory、3.2 bounded FINAL admission 与 3.2.1 exact identity hardening。3.2 增加冻结配置驱动的 trial admission；3.2.1 将 contract 绑定到 exact versioned RegistryEntry。两次提交均不改变 schema、scorer、数据库、canonical hash、COS、Reference、Bundle 或 PR #54 优化逻辑。
+本文档记录 COG-P3 的 Commit 3.1 inventory、3.2 bounded FINAL admission、3.2.1 exact identity hardening，以及 Final Closure 的 3.3–3.7 审计结论。3.2 增加冻结配置驱动的 trial admission；3.2.1 将 contract 绑定到 exact versioned RegistryEntry；3.3–3.5 仅做分析与消费者审计，没有发现需要修改生产代码的 correctness bug。COG-P3 不改变 schema、scorer、数据库、canonical hash、COS、Reference、Bundle 或 PR #54 优化逻辑。
 
 ## 1. 审计基线与结论
 
 - 仓库：caohuibj/eduK12-new-version
-- 基线：main 与 origin/main 均为 1ff8a745b90ffa21cefddef71a0779af446f5dc2
+- main 同步：`origin/main=cf4df886b7abf5abe78e96b804fecf58c975d065`；同步前 feature head=`5231b121adb31021a35404154802b86cb1f2a562`；以普通 merge 生成 `c8e739804f39c7fc7cd08ffd987f8f964c0d4379`，父提交为上述 feature head 与 `origin/main`。未 rebase、未改写历史。
 - COG-P2：PR #62 已以预期 head 154569fc... 合并，方式为 merge commit；merged_at=2026-09-08T07:18:52Z
 - Registry：24 个真实 task type，另有 fake framework task；v2 registry 展开为 28 个 definition（reaction、memory、stroop 各有 1.0/1.1 两个版本）
 - v2 audit：PASS；registryCount=28、publishedCount=9、draftCount=19、retiredCount=0；28 个 exact definition 均有合法 scorer 与 `finalSubmission.maxTrials` contract，无 issues
 - 当前 published v2 definition：reaction 1.1、memory 1.1、stroop 1.1、gonogo 1.0、cpt 1.0、nback 1.0、corsi 1.0、sst 1.0、taskswitch 1.0
 - 现有 definition 的 references 数组均为空；这只表示当前 scoring plane 没有接入 metric-specific reference/Bundle 映射，不表示研究参考资料不存在。当前报告消费 scorer 输出的 metrics，reference/report package 不是本次 raw trial payload 的清理对象。
-- 合并后工作区的 git diff --check 通过；本地 Compose 的 backend、worker、frontend、Postgres、Redis 均为可运行状态。
+- 合并后工作区的 git diff --check 通过；本地 Compose 的 backend、worker、frontend、Postgres、Redis 均为可运行状态。main 带入的 situational/scale、共享 runtime、migration 与 CI 变更保持原样；本阶段没有在这些范围上追加修改。
 
 PR #62 的代码等价 head 已由 #407 全绿验证（backend、frontend、Docker/security、CodeQL）；合并 SHA 的直接 commit-status/API 查询没有返回 PR-triggered status。末次只含报告变化的检查 #409 因 self-hosted runner 上 PostgreSQL 5432 已被占用而在测试前失败，属于 runner 基础设施问题，不是 COG-P2 代码回归。
 
@@ -274,27 +274,105 @@ fake 不是 24 个真实测量 task。其 schema 只有 correct、rtMs，Runner 
 
 历史兼容性只读检查：本地 Postgres 中 16 条已完成 `CognitiveRawSubmission`、20 个符合条件的 IN_PROGRESS session、21 个 PUBLISHED assignment 与 28 个 active/seeded config 均按 exact definition/frozen config 检查，incompatible=0。
 
-## 10. 本 Commit 的变更范围
+## 10. 3.3 Factorization feasibility（analysis-only）
 
-- 修改：server-version/docs/cognitive-scoring-plane-budget-v1.md；exact RegistryEntry/types、v2 TaskDefinition adapter、budget helper、publication gate、session snapshot freeze、trial normalizer、unified FINAL prepareRuntime
-- 新增/扩展测试：server-version/backend/src/__tests__/cognitive/final-submission-budget.test.ts、v2 registry exact-identity tests；instrument-final PostgreSQL integration、v2 contract fixture；删除 CRLF 敏感 administration provenance 源码文本断言
-- 未修改：production Runner、CognitiveTaskProps、useCognitiveSession、FINAL API/schema、trial envelope、compiled/frozen config shape、scorer、DB、canonical hash、COS、Reference、Bundle、PR #54 相关优化
-- 未执行：3.3+ cleanup/factorization、schema cleanup、scorer cleanup、数据库迁移、K6/capacity/load test、PR #67 merge/Ready for Review
+本节只评估把真正稳定的 identity 提升到一次性 `context` carrier 的收益，不改变当前 request/schema。测量使用现有 backend 的确定性 stimulus 生成器和 `canonicalJsonBytes`；baseline 是 `canonical({ trials: [...] })`，假设的 factored 形态是 `canonical({ context: {...}, trials: [...] })`。`gross` 是每个 trial 删除重复 key/value 的累计字节，`net` 已扣除一次性 context 的 canonical 开销。所有 response、RT、interrupt、phase 和 item-specific facts 均保留。
 
-## 11. 验证与 review gate
+| task | 标准 / 科研试次 | 3.1 文档 FINAL（标准 / 科研） | 本次重测：baseline → factored（标准 / 科研） | 只考虑的稳定 identity | gross / net 节省（标准 / 科研） | net 占本次重测 baseline |
+|---|---:|---:|---:|---|---:|---:|
+| Word List | 3 / 6 | 1,286 / 2,708 | 1,266 → 1,138 / 2,663 → 2,325 | `listId`、`stimulusSetVersion` | 210 / 128；420 / 338 bytes | 10.11% / 12.69% |
+| Lexical Decision | 100 / 200 | 43,088 / 86,388 | 42,824 → 32,936 / 85,734 → 65,846 | `stimulusVersion`、`pseudowordGeneratorVersion` | 10,000 / 9,888；20,000 / 19,888 bytes | 23.09% / 23.20% |
+| Emotion Recognition | 60 / 120 | 20,048 / 40,228 | 19,722 → 16,961 / 39,462 → 33,881 | `stimulusVersion` | 2,820 / 2,761；5,640 / 5,581 bytes | 14.00% / 14.14% |
 
-- backend TypeScript build：PASS
-- FINAL budget resolver + v2 contract/registry/draft tests：39/39 PASS；published golden：10/10 PASS
-- instrument-final PostgreSQL integration：12/12 PASS（认证/public over-limit、无 raw/trial 写入、replay/idempotency）
-- broader cognitive focused run：57 test files PASS、1 skipped；470 tests PASS、4 skipped；CRLF source-inspection assertions 已移除
-- cognitive:audit：PASS；28/28 exact identities 的 scorer 与 finalSubmission contract 通过验证，issues=[]
-- historical compatibility：16 completed raw submissions、20 in-progress sessions、21 published assignments、28 active configs checked，incompatible=0
-- synthetic schema parse + canonical byte measurement：24 个真实 task，标准/研究代表性场景；原始 measured bytes 未修改
-- git diff --check：通过
-- PR 状态：保持 Draft
+3.1 文档的 baseline 使用 field-complete synthetic payload；本次重测使用确定性实际 stimulus 序列和相同 envelope 结构，performance clock 样本的数字宽度不同，因此 baseline 会有少量差异。收益计算始终在同一组 payload/envelope 内比较，结论不依赖该时间字段差异。
+
+候选边界严格如下：Word List 保留 `responses`、`phase`、`responseDurationMs`、`interrupted`；Lexical Decision 保留 item-specific 的 `stimulusId`、`lexicality`、`wordLength`、`frequencyBand` 以及 response facts，不能把 `stimulusId` 因为可解析就视为可 factor；Emotion Recognition 保留 item-specific `stimulusId` 与 response facts。当前三个 schema 的版本/生成器 identity 才是候选。
+
+结论不是按一个人工百分比门槛决定：最大净收益是科研 Lexical Decision 的 19,888 bytes，而当前最大科研 representative FINAL 是 105,988 bytes，距离 1,572,864-byte canonical limit 仍有 1,466,876 bytes headroom。收益真实存在，但需要新的 context contract、旧版本 replay、audit 证明和 hash/导出兼容处理；当前压力不足以承担该语义变化。
+
+**3.3 ✅ DEFERRED — no production factorization。** Candidate identities remain documented for a later exact-replay design; no trial payload field was moved or deleted.
+
+## 11. 3.4 Raw / server-derived audit
+
+对 `server-version/backend/src/modules/cognitive/schemas/*.trial.ts` 做了 anchored property scan，并逐项读取 24 个真实 task schema：
+
+| 范围 | 数量 | D 类字段定义 |
+|---|---:|---:|
+| 真实测量 task trial schema | 24 | 0 |
+| `fake.trial.ts` framework schema | 1（排除） | `correct` 为测试字段，不代表真实测量 |
+
+`correct/score` 只在 memory/reaction/stroop 的注释中说明“由 scorer 推导”，没有成为真实 schema 属性。`hit/miss/accuracy/dPrime/slope/criterion/confusionMatrix` 以及类似结果字段在 24 个真实 trial schema 中均无定义；envelope 的 timing/quality flags 也不是 task result metric。由此不需要 raw schema cleanup，也不需要为了“去派生字段”修改生产代码。
+
+**3.4 ✅ PASS / NO-OP — no authoritative server-derived raw field found。**
+
+## 12. 3.5 Metric consumer audit
+
+审计范围包括 legacy single-task report、v2 report、research export/dictionary、composite report/export、Evidence Mapping、analysis package engine、Reference adapter 与 Bundle bridge。结论是：研究指标都在 scorer/result 下游，不是 raw trial payload；删除 result metric 会影响已存在的报告或未来冻结 package，而不是解决当前 FINAL payload 压力。
+
+| 指标 | 已确认消费者 | 分类 | 本阶段动作 |
+|---|---|---|---|
+| CPT `blockSlopeRt` / `blockSlopeOmission` | `cpt.v1.ts`；research profile 的 legacy report；research export | `RESEARCH_ONLY_CANDIDATE` | 保留，等待 P4/P5/P6 consumer evidence |
+| N-back `loadCostDPrime` | scorer；N-back product summary；Evidence Mapping supporting source；report/export | `KEEP_PRODUCT` + `KEEP_FUTURE_REFERENCE_BUNDLE` | 保留 |
+| Corsi `sequenceErrorDistance` | scorer；Evidence Mapping；package-analysis evidence builder；research report/export | `KEEP_FUTURE_REFERENCE_BUNDLE` | 保留 |
+| Task Switch `mixingCost` | scorer；research profile report；research export | `RESEARCH_ONLY_CANDIDATE` | 保留，等待下游证据 |
+| Word List `recallByRound` | scorer；research result/report/export | `RESEARCH_ONLY_CANDIDATE` | 保留，等待下游证据 |
+| Lexical Decision `accuracyByFrequencyBand` | scorer；result snapshot；research export | `RESEARCH_ONLY_CANDIDATE` | 保留，暂无删除依据 |
+| Emotion `accuracyByEmotion` / `confusionMatrix` | scorer；result snapshot；research export；完整 metrics 进入 Bundle bridge | `KEEP_QUALITY` + `KEEP_FUTURE_REFERENCE_BUNDLE` | 保留，不能把结构化诊断信息当作冗余字段 |
+
+具体边界：v2 `report.ts` 只投影 definition 明确声明的 headline/user/detail，`research_only` 不进入普通 participant surface；legacy report 按 profile 过滤；`export.service.ts` 的 `research` detail 保留所有 metrics；composite participant projector 会过滤 research-only，而 research projector 和 export 保留研究视图；Bundle bridge 复制完整 result metrics，analysis engine 按冻结 mapping/selectors 读取。当前所有 v2 definition 的 `references` 仍为空，不构成删除 scorer metric 的理由。
+
+**3.5 ✅ DEFERRED — await P4/P5/P6 consumer evidence。** 本阶段不删除 scorer metric、不改变 report/reference/Bundle/COS 语义。
+
+## 13. 3.6 Compatibility and validation
+
+- 合并后的 backend Docker build / TypeScript build：PASS。
+- 完整 cognitive + cognitive-analysis focused suite：57 个 test files PASS、1 个 skipped；470 个 tests PASS、4 个 skipped。唯一 skip 是已有 PostgreSQL concurrency file 的 4 个环境型用例。
+- FINAL budget tests：28/28 PASS；administration-provenance tests：3/3 PASS；published golden：10/10 PASS。
+- instrument-final PostgreSQL integration：12/12 PASS，**无 skip**；覆盖认证与 public 入口、1/5/10/100 trial、over-limit rejection、无 raw/trial 写入、replay/idempotency 与 query budget。
+- `cognitive:audit`：PASS；registryCount=28、published=9、draft=19、retired=0、issues=[]；28 个 exact identity 均有 scorer 与 `finalSubmission` contract。
+- 历史兼容性只读扫描：completed raw submissions 16、IN_PROGRESS `FINAL_ONLY + UNIFIED_V1` sessions 20、PUBLISHED assignments 21、DRAFT/PUBLISHED active configs 28；四类均 `incompatible=0`。
+- canonical hash/replay/legal payload semantics：保持原有 definitionHash/context hash、submissionId/attemptEpoch、raw persistence 与 scorer 输入形状；本阶段没有改动 canonical JSON、加密、DB schema 或 endpoint。
+- `git diff --check`：通过；两份用户本地未跟踪文档未被修改或 staged。
+
+**3.6 ✅**
+
+## 14. 3.7 Final characterization
+
+3.2/3.2.1 之后，FINAL admission 的决策顺序是：
+
+`exact versioned TaskDefinition / RegistryEntry` → `frozen validated config` → `task-derived maxTrials` → `global 1000 last-resort fallback`。
+
+代表性 contract 值为：reaction `20/60`、CPT `180/360`、N-back `100/360`、Trail Making `24/48`、Word List `3/6`、Lexical Decision `100/200`、Emotion Recognition `60/120`（标准 / 科研）；`patterncompare` 没有 protocol-defined count，保留 global `1000` fallback。完整 task/config 表仍以第 5 节为准。超过 global ceiling 的 scientific config 在 freeze gate 拒绝，不通过 `Math.min` 静默截断。
+
+热路径特征：已加载的 frozen snapshot 上做 exact definition lookup 和 bounded in-memory derivation；`input.trials.length` 在 per-trial Zod parse、canonicalization、hash、加密和 scorer 前 O(1) 拒绝。由 admission contract 引入的 DB SELECT/INSERT/UPDATE 增量为 0，network 增量为 0，Redis 增量为 0；配置数组受 schema 上限约束，派生为 bounded O(1)。集成测试确认超限请求不会写 raw/trial，合法请求仍沿用原有写入与 replay/idempotency 路径。
+
+payload 与法律语义没有变化：标准最大 representative FINAL 仍是 CPT `51,412` bytes；科研最大仍是 N-back `105,988` bytes；HTTP JSON parser 仍为 `2 MiB`；cognitive canonical limit 仍为 `1,572,864` bytes。没有新增 per-task byte ceiling，也没有把 representative measurement 当作任意 payload 的数学上限。
+
+**3.7 ✅**
+
+## 15. Final scope audit
+
+- 没有删除 trial payload 的 O/R 事实，没有 identity factorization，没有 scorer metric deletion。
+- 没有新增 COG-P3 DB schema/migration、endpoint、frontend Runner、canonical hash、COS、Reference、Bundle 或 PR #54 变更。普通 merge 带入的 main 自有 situational/scale/migration/CI 变更保持原样，本阶段未对其追加修改。
+- 没有进行 K6、capacity/load test、schema cleanup、scorer cleanup 或任何 opportunistic Scale/Situational 改动。
+- COG-P3 生产运行时最终仍是 exact-versioned admission + frozen-config bounded rejection；本 Final Closure 仅新增本审计文档。
+
+## 16. 本阶段变更范围
+
+- main 同步以普通 merge commit `c8e739804f39c7fc7cd08ffd987f8f964c0d4379` 完成；未 rebase、未改写历史。
+- COG-P3 Final Closure 的工作区生产变更为本文件的审计/验证记录；既有 3.2 与 3.2.1 代码提交保持不变。
+- 用户已有的 `docs/LOCAL-DEVELOPMENT-ENVIRONMENT.md` 与 `docs/~$CAL-DEVELOPMENT-ENVIRONMENT.md` 始终未跟踪、未修改、未 staged。
+
+## 17. Final review gate
+
+- PR #67：Ready for Review；保持 open，未执行 merge。
 - 3.1：✅
 - 3.2：✅
 - 3.2.1：✅
-- 3.3+：NOT STARTED
+- 3.3：✅ DEFERRED — no production factorization
+- 3.4：✅ PASS / NO-OP
+- 3.5：✅ DEFERRED — await P4/P5/P6 consumer evidence
+- 3.6：✅
+- 3.7：✅
 
 STOPPED — waiting for review
