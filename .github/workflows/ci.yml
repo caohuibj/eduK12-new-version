@@ -5,6 +5,10 @@
 #   pull_request → main / stacked feature branches (incl. ready_for_review)
 #   Draft PRs skip heavy jobs until Ready for review
 #
+# 编排（单机 self-hosted，两阶段错峰避免资源竞争）：
+#   阶段 1  backend 独占（全机资源，DB bootstrap / 并发断言无干扰）
+#   阶段 2  frontend + docker + codeql 并行（非时序敏感型互挤，可接受）
+#
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
@@ -67,6 +71,11 @@ jobs:
           POSTGRES_DB: ptool
         ports:
           - 5432:5432
+        # 保持与正式 release gate 相同的持久化语义（默认 durability），
+        # 串行执行已实测满足 200 并发完成门（<10s SLA）。
+        # services.postgres.options 是 docker create 参数：这里的 -c 会被
+        # docker 解析为 --cpu-shares（非法值，服务直接起不来）；要给 PG
+        # 传启动参数必须走 services.postgres.command。
         options: >-
           --health-cmd "pg_isready -U ptool -d ptool"
           --health-interval 5s
@@ -115,7 +124,29 @@ jobs:
       - name: build (tsc)
         run: npm run build
       - name: full regression
-        run: npm test -- --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+        # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
+        # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
+        # 把 200 并发完成门从本地串行的 ~7.6s 放大到 ~15s（实测 FAIL）。
+        run: npm test -- --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+      - name: capture CI environment snapshot
+        if: always()
+        run: |-
+          {
+            echo "node $(node -v)"
+            echo "cpus $(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo
+            df -h /tmp | tail -1
+            date -u +"timestamp %FT%TZ"
+          } > /tmp/eduk12-ci-env.txt
+      - name: upload vitest report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-vitest-report
+          path: |
+            /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-ci-env.txt
+          if-no-files-found: ignore
       - name: critical integration suites must not skip
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
@@ -135,6 +166,9 @@ jobs:
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
+    # 阶段 2：backend 独占跑完后才启动，避免同机资源竞争把 backend 的
+    # DB bootstrap / 并发性能断言挤进超时临界区。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: [self-hosted, linux, eduk12-ci]
     env:
@@ -164,6 +198,9 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
+    # 阶段 2：镜像构建是持续 I/O 风暴，与 backend 的 PG fsync 正面对撞，
+    # 必须错开。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: [self-hosted, linux, eduk12-ci]
     env:
@@ -189,6 +226,9 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
       - name: assert API/worker isolation topology
@@ -218,18 +258,32 @@ jobs:
 
   codeql:
     name: codeql (javascript/typescript SAST)
+    # 阶段 2：analyze 阶段的 JVM（threads/内存）与 backend 的 CPU/内存
+    # 竞争剧烈，错开后在阶段 2 与 frontend/docker 并行。backend 失败则跳过本 job。
+    needs: backend
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, eduk12-ci]
     permissions:
       actions: read
       contents: read
       security-events: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
+          # Runner unit cgroup caps memory at MemoryMax=5G; without an explicit
+          # cap the CodeQL JVM grows to "most of system memory" and gets
+          # OOM-killed mid-analysis.
+          ram: 3500
+          # 12 核机上 threads=12 会在阶段 2 与 frontend/docker 并行时吃满
+          # 全部 CPU，把 frontend 计时类测试饿到超时；8 是三路并行下实测
+          # 全绿的值。
+          threads: 8
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
         with:
