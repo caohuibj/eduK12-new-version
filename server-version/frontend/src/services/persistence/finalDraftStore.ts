@@ -12,6 +12,7 @@ export type FinalDraftInstrument =
   | 'cognitive'
   | 'questionnaire-form-section'
   | 'composite-form-section'
+  | 'situational'
 
 export type FinalDraftStatus =
   | 'DRAFT'
@@ -26,6 +27,10 @@ export interface FinalDraftMeta {
   attemptId: string
   attemptEpoch: number
   definitionHash: string
+  /** Frozen identity for standalone final-only runtimes. */
+  instrumentKey?: string
+  instrumentVersion?: string
+  compiledRuntimeHash?: string
   contextSnapshotHash: string | null
   deliveryMode: 'final_only'
   submissionId: string
@@ -145,6 +150,9 @@ const sameIdentity = (left: FinalDraftMeta, right: FinalDraftMeta) => (
   left.attemptId === right.attemptId
   && left.attemptEpoch === right.attemptEpoch
   && left.definitionHash === right.definitionHash
+  && left.instrumentKey === right.instrumentKey
+  && left.instrumentVersion === right.instrumentVersion
+  && left.compiledRuntimeHash === right.compiledRuntimeHash
   && left.contextSnapshotHash === right.contextSnapshotHash
   && left.instrument === right.instrument
   && left.deliveryMode === right.deliveryMode

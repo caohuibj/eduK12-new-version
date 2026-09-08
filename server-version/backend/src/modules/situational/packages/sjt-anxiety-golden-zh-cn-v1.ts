@@ -152,6 +152,7 @@ export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE = {
   key: 'sjt-anxiety-golden',
   instrumentVersion: '1.0.0',
   releaseStatus: 'DRAFT' as const,
+  scienceMaturity: 'PILOT' as const,
   definition: SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION,
   goldenCases: SJT_ANXIETY_GOLDEN_ZH_CN_V1_GOLDEN_CASES,
 }

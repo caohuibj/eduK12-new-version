@@ -153,7 +153,8 @@ export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCa
 export const SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE = {
   key: 'sjt-assertiveness-golden',
   instrumentVersion: '1.0.0',
-  releaseStatus: 'DRAFT' as const,
+  releaseStatus: 'PUBLISHED' as const,
+  scienceMaturity: 'PILOT' as const,
   definition: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION,
   goldenCases: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_GOLDEN_CASES,
 }

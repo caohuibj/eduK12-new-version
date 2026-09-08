@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck, Brain } from 'lucide-react'
+import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck, Brain, Sparkles } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from './Footer'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
@@ -20,6 +20,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   // active 对 /student/cognitive 子路由采用 prefix 策略，进入 Runner/Result 仍高亮。
   const navItems = [
     { path: '/student', icon: BookOpen, label: '课程' },
+    { path: '/student/situational', icon: Sparkles, label: '情境测评' },
     ...(cognitiveModuleEnabled
       ? [{ path: '/student/cognitive', icon: Brain, label: '认知测评' }]
       : []),
@@ -65,6 +66,8 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               const isActive =
                 item.path === '/student/cognitive'
                   ? location.pathname.startsWith('/student/cognitive')
+                  : item.path === '/student/situational'
+                    ? location.pathname.startsWith('/student/situational')
                   : location.pathname === item.path
               return (
                 <Link

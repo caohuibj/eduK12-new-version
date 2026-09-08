@@ -8,6 +8,7 @@ export interface SituationPackageV1 {
   key: string
   instrumentVersion: string
   releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
+  scienceMaturity: 'PILOT' | 'RESEARCH_GRADE'
   definition: SituationDefinitionV1
   goldenCases: SituationalGoldenCase[]
 }
