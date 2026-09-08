@@ -198,8 +198,27 @@ jobs:
         run: npm run lint
       - name: typecheck
         run: npm run typecheck
+      - name: capture frontend runner snapshot
+        run: |
+          echo "node $(node -v)"
+          echo "cpus $(nproc)"
+          cat /proc/loadavg
+          grep -E 'MemTotal|MemAvailable' /proc/meminfo
+          df -h /tmp | tail -1
+          if [ -f /proc/pressure/cpu ]; then
+            echo "--- cpu pressure ---"
+            cat /proc/pressure/cpu
+          fi
+          if [ -f /proc/pressure/memory ]; then
+            echo "--- memory pressure ---"
+            cat /proc/pressure/memory
+          fi
+          if [ -f /proc/pressure/io ]; then
+            echo "--- io pressure ---"
+            cat /proc/pressure/io
+          fi
       - name: full frontend tests
-        run: npm test
+        run: npm test -- --maxWorkers=4
       - name: build (vite)
         run: npm run build
 
@@ -256,6 +275,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          cache: 'false'
       - name: scan frontend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -265,6 +285,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          cache: 'false'
 
   codeql:
     name: codeql (javascript/typescript SAST)
