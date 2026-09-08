@@ -1,5 +1,6 @@
 import type { TaskDefinition, TrialEnvelope } from './types'
 import { parseTrialEnvelope } from './trial-envelope'
+import { COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS } from './final-submission-budget'
 
 /** Parse one untrusted envelope and its task payload exactly once. */
 export const validateAndNormalizeTrial = <TConfig, TTrial>(input: {
@@ -16,9 +17,12 @@ export const validateAndNormalizeTrials = <TConfig, TTrial>(input: {
   values: unknown[]
   maxTrials?: number
 }): TrialEnvelope<TTrial>[] => {
-  const maxTrials = input.maxTrials ?? 1000
-  if (input.values.length === 0 || input.values.length > maxTrials) {
+  const maxTrials = input.maxTrials ?? COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS
+  if (input.values.length === 0) {
     throw new Error('Trial count is outside the supported range')
+  }
+  if (input.values.length > maxTrials) {
+    throw new Error('submitted trial count exceeds frozen task limit')
   }
   return input.values.map((value) => validateAndNormalizeTrial({ definition: input.definition, value }))
 }

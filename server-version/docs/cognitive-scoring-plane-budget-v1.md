@@ -1,6 +1,6 @@
 # COG-P3 3.1：Scoring Plane 与 FINAL Payload Budget Inventory v1
 
-状态：PR Draft · 3.1 ✅ · 3.2 NOT STARTED
+状态：PR Draft · 3.1 ✅ · 3.2 ✅ · 3.3+ NOT STARTED
 
 本文档是 COG-P3 的 Commit 3.1，仅做当前 scoring plane、FINAL payload 与 trial budget 的事实盘点。本文不改变生产行为、schema、scorer、数据库、hash、COS、Reference、Bundle 或 PR #54 优化逻辑。
 
@@ -37,6 +37,7 @@ frozen session response
 2. v2 envelope 包含 schemaVersion=1、连续的 trialIndex、phase、可选 condition、performance timing、flags、最多 20 个 qualityEvents 与 task payload。服务端检查 index 从 0 连续、phase 已持久化、时间区间及 duration 一致性。
 3. FINAL schema 的公共 request 还包含 recoveryToken；服务端核心字段为 submissionId、attemptEpoch、definitionHash、可选 contextSnapshotHash、trials 与可选 administrationProvenance。trials 当前是 1..1000 个 unknown，具体形状再由 Registry 的 task schema 校验。
 4. unified-final-submit.service 在 scoring 前做 trial normalize、payload canonicalization、hash 与最终字节数检查；本盘点的 FINAL byte 使用与其无 provenance 分支一致的 canonical { trials: [...] } 形态。
+5. 当前已有两层 byte protection：HTTP JSON parser 为 `express.json({ limit: '2mb' })`，Cognitive canonical FINAL 为 `FINAL_SUBMISSION_MAX_BYTES.cognitive = 1,572,864` bytes。3.2 不改变这两个数值，不新增 route parser 或通用 payload middleware。
 
 ## 3. 事实分类口径
 
@@ -200,7 +201,8 @@ fake 不是 24 个真实测量 task。其 schema 只有 correct、rtMs，Runner 
 
 逐项结论：
 
-- 24 个真实 task 均至少包含 A 类或必须保留的 replay anchor；因此本 Commit 的 cleanup task 数为 0。
+- 24 个真实 task 均至少包含 A 类或必须保留的 replay anchor；因此 `Immediate safe semantic cleanup candidates = 0`。
+- B/C 类 replay-duplicate / identity-repeat candidates exist，但在没有 exact-replay proof 的情况下，没有任何候选足以支持 semantic deletion；因此 `safe immediate deletion = 0`，而 `potential future factorization candidates != 0`。
 - B 类覆盖 reaction、memory、stroop、gonogo、cpt、nback、corsi、sst、taskswitch、patterncompare、flanker、cardsort、digitbackward、picturesequence、pairedassociate、matrix、mentalrotation、reversallearning；它们的候选字段不能在没有 historical exact-replay fixtures 的情况下删除。
 - C 类覆盖 wordlist、lexicaldecision、emotionrecognition；候选方向是把稳定 identity 从每个 trial 提升为 session/phase-level context，而不是丢掉 identity。
 - D 类覆盖 patterncompare、tower、trailmaking、wordlist、pairedassociate，以及带 sequence/response arrays 的 memory/corsi/digitbackward；后续应先测 request-level byte worst case 和 early rejection。
@@ -238,17 +240,17 @@ fake 不是 24 个真实测量 task。其 schema 只有 correct、rtMs，Runner 
 | lexicaldecision | dPrime、lexicalityEffectMs、accuracyReal、accuracyPseudo | medianRtReal/Pseudo、omissionRate、validResponseCount；research：accuracyByFrequencyBand |
 | emotionrecognition | accuracy、balancedAccuracy | medianRtMs、omissionRate、validResponseCount；research：accuracyByEmotion/confusionMatrix |
 
-## 9. 3.2 的建议边界（仅建议，不在本 Commit 实施）
+## 9. 3.2 Bounded FINAL Admission 的设计边界
 
-3.2 应优先设计“按 definition/config/runtime 计算 maxTrials”的 contract，而不是把所有 task 继续视为同一种固定 count：
+3.2 已按“按 exact definition 与 validated frozen config 计算 maxTrials”的 contract 落地，而不是把所有 task 继续视为同一种固定 count：
 
 1. 保留当前 1000 作为 absolute safety ceiling，并在 deep parse、canonicalization、加密和 scorer 前做廉价的 array-length/phase/variable-trace guard。
 2. 对 fixed-count task 从 frozen config 取得 exact/maximum count；对 memory、corsi、digitbackward 使用 adaptive level formula；对 picturesequence、pairedassociate、wordlist 使用 phase-aware upper bound；对 patterncompare 使用 duration 与最大可接受 trial guard。
 3. 任何 per-task max 必须绑定 definitionHash、configVersion、engineVersion、scoringVersion 与 profile，不能把新版本规则 retroactively 应用于历史 submission。
 4. 先加拒绝路径与 exact replay fixtures，再讨论 B/C 类重复字段是否可从 trial envelope factor 到 session/phase context。原始 O 类、variable trace 与 adaptive state 不应因省字节而删除。
-5. 3.2 需覆盖 worst-case JSON bytes、provenance、recovery request 固定字段，以及 1000-array attack/oversized string；本次代表性 measurement 不替代这些测试。
+5. 本 Commit 保持既有 canonical byte guard、provenance/replay hash 分支和 request 固定字段不变；新增测试覆盖 1000-array count rejection 与现有 Cognitive byte budget 守护。代表性 measurement 不被当作 per-task byte ceiling。
 
-建议的后续抽象名称可为 maxTrialsForFinal(definition, frozenConfig, runtimeProfile)，但本 Commit 不新增该 API、不改 schema、不改 scorer。
+运行时使用 `finalSubmission.maxTrials(config)`；profile 不成为额外 runtime identity，因为 profile patch 已经进入 frozen config。本 Commit 不新增 DB 字段、profile max table、第二 registry、配置文件、schema、scorer 或 per-task byte ceiling。
 
 推荐优先级：
 
@@ -258,20 +260,39 @@ fake 不是 24 个真实测量 task。其 schema 只有 correct、rtMs，Runner 
   └─ 3.5 report/reference/Bundle consumer audit 后的 metric payload cleanup
        └─ 3.6/3.7 再做高风险 adaptive/exact-replay 与全面验证
 
+### 9.1 本 Commit 已实现的 admission contract
+
+- `TaskDefinition<TConfig, TTrial>` 增加纯函数 `finalSubmission.maxTrials(config)`；v2 registry 为现有 24 个真实 task 和 fake framework task 适配 version-scoped resolver。
+- fixed-count 使用冻结配置的 resolved `trialCount` / `totalTrials` / `itemCount` / `problemCount` / `balloonCount`；memory、corsi、digitbackward 使用 `trialsPerLevel × reachable levels`；picturesequence、pairedassociate、wordlist 使用 learning maximum 加 optional delayed maximum。
+- patterncompare 没有 protocol-defined count，保持 `1000` global fallback；不是根据“正常答题速度”猜上限。
+- `COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS = 1000` 仍是最后安全上限。派生值超过 1000 的科学配置在 `createSessionConfigSnapshot` freeze gate 以 400 拒绝，不用 `Math.min` 静默截断；当前有效 N-back research profile 为 360，合法 oversized fixture（80×5×3）为 1200 并在 freeze 阶段拒绝。3.1 记录的 N-back schema theoretical maximum 1440 保持不变。
+- unified `prepareRuntime` 从已加载 snapshot/config 解析 exact definition，先做 O(1) `input.trials.length` rejection，再进入 per-trial Zod parse、canonicalization、hash、byte guard 和 scorer；无新增 DB query、async 或 persistence path。
+- 超限沿用 `InstrumentFinalSubmitError` 的 `SUBMISSION_PAYLOAD_CONFLICT / 400` family，消息包含 `submitted trial count exceeds frozen task limit`。认证与 public recovery 入口均复用 unified service。
+- variable trace 的既有 schema/config bounds 保持不变；本 Commit 不删除 replay/identity 字段，不做 B/C factorization，不做语义 cleanup。
+- canonical payload/hash、submissionId/replay semantics、scorer、report、Reference、Bundle、COS、frontend 和 PR #54 均未改变；compiled runtime hash 也未因 admission contract 改变。
+
+历史兼容性只读检查：本地 Postgres 中 16 条已完成 `CognitiveRawSubmission` 全部按新 definition/frozen config 成功解析，`trialCount > newly-derived max` 为 0。
+
 ## 10. 本 Commit 的变更范围
 
-- 新增：server-version/docs/cognitive-scoring-plane-budget-v1.md
-- 未修改：production Runner、CognitiveTaskProps、useCognitiveSession、FINAL API/schema、trial envelope、unified final submit、registry、compiled/frozen config、scorer、DB、hash、COS、Reference、Bundle、PR #54 相关优化
-- 未执行：3.2 代码、schema cleanup、scorer cleanup、数据库迁移、全量 CI、capacity/load test
+- 修改：server-version/docs/cognitive-scoring-plane-budget-v1.md；v2 TaskDefinition/types、registry/publication gate、session snapshot freeze、trial normalizer、unified FINAL prepareRuntime
+- 新增测试：server-version/backend/src/__tests__/cognitive/final-submission-budget.test.ts；扩展 instrument-final PostgreSQL integration 与 v2 contract fixture
+- 未修改：production Runner、CognitiveTaskProps、useCognitiveSession、FINAL API/schema、trial envelope、compiled/frozen config shape、scorer、DB、canonical hash、COS、Reference、Bundle、PR #54 相关优化
+- 未执行：3.3+ cleanup/factorization、schema cleanup、scorer cleanup、数据库迁移、K6/capacity/load test、PR #67 merge/Ready for Review
 
 ## 11. 验证与 review gate
 
-- cognitive:audit：PASS
-- registry/scorer coverage：28/28，issues=[]
-- synthetic schema parse + canonical byte measurement：24 个真实 task，标准/研究代表性场景
+- backend TypeScript build：PASS
+- FINAL budget resolver + v2 contract/registry/draft tests：39/39 PASS；published golden：10/10 PASS
+- instrument-final PostgreSQL integration：12/12 PASS（认证/public over-limit、无 raw/trial 写入、replay/idempotency）
+- broader cognitive focused run：56 test files PASS、1 skipped；唯一剩余失败是 Windows working-tree CRLF 与既有 source-inspection 测试 LF 字面量断言不一致，非行为回归
+- cognitive:audit：PASS；registry/scorer coverage 28/28，issues=[]
+- historical compatibility：16/16 completed raw submissions checked，over-derived-max=0
+- synthetic schema parse + canonical byte measurement：24 个真实 task，标准/研究代表性场景；原始 measured bytes 未修改
 - git diff --check：通过
 - PR 状态：保持 Draft
 - 3.1：✅
-- 3.2–3.7：NOT STARTED
+- 3.2：✅
+- 3.3+：NOT STARTED
 
 STOPPED — waiting for review

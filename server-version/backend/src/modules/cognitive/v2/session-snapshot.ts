@@ -4,6 +4,11 @@ import type { ProtocolDefinition, SessionConfigSnapshot, TaskDefinition } from '
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from '../../assessment-runtime/canonical'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
 import { parseCompiledInstrumentRuntime } from '../../assessment-runtime/compiler'
+import {
+  CognitiveFinalSubmissionConfigError,
+  resolveCognitiveFinalMaxTrials,
+} from './final-submission-budget'
+import { BAD_REQUEST } from '../cognitive.errors'
 
 const protocolPhaseSchema = z.object({
   key: z.enum(['test', 'learning', 'delayed']),
@@ -58,6 +63,14 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   frozenAt?: Date
 }): SessionConfigSnapshot<TConfig> => {
   const validatedConfig = input.definition.configSchema.parse(input.config)
+  try {
+    resolveCognitiveFinalMaxTrials(input.definition, validatedConfig)
+  } catch (error) {
+    if (error instanceof CognitiveFinalSubmissionConfigError) {
+      throw BAD_REQUEST('该认知任务配置超过最终提交试次数上限，请调整配置后再发布')
+    }
+    throw error
+  }
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid session snapshot frozenAt')
   const snapshot: SessionConfigSnapshot<TConfig> = {

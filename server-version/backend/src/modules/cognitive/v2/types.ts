@@ -173,6 +173,11 @@ export type AuthoritativeScorer<TConfig, TTrial> = (
   input: AuthoritativeScorerInput<TConfig, TTrial>,
 ) => CognitiveScoreResult
 
+export interface FinalSubmissionDefinition<TConfig> {
+  /** Pure, deterministic upper bound for accepted FINAL trial envelopes. */
+  maxTrials(config: TConfig): number
+}
+
 export interface ReferenceApplicability {
   metricKey: string
   referenceVersion: string
@@ -218,6 +223,7 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   trialSchema: ZodType<TTrial>
   protocol: ProtocolDefinition
   scorer: AuthoritativeScorer<TConfig, TTrial>
+  finalSubmission: FinalSubmissionDefinition<TConfig>
   profiles: Record<CognitiveProfile, {
     estimatedMinutes: [number, number]
     configPatch: Record<string, unknown>

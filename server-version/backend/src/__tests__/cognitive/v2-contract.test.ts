@@ -46,6 +46,9 @@ const definition = (): TaskDefinition<{ trialCount: number }, { correct: boolean
     }),
     audit: { trialCount: trials.length, scorerVersion: '1.0.0' },
   }),
+  finalSubmission: {
+    maxTrials: (config) => config.trialCount,
+  },
   profiles: {
     experience: { estimatedMinutes: [1, 1], configPatch: {}, reportCaveats: [] },
     standard: { estimatedMinutes: [2, 3], configPatch: {}, reportCaveats: [] },
