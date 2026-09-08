@@ -16,6 +16,7 @@ import {
   resolveScaleDeviceInputProvenance,
   type DeviceInputProvenanceV1,
 } from '../../modules/scale/device-input-provenance'
+import { elapsedScaleResponseTimeMs, readScaleTimingNow } from '../../modules/scale/response-timing'
 
 type ResponseValue = string | number
 
@@ -89,7 +90,7 @@ const ScaleAssessment: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
-  const itemStartTimeRef = useRef<number>(Date.now())
+  const itemStartTimeRef = useRef<number>(readScaleTimingNow())
   const scaleDeviceInputProvenanceRef = useRef<DeviceInputProvenanceV1 | null>(null)
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
@@ -141,7 +142,7 @@ const ScaleAssessment: React.FC = () => {
   useCheckpointLifecycle(flushScaleCheckpoints, Boolean(assessment) && assessment?.deliveryMode !== 'FINAL_ONLY')
 
   useEffect(() => {
-    itemStartTimeRef.current = Date.now()
+    itemStartTimeRef.current = readScaleTimingNow()
   }, [currentIndex])
 
   useEffect(() => {
@@ -236,7 +237,7 @@ const ScaleAssessment: React.FC = () => {
     const itemIndex = currentIndex
     const item = items[itemIndex]
     if (!item) return
-    const responseTimeMs = Date.now() - itemStartTimeRef.current
+    const responseTimeMs = elapsedScaleResponseTimeMs(itemStartTimeRef.current, readScaleTimingNow())
     try {
       await runSave(async () => {
         if (assessment.deliveryMode === 'FINAL_ONLY') {
