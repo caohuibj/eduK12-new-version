@@ -89,8 +89,16 @@ export const absoluteFallbackFinalSubmission = <TConfig = unknown>(): FinalSubmi
  * criteria. The exact Cognitive RegistryEntry owns the resulting instance;
  * this module does not select a contract by task type.
  */
+export type CognitiveFinalSubmissionConfigErrorCode =
+  | 'MISSING_CONTRACT'
+  | 'INVALID_DERIVED_MAX'
+  | 'EXCEEDS_ABSOLUTE_LIMIT'
+
 export class CognitiveFinalSubmissionConfigError extends Error {
-  constructor(message: string) {
+  constructor(
+    public readonly code: CognitiveFinalSubmissionConfigErrorCode,
+    message: string,
+  ) {
     super(message)
     this.name = 'CognitiveFinalSubmissionConfigError'
   }
@@ -101,11 +109,17 @@ export const deriveCognitiveFinalSubmissionMaxTrials = <TConfig>(
   config: TConfig,
 ): number => {
   if (!finalSubmission || typeof finalSubmission.maxTrials !== 'function') {
-    throw new CognitiveFinalSubmissionConfigError('No Cognitive FINAL budget contract is attached to the task definition')
+    throw new CognitiveFinalSubmissionConfigError(
+      'MISSING_CONTRACT',
+      'No Cognitive FINAL budget contract is attached to the task definition',
+    )
   }
   const derived = finalSubmission.maxTrials(config)
   if (!Number.isSafeInteger(derived) || derived < 1) {
-    throw new CognitiveFinalSubmissionConfigError('Cognitive FINAL budget must be a positive integer')
+    throw new CognitiveFinalSubmissionConfigError(
+      'INVALID_DERIVED_MAX',
+      'Cognitive FINAL budget must be a positive integer',
+    )
   }
   return derived
 }
@@ -122,6 +136,7 @@ export const resolveCognitiveFinalMaxTrials = <TConfig>(
   const derived = deriveCognitiveFinalSubmissionMaxTrials(definition.finalSubmission, config)
   if (derived > COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS) {
     throw new CognitiveFinalSubmissionConfigError(
+      'EXCEEDS_ABSOLUTE_LIMIT',
       'Frozen Cognitive task configuration exceeds the global FINAL trial limit',
     )
   }

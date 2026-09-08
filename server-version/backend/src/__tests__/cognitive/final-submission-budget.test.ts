@@ -95,6 +95,39 @@ describe('Cognitive FINAL submission budget', () => {
     throw new Error('expected oversized N-back configuration to be rejected')
   })
 
+  it('uses a generic snapshot error for non-limit budget contract failures', () => {
+    const { definition } = definitionFor('fake')
+    const missingContractDefinition = {
+      ...definition,
+      finalSubmission: undefined,
+    } as unknown as typeof definition
+    expect(() => createSessionConfigSnapshot({
+      definition: missingContractDefinition,
+      configVersion: 'missing-contract-test-only',
+      config: definition.configSchema.parse({
+        trialCount: 3,
+        trialDurationMs: 1000,
+        allowPractice: false,
+        maxRtMs: 60000,
+      }),
+    })).toThrowError('该认知任务配置无法满足最终提交试次预算，请检查配置后再发布')
+
+    const invalidBudgetDefinition = {
+      ...definition,
+      finalSubmission: { maxTrials: () => 0 },
+    } as unknown as typeof definition
+    expect(() => createSessionConfigSnapshot({
+      definition: invalidBudgetDefinition,
+      configVersion: 'invalid-budget-test-only',
+      config: definition.configSchema.parse({
+        trialCount: 3,
+        trialDurationMs: 1000,
+        allowPractice: false,
+        maxRtMs: 60000,
+      }),
+    })).toThrowError('该认知任务配置无法满足最终提交试次预算，请检查配置后再发布')
+  })
+
   it('accepts a fixed-count maximum and rejects max plus one before per-trial schema parsing', () => {
     const { definition } = definitionFor('fake')
     const trial = (trialIndex: number) => createTrialEnvelope({
@@ -119,7 +152,7 @@ describe('Cognitive FINAL submission budget', () => {
         { ...trial(3), payload: { correct: 'not-a-boolean' } },
       ],
       maxTrials: 3,
-    })).toThrow('submitted trial count exceeds frozen task limit')
+    })).toThrow('submitted trial count exceeds maximum allowed trial count (3)')
   })
 
   it('keeps the 1000-trial absolute ceiling and accepts early-stopped adaptive submissions', () => {
@@ -136,7 +169,7 @@ describe('Cognitive FINAL submission budget', () => {
     expect(() => validateAndNormalizeTrials({
       definition: patternCompare,
       values: Array.from({ length: COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS + 1 }, () => null),
-    })).toThrow('submitted trial count exceeds frozen task limit')
+    })).toThrow('submitted trial count exceeds maximum allowed trial count (1000)')
 
     const { seed, definition } = definitionFor('memory')
     const config = definition.configSchema.parse({

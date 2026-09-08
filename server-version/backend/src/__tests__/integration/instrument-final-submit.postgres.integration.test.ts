@@ -702,8 +702,8 @@ suite('instrument final submit (real PostgreSQL)', () => {
       'SUBMISSION_PAYLOAD_CONFLICT',
     ))
 
-    expect(authenticated.value.message).toContain('submitted trial count exceeds frozen task limit')
-    expect(publicSubmission.value.message).toContain('submitted trial count exceeds frozen task limit')
+    expect(authenticated.value.message).toContain('submitted trial count exceeds maximum allowed trial count (3)')
+    expect(publicSubmission.value.message).toContain('submitted trial count exceeds maximum allowed trial count (3)')
     expect(authenticated.value.message).toBe(publicSubmission.value.message)
     for (const observed of [authenticated, publicSubmission]) {
       const unexpectedMutations = observed.calls.filter((call) => (

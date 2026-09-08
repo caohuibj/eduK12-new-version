@@ -22,7 +22,7 @@ export const validateAndNormalizeTrials = <TConfig, TTrial>(input: {
     throw new Error('Trial count is outside the supported range')
   }
   if (input.values.length > maxTrials) {
-    throw new Error('submitted trial count exceeds frozen task limit')
+    throw new Error(`submitted trial count exceeds maximum allowed trial count (${maxTrials})`)
   }
   return input.values.map((value) => validateAndNormalizeTrial({ definition: input.definition, value }))
 }

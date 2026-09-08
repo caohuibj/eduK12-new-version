@@ -67,7 +67,11 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
     resolveCognitiveFinalMaxTrials(input.definition, validatedConfig)
   } catch (error) {
     if (error instanceof CognitiveFinalSubmissionConfigError) {
-      throw BAD_REQUEST('该认知任务配置超过最终提交试次数上限，请调整配置后再发布')
+      throw BAD_REQUEST(
+        error.code === 'EXCEEDS_ABSOLUTE_LIMIT'
+          ? '该认知任务配置超过最终提交试次数上限，请调整配置后再发布'
+          : '该认知任务配置无法满足最终提交试次预算，请检查配置后再发布',
+      )
     }
     throw error
   }
