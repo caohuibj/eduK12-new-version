@@ -45,6 +45,7 @@ const SituationalRunner: React.FC = () => {
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const sceneStartedAt = useRef(Date.now())
+  const submittingRef = useRef(false)
 
   useEffect(() => {
     sceneStartedAt.current = Date.now()
@@ -130,15 +131,19 @@ const SituationalRunner: React.FC = () => {
   }
 
   const submit = async () => {
-    if (!data || submitting || saving) return
+    if (!data || submitting || submittingRef.current || saving) return
     const missingIndex = firstMissingSceneIndex(data.instrument.definition, responses)
     if (missingIndex >= 0) {
       setCurrentIndex(missingIndex)
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
+    // Lock before the first await so two clicks in the same event turn cannot
+    // both pass the guard while the draft metadata is being read.
+    submittingRef.current = true
     const meta = await finalDraftStore.get(situationalDraftKey(data.attempt.id))
     if (!meta) {
+      submittingRef.current = false
       setNotice('本地作答草稿不存在，请返回后重新进入测评。')
       return
     }
@@ -170,6 +175,7 @@ const SituationalRunner: React.FC = () => {
       const recovered = await recoverTerminalResult()
       if (!recovered) setNotice(situationalErrorMessage(reason))
     } finally {
+      submittingRef.current = false
       setSubmitting(false)
     }
   }

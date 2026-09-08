@@ -2,18 +2,44 @@
 // Uses the repository's existing Playwright runner: login → published text
 // instrument → local draft/resume surface → one final submit → stored result →
 // refresh/history/export, with a mobile layout smoke.
-const { chromium } = require('playwright')
+const fs = require('fs')
+const { chromium } = require('../backend/node_modules/playwright-core')
 
 const BASE = process.env.SITUATIONAL_E2E_BASE_URL || 'http://localhost'
 const SHOT_DIR = process.env.SITUATIONAL_E2E_SHOT_DIR || '/tmp/situational-text-pilot-e2e'
 const USER = process.env.SITUATIONAL_E2E_USER || 'e2estudent'
 const PASS = process.env.SITUATIONAL_E2E_PASS || 'e2e123456'
 
-const fs = require('fs')
+const configuredBrowserExecutable = process.env.SITUATIONAL_E2E_BROWSER_EXECUTABLE
+const browserCandidates = configuredBrowserExecutable
+  ? [configuredBrowserExecutable]
+  : [
+      chromium.executablePath(),
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser',
+    ]
+const browserExecutable = browserCandidates.find((candidate) => fs.existsSync(candidate))
+
 fs.mkdirSync(SHOT_DIR, { recursive: true })
 
 const results = []
 const record = (name, ok, detail = '') => results.push({ name, ok, detail })
+
+async function chooseFirstRadio(page) {
+  const radio = page.locator('input[type="radio"]').first()
+  await radio.locator('xpath=..').click()
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (await radio.isChecked()) return
+    await page.waitForTimeout(50)
+  }
+  throw new Error('first radio did not become checked')
+}
 
 async function studentLogin(page) {
   await page.goto(`${BASE}/student/login`)
@@ -24,7 +50,10 @@ async function studentLogin(page) {
 }
 
 async function main() {
-  const browser = await chromium.launch()
+  if (!browserExecutable) {
+    throw new Error(`Browser executable not found; checked: ${browserCandidates.join(', ')}`)
+  }
+  const browser = await chromium.launch({ headless: true, executablePath: browserExecutable })
   try {
     const desktop = await browser.newContext({ viewport: { width: 1280, height: 800 }, acceptDownloads: true })
     const page = await desktop.newPage()
@@ -43,12 +72,21 @@ async function main() {
     record('runner-loaded', (await page.getByText(/情境 1 \/ /).count()) > 0)
     await page.screenshot({ path: `${SHOT_DIR}/02-runner.png` })
 
+    // Verify the first raw answer survives a page reload against the same
+    // server-owned in-progress attempt before completing the happy path.
+    await chooseFirstRadio(page)
+    await page.getByText(/已完成 1 \/ 2 个通道/).waitFor()
+    await page.reload()
+    await page.getByText('文字情境测评').waitFor()
+    await page.getByRole('button', { name: /情境 1/ }).click()
+    await page.getByText(/情境 1 \/ /).waitFor()
+    record('partial-reload-resume', await page.locator('input[type="radio"]').first().isChecked())
+
     // The published golden pilot currently has two SINGLE_CHOICE scenes. The
     // runner itself is data-driven and the component suite covers CONTINUOUS.
-    await page.locator('input[type="radio"]').first().check()
     await page.getByRole('button', { name: '下一题' }).click()
     await page.getByText(/情境 2 \/ /).waitFor()
-    await page.locator('input[type="radio"]').first().check()
+    await chooseFirstRadio(page)
     record('raw-answers-and-navigation', true)
 
     await page.getByRole('button', { name: '提交测评' }).click()
