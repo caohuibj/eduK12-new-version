@@ -251,9 +251,13 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
     src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts \
     src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts \
     src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
     src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
-    src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
+    src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
+    src/__tests__/hotpath/query-budget.postgres.integration.test.ts
 
   run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
   run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint
