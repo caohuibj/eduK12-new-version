@@ -295,15 +295,15 @@ export const compileSituationRuntime = (input: {
       allowedReferenceClassifications: [],
     },
     referenceBindingDefinition: { required: false, selections: [] },
-    // Staged capabilities: only what the unified runtime supports TODAY.
-    // The PR that lands each path (standalone submit → PR-B, composite/
-    // aggregate → PR-D) flips the corresponding flag — never ahead of code.
+    // PR-B enables the standalone pilot only. Embedded delivery, aggregate
+    // projection and collection facts remain explicit non-capabilities until
+    // their own runtime paths are implemented.
     runtimeCapabilities: {
-      standalone: false,
+      standalone: true,
       embedded: false,
       aggregateEligible: false,
       collectionFacts: false,
-      supported: false,
+      supported: true,
     },
   }
   return completeRuntime(base)

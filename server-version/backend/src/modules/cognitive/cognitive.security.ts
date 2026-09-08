@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto'
 import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encryption'
+import { getParticipantKey as getSharedParticipantKey } from '../assessment-runtime/participant-key'
 
 /**
  * Cognitive 域专用安全助手。
@@ -16,8 +17,6 @@ import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encrypt
 const ENVELOPE_VERSION = 1
 const INTEGRITY_DOMAIN = 'cognitive-trial-integrity-v1'
 
-let cachedPseudonymKeySource: string | undefined
-let cachedPseudonymKey: Buffer | undefined
 let cachedIntegrityKeySource: string | undefined
 let cachedIntegrityKey: Buffer | undefined
 
@@ -29,17 +28,6 @@ export interface CognitiveEnvelope<T> {
 // ---------------------------------------------------------------------------
 // Key accessors
 // ---------------------------------------------------------------------------
-
-const getPseudonymKey = (): Buffer => {
-  const key = process.env.DATA_PSEUDONYM_KEY
-  if (!key || !HEX_32_BYTE_KEY.test(key)) {
-    throw new Error('DATA_PSEUDONYM_KEY must be exactly 64 hex characters (32 bytes)')
-  }
-  if (cachedPseudonymKeySource === key && cachedPseudonymKey) return cachedPseudonymKey
-  cachedPseudonymKeySource = key
-  cachedPseudonymKey = Buffer.from(key, 'hex')
-  return cachedPseudonymKey
-}
 
 // 从 DATA_ENCRYPTION_KEY 派生 trial 完整性密钥（domain separation），不新增环境变量。
 const getIntegrityKey = (): Buffer => {
@@ -99,10 +87,7 @@ export const decryptCognitivePayload = <T>(field: string): T => {
 // ---------------------------------------------------------------------------
 
 export const getParticipantKey = (userId: string): string => {
-  if (!userId) throw new Error('userId is required for participantKey')
-  return createHmac('sha256', getPseudonymKey())
-    .update(userId)
-    .digest('hex')
+  return getSharedParticipantKey(userId)
 }
 
 // ---------------------------------------------------------------------------

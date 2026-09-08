@@ -28,14 +28,14 @@ describe('compileSituationRuntime', () => {
     expect(runtime.aggregateProjection.allowedFactKeys).toEqual(['quality.status', 'quality.flag.*'])
     expect(runtime.aggregateProjection.allowedReferenceClassifications).toEqual([])
     expect(runtime.referenceBindingDefinition).toEqual({ required: false, selections: [] })
-    // Staged capabilities: PR-A has no standalone submit / composite / aggregate
-    // path yet, so the compiled contract must not claim them.
+    // PR-B enables the standalone pilot only; embedded and aggregate paths
+    // remain explicitly unavailable.
     expect(runtime.runtimeCapabilities).toEqual({
-      standalone: false,
+      standalone: true,
       embedded: false,
       aggregateEligible: false,
       collectionFacts: false,
-      supported: false,
+      supported: true,
     })
     expect(runtime.compiledRuntimeHash).toMatch(/^[0-9a-f]{64}$/)
   })

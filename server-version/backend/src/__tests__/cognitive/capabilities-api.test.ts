@@ -17,7 +17,16 @@ describe('runtime capability API', () => {
     expect(res.json).toHaveBeenCalledWith({
       code: 0,
       message: '操作成功',
-      data: { cognitive: true },
+      data: {
+        cognitive: true,
+        situational: {
+          standalone: true,
+          supported: true,
+          embedded: false,
+          aggregateEligible: false,
+          collectionFacts: false,
+        },
+      },
     })
   })
 })

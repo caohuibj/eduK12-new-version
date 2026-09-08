@@ -49,6 +49,11 @@ export interface SituationalResultV1 {
   quality: SituationalQuality
 }
 
+export interface SituationalScoringOptions {
+  /** Internal FINAL-only path: response validation has already completed. */
+  responsesValidated?: boolean
+}
+
 export interface SituationalResponseIssue {
   path: string
   message: string
@@ -196,6 +201,7 @@ const rangeFor = (definition: SituationDefinitionV1, expectedResponses: string[]
 export const scoreSituational = (
   definitionInput: SituationDefinitionV1,
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
+  options: SituationalScoringOptions = {},
 ): SituationalResultV1 => {
   // The frozen definition is trusted runtime input: publication/compile gates
   // own cross-field validation. Keep FINAL scoring free of duplicate governance
@@ -203,7 +209,9 @@ export const scoreSituational = (
   // participant responses exactly once here.
   const definition = situationDefinitionSchema.parse(definitionInput)
   const responses = normalizeResponses(inputResponses)
-  const answered = validateResponses(definition, responses)
+  const answered = options.responsesValidated
+    ? new Map(responses.map((response) => [responseKey(response.sceneKey, response.channelKey), response]))
+    : validateResponses(definition, responses)
   const contributions = contributionByKey(definition)
   // Continuous vs choice is dispatched by the channel's responseType, never by
   // its channelKey or purpose: the schema deliberately allows any combination.
