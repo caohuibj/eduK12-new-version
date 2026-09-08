@@ -143,15 +143,6 @@ jobs:
             df -h /tmp | tail -1
             date -u +"timestamp %FT%TZ"
           } > /tmp/eduk12-ci-env.txt
-      - name: upload vitest report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-vitest-report
-          path: |
-            /tmp/eduk12-backend-vitest.json
-            /tmp/eduk12-ci-env.txt
-          if-no-files-found: ignore
       - name: critical integration suites must not skip
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
@@ -168,6 +159,16 @@ jobs:
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
           src/__tests__/hotpath/query-budget.postgres.integration.test.ts
+      - name: upload vitest report artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-vitest-report
+          path: |
+            /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-ci-env.txt
+          if-no-files-found: ignore
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
@@ -256,6 +257,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          cache: 'false'
       - name: scan frontend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -265,6 +267,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          cache: 'false'
 
   codeql:
     name: codeql (javascript/typescript SAST)

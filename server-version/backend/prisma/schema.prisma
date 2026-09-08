@@ -51,6 +51,9 @@ model User {
   createdClassrooms                   Classroom[]                      @relation("ClassroomCreator")
   // 认知测评模块关联（userId 删除时 Session 保留，userId 置空 -> SetNull）
   cognitiveSessions                   CognitiveSession[]               @relation("SessionUser")
+  // Situational PR-B standalone attempts keep a stable participant pseudonym
+  // and remain readable as historical rows if the User is removed.
+  situationalAttempts                SituationalAttempt[]              @relation("SituationalAttemptUser")
   createdCognitiveAssignments         CognitiveAssignment[]            @relation("AssignmentCreator")
   // 综合测评模块关联
   createdCompositeAssessments         CompositeAssessment[]            @relation("CompositeAssessmentCreator")
@@ -1614,6 +1617,67 @@ model AssessmentUnitSnapshot {
   @@index([questionnaireAssessmentId, attemptEpoch, terminalState], map: "assessment_unit_snapshots_questionnaire_terminal_idx")
   @@index([compositeAttemptId, attemptEpoch, terminalState], map: "assessment_unit_snapshots_composite_terminal_idx")
   @@map("assessment_unit_snapshots")
+}
+
+// Standalone Situational PR-B attempt. This is intentionally independent from
+// Assessment/Questionnaire/Composite: a Situational pilot is one UNIT with no
+// parent slot and must not be represented as a fake Scale row.
+model SituationalAttempt {
+  id                     String                 @id @default(uuid())
+  userId                 String?                @map("user_id")
+  participantKey         String                 @map("participant_key")
+  instrumentKey          String                 @map("instrument_key")
+  instrumentVersion      String                 @map("instrument_version")
+  attemptNo              Int                    @default(1) @map("attempt_no")
+  status                 AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode           InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration      RuntimeGeneration     @default(UNIFIED_V1) @map("runtime_generation")
+  attemptEpoch           Int                    @default(1) @map("attempt_epoch")
+  definitionHash         String                 @map("definition_hash")
+  compiledRuntimeHash    String                 @map("compiled_runtime_hash")
+  scorerKey              String                 @map("scorer_key")
+  scoringVersion         String                 @map("scoring_version")
+  frozenAt               DateTime               @map("frozen_at")
+  runtimeSnapshotEncrypted String               @map("runtime_snapshot_encrypted")
+  submissionId           String?                @unique @map("submission_id")
+  submissionPayloadHash  String?                @map("submission_payload_hash")
+  submittedAt            DateTime?              @map("submitted_at")
+  progress               Int                    @default(0)
+  startedAt              DateTime               @default(now()) @map("started_at")
+  completedAt            DateTime?              @map("completed_at")
+  totalTime              Int?                   @map("total_time")
+  resultEncrypted        String?                @map("result_encrypted")
+  canonicalResultEncrypted String?              @map("canonical_result_encrypted")
+  createdAt              DateTime               @default(now()) @map("created_at")
+  updatedAt              DateTime               @updatedAt @map("updated_at")
+
+  user          User?                   @relation("SituationalAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  rawSubmission SituationalRawSubmission?
+
+  @@unique([instrumentKey, instrumentVersion, participantKey, attemptNo], map: "situational_attempts_identity_key")
+  @@index([userId, status])
+  @@index([participantKey, status])
+  @@index([instrumentKey, instrumentVersion, status])
+  @@map("situational_attempts")
+}
+
+// Exactly one immutable encrypted raw payload is attached to a completed
+// standalone attempt. Per-scene and per-answer writes are intentionally not
+// modelled.
+model SituationalRawSubmission {
+  id                  String            @id @default(uuid())
+  attemptId           String            @unique @map("attempt_id")
+  attemptEpoch        Int               @map("attempt_epoch")
+  responseCount       Int               @map("response_count")
+  payloadEncrypted    String            @map("payload_encrypted")
+  payloadHash         String            @map("payload_hash")
+  payloadSchemaVersion Int              @map("payload_schema_version")
+  encodingVersion     String            @map("encoding_version")
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  attempt SituationalAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@map("situational_raw_submissions")
 }
 
 model InstrumentAuthorization {
