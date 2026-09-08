@@ -208,7 +208,10 @@ const pilotPackage = (instrumentKey: string, instrumentVersion?: string): Situat
 }
 
 export const listSituationalInstruments = () => listSituationPackages()
-  .filter((situationPackage) => situationPackage.releaseStatus === 'PUBLISHED')
+  .filter((situationPackage) => (
+    situationPackage.releaseStatus === 'PUBLISHED'
+    && situationPackage.scienceMaturity === 'PILOT'
+  ))
   .map((situationPackage) => {
     const validation = validateSituationPackage(situationPackage)
     if (!validation.valid) return null
