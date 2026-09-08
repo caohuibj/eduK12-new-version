@@ -69,3 +69,4 @@ export const downloadSituationalExport = (data: SituationalAttemptResponse, form
   anchor.click()
   URL.revokeObjectURL(url)
 }
+

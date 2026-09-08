@@ -71,3 +71,4 @@ const SituationalResult: React.FC = () => {
 
 export default SituationalResult
 
+

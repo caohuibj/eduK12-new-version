@@ -347,3 +347,4 @@ export const listSituationalHistory = async (userId: string) => {
     total: rows.length,
   }
 }
+

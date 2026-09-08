@@ -62,3 +62,4 @@ describe('Situational text runner', () => {
     expect(JSON.stringify(payload)).not.toMatch(/score|contribution|percentile|quality/i)
   })
 })
+

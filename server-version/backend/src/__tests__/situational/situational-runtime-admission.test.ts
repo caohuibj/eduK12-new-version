@@ -53,3 +53,4 @@ describe('Situational participant runtime admission', () => {
     ], SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key, '1.0.3')).toBeUndefined()
   })
 })
+

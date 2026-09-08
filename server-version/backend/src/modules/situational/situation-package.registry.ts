@@ -138,3 +138,4 @@ export const validateSituationPackage = (situationPackage: SituationPackageV1): 
     issues,
   }
 }
+

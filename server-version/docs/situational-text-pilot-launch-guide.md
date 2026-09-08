@@ -46,3 +46,4 @@ The PR-C verification set includes:
 This pilot does not add bundle/composite/embedded/aggregate/collection facts, research-grade norms, percentile/reference comparisons, media stimulus, branching, open text, LLM interpretation, per-answer or per-scene durable server writes, telemetry, a new queue/semaphore, or administrative catalog authoring.
 
 Those capabilities require a separately reviewed contract and belong to later PR-D/PR-E/PR-F work. The participant entry point deliberately reuses the existing Student layout; no new admin menu or catalog is introduced in PR-C.
+

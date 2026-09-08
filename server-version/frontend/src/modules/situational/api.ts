@@ -37,3 +37,4 @@ export const situationalApi = {
   history: () => apiClient.get<{ list: SituationalAttemptResponse[]; total: number }>('/situational/history'),
 }
 
+
