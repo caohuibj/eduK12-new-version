@@ -1,6 +1,7 @@
 import type { CognitiveSession } from '../cognitive/types'
 import type { FormBackgroundReport } from '../reporting/types'
 import type { SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
+import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
 
 export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM' | 'FORM_SECTION'
 
@@ -66,6 +67,7 @@ export interface CompositeCurrentItem {
   description?: string | null
   contextSection?: boolean
   definitionHash?: string
+  deviceInputProvenance?: DeviceInputProvenanceV1
   status?: string
   formSection?: {
     id: string

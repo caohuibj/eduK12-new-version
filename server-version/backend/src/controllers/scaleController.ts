@@ -47,6 +47,7 @@ import {
   isTransientCompletionDatabaseError,
 } from '../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
+import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
 
 // ==================== Validation Schemas ====================
 
@@ -85,6 +86,7 @@ const answerPreviewSchema = z.object({
 
 const scaleBatchAnswerSchema = z.object({
   checkpointSequence: z.number().int().positive().optional(),
+  deviceInputProvenance: deviceInputProvenanceV1Schema.optional(),
   answers: z.array(z.object({
     checkpointId: z.string().min(1).optional(),
     checkpointSequence: z.number().int().positive().optional(),
@@ -873,9 +875,12 @@ export const scaleController = {
       const responseValue = req.body?.responseValue as string | number
       const responseTimeMs = req.body?.responseTimeMs ?? req.body?.responseTime
       const expectedRevisionResult = z.number().int().nonnegative().optional().safeParse(req.body?.expectedRevision)
+      const deviceInputProvenanceResult = deviceInputProvenanceV1Schema.optional().safeParse(req.body?.deviceInputProvenance)
       if (!itemCode || (typeof responseValue !== 'string' && typeof responseValue !== 'number')) return error(res, 'itemCode 和 responseValue 不能为空')
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
+      if (!deviceInputProvenanceResult.success) return error(res, 'deviceInputProvenance 无效')
       const expectedRevision = expectedRevisionResult.data
+      const deviceInputProvenance = deviceInputProvenanceResult.data
 
       const transactionResult = await withScaleAnswerTransaction(assessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
@@ -903,6 +908,7 @@ export const scaleController = {
         }
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const persistedProvenance = deviceInputProvenance ?? stored.deviceInputProvenance
         const merged = mergeScaleAnswersWithRevision(stored.answers, [{ ...answer, expectedRevision }])
         if (merged.kind === 'stale') return { kind: 'stale-answer' as const }
         const answers = merged.answers
@@ -910,7 +916,7 @@ export const scaleController = {
         const updated = await tx.assessment.updateMany({
           where: { id: assessmentId, userId, status: 'IN_PROGRESS', answersRevision: assessment.answersRevision ?? 0 },
           data: {
-            answers: encryptScaleAnswers(answers),
+            answers: encryptScaleAnswers(answers, persistedProvenance),
             progress,
             ...(merged.changedCount > 0 ? { answersRevision: { increment: merged.changedCount } } : {}),
           },
@@ -921,6 +927,7 @@ export const scaleController = {
           assessment: scaleAssessmentForResponse({
             ...assessment,
             answers,
+            deviceInputProvenance: persistedProvenance,
             answersRevision: (assessment.answersRevision ?? 0) + merged.changedCount,
             progress,
             result: null,
@@ -986,6 +993,7 @@ export const scaleController = {
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const persistedProvenance = parsed.data.deviceInputProvenance ?? stored.deviceInputProvenance
         const mergedResult = mergeScaleAnswersWithRevision(stored.answers, answers)
         if (mergedResult.kind === 'stale') return { kind: 'stale-answer' as const }
         const merged = mergedResult.answers
@@ -995,7 +1003,7 @@ export const scaleController = {
         const updated = await tx.assessment.updateMany({
           where: { id: assessmentId, userId, status: 'IN_PROGRESS', answersRevision: assessment.answersRevision ?? 0 },
           data: {
-            answers: encryptScaleAnswers(merged),
+            answers: encryptScaleAnswers(merged, persistedProvenance),
             progress,
             ...(mergedResult.changedCount > 0 ? { answersRevision: { increment: mergedResult.changedCount } } : {}),
           },
@@ -1063,7 +1071,7 @@ export const scaleController = {
           where: { id: assessmentId, userId, status: 'IN_PROGRESS' },
           data: {
             status: 'COMPLETED',
-            answers: encryptScaleAnswers(stored.answers),
+            answers: encryptScaleAnswers(stored.answers, stored.deviceInputProvenance),
             result: encryptScaleResult(result),
             completedAt,
             totalTime,
@@ -1078,7 +1086,19 @@ export const scaleController = {
           return { kind: 'ended' as const }
         }
         if (assessment.questionnaireAssessmentId) await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId)
-        return { kind: 'completed' as const, assessment: scaleAssessmentForResponse({ ...assessment, status: 'COMPLETED' as const, answers: stored.answers, result, completedAt, totalTime, progress: 100 }) }
+        return {
+          kind: 'completed' as const,
+          assessment: scaleAssessmentForResponse({
+            ...assessment,
+            status: 'COMPLETED' as const,
+            answers: stored.answers,
+            deviceInputProvenance: stored.deviceInputProvenance,
+            result,
+            completedAt,
+            totalTime,
+            progress: 100,
+          }),
+        }
       })
 
       if (transactionResult.kind === 'not-found') return notFound(res, '测评记录不存在')

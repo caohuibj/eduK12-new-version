@@ -14,6 +14,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { encryptScaleAnswers } from '../../modules/scale/scale-workflow.service'
 import { compositeExportService, toSavVariables } from '../../modules/composite/composite-export.service'
 
 const makeScaleDefinition = (itemCode: string, scoreKeys: string[]) => ({
@@ -173,6 +174,21 @@ const mixedFrozenReport = {
   },
 }
 
+const scaleProvenance = {
+  schemaVersion: 1 as const,
+  deviceClass: 'DESKTOP' as const,
+  osFamily: 'Windows' as const,
+  browserFamily: 'Chrome' as const,
+  viewportWidth: 1280,
+  viewportHeight: 720,
+  screenWidth: 1920,
+  screenHeight: 1080,
+  devicePixelRatio: 1,
+  maxTouchPoints: 0,
+  primaryPointer: 'FINE' as const,
+  capturedAt: '2026-08-20T10:00:00.000Z',
+}
+
 const makeMixedTemplate = () => ({
   id: 'composite-mixed',
   name: '混合宽表测评',
@@ -239,7 +255,7 @@ const makeMixedTemplate = () => ({
     scaleAssessments: [
       {
         compositeItemId: 'item-scale-a',
-        answers: [],
+        answers: encryptScaleAnswers([{ itemCode: 'A1', responseValue: 'never', responseTimeMs: 321 }], scaleProvenance),
         result: makeScaleResult({ scaleId: 'scale-a', code: 'S-A', name: '量表 A', itemCode: 'A1', scores: [{ key: 'A', value: 0 }] }),
       },
       {
@@ -323,10 +339,16 @@ describe('composite export service', () => {
       S001_scale_code: 'S-A',
       S001_report_definition_version: '2.0.0',
       S001_SCORE_a: 0,
+      S001_device_class: 'DESKTOP',
+      S001_device_os_family: 'Windows',
+      S001_device_browser_family: 'Chrome',
+      S001_device_viewport_width: 1280,
+      S001_device_captured_at: '2026-08-20T10:00:00.000Z',
       S002_scale_id: 'scale-b',
       S002_scale_code: 'S-B',
       S002_report_definition_version: '2.0.0',
       S002_SCORE_b: null,
+      S002_device_class: null,
       C003_score: 0,
       C003_quality: 'insufficient',
       C003_profile: 'standard',
@@ -381,7 +403,7 @@ describe('composite export service', () => {
     expect(data.trialCount).toBe(0)
     expect(query.include.attempts.include.cognitiveSessions.include).not.toHaveProperty('trials')
     expect(query.include.items.include.scale.select).toHaveProperty('definition')
-    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: false, result: true })
+    expect(query.include.attempts.include.scaleAssessments.select).toMatchObject({ answers: true, result: true })
     expect(query.include.attempts.include.scaleAssessments.select).not.toHaveProperty('scores')
   })
 

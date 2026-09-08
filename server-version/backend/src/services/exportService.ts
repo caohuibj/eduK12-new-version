@@ -55,6 +55,23 @@ const FIELD_RULES = {
   MAX_LENGTH: 8,
 }
 
+const deviceProvenanceFields = (prefix: string, labelPrefix = ''): ExportField[] => {
+  const label = (name: string) => `${labelPrefix ? `[${labelPrefix}] ` : ''}${name}`
+  return [
+    { name: `${prefix}DEVICE_CLASS`, label: label('设备类别'), type: 'string', width: 12 },
+    { name: `${prefix}DEVICE_OS_FAMILY`, label: label('操作系统族'), type: 'string', width: 16 },
+    { name: `${prefix}DEVICE_BROWSER_FAMILY`, label: label('浏览器族'), type: 'string', width: 16 },
+    { name: `${prefix}DEVICE_VIEWPORT_WIDTH`, label: label('视口宽度'), type: 'numeric', width: 10, decimals: 0 },
+    { name: `${prefix}DEVICE_VIEWPORT_HEIGHT`, label: label('视口高度'), type: 'numeric', width: 10, decimals: 0 },
+    { name: `${prefix}DEVICE_SCREEN_WIDTH`, label: label('屏幕宽度'), type: 'numeric', width: 10, decimals: 0 },
+    { name: `${prefix}DEVICE_SCREEN_HEIGHT`, label: label('屏幕高度'), type: 'numeric', width: 10, decimals: 0 },
+    { name: `${prefix}DEVICE_PIXEL_RATIO`, label: label('设备像素比'), type: 'numeric', width: 10, decimals: 3 },
+    { name: `${prefix}DEVICE_MAX_TOUCH_POINTS`, label: label('最大触点数'), type: 'numeric', width: 10, decimals: 0 },
+    { name: `${prefix}DEVICE_PRIMARY_POINTER`, label: label('主指针类型'), type: 'string', width: 10 },
+    { name: `${prefix}DEVICE_CAPTURED_AT`, label: label('捕获时间'), type: 'string', width: 32 },
+  ]
+}
+
 // Legacy callers can still clear/use the module cache, but every export run
 // receives its own context so concurrent exports never influence one another.
 const fieldNameCache = new Map<string, number>()
@@ -203,6 +220,7 @@ export async function getScaleExportData(
   }
   fields.push({ name: 'U_time', label: '完成用时(秒)', type: 'numeric', width: 6 })
   fields.push({ name: 'U_date', label: '完成日期', type: 'string', width: 10 })
+  fields.push(...deviceProvenanceFields(''))
 
   // Each item has response value, transformed item score and response time.
   const itemFieldMap = new Map<string, { response: string; score: string; responseTime: string }>()
@@ -267,8 +285,20 @@ export async function getScaleExportData(
     // completed scores are always read from the frozen result payload.
     const parsedAnswers = readScaleAnswers(assessment.answers)
     const answers = parsedAnswers.answers
+    const device = parsedAnswers.deviceInputProvenance
     const answerMap = new Map(answers.map((answer) => [answer.itemCode, answer.responseValue]))
     const responseTimeMap = new Map(answers.map((answer) => [answer.itemCode, answer.responseTimeMs]))
+    row.DEVICE_CLASS = device?.deviceClass ?? null
+    row.DEVICE_OS_FAMILY = device?.osFamily ?? null
+    row.DEVICE_BROWSER_FAMILY = device?.browserFamily ?? null
+    row.DEVICE_VIEWPORT_WIDTH = device?.viewportWidth ?? null
+    row.DEVICE_VIEWPORT_HEIGHT = device?.viewportHeight ?? null
+    row.DEVICE_SCREEN_WIDTH = device?.screenWidth ?? null
+    row.DEVICE_SCREEN_HEIGHT = device?.screenHeight ?? null
+    row.DEVICE_PIXEL_RATIO = device?.devicePixelRatio ?? null
+    row.DEVICE_MAX_TOUCH_POINTS = device?.maxTouchPoints ?? null
+    row.DEVICE_PRIMARY_POINTER = device?.primaryPointer ?? null
+    row.DEVICE_CAPTURED_AT = device?.capturedAt ?? null
 
     const parsedResult = assessment.status === 'COMPLETED' ? readScaleResult(assessment.result) : { result: null, decryptError: false }
     const resultValue = parsedResult.result
@@ -593,6 +623,17 @@ async function getQuestionnaireExportDataV2(
     definitionHashField: string
     referenceVersionsField: string
     contextSnapshotHashField: string
+    deviceClassField: string
+    deviceOsFamilyField: string
+    deviceBrowserFamilyField: string
+    deviceViewportWidthField: string
+    deviceViewportHeightField: string
+    deviceScreenWidthField: string
+    deviceScreenHeightField: string
+    devicePixelRatioField: string
+    deviceMaxTouchPointsField: string
+    devicePrimaryPointerField: string
+    deviceCapturedAtField: string
   }
 
   const scaleMaps: ScaleMap[] = []
@@ -632,6 +673,17 @@ async function getQuestionnaireExportDataV2(
       definitionHashField: `${prefix}DEFINITION_HASH`,
       referenceVersionsField: `${prefix}REFERENCE_VERSIONS`,
       contextSnapshotHashField: `${prefix}CONTEXT_SNAPSHOT_HASH`,
+      deviceClassField: `${prefix}DEVICE_CLASS`,
+      deviceOsFamilyField: `${prefix}DEVICE_OS_FAMILY`,
+      deviceBrowserFamilyField: `${prefix}DEVICE_BROWSER_FAMILY`,
+      deviceViewportWidthField: `${prefix}DEVICE_VIEWPORT_WIDTH`,
+      deviceViewportHeightField: `${prefix}DEVICE_VIEWPORT_HEIGHT`,
+      deviceScreenWidthField: `${prefix}DEVICE_SCREEN_WIDTH`,
+      deviceScreenHeightField: `${prefix}DEVICE_SCREEN_HEIGHT`,
+      devicePixelRatioField: `${prefix}DEVICE_PIXEL_RATIO`,
+      deviceMaxTouchPointsField: `${prefix}DEVICE_MAX_TOUCH_POINTS`,
+      devicePrimaryPointerField: `${prefix}DEVICE_PRIMARY_POINTER`,
+      deviceCapturedAtField: `${prefix}DEVICE_CAPTURED_AT`,
     }
     fields.push(
       { name: metadataFields.qualityStatusField, label: `[${scale.name}] 质量状态`, type: 'string', width: 16 },
@@ -642,6 +694,7 @@ async function getQuestionnaireExportDataV2(
       { name: metadataFields.definitionHashField, label: `[${scale.name}] 定义哈希`, type: 'string', width: 64 },
       { name: metadataFields.referenceVersionsField, label: `[${scale.name}] 使用的参考版本`, type: 'string', width: 32 },
       { name: metadataFields.contextSnapshotHashField, label: `[${scale.name}] 测评上下文快照哈希`, type: 'string', width: 64 },
+      ...deviceProvenanceFields(prefix, scale.name),
     )
     scaleMaps.push({ scaleId: scale.id, items, scores, responseFields, itemScoreFields, responseTimeFields, scoreFields, ...metadataFields })
   }
@@ -688,6 +741,18 @@ async function getQuestionnaireExportDataV2(
       row[scaleMap.definitionHashField] = result.result?.method.definitionHash ?? null
       row[scaleMap.referenceVersionsField] = result.result?.method.referenceVersions.join('|') ?? null
       row[scaleMap.contextSnapshotHashField] = result.result?.method.assessmentContext?.snapshotHash ?? assessment.contextSnapshotHash ?? null
+      const device = answers.deviceInputProvenance
+      row[scaleMap.deviceClassField] = device?.deviceClass ?? null
+      row[scaleMap.deviceOsFamilyField] = device?.osFamily ?? null
+      row[scaleMap.deviceBrowserFamilyField] = device?.browserFamily ?? null
+      row[scaleMap.deviceViewportWidthField] = device?.viewportWidth ?? null
+      row[scaleMap.deviceViewportHeightField] = device?.viewportHeight ?? null
+      row[scaleMap.deviceScreenWidthField] = device?.screenWidth ?? null
+      row[scaleMap.deviceScreenHeightField] = device?.screenHeight ?? null
+      row[scaleMap.devicePixelRatioField] = device?.devicePixelRatio ?? null
+      row[scaleMap.deviceMaxTouchPointsField] = device?.maxTouchPoints ?? null
+      row[scaleMap.devicePrimaryPointerField] = device?.primaryPointer ?? null
+      row[scaleMap.deviceCapturedAtField] = device?.capturedAt ?? null
     })
     rows.push(row)
   }

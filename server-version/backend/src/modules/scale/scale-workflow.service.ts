@@ -10,6 +10,10 @@ import { getScalePackage } from './scale-package.registry'
 import { buildScaleResult, parseScaleResultV2, type ScaleResultV2 } from './scale-result'
 import type { ScaleAnswer } from './scale-scoring'
 import {
+  deviceInputProvenanceV1Schema,
+  type DeviceInputProvenanceV1,
+} from './device-input-provenance'
+import {
   validateReferenceSetDefinition,
   type AssessmentReferenceSetDefinition,
   type ReferenceContext,
@@ -65,11 +69,20 @@ export const readJsonField = <T extends object>(value: unknown): { value: T | nu
   return { value: parsed, decryptError: parsed === null }
 }
 
-export const readScaleAnswers = (value: unknown): { answers: ScaleAnswer[]; decryptError: boolean } => {
-  const parsed = readJsonField<ScaleAnswer[]>(value)
-  if (parsed.decryptError || parsed.value === null) return { answers: [], decryptError: parsed.decryptError }
-  if (!Array.isArray(parsed.value)) return { answers: [], decryptError: true }
-  const valid = parsed.value.every((answer) => (
+export type ScaleAnswerEnvelopeV1 = {
+  schemaVersion: 1
+  answers: ScaleAnswer[]
+  deviceInputProvenance?: DeviceInputProvenanceV1
+}
+
+type ScaleAnswerReadResult = {
+  answers: ScaleAnswer[]
+  decryptError: boolean
+  deviceInputProvenance?: DeviceInputProvenanceV1
+}
+
+const validScaleAnswerArray = (value: unknown): value is ScaleAnswer[] => (
+  Array.isArray(value) && value.every((answer) => (
     answer
     && typeof answer === 'object'
     && !Array.isArray(answer)
@@ -77,10 +90,41 @@ export const readScaleAnswers = (value: unknown): { answers: ScaleAnswer[]; decr
     && (typeof answer.responseValue === 'string' || typeof answer.responseValue === 'number')
     && (answer.revision === undefined || (Number.isInteger(answer.revision) && answer.revision >= 0))
   ))
-  return valid ? { answers: parsed.value as ScaleAnswer[], decryptError: false } : { answers: [], decryptError: true }
+)
+
+const isScaleAnswerEnvelopeV1 = (value: unknown): value is ScaleAnswerEnvelopeV1 => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const candidate = value as Record<string, unknown>
+  if (candidate.schemaVersion !== 1 || !validScaleAnswerArray(candidate.answers)) return false
+  const allowed = new Set(['schemaVersion', 'answers', 'deviceInputProvenance'])
+  if (Object.keys(candidate).some((key) => !allowed.has(key))) return false
+  return candidate.deviceInputProvenance === undefined
+    || deviceInputProvenanceV1Schema.safeParse(candidate.deviceInputProvenance).success
 }
 
-export const encryptScaleAnswers = (answers: ScaleAnswer[]): string => encryptField(answers)
+export const readScaleAnswers = (value: unknown): ScaleAnswerReadResult => {
+  const parsed = readJsonField<ScaleAnswer[] | Record<string, unknown>>(value)
+  if (parsed.decryptError || parsed.value === null) return { answers: [], decryptError: parsed.decryptError }
+  if (validScaleAnswerArray(parsed.value)) return { answers: parsed.value, decryptError: false }
+  if (!isScaleAnswerEnvelopeV1(parsed.value)) return { answers: [], decryptError: true }
+  const envelope = parsed.value
+  const provenance = deviceInputProvenanceV1Schema.safeParse(envelope.deviceInputProvenance)
+  return {
+    answers: envelope.answers,
+    decryptError: false,
+    ...(provenance.success ? { deviceInputProvenance: provenance.data } : {}),
+  }
+}
+
+export const encryptScaleAnswers = (answers: ScaleAnswer[], deviceInputProvenance?: DeviceInputProvenanceV1): string => encryptField(
+  deviceInputProvenance === undefined
+    ? answers
+    : {
+        schemaVersion: 1,
+        answers,
+        deviceInputProvenance: deviceInputProvenanceV1Schema.parse(deviceInputProvenance),
+      } satisfies ScaleAnswerEnvelopeV1,
+)
 export const encryptScaleResult = (result: ScaleResultV2): string => encryptField(result)
 
 export const readScaleResult = (value: unknown): { result: ScaleResultV2 | null; decryptError: boolean } => {
@@ -103,10 +147,12 @@ const scaleMetadataForResponse = (scale: unknown): unknown => {
 export const scaleAssessmentForResponse = (assessment: any): any => {
   const answers = readScaleAnswers(assessment?.answers)
   const result = readScaleResult(assessment?.result)
+  const directProvenance = deviceInputProvenanceV1Schema.safeParse(assessment?.deviceInputProvenance)
   const {
     answers: _encryptedAnswers,
     result: _encryptedResult,
     runtimeSnapshotEncrypted: _runtimeSnapshotEncrypted,
+    deviceInputProvenance: _directDeviceInputProvenance,
     scale,
     ...metadata
   } = assessment ?? {}
@@ -115,6 +161,9 @@ export const scaleAssessmentForResponse = (assessment: any): any => {
     ...(scale !== undefined ? { scale: scaleMetadataForResponse(scale) } : {}),
     answers: answers.answers,
     result: result.result,
+    ...(answers.deviceInputProvenance || (directProvenance.success ? directProvenance.data : undefined)
+      ? { deviceInputProvenance: answers.deviceInputProvenance ?? directProvenance.data }
+      : {}),
     ...(answers.decryptError || result.decryptError ? { decryptError: true } : {}),
   }
 }

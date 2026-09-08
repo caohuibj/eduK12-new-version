@@ -29,6 +29,7 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   startedAt: true,
   submissionId: true,
   submissionPayloadHash: true,
+  answers: true,
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
@@ -52,6 +53,7 @@ export type ScaleAdmissionChildRow = {
   startedAt: Date
   submissionId: string | null
   submissionPayloadHash: string | null
+  answers: unknown
   questionnaireAssessmentId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null

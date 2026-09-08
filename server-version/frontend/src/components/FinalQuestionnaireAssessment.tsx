@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import {
@@ -9,6 +9,12 @@ import {
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import type { ApiResponse } from '../types'
+import {
+  SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
+  resolveScaleDeviceInputProvenance,
+  readScaleDeviceInputProvenance,
+  type DeviceInputProvenanceV1,
+} from '../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
 type FormValue = string | string[] | null
@@ -41,6 +47,7 @@ export interface FinalQuestionnaireScale {
   instruction: string | null
   scaleAssessmentId: string
   definitionHash: string
+  deviceInputProvenance?: DeviceInputProvenanceV1
   definition: {
     schemaVersion: 2
     respondentType: string
@@ -152,11 +159,16 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
+  const scaleDeviceInputProvenanceRef = useRef<{ scaleId: string; value: DeviceInputProvenanceV1 } | null>(null)
 
   const currentKey = draftKeyFor(data)
   const currentUnitKey = `${data.questionnaireAssessment.id}:${data.currentFormSection?.id || data.currentScale?.scaleAssessmentId || 'complete'}`
   const currentSection = data.currentFormSection
   const currentScale = data.currentScale
+  const currentScaleId = currentScale?.scaleAssessmentId ?? null
+  const currentScaleServerProvenanceJson = currentScale?.deviceInputProvenance
+    ? JSON.stringify(currentScale.deviceInputProvenance)
+    : null
 
   useEffect(() => {
     setSectionIndex(0)
@@ -174,6 +186,24 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       }
       try {
         const nextMeta = await ensureDraft(data, currentKey)
+        if (currentScaleId) {
+          const scaleId = currentScaleId
+          const storedProvenance = readScaleDeviceInputProvenance(nextMeta.instrumentMetadata)
+          const existing = scaleDeviceInputProvenanceRef.current?.scaleId === scaleId
+            ? scaleDeviceInputProvenanceRef.current.value
+            : null
+          const provenance = resolveScaleDeviceInputProvenance({
+            metadata: nextMeta.instrumentMetadata,
+            serverValue: currentScaleServerProvenanceJson ? JSON.parse(currentScaleServerProvenanceJson) : undefined,
+            existing,
+          })
+          scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
+          if (!storedProvenance) {
+            await finalDraftStore.setInstrumentMetadata(currentKey, {
+              [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
+            }).catch(() => null)
+          }
+        }
         const answers = await finalDraftStore.listAnswers(currentKey)
         if (cancelled) return
         const nextForm: Record<string, FormValue> = {}
@@ -203,7 +233,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
     }
     void loadDraft()
     return () => { cancelled = true }
-  }, [currentKey, currentUnitKey, currentSection, data])
+  }, [currentKey, currentUnitKey, currentSection, currentScaleId, currentScaleServerProvenanceJson, data])
 
   useEffect(() => {
     if (data.questionnaireAssessment.status === 'COMPLETED') onCompleted()
@@ -251,7 +281,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await runFinalDraftCapacityRetry({
+      await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
             code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
@@ -302,7 +332,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await runFinalDraftCapacityRetry({
+      await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
             code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
@@ -319,6 +349,9 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             definitionHash: meta.definitionHash,
             contextSnapshotHash: meta.contextSnapshotHash,
             answers,
+            ...(scaleDeviceInputProvenanceRef.current?.scaleId === currentScale.scaleAssessmentId
+              ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current.value }
+              : {}),
           })
           if (next.code !== 0) throw apiResponseError(next)
           return next
