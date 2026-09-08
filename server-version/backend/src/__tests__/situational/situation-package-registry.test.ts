@@ -48,5 +48,14 @@ describe('situation package registry', () => {
     const identityValidation = validateSituationPackage(brokenIdentity)
     expect(identityValidation.valid).toBe(false)
     expect(identityValidation.issues.some((issue) => issue.path === 'key')).toBe(true)
+
+    const brokenMaturity = {
+      ...SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
+      scienceMaturity: 'EXPERIMENTAL',
+    } as unknown as SituationPackageV1
+    const maturityValidation = validateSituationPackage(brokenMaturity)
+    expect(maturityValidation.valid).toBe(false)
+    expect(maturityValidation.issues.some((issue) => issue.path === 'scienceMaturity')).toBe(true)
   })
 })
+

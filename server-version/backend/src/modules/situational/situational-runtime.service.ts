@@ -77,8 +77,12 @@ const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => ({
   scorerKey: snapshot.scorerKey,
   scoringVersion: snapshot.scoringVersion,
   frozenAt: snapshot.frozenAt,
+  releaseStatus: 'PUBLISHED' as const,
   sampling: snapshot.runnerDefinition.sampling,
   definition: snapshot.runnerDefinition,
+  report: snapshot.definition.report,
+  referencePolicy: snapshot.definition.referencePolicy,
+  scienceMaturity: 'PILOT' as const,
   runtimeCapabilities: snapshot.compiledRuntime.runtimeCapabilities,
 })
 
@@ -204,7 +208,10 @@ const pilotPackage = (instrumentKey: string, instrumentVersion?: string): Situat
 }
 
 export const listSituationalInstruments = () => listSituationPackages()
-  .filter((situationPackage) => situationPackage.releaseStatus === 'PUBLISHED')
+  .filter((situationPackage) => (
+    situationPackage.releaseStatus === 'PUBLISHED'
+    && situationPackage.scienceMaturity === 'PILOT'
+  ))
   .map((situationPackage) => {
     const validation = validateSituationPackage(situationPackage)
     if (!validation.valid) return null
@@ -225,6 +232,9 @@ export const listSituationalInstruments = () => listSituationPackages()
       scoringVersion: runtime.scorerVersion,
       sampling: runnerDefinition.sampling,
       definition: runnerDefinition,
+      report: situationPackage.definition.report,
+      referencePolicy: situationPackage.definition.referencePolicy,
+      scienceMaturity: situationPackage.scienceMaturity,
       runtimeCapabilities: runtime.runtimeCapabilities,
     }
   })
@@ -239,7 +249,6 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
     frozenAt: new Date(0),
   })
   return {
-    releaseStatus: situationPackage.releaseStatus,
     ...instrumentResponse(snapshot),
   }
 }
@@ -341,3 +350,4 @@ export const listSituationalHistory = async (userId: string) => {
     total: rows.length,
   }
 }
+

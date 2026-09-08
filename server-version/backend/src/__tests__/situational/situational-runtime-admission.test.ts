@@ -9,27 +9,31 @@ import {
   type SituationPackageV1,
 } from '../../modules/situational/situation-package.registry'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
+import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-responsibility-golden-zh-cn-v1'
 
 const packageWithStatus = (
   releaseStatus: SituationPackageV1['releaseStatus'],
   instrumentVersion = SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
+  scienceMaturity: SituationPackageV1['scienceMaturity'] = 'PILOT',
 ): SituationPackageV1 => ({
   ...SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   releaseStatus,
   instrumentVersion,
+  scienceMaturity,
 })
 
 describe('Situational participant runtime admission', () => {
   it('does not expose the current DRAFT development fixtures', () => {
-    expect(listSituationalInstruments()).toEqual([])
-    expect(() => getSituationalInstrument(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key))
+    expect(listSituationalInstruments().map((entry) => entry.key)).toEqual(['sjt-assertiveness-golden'])
+    expect(listSituationalInstruments()[0]?.scienceMaturity).toBe('PILOT')
+    expect(() => getSituationalInstrument('sjt-responsibility-golden'))
       .toThrow('题包不存在或已停用')
   })
 
   it('rejects a DRAFT or RETIRED package before touching persistence', async () => {
     await expect(startSituationalAttempt('situational-admission-user', {
-      instrumentKey: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,
-      instrumentVersion: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
+      instrumentKey: SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE.key,
+      instrumentVersion: SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
     })).rejects.toMatchObject({ code: 'INSTRUMENT_NOT_AVAILABLE', statusCode: 404 })
 
     expect(selectPublishedSituationPackage([
@@ -49,5 +53,10 @@ describe('Situational participant runtime admission', () => {
     expect(selectPublishedSituationPackage([
       packageWithStatus('PUBLISHED', '1.0.2'),
     ], SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key, '1.0.3')).toBeUndefined()
+
+    expect(selectPublishedSituationPackage([
+      packageWithStatus('PUBLISHED', '2.0.0', 'RESEARCH_GRADE'),
+    ], SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key)).toBeUndefined()
   })
 })
+
