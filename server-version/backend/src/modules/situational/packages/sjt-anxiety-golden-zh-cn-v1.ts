@@ -1,0 +1,157 @@
+/**
+ * Golden text situational package: N-Anxiety (appraisal + emotion channels).
+ * Single scene with TWO channels (blueprint V04): a single-choice appraisal
+ * channel and a 0–100 continuous emotion rating. Exercises the construct ×
+ * channel separation (Decision B) and the rating response type.
+ */
+import type { SituationDefinitionV1 } from '../situation-definition'
+import type { SituationalGoldenCase } from '../situation-scoring'
+
+export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION: SituationDefinitionV1 = {
+  schemaVersion: 1,
+  respondentType: 'participant_self_report',
+  source: {
+    title: '情境化人格测评黄金模板：N-Anxiety（情境解释 + 情绪通道，文字版 V1）',
+    citation: 'eduK12 情境化测评设计组，基于 BFI-2 Anxiety facet 的自编情境草案。',
+    publicationYear: 2026,
+  },
+  license: {
+    status: 'self_authored',
+    redistribution: 'restricted',
+    note: '自编情境草案；provisional key 仅用于开发期验证，不得作为常模解释依据。',
+  },
+  sampling: { strategy: 'ALL' },
+  scenes: [{
+    sceneKey: 'AN-01',
+    title: '上级只发来一句："明天来聊一下"',
+    sortOrder: 0,
+    stimulus: {
+      type: 'TEXT_V1',
+      text: '一天的工作即将结束，负责人发来一条简短消息："明天上午有空来找我聊一下吗？"没有说明原因。往前翻对话记录，最近一次沟通很平常，没有批评或表扬的线索。手指停在回复框——画面定格。',
+    },
+    primaryConstruct: 'bfi2.anxiety',
+    secondaryConstructs: ['bfi2.trust'],
+    situationFeatures: { negativity: 0.5, duty: 0.5, uncertainty: 0.9 },
+    channels: [
+      {
+        channelKey: 'appraisal',
+        purpose: 'APPRAISAL',
+        responseType: 'SINGLE_CHOICE',
+        scoredConstruct: 'bfi2.anxiety',
+        prompt: '你第一反应觉得这次谈话更可能是什么？',
+        options: [
+          { optionKey: 'A', label: '可能有新的任务或安排。' },
+          { optionKey: 'B', label: '原因不清楚，现在无法判断。' },
+          { optionKey: 'C', label: '可能是我最近有哪里没做好。' },
+          { optionKey: 'D', label: '很可能是出了比较严重的问题。' },
+        ],
+      },
+      {
+        channelKey: 'emotion',
+        purpose: 'EMOTION',
+        responseType: 'CONTINUOUS',
+        range: { min: 0, max: 100 },
+        scoringDirection: 'POSITIVE',
+        scoredConstruct: 'bfi2.anxiety',
+        prompt: '如果是你，此刻会有多紧张？（0 = 完全不紧张，100 = 非常紧张）',
+      },
+    ],
+  }],
+  scoring: {
+    scoringVersion: 'sjt-provisional-v1',
+    choiceScores: [
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'A', contribution: -1.0 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'B', contribution: 0 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'C', contribution: 0.5 },
+      { sceneKey: 'AN-01', channelKey: 'appraisal', optionKey: 'D', contribution: 1.5 },
+    ],
+    publishedMetrics: [
+      {
+        key: 'bfi2.anxiety.appraisal',
+        label: '焦虑 × 情境解释（provisional）',
+        construct: 'bfi2.anxiety',
+        channelKey: 'appraisal',
+        direction: 'higher_is_more',
+        role: 'primary',
+        displayPrecision: 2,
+      },
+      {
+        key: 'bfi2.anxiety.emotion',
+        label: '焦虑 × 情绪反应（state，0–100）',
+        construct: 'bfi2.anxiety',
+        channelKey: 'emotion',
+        direction: 'higher_is_more',
+        role: 'primary',
+        displayPrecision: 1,
+      },
+    ],
+  },
+  report: {
+    reportVersion: 'sjt-report-v1',
+    primaryMetricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'],
+    metricOrder: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'],
+    interpretations: [
+      {
+        metricKey: 'bfi2.anxiety.appraisal',
+        headline: '焦虑 × 情境解释（威胁解释梯度，provisional）',
+        summary: '反映面对信息模糊的标准化情境时，第一反应偏向威胁解释的程度。分数为开发期 provisional 编码。',
+        bands: [],
+        guidance: [],
+      },
+      {
+        metricKey: 'bfi2.anxiety.emotion',
+        headline: '焦虑 × 情绪反应（state，0–100）',
+        summary: '反映该标准化情境诱发的紧张强度自评。这是情境化 state 反应，需由多个情境共同估计 trait 水平。',
+        bands: [],
+        guidance: [],
+      },
+    ],
+    limitations: [
+      '严格描述性；provisional key 未经过大样本校准。',
+      '情绪评分为单情境 state 反应，不等同于特质焦虑水平。',
+      '结果不构成人格诊断、常模比较或选拔依据。',
+    ],
+    disclaimer: '本测评结果仅描述本次标准化情境中的作答选择与自评强度，不能替代专业评估。',
+  },
+  referencePolicy: { type: 'none' },
+}
+
+export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_GOLDEN_CASES: SituationalGoldenCase[] = [
+  {
+    name: 'high-threat-high-arousal',
+    responses: [
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'D' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 80 },
+    ],
+    expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': 1.5, 'bfi2.anxiety.emotion': 80 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
+  },
+  {
+    name: 'low-threat-low-arousal',
+    responses: [
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'A' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 20 },
+    ],
+    expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': -1.0, 'bfi2.anxiety.emotion': 20 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
+  },
+  {
+    name: 'neutral-appraisal',
+    responses: [
+      { sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'B' },
+      { sceneKey: 'AN-01', channelKey: 'emotion', responseValue: 50 },
+    ],
+    expected: { quality: 'interpretable', metrics: { 'bfi2.anxiety.appraisal': 0, 'bfi2.anxiety.emotion': 50 }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
+  },
+  {
+    name: 'missing-emotion-rating',
+    responses: [{ sceneKey: 'AN-01', channelKey: 'appraisal', responseValue: 'C' }],
+    expected: { quality: 'invalid', metrics: { 'bfi2.anxiety.appraisal': 0.5, 'bfi2.anxiety.emotion': null }, metricKeys: ['bfi2.anxiety.appraisal', 'bfi2.anxiety.emotion'] },
+  },
+]
+
+export const SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE = {
+  key: 'sjt-anxiety-golden',
+  instrumentVersion: '1.0.0',
+  releaseStatus: 'DRAFT' as const,
+  definition: SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION,
+  goldenCases: SJT_ANXIETY_GOLDEN_ZH_CN_V1_GOLDEN_CASES,
+}

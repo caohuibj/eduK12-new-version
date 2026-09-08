@@ -1,5 +1,6 @@
 import type { ScaleResultV2 } from '../scale/scale-result'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
+import type { SituationalResultV1 } from '../situational/situation-scoring'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1, canonicalJsonBytes } from './canonical'
 import type {
   CompiledInstrumentRuntimeV1,
@@ -34,7 +35,7 @@ export interface ReferenceFactV1 {
 
 export interface CanonicalUnitResultCoreV1 {
   schemaVersion: 1
-  unitType: 'SCALE' | 'COGNITIVE'
+  unitType: 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
   instrumentKey: string
   instrumentVersion: string
   sourceDefinitionHash: string
@@ -205,7 +206,7 @@ const referenceFactFrom = (
 }
 
 const baseCore = (runtime: CompiledInstrumentRuntimeV1, input: {
-  unitType: 'SCALE' | 'COGNITIVE'
+  unitType: 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
   quality: CanonicalUnitResultCoreV1['quality']
   metrics: MetricFactV1[]
   facts: MachineFactV1[]
@@ -274,6 +275,47 @@ export const projectScaleCanonicalUnitResult = (input: {
     metrics,
     facts: qualityFacts(quality, input.runtime.aggregateProjection.allowedFactKeys),
     references,
+    contextHash: input.contextHash,
+  })
+}
+
+/**
+ * Construct × Channel metrics (Decision B): every published metric key is one
+ * cell; the canonical layer never merges channels and never carries raw scene
+ * responses. V1 situational instruments declare referencePolicy=none, so the
+ * reference list is always empty here.
+ */
+export const projectSituationCanonicalUnitResult = (input: {
+  result: SituationalResultV1
+  runtime: CompiledInstrumentRuntimeV1
+  contextHash: string | null
+}): CanonicalUnitResultCoreV1 => {
+  if (input.runtime.instrumentType !== 'SITUATIONAL') {
+    throw new Error('Situational canonical result requires a SITUATIONAL compiled runtime')
+  }
+  const allowed = new Set(input.runtime.aggregateProjection.allowedMetricKeys)
+  for (const metric of input.result.metrics) {
+    if (!allowed.has(metric.key)) throw new Error(`Situational metric ${metric.key} is not declared by the compiled runtime`)
+  }
+  const metrics = input.result.metrics
+    .filter((metric) => allowed.has(metric.key))
+    .map((metric) => ({
+      key: metric.key,
+      value: assertJsonValue(metric.value),
+      unit: 'score',
+      quality: metric.status,
+    }))
+    .sort((left, right) => left.key < right.key ? -1 : left.key > right.key ? 1 : 0)
+  const quality = {
+    status: input.result.quality.status,
+    flags: [...input.result.quality.flags].sort(),
+  }
+  return baseCore(input.runtime, {
+    unitType: 'SITUATIONAL',
+    quality,
+    metrics,
+    facts: qualityFacts(quality, input.runtime.aggregateProjection.allowedFactKeys),
+    references: [],
     contextHash: input.contextHash,
   })
 }
@@ -406,7 +448,7 @@ const referenceFactSchema = z.object({
 
 const canonicalUnitResultCoreSchema = z.object({
   schemaVersion: z.literal(1),
-  unitType: z.enum(['SCALE', 'COGNITIVE']),
+  unitType: z.enum(['SCALE', 'COGNITIVE', 'SITUATIONAL']),
   instrumentKey: z.string().min(1),
   instrumentVersion: z.string().min(1),
   sourceDefinitionHash: z.string().min(1),
