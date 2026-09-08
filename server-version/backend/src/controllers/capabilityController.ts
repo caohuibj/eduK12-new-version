@@ -10,6 +10,13 @@ export const capabilityController = {
   getCapabilities(_req: Request, res: Response) {
     return success(res, {
       cognitive: config.cognitiveModuleEnabled,
+      situational: {
+        standalone: true,
+        supported: true,
+        embedded: false,
+        aggregateEligible: false,
+        collectionFacts: false,
+      },
     })
   },
 }
