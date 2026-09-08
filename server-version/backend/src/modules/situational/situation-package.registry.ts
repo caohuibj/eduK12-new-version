@@ -8,6 +8,7 @@ export interface SituationPackageV1 {
   key: string
   instrumentVersion: string
   releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
+  scienceMaturity: 'PILOT' | 'RESEARCH_GRADE'
   definition: SituationDefinitionV1
   goldenCases: SituationalGoldenCase[]
 }
@@ -40,8 +41,10 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
 
 /**
  * Participant runtime admission is release-state aware. Development packages
- * remain in the registry for validation and CI, but only PUBLISHED packages
- * may be selected for a student-facing attempt.
+ * remain in the registry for validation and CI, but only PUBLISHED pilot
+ * packages may be selected for a student-facing attempt. The maturity gate is
+ * part of admission so a future RESEARCH_GRADE package cannot become
+ * participant-visible by release status alone.
  */
 export const selectPublishedSituationPackage = (
   availablePackages: readonly SituationPackageV1[],
@@ -52,6 +55,7 @@ export const selectPublishedSituationPackage = (
     .filter((candidate) => (
       candidate.key === key
       && candidate.releaseStatus === 'PUBLISHED'
+      && candidate.scienceMaturity === 'PILOT'
       && (instrumentVersion === undefined || candidate.instrumentVersion === instrumentVersion)
     ))
     .sort((left, right) => compareSituationalInstrumentVersions(right.instrumentVersion, left.instrumentVersion))
@@ -96,6 +100,7 @@ export const validateSituationPackage = (situationPackage: SituationPackageV1): 
   if (!situationPackage.key.trim()) identityIssues.push({ path: 'key', message: 'package key 不能为空', severity: 'error' })
   if (!situationPackage.instrumentVersion.trim()) identityIssues.push({ path: 'instrumentVersion', message: 'package instrumentVersion 不能为空', severity: 'error' })
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
+  if (!['PILOT', 'RESEARCH_GRADE'].includes(situationPackage.scienceMaturity)) identityIssues.push({ path: 'scienceMaturity', message: 'package scienceMaturity 不合法', severity: 'error' })
   const validation = validateSituationDefinition(situationPackage.definition, {
     forPublish: true,
     requireGoldenFixture: true,
@@ -137,3 +142,4 @@ export const validateSituationPackage = (situationPackage: SituationPackageV1): 
     issues,
   }
 }
+

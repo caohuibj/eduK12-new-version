@@ -63,6 +63,10 @@ const CheckinSubmit = React.lazy(() => import('./pages/student/CheckinSubmit'))
 const StudentCheckins = React.lazy(() => import('./pages/student/StudentCheckins'))
 const StudentAssignments = React.lazy(() => import('./pages/student/StudentAssignments'))
 const StudentProfile = React.lazy(() => import('./pages/student/StudentProfile'))
+const SituationalHome = React.lazy(() => import('./modules/situational/pages/SituationalHome'))
+const SituationalRunner = React.lazy(() => import('./modules/situational/pages/SituationalRunner'))
+const SituationalResult = React.lazy(() => import('./modules/situational/pages/SituationalResult'))
+const SituationalHistory = React.lazy(() => import('./modules/situational/pages/SituationalHistory'))
 const StudentScales = React.lazy(() => import('./pages/student/StudentScales'))
 const ScaleAssessment = React.lazy(() => import('./pages/student/ScaleAssessment'))
 const ScaleResult = React.lazy(() => import('./pages/student/ScaleResult'))
@@ -651,6 +655,38 @@ function AppRoutes() {
             }
           />
           <Route
+            path="/student/situational"
+            element={
+              <StudentProtectedRoute>
+                <SituationalHome />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/situational/history"
+            element={
+              <StudentProtectedRoute>
+                <SituationalHistory />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/situational/:instrumentKey"
+            element={
+              <StudentProtectedRoute>
+                <SituationalRunner />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/situational/attempts/:attemptId/result"
+            element={
+              <StudentProtectedRoute>
+                <SituationalResult />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
             path="/student/scales"
             element={
               <StudentProtectedRoute>
@@ -831,3 +867,4 @@ function App() {
 }
 
 export default App
+
