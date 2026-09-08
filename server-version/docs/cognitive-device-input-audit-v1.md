@@ -161,9 +161,11 @@ Timeout / miss / omission / no-response 不产生 modality observation。
 
 ## 13. Provisional tiers
 
-- Tier A = 11：reaction, cpt, gonogo, sst, stroop, flanker, taskswitch, patterncompare, lexicaldecision, cardsort, trailmaking
-- Tier B = 3：mentalrotation, corsi, tower
-- Tier C = 10：nback, matrix, emotionrecognition, reversallearning, bart, pairedassociate, picturesequence, wordlist, memory, digitbackward
+批准的 Cognitive device-sensitivity matrix：
+
+- Tier A — high sensitivity / future per-response modality useful（11）：reaction, cpt, gonogo, sst, stroop, flanker, taskswitch, patterncompare, trailmaking, lexicaldecision, cardsort
+- Tier B — medium（9）：nback, matrix, mentalrotation, tower, reversallearning, bart, emotionrecognition, pairedassociate, picturesequence
+- Tier C — accuracy/span dominant（4）：memory, corsi, digitbackward, wordlist
 
 这些只是 engineering/research prioritization hint，不是新的 scientific evidence truth。
 

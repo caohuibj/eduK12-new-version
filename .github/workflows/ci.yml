@@ -236,7 +236,7 @@ jobs:
       - name: validate monitoring compose
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
-        run: COMPOSE_BAKE=false COMPOSE_PARALLEL_LIMIT=1 docker compose build backend worker frontend
+        run: docker compose build backend worker frontend
       - name: scan backend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:

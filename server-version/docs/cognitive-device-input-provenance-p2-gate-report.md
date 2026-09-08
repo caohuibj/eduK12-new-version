@@ -1,138 +1,116 @@
-# COG-P2 Device & Input Provenance V1 — Cloud Validation Gate Report
+# COG-P2 Device & Input Provenance V1 — Final Local Gate Report
 
-Date: 2026-09-07
-Base: main@6033384d7db7af3294922b5f07d1a88f8749a3bb
-PR: #62 feat/cognitive-device-input-provenance-v1
+Date: 2026-09-08
+PR: #62 `feat(cognitive): COG-P2 device and input provenance v1`
+Scope: COG-P2 closure only. No COG-P3, PR #54, scorer/reference/report/Bundle/COS changes, performance work, device correction, or norms work was started.
 
-## 1. Validation scope and current status
+## 1. Git baseline and branch discipline
 
-This report records executed evidence, not a plan.
+- `origin/main`: `7fe641fcb024fa0f768176be0ec64ccfb15d490c`
+- Direct merge of `origin/main` into the feature branch: merge commit `f38798d33a331bfddabcf916bf06a56c4d51d5f3`
+- Merge result: clean, zero conflicts; no rebase, force reset, or history rewrite.
+- PR remains open and unmerged.
+- The workflow workaround from the original PR was removed. `git diff origin/main -- .github/workflows/ci.yml` is empty.
+- The two pre-existing local environment documents under `docs/` were preserved and are not part of the feature change.
 
-Code changes were made only on the COG-P2 branch. No merge was performed. No COG-P3, PR #54, or runtime/scoring performance work was started.
+## 2. Local validation environment
 
-At report time, the latest code head before this documentation update was:
-1f835485c77260b1d09e7ce0b6d575f66e43f4d9
+- Windows PC with WSL2 Ubuntu-24.04 and the repository at `D:/Project/eduK12-new-version`.
+- Docker Compose project: `eduk12-local`.
+- Services used: PostgreSQL 14, Redis 7, backend, worker, and frontend.
+- Frontend: `http://localhost:8080`.
+- Browser: installed Chrome, driven headlessly for repeatable smoke checks; touch run is browser emulation, not a physical mobile-device claim.
+- Repository runtime: Node 20.20.2 through the project container/Corepack.
+- Services were rebuilt from the feature branch and reported healthy before browser validation.
 
-The latest CI run for that head was run #369, id 34078548290:
-- CodeQL: success
-- backend: queued
-- frontend: queued
-- docker: queued
+## 3. Automated gate results
 
-Therefore the four-job latest-head gate is not complete.
+All results below are from clean temporary copies of the backend/frontend source. The repository working tree was not modified by dependency installation. PostgreSQL integration used the real local `ptool-postgres` service; it was not mocked and did not skip.
 
-## 2. Cloud environment
+| Gate | Result |
+|---|---|
+| Backend focused provenance test (`administration-provenance.test.ts`) | 1 file, 5 passed, 0 failed |
+| `test:integration:instrument-final` | 1 file, 11 passed, 0 skipped |
+| Frontend focused tests (provenance, hook, session, draft store) | 4 files, 30 passed, 0 skipped |
+| Backend typecheck/build | passed |
+| Frontend typecheck | passed |
+| Docker Compose rebuild of backend/worker/frontend | passed; all services healthy |
 
-Work shell observations:
-- Node: v24.19.0; Node 20.20.2 was available through an npx probe, but no repository-local install could be run.
-- Docker and Docker Compose: unavailable in the Work shell.
-- PostgreSQL client/server and Redis server: unavailable in the Work shell.
-- Chromium application: unavailable in the Work shell.
+The first backend focused-test attempt encountered a Windows CRLF-only source-snippet mismatch in the temporary test copy. After normalizing line endings in that temporary copy, the same five tests passed. No production source was changed for this environment artifact.
 
-The authenticated GitHub connector could inspect and update the PR, but a shell git clone was not authorized in this session. The code/test commits were therefore applied through the authenticated GitHub repository interface. No local repository, node_modules, database, Redis instance, Docker container, or browser app stack was fabricated.
+The real-PostgreSQL integration assertions covered authenticated and public FINAL propagation, encrypted `CognitiveRawSubmission` round-trip/decryption, result/trial isolation, same-provenance replay, changed-provenance conflict, old/no-provenance `{trials}` hash compatibility, no extra `CognitiveTrial` write, and raw query/write observations.
 
-The formal CI workflow targets Node 20, postgres:14-alpine, and redis:7-alpine. Run #357 proved that its backend clean-room services can start on the GitHub runner.
+## 4. Real-PC browser smoke results
 
-## 3. Git and PR state
+The smoke fixture created a temporary Reaction v1.1.0 assignment with eight formal experience-profile trials.
 
-- origin/main: 6033384d7db7af3294922b5f07d1a88f8749a3bb
-- PR head at handoff: 10b4a35fad6674e07b4bf5ffd695cc2c805cfc89
-- PR head after code/test fixes: 1f835485c77260b1d09e7ce0b6d575f66e43f4d9
-- mergeability: true
-- PR state: open, not merged
-- new commits: lint fix; non-blocking metadata persistence fix; frontend persistence test; final-submit provenance input typing; authenticated/public/raw durability tests; frontend event/resume tests; hook-test import fixes; constrained-runner Docker build serialization.
+### Desktop mouse and IndexedDB resume
 
-The branch remained based directly on origin/main. No force reset, rebase, or unrelated branch-history rewrite was used.
+- Session completed: `6d944f18-3355-414c-b783-2050356417e5`.
+- FINAL request provenance: `DESKTOP_LAPTOP` × `KEYBOARD_MOUSE`.
+- Formal trial count: 8.
+- After the first formal trial, IndexedDB showed `DRAFT`, one persisted trial, and the expected provenance metadata. After a real page refresh, the same draft status, trial count, and provenance were present; the session resumed at trial 2.
+- Completion reached the result page; a real result-page refresh still rendered the data-quality section.
+- The browser probe observed `pointerType=mouse` inside the cognitive task root; a final completion-control pointer event was outside the root and excluded.
 
-## 4. GitHub CI evidence
+### Desktop keyboard
 
-Run #357, id 34074457069, was the first validation run after handoff:
-- backend: success, including npm ci, audit, Prisma generate/migrate, seed, backfill, release preflight, build, full regression, and critical integration no-skip assertion;
-- frontend: failed at lint because administration-provenance.ts used let where const was required; fixed in 7aa92787;
-- CodeQL: success;
-- Docker: failed during the production image build with failed to execute bake: signal: killed after the frontend Vite build transformed 5569 modules. Compose/topology/monitoring configuration checks passed.
+- Session completed: `5ccba875-b3c5-409c-9797-dc95a5ca475a`.
+- FINAL request provenance: `DESKTOP_LAPTOP` × `KEYBOARD_MOUSE`.
+- Formal trial count: 8; result page remained available after refresh.
+- Keyboard probe observed `Enter` inside the cognitive task root. Control/outside inputs were not included in task modality evidence.
 
-Run #368 for the intermediate code head was superseded by the next commit. CodeQL passed; the other jobs were queued.
+### Mixed input / browser emulation
 
-Run #369 is the latest run for the code-fix head at report time. Only CodeQL has completed successfully; the three self-hosted jobs remain queued. No current-head backend/frontend/Docker result is available yet.
+- Session completed: `6d9191d5-c12f-499f-80b5-4416382aeb3e`.
+- Context: mobile viewport with `hasTouch`; this is browser emulation only.
+- Probe observed `pointerType=touch` on a formal task response, together with mouse/keyboard input.
+- FINAL request provenance: `PHONE` × `MIXED`; formal trial count: 8; result page remained available after refresh.
 
-The Docker failure was investigated against the source: the frontend Dockerfile is byte-for-byte the same on the PR branch and main. No main workflow run was available, and the connected GitHub capability cannot dispatch a temporary main run, so pre-existing status could not be proven by A/B. A minimal CI-only workaround was added in 1f835485: COMPOSE_BAKE=false and COMPOSE_PARALLEL_LIMIT=1 on the existing production image command. Image definitions and runtime topology are unchanged.
+### Public recovery A/B
 
-## 5. Backend COG-P2 gates
+- Context A completed one formal trial and retained the public recovery credential.
+- Independent context B used that credential and reached the same server session, but the current `FINAL_ONLY` architecture reset the runner to trial 0 rather than resuming at trial 1.
+- Feature-branch result: `RESET_TO_TRIAL_0`, `priorTrialsInA=1`, `crossContext=true`.
+- This is recorded as an existing product limitation, not silently treated as successful cross-context recovery. The COG-P2 scope does not add partial public persistence or redesign recovery semantics.
 
-Implemented coverage on the branch:
-- strict AdministrationProvenanceV1 contract;
-- canonical replay identity with optional provenance;
-- legacy no-provenance canonical shape remains trials-only;
-- authenticated unified FINAL raw-envelope durability;
-- changed-provenance replay conflict;
-- public unified recovery FINAL propagation;
-- result/trial isolation;
-- encrypted raw payload round-trip.
+## 5. Durable-storage and query/write evidence
 
-The existing instrument-final-submit.postgres.integration.test.ts was extended rather than creating a separate framework. It asserts one encrypted CognitiveRawSubmission write, no CognitiveTrial provenance duplication, exact decrypted provenance, same-provenance replay, changed-provenance conflict, and legacy hash compatibility.
+- `AdministrationProvenanceV1` is persisted only with the existing encrypted FINAL raw envelope.
+- The integration test decrypted the raw payload and matched the exact provenance object.
+- Provenance is absent from the result snapshot and each `CognitiveTrial` row.
+- Same-provenance replay is accepted; changed provenance conflicts; legacy no-provenance FINAL payloads retain the canonical trials-only identity.
+- The instrument-final integration test observed no provenance-specific extra query/write and no additional `CognitiveTrial` write.
+- No Prisma migration, session provenance column, provenance index, or second durable provenance truth was added.
 
-Execution status:
-- clean install/audit: current head pending in run #369; local Work execution blocked;
-- Prisma generate/migrate, seed, backfill, release preflight: current head pending; run #357 baseline succeeded;
-- backend build: current head pending; run #357 baseline succeeded;
-- focused provenance tests: added and included in CI; current result pending;
-- full regression and critical DB integration no-skip gate: current result pending;
-- skipped: no-skip result for the current head is not yet available. Run #357 baseline reported success.
+## 6. Tier matrix audit
 
-## 6. Frontend COG-P2 gates
+| Tier | Instruments |
+|---|---|
+| A — required full coverage | reaction, cpt, gonogo, sst, stroop, flanker, taskswitch, patterncompare, trailmaking, lexicaldecision, cardsort |
+| B — required full coverage | nback, matrix, mentalrotation, tower, reversallearning, bart, emotionrecognition, pairedassociate, picturesequence |
+| C — explicit no-new-hook list | memory, corsi, digitbackward, wordlist |
 
-Implemented/tested in source:
-- O(1) modality aggregation;
-- touch, mouse, keyboard, mixed, pen/unknown semantics;
-- editable input keydown exclusion;
-- control clicks excluded from measurement modality;
-- event listener cleanup;
-- stored PHONE x TOUCH resume followed by keyboard becomes PHONE x MIXED;
-- final metadata persistence failure is non-blocking and FINAL still submits provenance.
+The audit document records the same 11/9/4 classification and the C-tier exclusion from new hook wiring.
 
-Execution status:
-- npm ci/audit, lint, typecheck, full tests, and Vite build for the current head: pending in run #369;
-- initial lint failure was fixed and covered by a follow-up test commit;
-- local Work frontend execution: blocked because no shell clone/dependencies were available.
+## 7. Scope audit
 
-## 7. Browser and IndexedDB smoke
+- No scorer, reference, report, Bundle, COS, calibration, correction-factor, norm, or performance changes.
+- No raw user-agent, fingerprint, GPU/canvas, persistent device ID, location, IMEI, MAC, or serial capture.
+- No per-trial provenance duplication.
+- Editable-input keydown exclusion, control-click exclusion, listener cleanup, O(1) modality aggregation, and non-blocking metadata persistence failure behavior are covered by focused frontend tests.
+- Historical Trail Making device fields were preserved; provenance warnings remain non-degrading.
 
-Not executed in this Work session:
-- desktop mouse and desktop keyboard app smoke;
-- Chromium touch/mobile emulation;
-- IndexedDB refresh/resume;
-- mixed-input browser smoke;
-- cross-context public recovery.
+## 8. CI and merge gate
 
-Reason: the Work shell had no runnable application stack because Docker, PostgreSQL, and Redis were unavailable, and the authenticated browser session had no repository/app context. No physical iPhone, Android phone, or tablet smoke was executed. Browser emulation must not be reported as physical-device validation.
+The final feature head and latest-head CI status must be recorded after the branch is pushed. No merge is authorized by this report.
 
-## 8. Durable-storage and architecture review
+At the time this report was authored, the local gate was complete except for the latest-head remote CI result and the required main-branch public-recovery A/B classification.
 
-Static source/diff review confirms:
-- Prisma migration: none;
-- CognitiveSession provenance columns/index: none;
-- second provenance truth: none;
-- per-trial provenance duplication: none;
-- scorer impact: none;
-- report impact: none;
-- Bundle impact: none;
-- raw user-agent, fingerprint, GPU/canvas, persistent device ID, location, IMEI, MAC, or serial capture: none;
-- Trail Making historical device fields were not deleted;
-- Trail Making provenance warnings remain non-degrading;
-- provenance persistence uses the existing encrypted CognitiveRawSubmission FINAL write.
+## 9. Final disposition
 
-The new integration assertions are designed to prove extra DB query/write count remains zero for provenance, but current-head runtime evidence is pending run #369. No local query-budget test could run in the Work shell.
+- Physical phone/tablet validation: not claimed; the mixed-input run is explicitly browser emulation.
+- Public cross-context partial recovery: pre-existing `FINAL_ONLY` reset behavior must remain visible to reviewers.
+- Human review and latest-head CI remain required before any merge.
 
-## 9. Review closure
-
-The Copilot concern about IndexedDB metadata failure aborting FINAL was addressed by catching metadata-storage errors and retaining FINAL submission behavior. The original inline thread is outdated after the fix; it remains unresolved pending human review.
-
-## 10. Remaining blockers and limitations
-
-1. Latest-head run #369 has backend, frontend, and Docker jobs queued; the required 4/4 latest-head CI gate is not green.
-2. Work-shell clean-room execution could not be performed because authenticated shell clone access, Docker, PostgreSQL, Redis, and repository dependencies were unavailable.
-3. Cloud browser / IndexedDB / public-recovery smoke was not executed.
-4. Physical mobile/tablet smoke was not executed; this is an expected non-blocker and must be run separately if needed.
-
-STOP before merge and wait for human review.
+`COG-P2 MERGE READY: PENDING MAIN A/B AND LATEST-HEAD CI`
