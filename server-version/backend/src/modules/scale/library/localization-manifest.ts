@@ -7,9 +7,9 @@
  * 关键原则：
  * - 翻译/内容适配变化 → localizationVersion++；不自动 bump scoringVersion，
  *   也不自动 bump catalogManifestVersion（除非对应 metadata 同时变化）。
- * - translationRightsStatus 只是 provenance 记录（本 manifest 声明翻译用途是否
- *   已被授权覆盖）；法律事实源仍是 InstrumentAuthorization，publication gate
- *   负责与其交叉核对，本字段不得被当作第二 rights truth。
+ * - 本 manifest 只记录翻译/适配 provenance；允许翻译、数字化、展示、自动计分、
+ *   商业部署和 territory 的法律事实源全部是 InstrumentAuthorization，不在这里
+ *   复制第二套 rights 状态。
  * - PILOT 本地化不要求科研全部完成：cognitiveDebriefStatus / localEvidenceRefs
  *   允许 NOT_ESTABLISHED / 空，但必须显式声明当前文本来源与版本。
  */
@@ -19,19 +19,6 @@ import { isValidContentLocaleTag } from '../content-locale'
 const INSTRUMENT_KEY_RE = /^[a-z][a-z0-9_]*$/
 const VERSION_RE = /^[0-9]+\.[0-9]+\.[0-9]+$/
 const ISO_TIMESTAMP_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?Z$/
-
-/**
- * 翻译权利的 provenance 记录。COVERED_BY_INSTRUMENT_AUTHORIZATION 表示翻译用途
- * 已由 InstrumentAuthorization 覆盖（gate 会交叉核对）；DENIED/PENDING/UNKNOWN
- * 在 publication gate 中 fail-closed。
- */
-export const localizationRightsStatusSchema = z.enum([
-  'COVERED_BY_INSTRUMENT_AUTHORIZATION',
-  'DENIED',
-  'PENDING',
-  'UNKNOWN',
-])
-export type LocalizationRightsStatus = z.infer<typeof localizationRightsStatusSchema>
 
 /** 当前部署文本的来源方式；sourceLocale === targetLocale 时必须为 ORIGINAL_SOURCE。 */
 export const localizationAdaptationMethodSchema = z.enum([
@@ -54,7 +41,6 @@ export const localizationManifestV1Schema = z.object({
   targetLocale: z.string().refine(isValidContentLocaleTag, 'targetLocale 必须是合法的语言 tag（如 zh-CN / en）'),
   localizationVersion: z.string().regex(VERSION_RE, 'localizationVersion 必须是 x.y.z 三段数字'),
   translationSource: z.string({ required_error: 'translationSource 必填：必须记录当前部署文本的来源' }).min(1, 'translationSource 必填：必须记录当前部署文本的来源'),
-  translationRightsStatus: localizationRightsStatusSchema,
   adaptationMethod: localizationAdaptationMethodSchema,
   expertReviewStatus: localizationReviewItemStatusSchema,
   cognitiveDebriefStatus: localizationReviewItemStatusSchema,

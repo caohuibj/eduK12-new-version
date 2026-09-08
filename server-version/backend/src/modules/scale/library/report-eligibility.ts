@@ -40,7 +40,7 @@ export interface ReportEligibilityInput {
   instrumentVersion: string
   scoringVersion: string
   /** catalog referenceApplicability 与部署上下文冲突时在治理层拦截 L3（§31 Case C）。 */
-  deployment?: { territory?: string; respondent?: RespondentType }
+  deployment?: { territory?: string; respondent?: RespondentType; locale?: string }
   catalogReferenceApplicability?: ScaleReferenceApplicabilityRecord[]
 }
 
@@ -73,10 +73,11 @@ const referenceConflictWithDeployment = (
   const hasMatch = records.some((record) => (
     (!deployment.territory || record.territory === deployment.territory)
     && (!deployment.respondent || record.respondent === deployment.respondent)
+    && (!deployment.locale || record.locale === deployment.locale)
   ))
   if (hasMatch) return null
   const declared = records.map((record) => `${record.territory}/${record.respondent}`).join(', ')
-  return `reference ${selection.referenceVersion} 的 applicability（${declared}）无一匹配部署上下文（territory=${deployment.territory ?? 'any'}, respondent=${deployment.respondent ?? 'any'}）`
+  return `reference ${selection.referenceVersion} 的 applicability（${declared}）无一匹配部署上下文（territory=${deployment.territory ?? 'any'}, respondent=${deployment.respondent ?? 'any'}, locale=${deployment.locale ?? 'any'}）`
 }
 
 export const evaluateReportEligibility = (input: ReportEligibilityInput): ReportEligibilityDecision => {

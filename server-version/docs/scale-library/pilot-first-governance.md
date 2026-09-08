@@ -32,9 +32,13 @@ ScalePackage 稳定 + scoring 正确 + rights 合法 + localization 可用 + Pil
 |---|---|---|
 | Product correctness | HARD | valid ScalePackageV2/DefinitionV2、响应集/transform/missing policy、golden cases、runner 可执行 |
 | Rights | HARD | InstrumentAuthorization（唯一 rights truth）：electronic/display/scoring/translation、territory/locale、有效期 |
-| Localization | HARD | LocalizationManifestV1 存在且通过治理审核、translationRightsStatus=COVERED、content locale 匹配 |
+| Localization | HARD | LocalizationManifestV1 存在且通过治理审核、instrument/version 与 package 及 target locale 匹配、content locale 可用 |
 | Respondent applicability | HARD | 请求的 respondent 必须在 catalog 声明范围内 |
 | Scientific completeness | SOFT（永不阻塞） | 无常模/无 invariance/无 device 等价性/无重测/无 responsiveness/矩阵不完整 → researchGaps + limitations + warnings |
+
+`LocalizationManifestV1` 只保存来源、版本、适配和审核 provenance，不声明翻译/数字化/商业
+权利；这些权利只能由 `InstrumentAuthorization` 判定。已有 TEXI 专用 manifest 的历史字段
+保持兼容，但通用 publication evaluator 不把它们当作 authoritative rights truth。
 
 只有缺失直接意味着「当前产品输出本身不成立或具有误导性」（rights denied、wrong
 locale/respondent、已知无效 scoring、unusable localization 等）才 fail closed。

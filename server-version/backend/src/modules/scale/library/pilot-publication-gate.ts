@@ -12,8 +12,8 @@
  * 通用发布流程，只组合共享原语。
  *
  * fail-closed 项：package 校验失败、authorization 缺失/过期/拒绝、content locale
- * 不匹配、本地化 provenance 缺失/不可用（DENIED/PENDING/UNKNOWN rights 或
- * reviewStatus=PENDING）、requested respondent 不在 catalog 声明范围内。
+ * 不匹配、本地化 provenance 缺失/不可用（reviewStatus=PENDING、身份或部署 locale
+ * 不匹配）、requested respondent 不在 catalog 声明范围内。
  */
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
 import { assertContentLocaleCompatible } from '../content-locale'
@@ -80,13 +80,18 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
       localizationErrors.push(`localization manifest invalid: ${parsed.issues.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
     } else {
       localization = { sourceLocale: parsed.manifest.sourceLocale, targetLocale: parsed.manifest.targetLocale }
-      if (parsed.manifest.translationRightsStatus !== 'COVERED_BY_INSTRUMENT_AUTHORIZATION') {
-        localizationErrors.push(`translation rights ${parsed.manifest.translationRightsStatus}：非 COVERED 状态不得发布`)
+      if (parsed.manifest.instrumentKey !== input.pkg.key) {
+        localizationErrors.push(`localization instrumentKey=${parsed.manifest.instrumentKey} 与 package key=${input.pkg.key} 不一致`)
+      }
+      if (parsed.manifest.instrumentVersion !== input.pkg.instrumentVersion) {
+        localizationErrors.push(`localization instrumentVersion=${parsed.manifest.instrumentVersion} 与 package instrumentVersion=${input.pkg.instrumentVersion} 不一致`)
+      }
+      if (parsed.manifest.targetLocale !== input.locale) {
+        localizationErrors.push(`localization targetLocale=${parsed.manifest.targetLocale} 与部署 locale=${input.locale} 不一致`)
       }
       if (parsed.manifest.reviewStatus !== 'APPROVED') {
         localizationErrors.push('localization manifest reviewStatus=PENDING：治理审核未完成，不得发布')
       }
-      localizationUsable = localizationErrors.length === 0
       if (parsed.manifest.expertReviewStatus !== 'COMPLETED') {
         warnings.push(`localization expertReviewStatus=${parsed.manifest.expertReviewStatus}：PILOT 允许，作为 research gap 记录`)
       }
@@ -118,6 +123,10 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     instrumentKey: input.pkg.key,
     requestedLocale: input.locale,
   })
+  if (localeGate.contentLocale && localeGate.contentLocale !== input.locale) {
+    localizationErrors.push(`package contentLocale=${localeGate.contentLocale} 与部署 locale=${input.locale} 不一致`)
+  }
+  localizationUsable = localizationErrors.length === 0 && localeGate.ok
 
   // 6) Respondent applicability（catalog 声明范围）
   const respondentMatchErrors: string[] = manifestParse.ok
@@ -137,8 +146,8 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
   const decision: PilotPublicationDecision = manifest && scientific
     ? evaluatePilotPublicationPolicy({
         executableCorrectness: { ok: packageErrors.length === 0, errors: packageErrors },
-        rights: { ok: rights.ok, errors: [...localeGate.errors, ...rights.errors] },
-        localization: { ok: localizationErrors.length === 0, errors: localizationErrors },
+        rights: { ok: rights.ok, errors: rights.errors },
+        localization: { ok: localizationUsable, errors: [...localizationErrors, ...localeGate.errors] },
         respondentMatch: { ok: respondentMatchErrors.length === 0, errors: respondentMatchErrors },
         scientific,
       })
@@ -149,11 +158,11 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
           ...packageErrors.map((error) => `[executableCorrectness] ${error}`),
           ...errors.map((error) => `[catalogManifest] ${error}`),
           ...localizationErrors.map((error) => `[localization] ${error}`),
-          ...localeGate.errors.map((error) => `[rights] ${error}`),
           ...rights.errors.map((error) => `[rights] ${error}`),
+          ...localeGate.errors.map((error) => `[localization] ${error}`),
           ...respondentMatchErrors.map((error) => `[respondentMatch] ${error}`),
         ],
-        warnings,
+        warnings: [],
         limitations: [],
         researchGaps: [],
       }
@@ -167,7 +176,7 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         instrumentKey: input.pkg.key,
         instrumentVersion: input.pkg.instrumentVersion,
         scoringVersion: input.pkg.definition.scoring.scoringVersion,
-        deployment: { territory: input.territory, respondent: input.requestedRespondent },
+        deployment: { territory: input.territory, respondent: input.requestedRespondent, locale: input.locale },
         catalogReferenceApplicability: manifest.referenceApplicability,
       })
     : {

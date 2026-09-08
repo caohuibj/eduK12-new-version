@@ -46,7 +46,6 @@ const localizationManifest = (overrides?: Record<string, unknown>) => ({
   targetLocale: 'zh-CN',
   localizationVersion: '1.0.0',
   translationSource: 'WHO 官方 Chinese PR PDF（原文部署）',
-  translationRightsStatus: 'COVERED_BY_INSTRUMENT_AUTHORIZATION' as const,
   adaptationMethod: 'ORIGINAL_SOURCE' as const,
   expertReviewStatus: 'COMPLETED' as const,
   cognitiveDebriefStatus: 'COMPLETED' as const,
@@ -132,10 +131,10 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
       })
       expect(pendingReview.decision.publishable).toBe(false)
 
-      const deniedRights = gate({
+      const duplicatedRights = gate({
         localizationManifest: localizationManifest({ translationRightsStatus: 'DENIED' }),
       })
-      expect(deniedRights.decision.publishable).toBe(false)
+      expect(duplicatedRights.decision.publishable).toBe(false)
 
       const wrongRespondent = gate({ requestedRespondent: 'PARENT' })
       expect(wrongRespondent.decision.publishable).toBe(false)

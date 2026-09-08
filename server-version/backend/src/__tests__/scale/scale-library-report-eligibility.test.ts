@@ -120,6 +120,28 @@ describe('Pilot report / claim eligibility (SL2-C4)', () => {
     expect(decision.levels.L3_REFERENCED_INTERPRETIVE.eligible).toBe(true)
   })
 
+  it('blocks a reference applicability locale mismatch when deployment locale is known', () => {
+    const manifest = manifestWithMaturity('PILOT')
+    const decision = evaluateReportEligibility({
+      definition: declaredDefinition('local_pilot'),
+      references: [pilotReference('local_pilot')],
+      instrumentKey: 'who5',
+      instrumentVersion: '1.0.0',
+      scoringVersion: '1.0.0',
+      deployment: { territory: 'CN', respondent: 'SELF', locale: 'en' },
+      catalogReferenceApplicability: [{
+        ...manifest.referenceApplicability[0],
+        referenceVersion: 'who5-pilot-cn-v1',
+        referenceKind: 'normative_distribution',
+        territory: 'CN',
+        respondent: 'SELF',
+        locale: 'zh-CN',
+      }],
+    })
+    expect(decision.levels.L3_REFERENCED_INTERPRETIVE.eligible).toBe(false)
+    expect(decision.levels.L3_REFERENCED_INTERPRETIVE.reasons.some((reason) => reason.includes('locale=en'))).toBe(true)
+  })
+
   it('Case D: RESEARCH_GRADE with no reference still cannot fabricate percentile', () => {
     const decision = evaluateReportEligibility({
       definition: who5.definition,

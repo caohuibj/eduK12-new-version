@@ -9,7 +9,7 @@ import { validCatalogManifestBase } from './scale-library-catalog-fixtures'
 
 const NOW = '2026-09-07T00:00:00.000Z'
 
-const who5Authorization = (overrides?: { validTo?: string }) => {
+const who5Authorization = (overrides?: { validTo?: string; locales?: string[]; scoring?: boolean; display?: boolean }) => {
   const draft = createInstrumentAuthorizationDraft({
     instrumentKey: 'who5',
     instrumentVersion: '1.0.0',
@@ -17,11 +17,11 @@ const who5Authorization = (overrides?: { validTo?: string }) => {
     grantee: 'eduK12',
     scope: {
       electronicAdministration: true,
-      scoring: true,
+      scoring: overrides?.scoring ?? true,
       translation: false,
-      display: true,
+      display: overrides?.display ?? true,
       territories: ['CN'],
-      locales: ['zh-CN'],
+      locales: overrides?.locales ?? ['zh-CN'],
       commercialNature: 'NON_COMMERCIAL',
     },
     validFrom: '2026-01-01T00:00:00.000Z',
@@ -42,7 +42,6 @@ const who5LocalizationManifest = (overrides?: Record<string, unknown>) => ({
   targetLocale: 'zh-CN',
   localizationVersion: '1.0.0',
   translationSource: 'WHO 官方 Chinese PR PDF（原文部署）',
-  translationRightsStatus: 'COVERED_BY_INSTRUMENT_AUTHORIZATION' as const,
   adaptationMethod: 'ORIGINAL_SOURCE' as const,
   expertReviewStatus: 'COMPLETED' as const,
   cognitiveDebriefStatus: 'NOT_ESTABLISHED' as const,
@@ -84,10 +83,52 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
     expect(result.localizationUsable).toBe(false)
   })
 
-  it('blocks on DENIED translation rights in the localization manifest', () => {
+  it('rejects a generic rights-like localization field instead of treating it as authoritative', () => {
     const result = runGate({ localizationManifest: who5LocalizationManifest({ translationRightsStatus: 'DENIED' }) })
     expect(result.decision.publishable).toBe(false)
-    expect(result.decision.errors.some((error) => error.includes('DENIED'))).toBe(true)
+    expect(result.decision.errors.some((error) => error.includes('translationRightsStatus'))).toBe(true)
+  })
+
+  it('blocks localization identity and deployed-locale mismatches', () => {
+    const wrongIdentity = runGate({
+      localizationManifest: who5LocalizationManifest({ instrumentKey: 'other_scale' }),
+    })
+    expect(wrongIdentity.decision.publishable).toBe(false)
+    expect(wrongIdentity.decision.errors.some((error) => error.includes('instrumentKey'))).toBe(true)
+
+    const wrongVersion = runGate({
+      localizationManifest: who5LocalizationManifest({ instrumentVersion: '2.0.0' }),
+    })
+    expect(wrongVersion.decision.publishable).toBe(false)
+    expect(wrongVersion.decision.errors.some((error) => error.includes('instrumentVersion'))).toBe(true)
+
+    const wrongLocale = runGate({
+      localizationManifest: who5LocalizationManifest({ targetLocale: 'en', sourceLocale: 'en', adaptationMethod: 'ORIGINAL_SOURCE' }),
+    })
+    expect(wrongLocale.decision.publishable).toBe(false)
+    expect(wrongLocale.decision.errors.some((error) => error.includes('targetLocale'))).toBe(true)
+
+    const wrongPackageContentLocale = runGate({
+      locale: 'en',
+      authorizations: [who5Authorization({ locales: ['en'] })],
+      localizationManifest: who5LocalizationManifest({
+        sourceLocale: 'en',
+        targetLocale: 'en',
+        adaptationMethod: 'ORIGINAL_SOURCE',
+      }),
+    })
+    expect(wrongPackageContentLocale.decision.publishable).toBe(false)
+    expect(wrongPackageContentLocale.decision.errors.some((error) => error.includes('contentLocale'))).toBe(true)
+  })
+
+  it('blocks when automatic scoring or display rights are denied', () => {
+    const noScoring = runGate({ authorizations: [who5Authorization({ scoring: false })] })
+    expect(noScoring.decision.publishable).toBe(false)
+    expect(noScoring.decision.errors.some((error) => error.includes('scoring required'))).toBe(true)
+
+    const noDisplay = runGate({ authorizations: [who5Authorization({ display: false })] })
+    expect(noDisplay.decision.publishable).toBe(false)
+    expect(noDisplay.decision.errors.some((error) => error.includes('display required'))).toBe(true)
   })
 
   it('blocks when the localization manifest has not passed governance review', () => {

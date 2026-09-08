@@ -9,7 +9,6 @@ const validManifest = () => ({
   targetLocale: 'zh-CN',
   localizationVersion: '1.0.0',
   translationSource: 'WHO 官方 Chinese PR PDF（授权转录）',
-  translationRightsStatus: 'COVERED_BY_INSTRUMENT_AUTHORIZATION' as const,
   adaptationMethod: 'DIRECT_TRANSLATION' as const,
   expertReviewStatus: 'COMPLETED' as const,
   cognitiveDebriefStatus: 'NOT_ESTABLISHED' as const,
@@ -51,12 +50,9 @@ describe('LocalizationManifestV1 (SL2-C1)', () => {
     expect(result.issues.some((issue) => issue.message.includes('translationSource 必填'))).toBe(true)
   })
 
-  it('can express denied translation rights (fail-closed source data)', () => {
+  it('rejects a generic rights-like field so rights cannot be duplicated in localization provenance', () => {
     const result = parseLocalizationManifest({ ...validManifest(), translationRightsStatus: 'DENIED' })
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(result.manifest.translationRightsStatus).toBe('DENIED')
-    }
+    expect(result.ok).toBe(false)
   })
 
   it('rejects a malformed manifest (strict fields, bad schemaVersion, missing review fields)', () => {
