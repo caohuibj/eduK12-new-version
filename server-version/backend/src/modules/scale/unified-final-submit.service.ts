@@ -245,6 +245,13 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
   }
 
+  // The child row is already loaded by the final-submit admission path. Resolve
+  // stored provenance and build the encrypted answer envelope before entering
+  // the completion transaction; the transaction must only adjudicate and persist.
+  const storedProvenance = readScaleAnswers(child.answers).deviceInputProvenance
+  const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
+  const encryptedAnswers = encryptScaleAnswers(answers, persistedProvenance)
+
   const result = await measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission))
   const unitResult = snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible
     && Boolean(child.questionnaireAssessmentId || child.compositeAttemptId)
@@ -289,12 +296,9 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
     const replay = assertSubmissionReplay(current, submissionId, payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
-      return { replayed: true, assessment: scaleAssessmentForResponse({ ...current, scale: child.scale }), parent: null }
+      return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
-    const storedProvenance = readScaleAnswers(current.answers).deviceInputProvenance
-    const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
-    const encryptedAnswers = encryptScaleAnswers(answers, persistedProvenance)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
       id: input.assessmentId,
@@ -361,7 +365,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
     return {
       replayed: false,
-      assessment: scaleAssessmentForResponse({
+      current: {
         ...current,
         scale: child.scale,
         status: 'COMPLETED',
@@ -374,9 +378,14 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
-      }),
-      parent: null,
+      },
     }
   })
-  return { submissionId, payloadHash, ...committed, parent: null }
+  return {
+    submissionId,
+    payloadHash,
+    replayed: committed.replayed,
+    assessment: scaleAssessmentForResponse({ ...committed.current, scale: child.scale }),
+    parent: null,
+  }
 }
