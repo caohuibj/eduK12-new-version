@@ -16,9 +16,11 @@ import {
 import {
   listSituationPackages,
   getSituationPackage,
+  selectPublishedSituationPackage,
   validateSituationPackage,
   type SituationPackageV1,
 } from './situation-package.registry'
+import { runnerSituationDefinition } from './situation-definition'
 import type { SituationalResultV1 } from './situation-scoring'
 import {
   decryptUnifiedRuntimePayload,
@@ -184,12 +186,14 @@ export const situationalAttemptForResponse = (
 }
 
 const pilotPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackageV1 => {
-  const situationPackage = instrumentVersion
-    ? getSituationPackage(instrumentKey, instrumentVersion)
-    : listSituationPackages()
-      .filter((candidate) => candidate.key === instrumentKey)
-      .sort((left, right) => right.instrumentVersion.localeCompare(left.instrumentVersion))[0]
-  if (!situationPackage || situationPackage.releaseStatus === 'RETIRED') {
+  const situationPackage = selectPublishedSituationPackage(
+    instrumentVersion
+      ? [getSituationPackage(instrumentKey, instrumentVersion)].filter((candidate): candidate is SituationPackageV1 => candidate !== undefined)
+      : listSituationPackages(),
+    instrumentKey,
+    instrumentVersion,
+  )
+  if (!situationPackage) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化测评题包不存在或已停用', 404)
   }
   const validation = validateSituationPackage(situationPackage)
@@ -200,7 +204,7 @@ const pilotPackage = (instrumentKey: string, instrumentVersion?: string): Situat
 }
 
 export const listSituationalInstruments = () => listSituationPackages()
-  .filter((situationPackage) => situationPackage.releaseStatus !== 'RETIRED')
+  .filter((situationPackage) => situationPackage.releaseStatus === 'PUBLISHED')
   .map((situationPackage) => {
     const validation = validateSituationPackage(situationPackage)
     if (!validation.valid) return null
@@ -210,12 +214,7 @@ export const listSituationalInstruments = () => listSituationPackages()
       definition: situationPackage.definition,
       sourceDefinitionHash: validation.definitionHash,
     })
-    const snapshot = freezeSituationalRuntimeAtAttemptStart({
-      instrumentKey: situationPackage.key,
-      instrumentVersion: situationPackage.instrumentVersion,
-      definition: situationPackage.definition,
-      frozenAt: new Date(0),
-    })
+    const runnerDefinition = runnerSituationDefinition(situationPackage.definition)
     return {
       key: situationPackage.key,
       version: situationPackage.instrumentVersion,
@@ -224,8 +223,8 @@ export const listSituationalInstruments = () => listSituationPackages()
       compiledRuntimeHash: runtime.compiledRuntimeHash,
       scorerKey: runtime.scorerKey,
       scoringVersion: runtime.scorerVersion,
-      sampling: snapshot.runnerDefinition.sampling,
-      definition: snapshot.runnerDefinition,
+      sampling: runnerDefinition.sampling,
+      definition: runnerDefinition,
       runtimeCapabilities: runtime.runtimeCapabilities,
     }
   })

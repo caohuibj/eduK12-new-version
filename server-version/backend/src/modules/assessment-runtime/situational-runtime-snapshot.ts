@@ -98,7 +98,11 @@ const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => 
     collectionFacts: false,
     supported: true,
   }
-  if (JSON.stringify(runtime.runtimeCapabilities) !== JSON.stringify(expected)) {
+  const keys = Object.keys(expected) as Array<keyof typeof expected>
+  const actual = runtime.runtimeCapabilities
+  const hasExpectedKeys = Object.keys(actual).length === keys.length
+  const hasExpectedValues = keys.every((key) => actual[key] === expected[key])
+  if (!hasExpectedKeys || !hasExpectedValues) {
     throw new Error('Situational PR-B runtime capabilities are not the standalone pilot contract')
   }
 }

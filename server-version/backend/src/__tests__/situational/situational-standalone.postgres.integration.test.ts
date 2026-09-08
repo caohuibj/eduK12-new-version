@@ -1,9 +1,13 @@
 import { randomUUID } from 'node:crypto'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-anxiety-golden-zh-cn-v1'
+import { freezeSituationalRuntimeAtAttemptStart, encryptFrozenSituationalRuntimeSnapshot } from '../../modules/assessment-runtime/situational-runtime-snapshot'
+import { getParticipantKey } from '../../modules/assessment-runtime/participant-key'
+import { scoreSituational } from '../../modules/situational/situation-scoring'
+import type { SituationDefinitionV1 } from '../../modules/situational/situation-definition'
 
 const databaseUrl = integrationDatabaseUrl(
   'SITUATIONAL_PRB_INTEGRATION_DATABASE_URL',
@@ -36,8 +40,57 @@ const assertivenessResponses = [
   { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'B' as const },
 ]
 
+const publishedPackages = [
+  { ...SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE, releaseStatus: 'PUBLISHED' as const },
+  { ...SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE, releaseStatus: 'PUBLISHED' as const },
+]
+
+const sceneCountDefinition = (sceneCount: number): SituationDefinitionV1 => {
+  const definition = JSON.parse(JSON.stringify(SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE.definition)) as SituationDefinitionV1
+  const template = definition.scenes[0]!
+  definition.scenes = Array.from({ length: sceneCount }, (_, index) => {
+    const sceneKey = `SC-${String(index + 1).padStart(3, '0')}`
+    return {
+      ...template,
+      sceneKey,
+      title: `characterization scene ${index + 1}`,
+      sortOrder: index,
+      stimulus: template.stimulus.type === 'TEXT_V1'
+        ? { ...template.stimulus, text: `${template.stimulus.text} (${index + 1})` }
+        : template.stimulus,
+    }
+  })
+  definition.scoring.choiceScores = definition.scenes.flatMap((scene) => {
+    const channel = scene.channels.find((candidate) => candidate.responseType === 'SINGLE_CHOICE')
+    if (!channel || channel.responseType !== 'SINGLE_CHOICE') throw new Error('characterization fixture must contain a choice channel')
+    return channel.options.map((option) => ({
+      sceneKey: scene.sceneKey,
+      channelKey: channel.channelKey,
+      optionKey: option.optionKey,
+      contribution: option.optionKey === 'A' ? 1 : option.optionKey === 'B' ? 0 : option.optionKey === 'C' ? -0.5 : -1,
+    }))
+  })
+  return definition
+}
+
+const sceneCountResponses = (definition: SituationDefinitionV1) => definition.scenes.flatMap((scene) => ([
+  { sceneKey: scene.sceneKey, channelKey: 'appraisal', responseValue: 'A' as const },
+  { sceneKey: scene.sceneKey, channelKey: 'emotion', responseValue: 50 },
+]))
+
 suite('Situational PR-B standalone PostgreSQL runtime', () => {
   beforeAll(async () => {
+    // Production registry fixtures remain DRAFT until publication. The real-PG
+    // lifecycle tests use the same definitions through a published test view so
+    // they exercise participant admission without changing production status.
+    vi.doMock('../../modules/situational/situation-package.registry', async () => {
+      const actual = await vi.importActual<typeof import('../../modules/situational/situation-package.registry')>('../../modules/situational/situation-package.registry')
+      return {
+        ...actual,
+        listSituationPackages: () => publishedPackages,
+        getSituationPackage: (key: string, version: string) => publishedPackages.find((candidate) => candidate.key === key && candidate.instrumentVersion === version),
+      }
+    })
     process.env.DATABASE_URL = databaseUrl!
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
@@ -202,5 +255,74 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     expect(await db!.situationalRawSubmission.count({
       where: { attemptId: { in: fixtures.map(({ started }) => started.attemptId) } },
     })).toBe(count)
+  })
+
+  it.each([10, 30, 60])('characterizes one FINAL across %s scenes without per-scene persistence', async (sceneCount) => {
+    const userId = await createUser(`scene-count-${sceneCount}`)
+    const definition = sceneCountDefinition(sceneCount)
+    const snapshot = freezeSituationalRuntimeAtAttemptStart({
+      instrumentKey: `sjt-scene-count-${sceneCount}-${randomUUID()}`,
+      instrumentVersion: '1.0.0',
+      definition,
+    })
+    const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
+    const attempt = await db!.situationalAttempt.create({
+      data: {
+        userId,
+        participantKey: getParticipantKey(userId),
+        instrumentKey: snapshot.instrumentKey,
+        instrumentVersion: snapshot.instrumentVersion,
+        attemptNo: 1,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        definitionHash: snapshot.definitionHash,
+        compiledRuntimeHash: snapshot.compiledRuntimeHash,
+        scorerKey: snapshot.scorerKey,
+        scoringVersion: snapshot.scoringVersion,
+        frozenAt: new Date(snapshot.frozenAt),
+        runtimeSnapshotEncrypted: encryptedSnapshot,
+        progress: 0,
+      },
+      select: { id: true },
+    })
+    createdAttemptIds.push(attempt.id)
+
+    const responses = sceneCountResponses(definition)
+    const input = {
+      attemptId: attempt.id,
+      userId,
+      submissionId: `situational-prb-scene-count-${sceneCount}-${randomUUID()}`,
+      attemptEpoch: 1,
+      definitionHash: snapshot.definitionHash,
+      instrumentVersion: snapshot.instrumentVersion,
+      compiledRuntimeHash: snapshot.compiledRuntimeHash,
+      scoringVersion: snapshot.scoringVersion,
+      responses,
+    }
+    const expected = scoreSituational(definition, responses)
+    const submitted = await submitSituationalAttemptFinal(input)
+    expect(submitted.replayed).toBe(false)
+    expect(submitted.result).toEqual(expected)
+    expect(submitted.attempt.status).toBe('COMPLETED')
+    expect(submitted.canonicalResult?.core.unitType).toBe('SITUATIONAL')
+
+    const replayed = await submitSituationalAttemptFinal(input)
+    expect(replayed.replayed).toBe(true)
+    expect(replayed.canonicalResult?.resultHash).toBe(submitted.canonicalResult?.resultHash)
+
+    const stored = await db!.situationalAttempt.findUnique({
+      where: { id: attempt.id },
+      select: { status: true, resultEncrypted: true, canonicalResultEncrypted: true },
+    })
+    expect(stored).toMatchObject({
+      status: 'COMPLETED',
+      resultEncrypted: expect.any(String),
+      canonicalResultEncrypted: expect.any(String),
+    })
+    expect(await db!.situationalRawSubmission.count({ where: { attemptId: attempt.id } })).toBe(1)
+    expect((await db!.situationalRawSubmission.findUnique({ where: { attemptId: attempt.id }, select: { responseCount: true } }))?.responseCount)
+      .toBe(sceneCount * 2)
   })
 })

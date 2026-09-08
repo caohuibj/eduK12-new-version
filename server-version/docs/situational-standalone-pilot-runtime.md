@@ -3,9 +3,10 @@
 ## Scope
 
 PR-B delivers one standalone Situational assessment UNIT. The runtime is
-authenticated and student-facing, but it is still a pilot runtime: the three
-code-owned packages may remain `DRAFT` until the PR-C publication/launch gate
-is implemented. `RETIRED` packages cannot start.
+authenticated and student-facing, but participant admission is release-state
+aware: only `PUBLISHED` packages can be listed or started. Code-owned
+development packages may remain `DRAFT` until the PR-C publication/launch gate
+is implemented, and `RETIRED` packages cannot start.
 
 The instrument contract is fixed to:
 
