@@ -75,3 +75,58 @@ groups:
           service: monitoring
         annotations:
           summary: a monitoring exporter target is down
+
+  - name: eduk12-capacity
+    rules:
+      - alert: EduK12EventLoopDelayHigh
+        expr: ptool_nodejs_event_loop_delay_seconds{quantile="0.99"} > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: Node.js event-loop p99 delay stayed above 200 ms for five minutes
+
+      - alert: EduK12AdmissionQueueSustained
+        expr: max by (gate) (ptool_bounded_admission_queue) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: A bounded admission gate has remained queued for five minutes
+
+      - alert: EduK12AdmissionRejectionsHigh
+        expr: sum by (gate, reason) (increase(ptool_bounded_admission_rejections_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: A bounded admission gate is repeatedly rejecting work
+
+      - alert: EduK12PrismaLatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(ptool_prisma_call_duration_seconds_bucket[5m]))
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: Prisma call p95 latency stayed above 500 ms for ten minutes
+
+      - alert: EduK12SerializationConflictRateHigh
+        expr: |
+          sum(rate(ptool_serialization_conflicts_total[5m]))
+          /
+          clamp_min(sum(rate(ptool_serializable_attempts_total[5m])), 0.001)
+          > 0.2
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: Serializable transaction conflicts exceeded 20 percent of attempts

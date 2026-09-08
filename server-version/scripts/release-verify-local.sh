@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-# Reproducible local release gate.  All database and Redis state is created
-# in uniquely named, short-lived Docker resources; this script never calls
-# `docker compose down` and therefore cannot stop the developer stack.
+# Reproducible local release/deployment gate. All database and Redis state is
+# created in uniquely named, short-lived Docker resources; this script never
+# calls `docker compose down` and therefore cannot stop the developer stack.
+#
+# Code correctness is authoritative in GitHub CI. By default this gate assumes
+# the exact SHA has already passed CI and verifies release-specific concerns:
+# migration/backfill/preflight, production compose, production images, runtime
+# permissions, and cleanup. Set RELEASE_VERIFY_RUN_CODE_GATES=true only when an
+# explicit offline/full rerun of the duplicated code gates is required.
 #
 # Production sequencing is intentionally documented, not performed, here:
 # drain/stop old API, workers, and public traffic before migration; backup;
@@ -34,6 +40,7 @@ EXIT_CODE=0
 STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 SHA='unknown'
 BRANCH='unknown'
+RUN_CODE_GATES="${RELEASE_VERIFY_RUN_CODE_GATES:-false}"
 
 log() { printf '[release-verify] %s\n' "$*"; }
 fail() { printf '[release-verify] ERROR: %s\n' "$*" >&2; return 1; }
@@ -79,6 +86,7 @@ cleanup() {
   RELEASE_VERIFY_BACKEND_IMAGE_ID="${BACKEND_IMAGE_ID:-}" \
   RELEASE_VERIFY_FRONTEND_IMAGE_ID="${FRONTEND_IMAGE_ID:-}" \
   RELEASE_VERIFY_IMAGE_CLEANUP_STATUS="$image_cleanup_status" \
+  RELEASE_VERIFY_RUN_CODE_GATES="$RUN_CODE_GATES" \
   node --input-type=module - <<'NODE'
 import fs from 'node:fs'
 const output = {
@@ -89,6 +97,9 @@ const output = {
   endedAt: process.env.RELEASE_VERIFY_ENDED_AT,
   exitCode: Number(process.env.RELEASE_VERIFY_EXIT_CODE || 1),
   reportDirectory: process.env.RELEASE_VERIFY_REPORT_DIR,
+  verificationScope: 'release-deployment-artifact',
+  codeCorrectnessPrerequisite: 'same-sha-github-ci-green',
+  codeGatesRerun: process.env.RELEASE_VERIFY_RUN_CODE_GATES === 'true',
   temporaryResourcesClean: Number(process.env.RELEASE_VERIFY_CLEANUP_STATUS || 1) === 0,
   temporaryImagesClean: Number(process.env.RELEASE_VERIFY_IMAGE_CLEANUP_STATUS || 1) === 0,
   imageIds: {
@@ -102,6 +113,11 @@ NODE
   return "$EXIT_CODE"
 }
 trap cleanup EXIT
+
+case "$RUN_CODE_GATES" in
+  true|false) ;;
+  *) fail 'RELEASE_VERIFY_RUN_CODE_GATES must be true or false'; exit 1 ;;
+esac
 
 if ! command -v docker >/dev/null 2>&1; then fail 'Docker is required'; exit 1; fi
 if ! command -v npm >/dev/null 2>&1; then fail 'npm is required'; exit 1; fi
@@ -120,13 +136,18 @@ if [ -n "$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all -- "$BAC
 fi
 
 log 'production prerequisite reminder: drain/stop old API/workers/public traffic before applying NOT VALID token migrations; this gate never touches ptool-*'
+if [ "$RUN_CODE_GATES" = 'false' ]; then
+  log "code-correctness prerequisite: GitHub CI for exact SHA $SHA must already be green; duplicate code gates are skipped"
+else
+  log 'explicit full mode enabled: duplicated backend/frontend code gates will be rerun'
+fi
 
 git -C "$REPO_ROOT" diff --check >"$REPORT_DIR/git-diff-check.log"
 node --version >"$REPORT_DIR/tool-versions.log"
 npm --version >>"$REPORT_DIR/tool-versions.log"
 docker --version >>"$REPORT_DIR/tool-versions.log"
 docker compose version >>"$REPORT_DIR/tool-versions.log"
-printf 'sha=%s\nbranch=%s\nstarted_at=%s\n' "$SHA" "$BRANCH" "$STARTED_AT" >"$REPORT_DIR/metadata.txt"
+printf 'sha=%s\nbranch=%s\nstarted_at=%s\ncode_gates_rerun=%s\n' "$SHA" "$BRANCH" "$STARTED_AT" "$RUN_CODE_GATES" >"$REPORT_DIR/metadata.txt"
 
 TEST_DB_USER='release_test'
 TEST_DB_PASSWORD='release_test_password'
@@ -195,8 +216,10 @@ run_logged() {
   "$@" >"$REPORT_DIR/$log_name" 2>&1
 }
 
+# Backend dependencies remain necessary for the host-side migration/backfill/
+# preflight operators. Frontend dependencies are only needed in explicit full
+# mode; the production Docker build installs its own exact dependencies.
 run_logged backend-npm-ci.log npm --prefix "$BACKEND_DIR" ci
-run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
 run_logged backend-migrate.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
 ADMIN_USERNAME='release_verify_admin' ADMIN_PASSWORD='release_verify_admin_password_2026' \
   run_logged backend-seed.log npm --prefix "$BACKEND_DIR" run db:seed
@@ -214,27 +237,35 @@ if [ "$MISSING_UPLOAD_PREFLIGHT_STATUS" -eq 0 ]; then
   fail 'release preflight unexpectedly passed with a missing uploads directory'
   exit 1
 fi
-run_logged backend-build.log npm --prefix "$BACKEND_DIR" run build
-run_logged backend-audit.log npm --prefix "$BACKEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
 
-BACKEND_TEST_REPORT="$REPORT_DIR/backend-vitest.json"
-run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
-run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-release-test-report.mjs" "$BACKEND_TEST_REPORT" \
-  src/__tests__/cognitive/concurrency.integration.test.ts \
-  src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
-  src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
-  src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
-  src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts \
-  src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts \
-  src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
-  src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
-  src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
+if [ "$RUN_CODE_GATES" = 'true' ]; then
+  run_logged backend-build.log npm --prefix "$BACKEND_DIR" run build
+  run_logged backend-audit.log npm --prefix "$BACKEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
 
-run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint
-run_logged frontend-typecheck.log npm --prefix "$FRONTEND_DIR" run typecheck
-run_logged frontend-test.log npm --prefix "$FRONTEND_DIR" test
-run_logged frontend-build.log npm --prefix "$FRONTEND_DIR" run build
-run_logged frontend-audit.log npm --prefix "$FRONTEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
+  BACKEND_TEST_REPORT="$REPORT_DIR/backend-vitest.json"
+  run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
+  run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-release-test-report.mjs" "$BACKEND_TEST_REPORT" \
+    src/__tests__/cognitive/concurrency.integration.test.ts \
+    src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
+    src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
+    src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
+    src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts \
+    src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts \
+    src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts \
+    src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
+    src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
+    src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
+    src/__tests__/hotpath/query-budget.postgres.integration.test.ts
+
+  run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
+  run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint
+  run_logged frontend-typecheck.log npm --prefix "$FRONTEND_DIR" run typecheck
+  run_logged frontend-test.log npm --prefix "$FRONTEND_DIR" test
+  run_logged frontend-build.log npm --prefix "$FRONTEND_DIR" run build
+  run_logged frontend-audit.log npm --prefix "$FRONTEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
+fi
 
 COMPOSE_ENV="$REPORT_DIR/compose.env"
 umask 077
