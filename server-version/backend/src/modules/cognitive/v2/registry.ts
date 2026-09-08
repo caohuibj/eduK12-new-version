@@ -17,7 +17,17 @@ type AnyRegistryEntry = RegistryEntry<unknown, unknown>
 
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
 
+// Existing Trail Making scorer flags are provenance warnings: they do not
+// change metrics or legacy interpretability. Keep that historical meaning when
+// adapting into v2 instead of letting the legacy name-based fallback demote the
+// entire cognitive result to LIMITED.
+const nonDegradingProvenanceQualityFlags = new Set([
+  'deviceInfoIncomplete',
+  'mixedPointerType',
+])
+
 const qualityEffect = (key: string): QualityDefinition['effect'] => {
+  if (nonDegradingProvenanceQualityFlags.has(key)) return 'none'
   if (/invalid|corrupt|malformed/i.test(key)) return 'invalid'
   if (key === 'interpretable') return 'none'
   return 'limited'

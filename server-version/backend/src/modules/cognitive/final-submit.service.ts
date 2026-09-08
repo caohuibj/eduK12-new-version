@@ -33,6 +33,7 @@ import {
 import { submitUnifiedCognitiveSessionFinal } from './unified-final-submit.service'
 import { UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from './cognitive-admission.service'
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
+import type { AdministrationProvenanceV1 } from './administration-provenance'
 
 export type FinalCognitiveSubmitInput = {
   sessionId: string
@@ -41,6 +42,7 @@ export type FinalCognitiveSubmitInput = {
   definitionHash: string
   contextSnapshotHash?: string | null
   trials: unknown[]
+  administrationProvenance?: AdministrationProvenanceV1
   userId?: string | null
   recoveryTokenHash?: string
 }

@@ -45,4 +45,29 @@ describe('final draft persistence', () => {
     expect((await store.get(draftKey))?.status).toBe('RETRY_PENDING')
     await store.delete(draftKey)
   })
+
+  it('merges instrument metadata without making it draft identity or overwriting status', async () => {
+    const store = createFinalDraftStore()
+    const draftKey = `metadata-draft-${Date.now()}`
+    await store.ensure(metaFor(draftKey))
+    await store.setStatus(draftKey, 'RETRY_PENDING', { code: 'NETWORK', message: 'timeout' })
+    await store.setInstrumentMetadata(draftKey, {
+      cognitiveAdministrationProvenance: {
+        schemaVersion: 1,
+        deviceClass: 'PHONE',
+        administrationMode: 'TOUCH',
+      },
+    })
+    const current = await store.get(draftKey)
+    expect(current?.status).toBe('RETRY_PENDING')
+    expect(current?.instrumentMetadata).toMatchObject({
+      cognitiveAdministrationProvenance: {
+        schemaVersion: 1,
+        deviceClass: 'PHONE',
+        administrationMode: 'TOUCH',
+      },
+    })
+    await expect(store.ensure({ ...metaFor(draftKey), instrumentMetadata: { other: true } })).resolves.toBeTruthy()
+    await store.delete(draftKey)
+  })
 })

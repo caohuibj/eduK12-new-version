@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { useCognitiveSession } from '../core/useCognitiveSession'
+import { useAdministrationProvenance } from '../core/useAdministrationProvenance'
 import { resolveRunner } from '../registry'
 
 const safeInternalReturnTo = (value: string | null, fallback: string) => {
@@ -19,7 +20,6 @@ const safeInternalReturnTo = (value: string | null, fallback: string) => {
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
  * 按状态机渲染；RECOVERY_REQUIRED 明确提示、绝不静默重跑/猜测进度。
  */
-
 const CognitiveRunner: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
@@ -32,6 +32,8 @@ const CognitiveRunner: React.FC = () => {
   )
   const controller = useCognitiveSession(sessionId ?? '', sessionApi)
   const { state } = controller
+  const administrationProvenance = useAdministrationProvenance(state.session, state.status)
+  const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
 
@@ -60,7 +62,6 @@ const CognitiveRunner: React.FC = () => {
   }
 
   if (state.status === 'COMPLETED') {
-    // 完成态：结果页只读展示，不重新评分
     if (sessionId) {
       const returnTo = searchParams.get('returnTo')
       const target = safeInternalReturnTo(
@@ -186,18 +187,20 @@ const CognitiveRunner: React.FC = () => {
             匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存它，之后可在其他设备继续作答。
           </p>
         )}
-        <Runner
-          taskContext={state.taskContext}
-          trialIndex={state.trialIndex}
-          onTrialComplete={controller.appendTrial}
-          onTaskComplete={taskCompletes ? controller.complete : undefined}
-        />
+        <div data-cognitive-task-root="true">
+          <Runner
+            taskContext={state.taskContext}
+            trialIndex={state.trialIndex}
+            onTrialComplete={controller.appendTrial}
+            onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
+          />
+        </div>
         {state.error && (
           <p className="text-sm text-red-500 text-center mt-3">{state.error.message}</p>
         )}
         {isLastTrial && state.status !== 'SUBMITTING_TRIAL' && (
           <div className="text-center mt-6">
-            <button onClick={controller.complete} className="btn-primary">
+            <button onClick={() => void completeWithProvenance()} className="btn-primary">
               完成测评
             </button>
           </div>

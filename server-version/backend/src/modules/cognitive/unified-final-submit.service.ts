@@ -18,6 +18,7 @@ import { loadFrozenMeasurementContext } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
+import type { AdministrationProvenanceV1 } from './administration-provenance'
 
 import { validateAndNormalizeTrials } from './v2/trial-normalizer'
 import { runAuthoritativeScorer } from './v2/authoritative-scorer'
@@ -55,6 +56,7 @@ export type UnifiedCognitiveFinalSubmitInput = {
   definitionHash: string
   contextSnapshotHash?: string | null
   trials: unknown[]
+  administrationProvenance?: AdministrationProvenanceV1
   userId?: string | null
   recoveryTokenHash?: string
 }
@@ -211,7 +213,12 @@ const prepareRuntime = (
     'final_submit_payload_validation',
     () => normalizeSubmission(definition, input.trials),
   )
-  const payload = { trials }
+  // Preserve historical replay hashes exactly when provenance is absent.
+  // New clients bind provenance into the canonical submission identity so the
+  // same submissionId cannot silently replay with different cohort metadata.
+  const payload = input.administrationProvenance
+    ? { trials, administrationProvenance: input.administrationProvenance }
+    : { trials }
   const canonical = measureRequestPhaseSync('final_submit_serialization', () => {
     const bytes = canonicalJsonBytes(payload)
     const payloadHash = measureRequestPhaseSync(
@@ -353,6 +360,9 @@ export const submitUnifiedCognitiveSessionFinal = async (
     rawSubmission: encryptUnifiedRuntimePayload(createUnifiedCognitiveRawSubmissionPayload({
       attemptEpoch: input.attemptEpoch,
       trials: prepared.trials,
+      ...(input.administrationProvenance
+        ? { administrationProvenance: input.administrationProvenance }
+        : {}),
     })),
     resultSnapshot: encryptCognitivePayload(resultSnapshot),
     canonicalResult: canonicalResult

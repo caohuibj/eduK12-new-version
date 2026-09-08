@@ -35,6 +35,8 @@ export interface FinalDraftMeta {
   submittedAt?: number | null
   errorCode?: string | null
   errorMessage?: string | null
+  /** Optional, non-identity instrument metadata. Never participates in sameIdentity(). */
+  instrumentMetadata?: Record<string, unknown>
 }
 
 export interface FinalDraftAnswer {
@@ -152,6 +154,7 @@ export interface FinalDraftStore {
   get(draftKey: string): Promise<FinalDraftMeta | null>
   ensure(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
+  setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   putAnswer(answer: FinalDraftAnswer): Promise<void>
   listAnswers(draftKey: string): Promise<FinalDraftAnswer[]>
   putTrial(trial: FinalDraftTrial): Promise<void>
@@ -181,6 +184,18 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
     this.metas.set(meta.draftKey, { ...meta })
     return meta
+  }
+
+  async setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>) {
+    const current = this.metas.get(draftKey)
+    if (!current) return null
+    const next = {
+      ...current,
+      instrumentMetadata: { ...(current.instrumentMetadata ?? {}), ...metadata },
+      updatedAt: Date.now(),
+    }
+    this.metas.set(draftKey, next)
+    return next
   }
 
   async putAnswer(answer: FinalDraftAnswer) {
@@ -277,6 +292,21 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     return this.run<FinalDraftMeta>([META_STORE], 'readwrite', async (transaction) => {
       transaction.objectStore(META_STORE).put({ ...meta })
       return meta
+    })
+  }
+
+  async setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>) {
+    return this.run<FinalDraftMeta | null>([META_STORE], 'readwrite', async (transaction) => {
+      const store = transaction.objectStore(META_STORE)
+      const current = await requestResult<FinalDraftMeta | undefined>(store.get(draftKey))
+      if (!current) return null
+      const next = {
+        ...current,
+        instrumentMetadata: { ...(current.instrumentMetadata ?? {}), ...metadata },
+        updatedAt: Date.now(),
+      }
+      store.put(next)
+      return next
     })
   }
 

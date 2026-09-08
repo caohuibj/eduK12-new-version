@@ -9,6 +9,12 @@ import {
 import { initialRunnerState, runnerReducer } from './runner.state'
 import type { RunnerError, RunnerState } from './runner.types'
 import { wrapCognitiveTrial } from './trial-envelope'
+import type { AdministrationProvenanceV1, CognitiveAdministrationMode } from './administration-provenance'
+import { reconcileDeviceClass } from './administration-provenance'
+import {
+  COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY,
+  readCognitiveAdministrationProvenance,
+} from './useAdministrationProvenance'
 import {
   checkpointErrorStatus,
   CheckpointTransportError,
@@ -66,11 +72,36 @@ const finalDraftErrorStatus = (error: unknown) => {
     : 'RETRY_PENDING' as const
 }
 
+const mergeAdministrationMode = (
+  left: CognitiveAdministrationMode,
+  right: CognitiveAdministrationMode,
+): CognitiveAdministrationMode => {
+  const touch = left === 'TOUCH' || left === 'MIXED' || right === 'TOUCH' || right === 'MIXED'
+  const keyboardMouse = left === 'KEYBOARD_MOUSE' || left === 'MIXED' || right === 'KEYBOARD_MOUSE' || right === 'MIXED'
+  if (touch && keyboardMouse) return 'MIXED'
+  if (touch) return 'TOUCH'
+  if (keyboardMouse) return 'KEYBOARD_MOUSE'
+  return 'UNKNOWN'
+}
+
+const mergeAdministrationProvenance = (
+  stored: AdministrationProvenanceV1 | null,
+  current: AdministrationProvenanceV1 | undefined,
+): AdministrationProvenanceV1 | undefined => {
+  if (!stored) return current
+  if (!current) return stored
+  return {
+    schemaVersion: 1,
+    deviceClass: reconcileDeviceClass(stored.deviceClass, current.deviceClass),
+    administrationMode: mergeAdministrationMode(stored.administrationMode, current.administrationMode),
+  }
+}
+
 export interface CognitiveSessionController {
   state: RunnerState
   start: () => void
   appendTrial: (payload: Record<string, unknown>) => Promise<boolean>
-  complete: () => Promise<void>
+  complete: (administrationProvenance?: AdministrationProvenanceV1) => Promise<void>
   restart: () => Promise<CognitiveSession | null>
   reload: () => void
 }
@@ -283,7 +314,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
     [cognitiveCheckpointTransport, handleCheckpointError, sessionId]
   )
 
-  const complete = useCallback(async () => {
+  const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1) => {
     dispatch({ type: 'COMPLETE_START' })
     let finalDraftKey: string | null = null
     try {
@@ -293,8 +324,16 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         if (!submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
         const draftKey = `cognitive:${session.sessionId}`
         finalDraftKey = draftKey
-        const meta = await finalDraftStore.get(draftKey)
+        let meta = await finalDraftStore.get(draftKey)
         if (!meta) throw new Error('本地认知草稿不存在，请重启测评')
+        const storedProvenance = readCognitiveAdministrationProvenance(meta.instrumentMetadata)
+        const finalProvenance = mergeAdministrationProvenance(storedProvenance, administrationProvenance)
+        if (finalProvenance) {
+          const persistedMeta = await finalDraftStore.setInstrumentMetadata(draftKey, {
+            [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: finalProvenance,
+          }).catch(() => null)
+          meta = persistedMeta ?? meta
+        }
         const trials = await finalDraftStore.listTrials(draftKey)
         if (trials.length === 0) throw new Error('尚未记录任何认知试次')
         await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
@@ -312,6 +351,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
               definitionHash: meta.definitionHash,
               contextSnapshotHash: meta.contextSnapshotHash,
               trials: trials.map((trial) => trial.payload),
+              ...(finalProvenance ? { administrationProvenance: finalProvenance } : {}),
             })
             if (next.code !== 0 || !next.data) {
               const responseError = new Error(next.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
