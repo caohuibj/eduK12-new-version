@@ -46,6 +46,14 @@ export interface ResearchGradeReadinessInput {
   /** 想要在 research grade 下支持的用途；只有这些用途的证据要求参与评估。 */
   intendedUses: IntendedUse[]
   evidence: ScaleEvidenceRecord[]
+  /**
+   * 当前评估部署上下文。Applicability 只使用 manifest 已结构化的 locale /
+   * territory；population / ageRange 是 opaque catalog text，本模块不解析它们。
+   */
+  deployment: {
+    locale: string
+    territory: string
+  }
 }
 
 export interface ResearchGradeReadinessDecision {
@@ -55,9 +63,8 @@ export interface ResearchGradeReadinessDecision {
   evidenceRefs: string[]
 }
 
-const isSatisfied = (rating: ScaleEvidenceRecord['rating']): boolean => (
-  rating === 'SUFFICIENT' || rating === 'MIXED'
-)
+/** 只有明确 SUFFICIENT 才能满足 research-grade required evidence。 */
+const isSatisfied = (rating: ScaleEvidenceRecord['rating']): boolean => rating === 'SUFFICIENT'
 
 /** 显式评级优先级：SUFFICIENT > MIXED > INSUFFICIENT > UNKNOWN，保证取证结果与输入顺序无关。 */
 const RATING_PREFERENCE: Record<ScaleEvidenceRecord['rating'], number> = {
@@ -67,11 +74,31 @@ const RATING_PREFERENCE: Record<ScaleEvidenceRecord['rating'], number> = {
   UNKNOWN: 3,
 }
 
-/** 取该证据类型下评级最优的一条记录；INSUFFICIENT/UNKNOWN 也要返回，供 gap 消息引用评级。 */
-const bestEvidenceFor = (evidence: ScaleEvidenceRecord[], evidenceType: EvidenceType): ScaleEvidenceRecord | undefined => {
+/**
+ * 取该证据类型下评级最优的一条适用记录；INSUFFICIENT/UNKNOWN 也要返回，
+ * 供 gap 消息引用评级。只使用结构化 locale / territory，不对自由文本 population
+ * 做解析或推断，避免在 readiness evaluator 中隐式建立 Population Engine。
+ */
+const bestEvidenceFor = (
+  evidence: ScaleEvidenceRecord[],
+  evidenceType: EvidenceType,
+  deployment: ResearchGradeReadinessInput['deployment'],
+): ScaleEvidenceRecord | undefined => {
   const records = evidence.filter((record) => record.evidenceType === evidenceType)
+    .filter((record) => record.locale === deployment.locale && record.territory === deployment.territory)
   return [...records].sort((left, right) => RATING_PREFERENCE[left.rating] - RATING_PREFERENCE[right.rating])[0]
 }
+
+const mixedEvidenceFor = (
+  evidence: ScaleEvidenceRecord[],
+  evidenceType: EvidenceType,
+  deployment: ResearchGradeReadinessInput['deployment'],
+): ScaleEvidenceRecord[] => evidence.filter((record) => (
+  record.evidenceType === evidenceType
+  && record.locale === deployment.locale
+  && record.territory === deployment.territory
+  && record.rating === 'MIXED'
+))
 
 export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInput): ResearchGradeReadinessDecision => {
   if (input.intendedUses.length === 0) {
@@ -88,25 +115,38 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
   const evidenceRefs = new Set<string>()
   let requiredTotal = 0
   let requiredSatisfied = 0
+  let hasMixedEvidence = false
 
   const uniqueUses = [...new Set(input.intendedUses)]
   for (const use of uniqueUses) {
     const relevance = RELEVANCE_BY_INTENDED_USE[use]
     for (const evidenceType of relevance.required) {
       requiredTotal += 1
-      const record = bestEvidenceFor(input.evidence, evidenceType)
+      const record = bestEvidenceFor(input.evidence, evidenceType, input.deployment)
+      const mixedRecords = mixedEvidenceFor(input.evidence, evidenceType, input.deployment)
+      mixedRecords.forEach((mixedRecord) => evidenceRefs.add(mixedRecord.evidenceId))
+      if (mixedRecords.length > 0) hasMixedEvidence = true
       if (record && isSatisfied(record.rating)) {
         requiredSatisfied += 1
         evidenceRefs.add(record.evidenceId)
         strengths.push(`[${use}] ${evidenceType}：${record.rating}（${record.citation}）`)
+        if (mixedRecords.length > 0) {
+          gaps.push(`[${use}] required ${evidenceType}：存在 MIXED 证据，作为 caveat；仅 SUFFICIENT 才能满足 required evidence`)
+        }
       } else if (record) {
-        gaps.push(`[${use}] required ${evidenceType}：现有证据评级 ${record.rating}，不足以支持 research grade`)
+        gaps.push(`[${use}] required ${evidenceType}：现有证据评级 ${record.rating}，作为 caveat/gap，不足以支持 research grade`)
       } else {
-        gaps.push(`[${use}] required ${evidenceType}：缺少证据`)
+        gaps.push(`[${use}] required ${evidenceType}：缺少适用于 locale=${input.deployment.locale}, territory=${input.deployment.territory} 的证据`)
       }
     }
     for (const evidenceType of relevance.optional) {
-      const record = bestEvidenceFor(input.evidence, evidenceType)
+      const record = bestEvidenceFor(input.evidence, evidenceType, input.deployment)
+      const mixedRecords = mixedEvidenceFor(input.evidence, evidenceType, input.deployment)
+      mixedRecords.forEach((mixedRecord) => evidenceRefs.add(mixedRecord.evidenceId))
+      if (mixedRecords.length > 0) {
+        hasMixedEvidence = true
+        gaps.push(`[${use}] optional ${evidenceType}：存在 MIXED 证据，作为 caveat；不将其视为确定性支持`)
+      }
       if (record && isSatisfied(record.rating)) {
         evidenceRefs.add(record.evidenceId)
         strengths.push(`[${use}] ${evidenceType}：${record.rating}（${record.citation}）`)
@@ -115,9 +155,9 @@ export const evaluateResearchGradeReadiness = (input: ResearchGradeReadinessInpu
     }
   }
 
-  const status: ResearchReadinessStatus = requiredSatisfied === requiredTotal
+  const status: ResearchReadinessStatus = requiredSatisfied === requiredTotal && !hasMixedEvidence
     ? 'READY'
-    : requiredSatisfied > 0 ? 'PARTIAL' : 'NOT_ESTABLISHED'
+    : requiredSatisfied > 0 || hasMixedEvidence ? 'PARTIAL' : 'NOT_ESTABLISHED'
 
   return { status, strengths, gaps, evidenceRefs: [...evidenceRefs] }
 }

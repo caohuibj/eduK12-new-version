@@ -127,4 +127,34 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
     })
     expect(decision.publishable).toBe(true)
   })
+
+  it('uses one applicable local evidence record instead of summing records without sampleId', () => {
+    const parsed = manifest()
+    if (!parsed.ok) throw new Error('fixture manifest should parse')
+    const baseEvidence = parsed.manifest.evidence[0]
+    const splitSampleManifest = {
+      ...parsed.manifest,
+      evidence: [
+        { ...baseEvidence, evidenceId: 'local-sample-a', sampleSize: 200 },
+        { ...baseEvidence, evidenceId: 'local-sample-b', evidenceType: 'STRUCTURAL_VALIDITY' as const, sampleSize: 200 },
+        { ...baseEvidence, evidenceId: 'foreign-large-sample', locale: 'en', territory: 'GB', sampleSize: 1000 },
+      ],
+    }
+    const splitSummary = evaluateScientificCompleteness({
+      manifest: splitSampleManifest,
+      references: [],
+      deploymentTerritory: 'CN',
+    })
+    expect(splitSummary.hasSufficientLocalSample).toBe(false)
+
+    const thresholdSummary = evaluateScientificCompleteness({
+      manifest: {
+        ...parsed.manifest,
+        evidence: [{ ...baseEvidence, evidenceId: 'local-sample-threshold', sampleSize: 300 }],
+      },
+      references: [],
+      deploymentTerritory: 'CN',
+    })
+    expect(thresholdSummary.hasSufficientLocalSample).toBe(true)
+  })
 })

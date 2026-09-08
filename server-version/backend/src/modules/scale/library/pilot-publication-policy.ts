@@ -51,9 +51,13 @@ export const evaluateScientificCompleteness = (input: {
   deploymentTerritory: string
 }): ScientificCompletenessSummary => {
   const { manifest, references, deploymentTerritory } = input
-  const localSampleN = manifest.evidence
-    .filter((record) => record.territory === deploymentTerritory)
-    .reduce((sum, record) => sum + (record.sampleSize ?? 0), 0)
+  // Evidence has no sampleId in the current contract: never add multiple records,
+  // because they may describe the same study/sample. One applicable local record
+  // must independently meet the threshold (conservative, fail-closed semantics).
+  const hasSufficientLocalSample = manifest.evidence.some((record) => (
+    record.territory === deploymentTerritory
+    && (record.sampleSize ?? 0) >= LOCAL_SAMPLE_SUFFICIENT_N
+  ))
   return {
     scientificMaturity: manifest.scientificMaturity,
     evidenceCount: manifest.evidence.length,
@@ -69,7 +73,7 @@ export const evaluateScientificCompleteness = (input: {
     hasDeviceEquivalence: false,
     hasCompleteCoreValidityMatrix: (['CONTENT_VALIDITY', 'STRUCTURAL_VALIDITY', 'INTERNAL_CONSISTENCY'] as const)
       .every((evidenceType) => hasUsableEvidence(manifest, evidenceType)),
-    hasSufficientLocalSample: localSampleN >= LOCAL_SAMPLE_SUFFICIENT_N,
+    hasSufficientLocalSample,
   }
 }
 
