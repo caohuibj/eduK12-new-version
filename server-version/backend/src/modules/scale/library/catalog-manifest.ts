@@ -29,6 +29,16 @@ export const scaleCatalogStatusSchema = z.enum(['CANDIDATE', 'REVIEWED', 'ACCEPT
 export type ScaleCatalogStatus = z.infer<typeof scaleCatalogStatusSchema>
 
 /**
+ * Scientific maturity（SL2-C2）：与 product lifecycle（package releaseStatus）
+ * 完全独立的第二条状态轴，只有 PILOT → RESEARCH_GRADE 两档。
+ * PUBLISHED + PILOT 是完整、正式、可上线的正常产品状态；成熟度属于
+ * Admin/Expert 治理元数据，学生/家长/普通教师不需要感知。
+ * 只放 catalog：scientificMaturity 变化 → hashScaleDefinition(definition) 不变。
+ */
+export const scientificMaturitySchema = z.enum(['PILOT', 'RESEARCH_GRADE'])
+export type ScientificMaturity = z.infer<typeof scientificMaturitySchema>
+
+/**
  * 第一版 construct domains（规格 §SL1-C1）——刻意保持小集合，
  * 不做庞大 ontology；扩域必须改本枚举并过 review。
  */
@@ -347,6 +357,8 @@ export const scaleCatalogManifestV1Schema = z.object({
   schemaVersion: z.literal(SCALE_CATALOG_SCHEMA_VERSION),
   catalogManifestVersion: z.number().int().positive({ message: 'catalogManifestVersion 必须是正整数' }),
   catalogStatus: scaleCatalogStatusSchema,
+  /** 新 instrument 默认 PILOT（§10 默认原则）；显式声明 RESEARCH_GRADE 属于治理行为。 */
+  scientificMaturity: scientificMaturitySchema.default('PILOT'),
   identity: scaleCatalogIdentitySchema,
   construct: scaleCatalogConstructSchema,
   population: scaleCatalogPopulationSchema,
