@@ -165,6 +165,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const currentUnitKey = `${data.questionnaireAssessment.id}:${data.currentFormSection?.id || data.currentScale?.scaleAssessmentId || 'complete'}`
   const currentSection = data.currentFormSection
   const currentScale = data.currentScale
+  const currentScaleId = currentScale?.scaleAssessmentId ?? null
+  const currentScaleServerProvenanceJson = currentScale?.deviceInputProvenance
+    ? JSON.stringify(currentScale.deviceInputProvenance)
+    : null
 
   useEffect(() => {
     setSectionIndex(0)
@@ -182,15 +186,15 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       }
       try {
         const nextMeta = await ensureDraft(data, currentKey)
-        if (currentScale) {
-          const scaleId = currentScale.scaleAssessmentId
+        if (currentScaleId) {
+          const scaleId = currentScaleId
           const storedProvenance = readScaleDeviceInputProvenance(nextMeta.instrumentMetadata)
           const existing = scaleDeviceInputProvenanceRef.current?.scaleId === scaleId
             ? scaleDeviceInputProvenanceRef.current.value
             : null
           const provenance = resolveScaleDeviceInputProvenance({
             metadata: nextMeta.instrumentMetadata,
-            serverValue: currentScale.deviceInputProvenance,
+            serverValue: currentScaleServerProvenanceJson ? JSON.parse(currentScaleServerProvenanceJson) : undefined,
             existing,
           })
           scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
@@ -229,7 +233,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
     }
     void loadDraft()
     return () => { cancelled = true }
-  }, [currentKey, currentUnitKey, currentSection, data])
+  }, [currentKey, currentUnitKey, currentSection, currentScaleId, currentScaleServerProvenanceJson, data])
 
   useEffect(() => {
     if (data.questionnaireAssessment.status === 'COMPLETED') onCompleted()
@@ -277,7 +281,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await runFinalDraftCapacityRetry({
+      await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
             code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
@@ -294,9 +298,6 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             definitionHash: meta.definitionHash,
             contextSnapshotHash: meta.contextSnapshotHash,
             answers,
-            ...(currentScale && scaleDeviceInputProvenanceRef.current?.scaleId === currentScale.scaleAssessmentId
-              ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current.value }
-              : {}),
           })
           if (next.code !== 0) throw apiResponseError(next)
           return next
@@ -331,7 +332,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setSubmitting(true)
       setError(null)
       await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
-      const response = await runFinalDraftCapacityRetry({
+      await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
             code: String((error as any)?.code || 'ASSESSMENT_SUBMIT_BUSY'),
@@ -348,6 +349,9 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             definitionHash: meta.definitionHash,
             contextSnapshotHash: meta.contextSnapshotHash,
             answers,
+            ...(scaleDeviceInputProvenanceRef.current?.scaleId === currentScale.scaleAssessmentId
+              ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current.value }
+              : {}),
           })
           if (next.code !== 0) throw apiResponseError(next)
           return next
