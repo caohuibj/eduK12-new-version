@@ -15,7 +15,7 @@ import {
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
 import { buildScaleResult, type ScaleResultV2 } from './scale-result'
-import { encryptScaleAnswers, encryptScaleResult, scaleAssessmentForResponse } from './scale-workflow.service'
+import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse } from './scale-workflow.service'
 import {
   decryptFrozenScaleRuntimeSnapshot,
   type FrozenScaleRuntimeSnapshotV1,
@@ -31,6 +31,7 @@ import { withFinalOnlyCompletionTransaction } from '../../services/questionnaire
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
 import { buildScaleBundleBridge } from '../assessment-bundle/sources'
+import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 import {
   activateScaleAdmission,
   assertAdmissionParentBinding,
@@ -43,6 +44,7 @@ export type UnifiedScaleFinalSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
+  deviceInputProvenance?: DeviceInputProvenanceV1
   answers: Array<{
     itemCode: string
     responseValue: string | number
@@ -221,7 +223,10 @@ export const submitUnifiedScaleAssessmentFinal = async (
   const missing = missingRequiredScaleItemCodes(snapshot.definition, answers)
   if (missing.length > 0) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `还有 ${missing.length} 道必答题未作答`, 409)
   const canonical = measureRequestPhaseSync('final_submit_serialization', () => {
-    const bytes = measureRequestPhaseSync('final_submit_payload_hash', () => canonicalJsonBytes({ answers }))
+    const bytes = measureRequestPhaseSync('final_submit_payload_hash', () => canonicalJsonBytes({
+      answers,
+      ...(input.deviceInputProvenance ? { deviceInputProvenance: input.deviceInputProvenance } : {}),
+    }))
     return { bytes: bytes.byteLength, hash: createHash('sha256').update(bytes).digest('hex') }
   })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.scale, '量表提交数据')
@@ -252,7 +257,6 @@ export const submitUnifiedScaleAssessmentFinal = async (
     : null
   const completedAt = new Date()
   const encrypted = await measureRequestPhase('final_submit_encryption', async () => ({
-    answers: encryptScaleAnswers(answers),
     result: encryptScaleResult(result),
     canonicalResult: unitResult
       ? encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({
@@ -288,6 +292,9 @@ export const submitUnifiedScaleAssessmentFinal = async (
       return { replayed: true, assessment: scaleAssessmentForResponse({ ...current, scale: child.scale }), parent: null }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
+    const storedProvenance = readScaleAnswers(current.answers).deviceInputProvenance
+    const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
+    const encryptedAnswers = encryptScaleAnswers(answers, persistedProvenance)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
       id: input.assessmentId,
@@ -307,7 +314,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
       where: where as any,
       data: {
         status: 'COMPLETED',
-        answers: encrypted.answers,
+        answers: encryptedAnswers,
         result: encrypted.result,
         progress: 100,
         completedAt,
@@ -360,6 +367,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         status: 'COMPLETED',
         answers,
         result,
+        deviceInputProvenance: persistedProvenance,
         progress: 100,
         completedAt,
         totalTime,

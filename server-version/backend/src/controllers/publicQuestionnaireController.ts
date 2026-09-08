@@ -63,6 +63,7 @@ import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } f
 import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import { z } from 'zod'
+import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
 
 const publicScaleRunner = (scale: any) => {
   try {
@@ -1140,8 +1141,11 @@ export const publicQuestionnaireController = {
       const rawResponseTime = req.body?.responseTimeMs ?? req.body?.responseTime
       const responseTimeMs = rawResponseTime === undefined ? undefined : Number(rawResponseTime)
       const expectedRevisionResult = z.number().int().nonnegative().optional().safeParse(req.body?.expectedRevision)
+      const deviceInputProvenanceResult = deviceInputProvenanceV1Schema.optional().safeParse(req.body?.deviceInputProvenance)
       if (!expectedRevisionResult.success) return error(res, 'expectedRevision 必须是非负整数')
+      if (!deviceInputProvenanceResult.success) return error(res, 'deviceInputProvenance 无效')
       const expectedRevision = expectedRevisionResult.data
+      const deviceInputProvenance = deviceInputProvenanceResult.data
 
       const result = await withScaleAnswerTransaction(scaleAssessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({
@@ -1202,6 +1206,7 @@ export const publicQuestionnaireController = {
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const persistedProvenance = deviceInputProvenance ?? stored.deviceInputProvenance
         const merged = mergeScaleAnswersWithRevision(stored.answers, [{ ...answer, expectedRevision }])
         if (merged.kind === 'stale') return { kind: 'stale-answer' as const }
         const answers = merged.answers
@@ -1216,7 +1221,7 @@ export const publicQuestionnaireController = {
             answersRevision: assessment.answersRevision ?? 0,
           },
           data: {
-            answers: encryptScaleAnswers(answers),
+            answers: encryptScaleAnswers(answers, persistedProvenance),
             progress,
             ...(merged.changedCount > 0 ? { answersRevision: { increment: merged.changedCount } } : {}),
           },
@@ -1249,6 +1254,7 @@ export const publicQuestionnaireController = {
       const { sessionId } = req.params
       const schema = z.object({
         checkpointSequence: z.number().int().positive().optional(),
+        deviceInputProvenance: deviceInputProvenanceV1Schema.optional(),
         answers: z.array(z.object({
           checkpointId: z.string().min(1).optional(),
           checkpointSequence: z.number().int().positive().optional(),
@@ -1326,6 +1332,7 @@ export const publicQuestionnaireController = {
 
         const stored = readScaleAnswers(assessment.answers)
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
+        const persistedProvenance = parsed.data.deviceInputProvenance ?? stored.deviceInputProvenance
         const mergedResult = mergeScaleAnswersWithRevision(stored.answers, normalizedAnswers)
         if (mergedResult.kind === 'stale') return { kind: 'stale-answer' as const }
         const nextAnswers = mergedResult.answers
@@ -1340,7 +1347,7 @@ export const publicQuestionnaireController = {
             answersRevision: assessment.answersRevision ?? 0,
           },
           data: {
-            answers: encryptScaleAnswers(nextAnswers),
+            answers: encryptScaleAnswers(nextAnswers, persistedProvenance),
             progress,
             ...(mergedResult.changedCount > 0 ? { answersRevision: { increment: mergedResult.changedCount } } : {}),
           },
@@ -1436,7 +1443,7 @@ export const publicQuestionnaireController = {
           },
           data: {
             status: 'COMPLETED',
-            answers: encryptScaleAnswers(stored.answers),
+            answers: encryptScaleAnswers(stored.answers, stored.deviceInputProvenance),
             result: encryptScaleResult(scaleResult),
             completedAt,
             totalTime,

@@ -9,6 +9,9 @@ import {
   readScaleAnswers,
   scaleAssessmentForResponse,
 } from '../../modules/scale/scale-workflow.service'
+import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
+import { ADEXI_V2_PACKAGE } from '../../modules/scale/scale-package.registry'
+import { scoreScale } from '../../modules/scale/scale-scoring'
 
 const provenance: DeviceInputProvenanceV1 = {
   schemaVersion: 1,
@@ -30,6 +33,40 @@ describe('Scale device input provenance v1', () => {
     expect(deviceInputProvenanceV1Schema.safeParse(provenance).success).toBe(true)
     expect(deviceInputProvenanceV1Schema.safeParse({ ...provenance, userAgent: 'Mozilla/5.0' }).success).toBe(false)
     expect(deviceInputProvenanceV1Schema.safeParse({ ...provenance, hardwareId: 'device-1' }).success).toBe(false)
+  })
+
+  it('accepts provenance in the shared final submit contract and rejects identity-like additions', () => {
+    const base = {
+      submissionId: 'submission-123456',
+      attemptEpoch: 1,
+      definitionHash: 'definition-hash',
+      answers: [{ itemCode: 'item-1', responseValue: 'often' }],
+    }
+    expect(finalScaleSubmitSchema.safeParse(base).success).toBe(true)
+    expect(finalScaleSubmitSchema.safeParse({ ...base, deviceInputProvenance: provenance }).success).toBe(true)
+    expect(finalScaleSubmitSchema.safeParse({
+      ...base,
+      deviceInputProvenance: { ...provenance, userAgent: 'Mozilla/5.0' },
+    }).success).toBe(false)
+  })
+
+  it('keeps numeric scoring independent from device provenance and response timing', () => {
+    const answers = ADEXI_V2_PACKAGE.goldenCases[1].answers.map((answer) => ({
+      ...answer,
+      responseTimeMs: 500,
+    }))
+    const mobile = { ...provenance, deviceClass: 'MOBILE' as const, osFamily: 'Android' as const, browserFamily: 'Chrome' as const }
+    const desktopAnswers = readScaleAnswers(encryptScaleAnswers(answers, provenance)).answers
+    const mobileAnswers = readScaleAnswers(encryptScaleAnswers(
+      answers.map((answer) => ({ ...answer, responseTimeMs: 5000 })),
+      mobile,
+    )).answers
+    const desktop = scoreScale(ADEXI_V2_PACKAGE.definition, desktopAnswers)
+    const mobileResult = scoreScale(ADEXI_V2_PACKAGE.definition, mobileAnswers)
+    expect(desktop.scores).toEqual(mobileResult.scores)
+    expect(desktop.quality).toEqual(mobileResult.quality)
+    expect(desktop.itemScores.map(({ itemCode, responseValue, baseScore, score }) => ({ itemCode, responseValue, baseScore, score })))
+      .toEqual(mobileResult.itemScores.map(({ itemCode, responseValue, baseScore, score }) => ({ itemCode, responseValue, baseScore, score })))
   })
 
   it('keeps historical answer arrays readable and uses an envelope only when provenance exists', () => {

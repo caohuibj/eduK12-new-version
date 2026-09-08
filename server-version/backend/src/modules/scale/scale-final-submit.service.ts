@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { encryptScaleAnswers, encryptScaleResult, scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
+import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from './scale-definition'
 import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -26,6 +26,7 @@ import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.servic
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence } from './scale-admission.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
+import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 
 export type FinalScaleAnswerInput = {
   itemCode: string
@@ -40,6 +41,7 @@ export type FinalScaleSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
+  deviceInputProvenance?: DeviceInputProvenanceV1
   answers: FinalScaleAnswerInput[]
   userId?: string | null
   questionnaireSessionId?: string
@@ -306,7 +308,12 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
   if (missingRequiredItems.length > 0) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `还有 ${missingRequiredItems.length} 道必答题未作答`, 409)
   }
-  const payload = { answers }
+  const storedProvenance = readScaleAnswers(assessment.answers).deviceInputProvenance
+  const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
+  const payload = {
+    answers,
+    ...(input.deviceInputProvenance ? { deviceInputProvenance: input.deviceInputProvenance } : {}),
+  }
   const canonical = measureRequestPhaseSync('final_submit_non_db_compute', () => (
     measureRequestPhaseSync('final_submit_serialization', () => (
       measureRequestPhaseSync('final_submit_payload_hash', () => prepareCanonicalSubmission(payload))
@@ -337,7 +344,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     participantContextHash: context.hash,
   }))
   const { encryptedAnswers, encryptedResult } = await measureRequestPhase('final_submit_encryption', async () => ({
-    encryptedAnswers: encryptScaleAnswers(answers),
+    encryptedAnswers: encryptScaleAnswers(answers, persistedProvenance),
     encryptedResult: encryptScaleResult(result),
   }))
 
@@ -423,7 +430,19 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
     const parentProgress = await parentProgressUpdate(tx, assessment)
     return {
-      assessment: scaleAssessmentForResponse({ ...current, status: 'COMPLETED', answers, result, progress: 100, completedAt, totalTime, submissionId, submissionPayloadHash: payloadHash, submissionCompletedAt: completedAt }),
+      assessment: scaleAssessmentForResponse({
+        ...current,
+        status: 'COMPLETED',
+        answers,
+        result,
+        deviceInputProvenance: persistedProvenance,
+        progress: 100,
+        completedAt,
+        totalTime,
+        submissionId,
+        submissionPayloadHash: payloadHash,
+        submissionCompletedAt: completedAt,
+      }),
       replay: false,
       parent: parentProgress?.parent ?? null,
       shouldFinalize: parentProgress?.terminalCandidate ?? false,

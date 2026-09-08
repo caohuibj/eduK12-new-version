@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { MAX_TOKEN_USES } from '../../constants'
+import { deviceInputProvenanceV1Schema } from '../scale/device-input-provenance'
 
 const dateTime = z.string().datetime()
 const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
@@ -137,6 +138,7 @@ export const compositeScaleAnswerSchema = z.object({
   itemCode: z.string().min(1),
   responseValue: z.union([z.string(), z.number().finite()]),
   responseTimeMs: z.number().finite().nonnegative().optional(),
+  deviceInputProvenance: deviceInputProvenanceV1Schema.optional(),
 }).strict()
 
 export const compositeFormAnswerSchema = z.object({
