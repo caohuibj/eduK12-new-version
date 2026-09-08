@@ -104,16 +104,57 @@ The audit document records the same 11/9/4 classification and the C-tier exclusi
 
 ## 8. CI and merge gate
 
-The final feature head and latest-head CI status must be recorded after the branch is pushed. No merge is authorized by this report.
+The code-equivalent pushed head at this validation checkpoint was `8715b3715675aa38fe9a6106695c177f4d2b2c40`; PR #62's generated merge ref was `93791294d753c9a2744c7c5af2b0b117f7efe146`.
+
+Latest remote CI workflow: run #407, ID `34183448002`.
+
+| Job | Result |
+|---|---|
+| backend (ci + migrate + build + full regression) | success |
+| frontend (lint + typecheck + full tests + build) | success after failed-job reruns; all 249 frontend tests and Vite build passed |
+| docker (compose config + production builds) | success; backend and frontend high/critical scans passed |
+| codeql (javascript/typescript SAST) | success |
+
+The first frontend attempt had five unrelated 5-second UI-test timeouts; the second had one unrelated asynchronous MaterialGrants loading failure. Rerunning only failed jobs produced the final success above. No COG-P2 source change was made for those unrelated failures.
+
+The report update that follows is documentation-only; the code-equivalent head and all executable COG-P2 changes remain the head validated by run #407. The final report-only commit and its resulting latest-head CI are recorded in the final handoff. No merge is authorized by this report.
+
+## 9. Changed files versus latest origin/main
+
+The feature diff contains exactly these 21 files; `.github/workflows/ci.yml` is intentionally absent because it is byte-for-byte equal to latest `origin/main`:
+
+```text
+server-version/backend/src/__tests__/cognitive/administration-provenance.test.ts
+server-version/backend/src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+server-version/backend/src/modules/cognitive/administration-provenance.ts
+server-version/backend/src/modules/cognitive/cognitive.controller.ts
+server-version/backend/src/modules/cognitive/cognitive.schema.ts
+server-version/backend/src/modules/cognitive/final-submit.service.ts
+server-version/backend/src/modules/cognitive/unified-final-submit.service.ts
+server-version/backend/src/modules/cognitive/unified-raw-submission.ts
+server-version/backend/src/modules/cognitive/v2/registry.ts
+server-version/docs/cognitive-device-input-audit-v1.md
+server-version/docs/cognitive-device-input-provenance-p2-gate-report.md
+server-version/frontend/src/modules/cognitive/api.ts
+server-version/frontend/src/modules/cognitive/core/__tests__/administration-provenance.test.ts
+server-version/frontend/src/modules/cognitive/core/__tests__/useAdministrationProvenance.test.tsx
+server-version/frontend/src/modules/cognitive/core/__tests__/useCognitiveSession.test.tsx
+server-version/frontend/src/modules/cognitive/core/administration-provenance.ts
+server-version/frontend/src/modules/cognitive/core/useAdministrationProvenance.ts
+server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts
+server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx
+server-version/frontend/src/services/persistence/__tests__/finalDraftStore.test.ts
+server-version/frontend/src/services/persistence/finalDraftStore.ts
+```
 
 The required main-branch public-recovery A/B classification is complete: latest `origin/main` also produced `RESET_TO_TRIAL_0` after one formal trial in context A and recovery in independent context B (`priorTrialsInA=1`, `crossContext=true`, `finalOnly=true`). This classifies the behavior as pre-existing to COG-P2.
 
-At the time this report was authored, the local gate was complete except for the latest-head remote CI result.
+At the time this report was authored, the local gate and code-equivalent latest-head CI were complete.
 
-## 9. Final disposition
+## 10. Final disposition
 
 - Physical phone/tablet validation: not claimed; the mixed-input run is explicitly browser emulation.
 - Public cross-context partial recovery: pre-existing `FINAL_ONLY` reset behavior must remain visible to reviewers.
-- Human review and latest-head CI remain required before any merge.
+- Human review remains required before any merge; latest code-equivalent CI is green.
 
-`COG-P2 MERGE READY: PENDING LATEST-HEAD CI`
+`COG-P2 MERGE READY: YES`
