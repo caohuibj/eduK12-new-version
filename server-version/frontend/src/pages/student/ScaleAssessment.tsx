@@ -10,6 +10,12 @@ import { useCheckpointLifecycle } from '../../services/persistence/flushLifecycl
 import { checkpointId } from '../../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../../services/persistence/finalDraftCapacityRetry'
+import {
+  SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
+  readScaleDeviceInputProvenance,
+  resolveScaleDeviceInputProvenance,
+  type DeviceInputProvenanceV1,
+} from '../../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
 
@@ -47,6 +53,7 @@ interface Assessment {
   attemptEpoch?: number
   definitionHash?: string | null
   contextSnapshotHash?: string | null
+  deviceInputProvenance?: DeviceInputProvenanceV1
 }
 
 interface ScaleCheckpointPayload {
@@ -83,6 +90,7 @@ const ScaleAssessment: React.FC = () => {
   const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
   const itemStartTimeRef = useRef<number>(Date.now())
+  const scaleDeviceInputProvenanceRef = useRef<DeviceInputProvenanceV1 | null>(null)
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
 
   const scaleCheckpointTransport = useCallback(async (batch: CheckpointBatch<ScaleCheckpointPayload>) => {
@@ -96,6 +104,9 @@ const ScaleAssessment: React.FC = () => {
             checkpointId: record.id,
             checkpointSequence: record.sequence,
           })),
+          ...(scaleDeviceInputProvenanceRef.current
+            ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current }
+            : {}),
         },
       )
       if (response.code !== 0) {
@@ -156,7 +167,7 @@ const ScaleAssessment: React.FC = () => {
           const definitionHash = response.data.scale.definitionHash || nextAssessment.definitionHash
           if (!definitionHash) throw new Error('量表缺少冻结定义，请重启后重试')
           const draftKey = `scale:${nextAssessment.id}`
-          await finalDraftStore.ensure(createFinalDraftMeta({
+          const nextMeta = await finalDraftStore.ensure(createFinalDraftMeta({
             draftKey,
             instrument: 'scale',
             attemptId: nextAssessment.id,
@@ -166,6 +177,18 @@ const ScaleAssessment: React.FC = () => {
             deliveryMode: 'final_only',
             submissionId: checkpointId(),
           }))
+          const storedProvenance = readScaleDeviceInputProvenance(nextMeta.instrumentMetadata)
+          const provenance = resolveScaleDeviceInputProvenance({
+            metadata: nextMeta.instrumentMetadata,
+            serverValue: nextAssessment.deviceInputProvenance,
+            existing: scaleDeviceInputProvenanceRef.current,
+          })
+          scaleDeviceInputProvenanceRef.current = provenance
+          if (!storedProvenance) {
+            await finalDraftStore.setInstrumentMetadata(draftKey, {
+              [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
+            }).catch(() => null)
+          }
           const localAnswers = await finalDraftStore.listAnswers(draftKey)
           localAnswers.forEach((answer) => {
             const value = answer.value as { responseValue?: ResponseValue } | ResponseValue
@@ -177,6 +200,10 @@ const ScaleAssessment: React.FC = () => {
           setAnswers(existingAnswers)
           return
         }
+        scaleDeviceInputProvenanceRef.current = resolveScaleDeviceInputProvenance({
+          serverValue: nextAssessment.deviceInputProvenance,
+          existing: scaleDeviceInputProvenanceRef.current,
+        })
         registerScalePersistence(nextAssessment.id)
         const pending = await checkpointScheduler.pending('scale', nextAssessment.id)
         pending.forEach((record) => {
@@ -300,6 +327,9 @@ const ScaleAssessment: React.FC = () => {
               definitionHash: meta.definitionHash,
               ...(meta.contextSnapshotHash ? { contextSnapshotHash: meta.contextSnapshotHash } : {}),
               answers: finalAnswers,
+              ...(scaleDeviceInputProvenanceRef.current
+                ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current }
+                : {}),
             })
             if (next.code !== 0) {
               const conflict = String(next.code) === '409' || String(next.code) === 'STALE_ATTEMPT' || String(next.code) === 'SUBMISSION_PAYLOAD_CONFLICT'

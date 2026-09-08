@@ -4,6 +4,7 @@ import {
   inferDeviceInputProvenance,
   isDeviceInputProvenanceV1,
   readScaleDeviceInputProvenance,
+  resolveScaleDeviceInputProvenance,
 } from '../device-input-provenance'
 
 describe('Scale device input provenance capture', () => {
@@ -43,6 +44,14 @@ describe('Scale device input provenance capture', () => {
     expect(isDeviceInputProvenanceV1({ ...unknown, rawUa: 'Mozilla/5.0' })).toBe(false)
     expect(readScaleDeviceInputProvenance({ scaleDeviceInputProvenance: unknown })).toEqual(unknown)
     expect(readScaleDeviceInputProvenance({ scaleDeviceInputProvenance: { ...unknown, capturedAt: 'not-a-date' } })).toBeNull()
+  })
+
+  it('resolves stored or server provenance before capturing a new snapshot', () => {
+    const stored = inferDeviceInputProvenance({}, '2026-09-08T00:00:00.000Z')
+    const server = inferDeviceInputProvenance({}, '2026-09-08T00:01:00.000Z')
+    expect(resolveScaleDeviceInputProvenance({ metadata: { scaleDeviceInputProvenance: stored }, serverValue: server })).toBe(stored)
+    expect(resolveScaleDeviceInputProvenance({ serverValue: server })).toBe(server)
+    expect(resolveScaleDeviceInputProvenance({ existing: stored })).toBe(stored)
   })
 
   it('captures a validated snapshot in browser or server-like environments', () => {

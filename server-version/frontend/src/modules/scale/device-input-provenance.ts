@@ -193,3 +193,15 @@ export const readScaleDeviceInputProvenance = (
   const candidate = metadata?.[SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]
   return isDeviceInputProvenanceV1(candidate) ? candidate : null
 }
+
+/** Resolve one attempt snapshot without recapturing an existing value. */
+export const resolveScaleDeviceInputProvenance = (input: {
+  metadata?: Record<string, unknown>
+  serverValue?: unknown
+  existing?: DeviceInputProvenanceV1 | null
+}): DeviceInputProvenanceV1 => (
+  readScaleDeviceInputProvenance(input.metadata)
+  || (isDeviceInputProvenanceV1(input.serverValue) ? input.serverValue : null)
+  || input.existing
+  || captureScaleDeviceInputProvenance()
+)
