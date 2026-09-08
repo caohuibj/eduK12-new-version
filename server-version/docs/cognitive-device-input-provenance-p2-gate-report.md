@@ -6,9 +6,10 @@ Scope: COG-P2 closure only. No COG-P3, PR #54, scorer/reference/report/Bundle/CO
 
 ## 1. Git baseline and branch discipline
 
-- `origin/main`: `7fe641fcb024fa0f768176be0ec64ccfb15d490c`
+- `origin/main`: `82d76cfb96472b67a09228de33a419f56e06fa1c`
 - Direct merge of `origin/main` into the feature branch: merge commit `f38798d33a331bfddabcf916bf06a56c4d51d5f3`
-- Merge result: clean, zero conflicts; no rebase, force reset, or history rewrite.
+- The feature branch was then updated to the newer `origin/main` with a second direct merge: `7eb9662`.
+- Both merges were clean, zero conflicts; no rebase, force reset, or history rewrite.
 - PR remains open and unmerged.
 - The workflow workaround from the original PR was removed. `git diff origin/main -- .github/workflows/ci.yml` is empty.
 - The two pre-existing local environment documents under `docs/` were preserved and are not part of the feature change.
@@ -105,7 +106,9 @@ The audit document records the same 11/9/4 classification and the C-tier exclusi
 
 The final feature head and latest-head CI status must be recorded after the branch is pushed. No merge is authorized by this report.
 
-At the time this report was authored, the local gate was complete except for the latest-head remote CI result and the required main-branch public-recovery A/B classification.
+The required main-branch public-recovery A/B classification is complete: latest `origin/main` also produced `RESET_TO_TRIAL_0` after one formal trial in context A and recovery in independent context B (`priorTrialsInA=1`, `crossContext=true`, `finalOnly=true`). This classifies the behavior as pre-existing to COG-P2.
+
+At the time this report was authored, the local gate was complete except for the latest-head remote CI result.
 
 ## 9. Final disposition
 
@@ -113,4 +116,4 @@ At the time this report was authored, the local gate was complete except for the
 - Public cross-context partial recovery: pre-existing `FINAL_ONLY` reset behavior must remain visible to reviewers.
 - Human review and latest-head CI remain required before any merge.
 
-`COG-P2 MERGE READY: PENDING MAIN A/B AND LATEST-HEAD CI`
+`COG-P2 MERGE READY: PENDING LATEST-HEAD CI`
