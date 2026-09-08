@@ -5,6 +5,9 @@ import type {
   ReferenceKind,
 } from '../../assessment-reference/reference'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
+import type { FinalSubmissionDefinition } from '../cognitive.types'
+
+export type { FinalSubmissionDefinition } from '../cognitive.types'
 
 export const COGNITIVE_V2_SCHEMA_VERSION = 1 as const
 export const COGNITIVE_V2_TRIAL_ENVELOPE_VERSION = 1 as const
@@ -172,11 +175,6 @@ export interface AuthoritativeScorerInput<TConfig, TTrial> {
 export type AuthoritativeScorer<TConfig, TTrial> = (
   input: AuthoritativeScorerInput<TConfig, TTrial>,
 ) => CognitiveScoreResult
-
-export interface FinalSubmissionDefinition<TConfig> {
-  /** Pure, deterministic upper bound for accepted FINAL trial envelopes. */
-  maxTrials(config: TConfig): number
-}
 
 export interface ReferenceApplicability {
   metricKey: string

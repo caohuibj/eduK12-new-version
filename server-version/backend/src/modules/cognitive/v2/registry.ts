@@ -5,7 +5,6 @@ import {
 import type { RegistryEntry } from '../cognitive.types'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
 import { buildQualityAssessment } from './quality'
-import { createCognitiveFinalSubmissionDefinition } from './final-submission-budget'
 import type {
   CognitiveProfile,
   MetricDefinition,
@@ -147,7 +146,7 @@ export const buildCognitiveV2TaskDefinition = (
     configSchema: entry.configSchema,
     trialSchema: entry.trialSchema,
     protocol,
-    finalSubmission: createCognitiveFinalSubmissionDefinition(entry.testType),
+    finalSubmission: entry.finalSubmission,
     scorer: ({ config, trials, randomSeed }) => {
       const legacy = entry.score({
         config,

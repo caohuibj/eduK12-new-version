@@ -1,4 +1,5 @@
-import type { FinalSubmissionDefinition, TaskDefinition } from './types'
+import type { FinalSubmissionDefinition } from '../cognitive.types'
+import type { TaskDefinition } from './types'
 
 /** Last-resort protection for every Cognitive FINAL submission. */
 export const COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS = 1000 as const
@@ -37,71 +38,57 @@ const integerArrayField = (config: ConfigRecord, key: string): number[] => {
   return value as number[]
 }
 
-const fixedCount = (key: string): MaxTrialsResolver => (config) => integerField(config, key)
+const defineFinalSubmission = <TConfig = unknown>(resolver: MaxTrialsResolver): FinalSubmissionDefinition<TConfig> => ({
+  maxTrials: (config) => resolver(asConfigRecord(config)),
+})
 
-const spanTaskCount = (startKey: string, maxKey: string, trialsPerLevelKey: string): MaxTrialsResolver => (config) => {
+export const fixedCountFinalSubmission = <TConfig = unknown>(key: string): FinalSubmissionDefinition<TConfig> =>
+  defineFinalSubmission((config) => integerField(config, key))
+
+export const spanTaskCountFinalSubmission = <TConfig = unknown>(
+  startKey: string,
+  maxKey: string,
+  trialsPerLevelKey: string,
+): FinalSubmissionDefinition<TConfig> => defineFinalSubmission((config) => {
   const start = integerField(config, startKey)
   const max = integerField(config, maxKey)
   const trialsPerLevel = integerField(config, trialsPerLevelKey)
   return trialsPerLevel * (max - start + 1)
-}
-
-const phaseTaskCount: MaxTrialsResolver = (config) => (
-  integerField(config, 'learningRounds')
-  + (booleanField(config, 'delayedEnabled') ? 1 : 0)
-)
-
-const nbackTaskCount: MaxTrialsResolver = (config) => {
-  const nLevels = integerArrayField(config, 'nLevels')
-  const trialCountByN = integerArrayField(config, 'trialCountByN')
-  const blockCountByN = integerArrayField(config, 'blockCountByN')
-  if (nLevels.length !== trialCountByN.length || nLevels.length !== blockCountByN.length) {
-    throw new Error('Cognitive FINAL budget n-back arrays must have matching lengths')
-  }
-  return trialCountByN.reduce((total, trialCount, index) => total + trialCount * blockCountByN[index], 0)
-}
-
-const trailmakingTaskCount: MaxTrialsResolver = (config) => {
-  const form = config.form
-  const partA = integerField(config, 'partAItemCount')
-  const partB = integerField(config, 'partBItemCount')
-  return partA + (form === 'AB' ? partB : 0)
-}
-
-/**
- * These resolvers are the versioned Cognitive definition's admission contract.
- * They deliberately describe protocol upper bounds, not scientific completion
- * criteria. The service never owns a task-type switch.
- */
-const resolvers: Readonly<Record<string, MaxTrialsResolver>> = Object.freeze({
-  fake: fixedCount('trialCount'),
-  reaction: fixedCount('totalTrials'),
-  memory: spanTaskCount('startLength', 'maxLength', 'trialsPerLevel'),
-  stroop: fixedCount('totalTrials'),
-  gonogo: fixedCount('totalTrials'),
-  cpt: fixedCount('totalTrials'),
-  nback: nbackTaskCount,
-  corsi: spanTaskCount('startSpan', 'maxSpan', 'trialsPerLevel'),
-  sst: fixedCount('totalTrials'),
-  taskswitch: fixedCount('totalTrials'),
-  // No protocol-level count exists today; keep the global fallback.
-  patterncompare: () => COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS,
-  flanker: fixedCount('totalTrials'),
-  cardsort: fixedCount('totalTrials'),
-  digitbackward: spanTaskCount('startSpan', 'maxSpan', 'trialsPerLevel'),
-  picturesequence: phaseTaskCount,
-  pairedassociate: phaseTaskCount,
-  matrix: fixedCount('itemCount'),
-  mentalrotation: fixedCount('totalTrials'),
-  tower: fixedCount('problemCount'),
-  trailmaking: trailmakingTaskCount,
-  reversallearning: fixedCount('totalTrials'),
-  bart: fixedCount('balloonCount'),
-  wordlist: phaseTaskCount,
-  lexicaldecision: fixedCount('totalTrials'),
-  emotionrecognition: fixedCount('totalTrials'),
 })
 
+export const phaseTaskCountFinalSubmission = <TConfig = unknown>(): FinalSubmissionDefinition<TConfig> =>
+  defineFinalSubmission((config) => (
+    integerField(config, 'learningRounds')
+    + (booleanField(config, 'delayedEnabled') ? 1 : 0)
+  ))
+
+export const nbackTaskCountFinalSubmission = <TConfig = unknown>(): FinalSubmissionDefinition<TConfig> =>
+  defineFinalSubmission((config) => {
+    const nLevels = integerArrayField(config, 'nLevels')
+    const trialCountByN = integerArrayField(config, 'trialCountByN')
+    const blockCountByN = integerArrayField(config, 'blockCountByN')
+    if (nLevels.length !== trialCountByN.length || nLevels.length !== blockCountByN.length) {
+      throw new Error('Cognitive FINAL budget n-back arrays must have matching lengths')
+    }
+    return trialCountByN.reduce((total, trialCount, index) => total + trialCount * blockCountByN[index], 0)
+  })
+
+export const trailmakingTaskCountFinalSubmission = <TConfig = unknown>(): FinalSubmissionDefinition<TConfig> =>
+  defineFinalSubmission((config) => {
+    const form = config.form
+    const partA = integerField(config, 'partAItemCount')
+    const partB = integerField(config, 'partBItemCount')
+    return partA + (form === 'AB' ? partB : 0)
+  })
+
+export const absoluteFallbackFinalSubmission = <TConfig = unknown>(): FinalSubmissionDefinition<TConfig> =>
+  defineFinalSubmission(() => COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS)
+
+/**
+ * These factories describe protocol upper bounds, not scientific completion
+ * criteria. The exact Cognitive RegistryEntry owns the resulting instance;
+ * this module does not select a contract by task type.
+ */
 export class CognitiveFinalSubmissionConfigError extends Error {
   constructor(message: string) {
     super(message)
@@ -109,30 +96,19 @@ export class CognitiveFinalSubmissionConfigError extends Error {
   }
 }
 
-export const deriveCognitiveFinalSubmissionMaxTrials = (
-  testType: string,
-  config: unknown,
+export const deriveCognitiveFinalSubmissionMaxTrials = <TConfig>(
+  finalSubmission: FinalSubmissionDefinition<TConfig> | null | undefined,
+  config: TConfig,
 ): number => {
-  const resolver = resolvers[testType]
-  if (!resolver) {
-    throw new CognitiveFinalSubmissionConfigError(
-      'No Cognitive FINAL budget contract for task definition ' + testType,
-    )
+  if (!finalSubmission || typeof finalSubmission.maxTrials !== 'function') {
+    throw new CognitiveFinalSubmissionConfigError('No Cognitive FINAL budget contract is attached to the task definition')
   }
-  const derived = resolver(asConfigRecord(config))
+  const derived = finalSubmission.maxTrials(config)
   if (!Number.isSafeInteger(derived) || derived < 1) {
-    throw new CognitiveFinalSubmissionConfigError(
-      'Cognitive FINAL budget must be a positive integer for task definition ' + testType,
-    )
+    throw new CognitiveFinalSubmissionConfigError('Cognitive FINAL budget must be a positive integer')
   }
   return derived
 }
-
-export const createCognitiveFinalSubmissionDefinition = <TConfig>(
-  testType: string,
-): FinalSubmissionDefinition<TConfig> => ({
-  maxTrials: (config: TConfig) => deriveCognitiveFinalSubmissionMaxTrials(testType, config),
-})
 
 /**
  * Resolve the effective admission ceiling only after the frozen config has
@@ -140,19 +116,14 @@ export const createCognitiveFinalSubmissionDefinition = <TConfig>(
  * at snapshot creation; they are never silently truncated with Math.min.
  */
 export const resolveCognitiveFinalMaxTrials = <TConfig>(
-  definition: Pick<TaskDefinition<TConfig>, 'testType' | 'finalSubmission'>,
+  definition: Pick<TaskDefinition<TConfig>, 'testType' | 'engineVersion' | 'scoringVersion' | 'finalSubmission'>,
   config: TConfig,
 ): number => {
-  const derived = definition.finalSubmission.maxTrials(config)
-  if (!Number.isSafeInteger(derived) || derived < 1) {
-    throw new CognitiveFinalSubmissionConfigError(
-      'Cognitive FINAL budget must be a positive integer for task definition ' + definition.testType,
-    )
-  }
+  const derived = deriveCognitiveFinalSubmissionMaxTrials(definition.finalSubmission, config)
   if (derived > COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS) {
     throw new CognitiveFinalSubmissionConfigError(
       'Frozen Cognitive task configuration exceeds the global FINAL trial limit',
     )
   }
-  return Math.min(derived, COGNITIVE_FINAL_ABSOLUTE_MAX_TRIALS)
+  return derived
 }

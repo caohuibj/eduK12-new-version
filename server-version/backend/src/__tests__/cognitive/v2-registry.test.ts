@@ -3,10 +3,12 @@ import {
   buildCognitiveV2TaskDefinition,
   getCognitiveV2TaskDefinition,
   listCognitiveV2TaskDefinitions,
+  auditCognitiveV2Registry,
   validateTaskDefinition,
   computeConfigSnapshotHash,
   computeProtocolSignature,
   createTrialEnvelope,
+  resolveCognitiveFinalMaxTrials,
   runAuthoritativeScorer,
 } from '../../modules/cognitive/v2'
 import { listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.registry'
@@ -23,6 +25,53 @@ describe('Cognitive v2 registry adapter', () => {
       expect(errors, `${definition.testType}/${definition.scoringVersion}`).toEqual([])
       expect(definition.protocol.clock).toBe('performance')
     }
+  })
+
+  it('binds FINAL admission to every exact registry identity', () => {
+    const legacy = listCognitiveRegistryEntries()
+    const definitions = listCognitiveV2TaskDefinitions()
+    const legacyByKey = new Map(legacy.map((entry) => [
+      `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`,
+      entry,
+    ]))
+
+    expect(legacy).toHaveLength(28)
+    expect(definitions).toHaveLength(28)
+    for (const definition of definitions) {
+      const entry = legacyByKey.get(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)
+      expect(entry, `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).toBeDefined()
+      expect(typeof entry?.finalSubmission.maxTrials).toBe('function')
+      expect(definition.finalSubmission).toBe(entry?.finalSubmission)
+    }
+
+    const audit = auditCognitiveV2Registry(definitions)
+    expect(audit.registryCount).toBe(28)
+    expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
+  })
+
+  it('keeps same-test-type contracts independent across exact versions', () => {
+    const legacy = listCognitiveRegistryEntries().find((entry) => entry.testType === 'fake')
+    if (!legacy) throw new Error('fake registry entry missing')
+
+    const firstContract = { maxTrials: () => 3 }
+    const secondContract = { maxTrials: () => 7 }
+    const first = buildCognitiveV2TaskDefinition({
+      ...legacy,
+      scoringVersion: '1.0.0-test',
+      finalSubmission: firstContract,
+    }, 'DRAFT')
+    const second = buildCognitiveV2TaskDefinition({
+      ...legacy,
+      scoringVersion: '1.1.0-test',
+      finalSubmission: secondContract,
+    }, 'DRAFT')
+
+    expect(first.testType).toBe(second.testType)
+    expect(first.scoringVersion).not.toBe(second.scoringVersion)
+    expect(first.finalSubmission).toBe(firstContract)
+    expect(second.finalSubmission).toBe(secondContract)
+    expect(resolveCognitiveFinalMaxTrials(first, {})).toBe(3)
+    expect(resolveCognitiveFinalMaxTrials(second, {})).toBe(7)
   })
 
   it('requires exact task versions and does not fall back to another scorer', () => {
