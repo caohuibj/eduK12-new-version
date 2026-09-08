@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { performance } from 'node:perf_hooks'
 import type { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 
@@ -89,21 +90,39 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
       })),
       select: { id: true },
     })
-    const startedAt = Date.now()
+    const { runtimeMetricLines, resetRuntimeObservabilityForTests } = await import('../../services/runtimeObservability')
+    resetRuntimeObservabilityForTests()
+    const startedAt = performance.now()
     try {
-      // Keep the number of active DB transactions above the pool size without
-      // turning the test into an artificial 200-connection spike. The gate is
-      // 200 completion attempts inside the same ten-second window.
-      const batchSize = Math.min(20, assessments.length)
+      // Keep at most 20 completion calls in flight, above the default pool
+      // size. Refill each slot as it completes: a slow Serializable retry must
+      // not hold up the next 20 independent assessments behind a batch barrier.
+      // Production admission, pool limits, retries and the <10s gate still apply.
+      const concurrency = Math.min(20, assessments.length)
       const results: Array<Awaited<ReturnType<typeof withQuestionnaireCompletionTransaction>>> = []
-      for (let offset = 0; offset < assessments.length; offset += batchSize) {
-        const batch = await Promise.all(assessments.slice(offset, offset + batchSize).map(({ id }) => (
-          withQuestionnaireCompletionTransaction((tx) => refreshQuestionnaireProgress(tx, id))
-        )))
-        results.push(...batch)
-      }
+      let nextIndex = 0
+      // Drain all workers even on failure before deleting fixtures; Promise.all
+      // would let cleanup race with transactions that are still running.
+      const workers = await Promise.allSettled(Array.from({ length: concurrency }, async () => {
+        while (nextIndex < assessments.length) {
+          const index = nextIndex++
+          results[index] = await withQuestionnaireCompletionTransaction(
+            (tx) => refreshQuestionnaireProgress(tx, assessments[index].id),
+          )
+        }
+      }))
+      const elapsedMs = performance.now() - startedAt
+      const diagnostics = JSON.stringify({
+        burstSize: completionBurstSize,
+        concurrency,
+        elapsedMs,
+        metrics: runtimeMetricLines().filter((line) => (
+          !line.startsWith('#') && /ptool_serializable_attempts_total|ptool_serialization_conflicts_total|ptool_completion_admission_rejections_total/.test(line)
+        )),
+      })
+      console.info('Questionnaire completion burst:', diagnostics)
 
-      expect(Date.now() - startedAt).toBeLessThan(10_000)
+      expect(workers.filter((worker) => worker.status === 'rejected'), diagnostics).toEqual([])
       expect(results).toHaveLength(completionBurstSize)
       expect(results.every((result) => result?.completed && result.status === 'COMPLETED')).toBe(true)
 
@@ -116,8 +135,61 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
         select: { aggregateReport: true, aggregateReportEncrypted: true },
       })
       expect(reports.every((row) => row.aggregateReport === null && typeof row.aggregateReportEncrypted === 'string')).toBe(true)
+      // Check storage invariants before reporting a timing failure, while only
+      // measuring the burst itself (including admission and retry backoff).
+      expect(elapsedMs, diagnostics).toBeLessThan(10_000)
     } finally {
       await prisma.questionnaireAssessment.deleteMany({ where: { id: { in: assessments.map(({ id }) => id) } } })
+    }
+  }, 60000)
+
+  it('keeps one terminal report and timestamp across concurrent completion and replay', async () => {
+    const assessment = await prisma.questionnaireAssessment.create({
+      data: { questionnaireId, userId: null, status: 'IN_PROGRESS' },
+      select: { id: true },
+    })
+    const terminalSelect = {
+      status: true,
+      completedAt: true,
+      totalTime: true,
+      aggregateReport: true,
+      aggregateReportEncrypted: true,
+    } as const
+    const completeConcurrently = () => Promise.allSettled(Array.from({ length: 20 }, () => (
+      withQuestionnaireCompletionTransaction((tx) => refreshQuestionnaireProgress(tx, assessment.id))
+    )))
+    try {
+      const completions = await completeConcurrently()
+      expect(completions.filter((result) => result.status === 'rejected')).toEqual([])
+      const terminal = await prisma.questionnaireAssessment.findUniqueOrThrow({
+        where: { id: assessment.id },
+        select: terminalSelect,
+      })
+      expect(terminal).toMatchObject({
+        status: 'COMPLETED',
+        completedAt: expect.any(Date),
+        aggregateReport: null,
+        aggregateReportEncrypted: expect.any(String),
+      })
+      for (const result of completions) {
+        if (result.status === 'fulfilled') {
+          expect(result.value).toMatchObject({
+            completed: true,
+            status: 'COMPLETED',
+            completedAt: terminal.completedAt,
+            totalTime: terminal.totalTime,
+          })
+        }
+      }
+
+      const replays = await completeConcurrently()
+      expect(replays.filter((result) => result.status === 'rejected')).toEqual([])
+      expect(await prisma.questionnaireAssessment.findUniqueOrThrow({
+        where: { id: assessment.id },
+        select: terminalSelect,
+      })).toEqual(terminal)
+    } finally {
+      await prisma.questionnaireAssessment.delete({ where: { id: assessment.id } })
     }
   }, 60000)
 })
