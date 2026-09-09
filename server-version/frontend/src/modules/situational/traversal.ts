@@ -9,7 +9,10 @@ const responseKey = (sceneKey: string, channelKey: string): string => `${sceneKe
 const sceneIsAnswered = (
   scene: SituationalRunnerScene,
   responses: Record<string, SituationalDraftAnswer>,
-): boolean => scene.channels.every((channel) => responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined)
+): boolean => scene.channels.every((channel) => (
+  channel.required === false
+  || responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined
+))
 
 export interface SituationalReachableTrajectory {
   nodeKeys: string[]
@@ -20,8 +23,8 @@ export interface SituationalReachableTrajectory {
 /**
  * Derive the client-visible trajectory from the frozen runner definition and
  * raw local answers. No active-node cursor is stored separately. V1 keeps its
- * historical linear presentation semantics; V2 advances only after the
- * current scene is complete, then follows the frozen deterministic graph.
+ * historical linear presentation semantics; V2 advances after all required
+ * channels in the current scene are complete, then follows the frozen graph.
  */
 export const deriveReachableTrajectory = (
   definition: SituationalRunnerDefinition,
@@ -60,8 +63,6 @@ export const deriveReachableTrajectory = (
     if (!scene) break
     sceneKeys.push(scene.sceneKey)
 
-    // A branching scene may expose more than the routing channel. The entire
-    // scene must be complete before traversal can advance to the next node.
     if (!sceneIsAnswered(scene, responses)) break
 
     if (node.transition.type === 'NEXT') {
