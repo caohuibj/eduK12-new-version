@@ -1,8 +1,4 @@
 import { computeSubmissionPayloadHash } from '../../services/instrumentFinalSubmit'
-import {
-  assessmentImagePresentationListSchema,
-  type AssessmentImagePresentationListV1,
-} from '../assessment-media/assessment-image-presentation'
 
 export type QuestionnaireFormSectionItem = {
   id: string
@@ -11,7 +7,6 @@ export type QuestionnaireFormSectionItem = {
   placeholder: string | null
   required: boolean
   options: unknown
-  images?: AssessmentImagePresentationListV1
   contextKey: string | null
   position: number
   sectionPosition: number | null
@@ -33,7 +28,6 @@ export type CompositeFormSectionItem = {
   placeholder: string | null
   required: boolean
   formOptions: unknown
-  images?: AssessmentImagePresentationListV1
   contextKey: string | null
   position: number
   formSectionPosition: number | null
@@ -53,10 +47,6 @@ export type SectionRow = QuestionnaireFormSectionDefinition
 export type CompositeSectionItem = CompositeFormSectionItem
 export type CompositeSection = CompositeFormSectionDefinition
 
-const optionalImages = (value: unknown): AssessmentImagePresentationListV1 | undefined => (
-  value === null || value === undefined ? undefined : assessmentImagePresentationListSchema.parse(value)
-)
-
 export const orderedQuestionnaireFormSectionItems = (
   items: QuestionnaireFormSectionItem[],
 ): QuestionnaireFormSectionItem[] => [...items].sort(
@@ -70,21 +60,17 @@ export const orderedCompositeFormSectionItems = (
 )
 
 export const mapQuestionnaireSection = (section: any): QuestionnaireFormSectionDefinition => {
-  const items = orderedQuestionnaireFormSectionItems((section.items ?? []).map((item: any) => {
-    const images = optionalImages(item.images)
-    return {
-      id: item.id,
-      type: item.type,
-      label: item.label,
-      placeholder: item.placeholder ?? null,
-      required: item.required !== false,
-      options: item.options,
-      ...(images === undefined ? {} : { images }),
-      contextKey: item.contextKey ?? null,
-      position: item.position,
-      sectionPosition: item.sectionPosition ?? null,
-    }
-  }))
+  const items = orderedQuestionnaireFormSectionItems((section.items ?? []).map((item: any) => ({
+    id: item.id,
+    type: item.type,
+    label: item.label,
+    placeholder: item.placeholder ?? null,
+    required: item.required !== false,
+    options: item.options,
+    contextKey: item.contextKey ?? null,
+    position: item.position,
+    sectionPosition: item.sectionPosition ?? null,
+  })))
   return {
     id: section.id,
     title: section.title,
@@ -96,21 +82,17 @@ export const mapQuestionnaireSection = (section: any): QuestionnaireFormSectionD
 }
 
 export const mapCompositeSection = (section: any): CompositeFormSectionDefinition => {
-  const items = orderedCompositeFormSectionItems((section.items ?? []).map((item: any) => {
-    const images = optionalImages(item.formImages)
-    return {
-      id: item.id,
-      formType: item.formType,
-      formLabel: item.formLabel,
-      placeholder: item.formPlaceholder ?? null,
-      required: item.required !== false,
-      formOptions: item.formOptions,
-      ...(images === undefined ? {} : { images }),
-      contextKey: item.contextKey ?? null,
-      position: item.position,
-      formSectionPosition: item.formSectionPosition ?? null,
-    }
-  }))
+  const items = orderedCompositeFormSectionItems((section.items ?? []).map((item: any) => ({
+    id: item.id,
+    formType: item.formType,
+    formLabel: item.formLabel,
+    placeholder: item.formPlaceholder ?? null,
+    required: item.required !== false,
+    formOptions: item.formOptions,
+    contextKey: item.contextKey ?? null,
+    position: item.position,
+    formSectionPosition: item.formSectionPosition ?? null,
+  })))
   return {
     id: section.id,
     title: section.title,
@@ -135,7 +117,6 @@ export const questionnaireFormSectionDefinitionHash = (section: QuestionnaireFor
       placeholder: item.placeholder,
       required: item.required,
       options: item.options,
-      ...(item.images === undefined ? {} : { images: item.images }),
       contextKey: item.contextKey,
       position: item.position,
       sectionPosition: item.sectionPosition,
@@ -157,7 +138,6 @@ export const compositeFormSectionDefinitionHash = (section: CompositeFormSection
       placeholder: item.placeholder,
       required: item.required,
       formOptions: item.formOptions,
-      ...(item.images === undefined ? {} : { images: item.images }),
       contextKey: item.contextKey,
       position: item.position,
       formSectionPosition: item.formSectionPosition,
