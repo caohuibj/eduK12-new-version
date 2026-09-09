@@ -67,7 +67,7 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
     cognitiveDebriefStatus: 'NOT_ESTABLISHED',
   },
   rights: { status: 'NOT_GRANTED', commercialNature: 'NON_COMMERCIAL', locales: ['zh-CN'], territories: ['CN'] },
-  evidence: { recordCount: 1, status: 'SOURCE_RECORDED', coverageText: '来源已记录；不作本地验证声称。' },
+  evidence: { recordCount: 0, status: 'NO_EVIDENCE_RECORDED', coverageText: 'Wave 0 当前未在 Scientific Evidence Matrix 中录入可用于本地验证的科研证据；不作验证、常模或诊断声称。' },
   references: {
     policy: 'none',
     packageReferenceCount: 0,
@@ -173,5 +173,56 @@ describe('ScaleLibrary page', () => {
     )
     expect(await screen.findByText('治理详情（管理员）')).toBeInTheDocument()
     expect(screen.getAllByText('WHO-5 Well-Being Index')).toHaveLength(2)
+  })
+
+  it('loads an English detail directly and keeps its English locale on remount', async () => {
+    const english = entry({
+      identity: {
+        instrumentKey: 'sdq_teacher_zh_cn',
+        instrumentVersion: '1.0.0',
+        canonicalName: 'Strengths and Difficulties Questionnaire — Teacher T4–10',
+        abbreviation: 'SDQ Teacher T4–10',
+      },
+      source: { citation: 'Goodman R. SDQ Teacher form T 4-10.' },
+      localization: {
+        sourceLocale: 'en',
+        targetLocale: 'en',
+        localizationVersion: '1.0.0',
+        adaptationMethod: 'ORIGINAL_SOURCE',
+        reviewStatus: 'APPROVED',
+        expertReviewStatus: 'COMPLETED',
+        cognitiveDebriefStatus: 'NOT_ESTABLISHED',
+      },
+      availability: {
+        status: 'NOT_AVAILABLE',
+        locale: 'en',
+        territory: 'CN',
+        respondent: 'TEACHER',
+        reasons: ['量表包尚未发布，当前仅可浏览目录信息。'],
+      },
+    })
+    mockDetail.mockResolvedValue({ code: 0, message: 'ok', data: { entry: english } })
+
+    const renderDetail = () => render(
+      <MemoryRouter initialEntries={['/scale-library/sdq_teacher_zh_cn/1.0.0']}>
+        <Routes><Route path="/scale-library/:instrumentKey/:instrumentVersion" element={<ScaleLibrary />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    const first = renderDetail()
+    expect(await screen.findByText('Strengths and Difficulties Questionnaire — Teacher T4–10')).toBeInTheDocument()
+    expect(screen.getByText('当前内容：en；来源语言：en；版本 1.0.0。')).toBeInTheDocument()
+    expect(screen.queryByText(/不提供 zh-CN 版本/)).not.toBeInTheDocument()
+    expect(mockDetail).toHaveBeenLastCalledWith('sdq_teacher_zh_cn', '1.0.0', {
+      locale: undefined,
+      territory: undefined,
+      respondent: undefined,
+    })
+
+    first.unmount()
+    renderDetail()
+    expect(await screen.findByText('当前内容：en；来源语言：en；版本 1.0.0。')).toBeInTheDocument()
+    expect(screen.queryByText(/不提供 zh-CN 版本/)).not.toBeInTheDocument()
+    expect(mockDetail).toHaveBeenCalledTimes(2)
   })
 })

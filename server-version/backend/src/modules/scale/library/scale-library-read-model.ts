@@ -3,7 +3,7 @@ import {
   resolveEffectiveAuthorization,
   type InstrumentAuthorizationRecordV1,
 } from '../../assessment-authorization'
-import { assertContentLocaleCompatible } from '../content-locale'
+import { resolvePackageContentLocale } from '../content-locale'
 import {
   evaluateDurableInstrumentRights,
   evaluateSdqElectronicAdminGate,
@@ -125,7 +125,7 @@ export interface ScaleLibraryReferenceSummary {
 
 export interface ScaleLibraryEvidenceSummary {
   recordCount: number
-  status: 'SOURCE_RECORDED' | 'NO_LOCAL_EVIDENCE_CLAIM'
+  status: 'EVIDENCE_RECORDED' | 'NO_EVIDENCE_RECORDED'
   coverageText: string
 }
 
@@ -182,7 +182,6 @@ export interface ScaleLibraryReadModel {
   diagnostics: Array<{ severity: 'error' | 'warning'; code: string; message: string }>
 }
 
-const DEFAULT_LOCALE = 'zh-CN'
 const DEFAULT_TERRITORY = 'CN'
 
 export const WAVE0_SCALE_LIBRARY_REGISTRY: ScaleCatalogRegistry = createScaleCatalogRegistry(WAVE0_SCALE_CATALOG_MANIFESTS)
@@ -336,10 +335,10 @@ const buildReferenceSummary = (pkg: ScalePackageV2, manifest: ScaleCatalogManife
 
 const buildEvidenceSummary = (manifest: ScaleCatalogManifestV1): ScaleLibraryEvidenceSummary => ({
   recordCount: manifest.evidence.length,
-  status: manifest.evidence.length > 0 ? 'SOURCE_RECORDED' : 'NO_LOCAL_EVIDENCE_CLAIM',
+  status: manifest.evidence.length > 0 ? 'EVIDENCE_RECORDED' : 'NO_EVIDENCE_RECORDED',
   coverageText: manifest.evidence.length > 0
-    ? '已记录来源与适用边界；Wave 0 不把来源记录升级为本地验证、正式常模或诊断依据。'
-    : 'Wave 0 未记录本地心理测量学证据，不作验证或常模声称。',
+    ? 'Scientific Evidence Matrix 已记录科研证据；Wave 0 不把记录升级为本地验证、正式常模或诊断依据。'
+    : 'Wave 0 当前未在 Scientific Evidence Matrix 中录入可用于本地验证的科研证据；不作验证、常模或诊断声称。',
 })
 
 const buildEntry = (input: {
@@ -457,7 +456,6 @@ const buildEntry = (input: {
 }
 
 export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext = {}): ScaleLibraryReadModel => {
-  const locale = context.locale ?? DEFAULT_LOCALE
   const territory = context.territory ?? DEFAULT_TERRITORY
   const nowIso = context.nowIso ?? new Date().toISOString()
   const entries: ScaleLibraryEntry[] = []
@@ -465,6 +463,7 @@ export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext
     if (!catalogEntry.pkg) return
     const localization = getWave0LocalizationManifest(catalogEntry.manifest.identity.instrumentKey, catalogEntry.manifest.identity.instrumentVersion)
     if (!localization) return
+    const locale = context.locale ?? localization.targetLocale
     entries.push(buildEntry({
       catalogEntry,
       localization,
@@ -535,7 +534,7 @@ export const isScaleLibraryPublicPayloadSafe = (entry: ScaleLibraryEntry): boole
 export const getScaleLibraryPackage = (instrumentKey: string, instrumentVersion: string): ScalePackageV2 | undefined => getScalePackage(instrumentKey, instrumentVersion)
 
 export const getScaleLibraryContentLocale = (instrumentKey: string): string | undefined => (
-  assertContentLocaleCompatible({ instrumentKey, requestedLocale: DEFAULT_LOCALE }).contentLocale ?? undefined
+  resolvePackageContentLocale(instrumentKey) ?? undefined
 )
 
 export const getScaleLibraryLocalizationManifest = (instrumentKey: string, instrumentVersion: string): LocalizationManifestV1 | undefined => (

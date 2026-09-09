@@ -67,7 +67,7 @@ export interface ScaleLibraryEntry {
   }
   evidence: {
     recordCount: number
-    status: string
+    status: 'EVIDENCE_RECORDED' | 'NO_EVIDENCE_RECORDED'
     coverageText: string
   }
   references: {

@@ -300,7 +300,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
         </Section>
         <Section title="证据摘要">
           <p>{entry.evidence.coverageText}</p>
-          <p className="mt-2 text-gray-500">已记录来源条目：{entry.evidence.recordCount}。</p>
+          <p className="mt-2 text-gray-500">Scientific Evidence Matrix 记录数：{entry.evidence.recordCount}。</p>
         </Section>
       </div>
 

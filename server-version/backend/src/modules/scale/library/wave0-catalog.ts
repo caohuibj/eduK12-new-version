@@ -1,5 +1,5 @@
 import type { LocalizationManifestV1 } from './localization-manifest'
-import type { ScaleCatalogManifestV1, ScaleEvidenceRecord } from './catalog-manifest'
+import type { ScaleCatalogManifestV1 } from './catalog-manifest'
 
 /**
  * Wave 0 code-owned catalog entries.
@@ -26,22 +26,6 @@ const standardIntendedUse = {
     'UNSUPPORTED_GROUP_COMPARISON' as const,
   ],
 }
-
-const sourceEvidence = (input: {
-  evidenceId: string
-  evidenceType: ScaleEvidenceRecord['evidenceType']
-  population: string
-  ageRange: string
-  locale: string
-  territory: string
-  citation: string
-  url: string
-}): ScaleEvidenceRecord => ({
-  ...input,
-  studyDesign: '原始工具/授权来源记录；本条目不据此宣称本地心理测量学验证。',
-  rating: 'UNKNOWN',
-  notes: 'Wave 0 仅记录可追溯来源与适用边界；本目录不把来源记录升级为本地常模或验证结论。',
-})
 
 const adexi: ScaleCatalogManifestV1 = {
   schemaVersion: 1,
@@ -80,18 +64,7 @@ const adexi: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'adexi-v2-authorized-source',
-      evidenceType: 'CONTENT_VALIDITY',
-      population: '成人自评部署边界（来源记录）',
-      ageRange: '18+',
-      locale: 'zh-CN',
-      territory: 'CN',
-      citation: 'ADEXI Self-Report instrument, authorized Chinese adaptation package.',
-      url: 'https://chexi.se/onewebmedia/ADEXI_SELFREPORT_ENG.pdf',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 
@@ -133,18 +106,7 @@ const who5: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'who5-zh-cn-official-source',
-      evidenceType: 'CONTENT_VALIDITY',
-      population: 'WHO-5 中文 PR 字符版本来源记录',
-      ageRange: '9-18',
-      locale: 'zh-CN',
-      territory: 'CN',
-      citation: 'World Health Organization. The World Health Organization-Five Well-Being Index (WHO-5). WHO/UCN/MSD/MHE/2024.1; Chinese PR characters version (Sept 2007).',
-      url: 'https://www.who.int/publications/m/item/WHO-UCN-MSD-MHE-2024.01',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 
@@ -185,18 +147,7 @@ const sdqParent: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'sdq-parent-zh-cn-authorized-source',
-      evidenceType: 'CONTENT_VALIDITY',
-      population: '4-17 岁儿童/青少年家长观察来源记录',
-      ageRange: '4-17',
-      locale: 'zh-CN',
-      territory: 'CN',
-      citation: 'Goodman R. Strengths and Difficulties Questionnaire © 2005. Chinese Simplified parent form transcribed from authorized source PDF; scoring follows Goodman published instructions.',
-      url: 'https://www.sdqinfo.org/py/sdqinfo/c0.py',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 
@@ -237,18 +188,7 @@ const sdqTeacher: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'sdq-teacher-en-t4-10-source',
-      evidenceType: 'CONTENT_VALIDITY',
-      population: '4-10 岁儿童教师观察来源记录',
-      ageRange: '4-10',
-      locale: 'en',
-      territory: 'GB',
-      citation: 'Goodman R. Strengths and Difficulties Questionnaire © 2005. Teacher T4–10 source form; scoring follows Goodman published instructions.',
-      url: 'https://www.sdqinfo.org/py/sdqinfo/c0.py',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 
@@ -289,18 +229,7 @@ const texiParent: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'texi-parent-en-validation-source',
-      evidenceType: 'STRUCTURAL_VALIDITY',
-      population: '13-19 岁青少年家长观察研究来源记录',
-      ageRange: '13-19',
-      locale: 'en',
-      territory: 'SE',
-      citation: 'Thorell LB, et al. Psychometric properties of the Teenage Executive Functioning Inventory (TEXI). Child Neuropsychology. 2020. PMID 32090688.',
-      url: 'https://pubmed.ncbi.nlm.nih.gov/32090688/',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 
@@ -341,18 +270,7 @@ const texiTeacher: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [
-    sourceEvidence({
-      evidenceId: 'texi-teacher-en-validation-source',
-      evidenceType: 'STRUCTURAL_VALIDITY',
-      population: '13-19 岁青少年教师观察研究来源记录',
-      ageRange: '13-19',
-      locale: 'en',
-      territory: 'SE',
-      citation: 'Thorell LB, et al. Psychometric properties of the Teenage Executive Functioning Inventory (TEXI). Child Neuropsychology. 2020. PMID 32090688.',
-      url: 'https://pubmed.ncbi.nlm.nih.gov/32090688/',
-    }),
-  ],
+  evidence: [],
   referenceApplicability: [],
 }
 

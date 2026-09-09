@@ -58,6 +58,9 @@ describe('Wave 0 Scale Library read model', () => {
     ])
     expect(model.entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
     expect(model.entries.every((entry) => entry.governance === undefined)).toBe(true)
+    const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
+    expect(who5.source.citation).toContain('World Health Organization')
+    expect(who5.localization.targetLocale).toBe('zh-CN')
   })
 
   it('filters only by declared metadata and actual localization target locale', () => {
@@ -87,6 +90,50 @@ describe('Wave 0 Scale Library read model', () => {
     ])
     expect(keys(filterScaleLibraryEntries(model.entries, { minGrade: 3, maxGrade: 6 }))).toContain('who5')
     expect(keys(filterScaleLibraryEntries(model.entries, { intendedUse: 'INDIVIDUAL_REFLECTION' }))).toHaveLength(6)
+  })
+
+  it('uses each entry target locale when the read context does not specify one', () => {
+    const defaultModel = buildScaleLibraryReadModel({ territory: 'CN', nowIso: NOW })
+    const defaultLocales = Object.fromEntries(defaultModel.entries.map((entry) => [
+      entry.identity.instrumentKey,
+      entry.availability.locale,
+    ]))
+    expect(defaultLocales).toEqual({
+      adexi_v1: 'zh-CN',
+      who5: 'zh-CN',
+      sdq_parent_zh_cn: 'zh-CN',
+      sdq_teacher_zh_cn: 'en',
+      texi_parent_zh_cn: 'en',
+      texi_teacher_zh_cn: 'en',
+    })
+    for (const key of ['sdq_teacher_zh_cn', 'texi_parent_zh_cn', 'texi_teacher_zh_cn']) {
+      const entry = defaultModel.entries.find((candidate) => candidate.identity.instrumentKey === key)!
+      expect(entry.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
+    }
+
+    const explicitZh = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    expect(keys(filterScaleLibraryEntries(explicitZh.entries, { locale: 'zh-CN' }))).toEqual([
+      'adexi_v1',
+      'who5',
+      'sdq_parent_zh_cn',
+    ])
+    expect(explicitZh.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')?.availability.reasons)
+      .toContain('当前内容语言为 en，不提供 zh-CN 版本。')
+
+    const explicitEn = buildScaleLibraryReadModel({ locale: 'en', territory: 'CN', nowIso: NOW })
+    expect(keys(filterScaleLibraryEntries(explicitEn.entries, { locale: 'en' }))).toEqual([
+      'sdq_teacher_zh_cn',
+      'texi_parent_zh_cn',
+      'texi_teacher_zh_cn',
+    ])
+    expect(explicitEn.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')?.availability.locale).toBe('en')
+    expect(explicitEn.entries.find((entry) => entry.identity.instrumentKey === 'who5')?.availability.reasons)
+      .toContain('当前内容语言为 zh-CN，不提供 en 版本。')
+
+    const directEnglish = defaultModel.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')!
+    expect(directEnglish.localization.targetLocale).toBe('en')
+    expect(directEnglish.availability.locale).toBe('en')
+    expect(directEnglish.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
   })
 
   it('keeps package, deployment, and authorization gates fail-closed', () => {
@@ -133,8 +180,17 @@ describe('Wave 0 Scale Library read model', () => {
     const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.governance?.scientificMaturity).toBe('PILOT')
-    expect(who5.governance?.evidence[0].rating).toBe('UNKNOWN')
+    expect(who5.governance?.evidence).toEqual([])
+    expect(who5.source.citation).toContain('World Health Organization')
     expect(who5.governance?.gate.reportEligibility.maxEligibleLevel).toBe('L2_DESCRIPTIVE')
-    expect(who5.evidence.coverageText).toContain('不把来源记录升级')
+    expect(who5.evidence.recordCount).toBe(0)
+    expect(who5.evidence.status).toBe('NO_EVIDENCE_RECORDED')
+    expect(who5.evidence.coverageText).toContain('Scientific Evidence Matrix')
+    expect(who5.evidence.coverageText).toContain('不作验证、常模或诊断声称')
+
+    const sdqParent = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_parent_zh_cn')!
+    expect(sdqParent.source.citation).toContain('Goodman R.')
+    expect(sdqParent.governance?.evidence).toEqual([])
+    expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toEqual([])
   })
 })
