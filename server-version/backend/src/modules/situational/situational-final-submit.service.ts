@@ -15,9 +15,11 @@ import {
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import {
   createCanonicalUnitResultEnvelope,
+  buildSituationalBundleBridge,
   projectSituationCanonicalUnitResult,
 } from '../assessment-runtime/unit-result'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
 import {
   createSituationalRawSubmissionPayload,
   SITUATIONAL_RAW_ENCODING_VERSION,
@@ -35,6 +37,9 @@ import {
   assertSituationalAttemptOwner,
   assertRowMatchesSnapshot,
   situationalAttemptForResponse,
+  loadEmbeddedSituationalAttemptRuntime,
+  assertEmbeddedSituationalAttemptBinding,
+  type SituationalEmbeddedAccess,
   SITUATIONAL_ATTEMPT_SELECT,
   type SituationalAttemptRow,
 } from './situational-runtime.service'
@@ -42,7 +47,8 @@ import type { SituationalFinalSubmitInput } from './situational-final-submit.sch
 
 export type SituationalFinalSubmitServiceInput = SituationalFinalSubmitInput & {
   attemptId: string
-  userId: string
+  userId?: string
+  embedded?: SituationalEmbeddedAccess
 }
 
 const normalizedResponse = (response: SituationalResponse): SituationalResponse => ({
@@ -123,6 +129,13 @@ const lockSituationalAttempt = async (tx: Prisma.TransactionClient, attemptId: s
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
 }
 
+const lockEmbeddedCompositeAttempt = async (tx: Prisma.TransactionClient, attemptId: string): Promise<void> => {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "composite_assessment_attempts" WHERE "id" = ${attemptId} FOR UPDATE
+  `
+  if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+}
+
 const transactionRow = async (tx: Prisma.TransactionClient, attemptId: string) => (
   tx.situationalAttempt.findUnique({
     where: { id: attemptId },
@@ -134,7 +147,24 @@ export const submitSituationalAttemptFinal = async (
   input: SituationalFinalSubmitServiceInput,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const runtime = await loadSituationalAttemptRuntime(input.attemptId, input.userId)
+  // Controller callers pass the authenticated identity in both the service
+  // input and the embedded binding. Keep the service boundary tolerant of
+  // direct callers that provide the same identity only at the top level, but
+  // never let it override an explicit anonymous recovery binding.
+  const embedded = input.embedded
+    ? {
+        ...input.embedded,
+        ...(!input.embedded.userId && !input.embedded.recoveryTokenHash && input.userId
+          ? { userId: input.userId }
+          : {}),
+      }
+    : undefined
+  if (!embedded && !input.userId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评参与者身份缺失', 403)
+  }
+  const runtime = embedded
+    ? await loadEmbeddedSituationalAttemptRuntime(input.attemptId, embedded)
+    : await loadSituationalAttemptRuntime(input.attemptId, input.userId as string)
   const { row, snapshot } = runtime
   assertFinalOnly(row.deliveryMode)
   assertAttemptEpoch(row.attemptEpoch, input.attemptEpoch)
@@ -159,17 +189,18 @@ export const submitSituationalAttemptFinal = async (
   const canonicalCore = projectSituationCanonicalUnitResult({
     result,
     runtime: snapshot.compiledRuntime,
-    contextHash: null,
+    contextHash: row.compositeAttempt?.contextSnapshotHash ?? null,
   })
   const completedAt = new Date()
   const canonicalResult = createCanonicalUnitResultEnvelope({
     core: canonicalCore,
     completedAt,
     persistenceProvenance: {
-      sourceType: 'ASSESSMENT',
+      sourceType: embedded ? 'SITUATIONAL_ATTEMPT' : 'ASSESSMENT',
       sourceAttemptId: row.id,
       sourceSubmissionId: submissionId,
     },
+    bundleBridge: buildSituationalBundleBridge(result),
   })
   const rawPayload = createSituationalRawSubmissionPayload({
     attemptEpoch: row.attemptEpoch,
@@ -181,10 +212,15 @@ export const submitSituationalAttemptFinal = async (
   const totalTime = Math.max(0, completedAt.getTime() - row.startedAt.getTime())
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
     await lockSituationalAttempt(tx, input.attemptId)
     const current = await transactionRow(tx, input.attemptId)
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
-    assertSituationalAttemptOwner(current, input.userId)
+    if (embedded) {
+      assertEmbeddedSituationalAttemptBinding(current, embedded)
+    } else {
+      assertSituationalAttemptOwner(current, input.userId as string)
+    }
     assertRowMatchesSnapshot(current, snapshot)
     assertFinalOnly(current.deliveryMode)
     assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
@@ -233,6 +269,22 @@ export const submitSituationalAttemptFinal = async (
         encodingVersion: SITUATIONAL_RAW_ENCODING_VERSION,
       },
     })
+    if (embedded) {
+      await insertCompletedUnitSnapshot(tx, {
+        compositeAttemptId: embedded.compositeAttemptId,
+        attemptEpoch: current.attemptEpoch,
+        slotKey: embedded.compositeSlotKey,
+        unitType: 'SITUATIONAL',
+        payloadKind: 'UNIT_RESULT',
+        sourceType: 'SITUATIONAL_ATTEMPT',
+        sourceAttemptId: current.id,
+        sourceSubmissionId: submissionId,
+        sourceDefinitionHash: snapshot.definitionHash,
+        compiledRuntimeHash: snapshot.compiledRuntimeHash,
+        canonicalResultEncrypted: encryptedCanonicalResult,
+        completedAt,
+      })
+    }
     return {
       kind: 'committed' as const,
       row: {
@@ -250,5 +302,9 @@ export const submitSituationalAttemptFinal = async (
     }
   })
 
+  if (embedded && committed.kind === 'committed') {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await finalizeCompositeAttemptIfReady(embedded.compositeAttemptId)
+  }
   return situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' })
 }

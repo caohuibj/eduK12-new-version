@@ -9,7 +9,7 @@ export interface CompletedUnitSnapshotInput {
   compositeAttemptId?: string
   attemptEpoch: number
   slotKey: string
-  unitType: 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+  unitType: 'SCALE' | 'COGNITIVE' | 'FORM_SECTION' | 'SITUATIONAL'
   payloadKind: AssessmentUnitSnapshotPayloadKind
   sourceType: string
   sourceAttemptId: string

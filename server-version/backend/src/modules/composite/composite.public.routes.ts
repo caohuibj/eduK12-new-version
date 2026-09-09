@@ -5,10 +5,12 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 const router = Router()
 
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', compositeController.publicEmbeddedSituational)
 router.post('/attempts/:attemptId/restart', compositeController.publicRestart)
 router.post('/attempts/:attemptId/context/freeze', legacyWriteDisabled)
 router.post('/attempts/:attemptId/form-sections/:sectionId/submit', compositeController.publicSubmitFinalFormSection)
 router.post('/attempts/:attemptId/items/:itemId/scale/submit', compositeController.publicSubmitFinalScale)
+router.post('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit', compositeController.publicSubmitEmbeddedSituational)
 router.post('/attempts/:attemptId/save', legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/answer', legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', legacyWriteDisabled)

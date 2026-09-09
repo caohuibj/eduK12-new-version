@@ -60,11 +60,13 @@ export const setCompositeReportPackageSchema = z.object({
 const formOption = z.object({ value: z.string().min(1), label: z.string().min(1) }).strict()
 
 export const addCompositeItemSchema = z.object({
-  type: z.enum(['SCALE', 'COGNITIVE', 'FORM']),
+  type: z.enum(['SCALE', 'COGNITIVE', 'FORM', 'SITUATIONAL']),
   position: z.number().int().min(0).optional(),
   required: z.boolean().optional().default(true),
   scaleId: z.string().min(1).optional(),
   cognitiveAssignmentId: z.string().min(1).optional(),
+  situationalInstrumentKey: z.string().min(1).max(120).optional(),
+  situationalInstrumentVersion: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确情境化题包版本').optional(),
   formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month']).optional(),
   formLabel: z.string().min(1).max(500).optional(),
   formPlaceholder: z.string().nullable().optional(),
@@ -85,6 +87,9 @@ export const addCompositeItemSchema = z.object({
   if (input.type !== 'FORM' && input.contextKey !== undefined && input.contextKey !== null) {
     ctx.addIssue({ code: 'custom', path: ['contextKey'], message: '只有表单模块可以绑定 contextKey' })
   }
+  if (input.type === 'SITUATIONAL' && (!input.situationalInstrumentKey || !input.situationalInstrumentVersion)) {
+    ctx.addIssue({ code: 'custom', path: ['situationalInstrumentKey'], message: '情境化模块必须提供精确 instrumentKey 和 instrumentVersion' })
+  }
   if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
     ctx.addIssue({ code: 'custom', path: ['required'], message: '只有 context 表单可以设置为非必填' })
   }
@@ -96,7 +101,7 @@ export const reorderCompositeItemsSchema = z.object({
 
 export const reorderCompositeContentUnitsSchema = z.object({
   units: z.array(z.object({
-    type: z.enum(['scale', 'cognitive', 'form-section', 'SCALE', 'COGNITIVE', 'FORM_SECTION']),
+    type: z.enum(['scale', 'cognitive', 'situational', 'form-section', 'SCALE', 'COGNITIVE', 'SITUATIONAL', 'FORM_SECTION']),
     id: z.string().min(1),
     position: z.number().int().min(0),
   }).strict()).min(1),

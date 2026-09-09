@@ -14,7 +14,7 @@ import { bundleContractFail } from './errors'
 import type { BundleAnalysisEngineRegistry, BundleEngineInputV1 } from './registry'
 import { rollupEvidenceQuality } from './engines/mental-health-rule-v1'
 import { projectScaleEvidenceItems } from './engines/scale-evidence-v1'
-import type { BundleFrozenCognitiveSourceV1 } from './sources'
+import type { BundleFrozenCognitiveSourceV1, BundleFrozenSituationalSourceV1 } from './sources'
 import type {
   BundleContextFactsV1,
   BundleReportAudienceV1,
@@ -41,6 +41,8 @@ const toConstructSegment = (value: string): string => (
     .toLowerCase()
     .replace(/^[^a-z]+/, 'm_')
 )
+
+const toConstructPath = (value: string): string => value.split('.').map(toConstructSegment).join('.')
 
 /**
  * Project Cognitive metrics into EvidenceItemV1 rows (deferred from earlier commits).
@@ -86,6 +88,36 @@ export const projectCognitiveEvidenceItems = (input: {
   })
 }
 
+export const projectSituationalEvidenceItems = (input: {
+  source: BundleFrozenSituationalSourceV1
+  metricKeys: string[]
+  role?: EvidenceRoleV1
+}): EvidenceItemV1[] => {
+  const role = input.role ?? 'PRIMARY'
+  const prefix = toConstructSegment(input.source.instrumentKey)
+  const slotSeg = toConstructSegment(input.source.slotKey)
+  return input.metricKeys.map((metricKey) => {
+    const raw = input.source.metrics[metricKey]
+    const value = asScalar(raw)
+    const hasMetric = Object.prototype.hasOwnProperty.call(input.source.metrics, metricKey)
+    const metricPath = toConstructPath(metricKey)
+    const quality = input.source.qualityState === 'invalid'
+      ? 'invalid'
+      : !hasMetric || value === null
+        ? 'unavailable'
+        : input.source.qualityState === 'limited' ? 'limited' : 'interpretable'
+    return {
+      evidenceKey: `${slotSeg}.${prefix}.${metricPath}.primary`,
+      constructKey: `${prefix}.${metricPath}`,
+      source: { kind: 'SITUATIONAL_METRIC', slotKey: input.source.slotKey, metricKey, sourceResultHash: input.source.sourceResultHash },
+      value: value === null ? { state: 'missing' as const } : { state: 'present' as const, value },
+      quality,
+      criterionBandKey: null,
+      role,
+    }
+  })
+}
+
 const collectEvidenceFromSources = (input: BundleEngineInputV1): EvidenceItemV1[] => {
   // Always build from authoritative projectors — never trust caller-supplied evidence shortcut.
   const collected: EvidenceItemV1[] = []
@@ -113,6 +145,14 @@ const collectEvidenceFromSources = (input: BundleEngineInputV1): EvidenceItemV1[
         metricKeys: selectors,
         constructKeyPrefix: source.instrumentKey,
       }))
+    }
+    if (slot.unitType === 'SITUATIONAL') {
+      const source = (input.situationalSources ?? []).find((row) => row.slotKey === slot.slotKey)
+      if (!source) continue
+      const selectors = slot.valueSelectors && slot.valueSelectors.length > 0
+        ? slot.valueSelectors
+        : Object.keys(source.metrics)
+      collected.push(...projectSituationalEvidenceItems({ source, metricKeys: selectors }))
     }
   }
 

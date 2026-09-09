@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send, Sparkles } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { situationalApi } from '../api'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { embeddedSituationalApi, publicEmbeddedSituationalApi, situationalApi, type SituationalRunnerClient } from '../api'
 import {
   answeredResponseCount,
   ensureSituationalDraft,
@@ -34,8 +34,36 @@ const apiDataOrThrow = <T,>(response: { code: number | string; message: string; 
 }
 
 const SituationalRunner: React.FC = () => {
-  const { instrumentKey } = useParams<{ instrumentKey: string }>()
+  const { instrumentKey, attemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const publicMode = typeof window !== 'undefined' && window.location.pathname.startsWith('/public/composite/')
+  const compositeAttemptId = searchParams.get('compositeAttemptId') || ''
+  const compositeItemId = searchParams.get('compositeItemId') || ''
+  const embedded = Boolean(attemptId)
+  const recoveryToken = useMemo(() => {
+    if (!publicMode || !compositeAttemptId || typeof window === 'undefined') return ''
+    return window.sessionStorage.getItem(`composite:recovery:attempt:${compositeAttemptId}`) || ''
+  }, [compositeAttemptId, publicMode])
+  const returnTo = useMemo(() => {
+    const candidate = searchParams.get('returnTo') || ''
+    const prefix = publicMode ? '/public/composite/attempts/' : '/student/composite/attempts/'
+    return candidate.startsWith(prefix) ? candidate : ''
+  }, [publicMode, searchParams])
+  const embeddedCompletionPath = returnTo || (
+    embedded && compositeAttemptId
+      ? `${publicMode ? '/public' : '/student'}/composite/attempts/${compositeAttemptId}`
+      : ''
+  )
+  const client = useMemo<SituationalRunnerClient | null>(() => {
+    if (embedded) {
+      if (!compositeAttemptId || !compositeItemId) return null
+      return publicMode
+        ? publicEmbeddedSituationalApi(compositeAttemptId, compositeItemId, recoveryToken)
+        : embeddedSituationalApi(compositeAttemptId, compositeItemId)
+    }
+    return situationalApi
+  }, [compositeAttemptId, compositeItemId, embedded, publicMode, recoveryToken])
   const [data, setData] = useState<SituationalAttemptResponse | null>(null)
   const [responses, setResponses] = useState<Record<string, SituationalDraftAnswer>>({})
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -54,16 +82,28 @@ const SituationalRunner: React.FC = () => {
   useEffect(() => {
     let cancelled = false
     const load = async () => {
-      if (!instrumentKey) {
+      if (!client) {
+        setError('综合测评情境化槽位信息缺失，请返回后重新进入')
+        setLoading(false)
+        return
+      }
+      if (publicMode && !recoveryToken) {
+        setError('请输入保存时获得的恢复凭证，才能继续这次匿名测评')
+        setLoading(false)
+        return
+      }
+      if (!attemptId && !instrumentKey) {
         setError('题包标识缺失')
         setLoading(false)
         return
       }
       try {
-        const response = await situationalApi.start({ instrumentKey: decodeURIComponent(instrumentKey) })
+        const response = attemptId
+          ? await client.resume(attemptId)
+          : await client.start({ instrumentKey: decodeURIComponent(instrumentKey as string) })
         const next = apiDataOrThrow(response)
         if (next.attempt.status === 'COMPLETED') {
-          navigate(`/student/situational/attempts/${next.attemptId}/result`, { replace: true })
+          navigate(embeddedCompletionPath || `/student/situational/attempts/${next.attempt.id}/result`, { replace: true })
           return
         }
         await ensureSituationalDraft(next.attempt)
@@ -81,7 +121,7 @@ const SituationalRunner: React.FC = () => {
     }
     void load()
     return () => { cancelled = true }
-  }, [instrumentKey, navigate])
+  }, [attemptId, client, embeddedCompletionPath, instrumentKey, navigate, publicMode, recoveryToken])
 
   const scenes = useMemo(() => data?.instrument.definition.scenes ?? [], [data])
   const currentScene = scenes[currentIndex]
@@ -117,13 +157,13 @@ const SituationalRunner: React.FC = () => {
   }
 
   const recoverTerminalResult = async (): Promise<boolean> => {
-    if (!data) return false
+    if (!data || !client) return false
     try {
-      const response = await situationalApi.result(data.attempt.id)
+      const response = await client.result(data.attempt.id)
       const next = apiDataOrThrow(response)
       if (next.attempt.status !== 'COMPLETED') return false
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id)).catch(() => undefined)
-      navigate(`/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
       return true
     } catch {
       return false
@@ -131,7 +171,7 @@ const SituationalRunner: React.FC = () => {
   }
 
   const submit = async () => {
-    if (!data || submitting || submittingRef.current || saving) return
+    if (!data || !client || submitting || submittingRef.current || saving) return
     const missingIndex = firstMissingSceneIndex(data.instrument.definition, responses)
     if (missingIndex >= 0) {
       setCurrentIndex(missingIndex)
@@ -151,7 +191,7 @@ const SituationalRunner: React.FC = () => {
     setNotice(null)
     await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'SUBMITTING')
     try {
-      const response = await situationalApi.submit(data.attempt.id, {
+      const response = await client.submit(data.attempt.id, {
         submissionId: meta.submissionId,
         attemptEpoch: data.attempt.attemptEpoch,
         definitionHash: data.attempt.definitionHash,
@@ -163,7 +203,7 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'COMPLETED')
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id))
-      navigate(`/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
       await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'RETRY_PENDING', {
@@ -181,7 +221,7 @@ const SituationalRunner: React.FC = () => {
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate('/student/situational')} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回题包列表</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">

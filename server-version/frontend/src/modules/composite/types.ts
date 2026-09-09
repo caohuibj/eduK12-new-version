@@ -2,7 +2,7 @@ import type { CognitiveSession } from '../cognitive/types'
 import type { FormBackgroundReport } from '../reporting/types'
 import type { SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 
-export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM' | 'FORM_SECTION'
+export type CompositeItemType = 'SCALE' | 'COGNITIVE' | 'FORM' | 'FORM_SECTION' | 'SITUATIONAL'
 
 export interface CompositeItemSummary {
   id: string
@@ -103,6 +103,18 @@ export interface CompositeCurrentItem {
   }>
   formAnswers?: Array<{ formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | string[] | null }>
   cognitiveSession?: CognitiveSession
+  situationalAttemptId?: string
+  situationalInstrumentKey?: string
+  situationalInstrumentVersion?: string
+  instrument?: {
+    key: string
+    version: string
+    definitionHash: string
+    compiledRuntimeHash: string
+    scoringVersion: string
+    definition: unknown
+    runtimeCapabilities?: Record<string, boolean>
+  }
 }
 
 export interface CompositeAttemptState {
@@ -262,6 +274,21 @@ export interface CompositeReport {
         testType?: string | null
         finishedAt?: string | null
         singleTaskReport?: Record<string, unknown> | null
+      })
+    | (Record<string, unknown> & {
+        itemId: string
+        type: 'SITUATIONAL'
+        kind: 'situational'
+        label: string | null
+        instrumentKey?: string | null
+        instrumentVersion?: string | null
+        metrics: Array<{ key: string; value: number | null; unit?: string; quality?: string }>
+        quality?: Record<string, unknown> | null
+        qualityState?: string | null
+        resultHash?: string | null
+        completedAt?: string | null
+        totalTime?: number | null
+        decryptError?: boolean
       })
   >
 }

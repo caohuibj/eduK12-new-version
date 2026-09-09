@@ -48,6 +48,18 @@ import {
   compositeForbidden,
   compositeNotFound,
 } from './composite.errors'
+import {
+  createEmbeddedSituationalAttempt,
+  loadEmbeddedSituationalAttemptRuntime,
+  situationalAttemptForResponse,
+} from '../situational/situational-runtime.service'
+import {
+  compileSituationRuntime,
+} from '../assessment-runtime/compiler'
+import {
+  getSituationPackage,
+  validateSituationPackage,
+} from '../situational/situation-package.registry'
 import type {
   AddCompositeItemInput,
   CopyCompositeInput,
@@ -109,6 +121,8 @@ import {
   freezeScaleRuntimeAtAttemptStart,
 } from '../assessment-runtime/runtime-snapshot'
 import { compiledBundleRuntimeHashForSnapshot, evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
+import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
 import {
   compositeItemSlotKey,
   decryptFrozenActiveSlotSet,
@@ -266,9 +280,42 @@ const assertCognitiveModuleEnabled = () => {
   if (!config.cognitiveModuleEnabled) throw compositeBadRequest('认知模块未启用')
 }
 
-const assertSupportedComposite = (composite: { items?: Array<{ type: string }> }) => {
+const assertSituationalCompositeItem = (item: {
+  situationalInstrumentKey?: string | null
+  situationalInstrumentVersion?: string | null
+}) => {
+  if (!item.situationalInstrumentKey || !item.situationalInstrumentVersion) {
+    throw compositeBadRequest('情境化模块必须绑定精确 instrumentKey 和 instrumentVersion')
+  }
+  const situationPackage = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)
+  if (!situationPackage || situationPackage.releaseStatus !== 'PUBLISHED' || situationPackage.scienceMaturity !== 'PILOT') {
+    throw compositeBadRequest('情境化题包不存在、未发布或不满足 PILOT 准入')
+  }
+  const validation = validateSituationPackage(situationPackage)
+  if (!validation.valid) throw compositeBadRequest('情境化题包未通过运行时校验')
+  const runtime = compileSituationRuntime({
+    instrumentKey: situationPackage.key,
+    instrumentVersion: situationPackage.instrumentVersion,
+    definition: situationPackage.definition,
+    sourceDefinitionHash: validation.definitionHash,
+  })
+  if (
+    !runtime.runtimeCapabilities.supported
+    || !runtime.runtimeCapabilities.embedded
+    || !runtime.runtimeCapabilities.aggregateEligible
+    || runtime.runtimeCapabilities.collectionFacts
+  ) {
+    throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
+  }
+  return { situationPackage, runtime, definitionHash: validation.definitionHash }
+}
+
+const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }) => {
   if (!config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
     throw compositeBadRequest('认知模块未启用')
+  }
+  for (const item of composite.items ?? []) {
+    if (item.type === 'SITUATIONAL') assertSituationalCompositeItem(item)
   }
 }
 
@@ -435,7 +482,12 @@ const assertValidItem = async (
   if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
     throw compositeBadRequest('只有 context 表单可以设置为非必填')
   }
-  const supplied = [input.scaleId, input.cognitiveAssignmentId, input.formLabel].filter(Boolean).length
+  const supplied = [
+    input.scaleId,
+    input.cognitiveAssignmentId,
+    input.situationalInstrumentKey,
+    input.formLabel,
+  ].filter(Boolean).length
   if (input.type === 'SCALE') {
     if (!input.scaleId || supplied !== 1) throw compositeBadRequest('量表模块必须提供 scaleId')
     const scale = await prisma.scale.findUnique({ where: { id: input.scaleId } })
@@ -466,6 +518,14 @@ const assertValidItem = async (
       throw compositeForbidden('无权限使用此认知任务')
     }
     assertCognitiveAssignmentOnCompositeCourse(assignment, composite)
+    return
+  }
+
+  if (input.type === 'SITUATIONAL') {
+    if (!input.situationalInstrumentKey || !input.situationalInstrumentVersion || supplied !== 1) {
+      throw compositeBadRequest('情境化模块必须提供精确 instrumentKey 和 instrumentVersion')
+    }
+    assertSituationalCompositeItem(input)
     return
   }
 
@@ -515,6 +575,14 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
           engineVersion: item.cognitiveAssignment.config.engineVersion,
           scoringVersion: item.cognitiveAssignment.config.scoringVersion,
         },
+      }
+    : null,
+  situational: item.type === 'SITUATIONAL'
+    ? {
+        key: item.situationalInstrumentKey,
+        version: item.situationalInstrumentVersion,
+        status: 'PUBLISHED',
+        scienceMaturity: 'PILOT',
       }
     : null,
   form: item.type === 'FORM'
@@ -1003,6 +1071,15 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           required: item.required,
           cognitiveAssignmentId: ensured.id,
         })
+      } else if (item.type === 'SITUATIONAL') {
+        assertSituationalCompositeItem(item)
+        itemData.push({
+          type: 'SITUATIONAL',
+          position: item.position,
+          required: item.required,
+          situationalInstrumentKey: item.situationalInstrumentKey,
+          situationalInstrumentVersion: item.situationalInstrumentVersion,
+        })
       }
     }
 
@@ -1326,6 +1403,8 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
         required: input.required,
         scaleId: input.type === 'SCALE' ? input.scaleId : null,
         cognitiveAssignmentId: input.type === 'COGNITIVE' ? input.cognitiveAssignmentId : null,
+        situationalInstrumentKey: input.type === 'SITUATIONAL' ? input.situationalInstrumentKey : null,
+        situationalInstrumentVersion: input.type === 'SITUATIONAL' ? input.situationalInstrumentVersion : null,
         formType: input.type === 'FORM' ? input.formType : null,
         formLabel: input.type === 'FORM' ? input.formLabel : null,
         formPlaceholder: input.type === 'FORM' ? input.formPlaceholder ?? null : null,
@@ -1354,7 +1433,7 @@ export const removeItem = async (userId: string, role: UserRole, compositeId: st
 }
 
 type CompositeContentUnitInput = {
-  type: 'scale' | 'cognitive' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+  type: 'scale' | 'cognitive' | 'situational' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL' | 'FORM_SECTION'
   id: string
   position: number
 }
@@ -1362,6 +1441,7 @@ type CompositeContentUnitInput = {
 const canonicalCompositeContentUnitType = (type: CompositeContentUnitInput['type']) => {
   if (type === 'scale' || type === 'SCALE') return 'scale' as const
   if (type === 'cognitive' || type === 'COGNITIVE') return 'cognitive' as const
+  if (type === 'situational' || type === 'SITUATIONAL') return 'situational' as const
   return 'form-section' as const
 }
 
@@ -1410,7 +1490,7 @@ export const listCompositeContentUnits = async (compositeId: string) => {
     ...composite.items
       .filter((item: any) => item.type !== 'FORM')
       .map((item: any) => ({
-        type: item.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+        type: item.type === 'SCALE' ? 'scale' as const : item.type === 'COGNITIVE' ? 'cognitive' as const : 'situational' as const,
         id: item.id,
         position: item.position,
         label: resolveCompositeItemLabel(item, packageSlotLabels),
@@ -1446,8 +1526,8 @@ export const reorderCompositeContentUnits = async (
   const childItems = composite.items.filter((item: any) => item.type !== 'FORM')
   const expected = new Map<string, string>([
     ...childItems.map((item: any) => [
-      `${item.type === 'SCALE' ? 'scale' : 'cognitive'}:${item.id}`,
-      item.type === 'SCALE' ? 'scale' : 'cognitive',
+      `${item.type === 'SCALE' ? 'scale' : item.type === 'COGNITIVE' ? 'cognitive' : 'situational'}:${item.id}`,
+      item.type === 'SCALE' ? 'scale' : item.type === 'COGNITIVE' ? 'cognitive' : 'situational',
     ] as const),
     ...sections.map((section: any) => [`form-section:${section.id}`, 'form-section'] as const),
   ])
@@ -1541,7 +1621,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
       continue
     }
     activeSectionId = null
-    unitInputs.push({ type: item.type === 'SCALE' ? 'scale' : 'cognitive', id: item.id, position: entry.position })
+    unitInputs.push({ type: item.type === 'SCALE' ? 'scale' : item.type === 'COGNITIVE' ? 'cognitive' : 'situational', id: item.id, position: entry.position })
   }
   for (const section of composite.formSections ?? []) {
     if (!sectionIds.has(section.id)) unitInputs.push({ type: 'form-section', id: section.id, position: section.position })
@@ -1574,7 +1654,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   const contentUnits = [
     ...composite.items
       .filter((item: any) => item.type !== 'FORM')
-      .map((item: any) => ({ type: item.type === 'SCALE' ? 'scale' : 'cognitive', id: item.id, position: item.position })),
+      .map((item: any) => ({ type: item.type === 'SCALE' ? 'scale' : item.type === 'COGNITIVE' ? 'cognitive' : 'situational', id: item.id, position: item.position })),
     ...(composite.formSections ?? []).map((section: any) => ({ type: 'form-section', id: section.id, position: section.position })),
   ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
   if (contextSections[0] && (
@@ -1616,6 +1696,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
+    if (item.type === 'SITUATIONAL') assertSituationalCompositeItem(item)
     if (item.type === 'FORM') {
       if (!item.formType || !item.formLabel) {
         throw compositeBadRequest('综合测评包含未配置完成的表单')
@@ -1863,7 +1944,7 @@ export const listAvailableForStudent = async (userId: string) => {
       ...item.items
         .filter((child: any) => child.type !== 'FORM')
         .map((child: any) => ({
-          type: child.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+          type: child.type === 'SCALE' ? 'scale' as const : child.type === 'COGNITIVE' ? 'cognitive' as const : 'situational' as const,
           id: child.id,
           position: child.position,
           label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)),
@@ -1983,6 +2064,18 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
   const runtime = {
     scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
     cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
+    situational: [] as Array<{
+      compositeItemId: string
+      instrumentKey: string
+      instrumentVersion: string
+      definitionHash: string
+      compiledRuntimeHash: string
+      scorerKey: string
+      scoringVersion: string
+      runtimeGeneration: 'UNIFIED_V1'
+      deliveryMode: 'FINAL_ONLY'
+      frozenAt: string
+    }>,
   }
   for (const item of items) {
     if (!item.required) continue
@@ -2034,6 +2127,34 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
         })
       }
+    } else if (item.type === 'SITUATIONAL') {
+      if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
+      const situation = assertSituationalCompositeItem(item)
+      const embedded = await createEmbeddedSituationalAttempt(db, {
+        userId,
+        // Composite parent rows retain their historical participant key
+        // format. Embedded Situational children use the shared pseudonym
+        // contract so owner admission is identical to standalone runtime.
+        participantKey: userId ? getParticipantKey(userId) : attempt.participantKey,
+        compositeAttemptId: attempt.id,
+        compositeItemId: item.id,
+        compositeSlotKey: compositeItemSlotKey(item.id, 'SITUATIONAL'),
+        instrumentKey: situation.situationPackage.key,
+        instrumentVersion: situation.situationPackage.instrumentVersion,
+        attemptEpoch: attempt.attemptEpoch ?? 1,
+      })
+      runtime.situational.push({
+        compositeItemId: item.id,
+        instrumentKey: embedded.snapshot.instrumentKey,
+        instrumentVersion: embedded.snapshot.instrumentVersion,
+        definitionHash: embedded.snapshot.definitionHash,
+        compiledRuntimeHash: embedded.snapshot.compiledRuntimeHash,
+        scorerKey: embedded.snapshot.scorerKey,
+        scoringVersion: embedded.snapshot.scoringVersion,
+        runtimeGeneration: embedded.snapshot.runtimeGeneration,
+        deliveryMode: 'FINAL_ONLY',
+        frozenAt: embedded.snapshot.frozenAt,
+      })
     }
   }
   return runtime
@@ -2105,6 +2226,7 @@ const createAttempt = async (
       attemptEpoch,
       scales: runtime.scales,
       cognitive: runtime.cognitive,
+      situational: runtime.situational,
       formSections: formSections.map((section: any) => ({
         sectionId: section.id,
         definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
@@ -2280,7 +2402,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
     ...current.items
       .filter((item: any) => item.type !== 'FORM')
       .map((item: any) => ({
-        type: item.type === 'SCALE' ? 'scale' as const : 'cognitive' as const,
+        type: item.type === 'SCALE' ? 'scale' as const : item.type === 'COGNITIVE' ? 'cognitive' as const : 'situational' as const,
         id: item.id,
         position: item.position,
         label: resolveCompositeItemLabel(item, packageSlotLabels),
@@ -2458,6 +2580,7 @@ const loadAttemptWithChildren = async (attemptId: string) => {
       },
       formAnswers: true,
       formSectionAttempts: true,
+      situationalAttempts: true,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
@@ -2500,6 +2623,7 @@ const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
       cognitiveSessions: true,
       formAnswers: true,
       formSectionAttempts: true,
+      situationalAttempts: true,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
@@ -2588,6 +2712,7 @@ const latestChildrenByItem = (children: any[]) => {
 const attemptCompletedItemMaps = (attempt: any) => ({
   scaleMap: latestChildrenByItem(attempt.scaleAssessments),
   cognitiveMap: latestChildrenByItem(attempt.cognitiveSessions),
+  situationalMap: latestChildrenByItem(attempt.situationalAttempts ?? []),
   formMap: latestChildrenByItem(attempt.formAnswers),
   sectionMap: new Map<string, any>((attempt.formSectionAttempts ?? []).map((section: any) => [section.sectionId, section])),
 })
@@ -2600,6 +2725,7 @@ const isAttemptItemCompleted = (
   if (!item.required && !item.contextKey) return true
   if (item.type === 'SCALE') return maps.scaleMap.get(item.id)?.status === 'COMPLETED'
   if (item.type === 'COGNITIVE') return maps.cognitiveMap.get(item.id)?.status === 'COMPLETED'
+  if (item.type === 'SITUATIONAL') return maps.situationalMap.get(item.id)?.status === 'COMPLETED'
   if (finalOnly) return maps.sectionMap.get(item.formSectionId)?.status === 'COMPLETED'
   return maps.formMap.get(item.id)?.completed !== false && maps.formMap.has(item.id)
 }
@@ -2666,6 +2792,8 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
           position: true,
           required: true,
           scaleId: true,
+          situationalInstrumentKey: true,
+          situationalInstrumentVersion: true,
           formSectionId: true,
           formType: true,
           formLabel: true,
@@ -2749,6 +2877,31 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       runtimeGeneration: true,
     },
   },
+  situationalAttempts: {
+    select: {
+      id: true,
+      userId: true,
+      compositeAttemptId: true,
+      compositeItemId: true,
+      compositeSlotKey: true,
+      instrumentKey: true,
+      instrumentVersion: true,
+      status: true,
+      deliveryMode: true,
+      runtimeGeneration: true,
+      attemptEpoch: true,
+      definitionHash: true,
+      compiledRuntimeHash: true,
+      scorerKey: true,
+      scoringVersion: true,
+      frozenAt: true,
+      progress: true,
+      submissionId: true,
+      submissionPayloadHash: true,
+      submittedAt: true,
+      completedAt: true,
+    },
+  },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 
 const getUnifiedCompositeAttemptState = async (
@@ -2789,7 +2942,7 @@ const getUnifiedCompositeAttemptState = async (
   const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: attempt.attemptEpoch })
   if (completeness.invalidSlotKeys.length > 0) throw compositeBadRequest('综合测评进度快照不可用，请重启测评')
   const headerByKey = new Map(headers.map((header) => [header.slotKey, header]))
-  const slotKeyForItem = (item: any): string | null => item.type === 'SCALE' || item.type === 'COGNITIVE'
+  const slotKeyForItem = (item: any): string | null => item.type === 'SCALE' || item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'
     ? compositeItemSlotKey(item.id, item.type)
     : item.type === 'FORM' && item.formSectionId
       ? formSectionSlotKey(item.formSectionId)
@@ -2937,6 +3090,45 @@ const getUnifiedCompositeAttemptState = async (
     } catch (error) {
       if (isInstrumentFinalSubmitError(error)) throw error
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
+    }
+  } else if (currentUnit?.type === 'SITUATIONAL') {
+    const summary = attempt.situationalAttempts.find((candidate: any) => candidate.compositeItemId === currentUnit.item.id)
+    const slot = slotsByKey.get(compositeItemSlotKey(currentUnit.item.id, 'SITUATIONAL'))
+    if (!summary || !slot || !slot.runtimeIdentity) throw compositeConflict('情境化测评冻结运行时不可用，请重启测评')
+    try {
+      const runtime = await loadEmbeddedSituationalAttemptRuntime(summary.id, {
+        compositeAttemptId: attempt.id,
+        compositeItemId: currentUnit.item.id,
+        compositeSlotKey: slot.slotKey,
+        ...(context.userId ? { userId: context.userId } : { recoveryTokenHash: context.recoveryTokenHash }),
+      })
+      if (
+        runtime.row.attemptEpoch !== attempt.attemptEpoch
+        || runtime.snapshot.instrumentKey !== slot.runtimeIdentity.instrumentKey
+        || runtime.snapshot.instrumentVersion !== slot.runtimeIdentity.instrumentVersion
+        || runtime.snapshot.definitionHash !== slot.runtimeIdentity.definitionHash
+        || runtime.snapshot.compiledRuntimeHash !== slot.runtimeIdentity.compiledRuntimeHash
+        || runtime.snapshot.scorerKey !== slot.runtimeIdentity.scorerKey
+        || runtime.snapshot.scoringVersion !== slot.runtimeIdentity.scoringVersion
+        || runtime.snapshot.frozenAt !== slot.runtimeIdentity.frozenAt
+      ) throw new Error('Situational runtime identity mismatch')
+      const child = situationalAttemptForResponse(runtime.row, runtime.snapshot)
+      currentItem = {
+        id: currentUnit.item.id,
+        type: 'SITUATIONAL',
+        position: currentUnit.item.position,
+        required: currentUnit.item.required,
+        situationalAttemptId: runtime.row.id,
+        situationalInstrumentKey: runtime.row.instrumentKey,
+        situationalInstrumentVersion: runtime.row.instrumentVersion,
+        definitionHash: runtime.row.definitionHash,
+        compiledRuntimeHash: runtime.row.compiledRuntimeHash,
+        status: runtime.row.status,
+        instrument: child.instrument,
+      }
+    } catch (error) {
+      if (isInstrumentFinalSubmitError(error)) throw error
+      throw compositeConflict('情境化测评冻结运行时不可用，请重启测评')
     }
   }
 
@@ -3842,6 +4034,7 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = (attempt: any) => {
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
+  const situationalMap = new Map<string, any>((attempt.situationalAttempts ?? []).map((item: any) => [item.compositeItemId, item]))
   const readableFormAnswers = readContextFormAnswers(
     attempt.compositeAssessment.items
       .filter((item: any) => item.type === 'FORM')
@@ -3908,6 +4101,49 @@ export const buildCompositeReport = (attempt: any) => {
         })
         continue
       }
+    }
+    if (item.type === 'SITUATIONAL') {
+      try {
+        const child = situationalMap.get(item.id)
+        const canonical = child?.canonicalResultEncrypted
+          ? parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload<unknown>(child.canonicalResultEncrypted))
+          : null
+        if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
+        unitReports.push({
+          itemId: item.id,
+          type: 'SITUATIONAL' as const,
+          kind: 'situational' as const,
+          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          instrumentKey: canonical?.core.instrumentKey ?? child?.instrumentKey ?? item.situationalInstrumentKey ?? null,
+          instrumentVersion: canonical?.core.instrumentVersion ?? child?.instrumentVersion ?? item.situationalInstrumentVersion ?? null,
+          metrics: canonical?.core.metrics?.map((metric) => ({
+            key: metric.key,
+            value: metric.value,
+            unit: metric.unit,
+            quality: metric.quality,
+          })) ?? [],
+          quality: canonical?.core.quality ?? null,
+          qualityState: canonical?.core.quality.status ?? null,
+          resultHash: canonical?.resultHash ?? null,
+          completedAt: child?.completedAt ?? null,
+          totalTime: child?.totalTime ?? null,
+        })
+      } catch {
+        logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+        unitReports.push({
+          itemId: item.id,
+          type: 'SITUATIONAL' as const,
+          kind: 'situational' as const,
+          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          metrics: [],
+          quality: null,
+          qualityState: null,
+          completedAt: null,
+          totalTime: null,
+          decryptError: true,
+        })
+      }
+      continue
     }
     try {
       const session = cognitiveMap.get(item.id)

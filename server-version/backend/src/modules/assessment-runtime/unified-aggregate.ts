@@ -10,7 +10,7 @@ export type AggregateSnapshotHeader = {
   id?: string
   slotKey: string
   attemptEpoch: number
-  unitType: 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+  unitType: 'SCALE' | 'COGNITIVE' | 'FORM_SECTION' | 'SITUATIONAL'
   terminalState: 'COMPLETED' | 'SKIPPED' | 'NOT_APPLICABLE'
   payloadKind: 'UNIT_RESULT' | 'COLLECTION_FACTS' | 'NONE'
   sourceType: string

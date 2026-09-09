@@ -28,7 +28,7 @@ export type BundleInitiationModeV1 =
   | 'ANONYMOUS_SELF'
   | 'STUDENT_COURSE'
 
-export type BundleSlotUnitTypeV1 = 'COGNITIVE' | 'SCALE' | 'FORM'
+export type BundleSlotUnitTypeV1 = 'COGNITIVE' | 'SCALE' | 'FORM' | 'SITUATIONAL'
 
 export type BundleSubjectPopulationV1 = 'youth' | 'adult' | 'unspecified'
 
@@ -129,6 +129,12 @@ export type EvidenceSourceV1 =
       kind: 'SCALE_SCORE'
       slotKey: string
       scoreKey: string
+      sourceResultHash: string
+    }
+  | {
+      kind: 'SITUATIONAL_METRIC'
+      slotKey: string
+      metricKey: string
       sourceResultHash: string
     }
   | {

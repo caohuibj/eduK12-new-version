@@ -38,6 +38,15 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
+import {
+  loadEmbeddedSituationalAttemptRuntime,
+  situationalAttemptForResponse,
+  type SituationalEmbeddedAccess,
+} from '../situational/situational-runtime.service'
+import { submitSituationalAttemptFinal } from '../situational/situational-final-submit.service'
+import { situationalFinalSubmitSchema } from '../situational/situational-final-submit.schema'
+import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
 import {
   assignCompositeFormItemToSection,
   createCompositeFormSection,
@@ -54,6 +63,20 @@ const recoveryFromRequest = (req: Request): string => {
   if (!isValidRecoveryToken(value)) throw new z.ZodError([{ code: 'custom', path: ['recoveryToken'], message: '缺少有效恢复凭证' }])
   return value
 }
+
+const embeddedSituationalAccess = (
+  req: Request,
+  authorization: Pick<SituationalEmbeddedAccess, 'userId' | 'recoveryTokenHash'>,
+): SituationalEmbeddedAccess => ({
+  compositeAttemptId: req.params.attemptId,
+  compositeItemId: req.params.itemId,
+  compositeSlotKey: compositeItemSlotKey(req.params.itemId, 'SITUATIONAL'),
+  ...authorization,
+})
+
+const firstSituationalValidationMessage = (value: { issues?: Array<{ message: string }> }): string => (
+  value.issues?.[0]?.message || '请求参数不合法'
+)
 
 const sendAnalysisExport = async (
   res: Response,
@@ -341,6 +364,39 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async getEmbeddedSituational(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const runtime = await loadEmbeddedSituationalAttemptRuntime(
+        req.params.situationalAttemptId,
+        embeddedSituationalAccess(req, { userId: req.user.userId }),
+      )
+      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot))
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async submitEmbeddedSituational(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const parsed = situationalFinalSubmitSchema.safeParse(req.body)
+      if (!parsed.success) return error(res, firstSituationalValidationMessage(parsed.error))
+      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+        attemptId: req.params.situationalAttemptId,
+        userId: req.user!.userId,
+        embedded: embeddedSituationalAccess(req, { userId: req.user!.userId }),
+        ...parsed.data,
+      }))
+      return success(res, data, data.replayed ? '综合测评情境化模块提交已确认' : '综合测评情境化模块提交成功')
+    } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
   async freezeContext(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -560,6 +616,37 @@ export const compositeController = {
 
   async publicAttempt(req: Request, res: Response) {
     try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+  },
+
+  async publicEmbeddedSituational(req: Request, res: Response) {
+    try {
+      const runtime = await loadEmbeddedSituationalAttemptRuntime(
+        req.params.situationalAttemptId,
+        embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
+      )
+      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot))
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async publicSubmitEmbeddedSituational(req: Request, res: Response) {
+    try {
+      const parsed = situationalFinalSubmitSchema.safeParse(req.body)
+      if (!parsed.success) return error(res, firstSituationalValidationMessage(parsed.error))
+      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+        attemptId: req.params.situationalAttemptId,
+        userId: undefined,
+        embedded: embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
+        ...parsed.data,
+      }))
+      return success(res, data, data.replayed ? '匿名综合测评情境化模块提交已确认' : '匿名综合测评情境化模块提交成功')
+    } catch (err) {
+      if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
   },
 
   async publicFreezeContext(req: Request, res: Response) {

@@ -4,6 +4,7 @@ import { EXACT_VERSION } from './schema'
 import type {
   BundleFrozenCognitiveSourceV1,
   BundleFrozenScaleSourceV1,
+  BundleFrozenSituationalSourceV1,
 } from './sources'
 import type { MentalHealthRuleSetV1 } from './engines/mental-health-rule-v1'
 import { validateBundleContextFacts } from './evidence'
@@ -27,6 +28,8 @@ export interface BundleEngineInputV1 {
   cognitiveSources?: BundleFrozenCognitiveSourceV1[]
   /** Frozen Scale unit projections keyed by Bundle slot (optional). */
   scaleSources?: BundleFrozenScaleSourceV1[]
+  /** Frozen Situational metrics projected from CanonicalUnitResult only. */
+  situationalSources?: BundleFrozenSituationalSourceV1[]
   /** Frozen mental-health rule set (required by mental-health-rule-v1). */
   ruleSet?: MentalHealthRuleSetV1 | null
 }

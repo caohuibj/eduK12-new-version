@@ -5,7 +5,7 @@ import SituationalRunner from '../pages/SituationalRunner'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
 import { ensureSituationalDraft, situationalDraftKey } from '../draft'
 import type { SituationalAttemptResponse } from '../types'
-import { situationalApi } from '../api'
+import { embeddedSituationalApi, situationalApi } from '../api'
 
 vi.mock('../api', () => ({
   situationalApi: {
@@ -13,7 +13,15 @@ vi.mock('../api', () => ({
     submit: vi.fn(),
     result: vi.fn(),
   },
+  embeddedSituationalApi: vi.fn(),
 }))
+
+let embeddedClient: {
+  start: ReturnType<typeof vi.fn>
+  resume: ReturnType<typeof vi.fn>
+  submit: ReturnType<typeof vi.fn>
+  result: ReturnType<typeof vi.fn>
+}
 
 const startData = (): SituationalAttemptResponse => ({
   attemptId: 'ui-attempt',
@@ -69,6 +77,15 @@ const renderRunner = () => render(
   </MemoryRouter>,
 )
 
+const renderEmbeddedRunner = () => render(
+  <MemoryRouter initialEntries={['/student/composite/situational/ui-child?compositeAttemptId=parent-1&compositeItemId=item-1&returnTo=%2Fstudent%2Fcomposite%2Fattempts%2Fparent-1']}>
+    <Routes>
+      <Route path="/student/composite/situational/:attemptId" element={<SituationalRunner />} />
+      <Route path="/student/composite/attempts/:attemptId" element={<div data-testid="composite-parent-page">PARENT</div>} />
+    </Routes>
+  </MemoryRouter>
+)
+
 const answerDefaultRunner = async () => {
   fireEvent.click(screen.getByLabelText('选择 A'))
   await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
@@ -85,10 +102,19 @@ const answerDefaultRunner = async () => {
 describe('Situational text runner', () => {
   beforeEach(async () => {
     vi.resetAllMocks()
+    embeddedClient = { start: vi.fn(), resume: vi.fn(), submit: vi.fn(), result: vi.fn() }
+    vi.mocked(embeddedSituationalApi).mockReturnValue(embeddedClient as never)
     await finalDraftStore.delete('situational:ui-attempt')
+    await finalDraftStore.delete('situational:ui-child')
     vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: startData() })
     vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData() })
     vi.mocked(situationalApi.result).mockResolvedValue({ code: 0, message: 'ok', data: completedData() })
+    const embeddedData = startData()
+    embeddedData.attemptId = 'ui-child'
+    embeddedData.attempt = { ...embeddedData.attempt, id: 'ui-child' }
+    embeddedClient.resume.mockResolvedValue({ code: 0, message: 'ok', data: embeddedData })
+    embeddedClient.submit.mockResolvedValue({ code: 0, message: 'ok', data: completedData(embeddedData) })
+    embeddedClient.result.mockResolvedValue({ code: 0, message: 'ok', data: completedData(embeddedData) })
   })
 
   it('renders text, supports choice/continuous boundaries, navigation, and one final request', async () => {
@@ -181,6 +207,21 @@ describe('Situational text runner', () => {
     await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(situationalApi.result).toHaveBeenCalledWith('ui-attempt'))
     expect(await screen.findByTestId('situational-result-page')).toBeInTheDocument()
+  })
+
+  it('uses the pre-created embedded child and returns to the composite parent after FINAL', async () => {
+    renderEmbeddedRunner()
+    expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
+    await answerDefaultRunner()
+
+    fireEvent.click(screen.getByRole('button', { name: /提交测评/ }))
+
+    await waitFor(() => expect(embeddedClient.submit).toHaveBeenCalledTimes(1))
+    expect(embeddedClient.start).not.toHaveBeenCalled()
+    expect(embeddedClient.submit).toHaveBeenCalledWith('ui-child', expect.objectContaining({
+      responses: expect.any(Array),
+    }))
+    expect(await screen.findByTestId('composite-parent-page')).toBeInTheDocument()
   })
 
   it.each([10, 30, 60])('renders and navigates %i scenes with one final request and no start fan-out', async (sceneCount) => {

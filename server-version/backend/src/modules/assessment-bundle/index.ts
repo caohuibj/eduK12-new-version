@@ -63,6 +63,7 @@ export {
   validateEvidenceItem,
   validateEvidenceSource,
 } from './evidence'
+export { projectSituationalEvidenceItems } from './report-facts'
 export {
   assertContextDefinitionHashMatchesSnapshot,
   buildFrozenAssessmentBundleSnapshot,
@@ -93,16 +94,19 @@ export type {
   BundleFrozenCognitiveSourceV1,
   BundleFrozenScaleScoreV1,
   BundleFrozenScaleSourceV1,
+  BundleFrozenSituationalSourceV1,
   BundleFrozenSourceQualityV1,
 } from './sources'
 export {
   assertUniqueCognitiveSources,
   assertUniqueScaleSources,
+  assertUniqueSituationalSources,
   assertUniqueValueSelectors,
   projectBundleCognitiveSource,
   projectBundleScaleSource,
   projectBundleScaleSourceFromCanonicalBridge,
   projectBundleCognitiveSourceFromCanonicalBridge,
+  projectBundleSituationalSourceFromCanonicalBridge,
   buildScaleBundleBridge,
   buildCognitiveBundleBridge,
   validateBundleEngineSourceSet,
