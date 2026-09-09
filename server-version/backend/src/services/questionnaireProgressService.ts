@@ -570,7 +570,7 @@ export const refreshCompositeFinalOnlyProgress = async (
         && child.attemptNo === parent.attemptEpoch
         && child.status === 'COMPLETED')
       .map((child) => child.compositeItemId as string),
-    ...parent.situationalAttempts
+    ...(parent.situationalAttempts ?? [])
       .filter((child) => itemIds.has(child.compositeItemId ?? '')
         && child.attemptEpoch === parent.attemptEpoch
         && child.status === 'COMPLETED')
