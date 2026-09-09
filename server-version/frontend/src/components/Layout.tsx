@@ -44,6 +44,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: '/checkins', label: '打卡管理', icon: <Camera className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/teacher/classrooms', label: '课堂互动', icon: <Share2 className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/scales', label: '心理量表', icon: <FileText className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
+    { path: '/scale-library', label: '量表库', icon: <BookOpen className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/questionnaires', label: '聚合问卷', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     { path: '/composite-assessments', label: '综合测评', icon: <ClipboardCheck className="w-5 h-5" />, roles: ['TEACHER', 'ADMIN'] },
     ...(cognitiveModuleEnabled
@@ -120,7 +121,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               key={item.path}
               to={item.path}
               className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                location.pathname === item.path
+                location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(`${item.path}/`))
                   ? 'bg-primary text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
@@ -137,7 +138,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {/* Header */}
         <header className="h-16 bg-white shadow-sm flex items-center justify-between px-6">
           <h2 className="text-lg font-semibold text-gray-800">
-            {filteredMenuItems.find((item) => item.path === location.pathname)?.label || '首页'}
+            {filteredMenuItems.find((item) => item.path === location.pathname || (item.path !== '/' && location.pathname.startsWith(`${item.path}/`)))?.label || '首页'}
           </h2>
 
           {/* User Menu */}
