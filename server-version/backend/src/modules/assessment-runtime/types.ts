@@ -35,6 +35,8 @@ export interface ReferenceBindingDefinitionV1 {
     scoreKey?: string
     referenceKind?: string
     profileKey?: string
+    /** Optional instrument-specific applicability snapshot frozen into the compiled runtime. */
+    applicability?: JsonObject
   }>
 }
 
@@ -72,4 +74,6 @@ export interface ReferenceBindingSnapshot {
   scoreKey?: string
   referenceKind?: string
   profileKey?: string
+  /** Exact applicability semantics used by this attempt; absent only for legacy/non-Cognitive bindings. */
+  applicability?: JsonObject
 }
