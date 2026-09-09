@@ -104,7 +104,11 @@ const assertVisualScene = async (page, sceneIndex) => {
     naturalHeight: node.naturalHeight,
   })))
   assert.deepEqual(actual.map((image) => image.assetId), expected.map((image) => image.assetId), 'visual asset order does not match the frozen definition')
-  assert.deepEqual(actual.map((image) => image.alt), expected.map((image) => image.alt), 'visual alt text does not match the frozen definition')
+  assert.deepEqual(
+    actual.map((image) => image.alt),
+    expected.map((image) => image.alt),
+    `visual alt text does not match the frozen definition: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`,
+  )
   assert.ok(actual.every((image) => image.naturalWidth > 0 && image.naturalHeight > 0), 'visual asset did not decode')
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true, 'visual runner has horizontal overflow')
   record(sceneIndex === 1 ? 'visual-image-visible' : 'visual-comic-visible')
