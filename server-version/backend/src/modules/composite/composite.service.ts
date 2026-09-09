@@ -32,6 +32,7 @@ import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } 
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
+import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
 import { readContextFormAnswers, validateContextAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../assessment-context'
 import {
   freezeCompositeAttemptContext,
@@ -3711,6 +3712,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       scale: runnerScale,
       answers: decodedAnswers.answers,
       definitionHash,
+      ...(decodedAnswers.deviceInputProvenance ? { deviceInputProvenance: decodedAnswers.deviceInputProvenance } : {}),
       ...(decodedAnswers.decryptError ? { decryptError: true } : {}),
     }
   } else if (current?.type === 'COGNITIVE') {
@@ -3916,7 +3918,7 @@ export const saveFormAnswer = async (attemptId: string, itemId: string, value: s
 export const saveScaleAnswer = async (
   attemptId: string,
   itemId: string,
-  input: { itemCode: string; responseValue: string | number; responseTimeMs?: number },
+  input: { itemCode: string; responseValue: string | number; responseTimeMs?: number; deviceInputProvenance?: DeviceInputProvenanceV1 },
   context: { userId?: string; recoveryTokenHash?: string },
 ) => {
   const { attempt, item } = await getOwnedChild(attemptId, itemId, context)
@@ -3967,7 +3969,7 @@ export const saveScaleAnswer = async (
     await tx.assessment.update({
       where: { id: assessment.id },
       data: {
-        answers: encryptScaleAnswers(answers),
+        answers: encryptScaleAnswers(answers, input.deviceInputProvenance ?? decoded.deviceInputProvenance),
         result: null,
         progress: Math.round((answers.length / Math.max(definition.items.length, 1)) * 100),
       },
@@ -4019,7 +4021,7 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
       data: {
         status: 'COMPLETED',
         progress: 100,
-        answers: encryptScaleAnswers(answers),
+        answers: encryptScaleAnswers(answers, decoded.deviceInputProvenance),
         result: encryptScaleResult(result),
         completedAt,
         totalTime: completedAt.getTime() - assessment.startedAt.getTime(),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeCurrentItem } from '../modules/composite/types'
@@ -6,6 +6,12 @@ import { checkpointId } from '../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
+import {
+  SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
+  readScaleDeviceInputProvenance,
+  resolveScaleDeviceInputProvenance,
+  type DeviceInputProvenanceV1,
+} from '../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
 type FormValue = string | string[] | null
@@ -15,7 +21,7 @@ export interface FinalCompositeAssessmentProps {
   publicMode?: boolean
   recoveryToken?: string
   submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: FormValue }> }) => Promise<ApiResponse<unknown>>
-  submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }> }) => Promise<ApiResponse<unknown>>
+  submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }>; deviceInputProvenance?: DeviceInputProvenanceV1 }) => Promise<ApiResponse<unknown>>
   onReload: () => Promise<void>
   onExit: () => void
   onCompleted: () => void
@@ -66,6 +72,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
+  const scaleDeviceInputProvenanceRef = useRef<{ scaleId: string; value: DeviceInputProvenanceV1 } | null>(null)
 
   const isSection = item?.type === 'FORM_SECTION'
   const sectionId = isSection ? item?.formSectionId || item.id : null
@@ -104,6 +111,23 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           deliveryMode: 'final_only',
           submissionId: checkpointId(),
         }))
+        if (scaleId) {
+          const storedProvenance = readScaleDeviceInputProvenance(nextMeta.instrumentMetadata)
+          const existing = scaleDeviceInputProvenanceRef.current?.scaleId === scaleId
+            ? scaleDeviceInputProvenanceRef.current.value
+            : null
+          const provenance = resolveScaleDeviceInputProvenance({
+            metadata: nextMeta.instrumentMetadata,
+            serverValue: item.deviceInputProvenance,
+            existing,
+          })
+          scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
+          if (!storedProvenance) {
+            await finalDraftStore.setInstrumentMetadata(draftKey, {
+              [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
+            }).catch(() => null)
+          }
+        }
         const storedAnswers = await finalDraftStore.listAnswers(draftKey)
         if (cancelled) return
         const nextForm: Record<string, FormValue> = {}
@@ -250,12 +274,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           setError('提交繁忙，正在自动重试…')
         },
         operation: async () => {
+          const scaleDeviceInputProvenance = scaleDeviceInputProvenanceRef.current
+          const deviceInputProvenance = scaleDeviceInputProvenance
+            ? scaleDeviceInputProvenance.scaleId === item.scaleAssessmentId
+              ? scaleDeviceInputProvenance.value
+              : undefined
+            : undefined
           const next = await submitScale(state.id, item.id, {
             submissionId: meta.submissionId,
             attemptEpoch: meta.attemptEpoch,
             definitionHash: meta.definitionHash,
             contextSnapshotHash: meta.contextSnapshotHash,
             answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
+            ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
           })
           if (next.code !== 0) throw responseError(next)
           return next

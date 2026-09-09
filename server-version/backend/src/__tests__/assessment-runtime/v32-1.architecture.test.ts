@@ -75,6 +75,21 @@ describe('Unified runtime architecture boundaries', () => {
       .toBeLessThan(compositeBody.indexOf('formSections:'))
   })
 
+  it('keeps Scale answer encryption and provenance resolution outside completion transaction', () => {
+    const scale = source('modules/scale/unified-final-submit.service.ts')
+    const transactionStart = scale.indexOf('const committed = await withFinalOnlyCompletionTransaction')
+    const transactionEnd = scale.indexOf('\n  })\n  return {', transactionStart)
+    expect(transactionStart).toBeGreaterThan(-1)
+    expect(transactionEnd).toBeGreaterThan(transactionStart)
+    const transactionBody = scale.slice(transactionStart, transactionEnd)
+
+    expect(transactionBody).not.toContain('encryptScaleAnswers')
+    expect(transactionBody).not.toContain('readScaleAnswers')
+    expect(transactionBody).not.toContain('scaleAssessmentForResponse')
+    expect(scale.indexOf('const encryptedAnswers = encryptScaleAnswers')).toBeLessThan(transactionStart)
+    expect(scale).toContain('const storedProvenance = readScaleAnswers(child.answers).deviceInputProvenance')
+  })
+
   it('keeps the unified raw submission boundary strict and encrypted', () => {
     const raw = source('modules/cognitive/unified-raw-submission.ts')
     const security = source('modules/assessment-runtime/security.ts')

@@ -6,6 +6,7 @@ import { hashScaleDefinition, type ScaleDefinitionV2 } from '../../modules/scale
 import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { freezeQuestionnaireActiveSlotSet } from '../../modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
+import { encryptScaleAnswers, readScaleAnswers } from '../../modules/scale/scale-workflow.service'
 
 const databaseUrl = integrationDatabaseUrl('V32_3_INTEGRATION_DATABASE_URL')
 const suite = databaseUrl ? describe : describe.skip
@@ -213,6 +214,33 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
     return { ...fixture, questionnaireId, questionnaireScaleId, parentId, assessmentId, child }
   }
 
+  const createStandaloneChild = async (suffix: string, storedAnswers?: Prisma.InputJsonValue) => {
+    const fixture = await createUserAndScale(suffix)
+    const assessmentId = `v32-3-provenance-${suffix}`
+    await db!.assessment.create({
+      data: {
+        id: assessmentId,
+        scaleId: fixture.scale.id,
+        userId: fixture.userId,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(fixture.runtime),
+        compiledRuntimeHash: fixture.runtime.compiledRuntime.compiledRuntimeHash,
+        attemptEpoch: 1,
+        progress: 0,
+        ...(storedAnswers === undefined ? {} : { answers: storedAnswers }),
+      },
+    })
+    createdAssessmentIds.push(assessmentId)
+    const child = await db!.assessment.findUnique({
+      where: { id: assessmentId },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    })
+    if (!child) throw new Error('V32-3 provenance child fixture is missing')
+    return { ...fixture, assessmentId, child }
+  }
+
   it('persists a standalone frozen admission on first submit and reuses it on replay', async () => {
     const suffix = randomUUID()
     const fixture = await createUserAndScale(suffix)
@@ -265,6 +293,101 @@ suite('V32-3 frozen unit admission PostgreSQL', () => {
       where: { id: assessmentId },
       select: { frozenAdmissionSnapshotHash: true },
     })).toEqual({ frozenAdmissionSnapshotHash: stored?.frozenAdmissionSnapshotHash })
+  })
+
+  it('persists new provenance once and keeps replay/conflict semantics unchanged', async () => {
+    const suffix = randomUUID()
+    const fixture = await createStandaloneChild(suffix)
+    const provenance = {
+      schemaVersion: 1 as const,
+      deviceClass: 'DESKTOP' as const,
+      osFamily: 'Windows' as const,
+      browserFamily: 'Chrome' as const,
+      viewportWidth: 1280,
+      viewportHeight: 720,
+      screenWidth: 1920,
+      screenHeight: 1080,
+      devicePixelRatio: 1,
+      maxTouchPoints: 0,
+      primaryPointer: 'FINE' as const,
+      capturedAt: '2026-09-08T00:00:00.000Z',
+    }
+    const input = {
+      assessmentId: fixture.assessmentId,
+      submissionId: `v32-3-provenance-submit-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' as const }],
+      deviceInputProvenance: provenance,
+      userId: fixture.userId,
+    }
+
+    const submitted = await submitScaleAssessmentFinal(input)
+    expect(submitted.replayed).toBe(false)
+    const stored = await db!.assessment.findUnique({ where: { id: fixture.assessmentId }, select: { answers: true } })
+    expect(readScaleAnswers(stored?.answers).deviceInputProvenance).toEqual(provenance)
+
+    const replayed = await submitScaleAssessmentFinal(input)
+    expect(replayed.replayed).toBe(true)
+    await expect(submitScaleAssessmentFinal({
+      ...input,
+      deviceInputProvenance: { ...provenance, deviceClass: 'MOBILE' },
+    })).rejects.toMatchObject({ code: 'SUBMISSION_PAYLOAD_CONFLICT' })
+  })
+
+  it('preserves stored provenance when an old client omits it', async () => {
+    const suffix = randomUUID()
+    const storedProvenance = {
+      schemaVersion: 1 as const,
+      deviceClass: 'TABLET' as const,
+      osFamily: 'Android' as const,
+      browserFamily: 'Chrome' as const,
+      viewportWidth: 1024,
+      viewportHeight: 768,
+      screenWidth: 1280,
+      screenHeight: 800,
+      devicePixelRatio: 1,
+      maxTouchPoints: 5,
+      primaryPointer: 'COARSE' as const,
+      capturedAt: '2026-09-08T00:00:00.000Z',
+    }
+    const storedAnswers = encryptScaleAnswers([
+      { itemCode: 'v32-3-item-1', responseValue: 'yes' as const },
+    ], storedProvenance) as unknown as Prisma.InputJsonValue
+    const fixture = await createStandaloneChild(suffix, storedAnswers)
+    const submitted = await submitScaleAssessmentFinal({
+      assessmentId: fixture.assessmentId,
+      submissionId: `v32-3-old-client-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' as const }],
+      userId: fixture.userId,
+    })
+    expect(submitted.replayed).toBe(false)
+    const stored = await db!.assessment.findUnique({ where: { id: fixture.assessmentId }, select: { answers: true } })
+    expect(readScaleAnswers(stored?.answers).deviceInputProvenance).toEqual(storedProvenance)
+  })
+
+  it('completes historical plain answer arrays when provenance is absent', async () => {
+    const suffix = randomUUID()
+    const fixture = await createStandaloneChild(suffix, [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }])
+    const submitted = await submitScaleAssessmentFinal({
+      assessmentId: fixture.assessmentId,
+      submissionId: `v32-3-legacy-array-${suffix}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' as const }],
+      userId: fixture.userId,
+    })
+    expect(submitted.replayed).toBe(false)
+    const stored = await db!.assessment.findUnique({ where: { id: fixture.assessmentId }, select: { answers: true } })
+    expect(readScaleAnswers(stored?.answers)).toMatchObject({
+      answers: [{ itemCode: 'v32-3-item-1', responseValue: 'yes' }],
+      decryptError: false,
+    })
   })
 
   it('converges concurrent activate-once writes to a single stored admission hash', async () => {

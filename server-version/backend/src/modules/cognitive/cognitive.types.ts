@@ -74,6 +74,11 @@ export interface SingleTaskReportDefinition {
   disclaimer: string
 }
 
+/** Pure, deterministic upper bound for accepted Cognitive FINAL trial envelopes. */
+export interface FinalSubmissionDefinition<TConfig> {
+  maxTrials(config: TConfig): number
+}
+
 /** 一个注册的 Cognitive Test 实现：版本键 + 双 Zod schema + 纯函数 scorer。 */
 export interface RegistryEntry<TConfig, TTrial> {
   testType: string
@@ -84,6 +89,7 @@ export interface RegistryEntry<TConfig, TTrial> {
   randomizationAlgorithmVersion: string
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
+  finalSubmission: FinalSubmissionDefinition<TConfig>
   score(input: {
     config: TConfig
     trials: ScoringTrial<TTrial>[]

@@ -676,6 +676,49 @@ suite('instrument final submit (real PostgreSQL)', () => {
     expect(decryptUnifiedRuntimePayload<any>(raw!.payloadEncrypted).administrationProvenance).toEqual(provenance)
   })
 
+  it('rejects over-limit unified cognitive FINAL payloads consistently for authenticated and public callers', async () => {
+    const authenticatedFixture = await createUnifiedCognitiveFixture(3)
+    const anonymousFixture = await createUnifiedCognitiveFixture(3, true)
+    if (!anonymousFixture.credential) throw new Error('anonymous fixture credential is missing')
+
+    const overLimit = (fixture: Awaited<ReturnType<typeof createUnifiedCognitiveFixture>>) => ({
+      ...fixture.input,
+      trials: [
+        ...fixture.input.trials,
+        {
+          ...fixture.input.trials[0],
+          trialIndex: 3,
+          payload: { correct: 'not-a-boolean' },
+        },
+      ],
+    })
+
+    const authenticated = await withObserved(() => expectInstrumentError(
+      () => submitCognitiveSessionFinal(userId, overLimit(authenticatedFixture)),
+      'SUBMISSION_PAYLOAD_CONFLICT',
+    ))
+    const publicSubmission = await withObserved(() => expectInstrumentError(
+      () => submitCognitiveSessionFinalForPublic(overLimit(anonymousFixture), anonymousFixture.credential!.hash),
+      'SUBMISSION_PAYLOAD_CONFLICT',
+    ))
+
+    expect(authenticated.value.message).toContain('submitted trial count exceeds maximum allowed trial count (3)')
+    expect(publicSubmission.value.message).toContain('submitted trial count exceeds maximum allowed trial count (3)')
+    expect(authenticated.value.message).toBe(publicSubmission.value.message)
+    for (const observed of [authenticated, publicSubmission]) {
+      const unexpectedMutations = observed.calls.filter((call) => (
+        call.action === 'create'
+        || call.action === 'createMany'
+        || call.action === 'update'
+        || call.action === 'updateMany'
+        || call.action === 'upsert'
+      ) && !(call.model === 'CognitiveSession' && call.action === 'updateMany'))
+      expect(unexpectedMutations).toEqual([])
+      expect(observed.calls.filter((call) => call.model === 'CognitiveRawSubmission')).toHaveLength(0)
+      expect(observed.calls.filter((call) => call.model === 'CognitiveTrial')).toHaveLength(0)
+    }
+  })
+
   it('accepts anonymous cognitive final submit with only the recovery credential', async () => {
     const fixture = await createCognitiveFixture(1, true)
     if (!fixture.credential) throw new Error('anonymous fixture credential is missing')

@@ -107,6 +107,14 @@ import { scoreLexicaldecisionV1 } from './scoring/lexicaldecision.v1'
 import { emotionrecognitionConfigSchema } from './schemas/emotionrecognition.config'
 import { emotionrecognitionTrialSchema } from './schemas/emotionrecognition.trial'
 import { scoreEmotionrecognitionV1 } from './scoring/emotionrecognition.v1'
+import {
+  absoluteFallbackFinalSubmission,
+  fixedCountFinalSubmission,
+  nbackTaskCountFinalSubmission,
+  phaseTaskCountFinalSubmission,
+  spanTaskCountFinalSubmission,
+  trailmakingTaskCountFinalSubmission,
+} from './v2/final-submission-budget'
 
 /**
  * Cognitive Registry（D2 Step 5）。
@@ -172,6 +180,35 @@ export const hasCognitiveProfile = (entry: AnyRegistryEntry, profile: string): p
     ? Boolean(entry.profiles[profile])
     : false
 
+// Each contract is attached to an exact RegistryEntry below. Shared instances
+// are safe only when the versioned protocol contract is identical; the entry
+// still owns the binding, so a future version can replace it independently.
+const fakeFinalSubmission = fixedCountFinalSubmission('trialCount')
+const reactionFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const memoryFinalSubmission = spanTaskCountFinalSubmission('startLength', 'maxLength', 'trialsPerLevel')
+const stroopFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const gonogoFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const cptFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const nbackFinalSubmission = nbackTaskCountFinalSubmission()
+const corsiFinalSubmission = spanTaskCountFinalSubmission('startSpan', 'maxSpan', 'trialsPerLevel')
+const sstFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const taskswitchFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const patterncompareFinalSubmission = absoluteFallbackFinalSubmission()
+const flankerFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const cardsortFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const digitbackwardFinalSubmission = spanTaskCountFinalSubmission('startSpan', 'maxSpan', 'trialsPerLevel')
+const picturesequenceFinalSubmission = phaseTaskCountFinalSubmission()
+const pairedassociateFinalSubmission = phaseTaskCountFinalSubmission()
+const matrixFinalSubmission = fixedCountFinalSubmission('itemCount')
+const mentalrotationFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const towerFinalSubmission = fixedCountFinalSubmission('problemCount')
+const trailmakingFinalSubmission = trailmakingTaskCountFinalSubmission()
+const reversallearningFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const bartFinalSubmission = fixedCountFinalSubmission('balloonCount')
+const wordlistFinalSubmission = phaseTaskCountFinalSubmission()
+const lexicaldecisionFinalSubmission = fixedCountFinalSubmission('totalTrials')
+const emotionrecognitionFinalSubmission = fixedCountFinalSubmission('totalTrials')
+
 // 注册 Fake Test：fake / 1.0.0 / 1.0.0
 registerEntry({
   testType: 'fake',
@@ -179,6 +216,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: fakeConfigSchema,
   trialSchema: fakeTrialSchema,
+  finalSubmission: fakeFinalSubmission,
   score: scoreFakeV1,
   ...fakeRegistryMeta,
 })
@@ -190,6 +228,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: reactionConfigSchema,
   trialSchema: reactionTrialSchema,
+  finalSubmission: reactionFinalSubmission,
   score: scoreReactionV1,
   ...reactionRegistryMeta,
 })
@@ -201,6 +240,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: memoryConfigSchema,
   trialSchema: memoryTrialSchema,
+  finalSubmission: memoryFinalSubmission,
   score: scoreMemoryV1,
   ...memoryRegistryMeta,
 })
@@ -212,6 +252,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: stroopConfigSchema,
   trialSchema: stroopTrialSchema,
+  finalSubmission: stroopFinalSubmission,
   score: scoreStroopV1,
   ...stroopRegistryMeta,
 })
@@ -222,6 +263,7 @@ registerEntry({
   scoringVersion: '1.1.0',
   configSchema: reactionConfigSchema,
   trialSchema: reactionTrialSchema,
+  finalSubmission: reactionFinalSubmission,
   score: scoreReactionV1_1,
   ...reactionRegistryMetaV11,
 })
@@ -232,6 +274,7 @@ registerEntry({
   scoringVersion: '1.1.0',
   configSchema: memoryConfigSchema,
   trialSchema: memoryTrialSchema,
+  finalSubmission: memoryFinalSubmission,
   score: scoreMemoryV1_1,
   ...memoryRegistryMetaV11,
 })
@@ -242,6 +285,7 @@ registerEntry({
   scoringVersion: '1.1.0',
   configSchema: stroopConfigSchema,
   trialSchema: stroopTrialSchema,
+  finalSubmission: stroopFinalSubmission,
   score: scoreStroopV1_1,
   ...stroopRegistryMetaV11,
 })
@@ -252,6 +296,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: gonogoConfigSchema,
   trialSchema: gonogoTrialSchema,
+  finalSubmission: gonogoFinalSubmission,
   score: scoreGonogoV1,
   ...gonogoRegistryMeta,
 })
@@ -262,6 +307,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: cptConfigSchema,
   trialSchema: cptTrialSchema,
+  finalSubmission: cptFinalSubmission,
   score: scoreCptV1,
   ...cptRegistryMeta,
 })
@@ -272,6 +318,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: nbackConfigSchema,
   trialSchema: nbackTrialSchema,
+  finalSubmission: nbackFinalSubmission,
   score: scoreNbackV1,
   ...nbackRegistryMeta,
 })
@@ -282,6 +329,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: corsiConfigSchema,
   trialSchema: corsiTrialSchema,
+  finalSubmission: corsiFinalSubmission,
   score: scoreCorsiV1,
   ...corsiRegistryMeta,
 })
@@ -292,6 +340,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: sstConfigSchema,
   trialSchema: sstTrialSchema,
+  finalSubmission: sstFinalSubmission,
   score: scoreSstV1,
   ...sstRegistryMeta,
 })
@@ -302,6 +351,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: taskswitchConfigSchema,
   trialSchema: taskswitchTrialSchema,
+  finalSubmission: taskswitchFinalSubmission,
   score: scoreTaskswitchV1,
   ...taskswitchRegistryMeta,
 })
@@ -312,6 +362,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: patterncompareConfigSchema,
   trialSchema: patterncompareTrialSchema,
+  finalSubmission: patterncompareFinalSubmission,
   score: scorePatterncompareV1,
   ...patterncompareRegistryMeta,
 })
@@ -322,6 +373,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: flankerConfigSchema,
   trialSchema: flankerTrialSchema,
+  finalSubmission: flankerFinalSubmission,
   score: scoreFlankerV1,
   ...flankerRegistryMeta,
 })
@@ -332,6 +384,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: cardsortConfigSchema,
   trialSchema: cardsortTrialSchema,
+  finalSubmission: cardsortFinalSubmission,
   score: scoreCardsortV1,
   ...cardsortRegistryMeta,
 })
@@ -342,6 +395,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: digitbackwardConfigSchema,
   trialSchema: digitbackwardTrialSchema,
+  finalSubmission: digitbackwardFinalSubmission,
   score: scoreDigitbackwardV1,
   ...digitbackwardRegistryMeta,
 })
@@ -352,6 +406,7 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: picturesequenceConfigSchema,
   trialSchema: picturesequenceTrialSchema,
+  finalSubmission: picturesequenceFinalSubmission,
   score: scorePicturesequenceV1,
   ...picturesequenceRegistryMeta,
 })
@@ -362,16 +417,17 @@ registerEntry({
   scoringVersion: '1.0.0',
   configSchema: pairedassociateConfigSchema,
   trialSchema: pairedassociateTrialSchema,
+  finalSubmission: pairedassociateFinalSubmission,
   score: scorePairedassociateV1,
   ...pairedassociateRegistryMeta,
 })
 
-registerEntry({ testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: matrixConfigSchema, trialSchema: matrixTrialSchema, score: scoreMatrixV1, ...matrixRegistryMeta })
-registerEntry({ testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta })
-registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, score: scoreTowerV1, ...towerRegistryMeta })
-registerEntry({ testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, score: scoreTrailmakingV1, ...trailmakingRegistryMeta })
-registerEntry({ testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, score: scoreReversallearningV1, ...reversallearningRegistryMeta })
-registerEntry({ testType: 'bart', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: bartConfigSchema, trialSchema: bartTrialSchema, score: scoreBartV1, ...bartRegistryMeta })
-registerEntry({ testType: 'wordlist', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: wordlistConfigSchema, trialSchema: wordlistTrialSchema, score: scoreWordlistV1, ...wordlistRegistryMeta })
-registerEntry({ testType: 'lexicaldecision', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: lexicaldecisionConfigSchema, trialSchema: lexicaldecisionTrialSchema, score: scoreLexicaldecisionV1, ...lexicaldecisionRegistryMeta })
-registerEntry({ testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta })
+registerEntry({ testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: matrixConfigSchema, trialSchema: matrixTrialSchema, finalSubmission: matrixFinalSubmission, score: scoreMatrixV1, ...matrixRegistryMeta })
+registerEntry({ testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, finalSubmission: mentalrotationFinalSubmission, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta })
+registerEntry({ testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, finalSubmission: towerFinalSubmission, score: scoreTowerV1, ...towerRegistryMeta })
+registerEntry({ testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, finalSubmission: trailmakingFinalSubmission, score: scoreTrailmakingV1, ...trailmakingRegistryMeta })
+registerEntry({ testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, finalSubmission: reversallearningFinalSubmission, score: scoreReversallearningV1, ...reversallearningRegistryMeta })
+registerEntry({ testType: 'bart', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: bartConfigSchema, trialSchema: bartTrialSchema, finalSubmission: bartFinalSubmission, score: scoreBartV1, ...bartRegistryMeta })
+registerEntry({ testType: 'wordlist', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: wordlistConfigSchema, trialSchema: wordlistTrialSchema, finalSubmission: wordlistFinalSubmission, score: scoreWordlistV1, ...wordlistRegistryMeta })
+registerEntry({ testType: 'lexicaldecision', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: lexicaldecisionConfigSchema, trialSchema: lexicaldecisionTrialSchema, finalSubmission: lexicaldecisionFinalSubmission, score: scoreLexicaldecisionV1, ...lexicaldecisionRegistryMeta })
+registerEntry({ testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, finalSubmission: emotionrecognitionFinalSubmission, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta })

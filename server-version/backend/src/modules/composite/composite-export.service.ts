@@ -13,6 +13,7 @@ import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { getFrozenPackageSlotLabels } from './report-package-label'
 import { readContextFormAnswers } from '../assessment-context'
+import { readScaleAnswers } from '../scale/scale-workflow.service'
 import {
   assertExportLimits,
   cleanupExpiredExportFiles,
@@ -175,7 +176,7 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
           scaleAssessments: {
             select: {
               compositeItemId: true,
-              answers: detail === 'full',
+              answers: true,
               result: true,
             },
           },
@@ -240,6 +241,17 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
       builder.add(`${prefix}definition_hash`, `[${scaleLabel}] 定义哈希`, 'string', 80)
       builder.add(`${prefix}reference_versions`, `[${scaleLabel}] 使用的参考版本`, 'string', 48)
       builder.add(`${prefix}context_snapshot_hash`, `[${scaleLabel}] 测评上下文快照哈希`, 'string', 64)
+      builder.add(`${prefix}device_class`, `[${scaleLabel}] 设备类别`, 'string', 16)
+      builder.add(`${prefix}device_os_family`, `[${scaleLabel}] 操作系统族`, 'string', 24)
+      builder.add(`${prefix}device_browser_family`, `[${scaleLabel}] 浏览器族`, 'string', 24)
+      builder.add(`${prefix}device_viewport_width`, `[${scaleLabel}] 视口宽度`, 'numeric', 12)
+      builder.add(`${prefix}device_viewport_height`, `[${scaleLabel}] 视口高度`, 'numeric', 12)
+      builder.add(`${prefix}device_screen_width`, `[${scaleLabel}] 屏幕宽度`, 'numeric', 12)
+      builder.add(`${prefix}device_screen_height`, `[${scaleLabel}] 屏幕高度`, 'numeric', 12)
+      builder.add(`${prefix}device_pixel_ratio`, `[${scaleLabel}] 设备像素比`, 'numeric', 12, 3)
+      builder.add(`${prefix}device_max_touch_points`, `[${scaleLabel}] 最大触点数`, 'numeric', 12)
+      builder.add(`${prefix}device_primary_pointer`, `[${scaleLabel}] 主指针类型`, 'string', 16)
+      builder.add(`${prefix}device_captured_at`, `[${scaleLabel}] 捕获时间`, 'string', 32)
     }
     if (item.type === 'COGNITIVE') {
       const childPrefix = slotPrefix('C', index)
@@ -309,7 +321,8 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         const v2Items = Array.isArray(definition?.items) ? definition.items : []
         const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
         const scaleResult = decode<Record<string, any>>(result?.result)
-        const answers = detail === 'full' ? decode<any[]>(result?.answers) ?? [] : []
+        const decodedAnswers = readScaleAnswers(result?.answers)
+        const answers = detail === 'full' ? decodedAnswers.answers : []
         const answerMap = new Map<string, any>(answers.map((answer) => [answer.itemCode, answer]))
         const itemScoreMap = new Map<string, any>((scaleResult?.itemScores || []).map((answer: any) => [answer.itemCode, answer]))
         if (detail === 'full') {
@@ -331,6 +344,18 @@ export const getExportData = async (assessmentId: string, options: { detail?: Co
         row[`${prefix}definition_hash`] = scaleResult?.method?.definitionHash ?? null
         row[`${prefix}reference_versions`] = Array.isArray(scaleResult?.method?.referenceVersions) ? scaleResult.method.referenceVersions.join('|') : null
         row[`${prefix}context_snapshot_hash`] = scaleResult?.method?.assessmentContext?.snapshotHash ?? attempt.contextSnapshotHash ?? null
+        const device = decodedAnswers.deviceInputProvenance
+        row[`${prefix}device_class`] = device?.deviceClass ?? null
+        row[`${prefix}device_os_family`] = device?.osFamily ?? null
+        row[`${prefix}device_browser_family`] = device?.browserFamily ?? null
+        row[`${prefix}device_viewport_width`] = device?.viewportWidth ?? null
+        row[`${prefix}device_viewport_height`] = device?.viewportHeight ?? null
+        row[`${prefix}device_screen_width`] = device?.screenWidth ?? null
+        row[`${prefix}device_screen_height`] = device?.screenHeight ?? null
+        row[`${prefix}device_pixel_ratio`] = device?.devicePixelRatio ?? null
+        row[`${prefix}device_max_touch_points`] = device?.maxTouchPoints ?? null
+        row[`${prefix}device_primary_pointer`] = device?.primaryPointer ?? null
+        row[`${prefix}device_captured_at`] = device?.capturedAt ?? null
         const scoreMap = new Map<string, any>((scaleResult?.scores || []).map((score: any) => [score.key, score]))
         v2Scores.forEach((score: any) => {
           const scoreLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${score.key} ${score.label}冻结得分`

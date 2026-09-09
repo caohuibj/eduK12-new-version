@@ -146,6 +146,7 @@ export const buildCognitiveV2TaskDefinition = (
     configSchema: entry.configSchema,
     trialSchema: entry.trialSchema,
     protocol,
+    finalSubmission: entry.finalSubmission,
     scorer: ({ config, trials, randomSeed }) => {
       const legacy = entry.score({
         config,
