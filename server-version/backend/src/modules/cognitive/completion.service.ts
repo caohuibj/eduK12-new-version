@@ -157,6 +157,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     throw err
   }
 
+  const freeze = await loadFrozenMeasurementContext(tx, session.assignmentId)
   const references = scored.quality.state === 'invalid'
     ? []
     : await loadCognitiveReferenceSets(tx, session.testType)
@@ -168,6 +169,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
         references,
         context: contextState.context,
         quality: scored.quality,
+        measurement: freeze,
       })
   const report = projectThreeLayerReport({
     testType: session.testType,
@@ -175,7 +177,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     protocolSignature: snapshot.protocolSignature,
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
-    profile: (await loadFrozenMeasurementContext(tx, session.assignmentId)).profile,
+    profile: freeze.profile,
     definition: definition.report,
     metrics: scored.metrics,
     score: scored,

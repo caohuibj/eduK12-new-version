@@ -154,6 +154,25 @@ const assertFrozenAdmission = (
   }
 }
 
+const assertFrozenAssignmentConfig = (
+  child: UnifiedCognitiveAdmission,
+  prepared: { snapshot: { configHash: string }; runtime: { runtimeCapabilities: { aggregateEligible: boolean } } },
+  freeze: { resolvedConfigHash: string | null },
+): void => {
+  if (!child.compositeAttemptId || !prepared.runtime.runtimeCapabilities.aggregateEligible || !child.assignmentId) return
+  if (
+    !freeze.resolvedConfigHash
+    || !/^[0-9a-f]{64}$/.test(freeze.resolvedConfigHash)
+    || freeze.resolvedConfigHash !== prepared.snapshot.configHash
+  ) {
+    throw new InstrumentFinalSubmitError(
+      'DEFINITION_MISMATCH',
+      '认知会话冻结配置与分发冻结配置不匹配，请重启后重试',
+      409,
+    )
+  }
+}
+
 const normalizeSubmission = (
   definition: ReturnType<typeof getCognitiveV2TaskDefinition>,
   values: unknown[],
@@ -302,6 +321,8 @@ export const submitUnifiedCognitiveSessionFinal = async (
     )
   }
 
+  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, child.assignmentId))
+  assertFrozenAssignmentConfig(child, prepared, freeze)
   const referenceDefinitions = scored.quality.state === 'invalid' || prepared.snapshot.referenceBindings?.length === 0
     ? []
     : await measureRequestPhase('final_submit_db_query', () => loadFrozenReferenceSets(prisma as any, {
@@ -319,8 +340,8 @@ export const submitUnifiedCognitiveSessionFinal = async (
           references: referenceDefinitions,
           context: contextState.context,
           quality: scored.quality,
+          measurement: freeze,
         })
-  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, child.assignmentId))
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
     completedAt: new Date().toISOString(),
@@ -351,20 +372,6 @@ export const submitUnifiedCognitiveSessionFinal = async (
 
   const canonicalResult = child.compositeAttemptId && prepared.runtime.runtimeCapabilities.aggregateEligible
     ? (() => {
-        if (
-          child.assignmentId
-          && (
-            !freeze.resolvedConfigHash
-            || !/^[0-9a-f]{64}$/.test(freeze.resolvedConfigHash)
-            || freeze.resolvedConfigHash !== prepared.snapshot.configHash
-          )
-        ) {
-          throw new InstrumentFinalSubmitError(
-            'DEFINITION_MISMATCH',
-            '认知会话冻结配置与分发冻结配置不匹配，请重启后重试',
-            409,
-          )
-        }
         return projectCognitiveCanonicalUnitResult({
           snapshot: resultSnapshot,
           runtime: prepared.runtime,

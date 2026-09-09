@@ -165,6 +165,16 @@ describe('Assessment Reference Core', () => {
     expect(descriptiveResult).toMatchObject({ referenceKind: 'descriptive_sample', meanDifference: 10, percentile: null, criterionBand: null })
   })
 
+  it('requires a mean for descriptive samples because meanDifference is their only comparative statistic', () => {
+    const missingMean = setFor(baseEntry({
+      referenceKind: 'descriptive_sample',
+      statistics: {},
+    }))
+    expect(validateReferenceSetDefinition(missingMean).issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'entries.0.statistics.mean' }),
+    ]))
+  })
+
   it('requires exact versions and context, but accepts an unstratified reference', () => {
     const ageStratified = setFor(baseEntry({ population: { description: '按年龄分层', ageBand: 'K7-9' } }))
     const missingContext = resolveScaleReference({

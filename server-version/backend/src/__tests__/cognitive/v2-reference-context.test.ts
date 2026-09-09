@@ -5,6 +5,8 @@ import type { AssessmentReferenceSetDefinition } from '../../modules/assessment-
 
 type ReferenceKind = AssessmentReferenceSetDefinition['entries'][number]['referenceKind']
 
+const measurement = { profile: 'standard' as const, resolvedConfigHash: 'a'.repeat(64) }
+
 const definition = (referenceKind: ReferenceKind = 'normative_distribution') => {
   const base = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')
   if (!base) throw new Error('reaction v1.1 definition missing')
@@ -18,6 +20,8 @@ const definition = (referenceKind: ReferenceKind = 'normative_distribution') => 
       instrumentVersion: '1.0.0',
       scoringVersion: '1.1.0',
       direction: base.metrics.medianRtMs.direction,
+      profiles: [measurement.profile],
+      resolvedConfigHashes: [measurement.resolvedConfigHash],
       requiredContext: referenceKind === 'normative_distribution' ? ['age' as const] : [],
     }],
   }
@@ -57,6 +61,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
       context: null,
+      measurement,
     })
     expect(result).toHaveLength(1)
     expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'missing_context' })
@@ -68,6 +73,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ description: 'all participants' })])],
       context: null,
+      measurement,
     })
 
     expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'missing_context' })
@@ -81,6 +87,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
       context: { values: { ageMonthsAtFreeze: 156 } } as never,
+      measurement,
     })
     expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'no_population_match' })
   })
@@ -94,6 +101,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
         entry({ match: { minAgeMonthsInclusive: 100, maxAgeMonthsExclusive: 140 } }),
       ])],
       context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      measurement,
     })
     expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'ambiguous_population' })
   })
@@ -104,6 +112,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
       context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      measurement,
     })
     expect(result[0]).toMatchObject({
       status: 'available',
@@ -120,6 +129,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 450 },
       references: [referenceSet([entry({ description: 'descriptive sample' }, 'descriptive_sample', { mean: 500, sd: 50 })])],
       context: null,
+      measurement,
     })
     expect(result[0]).toMatchObject({
       status: 'available',
@@ -139,6 +149,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
       context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      measurement,
       quality: { state: 'invalid', flags: { corruptedPayload: true }, reasons: ['数据损坏'] },
     })
     expect(result).toEqual([])
@@ -155,6 +166,7 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       metrics: { medianRtMs: 350 },
       references: [referenceSet([entry({ match: { minAgeMonthsInclusive: 84, maxAgeMonthsExclusive: 120 } })])],
       context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      measurement,
       quality: { state: 'limited', flags: { insufficientTrials: true }, reasons: ['试次不足'] },
     })
     expect(result[0]).toMatchObject({
@@ -164,5 +176,40 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       source: null,
       relativePosition: null,
     })
+  })
+
+  it('fails closed when measurement applicability is omitted', () => {
+    const task = definition()
+    const mapping = task.references[0]
+    task.references = [{ ...mapping, profiles: undefined, resolvedConfigHashes: undefined }]
+    const result = resolveCognitiveMetricReferences({
+      definition: task,
+      metrics: { medianRtMs: 350 },
+      references: [referenceSet([entry({ description: 'all participants' })])],
+      context: { values: { ageMonthsAtFreeze: 108 } } as never,
+      measurement,
+    })
+    expect(result[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'measurement_mismatch' })
+  })
+
+  it('requires both the exact profile and resolved config hash', () => {
+    const task = definition()
+    const references = [referenceSet([entry({ description: 'all participants' })])]
+    const sameProfileDifferentHash = resolveCognitiveMetricReferences({
+      definition: task,
+      metrics: { medianRtMs: 350 },
+      references,
+      context: null,
+      measurement: { profile: 'standard', resolvedConfigHash: 'b'.repeat(64) },
+    })
+    const sameHashWrongProfile = resolveCognitiveMetricReferences({
+      definition: task,
+      metrics: { medianRtMs: 350 },
+      references,
+      context: null,
+      measurement: { profile: 'research', resolvedConfigHash: measurement.resolvedConfigHash },
+    })
+    expect(sameProfileDifferentHash[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'measurement_mismatch' })
+    expect(sameHashWrongProfile[0]).toMatchObject({ status: 'unavailable', unavailableReason: 'measurement_mismatch' })
   })
 })

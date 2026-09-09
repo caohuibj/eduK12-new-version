@@ -3,7 +3,7 @@
 - 日期：2026-09-09
 - 基线：COG-P3 PR #67 合并后的 `main @ 2ed9e4e`
 - 分支：`feat/cognitive-pilot-reference-v1`
-- 性质：**reference eligibility source audit**。本文记录当前注册表真值和未来 pipeline 的候选边界；不创建 reference row，不改变 publication、scorer、report 或数据库行为。
+- 性质：**reference eligibility source audit + measurement applicability foundation**。本文记录当前注册表真值和未来 pipeline 的候选边界；不创建 reference row，不改变现有 scorer、submission、report 输出或数据库 schema。
 - 配套文档：`cognitive-literature-reference-candidates-v1.md`（COG-P4 §4.2 / §4.2.1）
 
 ## 1. Scope
@@ -19,8 +19,8 @@
 
 - 不创建 `AssessmentReferenceSet` / `AssessmentReferenceEntry`；当前新增 reference rows = **0**；
 - 不把现有文献锚定、模拟数据或候选对象改为 ACTIVE；当前 ACTIVE cognitive reference = **0**；
-- 不实现 4.3 Reference Applicability runtime、4.4 Frozen Reference Binding、4.5–4.8 audience projection/regression；
-- 不修改 Student/Parent、Teacher 或 Admin report，不修改 FINAL runtime、scorer、Bundle、COS 或数据库 schema；
+- 4.3 只实现最小 measurement applicability foundation；不实现 4.4 Frozen Reference Binding、4.5–4.8 audience projection/regression；
+- 不修改 Student/Parent、Teacher 或 Admin report、scorer、submission payload、Bundle、COS 或数据库 schema；FINAL 只把既有 freeze 查询前移到 reference resolution 之前，当前 production mappings 为空，因此现有输出不变；
 - 不创建 `CognitiveNormEngine`、第二套 Reference Registry、连续年龄插值或自动 norm fitting；
 - 不做 touch/desktop correction、device penalty/bonus 或 device-specific norm switching。
 
@@ -30,7 +30,7 @@
 |---|---|---|
 | Product publication | 28 个 exact identities：9 `PUBLISHED`、19 `DRAFT`、0 `RETIRED` | 工程可发布状态，不是科研成熟度 |
 | Scientific status | 24 个真实 task identity 全部 `PILOT`；`fake` 为 `FRAMEWORK` | exact identity scoped；当前 `RESEARCH_GRADE_IDENTITIES` 为空 |
-| Reference applicability | 所有 v2 `TaskDefinition.references` 均为空 | 没有任何 metric 已绑定 reference version/kind/context |
+| Reference applicability | 所有 v2 `TaskDefinition.references` 均为空；非空 mapping 现在必须显式声明 profile 与 resolvedConfigHash | 没有任何 production metric 已绑定 reference version/kind/context；未来 mapping 不得隐式 wildcard |
 | Eligibility | 旧 `primary/report` fallback 识别的 22 个候选中，15 个当前 PUBLISHED metric 明确为 `true`、7 个收紧为 `false`；其余未显式覆盖的 PUBLISHED metric 及全部 DRAFT 也为 `false` | 只做候选资格筛选，不等同 reference 可用 |
 | Evidence Mapping | 版本 `1.0.0`，只提供 domain/facet/role 语义映射 | 只做构念链接，不授予 eligibility 或 applicability |
 
@@ -63,13 +63,13 @@ TaskDefinition.metrics[metricKey].referenceEligible
 它的真实来源和传递链路是：
 
 ```text
-RegistryEntry.metricDefinitions[metricKey].referenceEligible
-  → v2/registry.ts（原值透传）
+RegistryEntry.referenceEligibleMetricKeys（exact allowlist）
+  → v2/registry.ts（Set 派生）
   → TaskDefinition.metrics[metricKey].referenceEligible
   → future reference candidate filter
 ```
 
-本轮给 legacy `MetricDefinition` 增加了显式 `referenceEligible: boolean`。registry 的 `metric()` helper 默认写入 `false`，只有 exact RegistryEntry definition 对批准的 metric 显式覆盖为 `true`。因此：
+legacy `cognitive.types.MetricDefinition` 和 `FrozenReportSnapshot.metricDefinitions` 不携带 eligibility。只有 exact `RegistryEntry.referenceEligibleMetricKeys` 持有治理 allowlist，v2 adapter 再派生 runtime consumer truth；缺失/空 allowlist fail closed。因此：
 
 - `role === 'primary'` 不再自动授予 eligibility；
 - `reportDefinition.primaryMetrics` 不再自动授予 eligibility；
@@ -83,6 +83,7 @@ RegistryEntry.metricDefinitions[metricKey].referenceEligible
 - `referenceEligible` 必须是显式 boolean；
 - `referenceEligible=true` 时，`valueType` 必须是标量 `number` 或 `integer`；
 - `referenceEligible=true` 时，metric 不能是 `quality` 或 `research_only`；
+- exact allowlist 中的 duplicate key 或 unknown key 必须报错；全部 28 个 exact RegistryEntry 必须被 v2 audit 覆盖；
 - reference mapping 仍须引用现有 metric key，且 key、instrument version、scoring version、direction 必须精确匹配；
 - 不要求每个 `PUBLISHED` task 必须拥有 eligible metric；`PUBLISHED + PILOT + 0 eligible` 是合法状态；
 - `TaskDefinition.references` 仍然是具体 applicability 的声明位置，本轮全部为 `[]`。
@@ -98,6 +99,29 @@ RegistryEntry.metricDefinitions[metricKey].referenceEligible
 - `ReferenceProvenance`：`literature_reported`、`literature_derived_estimate`、`local_observed`。
 
 `normative_distribution` 至少要有可核验的 mean+SD 或 percentile table；`criterion_threshold` 必须有 thresholds；每条 entry 还要有 exact instrument/scoring identity、population、source 和 limitations。本轮没有 source 满足完整 admission 条件到足以落 row。
+
+### 2.4 4.3 measurement applicability foundation
+
+现有人口 applicability 保持 **KEEP**：shared Reference Core 已覆盖 missing context、no population match、ambiguous population、version mismatch、quality-limited、exact reference version 和 `ACTIVE` gating。本轮没有重建 population/age/language/sex matcher，也没有重新接入 legacy reference-protocol engine。
+
+实际缺口是 Cognitive mapping 过去没有 enforce 冻结测量身份。现在非空 `ReferenceApplicability` 必须显式声明：
+
+```text
+profiles: CognitiveProfile[]
+resolvedConfigHashes: lowercase SHA-256[]
+```
+
+两者都必须非空、合法且无重复；省略不是 wildcard。resolution 只比较当前 assignment 冻结的 `profile` 和 `resolvedConfigHash`，不默认 `standard`、不推断 profile、不读取 latest config。人口匹配但 profile/hash 任一不匹配时，结果明确为 `unavailableReason=measurement_mismatch`；不使用 nearest、fallback 或 `no_population_match` 代替。
+
+standalone FINAL、completion 和 unified FINAL 都在 reference resolution 前读取既有 frozen measurement context；unified composite 的既有 config consistency 路径同时验证 `resolvedConfigHash === snapshot.configHash`，没有新增 query。当前所有 production `TaskDefinition.references` 仍为 `[]`，所以没有实际 reference binding 或 report 输出变化。
+
+shared `descriptive_sample` validator 现在要求 `statistics.mean`，因为 resolver 的 descriptive 展示量是 mean/meanDifference；现有合法 fixtures 均已提供 mean。
+
+### 2.5 Frozen compatibility and compiled identity
+
+legacy `FrozenReportSnapshot`（`metricDefinitions` 内没有 eligibility 字段）仍可读取；新 freeze 的 serialized metricDefinitions 也不增加该字段，`metricDefinitionVersion`、Evidence Mapping version、`scoringVersion` 和 `engineVersion` 均未 bump。
+
+eligibility 虽然已移出 legacy frozen shape，但 v2 `TaskDefinition.metrics.referenceEligible` 仍属于 compiler source definition。因此相对 `main@2ed9e4e` 的 old broad primary/report fallback，9 个 PUBLISHED identity 中 6 个 compiled source/runtime hash 改变，3 个保持不变。这是 governance identity change，不是 scorer drift；scorer、submission payload、DB schema、report output 和 canonical submission hash 未改变，historical/frozen compatibility 由既有 identity gates 保护。
 
 ## 3. 28 exact identity audit
 
@@ -251,8 +275,11 @@ ACTIVE literature reference: NO
 Student/Parent report changed: NO
 Teacher report changed: NO
 Admin report changed: NO
-FINAL runtime binding changed: NO
-Reference applicability changed: NO
+FINAL runtime reference binding changed: NO
+Reference applicability contract changed: YES (foundation only; production mappings remain 0)
+Production reference bindings changed: NO
+FINAL frozen-context query order: YES (existing freeze query moved before resolution)
+Scorer / submission payload / canonical submission hash changed: NO
 Norm Engine created: NO
 continuous-age interpolation: NO
 automatic norm fitting: NO
@@ -260,6 +287,6 @@ device correction or device-specific norm switch: NO
 DB schema/migration: NO
 ```
 
-**4.1.1 ✅ explicit eligibility hardening complete. 4.2.1 continues in the companion literature audit. 4.3 NOT STARTED.**
+**4.1.2 ✅ eligibility ownership and frozen compatibility complete. 4.2.1 remains literature design only. 4.3 ✅ measurement applicability foundation complete. 4.2.2 and 4.4+ NOT STARTED.**
 
 **STOPPED — waiting for review.**

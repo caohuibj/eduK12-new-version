@@ -1,7 +1,13 @@
 import { resolveAssessmentReference, validateReferenceSetDefinition, type AssessmentReferenceSetDefinition, type ReferenceContext, type ResolvedScaleReference } from '../../assessment-reference/reference'
 import type { AssessmentContextV1 } from '../../assessment-context'
 import { metricIsQualityGated } from './quality'
-import type { MetricDirection, QualityAssessment, ReferenceApplicability, TaskDefinition } from './types'
+import type {
+  CognitiveMeasurementContext,
+  MetricDirection,
+  QualityAssessment,
+  ReferenceApplicability,
+  TaskDefinition,
+} from './types'
 
 export interface CognitiveMetricReference extends ResolvedScaleReference {
   metricKey: string
@@ -96,6 +102,44 @@ const missingContextReference = (mapping: ReferenceApplicability): CognitiveMetr
   relativePosition: null,
 })
 
+const measurementApplicabilityMatches = (
+  mapping: ReferenceApplicability,
+  measurement: CognitiveMeasurementContext | null | undefined,
+): boolean => {
+  if (!Array.isArray(mapping.profiles) || mapping.profiles.length === 0) return false
+  if (!Array.isArray(mapping.resolvedConfigHashes) || mapping.resolvedConfigHashes.length === 0) return false
+  if (!measurement?.profile || !measurement.resolvedConfigHash) return false
+  return mapping.profiles.includes(measurement.profile)
+    && mapping.resolvedConfigHashes.includes(measurement.resolvedConfigHash)
+}
+
+const measurementMismatchReference = (mapping: ReferenceApplicability): CognitiveMetricReference => ({
+  scoreKey: mapping.metricKey,
+  referenceVersion: mapping.referenceVersion,
+  referenceKind: mapping.referenceKind,
+  evidenceLevel: null,
+  status: 'unavailable',
+  unavailableReason: 'measurement_mismatch',
+  label: '参考暂不可用',
+  value: null,
+  mean: null,
+  sd: null,
+  z: null,
+  t: null,
+  percentile: null,
+  criterionBand: null,
+  meanDifference: null,
+  source: null,
+  population: null,
+  instrumentVersion: null,
+  scoringVersion: null,
+  limitations: [],
+  disclaimer: '该 reference 仅适用于声明的冻结测量 profile 与 resolvedConfigHash；本次测量身份不匹配。',
+  metricKey: mapping.metricKey,
+  direction: mapping.direction,
+  relativePosition: null,
+})
+
 /** Resolve each explicitly declared metric mapping through PR-A's shared core. */
 export const resolveCognitiveMetricReferences = <TConfig, TTrial>(input: {
   definition: TaskDefinition<TConfig, TTrial>
@@ -103,12 +147,16 @@ export const resolveCognitiveMetricReferences = <TConfig, TTrial>(input: {
   references: AssessmentReferenceSetDefinition[]
   context?: AssessmentContextV1 | null
   quality?: QualityAssessment | null
+  measurement?: CognitiveMeasurementContext | null
 }): CognitiveMetricReference[] => {
   if (input.quality?.state === 'invalid') return []
   const context = toReferenceContext(input.context)
   return input.definition.references.flatMap((mapping) => {
     const metric = input.definition.metrics[mapping.metricKey]
     if (!metric) return []
+    if (!measurementApplicabilityMatches(mapping, input.measurement)) {
+      return [measurementMismatchReference(mapping)]
+    }
     if (requiredContextMissing(mapping.requiredContext, context)) {
       return [missingContextReference(mapping)]
     }

@@ -3,7 +3,7 @@
 - 日期：2026-09-09
 - 基线：COG-P3 PR #67 合并后的 `main @ 2ed9e4e`
 - 分支：`feat/cognitive-pilot-reference-v1`
-- 性质：**literature candidate audit / design only**。本文不创建 `AssessmentReferenceSet` 或 `AssessmentReferenceEntry`，不把任何 mean、SD、percentile、threshold 或 sample-size 统计写入 Reference Core。
+- 性质：**literature candidate audit / design only**。本文不创建 `AssessmentReferenceSet` 或 `AssessmentReferenceEntry`，不把任何 mean、SD、percentile、threshold 或 sample-size 统计写入 Reference Core；4.3 的 measurement applicability 只在 shared/runtime contract 层完成，本文没有 production binding。
 - 前置审计：`cognitive-reference-eligibility-v1.md`（COG-P4 §4.1 / §4.1.1）
 
 ## 1. Decision summary
@@ -183,8 +183,8 @@ ACTIVE literature reference: NO
 Student/Parent report changed: NO
 Teacher report changed: NO
 Admin report changed: NO
-FINAL runtime binding changed: NO
-Reference applicability changed: NO
+FINAL runtime reference binding changed: NO
+Reference applicability foundation changed: YES (production mappings remain 0)
 Norm Engine created: NO
 continuous-age interpolation: NO
 automatic norm fitting: NO
@@ -192,6 +192,6 @@ device correction or device-specific norm switch: NO
 DB schema/migration: NO
 ```
 
-**4.2.1 ✅ ReferenceKind-tiered Literature Beta feasibility complete. 4.3 NOT STARTED.**
+**4.2.1 ✅ ReferenceKind-tiered Literature Beta feasibility complete. 4.3 measurement applicability foundation is implemented; no production reference mapping is active.**
 
 **STOPPED — waiting for review.**
