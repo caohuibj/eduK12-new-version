@@ -192,6 +192,14 @@ const FilterPanel: React.FC<{
           年龄上界
           <input type="number" min="0" max="100" value={filters.maxAge ?? ''} onChange={(event) => onChange({ ...filters, maxAge: event.target.value ? Number(event.target.value) : undefined })} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
         </label>
+        <label className="text-sm text-gray-700">
+          年级下界
+          <input type="number" min="1" max="12" value={filters.minGrade ?? ''} onChange={(event) => onChange({ ...filters, minGrade: event.target.value ? Number(event.target.value) : undefined })} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+        </label>
+        <label className="text-sm text-gray-700">
+          年级上界
+          <input type="number" min="1" max="12" value={filters.maxGrade ?? ''} onChange={(event) => onChange({ ...filters, maxGrade: event.target.value ? Number(event.target.value) : undefined })} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
+        </label>
       </div>
       <div className="mt-5 flex gap-3">
         <button type="submit" className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-90">应用筛选</button>
@@ -264,6 +272,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
             <span className="inline-flex items-center"><Clock className="mr-1 h-4 w-4" />约 {entry.administration.estimatedMinutes} 分钟</span>
           </div>
           <p className="mt-2">{entry.administration.timeFrame}；{entry.administration.administrationModes.join('、')}</p>
+          <p className="mt-2">施测培训：{entry.administration.requiredTraining ? '需要' : '不需要'}。</p>
         </Section>
         <Section title="用途与限制">
           <p className="font-medium">可用用途</p>

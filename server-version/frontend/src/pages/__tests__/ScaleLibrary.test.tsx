@@ -110,6 +110,8 @@ describe('ScaleLibrary page', () => {
     expect(await screen.findByText('WHO-5 Well-Being Index')).toBeInTheDocument()
     expect(screen.getByText('受限', { selector: 'span' })).toBeInTheDocument()
     expect(screen.getByText('过去两周身心健康相关感受。')).toBeInTheDocument()
+    expect(screen.getByLabelText('年级下界')).toBeInTheDocument()
+    expect(screen.getByLabelText('年级上界')).toBeInTheDocument()
     expect(screen.queryByText(/我感觉快乐/)).not.toBeInTheDocument()
 
     mockList.mockResolvedValue({ code: 0, message: 'ok', data: { schemaVersion: 1, generatedAt: '2026-09-07T00:00:00.000Z', entries: [] } })
