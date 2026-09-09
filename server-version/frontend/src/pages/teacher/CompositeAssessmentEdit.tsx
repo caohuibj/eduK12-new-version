@@ -54,8 +54,9 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [packageChoice, setPackageChoice] = useState('')
   const [packageProfile, setPackageProfile] = useState<ReportPackageProfile>('standard')
   const [savingProtocol, setSavingProtocol] = useState(false)
-  const [type, setType] = useState<'SCALE' | 'COGNITIVE' | 'FORM'>('SCALE')
+  const [type, setType] = useState<'SCALE' | 'COGNITIVE' | 'FORM' | 'SITUATIONAL'>('SCALE')
   const [selectedId, setSelectedId] = useState('')
+  const [situationalInstruments, setSituationalInstruments] = useState<any[]>([])
   const [formLabel, setFormLabel] = useState('')
   const [formType, setFormType] = useState('text_input')
   const [formOptions, setFormOptions] = useState('')
@@ -71,7 +72,7 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const load = async () => {
     try {
-      const [detailResponse, scaleResponse, tokenResponse, protocolResponse, packageResponse] = await Promise.all([
+      const [detailResponse, scaleResponse, tokenResponse, protocolResponse, packageResponse, situationalResponse] = await Promise.all([
         compositeApi.detail(id),
         apiClient.get<any>('/scales?status=PUBLISHED&page=1&pageSize=100'),
         compositeApi.listTokens(id),
@@ -81,6 +82,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         packageCatalogAvailable
           ? compositeApi.listReportPackages!()
           : Promise.resolve({ code: 0, data: { list: [] } }),
+        apiClient.get<any>('/situational/instruments'),
       ])
       if (detailResponse.code !== 0 || !detailResponse.data) throw new Error(detailResponse.message || '综合测评不存在')
       setDetail(detailResponse.data)
@@ -96,6 +98,8 @@ const CompositeAssessmentEdit: React.FC = () => {
       setTokenExpiresAt((current) => current || suggestedTokenExpiry(detailResponse.data.expiresAt))
       const scaleData = Array.isArray(scaleResponse.data) ? scaleResponse.data : scaleResponse.data?.list || scaleResponse.data?.data?.list || []
       setScales(scaleData)
+      const situationalData = Array.isArray(situationalResponse.data) ? situationalResponse.data : situationalResponse.data?.list || []
+      setSituationalInstruments(situationalData)
       try {
         const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED&listedStandalone=true')
         const cognitiveData = Array.isArray(cognitiveResponse.data)
@@ -168,6 +172,11 @@ const CompositeAssessmentEdit: React.FC = () => {
       const input: Record<string, unknown> = { type, required: type === 'FORM' ? formRequired : true }
       if (type === 'SCALE') input.scaleId = selectedId
       if (type === 'COGNITIVE') input.cognitiveAssignmentId = selectedId
+      if (type === 'SITUATIONAL') {
+        const separator = selectedId.lastIndexOf('/')
+        input.situationalInstrumentKey = separator > 0 ? selectedId.slice(0, separator) : selectedId
+        input.situationalInstrumentVersion = separator > 0 ? selectedId.slice(separator + 1) : undefined
+      }
       if (type === 'FORM') {
         input.formLabel = formLabel
         input.formType = formType
@@ -324,7 +333,7 @@ const CompositeAssessmentEdit: React.FC = () => {
   const protocolSelectionChanged = protocolChoice !== currentProtocolId
     || (Boolean(analysisProtocol) && protocolProfile !== analysisProtocol?.profile)
   const itemLabel = (item: any) =>
-    item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.form?.label
+    item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.type === 'SITUATIONAL' ? item.situational?.key : item.form?.label
 
   return (
     <div>
@@ -552,6 +561,7 @@ const CompositeAssessmentEdit: React.FC = () => {
             <select value={type} onChange={(e) => { setType(e.target.value as any); setSelectedId('') }} className="border rounded px-3 py-2">
               <option value="SCALE">心理量表</option>
               {cognitiveModuleEnabled && <option value="COGNITIVE">认知任务</option>}
+              <option value="SITUATIONAL">文字情境测评</option>
               <option value="FORM">表单</option>
             </select>
             {type !== 'FORM' ? (
@@ -559,11 +569,17 @@ const CompositeAssessmentEdit: React.FC = () => {
                 <option value="">请选择</option>
                 {type === 'SCALE'
                   ? scales.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)
-                  : cognitiveAssignments.map((item) => (
+                  : type === 'COGNITIVE'
+                    ? cognitiveAssignments.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.title}{item.listedStandalone === false ? '（综合测评用）' : ''}
                     </option>
-                  ))}
+                      ))
+                    : situationalInstruments.map((item) => (
+                      <option key={`${item.key}/${item.version}`} value={`${item.key}/${item.version}`}>
+                        {item.key} · v{item.version}
+                      </option>
+                    ))}
               </select>
             ) : (
               <>

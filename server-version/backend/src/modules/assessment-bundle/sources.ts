@@ -56,6 +56,17 @@ export interface BundleFrozenScaleSourceV1 {
   scores: BundleFrozenScaleScoreV1[]
 }
 
+export interface BundleFrozenSituationalSourceV1 {
+  slotKey: string
+  instrumentKey: string
+  instrumentVersion: string
+  /** Canonical source-result identity captured by the Situational submitter. */
+  sourceResultHash: string
+  envelopeResultHash: string
+  metrics: Record<string, unknown>
+  qualityState: BundleFrozenSourceQualityV1
+}
+
 /** Drop undefined keys so canonicalHash can hash ScaleResultV2 / Cognitive snapshots. */
 const stripUndefinedDeep = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(stripUndefinedDeep)
@@ -423,6 +434,18 @@ export const assertUniqueScaleSources = (
   }
 }
 
+export const assertUniqueSituationalSources = (
+  sources: BundleFrozenSituationalSourceV1[],
+): void => {
+  const seen = new Set<string>()
+  for (const source of sources) {
+    if (seen.has(source.slotKey)) {
+      bundleContractFail('SOURCE_SLOT_DUPLICATE', `重复 Situational slotKey: ${source.slotKey}`)
+    }
+    seen.add(source.slotKey)
+  }
+}
+
 /** Fail-closed: valueSelectors within a slot must be unique. */
 export const assertUniqueValueSelectors = (
   slots: Array<Pick<FrozenBundleSlotBindingV3, 'slotKey' | 'valueSelectors'> | {
@@ -448,6 +471,7 @@ export const assertUniqueValueSelectors = (
 export const validateBundleEngineSourceSet = (input: {
   cognitiveSources?: BundleFrozenCognitiveSourceV1[]
   scaleSources?: BundleFrozenScaleSourceV1[]
+  situationalSources?: BundleFrozenSituationalSourceV1[]
   slots?: Array<Pick<FrozenBundleSlotBindingV3, 'slotKey' | 'valueSelectors'> | {
     slotKey: string
     valueSelectors?: string[] | null
@@ -455,6 +479,7 @@ export const validateBundleEngineSourceSet = (input: {
 }): void => {
   if (input.cognitiveSources) assertUniqueCognitiveSources(input.cognitiveSources)
   if (input.scaleSources) assertUniqueScaleSources(input.scaleSources)
+  if (input.situationalSources) assertUniqueSituationalSources(input.situationalSources)
   if (input.slots) assertUniqueValueSelectors(input.slots)
 }
 
@@ -517,6 +542,49 @@ export const projectBundleCognitiveSourceFromCanonicalBridge = (input: {
     metrics: { ...bridge.metrics },
     qualityState: input.envelope.core.quality.status,
     hasReferenceNorms: bridge.hasReferenceNorms,
+  }
+}
+
+/**
+ * Project only aggregate-safe Situational metric cells from the canonical
+ * envelope. Raw scene responses, option keys, timings, and scorer internals
+ * never cross the Bundle boundary.
+ */
+export const projectBundleSituationalSourceFromCanonicalBridge = (input: {
+  slotKey: string
+  expectedInstrumentKey: string
+  expectedInstrumentVersion: string
+  envelope: CanonicalUnitResultEnvelopeV1
+}): BundleFrozenSituationalSourceV1 => {
+  if (input.envelope.core.unitType !== 'SITUATIONAL') {
+    return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 必须是 Situational：${input.slotKey}`)
+  }
+  assertInstrumentIdentity({
+    expectedInstrumentKey: input.expectedInstrumentKey,
+    expectedInstrumentVersion: input.expectedInstrumentVersion,
+    actualKey: input.envelope.core.instrumentKey,
+    actualVersion: input.envelope.core.instrumentVersion,
+    label: 'Situational',
+  })
+  const bridge = input.envelope.bundleBridge
+  if (!bridge || typeof bridge.sourceResultHash !== 'string') {
+    return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 缺少 Situational bundleBridge：${input.slotKey}`)
+  }
+  const metrics: Record<string, unknown> = {}
+  for (const metric of input.envelope.core.metrics) {
+    if (Object.prototype.hasOwnProperty.call(metrics, metric.key)) {
+      return bundleContractFail('SOURCE_SCORE_KEY_DUPLICATE', `Situational metric key 重复: ${metric.key}`)
+    }
+    metrics[metric.key] = metric.value
+  }
+  return {
+    slotKey: input.slotKey,
+    instrumentKey: input.envelope.core.instrumentKey,
+    instrumentVersion: input.envelope.core.instrumentVersion,
+    sourceResultHash: bridge.sourceResultHash,
+    envelopeResultHash: input.envelope.resultHash,
+    metrics,
+    qualityState: input.envelope.core.quality.status,
   }
 }
 

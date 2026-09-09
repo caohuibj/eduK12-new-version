@@ -139,6 +139,7 @@ const sharedProps = {
   onExit: vi.fn(),
   onCompleted: vi.fn(),
   onEnterCognitive: vi.fn(),
+  onEnterSituational: vi.fn(),
 }
 
 describe('FinalCompositeAssessment provenance sibling placement', () => {

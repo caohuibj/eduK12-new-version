@@ -21,6 +21,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const navItems = [
     { path: '/student', icon: BookOpen, label: '课程' },
     { path: '/student/situational', icon: Sparkles, label: '情境测评' },
+    { path: '/scale-library', icon: FileText, label: '量表库' },
     ...(cognitiveModuleEnabled
       ? [{ path: '/student/cognitive', icon: Brain, label: '认知测评' }]
       : []),
@@ -68,7 +69,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   ? location.pathname.startsWith('/student/cognitive')
                   : item.path === '/student/situational'
                     ? location.pathname.startsWith('/student/situational')
-                  : location.pathname === item.path
+                  : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
               return (
                 <Link
                   key={item.path}

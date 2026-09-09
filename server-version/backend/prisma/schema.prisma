@@ -417,6 +417,7 @@ enum AssessmentUnitType {
   SCALE
   COGNITIVE
   FORM_SECTION
+  SITUATIONAL
 }
 
 enum AssessmentUnitTerminalState {
@@ -891,6 +892,7 @@ enum CompositeAssessmentItemType {
   SCALE
   COGNITIVE
   FORM
+  SITUATIONAL
 }
 
 enum CompositeAssessmentAttemptStatus {
@@ -958,6 +960,8 @@ model CompositeAssessmentItem {
   required              Boolean                     @default(true)
   scaleId               String?                     @map("scale_id")
   cognitiveAssignmentId String?                     @map("cognitive_assignment_id")
+  situationalInstrumentKey     String?              @map("situational_instrument_key")
+  situationalInstrumentVersion String?              @map("situational_instrument_version")
   formType              String?                     @map("form_type")
   formLabel             String?                     @map("form_label")
   formPlaceholder       String?                     @map("form_placeholder")
@@ -973,6 +977,7 @@ model CompositeAssessmentItem {
   cognitiveAssignment CognitiveAssignment?  @relation("CompositeAssessmentCognitiveAssignment", fields: [cognitiveAssignmentId], references: [id], onDelete: Restrict)
   scaleAssessments    Assessment[]          @relation("CompositeScaleAssessments")
   cognitiveSessions   CognitiveSession[]    @relation("CompositeCognitiveSessions")
+  situationalAttempts SituationalAttempt[]  @relation("CompositeSituationalAttempts")
   formAnswers         CompositeFormAnswer[]
   formSection         CompositeFormSection? @relation(fields: [formSectionId], references: [id], onDelete: SetNull)
 
@@ -1046,6 +1051,7 @@ model CompositeAssessmentAttempt {
   accessToken         CompositeAssessmentAccessToken? @relation(fields: [accessTokenId], references: [id], onDelete: SetNull)
   scaleAssessments    Assessment[]                    @relation("CompositeAttemptAssessments")
   cognitiveSessions   CognitiveSession[]              @relation("CompositeAttemptCognitiveSessions")
+  situationalAttempts SituationalAttempt[]            @relation("CompositeAttemptSituationalAttempts")
   formAnswers         CompositeFormAnswer[]
   formSectionAttempts CompositeFormSectionAttempt[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
@@ -1625,6 +1631,9 @@ model AssessmentUnitSnapshot {
 model SituationalAttempt {
   id                     String                 @id @default(uuid())
   userId                 String?                @map("user_id")
+  compositeAttemptId     String?                @map("composite_attempt_id")
+  compositeItemId        String?                @map("composite_item_id")
+  compositeSlotKey       String?                @map("composite_slot_key")
   participantKey         String                 @map("participant_key")
   instrumentKey          String                 @map("instrument_key")
   instrumentVersion      String                 @map("instrument_version")
@@ -1652,12 +1661,18 @@ model SituationalAttempt {
   updatedAt              DateTime               @updatedAt @map("updated_at")
 
   user          User?                   @relation("SituationalAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  compositeAttempt CompositeAssessmentAttempt? @relation("CompositeAttemptSituationalAttempts", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
+  compositeItem   CompositeAssessmentItem? @relation("CompositeSituationalAttempts", fields: [compositeItemId], references: [id], onDelete: Restrict)
   rawSubmission SituationalRawSubmission?
 
-  @@unique([instrumentKey, instrumentVersion, participantKey, attemptNo], map: "situational_attempts_identity_key")
+  // Standalone attempt numbers are unique within the standalone namespace;
+  // embedded children are scoped by their composite parent/slot instead.
+  @@index([instrumentKey, instrumentVersion, participantKey, attemptNo])
   @@index([userId, status])
   @@index([participantKey, status])
   @@index([instrumentKey, instrumentVersion, status])
+  @@index([compositeAttemptId, status])
+  @@unique([compositeAttemptId, compositeItemId], map: "situational_attempts_composite_item_key")
   @@map("situational_attempts")
 }
 

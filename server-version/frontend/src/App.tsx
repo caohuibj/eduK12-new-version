@@ -31,6 +31,7 @@ const InstrumentAuthorization = React.lazy(() => import('./pages/admin/Instrumen
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
 const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
+const ScaleLibrary = React.lazy(() => import('./pages/ScaleLibrary'))
 const QuestionnaireList = React.lazy(() => import('./pages/QuestionnaireList'))
 const QuestionnaireEdit = React.lazy(() => import('./pages/QuestionnaireEdit'))
 const TeacherCourseDetail = React.lazy(() => import('./pages/teacher/TeacherCourseDetail'))
@@ -184,6 +185,21 @@ const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   return <StudentLayout>{children}</StudentLayout>
+}
+
+// Library is shared by students, teachers, and admins, but each role keeps its
+// existing shell. The page itself is read-only and never replaces runtime auth.
+const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, user, isLoading } = useAuth()
+
+  if (isLoading) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>加载中...</div>
+  }
+  if (!isAuthenticated) return <Navigate to="/" replace />
+  if (user?.mustChangePassword) return <FirstLoginPasswordChange />
+  if (user?.role === 'STUDENT') return <StudentLayout>{children}</StudentLayout>
+  if (user?.role === 'TEACHER' || user?.role === 'ADMIN') return <Layout>{children}</Layout>
+  return <Navigate to="/" replace />
 }
 
 // Optional Student Route - 允许未登录用户访问（临时课堂模式）
@@ -588,6 +604,22 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/scale-library"
+            element={
+              <ScaleLibraryRoute>
+                <ScaleLibrary />
+              </ScaleLibraryRoute>
+            }
+          />
+          <Route
+            path="/scale-library/:instrumentKey/:instrumentVersion"
+            element={
+              <ScaleLibraryRoute>
+                <ScaleLibrary />
+              </ScaleLibraryRoute>
+            }
+          />
 
           {/* Student Routes */}
           <Route
@@ -683,6 +715,14 @@ function AppRoutes() {
             element={
               <StudentProtectedRoute>
                 <SituationalResult />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/composite/situational/:attemptId"
+            element={
+              <StudentProtectedRoute>
+                <SituationalRunner />
               </StudentProtectedRoute>
             }
           />
@@ -815,6 +855,7 @@ function AppRoutes() {
           )}
 
           {/* 综合测评公开匿名入口 */}
+          <Route path="/public/composite/situational/:attemptId" element={<SituationalRunner />} />
           <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />

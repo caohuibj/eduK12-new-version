@@ -82,7 +82,7 @@ export interface CanonicalUnitResultEnvelopeV1 {
   hashScheme: typeof CANONICAL_JSON_SHA256_V1
   completedAt: string
   persistenceProvenance: {
-    sourceType: 'ASSESSMENT' | 'COGNITIVE_SESSION'
+    sourceType: 'ASSESSMENT' | 'COGNITIVE_SESSION' | 'SITUATIONAL_ATTEMPT'
     sourceAttemptId: string
     sourceSubmissionId?: string
   }
@@ -382,6 +382,14 @@ const stripUndefinedDeep = (value: unknown): unknown => {
   return out
 }
 
+/** Capture the narrow Bundle bridge while the Situational result is still in memory. */
+export const buildSituationalBundleBridge = (
+  result: SituationalResultV1,
+): NonNullable<CanonicalUnitResultEnvelopeV1['bundleBridge']> => ({
+  sourceResultHash: canonicalHash(stripUndefinedDeep(result)),
+  metrics: Object.fromEntries(result.metrics.map((metric) => [metric.key, metric.value])),
+})
+
 export const createCanonicalUnitResultEnvelope = (input: {
   core: CanonicalUnitResultCoreV1
   completedAt: Date | string
@@ -491,7 +499,7 @@ const canonicalUnitResultEnvelopeSchema = z.object({
   hashScheme: z.literal(CANONICAL_JSON_SHA256_V1),
   completedAt: z.string().min(1),
   persistenceProvenance: z.object({
-    sourceType: z.enum(['ASSESSMENT', 'COGNITIVE_SESSION']),
+    sourceType: z.enum(['ASSESSMENT', 'COGNITIVE_SESSION', 'SITUATIONAL_ATTEMPT']),
     sourceAttemptId: z.string().min(1),
     sourceSubmissionId: z.string().min(1).optional(),
   }).strict(),
