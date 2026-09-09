@@ -1,3 +1,5 @@
+import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/types'
+
 export type SituationalResponseValue = string | number
 
 export type SituationalResponseType = 'SINGLE_CHOICE' | 'CONTINUOUS'
@@ -15,11 +17,7 @@ export interface SituationalRunnerChannel {
   range?: { min: number; max: number }
 }
 
-export interface SituationalRunnerAssetReference {
-  assetId: string
-  contentHash: string
-  mimeType: 'image/png' | 'image/jpeg' | 'image/webp'
-}
+export type SituationalRunnerAssetReference = AssessmentStaticImageAssetIdentityV1
 
 export type SituationalRunnerStimulus =
   | { type: 'TEXT_V1'; text: string }
@@ -184,4 +182,3 @@ export type SituationalDraftAnswer = {
   responseTimeMs?: number
   answeredAt?: string
 }
-
