@@ -41,23 +41,24 @@ export const scaleImageController = {
         forPublish: true,
         scorerKeys: getScaleCustomScorerKeys(),
       })
-      if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
+      const definition = validation.definition
+      if (!definition || validation.issues.some((issue) => issue.severity === 'error')) {
         return error(res, definitionIssuesMessage(validation.issues))
       }
-      const definitionHash = hashScaleDefinition(validation.definition)
+      const definitionHash = hashScaleDefinition(definition)
       const updated = await prisma.$transaction(async (tx) => {
         await retainScaleAssessmentImages({
           owner: publishedScaleMediaOwner(scale.id, definitionHash),
-          definition: validation.definition!,
+          definition,
           db: tx as never,
         })
         return tx.scale.update({
           where: { id },
           data: {
             status: 'PUBLISHED',
-            definition: validation.definition as any,
+            definition: definition as any,
             definitionHash,
-            ...definitionSummary(validation.definition),
+            ...definitionSummary(definition),
           },
         })
       })
