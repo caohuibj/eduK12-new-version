@@ -301,7 +301,7 @@ const SituationalRunner: React.FC = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex flex-col gap-3 rounded-xl bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
+        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">文字情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
         <div className="text-left text-sm text-gray-600 sm:text-right"><div>已完成 {answeredCount} / {totalResponses} 个通道</div><div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 sm:w-48"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} /></div></div>
       </div>
 
