@@ -84,12 +84,12 @@ export const reachableSituationalScenes = (
   responses: Record<string, SituationalDraftAnswer>,
 ): SituationalRunnerScene[] => {
   if (definition.schemaVersion === 1) return definition.scenes
-  const reachable = new Set(deriveReachableTrajectory(definition, responses).sceneKeys)
+  const trajectory = deriveReachableTrajectory(definition, responses)
   const sceneByKey = new Map(definition.scenes.map((scene) => [scene.sceneKey, scene] as const))
-  return deriveReachableTrajectory(definition, responses).sceneKeys.flatMap((sceneKey) => {
+  return trajectory.sceneKeys.flatMap((sceneKey) => {
     const scene = sceneByKey.get(sceneKey)
     return scene ? [scene] : []
-  }).filter((scene) => reachable.has(scene.sceneKey))
+  })
 }
 
 export const situationalTrajectoryReachedTerminal = (
