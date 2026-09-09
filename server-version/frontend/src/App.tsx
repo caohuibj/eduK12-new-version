@@ -687,6 +687,14 @@ function AppRoutes() {
             }
           />
           <Route
+            path="/student/composite/situational/:attemptId"
+            element={
+              <StudentProtectedRoute>
+                <SituationalRunner />
+              </StudentProtectedRoute>
+            }
+          />
+          <Route
             path="/student/scales"
             element={
               <StudentProtectedRoute>
@@ -815,6 +823,7 @@ function AppRoutes() {
           )}
 
           {/* 综合测评公开匿名入口 */}
+          <Route path="/public/composite/situational/:attemptId" element={<SituationalRunner />} />
           <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />

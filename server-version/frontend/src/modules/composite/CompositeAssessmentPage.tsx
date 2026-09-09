@@ -263,6 +263,20 @@ const CompositeAssessmentPage: React.FC = () => {
     navigate(url)
   }
 
+  const enterSituational = (item: CompositeCurrentItem) => {
+    if (!state?.id || !item.situationalAttemptId) {
+      setError('情境化测评槽位尚未准备完成，请刷新综合测评')
+      return
+    }
+    const returnTo = publicMode ? `/public/composite/attempts/${state.id}` : `/student/composite/attempts/${state.id}`
+    const query = new URLSearchParams({
+      returnTo,
+      compositeAttemptId: state.id,
+      compositeItemId: item.id,
+    })
+    navigate(`${publicMode ? '/public' : '/student'}/composite/situational/${item.situationalAttemptId}?${query.toString()}`)
+  }
+
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
 
   if (publicMode && !state) {
@@ -324,6 +338,7 @@ const CompositeAssessmentPage: React.FC = () => {
         onExit={() => navigate(publicMode ? '/' : '/student')}
         onCompleted={() => goReport(state.id)}
         onEnterCognitive={enterCognitive}
+        onEnterSituational={enterSituational}
         onRestart={restartLegacyAttempt}
       />
     )

@@ -28,12 +28,11 @@ describe('compileSituationRuntime', () => {
     expect(runtime.aggregateProjection.allowedFactKeys).toEqual(['quality.status', 'quality.flag.*'])
     expect(runtime.aggregateProjection.allowedReferenceClassifications).toEqual([])
     expect(runtime.referenceBindingDefinition).toEqual({ required: false, selections: [] })
-    // PR-B enables the standalone pilot only; embedded and aggregate paths
-    // remain explicitly unavailable.
+    // PR-D promotes the frozen text pilot to the first embedded Bundle unit.
     expect(runtime.runtimeCapabilities).toEqual({
       standalone: true,
-      embedded: false,
-      aggregateEligible: false,
+      embedded: true,
+      aggregateEligible: true,
       collectionFacts: false,
       supported: true,
     })

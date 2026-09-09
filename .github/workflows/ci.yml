@@ -6,7 +6,7 @@
 #   Draft PRs skip heavy jobs until Ready for review
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
-#   Mac lane:     backend → docker
+#   Mac lane:     backend → seeded browser → docker
 #   Windows lane: frontend → codeql
 #   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
 #   这是 CI 调度稳定性优化，不代表 production performance improvement。
@@ -14,6 +14,7 @@
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
+#   browser       : isolated PostgreSQL/Redis + seeded Bundle + real Playwright acceptance flow
 #   docker       : baseline + monitoring compose config + backend/frontend production image build
 #
 # 说明：
@@ -59,6 +60,7 @@ jobs:
       V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
@@ -155,6 +157,7 @@ jobs:
           src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts
           src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts
           src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts
+          src/__tests__/composite/situational-bundle.postgres.integration.test.ts
           src/__tests__/classroom/classroom-start.postgres.integration.test.ts
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
@@ -204,11 +207,145 @@ jobs:
       - name: build (vite)
         run: npm run build
 
+  browser:
+    name: browser (seeded Situational Bundle acceptance)
+    # Browser acceptance must execute against the same commit after both
+    # production lanes have passed. It uses its own service containers and
+    # runs before Docker on the dedicated Mac lane.
+    needs: [backend, frontend]
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      NODE_ENV: test
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+      ASSET_MIGRATION_COMPLETE: 'false'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://127.0.0.1:5173
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/eduk12-situational-bundle-e2e-uploads
+      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-bundle-e2e-credentials
+      SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-situational-bundle-fixture.json
+      SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
+      SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-bundle-e2e
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: install Chromium for seeded browser
+        working-directory: server-version/backend
+        run: npx playwright-core install --with-deps chromium
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: prisma generate and guarded migration
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: seed reference and configuration data
+        working-directory: server-version/backend
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: build backend
+        working-directory: server-version/backend
+        run: npm run build
+      - name: build frontend
+        working-directory: server-version/frontend
+        run: npm run build
+      - name: seed isolated Bundle fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
+      - name: start backend
+        run: |
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-bundle-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-bundle-backend.log
+          exit 1
+      - name: start frontend
+        run: |
+          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-frontend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-bundle-frontend.log
+          exit 1
+      - name: run seeded browser acceptance
+        run: node e2e/situational-bundle-browser-e2e.cjs
+      - name: upload seeded browser evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: situational-bundle-browser-evidence
+          path: |
+            /tmp/eduk12-situational-bundle-e2e
+            /tmp/eduk12-situational-bundle-backend.log
+            /tmp/eduk12-situational-bundle-frontend.log
+          if-no-files-found: ignore
+      - name: stop seeded services
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-situational-bundle-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-frontend.pid) || true; fi
+          if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) || true; fi
+
   docker:
     name: docker (compose config + production builds)
-    # Mac lane 的第二个 job：仅在 backend 成功后启动；同一 dedicated runner
-    # 也保证 Docker 不会与 Backend 在同一物理主机重叠运行。
-    needs: backend
+    # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
+    # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
+    needs: [backend, browser]
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on:
       - self-hosted

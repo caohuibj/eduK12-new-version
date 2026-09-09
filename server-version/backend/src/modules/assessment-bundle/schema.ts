@@ -50,7 +50,7 @@ const factPresenceSchema = z.discriminatedUnion('state', [
 
 const slotSchema = z.object({
   slotKey: z.string().regex(SLOT_KEY),
-  unitType: z.enum(['COGNITIVE', 'SCALE', 'FORM']),
+  unitType: z.enum(['COGNITIVE', 'SCALE', 'FORM', 'SITUATIONAL']),
   position: z.number().int().nonnegative(),
   required: z.boolean(),
   instrumentKey: nonEmpty,
@@ -116,7 +116,7 @@ export const assessmentBundleDefinitionSchema = z.object({
 
 const slotBindingSchema = z.object({
   slotKey: z.string().regex(SLOT_KEY),
-  unitType: z.enum(['COGNITIVE', 'SCALE', 'FORM']),
+  unitType: z.enum(['COGNITIVE', 'SCALE', 'FORM', 'SITUATIONAL']),
   instrumentKey: nonEmpty,
   instrumentVersion: exactVersion,
   required: z.boolean(),
@@ -160,6 +160,13 @@ const scaleSourceSchema = z.object({
   sourceResultHash: hexHash,
 }).strict()
 
+const situationalSourceSchema = z.object({
+  kind: z.literal('SITUATIONAL_METRIC'),
+  slotKey: nonEmpty,
+  metricKey: nonEmpty,
+  sourceResultHash: hexHash,
+}).strict()
+
 const contextSourceSchema = z.object({
   kind: z.literal('CONTEXT_FACT'),
   contextKey: nonEmpty,
@@ -169,6 +176,7 @@ const contextSourceSchema = z.object({
 export const evidenceSourceSchema = z.discriminatedUnion('kind', [
   cognitiveSourceSchema,
   scaleSourceSchema,
+  situationalSourceSchema,
   contextSourceSchema,
 ])
 

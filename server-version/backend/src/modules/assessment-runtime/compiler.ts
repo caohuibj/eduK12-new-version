@@ -295,13 +295,10 @@ export const compileSituationRuntime = (input: {
       allowedReferenceClassifications: [],
     },
     referenceBindingDefinition: { required: false, selections: [] },
-    // PR-B enables the standalone pilot only. Embedded delivery, aggregate
-    // projection and collection facts remain explicit non-capabilities until
-    // their own runtime paths are implemented.
     runtimeCapabilities: {
       standalone: true,
-      embedded: false,
-      aggregateEligible: false,
+      embedded: true,
+      aggregateEligible: true,
       collectionFacts: false,
       supported: true,
     },

@@ -1,5 +1,5 @@
 import { canonicalHash } from './canonical'
-import { createFrozenActiveSlotSet, type FrozenActiveSlotSetV1, type FrozenActiveSlotV1 } from './slot-set'
+import { createFrozenActiveSlotSet, type FrozenActiveSlotSetV1, type FrozenActiveSlotV1, type FrozenSituationalRuntimeIdentityV1 } from './slot-set'
 import type { JsonObject } from './types'
 
 type ScaleSlotInput = {
@@ -22,6 +22,10 @@ type CognitiveSlotInput = {
 type FormSlotInput = {
   sectionId: string
   definitionHash: string
+}
+
+type SituationalSlotInput = FrozenSituationalRuntimeIdentityV1 & {
+  compositeItemId: string
 }
 
 const scaleSlot = (input: ScaleSlotInput): FrozenActiveSlotV1 => {
@@ -79,6 +83,36 @@ const formSlot = (input: FormSlotInput): FrozenActiveSlotV1 => ({
   sourceBinding: { sectionId: input.sectionId },
 })
 
+const situationalSlot = (input: SituationalSlotInput): FrozenActiveSlotV1 => ({
+  slotKey: `situational:${input.compositeItemId}`,
+  unitType: 'SITUATIONAL',
+  required: true,
+  sourceDefinitionIdentity: {
+    key: input.instrumentKey,
+    version: input.instrumentVersion,
+    hash: input.definitionHash,
+  },
+  sourceBinding: {
+    compositeItemId: input.compositeItemId,
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    compiledRuntimeHash: input.compiledRuntimeHash,
+    scorerKey: input.scorerKey,
+    scoringVersion: input.scoringVersion,
+  },
+  runtimeIdentity: {
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    definitionHash: input.definitionHash,
+    compiledRuntimeHash: input.compiledRuntimeHash,
+    scorerKey: input.scorerKey,
+    scoringVersion: input.scoringVersion,
+    runtimeGeneration: input.runtimeGeneration,
+    deliveryMode: input.deliveryMode,
+    frozenAt: input.frozenAt,
+  },
+})
+
 export const freezeQuestionnaireActiveSlotSet = (input: {
   attemptEpoch: number
   scales: ScaleSlotInput[]
@@ -98,6 +132,7 @@ export const freezeCompositeActiveSlotSet = (input: {
   scales: ScaleSlotInput[]
   cognitive: CognitiveSlotInput[]
   formSections: FormSlotInput[]
+  situational?: SituationalSlotInput[]
 }): FrozenActiveSlotSetV1 => createFrozenActiveSlotSet({
   schemaVersion: 1,
   runtimeGeneration: 'UNIFIED_V1',
@@ -106,6 +141,7 @@ export const freezeCompositeActiveSlotSet = (input: {
     ...input.scales.map(scaleSlot),
     ...input.cognitive.map(cognitiveSlot),
     ...input.formSections.map(formSlot),
+    ...(input.situational ?? []).map(situationalSlot),
   ].sort(compareSlotKeys),
 })
 

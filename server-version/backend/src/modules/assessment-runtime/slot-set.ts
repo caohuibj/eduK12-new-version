@@ -3,7 +3,19 @@ import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './se
 import type { JsonObject } from './types'
 import { z } from 'zod'
 
-export type FrozenSlotUnitType = 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+export type FrozenSlotUnitType = 'SCALE' | 'COGNITIVE' | 'FORM_SECTION' | 'SITUATIONAL'
+
+export interface FrozenSituationalRuntimeIdentityV1 {
+  instrumentKey: string
+  instrumentVersion: string
+  definitionHash: string
+  compiledRuntimeHash: string
+  scorerKey: string
+  scoringVersion: string
+  runtimeGeneration: 'UNIFIED_V1'
+  deliveryMode: 'FINAL_ONLY'
+  frozenAt: string
+}
 
 export interface FrozenActiveSlotV1 {
   slotKey: string
@@ -15,6 +27,8 @@ export interface FrozenActiveSlotV1 {
     hash: string
   }
   sourceBinding: JsonObject
+  /** Required for SITUATIONAL; optional for historical SCALE/COGNITIVE rows. */
+  runtimeIdentity?: FrozenSituationalRuntimeIdentityV1
 }
 
 export const getFrozenActiveSlot = (input: {
@@ -51,7 +65,7 @@ const jsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([
 
 const frozenSlotSchema = z.object({
   slotKey: z.string().min(1),
-  unitType: z.enum(['SCALE', 'COGNITIVE', 'FORM_SECTION']),
+  unitType: z.enum(['SCALE', 'COGNITIVE', 'FORM_SECTION', 'SITUATIONAL']),
   required: z.boolean(),
   sourceDefinitionIdentity: z.object({
     key: z.string().min(1),
@@ -59,6 +73,17 @@ const frozenSlotSchema = z.object({
     hash: z.string().regex(/^[0-9a-f]{64}$/),
   }).strict(),
   sourceBinding: z.record(jsonValueSchema),
+  runtimeIdentity: z.object({
+    instrumentKey: z.string().min(1),
+    instrumentVersion: z.string().min(1),
+    definitionHash: z.string().regex(/^[0-9a-f]{64}$/),
+    compiledRuntimeHash: z.string().regex(/^[0-9a-f]{64}$/),
+    scorerKey: z.string().min(1),
+    scoringVersion: z.string().min(1),
+    runtimeGeneration: z.literal('UNIFIED_V1'),
+    deliveryMode: z.literal('FINAL_ONLY'),
+    frozenAt: z.string().datetime({ offset: true }),
+  }).strict().optional(),
 }).strict()
 
 const frozenSlotSetSchema = z.object({
@@ -83,6 +108,14 @@ export const createFrozenActiveSlotSet = (input: Omit<FrozenActiveSlotSetV1, 'sn
   parsed.slots.forEach((slot) => {
     if (!slot.slotKey || seen.has(slot.slotKey)) throw new Error('Frozen active slot keys must be unique')
     seen.add(slot.slotKey)
+    if (slot.unitType === 'SITUATIONAL') {
+      if (!slot.runtimeIdentity) throw new Error('Situational frozen slot runtime identity is required')
+      if (
+        slot.runtimeIdentity.instrumentKey !== slot.sourceDefinitionIdentity.key
+        || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefinitionIdentity.version
+        || slot.runtimeIdentity.definitionHash !== slot.sourceDefinitionIdentity.hash
+      ) throw new Error('Situational frozen slot runtime identity mismatch')
+    }
   })
   const unsigned = unsignedSlotSet(parsed)
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
@@ -113,5 +146,5 @@ export const decryptFrozenActiveSlotSet = (value: string): FrozenActiveSlotSetV1
 )
 
 export const questionnaireScaleSlotKey = (questionnaireScaleId: string): string => `scale:${questionnaireScaleId}`
-export const compositeItemSlotKey = (compositeItemId: string, unitType: 'SCALE' | 'COGNITIVE'): string => `${unitType.toLowerCase()}:${compositeItemId}`
+export const compositeItemSlotKey = (compositeItemId: string, unitType: 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'): string => `${unitType.toLowerCase()}:${compositeItemId}`
 export const formSectionSlotKey = (sectionId: string): string => `form-section:${sectionId}`
