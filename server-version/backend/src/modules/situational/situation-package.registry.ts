@@ -1,6 +1,7 @@
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
 import {
+  asLinearSituationDefinition,
   hashSituationRuntimeDefinition,
   runnerSituationRuntimeDefinition,
   validateSituationRuntimeDefinition,
@@ -9,8 +10,13 @@ import {
 import {
   deriveAuthoritativeSituationalTrajectory,
   projectReachableSituationDefinitionForScoring,
+  reachableSituationalResponseKeys,
 } from './situation-trajectory'
-import { scoreSituational, type SituationalGoldenCase } from './situation-scoring'
+import {
+  scoreSituational,
+  validateSituationalResponse,
+  type SituationalGoldenCase,
+} from './situation-scoring'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
@@ -35,7 +41,7 @@ export interface SituationPackageV2 extends SituationPackageBase {
 export type SituationPackage = SituationPackageV1 | SituationPackageV2
 
 // Production content remains V1 until a later content PR deliberately adds a
-// reviewed V2 pilot. C only makes the package/runtime admission contract V2-capable.
+// reviewed V2 pilot. D extends the same package/runtime admission contract only.
 const packages: SituationPackageV1[] = [
   SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
@@ -118,19 +124,29 @@ const scoreGoldenCase = (
   fixture: SituationalGoldenCase,
 ) => {
   if (definition.schemaVersion === 1) return scoreSituational(definition, fixture.responses)
+
+  const linear = asLinearSituationDefinition(definition)
+  fixture.responses.forEach((response) => validateSituationalResponse(linear, response))
+
   const trajectory = deriveAuthoritativeSituationalTrajectory(definition, fixture.responses)
   if (!trajectory.reachedTerminal) throw new Error(`golden case ${fixture.name} 未到达 terminal`)
-  const reachableDefinition = projectReachableSituationDefinitionForScoring(definition, trajectory)
-  const reachableSceneKeys = new Set(trajectory.sceneKeys)
-  const offPath = fixture.responses.find((response) => !reachableSceneKeys.has(response.sceneKey))
+
+  const reachableKeys = new Set(reachableSituationalResponseKeys(definition, trajectory))
+  const offPath = fixture.responses.find((response) => !reachableKeys.has(`${response.sceneKey}:${response.channelKey}`))
   if (offPath) throw new Error(`golden case ${fixture.name} 包含 off-path response：${offPath.sceneKey}:${offPath.channelKey}`)
-  return scoreSituational(reachableDefinition, fixture.responses)
+
+  const reachableDefinition = projectReachableSituationDefinitionForScoring(definition, trajectory)
+  const scoredKeys = new Set(reachableDefinition.scenes.flatMap((scene) => (
+    scene.channels.map((channel) => `${scene.sceneKey}:${channel.channelKey}`)
+  )))
+  const scoredResponses = fixture.responses.filter((response) => scoredKeys.has(`${response.sceneKey}:${response.channelKey}`))
+  return scoreSituational(reachableDefinition, scoredResponses, { responsesValidated: true })
 }
 
 /**
  * Package-level release gate. V1 and V2 share one package envelope and one
- * scorer. V2 adds authoritative trajectory validation before its golden case
- * is projected to the existing scientific scoring plane.
+ * scorer. V2 validates complete raw golden responses, derives the authoritative
+ * path, then projects only SCORED responses into the existing scorer.
  */
 export const validateSituationPackage = (situationPackage: SituationPackage): SituationPackageValidation => {
   const identityIssues: DefinitionIssue[] = []
