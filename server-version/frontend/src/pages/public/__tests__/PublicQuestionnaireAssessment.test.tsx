@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { message } from 'antd'
 
 const { mockClient } = vi.hoisted(() => ({
   mockClient: {
@@ -64,6 +65,11 @@ const renderPage = () => render(
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.spyOn(message, 'warning').mockImplementation(() => undefined as never)
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 describe('PublicQuestionnaireAssessment recovery and answer states', () => {
