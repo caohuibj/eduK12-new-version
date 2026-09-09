@@ -93,8 +93,8 @@ const unsignedSnapshot = (input: Omit<FrozenSituationalRuntimeSnapshotV1, 'snaps
 const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => {
   const expected = {
     standalone: true,
-    embedded: false,
-    aggregateEligible: false,
+    embedded: true,
+    aggregateEligible: true,
     collectionFacts: false,
     supported: true,
   }
@@ -103,7 +103,7 @@ const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => 
   const hasExpectedKeys = Object.keys(actual).length === keys.length
   const hasExpectedValues = keys.every((key) => actual[key] === expected[key])
   if (!hasExpectedKeys || !hasExpectedValues) {
-    throw new Error('Situational PR-B runtime capabilities are not the standalone pilot contract')
+    throw new Error('Situational runtime capabilities are not the embedded pilot contract')
   }
 }
 

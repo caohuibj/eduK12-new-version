@@ -33,6 +33,9 @@ import {
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
   userId: true,
+  compositeAttemptId: true,
+  compositeItemId: true,
+  compositeSlotKey: true,
   participantKey: true,
   instrumentKey: true,
   instrumentVersion: true,
@@ -58,6 +61,25 @@ export const SITUATIONAL_ATTEMPT_SELECT = {
   canonicalResultEncrypted: true,
   createdAt: true,
   updatedAt: true,
+  compositeAttempt: {
+    select: {
+      id: true,
+      userId: true,
+      recoveryTokenHash: true,
+      participantKey: true,
+      status: true,
+      attemptEpoch: true,
+      contextSnapshotHash: true,
+    },
+  },
+  compositeItem: {
+    select: {
+      id: true,
+      type: true,
+      situationalInstrumentKey: true,
+      situationalInstrumentVersion: true,
+    },
+  },
 } as const
 
 export type SituationalAttemptRow = Prisma.SituationalAttemptGetPayload<{
@@ -111,6 +133,41 @@ export const assertSituationalAttemptOwner = (row: Pick<SituationalAttemptRow, '
   }
 }
 
+export type SituationalEmbeddedAccess = {
+  compositeAttemptId: string
+  compositeItemId: string
+  compositeSlotKey: string
+  userId?: string
+  recoveryTokenHash?: string
+}
+
+export const assertEmbeddedSituationalAttemptBinding = (
+  row: Pick<SituationalAttemptRow, 'userId' | 'participantKey' | 'compositeAttemptId' | 'compositeItemId' | 'compositeSlotKey' | 'compositeAttempt'>,
+  input: SituationalEmbeddedAccess,
+): void => {
+  if (
+    row.compositeAttemptId !== input.compositeAttemptId
+    || row.compositeItemId !== input.compositeItemId
+    || row.compositeSlotKey !== input.compositeSlotKey
+    || !row.compositeAttempt
+    || row.compositeAttempt.id !== input.compositeAttemptId
+  ) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评与综合测评槽位绑定不一致', 409)
+  }
+  const authorized = input.userId
+    ? row.compositeAttempt.userId === input.userId && row.userId === input.userId && row.participantKey === getParticipantKey(input.userId)
+    : Boolean(
+        input.recoveryTokenHash
+        && row.compositeAttempt.userId === null
+        && row.userId === null
+        && row.compositeAttempt.recoveryTokenHash === input.recoveryTokenHash,
+      )
+  if (!authorized) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评情境化模块', 403)
+  if (row.compositeAttempt.status !== 'IN_PROGRESS' && row.compositeAttempt.status !== 'COMPLETED') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评尝试状态不可用', 409)
+  }
+}
+
 export const loadSituationalAttemptRuntime = async (
   attemptId: string,
   userId: string,
@@ -121,6 +178,26 @@ export const loadSituationalAttemptRuntime = async (
   })
   if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
   assertSituationalAttemptOwner(row, userId)
+  let snapshot: FrozenSituationalRuntimeSnapshotV1
+  try {
+    snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
+  } catch {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评运行时快照无法读取', 500)
+  }
+  assertRowMatchesSnapshot(row, snapshot)
+  return { row, snapshot }
+}
+
+export const loadEmbeddedSituationalAttemptRuntime = async (
+  attemptId: string,
+  input: SituationalEmbeddedAccess,
+): Promise<SituationalAttemptRuntime> => {
+  const row = await prisma.situationalAttempt.findUnique({
+    where: { id: attemptId },
+    select: SITUATIONAL_ATTEMPT_SELECT,
+  })
+  if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
+  assertEmbeddedSituationalAttemptBinding(row, input)
   let snapshot: FrozenSituationalRuntimeSnapshotV1
   try {
     snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
@@ -325,6 +402,82 @@ export const startSituationalAttempt = async (userId: string, input: {
     }
   }
   throw new InstrumentFinalSubmitError('SUBMISSION_ALREADY_IN_PROGRESS', '已有进行中的情境化测评，请继续作答', 409)
+}
+
+export const createEmbeddedSituationalAttempt = async (
+  db: Prisma.TransactionClient,
+  input: {
+    userId: string | null
+    participantKey: string
+    compositeAttemptId: string
+    compositeItemId: string
+    compositeSlotKey: string
+    instrumentKey: string
+    instrumentVersion: string
+    attemptEpoch: number
+  },
+) => {
+  const situationPackage = pilotPackage(input.instrumentKey, input.instrumentVersion)
+  const frozenAt = new Date()
+  const snapshot = freezeSituationalRuntimeAtAttemptStart({
+    instrumentKey: situationPackage.key,
+    instrumentVersion: situationPackage.instrumentVersion,
+    definition: situationPackage.definition,
+    frozenAt,
+  })
+  const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
+  const existing = await db.situationalAttempt.findFirst({
+    where: {
+      compositeAttemptId: input.compositeAttemptId,
+      compositeItemId: input.compositeItemId,
+    },
+    select: SITUATIONAL_ATTEMPT_SELECT,
+  })
+  if (existing) {
+    const existingSnapshot = decryptFrozenSituationalRuntimeSnapshot(existing.runtimeSnapshotEncrypted)
+    assertRowMatchesSnapshot(existing, existingSnapshot)
+    if (existing.compositeSlotKey !== input.compositeSlotKey) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评情境化槽位绑定已变化', 409)
+    }
+    return { row: existing, snapshot: existingSnapshot }
+  }
+  try {
+    const row = await db.situationalAttempt.create({
+      data: {
+        userId: input.userId,
+        participantKey: input.participantKey,
+        compositeAttemptId: input.compositeAttemptId,
+        compositeItemId: input.compositeItemId,
+        compositeSlotKey: input.compositeSlotKey,
+        instrumentKey: situationPackage.key,
+        instrumentVersion: situationPackage.instrumentVersion,
+        attemptNo: 1,
+        status: 'IN_PROGRESS',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: input.attemptEpoch,
+        definitionHash: snapshot.definitionHash,
+        compiledRuntimeHash: snapshot.compiledRuntimeHash,
+        scorerKey: snapshot.scorerKey,
+        scoringVersion: snapshot.scoringVersion,
+        frozenAt: new Date(snapshot.frozenAt),
+        runtimeSnapshotEncrypted: encryptedSnapshot,
+        progress: 0,
+      },
+      select: SITUATIONAL_ATTEMPT_SELECT,
+    })
+    return { row, snapshot }
+  } catch (error: any) {
+    if (error?.code !== 'P2002') throw error
+    const concurrent = await db.situationalAttempt.findFirst({
+      where: { compositeAttemptId: input.compositeAttemptId, compositeItemId: input.compositeItemId },
+      select: SITUATIONAL_ATTEMPT_SELECT,
+    })
+    if (!concurrent) throw error
+    const concurrentSnapshot = decryptFrozenSituationalRuntimeSnapshot(concurrent.runtimeSnapshotEncrypted)
+    assertRowMatchesSnapshot(concurrent, concurrentSnapshot)
+    return { row: concurrent, snapshot: concurrentSnapshot }
+  }
 }
 
 export const resumeSituationalAttempt = async (attemptId: string, userId: string) => {

@@ -547,6 +547,7 @@ export const refreshCompositeFinalOnlyProgress = async (
       },
       scaleAssessments: { select: { compositeItemId: true, status: true, attemptEpoch: true } },
       cognitiveSessions: { select: { compositeItemId: true, status: true, attemptNo: true } },
+      situationalAttempts: { select: { compositeItemId: true, status: true, attemptEpoch: true } },
       formSectionAttempts: { select: { sectionId: true, status: true, attemptEpoch: true } },
     },
   })))
@@ -567,6 +568,11 @@ export const refreshCompositeFinalOnlyProgress = async (
     ...parent.cognitiveSessions
       .filter((child) => itemIds.has(child.compositeItemId ?? '')
         && child.attemptNo === parent.attemptEpoch
+        && child.status === 'COMPLETED')
+      .map((child) => child.compositeItemId as string),
+    ...(parent.situationalAttempts ?? [])
+      .filter((child) => itemIds.has(child.compositeItemId ?? '')
+        && child.attemptEpoch === parent.attemptEpoch
         && child.status === 'COMPLETED')
       .map((child) => child.compositeItemId as string),
   ])

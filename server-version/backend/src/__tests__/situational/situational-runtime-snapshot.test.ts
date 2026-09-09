@@ -27,8 +27,8 @@ describe('FrozenSituationalRuntimeSnapshotV1', () => {
     expect(snapshot.scoringVersion).toBe('sjt-provisional-v1')
     expect(snapshot.compiledRuntime.runtimeCapabilities).toEqual({
       standalone: true,
-      embedded: false,
-      aggregateEligible: false,
+      embedded: true,
+      aggregateEligible: true,
       collectionFacts: false,
       supported: true,
     })

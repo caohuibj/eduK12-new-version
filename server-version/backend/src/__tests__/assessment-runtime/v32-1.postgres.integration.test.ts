@@ -420,7 +420,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
     const enumValues = new Map<string, string[]>()
     for (const row of enumRows) enumValues.set(row.typname, [...(enumValues.get(row.typname) ?? []), row.enumlabel])
     expect(enumValues.get('RuntimeGeneration')).toEqual(['LEGACY', 'UNIFIED_V1'])
-    expect(enumValues.get('AssessmentUnitType')).toEqual(['SCALE', 'COGNITIVE', 'FORM_SECTION'])
+    expect(enumValues.get('AssessmentUnitType')).toEqual(['SCALE', 'COGNITIVE', 'FORM_SECTION', 'SITUATIONAL'])
     expect(enumValues.get('AssessmentUnitTerminalState')).toEqual(['COMPLETED', 'SKIPPED', 'NOT_APPLICABLE'])
     expect(enumValues.get('AssessmentUnitPayloadKind')).toEqual(['UNIT_RESULT', 'COLLECTION_FACTS', 'NONE'])
 

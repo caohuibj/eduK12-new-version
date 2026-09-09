@@ -261,6 +261,32 @@ const projectResearchCognitiveUnit = (unit: any) => ({
   ...(unit.decryptError ? { decryptError: true } : {}),
 })
 
+const projectSituationalMetric = (metric: any) => {
+  if (!metric || typeof metric !== 'object' || Array.isArray(metric)) return null
+  return {
+    key: metric.key,
+    value: metric.value === null || typeof metric.value === 'number' ? metric.value : null,
+    ...(typeof metric.unit === 'string' ? { unit: metric.unit } : {}),
+    ...(typeof metric.quality === 'string' ? { quality: metric.quality } : {}),
+  }
+}
+
+const projectSituationalUnit = (unit: any) => ({
+  itemId: unit.itemId,
+  type: 'SITUATIONAL' as const,
+  kind: 'situational' as const,
+  label: unit.label ?? null,
+  instrumentKey: unit.instrumentKey ?? null,
+  instrumentVersion: unit.instrumentVersion ?? null,
+  metrics: Array.isArray(unit.metrics) ? unit.metrics.map(projectSituationalMetric).filter(Boolean) : [],
+  quality: unit.quality ?? null,
+  qualityState: unit.qualityState ?? null,
+  resultHash: unit.resultHash ?? null,
+  completedAt: unit.completedAt ?? null,
+  totalTime: unit.totalTime ?? null,
+  ...(unit.decryptError ? { decryptError: true } : {}),
+})
+
 export const projectCompositeUnitReports = (
   unitReports: any[],
   audience: CompositeReportAudience,
@@ -275,6 +301,10 @@ export const projectCompositeUnitReports = (
           ? projectResearchScaleUnit(unit)
           : projectSafeScaleUnit(unit),
       )
+      continue
+    }
+    if (unit.type === 'SITUATIONAL') {
+      projected.push(projectSituationalUnit(unit))
       continue
     }
     if (unit.type !== 'COGNITIVE') continue
