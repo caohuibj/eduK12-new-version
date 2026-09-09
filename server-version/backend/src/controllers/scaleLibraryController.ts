@@ -35,6 +35,7 @@ const optionalNumber = z.preprocess((value) => {
 
 const libraryQuerySchema = z.object({
   keyword: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
+  instrumentFamily: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   primaryDomain: z.preprocess(queryValue, constructDomainSchema.optional()),
   secondaryDomain: z.preprocess(queryValue, constructDomainSchema.optional()),
   respondent: z.preprocess(queryValue, respondentTypeSchema.optional()),
@@ -117,6 +118,7 @@ const parseQuery = (req: Request): { query?: z.infer<typeof libraryQuerySchema>;
 
 const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibraryFilterInput => ({
   keyword: query.keyword,
+  instrumentFamily: query.instrumentFamily,
   primaryDomain: query.primaryDomain,
   secondaryDomain: query.secondaryDomain,
   respondent: query.respondent,

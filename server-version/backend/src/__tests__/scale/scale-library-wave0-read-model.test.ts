@@ -72,6 +72,7 @@ describe('Wave 0 Scale Library read model', () => {
       'texi_parent_zh_cn',
       'texi_teacher_zh_cn',
     ])
+    expect(keys(filterScaleLibraryEntries(model.entries, { instrumentFamily: 'WHO-5 Well-Being Index family' }))).toEqual(['who5'])
     expect(keys(filterScaleLibraryEntries(model.entries, { respondent: 'PARENT' }))).toEqual([
       'sdq_parent_zh_cn',
       'texi_parent_zh_cn',

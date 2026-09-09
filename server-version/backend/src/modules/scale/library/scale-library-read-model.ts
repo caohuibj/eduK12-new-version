@@ -63,6 +63,7 @@ export interface ScaleLibraryReadModelContext {
 
 export interface ScaleLibraryFilterInput {
   keyword?: string
+  instrumentFamily?: string
   primaryDomain?: ConstructDomain
   secondaryDomain?: ConstructDomain
   respondent?: RespondentType
@@ -499,6 +500,7 @@ export const filterScaleLibraryEntries = (
       ].join(' '))
       if (!haystack.includes(keyword)) return false
     }
+    if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false
     if (filters.primaryDomain && entry.construct.primaryDomain !== filters.primaryDomain) return false
     if (filters.secondaryDomain && !entry.construct.secondaryDomains.includes(filters.secondaryDomain)) return false
     if (filters.respondent && !entry.applicability.respondentTypes.includes(filters.respondent)) return false

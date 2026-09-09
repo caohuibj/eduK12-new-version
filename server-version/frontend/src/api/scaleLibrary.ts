@@ -133,6 +133,7 @@ export interface ScaleLibraryEntry {
 
 export interface ScaleLibraryFilters {
   keyword?: string
+  instrumentFamily?: string
   primaryDomain?: string
   secondaryDomain?: string
   respondent?: ScaleLibraryRespondent
