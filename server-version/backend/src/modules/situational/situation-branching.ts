@@ -65,6 +65,16 @@ export const situationalBranchFlowSchema = z.object({
 export type SituationalBranchFlow = z.infer<typeof situationalBranchFlowSchema>
 
 /**
+ * V1 `sampling: ALL` explicitly means every declared scene is presented.
+ * Branching cannot reuse that semantic because one attempt presents only the
+ * scenes reachable from its decisions. This remains deterministic traversal,
+ * not matrix/random sampling.
+ */
+export const situationalBranchSamplingSchema = z.object({
+  strategy: z.literal('BRANCH_REACHABLE'),
+}).strict()
+
+/**
  * V2 retains the complete V1 scientific/scoring plane and adds only the
  * presentation/traversal graph. Keeping V1 as a separate exported contract
  * prevents PR A from silently enabling V2 in production runtimes before the
@@ -72,13 +82,19 @@ export type SituationalBranchFlow = z.infer<typeof situationalBranchFlowSchema>
  */
 export const situationDefinitionV2Schema = situationDefinitionSchema.extend({
   schemaVersion: z.literal(2),
+  sampling: situationalBranchSamplingSchema,
   flow: situationalBranchFlowSchema,
 })
 export type SituationDefinitionV2 = z.infer<typeof situationDefinitionV2Schema>
 
 const asV1Definition = (definition: SituationDefinitionV2): SituationDefinitionV1 => {
-  const { flow: _flow, schemaVersion: _schemaVersion, ...rest } = definition
-  return { ...rest, schemaVersion: 1 }
+  const {
+    flow: _flow,
+    schemaVersion: _schemaVersion,
+    sampling: _sampling,
+    ...rest
+  } = definition
+  return { ...rest, schemaVersion: 1, sampling: { strategy: 'ALL' } }
 }
 
 const outgoingNodeKeys = (node: SituationalBranchFlowNode): string[] => {
@@ -339,6 +355,7 @@ export const runnerBranchingSituationDefinition = (definition: SituationDefiniti
   return {
     ...linearRunner,
     schemaVersion: 2 as const,
+    sampling: definition.sampling,
     flow: {
       strategy: definition.flow.strategy,
       entryNodeKey: definition.flow.entryNodeKey,
