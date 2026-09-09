@@ -106,7 +106,7 @@ const assertVisualScene = async (page, sceneIndex) => {
   assert.deepEqual(actual.map((image) => image.assetId), expected.map((image) => image.assetId), 'visual asset order does not match the frozen definition')
   assert.deepEqual(
     actual.map((image) => image.alt),
-    expected.map((image) => image.alt),
+    expected.map((image) => image.altText),
     `visual alt text does not match the frozen definition: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`,
   )
   assert.ok(actual.every((image) => image.naturalWidth > 0 && image.naturalHeight > 0), 'visual asset did not decode')
