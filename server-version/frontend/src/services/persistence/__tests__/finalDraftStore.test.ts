@@ -35,6 +35,23 @@ describe('final draft persistence', () => {
     expect(await store.snapshot(draftKey)).toBeNull()
   })
 
+  it('deletes only requested answers without disturbing draft metadata or trials', async () => {
+    const store = createFinalDraftStore()
+    const draftKey = `prune-draft-${Date.now()}`
+    await store.ensure(metaFor(draftKey))
+    await store.putAnswer({ draftKey, itemKey: 'q1', value: 'keep?', updatedAt: Date.now() })
+    await store.putAnswer({ draftKey, itemKey: 'q2', value: 'keep', updatedAt: Date.now() })
+    await store.putTrial({ draftKey, trialIndex: 0, payload: { response: 'trial' }, createdAt: Date.now() })
+    await store.setStatus(draftKey, 'RETRY_PENDING', { code: 'NETWORK', message: 'timeout' })
+
+    await store.deleteAnswers(draftKey, ['q1', 'q1'])
+
+    expect((await store.listAnswers(draftKey)).map((answer) => answer.itemKey)).toEqual(['q2'])
+    expect((await store.listTrials(draftKey)).map((trial) => trial.trialIndex)).toEqual([0])
+    expect((await store.get(draftKey))?.status).toBe('RETRY_PENDING')
+    await store.delete(draftKey)
+  })
+
   it('protects a draft from crossing attempt or definition identities', async () => {
     const store = createFinalDraftStore()
     const draftKey = `identity-draft-${Date.now()}`
