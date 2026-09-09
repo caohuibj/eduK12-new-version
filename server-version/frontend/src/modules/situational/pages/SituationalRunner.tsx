@@ -140,7 +140,13 @@ const SituationalRunner: React.FC = () => {
         setResponses(localResponses)
         const reachableScenes = reachableSituationalScenes(next.instrument.definition, localResponses)
         const missingIndex = firstMissingSceneIndex(next.instrument.definition, localResponses)
-        setCurrentIndex(missingIndex >= 0 ? missingIndex : Math.max(0, reachableScenes.length - 1))
+        setCurrentIndex(
+          missingIndex >= 0
+            ? missingIndex
+            : next.instrument.definition.schemaVersion === 1
+              ? 0
+              : Math.max(0, reachableScenes.length - 1),
+        )
       } catch (reason) {
         if (!cancelled) setError(situationalErrorMessage(reason))
       } finally {
@@ -214,7 +220,9 @@ const SituationalRunner: React.FC = () => {
         data.instrument.definition,
         { ...responses, [key]: answer },
       )
+      const nextScenes = reachableSituationalScenes(data.instrument.definition, nextResponses)
       setResponses(nextResponses)
+      setCurrentIndex((index) => Math.min(index, Math.max(0, nextScenes.length - 1)))
       setNotice(null)
     } catch (reason) {
       setNotice(situationalErrorMessage(reason))
