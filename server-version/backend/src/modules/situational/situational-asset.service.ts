@@ -10,7 +10,7 @@ import {
   AssessmentImageDeliveryError,
   assessmentImageInternals,
   serveAssessmentImageContent,
-} from '../assessment-media/assessment-image'
+} from '../assessment-media/assessment-image-delivery'
 import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
 import {
   situationDefinitionAssetReferences,

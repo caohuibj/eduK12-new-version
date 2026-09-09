@@ -13,10 +13,8 @@ vi.mock('../../services/assetStorage', () => ({
 }))
 vi.mock('../../utils/cos', () => ({ getCOSSignedUrl: mockGetCOSSignedUrl }))
 
-import {
-  assessmentStaticImageAssetIdentitySchema,
-  serveAssessmentImageContent,
-} from '../../modules/assessment-media/assessment-image'
+import { assessmentStaticImageAssetIdentitySchema } from '../../modules/assessment-media/assessment-image'
+import { serveAssessmentImageContent } from '../../modules/assessment-media/assessment-image-delivery'
 
 const reference = (overrides: Partial<{ assetId: string; contentHash: string; mimeType: string }> = {}) => ({
   assetId: 'asset-image-1',
