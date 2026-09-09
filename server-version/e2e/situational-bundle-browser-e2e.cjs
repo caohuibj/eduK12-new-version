@@ -74,8 +74,12 @@ const waitForRunner = async (page) => {
 const chooseFirstOption = async (page) => {
   const option = page.locator('input[type="radio"]').first()
   await option.waitFor({ state: 'visible', timeout: 30000 })
-  await option.check()
+  // The runner controls the radio value from an IndexedDB-backed async
+  // draft write. A real click exercises the user path without making
+  // Playwright require the controlled DOM state to change synchronously.
+  await option.click()
   await page.getByText(/已完成 [12] \/ 2 个通道/).waitFor({ state: 'visible', timeout: 30000 })
+  assert.equal(await option.isChecked(), true, 'selected option was not reflected in the runner')
 }
 
 const waitForSubmitEnabled = async (page) => {
