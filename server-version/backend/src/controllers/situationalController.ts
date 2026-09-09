@@ -8,11 +8,13 @@ import {
   getSituationalInstrument,
   listSituationalHistory,
   listSituationalInstruments,
+  loadSituationalAttemptRuntime,
   resumeSituationalAttempt,
   startSituationalAttempt,
 } from '../modules/situational/situational-runtime.service'
 import { submitSituationalAttemptFinal } from '../modules/situational/situational-final-submit.service'
 import { situationalFinalSubmitSchema, situationalStartSchema } from '../modules/situational/situational-final-submit.schema'
+import { serveFrozenSituationalAsset } from '../modules/situational/situational-asset.service'
 
 const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): string => (
   errorValue.errors?.[0]?.message ?? '请求参数不合法'
@@ -87,6 +89,20 @@ export const situationalController = {
       return success(res, data)
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化测评结果失败')
+    }
+  },
+
+  async assetContent(req: Request, res: Response) {
+    try {
+      const runtime = await loadSituationalAttemptRuntime(req.params.attemptId, req.user!.userId)
+      return serveFrozenSituationalAsset({
+        snapshot: runtime.snapshot,
+        assetId: req.params.assetId,
+        res,
+      })
+    } catch (errorValue) {
+      if (isInstrumentFinalSubmitError(errorValue)) return instrumentError(res, errorValue.code, errorValue.message, errorValue.statusCode)
+      return handleSituationalError(res, errorValue, '读取情境化视觉资产失败')
     }
   },
 

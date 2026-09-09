@@ -54,6 +54,7 @@ import {
   loadEmbeddedSituationalAttemptRuntime,
   situationalAttemptForResponse,
 } from '../situational/situational-runtime.service'
+import { assertSituationalAssetReferencesReady } from '../situational/situational-asset.service'
 import {
   compileSituationRuntime,
 } from '../assessment-runtime/compiler'
@@ -1697,7 +1698,10 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
       }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
-    if (item.type === 'SITUATIONAL') assertSituationalCompositeItem(item)
+    if (item.type === 'SITUATIONAL') {
+      const situation = assertSituationalCompositeItem(item)
+      await assertSituationalAssetReferencesReady(situation.situationPackage.definition)
+    }
     if (item.type === 'FORM') {
       if (!item.formType || !item.formLabel) {
         throw compositeBadRequest('综合测评包含未配置完成的表单')
