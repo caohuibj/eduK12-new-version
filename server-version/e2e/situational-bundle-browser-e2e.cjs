@@ -79,6 +79,10 @@ const chooseFirstOption = async (page) => {
   // Playwright require the controlled DOM state to change synchronously.
   await option.click()
   await page.getByText(/已完成 [12] \/ 2 个通道/).waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForFunction(() => {
+    const candidate = document.querySelector('input[type="radio"]')
+    return candidate instanceof HTMLInputElement && candidate.checked
+  }, null, { timeout: 30000 })
   assert.equal(await option.isChecked(), true, 'selected option was not reflected in the runner')
 }
 
