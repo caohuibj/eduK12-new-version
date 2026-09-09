@@ -128,10 +128,11 @@ const loginStudent = async (page) => {
 }
 
 const startAuthenticatedParent = async (page) => {
-  await page.goto(`${BASE_URL}/student`, { waitUntil: 'domcontentloaded' })
-  await page.getByText(fixture.course.title, { exact: true }).click()
-  await page.waitForURL(new RegExp(`/student/courses/${fixture.course.id}(?:\\?|$)`), { timeout: 30000 })
-  await page.getByRole('button', { name: '综合测评', exact: true }).click()
+  await page.goto(`${BASE_URL}/student/courses/${fixture.course.id}`, { waitUntil: 'domcontentloaded' })
+  await page.getByRole('heading', { name: fixture.course.title, exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  const compositeTab = page.getByRole('button', { name: /^综合测评\s*\d*$/ }).first()
+  await compositeTab.waitFor({ state: 'visible', timeout: 30000 })
+  await compositeTab.click()
   await page.getByText(fixture.composite.name, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 
   const card = page.locator('div.card').filter({ hasText: fixture.composite.name }).first()
