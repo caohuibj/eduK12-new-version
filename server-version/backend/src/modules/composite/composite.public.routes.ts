@@ -6,6 +6,7 @@ const router = Router()
 
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', compositeController.publicEmbeddedSituational)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', compositeController.publicEmbeddedSituationalAsset)
 router.post('/attempts/:attemptId/restart', compositeController.publicRestart)
 router.post('/attempts/:attemptId/context/freeze', legacyWriteDisabled)
 router.post('/attempts/:attemptId/form-sections/:sectionId/submit', compositeController.publicSubmitFinalFormSection)

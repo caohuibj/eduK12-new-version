@@ -14,6 +14,7 @@ router.post('/attempts', authenticate, requireStudent, situationalController.sta
 router.get('/attempts/:attemptId', authenticate, requireStudent, situationalController.resume)
 router.post('/attempts/:attemptId/resume', authenticate, requireStudent, situationalController.resume)
 router.get('/attempts/:attemptId/result', authenticate, requireStudent, situationalController.result)
+router.get('/attempts/:attemptId/assets/:assetId/content', authenticate, requireStudent, situationalController.assetContent)
 router.post('/attempts/:attemptId/submit', authenticate, requireStudent, situationalController.submitFinal)
 
 // Friendly start alias for clients that prefer a resource-oriented URL.

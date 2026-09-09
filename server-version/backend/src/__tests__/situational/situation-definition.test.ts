@@ -5,6 +5,8 @@ import {
   validateSituationDefinition,
   type SituationDefinitionV1,
 } from '../../modules/situational/situation-definition'
+import { scoreSituational } from '../../modules/situational/situation-scoring'
+import { compileSituationRuntime } from '../../modules/assessment-runtime/compiler'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION } from '../../modules/situational/packages/sjt-anxiety-golden-zh-cn-v1'
 
@@ -248,5 +250,113 @@ describe('situation definition hash and runner view', () => {
     expect(serialized).not.toContain('scoringDirection')
     expect(serialized).not.toContain('purpose')
     expect(serialized).not.toContain('scoredConstruct')
+  })
+})
+
+describe('static visual stimulus contract', () => {
+  const imageAsset = {
+    assetId: 'asset-image-1',
+    contentHash: 'a'.repeat(64),
+    mimeType: 'image/png' as const,
+  }
+
+  it('accepts IMAGE and COMIC without changing the response/scoring plane', () => {
+    const imageDefinition = clone(baseDefinition)
+    imageDefinition.scenes[0]!.stimulus = {
+      type: 'IMAGE',
+      asset: imageAsset,
+      altText: '小组正在核对投影数据',
+      caption: '数据核对场景',
+    }
+    const comicDefinition = clone(baseDefinition)
+    comicDefinition.scenes[0]!.stimulus = {
+      type: 'COMIC',
+      panels: [
+        { assetRef: imageAsset, altText: '第一格：小组查看数据' },
+        { assetRef: { ...imageAsset, assetId: 'asset-image-2', contentHash: 'b'.repeat(64) }, altText: '第二格：组员提出判断' },
+      ],
+    }
+
+    expect(validateSituationDefinition(imageDefinition).issues.filter((issue) => issue.severity === 'error')).toEqual([])
+    expect(validateSituationDefinition(comicDefinition).issues.filter((issue) => issue.severity === 'error')).toEqual([])
+    expect(runnerSituationDefinition(imageDefinition).scenes[0]?.stimulus).toMatchObject({ type: 'IMAGE', altText: '小组正在核对投影数据' })
+    const runnerComic = runnerSituationDefinition(comicDefinition).scenes[0]?.stimulus
+    expect(runnerComic).toMatchObject({ type: 'COMIC' })
+    expect(runnerComic && runnerComic.type === 'COMIC' ? runnerComic.panels[0] : undefined).toMatchObject({ assetRef: imageAsset })
+
+    const textScore = scoreSituational(baseDefinition, [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' }, { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'D' }])
+    const visualScore = scoreSituational(imageDefinition, [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' }, { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'D' }])
+    expect(visualScore).toEqual(textScore)
+  })
+
+  it('rejects empty comics, missing alt text, unsupported MIME, and external asset URLs', () => {
+    const emptyComic = clone(baseDefinition)
+    emptyComic.scenes[0]!.stimulus = { type: 'COMIC', panels: [] } as never
+    expect(JSON.stringify(validateSituationDefinition(emptyComic).issues)).toContain('at least 1')
+
+    const missingAlt = clone(baseDefinition)
+    missingAlt.scenes[0]!.stimulus = { type: 'IMAGE', asset: imageAsset, altText: '' }
+    expect(validateSituationDefinition(missingAlt).definition).toBeUndefined()
+
+    const unsupportedMime = clone(baseDefinition)
+    unsupportedMime.scenes[0]!.stimulus = { type: 'IMAGE', asset: { ...imageAsset, mimeType: 'image/gif' }, altText: '不支持的格式' } as never
+    expect(validateSituationDefinition(unsupportedMime).definition).toBeUndefined()
+
+    const external = clone(baseDefinition)
+    external.scenes[0]!.stimulus = { type: 'IMAGE', asset: { ...imageAsset, assetId: 'https://example.test/image.png' }, altText: '外链' }
+    expect(validateSituationDefinition(external).definition).toBeUndefined()
+
+    const dataUri = clone(baseDefinition)
+    dataUri.scenes[0]!.stimulus = { type: 'IMAGE', asset: { ...imageAsset, assetId: 'data:image/png;base64,AAAA' }, altText: '内嵌数据' }
+    expect(validateSituationDefinition(dataUri).definition).toBeUndefined()
+  })
+
+  it('includes immutable asset identity, alt text, and panel order in the definition hash', () => {
+    const first = clone(baseDefinition)
+    first.scenes[0]!.stimulus = {
+      type: 'COMIC',
+      panels: [
+        { assetRef: imageAsset, altText: '第一格' },
+        { assetRef: { ...imageAsset, assetId: 'asset-image-2', contentHash: 'b'.repeat(64) }, altText: '第二格' },
+      ],
+    }
+    const same = clone(first)
+    const altChanged = clone(first)
+    const assetChanged = clone(first)
+    const reordered = clone(first)
+    const firstComic = first.scenes[0]!.stimulus as Extract<SituationDefinitionV1['scenes'][number]['stimulus'], { type: 'COMIC' }>
+    altChanged.scenes[0]!.stimulus = { ...firstComic, panels: [{ ...firstComic.panels[0]!, altText: '替代描述' }, firstComic.panels[1]!] }
+    assetChanged.scenes[0]!.stimulus = { ...firstComic, panels: [{ ...firstComic.panels[0]!, assetRef: { ...imageAsset, contentHash: 'c'.repeat(64) } }, firstComic.panels[1]!] }
+    reordered.scenes[0]!.stimulus = { ...firstComic, panels: [...firstComic.panels].reverse() }
+
+    expect(hashSituationDefinition(same)).toBe(hashSituationDefinition(first))
+    expect(hashSituationDefinition(altChanged)).not.toBe(hashSituationDefinition(first))
+    expect(hashSituationDefinition(assetChanged)).not.toBe(hashSituationDefinition(first))
+    expect(hashSituationDefinition(reordered)).not.toBe(hashSituationDefinition(first))
+  })
+
+  it('keeps compiled runtime identity deterministic and bound to the visual definition', () => {
+    const definition = clone(baseDefinition)
+    definition.scenes[0]!.stimulus = {
+      type: 'IMAGE',
+      asset: imageAsset,
+      altText: '静态视觉刺激',
+    }
+    const input = {
+      instrumentKey: 'visual-fixture',
+      instrumentVersion: '1.0.0',
+      definition,
+    }
+    const first = compileSituationRuntime(input)
+    const second = compileSituationRuntime({ ...input, definition: clone(input.definition) })
+    expect(second.sourceDefinitionHash).toBe(first.sourceDefinitionHash)
+    expect(second.compiledRuntimeHash).toBe(first.compiledRuntimeHash)
+
+    const changed = clone(definition)
+    const stimulus = changed.scenes[0]!.stimulus as Extract<SituationDefinitionV1['scenes'][number]['stimulus'], { type: 'IMAGE' }>
+    changed.scenes[0]!.stimulus = { ...stimulus, asset: { ...imageAsset, contentHash: 'b'.repeat(64) } }
+    const changedRuntime = compileSituationRuntime({ ...input, definition: changed })
+    expect(changedRuntime.sourceDefinitionHash).not.toBe(first.sourceDefinitionHash)
+    expect(changedRuntime.compiledRuntimeHash).not.toBe(first.compiledRuntimeHash)
   })
 })

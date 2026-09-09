@@ -3,6 +3,7 @@ import { scoreSituational, type SituationalGoldenCase } from './situation-scorin
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
+import { SJT_STATIC_VISUAL_E2E_PACKAGE } from './packages/sjt-static-visual-e2e-fixture'
 
 export interface SituationPackageV1 {
   key: string
@@ -17,6 +18,7 @@ const packages: SituationPackageV1[] = [
   SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
+  ...(process.env.SITUATIONAL_STATIC_VISUAL_FIXTURE === 'true' ? [SJT_STATIC_VISUAL_E2E_PACKAGE] : []),
 ]
 
 const packageIdentityKey = (key: string, instrumentVersion: string): string => JSON.stringify([key, instrumentVersion])

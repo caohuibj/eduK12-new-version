@@ -208,7 +208,7 @@ jobs:
         run: npm run build
 
   browser:
-    name: browser (seeded Situational Bundle acceptance)
+    name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance must execute against the same commit after both
     # production lanes have passed. It uses its own service containers and
     # runs before Docker on the dedicated Mac lane.
@@ -238,6 +238,8 @@ jobs:
       LOG_LEVEL: warn
       UPLOAD_DIR: /tmp/eduk12-situational-bundle-e2e-uploads
       CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-bundle-e2e-credentials
+      SITUATIONAL_STATIC_VISUAL_FIXTURE: 'true'
+      SITUATIONAL_BUNDLE_E2E_INSTRUMENT_KEY: sjt-static-visual-e2e-fixture
       SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-situational-bundle-fixture.json
       SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
       SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-bundle-e2e
