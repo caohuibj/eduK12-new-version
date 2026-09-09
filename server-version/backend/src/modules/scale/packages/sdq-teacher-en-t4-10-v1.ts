@@ -285,7 +285,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman Emotional symptoms subscale (0–10). UK cut-points literature-only; not mainland CN norms.',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'reflection', text: 'Review classroom situations in which worries, low mood, or physical complaints were most noticeable.' }],
       },
       {
         scoreKey: 'conduct',
@@ -293,7 +293,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman Conduct problems subscale (0–10).',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'reflection', text: 'Review classroom observations involving conflict, rule-following, anger, or honesty; this is not a clinical cut-off.' }],
       },
       {
         scoreKey: 'hyperactivity',
@@ -301,7 +301,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman Hyperactivity/inattention subscale (0–10).',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'reflection', text: 'Review settings involving restlessness, distractibility, and sustained attention, including transitions between tasks.' }],
       },
       {
         scoreKey: 'peer',
@@ -309,7 +309,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman Peer relationship problems subscale (0–10).',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'reflection', text: 'Review the child’s opportunities for friendship, inclusion, and support with peers.' }],
       },
       {
         scoreKey: 'prosocial',
@@ -317,7 +317,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman Prosocial subscale (0–10); not in total difficulties.',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'reflection', text: 'Review strengths in helping, sharing, consideration, and cooperation alongside the difficulty scores.' }],
       },
       {
         scoreKey: 'impact',
@@ -325,7 +325,7 @@ export const SDQ_TEACHER_EN_T4_10_V1_DEFINITION: ScaleDefinitionV2 = {
         source: { type: 'score_only' },
         summary: 'Goodman teacher impact (distress + peer relations + classroom learning; 0–6). Chronicity and burden excluded. If overall difficulties answered No, impact is typically 0.',
         bands: [],
-        guidance: [],
+        guidance: [{ category: 'environment', text: 'Review whether the reported difficulties interfere with classroom learning, peer relationships, or the child’s day-to-day experience.' }],
       },
     ],
     limitations: [
