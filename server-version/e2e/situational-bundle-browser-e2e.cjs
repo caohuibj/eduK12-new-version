@@ -251,7 +251,16 @@ const runPublicFlow = async (browser) => {
   const page = await context.newPage()
   try {
     const token = encodeURIComponent(fixture.publicToken)
+    const publicInfoResponsePromise = page.waitForResponse((response) => (
+      response.request().method() === 'GET'
+        && response.url().includes('/api/public/composite-assessments/' + fixture.publicToken)
+    ), { timeout: 30000 })
     await page.goto(`${BASE_URL}/public/composite/${token}`, { waitUntil: 'domcontentloaded' })
+    const publicInfoResponse = await publicInfoResponsePromise
+    assert.equal(publicInfoResponse.status(), 200, `public info: HTTP ${publicInfoResponse.status()}`)
+    const publicInfoBody = await publicInfoResponse.json()
+    assert.equal(publicInfoBody.code, 0, `public info: ${publicInfoBody.message || 'API error'}`)
+    assert.equal(publicInfoBody.data?.name, fixture.composite.name, 'public info returned the wrong composite')
     await page.getByRole('heading', { name: fixture.composite.name }).waitFor({ state: 'visible', timeout: 30000 })
     const startResponsePromise = page.waitForResponse((response) => (
       response.request().method() === 'POST'
