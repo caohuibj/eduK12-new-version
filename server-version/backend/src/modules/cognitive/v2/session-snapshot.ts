@@ -46,6 +46,7 @@ export const sessionConfigSnapshotSchema = z.object({
     scoreKey: z.string().min(1).optional(),
     referenceKind: z.string().min(1).optional(),
     profileKey: z.string().min(1).optional(),
+    applicability: z.record(z.unknown()).optional(),
   }).strict()).optional(),
   protocol: protocolDefinitionSchema,
   protocolSignature: z.string().regex(/^[0-9a-f]{64}$/),
