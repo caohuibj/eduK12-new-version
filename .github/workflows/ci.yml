@@ -275,6 +275,9 @@ jobs:
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: install Chromium for seeded browser
+        working-directory: server-version/backend
+        run: npx playwright-core install --with-deps chromium
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
