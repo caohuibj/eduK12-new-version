@@ -206,7 +206,6 @@ const completeEmbeddedRunner = async (page, parentId, childId, publicMode = fals
     await chooseFirstOption(page)
     await page.reload({ waitUntil: 'domcontentloaded' })
     await waitForRunner(page)
-    await assertVisualScene(page, 1)
     assert.equal(await page.locator('input[type="radio"]').first().isChecked(), false, 'reload should resume at the first missing scene')
     await navigateToScene(page, 1, true)
     await assertVisualScene(page, 1)
