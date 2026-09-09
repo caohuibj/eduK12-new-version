@@ -1,4 +1,4 @@
-import apiClient from '../../api/client'
+import apiClient, { sessionFetch } from '../../api/client'
 import type {
   SituationalAttemptResponse,
   SituationalInstrument,
@@ -25,6 +25,7 @@ export interface SituationalRunnerClient {
   resume: (attemptId: string) => Promise<Awaited<ReturnType<typeof situationalApi.resume>>>
   result: (attemptId: string) => Promise<Awaited<ReturnType<typeof situationalApi.result>>>
   submit: (attemptId: string, payload: SituationalFinalSubmitPayload) => Promise<Awaited<ReturnType<typeof situationalApi.submit>>>
+  loadAsset: (attemptId: string, assetId: string) => Promise<Blob>
 }
 
 const embeddedPath = (parentAttemptId: string, itemId: string, situationalAttemptId: string, publicMode: boolean) => (
@@ -33,7 +34,13 @@ const embeddedPath = (parentAttemptId: string, itemId: string, situationalAttemp
 
 const embeddedClient = (parentAttemptId: string, itemId: string, recoveryToken?: string, publicMode = Boolean(recoveryToken)): SituationalRunnerClient => {
   const config = publicMode && recoveryToken ? { headers: { 'X-Recovery-Token': recoveryToken } } : undefined
+  const assetConfig = publicMode && recoveryToken ? { headers: { 'X-Recovery-Token': recoveryToken } } : undefined
   const path = (attemptId: string, suffix = '') => `${embeddedPath(parentAttemptId, itemId, attemptId, publicMode)}${suffix}`
+  const loadAsset = async (attemptId: string, assetId: string): Promise<Blob> => {
+    const response = await sessionFetch(`${path(attemptId, `/assets/${encodeURIComponent(assetId)}/content`)}`, assetConfig)
+    if (!response.ok) throw Object.assign(new Error('视觉内容加载失败'), { status: response.status })
+    return response.blob()
+  }
   return {
     // Embedded attempts are created with their parent. The runner never
     // creates a second child attempt, so start is intentionally unavailable.
@@ -41,6 +48,7 @@ const embeddedClient = (parentAttemptId: string, itemId: string, recoveryToken?:
     resume: (attemptId) => apiClient.get(path(attemptId), config),
     result: (attemptId) => apiClient.get(path(attemptId), config),
     submit: (attemptId, payload) => apiClient.post(`${path(attemptId, '/submit')}`, payload, config),
+    loadAsset,
   }
 }
 
@@ -55,6 +63,11 @@ export const situationalApi = {
   resume: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}`),
   resumePost: (attemptId: string) => apiClient.post<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/resume`, {}),
   result: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/result`),
+  loadAsset: async (attemptId: string, assetId: string) => {
+    const response = await sessionFetch(`/api/situational/attempts/${encodeURIComponent(attemptId)}/assets/${encodeURIComponent(assetId)}/content`)
+    if (!response.ok) throw Object.assign(new Error('视觉内容加载失败'), { status: response.status })
+    return response.blob()
+  },
   submit: (attemptId: string, payload: SituationalFinalSubmitPayload) => (
     apiClient.post<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/submit`, payload)
   ),
