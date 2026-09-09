@@ -376,6 +376,23 @@ const assertDurableCompletion = async (parentId, childId, label) => {
     assert.equal(snapshots[0].payloadKind, 'UNIT_RESULT')
     assert.equal(snapshots[0].sourceAttemptId, childId)
     record(`${label}-SITUATIONAL UNIT_RESULT snapshot: 1`)
+
+    if (fixture.visual) {
+      const expectedAssetIds = [
+        fixture.visual.image.assetId,
+        ...fixture.visual.comic.panels.map((panel) => panel.assetId),
+      ].sort()
+      const retained = await prisma.assetReference.findMany({
+        where: {
+          entityType: 'AssessmentFrozenRuntime',
+          entityId: `SITUATIONAL:${childId}`,
+          field: 'media',
+        },
+        select: { assetId: true },
+      })
+      assert.deepEqual(retained.map((reference) => reference.assetId).sort(), expectedAssetIds, `${label}: frozen visual AssetReferences are incomplete after FINAL`)
+      record(`${label}-AssessmentFrozenRuntime media refs: ${retained.length}`)
+    }
   } finally {
     await prisma.$disconnect()
   }

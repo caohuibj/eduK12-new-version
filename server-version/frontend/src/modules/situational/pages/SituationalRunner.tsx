@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send, Sparkles } from 'lucide-react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { embeddedSituationalApi, publicEmbeddedSituationalApi, situationalApi, type SituationalRunnerClient } from '../api'
@@ -24,6 +24,9 @@ import type {
   SituationalRunnerScene,
 } from '../types'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
+import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
+import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
+import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
 
 const responseValueFor = (
   responses: Record<string, SituationalDraftAnswer>,
@@ -31,17 +34,11 @@ const responseValueFor = (
   channel: SituationalRunnerChannel,
 ): SituationalDraftAnswer | undefined => responses[responseKey(scene.sceneKey, channel.channelKey)]
 
-type RunnerVisualAsset = {
-  assetId: string
-  altText: string
-  caption?: string
-}
-
-const visualAssetsFor = (stimulus: SituationalRunnerScene['stimulus']): RunnerVisualAsset[] => {
+const visualAssetsFor = (stimulus: SituationalRunnerScene['stimulus']): AssessmentImagePresentationItem[] => {
   if (stimulus.type === 'TEXT_V1') return []
-  if (stimulus.type === 'IMAGE') return [{ assetId: stimulus.asset.assetId, altText: stimulus.altText, caption: stimulus.caption }]
+  if (stimulus.type === 'IMAGE') return [{ asset: stimulus.asset, altText: stimulus.altText, caption: stimulus.caption }]
   return stimulus.panels.map((panel) => ({
-    assetId: panel.assetRef.assetId,
+    asset: panel.assetRef,
     altText: panel.altText,
     caption: panel.caption,
   }))
@@ -91,13 +88,6 @@ const SituationalRunner: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [visualState, setVisualState] = useState<{
-    sceneKey: string
-    loading: boolean
-    error: string | null
-    urls: Record<string, string>
-  }>({ sceneKey: '', loading: false, error: null, urls: {} })
-  const [visualRetry, setVisualRetry] = useState(0)
   const sceneStartedAt = useRef(Date.now())
   const submittingRef = useRef(false)
 
@@ -161,37 +151,12 @@ const SituationalRunner: React.FC = () => {
     data ? reachableSituationalScenes(data.instrument.definition, responses) : []
   ), [data, responses])
   const currentScene = scenes[currentIndex]
-
-  useEffect(() => {
-    let cancelled = false
-    const assets = currentScene ? visualAssetsFor(currentScene.stimulus) : []
-    const sceneKey = currentScene?.sceneKey ?? ''
-    setVisualState({ sceneKey, loading: assets.length > 0, error: null, urls: {} })
-    if (!assets.length) return () => { cancelled = true }
-    if (!data || !client) {
-      setVisualState({ sceneKey, loading: false, error: '视觉内容加载失败，请重试。', urls: {} })
-      return () => { cancelled = true }
-    }
-
-    const objectUrls: string[] = []
-    void Promise.all(assets.map(async (asset) => {
-      const blob = await client.loadAsset(data.attempt.id, asset.assetId)
-      const url = URL.createObjectURL(blob)
-      objectUrls.push(url)
-      return [asset.assetId, url] as const
-    })).then((entries) => {
-      if (cancelled) return
-      setVisualState({ sceneKey, loading: false, error: null, urls: Object.fromEntries(entries) })
-    }).catch((reason) => {
-      if (cancelled) return
-      setVisualState({ sceneKey, loading: false, error: situationalErrorMessage(reason), urls: {} })
-    })
-
-    return () => {
-      cancelled = true
-      objectUrls.forEach((url) => URL.revokeObjectURL(url))
-    }
-  }, [client, currentScene, data, visualRetry])
+  const visualItems = useMemo(() => currentScene ? visualAssetsFor(currentScene.stimulus) : [], [currentScene])
+  const loadVisualAsset = useCallback((assetId: string): Promise<Blob> => {
+    if (!data || !client) return Promise.reject(new Error('Assessment image client is unavailable'))
+    return client.loadAsset(data.attempt.id, assetId)
+  }, [client, data])
+  const visualState = useAssessmentImageAssets(visualItems, loadVisualAsset)
 
   const totalResponses = data ? expectedResponseKeys(data.instrument.definition, responses).length : 0
   const answeredCount = data ? answeredResponseCount(data.instrument.definition, responses) : 0
@@ -302,24 +267,24 @@ const SituationalRunner: React.FC = () => {
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
   if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
-  const visualRequired = visualAssetsFor(currentScene.stimulus).length > 0
-  const visualBusy = visualRequired && (visualState.sceneKey !== currentScene.sceneKey || visualState.loading || Boolean(visualState.error))
+  const visualRequired = visualItems.length > 0
+  const visualBusy = visualRequired && visualState.status !== 'ready'
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
       ? <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
       : null
     if (currentScene.stimulus.type === 'TEXT_V1') return textBlock
-    if (visualState.sceneKey !== currentScene.sceneKey || visualState.loading) {
-      return <>{textBlock}<div role="status" className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-sm text-indigo-800">加载视觉内容…</div></>
-    }
-    if (visualState.error) {
-      return <>{textBlock}<div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800"><p>视觉内容加载失败，当前情境暂不能作答。</p><button type="button" onClick={() => setVisualRetry((value) => value + 1)} className="mt-3 rounded-lg bg-white px-4 py-2 font-medium text-red-700 shadow-sm">重试</button></div></>
-    }
-    if (currentScene.stimulus.type === 'IMAGE') {
-      const asset = currentScene.stimulus.asset
-      return <>{textBlock}<figure className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4"><img src={visualState.urls[asset.assetId]} alt={currentScene.stimulus.altText} data-asset-id={asset.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{currentScene.stimulus.caption && <figcaption className="text-center text-sm text-slate-600">{currentScene.stimulus.caption}</figcaption>}</figure></>
-    }
-    return <>{textBlock}<ol aria-label="漫画分镜" className="mt-4 grid list-none grid-cols-1 gap-4 rounded-xl bg-slate-50 p-4">{currentScene.stimulus.panels.map((panel, index) => <li key={`${panel.assetRef.assetId}-${index}`} className="space-y-2"><img src={visualState.urls[panel.assetRef.assetId]} alt={panel.altText} data-asset-id={panel.assetRef.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{panel.caption && <p className="text-center text-sm text-slate-600">{panel.caption}</p>}</li>)}</ol></>
+    return (
+      <>
+        {textBlock}
+        <AssessmentImagePresentation
+          items={visualItems}
+          state={visualState}
+          ordered={currentScene.stimulus.type === 'COMIC'}
+          ariaLabel={currentScene.stimulus.type === 'COMIC' ? '漫画分镜' : '视觉内容'}
+        />
+      </>
+    )
   }
 
   return (
