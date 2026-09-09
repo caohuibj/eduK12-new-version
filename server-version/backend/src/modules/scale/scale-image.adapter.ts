@@ -3,6 +3,8 @@ import { prisma } from '../../config/database'
 import {
   ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
   ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+  ASSESSMENT_PUBLISHED_DEFINITION_REFERENCE_TYPE,
+  ASSESSMENT_PUBLISHED_MEDIA_FIELD,
   assertAssessmentAssetReferencesReady,
   findFrozenAssessmentAssetReference,
   retainAssessmentAssetReferences,
@@ -13,9 +15,6 @@ import { serveAssessmentImageContent } from '../assessment-media/assessment-imag
 import type { FrozenScaleRuntimeSnapshotV1 } from '../assessment-runtime/runtime-snapshot'
 import type { ScaleDefinitionV2 } from './scale-definition'
 import type { AssetDatabase } from '../../services/assetStorage'
-
-export const ASSESSMENT_PUBLISHED_DEFINITION_REFERENCE_TYPE = 'AssessmentPublishedDefinition'
-export const ASSESSMENT_PUBLISHED_MEDIA_FIELD = 'media'
 
 export const scaleAssessmentImageReferences = (definition: ScaleDefinitionV2) => (
   definition.items.flatMap((item) => assessmentImageAssetReferences(item.images))
