@@ -172,7 +172,10 @@ const buildDefinition = (respondentType: 'parent_observer' | 'teacher_observer')
         source: { type: 'score_only' },
         summary: 'Average of all 20 items. Prefer interpreting WM and Inhibition factors separately per published structure.',
         bands: [],
-        guidance: [],
+        guidance: [
+          { category: 'reflection', text: 'Review whether the overall pattern is consistent with the two published factors rather than treating the composite as a cut-off.' },
+          { category: 'strategy', text: 'Consider using the Working Memory and Inhibition factor descriptions to choose small, observable classroom or home supports.' },
+        ],
       },
     ],
     limitations: [
