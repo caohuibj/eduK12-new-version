@@ -165,6 +165,7 @@ export interface FinalDraftStore {
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   putAnswer(answer: FinalDraftAnswer): Promise<void>
   listAnswers(draftKey: string): Promise<FinalDraftAnswer[]>
+  deleteAnswers(draftKey: string, itemKeys: string[]): Promise<void>
   putTrial(trial: FinalDraftTrial): Promise<void>
   listTrials(draftKey: string): Promise<FinalDraftTrial[]>
   setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }): Promise<FinalDraftMeta | null>
@@ -212,6 +213,10 @@ class MemoryFinalDraftStore implements FinalDraftStore {
 
   async listAnswers(draftKey: string) {
     return [...this.answers.values()].filter((answer) => answer.draftKey === draftKey).sort((a, b) => a.itemKey.localeCompare(b.itemKey))
+  }
+
+  async deleteAnswers(draftKey: string, itemKeys: string[]) {
+    for (const itemKey of new Set(itemKeys)) this.answers.delete(`${draftKey}:${itemKey}`)
   }
 
   async putTrial(trial: FinalDraftTrial) {
@@ -329,6 +334,14 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       (await requestResult<FinalDraftAnswer[]>(transaction.objectStore(ANSWER_STORE).index(DRAFT_INDEX).getAll(draftKey)))
         .sort((a, b) => a.itemKey.localeCompare(b.itemKey))
     ))
+  }
+
+  async deleteAnswers(draftKey: string, itemKeys: string[]) {
+    if (itemKeys.length === 0) return
+    await this.run<void>([ANSWER_STORE], 'readwrite', async (transaction) => {
+      const store = transaction.objectStore(ANSWER_STORE)
+      for (const itemKey of new Set(itemKeys)) store.delete([draftKey, itemKey])
+    })
   }
 
   async putTrial(trial: FinalDraftTrial) {

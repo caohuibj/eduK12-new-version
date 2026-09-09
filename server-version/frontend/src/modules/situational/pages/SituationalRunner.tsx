@@ -7,13 +7,16 @@ import {
   ensureSituationalDraft,
   expectedResponseKeys,
   firstMissingSceneIndex,
+  pruneSituationalDraftResponses,
   readSituationalDraft,
   responseKey,
   sceneIsComplete,
   situationalDraftKey,
   situationalErrorMessage,
+  situationalReadyToSubmit,
   situationalResponsesFromDraft,
 } from '../draft'
+import { reachableSituationalScenes } from '../traversal'
 import type {
   SituationalAttemptResponse,
   SituationalDraftAnswer,
@@ -130,12 +133,20 @@ const SituationalRunner: React.FC = () => {
           return
         }
         await ensureSituationalDraft(next.attempt)
-        const localResponses = await readSituationalDraft(next.attempt)
+        const restoredResponses = await readSituationalDraft(next.attempt)
+        const localResponses = await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
         if (cancelled) return
         setData(next)
         setResponses(localResponses)
+        const reachableScenes = reachableSituationalScenes(next.instrument.definition, localResponses)
         const missingIndex = firstMissingSceneIndex(next.instrument.definition, localResponses)
-        setCurrentIndex(missingIndex >= 0 ? missingIndex : 0)
+        setCurrentIndex(
+          missingIndex >= 0
+            ? missingIndex
+            : next.instrument.definition.schemaVersion === 1
+              ? 0
+              : Math.max(0, reachableScenes.length - 1),
+        )
       } catch (reason) {
         if (!cancelled) setError(situationalErrorMessage(reason))
       } finally {
@@ -146,7 +157,9 @@ const SituationalRunner: React.FC = () => {
     return () => { cancelled = true }
   }, [attemptId, client, embeddedCompletionPath, instrumentKey, navigate, publicMode, recoveryToken])
 
-  const scenes = useMemo(() => data?.instrument.definition.scenes ?? [], [data])
+  const scenes = useMemo(() => (
+    data ? reachableSituationalScenes(data.instrument.definition, responses) : []
+  ), [data, responses])
   const currentScene = scenes[currentIndex]
 
   useEffect(() => {
@@ -180,7 +193,7 @@ const SituationalRunner: React.FC = () => {
     }
   }, [client, currentScene, data, visualRetry])
 
-  const totalResponses = data ? expectedResponseKeys(data.instrument.definition).length : 0
+  const totalResponses = data ? expectedResponseKeys(data.instrument.definition, responses).length : 0
   const answeredCount = data ? answeredResponseCount(data.instrument.definition, responses) : 0
   const progress = totalResponses > 0 ? Math.round((answeredCount / totalResponses) * 100) : 0
 
@@ -202,7 +215,14 @@ const SituationalRunner: React.FC = () => {
         value: answer,
         updatedAt: Date.now(),
       })
-      setResponses((previous) => ({ ...previous, [key]: answer }))
+      const nextResponses = await pruneSituationalDraftResponses(
+        data.attempt,
+        data.instrument.definition,
+        { ...responses, [key]: answer },
+      )
+      const nextScenes = reachableSituationalScenes(data.instrument.definition, nextResponses)
+      setResponses(nextResponses)
+      setCurrentIndex((index) => Math.min(index, Math.max(0, nextScenes.length - 1)))
       setNotice(null)
     } catch (reason) {
       setNotice(situationalErrorMessage(reason))
@@ -231,6 +251,10 @@ const SituationalRunner: React.FC = () => {
     if (missingIndex >= 0) {
       setCurrentIndex(missingIndex)
       setNotice('还有必答通道未完成，请补充后再提交。')
+      return
+    }
+    if (!situationalReadyToSubmit(data.instrument.definition, responses)) {
+      setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
     }
     // Lock before the first await so two clicks in the same event turn cannot

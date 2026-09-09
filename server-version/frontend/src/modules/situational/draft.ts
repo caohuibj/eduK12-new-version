@@ -4,6 +4,7 @@ import {
   type FinalDraftMeta,
 } from '../../services/persistence/finalDraftStore'
 import { checkpointId } from '../../services/persistence/checkpointTypes'
+import { deriveReachableTrajectory, reachableSituationalScenes, situationalTrajectoryReachedTerminal } from './traversal'
 import type {
   SituationalAttempt,
   SituationalDraftAnswer,
@@ -15,35 +16,70 @@ export const situationalDraftKey = (attemptId: string): string => `situational:$
 
 export const responseKey = (sceneKey: string, channelKey: string): string => `${sceneKey}:${channelKey}`
 
-export const expectedResponseKeys = (definition: SituationalRunnerDefinition): string[] => (
-  definition.scenes.flatMap((scene) => scene.channels.map((channel) => responseKey(scene.sceneKey, channel.channelKey)))
-)
+export const expectedResponseKeys = (
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer> = {},
+): string[] => reachableSituationalScenes(definition, responses)
+  .flatMap((scene) => scene.channels.map((channel) => responseKey(scene.sceneKey, channel.channelKey)))
 
 export const sceneIsComplete = (
   definition: SituationalRunnerDefinition,
   sceneIndex: number,
   responses: Record<string, SituationalDraftAnswer>,
 ): boolean => {
-  const scene = definition.scenes[sceneIndex]
+  const scene = reachableSituationalScenes(definition, responses)[sceneIndex]
   return Boolean(scene && scene.channels.every((channel) => responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined))
 }
 
 export const firstMissingSceneIndex = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
-): number => definition.scenes.findIndex((scene) => (
+): number => reachableSituationalScenes(definition, responses).findIndex((scene) => (
   scene.channels.some((channel) => responses[responseKey(scene.sceneKey, channel.channelKey)] === undefined)
 ))
 
 export const answeredResponseCount = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
-): number => expectedResponseKeys(definition).filter((key) => responses[key] !== undefined).length
+): number => expectedResponseKeys(definition, responses).filter((key) => responses[key] !== undefined).length
+
+export const situationalReadyToSubmit = (
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer>,
+): boolean => (
+  firstMissingSceneIndex(definition, responses) === -1
+  && situationalTrajectoryReachedTerminal(definition, responses)
+)
+
+export const pruneUnreachableSituationalResponses = (
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer>,
+): { responses: Record<string, SituationalDraftAnswer>; staleKeys: string[] } => {
+  if (definition.schemaVersion === 1) return { responses, staleKeys: [] }
+  const reachableKeys = new Set(expectedResponseKeys(definition, responses))
+  const staleKeys = Object.keys(responses).filter((key) => !reachableKeys.has(key))
+  if (staleKeys.length === 0) return { responses, staleKeys }
+  const next = { ...responses }
+  staleKeys.forEach((key) => { delete next[key] })
+  return { responses: next, staleKeys }
+}
+
+export const pruneSituationalDraftResponses = async (
+  attempt: SituationalAttempt,
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer>,
+): Promise<Record<string, SituationalDraftAnswer>> => {
+  const pruned = pruneUnreachableSituationalResponses(definition, responses)
+  if (pruned.staleKeys.length > 0) {
+    await finalDraftStore.deleteAnswers(situationalDraftKey(attempt.id), pruned.staleKeys)
+  }
+  return pruned.responses
+}
 
 export const situationalResponsesFromDraft = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
-): SituationalResponse[] => definition.scenes.flatMap((scene) => scene.channels.flatMap((channel) => {
+): SituationalResponse[] => reachableSituationalScenes(definition, responses).flatMap((scene) => scene.channels.flatMap((channel) => {
   const answer = responses[responseKey(scene.sceneKey, channel.channelKey)]
   if (!answer) return []
   return [{
@@ -54,6 +90,11 @@ export const situationalResponsesFromDraft = (
     ...(answer.answeredAt === undefined ? {} : { answeredAt: answer.answeredAt }),
   }]
 }))
+
+export const reachableSceneKeys = (
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer>,
+): string[] => deriveReachableTrajectory(definition, responses).sceneKeys
 
 const isMatchingIdentity = (meta: FinalDraftMeta, attempt: SituationalAttempt): boolean => (
   meta.instrument === 'situational'
@@ -121,4 +162,3 @@ export const situationalErrorMessage = (error: unknown): string => {
   if (typeof value?.message === 'string' && value.message.trim()) return value.message
   return '网络异常，请重试。'
 }
-
