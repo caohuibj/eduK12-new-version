@@ -47,8 +47,6 @@ export interface MetricDefinition {
   precision?: number
   requiresQualityFlags?: string[]
   availableProfiles: CognitiveProfile[]
-  /** Explicit opt-in for the future reference pipeline; default is fail-closed. */
-  referenceEligible: boolean
   export: { summary: boolean; label: string }
 }
 
@@ -101,6 +99,8 @@ export interface RegistryEntry<TConfig, TTrial> {
   profiles: Record<CognitiveProfile, CognitiveProfileDefinition>
   metricDefinitionVersion: string
   metricDefinitions: Record<string, MetricDefinition>
+  /** Exact reference-governance allowlist; omitted eligibility is impossible and empty is fail-closed. */
+  referenceEligibleMetricKeys: readonly string[]
   qualityDefinitionVersion: string
   qualityDefinitions: Record<string, QualityDefinition>
   reportDefinitionVersion: string

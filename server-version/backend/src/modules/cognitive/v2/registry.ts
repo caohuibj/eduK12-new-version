@@ -15,6 +15,45 @@ import type {
 
 type AnyRegistryEntry = RegistryEntry<unknown, unknown>
 
+export interface RegistryReferenceEligibilityIssue {
+  path: string
+  message: string
+}
+
+/** Validate the exact RegistryEntry-owned reference allowlist before publication. */
+export const validateRegistryReferenceEligibility = (entry: {
+  metricDefinitions: Record<string, { valueType: string; role: string }>
+  referenceEligibleMetricKeys?: unknown
+}): RegistryReferenceEligibilityIssue[] => {
+  const issues: RegistryReferenceEligibilityIssue[] = []
+  const keys = entry.referenceEligibleMetricKeys
+  if (!Array.isArray(keys)) {
+    return [{ path: 'referenceEligibleMetricKeys', message: 'referenceEligibleMetricKeys must be an array' }]
+  }
+  const seen = new Set<string>()
+  keys.forEach((key, index) => {
+    const path = `referenceEligibleMetricKeys.${index}`
+    if (typeof key !== 'string' || key.length === 0) {
+      issues.push({ path, message: 'eligible metric key must be a non-empty string' })
+      return
+    }
+    if (seen.has(key)) issues.push({ path, message: `duplicate eligible metric key: ${key}` })
+    seen.add(key)
+    const metric = entry.metricDefinitions[key]
+    if (!metric) {
+      issues.push({ path, message: `unknown eligible metric key: ${key}` })
+      return
+    }
+    if (metric.valueType !== 'number' && metric.valueType !== 'integer') {
+      issues.push({ path, message: `eligible metric ${key} must expose a scalar number or integer valueType` })
+    }
+    if (metric.role === 'quality' || metric.role === 'research_only') {
+      issues.push({ path, message: `quality or research_only metric ${key} cannot be reference eligible` })
+    }
+  })
+  return issues
+}
+
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
 
 // Existing Trail Making scorer flags are provenance warnings: they do not
@@ -53,8 +92,11 @@ const metricCategory = (key: string, entry: AnyRegistryEntry): string => {
   return mapping?.domain ?? entry.metricDefinitions[key]?.construct ?? entry.category
 }
 
-const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricDefinition> =>
-  Object.fromEntries(Object.entries(entry.metricDefinitions).map(([key, metric]) => [key, {
+const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricDefinition> => {
+  const eligibleMetricKeys = new Set(
+    Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys : [],
+  )
+  return Object.fromEntries(Object.entries(entry.metricDefinitions).map(([key, metric]) => [key, {
     key,
     label: metric.label,
     ...(metric.shortLabel ? { shortLabel: metric.shortLabel } : {}),
@@ -68,10 +110,11 @@ const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricD
     role: metric.role,
     ...(metric.precision === undefined ? {} : { precision: metric.precision }),
     availableProfiles: metric.availableProfiles,
-    referenceEligible: metric.referenceEligible,
+    referenceEligible: eligibleMetricKeys.has(key),
     ...(metric.requiresQualityFlags ? { requiresQualityFlags: metric.requiresQualityFlags } : {}),
     export: metric.export,
   }])) as Record<string, MetricDefinition>
+}
 
 const adaptQualityDefinitions = (entry: AnyRegistryEntry): Record<string, QualityDefinition> => ({
   ...Object.fromEntries(Object.entries(entry.qualityDefinitions).map(([key, quality]) => [key, {

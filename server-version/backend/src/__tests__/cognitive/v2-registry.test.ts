@@ -10,6 +10,7 @@ import {
   createTrialEnvelope,
   resolveCognitiveFinalMaxTrials,
   runAuthoritativeScorer,
+  validateRegistryReferenceEligibility,
 } from '../../modules/cognitive/v2'
 import { listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.registry'
 
@@ -64,6 +65,29 @@ describe('Cognitive v2 registry adapter', () => {
     const audit = auditCognitiveV2Registry(definitions)
     expect(audit).toMatchObject({ status: 'PASS', registryCount: 28, publishedCount: 9, draftCount: 19, retiredCount: 0 })
     expect(audit.entries).toHaveLength(28)
+  })
+
+  it('keeps eligibility on exact RegistryEntry metadata and audits malformed allowlists', () => {
+    const entries = listCognitiveRegistryEntries()
+    expect(entries).toHaveLength(28)
+    expect(entries.every((entry) => Array.isArray(entry.referenceEligibleMetricKeys))).toBe(true)
+    expect(entries.every((entry) => Object.values(entry.metricDefinitions)
+      .every((metric) => !Object.prototype.hasOwnProperty.call(metric, 'referenceEligible')))).toBe(true)
+
+    const reaction = entries.find((entry) => entry.testType === 'reaction' && entry.scoringVersion === '1.1.0')
+    if (!reaction) throw new Error('reaction v1.1 registry entry missing')
+    expect(validateRegistryReferenceEligibility({
+      ...reaction,
+      referenceEligibleMetricKeys: ['medianRtMs', 'medianRtMs'],
+    })).toEqual(expect.arrayContaining([
+      expect.objectContaining({ message: 'duplicate eligible metric key: medianRtMs' }),
+    ]))
+    expect(validateRegistryReferenceEligibility({
+      ...reaction,
+      referenceEligibleMetricKeys: ['unknownMetric'],
+    })).toEqual(expect.arrayContaining([
+      expect.objectContaining({ message: 'unknown eligible metric key: unknownMetric' }),
+    ]))
   })
 
   it('keeps same-test-type contracts independent across exact versions', () => {

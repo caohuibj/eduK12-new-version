@@ -25,7 +25,6 @@ const metric = (
   valueType: unit === 'map' ? 'object' : unit === 'count' || unit === 'level' ? 'integer' : 'number',
   direction,
   role,
-  referenceEligible: false,
   availableProfiles: allProfiles,
   export: { summary: role !== 'research_only', label },
   ...extra,
@@ -34,6 +33,7 @@ const metric = (
 export const fakeRegistryMeta = {
   name: 'Fake 测试',
   category: 'framework',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'none',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -66,6 +66,7 @@ export const fakeRegistryMeta = {
 export const reactionRegistryMeta = {
   name: '简单反应时',
   category: 'processing_speed',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'reaction-foreperiod-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -121,13 +122,11 @@ export const reactionRegistryMeta = {
 
 export const reactionRegistryMetaV11 = {
   ...reactionRegistryMeta,
+  referenceEligibleMetricKeys: ['medianRtMs', 'rtICV'] as const,
   profileDefinitionVersion: '1.1.0',
   metricDefinitionVersion: '1.1.0',
   metricDefinitions: {
     ...reactionRegistryMeta.metricDefinitions,
-    medianRtMs: { ...reactionRegistryMeta.metricDefinitions.medianRtMs, referenceEligible: true },
-    rtICV: { ...reactionRegistryMeta.metricDefinitions.rtICV, referenceEligible: true },
-    missRate: { ...reactionRegistryMeta.metricDefinitions.missRate, referenceEligible: false },
   } as Record<string, MetricDefinition>,
   qualityDefinitionVersion: '1.1.0',
   reportDefinitionVersion: '1.1.0',
@@ -147,6 +146,7 @@ export const reactionRegistryMetaV11 = {
 export const memoryRegistryMeta = {
   name: '数字广度顺背',
   category: 'working_memory',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'memory-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -196,6 +196,7 @@ export const memoryRegistryMeta = {
 
 export const memoryRegistryMetaV11 = {
   ...memoryRegistryMeta,
+  referenceEligibleMetricKeys: ['maxSpan'] as const,
   profileDefinitionVersion: '1.1.0',
   metricDefinitionVersion: '1.1.0',
   qualityDefinitionVersion: '1.1.0',
@@ -222,8 +223,7 @@ export const memoryRegistryMetaV11 = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitions: {
     ...memoryRegistryMeta.metricDefinitions,
-    maxSpan: { ...memoryRegistryMeta.metricDefinitions.maxSpan, referenceEligible: true },
-    totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: false }),
+    totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary'),
     perseverativeTrialCount: metric(
       'perseverativeTrialCount',
       '持续重复作答试次数',
@@ -252,6 +252,7 @@ export const memoryRegistryMetaV11 = {
 export const stroopRegistryMeta = {
   name: '色词 Stroop',
   category: 'inhibitory_control',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'stroop-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -307,6 +308,7 @@ export const stroopRegistryMeta = {
 
 export const stroopRegistryMetaV11 = {
   ...stroopRegistryMeta,
+  referenceEligibleMetricKeys: ['stroopEffectMs', 'incongruentAccuracy'] as const,
   profileDefinitionVersion: '1.1.0',
   metricDefinitionVersion: '1.1.0',
   qualityDefinitionVersion: '1.1.0',
@@ -333,9 +335,6 @@ export const stroopRegistryMetaV11 = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitions: {
     ...stroopRegistryMeta.metricDefinitions,
-    stroopEffectMs: { ...stroopRegistryMeta.metricDefinitions.stroopEffectMs, referenceEligible: true },
-    errorCost: { ...stroopRegistryMeta.metricDefinitions.errorCost, referenceEligible: false },
-    incongruentAccuracy: { ...stroopRegistryMeta.metricDefinitions.incongruentAccuracy, referenceEligible: true },
   } as Record<string, MetricDefinition>,
   qualityDefinitions: {
     ...stroopRegistryMeta.qualityDefinitions,
@@ -355,6 +354,7 @@ export const stroopRegistryMetaV11 = {
 export const gonogoRegistryMeta = {
   name: 'Go/No-Go',
   category: 'response_inhibition',
+  referenceEligibleMetricKeys: ['commissionRate', 'dPrime'] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -379,8 +379,8 @@ export const gonogoRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    commissionRate: metric('commissionRate', 'No-Go 误按率', 'response_inhibition', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
-    dPrime: metric('dPrime', '信号检测敏感度 d′', 'response_inhibition', 'd-prime', 'higher_is_better', 'primary', { referenceEligible: true }),
+    commissionRate: metric('commissionRate', 'No-Go 误按率', 'response_inhibition', 'ratio', 'lower_is_better', 'primary'),
+    dPrime: metric('dPrime', '信号检测敏感度 d′', 'response_inhibition', 'd-prime', 'higher_is_better', 'primary'),
     goMedianRtMs: metric('goMedianRtMs', 'Go 正确反应中位RT', 'response_inhibition', 'ms', 'descriptive', 'secondary'),
     hitRate: metric('hitRate', 'Go 命中率', 'response_inhibition', 'ratio', 'higher_is_better', 'secondary'),
     omissionRate: metric('omissionRate', 'Go 遗漏率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
@@ -411,6 +411,7 @@ export const gonogoRegistryMeta = {
 export const cptRegistryMeta = {
   name: '连续执行任务 CPT-X',
   category: 'sustained_attention',
+  referenceEligibleMetricKeys: ['dPrime', 'omissionRate', 'commissionRate', 'rtICV'] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -435,10 +436,10 @@ export const cptRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    dPrime: metric('dPrime', '目标辨别 d′', 'sustained_attention', 'd-prime', 'higher_is_better', 'primary', { referenceEligible: true }),
-    omissionRate: metric('omissionRate', '目标遗漏率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
-    commissionRate: metric('commissionRate', '非目标误报率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
-    rtICV: metric('rtICV', '命中RT变异系数', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
+    dPrime: metric('dPrime', '目标辨别 d′', 'sustained_attention', 'd-prime', 'higher_is_better', 'primary'),
+    omissionRate: metric('omissionRate', '目标遗漏率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
+    commissionRate: metric('commissionRate', '非目标误报率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
+    rtICV: metric('rtICV', '命中RT变异系数', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
     hitMedianRtMs: metric('hitMedianRtMs', '目标命中中位RT', 'sustained_attention', 'ms', 'descriptive', 'secondary'),
     hitRtSdMs: metric('hitRtSdMs', '目标RT标准差', 'sustained_attention', 'ms', 'lower_is_better', 'secondary'),
     blockSlopeRt: metric('blockSlopeRt', '跨 block RT 斜率', 'sustained_attention', 'ms', 'descriptive', 'research_only', { availableProfiles: ['research'] }),
@@ -470,6 +471,7 @@ export const cptRegistryMeta = {
 export const nbackRegistryMeta = {
   name: 'N-Back 工作记忆更新',
   category: 'working_memory_updating',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -494,8 +496,8 @@ export const nbackRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    dPrimeByN: metric('dPrimeByN', '各 N 水平 d′', 'working_memory_updating', 'map', 'higher_is_better', 'primary', { referenceEligible: false }),
-    maxReliableN: metric('maxReliableN', '达到质量门槛的最高 N', 'working_memory_updating', 'level', 'higher_is_better', 'primary', { referenceEligible: false }),
+    dPrimeByN: metric('dPrimeByN', '各 N 水平 d′', 'working_memory_updating', 'map', 'higher_is_better', 'primary'),
+    maxReliableN: metric('maxReliableN', '达到质量门槛的最高 N', 'working_memory_updating', 'level', 'higher_is_better', 'primary'),
     hitRateByN: metric('hitRateByN', '各 N 命中率', 'working_memory_updating', 'map', 'higher_is_better', 'secondary'),
     falseAlarmRateByN: metric('falseAlarmRateByN', '各 N 误报率', 'working_memory_updating', 'map', 'lower_is_better', 'secondary'),
     medianRtByN: metric('medianRtByN', '各 N 正确反应中位RT', 'working_memory_updating', 'map', 'descriptive', 'secondary'),
@@ -524,6 +526,7 @@ export const nbackRegistryMeta = {
 export const corsiRegistryMeta = {
   name: 'Corsi 视空间广度',
   category: 'visuospatial_memory',
+  referenceEligibleMetricKeys: ['maxSpan'] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -548,8 +551,8 @@ export const corsiRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    maxSpan: metric('maxSpan', '最大空间广度', 'visuospatial_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: true }),
-    totalCorrectTrials: metric('totalCorrectTrials', '总正确试次', 'visuospatial_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: false }),
+    maxSpan: metric('maxSpan', '最大空间广度', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
+    totalCorrectTrials: metric('totalCorrectTrials', '总正确试次', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
     firstTryPassCount: metric('firstTryPassCount', '首次通过级数', 'visuospatial_memory', 'count', 'higher_is_better', 'secondary'),
     medianResponseDurationMs: metric('medianResponseDurationMs', '中位复现时长', 'visuospatial_memory', 'ms', 'descriptive', 'secondary'),
     sequenceErrorDistance: metric('sequenceErrorDistance', '序列位置错误距离', 'visuospatial_memory', 'score', 'lower_is_better', 'research_only', { availableProfiles: ['research'] }),
@@ -577,6 +580,7 @@ export const corsiRegistryMeta = {
 export const sstRegistryMeta = {
   name: '停止信号任务 SST',
   category: 'response_inhibition',
+  referenceEligibleMetricKeys: ['ssrtMs'] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -601,8 +605,8 @@ export const sstRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    ssrtMs: metric('ssrtMs', '停止信号反应时 SSRT', 'response_inhibition', 'ms', 'lower_is_better', 'primary', { referenceEligible: true }),
-    pRespondStop: metric('pRespondStop', 'Stop trial 响应概率', 'response_inhibition', 'ratio', 'target_range', 'primary', { referenceEligible: false }),
+    ssrtMs: metric('ssrtMs', '停止信号反应时 SSRT', 'response_inhibition', 'ms', 'lower_is_better', 'primary'),
+    pRespondStop: metric('pRespondStop', 'Stop trial 响应概率', 'response_inhibition', 'ratio', 'target_range', 'primary'),
     goMedianRtMs: metric('goMedianRtMs', 'Go 中位RT', 'response_inhibition', 'ms', 'descriptive', 'secondary'),
     goOmissionRate: metric('goOmissionRate', 'Go 遗漏率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
     goChoiceErrorRate: metric('goChoiceErrorRate', 'Go 选择错误率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
@@ -633,6 +637,7 @@ export const sstRegistryMeta = {
 export const taskswitchRegistryMeta = {
   name: '任务转换 Task Switching',
   category: 'cognitive_flexibility',
+  referenceEligibleMetricKeys: ['switchCostRtMs', 'switchCostAccuracy'] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -657,8 +662,8 @@ export const taskswitchRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    switchCostRtMs: metric('switchCostRtMs', 'RT 转换代价', 'cognitive_flexibility', 'ms', 'lower_is_better', 'primary', { referenceEligible: true }),
-    switchCostAccuracy: metric('switchCostAccuracy', '准确率转换代价', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
+    switchCostRtMs: metric('switchCostRtMs', 'RT 转换代价', 'cognitive_flexibility', 'ms', 'lower_is_better', 'primary'),
+    switchCostAccuracy: metric('switchCostAccuracy', '准确率转换代价', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary'),
     medianRtSwitch: metric('medianRtSwitch', 'Switch 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
     medianRtRepeat: metric('medianRtRepeat', 'Repeat 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
     accuracySwitch: metric('accuracySwitch', 'Switch 准确率', 'cognitive_flexibility', 'ratio', 'higher_is_better', 'secondary'),
@@ -688,6 +693,7 @@ export const taskswitchRegistryMeta = {
 export const patterncompareRegistryMeta = {
   name: '图形模式比较',
   category: 'processing_speed',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -743,6 +749,7 @@ export const patterncompareRegistryMeta = {
 export const flankerRegistryMeta = {
   name: 'Flanker 箭头干扰',
   category: 'interference_control',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -801,6 +808,7 @@ export const flankerRegistryMeta = {
 export const cardsortRegistryMeta = {
   name: '规则卡片分类',
   category: 'cognitive_flexibility',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -862,6 +870,7 @@ export const cardsortRegistryMeta = {
 export const digitbackwardRegistryMeta = {
   name: '数字倒背',
   category: 'working_memory',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -899,6 +908,7 @@ export const digitbackwardRegistryMeta = {
 export const picturesequenceRegistryMeta = {
   name: '图片序列学习',
   category: 'episodic_learning_memory',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -939,6 +949,7 @@ export const picturesequenceRegistryMeta = {
 export const pairedassociateRegistryMeta = {
   name: '图形—位置配对学习',
   category: 'episodic_learning_memory',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'seq-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -975,7 +986,7 @@ export const pairedassociateRegistryMeta = {
 }
 
 export const matrixRegistryMeta = {
-  name: '矩阵规则推理', category: 'fluid_reasoning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  name: '矩阵规则推理', category: 'fluid_reasoning', referenceEligibleMetricKeys: [] as const, randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: { profile: 'experience' as const, estimatedMinutes: [3, 5], configPatch: { itemCount: 6 }, reportCaveats: ['体验档题目较少，不进入综合分析。'] },
     standard: { profile: 'standard' as const, estimatedMinutes: [8, 12], configPatch: { itemCount: 16 }, reportCaveats: ['内部生成题库，只描述本次规则归纳表现。'] },
@@ -1002,7 +1013,7 @@ export const matrixRegistryMeta = {
 }
 
 export const mentalrotationRegistryMeta = {
-  name: '心理旋转', category: 'visuospatial_reasoning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  name: '心理旋转', category: 'visuospatial_reasoning', referenceEligibleMetricKeys: [] as const, randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: { profile: 'experience' as const, estimatedMinutes: [2, 4], configPatch: { totalTrials: 12 }, reportCaveats: ['体验档角度条件较少，不进入综合分析。'] },
     standard: { profile: 'standard' as const, estimatedMinutes: [6, 9], configPatch: { totalTrials: 40 }, reportCaveats: ['角度、镜像和图形族平衡；不代表完整空间能力。'] },
@@ -1031,7 +1042,7 @@ export const mentalrotationRegistryMeta = {
 }
 
 export const towerRegistryMeta = {
-  name: '塔式规划', category: 'planning', randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
+  name: '塔式规划', category: 'planning', referenceEligibleMetricKeys: [] as const, randomizationAlgorithmVersion: 'seq-v1.0.0', profileDefinitionVersion: '1.0.0',
   profiles: {
     experience: { profile: 'experience' as const, estimatedMinutes: [3, 5], configPatch: { problemCount: 4 }, reportCaveats: ['体验档仅含低、中难度问题，不进入综合分析。'] },
     standard: { profile: 'standard' as const, estimatedMinutes: [8, 13], configPatch: { problemCount: 10 }, reportCaveats: ['报告解题、最短路径效率与规则违反，不形成计划能力等级。'] },
@@ -1061,6 +1072,7 @@ export const towerRegistryMeta = {
 export const trailmakingRegistryMeta = {
   name: 'Trail Making 视觉搜索',
   category: 'visual_search_set_shifting',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'trailmaking-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -1120,6 +1132,7 @@ export const trailmakingRegistryMeta = {
 export const reversallearningRegistryMeta = {
   name: '概率反转学习',
   category: 'decision_learning',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'reversallearning-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -1182,6 +1195,7 @@ export const reversallearningRegistryMeta = {
 export const bartRegistryMeta = {
   name: 'BART 泵压任务',
   category: 'risk_taking',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'bart-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -1240,6 +1254,7 @@ export const bartRegistryMeta = {
 export const wordlistRegistryMeta = {
   name: '中文词表自由回忆',
   category: 'language_learning',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'wordlist-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -1299,6 +1314,7 @@ export const wordlistRegistryMeta = {
 export const lexicaldecisionRegistryMeta = {
   name: '中文词汇判断',
   category: 'language_decision',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'lexicaldecision-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {
@@ -1358,6 +1374,7 @@ export const lexicaldecisionRegistryMeta = {
 export const emotionrecognitionRegistryMeta = {
   name: '六类情绪面孔分类',
   category: 'emotion_classification',
+  referenceEligibleMetricKeys: [] as const,
   randomizationAlgorithmVersion: 'emotionrecognition-sequence-v1.0.0',
   profileDefinitionVersion: '1.0.0',
   profiles: {

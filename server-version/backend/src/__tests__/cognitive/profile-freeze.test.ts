@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
+import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { freezeAssignmentProfile, hashResolvedConfig, mergeProfileConfig, readFrozenReport } from '../../modules/cognitive/profile-freeze'
 import { listCognitiveTestsCatalog, getCognitiveTestCatalog } from '../../modules/cognitive/catalog.service'
 
@@ -35,6 +36,28 @@ describe('profile merge / freeze', () => {
     expect(frozen.resolvedReportSnapshotEncrypted).toEqual(expect.any(String))
     expect(readFrozenReport(frozen.resolvedReportSnapshotEncrypted)?.randomizationAlgorithmVersion)
       .toBe('reaction-foreperiod-v1.0.0')
+  })
+
+  it('keeps the frozen report metric shape compatible with historical snapshots', () => {
+    const frozen = freezeAssignmentProfile({ entry: reactionEntry(), baseConfig: reactionBase, profile: 'standard' })
+    const serialized = decryptCognitivePayload<Record<string, unknown>>(frozen.resolvedReportSnapshotEncrypted)
+    const metricDefinitions = serialized.metricDefinitions as Record<string, Record<string, unknown>>
+    expect(Object.values(metricDefinitions).every((metric) => (
+      !Object.prototype.hasOwnProperty.call(metric, 'referenceEligible')
+    ))).toBe(true)
+
+    const historicalMetricDefinitions = Object.fromEntries(Object.entries(metricDefinitions).map(([key, metric]) => [
+      key,
+      Object.fromEntries(Object.entries(metric).filter(([field]) => field !== 'referenceEligible')),
+    ]))
+    const historicalSnapshot = encryptCognitivePayload({
+      ...serialized,
+      metricDefinitions: historicalMetricDefinitions,
+    })
+    const readable = readFrozenReport(historicalSnapshot)
+    expect(readable?.profile).toBe('standard')
+    expect(readable?.metricDefinitionVersion).toBe('1.0.0')
+    expect(readable?.metricDefinitions.medianRtMs.label).toBe('中位反应时')
   })
 })
 

@@ -251,6 +251,35 @@ describe('Cognitive Assessment v2 contracts', () => {
     })
   })
 
+  it('requires exact measurement applicability on every Cognitive reference mapping', () => {
+    const base = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')
+    if (!base) throw new Error('reaction v1.1 definition missing')
+    const mapping = {
+      metricKey: 'medianRtMs',
+      referenceVersion: 'beta-v1',
+      referenceKind: 'normative_distribution' as const,
+      evidenceLevel: 'literature_beta' as const,
+      instrumentVersion: '1.0.0',
+      scoringVersion: '1.1.0',
+      direction: base.metrics.medianRtMs.direction,
+    }
+    const missingApplicability = validateTaskDefinition({ ...base, references: [mapping] })
+    expect(missingApplicability).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'references.medianRtMs.profiles' }),
+      expect.objectContaining({ path: 'references.medianRtMs.resolvedConfigHashes' }),
+    ]))
+
+    const exactApplicability = validateTaskDefinition({
+      ...base,
+      references: [{
+        ...mapping,
+        profiles: ['standard'],
+        resolvedConfigHashes: ['a'.repeat(64)],
+      }],
+    })
+    expect(exactApplicability.filter((candidate) => candidate.severity === 'error')).toEqual([])
+  })
+
   it('separates structural contract validation from publication status', () => {
     const draft = { ...definition(), publication: { ...definition().publication, status: 'DRAFT' as const } }
     expect(() => assertTaskContractValid(draft)).not.toThrow()

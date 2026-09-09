@@ -1,5 +1,9 @@
 import { computeProtocolSignature } from './canonical'
-import { listCognitiveV2TaskDefinitions } from './registry'
+import {
+  listCognitiveV2TaskDefinitions,
+  validateRegistryReferenceEligibility,
+} from './registry'
+import { listCognitiveRegistryEntries } from '../cognitive.registry'
 import { validateTaskDefinition, type PublicationIssue } from './publication-gate'
 import type { TaskDefinition } from './types'
 
@@ -28,14 +32,29 @@ const taskKey = (definition: TaskDefinition): string => (
   `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
 )
 
+const registryKey = (entry: { testType: string; engineVersion: string; scoringVersion: string }): string => (
+  `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+)
+
 export const auditCognitiveV2Registry = (
   definitions = listCognitiveV2TaskDefinitions(),
 ): CognitiveAuditReport => {
   const issues: PublicationIssue[] = []
   const seen = new Set<string>()
+  const registryEntries = listCognitiveRegistryEntries()
   const entries = definitions.map((definition) => {
     const key = taskKey(definition)
     const entryIssues = validateTaskDefinition(definition)
+    const registryEntry = registryEntries.find((candidate) => registryKey(candidate) === key)
+    if (!registryEntry) {
+      entryIssues.push({ path: `registry.${key}`, message: 'task definition is not backed by an exact RegistryEntry', severity: 'error' })
+    } else {
+      entryIssues.push(...validateRegistryReferenceEligibility(registryEntry).map((candidate) => ({
+        path: `registry.${key}.${candidate.path}`,
+        message: candidate.message,
+        severity: 'error' as const,
+      })))
+    }
     if (seen.has(key)) issues.push({ path: `registry.${key}`, message: 'duplicate task definition key', severity: 'error' })
     seen.add(key)
     const signature = computeProtocolSignature(definition.protocol)
@@ -63,6 +82,14 @@ export const auditCognitiveV2Registry = (
       issues: entryIssues,
     }
   })
+  const definitionKeys = new Set(definitions.map(taskKey))
+  if (registryEntries.length !== 28) {
+    issues.push({ path: 'registry', message: `expected 28 exact RegistryEntry identities (found ${registryEntries.length})`, severity: 'error' })
+  }
+  for (const registryEntry of registryEntries) {
+    const key = registryKey(registryEntry)
+    if (!definitionKeys.has(key)) issues.push({ path: `registry.${key}`, message: 'exact RegistryEntry is missing from the v2 audit', severity: 'error' })
+  }
   const publishedCount = entries.filter((entry) => entry.status === 'PUBLISHED').length
   const draftCount = entries.filter((entry) => entry.status === 'DRAFT').length
   const retiredCount = entries.filter((entry) => entry.status === 'RETIRED').length
