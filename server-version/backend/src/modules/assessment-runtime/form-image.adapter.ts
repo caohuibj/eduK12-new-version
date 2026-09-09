@@ -101,6 +101,10 @@ export const serveFrozenFormSectionImage = async (input: {
   const references = frozenFormSectionImageReferences(input.admission)
   const reference = findFrozenAssessmentAssetReference(references, input.assetId)
   if (!reference) throw new Error('Assessment image is not referenced by the frozen Form section')
-  await retainAssessmentAssetReferences({ owner: input.owner, references: [reference], db: input.db })
+  // The first authorized image read retains the entire immutable presentation
+  // set for this frozen section, not just the requested image. Published-owner
+  // references protect the pre-attempt window; this frozen owner then survives
+  // publication supersession for the historical attempt.
+  await retainAssessmentAssetReferences({ owner: input.owner, references, db: input.db })
   await serveAssessmentImageContent({ reference, res: input.res, db: input.db })
 }
