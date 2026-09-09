@@ -1,6 +1,6 @@
 # Scale Library Wave 0 报告审计
 
-> SL4 Wave 0 审计基线：`origin/main` `2ed9e4e5c3e0a14a39dcfa48e67ed1eb5edb5b6e`。
+> SL4 Wave 0 审计基线：PR #73 原始基线 `2ed9e4e5c3e0a14a39dcfa48e67ed1eb5edb5b6e`；本轮已以 merge commit `aa66aed518253f055de3a6a26c65c79edbd48ee4` 同步最新 `origin/main` `54a406fe77e4fd72f51de752fe93b8fd2031b5f3`。
 > 本文只记录现有代码事实与本 PR 的产品完整性门禁，不引入新的 scoring/runtime。
 
 ## 判定口径
@@ -29,6 +29,8 @@
 4. `ScaleResultV2` / `ScaleUnitReport` 已将 score、interpretation、caveat、disclaimer 与版本方法快照投影到 standalone、questionnaire、composite 报告；SL4 不改变 scoring、reference selection、FINAL submit 或历史冻结机制。
 5. `ScaleCatalogManifestV1`、`LocalizationManifestV1`、`InstrumentAuthorization`、L1/L2/L3 eligibility 与 pilot governance evaluator 已存在，但还没有 Wave 0 的 code-owned manifest 集合、Library read model、详情页面或治理 metadata 投影。
 6. 现有 `/scales` 是教师/管理员的量表 CRUD、发布、导出页面；现有 `/student/scales` 是已授权给学生的测评实例列表。两者都不是 Library discovery/detail surface。
+7. Wave 0 六个 manifest 当前不把官方来源、授权来源或论文引用伪装成 Scientific Evidence Matrix 记录：`evidence=[]`；WHO-5、SDQ、TEXI 等来源引用仍保留在 executable package `source` 与 localization provenance。Library evidence summary 在无记录时明确显示未录入本地验证证据，不作验证、常模或诊断声称。
+8. Library read model 在请求未显式提供 locale 时按每个 localization manifest 的 `targetLocale` 计算 availability；显式 `locale` 仍作为部署上下文参与 locale gate。这样 English source detail 直接加载不会被缺省 `zh-CN` 错误限制。
 
 ## SL4 产品完整性补齐项
 
