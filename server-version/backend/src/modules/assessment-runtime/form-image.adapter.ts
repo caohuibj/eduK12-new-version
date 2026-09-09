@@ -91,20 +91,35 @@ export const retainFormSectionImages = async (input: {
   db: input.db,
 })
 
+const frozenFormMediaOwnerFromAdmission = (admission: FrozenUnitAdmissionV1): AssessmentAssetRetentionOwner => {
+  const frozen = admission.formSection
+  const parent = admission.parent
+  if (!frozen || !parent) throw new Error('Frozen Form admission is missing its parent binding')
+  if (frozen.kind !== parent.kind) throw new Error('Frozen Form admission parent binding does not match its definition kind')
+  return frozenFormMediaOwner(
+    frozen.kind === 'questionnaire' ? 'QUESTIONNAIRE' : 'COMPOSITE',
+    parent.parentId,
+    frozen.id,
+  )
+}
+
+export const retainFrozenFormAdmissionImages = async (
+  admission: FrozenUnitAdmissionV1,
+  db: AssetDatabase = prisma,
+): Promise<void> => retainFormSectionImages({
+  owner: frozenFormMediaOwnerFromAdmission(admission),
+  references: frozenFormSectionImageReferences(admission),
+  db,
+})
+
 export const serveFrozenFormSectionImage = async (input: {
   admission: FrozenUnitAdmissionV1
   assetId: string
-  owner: AssessmentAssetRetentionOwner
   res: Response
   db?: AssetDatabase
 }): Promise<void> => {
   const references = frozenFormSectionImageReferences(input.admission)
   const reference = findFrozenAssessmentAssetReference(references, input.assetId)
   if (!reference) throw new Error('Assessment image is not referenced by the frozen Form section')
-  // The first authorized image read retains the entire immutable presentation
-  // set for this frozen section, not just the requested image. Published-owner
-  // references protect the pre-attempt window; this frozen owner then survives
-  // publication supersession for the historical attempt.
-  await retainAssessmentAssetReferences({ owner: input.owner, references, db: input.db })
   await serveAssessmentImageContent({ reference, res: input.res, db: input.db })
 }
