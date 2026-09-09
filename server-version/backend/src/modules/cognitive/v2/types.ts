@@ -128,6 +128,12 @@ export interface SessionConfigSnapshot<TConfig = unknown> {
   protocolSignature: string
 }
 
+/** Frozen assignment facts that determine whether a reference applies to a measurement. */
+export interface CognitiveMeasurementContext {
+  profile: CognitiveProfile | null
+  resolvedConfigHash: string | null
+}
+
 export interface QualityAssessment {
   state: QualityState
   flags: Record<string, boolean>
@@ -184,6 +190,10 @@ export interface ReferenceApplicability {
   instrumentVersion: string
   scoringVersion: string
   direction: MetricDirection
+  /** Exact approved measurement profiles; omitted/empty is not a wildcard. */
+  profiles?: CognitiveProfile[]
+  /** Exact resolved config hashes for the approved measurement protocol; omitted/empty is not a wildcard. */
+  resolvedConfigHashes?: string[]
   /** Context fields needed by the selected population. */
   requiredContext?: Array<'age' | 'sexAtBirth' | 'gradeLevel' | 'primaryLanguage' | 'countryOrRegion'>
 }

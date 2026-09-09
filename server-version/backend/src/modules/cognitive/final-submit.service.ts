@@ -220,6 +220,7 @@ const prepareFinalCognitiveData = async (
     )
   }
 
+  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, session.assignmentId))
   const references = scored.quality.state === 'invalid'
     ? []
     : await measureRequestPhase('final_submit_db_query', () => loadCognitiveReferenceSets(prisma as any, session.testType))
@@ -231,8 +232,8 @@ const prepareFinalCognitiveData = async (
         references,
         context: contextState.context,
         quality: scored.quality,
+        measurement: freeze,
       })
-  const freeze = await measureRequestPhase('final_submit_db_query', () => loadFrozenMeasurementContext(prisma, session.assignmentId))
   const report = projectThreeLayerReport({
     testType: session.testType,
     configVersion: session.configVersion,

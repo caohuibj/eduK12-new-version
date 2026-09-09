@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { computeConfigSnapshotHash, computeProtocolSignature, assertProtocolSignature } from './canonical'
 import type { ProtocolDefinition, SessionConfigSnapshot, TaskDefinition } from './types'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from '../../assessment-runtime/canonical'
-import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
+import type { CompiledInstrumentRuntimeV1, JsonObject, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
 import { parseCompiledInstrumentRuntime } from '../../assessment-runtime/compiler'
 import {
   CognitiveFinalSubmissionConfigError,
@@ -46,10 +46,29 @@ export const sessionConfigSnapshotSchema = z.object({
     scoreKey: z.string().min(1).optional(),
     referenceKind: z.string().min(1).optional(),
     profileKey: z.string().min(1).optional(),
+    applicability: z.record(z.unknown()).optional(),
   }).strict()).optional(),
   protocol: protocolDefinitionSchema,
   protocolSignature: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
+
+const freezeReferenceApplicability = <TConfig, TTrial>(
+  definition: TaskDefinition<TConfig, TTrial>,
+  bindings: ReferenceBindingSnapshot[],
+): ReferenceBindingSnapshot[] => bindings.map((binding) => {
+  const mapping = definition.references.find((candidate) => (
+    candidate.referenceVersion === binding.referenceVersion
+    && candidate.metricKey === binding.scoreKey
+    && candidate.referenceKind === binding.referenceKind
+  ))
+  if (!mapping) {
+    throw new Error(`Cognitive reference binding ${binding.referenceVersion}/${binding.scoreKey ?? 'unknown'} has no exact applicability mapping`)
+  }
+  return {
+    ...binding,
+    applicability: mapping as unknown as JsonObject,
+  }
+})
 
 export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   definition: TaskDefinition<TConfig, TTrial>
@@ -90,7 +109,7 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
       hashScheme: CANONICAL_JSON_SHA256_V1,
       runtimeGeneration: input.runtime.runtimeGeneration,
       compiledRuntime: input.runtime.compiledRuntime,
-      referenceBindings: input.runtime.referenceBindings ?? [],
+      referenceBindings: freezeReferenceApplicability(input.definition, input.runtime.referenceBindings ?? []),
     } : {}),
     protocol: input.definition.protocol,
     protocolSignature: computeProtocolSignature(input.definition.protocol),

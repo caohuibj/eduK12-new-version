@@ -99,6 +99,8 @@ export interface RegistryEntry<TConfig, TTrial> {
   profiles: Record<CognitiveProfile, CognitiveProfileDefinition>
   metricDefinitionVersion: string
   metricDefinitions: Record<string, MetricDefinition>
+  /** Exact reference-governance allowlist; omitted eligibility is impossible and empty is fail-closed. */
+  referenceEligibleMetricKeys: readonly string[]
   qualityDefinitionVersion: string
   qualityDefinitions: Record<string, QualityDefinition>
   reportDefinitionVersion: string

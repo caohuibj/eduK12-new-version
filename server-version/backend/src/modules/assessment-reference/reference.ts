@@ -216,6 +216,9 @@ export const validateReferenceSetDefinition = (
     if (candidate.referenceKind === 'normative_distribution' && statistics && (!Array.isArray(statistics.percentileTable) || statistics.percentileTable.length === 0) && (statistics.mean === undefined || statistics.sd === undefined)) {
       issues.push({ path: `${path}.statistics`, message: 'normative reference 必须提供 mean + SD 或 percentile table', severity: 'error' })
     }
+    if (candidate.referenceKind === 'descriptive_sample' && statistics && statistics.mean === undefined) {
+      issues.push({ path: `${path}.statistics.mean`, message: 'descriptive reference 必须提供 mean 以计算 meanDifference', severity: 'error' })
+    }
     if (statistics?.mean !== undefined && !Number.isFinite(statistics.mean)) issues.push({ path: `${path}.statistics.mean`, message: 'mean 必须是有限数字', severity: 'error' })
     if (statistics?.sd !== undefined && (!(statistics.sd > 0) || !Number.isFinite(statistics.sd))) issues.push({ path: `${path}.statistics.sd`, message: 'SD 必须是正数', severity: 'error' })
     if (statistics?.percentileInterpolation !== undefined && statistics.percentileInterpolation !== 'none' && statistics.percentileInterpolation !== 'linear') issues.push({ path: `${path}.statistics.percentileInterpolation`, message: 'percentileInterpolation 只能是 none 或 linear', severity: 'error' })
@@ -310,7 +313,7 @@ export interface ResolvedScaleReference {
   referenceKind: ReferenceKind
   evidenceLevel: Exclude<ReferenceEvidenceLevel, 'none'> | null
   status: 'available' | 'unavailable'
-  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data' | 'quality_limited'
+  unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data' | 'quality_limited' | 'measurement_mismatch'
   label: string
   value: number | null
   mean: number | null

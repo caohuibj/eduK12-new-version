@@ -14,6 +14,7 @@ import {
   validateTaskDefinition,
   type TaskDefinition,
 } from '../../modules/cognitive/v2'
+import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
 
 const protocol = {
   schemaVersion: 1 as const,
@@ -197,6 +198,86 @@ describe('Cognitive Assessment v2 contracts', () => {
     task.report = { ...task.report, userMetrics: ['unknown'] }
     const issues = validateTaskDefinition(task)
     expect(issues.some((candidate) => candidate.path === 'report.unknown')).toBe(true)
+  })
+
+  it('keeps explicit eligibility independent from report role and rejects unsafe eligible metrics', () => {
+    const task = definition()
+    expect(validateTaskDefinition(task).filter((candidate) => candidate.severity === 'error')).toEqual([])
+    expect(task.metrics.accuracy.referenceEligible).toBe(false)
+
+    const objectEligible = {
+      ...task,
+      metrics: {
+        ...task.metrics,
+        detailAccuracy: { ...task.metrics.detailAccuracy, valueType: 'object' as const, referenceEligible: true },
+      },
+    }
+    expect(validateTaskDefinition(objectEligible).some((candidate) => (
+      candidate.path === 'metrics.detailAccuracy.valueType'
+    ))).toBe(true)
+
+    const qualityEligible = {
+      ...task,
+      metrics: {
+        ...task.metrics,
+        detailAccuracy: { ...task.metrics.detailAccuracy, role: 'quality' as const, referenceEligible: true },
+      },
+    }
+    expect(validateTaskDefinition(qualityEligible).some((candidate) => (
+      candidate.path === 'metrics.detailAccuracy.role'
+    ))).toBe(true)
+
+    const researchOnlyEligible = {
+      ...task,
+      metrics: {
+        ...task.metrics,
+        detailAccuracy: { ...task.metrics.detailAccuracy, role: 'research_only' as const, referenceEligible: true },
+      },
+    }
+    expect(validateTaskDefinition(researchOnlyEligible).some((candidate) => (
+      candidate.path === 'metrics.detailAccuracy.role'
+    ))).toBe(true)
+  })
+
+  it('passes the explicit registry eligibility field through without deriving it from primary/report status', () => {
+    expect(getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')?.metrics).toMatchObject({
+      medianRtMs: { referenceEligible: true },
+      rtICV: { referenceEligible: true },
+      missRate: { referenceEligible: false },
+    })
+    expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics).toMatchObject({
+      dPrimeByN: { referenceEligible: false, valueType: 'object' },
+      maxReliableN: { referenceEligible: false, valueType: 'integer' },
+    })
+  })
+
+  it('requires exact measurement applicability on every Cognitive reference mapping', () => {
+    const base = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')
+    if (!base) throw new Error('reaction v1.1 definition missing')
+    const mapping = {
+      metricKey: 'medianRtMs',
+      referenceVersion: 'beta-v1',
+      referenceKind: 'normative_distribution' as const,
+      evidenceLevel: 'literature_beta' as const,
+      instrumentVersion: '1.0.0',
+      scoringVersion: '1.1.0',
+      direction: base.metrics.medianRtMs.direction,
+    }
+    const missingApplicability = validateTaskDefinition({ ...base, references: [mapping] })
+    expect(missingApplicability).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'references.medianRtMs.profiles' }),
+      expect.objectContaining({ path: 'references.medianRtMs.resolvedConfigHashes' }),
+    ]))
+
+    const exactApplicability = validateTaskDefinition({
+      ...base,
+      references: [{
+        ...mapping,
+        profiles: ['standard'],
+        resolvedConfigHashes: ['a'.repeat(64)],
+      }],
+    })
+    expect(exactApplicability.filter((candidate) => candidate.severity === 'error')).toEqual([])
   })
 
   it('separates structural contract validation from publication status', () => {

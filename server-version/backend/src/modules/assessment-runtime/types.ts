@@ -72,4 +72,6 @@ export interface ReferenceBindingSnapshot {
   scoreKey?: string
   referenceKind?: string
   profileKey?: string
+  /** Exact Cognitive applicability semantics used by this attempt; absent for legacy/non-Cognitive bindings. */
+  applicability?: JsonObject
 }

@@ -15,6 +15,8 @@ const issue = (path: string, message: string, severity: PublicationIssue['severi
 
 const validVisibility = new Set(['headline', 'user', 'detail', 'research_only', 'hidden'])
 const validDirections = new Set(['higher_is_better', 'lower_is_better', 'target_range', 'descriptive', 'signed'])
+const validReferenceValueTypes = new Set(['number', 'integer'])
+const validProfiles = new Set(['experience', 'standard', 'research'])
 
 export const validateTaskDefinition = <TConfig, TTrial>(
   definition: TaskDefinition<TConfig, TTrial>,
@@ -55,6 +57,13 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (!metric.label || !metric.category || !metric.construct || !metric.description) issues.push(issue(`metrics.${key}`, 'metric label/category/construct/description are required'))
     if (!validVisibility.has(metric.visibility)) issues.push(issue(`metrics.${key}.visibility`, 'metric visibility is invalid'))
     if (!validDirections.has(metric.direction)) issues.push(issue(`metrics.${key}.direction`, 'metric direction is invalid'))
+    if (typeof metric.referenceEligible !== 'boolean') issues.push(issue(`metrics.${key}.referenceEligible`, 'referenceEligible must be an explicit boolean'))
+    if (metric.referenceEligible && !validReferenceValueTypes.has(metric.valueType)) {
+      issues.push(issue(`metrics.${key}.valueType`, 'reference-eligible metric must expose a scalar number or integer valueType'))
+    }
+    if (metric.referenceEligible && (metric.role === 'quality' || metric.role === 'research_only')) {
+      issues.push(issue(`metrics.${key}.role`, 'quality or research_only metric cannot be reference eligible'))
+    }
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
     for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
@@ -90,11 +99,34 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (!metricKeys.has(key)) issues.push(issue(`report.${key}`, 'report references an unknown metric'))
   }
   for (const mapping of definition.references) {
-    if (!metricKeys.has(mapping.metricKey)) issues.push(issue(`references.${mapping.metricKey}`, 'reference mapping references an unknown metric'))
-    if (!definition.metrics[mapping.metricKey]?.referenceEligible) issues.push(issue(`references.${mapping.metricKey}`, 'reference mapping requires a reference-eligible metric'))
-    if (mapping.instrumentVersion !== definition.engineVersion) issues.push(issue(`references.${mapping.metricKey}.instrumentVersion`, 'reference instrumentVersion must match the task engineVersion'))
-    if (mapping.scoringVersion !== definition.scoringVersion) issues.push(issue(`references.${mapping.metricKey}.scoringVersion`, 'reference scoringVersion must match the task scoringVersion'))
-    if (mapping.direction !== definition.metrics[mapping.metricKey]?.direction) issues.push(issue(`references.${mapping.metricKey}.direction`, 'reference direction must match the metric direction'))
+    const path = `references.${mapping.metricKey}`
+    if (!metricKeys.has(mapping.metricKey)) issues.push(issue(path, 'reference mapping references an unknown metric'))
+    if (!definition.metrics[mapping.metricKey]?.referenceEligible) issues.push(issue(path, 'reference mapping requires a reference-eligible metric'))
+    if (mapping.instrumentVersion !== definition.engineVersion) issues.push(issue(`${path}.instrumentVersion`, 'reference instrumentVersion must match the task engineVersion'))
+    if (mapping.scoringVersion !== definition.scoringVersion) issues.push(issue(`${path}.scoringVersion`, 'reference scoringVersion must match the task scoringVersion'))
+    if (mapping.direction !== definition.metrics[mapping.metricKey]?.direction) issues.push(issue(`${path}.direction`, 'reference direction must match the metric direction'))
+
+    if (!Array.isArray(mapping.profiles) || mapping.profiles.length === 0) {
+      issues.push(issue(`${path}.profiles`, 'reference mapping must declare at least one exact profile; omission is not a wildcard'))
+    } else {
+      const profiles = new Set<string>()
+      mapping.profiles.forEach((profile, index) => {
+        if (!validProfiles.has(profile)) issues.push(issue(`${path}.profiles.${index}`, 'reference profile is invalid'))
+        if (profiles.has(profile)) issues.push(issue(`${path}.profiles.${index}`, `duplicate reference profile: ${profile}`))
+        profiles.add(profile)
+      })
+    }
+
+    if (!Array.isArray(mapping.resolvedConfigHashes) || mapping.resolvedConfigHashes.length === 0) {
+      issues.push(issue(`${path}.resolvedConfigHashes`, 'reference mapping must declare at least one exact resolvedConfigHash; omission is not a wildcard'))
+    } else {
+      const hashes = new Set<string>()
+      mapping.resolvedConfigHashes.forEach((hash, index) => {
+        if (!/^[0-9a-f]{64}$/.test(hash)) issues.push(issue(`${path}.resolvedConfigHashes.${index}`, 'resolvedConfigHash must be a lowercase SHA-256 digest'))
+        if (hashes.has(hash)) issues.push(issue(`${path}.resolvedConfigHashes.${index}`, `duplicate resolvedConfigHash: ${hash}`))
+        hashes.add(hash)
+      })
+    }
   }
   if (definition.publication.status === 'PUBLISHED' && definition.publication.referenceRequired && definition.references.length === 0) {
     issues.push(issue('references', 'published task requires at least one reference mapping'))
