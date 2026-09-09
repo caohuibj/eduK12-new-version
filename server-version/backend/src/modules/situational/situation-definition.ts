@@ -3,6 +3,40 @@ import { z } from 'zod'
 
 export type SituationalResponseValue = string | number
 
+/**
+ * PR-E keeps visual stimulus deliberately small and static.  These are the
+ * only raster types a Situational definition may publish; the StoredAsset
+ * record remains the source of bytes, authorization, and storage metadata.
+ */
+export const SITUATIONAL_STATIC_IMAGE_MIME_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+] as const
+
+export const situationalStaticImageMimeTypeSchema = z.enum(SITUATIONAL_STATIC_IMAGE_MIME_TYPES)
+export type SituationalStaticImageMimeType = z.infer<typeof situationalStaticImageMimeTypeSchema>
+
+const nonBlankTextSchema = z.string().min(1).refine((value) => value.trim().length > 0, {
+  message: '文本不能为空白',
+})
+
+/**
+ * A definition stores only the stable StoredAsset identity.  Delivery URLs,
+ * signatures, object keys, and external URLs are intentionally not part of a
+ * scientific/runtime definition or its hash.
+ */
+export const situationalStoredAssetIdentitySchema = z.object({
+  assetId: z.string().min(1).max(200).refine((value) => (
+    !/^https?:\/\//iu.test(value)
+    && !/^data:/iu.test(value)
+    && !value.includes('/')
+  ), { message: '视觉资产必须引用项目内 StoredAsset，不能使用外部 URL 或对象路径' }),
+  contentHash: z.string().regex(/^[0-9a-f]{64}$/u, '视觉资产必须提供 sha256 contentHash'),
+  mimeType: situationalStaticImageMimeTypeSchema,
+}).strict()
+export type SituationalStoredAssetIdentity = z.infer<typeof situationalStoredAssetIdentitySchema>
+
 export const situationalDirectionSchema = z.enum([
   'higher_is_better',
   'higher_is_worse',
@@ -48,13 +82,37 @@ export type SituationalResponseType = z.infer<typeof situationalResponseTypeSche
 
 /**
  * Stimulus presentation is deliberately separated from the response model and
- * scoring: Image / Comic / Video land later as additional stimulus variants
- * without touching scoring or the response contract.
+ * scoring.  IMAGE is one immutable StoredAsset; COMIC is an ordered list of
+ * immutable panel assets.  Neither introduces a response or scoring surface.
  */
 export const situationalStimulusSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('TEXT_V1'), text: z.string().min(1) }),
+  z.object({ type: z.literal('TEXT_V1'), text: nonBlankTextSchema }),
+  z.object({
+    type: z.literal('IMAGE'),
+    asset: situationalStoredAssetIdentitySchema,
+    altText: nonBlankTextSchema,
+    caption: nonBlankTextSchema.optional(),
+  }).strict(),
+  z.object({
+    type: z.literal('COMIC'),
+    panels: z.array(z.object({
+      assetRef: situationalStoredAssetIdentitySchema,
+      altText: nonBlankTextSchema,
+      caption: nonBlankTextSchema.optional(),
+    }).strict()).min(1),
+  }).strict(),
 ])
 export type SituationalStimulus = z.infer<typeof situationalStimulusSchema>
+
+export const situationalAssetReferences = (stimulus: SituationalStimulus): SituationalStoredAssetIdentity[] => {
+  if (stimulus.type === 'TEXT_V1') return []
+  if (stimulus.type === 'IMAGE') return [stimulus.asset]
+  return stimulus.panels.map((panel) => panel.assetRef)
+}
+
+export const situationDefinitionAssetReferences = (definition: SituationDefinitionV1): SituationalStoredAssetIdentity[] => (
+  definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
+)
 
 const choiceOptionSchema = z.object({
   optionKey: situationalOpaqueKeySchema,
