@@ -13,8 +13,8 @@ import {
 } from '../assessment-media/assessment-image-delivery'
 import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
 import {
-  situationDefinitionAssetReferences,
-  type SituationDefinitionV1,
+  situationalAssetReferences,
+  type SituationalSceneDefinition,
   type SituationalStoredAssetIdentity,
 } from './situation-definition'
 
@@ -30,8 +30,12 @@ export interface SituationalAssetValidation {
   references: SituationalStoredAssetIdentity[]
 }
 
-const referencePaths = (definition: SituationDefinitionV1): SituationalStoredAssetIdentity[] => (
-  situationDefinitionAssetReferences(definition)
+type SituationAssetReferenceSource = {
+  scenes: ReadonlyArray<Pick<SituationalSceneDefinition, 'stimulus'>>
+}
+
+const referencePaths = (definition: SituationAssetReferenceSource): SituationalStoredAssetIdentity[] => (
+  definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
 )
 
 /**
@@ -39,7 +43,7 @@ const referencePaths = (definition: SituationDefinitionV1): SituationalStoredAss
  * contract. StoredAsset catalog validation is shared by Assessment media.
  */
 export const validateSituationalAssetReferences = async (
-  definition: SituationDefinitionV1,
+  definition: SituationAssetReferenceSource,
   db: AssetDatabase = prisma,
 ): Promise<SituationalAssetValidation> => {
   const references = referencePaths(definition)
@@ -55,7 +59,7 @@ export const validateSituationalAssetReferences = async (
 }
 
 export const assertSituationalAssetReferencesReady = async (
-  definition: SituationDefinitionV1,
+  definition: SituationAssetReferenceSource,
   db: AssetDatabase = prisma,
 ): Promise<void> => {
   const validation = await validateSituationalAssetReferences(definition, db)
@@ -69,7 +73,7 @@ const findFrozenAssetReference = (
   assetId: string,
 ): SituationalStoredAssetIdentity | undefined => (
   findFrozenAssessmentAssetReference(
-    situationDefinitionAssetReferences(snapshot.definition),
+    referencePaths(snapshot.definition),
     assetId,
   ) as SituationalStoredAssetIdentity | undefined
 )

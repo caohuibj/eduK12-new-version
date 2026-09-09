@@ -26,12 +26,22 @@ import {
   SITUATIONAL_RAW_PAYLOAD_SCHEMA_VERSION,
 } from './situational-raw-submission'
 import {
-  missingRequiredSituationalResponseKeys,
   scoreSituational,
   SituationalResponseValidationError,
   validateSituationalResponse,
   type SituationalResponse,
 } from './situation-scoring'
+import {
+  asLinearSituationDefinition,
+  isBranchingSituationDefinition,
+  type SituationRuntimeDefinition,
+} from './situation-runtime-definition'
+import {
+  deriveAuthoritativeSituationalTrajectory,
+  projectReachableSituationDefinitionForScoring,
+  reachableSituationalResponseKeys,
+  type AuthoritativeSituationalTrajectory,
+} from './situation-trajectory'
 import {
   loadSituationalAttemptRuntime,
   assertSituationalAttemptOwner,
@@ -59,11 +69,11 @@ const normalizedResponse = (response: SituationalResponse): SituationalResponse 
   ...(response.answeredAt === undefined ? {} : { answeredAt: response.answeredAt }),
 })
 
-/** Validate each untrusted response once, reject omissions, then order once. */
-export const normalizeSituationalResponses = (
-  definition: Parameters<typeof scoreSituational>[0],
+const normalizeSituationalSubmission = (
+  definition: SituationRuntimeDefinition,
   input: SituationalResponse[],
-): SituationalResponse[] => {
+): { responses: SituationalResponse[]; trajectory: AuthoritativeSituationalTrajectory } => {
+  const scientificDefinition = asLinearSituationDefinition(definition)
   const byPair = new Map<string, SituationalResponse>()
   input.forEach((candidate, index) => {
     const pairKey = `${candidate.sceneKey}:${candidate.channelKey}`
@@ -75,7 +85,7 @@ export const normalizeSituationalResponses = (
       )
     }
     try {
-      validateSituationalResponse(definition, candidate)
+      validateSituationalResponse(scientificDefinition, candidate)
     } catch (error) {
       if (error instanceof SituationalResponseValidationError) {
         const issue = error.issues[0]
@@ -89,22 +99,53 @@ export const normalizeSituationalResponses = (
     }
     byPair.set(pairKey, normalizedResponse(candidate))
   })
-  const missing = missingRequiredSituationalResponseKeys(definition, input)
-  if (missing.length > 0) {
+
+  const trajectory = deriveAuthoritativeSituationalTrajectory(definition, [...byPair.values()])
+  if (isBranchingSituationDefinition(definition) && !trajectory.reachedTerminal) {
     throw new InstrumentFinalSubmitError(
       'SUBMISSION_PAYLOAD_CONFLICT',
-      `还有 ${missing.length} 个场景通道未作答`,
+      '当前分支尚未到达结束节点',
       409,
     )
   }
-  return definition.scenes
-    .slice()
-    .sort((left, right) => left.sortOrder - right.sortOrder)
-    .flatMap((scene) => scene.channels.flatMap((channel) => {
+
+  const reachableKeys = reachableSituationalResponseKeys(definition, trajectory)
+  const reachableSet = new Set(reachableKeys)
+  const offPath = [...byPair.keys()].filter((pairKey) => !reachableSet.has(pairKey))
+  if (offPath.length > 0) {
+    throw new InstrumentFinalSubmitError(
+      'SUBMISSION_PAYLOAD_CONFLICT',
+      `提交包含当前分支不可达回答：${offPath[0]}`,
+      400,
+    )
+  }
+
+  const missing = reachableKeys.filter((pairKey) => !byPair.has(pairKey))
+  if (missing.length > 0) {
+    throw new InstrumentFinalSubmitError(
+      'SUBMISSION_PAYLOAD_CONFLICT',
+      `还有 ${missing.length} 个当前分支场景通道未作答`,
+      409,
+    )
+  }
+
+  const sceneByKey = new Map(scientificDefinition.scenes.map((scene) => [scene.sceneKey, scene] as const))
+  const responses = trajectory.sceneKeys.flatMap((sceneKey) => {
+    const scene = sceneByKey.get(sceneKey)
+    if (!scene) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', `冻结分支场景不存在：${sceneKey}`, 500)
+    return scene.channels.flatMap((channel) => {
       const value = byPair.get(`${scene.sceneKey}:${channel.channelKey}`)
       return value ? [value] : []
-    }))
+    })
+  })
+  return { responses, trajectory }
 }
+
+/** Validate untrusted responses once and return authoritative frozen-path order. */
+export const normalizeSituationalResponses = (
+  definition: SituationRuntimeDefinition,
+  input: SituationalResponse[],
+): SituationalResponse[] => normalizeSituationalSubmission(definition, input).responses
 
 const assertRequestRuntimeIdentity = (
   row: Pick<SituationalAttemptRow, 'instrumentVersion' | 'definitionHash' | 'compiledRuntimeHash' | 'scoringVersion'>,
@@ -171,7 +212,8 @@ export const submitSituationalAttemptFinal = async (
   assertFinalSubmitStatus(row.status, '情境化测评')
   assertRequestRuntimeIdentity(row, input)
 
-  const responses = normalizeSituationalResponses(snapshot.definition, input.responses)
+  const normalized = normalizeSituationalSubmission(snapshot.definition, input.responses)
+  const responses = normalized.responses
   const canonical = prepareCanonicalSubmission({ responses })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.situational, '情境化测评提交数据')
   const payloadHash = canonical.hash
@@ -183,9 +225,14 @@ export const submitSituationalAttemptFinal = async (
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评已完成，请重启后重新作答', 409)
   }
 
-  // This is the sole scoring call for an accepted FINAL. The response
-  // validation above has completed, so the scorer only builds the pure result.
-  const result = scoreSituational(snapshot.definition, responses, { responsesValidated: true })
+  // This is the sole scoring call for an accepted FINAL. V2 traversal and
+  // response validation have already completed, so the existing pure scorer
+  // receives only the reachable scientific plane.
+  const scoringDefinition = projectReachableSituationDefinitionForScoring(
+    snapshot.definition,
+    normalized.trajectory,
+  )
+  const result = scoreSituational(scoringDefinition, responses, { responsesValidated: true })
   const canonicalCore = projectSituationCanonicalUnitResult({
     result,
     runtime: snapshot.compiledRuntime,

@@ -20,7 +20,7 @@ import {
   validateSituationPackage,
   type SituationPackageV1,
 } from './situation-package.registry'
-import { runnerSituationDefinition, situationDefinitionAssetReferences } from './situation-definition'
+import { runnerSituationDefinition, situationalAssetReferences } from './situation-definition'
 import type { SituationalResultV1 } from './situation-scoring'
 import {
   decryptUnifiedRuntimePayload,
@@ -349,7 +349,7 @@ const retainFrozenSituationalAssets = async (
         entityId: `SITUATIONAL:${attemptId}`,
         field: ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
       },
-      references: situationDefinitionAssetReferences(snapshot.definition),
+      references: snapshot.definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus)),
       db,
     })
   } catch (error) {
