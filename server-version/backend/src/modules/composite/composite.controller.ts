@@ -44,6 +44,7 @@ import {
   situationalAttemptForResponse,
   type SituationalEmbeddedAccess,
 } from '../situational/situational-runtime.service'
+import { serveFrozenSituationalAsset } from '../situational/situational-asset.service'
 import { submitSituationalAttemptFinal } from '../situational/situational-final-submit.service'
 import { situationalFinalSubmitSchema } from '../situational/situational-final-submit.schema'
 import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
@@ -378,6 +379,24 @@ export const compositeController = {
     }
   },
 
+  async embeddedSituationalAsset(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const runtime = await loadEmbeddedSituationalAttemptRuntime(
+        req.params.situationalAttemptId,
+        embeddedSituationalAccess(req, { userId: req.user.userId }),
+      )
+      return serveFrozenSituationalAsset({
+        snapshot: runtime.snapshot,
+        assetId: req.params.assetId,
+        res,
+      })
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
   async submitEmbeddedSituational(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -625,6 +644,23 @@ export const compositeController = {
         embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
       )
       return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot))
+    } catch (err) {
+      if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+      return handleError(res, err)
+    }
+  },
+
+  async publicEmbeddedSituationalAsset(req: Request, res: Response) {
+    try {
+      const runtime = await loadEmbeddedSituationalAttemptRuntime(
+        req.params.situationalAttemptId,
+        embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
+      )
+      return serveFrozenSituationalAsset({
+        snapshot: runtime.snapshot,
+        assetId: req.params.assetId,
+        res,
+      })
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)

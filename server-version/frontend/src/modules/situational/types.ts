@@ -15,11 +15,22 @@ export interface SituationalRunnerChannel {
   range?: { min: number; max: number }
 }
 
+export interface SituationalRunnerAssetReference {
+  assetId: string
+  contentHash: string
+  mimeType: 'image/png' | 'image/jpeg' | 'image/webp'
+}
+
+export type SituationalRunnerStimulus =
+  | { type: 'TEXT_V1'; text: string }
+  | { type: 'IMAGE'; text?: string; asset: SituationalRunnerAssetReference; altText: string; caption?: string }
+  | { type: 'COMIC'; text?: string; panels: Array<{ assetRef: SituationalRunnerAssetReference; altText: string; caption?: string }> }
+
 export interface SituationalRunnerScene {
   sceneKey: string
   title: string
   sortOrder: number
-  stimulus: { type: 'TEXT_V1'; text: string }
+  stimulus: SituationalRunnerStimulus
   channels: SituationalRunnerChannel[]
 }
 

@@ -29,6 +29,7 @@ import {
   parseCanonicalUnitResultEnvelope,
   type CanonicalUnitResultEnvelopeV1,
 } from '../assessment-runtime/unit-result'
+import { assertSituationalAssetReferencesReady } from './situational-asset.service'
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
@@ -335,6 +336,7 @@ export const startSituationalAttempt = async (userId: string, input: {
   instrumentVersion?: string
 }) => {
   const situationPackage = pilotPackage(input.instrumentKey, input.instrumentVersion)
+  await assertSituationalAssetReferencesReady(situationPackage.definition)
   const participantKey = getParticipantKey(userId)
   const frozenAt = new Date()
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
@@ -418,6 +420,7 @@ export const createEmbeddedSituationalAttempt = async (
   },
 ) => {
   const situationPackage = pilotPackage(input.instrumentKey, input.instrumentVersion)
+  await assertSituationalAssetReferencesReady(situationPackage.definition, db)
   const frozenAt = new Date()
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
     instrumentKey: situationPackage.key,

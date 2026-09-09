@@ -3,6 +3,40 @@ import { z } from 'zod'
 
 export type SituationalResponseValue = string | number
 
+/**
+ * PR-E keeps visual stimulus deliberately small and static.  These are the
+ * only raster types a Situational definition may publish; the StoredAsset
+ * record remains the source of bytes, authorization, and storage metadata.
+ */
+export const SITUATIONAL_STATIC_IMAGE_MIME_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+] as const
+
+export const situationalStaticImageMimeTypeSchema = z.enum(SITUATIONAL_STATIC_IMAGE_MIME_TYPES)
+export type SituationalStaticImageMimeType = z.infer<typeof situationalStaticImageMimeTypeSchema>
+
+const nonBlankTextSchema = z.string().min(1).refine((value) => value.trim().length > 0, {
+  message: '文本不能为空白',
+})
+
+/**
+ * A definition stores only the stable StoredAsset identity.  Delivery URLs,
+ * signatures, object keys, and external URLs are intentionally not part of a
+ * scientific/runtime definition or its hash.
+ */
+export const situationalStoredAssetIdentitySchema = z.object({
+  assetId: z.string().min(1).max(200).refine((value) => (
+    !/^https?:\/\//iu.test(value)
+    && !/^data:/iu.test(value)
+    && !value.includes('/')
+  ), { message: '视觉资产必须引用项目内 StoredAsset，不能使用外部 URL 或对象路径' }),
+  contentHash: z.string().regex(/^[0-9a-f]{64}$/u, '视觉资产必须提供 sha256 contentHash'),
+  mimeType: situationalStaticImageMimeTypeSchema,
+}).strict()
+export type SituationalStoredAssetIdentity = z.infer<typeof situationalStoredAssetIdentitySchema>
+
 export const situationalDirectionSchema = z.enum([
   'higher_is_better',
   'higher_is_worse',
@@ -48,13 +82,42 @@ export type SituationalResponseType = z.infer<typeof situationalResponseTypeSche
 
 /**
  * Stimulus presentation is deliberately separated from the response model and
- * scoring: Image / Comic / Video land later as additional stimulus variants
- * without touching scoring or the response contract.
+ * scoring. Published visual scenes keep the same text stimulus and add one
+ * immutable IMAGE or an ordered COMIC panel list. Neither visual form creates
+ * a response or scoring surface. `text` remains optional at the draft/schema
+ * layer only for backwards-compatible tooling; the publication gate requires
+ * it for every visual scene.
  */
 export const situationalStimulusSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('TEXT_V1'), text: z.string().min(1) }),
+  z.object({ type: z.literal('TEXT_V1'), text: nonBlankTextSchema }),
+  z.object({
+    type: z.literal('IMAGE'),
+    text: nonBlankTextSchema.optional(),
+    asset: situationalStoredAssetIdentitySchema,
+    altText: nonBlankTextSchema,
+    caption: nonBlankTextSchema.optional(),
+  }).strict(),
+  z.object({
+    type: z.literal('COMIC'),
+    text: nonBlankTextSchema.optional(),
+    panels: z.array(z.object({
+      assetRef: situationalStoredAssetIdentitySchema,
+      altText: nonBlankTextSchema,
+      caption: nonBlankTextSchema.optional(),
+    }).strict()).min(1),
+  }).strict(),
 ])
 export type SituationalStimulus = z.infer<typeof situationalStimulusSchema>
+
+export const situationalAssetReferences = (stimulus: SituationalStimulus): SituationalStoredAssetIdentity[] => {
+  if (stimulus.type === 'TEXT_V1') return []
+  if (stimulus.type === 'IMAGE') return [stimulus.asset]
+  return stimulus.panels.map((panel) => panel.assetRef)
+}
+
+export const situationDefinitionAssetReferences = (definition: SituationDefinitionV1): SituationalStoredAssetIdentity[] => (
+  definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
+)
 
 const choiceOptionSchema = z.object({
   optionKey: situationalOpaqueKeySchema,
@@ -427,6 +490,15 @@ export const validateSituationDefinition = (
   })
 
   if (options.forPublish) {
+    definition.scenes.forEach((scene, sceneIndex) => {
+      if (scene.stimulus.type !== 'TEXT_V1' && !hasText(scene.stimulus.text)) {
+        issues.push({
+          path: `scenes.${sceneIndex}.stimulus.text`,
+          message: '发布的 IMAGE/COMIC 情境必须保留文字题面',
+          severity: 'error',
+        })
+      }
+    })
     if (!hasText(definition.source.title) && !hasText(definition.source.citation)) issues.push({ path: 'source', message: '发布前必须填写来源', severity: 'error' })
     if (definition.license.status === 'unknown' || definition.license.redistribution === 'unknown') issues.push({ path: 'license', message: '发布前必须明确内容授权状态', severity: 'error' })
     if (!hasText(definition.report.disclaimer)) issues.push({ path: 'report.disclaimer', message: '发布前必须填写免责声明', severity: 'error' })

@@ -1,4 +1,4 @@
-// PR-D seeded browser acceptance gate.
+// PR-D/PR-E seeded browser acceptance gate.
 //
 // The workflow creates a disposable PostgreSQL/Redis environment, seeds one
 // student Bundle and one public access token, starts the backend/frontend, and
@@ -84,6 +84,34 @@ const chooseFirstOption = async (page) => {
     return candidate instanceof HTMLInputElement && candidate.checked
   }, null, { timeout: 30000 })
   assert.equal(await option.isChecked(), true, 'selected option was not reflected in the runner')
+}
+
+const assertVisualScene = async (page, sceneIndex) => {
+  if (!fixture.visual) return
+  const expected = sceneIndex === 1
+    ? [fixture.visual.image]
+    : fixture.visual.comic.panels
+  const images = page.locator('img[data-asset-id]')
+  await images.first().waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForFunction(() => (
+    Array.from(document.querySelectorAll('img[data-asset-id]')).length > 0
+      && Array.from(document.querySelectorAll('img[data-asset-id]')).every((image) => image.naturalWidth > 0 && image.naturalHeight > 0)
+  ), null, { timeout: 30000 })
+  const actual = await images.evaluateAll((nodes) => nodes.map((node) => ({
+    assetId: node.getAttribute('data-asset-id'),
+    alt: node.getAttribute('alt'),
+    naturalWidth: node.naturalWidth,
+    naturalHeight: node.naturalHeight,
+  })))
+  assert.deepEqual(actual.map((image) => image.assetId), expected.map((image) => image.assetId), 'visual asset order does not match the frozen definition')
+  assert.deepEqual(
+    actual.map((image) => image.alt),
+    expected.map((image) => image.altText),
+    `visual alt text does not match the frozen definition: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`,
+  )
+  assert.ok(actual.every((image) => image.naturalWidth > 0 && image.naturalHeight > 0), 'visual asset did not decode')
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true, 'visual runner has horizontal overflow')
+  record(sceneIndex === 1 ? 'visual-image-visible' : 'visual-comic-visible')
 }
 
 const waitForSubmitEnabled = async (page) => {
@@ -178,15 +206,18 @@ const completeEmbeddedRunner = async (page, parentId, childId, publicMode = fals
   }
   page.on('request', onRequest)
   try {
+    await assertVisualScene(page, 1)
     await chooseFirstOption(page)
     await page.reload({ waitUntil: 'domcontentloaded' })
     await waitForRunner(page)
     assert.equal(await page.locator('input[type="radio"]').first().isChecked(), false, 'reload should resume at the first missing scene')
     await navigateToScene(page, 1, true)
+    await assertVisualScene(page, 1)
     assert.equal(await page.locator('input[type="radio"]').first().isChecked(), true, 'first scene answer was not restored locally')
     record(publicMode ? 'public-recovery-resume' : 'partial-reload-resume')
 
     await navigateToScene(page, 2, false)
+    await assertVisualScene(page, 2)
     const submitButton = page.getByRole('button', { name: '提交测评', exact: true })
     await submitButton.click()
     await page.getByRole('alert').filter({ hasText: '还有必答通道未完成' }).waitFor({ state: 'visible', timeout: 30000 })
@@ -292,14 +323,17 @@ const runPublicFlow = async (browser) => {
     const missingContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
     const missingPage = await missingContext.newPage()
     let embeddedGetRequests = 0
+    let assetGetRequests = 0
     missingPage.on('request', (request) => {
       if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGetRequests += 1
+      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGetRequests += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)
       await missingPage.goto(`${BASE_URL}/public/composite/situational/${childId}?compositeAttemptId=${parentId}&compositeItemId=${fixture.item.id}&returnTo=${returnTo}`, { waitUntil: 'domcontentloaded' })
       await missingPage.getByRole('alert').filter({ hasText: '恢复凭证' }).waitFor({ state: 'visible', timeout: 30000 })
       assert.equal(embeddedGetRequests, 0, 'missing public recovery token reached the embedded API')
+      assert.equal(assetGetRequests, 0, 'missing public recovery token reached the asset API')
       record('public-missing-token-rejected')
     } finally {
       await missingContext.close()
@@ -357,7 +391,7 @@ const main = async () => {
     await assertDurableCompletion(authenticated.parentId, authenticated.childId, 'authenticated')
     const publicFlow = await runPublicFlow(browser)
     await assertDurableCompletion(publicFlow.parentId, publicFlow.childId, 'public')
-    console.log('--- PR-D seeded browser acceptance ---')
+    console.log('--- seeded Situational Bundle acceptance ---')
     for (const name of results) console.log(`✅ ${name}`)
     console.log('ALL PASS')
   } finally {
@@ -366,9 +400,9 @@ const main = async () => {
 }
 
 main().catch((error) => {
-  console.error('PR-D seeded browser acceptance failed')
+  console.error('Seeded Situational Bundle acceptance failed')
   console.error(error && error.stack ? error.stack : error)
-  console.log('--- PR-D seeded browser acceptance ---')
+  console.log('--- seeded Situational Bundle acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('BLOCKED')
   process.exitCode = 1

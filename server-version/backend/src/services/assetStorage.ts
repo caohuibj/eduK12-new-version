@@ -52,6 +52,17 @@ export interface StoreAssetInput {
   provider?: AssetProvider
 }
 
+export interface StoredAssetContent {
+  id: string
+  objectKey: string
+  provider: string
+  mimeType: string
+  sizeBytes: number
+  sha256: string
+  deletedAt: Date | null
+  originalName?: string | null
+}
+
 const extensionFor = (fileName: string | undefined, mimeType: string): string => {
   const extension = fileName ? path.extname(fileName).toLowerCase() : ''
   if (/^\.[a-z0-9]{1,10}$/.test(extension)) return extension
@@ -583,6 +594,31 @@ export const issuePublicAssetUrl = async (req: Request, res: Response) => {
   return res.json({ code: 0, message: '操作成功', data: { assetId: asset.id, url, expiresIn: ASSET_URL_TTL_SECONDS } })
 }
 
+/**
+ * Serve an already-authorized StoredAsset.  Assessment-specific routes call
+ * this after validating the frozen attempt binding; generic asset routes call
+ * it after validating a signed URL.  Keeping the byte delivery in one place
+ * preserves path traversal, MIME, COS, and nosniff protections.
+ */
+export const serveStoredAssetContent = async (
+  asset: StoredAssetContent,
+  res: Response,
+  expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS,
+): Promise<Response | void> => {
+  if (asset.provider === 'cos') {
+    const url = await getCOSSignedUrl(asset.objectKey, Math.max(1, expiresAt - Math.floor(Date.now() / 1000)))
+    return res.redirect(302, url)
+  }
+
+  const localPath = localPathFor(asset.objectKey)
+  if (!fs.existsSync(localPath)) return notFound(res, '文件不存在')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('Content-Type', asset.mimeType)
+  res.setHeader('Content-Length', String(asset.sizeBytes))
+  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.originalName || asset.id)}"`)
+  return fs.createReadStream(localPath).pipe(res)
+}
+
 export const serveAsset = async (req: Request, res: Response) => {
   const publicRoute = req.baseUrl.includes('/public/assets')
   const expiresAt = Number(req.query.expires)
@@ -602,19 +638,7 @@ export const serveAsset = async (req: Request, res: Response) => {
     )
     if (!valid) return unauthorized(res, '无效的签到访问令牌')
   }
-
-  if (asset.provider === 'cos') {
-    const url = await getCOSSignedUrl(asset.objectKey, Math.max(1, expiresAt - Math.floor(Date.now() / 1000)))
-    return res.redirect(302, url)
-  }
-
-  const localPath = localPathFor(asset.objectKey)
-  if (!fs.existsSync(localPath)) return notFound(res, '文件不存在')
-  res.setHeader('X-Content-Type-Options', 'nosniff')
-  res.setHeader('Content-Type', asset.mimeType)
-  res.setHeader('Content-Length', String(asset.sizeBytes))
-  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.originalName || asset.id)}"`)
-  return fs.createReadStream(localPath).pipe(res)
+  return serveStoredAssetContent(asset, res, expiresAt)
 }
 
 export const assetStorageInternals = { localPathFor, providerFromEnvironment, signedPath }

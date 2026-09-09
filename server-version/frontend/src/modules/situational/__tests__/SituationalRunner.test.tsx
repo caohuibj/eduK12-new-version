@@ -12,6 +12,7 @@ vi.mock('../api', () => ({
     start: vi.fn(),
     submit: vi.fn(),
     result: vi.fn(),
+    loadAsset: vi.fn(),
   },
   embeddedSituationalApi: vi.fn(),
 }))
@@ -45,6 +46,23 @@ const completedData = (source = startData()): SituationalAttemptResponse => ({
   ...source,
   attempt: { ...source.attempt, status: 'COMPLETED' },
 })
+
+const visualStartData = (): SituationalAttemptResponse => {
+  const source = startData()
+  source.instrument.definition.scenes[0]!.stimulus = {
+    type: 'IMAGE',
+    asset: { assetId: 'ui-image', contentHash: 'a'.repeat(64), mimeType: 'image/png' },
+    altText: '界面中的静态图片',
+  }
+  source.instrument.definition.scenes[1]!.stimulus = {
+    type: 'COMIC',
+    panels: [
+      { assetRef: { assetId: 'ui-panel-1', contentHash: 'b'.repeat(64), mimeType: 'image/webp' }, altText: '漫画第一格' },
+      { assetRef: { assetId: 'ui-panel-2', contentHash: 'c'.repeat(64), mimeType: 'image/webp' }, altText: '漫画第二格' },
+    ],
+  }
+  return source
+}
 
 const scaledStartData = (sceneCount: number): SituationalAttemptResponse => {
   const source = startData()
@@ -109,6 +127,9 @@ describe('Situational text runner', () => {
     vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: startData() })
     vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData() })
     vi.mocked(situationalApi.result).mockResolvedValue({ code: 0, message: 'ok', data: completedData() })
+    vi.mocked(situationalApi.loadAsset).mockResolvedValue(new Blob(['static visual fixture'], { type: 'image/png' }))
+    if (!URL.createObjectURL) Object.defineProperty(URL, 'createObjectURL', { value: vi.fn((blob: Blob) => `blob:${blob.type}`), configurable: true })
+    if (!URL.revokeObjectURL) Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true })
     const embeddedData = startData()
     embeddedData.attemptId = 'ui-child'
     embeddedData.attempt = { ...embeddedData.attempt, id: 'ui-child' }
@@ -143,6 +164,37 @@ describe('Situational text runner', () => {
     expect(payload.responses).toHaveLength(3)
     expect(payload.responses.some((response) => response.responseValue === 100)).toBe(true)
     expect(JSON.stringify(payload)).not.toMatch(/score|contribution|percentile|quality/i)
+  })
+
+  it('renders IMAGE and ordered COMIC panels through the same runner', async () => {
+    const visual = visualStartData()
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: visual })
+    renderRunner()
+
+    expect(await screen.findByAltText('界面中的静态图片')).toBeInTheDocument()
+    expect(vi.mocked(situationalApi.loadAsset)).toHaveBeenCalledWith('ui-attempt', 'ui-image')
+    fireEvent.click(screen.getByRole('button', { name: '情境 2，未完成' }))
+
+    expect(await screen.findByAltText('漫画第一格')).toBeInTheDocument()
+    const panels = screen.getAllByRole('img')
+    expect(panels.map((panel) => panel.getAttribute('alt'))).toEqual(['漫画第一格', '漫画第二格'])
+    expect(vi.mocked(situationalApi.loadAsset)).toHaveBeenCalledWith('ui-attempt', 'ui-panel-1')
+    expect(vi.mocked(situationalApi.loadAsset)).toHaveBeenCalledWith('ui-attempt', 'ui-panel-2')
+  })
+
+  it('blocks the current scene while a visual asset fails and allows an explicit retry', async () => {
+    const visual = visualStartData()
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: visual })
+    vi.mocked(situationalApi.loadAsset)
+      .mockRejectedValueOnce(new Error('asset unavailable'))
+      .mockResolvedValue(new Blob(['retried visual fixture'], { type: 'image/png' }))
+    renderRunner()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('视觉内容加载失败')
+    expect(screen.getByRole('button', { name: /提交测评/ })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: '重试' }))
+    expect(await screen.findByAltText('界面中的静态图片')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /提交测评/ })).not.toBeDisabled()
   })
 
   it('blocks an incomplete final request and moves to the first missing scene', async () => {
