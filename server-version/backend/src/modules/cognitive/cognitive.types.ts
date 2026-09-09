@@ -47,6 +47,8 @@ export interface MetricDefinition {
   precision?: number
   requiresQualityFlags?: string[]
   availableProfiles: CognitiveProfile[]
+  /** Explicit opt-in for the future reference pipeline; default is fail-closed. */
+  referenceEligible: boolean
   export: { summary: boolean; label: string }
 }
 

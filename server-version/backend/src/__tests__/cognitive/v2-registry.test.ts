@@ -49,6 +49,23 @@ describe('Cognitive v2 registry adapter', () => {
     expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
   })
 
+  it('uses explicit fail-closed eligibility for the 28-identity audit', () => {
+    const definitions = listCognitiveV2TaskDefinitions()
+    const published = definitions.filter((definition) => definition.publication.status === 'PUBLISHED')
+    const eligible = published.flatMap((definition) => Object.values(definition.metrics).filter((metric) => metric.referenceEligible))
+
+    expect(published).toHaveLength(9)
+    expect(eligible).toHaveLength(15)
+    expect(definitions.filter((definition) => definition.publication.status === 'DRAFT')
+      .every((definition) => Object.values(definition.metrics).every((metric) => metric.referenceEligible === false))).toBe(true)
+    expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics.dPrimeByN.referenceEligible).toBe(false)
+    expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics.maxReliableN.referenceEligible).toBe(false)
+
+    const audit = auditCognitiveV2Registry(definitions)
+    expect(audit).toMatchObject({ status: 'PASS', registryCount: 28, publishedCount: 9, draftCount: 19, retiredCount: 0 })
+    expect(audit.entries).toHaveLength(28)
+  })
+
   it('keeps same-test-type contracts independent across exact versions', () => {
     const legacy = listCognitiveRegistryEntries().find((entry) => entry.testType === 'fake')
     if (!legacy) throw new Error('fake registry entry missing')

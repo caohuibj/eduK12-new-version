@@ -128,14 +128,20 @@ export const resolveCognitiveMetricReferences = <TConfig, TTrial>(input: {
       score: { key: mapping.metricKey, value, status: value === null ? 'not_calculable' : 'calculated' },
       context,
     })
-    return resolved.map((reference) => ({
-      ...(qualityGated ? qualityLimitedReference(reference) : reference),
-      metricKey: mapping.metricKey,
-      direction: mapping.direction,
-      relativePosition: !qualityGated && reference.status === 'available'
-        ? relativePositionFor(mapping.direction, reference.value, reference.mean, reference.criterionBand)
-        : null,
-    }))
+    return resolved.map((reference) => {
+      const effectiveReference = qualityGated ? qualityLimitedReference(reference) : reference
+      const relativePosition = !qualityGated && reference.status === 'available'
+        ? reference.referenceKind === 'descriptive_sample'
+          ? 'descriptive'
+          : relativePositionFor(mapping.direction, reference.value, reference.mean, reference.criterionBand)
+        : null
+      return {
+        ...effectiveReference,
+        metricKey: mapping.metricKey,
+        direction: mapping.direction,
+        relativePosition,
+      }
+    })
   })
 }
 

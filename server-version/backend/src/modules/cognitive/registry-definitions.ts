@@ -25,6 +25,7 @@ const metric = (
   valueType: unit === 'map' ? 'object' : unit === 'count' || unit === 'level' ? 'integer' : 'number',
   direction,
   role,
+  referenceEligible: false,
   availableProfiles: allProfiles,
   export: { summary: role !== 'research_only', label },
   ...extra,
@@ -122,6 +123,12 @@ export const reactionRegistryMetaV11 = {
   ...reactionRegistryMeta,
   profileDefinitionVersion: '1.1.0',
   metricDefinitionVersion: '1.1.0',
+  metricDefinitions: {
+    ...reactionRegistryMeta.metricDefinitions,
+    medianRtMs: { ...reactionRegistryMeta.metricDefinitions.medianRtMs, referenceEligible: true },
+    rtICV: { ...reactionRegistryMeta.metricDefinitions.rtICV, referenceEligible: true },
+    missRate: { ...reactionRegistryMeta.metricDefinitions.missRate, referenceEligible: false },
+  } as Record<string, MetricDefinition>,
   qualityDefinitionVersion: '1.1.0',
   reportDefinitionVersion: '1.1.0',
   qualityDefinitions: {
@@ -215,7 +222,8 @@ export const memoryRegistryMetaV11 = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitions: {
     ...memoryRegistryMeta.metricDefinitions,
-    totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary'),
+    maxSpan: { ...memoryRegistryMeta.metricDefinitions.maxSpan, referenceEligible: true },
+    totalCorrectTrials: metric('totalCorrectTrials', '正确试次数', 'working_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: false }),
     perseverativeTrialCount: metric(
       'perseverativeTrialCount',
       '持续重复作答试次数',
@@ -323,6 +331,12 @@ export const stroopRegistryMetaV11 = {
       reportCaveats: ['科研档增加试次；仍不是年龄常模。'],
     },
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitions: {
+    ...stroopRegistryMeta.metricDefinitions,
+    stroopEffectMs: { ...stroopRegistryMeta.metricDefinitions.stroopEffectMs, referenceEligible: true },
+    errorCost: { ...stroopRegistryMeta.metricDefinitions.errorCost, referenceEligible: false },
+    incongruentAccuracy: { ...stroopRegistryMeta.metricDefinitions.incongruentAccuracy, referenceEligible: true },
+  } as Record<string, MetricDefinition>,
   qualityDefinitions: {
     ...stroopRegistryMeta.qualityDefinitions,
     lowAccuracy: { key: 'lowAccuracy', label: '总体准确率过低', description: '总体准确率低于 0.5，抑制指标需谨慎解释。' },
@@ -365,8 +379,8 @@ export const gonogoRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    commissionRate: metric('commissionRate', 'No-Go 误按率', 'response_inhibition', 'ratio', 'lower_is_better', 'primary'),
-    dPrime: metric('dPrime', '信号检测敏感度 d′', 'response_inhibition', 'd-prime', 'higher_is_better', 'primary'),
+    commissionRate: metric('commissionRate', 'No-Go 误按率', 'response_inhibition', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
+    dPrime: metric('dPrime', '信号检测敏感度 d′', 'response_inhibition', 'd-prime', 'higher_is_better', 'primary', { referenceEligible: true }),
     goMedianRtMs: metric('goMedianRtMs', 'Go 正确反应中位RT', 'response_inhibition', 'ms', 'descriptive', 'secondary'),
     hitRate: metric('hitRate', 'Go 命中率', 'response_inhibition', 'ratio', 'higher_is_better', 'secondary'),
     omissionRate: metric('omissionRate', 'Go 遗漏率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
@@ -421,10 +435,10 @@ export const cptRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    dPrime: metric('dPrime', '目标辨别 d′', 'sustained_attention', 'd-prime', 'higher_is_better', 'primary'),
-    omissionRate: metric('omissionRate', '目标遗漏率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
-    commissionRate: metric('commissionRate', '非目标误报率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
-    rtICV: metric('rtICV', '命中RT变异系数', 'sustained_attention', 'ratio', 'lower_is_better', 'primary'),
+    dPrime: metric('dPrime', '目标辨别 d′', 'sustained_attention', 'd-prime', 'higher_is_better', 'primary', { referenceEligible: true }),
+    omissionRate: metric('omissionRate', '目标遗漏率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
+    commissionRate: metric('commissionRate', '非目标误报率', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
+    rtICV: metric('rtICV', '命中RT变异系数', 'sustained_attention', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
     hitMedianRtMs: metric('hitMedianRtMs', '目标命中中位RT', 'sustained_attention', 'ms', 'descriptive', 'secondary'),
     hitRtSdMs: metric('hitRtSdMs', '目标RT标准差', 'sustained_attention', 'ms', 'lower_is_better', 'secondary'),
     blockSlopeRt: metric('blockSlopeRt', '跨 block RT 斜率', 'sustained_attention', 'ms', 'descriptive', 'research_only', { availableProfiles: ['research'] }),
@@ -480,8 +494,8 @@ export const nbackRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    dPrimeByN: metric('dPrimeByN', '各 N 水平 d′', 'working_memory_updating', 'map', 'higher_is_better', 'primary'),
-    maxReliableN: metric('maxReliableN', '达到质量门槛的最高 N', 'working_memory_updating', 'level', 'higher_is_better', 'primary'),
+    dPrimeByN: metric('dPrimeByN', '各 N 水平 d′', 'working_memory_updating', 'map', 'higher_is_better', 'primary', { referenceEligible: false }),
+    maxReliableN: metric('maxReliableN', '达到质量门槛的最高 N', 'working_memory_updating', 'level', 'higher_is_better', 'primary', { referenceEligible: false }),
     hitRateByN: metric('hitRateByN', '各 N 命中率', 'working_memory_updating', 'map', 'higher_is_better', 'secondary'),
     falseAlarmRateByN: metric('falseAlarmRateByN', '各 N 误报率', 'working_memory_updating', 'map', 'lower_is_better', 'secondary'),
     medianRtByN: metric('medianRtByN', '各 N 正确反应中位RT', 'working_memory_updating', 'map', 'descriptive', 'secondary'),
@@ -534,8 +548,8 @@ export const corsiRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    maxSpan: metric('maxSpan', '最大空间广度', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
-    totalCorrectTrials: metric('totalCorrectTrials', '总正确试次', 'visuospatial_memory', 'count', 'higher_is_better', 'primary'),
+    maxSpan: metric('maxSpan', '最大空间广度', 'visuospatial_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: true }),
+    totalCorrectTrials: metric('totalCorrectTrials', '总正确试次', 'visuospatial_memory', 'count', 'higher_is_better', 'primary', { referenceEligible: false }),
     firstTryPassCount: metric('firstTryPassCount', '首次通过级数', 'visuospatial_memory', 'count', 'higher_is_better', 'secondary'),
     medianResponseDurationMs: metric('medianResponseDurationMs', '中位复现时长', 'visuospatial_memory', 'ms', 'descriptive', 'secondary'),
     sequenceErrorDistance: metric('sequenceErrorDistance', '序列位置错误距离', 'visuospatial_memory', 'score', 'lower_is_better', 'research_only', { availableProfiles: ['research'] }),
@@ -587,8 +601,8 @@ export const sstRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    ssrtMs: metric('ssrtMs', '停止信号反应时 SSRT', 'response_inhibition', 'ms', 'lower_is_better', 'primary'),
-    pRespondStop: metric('pRespondStop', 'Stop trial 响应概率', 'response_inhibition', 'ratio', 'target_range', 'primary'),
+    ssrtMs: metric('ssrtMs', '停止信号反应时 SSRT', 'response_inhibition', 'ms', 'lower_is_better', 'primary', { referenceEligible: true }),
+    pRespondStop: metric('pRespondStop', 'Stop trial 响应概率', 'response_inhibition', 'ratio', 'target_range', 'primary', { referenceEligible: false }),
     goMedianRtMs: metric('goMedianRtMs', 'Go 中位RT', 'response_inhibition', 'ms', 'descriptive', 'secondary'),
     goOmissionRate: metric('goOmissionRate', 'Go 遗漏率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
     goChoiceErrorRate: metric('goChoiceErrorRate', 'Go 选择错误率', 'response_inhibition', 'ratio', 'lower_is_better', 'secondary'),
@@ -643,8 +657,8 @@ export const taskswitchRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    switchCostRtMs: metric('switchCostRtMs', 'RT 转换代价', 'cognitive_flexibility', 'ms', 'lower_is_better', 'primary'),
-    switchCostAccuracy: metric('switchCostAccuracy', '准确率转换代价', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary'),
+    switchCostRtMs: metric('switchCostRtMs', 'RT 转换代价', 'cognitive_flexibility', 'ms', 'lower_is_better', 'primary', { referenceEligible: true }),
+    switchCostAccuracy: metric('switchCostAccuracy', '准确率转换代价', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary', { referenceEligible: true }),
     medianRtSwitch: metric('medianRtSwitch', 'Switch 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
     medianRtRepeat: metric('medianRtRepeat', 'Repeat 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
     accuracySwitch: metric('accuracySwitch', 'Switch 准确率', 'cognitive_flexibility', 'ratio', 'higher_is_better', 'secondary'),

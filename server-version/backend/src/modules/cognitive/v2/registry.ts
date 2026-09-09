@@ -68,7 +68,7 @@ const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricD
     role: metric.role,
     ...(metric.precision === undefined ? {} : { precision: metric.precision }),
     availableProfiles: metric.availableProfiles,
-    referenceEligible: metric.role === 'primary' || entry.reportDefinition.primaryMetrics.includes(key),
+    referenceEligible: metric.referenceEligible,
     ...(metric.requiresQualityFlags ? { requiresQualityFlags: metric.requiresQualityFlags } : {}),
     export: metric.export,
   }])) as Record<string, MetricDefinition>

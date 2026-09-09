@@ -3,7 +3,9 @@ import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registr
 import { resolveCognitiveMetricReferences } from '../../modules/cognitive/v2/reference-adapter'
 import type { AssessmentReferenceSetDefinition } from '../../modules/assessment-reference/reference'
 
-const definition = () => {
+type ReferenceKind = AssessmentReferenceSetDefinition['entries'][number]['referenceKind']
+
+const definition = (referenceKind: ReferenceKind = 'normative_distribution') => {
   const base = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')
   if (!base) throw new Error('reaction v1.1 definition missing')
   return {
@@ -11,12 +13,12 @@ const definition = () => {
     references: [{
       metricKey: 'medianRtMs',
       referenceVersion: 'beta-v1',
-      referenceKind: 'normative_distribution' as const,
+      referenceKind,
       evidenceLevel: 'literature_beta' as const,
       instrumentVersion: '1.0.0',
       scoringVersion: '1.1.0',
       direction: base.metrics.medianRtMs.direction,
-      requiredContext: ['age' as const],
+      requiredContext: referenceKind === 'normative_distribution' ? ['age' as const] : [],
     }],
   }
 }
@@ -30,16 +32,20 @@ const referenceSet = (entries: AssessmentReferenceSetDefinition['entries']): Ass
   entries,
 })
 
-const entry = (population: AssessmentReferenceSetDefinition['entries'][number]['population']): AssessmentReferenceSetDefinition['entries'][number] => ({
+const entry = (
+  population: AssessmentReferenceSetDefinition['entries'][number]['population'],
+  referenceKind: ReferenceKind = 'normative_distribution',
+  statistics: { mean: number; sd: number } = { mean: 300, sd: 50 },
+): AssessmentReferenceSetDefinition['entries'][number] => ({
   scoreKey: 'medianRtMs',
-  referenceKind: 'normative_distribution',
+  referenceKind,
   evidenceLevel: 'literature_beta',
   provenanceType: 'literature_derived_estimate',
   instrumentVersion: '1.0.0',
   scoringVersion: '1.1.0',
   population,
   source: { citation: 'Fixture literature beta', publicationYear: 2024, sampleSize: 48 },
-  statistics: { mean: 300, sd: 50 },
+  statistics,
   derivation: { distributionAssumption: 'normal', allowEstimatedPercentile: true },
   disclaimer: 'Fixture only; not a local norm.',
 })
@@ -106,6 +112,25 @@ describe('Cognitive v2 shared reference and context adapter', () => {
       relativePosition: 'above_reference',
     })
     expect(result[0].disclaimer).toContain('Beta')
+  })
+
+  it('forces descriptive samples to use descriptive position semantics without population positions', () => {
+    const result = resolveCognitiveMetricReferences({
+      definition: definition('descriptive_sample'),
+      metrics: { medianRtMs: 450 },
+      references: [referenceSet([entry({ description: 'descriptive sample' }, 'descriptive_sample', { mean: 500, sd: 50 })])],
+      context: null,
+    })
+    expect(result[0]).toMatchObject({
+      status: 'available',
+      referenceKind: 'descriptive_sample',
+      meanDifference: -50,
+      z: null,
+      t: null,
+      percentile: null,
+      criterionBand: null,
+      relativePosition: 'descriptive',
+    })
   })
 
   it('returns no references for an invalid result', () => {

@@ -15,6 +15,7 @@ const issue = (path: string, message: string, severity: PublicationIssue['severi
 
 const validVisibility = new Set(['headline', 'user', 'detail', 'research_only', 'hidden'])
 const validDirections = new Set(['higher_is_better', 'lower_is_better', 'target_range', 'descriptive', 'signed'])
+const validReferenceValueTypes = new Set(['number', 'integer'])
 
 export const validateTaskDefinition = <TConfig, TTrial>(
   definition: TaskDefinition<TConfig, TTrial>,
@@ -55,6 +56,13 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (!metric.label || !metric.category || !metric.construct || !metric.description) issues.push(issue(`metrics.${key}`, 'metric label/category/construct/description are required'))
     if (!validVisibility.has(metric.visibility)) issues.push(issue(`metrics.${key}.visibility`, 'metric visibility is invalid'))
     if (!validDirections.has(metric.direction)) issues.push(issue(`metrics.${key}.direction`, 'metric direction is invalid'))
+    if (typeof metric.referenceEligible !== 'boolean') issues.push(issue(`metrics.${key}.referenceEligible`, 'referenceEligible must be an explicit boolean'))
+    if (metric.referenceEligible && !validReferenceValueTypes.has(metric.valueType)) {
+      issues.push(issue(`metrics.${key}.valueType`, 'reference-eligible metric must expose a scalar number or integer valueType'))
+    }
+    if (metric.referenceEligible && (metric.role === 'quality' || metric.role === 'research_only')) {
+      issues.push(issue(`metrics.${key}.role`, 'quality or research_only metric cannot be reference eligible'))
+    }
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
     for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
