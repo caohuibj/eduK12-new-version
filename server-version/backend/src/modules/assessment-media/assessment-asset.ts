@@ -101,10 +101,10 @@ export const assertAssessmentAssetReferencesReady = async (
   }
 }
 
-export const findFrozenAssessmentAssetReference = (
-  references: readonly AssessmentAssetIdentityV1[],
+export const findFrozenAssessmentAssetReference = <T extends AssessmentAssetIdentityV1>(
+  references: readonly T[],
   assetId: string,
-): AssessmentAssetIdentityV1 | undefined => references.find((reference) => reference.assetId === assetId)
+): T | undefined => references.find((reference) => reference.assetId === assetId)
 
 export interface AssessmentAssetRetentionOwner {
   entityType: string
