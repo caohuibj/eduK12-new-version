@@ -150,7 +150,7 @@ describe('Situational text runner', () => {
     await waitFor(() => expect(slider).toHaveValue('1'))
     fireEvent.change(slider, { target: { value: '0' } })
     await waitFor(() => expect(slider).toHaveValue('0'))
-    expect(screen.getByText('已完成 2 / 3 个通道')).toBeInTheDocument()
+    expect(screen.getByText('已完成 2 / 3 个必答通道')).toBeInTheDocument()
     fireEvent.change(slider, { target: { value: '100' } })
     await waitFor(() => expect(slider).toHaveValue('100'))
     await waitFor(() => expect(screen.getByRole('button', { name: /下一题/ })).not.toBeDisabled())
@@ -227,7 +227,7 @@ describe('Situational text runner', () => {
 
     const restored = await screen.findByLabelText('选择 A')
     expect(restored).toBeChecked()
-    expect(screen.getByText('已完成 1 / 3 个通道')).toBeInTheDocument()
+    expect(screen.getByText('已完成 1 / 3 个必答通道')).toBeInTheDocument()
     expect(situationalApi.start).toHaveBeenCalledTimes(2)
   })
 
@@ -300,4 +300,3 @@ describe('Situational text runner', () => {
     expect(vi.mocked(situationalApi.submit).mock.calls[0]?.[1].responses).toHaveLength(sceneCount)
   })
 })
-
