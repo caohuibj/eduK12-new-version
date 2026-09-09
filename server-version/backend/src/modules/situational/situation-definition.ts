@@ -1,41 +1,34 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import {
+  ASSESSMENT_STATIC_IMAGE_MIME_TYPES,
+  assessmentStaticImageAssetIdentitySchema,
+  assessmentStaticImageMimeTypeSchema,
+  type AssessmentStaticImageAssetIdentityV1,
+  type AssessmentStaticImageMimeType,
+} from '../assessment-media/assessment-image'
 
 export type SituationalResponseValue = string | number
 
 /**
- * PR-E keeps visual stimulus deliberately small and static.  These are the
- * only raster types a Situational definition may publish; the StoredAsset
- * record remains the source of bytes, authorization, and storage metadata.
+ * Compatibility aliases keep the published Situational V1 JSON shape stable
+ * while the immutable StoredAsset identity is owned by Assessment media.
  */
-export const SITUATIONAL_STATIC_IMAGE_MIME_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-] as const
-
-export const situationalStaticImageMimeTypeSchema = z.enum(SITUATIONAL_STATIC_IMAGE_MIME_TYPES)
-export type SituationalStaticImageMimeType = z.infer<typeof situationalStaticImageMimeTypeSchema>
+export const SITUATIONAL_STATIC_IMAGE_MIME_TYPES = ASSESSMENT_STATIC_IMAGE_MIME_TYPES
+export const situationalStaticImageMimeTypeSchema = assessmentStaticImageMimeTypeSchema
+export type SituationalStaticImageMimeType = AssessmentStaticImageMimeType
 
 const nonBlankTextSchema = z.string().min(1).refine((value) => value.trim().length > 0, {
   message: '文本不能为空白',
 })
 
 /**
- * A definition stores only the stable StoredAsset identity.  Delivery URLs,
+ * A definition stores only the stable StoredAsset identity. Delivery URLs,
  * signatures, object keys, and external URLs are intentionally not part of a
  * scientific/runtime definition or its hash.
  */
-export const situationalStoredAssetIdentitySchema = z.object({
-  assetId: z.string().min(1).max(200).refine((value) => (
-    !/^https?:\/\//iu.test(value)
-    && !/^data:/iu.test(value)
-    && !value.includes('/')
-  ), { message: '视觉资产必须引用项目内 StoredAsset，不能使用外部 URL 或对象路径' }),
-  contentHash: z.string().regex(/^[0-9a-f]{64}$/u, '视觉资产必须提供 sha256 contentHash'),
-  mimeType: situationalStaticImageMimeTypeSchema,
-}).strict()
-export type SituationalStoredAssetIdentity = z.infer<typeof situationalStoredAssetIdentitySchema>
+export const situationalStoredAssetIdentitySchema = assessmentStaticImageAssetIdentitySchema
+export type SituationalStoredAssetIdentity = AssessmentStaticImageAssetIdentityV1
 
 export const situationalDirectionSchema = z.enum([
   'higher_is_better',
