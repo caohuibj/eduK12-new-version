@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest'
 import {
   answeredResponseCount,
   ensureSituationalDraft,
+  expectedResponseKeys,
   firstMissingSceneIndex,
+  pruneSituationalDraftResponses,
+  pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
   situationalDraftKey,
+  situationalReadyToSubmit,
   situationalResponsesFromDraft,
 } from '../draft'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
-import type { SituationalAttempt, SituationalRunnerDefinition } from '../types'
+import type { SituationalAttempt, SituationalRunnerDefinition, SituationalRunnerDefinitionV2 } from '../types'
 
 const definition: SituationalRunnerDefinition = {
   schemaVersion: 1,
@@ -25,6 +29,29 @@ const definition: SituationalRunnerDefinition = {
     },
     { sceneKey: 'S2', title: '第二题', sortOrder: 1, stimulus: { type: 'TEXT_V1', text: '文本二' }, channels: [{ channelKey: 'choice', responseType: 'SINGLE_CHOICE', prompt: '选择', options: [{ optionKey: 'A', label: 'A' }, { optionKey: 'B', label: 'B' }] }] },
   ],
+}
+
+const branchingDefinition: SituationalRunnerDefinitionV2 = {
+  schemaVersion: 2,
+  respondentType: 'participant_self_report',
+  sampling: { strategy: 'BRANCH_REACHABLE' },
+  scenes: definition.scenes,
+  flow: {
+    strategy: 'BRANCHING_DAG_V1',
+    entryNodeKey: 'n1',
+    nodes: [
+      {
+        nodeType: 'SCENE', nodeKey: 'n1', sceneKey: 'S1', motherSceneKey: 'M1', roundKey: 'R1', stepKey: 'P1',
+        transition: { type: 'DECISION', channelKey: 'choice', branches: [{ optionKey: 'A', nextNodeKey: 'n2' }, { optionKey: 'B', nextNodeKey: 'early' }] },
+      },
+      {
+        nodeType: 'SCENE', nodeKey: 'n2', sceneKey: 'S2', motherSceneKey: 'M1', roundKey: 'R2', stepKey: 'P1',
+        transition: { type: 'NEXT', nextNodeKey: 'complete' },
+      },
+      { nodeType: 'TERMINAL', nodeKey: 'early' },
+      { nodeType: 'TERMINAL', nodeKey: 'complete' },
+    ],
+  },
 }
 
 const attempt = (id: string, definitionHash = 'a'.repeat(64)): SituationalAttempt => ({
@@ -71,10 +98,56 @@ describe('Situational local draft boundary', () => {
     const responses = await readSituationalDraft(next)
     expect(answeredResponseCount(definition, responses)).toBe(3)
     expect(firstMissingSceneIndex(definition, responses)).toBe(-1)
+    expect(situationalReadyToSubmit(definition, responses)).toBe(true)
     expect(situationalResponsesFromDraft(definition, responses)).toEqual([
       { sceneKey: 'S1', channelKey: 'choice', responseValue: 'B' },
       { sceneKey: 'S1', channelKey: 'continuous', responseValue: 0 },
       { sceneKey: 'S2', channelKey: 'choice', responseValue: 'A' },
+    ])
+    await finalDraftStore.delete(draftKey)
+  })
+
+  it('counts only the currently reachable branch and blocks submit until the branch terminates', () => {
+    const partial = {
+      'S1:choice': { responseValue: 'A' },
+    }
+    expect(expectedResponseKeys(branchingDefinition, partial)).toEqual(['S1:choice', 'S1:continuous'])
+    expect(answeredResponseCount(branchingDefinition, partial)).toBe(1)
+    expect(firstMissingSceneIndex(branchingDefinition, partial)).toBe(0)
+    expect(situationalReadyToSubmit(branchingDefinition, partial)).toBe(false)
+
+    const early = {
+      'S1:choice': { responseValue: 'B' },
+      'S1:continuous': { responseValue: 10 },
+    }
+    expect(expectedResponseKeys(branchingDefinition, early)).toEqual(['S1:choice', 'S1:continuous'])
+    expect(situationalReadyToSubmit(branchingDefinition, early)).toBe(true)
+  })
+
+  it('prunes stale downstream answers after an upstream decision changes and excludes them from FINAL payload', async () => {
+    const next = attempt(`branch-prune-${Date.now()}`)
+    await ensureSituationalDraft(next)
+    const draftKey = situationalDraftKey(next.id)
+    const switched = {
+      'S1:choice': { responseValue: 'B' },
+      'S1:continuous': { responseValue: 25 },
+      'S2:choice': { responseValue: 'A' },
+    }
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'S1:choice', value: switched['S1:choice'], updatedAt: Date.now() })
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'S1:continuous', value: switched['S1:continuous'], updatedAt: Date.now() })
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'S2:choice', value: switched['S2:choice'], updatedAt: Date.now() })
+
+    expect(pruneUnreachableSituationalResponses(branchingDefinition, switched).staleKeys).toEqual(['S2:choice'])
+    const pruned = await pruneSituationalDraftResponses(next, branchingDefinition, switched)
+
+    expect(pruned).toEqual({
+      'S1:choice': { responseValue: 'B' },
+      'S1:continuous': { responseValue: 25 },
+    })
+    expect((await finalDraftStore.listAnswers(draftKey)).map((item) => item.itemKey)).toEqual(['S1:choice', 'S1:continuous'])
+    expect(situationalResponsesFromDraft(branchingDefinition, switched)).toEqual([
+      { sceneKey: 'S1', channelKey: 'choice', responseValue: 'B' },
+      { sceneKey: 'S1', channelKey: 'continuous', responseValue: 25 },
     ])
     await finalDraftStore.delete(draftKey)
   })
@@ -105,4 +178,3 @@ describe('Situational local draft boundary', () => {
     expect(JSON.stringify(payload)).not.toMatch(/score|percentile|norm|contribution/i)
   })
 })
-
