@@ -34,12 +34,57 @@ export interface SituationalRunnerScene {
   channels: SituationalRunnerChannel[]
 }
 
-export interface SituationalRunnerDefinition {
+export interface SituationalRunnerDefinitionV1 {
   schemaVersion: 1
   respondentType: string
   sampling: { strategy: 'ALL' }
   scenes: SituationalRunnerScene[]
 }
+
+export interface SituationalRunnerNextTransition {
+  type: 'NEXT'
+  nextNodeKey: string
+}
+
+export interface SituationalRunnerDecisionTransition {
+  type: 'DECISION'
+  channelKey: string
+  branches: Array<{
+    optionKey: string
+    nextNodeKey: string
+  }>
+}
+
+export interface SituationalRunnerBranchSceneNode {
+  nodeType: 'SCENE'
+  nodeKey: string
+  sceneKey: string
+  motherSceneKey: string
+  roundKey: string
+  stepKey: string
+  transition: SituationalRunnerNextTransition | SituationalRunnerDecisionTransition
+}
+
+export interface SituationalRunnerBranchTerminalNode {
+  nodeType: 'TERMINAL'
+  nodeKey: string
+}
+
+export type SituationalRunnerBranchFlowNode = SituationalRunnerBranchSceneNode | SituationalRunnerBranchTerminalNode
+
+export interface SituationalRunnerDefinitionV2 {
+  schemaVersion: 2
+  respondentType: string
+  sampling: { strategy: 'BRANCH_REACHABLE' }
+  scenes: SituationalRunnerScene[]
+  flow: {
+    strategy: 'BRANCHING_DAG_V1'
+    entryNodeKey: string
+    nodes: SituationalRunnerBranchFlowNode[]
+  }
+}
+
+export type SituationalRunnerDefinition = SituationalRunnerDefinitionV1 | SituationalRunnerDefinitionV2
 
 export interface SituationalReportGuidance {
   category: 'reflection' | 'strategy' | 'environment' | 'support'
@@ -80,7 +125,7 @@ export interface SituationalInstrument {
   scorerKey: string
   scoringVersion: string
   frozenAt: string
-  sampling: { strategy: 'ALL' }
+  sampling: SituationalRunnerDefinition['sampling']
   definition: SituationalRunnerDefinition
   report: SituationalReportDefinition
   referencePolicy: { type: 'none' }
@@ -184,4 +229,3 @@ export type SituationalDraftAnswer = {
   responseTimeMs?: number
   answeredAt?: string
 }
-
