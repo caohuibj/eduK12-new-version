@@ -281,26 +281,27 @@ const SituationalRunner: React.FC = () => {
   const visualRequired = visualAssetsFor(currentScene.stimulus).length > 0
   const visualBusy = visualRequired && (visualState.sceneKey !== currentScene.sceneKey || visualState.loading || Boolean(visualState.error))
   const renderStimulus = () => {
-    if (currentScene.stimulus.type === 'TEXT_V1') {
-      return <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
-    }
+    const textBlock = currentScene.stimulus.text
+      ? <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
+      : null
+    if (currentScene.stimulus.type === 'TEXT_V1') return textBlock
     if (visualState.sceneKey !== currentScene.sceneKey || visualState.loading) {
-      return <div role="status" className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-sm text-indigo-800">加载视觉内容…</div>
+      return <>{textBlock}<div role="status" className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-sm text-indigo-800">加载视觉内容…</div></>
     }
     if (visualState.error) {
-      return <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800"><p>视觉内容加载失败，当前情境暂不能作答。</p><button type="button" onClick={() => setVisualRetry((value) => value + 1)} className="mt-3 rounded-lg bg-white px-4 py-2 font-medium text-red-700 shadow-sm">重试</button></div>
+      return <>{textBlock}<div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800"><p>视觉内容加载失败，当前情境暂不能作答。</p><button type="button" onClick={() => setVisualRetry((value) => value + 1)} className="mt-3 rounded-lg bg-white px-4 py-2 font-medium text-red-700 shadow-sm">重试</button></div></>
     }
     if (currentScene.stimulus.type === 'IMAGE') {
       const asset = currentScene.stimulus.asset
-      return <figure className="mt-5 space-y-2 rounded-xl bg-slate-50 p-4"><img src={visualState.urls[asset.assetId]} alt={currentScene.stimulus.altText} data-asset-id={asset.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{currentScene.stimulus.caption && <figcaption className="text-center text-sm text-slate-600">{currentScene.stimulus.caption}</figcaption>}</figure>
+      return <>{textBlock}<figure className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4"><img src={visualState.urls[asset.assetId]} alt={currentScene.stimulus.altText} data-asset-id={asset.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{currentScene.stimulus.caption && <figcaption className="text-center text-sm text-slate-600">{currentScene.stimulus.caption}</figcaption>}</figure></>
     }
-    return <ol aria-label="漫画分镜" className="mt-5 grid list-none grid-cols-1 gap-4 rounded-xl bg-slate-50 p-4">{currentScene.stimulus.panels.map((panel, index) => <li key={`${panel.assetRef.assetId}-${index}`} className="space-y-2"><img src={visualState.urls[panel.assetRef.assetId]} alt={panel.altText} data-asset-id={panel.assetRef.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{panel.caption && <p className="text-center text-sm text-slate-600">{panel.caption}</p>}</li>)}</ol>
+    return <>{textBlock}<ol aria-label="漫画分镜" className="mt-4 grid list-none grid-cols-1 gap-4 rounded-xl bg-slate-50 p-4">{currentScene.stimulus.panels.map((panel, index) => <li key={`${panel.assetRef.assetId}-${index}`} className="space-y-2"><img src={visualState.urls[panel.assetRef.assetId]} alt={panel.altText} data-asset-id={panel.assetRef.assetId} className="mx-auto max-h-[min(60vh,560px)] w-full object-contain" />{panel.caption && <p className="text-center text-sm text-slate-600">{panel.caption}</p>}</li>)}</ol></>
   }
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex flex-col gap-3 rounded-xl bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">文字情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
+        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
         <div className="text-left text-sm text-gray-600 sm:text-right"><div>已完成 {answeredCount} / {totalResponses} 个通道</div><div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 sm:w-48"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} /></div></div>
       </div>
 
@@ -351,4 +352,3 @@ const SituationalRunner: React.FC = () => {
 }
 
 export default SituationalRunner
-

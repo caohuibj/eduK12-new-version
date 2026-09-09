@@ -82,19 +82,24 @@ export type SituationalResponseType = z.infer<typeof situationalResponseTypeSche
 
 /**
  * Stimulus presentation is deliberately separated from the response model and
- * scoring.  IMAGE is one immutable StoredAsset; COMIC is an ordered list of
- * immutable panel assets.  Neither introduces a response or scoring surface.
+ * scoring. Published visual scenes keep the same text stimulus and add one
+ * immutable IMAGE or an ordered COMIC panel list. Neither visual form creates
+ * a response or scoring surface. `text` remains optional at the draft/schema
+ * layer only for backwards-compatible tooling; the publication gate requires
+ * it for every visual scene.
  */
 export const situationalStimulusSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TEXT_V1'), text: nonBlankTextSchema }),
   z.object({
     type: z.literal('IMAGE'),
+    text: nonBlankTextSchema.optional(),
     asset: situationalStoredAssetIdentitySchema,
     altText: nonBlankTextSchema,
     caption: nonBlankTextSchema.optional(),
   }).strict(),
   z.object({
     type: z.literal('COMIC'),
+    text: nonBlankTextSchema.optional(),
     panels: z.array(z.object({
       assetRef: situationalStoredAssetIdentitySchema,
       altText: nonBlankTextSchema,
@@ -485,6 +490,15 @@ export const validateSituationDefinition = (
   })
 
   if (options.forPublish) {
+    definition.scenes.forEach((scene, sceneIndex) => {
+      if (scene.stimulus.type !== 'TEXT_V1' && !hasText(scene.stimulus.text)) {
+        issues.push({
+          path: `scenes.${sceneIndex}.stimulus.text`,
+          message: '发布的 IMAGE/COMIC 情境必须保留文字题面',
+          severity: 'error',
+        })
+      }
+    })
     if (!hasText(definition.source.title) && !hasText(definition.source.citation)) issues.push({ path: 'source', message: '发布前必须填写来源', severity: 'error' })
     if (definition.license.status === 'unknown' || definition.license.redistribution === 'unknown') issues.push({ path: 'license', message: '发布前必须明确内容授权状态', severity: 'error' })
     if (!hasText(definition.report.disclaimer)) issues.push({ path: 'report.disclaimer', message: '发布前必须填写免责声明', severity: 'error' })

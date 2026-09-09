@@ -33,12 +33,14 @@ export const SJT_STATIC_VISUAL_E2E_DEFINITION: SituationDefinitionV1 = {
     stimulus: index === 0
       ? {
           type: 'IMAGE' as const,
+          text: scene.stimulus.text,
           asset: SITUATIONAL_STATIC_VISUAL_E2E_ASSETS.image,
           altText: '一组成员正在核对投影数据。',
           caption: '静态 IMAGE fixture',
         }
       : {
           type: 'COMIC' as const,
+          text: scene.stimulus.text,
           panels: [
             {
               assetRef: SITUATIONAL_STATIC_VISUAL_E2E_ASSETS.comicPanelOne,

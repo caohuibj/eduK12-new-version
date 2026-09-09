@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
 import {
@@ -12,6 +13,7 @@ import {
   type AssetDatabase,
   type StoredAssetContent,
 } from '../../services/assetStorage'
+import { getCOSSignedUrl } from '../../utils/cos'
 
 export interface SituationalAssetIssue {
   path: string
@@ -97,6 +99,31 @@ const findFrozenAssetReference = (
   situationDefinitionAssetReferences(snapshot.definition).find((reference) => reference.assetId === assetId)
 )
 
+const proxyCosAsset = async (asset: StoredAssetRecord, res: Response): Promise<Response | void> => {
+  let upstream: globalThis.Response
+  try {
+    const signedUrl = await getCOSSignedUrl(asset.objectKey)
+    upstream = await fetch(signedUrl)
+  } catch {
+    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产暂时无法读取', 404)
+  }
+  if (!upstream.ok || !upstream.body) {
+    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产暂时无法读取', 404)
+  }
+
+  // Public recovery uses an authorization header that an <img> redirect cannot
+  // preserve. Proxy only the Situational COS bytes through the already-
+  // authorized application route so the browser never depends on bucket CORS
+  // and never receives the signed COS URL.
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('Content-Type', asset.mimeType)
+  res.setHeader('Content-Length', String(asset.sizeBytes))
+  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.id)}"`)
+  const stream = Readable.fromWeb(upstream.body as Parameters<typeof Readable.fromWeb>[0])
+  stream.on('error', () => res.destroy())
+  return stream.pipe(res)
+}
+
 /**
  * A delivery request is authorized by the already-authorized attempt and can
  * only address an asset referenced by that attempt's frozen definition.  The
@@ -129,7 +156,8 @@ export const serveFrozenSituationalAsset = async (params: {
   ) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产已失效或身份不匹配', 404)
   }
+  if (asset.provider === 'cos') return proxyCosAsset(asset, params.res)
   return serveStoredAssetContent(asset, params.res)
 }
 
-export const situationalAssetInternals = { findFrozenAssetReference }
+export const situationalAssetInternals = { findFrozenAssetReference, proxyCosAsset }

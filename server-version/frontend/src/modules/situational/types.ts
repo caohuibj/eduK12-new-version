@@ -23,8 +23,8 @@ export interface SituationalRunnerAssetReference {
 
 export type SituationalRunnerStimulus =
   | { type: 'TEXT_V1'; text: string }
-  | { type: 'IMAGE'; asset: SituationalRunnerAssetReference; altText: string; caption?: string }
-  | { type: 'COMIC'; panels: Array<{ assetRef: SituationalRunnerAssetReference; altText: string; caption?: string }> }
+  | { type: 'IMAGE'; text?: string; asset: SituationalRunnerAssetReference; altText: string; caption?: string }
+  | { type: 'COMIC'; text?: string; panels: Array<{ assetRef: SituationalRunnerAssetReference; altText: string; caption?: string }> }
 
 export interface SituationalRunnerScene {
   sceneKey: string
