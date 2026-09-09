@@ -182,26 +182,27 @@ export const validateBranchingSituationDefinition = (
     }
 
     if (node.transition.type !== 'DECISION') return
+    const transition = node.transition
 
-    const channel = scene.channels.find((candidate) => candidate.channelKey === node.transition.channelKey)
+    const channel = scene.channels.find((candidate) => candidate.channelKey === transition.channelKey)
     if (!channel) {
       issues.push(issue(
         `flow.nodes.${nodeIndex}.transition.channelKey`,
-        `Decision 引用了不存在的场景通道：${node.sceneKey}:${node.transition.channelKey}`,
+        `Decision 引用了不存在的场景通道：${node.sceneKey}:${transition.channelKey}`,
       ))
       return
     }
     if (channel.responseType !== 'SINGLE_CHOICE') {
       issues.push(issue(
         `flow.nodes.${nodeIndex}.transition.channelKey`,
-        `Decision branching 只能绑定 SINGLE_CHOICE 通道：${node.sceneKey}:${node.transition.channelKey}`,
+        `Decision branching 只能绑定 SINGLE_CHOICE 通道：${node.sceneKey}:${transition.channelKey}`,
       ))
       return
     }
 
     const validOptionKeys = new Set(channel.options.map((option) => option.optionKey))
     const branchOptionKeys = new Set<string>()
-    node.transition.branches.forEach((branch, branchIndex) => {
+    transition.branches.forEach((branch, branchIndex) => {
       if (branchOptionKeys.has(branch.optionKey)) {
         issues.push(issue(
           `flow.nodes.${nodeIndex}.transition.branches.${branchIndex}.optionKey`,
