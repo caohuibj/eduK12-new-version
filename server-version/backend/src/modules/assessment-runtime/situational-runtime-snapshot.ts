@@ -1,11 +1,19 @@
 import {
-  hashSituationDefinition,
-  runnerSituationDefinition,
-  situationDefinitionSchema,
   situationalOpaqueKeySchema,
   situationalStimulusSchema,
-  type SituationDefinitionV1,
+  situationDefinitionSchema,
 } from '../situational/situation-definition'
+import {
+  situationalBranchFlowSchema,
+  situationalBranchSamplingSchema,
+  situationDefinitionV2Schema,
+} from '../situational/situation-branching'
+import {
+  hashSituationRuntimeDefinition,
+  runnerSituationRuntimeDefinition,
+  validateSituationRuntimeDefinition,
+  type SituationRuntimeDefinition,
+} from '../situational/situation-runtime-definition'
 import { compileSituationRuntime, parseCompiledInstrumentRuntime } from './compiler'
 import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
@@ -13,6 +21,7 @@ import type { CompiledInstrumentRuntimeV1 } from './types'
 import { z } from 'zod'
 
 export interface FrozenSituationalRuntimeSnapshotV1 {
+  /** Snapshot envelope version. Definition schema may be Situational V1 or V2. */
   schemaVersion: 1
   runtimeGeneration: 'UNIFIED_V1'
   frozenAt: string
@@ -22,8 +31,8 @@ export interface FrozenSituationalRuntimeSnapshotV1 {
   compiledRuntimeHash: string
   scorerKey: string
   scoringVersion: string
-  definition: SituationDefinitionV1
-  runnerDefinition: ReturnType<typeof runnerSituationDefinition>
+  definition: SituationRuntimeDefinition
+  runnerDefinition: ReturnType<typeof runnerSituationRuntimeDefinition>
   compiledRuntime: CompiledInstrumentRuntimeV1
   snapshotHash: string
 }
@@ -46,17 +55,27 @@ const runnerChannelSchema = z.union([
   }).strict(),
 ])
 
-const runnerDefinitionSchema = z.object({
+const runnerSceneSchema = z.object({
+  sceneKey: situationalOpaqueKeySchema,
+  title: z.string().min(1),
+  sortOrder: z.number().int().nonnegative(),
+  stimulus: situationalStimulusSchema,
+  channels: z.array(runnerChannelSchema).min(1).max(3),
+}).strict()
+
+const runnerDefinitionV1Schema = z.object({
   schemaVersion: z.literal(1),
   respondentType: z.string().min(1),
   sampling: z.object({ strategy: z.literal('ALL') }).strict(),
-  scenes: z.array(z.object({
-    sceneKey: situationalOpaqueKeySchema,
-    title: z.string().min(1),
-    sortOrder: z.number().int().nonnegative(),
-    stimulus: situationalStimulusSchema,
-    channels: z.array(runnerChannelSchema).min(1).max(3),
-  }).strict()).min(1),
+  scenes: z.array(runnerSceneSchema).min(1),
+}).strict()
+
+const runnerDefinitionV2Schema = z.object({
+  schemaVersion: z.literal(2),
+  respondentType: z.string().min(1),
+  sampling: situationalBranchSamplingSchema,
+  scenes: z.array(runnerSceneSchema).min(1),
+  flow: situationalBranchFlowSchema,
 }).strict()
 
 const frozenSituationalRuntimeSnapshotSchema = z.object({
@@ -69,8 +88,8 @@ const frozenSituationalRuntimeSnapshotSchema = z.object({
   compiledRuntimeHash: z.string().regex(/^[0-9a-f]{64}$/),
   scorerKey: z.string().min(1),
   scoringVersion: z.string().min(1),
-  definition: situationDefinitionSchema,
-  runnerDefinition: runnerDefinitionSchema,
+  definition: z.union([situationDefinitionSchema, situationDefinitionV2Schema]),
+  runnerDefinition: z.union([runnerDefinitionV1Schema, runnerDefinitionV2Schema]),
   compiledRuntime: z.record(z.unknown()),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
@@ -110,29 +129,33 @@ const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => 
 const buildFrozenSnapshot = (input: {
   instrumentKey: string
   instrumentVersion: string
-  definition: SituationDefinitionV1
+  definition: SituationRuntimeDefinition
   frozenAt?: Date
 }): FrozenSituationalRuntimeSnapshotV1 => {
-  const validation = situationDefinitionSchema.safeParse(input.definition)
-  if (!validation.success) throw new Error('Situational definition cannot be frozen')
-  const definition = validation.data
+  const validation = validateSituationRuntimeDefinition(input.definition)
+  const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
+  if (!validation.definition || definitionErrors.length > 0) {
+    throw new Error('Situational definition cannot be frozen')
+  }
+  const definition = validation.definition
+  const definitionHash = hashSituationRuntimeDefinition(definition)
   const compiledRuntime = compileSituationRuntime({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     definition,
-    sourceDefinitionHash: hashSituationDefinition(definition),
+    sourceDefinitionHash: definitionHash,
   })
   assertPilotCapabilities(compiledRuntime)
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid frozen Situational runtime snapshot frozenAt')
-  const runnerDefinition = runnerSituationDefinition(definition)
+  const runnerDefinition = runnerSituationRuntimeDefinition(definition)
   const unsigned = unsignedSnapshot({
     schemaVersion: 1,
     runtimeGeneration: 'UNIFIED_V1',
     frozenAt: frozenAt.toISOString(),
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    definitionHash: hashSituationDefinition(definition),
+    definitionHash,
     compiledRuntimeHash: compiledRuntime.compiledRuntimeHash,
     scorerKey: compiledRuntime.scorerKey ?? 'situational.default',
     scoringVersion: definition.scoring.scoringVersion,
@@ -147,7 +170,7 @@ const buildFrozenSnapshot = (input: {
 export const freezeSituationalRuntimeAtAttemptStart = (input: {
   instrumentKey: string
   instrumentVersion: string
-  definition: SituationDefinitionV1
+  definition: SituationRuntimeDefinition
   frozenAt?: Date
 }): FrozenSituationalRuntimeSnapshotV1 => buildFrozenSnapshot(input)
 
@@ -157,9 +180,13 @@ export const hashFrozenSituationalRuntimeSnapshot = (snapshot: FrozenSituational
 
 export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSituationalRuntimeSnapshotV1 => {
   const parsed = frozenSituationalRuntimeSnapshotSchema.parse(value) as unknown as FrozenSituationalRuntimeSnapshotV1
-  const definitionHash = hashSituationDefinition(parsed.definition)
+  const validation = validateSituationRuntimeDefinition(parsed.definition)
+  const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
+  if (!validation.definition || definitionErrors.length > 0) throw new Error('Frozen Situational definition is invalid')
+  const definition = validation.definition
+  const definitionHash = hashSituationRuntimeDefinition(definition)
   if (parsed.definitionHash !== definitionHash) throw new Error('Frozen Situational definition hash mismatch')
-  if (parsed.runnerDefinition && canonicalHash(parsed.runnerDefinition) !== canonicalHash(runnerSituationDefinition(parsed.definition))) {
+  if (canonicalHash(parsed.runnerDefinition) !== canonicalHash(runnerSituationRuntimeDefinition(definition))) {
     throw new Error('Frozen Situational runner definition mismatch')
   }
   const compiledRuntime = parseCompiledInstrumentRuntime(parsed.compiledRuntime)
@@ -185,7 +212,7 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
     compiledRuntimeHash: parsed.compiledRuntimeHash,
     scorerKey: parsed.scorerKey,
     scoringVersion: parsed.scoringVersion,
-    definition: parsed.definition,
+    definition,
     runnerDefinition: parsed.runnerDefinition,
     compiledRuntime,
   })
