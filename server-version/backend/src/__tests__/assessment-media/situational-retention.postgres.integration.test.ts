@@ -4,8 +4,8 @@ import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import {
   SITUATIONAL_STATIC_VISUAL_E2E_ASSETS,
-  SITUATIONAL_STATIC_VISUAL_E2E_GOLDEN_CASES,
-  SITUATIONAL_STATIC_VISUAL_E2E_PACKAGE,
+  SJT_STATIC_VISUAL_E2E_GOLDEN_CASES,
+  SJT_STATIC_VISUAL_E2E_PACKAGE,
 } from '../../modules/situational/packages/sjt-static-visual-e2e-fixture'
 
 const databaseUrl = integrationDatabaseUrl(
@@ -98,8 +98,8 @@ suite('Assessment media frozen retention on real PostgreSQL', () => {
     if (!db) throw new Error('integration database is not connected')
 
     const started = await startSituationalAttempt(userId, {
-      instrumentKey: SITUATIONAL_STATIC_VISUAL_E2E_PACKAGE.key,
-      instrumentVersion: SITUATIONAL_STATIC_VISUAL_E2E_PACKAGE.instrumentVersion,
+      instrumentKey: SJT_STATIC_VISUAL_E2E_PACKAGE.key,
+      instrumentVersion: SJT_STATIC_VISUAL_E2E_PACKAGE.instrumentVersion,
     })
     attemptId = started.attempt.id
 
@@ -122,7 +122,7 @@ suite('Assessment media frozen retention on real PostgreSQL', () => {
     })
     expect(deletion.count).toBe(0)
 
-    const golden = SITUATIONAL_STATIC_VISUAL_E2E_GOLDEN_CASES[0]!
+    const golden = SJT_STATIC_VISUAL_E2E_GOLDEN_CASES[0]!
     const completed = await submitSituationalAttemptFinal({
       attemptId,
       userId,
