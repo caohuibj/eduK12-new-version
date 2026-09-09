@@ -37,7 +37,7 @@ const embeddedClient = (parentAttemptId: string, itemId: string, recoveryToken?:
   const assetConfig = publicMode && recoveryToken ? { headers: { 'X-Recovery-Token': recoveryToken } } : undefined
   const path = (attemptId: string, suffix = '') => `${embeddedPath(parentAttemptId, itemId, attemptId, publicMode)}${suffix}`
   const loadAsset = async (attemptId: string, assetId: string): Promise<Blob> => {
-    const response = await sessionFetch(`${path(attemptId, `/assets/${encodeURIComponent(assetId)}/content`)}`, assetConfig)
+    const response = await sessionFetch(`/api${path(attemptId, `/assets/${encodeURIComponent(assetId)}/content`)}`, assetConfig)
     if (!response.ok) throw Object.assign(new Error('视觉内容加载失败'), { status: response.status })
     return response.blob()
   }
