@@ -5,6 +5,9 @@ import type {
   ReferenceKind,
 } from '../../assessment-reference/reference'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
+import type { FinalSubmissionDefinition } from '../cognitive.types'
+
+export type { FinalSubmissionDefinition } from '../cognitive.types'
 
 export const COGNITIVE_V2_SCHEMA_VERSION = 1 as const
 export const COGNITIVE_V2_TRIAL_ENVELOPE_VERSION = 1 as const
@@ -218,6 +221,7 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   trialSchema: ZodType<TTrial>
   protocol: ProtocolDefinition
   scorer: AuthoritativeScorer<TConfig, TTrial>
+  finalSubmission: FinalSubmissionDefinition<TConfig>
   profiles: Record<CognitiveProfile, {
     estimatedMinutes: [number, number]
     configPatch: Record<string, unknown>

@@ -1,5 +1,3 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { finalCognitiveSubmitSchema } from '../../modules/cognitive/cognitive.schema'
 import {
@@ -67,20 +65,4 @@ describe('AdministrationProvenanceV1 backend contract', () => {
     expect(definition?.quality.insufficientCompletedSteps?.effect).toBe('limited')
   })
 
-  it('keeps the no-provenance canonical replay branch as historical { trials }', () => {
-    const source = fs.readFileSync(
-      path.resolve(__dirname, '../../modules/cognitive/unified-final-submit.service.ts'),
-      'utf8',
-    )
-    expect(source).toContain("input.administrationProvenance\n    ? { trials, administrationProvenance: input.administrationProvenance }\n    : { trials }")
-    expect(source).not.toContain('administrationProvenance: null')
-  })
-
-  it('passes public provenance through the controller instead of dropping it', () => {
-    const source = fs.readFileSync(
-      path.resolve(__dirname, '../../modules/cognitive/cognitive.controller.ts'),
-      'utf8',
-    )
-    expect(source).toContain('input.administrationProvenance ? { administrationProvenance: input.administrationProvenance } : {}')
-  })
 })

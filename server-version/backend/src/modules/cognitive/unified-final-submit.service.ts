@@ -18,6 +18,10 @@ import { loadFrozenMeasurementContext } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
+import {
+  CognitiveFinalSubmissionConfigError,
+  resolveCognitiveFinalMaxTrials,
+} from './v2/final-submission-budget'
 import type { AdministrationProvenanceV1 } from './administration-provenance'
 
 import { validateAndNormalizeTrials } from './v2/trial-normalizer'
@@ -153,10 +157,11 @@ const assertFrozenAdmission = (
 const normalizeSubmission = (
   definition: ReturnType<typeof getCognitiveV2TaskDefinition>,
   values: unknown[],
+  maxTrials: number,
 ): TrialEnvelope[] => {
   if (!definition) throw new Error('Cognitive task definition is unavailable')
   try {
-    const trials = validateAndNormalizeTrials({ definition, values, maxTrials: 1000 })
+    const trials = validateAndNormalizeTrials({ definition, values, maxTrials })
     for (const [index, trial] of trials.entries()) {
       if (trial.trialIndex !== index) throw new Error('Trial envelopes must be ordered and contiguous')
     }
@@ -209,9 +214,23 @@ const prepareRuntime = (
     snapshot.scoringVersion,
   )
   if (!definition) throw new Error(`No Cognitive v2 definition for ${snapshot.testType}/${snapshot.engineVersion}/${snapshot.scoringVersion}`)
+  const validatedConfig = definition.configSchema.parse(snapshot.config)
+  let maxTrials: number
+  try {
+    maxTrials = resolveCognitiveFinalMaxTrials(definition, validatedConfig)
+  } catch (error) {
+    if (error instanceof CognitiveFinalSubmissionConfigError) {
+      throw new InstrumentFinalSubmitError(
+        'DEFINITION_MISMATCH',
+        '认知冻结配置无法完成最终提交，请重新创建作答',
+        409,
+      )
+    }
+    throw error
+  }
   const trials = measureRequestPhaseSync(
     'final_submit_payload_validation',
-    () => normalizeSubmission(definition, input.trials),
+    () => normalizeSubmission(definition, input.trials, maxTrials),
   )
   // Preserve historical replay hashes exactly when provenance is absent.
   // New clients bind provenance into the canonical submission identity so the

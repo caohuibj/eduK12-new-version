@@ -27,6 +27,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   if (!definition.configSchema || typeof definition.configSchema.safeParse !== 'function') issues.push(issue('configSchema', 'configSchema is required'))
   if (!definition.trialSchema || typeof definition.trialSchema.safeParse !== 'function') issues.push(issue('trialSchema', 'trialSchema is required'))
   if (typeof definition.scorer !== 'function') issues.push(issue('scorer', 'authoritative scorer is required'))
+  if (!definition.finalSubmission || typeof definition.finalSubmission.maxTrials !== 'function') issues.push(issue('finalSubmission.maxTrials', 'final submission maxTrials contract is required'))
   if (!definition.protocol.key) issues.push(issue('protocol.key', 'protocol key is required'))
   if (!definition.protocol.version) issues.push(issue('protocol.version', 'protocol version is required'))
   if (definition.protocol.clock !== 'performance') issues.push(issue('protocol.clock', 'protocol clock must be performance'))
