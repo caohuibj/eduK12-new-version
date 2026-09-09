@@ -22,6 +22,7 @@ import {
   CognitiveFinalSubmissionConfigError,
   resolveCognitiveFinalMaxTrials,
 } from './v2/final-submission-budget'
+import { withFrozenCognitiveReferenceApplicability } from './v2/frozen-reference-applicability'
 import type { AdministrationProvenanceV1 } from './administration-provenance'
 
 import { validateAndNormalizeTrials } from './v2/trial-normalizer'
@@ -227,12 +228,22 @@ const prepareRuntime = (
     }
   }
   assertDefinitionHash(snapshot.configHash, input.definitionHash)
-  const definition = getCognitiveV2TaskDefinition(
+  const currentDefinition = getCognitiveV2TaskDefinition(
     snapshot.testType,
     snapshot.engineVersion,
     snapshot.scoringVersion,
   )
-  if (!definition) throw new Error(`No Cognitive v2 definition for ${snapshot.testType}/${snapshot.engineVersion}/${snapshot.scoringVersion}`)
+  if (!currentDefinition) throw new Error(`No Cognitive v2 definition for ${snapshot.testType}/${snapshot.engineVersion}/${snapshot.scoringVersion}`)
+  let definition
+  try {
+    definition = withFrozenCognitiveReferenceApplicability(currentDefinition, snapshot.referenceBindings ?? [])
+  } catch (error) {
+    throw new InstrumentFinalSubmitError(
+      'DEFINITION_MISMATCH',
+      error instanceof Error ? `认知冻结 reference applicability 不可用：${error.message}` : '认知冻结 reference applicability 不可用',
+      409,
+    )
+  }
   const validatedConfig = definition.configSchema.parse(snapshot.config)
   let maxTrials: number
   try {
