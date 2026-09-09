@@ -1,16 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
-import {
-  encryptFrozenSituationalRuntimeSnapshot,
-  freezeSituationalRuntimeAtAttemptStart,
-} from '../../modules/assessment-runtime/situational-runtime-snapshot'
-import { getParticipantKey } from '../../modules/assessment-runtime/participant-key'
 import { compositeItemSlotKey } from '../../modules/assessment-runtime/slot-set'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { parseCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
 import type { SituationDefinitionV2 } from '../../modules/situational/situation-branching'
+import type { SituationPackageV2 } from '../../modules/situational/situation-package.registry'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 
 const databaseUrl = integrationDatabaseUrl(
@@ -18,8 +14,11 @@ const databaseUrl = integrationDatabaseUrl(
   'V32_3_INTEGRATION_DATABASE_URL',
 )
 const suite = databaseUrl ? describe : describe.skip
+const BRANCHING_PACKAGE_KEY = 'sjt-branching-v2c-integration'
+const BRANCHING_PACKAGE_VERSION = '2.0.0'
 
 let db: PrismaClient | null = null
+let startSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['startSituationalAttempt']
 let submitSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinal']
 let compositeService: typeof import('../../modules/composite/composite.service')
 
@@ -75,6 +74,37 @@ const branchingDefinition = (): SituationDefinitionV2 => {
   }
 }
 
+const branchingPackage = (): SituationPackageV2 => ({
+  key: BRANCHING_PACKAGE_KEY,
+  instrumentVersion: BRANCHING_PACKAGE_VERSION,
+  releaseStatus: 'PUBLISHED',
+  scienceMaturity: 'PILOT',
+  definition: branchingDefinition(),
+  goldenCases: [
+    {
+      name: 'early-terminal',
+      responses: [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'B' }],
+      expected: {
+        quality: 'interpretable',
+        metrics: { 'bfi2.assertiveness.behavior': 0.5 },
+        metricKeys: ['bfi2.assertiveness.behavior'],
+      },
+    },
+    {
+      name: 'full-path',
+      responses: [
+        { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
+        { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'A' },
+      ],
+      expected: {
+        quality: 'interpretable',
+        metrics: { 'bfi2.assertiveness.behavior': 1.5 },
+        metricKeys: ['bfi2.assertiveness.behavior'],
+      },
+    },
+  ],
+})
+
 const createUser = async (label: string): Promise<string> => {
   if (!db) throw new Error('branching integration database is not connected')
   const suffix = `${label}-${randomUUID()}`
@@ -86,35 +116,15 @@ const createUser = async (label: string): Promise<string> => {
   return id
 }
 
-const createStandaloneV2Attempt = async (userId: string) => {
-  if (!db) throw new Error('branching integration database is not connected')
-  const snapshot = freezeSituationalRuntimeAtAttemptStart({
-    instrumentKey: `sjt-branching-pg-${randomUUID()}`,
-    instrumentVersion: '2.0.0',
-    definition: branchingDefinition(),
+const startStandaloneV2 = async (userId: string) => {
+  const started = await startSituationalAttempt(userId, {
+    instrumentKey: BRANCHING_PACKAGE_KEY,
+    instrumentVersion: BRANCHING_PACKAGE_VERSION,
   })
-  const row = await db.situationalAttempt.create({
-    data: {
-      userId,
-      participantKey: getParticipantKey(userId),
-      instrumentKey: snapshot.instrumentKey,
-      instrumentVersion: snapshot.instrumentVersion,
-      attemptNo: 1,
-      status: 'IN_PROGRESS',
-      deliveryMode: 'FINAL_ONLY',
-      runtimeGeneration: 'UNIFIED_V1',
-      attemptEpoch: 1,
-      definitionHash: snapshot.definitionHash,
-      compiledRuntimeHash: snapshot.compiledRuntimeHash,
-      scorerKey: snapshot.scorerKey,
-      scoringVersion: snapshot.scoringVersion,
-      frozenAt: new Date(snapshot.frozenAt),
-      runtimeSnapshotEncrypted: encryptFrozenSituationalRuntimeSnapshot(snapshot),
-      progress: 0,
-    },
-  })
-  createdSituationalAttemptIds.push(row.id)
-  return { row, snapshot }
+  createdSituationalAttemptIds.push(started.attemptId)
+  expect(started.instrument.definition.schemaVersion).toBe(2)
+  expect(started.instrument.sampling).toEqual({ strategy: 'BRANCH_REACHABLE' })
+  return started
 }
 
 const createCompositeFixture = async () => {
@@ -149,8 +159,8 @@ const createCompositeFixture = async () => {
       type: 'SITUATIONAL',
       position: 0,
       required: true,
-      situationalInstrumentKey: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,
-      situationalInstrumentVersion: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
+      situationalInstrumentKey: BRANCHING_PACKAGE_KEY,
+      situationalInstrumentVersion: BRANCHING_PACKAGE_VERSION,
     },
   })
   const started = await compositeService.startUserAttempt(userId, composite.id)
@@ -170,11 +180,26 @@ const createCompositeFixture = async () => {
 
 suite('Situational V2 branching authoritative PostgreSQL FINAL', () => {
   beforeAll(async () => {
+    const v2Package = branchingPackage()
+    vi.doMock('../../modules/situational/situation-package.registry', async () => {
+      const actual = await vi.importActual<typeof import('../../modules/situational/situation-package.registry')>('../../modules/situational/situation-package.registry')
+      return {
+        ...actual,
+        listSituationPackages: () => [...actual.listSituationPackages(), v2Package],
+        getSituationPackage: (key: string, version: string) => (
+          key === v2Package.key && version === v2Package.instrumentVersion
+            ? v2Package
+            : actual.getSituationPackage(key, version)
+        ),
+      }
+    })
     process.env.DATABASE_URL = databaseUrl!
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     db = new PrismaClient({ datasources: { db: { url: databaseUrl! } } })
     await db.$connect()
+    const runtime = await import('../../modules/situational/situational-runtime.service')
+    startSituationalAttempt = runtime.startSituationalAttempt
     submitSituationalAttemptFinal = (await import('../../modules/situational/situational-final-submit.service')).submitSituationalAttemptFinal
     compositeService = await import('../../modules/composite/composite.service')
   }, 30_000)
@@ -188,21 +213,22 @@ suite('Situational V2 branching authoritative PostgreSQL FINAL', () => {
     await db.user.deleteMany({ where: { id: { in: createdUserIds } } })
     await db.$disconnect()
     db = null
+    vi.doUnmock('../../modules/situational/situation-package.registry')
   })
 
-  it('commits only the reachable early-terminal responses and preserves replay idempotency', async () => {
+  it('admits V2 normally, commits only reachable early-terminal responses, and preserves replay idempotency', async () => {
     const userId = await createUser('standalone')
-    const { row, snapshot } = await createStandaloneV2Attempt(userId)
+    const started = await startStandaloneV2(userId)
     const submissionId = `situational-v2c-submit-${randomUUID()}`
     const input = {
-      attemptId: row.id,
+      attemptId: started.attemptId,
       userId,
       submissionId,
-      attemptEpoch: 1,
-      definitionHash: snapshot.definitionHash,
-      instrumentVersion: snapshot.instrumentVersion,
-      compiledRuntimeHash: snapshot.compiledRuntimeHash,
-      scoringVersion: snapshot.scoringVersion,
+      attemptEpoch: started.attempt.attemptEpoch,
+      definitionHash: started.instrument.definitionHash,
+      instrumentVersion: started.instrument.version,
+      compiledRuntimeHash: started.instrument.compiledRuntimeHash,
+      scoringVersion: started.instrument.scoringVersion,
       responses: [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'B' }],
     }
 
@@ -211,81 +237,65 @@ suite('Situational V2 branching authoritative PostgreSQL FINAL', () => {
     expect(submitted.result?.quality.status).toBe('interpretable')
     expect(submitted.result?.metrics[0]?.value).toBe(0.5)
     expect(submitted.canonicalResult?.core.unitType).toBe('SITUATIONAL')
-    expect(await db!.situationalRawSubmission.findUnique({ where: { attemptId: row.id }, select: { responseCount: true } }))
+    expect(await db!.situationalRawSubmission.findUnique({ where: { attemptId: started.attemptId }, select: { responseCount: true } }))
       .toEqual({ responseCount: 1 })
 
     const replayed = await submitSituationalAttemptFinal(input)
     expect(replayed.replayed).toBe(true)
     expect(replayed.canonicalResult?.resultHash).toBe(submitted.canonicalResult?.resultHash)
-    expect(await db!.situationalRawSubmission.count({ where: { attemptId: row.id } })).toBe(1)
+    expect(await db!.situationalRawSubmission.count({ where: { attemptId: started.attemptId } })).toBe(1)
   })
 
   it('rejects off-path and non-terminal V2 FINAL payloads without mutating attempts', async () => {
-    const userId = await createUser('reject')
-    const offPath = await createStandaloneV2Attempt(userId)
+    const offPathUserId = await createUser('offpath')
+    const offPath = await startStandaloneV2(offPathUserId)
     await expect(submitSituationalAttemptFinal({
-      attemptId: offPath.row.id,
-      userId,
+      attemptId: offPath.attemptId,
+      userId: offPathUserId,
       submissionId: `situational-v2c-offpath-${randomUUID()}`,
-      attemptEpoch: 1,
-      definitionHash: offPath.snapshot.definitionHash,
-      instrumentVersion: offPath.snapshot.instrumentVersion,
-      compiledRuntimeHash: offPath.snapshot.compiledRuntimeHash,
-      scoringVersion: offPath.snapshot.scoringVersion,
+      attemptEpoch: offPath.attempt.attemptEpoch,
+      definitionHash: offPath.instrument.definitionHash,
+      instrumentVersion: offPath.instrument.version,
+      compiledRuntimeHash: offPath.instrument.compiledRuntimeHash,
+      scoringVersion: offPath.instrument.scoringVersion,
       responses: [
         { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'B' },
         { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'A' },
       ],
     })).rejects.toMatchObject({ code: 'SUBMISSION_PAYLOAD_CONFLICT' })
-    expect(await db!.situationalAttempt.findUnique({ where: { id: offPath.row.id }, select: { status: true, submissionId: true } }))
+    expect(await db!.situationalAttempt.findUnique({ where: { id: offPath.attemptId }, select: { status: true, submissionId: true } }))
       .toEqual({ status: 'IN_PROGRESS', submissionId: null })
-    expect(await db!.situationalRawSubmission.count({ where: { attemptId: offPath.row.id } })).toBe(0)
+    expect(await db!.situationalRawSubmission.count({ where: { attemptId: offPath.attemptId } })).toBe(0)
 
-    const incomplete = await createStandaloneV2Attempt(userId)
+    const incompleteUserId = await createUser('incomplete')
+    const incomplete = await startStandaloneV2(incompleteUserId)
     await expect(submitSituationalAttemptFinal({
-      attemptId: incomplete.row.id,
-      userId,
+      attemptId: incomplete.attemptId,
+      userId: incompleteUserId,
       submissionId: `situational-v2c-incomplete-${randomUUID()}`,
-      attemptEpoch: 1,
-      definitionHash: incomplete.snapshot.definitionHash,
-      instrumentVersion: incomplete.snapshot.instrumentVersion,
-      compiledRuntimeHash: incomplete.snapshot.compiledRuntimeHash,
-      scoringVersion: incomplete.snapshot.scoringVersion,
+      attemptEpoch: incomplete.attempt.attemptEpoch,
+      definitionHash: incomplete.instrument.definitionHash,
+      instrumentVersion: incomplete.instrument.version,
+      compiledRuntimeHash: incomplete.instrument.compiledRuntimeHash,
+      scoringVersion: incomplete.instrument.scoringVersion,
       responses: [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' }],
     })).rejects.toMatchObject({ code: 'SUBMISSION_PAYLOAD_CONFLICT', statusCode: 409 })
-    expect(await db!.situationalAttempt.findUnique({ where: { id: incomplete.row.id }, select: { status: true, submissionId: true } }))
+    expect(await db!.situationalAttempt.findUnique({ where: { id: incomplete.attemptId }, select: { status: true, submissionId: true } }))
       .toEqual({ status: 'IN_PROGRESS', submissionId: null })
   })
 
-  it('completes an embedded Bundle child from a V2 frozen graph without exposing raw trajectory in CanonicalUnitResult', async () => {
+  it('completes a normally admitted V2 embedded Bundle child without exposing raw trajectory in CanonicalUnitResult', async () => {
     const fixture = await createCompositeFixture()
-    const snapshot = freezeSituationalRuntimeAtAttemptStart({
-      instrumentKey: fixture.child.instrumentKey,
-      instrumentVersion: fixture.child.instrumentVersion,
-      definition: branchingDefinition(),
-    })
-    await db!.situationalAttempt.update({
-      where: { id: fixture.child.id },
-      data: {
-        definitionHash: snapshot.definitionHash,
-        compiledRuntimeHash: snapshot.compiledRuntimeHash,
-        scorerKey: snapshot.scorerKey,
-        scoringVersion: snapshot.scoringVersion,
-        frozenAt: new Date(snapshot.frozenAt),
-        runtimeSnapshotEncrypted: encryptFrozenSituationalRuntimeSnapshot(snapshot),
-      },
-    })
-
     const submissionId = `situational-v2c-bundle-${randomUUID()}`
     const input = {
       attemptId: fixture.child.id,
       userId: fixture.userId,
       submissionId,
       attemptEpoch: fixture.child.attemptEpoch,
-      definitionHash: snapshot.definitionHash,
-      instrumentVersion: snapshot.instrumentVersion,
-      compiledRuntimeHash: snapshot.compiledRuntimeHash,
-      scoringVersion: snapshot.scoringVersion,
+      definitionHash: fixture.child.definitionHash,
+      instrumentVersion: fixture.child.instrumentVersion,
+      compiledRuntimeHash: fixture.child.compiledRuntimeHash,
+      scoringVersion: fixture.child.scoringVersion,
       responses: [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'B' }],
       embedded: {
         compositeAttemptId: fixture.parentId,
