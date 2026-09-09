@@ -20,7 +20,7 @@ import {
   validateSituationPackage,
   type SituationPackageV1,
 } from './situation-package.registry'
-import { runnerSituationDefinition } from './situation-definition'
+import { runnerSituationDefinition, situationDefinitionAssetReferences } from './situation-definition'
 import type { SituationalResultV1 } from './situation-scoring'
 import {
   decryptUnifiedRuntimePayload,
@@ -29,6 +29,12 @@ import {
   parseCanonicalUnitResultEnvelope,
   type CanonicalUnitResultEnvelopeV1,
 } from '../assessment-runtime/unit-result'
+import {
+  ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
+  ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+  AssessmentAssetValidationError,
+  retainAssessmentAssetReferences,
+} from '../assessment-media/assessment-asset'
 import { assertSituationalAssetReferencesReady } from './situational-asset.service'
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
@@ -331,6 +337,29 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
   }
 }
 
+const retainFrozenSituationalAssets = async (
+  db: Prisma.TransactionClient,
+  attemptId: string,
+  snapshot: FrozenSituationalRuntimeSnapshotV1,
+): Promise<void> => {
+  try {
+    await retainAssessmentAssetReferences({
+      owner: {
+        entityType: ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+        entityId: `SITUATIONAL:${attemptId}`,
+        field: ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
+      },
+      references: situationDefinitionAssetReferences(snapshot.definition),
+      db,
+    })
+  } catch (error) {
+    if (error instanceof AssessmentAssetValidationError) {
+      throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化视觉内容在冻结时已失效', 409)
+    }
+    throw error
+  }
+}
+
 export const startSituationalAttempt = async (userId: string, input: {
   instrumentKey: string
   instrumentVersion?: string
@@ -377,26 +406,30 @@ export const startSituationalAttempt = async (userId: string, input: {
     })
     const attemptNo = (latest?.attemptNo ?? 0) + 1
     try {
-      const created = await prisma.situationalAttempt.create({
-        data: {
-          userId,
-          participantKey,
-          instrumentKey: situationPackage.key,
-          instrumentVersion: situationPackage.instrumentVersion,
-          attemptNo,
-          status: 'IN_PROGRESS',
-          deliveryMode: 'FINAL_ONLY',
-          runtimeGeneration: 'UNIFIED_V1',
-          attemptEpoch: 1,
-          definitionHash: snapshot.definitionHash,
-          compiledRuntimeHash: snapshot.compiledRuntimeHash,
-          scorerKey: snapshot.scorerKey,
-          scoringVersion: snapshot.scoringVersion,
-          frozenAt: new Date(snapshot.frozenAt),
-          runtimeSnapshotEncrypted: encryptedSnapshot,
-          progress: 0,
-        },
-        select: SITUATIONAL_ATTEMPT_SELECT,
+      const created = await prisma.$transaction(async (db) => {
+        const row = await db.situationalAttempt.create({
+          data: {
+            userId,
+            participantKey,
+            instrumentKey: situationPackage.key,
+            instrumentVersion: situationPackage.instrumentVersion,
+            attemptNo,
+            status: 'IN_PROGRESS',
+            deliveryMode: 'FINAL_ONLY',
+            runtimeGeneration: 'UNIFIED_V1',
+            attemptEpoch: 1,
+            definitionHash: snapshot.definitionHash,
+            compiledRuntimeHash: snapshot.compiledRuntimeHash,
+            scorerKey: snapshot.scorerKey,
+            scoringVersion: snapshot.scoringVersion,
+            frozenAt: new Date(snapshot.frozenAt),
+            runtimeSnapshotEncrypted: encryptedSnapshot,
+            progress: 0,
+          },
+          select: SITUATIONAL_ATTEMPT_SELECT,
+        })
+        await retainFrozenSituationalAssets(db, row.id, snapshot)
+        return row
       })
       return situationalAttemptForResponse(created, snapshot)
     } catch (error: any) {
@@ -469,6 +502,7 @@ export const createEmbeddedSituationalAttempt = async (
       },
       select: SITUATIONAL_ATTEMPT_SELECT,
     })
+    await retainFrozenSituationalAssets(db, row.id, snapshot)
     return { row, snapshot }
   } catch (error: any) {
     if (error?.code !== 'P2002') throw error
@@ -506,4 +540,3 @@ export const listSituationalHistory = async (userId: string) => {
     total: rows.length,
   }
 }
-
