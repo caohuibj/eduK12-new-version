@@ -291,7 +291,7 @@ const SituationalRunner: React.FC = () => {
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex flex-col gap-3 rounded-xl bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">文字情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
-        <div className="text-left text-sm text-gray-600 sm:text-right"><div>已完成 {answeredCount} / {totalResponses} 个通道</div><div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 sm:w-48"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} /></div></div>
+        <div className="text-left text-sm text-gray-600 sm:text-right"><div>已完成 {answeredCount} / {totalResponses} 个必答通道</div><div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 sm:w-48"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} /></div></div>
       </div>
 
       {notice && <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div>}
@@ -307,7 +307,7 @@ const SituationalRunner: React.FC = () => {
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
               <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || visualBusy}>
-                <legend className="text-base font-semibold text-gray-900">{channel.prompt}</legend>
+                <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
                     <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void persistAnswer(currentScene, channel, option.optionKey)} className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
