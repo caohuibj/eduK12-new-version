@@ -18,6 +18,7 @@ const baseBranchingDefinition = (): SituationDefinitionV2 => {
   return {
     ...source,
     schemaVersion: 2,
+    sampling: { strategy: 'BRANCH_REACHABLE' },
     flow: {
       strategy: 'BRANCHING_DAG_V1',
       entryNodeKey: 'node-as-01',
@@ -72,6 +73,17 @@ describe('Situational V2 branching graph contract', () => {
     // V1 production runtime paths accept schemaVersion 2 before PR B/C land.
     expect(validateSituationDefinition(definition).definition).toBeUndefined()
     expect(validateSituationDefinition(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION).definition).toBeDefined()
+  })
+
+  it('uses branch-reachable presentation semantics instead of V1 sampling ALL', () => {
+    const definition = baseBranchingDefinition()
+    expect(definition.sampling).toEqual({ strategy: 'BRANCH_REACHABLE' })
+    const runner = runnerBranchingSituationDefinition(definition)
+    expect(runner.sampling).toEqual({ strategy: 'BRANCH_REACHABLE' })
+
+    const invalid = clone(definition) as unknown as Record<string, unknown>
+    invalid.sampling = { strategy: 'ALL' }
+    expect(errors(invalid)).toContain('sampling.strategy')
   })
 
   it('binds the hash to graph structure and exposes only runner-safe flow data', () => {
@@ -180,7 +192,6 @@ describe('Situational V2 branching graph contract', () => {
       bands: [],
       guidance: [],
     })
-    first.transition.channelKey = 'confidence'
     const continuousFirst = continuous.flow.nodes[0]
     if (continuousFirst?.nodeType !== 'SCENE' || continuousFirst.transition.type !== 'DECISION') throw new Error('fixture decision node missing')
     continuousFirst.transition.channelKey = 'confidence'
