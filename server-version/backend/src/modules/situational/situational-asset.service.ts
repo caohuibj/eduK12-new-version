@@ -2,8 +2,8 @@ import { Readable } from 'node:stream'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
 import {
-  situationDefinitionAssetReferences,
-  type SituationDefinitionV1,
+  situationalAssetReferences,
+  type SituationalSceneDefinition,
   type SituationalStoredAssetIdentity,
 } from './situation-definition'
 import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
@@ -28,6 +28,9 @@ export interface SituationalAssetValidation {
 }
 
 type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
+type SituationAssetReferenceSource = {
+  scenes: ReadonlyArray<Pick<SituationalSceneDefinition, 'stimulus'>>
+}
 
 const assetSelect = {
   id: true,
@@ -39,8 +42,8 @@ const assetSelect = {
   deletedAt: true,
 } as const
 
-const referencePaths = (definition: SituationDefinitionV1): SituationalStoredAssetIdentity[] => (
-  situationDefinitionAssetReferences(definition)
+const referencePaths = (definition: SituationAssetReferenceSource): SituationalStoredAssetIdentity[] => (
+  definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
 )
 
 /**
@@ -50,7 +53,7 @@ const referencePaths = (definition: SituationDefinitionV1): SituationalStoredAss
  * which the database-backed asset must exist and still match its hash.
  */
 export const validateSituationalAssetReferences = async (
-  definition: SituationDefinitionV1,
+  definition: SituationAssetReferenceSource,
   db: AssetDatabase = prisma,
 ): Promise<SituationalAssetValidation> => {
   const references = referencePaths(definition)
@@ -83,7 +86,7 @@ export const validateSituationalAssetReferences = async (
 }
 
 export const assertSituationalAssetReferencesReady = async (
-  definition: SituationDefinitionV1,
+  definition: SituationAssetReferenceSource,
   db: AssetDatabase = prisma,
 ): Promise<void> => {
   const validation = await validateSituationalAssetReferences(definition, db)
@@ -96,7 +99,7 @@ const findFrozenAssetReference = (
   snapshot: FrozenSituationalRuntimeSnapshotV1,
   assetId: string,
 ): SituationalStoredAssetIdentity | undefined => (
-  situationDefinitionAssetReferences(snapshot.definition).find((reference) => reference.assetId === assetId)
+  referencePaths(snapshot.definition).find((reference) => reference.assetId === assetId)
 )
 
 const proxyCosAsset = async (asset: StoredAssetRecord, res: Response): Promise<Response | void> => {
