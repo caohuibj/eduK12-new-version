@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { compileCognitiveRuntime } from '../../modules/assessment-runtime/compiler'
 import type { ReferenceBindingSnapshot } from '../../modules/assessment-runtime/types'
+import { hashResolvedConfig } from '../../modules/cognitive/profile-freeze'
 import { createSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
 import { withFrozenCognitiveReferenceApplicability } from '../../modules/cognitive/v2/frozen-reference-applicability'
 import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
@@ -33,7 +33,7 @@ const mapping = (profile: 'standard' | 'research' = 'standard'): ReferenceApplic
     scoringVersion: definition.scoringVersion,
     direction: definition.metrics.medianRtMs.direction,
     profiles: [profile],
-    resolvedConfigHashes: [canonicalHash(config)],
+    resolvedConfigHashes: [hashResolvedConfig(config)],
     requiredContext: ['age'],
   }
 }
@@ -53,7 +53,7 @@ const bindingFor = (
   scoreKey: reference.metricKey,
   referenceKind: reference.referenceKind,
   ...(options.applicability === null ? {} : {
-    applicability: (options.applicability ?? reference) as unknown as Record<string, never>,
+    applicability: (options.applicability ?? reference) as unknown as NonNullable<ReferenceBindingSnapshot['applicability']>,
   }),
 })
 
