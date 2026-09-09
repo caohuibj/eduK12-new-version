@@ -1,19 +1,22 @@
-import { Readable } from 'node:stream'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
+import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import type { AssetDatabase } from '../../services/assetStorage'
+import {
+  findFrozenAssessmentAssetReference,
+  validateAssessmentAssetReferences,
+} from '../assessment-media/assessment-asset'
+import {
+  AssessmentImageDeliveryError,
+  assessmentImageInternals,
+  serveAssessmentImageContent,
+} from '../assessment-media/assessment-image-delivery'
+import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
 import {
   situationalAssetReferences,
   type SituationalSceneDefinition,
   type SituationalStoredAssetIdentity,
 } from './situation-definition'
-import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
-import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
-import {
-  serveStoredAssetContent,
-  type AssetDatabase,
-  type StoredAssetContent,
-} from '../../services/assetStorage'
-import { getCOSSignedUrl } from '../../utils/cos'
 
 export interface SituationalAssetIssue {
   path: string
@@ -27,62 +30,32 @@ export interface SituationalAssetValidation {
   references: SituationalStoredAssetIdentity[]
 }
 
-type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
 type SituationAssetReferenceSource = {
   scenes: ReadonlyArray<Pick<SituationalSceneDefinition, 'stimulus'>>
 }
-
-const assetSelect = {
-  id: true,
-  objectKey: true,
-  provider: true,
-  mimeType: true,
-  sizeBytes: true,
-  sha256: true,
-  deletedAt: true,
-} as const
 
 const referencePaths = (definition: SituationAssetReferenceSource): SituationalStoredAssetIdentity[] => (
   definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
 )
 
 /**
- * Verify the stable asset identity recorded in a definition against the
- * existing StoredAsset catalog.  This is intentionally separate from the
- * pure definition validator: publication/runtime admission is the point at
- * which the database-backed asset must exist and still match its hash.
+ * Situational owns only reference enumeration and its unit-specific error
+ * contract. StoredAsset catalog validation is shared by Assessment media.
  */
 export const validateSituationalAssetReferences = async (
   definition: SituationAssetReferenceSource,
   db: AssetDatabase = prisma,
 ): Promise<SituationalAssetValidation> => {
   const references = referencePaths(definition)
-  const assetIds = [...new Set(references.map((reference) => reference.assetId))]
-  if (!assetIds.length) return { valid: true, issues: [], references }
-
-  const assets = await db.storedAsset.findMany({
-    where: { id: { in: assetIds } },
-    select: assetSelect,
-  })
-  const byId = new Map<string, StoredAssetRecord>(assets.map((asset) => [asset.id, asset]))
-  const issues: SituationalAssetIssue[] = []
-
-  references.forEach((reference, index) => {
-    const asset = byId.get(reference.assetId)
-    const path = `scenes.visualAssetReferences.${index}`
-    if (!asset || asset.deletedAt || asset.sizeBytes <= 0 || !asset.objectKey || !['local', 'cos'].includes(asset.provider)) {
-      issues.push({ path, message: `视觉资产不存在或不可读取：${reference.assetId}`, severity: 'error' })
-      return
-    }
-    if (asset.mimeType !== reference.mimeType) {
-      issues.push({ path: `${path}.mimeType`, message: `视觉资产 MIME 与 StoredAsset 不一致：${reference.assetId}`, severity: 'error' })
-    }
-    if (asset.sha256 !== reference.contentHash) {
-      issues.push({ path: `${path}.contentHash`, message: `视觉资产 contentHash 与 StoredAsset 不一致：${reference.assetId}`, severity: 'error' })
-    }
-  })
-
-  return { valid: issues.length === 0, issues, references }
+  const validation = await validateAssessmentAssetReferences(references, db)
+  return {
+    valid: validation.valid,
+    references,
+    issues: validation.issues.map((issue) => ({
+      ...issue,
+      path: issue.path.replace(/^references\./u, 'scenes.visualAssetReferences.'),
+    })),
+  }
 }
 
 export const assertSituationalAssetReferencesReady = async (
@@ -99,39 +72,17 @@ const findFrozenAssetReference = (
   snapshot: FrozenSituationalRuntimeSnapshotV1,
   assetId: string,
 ): SituationalStoredAssetIdentity | undefined => (
-  referencePaths(snapshot.definition).find((reference) => reference.assetId === assetId)
+  findFrozenAssessmentAssetReference(
+    referencePaths(snapshot.definition),
+    assetId,
+  ) as SituationalStoredAssetIdentity | undefined
 )
 
-const proxyCosAsset = async (asset: StoredAssetRecord, res: Response): Promise<Response | void> => {
-  let upstream: globalThis.Response
-  try {
-    const signedUrl = await getCOSSignedUrl(asset.objectKey)
-    upstream = await fetch(signedUrl)
-  } catch {
-    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产暂时无法读取', 404)
-  }
-  if (!upstream.ok || !upstream.body) {
-    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产暂时无法读取', 404)
-  }
-
-  // Public recovery uses an authorization header that an <img> redirect cannot
-  // preserve. Proxy only the Situational COS bytes through the already-
-  // authorized application route so the browser never depends on bucket CORS
-  // and never receives the signed COS URL.
-  res.setHeader('X-Content-Type-Options', 'nosniff')
-  res.setHeader('Content-Type', asset.mimeType)
-  res.setHeader('Content-Length', String(asset.sizeBytes))
-  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.id)}"`)
-  const stream = Readable.fromWeb(upstream.body as Parameters<typeof Readable.fromWeb>[0])
-  stream.on('error', () => res.destroy())
-  return stream.pipe(res)
-}
-
 /**
- * A delivery request is authorized by the already-authorized attempt and can
- * only address an asset referenced by that attempt's frozen definition.  The
- * content hash and MIME are checked again at delivery so catalog drift fails
- * closed instead of silently changing the stimulus.
+ * The attempt route performs Situational authorization before entering this
+ * adapter. The requested asset must additionally occur in that attempt's
+ * frozen definition; byte delivery and immutable identity revalidation are
+ * shared Assessment image responsibilities.
  */
 export const serveFrozenSituationalAsset = async (params: {
   snapshot: FrozenSituationalRuntimeSnapshotV1
@@ -143,24 +94,22 @@ export const serveFrozenSituationalAsset = async (params: {
   if (!reference) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产不属于当前冻结题面', 404)
   }
-  const db = params.db || prisma
-  const asset = await db.storedAsset.findUnique({
-    where: { id: params.assetId },
-    select: assetSelect,
-  })
-  if (
-    !asset
-    || asset.deletedAt
-    || asset.sizeBytes <= 0
-    || !asset.objectKey
-    || !['local', 'cos'].includes(asset.provider)
-    || asset.sha256 !== reference.contentHash
-    || asset.mimeType !== reference.mimeType
-  ) {
-    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产已失效或身份不匹配', 404)
+  try {
+    return await serveAssessmentImageContent({
+      reference,
+      res: params.res,
+      db: params.db || prisma,
+    })
+  } catch (error) {
+    if (error instanceof AssessmentImageDeliveryError) {
+      throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视觉资产已失效或身份不匹配', 404)
+    }
+    throw error
   }
-  if (asset.provider === 'cos') return proxyCosAsset(asset, params.res)
-  return serveStoredAssetContent(asset, params.res)
 }
 
-export const situationalAssetInternals = { findFrozenAssetReference, proxyCosAsset }
+/** Compatibility surface for existing focused tests/debugging only. */
+export const situationalAssetInternals = {
+  findFrozenAssetReference,
+  proxyCosAsset: assessmentImageInternals.proxyCosImage,
+}
