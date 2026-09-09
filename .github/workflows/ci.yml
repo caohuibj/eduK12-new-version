@@ -105,8 +105,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
@@ -192,8 +194,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
@@ -274,12 +278,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: configure runner-local npm and Playwright caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
-      - name: install Chromium for seeded browser
+      - name: prepare Chromium for seeded browser
         working-directory: server-version/backend
-        run: npx playwright-core install --with-deps chromium
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
@@ -379,6 +395,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: configure runner-local Trivy cache
+        id: runner-cache
+        run: |
+          trivy_cache="$HOME/.cache/trivy"
+          trivy_bin_dir="$HOME/.local/bin/trivy-bin"
+          mkdir -p "$trivy_cache" "$trivy_bin_dir"
+          echo "trivy_cache=$trivy_cache" >> "$GITHUB_OUTPUT"
+          echo "$trivy_bin_dir" >> "$GITHUB_PATH"
+      - name: detect runner-local Trivy 0.70.0
+        id: trivy-local
+        run: |
+          trivy_bin="$HOME/.local/bin/trivy-bin/trivy"
+          if [ -x "$trivy_bin" ] && "$trivy_bin" --version 2>/dev/null | grep -q '^Version: 0\.70\.0$'; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: install Trivy 0.70.0 once per runner
+        if: steps.trivy-local.outputs.ready != 'true'
+        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
       - name: assert API/worker isolation topology
@@ -397,6 +436,8 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
           cache: 'false'
+          skip-setup-trivy: true
+          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
       - name: scan frontend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -407,6 +448,8 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
           cache: 'false'
+          skip-setup-trivy: true
+          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
 
   codeql:
     name: codeql (javascript/typescript SAST)
