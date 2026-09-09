@@ -114,6 +114,8 @@ export interface AssessmentAssetRetentionOwner {
 
 export const ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE = 'AssessmentFrozenRuntime'
 export const ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD = 'media'
+export const ASSESSMENT_PUBLISHED_DEFINITION_REFERENCE_TYPE = 'AssessmentPublishedDefinition'
+export const ASSESSMENT_PUBLISHED_MEDIA_FIELD = 'media'
 
 export const retainAssessmentAssetReferences = async (params: {
   owner: AssessmentAssetRetentionOwner
