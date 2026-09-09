@@ -7,8 +7,10 @@ import { resolvePackageContentLocale } from '../content-locale'
 import {
   evaluateDurableInstrumentRights,
   evaluateSdqElectronicAdminGate,
+  evaluateTexiLocalizationGate,
   evaluateWho5ScalePackageGate,
 } from '../scale-package-gates'
+import { TEXI_LOCALIZATION_MANIFEST_PENDING } from '../localization/texi-localization-manifest'
 import { hashScaleDefinition } from '../scale-definition'
 import {
   getScalePackage,
@@ -262,6 +264,18 @@ const evaluateSpecialGate = (input: {
       territory: input.territory,
       nowIso: input.nowIso,
       allowEnglishTeacherSource: input.pkg.key === 'sdq_teacher_zh_cn' && input.locale === 'en',
+    })
+    return { errors: gate.errors, warnings: gate.warnings }
+  }
+  if (input.pkg.key === 'texi_parent_zh_cn' || input.pkg.key === 'texi_teacher_zh_cn') {
+    const gate = evaluateTexiLocalizationGate({
+      instrumentKey: input.pkg.key,
+      instrumentVersion: input.pkg.instrumentVersion,
+      localizationManifest: TEXI_LOCALIZATION_MANIFEST_PENDING,
+      authorizations: [...input.authorizations],
+      locale: input.locale,
+      territory: input.territory,
+      nowIso: input.nowIso,
     })
     return { errors: gate.errors, warnings: gate.warnings }
   }
