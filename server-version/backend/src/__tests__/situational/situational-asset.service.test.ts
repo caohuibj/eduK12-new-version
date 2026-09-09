@@ -4,15 +4,20 @@ import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_DEFINITION } from '../../modules/situ
 import { freezeSituationalRuntimeAtAttemptStart } from '../../modules/assessment-runtime/situational-runtime-snapshot'
 import type { SituationDefinitionV1 } from '../../modules/situational/situation-definition'
 
-const { mockPrisma, mockServeStoredAssetContent, mockGetCOSSignedUrl } = vi.hoisted(() => ({
-  mockPrisma: { storedAsset: { findMany: vi.fn(), findUnique: vi.fn() } },
+const { mockPrisma, mockServeStoredAssetContent, mockAttachAssetReference, mockGetCOSSignedUrl } = vi.hoisted(() => ({
+  mockPrisma: {
+    storedAsset: { findMany: vi.fn(), findUnique: vi.fn() },
+    assetReference: { upsert: vi.fn() },
+  },
   mockServeStoredAssetContent: vi.fn(),
+  mockAttachAssetReference: vi.fn(),
   mockGetCOSSignedUrl: vi.fn(),
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../services/assetStorage', () => ({
   serveStoredAssetContent: mockServeStoredAssetContent,
+  attachAssetReference: mockAttachAssetReference,
 }))
 vi.mock('../../utils/cos', () => ({
   getCOSSignedUrl: mockGetCOSSignedUrl,
@@ -53,7 +58,7 @@ const asset = (id: string, sha256: string, mimeType: string, provider = 'local')
   deletedAt: null,
 })
 
-describe('situational static asset boundary', () => {
+describe('situational static asset adapter', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockServeStoredAssetContent.mockResolvedValue(undefined)
@@ -64,7 +69,7 @@ describe('situational static asset boundary', () => {
     vi.unstubAllGlobals()
   })
 
-  it('requires every referenced StoredAsset to exist and match MIME/hash identity', async () => {
+  it('projects every Situational reference into shared catalog validation', async () => {
     mockPrisma.storedAsset.findMany.mockResolvedValue([
       asset('asset-image-1', 'a'.repeat(64), 'image/png'),
       asset('asset-panel-1', 'wrong'.padEnd(64, '0'), 'image/png'),
@@ -72,6 +77,7 @@ describe('situational static asset boundary', () => {
 
     const validation = await validateSituationalAssetReferences(visualDefinition(), mockPrisma as never)
     expect(validation.valid).toBe(false)
+    expect(validation.references.map((reference) => reference.assetId)).toEqual(['asset-image-1', 'asset-panel-1'])
     expect(validation.issues.map((issue) => issue.message).join('\n')).toContain('MIME')
     expect(validation.issues.map((issue) => issue.message).join('\n')).toContain('contentHash')
     await expect(assertSituationalAssetReferencesReady(visualDefinition(), mockPrisma as never)).rejects.toMatchObject({
@@ -79,7 +85,7 @@ describe('situational static asset boundary', () => {
     })
   })
 
-  it('accepts a complete immutable asset catalog', async () => {
+  it('accepts a complete immutable asset catalog through the compatibility wrapper', async () => {
     mockPrisma.storedAsset.findMany.mockResolvedValue([
       asset('asset-image-1', 'a'.repeat(64), 'image/png'),
       asset('asset-panel-1', 'b'.repeat(64), 'image/webp'),
@@ -111,7 +117,7 @@ describe('situational static asset boundary', () => {
       .rejects.toMatchObject({ code: 'INSTRUMENT_NOT_AVAILABLE', statusCode: 404 })
   })
 
-  it('proxies COS bytes through the authorized application route instead of redirecting the browser', async () => {
+  it('proxies COS bytes through the shared application delivery core', async () => {
     const snapshot = freezeSituationalRuntimeAtAttemptStart({
       instrumentKey: 'visual-fixture',
       instrumentVersion: '1.0.0',
@@ -136,7 +142,7 @@ describe('situational static asset boundary', () => {
     expect(mockServeStoredAssetContent).not.toHaveBeenCalled()
   })
 
-  it('fails closed when the StoredAsset hash drifts after the attempt was frozen', async () => {
+  it('maps shared delivery identity drift back to the existing Situational error contract', async () => {
     const snapshot = freezeSituationalRuntimeAtAttemptStart({
       instrumentKey: 'visual-fixture',
       instrumentVersion: '1.0.0',
@@ -150,4 +156,3 @@ describe('situational static asset boundary', () => {
     expect(mockServeStoredAssetContent).not.toHaveBeenCalled()
   })
 })
-
