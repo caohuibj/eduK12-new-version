@@ -1,9 +1,10 @@
-import apiClient from '../../api/client'
+import apiClient, { sessionFetch } from '../../api/client'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
 import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
+  loadAsset: (sessionId: string, assetId: string) => Promise<Blob>
   restartSession?: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession | { session: CognitiveSession; recoveryToken: string | null }>>
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
   appendTrials?: (sessionId: string, trials: Array<{ trialIndex: number; payload: unknown }>) => ReturnType<typeof apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>>
@@ -16,6 +17,15 @@ export interface CognitiveSessionApi {
     trials: unknown[]
     administrationProvenance?: AdministrationProvenanceV1
   }) => ReturnType<typeof apiClient.post<any>>
+}
+
+const loadSessionAsset = async (
+  path: string,
+  headers?: Record<string, string>,
+): Promise<Blob> => {
+  const response = await sessionFetch(path, headers ? { headers } : undefined)
+  if (!response.ok) throw Object.assign(new Error('认知测评视觉内容加载失败'), { status: response.status })
+  return response.blob()
 }
 
 /**
@@ -91,6 +101,9 @@ export const cognitiveApi = {
     apiClient.post<CognitiveSession>('/cognitive/sessions', { assignmentId }),
   getSession: (sessionId: string) =>
     apiClient.get<CognitiveSession>(`/cognitive/sessions/${sessionId}`),
+  loadAsset: (sessionId: string, assetId: string) => loadSessionAsset(
+    `/api/cognitive/sessions/${encodeURIComponent(sessionId)}/assets/${encodeURIComponent(assetId)}/content`,
+  ),
   restartSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/restart`, {}),
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) =>
@@ -111,6 +124,10 @@ export const cognitiveApi = {
 /** 公开匿名认知会话 API。恢复凭证只作为请求凭证，不写入 URL 路径。 */
 export const publicCognitiveApi = (recoveryToken: string): CognitiveSessionApi => ({
   getSession: (sessionId) => apiClient.get<CognitiveSession>(`/public/cognitive/sessions/${sessionId}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  loadAsset: (sessionId, assetId) => loadSessionAsset(
+    `/api/public/cognitive/sessions/${encodeURIComponent(sessionId)}/assets/${encodeURIComponent(assetId)}/content`,
+    { 'X-Recovery-Token': recoveryToken },
+  ),
   restartSession: (sessionId) => apiClient.post<{ session: CognitiveSession; recoveryToken: string | null }>(`/public/cognitive/sessions/${sessionId}/restart`, { recoveryToken }),
   appendTrial: (sessionId, trialIndex, payload) => apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>(`/public/cognitive/sessions/${sessionId}/trials`, { recoveryToken, trialIndex, payload }),
   appendTrials: (sessionId, trials) => apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>(`/public/cognitive/sessions/${sessionId}/trials/batch`, { recoveryToken, trials }),
