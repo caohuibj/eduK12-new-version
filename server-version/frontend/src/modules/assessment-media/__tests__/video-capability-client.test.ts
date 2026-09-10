@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { requestAssessmentVideoCapabilities } from '../video-capability-client'
 
 const jsonResponse = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
@@ -7,6 +7,10 @@ const jsonResponse = (body: unknown, status = 200) => new Response(JSON.stringif
 })
 
 describe('requestAssessmentVideoCapabilities', () => {
+  beforeEach(() => {
+    document.cookie = 'ptool_csrf=media-6-test; path=/'
+  })
+
   afterEach(() => vi.restoreAllMocks())
 
   it('returns the MEDIA-4 capability sources from the standard API envelope', async () => {
