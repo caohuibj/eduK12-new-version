@@ -365,7 +365,7 @@ const runCompositeFlow = async (browser, fixture, publicMode) => {
     const { parentId, recoveryToken } = started
 
     await page.getByRole('heading', { name: 'MEDIA-2 Image Form', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    await assertImage(page, fixture.formAssetId, '选项：媒体选项 A — MEDIA-2 form option image')
+    await assertImage(page, fixture.formAssetId, '媒体选项 A: MEDIA-2 form option image')
     await page.getByRole('button', { name: '媒体选项 A', exact: true }).click()
     await page.waitForTimeout(250)
 
@@ -374,7 +374,7 @@ const runCompositeFlow = async (browser, fixture, publicMode) => {
       : null
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'MEDIA-2 Image Form', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    await assertImage(page, fixture.formAssetId, '选项：媒体选项 A — MEDIA-2 form option image')
+    await assertImage(page, fixture.formAssetId, '媒体选项 A: MEDIA-2 form option image')
     await expectSelectedButton(page, '媒体选项 A')
     if (formRequest) {
       const request = await formRequest
