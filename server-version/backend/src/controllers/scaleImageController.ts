@@ -9,7 +9,6 @@ import {
 import { getScaleCustomScorerKeys } from '../modules/scale/scale-scoring'
 import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import {
-  frozenScaleMediaOwner,
   publishedScaleMediaOwner,
   retainScaleAssessmentImages,
   serveFrozenScaleAssessmentImage,
@@ -84,10 +83,6 @@ export const scaleImageController = {
       if (!assessment) return notFound(res, '量表测评记录不存在')
       if (!assessment.runtimeSnapshotEncrypted) return error(res, '量表冻结内容不可用')
       const snapshot = decryptFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)
-      await retainScaleAssessmentImages({
-        owner: frozenScaleMediaOwner(assessment.id),
-        definition: snapshot.definition,
-      })
       await serveFrozenScaleAssessmentImage({
         snapshot,
         assetId: req.params.assetId,
