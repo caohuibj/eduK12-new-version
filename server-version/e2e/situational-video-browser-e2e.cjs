@@ -77,11 +77,21 @@ const choose = async (page, optionKey) => {
 }
 
 const startStandalone = async (page) => {
-  await page.goto(`${BASE_URL}/student/situational`, { waitUntil: 'domcontentloaded' })
-  const card = page.locator('a').filter({ hasText: fixture.instrument.headline }).first()
-  await card.waitFor({ state: 'visible', timeout: 30000 })
-  await card.click()
+  // Pre-create the authoritative active attempt through the production start
+  // endpoint before mounting the runner. This keeps MEDIA-5 focused on video
+  // presentation/capability behavior and avoids exercising the unrelated
+  // concurrent-start race caused by multiple runner effects competing for the
+  // first standalone attempt identity in a fresh CI database.
+  const seeded = assertSuccess(await apiFetch(page, '/situational/attempts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ instrumentKey: fixture.instrument.key, instrumentVersion: fixture.instrument.version }),
+  }), 'seed standalone situational attempt')
+  assert.ok(seeded?.attempt?.id, 'standalone seed did not return an attempt')
+
+  await page.goto(`${BASE_URL}/student/situational/${encodeURIComponent(fixture.instrument.key)}`, { waitUntil: 'domcontentloaded' })
   await waitScene(page, fixture.instrument.videoSceneTitle)
+  return seeded.attempt.id
 }
 
 const assertCapabilityUrls = (sources, label) => {
