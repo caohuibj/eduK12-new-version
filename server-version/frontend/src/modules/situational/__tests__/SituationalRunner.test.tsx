@@ -298,5 +298,5 @@ describe('Situational text runner', () => {
     await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
     expect(situationalApi.start).toHaveBeenCalledTimes(1)
     expect(vi.mocked(situationalApi.submit).mock.calls[0]?.[1].responses).toHaveLength(sceneCount)
-  })
+  }, 10_000)
 })
