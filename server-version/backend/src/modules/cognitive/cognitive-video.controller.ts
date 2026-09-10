@@ -12,6 +12,9 @@ const requestSchema = z.object({
 }).strict()
 
 const handleVideoError = (res: Response, reason: unknown) => {
+  if (reason instanceof z.ZodError) {
+    return error(res, 'Invalid Cognitive video capability request', -1, 400)
+  }
   if (reason instanceof CognitiveServiceError) {
     return error(res, reason.message, -1, reason.statusCode)
   }
