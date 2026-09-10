@@ -27,6 +27,7 @@ describe('MEDIA-6 video projections', () => {
       { value: 'B', label: '选项 B' },
     ]
     expect(formOptionVideoPresentations(options)).toEqual([{
+      optionIndex: 0,
       optionLabel: '选项 A',
       presentation: presentation('video-a'),
     }])
