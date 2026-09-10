@@ -103,7 +103,7 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('请填写答案或选择跳过')
     expect(mockClient.post).not.toHaveBeenCalled()
 
-    fireEvent.click(getButtonByText(/跳\s*过/))
+    fireEvent.click(getButtonByText('跳 过'))
     await waitFor(() => expect(mockClient.patch).toHaveBeenCalledWith(
       '/assessments/session-1/form-answers/batch',
       expect.objectContaining({
