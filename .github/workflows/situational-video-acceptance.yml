@@ -1,0 +1,165 @@
+name: Situational Video Acceptance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - '.github/workflows/situational-video-acceptance.yml'
+      - 'server-version/backend/src/modules/situational/**'
+      - 'server-version/backend/src/routes/situational.ts'
+      - 'server-version/backend/src/modules/composite/composite.routes.ts'
+      - 'server-version/backend/src/modules/composite/composite.public.routes.ts'
+      - 'server-version/frontend/src/modules/situational/**'
+      - 'server-version/e2e/situational-video-*'
+  workflow_dispatch:
+
+concurrency:
+  group: situational-video-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  situational-video-browser:
+    name: Situational VIDEO auth/public/branch browser acceptance
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      NODE_ENV: test
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      ASSET_MIGRATION_COMPLETE: 'false'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://127.0.0.1:5173
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/eduk12-situational-video-e2e-uploads
+      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-video-e2e-credentials
+      SITUATIONAL_VIDEO_E2E_FIXTURE: 'true'
+      SITUATIONAL_VIDEO_E2E_FIXTURE_FILE: /tmp/eduk12-situational-video-fixture.json
+      SITUATIONAL_VIDEO_E2E_BASE_URL: http://127.0.0.1:5173
+      SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-video-e2e
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure isolated test keys
+        run: |
+          for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
+            value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: configure runner-local caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: prepare Chromium
+        working-directory: server-version/backend
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
+      - name: ensure ffmpeg
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: prisma generate and guarded migration
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: build backend
+        working-directory: server-version/backend
+        run: npm run build
+      - name: seed Situational VIDEO fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/situational-video-browser-fixture.ts
+      - name: start backend
+        run: |
+          rm -rf "$SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR"
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR" "$SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR"
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-video-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-video-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-video-backend.log
+          exit 1
+      - name: start frontend
+        run: |
+          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-video-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-video-frontend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-video-frontend.log
+          exit 1
+      - name: run Situational VIDEO browser acceptance
+        run: node e2e/situational-video-browser-e2e.cjs
+      - name: upload Situational VIDEO evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: situational-video-acceptance-evidence
+          path: |
+            /tmp/eduk12-situational-video-e2e
+            /tmp/eduk12-situational-video-backend.log
+            /tmp/eduk12-situational-video-frontend.log
+          if-no-files-found: ignore
+      - name: stop seeded services
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-situational-video-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-video-frontend.pid) || true; fi
+          if [ -f /tmp/eduk12-situational-video-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-video-backend.pid) || true; fi
