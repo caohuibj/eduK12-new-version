@@ -64,4 +64,34 @@ describe('SIT-V2-E branching browser fixture', () => {
     expect(result.quality.status).toBe('interpretable')
     expect(result.metrics[0]?.value).toBe(1.5)
   })
+
+  it('allows a routing-only early terminal to complete with no fabricated scored evidence', () => {
+    const responses = [{ sceneKey: 'BR-01', channelKey: 'behavior', responseValue: 'B' }]
+    const trajectory = deriveAuthoritativeSituationalTrajectory(
+      SJT_BRANCHING_E2E_DEFINITION,
+      responses,
+    )
+    expect(trajectory.reachedTerminal).toBe(true)
+    expect(trajectory.sceneKeys).toEqual(['BR-01'])
+    expect(trajectory.terminalNodeKey).toBe('terminal-early')
+
+    const scoringDefinition = projectReachableSituationDefinitionForScoring(
+      SJT_BRANCHING_E2E_DEFINITION,
+      trajectory,
+    )
+    expect(scoringDefinition.scenes).toEqual([])
+
+    const result = scoreSituational(scoringDefinition, responses, { responsesValidated: true })
+    expect(result.quality).toEqual({
+      status: 'invalid',
+      flags: ['metric_not_calculable'],
+    })
+    expect(result.metrics[0]).toMatchObject({
+      value: null,
+      range: { min: 0, max: 0 },
+      expectedResponses: [],
+      answeredResponses: [],
+      status: 'not_calculable',
+    })
+  })
 })
