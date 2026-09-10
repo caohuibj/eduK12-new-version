@@ -16,7 +16,12 @@ export const requestAssessmentVideoCapabilities = async (
   path: string,
   init: RequestInit = {},
 ): Promise<AssessmentVideoCapabilitySources> => {
-  const response = await sessionFetch(path, { ...init, method: 'POST' })
+  // Public assessment flows authenticate with an explicit recovery credential.
+  // Keep those exchanges cookie-free instead of letting sessionFetch replace
+  // `credentials: omit` with the authenticated same-origin cookie policy.
+  const response = init.credentials === 'omit'
+    ? await fetch(path, { ...init, method: 'POST', credentials: 'omit' })
+    : await sessionFetch(path, { ...init, method: 'POST' })
   let body: ApiResponse<unknown> | null = null
   try {
     body = await response.json() as ApiResponse<unknown>
