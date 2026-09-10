@@ -47,6 +47,7 @@ import {
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
+import { retainQuestionnaireScaleAssessmentImages } from '../modules/scale/questionnaire-scale-image-retention'
 import { questionnaireResumeTokenService } from './questionnaireResumeTokenService'
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import type { UnifiedParentHeader } from '../modules/assessment-runtime/unified-aggregate-finalizer.service'
@@ -601,14 +602,9 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
     include: {
       questionnaire: {
         include: {
-          questionnaireScales: {
-            orderBy: { position: 'asc' },
-            include: { scale: true },
-          },
-          formSections: {
-            orderBy: { position: 'asc' },
-            include: { items: { orderBy: [{ sectionPosition: 'asc' }, { position: 'asc' }] } },
-          },
+          formItems: true,
+          formSections: { include: { items: true } },
+          questionnaireScales: { include: { scale: true } },
         },
       },
       scaleAssessments: { include: { scale: true }, orderBy: { startedAt: 'asc' } },
@@ -1112,6 +1108,11 @@ export const restartQuestionnaireAssessment = async (
           questionnaireAssessmentId: next.id,
         })),
       })
+      await retainQuestionnaireScaleAssessmentImages({
+        questionnaireAssessmentId: next.id,
+        snapshots: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({ scaleId: entry.scaleId, snapshot })),
+        db: tx,
+      })
     }
     if (current.questionnaire.formItems.length > 0) {
       await tx.questionnaireFormAnswer.createMany({
@@ -1222,7 +1223,7 @@ export const updateQuestionnaireFormSection = async (
 export const reorderQuestionnaireFormSections = async (questionnaireId: string, sectionIds: string[]) => {
   const sections = await prisma.questionnaireFormSection.findMany({ where: { questionnaireId }, select: { id: true } })
   if (new Set(sectionIds).size !== sectionIds.length || sections.length !== sectionIds.length || sections.some((section) => !sectionIds.includes(section.id))) {
-    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段排序列表与问卷内容不一致', 400)
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段排序列表不一致', 400)
   }
   await prisma.$transaction(async (tx) => {
     const offset = sections.length + 1000

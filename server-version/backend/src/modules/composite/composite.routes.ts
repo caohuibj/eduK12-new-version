@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
+import { compositeImageController } from './composite-image.controller'
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
@@ -9,6 +10,8 @@ const router = Router()
 // 学生端（必须在 /:id 之前）
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getAttempt)
+router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedFormImage)
+router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedScaleImage)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getEmbeddedSituational)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeController.embeddedSituationalAsset)
 router.post('/attempts/:attemptId/restart', authenticate, requireRole(UserRole.STUDENT), compositeController.restartAttempt)
@@ -46,7 +49,7 @@ router.post('/:id/form-sections/:sectionId/items/reorder', authenticate, require
 router.post('/:id/form-sections/:sectionId/items/:itemId', authenticate, requireTeacher, compositeController.assignFormItemToSection)
 router.delete('/:id/items/:itemId', authenticate, requireTeacher, compositeController.removeItem)
 router.post('/:id/items/reorder', authenticate, requireTeacher, compositeController.reorderItems)
-router.post('/:id/publish', authenticate, requireTeacher, compositeController.publish)
+router.post('/:id/publish', authenticate, requireTeacher, compositeImageController.publish)
 router.get('/:id/public-tokens', authenticate, requireTeacher, compositeController.listTokens)
 router.post('/:id/public-tokens', authenticate, requireTeacher, compositeController.createToken)
 router.delete('/:id/public-tokens/:tokenId', authenticate, requireTeacher, compositeController.disableToken)

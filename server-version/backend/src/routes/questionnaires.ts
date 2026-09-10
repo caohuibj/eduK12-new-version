@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { questionnaireController } from '../controllers/questionnaireController'
+import { questionnaireImageController } from '../controllers/questionnaireImageController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -17,6 +18,8 @@ router.post('/assessments/:id/context/freeze', authenticate, legacyWriteDisabled
 
 router.post('/assessments/:assessmentId/form-sections/:sectionId/submit', authenticate, questionnaireController.submitFinalFormSection)
 router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/submit', authenticate, questionnaireController.submitFinalScale)
+router.get('/assessments/:assessmentId/form-sections/:sectionId/assets/:assetId', authenticate, questionnaireImageController.authenticatedFormImage)
+router.get('/assessments/:assessmentId/scales/:scaleAssessmentId/assets/:assetId', authenticate, questionnaireImageController.authenticatedScaleImage)
 
 // 完成问卷测评 (O4 load-once dispatch inside the controller: UNIFIED_V1 ->
 // unified finalizer with the preloaded parent; legacy attempts keep 410)
@@ -58,8 +61,8 @@ router.put('/:id', authenticate, requireTeacher, questionnaireController.update)
 // 删除问卷
 router.delete('/:id', authenticate, requireTeacher, questionnaireController.delete)
 
-// 发布问卷
-router.post('/:id/publish', authenticate, requireTeacher, questionnaireController.publish)
+// 发布问卷：原有完整性 gate + durable Form option image retention。
+router.post('/:id/publish', authenticate, requireTeacher, questionnaireImageController.publish)
 
 // 废弃问卷
 router.post('/:id/deprecate', authenticate, requireTeacher, questionnaireController.deprecate)

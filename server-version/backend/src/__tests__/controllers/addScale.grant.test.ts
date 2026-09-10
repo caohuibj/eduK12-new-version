@@ -11,7 +11,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
-vi.mock('../../config', () => ({ config: { materialGrantsEnabled: true, cognitiveModuleEnabled: true } }))
+vi.mock('../../config', () => ({ config: { materialGrantsEnabled: true, cognitiveModuleEnabled: true, uploadDir: '/tmp/eduk12-controller-test-uploads' } }))
 
 import { questionnaireController } from '../../controllers/questionnaireController'
 import { generalQuestionnaireController } from '../../controllers/generalQuestionnaireController'

@@ -4,6 +4,7 @@
 
 import { Router } from 'express'
 import { generalQuestionnaireController } from '../controllers/generalQuestionnaireController'
+import { generalQuestionnaireImageController } from '../controllers/generalQuestionnaireImageController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 
 const router = Router()
@@ -20,7 +21,7 @@ router.put('/:id', generalQuestionnaireController.update)
 router.get('/:id/scales', generalQuestionnaireController.listScales)
 router.post('/:id/scales', generalQuestionnaireController.addScale)
 router.delete('/:id/scales/:scaleId', generalQuestionnaireController.removeScale)
-router.post('/:id/publish', generalQuestionnaireController.publish)
+router.post('/:id/publish', generalQuestionnaireImageController.publish)
 router.post('/:id/deprecate', generalQuestionnaireController.deprecate)
 router.post('/:id/duplicate', generalQuestionnaireController.duplicate)
 

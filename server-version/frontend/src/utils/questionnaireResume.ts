@@ -1,4 +1,5 @@
 const keyFor = (token: string): string => `questionnaire_resume_${token}`
+const RESUME_PREFIX = 'questionnaire_resume_'
 
 export const readQuestionnaireSessionId = (questionnaireToken: string | undefined): string | null => {
   if (typeof window === 'undefined' || !questionnaireToken) return null
@@ -35,6 +36,23 @@ export const readQuestionnaireResumeToken = (
     return stored.sessionId === sessionId && typeof stored.resumeToken === 'string'
       ? stored.resumeToken
       : ''
+  } catch {
+    return ''
+  }
+}
+
+export const readQuestionnaireResumeTokenForSession = (sessionId: string | null | undefined): string => {
+  if (typeof window === 'undefined' || !sessionId) return ''
+  try {
+    for (let index = 0; index < window.sessionStorage.length; index += 1) {
+      const key = window.sessionStorage.key(index)
+      if (!key?.startsWith(RESUME_PREFIX)) continue
+      const raw = window.sessionStorage.getItem(key)
+      if (!raw) continue
+      const stored = JSON.parse(raw) as { sessionId?: unknown; resumeToken?: unknown }
+      if (stored.sessionId === sessionId && typeof stored.resumeToken === 'string') return stored.resumeToken
+    }
+    return ''
   } catch {
     return ''
   }

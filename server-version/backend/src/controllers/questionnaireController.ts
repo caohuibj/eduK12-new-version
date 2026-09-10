@@ -18,6 +18,7 @@ import {
   type QuestionnaireProgressSnapshot,
 } from '../services/questionnaireProgressService'
 import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord, scaleDefinitionFromRecord } from '../modules/scale/scale-workflow.service'
+import { retainQuestionnaireScaleAssessmentImages } from '../modules/scale/questionnaire-scale-image-retention'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
   assertContextMutable,
@@ -1986,7 +1987,7 @@ export const questionnaireController = {
             },
           ]
         } else {
-          // 未传入 courseId，返回学生所有课程的问卷
+          // 未传 courseId，返回学生所有课程的问卷
           where.OR = [
             { visibility: 'PUBLIC' },
             {
@@ -2450,6 +2451,11 @@ export const questionnaireController = {
             answers: encryptScaleAnswers([]),
             questionnaireAssessmentId: created.id,
           })),
+        })
+        await retainQuestionnaireScaleAssessmentImages({
+          questionnaireAssessmentId: created.id,
+          snapshots: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({ scaleId: qs.scaleId, snapshot })),
+          db: tx,
         })
 
         const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({

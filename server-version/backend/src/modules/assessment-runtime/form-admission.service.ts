@@ -18,6 +18,7 @@ import {
 } from './unit-admission'
 import { formSectionIdentityHash } from './attempt-runtime'
 import { formSectionSlotKey, getFrozenActiveSlot, type FrozenActiveSlotV1 } from './slot-set'
+import { retainFrozenFormAdmissionImages } from './form-image.adapter'
 
 const hasContextSection = (sections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>): boolean => (
   sections.some((section) => Boolean(section.contextSection) || section.items.some((item) => Boolean(item.contextKey)))
@@ -150,38 +151,46 @@ export const readStoredFormAdmission = (row: {
   readStoredUnitAdmission(row, '表单区段准入快照无法读取，请重启后重新作答')
 )
 
-const persistQuestionnaireFormAdmission = (
+const persistQuestionnaireFormAdmission = async (
   attemptId: string,
   snapshot: FrozenUnitAdmissionV1,
-): Promise<FrozenUnitAdmissionV1> => persistAdmissionOnce({
-  snapshot,
-  writeIfEmpty: (persisted) => prisma.questionnaireFormSectionAttempt.updateMany({
-    where: { id: attemptId, frozenAdmissionSnapshotHash: null },
-    data: persisted,
-  }),
-  read: () => prisma.questionnaireFormSectionAttempt.findUnique({
-    where: { id: attemptId },
-    select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
-  }),
-  missingMessage: '表单区段记录不存在',
-  unreadableMessage: '表单区段准入快照无法读取，请重启后重新作答',
+): Promise<FrozenUnitAdmissionV1> => prisma.$transaction(async (tx) => {
+  const admission = await persistAdmissionOnce({
+    snapshot,
+    writeIfEmpty: (persisted) => tx.questionnaireFormSectionAttempt.updateMany({
+      where: { id: attemptId, frozenAdmissionSnapshotHash: null },
+      data: persisted,
+    }),
+    read: () => tx.questionnaireFormSectionAttempt.findUnique({
+      where: { id: attemptId },
+      select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
+    }),
+    missingMessage: '表单区段记录不存在',
+    unreadableMessage: '表单区段准入快照无法读取，请重启后重新作答',
+  })
+  await retainFrozenFormAdmissionImages(admission, tx as never)
+  return admission
 })
 
-const persistCompositeFormAdmission = (
+const persistCompositeFormAdmission = async (
   attemptId: string,
   snapshot: FrozenUnitAdmissionV1,
-): Promise<FrozenUnitAdmissionV1> => persistAdmissionOnce({
-  snapshot,
-  writeIfEmpty: (persisted) => prisma.compositeFormSectionAttempt.updateMany({
-    where: { id: attemptId, frozenAdmissionSnapshotHash: null },
-    data: persisted,
-  }),
-  read: () => prisma.compositeFormSectionAttempt.findUnique({
-    where: { id: attemptId },
-    select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
-  }),
-  missingMessage: '表单区段记录不存在',
-  unreadableMessage: '表单区段准入快照无法读取，请重启后重新作答',
+): Promise<FrozenUnitAdmissionV1> => prisma.$transaction(async (tx) => {
+  const admission = await persistAdmissionOnce({
+    snapshot,
+    writeIfEmpty: (persisted) => tx.compositeFormSectionAttempt.updateMany({
+      where: { id: attemptId, frozenAdmissionSnapshotHash: null },
+      data: persisted,
+    }),
+    read: () => tx.compositeFormSectionAttempt.findUnique({
+      where: { id: attemptId },
+      select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
+    }),
+    missingMessage: '表单区段记录不存在',
+    unreadableMessage: '表单区段准入快照无法读取，请重启后重新作答',
+  })
+  await retainFrozenFormAdmissionImages(admission, tx as never)
+  return admission
 })
 
 export const ensureQuestionnaireSectionAttempt = async (
