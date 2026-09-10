@@ -66,18 +66,20 @@ const loginStudent = async (page) => {
   await page.getByText('我的课程', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 }
 
+const absolute = (url) => new URL(url, BASE_URL).href
+
 const exerciseNativeVideo = async (page, bundle, label) => {
   const mediaRequests = []
-  const responseListener = async (response) => {
+  const responseListener = (response) => {
     const url = response.url()
     if (!url.includes('/api/assets/assessment-media/content?cap=')) return
-    const request = response.request()
+    const headers = response.request().headers()
     mediaRequests.push({
       url,
       status: response.status(),
-      range: (await request.allHeaders()).range || null,
-      recovery: (await request.allHeaders())['x-recovery-token'] || null,
-      authorization: (await request.allHeaders()).authorization || null,
+      range: headers.range || null,
+      recovery: headers['x-recovery-token'] || null,
+      authorization: headers.authorization || null,
     })
   }
   page.on('response', responseListener)
@@ -151,6 +153,10 @@ const exerciseNativeVideo = async (page, bundle, label) => {
   await page.screenshot({ path: path.join(SCREENSHOT_DIR, `${label}.png`), fullPage: true })
   page.off('response', responseListener)
 
+  const videoUrl = absolute(bundle.sources.videoUrl)
+  const posterUrl = bundle.sources.posterUrl ? absolute(bundle.sources.posterUrl) : null
+  const captionUrls = (bundle.sources.captions || []).map((track) => absolute(track.src))
+
   assert.ok(Number.isFinite(outcome.duration) && outcome.duration > 5, `${label}: invalid duration`)
   assert.ok(outcome.finalTime >= 6, `${label}: native seek did not complete`)
   assert.equal(outcome.trackCount, 1, `${label}: caption track missing`)
@@ -159,8 +165,13 @@ const exerciseNativeVideo = async (page, bundle, label) => {
   assert.equal(outcome.headAcceptRanges, 'bytes', `${label}: HEAD missing Accept-Ranges`)
   assert.equal(outcome.multiStatus, 416, `${label}: multi-range policy must reject with 416`)
   assert.ok(outcome.multiContentRange?.startsWith('bytes */'), `${label}: 416 missing unsatisfied Content-Range`)
-  assert.ok(mediaRequests.some((item) => item.status === 206 && item.range?.startsWith('bytes=')), `${label}: native media never exercised 206 Range`)
+  assert.ok(mediaRequests.some((item) => item.url === videoUrl && item.status === 206 && item.range?.startsWith('bytes=')), `${label}: native video never exercised 206 Range`)
+  assert.ok(!posterUrl || mediaRequests.some((item) => item.url === posterUrl && item.status === 200), `${label}: poster capability was not delivered`)
+  for (const captionUrl of captionUrls) {
+    assert.ok(mediaRequests.some((item) => item.url === captionUrl && item.status === 200), `${label}: VTT capability was not delivered`)
+  }
   assert.ok(mediaRequests.every((item) => !item.recovery), `${label}: recovery credential leaked into native media request`)
+  assert.ok(mediaRequests.every((item) => !item.authorization), `${label}: account authorization leaked into native media request`)
   record(`${label}-native-range-seek-caption`, { mediaRequests, outcome })
   return mediaRequests
 }
