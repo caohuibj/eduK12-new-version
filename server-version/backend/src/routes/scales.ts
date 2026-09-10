@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
 import { scaleImageController } from '../controllers/scaleImageController'
+import { scaleVideoController } from '../controllers/scaleVideoController'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -37,6 +38,8 @@ router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent,
 // Frozen image delivery. Authorization is attempt-scoped; the adapter resolves
 // only immutable identities present in the encrypted Scale runtime snapshot.
 router.get('/assessments/:assessmentId/assets/:assetId', authenticate, requireStudent, scaleImageController.serveAssessmentImage)
+// Native video URLs are issued only after the same frozen-attempt authorization.
+router.post('/assessments/:assessmentId/items/:itemCode/video-capability', authenticate, requireStudent, scaleVideoController.issueAssessmentVideo)
 
 // 完成测评
 router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, legacyWriteDisabled)

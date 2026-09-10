@@ -12,6 +12,10 @@ import {
   retainFormSectionImages,
   serveFrozenFormSectionImage,
 } from '../modules/assessment-runtime/form-image.adapter'
+import {
+  questionnaireFormSectionVideoPresentations,
+  retainFormSectionVideos,
+} from '../modules/assessment-runtime/form-video.adapter'
 import { serveFrozenScaleAssessmentImage } from '../modules/scale/scale-image.adapter'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
@@ -119,9 +123,15 @@ export const questionnaireImageController = {
 
       const updated = await prisma.$transaction(async (tx) => {
         for (const section of sections) {
+          const owner = publishedFormMediaOwner('QUESTIONNAIRE', id, formSectionIdentityHash(section))
           await retainFormSectionImages({
-            owner: publishedFormMediaOwner('QUESTIONNAIRE', id, formSectionIdentityHash(section)),
+            owner,
             references: questionnaireFormSectionImageReferences(section),
+            db: tx as never,
+          })
+          await retainFormSectionVideos({
+            owner,
+            presentations: questionnaireFormSectionVideoPresentations(section),
             db: tx as never,
           })
         }

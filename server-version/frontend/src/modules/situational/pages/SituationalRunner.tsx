@@ -27,6 +27,7 @@ import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
 import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
 import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
 import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
+import SituationalVideoPresentation from '../SituationalVideoPresentation'
 
 const responseValueFor = (
   responses: Record<string, SituationalDraftAnswer>,
@@ -35,13 +36,15 @@ const responseValueFor = (
 ): SituationalDraftAnswer | undefined => responses[responseKey(scene.sceneKey, channel.channelKey)]
 
 const visualAssetsFor = (stimulus: SituationalRunnerScene['stimulus']): AssessmentImagePresentationItem[] => {
-  if (stimulus.type === 'TEXT_V1') return []
   if (stimulus.type === 'IMAGE') return [{ asset: stimulus.asset, altText: stimulus.altText, caption: stimulus.caption }]
-  return stimulus.panels.map((panel) => ({
-    asset: panel.assetRef,
-    altText: panel.altText,
-    caption: panel.caption,
-  }))
+  if (stimulus.type === 'COMIC') {
+    return stimulus.panels.map((panel) => ({
+      asset: panel.assetRef,
+      altText: panel.altText,
+      caption: panel.caption,
+    }))
+  }
+  return []
 }
 
 const apiDataOrThrow = <T,>(response: { code: number | string; message: string; data: T }): T => {
@@ -88,6 +91,7 @@ const SituationalRunner: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [readyVideoSceneKey, setReadyVideoSceneKey] = useState<string | null>(null)
   const sceneStartedAt = useRef(Date.now())
   const submittingRef = useRef(false)
 
@@ -151,12 +155,28 @@ const SituationalRunner: React.FC = () => {
     data ? reachableSituationalScenes(data.instrument.definition, responses) : []
   ), [data, responses])
   const currentScene = scenes[currentIndex]
+  const videoSceneKey = currentScene?.stimulus.type === 'VIDEO' ? currentScene.sceneKey : ''
+
+  useEffect(() => {
+    setReadyVideoSceneKey(null)
+  }, [videoSceneKey])
+
   const visualItems = useMemo(() => currentScene ? visualAssetsFor(currentScene.stimulus) : [], [currentScene])
   const loadVisualAsset = useCallback((assetId: string): Promise<Blob> => {
     if (!data || !client) return Promise.reject(new Error('Assessment image client is unavailable'))
     return client.loadAsset(data.attempt.id, assetId)
   }, [client, data])
   const visualState = useAssessmentImageAssets(visualItems, loadVisualAsset)
+  const loadVideoSources = useCallback(async () => {
+    if (!data || !client || !videoSceneKey) throw new Error('Assessment video client is unavailable')
+    return apiDataOrThrow(await client.loadVideoSources(data.attempt.id, videoSceneKey))
+  }, [client, data, videoSceneKey])
+  const handleVideoReadyChange = useCallback((sceneKey: string, ready: boolean) => {
+    setReadyVideoSceneKey((current) => {
+      if (ready) return sceneKey
+      return current === sceneKey ? null : current
+    })
+  }, [])
 
   const totalResponses = data ? expectedResponseKeys(data.instrument.definition, responses).length : 0
   const answeredCount = data ? answeredResponseCount(data.instrument.definition, responses) : 0
@@ -269,11 +289,27 @@ const SituationalRunner: React.FC = () => {
 
   const visualRequired = visualItems.length > 0
   const visualBusy = visualRequired && visualState.status !== 'ready'
+  const videoRequired = currentScene.stimulus.type === 'VIDEO'
+  const videoBusy = videoRequired && readyVideoSceneKey !== currentScene.sceneKey
+  const mediaBusy = visualBusy || videoBusy
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
       ? <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
       : null
     if (currentScene.stimulus.type === 'TEXT_V1') return textBlock
+    if (currentScene.stimulus.type === 'VIDEO') {
+      return (
+        <>
+          {textBlock}
+          <SituationalVideoPresentation
+            sceneKey={currentScene.sceneKey}
+            presentation={currentScene.stimulus.presentation}
+            loadSources={loadVideoSources}
+            onReadyChange={handleVideoReadyChange}
+          />
+        </>
+      )
+    }
     return (
       <>
         {textBlock}
@@ -306,7 +342,7 @@ const SituationalRunner: React.FC = () => {
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || visualBusy}>
+              <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || mediaBusy}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
@@ -330,8 +366,8 @@ const SituationalRunner: React.FC = () => {
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button type="button" onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || saving || submitting} className="inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"><ChevronLeft className="h-4 w-4" />上一题</button>
         <div className="flex gap-3">
-          {currentIndex < scenes.length - 1 && <button type="button" onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))} disabled={saving || submitting || visualBusy} className="inline-flex items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">下一题<ChevronRight className="h-4 w-4" /></button>}
-          <button type="button" onClick={() => void submit()} disabled={saving || submitting || visualBusy} className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{submitting ? '提交中…' : '提交测评'}</button>
+          {currentIndex < scenes.length - 1 && <button type="button" onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">下一题<ChevronRight className="h-4 w-4" /></button>}
+          <button type="button" onClick={() => void submit()} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{submitting ? '提交中…' : '提交测评'}</button>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { situationalController } from '../controllers/situationalController'
+import { situationalVideoController } from '../modules/situational/situational-video.controller'
 import { authenticate, requireStudent } from '../middleware/auth'
 
 const router = Router()
@@ -15,6 +16,7 @@ router.get('/attempts/:attemptId', authenticate, requireStudent, situationalCont
 router.post('/attempts/:attemptId/resume', authenticate, requireStudent, situationalController.resume)
 router.get('/attempts/:attemptId/result', authenticate, requireStudent, situationalController.result)
 router.get('/attempts/:attemptId/assets/:assetId/content', authenticate, requireStudent, situationalController.assetContent)
+router.get('/attempts/:attemptId/scenes/:sceneKey/video-sources', authenticate, requireStudent, situationalVideoController.standalone)
 router.post('/attempts/:attemptId/submit', authenticate, requireStudent, situationalController.submitFinal)
 
 // Friendly start alias for clients that prefer a resource-oriented URL.

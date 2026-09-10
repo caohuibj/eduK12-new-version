@@ -12,7 +12,11 @@ import { normalizeApiError } from '../utils/normalizeApiError'
 import { readQuestionnaireResumeTokenForSession } from '../utils/questionnaireResume'
 import type { ApiResponse } from '../types'
 import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
+import FormOptionVideoGroupGate from '../modules/assessment-media/FormOptionVideoGroupGate'
+import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
+import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
+import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   resolveScaleDeviceInputProvenance,
@@ -22,7 +26,7 @@ import {
 
 type ResponseValue = string | number
 type FormValue = string | string[] | null
-type FormOption = { value: string; label: string; images?: unknown }
+type FormOption = { value: string; label: string; images?: unknown; video?: unknown }
 
 export interface FinalQuestionnaireFormSection {
   id: string
@@ -66,6 +70,7 @@ export interface FinalQuestionnaireScale {
       responseSetKey: string
       randomizeOptions: boolean
       images?: unknown
+      video?: unknown
       options: Array<{ value: ResponseValue; label: string }>
     }>
   }
@@ -203,6 +208,16 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
   }, [currentScale, currentSection, data.questionnaireAssessment.id, data.sessionId, publicMode])
+
+  const loadQuestionnaireVideoCapability = useCallback(async (path: string) => {
+    if (!publicMode) return requestAssessmentVideoCapabilities(path)
+    const capability = readQuestionnaireResumeTokenForSession(data.sessionId)
+    if (!capability) throw new Error('缺少问卷恢复凭据')
+    return requestAssessmentVideoCapabilities(path, {
+      headers: { Authorization: `Bearer ${capability}` },
+      credentials: 'omit',
+    })
+  }, [data.sessionId, publicMode])
 
   useEffect(() => {
     setSectionIndex(0)
@@ -434,15 +449,23 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const value = formValues[item.id]
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)
+            const videoEntries = formOptionVideoPresentations(options)
             return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
-              <div>
-                <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
-                {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
-                {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
-                {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}
-                {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
-                <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
-              </div>
+              <FormOptionVideoGroupGate
+                entries={videoEntries}
+                loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
+                  ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
+                  : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
+              >
+                <div>
+                  <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
+                  {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
+                  {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
+                  {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}
+                  {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
+                  <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
+                </div>
+              </FormOptionVideoGroupGate>
             </AssessmentImageGate>
           })()}
         </div>
@@ -456,8 +479,17 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const item = currentScale.definition.items[scaleIndex]
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
             const imageItems = assessmentImageItems(item.images)
+            const videoPresentation = scaleItemVideoPresentation(item)
             return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
-              <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+              <ScaleFormVideoGate
+                presentation={videoPresentation}
+                loadSources={() => loadQuestionnaireVideoCapability(publicMode
+                  ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/scale/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`
+                  : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
+                ariaLabel={`${item.content} 视频内容`}
+              >
+                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+              </ScaleFormVideoGate>
             </AssessmentImageGate>
           })()}
         </div>
