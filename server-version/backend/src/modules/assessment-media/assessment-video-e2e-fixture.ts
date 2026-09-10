@@ -7,7 +7,12 @@ import { createAssessmentMediaCapability, type AssessmentMediaCapabilityAudience
 
 const fixtureSchema = z.object({
   scopeId: z.string().min(1),
-  studentUserId: z.string().min(1),
+  student: z.object({
+    id: z.string().min(1),
+    username: z.string().min(1),
+    password: z.string().min(1),
+  }).strict(),
+  publicRecoveryToken: z.string().min(1),
   publicRecoveryTokenHash: z.string().regex(/^[0-9a-f]{64}$/u),
   presentation: assessmentVideoPresentationSchema,
 }).strict()
@@ -64,7 +69,7 @@ const issueSources = (audience: AssessmentMediaCapabilityAudience) => {
 
 export const assessmentVideoE2EAuthenticatedCapabilities = (req: Request, res: Response) => {
   const fixture = readFixture()
-  if (!req.user || req.user.userId !== fixture.studentUserId) return res.status(403).end()
+  if (!req.user || req.user.userId !== fixture.student.id) return res.status(403).end()
   return res.json({ code: 0, message: 'ok', data: issueSources('authenticated') })
 }
 
