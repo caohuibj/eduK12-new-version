@@ -11,7 +11,10 @@ import { checkpointId } from '../../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../../services/persistence/finalDraftCapacityRetry'
 import AssessmentImageGate from '../../modules/assessment-media/AssessmentImageGate'
+import ScaleFormVideoGate from '../../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems } from '../../modules/assessment-media/adapter'
+import { scaleItemVideoPresentation } from '../../modules/assessment-media/video-adapter'
+import type { AssessmentVideoCapabilitySources } from '../../modules/assessment-media/types'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   readScaleDeviceInputProvenance,
@@ -31,6 +34,7 @@ interface ScaleRunnerItem {
   responseSetKey: string
   randomizeOptions: boolean
   images?: unknown
+  video?: unknown
   options: Array<{ value: ResponseValue; label: string }>
 }
 
@@ -102,6 +106,16 @@ const ScaleAssessment: React.FC = () => {
     const response = await sessionFetch(`/api/scales/assessments/${assessment.id}/assets/${assetId}`)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
+  }, [assessment])
+
+  const loadAssessmentVideo = useCallback(async (itemCode: string): Promise<AssessmentVideoCapabilitySources> => {
+    if (!assessment) throw new Error('量表冻结测评尚未创建')
+    const response = await apiClient.post<AssessmentVideoCapabilitySources>(
+      `/scales/assessments/${assessment.id}/items/${encodeURIComponent(itemCode)}/video-capability`,
+      {},
+    )
+    if (response.code !== 0 || !response.data) throw new Error(response.message || '视频授权失败')
+    return response.data
   }, [assessment])
 
   const scaleCheckpointTransport = useCallback(async (batch: CheckpointBatch<ScaleCheckpointPayload>) => {
@@ -403,6 +417,7 @@ const ScaleAssessment: React.FC = () => {
   const answeredCount = Object.keys(answers).length
   const progress = Math.round((answeredCount / items.length) * 100)
   const imageItems = assessmentImageItems(currentItem.images)
+  const videoPresentation = scaleItemVideoPresentation(currentItem)
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -414,30 +429,36 @@ const ScaleAssessment: React.FC = () => {
       {requiresRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地答案已保留。当前量表版本已变化，请重启后继续。</span><button type="button" onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
       {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
       <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="text-sm text-gray-500 mb-2">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
-          <h2 className="text-lg font-medium text-gray-900 mb-6">{currentItem.content}</h2>
-          <div className="space-y-3">
-            {currentItem.options.map((option) => (
-              <button
-                key={valueKey(option.value)}
-                onClick={() => void handleSelectAnswer(option.value)}
-                disabled={savingAnswer || submitting}
-                className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
-              >
-                {option.label}
-              </button>
-            ))}
+        <ScaleFormVideoGate
+          presentation={videoPresentation}
+          loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
+          ariaLabel={`${currentItem.content} 视频内容`}
+        >
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="text-sm text-gray-500 mb-2">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
+            <h2 className="text-lg font-medium text-gray-900 mb-6">{currentItem.content}</h2>
+            <div className="space-y-3">
+              {currentItem.options.map((option) => (
+                <button
+                  key={valueKey(option.value)}
+                  onClick={() => void handleSelectAnswer(option.value)}
+                  disabled={savingAnswer || submitting}
+                  className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="flex justify-between">
-          <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
-          {currentIndex === items.length - 1 ? (
-            <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : '完成测评'}</button>
-          ) : (
-            <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
-          )}
-        </div>
+          <div className="flex justify-between">
+            <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
+            {currentIndex === items.length - 1 ? (
+              <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : '完成测评'}</button>
+            ) : (
+              <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
+            )}
+          </div>
+        </ScaleFormVideoGate>
       </AssessmentImageGate>
       <div className="mt-6 bg-white rounded-lg shadow p-4">
         <div className="text-sm text-gray-600 mb-3">题目导航</div>
