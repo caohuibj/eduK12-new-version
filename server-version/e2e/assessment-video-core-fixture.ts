@@ -66,22 +66,25 @@ const main = async () => {
   })
 
   await mkdir(uploadRoot, { recursive: true })
-  const generatedVideo = path.join(uploadRoot, `media4-generated-${suffix}.mp4`)
+  // Playwright's bundled Chromium on Linux/ARM does not guarantee proprietary
+  // H.264/AAC decode support. Use an open WebM VP8/Vorbis fixture so this gate
+  // measures Assessment media delivery/Range/caption behavior, not runner codec
+  // licensing. MP4 remains covered by the shared contract/unit tests.
+  const generatedVideo = path.join(uploadRoot, `media4-generated-${suffix}.webm`)
   execFileSync('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y',
     '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=24:duration=12',
     '-f', 'lavfi', '-i', 'sine=frequency=440:duration=12',
     '-shortest',
-    '-c:v', 'libx264', '-preset', 'ultrafast', '-b:v', '500k', '-pix_fmt', 'yuv420p',
-    '-c:a', 'aac', '-b:a', '64k',
-    '-movflags', '+faststart',
+    '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '8', '-b:v', '450k',
+    '-c:a', 'libvorbis', '-b:a', '64k',
     generatedVideo,
   ])
 
   const video = await persistAsset({
     id: `media4-video-${suffix}`,
-    fileName: `media4-video-${suffix}.mp4`,
-    mimeType: 'video/mp4',
+    fileName: `media4-video-${suffix}.webm`,
+    mimeType: 'video/webm',
     sourcePath: generatedVideo,
     ownerId: student.id,
   })
@@ -137,7 +140,7 @@ const main = async () => {
   }
 
   await writeFile(fixturePath, JSON.stringify(fixture, null, 2), 'utf8')
-  console.log(JSON.stringify({ fixturePath, scopeId, videoAssetId: video.assetId }))
+  console.log(JSON.stringify({ fixturePath, scopeId, videoAssetId: video.assetId, videoMimeType: video.mimeType }))
 }
 
 main()
