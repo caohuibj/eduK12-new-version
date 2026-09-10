@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import { CourseStudentStatus, CognitiveSessionStatus } from '@prisma/client'
 import { prisma } from '../../config/database'
+import type { AssetDatabase } from '../../services/assetStorage'
 import {
   encryptCognitivePayload,
   decryptCognitivePayload,
@@ -18,9 +19,15 @@ import {
   createSessionConfigSnapshot,
   sessionConfigFromStoredValue,
 } from './v2/session-snapshot'
+import { cognitivePresentationAssetReferences } from './v2/presentation'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
 import { freezeExactReferenceBindings, type ExactReferenceDb } from '../assessment-runtime/reference-binding'
+import {
+  ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
+  ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+  retainAssessmentAssetReferences,
+} from '../assessment-media/assessment-asset'
 
 /**
  * D4 — Cognitive Session / Attempt 服务。
@@ -96,7 +103,7 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
   engineVersion: string
   scoringVersion: string
   config: unknown
-  db?: ExactReferenceDb
+  db?: ExactReferenceDb & AssetDatabase
 }): Promise<{ encrypted: string; compiledRuntime: ReturnType<typeof compileCognitiveRuntime> }> => {
   const definition = getCognitiveV2TaskDefinition(
     input.testType,
@@ -108,7 +115,8 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
     definition,
     instrumentVersion: input.engineVersion,
   })
-  const referenceBindings = await freezeExactReferenceBindings(input.db ?? (prisma as unknown as ExactReferenceDb), {
+  const db = input.db ?? (prisma as unknown as ExactReferenceDb & AssetDatabase)
+  const referenceBindings = await freezeExactReferenceBindings(db, {
     instrumentType: 'COGNITIVE',
     instrumentKey: definition.testType,
     selections: compiledRuntime.referenceBindingDefinition.selections,
@@ -123,6 +131,18 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
       referenceBindings,
     },
   })
+  const mediaReferences = cognitivePresentationAssetReferences(snapshot.presentation)
+  if (mediaReferences.length > 0) {
+    await retainAssessmentAssetReferences({
+      owner: {
+        entityType: ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+        entityId: `COGNITIVE:${compiledRuntime.compiledRuntimeHash}`,
+        field: ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
+      },
+      references: mediaReferences,
+      db,
+    })
+  }
   return { encrypted: encryptCognitivePayload(snapshot), compiledRuntime }
 }
 
@@ -272,6 +292,7 @@ const toRunnerPayload = (session: {
     scoringVersion: session.scoringVersion,
     config: validatedConfig,
     ...(snapshot ? { protocol: snapshot.protocol, protocolSignature: snapshot.protocolSignature } : {}),
+    ...(snapshot?.presentation ? { presentation: snapshot.presentation } : {}),
     randomSeed: session.randomSeed,
     profile: report?.profile ?? null,
     reportCaveats: report?.reportCaveats ?? [],
