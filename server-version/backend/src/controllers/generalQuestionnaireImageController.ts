@@ -7,6 +7,10 @@ import {
   questionnaireFormSectionImageReferences,
   retainFormSectionImages,
 } from '../modules/assessment-runtime/form-image.adapter'
+import {
+  questionnaireFormSectionVideoPresentations,
+  retainFormSectionVideos,
+} from '../modules/assessment-runtime/form-video.adapter'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
 import { cacheService } from '../services/cacheService'
@@ -59,9 +63,15 @@ export const generalQuestionnaireImageController = {
 
       const updated = await prisma.$transaction(async (tx) => {
         for (const section of sections) {
+          const owner = publishedFormMediaOwner('QUESTIONNAIRE', id, formSectionIdentityHash(section))
           await retainFormSectionImages({
-            owner: publishedFormMediaOwner('QUESTIONNAIRE', id, formSectionIdentityHash(section)),
+            owner,
             references: questionnaireFormSectionImageReferences(section),
+            db: tx as never,
+          })
+          await retainFormSectionVideos({
+            owner,
+            presentations: questionnaireFormSectionVideoPresentations(section),
             db: tx as never,
           })
         }
