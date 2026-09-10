@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import AssessmentVideoPlayer from './AssessmentVideoPlayer'
 import type { AssessmentVideoCapabilitySources, AssessmentVideoPresentationV1 } from './types'
 
@@ -9,64 +9,91 @@ export interface ScaleFormVideoGateProps {
   ariaLabel?: string
 }
 
-export const ScaleFormVideoGate = ({ presentation, loadSources, children, ariaLabel }: ScaleFormVideoGateProps) => {
-  const [sources, setSources] = useState<AssessmentVideoCapabilitySources | null>(null)
-  const [loading, setLoading] = useState(Boolean(presentation))
-  const [error, setError] = useState<string | null>(null)
-  const [ready, setReady] = useState(!presentation)
+type LoadedSources = {
+  identityKey: string
+  value: AssessmentVideoCapabilitySources
+}
 
-  const identityKey = useMemo(() => presentation
-    ? [presentation.video.assetId, presentation.video.contentHash, presentation.video.mimeType].join(':')
-    : '', [presentation])
+const presentationIdentityKey = (presentation?: AssessmentVideoPresentationV1): string => (
+  presentation ? JSON.stringify(presentation) : ''
+)
+
+export const ScaleFormVideoGate = ({ presentation, loadSources, children, ariaLabel }: ScaleFormVideoGateProps) => {
+  const identityKey = presentationIdentityKey(presentation)
+  const identityKeyRef = useRef(identityKey)
+  const loadSourcesRef = useRef(loadSources)
+  identityKeyRef.current = identityKey
+  loadSourcesRef.current = loadSources
+
+  const [sources, setSources] = useState<LoadedSources | null>(null)
+  const [loadingIdentity, setLoadingIdentity] = useState<string | null>(presentation ? identityKey : null)
+  const [error, setError] = useState<{ identityKey: string; message: string } | null>(null)
+  const [readyIdentity, setReadyIdentity] = useState<string | null>(presentation ? null : identityKey)
 
   const load = useCallback(async () => {
-    if (!presentation) {
+    const requestedIdentity = identityKey
+    const requestedPresentation = presentation
+    if (!requestedPresentation) {
       setSources(null)
-      setLoading(false)
+      setLoadingIdentity(null)
       setError(null)
-      setReady(true)
+      setReadyIdentity(requestedIdentity)
       return
     }
-    setLoading(true)
+
+    setLoadingIdentity(requestedIdentity)
     setError(null)
-    setReady(false)
+    setReadyIdentity(null)
     try {
-      setSources(await loadSources(presentation))
+      const nextSources = await loadSourcesRef.current(requestedPresentation)
+      if (identityKeyRef.current !== requestedIdentity) return
+      setSources({ identityKey: requestedIdentity, value: nextSources })
     } catch (cause) {
+      if (identityKeyRef.current !== requestedIdentity) return
       setSources(null)
-      setLoading(false)
-      setError(cause instanceof Error ? cause.message : '视频加载失败')
+      setLoadingIdentity(null)
+      setError({
+        identityKey: requestedIdentity,
+        message: cause instanceof Error ? cause.message : '视频加载失败',
+      })
     }
-  }, [loadSources, presentation])
+  }, [identityKey, presentation])
 
   useEffect(() => {
     void load()
-  }, [identityKey, load])
+  }, [load])
 
   if (!presentation) return <>{children}</>
 
+  const currentSources = sources?.identityKey === identityKey ? sources.value : null
+  const currentError = error?.identityKey === identityKey ? error.message : null
+  const loading = loadingIdentity === identityKey
+  const ready = readyIdentity === identityKey
+
   return (
     <section aria-label={ariaLabel || '测评视频'} className="space-y-4">
-      {sources ? (
+      {currentSources ? (
         <AssessmentVideoPlayer
           presentation={presentation}
-          sources={sources}
+          sources={currentSources}
           onReady={() => {
-            setLoading(false)
-            setReady(true)
+            if (identityKeyRef.current !== identityKey) return
+            setLoadingIdentity(null)
+            setReadyIdentity(identityKey)
           }}
           onError={() => {
-            setLoading(false)
-            setReady(false)
-            setError('视频加载失败')
+            if (identityKeyRef.current !== identityKey) return
+            setLoadingIdentity(null)
+            setReadyIdentity(null)
+            setError({ identityKey, message: '视频加载失败' })
           }}
           onRetry={load}
         />
       ) : null}
       {loading ? <p role="status" className="text-sm text-gray-500">正在准备视频…</p> : null}
-      {error ? (
+      {currentError ? (
         <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          <p>{error}</p>
+          <p>{currentError}</p>
           <button type="button" onClick={() => void load()} className="mt-2 underline">重试</button>
         </div>
       ) : null}
