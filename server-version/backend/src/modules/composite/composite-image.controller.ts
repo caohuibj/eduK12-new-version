@@ -11,6 +11,10 @@ import {
   retainFormSectionImages,
   serveFrozenFormSectionImage,
 } from '../assessment-runtime/form-image.adapter'
+import {
+  compositeFormSectionVideoPresentations,
+  retainFormSectionVideos,
+} from '../assessment-runtime/form-video.adapter'
 import { decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { serveFrozenScaleAssessmentImage } from '../scale/scale-image.adapter'
 import * as service from './composite.service'
@@ -62,6 +66,10 @@ const publishWithFormMedia = async (req: Request, res: Response) => {
       await retainFormSectionImages({
         owner,
         references: compositeFormSectionImageReferences(definition),
+      })
+      await retainFormSectionVideos({
+        owner,
+        presentations: compositeFormSectionVideoPresentations(definition),
       })
     }
     const published = await service.publishComposite(userId, role, composite.id)

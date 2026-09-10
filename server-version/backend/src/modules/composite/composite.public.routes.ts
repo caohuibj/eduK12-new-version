@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
+import { compositeVideoController } from './composite-video.controller'
 import { situationalVideoController } from '../situational/situational-video.controller'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
@@ -9,6 +10,8 @@ const router = Router()
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', compositeImageController.publicFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', compositeImageController.publicScaleImage)
+router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', compositeVideoController.publicFormVideo)
+router.post('/attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability', compositeVideoController.publicScaleVideo)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', compositeController.publicEmbeddedSituational)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', compositeController.publicEmbeddedSituationalAsset)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/scenes/:sceneKey/video-sources', situationalVideoController.embeddedPublic)
