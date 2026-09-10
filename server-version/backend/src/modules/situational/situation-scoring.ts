@@ -1,5 +1,7 @@
+import { z } from 'zod'
 import {
   situationDefinitionSchema,
+  situationalSceneSchema,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -78,6 +80,17 @@ export interface SituationalGoldenCase {
     metricKeys: string[]
   }
 }
+
+/**
+ * A published definition must declare at least one scene, but a valid V2
+ * trajectory may project to zero score-eligible scenes when it reaches an
+ * early terminal through routing-only decisions. The scorer still validates
+ * the complete definition shape and relaxes only this internal scene-count
+ * constraint; publication validation remains unchanged.
+ */
+const projectedSituationDefinitionSchema = situationDefinitionSchema.extend({
+  scenes: z.array(situationalSceneSchema),
+})
 
 const finite = (value: number): number => {
   if (!Number.isFinite(value)) throw new Error('计分结果必须是有限数字')
@@ -203,11 +216,13 @@ export const scoreSituational = (
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
   options: SituationalScoringOptions = {},
 ): SituationalResultV1 => {
-  // The frozen definition is trusted runtime input: publication/compile gates
-  // own cross-field validation. Keep FINAL scoring free of duplicate governance
-  // work while still parsing the structural schema and validating untrusted
-  // participant responses exactly once here.
-  const definition = situationDefinitionSchema.parse(definitionInput)
+  // Frozen definitions are trusted runtime input: publication/compile gates
+  // own cross-field validation. Keep structural parsing here. Only the
+  // internally projected zero-scene case uses the relaxed scoring-view schema.
+  const parsedDefinition = definitionInput.scenes.length === 0
+    ? projectedSituationDefinitionSchema.parse(definitionInput)
+    : situationDefinitionSchema.parse(definitionInput)
+  const definition = parsedDefinition as SituationDefinitionV1
   const responses = normalizeResponses(inputResponses)
   const answered = options.responsesValidated
     ? new Map(responses.map((response) => [responseKey(response.sceneKey, response.channelKey), response]))
