@@ -16,6 +16,10 @@ import {
   assessmentImagePresentationListSchema,
 } from '../assessment-media/assessment-image-presentation'
 import { serveAssessmentImageContent } from '../assessment-media/assessment-image-delivery'
+import {
+  assessmentVideoPresentationAssetReferences,
+  assessmentVideoPresentationSchema,
+} from '../assessment-media/assessment-video'
 import type { FrozenUnitAdmissionV1 } from './admission-snapshot'
 
 const optionImageReferences = (options: unknown) => {
@@ -25,6 +29,16 @@ const optionImageReferences = (options: unknown) => {
     const images = (option as { images?: unknown }).images
     if (images === undefined) return []
     return assessmentImageAssetReferences(assessmentImagePresentationListSchema.parse(images))
+  })
+}
+
+const optionVideoReferences = (options: unknown) => {
+  if (!Array.isArray(options)) return []
+  return options.flatMap((option) => {
+    if (!option || typeof option !== 'object' || Array.isArray(option)) return []
+    const video = (option as { video?: unknown }).video
+    if (video === undefined) return []
+    return assessmentVideoPresentationAssetReferences(assessmentVideoPresentationSchema.parse(video))
   })
 }
 
@@ -48,12 +62,43 @@ export const compositeFormSectionImageReferences = (definition: unknown) => {
   })
 }
 
+const questionnaireFormSectionVideoReferences = (definition: unknown) => {
+  if (!definition || typeof definition !== 'object' || Array.isArray(definition)) return []
+  const items = (definition as { items?: unknown }).items
+  if (!Array.isArray(items)) return []
+  return items.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return []
+    return optionVideoReferences((item as { options?: unknown }).options)
+  })
+}
+
+const compositeFormSectionVideoReferences = (definition: unknown) => {
+  if (!definition || typeof definition !== 'object' || Array.isArray(definition)) return []
+  const items = (definition as { items?: unknown }).items
+  if (!Array.isArray(items)) return []
+  return items.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return []
+    return optionVideoReferences((item as { formOptions?: unknown }).formOptions)
+  })
+}
+
 export const frozenFormSectionImageReferences = (admission: FrozenUnitAdmissionV1) => {
   const frozen = admission.formSection
   if (!frozen) return []
   return frozen.kind === 'questionnaire'
     ? questionnaireFormSectionImageReferences(frozen.definition)
     : compositeFormSectionImageReferences(frozen.definition)
+}
+
+export const frozenFormSectionMediaReferences = (admission: FrozenUnitAdmissionV1) => {
+  const frozen = admission.formSection
+  if (!frozen) return []
+  return [
+    ...frozenFormSectionImageReferences(admission),
+    ...(frozen.kind === 'questionnaire'
+      ? questionnaireFormSectionVideoReferences(frozen.definition)
+      : compositeFormSectionVideoReferences(frozen.definition)),
+  ]
 }
 
 export const assertFormSectionImagesReady = async (
@@ -91,7 +136,7 @@ export const retainFormSectionImages = async (input: {
   db: input.db,
 })
 
-const frozenFormMediaOwnerFromAdmission = (admission: FrozenUnitAdmissionV1): AssessmentAssetRetentionOwner => {
+export const frozenFormMediaOwnerFromAdmission = (admission: FrozenUnitAdmissionV1): AssessmentAssetRetentionOwner => {
   const frozen = admission.formSection
   const parent = admission.parent
   if (!frozen || !parent) throw new Error('Frozen Form admission is missing its parent binding')
@@ -106,9 +151,9 @@ const frozenFormMediaOwnerFromAdmission = (admission: FrozenUnitAdmissionV1): As
 export const retainFrozenFormAdmissionImages = async (
   admission: FrozenUnitAdmissionV1,
   db: AssetDatabase = prisma,
-): Promise<void> => retainFormSectionImages({
+): Promise<void> => retainAssessmentAssetReferences({
   owner: frozenFormMediaOwnerFromAdmission(admission),
-  references: frozenFormSectionImageReferences(admission),
+  references: frozenFormSectionMediaReferences(admission),
   db,
 })
 
