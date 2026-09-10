@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -56,7 +56,7 @@ const CognitiveRunner: React.FC = () => {
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
-  const [instructionVideoReady, setInstructionVideoReady] = useState<Record<string, boolean>>({})
+  const [instructionVideoReady, setInstructionVideoReady] = useState<Record<string, string>>({})
 
   const frozenPresentation = state.session?.presentation
   const instructionItems = useMemo(
@@ -90,17 +90,13 @@ const CognitiveRunner: React.FC = () => {
   }, [sessionApi, state.session])
   const imageState = useAssessmentImageAssets(allImageItems, loadPresentationAsset)
   const videoState = useCognitiveVideoSources(videoEntries, issueVideoSources)
-  const instructionVideoSourceKey = useMemo(() => instructionVideoEntries
-    .map((entry) => `${entry.key}:${videoState.sources[entry.key]?.videoUrl ?? ''}`)
-    .join('|'), [instructionVideoEntries, videoState.sources])
-
-  useEffect(() => {
-    setInstructionVideoReady({})
-  }, [state.session?.sessionId, instructionVideoSourceKey])
 
   const imagesReady = allImageItems.length === 0 || imageState.status === 'ready'
   const videoCapabilitiesReady = videoEntries.length === 0 || videoState.status === 'ready'
-  const instructionVideosReady = instructionVideoEntries.every((entry) => instructionVideoReady[entry.key] === true)
+  const instructionVideosReady = instructionVideoEntries.every((entry) => {
+    const currentUrl = videoState.sources[entry.key]?.videoUrl
+    return Boolean(currentUrl) && instructionVideoReady[entry.key] === currentUrl
+  })
   const mediaReady = imagesReady && videoCapabilitiesReady && instructionVideosReady
 
   // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
@@ -219,10 +215,10 @@ const CognitiveRunner: React.FC = () => {
               sources={sources}
               autoPlay={false}
               className="mt-4 text-left"
-              onReady={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: true }))}
-              onError={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: false }))}
+              onReady={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: sources.videoUrl }))}
+              onError={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: '' }))}
               onRetry={async () => {
-                setInstructionVideoReady((current) => ({ ...current, [entry.key]: false }))
+                setInstructionVideoReady((current) => ({ ...current, [entry.key]: '' }))
                 await videoState.refresh(entry.key)
               }}
             />
