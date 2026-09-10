@@ -7,7 +7,6 @@ import {
   ensureQuestionnaireFormAdmissionAtDelivery,
 } from '../modules/assessment-runtime/form-admission.service'
 import {
-  frozenFormMediaOwner,
   publishedFormMediaOwner,
   questionnaireFormSectionImageReferences,
   retainFormSectionImages,
@@ -61,7 +60,6 @@ const serveFormImage = async (input: {
   await serveFrozenFormSectionImage({
     admission,
     assetId: input.assetId,
-    owner: frozenFormMediaOwner('QUESTIONNAIRE', input.assessment.id, input.sectionId),
     res: input.res,
   })
   return undefined
