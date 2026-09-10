@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { useCognitiveSession } from '../core/useCognitiveSession'
 import { useAdministrationProvenance } from '../core/useAdministrationProvenance'
 import { resolveRunner } from '../registry'
+import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
+import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
+import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
 
 const safeInternalReturnTo = (value: string | null, fallback: string) => {
   if (!value) return fallback
@@ -16,9 +19,22 @@ const safeInternalReturnTo = (value: string | null, fallback: string) => {
   }
 }
 
+const presentationItems = (
+  presentation: NonNullable<import('../types').CognitiveSession['presentation']> | undefined,
+): AssessmentImagePresentationItem[] => presentation
+  ? [
+      ...(presentation.instruction ?? []),
+      ...(presentation.example ?? []),
+      ...(presentation.stimulus ?? []),
+    ]
+  : []
+
 /**
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
  * 按状态机渲染；RECOVERY_REQUIRED 明确提示、绝不静默重跑/猜测进度。
+ *
+ * Cognitive static media is fully preloaded before START_RUN. This keeps
+ * network/image delivery outside task-owned reaction-time and trial timing.
  */
 const CognitiveRunner: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -36,6 +52,22 @@ const CognitiveRunner: React.FC = () => {
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
+
+  const frozenPresentation = state.session?.presentation
+  const instructionItems = useMemo(
+    () => frozenPresentation?.instruction ?? [],
+    [frozenPresentation],
+  )
+  const allImageItems = useMemo(
+    () => presentationItems(frozenPresentation),
+    [frozenPresentation],
+  )
+  const loadPresentationAsset = useCallback((assetId: string): Promise<Blob> => {
+    if (!state.session) return Promise.reject(new Error('Cognitive image session is unavailable'))
+    return sessionApi.loadAsset(state.session.sessionId, assetId)
+  }, [sessionApi, state.session])
+  const imageState = useAssessmentImageAssets(allImageItems, loadPresentationAsset)
+  const mediaReady = allImageItems.length === 0 || imageState.status === 'ready'
 
   // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
   // Memory（自适应）不依赖固定总数，完成信号由其自身推进逻辑在 Session 3 处理。
@@ -113,7 +145,26 @@ const CognitiveRunner: React.FC = () => {
             匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存它，之后可在其他设备继续作答。
           </p>
         )}
-        <button onClick={controller.start} className="btn-primary">
+        {imageState.status === 'loading' && allImageItems.length > 0 && (
+          <p role="status" className="text-sm text-indigo-700 bg-indigo-50 border border-indigo-100 rounded p-3 mb-4">
+            正在准备测评视觉资源…
+          </p>
+        )}
+        {imageState.status === 'error' && (
+          <div role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3 mb-4">
+            <p>视觉内容加载失败，当前不能开始测评。</p>
+            <button type="button" onClick={imageState.retry} className="btn-secondary mt-3">重试视觉内容</button>
+          </div>
+        )}
+        {imageState.status === 'ready' && instructionItems.length > 0 && (
+          <AssessmentImagePresentation
+            items={instructionItems}
+            state={imageState}
+            ordered={instructionItems.length > 1}
+            ariaLabel="认知测评说明视觉内容"
+          />
+        )}
+        <button onClick={controller.start} disabled={!mediaReady} className="btn-primary mt-6">
           开始测评
         </button>
       </div>
@@ -169,6 +220,20 @@ const CognitiveRunner: React.FC = () => {
 
   // RUNNING / SUBMITTING_TRIAL
   if (state.session && state.taskContext) {
+    if (!mediaReady) {
+      return (
+        <div className="card p-8 max-w-2xl text-center">
+          {imageState.status === 'error' ? (
+            <div role="alert" className="text-red-700">
+              <p>视觉内容未就绪，测量不会继续。</p>
+              <button type="button" onClick={imageState.retry} className="btn-secondary mt-4">重试视觉内容</button>
+            </div>
+          ) : (
+            <p role="status" className="text-gray-600">正在准备视觉内容…</p>
+          )}
+        </div>
+      )
+    }
     const entry = resolveRunner(state.session.testType, state.session.engineVersion)
     if (!entry) {
       return (
@@ -190,6 +255,7 @@ const CognitiveRunner: React.FC = () => {
         <div data-cognitive-task-root="true">
           <Runner
             taskContext={state.taskContext}
+            imageAssetUrls={imageState.urls}
             trialIndex={state.trialIndex}
             onTrialComplete={controller.appendTrial}
             onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
