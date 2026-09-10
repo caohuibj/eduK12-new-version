@@ -3,6 +3,7 @@ import { prisma } from '../../config/database'
 import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from './scale-definition'
 import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
+import { retainFrozenScaleAssessmentImages } from './scale-image.adapter'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
   assertAttemptEpoch,
@@ -613,7 +614,7 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
       where: { id: current.id },
       data: { status: 'ABANDONED', completedAt: retiredAt },
     })
-    return tx.assessment.create({
+    const next = await tx.assessment.create({
       data: {
         scaleId: current.scaleId,
         userId,
@@ -638,6 +639,8 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
       },
       include: { scale: true },
     })
+    await retainFrozenScaleAssessmentImages({ assessmentId: next.id, snapshot: runtimeSnapshot, db: tx as never })
+    return next
   })
 
   const definition = scaleDefinitionFromRecord(created.scale)
