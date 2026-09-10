@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import type { AssessmentAssetIdentityV1 } from '../assessment-media/assessment-asset-identity'
 import {
   ASSESSMENT_STATIC_IMAGE_MIME_TYPES,
   assessmentStaticImageAssetIdentitySchema,
@@ -7,6 +8,10 @@ import {
   type AssessmentStaticImageAssetIdentityV1,
   type AssessmentStaticImageMimeType,
 } from '../assessment-media/assessment-image'
+import {
+  assessmentVideoPresentationAssetReferences,
+  assessmentVideoPresentationSchema,
+} from '../assessment-media/assessment-video'
 
 export type SituationalResponseValue = string | number
 
@@ -23,12 +28,12 @@ const nonBlankTextSchema = z.string().min(1).refine((value) => value.trim().leng
 })
 
 /**
- * A definition stores only the stable StoredAsset identity. Delivery URLs,
- * signatures, object keys, and external URLs are intentionally not part of a
- * scientific/runtime definition or its hash.
+ * Image compatibility aliases remain intentionally narrow. VIDEO presentation
+ * reuses the shared Assessment video identity instead of widening this alias.
  */
 export const situationalStoredAssetIdentitySchema = assessmentStaticImageAssetIdentitySchema
 export type SituationalStoredAssetIdentity = AssessmentStaticImageAssetIdentityV1
+export type SituationalAssetReference = AssessmentAssetIdentityV1
 
 export const situationalDirectionSchema = z.enum([
   'higher_is_better',
@@ -75,11 +80,12 @@ export type SituationalResponseType = z.infer<typeof situationalResponseTypeSche
 
 /**
  * Stimulus presentation is deliberately separated from the response model and
- * scoring. Published visual scenes keep the same text stimulus and add one
- * immutable IMAGE or an ordered COMIC panel list. Neither visual form creates
- * a response or scoring surface. `text` remains optional at the draft/schema
- * layer only for backwards-compatible tooling; the publication gate requires
- * it for every visual scene.
+ * scoring. IMAGE/COMIC and VIDEO are presentation-only variants. VIDEO embeds
+ * the shared AssessmentVideoPresentationV1 contract, so Range delivery,
+ * captions, poster identity and transcript semantics remain owned by MEDIA-4.
+ * Playback state is never a response or branching surface. `text` remains
+ * optional at the draft/schema layer; the publication gate requires fallback
+ * text for every media scene.
  */
 export const situationalStimulusSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TEXT_V1'), text: nonBlankTextSchema }),
@@ -99,16 +105,28 @@ export const situationalStimulusSchema = z.discriminatedUnion('type', [
       caption: nonBlankTextSchema.optional(),
     }).strict()).min(1),
   }).strict(),
+  z.object({
+    type: z.literal('VIDEO'),
+    text: nonBlankTextSchema.optional(),
+    presentation: assessmentVideoPresentationSchema,
+  }).strict(),
 ])
 export type SituationalStimulus = z.infer<typeof situationalStimulusSchema>
 
-export const situationalAssetReferences = (stimulus: SituationalStimulus): SituationalStoredAssetIdentity[] => {
-  if (stimulus.type === 'TEXT_V1') return []
+/** Existing image endpoint remains image-only; VIDEO poster bytes use capability delivery. */
+export const situationalImageAssetReferences = (stimulus: SituationalStimulus): SituationalStoredAssetIdentity[] => {
   if (stimulus.type === 'IMAGE') return [stimulus.asset]
-  return stimulus.panels.map((panel) => panel.assetRef)
+  if (stimulus.type === 'COMIC') return stimulus.panels.map((panel) => panel.assetRef)
+  return []
 }
 
-export const situationDefinitionAssetReferences = (definition: SituationDefinitionV1): SituationalStoredAssetIdentity[] => (
+/** All immutable StoredAsset identities frozen/retained for a Situational scene. */
+export const situationalAssetReferences = (stimulus: SituationalStimulus): SituationalAssetReference[] => {
+  if (stimulus.type === 'VIDEO') return assessmentVideoPresentationAssetReferences(stimulus.presentation)
+  return situationalImageAssetReferences(stimulus)
+}
+
+export const situationDefinitionAssetReferences = (definition: SituationDefinitionV1): SituationalAssetReference[] => (
   definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
 )
 
@@ -487,7 +505,7 @@ export const validateSituationDefinition = (
       if (scene.stimulus.type !== 'TEXT_V1' && !hasText(scene.stimulus.text)) {
         issues.push({
           path: `scenes.${sceneIndex}.stimulus.text`,
-          message: '发布的 IMAGE/COMIC 情境必须保留文字题面',
+          message: '发布的 IMAGE/COMIC/VIDEO 情境必须保留文字题面',
           severity: 'error',
         })
       }
