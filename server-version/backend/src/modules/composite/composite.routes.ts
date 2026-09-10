@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
+import { compositeVideoController } from './composite-video.controller'
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
@@ -12,6 +13,8 @@ router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeC
 router.get('/attempts/:attemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getAttempt)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedScaleImage)
+router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, requireRole(UserRole.STUDENT), compositeVideoController.authenticatedFormVideo)
+router.post('/attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability', authenticate, requireRole(UserRole.STUDENT), compositeVideoController.authenticatedScaleVideo)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getEmbeddedSituational)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeController.embeddedSituationalAsset)
 router.post('/attempts/:attemptId/restart', authenticate, requireRole(UserRole.STUDENT), compositeController.restartAttempt)
