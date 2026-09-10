@@ -16,11 +16,20 @@ export const situationalDraftKey = (attemptId: string): string => `situational:$
 
 export const responseKey = (sceneKey: string, channelKey: string): string => `${sceneKey}:${channelKey}`
 
-export const expectedResponseKeys = (
+const allReachableResponseKeys = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer> = {},
 ): string[] => reachableSituationalScenes(definition, responses)
   .flatMap((scene) => scene.channels.map((channel) => responseKey(scene.sceneKey, channel.channelKey)))
+
+/** Required reachable responses only; optional diagnostics do not reduce progress. */
+export const expectedResponseKeys = (
+  definition: SituationalRunnerDefinition,
+  responses: Record<string, SituationalDraftAnswer> = {},
+): string[] => reachableSituationalScenes(definition, responses)
+  .flatMap((scene) => scene.channels.flatMap((channel) => (
+    channel.required === false ? [] : [responseKey(scene.sceneKey, channel.channelKey)]
+  )))
 
 export const sceneIsComplete = (
   definition: SituationalRunnerDefinition,
@@ -28,14 +37,20 @@ export const sceneIsComplete = (
   responses: Record<string, SituationalDraftAnswer>,
 ): boolean => {
   const scene = reachableSituationalScenes(definition, responses)[sceneIndex]
-  return Boolean(scene && scene.channels.every((channel) => responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined))
+  return Boolean(scene && scene.channels.every((channel) => (
+    channel.required === false
+    || responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined
+  )))
 }
 
 export const firstMissingSceneIndex = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
 ): number => reachableSituationalScenes(definition, responses).findIndex((scene) => (
-  scene.channels.some((channel) => responses[responseKey(scene.sceneKey, channel.channelKey)] === undefined)
+  scene.channels.some((channel) => (
+    channel.required !== false
+    && responses[responseKey(scene.sceneKey, channel.channelKey)] === undefined
+  ))
 ))
 
 export const answeredResponseCount = (
@@ -56,7 +71,9 @@ export const pruneUnreachableSituationalResponses = (
   responses: Record<string, SituationalDraftAnswer>,
 ): { responses: Record<string, SituationalDraftAnswer>; staleKeys: string[] } => {
   if (definition.schemaVersion === 1) return { responses, staleKeys: [] }
-  const reachableKeys = new Set(expectedResponseKeys(definition, responses))
+  // Optional diagnostics are still legitimate raw evidence when answered, so
+  // pruning uses every reachable response surface rather than only required keys.
+  const reachableKeys = new Set(allReachableResponseKeys(definition, responses))
   const staleKeys = Object.keys(responses).filter((key) => !reachableKeys.has(key))
   if (staleKeys.length === 0) return { responses, staleKeys }
   const next = { ...responses }

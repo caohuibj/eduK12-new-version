@@ -15,7 +15,7 @@
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + full regression
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
 #   browser       : isolated PostgreSQL/Redis + seeded Bundle + real Playwright acceptance flow
-#   docker       : baseline + monitoring compose config + backend/frontend production image build
+#   docker        : baseline + monitoring compose config + backend/frontend production image build
 #
 # 说明：
 #   - Vite build 不作为 TypeScript typecheck 的替代品（v1.1 §11）。
@@ -23,6 +23,8 @@
 #     不扩大本里程碑范围。
 #   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
+#   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
+#   - browser 使用 Vite dev server 做验收，因此不重复 production frontend build；production build 已由 frontend gate 覆盖。
 
 name: CI
 
@@ -105,8 +107,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
@@ -130,6 +134,15 @@ jobs:
         run: npm run db:release:preflight
       - name: build (tsc)
         run: npm run build
+      - name: publish backend build to runner-local handoff
+        run: |
+          handoff_dir="$HOME/.cache/eduk12-ci/backend-builds"
+          artifact="$handoff_dir/${GITHUB_SHA}.tar"
+          temp_artifact="${artifact}.tmp"
+          mkdir -p "$handoff_dir"
+          tar -C dist -cf "$temp_artifact" .
+          mv "$temp_artifact" "$artifact"
+          find "$handoff_dir" -type f -name '*.tar' -mtime +7 -delete
       - name: full regression
         # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
         # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
@@ -192,8 +205,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
@@ -274,12 +289,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: configure runner-local npm and Playwright caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
-      - name: install Chromium for seeded browser
+      - name: prepare Chromium for seeded browser
         working-directory: server-version/backend
-        run: npx playwright-core install --with-deps chromium
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
@@ -294,11 +321,22 @@ jobs:
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
-      - name: build backend
+      - name: restore backend build from runner-local handoff
+        id: backend-build
         working-directory: server-version/backend
-        run: npm run build
-      - name: build frontend
-        working-directory: server-version/frontend
+        run: |
+          artifact="$HOME/.cache/eduk12-ci/backend-builds/${GITHUB_SHA}.tar"
+          if [ -f "$artifact" ]; then
+            rm -rf dist
+            mkdir -p dist
+            tar -C dist -xf "$artifact"
+            echo "restored=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "restored=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: build backend (fallback)
+        if: steps.backend-build.outputs.restored != 'true'
+        working-directory: server-version/backend
         run: npm run build
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
@@ -379,6 +417,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: configure runner-local Trivy cache
+        id: runner-cache
+        run: |
+          trivy_cache="$HOME/.cache/trivy"
+          trivy_bin_dir="$HOME/.local/bin/trivy-bin"
+          mkdir -p "$trivy_cache" "$trivy_bin_dir"
+          echo "trivy_cache=$trivy_cache" >> "$GITHUB_OUTPUT"
+          echo "$trivy_bin_dir" >> "$GITHUB_PATH"
+      - name: detect runner-local Trivy 0.70.0
+        id: trivy-local
+        run: |
+          trivy_bin="$HOME/.local/bin/trivy-bin/trivy"
+          if [ -x "$trivy_bin" ] && "$trivy_bin" --version 2>/dev/null | grep -q '^Version: 0\.70\.0$'; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: install Trivy 0.70.0 once per runner
+        if: steps.trivy-local.outputs.ready != 'true'
+        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
       - name: assert API/worker isolation topology
@@ -397,6 +458,8 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
           cache: 'false'
+          skip-setup-trivy: true
+          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
       - name: scan frontend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -407,6 +470,8 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
           cache: 'false'
+          skip-setup-trivy: true
+          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
 
   codeql:
     name: codeql (javascript/typescript SAST)
