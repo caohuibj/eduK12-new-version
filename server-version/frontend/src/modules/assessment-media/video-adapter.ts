@@ -2,6 +2,7 @@ import type { AssessmentVideoPresentationV1 } from './types'
 
 const VIDEO_MIME_TYPES = new Set(['video/mp4', 'video/webm', 'video/ogg'])
 const IMAGE_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
+const VTT_MIME_TYPES = new Set(['text/vtt'])
 
 const isAssetIdentity = (value: unknown, mimeTypes: Set<string>): boolean => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
@@ -26,7 +27,7 @@ export const assessmentVideoPresentation = (value: unknown): AssessmentVideoPres
     for (const entry of candidate.captions) {
       if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return undefined
       const track = entry as Record<string, unknown>
-      if (!isAssetIdentity(track.asset, new Set(['text/vtt']))) return undefined
+      if (!isAssetIdentity(track.asset, VTT_MIME_TYPES)) return undefined
       if (track.kind !== 'captions' && track.kind !== 'subtitles') return undefined
       if (typeof track.srcLang !== 'string' || !track.srcLang.trim()) return undefined
       if (typeof track.label !== 'string' || !track.label.trim()) return undefined
@@ -52,18 +53,19 @@ export const scaleItemVideoPresentation = (item: unknown): AssessmentVideoPresen
 }
 
 export interface FormOptionVideoPresentation {
+  optionIndex: number
   optionLabel: string
   presentation: AssessmentVideoPresentationV1
 }
 
 export const formOptionVideoPresentations = (options: unknown): FormOptionVideoPresentation[] => {
   if (!Array.isArray(options)) return []
-  return options.flatMap((option): FormOptionVideoPresentation[] => {
+  return options.flatMap((option, optionIndex): FormOptionVideoPresentation[] => {
     if (!option || typeof option !== 'object' || Array.isArray(option)) return []
     const candidate = option as { label?: unknown; video?: unknown }
     if (typeof candidate.label !== 'string' || !candidate.label.trim()) return []
     const presentation = assessmentVideoPresentation(candidate.video)
     if (!presentation) return []
-    return [{ optionLabel: candidate.label.trim(), presentation }]
+    return [{ optionIndex, optionLabel: candidate.label.trim(), presentation }]
   })
 }
