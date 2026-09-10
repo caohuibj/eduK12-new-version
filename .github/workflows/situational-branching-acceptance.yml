@@ -77,7 +77,11 @@ jobs:
           node-version: 20
       - name: configure isolated test keys
         run: |
-          node -e "const c=require('node:crypto'); console.log('JWT_SECRET='+c.randomBytes(32).toString('hex')); console.log('DATA_ENCRYPTION_KEY='+c.randomBytes(32).toString('hex')); console.log('DATA_PSEUDONYM_KEY='+c.randomBytes(32).toString('hex')); console.log('ASSET_SIGNING_SECRET='+c.randomBytes(32).toString('hex'))" >> "$GITHUB_ENV"
+          for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
+            value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
       - name: configure runner-local npm and Playwright caches
         run: |
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
