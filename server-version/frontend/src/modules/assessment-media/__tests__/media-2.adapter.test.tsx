@@ -24,12 +24,18 @@ describe('MEDIA-2 frontend image adapters', () => {
     expect(assessmentImageItems([{ ...image('bad'), asset: { ...image('bad').asset, mimeType: 'image/gif' } }])).toEqual([])
   })
 
-  it('projects Form option images without changing option value/label data', () => {
+  it('projects Form option images with an explicit frozen option-label association', () => {
     const options = [
       { value: 'a', label: 'A', images: [image('a-2', 1), image('a-1', 0)] },
       { value: 'b', label: 'B', images: [image('b-1', 0)] },
     ]
-    expect(assessmentOptionImageItems(options).map((item) => item.asset.assetId)).toEqual(['a-1', 'a-2', 'b-1'])
+    const projected = assessmentOptionImageItems(options)
+    expect(projected.map((item) => item.asset.assetId)).toEqual(['a-1', 'a-2', 'b-1'])
+    expect(projected.map((item) => [item.altText, item.caption])).toEqual([
+      ['A: alt a-1', 'A · caption a-1'],
+      ['A: alt a-2', 'A · caption a-2'],
+      ['B: alt b-1', 'B · caption b-1'],
+    ])
     expect(options.map(({ value, label }) => ({ value, label }))).toEqual([{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }])
   })
 
