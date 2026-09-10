@@ -138,7 +138,6 @@ const runStandalone = async (browser) => {
     assert.ok(heldRoute, 'standalone capability request was not held')
     record('standalone-video-readiness-blocks-response')
     releaseRoute()
-    await page.unroute('**/api/situational/attempts/*/scenes/VIDEO-01/video-sources')
 
     const video = await waitVideoReady(page)
     await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).some((node) => !node.matches(':disabled')), null, { timeout: 30000 })
