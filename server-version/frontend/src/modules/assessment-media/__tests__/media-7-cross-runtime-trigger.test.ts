@@ -22,5 +22,6 @@ describe('MEDIA-7 final cross-runtime Scale/Form marker', () => {
       optionLabel: 'A',
       presentation,
     }])
+    expect(formOptionVideoPresentations([])).toEqual([])
   })
 })
