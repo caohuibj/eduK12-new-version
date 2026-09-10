@@ -35,4 +35,36 @@ describe('ScaleFormVideoGate', () => {
     await waitFor(() => expect(loadSources).toHaveBeenCalledTimes(2))
     expect(await screen.findByLabelText('题目视频')).toBeTruthy()
   })
+
+  it('does not reissue capabilities for callback-only rerenders and invalidates readiness for a new frozen presentation', async () => {
+    const loadSources = vi.fn().mockResolvedValue({ videoUrl: '/video', captions: [] })
+    const view = render(
+      <ScaleFormVideoGate presentation={presentation} loadSources={(value) => loadSources(value)}>
+        <button type="button">作答</button>
+      </ScaleFormVideoGate>,
+    )
+
+    fireEvent.loadedMetadata(await screen.findByLabelText('题目视频'))
+    expect(await screen.findByRole('button', { name: '作答' })).toBeTruthy()
+    expect(loadSources).toHaveBeenCalledTimes(1)
+
+    view.rerender(
+      <ScaleFormVideoGate presentation={presentation} loadSources={(value) => loadSources(value)}>
+        <button type="button">作答</button>
+      </ScaleFormVideoGate>,
+    )
+    await Promise.resolve()
+    expect(loadSources).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: '作答' })).toBeTruthy()
+
+    const revisedPresentation = { ...presentation, title: '替代题目视频' }
+    view.rerender(
+      <ScaleFormVideoGate presentation={revisedPresentation} loadSources={(value) => loadSources(value)}>
+        <button type="button">作答</button>
+      </ScaleFormVideoGate>,
+    )
+    expect(screen.queryByRole('button', { name: '作答' })).toBeNull()
+    expect(await screen.findByLabelText('替代题目视频')).toBeTruthy()
+    await waitFor(() => expect(loadSources).toHaveBeenCalledTimes(2))
+  })
 })
