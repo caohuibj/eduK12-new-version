@@ -77,11 +77,6 @@ const choose = async (page, optionKey) => {
 }
 
 const startStandalone = async (page) => {
-  // Pre-create the authoritative active attempt through the production start
-  // endpoint before mounting the runner. This keeps MEDIA-5 focused on video
-  // presentation/capability behavior and avoids exercising the unrelated
-  // concurrent-start race caused by multiple runner effects competing for the
-  // first standalone attempt identity in a fresh CI database.
   const csrf = assertSuccess(await apiFetch(page, '/auth/csrf'), 'standalone csrf')
   assert.ok(csrf?.csrfToken, 'standalone csrf token missing')
   const seeded = assertSuccess(await apiFetch(page, '/situational/attempts', {
@@ -139,14 +134,14 @@ const runStandalone = async (browser) => {
     })
     await startStandalone(page)
     await page.waitForFunction(() => Boolean(document.querySelector('input[type="radio"]')), null, { timeout: 30000 })
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).every((node) => node.disabled), null, { timeout: 30000 })
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).every((node) => node.matches(':disabled')), null, { timeout: 30000 })
     assert.ok(heldRoute, 'standalone capability request was not held')
     record('standalone-video-readiness-blocks-response')
     releaseRoute()
     await page.unroute('**/api/situational/attempts/*/scenes/VIDEO-01/video-sources')
 
     const video = await waitVideoReady(page)
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).some((node) => !node.disabled), null, { timeout: 30000 })
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).some((node) => !node.matches(':disabled')), null, { timeout: 30000 })
     await page.waitForFunction(() => document.querySelectorAll('track').length > 0, null, { timeout: 30000 })
     assertCapabilityUrls(videoSources, 'standalone')
     assert.ok(nativeRequests.length > 0, 'native media request was not observed')
