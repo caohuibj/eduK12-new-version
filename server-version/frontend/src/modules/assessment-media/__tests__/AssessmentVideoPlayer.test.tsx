@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import AssessmentVideoPlayer from '../AssessmentVideoPlayer'
 import type { AssessmentVideoPresentationV1 } from '../types'
@@ -70,7 +70,7 @@ describe('AssessmentVideoPlayer', () => {
     fireEvent.error(video)
     expect(screen.getByText('视频加载失败，请重试。')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '重试' }))
-    await vi.waitFor(() => expect(onRetry).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(onRetry).toHaveBeenCalledTimes(1))
     expect(load).toHaveBeenCalled()
     expect(document.body.oncontextmenu).toBeNull()
     load.mockRestore()
