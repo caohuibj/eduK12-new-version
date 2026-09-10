@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
+import { situationalVideoController } from '../situational/situational-video.controller'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 const router = Router()
@@ -10,6 +11,7 @@ router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/conten
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', compositeImageController.publicScaleImage)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', compositeController.publicEmbeddedSituational)
 router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', compositeController.publicEmbeddedSituationalAsset)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/scenes/:sceneKey/video-sources', situationalVideoController.embeddedPublic)
 router.post('/attempts/:attemptId/restart', compositeController.publicRestart)
 router.post('/attempts/:attemptId/context/freeze', legacyWriteDisabled)
 router.post('/attempts/:attemptId/form-sections/:sectionId/submit', compositeController.publicSubmitFinalFormSection)
