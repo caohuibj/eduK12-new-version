@@ -22,6 +22,52 @@ fs.mkdirSync(SCREENSHOT_DIR, { recursive: true })
 const results = []
 const record = (name) => { results.push(name); console.log(`[PASS] ${name}`) }
 
+// Cognitive FINAL legitimately carries trial timing such as durationMs and
+// endedAtPerfMs. Reject playback-state fields by exact JSON key instead of
+// substring matching so the acceptance gate does not confuse scientific trial
+// timing with video telemetry.
+const playbackTelemetryKeys = new Set([
+  'currenttime',
+  'currenttimems',
+  'duration',
+  'ended',
+  'playing',
+  'buffering',
+  'watched',
+  'watchedms',
+  'watchedpercentage',
+  'watchpercentage',
+  'playback',
+  'playbackposition',
+  'playbackpositionms',
+  'playcount',
+  'videocurrenttime',
+  'videoduration',
+  'videodurationms',
+  'mediacurrenttime',
+  'mediaduration',
+  'mediadurationms',
+])
+
+const assertNoPlaybackTelemetry = (value, label) => {
+  const visit = (node, path = '$') => {
+    if (Array.isArray(node)) {
+      node.forEach((entry, index) => visit(entry, `${path}[${index}]`))
+      return
+    }
+    if (!node || typeof node !== 'object') return
+    for (const [key, child] of Object.entries(node)) {
+      assert.equal(
+        playbackTelemetryKeys.has(key.toLowerCase()),
+        false,
+        `${label}: playback telemetry key leaked at ${path}.${key}`,
+      )
+      visit(child, `${path}.${key}`)
+    }
+  }
+  visit(value)
+}
+
 const loginStudent = async (page) => {
   await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'commit', timeout: 30000 })
   await page.getByPlaceholder('请输入用户名').waitFor({ state: 'visible', timeout: 60000 })
@@ -133,7 +179,7 @@ const runAuthenticated = async (browser) => {
 
     await completeFakeTask(page, false)
     assert.ok(finalPayload, 'authenticated final payload not observed')
-    assert.doesNotMatch(JSON.stringify(finalPayload), /currentTime|duration|ended|playing|buffering|watched|playback/i)
+    assertNoPlaybackTelemetry(finalPayload, 'authenticated FINAL')
     record('authenticated-one-final-has-no-playback-telemetry')
 
     const historical = await page.evaluate(async ({ sessionId }) => {
@@ -199,7 +245,7 @@ const runPublic = async (browser) => {
 
     await completeFakeTask(page, true)
     assert.ok(finalPayload, 'public final payload not observed')
-    assert.doesNotMatch(JSON.stringify(finalPayload), /currentTime|duration|ended|playing|buffering|watched|playback/i)
+    assertNoPlaybackTelemetry(finalPayload, 'public FINAL')
     assert.equal(JSON.stringify(finalPayload).includes(fixture.publicSession.recoveryToken), true, 'public FINAL must carry recovery credential in POST body')
     record('public-one-final-has-no-playback-telemetry')
     await page.screenshot({ path: `${SCREENSHOT_DIR}/02-public-result.png`, fullPage: true })
