@@ -14,6 +14,8 @@ import {
 import type { FrozenSituationalRuntimeSnapshotV1 } from '../assessment-runtime/situational-runtime-snapshot'
 import {
   situationalAssetReferences,
+  situationalImageAssetReferences,
+  type SituationalAssetReference,
   type SituationalSceneDefinition,
   type SituationalStoredAssetIdentity,
 } from './situation-definition'
@@ -27,15 +29,19 @@ export interface SituationalAssetIssue {
 export interface SituationalAssetValidation {
   valid: boolean
   issues: SituationalAssetIssue[]
-  references: SituationalStoredAssetIdentity[]
+  references: SituationalAssetReference[]
 }
 
 type SituationAssetReferenceSource = {
   scenes: ReadonlyArray<Pick<SituationalSceneDefinition, 'stimulus'>>
 }
 
-const referencePaths = (definition: SituationAssetReferenceSource): SituationalStoredAssetIdentity[] => (
+const referencePaths = (definition: SituationAssetReferenceSource): SituationalAssetReference[] => (
   definition.scenes.flatMap((scene) => situationalAssetReferences(scene.stimulus))
+)
+
+const imageReferencePaths = (definition: SituationAssetReferenceSource): SituationalStoredAssetIdentity[] => (
+  definition.scenes.flatMap((scene) => situationalImageAssetReferences(scene.stimulus))
 )
 
 /**
@@ -53,7 +59,7 @@ export const validateSituationalAssetReferences = async (
     references,
     issues: validation.issues.map((issue) => ({
       ...issue,
-      path: issue.path.replace(/^references\./u, 'scenes.visualAssetReferences.'),
+      path: issue.path.replace(/^references\./u, 'scenes.mediaAssetReferences.'),
     })),
   }
 }
@@ -64,7 +70,7 @@ export const assertSituationalAssetReferencesReady = async (
 ): Promise<void> => {
   const validation = await validateSituationalAssetReferences(definition, db)
   if (!validation.valid) {
-    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化视觉内容未通过资产校验', 409)
+    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化媒体内容未通过资产校验', 409)
   }
 }
 
@@ -73,16 +79,15 @@ const findFrozenAssetReference = (
   assetId: string,
 ): SituationalStoredAssetIdentity | undefined => (
   findFrozenAssessmentAssetReference(
-    referencePaths(snapshot.definition),
+    imageReferencePaths(snapshot.definition),
     assetId,
   ) as SituationalStoredAssetIdentity | undefined
 )
 
 /**
  * The attempt route performs Situational authorization before entering this
- * adapter. The requested asset must additionally occur in that attempt's
- * frozen definition; byte delivery and immutable identity revalidation are
- * shared Assessment image responsibilities.
+ * adapter. This legacy endpoint remains IMAGE/COMIC-only; VIDEO, poster and
+ * caption bytes use MEDIA-4 capability delivery instead.
  */
 export const serveFrozenSituationalAsset = async (params: {
   snapshot: FrozenSituationalRuntimeSnapshotV1
