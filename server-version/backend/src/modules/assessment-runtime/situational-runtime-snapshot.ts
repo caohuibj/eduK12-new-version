@@ -42,6 +42,7 @@ const runnerChannelSchema = z.union([
     channelKey: situationalOpaqueKeySchema,
     responseType: z.literal('SINGLE_CHOICE'),
     prompt: z.string().min(1),
+    required: z.literal(false).optional(),
     options: z.array(z.object({
       optionKey: situationalOpaqueKeySchema,
       label: z.string().min(1),
@@ -51,6 +52,7 @@ const runnerChannelSchema = z.union([
     channelKey: situationalOpaqueKeySchema,
     responseType: z.literal('CONTINUOUS'),
     prompt: z.string().min(1),
+    required: z.literal(false).optional(),
     range: z.object({ min: z.number().finite(), max: z.number().finite() }).strict(),
   }).strict(),
 ])

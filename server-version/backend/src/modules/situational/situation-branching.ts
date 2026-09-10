@@ -11,6 +11,24 @@ import {
 } from './situation-definition'
 
 /**
+ * D keeps measurement/delivery policy on the V2 graph instead of widening the
+ * published V1 scientific channel schema. Omitted policy preserves the V2-C
+ * contract: channels are required and scored.
+ */
+export const situationalMeasurementRoleSchema = z.enum(['SCORED', 'ROUTING_ONLY'])
+export type SituationalMeasurementRole = z.infer<typeof situationalMeasurementRoleSchema>
+
+export const situationalInteractionRoleSchema = z.enum(['DECISION', 'DIAGNOSTIC'])
+export type SituationalInteractionRole = z.infer<typeof situationalInteractionRoleSchema>
+
+export const situationalBranchChannelPolicySchema = z.object({
+  channelKey: situationalOpaqueKeySchema,
+  measurementRole: situationalMeasurementRoleSchema.optional(),
+  required: z.boolean().optional(),
+}).strict()
+export type SituationalBranchChannelPolicy = z.infer<typeof situationalBranchChannelPolicySchema>
+
+/**
  * Situational V2 is deliberately a unit-local graph contract. It does not
  * create a new assessment runtime or server-side cursor. Each content node
  * references one existing scene, while terminal nodes carry no response
@@ -40,6 +58,13 @@ export const situationalBranchSceneNodeSchema = z.object({
   motherSceneKey: situationalOpaqueKeySchema,
   roundKey: situationalOpaqueKeySchema,
   stepKey: situationalOpaqueKeySchema,
+  /** Explicit interaction semantics; omitted keeps pre-D V2 definitions valid. */
+  interactionRole: situationalInteractionRoleSchema.optional(),
+  /**
+   * Per-channel V2 policy. Omitted entries mean SCORED + required. The policy
+   * is frozen definition metadata, never a mutable server-side round state.
+   */
+  channelPolicies: z.array(situationalBranchChannelPolicySchema).optional(),
   transition: z.union([
     situationalNextTransitionSchema,
     situationalDecisionTransitionSchema,
@@ -56,6 +81,7 @@ export const situationalBranchFlowNodeSchema = z.discriminatedUnion('nodeType', 
   situationalBranchTerminalNodeSchema,
 ])
 export type SituationalBranchFlowNode = z.infer<typeof situationalBranchFlowNodeSchema>
+export type SituationalBranchSceneNode = z.infer<typeof situationalBranchSceneNodeSchema>
 
 export const situationalBranchFlowSchema = z.object({
   strategy: z.literal('BRANCHING_DAG_V1'),
@@ -77,8 +103,7 @@ export const situationalBranchSamplingSchema = z.object({
 /**
  * V2 retains the complete V1 scientific/scoring plane and adds only the
  * presentation/traversal graph. Keeping V1 as a separate exported contract
- * prevents PR A from silently enabling V2 in production runtimes before the
- * client traversal and authoritative FINAL work land in later PRs.
+ * prevents V2 policy from mutating published V1 definitions or hashes.
  */
 export const situationDefinitionV2Schema = situationDefinitionSchema.extend({
   schemaVersion: z.literal(2),
@@ -97,6 +122,52 @@ const asV1Definition = (definition: SituationDefinitionV2): SituationDefinitionV
   return { ...rest, schemaVersion: 1, sampling: { strategy: 'ALL' } }
 }
 
+const sceneNodeFor = (
+  definition: SituationDefinitionV2,
+  sceneKey: string,
+): SituationalBranchSceneNode | undefined => definition.flow.nodes.find(
+  (node): node is SituationalBranchSceneNode => node.nodeType === 'SCENE' && node.sceneKey === sceneKey,
+)
+
+export const situationalBranchChannelPolicy = (
+  definition: SituationDefinitionV2,
+  sceneKey: string,
+  channelKey: string,
+): { measurementRole: SituationalMeasurementRole; required: boolean } => {
+  const node = sceneNodeFor(definition, sceneKey)
+  const policy = node?.channelPolicies?.find((candidate) => candidate.channelKey === channelKey)
+  return {
+    measurementRole: policy?.measurementRole ?? 'SCORED',
+    required: policy?.required !== false,
+  }
+}
+
+/**
+ * The existing V1 validator remains authoritative for the scientific scoring
+ * plane. ROUTING_ONLY channels are intentionally removed only from this
+ * validation/scoring projection; they remain in the frozen scene and raw FINAL.
+ */
+const asScoredV1Definition = (definition: SituationDefinitionV2): SituationDefinitionV1 => {
+  const linear = asV1Definition(definition)
+  const scoredPairs = new Set<string>()
+  const scenes = linear.scenes.flatMap((scene) => {
+    const channels = scene.channels.filter((channel) => {
+      const scored = situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).measurementRole === 'SCORED'
+      if (scored) scoredPairs.add(`${scene.sceneKey}:${channel.channelKey}`)
+      return scored
+    })
+    return channels.length > 0 ? [{ ...scene, channels }] : []
+  })
+  return {
+    ...linear,
+    scenes,
+    scoring: {
+      ...linear.scoring,
+      choiceScores: linear.scoring.choiceScores.filter((entry) => scoredPairs.has(`${entry.sceneKey}:${entry.channelKey}`)),
+    },
+  }
+}
+
 const outgoingNodeKeys = (node: SituationalBranchFlowNode): string[] => {
   if (node.nodeType === 'TERMINAL') return []
   if (node.transition.type === 'NEXT') return [node.transition.nextNodeKey]
@@ -111,8 +182,8 @@ const issue = (path: string, message: string): DefinitionIssue => ({
 
 /**
  * Validate the V2 graph on top of the already-authoritative V1 scientific
- * contract. This intentionally reuses V1 validation rather than forking the
- * scoring/report/publication rules into a second validator.
+ * contract. D adds only explicit interaction/channel policy checks; it does not
+ * introduce a generic rule engine or a second scorer.
  */
 export const validateBranchingSituationDefinition = (
   value: unknown,
@@ -130,12 +201,53 @@ export const validateBranchingSituationDefinition = (
   }
 
   const definition = parsed.data
-  const commonValidation = validateSituationDefinition(asV1Definition(definition), options)
+  const commonValidation = validateSituationDefinition(asScoredV1Definition(definition), options)
   const issues: DefinitionIssue[] = [...commonValidation.issues]
   const nodeIndexByKey = new Map<string, number>()
   const nodeByKey = new Map<string, SituationalBranchFlowNode>()
   const sceneNodeIndexBySceneKey = new Map<string, number>()
   const structuralStepIndex = new Map<string, number>()
+
+  const sceneKeys = new Set<string>()
+  const sceneSortOrders = new Set<number>()
+  definition.scenes.forEach((scene, sceneIndex) => {
+    if (sceneKeys.has(scene.sceneKey)) {
+      issues.push(issue(`scenes.${sceneIndex}.sceneKey`, `场景编码不能重复：${scene.sceneKey}`))
+    }
+    sceneKeys.add(scene.sceneKey)
+    if (sceneSortOrders.has(scene.sortOrder)) {
+      issues.push(issue(`scenes.${sceneIndex}.sortOrder`, `场景 sortOrder 不能重复：${scene.sortOrder}`))
+    }
+    sceneSortOrders.add(scene.sortOrder)
+    const declaredConstructs = new Set([scene.primaryConstruct, ...scene.secondaryConstructs])
+    const channelKeys = new Set<string>()
+    scene.channels.forEach((channel, channelIndex) => {
+      if (channelKeys.has(channel.channelKey)) {
+        issues.push(issue(`scenes.${sceneIndex}.channels.${channelIndex}.channelKey`, `同一场景内通道不能重复：${channel.channelKey}`))
+      }
+      channelKeys.add(channel.channelKey)
+      if (!declaredConstructs.has(channel.scoredConstruct)) {
+        issues.push(issue(
+          `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
+          `通道构念 ${channel.scoredConstruct} 未在场景 primary/secondary constructs 中声明`,
+        ))
+      }
+      if (channel.responseType === 'SINGLE_CHOICE') {
+        const optionKeys = new Set<string>()
+        channel.options.forEach((option, optionIndex) => {
+          if (optionKeys.has(option.optionKey)) {
+            issues.push(issue(
+              `scenes.${sceneIndex}.channels.${channelIndex}.options.${optionIndex}.optionKey`,
+              `同一选择通道内 optionKey 不能重复：${option.optionKey}`,
+            ))
+          }
+          optionKeys.add(option.optionKey)
+        })
+      } else if (channel.range.min >= channel.range.max) {
+        issues.push(issue(`scenes.${sceneIndex}.channels.${channelIndex}.range`, 'CONTINUOUS 通道的 range.min 必须小于 range.max'))
+      }
+    })
+  })
 
   definition.flow.nodes.forEach((node, nodeIndex) => {
     if (nodeByKey.has(node.nodeKey)) {
@@ -181,10 +293,52 @@ export const validateBranchingSituationDefinition = (
       return
     }
 
+    if (node.interactionRole === 'DIAGNOSTIC' && node.transition.type !== 'NEXT') {
+      issues.push(issue(
+        `flow.nodes.${nodeIndex}.transition`,
+        `DIAGNOSTIC 节点不能驱动分支：${node.nodeKey}`,
+      ))
+    }
+    if (node.interactionRole === 'DECISION' && node.transition.type !== 'DECISION') {
+      issues.push(issue(
+        `flow.nodes.${nodeIndex}.transition`,
+        `DECISION 节点必须声明 deterministic DECISION transition：${node.nodeKey}`,
+      ))
+    }
+
+    const channelByKey = new Map(scene.channels.map((channel) => [channel.channelKey, channel] as const))
+    const policyKeys = new Set<string>()
+    node.channelPolicies?.forEach((policy, policyIndex) => {
+      if (policyKeys.has(policy.channelKey)) {
+        issues.push(issue(
+          `flow.nodes.${nodeIndex}.channelPolicies.${policyIndex}.channelKey`,
+          `同一节点的 channel policy 不能重复：${policy.channelKey}`,
+        ))
+      }
+      policyKeys.add(policy.channelKey)
+      if (!channelByKey.has(policy.channelKey)) {
+        issues.push(issue(
+          `flow.nodes.${nodeIndex}.channelPolicies.${policyIndex}.channelKey`,
+          `channel policy 引用了不存在的场景通道：${node.sceneKey}:${policy.channelKey}`,
+        ))
+      }
+      if (policy.measurementRole === 'ROUTING_ONLY') {
+        const hasContribution = definition.scoring.choiceScores.some((entry) => (
+          entry.sceneKey === node.sceneKey && entry.channelKey === policy.channelKey
+        ))
+        if (hasContribution) {
+          issues.push(issue(
+            `flow.nodes.${nodeIndex}.channelPolicies.${policyIndex}.measurementRole`,
+            `ROUTING_ONLY 通道不能保留 choice scoring contribution：${node.sceneKey}:${policy.channelKey}`,
+          ))
+        }
+      }
+    })
+
     if (node.transition.type !== 'DECISION') return
     const transition = node.transition
 
-    const channel = scene.channels.find((candidate) => candidate.channelKey === transition.channelKey)
+    const channel = channelByKey.get(transition.channelKey)
     if (!channel) {
       issues.push(issue(
         `flow.nodes.${nodeIndex}.transition.channelKey`,
@@ -198,6 +352,12 @@ export const validateBranchingSituationDefinition = (
         `Decision branching 只能绑定 SINGLE_CHOICE 通道：${node.sceneKey}:${transition.channelKey}`,
       ))
       return
+    }
+    if (!situationalBranchChannelPolicy(definition, node.sceneKey, transition.channelKey).required) {
+      issues.push(issue(
+        `flow.nodes.${nodeIndex}.channelPolicies`,
+        `驱动 Decision transition 的通道必须 required：${node.sceneKey}:${transition.channelKey}`,
+      ))
     }
 
     const validOptionKeys = new Set(channel.options.map((option) => option.optionKey))
@@ -251,8 +411,6 @@ export const validateBranchingSituationDefinition = (
     issues.push(issue('flow.nodes', 'BRANCHING_DAG_V1 至少需要一个 TERMINAL 节点'))
   }
 
-  // Global cycle detection: even an unreachable cycle is invalid publication
-  // content and must not hide behind the entry-path reachability check.
   const visitState = new Map<string, 'visiting' | 'visited'>()
   let hasCycle = false
   const visit = (nodeKey: string): void => {
@@ -277,8 +435,6 @@ export const validateBranchingSituationDefinition = (
   }
   nodeByKey.forEach((_node, nodeKey) => visit(nodeKey))
 
-  // Every declared node must belong to the graph rooted at entry. This rejects
-  // orphan content even when the orphan itself is internally well-formed.
   const reachable = new Set<string>()
   if (entryNode) {
     const pending = [definition.flow.entryNodeKey]
@@ -299,8 +455,6 @@ export const validateBranchingSituationDefinition = (
     }
   })
 
-  // A fixed-point proof that every outgoing branch eventually reaches a
-  // terminal. For decision nodes, every option path must terminate.
   if (!hasCycle) {
     const guaranteedTerminal = new Set(
       definition.flow.nodes.filter((node) => node.nodeType === 'TERMINAL').map((node) => node.nodeKey),
@@ -348,8 +502,9 @@ export const hashSituationDefinitionV2 = (definition: SituationDefinitionV2): st
 
 /**
  * Runner projection contains only presentation/response data plus the graph
- * needed for deterministic local traversal. Scoring contributions, constructs,
- * purposes, and scoring directions stay server-side.
+ * needed for deterministic local traversal. MeasurementRole remains server
+ * side; only required=false is exposed because the runner must know what blocks
+ * local traversal. interactionRole is safe presentation metadata.
  */
 export const runnerBranchingSituationDefinition = (definition: SituationDefinitionV2) => {
   const linearRunner = runnerSituationDefinition(asV1Definition(definition))
@@ -357,6 +512,15 @@ export const runnerBranchingSituationDefinition = (definition: SituationDefiniti
     ...linearRunner,
     schemaVersion: 2 as const,
     sampling: definition.sampling,
+    scenes: linearRunner.scenes.map((scene) => ({
+      ...scene,
+      channels: scene.channels.map((channel) => ({
+        ...channel,
+        ...(situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).required
+          ? {}
+          : { required: false as const }),
+      })),
+    })),
     flow: {
       strategy: definition.flow.strategy,
       entryNodeKey: definition.flow.entryNodeKey,
@@ -370,6 +534,7 @@ export const runnerBranchingSituationDefinition = (definition: SituationDefiniti
               motherSceneKey: node.motherSceneKey,
               roundKey: node.roundKey,
               stepKey: node.stepKey,
+              ...(node.interactionRole ? { interactionRole: node.interactionRole } : {}),
               transition: node.transition.type === 'NEXT'
                 ? { type: 'NEXT' as const, nextNodeKey: node.transition.nextNodeKey }
                 : {

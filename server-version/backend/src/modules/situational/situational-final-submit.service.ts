@@ -40,6 +40,7 @@ import {
   deriveAuthoritativeSituationalTrajectory,
   projectReachableSituationDefinitionForScoring,
   reachableSituationalResponseKeys,
+  requiredReachableSituationalResponseKeys,
   type AuthoritativeSituationalTrajectory,
 } from './situation-trajectory'
 import {
@@ -120,11 +121,12 @@ const normalizeSituationalSubmission = (
     )
   }
 
-  const missing = reachableKeys.filter((pairKey) => !byPair.has(pairKey))
+  const requiredKeys = requiredReachableSituationalResponseKeys(definition, trajectory)
+  const missing = requiredKeys.filter((pairKey) => !byPair.has(pairKey))
   if (missing.length > 0) {
     throw new InstrumentFinalSubmitError(
       'SUBMISSION_PAYLOAD_CONFLICT',
-      `还有 ${missing.length} 个当前分支场景通道未作答`,
+      `还有 ${missing.length} 个当前分支必答通道未作答`,
       409,
     )
   }

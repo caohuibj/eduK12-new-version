@@ -13,6 +13,8 @@ export interface SituationalRunnerChannel {
   channelKey: string
   responseType: SituationalResponseType
   prompt: string
+  /** Omitted means required; only explicit false is projected by V2. */
+  required?: false
   options?: SituationalOption[]
   range?: { min: number; max: number }
 }
@@ -60,6 +62,7 @@ export interface SituationalRunnerBranchSceneNode {
   motherSceneKey: string
   roundKey: string
   stepKey: string
+  interactionRole?: 'DECISION' | 'DIAGNOSTIC'
   transition: SituationalRunnerNextTransition | SituationalRunnerDecisionTransition
 }
 

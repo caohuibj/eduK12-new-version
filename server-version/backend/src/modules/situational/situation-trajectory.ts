@@ -1,4 +1,7 @@
 import type { SituationDefinitionV1 } from './situation-definition'
+import {
+  situationalBranchChannelPolicy,
+} from './situation-branching'
 import type { SituationalResponse } from './situation-scoring'
 import {
   asLinearSituationDefinition,
@@ -25,6 +28,8 @@ const responseMap = (
  * Rebuild the path from the frozen definition and raw answers. There is no
  * separately persisted active-node cursor. Frozen graph validation owns DAG
  * integrity; this helper still fails closed if a malformed graph is observed.
+ * Optional diagnostic channels do not block traversal; a DECISION routing
+ * channel is publication-gated as required.
  */
 export const deriveAuthoritativeSituationalTrajectory = (
   definition: SituationRuntimeDefinition,
@@ -68,7 +73,10 @@ export const deriveAuthoritativeSituationalTrajectory = (
     if (!scene) throw new Error(`Frozen Situational branching scene is missing: ${node.sceneKey}`)
     sceneKeys.push(scene.sceneKey)
 
-    const complete = scene.channels.every((channel) => answers.has(responseKey(scene.sceneKey, channel.channelKey)))
+    const complete = scene.channels.every((channel) => (
+      !situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).required
+      || answers.has(responseKey(scene.sceneKey, channel.channelKey))
+    ))
     if (!complete) break
 
     if (node.transition.type === 'NEXT') {
@@ -91,6 +99,7 @@ export const deriveAuthoritativeSituationalTrajectory = (
   }
 }
 
+/** All response surfaces on the authoritative path, including optional diagnostics. */
 export const reachableSituationalResponseKeys = (
   definition: SituationRuntimeDefinition,
   trajectory: AuthoritativeSituationalTrajectory,
@@ -104,10 +113,31 @@ export const reachableSituationalResponseKeys = (
   })
 }
 
+/** Response surfaces that must be present for authoritative FINAL acceptance. */
+export const requiredReachableSituationalResponseKeys = (
+  definition: SituationRuntimeDefinition,
+  trajectory: AuthoritativeSituationalTrajectory,
+): string[] => {
+  const linear = asLinearSituationDefinition(definition)
+  const sceneByKey = new Map(linear.scenes.map((scene) => [scene.sceneKey, scene] as const))
+  return trajectory.sceneKeys.flatMap((sceneKey) => {
+    const scene = sceneByKey.get(sceneKey)
+    if (!scene) throw new Error(`Frozen Situational trajectory scene is missing: ${sceneKey}`)
+    return scene.channels.flatMap((channel) => {
+      if (
+        isBranchingSituationDefinition(definition)
+        && !situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).required
+      ) return []
+      return [responseKey(scene.sceneKey, channel.channelKey)]
+    })
+  })
+}
+
 /**
  * Produce the scientific plane consumed by the existing scorer. V1 is
- * unchanged. V2 keeps only reachable scenes and their choice contributions;
- * metric/report contracts remain identical and no second scorer is introduced.
+ * unchanged. V2 keeps only reachable SCORED channels and their choice
+ * contributions. ROUTING_ONLY answers stay in encrypted raw FINAL evidence but
+ * never enter metric calculation. No second scorer is introduced.
  */
 export const projectReachableSituationDefinitionForScoring = (
   definition: SituationRuntimeDefinition,
@@ -117,19 +147,24 @@ export const projectReachableSituationDefinitionForScoring = (
   if (!isBranchingSituationDefinition(definition)) return linear
 
   const sceneByKey = new Map(linear.scenes.map((scene) => [scene.sceneKey, scene] as const))
-  const scenes = trajectory.sceneKeys.map((sceneKey) => {
+  const scoredPairs = new Set<string>()
+  const scenes = trajectory.sceneKeys.flatMap((sceneKey) => {
     const scene = sceneByKey.get(sceneKey)
     if (!scene) throw new Error(`Frozen Situational trajectory scene is missing: ${sceneKey}`)
-    return scene
+    const channels = scene.channels.filter((channel) => {
+      const scored = situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).measurementRole === 'SCORED'
+      if (scored) scoredPairs.add(responseKey(scene.sceneKey, channel.channelKey))
+      return scored
+    })
+    return channels.length > 0 ? [{ ...scene, channels }] : []
   })
-  const reachableSceneKeys = new Set(trajectory.sceneKeys)
 
   return {
     ...linear,
     scenes,
     scoring: {
       ...linear.scoring,
-      choiceScores: linear.scoring.choiceScores.filter((entry) => reachableSceneKeys.has(entry.sceneKey)),
+      choiceScores: linear.scoring.choiceScores.filter((entry) => scoredPairs.has(responseKey(entry.sceneKey, entry.channelKey))),
     },
   }
 }
