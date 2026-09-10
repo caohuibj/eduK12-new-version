@@ -184,9 +184,20 @@ const runAuthenticated = async (browser) => {
 
     const historical = await page.evaluate(async ({ sessionId }) => {
       const token = window.localStorage.getItem('token')
+      const csrfResponse = await fetch('/api/auth/csrf', { credentials: 'same-origin' })
+      const csrfBody = await csrfResponse.json()
+      const csrfToken = csrfBody?.data?.csrfToken
+      if (!csrfResponse.ok || !csrfToken) {
+        return { capabilityStatus: csrfResponse.status, code: csrfBody?.code, mediaStatus: 0 }
+      }
       const response = await fetch(`/api/cognitive/sessions/${sessionId}/video-capabilities`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'X-CSRF-Token': csrfToken,
+        },
         body: JSON.stringify({ videoKey: 'instruction:0' }),
       })
       const body = await response.json()
