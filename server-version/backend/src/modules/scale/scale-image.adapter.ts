@@ -6,9 +6,9 @@ import type { ScaleDefinitionV2 } from './scale-definition'
 
 export {
   assertScaleAssessmentImagesReady,
-  frozenScaleRuntimeMediaOwner,
+  frozenScaleMediaOwner,
   publishedScaleMediaOwner,
-  retainFrozenScaleRuntimeImages,
+  retainFrozenScaleAssessmentImages,
   retainScaleAssessmentImages,
   scaleAssessmentImageReferences,
 } from './scale-image-retention'
