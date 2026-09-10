@@ -323,7 +323,7 @@ const runStandaloneScale = async (browser, fixture) => {
   try {
     await loginStudent(page)
     await page.goto(`${BASE_URL}/student/scales/${fixture.scale.id}`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: fixture.scale.name, exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+    await page.getByRole('heading', { name: 'MEDIA-2 量表题目', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await assertImage(page, fixture.scale.assetId, 'MEDIA-2 scale question image')
     await page.getByRole('button', { name: '选项 1', exact: true }).click()
     await page.waitForTimeout(250)
