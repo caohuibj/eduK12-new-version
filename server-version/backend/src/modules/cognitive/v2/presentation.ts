@@ -54,6 +54,14 @@ export const cognitivePresentationDefinitionSchema = z.object({
 export type CognitiveImagePresentationItem = z.infer<typeof cognitiveImagePresentationItemSchema>
 export type CognitiveVideoSlotsV1 = z.infer<typeof cognitiveVideoSlotsSchema>
 export type CognitivePresentationDefinitionV1 = z.infer<typeof cognitivePresentationDefinitionSchema>
+export type CognitiveVideoSlot = keyof CognitiveVideoSlotsV1
+
+export interface CognitiveVideoPresentationEntry {
+  key: string
+  slot: CognitiveVideoSlot
+  index: number
+  presentation: AssessmentVideoPresentationV1
+}
 
 export const parseCognitivePresentationDefinition = (
   value: unknown,
@@ -77,16 +85,28 @@ export const cognitiveImagePresentationAssetReferences = (
   presentation?: CognitivePresentationDefinitionV1,
 ): AssessmentStaticImageAssetIdentityV1[] => cognitivePresentationItems(presentation).map((item) => item.asset)
 
+const VIDEO_SLOT_ORDER: CognitiveVideoSlot[] = ['instruction', 'example', 'stimulus']
+
+/** Stable keys select frozen video presentations without relying on mutable URLs or ambiguous asset reuse. */
+export const cognitiveVideoPresentationEntries = (
+  presentation?: CognitivePresentationDefinitionV1,
+): CognitiveVideoPresentationEntry[] => {
+  if (!presentation?.videos) return []
+  return VIDEO_SLOT_ORDER.flatMap((slot) => (
+    (presentation.videos?.[slot] ?? []).map((video, index) => ({
+      key: `${slot}:${index}`,
+      slot,
+      index,
+      presentation: video,
+    }))
+  ))
+}
+
 /** Video slot order mirrors image slot order without changing task timing semantics. */
 export const cognitiveVideoPresentations = (
   presentation?: CognitivePresentationDefinitionV1,
-): AssessmentVideoPresentationV1[] => presentation?.videos
-  ? [
-      ...(presentation.videos.instruction ?? []),
-      ...(presentation.videos.example ?? []),
-      ...(presentation.videos.stimulus ?? []),
-    ]
-  : []
+): AssessmentVideoPresentationV1[] => cognitiveVideoPresentationEntries(presentation)
+  .map((entry) => entry.presentation)
 
 export const cognitiveVideoPresentationAssetReferences = (
   presentation?: CognitivePresentationDefinitionV1,
