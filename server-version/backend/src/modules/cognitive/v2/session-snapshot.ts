@@ -8,6 +8,7 @@ import {
   CognitiveFinalSubmissionConfigError,
   resolveCognitiveFinalMaxTrials,
 } from './final-submission-budget'
+import { cognitivePresentationDefinitionSchema, parseCognitivePresentationDefinition } from './presentation'
 import { BAD_REQUEST } from '../cognitive.errors'
 
 const protocolPhaseSchema = z.object({
@@ -48,6 +49,7 @@ export const sessionConfigSnapshotSchema = z.object({
     profileKey: z.string().min(1).optional(),
     applicability: z.record(z.unknown()).optional(),
   }).strict()).optional(),
+  presentation: cognitivePresentationDefinitionSchema.optional(),
   protocol: protocolDefinitionSchema,
   protocolSignature: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
@@ -96,6 +98,9 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   }
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid session snapshot frozenAt')
+  const presentation = input.definition.presentation
+    ? parseCognitivePresentationDefinition(input.definition.presentation)
+    : undefined
   const snapshot: SessionConfigSnapshot<TConfig> = {
     schemaVersion: 1,
     frozenAt: frozenAt.toISOString(),
@@ -111,6 +116,7 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
       compiledRuntime: input.runtime.compiledRuntime,
       referenceBindings: freezeReferenceApplicability(input.definition, input.runtime.referenceBindings ?? []),
     } : {}),
+    ...(presentation ? { presentation } : {}),
     protocol: input.definition.protocol,
     protocolSignature: computeProtocolSignature(input.definition.protocol),
   }
