@@ -161,7 +161,6 @@ describe('Assessment media capability', () => {
       scopeId: 'attempt:123', audience: 'authenticated', kind: 'video', asset: videoAsset, ttlSeconds: 10, nowSeconds: 100,
     })
     expect(() => verifyAssessmentMediaCapability(`${issued.token}x`, 101)).toThrow()
-    expect(() => verifyAssessmentMediaCapability(issued.token, 110)).toMatchObject
     expect(() => verifyAssessmentMediaCapability(issued.token, 110)).toThrow(/expired/u)
     expect(() => createAssessmentMediaCapability({
       scopeId: 'attempt:123', audience: 'authenticated', kind: 'caption', asset: videoAsset,
