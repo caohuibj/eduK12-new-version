@@ -5,6 +5,7 @@
 import { Router } from 'express'
 import { publicQuestionnaireController } from '../controllers/publicQuestionnaireController'
 import { questionnaireImageController } from '../controllers/questionnaireImageController'
+import { questionnaireVideoController } from '../controllers/questionnaireVideoController'
 import { requireQuestionnaireResume } from '../middleware/publicQuestionnaireAuth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -25,6 +26,8 @@ router.post('/assessments/:sessionId/form-sections/:sectionId/submit', requireQu
 router.post('/assessments/:sessionId/scale/:scaleAssessmentId/submit', requireQuestionnaireResume, publicQuestionnaireController.submitFinalScale)
 router.get('/assessments/:sessionId/form-sections/:sectionId/assets/:assetId', requireQuestionnaireResume, questionnaireImageController.publicFormImage)
 router.get('/assessments/:sessionId/scale/:scaleAssessmentId/assets/:assetId', requireQuestionnaireResume, questionnaireImageController.publicScaleImage)
+router.post('/assessments/:sessionId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', requireQuestionnaireResume, questionnaireVideoController.publicFormVideo)
+router.post('/assessments/:sessionId/scale/:scaleAssessmentId/items/:itemCode/video-capability', requireQuestionnaireResume, questionnaireVideoController.publicScaleVideo)
 router.get('/assessments/:sessionId/scale/:scaleAssessmentId', requireQuestionnaireResume, publicQuestionnaireController.getScaleAssessment)
 router.patch('/assessments/:sessionId/answers/batch', requireQuestionnaireResume, legacyWriteDisabled)
 router.patch('/assessments/:sessionId/answers', requireQuestionnaireResume, legacyWriteDisabled)
