@@ -63,7 +63,9 @@ const CognitiveRunner: React.FC = () => {
     [frozenPresentation],
   )
   const loadPresentationAsset = useCallback((assetId: string): Promise<Blob> => {
-    if (!state.session) return Promise.reject(new Error('Cognitive image session is unavailable'))
+    if (!state.session || !sessionApi.loadAsset) {
+      return Promise.reject(new Error('Cognitive image session is unavailable'))
+    }
     return sessionApi.loadAsset(state.session.sessionId, assetId)
   }, [sessionApi, state.session])
   const imageState = useAssessmentImageAssets(allImageItems, loadPresentationAsset)
