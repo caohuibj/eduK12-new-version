@@ -2,6 +2,7 @@ name: Situational Branching Acceptance
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/situational-branching-acceptance.yml'
       - 'server-version/backend/src/modules/situational/**'

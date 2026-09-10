@@ -52,7 +52,8 @@ const assertSuccess = (response, label) => {
 }
 
 const loginStudent = async (page) => {
-  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'domcontentloaded' })
+  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'commit', timeout: 30000 })
+  await page.getByPlaceholder('请输入用户名').waitFor({ state: 'visible', timeout: 60000 })
   await page.getByPlaceholder('请输入用户名').fill(fixture.student.username)
   await page.getByPlaceholder('请输入密码').fill(fixture.student.password)
   await Promise.all([

@@ -2,6 +2,7 @@ name: Assessment Video Core Acceptance
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/assessment-video-core-acceptance.yml'
       - 'server-version/backend/src/modules/assessment-media/**'

@@ -149,10 +149,8 @@ const assertAggregateSafe = (payload, label) => {
 }
 
 const loginStudent = async (page) => {
-  // The self-hosted browser lane starts Vite immediately before this first
-  // navigation. Give only that cold SPA navigation a larger budget; all later
-  // product assertions keep the normal 30s acceptance timeout.
-  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'commit', timeout: 30000 })
+  await page.getByPlaceholder('请输入用户名').waitFor({ state: 'visible', timeout: 60000 })
   await page.getByPlaceholder('请输入用户名').fill(fixture.student.username)
   await page.getByPlaceholder('请输入密码').fill(fixture.student.password)
   await Promise.all([

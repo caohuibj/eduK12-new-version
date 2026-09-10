@@ -1,9 +1,11 @@
 # CI / merge gate
 #
-# 触发：
-#   push main only (no auto full CI on feature/**)
-#   pull_request → main / stacked feature branches (incl. ready_for_review)
-#   Draft PRs skip heavy jobs until Ready for review
+# 触发模型：
+#   Draft PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
+#   Ready PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
+#   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
+#   workflow_dispatch: manual Full Gate for explicit debugging/verification.
+#   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
 #   Mac lane:     backend → seeded browser → docker
@@ -44,9 +46,100 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pr-light-backend:
+    name: PR light / backend compile
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: npm ci
+        run: npm ci
+      - name: prisma generate
+        run: npx prisma generate
+      - name: build (tsc)
+        run: npm run build
+
+  pr-light-frontend:
+    name: PR light / frontend lint + typecheck
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-win-ci
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: npm ci
+        run: npm ci
+      - name: lint
+        run: npm run lint
+      - name: typecheck
+        run: npm run typecheck
+
+  post-merge-smoke:
+    name: main / post-merge compile smoke
+    if: github.event_name == 'push'
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: backend prisma generate
+        working-directory: server-version/backend
+        run: npx prisma generate
+      - name: backend compile smoke
+        working-directory: server-version/backend
+        run: npm run build
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: frontend typecheck smoke
+        working-directory: server-version/frontend
+        run: npm run typecheck
+      - name: frontend production build smoke
+        working-directory: server-version/frontend
+        run: npm run build
+
   backend:
     name: backend (ci + migrate + build + full regression)
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -190,7 +283,7 @@ jobs:
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -228,7 +321,7 @@ jobs:
     # production lanes have passed. It uses its own service containers and
     # runs before Docker on the dedicated Mac lane.
     needs: [backend, frontend]
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -386,7 +479,7 @@ jobs:
     # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
     # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
     needs: [backend, browser]
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -478,7 +571,7 @@ jobs:
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
     needs: frontend
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
