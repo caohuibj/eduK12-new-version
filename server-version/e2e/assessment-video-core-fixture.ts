@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { mkdir, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import bcrypt from '../backend/node_modules/bcryptjs'
 import {
@@ -31,14 +31,13 @@ const persistAsset = async (params: {
   const objectKey = `assets/${params.fileName}`
   const filePath = path.resolve(uploadRoot, objectKey)
   await mkdir(path.dirname(filePath), { recursive: true })
-  if (params.bytes) await writeFile(filePath, params.bytes)
-  const sourcePath = params.sourcePath || filePath
-  if (params.sourcePath) {
-    const bytes = await import('node:fs/promises').then(({ readFile }) => readFile(params.sourcePath!))
-    await writeFile(filePath, bytes)
-  }
-  const bytes = await import('node:fs/promises').then(({ readFile }) => readFile(filePath))
+  if (params.sourcePath) await writeFile(filePath, await readFile(params.sourcePath))
+  else if (params.bytes) await writeFile(filePath, params.bytes)
+  else throw new Error('fixture asset requires bytes or sourcePath')
+
+  const bytes = await readFile(filePath)
   const size = (await stat(filePath)).size
+  const contentHash = sha256(bytes)
   await prisma.storedAsset.create({
     data: {
       id: params.id,
@@ -46,13 +45,13 @@ const persistAsset = async (params: {
       provider: 'local',
       mimeType: params.mimeType,
       sizeBytes: size,
-      sha256: sha256(bytes),
+      sha256: contentHash,
       originalName: params.fileName,
       ownerId: params.ownerId,
       accessScope: 'PRIVATE',
     },
   })
-  return { assetId: params.id, contentHash: sha256(bytes), mimeType: params.mimeType }
+  return { assetId: params.id, contentHash, mimeType: params.mimeType }
 }
 
 const main = async () => {
