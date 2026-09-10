@@ -42,18 +42,22 @@ export interface SituationPackageV2 extends SituationPackageBase {
 export type SituationPackage = SituationPackageV1 | SituationPackageV2
 
 // Production content remains V1 until a later content PR deliberately adds a
-// reviewed V2 pilot. E only admits one explicit CI-only V2 fixture through an
-// opt-in environment flag; normal catalog contents and publication remain V1.
-const packages: SituationPackage[] = [
+// reviewed V2 pilot. E only admits one explicit CI-only V2 fixture. The cast is
+// deliberately isolated here so normal catalog/service typing does not imply a
+// production V2 publication in this acceptance PR; runtime validation still
+// receives the real schemaVersion=2 object at execution time.
+const packages: SituationPackageV1[] = [
   SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
   ...(process.env.SITUATIONAL_STATIC_VISUAL_FIXTURE === 'true' ? [SJT_STATIC_VISUAL_E2E_PACKAGE] : []),
-  ...(process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE === 'true' ? [SJT_BRANCHING_E2E_PACKAGE] : []),
+  ...(process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE === 'true'
+    ? [SJT_BRANCHING_E2E_PACKAGE as unknown as SituationPackageV1]
+    : []),
 ]
 
 const packageIdentityKey = (key: string, instrumentVersion: string): string => JSON.stringify([key, instrumentVersion])
-const packageByKey = new Map<string, SituationPackage>()
+const packageByKey = new Map<string, SituationPackageV1>()
 for (const situationPackage of packages) {
   const identity = packageIdentityKey(situationPackage.key, situationPackage.instrumentVersion)
   if (packageByKey.has(identity)) {
@@ -62,11 +66,11 @@ for (const situationPackage of packages) {
   packageByKey.set(identity, situationPackage)
 }
 
-export const getSituationPackage = (key: string, instrumentVersion: string): SituationPackage | undefined => (
+export const getSituationPackage = (key: string, instrumentVersion: string): SituationPackageV1 | undefined => (
   packageByKey.get(packageIdentityKey(key, instrumentVersion))
 )
 
-export const listSituationPackages = (): SituationPackage[] => [...packages]
+export const listSituationPackages = (): SituationPackageV1[] => [...packages]
 
 export const hasSituationPackage = (key: string, instrumentVersion: string): boolean => (
   packageByKey.has(packageIdentityKey(key, instrumentVersion))
