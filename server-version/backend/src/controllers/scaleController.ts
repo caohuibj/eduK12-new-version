@@ -34,6 +34,7 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-concurrency'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { retainFrozenScaleAssessmentImages } from '../modules/scale/scale-image.adapter'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
@@ -611,17 +612,11 @@ export const scaleController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
 
-      // 可见性规则：
-      // 1. PUBLIC：全体可见
-      // 2. COURSE：关联课程后，该课程学生可见
-      // 3. HIDDEN：未关联不可见
-
       let where: any = {
         status: 'PUBLISHED'
       }
 
       if (userRole === UserRole.STUDENT) {
-        // 获取学生所在的所有课程ID
         const courseStudents = await prisma.courseStudent.findMany({
           where: {
             studentId: userId,
@@ -631,9 +626,6 @@ export const scaleController = {
         })
         const courseIds = courseStudents.map(cs => cs.courseId)
 
-        // 学生可见条件：
-        // 1. visibility = PUBLIC（全体可见）
-        // 2. visibility = COURSE 且关联到学生所在课程
         where.OR = [
           { visibility: 'PUBLIC' },
           {
@@ -670,8 +662,6 @@ export const scaleController = {
         }
       })
 
-      // 批量查询所有尝试（消除 N+1 查询）。PR25 只限制同时一个
-      // IN_PROGRESS 尝试，历史完成/放弃记录仍用于稳定的列表 DTO。
       const assessments = await prisma.assessment.findMany({
         where: {
           userId,
@@ -811,30 +801,34 @@ export const scaleController = {
         definition,
       })
       try {
-        assessment = await prisma.assessment.create({
-          data: {
-            scaleId,
-            userId: userId!,
-            status: 'IN_PROGRESS',
-            deliveryMode: 'FINAL_ONLY',
-            runtimeGeneration: 'UNIFIED_V1',
-            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
-            compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
-            ...standaloneAdmissionPersistence({
-              attemptEpoch: 1,
+        assessment = await prisma.$transaction(async (tx) => {
+          const created = await tx.assessment.create({
+            data: {
+              scaleId,
               userId: userId!,
-              scale: {
-                id: scale.id,
-                code: scale.code,
-                name: scale.name,
-                instrumentVersion: scale.instrumentVersion,
-              },
-            }),
-            attemptEpoch: 1,
-            progress: 0,
-            answers: encryptField([]),
-            startedAt: new Date(),
-          },
+              status: 'IN_PROGRESS',
+              deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1',
+              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+              compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
+              ...standaloneAdmissionPersistence({
+                attemptEpoch: 1,
+                userId: userId!,
+                scale: {
+                  id: scale.id,
+                  code: scale.code,
+                  name: scale.name,
+                  instrumentVersion: scale.instrumentVersion,
+                },
+              }),
+              attemptEpoch: 1,
+              progress: 0,
+              answers: encryptField([]),
+              startedAt: new Date(),
+            },
+          })
+          await retainFrozenScaleAssessmentImages({ assessmentId: created.id, snapshot: runtimeSnapshot, db: tx as never })
+          return created
         })
       } catch (err: any) {
         // The partial unique index is the final concurrency boundary. If a
@@ -1170,7 +1164,6 @@ export const scaleController = {
       const userRole = req.user?.role
       const { scaleId } = req.params
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId }
       })
@@ -1211,7 +1204,6 @@ export const scaleController = {
 
   // ==================== 课程关联管理 ====================
 
-  // 获取量表关联的课程列表
   async listCourseScales(req: Request, res: Response) {
     try {
       const { scaleId } = req.params
@@ -1247,9 +1239,6 @@ export const scaleController = {
           id: cs.course.id,
           title: cs.course.title,
           status: cs.course.status,
-          // A granted teacher may use the scale but must not enumerate a
-          // course's join code unless they own that course (admins may see
-          // all codes).
           ...(userRole === UserRole.ADMIN || cs.course.creatorId === userId
             ? { courseCode: cs.course.courseCode }
             : {}),
@@ -1262,7 +1251,6 @@ export const scaleController = {
     }
   },
 
-  // 添加课程关联
   async addCourseScale(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -1274,7 +1262,6 @@ export const scaleController = {
         return error(res, '请选择要关联的课程')
       }
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId }
       })
@@ -1287,7 +1274,6 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
-      // 检查课程是否存在
       const courses = await prisma.course.findMany({
         where: { id: { in: courseIds } }
       })
@@ -1296,14 +1282,10 @@ export const scaleController = {
         return error(res, '部分课程不存在')
       }
 
-      // A share grants content visibility, not write access. Teachers may
-      // associate a scale only with courses they own; validate the whole
-      // batch before creating any relation.
       if (userRole !== UserRole.ADMIN && courses.some((course) => course.creatorId !== userId)) {
         return forbidden(res, '只能关联自己创建的课程')
       }
 
-      // 批量创建关联（忽略已存在的）
       const created = await prisma.$transaction(async (tx) => tx.courseScale.createMany({
         data: courseIds.map(courseId => ({ scaleId, courseId })),
         skipDuplicates: true,
@@ -1316,14 +1298,12 @@ export const scaleController = {
     }
   },
 
-  // 删除课程关联
   async removeCourseScale(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
       const { scaleId, courseId } = req.params
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId }
       })
@@ -1361,7 +1341,6 @@ export const scaleController = {
     }
   },
 
-  // 导出量表数据
   async exportScaleData(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -1372,26 +1351,18 @@ export const scaleController = {
         includeProgress = false,
         minProgress = 100,
         dateRange,
-        format = 'csv'  // 'csv' | 'sav' | 'spss'
+        format = 'csv'
       } = req.body
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
         select: { id: true, name: true, creatorId: true }
       })
 
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限导出此量表数据')
 
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限导出此量表数据')
-      }
-
-      // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
-
       const countWhere: any = { scaleId, progress: { gte: minProgress } }
       if (!includeProgress) countWhere.status = 'COMPLETED'
       const countDateFilter = utcHalfOpenDateFilter(dateRange)
@@ -1417,18 +1388,13 @@ export const scaleController = {
         }, '导出任务已创建')
       }
 
-      // 动态导入导出服务
       const { exportService } = await import('../services/exportService')
-
-      // 获取导出数据预览
       const exportData = await exportService.getScaleExportData(scaleId, {
         anonymize,
         includeProgress,
         minProgress,
         dateRange
       })
-
-      // 保存导出文件
       const files = await exportService.saveExportFiles(scaleId, {
         anonymize,
         includeProgress,
@@ -1473,16 +1439,9 @@ export const scaleController = {
         artifacts,
       }
 
-      // 只向客户端返回可下载的文件名，不暴露服务器文件系统路径。
-      if (files.csvPath) {
-        result.fileName = path.basename(files.csvPath)
-      }
-      if (files.savPath) {
-        result.fileName = path.basename(files.savPath)
-      }
-      if (files.spsPath) {
-        result.additionalFileNames = [path.basename(files.spsPath)]
-      }
+      if (files.csvPath) result.fileName = path.basename(files.csvPath)
+      if (files.savPath) result.fileName = path.basename(files.savPath)
+      if (files.spsPath) result.additionalFileNames = [path.basename(files.spsPath)]
 
       return success(res, result, '导出成功')
     } catch (err) {
@@ -1491,14 +1450,12 @@ export const scaleController = {
     }
   },
 
-  // 获取导出预览
   async getExportPreview(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
       const { scaleId } = req.params
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
         include: {
@@ -1508,24 +1465,14 @@ export const scaleController = {
         },
       })
 
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
+      if (!scale) return notFound(res, '量表不存在')
+      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限查看此量表')
 
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限查看此量表')
-      }
-
-      // 动态导入导出服务
       const { exportService } = await import('../services/exportService')
-
-      // 获取字段预览
       const previewData = await exportService.getScaleExportData(scaleId, {
         anonymize: true,
         minProgress: 100
       })
-
-      // 只返回前5行数据
       const sampleRows = previewData.rows.slice(0, 5)
 
       return success(res, {
@@ -1545,7 +1492,6 @@ export const scaleController = {
     }
   },
 
-  // 下载导出文件
   async downloadExportFile(req: Request, res: Response) {
     try {
       const artifactId = req.params.artifactId || req.params.fileName
@@ -1576,21 +1522,18 @@ export const scaleController = {
     }
   },
 
-  // 获取所有量表标签（去重）
   async getTags(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
 
       const where = await scaleWhereForViewer(userId as string, userRole as UserRole)
-
       const scales = await prisma.scale.findMany({
         where,
         select: { tags: true }
       })
 
       const allTags = [...new Set(scales.flatMap(s => s.tags))]
-
       return success(res, { tags: allTags })
     } catch (err) {
       logger.error('获取量表标签错误', err)
