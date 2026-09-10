@@ -10,6 +10,7 @@ import {
   type AssessmentAssetRetentionOwner,
 } from '../assessment-media/assessment-asset'
 import { assessmentImageAssetReferences } from '../assessment-media/assessment-image-presentation'
+import type { FrozenScaleRuntimeSnapshotV1 } from '../assessment-runtime/runtime-snapshot'
 import type { ScaleDefinitionV2 } from './scale-definition'
 
 export const scaleAssessmentImageReferences = (definition: ScaleDefinitionV2) => (
@@ -27,15 +28,9 @@ export const publishedScaleMediaOwner = (scaleId: string, definitionHash: string
   field: ASSESSMENT_PUBLISHED_MEDIA_FIELD,
 })
 
-/**
- * A Scale frozen runtime is immutable and fully identified by compiledRuntimeHash.
- * Using that stable identity lets concurrent/repeated attempts share one durable
- * media owner while still protecting historical frozen bytes independently of
- * the current published Scale row.
- */
-export const frozenScaleRuntimeMediaOwner = (compiledRuntimeHash: string): AssessmentAssetRetentionOwner => ({
+export const frozenScaleMediaOwner = (assessmentId: string): AssessmentAssetRetentionOwner => ({
   entityType: ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
-  entityId: `SCALE_RUNTIME:${compiledRuntimeHash}`,
+  entityId: `SCALE:${assessmentId}`,
   field: ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
 })
 
@@ -49,12 +44,12 @@ export const retainScaleAssessmentImages = async (input: {
   db: input.db,
 })
 
-export const retainFrozenScaleRuntimeImages = async (input: {
-  compiledRuntimeHash: string
-  definition: ScaleDefinitionV2
+export const retainFrozenScaleAssessmentImages = async (input: {
+  assessmentId: string
+  snapshot: FrozenScaleRuntimeSnapshotV1
   db: AssetDatabase
 }): Promise<void> => retainScaleAssessmentImages({
-  owner: frozenScaleRuntimeMediaOwner(input.compiledRuntimeHash),
-  definition: input.definition,
+  owner: frozenScaleMediaOwner(input.assessmentId),
+  definition: input.snapshot.definition,
   db: input.db,
 })
