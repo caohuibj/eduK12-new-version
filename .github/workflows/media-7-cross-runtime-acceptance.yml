@@ -1,0 +1,187 @@
+name: MEDIA-7 Cross-runtime Acceptance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - '.github/workflows/media-7-cross-runtime-acceptance.yml'
+      - 'server-version/backend/src/modules/cognitive/**'
+      - 'server-version/frontend/src/modules/cognitive/**'
+      - 'server-version/e2e/cognitive-video-*'
+  workflow_dispatch:
+
+concurrency:
+  group: media-7-cross-runtime-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cognitive-video-and-cross-runtime:
+    name: Cognitive VIDEO auth/public + media boundary acceptance
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      NODE_ENV: test
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      ASSET_MIGRATION_COMPLETE: 'false'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://127.0.0.1:5173
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/eduk12-media-7-e2e-uploads
+      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-media-7-e2e-credentials
+      COGNITIVE_VIDEO_E2E_FIXTURE_FILE: /tmp/eduk12-cognitive-video-fixture.json
+      COGNITIVE_VIDEO_E2E_BASE_URL: http://127.0.0.1:5173
+      COGNITIVE_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-cognitive-video-e2e
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure isolated test keys
+        run: |
+          for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
+            value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: configure runner-local caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: prepare Chromium
+        working-directory: server-version/backend
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
+      - name: ensure ffmpeg
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+      - name: prisma generate and guarded migration
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: seed reference and Cognitive configuration data
+        working-directory: server-version/backend
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: focused backend media + FINAL/Bundle boundary tests
+        working-directory: server-version/backend
+        run: >-
+          npx vitest run
+          src/__tests__/cognitive/cognitive-video-adapter.test.ts
+          src/__tests__/assessment-media/media-6-boundaries.test.ts
+          src/__tests__/assessment-media/media-6-scale-definition.test.ts
+          src/__tests__/assessment-media/media-6-scale-form-video.adapter.test.ts
+          src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+      - name: focused frontend Cognitive + Scale/Form VIDEO tests
+        working-directory: server-version/frontend
+        run: >-
+          npx vitest run
+          src/modules/cognitive/__tests__/CognitiveVideoPresentation.test.tsx
+          src/modules/assessment-media/__tests__/FormOptionVideoGroupGate.test.tsx
+          src/modules/assessment-media/__tests__/ScaleFormVideoGate.test.tsx
+          src/modules/assessment-media/__tests__/media-6.video-adapter.test.ts
+          src/modules/assessment-media/__tests__/video-capability-client.test.ts
+      - name: build backend
+        working-directory: server-version/backend
+        run: npm run build
+      - name: seed Cognitive VIDEO frozen-session fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/cognitive-video-browser-fixture.ts
+      - name: start backend
+        run: |
+          rm -rf "$COGNITIVE_VIDEO_E2E_SCREENSHOT_DIR"
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR" "$COGNITIVE_VIDEO_E2E_SCREENSHOT_DIR"
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-media-7-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-media-7-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-media-7-backend.log
+          exit 1
+      - name: start frontend
+        run: |
+          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-media-7-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-media-7-frontend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-media-7-frontend.log
+          exit 1
+      - name: run Cognitive VIDEO browser acceptance
+        run: node e2e/cognitive-video-browser-e2e.cjs
+      - name: upload MEDIA-7 cross-runtime evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-7-cross-runtime-acceptance-evidence
+          path: |
+            /tmp/eduk12-cognitive-video-e2e
+            /tmp/eduk12-media-7-backend.log
+            /tmp/eduk12-media-7-frontend.log
+            /tmp/eduk12-cognitive-video-fixture.json
+          if-no-files-found: ignore
+      - name: stop seeded services
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-media-7-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-media-7-frontend.pid) || true; fi
+          if [ -f /tmp/eduk12-media-7-backend.pid ]; then kill -- -$(cat /tmp/eduk12-media-7-backend.pid) || true; fi

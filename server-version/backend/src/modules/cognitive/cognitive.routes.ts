@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
+import { cognitiveVideoController } from './cognitive-video.controller'
 import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
@@ -43,6 +44,7 @@ router.post('/assignments/:id/export', authenticate, requireTeacher, cognitiveCo
 router.post('/sessions', authenticate, requireRole(UserRole.STUDENT), cognitiveController.createSession)
 router.get('/sessions/:id', authenticate, cognitiveController.getSession)
 router.get('/sessions/:id/assets/:assetId/content', authenticate, cognitiveImageController.content)
+router.post('/sessions/:id/video-capabilities', authenticate, cognitiveVideoController.issue)
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
 // Final-only Cognitive submit: the complete trial sequence is persisted once.

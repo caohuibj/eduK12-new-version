@@ -13,14 +13,14 @@ import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/a
 import { decryptCognitivePayload } from './cognitive.security'
 import { FORBIDDEN, NOT_FOUND } from './cognitive.errors'
 import { parseSessionConfigSnapshot } from './v2/session-snapshot'
-import { cognitivePresentationAssetReferences } from './v2/presentation'
+import { cognitiveImagePresentationAssetReferences } from './v2/presentation'
 import type { SessionConfigSnapshot } from './v2/types'
 
 export const findFrozenCognitiveImageReference = (
   snapshot: SessionConfigSnapshot,
   assetId: string,
 ): AssessmentStaticImageAssetIdentityV1 | undefined => findFrozenAssessmentAssetReference(
-  cognitivePresentationAssetReferences(snapshot.presentation),
+  cognitiveImagePresentationAssetReferences(snapshot.presentation),
   assetId,
 ) as AssessmentStaticImageAssetIdentityV1 | undefined
 

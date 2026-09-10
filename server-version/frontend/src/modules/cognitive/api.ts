@@ -1,10 +1,12 @@
 import apiClient, { sessionFetch } from '../../api/client'
+import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
 import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
   loadAsset?: (sessionId: string, assetId: string) => Promise<Blob>
+  issueVideoCapabilities?: (sessionId: string, videoKey: string) => ReturnType<typeof apiClient.post<AssessmentVideoCapabilitySources>>
   restartSession?: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession | { session: CognitiveSession; recoveryToken: string | null }>>
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
   appendTrials?: (sessionId: string, trials: Array<{ trialIndex: number; payload: unknown }>) => ReturnType<typeof apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>>
@@ -104,6 +106,8 @@ export const cognitiveApi = {
   loadAsset: (sessionId: string, assetId: string) => loadSessionAsset(
     `/api/cognitive/sessions/${encodeURIComponent(sessionId)}/assets/${encodeURIComponent(assetId)}/content`,
   ),
+  issueVideoCapabilities: (sessionId: string, videoKey: string) =>
+    apiClient.post<AssessmentVideoCapabilitySources>(`/cognitive/sessions/${sessionId}/video-capabilities`, { videoKey }),
   restartSession: (sessionId: string) =>
     apiClient.post<CognitiveSession>(`/cognitive/sessions/${sessionId}/restart`, {}),
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) =>
@@ -127,6 +131,11 @@ export const publicCognitiveApi = (recoveryToken: string): CognitiveSessionApi =
   loadAsset: (sessionId, assetId) => loadSessionAsset(
     `/api/public/cognitive/sessions/${encodeURIComponent(sessionId)}/assets/${encodeURIComponent(assetId)}/content`,
     { 'X-Recovery-Token': recoveryToken },
+  ),
+  issueVideoCapabilities: (sessionId, videoKey) => apiClient.post<AssessmentVideoCapabilitySources>(
+    `/public/cognitive/sessions/${sessionId}/video-capabilities`,
+    { videoKey },
+    { headers: { 'X-Recovery-Token': recoveryToken } },
   ),
   restartSession: (sessionId) => apiClient.post<{ session: CognitiveSession; recoveryToken: string | null }>(`/public/cognitive/sessions/${sessionId}/restart`, { recoveryToken }),
   appendTrial: (sessionId, trialIndex, payload) => apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>(`/public/cognitive/sessions/${sessionId}/trials`, { recoveryToken, trialIndex, payload }),
