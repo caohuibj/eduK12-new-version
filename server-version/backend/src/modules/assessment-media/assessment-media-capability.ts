@@ -7,9 +7,7 @@ import {
   type AssessmentAssetRetentionOwner,
 } from './assessment-asset'
 import { assessmentAssetIdentitySchema, type AssessmentAssetIdentityV1 } from './assessment-asset-identity'
-import {
-  assessmentStaticImageAssetIdentitySchema,
-} from './assessment-image'
+import { assessmentStaticImageAssetIdentitySchema } from './assessment-image'
 import {
   assessmentVideoAssetIdentitySchema,
   assessmentVideoPresentationAssetReferences,
@@ -82,7 +80,7 @@ const safeEqual = (left: string, right: string): boolean => {
   return a.length === b.length && crypto.timingSafeEqual(a, b)
 }
 
-export const createAssessmentMediaCapability = (params: {
+const createAssessmentMediaCapability = (params: {
   scopeId: string
   audience: AssessmentMediaCapabilityAudience
   kind: AssessmentMediaCapabilityKind
@@ -171,8 +169,8 @@ const assertPresentationIsRetained = async (params: {
 
 /**
  * Exchange an already-authorized frozen runtime for short-lived native-media
- * URLs. The caller still owns user/recovery authorization; this helper owns
- * frozen membership, immutable catalog validation, and capability binding.
+ * URLs. The caller owns user/recovery authorization; this helper owns frozen
+ * membership, immutable catalog validation, and capability binding.
  */
 export const issueFrozenAssessmentVideoCapabilities = async (params: {
   scopeId: string
@@ -216,4 +214,7 @@ export const issueFrozenAssessmentVideoCapabilities = async (params: {
   }
 }
 
-export const assessmentMediaCapabilityInternals = { assertPresentationIsRetained }
+export const assessmentMediaCapabilityInternals = {
+  assertPresentationIsRetained,
+  createAssessmentMediaCapability,
+}
