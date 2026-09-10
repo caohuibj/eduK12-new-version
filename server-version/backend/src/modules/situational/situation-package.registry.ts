@@ -22,6 +22,7 @@ import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-respo
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
 import { SJT_STATIC_VISUAL_E2E_PACKAGE } from './packages/sjt-static-visual-e2e-fixture'
 import { SJT_BRANCHING_E2E_PACKAGE } from './packages/sjt-branching-e2e-fixture'
+import { SJT_VIDEO_E2E_PACKAGE } from './packages/sjt-video-e2e-fixture'
 
 interface SituationPackageBase {
   key: string
@@ -42,10 +43,8 @@ export interface SituationPackageV2 extends SituationPackageBase {
 export type SituationPackage = SituationPackageV1 | SituationPackageV2
 
 // Production content remains V1 until a later content PR deliberately adds a
-// reviewed V2 pilot. E only admits one explicit CI-only V2 fixture. The cast is
-// deliberately isolated here so normal catalog/service typing does not imply a
-// production V2 publication in this acceptance PR; runtime validation still
-// receives the real schemaVersion=2 object at execution time.
+// reviewed V2 pilot. CI-only V2 fixtures are isolated behind explicit env flags
+// so normal catalog/service typing does not imply production V2 publication.
 const packages: SituationPackageV1[] = [
   SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
@@ -53,6 +52,9 @@ const packages: SituationPackageV1[] = [
   ...(process.env.SITUATIONAL_STATIC_VISUAL_FIXTURE === 'true' ? [SJT_STATIC_VISUAL_E2E_PACKAGE] : []),
   ...(process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE === 'true'
     ? [SJT_BRANCHING_E2E_PACKAGE as unknown as SituationPackageV1]
+    : []),
+  ...(process.env.SITUATIONAL_VIDEO_E2E_FIXTURE === 'true'
+    ? [SJT_VIDEO_E2E_PACKAGE as unknown as SituationPackageV1]
     : []),
 ]
 

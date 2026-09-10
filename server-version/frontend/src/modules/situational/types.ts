@@ -1,4 +1,7 @@
-import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/types'
+import type {
+  AssessmentStaticImageAssetIdentityV1,
+  AssessmentVideoPresentationV1,
+} from '../assessment-media/types'
 
 export type SituationalResponseValue = string | number
 
@@ -25,6 +28,7 @@ export type SituationalRunnerStimulus =
   | { type: 'TEXT_V1'; text: string }
   | { type: 'IMAGE'; text?: string; asset: SituationalRunnerAssetReference; altText: string; caption?: string }
   | { type: 'COMIC'; text?: string; panels: Array<{ assetRef: SituationalRunnerAssetReference; altText: string; caption?: string }> }
+  | { type: 'VIDEO'; text?: string; presentation: AssessmentVideoPresentationV1 }
 
 export interface SituationalRunnerScene {
   sceneKey: string
