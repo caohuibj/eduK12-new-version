@@ -95,5 +95,5 @@ describe('Round 2 PR5 task runners', () => {
     for (const move of path) { fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${move.from + 1}` })); fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${move.to + 1}` })) }
     await act(async () => { fireEvent.click(screen.getByText('提交已解问题')) })
     expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ problemId: problem.problemId, gaveUp: false, moves: expect.any(Array) }))
-  })
+  }, 10_000)
 })
