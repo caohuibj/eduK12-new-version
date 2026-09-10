@@ -13,11 +13,20 @@ import type { FrozenScaleRuntimeSnapshotV1 } from '../assessment-runtime/runtime
 import type { ScaleDefinitionV2 } from './scale-definition'
 import { frozenScaleMediaOwner, publishedScaleMediaOwner } from './scale-image-retention'
 
+export const scaleItemVideoPresentation = (
+  definition: ScaleDefinitionV2,
+  itemCode: string,
+): AssessmentVideoPresentationV1 | null => {
+  const item = definition.items.find((candidate) => candidate.itemCode === itemCode)
+  if (!item) return null
+  const video = (item as typeof item & { video?: unknown }).video
+  return video === undefined ? null : assessmentVideoPresentationSchema.parse(video)
+}
+
 export const scaleAssessmentVideoPresentations = (definition: ScaleDefinitionV2): AssessmentVideoPresentationV1[] => (
   definition.items.flatMap((item): AssessmentVideoPresentationV1[] => {
-    const video = (item as typeof item & { video?: unknown }).video
-    if (video === undefined) return []
-    return [assessmentVideoPresentationSchema.parse(video)]
+    const presentation = scaleItemVideoPresentation(definition, item.itemCode)
+    return presentation ? [presentation] : []
   })
 )
 
