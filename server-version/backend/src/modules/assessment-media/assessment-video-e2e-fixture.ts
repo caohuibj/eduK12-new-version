@@ -2,8 +2,16 @@ import crypto from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
+import { prisma } from '../../config/database'
+import {
+  ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
+  ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+} from './assessment-asset'
 import { assessmentVideoPresentationSchema } from './assessment-video'
-import { createAssessmentMediaCapability, type AssessmentMediaCapabilityAudience } from './assessment-media-capability'
+import {
+  issueFrozenAssessmentVideoCapabilities,
+  type AssessmentMediaCapabilityAudience,
+} from './assessment-media-capability'
 
 const fixtureSchema = z.object({
   scopeId: z.string().min(1),
@@ -23,59 +31,37 @@ const readFixture = () => fixtureSchema.parse(JSON.parse(readFileSync(fixturePat
 
 const sha256 = (value: string): string => crypto.createHash('sha256').update(value).digest('hex')
 
-const issueSources = (audience: AssessmentMediaCapabilityAudience) => {
+const equalDigest = (left: string, right: string): boolean => {
+  const a = Buffer.from(left)
+  const b = Buffer.from(right)
+  return a.length === b.length && crypto.timingSafeEqual(a, b)
+}
+
+const issueSources = async (audience: AssessmentMediaCapabilityAudience) => {
   const fixture = readFixture()
-  const video = createAssessmentMediaCapability({
+  const sources = await issueFrozenAssessmentVideoCapabilities({
     scopeId: fixture.scopeId,
     audience,
-    kind: 'video',
-    asset: fixture.presentation.video,
-  })
-  const poster = fixture.presentation.poster
-    ? createAssessmentMediaCapability({
-        scopeId: fixture.scopeId,
-        audience,
-        kind: 'poster',
-        asset: fixture.presentation.poster,
-      })
-    : null
-  const captions = (fixture.presentation.captions || []).map((track) => {
-    const issued = createAssessmentMediaCapability({
-      scopeId: fixture.scopeId,
-      audience,
-      kind: 'caption',
-      asset: track.asset,
-    })
-    return {
-      assetId: track.asset.assetId,
-      src: issued.url,
-      kind: track.kind,
-      srcLang: track.srcLang,
-      label: track.label,
-      default: track.default,
-      expiresAt: issued.expiresAt,
-    }
-  })
-  return {
     presentation: fixture.presentation,
-    sources: {
-      videoUrl: video.url,
-      posterUrl: poster?.url,
-      captions,
-      expiresAt: Math.min(video.expiresAt, poster?.expiresAt || video.expiresAt, ...captions.map((track) => track.expiresAt)),
+    retentionOwner: {
+      entityType: ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,
+      entityId: fixture.scopeId,
+      field: ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
     },
-  }
+    db: prisma,
+  })
+  return { presentation: fixture.presentation, sources }
 }
 
-export const assessmentVideoE2EAuthenticatedCapabilities = (req: Request, res: Response) => {
+export const assessmentVideoE2EAuthenticatedCapabilities = async (req: Request, res: Response) => {
   const fixture = readFixture()
   if (!req.user || req.user.userId !== fixture.student.id) return res.status(403).end()
-  return res.json({ code: 0, message: 'ok', data: issueSources('authenticated') })
+  return res.json({ code: 0, message: 'ok', data: await issueSources('authenticated') })
 }
 
-export const assessmentVideoE2EPublicCapabilities = (req: Request, res: Response) => {
+export const assessmentVideoE2EPublicCapabilities = async (req: Request, res: Response) => {
   const fixture = readFixture()
   const token = req.header('X-Recovery-Token') || ''
-  if (!token || sha256(token) !== fixture.publicRecoveryTokenHash) return res.status(401).end()
-  return res.json({ code: 0, message: 'ok', data: issueSources('public') })
+  if (!token || !equalDigest(sha256(token), fixture.publicRecoveryTokenHash)) return res.status(401).end()
+  return res.json({ code: 0, message: 'ok', data: await issueSources('public') })
 }
