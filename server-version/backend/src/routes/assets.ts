@@ -6,6 +6,10 @@ import {
   AssessmentMediaDeliveryError,
   serveAssessmentMediaCapabilityContent,
 } from '../modules/assessment-media/assessment-video-delivery'
+import {
+  assessmentVideoE2EAuthenticatedCapabilities,
+  assessmentVideoE2EPublicCapabilities,
+} from '../modules/assessment-media/assessment-video-e2e-fixture'
 
 const router = Router()
 export const publicAssetRouter = Router()
@@ -30,6 +34,13 @@ const assessmentMediaContent = async (req: Request, res: Response) => {
 // requests use only that signed capability.
 router.get('/assessment-media/content', assessmentMediaContent)
 router.head('/assessment-media/content', assessmentMediaContent)
+
+// CI-only issuance seam used to prove that authenticated and anonymous
+// recovery credentials can be exchanged once, before native media requests.
+if (process.env.ASSESSMENT_VIDEO_E2E_FIXTURE === 'true') {
+  router.get('/assessment-media/e2e/auth-capabilities', authenticate, assessmentVideoE2EAuthenticatedCapabilities)
+  router.get('/assessment-media/e2e/public-capabilities', assessmentVideoE2EPublicCapabilities)
+}
 
 // Public issuance and delivery both require the X-Checkin-Token header.
 publicAssetRouter.get('/:id/url', issuePublicAssetUrl)
