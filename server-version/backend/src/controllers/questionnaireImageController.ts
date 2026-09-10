@@ -12,11 +12,7 @@ import {
   retainFormSectionImages,
   serveFrozenFormSectionImage,
 } from '../modules/assessment-runtime/form-image.adapter'
-import {
-  frozenScaleMediaOwner,
-  retainScaleAssessmentImages,
-  serveFrozenScaleAssessmentImage,
-} from '../modules/scale/scale-image.adapter'
+import { serveFrozenScaleAssessmentImage } from '../modules/scale/scale-image.adapter'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
 import { cacheService } from '../services/cacheService'
@@ -82,7 +78,6 @@ const serveScaleImage = async (input: {
   if (!child) return notFound(input.res, '量表测评记录不存在')
   if (!child.runtimeSnapshotEncrypted) return error(input.res, '量表冻结内容不可用')
   const snapshot = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
-  await retainScaleAssessmentImages({ owner: frozenScaleMediaOwner(child.id), definition: snapshot.definition })
   await serveFrozenScaleAssessmentImage({ snapshot, assetId: input.assetId, res: input.res })
   return undefined
 }
