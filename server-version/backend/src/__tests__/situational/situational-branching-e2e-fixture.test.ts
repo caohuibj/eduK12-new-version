@@ -22,6 +22,7 @@ describe('SIT-V2-E branching browser fixture', () => {
   it('projects only runner-safe branch and presentation metadata', () => {
     const runner = runnerSituationRuntimeDefinition(SJT_BRANCHING_E2E_DEFINITION)
     expect(runner.schemaVersion).toBe(2)
+    if (runner.schemaVersion !== 2) throw new Error('fixture did not project a V2 runner')
     expect(runner.sampling).toEqual({ strategy: 'BRANCH_REACHABLE' })
     expect(runner.flow.nodes).toHaveLength(7)
 
