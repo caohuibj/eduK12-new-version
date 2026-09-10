@@ -4,7 +4,7 @@ import type { AdministrationProvenanceV1 } from './core/administration-provenanc
 
 export interface CognitiveSessionApi {
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
-  loadAsset: (sessionId: string, assetId: string) => Promise<Blob>
+  loadAsset?: (sessionId: string, assetId: string) => Promise<Blob>
   restartSession?: (sessionId: string) => ReturnType<typeof apiClient.post<CognitiveSession | { session: CognitiveSession; recoveryToken: string | null }>>
   appendTrial: (sessionId: string, trialIndex: number, payload: unknown) => ReturnType<typeof apiClient.post<{ trialId: string; trialIndex: number; createdAt: string }>>
   appendTrials?: (sessionId: string, trials: Array<{ trialIndex: number; payload: unknown }>) => ReturnType<typeof apiClient.post<{ saved: number; trials: Array<{ trialId: string; trialIndex: number; createdAt: string }> }>>
