@@ -21,7 +21,7 @@ import {
   assessmentVideoPresentationSchema,
 } from '../../modules/assessment-media/assessment-video'
 import {
-  createAssessmentMediaCapability,
+  assessmentMediaCapabilityInternals,
   verifyAssessmentMediaCapability,
 } from '../../modules/assessment-media/assessment-media-capability'
 import {
@@ -29,6 +29,7 @@ import {
   serveAssessmentMediaCapabilityContent,
 } from '../../modules/assessment-media/assessment-video-delivery'
 
+const { createAssessmentMediaCapability } = assessmentMediaCapabilityInternals
 const digest = 'a'.repeat(64)
 const videoAsset = { assetId: 'video-asset', contentHash: digest, mimeType: 'video/mp4' as const }
 const posterAsset = { assetId: 'poster-asset', contentHash: 'b'.repeat(64), mimeType: 'image/png' as const }
