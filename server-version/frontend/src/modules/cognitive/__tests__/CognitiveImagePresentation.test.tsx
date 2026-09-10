@@ -127,7 +127,8 @@ describe('MEDIA-3 Cognitive image presentation gate', () => {
 
     renderRunner()
 
-    const loadedItems = mocks.imageHook.mock.calls.at(-1)?.[0] as Array<{ asset: { assetId: string } }>
+    const calls = mocks.imageHook.mock.calls
+    const loadedItems = calls[calls.length - 1]?.[0] as Array<{ asset: { assetId: string } }>
     expect(loadedItems.map((item) => item.asset.assetId)).toEqual([
       'instruction-image',
       'example-image',
