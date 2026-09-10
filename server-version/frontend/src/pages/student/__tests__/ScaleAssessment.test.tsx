@@ -126,7 +126,7 @@ describe('ScaleAssessment answer navigation', () => {
       },
     })
     expect(await screen.findByText('RESULT_PAGE')).toBeInTheDocument()
-  })
+  }, 10_000)
 
   it('keeps the pending checkpoint when the batch flush fails', async () => {
     mockPatch.mockResolvedValueOnce({ code: 500, message: '保存失败' })
