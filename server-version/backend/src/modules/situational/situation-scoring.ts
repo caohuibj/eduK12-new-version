@@ -189,7 +189,7 @@ const expectedResponsesFor = (definition: SituationDefinitionV1, metric: Situati
 )
 
 const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min: number; max: number } => {
-  const scene = definition.scenes.find((candidate) => candidate.channels.some((channel) => responseKey(candidate.sceneKey, candidate.channelKey) === pairKey))
+  const scene = definition.scenes.find((candidate) => candidate.channels.some((channel) => responseKey(candidate.sceneKey, channel.channelKey) === pairKey))
   const channel = scene?.channels.find((candidate) => responseKey(scene.sceneKey, candidate.channelKey) === pairKey)
   if (!scene || !channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
   if (channel.responseType === 'CONTINUOUS') return { ...channel.range }
@@ -219,9 +219,10 @@ export const scoreSituational = (
   // Frozen definitions are trusted runtime input: publication/compile gates
   // own cross-field validation. Keep structural parsing here. Only the
   // internally projected zero-scene case uses the relaxed scoring-view schema.
-  const definition = definitionInput.scenes.length === 0
+  const parsedDefinition = definitionInput.scenes.length === 0
     ? projectedSituationDefinitionSchema.parse(definitionInput)
     : situationDefinitionSchema.parse(definitionInput)
+  const definition = parsedDefinition as SituationDefinitionV1
   const responses = normalizeResponses(inputResponses)
   const answered = options.responsesValidated
     ? new Map(responses.map((response) => [responseKey(response.sceneKey, response.channelKey), response]))
