@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
+import { sessionFetch } from '../api/client'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import {
   createFinalDraftMeta,
@@ -8,7 +9,10 @@ import {
 } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
+import { readQuestionnaireResumeTokenForSession } from '../utils/questionnaireResume'
 import type { ApiResponse } from '../types'
+import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
+import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   resolveScaleDeviceInputProvenance,
@@ -18,6 +22,7 @@ import {
 
 type ResponseValue = string | number
 type FormValue = string | string[] | null
+type FormOption = { value: string; label: string; images?: unknown }
 
 export interface FinalQuestionnaireFormSection {
   id: string
@@ -34,7 +39,7 @@ export interface FinalQuestionnaireFormSection {
     type: 'fill_blank' | 'single_choice' | 'multiple_choice' | 'text_input' | 'year_month' | string
     label: string
     placeholder: string | null
-    options: Array<{ value: string; label: string }> | string | null
+    options: FormOption[] | string | null
     required: boolean
     contextKey: string | null
     value: FormValue
@@ -60,6 +65,7 @@ export interface FinalQuestionnaireScale {
       sortOrder: number
       responseSetKey: string
       randomizeOptions: boolean
+      images?: unknown
       options: Array<{ value: ResponseValue; label: string }>
     }>
   }
@@ -97,13 +103,13 @@ export interface FinalQuestionnaireAssessmentProps {
   onRestart?: () => Promise<void> | void
 }
 
-const parseOptions = (options: FinalQuestionnaireFormSection['items'][number]['options']) => {
+const parseOptions = (options: FinalQuestionnaireFormSection['items'][number]['options']): FormOption[] => {
   if (Array.isArray(options)) return options
   if (typeof options !== 'string') return []
   try {
     const parsed: unknown = JSON.parse(options)
     return Array.isArray(parsed)
-      ? parsed.filter((option): option is { value: string; label: string } => Boolean(option) && typeof option === 'object' && typeof (option as any).value === 'string' && typeof (option as any).label === 'string')
+      ? parsed.filter((option): option is FormOption => Boolean(option) && typeof option === 'object' && typeof (option as any).value === 'string' && typeof (option as any).label === 'string')
       : []
   } catch {
     return []
@@ -169,6 +175,34 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const currentScaleServerProvenanceJson = currentScale?.deviceInputProvenance
     ? JSON.stringify(currentScale.deviceInputProvenance)
     : null
+
+  const loadAssessmentImage = useCallback(async (assetId: string): Promise<Blob> => {
+    let url: string
+    if (currentSection) {
+      url = publicMode
+        ? `/api/public/assessments/${data.sessionId}/form-sections/${currentSection.id}/assets/${assetId}`
+        : `/api/questionnaires/assessments/${data.questionnaireAssessment.id}/form-sections/${currentSection.id}/assets/${assetId}`
+    } else if (currentScale) {
+      url = publicMode
+        ? `/api/public/assessments/${data.sessionId}/scale/${currentScale.scaleAssessmentId}/assets/${assetId}`
+        : `/api/questionnaires/assessments/${data.questionnaireAssessment.id}/scales/${currentScale.scaleAssessmentId}/assets/${assetId}`
+    } else {
+      throw new Error('当前没有可加载视觉内容的冻结单元')
+    }
+    let response: Response
+    if (publicMode) {
+      const capability = readQuestionnaireResumeTokenForSession(data.sessionId)
+      if (!capability) throw new Error('缺少问卷恢复凭据')
+      response = await fetch(url, {
+        headers: { Authorization: `Bearer ${capability}` },
+        credentials: 'omit',
+      })
+    } else {
+      response = await sessionFetch(url)
+    }
+    if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
+    return response.blob()
+  }, [currentScale, currentSection, data.questionnaireAssessment.id, data.sessionId, publicMode])
 
   useEffect(() => {
     setSectionIndex(0)
@@ -399,14 +433,17 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             if (!item) return <p className="text-gray-500">该区段没有字段。</p>
             const value = formValues[item.id]
             const options = parseOptions(item.options)
-            return <div>
-              <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
-              {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
-              {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
-              {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}
-              {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
-              <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
-            </div>
+            const imageItems = assessmentOptionImageItems(options)
+            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
+              <div>
+                <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
+                {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
+                {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
+                {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}
+                {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
+                <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
+              </div>
+            </AssessmentImageGate>
           })()}
         </div>
       )}
@@ -418,7 +455,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
           {(() => {
             const item = currentScale.definition.items[scaleIndex]
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
-            return <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+            const imageItems = assessmentImageItems(item.images)
+            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
+              <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+            </AssessmentImageGate>
           })()}
         </div>
       )}

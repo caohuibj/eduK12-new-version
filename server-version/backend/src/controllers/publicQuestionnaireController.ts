@@ -41,6 +41,7 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-concurrency'
 import { missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { retainQuestionnaireScaleAssessmentImages } from '../modules/scale/questionnaire-scale-image-retention'
 import { readContextFormAnswer, writeContextFormAnswer } from '../modules/assessment-context'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
 import { freezeQuestionnaireAssessmentContext, freezeQuestionnaireAssessmentContextFromSnapshot, isAssessmentContextServiceError } from '../services/assessmentContextService'
@@ -618,6 +619,11 @@ export const publicQuestionnaireController = {
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
             })),
+          })
+          await retainQuestionnaireScaleAssessmentImages({
+            questionnaireAssessmentId: assessment.id,
+            snapshots: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({ scaleId: qs.scaleId, snapshot })),
+            db: tx,
           })
 
           const frozenActiveSlotSet = freezeQuestionnaireActiveSlotSet({

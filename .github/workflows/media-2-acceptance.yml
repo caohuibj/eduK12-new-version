@@ -1,0 +1,186 @@
+name: MEDIA-2 Scale Form Image Acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/media-2-acceptance.yml'
+      - 'server-version/backend/src/modules/assessment-media/**'
+      - 'server-version/backend/src/modules/assessment-runtime/form-admission.service.ts'
+      - 'server-version/backend/src/modules/assessment-runtime/form-image.adapter.ts'
+      - 'server-version/backend/src/modules/scale/scale-definition.ts'
+      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
+      - 'server-version/backend/src/modules/scale/scale-image-retention.ts'
+      - 'server-version/backend/src/modules/scale/scale-image.adapter.ts'
+      - 'server-version/backend/src/modules/scale/questionnaire-scale-image-retention.ts'
+      - 'server-version/backend/src/modules/composite/composite-image.controller.ts'
+      - 'server-version/backend/src/modules/composite/composite.public.routes.ts'
+      - 'server-version/backend/src/modules/composite/composite.routes.ts'
+      - 'server-version/backend/src/modules/composite/composite.service.ts'
+      - 'server-version/backend/src/controllers/generalQuestionnaireImageController.ts'
+      - 'server-version/backend/src/controllers/publicQuestionnaireController.ts'
+      - 'server-version/backend/src/controllers/questionnaireController.ts'
+      - 'server-version/backend/src/controllers/questionnaireImageController.ts'
+      - 'server-version/backend/src/controllers/scaleController.ts'
+      - 'server-version/backend/src/controllers/scaleImageController.ts'
+      - 'server-version/backend/src/routes/generalQuestionnaires.ts'
+      - 'server-version/backend/src/routes/public.ts'
+      - 'server-version/backend/src/routes/questionnaires.ts'
+      - 'server-version/backend/src/routes/scales.ts'
+      - 'server-version/backend/src/services/questionnaire-form-section.service.ts'
+      - 'server-version/frontend/src/modules/assessment-media/**'
+      - 'server-version/frontend/src/components/FinalCompositeAssessment.tsx'
+      - 'server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx'
+      - 'server-version/frontend/src/pages/student/ScaleAssessment.tsx'
+      - 'server-version/frontend/src/utils/questionnaireResume.ts'
+      - 'server-version/e2e/media-2-browser-e2e.cjs'
+  workflow_dispatch:
+
+concurrency:
+  group: media-2-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    name: Scale Form image auth public Bundle browser acceptance
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      NODE_ENV: test
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      ASSET_MIGRATION_COMPLETE: 'false'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://127.0.0.1:5173
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/eduk12-media-2-e2e-uploads
+      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-media-2-e2e-credentials
+      SITUATIONAL_STATIC_VISUAL_FIXTURE: 'true'
+      SITUATIONAL_BUNDLE_E2E_INSTRUMENT_KEY: sjt-static-visual-e2e-fixture
+      SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-media-2-base-fixture.json
+      SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure isolated test keys
+        run: |
+          for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
+            value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: configure runner-local npm and Playwright caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: prepare Chromium
+        working-directory: server-version/backend
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: prisma generate and guarded migration
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: seed reference and configuration data
+        working-directory: server-version/backend
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: build backend
+        working-directory: server-version/backend
+        run: npm run build
+      - name: prepare MEDIA-2 upload directory
+        run: |
+          rm -rf "$UPLOAD_DIR"
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
+      - name: seed base user and course fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
+      - name: start backend
+        run: |
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-media-2-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-media-2-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-media-2-backend.log
+          exit 1
+      - name: start frontend
+        run: |
+          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-media-2-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-media-2-frontend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-media-2-frontend.log
+          exit 1
+      - name: run MEDIA-2 browser acceptance
+        run: node e2e/media-2-browser-e2e.cjs
+      - name: upload MEDIA-2 browser evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-2-scale-form-image-acceptance-evidence
+          path: |
+            /tmp/eduk12-media-2-backend.log
+            /tmp/eduk12-media-2-frontend.log
+          if-no-files-found: ignore
+      - name: stop seeded services
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-media-2-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-media-2-frontend.pid) || true; fi
+          if [ -f /tmp/eduk12-media-2-backend.pid ]; then kill -- -$(cat /tmp/eduk12-media-2-backend.pid) || true; fi

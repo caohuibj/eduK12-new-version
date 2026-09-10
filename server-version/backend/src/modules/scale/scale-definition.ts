@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 
 export type ScaleResponseValue = string | number
 
@@ -49,6 +50,7 @@ export type ScaleTransform = z.infer<typeof transformSchema>
 export const scaleItemDefinitionSchema = z.object({
   itemCode: z.string().min(1),
   content: z.string().min(1),
+  images: assessmentImagePresentationListSchema.optional(),
   type: z.string().default('single'),
   required: z.boolean().default(true),
   sortOrder: z.number().int().nonnegative(),

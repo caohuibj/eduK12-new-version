@@ -101,10 +101,10 @@ export const assertAssessmentAssetReferencesReady = async (
   }
 }
 
-export const findFrozenAssessmentAssetReference = (
-  references: readonly AssessmentAssetIdentityV1[],
+export const findFrozenAssessmentAssetReference = <T extends AssessmentAssetIdentityV1>(
+  references: readonly T[],
   assetId: string,
-): AssessmentAssetIdentityV1 | undefined => references.find((reference) => reference.assetId === assetId)
+): T | undefined => references.find((reference) => reference.assetId === assetId)
 
 export interface AssessmentAssetRetentionOwner {
   entityType: string
@@ -114,6 +114,8 @@ export interface AssessmentAssetRetentionOwner {
 
 export const ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE = 'AssessmentFrozenRuntime'
 export const ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD = 'media'
+export const ASSESSMENT_PUBLISHED_DEFINITION_REFERENCE_TYPE = 'AssessmentPublishedDefinition'
+export const ASSESSMENT_PUBLISHED_MEDIA_FIELD = 'media'
 
 export const retainAssessmentAssetReferences = async (params: {
   owner: AssessmentAssetRetentionOwner

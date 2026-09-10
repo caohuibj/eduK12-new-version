@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
+import { scaleImageController } from '../controllers/scaleImageController'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -33,6 +34,10 @@ router.post('/assessments/:assessmentId/restart', authenticate, requireStudent, 
 router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, legacyWriteDisabled)
 router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, legacyWriteDisabled)
 
+// Frozen image delivery. Authorization is attempt-scoped; the adapter resolves
+// only immutable identities present in the encrypted Scale runtime snapshot.
+router.get('/assessments/:assessmentId/assets/:assetId', authenticate, requireStudent, scaleImageController.serveAssessmentImage)
+
 // 完成测评
 router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, legacyWriteDisabled)
 
@@ -63,8 +68,8 @@ router.post('/:id/preview', authenticate, requireTeacher, scaleController.previe
 // 删除量表
 router.delete('/:id', authenticate, requireTeacher, scaleController.delete)
 
-// 发布量表：重新执行 v2 release gate。
-router.post('/:id/publish', authenticate, requireTeacher, scaleController.publishV2)
+// 发布量表：release gate + durable published media retention in one transaction.
+router.post('/:id/publish', authenticate, requireTeacher, scaleImageController.publish)
 
 // 废弃量表
 router.post('/:id/deprecate', authenticate, requireTeacher, scaleController.deprecate)

@@ -4,6 +4,7 @@
 
 import { Router } from 'express'
 import { publicQuestionnaireController } from '../controllers/publicQuestionnaireController'
+import { questionnaireImageController } from '../controllers/questionnaireImageController'
 import { requireQuestionnaireResume } from '../middleware/publicQuestionnaireAuth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -22,6 +23,8 @@ router.post('/assessments/:sessionId/restart', requireQuestionnaireResume, publi
 router.post('/assessments/:sessionId/context/freeze', requireQuestionnaireResume, legacyWriteDisabled)
 router.post('/assessments/:sessionId/form-sections/:sectionId/submit', requireQuestionnaireResume, publicQuestionnaireController.submitFinalFormSection)
 router.post('/assessments/:sessionId/scale/:scaleAssessmentId/submit', requireQuestionnaireResume, publicQuestionnaireController.submitFinalScale)
+router.get('/assessments/:sessionId/form-sections/:sectionId/assets/:assetId', requireQuestionnaireResume, questionnaireImageController.publicFormImage)
+router.get('/assessments/:sessionId/scale/:scaleAssessmentId/assets/:assetId', requireQuestionnaireResume, questionnaireImageController.publicScaleImage)
 router.get('/assessments/:sessionId/scale/:scaleAssessmentId', requireQuestionnaireResume, publicQuestionnaireController.getScaleAssessment)
 router.patch('/assessments/:sessionId/answers/batch', requireQuestionnaireResume, legacyWriteDisabled)
 router.patch('/assessments/:sessionId/answers', requireQuestionnaireResume, legacyWriteDisabled)

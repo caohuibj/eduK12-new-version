@@ -56,7 +56,10 @@ const assertSuccess = (response, label) => {
 }
 
 const loginStudent = async (page) => {
-  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'domcontentloaded' })
+  // Self-hosted acceptance jobs start a cold Vite module graph immediately
+  // before this first SPA navigation. Keep the larger budget isolated here;
+  // all subsequent product assertions retain their normal 30s timeout.
+  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'domcontentloaded', timeout: 90000 })
   await page.getByPlaceholder('请输入用户名').fill(fixture.student.username)
   await page.getByPlaceholder('请输入密码').fill(fixture.student.password)
   await Promise.all([
