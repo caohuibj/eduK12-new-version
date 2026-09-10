@@ -87,7 +87,7 @@ export const createAssessmentMediaCapability = (params: {
   const token = `${encodedPayload}.${signatureFor(encodedPayload)}`
   return {
     token,
-    url: `/api/assessment-media/capabilities/content?cap=${encodeURIComponent(token)}`,
+    url: `/api/assets/assessment-media/content?cap=${encodeURIComponent(token)}`,
     expiresAt: payload.expiresAt,
   }
 }
