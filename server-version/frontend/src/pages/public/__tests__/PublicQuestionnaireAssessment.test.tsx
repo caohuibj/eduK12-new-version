@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { message } from 'antd'
 
@@ -66,6 +65,7 @@ const renderPage = () => render(
 beforeEach(() => {
   vi.clearAllMocks()
   vi.spyOn(message, 'warning').mockImplementation(() => undefined as never)
+  vi.spyOn(message, 'error').mockImplementation(() => undefined as never)
 })
 
 afterEach(() => {
@@ -79,23 +79,24 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     mockClient.patch.mockImplementation(async (_url: string, body: { answers: Array<{ checkpointSequence: number }> }) => (
       response({ acceptedSequences: body.answers.map((answer) => answer.checkpointSequence) })
     ))
-    const user = userEvent.setup()
 
     renderPage()
 
-    const submit = await screen.findByRole('button', { name: '提交并继续' })
-    await user.click(submit)
+    const submit = await screen.findByText('提交并继续', { selector: 'button' })
+    fireEvent.click(submit)
 
     expect(await screen.findByRole('alert')).toHaveTextContent('请填写答案或选择跳过')
     expect(mockClient.post).not.toHaveBeenCalled()
 
-    await user.click(screen.getByRole('button', { name: /跳\s*过/ }))
+    fireEvent.click(screen.getByText(/跳\s*过/, { selector: 'button' }))
     await waitFor(() => expect(mockClient.patch).toHaveBeenCalledWith(
       '/assessments/session-1/form-answers/batch',
       expect.objectContaining({
         answers: [expect.objectContaining({ formItemId: 'form-item-1', action: 'skip', checkpointSequence: expect.any(Number) })],
       }),
     ))
+    await waitFor(() => expect(mockClient.get).toHaveBeenCalledTimes(2))
+    expect(await screen.findByText('提交并继续', { selector: 'button' })).toBeEnabled()
   })
 
   it('keeps the current item and exposes retry when advancing cannot recover state', async () => {
@@ -106,21 +107,20 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     mockClient.patch.mockImplementation(async (_url: string, body: { answers: Array<{ checkpointSequence: number }> }) => (
       response({ acceptedSequences: body.answers.map((answer) => answer.checkpointSequence) })
     ))
-    const user = userEvent.setup()
 
     renderPage()
 
-    const input = await screen.findByRole('textbox')
-    await user.type(input, '已填写')
-    await user.click(screen.getByRole('button', { name: '提交并继续' }))
+    const input = await screen.findByPlaceholderText('请输入')
+    fireEvent.change(input, { target: { value: '已填写' } })
+    fireEvent.click(screen.getByText('提交并继续', { selector: 'button' }))
 
     expect(await screen.findByText('恢复失败，暂时不能继续作答。')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /重\s*试/ })).toBeInTheDocument()
+    expect(screen.getByText(/重\s*试/, { selector: 'button' })).toBeInTheDocument()
     expect(screen.getByText('补充说明')).toBeInTheDocument()
 
     mockClient.get.mockResolvedValueOnce(response(formData(false)))
-    await user.click(screen.getByRole('button', { name: /重\s*试/ }))
+    fireEvent.click(screen.getByText(/重\s*试/, { selector: 'button' }))
     await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答。')).not.toBeInTheDocument())
-    expect(screen.getByRole('button', { name: '提交并继续' })).toBeEnabled()
+    expect(await screen.findByText('提交并继续', { selector: 'button' })).toBeEnabled()
   })
 })
