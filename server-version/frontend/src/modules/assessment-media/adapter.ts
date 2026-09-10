@@ -33,6 +33,13 @@ export const assessmentOptionImageItems = (options: unknown): OrderedAssessmentI
   if (!Array.isArray(options)) return []
   return options.flatMap((option) => {
     if (!option || typeof option !== 'object' || Array.isArray(option)) return []
-    return assessmentImageItems((option as { images?: unknown }).images)
+    const candidate = option as { label?: unknown; images?: unknown }
+    if (typeof candidate.label !== 'string' || !candidate.label.trim()) return []
+    const label = candidate.label.trim()
+    return assessmentImageItems(candidate.images).map((item) => ({
+      ...item,
+      altText: `${label}: ${item.altText}`,
+      caption: item.caption ? `${label} · ${item.caption}` : label,
+    }))
   })
 }
