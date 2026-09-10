@@ -56,7 +56,7 @@ export const cognitiveApi = {
       id: string
       testType: string
       configVersion: string
-      name: string | null
+      name: string
       instruction: string | null
       engineVersion?: string
       scoringVersion?: string
