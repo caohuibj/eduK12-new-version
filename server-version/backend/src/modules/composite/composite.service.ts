@@ -28,6 +28,7 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
+import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -2092,7 +2093,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             definition: scaleDefinitionFromRecord(item.scale),
           })
         : null
-      await db.assessment.create({
+      const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
           userId,
@@ -2111,6 +2112,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
         },
       })
       if (frozenScale) {
+        await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
         runtime.scales.push({
           compositeItemId: item.id,
           code: item.scale.code,
@@ -3614,6 +3616,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   }
 
   const attempt = await findAttempt(attemptId, context)
+  if (attempt.runtimeGeneration === 'UNIFIED_V1') return getUnifiedCompositeAttemptState(attempt, context)
   const readableFormAnswers = readContextFormAnswers(
     attempt.compositeAssessment.items
       .filter((item: any) => item.type === 'FORM')
