@@ -81,7 +81,6 @@ const getButtonByText = (text: string | RegExp): HTMLButtonElement => (
 beforeEach(() => {
   vi.clearAllMocks()
   vi.spyOn(message, 'warning').mockImplementation(() => undefined as never)
-  vi.spyOn(message, 'error').mockImplementation(() => undefined as never)
 })
 
 afterEach(() => {
