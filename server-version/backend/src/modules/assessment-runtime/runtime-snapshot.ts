@@ -1,11 +1,9 @@
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
-import { retainFrozenScaleRuntimeImages } from '../scale/scale-image-retention'
 import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
 import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
 import { freezeExactReferenceBindings } from './reference-binding'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
-import type { AssetDatabase } from '../../services/assetStorage'
 import { z } from 'zod'
 
 export interface FrozenScaleRuntimeSnapshotV1 {
@@ -128,7 +126,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     instrumentKey: input.instrumentKey,
     selections: compiledRuntime.referenceBindingDefinition.selections,
   })
-  const snapshot = buildFrozenScaleRuntimeSnapshot({
+  return buildFrozenScaleRuntimeSnapshot({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     definition,
@@ -136,12 +134,6 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     referenceBindings,
     frozenAt: input.frozenAt,
   })
-  await retainFrozenScaleRuntimeImages({
-    compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
-    definition: snapshot.definition,
-    db: db as AssetDatabase,
-  })
-  return snapshot
 }
 
 export const hashFrozenScaleRuntimeSnapshot = (snapshot: FrozenScaleRuntimeSnapshotV1): string => (
