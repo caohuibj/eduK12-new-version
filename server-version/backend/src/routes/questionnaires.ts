@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { questionnaireController } from '../controllers/questionnaireController'
 import { questionnaireImageController } from '../controllers/questionnaireImageController'
+import { questionnaireVideoController } from '../controllers/questionnaireVideoController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -20,6 +21,8 @@ router.post('/assessments/:assessmentId/form-sections/:sectionId/submit', authen
 router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/submit', authenticate, questionnaireController.submitFinalScale)
 router.get('/assessments/:assessmentId/form-sections/:sectionId/assets/:assetId', authenticate, questionnaireImageController.authenticatedFormImage)
 router.get('/assessments/:assessmentId/scales/:scaleAssessmentId/assets/:assetId', authenticate, questionnaireImageController.authenticatedScaleImage)
+router.post('/assessments/:assessmentId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, questionnaireVideoController.authenticatedFormVideo)
+router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/items/:itemCode/video-capability', authenticate, questionnaireVideoController.authenticatedScaleVideo)
 
 // 完成问卷测评 (O4 load-once dispatch inside the controller: UNIFIED_V1 ->
 // unified finalizer with the preloaded parent; legacy attempts keep 410)
@@ -126,7 +129,7 @@ router.get('/:id/courses', authenticate, requireTeacher, questionnaireController
 // 添加课程关联
 router.post('/:id/courses', authenticate, requireTeacher, questionnaireController.addCourses)
 
-// 移除课程关联
+// 移除课程
 router.delete('/:id/courses/:courseId', authenticate, requireTeacher, questionnaireController.removeCourse)
 
 export default router
