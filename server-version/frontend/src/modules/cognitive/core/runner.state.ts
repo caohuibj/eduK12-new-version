@@ -47,6 +47,7 @@ const buildTaskContext = (session: NonNullable<RunnerState['session']>): Cogniti
   configVersion: session.configVersion,
   attemptNo: session.attemptNo,
   config: session.config,
+  ...(session.presentation ? { presentation: session.presentation } : {}),
   randomSeed: session.randomSeed,
 })
 
