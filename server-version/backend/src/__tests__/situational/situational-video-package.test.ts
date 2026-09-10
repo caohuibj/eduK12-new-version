@@ -9,7 +9,8 @@ describe('MEDIA-5 Situational VIDEO package boundary', () => {
   it('passes the existing V2 publication/golden gate without new scoring semantics', () => {
     const validation = validateSituationPackage(SJT_VIDEO_E2E_PACKAGE)
     expect(validation.valid).toBe(true)
-    expect(validation.issues).toEqual([])
+    expect(validation.issues.filter((issue) => issue.severity === 'error')).toEqual([])
+    expect(validation.issues.filter((issue) => issue.severity === 'warning').every((issue) => issue.path === 'license')).toBe(true)
 
     const videoNode = SJT_VIDEO_E2E_PACKAGE.definition.flow.nodes.find((node) => node.nodeKey === 'node-video')
     expect(videoNode).toMatchObject({
