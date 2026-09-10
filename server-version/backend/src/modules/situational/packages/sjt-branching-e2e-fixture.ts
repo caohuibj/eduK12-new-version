@@ -102,6 +102,14 @@ export const SJT_BRANCHING_E2E_DEFINITION: SituationDefinitionV2 = {
       ...remapChoiceScores('AS-02', 'BR-04'),
     ],
   },
+  report: {
+    ...source.report,
+    interpretations: source.report.interpretations.map((interpretation, index) => (
+      index === 0
+        ? { ...interpretation, headline: 'SIT-V2-E Branching Browser Fixture' }
+        : interpretation
+    )),
+  },
   flow: {
     strategy: 'BRANCHING_DAG_V1',
     entryNodeKey: 'node-entry',
