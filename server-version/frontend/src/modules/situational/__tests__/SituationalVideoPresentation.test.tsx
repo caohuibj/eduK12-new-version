@@ -79,15 +79,16 @@ describe('SituationalVideoPresentation', () => {
 
     pending.resolve(sources)
     expect(await screen.findByTestId('video-player-adapter')).toBeInTheDocument()
-    expect(playerProps.at(-1)).toMatchObject({ presentation, sources, autoPlay: false })
+    const latestProps = playerProps[playerProps.length - 1]
+    expect(latestProps).toMatchObject({ presentation, sources, autoPlay: false })
     expect(onReadyChange).not.toHaveBeenCalledWith('VIDEO-01', true)
 
     fireEvent.click(screen.getByRole('button', { name: 'metadata-ready' }))
     await waitFor(() => expect(onReadyChange).toHaveBeenCalledWith('VIDEO-01', true))
 
     // MEDIA-5 deliberately has no playback-completion/ended callback contract.
-    expect(playerProps.at(-1)).not.toHaveProperty('onEnded')
-    expect(playerProps.at(-1)).not.toHaveProperty('onTimeUpdate')
+    expect(latestProps).not.toHaveProperty('onEnded')
+    expect(latestProps).not.toHaveProperty('onTimeUpdate')
   })
 
   it('fails closed on capability loading and recovers only through explicit retry', async () => {
