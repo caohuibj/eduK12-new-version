@@ -1,3 +1,4 @@
+import type { AssessmentVideoCapabilitySources } from '../../assessment-media/types'
 import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSession } from '../types'
 
 /**
@@ -25,6 +26,10 @@ export interface CognitiveTaskProps {
   taskContext: CognitiveTaskContext
   /** Preloaded immutable image ObjectURLs keyed by frozen assetId. */
   imageAssetUrls?: Readonly<Record<string, string>>
+  /** Short-lived MEDIA-4 capability sources keyed by frozen Cognitive video slot key. */
+  videoSources?: Readonly<Record<string, AssessmentVideoCapabilitySources>>
+  /** Refresh a single expired/failed capability without changing frozen task identity. */
+  refreshVideoSource?: (videoKey: string) => Promise<void>
   /** 当前应渲染的试次（0-based）。 */
   trialIndex: number
   /** 提交单笔 raw trial；前端不得提交 score/payloadHash/加密内容。 */
