@@ -62,6 +62,22 @@ const renderPage = () => render(
   </MemoryRouter>,
 )
 
+const buttonFromLabel = (label: HTMLElement): HTMLButtonElement => {
+  const button = label.closest('button')
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error(`Expected label "${label.textContent || ''}" to be inside a button`)
+  }
+  return button
+}
+
+const findButtonByText = async (text: string | RegExp): Promise<HTMLButtonElement> => (
+  buttonFromLabel(await screen.findByText(text))
+)
+
+const getButtonByText = (text: string | RegExp): HTMLButtonElement => (
+  buttonFromLabel(screen.getByText(text))
+)
+
 beforeEach(() => {
   vi.clearAllMocks()
   vi.spyOn(message, 'warning').mockImplementation(() => undefined as never)
@@ -82,13 +98,12 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
 
     renderPage()
 
-    const submit = await screen.findByText('提交并继续', { selector: 'button' })
-    fireEvent.click(submit)
+    fireEvent.click(await findButtonByText('提交并继续'))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('请填写答案或选择跳过')
     expect(mockClient.post).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByText(/跳\s*过/, { selector: 'button' }))
+    fireEvent.click(getButtonByText(/跳\s*过/))
     await waitFor(() => expect(mockClient.patch).toHaveBeenCalledWith(
       '/assessments/session-1/form-answers/batch',
       expect.objectContaining({
@@ -96,7 +111,7 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
       }),
     ))
     await waitFor(() => expect(mockClient.get).toHaveBeenCalledTimes(2))
-    expect(await screen.findByText('提交并继续', { selector: 'button' })).toBeEnabled()
+    expect(await findButtonByText('提交并继续')).toBeEnabled()
   })
 
   it('keeps the current item and exposes retry when advancing cannot recover state', async () => {
@@ -112,15 +127,15 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
 
     const input = await screen.findByPlaceholderText('请输入')
     fireEvent.change(input, { target: { value: '已填写' } })
-    fireEvent.click(screen.getByText('提交并继续', { selector: 'button' }))
+    fireEvent.click(getButtonByText('提交并继续'))
 
     expect(await screen.findByText('恢复失败，暂时不能继续作答。')).toBeInTheDocument()
-    expect(screen.getByText(/重\s*试/, { selector: 'button' })).toBeInTheDocument()
+    expect(getButtonByText(/重\s*试/)).toBeInTheDocument()
     expect(screen.getByText('补充说明')).toBeInTheDocument()
 
     mockClient.get.mockResolvedValueOnce(response(formData(false)))
-    fireEvent.click(screen.getByText(/重\s*试/, { selector: 'button' }))
+    fireEvent.click(getButtonByText(/重\s*试/))
     await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答。')).not.toBeInTheDocument())
-    expect(await screen.findByText('提交并继续', { selector: 'button' })).toBeEnabled()
+    expect(await findButtonByText('提交并继续')).toBeEnabled()
   })
 })
