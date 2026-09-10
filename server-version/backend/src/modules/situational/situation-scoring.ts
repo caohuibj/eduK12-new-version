@@ -1,5 +1,7 @@
+import { z } from 'zod'
 import {
   situationDefinitionSchema,
+  situationalSceneSchema,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -52,6 +54,13 @@ export interface SituationalResultV1 {
 export interface SituationalScoringOptions {
   /** Internal FINAL-only path: response validation has already completed. */
   responsesValidated?: boolean
+  /**
+   * Internal V2 projection path. A valid frozen definition can legitimately
+   * project to zero scored scenes when routing reaches a terminal before any
+   * scored evidence. Keep all structural validation while relaxing only the
+   * published-definition requirement that at least one scene exists.
+   */
+  trustedScoringProjection?: boolean
 }
 
 export interface SituationalResponseIssue {
@@ -78,6 +87,10 @@ export interface SituationalGoldenCase {
     metricKeys: string[]
   }
 }
+
+const projectedSituationDefinitionSchema = situationDefinitionSchema.extend({
+  scenes: z.array(situationalSceneSchema),
+})
 
 const finite = (value: number): number => {
   if (!Number.isFinite(value)) throw new Error('计分结果必须是有限数字')
@@ -203,11 +216,12 @@ export const scoreSituational = (
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
   options: SituationalScoringOptions = {},
 ): SituationalResultV1 => {
-  // The frozen definition is trusted runtime input: publication/compile gates
-  // own cross-field validation. Keep FINAL scoring free of duplicate governance
-  // work while still parsing the structural schema and validating untrusted
-  // participant responses exactly once here.
-  const definition = situationDefinitionSchema.parse(definitionInput)
+  // Publication/compile gates own cross-field validation. Ordinary callers
+  // still require a complete published definition. The V2 FINAL path may pass
+  // a trusted scored projection whose scene set is empty after early routing.
+  const definition = options.trustedScoringProjection
+    ? projectedSituationDefinitionSchema.parse(definitionInput)
+    : situationDefinitionSchema.parse(definitionInput)
   const responses = normalizeResponses(inputResponses)
   const answered = options.responsesValidated
     ? new Map(responses.map((response) => [responseKey(response.sceneKey, response.channelKey), response]))
