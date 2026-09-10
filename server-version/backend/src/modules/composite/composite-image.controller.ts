@@ -12,11 +12,7 @@ import {
   serveFrozenFormSectionImage,
 } from '../assessment-runtime/form-image.adapter'
 import { decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
-import {
-  frozenScaleMediaOwner,
-  retainScaleAssessmentImages,
-  serveFrozenScaleAssessmentImage,
-} from '../scale/scale-image.adapter'
+import { serveFrozenScaleAssessmentImage } from '../scale/scale-image.adapter'
 import * as service from './composite.service'
 
 const recoveryHashFromRequest = (req: Request): string | null => {
@@ -102,7 +98,6 @@ const serveScaleImage = async (req: Request, res: Response, publicMode: boolean)
   })
   if (!child?.runtimeSnapshotEncrypted) return notFound(res, '量表冻结内容不可用')
   const snapshot = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
-  await retainScaleAssessmentImages({ owner: frozenScaleMediaOwner(child.id), definition: snapshot.definition })
   await serveFrozenScaleAssessmentImage({ snapshot, assetId: req.params.assetId, res })
   return undefined
 }
