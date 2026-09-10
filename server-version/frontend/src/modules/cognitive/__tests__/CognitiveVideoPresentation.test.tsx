@@ -89,13 +89,14 @@ const session = {
   presentation: PRESENTATION,
 }
 
-const renderRunner = () => render(
+const runnerTree = () => (
   <MemoryRouter initialEntries={['/student/cognitive/sessions/session-media-7']}>
     <Routes>
       <Route path="/student/cognitive/sessions/:sessionId" element={<CognitiveRunner />} />
     </Routes>
-  </MemoryRouter>,
+  </MemoryRouter>
 )
+const renderRunner = () => render(runnerTree())
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -135,6 +136,28 @@ describe('MEDIA-7 Cognitive video presentation gate', () => {
 
     const playerProps = mocks.videoRender.mock.calls[0]?.[0] as { autoPlay?: boolean }
     expect(playerProps.autoPlay).toBe(false)
+  })
+
+  it('invalidates instruction readiness immediately when the exact capability URL changes', () => {
+    mocks.controller.state = {
+      status: 'READY', session, taskContext: null, trialIndex: 0, error: null, result: null,
+    }
+    const rendered = renderRunner()
+    fireEvent.click(screen.getByRole('button', { name: 'ready 说明视频' }))
+    expect((screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement).disabled).toBe(false)
+
+    mocks.videoState.current = {
+      ...mocks.videoState.current,
+      sources: {
+        ...SOURCES,
+        'instruction:0': { ...SOURCES['instruction:0'], videoUrl: '/media/instruction-refreshed' },
+      },
+    }
+    rendered.rerender(runnerTree())
+
+    expect((screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement).disabled).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'ready 说明视频' }))
+    expect((screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement).disabled).toBe(false)
   })
 
   it('blocks START when capability issuance fails and exposes retry without a playback state machine', () => {
