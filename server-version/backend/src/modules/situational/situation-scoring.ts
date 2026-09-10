@@ -54,13 +54,6 @@ export interface SituationalResultV1 {
 export interface SituationalScoringOptions {
   /** Internal FINAL-only path: response validation has already completed. */
   responsesValidated?: boolean
-  /**
-   * Internal V2 projection path. A valid frozen definition can legitimately
-   * project to zero scored scenes when routing reaches a terminal before any
-   * scored evidence. Keep all structural validation while relaxing only the
-   * published-definition requirement that at least one scene exists.
-   */
-  trustedScoringProjection?: boolean
 }
 
 export interface SituationalResponseIssue {
@@ -88,6 +81,13 @@ export interface SituationalGoldenCase {
   }
 }
 
+/**
+ * A published definition must declare at least one scene, but a valid V2
+ * trajectory may project to zero score-eligible scenes when it reaches an
+ * early terminal through routing-only decisions. The scorer still validates
+ * the complete definition shape and relaxes only this internal scene-count
+ * constraint; publication validation remains unchanged.
+ */
 const projectedSituationDefinitionSchema = situationDefinitionSchema.extend({
   scenes: z.array(situationalSceneSchema),
 })
@@ -189,7 +189,7 @@ const expectedResponsesFor = (definition: SituationDefinitionV1, metric: Situati
 )
 
 const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min: number; max: number } => {
-  const scene = definition.scenes.find((candidate) => candidate.channels.some((channel) => responseKey(candidate.sceneKey, channel.channelKey) === pairKey))
+  const scene = definition.scenes.find((candidate) => candidate.channels.some((channel) => responseKey(candidate.sceneKey, candidate.channelKey) === pairKey))
   const channel = scene?.channels.find((candidate) => responseKey(scene.sceneKey, candidate.channelKey) === pairKey)
   if (!scene || !channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
   if (channel.responseType === 'CONTINUOUS') return { ...channel.range }
@@ -216,10 +216,10 @@ export const scoreSituational = (
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
   options: SituationalScoringOptions = {},
 ): SituationalResultV1 => {
-  // Publication/compile gates own cross-field validation. Ordinary callers
-  // still require a complete published definition. The V2 FINAL path may pass
-  // a trusted scored projection whose scene set is empty after early routing.
-  const definition = options.trustedScoringProjection
+  // Frozen definitions are trusted runtime input: publication/compile gates
+  // own cross-field validation. Keep structural parsing here. Only the
+  // internally projected zero-scene case uses the relaxed scoring-view schema.
+  const definition = definitionInput.scenes.length === 0
     ? projectedSituationDefinitionSchema.parse(definitionInput)
     : situationDefinitionSchema.parse(definitionInput)
   const responses = normalizeResponses(inputResponses)
