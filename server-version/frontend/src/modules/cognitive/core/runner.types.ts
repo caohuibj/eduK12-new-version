@@ -1,4 +1,4 @@
-import type { CognitiveResult, CognitiveSession } from '../types'
+import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSession } from '../types'
 
 /**
  * Runner 核心类型（Stage B v1.1 §16/§20/§22）。
@@ -14,6 +14,8 @@ export interface CognitiveTaskContext {
   attemptNo: number
   /** 冻结 config snapshot（decrypted，来自 Session response）。 */
   config: Record<string, unknown>
+  /** Static media identity is frozen with the Cognitive runtime; task code owns timing. */
+  presentation?: CognitivePresentationDefinitionV1
   /** randomSeed 必须 accept/retain/pass into task context，禁止 regenerate（v1.1 §22）。 */
   randomSeed: string
 }
@@ -21,6 +23,8 @@ export interface CognitiveTaskContext {
 /** Task Runner 组件契约：渲染当前 trial，提交 raw trial payload。 */
 export interface CognitiveTaskProps {
   taskContext: CognitiveTaskContext
+  /** Preloaded immutable image ObjectURLs keyed by frozen assetId. */
+  imageAssetUrls?: Readonly<Record<string, string>>
   /** 当前应渲染的试次（0-based）。 */
   trialIndex: number
   /** 提交单笔 raw trial；前端不得提交 score/payloadHash/加密内容。 */
