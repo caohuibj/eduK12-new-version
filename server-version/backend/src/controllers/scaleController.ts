@@ -34,6 +34,7 @@ import {
 } from '../modules/scale/scale-workflow.service'
 import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-concurrency'
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
+import { retainFrozenScaleAssessmentImages } from '../modules/scale/scale-image.adapter'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
 import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
@@ -811,30 +812,34 @@ export const scaleController = {
         definition,
       })
       try {
-        assessment = await prisma.assessment.create({
-          data: {
-            scaleId,
-            userId: userId!,
-            status: 'IN_PROGRESS',
-            deliveryMode: 'FINAL_ONLY',
-            runtimeGeneration: 'UNIFIED_V1',
-            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
-            compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
-            ...standaloneAdmissionPersistence({
-              attemptEpoch: 1,
+        assessment = await prisma.$transaction(async (tx) => {
+          const created = await tx.assessment.create({
+            data: {
+              scaleId,
               userId: userId!,
-              scale: {
-                id: scale.id,
-                code: scale.code,
-                name: scale.name,
-                instrumentVersion: scale.instrumentVersion,
-              },
-            }),
-            attemptEpoch: 1,
-            progress: 0,
-            answers: encryptField([]),
-            startedAt: new Date(),
-          },
+              status: 'IN_PROGRESS',
+              deliveryMode: 'FINAL_ONLY',
+              runtimeGeneration: 'UNIFIED_V1',
+              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+              compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
+              ...standaloneAdmissionPersistence({
+                attemptEpoch: 1,
+                userId: userId!,
+                scale: {
+                  id: scale.id,
+                  code: scale.code,
+                  name: scale.name,
+                  instrumentVersion: scale.instrumentVersion,
+                },
+              }),
+              attemptEpoch: 1,
+              progress: 0,
+              answers: encryptField([]),
+              startedAt: new Date(),
+            },
+          })
+          await retainFrozenScaleAssessmentImages({ assessmentId: created.id, snapshot: runtimeSnapshot, db: tx as never })
+          return created
         })
       } catch (err: any) {
         // The partial unique index is the final concurrency boundary. If a
