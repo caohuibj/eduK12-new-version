@@ -10,7 +10,7 @@ interface SituationalVideoPresentationProps {
   sceneKey: string
   presentation: AssessmentVideoPresentationV1
   loadSources: () => Promise<AssessmentVideoCapabilitySources>
-  onReadyChange: (ready: boolean) => void
+  onReadyChange: (sceneKey: string, ready: boolean) => void
 }
 
 const SituationalVideoPresentation = ({
@@ -23,7 +23,7 @@ const SituationalVideoPresentation = ({
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   const refreshSources = useCallback(async () => {
-    onReadyChange(false)
+    onReadyChange(sceneKey, false)
     setStatus('loading')
     try {
       const next = await loadSources()
@@ -32,13 +32,12 @@ const SituationalVideoPresentation = ({
     } catch {
       setSources(null)
       setStatus('error')
-      throw new Error('Situational video capability request failed')
     }
-  }, [loadSources, onReadyChange])
+  }, [loadSources, onReadyChange, sceneKey])
 
   useEffect(() => {
     let cancelled = false
-    onReadyChange(false)
+    onReadyChange(sceneKey, false)
     setSources(null)
     setStatus('loading')
     void loadSources()
@@ -53,11 +52,11 @@ const SituationalVideoPresentation = ({
       })
     return () => {
       cancelled = true
-      onReadyChange(false)
+      onReadyChange(sceneKey, false)
     }
   }, [loadSources, onReadyChange, sceneKey])
 
-  if (status === 'loading' || !sources && status !== 'error') {
+  if (status === 'loading' || (!sources && status !== 'error')) {
     return (
       <div className="mt-5 flex min-h-48 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600" role="status">
         <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
@@ -74,7 +73,7 @@ const SituationalVideoPresentation = ({
         <button
           type="button"
           className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 font-medium"
-          onClick={() => void refreshSources().catch(() => undefined)}
+          onClick={() => void refreshSources()}
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           重试视频
@@ -89,8 +88,8 @@ const SituationalVideoPresentation = ({
       sources={sources}
       className="mt-5"
       autoPlay={false}
-      onReady={() => onReadyChange(true)}
-      onError={() => onReadyChange(false)}
+      onReady={() => onReadyChange(sceneKey, true)}
+      onError={() => onReadyChange(sceneKey, false)}
       onRetry={refreshSources}
     />
   )
