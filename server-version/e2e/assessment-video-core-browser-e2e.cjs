@@ -85,6 +85,17 @@ const exerciseNativeVideo = async (page, bundle, label) => {
   page.on('response', responseListener)
 
   const outcome = await page.evaluate(async ({ presentation, sources, label: fixtureLabel }) => {
+    // Fail with an explicit HTTP-contract error before relying on the browser's
+    // generic MEDIA_ERR_SRC_NOT_SUPPORTED signal. This distinguishes delivery
+    // failures from codec support on the CI Chromium build.
+    const preflight = await fetch(sources.videoUrl, { headers: { Range: 'bytes=0-1023' } })
+    const preflightType = preflight.headers.get('content-type')
+    const preflightRange = preflight.headers.get('content-range')
+    const preflightBytes = (await preflight.arrayBuffer()).byteLength
+    if (preflight.status !== 206 || preflightType !== presentation.video.mimeType || preflightBytes <= 0) {
+      throw new Error(`video range preflight failed: status=${preflight.status} type=${preflightType} range=${preflightRange} bytes=${preflightBytes}`)
+    }
+
     document.body.innerHTML = ''
     const heading = document.createElement('h1')
     heading.textContent = fixtureLabel
@@ -142,6 +153,10 @@ const exerciseNativeVideo = async (page, bundle, label) => {
       cues,
       poster: video.poster,
       trackCount: video.textTracks.length,
+      preflightStatus: preflight.status,
+      preflightType,
+      preflightRange,
+      preflightBytes,
       headStatus: head.status,
       headAcceptRanges: head.headers.get('accept-ranges'),
       multiStatus: multi.status,
@@ -157,6 +172,10 @@ const exerciseNativeVideo = async (page, bundle, label) => {
   const posterUrl = bundle.sources.posterUrl ? absolute(bundle.sources.posterUrl) : null
   const captionUrls = (bundle.sources.captions || []).map((track) => absolute(track.src))
 
+  assert.equal(outcome.preflightStatus, 206, `${label}: Range preflight must be 206`)
+  assert.equal(outcome.preflightType, bundle.presentation.video.mimeType, `${label}: Range preflight MIME mismatch`)
+  assert.ok(outcome.preflightRange?.startsWith('bytes 0-'), `${label}: Range preflight missing Content-Range`)
+  assert.ok(outcome.preflightBytes > 0, `${label}: Range preflight returned no bytes`)
   assert.ok(Number.isFinite(outcome.duration) && outcome.duration > 5, `${label}: invalid duration`)
   assert.ok(outcome.finalTime >= 6, `${label}: native seek did not complete`)
   assert.equal(outcome.trackCount, 1, `${label}: caption track missing`)
