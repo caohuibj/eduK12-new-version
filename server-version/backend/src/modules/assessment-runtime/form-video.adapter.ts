@@ -10,7 +10,7 @@ import {
   type AssessmentVideoPresentationV1,
 } from '../assessment-media/assessment-video'
 import {
-  frozenFormMediaOwner,
+  frozenFormMediaOwnerFromAdmission,
   publishedFormMediaOwner,
 } from './form-image.adapter'
 import type { FrozenUnitAdmissionV1 } from './admission-snapshot'
@@ -23,6 +23,17 @@ const optionVideoPresentations = (options: unknown): AssessmentVideoPresentation
     if (video === undefined) return []
     return [assessmentVideoPresentationSchema.parse(video)]
   })
+}
+
+const optionVideoPresentationAt = (
+  options: unknown,
+  optionIndex: number,
+): AssessmentVideoPresentationV1 | null => {
+  if (!Array.isArray(options) || !Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex >= options.length) return null
+  const option = options[optionIndex]
+  if (!option || typeof option !== 'object' || Array.isArray(option)) return null
+  const video = (option as { video?: unknown }).video
+  return video === undefined ? null : assessmentVideoPresentationSchema.parse(video)
 }
 
 export const questionnaireFormSectionVideoPresentations = (definition: unknown): AssessmentVideoPresentationV1[] => {
@@ -43,6 +54,22 @@ export const compositeFormSectionVideoPresentations = (definition: unknown): Ass
     if (!item || typeof item !== 'object' || Array.isArray(item)) return []
     return optionVideoPresentations((item as { formOptions?: unknown }).formOptions)
   })
+}
+
+export const frozenFormOptionVideoPresentation = (
+  admission: FrozenUnitAdmissionV1,
+  itemId: string,
+  optionIndex: number,
+): AssessmentVideoPresentationV1 | null => {
+  const frozen = admission.formSection
+  if (!frozen || !frozen.definition || typeof frozen.definition !== 'object' || Array.isArray(frozen.definition)) return null
+  const items = (frozen.definition as { items?: unknown }).items
+  if (!Array.isArray(items)) return null
+  const item = items.find((entry) => entry && typeof entry === 'object' && !Array.isArray(entry) && (entry as { id?: unknown }).id === itemId)
+  if (!item || typeof item !== 'object' || Array.isArray(item)) return null
+  return frozen.kind === 'questionnaire'
+    ? optionVideoPresentationAt((item as { options?: unknown }).options, optionIndex)
+    : optionVideoPresentationAt((item as { formOptions?: unknown }).formOptions, optionIndex)
 }
 
 export const frozenFormSectionVideoPresentations = (admission: FrozenUnitAdmissionV1): AssessmentVideoPresentationV1[] => {
@@ -70,18 +97,11 @@ export const retainFormSectionVideos = async (input: {
 export const retainFrozenFormAdmissionVideos = async (
   admission: FrozenUnitAdmissionV1,
   db: AssetDatabase = prisma,
-): Promise<void> => {
-  const frozen = admission.formSection
-  const parent = admission.parent
-  if (!frozen || !parent) throw new Error('Frozen Form admission is missing its parent binding')
-  if (frozen.kind !== parent.kind) throw new Error('Frozen Form admission parent binding does not match its definition kind')
-  const owner = frozenFormMediaOwner(
-    frozen.kind === 'questionnaire' ? 'QUESTIONNAIRE' : 'COMPOSITE',
-    parent.parentId,
-    frozen.id,
-  )
-  await retainFormSectionVideos({ owner, presentations: frozenFormSectionVideoPresentations(admission), db })
-}
+): Promise<void> => retainFormSectionVideos({
+  owner: frozenFormMediaOwnerFromAdmission(admission),
+  presentations: frozenFormSectionVideoPresentations(admission),
+  db,
+})
 
 export const publishedQuestionnaireFormVideoOwner = (
   ownerId: string,
