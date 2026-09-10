@@ -7,7 +7,6 @@ import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../asse
 import { readStoredFormAdmission } from '../assessment-runtime/form-admission.service'
 import {
   compositeFormSectionImageReferences,
-  frozenFormMediaOwner,
   publishedFormMediaOwner,
   retainFormSectionImages,
   serveFrozenFormSectionImage,
@@ -124,7 +123,6 @@ const serveFormImage = async (req: Request, res: Response, publicMode: boolean) 
   await serveFrozenFormSectionImage({
     admission,
     assetId: req.params.assetId,
-    owner: frozenFormMediaOwner('COMPOSITE', req.params.attemptId, req.params.sectionId),
     res,
   })
   return undefined
