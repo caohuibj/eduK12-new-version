@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -6,8 +6,11 @@ import { useCognitiveSession } from '../core/useCognitiveSession'
 import { useAdministrationProvenance } from '../core/useAdministrationProvenance'
 import { resolveRunner } from '../registry'
 import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
+import AssessmentVideoPlayer from '../../assessment-media/AssessmentVideoPlayer'
 import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
-import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
+import type { AssessmentImagePresentationItem, AssessmentVideoCapabilitySources } from '../../assessment-media/types'
+import { cognitiveVideoPresentationEntries } from '../video-presentation'
+import { useCognitiveVideoSources } from '../useCognitiveVideoSources'
 
 const safeInternalReturnTo = (value: string | null, fallback: string) => {
   if (!value) return fallback
@@ -33,8 +36,9 @@ const presentationItems = (
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
  * 按状态机渲染；RECOVERY_REQUIRED 明确提示、绝不静默重跑/猜测进度。
  *
- * Cognitive static media is fully preloaded before START_RUN. This keeps
- * network/image delivery outside task-owned reaction-time and trial timing.
+ * Cognitive image bytes and video capability URLs are prepared before START_RUN.
+ * Video bytes remain native-streamed; task code owns example/stimulus timing and
+ * no playback position is persisted or included in FINAL.
  */
 const CognitiveRunner: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -52,6 +56,7 @@ const CognitiveRunner: React.FC = () => {
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
+  const [instructionVideoReady, setInstructionVideoReady] = useState<Record<string, boolean>>({})
 
   const frozenPresentation = state.session?.presentation
   const instructionItems = useMemo(
@@ -62,14 +67,41 @@ const CognitiveRunner: React.FC = () => {
     () => presentationItems(frozenPresentation),
     [frozenPresentation],
   )
+  const videoEntries = useMemo(
+    () => cognitiveVideoPresentationEntries(frozenPresentation),
+    [frozenPresentation],
+  )
+  const instructionVideoEntries = useMemo(
+    () => videoEntries.filter((entry) => entry.slot === 'instruction'),
+    [videoEntries],
+  )
   const loadPresentationAsset = useCallback((assetId: string): Promise<Blob> => {
     if (!state.session || !sessionApi.loadAsset) {
       return Promise.reject(new Error('Cognitive image session is unavailable'))
     }
     return sessionApi.loadAsset(state.session.sessionId, assetId)
   }, [sessionApi, state.session])
+  const issueVideoSources = useCallback(async (videoKey: string): Promise<AssessmentVideoCapabilitySources> => {
+    if (!state.session || !sessionApi.issueVideoCapabilities) {
+      throw new Error('Cognitive video session is unavailable')
+    }
+    const response = await sessionApi.issueVideoCapabilities(state.session.sessionId, videoKey)
+    return response.data
+  }, [sessionApi, state.session])
   const imageState = useAssessmentImageAssets(allImageItems, loadPresentationAsset)
-  const mediaReady = allImageItems.length === 0 || imageState.status === 'ready'
+  const videoState = useCognitiveVideoSources(videoEntries, issueVideoSources)
+  const instructionVideoSourceKey = useMemo(() => instructionVideoEntries
+    .map((entry) => `${entry.key}:${videoState.sources[entry.key]?.videoUrl ?? ''}`)
+    .join('|'), [instructionVideoEntries, videoState.sources])
+
+  useEffect(() => {
+    setInstructionVideoReady({})
+  }, [state.session?.sessionId, instructionVideoSourceKey])
+
+  const imagesReady = allImageItems.length === 0 || imageState.status === 'ready'
+  const videoCapabilitiesReady = videoEntries.length === 0 || videoState.status === 'ready'
+  const instructionVideosReady = instructionVideoEntries.every((entry) => instructionVideoReady[entry.key] === true)
+  const mediaReady = imagesReady && videoCapabilitiesReady && instructionVideosReady
 
   // 试次总数：Fake 用 trialCount，Reaction 用 totalTrials（Milestone E §28）。
   // Memory（自适应）不依赖固定总数，完成信号由其自身推进逻辑在 Session 3 处理。
@@ -158,6 +190,17 @@ const CognitiveRunner: React.FC = () => {
             <button type="button" onClick={imageState.retry} className="btn-secondary mt-3">重试视觉内容</button>
           </div>
         )}
+        {videoState.status === 'loading' && videoEntries.length > 0 && (
+          <p role="status" className="text-sm text-indigo-700 bg-indigo-50 border border-indigo-100 rounded p-3 mb-4">
+            正在准备测评视频资源…
+          </p>
+        )}
+        {videoState.status === 'error' && (
+          <div role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3 mb-4">
+            <p>视频内容加载失败，当前不能开始测评。</p>
+            <button type="button" onClick={videoState.retry} className="btn-secondary mt-3">重试视频内容</button>
+          </div>
+        )}
         {imageState.status === 'ready' && instructionItems.length > 0 && (
           <AssessmentImagePresentation
             items={instructionItems}
@@ -166,6 +209,25 @@ const CognitiveRunner: React.FC = () => {
             ariaLabel="认知测评说明视觉内容"
           />
         )}
+        {videoState.status === 'ready' && instructionVideoEntries.map((entry) => {
+          const sources = videoState.sources[entry.key]
+          if (!sources) return null
+          return (
+            <AssessmentVideoPlayer
+              key={`${entry.key}:${sources.videoUrl}`}
+              presentation={entry.presentation}
+              sources={sources}
+              autoPlay={false}
+              className="mt-4 text-left"
+              onReady={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: true }))}
+              onError={() => setInstructionVideoReady((current) => ({ ...current, [entry.key]: false }))}
+              onRetry={async () => {
+                setInstructionVideoReady((current) => ({ ...current, [entry.key]: false }))
+                await videoState.refresh(entry.key)
+              }}
+            />
+          )
+        })}
         <button onClick={controller.start} disabled={!mediaReady} className="btn-primary mt-6">
           开始测评
         </button>
@@ -222,7 +284,7 @@ const CognitiveRunner: React.FC = () => {
 
   // RUNNING / SUBMITTING_TRIAL
   if (state.session && state.taskContext) {
-    if (!mediaReady) {
+    if (!imagesReady || !videoCapabilitiesReady) {
       return (
         <div className="card p-8 max-w-2xl text-center">
           {imageState.status === 'error' ? (
@@ -230,8 +292,13 @@ const CognitiveRunner: React.FC = () => {
               <p>视觉内容未就绪，测量不会继续。</p>
               <button type="button" onClick={imageState.retry} className="btn-secondary mt-4">重试视觉内容</button>
             </div>
+          ) : videoState.status === 'error' ? (
+            <div role="alert" className="text-red-700">
+              <p>视频能力未就绪，测量不会继续。</p>
+              <button type="button" onClick={videoState.retry} className="btn-secondary mt-4">重试视频内容</button>
+            </div>
           ) : (
-            <p role="status" className="text-gray-600">正在准备视觉内容…</p>
+            <p role="status" className="text-gray-600">正在准备测评媒体…</p>
           )}
         </div>
       )
@@ -258,6 +325,8 @@ const CognitiveRunner: React.FC = () => {
           <Runner
             taskContext={state.taskContext}
             imageAssetUrls={imageState.urls}
+            videoSources={videoState.sources}
+            refreshVideoSource={videoState.refresh}
             trialIndex={state.trialIndex}
             onTrialComplete={controller.appendTrial}
             onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
