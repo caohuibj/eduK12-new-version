@@ -8,11 +8,7 @@ export const retainQuestionnaireScaleAssessmentImages = async (input: {
     scaleId: string
     snapshot: FrozenScaleRuntimeSnapshotV1
   }>
-  db: AssetDatabase & {
-    assessment: {
-      findMany(args: unknown): Promise<Array<{ id: string; scaleId: string }>>
-    }
-  }
+  db: AssetDatabase
 }): Promise<void> => {
   const children = await input.db.assessment.findMany({
     where: { questionnaireAssessmentId: input.questionnaireAssessmentId },
