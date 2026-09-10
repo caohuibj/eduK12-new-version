@@ -1,8 +1,5 @@
 // SIT-V2-E final branching acceptance gate.
-//
-// This harness deliberately exercises the real frontend/backend/IndexedDB/
-// PostgreSQL path. The fixture package is CI-only and is enabled by
-// SITUATIONAL_BRANCHING_E2E_FIXTURE=true.
+// Real Chromium + IndexedDB + backend + PostgreSQL; fixture is CI-only.
 
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
@@ -31,11 +28,7 @@ const BROWSER_EXECUTABLE = browserCandidates.find((candidate) => fs.existsSync(c
 assert.ok(fs.existsSync(FIXTURE_FILE), `fixture not found: ${FIXTURE_FILE}`)
 const fixture = JSON.parse(fs.readFileSync(FIXTURE_FILE, 'utf8'))
 const results = []
-
-const record = (name) => {
-  results.push(name)
-  console.log(`[PASS] ${name}`)
-}
+const record = (name) => { results.push(name); console.log(`[PASS] ${name}`) }
 
 const apiFetch = async (page, endpoint, init = {}) => page.evaluate(async ({ endpoint: pathName, requestInit }) => {
   const token = window.localStorage.getItem('token')
@@ -69,7 +62,7 @@ const loginStudent = async (page) => {
   await page.getByText('我的课程', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 }
 
-const sceneTitle = async (page, title) => {
+const waitScene = async (page, title) => {
   await page.getByRole('heading', { name: '文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   await page.getByRole('heading', { name: title, exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 }
@@ -82,7 +75,7 @@ const chooseOption = async (page, optionKey) => {
     const candidate = document.querySelector(`input[type="radio"][value="${value}"]`)
     return candidate instanceof HTMLInputElement && candidate.checked
   }, optionKey, { timeout: 30000 })
-  assert.equal(await option.isChecked(), true, `option ${optionKey} was not persisted in the controlled runner`)
+  assert.equal(await option.isChecked(), true, `option ${optionKey} was not persisted`)
 }
 
 const setConfidence = async (page, value) => {
@@ -95,18 +88,17 @@ const setConfidence = async (page, value) => {
   }, value, { timeout: 30000 })
 }
 
-const waitForProgress = async (page, answered, total) => {
+const waitProgress = async (page, answered, total) => {
   await page.getByText(`已完成 ${answered} / ${total} 个必答通道`, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 }
 
 const nextScene = async (page, title) => {
   await page.getByRole('button', { name: '下一题', exact: true }).click()
-  await sceneTitle(page, title)
+  await waitScene(page, title)
 }
 
-const navigateToScene = async (page, index, completed = true) => {
-  const label = `情境 ${index}，${completed ? '已完成' : '未完成'}`
-  await page.getByRole('button', { name: label, exact: true }).click()
+const navigateScene = async (page, index, completed = true) => {
+  await page.getByRole('button', { name: `情境 ${index}，${completed ? '已完成' : '未完成'}`, exact: true }).click()
 }
 
 const assertImageScene = async (page) => {
@@ -137,32 +129,30 @@ const assertComicScene = async (page) => {
   record('branch-comic-visible')
 }
 
-const assertTextOnlyScene = async (page, label) => {
-  assert.equal(await page.locator('img[data-asset-id]').count(), 0, `${label} unexpectedly rendered image media`)
+const assertTextOnly = async (page, label) => {
+  assert.equal(await page.locator('img[data-asset-id]').count(), 0, `${label} unexpectedly rendered media`)
   record(label)
 }
 
-const assertNoHorizontalOverflow = async (page, label) => {
-  const ok = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)
-  assert.equal(ok, true, `${label} has horizontal overflow`)
+const assertNoOverflow = async (page, label) => {
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true, `${label} has horizontal overflow`)
   record(label)
 }
 
-const extractStandaloneAttemptId = (url) => {
+const standaloneAttemptId = (url) => {
   const match = url.match(/\/student\/situational\/attempts\/([^/?]+)\/result/)
-  assert.ok(match?.[1], `standalone result URL does not contain attempt id: ${url}`)
+  assert.ok(match?.[1], `result URL does not contain attempt id: ${url}`)
   return decodeURIComponent(match[1])
 }
 
-const startStandaloneFromHome = async (page) => {
+const startStandalone = async (page) => {
   await page.goto(`${BASE_URL}/student/situational`, { waitUntil: 'domcontentloaded' })
   await page.getByText('情境化测评', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   const card = page.locator('a').filter({ hasText: fixture.branching.reportHeadline }).first()
   await card.waitFor({ state: 'visible', timeout: 30000 })
   record('authenticated-standalone-published-entry')
   await card.click()
-  await sceneTitle(page, fixture.branching.scenes.entry)
-  return page
+  await waitScene(page, fixture.branching.scenes.entry)
 }
 
 const assertStandaloneDurable = async (attemptId, label) => {
@@ -172,23 +162,18 @@ const assertStandaloneDurable = async (attemptId, label) => {
       where: { id: attemptId },
       select: { status: true, resultEncrypted: true, canonicalResultEncrypted: true },
     })
-    assert.equal(attempt?.status, 'COMPLETED', `${label}: standalone attempt is not COMPLETED`)
-    assert.ok(attempt?.resultEncrypted, `${label}: result is missing`)
-    assert.ok(attempt?.canonicalResultEncrypted, `${label}: canonical result is missing`)
-    const rawCount = await prisma.situationalRawSubmission.count({ where: { attemptId } })
-    assert.equal(rawCount, 1, `${label}: expected exactly one raw FINAL row`)
+    assert.equal(attempt?.status, 'COMPLETED', `${label}: attempt is not COMPLETED`)
+    assert.ok(attempt?.resultEncrypted, `${label}: result missing`)
+    assert.ok(attempt?.canonicalResultEncrypted, `${label}: canonical result missing`)
+    assert.equal(await prisma.situationalRawSubmission.count({ where: { attemptId } }), 1, `${label}: raw FINAL count`)
     const retained = await prisma.assetReference.findMany({
-      where: {
-        entityType: 'AssessmentFrozenRuntime',
-        entityId: `SITUATIONAL:${attemptId}`,
-        field: 'media',
-      },
+      where: { entityType: 'AssessmentFrozenRuntime', entityId: `SITUATIONAL:${attemptId}`, field: 'media' },
       select: { assetId: true },
     })
     assert.deepEqual(
       retained.map((entry) => entry.assetId).sort(),
       [fixture.visual.image.assetId, ...fixture.visual.comic.panels.map((entry) => entry.assetId)].sort(),
-      `${label}: frozen media retention is incomplete`,
+      `${label}: frozen media retention incomplete`,
     )
     record(`${label}-durable-final`)
   } finally {
@@ -209,85 +194,77 @@ const runStandaloneLongPath = async (browser) => {
   page.on('request', onRequest)
   try {
     await loginStudent(page)
-    await startStandaloneFromHome(page)
+    await startStandalone(page)
     await assertImageScene(page)
-    await assertNoHorizontalOverflow(page, 'standalone-image-layout')
-
+    await assertNoOverflow(page, 'standalone-image-layout')
     await chooseOption(page, fixture.branching.options.longPath)
-    await waitForProgress(page, 1, 2)
+    await waitProgress(page, 1, 2)
+
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await sceneTitle(page, fixture.branching.scenes.diagnostic)
-    await waitForProgress(page, 1, 2)
-    await navigateToScene(page, 1, true)
-    await sceneTitle(page, fixture.branching.scenes.entry)
-    assert.equal(await page.locator(`input[type="radio"][value="${fixture.branching.options.longPath}"]`).first().isChecked(), true, 'entry decision did not survive reload')
+    await waitScene(page, fixture.branching.scenes.diagnostic)
+    await navigateScene(page, 1, true)
+    await waitScene(page, fixture.branching.scenes.entry)
+    assert.equal(await page.locator(`input[type="radio"][value="${fixture.branching.options.longPath}"]`).first().isChecked(), true)
     record('standalone-local-refresh-resume')
 
     await nextScene(page, fixture.branching.scenes.diagnostic)
-    await assertTextOnlyScene(page, 'diagnostic-text-visible')
+    await assertTextOnly(page, 'diagnostic-text-visible')
     await page.getByText('（可选）', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.getByRole('alert').filter({ hasText: '还有必答通道未完成' }).waitFor({ state: 'visible', timeout: 30000 })
-    assert.equal(submitCount, 0, 'incomplete standalone FINAL emitted a request')
+    assert.equal(submitCount, 0, 'incomplete standalone FINAL emitted request')
     record('standalone-required-blocking')
 
     await chooseOption(page, 'A')
     await setConfidence(page, 80)
-    await waitForProgress(page, 2, 3)
+    await waitProgress(page, 2, 3)
     await nextScene(page, fixture.branching.scenes.nested)
     await assertComicScene(page)
     await chooseOption(page, fixture.branching.options.nestedContinue)
-    await waitForProgress(page, 3, 4)
+    await waitProgress(page, 3, 4)
     await nextScene(page, fixture.branching.scenes.roundTwo)
-    await assertTextOnlyScene(page, 'round-two-text-visible')
+    await assertTextOnly(page, 'round-two-text-visible')
 
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await sceneTitle(page, fixture.branching.scenes.roundTwo)
-    await waitForProgress(page, 3, 4)
+    await waitScene(page, fixture.branching.scenes.roundTwo)
+    await waitProgress(page, 3, 4)
     record('multi-round-refresh-resume')
-
     await chooseOption(page, 'A')
-    await waitForProgress(page, 4, 4)
+    await waitProgress(page, 4, 4)
 
     let forcedAmbiguousFailure = false
     await page.route('**/api/situational/attempts/*/submit', async (route) => {
-      if (forcedAmbiguousFailure) {
-        await route.continue()
-        return
-      }
+      if (forcedAmbiguousFailure) return route.continue()
       forcedAmbiguousFailure = true
       const committed = await route.fetch()
       assert.equal(committed.status(), 200, 'server did not commit before simulated response loss')
       await route.abort('failed')
     })
-
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.waitForURL(/\/student\/situational\/attempts\/[^/]+\/result(?:\?|$)/, { timeout: 30000 })
     await page.getByText('测评已完成', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await page.unroute('**/api/situational/attempts/*/submit')
-    assert.equal(forcedAmbiguousFailure, true, 'ambiguous network failure hook did not execute')
-    assert.equal(submitCount, 1, 'ambiguous recovery emitted more than one FINAL request')
-    assert.ok(finalPayload?.responses?.some((entry) => entry.sceneKey === 'BR-02' && entry.channelKey === 'confidence' && entry.responseValue === 80), 'optional diagnostic answer was not retained in FINAL serialization')
+    assert.equal(forcedAmbiguousFailure, true)
+    assert.equal(submitCount, 1, 'ambiguous recovery emitted duplicate FINAL')
+    assert.ok(finalPayload?.responses?.some((entry) => entry.sceneKey === 'BR-02' && entry.channelKey === 'confidence' && entry.responseValue === 80), 'optional diagnostic missing from FINAL')
     record('ambiguous-final-recovery')
     record('optional-diagnostic-raw-retained')
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/01-standalone-result.png`, fullPage: true })
-    const attemptId = extractStandaloneAttemptId(page.url())
-
+    const attemptId = standaloneAttemptId(page.url())
     const downloadPromise = page.waitForEvent('download')
     await page.getByRole('button', { name: 'JSON', exact: true }).click()
     const download = await downloadPromise
-    assert.ok(download.suggestedFilename().toLowerCase().endsWith('.json'), 'standalone JSON export filename is invalid')
+    assert.ok(download.suggestedFilename().toLowerCase().endsWith('.json'))
     record('standalone-result-export')
 
     await page.getByRole('link', { name: '测评历史' }).first().click()
     await page.waitForURL(/\/student\/situational\/history(?:\?|$)/, { timeout: 30000 })
     await page.getByText('情境测评历史', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    assert.ok(await page.getByText('已完成').count(), 'completed standalone attempt missing from history')
+    await page.getByText(fixture.branching.reportHeadline, { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 })
+    await page.getByText('已完成', { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 })
     record('standalone-history')
-
     await assertStandaloneDurable(attemptId, 'standalone-long-path')
-    return { attemptId }
   } finally {
     page.off('request', onRequest)
     await context.close()
@@ -305,7 +282,7 @@ const runStandalonePruneAndEarlyTerminal = async (browser) => {
   page.on('request', onRequest)
   try {
     await loginStudent(page)
-    await startStandaloneFromHome(page)
+    await startStandalone(page)
     await chooseOption(page, fixture.branching.options.longPath)
     await nextScene(page, fixture.branching.scenes.diagnostic)
     await chooseOption(page, 'A')
@@ -314,45 +291,40 @@ const runStandalonePruneAndEarlyTerminal = async (browser) => {
     await chooseOption(page, fixture.branching.options.nestedContinue)
     await nextScene(page, fixture.branching.scenes.roundTwo)
     await chooseOption(page, 'A')
-    await waitForProgress(page, 4, 4)
+    await waitProgress(page, 4, 4)
 
-    await navigateToScene(page, 1, true)
-    await sceneTitle(page, fixture.branching.scenes.entry)
+    await navigateScene(page, 1, true)
+    await waitScene(page, fixture.branching.scenes.entry)
     await chooseOption(page, fixture.branching.options.earlyTerminal)
-    await waitForProgress(page, 1, 1)
+    await waitProgress(page, 1, 1)
     assert.equal(await page.getByRole('navigation', { name: '情境导航' }).getByRole('button').count(), 1, 'early branch retained stale downstream navigation')
     record('cross-round-prune-to-early-terminal')
 
     await chooseOption(page, fixture.branching.options.longPath)
-    await waitForProgress(page, 1, 2)
+    await waitProgress(page, 1, 2)
     await nextScene(page, fixture.branching.scenes.diagnostic)
-    assert.equal(await page.locator('input[type="radio"]').first().isChecked(), false, 'required diagnostic answer survived upstream branch prune')
+    assert.equal(await page.locator('input[type="radio"]').first().isChecked(), false, 'required diagnostic survived prune')
     await page.getByText('未选择', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     record('pruned-required-and-optional-not-restored')
 
-    await navigateToScene(page, 1, true)
+    await navigateScene(page, 1, true)
     await chooseOption(page, fixture.branching.options.earlyTerminal)
-    await waitForProgress(page, 1, 1)
+    await waitProgress(page, 1, 1)
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.waitForURL(/\/student\/situational\/attempts\/[^/]+\/result(?:\?|$)/, { timeout: 30000 })
     await page.getByText('测评已完成', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    assert.deepEqual(
-      finalPayload?.responses?.map((entry) => `${entry.sceneKey}:${entry.channelKey}`),
-      ['BR-01:behavior'],
-      'early-terminal FINAL still contained stale downstream responses',
-    )
+    assert.deepEqual(finalPayload?.responses?.map((entry) => `${entry.sceneKey}:${entry.channelKey}`), ['BR-01:behavior'], 'early FINAL retained stale downstream answers')
     record('early-terminal-final')
-    const attemptId = extractStandaloneAttemptId(page.url())
+    const attemptId = standaloneAttemptId(page.url())
     await assertStandaloneDurable(attemptId, 'standalone-early-terminal')
     await page.screenshot({ path: `${SCREENSHOT_DIR}/02-early-terminal-result.png`, fullPage: true })
-    return { attemptId }
   } finally {
     page.off('request', onRequest)
     await context.close()
   }
 }
 
-const waitForParentState = async (page, parentId, recoveryToken = '') => {
+const waitParent = async (page, parentId, recoveryToken = '') => {
   const headers = recoveryToken ? { 'X-Recovery-Token': recoveryToken } : undefined
   return assertSuccess(
     await apiFetch(page, `${recoveryToken ? '/public' : ''}/composite-assessments/attempts/${parentId}`, headers ? { headers } : {}),
@@ -368,32 +340,29 @@ const startAuthenticatedParent = async (page) => {
   await compositeTab.click()
   await page.getByText(fixture.composite.name, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   const card = page.locator('div.card').filter({ hasText: fixture.composite.name }).first()
-  const startResponsePromise = page.waitForResponse((response) => (
+  const responsePromise = page.waitForResponse((response) => (
     response.request().method() === 'POST'
       && response.url().includes(`/api/composite-assessments/${fixture.composite.id}/attempts`)
       && response.status() === 200
   ), { timeout: 30000 })
   await card.getByRole('button', { name: '开始测评', exact: true }).click()
-  const startResponse = await startResponsePromise
-  const startBody = await startResponse.json()
-  assert.equal(startBody.code, 0, startBody.message || 'authenticated Bundle start failed')
-  const parentId = startBody.data.attempt.id
-  assert.ok(parentId, 'authenticated parent attempt id is missing')
+  const body = await (await responsePromise).json()
+  assert.equal(body.code, 0, body.message || 'authenticated Bundle start failed')
   await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-  return parentId
+  return body.data.attempt.id
 }
 
-const enterEmbeddedRunner = async (page, parentId, publicMode = false, recoveryToken = '') => {
-  const parent = await waitForParentState(page, parentId, recoveryToken)
-  assert.equal(parent.currentItem?.type, 'SITUATIONAL', 'Bundle current item is not Situational')
+const enterEmbedded = async (page, parentId, publicMode = false, recoveryToken = '') => {
+  const parent = await waitParent(page, parentId, recoveryToken)
+  assert.equal(parent.currentItem?.type, 'SITUATIONAL')
   const childId = parent.currentItem?.situationalAttemptId
-  assert.ok(childId, 'Bundle did not expose a Situational child attempt')
-  const routePrefix = publicMode ? '/public' : '/student'
+  assert.ok(childId, 'Bundle child attempt missing')
+  const prefix = publicMode ? '/public' : '/student'
   await Promise.all([
-    page.waitForURL(new RegExp(`${routePrefix}/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),
+    page.waitForURL(new RegExp(`${prefix}/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),
     page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).click(),
   ])
-  await sceneTitle(page, fixture.branching.scenes.entry)
+  await waitScene(page, fixture.branching.scenes.entry)
   return childId
 }
 
@@ -407,26 +376,19 @@ const assertAggregateSafe = (payload, label) => {
 const assertEmbeddedDurable = async (parentId, childId, label) => {
   const prisma = new PrismaClient()
   try {
-    const parent = await prisma.compositeAssessmentAttempt.findUnique({
-      where: { id: parentId },
-      select: { status: true, progress: true },
-    })
-    assert.equal(parent?.status, 'COMPLETED', `${label}: parent is not COMPLETED`)
-    assert.equal(parent?.progress, 100, `${label}: parent progress is not 100`)
-    const children = await prisma.situationalAttempt.findMany({
-      where: { compositeAttemptId: parentId },
-      select: { id: true, status: true },
-    })
-    assert.equal(children.length, 1, `${label}: expected one Situational child`)
-    assert.equal(children[0]?.id, childId, `${label}: unexpected child attempt`)
-    assert.equal(children[0]?.status, 'COMPLETED', `${label}: child is not COMPLETED`)
-    const rawCount = await prisma.situationalRawSubmission.count({ where: { attemptId: childId } })
-    assert.equal(rawCount, 1, `${label}: expected exactly one raw FINAL row`)
+    const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: parentId }, select: { status: true, progress: true } })
+    assert.equal(parent?.status, 'COMPLETED')
+    assert.equal(parent?.progress, 100)
+    const children = await prisma.situationalAttempt.findMany({ where: { compositeAttemptId: parentId }, select: { id: true, status: true } })
+    assert.equal(children.length, 1)
+    assert.equal(children[0]?.id, childId)
+    assert.equal(children[0]?.status, 'COMPLETED')
+    assert.equal(await prisma.situationalRawSubmission.count({ where: { attemptId: childId } }), 1)
     const snapshots = await prisma.assessmentUnitSnapshot.findMany({
       where: { compositeAttemptId: parentId, sourceAttemptId: childId },
-      select: { unitType: true, payloadKind: true, sourceAttemptId: true },
+      select: { unitType: true, payloadKind: true },
     })
-    assert.equal(snapshots.length, 1, `${label}: expected one canonical UNIT_RESULT snapshot`)
+    assert.equal(snapshots.length, 1)
     assert.equal(snapshots[0]?.unitType, 'SITUATIONAL')
     assert.equal(snapshots[0]?.payloadKind, 'UNIT_RESULT')
     record(`${label}-bundle-durable-completion`)
@@ -441,10 +403,9 @@ const runAuthenticatedBundle = async (browser) => {
   try {
     await loginStudent(page)
     const parentId = await startAuthenticatedParent(page)
-    const childId = await enterEmbeddedRunner(page, parentId)
+    const childId = await enterEmbedded(page, parentId)
     record('authenticated-bundle-entry')
     await assertImageScene(page)
-
     await chooseOption(page, fixture.branching.options.directNested)
     await nextScene(page, fixture.branching.scenes.nested)
     await assertComicScene(page)
@@ -453,14 +414,12 @@ const runAuthenticatedBundle = async (browser) => {
 
     let submitCount = 0
     const submitPath = `/api/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}/submit`
-    const onRequest = (request) => {
-      if (request.method() === 'POST' && request.url().includes(submitPath)) submitCount += 1
-    }
+    const onRequest = (request) => { if (request.method() === 'POST' && request.url().includes(submitPath)) submitCount += 1 }
     page.on('request', onRequest)
     try {
       await page.getByRole('button', { name: '提交测评', exact: true }).click()
       await page.getByRole('alert').filter({ hasText: '还有必答通道未完成' }).waitFor({ state: 'visible', timeout: 30000 })
-      assert.equal(submitCount, 0, 'incomplete embedded FINAL emitted a request')
+      assert.equal(submitCount, 0)
       await chooseOption(page, 'D')
       await page.evaluate(() => {
         const button = Array.from(document.querySelectorAll('button')).find((candidate) => candidate.textContent?.includes('提交测评'))
@@ -470,13 +429,13 @@ const runAuthenticatedBundle = async (browser) => {
       })
       await page.waitForURL(new RegExp(`/student/composite/attempts/${parentId}(?:/report)?(?:\\?|$)`), { timeout: 30000 })
       await page.waitForTimeout(300)
-      assert.equal(submitCount, 1, 'rapid duplicate embedded FINAL emitted more than one logical submit')
+      assert.equal(submitCount, 1, 'rapid duplicate embedded FINAL emitted duplicate request')
       record('embedded-one-final-duplicate-guard')
     } finally {
       page.off('request', onRequest)
     }
 
-    const parent = await waitForParentState(page, parentId)
+    const parent = await waitParent(page, parentId)
     assert.equal(parent.status, 'COMPLETED')
     assert.equal(parent.progress, 100)
     const report = assertSuccess(await apiFetch(page, `/composite-assessments/attempts/${parentId}/report`), 'authenticated branching report')
@@ -484,7 +443,6 @@ const runAuthenticatedBundle = async (browser) => {
     record('embedded-aggregate-safe-report')
     await assertEmbeddedDurable(parentId, childId, 'authenticated-branching')
     await page.screenshot({ path: `${SCREENSHOT_DIR}/03-authenticated-bundle.png`, fullPage: true })
-    return { parentId, childId }
   } finally {
     await context.close()
   }
@@ -497,37 +455,35 @@ const runPublicBundle = async (browser) => {
     const token = encodeURIComponent(fixture.publicToken)
     await page.goto(`${BASE_URL}/public/composite/${token}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.composite.name }).waitFor({ state: 'visible', timeout: 30000 })
-    const startResponsePromise = page.waitForResponse((response) => (
+    const responsePromise = page.waitForResponse((response) => (
       response.request().method() === 'POST'
         && response.url().includes(`/api/public/composite-assessments/${fixture.publicToken}/start`)
         && response.status() === 200
     ), { timeout: 30000 })
     await page.getByRole('button', { name: /开始匿名测评/, exact: true }).click()
-    const startResponse = await startResponsePromise
-    const startBody = await startResponse.json()
-    assert.equal(startBody.code, 0, startBody.message || 'public Bundle start failed')
-    const parentId = startBody.data.attempt.id
-    const recoveryToken = startBody.data.recoveryToken
-    assert.ok(parentId, 'public parent attempt id is missing')
-    assert.ok(recoveryToken, 'public recovery token was not issued')
+    const body = await (await responsePromise).json()
+    assert.equal(body.code, 0, body.message || 'public Bundle start failed')
+    const parentId = body.data.attempt.id
+    const recoveryToken = body.data.recoveryToken
+    assert.ok(parentId && recoveryToken)
     await page.waitForFunction((key) => Boolean(window.sessionStorage.getItem(key)), `composite:recovery:attempt:${parentId}`, { timeout: 30000 })
     await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    const childId = await enterEmbeddedRunner(page, parentId, true, recoveryToken)
+    const childId = await enterEmbedded(page, parentId, true, recoveryToken)
     record('public-anonymous-bundle-entry')
 
     await chooseOption(page, fixture.branching.options.longPath)
     await nextScene(page, fixture.branching.scenes.diagnostic)
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await sceneTitle(page, fixture.branching.scenes.diagnostic)
+    await waitScene(page, fixture.branching.scenes.diagnostic)
     record('public-recovery-token-resume')
     await chooseOption(page, 'B')
     await nextScene(page, fixture.branching.scenes.nested)
     await chooseOption(page, fixture.branching.options.nestedTerminal)
-    await waitForProgress(page, 3, 3)
+    await waitProgress(page, 3, 3)
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.waitForURL(new RegExp(`/public/composite/attempts/${parentId}(?:/report)?(?:\\?|$)`), { timeout: 30000 })
 
-    const parent = await waitForParentState(page, parentId, recoveryToken)
+    const parent = await waitParent(page, parentId, recoveryToken)
     assert.equal(parent.status, 'COMPLETED')
     assert.equal(parent.progress, 100)
     const report = assertSuccess(
@@ -539,25 +495,23 @@ const runPublicBundle = async (browser) => {
 
     const missingContext = await browser.newContext({ viewport: { width: 1280, height: 900 } })
     const missingPage = await missingContext.newPage()
-    let embeddedGetRequests = 0
-    let assetGetRequests = 0
+    let embeddedGets = 0
+    let assetGets = 0
     missingPage.on('request', (request) => {
-      if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGetRequests += 1
-      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGetRequests += 1
+      if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGets += 1
+      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGets += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)
       await missingPage.goto(`${BASE_URL}/public/composite/situational/${childId}?compositeAttemptId=${parentId}&compositeItemId=${fixture.item.id}&returnTo=${returnTo}`, { waitUntil: 'domcontentloaded' })
       await missingPage.getByRole('alert').filter({ hasText: '恢复凭证' }).waitFor({ state: 'visible', timeout: 30000 })
-      assert.equal(embeddedGetRequests, 0, 'missing public recovery token reached embedded API')
-      assert.equal(assetGetRequests, 0, 'missing public recovery token reached asset API')
+      assert.equal(embeddedGets, 0)
+      assert.equal(assetGets, 0)
       record('public-missing-token-fail-closed')
     } finally {
       await missingContext.close()
     }
-
     await page.screenshot({ path: `${SCREENSHOT_DIR}/04-public-bundle.png`, fullPage: true })
-    return { parentId, childId }
   } finally {
     await context.close()
   }
@@ -565,10 +519,9 @@ const runPublicBundle = async (browser) => {
 
 const main = async () => {
   assert.ok(BROWSER_EXECUTABLE, `browser executable not found; checked: ${browserCandidates.join(', ')}`)
-  assert.equal(fixture.item.instrumentKey, 'sjt-branching-e2e-fixture', 'wrong branching instrument key')
-  assert.equal(fixture.item.instrumentVersion, '2.0.0', 'wrong branching instrument version')
+  assert.equal(fixture.item.instrumentKey, 'sjt-branching-e2e-fixture')
+  assert.equal(fixture.item.instrumentVersion, '2.0.0')
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true })
-
   const browser = await chromium.launch({ headless: true, executablePath: BROWSER_EXECUTABLE })
   try {
     await runStandaloneLongPath(browser)
@@ -578,7 +531,6 @@ const main = async () => {
   } finally {
     await browser.close()
   }
-
   console.log('--- SIT-V2-E branching acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('ALL PASS')
