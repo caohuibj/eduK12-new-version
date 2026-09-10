@@ -1,4 +1,5 @@
 import { ZodType } from 'zod'
+import type { CognitivePresentationDefinitionV1 } from './v2/presentation'
 
 /**
  * Cognitive 后端插件契约核心类型（D2 Registry Contract）。
@@ -87,6 +88,8 @@ export interface RegistryEntry<TConfig, TTrial> {
   engineVersion: string
   scoringVersion: string
   randomizationAlgorithmVersion: string
+  /** Optional static presentation metadata; task timing remains protocol-owned. */
+  presentation?: CognitivePresentationDefinitionV1
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
   finalSubmission: FinalSubmissionDefinition<TConfig>

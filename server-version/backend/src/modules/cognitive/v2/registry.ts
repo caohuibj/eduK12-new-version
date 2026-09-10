@@ -5,6 +5,7 @@ import {
 import type { RegistryEntry } from '../cognitive.types'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
 import { buildQualityAssessment } from './quality'
+import { parseCognitivePresentationDefinition } from './presentation'
 import type {
   CognitiveProfile,
   MetricDefinition,
@@ -186,6 +187,9 @@ export const buildCognitiveV2TaskDefinition = (
     category: entry.category,
     engineVersion: entry.engineVersion,
     scoringVersion: entry.scoringVersion,
+    ...(entry.presentation
+      ? { presentation: parseCognitivePresentationDefinition(entry.presentation) }
+      : {}),
     configSchema: entry.configSchema,
     trialSchema: entry.trialSchema,
     protocol,

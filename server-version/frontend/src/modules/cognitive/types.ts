@@ -1,3 +1,5 @@
+import type { AssessmentImagePresentationItem } from '../assessment-media/types'
+
 /**
  * Cognitive 前端类型（Stage B v1.1 §12/§15）。
  * 与后端 `server-version/backend/src/modules/cognitive` 的响应形状对齐；
@@ -162,6 +164,13 @@ export interface CognitiveReportDefinition {
   disclaimer: string
 }
 
+export interface CognitivePresentationDefinitionV1 {
+  schemaVersion: 1
+  instruction?: AssessmentImagePresentationItem[]
+  example?: AssessmentImagePresentationItem[]
+  stimulus?: AssessmentImagePresentationItem[]
+}
+
 export interface CognitiveSession {
   sessionId: string
   assignmentId: string | null
@@ -186,6 +195,7 @@ export interface CognitiveSession {
     phases: Array<{ key: 'test' | 'learning' | 'delayed'; persists: boolean; required: boolean }>
     measurementCriticalConfigPaths: string[]
   }
+  presentation?: CognitivePresentationDefinitionV1
   config: Record<string, unknown>
   randomSeed: string
   profile?: 'experience' | 'standard' | 'research' | null

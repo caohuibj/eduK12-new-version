@@ -6,6 +6,7 @@ import type {
 } from '../../assessment-reference/reference'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
 import type { FinalSubmissionDefinition } from '../cognitive.types'
+import type { CognitivePresentationDefinitionV1 } from './presentation'
 
 export type { FinalSubmissionDefinition } from '../cognitive.types'
 
@@ -124,6 +125,8 @@ export interface SessionConfigSnapshot<TConfig = unknown> {
   runtimeGeneration?: 'UNIFIED_V1'
   compiledRuntime?: CompiledInstrumentRuntimeV1
   referenceBindings?: ReferenceBindingSnapshot[]
+  /** Frozen presentation metadata only; timing remains task/protocol-owned. */
+  presentation?: CognitivePresentationDefinitionV1
   protocol: ProtocolDefinition
   protocolSignature: string
 }
@@ -227,6 +230,8 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   category: string
   engineVersion: string
   scoringVersion: string
+  /** Optional static image presentation. Absence preserves existing task identity. */
+  presentation?: CognitivePresentationDefinitionV1
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
   protocol: ProtocolDefinition

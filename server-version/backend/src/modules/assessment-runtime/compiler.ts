@@ -5,6 +5,7 @@ import {
   type SituationRuntimeDefinition,
 } from '../situational/situation-runtime-definition'
 import type { TaskDefinition } from '../cognitive/v2/types'
+import { parseCognitivePresentationDefinition } from '../cognitive/v2/presentation'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from './canonical'
 import { z } from 'zod'
 import type {
@@ -187,6 +188,9 @@ export const compileCognitiveRuntime = (input: {
   sourceDefinitionHash?: string
 }): CompiledInstrumentRuntimeV1 => {
   const definition = input.definition
+  const presentation = definition.presentation
+    ? parseCognitivePresentationDefinition(definition.presentation)
+    : undefined
   const metricDefinitions = compileMetrics(Object.values(definition.metrics).map((metric) => ({
     key: metric.key,
     label: metric.label,
@@ -219,6 +223,7 @@ export const compileCognitiveRuntime = (input: {
       category: definition.category,
       engineVersion: definition.engineVersion,
       scoringVersion: definition.scoringVersion,
+      ...(presentation ? { presentation } : {}),
       protocol: definition.protocol,
       metrics: definition.metrics,
       quality: definition.quality,
