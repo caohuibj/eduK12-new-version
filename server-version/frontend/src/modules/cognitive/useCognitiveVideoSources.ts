@@ -42,10 +42,10 @@ export const useCognitiveVideoSources = (
   })
 
   useEffect(() => {
-    if (!entries.length) {
-      setState({ requestKey, status: 'ready', sources: {}, error: null })
-      return undefined
-    }
+    // Preserve MEDIA-3/no-media behavior exactly: mounting the video adapter for
+    // a session with no frozen video slots must not schedule an extra render.
+    if (!entries.length) return undefined
+
     let disposed = false
     setState({ requestKey, status: 'loading', sources: {}, error: null })
     void Promise.all(entries.map(async (entry) => [entry.key, await issueSources(entry.key)] as const))
