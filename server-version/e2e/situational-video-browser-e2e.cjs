@@ -82,9 +82,14 @@ const startStandalone = async (page) => {
   // presentation/capability behavior and avoids exercising the unrelated
   // concurrent-start race caused by multiple runner effects competing for the
   // first standalone attempt identity in a fresh CI database.
+  const csrf = assertSuccess(await apiFetch(page, '/auth/csrf'), 'standalone csrf')
+  assert.ok(csrf?.csrfToken, 'standalone csrf token missing')
   const seeded = assertSuccess(await apiFetch(page, '/situational/attempts', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrf.csrfToken,
+    },
     body: JSON.stringify({ instrumentKey: fixture.instrument.key, instrumentVersion: fixture.instrument.version }),
   }), 'seed standalone situational attempt')
   assert.ok(seeded?.attempt?.id, 'standalone seed did not return an attempt')
