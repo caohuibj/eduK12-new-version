@@ -1,4 +1,7 @@
-import type { AssessmentImagePresentationItem } from '../assessment-media/types'
+import type {
+  AssessmentImagePresentationItem,
+  AssessmentVideoPresentationV1,
+} from '../assessment-media/types'
 
 /**
  * Cognitive 前端类型（Stage B v1.1 §12/§15）。
@@ -166,9 +169,16 @@ export interface CognitiveReportDefinition {
 
 export interface CognitivePresentationDefinitionV1 {
   schemaVersion: 1
+  /** MEDIA-3 image slots remain backward compatible. */
   instruction?: AssessmentImagePresentationItem[]
   example?: AssessmentImagePresentationItem[]
   stimulus?: AssessmentImagePresentationItem[]
+  /** MEDIA-7 non-timing-critical video slots; task code owns when example/stimulus are shown. */
+  videos?: {
+    instruction?: AssessmentVideoPresentationV1[]
+    example?: AssessmentVideoPresentationV1[]
+    stimulus?: AssessmentVideoPresentationV1[]
+  }
 }
 
 export interface CognitiveSession {
