@@ -1,9 +1,35 @@
-import { Router } from 'express'
+import { Router, type Request, type Response } from 'express'
 import { authenticate } from '../middleware/auth'
 import { issuePrivateAssetUrl, issuePublicAssetUrl, serveAsset } from '../services/assetStorage'
+import {
+  AssessmentMediaCapabilityError,
+  AssessmentMediaDeliveryError,
+  serveAssessmentMediaCapabilityContent,
+} from '../modules/assessment-media/assessment-video-delivery'
 
 const router = Router()
 export const publicAssetRouter = Router()
+
+const assessmentMediaContent = async (req: Request, res: Response) => {
+  const token = typeof req.query.cap === 'string' ? req.query.cap : ''
+  if (!token) return res.status(401).end()
+  try {
+    return await serveAssessmentMediaCapabilityContent({ token, req, res })
+  } catch (error) {
+    if (error instanceof AssessmentMediaCapabilityError) return res.status(401).end()
+    if (error instanceof AssessmentMediaDeliveryError) {
+      return res.status(error.reason === 'IDENTITY_MISMATCH' ? 409 : 404).end()
+    }
+    throw error
+  }
+}
+
+// Native <video>, poster, and <track> requests cannot attach assessment
+// recovery headers reliably. Adapters exchange their existing authorization
+// for a short-lived, scope-bound capability URL, then media GET/HEAD/Range
+// requests use only that signed capability.
+router.get('/assessment-media/content', assessmentMediaContent)
+router.head('/assessment-media/content', assessmentMediaContent)
 
 // Public issuance and delivery both require the X-Checkin-Token header.
 publicAssetRouter.get('/:id/url', issuePublicAssetUrl)
