@@ -47,6 +47,16 @@ export const retainScaleAssessmentImages = async (input: {
   db: input.db,
 })
 
+export const retainFrozenScaleAssessmentImages = async (input: {
+  assessmentId: string
+  snapshot: FrozenScaleRuntimeSnapshotV1
+  db?: AssetDatabase
+}): Promise<void> => retainScaleAssessmentImages({
+  owner: frozenScaleMediaOwner(input.assessmentId),
+  definition: input.snapshot.definition,
+  db: input.db,
+})
+
 export const serveFrozenScaleAssessmentImage = async (input: {
   snapshot: FrozenScaleRuntimeSnapshotV1
   assetId: string
