@@ -14,37 +14,55 @@ const readinessMessage = (identity: string, blockers: Array<{ stage: string; cod
   `${identity}: ${blockers.map((blocker) => `${blocker.stage}/${blocker.code} ${blocker.message}`).join('; ')}`
 )
 
-describe('published assessment product readiness inventory', () => {
-  it('keeps every PUBLISHED Scale package executable-ready', () => {
-    for (const pkg of listScalePackages().filter((candidate) => candidate.releaseStatus === 'PUBLISHED')) {
+const cognitiveFrontendReady = (testType: string, engineVersion: string): boolean => {
+  const frontendRegistry = readFileSync(resolve(frontendRoot, 'registry.ts'), 'utf8')
+  const registryFile = resolve(frontendRoot, 'tasks', testType, `${testType}.registry.ts`)
+  if (!existsSync(registryFile)) return false
+  const taskRegistry = readFileSync(registryFile, 'utf8')
+  return taskRegistry.includes(engineVersion)
+    && frontendRegistry.includes(`registerCognitiveRunner(${testType}RegistryEntry)`)
+}
+
+describe('assessment product readiness inventory', () => {
+  it('keeps Scale release status aligned with executable readiness', () => {
+    for (const pkg of listScalePackages().filter((candidate) => candidate.releaseStatus !== 'RETIRED')) {
       const readiness = evaluateScaleProductReadiness(pkg)
-      expect(readiness.ready, readinessMessage(`${pkg.key}@${pkg.instrumentVersion}`, readiness.blockers)).toBe(true)
+      const identity = `${pkg.key}@${pkg.instrumentVersion}`
+      if (pkg.releaseStatus === 'PUBLISHED') {
+        expect(readiness.ready, readinessMessage(identity, readiness.blockers)).toBe(true)
+      } else {
+        expect(readiness.ready, `${identity}: DRAFT has no executable blocker and should be PUBLISHED`).toBe(false)
+      }
     }
   })
 
-  it('keeps every PUBLISHED Cognitive identity backend-ready and backed by an exact frontend runner', () => {
-    const frontendRegistry = readFileSync(resolve(frontendRoot, 'registry.ts'), 'utf8')
-    const published = listCognitiveV2TaskDefinitions().filter((definition) => definition.publication.status === 'PUBLISHED')
-    expect(published.length).toBeGreaterThan(0)
-    for (const definition of published) {
+  it('keeps Cognitive release status aligned with backend + exact frontend readiness', () => {
+    const definitions = listCognitiveV2TaskDefinitions().filter((definition) => definition.publication.status !== 'RETIRED')
+    expect(definitions.length).toBeGreaterThan(0)
+    for (const definition of definitions) {
       const identity = `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
-      const readiness = evaluateCognitiveProductReadiness(definition)
-      expect(readiness.ready, readinessMessage(identity, readiness.blockers)).toBe(true)
-
-      const registryFile = resolve(frontendRoot, 'tasks', definition.testType, `${definition.testType}.registry.ts`)
-      expect(existsSync(registryFile), `${identity}: frontend runner registry file missing`).toBe(true)
-      const taskRegistry = readFileSync(registryFile, 'utf8')
-      expect(taskRegistry, `${identity}: frontend runner does not declare exact engineVersion`).toContain(definition.engineVersion)
-      expect(frontendRegistry, `${identity}: frontend root registry does not register task runner`).toContain(`registerCognitiveRunner(${definition.testType}RegistryEntry)`)
+      const backend = evaluateCognitiveProductReadiness(definition)
+      const frontendReady = cognitiveFrontendReady(definition.testType, definition.engineVersion)
+      const ready = backend.ready && frontendReady
+      if (definition.publication.status === 'PUBLISHED') {
+        expect(ready, `${readinessMessage(identity, backend.blockers)}; frontendReady=${frontendReady}`).toBe(true)
+      } else {
+        expect(ready, `${identity}: DRAFT has no backend/frontend executable blocker and should be PUBLISHED`).toBe(false)
+      }
     }
   })
 
-  it('keeps every production PUBLISHED Situational package executable-ready', () => {
-    const published = listSituationPackages().filter((candidate) => candidate.releaseStatus === 'PUBLISHED')
-    expect(published.length).toBeGreaterThan(0)
-    for (const pkg of published) {
+  it('keeps production Situational release status aligned with executable readiness', () => {
+    const packages = listSituationPackages().filter((candidate) => candidate.releaseStatus !== 'RETIRED')
+    expect(packages.length).toBeGreaterThan(0)
+    for (const pkg of packages) {
       const readiness = evaluateSituationalProductReadiness(pkg)
-      expect(readiness.ready, readinessMessage(`${pkg.key}@${pkg.instrumentVersion}`, readiness.blockers)).toBe(true)
+      const identity = `${pkg.key}@${pkg.instrumentVersion}`
+      if (pkg.releaseStatus === 'PUBLISHED') {
+        expect(readiness.ready, readinessMessage(identity, readiness.blockers)).toBe(true)
+      } else {
+        expect(readiness.ready, `${identity}: DRAFT has no executable blocker and should be PUBLISHED`).toBe(false)
+      }
     }
   })
 })
