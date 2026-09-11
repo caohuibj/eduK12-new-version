@@ -1,5 +1,6 @@
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
+import { isAssessmentOperationallyPaused } from '../assessment-governance/operational-hold'
 import {
   asLinearSituationDefinition,
   hashSituationRuntimeDefinition,
@@ -84,9 +85,10 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
 )
 
 /**
- * Participant runtime admission is controlled only by product release state.
- * Scientific maturity lives in a separate exact-identity governance resolver;
- * all PUBLISHED maturity labels therefore use the same executable package.
+ * New participant admission first resolves the exact product version, then
+ * applies the manual operational hold. Pausing the latest version never falls
+ * back to an older PUBLISHED version. Existing attempts do not call this
+ * selector; they continue from their frozen snapshot.
  */
 export const selectPublishedSituationPackage = <T extends SituationPackage>(
   availablePackages: readonly T[],
@@ -100,7 +102,13 @@ export const selectPublishedSituationPackage = <T extends SituationPackage>(
       && (instrumentVersion === undefined || candidate.instrumentVersion === instrumentVersion)
     ))
     .sort((left, right) => compareSituationalInstrumentVersions(right.instrumentVersion, left.instrumentVersion))
-  return candidates[0]
+  const selected = candidates[0]
+  if (!selected) return undefined
+  return isAssessmentOperationallyPaused({
+    family: 'SITUATIONAL',
+    key: selected.key,
+    version: selected.instrumentVersion,
+  }) ? undefined : selected
 }
 
 /** Compare numeric version segments without treating 1.0.10 as older than 1.0.2. */
