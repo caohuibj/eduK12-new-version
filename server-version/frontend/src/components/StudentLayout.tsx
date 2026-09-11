@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { BookOpen, Calendar, LogOut, User, ClipboardList, Settings, FileText, ClipboardCheck, Brain, Sparkles } from 'lucide-react'
+import { BookOpen, LogOut, User, Settings, FileText, Brain, Sparkles } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import Footer from './Footer'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
@@ -17,7 +17,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }
 
   // Stage B（v1.1 §18）：Cognitive 导航在 flag=true 时显示；
-  // active 对 /student/cognitive 子路由采用 prefix 策略，进入 Runner/Result 仍高亮。
+  // active 对领域子路由采用 prefix 策略，学生首页只允许 exact match，避免在所有 /student/* 页面同时高亮“课程”。
   const navItems = [
     { path: '/student', icon: BookOpen, label: '课程' },
     { path: '/student/situational', icon: Sparkles, label: '情境测评' },
@@ -28,29 +28,34 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { path: '/student/profile', icon: Settings, label: '设置' },
   ]
 
+  const isNavItemActive = (path: string) => {
+    if (path === '/student') return location.pathname === '/student'
+    return location.pathname === path || location.pathname.startsWith(`${path}/`)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">P</span>
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex min-h-16 items-center justify-between gap-4 py-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+                <span className="text-lg font-bold text-white">P</span>
               </div>
-              <span className="text-xl font-bold text-gray-800">学生端</span>
+              <span className="truncate text-lg font-semibold text-gray-900 sm:text-xl">学生端</span>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-gray-600">
-                <User className="w-5 h-5" />
-                <span>{user?.nickname || user?.username}</span>
+            <div className="flex items-center gap-1 sm:gap-3">
+              <div className="hidden items-center gap-2 text-sm text-gray-600 sm:flex">
+                <User className="h-5 w-5" />
+                <span className="max-w-40 truncate">{user?.nickname || user?.username}</span>
               </div>
               <button
+                type="button"
                 onClick={handleLogout}
-                className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors"
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="h-5 w-5" />
                 <span>退出</span>
               </button>
             </div>
@@ -58,29 +63,24 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
       </header>
 
-      {/* Navigation */}
-      <nav className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
+      <nav className="border-b border-gray-200 bg-white" aria-label="学生端主导航">
+        <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-max gap-5 sm:gap-7">
             {navItems.map((item) => {
               const Icon = item.icon
-              const isActive =
-                item.path === '/student/cognitive'
-                  ? location.pathname.startsWith('/student/cognitive')
-                  : item.path === '/student/situational'
-                    ? location.pathname.startsWith('/student/situational')
-                  : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
+              const isActive = isNavItemActive(item.path)
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
                       ? 'border-primary text-primary'
-                      : 'border-transparent text-gray-600 hover:text-gray-800'
+                      : 'border-transparent text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
                 </Link>
               )
@@ -89,16 +89,13 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         {children}
       </main>
 
-      {/* Footer */}
       <Footer variant="light" />
     </div>
   )
 }
 
 export default StudentLayout
-
