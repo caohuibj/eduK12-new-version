@@ -171,10 +171,11 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
     expect(result.decision.warnings.some((warning) => warning.includes('respondent'))).toBe(true)
   })
 
-  it('still fails closed when the catalog manifest itself is structurally invalid', () => {
+  it('keeps an invalid catalog manifest outside Product Release while disabling scientific/report eligibility', () => {
     const result = runGate({ manifest: { identity: 'broken' } })
-    expect(result.decision.publishable).toBe(false)
-    expect(result.decision.errors.some((error) => error.includes('[catalogManifest]'))).toBe(true)
+    expect(result.decision.publishable).toBe(true)
+    expect(result.decision.errors).toHaveLength(0)
+    expect(result.decision.warnings.some((warning) => warning.includes('[catalog/governance]'))).toBe(true)
     expect(result.reportEligibility.maxEligibleLevel).toBeNull()
   })
 
