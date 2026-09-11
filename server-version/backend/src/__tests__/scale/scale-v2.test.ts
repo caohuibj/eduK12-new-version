@@ -321,7 +321,6 @@ describe('ScaleDefinitionV2 and generic scorer', () => {
     const sourceDefined = makeDefinition()
     sourceDefined.scoring.defaultMissingPolicy = { type: 'source_defined' }
     sourceDefined.scoring.scores[0].missingPolicy = { type: 'source_defined' }
-    sourceDefined.scoring.scoringVersion = sourceDefined.scoring.scoringVersion
     sourceDefined.scoring.scorerKey = 'scale-v2-test-scorer'
     sourceDefined.scoring.scores[0].range = { min: 0, max: 99 }
     registerScaleCustomScorer('scale-v2-test-scorer', ({ definition, itemScores }) => ({
