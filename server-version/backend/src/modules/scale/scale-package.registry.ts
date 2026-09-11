@@ -44,10 +44,13 @@ export interface ScalePackageValidation {
 }
 
 /**
- * Package-level release gate. A package is code-owned, so its golden cases
- * and runner/report shape are checked together with the definition contract.
- * The function is pure and can be used by seed, CI, or an admin diagnostic
- * endpoint without touching the database.
+ * Exact-package executable correctness gate. A package is code-owned, so its
+ * runner/report/scoring shape and golden cases are checked together with the
+ * definition contract. Scientific evidence, source/rights provenance and
+ * deployment authorization are deliberately not publication blockers here.
+ *
+ * The function is pure and can be used by seed, CI, or admin diagnostics
+ * without touching the database.
  */
 export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackageValidation => {
   const identityIssues: DefinitionIssue[] = []
@@ -56,12 +59,24 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(scalePackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
   const validation = validateScaleDefinition(scalePackage.definition, {
     instrumentClass: 'STANDARD',
-    forPublish: true,
+    forPublish: false,
     scorerKeys: getScaleCustomScorerKeys(),
-    requireGoldenFixture: true,
-    hasGoldenFixture: scalePackage.goldenCases.length > 0,
   })
   const issues = [...identityIssues, ...validation.issues]
+
+  // These are product capability constraints, not scientific/rights gates.
+  if (scalePackage.definition.display.randomizeItems) {
+    issues.push({ path: 'display.randomizeItems', message: '当前 Runner 不支持题目随机化', severity: 'error' })
+  }
+  scalePackage.definition.items.forEach((item, index) => {
+    if (item.randomizeOptions) {
+      issues.push({ path: `items.${index}.randomizeOptions`, message: '当前 Runner 不支持选项随机化', severity: 'error' })
+    }
+  })
+  if (scalePackage.goldenCases.length === 0) {
+    issues.push({ path: 'goldenCases', message: '标准量表缺少 golden scoring fixture', severity: 'error' })
+  }
+
   const scoreKeys = new Set(scalePackage.definition.scoring.scores.map((score) => score.key))
   const referenceVersions = new Set<string>()
   scalePackage.references.forEach((reference, referenceIndex) => {
@@ -113,7 +128,7 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
         issues.push({ path: `definition.referencePolicy.selections.${selectionIndex}`, message: 'package reference 中缺少与 selection 匹配的 scoreKey/referenceKind', severity: 'error' })
       }
       if (reference.status !== 'ACTIVE') {
-        issues.push({ path: `references.${scalePackage.references.indexOf(reference)}.status`, message: '发布 package 使用的 reference 必须为 ACTIVE', severity: 'error' })
+        issues.push({ path: `references.${scalePackage.references.indexOf(reference)}.status`, message: '当前报告 contract 使用的 reference 必须为 ACTIVE', severity: 'error' })
       }
     })
   }
