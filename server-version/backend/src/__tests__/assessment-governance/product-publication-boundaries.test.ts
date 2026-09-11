@@ -13,7 +13,7 @@ describe('product publication boundaries', () => {
       source: {},
       license: { status: 'unknown' as const, redistribution: 'unknown' as const },
     }
-    const decision = validateScaleProductDefinition(definition, 'CUSTOM_DESCRIPTIVE')
+    const decision = validateScaleProductDefinition(definition, 'STANDARD')
     expect(decision.valid, JSON.stringify(decision.issues)).toBe(true)
   })
 
@@ -24,7 +24,7 @@ describe('product publication boundaries', () => {
       source: {},
       license: { status: 'unknown' as const, redistribution: 'unknown' as const },
     }
-    const decision = validateScaleProductDefinition(definition, 'CUSTOM_DESCRIPTIVE')
+    const decision = validateScaleProductDefinition(definition, 'STANDARD')
     expect(decision.valid).toBe(false)
     expect(decision.issues).toContainEqual(expect.objectContaining({ path: 'display.randomizeItems', severity: 'error' }))
   })
