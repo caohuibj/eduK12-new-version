@@ -7,14 +7,23 @@ import {
 } from '../assessment-governance/product-readiness'
 import { validateSituationPackage, type SituationPackage } from './situation-package.registry'
 
-/** Exact-package executable audit; scientific provenance is intentionally out of scope. */
+const isLegacyScientificOrProvenanceBlocker = (path: string): boolean => (
+  path === 'source' || path === 'license' || path.startsWith('source.') || path.startsWith('license.')
+)
+
+/**
+ * Exact-package executable audit. Scientific provenance is intentionally out
+ * of scope. Legacy source/license errors emitted by validateSituationPackage
+ * are filtered here while executable definition, presentation, scorer, golden
+ * and report-integrity errors remain hard blockers.
+ */
 export const evaluateSituationalProductReadiness = (
   pkg: SituationPackage,
 ): ProductReadinessDecisionV1 => {
   const blockers: ProductReadinessIssueV1[] = []
   const validation = validateSituationPackage(pkg)
   validation.issues
-    .filter((candidate) => candidate.severity === 'error')
+    .filter((candidate) => candidate.severity === 'error' && !isLegacyScientificOrProvenanceBlocker(candidate.path))
     .forEach((candidate) => blockers.push({
       stage: candidate.path.startsWith('goldenCases') ? 'SCORING' : 'DEFINITION',
       code: 'SITUATIONAL_PACKAGE_INVALID',
