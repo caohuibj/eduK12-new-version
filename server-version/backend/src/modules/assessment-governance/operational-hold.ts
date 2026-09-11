@@ -39,3 +39,19 @@ export const getAssessmentOperationalHold = (
 export const isAssessmentOperationallyPaused = (
   identity: AssessmentOperationalIdentityV1,
 ): boolean => getAssessmentOperationalHold(identity) !== undefined
+
+export class AssessmentOperationalHoldError extends Error {
+  readonly code = 'ASSESSMENT_OPERATIONALLY_PAUSED'
+
+  constructor(readonly hold: OperationalHoldV1) {
+    super(hold.note ?? `Assessment is temporarily paused (${hold.reasonCode})`)
+    this.name = 'AssessmentOperationalHoldError'
+  }
+}
+
+export const assertAssessmentOperationallyActive = (
+  identity: AssessmentOperationalIdentityV1,
+): void => {
+  const hold = getAssessmentOperationalHold(identity)
+  if (hold) throw new AssessmentOperationalHoldError(hold)
+}
