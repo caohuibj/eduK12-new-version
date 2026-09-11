@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
 import { scaleImageController } from '../controllers/scaleImageController'
+import { scaleQualificationController } from '../controllers/scaleQualificationController'
 import { scaleVideoController } from '../controllers/scaleVideoController'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
@@ -65,13 +66,13 @@ router.put('/:id', authenticate, requireTeacher, scaleController.update)
 
 // v2 聚合 definition 管理
 router.put('/:id/definition', authenticate, requireTeacher, scaleController.updateDefinition)
-router.post('/:id/validate', authenticate, requireTeacher, scaleController.validateDefinition)
+router.post('/:id/validate', authenticate, requireTeacher, scaleQualificationController.validateDefinition)
 router.post('/:id/preview', authenticate, requireTeacher, scaleController.previewDefinition)
 
 // 删除量表
 router.delete('/:id', authenticate, requireTeacher, scaleController.delete)
 
-// 发布量表：release gate + durable published media retention in one transaction.
+// 发布量表：product readiness + durable published media retention in one transaction.
 router.post('/:id/publish', authenticate, requireTeacher, scaleImageController.publish)
 
 // 废弃量表
