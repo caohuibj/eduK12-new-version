@@ -39,7 +39,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'wordlist': return { phase: 'learning', payload: { listId: 'wordlist-01', stimulusSetVersion: 'chinese-wordlist-v1.0.0', phase: 'learning', responses: ['学校'], responseDurationMs: 100, interrupted: false } }
     case 'lexicaldecision': return { phase: 'test', payload: { stimulusId: 'zh-real-2-ab-001', stimulusVersion: 'zh-lexical-v1.0.0', lexicality: 'real', wordLength: 2, frequencyBand: 'high', pseudowordGeneratorVersion: 'zh-pseudoword-generator-v1.0.0', response: 'word', rtMs: 300, interrupted: false } }
     case 'emotionrecognition': return { phase: 'test', payload: { stimulusId: 'emotion-identity-01-happy', stimulusVersion: 'emotion-faces-ai-zh-v1.0.0', responseEmotion: 'happy', rtMs: 300, interrupted: false } }
-    default: throw new Error(`No draft smoke payload for ${testType}`)
+    default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }
 
@@ -49,12 +49,12 @@ const seedFor = (definition: TaskDefinition): typeof COGNITIVE_SEEDS[number] | u
     && seed.scoringVersion === definition.scoringVersion)
 )
 
-describe('Cognitive v2 Draft contract smoke fixtures', () => {
-  const drafts = listCognitiveV2TaskDefinitions().filter((definition) => definition.publication.status === 'DRAFT')
+describe('Cognitive v2 exact-identity contract smoke fixtures', () => {
+  const definitions = listCognitiveV2TaskDefinitions()
 
-  it('covers every current Draft definition with a seeded config and valid envelope payload', () => {
-    expect(drafts).toHaveLength(19)
-    for (const definition of drafts) {
+  it('covers every registered exact identity with a seeded config and valid envelope payload', () => {
+    expect(definitions).toHaveLength(28)
+    for (const definition of definitions) {
       const seed = seedFor(definition)
       expect(seed, `${definition.testType}/${definition.scoringVersion} is missing a seed fixture`).toBeTruthy()
       if (!seed) continue
