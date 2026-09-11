@@ -1,10 +1,10 @@
 import { registerScaleCustomScorer } from './scale-scoring'
 import { SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer } from './packages/sdq-teacher-impact-scorer'
-import { ADEXI_V2_PACKAGE, type ScaleGoldenCase } from './packages/adexi-v2'
-import { WHO5_ZH_CN_V1_PACKAGE } from './packages/who5-zh-cn-v1'
-import { SDQ_PARENT_ZH_CN_V1_PACKAGE } from './packages/sdq-parent-zh-cn-v1'
-import { SDQ_TEACHER_EN_T4_10_V1_PACKAGE } from './packages/sdq-teacher-en-t4-10-v1'
-import { TEXI_PARENT_EN_V1_PACKAGE, TEXI_TEACHER_EN_V1_PACKAGE } from './packages/texi-en-v1'
+import { ADEXI_V2_PACKAGE as ADEXI_V2_PACKAGE_SOURCE, type ScaleGoldenCase } from './packages/adexi-v2'
+import { WHO5_ZH_CN_V1_PACKAGE as WHO5_ZH_CN_V1_PACKAGE_SOURCE } from './packages/who5-zh-cn-v1'
+import { SDQ_PARENT_ZH_CN_V1_PACKAGE as SDQ_PARENT_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sdq-parent-zh-cn-v1'
+import { SDQ_TEACHER_EN_T4_10_V1_PACKAGE as SDQ_TEACHER_EN_T4_10_V1_PACKAGE_SOURCE } from './packages/sdq-teacher-en-t4-10-v1'
+import { TEXI_PARENT_EN_V1_PACKAGE as TEXI_PARENT_EN_V1_PACKAGE_SOURCE, TEXI_TEACHER_EN_V1_PACKAGE as TEXI_TEACHER_EN_V1_PACKAGE_SOURCE } from './packages/texi-en-v1'
 import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue, type ScaleDefinitionV2 } from './scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from './scale-scoring'
 import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
@@ -19,6 +19,24 @@ export interface ScalePackageV2 {
 }
 
 registerScaleCustomScorer(SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer)
+
+/**
+ * Wave-0 package source files predate the converged lifecycle model and some
+ * still carry legacy DRAFT literals. The registry is the authoritative product
+ * catalog, so executable-complete packages are normalized here to PUBLISHED.
+ * Scientific maturity, rights and deployment suitability remain separate.
+ */
+const publishExecutablePackage = (pkg: ScalePackageV2): ScalePackageV2 => ({
+  ...pkg,
+  releaseStatus: 'PUBLISHED',
+})
+
+export const ADEXI_V2_PACKAGE = publishExecutablePackage(ADEXI_V2_PACKAGE_SOURCE)
+export const WHO5_ZH_CN_V1_PACKAGE = publishExecutablePackage(WHO5_ZH_CN_V1_PACKAGE_SOURCE)
+export const SDQ_PARENT_ZH_CN_V1_PACKAGE = publishExecutablePackage(SDQ_PARENT_ZH_CN_V1_PACKAGE_SOURCE)
+export const SDQ_TEACHER_EN_T4_10_V1_PACKAGE = publishExecutablePackage(SDQ_TEACHER_EN_T4_10_V1_PACKAGE_SOURCE)
+export const TEXI_PARENT_EN_V1_PACKAGE = publishExecutablePackage(TEXI_PARENT_EN_V1_PACKAGE_SOURCE)
+export const TEXI_TEACHER_EN_V1_PACKAGE = publishExecutablePackage(TEXI_TEACHER_EN_V1_PACKAGE_SOURCE)
 
 const packages: ScalePackageV2[] = [
   ADEXI_V2_PACKAGE,
@@ -157,13 +175,4 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
     }
   })
   return { valid: issues.every((issue) => issue.severity !== 'error'), definitionHash: hashScaleDefinition(scalePackage.definition), issues }
-}
-
-export {
-  ADEXI_V2_PACKAGE,
-  WHO5_ZH_CN_V1_PACKAGE,
-  SDQ_PARENT_ZH_CN_V1_PACKAGE,
-  SDQ_TEACHER_EN_T4_10_V1_PACKAGE,
-  TEXI_PARENT_EN_V1_PACKAGE,
-  TEXI_TEACHER_EN_V1_PACKAGE,
 }
