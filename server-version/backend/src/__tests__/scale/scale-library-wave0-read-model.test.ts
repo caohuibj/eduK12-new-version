@@ -136,7 +136,7 @@ describe('Wave 0 Scale Library read model', () => {
     expect(directEnglish.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
   })
 
-  it('keeps package, deployment, and authorization gates fail-closed', () => {
+  it('keeps deployment and authorization gates fail-closed for PUBLISHED packages', () => {
     const model = buildScaleLibraryReadModel({
       locale: 'zh-CN',
       territory: 'CN',
@@ -146,7 +146,8 @@ describe('Wave 0 Scale Library read model', () => {
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.availability.status).toBe('RESTRICTED')
     expect(who5.availability.launch).toBeUndefined()
-    expect(who5.availability.reasons.join(' ')).toContain('量表包尚未发布')
+    expect(who5.availability.reasons.join(' ')).toContain('授权未满足')
+    expect(who5.availability.reasons.join(' ')).not.toContain('量表包尚未发布')
     expect(who5.rights.status).toBe('NOT_GRANTED')
 
     const missingDeployment = model.entries.find((entry) => entry.identity.instrumentKey === 'adexi_v1')!

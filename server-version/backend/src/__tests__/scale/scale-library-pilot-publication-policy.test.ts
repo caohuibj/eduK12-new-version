@@ -21,8 +21,8 @@ const emptyScientific = () => {
   })
 }
 
-describe('Pilot-first publication policy (SL2-C3)', () => {
-  it('publishes PUBLISHED + PILOT with a completely empty evidence matrix (§13 core)', () => {
+describe('Scale product publication policy', () => {
+  it('publishes PUBLISHED + PILOT with a completely empty evidence matrix', () => {
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
       rights: ok(),
@@ -32,7 +32,6 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
     })
     expect(decision.publishable).toBe(true)
     const codes = decision.researchGaps.map((gap) => gap.code)
-    // §13 全部非 blocker 项都落入 research gap
     expect(codes).toContain('NO_LOCAL_NORM')
     expect(codes).toContain('NO_VALIDATED_NORM')
     expect(codes).toContain('NO_MEASUREMENT_INVARIANCE')
@@ -44,7 +43,7 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
     expect(decision.limitations.some((line) => line.includes('scientificMaturity=PILOT'))).toBe(true)
   })
 
-  it('never blocks on scientific gaps even at RESEARCH_GRADE (maturity ≠ license, §31 Case D spirit)', () => {
+  it('never blocks Product Release on scientific gaps even at RESEARCH_GRADE', () => {
     const scientific = { ...emptyScientific(), scientificMaturity: 'RESEARCH_GRADE' as const }
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
@@ -70,7 +69,7 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
     expect(decision.errors.some((error) => error.includes('executableCorrectness'))).toBe(true)
   })
 
-  it('blocks on rights failure (§14: rights denied stays fail-closed)', () => {
+  it('keeps rights failure as governance warning without changing Product Release', () => {
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
       rights: failed('who5@1.0.0 requires APPROVED|EVIDENCE_PENDING authorization'),
@@ -78,11 +77,12 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
       respondentMatch: ok(),
       scientific: emptyScientific(),
     })
-    expect(decision.publishable).toBe(false)
-    expect(decision.errors.some((error) => error.includes('rights'))).toBe(true)
+    expect(decision.publishable).toBe(true)
+    expect(decision.errors).toHaveLength(0)
+    expect(decision.warnings.some((warning) => warning.includes('rights/governance'))).toBe(true)
   })
 
-  it('blocks on unusable localization', () => {
+  it('keeps unusable localization as deployment warning', () => {
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
       rights: ok(),
@@ -90,11 +90,12 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
       respondentMatch: ok(),
       scientific: emptyScientific(),
     })
-    expect(decision.publishable).toBe(false)
-    expect(decision.errors.some((error) => error.includes('localization'))).toBe(true)
+    expect(decision.publishable).toBe(true)
+    expect(decision.errors).toHaveLength(0)
+    expect(decision.warnings.some((warning) => warning.includes('localization/deployment'))).toBe(true)
   })
 
-  it('blocks on unsupported respondent (§29)', () => {
+  it('keeps unsupported respondent as deployment warning', () => {
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
       rights: ok(),
@@ -102,8 +103,9 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
       respondentMatch: failed('requested respondent TEACHER not in declared respondentTypes [SELF]'),
       scientific: emptyScientific(),
     })
-    expect(decision.publishable).toBe(false)
-    expect(decision.errors.some((error) => error.includes('respondentMatch'))).toBe(true)
+    expect(decision.publishable).toBe(true)
+    expect(decision.errors).toHaveLength(0)
+    expect(decision.warnings.some((warning) => warning.includes('respondent/deployment'))).toBe(true)
   })
 
   it('derives completeness from catalog manifest and references, removing satisfied gaps', () => {
@@ -115,7 +117,6 @@ describe('Pilot-first publication policy (SL2-C3)', () => {
       deploymentTerritory: 'CN',
     })
     expect(summary.evidenceCount).toBe(2)
-    // fixture 有 CN descriptive applicability（非 normative）→ 仍无 local norm
     expect(summary.hasLocalNorm).toBe(false)
     expect(summary.hasDeviceEquivalence).toBe(false)
     const decision = evaluatePilotPublicationPolicy({

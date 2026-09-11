@@ -1,5 +1,6 @@
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
+import { isAssessmentOperationallyPaused } from '../assessment-governance/operational-hold'
 import {
   asLinearSituationDefinition,
   hashSituationRuntimeDefinition,
@@ -17,9 +18,9 @@ import {
   validateSituationalResponse,
   type SituationalGoldenCase,
 } from './situation-scoring'
-import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
-import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
-import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
+import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE as SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
+import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE as SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-responsibility-golden-zh-cn-v1'
+import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE as SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-anxiety-golden-zh-cn-v1'
 import { SJT_STATIC_VISUAL_E2E_PACKAGE } from './packages/sjt-static-visual-e2e-fixture'
 import { SJT_BRANCHING_E2E_PACKAGE } from './packages/sjt-branching-e2e-fixture'
 import { SJT_VIDEO_E2E_PACKAGE } from './packages/sjt-video-e2e-fixture'
@@ -47,13 +48,27 @@ export interface SituationPackageV2 extends SituationPackageBase {
 
 export type SituationPackage = SituationPackageV1 | SituationPackageV2
 
+const publishExecutablePackage = (pkg: SituationPackageV1): SituationPackageV1 => ({
+  ...pkg,
+  releaseStatus: 'PUBLISHED',
+})
+
+/**
+ * Production V1 packages are executable-complete and therefore PUBLISHED.
+ * Their scientific maturity remains PILOT. CI-only fixtures keep their own
+ * fixture lifecycle and are never normalized into production availability.
+ */
+const productionPackages: SituationPackageV1[] = [
+  publishExecutablePackage(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+  publishExecutablePackage(SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+  publishExecutablePackage(SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+]
+
 // Production content remains V1 until a later content PR deliberately adds a
 // reviewed V2 pilot. CI-only V2 fixtures are isolated behind explicit env flags
 // so normal catalog/service typing does not imply production V2 publication.
 const packages: SituationPackageV1[] = [
-  SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
-  SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
-  SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
+  ...productionPackages,
   ...(process.env.SITUATIONAL_STATIC_VISUAL_FIXTURE === 'true' ? [SJT_STATIC_VISUAL_E2E_PACKAGE] : []),
   ...(process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE === 'true'
     ? [SJT_BRANCHING_E2E_PACKAGE as unknown as SituationPackageV1]
@@ -84,9 +99,10 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
 )
 
 /**
- * Participant runtime admission is controlled only by product release state.
- * Scientific maturity lives in a separate exact-identity governance resolver;
- * all PUBLISHED maturity labels therefore use the same executable package.
+ * New participant admission first resolves the exact product version, then
+ * applies the manual operational hold. Pausing the latest version never falls
+ * back to an older PUBLISHED version. Existing attempts do not call this
+ * selector; they continue from their frozen snapshot.
  */
 export const selectPublishedSituationPackage = <T extends SituationPackage>(
   availablePackages: readonly T[],
@@ -100,7 +116,13 @@ export const selectPublishedSituationPackage = <T extends SituationPackage>(
       && (instrumentVersion === undefined || candidate.instrumentVersion === instrumentVersion)
     ))
     .sort((left, right) => compareSituationalInstrumentVersions(right.instrumentVersion, left.instrumentVersion))
-  return candidates[0]
+  const selected = candidates[0]
+  if (!selected) return undefined
+  return isAssessmentOperationallyPaused({
+    family: 'SITUATIONAL',
+    key: selected.key,
+    version: selected.instrumentVersion,
+  }) ? undefined : selected
 }
 
 /** Compare numeric version segments without treating 1.0.10 as older than 1.0.2. */
@@ -155,9 +177,9 @@ const scoreGoldenCase = (
 }
 
 /**
- * Package-level release gate. V1 and V2 share one package envelope and one
- * scorer. V2 validates complete raw golden responses, derives the authoritative
- * path, then projects only SCORED responses into the existing scorer.
+ * Exact-package executable correctness gate. V1 and V2 share one package
+ * envelope and scorer. Provenance/source/license completeness belongs to
+ * scientific qualification, not product publication.
  */
 export const validateSituationPackage = (situationPackage: SituationPackage): SituationPackageValidation => {
   const identityIssues: DefinitionIssue[] = []
@@ -166,11 +188,25 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
   if (situationPackage.scienceMaturity !== 'PILOT') identityIssues.push({ path: 'scienceMaturity', message: 'legacy package scienceMaturity 必须保持 PILOT；真实成熟度属于 governance metadata', severity: 'error' })
   const validation = validateSituationRuntimeDefinition(situationPackage.definition, {
-    forPublish: true,
-    requireGoldenFixture: true,
-    hasGoldenFixture: situationPackage.goldenCases.length > 0,
+    forPublish: false,
   })
   const issues = [...identityIssues, ...validation.issues]
+
+  // Product presentation contract: non-text stimuli require a textual fallback
+  // so a declared PUBLISHED package never reaches a renderer-only dead end.
+  situationPackage.definition.scenes.forEach((scene, sceneIndex) => {
+    if (scene.stimulus.type !== 'TEXT_V1' && (!scene.stimulus.text || scene.stimulus.text.trim().length === 0)) {
+      issues.push({
+        path: `scenes.${sceneIndex}.stimulus.text`,
+        message: 'IMAGE/COMIC/VIDEO 情境必须保留文字题面以满足产品呈现回退',
+        severity: 'error',
+      })
+    }
+  })
+  if (situationPackage.goldenCases.length === 0) {
+    issues.push({ path: 'goldenCases', message: '情境化测评缺少 golden scoring fixture', severity: 'error' })
+  }
+
   const definition = validation.definition ?? situationPackage.definition
   if (hashSituationRuntimeDefinition(situationPackage.definition) !== hashSituationRuntimeDefinition(definition)) {
     issues.push({ path: 'definitionHash', message: 'definition hash 计算不稳定', severity: 'error' })

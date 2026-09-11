@@ -565,22 +565,29 @@ suite('Situational Bundle PostgreSQL integration', () => {
     expect(await db!.assessmentUnitSnapshot.count({ where: { compositeAttemptId: parentId, slotKey } })).toBe(1)
   }, 30_000)
 
-  it('admits only exact PUBLISHED + PILOT Situational packages before creating a Bundle attempt', async () => {
+  it('admits exact PUBLISHED Situational packages and rejects missing or RETIRED identities before creating a Bundle attempt', async () => {
     const retiredPackage = JSON.parse(JSON.stringify(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE)) as SituationPackageV1
     retiredPackage.key = `sjt-retired-bundle-fixture-${randomUUID()}`
     retiredPackage.releaseStatus = 'RETIRED'
     dynamicPackages.set(`${retiredPackage.key}@${retiredPackage.instrumentVersion}`, retiredPackage)
     try {
-      const cases = [
+      const rejectedCases = [
         { instrumentKey: 'sjt-missing-bundle-fixture', instrumentVersion: '1.0.0' },
-        { instrumentKey: 'sjt-responsibility-golden', instrumentVersion: '1.0.0' },
         { instrumentKey: retiredPackage.key, instrumentVersion: retiredPackage.instrumentVersion },
       ]
-      for (const input of cases) {
+      for (const input of rejectedCases) {
         const fixture = await createCompositeFixture(input)
         await expect(compositeService.startUserAttempt(fixture.userId, fixture.compositeId))
           .rejects.toMatchObject({ statusCode: 400 })
       }
+
+      const publishedFixture = await createCompositeFixture({
+        instrumentKey: 'sjt-responsibility-golden',
+        instrumentVersion: '1.0.0',
+      })
+      const started = await compositeService.startUserAttempt(publishedFixture.userId, publishedFixture.compositeId)
+      createdAttemptIds.push(started.attempt.id)
+      expect(started.attempt.id).toBeTruthy()
     } finally {
       dynamicPackages.delete(`${retiredPackage.key}@${retiredPackage.instrumentVersion}`)
     }

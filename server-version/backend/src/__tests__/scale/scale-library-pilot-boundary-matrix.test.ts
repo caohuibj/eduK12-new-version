@@ -83,8 +83,8 @@ const summaryFor = (overrides?: { maturity?: 'PILOT' | 'RESEARCH_GRADE'; evidenc
 const ok = { ok: true, errors: [] as string[] }
 
 describe('Pilot publication boundary matrix (SL2-C7)', () => {
-  describe('§29 must BLOCK publication', () => {
-    it('blocks an invalid package (tampered definition breaks validation/golden)', () => {
+  describe('Product Release hard boundary', () => {
+    it('blocks an invalid package because executable correctness is broken', () => {
       const tampered = {
         ...who5,
         definition: {
@@ -99,20 +99,24 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
       expect(result.decision.publishable).toBe(false)
       expect(result.decision.errors.some((error) => error.includes('executableCorrectness'))).toBe(true)
     })
+  })
 
-    it('blocks wrong territory, expired authorization and denied electronic administration', () => {
+  describe('governance/deployment diagnostics do not rewrite Product Release', () => {
+    it('keeps wrong territory, expired authorization and denied electronic administration visible as warnings', () => {
       const wrongTerritory = gate({ territory: 'GB' })
-      expect(wrongTerritory.decision.publishable).toBe(false)
+      expect(wrongTerritory.decision.publishable).toBe(true)
+      expect(wrongTerritory.decision.warnings.length).toBeGreaterThan(0)
 
       const expired = gate({ authorizations: [authorization({ validTo: '2026-06-01T00:00:00.000Z' })] })
-      expect(expired.decision.publishable).toBe(false)
+      expect(expired.decision.publishable).toBe(true)
+      expect(expired.decision.warnings.some((warning) => /EXPIRED|validFrom\/validTo/.test(warning))).toBe(true)
 
       const noElectronic = gate({ authorizations: [authorization({ electronicAdministration: false })] })
-      expect(noElectronic.decision.publishable).toBe(false)
-      expect(noElectronic.decision.errors.some((error) => error.includes('electronicAdministration'))).toBe(true)
+      expect(noElectronic.decision.publishable).toBe(true)
+      expect(noElectronic.decision.warnings.some((warning) => warning.includes('electronicAdministration'))).toBe(true)
     })
 
-    it('blocks translation deployment when translation rights are denied (§14)', () => {
+    it('keeps denied translation rights as governance warning for that deployment', () => {
       const result = gate({
         authorizations: [authorization({ translation: false })],
         localizationManifest: localizationManifest({
@@ -121,34 +125,39 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
           adaptationMethod: 'DIRECT_TRANSLATION',
         }),
       })
-      expect(result.decision.publishable).toBe(false)
-      expect(result.decision.errors.some((error) => error.includes('translation required'))).toBe(true)
+      expect(result.decision.publishable).toBe(true)
+      expect(result.decision.warnings.some((warning) => warning.includes('translation required'))).toBe(true)
     })
 
-    it('blocks unusable deployed localization (unsigned/PENDING review) and unsupported respondent', () => {
+    it('keeps unusable localization and respondent mismatch as deployment diagnostics', () => {
       const pendingReview = gate({
         localizationManifest: localizationManifest({ reviewStatus: 'PENDING', reviewedAt: undefined }),
       })
-      expect(pendingReview.decision.publishable).toBe(false)
+      expect(pendingReview.decision.publishable).toBe(true)
+      expect(pendingReview.localizationUsable).toBe(false)
+      expect(pendingReview.decision.warnings.some((warning) => warning.includes('reviewStatus=PENDING'))).toBe(true)
 
       const duplicatedRights = gate({
         localizationManifest: localizationManifest({ translationRightsStatus: 'DENIED' }),
       })
-      expect(duplicatedRights.decision.publishable).toBe(false)
+      expect(duplicatedRights.decision.publishable).toBe(true)
+      expect(duplicatedRights.localizationUsable).toBe(false)
+      expect(duplicatedRights.decision.warnings.some((warning) => warning.includes('translationRightsStatus'))).toBe(true)
 
       const wrongRespondent = gate({ requestedRespondent: 'PARENT' })
-      expect(wrongRespondent.decision.publishable).toBe(false)
+      expect(wrongRespondent.decision.publishable).toBe(true)
+      expect(wrongRespondent.decision.warnings.some((warning) => warning.includes('respondent'))).toBe(true)
     })
   })
 
-  describe('§30 must NOT block PILOT publication', () => {
+  describe('scientific gaps do not block PILOT publication', () => {
     it('publishes with scientificMaturity=PILOT and a completely empty evidence matrix', () => {
       const result = gate()
       expect(result.decision.publishable).toBe(true)
       expect(summaryFor({ maturity: 'PILOT' }).scientificMaturity).toBe('PILOT')
     })
 
-    it('turns every §30 non-blocker into a research gap, never a publication denial', () => {
+    it('turns every scientific non-blocker into a research gap, never a publication denial', () => {
       const decision = evaluatePilotPublicationPolicy({
         executableCorrectness: ok,
         rights: ok,
@@ -163,7 +172,7 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
       }
     })
 
-    it('warns on incomplete local psychometric evidence without blocking (§30)', () => {
+    it('warns on incomplete local psychometric evidence without blocking', () => {
       const result = gate({
         localizationManifest: localizationManifest({ cognitiveDebriefStatus: 'NOT_ESTABLISHED', expertReviewStatus: 'PENDING' }),
       })
@@ -173,7 +182,7 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
     })
   })
 
-  describe('§31 report matrix', () => {
+  describe('report matrix', () => {
     const eligibilityFor = (overrides?: Partial<Parameters<typeof evaluateReportEligibility>[0]>) => evaluateReportEligibility({
       definition: who5.definition,
       references: who5.references,
@@ -272,7 +281,7 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
     })
   })
 
-  describe('research upgrade path preserved without touching runtime (Gate B / Q2)', () => {
+  describe('research upgrade path preserved without touching runtime', () => {
     it('adding evidence to the catalog keeps the manifest valid and the definition hash untouched', () => {
       const before = parseScaleCatalogManifest(validCatalogManifestBase())
       if (!before.ok) throw new Error('fixture should parse')
@@ -297,12 +306,10 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
         ],
       }
       const after = parseScaleCatalogManifest(withMoreEvidence)
-      // Evidence 可新增（升级入口保留），且 manifest 仍合法
       expect(after.ok).toBe(true)
       if (after.ok) {
         expect(after.manifest.evidence.length).toBe(before.manifest.evidence.length + 1)
       }
-      // definition 完全未被 catalog 变化触碰（hash 不变）
       expect(hashScaleDefinition(who5.definition)).toBe(hashBefore)
     })
   })

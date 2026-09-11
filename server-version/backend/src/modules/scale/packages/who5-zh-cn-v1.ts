@@ -164,7 +164,7 @@ export const WHO5_ZH_CN_V1_GOLDEN_CASES: ScaleGoldenCase[] = [
 export const WHO5_ZH_CN_V1_PACKAGE = {
   key: 'who5',
   instrumentVersion: '1.0.0',
-  releaseStatus: 'DRAFT' as const,
+  releaseStatus: 'PUBLISHED' as const,
   definition: WHO5_ZH_CN_V1_DEFINITION,
   references: [],
   goldenCases: WHO5_ZH_CN_V1_GOLDEN_CASES,

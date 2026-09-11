@@ -156,14 +156,16 @@ describe('catalog single-source-of-truth boundaries', () => {
     }
   })
 
-  it('library never imports publication/reference truth; only dual-contracts may read v2 definitions read-only', () => {
-    const source = readLibrarySource()
-    expect(source).not.toMatch(/from\s+['"].*publication-gate/)
-    expect(source).not.toMatch(/from\s+['"].*cognitive\/reference/)
-    expect(source).not.toMatch(/from\s+['"].*reference-protocol/)
-    expect(source).not.toMatch(/from\s+['"].*reference-adapter/)
-    expect(source).not.toContain('LITERATURE_DESCRIPTIVE')
-    expect(source).not.toContain('SOURCE_REVIEWED')
+  it('keeps catalog/projection modules isolated while allowing the explicit Product Readiness adapter to validate v2 executability', () => {
+    const catalogProjectionSource = ['catalog.ts', 'catalog-contract.ts', 'audience-projection.ts', 'dual-contracts.ts']
+      .map((file) => fs.readFileSync(path.join(LIBRARY_DIR, file), 'utf8'))
+      .join('\n')
+    expect(catalogProjectionSource).not.toMatch(/from\s+['"].*publication-gate/)
+    expect(catalogProjectionSource).not.toMatch(/from\s+['"].*cognitive\/reference/)
+    expect(catalogProjectionSource).not.toMatch(/from\s+['"].*reference-protocol/)
+    expect(catalogProjectionSource).not.toMatch(/from\s+['"].*reference-adapter/)
+    expect(catalogProjectionSource).not.toContain('LITERATURE_DESCRIPTIVE')
+    expect(catalogProjectionSource).not.toContain('SOURCE_REVIEWED')
     // Review Fix 2：只有 dual-contracts 的派生路径允许 read-only 消费 v2 TaskDefinition；
     // catalog 与 audience projection 不得建立第二份 publication/reference 真值。
     for (const file of ['catalog.ts', 'catalog-contract.ts', 'audience-projection.ts']) {
@@ -172,6 +174,8 @@ describe('catalog single-source-of-truth boundaries', () => {
     }
     const dual = fs.readFileSync(path.join(LIBRARY_DIR, 'dual-contracts.ts'), 'utf8')
     expect(dual).toMatch(/getCognitiveV2TaskDefinition/)
+    const readiness = fs.readFileSync(path.join(LIBRARY_DIR, 'product-readiness.ts'), 'utf8')
+    expect(readiness).toMatch(/validateTaskDefinition/)
   })
 
   it('catalog metadata is not imported by any runtime/scorer/hash path (hash stability by construction)', () => {

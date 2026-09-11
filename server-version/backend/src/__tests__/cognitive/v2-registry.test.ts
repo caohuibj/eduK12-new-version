@@ -50,20 +50,34 @@ describe('Cognitive v2 registry adapter', () => {
     expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
   })
 
-  it('uses explicit fail-closed eligibility for the 28-identity audit', () => {
+  it('separates product lifecycle from recommendation and reference eligibility', () => {
     const definitions = listCognitiveV2TaskDefinitions()
+    const entries = listCognitiveRegistryEntries()
     const published = definitions.filter((definition) => definition.publication.status === 'PUBLISHED')
-    const eligible = published.flatMap((definition) => Object.values(definition.metrics).filter((metric) => metric.referenceEligible))
+    const drafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
+    const retired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
 
-    expect(published).toHaveLength(9)
-    expect(eligible).toHaveLength(15)
-    expect(definitions.filter((definition) => definition.publication.status === 'DRAFT')
-      .every((definition) => Object.values(definition.metrics).every((metric) => metric.referenceEligible === false))).toBe(true)
+    expect(published).toHaveLength(24)
+    expect(drafts.map((definition) => definition.testType)).toEqual(['fake'])
+    expect(retired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
+      'memory/1.0.0/1.0.0',
+      'reaction/1.0.0/1.0.0',
+      'stroop/1.0.0/1.0.0',
+    ])
+
+    const expectedEligible = entries.reduce((count, entry) => (
+      count + (Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys.length : 0)
+    ), 0)
+    const actualEligible = definitions.reduce((count, definition) => (
+      count + Object.values(definition.metrics).filter((metric) => metric.referenceEligible).length
+    ), 0)
+    expect(actualEligible).toBe(expectedEligible)
+
     expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics.dPrimeByN.referenceEligible).toBe(false)
     expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics.maxReliableN.referenceEligible).toBe(false)
 
     const audit = auditCognitiveV2Registry(definitions)
-    expect(audit).toMatchObject({ status: 'PASS', registryCount: 28, publishedCount: 9, draftCount: 19, retiredCount: 0 })
+    expect(audit).toMatchObject({ status: 'PASS', registryCount: 28, publishedCount: 24, draftCount: 1, retiredCount: 3 })
     expect(audit.entries).toHaveLength(28)
   })
 

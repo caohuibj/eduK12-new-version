@@ -2,11 +2,8 @@ import type { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { error, forbidden, notFound, success } from '../utils/response'
-import {
-  hashScaleDefinition,
-  validateScaleDefinition,
-} from '../modules/scale/scale-definition'
-import { getScaleCustomScorerKeys } from '../modules/scale/scale-scoring'
+import { hashScaleDefinition } from '../modules/scale/scale-definition'
+import { validateScaleProductDefinition } from '../modules/scale/product-definition-readiness'
 import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import {
   publishedScaleMediaOwner,
@@ -35,13 +32,9 @@ export const scaleImageController = {
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布')
 
-      const validation = validateScaleDefinition(scale.definition, {
-        instrumentClass: 'CUSTOM_DESCRIPTIVE',
-        forPublish: true,
-        scorerKeys: getScaleCustomScorerKeys(),
-      })
+      const validation = validateScaleProductDefinition(scale.definition, 'CUSTOM_DESCRIPTIVE')
       const definition = validation.definition
-      if (!definition || validation.issues.some((issue) => issue.severity === 'error')) {
+      if (!definition || !validation.valid) {
         return error(res, definitionIssuesMessage(validation.issues))
       }
       const definitionHash = hashScaleDefinition(definition)

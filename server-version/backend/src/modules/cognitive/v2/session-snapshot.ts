@@ -4,6 +4,7 @@ import type { ProtocolDefinition, SessionConfigSnapshot, TaskDefinition } from '
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from '../../assessment-runtime/canonical'
 import type { CompiledInstrumentRuntimeV1, JsonObject, ReferenceBindingSnapshot } from '../../assessment-runtime/types'
 import { parseCompiledInstrumentRuntime } from '../../assessment-runtime/compiler'
+import { getAssessmentOperationalHold } from '../../assessment-governance/operational-hold'
 import {
   CognitiveFinalSubmissionConfigError,
   resolveCognitiveFinalMaxTrials,
@@ -83,6 +84,19 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   }
   frozenAt?: Date
 }): SessionConfigSnapshot<TConfig> => {
+  // Start/freeze boundary only. Existing snapshots are parsed below without
+  // consulting current operational state, so a later pause cannot invalidate
+  // an already-started attempt or add work to FINAL/save hot paths.
+  const hold = getAssessmentOperationalHold({
+    family: 'COGNITIVE',
+    key: input.definition.testType,
+    version: input.definition.engineVersion,
+    scoringVersion: input.definition.scoringVersion,
+  })
+  if (hold) {
+    throw BAD_REQUEST(hold.note ?? `该认知测评当前暂停新的作答（${hold.reasonCode}）`)
+  }
+
   const validatedConfig = input.definition.configSchema.parse(input.config)
   try {
     resolveCognitiveFinalMaxTrials(input.definition, validatedConfig)

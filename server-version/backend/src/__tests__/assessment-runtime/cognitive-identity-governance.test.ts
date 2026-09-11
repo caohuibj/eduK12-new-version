@@ -2,6 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { compileCognitiveRuntime, parseCompiledInstrumentRuntime } from '../../modules/assessment-runtime/compiler'
 import { getCognitiveV2TaskDefinition, listCognitiveV2TaskDefinitions } from '../../modules/cognitive/v2/registry'
 
+const OLD_MAIN_PUBLISHED_IDENTITIES = new Set([
+  'reaction/1.0.0/1.1.0',
+  'memory/1.0.0/1.1.0',
+  'stroop/1.0.0/1.1.0',
+  'gonogo/1.0.0/1.0.0',
+  'cpt/1.0.0/1.0.0',
+  'nback/1.0.0/1.0.0',
+  'corsi/1.0.0/1.0.0',
+  'sst/1.0.0/1.0.0',
+  'taskswitch/1.0.0/1.0.0',
+])
+
 const oldMainEligibility = (definition: ReturnType<typeof getCognitiveV2TaskDefinition>) => {
   if (!definition) throw new Error('Cognitive definition is missing')
   return {
@@ -21,9 +33,11 @@ const oldMainEligibility = (definition: ReturnType<typeof getCognitiveV2TaskDefi
 }
 
 describe('Cognitive compiled identity governance audit', () => {
-  it('measures old-main versus current hashes for all nine PUBLISHED identities', () => {
-    const published = listCognitiveV2TaskDefinitions().filter((definition) => definition.publication.status === 'PUBLISHED')
-    const rows = published.map((definition) => {
+  it('measures old-main versus current hashes for the nine identities Published on that baseline', () => {
+    const baselineDefinitions = listCognitiveV2TaskDefinitions().filter((definition) => (
+      OLD_MAIN_PUBLISHED_IDENTITIES.has(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)
+    ))
+    const rows = baselineDefinitions.map((definition) => {
       const oldRuntime = compileCognitiveRuntime({ definition: oldMainEligibility(definition) })
       const newRuntime = compileCognitiveRuntime({ definition })
       return {
