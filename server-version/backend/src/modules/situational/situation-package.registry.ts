@@ -17,6 +17,10 @@ import {
   validateSituationalResponse,
   type SituationalGoldenCase,
 } from './situation-scoring'
+import {
+  isScientificMaturity,
+  type ScientificMaturity,
+} from '../assessment-governance/scientific-maturity'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
@@ -28,7 +32,7 @@ interface SituationPackageBase {
   key: string
   instrumentVersion: string
   releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
-  scienceMaturity: 'PILOT' | 'RESEARCH_GRADE'
+  scienceMaturity: ScientificMaturity
   goldenCases: SituationalGoldenCase[]
 }
 
@@ -79,11 +83,11 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
 )
 
 /**
- * Participant runtime admission is release-state aware. Development packages
- * remain in the registry for validation and CI, but only PUBLISHED pilot
- * packages may be selected for a student-facing attempt. The implementation
- * depends only on the common package envelope, so a test/future V2 package can
- * use the exact same admission semantics without a second registry.
+ * Participant runtime admission is controlled only by product release state.
+ * Scientific maturity is governance metadata: PUBLISHED PILOT,
+ * RESEARCH_READY and future RESEARCH_GRADE packages all use the same runtime.
+ * Development packages remain in the registry for validation and CI but cannot
+ * be selected for a participant-facing attempt.
  */
 export const selectPublishedSituationPackage = <T extends SituationPackage>(
   availablePackages: readonly T[],
@@ -94,7 +98,6 @@ export const selectPublishedSituationPackage = <T extends SituationPackage>(
     .filter((candidate) => (
       candidate.key === key
       && candidate.releaseStatus === 'PUBLISHED'
-      && candidate.scienceMaturity === 'PILOT'
       && (instrumentVersion === undefined || candidate.instrumentVersion === instrumentVersion)
     ))
     .sort((left, right) => compareSituationalInstrumentVersions(right.instrumentVersion, left.instrumentVersion))
@@ -162,7 +165,7 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   if (!situationPackage.key.trim()) identityIssues.push({ path: 'key', message: 'package key 不能为空', severity: 'error' })
   if (!situationPackage.instrumentVersion.trim()) identityIssues.push({ path: 'instrumentVersion', message: 'package instrumentVersion 不能为空', severity: 'error' })
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
-  if (!['PILOT', 'RESEARCH_GRADE'].includes(situationPackage.scienceMaturity)) identityIssues.push({ path: 'scienceMaturity', message: 'package scienceMaturity 不合法', severity: 'error' })
+  if (!isScientificMaturity(situationPackage.scienceMaturity)) identityIssues.push({ path: 'scienceMaturity', message: 'package scienceMaturity 不合法', severity: 'error' })
   const validation = validateSituationRuntimeDefinition(situationPackage.definition, {
     forPublish: true,
     requireGoldenFixture: true,
