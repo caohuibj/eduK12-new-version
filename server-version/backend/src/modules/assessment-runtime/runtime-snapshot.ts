@@ -1,4 +1,5 @@
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
+import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
 import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
 import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
@@ -114,6 +115,15 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     frozenAt?: Date
   },
 ): Promise<FrozenScaleRuntimeSnapshotV1> => {
+  // Manual operational pause is checked before any reference-binding DB read.
+  // Parsing an existing frozen snapshot never consults current operational
+  // state, so already-started attempts remain completable.
+  assertAssessmentOperationallyActive({
+    family: 'SCALE',
+    key: input.instrumentKey,
+    version: input.instrumentVersion,
+  })
+
   const definition = scaleDefinitionSchema.parse(input.definition)
   const compiledRuntime = compileScaleRuntime({
     instrumentKey: input.instrumentKey,
