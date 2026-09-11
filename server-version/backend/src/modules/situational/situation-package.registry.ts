@@ -155,9 +155,9 @@ const scoreGoldenCase = (
 }
 
 /**
- * Package-level release gate. V1 and V2 share one package envelope and one
- * scorer. V2 validates complete raw golden responses, derives the authoritative
- * path, then projects only SCORED responses into the existing scorer.
+ * Exact-package executable correctness gate. V1 and V2 share one package
+ * envelope and scorer. Provenance/source/license completeness belongs to
+ * scientific qualification, not product publication.
  */
 export const validateSituationPackage = (situationPackage: SituationPackage): SituationPackageValidation => {
   const identityIssues: DefinitionIssue[] = []
@@ -166,11 +166,25 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
   if (situationPackage.scienceMaturity !== 'PILOT') identityIssues.push({ path: 'scienceMaturity', message: 'legacy package scienceMaturity 必须保持 PILOT；真实成熟度属于 governance metadata', severity: 'error' })
   const validation = validateSituationRuntimeDefinition(situationPackage.definition, {
-    forPublish: true,
-    requireGoldenFixture: true,
-    hasGoldenFixture: situationPackage.goldenCases.length > 0,
+    forPublish: false,
   })
   const issues = [...identityIssues, ...validation.issues]
+
+  // Product presentation contract: non-text stimuli require a textual fallback
+  // so a declared PUBLISHED package never reaches a renderer-only dead end.
+  situationPackage.definition.scenes.forEach((scene, sceneIndex) => {
+    if (scene.stimulus.type !== 'TEXT_V1' && (!scene.stimulus.text || scene.stimulus.text.trim().length === 0)) {
+      issues.push({
+        path: `scenes.${sceneIndex}.stimulus.text`,
+        message: 'IMAGE/COMIC/VIDEO 情境必须保留文字题面以满足产品呈现回退',
+        severity: 'error',
+      })
+    }
+  })
+  if (situationPackage.goldenCases.length === 0) {
+    issues.push({ path: 'goldenCases', message: '情境化测评缺少 golden scoring fixture', severity: 'error' })
+  }
+
   const definition = validation.definition ?? situationPackage.definition
   if (hashSituationRuntimeDefinition(situationPackage.definition) !== hashSituationRuntimeDefinition(definition)) {
     issues.push({ path: 'definitionHash', message: 'definition hash 计算不稳定', severity: 'error' })
