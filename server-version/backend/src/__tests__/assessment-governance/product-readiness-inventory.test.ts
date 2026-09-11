@@ -36,8 +36,10 @@ describe('assessment product readiness inventory', () => {
     }
   })
 
-  it('keeps Cognitive release status aligned with backend + exact frontend readiness', () => {
-    const definitions = listCognitiveV2TaskDefinitions().filter((definition) => definition.publication.status !== 'RETIRED')
+  it('keeps Cognitive product release aligned with backend + exact frontend readiness', () => {
+    const definitions = listCognitiveV2TaskDefinitions().filter((definition) => (
+      definition.testType !== 'fake' && definition.publication.status !== 'RETIRED'
+    ))
     expect(definitions.length).toBeGreaterThan(0)
     for (const definition of definitions) {
       const identity = `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
