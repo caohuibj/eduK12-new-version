@@ -17,10 +17,6 @@ import {
   validateSituationalResponse,
   type SituationalGoldenCase,
 } from './situation-scoring'
-import {
-  isScientificMaturity,
-  type ScientificMaturity,
-} from '../assessment-governance/scientific-maturity'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
 import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
@@ -32,7 +28,12 @@ interface SituationPackageBase {
   key: string
   instrumentVersion: string
   releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
-  scienceMaturity: ScientificMaturity
+  /**
+   * Legacy compatibility marker only. Scientific maturity is now governed by
+   * resolveSituationalScientificMaturity(exact identity), so promotion does
+   * not alter the executable package or become a runtime capability switch.
+   */
+  scienceMaturity: 'PILOT'
   goldenCases: SituationalGoldenCase[]
 }
 
@@ -84,10 +85,8 @@ export const hasSituationPackage = (key: string, instrumentVersion: string): boo
 
 /**
  * Participant runtime admission is controlled only by product release state.
- * Scientific maturity is governance metadata: PUBLISHED PILOT,
- * RESEARCH_READY and future RESEARCH_GRADE packages all use the same runtime.
- * Development packages remain in the registry for validation and CI but cannot
- * be selected for a participant-facing attempt.
+ * Scientific maturity lives in a separate exact-identity governance resolver;
+ * all PUBLISHED maturity labels therefore use the same executable package.
  */
 export const selectPublishedSituationPackage = <T extends SituationPackage>(
   availablePackages: readonly T[],
@@ -165,7 +164,7 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   if (!situationPackage.key.trim()) identityIssues.push({ path: 'key', message: 'package key 不能为空', severity: 'error' })
   if (!situationPackage.instrumentVersion.trim()) identityIssues.push({ path: 'instrumentVersion', message: 'package instrumentVersion 不能为空', severity: 'error' })
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
-  if (!isScientificMaturity(situationPackage.scienceMaturity)) identityIssues.push({ path: 'scienceMaturity', message: 'package scienceMaturity 不合法', severity: 'error' })
+  if (situationPackage.scienceMaturity !== 'PILOT') identityIssues.push({ path: 'scienceMaturity', message: 'legacy package scienceMaturity 必须保持 PILOT；真实成熟度属于 governance metadata', severity: 'error' })
   const validation = validateSituationRuntimeDefinition(situationPackage.definition, {
     forPublish: true,
     requireGoldenFixture: true,
