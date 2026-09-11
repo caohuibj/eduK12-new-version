@@ -19,10 +19,14 @@ describe('assessment qualification governance boundaries', () => {
     const files = [
       'assessment-governance/product-readiness.ts',
       'assessment-governance/scientific-qualification.ts',
+      'assessment-governance/scientific-evidence.ts',
       'assessment-governance/operational-hold.ts',
       'scale/library/product-readiness.ts',
+      'scale/library/scientific-qualification.ts',
       'cognitive/library/product-readiness.ts',
+      'cognitive/library/scientific-qualification.ts',
       'situational/product-readiness.ts',
+      'situational/scientific-qualification.ts',
     ]
     for (const file of files) {
       const source = readModule(file)
@@ -32,7 +36,7 @@ describe('assessment qualification governance boundaries', () => {
 
   it('keeps qualification and operational-hold evaluators out of save/scorer/FINAL hot paths', () => {
     const hotPathName = /(final|submit|scor|save|attempt-runtime)/iu
-    const forbiddenImport = /assessment-governance\/(?:scientific-qualification|product-readiness|operational-hold)|library\/product-readiness|situational\/product-readiness/u
+    const forbiddenImport = /assessment-governance\/(?:scientific-qualification|scientific-evidence|product-readiness|operational-hold)|library\/(?:product-readiness|scientific-qualification)|situational\/(?:product-readiness|scientific-qualification)/u
     const hotPaths = walkTs(MODULE_ROOT).filter((file) => hotPathName.test(file))
     expect(hotPaths.length).toBeGreaterThan(0)
     for (const file of hotPaths) {
