@@ -1,19 +1,13 @@
 /**
- * Pilot-first Publication Gate（SL2-C6）——组合既有事实源的通用出版门。
+ * Scale governance composition for Pilot-era catalog data.
  *
- * 职责分层（§25）：
- *   Rights hard gate                ← evaluateDurableInstrumentRights（复用）
- *   Localization hard gate          ← LocalizationManifestV1 + content locale（复用）
- *   Product correctness hard gate   ← validateScalePackage（复用）
- *   Scientific completeness         ← soft layer，永不阻塞（pilot-publication-policy）
+ * `decision.publishable` now means Product Readiness only: the exact package is
+ * executable in the current Huisurvey workflow. Rights, localization,
+ * respondent/deployment fit and scientific completeness remain visible as
+ * diagnostics, but they do not turn an executable package back into DRAFT.
  *
- * 不重写 WHO-5 / SDQ / TEXI 既有 gate（§27）：它们的 instrument-specific 约束
- * （如 WHO-5 non-commercial）继续由原 gate 承担；本模块面向新 instrument 的
- * 通用发布流程，只组合共享原语。
- *
- * fail-closed 项：package 校验失败、authorization 缺失/过期/拒绝、content locale
- * 不匹配、本地化 provenance 缺失/不可用（reviewStatus=PENDING、身份或部署 locale
- * 不匹配）、requested respondent 不在 catalog 声明范围内。
+ * This evaluator is admin/catalog-side only. It performs no DB queries and is
+ * never consulted by participant save/FINAL paths.
  */
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
 import { assertContentLocaleCompatible } from '../content-locale'
@@ -33,9 +27,7 @@ import { parseScaleCatalogManifest, type RespondentType } from './catalog-manife
 
 export interface PilotFirstPublicationGateInput {
   pkg: ScalePackageV2
-  /** catalog manifest 以 unknown 传入、gate 内部解析——无效 manifest fail-closed。 */
   manifest: unknown
-  /** 通用 LocalizationManifestV1（§12.C：发布必须携带本地化 provenance）。 */
   localizationManifest?: unknown
   authorizations: InstrumentAuthorizationRecordV1[]
   locale: string
@@ -49,31 +41,32 @@ export interface PilotFirstPublicationGateResult {
   instrumentVersion: string
   decision: PilotPublicationDecision
   reportEligibility: ReportEligibilityDecision
+  /** Deployment diagnostic only; not Product Release. */
   localizationUsable: boolean
 }
 
 export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGateInput): PilotFirstPublicationGateResult => {
-  const errors: string[] = []
-  const warnings: string[] = []
+  const gateWarnings: string[] = []
 
-  // 1) Product correctness hard gate（复用 package 级校验，含 golden cases）
+  // 1) The only Product Release hard gate in this composition.
   const packageValidation = validateScalePackage(input.pkg)
   const packageErrors = packageValidation.issues
     .filter((issue) => issue.severity === 'error')
     .map((issue) => `${issue.path}: ${issue.message}`)
 
-  // 2) Catalog manifest 解析（fail-closed）
+  // 2) Catalog is scientific/discovery governance. Invalid metadata degrades
+  // admin/report eligibility but does not make an executable package DRAFT.
   const manifestParse = parseScaleCatalogManifest(input.manifest)
   if (!manifestParse.ok) {
-    errors.push(manifestParse.issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+    gateWarnings.push(`[catalog/governance] ${manifestParse.issues.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
   }
 
-  // 3) Localization hard gate（通用 manifest；原专用 gate 不受影响）
+  // 3) Localization is retained as a deployment diagnostic.
   let localizationUsable = false
   const localizationErrors: string[] = []
   let localization: { sourceLocale: string; targetLocale: string } | null = null
   if (input.localizationManifest === undefined) {
-    localizationErrors.push('localization provenance missing：发布必须携带 LocalizationManifestV1')
+    localizationErrors.push('localization provenance missing：尚无 LocalizationManifestV1')
   } else {
     const parsed = parseLocalizationManifest(input.localizationManifest)
     if (!parsed.ok) {
@@ -90,18 +83,19 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         localizationErrors.push(`localization targetLocale=${parsed.manifest.targetLocale} 与部署 locale=${input.locale} 不一致`)
       }
       if (parsed.manifest.reviewStatus !== 'APPROVED') {
-        localizationErrors.push('localization manifest reviewStatus=PENDING：治理审核未完成，不得发布')
+        localizationErrors.push('localization manifest reviewStatus=PENDING：治理审核未完成')
       }
       if (parsed.manifest.expertReviewStatus !== 'COMPLETED') {
-        warnings.push(`localization expertReviewStatus=${parsed.manifest.expertReviewStatus}：PILOT 允许，作为 research gap 记录`)
+        gateWarnings.push(`localization expertReviewStatus=${parsed.manifest.expertReviewStatus}：scientific/deployment gap`)
       }
       if (parsed.manifest.cognitiveDebriefStatus !== 'COMPLETED') {
-        warnings.push(`localization cognitiveDebriefStatus=${parsed.manifest.cognitiveDebriefStatus}：PILOT 允许，作为 research gap 记录`)
+        gateWarnings.push(`localization cognitiveDebriefStatus=${parsed.manifest.cognitiveDebriefStatus}：scientific/deployment gap`)
       }
     }
   }
 
-  // 4) Rights hard gate（复用 durable rights evaluator；原文部署不要求 translation 权利）
+  // 4) Rights are governance/operational facts. They may motivate a manual
+  // operational pause, but do not redefine DRAFT/PUBLISHED.
   const needsTranslation = localization !== null && localization.sourceLocale !== localization.targetLocale
   const rights = evaluateDurableInstrumentRights({
     instrumentKey: input.pkg.key,
@@ -115,10 +109,9 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     requireDisplay: true,
     requireTranslation: needsTranslation,
   })
-  // EVIDENCE_PENDING 等 rights 级 warn-only 语义必须透传到上层（不丢失、不阻塞）
-  warnings.push(...rights.warnings)
+  gateWarnings.push(...rights.warnings)
 
-  // 5) Content locale（复用既有 contentLocale 纪律）
+  // 5) Content locale remains a deployment-fit diagnostic.
   const localeGate = assertContentLocaleCompatible({
     instrumentKey: input.pkg.key,
     requestedLocale: input.locale,
@@ -128,7 +121,8 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
   }
   localizationUsable = localizationErrors.length === 0 && localeGate.ok
 
-  // 6) Respondent applicability（catalog 声明范围）
+  // 6) Respondent applicability is deployment/claim governance, not whether
+  // the package itself can execute.
   const respondentMatchErrors: string[] = manifestParse.ok
     && !manifestParse.manifest.population.respondentTypes.includes(input.requestedRespondent)
     ? [`requested respondent ${input.requestedRespondent} 不在 catalog 声明范围 [${manifestParse.manifest.population.respondentTypes.join(', ')}]`]
@@ -143,7 +137,7 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
       })
     : null
 
-  const decision: PilotPublicationDecision = manifest && scientific
+  const decision: PilotPublicationDecision = scientific
     ? evaluatePilotPublicationPolicy({
         executableCorrectness: { ok: packageErrors.length === 0, errors: packageErrors },
         rights: { ok: rights.ok, errors: rights.errors },
@@ -152,22 +146,18 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         scientific,
       })
     : {
-        // catalog manifest 无效时的兜底路径：保持各层前缀清晰，直接 fail-closed
-        publishable: false,
-        errors: [
-          ...packageErrors.map((error) => `[executableCorrectness] ${error}`),
-          ...errors.map((error) => `[catalogManifest] ${error}`),
-          ...localizationErrors.map((error) => `[localization] ${error}`),
-          ...rights.errors.map((error) => `[rights] ${error}`),
-          ...localeGate.errors.map((error) => `[localization] ${error}`),
-          ...respondentMatchErrors.map((error) => `[respondentMatch] ${error}`),
+        publishable: packageErrors.length === 0,
+        errors: packageErrors.map((message) => `[executableCorrectness] ${message}`),
+        warnings: [
+          ...rights.errors.map((message) => `[rights/governance] ${message}`),
+          ...localizationErrors.map((message) => `[localization/deployment] ${message}`),
+          ...localeGate.errors.map((message) => `[localization/deployment] ${message}`),
+          ...respondentMatchErrors.map((message) => `[respondent/deployment] ${message}`),
         ],
-        warnings: [],
-        limitations: [],
+        limitations: ['Catalog manifest 无效：scientific qualification / report eligibility 无法建立，但不改变 package Product Readiness。'],
         researchGaps: [],
       }
-  // gate 级 warning（PILOT 本地化研究项）并入 decision
-  decision.warnings.push(...warnings)
+  decision.warnings.push(...gateWarnings)
 
   const reportEligibility = manifest
     ? evaluateReportEligibility({
