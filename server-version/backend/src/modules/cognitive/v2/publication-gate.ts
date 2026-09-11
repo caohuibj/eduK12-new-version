@@ -128,8 +128,16 @@ export const validateTaskDefinition = <TConfig, TTrial>(
       })
     }
   }
-  if (definition.publication.status === 'PUBLISHED' && definition.publication.referenceRequired && definition.references.length === 0) {
-    issues.push(issue('references', 'published task requires at least one reference mapping'))
+
+  // Reference/norm availability is scientific/claim governance, not product
+  // publication. Existing mappings must still be internally valid, but a task
+  // may be PUBLISHED with zero mappings and remain descriptive/non-normative.
+  if (definition.publication.referenceRequired && definition.references.length === 0) {
+    issues.push(issue(
+      'references',
+      'referenceRequired is not a product-publication blocker; scientific qualification/claim eligibility must resolve reference evidence separately',
+      'warning',
+    ))
   }
   if (!definition.report.disclaimer) issues.push(issue('report.disclaimer', 'report disclaimer is required'))
   return issues
