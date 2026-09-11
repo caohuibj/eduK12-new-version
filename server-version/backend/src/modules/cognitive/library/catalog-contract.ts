@@ -11,12 +11,14 @@
  *      reference        → Reference Core（reference.ts / AssessmentReferenceSet）
  *      scoring          → registry config/trial schema + scorer
  *      estimated burden → registry profiles[*].estimatedMinutes
- *  - scientificStatus 与 engineering publication 完全独立（PUBLISHED + PILOT 允许）。
+ *  - scientificStatus 与 engineering publication 完全独立（PUBLISHED + PILOT /
+ *    PUBLISHED + RESEARCH_READY 都允许）。
  *  - 本模块为 build-time 只读元数据：不得被 scorer / submit / runtime / hash 路径 import。
  */
+import type { ScientificMaturity } from '../../assessment-governance/scientific-maturity'
 
 /** 科学成熟度（与 DRAFT/PUBLISHED/RETIRED 工程发布状态完全独立）。 */
-export type CognitiveScientificStatus = 'PILOT' | 'RESEARCH_GRADE'
+export type CognitiveScientificStatus = ScientificMaturity
 
 /**
  * 交互族：按学生实际使用的输入模式划分，供 COG-P2 设备/输入 provenance 审计使用。
@@ -57,9 +59,8 @@ export interface CognitiveLibraryCatalogEntry {
 }
 
 /**
- * scientificStatus 是 **exact task identity scoped**（review Fix 1）：
- * 不绑定 task family。protocol/scorer 发生实质变化的新 engine/scoring 版本
- * 天然回到 PILOT，不会继承旧版本科研资格。
- * 解析入口见 catalog.ts 的 resolveScientificStatus（allowlist 为空 → 全部 PILOT）。
+ * scientificStatus 是 **exact task identity scoped**：不绑定 task family。
+ * protocol/scorer 发生实质变化的新 engine/scoring 版本天然回到 PILOT，
+ * 不会继承旧版本的 RESEARCH_READY / RESEARCH_GRADE 资格。
+ * 解析入口见 catalog.ts 的 resolveScientificStatus（无显式治理记录 → PILOT）。
  */
-
