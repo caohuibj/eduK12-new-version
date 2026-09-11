@@ -20,6 +20,7 @@ import {
   validateSituationPackage,
   type SituationPackageV1,
 } from './situation-package.registry'
+import { resolveSituationalScientificMaturity } from './scientific-maturity'
 import { runnerSituationDefinition, situationalAssetReferences } from './situation-definition'
 import type { SituationalResultV1 } from './situation-scoring'
 import {
@@ -118,7 +119,9 @@ const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
     definition: snapshot.runnerDefinition,
     report: snapshot.definition.report,
     referencePolicy: snapshot.definition.referencePolicy,
-    scienceMaturity: governance?.scienceMaturity ?? 'PILOT' as const,
+    scienceMaturity: governance
+      ? resolveSituationalScientificMaturity(snapshot.instrumentKey, snapshot.instrumentVersion)
+      : 'PILOT' as const,
     runtimeCapabilities: snapshot.compiledRuntime.runtimeCapabilities,
   }
 }
@@ -323,7 +326,10 @@ export const listSituationalInstruments = () => listSituationPackages()
       definition: runnerDefinition,
       report: situationPackage.definition.report,
       referencePolicy: situationPackage.definition.referencePolicy,
-      scienceMaturity: situationPackage.scienceMaturity,
+      scienceMaturity: resolveSituationalScientificMaturity(
+        situationPackage.key,
+        situationPackage.instrumentVersion,
+      ),
       runtimeCapabilities: runtime.runtimeCapabilities,
     }
   })
