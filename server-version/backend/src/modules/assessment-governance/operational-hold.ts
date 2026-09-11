@@ -13,6 +13,8 @@ export interface AssessmentOperationalIdentityV1 {
   family: AssessmentFamily
   key: string
   version: string
+  /** Cognitive exact identity also binds scoringVersion. */
+  scoringVersion?: string
 }
 
 export interface OperationalHoldV1 extends AssessmentOperationalIdentityV1 {
@@ -22,7 +24,7 @@ export interface OperationalHoldV1 extends AssessmentOperationalIdentityV1 {
 }
 
 const identityKey = (identity: AssessmentOperationalIdentityV1): string => (
-  `${identity.family}:${identity.key}@${identity.version}`
+  [identity.family, `${identity.key}@${identity.version}`, identity.scoringVersion ?? ''].join(':')
 )
 
 /** Empty by default. Changes are deliberate code-reviewed operational actions. */
