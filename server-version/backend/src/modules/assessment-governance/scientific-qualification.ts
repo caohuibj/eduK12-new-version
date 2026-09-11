@@ -5,7 +5,7 @@
  * The evaluator consumes already-resolved facts. It performs no I/O and must
  * never become part of save/scorer/FINAL request paths.
  */
-import type { ScientificMaturity } from './scientific-maturity'
+import { SCIENTIFIC_MATURITY_LEVELS, type ScientificMaturity } from './scientific-maturity'
 import type { ProductReadinessDecisionV1 } from './product-readiness'
 
 export interface ScientificQualificationFactsV1 {
@@ -36,6 +36,24 @@ const decision = (blockers: string[]): ScientificQualificationLevelDecisionV1 =>
   eligible: blockers.length === 0,
   blockers,
 })
+
+const scientificMaturityRank = (maturity: ScientificMaturity): number => (
+  SCIENTIFIC_MATURITY_LEVELS.indexOf(maturity)
+)
+
+/**
+ * Governance/admin/CI helper only. A declared scientific claim is valid only
+ * when the evidence evaluator reaches at least the same level. DRAFT content
+ * with the compatibility-default PILOT label is intentionally handled by the
+ * inventory caller rather than being treated as an earned maturity claim here.
+ */
+export const qualificationAllowsScientificMaturity = (
+  declared: ScientificMaturity,
+  qualification: ScientificQualificationDecisionV1,
+): boolean => (
+  qualification.maxEligibleMaturity !== null
+  && scientificMaturityRank(declared) <= scientificMaturityRank(qualification.maxEligibleMaturity)
+)
 
 export const evaluateScientificQualification = (
   facts: ScientificQualificationFactsV1,
