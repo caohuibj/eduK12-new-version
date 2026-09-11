@@ -24,3 +24,29 @@ const SCIENTIFIC_MATURITY_SET = new Set<string>(SCIENTIFIC_MATURITY_LEVELS)
 export const isScientificMaturity = (value: unknown): value is ScientificMaturity => (
   typeof value === 'string' && SCIENTIFIC_MATURITY_SET.has(value)
 )
+
+/**
+ * Lightweight Pilot research backlog. It intentionally records questions and
+ * upgrade evidence targets rather than pretending those answers already exist.
+ * Family-specific catalogs may embed/reference this contract; runtime code must
+ * not depend on it.
+ */
+export interface ResearchPlanV1 {
+  unknowns: string[]
+  validationQuestions: string[]
+  requiredData: string[]
+  plannedAnalyses: string[]
+  upgradeCriteria: string[]
+  knownGaps: string[]
+  evidenceRefs: string[]
+}
+
+export const emptyResearchPlan = (): ResearchPlanV1 => ({
+  unknowns: [],
+  validationQuestions: [],
+  requiredData: [],
+  plannedAnalyses: [],
+  upgradeCriteria: [],
+  knownGaps: [],
+  evidenceRefs: [],
+})
