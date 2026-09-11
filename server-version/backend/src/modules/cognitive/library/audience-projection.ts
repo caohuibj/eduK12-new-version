@@ -2,7 +2,7 @@
  * COG-P1 Commit 5 — Audience Projection Contract.
  *
  * 显示边界（Pilot-first v2 指令 §12）：
- *  - Student/Parent：产品化信息（名称、大致能力、时长、用途、Pilot 属性、简单局限）。
+ *  - Student/Parent：产品化信息（名称、大致能力、时长、用途、简单局限）。
  *  - Teacher：增加 Domain/Facet、主要 metric 标签、reference 状态、解释边界。
  *  - Admin：完整 identity/version、scientificStatus、rights/provenance、备注。
  *  - 科研背景不得原样进入学生/家长视图（类型层面剔除 + 测试断言）。
@@ -18,8 +18,8 @@ import type { CognitiveProfile, RegistryEntry } from '../cognitive.types'
 import {
   requireCatalogForIdentity,
   deriveCatalogDomainSummary,
-  resolveScientificStatus,
 } from './catalog'
+import { resolveCognitiveScientificMaturity } from './scientific-maturity'
 import type { CognitiveCatalogDomainFacetSummary } from './catalog'
 import type { CognitiveScientificStatus, CognitiveInteractionFamily, CognitiveSensitivity } from './catalog-contract'
 
@@ -37,8 +37,7 @@ export interface StudentParentCatalogView {
   plainAbilityHint: string
   /** 来自 registry profiles[profile].estimatedMinutes；未提供 profile 时为 null。 */
   estimatedMinutes: [number, number] | null
-  /** Review Fix 5：学生/家长不暴露 scientific maturity（isPilot/scientificStatus 已删除）；
-   * 未来结果报告中的"试行参考"属于 Reference status，不是工具科研成熟度。 */
+  /** 学生/家长不暴露 scientific maturity；成熟度不改变作答功能或体验。 */
   simpleLimitations: string[]
 }
 
@@ -59,7 +58,7 @@ export interface AdminCatalogView extends TeacherCatalogView {
     qualityDefinitionVersion: string
     reportDefinitionVersion: string
   }
-  /** Review Fix 1：来自 exact-identity resolver（resolveScientificStatus），非 catalog family 字段。 */
+  /** Exact-identity governance resolver; publication and maturity are independent. */
   scientificStatus: CognitiveScientificStatus
   interactionFamily: CognitiveInteractionFamily
   rtSensitivity: CognitiveSensitivity
@@ -135,7 +134,7 @@ export const projectCatalogForAudience = (
       qualityDefinitionVersion: registry.qualityDefinitionVersion,
       reportDefinitionVersion: registry.reportDefinitionVersion,
     },
-    scientificStatus: resolveScientificStatus(
+    scientificStatus: resolveCognitiveScientificMaturity(
       input.testType,
       input.engineVersion,
       input.scoringVersion,
