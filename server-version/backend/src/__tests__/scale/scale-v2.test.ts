@@ -321,6 +321,7 @@ describe('ScaleDefinitionV2 and generic scorer', () => {
     const sourceDefined = makeDefinition()
     sourceDefined.scoring.defaultMissingPolicy = { type: 'source_defined' }
     sourceDefined.scoring.scores[0].missingPolicy = { type: 'source_defined' }
+    sourceDefined.scoring.scoringVersion = sourceDefined.scoring.scoringVersion
     sourceDefined.scoring.scorerKey = 'scale-v2-test-scorer'
     sourceDefined.scoring.scores[0].range = { min: 0, max: 99 }
     registerScaleCustomScorer('scale-v2-test-scorer', ({ definition, itemScores }) => ({
@@ -453,11 +454,11 @@ describe('ScaleDefinitionV2 and generic scorer', () => {
 })
 
 describe('standard ScalePackageV2 release gate', () => {
-  it('validates ADEXI as a hidden draft package with two canonical dimensions and no total', () => {
+  it('validates ADEXI as a PUBLISHED executable package with two canonical dimensions and no total', () => {
     const gate = validateScalePackage(ADEXI_V2_PACKAGE)
     expect(gate.valid).toBe(true)
     expect(gate.definitionHash).toMatch(/^[a-f0-9]{64}$/)
-    expect(ADEXI_V2_PACKAGE.releaseStatus).toBe('DRAFT')
+    expect(ADEXI_V2_PACKAGE.releaseStatus).toBe('PUBLISHED')
     expect(ADEXI_V2_PACKAGE.definition.scoring.scores.map((score) => score.key)).toEqual(['working_memory', 'inhibition'])
     expect(ADEXI_V2_PACKAGE.definition.scoring.scores.every((score) => score.canonical)).toBe(true)
     expect(ADEXI_V2_PACKAGE.definition.scoring.scores.some((score) => score.type === 'total')).toBe(false)
