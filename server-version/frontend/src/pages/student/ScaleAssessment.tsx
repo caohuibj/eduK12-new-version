@@ -22,6 +22,7 @@ import {
   type DeviceInputProvenanceV1,
 } from '../../modules/scale/device-input-provenance'
 import { elapsedScaleResponseTimeMs, readScaleTimingNow } from '../../modules/scale/response-timing'
+import { ProductPage, ProductPageHeader, ProductStatus, ProductSurface } from '../../components/product/ProductPage'
 
 type ResponseValue = string | number
 
@@ -89,6 +90,7 @@ const ScaleAssessment: React.FC = () => {
   const { scaleId } = useParams<{ scaleId: string }>()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [scale, setScale] = useState<Scale | null>(null)
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -172,9 +174,11 @@ const ScaleAssessment: React.FC = () => {
   useEffect(() => {
     let cancelled = false
     const startAssessment = async () => {
+      setLoadError(null)
       try {
         const response = await apiClient.post<{ assessment: Assessment; scale: Scale & { definitionHash?: string } }>(`/scales/${scaleId}/assessments`)
-        if (cancelled || response.code !== 0 || !response.data) return
+        if (cancelled) return
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '量表测评加载失败')
         const nextAssessment = response.data.assessment
         setAssessment(nextAssessment)
         setScale(response.data.scale)
@@ -246,6 +250,7 @@ const ScaleAssessment: React.FC = () => {
         })
       } catch (err) {
         if (isFinalAttemptConflict(err)) setRequiresRestart(true)
+        if (!cancelled) setLoadError(normalizeApiError(err).message)
         console.error('开始测评失败', err)
       } finally {
         if (!cancelled) setLoading(false)
@@ -253,7 +258,7 @@ const ScaleAssessment: React.FC = () => {
     }
     void startAssessment()
     return () => { cancelled = true }
-  }, [registerScalePersistence, scaleId])
+  }, [navigate, registerScalePersistence, scaleId])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
     if (!scale || !assessment || savingAnswerRef.current || submitting) return
@@ -401,17 +406,84 @@ const ScaleAssessment: React.FC = () => {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">加载中...</div></div>
-  if (!scale || !assessment) return <div className="text-center py-12"><p className="text-gray-500">量表不存在、未发布或尚未安装有效定义</p></div>
+  if (loading) {
+    return (
+      <ProductPage width="assessment">
+        <ProductPageHeader title="量表测评" description="正在准备本次测评与已保存的作答进度。" />
+        <ProductSurface className="flex min-h-64 items-center justify-center p-6 text-sm text-gray-500">
+          正在加载测评…
+        </ProductSurface>
+      </ProductPage>
+    )
+  }
 
-  if (assessment.status === 'COMPLETED') return <div className="text-center py-12"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><p className="text-gray-700 mb-4">量表测评已完成</p><button onClick={() => navigate(`/student/scales/result/${assessment.id}`)} className="btn-primary">查看结果</button></div>
+  if (loadError || !scale || !assessment) {
+    return (
+      <ProductPage width="assessment">
+        <ProductPageHeader title="量表测评" description="当前无法进入这次测评。" />
+        <ProductStatus tone="danger">
+          {loadError || '量表不存在、未发布或尚未安装有效定义'}
+        </ProductStatus>
+        <button
+          type="button"
+          onClick={() => navigate('/student/scales')}
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          返回量表列表
+        </button>
+      </ProductPage>
+    )
+  }
+
+  if (assessment.status === 'COMPLETED') {
+    return (
+      <ProductPage width="assessment">
+        <ProductSurface className="px-6 py-10 text-center">
+          <CheckCircle className="mx-auto mb-4 h-12 w-12 text-emerald-500" />
+          <h1 className="text-xl font-semibold text-gray-950">量表测评已完成</h1>
+          <p className="mt-2 text-sm text-gray-600">服务器已经确认本次测评完成，可以直接查看结果。</p>
+          <button
+            type="button"
+            onClick={() => navigate(`/student/scales/result/${assessment.id}`)}
+            className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            查看结果
+          </button>
+        </ProductSurface>
+      </ProductPage>
+    )
+  }
 
   if (assessment.deliveryMode === 'LEGACY') {
-    return <div className="max-w-xl mx-auto rounded-lg border border-amber-200 bg-amber-50 p-6 text-center"><h1 className="text-xl font-semibold text-amber-900 mb-2">这是旧版进行中的量表</h1><p className="text-sm text-amber-800 mb-5">旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整份提交测评。</p>{completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}<button onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary">{submitting ? '重启中...' : '重启并继续作答'}</button></div>
+    return (
+      <ProductPage width="assessment">
+        <ProductPageHeader title="继续量表测评" description="这是一份旧版进行中的记录，需要先创建新的整份提交测评才能继续作答。" />
+        <ProductStatus tone="warning" className="mb-5">
+          旧版答案仍可读取。重启会保留历史记录，并创建新的测评尝试。
+        </ProductStatus>
+        {completionNotice && <ProductStatus tone="danger" className="mb-5">{completionNotice}</ProductStatus>}
+        <button
+          type="button"
+          onClick={() => void restartLegacyAttempt()}
+          disabled={submitting}
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+        >
+          {submitting ? '重启中…' : '重启并继续作答'}
+        </button>
+      </ProductPage>
+    )
   }
 
   const items = scale.definition.items
-  if (items.length === 0) return <div className="text-center py-12"><p className="text-gray-500">量表题目加载失败</p></div>
+  if (items.length === 0) {
+    return (
+      <ProductPage width="assessment">
+        <ProductPageHeader title={scale.name} description="当前测评没有可展示的题目。" />
+        <ProductStatus tone="danger">量表题目加载失败</ProductStatus>
+      </ProductPage>
+    )
+  }
+
   const currentItem = items[currentIndex]
   const selectedValue = currentItem ? answers[currentItem.itemCode] : undefined
   const answeredCount = Object.keys(answers).length
@@ -420,55 +492,131 @@ const ScaleAssessment: React.FC = () => {
   const videoPresentation = scaleItemVideoPresentation(currentItem)
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-gray-600 mb-2"><span>答题进度</span><span>{answeredCount} / {items.length}</span></div>
-        <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${progress}%` }} /></div>
+    <ProductPage width="assessment">
+      <ProductPageHeader
+        eyebrow="量表测评"
+        title={scale.name}
+        description={scale.instruction || '请按当前实际情况选择最符合你的答案。'}
+      />
+
+      <div className="mb-6" aria-label={`已完成 ${answeredCount} / ${items.length} 题`}>
+        <div className="mb-2 flex items-center justify-between gap-4 text-sm text-gray-600">
+          <span>已完成</span>
+          <span className="font-medium text-gray-900">{answeredCount} / {items.length} 题</span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200" aria-hidden="true">
+          <div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+        </div>
       </div>
-      {completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}
-      {requiresRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地答案已保留。当前量表版本已变化，请重启后继续。</span><button type="button" onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
-      {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
-      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
+
+      {savingAnswer && (
+        <ProductStatus tone="info" className="mb-4">
+          正在保存本题回答…
+        </ProductStatus>
+      )}
+      {completionNotice && <ProductStatus tone="danger" className="mb-4">{completionNotice}</ProductStatus>}
+      {requiresRestart && (
+        <ProductStatus tone="warning" className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span>本地答案已保留。当前量表版本已变化，请重启后继续。</span>
+          <button
+            type="button"
+            onClick={() => void restartLegacyAttempt()}
+            disabled={submitting}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-white px-4 font-medium text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+          >
+            重启并继续
+          </button>
+        </ProductStatus>
+      )}
+
+      <AssessmentImageGate
+        items={imageItems}
+        loadAsset={loadAssessmentImage}
+        disabled={savingAnswer || submitting}
+        ariaLabel={`${currentItem.content} 视觉内容`}
+      >
         <ScaleFormVideoGate
           presentation={videoPresentation}
           loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
           ariaLabel={`${currentItem.content} 视频内容`}
         >
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <div className="text-sm text-gray-500 mb-2">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
-            <h2 className="text-lg font-medium text-gray-900 mb-6">{currentItem.content}</h2>
+          <ProductSurface className="mb-5 p-5 sm:p-6">
+            <div className="mb-2 text-sm font-medium text-gray-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
+            <h2 className="mb-6 text-lg font-semibold leading-7 text-gray-950">{currentItem.content}</h2>
             <div className="space-y-3">
-              {currentItem.options.map((option) => (
-                <button
-                  key={valueKey(option.value)}
-                  onClick={() => void handleSelectAnswer(option.value)}
-                  disabled={savingAnswer || submitting}
-                  className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
-                >
-                  {option.label}
-                </button>
-              ))}
+              {currentItem.options.map((option) => {
+                const selected = selectedValue === option.value
+                return (
+                  <button
+                    key={valueKey(option.value)}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => void handleSelectAnswer(option.value)}
+                    disabled={savingAnswer || submitting}
+                    className={`min-h-11 w-full rounded-xl border px-4 py-3 text-left text-sm leading-6 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${selected ? 'border-primary bg-primary/5 font-medium text-primary' : 'border-gray-300 bg-white text-gray-800 hover:border-gray-400 hover:bg-gray-50'}`}
+                  >
+                    {option.label}
+                  </button>
+                )
+              })}
             </div>
-          </div>
-          <div className="flex justify-between">
-            <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
+          </ProductSurface>
+
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="button"
+              onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
+              disabled={currentIndex === 0 || savingAnswer || submitting}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+            >
+              <ChevronLeft className="mr-1 h-5 w-5" />上一题
+            </button>
             {currentIndex === items.length - 1 ? (
-              <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : '完成测评'}</button>
+              <button
+                type="button"
+                onClick={() => void handleComplete()}
+                disabled={submitting || savingAnswer || requiresRestart}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-50"
+              >
+                <CheckCircle className="mr-1.5 h-5 w-5" />{submitting ? '提交中…' : '完成测评'}
+              </button>
             ) : (
-              <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
+              <button
+                type="button"
+                onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))}
+                disabled={savingAnswer || submitting}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+              >
+                下一题<ChevronRight className="ml-1 h-5 w-5" />
+              </button>
             )}
           </div>
         </ScaleFormVideoGate>
       </AssessmentImageGate>
-      <div className="mt-6 bg-white rounded-lg shadow p-4">
-        <div className="text-sm text-gray-600 mb-3">题目导航</div>
+
+      <ProductSurface className="mt-6 p-4 sm:p-5">
+        <div className="mb-3 text-sm font-medium text-gray-700">题目导航</div>
         <div className="flex flex-wrap gap-2">
-          {items.map((item, index) => (
-          <button key={item.itemCode} onClick={() => setCurrentIndex(index)} disabled={savingAnswer || submitting} className={`w-8 h-8 rounded text-sm font-medium disabled:cursor-wait disabled:opacity-60 ${currentIndex === index ? 'bg-primary text-white' : answers[item.itemCode] !== undefined ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{index + 1}</button>
-          ))}
+          {items.map((item, index) => {
+            const isCurrent = currentIndex === index
+            const isAnswered = answers[item.itemCode] !== undefined
+            return (
+              <button
+                key={item.itemCode}
+                type="button"
+                aria-current={isCurrent ? 'step' : undefined}
+                aria-label={`第 ${index + 1} 题${isAnswered ? '，已作答' : '，未作答'}`}
+                onClick={() => setCurrentIndex(index)}
+                disabled={savingAnswer || submitting}
+                className={`h-11 w-11 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${isCurrent ? 'bg-primary text-white' : isAnswered ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              >
+                {index + 1}
+              </button>
+            )
+          })}
         </div>
-      </div>
-    </div>
+      </ProductSurface>
+    </ProductPage>
   )
 }
 
