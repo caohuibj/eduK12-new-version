@@ -42,7 +42,7 @@ export const ADEXI_V2_DEFINITION: ScaleDefinitionV2 = {
   license: {
     status: 'authorized',
     redistribution: 'restricted',
-    note: '按项目已取得的量表使用授权使用；本 package 保持 DRAFT/HIDDEN。',
+    note: '按项目已取得的量表使用授权使用；授权范围由 governance/deployment 层单独管理。',
   },
   display: { randomizeItems: false },
   responseSets: [{ key: 'adexi_frequency_1_5', options: [...responseOptions] }],
@@ -167,7 +167,7 @@ export const ADEXI_V2_GOLDEN_CASES: ScaleGoldenCase[] = [
 export const ADEXI_V2_PACKAGE = {
   key: 'adexi_v1',
   instrumentVersion: '2.0.0',
-  releaseStatus: 'DRAFT' as const,
+  releaseStatus: 'PUBLISHED' as const,
   definition: ADEXI_V2_DEFINITION,
   references: [],
   goldenCases: ADEXI_V2_GOLDEN_CASES,
