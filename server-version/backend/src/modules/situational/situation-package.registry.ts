@@ -18,9 +18,9 @@ import {
   validateSituationalResponse,
   type SituationalGoldenCase,
 } from './situation-scoring'
-import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
-import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-responsibility-golden-zh-cn-v1'
-import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from './packages/sjt-anxiety-golden-zh-cn-v1'
+import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE as SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-assertiveness-golden-zh-cn-v1'
+import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE as SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-responsibility-golden-zh-cn-v1'
+import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE as SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sjt-anxiety-golden-zh-cn-v1'
 import { SJT_STATIC_VISUAL_E2E_PACKAGE } from './packages/sjt-static-visual-e2e-fixture'
 import { SJT_BRANCHING_E2E_PACKAGE } from './packages/sjt-branching-e2e-fixture'
 import { SJT_VIDEO_E2E_PACKAGE } from './packages/sjt-video-e2e-fixture'
@@ -48,13 +48,27 @@ export interface SituationPackageV2 extends SituationPackageBase {
 
 export type SituationPackage = SituationPackageV1 | SituationPackageV2
 
+const publishExecutablePackage = (pkg: SituationPackageV1): SituationPackageV1 => ({
+  ...pkg,
+  releaseStatus: 'PUBLISHED',
+})
+
+/**
+ * Production V1 packages are executable-complete and therefore PUBLISHED.
+ * Their scientific maturity remains PILOT. CI-only fixtures keep their own
+ * fixture lifecycle and are never normalized into production availability.
+ */
+const productionPackages: SituationPackageV1[] = [
+  publishExecutablePackage(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+  publishExecutablePackage(SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+  publishExecutablePackage(SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE_SOURCE),
+]
+
 // Production content remains V1 until a later content PR deliberately adds a
 // reviewed V2 pilot. CI-only V2 fixtures are isolated behind explicit env flags
 // so normal catalog/service typing does not imply production V2 publication.
 const packages: SituationPackageV1[] = [
-  SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
-  SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE,
-  SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE,
+  ...productionPackages,
   ...(process.env.SITUATIONAL_STATIC_VISUAL_FIXTURE === 'true' ? [SJT_STATIC_VISUAL_E2E_PACKAGE] : []),
   ...(process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE === 'true'
     ? [SJT_BRANCHING_E2E_PACKAGE as unknown as SituationPackageV1]
