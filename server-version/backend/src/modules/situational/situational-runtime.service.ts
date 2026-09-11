@@ -98,22 +98,30 @@ export type SituationalAttemptRuntime = {
   snapshot: FrozenSituationalRuntimeSnapshotV1
 }
 
-const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => ({
-  key: snapshot.instrumentKey,
-  version: snapshot.instrumentVersion,
-  definitionHash: snapshot.definitionHash,
-  compiledRuntimeHash: snapshot.compiledRuntimeHash,
-  scorerKey: snapshot.scorerKey,
-  scoringVersion: snapshot.scoringVersion,
-  frozenAt: snapshot.frozenAt,
-  releaseStatus: 'PUBLISHED' as const,
-  sampling: snapshot.runnerDefinition.sampling,
-  definition: snapshot.runnerDefinition,
-  report: snapshot.definition.report,
-  referencePolicy: snapshot.definition.referencePolicy,
-  scienceMaturity: 'PILOT' as const,
-  runtimeCapabilities: snapshot.compiledRuntime.runtimeCapabilities,
-})
+/**
+ * Runtime identity comes exclusively from the frozen snapshot. Product release
+ * state and scientific maturity are governance projections for the same exact
+ * instrument identity; changing either does not alter the frozen runner/scorer.
+ */
+const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
+  const governance = getSituationPackage(snapshot.instrumentKey, snapshot.instrumentVersion)
+  return {
+    key: snapshot.instrumentKey,
+    version: snapshot.instrumentVersion,
+    definitionHash: snapshot.definitionHash,
+    compiledRuntimeHash: snapshot.compiledRuntimeHash,
+    scorerKey: snapshot.scorerKey,
+    scoringVersion: snapshot.scoringVersion,
+    frozenAt: snapshot.frozenAt,
+    releaseStatus: governance?.releaseStatus ?? 'RETIRED' as const,
+    sampling: snapshot.runnerDefinition.sampling,
+    definition: snapshot.runnerDefinition,
+    report: snapshot.definition.report,
+    referencePolicy: snapshot.definition.referencePolicy,
+    scienceMaturity: governance?.scienceMaturity ?? 'PILOT' as const,
+    runtimeCapabilities: snapshot.compiledRuntime.runtimeCapabilities,
+  }
+}
 
 export const assertRowMatchesSnapshot = (
   row: Pick<SituationalAttemptRow, 'instrumentKey' | 'instrumentVersion' | 'definitionHash' | 'compiledRuntimeHash' | 'scorerKey' | 'scoringVersion' | 'runtimeGeneration' | 'deliveryMode' | 'frozenAt'>,
@@ -273,7 +281,7 @@ export const situationalAttemptForResponse = (
   }
 }
 
-const pilotPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackageV1 => {
+const publishedPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackageV1 => {
   const situationPackage = selectPublishedSituationPackage(
     instrumentVersion
       ? [getSituationPackage(instrumentKey, instrumentVersion)].filter((candidate): candidate is SituationPackageV1 => candidate !== undefined)
@@ -292,10 +300,7 @@ const pilotPackage = (instrumentKey: string, instrumentVersion?: string): Situat
 }
 
 export const listSituationalInstruments = () => listSituationPackages()
-  .filter((situationPackage) => (
-    situationPackage.releaseStatus === 'PUBLISHED'
-    && situationPackage.scienceMaturity === 'PILOT'
-  ))
+  .filter((situationPackage) => situationPackage.releaseStatus === 'PUBLISHED')
   .map((situationPackage) => {
     const validation = validateSituationPackage(situationPackage)
     if (!validation.valid) return null
@@ -325,7 +330,7 @@ export const listSituationalInstruments = () => listSituationPackages()
   .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
 
 export const getSituationalInstrument = (instrumentKey: string, instrumentVersion?: string) => {
-  const situationPackage = pilotPackage(instrumentKey, instrumentVersion)
+  const situationPackage = publishedPackage(instrumentKey, instrumentVersion)
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
@@ -364,7 +369,7 @@ export const startSituationalAttempt = async (userId: string, input: {
   instrumentKey: string
   instrumentVersion?: string
 }) => {
-  const situationPackage = pilotPackage(input.instrumentKey, input.instrumentVersion)
+  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion)
   await assertSituationalAssetReferencesReady(situationPackage.definition)
   const participantKey = getParticipantKey(userId)
   const frozenAt = new Date()
@@ -452,7 +457,7 @@ export const createEmbeddedSituationalAttempt = async (
     attemptEpoch: number
   },
 ) => {
-  const situationPackage = pilotPackage(input.instrumentKey, input.instrumentVersion)
+  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion)
   await assertSituationalAssetReferencesReady(situationPackage.definition, db)
   const frozenAt = new Date()
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
