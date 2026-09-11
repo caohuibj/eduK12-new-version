@@ -3,6 +3,8 @@ import { evaluateScientificQualification, type ScientificQualificationDecisionV1
 import type { SituationPackage } from './situation-package.registry'
 import { evaluateSituationalProductReadiness } from './product-readiness'
 
+const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
+
 export const evaluateSituationalScientificQualification = (
   pkg: SituationPackage,
 ): ScientificQualificationDecisionV1 => {
@@ -12,10 +14,18 @@ export const evaluateSituationalScientificQualification = (
     version: pkg.instrumentVersion,
     scoringVersion: pkg.definition.scoring.scoringVersion,
   })
+  const definitionProvenance = (
+    (hasText(pkg.definition.source.title) || hasText(pkg.definition.source.citation))
+    && pkg.definition.license.status !== 'unknown'
+  )
   return evaluateScientificQualification({
     productReadiness: evaluateSituationalProductReadiness(pkg),
+    // Self-authored/provenanced content is not automatically research-based.
+    // Situational Research Ready still requires an explicit literature,
+    // research-design, protocol or preregistration evidence pointer.
     hasResearchFoundation: (evidence?.researchFoundationRefs.length ?? 0) > 0,
-    hasTraceableProvenance: (evidence?.provenanceRefs.length ?? 0) > 0,
+    hasTraceableProvenance: definitionProvenance
+      || (evidence?.provenanceRefs.length ?? 0) > 0,
     hasEmpiricalReference: (evidence?.empiricalReferenceRefs.length ?? 0) > 0,
     hasFormalResearchOutput: (evidence?.researchOutputRefs.length ?? 0) > 0,
   })
