@@ -7,10 +7,19 @@ import {
 } from '../../assessment-governance/product-readiness'
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
 
+const isLegacyScientificOrProvenanceBlocker = (path: string): boolean => (
+  path === 'source' || path === 'license' || path.startsWith('source.') || path.startsWith('license.')
+)
+
 /**
  * Pure exact-package readiness audit. It deliberately ignores catalog evidence,
- * authorizations, territory, localization research status and scientific
- * maturity. Those belong to scientific qualification or deployment availability.
+ * authorizations, territory, localization research status, source/provenance
+ * completeness and scientific maturity. Those belong to scientific
+ * qualification or deployment availability.
+ *
+ * validateScalePackage still carries legacy source/license publication errors;
+ * this adapter filters only those legacy governance errors while preserving all
+ * executable definition, scorer, golden-case and report-structure failures.
  */
 export const evaluateScaleProductReadiness = (
   pkg: ScalePackageV2,
@@ -18,7 +27,7 @@ export const evaluateScaleProductReadiness = (
   const blockers: ProductReadinessIssueV1[] = []
   const validation = validateScalePackage(pkg)
   validation.issues
-    .filter((candidate) => candidate.severity === 'error')
+    .filter((candidate) => candidate.severity === 'error' && !isLegacyScientificOrProvenanceBlocker(candidate.path))
     .forEach((candidate) => blockers.push({
       stage: candidate.path.startsWith('goldenCases') ? 'SCORING' : 'DEFINITION',
       code: 'SCALE_PACKAGE_INVALID',
