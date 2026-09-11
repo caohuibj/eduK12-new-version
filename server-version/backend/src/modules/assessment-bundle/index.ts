@@ -221,3 +221,11 @@ export type {
 } from './engines/integrated-evidence-v1'
 export { INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1 } from './bundles/integrated-gonogo-adexi-adult-zh-cn-v1'
 export { INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1 } from './bundles/integrated-adult-age-context-v1'
+
+export {
+  bundleScientificMaturityIdentity,
+  createBundleScientificMaturityRegistry,
+  resolveBundleScientificMaturity,
+  validateBundleScientificMaturityManifest,
+} from './scientific-maturity'
+export type { BundleScientificMaturityManifestV1 } from './scientific-maturity'

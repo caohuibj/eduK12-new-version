@@ -16,6 +16,7 @@
 import { z } from 'zod'
 import { isValidContentLocaleTag } from '../content-locale'
 import type { ReferenceKind } from '../../assessment-reference/reference'
+import { SCIENTIFIC_MATURITY_LEVELS } from '../../assessment-governance/scientific-maturity'
 
 export const SCALE_CATALOG_SCHEMA_VERSION = 1 as const
 
@@ -29,13 +30,12 @@ export const scaleCatalogStatusSchema = z.enum(['CANDIDATE', 'REVIEWED', 'ACCEPT
 export type ScaleCatalogStatus = z.infer<typeof scaleCatalogStatusSchema>
 
 /**
- * Scientific maturity（SL2-C2）：与 product lifecycle（package releaseStatus）
- * 完全独立的第二条状态轴，只有 PILOT → RESEARCH_GRADE 两档。
- * PUBLISHED + PILOT 是完整、正式、可上线的正常产品状态；成熟度属于
- * Admin/Expert 治理元数据，学生/家长/普通教师不需要感知。
- * 只放 catalog：scientificMaturity 变化 → hashScaleDefinition(definition) 不变。
+ * Scientific maturity is independent from product lifecycle. PILOT and
+ * RESEARCH_READY are both normal publishable product states; RESEARCH_GRADE is
+ * reserved for a future higher evidence bar. Maturity is catalog-only
+ * governance metadata and never changes hashScaleDefinition(definition).
  */
-export const scientificMaturitySchema = z.enum(['PILOT', 'RESEARCH_GRADE'])
+export const scientificMaturitySchema = z.enum(SCIENTIFIC_MATURITY_LEVELS)
 export type ScientificMaturity = z.infer<typeof scientificMaturitySchema>
 
 /**
@@ -357,7 +357,7 @@ export const scaleCatalogManifestV1Schema = z.object({
   schemaVersion: z.literal(SCALE_CATALOG_SCHEMA_VERSION),
   catalogManifestVersion: z.number().int().positive({ message: 'catalogManifestVersion 必须是正整数' }),
   catalogStatus: scaleCatalogStatusSchema,
-  /** 新 instrument 默认 PILOT（§10 默认原则）；显式声明 RESEARCH_GRADE 属于治理行为。 */
+  /** New exact identities default to PILOT; maturity upgrades are governance-only. */
   scientificMaturity: scientificMaturitySchema.default('PILOT'),
   identity: scaleCatalogIdentitySchema,
   construct: scaleCatalogConstructSchema,

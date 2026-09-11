@@ -124,7 +124,7 @@ export interface SituationalInstrument {
   key: string
   version: string
   releaseStatus: 'PUBLISHED' | 'DRAFT' | 'RETIRED'
-  scienceMaturity: 'PILOT' | 'RESEARCH_GRADE'
+  scienceMaturity: 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
   definitionHash: string
   compiledRuntimeHash: string
   scorerKey: string

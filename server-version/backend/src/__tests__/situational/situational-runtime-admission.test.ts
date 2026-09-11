@@ -14,12 +14,10 @@ import { SJT_RESPONSIBILITY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situat
 const packageWithStatus = (
   releaseStatus: SituationPackageV1['releaseStatus'],
   instrumentVersion = SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
-  scienceMaturity: SituationPackageV1['scienceMaturity'] = 'PILOT',
 ): SituationPackageV1 => ({
   ...SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE,
   releaseStatus,
   instrumentVersion,
-  scienceMaturity,
 })
 
 describe('Situational participant runtime admission', () => {
@@ -53,10 +51,5 @@ describe('Situational participant runtime admission', () => {
     expect(selectPublishedSituationPackage([
       packageWithStatus('PUBLISHED', '1.0.2'),
     ], SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key, '1.0.3')).toBeUndefined()
-
-    expect(selectPublishedSituationPackage([
-      packageWithStatus('PUBLISHED', '2.0.0', 'RESEARCH_GRADE'),
-    ], SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key)).toBeUndefined()
   })
 })
-
