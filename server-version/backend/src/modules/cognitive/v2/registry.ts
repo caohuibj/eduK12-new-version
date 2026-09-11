@@ -57,10 +57,6 @@ export const validateRegistryReferenceEligibility = (entry: {
 
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
 
-// Existing Trail Making scorer flags are provenance warnings: they do not
-// change metrics or legacy interpretability. Keep that historical meaning when
-// adapting into v2 instead of letting the legacy name-based fallback demote the
-// entire cognitive result to LIMITED.
 const nonDegradingProvenanceQualityFlags = new Set([
   'deviceInfoIncomplete',
   'mixedPointerType',
@@ -167,9 +163,6 @@ const adaptProtocol = (entry: AnyRegistryEntry) => ({
         { key: 'delayed' as const, persists: true, required: false },
       ]
     : [{ key: 'test' as const, persists: true, required: true }],
-  // The resolved config is the measurement contract for the existing tasks.
-  // A later task-specific definition can narrow this list without changing the
-  // snapshot or scorer boundary.
   measurementCriticalConfigPaths: ['*'],
 })
 
@@ -223,13 +216,29 @@ export const buildCognitiveV2TaskDefinition = (
     publication: {
       status: publicationStatus,
       referenceRequired: false,
-      evidenceNote: 'Reference eligibility is metric-specific; no eligible reference is silently inferred.',
+      evidenceNote: 'Scientific evidence/reference maturity is governed separately from Product Release.',
     },
   }
 }
 
-const defaultStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' =>
-  entry.testType !== 'fake' && entry.recommendedForCreate === true ? 'PUBLISHED' : 'DRAFT'
+const SUPERSEDED_IDENTITIES = new Set([
+  'reaction/1.0.0/1.0.0',
+  'memory/1.0.0/1.0.0',
+  'stroop/1.0.0/1.0.0',
+])
+
+/**
+ * Product lifecycle is executable-state only. `recommendedForCreate` remains a
+ * catalog/recommendation signal and does not demote a complete task to DRAFT.
+ * Legacy scorer identities stay readable for frozen attempts but are RETIRED
+ * for new product use. `fake` is test infrastructure and never a real product.
+ */
+const defaultStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' | 'RETIRED' => {
+  if (entry.testType === 'fake') return 'DRAFT'
+  const identity = `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+  if (SUPERSEDED_IDENTITIES.has(identity)) return 'RETIRED'
+  return 'PUBLISHED'
+}
 
 export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
   listCognitiveRegistryEntries()
