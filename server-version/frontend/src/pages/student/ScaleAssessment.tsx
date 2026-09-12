@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../../api/client'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ActionBar, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
 import { checkpointScheduler, CheckpointTransportError } from '../../services/persistence/checkpointScheduler'
@@ -13,6 +14,7 @@ import { runFinalDraftCapacityRetry } from '../../services/persistence/finalDraf
 import AssessmentImageGate from '../../modules/assessment-media/AssessmentImageGate'
 import ScaleFormVideoGate from '../../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems } from '../../modules/assessment-media/adapter'
+import { requiredVideoCompletionFromMeta } from '../../modules/assessment-media/required-video-completion'
 import { scaleItemVideoPresentation } from '../../modules/assessment-media/video-adapter'
 import type { AssessmentVideoCapabilitySources } from '../../modules/assessment-media/types'
 import {
@@ -80,7 +82,31 @@ interface ScaleCheckpointPayload {
   expectedRevision: number
 }
 
+type SubmissionLockReason = 'sealed' | 'legacy-pending' | null
+
+class ScaleVideoCompletionRequiredError extends Error {
+  readonly itemCode: string
+
+  constructor(itemCode: string) {
+    super('该题包含必看视频。请从头以 1× 完整观看视频后再提交测评。')
+    this.name = 'ScaleVideoCompletionRequiredError'
+    this.itemCode = itemCode
+  }
+}
+
 const valueKey = (value: ResponseValue) => `${typeof value}:${String(value)}`
+const scaleVideoSlotKey = (itemCode: string) => `scale-item:${itemCode}:video`
+
+const scaleVideoCompletionIdentity = (draftKey: string, item: ScaleRunnerItem) => {
+  const presentation = scaleItemVideoPresentation(item)
+  if (!presentation) return null
+  return {
+    draftKey,
+    slotKey: scaleVideoSlotKey(item.itemCode),
+    assetId: presentation.video.assetId,
+    contentHash: presentation.video.contentHash,
+  }
+}
 
 const isFinalAttemptConflict = (error: unknown) => {
   const value = error as { status?: number; statusCode?: number; code?: number | string }
@@ -105,6 +131,7 @@ const ScaleAssessment: React.FC = () => {
   const answerRevisionsRef = useRef<Record<string, number>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submissionLocked, setSubmissionLocked] = useState(false)
+  const [submissionLockReason, setSubmissionLockReason] = useState<SubmissionLockReason>(null)
   const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
   const itemStartTimeRef = useRef<number>(readScaleTimingNow())
@@ -236,14 +263,11 @@ const ScaleAssessment: React.FC = () => {
           setAnswers(existingAnswers)
           const locked = nextMeta.status !== 'DRAFT' || Boolean(nextMeta.sealedSubmission)
           setSubmissionLocked(locked)
-          if (locked) {
-            setCompletionNotice(nextMeta.sealedSubmission
-              ? '该测评已有一份已封存提交，答案已锁定；再次提交只会重放同一份内容。'
-              : '检测到旧版未确认提交。请刷新页面核对服务器状态，当前答案已锁定且不会被重新生成提交。')
-          }
+          setSubmissionLockReason(locked ? (nextMeta.sealedSubmission ? 'sealed' : 'legacy-pending') : null)
           return
         }
         setSubmissionLocked(false)
+        setSubmissionLockReason(null)
         scaleDeviceInputProvenanceRef.current = resolveScaleDeviceInputProvenance({
           serverValue: nextAssessment.deviceInputProvenance,
           existing: scaleDeviceInputProvenanceRef.current,
@@ -265,6 +289,7 @@ const ScaleAssessment: React.FC = () => {
         })
       } catch (err) {
         if (isFinalAttemptConflict(err)) setRequiresRestart(true)
+        setCompletionNotice(normalizeApiError(err).message)
         console.error('开始测评失败', err)
       } finally {
         if (!cancelled) setLoading(false)
@@ -272,13 +297,12 @@ const ScaleAssessment: React.FC = () => {
     }
     void startAssessment()
     return () => { cancelled = true }
-  }, [registerScalePersistence, scaleId])
+  }, [navigate, registerScalePersistence, scaleId])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
     if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return
     const items = scale.definition.items
-    const itemIndex = currentIndex
-    const item = items[itemIndex]
+    const item = items[currentIndex]
     if (!item) return
     const responseTimeMs = elapsedScaleResponseTimeMs(itemStartTimeRef.current, readScaleTimingNow())
     try {
@@ -291,9 +315,6 @@ const ScaleAssessment: React.FC = () => {
             updatedAt: Date.now(),
           })
           setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
-          if (itemIndex < items.length - 1) {
-            setCurrentIndex((index) => index === itemIndex ? itemIndex + 1 : index)
-          }
           setCompletionNotice(null)
           return
         }
@@ -309,9 +330,6 @@ const ScaleAssessment: React.FC = () => {
         }, scaleCheckpointTransport, { maxBatchSize: 10, maxWaitMs: 12000 })
         answerRevisionsRef.current[item.itemCode] = (answerRevisionsRef.current[item.itemCode] ?? 0) + 1
         setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
-        if (itemIndex < items.length - 1) {
-          setCurrentIndex((index) => index === itemIndex ? itemIndex + 1 : index)
-        }
         setCompletionNotice(null)
       })
     } catch (err) {
@@ -349,6 +367,13 @@ const ScaleAssessment: React.FC = () => {
           if (missingStored.length > 0) {
             throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认最后一次作答已完成本地保存`)
           }
+          const missingVideo = scale.definition.items.find((item) => {
+            if (answerMap.get(item.itemCode)?.responseValue === undefined) return false
+            const identity = scaleVideoCompletionIdentity(draftKey, item)
+            return Boolean(identity && !requiredVideoCompletionFromMeta(snapshot.meta, identity))
+          })
+          if (missingVideo) throw new ScaleVideoCompletionRequiredError(missingVideo.itemCode)
+
           const finalAnswers = scale.definition.items
             .filter((item) => answerMap.get(item.itemCode)?.responseValue !== undefined)
             .map((item) => {
@@ -372,6 +397,7 @@ const ScaleAssessment: React.FC = () => {
         })
         if (!sealed) throw new Error('本地量表草稿不存在，请重启测评')
         setSubmissionLocked(true)
+        setSubmissionLockReason('sealed')
         await runFinalDraftCapacityRetry({
           onRetry: async ({ error }) => {
             await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -412,6 +438,7 @@ const ScaleAssessment: React.FC = () => {
         const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
         if (currentMeta?.sealedSubmission) {
           setSubmissionLocked(true)
+          setSubmissionLockReason('sealed')
           const terminal = await apiClient.get<Assessment>(`/scales/assessments/${assessment.id}`).catch(() => null)
           if (terminal?.code === 0 && terminal.data?.status === 'COMPLETED') {
             await finalDraftStore.setStatus(draftKey, 'COMPLETED').catch(() => undefined)
@@ -420,6 +447,10 @@ const ScaleAssessment: React.FC = () => {
             return
           }
         }
+      }
+      if (err instanceof ScaleVideoCompletionRequiredError) {
+        const videoIndex = scale.definition.items.findIndex((item) => item.itemCode === err.itemCode)
+        if (videoIndex >= 0) setCurrentIndex(videoIndex)
       }
       if (isFinalAttemptConflict(err)) setRequiresRestart(true)
       setCompletionNotice(normalizeApiError(err).message)
@@ -441,74 +472,212 @@ const ScaleAssessment: React.FC = () => {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">加载中...</div></div>
-  if (!scale || !assessment) return <div className="text-center py-12"><p className="text-gray-500">量表不存在、未发布或尚未安装有效定义</p></div>
+  if (loading) {
+    return (
+      <ProductPage width="assessment">
+        <ProductStatus kind="pending" title="正在准备量表" announce="polite">正在加载冻结题目与本地作答状态。</ProductStatus>
+      </ProductPage>
+    )
+  }
 
-  if (assessment.status === 'COMPLETED') return <div className="text-center py-12"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><p className="text-gray-700 mb-4">量表测评已完成</p><button onClick={() => navigate(`/student/scales/result/${assessment.id}`)} className="btn-primary">查看结果</button></div>
+  if (!scale || !assessment) {
+    return (
+      <ProductPage width="assessment">
+        <ProductStatus kind="error" title="无法开始量表">量表不存在、未发布或尚未安装有效定义。</ProductStatus>
+      </ProductPage>
+    )
+  }
+
+  if (assessment.status === 'COMPLETED') {
+    return (
+      <ProductPage width="reading">
+        <ProductStatus
+          kind="success"
+          title="量表测评已完成"
+          actions={<ProductButton variant="primary" onClick={() => navigate(`/student/scales/result/${assessment.id}`)}>查看结果</ProductButton>}
+        >
+          本次测评已有权威结果，不会重新创建提交。
+        </ProductStatus>
+      </ProductPage>
+    )
+  }
 
   if (assessment.deliveryMode === 'LEGACY') {
-    return <div className="max-w-xl mx-auto rounded-lg border border-amber-200 bg-amber-50 p-6 text-center"><h1 className="text-xl font-semibold text-amber-900 mb-2">这是旧版进行中的量表</h1><p className="text-sm text-amber-800 mb-5">旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整份提交测评。</p>{completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}<button onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary">{submitting ? '重启中...' : '重启并继续作答'}</button></div>
+    return (
+      <ProductPage width="reading">
+        <ProductStatus
+          kind="warning"
+          title="这是旧版进行中的量表"
+          actions={<ProductButton variant="primary" onClick={() => void restartLegacyAttempt()} disabled={submitting}>{submitting ? '重启中…' : '重启并继续作答'}</ProductButton>}
+        >
+          旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整份提交测评。
+        </ProductStatus>
+        {completionNotice ? <div className="mt-4"><ProductStatus kind="error" title="重启失败" announce="assertive">{completionNotice}</ProductStatus></div> : null}
+      </ProductPage>
+    )
   }
 
   const items = scale.definition.items
-  if (items.length === 0) return <div className="text-center py-12"><p className="text-gray-500">量表题目加载失败</p></div>
+  if (items.length === 0) {
+    return (
+      <ProductPage width="assessment">
+        <ProductStatus kind="error" title="量表题目加载失败">冻结定义中没有可作答题目。</ProductStatus>
+      </ProductPage>
+    )
+  }
+
   const currentItem = items[currentIndex]
   const selectedValue = currentItem ? answers[currentItem.itemCode] : undefined
-  const answeredCount = Object.keys(answers).length
+  const answeredCount = items.filter((item) => answers[item.itemCode] !== undefined).length
   const progress = Math.round((answeredCount / items.length) * 100)
   const imageItems = assessmentImageItems(currentItem.images)
   const videoPresentation = scaleItemVideoPresentation(currentItem)
+  const draftKey = `scale:${assessment.id}`
+  const requiredViewing = videoPresentation && !submissionLocked
+    ? { draftKey, slotKey: scaleVideoSlotKey(currentItem.itemCode) }
+    : undefined
+  const answerControlsDisabled = savingAnswer || submitting || submissionLocked
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-gray-600 mb-2"><span>答题进度</span><span>{answeredCount} / {items.length}</span></div>
-        <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${progress}%` }} /></div>
-      </div>
-      {completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}
-      {requiresRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地答案已保留。当前量表版本已变化，请重启后继续。</span><button type="button" onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
-      {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
-      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
-        <ScaleFormVideoGate
-          presentation={videoPresentation}
-          loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
-          ariaLabel={`${currentItem.content} 视频内容`}
-        >
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <div className="text-sm text-gray-500 mb-2">第 {currentIndex + 1} 题 / 共 {items.length} 题</div>
-            <h2 className="text-lg font-medium text-gray-900 mb-6">{currentItem.content}</h2>
-            <div className="space-y-3">
-              {currentItem.options.map((option) => (
-                <button
-                  key={valueKey(option.value)}
-                  onClick={() => void handleSelectAnswer(option.value)}
-                  disabled={savingAnswer || submitting || submissionLocked}
-                  className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+    <ProductPage width="assessment" data-scale-reference-journey>
+      <header className="mb-6 space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-slate-500">心理测评</p>
+            <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-900">{scale.name}</h1>
           </div>
-          <div className="flex justify-between">
-            <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
-            {currentIndex === items.length - 1 ? (
-              <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : submissionLocked ? '重新核对提交' : '完成测评'}</button>
-            ) : (
-              <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
-            )}
-          </div>
-        </ScaleFormVideoGate>
-      </AssessmentImageGate>
-      <div className="mt-6 bg-white rounded-lg shadow p-4">
-        <div className="text-sm text-gray-600 mb-3">题目导航</div>
-        <div className="flex flex-wrap gap-2">
-          {items.map((item, index) => (
-          <button key={item.itemCode} onClick={() => setCurrentIndex(index)} disabled={savingAnswer || submitting} className={`w-8 h-8 rounded text-sm font-medium disabled:cursor-wait disabled:opacity-60 ${currentIndex === index ? 'bg-primary text-white' : answers[item.itemCode] !== undefined ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{index + 1}</button>
-          ))}
+          {scale.estimatedTime ? <p className="text-sm text-slate-500 sm:text-right">预计约 {scale.estimatedTime} 分钟</p> : null}
         </div>
-      </div>
-    </div>
+        {scale.instruction ? <p className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{scale.instruction}</p> : null}
+      </header>
+
+      <section aria-label="答题进度" className="mb-6">
+        <div className="mb-2 flex items-center justify-between gap-4 text-sm text-slate-600">
+          <span>答题进度</span>
+          <span>{answeredCount} / {items.length}</span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="量表答题进度" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={answeredCount}>
+          <div className="h-full rounded-full bg-blue-700 transition-[width] motion-reduce:transition-none" style={{ width: `${progress}%` }} />
+        </div>
+      </section>
+
+      {submissionLockReason === 'sealed' ? (
+        <div className="mb-4">
+          <ProductStatus kind="pending" title="提交内容已封存">
+            答案已经锁定。若上一次网络结果不明确，“重新核对提交”只会重放同一份 FINAL，不会重新生成答案或视频状态。
+          </ProductStatus>
+        </div>
+      ) : null}
+      {submissionLockReason === 'legacy-pending' ? (
+        <div className="mb-4">
+          <ProductStatus kind="warning" title="检测到旧版未确认提交">
+            当前答案已锁定，系统不会根据页面状态重新生成 FINAL。请核对服务器状态或重启测评。
+          </ProductStatus>
+        </div>
+      ) : null}
+      {completionNotice ? (
+        <div className="mb-4">
+          <ProductStatus kind={submitting ? 'pending' : 'error'} title={submitting ? '正在处理提交' : '需要处理'} announce={submitting ? 'polite' : 'assertive'}>
+            {completionNotice}
+          </ProductStatus>
+        </div>
+      ) : null}
+      {requiresRestart ? (
+        <div className="mb-4">
+          <ProductStatus
+            kind="warning"
+            title="量表版本已变化"
+            actions={<ProductButton variant="primary" onClick={() => void restartLegacyAttempt()} disabled={submitting}>重启并继续</ProductButton>}
+          >
+            本地答案仍保留在旧尝试中。需要创建新的冻结尝试后继续作答。
+          </ProductStatus>
+        </div>
+      ) : null}
+
+      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${currentItem.itemCode}`}>
+        <div className="mb-5">
+          <p className="text-sm font-medium text-slate-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</p>
+          <h2 id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
+        </div>
+
+        <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
+          <ScaleFormVideoGate
+            presentation={videoPresentation}
+            loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
+            ariaLabel={`${currentItem.content} 视频内容`}
+            requiredViewing={requiredViewing}
+          >
+            <fieldset disabled={answerControlsDisabled} className="space-y-3">
+              <legend className="sr-only">{currentItem.content}</legend>
+              {currentItem.options.map((option) => {
+                const checked = selectedValue === option.value
+                return (
+                  <label
+                    key={valueKey(option.value)}
+                    className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 has-[:focus-visible]:ring-offset-2 ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${answerControlsDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name={`scale-${assessment.id}-${currentItem.itemCode}`}
+                      checked={checked}
+                      onChange={() => void handleSelectAnswer(option.value)}
+                      disabled={answerControlsDisabled}
+                      className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
+                    />
+                    <span className="min-w-0 flex-1 leading-relaxed">{option.label}</span>
+                  </label>
+                )
+              })}
+            </fieldset>
+          </ScaleFormVideoGate>
+        </AssessmentImageGate>
+
+        <p className="mt-4 min-h-6 text-sm text-slate-500" role="status" aria-live="polite">
+          {savingAnswer ? '正在保存本题到本机…' : selectedValue !== undefined ? '本题答案已保存到本机，可继续或返回修改。' : videoPresentation && !submissionLocked ? '完整观看视频后选择一个答案。' : '请选择一个答案。'}
+        </p>
+      </section>
+
+      <ActionBar className="mt-5 justify-between">
+        <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting}>
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          上一题
+        </ProductButton>
+        {currentIndex === items.length - 1 ? (
+          <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart}>
+            <CheckCircle className="h-5 w-5" aria-hidden="true" />
+            {submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '完成测评'}
+          </ProductButton>
+        ) : (
+          <ProductButton variant="primary" onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting}>
+            下一题
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+          </ProductButton>
+        )}
+      </ActionBar>
+
+      <nav aria-label="题目导航" className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
+        <p className="mb-3 text-sm font-medium text-slate-600">题目导航</p>
+        <div className="flex flex-wrap gap-2">
+          {items.map((item, index) => {
+            const current = currentIndex === index
+            const answered = answers[item.itemCode] !== undefined
+            return (
+              <button
+                key={item.itemCode}
+                type="button"
+                onClick={() => setCurrentIndex(index)}
+                disabled={savingAnswer || submitting}
+                aria-current={current ? 'step' : undefined}
+                aria-label={`第 ${index + 1} 题${answered ? '，已作答' : '，未作答'}`}
+                className={`min-h-11 min-w-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-wait disabled:opacity-60 ${current ? 'border-blue-700 bg-blue-700 text-white' : answered ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-700'}`}
+              >
+                {index + 1}
+              </button>
+            )
+          })}
+        </div>
+      </nav>
+    </ProductPage>
   )
 }
 
