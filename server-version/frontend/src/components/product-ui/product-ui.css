@@ -1,0 +1,99 @@
+/* Opt-in: importing this sheet cannot restyle an existing page outside .hui-product. */
+.hui-product {
+  box-sizing: border-box;
+  --hui-color-text: #1e293b;
+  --hui-color-muted: #475569;
+  --hui-color-surface: #ffffff;
+  --hui-color-background: #f8fafc;
+  --hui-color-border: #cbd5e1;
+  --hui-color-action: #1d4ed8;
+  --hui-color-action-hover: #1e40af;
+  --hui-color-danger: #b91c1c;
+  --hui-color-focus: #1d4ed8;
+  --hui-space-1: 0.25rem;
+  --hui-space-2: 0.5rem;
+  --hui-space-3: 0.75rem;
+  --hui-space-4: 1rem;
+  --hui-space-6: 1.5rem;
+  --hui-space-8: 2rem;
+  --hui-radius: 0.75rem;
+  --hui-target: 44px;
+  --hui-width-reading: 42rem;
+  --hui-width-assessment: 48rem;
+  --hui-width-report: 64rem;
+  --hui-width-management: 80rem;
+  color: var(--hui-color-text);
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.hui-product *, .hui-product *::before, .hui-product *::after { box-sizing: border-box; }
+.hui-product :where(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--hui-color-focus);
+  outline-offset: 3px;
+}
+.hui-product.hui-page {
+  width: 100%;
+  max-width: var(--hui-page-width, var(--hui-width-reading));
+  min-width: 0;
+  margin-inline: auto;
+  padding: var(--hui-space-6) max(var(--hui-space-4), env(safe-area-inset-right)) max(var(--hui-space-6), env(safe-area-inset-bottom)) max(var(--hui-space-4), env(safe-area-inset-left));
+}
+.hui-product.hui-page--reading { --hui-page-width: var(--hui-width-reading); }
+.hui-product.hui-page--assessment { --hui-page-width: var(--hui-width-assessment); }
+.hui-product.hui-page--report { --hui-page-width: var(--hui-width-report); }
+.hui-product.hui-page--management { --hui-page-width: var(--hui-width-management); }
+.hui-product .hui-page-header { display: flex; flex-direction: column; gap: var(--hui-space-4); margin-block-end: var(--hui-space-6); }
+.hui-product .hui-page-header__text { min-width: 0; }
+.hui-product .hui-page-header__title { margin: 0; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 700; line-height: 1.3; }
+.hui-product .hui-page-header__description { margin-block: var(--hui-space-2) 0; color: var(--hui-color-muted); max-width: 65ch; }
+.hui-product .hui-actions { display: flex; flex-wrap: wrap; gap: var(--hui-space-3); align-items: center; }
+.hui-product .hui-actions > * { width: 100%; min-width: 0; }
+.hui-product .hui-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--hui-space-2);
+  min-width: var(--hui-target);
+  min-height: var(--hui-target);
+  padding: var(--hui-space-2) var(--hui-space-4);
+  border: 1px solid var(--hui-color-border);
+  border-radius: var(--hui-radius);
+  background: var(--hui-color-surface);
+  color: var(--hui-color-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+}
+.hui-product .hui-button--primary { background: var(--hui-color-action); border-color: var(--hui-color-action); color: #ffffff; }
+.hui-product .hui-button--danger { background: var(--hui-color-danger); border-color: var(--hui-color-danger); color: #ffffff; }
+.hui-product .hui-button:disabled { background: #e2e8f0; border-color: #cbd5e1; color: #475569; cursor: not-allowed; }
+.hui-product .hui-status { display: flex; align-items: flex-start; gap: var(--hui-space-3); padding: var(--hui-space-4); border: 1px solid var(--hui-color-border); border-radius: var(--hui-radius); background: var(--hui-color-surface); }
+.hui-product .hui-status__symbol { flex: 0 0 1.5rem; text-align: center; font-weight: 700; }
+.hui-product .hui-status__body { flex: 1; min-width: 0; }
+.hui-product .hui-status__title { display: block; }
+.hui-product .hui-status__description { margin-block-start: var(--hui-space-1); }
+.hui-product .hui-status__actions { margin-block-start: var(--hui-space-3); }
+.hui-product .hui-status--success { border-color: #86b8a1; background: #f0fdf4; color: #166534; }
+.hui-product .hui-status--warning { border-color: #d4b574; background: #fffbeb; color: #854d0e; }
+.hui-product .hui-status--error { border-color: #e9a1a1; background: #fef2f2; color: #991b1b; }
+.hui-product .hui-status--pending { border-color: #93b4e7; background: #eff6ff; color: #1e40af; }
+@media (hover: hover) {
+  .hui-product .hui-button--secondary:not(:disabled):hover { background: var(--hui-color-background); }
+  .hui-product .hui-button--primary:not(:disabled):hover { background: var(--hui-color-action-hover); }
+  .hui-product .hui-button--danger:not(:disabled):hover { background: #991b1b; }
+}
+@media (min-width: 40rem) {
+  .hui-product.hui-page { padding-inline: var(--hui-space-6); }
+  .hui-product .hui-actions > * { width: auto; }
+  .hui-product .hui-page-header { flex-direction: row; align-items: flex-start; justify-content: space-between; }
+  .hui-product .hui-page-header__actions { flex-shrink: 0; max-width: 45%; }
+}
+@media (min-width: 64rem) {
+  .hui-product.hui-page { padding-block: var(--hui-space-8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hui-product *, .hui-product *::before, .hui-product *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

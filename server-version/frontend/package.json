@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "pretypecheck": "npm run inventory:product-ui:check",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.cognitive.json --noEmit",
     "test": "vitest run --maxWorkers=2",
     "test:cognitive": "vitest run src/modules/cognitive src/modules/reporting src/modules/composite src/pages/teacher",
     "test:composite": "vitest run src/modules/composite src/pages/teacher src/pages/student",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "bash /opt/ptool/scripts/deploy.sh frontend"
+    "deploy": "bash /opt/ptool/scripts/deploy.sh frontend",
+    "inventory:product-ui": "node scripts/product-route-inventory.mjs",
+    "inventory:product-ui:check": "node scripts/product-route-inventory.mjs --check"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",

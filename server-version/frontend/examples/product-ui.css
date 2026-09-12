@@ -1,0 +1,13 @@
+/* Example-only scaffolding; deliberately excluded from the production entry. */
+body { margin: 0; background: #f8fafc; font-family: system-ui, sans-serif; }
+.example-section { margin-block: var(--hui-space-6); }
+.example-section h2 { font-size: 1.25rem; line-height: 1.5; margin-block: var(--hui-space-4); }
+.example-section fieldset { padding: 0; border: 0; margin: 0; }
+.example-section legend { color: var(--hui-color-muted); margin-bottom: var(--hui-space-3); }
+.example-muted { color: var(--hui-color-muted); }
+.example-answer { display: flex; align-items: center; gap: var(--hui-space-3); min-height: 44px; border: 1px solid var(--hui-color-border); border-radius: var(--hui-radius); padding: var(--hui-space-3); margin-block: var(--hui-space-2); background: var(--hui-color-surface); cursor: pointer; }
+.example-answer input { flex: 0 0 auto; accent-color: var(--hui-color-action); }
+.example-field { display: block; margin-top: var(--hui-space-6); }
+.example-field textarea { display: block; width: 100%; min-height: 44px; padding: var(--hui-space-3); margin-top: var(--hui-space-2); font: inherit; border: 1px solid var(--hui-color-border); border-radius: var(--hui-radius); resize: vertical; }
+.example-stack { display: grid; gap: var(--hui-space-4); }
+#legacy-sentinel { margin: 1rem; }
