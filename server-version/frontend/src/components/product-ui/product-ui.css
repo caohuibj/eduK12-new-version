@@ -1,5 +1,6 @@
 /* Opt-in: importing this sheet cannot restyle an existing page outside .hui-product. */
 .hui-product {
+  box-sizing: border-box;
   --hui-color-text: #1e293b;
   --hui-color-muted: #475569;
   --hui-color-surface: #ffffff;
