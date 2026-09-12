@@ -24,6 +24,7 @@ import type {
   SituationalRunnerScene,
 } from '../types'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
+import { runFinalDraftCapacityRetry } from '../../../services/persistence/finalDraftCapacityRetry'
 import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
 import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
 import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
@@ -51,6 +52,21 @@ const apiDataOrThrow = <T,>(response: { code: number | string; message: string; 
   if (response.code !== 0) throw Object.assign(new Error(response.message || '请求失败'), { code: response.code })
   return response.data
 }
+
+const situationalFinalStatus = (error: unknown) => {
+  const value = error as { code?: unknown; status?: number; statusCode?: number }
+  const code = String(value?.code ?? '')
+  return value?.status === 409
+    || value?.statusCode === 409
+    || code === '409'
+    || code === 'STALE_ATTEMPT'
+    || code === 'DEFINITION_MISMATCH'
+    || code === 'SUBMISSION_PAYLOAD_CONFLICT'
+    ? 'CONFLICT' as const
+    : 'RETRY_PENDING' as const
+}
+
+const TERMINAL_RECOVERED_CODE = 'FINAL_TERMINAL_RECOVERED'
 
 const SituationalRunner: React.FC = () => {
   const { instrumentKey, attemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
@@ -89,6 +105,7 @@ const SituationalRunner: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [submissionLocked, setSubmissionLocked] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [readyVideoSceneKey, setReadyVideoSceneKey] = useState<string | null>(null)
@@ -123,15 +140,25 @@ const SituationalRunner: React.FC = () => {
           : await client.start({ instrumentKey: decodeURIComponent(instrumentKey as string) })
         const next = apiDataOrThrow(response)
         if (next.attempt.status === 'COMPLETED') {
+          await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
           navigate(embeddedCompletionPath || `/student/situational/attempts/${next.attempt.id}/result`, { replace: true })
           return
         }
-        await ensureSituationalDraft(next.attempt)
+        const meta = await ensureSituationalDraft(next.attempt)
         const restoredResponses = await readSituationalDraft(next.attempt)
-        const localResponses = await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
+        const locked = meta.status !== 'DRAFT' || Boolean(meta.sealedSubmission)
+        const localResponses = !locked
+          ? await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
+          : restoredResponses
         if (cancelled) return
         setData(next)
         setResponses(localResponses)
+        setSubmissionLocked(locked)
+        if (locked) {
+          setNotice(meta.sealedSubmission
+            ? '这次测评已有一份已封存提交；答案已锁定，再次提交只会重放相同内容。'
+            : '检测到旧版未确认提交；答案已锁定，请先核对服务器结果，不能重新生成提交内容。')
+        }
         const reachableScenes = reachableSituationalScenes(next.instrument.definition, localResponses)
         const missingIndex = firstMissingSceneIndex(next.instrument.definition, localResponses)
         setCurrentIndex(
@@ -185,7 +212,7 @@ const SituationalRunner: React.FC = () => {
   const sceneCompletion = useMemo(() => scenes.map((_, index) => data ? sceneIsComplete(data.instrument.definition, index, responses) : false), [data, responses, scenes])
 
   const persistAnswer = async (scene: SituationalRunnerScene, channel: SituationalRunnerChannel, responseValue: string | number) => {
-    if (!data || submitting) return
+    if (!data || submitting || submissionLocked) return
     const key = responseKey(scene.sceneKey, channel.channelKey)
     const answer: SituationalDraftAnswer = {
       responseValue,
@@ -233,51 +260,78 @@ const SituationalRunner: React.FC = () => {
   const submit = async () => {
     if (!data || !client || submitting || submittingRef.current || saving) return
     const missingIndex = firstMissingSceneIndex(data.instrument.definition, responses)
-    if (missingIndex >= 0) {
+    if (missingIndex >= 0 && !submissionLocked) {
       setCurrentIndex(missingIndex)
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
-    if (!situationalReadyToSubmit(data.instrument.definition, responses)) {
+    if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responses)) {
       setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
     }
-    // Lock before the first await so two clicks in the same event turn cannot
-    // both pass the guard while the draft metadata is being read.
     submittingRef.current = true
-    const meta = await finalDraftStore.get(situationalDraftKey(data.attempt.id))
-    if (!meta) {
-      submittingRef.current = false
-      setNotice('本地作答草稿不存在，请返回后重新进入测评。')
-      return
-    }
     setSubmitting(true)
     setNotice(null)
-    await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'SUBMITTING')
+    const draftKey = situationalDraftKey(data.attempt.id)
     try {
-      const response = await client.submit(data.attempt.id, {
-        submissionId: meta.submissionId,
-        attemptEpoch: data.attempt.attemptEpoch,
-        definitionHash: data.attempt.definitionHash,
-        instrumentVersion: data.attempt.instrumentVersion,
-        compiledRuntimeHash: data.attempt.compiledRuntimeHash,
-        scoringVersion: data.attempt.scoringVersion,
-        responses: situationalResponsesFromDraft(data.instrument.definition, responses),
+      const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const sealedResponses: Record<string, SituationalDraftAnswer> = {}
+        snapshot.answers.forEach((answer) => {
+          if (!answer.value || typeof answer.value !== 'object') return
+          const value = answer.value as Partial<SituationalDraftAnswer>
+          if (typeof value.responseValue !== 'string' && typeof value.responseValue !== 'number') return
+          sealedResponses[answer.itemKey] = {
+            responseValue: value.responseValue,
+            ...(typeof value.responseTimeMs === 'number' ? { responseTimeMs: value.responseTimeMs } : {}),
+            ...(typeof value.answeredAt === 'string' ? { answeredAt: value.answeredAt } : {}),
+          }
+        })
+        if (!situationalReadyToSubmit(data.instrument.definition, sealedResponses)) {
+          throw new Error('本地持久化的情境作答尚未达到可提交终点，请确认最后一次作答已经保存')
+        }
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          instrumentVersion: data.attempt.instrumentVersion,
+          compiledRuntimeHash: data.attempt.compiledRuntimeHash,
+          scoringVersion: data.attempt.scoringVersion,
+          responses: situationalResponsesFromDraft(data.instrument.definition, sealedResponses),
+        }
+      })
+      if (!sealed) throw new Error('本地作答草稿不存在，请返回后重新进入测评。')
+      setSubmissionLocked(true)
+      const response = await runFinalDraftCapacityRetry({
+        onRetry: async ({ error: retryError }) => {
+          if (await recoverTerminalResult()) {
+            throw Object.assign(new Error('服务器已确认测评完成'), { code: TERMINAL_RECOVERED_CODE })
+          }
+          await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+            code: String((retryError as { code?: unknown })?.code ?? 'ASSESSMENT_SUBMIT_BUSY'),
+            message: situationalErrorMessage(retryError),
+          }).catch(() => undefined)
+          setNotice('提交繁忙，正在自动重试…')
+        },
+        operation: () => client.submit(data.attempt.id, sealed.payload),
       })
       const next = apiDataOrThrow(response)
-      await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'COMPLETED')
-      await finalDraftStore.delete(situationalDraftKey(data.attempt.id))
+      await finalDraftStore.setStatus(draftKey, 'COMPLETED')
+      await finalDraftStore.delete(draftKey)
       navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
-      await finalDraftStore.setStatus(situationalDraftKey(data.attempt.id), 'RETRY_PENDING', {
-        code: String((reason as { code?: unknown })?.code ?? 'NETWORK'),
-        message: situationalErrorMessage(reason),
-      }).catch(() => undefined)
-      // A timeout may arrive after the server has committed. Reading the
-      // terminal result is the recovery path and never re-scores in the client.
+      if (String((reason as { code?: unknown })?.code ?? '') === TERMINAL_RECOVERED_CODE) return
       const recovered = await recoverTerminalResult()
-      if (!recovered) setNotice(situationalErrorMessage(reason))
+      if (!recovered) {
+        const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
+        if (currentMeta?.sealedSubmission) setSubmissionLocked(true)
+        const status = situationalFinalStatus(reason)
+        await finalDraftStore.setStatus(draftKey, status, {
+          code: String((reason as { code?: unknown })?.code ?? 'NETWORK'),
+          message: situationalErrorMessage(reason),
+        }).catch(() => undefined)
+        setNotice(situationalErrorMessage(reason))
+      }
     } finally {
       submittingRef.current = false
       setSubmitting(false)
@@ -342,7 +396,7 @@ const SituationalRunner: React.FC = () => {
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || mediaBusy}>
+              <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || mediaBusy || submissionLocked}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
@@ -367,7 +421,7 @@ const SituationalRunner: React.FC = () => {
         <button type="button" onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || saving || submitting} className="inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"><ChevronLeft className="h-4 w-4" />上一题</button>
         <div className="flex gap-3">
           {currentIndex < scenes.length - 1 && <button type="button" onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">下一题<ChevronRight className="h-4 w-4" /></button>}
-          <button type="button" onClick={() => void submit()} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{submitting ? '提交中…' : '提交测评'}</button>
+          <button type="button" onClick={() => void submit()} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}</button>
         </div>
       </div>
 

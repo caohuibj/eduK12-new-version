@@ -91,6 +91,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       ? `composite-scale:${scaleId}`
       : null
   const unitKey = `${state.id}:${item?.type || 'complete'}:${item?.id || ''}`
+  const draftLocked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
 
   const loadAssessmentImage = useCallback(async (assetId: string): Promise<Blob> => {
     if (!item) throw new Error('当前没有冻结测评单元')
@@ -131,6 +132,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         if (!cancelled) setLoadingDraft(false)
         return
       }
+      if (state.status === 'COMPLETED') {
+        await finalDraftStore.delete(draftKey).catch(() => undefined)
+        if (!cancelled) setLoadingDraft(false)
+        return
+      }
       try {
         const definitionHash = item.definitionHash
         if (!definitionHash) throw new Error('综合测评内容缺少冻结定义，请重启测评')
@@ -155,13 +161,38 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             existing,
           })
           scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
-          if (!storedProvenance) {
+          if (!storedProvenance && nextMeta.status === 'DRAFT' && !nextMeta.sealedSubmission) {
             await finalDraftStore.setInstrumentMetadata(draftKey, {
               [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
             }).catch(() => null)
           }
         }
-        const storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        let storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        if (nextMeta.status === 'DRAFT' && storedAnswers.length === 0) {
+          if (sectionId) {
+            const restored = item.formAnswers || item.answers || []
+            for (const answer of restored as any[]) {
+              if (!answer.formItemId) continue
+              await finalDraftStore.putAnswer({
+                draftKey,
+                itemKey: answer.formItemId,
+                value: answer.value ?? null,
+                updatedAt: Date.now(),
+              })
+            }
+          } else {
+            for (const answer of (item.answers || []) as any[]) {
+              if (!answer.itemCode || answer.responseValue === undefined) continue
+              await finalDraftStore.putAnswer({
+                draftKey,
+                itemKey: answer.itemCode,
+                value: { responseValue: answer.responseValue },
+                updatedAt: Date.now(),
+              })
+            }
+          }
+          storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        }
         if (cancelled) return
         const nextForm: Record<string, FormValue> = {}
         const nextScale: Record<string, ResponseValue> = {}
@@ -174,21 +205,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
               : value as ResponseValue
           }
         })
-        if (sectionId && storedAnswers.length === 0) {
-          ;(item.formAnswers || item.answers || []).forEach((answer: any) => {
-            if (answer.formItemId) nextForm[answer.formItemId] = answer.value ?? null
-          })
-        }
-        if (!sectionId && storedAnswers.length === 0) {
-          ;(item.answers || []).forEach((answer: any) => {
-            if (answer.itemCode && answer.responseValue !== undefined) nextScale[answer.itemCode] = answer.responseValue
-          })
-        }
         setMeta(nextMeta)
         setFormValues(nextForm)
         setScaleValues(nextScale)
         setRequiresRestart(nextMeta.status === 'CONFLICT')
-        setError(nextMeta.status === 'CONFLICT' ? (nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评') : null)
+        if (nextMeta.status === 'CONFLICT') {
+          setError(nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评')
+        } else if (nextMeta.status !== 'DRAFT') {
+          setError(nextMeta.sealedSubmission
+            ? '当前单元已有一份已封存提交；再次提交只会重放相同内容。'
+            : '检测到旧版未确认提交；请先核对服务器终态，不能重新生成提交内容。')
+        } else {
+          setError(null)
+        }
       } catch (cause) {
         if (!cancelled) {
           setRequiresRestart((cause as { code?: string })?.code === 'FINAL_DRAFT_IDENTITY_CONFLICT')
@@ -200,14 +229,14 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     }
     void load()
     return () => { cancelled = true }
-  }, [draftKey, unitKey, item, sectionId, scaleId, state.id, state.attemptEpoch, state.contextSnapshotHash, state.context?.snapshotHash])
+  }, [draftKey, unitKey, item, sectionId, scaleId, state.id, state.status, state.attemptEpoch, state.contextSnapshotHash, state.context?.snapshotHash])
 
   useEffect(() => {
     if (state.status === 'COMPLETED') onCompleted()
   }, [state.status, onCompleted])
 
   const saveForm = async (itemId: string, value: FormValue) => {
-    if (!draftKey || submitting) return
+    if (!draftKey || submitting || draftLocked) return
     setFormValues((previous) => ({ ...previous, [itemId]: value }))
     try {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
@@ -218,7 +247,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
-    if (!draftKey || submitting) return
+    if (!draftKey || submitting || draftLocked) return
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     try {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
@@ -250,7 +279,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
+        const missingStored = formAnswers.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: answerMap.get(answer.formItemId) ?? null })),
+        }
+      })
+      if (!sealed) throw new Error('本地综合表单草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -260,13 +301,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           setError('提交繁忙，正在自动重试…')
         },
         operation: async () => {
-          const next = await submitFormSection(state.id, sectionId, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: formValues[answer.formItemId] ?? null })),
-          })
+          const next = await submitFormSection(state.id, sectionId, sealed.payload)
           if (next.code !== 0) throw responseError(next)
           return next
         },
@@ -297,7 +332,28 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => {
+          const value = answer.value as { responseValue?: ResponseValue } | ResponseValue
+          return [answer.itemKey, typeof value === 'object' && value !== null && 'responseValue' in value
+            ? value.responseValue
+            : value] as const
+        }))
+        const missingStored = items.filter((question) => question.required && answerMap.get(question.itemCode) === undefined)
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认后再提交`)
+        const deviceInputProvenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: items
+            .filter((question) => answerMap.get(question.itemCode) !== undefined)
+            .map((question) => ({ itemCode: question.itemCode, responseValue: answerMap.get(question.itemCode) as ResponseValue })),
+          ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
+        }
+      })
+      if (!sealed) throw new Error('本地综合量表草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -307,20 +363,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           setError('提交繁忙，正在自动重试…')
         },
         operation: async () => {
-          const scaleDeviceInputProvenance = scaleDeviceInputProvenanceRef.current
-          const deviceInputProvenance = scaleDeviceInputProvenance
-            ? scaleDeviceInputProvenance.scaleId === item.scaleAssessmentId
-              ? scaleDeviceInputProvenance.value
-              : undefined
-            : undefined
-          const next = await submitScale(state.id, item.id, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
-            ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
-          })
+          const next = await submitScale(state.id, item.id, sealed.payload)
           if (next.code !== 0) throw responseError(next)
           return next
         },
@@ -361,9 +404,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
       {item?.type === 'SITUATIONAL' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{units[state.currentIndex]?.label || '文字情境测评'}</h2><p className="text-gray-600 mb-6">进入文字情境测评后，答案只在本地保留，完成时一次提交冻结结果。</p><button type="button" onClick={() => onEnterSituational(item)} className="btn-primary">开始/继续文字情境测评</button></div>}
 
-      {item?.type === 'FORM_SECTION' && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{item.title || '表单'}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {(item.formAnswers || item.answers || []).length}</span></div>{item.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{item.description}</p>}{(() => { const fields = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)) as any[]; const field = fields[sectionIndex]; if (!field) return <p className="text-gray-500">该区段没有字段。</p>; const value = formValues[field.formItemId]; const options = parseOptions(field.options); const imageItems = assessmentOptionImageItems(options); const videoEntries = formOptionVideoPresentations(options); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}><FormOptionVideoGroupGate entries={videoEntries} loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}><div><h3 className="text-lg font-medium mb-4">{field.label}{field.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>{field.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}{field.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}{field.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}{(!['single_choice', 'multiple_choice', 'year_month'].includes(field.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting} placeholder={field.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}<div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < fields.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div></div></FormOptionVideoGroupGate></AssessmentImageGate> })()}</div>}
+      {item?.type === 'FORM_SECTION' && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{item.title || '表单'}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {(item.formAnswers || item.answers || []).length}</span></div>{item.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{item.description}</p>}{(() => { const fields = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)) as any[]; const field = fields[sectionIndex]; if (!field) return <p className="text-gray-500">该区段没有字段。</p>; const value = formValues[field.formItemId]; const options = parseOptions(field.options); const imageItems = assessmentOptionImageItems(options); const videoEntries = formOptionVideoPresentations(options); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}><FormOptionVideoGroupGate entries={videoEntries} loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}><div><h3 className="text-lg font-medium mb-4">{field.label}{field.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>{field.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}{field.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}{field.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting || draftLocked} className="w-full border rounded px-3 py-2" />}{(!['single_choice', 'multiple_choice', 'year_month'].includes(field.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting || draftLocked} placeholder={field.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}<div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < fields.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div></div></FormOptionVideoGroupGate></AssessmentImageGate> })()}</div>}
 
-      {item?.type === 'SCALE' && item.scale && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{item.scale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {scaleItems.length}</span></div>{(() => { const question = scaleItems[scaleIndex]; if (!question) return <p className="text-gray-500">量表题目为空。</p>; const imageItems = assessmentImageItems(question.images); const videoPresentation = scaleItemVideoPresentation(question); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}><ScaleFormVideoGate presentation={videoPresentation} loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)} ariaLabel={`${question.content} 视频内容`}><div><h3 className="text-lg font-medium mb-5">{question.content}{question.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{question.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScale(question.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[question.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScaleNow()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div></ScaleFormVideoGate></AssessmentImageGate> })()}</div>}
+      {item?.type === 'SCALE' && item.scale && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{item.scale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {scaleItems.length}</span></div>{(() => { const question = scaleItems[scaleIndex]; if (!question) return <p className="text-gray-500">量表题目为空。</p>; const imageItems = assessmentImageItems(question.images); const videoPresentation = scaleItemVideoPresentation(question); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}><ScaleFormVideoGate presentation={videoPresentation} loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)} ariaLabel={`${question.content} 视频内容`}><div><h3 className="text-lg font-medium mb-5">{question.content}{question.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{question.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScale(question.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[question.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScaleNow()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div></ScaleFormVideoGate></AssessmentImageGate> })()}</div>}
 
       <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">提交单元</p><div className="flex flex-wrap gap-2">{units.map((unit) => <span key={`${unit.type}-${unit.id}`} className={`px-3 py-1 rounded text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{unit.index + 1}. {unit.label || unit.type}</span>)}</div></div>
     </div>

@@ -180,6 +180,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const currentScaleServerProvenanceJson = currentScale?.deviceInputProvenance
     ? JSON.stringify(currentScale.deviceInputProvenance)
     : null
+  const draftLocked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
 
   const loadAssessmentImage = useCallback(async (assetId: string): Promise<Blob> => {
     let url: string
@@ -233,6 +234,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         if (!cancelled) setLoadingDraft(false)
         return
       }
+      if (data.questionnaireAssessment.status === 'COMPLETED') {
+        await finalDraftStore.delete(currentKey).catch(() => undefined)
+        if (!cancelled) setLoadingDraft(false)
+        return
+      }
       try {
         const nextMeta = await ensureDraft(data, currentKey)
         if (currentScaleId) {
@@ -247,7 +253,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             existing,
           })
           scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
-          if (!storedProvenance) {
+          if (!storedProvenance && nextMeta.status === 'DRAFT' && !nextMeta.sealedSubmission) {
             await finalDraftStore.setInstrumentMetadata(currentKey, {
               [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
             }).catch(() => null)
@@ -270,7 +276,15 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         setFormValues(nextForm)
         setScaleValues(nextScale)
         setRequiresRestart(nextMeta.status === 'CONFLICT')
-        setError(nextMeta.status === 'CONFLICT' ? (nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评') : null)
+        if (nextMeta.status === 'CONFLICT') {
+          setError(nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评')
+        } else if (nextMeta.status !== 'DRAFT') {
+          setError(nextMeta.sealedSubmission
+            ? '当前单元已有一份已封存提交；再次提交只会重放相同内容。'
+            : '检测到旧版未确认提交；请先核对服务器终态，不能重新生成提交内容。')
+        } else {
+          setError(null)
+        }
       } catch (cause) {
         if (!cancelled) {
           setRequiresRestart((cause as { code?: string })?.code === 'FINAL_DRAFT_IDENTITY_CONFLICT')
@@ -295,7 +309,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       : '当前答案只保存在本地草稿中。'
 
   const saveFormValue = async (itemId: string, value: FormValue) => {
-    if (!currentKey || submitting) return
+    if (!currentKey || submitting || draftLocked) return
     setFormValues((previous) => ({ ...previous, [itemId]: value }))
     try {
       await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemId, value, updatedAt: Date.now() })
@@ -306,7 +320,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   }
 
   const saveScaleValue = async (itemCode: string, value: ResponseValue) => {
-    if (!currentKey || submitting) return
+    if (!currentKey || submitting || draftLocked) return
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     try {
       await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
@@ -319,7 +333,6 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const submitSection = async () => {
     if (!currentSection || !currentKey || !meta || submitting) return
-    const answers = currentSection.items.map((item) => ({ formItemId: item.id, value: formValues[item.id] ?? null }))
     const missing = currentSection.items.filter((item) => item.required && isEmpty(formValues[item.id]))
     if (missing.length > 0) {
       setSectionIndex(Math.max(0, currentSection.items.findIndex((item) => item.required && isEmpty(formValues[item.id]))))
@@ -329,7 +342,19 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(currentKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
+        const missingStored = currentSection.items.filter((item) => item.required && isEmpty(answerMap.get(item.id)))
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: currentSection.items.map((item) => ({ formItemId: item.id, value: answerMap.get(item.id) ?? null })),
+        }
+      })
+      if (!sealed) throw new Error('本地问卷区段草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
@@ -341,13 +366,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         operation: async () => {
           const next = await post(publicMode
             ? `/assessments/${data.sessionId}/form-sections/${currentSection.id}/submit`
-            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/form-sections/${currentSection.id}/submit`, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers,
-          })
+            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/form-sections/${currentSection.id}/submit`, sealed.payload)
           if (next.code !== 0) throw apiResponseError(next)
           return next
         },
@@ -374,13 +393,31 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       setError(`还有 ${missing.length} 道必答题未作答`)
       return
     }
-    const answers = currentScale.definition.items
-      .filter((item) => scaleValues[item.itemCode] !== undefined)
-      .map((item) => ({ itemCode: item.itemCode, responseValue: scaleValues[item.itemCode] }))
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(currentKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(currentKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => {
+          const stored = answer.value as { responseValue?: ResponseValue } | ResponseValue
+          return [answer.itemKey, typeof stored === 'object' && stored !== null && 'responseValue' in stored
+            ? stored.responseValue
+            : stored] as const
+        }))
+        const missingStored = currentScale.definition.items.filter((item) => item.required && answerMap.get(item.itemCode) === undefined)
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认后再提交`)
+        const provenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: currentScale.definition.items
+            .filter((item) => answerMap.get(item.itemCode) !== undefined)
+            .map((item) => ({ itemCode: item.itemCode, responseValue: answerMap.get(item.itemCode) as ResponseValue })),
+          ...(provenance ? { deviceInputProvenance: provenance } : {}),
+        }
+      })
+      if (!sealed) throw new Error('本地问卷量表草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(currentKey, 'RETRY_PENDING', {
@@ -392,16 +429,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         operation: async () => {
           const next = await post(publicMode
             ? `/assessments/${data.sessionId}/scale/${currentScale.scaleAssessmentId}/submit`
-            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/scales/${currentScale.scaleAssessmentId}/submit`, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers,
-            ...(scaleDeviceInputProvenanceRef.current?.scaleId === currentScale.scaleAssessmentId
-              ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current.value }
-              : {}),
-          })
+            : `/questionnaires/assessments/${data.questionnaireAssessment.id}/scales/${currentScale.scaleAssessmentId}/submit`, sealed.payload)
           if (next.code !== 0) throw apiResponseError(next)
           return next
         },
@@ -459,10 +487,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
               >
                 <div>
                   <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
-                  {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
-                  {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
-                  {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} className="w-full border rounded px-3 py-2" />}
-                  {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
+                  {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
+                  {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
+                  {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} className="w-full border rounded px-3 py-2" />}
+                  {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
                   <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
                 </div>
               </FormOptionVideoGroupGate>
@@ -488,7 +516,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
                 ariaLabel={`${item.content} 视频内容`}
               >
-                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
               </ScaleFormVideoGate>
             </AssessmentImageGate>
           })()}

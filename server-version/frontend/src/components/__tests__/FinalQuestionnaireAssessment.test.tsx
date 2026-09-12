@@ -229,4 +229,26 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     expect(mockCapture).not.toHaveBeenCalled()
     expect((post.mock.calls[0][1] as Record<string, any>).deviceInputProvenance).toEqual(provenance)
   })
+
+  it('replays the identical sealed Scale body after an ambiguous submit failure', async () => {
+    const user = userEvent.setup()
+    const { post } = renderAssessment(makeScaleData())
+    post
+      .mockResolvedValueOnce({ code: 500, message: 'response lost', data: null })
+      .mockResolvedValueOnce(response)
+
+    await user.click(await screen.findByRole('button', { name: '经常' }))
+    await user.click(screen.getByRole('button', { name: '提交整份量表' }))
+    await waitFor(() => expect(post).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('response lost'))
+
+    const firstBody = structuredClone(post.mock.calls[0][1])
+    const sealedMeta = await finalDraftStore.get('questionnaire-scale:scale-assessment-1')
+    expect(sealedMeta?.status).toBe('RETRY_PENDING')
+    expect(sealedMeta?.sealedSubmission?.payload).toEqual(firstBody)
+
+    await user.click(screen.getByRole('button', { name: '提交整份量表' }))
+    await waitFor(() => expect(post).toHaveBeenCalledTimes(2))
+    expect(post.mock.calls[1][1]).toEqual(firstBody)
+  })
 })

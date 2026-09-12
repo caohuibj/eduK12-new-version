@@ -127,12 +127,12 @@ const isMatchingIdentity = (meta: FinalDraftMeta, attempt: SituationalAttempt): 
 export const ensureSituationalDraft = async (attempt: SituationalAttempt): Promise<FinalDraftMeta> => {
   const draftKey = situationalDraftKey(attempt.id)
   const existing = await finalDraftStore.get(draftKey)
-  if (existing && !isMatchingIdentity(existing, attempt)) {
-    await finalDraftStore.delete(draftKey)
-  }
   if (existing?.status === 'COMPLETED' && isMatchingIdentity(existing, attempt)) {
     await finalDraftStore.delete(draftKey)
   }
+  // A mismatching frozen identity must fail closed in finalDraftStore.ensure().
+  // Deleting the old draft here would destroy recoverable evidence and could
+  // silently turn a conflict into a new logical FINAL.
   return finalDraftStore.ensure(createFinalDraftMeta({
     draftKey,
     instrument: 'situational',
@@ -172,6 +172,9 @@ export const situationalErrorMessage = (error: unknown): string => {
   const value = error as { code?: unknown; message?: unknown; status?: number; statusCode?: number }
   const code = String(value?.code ?? '')
   if (code === 'INSTRUMENT_NOT_AVAILABLE') return '题包已不可用，请返回列表选择其他测评。'
+  if (code === 'FINAL_DRAFT_IDENTITY_CONFLICT') return '本地草稿与当前冻结测评身份不一致；草稿已保留，请返回后重新进入并核对。'
+  if (code === 'FINAL_DRAFT_PENDING_WITHOUT_SEAL') return '检测到旧版未确认提交；请先核对服务器结果，不能重新生成提交内容。'
+  if (code === 'FINAL_DRAFT_NOT_WRITABLE') return '该测评已经进入提交状态，不能继续修改答案。'
   if (code === 'STALE_ATTEMPT' || code === 'DEFINITION_MISMATCH') return '测评版本已变更，请重新进入。'
   if (code === 'SUBMISSION_PAYLOAD_CONFLICT') return '这次提交与服务器已有记录不一致，请返回测评历史查看结果。'
   if (code === 'SUBMISSION_ALREADY_IN_PROGRESS') return '已有进行中的测评，正在恢复作答。'
