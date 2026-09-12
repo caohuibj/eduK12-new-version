@@ -25,6 +25,15 @@ import { elapsedScaleResponseTimeMs, readScaleTimingNow } from '../../modules/sc
 
 type ResponseValue = string | number
 
+type ScaleFinalPayload = {
+  submissionId: string
+  attemptEpoch: number
+  definitionHash: string
+  contextSnapshotHash?: string
+  answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }>
+  deviceInputProvenance?: DeviceInputProvenanceV1
+}
+
 interface ScaleRunnerItem {
   itemCode: string
   content: string
@@ -186,6 +195,7 @@ const ScaleAssessment: React.FC = () => {
         })
         if (nextAssessment.deliveryMode === 'FINAL_ONLY') {
           if (nextAssessment.status === 'COMPLETED') {
+            await finalDraftStore.delete(`scale:${nextAssessment.id}`).catch(() => undefined)
             navigate(`/student/scales/result/${nextAssessment.id}`)
             return
           }
@@ -209,7 +219,7 @@ const ScaleAssessment: React.FC = () => {
             existing: scaleDeviceInputProvenanceRef.current,
           })
           scaleDeviceInputProvenanceRef.current = provenance
-          if (!storedProvenance) {
+          if (!storedProvenance && nextMeta.status === 'DRAFT' && !nextMeta.sealedSubmission) {
             await finalDraftStore.setInstrumentMetadata(draftKey, {
               [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
             }).catch(() => null)
@@ -223,6 +233,11 @@ const ScaleAssessment: React.FC = () => {
           })
           answerRevisionsRef.current = revisions
           setAnswers(existingAnswers)
+          if (nextMeta.status !== 'DRAFT') {
+            setCompletionNotice(nextMeta.sealedSubmission
+              ? '该测评已有一份已封存提交，继续操作只会重放同一份提交内容。'
+              : '检测到旧版未确认提交。请刷新页面核对服务器状态，当前答案不会被重新生成提交。')
+          }
           return
         }
         scaleDeviceInputProvenanceRef.current = resolveScaleDeviceInputProvenance({
@@ -316,27 +331,36 @@ const ScaleAssessment: React.FC = () => {
       setSubmitting(true)
       if (assessment.deliveryMode === 'FINAL_ONLY') {
         const draftKey = `scale:${assessment.id}`
-        const meta = await finalDraftStore.get(draftKey)
-        if (!meta) throw new Error('本地量表草稿不存在，请重启测评')
-        const localAnswers = await finalDraftStore.listAnswers(draftKey)
-        const answerMap = new Map(localAnswers.map((answer) => {
-          const value = answer.value as { responseValue?: ResponseValue; responseTimeMs?: number } | ResponseValue
-          const stored = typeof value === 'object' && value !== null && 'responseValue' in value
-            ? value as { responseValue?: ResponseValue; responseTimeMs?: number }
-            : { responseValue: value as ResponseValue }
-          return [answer.itemKey, stored] as const
-        }))
-        const finalAnswers = scale.definition.items
-          .filter((item) => answerMap.has(item.itemCode))
-          .map((item) => {
-            const value = answerMap.get(item.itemCode)!
-            return {
-              itemCode: item.itemCode,
-              responseValue: value.responseValue as ResponseValue,
-              ...(value.responseTimeMs === undefined ? {} : { responseTimeMs: value.responseTimeMs }),
-            }
-          })
-        await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+        const sealed = await finalDraftStore.sealForSubmission<ScaleFinalPayload>(draftKey, (snapshot) => {
+          const answerMap = new Map(snapshot.answers.map((answer) => {
+            const value = answer.value as { responseValue?: ResponseValue; responseTimeMs?: number } | ResponseValue
+            const stored = typeof value === 'object' && value !== null && 'responseValue' in value
+              ? value as { responseValue?: ResponseValue; responseTimeMs?: number }
+              : { responseValue: value as ResponseValue }
+            return [answer.itemKey, stored] as const
+          }))
+          const finalAnswers = scale.definition.items
+            .filter((item) => answerMap.has(item.itemCode))
+            .map((item) => {
+              const value = answerMap.get(item.itemCode)!
+              return {
+                itemCode: item.itemCode,
+                responseValue: value.responseValue as ResponseValue,
+                ...(value.responseTimeMs === undefined ? {} : { responseTimeMs: value.responseTimeMs }),
+              }
+            })
+          const provenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
+            ?? scaleDeviceInputProvenanceRef.current
+          return {
+            submissionId: snapshot.meta.submissionId,
+            attemptEpoch: snapshot.meta.attemptEpoch,
+            definitionHash: snapshot.meta.definitionHash,
+            ...(snapshot.meta.contextSnapshotHash ? { contextSnapshotHash: snapshot.meta.contextSnapshotHash } : {}),
+            answers: finalAnswers,
+            ...(provenance ? { deviceInputProvenance: provenance } : {}),
+          }
+        })
+        if (!sealed) throw new Error('本地量表草稿不存在，请重启测评')
         await runFinalDraftCapacityRetry({
           onRetry: async ({ error }) => {
             await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -346,16 +370,7 @@ const ScaleAssessment: React.FC = () => {
             setCompletionNotice('提交繁忙，正在自动重试…')
           },
           operation: async () => {
-            const next = await apiClient.post(`/scales/assessments/${assessment.id}/submit`, {
-              submissionId: meta.submissionId,
-              attemptEpoch: meta.attemptEpoch,
-              definitionHash: meta.definitionHash,
-              ...(meta.contextSnapshotHash ? { contextSnapshotHash: meta.contextSnapshotHash } : {}),
-              answers: finalAnswers,
-              ...(scaleDeviceInputProvenanceRef.current
-                ? { deviceInputProvenance: scaleDeviceInputProvenanceRef.current }
-                : {}),
-            })
+            const next = await apiClient.post(`/scales/assessments/${assessment.id}/submit`, sealed.payload)
             if (next.code !== 0) {
               const conflict = String(next.code) === '409' || String(next.code) === 'STALE_ATTEMPT' || String(next.code) === 'SUBMISSION_PAYLOAD_CONFLICT'
               await finalDraftStore.setStatus(draftKey, conflict ? 'CONFLICT' : 'RETRY_PENDING', { code: String(next.code), message: next.message })
