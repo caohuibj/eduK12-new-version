@@ -32,3 +32,6 @@
   .hui-account { width: 100%; justify-content: space-between; }
   .hui-breadcrumb { padding-inline: 16px; }
 }
+.hui-product .hui-portal-entries { display: grid; gap: 16px; }
+.hui-product .hui-portal-entries a { display: flex; flex-direction: column; gap: 4px; min-height: 44px; padding: 20px; background: white; border: 1px solid var(--hui-color-border); border-radius: var(--hui-radius); }
+.hui-product .hui-portal-entries span { color: var(--hui-color-muted); }

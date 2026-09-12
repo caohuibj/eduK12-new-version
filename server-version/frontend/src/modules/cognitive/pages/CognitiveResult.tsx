@@ -1,3 +1,4 @@
+import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath } from '../../../components/app-shell/access'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -74,6 +75,7 @@ const CognitiveResult: React.FC = () => {
       <div className="card p-8 text-center">
         <p className="text-gray-600 mb-4">{error || '暂无结果'}</p>
         <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">返回列表</button>
+        {isPublic && sessionId && <CognitiveCredentialReset sessionId={sessionId} />}
       </div>
     )
   }

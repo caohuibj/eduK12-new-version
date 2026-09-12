@@ -13,7 +13,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const cognitive = useCognitiveEnabled()
   const location = useLocation()
   const desiredMode = shellModeFor(location.pathname)
-  const mode = desiredMode === 'standard' && !user ? 'public' : desiredMode
+  const guestClassroom = location.pathname.startsWith('/student/classroom/') && user?.role !== 'STUDENT'
+  const mode = guestClassroom || (desiredMode === 'standard' && !user) ? 'public' : desiredMode
   const items = navigationFor(user?.role, cognitive)
   const active = activeNavigation(items, location.pathname)
   const title = routeTitle(location.pathname, active)
@@ -36,7 +37,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={() => mainRef.current?.focus()}>跳到主要内容</a></div>
       <header className="hui-product hui-app-header">
         {mode === 'focused' ? <span className="hui-brand">Huisurvey</span> : <Link className="hui-brand" to={homeFor(user?.role)}>Huisurvey</Link>}
-        {mode === 'standard' && <ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onClick={() => setOpenPath(menuOpen ? null : location.pathname)}>导航菜单</ProductButton>}
+        {mode === 'standard' && <ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={(event) => { if (event.key === 'Escape') setOpenPath(null) }} onClick={() => setOpenPath(menuOpen ? null : location.pathname)}>导航菜单</ProductButton>}
         <div className="hui-account">
           {isPublicAssessmentPath(location.pathname) ? <span>公开参与</span> : user ? <span>{user.nickname || user.username} · {{ STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员' }[user.role]}</span> : <span>欢迎使用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
@@ -48,7 +49,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </nav>}
         <div className="hui-app-content">
           {mode === 'standard' && <nav className="hui-product hui-breadcrumb" aria-label="当前位置"><Link to={homeFor(user?.role)}>首页</Link>{active && <><span aria-hidden="true">/</span>{active.path === location.pathname ? <span>{active.label}</span> : <Link to={active.path}>{active.label}</Link>}</>}{title !== active?.label && <><span aria-hidden="true">/</span><span>{title}</span></>}</nav>}
-          <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${isAuthPath(location.pathname) ? 'hui-auth-content' : ''}`}>{children}</main>
+          <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname) || location.pathname === '/profile' || location.pathname === '/student/profile' || user?.mustChangePassword) ? 'hui-auth-content' : ''}`}>{children}</main>
         </div>
       </div>
       {mode !== 'focused' && <Footer variant="light" />}

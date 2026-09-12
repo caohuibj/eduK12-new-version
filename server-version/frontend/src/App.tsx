@@ -1,10 +1,9 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesContext'
 import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
-import { Link, useLocation } from 'react-router-dom'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
 
 // Portal & Auth Pages
@@ -123,7 +122,10 @@ class RouteErrorBoundary extends React.Component<
 const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
 const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT']}>{children}</RouteAccess>
 const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'TEACHER', 'ADMIN']}>{children}</RouteAccess>
-const OptionalStudentRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>
+const OptionalStudentRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLoading } = useAuth()
+  return isLoading ? <RouteLoading /> : <>{children}</>
+}
 
 // Entry Route - for portal page (redirect if authenticated)
 const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

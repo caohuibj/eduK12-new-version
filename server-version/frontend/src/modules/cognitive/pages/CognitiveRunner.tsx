@@ -1,3 +1,4 @@
+import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -266,6 +267,7 @@ const CognitiveRunner: React.FC = () => {
         <button onClick={controller.reload} className="btn-secondary">
           重试
         </button>
+        {isPublic && sessionId && <CognitiveCredentialReset sessionId={sessionId} />}
       </div>
     )
   }

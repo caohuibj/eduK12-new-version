@@ -21,7 +21,7 @@ it('preserves protected deep-link query and hash through sign-in redirect', () =
   expect(screen.queryByText('private')).not.toBeInTheDocument()
 })
 it('never mounts protected children for another account after expiry', () => {
-  rememberReauthReturn({ id: 'original', role: 'STUDENT' }, '/student/scales/1')
+  rememberReauthReturn({ id: 'original', role: 'STUDENT' }, '/student/scales/1?returnTo=%2Fstudent')
   const child = vi.fn(() => <p>draft contents</p>)
   const Child = child
   render(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><Child /></RouteAccess></MemoryRouter>)

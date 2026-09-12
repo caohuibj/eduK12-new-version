@@ -158,7 +158,7 @@ const TeacherProfile: React.FC = () => {
       </div>
 
       {message && (
-        <div className={`p-4 rounded-lg ${
+        <div role={message.type === 'error' ? 'alert' : 'status'} className={`p-4 rounded-lg ${
           message.type === 'success' 
             ? 'bg-green-50 border border-green-200 text-green-700' 
             : 'bg-red-50 border border-red-200 text-red-700'
@@ -184,10 +184,10 @@ const TeacherProfile: React.FC = () => {
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="profile-nickname" className="block text-sm font-medium text-gray-700 mb-1">
               真实姓名 <span className="text-xs text-gray-500">(中文2-10字或英文2-20字母)</span>
             </label>
-            <input
+            <input id="profile-nickname" aria-invalid={Boolean(nicknameError)} aria-describedby={nicknameError ? "profile-nickname-error" : undefined}
               type="text"
               value={nickname}
               onChange={(e) => {
@@ -198,7 +198,7 @@ const TeacherProfile: React.FC = () => {
               placeholder="请输入真实姓名"
             />
             {nicknameError && (
-              <p className="mt-1 text-xs text-red-500">{nicknameError}</p>
+              <p role="alert" id="profile-nickname-error" className="mt-1 text-xs text-red-500">{nicknameError}</p>
             )}
           </div>
 
@@ -245,11 +245,11 @@ const TeacherProfile: React.FC = () => {
         {showPasswordForm && (
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-oldPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 原密码
               </label>
               <div className="relative">
-                <input
+                <input id="profile-oldPassword" aria-invalid={Boolean(passwordErrors.oldPassword)} aria-describedby={passwordErrors.oldPassword ? "profile-oldPassword-error" : undefined}
                   type={showOldPassword ? 'text' : 'password'}
                   value={oldPassword}
                   onChange={(e) => {
@@ -261,6 +261,7 @@ const TeacherProfile: React.FC = () => {
                 />
                 <button
                   type="button"
+                  aria-label={showOldPassword ? "隐藏原密码" : "显示原密码"}
                   onClick={() => setShowOldPassword(!showOldPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
@@ -268,16 +269,16 @@ const TeacherProfile: React.FC = () => {
                 </button>
               </div>
               {passwordErrors.oldPassword && (
-                <p className="mt-1 text-xs text-red-500">{passwordErrors.oldPassword}</p>
+                <p role="alert" id="profile-oldPassword-error" className="mt-1 text-xs text-red-500">{passwordErrors.oldPassword}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-newPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 新密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
               </label>
               <div className="relative">
-                <input
+                <input id="profile-newPassword" aria-invalid={Boolean(passwordErrors.newPassword)} aria-describedby={passwordErrors.newPassword ? "profile-newPassword-error" : undefined}
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => {
@@ -289,6 +290,7 @@ const TeacherProfile: React.FC = () => {
                 />
                 <button
                   type="button"
+                  aria-label={showNewPassword ? "隐藏新密码" : "显示新密码"}
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
@@ -296,15 +298,15 @@ const TeacherProfile: React.FC = () => {
                 </button>
               </div>
               {passwordErrors.newPassword && (
-                <p className="mt-1 text-xs text-red-500">{passwordErrors.newPassword}</p>
+                <p role="alert" id="profile-newPassword-error" className="mt-1 text-xs text-red-500">{passwordErrors.newPassword}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 确认新密码
               </label>
-              <input
+              <input id="profile-confirmPassword" aria-invalid={Boolean(passwordErrors.confirmPassword)} aria-describedby={passwordErrors.confirmPassword ? "profile-confirmPassword-error" : undefined}
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => {
@@ -315,7 +317,7 @@ const TeacherProfile: React.FC = () => {
                 placeholder="请再次输入新密码"
               />
               {passwordErrors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-500">{passwordErrors.confirmPassword}</p>
+                <p role="alert" id="profile-confirmPassword-error" className="mt-1 text-xs text-red-500">{passwordErrors.confirmPassword}</p>
               )}
             </div>
 

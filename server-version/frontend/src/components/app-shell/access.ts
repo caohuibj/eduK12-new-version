@@ -26,7 +26,7 @@ export function shellModeFor(pathname: string): ShellMode {
 
 /** URLSearchParams already decodes query values. Never decode a return URL twice. */
 export function internalReturnTo(value: string | null | undefined): string | null {
-  if (!value || !value.startsWith('/') || value.startsWith('//') || /[\\\u0000-\u0020\u007f]/.test(value)) return null
+  if (!value || !value.startsWith('/') || value.startsWith('//') || [...value].some((char) => char === '\\' || char.charCodeAt(0) <= 32 || char.charCodeAt(0) === 127)) return null
   try {
     const url = new URL(value, 'https://huisurvey.invalid')
     if (url.origin !== 'https://huisurvey.invalid') return null
@@ -67,4 +67,10 @@ export function parentReturnTo(value: string | null, isPublic: boolean, fallback
   if (!target) return fallback
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
   return pathname.startsWith(isPublic ? '/public/composite/' : '/student/composite/') ? target : fallback
+}
+
+export function sameReturnPage(left: string | undefined, right: string): boolean {
+  const a = internalReturnTo(left)
+  const b = internalReturnTo(right)
+  return Boolean(a && b && new URL(a, 'https://huisurvey.invalid').pathname === new URL(b, 'https://huisurvey.invalid').pathname)
 }

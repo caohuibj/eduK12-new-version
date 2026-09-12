@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { mockMe, mockLogin, mockCsrf } = vi.hoisted(() => ({
   mockMe: vi.fn(),
@@ -27,6 +27,7 @@ const Probe = () => {
 describe('AuthContext session expiry handling', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    sessionStorage.clear()
     mockMe.mockResolvedValue({
       code: 0,
       message: 'ok',
@@ -38,6 +39,20 @@ describe('AuthContext session expiry handling', () => {
       message: 'ok',
       data: { user: { id: 'user-2', username: 'teacher-2', role: 'TEACHER' } },
     })
+  })
+
+  afterEach(() => vi.restoreAllMocks())
+
+  it('retains the interrupted account in AuthContext when hint storage is denied', async () => {
+    const ReturnProbe = () => {
+      const { user, reauthReturn } = useAuth()
+      return <output>{user?.id || 'out'}:{reauthReturn?.userId || 'none'}</output>
+    }
+    render(<AuthProvider><ReturnProbe /></AuthProvider>)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('user-1:none'))
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied') })
+    act(() => window.dispatchEvent(new CustomEvent('auth:expired')))
+    expect(screen.getByRole('status')).toHaveTextContent('out:user-1')
   })
 
   it('clears the in-memory identity when a protected request reports expiry', async () => {

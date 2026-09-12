@@ -1,4 +1,4 @@
-import { loginUrl, rememberReauthReturn } from '../components/app-shell/access'
+import { loginUrl } from '../components/app-shell/access'
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Alert, Button, Card, Form, Input, message } from 'antd'
@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { isValidPassword, passwordPolicyMessage } from '../utils/password'
 
 const FirstLoginPasswordChange: React.FC = () => {
-  const { user, setUser, logout } = useAuth()
+  const { user, setUser, logout, prepareReauthentication } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [oldPassword, setOldPassword] = useState('')
@@ -26,7 +26,7 @@ const FirstLoginPasswordChange: React.FC = () => {
       const response = await authApi.changePassword(oldPassword, newPassword)
       if (response.code !== 0) throw new Error(response.message || '密码修改失败')
       const target = `${location.pathname}${location.search}${location.hash}`
-      if (user) rememberReauthReturn(user, target)
+      prepareReauthentication(target)
       setUser(null)
       message.success('密码已修改，请使用新密码重新登录')
       navigate(loginUrl(user?.role, target), { replace: true })
