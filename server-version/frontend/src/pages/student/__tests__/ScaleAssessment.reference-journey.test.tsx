@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -59,11 +60,11 @@ vi.mock('../../../hooks/useRunnerSaveState', () => ({
 }))
 
 vi.mock('../../../modules/assessment-media/AssessmentImageGate', () => ({
-  default: ({ children }: { children: React.ReactNode }) => children,
+  default: ({ children }: { children: ReactNode }) => children,
 }))
 
 vi.mock('../../../modules/assessment-media/ScaleFormVideoGate', () => ({
-  default: (props: Record<string, unknown> & { children?: React.ReactNode }) => {
+  default: (props: Record<string, unknown> & { children?: ReactNode }) => {
     mocks.videoGateProps = props
     return mocks.hideVideoChildren ? null : props.children
   },
