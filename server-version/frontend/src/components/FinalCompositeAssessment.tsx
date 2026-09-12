@@ -131,6 +131,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         if (!cancelled) setLoadingDraft(false)
         return
       }
+      if (state.status === 'COMPLETED') {
+        await finalDraftStore.delete(draftKey).catch(() => undefined)
+        if (!cancelled) setLoadingDraft(false)
+        return
+      }
       try {
         const definitionHash = item.definitionHash
         if (!definitionHash) throw new Error('综合测评内容缺少冻结定义，请重启测评')
@@ -155,13 +160,38 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             existing,
           })
           scaleDeviceInputProvenanceRef.current = { scaleId, value: provenance }
-          if (!storedProvenance) {
+          if (!storedProvenance && nextMeta.status === 'DRAFT' && !nextMeta.sealedSubmission) {
             await finalDraftStore.setInstrumentMetadata(draftKey, {
               [SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY]: provenance,
             }).catch(() => null)
           }
         }
-        const storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        let storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        if (nextMeta.status === 'DRAFT' && storedAnswers.length === 0) {
+          if (sectionId) {
+            const restored = item.formAnswers || item.answers || []
+            for (const answer of restored as any[]) {
+              if (!answer.formItemId) continue
+              await finalDraftStore.putAnswer({
+                draftKey,
+                itemKey: answer.formItemId,
+                value: answer.value ?? null,
+                updatedAt: Date.now(),
+              })
+            }
+          } else {
+            for (const answer of (item.answers || []) as any[]) {
+              if (!answer.itemCode || answer.responseValue === undefined) continue
+              await finalDraftStore.putAnswer({
+                draftKey,
+                itemKey: answer.itemCode,
+                value: { responseValue: answer.responseValue },
+                updatedAt: Date.now(),
+              })
+            }
+          }
+          storedAnswers = await finalDraftStore.listAnswers(draftKey)
+        }
         if (cancelled) return
         const nextForm: Record<string, FormValue> = {}
         const nextScale: Record<string, ResponseValue> = {}
@@ -174,21 +204,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
               : value as ResponseValue
           }
         })
-        if (sectionId && storedAnswers.length === 0) {
-          ;(item.formAnswers || item.answers || []).forEach((answer: any) => {
-            if (answer.formItemId) nextForm[answer.formItemId] = answer.value ?? null
-          })
-        }
-        if (!sectionId && storedAnswers.length === 0) {
-          ;(item.answers || []).forEach((answer: any) => {
-            if (answer.itemCode && answer.responseValue !== undefined) nextScale[answer.itemCode] = answer.responseValue
-          })
-        }
         setMeta(nextMeta)
         setFormValues(nextForm)
         setScaleValues(nextScale)
         setRequiresRestart(nextMeta.status === 'CONFLICT')
-        setError(nextMeta.status === 'CONFLICT' ? (nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评') : null)
+        if (nextMeta.status === 'CONFLICT') {
+          setError(nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评')
+        } else if (nextMeta.status !== 'DRAFT') {
+          setError(nextMeta.sealedSubmission
+            ? '当前单元已有一份已封存提交；再次提交只会重放相同内容。'
+            : '检测到旧版未确认提交；请先核对服务器终态，不能重新生成提交内容。')
+        } else {
+          setError(null)
+        }
       } catch (cause) {
         if (!cancelled) {
           setRequiresRestart((cause as { code?: string })?.code === 'FINAL_DRAFT_IDENTITY_CONFLICT')
@@ -200,7 +228,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     }
     void load()
     return () => { cancelled = true }
-  }, [draftKey, unitKey, item, sectionId, scaleId, state.id, state.attemptEpoch, state.contextSnapshotHash, state.context?.snapshotHash])
+  }, [draftKey, unitKey, item, sectionId, scaleId, state.id, state.status, state.attemptEpoch, state.contextSnapshotHash, state.context?.snapshotHash])
 
   useEffect(() => {
     if (state.status === 'COMPLETED') onCompleted()
@@ -250,7 +278,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
+        const missingStored = formAnswers.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: answerMap.get(answer.formItemId) ?? null })),
+        }
+      })
+      if (!sealed) throw new Error('本地综合表单草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -260,13 +300,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           setError('提交繁忙，正在自动重试…')
         },
         operation: async () => {
-          const next = await submitFormSection(state.id, sectionId, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: formValues[answer.formItemId] ?? null })),
-          })
+          const next = await submitFormSection(state.id, sectionId, sealed.payload)
           if (next.code !== 0) throw responseError(next)
           return next
         },
@@ -297,7 +331,28 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
-      await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+      const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const answerMap = new Map(snapshot.answers.map((answer) => {
+          const value = answer.value as { responseValue?: ResponseValue } | ResponseValue
+          return [answer.itemKey, typeof value === 'object' && value !== null && 'responseValue' in value
+            ? value.responseValue
+            : value] as const
+        }))
+        const missingStored = items.filter((question) => question.required && answerMap.get(question.itemCode) === undefined)
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认后再提交`)
+        const deviceInputProvenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          definitionHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          answers: items
+            .filter((question) => answerMap.get(question.itemCode) !== undefined)
+            .map((question) => ({ itemCode: question.itemCode, responseValue: answerMap.get(question.itemCode) as ResponseValue })),
+          ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
+        }
+      })
+      if (!sealed) throw new Error('本地综合量表草稿不存在，请重新加载')
       await runFinalDraftCapacityRetry({
         onRetry: async ({ error }) => {
           await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -307,20 +362,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           setError('提交繁忙，正在自动重试…')
         },
         operation: async () => {
-          const scaleDeviceInputProvenance = scaleDeviceInputProvenanceRef.current
-          const deviceInputProvenance = scaleDeviceInputProvenance
-            ? scaleDeviceInputProvenance.scaleId === item.scaleAssessmentId
-              ? scaleDeviceInputProvenance.value
-              : undefined
-            : undefined
-          const next = await submitScale(state.id, item.id, {
-            submissionId: meta.submissionId,
-            attemptEpoch: meta.attemptEpoch,
-            definitionHash: meta.definitionHash,
-            contextSnapshotHash: meta.contextSnapshotHash,
-            answers: items.filter((question) => scaleValues[question.itemCode] !== undefined).map((question) => ({ itemCode: question.itemCode, responseValue: scaleValues[question.itemCode]! })),
-            ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
-          })
+          const next = await submitScale(state.id, item.id, sealed.payload)
           if (next.code !== 0) throw responseError(next)
           return next
         },
