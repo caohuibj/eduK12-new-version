@@ -158,6 +158,17 @@ const draftMeta = (sealed = false) => ({
   } : {}),
 })
 
+type SealSnapshot = {
+  meta: ReturnType<typeof draftMeta>
+  answers: Array<{ itemKey: string; value: unknown }>
+  trials: never[]
+}
+
+const storedAnswers = () => ([
+  { itemKey: 'item-1', value: { responseValue: 1, responseTimeMs: 100 } },
+  { itemKey: 'item-2', value: { responseValue: 2, responseTimeMs: 120 } },
+])
+
 const renderRunner = (withVideo = false) => {
   mocks.post.mockImplementation(async (url: string) => {
     if (url === '/scales/scale-1/assessments') {
@@ -220,6 +231,24 @@ describe('ScaleAssessment reference journey', () => {
       draftKey: 'scale:attempt-1',
       slotKey: 'scale-item:item-1:video',
     })
+  })
+
+  it('fails before the first seal when an answered video item has no durable completion marker', async () => {
+    const user = userEvent.setup()
+    mocks.listAnswers.mockResolvedValue(storedAnswers())
+    mocks.sealForSubmission.mockImplementation(async (_draftKey: string, builder: (snapshot: SealSnapshot) => unknown) => (
+      builder({ meta: draftMeta(false), answers: storedAnswers(), trials: [] })
+    ))
+    renderRunner(true)
+
+    await screen.findByText('第一题')
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    expect(screen.getByText('第二题')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '完成测评' }))
+
+    await waitFor(() => expect(mocks.sealForSubmission).toHaveBeenCalledTimes(1))
+    expect(await screen.findByText('第一题')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('该题包含必看视频')
   })
 
   it('keeps exact sealed FINAL retry reachable even when media content is unavailable', async () => {
