@@ -170,8 +170,13 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
           dispatch({ type: 'SESSION_ERROR', error: { code: 'DEFINITION_MISMATCH', message: '该认知测评缺少可恢复的冻结定义，请重启后重试' } })
           return
         }
+        const draftKey = `cognitive:${session.sessionId}`
+        if (session.status === 'COMPLETED') {
+          await finalDraftStore.delete(draftKey).catch(() => undefined)
+          dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
+          return
+        }
         try {
-          const draftKey = `cognitive:${session.sessionId}`
           const meta = await finalDraftStore.ensure(createFinalDraftMeta({
             draftKey,
             instrument: 'cognitive',
@@ -186,13 +191,20 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             dispatch({ type: 'RECOVERY_REQUIRED' })
             return
           }
-          if (session.status === 'COMPLETED') {
-            await finalDraftStore.delete(draftKey)
-            dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
-            return
-          }
           if (session.status !== 'IN_PROGRESS') {
             dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
+            return
+          }
+          if (meta.status !== 'DRAFT') {
+            dispatch({
+              type: 'SESSION_ERROR',
+              error: {
+                code: meta.sealedSubmission ? 'FINAL_SUBMISSION_PENDING' : 'FINAL_DRAFT_PENDING_WITHOUT_SEAL',
+                message: meta.sealedSubmission
+                  ? '该测评已有一份已封存提交，请重试提交或稍后重新加载结果。'
+                  : '检测到旧版未确认提交；请先核对服务器终态，不能重新生成试次提交。',
+              },
+            })
             return
           }
           const trials = await finalDraftStore.listTrials(draftKey)
@@ -282,7 +294,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             payload: submittedPayload,
             createdAt: Date.now(),
           })
-          await finalDraftStore.setStatus(draftKey, 'DRAFT')
           dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
           return true
         }
@@ -324,19 +335,30 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         if (!submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
         const draftKey = `cognitive:${session.sessionId}`
         finalDraftKey = draftKey
-        let meta = await finalDraftStore.get(draftKey)
-        if (!meta) throw new Error('本地认知草稿不存在，请重启测评')
-        const storedProvenance = readCognitiveAdministrationProvenance(meta.instrumentMetadata)
-        const finalProvenance = mergeAdministrationProvenance(storedProvenance, administrationProvenance)
-        if (finalProvenance) {
-          const persistedMeta = await finalDraftStore.setInstrumentMetadata(draftKey, {
-            [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: finalProvenance,
-          }).catch(() => null)
-          meta = persistedMeta ?? meta
+        const currentMeta = await finalDraftStore.get(draftKey)
+        if (!currentMeta) throw new Error('本地认知草稿不存在，请重启测评')
+        if (!currentMeta.sealedSubmission) {
+          const storedProvenance = readCognitiveAdministrationProvenance(currentMeta.instrumentMetadata)
+          const finalProvenance = mergeAdministrationProvenance(storedProvenance, administrationProvenance)
+          if (finalProvenance) {
+            await finalDraftStore.setInstrumentMetadata(draftKey, {
+              [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: finalProvenance,
+            })
+          }
         }
-        const trials = await finalDraftStore.listTrials(draftKey)
-        if (trials.length === 0) throw new Error('尚未记录任何认知试次')
-        await finalDraftStore.setStatus(draftKey, 'SUBMITTING')
+        const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+          if (snapshot.trials.length === 0) throw new Error('尚未记录任何认知试次')
+          const finalProvenance = readCognitiveAdministrationProvenance(snapshot.meta.instrumentMetadata)
+          return {
+            submissionId: snapshot.meta.submissionId,
+            attemptEpoch: snapshot.meta.attemptEpoch,
+            definitionHash: snapshot.meta.definitionHash,
+            contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+            trials: snapshot.trials.map((trial) => trial.payload),
+            ...(finalProvenance ? { administrationProvenance: finalProvenance } : {}),
+          }
+        })
+        if (!sealed) throw new Error('本地认知草稿不存在，请重启测评')
         const response = await runFinalDraftCapacityRetry({
           onRetry: async ({ error }) => {
             await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -345,14 +367,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             }).catch(() => undefined)
           },
           operation: async () => {
-            const next = await submitFinal(session.sessionId, {
-              submissionId: meta.submissionId,
-              attemptEpoch: meta.attemptEpoch,
-              definitionHash: meta.definitionHash,
-              contextSnapshotHash: meta.contextSnapshotHash,
-              trials: trials.map((trial) => trial.payload),
-              ...(finalProvenance ? { administrationProvenance: finalProvenance } : {}),
-            })
+            const next = await submitFinal(session.sessionId, sealed.payload)
             if (next.code !== 0 || !next.data) {
               const responseError = new Error(next.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
               responseError.code = next.code
