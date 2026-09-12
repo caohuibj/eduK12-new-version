@@ -5,6 +5,7 @@ import {
   FinalDraftIdentityConflictError,
   FinalDraftNotWritableError,
   FinalDraftPendingWithoutSealError,
+  FinalDraftSealRequiredError,
   FinalDraftTrialConflictError,
 } from '../finalDraftStore'
 
@@ -58,8 +59,7 @@ describe('final draft persistence', () => {
     await store.ensure(metaFor(draftKey))
     await expect(store.ensure({ ...metaFor(draftKey), attemptEpoch: 2 }))
       .rejects.toBeInstanceOf(FinalDraftIdentityConflictError)
-    await store.setStatus(draftKey, 'RETRY_PENDING', { code: 'NETWORK', message: 'timeout' })
-    expect((await store.get(draftKey))?.status).toBe('RETRY_PENDING')
+    expect((await store.get(draftKey))?.status).toBe('DRAFT')
     await store.delete(draftKey)
   })
 
@@ -132,11 +132,29 @@ describe('final draft persistence', () => {
     await store.delete(draftKey)
   })
 
+  it('keeps a draft writable when validation fails before sealing', async () => {
+    const store = createFinalDraftStore()
+    const draftKey = `pre-seal-failure-${Date.now()}`
+    await store.ensure(metaFor(draftKey))
+    await store.putAnswer({ draftKey, itemKey: 'q1', value: 'incomplete', updatedAt: Date.now() })
+
+    await expect(store.sealForSubmission(draftKey, () => {
+      throw new Error('required answer is not durably saved')
+    })).rejects.toThrow('required answer is not durably saved')
+    await expect(store.setStatus(draftKey, 'RETRY_PENDING', { code: 'LOCAL_VALIDATION' }))
+      .rejects.toBeInstanceOf(FinalDraftSealRequiredError)
+    expect((await store.get(draftKey))?.status).toBe('DRAFT')
+    expect((await store.get(draftKey))?.sealedSubmission).toBeUndefined()
+    await expect(store.putAnswer({ draftKey, itemKey: 'q2', value: 'fixed', updatedAt: Date.now() })).resolves.toBeUndefined()
+    await store.delete(draftKey)
+  })
+
   it('does not invent a payload for legacy pending metadata without a sealed submission', async () => {
     const store = createFinalDraftStore()
     const draftKey = `legacy-pending-${Date.now()}`
     await store.ensure(metaFor(draftKey))
     await store.putAnswer({ draftKey, itemKey: 'q1', value: 'answer', updatedAt: Date.now() })
+    // Direct SUBMITTING remains representable for drafts written by a pre-FE-03A client.
     await store.setStatus(draftKey, 'SUBMITTING')
 
     await expect(store.sealForSubmission(draftKey, (snapshot) => ({
