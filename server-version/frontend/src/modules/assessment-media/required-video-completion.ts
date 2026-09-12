@@ -12,12 +12,12 @@ export interface RequiredVideoCompletionIdentity {
   slotKey: string
   assetId: string
   contentHash: string
-  policyVersion?: typeof REQUIRED_VIDEO_POLICY_VERSION
+  policyVersion?: string
 }
 
 export interface RequiredVideoCompletionMarker {
   schemaVersion: 1
-  policyVersion: typeof REQUIRED_VIDEO_POLICY_VERSION
+  policyVersion: string
   slotKey: string
   assetId: string
   contentHash: string
