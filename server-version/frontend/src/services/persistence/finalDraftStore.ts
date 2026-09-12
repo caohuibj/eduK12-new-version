@@ -132,6 +132,17 @@ export class FinalDraftPendingWithoutSealError extends Error {
   }
 }
 
+export class FinalDraftSealRequiredError extends Error {
+  readonly code = 'FINAL_DRAFT_SEAL_REQUIRED'
+  readonly nextStatus: FinalDraftStatus
+
+  constructor(nextStatus: FinalDraftStatus) {
+    super('只有已封存的逻辑 FINAL 才能进入重试、冲突或完成状态')
+    this.name = 'FinalDraftSealRequiredError'
+    this.nextStatus = nextStatus
+  }
+}
+
 const DATABASE_NAME = 'eduk12-final-drafts-v1'
 const DATABASE_VERSION = 1
 const META_STORE = 'draftMeta'
@@ -202,6 +213,19 @@ const sameIdentity = (left: FinalDraftMeta, right: FinalDraftMeta) => (
 
 const assertWritable = (meta: FinalDraftMeta) => {
   if (meta.status !== 'DRAFT' || meta.sealedSubmission) throw new FinalDraftNotWritableError(meta.status)
+}
+
+const assertStatusTransition = (meta: FinalDraftMeta, nextStatus: FinalDraftStatus) => {
+  if (nextStatus === 'DRAFT' && meta.sealedSubmission) throw new FinalDraftNotWritableError(meta.status)
+  // SUBMITTING without a seal is retained only as a compatibility representation
+  // for pre-FE-03A clients. New submission paths enter SUBMITTING exclusively via
+  // sealForSubmission(). A pre-seal validation failure must remain writable DRAFT.
+  if (
+    meta.status === 'DRAFT'
+    && !meta.sealedSubmission
+    && nextStatus !== 'DRAFT'
+    && nextStatus !== 'SUBMITTING'
+  ) throw new FinalDraftSealRequiredError(nextStatus)
 }
 
 const sortedAnswers = (answers: FinalDraftAnswer[]) => answers.sort((a, b) => a.itemKey.localeCompare(b.itemKey))
@@ -296,7 +320,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   async setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }) {
     const current = this.metas.get(draftKey)
     if (!current) return null
-    if (status === 'DRAFT' && current.sealedSubmission) throw new FinalDraftNotWritableError(current.status)
+    assertStatusTransition(current, status)
     const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
     this.metas.set(draftKey, next)
     return next
@@ -377,6 +401,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
         || error instanceof FinalDraftTrialConflictError
         || error instanceof FinalDraftNotWritableError
         || error instanceof FinalDraftPendingWithoutSealError
+        || error instanceof FinalDraftSealRequiredError
       ) throw error
       if (error instanceof FinalDraftStorageError) throw error
       throw new FinalDraftStorageError('本地测评草稿读写失败，请检查浏览器存储权限', { cause: error })
@@ -479,7 +504,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       const store = transaction.objectStore(META_STORE)
       const current = await requestResult<FinalDraftMeta | undefined>(store.get(draftKey))
       if (!current) return null
-      if (status === 'DRAFT' && current.sealedSubmission) throw new FinalDraftNotWritableError(current.status)
+      assertStatusTransition(current, status)
       const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
       store.put(next)
       return next
