@@ -117,8 +117,6 @@ describe('ScaleFormVideoGate', () => {
         <button type="button">作答</button>
       </ScaleFormVideoGate>,
     )
-    const replay = await screen.findByLabelText('题目视频')
-    fireEvent.loadedMetadata(replay)
     expect(await screen.findByRole('button', { name: '作答' })).toBeTruthy()
   })
 })
