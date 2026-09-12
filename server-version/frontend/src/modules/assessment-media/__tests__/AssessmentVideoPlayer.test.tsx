@@ -32,6 +32,18 @@ const sources = {
   }],
 }
 
+const setFullPlayedCoverage = (video: HTMLVideoElement, duration = 10) => {
+  Object.defineProperty(video, 'duration', { configurable: true, value: duration })
+  Object.defineProperty(video, 'played', {
+    configurable: true,
+    value: {
+      length: 1,
+      start: () => 0,
+      end: () => duration,
+    },
+  })
+}
+
 describe('AssessmentVideoPlayer', () => {
   it('uses native streaming URLs directly and exposes poster, captions, transcript, and controls', () => {
     render(<AssessmentVideoPlayer presentation={presentation} sources={sources} />)
@@ -74,5 +86,73 @@ describe('AssessmentVideoPlayer', () => {
     expect(load).toHaveBeenCalled()
     expect(document.body.oncontextmenu).toBeNull()
     load.mockRestore()
+  })
+
+  it('uses controlled required-viewing controls and only reports completion after contiguous 1x playback', async () => {
+    const onViewingComplete = vi.fn().mockResolvedValue(undefined)
+    render(
+      <AssessmentVideoPlayer
+        presentation={presentation}
+        sources={sources}
+        requiredViewing
+        onViewingComplete={onViewingComplete}
+      />,
+    )
+    const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
+    expect(video.controls).toBe(false)
+    expect(video.getAttribute('controlsList')).toContain('noplaybackrate')
+    expect(screen.getByLabelText('固定播放速度')).toHaveTextContent('1×')
+    expect(screen.getByRole('button', { name: '播放视频' })).toBeInTheDocument()
+    expect(screen.queryByRole('slider', { name: /进度|seek/i })).toBeNull()
+
+    fireEvent.loadedMetadata(video)
+    setFullPlayedCoverage(video)
+    fireEvent.ended(video)
+    await waitFor(() => expect(onViewingComplete).toHaveBeenCalledTimes(1))
+  })
+
+  it('rejects seeking or rate changes before completion and resets playback to the beginning', () => {
+    const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+    render(
+      <AssessmentVideoPlayer
+        presentation={presentation}
+        sources={sources}
+        requiredViewing
+        onViewingComplete={vi.fn()}
+      />,
+    )
+    const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
+    Object.defineProperty(video, 'currentTime', { configurable: true, writable: true, value: 4 })
+    fireEvent.seeking(video)
+    expect(video.currentTime).toBe(0)
+    expect(screen.getByText(/不能跳播/)).toBeInTheDocument()
+
+    Object.defineProperty(video, 'currentTime', { configurable: true, writable: true, value: 3 })
+    Object.defineProperty(video, 'playbackRate', { configurable: true, writable: true, value: 2 })
+    Object.defineProperty(video, 'defaultPlaybackRate', { configurable: true, writable: true, value: 2 })
+    fireEvent.rateChange(video)
+    expect(video.playbackRate).toBe(1)
+    expect(video.defaultPlaybackRate).toBe(1)
+    expect(video.currentTime).toBe(0)
+    expect(screen.getByText(/必须保持 1×/)).toBeInTheDocument()
+    pause.mockRestore()
+  })
+
+  it('does not silently unlock when the durable completion marker cannot be saved', async () => {
+    const onViewingComplete = vi.fn().mockRejectedValue(new Error('quota'))
+    render(
+      <AssessmentVideoPlayer
+        presentation={presentation}
+        sources={sources}
+        requiredViewing
+        onViewingComplete={onViewingComplete}
+      />,
+    )
+    const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
+    fireEvent.loadedMetadata(video)
+    setFullPlayedCoverage(video)
+    fireEvent.ended(video)
+    expect(await screen.findByRole('alert')).toHaveTextContent('本地完成状态保存失败')
+    expect(screen.getByRole('button', { name: '重试保存完成状态' })).toBeInTheDocument()
   })
 })

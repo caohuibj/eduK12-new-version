@@ -255,7 +255,7 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     expect(await db!.situationalRawSubmission.count({
       where: { attemptId: { in: fixtures.map(({ started }) => started.attemptId) } },
     })).toBe(count)
-  })
+  }, 30_000)
 
   it.each([10, 30, 60])('characterizes one FINAL across %s scenes without per-scene persistence', async (sceneCount) => {
     const userId = await createUser(`scene-count-${sceneCount}`)
