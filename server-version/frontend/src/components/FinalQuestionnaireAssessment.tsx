@@ -478,7 +478,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)
             const videoEntries = formOptionVideoPresentations(options)
-            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting || draftLocked} ariaLabel={`${item.label} 选项视觉内容`}>
+            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
               <FormOptionVideoGroupGate
                 entries={videoEntries}
                 loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
@@ -508,7 +508,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
             const imageItems = assessmentImageItems(item.images)
             const videoPresentation = scaleItemVideoPresentation(item)
-            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting || draftLocked} ariaLabel={`${item.content} 视觉内容`}>
+            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
               <ScaleFormVideoGate
                 presentation={videoPresentation}
                 loadSources={() => loadQuestionnaireVideoCapability(publicMode
