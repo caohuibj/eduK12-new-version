@@ -72,6 +72,14 @@ const finalDraftErrorStatus = (error: unknown) => {
     : 'RETRY_PENDING' as const
 }
 
+const responseError = (response: { code: number | string; message?: string }) => {
+  const error = new Error(response.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
+  error.code = response.code
+  if (typeof response.code === 'number') error.status = response.code
+  if (response.code === 'ASSESSMENT_SUBMIT_BUSY' || response.code === 'COMPLETION_BUSY') error.status = 503
+  return error
+}
+
 const mergeAdministrationMode = (
   left: CognitiveAdministrationMode,
   right: CognitiveAdministrationMode,
@@ -113,8 +121,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
 
   const handleCheckpointError = useCallback((error: unknown) => {
     if (checkpointErrorStatus(error) === 409) {
-      // A conflicting trial is not retryable: stop both background flushes and
-      // future enqueue calls for this session before entering recovery state.
       checkpointScheduler.block('cognitive', sessionId, error)
       dispatch({ type: 'TRIAL_CONFLICT' })
     }
@@ -129,9 +135,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
           status: typeof response.code === 'number' && response.code >= 400 && response.code <= 599 ? response.code : undefined,
         })
       }
-      return {
-        acceptedSequences: batch.records.map((record) => record.sequence),
-      }
+      return { acceptedSequences: batch.records.map((record) => record.sequence) }
     }
 
     for (const record of batch.records) {
@@ -166,7 +170,8 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       const session: CognitiveSession = response.data
 
       if (session.deliveryMode === 'FINAL_ONLY') {
-        if (!api.submitFinal || !session.definitionHash) {
+        const submitFinal = api.submitFinal
+        if (!submitFinal || !session.definitionHash) {
           dispatch({ type: 'SESSION_ERROR', error: { code: 'DEFINITION_MISMATCH', message: '该认知测评缺少可恢复的冻结定义，请重启后重试' } })
           return
         }
@@ -195,14 +200,59 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
             return
           }
+          if (meta.sealedSubmission) {
+            // The task must never remount after a logical FINAL is sealed. Reuse
+            // the exact immutable body, then read authoritative terminal state.
+            try {
+              await runFinalDraftCapacityRetry({
+                onRetry: async ({ error }) => {
+                  await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+                    code: String((error as { code?: unknown })?.code || 'ASSESSMENT_SUBMIT_BUSY'),
+                    message: friendlyError(error).message,
+                  }).catch(() => undefined)
+                },
+                operation: async () => {
+                  const next = await submitFinal(
+                    session.sessionId,
+                    meta.sealedSubmission!.payload as Parameters<typeof submitFinal>[1],
+                  )
+                  if (next.code !== 0 || !next.data) throw responseError(next)
+                  return next
+                },
+              })
+              const terminal = await api.getSession(sessionId)
+              if (terminal.code === 0 && terminal.data?.status === 'COMPLETED') {
+                await finalDraftStore.setStatus(draftKey, 'COMPLETED').catch(() => undefined)
+                await finalDraftStore.delete(draftKey).catch(() => undefined)
+                dispatch({ type: 'SESSION_LOADED', session: terminal.data, trialIndex: 0 })
+                return
+              }
+              dispatch({
+                type: 'SESSION_ERROR',
+                error: { code: 'FINAL_SUBMISSION_PENDING', message: '提交已发送但服务器终态暂未确认，请稍后重试核对。' },
+              })
+              return
+            } catch (error) {
+              const status = finalDraftErrorStatus(error)
+              await finalDraftStore.setStatus(draftKey, status, {
+                code: String((error as { code?: unknown })?.code ?? ''),
+                message: friendlyError(error).message,
+              }).catch(() => undefined)
+              dispatch({
+                type: status === 'CONFLICT' ? 'RECOVERY_REQUIRED' : 'SESSION_ERROR',
+                ...(status === 'CONFLICT'
+                  ? {}
+                  : { error: { code: 'FINAL_SUBMISSION_PENDING', message: '已封存提交仍未确认，请稍后重试核对。' } }),
+              } as any)
+              return
+            }
+          }
           if (meta.status !== 'DRAFT') {
             dispatch({
               type: 'SESSION_ERROR',
               error: {
-                code: meta.sealedSubmission ? 'FINAL_SUBMISSION_PENDING' : 'FINAL_DRAFT_PENDING_WITHOUT_SEAL',
-                message: meta.sealedSubmission
-                  ? '该测评已有一份已封存提交，请重试提交或稍后重新加载结果。'
-                  : '检测到旧版未确认提交；请先核对服务器终态，不能重新生成试次提交。',
+                code: 'FINAL_DRAFT_PENDING_WITHOUT_SEAL',
+                message: '检测到旧版未确认提交；请先核对服务器终态，不能重新生成试次提交。',
               },
             })
             return
@@ -216,9 +266,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         return
       }
 
-      // Historical attempts remain readable, but every legacy write endpoint
-      // is disabled. Let the UI offer an explicit restart instead of loading
-      // the old runner and attempting a write that can never succeed.
       if (session.deliveryMode === 'LEGACY') {
         dispatch({ type: 'LEGACY_READ_ONLY', session })
         return
@@ -238,7 +285,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
         return
       }
-      // IN_PROGRESS：先检查前端能否解析 Runner（无 fallback）
       if (!resolveRunner(session.testType, session.engineVersion)) {
         dispatch({ type: 'RUNNER_UNSUPPORTED' })
         return
@@ -253,7 +299,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         dispatch({ type: 'RECOVERY_REQUIRED' })
         return
       }
-      // 优先使用本地账本；未 ACK 的 durable checkpoint 也属于本地可证明进度。
       const trialIndex = Math.max(
         ledger ? ledger.trialIndex + 1 : 0,
         session.nextTrialIndex ?? 0,
@@ -306,13 +351,10 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
           maxWaitMs: 2000,
           onError: handleCheckpointError,
         })
-        // durable append 成功后即可恢复；服务端 ACK 在后台批量到达，
-        // complete 会再次强制 flush，确保评分前所有 trial 已落库。
         writeSessionLedger(sessionId, { status: 'IN_PROGRESS', trialIndex: nextIndex })
         dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
         return true
       } catch (err) {
-        // 409 = 同 index 异 hash 冲突 → 禁止重跑，进入安全态
         if (checkpointErrorStatus(err) === 409) {
           checkpointScheduler.block('cognitive', sessionId, err)
           dispatch({ type: 'TRIAL_CONFLICT' })
@@ -368,13 +410,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
           },
           operation: async () => {
             const next = await submitFinal(session.sessionId, sealed.payload)
-            if (next.code !== 0 || !next.data) {
-              const responseError = new Error(next.message || '认知测评提交失败') as Error & { status?: number; code?: number | string }
-              responseError.code = next.code
-              if (typeof next.code === 'number') responseError.status = next.code
-              if (next.code === 'ASSESSMENT_SUBMIT_BUSY' || next.code === 'COMPLETION_BUSY') responseError.status = 503
-              throw responseError
-            }
+            if (next.code !== 0 || !next.data) throw responseError(next)
             return next
           },
         })
@@ -406,8 +442,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(response) })
         return
       }
-      // complete 返回扁平 {score, metrics, qualityFlags}（completion.service）；
-      // GET session 返回 {result:{...}}（session.service COMPLETED 分支）。两种都兼容。
       const d = response.data as CognitiveSession & Partial<CognitiveResult>
       const result: CognitiveResult | null =
         d.result ??
@@ -449,7 +483,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
     return nextSession
   }, [api, sessionId])
 
-  // 让 appendTrial 读取最新的 trialIndex（避免闭包陈旧）
   const stateRef = useRef(state)
   stateRef.current = state
 
