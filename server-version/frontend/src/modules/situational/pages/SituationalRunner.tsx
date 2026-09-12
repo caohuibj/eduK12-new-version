@@ -66,6 +66,8 @@ const situationalFinalStatus = (error: unknown) => {
     : 'RETRY_PENDING' as const
 }
 
+const TERMINAL_RECOVERED_CODE = 'FINAL_TERMINAL_RECOVERED'
+
 const SituationalRunner: React.FC = () => {
   const { instrumentKey, attemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
   const navigate = useNavigate()
@@ -301,6 +303,9 @@ const SituationalRunner: React.FC = () => {
       setSubmissionLocked(true)
       const response = await runFinalDraftCapacityRetry({
         onRetry: async ({ error: retryError }) => {
+          if (await recoverTerminalResult()) {
+            throw Object.assign(new Error('服务器已确认测评完成'), { code: TERMINAL_RECOVERED_CODE })
+          }
           await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
             code: String((retryError as { code?: unknown })?.code ?? 'ASSESSMENT_SUBMIT_BUSY'),
             message: situationalErrorMessage(retryError),
@@ -315,6 +320,7 @@ const SituationalRunner: React.FC = () => {
       navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
+      if (String((reason as { code?: unknown })?.code ?? '') === TERMINAL_RECOVERED_CODE) return
       const recovered = await recoverTerminalResult()
       if (!recovered) {
         const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
