@@ -1,10 +1,14 @@
+import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
+import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { GraduationCap, Loader2, ArrowLeft } from 'lucide-react'
+import { useLoginReturn } from '../components/app-shell/useLoginReturn'
 import { useAuth } from '../contexts/AuthContext'
 
 const StudentLogin: React.FC = () => {
-  const navigate = useNavigate()
+  const authLink = useAuthLinks()
+  const completeLogin = useLoginReturn()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -20,7 +24,7 @@ const StudentLogin: React.FC = () => {
 
     try {
       await login(formData.username, formData.password)
-      navigate('/student')
+      completeLogin()
     } catch (err: any) {
       setError(err.message || '登录失败')
     } finally {
@@ -51,18 +55,19 @@ const StudentLogin: React.FC = () => {
 
         {/* Form */}
         <div className="card">
+          <LoginRecoveryNotice />
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-username" className="block text-sm font-medium text-gray-700 mb-1">
                 用户名
               </label>
-              <input
+              <input autoComplete="username" aria-describedby={error ? "auth-error" : undefined} id="auth-username"
                 type="text"
                 value={formData.username}
                 onChange={(e) =>
@@ -75,10 +80,10 @@ const StudentLogin: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
                 密码
               </label>
-              <input
+              <input autoComplete="current-password" aria-describedby={error ? "auth-error" : undefined} id="auth-password"
                 type="password"
                 value={formData.password}
                 onChange={(e) =>
@@ -109,7 +114,7 @@ const StudentLogin: React.FC = () => {
           <div className="mt-6 flex items-center justify-between text-sm">
             <span className="text-gray-500">还没有账号？</span>
             <Link
-              to="/student/course-login"
+              to={authLink("/student/course-login")}
               className="text-primary hover:underline"
             >
               使用课程码注册

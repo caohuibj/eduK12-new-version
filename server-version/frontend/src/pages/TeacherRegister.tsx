@@ -1,3 +1,4 @@
+import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Users, Loader2, ArrowLeft, CheckCircle } from 'lucide-react'
@@ -10,6 +11,7 @@ interface TeacherRegisterData {
 }
 
 const TeacherRegister: React.FC = () => {
+  const authLink = useAuthLinks()
   const [searchParams] = useSearchParams()
   const teacherCode = searchParams.get('code') || ''
   
@@ -98,7 +100,7 @@ const TeacherRegister: React.FC = () => {
         <div className="card text-center">
           <p className="text-red-500 mb-4">无效的访问</p>
           <p className="text-gray-600 mb-4">请通过教师码登录页面进入</p>
-          <Link to="/teacher/login" className="btn-primary inline-block">
+          <Link to={authLink("/teacher/login")} className="btn-primary inline-block">
             返回教师登录
           </Link>
         </div>
@@ -115,7 +117,7 @@ const TeacherRegister: React.FC = () => {
           <p className="text-gray-600 mb-6">
             账号已创建。管理员在「用户管理」中点通过后，即可用刚才设置的用户名和密码登录。
           </p>
-          <Link to="/teacher/account-login" className="btn-primary inline-block">
+          <Link to={authLink("/teacher/account-login")} className="btn-primary inline-block">
             前往教师登录
           </Link>
         </div>
@@ -128,7 +130,7 @@ const TeacherRegister: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Back Button */}
         <Link
-          to="/teacher/login"
+          to={authLink("/teacher/login")}
           className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
@@ -158,17 +160,17 @@ const TeacherRegister: React.FC = () => {
         {/* Form */}
         <div className="card">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-username" className="block text-sm font-medium text-gray-700 mb-1">
                 用户名 <span className="text-xs text-gray-500">(字母+数字组合)</span>
               </label>
-              <input
+              <input autoComplete="username" aria-invalid={Boolean(fieldErrors.username)} aria-describedby={fieldErrors.username ? "auth-username-error" : undefined} id="auth-username"
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -177,15 +179,15 @@ const TeacherRegister: React.FC = () => {
                 required
               />
               {fieldErrors.username && (
-                <p className="mt-1 text-xs text-red-500">{fieldErrors.username}</p>
+                <p role="alert" id="auth-username-error" className="mt-1 text-xs text-red-500">{fieldErrors.username}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-nickname" className="block text-sm font-medium text-gray-700 mb-1">
                 真实姓名 <span className="text-xs text-gray-500">(必填)</span>
               </label>
-              <input
+              <input aria-invalid={Boolean(fieldErrors.nickname)} aria-describedby={fieldErrors.nickname ? "auth-nickname-error" : undefined} id="auth-nickname"
                 type="text"
                 value={formData.nickname}
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
@@ -194,15 +196,15 @@ const TeacherRegister: React.FC = () => {
                 required
               />
               {fieldErrors.nickname && (
-                <p className="mt-1 text-xs text-red-500">{fieldErrors.nickname}</p>
+                <p role="alert" id="auth-nickname-error" className="mt-1 text-xs text-red-500">{fieldErrors.nickname}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
                 密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
               </label>
-              <input
+              <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.password)} aria-describedby={fieldErrors.password ? "auth-password-error" : undefined} id="auth-password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -211,15 +213,15 @@ const TeacherRegister: React.FC = () => {
                 required
               />
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
+                <p role="alert" id="auth-password-error" className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 确认密码
               </label>
-              <input
+              <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.confirmPassword)} aria-describedby={fieldErrors.confirmPassword ? "auth-confirmPassword-error" : undefined} id="auth-confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
@@ -228,7 +230,7 @@ const TeacherRegister: React.FC = () => {
                 required
               />
               {fieldErrors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>
+                <p role="alert" id="auth-confirmPassword-error" className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>
               )}
             </div>
 

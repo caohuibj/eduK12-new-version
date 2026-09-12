@@ -1,7 +1,9 @@
+import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
 const Portal: React.FC = () => {
+  const authLink = useAuthLinks()
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ width: '100%', maxWidth: '900px' }}>
@@ -14,7 +16,7 @@ const Portal: React.FC = () => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-          <Link to="/student/course-login" style={{ textDecoration: 'none' }}>
+          <Link to={authLink("/student/course-login")} style={{ textDecoration: 'none' }}>
             <div style={{ background: '#ebf8ff', borderRadius: '16px', padding: '30px', transition: 'all 0.3s', cursor: 'pointer' }}>
               <div style={{ width: '60px', height: '60px', background: 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span style={{ fontSize: '30px' }}>👨‍🎓</span>
@@ -24,7 +26,7 @@ const Portal: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/teacher/account-login" style={{ textDecoration: 'none' }}>
+          <Link to={authLink("/teacher/account-login")} style={{ textDecoration: 'none' }}>
             <div style={{ background: '#faf5ff', borderRadius: '16px', padding: '30px', transition: 'all 0.3s', cursor: 'pointer' }}>
               <div style={{ width: '60px', height: '60px', background: 'linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span style={{ fontSize: '30px' }}>👨‍🏫</span>
@@ -34,7 +36,7 @@ const Portal: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/admin/login" style={{ textDecoration: 'none' }}>
+          <Link to={authLink("/admin/login")} style={{ textDecoration: 'none' }}>
             <div style={{ background: '#fffaf0', borderRadius: '16px', padding: '30px', transition: 'all 0.3s', cursor: 'pointer' }}>
               <div style={{ width: '60px', height: '60px', background: 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span style={{ fontSize: '30px' }}>👑</span>

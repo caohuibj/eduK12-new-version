@@ -1,3 +1,4 @@
+import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { BookOpen, Loader2, ArrowLeft } from 'lucide-react'
@@ -5,6 +6,7 @@ import apiClient from '../api/client'
 
 
 const StudentCourseLogin: React.FC = () => {
+  const authLink = useAuthLinks()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -26,7 +28,7 @@ const StudentCourseLogin: React.FC = () => {
 
       if (response.code === 0 && response.data) {
         // 跳转到注册页面
-        navigate(`/student/register?course=${encodeURIComponent(courseCode.trim())}`)
+        navigate(authLink(`/student/register?course=${encodeURIComponent(courseCode.trim())}`))
       } else {
         setError(response.message || '课程码无效或课程已结束')
       }
@@ -61,17 +63,17 @@ const StudentCourseLogin: React.FC = () => {
         {/* Form */}
         <div className="card">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleVerifyCode} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-courseCode" className="block text-sm font-medium text-gray-700 mb-1">
                 课程码
               </label>
-              <input
+              <input aria-describedby={error ? "auth-error" : undefined} id="auth-courseCode"
                 type="text"
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
@@ -102,7 +104,7 @@ const StudentCourseLogin: React.FC = () => {
 
           <div className="mt-6 pt-6 border-t text-center">
             <p className="text-sm text-gray-500 mb-3">已经注册过？用账号密码登录即可，不必再填课程码。</p>
-            <Link to="/student/login" className="inline-flex justify-center w-full btn-secondary">
+            <Link to={authLink("/student/login")} className="inline-flex justify-center w-full btn-secondary">
               已有账号，去登录
             </Link>
           </div>

@@ -1,9 +1,11 @@
+import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Users, Loader2, ArrowLeft } from 'lucide-react'
 import apiClient from '../api/client'
 
 const TeacherLogin: React.FC = () => {
+  const authLink = useAuthLinks()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,7 +29,7 @@ const TeacherLogin: React.FC = () => {
           setError('该教师码已被使用，请直接使用用户名密码登录')
         } else {
           // 教师码有效且未使用，跳转到注册页面
-          navigate(`/teacher/register?code=${encodeURIComponent(teacherCode.trim())}`)
+          navigate(authLink(`/teacher/register?code=${encodeURIComponent(teacherCode.trim())}`))
           return
         }
       } else {
@@ -64,17 +66,17 @@ const TeacherLogin: React.FC = () => {
         {/* Form */}
         <div className="card">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleVerifyCode} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="auth-teacherCode" className="block text-sm font-medium text-gray-700 mb-1">
                 教师邀请码
               </label>
-              <input
+              <input aria-describedby={error ? "auth-error" : undefined} id="auth-teacherCode"
                 type="text"
                 value={teacherCode}
                 onChange={(e) => setTeacherCode(e.target.value)}
@@ -105,7 +107,7 @@ const TeacherLogin: React.FC = () => {
 
           <div className="mt-6 pt-6 border-t text-center">
             <p className="text-sm text-gray-500 mb-2">已有教师账号？</p>
-            <Link to="/teacher/account-login" className="text-primary hover:underline font-medium">
+            <Link to={authLink("/teacher/account-login")} className="text-primary hover:underline font-medium">
               直接登录
             </Link>
           </div>
