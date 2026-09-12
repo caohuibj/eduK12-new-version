@@ -453,16 +453,33 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })
     } catch (err) {
       if (finalDraftKey) {
-        const draftStatus = finalDraftErrorStatus(err)
-        await finalDraftStore.setStatus(finalDraftKey, draftStatus, {
-          code: String((err as { code?: number | string })?.code ?? ''),
-          message: friendlyError(err).message,
-        }).catch(() => undefined)
-        if (draftStatus === 'CONFLICT') {
-          dispatch({ type: 'FINAL_SUBMIT_CONFLICT', error: friendlyError(err) })
+        const currentMeta = await finalDraftStore.get(finalDraftKey).catch(() => null)
+        if (currentMeta?.sealedSubmission) {
+          const terminal = await api.getSession(sessionId).catch(() => null)
+          if (terminal?.code === 0 && terminal.data?.status === 'COMPLETED') {
+            await finalDraftStore.setStatus(finalDraftKey, 'COMPLETED').catch(() => undefined)
+            await finalDraftStore.delete(finalDraftKey).catch(() => undefined)
+            dispatch({ type: 'SESSION_LOADED', session: terminal.data, trialIndex: 0 })
+            return
+          }
+          const draftStatus = finalDraftErrorStatus(err)
+          await finalDraftStore.setStatus(finalDraftKey, draftStatus, {
+            code: String((err as { code?: number | string })?.code ?? ''),
+            message: friendlyError(err).message,
+          }).catch(() => undefined)
+          if (draftStatus === 'CONFLICT') {
+            dispatch({ type: 'FINAL_SUBMIT_CONFLICT', error: friendlyError(err) })
+          } else {
+            dispatch({
+              type: 'SESSION_ERROR',
+              error: { code: 'FINAL_SUBMISSION_PENDING', message: '提交已封存但服务器终态暂未确认，请稍后重试核对。' },
+            })
+          }
           return
         }
       }
+      // Builder/local validation failed before the logical FINAL was sealed.
+      // The DRAFT remains writable, so returning to RUNNING is safe here.
       dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(err) })
     }
   }, [api, sessionId])
