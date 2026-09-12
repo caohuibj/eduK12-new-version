@@ -72,7 +72,6 @@ export const AssessmentVideoPlayer = ({
     if (video.currentTime > 0.01) {
       internalSeekRef.current = true
       video.currentTime = 0
-      window.setTimeout(() => { internalSeekRef.current = false }, 0)
     }
   }, [requiredViewing, viewingComplete])
 
@@ -83,6 +82,7 @@ export const AssessmentVideoPlayer = ({
     setPlaying(false)
     setCompletionPersistError(null)
     completionCandidateRef.current = false
+    internalSeekRef.current = false
     if (requiredViewing && !viewingComplete) resetRequiredViewing()
   }, [sources.videoUrl, requiredViewing, viewingComplete, resetRequiredViewing])
 
@@ -163,7 +163,9 @@ export const AssessmentVideoPlayer = ({
   }
 
   const handleSeeking = () => {
-    if (!requiredViewing || viewingComplete || internalSeekRef.current) return
+    if (!requiredViewing || viewingComplete) return
+    const video = videoRef.current
+    if (internalSeekRef.current && video && video.currentTime <= 0.01) return
     resetRequiredViewing('测评视频不能跳播；请从头完整观看。')
   }
 
@@ -180,6 +182,7 @@ export const AssessmentVideoPlayer = ({
     const video = videoRef.current
     if (!video) return
     if (video.paused) {
+      if (viewingComplete && video.ended) video.currentTime = 0
       video.playbackRate = 1
       try { await video.play() } catch { handleError() }
     } else {
@@ -253,7 +256,7 @@ export const AssessmentVideoPlayer = ({
           src={sources.videoUrl}
           poster={sources.posterUrl}
           controls={!requiredViewing}
-          controlsList={requiredViewing ? 'noplaybackrate nofullscreen nodownload' : undefined}
+          controlsList={requiredViewing ? 'noplaybackrate nofullscreen nodownload noremoteplayback' : undefined}
           disablePictureInPicture={requiredViewing}
           playsInline
           preload="metadata"
