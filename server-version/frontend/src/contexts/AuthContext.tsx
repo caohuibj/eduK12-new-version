@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { authApi } from '../api/auth'
-import { readReauthReturn, rememberReauthReturn, type ReauthReturn } from '../components/app-shell/access'
+import { clearReauthReturn, readReauthReturn, rememberReauthReturn, type ReauthReturn } from '../components/app-shell/access'
 import type { User } from '../types'
 
 interface AuthContextType {
   user: User | null
   reauthReturn: ReauthReturn | null
   prepareReauthentication: (target: string) => void
+  clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
   login: (username: string, password: string) => Promise<void>
@@ -36,6 +37,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!userRef.current) return
     setReauthReturn({ userId: userRef.current.id, role: userRef.current.role, target })
     rememberReauthReturn(userRef.current, target)
+  }, [])
+
+  const clearReauthentication = useCallback(() => {
+    setReauthReturn(null)
+    clearReauthReturn()
   }, [])
 
   useEffect(() => {
@@ -110,6 +116,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       user,
       reauthReturn,
       prepareReauthentication,
+      clearReauthentication,
       isAuthenticated: !!user,
       isLoading,
       login,
