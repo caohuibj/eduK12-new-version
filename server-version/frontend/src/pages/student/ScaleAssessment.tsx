@@ -104,6 +104,7 @@ const ScaleAssessment: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, ResponseValue>>({})
   const answerRevisionsRef = useRef<Record<string, number>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [submissionLocked, setSubmissionLocked] = useState(false)
   const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
   const itemStartTimeRef = useRef<number>(readScaleTimingNow())
@@ -233,13 +234,16 @@ const ScaleAssessment: React.FC = () => {
           })
           answerRevisionsRef.current = revisions
           setAnswers(existingAnswers)
-          if (nextMeta.status !== 'DRAFT') {
+          const locked = nextMeta.status !== 'DRAFT' || Boolean(nextMeta.sealedSubmission)
+          setSubmissionLocked(locked)
+          if (locked) {
             setCompletionNotice(nextMeta.sealedSubmission
-              ? '该测评已有一份已封存提交，继续操作只会重放同一份提交内容。'
-              : '检测到旧版未确认提交。请刷新页面核对服务器状态，当前答案不会被重新生成提交。')
+              ? '该测评已有一份已封存提交，答案已锁定；再次提交只会重放同一份内容。'
+              : '检测到旧版未确认提交。请刷新页面核对服务器状态，当前答案已锁定且不会被重新生成提交。')
           }
           return
         }
+        setSubmissionLocked(false)
         scaleDeviceInputProvenanceRef.current = resolveScaleDeviceInputProvenance({
           serverValue: nextAssessment.deviceInputProvenance,
           existing: scaleDeviceInputProvenanceRef.current,
@@ -271,7 +275,7 @@ const ScaleAssessment: React.FC = () => {
   }, [registerScalePersistence, scaleId])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
-    if (!scale || !assessment || savingAnswerRef.current || submitting) return
+    if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return
     const items = scale.definition.items
     const itemIndex = currentIndex
     const item = items[itemIndex]
@@ -320,7 +324,7 @@ const ScaleAssessment: React.FC = () => {
   const handleComplete = async () => {
     if (!assessment || !scale || savingAnswerRef.current) return
     const unanswered = scale.definition.items.filter((item) => item.required && answers[item.itemCode] === undefined)
-    if (unanswered.length > 0) {
+    if (unanswered.length > 0 && !submissionLocked) {
       const firstMissingIndex = scale.definition.items.findIndex((item) => item.required && answers[item.itemCode] === undefined)
       if (firstMissingIndex >= 0) setCurrentIndex(firstMissingIndex)
       setCompletionNotice(`还有 ${unanswered.length} 道必答题未作答，请完成后再提交`)
@@ -339,8 +343,14 @@ const ScaleAssessment: React.FC = () => {
               : { responseValue: value as ResponseValue }
             return [answer.itemKey, stored] as const
           }))
+          const missingStored = scale.definition.items.filter((item) => (
+            item.required && answerMap.get(item.itemCode)?.responseValue === undefined
+          ))
+          if (missingStored.length > 0) {
+            throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认最后一次作答已完成本地保存`)
+          }
           const finalAnswers = scale.definition.items
-            .filter((item) => answerMap.has(item.itemCode))
+            .filter((item) => answerMap.get(item.itemCode)?.responseValue !== undefined)
             .map((item) => {
               const value = answerMap.get(item.itemCode)!
               return {
@@ -361,6 +371,7 @@ const ScaleAssessment: React.FC = () => {
           }
         })
         if (!sealed) throw new Error('本地量表草稿不存在，请重启测评')
+        setSubmissionLocked(true)
         await runFinalDraftCapacityRetry({
           onRetry: async ({ error }) => {
             await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
@@ -396,6 +407,20 @@ const ScaleAssessment: React.FC = () => {
       if (response.code !== 0) throw new Error(response.message || '提交失败')
       navigate(`/student/scales/result/${assessment.id}`)
     } catch (err) {
+      if (assessment.deliveryMode === 'FINAL_ONLY') {
+        const draftKey = `scale:${assessment.id}`
+        const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
+        if (currentMeta?.sealedSubmission) {
+          setSubmissionLocked(true)
+          const terminal = await apiClient.get<Assessment>(`/scales/assessments/${assessment.id}`).catch(() => null)
+          if (terminal?.code === 0 && terminal.data?.status === 'COMPLETED') {
+            await finalDraftStore.setStatus(draftKey, 'COMPLETED').catch(() => undefined)
+            await finalDraftStore.delete(draftKey).catch(() => undefined)
+            navigate(`/student/scales/result/${assessment.id}`, { replace: true })
+            return
+          }
+        }
+      }
       if (isFinalAttemptConflict(err)) setRequiresRestart(true)
       setCompletionNotice(normalizeApiError(err).message)
     } finally {
@@ -443,7 +468,7 @@ const ScaleAssessment: React.FC = () => {
       {completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}
       {requiresRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地答案已保留。当前量表版本已变化，请重启后继续。</span><button type="button" onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
       {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
-      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
+      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || submissionLocked} ariaLabel={`${currentItem.content} 视觉内容`}>
         <ScaleFormVideoGate
           presentation={videoPresentation}
           loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
@@ -457,7 +482,7 @@ const ScaleAssessment: React.FC = () => {
                 <button
                   key={valueKey(option.value)}
                   onClick={() => void handleSelectAnswer(option.value)}
-                  disabled={savingAnswer || submitting}
+                  disabled={savingAnswer || submitting || submissionLocked}
                   className={`w-full text-left px-4 py-3 rounded-lg border transition-colors disabled:cursor-wait disabled:opacity-60 ${selectedValue === option.value ? 'border-primary bg-primary/5 text-primary' : 'border-gray-300 hover:border-gray-400'}`}
                 >
                   {option.label}
@@ -468,7 +493,7 @@ const ScaleAssessment: React.FC = () => {
           <div className="flex justify-between">
             <button onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting} className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-1" />上一题</button>
             {currentIndex === items.length - 1 ? (
-              <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : '完成测评'}</button>
+              <button onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart} className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"><CheckCircle className="w-5 h-5 mr-1" />{submitting ? '提交中...' : submissionLocked ? '重新核对提交' : '完成测评'}</button>
             ) : (
               <button onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting} className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">下一题<ChevronRight className="w-5 h-5 ml-1" /></button>
             )}
