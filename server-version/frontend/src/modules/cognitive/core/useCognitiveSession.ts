@@ -201,8 +201,6 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             return
           }
           if (meta.sealedSubmission) {
-            // The task must never remount after a logical FINAL is sealed. Reuse
-            // the exact immutable body, then read authoritative terminal state.
             try {
               await runFinalDraftCapacityRetry({
                 onRetry: async ({ error }) => {
@@ -238,12 +236,14 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
                 code: String((error as { code?: unknown })?.code ?? ''),
                 message: friendlyError(error).message,
               }).catch(() => undefined)
-              dispatch({
-                type: status === 'CONFLICT' ? 'RECOVERY_REQUIRED' : 'SESSION_ERROR',
-                ...(status === 'CONFLICT'
-                  ? {}
-                  : { error: { code: 'FINAL_SUBMISSION_PENDING', message: '已封存提交仍未确认，请稍后重试核对。' } }),
-              } as any)
+              if (status === 'CONFLICT') {
+                dispatch({ type: 'RECOVERY_REQUIRED' })
+              } else {
+                dispatch({
+                  type: 'SESSION_ERROR',
+                  error: { code: 'FINAL_SUBMISSION_PENDING', message: '已封存提交仍未确认，请稍后重试核对。' },
+                })
+              }
               return
             }
           }
@@ -379,18 +379,19 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
         finalDraftKey = draftKey
         const currentMeta = await finalDraftStore.get(draftKey)
         if (!currentMeta) throw new Error('本地认知草稿不存在，请重启测评')
+        let sealProvenance = readCognitiveAdministrationProvenance(currentMeta.instrumentMetadata) ?? undefined
         if (!currentMeta.sealedSubmission) {
-          const storedProvenance = readCognitiveAdministrationProvenance(currentMeta.instrumentMetadata)
-          const finalProvenance = mergeAdministrationProvenance(storedProvenance, administrationProvenance)
-          if (finalProvenance) {
+          sealProvenance = mergeAdministrationProvenance(sealProvenance ?? null, administrationProvenance)
+          if (sealProvenance) {
             await finalDraftStore.setInstrumentMetadata(draftKey, {
-              [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: finalProvenance,
-            })
+              [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: sealProvenance,
+            }).catch(() => null)
           }
         }
         const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
           if (snapshot.trials.length === 0) throw new Error('尚未记录任何认知试次')
           const finalProvenance = readCognitiveAdministrationProvenance(snapshot.meta.instrumentMetadata)
+            ?? sealProvenance
           return {
             submissionId: snapshot.meta.submissionId,
             attemptEpoch: snapshot.meta.attemptEpoch,
