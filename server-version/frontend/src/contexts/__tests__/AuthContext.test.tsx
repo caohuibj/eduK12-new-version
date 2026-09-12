@@ -55,6 +55,27 @@ describe('AuthContext session expiry handling', () => {
     expect(screen.getByRole('status')).toHaveTextContent('out:user-1')
   })
 
+  it('clears both in-memory and stored reauth context after safe consumption', async () => {
+    const ReturnProbe = () => {
+      const { user, reauthReturn, prepareReauthentication, clearReauthentication } = useAuth()
+      return <>
+        <output>{user?.id || 'out'}:{reauthReturn?.userId || 'none'}</output>
+        <button onClick={() => prepareReauthentication('/dashboard')}>remember</button>
+        <button onClick={clearReauthentication}>clear</button>
+      </>
+    }
+    render(<AuthProvider><ReturnProbe /></AuthProvider>)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('user-1:none'))
+
+    act(() => screen.getByRole('button', { name: 'remember' }).click())
+    expect(screen.getByRole('status')).toHaveTextContent('user-1:user-1')
+    expect(sessionStorage.getItem('huisurvey:reauth-return')).not.toBeNull()
+
+    act(() => screen.getByRole('button', { name: 'clear' }).click())
+    expect(screen.getByRole('status')).toHaveTextContent('user-1:none')
+    expect(sessionStorage.getItem('huisurvey:reauth-return')).toBeNull()
+  })
+
   it('clears the in-memory identity when a protected request reports expiry', async () => {
     render(<AuthProvider><Probe /></AuthProvider>)
 
