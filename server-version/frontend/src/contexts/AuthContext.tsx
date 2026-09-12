@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react'
 import { authApi } from '../api/auth'
+import { rememberReauthReturn } from '../components/app-shell/access'
 import type { User } from '../types'
 
 interface AuthContextType {
@@ -17,6 +18,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const userRef = useRef(user)
+  userRef.current = user
   const authEpochRef = useRef(0)
   const lastAuthTransitionAtRef = useRef(0)
 
@@ -32,6 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // A protected request that started before a newer login must not sign
       // that newer session out when its late 401 finally arrives.
       if (requestStartedAt > 0 && requestStartedAt < lastAuthTransitionAtRef.current) return
+      if (userRef.current) rememberReauthReturn(userRef.current, `${window.location.pathname}${window.location.search}${window.location.hash}`)
       authEpochRef.current += 1
       lastAuthTransitionAtRef.current = Date.now()
       // A 401 from login/public capability endpoints is not reported by the
