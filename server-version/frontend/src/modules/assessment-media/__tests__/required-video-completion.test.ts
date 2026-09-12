@@ -3,6 +3,7 @@ import {
   REQUIRED_VIDEO_POLICY_VERSION,
   markRequiredVideoComplete,
   readRequiredVideoCompletion,
+  requiredVideoCompletionFromMeta,
   requiredVideoCompletionMetadataKey,
 } from '../required-video-completion'
 import type { FinalDraftMeta } from '../../../services/persistence/finalDraftStore'
@@ -47,6 +48,7 @@ describe('required video completion markers', () => {
     expect(meta.instrumentMetadata?.[requiredVideoCompletionMetadataKey(identity)]).toEqual(marker)
     expect(JSON.stringify(meta.instrumentMetadata)).not.toContain('currentTime')
     expect(await readRequiredVideoCompletion(identity, store)).toEqual(marker)
+    expect(requiredVideoCompletionFromMeta(meta, identity)).toEqual(marker)
   })
 
   it('does not reuse a marker for a different slot, asset hash, or viewing-policy version', async () => {
@@ -69,6 +71,7 @@ describe('required video completion markers', () => {
     expect(await readRequiredVideoCompletion({ ...identity, slotKey: 'scale-item:item-2:video' }, store)).toBeNull()
     expect(await readRequiredVideoCompletion({ ...identity, contentHash: 'b'.repeat(64) }, store)).toBeNull()
     expect(await readRequiredVideoCompletion({ ...identity, policyVersion: 'required-full-view-v2' }, store)).toBeNull()
+    expect(requiredVideoCompletionFromMeta(meta, { ...identity, contentHash: 'b'.repeat(64) })).toBeNull()
   })
 
   it('fails closed when the draft is missing and the completion marker cannot be written', async () => {
