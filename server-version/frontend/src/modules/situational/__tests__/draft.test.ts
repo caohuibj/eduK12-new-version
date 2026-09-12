@@ -12,7 +12,7 @@ import {
   situationalReadyToSubmit,
   situationalResponsesFromDraft,
 } from '../draft'
-import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
+import { FinalDraftIdentityConflictError, finalDraftStore } from '../../../services/persistence/finalDraftStore'
 import type { SituationalAttempt, SituationalRunnerDefinition, SituationalRunnerDefinitionV2 } from '../types'
 
 const definition: SituationalRunnerDefinition = {
@@ -79,13 +79,20 @@ const attempt = (id: string, definitionHash = 'a'.repeat(64)): SituationalAttemp
 })
 
 describe('Situational local draft boundary', () => {
-  it('keeps the raw draft bound to attempt and frozen runtime identity', async () => {
+  it('keeps the raw draft bound to attempt and preserves frozen runtime identity conflicts', async () => {
     const first = attempt(`draft-${Date.now()}`)
+    const draftKey = situationalDraftKey(first.id)
     await ensureSituationalDraft(first)
-    await finalDraftStore.putAnswer({ draftKey: situationalDraftKey(first.id), itemKey: 'S1:choice', value: { responseValue: 'A' }, updatedAt: Date.now() })
-    await ensureSituationalDraft(attempt(first.id, 'c'.repeat(64)))
-    expect(await finalDraftStore.listAnswers(situationalDraftKey(first.id))).toEqual([])
-    await finalDraftStore.delete(situationalDraftKey(first.id))
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'S1:choice', value: { responseValue: 'A' }, updatedAt: Date.now() })
+
+    await expect(ensureSituationalDraft(attempt(first.id, 'c'.repeat(64))))
+      .rejects.toBeInstanceOf(FinalDraftIdentityConflictError)
+
+    expect((await finalDraftStore.get(draftKey))?.definitionHash).toBe(first.definitionHash)
+    expect(await finalDraftStore.listAnswers(draftKey)).toEqual([
+      expect.objectContaining({ itemKey: 'S1:choice', value: { responseValue: 'A' } }),
+    ])
+    await finalDraftStore.delete(draftKey)
   })
 
   it('restores raw values and creates one ordered final payload without scoring fields', async () => {
