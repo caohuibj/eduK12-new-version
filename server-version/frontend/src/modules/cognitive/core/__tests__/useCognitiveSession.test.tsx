@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CognitiveSession } from '../../types'
-import { finalDraftStore } from '../../../../services/persistence/finalDraftStore'
+import { createFinalDraftMeta, finalDraftStore } from '../../../../services/persistence/finalDraftStore'
 
 const { mockScheduler } = vi.hoisted(() => ({
   mockScheduler: {
@@ -145,5 +145,66 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     } finally {
       metadataSpy.mockRestore()
     }
+  })
+
+  it('replays an existing sealed FINAL after refresh and never remounts the task', async () => {
+    const finalSession: CognitiveSession = {
+      ...session,
+      sessionId: 'cognitive-session-sealed-recovery',
+      deliveryMode: 'FINAL_ONLY',
+      definitionHash: 'definition-1',
+      contextSnapshotHash: null,
+      attemptEpoch: 1,
+    }
+    const completedSession: CognitiveSession = {
+      ...finalSession,
+      status: 'COMPLETED',
+      result: {
+        metrics: {},
+        qualityFlags: {},
+        report: {},
+        assessmentContext: null,
+      },
+    }
+    const draftKey = `cognitive:${finalSession.sessionId}`
+    await finalDraftStore.ensure(createFinalDraftMeta({
+      draftKey,
+      instrument: 'cognitive',
+      attemptId: finalSession.sessionId,
+      attemptEpoch: 1,
+      definitionHash: 'definition-1',
+      contextSnapshotHash: null,
+      deliveryMode: 'final_only',
+      submissionId: 'sealed-submission-id',
+    }))
+    await finalDraftStore.putTrial({
+      draftKey,
+      trialIndex: 0,
+      payload: { correct: true, rtMs: 420 },
+      createdAt: Date.now(),
+    })
+    const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => ({
+      submissionId: snapshot.meta.submissionId,
+      attemptEpoch: snapshot.meta.attemptEpoch,
+      definitionHash: snapshot.meta.definitionHash,
+      contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+      trials: snapshot.trials.map((trial) => trial.payload),
+    }))
+    const finalApi = {
+      ...api,
+      getSession: vi.fn()
+        .mockResolvedValueOnce({ code: 0, message: 'ok', data: finalSession })
+        .mockResolvedValueOnce({ code: 0, message: 'ok', data: completedSession }),
+      submitFinal: vi.fn().mockResolvedValue({ code: 0, message: 'ok', data: { accepted: true } }),
+    }
+
+    const { result } = renderHook(() => useCognitiveSession(finalSession.sessionId, finalApi))
+
+    await waitFor(() => expect(result.current.state.status).toBe('COMPLETED'))
+    expect(finalApi.submitFinal).toHaveBeenCalledTimes(1)
+    expect(finalApi.submitFinal).toHaveBeenCalledWith(finalSession.sessionId, sealed?.payload)
+    expect(finalApi.getSession).toHaveBeenCalledTimes(2)
+    expect(mockScheduler.register).not.toHaveBeenCalled()
+    expect(await finalDraftStore.get(draftKey)).toBeNull()
   })
 })
