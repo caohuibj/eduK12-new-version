@@ -136,7 +136,12 @@ export const ScaleFormVideoGate = ({
   const completionLoaded = !requiredViewing || completionLoadedIdentity === completionIdentityKey
   const viewingComplete = Boolean(requiredViewing && viewingCompleteIdentity === completionIdentityKey)
   const currentCompletionError = completionError?.identityKey === completionIdentityKey ? completionError.message : null
-  const unlocked = ready && completionLoaded && (!requiredViewing || viewingComplete)
+  // A durable marker is authoritative for the same frozen slot. Returning to an
+  // already-completed video must not require another capability fetch or metadata
+  // load before the associated response controls are restored.
+  const unlocked = requiredViewing
+    ? completionLoaded && viewingComplete
+    : ready
 
   const persistViewingCompletion = async () => {
     if (!requiredViewing) return
