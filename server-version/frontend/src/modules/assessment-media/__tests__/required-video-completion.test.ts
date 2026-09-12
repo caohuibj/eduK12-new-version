@@ -68,7 +68,7 @@ describe('required video completion markers', () => {
 
     expect(await readRequiredVideoCompletion({ ...identity, slotKey: 'scale-item:item-2:video' }, store)).toBeNull()
     expect(await readRequiredVideoCompletion({ ...identity, contentHash: 'b'.repeat(64) }, store)).toBeNull()
-    expect(await readRequiredVideoCompletion({ ...identity, policyVersion: 'required-full-view-v1' }, store)).not.toBeNull()
+    expect(await readRequiredVideoCompletion({ ...identity, policyVersion: 'required-full-view-v2' }, store)).toBeNull()
   })
 
   it('fails closed when the draft is missing and the completion marker cannot be written', async () => {
