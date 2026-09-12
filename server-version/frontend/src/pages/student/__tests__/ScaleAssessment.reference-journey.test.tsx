@@ -29,6 +29,9 @@ vi.mock('../../../api/client', () => ({
 }))
 
 vi.mock('../../../services/persistence/finalDraftStore', () => ({
+  FinalDraftStorageError: class FinalDraftStorageError extends Error {
+    code = 'FINAL_DRAFT_STORAGE_ERROR'
+  },
   createFinalDraftMeta: (input: Record<string, unknown>) => ({
     ...input,
     status: 'DRAFT',
