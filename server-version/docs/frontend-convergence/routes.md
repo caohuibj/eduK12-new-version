@@ -4,99 +4,99 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 expl
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
-| / | Portal | Guest; signed-in redirect | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /admin/login | AdminLogin | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /teacher/login | TeacherLogin | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /teacher/register | TeacherRegister | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /teacher/account-login | TeacherAccountLogin | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /student/login | StudentLogin | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /student/course-login | StudentCourseLogin | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /student/register | StudentRegister | Public / unguarded | — | Page-owned / bare | public | FE-02 | Inventory only; not migrated |
-| /dashboard | CourseList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /courses | CourseList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /courses/:courseId/students | CourseStudents | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /courses/:courseId/detail | TeacherCourseDetail | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /students | StudentManagement | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /assignments | AssignmentList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /checkins | CheckinList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /scales | ScaleList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /scales/:id | ScaleEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /questionnaires | QuestionnaireList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /questionnaires/:id | QuestionnaireEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /general-questionnaires | GeneralQuestionnaireList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /general-questionnaires/create | GeneralQuestionnaireCreate | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /general-questionnaires/:id/edit | GeneralQuestionnaireEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /composite-assessments | CompositeAssessmentList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-09 | Inventory only; not migrated |
-| /composite-assessments/:id/results | CompositeAssessmentResults | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-09 | Inventory only; not migrated |
-| /composite-assessments/:id/attempts/:attemptId/report | CompositeReportPage | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-09 | Inventory only; not migrated |
-| /composite-assessments/:id | CompositeAssessmentEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-09 | Inventory only; not migrated |
-| /cognitive-assignments | CognitiveAssignmentList | TEACHER / ADMIN | Cognitive capability | Layout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /cognitive-assignments/:id | CognitiveAssignmentEdit | TEACHER / ADMIN | Cognitive capability | Layout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /teacher/classrooms | ClassroomList | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher/classrooms/create | ClassroomCreate | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher/classrooms/:id/control | ClassroomControl | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher/classrooms/:id/edit | ClassroomEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher/classrooms/:id/qrcode | ClassroomQRCode | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher/classrooms/:id/questions | ClassroomQuestionEdit | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /videos | VideoLibrary | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /images | ImageLibrary | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /documents | DocumentLibrary | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /users | UserList | ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /teacher-codes | TeacherCodeList | ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /admin/material-grants | MaterialGrants | ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /admin/instrument-authorizations | InstrumentAuthorization | ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /profile | TeacherProfile | TEACHER / ADMIN | — | Layout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /scale-library | ScaleLibrary | STUDENT / TEACHER / ADMIN | — | Role layout | standard | FE-02 + FE-03C | Inventory only; not migrated |
-| /scale-library/:instrumentKey/:instrumentVersion | ScaleLibrary | STUDENT / TEACHER / ADMIN | — | Role layout | standard | FE-02 + FE-03C | Inventory only; not migrated |
-| /student | StudentHome | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/classroom/enter | ClassroomEnter | Optional student / guest | — | StudentLayout or bare | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/courses/:courseId | CourseDetail | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/assignments/:assignmentId | AssignmentSubmit | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/assignments | StudentAssignments | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/checkins | StudentCheckins | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/checkins/:checkinId | CheckinSubmit | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/profile | StudentProfile | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/situational | SituationalHome | STUDENT | — | StudentLayout | standard | FE-02 + FE-06 | Inventory only; not migrated |
-| /student/situational/history | SituationalHistory | STUDENT | — | StudentLayout | standard | FE-02 + FE-06 | Inventory only; not migrated |
-| /student/situational/:instrumentKey | SituationalRunner | STUDENT | — | StudentLayout | focused | FE-02 + FE-06 | Inventory only; not migrated |
-| /student/situational/attempts/:attemptId/result | SituationalResult | STUDENT | — | StudentLayout | standard | FE-02 + FE-06 | Inventory only; not migrated |
-| /student/composite/situational/:attemptId | SituationalRunner | STUDENT | — | StudentLayout | focused | FE-02 + FE-06 | Inventory only; not migrated |
-| /student/scales | StudentScales | STUDENT | — | StudentLayout | standard | FE-02 + FE-03C | Inventory only; not migrated |
-| /student/scales/:scaleId | ScaleAssessment | STUDENT | — | StudentLayout | focused | FE-02 + FE-03C | Inventory only; not migrated |
-| /student/scales/result/:assessmentId | ScaleResult | STUDENT | — | StudentLayout | standard | FE-02 + FE-05 | Inventory only; not migrated |
-| /student/questionnaires | StudentQuestionnaires | STUDENT | — | StudentLayout | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/questionnaires/:questionnaireId | QuestionnaireAssessment | STUDENT | — | StudentLayout | focused | FE-02 + FE-08 | Inventory only; not migrated |
-| /student/questionnaires/result/:assessmentId | QuestionnaireResult | STUDENT | — | StudentLayout | standard | FE-02 + FE-05 | Inventory only; not migrated |
-| /student/classroom/join/:code | ClassroomJoin | Optional student / guest | — | StudentLayout or bare | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/classroom/answer/:classroomId | ClassroomAnswer | Optional student / guest | — | StudentLayout or bare | standard | FE-02 + FE-10 | Inventory only; not migrated |
-| /student/composite/:assessmentId | CompositeAssessmentPage | STUDENT | — | StudentLayout | focused | FE-02 + FE-09 | Inventory only; not migrated |
-| /student/composite/attempts/:attemptId | CompositeAssessmentPage | STUDENT | — | StudentLayout | focused | FE-02 + FE-09 | Inventory only; not migrated |
-| /student/composite/attempts/:attemptId/report | CompositeReportPage | STUDENT | — | StudentLayout | standard | FE-02 + FE-09 | Inventory only; not migrated |
-| /student/cognitive | CognitiveHome | STUDENT | Cognitive capability | StudentLayout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /student/cognitive/assignments/:assignmentId | CognitiveAssignmentEntry | STUDENT | Cognitive capability | StudentLayout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /student/cognitive/history | CognitiveHistory | STUDENT | Cognitive capability | StudentLayout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /student/cognitive/sessions/:sessionId | CognitiveRunner | STUDENT | Cognitive capability | StudentLayout | focused | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /student/cognitive/sessions/:sessionId/result | CognitiveResult | STUDENT | Cognitive capability | StudentLayout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/cognitive/assignments/:token | PublicCognitiveAssignment | Public / unguarded | Cognitive capability | Page-owned / bare | public | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | Page-owned / bare | focused | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | Cognitive capability | Page-owned / bare | public | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-06 | Inventory only; not migrated |
-| /public/composite/:token | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-09 | Inventory only; not migrated |
-| /public/composite/attempts/:attemptId | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-09 | Inventory only; not migrated |
-| /public/composite/attempts/:attemptId/report | CompositeReportPage | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-09 | Inventory only; not migrated |
-| /public/questionnaire/:token | PublicQuestionnaire | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-08 | Inventory only; not migrated |
-| /public/questionnaire/:token/assessment | PublicQuestionnaireAssessment | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-08 | Inventory only; not migrated |
-| /public/questionnaire/:token/result | PublicQuestionnaireResult | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-08 | Inventory only; not migrated |
-| /public/checkin/:token | PublicCheckin | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-10 | Inventory only; not migrated |
-| /bigscreen/:classroomId | BigScreen | Public / unguarded | — | Page-owned / bare | Dedicated display | FE-02 + FE-10 | Inventory only; not migrated |
-| * | Navigate | Public / unguarded | — | Page-owned / bare | Not-found / redirect decision | FE-02 | Inventory only; not migrated |
+| / | Portal | Guest; signed-in redirect | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /admin/login | AdminLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /teacher/login | TeacherLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /teacher/register | TeacherRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /teacher/account-login | TeacherAccountLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /student/login | StudentLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /student/course-login | StudentCourseLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /student/register | StudentRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /dashboard | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /courses | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /courses/:courseId/students | CourseStudents | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /courses/:courseId/detail | TeacherCourseDetail | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /students | StudentManagement | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /assignments | AssignmentList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /checkins | CheckinList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /scales | ScaleList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /scales/:id | ScaleEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /questionnaires | QuestionnaireList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /questionnaires/:id | QuestionnaireEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /general-questionnaires | GeneralQuestionnaireList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /general-questionnaires/create | GeneralQuestionnaireCreate | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /general-questionnaires/:id/edit | GeneralQuestionnaireEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /composite-assessments | CompositeAssessmentList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /composite-assessments/:id/results | CompositeAssessmentResults | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /composite-assessments/:id/attempts/:attemptId/report | CompositeReportPage | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /composite-assessments/:id | CompositeAssessmentEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /cognitive-assignments | CognitiveAssignmentList | TEACHER / ADMIN | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /cognitive-assignments/:id | CognitiveAssignmentEdit | TEACHER / ADMIN | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /teacher/classrooms | ClassroomList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/classrooms/create | ClassroomCreate | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/classrooms/:id/control | ClassroomControl | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/classrooms/:id/edit | ClassroomEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/classrooms/:id/qrcode | ClassroomQRCode | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/classrooms/:id/questions | ClassroomQuestionEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /videos | VideoLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /images | ImageLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /documents | DocumentLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /users | UserList | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher-codes | TeacherCodeList | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/material-grants | MaterialGrants | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/instrument-authorizations | InstrumentAuthorization | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /profile | TeacherProfile | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /scale-library | ScaleLibrary | STUDENT / TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
+| /scale-library/:instrumentKey/:instrumentVersion | ScaleLibrary | STUDENT / TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
+| /student | StudentHome | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/classroom/enter | ClassroomEnter | Optional student / guest | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/courses/:courseId | CourseDetail | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/assignments/:assignmentId | AssignmentSubmit | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/assignments | StudentAssignments | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/checkins | StudentCheckins | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/checkins/:checkinId | CheckinSubmit | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/profile | StudentProfile | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/situational | SituationalHome | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /student/situational/history | SituationalHistory | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /student/situational/:instrumentKey | SituationalRunner | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /student/situational/attempts/:attemptId/result | SituationalResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /student/composite/situational/:attemptId | SituationalRunner | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /student/scales | StudentScales | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
+| /student/scales/:scaleId | ScaleAssessment | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
+| /student/scales/result/:assessmentId | ScaleResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
+| /student/questionnaires | StudentQuestionnaires | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/questionnaires/:questionnaireId | QuestionnaireAssessment | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
+| /student/questionnaires/result/:assessmentId | QuestionnaireResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
+| /student/classroom/join/:code | ClassroomJoin | Optional student / guest | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/classroom/answer/:classroomId | ClassroomAnswer | Optional student / guest | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/composite/:assessmentId | CompositeAssessmentPage | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /student/composite/attempts/:attemptId | CompositeAssessmentPage | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /student/composite/attempts/:attemptId/report | CompositeReportPage | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /student/cognitive | CognitiveHome | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/assignments/:assignmentId | CognitiveAssignmentEntry | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/history | CognitiveHistory | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/sessions/:sessionId | CognitiveRunner | STUDENT | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/sessions/:sessionId/result | CognitiveResult | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/assignments/:token | PublicCognitiveAssignment | Public / unguarded | Cognitive capability | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | Cognitive capability | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /public/composite/:token | CompositeAssessmentPage | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /public/composite/attempts/:attemptId | CompositeAssessmentPage | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /public/composite/attempts/:attemptId/report | CompositeReportPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
+| /public/questionnaire/:token | PublicQuestionnaire | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
+| /public/questionnaire/:token/assessment | PublicQuestionnaireAssessment | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
+| /public/questionnaire/:token/result | PublicQuestionnaireResult | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
+| /public/checkin/:token | PublicCheckin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /bigscreen/:classroomId | BigScreen | Public / unguarded | — | Dedicated display | Dedicated display | FE-02 + FE-10 | Dedicated mode retained |
+| * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
 
 ## Additional boundaries
 
-- FirstLoginPasswordChange is an inline guard flow, not a separate route. FE-02 owns its focus/error and authenticated return behavior.
+- FirstLoginPasswordChange remains an inline guard flow. FE-02 preserves the original destination through reauthentication.
 - Parent ObserverSelfServe and Teacher ObserverAssign exist but are not registered in App.tsx. Do not declare a working Parent journey from component existence.
 - User roles are currently STUDENT / TEACHER / ADMIN; researcher report projection is not a new frontend login role.
-- Public Cognitive runner currently also uses a public query parameter; FE-02 must reconcile route and client authority.
+- Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.
 - Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.
 - BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.
 - Non-route components and legacy branches are not declared dead code by this inventory.

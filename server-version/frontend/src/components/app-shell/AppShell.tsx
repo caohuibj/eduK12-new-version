@@ -1,0 +1,57 @@
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
+import Footer from '../Footer'
+import { ProductButton } from '../product-ui'
+import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
+import { activeNavigation, navigationFor, routeTitle } from './navigation'
+import './app-shell.css'
+
+export default function AppShell({ children }: { children: ReactNode }) {
+  const { user, logout } = useAuth()
+  const cognitive = useCognitiveEnabled()
+  const location = useLocation()
+  const desiredMode = shellModeFor(location.pathname)
+  const mode = desiredMode === 'standard' && !user ? 'public' : desiredMode
+  const items = navigationFor(user?.role, cognitive)
+  const active = activeNavigation(items, location.pathname)
+  const title = routeTitle(location.pathname, active)
+  const mainRef = useRef<HTMLElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const previousPath = useRef(location.pathname)
+  const [openPath, setOpenPath] = useState<string | null>(null)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const menuOpen = openPath === location.pathname
+  useEffect(() => {
+    if (mode === 'display') return
+    document.title = `${title === 'Huisurvey' ? '' : `${title} · `}Huisurvey`
+    // Path navigation only: query changes and trial updates must not steal player focus.
+    if (previousPath.current !== location.pathname && mode !== 'focused') mainRef.current?.focus()
+    previousPath.current = location.pathname
+  }, [location.pathname, title, mode])
+  if (mode === 'display') return <>{children}</>
+  return (
+    <div className={`hui-app hui-app--${mode}`} data-shell-mode={mode}>
+      <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={() => mainRef.current?.focus()}>跳到主要内容</a></div>
+      <header className="hui-product hui-app-header">
+        {mode === 'focused' ? <span className="hui-brand">Huisurvey</span> : <Link className="hui-brand" to={homeFor(user?.role)}>Huisurvey</Link>}
+        {mode === 'standard' && <ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onClick={() => setOpenPath(menuOpen ? null : location.pathname)}>导航菜单</ProductButton>}
+        <div className="hui-account">
+          {isPublicAssessmentPath(location.pathname) ? <span>公开参与</span> : user ? <span>{user.nickname || user.username} · {{ STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员' }[user.role]}</span> : <span>欢迎使用</span>}
+          {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
+        </div>
+      </header>
+      <div className="hui-app-body">
+        {mode === 'standard' && <nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen ? 'hui-navigation--open' : ''}`} onKeyDown={(event) => { if (event.key === 'Escape') { setOpenPath(null); toggleRef.current?.focus() } }}>
+          {items.map((item) => <Link key={item.path} to={item.path} aria-current={active?.path === item.path ? 'page' : undefined} onClick={() => { setOpenPath(null); if (item.path === location.pathname) toggleRef.current?.focus() }}>{item.label}</Link>)}
+        </nav>}
+        <div className="hui-app-content">
+          {mode === 'standard' && <nav className="hui-product hui-breadcrumb" aria-label="当前位置"><Link to={homeFor(user?.role)}>首页</Link>{active && <><span aria-hidden="true">/</span>{active.path === location.pathname ? <span>{active.label}</span> : <Link to={active.path}>{active.label}</Link>}</>}{title !== active?.label && <><span aria-hidden="true">/</span><span>{title}</span></>}</nav>}
+          <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${isAuthPath(location.pathname) ? 'hui-auth-content' : ''}`}>{children}</main>
+        </div>
+      </div>
+      {mode !== 'focused' && <Footer variant="light" />}
+    </div>
+  )
+}
