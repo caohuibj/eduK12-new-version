@@ -62,6 +62,9 @@ export function readReauthReturn(): ReauthReturn | null {
 export function rememberReauthReturn(user: Pick<User, 'id' | 'role'>, target: string) {
   try { sessionStorage.setItem(resumeKey, JSON.stringify({ userId: user.id, role: user.role, target })) } catch { /* Optional hint; never change draft persistence. */ }
 }
+export function clearReauthReturn() {
+  try { sessionStorage.removeItem(resumeKey) } catch { /* Optional hint; never change draft persistence. */ }
+}
 export function parentReturnTo(value: string | null, isPublic: boolean, fallback: string): string {
   const target = internalReturnTo(value)
   if (!target) return fallback
