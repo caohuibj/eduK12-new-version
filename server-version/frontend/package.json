@@ -12,7 +12,9 @@
     "test:composite": "vitest run src/modules/composite src/pages/teacher src/pages/student",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "bash /opt/ptool/scripts/deploy.sh frontend"
+    "deploy": "bash /opt/ptool/scripts/deploy.sh frontend",
+    "inventory:product-ui": "node scripts/product-route-inventory.mjs",
+    "inventory:product-ui:check": "node scripts/product-route-inventory.mjs --check"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
