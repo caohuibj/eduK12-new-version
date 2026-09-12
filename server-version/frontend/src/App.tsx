@@ -1,9 +1,10 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesContext'
-import Layout from './components/Layout'
-import StudentLayout from './components/StudentLayout'
+import AppShell from './components/app-shell/AppShell'
+import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
+import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
 
 // Portal & Auth Pages
 import Portal from './pages/Portal'
@@ -91,7 +92,6 @@ const PublicCognitiveAssignment = React.lazy(() => import('./modules/cognitive/p
 
 // BigScreen Pages
 const BigScreen = React.lazy(() => import('./pages/bigscreen/BigScreen'))
-import FirstLoginPasswordChange from './pages/FirstLoginPasswordChange'
 
 class RouteErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -113,137 +113,18 @@ class RouteErrorBoundary extends React.Component<
   render() {
     if (!this.state.hasError) return this.props.children
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div role="alert" className="max-w-md rounded-lg bg-white p-6 text-center shadow">
-          <h1 className="text-xl font-semibold text-gray-900">页面加载失败</h1>
-          <p className="mt-2 text-sm text-gray-600">{this.state.message}</p>
-          <button
-            type="button"
-            className="mt-4 rounded bg-primary px-4 py-2 text-white"
-            onClick={() => this.setState({ hasError: false, message: '' })}
-          >
-            重试
-          </button>
-        </div>
-      </div>
+      <ProductPage><ProductStatus kind="error" title="页面加载失败" announce="assertive" actions={<><ProductButton onClick={() => window.location.reload()}>重新加载页面</ProductButton> <Link to="/">返回入口</Link></>}>暂时无法显示此页面。本机草稿不会被清除，请重新加载后按页面提示恢复。</ProductStatus></ProductPage>
     )
   }
 }
 
-// Protected Route for Teachers/Admins
-const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({
-  children,
-  roles,
-}) => {
-  const { isAuthenticated, user, isLoading } = useAuth()
-
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />
-  }
-
-  if (user?.mustChangePassword) {
-    return <FirstLoginPasswordChange />
-  }
-
-  if (roles && user && !roles.includes(user.role)) {
-    return <Navigate to="/" replace />
-  }
-
-  return <Layout>{children}</Layout>
-}
-
-// Protected Route for Students
-const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuth()
-
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/student/login" replace />
-  }
-
-  if (user?.role !== 'STUDENT') {
-    return <Navigate to="/" replace />
-  }
-
-  if (user.mustChangePassword) {
-    return <FirstLoginPasswordChange />
-  }
-
-  return <StudentLayout>{children}</StudentLayout>
-}
-
-// Library is shared by students, teachers, and admins, but each role keeps its
-// existing shell. The page itself is read-only and never replaces runtime auth.
-const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuth()
-
-  if (isLoading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>加载中...</div>
-  }
-  if (!isAuthenticated) return <Navigate to="/" replace />
-  if (user?.mustChangePassword) return <FirstLoginPasswordChange />
-  if (user?.role === 'STUDENT') return <StudentLayout>{children}</StudentLayout>
-  if (user?.role === 'TEACHER' || user?.role === 'ADMIN') return <Layout>{children}</Layout>
-  return <Navigate to="/" replace />
-}
-
-// Optional Student Route - 允许未登录用户访问（临时课堂模式）
+// Guards decide access only; AppShell owns chrome outside the route tree.
+const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
+const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT']}>{children}</RouteAccess>
+const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'TEACHER', 'ADMIN']}>{children}</RouteAccess>
 const OptionalStudentRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuth()
-
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
-  }
-
-  // 已登录学生：显示完整布局
-  if (isAuthenticated && user?.role === 'STUDENT') {
-    return <StudentLayout>{children}</StudentLayout>
-  }
-
-  // 未登录或其他角色：允许访问但不显示布局（临时学生模式）
-  return <>{children}</>
-}
-
-// Public Route (redirect if authenticated)
-const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuth()
-
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
-  }
-
-  if (isAuthenticated) {
-    if (user?.role === 'STUDENT') {
-      return <Navigate to="/student" replace />
-    }
-    // TEACHER 和 ADMIN 跳转到 dashboard
-    return <Navigate to="/dashboard" replace />
-  }
-
-  return <>{children}</>
+  const { isLoading } = useAuth()
+  return isLoading ? <RouteLoading /> : <>{children}</>
 }
 
 // Entry Route - for portal page (redirect if authenticated)
@@ -251,11 +132,7 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, user, isLoading } = useAuth()
 
   if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
+    return <RouteLoading />
   }
 
   // 已登录用户跳转到对应首页
@@ -273,15 +150,11 @@ function AppRoutes() {
   const { cognitiveEnabled: cognitiveModuleEnabled, isLoading } = useCapabilities()
 
   if (isLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div>加载中...</div>
-      </div>
-    )
+    return <RouteLoading />
   }
 
   return (
-    <React.Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>加载中...</div>}>
+    <React.Suspense fallback={<RouteLoading />}>
       <Routes>
           {/* Portal - Entry Point */}
           <Route
@@ -887,10 +760,15 @@ function AppRoutes() {
           />
 
           {/* Default Redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<ProductPage><ProductStatus kind="warning" title="找不到此页面" actions={<Link to="/">返回入口</Link>}>链接可能不完整或该功能当前不可用。请检查原链接，或联系老师获取完整链接。</ProductStatus></ProductPage>} />
       </Routes>
     </React.Suspense>
   )
+}
+
+function ApplicationFrame() {
+  const location = useLocation()
+  return <AppShell><RouteErrorBoundary key={location.pathname}><AppRoutes /></RouteErrorBoundary></AppShell>
 }
 
 function App() {
@@ -898,9 +776,7 @@ function App() {
     <CapabilitiesProvider>
       <AuthProvider>
         <BrowserRouter>
-          <RouteErrorBoundary>
-            <AppRoutes />
-          </RouteErrorBoundary>
+          <ApplicationFrame />
         </BrowserRouter>
       </AuthProvider>
     </CapabilitiesProvider>

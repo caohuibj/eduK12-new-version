@@ -1,5 +1,8 @@
+import CognitiveCredentialReset from './CognitiveCredentialReset'
+import CognitiveSessionEntry from './CognitiveSessionEntry'
+import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { useCognitiveSession } from '../core/useCognitiveSession'
@@ -11,16 +14,6 @@ import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentIm
 import type { AssessmentImagePresentationItem, AssessmentVideoCapabilitySources } from '../../assessment-media/types'
 import { cognitiveVideoPresentationEntries } from '../video-presentation'
 import { useCognitiveVideoSources } from '../useCognitiveVideoSources'
-
-const safeInternalReturnTo = (value: string | null, fallback: string) => {
-  if (!value) return fallback
-  try {
-    const decoded = decodeURIComponent(value)
-    return decoded.startsWith('/') && !decoded.startsWith('//') ? decoded : fallback
-  } catch {
-    return fallback
-  }
-}
 
 const presentationItems = (
   presentation: NonNullable<import('../types').CognitiveSession['presentation']> | undefined,
@@ -44,7 +37,7 @@ const CognitiveRunner: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const isPublic = searchParams.get('public') === '1'
+  const isPublic = isPublicAssessmentPath(useLocation().pathname)
   const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
   const sessionApi = useMemo(
     () => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
@@ -126,8 +119,8 @@ const CognitiveRunner: React.FC = () => {
   if (state.status === 'COMPLETED') {
     if (sessionId) {
       const returnTo = searchParams.get('returnTo')
-      const target = safeInternalReturnTo(
-        returnTo,
+      const target = parentReturnTo(
+        returnTo, isPublic,
         isPublic
           ? `/public/cognitive/sessions/${sessionId}/result?public=1`
           : `/student/cognitive/sessions/${sessionId}/result`,
@@ -236,7 +229,7 @@ const CognitiveRunner: React.FC = () => {
       <div className="card p-8 text-center">
         <p className="text-xl font-semibold text-gray-700 mb-2">该测评类型或版本暂不支持</p>
         <p className="text-gray-500 mb-6">请联系老师处理</p>
-        <button onClick={() => navigate('/student/cognitive')} className="btn-secondary">
+        <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">
           返回列表
         </button>
       </div>
@@ -244,8 +237,8 @@ const CognitiveRunner: React.FC = () => {
   }
 
   if (state.status === 'RECOVERY_REQUIRED') {
-    const returnTo = safeInternalReturnTo(searchParams.get('returnTo'), '/student/cognitive')
-    const hasParentReturn = Boolean(searchParams.get('returnTo'))
+    const returnTo = parentReturnTo(searchParams.get('returnTo'), isPublic, isPublic ? '/' : '/student/cognitive')
+    const hasParentReturn = returnTo !== (isPublic ? '/' : '/student/cognitive')
     return (
       <div className="card p-8 text-center">
         <p className="text-xl font-semibold text-amber-600 mb-2">无法恢复测评进度</p>
@@ -274,6 +267,7 @@ const CognitiveRunner: React.FC = () => {
         <button onClick={controller.reload} className="btn-secondary">
           重试
         </button>
+        {isPublic && sessionId && <CognitiveCredentialReset sessionId={sessionId} />}
       </div>
     )
   }
@@ -349,4 +343,6 @@ const CognitiveRunner: React.FC = () => {
   )
 }
 
-export default CognitiveRunner
+export default function CognitiveRunnerEntry() {
+  return <CognitiveSessionEntry><CognitiveRunner /></CognitiveSessionEntry>
+}

@@ -1,5 +1,8 @@
+import CognitiveCredentialReset from './CognitiveCredentialReset'
+import CognitiveSessionEntry from './CognitiveSessionEntry'
+import { isPublicAssessmentPath } from '../../../components/app-shell/access'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -38,8 +41,7 @@ const isCognitiveV2Report = (value: unknown): value is CognitiveV2Report => {
 const CognitiveResult: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const isPublic = searchParams.get('public') === '1'
+  const isPublic = isPublicAssessmentPath(useLocation().pathname)
   const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
   const sessionApi = useMemo(() => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi), [isPublic, recoveryToken])
   const [loading, setLoading] = useState(true)
@@ -73,6 +75,7 @@ const CognitiveResult: React.FC = () => {
       <div className="card p-8 text-center">
         <p className="text-gray-600 mb-4">{error || '暂无结果'}</p>
         <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">返回列表</button>
+        {isPublic && sessionId && <CognitiveCredentialReset sessionId={sessionId} />}
       </div>
     )
   }
@@ -353,4 +356,6 @@ const CognitiveResult: React.FC = () => {
   )
 }
 
-export default CognitiveResult
+export default function CognitiveResultEntry() {
+  return <CognitiveSessionEntry><CognitiveResult /></CognitiveSessionEntry>
+}
