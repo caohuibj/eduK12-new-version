@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import ScaleFormVideoGate from './ScaleFormVideoGate'
+import ScaleFormVideoGate, { type RequiredVideoGateContext } from './ScaleFormVideoGate'
 import type { AssessmentVideoCapabilitySources, AssessmentVideoPresentationV1 } from './types'
 
 export interface FormOptionVideoEntry {
@@ -8,13 +8,31 @@ export interface FormOptionVideoEntry {
   presentation: AssessmentVideoPresentationV1
 }
 
+export interface FormOptionVideoGroupRequiredViewing {
+  draftKey: string
+  slotKeyPrefix: string
+}
+
 export interface FormOptionVideoGroupGateProps {
   entries: FormOptionVideoEntry[]
   loadSources: (entry: FormOptionVideoEntry) => Promise<AssessmentVideoCapabilitySources>
   children: ReactNode
+  requiredViewing?: FormOptionVideoGroupRequiredViewing
 }
 
-const FormOptionVideoGroupGate = ({ entries, loadSources, children }: FormOptionVideoGroupGateProps) => {
+const requiredViewingForEntry = (
+  requiredViewing: FormOptionVideoGroupRequiredViewing | undefined,
+  entry: FormOptionVideoEntry,
+): RequiredVideoGateContext | undefined => (
+  requiredViewing
+    ? {
+        draftKey: requiredViewing.draftKey,
+        slotKey: `${requiredViewing.slotKeyPrefix}:option:${entry.optionIndex}`,
+      }
+    : undefined
+)
+
+const FormOptionVideoGroupGate = ({ entries, loadSources, children, requiredViewing }: FormOptionVideoGroupGateProps) => {
   const renderAt = (index: number): ReactNode => {
     const entry = entries[index]
     if (!entry) return children
@@ -25,6 +43,7 @@ const FormOptionVideoGroupGate = ({ entries, loadSources, children }: FormOption
           presentation={entry.presentation}
           loadSources={() => loadSources(entry)}
           ariaLabel={`${entry.optionLabel} 视频内容`}
+          requiredViewing={requiredViewingForEntry(requiredViewing, entry)}
         >
           {renderAt(index + 1)}
         </ScaleFormVideoGate>
