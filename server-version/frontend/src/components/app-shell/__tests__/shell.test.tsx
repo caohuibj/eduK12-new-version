@@ -1,18 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import AppShell from '../AppShell'
 import { RouteAccess } from '../RouteAccess'
-import { rememberReauthReturn } from '../access'
+import { readReauthReturn, rememberReauthReturn } from '../access'
 import type { User } from '../../../types'
 
-const auth = vi.hoisted(() => ({ user: null as User | null, isLoading: false, logout: vi.fn() }))
+const auth = vi.hoisted(() => ({
+  user: null as User | null,
+  isLoading: false,
+  logout: vi.fn(),
+  reauthReturn: null,
+  clearReauthentication: vi.fn(),
+}))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
 vi.mock('../../../pages/FirstLoginPasswordChange', () => ({ default: () => <p>修改临时密码</p> }))
 const student = { id: 's1', role: 'STUDENT', username: 'student' } as User
-beforeEach(() => { auth.user = student; auth.isLoading = false; sessionStorage.clear() })
+beforeEach(() => {
+  auth.user = student
+  auth.isLoading = false
+  auth.reauthReturn = null
+  auth.clearReauthentication.mockReset()
+  auth.clearReauthentication.mockImplementation(() => sessionStorage.removeItem('huisurvey:reauth-return'))
+  sessionStorage.clear()
+})
 function Location() { const location = useLocation(); return <output>{location.pathname}{location.search}</output> }
 it('preserves protected deep-link query and hash through sign-in redirect', () => {
   auth.user = null
@@ -28,14 +41,41 @@ it('never mounts protected children for another account after expiry', () => {
   expect(screen.getByText('请使用原账户继续')).toBeInTheDocument()
   expect(child).not.toHaveBeenCalled()
 })
+it('consumes the matching reauth hint after the original account safely resumes', async () => {
+  rememberReauthReturn(student, '/student/scales/1')
+  const first = render(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><p>authorized page</p></RouteAccess></MemoryRouter>)
+  expect(screen.getByText('authorized page')).toBeInTheDocument()
+  await waitFor(() => expect(auth.clearReauthentication).toHaveBeenCalledTimes(1))
+  expect(readReauthReturn()).toBeNull()
+  first.unmount()
+
+  auth.user = { ...student, id: 's2', username: 'second-student' }
+  render(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><p>second account page</p></RouteAccess></MemoryRouter>)
+  expect(screen.getByText('second account page')).toBeInTheDocument()
+  expect(screen.queryByText('请使用原账户继续')).not.toBeInTheDocument()
+})
+it('does not let an unrelated reauth hint choose the login role for a shared route', () => {
+  rememberReauthReturn(student, '/student/scales/1')
+  auth.user = null
+  render(<MemoryRouter initialEntries={['/scale-library/test/v1']}><Routes>
+    <Route path="/scale-library/:key/:version" element={<RouteAccess roles={['STUDENT', 'TEACHER', 'ADMIN']}><p>library</p></RouteAccess>} />
+    <Route path="/" element={<Location />} />
+    <Route path="/teacher/account-login" element={<p>teacher login</p>} />
+  </Routes></MemoryRouter>)
+  expect(screen.getByRole('status')).toHaveTextContent('/?returnTo=%2Fscale-library%2Ftest%2Fv1')
+  expect(screen.queryByText('teacher login')).not.toBeInTheDocument()
+})
 it('resumes the original account and retains mandatory password change', () => {
   rememberReauthReturn(student, '/student/scales/1')
-  const { rerender } = render(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><p>authorized page</p></RouteAccess></MemoryRouter>)
-  expect(screen.getByText('authorized page')).toBeInTheDocument()
   auth.user = { ...student, mustChangePassword: true }
-  rerender(<MemoryRouter><RouteAccess roles={['STUDENT']}><p>authorized page</p></RouteAccess></MemoryRouter>)
+  const { rerender } = render(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><p>authorized page</p></RouteAccess></MemoryRouter>)
   expect(screen.getByText('修改临时密码')).toBeInTheDocument()
-  expect(screen.queryByText('authorized page')).not.toBeInTheDocument()
+  expect(auth.clearReauthentication).not.toHaveBeenCalled()
+  expect(readReauthReturn()).not.toBeNull()
+
+  auth.user = student
+  rerender(<MemoryRouter initialEntries={['/student/scales/1']}><RouteAccess roles={['STUDENT']}><p>authorized page</p></RouteAccess></MemoryRouter>)
+  expect(screen.getByText('authorized page')).toBeInTheDocument()
 })
 describe('one shared chrome', () => {
   it('selects one active nav item and returns focus on Escape', async () => {
