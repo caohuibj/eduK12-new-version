@@ -59,11 +59,29 @@ async function main() {
         await context.close()
       }
     }
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
     const page = await context.newPage()
     await page.goto(`${base}/examples/product-ui.html`)
     await page.getByRole('heading', { name: '了解自己的学习方式' }).waitFor()
-    assert.equal(await page.locator('.hui-button').first().evaluate((node) => getComputedStyle(node).animationName), 'none')
+    const motionProbe = page.locator('.hui-button').first()
+    await motionProbe.evaluate((node) => {
+      node.style.animation = 'hui-test-motion 1s linear infinite'
+      node.style.transition = 'transform 1s linear'
+    })
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    const normalMotion = await motionProbe.evaluate((node) => {
+      const style = getComputedStyle(node)
+      return { animationName: style.animationName, transitionDuration: style.transitionDuration }
+    })
+    assert.equal(normalMotion.animationName, 'hui-test-motion')
+    assert.equal(normalMotion.transitionDuration, '1s')
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    const reducedMotion = await motionProbe.evaluate((node) => {
+      const style = getComputedStyle(node)
+      return { animationName: style.animationName, transitionDuration: style.transitionDuration }
+    })
+    assert.equal(reducedMotion.animationName, 'none')
+    assert.equal(reducedMotion.transitionDuration, '0s')
     evidence.push({ reducedMotion: true, passed: true })
     await context.close()
     fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify(evidence, null, 2))
