@@ -1,7 +1,5 @@
 # Frontend route inventory
 
-Baseline: main `8bbb40960079740cb5720b67969737971f367d8f` (2026-09-12).
-
 Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
@@ -80,14 +78,14 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 expl
 | /student/cognitive/sessions/:sessionId | CognitiveRunner | STUDENT | Cognitive capability | StudentLayout | focused | FE-02 + FE-07A/B | Inventory only; not migrated |
 | /student/cognitive/sessions/:sessionId/result | CognitiveResult | STUDENT | Cognitive capability | StudentLayout | standard | FE-02 + FE-07A/B | Inventory only; not migrated |
 | /public/cognitive/assignments/:token | PublicCognitiveAssignment | Public / unguarded | Cognitive capability | Page-owned / bare | public | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | Page-owned / bare | public | FE-02 + FE-07A/B | Inventory only; not migrated |
+| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | Page-owned / bare | focused | FE-02 + FE-07A/B | Inventory only; not migrated |
 | /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | Cognitive capability | Page-owned / bare | public | FE-02 + FE-07A/B | Inventory only; not migrated |
-| /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-06 | Inventory only; not migrated |
-| /public/composite/:token | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-09 | Inventory only; not migrated |
-| /public/composite/attempts/:attemptId | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-09 | Inventory only; not migrated |
+| /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-06 | Inventory only; not migrated |
+| /public/composite/:token | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-09 | Inventory only; not migrated |
+| /public/composite/attempts/:attemptId | CompositeAssessmentPage | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-09 | Inventory only; not migrated |
 | /public/composite/attempts/:attemptId/report | CompositeReportPage | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-09 | Inventory only; not migrated |
 | /public/questionnaire/:token | PublicQuestionnaire | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-08 | Inventory only; not migrated |
-| /public/questionnaire/:token/assessment | PublicQuestionnaireAssessment | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-08 | Inventory only; not migrated |
+| /public/questionnaire/:token/assessment | PublicQuestionnaireAssessment | Public / unguarded | — | Page-owned / bare | focused | FE-02 + FE-08 | Inventory only; not migrated |
 | /public/questionnaire/:token/result | PublicQuestionnaireResult | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-08 | Inventory only; not migrated |
 | /public/checkin/:token | PublicCheckin | Public / unguarded | — | Page-owned / bare | public | FE-02 + FE-10 | Inventory only; not migrated |
 | /bigscreen/:classroomId | BigScreen | Public / unguarded | — | Page-owned / bare | Dedicated display | FE-02 + FE-10 | Inventory only; not migrated |
