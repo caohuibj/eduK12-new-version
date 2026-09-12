@@ -468,7 +468,7 @@ const ScaleAssessment: React.FC = () => {
       {completionNotice && <p role="alert" className="mb-4 text-sm text-red-600">{completionNotice}</p>}
       {requiresRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地答案已保留。当前量表版本已变化，请重启后继续。</span><button type="button" onClick={() => void restartLegacyAttempt()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
       {scale.instruction && <p className="text-sm text-gray-600 mb-4 whitespace-pre-wrap">{scale.instruction}</p>}
-      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || submissionLocked} ariaLabel={`${currentItem.content} 视觉内容`}>
+      <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
         <ScaleFormVideoGate
           presentation={videoPresentation}
           loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
