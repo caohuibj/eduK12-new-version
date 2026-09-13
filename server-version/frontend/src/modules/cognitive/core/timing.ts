@@ -25,11 +25,23 @@ export type EventTimestampValidation =
   | { ok: true; eventPerfMs: number; ageMs: number }
   | { ok: false; reason: EventTimestampFailureReason }
 
+export interface CognitiveTimingIdentity {
+  testType: string
+  engineVersion: string
+  configVersion: string
+}
+
 export const DEFAULT_TIMING_DIAGNOSTIC_CAPACITY = 64
 export const MAX_TIMING_DIAGNOSTIC_CAPACITY = 128
 export const EVENT_TIMESTAMP_FUTURE_TOLERANCE_MS = 8
 export const TIME_ORIGIN_EQUALITY_TOLERANCE_MS = 0.5
 export const COGNITIVE_SOFTWARE_TIMING_POLICY_V1 = 'software-frame-v1' as const
+
+const SOFTWARE_FRAME_V1_IDENTITIES = new Set([
+  'reaction/1.0.0/1.2.0',
+  'gonogo/1.0.0/1.1.0',
+  'cpt/1.0.0/1.1.0',
+])
 
 const defaultPerformanceSource = (): TimingPerformanceSource | null => {
   if (typeof performance === 'undefined') return null
@@ -39,14 +51,13 @@ const defaultPerformanceSource = (): TimingPerformanceSource | null => {
 const isFiniteNonNegative = (value: number): boolean => Number.isFinite(value) && value >= 0
 
 /**
- * Existing frozen configs do not contain timingPolicyVersion. FE-07B timing is
- * therefore opt-in only: absence, typo, or a future unknown value remains on
- * the legacy task path instead of hot-switching historical administrations.
+ * FE-07B timing is admitted by an exact frozen test/engine/config identity.
+ * Existing sessions keep their old configVersion and therefore cannot be
+ * hot-switched by a frontend deployment. New timing-pilot configs may reuse
+ * the same strict JSON schema/scorer while remaining a distinct frozen admin.
  */
-export const usesSoftwareFrameTiming = (config: unknown): boolean => {
-  if (!config || typeof config !== 'object') return false
-  return (config as Record<string, unknown>).timingPolicyVersion === COGNITIVE_SOFTWARE_TIMING_POLICY_V1
-}
+export const usesSoftwareFrameTiming = (identity: CognitiveTimingIdentity): boolean =>
+  SOFTWARE_FRAME_V1_IDENTITIES.has(`${identity.testType}/${identity.engineVersion}/${identity.configVersion}`)
 
 /**
  * Capture the current document's monotonic clock and its epoch anchor.
