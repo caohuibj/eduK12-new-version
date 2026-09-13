@@ -41,12 +41,17 @@ const baseContext = {
   randomSeed: 'seed-1',
 }
 
+const requireRunner = (testType: string) => {
+  const Runner = resolveRunner(testType, '1.0.0')?.RunnerComponent
+  if (!Runner) throw new Error(`missing runner for ${testType}/1.0.0`)
+  return Runner
+}
+
 describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
   it('keeps frozen Go/No-Go configs on the legacy path by default', () => {
-    const Runner = resolveRunner('gonogo', '1.0.0')?.RunnerComponent
-    expect(Runner).toBeTruthy()
+    const Runner = requireRunner('gonogo')
     render(
-      <Runner!
+      <Runner
         taskContext={{
           ...baseContext,
           testType: 'gonogo',
@@ -65,10 +70,9 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
   })
 
   it('waits for the animation frame before exposing a Go/No-Go stimulus and starts duration at that frame', () => {
-    const Runner = resolveRunner('gonogo', '1.0.0')?.RunnerComponent
-    expect(Runner).toBeTruthy()
+    const Runner = requireRunner('gonogo')
     render(
-      <Runner!
+      <Runner
         taskContext={{
           ...baseContext,
           testType: 'gonogo',
@@ -100,10 +104,9 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
   })
 
   it('waits for the animation frame before exposing CPT and starts stimulus duration at that frame', () => {
-    const Runner = resolveRunner('cpt', '1.0.0')?.RunnerComponent
-    expect(Runner).toBeTruthy()
+    const Runner = requireRunner('cpt')
     render(
-      <Runner!
+      <Runner
         taskContext={{
           ...baseContext,
           testType: 'cpt',
