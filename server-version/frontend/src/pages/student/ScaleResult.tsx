@@ -114,9 +114,10 @@ const ScaleResult: React.FC = () => {
       status={{ kind: 'success', title: '已提交', description: '以下内容来自当前已完成结果记录。' }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
     >
-      <div className="card p-6">
+      <section className="card p-6" aria-labelledby="scale-report-detail-heading">
+        <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
         <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
-      </div>
+      </section>
     </ReportShell>
   )
 }
