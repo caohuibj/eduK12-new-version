@@ -35,14 +35,11 @@ export const useCognitiveInstructionVideoCompletion = (
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let cancelled = false
-    if (!required || !session) {
-      setCompleted({})
-      setLoading(false)
-      setError(null)
-      return () => { cancelled = true }
-    }
+    // Preserve the existing MEDIA-3/7 no-video contract: no frozen instruction
+    // video means this adapter schedules no state update and no extra render.
+    if (!required || !session) return undefined
 
+    let cancelled = false
     setLoading(true)
     setError(null)
     void Promise.all(entries.map(async (entry) => {
