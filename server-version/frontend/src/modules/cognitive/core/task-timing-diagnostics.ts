@@ -10,7 +10,6 @@ export interface TaskTimingDiagnostics {
   frameCallback: (input: { eligiblePerfMs: number; framePerfMs: number; trialIndex: number }) => void
   responseFailure: (input: {
     result: Exclude<CognitiveResponseTimestampResult, { ok: true }>
-    eventTimeStamp: number
     trialIndex: number
   }) => void
   visibilityLost: (atPerfMs: number, trialIndex: number) => void
@@ -42,10 +41,10 @@ export const createTaskTimingDiagnostics = (): TaskTimingDiagnostics => {
         deltaMs: Math.max(0, framePerfMs - eligiblePerfMs),
       })
     },
-    responseFailure({ result, eventTimeStamp, trialIndex }) {
+    responseFailure({ result, trialIndex }) {
       buffer.record({
         code: responseFailureCode(result.reason),
-        atPerfMs: eventTimeStamp,
+        atPerfMs: result.fallbackPerfMs,
         trialIndex,
       })
     },
