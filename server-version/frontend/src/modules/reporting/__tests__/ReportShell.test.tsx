@@ -48,7 +48,7 @@ describe('SituationalReportCard frozen projection', () => {
     expect(screen.getByTestId('situational-report-situational-1')).toBeTruthy()
     expect(screen.getByText('assertiveness.behavior')).toBeTruthy()
     expect(screen.getByText('cooperation.behavior')).toBeTruthy()
-    expect(screen.getByText('0')).toBeTruthy()
+    expect(screen.getByText('0.00')).toBeTruthy()
     expect(screen.getByText('—')).toBeTruthy()
     expect(screen.getByTestId('situational-frozen-projection-limitation')).toBeTruthy()
   })
