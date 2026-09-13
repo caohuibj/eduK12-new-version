@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { createTaskTimingDiagnostics } from '../../core/task-timing-diagnostics'
 import { cptSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 
@@ -21,6 +22,7 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     () => cptSequence(taskContext.randomSeed, total, config.targetRatio ?? 0.2, config.blockCount ?? 1),
     [taskContext.randomSeed, total, config.targetRatio, config.blockCount],
   )
+  const [timingDiagnostics] = useState(createTaskTimingDiagnostics)
   const [phase, setPhase] = useState<Phase>('instruction')
   const [visible, setVisible] = useState(false)
   const [practiceIndex, setPracticeIndex] = useState(0)
@@ -55,10 +57,25 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   }
 
   useEffect(() => {
-    const onHidden = () => { if (document.hidden) interruptedRef.current = true }
+    const onHidden = () => {
+      if (!document.hidden) return
+      interruptedRef.current = true
+      if (phase === 'formal' && trialIndex < total) {
+        timingDiagnostics.visibilityLost(performance.now(), trialIndex)
+      }
+    }
+    const onBlur = () => {
+      if (phase === 'formal' && trialIndex < total) {
+        timingDiagnostics.focusLost(performance.now(), trialIndex)
+      }
+    }
     document.addEventListener('visibilitychange', onHidden)
-    return () => document.removeEventListener('visibilitychange', onHidden)
-  }, [])
+    window.addEventListener('blur', onBlur)
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden)
+      window.removeEventListener('blur', onBlur)
+    }
+  }, [phase, trialIndex, total, timingDiagnostics])
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
@@ -118,12 +135,18 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     }
 
     const show = window.setTimeout(() => {
+      const eligiblePerfMs = performance.now()
       if (typeof window.requestAnimationFrame !== 'function') {
         interruptedRef.current = true
         present(performance.now())
         return
       }
-      animationFrameId = window.requestAnimationFrame((framePerfMs) => present(framePerfMs))
+      animationFrameId = window.requestAnimationFrame((framePerfMs) => {
+        if (phase === 'formal') {
+          timingDiagnostics.frameCallback({ eligiblePerfMs, framePerfMs, trialIndex })
+        }
+        present(framePerfMs)
+      })
     }, isiMs)
 
     return () => {
@@ -133,7 +156,7 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         window.cancelAnimationFrame(animationFrameId)
       }
     }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete])
+  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete, timingDiagnostics])
 
   const current = phase === 'formal'
     ? sequence[trialIndex]
@@ -143,7 +166,12 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     if (!visible || respondedRef.current || onsetRef.current == null) return
     const resolved = resolveEventResponseTimestamp(eventTimeStamp, onsetRef.current)
     const responsePerfMs = resolved.ok ? resolved.responsePerfMs : resolved.fallbackPerfMs
-    if (!resolved.ok) interruptedRef.current = true
+    if (!resolved.ok) {
+      interruptedRef.current = true
+      if (phase === 'formal') {
+        timingDiagnostics.responseFailure({ result: resolved, eventTimeStamp, trialIndex })
+      }
+    }
     if (responsePerfMs == null) return
 
     respondedRef.current = true
@@ -168,6 +196,9 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const pointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return
     interruptedRef.current = true
+    if (phase === 'formal') {
+      timingDiagnostics.pointerCancelled(performance.now(), trialIndex)
+    }
   }
 
   const keyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
