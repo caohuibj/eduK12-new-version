@@ -138,9 +138,10 @@ afterEach(async () => {
 
 const completeTwoItemFinalOnlyAttempt = async () => {
   const user = userEvent.setup()
-  await user.click(await screen.findByRole('button', { name: '选项 A' }))
-  await screen.findByText('第二题内容')
-  await user.click(screen.getByRole('button', { name: '选项 B' }))
+  await user.click(await screen.findByRole('radio', { name: '选项 A' }))
+  await user.click(screen.getByRole('button', { name: '下一题' }))
+  await screen.findByRole('heading', { name: '第二题内容' })
+  await user.click(screen.getByRole('radio', { name: '选项 B' }))
   await user.click(screen.getByRole('button', { name: '完成测评' }))
   await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2))
 }
@@ -148,7 +149,7 @@ const completeTwoItemFinalOnlyAttempt = async () => {
 describe('ScaleAssessment FINAL_ONLY provenance boundaries', () => {
   it('captures once across answers, navigation, rerender, and one final submit', async () => {
     const view = renderPage(makeAssessment('assessment-fresh'))
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
     expect(mockPost).toHaveBeenCalledTimes(1)
 
     await completeTwoItemFinalOnlyAttempt()
@@ -177,7 +178,7 @@ describe('ScaleAssessment FINAL_ONLY provenance boundaries', () => {
     await finalDraftStore.setInstrumentMetadata(draftKey, { scaleDeviceInputProvenance: provenance })
 
     renderPage(makeAssessment('assessment-draft'))
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
 
     expect(mockCapture).not.toHaveBeenCalled()
     expect(mockResolve).toHaveBeenCalledWith(expect.objectContaining({
@@ -187,7 +188,7 @@ describe('ScaleAssessment FINAL_ONLY provenance boundaries', () => {
 
   it('restores valid server provenance without a fresh browser capture', async () => {
     renderPage(makeAssessment('assessment-server', provenance))
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
 
     expect(mockCapture).not.toHaveBeenCalled()
     expect(mockResolve).toHaveBeenCalledWith(expect.objectContaining({ serverValue: provenance }))
