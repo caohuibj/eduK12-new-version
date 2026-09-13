@@ -67,7 +67,7 @@ const waitForParentState = async (page, parentId, recoveryToken = '') => {
 }
 
 const waitForRunner = async (page) => {
-  await page.getByRole('heading', { name: '文字情境测评' }).waitFor({ state: 'visible', timeout: 30000 })
+  await page.locator('[data-assessment-shell-header]').waitFor({ state: 'visible', timeout: 30000 })
   await page.getByText(/情境 [12] \/ 2/).waitFor({ state: 'visible', timeout: 30000 })
 }
 
