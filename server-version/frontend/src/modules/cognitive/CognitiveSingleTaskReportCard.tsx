@@ -9,16 +9,19 @@ const CognitiveSingleTaskReportCard: React.FC<{
   attemptNo?: number
   finishedAt?: string | null
   anonymousCode?: string | null
-}> = ({ report, attemptNo, finishedAt, anonymousCode }) => {
+  headingLevel?: 1 | 2 | 3
+}> = ({ report, attemptNo, finishedAt, anonymousCode, headingLevel = 3 }) => {
   const interpretable = report.interpretable
   const method = report.method || {} as CognitiveSingleTaskReport['method']
   const comparison = report.reference?.comparison
   const activeFlags = report.qualityFlags.filter((flag) => flag.active)
   const profileText = profileLabelOf(report.profile, report.profileLabel)
+  const TitleHeading = headingLevel === 1 ? 'h1' : headingLevel === 2 ? 'h2' : 'h3'
+  const SectionHeading = headingLevel === 1 ? 'h2' : headingLevel === 2 ? 'h3' : 'h4'
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">{report.title}</h1>
+      <TitleHeading className="text-2xl font-bold text-gray-800 mb-2">{report.title}</TitleHeading>
       <p className="text-sm text-gray-500 mb-6">
         {attemptNo != null ? `尝试 #${attemptNo}（` : ''}
         {method.testType || report.testType}{method.engineVersion ? ` / ${method.engineVersion}` : ''}
@@ -29,7 +32,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
       </p>
 
       <section className="text-left mb-6">
-        <h2 className="text-sm font-semibold text-gray-600 mb-2">数据质量</h2>
+        <SectionHeading className="text-sm font-semibold text-gray-600 mb-2">数据质量</SectionHeading>
         <div className={`rounded-lg px-4 py-3 text-sm ${interpretable ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
           {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议重新测量。'}
         </div>
@@ -61,7 +64,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
 
       {report.primaryMetrics.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">主要指标</h2>
+          <SectionHeading className="text-sm font-semibold text-gray-600 mb-2 text-left">主要指标</SectionHeading>
           <div className="grid grid-cols-2 gap-3">
             {report.primaryMetrics.map((metric) => (
               <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
@@ -75,7 +78,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
 
       {report.secondaryMetrics.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">次级指标</h2>
+          <SectionHeading className="text-sm font-semibold text-gray-600 mb-2 text-left">次级指标</SectionHeading>
           <div className="grid grid-cols-2 gap-3">
             {report.secondaryMetrics.map((metric) => (
               <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
@@ -106,14 +109,14 @@ const CognitiveSingleTaskReportCard: React.FC<{
 
       {(report.caveats.length > 0 || report.practicalTips.length > 0) && (
         <section className="text-left mt-4 border-t pt-3">
-          <h2 className="text-sm font-semibold text-gray-600 mb-2">简要解释</h2>
+          <SectionHeading className="text-sm font-semibold text-gray-600 mb-2">简要解释</SectionHeading>
           {report.caveats.map((caveat) => <p key={caveat} className="text-sm text-amber-800">{caveat}</p>)}
           {report.practicalTips.map((tip) => <p key={tip} className="text-sm text-gray-500">{tip}</p>)}
         </section>
       )}
 
       {(method.engineVersion || method.scoringVersion || method.configVersion) && <section className="text-left mt-4 border-t pt-3">
-        <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明</h2>
+        <SectionHeading className="text-sm font-semibold text-gray-600 mb-2">方法说明</SectionHeading>
         <p className="text-xs text-gray-500">
           任务 {method.testType || report.testType} · 引擎 {method.engineVersion} · 评分 {method.scoringVersion} · 配置 {method.configVersion}
           {profileText ? ` · ${profileText}` : ''}
