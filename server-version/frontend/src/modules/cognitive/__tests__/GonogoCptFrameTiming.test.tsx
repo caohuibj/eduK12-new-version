@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { COGNITIVE_SOFTWARE_TIMING_POLICY_V1 } from '../core/timing'
 import { resolveRunner } from '../registry'
 
 let nextFrameId = 1
@@ -69,12 +68,13 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     expect(requestAnimationFrame).not.toHaveBeenCalled()
   })
 
-  it('waits for the animation frame before exposing a Go/No-Go stimulus and starts duration at that frame', () => {
+  it('waits for the animation frame for the Go/No-Go timing-pilot config', () => {
     const Runner = requireRunner('gonogo')
     render(
       <Runner
         taskContext={{
           ...baseContext,
+          configVersion: '1.1.0',
           testType: 'gonogo',
           config: {
             totalTrials: 8,
@@ -82,7 +82,6 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
             stimulusMs: 50,
             isiMs: 20,
             validRtFloorMs: 100,
-            timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
           },
         }}
         trialIndex={0}
@@ -103,12 +102,13 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     expect(screen.getByLabelText('respond').className).toContain('bg-gray-200')
   })
 
-  it('waits for the animation frame before exposing CPT and starts stimulus duration at that frame', () => {
+  it('waits for the animation frame for the CPT timing-pilot config', () => {
     const Runner = requireRunner('cpt')
     render(
       <Runner
         taskContext={{
           ...baseContext,
+          configVersion: '1.1.0',
           testType: 'cpt',
           config: {
             totalTrials: 12,
@@ -116,7 +116,6 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
             blockCount: 1,
             stimulusMs: 50,
             isiMs: 20,
-            timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
           },
         }}
         trialIndex={0}
