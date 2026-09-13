@@ -30,7 +30,7 @@ export const requiredVideoCompletionMetadataKey = (identity: RequiredVideoComple
   `assessmentVideoCompletion:${identity.policyVersion ?? REQUIRED_VIDEO_POLICY_VERSION}:${identity.slotKey}:${identity.assetId}:${identity.contentHash}`
 )
 
-const markerFromMeta = (
+export const requiredVideoCompletionFromMeta = (
   meta: FinalDraftMeta | null,
   identity: RequiredVideoCompletionIdentity,
 ): RequiredVideoCompletionMarker | null => {
@@ -52,7 +52,7 @@ const markerFromMeta = (
 export const readRequiredVideoCompletion = async (
   identity: RequiredVideoCompletionIdentity,
   store: RequiredVideoCompletionStore = finalDraftStore,
-) => markerFromMeta(await store.get(identity.draftKey), identity)
+) => requiredVideoCompletionFromMeta(await store.get(identity.draftKey), identity)
 
 export const markRequiredVideoComplete = async (
   identity: RequiredVideoCompletionIdentity,

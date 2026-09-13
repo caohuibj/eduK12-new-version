@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { FileText, Clock, CheckCircle, ChevronRight } from 'lucide-react'
+import { CheckCircle, ChevronRight, Clock, FileText } from 'lucide-react'
+import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 
 interface Scale {
   id: string
@@ -24,23 +25,33 @@ interface Scale {
   retakeAllowed?: boolean
 }
 
+const scaleDestination = (scale: Scale) => (
+  scale.completed && !scale.inProgress && scale.assessmentId
+    ? `/student/scales/result/${scale.assessmentId}`
+    : `/student/scales/${scale.id}`
+)
+
 const StudentScales: React.FC = () => {
-  const navigate = useNavigate()
   const [scales, setScales] = useState<Scale[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchScales()
+    void fetchScales()
   }, [])
 
   const fetchScales = async () => {
     try {
+      setLoadError(null)
       const response = await apiClient.get<{ list: Scale[] }>('/scales/available')
       if (response.code === 0) {
         setScales(response.data.list)
+      } else {
+        setLoadError(response.message || '无法加载可用量表')
       }
     } catch (err) {
       console.error('获取量表列表失败', err)
+      setLoadError(err instanceof Error ? err.message : '无法加载可用量表')
     } finally {
       setLoading(false)
     }
@@ -48,84 +59,69 @@ const StudentScales: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="assessment">
+        <ProductStatus kind="pending" title="正在加载心理测评" announce="polite">正在核对可用量表与当前尝试状态。</ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">心理测评</h1>
-        <p className="text-gray-600 mt-1">完成心理量表测评，了解自己的心理状态</p>
-      </div>
+    <ProductPage width="assessment">
+      <PageHeader title="心理测评" description="完成已发布的心理量表；进行中的测评会从当前本地尝试继续。" />
 
-      {scales.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">暂无可用的心理量表</p>
-        </div>
+      {loadError ? (
+        <ProductStatus kind="error" title="量表列表加载失败" announce="assertive">{loadError}</ProductStatus>
+      ) : scales.length === 0 ? (
+        <ProductStatus kind="info" title="暂无可用的心理量表">
+          当有适用于你的已发布量表后，会显示在这里。
+        </ProductStatus>
       ) : (
         <div className="grid gap-4">
           {scales.map((scale) => (
-            <div
+            <Link
               key={scale.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => {
-                if (scale.inProgress) {
-                  navigate(`/student/scales/${scale.id}`)
-                } else if (scale.completed && scale.assessmentId) {
-                  navigate(`/student/scales/result/${scale.assessmentId}`)
-                } else {
-                  navigate(`/student/scales/${scale.id}`)
-                }
-              }}
+              to={scaleDestination(scale)}
+              className="group block min-h-11 rounded-xl border border-slate-200 bg-white p-4 text-inherit no-underline transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-700 hover:border-slate-300 sm:p-5"
+              aria-label={`${scale.name}${scale.inProgress ? '，继续作答' : scale.completed ? '，查看结果' : '，开始测评'}`}
             >
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-medium text-gray-900">{scale.name}</h3>
-                      {scale.inProgress && (
-                        <span className="text-blue-600 text-sm">进行中</span>
-                      )}
-                      {scale.completed && (
-                        <span className="flex items-center text-green-600 text-sm">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          已完成
-                        </span>
-                      )}
-                    </div>
-                    {scale.description && (
-                      <p className="text-gray-600 mt-1 text-sm">{scale.description}</p>
-                    )}
-                    <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <FileText className="w-4 h-4 mr-1" />
-                        {scale.itemCount} 道题目
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold leading-snug text-slate-900">{scale.name}</h2>
+                    {scale.inProgress ? (
+                      <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">进行中</span>
+                    ) : scale.completed ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                        <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                        已完成
                       </span>
-                      {scale.estimatedTime && (
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          约 {scale.estimatedTime} 分钟
-                        </span>
-                      )}
-                      {scale.course && (
-                        <span className="text-blue-600">
-                          课程: {scale.course.title}
-                        </span>
-                      )}
-                    </div>
+                    ) : null}
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  {scale.description ? <p className="mt-2 text-sm leading-relaxed text-slate-600">{scale.description}</p> : null}
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-500">
+                    <span className="inline-flex items-center gap-1.5">
+                      <FileText className="h-4 w-4" aria-hidden="true" />
+                      {scale.itemCount} 道题目
+                    </span>
+                    {scale.estimatedTime ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="h-4 w-4" aria-hidden="true" />
+                        约 {scale.estimatedTime} 分钟
+                      </span>
+                    ) : null}
+                    {scale.course ? <span>课程：{scale.course.title}</span> : null}
+                  </div>
+                  {scale.inProgress && scale.activeAttempt ? (
+                    <p className="mt-3 text-sm font-medium text-blue-800">已有进行中的尝试，进入后继续当前本地作答。</p>
+                  ) : null}
                 </div>
+                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

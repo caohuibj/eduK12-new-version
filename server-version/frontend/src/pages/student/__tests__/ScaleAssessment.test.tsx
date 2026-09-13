@@ -66,12 +66,12 @@ let assessmentForTest = assessment
 const renderPage = (id = `assessment-${Date.now()}-${Math.random()}`) => {
   assessmentForTest = { ...assessment, id, answers: [] }
   return render(
-  <MemoryRouter initialEntries={['/student/scales/scale-1']}>
-    <Routes>
-      <Route path="/student/scales/:scaleId" element={<ScaleAssessment />} />
-      <Route path="/student/scales/result/:assessmentId" element={<div>RESULT_PAGE</div>} />
-    </Routes>
-  </MemoryRouter>,
+    <MemoryRouter initialEntries={['/student/scales/scale-1']}>
+      <Routes>
+        <Route path="/student/scales/:scaleId" element={<ScaleAssessment />} />
+        <Route path="/student/scales/result/:assessmentId" element={<div>RESULT_PAGE</div>} />
+      </Routes>
+    </MemoryRouter>,
   )
 }
 
@@ -92,7 +92,7 @@ beforeEach(() => {
 })
 
 describe('ScaleAssessment answer navigation', () => {
-  it('appends locally and advances before the batched network flush', async () => {
+  it('appends locally and advances explicitly before the batched network flush', async () => {
     let resolvePatch!: (value: { code: number; data?: { acceptedIds: string[]; acceptedSequences: number[] } }) => void
     mockPatch.mockReturnValueOnce(new Promise((resolve) => {
       resolvePatch = resolve
@@ -101,13 +101,15 @@ describe('ScaleAssessment answer navigation', () => {
     const id = `assessment-batch-${Date.now()}`
     renderPage(id)
 
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '选项 A' }))
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
 
     expect(mockPatch).not.toHaveBeenCalled()
-    expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    expect(await screen.findByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: '选项 C' }))
+    await user.click(screen.getByRole('radio', { name: '选项 C' }))
     await user.click(screen.getByRole('button', { name: '完成测评' }))
     await waitFor(() => expect(mockPatch).toHaveBeenCalledWith(
       `/scales/assessments/${id}/answers/batch`,
@@ -133,24 +135,25 @@ describe('ScaleAssessment answer navigation', () => {
     const user = userEvent.setup()
     renderPage(`assessment-failure-${Date.now()}`)
 
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '选项 A' }))
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
+    await user.click(screen.getByRole('button', { name: '下一题' }))
 
-    expect(await screen.findByText('第二题内容')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '选项 C' }))
+    expect(await screen.findByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '选项 C' }))
     await user.click(screen.getByRole('button', { name: '完成测评' }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('保存失败'))
-    expect(screen.getByText('第二题内容')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
   })
 
   it('does not issue one network request per answer', async () => {
     const user = userEvent.setup()
     renderPage(`assessment-one-request-${Date.now()}`)
 
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '选项 A' }))
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
 
-    expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
     expect(mockPatch).not.toHaveBeenCalled()
   })
 
@@ -158,13 +161,15 @@ describe('ScaleAssessment answer navigation', () => {
     const user = userEvent.setup()
     renderPage(`assessment-complete-${Date.now()}`)
 
-    expect(await screen.findByText('第一题内容')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '选项 A' }))
-    expect(await screen.findByText('第二题内容')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    expect(await screen.findByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: '选项 C' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: '选项 C' })).toHaveClass('border-primary'))
-    expect(screen.getByText('第二题内容')).toBeInTheDocument()
+    const lastOption = screen.getByRole('radio', { name: '选项 C' })
+    await user.click(lastOption)
+    await waitFor(() => expect(lastOption).toBeChecked())
+    expect(screen.getByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
     expect(mockPost).toHaveBeenCalledTimes(1)
     expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments')
 
