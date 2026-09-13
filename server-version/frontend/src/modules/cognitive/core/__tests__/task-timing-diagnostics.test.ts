@@ -54,6 +54,6 @@ describe('FE-07B task-local timing diagnostics', () => {
     const snapshot = diagnostics.buffer.snapshot()
     expect(snapshot).toHaveLength(64)
     expect(snapshot[0]?.sequence).toBe(17)
-    expect(snapshot.at(-1)?.sequence).toBe(80)
+    expect(snapshot[snapshot.length - 1]?.sequence).toBe(80)
   })
 })
