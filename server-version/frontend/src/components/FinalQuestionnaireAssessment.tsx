@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
+import { AssessmentShell } from './assessment-shell'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import {
   createFinalDraftMeta,
@@ -513,25 +514,66 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const contentUnits = data.units || data.contentItems
   const title = data.questionnaire?.name || '问卷测评'
+  const completedUnitCount = contentUnits.filter((unit) => unit.completed).length
+  const totalUnitCount = Math.max(contentUnits.length, data.totalItems, 1)
+  const submissionStatus = submitting
+    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+    : meta?.status === 'SUBMITTING'
+      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+      : meta?.status === 'RETRY_PENDING'
+        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
+        : meta?.status === 'COMPLETED'
+          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+          : { state: 'ready' as const }
+  const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
+    ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
+    : { state: 'none' as const }
 
   if (loadingDraft) return <div className="flex items-center justify-center h-64 text-gray-500">正在恢复本地草稿...</div>
   if (data.questionnaireAssessment.status === 'COMPLETED') return null
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          <p className="text-sm text-gray-500">完成单元：{contentUnits.filter((unit) => unit.completed).length} / {data.totalItems}（{data.questionnaireAssessment.progress}%）</p>
+    <AssessmentShell
+      title={title}
+      eyebrow="问卷测评"
+      instructions={(
+        <div className="space-y-2">
+          {data.questionnaire?.instruction ? <p>{data.questionnaire.instruction}</p> : null}
+          <p>{contextText} 页面刷新或离线时会从 IndexedDB 恢复。</p>
         </div>
-        <button type="button" onClick={() => void exitAfterFlush()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
-      </div>
-      <p className="text-sm text-gray-500 mb-4">{contextText} 页面刷新或离线时会从 IndexedDB 恢复。</p>
-      {localSaveStatus.state === 'saving' ? <p role="status" className="mb-3 text-sm text-slate-500">{localSaveStatus.message}</p> : null}
-      {localSaveStatus.state === 'saved' ? <p role="status" className="mb-3 text-sm text-emerald-700">{localSaveStatus.message}</p> : null}
-      {localSaveStatus.state === 'error' ? <p role="alert" className="mb-3 text-sm text-red-700">本机保存失败：{localSaveStatus.message}</p> : null}
-      {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
-      {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
+      )}
+      progress={{ kind: 'count', completed: completedUnitCount, total: totalUnitCount, label: '问卷单元进度' }}
+      saveStatus={localSaveStatus}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      actions={(
+        <button type="button" onClick={() => void exitAfterFlush()} className="btn-secondary min-h-11">
+          <Save className="w-4 h-4 inline mr-1" />保存并退出
+        </button>
+      )}
+      navigation={(
+        <section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="mb-2 text-sm font-medium text-slate-600">提交单元</p>
+          <div className="flex flex-wrap gap-2">
+            {contentUnits.map((unit) => (
+              <span
+                key={`${unit.type}-${unit.id}`}
+                className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === data.questionnaireAssessment.currentIndex ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600'}`}
+              >
+                {unit.index + 1}. {unit.label}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    >
+      {error ? <p role="alert" className="mb-4 text-sm text-red-700">{error}</p> : null}
+      {requiresRestart && onRestart ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
+          <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary min-h-11 whitespace-nowrap">重启并继续</button>
+        </div>
+      ) : null}
 
       {currentSection && (
         <div>
@@ -588,9 +630,12 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       )}
 
       {currentScale && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{currentScale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {currentScale.definition.items.length}</span></div>
-          {currentScale.instruction && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{currentScale.instruction}</p>}
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div><p className="text-sm text-slate-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold text-slate-900">{currentScale.name}</h2></div>
+            <span className="text-sm text-slate-500">题目 {scaleIndex + 1} / {currentScale.definition.items.length}</span>
+          </div>
+          {currentScale.instruction ? <p className="mb-5 whitespace-pre-wrap text-sm text-slate-600">{currentScale.instruction}</p> : null}
           {(() => {
             const item = currentScale.definition.items[scaleIndex]
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
@@ -608,15 +653,34 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   slotKey: scaleItemVideoSlotKey(item.itemCode),
                 } : undefined}
               >
-                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => void goToScaleIndex(scaleIndex - 1)} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => void goToScaleIndex(scaleIndex + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+                <div>
+                  <h3 className="mb-5 text-lg font-medium text-slate-900">{item.content}{item.required && <span className="ml-2 text-sm text-red-600">必答</span>}</h3>
+                  <div className="space-y-2">
+                    {item.options.map((option) => (
+                      <button
+                        type="button"
+                        key={`${typeof option.value}:${String(option.value)}`}
+                        onClick={() => saveScaleValue(item.itemCode, option.value)}
+                        disabled={submitting || draftLocked}
+                        className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${scaleValues[item.itemCode] === option.value ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex flex-wrap justify-between gap-3">
+                    <button type="button" onClick={() => void goToScaleIndex(scaleIndex - 1)} disabled={scaleIndex === 0 || submitting} className="btn-secondary min-h-11"><ChevronLeft className="w-4 h-4 inline" />上一题</button>
+                    {scaleIndex < currentScale.definition.items.length - 1
+                      ? <button type="button" onClick={() => void goToScaleIndex(scaleIndex + 1)} disabled={submitting} className="btn-secondary min-h-11">下一题<ChevronRight className="w-4 h-4 inline" /></button>
+                      : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary min-h-11"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}
+                  </div>
+                </div>
               </ScaleFormVideoGate>
             </AssessmentImageGate>
           })()}
         </div>
       )}
-
-      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">提交单元</p><div className="flex flex-wrap gap-2">{contentUnits.map((unit) => <span key={`${unit.type}-${unit.id}`} className={`px-3 py-1 rounded text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === data.questionnaireAssessment.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{unit.index + 1}. {unit.label}</span>)}</div></div>
-    </div>
+    </AssessmentShell>
   )
 }
 
