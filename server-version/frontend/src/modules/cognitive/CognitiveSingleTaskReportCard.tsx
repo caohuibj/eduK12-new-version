@@ -10,14 +10,15 @@ const CognitiveSingleTaskReportCard: React.FC<{
   finishedAt?: string | null
   anonymousCode?: string | null
   headingLevel?: 1 | 2 | 3
-}> = ({ report, attemptNo, finishedAt, anonymousCode, headingLevel = 3 }) => {
+}> = ({ report, attemptNo, finishedAt, anonymousCode, headingLevel }) => {
   const interpretable = report.interpretable
   const method = report.method || {} as CognitiveSingleTaskReport['method']
   const comparison = report.reference?.comparison
   const activeFlags = report.qualityFlags.filter((flag) => flag.active)
   const profileText = profileLabelOf(report.profile, report.profileLabel)
-  const TitleHeading = headingLevel === 1 ? 'h1' : headingLevel === 2 ? 'h2' : 'h3'
-  const SectionHeading = headingLevel === 1 ? 'h2' : headingLevel === 2 ? 'h3' : 'h4'
+  const resolvedHeadingLevel = headingLevel ?? (attemptNo != null ? 1 : 3)
+  const TitleHeading = resolvedHeadingLevel === 1 ? 'h1' : resolvedHeadingLevel === 2 ? 'h2' : 'h3'
+  const SectionHeading = resolvedHeadingLevel === 1 ? 'h2' : resolvedHeadingLevel === 2 ? 'h3' : 'h4'
 
   return (
     <>
