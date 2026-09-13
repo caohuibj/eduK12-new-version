@@ -15,10 +15,10 @@ export type AssessmentSaveStatus =
 
 export type AssessmentSubmissionStatus =
   | { state: 'idle' | 'ready' }
-  | { state: 'submitting'; message?: string }
-  | { state: 'reconciling'; message?: string }
-  | { state: 'pending'; message?: string }
-  | { state: 'committed'; message?: string }
+  | { state: 'submitting'; title?: string; message?: string }
+  | { state: 'reconciling'; title?: string; message?: string }
+  | { state: 'pending'; title?: string; message?: string }
+  | { state: 'committed'; title?: string; message?: string }
 
 export type AssessmentRecoveryState =
   | { state: 'none' }
@@ -137,16 +137,16 @@ function ShellStatuses({
         <ProductStatus kind="error" title="本机保存失败" announce="assertive">{saveStatus.message}</ProductStatus>
       ) : null}
       {submissionStatus?.state === 'submitting' ? (
-        <ProductStatus kind="pending" title="正在提交" announce="polite">{submissionStatus.message ?? '答案已锁定，正在提交同一份 FINAL。'}</ProductStatus>
+        <ProductStatus kind="pending" title={submissionStatus.title ?? '正在提交'} announce="polite">{submissionStatus.message ?? '答案已锁定，正在提交同一份 FINAL。'}</ProductStatus>
       ) : null}
       {submissionStatus?.state === 'reconciling' ? (
-        <ProductStatus kind="pending" title="正在确认提交状态" announce="polite">{submissionStatus.message ?? '正在核对服务器终态，不会重新生成答案。'}</ProductStatus>
+        <ProductStatus kind="pending" title={submissionStatus.title ?? '正在确认提交状态'} announce="polite">{submissionStatus.message ?? '正在核对服务器终态，不会重新生成答案。'}</ProductStatus>
       ) : null}
       {submissionStatus?.state === 'pending' ? (
-        <ProductStatus kind="warning" title="提交状态尚未确认">{submissionStatus.message ?? '答案保持锁定；稍后继续核对同一份提交。'}</ProductStatus>
+        <ProductStatus kind="warning" title={submissionStatus.title ?? '提交状态尚未确认'}>{submissionStatus.message ?? '答案保持锁定；稍后继续核对同一份提交。'}</ProductStatus>
       ) : null}
       {submissionStatus?.state === 'committed' ? (
-        <ProductStatus kind="success" title="已提交">{submissionStatus.message ?? '服务器已确认本单元的权威结果。'}</ProductStatus>
+        <ProductStatus kind="success" title={submissionStatus.title ?? '已提交'}>{submissionStatus.message ?? '服务器已确认本单元的权威结果。'}</ProductStatus>
       ) : null}
     </div>
   )
