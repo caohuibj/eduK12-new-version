@@ -17,6 +17,7 @@ import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
+import FormPlayer from './questionnaire/FormPlayer'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   resolveScaleDeviceInputProvenance,
@@ -468,9 +469,12 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
 
       {currentSection && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{currentSection.title}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {currentSection.items.length}</span></div>
-          {currentSection.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{currentSection.description}</p>}
+        <div>
+          <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+            <p className="text-sm text-slate-500"><FileText className="mr-1 inline h-4 w-4" />表单区段</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-900">{currentSection.title}</h2>
+            {currentSection.description ? <p className="mt-3 whitespace-pre-wrap text-sm text-slate-600">{currentSection.description}</p> : null}
+          </div>
           {(() => {
             const item = currentSection.items[sectionIndex]
             if (!item) return <p className="text-gray-500">该区段没有字段。</p>
@@ -478,23 +482,38 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)
             const videoEntries = formOptionVideoPresentations(options)
-            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
-              <FormOptionVideoGroupGate
-                entries={videoEntries}
-                loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
-                  ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
-                  : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
-              >
-                <div>
-                  <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
-                  {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
-                  {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
-                  {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} className="w-full border rounded px-3 py-2" />}
-                  {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
-                  <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
-                </div>
-              </FormOptionVideoGroupGate>
-            </AssessmentImageGate>
+            return (
+              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
+                <FormOptionVideoGroupGate
+                  entries={videoEntries}
+                  loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
+                    ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
+                    : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
+                >
+                  <FormPlayer
+                    item={{
+                      id: item.id,
+                      type: item.type,
+                      label: item.label,
+                      placeholder: item.placeholder,
+                      required: item.required,
+                    }}
+                    options={options}
+                    value={value}
+                    disabled={draftLocked || requiresRestart}
+                    position={sectionIndex + 1}
+                    total={currentSection.items.length}
+                    onChange={(nextValue) => saveFormValue(item.id, nextValue)}
+                    onPrevious={() => setSectionIndex((index) => Math.max(0, index - 1))}
+                    onNext={sectionIndex < currentSection.items.length - 1
+                      ? () => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))
+                      : undefined}
+                    onSubmit={sectionIndex === currentSection.items.length - 1 ? submitSection : undefined}
+                    submitting={submitting}
+                  />
+                </FormOptionVideoGroupGate>
+              </AssessmentImageGate>
+            )
           })()}
         </div>
       )}
