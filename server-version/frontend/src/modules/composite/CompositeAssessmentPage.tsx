@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAttemptState, CompositeCurrentItem, CompositePublicInfo } from './types'
+import { resolveCompositeChildRouteContext } from './child-route-context'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 
@@ -252,29 +253,21 @@ const CompositeAssessmentPage: React.FC = () => {
     }
   }
 
-  const enterCognitive = (item: CompositeCurrentItem) => {
-    const session = item.cognitiveSession
-    if (!session) return
-    if (publicMode && recoveryToken) saveCognitiveRecoveryCredential(session.sessionId, recoveryToken)
-    const returnTo = encodeURIComponent(publicMode ? `/public/composite/attempts/${state?.id}` : `/student/composite/attempts/${state?.id}`)
-    const url = publicMode
-      ? `/public/cognitive/sessions/${session.sessionId}?public=1&returnTo=${returnTo}`
-      : `/student/cognitive/sessions/${session.sessionId}?returnTo=${returnTo}`
-    navigate(url)
-  }
-
-  const enterSituational = (item: CompositeCurrentItem) => {
-    if (!state?.id || !item.situationalAttemptId) {
-      setError('情境化测评槽位尚未准备完成，请刷新综合测评')
+  const enterChild = (item: CompositeCurrentItem) => {
+    const result = resolveCompositeChildRouteContext({
+      publicMode,
+      parentAttemptId: state?.id || '',
+      item,
+    })
+    if (!result.ok) {
+      setError(result.message)
       return
     }
-    const returnTo = publicMode ? `/public/composite/attempts/${state.id}` : `/student/composite/attempts/${state.id}`
-    const query = new URLSearchParams({
-      returnTo,
-      compositeAttemptId: state.id,
-      compositeItemId: item.id,
-    })
-    navigate(`${publicMode ? '/public' : '/student'}/composite/situational/${item.situationalAttemptId}?${query.toString()}`)
+    setError(null)
+    if (result.context.kind === 'COGNITIVE' && publicMode && recoveryToken) {
+      saveCognitiveRecoveryCredential(result.context.childAttemptId, recoveryToken)
+    }
+    navigate(result.context.target)
   }
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
@@ -337,8 +330,8 @@ const CompositeAssessmentPage: React.FC = () => {
         onReload={() => loadAttempt(state.id, recoveryToken)}
         onExit={() => navigate(publicMode ? '/' : '/student')}
         onCompleted={() => goReport(state.id)}
-        onEnterCognitive={enterCognitive}
-        onEnterSituational={enterSituational}
+        onEnterCognitive={enterChild}
+        onEnterSituational={enterChild}
         onRestart={restartLegacyAttempt}
       />
     )
@@ -359,7 +352,7 @@ const CompositeAssessmentPage: React.FC = () => {
       {publicMode && (newRecoveryToken || recoveryToken) && <div className="bg-amber-50 border border-amber-200 rounded p-3 mb-5 text-sm text-amber-800">匿名编号：<strong>{state.anonymousCode || '匿名参与者'}</strong>。请保存恢复凭证：<code className="break-all">{newRecoveryToken || recoveryToken}</code></div>}
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-      {current?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{state.items[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">完成该认知任务后会自动回到综合测评。</p><button onClick={() => enterCognitive(current)} className="btn-primary">开始/继续认知任务</button></div>}
+      {current?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{state.items[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">完成该认知任务后会自动回到综合测评。</p><button onClick={() => enterChild(current)} className="btn-primary">开始/继续认知任务</button></div>}
 
       {current?.type === 'FORM' && current.form && <div className="card p-8">
         <h2 className="text-xl font-semibold mb-6">
