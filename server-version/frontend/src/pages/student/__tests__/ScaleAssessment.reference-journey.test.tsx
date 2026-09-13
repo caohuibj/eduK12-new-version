@@ -219,13 +219,13 @@ describe('ScaleAssessment reference journey', () => {
     expect(screen.getByText('本题答案已保存到本机，可继续或返回修改。')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: '下一题' }))
-    expect(screen.getByText('第二题')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第二题' })).toBeInTheDocument()
   })
 
   it('passes the frozen draft/item identity into required video viewing for an editable FINAL_ONLY attempt', async () => {
     renderRunner(true)
 
-    await screen.findByText('第一题')
+    await screen.findByRole('heading', { name: '第一题' })
     await waitFor(() => expect(mocks.videoGateProps).not.toBeNull())
     expect(mocks.videoGateProps?.requiredViewing).toEqual({
       draftKey: 'scale:attempt-1',
@@ -241,13 +241,13 @@ describe('ScaleAssessment reference journey', () => {
     ))
     renderRunner(true)
 
-    await screen.findByText('第一题')
+    await screen.findByRole('heading', { name: '第一题' })
     await user.click(screen.getByRole('button', { name: '下一题' }))
-    expect(screen.getByText('第二题')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第二题' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '完成测评' }))
 
     await waitFor(() => expect(mocks.sealForSubmission).toHaveBeenCalledTimes(1))
-    expect(await screen.findByText('第一题')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '第一题' })).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('该题包含必看视频')
   })
 
