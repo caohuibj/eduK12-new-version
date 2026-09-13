@@ -162,7 +162,7 @@ describe('MEDIA-3 Cognitive image presentation gate', () => {
 
     renderRunner()
 
-    expect(screen.getByText('正在准备测评视觉资源…')).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toContain('正在准备本次任务的冻结媒体。')
     const start = screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement
     expect(start.disabled).toBe(true)
     fireEvent.click(start)
@@ -188,7 +188,7 @@ describe('MEDIA-3 Cognitive image presentation gate', () => {
 
     renderRunner()
 
-    expect(screen.getByText('视觉内容加载失败，当前不能开始测评。')).toBeTruthy()
+    expect(screen.getByRole('alert').textContent).toContain('视觉内容加载失败，当前不能开始测评。')
     expect((screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '重试视觉内容' }))
     expect(retry).toHaveBeenCalledTimes(1)

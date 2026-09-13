@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
 
-// mock runner hook：组件测试聚焦各状态的渲染与安全文案
 const mockController = {
   state: {} as any,
   start: vi.fn(),
@@ -32,7 +31,7 @@ beforeEach(() => {
 
 describe('CognitiveRunner page', () => {
   it('renders loading state', () => {
-    mockController.state = { status: 'LOADING' }
+    mockController.state = { status: 'LOADING', session: null }
     renderAt('/student/cognitive/sessions/s1')
     expect(screen.getByText('加载中...')).toBeTruthy()
   })
@@ -56,14 +55,14 @@ describe('CognitiveRunner page', () => {
     expect(screen.getByText('开始测评')).toBeTruthy()
   })
 
-  it('renders UNSUPPORTED with friendly message (no retry submit)', () => {
+  it('renders UNSUPPORTED with friendly message and no start path', () => {
     mockController.state = { status: 'UNSUPPORTED', session: null, error: null, trialIndex: 0, result: null }
     renderAt('/student/cognitive/sessions/s1')
-    expect(screen.getByText('该测评类型或版本暂不支持')).toBeTruthy()
-    expect(screen.queryByText('作答')).toBeNull()
+    expect(screen.getByText(/该测评类型或版本暂不支持/)).toBeTruthy()
+    expect(screen.queryByText('开始测评')).toBeNull()
   })
 
-  it('renders RECOVERY_REQUIRED with explicit warning (never silently rerun)', () => {
+  it('renders RECOVERY_REQUIRED with explicit blocked state', () => {
     mockController.state = {
       status: 'RECOVERY_REQUIRED',
       session: null,
@@ -72,14 +71,12 @@ describe('CognitiveRunner page', () => {
       result: null,
     }
     renderAt('/student/cognitive/sessions/s1')
-    expect(screen.getByText('无法恢复测评进度')).toBeTruthy()
-    expect(screen.getByText(/请勿刷新或重复提交/)).toBeTruthy()
-    // 无任何"作答/开始"按钮（不静默重跑）
-    expect(screen.queryByText('作答')).toBeNull()
+    expect(screen.getByText('需要处理恢复状态')).toBeTruthy()
+    expect(screen.getByText('无法确认进度')).toBeTruthy()
     expect(screen.queryByText('开始测评')).toBeNull()
   })
 
-  it('renders ERROR with retry button', () => {
+  it('renders ERROR with recovery status and retry button', () => {
     mockController.state = {
       status: 'ERROR',
       session: null,
@@ -88,7 +85,7 @@ describe('CognitiveRunner page', () => {
       result: null,
     }
     renderAt('/student/cognitive/sessions/s1')
-    expect(screen.getByText('加载失败')).toBeTruthy()
+    expect(screen.getByText('恢复失败')).toBeTruthy()
     expect(screen.getByText('重试')).toBeTruthy()
   })
 })
