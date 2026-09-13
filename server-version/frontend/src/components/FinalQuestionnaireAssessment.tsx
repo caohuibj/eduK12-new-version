@@ -19,6 +19,13 @@ import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../mod
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import FormPlayer from './questionnaire/FormPlayer'
 import {
+  QuestionnaireRequiredVideoCompletionError,
+  assertFormItemRequiredVideosComplete,
+  assertScaleRequiredVideosComplete,
+  formItemVideoSlotPrefix,
+  scaleItemVideoSlotKey,
+} from './questionnaire/requiredViewing'
+import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   resolveScaleDeviceInputProvenance,
   readScaleDeviceInputProvenance,
@@ -332,6 +339,24 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
     }
   }
 
+  const recordSubmissionFailure = async (draftKey: string, cause: unknown) => {
+    const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
+    if (currentMeta?.status === 'DRAFT' && !currentMeta.sealedSubmission) {
+      setMeta(currentMeta)
+      setRequiresRestart(false)
+      setError(normalizeApiError(cause).message)
+      return
+    }
+    const status = finalErrorStatus(cause)
+    const nextMeta = await finalDraftStore.setStatus(draftKey, status, {
+      code: String((cause as any)?.code || ''),
+      message: normalizeApiError(cause).message,
+    }).catch(() => null)
+    if (nextMeta) setMeta(nextMeta)
+    setRequiresRestart(status === 'CONFLICT')
+    setError(normalizeApiError(cause).message)
+  }
+
   const submitSection = async () => {
     if (!currentSection || !currentKey || !meta || submitting) return
     const missing = currentSection.items.filter((item) => item.required && isEmpty(formValues[item.id]))
@@ -347,6 +372,14 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
         const missingStored = currentSection.items.filter((item) => item.required && isEmpty(answerMap.get(item.id)))
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        currentSection.items.forEach((item) => {
+          assertFormItemRequiredVideosComplete({
+            meta: snapshot.meta,
+            draftKey: currentKey,
+            itemId: item.id,
+            options: item.options,
+          })
+        })
         return {
           submissionId: snapshot.meta.submissionId,
           attemptEpoch: snapshot.meta.attemptEpoch,
@@ -376,11 +409,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
-      const status = finalErrorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(currentKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
-      if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
-      setError(normalizeApiError(cause).message)
+      if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
+        const nextIndex = currentSection.items.findIndex((item) => item.id === cause.itemKey)
+        if (nextIndex >= 0) setSectionIndex(nextIndex)
+      }
+      await recordSubmissionFailure(currentKey, cause)
     } finally {
       setSubmitting(false)
     }
@@ -406,6 +439,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         }))
         const missingStored = currentScale.definition.items.filter((item) => item.required && answerMap.get(item.itemCode) === undefined)
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认后再提交`)
+        assertScaleRequiredVideosComplete({
+          meta: snapshot.meta,
+          draftKey: currentKey,
+          items: currentScale.definition.items,
+        })
         const provenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
         return {
           submissionId: snapshot.meta.submissionId,
@@ -439,11 +477,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
-      const status = finalErrorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(currentKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
-      if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
-      setError(normalizeApiError(cause).message)
+      if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
+        const nextIndex = currentScale.definition.items.findIndex((item) => item.itemCode === cause.itemKey)
+        if (nextIndex >= 0) setScaleIndex(nextIndex)
+      }
+      await recordSubmissionFailure(currentKey, cause)
     } finally {
       setSubmitting(false)
     }
@@ -489,6 +527,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
                     ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
                     : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
+                  requiredViewing={currentKey ? {
+                    draftKey: currentKey,
+                    slotKeyPrefix: formItemVideoSlotPrefix(item.id),
+                  } : undefined}
                 >
                   <FormPlayer
                     item={{
@@ -534,6 +576,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/scale/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`
                   : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
                 ariaLabel={`${item.content} 视频内容`}
+                requiredViewing={currentKey ? {
+                  draftKey: currentKey,
+                  slotKey: scaleItemVideoSlotKey(item.itemCode),
+                } : undefined}
               >
                 <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
               </ScaleFormVideoGate>
