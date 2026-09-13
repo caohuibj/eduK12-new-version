@@ -70,12 +70,8 @@ const StudentScales: React.FC = () => {
       <PageHeader title="心理测评" description="完成已发布的心理量表；进行中的测评会从当前本地尝试继续。" />
 
       {loadError ? (
-        <div className="mb-5">
-          <ProductStatus kind="error" title="量表列表加载失败" announce="assertive">{loadError}</ProductStatus>
-        </div>
-      ) : null}
-
-      {scales.length === 0 ? (
+        <ProductStatus kind="error" title="量表列表加载失败" announce="assertive">{loadError}</ProductStatus>
+      ) : scales.length === 0 ? (
         <ProductStatus kind="info" title="暂无可用的心理量表">
           当有适用于你的已发布量表后，会显示在这里。
         </ProductStatus>
