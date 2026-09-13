@@ -20,6 +20,9 @@ export interface FormPlayerProps {
   options: FormPlayerOption[]
   value: FormPlayerValue | undefined
   disabled?: boolean
+  answerDisabled?: boolean
+  navigationDisabled?: boolean
+  submitDisabled?: boolean
   errorMessage?: string | null
   position: number
   total: number
@@ -70,6 +73,9 @@ export function FormPlayer({
   options,
   value,
   disabled = false,
+  answerDisabled = false,
+  navigationDisabled = false,
+  submitDisabled = false,
   errorMessage,
   position,
   total,
@@ -83,7 +89,9 @@ export function FormPlayer({
   const choiceName = `form-player-choice-${item.id}`
   const textValue = typeof value === 'string' ? value : ''
   const multipleValues = Array.isArray(value) ? value : []
-  const controlsDisabled = disabled || submitting
+  const answerControlsDisabled = disabled || answerDisabled || submitting
+  const navigationControlsDisabled = disabled || navigationDisabled || submitting
+  const submitControlsDisabled = disabled || submitDisabled || submitting
 
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     void onChange(event.target.value)
@@ -103,7 +111,7 @@ export function FormPlayer({
       </div>
 
       {item.type === 'single_choice' ? (
-        <fieldset aria-describedby={describedBy} disabled={controlsDisabled}>
+        <fieldset aria-describedby={describedBy} disabled={answerControlsDisabled}>
           <legend className="mb-4 text-lg font-semibold text-slate-900">{prompt}</legend>
           <div className="space-y-2">
             {options.map((option) => (
@@ -113,7 +121,7 @@ export function FormPlayer({
                 name={choiceName}
                 option={option}
                 checked={value === option.value}
-                disabled={controlsDisabled}
+                disabled={answerControlsDisabled}
                 describedBy={describedBy}
                 onChange={() => void onChange(option.value)}
               />
@@ -123,7 +131,7 @@ export function FormPlayer({
       ) : null}
 
       {item.type === 'multiple_choice' ? (
-        <fieldset aria-describedby={describedBy} disabled={controlsDisabled}>
+        <fieldset aria-describedby={describedBy} disabled={answerControlsDisabled}>
           <legend className="mb-4 text-lg font-semibold text-slate-900">{prompt}</legend>
           <div className="space-y-2">
             {options.map((option) => {
@@ -135,7 +143,7 @@ export function FormPlayer({
                   name={choiceName}
                   option={option}
                   checked={checked}
-                  disabled={controlsDisabled}
+                  disabled={answerControlsDisabled}
                   describedBy={describedBy}
                   onChange={() => void onChange(checked
                     ? multipleValues.filter((entry) => entry !== option.value)
@@ -154,7 +162,7 @@ export function FormPlayer({
             id={inputId(item.id)}
             type="month"
             value={textValue}
-            disabled={controlsDisabled}
+            disabled={answerControlsDisabled}
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={describedBy}
             onChange={handleTextChange}
@@ -169,7 +177,7 @@ export function FormPlayer({
           <textarea
             id={inputId(item.id)}
             value={textValue}
-            disabled={controlsDisabled}
+            disabled={answerControlsDisabled}
             placeholder={item.placeholder || '请输入'}
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={describedBy}
@@ -185,7 +193,7 @@ export function FormPlayer({
         <button
           type="button"
           onClick={onPrevious}
-          disabled={position <= 1 || controlsDisabled}
+          disabled={position <= 1 || navigationControlsDisabled}
           className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           上一字段
@@ -194,7 +202,7 @@ export function FormPlayer({
           <button
             type="button"
             onClick={onNext}
-            disabled={controlsDisabled}
+            disabled={navigationControlsDisabled}
             className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             下一字段
@@ -203,7 +211,7 @@ export function FormPlayer({
           <button
             type="button"
             onClick={() => void onSubmit()}
-            disabled={controlsDisabled}
+            disabled={submitControlsDisabled}
             className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? '提交区段中…' : '提交整个区段'}
