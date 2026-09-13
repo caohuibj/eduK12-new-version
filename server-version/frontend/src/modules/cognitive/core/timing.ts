@@ -53,11 +53,23 @@ const isFiniteNonNegative = (value: number): boolean => Number.isFinite(value) &
 /**
  * FE-07B timing is admitted by an exact frozen test/engine/config identity.
  * Existing sessions keep their old configVersion and therefore cannot be
- * hot-switched by a frontend deployment. New timing-pilot configs may reuse
- * the same strict JSON schema/scorer while remaining a distinct frozen admin.
+ * hot-switched by a frontend deployment. Inputs that are not a complete frozen
+ * identity fail closed to the legacy path.
  */
-export const usesSoftwareFrameTiming = (identity: CognitiveTimingIdentity): boolean =>
-  SOFTWARE_FRAME_V1_IDENTITIES.has(`${identity.testType}/${identity.engineVersion}/${identity.configVersion}`)
+export const usesSoftwareFrameTiming = (identity: unknown): boolean => {
+  if (!identity || typeof identity !== 'object') return false
+  const candidate = identity as Partial<CognitiveTimingIdentity>
+  if (
+    typeof candidate.testType !== 'string'
+    || typeof candidate.engineVersion !== 'string'
+    || typeof candidate.configVersion !== 'string'
+  ) {
+    return false
+  }
+  return SOFTWARE_FRAME_V1_IDENTITIES.has(
+    `${candidate.testType}/${candidate.engineVersion}/${candidate.configVersion}`,
+  )
+}
 
 /**
  * Capture the current document's monotonic clock and its epoch anchor.
