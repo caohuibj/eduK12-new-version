@@ -9,6 +9,7 @@ import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
+import { AssessmentShell } from './assessment-shell'
 import FormPlayer from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
 import { checkpointId } from '../services/persistence/checkpointTypes'
@@ -131,7 +132,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const load = async () => {
       setLoadingDraft(true)
       if (!draftKey || !item) {
-        if (!cancelled) setLoadingDraft(false)
+        if (!cancelled) {
+          setMeta(null)
+          setRequiresRestart(false)
+          setLoadingDraft(false)
+        }
         return
       }
       if (state.status === 'COMPLETED') {
@@ -388,7 +393,20 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   if (state.status === 'COMPLETED') return null
 
   const units = state.units || state.items
+  const currentUnit = units[state.currentIndex]
   const contextText = state.context?.status === 'frozen' ? '上下文已冻结，后续模块共享同一快照。' : '答案只保存在本地草稿中，完成单元时一次提交。'
+  const submissionStatus = submitting
+    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+    : meta?.status === 'SUBMITTING'
+      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+      : meta?.status === 'RETRY_PENDING'
+        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
+        : meta?.status === 'COMPLETED'
+          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+          : { state: 'ready' as const }
+  const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
+    ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
+    : { state: 'none' as const }
   const formFields = item?.type === 'FORM_SECTION'
     ? (item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[]
     : []
@@ -397,38 +415,62 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     : []
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{state.name}</h1>
-          <p className="text-sm text-gray-500">完成单元：{state.completedItems} / {state.totalItems}（{state.progress}%）</p>
+    <AssessmentShell
+      title={state.name}
+      eyebrow="综合测评"
+      instructions={(
+        <div className="space-y-2">
+          {state.instruction ? <p>{state.instruction}</p> : null}
+          <p>当前单元：{currentUnit?.label || item?.type || '—'}</p>
+          <p>{contextText} 浏览器重开后可以继续恢复。</p>
         </div>
-        <button type="button" onClick={onExit} className="btn-secondary"><Save className="mr-1 inline h-4 w-4" />保存并退出</button>
-      </div>
-      <div className="mb-4 h-2 w-full rounded-full bg-gray-200"><div className="h-2 rounded-full bg-primary" style={{ width: `${state.progress}%` }} /></div>
+      )}
+      progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      actions={(
+        <button type="button" onClick={onExit} className="btn-secondary min-h-11">
+          <Save className="mr-1 inline h-4 w-4" />保存并退出
+        </button>
+      )}
+      navigation={(
+        <section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="mb-2 text-sm font-medium text-slate-600">提交单元</p>
+          <div className="flex flex-wrap gap-2">
+            {units.map((unit) => (
+              <span
+                key={`${unit.type}-${unit.id}`}
+                className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600'}`}
+              >
+                {unit.index + 1}. {unit.label || unit.type}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    >
       {publicMode && recoveryToken ? <p className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">匿名恢复凭证已保存；请继续保管。</p> : null}
-      <p className="mb-4 text-sm text-gray-500">{contextText} 浏览器重开后可以继续恢复。</p>
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
-          <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button>
+          <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary min-h-11 whitespace-nowrap">重启并继续</button>
         </div>
       ) : null}
 
       {item?.type === 'COGNITIVE' ? (
         <div className="card p-8 text-center">
-          <h2 className="mb-3 text-xl font-semibold">{units[state.currentIndex]?.label || '认知任务'}</h2>
+          <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '认知任务'}</h2>
           <p className="mb-6 text-gray-600">认知测验会逐试次写入本地，完成时一次提交全部试次。</p>
-          <button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary">开始/继续认知任务</button>
+          <button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary min-h-11">开始/继续认知任务</button>
         </div>
       ) : null}
 
       {item?.type === 'SITUATIONAL' ? (
         <div className="card p-8 text-center">
-          <h2 className="mb-3 text-xl font-semibold">{units[state.currentIndex]?.label || '文字情境测评'}</h2>
+          <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '文字情境测评'}</h2>
           <p className="mb-6 text-gray-600">进入文字情境测评后，答案只在本地保留，完成时一次提交冻结结果。</p>
-          <button type="button" onClick={() => onEnterSituational(item)} className="btn-primary">开始/继续文字情境测评</button>
+          <button type="button" onClick={() => onEnterSituational(item)} className="btn-primary min-h-11">开始/继续文字情境测评</button>
         </div>
       ) : null}
 
@@ -523,21 +565,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           })()}
         </div>
       ) : null}
-
-      <div className="mt-5 rounded bg-white p-4 shadow">
-        <p className="mb-2 text-sm text-gray-500">提交单元</p>
-        <div className="flex flex-wrap gap-2">
-          {units.map((unit) => (
-            <span
-              key={`${unit.type}-${unit.id}`}
-              className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
-            >
-              {unit.index + 1}. {unit.label || unit.type}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
+    </AssessmentShell>
   )
 }
 
