@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Card, Spin, Result, Button } from 'antd'
 import { Clock, FileText } from 'lucide-react'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
 import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
 import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
+import { normalizeApiError } from '../../utils/normalizeApiError'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -16,30 +17,63 @@ const formatTime = (ms: number) => {
 const PublicQuestionnaireResult: React.FC = () => {
   const { token } = useParams<{ token: string }>()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const sessionId = searchParams.get('sessionId')
   const [loading, setLoading] = useState(true)
   const [report, setReport] = useState<CollectionQuestionnaireResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const questionnaireEntry = token ? `/public/questionnaire/${encodeURIComponent(token)}` : '/'
 
-  const fetchReport = async () => {
-    if (!sessionId) return
+  const fetchReport = useCallback(async () => {
+    setError(null)
+    if (!sessionId) {
+      setReport(null)
+      setLoading(false)
+      setError('缺少问卷会话参数，请从问卷入口重新进入结果页。')
+      return
+    }
+    const resumeToken = readQuestionnaireResumeToken(token, sessionId)
+    if (!resumeToken) {
+      setReport(null)
+      setLoading(false)
+      setError('缺少本次问卷的恢复凭据，请从问卷入口重新进入或恢复测评。')
+      return
+    }
     try {
       setLoading(true)
-      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
+      const client = createPublicCapabilityClient(resumeToken)
       const data = await client.get<CollectionQuestionnaireResponse>(`/assessments/${sessionId}/report`)
       setReport(data.data)
-    } catch (err: any) {
-      setError(err.message || '获取报告失败')
+    } catch (cause) {
+      setReport(null)
+      setError(normalizeApiError(cause).message || '获取报告失败')
     } finally {
       setLoading(false)
     }
-  }
+  }, [sessionId, token])
 
-  useEffect(() => { void fetchReport() }, [sessionId])
+  useEffect(() => { void fetchReport() }, [fetchReport])
 
   if (loading) return <div className="flex justify-center items-center min-h-screen"><Spin size="large" tip="正在生成报告..." /></div>
-  if (error) return <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4"><Result status="error" title="报告生成失败" subTitle={error} extra={<Button type="primary" onClick={() => void fetchReport()}>重试</Button>} /></div>
-  if (!report) return <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4"><Result status="warning" title="暂无报告" subTitle="报告正在生成中，请稍后再试" /></div>
+  if (error) {
+    const canRetry = Boolean(sessionId && readQuestionnaireResumeToken(token, sessionId))
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Result
+          status="error"
+          title="无法打开问卷报告"
+          subTitle={error}
+          extra={(
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button type="primary" onClick={() => navigate(questionnaireEntry)}>返回问卷入口</Button>
+              {canRetry ? <Button onClick={() => void fetchReport()}>重试读取报告</Button> : null}
+            </div>
+          )}
+        />
+      </div>
+    )
+  }
+  if (!report) return <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4"><Result status="warning" title="暂无报告" subTitle="报告正在生成中，请稍后再试" extra={<Button type="primary" onClick={() => navigate(questionnaireEntry)}>返回问卷入口</Button>} /></div>
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
