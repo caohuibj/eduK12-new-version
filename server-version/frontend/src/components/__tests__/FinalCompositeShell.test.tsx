@@ -1,34 +1,55 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import type { CompositeAttemptState, CompositeCurrentItem } from '../../modules/composite/types'
+import type { CompositeAttemptState, CompositeCurrentItem, CompositeItemType } from '../../modules/composite/types'
 import FinalCompositeAssessment from '../FinalCompositeAssessment'
 
-const stateFor = (currentItem: CompositeCurrentItem, completedItems = 1, totalItems = 4): CompositeAttemptState => ({
-  id: 'bundle-attempt-1',
-  assessmentId: 'bundle-1',
-  name: '四域综合测评',
-  instruction: '按顺序完成每个单元。',
-  status: 'IN_PROGRESS',
-  progress: 25,
-  completedItems,
-  totalItems,
-  currentIndex: completedItems,
-  startedAt: '2026-09-14T00:00:00.000Z',
-  lastSavedAt: '2026-09-14T00:00:00.000Z',
-  completedAt: null,
-  anonymousCode: null,
-  items: [
-    { id: 'scale', type: 'SCALE', position: 0, label: '量表', completed: true, index: 0 },
-    { id: currentItem.id, type: currentItem.type, position: 1, label: '当前任务', completed: false, index: completedItems },
-    { id: 'form', type: 'FORM_SECTION', position: 2, label: '表单', completed: false, index: 2 },
-    { id: 'situational', type: 'SITUATIONAL', position: 3, label: '情境', completed: false, index: 3 },
-  ],
-  currentItem,
-  deliveryMode: 'FINAL_ONLY',
-  attemptEpoch: 1,
-  contextSnapshotHash: null,
-})
+const fallbackUnit = (
+  index: number,
+  completed: boolean,
+): CompositeAttemptState['items'][number] => {
+  const defaults: Array<{ id: string; type: CompositeItemType; label: string }> = [
+    { id: 'scale-slot', type: 'SCALE', label: '量表' },
+    { id: 'cognitive-slot', type: 'COGNITIVE', label: '认知' },
+    { id: 'form-slot', type: 'FORM_SECTION', label: '表单' },
+    { id: 'situational-slot', type: 'SITUATIONAL', label: '情境' },
+  ]
+  const unit = defaults[index] || { id: `slot-${index}`, type: 'FORM_SECTION' as const, label: `单元 ${index + 1}` }
+  return { ...unit, position: index, completed, index }
+}
+
+const stateFor = (currentItem: CompositeCurrentItem, completedItems = 1, totalItems = 4): CompositeAttemptState => {
+  const items = Array.from({ length: totalItems }, (_, index) => fallbackUnit(index, index < completedItems))
+  items[completedItems] = {
+    id: currentItem.id,
+    type: currentItem.type,
+    position: completedItems,
+    label: '当前任务',
+    completed: false,
+    index: completedItems,
+  }
+
+  return {
+    id: 'bundle-attempt-1',
+    assessmentId: 'bundle-1',
+    name: '四域综合测评',
+    instruction: '按顺序完成每个单元。',
+    status: 'IN_PROGRESS',
+    progress: Math.round((completedItems / totalItems) * 100),
+    completedItems,
+    totalItems,
+    currentIndex: completedItems,
+    startedAt: '2026-09-14T00:00:00.000Z',
+    lastSavedAt: '2026-09-14T00:00:00.000Z',
+    completedAt: null,
+    anonymousCode: null,
+    items,
+    currentItem,
+    deliveryMode: 'FINAL_ONLY',
+    attemptEpoch: 1,
+    contextSnapshotHash: null,
+  }
+}
 
 const sharedProps = {
   submitFormSection: vi.fn(),
@@ -111,6 +132,7 @@ describe('FinalCompositeAssessment Bundle shell', () => {
     )
 
     expect(await screen.findByText('Bundle 嵌入运行：支持')).toBeInTheDocument()
+    expect(screen.getByText('当前单元：当前任务')).toBeInTheDocument()
     expect(screen.getByRole('progressbar', { name: '综合测评单元进度' })).toHaveAttribute('aria-valuenow', '3')
     await user.click(screen.getByRole('button', { name: '开始/继续文字情境测评' }))
     expect(onEnterSituational).toHaveBeenCalledWith(item)
