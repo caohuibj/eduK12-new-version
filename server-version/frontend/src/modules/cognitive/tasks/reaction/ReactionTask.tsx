@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
-import { usesSoftwareFrameTiming } from '../../core/timing'
 import type { ReactionConfig, ReactionTrialPayload } from '../../types'
 import { deterministicForeperiod } from './prng'
 
@@ -40,7 +39,6 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const foreperiodMax = config?.foreperiodMaxMs ?? 1500
   const timeoutMs = config?.timeoutMs ?? 2000
   const readyDurationMs = config?.readyDurationMs ?? 1000
-  const frameTimingEnabled = usesSoftwareFrameTiming(taskContext.config)
 
   const [phase, setPhase] = useState<Phase>('instruction')
 
@@ -84,49 +82,25 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     return () => window.clearTimeout(t)
   }, [phase, sub, readyDurationMs, round])
 
-  // formal gray → green：legacy 保持原语义；software-frame-v1 在 foreperiod 后跨 rAF 建立 onset。
+  // formal gray → green：真正的刺激前间隔使用 seeded foreperiod。
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total || sub !== 'gray') return
-    let animationFrameId: number | null = null
     const t = window.setTimeout(() => {
-      if (!frameTimingEnabled) {
-        setSub('green')
-        setStimulusOnset(performance.now())
-        return
-      }
-      if (typeof window.requestAnimationFrame !== 'function') {
-        // 新 timing policy 理论上应由 readiness 阶段过滤无 rAF 环境；这里保留可完成的降级路径，
-        // 同时把该 trial 标成 interrupted，避免把降级结果当作正常 frame-timed 数据。
-        interruptedRef.current = true
-        setInterrupted(true)
-        setStimulusOnset(performance.now())
-        setSub('green')
-        return
-      }
-      animationFrameId = window.requestAnimationFrame((framePerfMs) => {
-        setStimulusOnset(framePerfMs)
-        setSub('green')
-      })
+      setSub('green')
+      setStimulusOnset(performance.now())
     }, foreperiodMs)
-    return () => {
-      window.clearTimeout(t)
-      if (animationFrameId != null && typeof window.cancelAnimationFrame === 'function') {
-        window.cancelAnimationFrame(animationFrameId)
-      }
-    }
-  }, [frameTimingEnabled, phase, sub, foreperiodMs, round, trialIndex, total])
+    return () => window.clearTimeout(t)
+  }, [phase, sub, foreperiodMs, round])
 
-  // formal green → timeout（software-frame-v1 按采用的 onset deadline 计算剩余等待）。
+  // formal green → timeout（无响应按 miss 提交）
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total || sub !== 'green' || stimulusOnset == null) return
-    const elapsedMs = frameTimingEnabled ? Math.max(0, performance.now() - stimulusOnset) : 0
-    const remainingMs = frameTimingEnabled ? Math.max(0, timeoutMs - elapsedMs) : timeoutMs
     const t = window.setTimeout(() => {
       setSub('feedback')
       void submit(null, 'pointer')
-    }, remainingMs)
+    }, timeoutMs)
     return () => window.clearTimeout(t)
-  }, [frameTimingEnabled, phase, sub, stimulusOnset, timeoutMs, trialIndex, total])
+  }, [phase, sub, stimulusOnset, timeoutMs, trialIndex, total])
 
   // visibility 中断检测
   useEffect(() => {
