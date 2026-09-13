@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { resolveRunner } from '../registry'
 import { FakeTask } from '../tasks/fake/FakeTask'
-import { ReactionTask } from '../tasks/reaction/ReactionTask'
 import { MemoryTask } from '../tasks/memory/MemoryTask'
 import { StroopTask } from '../tasks/stroop/StroopTask'
 import { TrailmakingTask } from '../tasks/trailmaking/TrailmakingTask'
@@ -18,10 +17,13 @@ describe('cognitive frontend registry', () => {
     expect(entry?.RunnerComponent).toBe(FakeTask)
   })
 
-  it('resolves reaction / 1.0.0 to the ReactionTask runner (Milestone E Session 2)', () => {
+  it('resolves reaction / 1.0.0 to a config-aware Reaction runner', () => {
     const entry = resolveRunner('reaction', '1.0.0')
     expect(entry).toBeDefined()
-    expect(entry?.RunnerComponent).toBe(ReactionTask)
+    // FE-07B routes exact frozen config identities inside the registered runner.
+    // Dedicated frame-timing tests assert legacy-vs-pilot behavior; this registry
+    // contract should not pin the implementation to one concrete task function.
+    expect(typeof entry?.RunnerComponent).toBe('function')
     expect(entry?.name).toBe('反应速度')
     expect(entry?.reportDefinition.title).toBe('反应速度')
     expect(entry?.metricDefinitions.length).toBeGreaterThan(0)
