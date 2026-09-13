@@ -71,10 +71,11 @@ describe('StudentScales reference journey entry', () => {
     expect(screen.getByText('已有进行中的尝试，进入后继续当前本地作答。')).toBeInTheDocument()
   })
 
-  it('shows a visible error instead of silently rendering an empty journey when loading fails', async () => {
+  it('shows only the error state when loading fails', async () => {
     mockGet.mockRejectedValue(new Error('network down'))
     render(<MemoryRouter><StudentScales /></MemoryRouter>)
 
     expect(await screen.findByRole('alert')).toHaveTextContent('network down')
+    expect(screen.queryByText('暂无可用的心理量表')).not.toBeInTheDocument()
   })
 })
