@@ -275,6 +275,12 @@ const expectSelectedButton = async (page, label) => {
   assert.match((await button.getAttribute('class')) || '', /border-primary/, `${label} was not restored from local draft`)
 }
 
+const expectSelectedRadio = async (page, label) => {
+  const radio = page.getByRole('radio', { name: label, exact: true })
+  await radio.waitFor({ state: 'visible', timeout: 30000 })
+  assert.equal(await radio.isChecked(), true, `${label} was not restored from local draft`)
+}
+
 const startAuthenticatedComposite = async (page, fixture) => {
   await page.goto(`${BASE_URL}/student/courses/${fixture.courseId}`, { waitUntil: 'domcontentloaded' })
   const tab = page.getByRole('button', { name: /^综合测评\s*\d*$/ }).first()
@@ -328,11 +334,11 @@ const runStandaloneScale = async (browser, fixture) => {
     await page.goto(`${BASE_URL}/student/scales/${fixture.scale.id}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'MEDIA-2 量表题目', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await assertImage(page, fixture.scale.assetId, 'MEDIA-2 scale question image')
-    await page.getByRole('button', { name: '选项 1', exact: true }).click()
-    await page.waitForTimeout(250)
+    await page.getByRole('radio', { name: '选项 1', exact: true }).click()
+    await page.getByText('本题答案已保存到本机，可继续或返回修改。', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await page.reload({ waitUntil: 'domcontentloaded' })
     await assertImage(page, fixture.scale.assetId, 'MEDIA-2 scale question image')
-    await expectSelectedButton(page, '选项 1')
+    await expectSelectedRadio(page, '选项 1')
     await page.getByRole('button', { name: '完成测评', exact: true }).click()
     await page.waitForURL(/\/student\/scales\/result\//, { timeout: 30000 })
 
