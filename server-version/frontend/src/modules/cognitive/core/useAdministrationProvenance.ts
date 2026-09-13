@@ -11,17 +11,10 @@ import {
   type CognitiveAdministrationMode,
   type ObservedResponseModality,
 } from './administration-provenance'
+import { usesGlobalKeyboardCapture } from './readiness'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
 
 export const COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY = 'cognitiveAdministrationProvenance'
-
-const GLOBAL_KEYBOARD_RESPONSE_TASKS = new Set([
-  'reaction',
-  'stroop',
-  'lexicaldecision',
-  'emotionrecognition',
-  'memory',
-])
 
 const isEditableTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false
@@ -128,7 +121,10 @@ export const useAdministrationProvenance = (
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditableTarget(event.target)) return
-      if (!insideTaskRoot(event.target) && !GLOBAL_KEYBOARD_RESPONSE_TASKS.has(session.testType)) return
+      if (
+        !insideTaskRoot(event.target)
+        && !usesGlobalKeyboardCapture(session.testType, session.engineVersion)
+      ) return
       observe('keyboard')
     }
 

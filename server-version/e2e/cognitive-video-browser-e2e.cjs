@@ -90,13 +90,63 @@ const assertCapabilityUrls = (sources, label, forbiddenCredential = '') => {
   }
 }
 
-const waitVideoReady = async (page) => {
-  const video = page.locator('video[controls]').first()
+const waitRequiredVideoReady = async (page) => {
+  const selector = '[data-assessment-video-player][data-required-viewing="true"] video'
+  const video = page.locator(selector).first()
   await video.waitFor({ state: 'visible', timeout: 30000 })
+  await page.waitForFunction((videoSelector) => {
+    const element = document.querySelector(videoSelector)
+    return element instanceof HTMLVideoElement
+      && element.readyState >= 1
+      && Number.isFinite(element.duration)
+      && element.duration > 0
+  }, selector, { timeout: 30000 })
+  const policy = await video.evaluate((element) => ({
+    controls: element.controls,
+    playbackRate: element.playbackRate,
+    defaultPlaybackRate: element.defaultPlaybackRate,
+  }))
+  assert.equal(policy.controls, false, 'required Cognitive video must not expose seekable native controls')
+  assert.equal(policy.playbackRate, 1, 'required Cognitive video must start at 1x')
+  assert.equal(policy.defaultPlaybackRate, 1, 'required Cognitive video default speed must remain 1x')
+  return video
+}
+
+const assertStartDisabled = async (start, label) => {
+  assert.equal(await start.isDisabled(), true, label)
+}
+
+const completeRequiredInstructionVideo = async (page, start, { checkSyntheticEnded = false } = {}) => {
+  const video = await waitRequiredVideoReady(page)
+  await assertStartDisabled(start, 'Cognitive START must stay blocked until required instruction video completes')
+
+  if (checkSyntheticEnded) {
+    await video.dispatchEvent('ended')
+    await page.waitForTimeout(150)
+    await assertStartDisabled(start, 'synthetic ended event must not unlock required Cognitive video gate')
+    record('video-ended-does-not-unlock-required-cognitive-video')
+  }
+
+  const play = page.getByRole('button', { name: '播放视频', exact: true })
+  await play.waitFor({ state: 'visible', timeout: 30000 })
+  await play.click()
   await page.waitForFunction(() => {
-    const element = document.querySelector('video[controls]')
-    return element instanceof HTMLVideoElement && element.readyState >= 1 && Number.isFinite(element.duration) && element.duration > 0
+    const button = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === '开始测评')
+    return button instanceof HTMLButtonElement && !button.disabled
   }, null, { timeout: 30000 })
+
+  const completion = await video.evaluate((element) => ({
+    ended: element.ended,
+    playbackRate: element.playbackRate,
+    duration: element.duration,
+    playedEnd: element.played.length ? element.played.end(element.played.length - 1) : 0,
+  }))
+  assert.equal(completion.ended, true, 'required Cognitive video must reach the real media end before START unlocks')
+  assert.equal(completion.playbackRate, 1, 'required Cognitive video must remain at 1x through completion')
+  assert.ok(
+    completion.playedEnd >= completion.duration - 0.25,
+    `required Cognitive video played coverage ended at ${completion.playedEnd} of ${completion.duration}`,
+  )
   return video
 }
 
@@ -158,11 +208,7 @@ const runAuthenticated = async (browser) => {
     record('authenticated-video-capability-blocks-start')
     releaseRoute()
 
-    const video = await waitVideoReady(page)
-    await page.waitForFunction(() => {
-      const button = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === '开始测评')
-      return button instanceof HTMLButtonElement && !button.disabled
-    }, null, { timeout: 30000 })
+    const video = await completeRequiredInstructionVideo(page, start, { checkSyntheticEnded: true })
     await page.waitForFunction(() => document.querySelectorAll('track').length > 0, null, { timeout: 30000 })
     assertCapabilityUrls(sources, 'authenticated')
     assert.ok(nativeRequests.length > 0, 'authenticated native media request was not observed')
@@ -170,12 +216,10 @@ const runAuthenticated = async (browser) => {
       assert.equal(Boolean(request.headers.authorization), false, 'native media request leaked Authorization header')
       assert.equal(Boolean(request.headers['x-recovery-token']), false, 'native media request leaked recovery token')
     }
+    const readiness = await video.evaluate((element) => ({ readyState: element.readyState, duration: element.duration }))
+    assert.ok(readiness.readyState >= 1 && readiness.duration > 0)
+    record('authenticated-required-video-completion-unlocks-start')
     record('authenticated-native-video-capability')
-
-    await video.dispatchEvent('ended')
-    await page.waitForTimeout(150)
-    await start.waitFor({ state: 'visible', timeout: 30000 })
-    record('video-ended-does-not-start-cognitive-run')
 
     await completeFakeTask(page, false)
     assert.ok(finalPayload, 'authenticated final payload not observed')
@@ -239,11 +283,7 @@ const runPublic = async (browser) => {
     await page.goto(`${BASE_URL}/public/cognitive/sessions/${fixture.publicSession.id}?public=1`, { waitUntil: 'domcontentloaded' })
     const start = page.getByRole('button', { name: '开始测评', exact: true })
     await start.waitFor({ state: 'visible', timeout: 30000 })
-    const video = await waitVideoReady(page)
-    await page.waitForFunction(() => {
-      const button = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === '开始测评')
-      return button instanceof HTMLButtonElement && !button.disabled
-    }, null, { timeout: 30000 })
+    const video = await completeRequiredInstructionVideo(page, start)
     assertCapabilityUrls(sources, 'public', fixture.publicSession.recoveryToken)
     assert.ok(nativeRequests.length > 0, 'public native media request was not observed')
     for (const request of nativeRequests) {
@@ -253,6 +293,7 @@ const runPublic = async (browser) => {
     const readiness = await video.evaluate((element) => ({ readyState: element.readyState, duration: element.duration }))
     assert.ok(readiness.readyState >= 1 && readiness.duration > 0)
     record('public-recovery-credential-issues-short-lived-video-capability')
+    record('public-required-video-completion-unlocks-start')
 
     await completeFakeTask(page, true)
     assert.ok(finalPayload, 'public final payload not observed')

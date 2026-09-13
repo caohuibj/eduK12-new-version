@@ -165,6 +165,22 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     expect(body).not.toHaveProperty('deviceInputProvenance')
   })
 
+  it('flushes the last text edit before sealing the FORM_SECTION payload', async () => {
+    const data = makeFormData()
+    data.currentFormSection!.items[0].required = true
+    data.currentFormSection!.items[0].type = 'text_input'
+    const user = userEvent.setup()
+    const { post } = renderAssessment(data)
+
+    const input = await screen.findByRole('textbox', { name: /年级/ })
+    await user.type(input, '六年级')
+    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(post).toHaveBeenCalledTimes(1))
+
+    const body = post.mock.calls[0][1] as { answers: Array<{ formItemId: string; value: unknown }> }
+    expect(body.answers).toEqual([{ formItemId: 'form-item-1', value: '六年级' }])
+  })
+
   it('sends one top-level provenance object on authenticated Scale final submit', async () => {
     const user = userEvent.setup()
     const { post } = renderAssessment(makeScaleData())

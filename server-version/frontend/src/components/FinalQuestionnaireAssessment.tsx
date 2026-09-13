@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
+import { AssessmentShell } from './assessment-shell'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import {
   createFinalDraftMeta,
@@ -17,6 +18,15 @@ import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
+import FormPlayer from './questionnaire/FormPlayer'
+import useLocalDraftSaveQueue from './questionnaire/useLocalDraftSaveQueue'
+import {
+  QuestionnaireRequiredVideoCompletionError,
+  assertFormItemRequiredVideosComplete,
+  assertScaleRequiredVideosComplete,
+  formItemVideoSlotPrefix,
+  scaleItemVideoSlotKey,
+} from './questionnaire/requiredViewing'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
   resolveScaleDeviceInputProvenance,
@@ -173,6 +183,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const scaleDeviceInputProvenanceRef = useRef<{ scaleId: string; value: DeviceInputProvenanceV1 } | null>(null)
 
   const currentKey = draftKeyFor(data)
+  const { schedule: scheduleLocalSave, flush: flushLocalSaves, status: localSaveStatus } = useLocalDraftSaveQueue(currentKey)
   const currentUnitKey = `${data.questionnaireAssessment.id}:${data.currentFormSection?.id || data.currentScale?.scaleAssessmentId || 'complete'}`
   const currentSection = data.currentFormSection
   const currentScale = data.currentScale
@@ -308,31 +319,70 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       ? '这是首个上下文区段；提交后会冻结本次测评上下文。'
       : '当前答案只保存在本地草稿中。'
 
-  const saveFormValue = async (itemId: string, value: FormValue) => {
+  const saveFormValue = (itemId: string, value: FormValue) => {
     if (!currentKey || submitting || draftLocked) return
+    setError(null)
     setFormValues((previous) => ({ ...previous, [itemId]: value }))
-    try {
+    void scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemId, value, updatedAt: Date.now() })
-      setError(null)
+    })
+  }
+
+  const saveScaleValue = (itemCode: string, value: ResponseValue) => {
+    if (!currentKey || submitting || draftLocked) return
+    setError(null)
+    setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
+    void scheduleLocalSave(`scale:${itemCode}`, async () => {
+      await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
+    })
+  }
+
+  const flushOrShowError = async () => {
+    try {
+      await flushLocalSaves()
+      return true
     } catch (cause) {
-      setError(normalizeApiError(cause).message)
+      setError(`本机保存失败：${normalizeApiError(cause).message}`)
+      return false
     }
   }
 
-  const saveScaleValue = async (itemCode: string, value: ResponseValue) => {
-    if (!currentKey || submitting || draftLocked) return
-    setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    try {
-      await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
-      setError(null)
-      if (currentScale && scaleIndex < currentScale.definition.items.length - 1) setScaleIndex((index) => index + 1)
-    } catch (cause) {
+  const goToFormIndex = async (nextIndex: number) => {
+    if (!(await flushOrShowError())) return
+    setSectionIndex(Math.max(0, Math.min(currentSection ? currentSection.items.length - 1 : 0, nextIndex)))
+  }
+
+  const goToScaleIndex = async (nextIndex: number) => {
+    if (!(await flushOrShowError())) return
+    setScaleIndex(Math.max(0, Math.min(currentScale ? currentScale.definition.items.length - 1 : 0, nextIndex)))
+  }
+
+  const exitAfterFlush = async () => {
+    if (!(await flushOrShowError())) return
+    onExit()
+  }
+
+  const recordSubmissionFailure = async (draftKey: string, cause: unknown) => {
+    const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
+    if (currentMeta?.status === 'DRAFT' && !currentMeta.sealedSubmission) {
+      setMeta(currentMeta)
+      setRequiresRestart(false)
       setError(normalizeApiError(cause).message)
+      return
     }
+    const status = finalErrorStatus(cause)
+    const nextMeta = await finalDraftStore.setStatus(draftKey, status, {
+      code: String((cause as any)?.code || ''),
+      message: normalizeApiError(cause).message,
+    }).catch(() => null)
+    if (nextMeta) setMeta(nextMeta)
+    setRequiresRestart(status === 'CONFLICT')
+    setError(normalizeApiError(cause).message)
   }
 
   const submitSection = async () => {
     if (!currentSection || !currentKey || !meta || submitting) return
+    if (!(await flushOrShowError())) return
     const missing = currentSection.items.filter((item) => item.required && isEmpty(formValues[item.id]))
     if (missing.length > 0) {
       setSectionIndex(Math.max(0, currentSection.items.findIndex((item) => item.required && isEmpty(formValues[item.id]))))
@@ -346,6 +396,14 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
         const missingStored = currentSection.items.filter((item) => item.required && isEmpty(answerMap.get(item.id)))
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        currentSection.items.forEach((item) => {
+          assertFormItemRequiredVideosComplete({
+            meta: snapshot.meta,
+            draftKey: currentKey,
+            itemId: item.id,
+            options: item.options,
+          })
+        })
         return {
           submissionId: snapshot.meta.submissionId,
           attemptEpoch: snapshot.meta.attemptEpoch,
@@ -375,11 +433,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
-      const status = finalErrorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(currentKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
-      if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
-      setError(normalizeApiError(cause).message)
+      if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
+        const nextIndex = currentSection.items.findIndex((item) => item.id === cause.itemKey)
+        if (nextIndex >= 0) setSectionIndex(nextIndex)
+      }
+      await recordSubmissionFailure(currentKey, cause)
     } finally {
       setSubmitting(false)
     }
@@ -387,6 +445,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const submitScale = async () => {
     if (!currentScale || !currentKey || !meta || submitting) return
+    if (!(await flushOrShowError())) return
     const missing = currentScale.definition.items.filter((item) => item.required && scaleValues[item.itemCode] === undefined)
     if (missing.length > 0) {
       setScaleIndex(Math.max(0, currentScale.definition.items.findIndex((item) => item.required && scaleValues[item.itemCode] === undefined)))
@@ -405,6 +464,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
         }))
         const missingStored = currentScale.definition.items.filter((item) => item.required && answerMap.get(item.itemCode) === undefined)
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 道必答题尚未保存，请确认后再提交`)
+        assertScaleRequiredVideosComplete({
+          meta: snapshot.meta,
+          draftKey: currentKey,
+          items: currentScale.definition.items,
+        })
         const provenance = readScaleDeviceInputProvenance(snapshot.meta.instrumentMetadata)
         return {
           submissionId: snapshot.meta.submissionId,
@@ -438,11 +502,11 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       await finalDraftStore.delete(currentKey)
       await onReload()
     } catch (cause) {
-      const status = finalErrorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(currentKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
-      if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
-      setError(normalizeApiError(cause).message)
+      if (cause instanceof QuestionnaireRequiredVideoCompletionError) {
+        const nextIndex = currentScale.definition.items.findIndex((item) => item.itemCode === cause.itemKey)
+        if (nextIndex >= 0) setScaleIndex(nextIndex)
+      }
+      await recordSubmissionFailure(currentKey, cause)
     } finally {
       setSubmitting(false)
     }
@@ -450,27 +514,74 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const contentUnits = data.units || data.contentItems
   const title = data.questionnaire?.name || '问卷测评'
+  const completedUnitCount = contentUnits.filter((unit) => unit.completed).length
+  const totalUnitCount = Math.max(contentUnits.length, data.totalItems, 1)
+  const submissionStatus = submitting
+    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+    : meta?.status === 'SUBMITTING'
+      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+      : meta?.status === 'RETRY_PENDING'
+        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
+        : meta?.status === 'COMPLETED'
+          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+          : { state: 'ready' as const }
+  const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
+    ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
+    : { state: 'none' as const }
 
   if (loadingDraft) return <div className="flex items-center justify-center h-64 text-gray-500">正在恢复本地草稿...</div>
   if (data.questionnaireAssessment.status === 'COMPLETED') return null
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          <p className="text-sm text-gray-500">完成单元：{contentUnits.filter((unit) => unit.completed).length} / {data.totalItems}（{data.questionnaireAssessment.progress}%）</p>
+    <AssessmentShell
+      title={title}
+      eyebrow="问卷测评"
+      instructions={(
+        <div className="space-y-2">
+          {data.questionnaire?.instruction ? <p>{data.questionnaire.instruction}</p> : null}
+          <p>{contextText} 页面刷新或离线时会从 IndexedDB 恢复。</p>
         </div>
-        <button type="button" onClick={onExit} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
-      </div>
-      <p className="text-sm text-gray-500 mb-4">{contextText} 页面刷新或离线时会从 IndexedDB 恢复。</p>
-      {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
-      {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
+      )}
+      progress={{ kind: 'count', completed: completedUnitCount, total: totalUnitCount, label: '问卷单元进度' }}
+      saveStatus={localSaveStatus}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      actions={(
+        <button type="button" onClick={() => void exitAfterFlush()} className="btn-secondary min-h-11">
+          <Save className="w-4 h-4 inline mr-1" />保存并退出
+        </button>
+      )}
+      navigation={(
+        <section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="mb-2 text-sm font-medium text-slate-600">提交单元</p>
+          <div className="flex flex-wrap gap-2">
+            {contentUnits.map((unit) => (
+              <span
+                key={`${unit.type}-${unit.id}`}
+                className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === data.questionnaireAssessment.currentIndex ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600'}`}
+              >
+                {unit.index + 1}. {unit.label}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    >
+      {error ? <p role="alert" className="mb-4 text-sm text-red-700">{error}</p> : null}
+      {requiresRestart && onRestart ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
+          <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary min-h-11 whitespace-nowrap">重启并继续</button>
+        </div>
+      ) : null}
 
       {currentSection && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{currentSection.title}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {currentSection.items.length}</span></div>
-          {currentSection.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{currentSection.description}</p>}
+        <div>
+          <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+            <p className="text-sm text-slate-500"><FileText className="mr-1 inline h-4 w-4" />表单区段</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-900">{currentSection.title}</h2>
+            {currentSection.description ? <p className="mt-3 whitespace-pre-wrap text-sm text-slate-600">{currentSection.description}</p> : null}
+          </div>
           {(() => {
             const item = currentSection.items[sectionIndex]
             if (!item) return <p className="text-gray-500">该区段没有字段。</p>
@@ -478,31 +589,53 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)
             const videoEntries = formOptionVideoPresentations(options)
-            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
-              <FormOptionVideoGroupGate
-                entries={videoEntries}
-                loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
-                  ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
-                  : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
-              >
-                <div>
-                  <h3 className="text-lg font-medium mb-4">{item.label}{item.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>
-                  {item.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}
-                  {item.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveFormValue(item.id, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}
-                  {item.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} className="w-full border rounded px-3 py-2" />}
-                  {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveFormValue(item.id, event.target.value)} disabled={submitting || draftLocked} placeholder={item.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}
-                  <div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < currentSection.items.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div>
-                </div>
-              </FormOptionVideoGroupGate>
-            </AssessmentImageGate>
+            return (
+              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.label} 选项视觉内容`}>
+                <FormOptionVideoGroupGate
+                  entries={videoEntries}
+                  loadSources={(entry) => loadQuestionnaireVideoCapability(publicMode
+                    ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`
+                    : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/form-sections/${encodeURIComponent(currentSection.id)}/items/${encodeURIComponent(item.id)}/options/${entry.optionIndex}/video-capability`)}
+                  requiredViewing={currentKey ? {
+                    draftKey: currentKey,
+                    slotKeyPrefix: formItemVideoSlotPrefix(item.id),
+                  } : undefined}
+                >
+                  <FormPlayer
+                    item={{
+                      id: item.id,
+                      type: item.type,
+                      label: item.label,
+                      placeholder: item.placeholder,
+                      required: item.required,
+                    }}
+                    options={options}
+                    value={value}
+                    disabled={draftLocked || requiresRestart}
+                    position={sectionIndex + 1}
+                    total={currentSection.items.length}
+                    onChange={(nextValue) => saveFormValue(item.id, nextValue)}
+                    onPrevious={() => void goToFormIndex(sectionIndex - 1)}
+                    onNext={sectionIndex < currentSection.items.length - 1
+                      ? () => void goToFormIndex(sectionIndex + 1)
+                      : undefined}
+                    onSubmit={sectionIndex === currentSection.items.length - 1 ? submitSection : undefined}
+                    submitting={submitting}
+                  />
+                </FormOptionVideoGroupGate>
+              </AssessmentImageGate>
+            )
           })()}
         </div>
       )}
 
       {currentScale && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{currentScale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {currentScale.definition.items.length}</span></div>
-          {currentScale.instruction && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{currentScale.instruction}</p>}
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div><p className="text-sm text-slate-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold text-slate-900">{currentScale.name}</h2></div>
+            <span className="text-sm text-slate-500">题目 {scaleIndex + 1} / {currentScale.definition.items.length}</span>
+          </div>
+          {currentScale.instruction ? <p className="mb-5 whitespace-pre-wrap text-sm text-slate-600">{currentScale.instruction}</p> : null}
           {(() => {
             const item = currentScale.definition.items[scaleIndex]
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
@@ -515,16 +648,39 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/scale/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`
                   : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
                 ariaLabel={`${item.content} 视频内容`}
+                requiredViewing={currentKey ? {
+                  draftKey: currentKey,
+                  slotKey: scaleItemVideoSlotKey(item.itemCode),
+                } : undefined}
               >
-                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+                <div>
+                  <h3 className="mb-5 text-lg font-medium text-slate-900">{item.content}{item.required && <span className="ml-2 text-sm text-red-600">必答</span>}</h3>
+                  <div className="space-y-2">
+                    {item.options.map((option) => (
+                      <button
+                        type="button"
+                        key={`${typeof option.value}:${String(option.value)}`}
+                        onClick={() => saveScaleValue(item.itemCode, option.value)}
+                        disabled={submitting || draftLocked}
+                        className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${scaleValues[item.itemCode] === option.value ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex flex-wrap justify-between gap-3">
+                    <button type="button" onClick={() => void goToScaleIndex(scaleIndex - 1)} disabled={scaleIndex === 0 || submitting} className="btn-secondary min-h-11"><ChevronLeft className="w-4 h-4 inline" />上一题</button>
+                    {scaleIndex < currentScale.definition.items.length - 1
+                      ? <button type="button" onClick={() => void goToScaleIndex(scaleIndex + 1)} disabled={submitting} className="btn-secondary min-h-11">下一题<ChevronRight className="w-4 h-4 inline" /></button>
+                      : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary min-h-11"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}
+                  </div>
+                </div>
               </ScaleFormVideoGate>
             </AssessmentImageGate>
           })()}
         </div>
       )}
-
-      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">提交单元</p><div className="flex flex-wrap gap-2">{contentUnits.map((unit) => <span key={`${unit.type}-${unit.id}`} className={`px-3 py-1 rounded text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === data.questionnaireAssessment.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{unit.index + 1}. {unit.label}</span>)}</div></div>
-    </div>
+    </AssessmentShell>
   )
 }
 
