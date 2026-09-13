@@ -6,7 +6,7 @@ import { CptFrameTask } from './CptFrameTask'
 import { CptTask } from './CptTask'
 
 const CptRunner = (props: CognitiveTaskProps) => createElement(
-  usesSoftwareFrameTiming(props.taskContext.config) ? CptFrameTask : CptTask,
+  usesSoftwareFrameTiming(props.taskContext) ? CptFrameTask : CptTask,
   props,
 )
 
