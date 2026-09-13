@@ -1,5 +1,14 @@
-import { ReactionTask } from './ReactionTask'
+import { createElement } from 'react'
+import type { CognitiveTaskProps } from '../../core/runner.types'
+import { usesSoftwareFrameTiming } from '../../core/timing'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
+import { ReactionFrameTask } from './ReactionFrameTask'
+import { ReactionTask } from './ReactionTask'
+
+const ReactionRunner = (props: CognitiveTaskProps) => createElement(
+  usesSoftwareFrameTiming(props.taskContext) ? ReactionFrameTask : ReactionTask,
+  props,
+)
 
 /** Reaction Test 前端注册条目：testType=reaction，engineVersion=1.0.0（与后端 registry key 对齐）。 */
 export const reactionRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -7,7 +16,7 @@ export const reactionRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '反应速度',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: ReactionTask,
+  RunnerComponent: ReactionRunner,
   metricDefinitions: [
     { key: 'medianRtMs', label: '中位反应时', unit: 'ms', displayType: 'ms' },
     { key: 'meanRtMs', label: '平均反应时', unit: 'ms', displayType: 'ms' },

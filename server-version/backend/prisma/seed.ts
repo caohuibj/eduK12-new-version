@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { seedAdmin } from './seeds/users'
 import { seedScalePackages } from './seeds/scales'
 import { seedCognitiveConfigs } from './seeds/cognitive'
+import { seedCognitiveTimingPilotConfigs } from './seeds/cognitive-timing-pilot'
 
 // `npm run db:seed` is also used directly by bare-metal deployment scripts,
 // outside Prisma CLI's environment loading path.
@@ -15,6 +16,7 @@ async function main(): Promise<void> {
   const adminId = await seedAdmin(prisma)
   await seedScalePackages(prisma, adminId)
   await seedCognitiveConfigs(prisma)
+  await seedCognitiveTimingPilotConfigs(prisma)
   console.log('数据库初始化完成。')
 }
 
