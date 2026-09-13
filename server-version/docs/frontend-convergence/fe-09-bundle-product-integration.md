@@ -6,51 +6,144 @@ Plan source: Frontend Product Convergence v1.2, FE-09.
 
 ## Goal
 
-Deliver a coherent participant journey:
+Deliver one coherent participant journey:
 
 `Bundle → Unit → Player → Unit FINAL → parent read`
 
-This PR integrates the already-migrated domain players into the Composite / Bundle product flow. It does not redesign domain runtimes, scoring, FINAL semantics, persistence, media policy, or Cognitive timing.
+FE-09 integrates already-migrated domain players into the Composite / Bundle product flow. It does not redesign domain runtimes, scoring, FINAL semantics, persistence, media policy, report science, or Cognitive timing.
 
 ## Dependency status
 
-FE-09 strong dependencies are merged on this baseline:
+FE-05, FE-06, FE-07A, FE-08 and FE-07B are merged on this baseline. FE-07B timing-sensitive Pilot identities remain independently gated; FE-09 does not broaden their device support.
 
-- FE-05 — ReportShell + Reporting Convergence;
-- FE-06 — Situational Migration;
-- FE-07A — Cognitive Shell + Input / Resume Readiness;
-- FE-08 — Form / Questionnaire Migration.
+## Ownership after FE-09
 
-FE-07B is also merged. Its timing-sensitive Pilot identities remain independently gated; FE-09 must not reinterpret or broaden their device support.
+### Parent orchestration
 
-## Current ownership inventory
+`modules/composite/CompositeAssessmentPage.tsx` remains the Bundle route controller. It owns:
 
-### Route / orchestration
+- authenticated/public API selection;
+- public recovery credentials;
+- start/restart of the parent attempt where already supported;
+- server parent reads/reloads;
+- child-entry navigation;
+- transition to the parent report only when the server parent says `COMPLETED`.
 
-`modules/composite/CompositeAssessmentPage.tsx` owns Bundle route orchestration, authenticated/public API selection, recovery credentials, parent attempt reload and child-entry navigation.
+### Bundle participant renderer
 
-### Current participant renderer
+`components/FinalCompositeAssessment.tsx` remains the FINAL_ONLY Bundle renderer and owns:
 
-`components/FinalCompositeAssessment.tsx` currently owns:
+- current Bundle unit projection;
+- Composite-local draft recovery for FORM_SECTION / Scale;
+- media capability reads and media gates;
+- Composite FORM_SECTION / Scale sealed FINAL calls;
+- delegation into Cognitive / Situational child runners.
 
-- current Bundle unit presentation;
-- local FINAL_ONLY draft recovery;
-- FORM_SECTION and Scale answer state;
-- media capability reads and image/video gates;
-- FORM_SECTION and Scale sealed unit FINAL calls;
-- Cognitive / Situational entry callbacks.
+It now uses the shared `AssessmentShell` for parent presentation and reuses presentation-only Form / Scale players without transferring controller ownership.
 
-It therefore contains duplicated FORM_SECTION and Scale presentation that overlaps the already-migrated Questionnaire path.
+### Shared presentation players
 
-### Reusable FE-08 boundary
+- `components/questionnaire/FormPlayer.tsx` remains presentation-only. FE-09 adds separate answer/navigation/submit lock props so Composite sealed-FINAL replay semantics can be preserved while the existing Questionnaire `disabled` contract remains backward compatible.
+- `components/questionnaire/ScalePlayer.tsx` is a new presentation-only component shared by Questionnaire and Composite. It owns question/options/navigation rendering only. It does not own draft state, media gates, API clients, provenance, or FINAL payloads.
 
-`components/questionnaire/FormPlayer.tsx` is presentation-only and already provides semantic FORM_SECTION controls. It does not own API clients, finalDraftStore identity, sealed payloads or reconciliation and is safe to reuse from Composite.
+There is still no universal Form/Scale controller or assessment state machine.
 
-FE-08 did not create a second Scale controller or universal Scale state store. Embedded Scale presentation remains callback-driven inside the Questionnaire owner. FE-09 must preserve that boundary rather than introducing a universal Form/Scale renderer.
+## C1 — Form / Scale presentation reuse — implemented
+
+Composite FORM_SECTION now reuses `FormPlayer` and Composite embedded Scale uses `ScalePlayer`. Questionnaire embedded Scale also uses the same `ScalePlayer`, making the component genuinely shared instead of copying another renderer.
+
+Preserved contracts:
+
+- Composite draft keys are unchanged;
+- Questionnaire draft keys / local save queue / flush boundary are unchanged;
+- media gates and required-viewing ownership remain in their existing controllers;
+- Scale device/input provenance remains a top-level Scale FINAL sibling only;
+- sealed payload construction and identical-payload replay are unchanged;
+- navigation remains callback-driven by each controller.
+
+Focused evidence:
+
+- `ScalePlayer.test.tsx` — value/selected state, navigation callback and lock behavior;
+- `FinalCompositePresentationReuse.test.tsx` — native Form radio semantics plus unchanged sealed Composite FORM_SECTION payload;
+- existing `FinalCompositeAssessment.test.tsx` — Scale provenance sibling placement and no Form provenance leakage.
+
+## C2 — frozen parent / child route context — implemented
+
+`modules/composite/child-route-context.ts` makes the existing route contract explicit and testable.
+
+Rules:
+
+- Cognitive entry uses the `cognitiveSession.sessionId` already returned by the parent read;
+- Situational entry uses the `situationalAttemptId` already returned by the parent read;
+- both receive a return path to the same parent attempt;
+- Situational also keeps the existing parent attempt / parent item context;
+- public Cognitive recovery credentials remain bound to that existing session id;
+- missing parent or child identity fails closed with a refresh message;
+- the helper has no start/resume/submit/network side effects.
+
+`CompositeAssessmentPage` routes both child types through this contract. No new child-start API was introduced.
+
+## C3 — one Bundle parent shell — implemented
+
+FINAL_ONLY Bundle now projects parent state into the shared `AssessmentShell`:
+
+- title / instruction from the parent read;
+- current unit title from server units/items;
+- progress from server `completedItems / totalItems`;
+- unit chips from server `completed/currentIndex` state;
+- existing exit callback;
+- existing local sealed-FINAL submission/recovery status for Composite-owned Form/Scale units.
+
+The frontend does not recompute parent completion from local answers or child UI state.
+
+When moving from a Composite-owned Form/Scale unit to a Cognitive/Situational child, stale Form/Scale draft metadata is cleared from the parent shell so prior submission state cannot leak across units.
+
+## C4 — descriptive requirements only — implemented
+
+`modules/composite/unit-requirements.ts` derives a pre-entry explanation only from already-frozen facts:
+
+- Cognitive: exact `testType + engineVersion` FE-07A readiness profile; input capabilities, orientation and resume warning;
+- Situational: frozen runtime capabilities such as `embedded` and `supported`;
+- Scale: estimated time only when explicitly present;
+- Form/Scale device/input requirements remain `unknown` when the parent data does not declare them.
+
+`CompositeUnitRequirements` is display-only. It never substitutes for the child runner's readiness/admission check and never enables/disables a child. Unknown is displayed as unknown rather than inferred from viewport or device class.
+
+## C5 — parent completion / report truth — verified, no new frontend finalizer
+
+No new completion inference was added.
+
+The existing backend Composite finalizer remains authoritative: it checks the current parent attempt and authoritative completed-unit count before the parent becomes `COMPLETED`. The report endpoint rejects a parent that is not completed.
+
+Frontend behavior remains:
+
+- after Composite-owned unit FINAL: reload the same parent attempt;
+- after Cognitive/Situational completion: child runner returns to the same parent attempt and the parent page reads it;
+- if parent is still `IN_PROGRESS`, continue with the server-allowed current unit;
+- only server-returned `COMPLETED` routes to the parent report;
+- report/snapshot reads are read-only and do not convert a pending parent into completed state.
+
+Therefore a successful last child UI cannot independently declare the Bundle complete.
+
+## C6 — integrated focused coverage
+
+Focused FE-09 tests now cover:
+
+- shared Form and Scale presentation boundaries;
+- exact frozen Cognitive/Situational child route identities;
+- authenticated/public Cognitive return context;
+- Situational parent/item return context;
+- missing child identity fails closed rather than starting another child;
+- server parent progress/currentIndex projection in the Bundle shell;
+- Cognitive readiness facts and Situational frozen runtime capabilities;
+- Form/Scale unknown requirements stay unknown;
+- Cognitive/Situational entry does not call Composite Form/Scale FINAL callbacks.
+
+Repository Ready/full CI remains the release evidence for complete auth/public, browser, Docker, media, security and old-runtime regressions.
 
 ## Domain invariants
 
-FE-09 must not change:
+FE-09 does not change:
 
 - server-owned Bundle unit order / slot admission;
 - one authoritative result per child unit;
@@ -64,86 +157,28 @@ FE-09 must not change:
 - Aggregate-safe evidence or report projection semantics;
 - authenticated/public authorization authority.
 
-A child completion may trigger a parent **read / reload**. It must not create a fresh child attempt when the completed child already exists.
+## Network / persistence impact
 
-## Network / persistence budget
-
-During child answering:
-
-- answer / trial / video completion remains local according to the owning domain path;
 - no new per-answer, per-trial or per-video server writes;
-- child completion uses the existing logical unit FINAL endpoint and idempotent replay contract;
-- returning from a child may read the parent Bundle state;
-- FE-09 adds no new Prisma migration, IndexedDB store/version, telemetry endpoint or bundle-wide FINAL.
-
-## Planned slices
-
-### C1 — reuse proven Form / Scale presentation boundaries
-
-- replace duplicated Composite FORM_SECTION rendering with the existing `FormPlayer` presentation boundary;
-- keep Composite draft key, media identity, submit payload, authenticated/public client and orchestration ownership unchanged;
-- extract only a narrow Scale presentation component if it can remain callback/frozen-identity driven; do not create a second Scale state owner or universal renderer;
-- add focused regression proving payload shape, media gates and sealed FINAL behavior are unchanged.
-
-### C2 — explicit parent / unit / return context
-
-- carry parent attempt, child unit and safe return context explicitly;
-- Cognitive / Situational completion returns by reading the same parent attempt;
-- completed child revisit does not create a new child attempt.
-
-### C3 — one parent shell / progress model
-
-- show server-authoritative parent unit count and current unit title;
-- unify exit / resume presentation;
-- keep only one complete `AssessmentShell`; child player owns its internal interaction progress.
-
-### C4 — requirements summary
-
-- derive a simple pre-start requirements / warning list only from already-available unit requirements;
-- intersection / warning logic is descriptive, not a new compatibility engine;
-- unknown / unreadable requirements are shown as unknown, never treated as compatible;
-- maturity labels do not determine device compatibility.
-
-### C5 — parent result / snapshot continuation
-
-- after a unit FINAL, read parent state and route to the next server-allowed unit or parent result;
-- after the last unit, render parent `PENDING` / `COMPLETED` truthfully;
-- report reads use the existing snapshot / ReportShell contracts.
-
-### C6 — integrated acceptance
-
-Cover:
-
-- mixed Scale / Form / Cognitive / Situational Bundle;
-- authenticated and public entry;
-- refresh between units;
-- last-unit FINAL response loss and reconciliation;
-- completed-child revisit;
-- parent read failure without child resubmission;
-- supported viewport / input combinations and timing-sensitive task warnings.
-
-## Acceptance gates
-
-Before Ready:
-
-1. Parent order comes from the server; the frontend does not unlock a disallowed slot from local progress.
-2. Each child unit produces at most one authoritative result; identical FINAL retry remains the only replay path.
-3. Parent read failure never causes a child FINAL or child-start replay.
-4. Cognitive / Situational return uses the same parent attempt identity.
-5. FORM_SECTION and embedded Scale continue to seal from their existing local draft identities.
-6. No duplicate full Shell is rendered around a migrated child player.
-7. Aggregate-safe evidence remains unchanged.
-8. Device requirements are explained before entry where data exists; unsupported / unknown combinations are not silently skipped or substituted.
-9. Final validation uses one exact candidate SHA and includes focused tests plus the repository full CI / browser / Docker gates required for Ready.
+- no new Bundle-wide FINAL;
+- no new child-start/restart call during parent → child navigation;
+- returning from a child may read/reload the same parent attempt;
+- no Prisma migration;
+- no IndexedDB schema/version change;
+- no telemetry endpoint.
 
 ## Draft / in-progress compatibility
 
-- existing Bundle attempts keep the same parent and child identities;
-- existing local drafts / sealed child submissions remain readable and replayable;
-- no in-progress child is hot-switched to another runtime or timing policy;
+- existing Bundle parent and child identities remain unchanged;
+- existing local drafts and sealed child submissions remain readable/replayable;
 - completed server child state wins over stale local state;
-- rollback is entry / presentation-level and must not delete persisted drafts or authoritative results.
+- no in-progress child is hot-switched to another runtime or timing policy;
+- public recovery credentials remain scoped to the same existing attempt/session.
+
+## Validation status
+
+Candidate implementation is complete through C1–C6 focused coverage. The PR remains Draft until the exact candidate head passes frontend lint/typecheck and backend compile. It must then be marked Ready and pass the repository full frontend/backend regression, browser, Docker, CodeQL and triggered media acceptance workflows on the same exact head before merge readiness is claimed.
 
 ## Rollback
 
-Keep existing child routes and return context available. If the integrated entry must be disabled, stop new Bundle entries from using the candidate presentation while preserving existing attempts, child recovery credentials, sealed submissions and server parent state. No destructive cleanup or runtime-version rewrite is permitted.
+Rollback is entry/presentation-level. Keep existing child routes, recovery credentials, local drafts, sealed submissions and server parent state. Do not perform destructive draft cleanup, authoritative-result deletion, or runtime-version rewrites.
