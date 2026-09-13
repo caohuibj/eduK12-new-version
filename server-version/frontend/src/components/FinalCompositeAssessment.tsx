@@ -9,6 +9,7 @@ import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
+import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
 import { AssessmentShell } from './assessment-shell'
 import FormPlayer from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
@@ -457,6 +458,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary min-h-11 whitespace-nowrap">重启并继续</button>
         </div>
       ) : null}
+
+      <CompositeUnitRequirements item={item} />
 
       {item?.type === 'COGNITIVE' ? (
         <div className="card p-8 text-center">
