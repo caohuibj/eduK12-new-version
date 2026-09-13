@@ -168,7 +168,8 @@ describe('MEDIA-7 Cognitive video presentation gate', () => {
     }
     renderRunner()
 
-    expect(screen.getByText('视频内容加载失败，当前不能开始测评。')).toBeTruthy()
+    const alert = screen.getByRole('alert')
+    expect(alert.textContent).toContain('视频内容加载失败，当前不能开始测评。')
     expect((screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '重试视频内容' }))
     expect(retry).toHaveBeenCalledTimes(1)
