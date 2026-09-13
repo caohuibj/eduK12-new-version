@@ -18,6 +18,9 @@ export interface ScalePlayerProps {
   item: ScalePlayerItem
   value: ScalePlayerValue | undefined
   disabled?: boolean
+  answerDisabled?: boolean
+  navigationDisabled?: boolean
+  submitDisabled?: boolean
   position: number
   total: number
   onChange: (value: ScalePlayerValue) => void | Promise<void>
@@ -31,6 +34,9 @@ export function ScalePlayer({
   item,
   value,
   disabled = false,
+  answerDisabled = false,
+  navigationDisabled = false,
+  submitDisabled = false,
   position,
   total,
   onChange,
@@ -39,7 +45,9 @@ export function ScalePlayer({
   onSubmit,
   submitting = false,
 }: ScalePlayerProps) {
-  const controlsDisabled = disabled || submitting
+  const answerControlsDisabled = disabled || answerDisabled || submitting
+  const navigationControlsDisabled = disabled || navigationDisabled || submitting
+  const submitControlsDisabled = disabled || submitDisabled || submitting
 
   return (
     <section aria-label={`量表题目 ${position} / ${total}`}>
@@ -57,7 +65,7 @@ export function ScalePlayer({
               key={`${typeof option.value}:${String(option.value)}`}
               aria-pressed={selected}
               onClick={() => void onChange(option.value)}
-              disabled={controlsDisabled}
+              disabled={answerControlsDisabled}
               className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${selected ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
             >
               {option.label}
@@ -70,7 +78,7 @@ export function ScalePlayer({
         <button
           type="button"
           onClick={() => void onPrevious()}
-          disabled={position <= 1 || controlsDisabled}
+          disabled={position <= 1 || navigationControlsDisabled}
           className="btn-secondary min-h-11"
         >
           <ChevronLeft className="inline h-4 w-4" />上一题
@@ -79,7 +87,7 @@ export function ScalePlayer({
           <button
             type="button"
             onClick={() => void onNext()}
-            disabled={controlsDisabled}
+            disabled={navigationControlsDisabled}
             className="btn-secondary min-h-11"
           >
             下一题<ChevronRight className="inline h-4 w-4" />
@@ -88,7 +96,7 @@ export function ScalePlayer({
           <button
             type="button"
             onClick={() => void onSubmit()}
-            disabled={controlsDisabled}
+            disabled={submitControlsDisabled}
             className="btn-primary min-h-11"
           >
             <CheckCircle className="mr-1 inline h-4 w-4" />
