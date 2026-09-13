@@ -18,6 +18,7 @@ import { assessmentImageItems, assessmentOptionImageItems } from '../modules/ass
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import FormPlayer from './questionnaire/FormPlayer'
+import useLocalDraftSaveQueue from './questionnaire/useLocalDraftSaveQueue'
 import {
   QuestionnaireRequiredVideoCompletionError,
   assertFormItemRequiredVideosComplete,
@@ -181,6 +182,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   const scaleDeviceInputProvenanceRef = useRef<{ scaleId: string; value: DeviceInputProvenanceV1 } | null>(null)
 
   const currentKey = draftKeyFor(data)
+  const { schedule: scheduleLocalSave, flush: flushLocalSaves, status: localSaveStatus } = useLocalDraftSaveQueue(currentKey)
   const currentUnitKey = `${data.questionnaireAssessment.id}:${data.currentFormSection?.id || data.currentScale?.scaleAssessmentId || 'complete'}`
   const currentSection = data.currentFormSection
   const currentScale = data.currentScale
@@ -316,27 +318,47 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       ? '这是首个上下文区段；提交后会冻结本次测评上下文。'
       : '当前答案只保存在本地草稿中。'
 
-  const saveFormValue = async (itemId: string, value: FormValue) => {
+  const saveFormValue = (itemId: string, value: FormValue) => {
     if (!currentKey || submitting || draftLocked) return
+    setError(null)
     setFormValues((previous) => ({ ...previous, [itemId]: value }))
-    try {
+    void scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemId, value, updatedAt: Date.now() })
-      setError(null)
+    })
+  }
+
+  const saveScaleValue = (itemCode: string, value: ResponseValue) => {
+    if (!currentKey || submitting || draftLocked) return
+    setError(null)
+    setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
+    void scheduleLocalSave(`scale:${itemCode}`, async () => {
+      await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
+    })
+  }
+
+  const flushOrShowError = async () => {
+    try {
+      await flushLocalSaves()
+      return true
     } catch (cause) {
-      setError(normalizeApiError(cause).message)
+      setError(`本机保存失败：${normalizeApiError(cause).message}`)
+      return false
     }
   }
 
-  const saveScaleValue = async (itemCode: string, value: ResponseValue) => {
-    if (!currentKey || submitting || draftLocked) return
-    setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    try {
-      await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
-      setError(null)
-      if (currentScale && scaleIndex < currentScale.definition.items.length - 1) setScaleIndex((index) => index + 1)
-    } catch (cause) {
-      setError(normalizeApiError(cause).message)
-    }
+  const goToFormIndex = async (nextIndex: number) => {
+    if (!(await flushOrShowError())) return
+    setSectionIndex(Math.max(0, Math.min(currentSection ? currentSection.items.length - 1 : 0, nextIndex)))
+  }
+
+  const goToScaleIndex = async (nextIndex: number) => {
+    if (!(await flushOrShowError())) return
+    setScaleIndex(Math.max(0, Math.min(currentScale ? currentScale.definition.items.length - 1 : 0, nextIndex)))
+  }
+
+  const exitAfterFlush = async () => {
+    if (!(await flushOrShowError())) return
+    onExit()
   }
 
   const recordSubmissionFailure = async (draftKey: string, cause: unknown) => {
@@ -359,6 +381,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const submitSection = async () => {
     if (!currentSection || !currentKey || !meta || submitting) return
+    if (!(await flushOrShowError())) return
     const missing = currentSection.items.filter((item) => item.required && isEmpty(formValues[item.id]))
     if (missing.length > 0) {
       setSectionIndex(Math.max(0, currentSection.items.findIndex((item) => item.required && isEmpty(formValues[item.id]))))
@@ -421,6 +444,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
 
   const submitScale = async () => {
     if (!currentScale || !currentKey || !meta || submitting) return
+    if (!(await flushOrShowError())) return
     const missing = currentScale.definition.items.filter((item) => item.required && scaleValues[item.itemCode] === undefined)
     if (missing.length > 0) {
       setScaleIndex(Math.max(0, currentScale.definition.items.findIndex((item) => item.required && scaleValues[item.itemCode] === undefined)))
@@ -500,9 +524,12 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
           <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
           <p className="text-sm text-gray-500">完成单元：{contentUnits.filter((unit) => unit.completed).length} / {data.totalItems}（{data.questionnaireAssessment.progress}%）</p>
         </div>
-        <button type="button" onClick={onExit} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
+        <button type="button" onClick={() => void exitAfterFlush()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
       </div>
       <p className="text-sm text-gray-500 mb-4">{contextText} 页面刷新或离线时会从 IndexedDB 恢复。</p>
+      {localSaveStatus.state === 'saving' ? <p role="status" className="mb-3 text-sm text-slate-500">{localSaveStatus.message}</p> : null}
+      {localSaveStatus.state === 'saved' ? <p role="status" className="mb-3 text-sm text-emerald-700">{localSaveStatus.message}</p> : null}
+      {localSaveStatus.state === 'error' ? <p role="alert" className="mb-3 text-sm text-red-700">本机保存失败：{localSaveStatus.message}</p> : null}
       {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
       {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
 
@@ -546,9 +573,9 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     position={sectionIndex + 1}
                     total={currentSection.items.length}
                     onChange={(nextValue) => saveFormValue(item.id, nextValue)}
-                    onPrevious={() => setSectionIndex((index) => Math.max(0, index - 1))}
+                    onPrevious={() => void goToFormIndex(sectionIndex - 1)}
                     onNext={sectionIndex < currentSection.items.length - 1
-                      ? () => setSectionIndex((index) => Math.min(currentSection.items.length - 1, index + 1))
+                      ? () => void goToFormIndex(sectionIndex + 1)
                       : undefined}
                     onSubmit={sectionIndex === currentSection.items.length - 1 ? submitSection : undefined}
                     submitting={submitting}
@@ -581,7 +608,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   slotKey: scaleItemVideoSlotKey(item.itemCode),
                 } : undefined}
               >
-                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
+                <div><h3 className="text-lg font-medium mb-5">{item.content}{item.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{item.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => saveScaleValue(item.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[item.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => void goToScaleIndex(scaleIndex - 1)} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < currentScale.definition.items.length - 1 ? <button type="button" onClick={() => void goToScaleIndex(scaleIndex + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div>
               </ScaleFormVideoGate>
             </AssessmentImageGate>
           })()}
