@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
   MAX_TIMING_DIAGNOSTIC_CAPACITY,
   captureTimingClockSnapshot,
   createCognitiveTimingDiagnosticBuffer,
@@ -51,11 +50,26 @@ describe('FE-07B Cognitive timing primitive', () => {
     expect(isSameDocumentTimeOrigin(Number.NaN, 1)).toBe(false)
   })
 
-  it('requires an exact software timing policy opt-in so frozen configs remain legacy', () => {
+  it('admits software timing only for exact frozen timing-pilot config identities', () => {
     expect(usesSoftwareFrameTiming(null)).toBe(false)
     expect(usesSoftwareFrameTiming({})).toBe(false)
-    expect(usesSoftwareFrameTiming({ timingPolicyVersion: 'software-frame-v0' })).toBe(false)
-    expect(usesSoftwareFrameTiming({ timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1 })).toBe(true)
+    expect(usesSoftwareFrameTiming({ timingPolicyVersion: 'software-frame-v1' })).toBe(false)
+
+    expect(usesSoftwareFrameTiming({
+      testType: 'reaction', engineVersion: '1.0.0', configVersion: '1.1.0',
+    })).toBe(false)
+    expect(usesSoftwareFrameTiming({
+      testType: 'reaction', engineVersion: '1.0.0', configVersion: '1.2.0',
+    })).toBe(true)
+    expect(usesSoftwareFrameTiming({
+      testType: 'gonogo', engineVersion: '1.0.0', configVersion: '1.1.0',
+    })).toBe(true)
+    expect(usesSoftwareFrameTiming({
+      testType: 'cpt', engineVersion: '1.0.0', configVersion: '1.1.0',
+    })).toBe(true)
+    expect(usesSoftwareFrameTiming({
+      testType: 'cpt', engineVersion: '9.9.9', configVersion: '1.1.0',
+    })).toBe(false)
   })
 
   it('keeps diagnostics local and bounded by evicting the oldest records', () => {
