@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../../api/client'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { AssessmentShell } from '../../components/assessment-shell'
 import { ActionBar, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { useRunnerSaveState } from '../../hooks/useRunnerSaveState'
@@ -529,7 +530,6 @@ const ScaleAssessment: React.FC = () => {
   const currentItem = items[currentIndex]
   const selectedValue = currentItem ? answers[currentItem.itemCode] : undefined
   const answeredCount = items.filter((item) => answers[item.itemCode] !== undefined).length
-  const progress = Math.round((answeredCount / items.length) * 100)
   const imageItems = assessmentImageItems(currentItem.images)
   const videoPresentation = scaleItemVideoPresentation(currentItem)
   const draftKey = `scale:${assessment.id}`
@@ -538,146 +538,161 @@ const ScaleAssessment: React.FC = () => {
     : undefined
   const answerControlsDisabled = savingAnswer || submitting || submissionLocked
 
-  return (
-    <ProductPage width="assessment" data-scale-reference-journey>
-      <header className="mb-6 space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-500">心理测评</p>
-            <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-900">{scale.name}</h1>
-          </div>
-          {scale.estimatedTime ? <p className="text-sm text-slate-500 sm:text-right">预计约 {scale.estimatedTime} 分钟</p> : null}
-        </div>
-        {scale.instruction ? <p className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{scale.instruction}</p> : null}
-      </header>
+  const saveStatus = savingAnswer
+    ? ({ state: 'saving', message: '正在保存本题到本机…' } as const)
+    : selectedValue !== undefined
+      ? ({ state: 'saved', message: '本题答案已保存到本机，可继续或返回修改。' } as const)
+      : ({ state: 'idle' } as const)
 
-      <section aria-label="答题进度" className="mb-6">
-        <div className="mb-2 flex items-center justify-between gap-4 text-sm text-slate-600">
-          <span>答题进度</span>
-          <span>{answeredCount} / {items.length}</span>
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="量表答题进度" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={answeredCount}>
-          <div className="h-full rounded-full bg-blue-700 transition-[width] motion-reduce:transition-none" style={{ width: `${progress}%` }} />
-        </div>
-      </section>
+  const submissionStatus = submitting
+    ? ({
+        state: 'submitting',
+        title: '正在处理提交',
+        ...(completionNotice ? { message: completionNotice } : {}),
+      } as const)
+    : submissionLockReason === 'sealed'
+      ? ({
+          state: 'pending',
+          title: '提交内容已封存',
+          message: '答案已经锁定。若上一次网络结果不明确，“重新核对提交”只会重放同一份 FINAL，不会重新生成答案或视频状态。',
+        } as const)
+      : submissionLockReason === 'legacy-pending'
+        ? ({
+            state: 'pending',
+            title: '检测到旧版未确认提交',
+            message: '当前答案已锁定，系统不会根据页面状态重新生成 FINAL。请核对服务器状态或重启测评。',
+          } as const)
+        : ({ state: 'idle' } as const)
 
-      {submissionLockReason === 'sealed' ? (
-        <div className="mb-4">
-          <ProductStatus kind="pending" title="提交内容已封存">
-            答案已经锁定。若上一次网络结果不明确，“重新核对提交”只会重放同一份 FINAL，不会重新生成答案或视频状态。
-          </ProductStatus>
-        </div>
-      ) : null}
-      {submissionLockReason === 'legacy-pending' ? (
-        <div className="mb-4">
-          <ProductStatus kind="warning" title="检测到旧版未确认提交">
-            当前答案已锁定，系统不会根据页面状态重新生成 FINAL。请核对服务器状态或重启测评。
-          </ProductStatus>
-        </div>
-      ) : null}
-      {completionNotice ? (
-        <div className="mb-4">
-          <ProductStatus kind={submitting ? 'pending' : 'error'} title={submitting ? '正在处理提交' : '需要处理'} announce={submitting ? 'polite' : 'assertive'}>
-            {completionNotice}
-          </ProductStatus>
-        </div>
-      ) : null}
-      {requiresRestart ? (
-        <div className="mb-4">
-          <ProductStatus
-            kind="warning"
-            title="量表版本已变化"
-            actions={<ProductButton variant="primary" onClick={() => void restartLegacyAttempt()} disabled={submitting}>重启并继续</ProductButton>}
-          >
-            本地答案仍保留在旧尝试中。需要创建新的冻结尝试后继续作答。
-          </ProductStatus>
-        </div>
-      ) : null}
+  const recoveryState = requiresRestart
+    ? ({
+        state: 'blocked',
+        message: '量表版本已变化。本地答案仍保留在旧尝试中，需要创建新的冻结尝试后继续作答。',
+      } as const)
+    : ({ state: 'none' } as const)
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${currentItem.itemCode}`}>
-        <div className="mb-5">
-          <p className="text-sm font-medium text-slate-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</p>
-          <h2 id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
-        </div>
-
-        <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
-          <ScaleFormVideoGate
-            presentation={videoPresentation}
-            loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
-            ariaLabel={`${currentItem.content} 视频内容`}
-            requiredViewing={requiredViewing}
-          >
-            <fieldset disabled={answerControlsDisabled} className="space-y-3">
-              <legend className="sr-only">{currentItem.content}</legend>
-              {currentItem.options.map((option) => {
-                const checked = selectedValue === option.value
-                return (
-                  <label
-                    key={valueKey(option.value)}
-                    className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 has-[:focus-visible]:ring-offset-2 ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${answerControlsDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name={`scale-${assessment.id}-${currentItem.itemCode}`}
-                      checked={checked}
-                      onChange={() => void handleSelectAnswer(option.value)}
-                      disabled={answerControlsDisabled}
-                      className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
-                    />
-                    <span className="min-w-0 flex-1 leading-relaxed">{option.label}</span>
-                  </label>
-                )
-              })}
-            </fieldset>
-          </ScaleFormVideoGate>
-        </AssessmentImageGate>
-
-        <p className="mt-4 min-h-6 text-sm text-slate-500" role="status" aria-live="polite">
-          {savingAnswer ? '正在保存本题到本机…' : selectedValue !== undefined ? '本题答案已保存到本机，可继续或返回修改。' : videoPresentation && !submissionLocked ? '完整观看视频后选择一个答案。' : '请选择一个答案。'}
-        </p>
-      </section>
-
-      <ActionBar className="mt-5 justify-between">
-        <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting}>
-          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-          上一题
+  const actions = (
+    <ActionBar className="justify-between">
+      <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting}>
+        <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+        上一题
+      </ProductButton>
+      {currentIndex === items.length - 1 ? (
+        <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart}>
+          <CheckCircle className="h-5 w-5" aria-hidden="true" />
+          {submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '完成测评'}
         </ProductButton>
-        {currentIndex === items.length - 1 ? (
-          <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart}>
-            <CheckCircle className="h-5 w-5" aria-hidden="true" />
-            {submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '完成测评'}
-          </ProductButton>
-        ) : (
-          <ProductButton variant="primary" onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting}>
-            下一题
-            <ChevronRight className="h-5 w-5" aria-hidden="true" />
-          </ProductButton>
-        )}
-      </ActionBar>
+      ) : (
+        <ProductButton variant="primary" onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting}>
+          下一题
+          <ChevronRight className="h-5 w-5" aria-hidden="true" />
+        </ProductButton>
+      )}
+    </ActionBar>
+  )
 
-      <nav aria-label="题目导航" className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
-        <p className="mb-3 text-sm font-medium text-slate-600">题目导航</p>
-        <div className="flex flex-wrap gap-2">
-          {items.map((item, index) => {
-            const current = currentIndex === index
-            const answered = answers[item.itemCode] !== undefined
-            return (
-              <button
-                key={item.itemCode}
-                type="button"
-                onClick={() => setCurrentIndex(index)}
-                disabled={savingAnswer || submitting}
-                aria-current={current ? 'step' : undefined}
-                aria-label={`第 ${index + 1} 题${answered ? '，已作答' : '，未作答'}`}
-                className={`min-h-11 min-w-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-wait disabled:opacity-60 ${current ? 'border-blue-700 bg-blue-700 text-white' : answered ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-700'}`}
-              >
-                {index + 1}
-              </button>
-            )
-          })}
-        </div>
-      </nav>
-    </ProductPage>
+  const navigation = (
+    <nav aria-label="题目导航" className="rounded-xl border border-slate-200 bg-white p-4">
+      <p className="mb-3 text-sm font-medium text-slate-600">题目导航</p>
+      <div className="flex flex-wrap gap-2">
+        {items.map((item, index) => {
+          const current = currentIndex === index
+          const answered = answers[item.itemCode] !== undefined
+          return (
+            <button
+              key={item.itemCode}
+              type="button"
+              onClick={() => setCurrentIndex(index)}
+              disabled={savingAnswer || submitting}
+              aria-current={current ? 'step' : undefined}
+              aria-label={`第 ${index + 1} 题${answered ? '，已作答' : '，未作答'}`}
+              className={`min-h-11 min-w-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-wait disabled:opacity-60 ${current ? 'border-blue-700 bg-blue-700 text-white' : answered ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-700'}`}
+            >
+              {index + 1}
+            </button>
+          )
+        })}
+      </div>
+    </nav>
+  )
+
+  return (
+    <AssessmentShell
+      title={scale.name}
+      eyebrow="心理测评"
+      instructions={scale.instruction}
+      estimatedMinutes={scale.estimatedTime}
+      progress={{ kind: 'count', completed: answeredCount, total: items.length, label: '答题进度' }}
+      saveStatus={saveStatus}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      actions={actions}
+      navigation={navigation}
+    >
+      <div data-scale-reference-journey>
+        {completionNotice && !submitting ? (
+          <div className="mb-4">
+            <ProductStatus kind="error" title="需要处理" announce="assertive">
+              {completionNotice}
+            </ProductStatus>
+          </div>
+        ) : null}
+        {requiresRestart ? (
+          <div className="mb-4">
+            <ActionBar label="恢复操作">
+              <ProductButton variant="primary" onClick={() => void restartLegacyAttempt()} disabled={submitting}>重启并继续</ProductButton>
+            </ActionBar>
+          </div>
+        ) : null}
+
+        <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${currentItem.itemCode}`}>
+          <div className="mb-5">
+            <p className="text-sm font-medium text-slate-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</p>
+            <h2 id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
+          </div>
+
+          <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
+            <ScaleFormVideoGate
+              presentation={videoPresentation}
+              loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
+              ariaLabel={`${currentItem.content} 视频内容`}
+              requiredViewing={requiredViewing}
+            >
+              <fieldset disabled={answerControlsDisabled} className="space-y-3">
+                <legend className="sr-only">{currentItem.content}</legend>
+                {currentItem.options.map((option) => {
+                  const checked = selectedValue === option.value
+                  return (
+                    <label
+                      key={valueKey(option.value)}
+                      className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 has-[:focus-visible]:ring-offset-2 ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${answerControlsDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name={`scale-${assessment.id}-${currentItem.itemCode}`}
+                        checked={checked}
+                        onChange={() => void handleSelectAnswer(option.value)}
+                        disabled={answerControlsDisabled}
+                        className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
+                      />
+                      <span className="min-w-0 flex-1 leading-relaxed">{option.label}</span>
+                    </label>
+                  )
+                })}
+              </fieldset>
+            </ScaleFormVideoGate>
+          </AssessmentImageGate>
+
+          <p className="mt-4 min-h-6 text-sm text-slate-500">
+            {selectedValue === undefined && !savingAnswer
+              ? videoPresentation && !submissionLocked
+                ? '完整观看视频后选择一个答案。'
+                : '请选择一个答案。'
+              : null}
+          </p>
+        </section>
+      </div>
+    </AssessmentShell>
   )
 }
 
