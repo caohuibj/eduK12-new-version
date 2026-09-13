@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
   MAX_TIMING_DIAGNOSTIC_CAPACITY,
   captureTimingClockSnapshot,
   createCognitiveTimingDiagnosticBuffer,
   isSameDocumentTimeOrigin,
+  usesSoftwareFrameTiming,
   validateEventTimestamp,
 } from '../timing'
 
@@ -47,6 +49,13 @@ describe('FE-07B Cognitive timing primitive', () => {
     expect(isSameDocumentTimeOrigin(1_700_000_000_000, 1_700_000_000_000.25)).toBe(true)
     expect(isSameDocumentTimeOrigin(1_700_000_000_000, 1_700_000_000_010)).toBe(false)
     expect(isSameDocumentTimeOrigin(Number.NaN, 1)).toBe(false)
+  })
+
+  it('requires an exact software timing policy opt-in so frozen configs remain legacy', () => {
+    expect(usesSoftwareFrameTiming(null)).toBe(false)
+    expect(usesSoftwareFrameTiming({})).toBe(false)
+    expect(usesSoftwareFrameTiming({ timingPolicyVersion: 'software-frame-v0' })).toBe(false)
+    expect(usesSoftwareFrameTiming({ timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1 })).toBe(true)
   })
 
   it('keeps diagnostics local and bounded by evicting the oldest records', () => {
