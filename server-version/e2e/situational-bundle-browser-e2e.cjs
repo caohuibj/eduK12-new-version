@@ -67,7 +67,7 @@ const waitForParentState = async (page, parentId, recoveryToken = '') => {
 }
 
 const waitForRunner = async (page) => {
-  await page.getByRole('heading', { name: '文字情境测评' }).waitFor({ state: 'visible', timeout: 30000 })
+  await page.locator('[data-assessment-shell-header]').waitFor({ state: 'visible', timeout: 30000 })
   await page.getByText(/情境 [12] \/ 2/).waitFor({ state: 'visible', timeout: 30000 })
 }
 
@@ -78,12 +78,12 @@ const chooseFirstOption = async (page) => {
   // draft write. A real click exercises the user path without making
   // Playwright require the controlled DOM state to change synchronously.
   await option.click()
-  await page.getByText(/已完成 [12] \/ 2 个必答通道/).waitFor({ state: 'visible', timeout: 30000 })
   await page.waitForFunction(() => {
     const candidate = document.querySelector('input[type="radio"]')
     return candidate instanceof HTMLInputElement && candidate.checked
   }, null, { timeout: 30000 })
   assert.equal(await option.isChecked(), true, 'selected option was not reflected in the runner')
+  await page.locator('button[aria-current="step"][aria-label$="，已完成"]').waitFor({ state: 'visible', timeout: 30000 })
 }
 
 const assertVisualScene = async (page, sceneIndex) => {

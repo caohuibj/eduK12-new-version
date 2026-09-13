@@ -1,4 +1,4 @@
-// MEDIA-5 Situational VIDEO adapter acceptance.
+// FE-06 Situational required VIDEO acceptance.
 // Real Chromium + backend + PostgreSQL + native MEDIA-4 capability delivery.
 
 const assert = require('node:assert/strict')
@@ -57,12 +57,44 @@ const waitScene = async (page, title) => {
 }
 
 const waitVideoReady = async (page) => {
-  const video = page.locator('video[controls]').first()
+  const player = page.locator('[data-assessment-video-player][data-required-viewing="true"]').first()
+  await player.waitFor({ state: 'visible', timeout: 30000 })
+  const video = player.locator('video').first()
   await video.waitFor({ state: 'visible', timeout: 30000 })
   await page.waitForFunction(() => {
-    const element = document.querySelector('video[controls]')
+    const element = document.querySelector('[data-assessment-video-player][data-required-viewing="true"] video')
     return element instanceof HTMLVideoElement && element.readyState >= 1 && Number.isFinite(element.duration) && element.duration > 0
   }, null, { timeout: 30000 })
+  assert.equal(await video.getAttribute('controls'), null, 'required video exposed native controls')
+  await page.getByText('固定播放速度', { exact: false }).count().catch(() => 0)
+  return video
+}
+
+const waitResponsesDisabled = async (page) => {
+  await page.waitForFunction(() => {
+    const inputs = Array.from(document.querySelectorAll('input[type="radio"]'))
+    return inputs.length > 0 && inputs.every((node) => node.matches(':disabled'))
+  }, null, { timeout: 30000 })
+}
+
+const waitResponsesEnabled = async (page) => {
+  await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).some((node) => !node.matches(':disabled')), null, { timeout: 30000 })
+}
+
+const completeRequiredVideo = async (page, label) => {
+  const video = await waitVideoReady(page)
+  await waitResponsesDisabled(page)
+  await page.getByText('请以 1× 速度从头完整观看视频后继续；不支持跳播或倍速。', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+
+  await video.dispatchEvent('ended')
+  await page.waitForTimeout(150)
+  await waitResponsesDisabled(page)
+  record(`${label}-synthetic-ended-does-not-unlock`)
+
+  await page.getByRole('button', { name: '播放视频', exact: true }).click()
+  await page.getByText('视频已完整观看，可以继续。', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await waitResponsesEnabled(page)
+  record(`${label}-full-view-unlocks-response`)
   return video
 }
 
@@ -134,13 +166,13 @@ const runStandalone = async (browser) => {
     })
     await startStandalone(page)
     await page.waitForFunction(() => Boolean(document.querySelector('input[type="radio"]')), null, { timeout: 30000 })
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).every((node) => node.matches(':disabled')), null, { timeout: 30000 })
+    await waitResponsesDisabled(page)
     assert.ok(heldRoute, 'standalone capability request was not held')
     record('standalone-video-readiness-blocks-response')
     releaseRoute()
 
     const video = await waitVideoReady(page)
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('input[type="radio"]')).some((node) => !node.matches(':disabled')), null, { timeout: 30000 })
+    await waitResponsesDisabled(page)
     await page.waitForFunction(() => document.querySelectorAll('track').length > 0, null, { timeout: 30000 })
     assertCapabilityUrls(videoSources, 'standalone')
     assert.ok(nativeRequests.length > 0, 'native media request was not observed')
@@ -155,8 +187,33 @@ const runStandalone = async (browser) => {
     assert.ok(playback.currentTime < playback.duration, 'fixture unexpectedly finished before response')
     await video.dispatchEvent('ended')
     await page.waitForTimeout(150)
+    await waitResponsesDisabled(page)
     await waitScene(page, fixture.instrument.videoSceneTitle)
     record('playback-ended-does-not-drive-branch')
+
+    await page.getByRole('button', { name: '播放视频', exact: true }).click()
+    await page.waitForTimeout(100)
+    const pauseButton = page.getByRole('button', { name: '暂停视频', exact: true })
+    if (await pauseButton.isVisible().catch(() => false)) await pauseButton.click()
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await waitScene(page, fixture.instrument.videoSceneTitle)
+    const reloadedVideo = await waitVideoReady(page)
+    await waitResponsesDisabled(page)
+    const afterIncompleteReload = await reloadedVideo.evaluate((element) => element.currentTime)
+    assert.ok(afterIncompleteReload <= 0.1, `incomplete reload resumed at ${afterIncompleteReload}`)
+    record('incomplete-refresh-restarts-video')
+
+    await page.getByRole('button', { name: '播放视频', exact: true }).click()
+    await page.getByText('视频已完整观看，可以继续。', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+    await waitResponsesEnabled(page)
+    record('standalone-full-view-unlocks-response')
+
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await waitScene(page, fixture.instrument.videoSceneTitle)
+    await waitVideoReady(page)
+    await page.getByText('视频已完整观看，可以继续。', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+    await waitResponsesEnabled(page)
+    record('standalone-completion-marker-survives-refresh')
 
     await choose(page, fixture.instrument.longPathOption)
     await page.getByRole('button', { name: '下一题', exact: true }).click()
@@ -255,7 +312,7 @@ const runAuthenticatedBundle = async (browser) => {
     await loginStudent(page)
     const parentId = await startAuthenticatedParent(page)
     const childId = await enterEmbedded(page, parentId)
-    await waitVideoReady(page)
+    await completeRequiredVideo(page, 'authenticated-embedded')
     assertCapabilityUrls(sources, 'authenticated embedded')
     record('authenticated-embedded-video-capability')
     await choose(page, fixture.instrument.earlyTerminalOption)
@@ -295,7 +352,7 @@ const runPublicBundle = async (browser) => {
     const recoveryToken = body.data.recoveryToken
     assert.ok(parentId && recoveryToken)
     const childId = await enterEmbedded(page, parentId, true, recoveryToken)
-    await waitVideoReady(page)
+    await completeRequiredVideo(page, 'public-embedded')
     assert.equal(issuanceHeaders?.['x-recovery-token'], recoveryToken)
     assertCapabilityUrls(sources, 'public embedded')
     record('public-embedded-recovery-authorizes-capability')
@@ -335,15 +392,15 @@ const main = async () => {
   } finally {
     await browser.close()
   }
-  console.log('--- MEDIA-5 Situational Video Acceptance ---')
+  console.log('--- FE-06 Situational Video Acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('ALL PASS')
 }
 
 main().catch((error) => {
-  console.error('MEDIA-5 Situational Video Acceptance failed')
+  console.error('FE-06 Situational Video Acceptance failed')
   console.error(error?.stack || error)
-  console.log('--- MEDIA-5 Situational Video Acceptance ---')
+  console.log('--- FE-06 Situational Video Acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('BLOCKED')
   process.exitCode = 1

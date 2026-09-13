@@ -138,9 +138,11 @@ describe('Situational text runner', () => {
     embeddedClient.result.mockResolvedValue({ code: 0, message: 'ok', data: completedData(embeddedData) })
   })
 
-  it('renders text, supports choice/continuous boundaries, navigation, and one final request', async () => {
+  it('renders text, supports choice/continuous boundaries, fixed scene progress, navigation, and one final request', async () => {
     renderRunner()
     expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '第一场景' })).toBeInTheDocument()
+    expect(screen.getByText('第 1 / 2')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('选择 A'))
     await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
     const slider = screen.getByRole('slider')
@@ -150,12 +152,13 @@ describe('Situational text runner', () => {
     await waitFor(() => expect(slider).toHaveValue('1'))
     fireEvent.change(slider, { target: { value: '0' } })
     await waitFor(() => expect(slider).toHaveValue('0'))
-    expect(screen.getByText('已完成 2 / 3 个必答通道')).toBeInTheDocument()
+    expect(screen.getByText('第 1 / 2')).toBeInTheDocument()
     fireEvent.change(slider, { target: { value: '100' } })
     await waitFor(() => expect(slider).toHaveValue('100'))
     await waitFor(() => expect(screen.getByRole('button', { name: /下一题/ })).not.toBeDisabled())
     fireEvent.click(screen.getByRole('button', { name: /下一题/ }))
     expect(await screen.findByText('第二段文字情境')).toBeInTheDocument()
+    expect(screen.getByText('第 2 / 2')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('第二个 A'))
     await waitFor(() => expect(screen.getByLabelText('第二个 A')).toBeChecked())
     fireEvent.click(screen.getByRole('button', { name: /提交测评/ }))
@@ -164,6 +167,27 @@ describe('Situational text runner', () => {
     expect(payload.responses).toHaveLength(3)
     expect(payload.responses.some((response) => response.responseValue === 100)).toBe(true)
     expect(JSON.stringify(payload)).not.toMatch(/score|contribution|percentile|quality/i)
+  })
+
+  it('serializes rapid local edits and submits the newest slider value', async () => {
+    renderRunner()
+    expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    const slider = screen.getByRole('slider')
+    fireEvent.change(slider, { target: { value: '1' } })
+    fireEvent.change(slider, { target: { value: '40' } })
+    fireEvent.change(slider, { target: { value: '100' } })
+
+    await waitFor(() => expect(slider).toHaveValue('100'))
+    await waitFor(() => expect(screen.getByRole('button', { name: /下一题/ })).not.toBeDisabled())
+    fireEvent.click(screen.getByRole('button', { name: /下一题/ }))
+    fireEvent.click(await screen.findByLabelText('第二个 A'))
+    await waitFor(() => expect(screen.getByLabelText('第二个 A')).toBeChecked())
+    fireEvent.click(screen.getByRole('button', { name: /提交测评/ }))
+
+    await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
+    const payload = vi.mocked(situationalApi.submit).mock.calls[0]?.[1]
+    expect(payload.responses.find((response) => response.channelKey === 'continuous')?.responseValue).toBe(100)
   })
 
   it('renders IMAGE and ordered COMIC panels through the same runner', async () => {
@@ -227,7 +251,8 @@ describe('Situational text runner', () => {
 
     const restored = await screen.findByLabelText('选择 A')
     expect(restored).toBeChecked()
-    expect(screen.getByText('已完成 1 / 3 个必答通道')).toBeInTheDocument()
+    expect(screen.getByText('第 1 / 2')).toBeInTheDocument()
+    expect(screen.getByText('已恢复本机进度')).toBeInTheDocument()
     expect(situationalApi.start).toHaveBeenCalledTimes(2)
   })
 

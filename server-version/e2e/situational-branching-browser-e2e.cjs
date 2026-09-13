@@ -1,4 +1,4 @@
-// SIT-V2-E final branching acceptance gate.
+// FE-06 final branching acceptance gate.
 // Real Chromium + IndexedDB + backend + PostgreSQL; fixture is CI-only.
 
 const assert = require('node:assert/strict')
@@ -64,8 +64,8 @@ const loginStudent = async (page) => {
 }
 
 const waitScene = async (page, title) => {
-  await page.getByRole('heading', { name: '文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-  await page.getByRole('heading', { name: title, exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await page.locator('[data-assessment-shell-header]').waitFor({ state: 'visible', timeout: 30000 })
+  await page.getByRole('heading', { name: title, exact: true, level: 1 }).waitFor({ state: 'visible', timeout: 30000 })
 }
 
 const chooseOption = async (page, optionKey) => {
@@ -89,8 +89,13 @@ const setConfidence = async (page, value) => {
   }, value, { timeout: 30000 })
 }
 
-const waitProgress = async (page, answered, total) => {
-  await page.getByText(`已完成 ${answered} / ${total} 个必答通道`, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+const waitProgress = async (page, completedSteps, _legacyTotal) => {
+  const openPath = page.locator('section[aria-label="当前开放路径"]').first()
+  await openPath.waitFor({ state: 'visible', timeout: 30000 })
+  await openPath.getByText(`已完成 ${completedSteps} 个步骤`, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await openPath.getByText(/^当前：/u).waitFor({ state: 'visible', timeout: 30000 })
+  const progressText = await openPath.textContent()
+  assert.doesNotMatch(progressText || '', /已完成\s+\d+\s*\/\s*\d+/u, 'branching progress exposed a mutable denominator')
 }
 
 const nextScene = async (page, title) => {
@@ -532,15 +537,15 @@ const main = async () => {
   } finally {
     await browser.close()
   }
-  console.log('--- SIT-V2-E branching acceptance ---')
+  console.log('--- FE-06 branching acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('ALL PASS')
 }
 
 main().catch((error) => {
-  console.error('SIT-V2-E branching acceptance failed')
+  console.error('FE-06 branching acceptance failed')
   console.error(error && error.stack ? error.stack : error)
-  console.log('--- SIT-V2-E branching acceptance ---')
+  console.log('--- FE-06 branching acceptance ---')
   for (const name of results) console.log(`✅ ${name}`)
   console.log('BLOCKED')
   process.exitCode = 1

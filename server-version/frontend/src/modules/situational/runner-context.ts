@@ -1,0 +1,51 @@
+export interface SituationalRunnerRouteContextInput {
+  pathname: string
+  searchParams: URLSearchParams
+  attemptId?: string
+}
+
+export interface SituationalRunnerRouteContext {
+  publicMode: boolean
+  embedded: boolean
+  compositeAttemptId: string
+  compositeItemId: string
+  returnTo: string
+  completionPath: string
+  recoveryStorageKey: string | null
+}
+
+/**
+ * Route/access context only. Traversal, answers, draft state and FINAL identity
+ * deliberately stay outside this helper so a parent/public route cannot mutate
+ * scientific runtime state.
+ */
+export const resolveSituationalRunnerRouteContext = ({
+  pathname,
+  searchParams,
+  attemptId,
+}: SituationalRunnerRouteContextInput): SituationalRunnerRouteContext => {
+  const publicMode = pathname.startsWith('/public/composite/')
+  const embedded = Boolean(attemptId)
+  const compositeAttemptId = searchParams.get('compositeAttemptId') || ''
+  const compositeItemId = searchParams.get('compositeItemId') || ''
+  const candidateReturnTo = searchParams.get('returnTo') || ''
+  const allowedReturnPrefix = publicMode ? '/public/composite/attempts/' : '/student/composite/attempts/'
+  const returnTo = candidateReturnTo.startsWith(allowedReturnPrefix) ? candidateReturnTo : ''
+  const completionPath = returnTo || (
+    embedded && compositeAttemptId
+      ? `${publicMode ? '/public' : '/student'}/composite/attempts/${compositeAttemptId}`
+      : ''
+  )
+
+  return {
+    publicMode,
+    embedded,
+    compositeAttemptId,
+    compositeItemId,
+    returnTo,
+    completionPath,
+    recoveryStorageKey: publicMode && compositeAttemptId
+      ? `composite:recovery:attempt:${compositeAttemptId}`
+      : null,
+  }
+}
