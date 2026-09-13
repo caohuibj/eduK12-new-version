@@ -1,12 +1,21 @@
-import { GonogoTask } from './GonogoTask'
+import { createElement } from 'react'
+import type { CognitiveTaskProps } from '../../core/runner.types'
+import { usesSoftwareFrameTiming } from '../../core/timing'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
+import { GonogoFrameTask } from './GonogoFrameTask'
+import { GonogoTask } from './GonogoTask'
+
+const GonogoRunner = (props: CognitiveTaskProps) => createElement(
+  usesSoftwareFrameTiming(props.taskContext.config) ? GonogoFrameTask : GonogoTask,
+  props,
+)
 
 export const gonogoRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'gonogo',
   name: 'Go/No-Go',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: GonogoTask,
+  RunnerComponent: GonogoRunner,
   metricDefinitions: [
     { key: 'commissionRate', label: 'No-Go 误按率', displayType: 'percentage' },
     { key: 'dPrime', label: 'd′', displayType: 'number' },
