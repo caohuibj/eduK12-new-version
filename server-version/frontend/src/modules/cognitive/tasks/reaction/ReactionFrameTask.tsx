@@ -5,6 +5,7 @@ import {
   type CognitiveTimingOnset,
 } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { createTaskTimingDiagnostics } from '../../core/task-timing-diagnostics'
 import type { ReactionConfig, ReactionTrialPayload } from '../../types'
 import { deterministicForeperiod } from './prng'
 
@@ -25,6 +26,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   const foreperiodMax = config?.foreperiodMaxMs ?? 1500
   const timeoutMs = config?.timeoutMs ?? 2000
   const readyDurationMs = config?.readyDurationMs ?? 1000
+  const [timingDiagnostics] = useState(createTaskTimingDiagnostics)
 
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
@@ -71,6 +73,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     if (phase !== 'formal' || trialIndex >= total || sub !== 'gray') return
     let animationFrameId: number | null = null
     const timer = window.setTimeout(() => {
+      const eligiblePerfMs = performance.now()
       const present = (framePerfMs: number) => {
         const captured = captureFrameTimingOnset(framePerfMs)
         if (captured.ok) {
@@ -93,7 +96,10 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
         present(performance.now())
         return
       }
-      animationFrameId = window.requestAnimationFrame(present)
+      animationFrameId = window.requestAnimationFrame((framePerfMs) => {
+        timingDiagnostics.frameCallback({ eligiblePerfMs, framePerfMs, trialIndex })
+        present(framePerfMs)
+      })
     }, foreperiodMs)
 
     return () => {
@@ -102,7 +108,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
         window.cancelAnimationFrame(animationFrameId)
       }
     }
-  }, [phase, sub, foreperiodMs, round, trialIndex, total, markInterrupted])
+  }, [phase, sub, foreperiodMs, round, trialIndex, total, markInterrupted, timingDiagnostics])
 
   const submit = useCallback(
     async (rtMs: number | null, inputMode: ReactionTrialPayload['inputMode']) => {
@@ -138,11 +144,20 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total) return
     const onVisibilityChange = () => {
-      if (document.hidden) markInterrupted()
+      if (!document.hidden) return
+      timingDiagnostics.visibilityLost(performance.now(), trialIndex)
+      markInterrupted()
+    }
+    const onBlur = () => {
+      timingDiagnostics.focusLost(performance.now(), trialIndex)
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
-  }, [phase, trialIndex, total, markInterrupted])
+    window.addEventListener('blur', onBlur)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('blur', onBlur)
+    }
+  }, [phase, trialIndex, total, markInterrupted, timingDiagnostics])
 
   const handleFormalInput = useCallback((
     inputMode: ReactionTrialPayload['inputMode'],
@@ -161,13 +176,16 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
 
     const resolved = resolveEventResponseTimestamp(eventTimeStamp, stimulusOnsetRef.current)
     const responsePerfMs = resolved.ok ? resolved.responsePerfMs : resolved.fallbackPerfMs
-    if (!resolved.ok) markInterrupted()
+    if (!resolved.ok) {
+      timingDiagnostics.responseFailure({ result: resolved, eventTimeStamp, trialIndex })
+      markInterrupted()
+    }
     if (responsePerfMs == null) return
 
     const rtMs = Math.round(Math.max(0, responsePerfMs - stimulusOnsetRef.current.perfMs))
     setSub('feedback')
     void submit(rtMs, inputMode)
-  }, [phase, trialIndex, total, sub, markInterrupted, submit])
+  }, [phase, trialIndex, total, sub, timingDiagnostics, markInterrupted, submit])
 
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total) return
@@ -249,6 +267,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
 
   const handlePointerCancel = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (!event.isPrimary) return
+    timingDiagnostics.pointerCancelled(performance.now(), trialIndex)
     markInterrupted()
   }
 
