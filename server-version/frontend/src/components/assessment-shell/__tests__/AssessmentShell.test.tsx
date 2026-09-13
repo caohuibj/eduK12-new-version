@@ -23,6 +23,19 @@ describe('AssessmentShell presentation contract', () => {
     expect(screen.getByRole('group', { name: '领域内容' })).toBeInTheDocument()
   })
 
+  it('supports real positional progress without confusing it with completion count', () => {
+    render(
+      <AssessmentShell title="分段问卷" progress={{ kind: 'position', current: 2, total: 5, label: '区段位置' }}>
+        <div>section</div>
+      </AssessmentShell>,
+    )
+
+    const progress = screen.getByRole('progressbar', { name: '区段位置' })
+    expect(progress).toHaveAttribute('aria-valuenow', '2')
+    expect(progress).toHaveAttribute('aria-valuemax', '5')
+    expect(screen.getByText('第 2 / 5')).toBeInTheDocument()
+  })
+
   it('does not invent a percentage for phase or open-path progress', () => {
     const { rerender } = render(
       <AssessmentShell title="认知任务" progress={{ kind: 'phase', phase: '练习阶段', detail: '完成后进入正式任务' }}>
@@ -55,21 +68,22 @@ describe('AssessmentShell presentation contract', () => {
       </AssessmentShell>,
     )
 
-    expect(screen.getByRole('status')).toHaveTextContent('正在准备交互')
-    expect(screen.getAllByText(/正在/).length).toBeGreaterThan(1)
+    expect(screen.getAllByRole('status')).toHaveLength(2)
+    expect(screen.getByText('正在准备交互')).toBeInTheDocument()
+    expect(screen.getByText('正在保存到本机')).toBeInTheDocument()
 
     rerender(
       <AssessmentShell
         title="任务"
         recoveryState={{ state: 'blocked', message: '需要先核对服务器终态' }}
-        submissionStatus={{ state: 'pending', message: '保持同一 submissionId' }}
+        submissionStatus={{ state: 'pending', title: '提交内容已封存', message: '保持同一 submissionId' }}
       >
         <div>content</div>
       </AssessmentShell>,
     )
 
     expect(screen.getByText('需要处理恢复状态')).toBeInTheDocument()
-    expect(screen.getByText('提交状态尚未确认')).toBeInTheDocument()
+    expect(screen.getByText('提交内容已封存')).toBeInTheDocument()
     expect(screen.getByText('保持同一 submissionId')).toBeInTheDocument()
   })
 })
