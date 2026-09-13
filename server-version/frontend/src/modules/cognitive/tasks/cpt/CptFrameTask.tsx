@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { cptSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
@@ -26,7 +27,7 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
-  const onsetRef = useRef<number | null>(null)
+  const onsetRef = useRef<CognitiveTimingOnset | null>(null)
   const respondedRef = useRef(false)
   const interruptedRef = useRef(false)
   const practiceCorrectRef = useRef(0)
@@ -105,8 +106,14 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     }
 
     const present = (onsetPerfMs: number) => {
+      const captured = captureFrameTimingOnset(onsetPerfMs)
+      if (captured.ok) {
+        onsetRef.current = captured.onset
+      } else {
+        interruptedRef.current = true
+        onsetRef.current = null
+      }
       setVisible(true)
-      onsetRef.current = onsetPerfMs
       hideTimerId = window.setTimeout(() => { void finishStimulus() }, stimulusMs)
     }
 
@@ -132,10 +139,15 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     ? sequence[trialIndex]
     : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
 
-  const respond = async () => {
+  const respond = async (eventTimeStamp: number) => {
     if (!visible || respondedRef.current || onsetRef.current == null) return
+    const resolved = resolveEventResponseTimestamp(eventTimeStamp, onsetRef.current)
+    const responsePerfMs = resolved.ok ? resolved.responsePerfMs : resolved.fallbackPerfMs
+    if (!resolved.ok) interruptedRef.current = true
+    if (responsePerfMs == null) return
+
     respondedRef.current = true
-    const rtMs = Math.round(performance.now() - onsetRef.current)
+    const rtMs = Math.round(Math.max(0, responsePerfMs - onsetRef.current.perfMs))
     if (phase !== 'formal') return
     await onTrialComplete({
       blockIndex: current.blockIndex,
@@ -145,6 +157,22 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       rtMs,
       interrupted: interruptedRef.current,
     })
+  }
+
+  const pointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary) return
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    void respond(event.timeStamp)
+  }
+
+  const pointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary) return
+    interruptedRef.current = true
+  }
+
+  const keyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.repeat) return
+    void respond(event.timeStamp)
   }
 
   if (phase === 'instruction') {
@@ -173,7 +201,14 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   }
 
   return (
-    <div className="text-center p-8" onClick={() => { void respond() }} onKeyDown={() => { void respond() }} role="button" tabIndex={0}>
+    <div
+      className="text-center p-8"
+      onPointerDown={pointerDown}
+      onPointerCancel={pointerCancel}
+      onKeyDown={keyDown}
+      role="button"
+      tabIndex={0}
+    >
       <p className="text-sm text-gray-500 mb-2">
         {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}
       </p>
