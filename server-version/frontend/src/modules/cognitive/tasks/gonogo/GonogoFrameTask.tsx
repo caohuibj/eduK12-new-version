@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { createTaskTimingDiagnostics } from '../../core/task-timing-diagnostics'
 import { gonogoSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 
@@ -21,6 +22,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     () => gonogoSequence(taskContext.randomSeed, total, config.nogoRatio ?? 0.25),
     [taskContext.randomSeed, total, config.nogoRatio],
   )
+  const [timingDiagnostics] = useState(createTaskTimingDiagnostics)
   const [phase, setPhase] = useState<Phase>('instruction')
   const [visible, setVisible] = useState(false)
   const [practiceIndex, setPracticeIndex] = useState(0)
@@ -55,10 +57,25 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   }
 
   useEffect(() => {
-    const onHidden = () => { if (document.hidden) interruptedRef.current = true }
+    const onHidden = () => {
+      if (!document.hidden) return
+      interruptedRef.current = true
+      if (phase === 'formal' && trialIndex < total) {
+        timingDiagnostics.visibilityLost(performance.now(), trialIndex)
+      }
+    }
+    const onBlur = () => {
+      if (phase === 'formal' && trialIndex < total) {
+        timingDiagnostics.focusLost(performance.now(), trialIndex)
+      }
+    }
     document.addEventListener('visibilitychange', onHidden)
-    return () => document.removeEventListener('visibilitychange', onHidden)
-  }, [])
+    window.addEventListener('blur', onBlur)
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden)
+      window.removeEventListener('blur', onBlur)
+    }
+  }, [phase, trialIndex, total, timingDiagnostics])
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
@@ -114,12 +131,18 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     }
 
     const show = window.setTimeout(() => {
+      const eligiblePerfMs = performance.now()
       if (typeof window.requestAnimationFrame !== 'function') {
         interruptedRef.current = true
         present(performance.now())
         return
       }
-      animationFrameId = window.requestAnimationFrame((framePerfMs) => present(framePerfMs))
+      animationFrameId = window.requestAnimationFrame((framePerfMs) => {
+        if (phase === 'formal') {
+          timingDiagnostics.frameCallback({ eligiblePerfMs, framePerfMs, trialIndex })
+        }
+        present(framePerfMs)
+      })
     }, isiMs)
 
     return () => {
@@ -129,7 +152,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
         window.cancelAnimationFrame(animationFrameId)
       }
     }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete])
+  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete, timingDiagnostics])
 
   const trialType = phase === 'formal' ? sequence[trialIndex] : (practiceIndex % 2 === 0 ? 'go' : 'nogo')
 
@@ -140,7 +163,12 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
     const resolved = resolveEventResponseTimestamp(event.timeStamp, onsetRef.current)
     const responsePerfMs = resolved.ok ? resolved.responsePerfMs : resolved.fallbackPerfMs
-    if (!resolved.ok) interruptedRef.current = true
+    if (!resolved.ok) {
+      interruptedRef.current = true
+      if (phase === 'formal') {
+        timingDiagnostics.responseFailure({ result: resolved, eventTimeStamp: event.timeStamp, trialIndex })
+      }
+    }
     if (responsePerfMs == null) return
 
     respondedRef.current = true
@@ -157,6 +185,9 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const cancelPointer = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (!event.isPrimary) return
     interruptedRef.current = true
+    if (phase === 'formal') {
+      timingDiagnostics.pointerCancelled(performance.now(), trialIndex)
+    }
   }
 
   if (phase === 'instruction') {
