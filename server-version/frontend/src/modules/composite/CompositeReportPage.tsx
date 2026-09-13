@@ -8,6 +8,7 @@ import CompositePackageReport from './CompositePackageReport'
 import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
 import type { CognitiveSingleTaskReport } from '../cognitive/types'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
+import SituationalReportCard, { type SituationalReportView } from '../reporting/SituationalReportCard'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 type LegacyCompositeModule = Record<string, unknown> & {
@@ -122,9 +123,6 @@ const CompositeReportPage: React.FC = () => {
     setExportingFormat(format)
     setSnapshotError(null)
     try {
-      // A default teacher/admin report includes the completion Snapshot ID;
-      // using it here keeps the downloaded file on the same frozen version as
-      // the screen. An explicitly selected history ID wins over the default.
       const snapshotId = selectedSnapshotId || report.packageReport.snapshotId
       const download = await compositeApi.downloadAnalysisExport(id, attemptId, format, snapshotId)
       const objectUrl = URL.createObjectURL(download.blob)
@@ -204,6 +202,7 @@ const CompositeReportPage: React.FC = () => {
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} />
                   : <p className="text-gray-500">该认知任务尚未完成或没有可展示的单任务报告。</p>
               )}
+              {module.type === 'SITUATIONAL' && <SituationalReportCard report={module as SituationalReportView} />}
             </>
           )}
         </div>
