@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { ArrowLeft } from 'lucide-react'
+import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { ScaleResultV2, ScaleUnitReport } from '../../modules/reporting/types'
 
@@ -45,80 +45,80 @@ export const toScaleUnitReport = (value: Assessment): ScaleUnitReport => {
   }
 }
 
+const formatTime = (ms: number) => {
+  const minutes = Math.floor(ms / 60000)
+  const seconds = Math.floor((ms % 60000) / 1000)
+  return `${minutes}分${seconds}秒`
+}
+
 const ScaleResult: React.FC = () => {
   const { assessmentId } = useParams<{ assessmentId: string }>()
   const navigate = useNavigate()
-  
   const [loading, setLoading] = useState(true)
   const [assessment, setAssessment] = useState<Assessment | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchResult()
+    let cancelled = false
+    const fetchResult = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await apiClient.get<Assessment>(`/scales/assessments/${assessmentId}`)
+        if (cancelled) return
+        if (response.code === 0 && response.data) {
+          setAssessment(response.data)
+        } else {
+          setAssessment(null)
+          setError(response.message || '测评结果不存在或不可访问')
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setAssessment(null)
+          setError((err as { message?: string }).message || '报告读取失败')
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void fetchResult()
+    return () => { cancelled = true }
   }, [assessmentId])
 
-  const fetchResult = async () => {
-    try {
-      const response = await apiClient.get<Assessment>(`/scales/assessments/${assessmentId}`)
-      if (response.code === 0 && response.data) {
-        setAssessment(response.data)
-      }
-    } catch (err) {
-      console.error('获取测评结果失败', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const formatTime = (ms: number) => {
-    const minutes = Math.floor(ms / 60000)
-    const seconds = Math.floor((ms % 60000) / 1000)
-    return `${minutes}分${seconds}秒`
-  }
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    )
+    return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
   }
 
   if (!assessment) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">测评结果不存在</p>
-        <Link to="/student/scales" className="text-primary mt-4 inline-block">
-          返回量表列表
-        </Link>
-      </div>
+      <ReportShell
+        title="量表报告"
+        description="无法读取当前结果记录。"
+        status={{ kind: 'error', title: '报告暂时无法打开', description: error || '测评结果不存在或不可访问' }}
+        actions={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+      />
     )
   }
 
-  return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <button
-          onClick={() => navigate('/student/scales')}
-          className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          返回列表
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">{assessment.scale.name}</h1>
-        <p className="text-gray-600 mt-1">测评报告</p>
-      </div>
+  const facts = [
+    ...(assessment.completedAt ? [{ label: '完成时间', value: new Date(assessment.completedAt).toLocaleString('zh-CN') }] : []),
+    ...(assessment.totalTime != null ? [{ label: '用时', value: formatTime(assessment.totalTime) }] : []),
+  ]
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
-          {assessment.completedAt && <span>完成时间: {new Date(assessment.completedAt).toLocaleString('zh-CN')}</span>}
-          {assessment.totalTime != null && <span>用时: {formatTime(assessment.totalTime)}</span>}
-        </div>
-      </div>
-      <div className="bg-white rounded-lg shadow p-6">
+  return (
+    <ReportShell
+      title={assessment.scale.name}
+      description="测评报告"
+      facts={facts}
+      status={{ kind: 'success', title: '已提交', description: '以下内容来自当前已完成结果记录。' }}
+      backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+    >
+      <section className="card p-6" aria-labelledby="scale-report-detail-heading">
+        <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
         <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
-      </div>
-    </div>
+      </section>
+    </ReportShell>
   )
 }
 
