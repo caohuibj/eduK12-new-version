@@ -91,16 +91,20 @@ const SituationalResult: React.FC = () => {
       title="情境化测评报告"
       description="以下内容来自本次已完成 attempt 的冻结工具与权威结果。"
       facts={facts}
-      status={{ kind: 'success', title: '已提交', description: `数据质量：${result.quality.status}` }}
-      backAction={<Link to="/student/situational/history" className="btn-secondary">返回测评历史</Link>}
+      status={{
+        kind: 'success',
+        title: '测评已完成',
+        description: <><span>已提交</span> · 数据质量：{result.quality.status}</>,
+      }}
+      backAction={<Link to="/student/situational/history" aria-label="测评历史" className="btn-secondary">返回测评历史</Link>}
       limitations={[
         ...data.instrument.report.limitations,
         '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
       ]}
       actions={
         <>
-          <button type="button" onClick={() => downloadSituationalExport(data, 'json')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 JSON</button>
-          <button type="button" onClick={() => downloadSituationalExport(data, 'csv')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 CSV</button>
+          <button type="button" aria-label="JSON" onClick={() => downloadSituationalExport(data, 'json')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 JSON</button>
+          <button type="button" aria-label="CSV" onClick={() => downloadSituationalExport(data, 'csv')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 CSV</button>
           <Link to="/student/situational" className="btn-primary">返回题包</Link>
         </>
       }
