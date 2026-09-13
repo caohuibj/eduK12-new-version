@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { COGNITIVE_SOFTWARE_TIMING_POLICY_V1 } from '../core/timing'
 import { resolveRunner } from '../registry'
 import { deterministicForeperiod } from '../tasks/reaction/prng'
 
@@ -77,7 +76,6 @@ const enterReactionFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) =>
     foreperiodMaxMs: 1500,
     timeoutMs: 2000,
     readyDurationMs: 1000,
-    timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
     report: { reportVersion: '1.0.0', referenceMode: 'simulated' as const },
   }
   render(
@@ -87,7 +85,7 @@ const enterReactionFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) =>
         testType: 'reaction',
         engineVersion: '1.0.0',
         scoringVersion: '1.1.0',
-        configVersion: '1.1.0',
+        configVersion: '1.2.0',
         attemptNo: 1,
         config,
         randomSeed: 'seed-frame-input',
@@ -172,7 +170,7 @@ describe('FE-07B direct input timestamps', () => {
           testType: 'cpt',
           engineVersion: '1.0.0',
           scoringVersion: '1.0.0',
-          configVersion: '1.0.0',
+          configVersion: '1.1.0',
           attemptNo: 1,
           randomSeed: 'seed-1',
           config: {
@@ -181,7 +179,6 @@ describe('FE-07B direct input timestamps', () => {
             blockCount: 1,
             stimulusMs: 500,
             isiMs: 20,
-            timingPolicyVersion: COGNITIVE_SOFTWARE_TIMING_POLICY_V1,
           },
         }}
         trialIndex={0}
@@ -203,8 +200,7 @@ describe('FE-07B direct input timestamps', () => {
       act(() => vi.advanceTimersByTime(500 + 600))
     }
 
-    const startFormal = screen.queryByText('开始正式测验')
-    if (!startFormal) return
+    const startFormal = screen.getByText('开始正式测验')
     fireEvent.click(startFormal)
     act(() => vi.advanceTimersByTime(20))
     flushFrame(6000)
