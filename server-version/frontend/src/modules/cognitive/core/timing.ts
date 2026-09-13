@@ -29,6 +29,7 @@ export const DEFAULT_TIMING_DIAGNOSTIC_CAPACITY = 64
 export const MAX_TIMING_DIAGNOSTIC_CAPACITY = 128
 export const EVENT_TIMESTAMP_FUTURE_TOLERANCE_MS = 8
 export const TIME_ORIGIN_EQUALITY_TOLERANCE_MS = 0.5
+export const COGNITIVE_SOFTWARE_TIMING_POLICY_V1 = 'software-frame-v1' as const
 
 const defaultPerformanceSource = (): TimingPerformanceSource | null => {
   if (typeof performance === 'undefined') return null
@@ -36,6 +37,16 @@ const defaultPerformanceSource = (): TimingPerformanceSource | null => {
 }
 
 const isFiniteNonNegative = (value: number): boolean => Number.isFinite(value) && value >= 0
+
+/**
+ * Existing frozen configs do not contain timingPolicyVersion. FE-07B timing is
+ * therefore opt-in only: absence, typo, or a future unknown value remains on
+ * the legacy task path instead of hot-switching historical administrations.
+ */
+export const usesSoftwareFrameTiming = (config: unknown): boolean => {
+  if (!config || typeof config !== 'object') return false
+  return (config as Record<string, unknown>).timingPolicyVersion === COGNITIVE_SOFTWARE_TIMING_POLICY_V1
+}
 
 /**
  * Capture the current document's monotonic clock and its epoch anchor.
