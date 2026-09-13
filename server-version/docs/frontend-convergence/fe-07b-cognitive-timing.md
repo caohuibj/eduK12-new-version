@@ -4,132 +4,202 @@ Base: `main@1fcfbb1d684ffb6e1b3834669ef93e84e77ed45b` (PR #104 / FE-06 merged).
 
 ## Goal
 
-Improve auditable software timing only for an explicitly scoped Pilot subset. FE-07B does **not** claim hardware calibration, photon-onset measurement, cross-device equivalence, or Research Grade timing. Existing frozen sessions keep their existing engine/protocol behavior; timing changes are admitted only for new sessions under an exact reviewed identity.
+Improve auditable **software timing** for an explicitly scoped Pilot subset without making claims the browser cannot support. FE-07B does **not** claim hardware calibration, photon-onset measurement, cross-device equivalence, device-latency correction, or Research Grade timing.
 
-## C1 — Pilot scope and timing baseline
+The implementation is deliberately frozen-identity gated. Existing sessions keep their existing engine/config behavior; new timing behavior is admitted only for exact reviewed `testType + engineVersion + configVersion` identities.
 
-### Pilot task slice
+## Pilot task slice
 
-The first FE-07B timing slice is deliberately limited to three currently published, non-adaptive timed-response tasks:
+The first timing slice remains limited to three published, non-adaptive timed-response task families:
 
-| task | engine | config | scoring | definition/profile | current publication fact | FE-07B scope |
-|---|---|---|---|---|---|---|
-| `reaction` | `1.0.0` | `1.1.0` | `1.1.0` | `1.1.0` | published/recommended current definition | in scope |
-| `gonogo` | `1.0.0` | `1.0.0` | `1.0.0` | `1.0.0` | published/recommended current definition | in scope |
-| `cpt` | `1.0.0` | `1.0.0` | `1.0.0` | `1.0.0` | published/recommended current definition | in scope |
+- `reaction`;
+- `gonogo`;
+- `cpt`.
 
-Why these three:
+Adaptive/staircase/span/learning/staged tasks remain deferred, including `sst`, `nback`, `corsi`, `memory`, `stroop`, and `taskswitch`. Draft library tasks are also outside this first timing slice.
 
-- all three are already in the current published v2 set and scoring-golden/release coverage;
-- they are timed-response tasks without adaptive staircase/span/learning state, reducing the chance that a timing patch changes task semantics beyond onset/input capture;
-- all three currently expose the same class of software-reference weakness: timer callback changes React-visible stimulus state and immediately records `performance.now()`, while the response path does not use the event timestamp as its RT endpoint;
-- they provide a useful minimum input surface: Reaction already distinguishes keyboard vs pointer in payload; CPT accepts click/keyboard on the task root; Go/No-Go currently accepts click only.
+There is no category-wide switch and no universal Cognitive timing engine.
 
-### Explicitly deferred tasks
+## Frozen identity admission
 
-FE-07B does not automatically migrate every published Cognitive task.
+The existing published configurations remain legacy timing identities:
 
-- `sst`, `nback`, `corsi`, `memory`: adaptive/staircase/span state; timing changes require separate task-level review.
-- `stroop`, `taskswitch`: staged/practice/formal subphase semantics; defer until the initial timing primitive is proven.
-- DRAFT tasks such as lexical decision/emotion recognition and other library candidates are outside the first Pilot timing release even if they are RT-sensitive.
+| task | legacy engine | legacy config | scorer | behavior after FE-07B |
+|---|---:|---:|---:|---|
+| `reaction` | `1.0.0` | `1.1.0` | `1.1.0` | unchanged legacy task path |
+| `gonogo` | `1.0.0` | `1.0.0` | `1.0.0` | unchanged legacy task path |
+| `cpt` | `1.0.0` | `1.0.0` | `1.0.0` | unchanged legacy task path |
 
-Adding another task requires an explicit support-matrix update and exact-version review; there is no category-wide opt-in.
+FE-07B adds separate timing-pilot configuration identities:
 
-## Current source baseline
+| task | engine | timing-pilot config | scorer | seed status |
+|---|---:|---:|---:|---|
+| `reaction` | `1.0.0` | `1.2.0` | `1.1.0` | `DRAFT` |
+| `gonogo` | `1.0.0` | `1.1.0` | `1.0.0` | `DRAFT` |
+| `cpt` | `1.0.0` | `1.1.0` | `1.0.0` | `DRAFT` |
+
+The config JSON itself stays within the existing strict task schema. No hidden timing field is inserted into the task configuration. The new `configVersion` is the frozen admission identity. This preserves scorer/config contracts while preventing a frontend deployment from hot-switching an already frozen session.
+
+The timing-pilot seed rows are intentionally `DRAFT`. Merging FE-07B therefore does not by itself publish the new timing behavior. Promotion to a participant-facing published config remains a separate release decision after device evidence is reviewed.
+
+## Baseline weakness being addressed
 
 ### Reaction
 
-Current formal onset path:
-
-1. `setTimeout(foreperiodMs)` fires;
-2. `setSub('green')` schedules the visible React state;
-3. `setStimulusOnset(performance.now())` runs immediately in the same timer callback.
-
-Current response path:
-
-- pointer uses React `onClick`, then samples a new `performance.now()`;
-- keyboard uses a window `keydown` listener, but ignores `event.timeStamp` and does not currently filter `event.repeat`;
-- premature responses reset the trial waiting subphase;
-- timeout remains scheduled with `setTimeout`.
-
-Therefore current `rtMs` is a useful existing behavioral value but is **not** evidence that the recorded start equals the first painted stimulus frame or that the endpoint equals the browser event timestamp.
+Legacy formal onset is `setTimeout(foreperiodMs) -> setSub('green') -> performance.now()` in the same timer callback. Legacy pointer input uses click-time `performance.now()`, and keyboard input ignores `event.timeStamp` and repeat.
 
 ### Go/No-Go
 
-Current onset path is `setTimeout(isiMs) -> setVisible(true) -> onsetRef = performance.now()`.
-
-Current response path is a React `onClick` button handler that samples `performance.now() - onsetRef`. There is no task-level keyboard event capture or event-timestamp endpoint in the current component.
+Legacy onset is `setTimeout(isiMs) -> setVisible(true) -> performance.now()`. Response is click-based and samples a new `performance.now()`.
 
 ### CPT
 
-Current onset path is also `setTimeout(isiMs) -> setVisible(true) -> onsetRef = performance.now()`.
+Legacy onset is also timer callback state change followed by `performance.now()`. Root click/key handlers share a response function that samples `performance.now()` instead of the browser event timestamp.
 
-The task root currently handles both React `onClick` and `onKeyDown`, but both call the same `respond()` function, which samples `performance.now()`. It does not use `event.timeStamp`, does not distinguish keyboard/pointer/touch in the trial payload, and does not filter key repeat.
+These values are useful behavioral timing values, but the legacy start reference is not evidence of a frame-boundary software onset and the endpoint is not browser-event timestamp based.
 
 ## Envelope / payload contract gate
 
-`frontend/core/trial-envelope.ts` is currently a transport wrapper, not an independent timing telemetry source. It derives `durationMs` from task payload fields such as `rtMs`, samples an envelope end time, then computes `startedAtPerfMs = endedAtPerfMs - durationMs`. That derived start must **not** be described as stimulus onset in FE-07B evidence.
+`frontend/core/trial-envelope.ts` remains transport metadata, not independent stimulus-onset telemetry. Its derived `startedAtPerfMs` must not be described as an observed stimulus onset.
 
-The backend TrialEnvelope schema is strict for envelope fields. The three selected task payload schemas are also strict:
+The three task payload schemas remain unchanged and strict:
 
-- Reaction: `foreperiodMs`, `rtMs`, `prematureCount`, `interrupted`, `inputMode` only;
-- Go/No-Go: `trialType`, `responded`, `rtMs`, `interrupted` only;
-- CPT: `blockIndex`, `stimulus`, `isTarget`, `responded`, `rtMs`, `interrupted` only.
+- Reaction: `foreperiodMs`, `rtMs`, `prematureCount`, `interrupted`, `inputMode`;
+- Go/No-Go: `trialType`, `responded`, `rtMs`, `interrupted`;
+- CPT: `blockIndex`, `stimulus`, `isTarget`, `responded`, `rtMs`, `interrupted`.
 
-Consequences for this PR:
+FE-07B adds no per-trial diagnostics API, no diagnostics payload extension, no timing heartbeat, and no server-side RT correction.
 
-1. frame/event/focus/visibility diagnostics remain local diagnostic records unless a compatible existing field is proven;
-2. do not add arbitrary timing metadata into strict trial payloads;
-3. do not add a per-trial diagnostics API;
-4. if server persistence of new metadata becomes necessary, open a separate BE-C1 contract PR; any accepted metadata may travel only with the existing unit FINAL budget;
-5. no automatic RT correction is derived from diagnostics.
+## C2 — Clock and time-origin contract
 
-## Timing reference contract for C2–C5
+The shared timing primitive now:
 
-FE-07B may introduce a task-local timing helper, but not a global device engine.
+- uses only the current document `performance` monotonic domain;
+- captures and validates `performance.timeOrigin`;
+- rejects unavailable or invalid monotonic clock values instead of falling back to `Date.now()`;
+- validates browser event timestamps against the current monotonic domain;
+- rejects epoch-like/future timestamps instead of silently rebasing them;
+- fails closed if a response sample no longer matches the onset document time origin.
 
-The target software contract is:
+An invalid event timestamp may use the current monotonic `performance.now()` only as a usability fallback. That response is quality-degraded (`interrupted=true`); the fallback is not described as calibrated correction.
 
-- scheduler wait (`setTimeout`) may decide when a presentation attempt becomes eligible;
-- task-owned presentation then crosses an explicit frame boundary before recording its software onset reference;
-- onset reference and response event timestamp must be comparable within the same document time origin;
-- direct response collection uses task-owned `pointerdown` / `keydown` where appropriate, with repeat, multitouch and cancellation handling;
-- one physical/logical user response produces at most one accepted trial response;
-- timeout is computed relative to the adopted software onset reference;
-- visibility/focus/frame diagnostics are evidence/quality context only and never silently subtract latency from `rtMs`.
+## C3 — Software frame onset
 
-`requestAnimationFrame` is still a software scheduling/paint-adjacent reference. It is not a claim about display scan-out or photon onset, and React state changes inside an rAF callback are not automatically proof that the DOM became visible in that same frame. Each task must use an explicit task-owned presentation sequence and browser/device experiments.
+For the exact timing-pilot identities only:
 
-## Planned review slices
+1. the existing `setTimeout` wait decides when presentation is eligible;
+2. the task requests an animation frame;
+3. the rAF callback timestamp becomes the software onset candidate after same-domain validation;
+4. stimulus duration/response timeout is scheduled relative to that adopted onset path.
 
-- **C2** — task-local clock/time-origin validation and bounded local diagnostics primitive.
-- **C3** — frame-synchronized software onset path for `reaction`, `gonogo`, `cpt` only.
-- **C4** — direct `pointerdown` / `keydown` response capture, event timestamp validation, repeat/multitouch/cancel handling.
-- **C5** — bounded frame/event/focus/visibility diagnostics; no RT correction and no server per-trial writes.
-- **C6** — real-device/load experiments plus trial order/count/timeout/correctness/scoring-golden regression and final support matrix.
+`requestAnimationFrame` is only a software frame-boundary / paint-adjacent reference. It does not prove DOM commit in the same frame, display scan-out, or photon onset.
 
-## Initial support matrix
+Legacy task components remain the default path for old config identities.
 
-| task | desktop keyboard | desktop pointer | tablet touch | tablet + keyboard | current timing status | candidate release status |
+## C4 — Direct response capture
+
+### Reaction
+
+Timing-pilot Reaction uses task-owned:
+
+- `pointerdown` for pointer/touch;
+- window `keydown` for keyboard;
+- `event.timeStamp` as the preferred endpoint;
+- keyboard repeat rejection;
+- primary-pointer filtering;
+- non-left mouse button rejection;
+- pointer cancellation handling;
+- existing duplicate-response guard.
+
+The existing Reaction `inputMode` field distinguishes `touch`, `pointer`, and `keyboard`; no new payload field is added.
+
+### Go/No-Go
+
+Timing-pilot Go/No-Go uses direct `pointerdown` with event-timestamp validation. FE-07B deliberately does **not** add a keyboard response mode because the current task contract did not define one.
+
+### CPT
+
+Timing-pilot CPT uses direct `pointerdown` and `keydown` with event-timestamp validation. Keyboard repeat, non-primary pointers, and non-left mouse buttons are ignored. The strict CPT payload remains unchanged and therefore does not add input-modality metadata.
+
+One physical/logical accepted response still produces at most one accepted trial response.
+
+## C5 — Bounded local diagnostics
+
+Timing diagnostics are task-local, memory-only, and fixed-capacity. The ring buffer defaults to 64 records and hard-caps capacity at 128.
+
+The closed diagnostic code set covers:
+
+- frame callback delay (`eligible -> rAF callback`);
+- unavailable clock;
+- changed time origin;
+- rejected event timestamp;
+- visibility loss;
+- focus loss;
+- pointer cancellation.
+
+The three timing-pilot tasks record formal-trial frame/event/focus/visibility/cancel context into this local buffer. Diagnostics have no persistence/network/export API and disappear when the mounted task is discarded.
+
+Diagnostics are observational only. They never subtract frame delay, event age, dispatch latency, touch latency, or estimated device latency from `rtMs`.
+
+## C6 — Regression evidence and release gate
+
+### Automated evidence included in this PR
+
+The implementation includes automated coverage for:
+
+- exact frozen identity admission and legacy fail-closed routing;
+- monotonic clock/time-origin validation;
+- event timestamp acceptance/rejection;
+- frame-boundary onset behavior for the three Pilot tasks;
+- direct touch/pointer/keyboard timestamp handling where the task contract supports it;
+- repeat and pointer filtering;
+- strict payload shape preservation;
+- bounded diagnostics behavior;
+- legacy task path preservation for prior config versions.
+
+Normal repository CI remains the authority for lint, typecheck, full frontend/backend regressions, build, security checks, browser acceptance, and Docker build gates on the final candidate head.
+
+### Real-device evidence status
+
+FE-07B source code does **not** include evidence sufficient to claim hardware/device equivalence. Real-device runs under representative desktop, tablet/touch, and external-keyboard conditions are still a **publication gate** for the new DRAFT timing-pilot configs.
+
+Recommended publication evidence should characterize, not auto-correct:
+
+- rAF callback delay distribution under idle and UI/CPU load;
+- accepted event timestamp age and rejection rate;
+- visibility/focus/cancel incidence;
+- trial count/order/timeout invariants;
+- scorer-golden equivalence for identical raw task payload semantics;
+- touch, mouse, trackpad, and supported keyboard paths on representative devices/browsers.
+
+Failure to obtain stable evidence should keep the new configs DRAFT or `LIMITED`; it must not trigger an automatic latency-correction model.
+
+## Final software support matrix
+
+| task / timing config | desktop keyboard | desktop pointer | tablet touch | tablet + keyboard | software timing evidence | release status |
 |---|---|---|---|---|---|---|
-| reaction | existing | existing | click compatibility, not direct touch timestamp | existing keyboard path | baseline only | `LIMITED` until C3–C6 evidence |
-| gonogo | no dedicated keyboard task path | existing click | click compatibility, not direct touch timestamp | not proven | baseline only | `LIMITED` until C3–C6 evidence |
-| cpt | existing root keydown | existing root click | click compatibility, not direct touch timestamp | existing root keydown | baseline only | `LIMITED` until C3–C6 evidence |
+| Reaction `1.2.0` | direct `keydown`, repeat filtered, event timestamp | direct primary `pointerdown`, event timestamp | direct primary touch `pointerdown`, `inputMode=touch` | same keyboard path when browser exposes it | frame-onset + same-origin event endpoint implemented/tested | `LIMITED`, DRAFT until device evidence |
+| Go/No-Go `1.1.0` | not added by FE-07B | direct primary `pointerdown`, event timestamp | direct primary touch `pointerdown` | no dedicated keyboard response contract | frame-onset + pointer endpoint implemented/tested | `LIMITED`, DRAFT until device evidence |
+| CPT `1.1.0` | direct root `keydown`, repeat filtered, event timestamp | direct primary root `pointerdown`, event timestamp | direct primary touch `pointerdown` | same root keyboard path when browser exposes it | frame-onset + pointer/keyboard endpoint implemented/tested | `LIMITED`, DRAFT until device evidence |
 
-`LIMITED` here is an evidence status, not a scorer change and not a hardware diagnosis. No task becomes Research Grade through FE-07B alone.
+`LIMITED` is an evidence status, not a diagnosis, scorer change, or hardware-quality classification. No task becomes Research Grade through FE-07B alone.
 
-## Non-goals / invariants
+## Invariants preserved
 
-FE-07B must preserve:
+FE-07B preserves:
 
-- ONE UNIT / ONE FINAL and zero per-trial server writes during FINAL_ONLY administration;
-- task payload/scoring semantics unless an exact new protocol identity is separately approved;
-- authoritative server scorer and CanonicalUnitResult behavior;
+- ONE UNIT / ONE FINAL;
+- zero per-trial server writes during FINAL_ONLY administration;
+- authoritative server scoring and CanonicalUnitResult behavior;
+- strict task payload schemas;
+- old frozen config identities and legacy task paths;
 - FE-07A fail-closed resume behavior;
-- existing frozen sessions and drafts without hot-switching their timing policy;
-- no global hardware/device fingerprinting or latency correction engine;
-- no persistence work in the timed stimulus hot path beyond the already approved trial-boundary behavior.
+- no global hardware/device fingerprinting;
+- no automatic device-latency correction;
+- no persistence work added to the timed stimulus hot path.
 
-## C1 exit criteria
+## Merge vs publication
 
-C1 is complete when this scope is reviewed as the source of truth for FE-07B implementation. C1 intentionally changes **no task timing behavior** and therefore cannot be cited as timing improvement evidence. Exact-head CI for later behavior commits must be rerun on the final candidate; historical green runs do not validate new timing behavior.
+The code change is safe to merge once the final exact-head CI is green because the new timing-pilot configuration rows are seeded as `DRAFT`. Merge therefore installs a versioned capability without silently changing existing sessions or publishing it to normal participants.
+
+Publishing Reaction `1.2.0`, Go/No-Go `1.1.0`, or CPT `1.1.0` is a separate decision and should require the real-device evidence described above.
