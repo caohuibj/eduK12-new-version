@@ -10,6 +10,7 @@ export interface TaskTimingDiagnostics {
   frameCallback: (input: { eligiblePerfMs: number; framePerfMs: number; trialIndex: number }) => void
   responseFailure: (input: {
     result: Exclude<CognitiveResponseTimestampResult, { ok: true }>
+    eventTimeStamp: number
     trialIndex: number
   }) => void
   visibilityLost: (atPerfMs: number, trialIndex: number) => void
@@ -42,6 +43,9 @@ export const createTaskTimingDiagnostics = (): TaskTimingDiagnostics => {
       })
     },
     responseFailure({ result, trialIndex }) {
+      // Rejected DOM timestamps can be epoch-like or otherwise outside the
+      // current monotonic domain. Record only the already-validated monotonic
+      // fallback; when the clock itself is unavailable this remains null.
       buffer.record({
         code: responseFailureCode(result.reason),
         atPerfMs: result.fallbackPerfMs,
