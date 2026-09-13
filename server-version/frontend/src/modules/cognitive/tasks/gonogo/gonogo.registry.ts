@@ -6,7 +6,7 @@ import { GonogoFrameTask } from './GonogoFrameTask'
 import { GonogoTask } from './GonogoTask'
 
 const GonogoRunner = (props: CognitiveTaskProps) => createElement(
-  usesSoftwareFrameTiming(props.taskContext.config) ? GonogoFrameTask : GonogoTask,
+  usesSoftwareFrameTiming(props.taskContext) ? GonogoFrameTask : GonogoTask,
   props,
 )
 
