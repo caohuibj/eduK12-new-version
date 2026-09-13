@@ -1,14 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import QuestionnaireResult from '../../../pages/student/QuestionnaireResult'
 import PublicQuestionnaireResult from '../../../pages/public/PublicQuestionnaireResult'
 
-const { mockClient } = vi.hoisted(() => ({
+const { mockClient, mockResumeToken } = vi.hoisted(() => ({
   mockClient: { get: vi.fn() },
+  mockResumeToken: vi.fn(),
 }))
 
 vi.mock('../../../api/client', () => ({ default: mockClient }))
+vi.mock('../../../utils/questionnaireResume', () => ({
+  readQuestionnaireResumeToken: mockResumeToken,
+}))
 
 const report = {
   questionnaireId: 'questionnaire-1',
@@ -42,6 +46,7 @@ const report = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockResumeToken.mockReturnValue('resume-capability')
   mockClient.get.mockResolvedValue({ code: 0, data: report })
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     ok: true,
@@ -50,25 +55,49 @@ beforeEach(() => {
   }))
 })
 
+const renderPublicResult = (entry: string) => render(
+  <MemoryRouter initialEntries={[entry]}>
+    <Routes>
+      <Route path="/public/questionnaire/:token/result" element={<PublicQuestionnaireResult />} />
+      <Route path="/public/questionnaire/:token" element={<div>QUESTIONNAIRE_ENTRY</div>} />
+    </Routes>
+  </MemoryRouter>,
+)
+
 describe('Questionnaire Scale report UI matrix', () => {
   it('renders the shared DTO without aggregate/overall semantics in authenticated and public pages', async () => {
     const authenticated = render(
       <MemoryRouter initialEntries={['/student/questionnaires/assessment-1/result']}>
         <QuestionnaireResult />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
     expect(await screen.findByText('学习问卷')).toBeTruthy()
     expect(screen.getByText('仅用于本次作答解读。')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|总体评价|聚合测评报告/)).toBeNull()
     authenticated.unmount()
 
-    render(
-      <MemoryRouter initialEntries={['/public/questionnaires/token/result?sessionId=session-1']}>
-        <PublicQuestionnaireResult />
-      </MemoryRouter>
-    )
+    renderPublicResult('/public/questionnaire/token/result?sessionId=session-1')
     expect(await screen.findByText('学习问卷')).toBeTruthy()
     expect(screen.getByText('不构成医学诊断。')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|总体评价|聚合测评报告/)).toBeNull()
+  })
+
+  it('does not leave a missing public session id in an infinite loading state', async () => {
+    renderPublicResult('/public/questionnaire/token/result')
+
+    expect(await screen.findByText('无法打开问卷报告')).toBeTruthy()
+    expect(screen.getByText(/缺少问卷会话参数/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: '返回问卷入口' })).toBeTruthy()
+    expect(screen.queryByText('正在生成报告...')).toBeNull()
+  })
+
+  it('fails closed with an actionable entry path when the public resume capability is missing', async () => {
+    mockResumeToken.mockReturnValue('')
+    renderPublicResult('/public/questionnaire/token/result?sessionId=session-1')
+
+    expect(await screen.findByText('无法打开问卷报告')).toBeTruthy()
+    expect(screen.getByText(/缺少本次问卷的恢复凭据/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: '返回问卷入口' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '重试读取报告' })).toBeNull()
   })
 })
