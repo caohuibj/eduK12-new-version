@@ -1,16 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, CheckCircle } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAnalysisExportFormat, CompositeReport, CompositeSnapshotMetadata } from './types'
 import { useAuth } from '../../contexts/AuthContext'
 import CompositePackageReport from './CompositePackageReport'
 import CognitiveSingleTaskReportCard from '../cognitive/CognitiveSingleTaskReportCard'
 import type { CognitiveSingleTaskReport } from '../cognitive/types'
+import ReportShell from '../reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 import SituationalReportCard, { type SituationalReportView } from '../reporting/SituationalReportCard'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
+const formatDuration = (ms: number) => {
+  const minutes = Math.floor(ms / 60000)
+  const seconds = Math.floor((ms % 60000) / 1000)
+  return `${minutes}分${seconds}秒`
+}
+
 type LegacyCompositeModule = Record<string, unknown> & {
   itemId: string
   type?: string
@@ -139,7 +145,7 @@ const CompositeReportPage: React.FC = () => {
   }
 
   const showSnapshotControls = staffMode && (Boolean(report?.packageReport) || snapshots.length > 0)
-  const snapshotControls = showSnapshotControls && <div className="card p-5 mb-4" data-testid="composite-snapshot-controls">
+  const snapshotControls = showSnapshotControls && <div className="card p-5" data-testid="composite-snapshot-controls">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <label className="text-sm font-medium text-gray-700" htmlFor="composite-snapshot-select">报告版本</label>
       <select id="composite-snapshot-select" aria-label="报告版本" value={selectedSnapshotId || ''} onChange={(event) => selectSnapshot(event.target.value)} className="border rounded px-3 py-2 text-sm min-w-64">
@@ -172,15 +178,44 @@ const CompositeReportPage: React.FC = () => {
   </div>
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
-  if (!report) return <div className="max-w-xl mx-auto card p-8 text-center">{snapshotControls}<p className="text-red-500 mb-4">{error || '暂无报告'}</p>{publicMode && <><input value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-3" placeholder="恢复凭证" /><button onClick={() => { setRecoveryToken(recoveryInput); setLoading(true); void load(recoveryInput) }} className="btn-primary">查看匿名报告</button></>}<button onClick={() => navigate(backTo)} className="btn-secondary mt-4 block mx-auto">返回</button></div>
+
+  if (!report) {
+    return (
+      <ReportShell
+        title="综合测评报告"
+        description="无法读取当前结果记录。"
+        status={{ kind: 'error', title: '报告暂时无法打开', description: error || '暂无报告' }}
+        actions={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
+      >
+        {snapshotControls}
+        {publicMode && (
+          <div className="card p-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="composite-recovery-input">恢复凭证</label>
+            <input id="composite-recovery-input" value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-3" placeholder="恢复凭证" />
+            <button onClick={() => { setRecoveryToken(recoveryInput); setLoading(true); void load(recoveryInput) }} className="btn-primary">查看匿名报告</button>
+          </div>
+        )}
+      </ReportShell>
+    )
+  }
+
+  const facts = [
+    ...(report.completedAt ? [{ label: '完成时间', value: new Date(report.completedAt).toLocaleString('zh-CN') }] : []),
+    ...(report.totalTime != null ? [{ label: '用时', value: formatDuration(report.totalTime) }] : []),
+    ...(report.anonymousCode ? [{ label: '匿名编号', value: report.anonymousCode }] : []),
+  ]
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <button onClick={() => navigate(backTo)} className="flex items-center text-gray-500 hover:text-gray-700 mb-4"><ArrowLeft className="w-4 h-4 mr-1" />返回</button>
-      <div className="card p-8 mb-5"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" /><h1 className="text-2xl font-bold text-center text-gray-800">{report.name}</h1><p className="text-center text-gray-500 mt-2">以下按容器顺序展示各模块的独立结果。</p>{report.anonymousCode && <p className="text-center text-sm text-gray-500 mt-2">匿名编号：{report.anonymousCode}</p>}</div>
+    <ReportShell
+      title={report.name}
+      description="以下按容器顺序展示各模块的独立结果。"
+      facts={facts}
+      status={{ kind: 'success', title: '已提交', description: '报告读取失败不会改变已经完成的提交状态。' }}
+      backAction={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
+    >
       {snapshotControls}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
-      {backgroundValues.length > 0 && <div className="card p-6 mb-4" data-testid="composite-background-values">
+      {backgroundValues.length > 0 && <div className="card p-6" data-testid="composite-background-values">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">背景信息</h2>
         <div className="space-y-2">{backgroundValues.map((background) => (
           <div key={background.itemId} className="flex justify-between gap-4 text-sm">
@@ -207,7 +242,7 @@ const CompositeReportPage: React.FC = () => {
           )}
         </div>
       ))}</div>
-    </div>
+    </ReportShell>
   )
 }
 
