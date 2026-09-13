@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send, Sparkles } from 'lucide-react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import {
+  AssessmentShell,
+  type AssessmentInteractionReadiness,
+  type AssessmentProgress,
+  type AssessmentRecoveryState,
+  type AssessmentSaveStatus,
+  type AssessmentSubmissionStatus,
+} from '../../../components/assessment-shell'
 import { embeddedSituationalApi, publicEmbeddedSituationalApi, situationalApi, type SituationalRunnerClient } from '../api'
 import {
-  answeredResponseCount,
   ensureSituationalDraft,
-  expectedResponseKeys,
   firstMissingSceneIndex,
   pruneSituationalDraftResponses,
   readSituationalDraft,
@@ -16,7 +22,7 @@ import {
   situationalReadyToSubmit,
   situationalResponsesFromDraft,
 } from '../draft'
-import { reachableSituationalScenes } from '../traversal'
+import { deriveReachableTrajectory, reachableSituationalScenes } from '../traversal'
 import type {
   SituationalAttemptResponse,
   SituationalDraftAnswer,
@@ -28,7 +34,8 @@ import { runFinalDraftCapacityRetry } from '../../../services/persistence/finalD
 import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
 import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
 import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
-import SituationalVideoPresentation from '../SituationalVideoPresentation'
+import SituationalVideoPresentation, { type SituationalVideoGateStatus } from '../SituationalVideoPresentation'
+import { resolveSituationalRunnerRouteContext } from '../runner-context'
 
 const responseValueFor = (
   responses: Record<string, SituationalDraftAnswer>,
@@ -68,28 +75,34 @@ const situationalFinalStatus = (error: unknown) => {
 
 const TERMINAL_RECOVERED_CODE = 'FINAL_TERMINAL_RECOVERED'
 
+type VideoGateState = {
+  sceneKey: string
+  status: SituationalVideoGateStatus
+  message?: string
+}
+
 const SituationalRunner: React.FC = () => {
   const { instrumentKey, attemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
-  const publicMode = typeof window !== 'undefined' && window.location.pathname.startsWith('/public/composite/')
-  const compositeAttemptId = searchParams.get('compositeAttemptId') || ''
-  const compositeItemId = searchParams.get('compositeItemId') || ''
-  const embedded = Boolean(attemptId)
+  const routeContext = useMemo(() => resolveSituationalRunnerRouteContext({
+    pathname: location.pathname,
+    searchParams,
+    attemptId,
+  }), [attemptId, location.pathname, searchParams])
+  const {
+    publicMode,
+    embedded,
+    compositeAttemptId,
+    compositeItemId,
+    completionPath: embeddedCompletionPath,
+    recoveryStorageKey,
+  } = routeContext
   const recoveryToken = useMemo(() => {
-    if (!publicMode || !compositeAttemptId || typeof window === 'undefined') return ''
-    return window.sessionStorage.getItem(`composite:recovery:attempt:${compositeAttemptId}`) || ''
-  }, [compositeAttemptId, publicMode])
-  const returnTo = useMemo(() => {
-    const candidate = searchParams.get('returnTo') || ''
-    const prefix = publicMode ? '/public/composite/attempts/' : '/student/composite/attempts/'
-    return candidate.startsWith(prefix) ? candidate : ''
-  }, [publicMode, searchParams])
-  const embeddedCompletionPath = returnTo || (
-    embedded && compositeAttemptId
-      ? `${publicMode ? '/public' : '/student'}/composite/attempts/${compositeAttemptId}`
-      : ''
-  )
+    if (!recoveryStorageKey || typeof window === 'undefined') return ''
+    return window.sessionStorage.getItem(recoveryStorageKey) || ''
+  }, [recoveryStorageKey])
   const client = useMemo<SituationalRunnerClient | null>(() => {
     if (embedded) {
       if (!compositeAttemptId || !compositeItemId) return null
@@ -99,8 +112,10 @@ const SituationalRunner: React.FC = () => {
     }
     return situationalApi
   }, [compositeAttemptId, compositeItemId, embedded, publicMode, recoveryToken])
+
   const [data, setData] = useState<SituationalAttemptResponse | null>(null)
   const [responses, setResponses] = useState<Record<string, SituationalDraftAnswer>>({})
+  const responsesRef = useRef<Record<string, SituationalDraftAnswer>>({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -108,9 +123,17 @@ const SituationalRunner: React.FC = () => {
   const [submissionLocked, setSubmissionLocked] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [readyVideoSceneKey, setReadyVideoSceneKey] = useState<string | null>(null)
+  const [saveStatus, setSaveStatus] = useState<AssessmentSaveStatus>({ state: 'idle' })
+  const [recoveryState, setRecoveryState] = useState<AssessmentRecoveryState>({ state: 'none' })
+  const [videoGate, setVideoGate] = useState<VideoGateState | null>(null)
   const sceneStartedAt = useRef(Date.now())
   const submittingRef = useRef(false)
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
+  const pendingSavesRef = useRef(0)
+
+  useEffect(() => {
+    responsesRef.current = responses
+  }, [responses])
 
   useEffect(() => {
     sceneStartedAt.current = Date.now()
@@ -151,13 +174,21 @@ const SituationalRunner: React.FC = () => {
           ? await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
           : restoredResponses
         if (cancelled) return
+        responsesRef.current = localResponses
         setData(next)
         setResponses(localResponses)
         setSubmissionLocked(locked)
+        setSaveStatus({ state: 'idle' })
         if (locked) {
-          setNotice(meta.sealedSubmission
+          const message = meta.sealedSubmission
             ? '这次测评已有一份已封存提交；答案已锁定，再次提交只会重放相同内容。'
-            : '检测到旧版未确认提交；答案已锁定，请先核对服务器结果，不能重新生成提交内容。')
+            : '检测到旧版未确认提交；答案已锁定，请先核对服务器结果，不能重新生成提交内容。'
+          setNotice(message)
+          setRecoveryState({ state: 'blocked', message })
+        } else if (Object.keys(localResponses).length > 0) {
+          setRecoveryState({ state: 'resumed', message: '已从本机恢复此前确认保存的情境作答。' })
+        } else {
+          setRecoveryState({ state: 'none' })
         }
         const reachableScenes = reachableSituationalScenes(next.instrument.definition, localResponses)
         const missingIndex = firstMissingSceneIndex(next.instrument.definition, localResponses)
@@ -181,12 +212,25 @@ const SituationalRunner: React.FC = () => {
   const scenes = useMemo(() => (
     data ? reachableSituationalScenes(data.instrument.definition, responses) : []
   ), [data, responses])
+  const trajectory = useMemo(() => (
+    data ? deriveReachableTrajectory(data.instrument.definition, responses) : { nodeKeys: [], sceneKeys: [], terminalNodeKey: null }
+  ), [data, responses])
   const currentScene = scenes[currentIndex]
+  const currentSceneComplete = Boolean(data && currentScene && sceneIsComplete(data.instrument.definition, currentIndex, responses))
+  const currentFlowNode = useMemo(() => {
+    if (!data || data.instrument.definition.schemaVersion !== 2) return null
+    const nodeKey = trajectory.nodeKeys[currentIndex]
+    const node = data.instrument.definition.flow.nodes.find((candidate) => candidate.nodeKey === nodeKey)
+    return node?.nodeType === 'SCENE' ? node : null
+  }, [currentIndex, data, trajectory.nodeKeys])
   const videoSceneKey = currentScene?.stimulus.type === 'VIDEO' ? currentScene.sceneKey : ''
+  const videoSlotKey = currentScene?.stimulus.type === 'VIDEO'
+    ? (currentFlowNode?.nodeKey || currentScene.sceneKey)
+    : ''
 
   useEffect(() => {
-    setReadyVideoSceneKey(null)
-  }, [videoSceneKey])
+    setVideoGate(videoSceneKey ? { sceneKey: videoSceneKey, status: 'checking' } : null)
+  }, [videoSceneKey, videoSlotKey])
 
   const visualItems = useMemo(() => currentScene ? visualAssetsFor(currentScene.stimulus) : [], [currentScene])
   const loadVisualAsset = useCallback((assetId: string): Promise<Blob> => {
@@ -198,49 +242,118 @@ const SituationalRunner: React.FC = () => {
     if (!data || !client || !videoSceneKey) throw new Error('Assessment video client is unavailable')
     return apiDataOrThrow(await client.loadVideoSources(data.attempt.id, videoSceneKey))
   }, [client, data, videoSceneKey])
-  const handleVideoReadyChange = useCallback((sceneKey: string, ready: boolean) => {
-    setReadyVideoSceneKey((current) => {
-      if (ready) return sceneKey
-      return current === sceneKey ? null : current
+  const handleVideoGateChange = useCallback((sceneKey: string, status: SituationalVideoGateStatus, message?: string) => {
+    setVideoGate((current) => {
+      if (videoSceneKey && sceneKey !== videoSceneKey) return current
+      return { sceneKey, status, message }
     })
-  }, [])
+  }, [videoSceneKey])
 
-  const totalResponses = data ? expectedResponseKeys(data.instrument.definition, responses).length : 0
-  const answeredCount = data ? answeredResponseCount(data.instrument.definition, responses) : 0
-  const progress = totalResponses > 0 ? Math.round((answeredCount / totalResponses) * 100) : 0
+  const visualRequired = visualItems.length > 0
+  const visualBusy = visualRequired && visualState.status !== 'ready'
+  const videoRequired = currentScene?.stimulus.type === 'VIDEO'
+  const currentVideoGate = videoRequired && videoGate?.sceneKey === currentScene.sceneKey ? videoGate : null
+  const videoBusy = Boolean(videoRequired && currentVideoGate?.status !== 'ready')
+  const mediaBusy = visualBusy || videoBusy
 
-  const sceneCompletion = useMemo(() => scenes.map((_, index) => data ? sceneIsComplete(data.instrument.definition, index, responses) : false), [data, responses, scenes])
+  const interactionReadiness = useMemo<AssessmentInteractionReadiness>(() => {
+    if (visualRequired && visualState.status === 'error') {
+      return { state: 'blocked', message: '视觉内容加载失败。请重试加载后再继续作答。' }
+    }
+    if (videoRequired && currentVideoGate?.status === 'error') {
+      return { state: 'blocked', message: currentVideoGate.message || '视频题面暂时无法使用，请重试。' }
+    }
+    if (videoRequired && currentVideoGate?.status === 'blocked') {
+      return { state: 'blocked', message: currentVideoGate.message || '请完整观看当前必看视频后继续。' }
+    }
+    if (visualBusy || (videoRequired && (!currentVideoGate || currentVideoGate.status === 'checking'))) {
+      return { state: 'preparing', message: videoRequired ? '正在准备并核对当前必看视频。' : '正在准备当前视觉内容。' }
+    }
+    return { state: 'ready' }
+  }, [currentVideoGate, videoRequired, visualBusy, visualRequired, visualState.status])
 
-  const persistAnswer = async (scene: SituationalRunnerScene, channel: SituationalRunnerChannel, responseValue: string | number) => {
-    if (!data || submitting || submissionLocked) return
+  const shellProgress = useMemo<AssessmentProgress | undefined>(() => {
+    if (!data || !currentScene) return undefined
+    if (data.instrument.definition.schemaVersion === 1) {
+      return {
+        kind: 'position',
+        current: currentIndex + 1,
+        total: scenes.length,
+        label: '情境进度',
+      }
+    }
+    const currentParts = [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentScene.title].filter(Boolean)
+    return {
+      kind: 'open-path',
+      visited: currentIndex + (currentSceneComplete ? 1 : 0),
+      current: currentParts.join(' · '),
+      label: '当前开放路径',
+    }
+  }, [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentIndex, currentScene, currentSceneComplete, data, scenes.length])
+
+  const submissionStatus = useMemo<AssessmentSubmissionStatus>(() => {
+    if (submitting) return { state: 'submitting', message: '答案已锁定，正在提交同一份封存 FINAL。' }
+    if (submissionLocked) return { state: 'pending', message: '答案保持锁定；再次操作只会核对或重放同一份提交。' }
+    return { state: 'ready' }
+  }, [submissionLocked, submitting])
+
+  const persistAnswer = (
+    scene: SituationalRunnerScene,
+    channel: SituationalRunnerChannel,
+    responseValue: string | number,
+  ): Promise<void> => {
+    if (!data || submitting || submissionLocked) return Promise.resolve()
+    const currentData = data
     const key = responseKey(scene.sceneKey, channel.channelKey)
     const answer: SituationalDraftAnswer = {
       responseValue,
       responseTimeMs: Math.max(0, Date.now() - sceneStartedAt.current),
       answeredAt: new Date().toISOString(),
     }
+
+    pendingSavesRef.current += 1
     setSaving(true)
-    try {
-      await finalDraftStore.putAnswer({
-        draftKey: situationalDraftKey(data.attempt.id),
-        itemKey: key,
-        value: answer,
-        updatedAt: Date.now(),
+    setSaveStatus({ state: 'saving', message: '正在把最新作答安全保存到本机。' })
+
+    const operation = saveQueueRef.current
+      .catch(() => undefined)
+      .then(async () => {
+        await finalDraftStore.putAnswer({
+          draftKey: situationalDraftKey(currentData.attempt.id),
+          itemKey: key,
+          value: answer,
+          updatedAt: Date.now(),
+        })
+        const nextResponses = await pruneSituationalDraftResponses(
+          currentData.attempt,
+          currentData.instrument.definition,
+          { ...responsesRef.current, [key]: answer },
+        )
+        responsesRef.current = nextResponses
+        const nextScenes = reachableSituationalScenes(currentData.instrument.definition, nextResponses)
+        setResponses(nextResponses)
+        setCurrentIndex((index) => Math.min(index, Math.max(0, nextScenes.length - 1)))
+        setNotice(null)
       })
-      const nextResponses = await pruneSituationalDraftResponses(
-        data.attempt,
-        data.instrument.definition,
-        { ...responses, [key]: answer },
-      )
-      const nextScenes = reachableSituationalScenes(data.instrument.definition, nextResponses)
-      setResponses(nextResponses)
-      setCurrentIndex((index) => Math.min(index, Math.max(0, nextScenes.length - 1)))
-      setNotice(null)
-    } catch (reason) {
-      setNotice(situationalErrorMessage(reason))
-    } finally {
-      setSaving(false)
-    }
+
+    const tracked = operation
+      .then(() => {
+        if (pendingSavesRef.current === 1) {
+          setSaveStatus({ state: 'saved', message: '最新作答已保存到本机。' })
+        }
+      })
+      .catch((reason) => {
+        const message = situationalErrorMessage(reason)
+        setNotice(message)
+        setSaveStatus({ state: 'error', message })
+      })
+      .finally(() => {
+        pendingSavesRef.current = Math.max(0, pendingSavesRef.current - 1)
+        if (pendingSavesRef.current === 0) setSaving(false)
+      })
+
+    saveQueueRef.current = tracked.catch(() => undefined)
+    return tracked
   }
 
   const recoverTerminalResult = async (): Promise<boolean> => {
@@ -258,14 +371,17 @@ const SituationalRunner: React.FC = () => {
   }
 
   const submit = async () => {
-    if (!data || !client || submitting || submittingRef.current || saving) return
-    const missingIndex = firstMissingSceneIndex(data.instrument.definition, responses)
+    if (!data || !client || submitting || submittingRef.current || saving || pendingSavesRef.current > 0 || mediaBusy) {
+      if (pendingSavesRef.current > 0) setNotice('正在保存最新作答，保存完成后再提交。')
+      return
+    }
+    const missingIndex = firstMissingSceneIndex(data.instrument.definition, responsesRef.current)
     if (missingIndex >= 0 && !submissionLocked) {
       setCurrentIndex(missingIndex)
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
-    if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responses)) {
+    if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responsesRef.current)) {
       setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
     }
@@ -339,13 +455,8 @@ const SituationalRunner: React.FC = () => {
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
-  const visualRequired = visualItems.length > 0
-  const visualBusy = visualRequired && visualState.status !== 'ready'
-  const videoRequired = currentScene.stimulus.type === 'VIDEO'
-  const videoBusy = videoRequired && readyVideoSceneKey !== currentScene.sceneKey
-  const mediaBusy = visualBusy || videoBusy
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
       ? <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
@@ -356,10 +467,12 @@ const SituationalRunner: React.FC = () => {
         <>
           {textBlock}
           <SituationalVideoPresentation
+            draftKey={situationalDraftKey(data.attempt.id)}
             sceneKey={currentScene.sceneKey}
+            slotKey={videoSlotKey}
             presentation={currentScene.stimulus.presentation}
             loadSources={loadVideoSources}
-            onReadyChange={handleVideoReadyChange}
+            onGateChange={handleVideoGateChange}
           />
         </>
       )
@@ -377,18 +490,81 @@ const SituationalRunner: React.FC = () => {
     )
   }
 
-  return (
-    <div className="mx-auto max-w-4xl space-y-5">
-      <div className="flex flex-col gap-3 rounded-xl bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><Sparkles className="h-5 w-5" /></div><div><h1 className="font-semibold text-gray-900">文字情境测评</h1><p className="text-xs text-gray-500">{data.attempt.instrumentKey} · v{data.attempt.instrumentVersion}</p></div></div>
-        <div className="text-left text-sm text-gray-600 sm:text-right"><div>已完成 {answeredCount} / {totalResponses} 个必答通道</div><div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 sm:w-48"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${progress}%` }} /></div></div>
+  const actions = (
+    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <button
+        type="button"
+        onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
+        disabled={currentIndex === 0 || saving || submitting}
+        className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <ChevronLeft className="h-4 w-4" />上一题
+      </button>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        {currentIndex < scenes.length - 1 ? (
+          <button
+            type="button"
+            onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))}
+            disabled={saving || submitting || mediaBusy || !currentSceneComplete}
+            className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            下一题<ChevronRight className="h-4 w-4" />
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => void submit()}
+          disabled={saving || submitting || mediaBusy}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}
+        </button>
       </div>
+    </div>
+  )
 
-      {notice && <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div>}
+  const navigation = (
+    <nav aria-label="情境导航" className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+      <div className="mb-3 text-sm font-medium text-gray-700">可达情境</div>
+      <div className="flex flex-wrap gap-2">
+        {scenes.map((scene, index) => (
+          <button
+            key={`${scene.sceneKey}:${index}`}
+            type="button"
+            onClick={() => setCurrentIndex(index)}
+            disabled={saving || submitting}
+            aria-label={`情境 ${index + 1}${sceneIsComplete(data.instrument.definition, index, responses) ? '，已完成' : '，未完成'}`}
+            aria-current={currentIndex === index ? 'step' : undefined}
+            className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneIsComplete(data.instrument.definition, index, responses) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
+    </nav>
+  )
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-8" aria-labelledby="situational-scene-title">
-        <div className="mb-5 flex items-center justify-between gap-4 text-sm text-gray-500"><span>情境 {currentIndex + 1} / {scenes.length}</span><span>{sceneIsComplete(data.instrument.definition, currentIndex, responses) ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />已完成</span> : '待完成'}</span></div>
-        <h2 id="situational-scene-title" className="text-xl font-semibold text-gray-900">{currentScene.title}</h2>
+  return (
+    <AssessmentShell
+      title={currentScene.title}
+      eyebrow={embedded ? '综合测评 · 情境单元' : '情境化测评'}
+      instructions={`冻结版本 ${data.attempt.instrumentVersion}。请根据当前可达情境完成作答；分支变化时，只保留当前路径上仍有效的答案。`}
+      progress={shellProgress}
+      saveStatus={saveStatus}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      interactionReadiness={interactionReadiness}
+      actions={actions}
+      navigation={navigation}
+    >
+      {notice ? <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div> : null}
+
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-8" aria-labelledby="situational-scene-content-title">
+        <div className="mb-5 flex items-center justify-between gap-4 text-sm text-gray-500">
+          <span>{data.instrument.definition.schemaVersion === 1 ? `情境 ${currentIndex + 1} / ${scenes.length}` : '开放路径中的当前情境'}</span>
+          <span>{currentSceneComplete ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />已完成</span> : '待完成'}</span>
+        </div>
+        <h2 id="situational-scene-content-title" className="text-base font-semibold text-gray-900">情境内容</h2>
         {renderStimulus()}
 
         <div className="mt-7 space-y-7">
@@ -396,37 +572,27 @@ const SituationalRunner: React.FC = () => {
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={channel.channelKey} className="space-y-3" disabled={saving || submitting || mediaBusy || submissionLocked}>
+              <fieldset key={channel.channelKey} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
-                  <label key={option.optionKey} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
-                    <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void persistAnswer(currentScene, channel, option.optionKey)} className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
+                  <label key={option.optionKey} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
+                    <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void persistAnswer(currentScene, channel, option.optionKey)} className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
                     <span className="text-sm leading-6 text-gray-700">{option.label}</span>
                   </label>
                 ))}
-                {channel.responseType === 'CONTINUOUS' && channel.range && (
+                {channel.responseType === 'CONTINUOUS' && channel.range ? (
                   <div className="rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between text-sm text-gray-600"><span>当前值</span><strong className="text-indigo-700">{typeof answer?.responseValue === 'number' ? answer.responseValue : '未选择'}</strong></div>
-                    <input type="range" min={channel.range.min} max={channel.range.max} step="any" value={typeof answer?.responseValue === 'number' ? answer.responseValue : channel.range.min} onChange={(event) => void persistAnswer(currentScene, channel, Number(event.target.value))} className="mt-4 w-full accent-indigo-600" aria-label={`${channel.prompt}，范围 ${channel.range.min} 到 ${channel.range.max}`} />
+                    <input type="range" min={channel.range.min} max={channel.range.max} step="any" value={typeof answer?.responseValue === 'number' ? answer.responseValue : channel.range.min} onChange={(event) => void persistAnswer(currentScene, channel, Number(event.target.value))} className="mt-4 min-h-11 w-full accent-indigo-600" aria-label={`${channel.prompt}，范围 ${channel.range.min} 到 ${channel.range.max}`} />
                     <div className="mt-2 flex justify-between text-xs text-gray-500"><span>最小值 {channel.range.min}</span><span>最大值 {channel.range.max}</span></div>
                   </div>
-                )}
+                ) : null}
               </fieldset>
             )
           })}
         </div>
       </section>
-
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button type="button" onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || saving || submitting} className="inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"><ChevronLeft className="h-4 w-4" />上一题</button>
-        <div className="flex gap-3">
-          {currentIndex < scenes.length - 1 && <button type="button" onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">下一题<ChevronRight className="h-4 w-4" /></button>}
-          <button type="button" onClick={() => void submit()} disabled={saving || submitting || mediaBusy} className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}</button>
-        </div>
-      </div>
-
-      <nav aria-label="情境导航" className="rounded-xl bg-white p-4 shadow-sm"><div className="mb-3 text-sm font-medium text-gray-700">情境导航</div><div className="flex flex-wrap gap-2">{scenes.map((scene, index) => <button key={scene.sceneKey} type="button" onClick={() => setCurrentIndex(index)} disabled={saving || submitting} aria-label={`情境 ${index + 1}${sceneCompletion[index] ? '，已完成' : '，未完成'}`} aria-current={currentIndex === index ? 'step' : undefined} className={`h-9 w-9 rounded-lg text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneCompletion[index] ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{index + 1}</button>)}</div></nav>
-    </div>
+    </AssessmentShell>
   )
 }
 
