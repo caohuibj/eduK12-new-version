@@ -252,13 +252,15 @@ describe('ScaleAssessment reference journey', () => {
   })
 
   it('keeps exact sealed FINAL retry reachable even when media content is unavailable', async () => {
+    const user = userEvent.setup()
     mocks.ensure.mockResolvedValue(draftMeta(true))
     mocks.getDraft.mockResolvedValue(draftMeta(true))
     mocks.hideVideoChildren = true
     renderRunner(true)
 
-    expect(await screen.findByRole('button', { name: '重新核对提交' })).toBeInTheDocument()
-    expect(screen.getByText('提交内容已封存')).toBeInTheDocument()
+    expect(await screen.findByText('提交内容已封存')).toBeInTheDocument()
     await waitFor(() => expect(mocks.videoGateProps?.requiredViewing).toBeUndefined())
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    expect(await screen.findByRole('button', { name: '重新核对提交' })).toBeInTheDocument()
   })
 })
