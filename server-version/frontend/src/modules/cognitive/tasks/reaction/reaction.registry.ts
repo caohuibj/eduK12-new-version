@@ -6,7 +6,7 @@ import { ReactionFrameTask } from './ReactionFrameTask'
 import { ReactionTask } from './ReactionTask'
 
 const ReactionRunner = (props: CognitiveTaskProps) => createElement(
-  usesSoftwareFrameTiming(props.taskContext.config) ? ReactionFrameTask : ReactionTask,
+  usesSoftwareFrameTiming(props.taskContext) ? ReactionFrameTask : ReactionTask,
   props,
 )
 
