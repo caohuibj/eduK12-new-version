@@ -457,6 +457,8 @@ jobs:
           exit 1
       - name: run seeded browser acceptance
         run: node e2e/situational-bundle-browser-e2e.cjs
+      - name: run FE-11 storage fault acceptance
+        run: node e2e/fe-11-storage-fault-browser-e2e.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
