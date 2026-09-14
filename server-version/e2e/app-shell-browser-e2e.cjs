@@ -70,7 +70,7 @@ async function main() {
     for (const width of [360, 390, 768, 820, 1366]) for (const mode of inputModes) {
       const { context, page, state } = await setup(browser, { width, touch: mode.touch })
       await page.goto(`${base}/student/cognitive/history`)
-      await page.getByRole('heading', { name: '测评历史', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
       let nav = await openNav(page, mode.name === 'emulated-touch' ? 'touch' : 'pointer')
       assert.equal(await nav.locator('[aria-current="page"]').count(), 1)
       assert.equal(await nav.locator('[aria-current="page"]').innerText(), '认知测评')
@@ -133,7 +133,7 @@ async function main() {
     {
       const { context, page, state } = await setup(browser)
       await page.goto(`${base}/student/cognitive/history`)
-      await page.getByRole('heading', { name: '测评历史', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
       // Sentinel models existing browser data; FE-02 must not delete storage on 401.
       await page.evaluate(() => localStorage.setItem('fe02-draft-sentinel', 'keep'))
       state.expires = true
