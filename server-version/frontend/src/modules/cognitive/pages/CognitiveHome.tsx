@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Brain, ChevronRight, Clock } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Brain, Clock, History } from 'lucide-react'
+import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../../components/product-ui'
 import { cognitiveApi } from '../api'
 import type { CognitiveAssignmentSummary } from '../types'
 
@@ -10,7 +11,6 @@ import type { CognitiveAssignmentSummary } from '../types'
  */
 
 const CognitiveHome: React.FC = () => {
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [assignments, setAssignments] = useState<CognitiveAssignmentSummary[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -35,70 +35,68 @@ const CognitiveHome: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="card p-8 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <p className="text-gray-500">如持续失败，请联系老师</p>
-      </div>
+      <ProductPage width="assessment">
+        <ProductStatus kind="pending" title="正在加载认知测评" announce="polite">正在读取已发布的认知任务。</ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div>
-      <div className="flex items-center space-x-2 mb-6">
-        <Brain className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-bold text-gray-800">认知测评</h1>
-        <button type="button" onClick={() => navigate('/student/cognitive/history')} className="ml-auto text-sm text-primary hover:underline">
-          查看历史
-        </button>
-      </div>
+    <ProductPage width="assessment">
+      <PageHeader
+        title="认知测评"
+        description="选择已发布的认知任务。任务入口会继续使用冻结的测试类型与引擎版本。"
+        actions={(
+          <Link to="/student/cognitive/history" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+            <History className="h-4 w-4" aria-hidden="true" />
+            查看历史
+          </Link>
+        )}
+      />
 
-      {assignments.length === 0 ? (
-        <div className="card p-12 text-center">
-          <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无认知测评任务</p>
-        </div>
+      {error ? (
+        <ProductStatus kind="error" title="认知测评列表加载失败" announce="assertive">
+          {error}。如持续失败，请联系老师。
+        </ProductStatus>
+      ) : assignments.length === 0 ? (
+        <ProductStatus kind="info" title="暂无认知测评任务">
+          当老师发布适用于你的认知任务后，会显示在这里。
+        </ProductStatus>
       ) : (
         <div className="grid gap-4">
           {assignments.map((item) => (
-            <div
+            <DiscoveryCard
               key={item.id}
-              className="card hover:shadow-md transition-shadow cursor-pointer p-5"
-              onClick={() => navigate(`/student/cognitive/assignments/${item.id}`)}
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                    {item.config && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700">
-                        {item.config.testType} / {item.config.engineVersion}
-                      </span>
-                    )}
-                  </div>
-                  {item.course && <p className="text-sm text-gray-500 mt-1">{item.course.title}</p>}
-                  {item.instruction && <p className="text-sm text-gray-600 mt-2">{item.instruction}</p>}
-                  {item.dueAt && (
-                    <p className="flex items-center text-xs text-gray-400 mt-2">
-                      <Clock className="w-3.5 h-3.5 mr-1" />
-                      截止: {new Date(item.dueAt).toLocaleString('zh-CN')}
-                    </p>
-                  )}
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-300" />
-              </div>
-            </div>
+              to={`/student/cognitive/assignments/${item.id}`}
+              title={item.title}
+              ariaLabel={`${item.title}，打开认知测评任务`}
+              leading={(
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                  <Brain className="h-6 w-6" />
+                </span>
+              )}
+              status={item.config ? (
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">
+                  {item.config.testType} / {item.config.engineVersion}
+                </span>
+              ) : undefined}
+              description={item.instruction}
+              meta={(
+                <>
+                  {item.course ? <span>课程：{item.course.title}</span> : null}
+                  {item.dueAt ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock className="h-4 w-4" aria-hidden="true" />
+                      截止：{new Date(item.dueAt).toLocaleString('zh-CN')}
+                    </span>
+                  ) : null}
+                </>
+              )}
+            />
           ))}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
