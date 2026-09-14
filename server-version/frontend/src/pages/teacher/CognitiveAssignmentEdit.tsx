@@ -10,6 +10,8 @@ const statusLabel: Record<string, string> = {
   ARCHIVED: '已归档',
 }
 
+type CognitiveExportKind = 'summary-csv' | 'full-csv' | 'research-zip' | 'research-xlsx'
+
 const CognitiveAssignmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -20,6 +22,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const [title, setTitle] = useState('')
   const [instruction, setInstruction] = useState('')
   const [saving, setSaving] = useState(false)
+  const [exporting, setExporting] = useState<CognitiveExportKind | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const isWrapper = detail?.listedStandalone === false
@@ -103,13 +106,17 @@ const CognitiveAssignmentEdit: React.FC = () => {
     else setError(response.message || '停用公开链接失败')
   }
 
-  const exportData = async (detailMode: 'summary' | 'full' | 'research', format: 'csv' | 'zip' | 'xlsx' = 'csv') => {
-    const response = await cognitiveApi.exportData(id, { detail: detailMode, format })
-    if (response.code !== 0 || !response.data?.fileName) {
-      setError(response.message || '导出失败')
-      return
-    }
+  const exportData = async (
+    kind: CognitiveExportKind,
+    detailMode: 'summary' | 'full' | 'research',
+    format: 'csv' | 'zip' | 'xlsx' = 'csv',
+  ) => {
+    if (exporting) return
+    setExporting(kind)
+    setError(null)
     try {
+      const response = await cognitiveApi.exportData(id, { detail: detailMode, format })
+      if (response.code !== 0 || !response.data?.fileName) throw new Error(response.message || '导出失败')
       const download = await sessionFetch(`/api/cognitive/assignments/${id}/export/files/${response.data.fileName}`)
       if (!download.ok) throw new Error('下载导出文件失败')
       const blobUrl = URL.createObjectURL(await download.blob())
@@ -119,7 +126,9 @@ const CognitiveAssignmentEdit: React.FC = () => {
       anchor.click()
       URL.revokeObjectURL(blobUrl)
     } catch (err) {
-      setError((err as { message?: string }).message || '下载导出文件失败')
+      setError((err as { message?: string }).message || '导出失败，请重试')
+    } finally {
+      setExporting(null)
     }
   }
 
@@ -146,7 +155,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
             {detail.config?.name ? ` · ${detail.config.name}` : ''}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           {isDraft && !isWrapper && (
             <button onClick={() => void publish()} className="btn-primary">
               <Send className="w-4 h-4 inline mr-1" />发布
@@ -159,17 +168,17 @@ const CognitiveAssignmentEdit: React.FC = () => {
           )}
           {!isWrapper && (
             <>
-              <button onClick={() => void exportData('summary')} className="btn-secondary">
-                <Download className="w-4 h-4 inline mr-1" />导出摘要
+              <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50">
+                <Download className="w-4 h-4 inline mr-1" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}
               </button>
-              <button onClick={() => void exportData('full')} className="btn-secondary">导出完整数据</button>
-              <button onClick={() => void exportData('research', 'zip')} className="btn-secondary">科研长表 ZIP</button>
-              <button onClick={() => void exportData('research', 'xlsx')} className="btn-secondary">科研工作簿 XLSX</button>
+              <button disabled={exporting !== null} onClick={() => void exportData('full-csv', 'full')} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'full-csv' ? '导出完整数据中...' : '导出完整数据'}</button>
+              <button disabled={exporting !== null} onClick={() => void exportData('research-zip', 'research', 'zip')} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'research-zip' ? '科研长表生成中...' : '科研长表 ZIP'}</button>
+              <button disabled={exporting !== null} onClick={() => void exportData('research-xlsx', 'research', 'xlsx')} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'research-xlsx' ? '科研工作簿生成中...' : '科研工作簿 XLSX'}</button>
             </>
           )}
         </div>
       </div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {error && <p role="alert" className="text-red-500 mb-4">{error}</p>}
       {isWrapper ? (
         <div className="card p-6 mb-5">
           <h2 className="font-semibold mb-2">任务信息</h2>

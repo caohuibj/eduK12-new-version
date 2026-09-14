@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Play, RotateCcw } from 'lucide-react'
 import { cognitiveApi } from '../api'
+import { resolveCognitiveEntryAction } from '../entry-action'
 import {
   readAssignmentSessionId,
   readSessionLedger,
@@ -51,7 +52,6 @@ const CognitiveAssignmentEntry: React.FC = () => {
     }
     void fetchAssignment()
 
-    // 本地账本分流依据
     const sid = readAssignmentSessionId(assignmentId)
     if (sid) {
       setLedgerSessionId(sid)
@@ -69,15 +69,11 @@ const CognitiveAssignmentEntry: React.FC = () => {
     try {
       const response = await cognitiveApi.createSession(assignmentId)
       if (response.code !== 0 || !response.data) {
-        // 409 = 已达最大测评次数
         const code = (response as unknown as { statusCode?: number }).statusCode
-        setError(
-          code === 409 ? '已达到最大测评次数' : (response.message || '无法开始测评')
-        )
+        setError(code === 409 ? '已达到最大测评次数' : (response.message || '无法开始或继续测评'))
         return
       }
       const session: CognitiveSession = response.data
-      // 先写账本再跳转（可证明进度 = 尚未提交任何 trial）
       writeAssignmentSessionId(assignmentId, session.sessionId)
       writeSessionLedger(session.sessionId, { status: session.status, trialIndex: -1 })
       navigate(`/student/cognitive/sessions/${session.sessionId}`)
@@ -86,7 +82,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
       setError(
         status === 409
           ? '已达到最大测评次数'
-          : (err as { message?: string }).message || '无法开始测评'
+          : (err as { message?: string }).message || '无法开始或继续测评'
       )
     } finally {
       setSubmitting(false)
@@ -94,9 +90,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
   }, [assignmentId, navigate, submitting])
 
   const handleResume = useCallback(() => {
-    if (ledgerSessionId) {
-      navigate(`/student/cognitive/sessions/${ledgerSessionId}`)
-    }
+    if (ledgerSessionId) navigate(`/student/cognitive/sessions/${ledgerSessionId}`)
   }, [ledgerSessionId, navigate])
 
   if (loading) {
@@ -118,8 +112,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
     )
   }
 
-  const canResume = ledgerStatus === 'IN_PROGRESS' && ledgerSessionId
-  const showResult = ledgerStatus === 'COMPLETED' && ledgerSessionId
+  const entryAction = resolveCognitiveEntryAction(ledgerSessionId, ledgerStatus)
 
   return (
     <div>
@@ -151,20 +144,30 @@ const CognitiveAssignmentEntry: React.FC = () => {
           )}
         </div>
 
+        {entryAction.kind === 'reconcile' ? (
+          <p className="mb-4 text-sm text-slate-600">
+            进入时会先核对服务器上的进行中尝试；如已存在则继续原尝试，否则才创建新尝试。
+          </p>
+        ) : null}
+
         <div className="flex space-x-3">
-          {showResult ? (
+          {entryAction.kind === 'result' ? (
             <button onClick={() => ledgerSessionId && navigate(`/student/cognitive/sessions/${ledgerSessionId}/result`)} className="btn-primary">
-              查看结果
+              {entryAction.label}
             </button>
           ) : (
-            <button onClick={canResume ? handleResume : handleStart} disabled={submitting} className="btn-primary">
-              {canResume ? (
+            <button
+              onClick={entryAction.kind === 'continue' ? handleResume : handleStart}
+              disabled={submitting}
+              className="btn-primary"
+            >
+              {entryAction.kind === 'continue' ? (
                 <>
-                  <RotateCcw className="w-4 h-4 mr-1 inline" /> 继续测评
+                  <RotateCcw className="w-4 h-4 mr-1 inline" /> {entryAction.label}
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 mr-1 inline" /> {submitting ? '请稍候...' : '开始测评'}
+                  <Play className="w-4 h-4 mr-1 inline" /> {submitting ? '正在核对...' : entryAction.label}
                 </>
               )}
             </button>
