@@ -105,7 +105,6 @@ const MaterialGrants: React.FC = () => {
                           type="button"
                           onClick={() => void revoke(grant)}
                           className="text-sm text-red-600 hover:text-red-800"
-                          aria-label={`撤销 ${teacherName} 对 ${resourceName} 的授权`}
                         >
                           撤销
                         </button>
