@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { FileText, Clock, CheckCircle, ChevronRight, Layers, PlayCircle } from 'lucide-react'
+import { CheckCircle, Clock, FileText, Layers, PlayCircle } from 'lucide-react'
+import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 
 interface Questionnaire {
   id: string
@@ -26,115 +26,75 @@ interface Questionnaire {
   retakeAllowed?: boolean
 }
 
+const questionnaireDestination = (questionnaire: Questionnaire) => (
+  questionnaire.inProgress
+    ? `/student/questionnaires/${questionnaire.id}`
+    : questionnaire.completed && questionnaire.assessmentId
+      ? `/student/questionnaires/result/${questionnaire.assessmentId}`
+      : `/student/questionnaires/${questionnaire.id}`
+)
+
 const StudentQuestionnaires: React.FC = () => {
-  const navigate = useNavigate()
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchQuestionnaires()
+    void fetchQuestionnaires()
   }, [])
 
   const fetchQuestionnaires = async () => {
     try {
+      setError(null)
       const response = await apiClient.get<{ list: Questionnaire[] }>('/questionnaires/available')
-      if (response.code === 0) {
-        setQuestionnaires(response.data.list)
-      }
-    } catch (err) {
-      console.error('获取问卷列表失败', err)
+      if (response.code !== 0) throw new Error(response.message || '获取问卷列表失败')
+      setQuestionnaires(response.data.list)
+    } catch (reason) {
+      console.error('获取问卷列表失败', reason)
+      setError(reason instanceof Error ? reason.message : '获取问卷列表失败')
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    )
-  }
-
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">聚合问卷</h1>
-        <p className="text-gray-600 mt-1">一次性完成多个心理量表的测评</p>
-      </div>
+    <ProductPage width="assessment">
+      <PageHeader title="聚合问卷" description="一次完成问卷中配置的多个量表；进行中的尝试优先继续，已完成记录打开对应结果。" />
 
-      {questionnaires.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">暂无可用的问卷</p>
-        </div>
+      {loading ? (
+        <ProductStatus kind="pending" title="正在加载问卷" announce="polite" />
+      ) : error ? (
+        <ProductStatus kind="error" title="问卷列表加载失败" announce="assertive">{error}</ProductStatus>
+      ) : questionnaires.length === 0 ? (
+        <ProductStatus kind="info" title="暂无可用的问卷">当有适用于你的已发布问卷后，会显示在这里。</ProductStatus>
       ) : (
         <div className="grid gap-4">
-          {questionnaires.map((qn) => (
-            <div
-              key={qn.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => {
-                if (qn.inProgress) {
-                  navigate(`/student/questionnaires/${qn.id}`)
-                } else if (qn.completed && qn.assessmentId) {
-                  navigate(`/student/questionnaires/result/${qn.assessmentId}`)
-                } else {
-                  navigate(`/student/questionnaires/${qn.id}`)
-                }
-              }}
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-medium text-gray-900">{qn.name}</h3>
-                      {qn.completed && (
-                        <span className="flex items-center text-green-600 text-sm">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          已完成
-                        </span>
-                      )}
-                      {qn.inProgress && (
-                        <span className="flex items-center text-amber-600 text-sm">
-                          <PlayCircle className="w-4 h-4 mr-1" />
-                          进行中
-                        </span>
-                      )}
-                    </div>
-                    {qn.description && (
-                      <p className="text-gray-600 mt-1 text-sm">{qn.description}</p>
-                    )}
-                    <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <Layers className="w-4 h-4 mr-1" />
-                        {qn.scaleCount} 个量表
-                      </span>
-                      <span className="flex items-center">
-                        <FileText className="w-4 h-4 mr-1" />
-                        {qn.totalItems} 道题目
-                      </span>
-                      {qn.estimatedTime && (
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          约 {qn.estimatedTime} 分钟
-                        </span>
-                      )}
-                      {qn.courses.length > 0 && (
-                        <span className="text-blue-600">
-                          课程: {qn.courses[0].title}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            </div>
+          {questionnaires.map((questionnaire) => (
+            <DiscoveryCard
+              key={questionnaire.id}
+              to={questionnaireDestination(questionnaire)}
+              title={questionnaire.name}
+              ariaLabel={`${questionnaire.name}${questionnaire.inProgress ? '，继续作答' : questionnaire.completed ? '，查看结果' : '，开始测评'}`}
+              status={questionnaire.inProgress ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800"><PlayCircle className="h-3.5 w-3.5" />进行中</span>
+              ) : questionnaire.completed ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"><CheckCircle className="h-3.5 w-3.5" />已完成</span>
+              ) : undefined}
+              description={questionnaire.description}
+              meta={(
+                <>
+                  <span className="inline-flex items-center gap-1.5"><Layers className="h-4 w-4" aria-hidden="true" />{questionnaire.scaleCount} 个量表</span>
+                  <span className="inline-flex items-center gap-1.5"><FileText className="h-4 w-4" aria-hidden="true" />{questionnaire.totalItems} 道题目</span>
+                  {questionnaire.estimatedTime ? <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" aria-hidden="true" />约 {questionnaire.estimatedTime} 分钟</span> : null}
+                  {questionnaire.courses.length > 0 ? <span>课程：{questionnaire.courses[0].title}</span> : null}
+                </>
+              )}
+              notice={questionnaire.inProgress ? '已有进行中的问卷尝试，进入后继续当前尝试。' : undefined}
+            />
           ))}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
