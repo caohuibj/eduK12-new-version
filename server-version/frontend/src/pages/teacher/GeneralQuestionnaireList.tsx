@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Card, Space, Modal, Form, InputNumber, message, Tag } from 'antd'
-import { PlusOutlined, LinkOutlined, DeleteOutlined, EyeOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Empty, Form, InputNumber, message, Modal, Space, Table, Tag } from 'antd'
+import { PlusOutlined, LinkOutlined, DeleteOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { sessionFetch } from '../../api/client'
+import { PageHeader, ProductPage } from '../../components/product-ui'
 
 const GeneralQuestionnaireList: React.FC = () => {
   const navigate = useNavigate()
   const [questionnaires, setQuestionnaires] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [tokenModalVisible, setTokenModalVisible] = useState(false)
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState<any>(null)
   const [tokens, setTokens] = useState<any[]>([])
@@ -20,17 +22,17 @@ const GeneralQuestionnaireList: React.FC = () => {
   const fetchQuestionnaires = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await sessionFetch('/api/general-questionnaires')
-      
+
       if (!response.ok) {
         throw new Error('获取泛化问卷列表失败')
       }
 
       const data = await response.json()
       setQuestionnaires(data.data?.list || [])
-      
     } catch (err: any) {
-      message.error(err.message || '获取列表失败')
+      setError(err.message || '获取列表失败')
     } finally {
       setLoading(false)
     }
@@ -49,14 +51,13 @@ const GeneralQuestionnaireList: React.FC = () => {
   const fetchTokens = async (questionnaireId: string) => {
     try {
       const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/tokens`)
-      
+
       if (!response.ok) {
         throw new Error('获取令牌列表失败')
       }
 
       const data = await response.json()
       setTokens(data.data?.list || [])
-      
     } catch (err: any) {
       message.error(err.message || '获取令牌失败')
     }
@@ -86,13 +87,11 @@ const GeneralQuestionnaireList: React.FC = () => {
       tokenForm.resetFields()
       await fetchTokens(currentQuestionnaire.id)
 
-      // 复制链接到剪贴板
       if (data.data?.token) {
         const link = `${window.location.origin}/public/questionnaire/${data.data.token}`
         await navigator.clipboard.writeText(link)
         message.success('链接已复制到剪贴板')
       }
-      
     } catch (err: any) {
       message.error(err.message || '生成令牌失败')
     }
@@ -110,7 +109,6 @@ const GeneralQuestionnaireList: React.FC = () => {
 
       message.success('令牌已禁用')
       await fetchTokens(currentQuestionnaire.id)
-      
     } catch (err: any) {
       message.error(err.message || '操作失败')
     }
@@ -119,7 +117,7 @@ const GeneralQuestionnaireList: React.FC = () => {
   const handleExportData = async (questionnaireId: string) => {
     try {
       const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/export`)
-      
+
       if (!response.ok) {
         throw new Error('导出数据失败')
       }
@@ -130,7 +128,7 @@ const GeneralQuestionnaireList: React.FC = () => {
       a.href = url
       a.download = `general_questionnaire_data_${Date.now()}.csv`
       a.click()
-      
+
       message.success('数据导出成功')
     } catch (err: any) {
       message.error(err.message || '导出失败')
@@ -209,7 +207,7 @@ const GeneralQuestionnaireList: React.FC = () => {
       title: '操作',
       key: 'action',
       render: (_: any, record: any) => (
-        <Space>
+        <Space wrap>
           <Button
             type="link"
             icon={<CopyOutlined />}
@@ -263,7 +261,7 @@ const GeneralQuestionnaireList: React.FC = () => {
       dataIndex: 'token',
       key: 'token',
       render: (token: string) => (
-        <Space>
+        <Space wrap>
           <code className="bg-gray-100 px-2 py-1 rounded text-sm">
             {token.substring(0, 16)}...
           </code>
@@ -321,10 +319,11 @@ const GeneralQuestionnaireList: React.FC = () => {
   ]
 
   return (
-    <div className="p-6">
-      <Card
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader
         title="泛化问卷管理"
-        extra={
+        description="创建、发布和管理泛化问卷；公开令牌与数据导出仍使用现有授权接口。"
+        actions={
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -333,18 +332,35 @@ const GeneralQuestionnaireList: React.FC = () => {
             创建问卷
           </Button>
         }
-      >
+      />
+
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="问卷列表暂时无法加载"
+          description={error}
+          action={<Button onClick={() => void fetchQuestionnaires()}>重试</Button>}
+        />
+      )}
+
+      <Card>
         <Table
           columns={columns}
           dataSource={questionnaires}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 820 }}
+          locale={{
+            emptyText: error
+              ? '请修复加载错误后重试'
+              : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无泛化问卷" />,
+          }}
         />
       </Card>
 
-      {/* 令牌管理弹窗 */}
       <Modal
-        title={`令牌管理 - ${currentQuestionnaire?.name}`}
+        title={`令牌管理 - ${currentQuestionnaire?.name || ''}`}
         open={tokenModalVisible}
         onCancel={() => setTokenModalVisible(false)}
         footer={null}
@@ -387,10 +403,12 @@ const GeneralQuestionnaireList: React.FC = () => {
             rowKey="id"
             pagination={false}
             size="small"
+            scroll={{ x: 680 }}
+            locale={{ emptyText: '暂无令牌' }}
           />
         </div>
       </Modal>
-    </div>
+    </ProductPage>
   )
 }
 
