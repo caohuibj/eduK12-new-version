@@ -272,7 +272,7 @@ const assertImage = async (page, assetId, expectedAlt) => {
 const expectSelectedButton = async (page, label) => {
   const button = page.getByRole('button', { name: label, exact: true })
   await button.waitFor({ state: 'visible', timeout: 30000 })
-  assert.match((await button.getAttribute('class')) || '', /border-primary/, `${label} was not restored from local draft`)
+  assert.equal(await button.getAttribute('aria-pressed'), 'true', `${label} was not restored from local draft`)
 }
 
 const expectSelectedRadio = async (page, label) => {
@@ -375,7 +375,7 @@ const runCompositeFlow = async (browser, fixture, publicMode) => {
 
     await page.getByRole('heading', { name: 'MEDIA-2 Image Form', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await assertImage(page, fixture.formAssetId, '媒体选项 A: MEDIA-2 form option image')
-    await page.getByRole('button', { name: '媒体选项 A', exact: true }).click()
+    await page.getByRole('radio', { name: '媒体选项 A', exact: true }).click()
     await page.waitForTimeout(250)
 
     const formRequest = publicMode
@@ -384,7 +384,7 @@ const runCompositeFlow = async (browser, fixture, publicMode) => {
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'MEDIA-2 Image Form', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await assertImage(page, fixture.formAssetId, '媒体选项 A: MEDIA-2 form option image')
-    await expectSelectedButton(page, '媒体选项 A')
+    await expectSelectedRadio(page, '媒体选项 A')
     if (formRequest) {
       const request = await formRequest
       assert.equal(await request.headerValue('x-recovery-token'), recoveryToken, 'public Form image request did not carry the existing recovery token')

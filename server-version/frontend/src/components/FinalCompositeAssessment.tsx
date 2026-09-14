@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
+import { FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeCurrentItem } from '../modules/composite/types'
@@ -9,6 +9,10 @@ import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
+import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
+import { AssessmentShell } from './assessment-shell'
+import FormPlayer from './questionnaire/FormPlayer'
+import ScalePlayer from './questionnaire/ScalePlayer'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
@@ -129,7 +133,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const load = async () => {
       setLoadingDraft(true)
       if (!draftKey || !item) {
-        if (!cancelled) setLoadingDraft(false)
+        if (!cancelled) {
+          setMeta(null)
+          setRequiresRestart(false)
+          setLoadingDraft(false)
+        }
         return
       }
       if (state.status === 'COMPLETED') {
@@ -382,34 +390,185 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     }
   }
 
-  if (loadingDraft) return <div className="flex items-center justify-center h-64 text-gray-500">正在恢复本地草稿...</div>
+  if (loadingDraft) return <div className="flex h-64 items-center justify-center text-gray-500">正在恢复本地草稿...</div>
   if (state.status === 'COMPLETED') return null
 
   const units = state.units || state.items
+  const currentUnit = units[state.currentIndex]
   const contextText = state.context?.status === 'frozen' ? '上下文已冻结，后续模块共享同一快照。' : '答案只保存在本地草稿中，完成单元时一次提交。'
+  const submissionStatus = submitting
+    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+    : meta?.status === 'SUBMITTING'
+      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+      : meta?.status === 'RETRY_PENDING'
+        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
+        : meta?.status === 'COMPLETED'
+          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+          : { state: 'ready' as const }
+  const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
+    ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
+    : { state: 'none' as const }
+  const formFields = item?.type === 'FORM_SECTION'
+    ? (item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[]
+    : []
   const scaleItems = item?.type === 'SCALE'
     ? (item.scale?.definition?.items || []) as Array<(NonNullable<NonNullable<CompositeCurrentItem['scale']>['definition']>['items'][number]) & { images?: unknown; video?: unknown }>
     : []
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-4"><div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">完成单元：{state.completedItems} / {state.totalItems}（{state.progress}%）</p></div><button type="button" onClick={onExit} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button></div>
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-4"><div className="bg-primary h-2 rounded-full" style={{ width: `${state.progress}%` }} /></div>
-      {publicMode && recoveryToken && <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mb-4">匿名恢复凭证已保存；请继续保管。</p>}
-      <p className="text-sm text-gray-500 mb-4">{contextText} 浏览器重开后可以继续恢复。</p>
-      {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
-      {requiresRestart && onRestart && <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"><span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span><button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary whitespace-nowrap">重启并继续</button></div>}
+    <AssessmentShell
+      title={state.name}
+      eyebrow="综合测评"
+      instructions={(
+        <div className="space-y-2">
+          {state.instruction ? <p>{state.instruction}</p> : null}
+          <p>当前单元：{currentUnit?.label || item?.type || '—'}</p>
+          <p>{contextText} 浏览器重开后可以继续恢复。</p>
+        </div>
+      )}
+      progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}
+      submissionStatus={submissionStatus}
+      recoveryState={recoveryState}
+      actions={(
+        <button type="button" onClick={onExit} className="btn-secondary min-h-11">
+          <Save className="mr-1 inline h-4 w-4" />保存并退出
+        </button>
+      )}
+      navigation={(
+        <section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="mb-2 text-sm font-medium text-slate-600">提交单元</p>
+          <div className="flex flex-wrap gap-2">
+            {units.map((unit) => (
+              <span
+                key={`${unit.type}-${unit.id}`}
+                className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600'}`}
+              >
+                {unit.index + 1}. {unit.label || unit.type}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    >
+      {publicMode && recoveryToken ? <p className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">匿名恢复凭证已保存；请继续保管。</p> : null}
+      {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
+      {requiresRestart && onRestart ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
+          <button type="button" onClick={() => void onRestart()} disabled={submitting} className="btn-primary min-h-11 whitespace-nowrap">重启并继续</button>
+        </div>
+      ) : null}
 
-      {item?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{units[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">认知测验会逐试次写入本地，完成时一次提交全部试次。</p><button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary">开始/继续认知任务</button></div>}
+      <CompositeUnitRequirements item={item} />
 
-      {item?.type === 'SITUATIONAL' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{units[state.currentIndex]?.label || '文字情境测评'}</h2><p className="text-gray-600 mb-6">进入文字情境测评后，答案只在本地保留，完成时一次提交冻结结果。</p><button type="button" onClick={() => onEnterSituational(item)} className="btn-primary">开始/继续文字情境测评</button></div>}
+      {item?.type === 'COGNITIVE' ? (
+        <div className="card p-8 text-center">
+          <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '认知任务'}</h2>
+          <p className="mb-6 text-gray-600">认知测验会逐试次写入本地，完成时一次提交全部试次。</p>
+          <button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary min-h-11">开始/继续认知任务</button>
+        </div>
+      ) : null}
 
-      {item?.type === 'FORM_SECTION' && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><FileText className="w-4 h-4 inline mr-1" />表单区段</p><h2 className="text-xl font-semibold">{item.title || '表单'}</h2></div><span className="text-sm text-gray-500">字段 {sectionIndex + 1} / {(item.formAnswers || item.answers || []).length}</span></div>{item.description && <p className="text-sm text-gray-600 mb-5 whitespace-pre-wrap">{item.description}</p>}{(() => { const fields = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)) as any[]; const field = fields[sectionIndex]; if (!field) return <p className="text-gray-500">该区段没有字段。</p>; const value = formValues[field.formItemId]; const options = parseOptions(field.options); const imageItems = assessmentOptionImageItems(options); const videoEntries = formOptionVideoPresentations(options); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}><FormOptionVideoGroupGate entries={videoEntries} loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}><div><h3 className="text-lg font-medium mb-4">{field.label}{field.required && <span className="text-red-500 text-sm ml-2">必填</span>}</h3>{field.type === 'single_choice' && <div className="space-y-2">{options.map((option) => <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${value === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div>}{field.type === 'multiple_choice' && <div className="space-y-2">{options.map((option) => { const values = Array.isArray(value) ? value : []; const selected = values.includes(option.value); return <button type="button" key={option.value} onClick={() => void saveForm(field.formItemId, selected ? values.filter((entry) => entry !== option.value) : [...values, option.value])} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${selected ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{selected ? '✓ ' : ''}{option.label}</button> })}</div>}{field.type === 'year_month' && <input type="month" value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting || draftLocked} className="w-full border rounded px-3 py-2" />}{(!['single_choice', 'multiple_choice', 'year_month'].includes(field.type)) && <textarea value={typeof value === 'string' ? value : ''} onChange={(event) => void saveForm(field.formItemId, event.target.value)} disabled={submitting || draftLocked} placeholder={field.placeholder || '请输入'} className="w-full border rounded px-3 py-2 min-h-32" />}<div className="flex justify-between mt-6"><button type="button" onClick={() => setSectionIndex((index) => Math.max(0, index - 1))} disabled={sectionIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一字段</button>{sectionIndex < fields.length - 1 ? <button type="button" onClick={() => setSectionIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一字段<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitSection()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交区段中...' : '提交整个区段'}</button>}</div></div></FormOptionVideoGroupGate></AssessmentImageGate> })()}</div>}
+      {item?.type === 'SITUATIONAL' ? (
+        <div className="card p-8 text-center">
+          <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '文字情境测评'}</h2>
+          <p className="mb-6 text-gray-600">进入文字情境测评后，答案只在本地保留，完成时一次提交冻结结果。</p>
+          <button type="button" onClick={() => onEnterSituational(item)} className="btn-primary min-h-11">开始/继续文字情境测评</button>
+        </div>
+      ) : null}
 
-      {item?.type === 'SCALE' && item.scale && <div className="bg-white rounded-lg shadow p-6"><div className="flex items-center justify-between mb-5"><div><p className="text-sm text-gray-500"><Layers className="w-4 h-4 inline mr-1" />量表</p><h2 className="text-xl font-semibold">{item.scale.name}</h2></div><span className="text-sm text-gray-500">题目 {scaleIndex + 1} / {scaleItems.length}</span></div>{(() => { const question = scaleItems[scaleIndex]; if (!question) return <p className="text-gray-500">量表题目为空。</p>; const imageItems = assessmentImageItems(question.images); const videoPresentation = scaleItemVideoPresentation(question); return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}><ScaleFormVideoGate presentation={videoPresentation} loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)} ariaLabel={`${question.content} 视频内容`}><div><h3 className="text-lg font-medium mb-5">{question.content}{question.required && <span className="text-red-500 text-sm ml-2">必答</span>}</h3><div className="space-y-2">{question.options.map((option) => <button type="button" key={`${typeof option.value}:${String(option.value)}`} onClick={() => void saveScale(question.itemCode, option.value)} disabled={submitting || draftLocked} className={`block w-full text-left border rounded px-4 py-3 ${scaleValues[question.itemCode] === option.value ? 'border-primary bg-primary/5 text-primary' : 'hover:border-gray-400'}`}>{option.label}</button>)}</div><div className="flex justify-between mt-6"><button type="button" onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0 || submitting} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button type="button" onClick={() => setScaleIndex((index) => index + 1)} disabled={submitting} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button type="button" onClick={() => void submitScaleNow()} disabled={submitting || requiresRestart} className="btn-primary"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}</div></div></ScaleFormVideoGate></AssessmentImageGate> })()}</div>}
+      {item?.type === 'FORM_SECTION' ? (
+        <div>
+          <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+            <p className="text-sm text-slate-500"><FileText className="mr-1 inline h-4 w-4" />表单区段</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-900">{item.title || '表单'}</h2>
+            {item.description ? <p className="mt-3 whitespace-pre-wrap text-sm text-slate-600">{item.description}</p> : null}
+          </div>
+          {(() => {
+            const field = formFields[sectionIndex]
+            if (!field) return <p className="text-gray-500">该区段没有字段。</p>
+            const value = formValues[field.formItemId]
+            const options = parseOptions(field.options)
+            const imageItems = assessmentOptionImageItems(options)
+            const videoEntries = formOptionVideoPresentations(options)
+            return (
+              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}>
+                <FormOptionVideoGroupGate
+                  entries={videoEntries}
+                  loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}
+                >
+                  <FormPlayer
+                    item={{
+                      id: field.formItemId,
+                      type: field.type,
+                      label: field.label,
+                      placeholder: field.placeholder,
+                      required: Boolean(field.required),
+                    }}
+                    options={options}
+                    value={value}
+                    answerDisabled={draftLocked}
+                    submitDisabled={requiresRestart}
+                    position={sectionIndex + 1}
+                    total={formFields.length}
+                    onChange={(nextValue) => saveForm(field.formItemId, nextValue)}
+                    onPrevious={() => setSectionIndex((index) => Math.max(0, index - 1))}
+                    onNext={sectionIndex < formFields.length - 1
+                      ? () => setSectionIndex((index) => index + 1)
+                      : undefined}
+                    onSubmit={sectionIndex === formFields.length - 1 ? submitSection : undefined}
+                    submitting={submitting}
+                  />
+                </FormOptionVideoGroupGate>
+              </AssessmentImageGate>
+            )
+          })()}
+        </div>
+      ) : null}
 
-      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">提交单元</p><div className="flex flex-wrap gap-2">{units.map((unit) => <span key={`${unit.type}-${unit.id}`} className={`px-3 py-1 rounded text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{unit.index + 1}. {unit.label || unit.type}</span>)}</div></div>
-    </div>
+      {item?.type === 'SCALE' && item.scale ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm text-slate-500"><Layers className="mr-1 inline h-4 w-4" />量表</p>
+              <h2 className="text-xl font-semibold text-slate-900">{item.scale.name}</h2>
+            </div>
+            <span className="text-sm text-slate-500">题目 {scaleIndex + 1} / {scaleItems.length}</span>
+          </div>
+          {(() => {
+            const question = scaleItems[scaleIndex]
+            if (!question) return <p className="text-gray-500">量表题目为空。</p>
+            const imageItems = assessmentImageItems(question.images)
+            const videoPresentation = scaleItemVideoPresentation(question)
+            return (
+              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
+                <ScaleFormVideoGate
+                  presentation={videoPresentation}
+                  loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)}
+                  ariaLabel={`${question.content} 视频内容`}
+                >
+                  <ScalePlayer
+                    item={question}
+                    value={scaleValues[question.itemCode]}
+                    answerDisabled={draftLocked}
+                    submitDisabled={requiresRestart}
+                    position={scaleIndex + 1}
+                    total={scaleItems.length}
+                    onChange={(nextValue) => saveScale(question.itemCode, nextValue)}
+                    onPrevious={() => setScaleIndex((index) => Math.max(0, index - 1))}
+                    onNext={scaleIndex < scaleItems.length - 1
+                      ? () => setScaleIndex((index) => index + 1)
+                      : undefined}
+                    onSubmit={scaleIndex === scaleItems.length - 1 ? submitScaleNow : undefined}
+                    submitting={submitting}
+                  />
+                </ScaleFormVideoGate>
+              </AssessmentImageGate>
+            )
+          })()}
+        </div>
+      ) : null}
+    </AssessmentShell>
   )
 }
 

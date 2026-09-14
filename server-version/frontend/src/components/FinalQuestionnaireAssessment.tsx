@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { CheckCircle, ChevronLeft, ChevronRight, FileText, Layers, Save } from 'lucide-react'
+import { FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
 import { AssessmentShell } from './assessment-shell'
 import { checkpointId } from '../services/persistence/checkpointTypes'
@@ -19,6 +19,7 @@ import { assessmentImageItems, assessmentOptionImageItems } from '../modules/ass
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import FormPlayer from './questionnaire/FormPlayer'
+import ScalePlayer from './questionnaire/ScalePlayer'
 import useLocalDraftSaveQueue from './questionnaire/useLocalDraftSaveQueue'
 import {
   QuestionnaireRequiredVideoCompletionError,
@@ -641,42 +642,37 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             if (!item) return <p className="text-gray-500">量表题目为空。</p>
             const imageItems = assessmentImageItems(item.images)
             const videoPresentation = scaleItemVideoPresentation(item)
-            return <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
-              <ScaleFormVideoGate
-                presentation={videoPresentation}
-                loadSources={() => loadQuestionnaireVideoCapability(publicMode
-                  ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/scale/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`
-                  : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
-                ariaLabel={`${item.content} 视频内容`}
-                requiredViewing={currentKey ? {
-                  draftKey: currentKey,
-                  slotKey: scaleItemVideoSlotKey(item.itemCode),
-                } : undefined}
-              >
-                <div>
-                  <h3 className="mb-5 text-lg font-medium text-slate-900">{item.content}{item.required && <span className="ml-2 text-sm text-red-600">必答</span>}</h3>
-                  <div className="space-y-2">
-                    {item.options.map((option) => (
-                      <button
-                        type="button"
-                        key={`${typeof option.value}:${String(option.value)}`}
-                        onClick={() => saveScaleValue(item.itemCode, option.value)}
-                        disabled={submitting || draftLocked}
-                        className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${scaleValues[item.itemCode] === option.value ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-6 flex flex-wrap justify-between gap-3">
-                    <button type="button" onClick={() => void goToScaleIndex(scaleIndex - 1)} disabled={scaleIndex === 0 || submitting} className="btn-secondary min-h-11"><ChevronLeft className="w-4 h-4 inline" />上一题</button>
-                    {scaleIndex < currentScale.definition.items.length - 1
-                      ? <button type="button" onClick={() => void goToScaleIndex(scaleIndex + 1)} disabled={submitting} className="btn-secondary min-h-11">下一题<ChevronRight className="w-4 h-4 inline" /></button>
-                      : <button type="button" onClick={() => void submitScale()} disabled={submitting || requiresRestart} className="btn-primary min-h-11"><CheckCircle className="w-4 h-4 inline mr-1" />{submitting ? '提交量表中...' : '提交整份量表'}</button>}
-                  </div>
-                </div>
-              </ScaleFormVideoGate>
-            </AssessmentImageGate>
+            return (
+              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
+                <ScaleFormVideoGate
+                  presentation={videoPresentation}
+                  loadSources={() => loadQuestionnaireVideoCapability(publicMode
+                    ? `/api/public/assessments/${encodeURIComponent(data.sessionId || '')}/scale/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`
+                    : `/api/questionnaires/assessments/${encodeURIComponent(data.questionnaireAssessment.id)}/scales/${encodeURIComponent(currentScale.scaleAssessmentId)}/items/${encodeURIComponent(item.itemCode)}/video-capability`)}
+                  ariaLabel={`${item.content} 视频内容`}
+                  requiredViewing={currentKey ? {
+                    draftKey: currentKey,
+                    slotKey: scaleItemVideoSlotKey(item.itemCode),
+                  } : undefined}
+                >
+                  <ScalePlayer
+                    item={item}
+                    value={scaleValues[item.itemCode]}
+                    answerDisabled={draftLocked}
+                    submitDisabled={requiresRestart}
+                    position={scaleIndex + 1}
+                    total={currentScale.definition.items.length}
+                    onChange={(nextValue) => saveScaleValue(item.itemCode, nextValue)}
+                    onPrevious={() => void goToScaleIndex(scaleIndex - 1)}
+                    onNext={scaleIndex < currentScale.definition.items.length - 1
+                      ? () => void goToScaleIndex(scaleIndex + 1)
+                      : undefined}
+                    onSubmit={scaleIndex === currentScale.definition.items.length - 1 ? submitScale : undefined}
+                    submitting={submitting}
+                  />
+                </ScaleFormVideoGate>
+              </AssessmentImageGate>
+            )
           })()}
         </div>
       )}
