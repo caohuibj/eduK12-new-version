@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, Lock, Unlock, Key, Trash2, Users, UserX, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, Lock, Unlock, Key, Users, UserX, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 import apiClient from '../api/client'
+import { PageHeader } from '../components/product-ui/PageHeader'
+import { ProductPage } from '../components/product-ui/ProductPage'
 import type { Course } from '../types'
 
 interface Student {
@@ -17,10 +18,10 @@ interface Student {
 }
 
 const StudentManagement: React.FC = () => {
-  const navigate = useNavigate()
   const [students, setStudents] = useState<Student[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [keyword, setKeyword] = useState('')
   const [selectedCourseId, setSelectedCourseId] = useState<string>('all')
   const [processingId, setProcessingId] = useState<string | null>(null)
@@ -37,18 +38,18 @@ const StudentManagement: React.FC = () => {
       if (response.code === 0) {
         setCourses(response.data.list)
       }
-    } catch (error) {
-      console.error('获取课程列表失败:', error)
+    } catch (fetchError) {
+      console.error('获取课程列表失败:', fetchError)
     }
   }
 
   const fetchAllStudents = async () => {
     try {
       setLoading(true)
-      // 获取教师的所有课程
+      setError(null)
       const coursesRes = await apiClient.get('/courses')
       if (coursesRes.code !== 0) {
-        setLoading(false)
+        setError(coursesRes.message || '获取课程列表失败')
         return
       }
 
@@ -57,59 +58,55 @@ const StudentManagement: React.FC = () => {
 
       if (myCourses.length === 0) {
         setStudents([])
-        setLoading(false)
         return
       }
 
-      // 使用批量接口一次性获取所有课程的学生（优化 N+1 查询）
-      const courseIds = myCourses.map(c => c.id)
+      const courseIds = myCourses.map(course => course.id)
       try {
-        const batchRes = await apiClient.post('/courses/batch-students', {
-          courseIds
-        })
-        
+        const batchRes = await apiClient.post('/courses/batch-students', { courseIds })
+
         if (batchRes.code === 0 && batchRes.data.data) {
           const groupedStudents = batchRes.data.data
           const allStudents: Student[] = []
-          
+
           for (const course of myCourses) {
             const courseStudents = groupedStudents[course.id] || []
-            courseStudents.forEach((s: any) => {
+            courseStudents.forEach((student: any) => {
               allStudents.push({
-                ...s,
+                ...student,
                 courseId: course.id,
                 courseTitle: course.title,
                 courseCode: course.courseCode,
               })
             })
           }
-          
+
           setStudents(allStudents)
         }
-      } catch (err) {
-        console.error('批量获取学生失败:', err)
-        // 降级：使用原来的逐个获取方式
+      } catch (batchError) {
+        console.error('批量获取学生失败:', batchError)
         const allStudents: Student[] = []
         for (const course of myCourses) {
           try {
             const studentsRes = await apiClient.get(`/courses/${course.id}/students`)
             if (studentsRes.code === 0 && studentsRes.data.list) {
-              const courseStudents = studentsRes.data.list.map((s: any) => ({
-                ...s,
+              const courseStudents = studentsRes.data.list.map((student: any) => ({
+                ...student,
                 courseId: course.id,
                 courseTitle: course.title,
                 courseCode: course.courseCode,
               }))
               allStudents.push(...courseStudents)
             }
-          } catch (err) {
-            console.error(`获取课程 ${course.id} 学生失败:`, err)
+          } catch (courseError) {
+            console.error(`获取课程 ${course.id} 学生失败:`, courseError)
           }
         }
         setStudents(allStudents)
       }
-    } catch (error) {
-      console.error('获取学生列表失败:', error)
+    } catch (fetchError) {
+      console.error('获取学生列表失败:', fetchError)
+      setError((fetchError as { message?: string }).message || '获取学生列表失败')
     } finally {
       setLoading(false)
     }
@@ -123,15 +120,14 @@ const StudentManagement: React.FC = () => {
     setProcessingId(student.id)
     try {
       const response = await apiClient.put(`/courses/${student.courseId}/students/${student.id}/freeze`, {
-        isFrozen: !student.isFrozen
+        isFrozen: !student.isFrozen,
       })
       if (response.code === 0) {
-        // 操作成功后重新获取数据，确保状态同步
         await fetchAllStudents()
         alert(response.message)
       }
-    } catch (error: any) {
-      alert(error.message || '操作失败')
+    } catch (operationError: any) {
+      alert(operationError.message || '操作失败')
     } finally {
       setProcessingId(null)
     }
@@ -149,8 +145,8 @@ const StudentManagement: React.FC = () => {
         const handoffFile = response.data?.handoffFile || '受保护的交接文件'
         alert(`${response.message || '密码已重置'}\n文件：${handoffFile}\n请从本机受保护的交接目录读取临时密码，并让学生首次登录后立即修改。`)
       }
-    } catch (error: any) {
-      alert(error.message || '重置密码失败')
+    } catch (operationError: any) {
+      alert(operationError.message || '重置密码失败')
     } finally {
       setProcessingId(null)
     }
@@ -165,362 +161,302 @@ const StudentManagement: React.FC = () => {
     try {
       const response = await apiClient.delete(`/courses/${student.courseId}/students/${student.id}`)
       if (response.code === 0) {
-        // 操作成功后重新获取数据，确保状态同步
         await fetchAllStudents()
         alert('学生已从课程中移除')
       }
-    } catch (error: any) {
-      alert(error.message || '移除学生失败')
+    } catch (operationError: any) {
+      alert(operationError.message || '移除学生失败')
     } finally {
       setProcessingId(null)
     }
   }
 
   const toggleCourseExpand = (courseId: string) => {
-    const newExpanded = new Set(expandedCourses)
-    if (newExpanded.has(courseId)) {
-      newExpanded.delete(courseId)
+    const nextExpanded = new Set(expandedCourses)
+    if (nextExpanded.has(courseId)) {
+      nextExpanded.delete(courseId)
     } else {
-      newExpanded.add(courseId)
+      nextExpanded.add(courseId)
     }
-    setExpandedCourses(newExpanded)
+    setExpandedCourses(nextExpanded)
   }
 
-  const filteredStudents = students.filter(
-    (student) => {
-      const matchesKeyword = 
-        student.nickname?.toLowerCase().includes(keyword.toLowerCase()) ||
-        student.username?.toLowerCase().includes(keyword.toLowerCase())
-      const matchesCourse = selectedCourseId === 'all' || student.courseId === selectedCourseId
-      return matchesKeyword && matchesCourse
-    }
-  )
+  const filteredStudents = students.filter(student => {
+    const matchesKeyword =
+      student.nickname?.toLowerCase().includes(keyword.toLowerCase()) ||
+      student.username?.toLowerCase().includes(keyword.toLowerCase())
+    const matchesCourse = selectedCourseId === 'all' || student.courseId === selectedCourseId
+    return matchesKeyword && matchesCourse
+  })
 
-  // 按课程分组学生
   const studentsByCourse = courses.reduce((acc, course) => {
-    acc[course.id] = students.filter(s => s.courseId === course.id)
+    acc[course.id] = students.filter(student => student.courseId === course.id)
     return acc
   }, {} as Record<string, Student[]>)
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-  }
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN')
+  const getCourseStudentCount = (courseId: string) => students.filter(student => student.courseId === courseId).length
 
-  const getCourseStudentCount = (courseId: string) => {
-    return students.filter(s => s.courseId === courseId).length
-  }
+  const renderStudentActions = (student: Student, compact = false) => (
+    <div className={`flex items-center justify-end ${compact ? 'gap-1' : 'gap-2'}`}>
+      <button
+        type="button"
+        onClick={() => handleToggleFreeze(student)}
+        disabled={processingId === student.id}
+        className={`${compact ? 'p-1' : 'p-2'} rounded ${
+          student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'
+        } disabled:opacity-50`}
+        aria-label={student.isFrozen ? `解冻 ${student.nickname} 的账号` : `冻结 ${student.nickname} 的账号`}
+        title={student.isFrozen ? '解冻账号' : '冻结账号'}
+      >
+        {student.isFrozen ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+      </button>
+      <button
+        type="button"
+        onClick={() => handleResetPassword(student)}
+        disabled={processingId === student.id}
+        className={`${compact ? 'p-1' : 'p-2'} text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50`}
+        aria-label={`重置 ${student.nickname} 的密码`}
+        title="重置密码"
+      >
+        <Key className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => handleRemoveStudent(student)}
+        disabled={processingId === student.id}
+        className={`${compact ? 'p-1' : 'p-2'} text-red-600 hover:bg-red-50 rounded disabled:opacity-50`}
+        aria-label={`将 ${student.nickname} 从课程中移除`}
+        title="从课程中移除"
+      >
+        <UserX className="w-4 h-4" />
+      </button>
+    </div>
+  )
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">学生管理</h1>
-          <p className="text-sm text-gray-500">
-            共 {students.length} 名学生 | {courses.length} 个课程
-          </p>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader
+        title="学生管理"
+        description={`共 ${students.length} 名学生 · ${courses.length} 个课程`}
+      />
+
+      {error && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>{error}</span>
+            <button type="button" className="btn-secondary" onClick={() => void fetchAllStudents()}>
+              重试
+            </button>
+          </div>
         </div>
+      )}
+
+      <div className="flex flex-col gap-4 md:flex-row md:items-end">
+        <label className="block flex-1 max-w-md">
+          <span className="mb-1 block text-sm font-medium text-gray-700">搜索学生</span>
+          <span className="relative block">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+            <input
+              type="search"
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="姓名或账号"
+              className="input w-full pl-10"
+            />
+          </span>
+        </label>
+        <label className="block md:min-w-56">
+          <span className="mb-1 block text-sm font-medium text-gray-700">课程</span>
+          <select
+            value={selectedCourseId}
+            onChange={(event) => setSelectedCourseId(event.target.value)}
+            className="input w-full"
+          >
+            <option value="all">所有课程</option>
+            {courses.map(course => (
+              <option key={course.id} value={course.id}>
+                {course.title} ({getCourseStudentCount(course.id)}人)
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {/* Search & Filter */}
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索学生姓名或账号..."
-            className="input pl-10 w-full"
-          />
-        </div>
-        <select
-          value={selectedCourseId}
-          onChange={(e) => setSelectedCourseId(e.target.value)}
-          className="input"
-        >
-          <option value="all">所有课程</option>
-          {courses.map(course => (
-            <option key={course.id} value={course.id}>
-              {course.title} ({getCourseStudentCount(course.id)}人)
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-gray-800">{students.length}</div>
           <div className="text-sm text-gray-500">总学生数</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="text-2xl font-bold text-green-600">
-            {students.filter(s => !s.isFrozen).length}
-          </div>
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="text-2xl font-bold text-green-600">{students.filter(student => !student.isFrozen).length}</div>
           <div className="text-sm text-gray-500">正常账号</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="text-2xl font-bold text-red-600">
-            {students.filter(s => s.isFrozen).length}
-          </div>
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="text-2xl font-bold text-red-600">{students.filter(student => student.isFrozen).length}</div>
           <div className="text-sm text-gray-500">已冻结</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
+        <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-blue-600">{courses.length}</div>
           <div className="text-sm text-gray-500">课程数</div>
         </div>
       </div>
 
-      {/* Course List with Students */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <span className="sr-only">正在加载学生列表</span>
         </div>
       ) : selectedCourseId !== 'all' ? (
-        // Single course view
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  学生信息
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  账号
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  状态
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  加入时间
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  操作
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredStudents.map((student) => (
-                <tr key={`${student.courseId}-${student.id}`} className={student.isFrozen ? 'bg-gray-50' : ''}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        {student.avatarUrl ? (
-                          <img
-                            className="h-10 w-10 rounded-full"
-                            src={student.avatarUrl}
-                            alt={student.nickname}
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-primary font-medium">
-                              {student.nickname?.charAt(0) || '?'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="ml-4">
-                        <div className={`text-sm font-medium ${student.isFrozen ? 'text-gray-500' : 'text-gray-900'}`}>
-                          {student.nickname}
-                          {student.isFrozen && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                              <Lock className="w-3 h-3 mr-1" />
-                              已冻结
-                            </span>
+        <div className="overflow-hidden rounded-lg bg-white shadow">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">学生信息</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">账号</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">状态</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">加入时间</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {filteredStudents.map(student => (
+                  <tr key={`${student.courseId}-${student.id}`} className={student.isFrozen ? 'bg-gray-50' : ''}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          {student.avatarUrl ? (
+                            <img className="h-10 w-10 rounded-full" src={student.avatarUrl} alt="" />
+                          ) : (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                              <span className="font-medium text-primary">{student.nickname?.charAt(0) || '?'}</span>
+                            </div>
                           )}
                         </div>
+                        <div className="ml-4">
+                          <div className={`text-sm font-medium ${student.isFrozen ? 'text-gray-500' : 'text-gray-900'}`}>
+                            {student.nickname}
+                            {student.isFrozen && (
+                              <span className="ml-2 inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
+                                <Lock className="mr-1 h-3 w-3" aria-hidden="true" />已冻结
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{student.username}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                      student.isFrozen
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-green-100 text-green-700'
-                    }`}>
-                      {student.isFrozen ? '已冻结' : '正常'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(student.joinedAt)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => handleToggleFreeze(student)}
-                        disabled={processingId === student.id}
-                        className={`p-2 rounded ${
-                          student.isFrozen
-                            ? 'text-green-600 hover:bg-green-50'
-                            : 'text-orange-600 hover:bg-orange-50'
-                        } disabled:opacity-50`}
-                        title={student.isFrozen ? '解冻账号' : '冻结账号'}
-                      >
-                        {student.isFrozen ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(student)}
-                        disabled={processingId === student.id}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50"
-                        title="重置密码为 12345678"
-                      >
-                        <Key className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleRemoveStudent(student)}
-                        disabled={processingId === student.id}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
-                        title="从课程中移除"
-                      >
-                        <UserX className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.username}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex rounded-full px-2 py-1 text-xs ${student.isFrozen ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        {student.isFrozen ? '已冻结' : '正常'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(student.joinedAt)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">{renderStudentActions(student)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {filteredStudents.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">
-                {keyword ? '未找到匹配的学生' : '该课程暂无学生'}
-              </p>
+            <div className="py-12 text-center">
+              <Users className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
+              <p className="text-gray-500">{keyword ? '未找到匹配的学生' : '该课程暂无学生'}</p>
             </div>
           )}
         </div>
       ) : (
-        // All courses view - grouped by course
         <div className="space-y-4">
           {courses.map(course => {
             const courseStudents = studentsByCourse[course.id] || []
             const isExpanded = expandedCourses.has(course.id)
-            
+            const panelId = `course-students-${course.id}`
+
             return (
-              <div key={course.id} className="bg-white rounded-lg shadow overflow-hidden">
+              <div key={course.id} className="overflow-hidden rounded-lg bg-white shadow">
                 <button
+                  type="button"
                   onClick={() => toggleCourseExpand(course.id)}
-                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+                  className="flex w-full flex-col gap-3 px-4 py-4 text-left hover:bg-gray-50 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                  aria-expanded={isExpanded}
+                  aria-controls={panelId}
                 >
-                  <div className="flex items-center space-x-3">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    <div className="text-left">
-                      <span className="font-medium text-gray-900">{course.title}</span>
-                      <span className="ml-2 text-sm text-gray-500">课程号: {course.courseCode}</span>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <BookOpen className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <span className="block truncate font-medium text-gray-900">{course.title}</span>
+                      <span className="block text-sm text-gray-500">课程号: {course.courseCode}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-4">
                     <span className="text-sm text-gray-500">{courseStudents.length} 名学生</span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
-                    )}
+                    {isExpanded ? <ChevronUp className="h-5 w-5 text-gray-400" aria-hidden="true" /> : <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />}
                   </div>
                 </button>
-                
+
                 {isExpanded && courseStudents.length > 0 && (
-                  <div className="border-t">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase">学生</th>
-                          <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase">账号</th>
-                          <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                          <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase">操作</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {courseStudents.slice(0, 5).map((student) => (
-                          <tr key={`${course.id}-${student.id}`} className={student.isFrozen ? 'bg-gray-50' : ''}>
-                            <td className="px-6 py-2 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <span className="text-primary text-sm font-medium">
-                                    {student.nickname?.charAt(0) || '?'}
-                                  </span>
-                                </div>
-                                <span className="ml-2 text-sm text-gray-900">{student.nickname}</span>
-                                {student.isFrozen && (
-                                  <span className="ml-2 text-xs text-gray-500">(已冻结)</span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{student.username}</td>
-                            <td className="px-6 py-2 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-0.5 text-xs rounded-full ${
-                                student.isFrozen ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                              }`}>
-                                {student.isFrozen ? '已冻结' : '正常'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-2 whitespace-nowrap text-right">
-                              <div className="flex items-center justify-end space-x-1">
-                                <button
-                                  onClick={() => handleToggleFreeze(student)}
-                                  disabled={processingId === student.id}
-                                  className={`p-1 rounded ${student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}`}
-                                  title={student.isFrozen ? '解冻' : '冻结'}
-                                >
-                                  {student.isFrozen ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                                </button>
-                                <button
-                                  onClick={() => handleResetPassword(student)}
-                                  disabled={processingId === student.id}
-                                  className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                                  title="重置密码"
-                                >
-                                  <Key className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleRemoveStudent(student)}
-                                  disabled={processingId === student.id}
-                                  className="p-1 text-red-600 hover:bg-red-50 rounded"
-                                  title="移除"
-                                >
-                                  <UserX className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
+                  <div id={panelId} className="border-t">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-2 text-left text-xs font-medium uppercase text-gray-500">学生</th>
+                            <th className="px-6 py-2 text-left text-xs font-medium uppercase text-gray-500">账号</th>
+                            <th className="px-6 py-2 text-left text-xs font-medium uppercase text-gray-500">状态</th>
+                            <th className="px-6 py-2 text-right text-xs font-medium uppercase text-gray-500">操作</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {courseStudents.slice(0, 5).map(student => (
+                            <tr key={`${course.id}-${student.id}`} className={student.isFrozen ? 'bg-gray-50' : ''}>
+                              <td className="px-6 py-2 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                                    <span className="text-sm font-medium text-primary">{student.nickname?.charAt(0) || '?'}</span>
+                                  </div>
+                                  <span className="ml-2 text-sm text-gray-900">{student.nickname}</span>
+                                  {student.isFrozen && <span className="ml-2 text-xs text-gray-500">(已冻结)</span>}
+                                </div>
+                              </td>
+                              <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{student.username}</td>
+                              <td className="px-6 py-2 whitespace-nowrap">
+                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${student.isFrozen ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                  {student.isFrozen ? '已冻结' : '正常'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-2 whitespace-nowrap text-right">{renderStudentActions(student, true)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                     {courseStudents.length > 5 && (
-                      <div className="px-6 py-2 text-center border-t">
-                        <button
-                          onClick={() => setSelectedCourseId(course.id)}
-                          className="text-sm text-primary hover:text-primary-hover"
-                        >
+                      <div className="border-t px-6 py-2 text-center">
+                        <button type="button" onClick={() => setSelectedCourseId(course.id)} className="text-sm text-primary hover:text-primary-hover">
                           查看全部 {courseStudents.length} 名学生 →
                         </button>
                       </div>
                     )}
                   </div>
                 )}
-                
+
                 {isExpanded && courseStudents.length === 0 && (
-                  <div className="px-6 py-4 text-center text-gray-500 border-t">
-                    该课程暂无学生
-                  </div>
+                  <div id={panelId} className="border-t px-6 py-4 text-center text-gray-500">该课程暂无学生</div>
                 )}
               </div>
             )
           })}
-          
+
           {courses.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-lg shadow">
-              <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <div className="rounded-lg bg-white py-12 text-center shadow">
+              <BookOpen className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
               <p className="text-gray-500">暂无课程，请先创建课程</p>
             </div>
           )}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
