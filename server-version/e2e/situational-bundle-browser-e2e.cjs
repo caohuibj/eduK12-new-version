@@ -9,6 +9,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
+const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
 
 const BASE_URL = (process.env.SITUATIONAL_BUNDLE_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const FIXTURE_FILE = process.env.SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE || '/tmp/eduk12-situational-bundle-fixture.json'
@@ -37,25 +38,50 @@ const record = (name) => {
   console.log(`[PASS] ${name}`)
 }
 
-const apiFetch = async (page, endpoint, init = {}) => page.evaluate(async ({ endpoint: pathName, requestInit }) => {
-  const token = window.localStorage.getItem('token')
-  const response = await fetch(`/api${pathName}`, {
-    ...requestInit,
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(requestInit.headers || {}),
-    },
-  })
-  const text = await response.text()
-  let body = null
-  try { body = text ? JSON.parse(text) : null } catch { body = text }
-  return { status: response.status, body }
-}, { endpoint, requestInit: init })
+const apiFetch = sessionJsonFetch
 
 const assertSuccess = (response, label) => {
   assert.equal(response.status, 200, `${label}: HTTP ${response.status}`)
   assert.equal(response.body?.code, 0, `${label}: ${response.body?.message || 'API error'}`)
   return response.body.data
+}
+
+const normalizeFrozenIdentity = (attempt) => ({
+  instrumentKey: attempt.instrumentKey,
+  instrumentVersion: attempt.instrumentVersion,
+  definitionHash: attempt.definitionHash,
+  compiledRuntimeHash: attempt.compiledRuntimeHash,
+  scorerKey: attempt.scorerKey,
+  scoringVersion: attempt.scoringVersion,
+  runtimeGeneration: attempt.runtimeGeneration,
+  deliveryMode: attempt.deliveryMode,
+  attemptEpoch: attempt.attemptEpoch,
+  frozenAt: attempt.frozenAt instanceof Date ? attempt.frozenAt.toISOString() : String(attempt.frozenAt),
+})
+
+const readFrozenIdentity = async (attemptId) => {
+  const prisma = new PrismaClient()
+  try {
+    const attempt = await prisma.situationalAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        instrumentKey: true,
+        instrumentVersion: true,
+        definitionHash: true,
+        compiledRuntimeHash: true,
+        scorerKey: true,
+        scoringVersion: true,
+        runtimeGeneration: true,
+        deliveryMode: true,
+        attemptEpoch: true,
+        frozenAt: true,
+      },
+    })
+    assert.ok(attempt, `Situational attempt ${attemptId} not found for frozen identity`)
+    return normalizeFrozenIdentity(attempt)
+  } finally {
+    await prisma.$disconnect()
+  }
 }
 
 const waitForParentState = async (page, parentId, recoveryToken = '') => {
@@ -149,14 +175,14 @@ const assertAggregateSafe = (payload, label) => {
 }
 
 const loginStudent = async (page) => {
-  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'commit', timeout: 30000 })
-  await page.getByPlaceholder('请输入用户名').waitFor({ state: 'visible', timeout: 60000 })
-  await page.getByPlaceholder('请输入用户名').fill(fixture.student.username)
-  await page.getByPlaceholder('请输入密码').fill(fixture.student.password)
-  await Promise.all([
-    page.waitForURL(/\/student(?:\?|$)/, { timeout: 30000 }),
-    page.getByRole('button', { name: '登录', exact: true }).click(),
-  ])
+  await loginWithSession(page, {
+    baseUrl: BASE_URL,
+    route: '/student/login',
+    username: fixture.student.username,
+    password: fixture.student.password,
+    timeout: 60000,
+  })
+  await page.waitForURL(/\/student(?:\?|$)/, { timeout: 30000 })
   await page.getByText('我的课程', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
 }
 
@@ -202,8 +228,14 @@ const enterEmbeddedRunner = async (page, parentId, publicMode = false, recoveryT
 const completeEmbeddedRunner = async (page, parentId, childId, publicMode = false, recoveryToken = '') => {
   const submitPath = `${publicMode ? '/api/public' : '/api'}/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}/submit`
   let submitCount = 0
+  const unsafeRequests = []
   const onRequest = (request) => {
-    if (request.method() === 'POST' && request.url().includes(submitPath)) submitCount += 1
+    const method = request.method()
+    const pathname = new URL(request.url()).pathname
+    if (pathname.startsWith('/api/') && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      unsafeRequests.push({ method, pathname })
+    }
+    if (method === 'POST' && pathname === submitPath) submitCount += 1
   }
   page.on('request', onRequest)
   try {
@@ -215,6 +247,8 @@ const completeEmbeddedRunner = async (page, parentId, childId, publicMode = fals
     await navigateToScene(page, 1, true)
     await assertVisualScene(page, 1)
     assert.equal(await page.locator('input[type="radio"]').first().isChecked(), true, 'first scene answer was not restored locally')
+    assert.deepEqual(unsafeRequests, [], 'answer/navigation/reload emitted an unsafe API write before FINAL')
+    record(publicMode ? 'public-local-draft-zero-server-writes' : 'local-draft-zero-server-writes')
     record(publicMode ? 'public-recovery-resume' : 'partial-reload-resume')
 
     await navigateToScene(page, 2, false)
@@ -224,6 +258,7 @@ const completeEmbeddedRunner = async (page, parentId, childId, publicMode = fals
     await page.getByRole('alert').filter({ hasText: '还有必答通道未完成' }).waitFor({ state: 'visible', timeout: 30000 })
     await page.waitForTimeout(200)
     assert.equal(submitCount, 0, 'incomplete FINAL emitted a submit request')
+    assert.deepEqual(unsafeRequests, [], 'incomplete FINAL emitted an unsafe API write')
     if (!publicMode) record('required-response-blocked')
 
     await chooseFirstOption(page)
@@ -239,6 +274,7 @@ const completeEmbeddedRunner = async (page, parentId, childId, publicMode = fals
     await page.waitForURL(parentRoute, { timeout: 30000 })
     await page.waitForTimeout(300)
     assert.equal(submitCount, 1, 'rapid duplicate FINAL emitted more than one logical submit')
+    assert.deepEqual(unsafeRequests, [{ method: 'POST', pathname: submitPath }], 'runner emitted unsafe writes outside the single FINAL submit')
     record(publicMode ? 'public-final-return' : 'single-final')
   } finally {
     page.off('request', onRequest)
@@ -270,13 +306,14 @@ const runAuthenticatedFlow = async (browser) => {
     const parentId = await startAuthenticatedParent(page)
     record('authenticated-bundle-entry')
     const childId = await enterEmbeddedRunner(page, parentId)
+    const frozenIdentity = await readFrozenIdentity(childId)
     record('embedded-child')
     await completeEmbeddedRunner(page, parentId, childId)
     await assertCompletedSlotDoesNotRestart(page, parentId)
     const report = assertSuccess(await apiFetch(page, `/composite-assessments/attempts/${parentId}/report`), 'authenticated report')
     assertAggregateSafe(report, 'authenticated report')
     record('aggregate-safe-output')
-    return { parentId, childId }
+    return { parentId, childId, frozenIdentity }
   } finally {
     await context.close()
   }
@@ -314,6 +351,7 @@ const runPublicFlow = async (browser) => {
     await page.waitForFunction((key) => Boolean(window.sessionStorage.getItem(key)), `composite:recovery:attempt:${parentId}`, { timeout: 30000 })
     await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     const childId = await enterEmbeddedRunner(page, parentId, true, recoveryToken)
+    const frozenIdentity = await readFrozenIdentity(childId)
     await completeEmbeddedRunner(page, parentId, childId, true, recoveryToken)
     const report = assertSuccess(
       await apiFetch(page, `/public/composite-assessments/attempts/${parentId}/report`, { headers: { 'X-Recovery-Token': recoveryToken } }),
@@ -339,13 +377,13 @@ const runPublicFlow = async (browser) => {
     } finally {
       await missingContext.close()
     }
-    return { parentId, childId }
+    return { parentId, childId, frozenIdentity }
   } finally {
     await context.close()
   }
 }
 
-const assertDurableCompletion = async (parentId, childId, label) => {
+const assertDurableCompletion = async (parentId, childId, label, frozenIdentity) => {
   const prisma = new PrismaClient()
   try {
     const parent = await prisma.compositeAssessmentAttempt.findUnique({
@@ -363,6 +401,25 @@ const assertDurableCompletion = async (parentId, childId, label) => {
     assert.equal(children[0].id, childId, `${label}: unexpected child attempt`)
     assert.equal(children[0].status, 'COMPLETED', `${label}: child is not COMPLETED`)
     record(`${label}-SituationalAttempt: 1`)
+
+    const completedAttempt = await prisma.situationalAttempt.findUnique({
+      where: { id: childId },
+      select: {
+        instrumentKey: true,
+        instrumentVersion: true,
+        definitionHash: true,
+        compiledRuntimeHash: true,
+        scorerKey: true,
+        scoringVersion: true,
+        runtimeGeneration: true,
+        deliveryMode: true,
+        attemptEpoch: true,
+        frozenAt: true,
+      },
+    })
+    assert.ok(completedAttempt, `${label}: completed attempt missing`)
+    assert.deepEqual(normalizeFrozenIdentity(completedAttempt), frozenIdentity, `${label}: frozen runtime identity changed across FINAL`)
+    record(`${label}-frozen-runtime-identity-stable`)
 
     const rawCount = await prisma.situationalRawSubmission.count({ where: { attemptId: childId } })
     assert.equal(rawCount, 1, `${label}: expected one raw submission, got ${rawCount}`)
@@ -406,9 +463,9 @@ const main = async () => {
   const browser = await chromium.launch({ headless: true, executablePath: BROWSER_EXECUTABLE })
   try {
     const authenticated = await runAuthenticatedFlow(browser)
-    await assertDurableCompletion(authenticated.parentId, authenticated.childId, 'authenticated')
+    await assertDurableCompletion(authenticated.parentId, authenticated.childId, 'authenticated', authenticated.frozenIdentity)
     const publicFlow = await runPublicFlow(browser)
-    await assertDurableCompletion(publicFlow.parentId, publicFlow.childId, 'public')
+    await assertDurableCompletion(publicFlow.parentId, publicFlow.childId, 'public', publicFlow.frozenIdentity)
     console.log('--- seeded Situational Bundle acceptance ---')
     for (const name of results) console.log(`✅ ${name}`)
     console.log('ALL PASS')

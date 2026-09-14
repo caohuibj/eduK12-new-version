@@ -15,6 +15,7 @@ const assert = require('assert/strict')
 const fs = require('fs')
 const path = require('path')
 const { chromium } = require('../backend/node_modules/playwright-core')
+const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
 
 const BASE_URL = (process.env.COGNITIVE_E2E_BASE_URL || 'http://127.0.0.1').replace(/\/$/, '')
 const TOKEN = process.env.COMPOSITE_E2E_TOKEN
@@ -41,19 +42,6 @@ const required = (value, label) => {
   return value
 }
 
-const jsonFetch = async (page, endpoint, init = {}) => page.evaluate(async ({ endpoint: pathName, requestInit }) => {
-  const token = localStorage.getItem('token')
-  const headers = {
-    ...(requestInit.headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
-  const response = await fetch(`/api${pathName}`, { ...requestInit, headers })
-  const text = await response.text()
-  let body = null
-  try { body = text ? JSON.parse(text) : null } catch { body = text }
-  return { status: response.status, body }
-}, { endpoint, requestInit: init })
-
 const publicInfo = async (page) => page.evaluate(async ({ baseUrl, token }) => {
   const response = await fetch(`${baseUrl}/api/public/composite-assessments/${token}`)
   return { status: response.status, body: await response.json() }
@@ -65,15 +53,12 @@ const assertSuccess = (response, label) => {
   return response.body.data
 }
 
-const login = async (page) => {
-  await page.goto(`${BASE_URL}/teacher/account-login`, { waitUntil: 'domcontentloaded' })
-  await page.getByPlaceholder('请输入用户名').fill(USERNAME)
-  await page.getByPlaceholder('请输入密码').fill(PASSWORD)
-  await Promise.all([
-    page.waitForFunction(() => Boolean(localStorage.getItem('token')), null, { timeout: 30000 }),
-    page.getByRole('button', { name: '登录', exact: true }).click(),
-  ])
-}
+const login = async (page) => loginWithSession(page, {
+  baseUrl: BASE_URL,
+  route: '/teacher/account-login',
+  username: USERNAME,
+  password: PASSWORD,
+})
 
 const main = async () => {
   assert.equal(process.env.COMPOSITE_E2E_ISOLATED_DB, '1', 'Set COMPOSITE_E2E_ISOLATED_DB=1 for a dedicated Gate service')
@@ -114,7 +99,7 @@ const main = async () => {
     const teacherPage = await teacherContext.newPage()
     try {
       await login(teacherPage)
-      const tokens = assertSuccess(await jsonFetch(teacherPage, `/composite-assessments/${ASSESSMENT_ID}/public-tokens`), 'token list after start')
+      const tokens = assertSuccess(await sessionJsonFetch(teacherPage, `/composite-assessments/${ASSESSMENT_ID}/public-tokens`), 'token list after start')
       const token = tokens.list.find((entry) => entry.token === TOKEN)
       assert.ok(token, 'fixture token is missing from the teacher token list')
       assert.equal(token.usedCount, beforeUsedCount + 1, 'explicit start did not consume exactly one participation slot')

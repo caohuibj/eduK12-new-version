@@ -11,6 +11,7 @@ on:
       - 'server-version/backend/src/modules/composite/composite.public.routes.ts'
       - 'server-version/frontend/src/modules/situational/**'
       - 'server-version/e2e/situational-video-*'
+      - 'server-version/e2e/fe-11-video-fault-*'
   workflow_dispatch:
 
 concurrency:
@@ -145,6 +146,8 @@ jobs:
           done
           cat /tmp/eduk12-situational-video-frontend.log
           exit 1
+      - name: run FE-11 video capability fault acceptance
+        run: node e2e/fe-11-video-fault-browser-e2e.cjs
       - name: run Situational VIDEO browser acceptance
         run: node e2e/situational-video-browser-e2e.cjs
       - name: upload Situational VIDEO evidence

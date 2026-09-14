@@ -8,6 +8,8 @@ on:
       - 'server-version/backend/src/modules/cognitive/**'
       - 'server-version/frontend/src/modules/cognitive/**'
       - 'server-version/e2e/cognitive-video-*'
+      - 'server-version/e2e/helpers/session-auth.cjs'
+      - 'server-version/docs/frontend-convergence/fe-11-unified-journey-gate.md'
   workflow_dispatch:
 
 concurrency:

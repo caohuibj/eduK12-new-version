@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "pretypecheck": "npm run inventory:product-ui:check",
+    "pretypecheck": "npm run inventory:product-ui:check && node ../e2e/validate-session-auth-gates.cjs",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.cognitive.json --noEmit",
     "test": "vitest run --maxWorkers=2",
     "test:cognitive": "vitest run src/modules/cognitive src/modules/reporting src/modules/composite src/pages/teacher",

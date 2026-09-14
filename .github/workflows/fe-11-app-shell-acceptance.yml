@@ -1,0 +1,86 @@
+name: FE-11 AppShell Device Accessibility Acceptance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - '.github/workflows/fe-11-app-shell-acceptance.yml'
+      - 'server-version/e2e/app-shell-browser-e2e.cjs'
+      - 'server-version/frontend/src/components/app-shell/**'
+      - 'server-version/frontend/src/components/product-ui/**'
+  workflow_dispatch:
+
+concurrency:
+  group: fe-11-app-shell-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app-shell-device-accessibility:
+    name: AppShell viewport/input/accessibility browser matrix
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      APP_SHELL_BASE_URL: http://127.0.0.1:5173
+      APP_SHELL_EVIDENCE_DIR: /tmp/eduk12-fe-11-app-shell
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: configure runner-local npm and Playwright caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: backend npm ci for Playwright runtime
+        working-directory: server-version/backend
+        run: npm ci
+      - name: prepare Chromium
+        working-directory: server-version/backend
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: start frontend
+        run: |
+          rm -rf "$APP_SHELL_EVIDENCE_DIR"
+          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-fe-11-app-shell-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-fe-11-app-shell-frontend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-fe-11-app-shell-frontend.log
+          exit 1
+      - name: run viewport input accessibility matrix
+        run: node e2e/app-shell-browser-e2e.cjs
+      - name: upload FE-11 AppShell evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: fe-11-app-shell-device-accessibility-evidence
+          path: |
+            /tmp/eduk12-fe-11-app-shell
+            /tmp/eduk12-fe-11-app-shell-frontend.log
+          if-no-files-found: ignore
+      - name: stop frontend
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-fe-11-app-shell-frontend.pid ]; then
+            kill -- -$(cat /tmp/eduk12-fe-11-app-shell-frontend.pid) || true
+          fi

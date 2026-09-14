@@ -35,44 +35,65 @@ async function login(page) {
   await page.getByLabel('密码', { exact: true }).fill('password123')
   await page.getByRole('button', { name: '登录', exact: true }).click()
 }
-async function openNav(page) {
+async function openNav(page, method = 'pointer') {
   const toggle = page.getByRole('button', { name: '导航菜单' })
-  if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') === 'false') await toggle.click()
+  if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') === 'false') {
+    if (method === 'touch') await toggle.tap()
+    else await toggle.click()
+  }
   return page.getByRole('navigation', { name: '主要导航' })
+}
+async function activateAssessmentLink(page, nav, mode) {
+  const target = nav.getByRole('link', { name: '我的测评' })
+  if (mode === 'keyboard' || mode === 'hybrid') {
+    await target.focus()
+    await page.keyboard.press('Enter')
+    return
+  }
+  if (mode === 'emulated-touch') {
+    await target.tap()
+    return
+  }
+  await target.click()
 }
 async function main() {
   fs.mkdirSync(output, { recursive: true })
   const browser = await chromium.launch({ headless: true, channel: process.env.APP_SHELL_BROWSER_CHANNEL || undefined })
   const cases = []
+  const inputModes = [
+    { name: 'keyboard', touch: false },
+    { name: 'pointer', touch: false },
+    { name: 'emulated-touch', touch: true },
+    { name: 'hybrid', touch: true },
+  ]
   try {
-    for (const width of [360, 390, 768, 820, 1366]) for (const touch of [false, true]) {
-      const { context, page, state } = await setup(browser, { width, touch })
+    for (const width of [360, 390, 768, 820, 1366]) for (const mode of inputModes) {
+      const { context, page, state } = await setup(browser, { width, touch: mode.touch })
       await page.goto(`${base}/student/cognitive/history`)
-      await page.getByRole('heading', { name: '测评历史', exact: true }).waitFor()
-      const nav = await openNav(page)
+      await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
+      let nav = await openNav(page, mode.name === 'emulated-touch' ? 'touch' : 'pointer')
       assert.equal(await nav.locator('[aria-current="page"]').count(), 1)
       assert.equal(await nav.locator('[aria-current="page"]').innerText(), '认知测评')
       assert.equal(await page.getByRole('main').count(), 1)
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
       const sizes = await nav.locator('a').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height))
       assert(sizes.every((height) => height >= 44))
-      if (width < 1024) {
+      if (width < 1024 && (mode.name === 'keyboard' || mode.name === 'hybrid')) {
         await nav.getByRole('link', { name: '课程', exact: true }).focus()
         await page.keyboard.press('Escape')
         assert.equal(await page.getByRole('button', { name: '导航菜单' }).evaluate((node) => node === document.activeElement), true)
         assert.equal(await nav.isVisible(), false)
-        await openNav(page)
+        nav = await openNav(page, mode.name === 'hybrid' ? 'touch' : 'pointer')
       }
-      await page.screenshot({ path: path.join(output, `${width}-${touch ? 'touch' : 'keyboard'}.png`), fullPage: true })
-      if (touch) await nav.getByRole('link', { name: '我的测评' }).tap()
-      else { await nav.getByRole('link', { name: '我的测评' }).focus(); await page.keyboard.press('Enter') }
+      await page.screenshot({ path: path.join(output, `${width}-${mode.name}.png`), fullPage: true })
+      await activateAssessmentLink(page, nav, mode.name)
       await page.getByRole('heading', { name: '心理测评', exact: true }).waitFor()
       assert.equal(await page.getByRole('main').evaluate((node) => node === document.activeElement), true)
       await page.reload()
       await page.getByRole('heading', { name: '心理测评', exact: true }).waitFor()
       assert.deepEqual(state.errors, [])
       assert.equal(state.requests.some((req) => req.method !== 'GET'), false)
-      cases.push({ width, input: touch ? 'emulated-touch' : 'keyboard', passed: true })
+      cases.push({ width, input: mode.name, touchCapable: mode.touch, passed: true })
       await context.close()
     }
     for (const role of ['TEACHER', 'ADMIN']) {
@@ -94,7 +115,7 @@ async function main() {
       await page.reload()
       await page.getByLabel('恢复凭证').fill('fixture-credential')
       await page.getByRole('button', { name: '恢复测评', exact: true }).click()
-      await page.getByText('加载失败', { exact: true }).waitFor()
+      await page.getByText('测评不可访问', { exact: true }).waitFor()
       assert(state.requests.some((req) => req.pathname.includes('/public/cognitive/sessions/s1')))
       assert.equal(state.requests.some((req) => req.pathname.startsWith('/api/cognitive/')), false)
       await page.goto(`${base}/public/cognitive/sessions`)
@@ -112,7 +133,7 @@ async function main() {
     {
       const { context, page, state } = await setup(browser)
       await page.goto(`${base}/student/cognitive/history`)
-      await page.getByRole('heading', { name: '测评历史', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
       // Sentinel models existing browser data; FE-02 must not delete storage on 401.
       await page.evaluate(() => localStorage.setItem('fe02-draft-sentinel', 'keep'))
       state.expires = true
