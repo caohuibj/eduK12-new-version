@@ -81,8 +81,7 @@ const ClassroomEnter: React.FC = () => {
 
       <div className="flex flex-1 flex-col justify-center px-4 py-8">
         <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6">
-          <section className="rounded-lg bg-white p-6 shadow-sm" aria-labelledby="classroom-code-title">
-            <h2 id="classroom-code-title" className="sr-only">课堂码</h2>
+          <section className="rounded-lg bg-white p-6 shadow-sm">
             <div className="mb-4 flex justify-center gap-2" aria-hidden="true">
               {[0, 1, 2, 3, 4, 5].map(index => (
                 <div
