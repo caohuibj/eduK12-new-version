@@ -5,6 +5,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
+const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
 
 const BASE_URL = (process.env.SITUATIONAL_VIDEO_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const FIXTURE_FILE = process.env.SITUATIONAL_VIDEO_E2E_FIXTURE_FILE || '/tmp/eduk12-situational-video-fixture.json'
@@ -19,21 +20,7 @@ assert.ok(fs.existsSync(FIXTURE_FILE), `fixture not found: ${FIXTURE_FILE}`)
 const fixture = JSON.parse(fs.readFileSync(FIXTURE_FILE, 'utf8'))
 const results = []
 const record = (name) => { results.push(name); console.log(`[PASS] ${name}`) }
-
-const apiFetch = async (page, endpoint, init = {}) => page.evaluate(async ({ endpoint: pathName, requestInit }) => {
-  const token = window.localStorage.getItem('token')
-  const response = await fetch(`/api${pathName}`, {
-    ...requestInit,
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(requestInit.headers || {}),
-    },
-  })
-  const text = await response.text()
-  let body = null
-  try { body = text ? JSON.parse(text) : null } catch { body = text }
-  return { status: response.status, body }
-}, { endpoint, requestInit: init })
+const apiFetch = sessionJsonFetch
 
 const assertSuccess = (response, label) => {
   assert.equal(response.status, 200, `${label}: HTTP ${response.status}`)
@@ -42,14 +29,14 @@ const assertSuccess = (response, label) => {
 }
 
 const loginStudent = async (page) => {
-  await page.goto(`${BASE_URL}/student/login`, { waitUntil: 'commit', timeout: 30000 })
-  await page.getByPlaceholder('请输入用户名').waitFor({ state: 'visible', timeout: 60000 })
-  await page.getByPlaceholder('请输入用户名').fill(fixture.student.username)
-  await page.getByPlaceholder('请输入密码').fill(fixture.student.password)
-  await Promise.all([
-    page.waitForURL(/\/student(?:\?|$)/, { timeout: 30000 }),
-    page.getByRole('button', { name: '登录', exact: true }).click(),
-  ])
+  await loginWithSession(page, {
+    baseUrl: BASE_URL,
+    route: '/student/login',
+    username: fixture.student.username,
+    password: fixture.student.password,
+    timeout: 60000,
+  })
+  await page.waitForURL(/\/student(?:\?|$)/, { timeout: 30000 })
 }
 
 const waitScene = async (page, title) => {
