@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { CheckCircle, ChevronRight, Clock, FileText } from 'lucide-react'
-import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
+import { CheckCircle, Clock, FileText } from 'lucide-react'
+import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 
 interface Scale {
   id: string
@@ -78,46 +77,37 @@ const StudentScales: React.FC = () => {
       ) : (
         <div className="grid gap-4">
           {scales.map((scale) => (
-            <Link
+            <DiscoveryCard
               key={scale.id}
               to={scaleDestination(scale)}
-              className="group block min-h-11 rounded-xl border border-slate-200 bg-white p-4 text-inherit no-underline transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-700 hover:border-slate-300 sm:p-5"
-              aria-label={`${scale.name}${scale.inProgress ? '，继续作答' : scale.completed ? '，查看结果' : '，开始测评'}`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-semibold leading-snug text-slate-900">{scale.name}</h2>
-                    {scale.inProgress ? (
-                      <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">进行中</span>
-                    ) : scale.completed ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                        <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                        已完成
-                      </span>
-                    ) : null}
-                  </div>
-                  {scale.description ? <p className="mt-2 text-sm leading-relaxed text-slate-600">{scale.description}</p> : null}
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-500">
+              title={scale.name}
+              ariaLabel={`${scale.name}${scale.inProgress ? '，继续作答' : scale.completed ? '，查看结果' : '，开始测评'}`}
+              status={scale.inProgress ? (
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">进行中</span>
+              ) : scale.completed ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                  <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                  已完成
+                </span>
+              ) : undefined}
+              description={scale.description}
+              meta={(
+                <>
+                  <span className="inline-flex items-center gap-1.5">
+                    <FileText className="h-4 w-4" aria-hidden="true" />
+                    {scale.itemCount} 道题目
+                  </span>
+                  {scale.estimatedTime ? (
                     <span className="inline-flex items-center gap-1.5">
-                      <FileText className="h-4 w-4" aria-hidden="true" />
-                      {scale.itemCount} 道题目
+                      <Clock className="h-4 w-4" aria-hidden="true" />
+                      约 {scale.estimatedTime} 分钟
                     </span>
-                    {scale.estimatedTime ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock className="h-4 w-4" aria-hidden="true" />
-                        约 {scale.estimatedTime} 分钟
-                      </span>
-                    ) : null}
-                    {scale.course ? <span>课程：{scale.course.title}</span> : null}
-                  </div>
-                  {scale.inProgress && scale.activeAttempt ? (
-                    <p className="mt-3 text-sm font-medium text-blue-800">已有进行中的尝试，进入后继续当前本地作答。</p>
                   ) : null}
-                </div>
-                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-              </div>
-            </Link>
+                  {scale.course ? <span>课程：{scale.course.title}</span> : null}
+                </>
+              )}
+              notice={scale.inProgress && scale.activeAttempt ? '已有进行中的尝试，进入后继续当前本地作答。' : undefined}
+            />
           ))}
         </div>
       )}
