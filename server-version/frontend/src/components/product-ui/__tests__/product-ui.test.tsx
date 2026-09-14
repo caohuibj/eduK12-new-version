@@ -2,7 +2,8 @@ import { createRef } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ActionBar, PageHeader, ProductButton, ProductPage, ProductStatus } from '..'
+import { MemoryRouter } from 'react-router-dom'
+import { ActionBar, DiscoveryCard, PageHeader, ProductButton, ProductPage, ProductStatus } from '..'
 
 describe('product presentation boundaries', () => {
   it('does not create a nested main landmark or a second primary heading', () => {
@@ -41,5 +42,26 @@ describe('product presentation boundaries', () => {
     expect(retry).toHaveBeenCalledOnce()
     rerender(<ProductPage><ProductStatus kind="pending" title="正在确认提交状态" announce="polite" /></ProductPage>)
     expect(screen.getByRole('status')).toHaveTextContent('正在确认提交状态')
+  })
+
+  it('keeps discovery destination and domain semantics caller-owned', () => {
+    render(
+      <MemoryRouter>
+        <DiscoveryCard
+          to="/student/scales/scale-1"
+          title="专注力测评"
+          ariaLabel="专注力测评，继续作答"
+          status={<span>进行中</span>}
+          meta={<><span>20 道题目</span><span>约 8 分钟</span></>}
+          notice="已有进行中的尝试"
+        />
+      </MemoryRouter>,
+    )
+    const link = screen.getByRole('link', { name: '专注力测评，继续作答' })
+    expect(link).toHaveAttribute('href', '/student/scales/scale-1')
+    expect(screen.getByRole('heading', { level: 2, name: '专注力测评' })).toBeInTheDocument()
+    expect(screen.getByText('进行中')).toBeInTheDocument()
+    expect(screen.getByText('20 道题目')).toBeInTheDocument()
+    expect(screen.getByText('已有进行中的尝试')).toBeInTheDocument()
   })
 })
