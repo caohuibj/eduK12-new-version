@@ -4,11 +4,15 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const e2eDir = __dirname
-const guardedGates = [
+const sessionGuardedGates = [
   'composite-access-browser-e2e.cjs',
   'situational-bundle-browser-e2e.cjs',
   'situational-branching-browser-e2e.cjs',
   'situational-video-browser-e2e.cjs',
+  'fe-11-storage-fault-browser-e2e.cjs',
+]
+const syntaxOnlyGates = [
+  'app-shell-browser-e2e.cjs',
 ]
 
 const legacyPatterns = [
@@ -16,7 +20,7 @@ const legacyPatterns = [
   { label: 'Bearer token header', pattern: /Authorization\s*:\s*[`'"]Bearer\s/u },
 ]
 
-for (const file of guardedGates) {
+for (const file of sessionGuardedGates) {
   const filePath = path.join(e2eDir, file)
   const source = fs.readFileSync(filePath, 'utf8')
   assert.match(source, /helpers\/session-auth\.cjs/u, `${file} must use the shared cookie-session helper`)
@@ -24,6 +28,10 @@ for (const file of guardedGates) {
     assert.doesNotMatch(source, legacy.pattern, `${file} still contains ${legacy.label}`)
   }
   execFileSync(process.execPath, ['--check', filePath], { stdio: 'pipe' })
+}
+
+for (const file of syntaxOnlyGates) {
+  execFileSync(process.execPath, ['--check', path.join(e2eDir, file)], { stdio: 'pipe' })
 }
 
 const helperPath = path.join(e2eDir, 'helpers/session-auth.cjs')
@@ -34,4 +42,4 @@ assert.match(helper, /\/api\/auth\/me/u, 'session helper must verify the restore
 assert.doesNotMatch(helper, /localStorage\.getItem\(['"]token['"]\)/u, 'session helper must not read a bearer token from localStorage')
 execFileSync(process.execPath, ['--check', helperPath], { stdio: 'pipe' })
 
-console.log(`FE-11 session-auth gate contract: PASS (${guardedGates.length} browser gates)`)
+console.log(`FE-11 browser gate contract: PASS (${sessionGuardedGates.length} session gates, ${syntaxOnlyGates.length} syntax-only gates)`)
