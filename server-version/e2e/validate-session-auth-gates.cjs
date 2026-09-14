@@ -5,6 +5,7 @@ const path = require('node:path')
 
 const e2eDir = __dirname
 const sessionGuardedGates = [
+  'assessment-video-core-browser-e2e.cjs',
   'composite-access-browser-e2e.cjs',
   'situational-bundle-browser-e2e.cjs',
   'situational-branching-browser-e2e.cjs',
