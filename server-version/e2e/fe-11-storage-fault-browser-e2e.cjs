@@ -6,6 +6,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
+const { execFileSync } = require('node:child_process')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
 const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
@@ -26,7 +27,18 @@ const browserCandidates = configuredBrowserExecutable
       '/usr/bin/chromium-browser',
     ]
 const BROWSER_EXECUTABLE = browserCandidates.find((candidate) => fs.existsSync(candidate))
-const fixture = JSON.parse(fs.readFileSync(FIXTURE_FILE, 'utf8'))
+let fixture = null
+
+const reseedFaultFixture = () => {
+  const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx'
+  execFileSync(npx, ['tsx', '../e2e/situational-bundle-browser-fixture.ts'], {
+    cwd: path.resolve(__dirname, '../backend'),
+    env: process.env,
+    stdio: 'inherit',
+  })
+  assert.ok(fs.existsSync(FIXTURE_FILE), `fixture not found after reseed: ${FIXTURE_FILE}`)
+  fixture = JSON.parse(fs.readFileSync(FIXTURE_FILE, 'utf8'))
+}
 
 const assertSuccess = (response, label) => {
   assert.equal(response.status, 200, `${label}: HTTP ${response.status}`)
@@ -224,9 +236,9 @@ const runDuplicateTabReplay = async (browser, parentId, childId) => {
 }
 
 const main = async () => {
-  assert.ok(fs.existsSync(FIXTURE_FILE), `fixture not found: ${FIXTURE_FILE}`)
   assert.ok(BROWSER_EXECUTABLE, `browser executable not found; checked: ${browserCandidates.join(', ')}`)
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true })
+  reseedFaultFixture()
 
   const browser = await chromium.launch({ headless: true, executablePath: BROWSER_EXECUTABLE })
   try {
