@@ -33,16 +33,14 @@ describe('ClassroomEnter input capability', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/student/classroom/join/123456')
   })
 
-  it('filters non-digits and exposes validation errors inline', async () => {
+  it('filters non-digits and keeps entry disabled until six digits are present', async () => {
     const user = userEvent.setup()
     render(<ClassroomEnter />)
 
     const input = screen.getByLabelText('课堂码')
     await user.type(input, '12a3')
     expect(input).toHaveValue('123')
-
-    await user.click(screen.getByRole('button', { name: '进入课堂' }))
-    expect(screen.getByRole('alert')).toHaveTextContent('课堂码必须是6位数字')
+    expect(screen.getByRole('button', { name: '进入课堂' })).toBeDisabled()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
