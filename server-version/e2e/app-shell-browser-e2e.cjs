@@ -115,7 +115,7 @@ async function main() {
       await page.reload()
       await page.getByLabel('恢复凭证').fill('fixture-credential')
       await page.getByRole('button', { name: '恢复测评', exact: true }).click()
-      await page.getByText('测评不存在或不可访问', { exact: true }).waitFor()
+      await page.getByText('测评不可访问', { exact: true }).waitFor()
       assert(state.requests.some((req) => req.pathname.includes('/public/cognitive/sessions/s1')))
       assert.equal(state.requests.some((req) => req.pathname.startsWith('/api/cognitive/')), false)
       await page.goto(`${base}/public/cognitive/sessions`)
