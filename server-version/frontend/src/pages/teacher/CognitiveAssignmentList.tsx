@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Brain, Plus, Settings } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import MaterialGrantModal from '../../components/MaterialGrantModal'
+import { PageHeader, ProductPage } from '../../components/product-ui'
 
 type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean }
 type ConfigOption = {
@@ -74,6 +75,7 @@ const CognitiveAssignmentList: React.FC = () => {
 
   const load = async () => {
     try {
+      setError(null)
       const [assignmentsRes, coursesRes, configsRes, testsRes] = await Promise.all([
         cognitiveApi.listTeacherAssignments(undefined, isAdmin ? undefined : true),
         apiClient.get<{ list: CourseOption[] }>('/courses?status=all&page=1&pageSize=100'),
@@ -135,41 +137,62 @@ const CognitiveAssignmentList: React.FC = () => {
   if (loading) return <div className="text-gray-500 p-8">加载中...</div>
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Brain className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-gray-800">认知任务</h1>
-        </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus className="w-4 h-4 inline mr-1" />新建认知任务
-        </button>
-      </div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader
+        title="认知任务"
+        description="创建和管理认知任务；任务类型、版本、Profile 与访问策略仍由 Cognitive domain contract 决定。"
+        actions={
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="btn-primary"
+            aria-expanded={showForm}
+            aria-controls="cognitive-assignment-create"
+          >
+            <Plus className="w-4 h-4 inline mr-1" />新建认知任务
+          </button>
+        }
+      />
+
+      {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+
       {showForm && (
-        <div className="card p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">新建认知任务</h2>
-          <div className="grid md:grid-cols-2 gap-3">
-            <input className="border rounded px-3 py-2 md:col-span-2" placeholder="标题" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            <select className="border rounded px-3 py-2" value={form.courseId} onChange={(e) => setForm({ ...form, courseId: e.target.value })}>
-              <option value="">选择课程</option>
-              {selectableCourses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.title}（{course.courseCode}）{course.isLibrary ? ' · 库课程' : ''}
-                </option>
-              ))}
-            </select>
-            <select className="border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value })}>
-              <option value="">选择任务类型</option>
-              {configs.map((config) => (
-                <option key={config.id} value={config.id}>
-                  {config.name} · {config.testType} {config.configVersion}{config.accessPolicy ? ` · ${config.accessPolicy}` : ''}
-                </option>
-              ))}
-            </select>
+        <section id="cognitive-assignment-create" className="card p-6" aria-labelledby="cognitive-assignment-create-title">
+          <div className="flex items-center gap-2 mb-4">
+            <Brain className="w-5 h-5 text-primary" aria-hidden="true" />
+            <h2 id="cognitive-assignment-create-title" className="text-lg font-semibold">新建认知任务</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label className="md:col-span-2 text-sm text-gray-700">
+              标题
+              <input className="mt-1 w-full border rounded px-3 py-2" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            </label>
+            <label className="text-sm text-gray-700">
+              课程
+              <select className="mt-1 w-full border rounded px-3 py-2" value={form.courseId} onChange={(e) => setForm({ ...form, courseId: e.target.value })}>
+                <option value="">选择课程</option>
+                {selectableCourses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}（{course.courseCode}）{course.isLibrary ? ' · 库课程' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm text-gray-700">
+              任务类型
+              <select className="mt-1 w-full border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value })}>
+                <option value="">选择任务类型</option>
+                {configs.map((config) => (
+                  <option key={config.id} value={config.id}>
+                    {config.name} · {config.testType} {config.configVersion}{config.accessPolicy ? ` · ${config.accessPolicy}` : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
             {isAdmin && selectedConfig && (
-              <div className="md:col-span-2 flex flex-wrap items-center gap-3 text-sm text-gray-700">
-                <span>访问策略</span>
+              <fieldset className="md:col-span-2 flex flex-wrap items-center gap-3 text-sm text-gray-700">
+                <legend className="sr-only">访问策略</legend>
+                <span aria-hidden="true">访问策略</span>
                 <label className="flex items-center gap-1">
                   <input
                     type="radio"
@@ -191,25 +214,34 @@ const CognitiveAssignmentList: React.FC = () => {
                 <button type="button" onClick={() => setGrantConfig(selectedConfig)} className="btn-secondary">
                   授权给教师
                 </button>
-              </div>
+              </fieldset>
             )}
-            <select
-              className="border rounded px-3 py-2"
-              value={form.profile}
-              disabled={!selectedTest}
-              onChange={(e) => setForm({ ...form, profile: e.target.value as 'experience' | 'standard' | 'research' })}
-            >
-              {(selectedTest?.profiles || []).map((profile) => (
-                <option key={profile.profile} value={profile.profile}>
-                  {profile.profile === 'experience' ? '体验版' : profile.profile === 'research' ? '科研版' : '正式版'}
-                </option>
-              ))}
-            </select>
-            <input type="number" min={1} className="border rounded px-3 py-2" placeholder="最大次数" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: Number(e.target.value) })} />
+            <label className="text-sm text-gray-700">
+              测验档位
+              <select
+                className="mt-1 w-full border rounded px-3 py-2"
+                value={form.profile}
+                disabled={!selectedTest}
+                onChange={(e) => setForm({ ...form, profile: e.target.value as 'experience' | 'standard' | 'research' })}
+              >
+                {(selectedTest?.profiles || []).map((profile) => (
+                  <option key={profile.profile} value={profile.profile}>
+                    {profile.profile === 'experience' ? '体验版' : profile.profile === 'research' ? '科研版' : '正式版'}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm text-gray-700">
+              最大次数
+              <input type="number" min={1} className="mt-1 w-full border rounded px-3 py-2" value={form.maxAttempts} onChange={(e) => setForm({ ...form, maxAttempts: Number(e.target.value) })} />
+            </label>
             {form.profile === 'experience' && (
               <p className="text-xs text-amber-600 md:col-span-2">体验版，结果仅供体验。</p>
             )}
-            <textarea className="border rounded px-3 py-2 md:col-span-2" placeholder="学生须知（可选）" value={form.instruction} onChange={(e) => setForm({ ...form, instruction: e.target.value })} />
+            <label className="md:col-span-2 text-sm text-gray-700">
+              学生须知（可选）
+              <textarea className="mt-1 w-full border rounded px-3 py-2" value={form.instruction} onChange={(e) => setForm({ ...form, instruction: e.target.value })} />
+            </label>
           </div>
           {selectedCourse?.isLibrary && (
             <p className="text-xs text-amber-600 mt-3">库课程上的认知任务不能单独发给学生，通常只作为综合测评模板的模块。</p>
@@ -217,18 +249,19 @@ const CognitiveAssignmentList: React.FC = () => {
           {catalogMismatch && (
             <p className="text-xs text-red-600 mt-3">任务配置与 Catalog 版本不一致，无法选择 Profile。请重新选择匹配 engineVersion / scoringVersion 的任务类型。</p>
           )}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || !selectedTest} className="btn-primary">{saving ? '保存中...' : '保存草稿'}</button>
-            <button onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
+            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
           </div>
-        </div>
+        </section>
       )}
+
       {list.length === 0 ? (
         <div className="card p-10 text-center text-gray-500">还没有认知任务。先创建并发布后，才能加入综合测评或发给学生。</div>
       ) : (
         <div className="grid gap-4">
           {list.map((item) => (
-            <div key={item.id} className="card p-5 flex items-center justify-between">
+            <article key={item.id} className="card p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="font-semibold text-gray-800">{item.title}</h2>
@@ -242,10 +275,10 @@ const CognitiveAssignmentList: React.FC = () => {
                   {` · 最多 ${item.maxAttempts} 次`}
                 </p>
               </div>
-              <button onClick={() => navigate(`/cognitive-assignments/${item.id}`)} className="btn-secondary">
-                <Settings className="w-4 h-4 inline mr-1" />配置
-              </button>
-            </div>
+              <Link to={`/cognitive-assignments/${item.id}`} className="btn-secondary self-start sm:self-auto">
+                <Settings className="w-4 h-4 inline mr-1" aria-hidden="true" />配置
+              </Link>
+            </article>
           ))}
         </div>
       )}
@@ -257,7 +290,7 @@ const CognitiveAssignmentList: React.FC = () => {
           onClose={() => setGrantConfig(null)}
         />
       )}
-    </div>
+    </ProductPage>
   )
 }
 
