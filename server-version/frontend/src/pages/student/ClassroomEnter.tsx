@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Keyboard, ArrowRight, Loader2 } from 'lucide-react'
+import { ArrowRight, Keyboard, Loader2 } from 'lucide-react'
 
 const ClassroomEnter: React.FC = () => {
   const navigate = useNavigate()
@@ -9,177 +9,170 @@ const ClassroomEnter: React.FC = () => {
   const [error, setError] = useState('')
   const [isEntering, setIsEntering] = useState(false)
 
-  // 从 URL 参数中获取课堂码
   useEffect(() => {
     const codeParam = searchParams.get('code')
     if (codeParam && /^\d{6}$/.test(codeParam)) {
       setCode(codeParam)
-      // 自动跳转
       setIsEntering(true)
       setTimeout(() => {
-        // 直接跳转，不修改登录状态
-        // 已登录学生会保持登录状态，未登录学生使用临时身份
         navigate(`/student/classroom/join/${codeParam}`)
       }, 500)
     }
   }, [searchParams, navigate])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const validateCode = (value: string) => {
+    if (!value.trim()) return '请输入课堂码'
+    if (!/^\d{6}$/.test(value)) return '课堂码必须是6位数字'
+    return ''
+  }
 
-    // 验证课堂码格式（6位数字）
-    if (!code.trim()) {
-      setError('请输入课堂码')
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault()
+    const validationError = validateCode(code)
+    if (validationError) {
+      setError(validationError)
       return
     }
-
-    if (!/^\d{6}$/.test(code)) {
-      setError('课堂码必须是6位数字')
-      return
-    }
-
-    // 跳转到加入课堂页面
+    setIsEntering(true)
     navigate(`/student/classroom/join/${code}`)
   }
 
+  const handleCodeChange = (value: string) => {
+    if (isEntering) return
+    const nextCode = value.replace(/\D/g, '').slice(0, 6)
+    setCode(nextCode)
+    setError('')
+  }
+
   const handleKeyPress = (digit: string) => {
-    if (code.length < 6 && !isEntering) {
-      const newCode = code + digit
-      setCode(newCode)
-      setError('')
-      
-      // 输入满6位后自动跳转
-      if (newCode.length === 6) {
-        setIsEntering(true)
-        setTimeout(() => {
-          // 直接跳转，不修改登录状态
-          // 已登录学生会保持登录状态，未登录学生使用临时身份
-          navigate(`/student/classroom/join/${newCode}`)
-        }, 300)
-      }
+    if (code.length >= 6 || isEntering) return
+    const nextCode = code + digit
+    setCode(nextCode)
+    setError('')
+
+    if (nextCode.length === 6) {
+      setIsEntering(true)
+      setTimeout(() => {
+        navigate(`/student/classroom/join/${nextCode}`)
+      }, 300)
     }
   }
 
   const handleDelete = () => {
-    setCode(code.slice(0, -1))
+    if (isEntering) return
+    setCode(current => current.slice(0, -1))
     setError('')
   }
 
   const handleClear = () => {
+    if (isEntering) return
     setCode('')
     setError('')
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* 顶部标题 */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 text-center">加入课堂</h1>
-          <p className="text-gray-500 text-center mt-2 text-sm">
-            请输入6位课堂码
-          </p>
+    <main className="flex min-h-screen flex-col bg-gray-50">
+      <header className="bg-white shadow-sm">
+        <div className="mx-auto max-w-md px-4 py-6 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">加入课堂</h1>
+          <p className="mt-2 text-sm text-gray-500">输入6位课堂码；可使用键盘或屏幕数字键盘。</p>
         </div>
-      </div>
+      </header>
 
-      {/* 主要内容 */}
-      <div className="flex-1 flex flex-col justify-center px-4 py-8">
-        <div className="max-w-md mx-auto w-full">
-          {/* 课堂码显示 */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="flex justify-center gap-2 mb-4">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
+      <div className="flex flex-1 flex-col justify-center px-4 py-8">
+        <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6">
+          <section className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="mb-4 flex justify-center gap-2" aria-hidden="true">
+              {[0, 1, 2, 3, 4, 5].map(index => (
                 <div
-                  key={i}
-                  className="w-12 h-14 border-2 rounded-lg flex items-center justify-center text-2xl font-bold"
-                  style={{
-                    borderColor: code[i] ? '#10b981' : '#e5e7eb',
-                    color: code[i] ? '#10b981' : '#9ca3af',
-                  }}
+                  key={index}
+                  className={`flex h-14 w-12 items-center justify-center rounded-lg border-2 text-2xl font-bold ${code[index] ? 'border-emerald-500 text-emerald-500' : 'border-gray-200 text-gray-400'}`}
                 >
-                  {code[i] || '-'}
+                  {code[index] || '-'}
                 </div>
               ))}
             </div>
 
-            {error && (
-              <div className="text-red-600 text-sm text-center">{error}</div>
-            )}
-            
+            <label htmlFor="classroom-code" className="mb-1 block text-sm font-medium text-gray-700">课堂码</label>
+            <input
+              id="classroom-code"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="one-time-code"
+              maxLength={6}
+              value={code}
+              onChange={event => handleCodeChange(event.target.value)}
+              disabled={isEntering}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'classroom-code-error' : undefined}
+              className="input w-full text-center text-lg tracking-[0.35em]"
+              placeholder="000000"
+            />
+
+            {error && <div id="classroom-code-error" role="alert" className="mt-2 text-center text-sm text-red-600">{error}</div>}
             {isEntering && (
-              <div className="text-primary text-sm text-center mt-2 flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                正在进入课堂...
+              <div role="status" aria-live="polite" className="mt-2 flex items-center justify-center gap-2 text-sm text-primary">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />正在进入课堂...
               </div>
             )}
-          </div>
+          </section>
 
-          {/* 数字键盘 */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <section className="rounded-lg bg-white p-4 shadow-sm" aria-label="屏幕数字键盘">
             <div className="grid grid-cols-3 gap-3">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map(
-                (digit, index) => {
-                  if (digit === '') {
-                    return <div key={index} />
-                  }
-
-                  if (digit === 'del') {
-                    return (
-                      <button
-                        key={index}
-                        onClick={handleDelete}
-                        className="h-14 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center"
-                      >
-                        删除
-                      </button>
-                    )
-                  }
-
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map((digit, index) => {
+                if (digit === '') return <div key={index} aria-hidden="true" />
+                if (digit === 'del') {
                   return (
                     <button
                       key={index}
-                      onClick={() => handleKeyPress(digit)}
-                      disabled={isEntering}
-                      className="h-14 rounded-lg bg-gray-50 text-gray-900 text-xl font-medium hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={isEntering || code.length === 0}
+                      className="flex h-14 items-center justify-center rounded-lg bg-gray-100 font-medium text-gray-600 hover:bg-gray-200 active:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {digit}
+                      删除
                     </button>
                   )
                 }
-              )}
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleKeyPress(digit)}
+                    disabled={isEntering || code.length >= 6}
+                    className="h-14 rounded-lg bg-gray-50 text-xl font-medium text-gray-900 hover:bg-gray-100 active:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label={`输入数字 ${digit}`}
+                  >
+                    {digit}
+                  </button>
+                )
+              })}
             </div>
-
-            {/* 清空按钮 */}
             <button
+              type="button"
               onClick={handleClear}
-              className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-700"
+              disabled={isEntering || code.length === 0}
+              className="mt-3 w-full py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
             >
               清空
             </button>
-          </div>
+          </section>
 
-          {/* 提交按钮 */}
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={code.length !== 6 || isEntering}
-            className="w-full mt-6 px-4 py-3 bg-primary text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             {isEntering ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                正在进入...
-              </>
+              <><Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />正在进入...</>
             ) : (
-              <>
-                <Keyboard className="w-5 h-5" />
-                进入课堂
-                <ArrowRight className="w-5 h-5" />
-              </>
+              <><Keyboard className="h-5 w-5" aria-hidden="true" />进入课堂<ArrowRight className="h-5 w-5" aria-hidden="true" /></>
             )}
           </button>
-        </div>
+        </form>
       </div>
-    </div>
+    </main>
   )
 }
 

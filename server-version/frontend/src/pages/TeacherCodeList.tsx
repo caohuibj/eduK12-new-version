@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from 'react'
-import { Plus, Key, Trash2, Copy } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Copy, Key, Plus, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
+import { PageHeader } from '../components/product-ui/PageHeader'
+import { ProductPage } from '../components/product-ui/ProductPage'
 import type { TeacherCode } from '../types'
 
 const TeacherCodeList: React.FC = () => {
   const [codes, setCodes] = useState<TeacherCode[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchCodes()
+    void fetchCodes()
   }, [])
 
   const fetchCodes = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await apiClient.get('/teacher-codes')
       if (response.code === 0) {
         setCodes(response.data.list)
+      } else {
+        setError(response.message || '获取教师码列表失败')
       }
-    } catch (error) {
-      console.error('获取教师码列表失败:', error)
+    } catch (fetchError) {
+      console.error('获取教师码列表失败:', fetchError)
+      setError((fetchError as { message?: string }).message || '获取教师码列表失败')
     } finally {
       setLoading(false)
     }
@@ -27,99 +36,141 @@ const TeacherCodeList: React.FC = () => {
 
   const handleCreate = async () => {
     try {
+      setCreating(true)
+      setError(null)
       const response = await apiClient.post('/teacher-codes', { maxUses: 1 })
       if (response.code === 0) {
-        fetchCodes()
+        await fetchCodes()
+      } else {
+        setError(response.message || '生成教师码失败')
       }
-    } catch (error: any) {
-      alert(error.message || '生成失败')
+    } catch (operationError: any) {
+      setError(operationError.message || '生成失败')
+    } finally {
+      setCreating(false)
     }
   }
 
-  const copyCode = (code: string) => {
-    navigator.clipboard.writeText(code)
-    alert('已复制到剪贴板')
+  const handleDelete = async (teacherCode: TeacherCode) => {
+    if (!window.confirm(`确定要删除教师码 ${teacherCode.code} 吗？`)) return
+
+    try {
+      setDeletingId(teacherCode.id)
+      setError(null)
+      const response = await apiClient.delete(`/teacher-codes/${teacherCode.id}`)
+      if (response.code === 0) {
+        setCodes(current => current.filter(item => item.id !== teacherCode.id))
+      } else {
+        setError(response.message || '删除教师码失败')
+      }
+    } catch (operationError: any) {
+      setError(operationError.message || '删除教师码失败')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const copyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code)
+      alert('已复制到剪贴板')
+    } catch {
+      setError('复制教师码失败，请手动复制。')
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">教师码管理</h2>
-        <button
-          onClick={handleCreate}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>生成教师码</span>
-        </button>
-      </div>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader
+        title="教师码管理"
+        description="生成一次性教师注册码，并撤销不再需要的注册码。"
+        actions={(
+          <button type="button" onClick={() => void handleCreate()} disabled={creating} className="btn-primary inline-flex items-center gap-2">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {creating ? '生成中...' : '生成教师码'}
+          </button>
+        )}
+      />
+
+      {error && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>{error}</span>
+            <button type="button" className="btn-secondary" onClick={() => void fetchCodes()}>重新加载</button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <span className="sr-only">正在加载教师码</span>
         </div>
       ) : codes.length === 0 ? (
-        <div className="text-center py-12">
-          <Key className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <div className="py-12 text-center">
+          <Key className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
           <p className="text-gray-500">暂无教师码</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {codes.map((code) => (
-            <div key={code.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <Key className="w-5 h-5 text-primary" />
-                  <span className="text-lg font-mono font-bold tracking-wider">
-                    {code.code}
-                  </span>
-                </div>
-                <button
-                  onClick={() => copyCode(code.code)}
-                  className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex justify-between">
-                  <span>使用次数:</span>
-                  <span>
-                    {code.usedCount} / {code.maxUses}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>创建者:</span>
-                  <span>{code.creator?.nickname || code.creator?.username}</span>
-                </div>
-                {code.expiresAt && (
-                  <div className="flex justify-between">
-                    <span>过期时间:</span>
-                    <span>{new Date(code.expiresAt).toLocaleDateString('zh-CN')}</span>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {codes.map(code => {
+            const valid = code.isActive && code.usedCount < code.maxUses
+            return (
+              <article key={code.id} className="card transition-shadow hover:shadow-lg" aria-label={`教师码 ${code.code}`}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Key className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
+                    <span className="truncate font-mono text-lg font-bold tracking-wider">{code.code}</span>
                   </div>
-                )}
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => void copyCode(code.code)}
+                    className="rounded p-2 text-gray-400 hover:bg-blue-50 hover:text-primary"
+                    aria-label={`复制教师码 ${code.code}`}
+                    title="复制教师码"
+                  >
+                    <Copy className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
 
-              <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                <span
-                  className={`px-2 py-1 rounded text-xs ${
-                    code.isActive && code.usedCount < code.maxUses
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  {code.isActive && code.usedCount < code.maxUses ? '有效' : '已失效'}
-                </span>
-                <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+                <dl className="space-y-2 text-sm text-gray-600">
+                  <div className="flex justify-between gap-4">
+                    <dt>使用次数:</dt>
+                    <dd>{code.usedCount} / {code.maxUses}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt>创建者:</dt>
+                    <dd className="text-right">{code.creator?.nickname || code.creator?.username}</dd>
+                  </div>
+                  {code.expiresAt && (
+                    <div className="flex justify-between gap-4">
+                      <dt>过期时间:</dt>
+                      <dd>{new Date(code.expiresAt).toLocaleDateString('zh-CN')}</dd>
+                    </div>
+                  )}
+                </dl>
+
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <span className={`rounded px-2 py-1 text-xs ${valid ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {valid ? '有效' : '已失效'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => void handleDelete(code)}
+                    disabled={deletingId === code.id}
+                    className="rounded p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                    aria-label={`删除教师码 ${code.code}`}
+                    title="删除教师码"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
