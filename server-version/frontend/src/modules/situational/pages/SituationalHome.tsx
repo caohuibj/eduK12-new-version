@@ -61,7 +61,7 @@ const SituationalHome: React.FC = () => {
               key={`${instrument.key}:${instrument.version}`}
               to={`/student/situational/${encodeURIComponent(instrument.key)}`}
               title={instrumentTitle(instrument)}
-              ariaLabel={`${instrumentTitle(instrument)}，打开情境化测评`}
+              ariaLabel={`${instrumentTitle(instrument)}，开始或继续情境化测评`}
               eyebrow="Situational Text Pilot"
               leading={(
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
@@ -77,6 +77,7 @@ const SituationalHome: React.FC = () => {
                   <span className="inline-flex items-center gap-1.5"><Clock3 className="h-4 w-4" aria-hidden="true" />文字版</span>
                 </>
               )}
+              notice="进入时会继续同一版本的进行中尝试；没有进行中尝试时才创建新尝试。"
             />
           ))}
         </div>
