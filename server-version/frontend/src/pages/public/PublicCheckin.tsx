@@ -3,10 +3,10 @@
  * 学生通过令牌访问，无需登录即可打卡
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Spin, message, Card, Button, Result, Input, Upload, Image } from 'antd'
-import { CheckCircleOutlined, UploadOutlined, CameraOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons'
+import { Button, Card, Image, Input, Result, Spin, Upload, message } from 'antd'
+import { CameraOutlined, CheckCircleOutlined, FileTextOutlined, UploadOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { sanitizeHtml } from '../../utils/sanitize'
 import { isSafeExternalMediaUrl } from '../../utils/mediaUtils'
@@ -36,7 +36,7 @@ interface CheckinData {
   allowViewOthers: boolean
 }
 
-const containsControlCharacter = (value: string): boolean => [...value].some((character) => {
+const containsControlCharacter = (value: string): boolean => [...value].some(character => {
   const codePoint = character.codePointAt(0) ?? 0
   return codePoint < 0x20 || codePoint === 0x7f
 })
@@ -48,7 +48,7 @@ const isSafeLegacyUploadReference = (value: string): boolean => {
     return /^\/?uploads\/[A-Za-z0-9._~!$&'()*+,;=@/_-]+$/.test(decoded)
       && !decoded.includes('\\')
       && !containsControlCharacter(decoded)
-      && !decoded.split('/').some((segment) => segment === '.' || segment === '..')
+      && !decoded.split('/').some(segment => segment === '.' || segment === '..')
   } catch {
     return false
   }
@@ -94,11 +94,11 @@ const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string 
 
     setResolvedUrl('')
     fetch(directUrl, { headers: { 'X-Checkin-Token': token || '' } })
-      .then((response) => {
+      .then(response => {
         if (!response.ok) throw new Error('asset unavailable')
         return response.blob()
       })
-      .then((blob) => {
+      .then(blob => {
         if (disposed) return
         objectUrl = URL.createObjectURL(blob)
         setResolvedUrl(objectUrl)
@@ -119,35 +119,33 @@ const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string 
 const PublicAssetImage: React.FC<{ source: PublicAssetSource; token?: string; alt: string }> = ({ source, token, alt }) => {
   const url = usePublicAssetUrl(source, token)
   return url ? (
-    <Image
-      src={url}
-      alt={alt}
-      className="rounded-lg object-cover"
-      style={{ maxHeight: '200px', width: '100%' }}
-    />
-  ) : <div className="h-32 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">图片暂不可用</div>
+    <Image src={url} alt={alt} className="rounded-lg object-cover" style={{ maxHeight: '200px', width: '100%' }} />
+  ) : (
+    <div className="flex h-32 items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-500">图片暂不可用</div>
+  )
 }
 
 const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; title: string }> = ({ source, token, title }) => {
   const url = usePublicAssetUrl(source, token)
-  if (!url) return <div className="border rounded-lg p-4 bg-red-50 text-red-600 text-sm">{title}：视频暂不可用</div>
+  if (!url) return <div className="rounded-lg border bg-red-50 p-4 text-sm text-red-600">{title}：视频暂不可用</div>
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-gray-50">
-      <div className="p-3 flex items-center">
-        <VideoCameraOutlined className="text-blue-500 mr-2" />
+    <div className="overflow-hidden rounded-lg border bg-gray-50">
+      <div className="flex items-center p-3">
+        <VideoCameraOutlined className="mr-2 text-blue-500" aria-hidden="true" />
         <span className="text-sm font-medium">{title}</span>
       </div>
-      <div onContextMenu={(e) => e.preventDefault()} className="relative">
+      <div onContextMenu={event => event.preventDefault()} className="relative">
         <video
           src={url}
           controls
           controlsList="nodownload"
           disablePictureInPicture
-          className="w-full max-h-80 bg-black"
+          className="max-h-80 w-full bg-black"
           preload="metadata"
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={event => event.preventDefault()}
           poster="/video-error.png"
+          aria-label={title}
         >
           您的浏览器不支持视频播放
         </video>
@@ -156,23 +154,39 @@ const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; ti
   )
 }
 
+const DocumentBody: React.FC<{ title: string; size?: string; available: boolean }> = ({ title, size, available }) => (
+  <>
+    <div className="flex items-center gap-3">
+      <FileTextOutlined className="text-xl text-red-500" aria-hidden="true" />
+      <div>
+        <div className="text-sm font-medium text-gray-900">{title}</div>
+        {size && <div className="text-xs text-gray-500">{size}</div>}
+      </div>
+    </div>
+    <span className="text-sm text-blue-600">{available ? '在线查看' : '暂不可用'}</span>
+  </>
+)
+
 const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string; title: string; size?: string }> = ({ source, token, title, size }) => {
   const url = usePublicAssetUrl(source, token)
-  return (
-    <div
-      onClick={() => url && window.open(url, '_blank', 'noopener,noreferrer')}
-      onContextMenu={(e) => e.preventDefault()}
-      className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${url ? 'hover:bg-gray-50 cursor-pointer' : 'opacity-60'}`}
-    >
-      <div className="flex items-center space-x-3">
-        <FileTextOutlined className="text-red-500 text-xl" />
-        <div>
-          <div className="text-sm font-medium text-gray-900">{title}</div>
-          {size && <div className="text-xs text-gray-500">{size}</div>}
-        </div>
+  if (!url) {
+    return (
+      <div className="flex items-center justify-between rounded-lg border p-3 opacity-60" aria-disabled="true">
+        <DocumentBody title={title} size={size} available={false} />
       </div>
-      <span className="text-blue-600 text-sm">{url ? '在线查看' : '暂不可用'}</span>
-    </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+      onContextMenu={event => event.preventDefault()}
+      className="flex w-full items-center justify-between rounded-lg border p-3 text-left transition-colors hover:bg-gray-50"
+      aria-label={`在线查看 ${title}`}
+    >
+      <DocumentBody title={title} size={size} available />
+    </button>
   )
 }
 
@@ -181,58 +195,42 @@ const PublicCheckin: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [checkin, setCheckin] = useState<CheckinData | null>(null)
-  const [sessionId, setSessionId] = useState<string>('')
-  const [sessionCapability, setSessionCapability] = useState<string>('')
+  const [sessionId, setSessionId] = useState('')
+  const [sessionCapability, setSessionCapability] = useState('')
   const [error, setError] = useState<string | null>(null)
-  
-  // 表单数据
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [content, setContent] = useState('')
   const [imageList, setImageList] = useState<UploadFile[]>([])
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
-    if (token) {
-      validateAndFetchCheckin()
-    }
+    if (token) validateAndFetchCheckin()
   }, [token])
 
-  /**
-   * 验证令牌并获取打卡信息
-   */
   const validateAndFetchCheckin = async () => {
     try {
       setLoading(true)
-      
+      setError(null)
       const response = await fetch(`/api/checkins/public/${token}`)
-
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.message || '访问失败')
       }
 
       const data = await response.json()
-      
-      const checkinData = data.data.checkin as CheckinData
-      
-      setCheckin(checkinData)
+      setCheckin(data.data.checkin as CheckinData)
       setSessionId(data.data.sessionId)
       setSessionCapability(data.data.sessionCapability)
-      
-      // 会话标识只用于本次浏览器会话，不能长期留在 localStorage。
       sessionStorage.setItem(`checkin_session_${token}`, data.data.sessionId)
       sessionStorage.setItem(`checkin_session_capability_${token}`, data.data.sessionCapability)
-      
-    } catch (err: any) {
-      setError(err.message || '打卡访问失败')
-      message.error(err.message || '打卡访问失败')
+    } catch (fetchError: any) {
+      setError(fetchError.message || '打卡访问失败')
+      message.error(fetchError.message || '打卡访问失败')
     } finally {
       setLoading(false)
     }
   }
 
-  /**
-   * 上传图片
-   */
   const uploadImage = async (file: File): Promise<{ assetId: string }> => {
     const formData = new FormData()
     formData.append('file', file)
@@ -247,30 +245,20 @@ const PublicCheckin: React.FC = () => {
       body: formData,
     })
 
-    if (!response.ok) {
-      throw new Error('图片上传失败')
-    }
-
+    if (!response.ok) throw new Error('图片上传失败')
     const data = await response.json()
     return { assetId: data.data.assetId }
   }
 
-  /**
-   * 提交打卡
-   */
   const handleSubmit = async () => {
     try {
       setSubmitting(true)
-
-      // 上传图片
+      setSubmitError(null)
       const uploadedImages: Array<{ assetId: string }> = []
       for (const file of imageList) {
-        if (file.originFileObj) {
-          uploadedImages.push(await uploadImage(file.originFileObj))
-        }
+        if (file.originFileObj) uploadedImages.push(await uploadImage(file.originFileObj))
       }
 
-      // 提交打卡
       const response = await fetch(`/api/checkins/public/${token}/submit`, {
         method: 'POST',
         headers: {
@@ -278,11 +266,7 @@ const PublicCheckin: React.FC = () => {
           'X-Checkin-Token': token || '',
           'X-Checkin-Session-Capability': sessionCapability,
         },
-        body: JSON.stringify({
-          content,
-          images: uploadedImages,
-          sessionId,
-        }),
+        body: JSON.stringify({ content, images: uploadedImages, sessionId }),
       })
 
       if (!response.ok) {
@@ -292,9 +276,10 @@ const PublicCheckin: React.FC = () => {
 
       message.success('提交成功！')
       setSubmitted(true)
-      
-    } catch (err: any) {
-      message.error(err.message || '提交失败')
+    } catch (operationError: any) {
+      const text = operationError.message || '提交失败'
+      setSubmitError(text)
+      message.error(text)
     } finally {
       setSubmitting(false)
     }
@@ -302,7 +287,7 @@ const PublicCheckin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center" role="status" aria-live="polite">
         <div className="text-center">
           <Spin size="large" />
           <div className="mt-4 text-gray-600">正在加载打卡信息...</div>
@@ -313,16 +298,12 @@ const PublicCheckin: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Result
           status="error"
           title="访问失败"
           subTitle={error}
-          extra={
-            <Button type="primary" onClick={() => window.location.reload()}>
-              重试
-            </Button>
-          }
+          extra={<Button type="primary" onClick={() => void validateAndFetchCheckin()}>重试</Button>}
         />
       </div>
     )
@@ -330,124 +311,93 @@ const PublicCheckin: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="flex justify-center items-center min-h-screen p-4">
-        <Result
-          status="success"
-          icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-          title="提交成功"
-          subTitle="感谢您的参与！"
-        />
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Result status="success" icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />} title="提交成功" subTitle="感谢您的参与！" />
       </div>
     )
   }
 
-  // 检查是否已截止
   const isEnded = checkin?.endTime && new Date(checkin.endTime) < new Date()
-
   if (isEnded) {
     return (
-      <div className="flex justify-center items-center min-h-screen p-4">
-        <Result
-          status="warning"
-          title="打卡已结束"
-          subTitle={`截止时间：${new Date(checkin.endTime!).toLocaleString('zh-CN')}`}
-        />
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Result status="warning" title="打卡已结束" subTitle={`截止时间：${new Date(checkin.endTime!).toLocaleString('zh-CN')}`} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:py-12">
+      <main className="mx-auto max-w-3xl">
         <Card className="shadow-lg">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {checkin?.title}
-            </h1>
-            {checkin?.description && (
-              <p className="text-gray-600 mb-6">{checkin.description}</p>
-            )}
+          <header className="mb-8">
+            <h1 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl">{checkin?.title}</h1>
+            {checkin?.description && <p className="mb-6 text-gray-600">{checkin.description}</p>}
             {checkin?.endTime && (
-              <div className="bg-yellow-50 p-4 rounded-lg mb-6">
-                <p className="text-sm text-yellow-800">
-                  📅 截止时间：{new Date(checkin.endTime).toLocaleString('zh-CN')}
-                </p>
+              <div className="mb-6 rounded-lg bg-yellow-50 p-4">
+                <p className="text-sm text-yellow-800">📅 截止时间：{new Date(checkin.endTime).toLocaleString('zh-CN')}</p>
               </div>
             )}
-          </div>
+          </header>
 
-          {/* 打卡内容 */}
           {checkin?.content && (
-            <div className="bg-gray-50 p-6 rounded-lg mb-8">
-              <div 
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }}
-              />
+            <div className="mb-8 rounded-lg bg-gray-50 p-4 sm:p-6">
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }} />
             </div>
           )}
 
-          {/* 打卡图片 */}
           {checkin?.images && checkin.images.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-semibold text-gray-900 mb-4">参考图片</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {checkin.images.map((img, index) => (
+            <section className="mb-8" aria-labelledby="public-checkin-images-title">
+              <h2 id="public-checkin-images-title" className="mb-4 font-semibold text-gray-900">参考图片</h2>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                {checkin.images.map((image, index) => (
                   <div key={index} className="relative">
-                    <PublicAssetImage source={img} token={token} alt={`参考图片 ${index + 1}`} />
+                    <PublicAssetImage source={image} token={token} alt={`参考图片 ${index + 1}`} />
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* 参考视频 */}
           {checkin?.videos && checkin.videos.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <VideoCameraOutlined className="mr-2" />
-                参考视频
-              </h3>
+            <section className="mb-8" aria-labelledby="public-checkin-videos-title">
+              <h2 id="public-checkin-videos-title" className="mb-4 flex items-center font-semibold text-gray-900">
+                <VideoCameraOutlined className="mr-2" aria-hidden="true" />参考视频
+              </h2>
               <div className="space-y-3">
                 {checkin.videos.map((video, index) => {
                   const videoTitle = typeof video === 'string' ? `视频 ${index + 1}` : (video.title || `视频 ${index + 1}`)
-                  return (
-                    <PublicAssetVideo key={index} source={video} token={token} title={videoTitle} />
-                  )
+                  return <PublicAssetVideo key={index} source={video} token={token} title={videoTitle} />
                 })}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* 参考文档 */}
           {checkin?.documents && checkin.documents.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <FileTextOutlined className="mr-2" />
-                参考文档
-              </h3>
+            <section className="mb-8" aria-labelledby="public-checkin-documents-title">
+              <h2 id="public-checkin-documents-title" className="mb-4 flex items-center font-semibold text-gray-900">
+                <FileTextOutlined className="mr-2" aria-hidden="true" />参考文档
+              </h2>
               <div className="space-y-2">
-                {checkin.documents.map((doc, index) => {
-                  const docTitle = typeof doc === 'string' ? `文档 ${index + 1}` : (doc.title || doc.fileName || `文档 ${index + 1}`)
-                  const docBytes = typeof doc === 'string' ? undefined : (doc.size || doc.fileSize)
-                  const docSize = docBytes ? `${(docBytes / 1024).toFixed(1)} KB` : ''
-                  return (
-                    <PublicAssetDocument key={index} source={doc} token={token} title={docTitle} size={docSize} />
-                  )
+                {checkin.documents.map((document, index) => {
+                  const documentTitle = typeof document === 'string' ? `文档 ${index + 1}` : (document.title || document.fileName || `文档 ${index + 1}`)
+                  const documentBytes = typeof document === 'string' ? undefined : (document.size || document.fileSize)
+                  const documentSize = documentBytes ? `${(documentBytes / 1024).toFixed(1)} KB` : ''
+                  return <PublicAssetDocument key={index} source={document} token={token} title={documentTitle} size={documentSize} />
                 })}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* 提交表单 */}
-          <div className="space-y-6">
+          <section className="space-y-6" aria-labelledby="public-checkin-response-title">
+            <h2 id="public-checkin-response-title" className="sr-only">提交打卡</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                打卡内容
-              </label>
+              <label htmlFor="public-checkin-content" className="mb-2 block text-sm font-medium text-gray-700">打卡内容</label>
               <Input.TextArea
+                id="public-checkin-content"
                 rows={4}
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={event => setContent(event.target.value)}
                 placeholder="请输入打卡内容..."
                 maxLength={1000}
                 showCount
@@ -455,11 +405,11 @@ const PublicCheckin: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <CameraOutlined className="mr-2" />
-                上传图片（可选）
-              </label>
+              <div id="public-checkin-upload-label" className="mb-2 block text-sm font-medium text-gray-700">
+                <CameraOutlined className="mr-2" aria-hidden="true" />上传图片（可选）
+              </div>
               <Upload
+                aria-labelledby="public-checkin-upload-label"
                 listType="picture-card"
                 fileList={imageList}
                 onChange={({ fileList }) => setImageList(fileList)}
@@ -469,32 +419,25 @@ const PublicCheckin: React.FC = () => {
               >
                 {imageList.length < 9 && (
                   <div>
-                    <UploadOutlined />
+                    <UploadOutlined aria-hidden="true" />
                     <div style={{ marginTop: 8 }}>上传</div>
                   </div>
                 )}
               </Upload>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-blue-800">
-                ℹ️ 本次打卡采用匿名方式，您的提交将被记录但不会显示个人信息
-              </p>
+            <div className="rounded-lg bg-blue-50 p-4">
+              <p className="text-sm text-blue-800">ℹ️ 本次打卡采用匿名方式，您的提交将被记录但不会显示个人信息</p>
             </div>
 
-            <Button
-              type="primary"
-              size="large"
-              block
-              onClick={handleSubmit}
-              loading={submitting}
-              disabled={!content && imageList.length === 0}
-            >
+            {submitError && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{submitError}</div>}
+
+            <Button type="primary" size="large" block onClick={handleSubmit} loading={submitting} disabled={!content && imageList.length === 0}>
               提交打卡
             </Button>
-          </div>
+          </section>
         </Card>
-      </div>
+      </main>
     </div>
   )
 }
