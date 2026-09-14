@@ -2,13 +2,24 @@
 
 Baseline: `main@41bcade06245c005a07d54016402e6f894317fb4` after FE-09 / PR #108 merged.
 
-This document freezes the implementation scope for FE-10 from Frontend Product Convergence v1.2. It is a product-integration package, not a new assessment runtime, export backend, authorization model, or universal content schema.
+This document defines the FE-10 package from Frontend Product Convergence v1.2. It is a product-integration package, not a new assessment runtime, export backend, authorization model, or universal content schema.
+
+## Package split
+
+During implementation C5 proved too broad for one reviewable pull request: the remaining surfaces include student discovery/list pages plus large teacher/admin editors, classroom real-time control, media libraries and authorization pages with unrelated business protocols.
+
+FE-10 is therefore split by page family as explicitly allowed by the original plan:
+
+- **FE-10a / PR #109** — Discovery + Continue/Completed + History + Export + student-facing discovery/list surfaces + Parent/Observer fact audit.
+- **FE-10b** — teacher/admin remaining pages, public check-in, classroom/media/admin families, BigScreen retained-mode evidence and final 86-route inventory closeout.
+
+The **FE-10 package gate is not complete until FE-10b is merged**. FE-10a must not claim full route convergence.
 
 ## Goal
 
 Complete the user journeys around migrated assessments so a user can find an available assessment, continue an active attempt, reopen a completed result, export through existing authorized formats, and navigate the remaining reachable product pages with a coherent product frame.
 
-FE-10 also closes the FE-01 route-inventory coverage gaps. Every reachable route must end this package with either migration evidence or an explicit reason that its specialized presentation is retained.
+FE-10 also closes the FE-01 route-inventory coverage gaps. Every reachable route must end the package with either migration evidence or an explicit reason that its specialized presentation is retained.
 
 ## Dependency state
 
@@ -22,7 +33,7 @@ FE-10 consumes those contracts. It does not redefine AppShell, ReportShell, asse
 
 ## Current route baseline
 
-The FE-01 inventory still records 86 explicit frontend routes, including fallback. The inventory is descriptive rather than an authorization source. FE-10 must reconcile it against the current `App.tsx` before Ready and update evidence/status where this package changes or explicitly retains a surface.
+The FE-01 inventory records 86 explicit frontend routes, including fallback. The inventory is descriptive rather than an authorization source. No FE-10a change adds, removes or retargets an `App.tsx` route; FE-10b owns the final generated-inventory drift check and evidence/status closeout after all remaining page families are addressed.
 
 Initial FE-10-owned or FE-10-shared families include:
 
@@ -43,13 +54,13 @@ Assessment runners and scientific report bodies remain owned by their migrated d
 
 ### Discovery / Continue / Completed
 
-Discovery should expose real server capability rather than inventing one cross-domain content schema.
+Discovery exposes real server/domain capability rather than inventing one cross-domain content schema.
 
 - Reuse existing Scale, Cognitive, Situational and Bundle lists / APIs.
-- If one unified backend discovery API does not exist, use a product-level type switch / grouped surfaces over the existing lists.
+- A presentation-only `DiscoveryCard` may normalize hierarchy and semantics; it does not know assessment type or choose destinations.
 - An active attempt has a clear **Continue** action and must not be presented as a fresh **Start** when the existing domain says it is resumable.
 - A completed result remains separately reachable; do not replace a historical result CTA with a new-attempt CTA.
-- URL filter state may coordinate product discovery presentation, but it must not become authorization or runtime state.
+- Absence of local recovery metadata is not proof that a server attempt does not exist.
 
 ### History
 
@@ -58,42 +69,52 @@ History is a projection over existing domain history APIs and authoritative atte
 - Preserve exact attempt / result identity.
 - Pending or ambiguous completion must lead to reconciliation / continue-checking behavior, not a new attempt.
 - Do not fetch only the first page from several domain endpoints and concatenate it as a fake globally sorted history.
-- A cross-domain view is allowed only when pagination / ordering semantics are truthful. Otherwise use per-type history sections/tabs.
-- Old attempts must reopen the stored/frozen result or snapshot they actually belong to; never substitute latest content or latest snapshot.
+- Cognitive keeps its real server pagination.
+- Situational currently exposes `{list,total}` without paging parameters; FE-10a displays that server-provided range and does not client-slice it into fake pages.
+- Old attempts reopen their stored/frozen result; never substitute latest content.
 
 ### Export
 
 FE-10 does not create a generic export engine.
 
 - Expose only already-authorized export actions and existing formats.
-- Keep export identity tied to the result/snapshot currently shown when the domain contract supports snapshot selection.
-- Busy, retry and read/download errors must keep the user on the current page with context intact.
-- File naming may be normalized at the presentation layer when it does not change server artifact identity.
-- Research CSV / analysis export must not be relabeled as child-facing feedback.
-- Do not bypass audience authorization by changing a frontend audience selector.
+- Composite analysis export remains tied to `selectedSnapshotId || report.packageReport.snapshotId`.
+- Situational local JSON/CSV export is built directly from the loaded frozen attempt/result and therefore has no asynchronous server generation state to invent.
+- Cognitive teacher export serializes generation/download actions so repeated clicks cannot create concurrent exports; failure releases the lock and preserves context for retry.
+- Research exports are not presented as participant feedback.
 
 ### Remaining product pages
 
-Remaining pages receive product-frame convergence only to the depth justified by the current business logic:
+Remaining pages receive product-frame convergence only to the depth justified by their current business logic:
 
 - ProductPage / page title / primary-secondary actions / status / empty / error states;
+- semantic links instead of clickable non-interactive cards;
 - semantic labels and form associations where missing;
 - keyboard operation and basic narrow-screen usability;
 - no rewrite of course, assignment, check-in, classroom real-time protocol, editor business rules, media-library behavior, or course-video policy.
 
-BigScreen remains a dedicated presentation. FE-10 may align appropriate tokens and status vocabulary but must not wrap it in a normal application page if that damages display-mode behavior.
+BigScreen remains a dedicated presentation and is a FE-10b retained-mode validation item.
 
-## Parent / Observer gate
+## Parent / Observer gate — audited
 
-The v1.2 plan explicitly forbids claiming a completed Parent product when there is no real account / binding / authorization path.
+**FE-10a result: Parent complete journey NOT PASSED.**
 
-Current planning fact to verify in source during C6:
+Current repository facts:
 
-- the primary `User.role` model has historically exposed STUDENT / TEACHER / ADMIN;
-- FE-01 inventory contains no self-service Parent/Observer top-level journey;
-- report projection may understand additional audiences internally, but projection support is not equivalent to a login, binding and route authorization chain.
+- backend `UserRole` contains only `STUDENT`, `TEACHER`, `ADMIN`;
+- user-creation validation accepts only those three roles;
+- repository search finds no Parent/Observer/Guardian account role, student-binding model or top-level route/authorization chain;
+- report/audience projection capability is not equivalent to an authenticated Parent product.
 
-FE-10 C6 must inspect the current backend/frontend facts. If the required identity/binding/API chain exists, wire the real route. If it does not, document the smallest separate backend/identity dependency and mark **Parent complete journey not passed**. Mock data or a frontend-only role toggle cannot satisfy this gate.
+Smallest separate dependency before a Parent UI can be claimed:
+
+1. define Parent/Observer identity semantics;
+2. define durable authorized binding to one or more students;
+3. define report audience/redaction authorization using that binding;
+4. add authenticated entry/list/report routes;
+5. only then add Parent navigation and report presentation.
+
+FE-10 must not substitute teacher/admin access, mock data, CSS-hidden researcher fields or a frontend role selector for that dependency.
 
 ## Network / persistence budget
 
@@ -113,11 +134,11 @@ Not introduced by FE-10:
 - a new history aggregation database table;
 - a new export artifact model;
 - a new frontend workflow engine;
-- Prisma migration or IndexedDB schema/version changes unless a separately reviewed dependency proves unavoidable.
+- Prisma migration or IndexedDB schema/version changes.
 
 ## Scientific / runtime invariants
 
-FE-10 must not change:
+FE-10 does not change:
 
 - ONE UNIT / ONE FINAL semantics;
 - scorer or CanonicalUnitResult;
@@ -129,94 +150,87 @@ FE-10 must not change:
 - Bundle server-authoritative unit order;
 - maturity classification as an interaction or authorization switch.
 
-Historical presentation must remain version faithful. Missing historical interpretation is shown as unavailable/limited rather than reconstructed from current content.
+Historical presentation remains version faithful. Missing historical interpretation is shown as unavailable/limited rather than reconstructed from current content.
 
-## Planned slices
+## FE-10a implementation status
 
 ### C1 — Discovery shell
 
-Evolve the proven Scale library/product patterns into a limited `LibraryShell` / discovery presentation contract and connect existing Cognitive, Situational and Bundle discovery surfaces without creating a shared backend content schema.
+Implemented:
 
-Acceptance focus:
-
-- type-specific capability remains visible;
-- current availability / permission rules remain server/domain driven;
-- filters are URL/presentation state only;
-- empty/error/loading states are coherent on compact/medium/wide layouts.
+- added presentation-only `components/product-ui/DiscoveryCard.tsx`;
+- Scale, Cognitive and Situational discovery surfaces use the shared semantic card while retaining their domain APIs and target rules;
+- Bundle discovery in `CourseDetail` already consumes authoritative `canContinue`, `canStartNewAttempt` and `latestCompletedAttempt`; FE-10a intentionally does not rewrite that large controller merely to manufacture visual uniformity.
 
 ### C2 — Continue / Completed actions
 
-Normalize Discover / Continue / Completed CTA semantics across supported assessment families.
+Implemented:
 
-Acceptance focus:
-
-- active attempt resumes exact attempt identity;
-- completed attempt links to exact result/report;
-- no render/effect creates duplicate attempts;
-- restart remains an explicit domain-supported action, not an implicit fallback from a failed result read.
+- Scale and Questionnaire retain exact active/completed target selection from their existing availability projections;
+- Cognitive entry resolves known local `COMPLETED` to exact result, known `IN_PROGRESS` to exact session, and ambiguous/missing local state to **开始/继续测评** through the existing idempotent server `createSession` boundary;
+- Situational discovery explicitly states the existing backend rule: entering a given instrument/version returns its active IN_PROGRESS attempt when present and only creates a new attempt otherwise;
+- no render/effect creates an extra assessment attempt.
 
 ### C3 — History convergence
 
-Converge history presentation and exact-result navigation while preserving each domain's pagination and authority.
+Implemented:
 
-Acceptance focus:
-
-- pending is not displayed as completed or restarted;
-- exact attempt/result IDs are preserved through refresh/deep link;
-- type filters do not hide authorization failures;
-- no fake global ordering from partial per-domain pages.
+- Cognitive history uses ProductPage/DiscoveryCard and preserves real page/pageSize/totalPages/hasMore semantics;
+- each Cognitive row links directly to its exact `sessionId` result;
+- Situational history uses exact `attemptId` result links for completed rows and server reconciliation for active rows;
+- Situational does not pretend its unpaged API is paginated.
 
 ### C4 — Export actions
 
-Converge export action placement/status/error behavior over the existing authorized export contracts.
+Implemented / retained:
 
-Acceptance focus:
+- Composite report already had correct snapshot-bound source selection, busy lock and inline error state; retained unchanged;
+- Situational export already serializes the loaded frozen attempt/result into JSON/CSV client-side; retained unchanged;
+- Cognitive teacher export now has one in-flight export lock across summary/full/research formats, format-specific busy labels and retry-safe error release;
+- no export endpoint, artifact identity or authorization contract changed.
 
-- selected/frozen snapshot remains the export source where applicable;
-- retry does not silently switch export version;
-- download/generation failure preserves page context;
-- unauthorized formats/actions stay unavailable;
-- research exports are not presented as participant feedback.
+### C5a — student-facing remaining surfaces
 
-### C5 — Remaining reachable pages
+Implemented:
 
-Apply existing product primitives to FE-10-owned teacher/admin/student/course/assignment/check-in/classroom/media/admin pages where this improves hierarchy, controls, empty/error states and responsive use without changing page business logic.
+- `StudentHome`: ProductPage/PageHeader, semantic course links, loading/error/empty states, accessible join-course dialog and inline join error instead of `alert()`;
+- `StudentAssignments`: semantic links, status metadata, loading/error/empty states;
+- `StudentCheckins`: semantic links, status metadata, loading/error/empty states;
+- `StudentQuestionnaires`: semantic discovery cards while preserving in-progress and exact completed result targets;
+- Scale/Cognitive/Situational discovery/history surfaces above also satisfy this student-facing page-family pass.
 
-Acceptance focus:
+Explicitly retained in FE-10a:
 
-- primary action remains clear;
-- labels/errors are programmatically associated where applicable;
-- keyboard path and narrow-screen path remain usable;
-- BigScreen remains dedicated;
-- no global CSS sweep is treated as proof that all routes passed.
+- `CourseDetail` business controller, because it already owns multiple assignment/check-in/questionnaire/Bundle protocols and authoritative Bundle CTA facts; broad presentation rewrite is deferred to FE-10b with its page-family review.
+- assessment runners/results migrated by earlier FE packages are not reopened by C5.
 
-If the diff becomes too broad for safe review, split implementation by page family (FE-10a / FE-10b) while preserving this package-level gate.
+### C5b / FE-10b — remaining teacher/admin/public families
 
-### C6 — Parent/Observer truth + route inventory closeout
+Deferred to the next FE-10 PR:
 
-Audit the real Parent/Observer identity/binding/authorization chain and reconcile the full route inventory.
+- teacher/admin course/student/assignment/check-in/Scale/Questionnaire pages;
+- Composite/Cognitive editors beyond the focused export behavior above;
+- classroom list/create/control/edit/QR/question pages;
+- video/image/document libraries;
+- admin user/teacher-code/material-grant/instrument-authorization pages;
+- profiles and public check-in;
+- BigScreen retained-mode acceptance;
+- final generated 86-route inventory evidence/status reconciliation.
 
-Acceptance focus:
+This deferral is a reviewability split, not a claim that those pages have passed FE-10.
 
-- every reachable route has migration evidence or an explicit retained-mode reason;
-- Parent/Observer is either genuinely wired end-to-end or explicitly marked as a separate dependency / not passed;
-- only demonstrably unreferenced old chrome is removed;
-- no route is deleted merely because its UI appears legacy.
+## FE-10a validation requirements
 
-## Validation plan
+Before PR #109 becomes Ready, its exact final candidate must include:
 
-Each implementation slice adds focused tests with behavior changes. Before Ready, the exact final candidate must include:
+- focused product primitive and Cognitive entry-action tests;
+- frontend lint/typecheck and full frontend tests;
+- backend compile/full regression even though FE-10a adds no backend behavior;
+- seeded browser/Docker/CodeQL gates required by repository CI;
+- exact discovery/history/result/export target regression through existing tests;
+- explicit report that specialized workflows skipped while Draft are not counted as passed.
 
-- route inventory drift check against current `App.tsx`;
-- focused discovery/CTA/history/export tests;
-- deep-link / refresh tests for exact attempt/result identity;
-- authorization regression for export and audience paths;
-- compact/medium/wide and keyboard basic acceptance for representative remaining-page families;
-- BigScreen retained-mode evidence;
-- full frontend/backend CI;
-- seeded browser acceptance and Docker/CodeQL gates required by repository CI.
-
-Skipped or unavailable gates must be reported as skipped/unavailable, never as passed.
+FE-10b owns the package-level compact/medium/wide representative business-page acceptance, BigScreen retained-mode evidence and final `npm run inventory:product-ui:check` closeout.
 
 ## Rollback
 
@@ -226,4 +240,4 @@ Rollback is presentation / entry-point level:
 - retain existing stored attempts, results, snapshots and export artifacts;
 - do not rewrite attempt identities or snapshots;
 - do not perform destructive database or browser-storage cleanup;
-- if a discovery/history aggregation presentation proves unsafe, fall back to the existing type-specific entry points rather than changing backend scientific/runtime contracts.
+- if a discovery/history presentation proves unsafe, fall back to the existing type-specific entry point rather than changing backend scientific/runtime contracts.
