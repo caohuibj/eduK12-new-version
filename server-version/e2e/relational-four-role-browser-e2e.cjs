@@ -125,18 +125,18 @@ const main = async () => {
       await page.goto(`${baseUrl}/relational/tasks`, { waitUntil: 'domcontentloaded' })
 
       if (role === 'PARENT') {
-        await page.getByRole('heading', { name: '观察测评' }).waitFor()
+        await page.getByRole('heading', { name: '观察测评', exact: true }).waitFor()
         assert.equal(await page.getByRole('button', { name: '同意并继续' }).count(), 1)
       } else if (role === 'STUDENT') {
-        await page.getByRole('heading', { name: '课堂与关系体验' }).waitFor()
+        await page.getByRole('heading', { name: '课堂与关系体验', exact: true }).waitFor()
         await page.getByText('此类体验测评不提供个人结果页').waitFor()
         assert.equal(await page.getByRole('button', { name: '查看结果' }).count(), 0, 'student cohort task must not expose an individual report button')
       } else if (role === 'TEACHER') {
-        await page.getByRole('heading', { name: '关系测评' }).waitFor()
+        await page.getByRole('heading', { name: '关系测评', exact: true }).waitFor()
         await page.getByText('阈值前不显示精确参与人数').waitFor()
         assert.equal(await page.getByTestId('relational-cohort-reports').getByText(/N=1|1 人有效/u).count(), 0, 'sub-threshold cohort must not disclose exact N')
       } else {
-        await page.getByRole('heading', { name: '当前账户无法访问此页面' }).waitFor()
+        await page.getByRole('heading', { name: '当前账户无法访问此页面', exact: true }).waitFor()
         assert.equal(await page.getByTestId('relational-task-list').count(), 0, 'admin must not enter respondent relational product surface')
       }
       await context.close()
