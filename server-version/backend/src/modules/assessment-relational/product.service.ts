@@ -86,15 +86,18 @@ export const createRelationalProductService = (
     const launched = await prisma.$transaction(async (tx) => {
       const repository = createSqlRelationalAssignmentRepository(tx as any)
       const assignment = await repository.findById(input.assignmentId)
-      if (!assignment) relationalFail('RELATIONAL_ASSIGNMENT_NOT_FOUND', 'assignment not found')
+        ?? relationalFail('RELATIONAL_ASSIGNMENT_NOT_FOUND', 'assignment not found')
       if (assignment.respondentUserId !== input.userId || assignment.respondentRole !== relationalRole) {
         relationalFail('RELATIONAL_ASSIGNMENT_ACTOR', 'only the assigned respondent can start this assessment')
       }
 
       const entry = registry.findExact(assignment)
-      if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.launchTarget) {
+        ?? relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released or launchable')
+      if (entry.releaseStatus !== 'PUBLISHED') {
         relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released or launchable')
       }
+      const launchTarget = entry.launchTarget
+        ?? relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released or launchable')
       if (registry.applicabilityHash(entry) !== assignment.applicabilityHash) {
         relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'assignment applicability does not match the released product contract')
       }
@@ -115,7 +118,7 @@ export const createRelationalProductService = (
       })
       if (existing) {
         if (
-          existing.compositeAssessmentId !== entry.launchTarget.compositeAssessmentId
+          existing.compositeAssessmentId !== launchTarget.compositeAssessmentId
           || existing.userId !== input.userId
           || existing.subjectUserId !== assignment.subjectUserId
           || existing.respondentUserId !== assignment.respondentUserId
@@ -139,7 +142,7 @@ export const createRelationalProductService = (
         actorUserId: input.userId,
       })
       const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
-        compositeAssessmentId: entry.launchTarget.compositeAssessmentId,
+        compositeAssessmentId: launchTarget.compositeAssessmentId,
         respondentUserId: input.userId,
         attemptIdentity: started.attemptIdentity,
       })
