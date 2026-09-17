@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { ObserverAssignmentRecordV1 } from '../assessment-observer/types'
-import { assertRelationalApplicabilityMatch } from './contracts'
+import { assertRelationalApplicabilityMatch, hashRelationalApplicability } from './contracts'
 import { relationalFail } from './errors'
 import { hashRelationalRelationshipSnapshot } from './relationship'
 import type {
@@ -43,6 +43,9 @@ export const buildRelationalAssignment = (input: {
   } else if (snapshot.subjectUserId === snapshot.respondentUserId) {
     relationalFail('RELATIONAL_ACTORS', 'non-SELF assignment requires distinct actors')
   }
+  if (input.applicability.analysisMode === 'MULTI_INFORMANT_SYNTHESIS') {
+    relationalFail('RELATIONAL_ANALYSIS_RESERVED', 'MULTI_INFORMANT_SYNTHESIS is reserved and not implemented in V1')
+  }
   return {
     assignmentId: input.assignmentId ?? randomUUID(),
     episodeId: input.episodeId,
@@ -59,6 +62,9 @@ export const buildRelationalAssignment = (input: {
     resourceKind: input.applicability.resourceKind,
     resourceKey: input.applicability.resourceKey,
     resourceVersion: input.applicability.resourceVersion,
+    applicabilityHash: hashRelationalApplicability(input.applicability),
+    analysisMode: input.applicability.analysisMode,
+    minimumRespondents: input.applicability.minimumRespondents,
     consentId: input.consentId,
     visibilityPolicyKey: input.applicability.visibilityPolicyKey,
     status: 'OPEN',
@@ -79,8 +85,9 @@ const observerVisibilityPolicy = (visibility: ObserverAssignmentRecordV1['visibi
 export const adaptObserverAssignmentToRelational = (input: {
   observer: ObserverAssignmentRecordV1
   relationshipSnapshot: RelationalRelationshipSnapshotV1
+  applicability: RelationalApplicabilityV1
 }): RelationalAssignmentRecordV1 => {
-  const { observer, relationshipSnapshot } = input
+  const { observer, relationshipSnapshot, applicability } = input
   if (
     observer.subjectUserId !== relationshipSnapshot.subjectUserId
     || observer.respondentUserId !== relationshipSnapshot.respondentUserId
@@ -95,6 +102,23 @@ export const adaptObserverAssignmentToRelational = (input: {
   if (relationshipSnapshot.subjectRole !== 'STUDENT' || relationshipSnapshot.respondentRole !== expectedRole) {
     relationalFail('RELATIONAL_OBSERVER_MISMATCH', 'observer assignment roles do not match relationship snapshot')
   }
+  if (
+    applicability.resourceKind !== 'BUNDLE'
+    || applicability.resourceKey !== observer.bundleKey
+    || applicability.resourceVersion !== observer.bundleVersion
+    || applicability.analysisMode !== 'INDIVIDUAL_ONLY'
+    || applicability.minimumRespondents !== null
+    || applicability.visibilityPolicyKey !== observerVisibilityPolicy(observer.visibility)
+  ) {
+    relationalFail('RELATIONAL_OBSERVER_MISMATCH', 'observer assignment does not match relational applicability')
+  }
+  assertRelationalApplicabilityMatch({
+    applicability,
+    subjectRole: 'STUDENT',
+    respondentRole: expectedRole,
+    relationshipKind: relationshipSnapshot.relationshipKind,
+    perspective: 'OBSERVER_REPORT',
+  })
   return {
     assignmentId: observer.assignmentId,
     episodeId: observer.episodeId,
@@ -111,8 +135,11 @@ export const adaptObserverAssignmentToRelational = (input: {
     resourceKind: 'BUNDLE',
     resourceKey: observer.bundleKey,
     resourceVersion: observer.bundleVersion,
+    applicabilityHash: hashRelationalApplicability(applicability),
+    analysisMode: 'INDIVIDUAL_ONLY',
+    minimumRespondents: null,
     consentId: observer.consentId,
-    visibilityPolicyKey: observerVisibilityPolicy(observer.visibility),
+    visibilityPolicyKey: applicability.visibilityPolicyKey,
     status: observer.status,
     createdAt: observer.createdAt,
     startedAt: null,
