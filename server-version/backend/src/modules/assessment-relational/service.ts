@@ -1,18 +1,64 @@
+import type { RespondentTypeV1 } from '../assessment-identity/types'
 import { buildRelationalAssignment } from './assignment'
 import {
   assertAssignmentStartable,
-  buildRelationalAttemptIdentityBinding,
   markRelationalAssignmentCompleted,
   markRelationalAssignmentStarted,
 } from './binding'
 import { relationalFail } from './errors'
-import type { RelationalAssignmentRepository } from './repository'
+import type {
+  RelationalAssignmentRepository,
+  ResolvedRelationalConsentV1,
+} from './repository'
 import type {
   RelationalApplicabilityV1,
   RelationalAssignmentRecordV1,
   RelationalPerspectiveV1,
   RelationalRelationshipSnapshotV1,
 } from './types'
+
+interface RelationalAttemptIdentityBindingV1 {
+  subjectUserId: string
+  respondentUserId: string
+  /** Legacy compatibility only. STUDENT-as-other-report remains null and is resolved from assignmentRef. */
+  respondentType: RespondentTypeV1 | null
+  episodeId: string
+  assignmentRef: string
+  /** Actual accepted consent row authorizing this attempt; assignment.consentId remains the lineage root. */
+  consentId: string | null
+}
+
+const buildResolvedAttemptIdentityBinding = (
+  assignment: RelationalAssignmentRecordV1,
+  resolvedConsent: ResolvedRelationalConsentV1 | null,
+): RelationalAttemptIdentityBindingV1 => {
+  if (assignment.status === 'REVOKED' || assignment.status === 'EXPIRED') {
+    relationalFail('RELATIONAL_ASSIGNMENT_INACTIVE', 'inactive assignment cannot bind an attempt')
+  }
+  if (assignment.consentId && !resolvedConsent) {
+    relationalFail('RELATIONAL_CONSENT_REQUIRED', 'consent-bearing assignment requires repository-resolved accepted consent')
+  }
+  if (!assignment.consentId && resolvedConsent) {
+    relationalFail('RELATIONAL_CONSENT_BINDING', 'consent-free assignment cannot bind an unrelated consent row')
+  }
+
+  const respondentType: RespondentTypeV1 | null = assignment.respondentRole === 'PARENT'
+    ? 'PARENT'
+    : assignment.respondentRole === 'TEACHER'
+      ? 'TEACHER'
+      : assignment.relationshipKind === 'SELF'
+        ? 'SELF'
+        : null
+
+  return {
+    subjectUserId: assignment.subjectUserId,
+    respondentUserId: assignment.respondentUserId,
+    respondentType,
+    episodeId: assignment.episodeId,
+    assignmentRef: assignment.assignmentId,
+    consentId: resolvedConsent?.consentId ?? null,
+  }
+}
 
 export const createRelationalAssessmentService = (repository: RelationalAssignmentRepository) => {
   const requireAssignment = async (assignmentId: string): Promise<RelationalAssignmentRecordV1> => {
@@ -66,7 +112,7 @@ export const createRelationalAssessmentService = (repository: RelationalAssignme
       if (!changed) relationalFail('RELATIONAL_ASSIGNMENT_CONFLICT', 'assignment state changed concurrently')
       return {
         assignment: next,
-        attemptIdentity: buildRelationalAttemptIdentityBinding(next, resolvedConsent?.consentId ?? null),
+        attemptIdentity: buildResolvedAttemptIdentityBinding(next, resolvedConsent),
       }
     },
 
