@@ -48,6 +48,8 @@ export interface ParentStudentRelationshipRecordV1 {
 
 export interface AssessmentAttemptConsentRecordV1 {
   consentId: string
+  /** Direct append-only predecessor. Acceptance of pending consent points back to the pending row. */
+  priorConsentId: string | null
   subjectUserId: string | null
   respondentUserId: string | null
   respondentType: RespondentTypeV1
