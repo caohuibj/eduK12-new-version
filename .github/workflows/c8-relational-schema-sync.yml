@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   sync:
-    if: ${{ !contains(github.event.head_commit.message, 'sync Prisma datamodel') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -134,10 +133,10 @@ model RelationalAssessmentAssignment {
   completedAt              DateTime? @map("completed_at")
   revokedAt                DateTime? @map("revoked_at")
 
-  episode    AssessmentEpisode        @relation(fields: [episodeId], references: [id], onDelete: Restrict)
-  subject    User                     @relation("RelationalAssignmentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
-  respondent User                     @relation("RelationalAssignmentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
-  creator    User                     @relation("RelationalAssignmentCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  episode    AssessmentEpisode         @relation(fields: [episodeId], references: [id], onDelete: Restrict)
+  subject    User                      @relation("RelationalAssignmentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  respondent User                      @relation("RelationalAssignmentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
+  creator    User                      @relation("RelationalAssignmentCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   consent    AssessmentAttemptConsent? @relation(fields: [consentId], references: [id], onDelete: Restrict)
 
   @@unique([episodeId, respondentUserId, resourceKind, resourceKey, resourceVersion], map: "relational_assignment_episode_respondent_resource_key")
