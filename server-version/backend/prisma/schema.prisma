@@ -1865,7 +1865,7 @@ model AssessmentAttemptConsent {
 
   subject    User? @relation("ConsentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
   respondent User? @relation("ConsentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
-  priorConsent AssessmentAttemptConsent? @relation("ConsentLineage", fields: [priorConsentId], references: [id], onDelete: Restrict)
+  priorConsent AssessmentAttemptConsent? @relation("ConsentLineage", fields: [priorConsentId], references: [id], onDelete: Restrict, map: "assessment_attempt_consents_prior_consent_id_fkey")
   supersedingConsent AssessmentAttemptConsent? @relation("ConsentLineage")
   assessments Assessment[]
   compositeAttempts CompositeAssessmentAttempt[]
@@ -1904,11 +1904,11 @@ model RelationalAssessmentAssignment {
   completedAt              DateTime? @map("completed_at")
   revokedAt                DateTime? @map("revoked_at")
 
-  episode    AssessmentEpisode         @relation(fields: [episodeId], references: [id], onDelete: Restrict)
-  subject    User                      @relation("RelationalAssignmentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
-  respondent User                      @relation("RelationalAssignmentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
-  creator    User                      @relation("RelationalAssignmentCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
-  consent    AssessmentAttemptConsent? @relation(fields: [consentId], references: [id], onDelete: Restrict)
+  episode    AssessmentEpisode         @relation(fields: [episodeId], references: [id], onDelete: Restrict, map: "relational_assignment_episode_fkey")
+  subject    User                      @relation("RelationalAssignmentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict, map: "relational_assignment_subject_fkey")
+  respondent User                      @relation("RelationalAssignmentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict, map: "relational_assignment_respondent_fkey")
+  creator    User                      @relation("RelationalAssignmentCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, map: "relational_assignment_created_by_fkey")
+  consent    AssessmentAttemptConsent? @relation(fields: [consentId], references: [id], onDelete: Restrict, map: "relational_assignment_consent_fkey")
 
   @@unique([episodeId, respondentUserId, resourceKind, resourceKey, resourceVersion], map: "relational_assignment_episode_respondent_resource_key")
   @@index([respondentUserId, status], map: "relational_assignment_respondent_status_idx")
@@ -1935,7 +1935,7 @@ model RelationalAnalysisSnapshot {
   snapshotHash          String   @unique(map: "relational_analysis_snapshot_hash_key") @map("snapshot_hash")
   createdAt             DateTime @default(now()) @map("created_at")
 
-  subject User @relation("RelationalAnalysisSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  subject User @relation("RelationalAnalysisSubject", fields: [subjectUserId], references: [id], onDelete: Restrict, map: "relational_analysis_subject_fkey")
 
   @@index([subjectUserId, resourceKind, resourceKey, createdAt(sort: Desc)], map: "relational_analysis_subject_resource_created_idx")
   @@map("relational_analysis_snapshots")
