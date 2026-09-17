@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 88 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -9,9 +9,11 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 expl
 | /teacher/login | TeacherLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /teacher/register | TeacherRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /teacher/account-login | TeacherAccountLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /parent/login | ParentLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /student/login | StudentLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /student/course-login | StudentCourseLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /student/register | StudentRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /parent | ParentHome | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /dashboard | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /courses | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /courses/:courseId/students | CourseStudents | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
@@ -94,8 +96,8 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 86 expl
 ## Additional boundaries
 
 - FirstLoginPasswordChange remains an inline guard flow. FE-02 preserves the original destination through reauthentication.
-- Parent ObserverSelfServe and Teacher ObserverAssign exist but are not registered in App.tsx. Do not declare a working Parent journey from component existence.
-- User roles are currently STUDENT / TEACHER / ADMIN; researcher report projection is not a new frontend login role.
+- Parent login/home are explicitly registered with a PARENT-only route guard. ObserverSelfServe and Teacher ObserverAssign remain domain shells until RA-02 journey wiring registers their product routes.
+- User roles are STUDENT / TEACHER / ADMIN / PARENT; researcher report projection is not a new frontend login role.
 - Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.
 - Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.
 - BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.

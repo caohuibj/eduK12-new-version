@@ -985,7 +985,7 @@ const persistCompositeCompletion = async (input: {
         })
         if (relationalUpdated.count !== 1) {
           throw new InstrumentFinalSubmitError(
-            'RELATIONAL_ASSIGNMENT_CONFLICT',
+            'STALE_ATTEMPT',
             '关系测评 assignment 状态与 Composite FINAL 不一致',
             409,
           )
