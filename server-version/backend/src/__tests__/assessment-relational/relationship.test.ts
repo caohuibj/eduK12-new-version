@@ -7,6 +7,7 @@ import {
   hashRelationalRelationshipSnapshot,
   resolveCourseTeacherStudentRelationship,
   resolveParentChildRelationship,
+  type RelationalApplicabilityV1,
 } from '../../modules/assessment-relational'
 
 const failCode = (run: () => unknown): string => {
@@ -32,6 +33,20 @@ const parentRelationship: ParentStudentRelationshipRecordV1 = {
   revokeReason: null,
   consentVersion: 'parent-rel-v1',
   consentHash: 'a'.repeat(64),
+}
+
+const parentObserverApplicability: RelationalApplicabilityV1 = {
+  schemaVersion: 1,
+  resourceKind: 'BUNDLE',
+  resourceKey: 'sdq_parent_observer_zh_cn_v1',
+  resourceVersion: '1.0.0',
+  subjectRoles: ['STUDENT'],
+  respondentRoles: ['PARENT'],
+  relationshipKinds: ['PARENT_CHILD'],
+  perspectives: ['OBSERVER_REPORT'],
+  analysisMode: 'INDIVIDUAL_ONLY',
+  visibilityPolicyKey: 'observer_assigning_teacher_v1',
+  minimumRespondents: null,
 }
 
 describe('relational relationship resolvers', () => {
@@ -137,10 +152,16 @@ describe('relational relationship resolvers', () => {
       createdAt: '2026-09-17T02:00:00.000Z',
       status: 'OPEN',
     }
-    const relational = adaptObserverAssignmentToRelational({ observer, relationshipSnapshot })
+    const relational = adaptObserverAssignmentToRelational({
+      observer,
+      relationshipSnapshot,
+      applicability: parentObserverApplicability,
+    })
     expect(relational.assignmentId).toBe(observer.assignmentId)
     expect(relational.resourceKey).toBe(observer.bundleKey)
     expect(relational.perspective).toBe('OBSERVER_REPORT')
     expect(relational.visibilityPolicyKey).toBe('observer_assigning_teacher_v1')
+    expect(relational.analysisMode).toBe('INDIVIDUAL_ONLY')
+    expect(relational.minimumRespondents).toBeNull()
   })
 })
