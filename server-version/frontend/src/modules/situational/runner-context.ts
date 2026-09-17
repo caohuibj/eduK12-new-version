@@ -25,15 +25,21 @@ export const resolveSituationalRunnerRouteContext = ({
   attemptId,
 }: SituationalRunnerRouteContextInput): SituationalRunnerRouteContext => {
   const publicMode = pathname.startsWith('/public/composite/')
+  const relationalMode = pathname.startsWith('/relational/composite/')
   const embedded = Boolean(attemptId)
   const compositeAttemptId = searchParams.get('compositeAttemptId') || ''
   const compositeItemId = searchParams.get('compositeItemId') || ''
   const candidateReturnTo = searchParams.get('returnTo') || ''
-  const allowedReturnPrefix = publicMode ? '/public/composite/attempts/' : '/student/composite/attempts/'
+  const allowedReturnPrefix = publicMode
+    ? '/public/composite/attempts/'
+    : relationalMode
+      ? '/relational/attempts/'
+      : '/student/composite/attempts/'
   const returnTo = candidateReturnTo.startsWith(allowedReturnPrefix) ? candidateReturnTo : ''
+  const namespace = publicMode ? '/public' : relationalMode ? '/relational' : '/student'
   const completionPath = returnTo || (
     embedded && compositeAttemptId
-      ? `${publicMode ? '/public' : '/student'}/composite/attempts/${compositeAttemptId}`
+      ? `${namespace}/composite/attempts/${compositeAttemptId}`
       : ''
   )
 
