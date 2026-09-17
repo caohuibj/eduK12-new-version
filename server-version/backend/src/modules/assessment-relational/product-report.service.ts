@@ -162,7 +162,7 @@ export const createRelationalProductReportService = (
       minimumRespondents: applicability.minimumRespondents,
     }
     if (candidates.length === 0) {
-      return { ...base, state: 'EMPTY' as const, respondentCount: 0, snapshot: null }
+      return { ...base, state: 'EMPTY' as const, respondentCount: null, snapshot: null }
     }
 
     // New RA-02 issuance uses one deterministic cohort episode. For compatibility
@@ -181,7 +181,7 @@ export const createRelationalProductReportService = (
       return {
         ...base,
         state: 'INSUFFICIENT' as const,
-        respondentCount,
+        respondentCount: null,
         snapshot: null,
       }
     }

@@ -1,5 +1,6 @@
 import type { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   acceptPendingAttemptConsent,
   createAttemptConsent,
@@ -219,6 +220,32 @@ const createEpisode = async (tx: any, input: {
   data: input,
   select: { id: true },
 })
+
+const createCohortEpisode = async (tx: any, input: {
+  subjectUserId: string
+  courseId: string
+  resourceKind: RelationalResourceKindV1
+  resourceKey: string
+  resourceVersion: string
+  applicabilityHash: string
+}) => {
+  const cohortHash = canonicalHash({ schema: 'RelationalCohortEpisodeV1', ...input })
+  const id = `rel-cohort-${cohortHash}`
+  return tx.assessmentEpisode.upsert({
+    where: { id },
+    create: {
+      id,
+      subjectUserId: input.subjectUserId,
+      initiatedByUserId: null,
+      initiationMode: 'STUDENT_SELF',
+      courseId: input.courseId,
+      campaignKey: `relational-cohort-v1:${cohortHash}`,
+      label: 'Student relational-experience cohort',
+    },
+    update: {},
+    select: { id: true },
+  })
+}
 
 export const createRelationalProductService = (
   registry: RelationalProductRegistryV1 = relationalProductRegistry,
@@ -444,12 +471,31 @@ export const createRelationalProductService = (
         respondentUserId: input.studentUserId,
         respondentRole: 'STUDENT',
       })
-      const episode = await createEpisode(tx, {
+      const applicabilityHash = registry.applicabilityHash(entry)
+      const episode = await createCohortEpisode(tx, {
         subjectUserId: course.creatorId,
-        initiatedByUserId: input.studentUserId,
-        initiationMode: 'STUDENT_SELF',
         courseId: input.courseId,
+        resourceKind: entry.applicability.resourceKind,
+        resourceKey: entry.applicability.resourceKey,
+        resourceVersion: entry.applicability.resourceVersion,
+        applicabilityHash,
       })
+      const repository = createSqlRelationalAssignmentRepository(tx as any)
+      const existingRow = await tx.relationalAssessmentAssignment.findFirst({
+        where: {
+          episodeId: episode.id,
+          respondentUserId: input.studentUserId,
+          resourceKind: entry.applicability.resourceKind,
+          resourceKey: entry.applicability.resourceKey,
+          resourceVersion: entry.applicability.resourceVersion,
+        },
+        select: { id: true },
+      })
+      if (existingRow) {
+        const existing = await repository.findById(existingRow.id)
+          ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'existing cohort assignment could not be reloaded')
+        return existing
+      }
       const record = buildRelationalAssignment({
         applicability: entry.applicability,
         relationshipSnapshot: snapshot,
@@ -458,7 +504,7 @@ export const createRelationalProductService = (
         createdByUserId: input.studentUserId,
         consentId: null,
       })
-      await createSqlRelationalAssignmentRepository(tx as any).create(record)
+      await repository.create(record)
       return record
     })
     return taskProjection(assignment, registry, false)

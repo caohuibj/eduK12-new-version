@@ -48,6 +48,7 @@ const CognitiveRunner: React.FC = () => {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const isPublic = isPublicAssessmentPath(location.pathname)
+  const relationalMode = location.pathname.startsWith('/relational/cognitive/')
   const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
   const sessionApi = useMemo(
     () => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
@@ -138,7 +139,7 @@ const CognitiveRunner: React.FC = () => {
       const returnTo = searchParams.get('returnTo')
       if (returnTo) query.set('returnTo', returnTo)
       const suffix = query.toString() ? `?${query.toString()}` : ''
-      navigate(`${isPublic ? '/public' : '/student'}/cognitive/sessions/${next.sessionId}${suffix}`, { replace: true })
+      navigate(`${isPublic ? '/public' : relationalMode ? '/relational' : '/student'}/cognitive/sessions/${next.sessionId}${suffix}`, { replace: true })
     } catch (error) {
       setRestartError((error as { message?: string })?.message || '重启失败，请稍后重试')
     } finally {
@@ -146,12 +147,13 @@ const CognitiveRunner: React.FC = () => {
     }
   }
 
+  const cognitiveFallback = isPublic ? '/' : relationalMode ? '/relational/tasks' : '/student/cognitive'
   const parentTarget = parentReturnTo(
     searchParams.get('returnTo'),
     isPublic,
-    isPublic ? '/' : '/student/cognitive',
+    cognitiveFallback,
   )
-  const hasParentReturn = parentTarget !== (isPublic ? '/' : '/student/cognitive')
+  const hasParentReturn = parentTarget !== cognitiveFallback
   const recoveryActions = (
     <div className="flex flex-wrap justify-center gap-3">
       <button onClick={() => navigate(parentTarget)} className="btn-secondary">
@@ -178,7 +180,9 @@ const CognitiveRunner: React.FC = () => {
         returnTo, isPublic,
         isPublic
           ? `/public/cognitive/sessions/${sessionId}/result?public=1`
-          : `/student/cognitive/sessions/${sessionId}/result`,
+          : relationalMode
+            ? '/relational/tasks'
+            : `/student/cognitive/sessions/${sessionId}/result`,
       )
       navigate(target, { replace: true })
     }
@@ -229,7 +233,7 @@ const CognitiveRunner: React.FC = () => {
         <AssessmentShell
           title="认知测评"
           interactionReadiness={{ state: 'blocked', message: '该冻结任务类型或 engineVersion 没有可用的前端支持契约。' }}
-          actions={<button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">返回列表</button>}
+          actions={<button onClick={() => navigate(cognitiveFallback)} className="btn-secondary">返回列表</button>}
         >
           <p className="text-center text-slate-600">该测评类型或版本暂不支持，请联系老师处理。</p>
         </AssessmentShell>

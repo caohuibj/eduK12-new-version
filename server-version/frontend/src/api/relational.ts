@@ -7,6 +7,7 @@ export type RelationalProductJourney =
   | 'TEACHER_ASSIGN_PARENT'
   | 'TEACHER_OBSERVER'
   | 'STUDENT_EXPERIENCE'
+  | 'TEACHER_COHORT_REPORT'
 
 export type RelationalProductRef = {
   resourceKind: RelationalResourceKind
@@ -71,7 +72,7 @@ export type RelationalCohortReport = RelationalProductRef & {
   courseId: string
   title: string
   minimumRespondents: number
-  respondentCount: number
+  respondentCount: number | null
   state: 'EMPTY' | 'INSUFFICIENT' | 'AWAITING_ANALYSIS' | 'READY'
   snapshot: RelationalCohortSnapshot | null
 }

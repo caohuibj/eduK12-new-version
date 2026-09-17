@@ -16,12 +16,13 @@ describe('safe access and return context', () => {
     expect(returnAfterLogin('/student/login?returnTo=/users', 'STUDENT')).toBe('/student')
     expect(returnAfterLogin('/scale-library/key/1', 'STUDENT')).toBe('/scale-library/key/1')
     expect(returnAfterLogin('/dashboard', 'PARENT')).toBe('/parent')
-    expect(returnAfterLogin('/parent/observer', 'PARENT')).toBe('/parent/observer')
+    expect(returnAfterLogin('/relational/tasks', 'PARENT')).toBe('/relational/tasks')
     expect(returnAfterLogin('/student/scales/1', 'PARENT')).toBe('/parent')
   })
   it('restricts child returns to the matching public/authenticated parent family', () => {
     expect(parentReturnTo('/student/composite/attempts/1?slot=a', false, '/')).toBe('/student/composite/attempts/1?slot=a')
     expect(parentReturnTo('/student/composite/attempts/1', true, '/')).toBe('/')
+    expect(parentReturnTo('/relational/attempts/1?slot=a', false, '/')).toBe('/relational/attempts/1?slot=a')
     expect(parentReturnTo('/users', false, '/')).toBe('/')
   })
   it('stores only an identity and return hint for reauthentication', () => {
@@ -33,6 +34,8 @@ describe('safe access and return context', () => {
     expect(shellModeFor('/student/situational/test')).toBe('focused')
     expect(shellModeFor('/public/cognitive/sessions/1')).toBe('focused')
     expect(shellModeFor('/public/cognitive/sessions/1/result')).toBe('public')
+    expect(shellModeFor('/relational/attempts/1')).toBe('focused')
+    expect(shellModeFor('/relational/cognitive/sessions/1')).toBe('focused')
     expect(shellModeFor('/bigscreen/1')).toBe('display')
   })
 })
@@ -46,8 +49,8 @@ describe('role navigation', () => {
   })
   it('keeps parent navigation isolated from staff and student surfaces', () => {
     const items = navigationFor('PARENT', true)
-    expect(items.map((item) => item.path)).toEqual(['/parent', '/parent/observer'])
-    expect(activeNavigation(items, '/parent/observer')).toBeDefined()
+    expect(items.map((item) => item.path)).toEqual(['/parent', '/relational/tasks'])
+    expect(activeNavigation(items, '/relational/attempts/attempt-1')?.path).toBe('/relational/tasks')
   })
   it('keeps admin and disabled capability items out of other menus', () => {
     expect(navigationFor('TEACHER', false).some((item) => item.path === '/users' || item.path === '/cognitive-assignments')).toBe(false)

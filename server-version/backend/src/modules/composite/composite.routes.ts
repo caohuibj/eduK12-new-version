@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type NextFunction, type Request, type Response } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
 import { compositeVideoController } from './composite-video.controller'
@@ -6,9 +6,28 @@ import { situationalVideoController } from '../situational/situational-video.con
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
+import { instrumentError } from '../../utils/response'
+import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { relationalProductReportService } from '../assessment-relational/product-report.service'
 
 const router = Router()
 const respondentAttemptAccess = requireRole(UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER)
+const relationalRespondentReportGuard = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) return next()
+    await relationalProductReportService.assertRespondentReportAllowed({
+      attemptId: req.params.attemptId,
+      userId: req.user.userId,
+    })
+    return next()
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) {
+      const status = error.code === 'RELATIONAL_ANALYSIS_ACCESS' ? 403 : 409
+      return instrumentError(res, error.code, error.message, status)
+    }
+    return next(error)
+  }
+}
 
 // 学生端（必须在 /:id 之前）
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
@@ -29,7 +48,7 @@ router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUD
 router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
-router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, compositeController.report)
+router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalRespondentReportGuard, compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
 router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
