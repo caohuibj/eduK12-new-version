@@ -2,6 +2,7 @@ import { Router, type Response } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { instrumentError, success, unauthorized } from '../../utils/response'
 import { RelationalAssessmentError } from './errors'
+import { relationalProductContextService } from './product-context.service'
 import { relationalProductService } from './product.service'
 import type { RelationalResourceKindV1 } from './types'
 
@@ -70,6 +71,47 @@ router.get('/tasks', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, { list: await relationalProductService.tasks(req.user.userId, req.user.role) })
+  } catch (error) {
+    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
+  }
+})
+
+router.get('/context/parent-children', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    return success(res, {
+      list: await relationalProductContextService.parentChildren({
+        userId: req.user.userId,
+        role: req.user.role,
+      }),
+    })
+  } catch (error) {
+    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
+  }
+})
+
+router.get('/context/courses/:courseId/roster', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    return success(res, await relationalProductContextService.teacherRoster({
+      userId: req.user.userId,
+      role: req.user.role,
+      courseId: req.params.courseId,
+    }))
+  } catch (error) {
+    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
+  }
+})
+
+router.get('/context/student-courses', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    return success(res, {
+      list: await relationalProductContextService.studentCourses({
+        userId: req.user.userId,
+        role: req.user.role,
+      }),
+    })
   } catch (error) {
     try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
   }
