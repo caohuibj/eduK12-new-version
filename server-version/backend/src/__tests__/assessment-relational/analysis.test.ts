@@ -8,6 +8,7 @@ import {
   resolveCourseTeacherStudentRelationship,
   resolveParentChildRelationship,
   type RelationalApplicabilityV1,
+  type RelationalAssignmentRecordV1,
   type RelationalCohortAnalysisPolicyV1,
 } from '../../modules/assessment-relational'
 import type { ParentStudentRelationshipRecordV1 } from '../../modules/assessment-identity/types'
@@ -44,39 +45,76 @@ const classroomApplicability: RelationalApplicabilityV1 = {
   minimumRespondents: 5,
 }
 
-const results = (count: number) => Array.from({ length: count }, (_, index) => ({
-  assignmentId: `assignment-${index + 1}`,
-  respondentUserId: `student-${index + 1}`,
-  canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
-  metrics: {
-    support: 2 + index,
-    clarity: index === 0 ? null : 3 + index,
-  },
-}))
+const complete = (assignment: RelationalAssignmentRecordV1): RelationalAssignmentRecordV1 => ({
+  ...assignment,
+  status: 'COMPLETED',
+  startedAt: '2026-09-17T02:00:00.000Z',
+  completedAt: '2026-09-17T02:10:00.000Z',
+})
+
+const cohortResults = (count: number, input?: {
+  teacherUserId?: string
+  courseId?: string
+  episodeId?: string
+  applicability?: RelationalApplicabilityV1
+}) => Array.from({ length: count }, (_, index) => {
+  const respondentUserId = `student-${index + 1}`
+  const teacherUserId = input?.teacherUserId ?? 'teacher-1'
+  const courseId = input?.courseId ?? 'course-1'
+  const applicability = input?.applicability ?? classroomApplicability
+  const assignment = buildRelationalAssignment({
+    applicability,
+    relationshipSnapshot: resolveCourseTeacherStudentRelationship({
+      courseId,
+      courseCreatorUserId: teacherUserId,
+      membershipStudentUserId: respondentUserId,
+      membershipStatus: 'ACTIVE',
+      subjectUserId: teacherUserId,
+      subjectRole: 'TEACHER',
+      respondentUserId,
+      respondentRole: 'STUDENT',
+    }),
+    perspective: 'RELATIONAL_EXPERIENCE',
+    episodeId: input?.episodeId ?? 'episode-classroom',
+    createdByUserId: teacherUserId,
+    consentId: null,
+    assignmentId: `assignment-${teacherUserId}-${courseId}-${index + 1}`,
+  })
+  return {
+    assignment: complete(assignment),
+    canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
+    metrics: {
+      support: 2 + index,
+      clarity: index === 0 ? null : 3 + index,
+    },
+  }
+})
 
 describe('relational analysis and privacy', () => {
-  it('suppresses cohort output below minimum N', () => {
+  it('suppresses cohort output below assignment-frozen minimum N', () => {
     expect(failCode(() => buildRelationalCohortAnalysis({
-      subjectUserId: 'teacher-1',
-      resourceKind: 'BUNDLE',
-      resourceKey: 'classroom_environment_student_report_v1',
-      resourceVersion: '1.0.0',
       policy,
-      results: results(4),
+      results: cohortResults(4),
     }))).toBe('RELATIONAL_INSUFFICIENT_RESPONDENTS')
+  })
+
+  it('refuses caller attempts to lower minimum N below applicability', () => {
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy: { ...policy, minimumRespondents: 3 },
+      results: cohortResults(3),
+    }))).toBe('RELATIONAL_MINIMUM_N')
   })
 
   it('builds aggregate-only metrics and suppresses a metric with insufficient valid N', () => {
     const snapshot = buildRelationalCohortAnalysis({
-      subjectUserId: 'teacher-1',
-      resourceKind: 'BUNDLE',
-      resourceKey: 'classroom_environment_student_report_v1',
-      resourceVersion: '1.0.0',
       policy,
-      results: results(5),
+      results: cohortResults(5),
       createdAt: '2026-09-17T03:00:00.000Z',
     })
     expect(snapshot.respondentCount).toBe(5)
+    expect(snapshot.minimumRespondents).toBe(5)
+    expect(snapshot.courseId).toBe('course-1')
+    expect(snapshot.episodeId).toBe('episode-classroom')
     expect(snapshot.metrics.support).toMatchObject({ state: 'present', validN: 5, mean: 4 })
     expect(snapshot.metrics.clarity).toEqual({ state: 'insufficient', validN: 4, missingN: 1 })
     expect(snapshot.inputResultHashes).toHaveLength(5)
@@ -88,6 +126,43 @@ describe('relational analysis and privacy', () => {
       snapshot,
       viewerUserId: 'teacher-2',
     }))).toBe('RELATIONAL_ANALYSIS_ACCESS')
+  })
+
+  it('rejects non-completed assignments before aggregation', () => {
+    const inputs = cohortResults(5)
+    inputs[0] = { ...inputs[0], assignment: { ...inputs[0].assignment, status: 'STARTED', completedAt: null } }
+    expect(failCode(() => buildRelationalCohortAnalysis({ policy, results: inputs }))).toBe('RELATIONAL_COHORT_ASSIGNMENT')
+  })
+
+  it('rejects cross-teacher, cross-course, cross-episode and cross-resource mixing', () => {
+    const base = cohortResults(5)
+    const crossCourse = cohortResults(1, { courseId: 'course-2' })[0]
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy,
+      results: [...base.slice(0, 4), crossCourse],
+    }))).toBe('RELATIONAL_COHORT_SCOPE')
+
+    const crossEpisode = cohortResults(1, { episodeId: 'episode-other' })[0]
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy,
+      results: [...base.slice(0, 4), crossEpisode],
+    }))).toBe('RELATIONAL_COHORT_SCOPE')
+
+    const crossTeacher = cohortResults(1, { teacherUserId: 'teacher-2' })[0]
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy,
+      results: [...base.slice(0, 4), crossTeacher],
+    }))).toBe('RELATIONAL_COHORT_SCOPE')
+
+    const otherResource: RelationalApplicabilityV1 = {
+      ...classroomApplicability,
+      resourceKey: 'other_classroom_environment_v1',
+    }
+    const crossResource = cohortResults(1, { applicability: otherResource })[0]
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy,
+      results: [...base.slice(0, 4), crossResource],
+    }))).toBe('RELATIONAL_COHORT_SCOPE')
   })
 
   it('never exposes an individual Student -> Teacher relational-experience result', () => {
