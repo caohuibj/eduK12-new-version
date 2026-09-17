@@ -43,10 +43,15 @@ export const buildRelationalAssignment = (input: {
   } else if (snapshot.subjectUserId === snapshot.respondentUserId) {
     relationalFail('RELATIONAL_ACTORS', 'non-SELF assignment requires distinct actors')
   }
-  const analysisMode = input.applicability.analysisMode
-  if (analysisMode === 'MULTI_INFORMANT_SYNTHESIS') {
-    relationalFail('RELATIONAL_ANALYSIS_RESERVED', 'MULTI_INFORMANT_SYNTHESIS is reserved and not implemented in V1')
-  }
+  const analysisMode: RelationalAssignmentRecordV1['analysisMode'] =
+    input.applicability.analysisMode === 'INDIVIDUAL_ONLY'
+      ? 'INDIVIDUAL_ONLY'
+      : input.applicability.analysisMode === 'COHORT_AGGREGATE'
+        ? 'COHORT_AGGREGATE'
+        : relationalFail(
+          'RELATIONAL_ANALYSIS_RESERVED',
+          'MULTI_INFORMANT_SYNTHESIS is reserved and not implemented in V1',
+        )
   return {
     assignmentId: input.assignmentId ?? randomUUID(),
     episodeId: input.episodeId,
