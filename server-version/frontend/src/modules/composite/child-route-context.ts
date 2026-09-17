@@ -12,8 +12,16 @@ export type CompositeChildRouteContextResult =
   | { ok: true; context: CompositeChildRouteContext }
   | { ok: false; message: string }
 
-export const compositeParentAttemptPath = (publicMode: boolean, parentAttemptId: string) => (
-  `${publicMode ? '/public' : '/student'}/composite/attempts/${encodeURIComponent(parentAttemptId)}`
+export const compositeParentAttemptPath = (
+  publicMode: boolean,
+  relationalMode: boolean,
+  parentAttemptId: string,
+) => (
+  publicMode
+    ? `/public/composite/attempts/${encodeURIComponent(parentAttemptId)}`
+    : relationalMode
+      ? `/relational/attempts/${encodeURIComponent(parentAttemptId)}`
+      : `/student/composite/attempts/${encodeURIComponent(parentAttemptId)}`
 )
 
 /**
@@ -23,10 +31,12 @@ export const compositeParentAttemptPath = (publicMode: boolean, parentAttemptId:
  */
 export const resolveCompositeChildRouteContext = ({
   publicMode,
+  relationalMode = false,
   parentAttemptId,
   item,
 }: {
   publicMode: boolean
+  relationalMode?: boolean
   parentAttemptId: string
   item: CompositeCurrentItem
 }): CompositeChildRouteContextResult => {
@@ -34,7 +44,7 @@ export const resolveCompositeChildRouteContext = ({
     return { ok: false, message: '综合测评父级记录缺失，请刷新后重试' }
   }
 
-  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId)
+  const parentReturnTo = compositeParentAttemptPath(publicMode, relationalMode, parentAttemptId)
 
   if (item.type === 'COGNITIVE') {
     const sessionId = item.cognitiveSession?.sessionId || ''
@@ -44,6 +54,7 @@ export const resolveCompositeChildRouteContext = ({
     const query = new URLSearchParams()
     if (publicMode) query.set('public', '1')
     query.set('returnTo', parentReturnTo)
+    const prefix = publicMode ? '/public' : relationalMode ? '/relational' : '/student'
     return {
       ok: true,
       context: {
@@ -51,7 +62,7 @@ export const resolveCompositeChildRouteContext = ({
         parentAttemptId,
         parentReturnTo,
         childAttemptId: sessionId,
-        target: `${publicMode ? '/public' : '/student'}/cognitive/sessions/${encodeURIComponent(sessionId)}?${query.toString()}`,
+        target: `${prefix}/cognitive/sessions/${encodeURIComponent(sessionId)}?${query.toString()}`,
       },
     }
   }
@@ -66,6 +77,7 @@ export const resolveCompositeChildRouteContext = ({
       compositeAttemptId: parentAttemptId,
       compositeItemId: item.id,
     })
+    const prefix = publicMode ? '/public' : relationalMode ? '/relational' : '/student'
     return {
       ok: true,
       context: {
@@ -73,7 +85,7 @@ export const resolveCompositeChildRouteContext = ({
         parentAttemptId,
         parentReturnTo,
         childAttemptId,
-        target: `${publicMode ? '/public' : '/student'}/composite/situational/${encodeURIComponent(childAttemptId)}?${query.toString()}`,
+        target: `${prefix}/composite/situational/${encodeURIComponent(childAttemptId)}?${query.toString()}`,
       },
     }
   }
