@@ -11,6 +11,7 @@ export type RelationalProductJourneyV1 =
   | 'TEACHER_ASSIGN_PARENT'
   | 'TEACHER_OBSERVER'
   | 'STUDENT_EXPERIENCE'
+  | 'TEACHER_COHORT_REPORT'
 
 const journeysFor = (entry: RelationalProductEntryV1): RelationalProductJourneyV1[] => {
   const a = entry.applicability
@@ -39,7 +40,10 @@ const journeysFor = (entry: RelationalProductEntryV1): RelationalProductJourneyV
     && a.relationshipKinds.includes('COURSE_TEACHER_STUDENT')
     && a.perspectives.includes('RELATIONAL_EXPERIENCE')
     && a.analysisMode === 'COHORT_AGGREGATE'
-  ) journeys.push('STUDENT_EXPERIENCE')
+  ) {
+    journeys.push('STUDENT_EXPERIENCE')
+    journeys.push('TEACHER_COHORT_REPORT')
+  }
   return journeys
 }
 
@@ -60,8 +64,11 @@ export const createRelationalProductCatalogService = (
   registry: RelationalProductRegistryV1 = relationalProductRegistry,
 ) => ({
   catalog(role: UserRole) {
+    // A teacher is both a possible respondent and the subject of Student→Teacher
+    // cohort products. The catalog projects journeys after lookup, so adding the
+    // STUDENT respondent lane here does not authorize teacher participation as a student.
     const roles = role === 'TEACHER'
-      ? (['TEACHER', 'PARENT'] as const)
+      ? (['TEACHER', 'PARENT', 'STUDENT'] as const)
       : role === 'PARENT'
         ? (['PARENT'] as const)
         : role === 'STUDENT'
@@ -74,7 +81,7 @@ export const createRelationalProductCatalogService = (
       }
     }
     const allowedJourneys = role === 'TEACHER'
-      ? new Set<RelationalProductJourneyV1>(['TEACHER_ASSIGN_PARENT', 'TEACHER_OBSERVER'])
+      ? new Set<RelationalProductJourneyV1>(['TEACHER_ASSIGN_PARENT', 'TEACHER_OBSERVER', 'TEACHER_COHORT_REPORT'])
       : role === 'PARENT'
         ? new Set<RelationalProductJourneyV1>(['PARENT_SELF_SERVE'])
         : new Set<RelationalProductJourneyV1>(['STUDENT_EXPERIENCE'])
