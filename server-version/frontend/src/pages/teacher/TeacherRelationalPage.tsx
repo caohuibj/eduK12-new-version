@@ -13,7 +13,7 @@ import ObserverAssign from './ObserverAssign'
 
 type CourseSummary = { id: string; title: string }
 
-const metricLabel = (key: string) => key.replaceAll('_', ' ')
+const metricLabel = (key: string) => key.split('_').join(' ')
 
 export default function TeacherRelationalPage() {
   const [courses, setCourses] = useState<CourseSummary[]>([])
