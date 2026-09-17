@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/auth'
 import { instrumentError, success, unauthorized } from '../../utils/response'
 import { RelationalAssessmentError } from './errors'
 import { relationalProductContextService } from './product-context.service'
+import { relationalProductReportService } from './product-report.service'
 import { relationalProductService } from './product.service'
 import type { RelationalResourceKindV1 } from './types'
 
@@ -14,8 +15,9 @@ const statusFor = (code: string): number => {
     code === 'RELATIONAL_ASSIGNMENT_ACTOR'
     || code === 'RELATIONAL_PRODUCT_ROLE'
     || code === 'RELATIONAL_COURSE_TEACHER'
+    || code === 'RELATIONAL_ANALYSIS_ACCESS'
   ) return 403
-  if (code === 'RELATIONAL_PRODUCT_UNAVAILABLE') return 409
+  if (code === 'RELATIONAL_PRODUCT_UNAVAILABLE' || code === 'RELATIONAL_REPORT_NOT_READY') return 409
   if (
     code.includes('CONSENT')
     || code.includes('CONFLICT')
@@ -180,6 +182,19 @@ router.post('/assignments/:assignmentId/consent/accept', authenticate, async (re
   try {
     if (!req.user) return unauthorized(res)
     return success(res, await relationalProductService.acceptConsent({
+      assignmentId: req.params.assignmentId,
+      userId: req.user.userId,
+      role: req.user.role,
+    }))
+  } catch (error) {
+    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
+  }
+})
+
+router.get('/assignments/:assignmentId/report-target', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    return success(res, await relationalProductReportService.respondentReportTarget({
       assignmentId: req.params.assignmentId,
       userId: req.user.userId,
       role: req.user.role,
