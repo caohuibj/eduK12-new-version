@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   RelationalAssessmentError,
   buildRelationalAssignment,
-  buildRelationalCohortAnalysis,
+  createRelationalCohortAnalysisService,
   projectIndividualRelationalResult,
   projectRelationalCohortForSubject,
   resolveCourseTeacherStudentRelationship,
@@ -10,12 +10,23 @@ import {
   type RelationalApplicabilityV1,
   type RelationalAssignmentRecordV1,
   type RelationalCohortAnalysisPolicyV1,
+  type RelationalCanonicalResultProjectionV1,
 } from '../../modules/assessment-relational'
 import type { ParentStudentRelationshipRecordV1 } from '../../modules/assessment-identity/types'
 
 const failCode = (run: () => unknown): string => {
   try {
     run()
+    throw new Error('expected RelationalAssessmentError')
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) return error.code
+    throw error
+  }
+}
+
+const failCodeAsync = async (run: () => Promise<unknown>): Promise<string> => {
+  try {
+    await run()
     throw new Error('expected RelationalAssessmentError')
   } catch (error) {
     if (error instanceof RelationalAssessmentError) return error.code
@@ -52,12 +63,17 @@ const complete = (assignment: RelationalAssignmentRecordV1): RelationalAssignmen
   completedAt: '2026-09-17T02:10:00.000Z',
 })
 
+type CohortFixture = {
+  assignment: RelationalAssignmentRecordV1
+  result: RelationalCanonicalResultProjectionV1
+}
+
 const cohortResults = (count: number, input?: {
   teacherUserId?: string
   courseId?: string
   episodeId?: string
   applicability?: RelationalApplicabilityV1
-}) => Array.from({ length: count }, (_, index) => {
+}): CohortFixture[] => Array.from({ length: count }, (_, index) => {
   const respondentUserId = `student-${index + 1}`
   const teacherUserId = input?.teacherUserId ?? 'teacher-1'
   const courseId = input?.courseId ?? 'course-1'
@@ -82,35 +98,52 @@ const cohortResults = (count: number, input?: {
   })
   return {
     assignment: complete(assignment),
-    canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
-    metrics: {
-      support: 2 + index,
-      clarity: index === 0 ? null : 3 + index,
+    result: {
+      canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
+      metrics: {
+        support: 2 + index,
+        clarity: index === 0 ? null : 3 + index,
+      },
     },
   }
 })
 
+const buildCohort = async (
+  fixtures: CohortFixture[],
+  requestedPolicy: RelationalCohortAnalysisPolicyV1 = policy,
+  createdAt?: string,
+) => {
+  const assignments = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.assignment]))
+  const results = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.result]))
+  const service = createRelationalCohortAnalysisService({
+    assignments: {
+      findById: async (assignmentId) => assignments.get(assignmentId) ?? null,
+    },
+    canonicalResults: {
+      loadForAssignment: async (assignment) => results.get(assignment.assignmentId) ?? null,
+    },
+  })
+  return service.build({
+    assignmentIds: fixtures.map((entry) => entry.assignment.assignmentId),
+    policy: requestedPolicy,
+    createdAt,
+  })
+}
+
 describe('relational analysis and privacy', () => {
-  it('suppresses cohort output below assignment-frozen minimum N', () => {
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy,
-      results: cohortResults(4),
-    }))).toBe('RELATIONAL_INSUFFICIENT_RESPONDENTS')
+  it('suppresses cohort output below assignment-frozen minimum N', async () => {
+    expect(await failCodeAsync(() => buildCohort(cohortResults(4)))).toBe('RELATIONAL_INSUFFICIENT_RESPONDENTS')
   })
 
-  it('refuses caller attempts to lower minimum N below applicability', () => {
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy: { ...policy, minimumRespondents: 3 },
-      results: cohortResults(3),
-    }))).toBe('RELATIONAL_MINIMUM_N')
+  it('refuses caller attempts to lower minimum N below applicability', async () => {
+    expect(await failCodeAsync(() => buildCohort(
+      cohortResults(3),
+      { ...policy, minimumRespondents: 3 },
+    ))).toBe('RELATIONAL_MINIMUM_N')
   })
 
-  it('builds aggregate-only metrics and suppresses a metric with insufficient valid N', () => {
-    const snapshot = buildRelationalCohortAnalysis({
-      policy,
-      results: cohortResults(5),
-      createdAt: '2026-09-17T03:00:00.000Z',
-    })
+  it('builds aggregate-only metrics and suppresses a metric with insufficient valid N', async () => {
+    const snapshot = await buildCohort(cohortResults(5), policy, '2026-09-17T03:00:00.000Z')
     expect(snapshot.respondentCount).toBe(5)
     expect(snapshot.minimumRespondents).toBe(5)
     expect(snapshot.courseId).toBe('course-1')
@@ -128,41 +161,46 @@ describe('relational analysis and privacy', () => {
     }))).toBe('RELATIONAL_ANALYSIS_ACCESS')
   })
 
-  it('rejects non-completed assignments before aggregation', () => {
-    const inputs = cohortResults(5)
-    inputs[0] = { ...inputs[0], assignment: { ...inputs[0].assignment, status: 'STARTED', completedAt: null } }
-    expect(failCode(() => buildRelationalCohortAnalysis({ policy, results: inputs }))).toBe('RELATIONAL_COHORT_ASSIGNMENT')
+  it('refuses caller-supplied assignment ids that do not exist in persistence', async () => {
+    const fixtures = cohortResults(5)
+    const assignments = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.assignment]))
+    const results = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.result]))
+    const service = createRelationalCohortAnalysisService({
+      assignments: { findById: async (id) => assignments.get(id) ?? null },
+      canonicalResults: { loadForAssignment: async (assignment) => results.get(assignment.assignmentId) ?? null },
+    })
+    expect(await failCodeAsync(() => service.build({
+      assignmentIds: [...fixtures.slice(0, 4).map((entry) => entry.assignment.assignmentId), 'fabricated-assignment'],
+      policy,
+    }))).toBe('RELATIONAL_COHORT_ASSIGNMENT_NOT_FOUND')
   })
 
-  it('rejects cross-teacher, cross-course, cross-episode and cross-resource mixing', () => {
+  it('rejects non-completed assignments before aggregation', async () => {
+    const inputs = cohortResults(5)
+    inputs[0] = {
+      ...inputs[0],
+      assignment: { ...inputs[0].assignment, status: 'STARTED', completedAt: null },
+    }
+    expect(await failCodeAsync(() => buildCohort(inputs))).toBe('RELATIONAL_COHORT_ASSIGNMENT')
+  })
+
+  it('rejects cross-teacher, cross-course, cross-episode and cross-resource mixing', async () => {
     const base = cohortResults(5)
     const crossCourse = cohortResults(1, { courseId: 'course-2' })[0]
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy,
-      results: [...base.slice(0, 4), crossCourse],
-    }))).toBe('RELATIONAL_COHORT_SCOPE')
+    expect(await failCodeAsync(() => buildCohort([...base.slice(0, 4), crossCourse]))).toBe('RELATIONAL_COHORT_SCOPE')
 
     const crossEpisode = cohortResults(1, { episodeId: 'episode-other' })[0]
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy,
-      results: [...base.slice(0, 4), crossEpisode],
-    }))).toBe('RELATIONAL_COHORT_SCOPE')
+    expect(await failCodeAsync(() => buildCohort([...base.slice(0, 4), crossEpisode]))).toBe('RELATIONAL_COHORT_SCOPE')
 
     const crossTeacher = cohortResults(1, { teacherUserId: 'teacher-2' })[0]
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy,
-      results: [...base.slice(0, 4), crossTeacher],
-    }))).toBe('RELATIONAL_COHORT_SCOPE')
+    expect(await failCodeAsync(() => buildCohort([...base.slice(0, 4), crossTeacher]))).toBe('RELATIONAL_COHORT_SCOPE')
 
     const otherResource: RelationalApplicabilityV1 = {
       ...classroomApplicability,
       resourceKey: 'other_classroom_environment_v1',
     }
     const crossResource = cohortResults(1, { applicability: otherResource })[0]
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy,
-      results: [...base.slice(0, 4), crossResource],
-    }))).toBe('RELATIONAL_COHORT_SCOPE')
+    expect(await failCodeAsync(() => buildCohort([...base.slice(0, 4), crossResource]))).toBe('RELATIONAL_COHORT_SCOPE')
   })
 
   it('never exposes an individual Student -> Teacher relational-experience result', () => {
