@@ -117,14 +117,16 @@ export const createRelationalProductReportService = (
     if (
       entry.releaseStatus !== 'PUBLISHED'
       || applicability.analysisMode !== 'COHORT_AGGREGATE'
-      || applicability.minimumRespondents === null
-      || applicability.minimumRespondents < 3
       || !applicability.subjectRoles.includes('TEACHER')
       || !applicability.respondentRoles.includes('STUDENT')
       || !applicability.perspectives.includes('RELATIONAL_EXPERIENCE')
       || !applicability.relationshipKinds.includes('COURSE_TEACHER_STUDENT')
     ) {
       relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product is not a Student-to-Teacher cohort contract')
+    }
+    const minimumRespondents = applicability.minimumRespondents
+    if (minimumRespondents === null || minimumRespondents < 3) {
+      relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product must freeze a minimum respondent threshold of at least 3')
     }
 
     const course = await db.course.findUnique({
@@ -148,7 +150,7 @@ export const createRelationalProductReportService = (
       && assignment.resourceKey === input.product.resourceKey
       && assignment.resourceVersion === input.product.resourceVersion
       && assignment.applicabilityHash === expectedHash
-      && assignment.minimumRespondents === applicability.minimumRespondents
+      && assignment.minimumRespondents === minimumRespondents
       && assignment.status !== 'REVOKED'
       && assignment.status !== 'EXPIRED'
     ))
@@ -159,7 +161,7 @@ export const createRelationalProductReportService = (
       resourceKey: input.product.resourceKey,
       resourceVersion: input.product.resourceVersion,
       title: entry.title,
-      minimumRespondents: applicability.minimumRespondents,
+      minimumRespondents,
     }
     if (candidates.length === 0) {
       return { ...base, state: 'EMPTY' as const, respondentCount: null, snapshot: null }
@@ -177,7 +179,7 @@ export const createRelationalProductReportService = (
     const cohort = candidates.filter((assignment) => assignment.episodeId === episodeId)
     const completed = cohort.filter((assignment) => assignment.status === 'COMPLETED')
     const respondentCount = new Set(completed.map((assignment) => assignment.respondentUserId)).size
-    if (respondentCount < applicability.minimumRespondents) {
+    if (respondentCount < minimumRespondents) {
       return {
         ...base,
         state: 'INSUFFICIENT' as const,
@@ -204,7 +206,7 @@ export const createRelationalProductReportService = (
         snapshot: null,
       }
     }
-    if (snapshot.minimumRespondents !== seed.minimumRespondents || snapshot.respondentCount < applicability.minimumRespondents) {
+    if (snapshot.minimumRespondents !== seed.minimumRespondents || snapshot.respondentCount < minimumRespondents) {
       relationalFail('RELATIONAL_COHORT_SCOPE', 'stored cohort snapshot does not match the frozen assignment privacy contract')
     }
     return {
