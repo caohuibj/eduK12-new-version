@@ -87,7 +87,10 @@ export const adaptObserverAssignmentToRelational = (input: {
   ) {
     relationalFail('RELATIONAL_OBSERVER_MISMATCH', 'observer assignment actors do not match relationship snapshot')
   }
-  const expectedRole = observer.respondentType === 'PARENT' ? 'PARENT' : 'TEACHER'
+  if (observer.respondentType !== 'PARENT' && observer.respondentType !== 'TEACHER') {
+    relationalFail('RELATIONAL_OBSERVER_MISMATCH', 'observer assignment requires PARENT or TEACHER respondentType')
+  }
+  const expectedRole = observer.respondentType
   if (relationshipSnapshot.subjectRole !== 'STUDENT' || relationshipSnapshot.respondentRole !== expectedRole) {
     relationalFail('RELATIONAL_OBSERVER_MISMATCH', 'observer assignment roles do not match relationship snapshot')
   }
