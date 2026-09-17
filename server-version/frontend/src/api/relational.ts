@@ -2,6 +2,11 @@ import apiClient from './client'
 import type { CompositeAttemptState } from '../modules/composite/types'
 
 export type RelationalResourceKind = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL'
+export type RelationalProductJourney =
+  | 'PARENT_SELF_SERVE'
+  | 'TEACHER_ASSIGN_PARENT'
+  | 'TEACHER_OBSERVER'
+  | 'STUDENT_EXPERIENCE'
 
 export type RelationalProductRef = {
   resourceKind: RelationalResourceKind
@@ -16,6 +21,7 @@ export type RelationalProduct = RelationalProductRef & {
   perspectives: Array<'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'>
   analysisMode: 'INDIVIDUAL_ONLY' | 'COHORT_AGGREGATE'
   minimumRespondents: number | null
+  journeys: RelationalProductJourney[]
 }
 
 export type RelationalTask = RelationalProductRef & {
