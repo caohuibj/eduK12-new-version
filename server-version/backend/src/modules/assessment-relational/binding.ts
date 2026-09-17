@@ -9,14 +9,19 @@ export interface RelationalAttemptIdentityBindingV1 {
   respondentType: RespondentTypeV1 | null
   episodeId: string
   assignmentRef: string
+  /** Actual accepted consent row authorizing this attempt; assignment.consentId remains the lineage root. */
   consentId: string | null
 }
 
 export const buildRelationalAttemptIdentityBinding = (
   assignment: RelationalAssignmentRecordV1,
+  effectiveConsentId: string | null = assignment.consentId,
 ): RelationalAttemptIdentityBindingV1 => {
   if (assignment.status === 'REVOKED' || assignment.status === 'EXPIRED') {
     relationalFail('RELATIONAL_ASSIGNMENT_INACTIVE', 'inactive assignment cannot bind an attempt')
+  }
+  if (assignment.consentId && !effectiveConsentId) {
+    relationalFail('RELATIONAL_CONSENT_REQUIRED', 'consent-bearing assignment requires an effective accepted consent')
   }
   const respondentType: RespondentTypeV1 | null = assignment.respondentRole === 'PARENT'
     ? 'PARENT'
@@ -32,7 +37,7 @@ export const buildRelationalAttemptIdentityBinding = (
     respondentType,
     episodeId: assignment.episodeId,
     assignmentRef: assignment.assignmentId,
-    consentId: assignment.consentId,
+    consentId: effectiveConsentId,
   }
 }
 
