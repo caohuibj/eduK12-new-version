@@ -10,6 +10,7 @@ import {
   type RelationalAssignmentRecordV1,
   type RelationalAssignmentRepository,
   type RelationalAssignmentStatusV1,
+  type ResolvedRelationalConsentV1,
 } from '../../modules/assessment-relational'
 import type { ParentStudentRelationshipRecordV1 } from '../../modules/assessment-identity/types'
 
@@ -33,7 +34,7 @@ const observerApplicability: RelationalApplicabilityV1 = {
   relationshipKinds: ['PARENT_CHILD'],
   perspectives: ['OBSERVER_REPORT'],
   analysisMode: 'INDIVIDUAL_ONLY',
-  visibilityPolicyKey: 'observer_private_respondent_v1',
+  visibilityPolicyKey: 'observer_assigning_teacher_v1',
   minimumRespondents: null,
 }
 
@@ -53,7 +54,7 @@ const classroomApplicability: RelationalApplicabilityV1 = {
 
 class MemoryRepository implements RelationalAssignmentRepository {
   readonly assignments = new Map<string, RelationalAssignmentRecordV1>()
-  readonly consents = new Map<string, string | null>()
+  readonly acceptedByRoot = new Map<string, ResolvedRelationalConsentV1 | null>()
 
   async create(assignment: RelationalAssignmentRecordV1) {
     this.assignments.set(assignment.assignmentId, assignment)
@@ -89,8 +90,9 @@ class MemoryRepository implements RelationalAssignmentRepository {
     return true
   }
 
-  async consentAcceptedAt(consentId: string) {
-    return this.consents.get(consentId) ?? null
+  async resolveAcceptedConsent(assignment: RelationalAssignmentRecordV1) {
+    if (!assignment.consentId) return null
+    return this.acceptedByRoot.get(assignment.consentId) ?? null
   }
 }
 
@@ -172,19 +174,54 @@ describe('relational assignment -> unified runtime bridge', () => {
       perspective: 'OBSERVER_REPORT',
       episodeId: 'episode-1',
       createdByUserId: 'teacher-1',
-      consentId: 'consent-1',
+      consentId: 'consent-root-1',
       assignmentId: 'assignment-1',
     })
-    repo.consents.set('consent-1', null)
+    repo.acceptedByRoot.set('consent-root-1', null)
     expect(await failCodeAsync(() => service.start({
       assignmentId: assignment.assignmentId,
       actorUserId: 'parent-1',
     }))).toBe('RELATIONAL_CONSENT_REQUIRED')
-    repo.consents.set('consent-1', '2026-09-17T02:05:00.000Z')
+    repo.acceptedByRoot.set('consent-root-1', {
+      consentId: 'consent-accepted-1',
+      acceptedAt: '2026-09-17T02:05:00.000Z',
+    })
     expect(await failCodeAsync(() => service.start({
       assignmentId: assignment.assignmentId,
       actorUserId: 'parent-2',
     }))).toBe('RELATIONAL_ASSIGNMENT_ACTOR')
+  })
+
+  it('binds the runtime attempt to the accepted descendant while preserving the assignment root consent', async () => {
+    const repo = new MemoryRepository()
+    const service = createRelationalAssessmentService(repo)
+    const assignment = await service.issue({
+      applicability: observerApplicability,
+      relationshipSnapshot: resolveParentChildRelationship({
+        relationship: parentRelationship,
+        subjectUserId: 'student-1',
+        subjectRole: 'STUDENT',
+        respondentUserId: 'parent-1',
+        respondentRole: 'PARENT',
+      }),
+      perspective: 'OBSERVER_REPORT',
+      episodeId: 'episode-parent',
+      createdByUserId: 'teacher-1',
+      consentId: 'consent-pending-a',
+      assignmentId: 'assignment-parent',
+    })
+    repo.acceptedByRoot.set('consent-pending-a', {
+      consentId: 'consent-accepted-b',
+      acceptedAt: '2026-09-17T02:05:00.000Z',
+    })
+
+    const started = await service.start({
+      assignmentId: assignment.assignmentId,
+      actorUserId: 'parent-1',
+      startedAt: '2026-09-17T02:10:00.000Z',
+    })
+    expect(started.assignment.consentId).toBe('consent-pending-a')
+    expect(started.attemptIdentity.consentId).toBe('consent-accepted-b')
   })
 
   it('starts and completes without touching scoring/finalization semantics', async () => {
