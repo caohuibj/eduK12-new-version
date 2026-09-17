@@ -30,11 +30,14 @@ export default function ObserverAssign({
   onTeacherObserver,
   disabled = false,
 }: Props) {
-  const parentProducts = useMemo(() => catalog.filter((row) => (
-    row.perspectives.includes('OBSERVER_REPORT')
-    && row.analysisMode === 'INDIVIDUAL_ONLY'
-  )), [catalog])
-  const teacherProducts = parentProducts
+  const parentProducts = useMemo(
+    () => catalog.filter((row) => row.journeys.includes('TEACHER_ASSIGN_PARENT')),
+    [catalog],
+  )
+  const teacherProducts = useMemo(
+    () => catalog.filter((row) => row.journeys.includes('TEACHER_OBSERVER')),
+    [catalog],
+  )
   const [studentUserId, setStudentUserId] = useState(roster[0]?.studentUserId ?? '')
   const student = roster.find((row) => row.studentUserId === studentUserId)
   const [parentUserId, setParentUserId] = useState(student?.approvedParents[0]?.parentUserId ?? '')
@@ -68,22 +71,20 @@ export default function ObserverAssign({
                 setParentUserId(nextStudent?.approvedParents[0]?.parentUserId ?? '')
               }}
             >
-              {roster.map((row) => (
-                <option key={row.studentUserId} value={row.studentUserId}>{row.displayName}</option>
-              ))}
+              {roster.map((row) => <option key={row.studentUserId} value={row.studentUserId}>{row.displayName}</option>)}
             </select>
           </label>
 
           <section className="space-y-3 rounded border border-gray-200 p-4">
             <h3 className="text-sm font-semibold text-gray-800">分配给获批家长</h3>
-            {(student?.approvedParents.length ?? 0) === 0 ? (
+            {parentProducts.length === 0 ? (
+              <p className="text-sm text-gray-600">当前没有已发布的教师→家长观察内容。</p>
+            ) : (student?.approvedParents.length ?? 0) === 0 ? (
               <p className="text-sm text-gray-600">该学生当前没有 ACTIVE 的家长关系。</p>
             ) : (
               <>
                 <select className="w-full rounded border border-gray-300 px-3 py-2" value={parentUserId} onChange={(event) => setParentUserId(event.target.value)}>
-                  {(student?.approvedParents ?? []).map((parent) => (
-                    <option key={parent.parentUserId} value={parent.parentUserId}>{parent.displayName}</option>
-                  ))}
+                  {(student?.approvedParents ?? []).map((parent) => <option key={parent.parentUserId} value={parent.parentUserId}>{parent.displayName}</option>)}
                 </select>
                 <select className="w-full rounded border border-gray-300 px-3 py-2" value={parentProductId} onChange={(event) => setParentProductId(event.target.value)}>
                   {parentProducts.map((item) => <option key={productId(item)} value={productId(item)}>{item.title} · {item.resourceVersion}</option>)}
