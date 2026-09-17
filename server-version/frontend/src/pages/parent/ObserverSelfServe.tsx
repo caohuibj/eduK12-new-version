@@ -24,10 +24,7 @@ export default function ObserverSelfServe({
   disabled = false,
 }: Props) {
   const published = useMemo(
-    () => catalog.filter((row) => (
-      row.perspectives.includes('OBSERVER_REPORT')
-      && row.analysisMode === 'INDIVIDUAL_ONLY'
-    )),
+    () => catalog.filter((row) => row.journeys.includes('PARENT_SELF_SERVE')),
     [catalog],
   )
   const [studentUserId, setStudentUserId] = useState(childrenBound[0]?.studentUserId ?? '')
@@ -39,13 +36,13 @@ export default function ObserverSelfServe({
       <header>
         <h2 className="text-lg font-semibold text-gray-900">为已绑定孩子发起观察测评</h2>
         <p className="mt-2 text-sm text-gray-600">
-          仅能选择系统已发布、且明确允许家长观察的内容。结果默认按内容的可见性策略处理，不会混合孩子自评、其他家长或教师原始答案。
+          仅能选择系统已发布、且明确允许家长自助观察的内容。结果默认按内容的可见性策略处理，不会混合孩子自评、其他家长或教师原始答案。
         </p>
       </header>
 
       {childrenBound.length === 0 || published.length === 0 ? (
         <p className="rounded border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-          {childrenBound.length === 0 ? '当前没有 ACTIVE 的亲子绑定关系。' : '当前没有已发布的家长观察内容。'}
+          {childrenBound.length === 0 ? '当前没有 ACTIVE 的亲子绑定关系。' : '当前没有已发布的家长自助观察内容。'}
         </p>
       ) : (
         <section className="space-y-3 rounded border border-gray-200 p-4">
@@ -57,9 +54,7 @@ export default function ObserverSelfServe({
               onChange={(event) => setStudentUserId(event.target.value)}
             >
               {childrenBound.map((child) => (
-                <option key={child.studentUserId} value={child.studentUserId}>
-                  {child.displayName}
-                </option>
+                <option key={child.studentUserId} value={child.studentUserId}>{child.displayName}</option>
               ))}
             </select>
           </label>
@@ -71,9 +66,7 @@ export default function ObserverSelfServe({
               onChange={(event) => setSelectedProductId(event.target.value)}
             >
               {published.map((item) => (
-                <option key={productId(item)} value={productId(item)}>
-                  {item.title} · {item.resourceVersion}
-                </option>
+                <option key={productId(item)} value={productId(item)}>{item.title} · {item.resourceVersion}</option>
               ))}
             </select>
           </label>
