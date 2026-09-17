@@ -20,6 +20,22 @@ describe('situational runner route context', () => {
     })
   })
 
+  it('preserves relational embedded return context without public recovery state', () => {
+    expect(resolveSituationalRunnerRouteContext({
+      pathname: '/relational/composite/situational/child-r',
+      searchParams: params('compositeAttemptId=parent-r&compositeItemId=item-r&returnTo=%2Frelational%2Fattempts%2Fparent-r'),
+      attemptId: 'child-r',
+    })).toEqual({
+      publicMode: false,
+      embedded: true,
+      compositeAttemptId: 'parent-r',
+      compositeItemId: 'item-r',
+      returnTo: '/relational/attempts/parent-r',
+      completionPath: '/relational/attempts/parent-r',
+      recoveryStorageKey: null,
+    })
+  })
+
   it('uses public recovery context and rejects a cross-surface returnTo', () => {
     expect(resolveSituationalRunnerRouteContext({
       pathname: '/public/composite/situational/child-2',
