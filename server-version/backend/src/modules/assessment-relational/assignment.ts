@@ -109,10 +109,10 @@ export const adaptObserverAssignmentToRelational = (input: {
     resourceVersion: observer.bundleVersion,
     consentId: observer.consentId,
     visibilityPolicyKey: observerVisibilityPolicy(observer.visibility),
-    status: observer.status === 'OPEN' ? 'OPEN' : 'COMPLETED',
+    status: observer.status,
     createdAt: observer.createdAt,
     startedAt: null,
-    completedAt: observer.status === 'COMPLETED' ? observer.completedAt : null,
+    completedAt: null,
     revokedAt: null,
   }
 }
