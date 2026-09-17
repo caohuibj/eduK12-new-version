@@ -521,7 +521,7 @@ export const createRelationalProductService = (
         update: {},
       })
       const resolved = await repository.resolveAcceptedConsent(assignment)
-      if (!resolved) relationalFail('RELATIONAL_CONSENT_REQUIRED', 'consent acceptance was not persisted')
+        ?? relationalFail('RELATIONAL_CONSENT_REQUIRED', 'consent acceptance was not persisted')
       return { accepted: true, replayed: resolved.consentId !== accepted.consentId }
     })
   },
