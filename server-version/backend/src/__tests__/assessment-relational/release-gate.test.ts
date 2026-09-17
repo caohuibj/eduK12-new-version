@@ -168,7 +168,10 @@ describe('RA-01 backend release gate', () => {
         metrics: { climate: index + 1 },
       })),
     })
-    const projection = projectRelationalCohortForSubject({ cohort: undefined as never, snapshot: cohort, viewerUserId: 'teacher-1' } as never)
+    const projection = projectRelationalCohortForSubject({
+      snapshot: cohort,
+      viewerUserId: 'teacher-1',
+    })
     expect(projection.respondentCount).toBe(5)
     expect('inputResultHashes' in projection).toBe(false)
   })
