@@ -43,6 +43,39 @@ export type RelationalTask = RelationalProductRef & {
   product: RelationalProduct | null
 }
 
+export type RelationalCohortMetric =
+  | { state: 'present'; validN: number; missingN: number; mean: number }
+  | { state: 'insufficient'; validN: number; missingN: number }
+
+export type RelationalCohortSnapshot = {
+  schemaVersion: 1
+  kind: 'COHORT_AGGREGATE'
+  subjectUserId: string
+  episodeId: string
+  courseId: string
+  resourceKind: RelationalResourceKind
+  resourceKey: string
+  resourceVersion: string
+  applicabilityHash: string
+  minimumRespondents: number
+  policyKey: string
+  policyVersion: string
+  policyHash: string
+  respondentCount: number
+  metrics: Record<string, RelationalCohortMetric>
+  createdAt: string
+  snapshotHash: string
+}
+
+export type RelationalCohortReport = RelationalProductRef & {
+  courseId: string
+  title: string
+  minimumRespondents: number
+  respondentCount: number
+  state: 'EMPTY' | 'INSUFFICIENT' | 'AWAITING_ANALYSIS' | 'READY'
+  snapshot: RelationalCohortSnapshot | null
+}
+
 export type ParentChild = { studentUserId: string; displayName: string }
 export type TeacherRosterStudent = {
   studentUserId: string
@@ -66,6 +99,12 @@ export const relationalApi = {
   async tasks(): Promise<RelationalTask[]> {
     const response = await apiClient.get<{ list: RelationalTask[] }>('/relational/tasks')
     return response.data.list
+  },
+  async cohortReport(courseId: string, product: RelationalProductRef): Promise<RelationalCohortReport> {
+    const response = await apiClient.get<RelationalCohortReport>('/relational/reports/cohort', {
+      params: { courseId, ...productPayload(product) },
+    })
+    return response.data
   },
   async parentChildren(): Promise<ParentChild[]> {
     const response = await apiClient.get<{ list: ParentChild[] }>('/relational/context/parent-children')
