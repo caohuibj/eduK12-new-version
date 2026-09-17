@@ -46,6 +46,19 @@ export default function RelationalTaskList({ tasks, onRefresh }: Props) {
     }
   }
 
+  const openReport = async (assignmentId: string) => {
+    try {
+      setBusyId(assignmentId)
+      setError(null)
+      const target = await relationalApi.reportTarget(assignmentId)
+      navigate(`/relational/attempts/${target.attemptId}/report`)
+    } catch (err) {
+      setError((err as { message?: string }).message || '报告暂不可用')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (tasks.length === 0) {
     return <p className="rounded border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">当前没有关系测评任务。</p>
   }
@@ -88,8 +101,9 @@ export default function RelationalTaskList({ tasks, onRefresh }: Props) {
             {task.status === 'COMPLETED' && (
               <button
                 type="button"
-                className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700"
-                onClick={() => navigate(`/relational/assignments/${task.assignmentId}/report`)}
+                className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 disabled:opacity-50"
+                disabled={busyId === task.assignmentId}
+                onClick={() => void openReport(task.assignmentId)}
               >
                 查看结果
               </button>
