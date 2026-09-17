@@ -10,4 +10,19 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - run: echo schema-sync-helper-ok
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ra-01-relational-assessment-core
+          fetch-depth: 0
+      - run: python3 server-version/scripts/c8-sync-prisma-schema.py
+      - name: commit schema sync
+        shell: bash
+        run: |
+          if git diff --quiet -- server-version/backend/prisma/schema.prisma; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server-version/backend/prisma/schema.prisma
+          git commit -m "wip C8 sync Prisma datamodel"
+          git push origin HEAD:feat/ra-01-relational-assessment-core
