@@ -1,5 +1,6 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { relationalFail } from './errors'
+import type { RelationalAssignmentRepository } from './repository'
 import type { RelationalAssignmentRecordV1, RelationalResourceKindV1 } from './types'
 
 const HASH = /^[0-9a-f]{64}$/
@@ -21,10 +22,24 @@ export interface RelationalCohortAnalysisPolicyV1 {
   metricKeys: string[]
 }
 
-export interface RelationalCohortResultInputV1 {
+interface RelationalCohortResultInputV1 {
   assignment: RelationalAssignmentRecordV1
   canonicalResultHash: string
   metrics: Record<string, number | null>
+}
+
+export interface RelationalCanonicalResultProjectionV1 {
+  canonicalResultHash: string
+  metrics: Record<string, number | null>
+}
+
+/**
+ * Internal authority boundary. Implementations must resolve the canonical/report-safe
+ * result for the persisted assignment; callers cannot inject metrics directly into
+ * cohort generation.
+ */
+export interface RelationalCanonicalResultSourceV1 {
+  loadForAssignment(assignment: RelationalAssignmentRecordV1): Promise<RelationalCanonicalResultProjectionV1 | null>
 }
 
 export type RelationalAggregateMetricV1 =
@@ -115,7 +130,7 @@ const assertCohortAssignment = (
   return { courseId, minimumRespondents: assignment.minimumRespondents! }
 }
 
-export const buildRelationalCohortAnalysis = (input: {
+const buildRelationalCohortAnalysis = (input: {
   policy: RelationalCohortAnalysisPolicyV1
   results: RelationalCohortResultInputV1[]
   createdAt?: string
@@ -205,6 +220,42 @@ export const buildRelationalCohortAnalysis = (input: {
     snapshotHash: canonicalHash({ schema: 'RelationalCohortAnalysisSnapshotV1', snapshot: withoutHash }),
   }
 }
+
+export const createRelationalCohortAnalysisService = (input: {
+  assignments: Pick<RelationalAssignmentRepository, 'findById'>
+  canonicalResults: RelationalCanonicalResultSourceV1
+}) => ({
+  async build(request: {
+    assignmentIds: string[]
+    policy: RelationalCohortAnalysisPolicyV1
+    createdAt?: string
+  }): Promise<RelationalCohortAnalysisSnapshotV1> {
+    if (request.assignmentIds.length === 0) {
+      return relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignmentIds must be non-empty')
+    }
+    if (new Set(request.assignmentIds).size !== request.assignmentIds.length) {
+      return relationalFail('RELATIONAL_ANALYSIS_DUPLICATE', 'duplicate assignment id in cohort request')
+    }
+
+    const validated: RelationalCohortResultInputV1[] = []
+    for (const assignmentId of request.assignmentIds) {
+      const assignment = await input.assignments.findById(assignmentId)
+      if (!assignment) {
+        return relationalFail('RELATIONAL_COHORT_ASSIGNMENT_NOT_FOUND', 'cohort assignment not found')
+      }
+      const result = await input.canonicalResults.loadForAssignment(assignment)
+      if (!result) {
+        return relationalFail('RELATIONAL_COHORT_RESULT_NOT_FOUND', 'canonical result not found for assignment')
+      }
+      validated.push({ assignment, ...result })
+    }
+    return buildRelationalCohortAnalysis({
+      policy: request.policy,
+      results: validated,
+      createdAt: request.createdAt,
+    })
+  },
+})
 
 export const projectRelationalCohortForSubject = (input: {
   snapshot: RelationalCohortAnalysisSnapshotV1
