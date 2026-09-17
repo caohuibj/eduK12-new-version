@@ -1,0 +1,33 @@
+name: RA02 fix compile and inventory
+on:
+  push:
+    branches: [feat/ra-02-relational-product-integration]
+    paths:
+      - server-version/scripts/ra02-fix-compile.py
+      - .github/workflows/ra02-fix-compile.yml
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ra-02-relational-product-integration
+      - run: python server-version/scripts/ra02-fix-compile.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: regenerate product route inventory
+        working-directory: server-version/frontend
+        run: |
+          npm ci
+          npm run inventory:product-ui
+      - name: commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts server-version/docs/frontend-convergence/routes.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix(relational): close compile and parent inventory gaps"
+          git push origin HEAD:feat/ra-02-relational-product-integration
