@@ -122,10 +122,10 @@ const assertCohortAssignment = (
   if (assignment.relationshipKind !== 'COURSE_TEACHER_STUDENT') {
     relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'V1 relational-experience cohort requires course teacher/student relationship')
   }
-  const courseId = assignment.relationshipSnapshot.courseId
-  if (!courseId) relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen courseId')
+  const courseId: string = assignment.relationshipSnapshot.courseId
+    || relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen courseId')
   const applicabilityHash = assignment.applicabilityHash
-  if (!applicabilityHash || !HASH.test(applicabilityHash)) {
+  if (!HASH.test(applicabilityHash)) {
     relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen applicability hash')
   }
   return { courseId, minimumRespondents: assignment.minimumRespondents!, applicabilityHash }
