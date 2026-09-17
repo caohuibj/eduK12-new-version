@@ -16,13 +16,13 @@ export interface RelationalCohortAnalysisPolicyV1 {
   schemaVersion: 1
   policyKey: string
   policyVersion: string
+  /** Must equal the minimum frozen into every assignment from applicability. */
   minimumRespondents: number
   metricKeys: string[]
 }
 
 export interface RelationalCohortResultInputV1 {
-  assignmentId: string
-  respondentUserId: string
+  assignment: RelationalAssignmentRecordV1
   canonicalResultHash: string
   metrics: Record<string, number | null>
 }
@@ -35,9 +35,13 @@ export interface RelationalCohortAnalysisSnapshotV1 {
   schemaVersion: 1
   kind: 'COHORT_AGGREGATE'
   subjectUserId: string
+  episodeId: string
+  courseId: string
   resourceKind: RelationalResourceKindV1
   resourceKey: string
   resourceVersion: string
+  applicabilityHash: string
+  minimumRespondents: number
   policyKey: string
   policyVersion: string
   policyHash: string
@@ -85,25 +89,69 @@ export const hashRelationalCohortPolicy = (policy: RelationalCohortAnalysisPolic
   canonicalHash({ schema: 'RelationalCohortAnalysisPolicyV1', policy: validateRelationalCohortPolicy(policy) })
 )
 
+const assertCohortAssignment = (
+  assignment: RelationalAssignmentRecordV1,
+): { courseId: string; minimumRespondents: number } => {
+  if (assignment.status !== 'COMPLETED') {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort input requires COMPLETED assignments')
+  }
+  if (assignment.perspective !== 'RELATIONAL_EXPERIENCE') {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort input requires RELATIONAL_EXPERIENCE assignments')
+  }
+  if (assignment.analysisMode !== 'COHORT_AGGREGATE') {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort input requires COHORT_AGGREGATE assignments')
+  }
+  if (!Number.isInteger(assignment.minimumRespondents) || (assignment.minimumRespondents ?? 0) < 3) {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen minimumRespondents')
+  }
+  if (assignment.relationshipKind !== 'COURSE_TEACHER_STUDENT') {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'V1 relational-experience cohort requires course teacher/student relationship')
+  }
+  const courseId = assignment.relationshipSnapshot.courseId
+  if (!courseId) relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen courseId')
+  if (!HASH.test(assignment.applicabilityHash)) {
+    relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen applicability hash')
+  }
+  return { courseId, minimumRespondents: assignment.minimumRespondents! }
+}
+
 export const buildRelationalCohortAnalysis = (input: {
-  subjectUserId: string
-  resourceKind: RelationalResourceKindV1
-  resourceKey: string
-  resourceVersion: string
   policy: RelationalCohortAnalysisPolicyV1
   results: RelationalCohortResultInputV1[]
   createdAt?: string
 }): RelationalCohortAnalysisSnapshotV1 => {
   const policy = validateRelationalCohortPolicy(input.policy)
-  if (!EXACT_VERSION.test(input.resourceVersion)) relationalFail('RELATIONAL_ANALYSIS_RESOURCE', 'resourceVersion must be exact semver')
+  if (input.results.length === 0) relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort input must be non-empty')
+
+  const first = input.results[0].assignment
+  const firstContract = assertCohortAssignment(first)
+  if (policy.minimumRespondents !== firstContract.minimumRespondents) {
+    relationalFail('RELATIONAL_MINIMUM_N', 'analysis policy minimumRespondents must equal assignment-frozen applicability minimum')
+  }
+
   const assignmentIds = new Set<string>()
   const respondentIds = new Set<string>()
   for (const result of input.results) {
+    const assignment = result.assignment
+    const contract = assertCohortAssignment(assignment)
+    if (
+      assignment.subjectUserId !== first.subjectUserId
+      || assignment.episodeId !== first.episodeId
+      || contract.courseId !== firstContract.courseId
+      || assignment.resourceKind !== first.resourceKind
+      || assignment.resourceKey !== first.resourceKey
+      || assignment.resourceVersion !== first.resourceVersion
+      || assignment.applicabilityHash !== first.applicabilityHash
+      || assignment.minimumRespondents !== first.minimumRespondents
+      || assignment.visibilityPolicyKey !== first.visibilityPolicyKey
+    ) {
+      relationalFail('RELATIONAL_COHORT_SCOPE', 'cohort assignments must share subject/course/episode/resource/applicability')
+    }
     if (!HASH.test(result.canonicalResultHash)) relationalFail('RELATIONAL_RESULT_HASH', 'canonicalResultHash must be sha256')
-    if (assignmentIds.has(result.assignmentId)) relationalFail('RELATIONAL_ANALYSIS_DUPLICATE', 'duplicate assignment in cohort input')
-    if (respondentIds.has(result.respondentUserId)) relationalFail('RELATIONAL_ANALYSIS_DUPLICATE', 'duplicate respondent in cohort input')
-    assignmentIds.add(result.assignmentId)
-    respondentIds.add(result.respondentUserId)
+    if (assignmentIds.has(assignment.assignmentId)) relationalFail('RELATIONAL_ANALYSIS_DUPLICATE', 'duplicate assignment in cohort input')
+    if (respondentIds.has(assignment.respondentUserId)) relationalFail('RELATIONAL_ANALYSIS_DUPLICATE', 'duplicate respondent in cohort input')
+    assignmentIds.add(assignment.assignmentId)
+    respondentIds.add(assignment.respondentUserId)
     for (const metricKey of policy.metricKeys) {
       const value = result.metrics[metricKey]
       if (value !== null && value !== undefined && (!Number.isFinite(value) || typeof value !== 'number')) {
@@ -111,8 +159,8 @@ export const buildRelationalCohortAnalysis = (input: {
       }
     }
   }
-  if (respondentIds.size < policy.minimumRespondents) {
-    relationalFail('RELATIONAL_INSUFFICIENT_RESPONDENTS', 'cohort has fewer respondents than policy minimum')
+  if (respondentIds.size < firstContract.minimumRespondents) {
+    relationalFail('RELATIONAL_INSUFFICIENT_RESPONDENTS', 'cohort has fewer respondents than assignment-frozen minimum')
   }
 
   const metrics: Record<string, RelationalAggregateMetricV1> = {}
@@ -121,7 +169,7 @@ export const buildRelationalCohortAnalysis = (input: {
       .map((result) => result.metrics[metricKey])
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     const missingN = input.results.length - values.length
-    if (values.length < policy.minimumRespondents) {
+    if (values.length < firstContract.minimumRespondents) {
       metrics[metricKey] = { state: 'insufficient', validN: values.length, missingN }
       continue
     }
@@ -136,10 +184,14 @@ export const buildRelationalCohortAnalysis = (input: {
   const withoutHash = {
     schemaVersion: 1 as const,
     kind: 'COHORT_AGGREGATE' as const,
-    subjectUserId: input.subjectUserId,
-    resourceKind: input.resourceKind,
-    resourceKey: input.resourceKey,
-    resourceVersion: input.resourceVersion,
+    subjectUserId: first.subjectUserId,
+    episodeId: first.episodeId,
+    courseId: firstContract.courseId,
+    resourceKind: first.resourceKind,
+    resourceKey: first.resourceKey,
+    resourceVersion: first.resourceVersion,
+    applicabilityHash: first.applicabilityHash,
+    minimumRespondents: firstContract.minimumRespondents,
     policyKey: policy.policyKey,
     policyVersion: policy.policyVersion,
     policyHash: hashRelationalCohortPolicy(policy),
