@@ -1,10 +1,13 @@
-import { Router } from 'express'
+import { Router, type NextFunction, type Request, type Response } from 'express'
 import { cognitiveController } from './cognitive.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
 import { cognitiveVideoController } from './cognitive-video.controller'
 import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
+import { instrumentError } from '../../utils/response'
+import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 
 /**
  * Cognitive 路由（D3 起）。
@@ -13,6 +16,19 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
  */
 const router = Router()
 const respondentAttemptAccess = requireRole(UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER)
+const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) return next()
+    await relationalRuntimeConsentAuthority.assertCognitiveFinal(req.params.id, req.user.userId)
+    return next()
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) {
+      const status = error.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
+      return instrumentError(res, error.code, error.message, status)
+    }
+    return next(error)
+  }
+}
 
 router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
 router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
@@ -49,7 +65,7 @@ router.post('/sessions/:id/video-capabilities', authenticate, cognitiveVideoCont
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
 // Final-only Cognitive submit: the complete trial sequence is persisted once.
-router.post('/sessions/:id/submit', authenticate, respondentAttemptAccess, cognitiveController.submitSessionFinal)
+router.post('/sessions/:id/submit', authenticate, respondentAttemptAccess, relationalCognitiveFinalConsentGuard, cognitiveController.submitSessionFinal)
 
 // D5 — Append-only Trial
 router.post('/sessions/:id/trials/batch', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
