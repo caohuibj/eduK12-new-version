@@ -39,7 +39,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         {mode === 'focused' ? <span className="hui-brand">Huisurvey</span> : <Link className="hui-brand" to={homeFor(user?.role)}>Huisurvey</Link>}
         {mode === 'standard' && <ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={(event) => { if (event.key === 'Escape') setOpenPath(null) }} onClick={() => setOpenPath(menuOpen ? null : location.pathname)}>导航菜单</ProductButton>}
         <div className="hui-account">
-          {isPublicAssessmentPath(location.pathname) ? <span>公开参与</span> : user ? <span>{user.nickname || user.username} · {{ STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员' }[user.role]}</span> : <span>欢迎使用</span>}
+          {isPublicAssessmentPath(location.pathname) ? <span>公开参与</span> : user ? <span>{user.nickname || user.username} · {{ STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员', PARENT: '家长' }[user.role]}</span> : <span>欢迎使用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>
       </header>

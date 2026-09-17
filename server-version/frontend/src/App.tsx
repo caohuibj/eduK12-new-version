@@ -12,6 +12,7 @@ import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import TeacherRegister from './pages/TeacherRegister'
 import TeacherAccountLogin from './pages/TeacherAccountLogin'
+import ParentLogin from './pages/parent/ParentLogin'
 import StudentLogin from './pages/StudentLogin'
 import StudentCourseLogin from './pages/StudentCourseLogin'
 import StudentRegister from './pages/student/StudentRegister'
@@ -80,6 +81,7 @@ const ClassroomAnswer = React.lazy(() => import('./pages/student/ClassroomAnswer
 const ClassroomEnter = React.lazy(() => import('./pages/student/ClassroomEnter'))
 const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
 const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
+const ParentHome = React.lazy(() => import('./pages/parent/ParentHome'))
 
 // Cognitive 页面（Stage B：URL 以 Assignment/Session 为核心；flag=false 时不注册 → 隐藏入口）
 const CognitiveHome = React.lazy(() => import('./modules/cognitive/pages/CognitiveHome'))
@@ -119,7 +121,8 @@ class RouteErrorBoundary extends React.Component<
 }
 
 // Guards decide access only; AppShell owns chrome outside the route tree.
-const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
+const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
+const ParentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['PARENT']}>{children}</RouteAccess>
 const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT']}>{children}</RouteAccess>
 const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'TEACHER', 'ADMIN']}>{children}</RouteAccess>
 const OptionalStudentRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -137,9 +140,8 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // 已登录用户跳转到对应首页
   if (isAuthenticated) {
-    if (user?.role === 'STUDENT') {
-      return <Navigate to="/student" replace />
-    }
+    if (user?.role === 'STUDENT') return <Navigate to="/student" replace />
+    if (user?.role === 'PARENT') return <Navigate to="/parent" replace />
     return <Navigate to="/dashboard" replace />
   }
 
@@ -185,6 +187,7 @@ function AppRoutes() {
             path="/teacher/account-login"
             element={<TeacherAccountLogin />}
           />
+          <Route path="/parent/login" element={<ParentLogin />} />
 
           {/* Student Login/Register - no auth check to allow switching accounts */}
           <Route
@@ -198,6 +201,11 @@ function AppRoutes() {
           <Route
             path="/student/register"
             element={<StudentRegister />}
+          />
+
+          <Route
+            path="/parent"
+            element={<ParentProtectedRoute><ParentHome /></ParentProtectedRoute>}
           />
 
           {/* Admin/Teacher Routes */}

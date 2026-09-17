@@ -2,9 +2,13 @@ import type { Role } from './access'
 export type NavigationItem = { path: string; label: string; aliases?: string[] }
 const student: NavigationItem[] = [
   { path: '/student', label: '课程', aliases: ['/student/courses', '/student/assignments', '/student/checkins', '/student/classroom'] },
-  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite'] },
+  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite', '/relational/tasks'] },
   { path: '/student/situational', label: '情境测评' },
   { path: '/scale-library', label: '量表库' },
+]
+const parent: NavigationItem[] = [
+  { path: '/parent', label: '家长首页' },
+  { path: '/parent/observer', label: '观察测评', aliases: ['/relational/tasks', '/relational/reports'] },
 ]
 const staff: NavigationItem[] = [
   { path: '/dashboard', label: '课程管理', aliases: ['/courses'] },
@@ -17,18 +21,19 @@ const staff: NavigationItem[] = [
 ]
 export function navigationFor(role: Role | undefined, cognitive: boolean): NavigationItem[] {
   if (!role) return []
-  const items = [...(role === 'STUDENT' ? student : staff)]
-  if (cognitive) items.push({ path: role === 'STUDENT' ? '/student/cognitive' : '/cognitive-assignments', label: role === 'STUDENT' ? '认知测评' : '认知任务' })
+  const items = [...(role === 'STUDENT' ? student : role === 'PARENT' ? parent : staff)]
+  if (cognitive && role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/cognitive' : '/cognitive-assignments', label: role === 'STUDENT' ? '认知测评' : '认知任务' })
+  if (role === 'TEACHER' || role === 'ADMIN') items.push({ path: '/relational/observer', label: '关系测评' })
   if (role === 'ADMIN') items.push(
     { path: '/users', label: '用户管理' }, { path: '/teacher-codes', label: '教师码' },
     { path: '/admin/material-grants', label: '材料授权' }, { path: '/admin/instrument-authorizations', label: '测评授权' },
   )
-  items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置' })
+  if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置' })
   return items
 }
 export function activeNavigation(items: NavigationItem[], pathname: string): NavigationItem | undefined {
   return items.flatMap((item) => [item.path, ...(item.aliases || [])].map((path) => ({ item, path })))
-    .filter(({ path }) => pathname === path || (path !== '/student' && pathname.startsWith(`${path}/`)))
+    .filter(({ path }) => pathname === path || (path !== '/student' && path !== '/parent' && pathname.startsWith(`${path}/`)))
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 export function routeTitle(pathname: string, active?: NavigationItem): string {
