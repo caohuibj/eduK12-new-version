@@ -124,8 +124,8 @@ export const createRelationalProductReportService = (
     ) {
       relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product is not a Student-to-Teacher cohort contract')
     }
-    const minimumRespondents = applicability.minimumRespondents
-    if (minimumRespondents === null || minimumRespondents < 3) {
+    const minimumRespondents = applicability.minimumRespondents ?? 0
+    if (minimumRespondents < 3) {
       relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product must freeze a minimum respondent threshold of at least 3')
     }
 
