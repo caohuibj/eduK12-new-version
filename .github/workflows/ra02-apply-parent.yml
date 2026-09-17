@@ -1,0 +1,25 @@
+name: RA02 apply parent shell
+on:
+  push:
+    branches: [feat/ra-02-relational-product-integration]
+    paths:
+      - server-version/scripts/ra02-apply-parent.py
+      - .github/workflows/ra02-apply-parent.yml
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ra-02-relational-product-integration
+      - run: python server-version/scripts/ra02-apply-parent.py
+      - name: commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server-version/frontend
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "feat(fe-relational): add parent auth shell and access mapping"
+          git push origin HEAD:feat/ra-02-relational-product-integration
