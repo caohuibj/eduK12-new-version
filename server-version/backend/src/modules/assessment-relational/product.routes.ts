@@ -45,21 +45,30 @@ const requiredString = (body: unknown, key: string): string => {
   return value.trim()
 }
 
+const requiredQueryString = (query: Record<string, unknown>, key: string): string => {
+  const value = query[key]
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', `${key} is required`)
+  }
+  return value.trim()
+}
+
+const checkedResourceKind = (value: string): RelationalResourceKindV1 => {
+  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(value)) {
+    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
+  }
+  return value as RelationalResourceKindV1
+}
+
 const productRef = (body: unknown): {
   resourceKind: RelationalResourceKindV1
   resourceKey: string
   resourceVersion: string
-} => {
-  const resourceKind = requiredString(body, 'resourceKind')
-  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(resourceKind)) {
-    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
-  }
-  return {
-    resourceKind: resourceKind as RelationalResourceKindV1,
-    resourceKey: requiredString(body, 'resourceKey'),
-    resourceVersion: requiredString(body, 'resourceVersion'),
-  }
-}
+} => ({
+  resourceKind: checkedResourceKind(requiredString(body, 'resourceKind')),
+  resourceKey: requiredString(body, 'resourceKey'),
+  resourceVersion: requiredString(body, 'resourceVersion'),
+})
 
 router.get('/catalog', authenticate, async (req, res, next) => {
   try {
@@ -74,6 +83,24 @@ router.get('/tasks', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, { list: await relationalProductService.tasks(req.user.userId, req.user.role) })
+  } catch (error) {
+    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
+  }
+})
+
+router.get('/reports/cohort', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    return success(res, await relationalProductReportService.teacherCohortReport({
+      userId: req.user.userId,
+      role: req.user.role,
+      courseId: requiredQueryString(req.query as Record<string, unknown>, 'courseId'),
+      product: {
+        resourceKind: checkedResourceKind(requiredQueryString(req.query as Record<string, unknown>, 'resourceKind')),
+        resourceKey: requiredQueryString(req.query as Record<string, unknown>, 'resourceKey'),
+        resourceVersion: requiredQueryString(req.query as Record<string, unknown>, 'resourceVersion'),
+      },
+    }))
   } catch (error) {
     try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
   }
