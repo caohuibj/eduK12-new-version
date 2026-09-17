@@ -125,6 +125,12 @@ export const relationalApi = {
     )
     return response.data
   },
+  async reportTarget(assignmentId: string): Promise<{ attemptId: string }> {
+    const response = await apiClient.get<{ attemptId: string }>(
+      `/relational/assignments/${encodeURIComponent(assignmentId)}/report-target`,
+    )
+    return response.data
+  },
   async start(assignmentId: string): Promise<{
     assignment: RelationalTask
     attempt: CompositeAttemptState
