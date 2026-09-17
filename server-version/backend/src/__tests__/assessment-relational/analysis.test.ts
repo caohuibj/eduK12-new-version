@@ -77,6 +77,7 @@ const cohortResults = (count: number, input?: {
   const respondentUserId = `student-${index + 1}`
   const teacherUserId = input?.teacherUserId ?? 'teacher-1'
   const courseId = input?.courseId ?? 'course-1'
+  const episodeId = input?.episodeId ?? 'episode-classroom'
   const applicability = input?.applicability ?? classroomApplicability
   const assignment = buildRelationalAssignment({
     applicability,
@@ -91,10 +92,10 @@ const cohortResults = (count: number, input?: {
       respondentRole: 'STUDENT',
     }),
     perspective: 'RELATIONAL_EXPERIENCE',
-    episodeId: input?.episodeId ?? 'episode-classroom',
+    episodeId,
     createdByUserId: teacherUserId,
     consentId: null,
-    assignmentId: `assignment-${teacherUserId}-${courseId}-${index + 1}`,
+    assignmentId: `assignment-${teacherUserId}-${courseId}-${episodeId}-${applicability.resourceKey}-${index + 1}`,
   })
   return {
     assignment: complete(assignment),
