@@ -2,13 +2,14 @@ import type { Role } from './access'
 export type NavigationItem = { path: string; label: string; aliases?: string[] }
 const student: NavigationItem[] = [
   { path: '/student', label: '课程', aliases: ['/student/courses', '/student/assignments', '/student/checkins', '/student/classroom'] },
-  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite', '/relational/tasks'] },
+  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite'] },
+  { path: '/relational/tasks', label: '课堂体验', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
   { path: '/student/situational', label: '情境测评' },
   { path: '/scale-library', label: '量表库' },
 ]
 const parent: NavigationItem[] = [
   { path: '/parent', label: '家长首页' },
-  { path: '/parent/observer', label: '观察测评', aliases: ['/relational/tasks', '/relational/reports'] },
+  { path: '/relational/tasks', label: '观察测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
 ]
 const staff: NavigationItem[] = [
   { path: '/dashboard', label: '课程管理', aliases: ['/courses'] },
@@ -23,7 +24,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
   if (!role) return []
   const items = [...(role === 'STUDENT' ? student : role === 'PARENT' ? parent : staff)]
   if (cognitive && role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/cognitive' : '/cognitive-assignments', label: role === 'STUDENT' ? '认知测评' : '认知任务' })
-  if (role === 'TEACHER' || role === 'ADMIN') items.push({ path: '/relational/observer', label: '关系测评' })
+  if (role === 'TEACHER') items.push({ path: '/relational/tasks', label: '关系测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] })
   if (role === 'ADMIN') items.push(
     { path: '/users', label: '用户管理' }, { path: '/teacher-codes', label: '教师码' },
     { path: '/admin/material-grants', label: '材料授权' }, { path: '/admin/instrument-authorizations', label: '测评授权' },
