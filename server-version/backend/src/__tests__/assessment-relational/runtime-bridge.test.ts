@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import * as relationalModule from '../../modules/assessment-relational'
 import {
   RelationalAssessmentError,
-  buildRelationalAssignment,
-  buildRelationalAttemptIdentityBinding,
   createRelationalAssessmentService,
   resolveCourseTeacherStudentRelationship,
   resolveParentChildRelationship,
@@ -112,51 +111,8 @@ const parentRelationship: ParentStudentRelationshipRecordV1 = {
 }
 
 describe('relational assignment -> unified runtime bridge', () => {
-  it('keeps legacy respondentType for Parent observer but not Student-as-other-report', () => {
-    const parentAssignment = buildRelationalAssignment({
-      applicability: observerApplicability,
-      relationshipSnapshot: resolveParentChildRelationship({
-        relationship: parentRelationship,
-        subjectUserId: 'student-1',
-        subjectRole: 'STUDENT',
-        respondentUserId: 'parent-1',
-        respondentRole: 'PARENT',
-        verifiedAt: '2026-09-17T02:00:00.000Z',
-      }),
-      perspective: 'OBSERVER_REPORT',
-      episodeId: 'episode-parent',
-      createdByUserId: 'parent-1',
-      consentId: 'consent-parent',
-      assignmentId: 'assignment-parent',
-      createdAt: '2026-09-17T02:00:00.000Z',
-    })
-    expect(buildRelationalAttemptIdentityBinding(parentAssignment).respondentType).toBe('PARENT')
-
-    const studentAssignment = buildRelationalAssignment({
-      applicability: classroomApplicability,
-      relationshipSnapshot: resolveCourseTeacherStudentRelationship({
-        courseId: 'course-1',
-        courseCreatorUserId: 'teacher-1',
-        membershipStudentUserId: 'student-1',
-        membershipStatus: 'ACTIVE',
-        subjectUserId: 'teacher-1',
-        subjectRole: 'TEACHER',
-        respondentUserId: 'student-1',
-        respondentRole: 'STUDENT',
-        verifiedAt: '2026-09-17T02:00:00.000Z',
-      }),
-      perspective: 'RELATIONAL_EXPERIENCE',
-      episodeId: 'episode-classroom',
-      createdByUserId: 'teacher-1',
-      consentId: null,
-      assignmentId: 'assignment-classroom',
-      createdAt: '2026-09-17T02:00:00.000Z',
-    })
-    const binding = buildRelationalAttemptIdentityBinding(studentAssignment)
-    expect(binding.respondentType).toBeNull()
-    expect(binding.assignmentRef).toBe('assignment-classroom')
-    expect(binding.subjectUserId).toBe('teacher-1')
-    expect(binding.respondentUserId).toBe('student-1')
+  it('does not expose a public runtime identity binder that can bypass consent resolution', () => {
+    expect('buildRelationalAttemptIdentityBinding' in relationalModule).toBe(false)
   })
 
   it('blocks pending consent and wrong respondent before start', async () => {
@@ -222,9 +178,10 @@ describe('relational assignment -> unified runtime bridge', () => {
     })
     expect(started.assignment.consentId).toBe('consent-pending-a')
     expect(started.attemptIdentity.consentId).toBe('consent-accepted-b')
+    expect(started.attemptIdentity.respondentType).toBe('PARENT')
   })
 
-  it('starts and completes without touching scoring/finalization semantics', async () => {
+  it('starts and completes Student -> Teacher without touching scoring/finalization semantics', async () => {
     const repo = new MemoryRepository()
     const service = createRelationalAssessmentService(repo)
     const assignment = await service.issue({
@@ -252,6 +209,7 @@ describe('relational assignment -> unified runtime bridge', () => {
     })
     expect(started.assignment.status).toBe('STARTED')
     expect(started.attemptIdentity.respondentType).toBeNull()
+    expect(started.attemptIdentity.consentId).toBeNull()
     const completed = await service.complete({
       assignmentId: assignment.assignmentId,
       actorUserId: 'student-1',

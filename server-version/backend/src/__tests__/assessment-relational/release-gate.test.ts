@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   RelationalAssessmentError,
   buildRelationalAssignment,
-  buildRelationalAttemptIdentityBinding,
   createRelationalCohortAnalysisService,
   projectIndividualRelationalResult,
   projectRelationalCohortForSubject,
@@ -160,7 +159,7 @@ describe('RA-01 backend release gate', () => {
       createdByUserId: 'parent-1',
       consentId: 'consent-parent',
     })
-    expect(buildRelationalAttemptIdentityBinding(assignment).respondentType).toBe('PARENT')
+    expect(assignment.respondentRole).toBe('PARENT')
     expect(projectIndividualRelationalResult({
       assignment,
       viewerUserId: 'parent-1',
@@ -188,13 +187,13 @@ describe('RA-01 backend release gate', () => {
       createdByUserId: 'teacher-1',
       consentId: 'consent-teacher',
     })
-    expect(buildRelationalAttemptIdentityBinding(assignment).respondentType).toBe('TEACHER')
+    expect(assignment.respondentRole).toBe('TEACHER')
     expect(assignment.relationshipKind).toBe('COURSE_TEACHER_STUDENT')
   })
 
-  it('Student -> Teacher has no legacy respondentType and only releases repository-bound minimum-N cohort output', async () => {
+  it('Student -> Teacher only releases repository-bound minimum-N cohort output', async () => {
     const first = studentExperienceResult(0)
-    expect(buildRelationalAttemptIdentityBinding(first.assignment).respondentType).toBeNull()
+    expect(first.assignment.respondentRole).toBe('STUDENT')
     expect(failCode(() => projectIndividualRelationalResult({
       assignment: first.assignment,
       viewerUserId: 'teacher-1',

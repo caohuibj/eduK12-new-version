@@ -1,45 +1,5 @@
-import type { RespondentTypeV1 } from '../assessment-identity/types'
 import { relationalFail } from './errors'
 import type { RelationalAssignmentRecordV1 } from './types'
-
-export interface RelationalAttemptIdentityBindingV1 {
-  subjectUserId: string
-  respondentUserId: string
-  /** Legacy compatibility only. STUDENT-as-other-report remains null and is resolved from assignmentRef. */
-  respondentType: RespondentTypeV1 | null
-  episodeId: string
-  assignmentRef: string
-  /** Actual accepted consent row authorizing this attempt; assignment.consentId remains the lineage root. */
-  consentId: string | null
-}
-
-export const buildRelationalAttemptIdentityBinding = (
-  assignment: RelationalAssignmentRecordV1,
-  effectiveConsentId: string | null = assignment.consentId,
-): RelationalAttemptIdentityBindingV1 => {
-  if (assignment.status === 'REVOKED' || assignment.status === 'EXPIRED') {
-    relationalFail('RELATIONAL_ASSIGNMENT_INACTIVE', 'inactive assignment cannot bind an attempt')
-  }
-  if (assignment.consentId && !effectiveConsentId) {
-    relationalFail('RELATIONAL_CONSENT_REQUIRED', 'consent-bearing assignment requires an effective accepted consent')
-  }
-  const respondentType: RespondentTypeV1 | null = assignment.respondentRole === 'PARENT'
-    ? 'PARENT'
-    : assignment.respondentRole === 'TEACHER'
-      ? 'TEACHER'
-      : assignment.relationshipKind === 'SELF'
-        ? 'SELF'
-        : null
-
-  return {
-    subjectUserId: assignment.subjectUserId,
-    respondentUserId: assignment.respondentUserId,
-    respondentType,
-    episodeId: assignment.episodeId,
-    assignmentRef: assignment.assignmentId,
-    consentId: effectiveConsentId,
-  }
-}
 
 export const assertAssignmentStartable = (input: {
   assignment: RelationalAssignmentRecordV1
