@@ -136,7 +136,7 @@ const main = async () => {
         await page.getByText('阈值前不显示精确参与人数').waitFor()
         assert.equal(await page.getByTestId('relational-cohort-reports').getByText(/N=1|1 人有效/u).count(), 0, 'sub-threshold cohort must not disclose exact N')
       } else {
-        await page.getByRole('heading', { name: '当前账户无法访问此页面', exact: true }).waitFor()
+        await page.getByText('当前账户无法访问此页面', { exact: true }).waitFor()
         assert.equal(await page.getByTestId('relational-task-list').count(), 0, 'admin must not enter respondent relational product surface')
       }
       await context.close()
