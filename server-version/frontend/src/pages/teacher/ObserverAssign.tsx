@@ -1,16 +1,5 @@
-/**
- * Teacher observer assignment UI shell.
- * Assign independent observer tasks to approved parents, or start teacher-report
- * for roster students. Does not synthesize SELF/PARENT/TEACHER averages.
- */
-import { useState } from 'react'
-
-export type TeacherObserverCatalogItem = {
-  bundleKey: string
-  name: string
-  respondentType: 'PARENT' | 'TEACHER'
-  releaseStatus: 'PUBLISHED' | 'DRAFT' | 'HOLD'
-}
+import { useMemo, useState } from 'react'
+import type { RelationalProduct, RelationalProductRef } from '../../api/relational'
 
 export type RosterStudent = {
   studentUserId: string
@@ -19,116 +8,120 @@ export type RosterStudent = {
 }
 
 type Props = {
-  catalog: TeacherObserverCatalogItem[]
+  catalog: RelationalProduct[]
   roster: RosterStudent[]
   onAssignToParent: (input: {
-    bundleKey: string
+    product: RelationalProductRef
     studentUserId: string
     parentUserId: string
   }) => void
-  onTeacherSelfReport: (input: { bundleKey: string; studentUserId: string }) => void
+  onTeacherObserver: (input: { product: RelationalProductRef; studentUserId: string }) => void
+  disabled?: boolean
 }
+
+const productId = (product: RelationalProductRef) => (
+  `${product.resourceKind}:${product.resourceKey}:${product.resourceVersion}`
+)
 
 export default function ObserverAssign({
   catalog,
   roster,
   onAssignToParent,
-  onTeacherSelfReport,
+  onTeacherObserver,
+  disabled = false,
 }: Props) {
-  const published = catalog.filter((row) => row.releaseStatus === 'PUBLISHED')
-  const parentBundles = published.filter((row) => row.respondentType === 'PARENT')
-  const teacherBundles = published.filter((row) => row.respondentType === 'TEACHER')
+  const parentProducts = useMemo(() => catalog.filter((row) => (
+    row.perspectives.includes('OBSERVER_REPORT')
+    && row.analysisMode === 'INDIVIDUAL_ONLY'
+  )), [catalog])
+  const teacherProducts = parentProducts
   const [studentUserId, setStudentUserId] = useState(roster[0]?.studentUserId ?? '')
   const student = roster.find((row) => row.studentUserId === studentUserId)
   const [parentUserId, setParentUserId] = useState(student?.approvedParents[0]?.parentUserId ?? '')
-  const [parentBundleKey, setParentBundleKey] = useState(parentBundles[0]?.bundleKey ?? '')
-  const [teacherBundleKey, setTeacherBundleKey] = useState(teacherBundles[0]?.bundleKey ?? '')
+  const [parentProductId, setParentProductId] = useState(parentProducts[0] ? productId(parentProducts[0]) : '')
+  const [teacherProductId, setTeacherProductId] = useState(teacherProducts[0] ? productId(teacherProducts[0]) : '')
+  const parentProduct = parentProducts.find((item) => productId(item) === parentProductId)
+  const teacherProduct = teacherProducts.find((item) => productId(item) === teacherProductId)
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6" data-testid="teacher-observer-assign">
+    <div className="space-y-6" data-testid="teacher-observer-assign">
       <header>
-        <h1 className="text-xl font-semibold text-gray-900">教师分配观察测评</h1>
+        <h2 className="text-lg font-semibold text-gray-900">教师分配观察测评</h2>
         <p className="mt-2 text-sm text-gray-600">
-          可为获批家长生成独立观察任务，或完成教师观察。本版本不提供跨 informant 综合或平均分。
+          仅能为当前课程 roster 学生和 ACTIVE 亲子关系发起任务；身份、关系与 consent 都由服务端重新校验。
         </p>
       </header>
 
-      <label className="block text-sm font-medium text-gray-700">
-        课程学生
-        <select
-          className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-          value={studentUserId}
-          onChange={(event) => {
-            const next = event.target.value
-            setStudentUserId(next)
-            const nextStudent = roster.find((row) => row.studentUserId === next)
-            setParentUserId(nextStudent?.approvedParents[0]?.parentUserId ?? '')
-          }}
-        >
-          {roster.map((row) => (
-            <option key={row.studentUserId} value={row.studentUserId}>
-              {row.displayName}
-            </option>
-          ))}
-        </select>
-      </label>
+      {roster.length === 0 ? (
+        <p className="rounded border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">当前课程没有 ACTIVE/APPROVED 学生。</p>
+      ) : (
+        <>
+          <label className="block text-sm font-medium text-gray-700">
+            课程学生
+            <select
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+              value={studentUserId}
+              onChange={(event) => {
+                const next = event.target.value
+                setStudentUserId(next)
+                const nextStudent = roster.find((row) => row.studentUserId === next)
+                setParentUserId(nextStudent?.approvedParents[0]?.parentUserId ?? '')
+              }}
+            >
+              {roster.map((row) => (
+                <option key={row.studentUserId} value={row.studentUserId}>{row.displayName}</option>
+              ))}
+            </select>
+          </label>
 
-      <section className="space-y-3 rounded border border-gray-200 p-4">
-        <h2 className="text-sm font-semibold text-gray-800">分配给获批家长</h2>
-        <select
-          className="w-full rounded border border-gray-300 px-3 py-2"
-          value={parentUserId}
-          onChange={(event) => setParentUserId(event.target.value)}
-        >
-          {(student?.approvedParents ?? []).map((parent) => (
-            <option key={parent.parentUserId} value={parent.parentUserId}>
-              {parent.displayName}
-            </option>
-          ))}
-        </select>
-        <select
-          className="w-full rounded border border-gray-300 px-3 py-2"
-          value={parentBundleKey}
-          onChange={(event) => setParentBundleKey(event.target.value)}
-        >
-          {parentBundles.map((item) => (
-            <option key={item.bundleKey} value={item.bundleKey}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          disabled={!studentUserId || !parentUserId || !parentBundleKey}
-          onClick={() => onAssignToParent({ bundleKey: parentBundleKey, studentUserId, parentUserId })}
-        >
-          向家长发送观察任务
-        </button>
-      </section>
+          <section className="space-y-3 rounded border border-gray-200 p-4">
+            <h3 className="text-sm font-semibold text-gray-800">分配给获批家长</h3>
+            {(student?.approvedParents.length ?? 0) === 0 ? (
+              <p className="text-sm text-gray-600">该学生当前没有 ACTIVE 的家长关系。</p>
+            ) : (
+              <>
+                <select className="w-full rounded border border-gray-300 px-3 py-2" value={parentUserId} onChange={(event) => setParentUserId(event.target.value)}>
+                  {(student?.approvedParents ?? []).map((parent) => (
+                    <option key={parent.parentUserId} value={parent.parentUserId}>{parent.displayName}</option>
+                  ))}
+                </select>
+                <select className="w-full rounded border border-gray-300 px-3 py-2" value={parentProductId} onChange={(event) => setParentProductId(event.target.value)}>
+                  {parentProducts.map((item) => <option key={productId(item)} value={productId(item)}>{item.title} · {item.resourceVersion}</option>)}
+                </select>
+                <button
+                  type="button"
+                  className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  disabled={disabled || !studentUserId || !parentUserId || !parentProduct}
+                  onClick={() => parentProduct && onAssignToParent({ product: parentProduct, studentUserId, parentUserId })}
+                >
+                  向家长发送观察任务
+                </button>
+              </>
+            )}
+          </section>
 
-      <section className="space-y-3 rounded border border-gray-200 p-4">
-        <h2 className="text-sm font-semibold text-gray-800">教师观察（本人作答）</h2>
-        <select
-          className="w-full rounded border border-gray-300 px-3 py-2"
-          value={teacherBundleKey}
-          onChange={(event) => setTeacherBundleKey(event.target.value)}
-        >
-          {teacherBundles.map((item) => (
-            <option key={item.bundleKey} value={item.bundleKey}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          disabled={!studentUserId || !teacherBundleKey}
-          onClick={() => onTeacherSelfReport({ bundleKey: teacherBundleKey, studentUserId })}
-        >
-          开始教师观察
-        </button>
-      </section>
+          <section className="space-y-3 rounded border border-gray-200 p-4">
+            <h3 className="text-sm font-semibold text-gray-800">教师观察（本人作答）</h3>
+            {teacherProducts.length === 0 ? (
+              <p className="text-sm text-gray-600">当前没有已发布的教师观察内容。</p>
+            ) : (
+              <>
+                <select className="w-full rounded border border-gray-300 px-3 py-2" value={teacherProductId} onChange={(event) => setTeacherProductId(event.target.value)}>
+                  {teacherProducts.map((item) => <option key={productId(item)} value={productId(item)}>{item.title} · {item.resourceVersion}</option>)}
+                </select>
+                <button
+                  type="button"
+                  className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  disabled={disabled || !studentUserId || !teacherProduct}
+                  onClick={() => teacherProduct && onTeacherObserver({ product: teacherProduct, studentUserId })}
+                >
+                  创建教师观察任务
+                </button>
+              </>
+            )}
+          </section>
+        </>
+      )}
     </div>
   )
 }
