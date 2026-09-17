@@ -14,8 +14,8 @@ export type CompositeChildRouteContextResult =
 
 export const compositeParentAttemptPath = (
   publicMode: boolean,
-  relationalMode: boolean,
   parentAttemptId: string,
+  relationalMode = false,
 ) => (
   publicMode
     ? `/public/composite/attempts/${encodeURIComponent(parentAttemptId)}`
@@ -44,7 +44,7 @@ export const resolveCompositeChildRouteContext = ({
     return { ok: false, message: '综合测评父级记录缺失，请刷新后重试' }
   }
 
-  const parentReturnTo = compositeParentAttemptPath(publicMode, relationalMode, parentAttemptId)
+  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId, relationalMode)
 
   if (item.type === 'COGNITIVE') {
     const sessionId = item.cognitiveSession?.sessionId || ''
