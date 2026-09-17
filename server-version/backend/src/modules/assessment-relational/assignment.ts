@@ -43,7 +43,8 @@ export const buildRelationalAssignment = (input: {
   } else if (snapshot.subjectUserId === snapshot.respondentUserId) {
     relationalFail('RELATIONAL_ACTORS', 'non-SELF assignment requires distinct actors')
   }
-  if (input.applicability.analysisMode === 'MULTI_INFORMANT_SYNTHESIS') {
+  const analysisMode = input.applicability.analysisMode
+  if (analysisMode === 'MULTI_INFORMANT_SYNTHESIS') {
     relationalFail('RELATIONAL_ANALYSIS_RESERVED', 'MULTI_INFORMANT_SYNTHESIS is reserved and not implemented in V1')
   }
   return {
@@ -63,7 +64,7 @@ export const buildRelationalAssignment = (input: {
     resourceKey: input.applicability.resourceKey,
     resourceVersion: input.applicability.resourceVersion,
     applicabilityHash: hashRelationalApplicability(input.applicability),
-    analysisMode: input.applicability.analysisMode,
+    analysisMode,
     minimumRespondents: input.applicability.minimumRespondents,
     consentId: input.consentId,
     visibilityPolicyKey: input.applicability.visibilityPolicyKey,
