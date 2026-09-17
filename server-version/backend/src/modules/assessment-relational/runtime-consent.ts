@@ -64,7 +64,10 @@ export const createRelationalRuntimeConsentAuthority = (input?: {
       return
     }
     const resolved = await assignments.resolveAcceptedConsent(assignment)
-    if (!resolved) relationalFail('RELATIONAL_CONSENT_REQUIRED', 'accepted consent is required at relational FINAL')
+    if (!resolved) {
+      relationalFail('RELATIONAL_CONSENT_REQUIRED', 'accepted consent is required at relational FINAL')
+      return
+    }
     if (attempt.consentId !== resolved.consentId) {
       relationalFail('RELATIONAL_CONSENT_BINDING', 'runtime FINAL consent does not match the currently authoritative accepted consent')
     }
