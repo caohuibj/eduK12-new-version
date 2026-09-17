@@ -19,14 +19,14 @@ Promote the existing subject/respondent/episode/consent observer foundation into
 4. Preserve all existing SELF, PARENT and TEACHER attempt behavior.
 5. Historical attempts remain valid; no identity backfill or inference from legacy `userId`.
 6. Existing frozen Bundle snapshots must continue to validate with the same hashes.
-7. Bundle extensions must be additive. Legacy definitions that omit relational applicability retain their current validation rules.
+7. Relational applicability is a separate resource-scoped contract; it is deliberately not injected into `AssessmentBundleDefinitionV1` or existing frozen snapshots.
 8. Cross-informant synthesis is not implicit. Parent, teacher and self reports remain separate unless a future explicit analysis protocol permits synthesis.
 9. Relationship validity is checked before an assignment is issued/started and frozen for audit/provenance; runtime scoring does not re-resolve relationships.
 10. Student -> teacher results default to aggregate-only subject visibility and require a policy-defined minimum respondent count.
 
-## Existing issue to fix before production observer wiring
+## Pending-consent persistence alignment
 
-The domain contract permits pending consent with `acceptedAt = null`, while Prisma currently requires non-null `AssessmentAttemptConsent.acceptedAt`. The first backend PR must align persistence with the existing domain contract through an additive/relaxing migration.
+The domain contract permits pending consent with `acceptedAt = null`, while the original database column required non-null `AssessmentAttemptConsent.acceptedAt`. RA-01 relaxes the database column through an additive migration. Relational persistence reads this nullable state through its dedicated repository boundary; legacy generated Prisma identity types are not broadened as part of RA-01.
 
 ## Canonical relational model
 
@@ -39,7 +39,7 @@ It freezes:
 - `respondentUserId` and respondent role snapshot;
 - `relationshipKind`, relationship reference and frozen relationship snapshot/hash;
 - `perspective`: `SELF_REPORT | OBSERVER_REPORT | RELATIONAL_EXPERIENCE`;
-- assessment/bundle identity and version;
+- assessment resource identity and version;
 - consent reference;
 - visibility policy;
 - assignment status and provenance.
@@ -57,6 +57,8 @@ Relational Assignment -> frozen attempt identity/context -> existing runner -> e
 
 No parent runtime, teacher runtime, or student-rates-teacher runtime is introduced.
 
+For legacy compatibility, PARENT and TEACHER relational assignments still project legacy `respondentType`; STUDENT-as-other-report does not invent a new V1 `respondentType` and instead resolves authority through `assignmentRef`.
+
 ## Analysis boundary
 
 Relational analysis is above canonical results, not inside Bundle/UNIT finalization.
@@ -67,7 +69,7 @@ Initial analysis modes:
 - `COHORT_AGGREGATE` — explicit aggregate contract, minimum N and aggregate-only disclosure;
 - `MULTI_INFORMANT_SYNTHESIS` — reserved, not implemented in V1.
 
-Cohort analysis snapshots freeze input result hashes, analysis policy/version/hash, output and provenance.
+Cohort analysis snapshots freeze input result hashes, analysis policy/version/hash, aggregate output and provenance. Raw answers are not accepted by the relational report-projection boundary.
 
 # Delivery structure
 
@@ -83,46 +85,46 @@ Backend/data contracts only. No new end-user route is required to merge this PR.
 
 - Lock SELF subject/respondent equality behavior.
 - Lock existing Parent/Teacher observer identity and visibility behavior.
-- Pin representative legacy Bundle definition/snapshot hashes.
-- Lock existing audience projection rules and raw-answer redaction.
+- Pin representative legacy Bundle definition hashes.
 - Confirm existing SELF/PARENT/TEACHER definitions validate exactly as before.
 
 ### Commit 2 — persistence alignment and relational tables
 
 `feat(relational): add additive assignment persistence and align pending consent`
 
-- Make `AssessmentAttemptConsent.acceptedAt` nullable to match the existing pending-consent domain contract.
+- Make database `AssessmentAttemptConsent.acceptedAt` nullable to match the existing pending-consent domain contract.
 - Add persistent relational assignment storage.
 - Add relationship snapshot/hash and visibility-policy storage.
-- Add relational analysis snapshot storage if required by the final repository shape.
 - No legacy-row backfill and no destructive migration.
 
-### Commit 3 — relational contracts + Bundle applicability
+### Commit 3 — relational contracts and external applicability
 
 `feat(relational): add relationship perspective and applicability contracts`
 
 - Add subject/respondent role, relationship kind and perspective contracts.
-- Add an optional relational applicability contract to Bundle definitions.
-- Keep legacy definitions on the existing validation path when applicability is absent.
-- Allow student-as-respondent only through the explicit relational applicability path.
-- Preserve legacy frozen snapshot hashes when the new optional contract is absent.
+- Keep relational applicability outside frozen Bundle V1 definitions.
+- Allow student-as-respondent only through explicit relational applicability.
+- Preserve legacy frozen Bundle definition/snapshot hashes exactly.
+- Reserve `MULTI_INFORMANT_SYNTHESIS`; do not implement it in V1.
 
-### Commit 4 — relationship resolvers + observer compatibility adapters
+### Commit 4 — relationship resolvers and observer compatibility adapter
 
 `feat(relational): resolve and freeze parent-child and course relationships`
 
 - `PARENT_CHILD` resolver uses active ParentStudentRelationship.
 - `COURSE_TEACHER_STUDENT` resolver uses course creator + ACTIVE/APPROVED membership.
 - Freeze relationship provenance at assignment creation.
-- Adapt existing teacher->parent, parent self-serve and teacher observer domain functions to the persistent relational assignment model without changing their externally tested semantics.
+- `CourseShare` is not accepted as relationship authority.
+- Existing observer assignment records can be adapted without changing existing observer workflow behavior.
 
-### Commit 5 — assignment/API -> existing runtime bridge
+### Commit 5 — assignment -> existing runtime identity bridge
 
 `feat(relational): bind relational assignments to unified assessment attempts`
 
-- Create/list/accept/start relational assignments.
-- Bind `assignmentRef`, subject and respondent identity to the existing attempt.
-- Support Parent->Student, Teacher->Student and Student->Teacher assignment directions.
+- Add issue/list/start/complete/revoke application service and persistence boundary.
+- Bind `assignmentRef`, subject and respondent identity to existing attempt identity.
+- PARENT/TEACHER retain legacy respondentType projection.
+- Student -> Teacher keeps legacy respondentType null and resolves role semantics through the assignment.
 - Reuse existing Scale/Form/Situational/Bundle runners.
 - Do not change scorer, UNIT FINAL, parent aggregate finalizer or retry semantics.
 
@@ -141,12 +143,11 @@ Backend/data contracts only. No new end-user route is required to merge this PR.
 
 `test(relational): add authorization compatibility and release gates`
 
-- Full domain/API tests for the three reference directions.
-- Consent pending/accept/revoke tests.
-- IDOR/cross-course/cross-child denial tests.
-- Legacy snapshot/hash regression tests.
-- Existing observer release-gate compatibility.
-- Backend typecheck and relevant assessment suites.
+- Reference directions: Parent -> Student, Teacher -> Student, Student -> Teacher.
+- Consent pending/start protection.
+- Cross-course/cross-child denial tests.
+- Legacy Bundle hash and observer compatibility regressions.
+- Dedicated targeted release-gate shell plus repository Full Gate when PR becomes Ready.
 
 ## PR RA-02 — Relational Product Integration
 
@@ -209,6 +210,6 @@ Frontend/product wiring and browser acceptance on top of merged RA-01.
 
 ## Merge rule
 
-RA-01 merges only after legacy backend assessment suites, relational release gates, Prisma migration validation and typecheck pass on the exact head.
+RA-01 merges only after legacy backend assessment suites, relational release gates, migration deployment validation and backend typecheck pass on the exact head.
 
 RA-02 merges only after RA-01 is on main and the exact RA-02 head passes the existing frontend/browser/accessibility regression gates plus the new relational E2E journeys.
