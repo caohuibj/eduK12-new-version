@@ -2,6 +2,7 @@ import { Router, type Response } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { instrumentError, success, unauthorized } from '../../utils/response'
 import { RelationalAssessmentError } from './errors'
+import { relationalProductCatalogService } from './product-catalog.service'
 import { relationalProductContextService } from './product-context.service'
 import { relationalProductReportService } from './product-report.service'
 import { relationalProductService } from './product.service'
@@ -63,7 +64,7 @@ const productRef = (body: unknown): {
 router.get('/catalog', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, { list: relationalProductService.catalog(req.user.role) })
+    return success(res, { list: relationalProductCatalogService.catalog(req.user.role) })
   } catch (error) {
     try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
   }
