@@ -3,13 +3,14 @@ import {
   RelationalAssessmentError,
   buildRelationalAssignment,
   buildRelationalAttemptIdentityBinding,
-  buildRelationalCohortAnalysis,
+  createRelationalCohortAnalysisService,
   projectIndividualRelationalResult,
   projectRelationalCohortForSubject,
   resolveCourseTeacherStudentRelationship,
   resolveParentChildRelationship,
   type RelationalApplicabilityV1,
   type RelationalAssignmentRecordV1,
+  type RelationalCanonicalResultProjectionV1,
 } from '../../modules/assessment-relational'
 import type { ParentStudentRelationshipRecordV1 } from '../../modules/assessment-identity/types'
 
@@ -71,7 +72,12 @@ const complete = (assignment: RelationalAssignmentRecordV1): RelationalAssignmen
   completedAt: '2026-09-17T02:10:00.000Z',
 })
 
-const studentExperienceResult = (index: number, input?: { courseId?: string; episodeId?: string }) => {
+type StudentExperienceFixture = {
+  assignment: RelationalAssignmentRecordV1
+  result: RelationalCanonicalResultProjectionV1
+}
+
+const studentExperienceResult = (index: number, input?: { courseId?: string; episodeId?: string }): StudentExperienceFixture => {
   const respondentUserId = `student-${index + 1}`
   const courseId = input?.courseId ?? 'course-1'
   const assignment = buildRelationalAssignment({
@@ -94,14 +100,43 @@ const studentExperienceResult = (index: number, input?: { courseId?: string; epi
   })
   return {
     assignment: complete(assignment),
-    canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
-    metrics: { climate: index + 1 },
+    result: {
+      canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
+      metrics: { climate: index + 1 },
+    },
   }
 }
+
+const createCohortService = (fixtures: StudentExperienceFixture[]) => {
+  const assignments = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.assignment]))
+  const results = new Map(fixtures.map((entry) => [entry.assignment.assignmentId, entry.result]))
+  return createRelationalCohortAnalysisService({
+    assignments: { findById: async (id) => assignments.get(id) ?? null },
+    canonicalResults: { loadForAssignment: async (assignment) => results.get(assignment.assignmentId) ?? null },
+  })
+}
+
+const cohortPolicy = (minimumRespondents: number) => ({
+  schemaVersion: 1 as const,
+  policyKey: 'classroom_environment_cohort_v1',
+  policyVersion: '1.0.0',
+  minimumRespondents,
+  metricKeys: ['climate'],
+})
 
 const failCode = (run: () => unknown): string => {
   try {
     run()
+    throw new Error('expected RelationalAssessmentError')
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) return error.code
+    throw error
+  }
+}
+
+const failCodeAsync = async (run: () => Promise<unknown>): Promise<string> => {
+  try {
+    await run()
     throw new Error('expected RelationalAssessmentError')
   } catch (error) {
     if (error instanceof RelationalAssessmentError) return error.code
@@ -157,7 +192,7 @@ describe('RA-01 backend release gate', () => {
     expect(assignment.relationshipKind).toBe('COURSE_TEACHER_STUDENT')
   })
 
-  it('Student -> Teacher has no legacy respondentType and only releases assignment-bound minimum-N cohort output', () => {
+  it('Student -> Teacher has no legacy respondentType and only releases repository-bound minimum-N cohort output', async () => {
     const first = studentExperienceResult(0)
     expect(buildRelationalAttemptIdentityBinding(first.assignment).respondentType).toBeNull()
     expect(failCode(() => projectIndividualRelationalResult({
@@ -169,15 +204,10 @@ describe('RA-01 backend release gate', () => {
     }))).toBe('RELATIONAL_ANALYSIS_ACCESS')
 
     const results = Array.from({ length: 5 }, (_, index) => studentExperienceResult(index))
-    const cohort = buildRelationalCohortAnalysis({
-      policy: {
-        schemaVersion: 1,
-        policyKey: 'classroom_environment_cohort_v1',
-        policyVersion: '1.0.0',
-        minimumRespondents: 5,
-        metricKeys: ['climate'],
-      },
-      results,
+    const service = createCohortService(results)
+    const cohort = await service.build({
+      assignmentIds: results.map((entry) => entry.assignment.assignmentId),
+      policy: cohortPolicy(5),
     })
     const projection = projectRelationalCohortForSubject({
       snapshot: cohort,
@@ -187,26 +217,15 @@ describe('RA-01 backend release gate', () => {
     expect(projection.minimumRespondents).toBe(5)
     expect('inputResultHashes' in projection).toBe(false)
 
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy: {
-        schemaVersion: 1,
-        policyKey: 'classroom_environment_cohort_v1',
-        policyVersion: '1.0.0',
-        minimumRespondents: 3,
-        metricKeys: ['climate'],
-      },
-      results: results.slice(0, 3),
+    expect(await failCodeAsync(() => createCohortService(results.slice(0, 3)).build({
+      assignmentIds: results.slice(0, 3).map((entry) => entry.assignment.assignmentId),
+      policy: cohortPolicy(3),
     }))).toBe('RELATIONAL_MINIMUM_N')
 
-    expect(failCode(() => buildRelationalCohortAnalysis({
-      policy: {
-        schemaVersion: 1,
-        policyKey: 'classroom_environment_cohort_v1',
-        policyVersion: '1.0.0',
-        minimumRespondents: 5,
-        metricKeys: ['climate'],
-      },
-      results: [...results.slice(0, 4), studentExperienceResult(5, { courseId: 'course-2' })],
+    const mixed = [...results.slice(0, 4), studentExperienceResult(5, { courseId: 'course-2' })]
+    expect(await failCodeAsync(() => createCohortService(mixed).build({
+      assignmentIds: mixed.map((entry) => entry.assignment.assignmentId),
+      policy: cohortPolicy(5),
     }))).toBe('RELATIONAL_COHORT_SCOPE')
   })
 
