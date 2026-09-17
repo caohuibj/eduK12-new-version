@@ -106,7 +106,7 @@ export const hashRelationalCohortPolicy = (policy: RelationalCohortAnalysisPolic
 
 const assertCohortAssignment = (
   assignment: RelationalAssignmentRecordV1,
-): { courseId: string; minimumRespondents: number } => {
+): { courseId: string; minimumRespondents: number; applicabilityHash: string } => {
   if (assignment.status !== 'COMPLETED') {
     relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort input requires COMPLETED assignments')
   }
@@ -124,10 +124,11 @@ const assertCohortAssignment = (
   }
   const courseId = assignment.relationshipSnapshot.courseId
   if (!courseId) relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen courseId')
-  if (!HASH.test(assignment.applicabilityHash)) {
+  const applicabilityHash = assignment.applicabilityHash
+  if (!applicabilityHash || !HASH.test(applicabilityHash)) {
     relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort assignment is missing frozen applicability hash')
   }
-  return { courseId, minimumRespondents: assignment.minimumRespondents! }
+  return { courseId, minimumRespondents: assignment.minimumRespondents!, applicabilityHash }
 }
 
 const buildRelationalCohortAnalysis = (input: {
@@ -156,7 +157,7 @@ const buildRelationalCohortAnalysis = (input: {
       || assignment.resourceKind !== first.resourceKind
       || assignment.resourceKey !== first.resourceKey
       || assignment.resourceVersion !== first.resourceVersion
-      || assignment.applicabilityHash !== first.applicabilityHash
+      || contract.applicabilityHash !== firstContract.applicabilityHash
       || assignment.minimumRespondents !== first.minimumRespondents
       || assignment.visibilityPolicyKey !== first.visibilityPolicyKey
     ) {
@@ -205,7 +206,7 @@ const buildRelationalCohortAnalysis = (input: {
     resourceKind: first.resourceKind,
     resourceKey: first.resourceKey,
     resourceVersion: first.resourceVersion,
-    applicabilityHash: first.applicabilityHash,
+    applicabilityHash: firstContract.applicabilityHash,
     minimumRespondents: firstContract.minimumRespondents,
     policyKey: policy.policyKey,
     policyVersion: policy.policyVersion,
