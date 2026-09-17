@@ -62,6 +62,10 @@ export interface RelationalAssignmentRecordV1 {
   resourceKind: RelationalResourceKindV1
   resourceKey: string
   resourceVersion: string
+  /** Frozen applicability identity; cohort privacy must never be caller-selected later. */
+  applicabilityHash: string
+  analysisMode: Exclude<RelationalAnalysisModeV1, 'MULTI_INFORMANT_SYNTHESIS'>
+  minimumRespondents: number | null
   consentId: string | null
   visibilityPolicyKey: string
   status: RelationalAssignmentStatusV1
