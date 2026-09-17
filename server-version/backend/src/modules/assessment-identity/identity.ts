@@ -305,6 +305,7 @@ export const createAttemptConsent = (input: {
   })
   return {
     consentId: randomUUID(),
+    priorConsentId: null,
     subjectUserId: input.subjectUserId,
     respondentUserId: input.respondentUserId,
     respondentType: input.respondentType,
@@ -330,6 +331,7 @@ export const acceptPendingAttemptConsent = (input: {
   return {
     ...input.pending,
     consentId: randomUUID(), // append-only new acceptance row
+    priorConsentId: input.pending.consentId,
     acceptedAt,
     consentHash: canonicalHash({
       consentVersion: input.pending.consentVersion,
