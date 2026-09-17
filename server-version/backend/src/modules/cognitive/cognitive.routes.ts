@@ -12,6 +12,7 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
  * `/assignments/my` 必须先于 `/assignments/:id` 注册。
  */
 const router = Router()
+const respondentAttemptAccess = requireRole(UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER)
 
 router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
 router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
@@ -48,7 +49,7 @@ router.post('/sessions/:id/video-capabilities', authenticate, cognitiveVideoCont
 router.post('/sessions/:id/restart', authenticate, requireRole(UserRole.STUDENT), cognitiveController.restartSession)
 
 // Final-only Cognitive submit: the complete trial sequence is persisted once.
-router.post('/sessions/:id/submit', authenticate, requireRole(UserRole.STUDENT), cognitiveController.submitSessionFinal)
+router.post('/sessions/:id/submit', authenticate, respondentAttemptAccess, cognitiveController.submitSessionFinal)
 
 // D5 — Append-only Trial
 router.post('/sessions/:id/trials/batch', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)

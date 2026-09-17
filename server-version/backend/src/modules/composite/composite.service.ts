@@ -185,8 +185,8 @@ const assertOwner = (resource: { createdBy: string | null }, userId: string, rol
 
 const parseDate = (value: string | null | undefined) => (value ? new Date(value) : null)
 
-const loadComposite = async (id: string, includeItems = false) => {
-  const composite = await prisma.compositeAssessment.findUnique({
+const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
+  const composite = await db.compositeAssessment.findUnique({
     where: { id },
     include: {
       creator: { select: { id: true, role: true } },
@@ -2167,6 +2167,15 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
   return runtime
 }
 
+export interface RelationalCompositeAttemptIdentityV1 {
+  subjectUserId: string
+  respondentUserId: string
+  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | null
+  episodeId: string
+  assignmentRef: string
+  consentId: string | null
+}
+
 const createAttempt = async (
   db: Db,
   composite: any,
@@ -2175,6 +2184,7 @@ const createAttempt = async (
   credential?: ReturnType<typeof createRecoveryCredential>,
   attemptNo = 1,
   attemptEpoch = 1,
+  relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
@@ -2214,6 +2224,14 @@ const createAttempt = async (
       runtimeGeneration: finalOnly ? 'UNIFIED_V1' : null,
       compiledBundleRuntimeHash: packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null,
       attemptEpoch,
+      ...(relationalIdentity ? {
+        subjectUserId: relationalIdentity.subjectUserId,
+        respondentUserId: relationalIdentity.respondentUserId,
+        respondentType: relationalIdentity.respondentType,
+        episodeId: relationalIdentity.episodeId,
+        assignmentRef: relationalIdentity.assignmentRef,
+        consentId: relationalIdentity.consentId,
+      } : {}),
       completedItems,
       progress,
     },
@@ -2248,6 +2266,53 @@ const createAttempt = async (
     })
   }
   return attempt
+}
+
+export const startRelationalCompositeAttemptInTransaction = async (
+  db: Db,
+  input: {
+    compositeAssessmentId: string
+    respondentUserId: string
+    attemptIdentity: RelationalCompositeAttemptIdentityV1
+  },
+) => {
+  if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
+    throw compositeForbidden('关系测评 respondent identity 不匹配')
+  }
+  await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${input.compositeAssessmentId} FOR UPDATE`
+  const composite = await loadComposite(input.compositeAssessmentId, true, db)
+  assertSupportedComposite(composite)
+  if (composite.status !== 'PUBLISHED') throw compositeBadRequest('关系测评运行目标尚未发布')
+  if (composite.deliveryMode === 'LEGACY') throw compositeBadRequest('关系测评必须使用 Unified FINAL_ONLY 运行时')
+  if (composite.course?.isLibrary) throw compositeBadRequest('库课程综合测评不能作为关系测评运行目标')
+
+  const existing = await db.compositeAssessmentAttempt.findFirst({
+    where: { assignmentRef: input.attemptIdentity.assignmentRef },
+    orderBy: { startedAt: 'desc' },
+  })
+  if (existing) {
+    if (existing.userId !== input.respondentUserId || existing.compositeAssessmentId !== input.compositeAssessmentId) {
+      throw compositeConflict('关系测评 assignmentRef 已绑定到其他运行记录')
+    }
+    return existing
+  }
+
+  const participantKey = `user:${input.respondentUserId}`
+  const latest = await db.compositeAssessmentAttempt.findFirst({
+    where: { compositeAssessmentId: input.compositeAssessmentId, participantKey },
+    orderBy: { attemptNo: 'desc' },
+    select: { attemptNo: true },
+  })
+  return createAttempt(
+    db,
+    composite,
+    input.respondentUserId,
+    null,
+    undefined,
+    (latest?.attemptNo ?? 0) + 1,
+    1,
+    input.attemptIdentity,
+  )
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
