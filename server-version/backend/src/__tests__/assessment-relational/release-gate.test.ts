@@ -9,6 +9,7 @@ import {
   resolveCourseTeacherStudentRelationship,
   resolveParentChildRelationship,
   type RelationalApplicabilityV1,
+  type RelationalAssignmentRecordV1,
 } from '../../modules/assessment-relational'
 import type { ParentStudentRelationshipRecordV1 } from '../../modules/assessment-identity/types'
 
@@ -61,6 +62,41 @@ const studentExperience: RelationalApplicabilityV1 = {
   analysisMode: 'COHORT_AGGREGATE',
   visibilityPolicyKey: 'student_teacher_aggregate_only_v1',
   minimumRespondents: 5,
+}
+
+const complete = (assignment: RelationalAssignmentRecordV1): RelationalAssignmentRecordV1 => ({
+  ...assignment,
+  status: 'COMPLETED',
+  startedAt: '2026-09-17T02:00:00.000Z',
+  completedAt: '2026-09-17T02:10:00.000Z',
+})
+
+const studentExperienceResult = (index: number, input?: { courseId?: string; episodeId?: string }) => {
+  const respondentUserId = `student-${index + 1}`
+  const courseId = input?.courseId ?? 'course-1'
+  const assignment = buildRelationalAssignment({
+    applicability: studentExperience,
+    relationshipSnapshot: resolveCourseTeacherStudentRelationship({
+      courseId,
+      courseCreatorUserId: 'teacher-1',
+      membershipStudentUserId: respondentUserId,
+      membershipStatus: 'ACTIVE',
+      subjectUserId: 'teacher-1',
+      subjectRole: 'TEACHER',
+      respondentUserId,
+      respondentRole: 'STUDENT',
+    }),
+    perspective: 'RELATIONAL_EXPERIENCE',
+    episodeId: input?.episodeId ?? 'episode-classroom',
+    createdByUserId: 'teacher-1',
+    consentId: null,
+    assignmentId: `a-${courseId}-${index}`,
+  })
+  return {
+    assignment: complete(assignment),
+    canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
+    metrics: { climate: index + 1 },
+  }
 }
 
 const failCode = (run: () => unknown): string => {
@@ -121,39 +157,19 @@ describe('RA-01 backend release gate', () => {
     expect(assignment.relationshipKind).toBe('COURSE_TEACHER_STUDENT')
   })
 
-  it('Student -> Teacher has no legacy respondentType and only releases minimum-N cohort output', () => {
-    const relationship = resolveCourseTeacherStudentRelationship({
-      courseId: 'course-1',
-      courseCreatorUserId: 'teacher-1',
-      membershipStudentUserId: 'student-1',
-      membershipStatus: 'ACTIVE',
-      subjectUserId: 'teacher-1',
-      subjectRole: 'TEACHER',
-      respondentUserId: 'student-1',
-      respondentRole: 'STUDENT',
-    })
-    const assignment = buildRelationalAssignment({
-      applicability: studentExperience,
-      relationshipSnapshot: relationship,
-      perspective: 'RELATIONAL_EXPERIENCE',
-      episodeId: 'episode-classroom',
-      createdByUserId: 'teacher-1',
-      consentId: null,
-    })
-    expect(buildRelationalAttemptIdentityBinding(assignment).respondentType).toBeNull()
+  it('Student -> Teacher has no legacy respondentType and only releases assignment-bound minimum-N cohort output', () => {
+    const first = studentExperienceResult(0)
+    expect(buildRelationalAttemptIdentityBinding(first.assignment).respondentType).toBeNull()
     expect(failCode(() => projectIndividualRelationalResult({
-      assignment,
+      assignment: first.assignment,
       viewerUserId: 'teacher-1',
       viewerRole: 'TEACHER',
       canonicalResultHash: 'b'.repeat(64),
       reportProjection: { climate: 2 },
     }))).toBe('RELATIONAL_ANALYSIS_ACCESS')
 
+    const results = Array.from({ length: 5 }, (_, index) => studentExperienceResult(index))
     const cohort = buildRelationalCohortAnalysis({
-      subjectUserId: 'teacher-1',
-      resourceKind: 'BUNDLE',
-      resourceKey: studentExperience.resourceKey,
-      resourceVersion: studentExperience.resourceVersion,
       policy: {
         schemaVersion: 1,
         policyKey: 'classroom_environment_cohort_v1',
@@ -161,19 +177,37 @@ describe('RA-01 backend release gate', () => {
         minimumRespondents: 5,
         metricKeys: ['climate'],
       },
-      results: Array.from({ length: 5 }, (_, index) => ({
-        assignmentId: `a-${index}`,
-        respondentUserId: `student-${index}`,
-        canonicalResultHash: (index + 1).toString(16).padStart(64, '0'),
-        metrics: { climate: index + 1 },
-      })),
+      results,
     })
     const projection = projectRelationalCohortForSubject({
       snapshot: cohort,
       viewerUserId: 'teacher-1',
     })
     expect(projection.respondentCount).toBe(5)
+    expect(projection.minimumRespondents).toBe(5)
     expect('inputResultHashes' in projection).toBe(false)
+
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy: {
+        schemaVersion: 1,
+        policyKey: 'classroom_environment_cohort_v1',
+        policyVersion: '1.0.0',
+        minimumRespondents: 3,
+        metricKeys: ['climate'],
+      },
+      results: results.slice(0, 3),
+    }))).toBe('RELATIONAL_MINIMUM_N')
+
+    expect(failCode(() => buildRelationalCohortAnalysis({
+      policy: {
+        schemaVersion: 1,
+        policyKey: 'classroom_environment_cohort_v1',
+        policyVersion: '1.0.0',
+        minimumRespondents: 5,
+        metricKeys: ['climate'],
+      },
+      results: [...results.slice(0, 4), studentExperienceResult(5, { courseId: 'course-2' })],
+    }))).toBe('RELATIONAL_COHORT_SCOPE')
   })
 
   it('rejects cross-child and cross-course identity substitution', () => {
