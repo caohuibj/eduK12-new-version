@@ -1,23 +1,77 @@
 import type { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { projectRelationalCohortForSubject } from './analysis'
+import { createSqlRelationalAnalysisRepository } from './analysis-repository'
 import { relationalFail } from './errors'
+import {
+  relationalProductRegistry,
+  type RelationalProductRegistryV1,
+} from './product-registry'
 import { createSqlRelationalAssignmentRepository } from './repository'
+import type { RelationalResourceKindV1 } from './types'
 
-export const createRelationalProductReportService = (db: any = prisma) => ({
+type ProductRef = {
+  resourceKind: RelationalResourceKindV1
+  resourceKey: string
+  resourceVersion: string
+}
+
+const assertParticipantRole = (role: UserRole): void => {
+  if (role !== 'STUDENT' && role !== 'PARENT' && role !== 'TEACHER') {
+    relationalFail('RELATIONAL_PRODUCT_ROLE', 'this account role cannot read a relational respondent report')
+  }
+}
+
+const assertIndividualRespondentReport = (assignment: {
+  perspective: string
+  analysisMode: string
+}): void => {
+  if (assignment.perspective === 'RELATIONAL_EXPERIENCE' || assignment.analysisMode === 'COHORT_AGGREGATE') {
+    relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'relational-experience results are available only through minimum-N cohort projection')
+  }
+}
+
+export const createRelationalProductReportService = (
+  db: any = prisma,
+  registry: RelationalProductRegistryV1 = relationalProductRegistry,
+) => ({
+  /**
+   * Guard the generic participant Composite report endpoint. Historical/non-relational
+   * attempts remain unchanged; relational-experience attempts fail closed so a
+   * respondent cannot bypass the product UI by guessing an attempt URL.
+   */
+  async assertRespondentReportAllowed(input: {
+    attemptId: string
+    userId: string
+  }): Promise<void> {
+    const attempt = await db.compositeAssessmentAttempt.findUnique({
+      where: { id: input.attemptId },
+      select: { userId: true, assignmentRef: true },
+    })
+    if (!attempt || attempt.userId !== input.userId) return
+    if (!attempt.assignmentRef) return
+
+    const assignment = await createSqlRelationalAssignmentRepository(db as any).findById(attempt.assignmentRef)
+      ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
+    if (assignment.respondentUserId !== input.userId) {
+      relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime respondent does not match the signed-in participant')
+    }
+    assertIndividualRespondentReport(assignment)
+  },
+
   async respondentReportTarget(input: {
     assignmentId: string
     userId: string
     role: UserRole
   }): Promise<{ attemptId: string }> {
-    if (input.role !== 'STUDENT' && input.role !== 'PARENT' && input.role !== 'TEACHER') {
-      relationalFail('RELATIONAL_PRODUCT_ROLE', 'this account role cannot read a relational respondent report')
-    }
+    assertParticipantRole(input.role)
     const repository = createSqlRelationalAssignmentRepository(db as any)
     const assignment = await repository.findById(input.assignmentId)
       ?? relationalFail('RELATIONAL_ASSIGNMENT_NOT_FOUND', 'assignment not found')
     if (assignment.respondentUserId !== input.userId || assignment.respondentRole !== input.role) {
       relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'only the assignment respondent can open this report target')
     }
+    assertIndividualRespondentReport(assignment)
     if (assignment.status !== 'COMPLETED') {
       relationalFail('RELATIONAL_REPORT_NOT_READY', 'assignment is not completed')
     }
@@ -46,6 +100,119 @@ export const createRelationalProductReportService = (db: any = prisma) => ({
       relationalFail('RELATIONAL_RUNTIME_BINDING', 'runtime report target does not match the relational assignment')
     }
     return { attemptId: attempt.id }
+  },
+
+  async teacherCohortReport(input: {
+    userId: string
+    role: UserRole
+    courseId: string
+    product: ProductRef
+  }) {
+    if (input.role !== 'TEACHER') {
+      relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'only the teacher subject can read this cohort report')
+    }
+    const entry = registry.findExact(input.product)
+      ?? relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released')
+    const applicability = entry.applicability
+    if (
+      entry.releaseStatus !== 'PUBLISHED'
+      || applicability.analysisMode !== 'COHORT_AGGREGATE'
+      || applicability.minimumRespondents === null
+      || applicability.minimumRespondents < 3
+      || !applicability.subjectRoles.includes('TEACHER')
+      || !applicability.respondentRoles.includes('STUDENT')
+      || !applicability.perspectives.includes('RELATIONAL_EXPERIENCE')
+      || !applicability.relationshipKinds.includes('COURSE_TEACHER_STUDENT')
+    ) {
+      relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product is not a Student-to-Teacher cohort contract')
+    }
+
+    const course = await db.course.findUnique({
+      where: { id: input.courseId },
+      select: { id: true, creatorId: true },
+    })
+    if (!course) relationalFail('RELATIONAL_COURSE_NOT_FOUND', 'course not found')
+    if (course.creatorId !== input.userId) {
+      relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'teacher must be the course creator and cohort subject')
+    }
+
+    const repository = createSqlRelationalAssignmentRepository(db as any)
+    const expectedHash = registry.applicabilityHash(entry)
+    const candidates = (await repository.listForSubject(input.userId, 200)).filter((assignment) => (
+      assignment.subjectRole === 'TEACHER'
+      && assignment.perspective === 'RELATIONAL_EXPERIENCE'
+      && assignment.analysisMode === 'COHORT_AGGREGATE'
+      && assignment.relationshipKind === 'COURSE_TEACHER_STUDENT'
+      && assignment.relationshipSnapshot.courseId === input.courseId
+      && assignment.resourceKind === input.product.resourceKind
+      && assignment.resourceKey === input.product.resourceKey
+      && assignment.resourceVersion === input.product.resourceVersion
+      && assignment.applicabilityHash === expectedHash
+      && assignment.minimumRespondents === applicability.minimumRespondents
+      && assignment.status !== 'REVOKED'
+      && assignment.status !== 'EXPIRED'
+    ))
+
+    const base = {
+      courseId: input.courseId,
+      resourceKind: input.product.resourceKind,
+      resourceKey: input.product.resourceKey,
+      resourceVersion: input.product.resourceVersion,
+      title: entry.title,
+      minimumRespondents: applicability.minimumRespondents,
+    }
+    if (candidates.length === 0) {
+      return { ...base, state: 'EMPTY' as const, respondentCount: 0, snapshot: null }
+    }
+
+    // New RA-02 issuance uses one deterministic cohort episode. For compatibility
+    // with any pre-release rows, select the most recently active episode rather
+    // than mixing assignments across episodes.
+    const episodeLatest = new Map<string, string>()
+    for (const assignment of candidates) {
+      const previous = episodeLatest.get(assignment.episodeId)
+      if (!previous || assignment.createdAt > previous) episodeLatest.set(assignment.episodeId, assignment.createdAt)
+    }
+    const episodeId = [...episodeLatest.entries()].sort((a, b) => b[1].localeCompare(a[1]))[0][0]
+    const cohort = candidates.filter((assignment) => assignment.episodeId === episodeId)
+    const completed = cohort.filter((assignment) => assignment.status === 'COMPLETED')
+    const respondentCount = new Set(completed.map((assignment) => assignment.respondentUserId)).size
+    if (respondentCount < applicability.minimumRespondents) {
+      return {
+        ...base,
+        state: 'INSUFFICIENT' as const,
+        respondentCount,
+        snapshot: null,
+      }
+    }
+
+    const seed = cohort[0]
+    const snapshot = await createSqlRelationalAnalysisRepository(db as any).latestCohort({
+      subjectUserId: input.userId,
+      courseId: input.courseId,
+      episodeId,
+      resourceKind: input.product.resourceKind,
+      resourceKey: input.product.resourceKey,
+      resourceVersion: input.product.resourceVersion,
+      applicabilityHash: expectedHash,
+    })
+    if (!snapshot) {
+      return {
+        ...base,
+        state: 'AWAITING_ANALYSIS' as const,
+        respondentCount,
+        snapshot: null,
+      }
+    }
+    if (snapshot.minimumRespondents !== seed.minimumRespondents || snapshot.respondentCount < applicability.minimumRespondents) {
+      relationalFail('RELATIONAL_COHORT_SCOPE', 'stored cohort snapshot does not match the frozen assignment privacy contract')
+    }
+    return {
+      ...base,
+      state: 'READY' as const,
+      respondentCount,
+      snapshot: projectRelationalCohortForSubject({ snapshot, viewerUserId: input.userId }),
+    }
   },
 })
 
