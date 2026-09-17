@@ -24,4 +24,16 @@ describe('RA-01 migration release gate', () => {
     expect(sql).not.toMatch(/ALTER TABLE\s+"assessment_unit_snapshots"/i)
     expect(sql).not.toMatch(/ALTER TABLE\s+"composite_assessment_attempts"/i)
   })
+
+  it('hardens consent lineage and cohort privacy without rewriting attempt/final tables', () => {
+    const sql = migration('20260917040000_relational_contract_hardening')
+    expect(sql).toContain('"prior_consent_id" TEXT')
+    expect(sql).toContain('"assessment_attempt_consents_prior_consent_id_key"')
+    expect(sql).toContain('"analysis_mode" TEXT')
+    expect(sql).toContain('"minimum_respondents" INTEGER')
+    expect(sql).toContain('"applicability_hash" TEXT')
+    expect(sql).not.toMatch(/ALTER TABLE\s+"assessments"/i)
+    expect(sql).not.toMatch(/ALTER TABLE\s+"assessment_unit_snapshots"/i)
+    expect(sql).not.toMatch(/ALTER TABLE\s+"composite_assessment_attempts"/i)
+  })
 })
