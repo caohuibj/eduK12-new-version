@@ -1,6 +1,7 @@
 import { relationalFail } from './errors'
 import type {
   RelationalActorRoleV1,
+  RelationalAnalysisModeV1,
   RelationalAssignmentRecordV1,
   RelationalAssignmentStatusV1,
   RelationalPerspectiveV1,
@@ -30,6 +31,9 @@ type AssignmentRow = {
   resourceKind: RelationalResourceKindV1
   resourceKey: string
   resourceVersion: string
+  applicabilityHash: string | null
+  analysisMode: RelationalAnalysisModeV1 | null
+  minimumRespondents: number | null
   consentId: string | null
   visibilityPolicyKey: string
   status: RelationalAssignmentStatusV1
@@ -38,6 +42,27 @@ type AssignmentRow = {
   completedAt: Date | null
   revokedAt: Date | null
 }
+
+type ConsentRow = {
+  id: string
+  priorConsentId: string | null
+  subjectUserId: string | null
+  respondentUserId: string | null
+  respondentType: string
+  consentVersion: string
+  purpose: string
+  visibilityScope: string
+  shareTargetsJson: unknown
+  acceptedAt: Date | null
+  revokedAt: Date | null
+}
+
+export interface ResolvedRelationalConsentV1 {
+  consentId: string
+  acceptedAt: string
+}
+
+const HASH = /^[0-9a-f]{64}$/
 
 const SELECT_ASSIGNMENT = `
   SELECT
@@ -56,6 +81,9 @@ const SELECT_ASSIGNMENT = `
     resource_kind AS "resourceKind",
     resource_key AS "resourceKey",
     resource_version AS "resourceVersion",
+    applicability_hash AS "applicabilityHash",
+    analysis_mode AS "analysisMode",
+    minimum_respondents AS "minimumRespondents",
     consent_id AS "consentId",
     visibility_policy_key AS "visibilityPolicyKey",
     status,
@@ -66,32 +94,154 @@ const SELECT_ASSIGNMENT = `
   FROM relational_assessment_assignments
 `
 
+const SELECT_CONSENT = `
+  SELECT
+    id,
+    prior_consent_id AS "priorConsentId",
+    subject_user_id AS "subjectUserId",
+    respondent_user_id AS "respondentUserId",
+    respondent_type AS "respondentType",
+    consent_version AS "consentVersion",
+    purpose,
+    visibility_scope AS "visibilityScope",
+    share_targets_json AS "shareTargetsJson",
+    accepted_at AS "acceptedAt",
+    revoked_at AS "revokedAt"
+  FROM assessment_attempt_consents
+`
+
 const iso = (value: Date | null): string | null => value ? value.toISOString() : null
 
-const toRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => ({
-  assignmentId: row.id,
-  episodeId: row.episodeId,
-  subjectUserId: row.subjectUserId,
-  subjectRole: row.subjectRole,
-  respondentUserId: row.respondentUserId,
-  respondentRole: row.respondentRole,
-  createdByUserId: row.createdByUserId,
-  relationshipKind: row.relationshipKind,
-  relationshipRef: row.relationshipRef,
-  relationshipSnapshot: row.relationshipSnapshotJson,
-  relationshipSnapshotHash: row.relationshipSnapshotHash,
-  perspective: row.perspective,
-  resourceKind: row.resourceKind,
-  resourceKey: row.resourceKey,
-  resourceVersion: row.resourceVersion,
-  consentId: row.consentId,
-  visibilityPolicyKey: row.visibilityPolicyKey,
-  status: row.status,
-  createdAt: row.createdAt.toISOString(),
-  startedAt: iso(row.startedAt),
-  completedAt: iso(row.completedAt),
-  revokedAt: iso(row.revokedAt),
-})
+const validateFrozenAnalysisContract = (row: AssignmentRow): {
+  applicabilityHash: string
+  analysisMode: 'INDIVIDUAL_ONLY' | 'COHORT_AGGREGATE'
+  minimumRespondents: number | null
+} => {
+  if (!row.applicabilityHash || !HASH.test(row.applicabilityHash)) {
+    return relationalFail('RELATIONAL_ASSIGNMENT_CONTRACT', 'assignment is missing a valid frozen applicability hash')
+  }
+  if (row.analysisMode !== 'INDIVIDUAL_ONLY' && row.analysisMode !== 'COHORT_AGGREGATE') {
+    return relationalFail('RELATIONAL_ASSIGNMENT_CONTRACT', 'assignment is missing a supported frozen analysis mode')
+  }
+  if (row.analysisMode === 'COHORT_AGGREGATE') {
+    if (!Number.isInteger(row.minimumRespondents) || (row.minimumRespondents ?? 0) < 3) {
+      return relationalFail('RELATIONAL_ASSIGNMENT_CONTRACT', 'cohort assignment is missing a valid frozen minimumRespondents')
+    }
+  } else if (row.minimumRespondents !== null) {
+    return relationalFail('RELATIONAL_ASSIGNMENT_CONTRACT', 'individual assignment must freeze minimumRespondents=null')
+  }
+  return {
+    applicabilityHash: row.applicabilityHash,
+    analysisMode: row.analysisMode,
+    minimumRespondents: row.minimumRespondents,
+  }
+}
+
+const toRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => {
+  const analysis = validateFrozenAnalysisContract(row)
+  return {
+    assignmentId: row.id,
+    episodeId: row.episodeId,
+    subjectUserId: row.subjectUserId,
+    subjectRole: row.subjectRole,
+    respondentUserId: row.respondentUserId,
+    respondentRole: row.respondentRole,
+    createdByUserId: row.createdByUserId,
+    relationshipKind: row.relationshipKind,
+    relationshipRef: row.relationshipRef,
+    relationshipSnapshot: row.relationshipSnapshotJson,
+    relationshipSnapshotHash: row.relationshipSnapshotHash,
+    perspective: row.perspective,
+    resourceKind: row.resourceKind,
+    resourceKey: row.resourceKey,
+    resourceVersion: row.resourceVersion,
+    applicabilityHash: analysis.applicabilityHash,
+    analysisMode: analysis.analysisMode,
+    minimumRespondents: analysis.minimumRespondents,
+    consentId: row.consentId,
+    visibilityPolicyKey: row.visibilityPolicyKey,
+    status: row.status,
+    createdAt: row.createdAt.toISOString(),
+    startedAt: iso(row.startedAt),
+    completedAt: iso(row.completedAt),
+    revokedAt: iso(row.revokedAt),
+  }
+}
+
+const expectedConsentRespondentType = (assignment: RelationalAssignmentRecordV1): string | null => {
+  if (assignment.relationshipKind === 'SELF') return 'SELF'
+  if (assignment.respondentRole === 'PARENT') return 'PARENT'
+  if (assignment.respondentRole === 'TEACHER') return 'TEACHER'
+  return null
+}
+
+const expectedConsentScope = (assignment: RelationalAssignmentRecordV1): string | null => {
+  if (assignment.visibilityPolicyKey === 'observer_private_respondent_v1') return 'PRIVATE_RESPONDENT'
+  if (assignment.visibilityPolicyKey === 'observer_assigning_teacher_v1') return 'ASSIGNING_TEACHER'
+  if (assignment.visibilityPolicyKey === 'observer_shared_course_lead_v1') return 'SHARED_COURSE_LEAD'
+  return null
+}
+
+const expectedConsentPurpose = (assignment: RelationalAssignmentRecordV1): string | null => {
+  if (
+    assignment.visibilityPolicyKey === 'observer_private_respondent_v1'
+    && assignment.respondentRole === 'PARENT'
+    && assignment.createdByUserId === assignment.respondentUserId
+  ) return 'parent_self_serve_observer'
+  if (
+    assignment.visibilityPolicyKey === 'observer_assigning_teacher_v1'
+    && assignment.respondentRole === 'PARENT'
+    && assignment.createdByUserId !== assignment.respondentUserId
+  ) return 'teacher_assigned_parent_observer'
+  if (
+    assignment.visibilityPolicyKey === 'observer_assigning_teacher_v1'
+    && assignment.respondentRole === 'TEACHER'
+    && assignment.createdByUserId === assignment.respondentUserId
+  ) return 'teacher_self_report_observer'
+  if (
+    assignment.visibilityPolicyKey === 'observer_shared_course_lead_v1'
+    && assignment.respondentRole === 'PARENT'
+  ) return 'parent_share_to_course_lead'
+  return null
+}
+
+const stableJson = (value: unknown): string => JSON.stringify(value ?? null)
+
+const assertConsentRootMatchesAssignment = (
+  assignment: RelationalAssignmentRecordV1,
+  consent: ConsentRow,
+): void => {
+  const respondentType = expectedConsentRespondentType(assignment)
+  const visibilityScope = expectedConsentScope(assignment)
+  const purpose = expectedConsentPurpose(assignment)
+  if (!respondentType || !visibilityScope || !purpose) {
+    relationalFail('RELATIONAL_CONSENT_BINDING', 'assignment does not declare a supported consent contract')
+  }
+  if (
+    consent.subjectUserId !== assignment.subjectUserId
+    || consent.respondentUserId !== assignment.respondentUserId
+    || consent.respondentType !== respondentType
+    || consent.visibilityScope !== visibilityScope
+    || consent.purpose !== purpose
+  ) {
+    relationalFail('RELATIONAL_CONSENT_BINDING', 'consent identity/purpose/visibility does not match assignment')
+  }
+}
+
+const assertAcceptedLineageMatchesRoot = (root: ConsentRow, accepted: ConsentRow): void => {
+  if (
+    accepted.priorConsentId !== root.id
+    || accepted.subjectUserId !== root.subjectUserId
+    || accepted.respondentUserId !== root.respondentUserId
+    || accepted.respondentType !== root.respondentType
+    || accepted.consentVersion !== root.consentVersion
+    || accepted.purpose !== root.purpose
+    || accepted.visibilityScope !== root.visibilityScope
+    || stableJson(accepted.shareTargetsJson) !== stableJson(root.shareTargetsJson)
+  ) {
+    relationalFail('RELATIONAL_CONSENT_BINDING', 'accepted consent lineage does not preserve the issued consent contract')
+  }
+}
 
 export interface RelationalAssignmentRepository {
   create(assignment: RelationalAssignmentRecordV1): Promise<void>
@@ -104,7 +254,7 @@ export interface RelationalAssignmentRepository {
     to: RelationalAssignmentStatusV1
     at: string
   }): Promise<boolean>
-  consentAcceptedAt(consentId: string): Promise<string | null>
+  resolveAcceptedConsent(assignment: RelationalAssignmentRecordV1): Promise<ResolvedRelationalConsentV1 | null>
 }
 
 export const createSqlRelationalAssignmentRepository = (
@@ -116,9 +266,11 @@ export const createSqlRelationalAssignmentRepository = (
         id, episode_id, subject_user_id, subject_role, respondent_user_id, respondent_role,
         created_by_user_id, relationship_kind, relationship_ref, relationship_snapshot_json,
         relationship_snapshot_hash, perspective, resource_kind, resource_key, resource_version,
+        applicability_hash, analysis_mode, minimum_respondents,
         consent_id, visibility_policy_key, status, created_at, updated_at, started_at, completed_at, revoked_at
       ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,$17,$18,$19::timestamp,$19::timestamp,$20::timestamp,$21::timestamp,$22::timestamp
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,$17,$18,
+        $19,$20,$21,$22::timestamp,$22::timestamp,$23::timestamp,$24::timestamp,$25::timestamp
       )`,
       assignment.assignmentId,
       assignment.episodeId,
@@ -135,6 +287,9 @@ export const createSqlRelationalAssignmentRepository = (
       assignment.resourceKind,
       assignment.resourceKey,
       assignment.resourceVersion,
+      assignment.applicabilityHash,
+      assignment.analysisMode,
+      assignment.minimumRespondents,
       assignment.consentId,
       assignment.visibilityPolicyKey,
       assignment.status,
@@ -191,15 +346,33 @@ export const createSqlRelationalAssignmentRepository = (
     return changed === 1
   },
 
-  async consentAcceptedAt(consentId) {
-    const rows = await db.$queryRawUnsafe<Array<{ acceptedAt: Date | null; revokedAt: Date | null }>>(
-      `SELECT accepted_at AS "acceptedAt", revoked_at AS "revokedAt"
-       FROM assessment_attempt_consents WHERE id = $1 LIMIT 1`,
-      consentId,
+  async resolveAcceptedConsent(assignment) {
+    if (!assignment.consentId) return null
+    const roots = await db.$queryRawUnsafe<ConsentRow[]>(`${SELECT_CONSENT} WHERE id = $1 LIMIT 1`, assignment.consentId)
+    const root = roots[0]
+    if (!root) relationalFail('RELATIONAL_CONSENT_NOT_FOUND', 'consent record not found')
+    if (root.priorConsentId !== null) {
+      relationalFail('RELATIONAL_CONSENT_BINDING', 'assignment consentId must reference the issuance/root consent row')
+    }
+    if (root.revokedAt) relationalFail('RELATIONAL_CONSENT_REVOKED', 'consent has been revoked')
+    assertConsentRootMatchesAssignment(assignment, root)
+    if (root.acceptedAt) {
+      return { consentId: root.id, acceptedAt: root.acceptedAt.toISOString() }
+    }
+
+    const acceptedRows = await db.$queryRawUnsafe<ConsentRow[]>(
+      `${SELECT_CONSENT}
+       WHERE prior_consent_id = $1 AND accepted_at IS NOT NULL
+       ORDER BY created_at ASC LIMIT 2`,
+      root.id,
     )
-    const row = rows[0]
-    if (!row) relationalFail('RELATIONAL_CONSENT_NOT_FOUND', 'consent record not found')
-    if (row.revokedAt) relationalFail('RELATIONAL_CONSENT_REVOKED', 'consent has been revoked')
-    return row.acceptedAt?.toISOString() ?? null
+    if (acceptedRows.length === 0) return null
+    if (acceptedRows.length > 1) {
+      relationalFail('RELATIONAL_CONSENT_LINEAGE', 'consent lineage contains multiple acceptance rows')
+    }
+    const accepted = acceptedRows[0]
+    if (accepted.revokedAt) relationalFail('RELATIONAL_CONSENT_REVOKED', 'accepted consent has been revoked')
+    assertAcceptedLineageMatchesRoot(root, accepted)
+    return { consentId: accepted.id, acceptedAt: accepted.acceptedAt!.toISOString() }
   },
 })
