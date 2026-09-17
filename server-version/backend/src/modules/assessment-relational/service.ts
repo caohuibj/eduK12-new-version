@@ -45,9 +45,10 @@ export const createRelationalAssessmentService = (repository: RelationalAssignme
 
     async start(input: { assignmentId: string; actorUserId: string; startedAt?: string }) {
       const assignment = await requireAssignment(input.assignmentId)
-      const consentAcceptedAt = assignment.consentId
-        ? await repository.consentAcceptedAt(assignment.consentId)
+      const resolvedConsent = assignment.consentId
+        ? await repository.resolveAcceptedConsent(assignment)
         : null
+      const consentAcceptedAt = resolvedConsent?.acceptedAt ?? null
       assertAssignmentStartable({ assignment, actorUserId: input.actorUserId, consentAcceptedAt })
       const startedAt = input.startedAt ?? new Date().toISOString()
       const next = markRelationalAssignmentStarted({
@@ -65,7 +66,7 @@ export const createRelationalAssessmentService = (repository: RelationalAssignme
       if (!changed) relationalFail('RELATIONAL_ASSIGNMENT_CONFLICT', 'assignment state changed concurrently')
       return {
         assignment: next,
-        attemptIdentity: buildRelationalAttemptIdentityBinding(next),
+        attemptIdentity: buildRelationalAttemptIdentityBinding(next, resolvedConsent?.consentId ?? null),
       }
     },
 
