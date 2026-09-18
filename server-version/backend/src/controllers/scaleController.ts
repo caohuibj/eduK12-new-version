@@ -49,6 +49,7 @@ import {
 } from '../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
+import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
 
 // ==================== Validation Schemas ====================
 
@@ -747,7 +748,12 @@ export const scaleController = {
         userId: req.user?.userId ?? null,
         ...input.data,
       })
-      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+      const binding = await prisma.assessment.findUnique({
+        where: { id: req.params.assessmentId },
+        select: { compositeAttemptId: true },
+      })
+      const responseData = await projectRelationalUnitFinalResponse(binding?.compositeAttemptId, data)
+      return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
@@ -1129,6 +1135,12 @@ export const scaleController = {
       })
       if (!assessment) return notFound(res, '测评记录不存在')
       if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')
+      if (
+        assessment.status === 'COMPLETED'
+        && await isRelationalCohortOnlyCompositeAttempt(assessment.compositeAttemptId)
+      ) {
+        return forbidden(res, '关系测评个人结果仅通过群体报告提供')
+      }
       return success(res, scaleAssessmentForResponse(assessment))
     } catch (err) {
       logger.error('获取 v2 量表结果错误', err)
@@ -1142,7 +1154,7 @@ export const scaleController = {
       const userId = req.user?.userId
 
       const assessments = await prisma.assessment.findMany({
-        where: { userId },
+        where: { userId, compositeAttemptId: null },
         include: {
           scale: {
             select: {
@@ -1189,7 +1201,10 @@ export const scaleController = {
       }
 
       const assessments = await prisma.assessment.findMany({
-        where: { scaleId },
+        where: {
+          scaleId,
+          ...(userRole === UserRole.ADMIN ? {} : { compositeAttemptId: null }),
+        },
         include: {
           user: {
             select: {
@@ -1397,7 +1412,7 @@ export const scaleController = {
       // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
 
-      const countWhere: any = { scaleId, progress: { gte: minProgress } }
+      const countWhere: any = { scaleId, compositeAttemptId: null, progress: { gte: minProgress } }
       if (!includeProgress) countWhere.status = 'COMPLETED'
       const countDateFilter = utcHalfOpenDateFilter(dateRange)
       if (countDateFilter) countWhere.completedAt = countDateFilter
@@ -1508,7 +1523,7 @@ export const scaleController = {
         where: { id: scaleId },
         include: {
           _count: {
-            select: { assessments: { where: { status: 'COMPLETED' } } },
+            select: { assessments: { where: { status: 'COMPLETED', compositeAttemptId: null } } },
           },
         },
       })
