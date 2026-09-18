@@ -3,6 +3,7 @@ import { prisma } from '../../config/database'
 import { projectRelationalCohortForSubject } from './analysis'
 import { createSqlRelationalAnalysisRepository } from './analysis-repository'
 import { relationalFail } from './errors'
+import { createRelationalProductCohortMaterializer } from './product-cohort-materializer'
 import {
   relationalProductRegistry,
   type RelationalProductRegistryV1,
@@ -128,6 +129,10 @@ export const createRelationalProductReportService = (
     if (minimumRespondents < 3) {
       relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released product must freeze a minimum respondent threshold of at least 3')
     }
+    const cohortPolicy = entry.cohortAnalysisPolicy
+    if (!cohortPolicy || cohortPolicy.minimumRespondents !== minimumRespondents) {
+      relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released cohort product is missing its frozen authoritative analysis policy')
+    }
 
     const course = await db.course.findUnique({
       where: { id: input.courseId },
@@ -189,7 +194,8 @@ export const createRelationalProductReportService = (
     }
 
     const seed = cohort[0]
-    const snapshot = await createSqlRelationalAnalysisRepository(db as any).latestCohort({
+    const analysisRepository = createSqlRelationalAnalysisRepository(db as any)
+    let snapshot = await analysisRepository.latestCohort({
       subjectUserId: input.userId,
       courseId: input.courseId,
       episodeId,
@@ -198,6 +204,12 @@ export const createRelationalProductReportService = (
       resourceVersion: input.product.resourceVersion,
       applicabilityHash: expectedHash,
     })
+    if (!snapshot || snapshot.respondentCount < respondentCount) {
+      snapshot = await createRelationalProductCohortMaterializer(db).materialize({
+        assignments: completed,
+        policy: cohortPolicy,
+      })
+    }
     if (!snapshot) {
       return {
         ...base,
