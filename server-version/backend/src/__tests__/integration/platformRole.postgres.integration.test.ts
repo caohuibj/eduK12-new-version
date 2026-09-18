@@ -21,6 +21,18 @@ async function platformRoleOf(userId: string): Promise<string | null> {
   return rows[0]?.platformRole ?? null
 }
 
+async function legacySystemAdminId(): Promise<string | null> {
+  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "users"
+    WHERE "role" = 'ADMIN'
+      AND "platform_role" = 'SYSTEM_ADMIN'::"PlatformRole"
+    ORDER BY "created_at" ASC, "id" ASC
+    LIMIT 1
+  `
+  return rows[0]?.id ?? null
+}
+
 suite('platform role migration and seed invariants (real PostgreSQL)', () => {
   beforeAll(async () => {
     prisma = new PrismaClient({ datasources: { db: { url: DB_URL! } } })
@@ -49,29 +61,40 @@ suite('platform role migration and seed invariants (real PostgreSQL)', () => {
     }
   })
 
-  it('backfills every current legacy ADMIN to SYSTEM_ADMIN exactly once', async () => {
-    const admins = await prisma.user.findMany({
-      where: { role: UserRole.ADMIN },
+  it('keeps bootstrap/backfilled authority explicit and does not infer later legacy ADMINs', async () => {
+    // CI seeds one bootstrap administrator after migrations. Upgrade installs
+    // may instead reach this state through the one-time migration backfill.
+    // Either way, at least one legacy ADMIN is explicitly SYSTEM_ADMIN.
+    const explicitSystemAdmin = await legacySystemAdminId()
+    expect(explicitSystemAdmin).not.toBeNull()
+    await expect(platformRoleOf(explicitSystemAdmin!)).resolves.toBe('SYSTEM_ADMIN')
+
+    // A legacy ADMIN created after the migration is *not* automatically a
+    // platform administrator. This is the key non-inference invariant.
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const laterAdmin = await prisma.user.create({
+      data: {
+        username: `platform-role-later-admin-${suffix}`,
+        passwordHash: 'test-only',
+        role: UserRole.ADMIN,
+      },
       select: { id: true },
     })
-    expect(admins.length).toBeGreaterThan(0)
-
-    for (const admin of admins) {
-      await expect(platformRoleOf(admin.id)).resolves.toBe('SYSTEM_ADMIN')
+    try {
+      await expect(platformRoleOf(laterAdmin.id)).resolves.toBe('STANDARD')
+    } finally {
+      await prisma.user.delete({ where: { id: laterAdmin.id } })
     }
   })
 
   it('does not re-promote an explicitly demoted legacy ADMIN on repeated seed', async () => {
-    const admin = await prisma.user.findFirst({
-      where: { role: UserRole.ADMIN },
-      select: { id: true },
-    })
-    expect(admin).not.toBeNull()
+    const adminId = await legacySystemAdminId()
+    expect(adminId).not.toBeNull()
 
     await prisma.$executeRaw`
       UPDATE "users"
       SET "platform_role" = 'STANDARD'::"PlatformRole"
-      WHERE "id" = ${admin!.id}
+      WHERE "id" = ${adminId!}
     `
 
     const originalUsername = process.env.ADMIN_USERNAME
@@ -81,12 +104,14 @@ suite('platform role migration and seed invariants (real PostgreSQL)', () => {
 
     try {
       await seedAdmin(prisma)
-      await expect(platformRoleOf(admin!.id)).resolves.toBe('STANDARD')
+      await expect(platformRoleOf(adminId!)).resolves.toBe('STANDARD')
     } finally {
+      // Restore the CI bootstrap authority because the integration database is
+      // shared by the remaining serial suites in this job.
       await prisma.$executeRaw`
         UPDATE "users"
         SET "platform_role" = 'SYSTEM_ADMIN'::"PlatformRole"
-        WHERE "id" = ${admin!.id}
+        WHERE "id" = ${adminId!}
       `
       if (originalUsername === undefined) delete process.env.ADMIN_USERNAME
       else process.env.ADMIN_USERNAME = originalUsername
