@@ -82,7 +82,7 @@ const fixture = async () => {
   const otherTeacher = await prisma.user.create({
     data: { username: `ra02-cohort-other-${suffix}`, passwordHash: 'test', role: 'TEACHER' },
   })
-  const students = await Promise.all([0, 1, 2].map((index) => prisma.user.create({
+  const students = await Promise.all([0, 1, 2, 3].map((index) => prisma.user.create({
     data: { username: `ra02-cohort-student-${index}-${suffix}`, passwordHash: 'test', role: 'STUDENT' },
   })))
   for (const user of [teacher, otherTeacher, ...students]) userIds.add(user.id)
@@ -236,7 +236,7 @@ describe.skipIf(!enabled)('RA-02 Student-to-Teacher cohort persistence', () => {
   it('materializes authoritative cohort results, keeps minimum-N privacy, and blocks generic individual reads', async () => {
     const { teacher, otherTeacher, students, course } = await fixture()
     const assignments = []
-    for (const student of students) {
+    for (const student of students.slice(0, 3)) {
       assignments.push(await service.issueStudentExperience({
         studentUserId: student.id,
         role: 'STUDENT',
@@ -350,6 +350,46 @@ describe.skipIf(!enabled)('RA-02 Student-to-Teacher cohort persistence', () => {
     expect(await prisma.relationalAnalysisSnapshot.count({
       where: { subjectUserId: teacher.id },
     })).toBe(1)
+
+    await prisma.relationalAssessmentAssignment.update({
+      where: { id: assignments[0].assignmentId },
+      data: { status: 'REVOKED', revokedAt: new Date() },
+    })
+    const replacement = await service.issueStudentExperience({
+      studentUserId: students[3].id,
+      role: 'STUDENT',
+      courseId: course.id,
+      product,
+    })
+    expect(replacement.episodeId).toBe(assignments[0].episodeId)
+    await prisma.relationalAssessmentAssignment.update({
+      where: { id: replacement.assignmentId },
+      data: { status: 'COMPLETED', completedAt: new Date() },
+    })
+    await persistCanonicalRuntimeResult({
+      assignment: replacement,
+      studentId: students[3].id,
+      total: 4,
+      index: 3,
+    })
+
+    const replacedReady = await reports.teacherCohortReport({
+      userId: teacher.id,
+      role: 'TEACHER',
+      courseId: course.id,
+      product,
+    })
+    expect(replacedReady.state).toBe('READY')
+    expect(replacedReady.respondentCount).toBe(3)
+    expect(replacedReady.snapshot?.metrics.total).toEqual({
+      state: 'present',
+      validN: 3,
+      missingN: 0,
+      mean: 3,
+    })
+    expect(await prisma.relationalAnalysisSnapshot.count({
+      where: { subjectUserId: teacher.id },
+    })).toBe(2)
 
     expect(await errorCode(() => reports.assertRespondentReportAllowed({
       attemptId: runtimeAttempts[0].id,
