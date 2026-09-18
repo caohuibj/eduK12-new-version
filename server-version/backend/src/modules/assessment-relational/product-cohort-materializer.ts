@@ -138,11 +138,6 @@ export const createRelationalProductCohortMaterializer = (db: any) => ({
         applicabilityHash: first.applicabilityHash,
       }
       const existing = await analysisRepository.latestCohort(scope)
-      if (
-        existing
-        && existing.policyHash === policyHash
-        && existing.respondentCount >= input.assignments.length
-      ) return existing
 
       const assignments = createSqlRelationalAssignmentRepository(tx as any)
       const analysis = createRelationalCohortAnalysisService({
@@ -152,10 +147,25 @@ export const createRelationalProductCohortMaterializer = (db: any) => ({
       const snapshot = await analysis.build({
         assignmentIds: input.assignments.map((assignment) => assignment.assignmentId),
         policy,
-        createdAt: new Date().toISOString(),
+        createdAt: existing?.createdAt ?? new Date().toISOString(),
       })
-      await analysisRepository.saveCohort(snapshot)
-      return snapshot
+      if (
+        existing
+        && existing.policyHash === policyHash
+        && existing.snapshotHash === snapshot.snapshotHash
+      ) return existing
+
+      // A changed completed-assignment set (including revoke/replace at the
+      // same respondent count) creates a new append-only snapshot.
+      const fresh = existing
+        ? await analysis.build({
+            assignmentIds: input.assignments.map((assignment) => assignment.assignmentId),
+            policy,
+            createdAt: new Date().toISOString(),
+          })
+        : snapshot
+      await analysisRepository.saveCohort(fresh)
+      return fresh
     })
   },
 })
