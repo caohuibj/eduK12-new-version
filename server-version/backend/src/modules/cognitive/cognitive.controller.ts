@@ -42,6 +42,8 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
+import { prisma } from '../../config/database'
+import { projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
 
 /**
  * Cognitive 控制器（D3 起逐步扩展；D4 createSession/getSession/restartSession，D5 appendTrial，D6 completeSession）。
