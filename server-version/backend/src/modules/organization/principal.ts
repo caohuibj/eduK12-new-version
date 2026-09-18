@@ -16,23 +16,12 @@ export interface CurrentPrincipal {
   teacherApproved: boolean
 }
 
-type PrincipalRow = {
-  id: string
-  username: string
-  role: UserRole
-  platformRole: PlatformRole
-  tokenVersion: number
-  mustChangePassword: boolean
-  isActive: boolean
-  isFrozen: boolean
-  expiresAt: Date | null
-  teacherApproved: boolean
-}
+type PrincipalRow = CurrentPrincipal
 
 export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrincipal | null> {
   const rows = await prisma.$queryRaw<PrincipalRow[]>`
     SELECT
-      "id",
+      "id" AS "userId",
       "username",
       "role",
       "platform_role"::text AS "platformRole",
