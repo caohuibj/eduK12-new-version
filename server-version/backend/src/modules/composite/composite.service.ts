@@ -629,7 +629,7 @@ const relationalTeacherReadableAssignmentIds = async (userId: string): Promise<s
 const teacherRelationalAttemptVisibility = async (
   userId: string,
   role: UserRole,
-): Promise<Record<string, unknown> | null> => {
+): Promise<Prisma.CompositeAssessmentAttemptWhereInput | null> => {
   if (role !== UserRole.TEACHER) return null
   const readableAssignmentIds = await relationalTeacherReadableAssignmentIds(userId)
   return {
@@ -1205,7 +1205,7 @@ export const listAttemptsForTeacher = async (
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
 
-  const filters: Record<string, unknown>[] = [{ compositeAssessmentId: compositeId }]
+  const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{ compositeAssessmentId: compositeId }]
   const visibility = await teacherRelationalAttemptVisibility(userId, role)
   if (visibility) filters.push(visibility)
   if (query.status) filters.push({ status: query.status })
@@ -1219,7 +1219,7 @@ export const listAttemptsForTeacher = async (
       ],
     })
   }
-  const where: Record<string, unknown> = filters.length === 1 ? filters[0] : { AND: filters }
+  const where: Prisma.CompositeAssessmentAttemptWhereInput = filters.length === 1 ? filters[0] : { AND: filters }
 
   const [attempts, total, counts] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
