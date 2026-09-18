@@ -188,6 +188,7 @@ export const createRelationalProductReportService = (
     if (!cohortPolicy || cohortPolicy.minimumRespondents !== minimumRespondents) {
       relationalFail('RELATIONAL_PRODUCT_CONTRACT', 'released cohort product is missing its frozen authoritative analysis policy')
     }
+    const authoritativeCohortPolicy = cohortPolicy!
 
     const course = await db.course.findUnique({
       where: { id: input.courseId },
@@ -249,7 +250,7 @@ export const createRelationalProductReportService = (
     }
 
     const seed = cohort[0]
-    const expectedPolicyHash = hashRelationalCohortPolicy(cohortPolicy)
+    const expectedPolicyHash = hashRelationalCohortPolicy(authoritativeCohortPolicy)
     const analysisRepository = createSqlRelationalAnalysisRepository(db as any)
     let snapshot = await analysisRepository.latestCohort({
       subjectUserId: input.userId,
@@ -263,7 +264,7 @@ export const createRelationalProductReportService = (
     if (!snapshot || snapshot.policyHash !== expectedPolicyHash || snapshot.respondentCount < respondentCount) {
       snapshot = await createRelationalProductCohortMaterializer(db).materialize({
         assignments: completed,
-        policy: cohortPolicy,
+        policy: authoritativeCohortPolicy,
       })
     }
     if (!snapshot) {
