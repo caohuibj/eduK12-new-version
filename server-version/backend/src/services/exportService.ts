@@ -185,6 +185,7 @@ export async function getScaleExportData(
   // 构建查询条件
   const where: any = {
     scaleId,
+    compositeAttemptId: null,
     progress: { gte: minProgress }
   }
   
