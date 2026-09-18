@@ -1,6 +1,6 @@
 import type { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { projectRelationalCohortForSubject } from './analysis'
+import { hashRelationalCohortPolicy, projectRelationalCohortForSubject } from './analysis'
 import { createSqlRelationalAnalysisRepository } from './analysis-repository'
 import { relationalFail } from './errors'
 import { createRelationalProductCohortMaterializer } from './product-cohort-materializer'
@@ -194,6 +194,7 @@ export const createRelationalProductReportService = (
     }
 
     const seed = cohort[0]
+    const expectedPolicyHash = hashRelationalCohortPolicy(cohortPolicy)
     const analysisRepository = createSqlRelationalAnalysisRepository(db as any)
     let snapshot = await analysisRepository.latestCohort({
       subjectUserId: input.userId,
@@ -204,7 +205,7 @@ export const createRelationalProductReportService = (
       resourceVersion: input.product.resourceVersion,
       applicabilityHash: expectedHash,
     })
-    if (!snapshot || snapshot.respondentCount < respondentCount) {
+    if (!snapshot || snapshot.policyHash !== expectedPolicyHash || snapshot.respondentCount < respondentCount) {
       snapshot = await createRelationalProductCohortMaterializer(db).materialize({
         assignments: completed,
         policy: cohortPolicy,
@@ -218,7 +219,11 @@ export const createRelationalProductReportService = (
         snapshot: null,
       }
     }
-    if (snapshot.minimumRespondents !== seed.minimumRespondents || snapshot.respondentCount < minimumRespondents) {
+    if (
+      snapshot.minimumRespondents !== seed.minimumRespondents
+      || snapshot.policyHash !== expectedPolicyHash
+      || snapshot.respondentCount < minimumRespondents
+    ) {
       relationalFail('RELATIONAL_COHORT_SCOPE', 'stored cohort snapshot does not match the frozen assignment privacy contract')
     }
     return {
