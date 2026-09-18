@@ -17,6 +17,10 @@ const { mockPrisma } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       count: vi.fn(),
     },
+    relationalAssessmentAssignment: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn(),
+    },
   },
 }))
 
