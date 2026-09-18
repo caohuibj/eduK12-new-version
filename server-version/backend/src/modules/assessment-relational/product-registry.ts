@@ -1,3 +1,4 @@
+import { validateRelationalCohortPolicy, type RelationalCohortAnalysisPolicyV1 } from './analysis'
 import { hashRelationalApplicability, validateRelationalApplicability } from './contracts'
 import { relationalFail } from './errors'
 import type { RelationalActorRoleV1, RelationalApplicabilityV1, RelationalResourceKindV1 } from './types'
@@ -16,6 +17,7 @@ export interface RelationalProductEntryV1 {
   releaseStatus: RelationalProductReleaseStatusV1
   scienceMaturity: RelationalProductScienceMaturityV1
   applicability: RelationalApplicabilityV1
+  cohortAnalysisPolicy: RelationalCohortAnalysisPolicyV1 | null
   launchTarget: RelationalCompositeLaunchTargetV1 | null
 }
 
@@ -38,7 +40,20 @@ const validateEntry = (entry: RelationalProductEntryV1): RelationalProductEntryV
   if (entry.launchTarget && !entry.launchTarget.compositeAssessmentId.trim()) {
     relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'composite launch target id is required')
   }
-  return { ...entry, applicability }
+  const cohortAnalysisPolicy = entry.cohortAnalysisPolicy
+    ? validateRelationalCohortPolicy(entry.cohortAnalysisPolicy)
+    : null
+  if (applicability.analysisMode === 'COHORT_AGGREGATE') {
+    if (entry.releaseStatus === 'PUBLISHED' && !cohortAnalysisPolicy) {
+      relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'published cohort product must declare an authoritative cohort analysis policy')
+    }
+    if (cohortAnalysisPolicy && cohortAnalysisPolicy.minimumRespondents !== applicability.minimumRespondents) {
+      relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'cohort analysis policy minimum must equal applicability minimumRespondents')
+    }
+  } else if (cohortAnalysisPolicy) {
+    relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'individual relational product cannot declare a cohort analysis policy')
+  }
+  return { ...entry, applicability, cohortAnalysisPolicy }
 }
 
 export interface RelationalProductRegistryV1 {
