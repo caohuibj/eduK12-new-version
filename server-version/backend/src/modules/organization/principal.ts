@@ -16,7 +16,10 @@ export interface CurrentPrincipal {
   teacherApproved: boolean
 }
 
-type PrincipalRow = CurrentPrincipal
+type PrincipalRow = Omit<CurrentPrincipal, 'userId'> & {
+  userId?: string
+  id?: string
+}
 
 export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrincipal | null> {
   const rows = await prisma.$queryRaw<PrincipalRow[]>`
@@ -36,7 +39,11 @@ export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrinc
     LIMIT 1
   `
 
-  return rows[0] ?? null
+  const row = rows[0]
+  if (!row) return null
+  const resolvedUserId = row.userId ?? row.id
+  if (!resolvedUserId) return null
+  return { ...row, userId: resolvedUserId }
 }
 
 export function toRequestPrincipal(principal: CurrentPrincipal) {
