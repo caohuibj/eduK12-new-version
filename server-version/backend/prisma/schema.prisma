@@ -12,6 +12,7 @@ model User {
   username                            String                           @unique
   passwordHash                        String                           @map("password_hash")
   role                                UserRole                         @default(STUDENT)
+  platformRole                        PlatformRole                     @default(STANDARD) @map("platform_role")
   nickname                            String?
   avatarUrl                           String?                          @map("avatar_url")
   phone                               String?
@@ -53,7 +54,7 @@ model User {
   cognitiveSessions                   CognitiveSession[]               @relation("SessionUser")
   // Situational PR-B standalone attempts keep a stable participant pseudonym
   // and remain readable as historical rows if the User is removed.
-  situationalAttempts                SituationalAttempt[]              @relation("SituationalAttemptUser")
+  situationalAttempts                 SituationalAttempt[]             @relation("SituationalAttemptUser")
   createdCognitiveAssignments         CognitiveAssignment[]            @relation("AssignmentCreator")
   // 综合测评模块关联
   createdCompositeAssessments         CompositeAssessment[]            @relation("CompositeAssessmentCreator")
@@ -65,21 +66,167 @@ model User {
   materialGrantsGiven                 MaterialGrant[]                  @relation("MaterialGrantGranter")
 
   // Unified Assessment Bundle: PARENT / episode / invite / consent
-  parentRelationshipsAsParent   ParentStudentRelationship[] @relation("ParentRelationshipParent")
-  parentRelationshipsAsStudent  ParentStudentRelationship[] @relation("ParentRelationshipStudent")
-  parentInviteCodesCreated      ParentInviteCode[]          @relation("ParentInviteCodeCreator")
-  assessmentEpisodesAsSubject   AssessmentEpisode[]         @relation("EpisodeSubject")
-  assessmentEpisodesInitiated   AssessmentEpisode[]         @relation("EpisodeInitiator")
-  attemptConsentsAsSubject      AssessmentAttemptConsent[]  @relation("ConsentSubject")
-  attemptConsentsAsRespondent   AssessmentAttemptConsent[]  @relation("ConsentRespondent")
-  relationalAssignmentsAsSubject    RelationalAssessmentAssignment[] @relation("RelationalAssignmentSubject")
-  relationalAssignmentsAsRespondent RelationalAssessmentAssignment[] @relation("RelationalAssignmentRespondent")
-  relationalAssignmentsCreated      RelationalAssessmentAssignment[] @relation("RelationalAssignmentCreator")
-  relationalAnalysisSnapshotsAsSubject RelationalAnalysisSnapshot[] @relation("RelationalAnalysisSubject")
-  safetyCasesAsSubject          SafetyCase[]                @relation("SafetyCaseSubject")
-  safetyCasesAsPrimaryOwner     SafetyCase[]                @relation("SafetyCasePrimaryOwner")
+  parentRelationshipsAsParent          ParentStudentRelationship[]      @relation("ParentRelationshipParent")
+  parentRelationshipsAsStudent         ParentStudentRelationship[]      @relation("ParentRelationshipStudent")
+  parentInviteCodesCreated             ParentInviteCode[]               @relation("ParentInviteCodeCreator")
+  assessmentEpisodesAsSubject          AssessmentEpisode[]              @relation("EpisodeSubject")
+  assessmentEpisodesInitiated          AssessmentEpisode[]              @relation("EpisodeInitiator")
+  attemptConsentsAsSubject             AssessmentAttemptConsent[]       @relation("ConsentSubject")
+  attemptConsentsAsRespondent          AssessmentAttemptConsent[]       @relation("ConsentRespondent")
+  relationalAssignmentsAsSubject       RelationalAssessmentAssignment[] @relation("RelationalAssignmentSubject")
+  relationalAssignmentsAsRespondent    RelationalAssessmentAssignment[] @relation("RelationalAssignmentRespondent")
+  relationalAssignmentsCreated         RelationalAssessmentAssignment[] @relation("RelationalAssignmentCreator")
+  relationalAnalysisSnapshotsAsSubject RelationalAnalysisSnapshot[]     @relation("RelationalAnalysisSubject")
+  safetyCasesAsSubject                 SafetyCase[]                     @relation("SafetyCaseSubject")
+  safetyCasesAsPrimaryOwner            SafetyCase[]                     @relation("SafetyCasePrimaryOwner")
+
+  // Organization / Reporting V2.1 identity authority
+  organizationsCreated                Organization[]                @relation("OrganizationCreator")
+  organizationMemberships             OrganizationMembership[]      @relation("OrganizationMembershipUser")
+  organizationMembershipsEnded        OrganizationMembership[]      @relation("OrganizationMembershipEnder")
+  organizationPersonaGrantsGiven      OrganizationPersonaGrant[]    @relation("OrganizationPersonaGrantGranter")
+  organizationPersonaGrantsRevoked    OrganizationPersonaGrant[]    @relation("OrganizationPersonaGrantRevoker")
+  organizationCapabilityGrantsGiven   OrganizationCapabilityGrant[] @relation("OrganizationCapabilityGrantGranter")
+  organizationCapabilityGrantsRevoked OrganizationCapabilityGrant[] @relation("OrganizationCapabilityGrantRevoker")
+  organizationAccessDeniesReceived    OrganizationAccessDeny[]      @relation("OrganizationAccessDenySubject")
+  organizationAccessDeniesGiven       OrganizationAccessDeny[]      @relation("OrganizationAccessDenyDenier")
+  organizationAccessDeniesLifted      OrganizationAccessDeny[]      @relation("OrganizationAccessDenyLifter")
+  organizationGovernanceAudits        OrganizationGovernanceAudit[] @relation("OrganizationGovernanceAuditActor")
+  organizationCommandReceipts         OrganizationCommandReceipt[]  @relation("OrganizationCommandReceiptActor")
 
   @@map("users")
+}
+
+// ==================== Organization / Reporting V2.1 identity authority ====================
+// PostgreSQL-only partial/expression indexes, CHECK constraints, and the
+// append-only audit trigger remain authoritative in the handwritten migrations.
+model Organization {
+  id              String    @id
+  name            String
+  status          String    @default("ACTIVE")
+  createdByUserId String    @map("created_by_user_id")
+  suspendedAt     DateTime? @map("suspended_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  createdBy        User                          @relation("OrganizationCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  memberships      OrganizationMembership[]
+  accessDenies     OrganizationAccessDeny[]
+  governanceAudits OrganizationGovernanceAudit[]
+  commandReceipts  OrganizationCommandReceipt[]
+
+  @@map("organizations")
+}
+
+model OrganizationMembership {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  userId         String    @map("user_id")
+  orgRole        String    @default("MEMBER") @map("org_role")
+  validFrom      DateTime  @default(now()) @map("valid_from") @db.Timestamptz(6)
+  validUntil     DateTime? @map("valid_until") @db.Timestamptz(6)
+  endedByUserId  String?   @map("ended_by_user_id")
+  endReason      String?   @map("end_reason")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  organization     Organization                  @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_organization_id_fkey")
+  user             User                          @relation("OrganizationMembershipUser", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_user_id_fkey")
+  endedBy          User?                         @relation("OrganizationMembershipEnder", fields: [endedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_ended_by_user_id_fkey")
+  personaGrants    OrganizationPersonaGrant[]
+  capabilityGrants OrganizationCapabilityGrant[]
+
+  @@unique([organizationId, id], map: "organization_memberships_org_id_id_key")
+  @@index([userId, organizationId, validFrom(sort: Desc)], map: "organization_memberships_user_history_idx")
+  @@map("organization_memberships")
+}
+
+model OrganizationPersonaGrant {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  membershipId    String    @map("membership_id")
+  persona         String
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?   @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  membership OrganizationMembership @relation(fields: [organizationId, membershipId], references: [organizationId, id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_membership_fkey")
+  grantedBy  User                   @relation("OrganizationPersonaGrantGranter", fields: [grantedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_granted_by_fkey")
+  revokedBy  User?                  @relation("OrganizationPersonaGrantRevoker", fields: [revokedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_revoked_by_fkey")
+
+  @@index([organizationId, membershipId], map: "organization_persona_grants_org_membership_idx")
+  @@map("organization_persona_grants")
+}
+
+model OrganizationCapabilityGrant {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  membershipId    String    @map("membership_id")
+  capability      String
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?   @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  membership OrganizationMembership @relation(fields: [organizationId, membershipId], references: [organizationId, id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_membership_fkey")
+  grantedBy  User                   @relation("OrganizationCapabilityGrantGranter", fields: [grantedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_granted_by_fkey")
+  revokedBy  User?                  @relation("OrganizationCapabilityGrantRevoker", fields: [revokedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_revoked_by_fkey")
+
+  @@index([organizationId, membershipId], map: "organization_capability_grants_org_membership_idx")
+  @@map("organization_capability_grants")
+}
+
+model OrganizationAccessDeny {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  userId         String    @map("user_id")
+  permission     String
+  reason         String
+  deniedByUserId String    @map("denied_by_user_id")
+  deniedAt       DateTime  @default(now()) @map("denied_at") @db.Timestamptz(6)
+  liftedByUserId String?   @map("lifted_by_user_id")
+  liftedAt       DateTime? @map("lifted_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_org_fkey")
+  user         User         @relation("OrganizationAccessDenySubject", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_user_fkey")
+  deniedBy     User         @relation("OrganizationAccessDenyDenier", fields: [deniedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_denied_by_fkey")
+  liftedBy     User?        @relation("OrganizationAccessDenyLifter", fields: [liftedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_lifted_by_fkey")
+
+  @@map("organization_access_denies")
+}
+
+model OrganizationGovernanceAudit {
+  id             String   @id
+  organizationId String?  @map("organization_id")
+  actorUserId    String   @map("actor_user_id")
+  action         String
+  targetType     String   @map("target_type")
+  targetId       String?  @map("target_id")
+  domainEventId  String   @unique(map: "organization_governance_audits_domain_event_id_key") @map("domain_event_id")
+  payload        Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_governance_audits_org_fkey")
+  actor        User          @relation("OrganizationGovernanceAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_governance_audits_actor_fkey")
+
+  @@index([organizationId, createdAt(sort: Desc)], map: "organization_governance_audits_org_created_idx")
+  @@map("organization_governance_audits")
+}
+
+model OrganizationCommandReceipt {
+  id             String   @id
+  actorUserId    String   @map("actor_user_id")
+  organizationId String?  @map("organization_id")
+  commandKey     String   @map("command_key")
+  payloadHash    String   @map("payload_hash")
+  response       Json
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor        User          @relation("OrganizationCommandReceiptActor", fields: [actorUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_command_receipts_actor_fkey")
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_command_receipts_org_fkey")
+
+  @@index([createdAt], map: "organization_command_receipts_created_idx")
+  @@map("organization_command_receipts")
 }
 
 model TeacherCode {
@@ -350,6 +497,11 @@ model Video {
   @@map("videos")
 }
 
+enum PlatformRole {
+  SYSTEM_ADMIN
+  STANDARD
+}
+
 enum UserRole {
   STUDENT
   TEACHER
@@ -527,39 +679,39 @@ model Scale {
 
 // 测评记录表
 model Assessment {
-  id                        String                 @id @default(uuid())
-  scaleId                   String                 @map("scale_id")
-  userId                    String?                @map("user_id") // 改为可选，支持匿名测评
-  status                    AssessmentStatus       @default(IN_PROGRESS)
-  deliveryMode              InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration         RuntimeGeneration?     @map("runtime_generation")
-  attemptEpoch              Int                    @default(1) @map("attempt_epoch")
-  submissionId              String?                @unique @map("submission_id")
-  submissionPayloadHash     String?                @map("submission_payload_hash")
-  submissionCompletedAt     DateTime?              @map("submission_completed_at")
-  answers                   Json? // 答案数组（加密存储）
-  answersRevision           Int                    @default(0) @map("answers_revision") // 量表答案 OCC 版本
-  result                    Json? // 加密的完整 ScaleResultV2
-  runtimeSnapshotEncrypted  String?                @map("runtime_snapshot_encrypted")
-  compiledRuntimeHash       String?                @map("compiled_runtime_hash")
-  frozenAdmissionSnapshotEncrypted String?         @map("frozen_admission_snapshot_encrypted")
-  frozenAdmissionSnapshotHash      String?         @map("frozen_admission_snapshot_hash")
-  progress                  Int                    @default(0) // 进度百分比
-  startedAt                 DateTime               @default(now()) @map("started_at")
-  completedAt               DateTime?              @map("completed_at") // 完成时间
-  totalTime                 Int?                   @map("total_time") // 总用时（毫秒）
+  id                               String                 @id @default(uuid())
+  scaleId                          String                 @map("scale_id")
+  userId                           String?                @map("user_id") // 改为可选，支持匿名测评
+  status                           AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode                     InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration                RuntimeGeneration?     @map("runtime_generation")
+  attemptEpoch                     Int                    @default(1) @map("attempt_epoch")
+  submissionId                     String?                @unique @map("submission_id")
+  submissionPayloadHash            String?                @map("submission_payload_hash")
+  submissionCompletedAt            DateTime?              @map("submission_completed_at")
+  answers                          Json? // 答案数组（加密存储）
+  answersRevision                  Int                    @default(0) @map("answers_revision") // 量表答案 OCC 版本
+  result                           Json? // 加密的完整 ScaleResultV2
+  runtimeSnapshotEncrypted         String?                @map("runtime_snapshot_encrypted")
+  compiledRuntimeHash              String?                @map("compiled_runtime_hash")
+  frozenAdmissionSnapshotEncrypted String?                @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?                @map("frozen_admission_snapshot_hash")
+  progress                         Int                    @default(0) // 进度百分比
+  startedAt                        DateTime               @default(now()) @map("started_at")
+  completedAt                      DateTime?              @map("completed_at") // 完成时间
+  totalTime                        Int?                   @map("total_time") // 总用时（毫秒）
   // 聚合问卷模块关联（可选，单体量表测评时为空）
-  questionnaireAssessmentId String?                @map("questionnaire_assessment_id")
-  compositeAttemptId        String?                @map("composite_attempt_id")
-  compositeItemId           String?                @map("composite_item_id")
+  questionnaireAssessmentId        String?                @map("questionnaire_assessment_id")
+  compositeAttemptId               String?                @map("composite_attempt_id")
+  compositeItemId                  String?                @map("composite_item_id")
   // Additive identity (Commit 11). Historical rows stay null — never infer from userId.
-  subjectUserId             String?                @map("subject_user_id")
-  respondentUserId          String?                @map("respondent_user_id")
-  respondentType            String?                @map("respondent_type")
-  episodeId                 String?                @map("episode_id")
-  assignmentRef             String?                @map("assignment_ref")
-  consentId                 String?                @map("consent_id")
-  contextSnapshotRef        String?                @map("context_snapshot_ref")
+  subjectUserId                    String?                @map("subject_user_id")
+  respondentUserId                 String?                @map("respondent_user_id")
+  respondentType                   String?                @map("respondent_type")
+  episodeId                        String?                @map("episode_id")
+  assignmentRef                    String?                @map("assignment_ref")
+  consentId                        String?                @map("consent_id")
+  contextSnapshotRef               String?                @map("context_snapshot_ref")
 
   // 关联
   scale                   Scale                       @relation(fields: [scaleId], references: [id], onDelete: Cascade)
@@ -840,18 +992,18 @@ model QuestionnaireFormItem {
 }
 
 model QuestionnaireFormSectionAttempt {
-  id                        String           @id @default(uuid())
-  questionnaireAssessmentId String           @map("questionnaire_assessment_id")
-  sectionId                 String           @map("section_id")
-  status                    AssessmentStatus @default(IN_PROGRESS)
-  attemptEpoch              Int              @default(1) @map("attempt_epoch")
-  submissionId              String?          @unique @map("submission_id")
-  submissionPayloadHash     String?          @map("submission_payload_hash")
-  submittedAt               DateTime?        @map("submitted_at")
-  frozenAdmissionSnapshotEncrypted String?   @map("frozen_admission_snapshot_encrypted")
-  frozenAdmissionSnapshotHash      String?   @map("frozen_admission_snapshot_hash")
-  createdAt                 DateTime         @default(now()) @map("created_at")
-  updatedAt                 DateTime         @updatedAt @map("updated_at")
+  id                               String           @id @default(uuid())
+  questionnaireAssessmentId        String           @map("questionnaire_assessment_id")
+  sectionId                        String           @map("section_id")
+  status                           AssessmentStatus @default(IN_PROGRESS)
+  attemptEpoch                     Int              @default(1) @map("attempt_epoch")
+  submissionId                     String?          @unique @map("submission_id")
+  submissionPayloadHash            String?          @map("submission_payload_hash")
+  submittedAt                      DateTime?        @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?          @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?          @map("frozen_admission_snapshot_hash")
+  createdAt                        DateTime         @default(now()) @map("created_at")
+  updatedAt                        DateTime         @updatedAt @map("updated_at")
 
   questionnaireAssessment QuestionnaireAssessment   @relation(fields: [questionnaireAssessmentId], references: [id], onDelete: Cascade)
   section                 QuestionnaireFormSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
@@ -957,24 +1109,24 @@ model CompositeAssessment {
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
 model CompositeAssessmentItem {
-  id                    String                      @id @default(uuid())
-  compositeAssessmentId String                      @map("composite_assessment_id")
-  type                  CompositeAssessmentItemType
-  position              Int                         @default(0)
-  required              Boolean                     @default(true)
-  scaleId               String?                     @map("scale_id")
-  cognitiveAssignmentId String?                     @map("cognitive_assignment_id")
-  situationalInstrumentKey     String?              @map("situational_instrument_key")
-  situationalInstrumentVersion String?              @map("situational_instrument_version")
-  formType              String?                     @map("form_type")
-  formLabel             String?                     @map("form_label")
-  formPlaceholder       String?                     @map("form_placeholder")
-  formOptions           Json?                       @map("form_options")
-  contextKey            String?                     @map("context_key")
-  formSectionId         String?                     @map("form_section_id")
-  formSectionPosition   Int?                        @map("form_section_position")
-  createdAt             DateTime                    @default(now()) @map("created_at")
-  updatedAt             DateTime                    @updatedAt @map("updated_at")
+  id                           String                      @id @default(uuid())
+  compositeAssessmentId        String                      @map("composite_assessment_id")
+  type                         CompositeAssessmentItemType
+  position                     Int                         @default(0)
+  required                     Boolean                     @default(true)
+  scaleId                      String?                     @map("scale_id")
+  cognitiveAssignmentId        String?                     @map("cognitive_assignment_id")
+  situationalInstrumentKey     String?                     @map("situational_instrument_key")
+  situationalInstrumentVersion String?                     @map("situational_instrument_version")
+  formType                     String?                     @map("form_type")
+  formLabel                    String?                     @map("form_label")
+  formPlaceholder              String?                     @map("form_placeholder")
+  formOptions                  Json?                       @map("form_options")
+  contextKey                   String?                     @map("context_key")
+  formSectionId                String?                     @map("form_section_id")
+  formSectionPosition          Int?                        @map("form_section_position")
+  createdAt                    DateTime                    @default(now()) @map("created_at")
+  updatedAt                    DateTime                    @updatedAt @map("updated_at")
 
   compositeAssessment CompositeAssessment   @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   scale               Scale?                @relation("CompositeAssessmentScale", fields: [scaleId], references: [id], onDelete: Restrict)
@@ -1124,18 +1276,18 @@ model CompositeFormAnswer {
 }
 
 model CompositeFormSectionAttempt {
-  id                    String                           @id @default(uuid())
-  attemptId             String                           @map("attempt_id")
-  sectionId             String                           @map("section_id")
-  status                CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
-  attemptEpoch          Int                              @default(1) @map("attempt_epoch")
-  submissionId          String?                          @unique @map("submission_id")
-  submissionPayloadHash String?                          @map("submission_payload_hash")
-  submittedAt           DateTime?                        @map("submitted_at")
-  frozenAdmissionSnapshotEncrypted String?               @map("frozen_admission_snapshot_encrypted")
-  frozenAdmissionSnapshotHash      String?               @map("frozen_admission_snapshot_hash")
-  createdAt             DateTime                         @default(now()) @map("created_at")
-  updatedAt             DateTime                         @updatedAt @map("updated_at")
+  id                               String                           @id @default(uuid())
+  attemptId                        String                           @map("attempt_id")
+  sectionId                        String                           @map("section_id")
+  status                           CompositeAssessmentAttemptStatus @default(IN_PROGRESS)
+  attemptEpoch                     Int                              @default(1) @map("attempt_epoch")
+  submissionId                     String?                          @unique @map("submission_id")
+  submissionPayloadHash            String?                          @map("submission_payload_hash")
+  submittedAt                      DateTime?                        @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?                          @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?                          @map("frozen_admission_snapshot_hash")
+  createdAt                        DateTime                         @default(now()) @map("created_at")
+  updatedAt                        DateTime                         @updatedAt @map("updated_at")
 
   attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   section CompositeFormSection       @relation(fields: [sectionId], references: [id], onDelete: Cascade)
@@ -1220,12 +1372,12 @@ model StoredAsset {
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  courseCovers    Course[]         @relation("CourseCoverAsset")
-  documents       Document[]       @relation("DocumentAsset")
-  videoOriginals  Video[]          @relation("VideoOriginalAsset")
-  videoProcessed  Video[]          @relation("VideoProcessedAsset")
-  videoThumbnails Video[]          @relation("VideoThumbnailAsset")
-  references      AssetReference[]
+  courseCovers                    Course[]                  @relation("CourseCoverAsset")
+  documents                       Document[]                @relation("DocumentAsset")
+  videoOriginals                  Video[]                   @relation("VideoOriginalAsset")
+  videoProcessed                  Video[]                   @relation("VideoProcessedAsset")
+  videoThumbnails                 Video[]                   @relation("VideoThumbnailAsset")
+  references                      AssetReference[]
   instrumentAuthorizationEvidence InstrumentAuthorization[] @relation("InstrumentAuthorizationEvidence")
 
   @@index([ownerId])
@@ -1473,42 +1625,42 @@ model CognitiveAssignment {
 // participantSnapshotEncrypted 为预留的身份快照（即使 User 被删除也保留必要历史信息），
 // D4 Session API 写入时须用 Cognitive strict encryption 加密，禁止写入明文身份数据。
 model CognitiveSession {
-  id                           String                 @id @default(uuid())
-  userId                       String?                @map("user_id")
-  participantKey               String                 @map("participant_key")
-  participantSnapshotEncrypted String?                @map("participant_snapshot_encrypted")
-  assignmentId                 String?                @map("assignment_id")
-  compositeAttemptId           String?                @map("composite_attempt_id")
-  compositeItemId              String?                @map("composite_item_id")
-  accessTokenId                String?                @map("access_token_id")
-  recoveryTokenHash            String?                @unique @map("recovery_token_hash")
-  anonymousCode                String?                @map("anonymous_code")
-  configId                     String                 @map("config_id")
-  testType                     String                 @map("test_type")
-  attemptNo                    Int                    @default(1) @map("attempt_no")
-  status                       CognitiveSessionStatus @default(IN_PROGRESS)
-  startedAt                    DateTime               @default(now()) @map("started_at")
-  finishedAt                   DateTime?              @map("finished_at")
-  scoreEncrypted               String?                @map("score_encrypted")
-  metricsEncrypted             String?                @map("metrics_encrypted")
-  qualityFlagsEncrypted        String?                @map("quality_flags_encrypted")
-  resultSnapshotEncrypted      String?                @map("result_snapshot_encrypted")
-  configVersion                String                 @map("config_version")
-  configSnapshotEncrypted      String                 @map("config_snapshot_encrypted")
-  engineVersion                String                 @map("engine_version")
-  scoringVersion               String                 @map("scoring_version")
-  randomSeed                   String                 @map("random_seed")
-  completionKey                String?                @map("completion_key")
-  deliveryMode                 InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration            RuntimeGeneration?     @map("runtime_generation")
-  compiledRuntimeHash          String?                @map("compiled_runtime_hash")
-  submissionId                 String?                @unique @map("submission_id")
-  submissionPayloadHash        String?                @map("submission_payload_hash")
-  submittedAt                  DateTime?              @map("submitted_at")
-  frozenAdmissionSnapshotEncrypted String?            @map("frozen_admission_snapshot_encrypted")
-  frozenAdmissionSnapshotHash      String?            @map("frozen_admission_snapshot_hash")
-  createdAt                    DateTime               @default(now()) @map("created_at")
-  updatedAt                    DateTime               @updatedAt @map("updated_at")
+  id                               String                 @id @default(uuid())
+  userId                           String?                @map("user_id")
+  participantKey                   String                 @map("participant_key")
+  participantSnapshotEncrypted     String?                @map("participant_snapshot_encrypted")
+  assignmentId                     String?                @map("assignment_id")
+  compositeAttemptId               String?                @map("composite_attempt_id")
+  compositeItemId                  String?                @map("composite_item_id")
+  accessTokenId                    String?                @map("access_token_id")
+  recoveryTokenHash                String?                @unique @map("recovery_token_hash")
+  anonymousCode                    String?                @map("anonymous_code")
+  configId                         String                 @map("config_id")
+  testType                         String                 @map("test_type")
+  attemptNo                        Int                    @default(1) @map("attempt_no")
+  status                           CognitiveSessionStatus @default(IN_PROGRESS)
+  startedAt                        DateTime               @default(now()) @map("started_at")
+  finishedAt                       DateTime?              @map("finished_at")
+  scoreEncrypted                   String?                @map("score_encrypted")
+  metricsEncrypted                 String?                @map("metrics_encrypted")
+  qualityFlagsEncrypted            String?                @map("quality_flags_encrypted")
+  resultSnapshotEncrypted          String?                @map("result_snapshot_encrypted")
+  configVersion                    String                 @map("config_version")
+  configSnapshotEncrypted          String                 @map("config_snapshot_encrypted")
+  engineVersion                    String                 @map("engine_version")
+  scoringVersion                   String                 @map("scoring_version")
+  randomSeed                       String                 @map("random_seed")
+  completionKey                    String?                @map("completion_key")
+  deliveryMode                     InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration                RuntimeGeneration?     @map("runtime_generation")
+  compiledRuntimeHash              String?                @map("compiled_runtime_hash")
+  submissionId                     String?                @unique @map("submission_id")
+  submissionPayloadHash            String?                @map("submission_payload_hash")
+  submittedAt                      DateTime?              @map("submitted_at")
+  frozenAdmissionSnapshotEncrypted String?                @map("frozen_admission_snapshot_encrypted")
+  frozenAdmissionSnapshotHash      String?                @map("frozen_admission_snapshot_hash")
+  createdAt                        DateTime               @default(now()) @map("created_at")
+  updatedAt                        DateTime               @updatedAt @map("updated_at")
 
   user             User?                       @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
   assignment       CognitiveAssignment?        @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
@@ -1633,42 +1785,43 @@ model AssessmentUnitSnapshot {
 // Assessment/Questionnaire/Composite: a Situational pilot is one UNIT with no
 // parent slot and must not be represented as a fake Scale row.
 model SituationalAttempt {
-  id                     String                 @id @default(uuid())
-  userId                 String?                @map("user_id")
-  compositeAttemptId     String?                @map("composite_attempt_id")
-  compositeItemId        String?                @map("composite_item_id")
-  compositeSlotKey       String?                @map("composite_slot_key")
-  participantKey         String                 @map("participant_key")
-  instrumentKey          String                 @map("instrument_key")
-  instrumentVersion      String                 @map("instrument_version")
-  attemptNo              Int                    @default(1) @map("attempt_no")
-  status                 AssessmentStatus       @default(IN_PROGRESS)
-  deliveryMode           InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
-  runtimeGeneration      RuntimeGeneration     @default(UNIFIED_V1) @map("runtime_generation")
-  attemptEpoch           Int                    @default(1) @map("attempt_epoch")
-  definitionHash         String                 @map("definition_hash")
-  compiledRuntimeHash    String                 @map("compiled_runtime_hash")
-  scorerKey              String                 @map("scorer_key")
-  scoringVersion         String                 @map("scoring_version")
-  frozenAt               DateTime               @map("frozen_at")
-  runtimeSnapshotEncrypted String               @map("runtime_snapshot_encrypted")
-  submissionId           String?                @unique @map("submission_id")
-  submissionPayloadHash  String?                @map("submission_payload_hash")
-  submittedAt            DateTime?              @map("submitted_at")
-  progress               Int                    @default(0)
-  startedAt              DateTime               @default(now()) @map("started_at")
-  completedAt            DateTime?              @map("completed_at")
-  totalTime              Int?                   @map("total_time")
-  resultEncrypted        String?                @map("result_encrypted")
-  canonicalResultEncrypted String?              @map("canonical_result_encrypted")
-  createdAt              DateTime               @default(now()) @map("created_at")
-  updatedAt              DateTime               @updatedAt @map("updated_at")
+  id                       String                 @id @default(uuid())
+  userId                   String?                @map("user_id")
+  compositeAttemptId       String?                @map("composite_attempt_id")
+  compositeItemId          String?                @map("composite_item_id")
+  compositeSlotKey         String?                @map("composite_slot_key")
+  participantKey           String                 @map("participant_key")
+  instrumentKey            String                 @map("instrument_key")
+  instrumentVersion        String                 @map("instrument_version")
+  attemptNo                Int                    @default(1) @map("attempt_no")
+  status                   AssessmentStatus       @default(IN_PROGRESS)
+  deliveryMode             InstrumentDeliveryMode @default(FINAL_ONLY) @map("delivery_mode")
+  runtimeGeneration        RuntimeGeneration      @default(UNIFIED_V1) @map("runtime_generation")
+  attemptEpoch             Int                    @default(1) @map("attempt_epoch")
+  definitionHash           String                 @map("definition_hash")
+  compiledRuntimeHash      String                 @map("compiled_runtime_hash")
+  scorerKey                String                 @map("scorer_key")
+  scoringVersion           String                 @map("scoring_version")
+  frozenAt                 DateTime               @map("frozen_at")
+  runtimeSnapshotEncrypted String                 @map("runtime_snapshot_encrypted")
+  submissionId             String?                @unique @map("submission_id")
+  submissionPayloadHash    String?                @map("submission_payload_hash")
+  submittedAt              DateTime?              @map("submitted_at")
+  progress                 Int                    @default(0)
+  startedAt                DateTime               @default(now()) @map("started_at")
+  completedAt              DateTime?              @map("completed_at")
+  totalTime                Int?                   @map("total_time")
+  resultEncrypted          String?                @map("result_encrypted")
+  canonicalResultEncrypted String?                @map("canonical_result_encrypted")
+  createdAt                DateTime               @default(now()) @map("created_at")
+  updatedAt                DateTime               @updatedAt @map("updated_at")
 
-  user          User?                   @relation("SituationalAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
+  user             User?                       @relation("SituationalAttemptUser", fields: [userId], references: [id], onDelete: SetNull)
   compositeAttempt CompositeAssessmentAttempt? @relation("CompositeAttemptSituationalAttempts", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
-  compositeItem   CompositeAssessmentItem? @relation("CompositeSituationalAttempts", fields: [compositeItemId], references: [id], onDelete: Restrict)
-  rawSubmission SituationalRawSubmission?
+  compositeItem    CompositeAssessmentItem?    @relation("CompositeSituationalAttempts", fields: [compositeItemId], references: [id], onDelete: Restrict)
+  rawSubmission    SituationalRawSubmission?
 
+  @@unique([compositeAttemptId, compositeItemId], map: "situational_attempts_composite_item_key")
   // Standalone attempt numbers are unique within the standalone namespace;
   // embedded children are scoped by their composite parent/slot instead.
   @@index([instrumentKey, instrumentVersion, participantKey, attemptNo])
@@ -1676,7 +1829,6 @@ model SituationalAttempt {
   @@index([participantKey, status])
   @@index([instrumentKey, instrumentVersion, status])
   @@index([compositeAttemptId, status])
-  @@unique([compositeAttemptId, compositeItemId], map: "situational_attempts_composite_item_key")
   @@map("situational_attempts")
 }
 
@@ -1684,15 +1836,15 @@ model SituationalAttempt {
 // standalone attempt. Per-scene and per-answer writes are intentionally not
 // modelled.
 model SituationalRawSubmission {
-  id                  String            @id @default(uuid())
-  attemptId           String            @unique @map("attempt_id")
-  attemptEpoch        Int               @map("attempt_epoch")
-  responseCount       Int               @map("response_count")
-  payloadEncrypted    String            @map("payload_encrypted")
-  payloadHash         String            @map("payload_hash")
-  payloadSchemaVersion Int              @map("payload_schema_version")
-  encodingVersion     String            @map("encoding_version")
-  createdAt           DateTime          @default(now()) @map("created_at")
+  id                   String   @id @default(uuid())
+  attemptId            String   @unique @map("attempt_id")
+  attemptEpoch         Int      @map("attempt_epoch")
+  responseCount        Int      @map("response_count")
+  payloadEncrypted     String   @map("payload_encrypted")
+  payloadHash          String   @map("payload_hash")
+  payloadSchemaVersion Int      @map("payload_schema_version")
+  encodingVersion      String   @map("encoding_version")
+  createdAt            DateTime @default(now()) @map("created_at")
 
   attempt SituationalAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
@@ -1700,35 +1852,35 @@ model SituationalRawSubmission {
 }
 
 model InstrumentAuthorization {
-  id                       String   @id @default(uuid())
-  authorizationKey         String   @map("authorization_key")
+  id                       String    @id @default(uuid())
+  authorizationKey         String    @map("authorization_key")
   version                  Int
-  instrumentKey            String   @map("instrument_key")
-  instrumentVersion        String   @map("instrument_version")
+  instrumentKey            String    @map("instrument_key")
+  instrumentVersion        String    @map("instrument_version")
   grantor                  String
   grantee                  String
-  electronicAdministration Boolean  @default(true) @map("electronic_administration")
-  scoring                  Boolean  @default(true)
-  translation              Boolean  @default(false)
-  display                  Boolean  @default(true)
-  territories              String[] @default([])
-  locales                  String[] @default([])
-  commercialNature         String   @map("commercial_nature")
-  validFrom                DateTime @map("valid_from")
-  validTo                  DateTime @map("valid_to")
+  electronicAdministration Boolean   @default(true) @map("electronic_administration")
+  scoring                  Boolean   @default(true)
+  translation              Boolean   @default(false)
+  display                  Boolean   @default(true)
+  territories              String[]  @default([])
+  locales                  String[]  @default([])
+  commercialNature         String    @map("commercial_nature")
+  validFrom                DateTime  @map("valid_from")
+  validTo                  DateTime  @map("valid_to")
   basis                    String
   status                   String
-  evidenceAssetId          String?  @map("evidence_asset_id")
-  evidenceSha256           String?  @map("evidence_sha256")
-  selfApprovalDeclaration  String?  @map("self_approval_declaration")
-  approvedByUserId         String?  @map("approved_by_user_id")
+  evidenceAssetId          String?   @map("evidence_asset_id")
+  evidenceSha256           String?   @map("evidence_sha256")
+  selfApprovalDeclaration  String?   @map("self_approval_declaration")
+  approvedByUserId         String?   @map("approved_by_user_id")
   approvedAt               DateTime? @map("approved_at")
-  createdByUserId          String   @map("created_by_user_id")
-  recordHash               String   @map("record_hash")
-  createdAt                DateTime @default(now()) @map("created_at")
-  updatedAt                DateTime @updatedAt @map("updated_at")
+  createdByUserId          String    @map("created_by_user_id")
+  recordHash               String    @map("record_hash")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
 
-  evidenceAsset StoredAsset? @relation("InstrumentAuthorizationEvidence", fields: [evidenceAssetId], references: [id], onDelete: SetNull)
+  evidenceAsset StoredAsset?                   @relation("InstrumentAuthorizationEvidence", fields: [evidenceAssetId], references: [id], onDelete: SetNull)
   audits        InstrumentAuthorizationAudit[]
 
   @@unique([authorizationKey, version])
@@ -1738,22 +1890,21 @@ model InstrumentAuthorization {
 }
 
 model InstrumentAuthorizationAudit {
-  id                    String   @id @default(uuid())
-  authorizationId       String   @map("authorization_id")
-  authorizationVersion  Int      @map("authorization_version")
-  action                String
-  actorUserId           String   @map("actor_user_id")
-  at                    DateTime
-  note                  String
-  recordHash            String   @map("record_hash")
-  createdAt             DateTime @default(now()) @map("created_at")
+  id                   String   @id @default(uuid())
+  authorizationId      String   @map("authorization_id")
+  authorizationVersion Int      @map("authorization_version")
+  action               String
+  actorUserId          String   @map("actor_user_id")
+  at                   DateTime
+  note                 String
+  recordHash           String   @map("record_hash")
+  createdAt            DateTime @default(now()) @map("created_at")
 
   authorization InstrumentAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Restrict)
 
   @@index([authorizationId, at])
   @@map("instrument_authorization_audits")
 }
-
 
 enum ParentRelationshipStatus {
   PENDING
@@ -1777,23 +1928,23 @@ enum ParentInviteCodeStatus {
 
 /// Global many-to-many parent↔student relationship. Revocable; never physically deleted.
 model ParentStudentRelationship {
-  id              String                   @id @default(uuid())
-  parentUserId    String                   @map("parent_user_id")
-  studentUserId   String                   @map("student_user_id")
-  status          ParentRelationshipStatus @default(PENDING)
-  inviteCodeId    String?                  @map("invite_code_id")
-  approvedByUserId String?                 @map("approved_by_user_id")
-  approvedAt      DateTime?                @map("approved_at")
-  revokedByUserId String?                  @map("revoked_by_user_id")
-  revokedAt       DateTime?                @map("revoked_at")
-  revokeReason    String?                  @map("revoke_reason")
-  consentVersion  String?                  @map("consent_version")
-  consentHash     String?                  @map("consent_hash")
-  createdAt       DateTime                 @default(now()) @map("created_at")
-  updatedAt       DateTime                 @updatedAt @map("updated_at")
+  id               String                   @id @default(uuid())
+  parentUserId     String                   @map("parent_user_id")
+  studentUserId    String                   @map("student_user_id")
+  status           ParentRelationshipStatus @default(PENDING)
+  inviteCodeId     String?                  @map("invite_code_id")
+  approvedByUserId String?                  @map("approved_by_user_id")
+  approvedAt       DateTime?                @map("approved_at")
+  revokedByUserId  String?                  @map("revoked_by_user_id")
+  revokedAt        DateTime?                @map("revoked_at")
+  revokeReason     String?                  @map("revoke_reason")
+  consentVersion   String?                  @map("consent_version")
+  consentHash      String?                  @map("consent_hash")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
 
-  parent     User             @relation("ParentRelationshipParent", fields: [parentUserId], references: [id], onDelete: Restrict)
-  student    User             @relation("ParentRelationshipStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  parent     User              @relation("ParentRelationshipParent", fields: [parentUserId], references: [id], onDelete: Restrict)
+  student    User              @relation("ParentRelationshipStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
   inviteCode ParentInviteCode? @relation(fields: [inviteCodeId], references: [id], onDelete: Restrict)
 
   @@unique([parentUserId, studentUserId])
@@ -1804,19 +1955,19 @@ model ParentStudentRelationship {
 
 /// Single-use, time-limited invite hashed at rest. Bound to a student-selected course.
 model ParentInviteCode {
-  id                String                 @id @default(uuid())
-  codeHash          String                 @unique @map("code_hash")
-  studentUserId     String                 @map("student_user_id")
-  courseId          String                 @map("course_id")
-  createdByUserId   String                 @map("created_by_user_id")
-  status            ParentInviteCodeStatus @default(ACTIVE)
-  expiresAt         DateTime               @map("expires_at")
-  consumedAt        DateTime?              @map("consumed_at")
-  consumedByParentUserId String?           @map("consumed_by_parent_user_id")
-  createdAt         DateTime               @default(now()) @map("created_at")
-  updatedAt         DateTime               @updatedAt @map("updated_at")
+  id                     String                 @id @default(uuid())
+  codeHash               String                 @unique @map("code_hash")
+  studentUserId          String                 @map("student_user_id")
+  courseId               String                 @map("course_id")
+  createdByUserId        String                 @map("created_by_user_id")
+  status                 ParentInviteCodeStatus @default(ACTIVE)
+  expiresAt              DateTime               @map("expires_at")
+  consumedAt             DateTime?              @map("consumed_at")
+  consumedByParentUserId String?                @map("consumed_by_parent_user_id")
+  createdAt              DateTime               @default(now()) @map("created_at")
+  updatedAt              DateTime               @updatedAt @map("updated_at")
 
-  creator       User                         @relation("ParentInviteCodeCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  creator       User                        @relation("ParentInviteCodeCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   relationships ParentStudentRelationship[]
 
   @@index([studentUserId, status])
@@ -1826,20 +1977,20 @@ model ParentInviteCode {
 }
 
 model AssessmentEpisode {
-  id                String                           @id @default(uuid())
-  subjectUserId     String?                          @map("subject_user_id")
-  initiatedByUserId String?                          @map("initiated_by_user_id")
-  initiationMode    AssessmentEpisodeInitiationMode  @map("initiation_mode")
-  courseId          String?                          @map("course_id")
-  campaignKey       String?                          @map("campaign_key")
+  id                String                          @id @default(uuid())
+  subjectUserId     String?                         @map("subject_user_id")
+  initiatedByUserId String?                         @map("initiated_by_user_id")
+  initiationMode    AssessmentEpisodeInitiationMode @map("initiation_mode")
+  courseId          String?                         @map("course_id")
+  campaignKey       String?                         @map("campaign_key")
   label             String?
-  createdAt         DateTime                         @default(now()) @map("created_at")
-  updatedAt         DateTime                         @updatedAt @map("updated_at")
+  createdAt         DateTime                        @default(now()) @map("created_at")
+  updatedAt         DateTime                        @updatedAt @map("updated_at")
 
-  subject    User? @relation("EpisodeSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
-  initiator  User? @relation("EpisodeInitiator", fields: [initiatedByUserId], references: [id], onDelete: Restrict)
-  assessments Assessment[]
-  compositeAttempts CompositeAssessmentAttempt[]
+  subject               User?                            @relation("EpisodeSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  initiator             User?                            @relation("EpisodeInitiator", fields: [initiatedByUserId], references: [id], onDelete: Restrict)
+  assessments           Assessment[]
+  compositeAttempts     CompositeAssessmentAttempt[]
   relationalAssignments RelationalAssessmentAssignment[]
 
   @@index([subjectUserId, createdAt])
@@ -1849,26 +2000,26 @@ model AssessmentEpisode {
 
 /// Per-attempt consent; append-only semantics (revoke via new row / status, no physical delete).
 model AssessmentAttemptConsent {
-  id                 String   @id @default(uuid())
-  priorConsentId     String?  @unique(map: "assessment_attempt_consents_prior_consent_id_key") @map("prior_consent_id")
-  subjectUserId      String?  @map("subject_user_id")
-  respondentUserId   String?  @map("respondent_user_id")
-  respondentType     String   @map("respondent_type")
-  consentVersion     String   @map("consent_version")
-  consentHash        String   @map("consent_hash")
-  purpose            String
-  visibilityScope    String   @map("visibility_scope")
-  shareTargetsJson   Json?    @map("share_targets_json")
-  acceptedAt         DateTime? @map("accepted_at")
-  revokedAt          DateTime? @map("revoked_at")
-  createdAt          DateTime @default(now()) @map("created_at")
+  id               String    @id @default(uuid())
+  priorConsentId   String?   @unique(map: "assessment_attempt_consents_prior_consent_id_key") @map("prior_consent_id")
+  subjectUserId    String?   @map("subject_user_id")
+  respondentUserId String?   @map("respondent_user_id")
+  respondentType   String    @map("respondent_type")
+  consentVersion   String    @map("consent_version")
+  consentHash      String    @map("consent_hash")
+  purpose          String
+  visibilityScope  String    @map("visibility_scope")
+  shareTargetsJson Json?     @map("share_targets_json")
+  acceptedAt       DateTime? @map("accepted_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
 
-  subject    User? @relation("ConsentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
-  respondent User? @relation("ConsentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
-  priorConsent AssessmentAttemptConsent? @relation("ConsentLineage", fields: [priorConsentId], references: [id], onDelete: Restrict, map: "assessment_attempt_consents_prior_consent_id_fkey")
-  supersedingConsent AssessmentAttemptConsent? @relation("ConsentLineage")
-  assessments Assessment[]
-  compositeAttempts CompositeAssessmentAttempt[]
+  subject               User?                            @relation("ConsentSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  respondent            User?                            @relation("ConsentRespondent", fields: [respondentUserId], references: [id], onDelete: Restrict)
+  priorConsent          AssessmentAttemptConsent?        @relation("ConsentLineage", fields: [priorConsentId], references: [id], onDelete: Restrict, map: "assessment_attempt_consents_prior_consent_id_fkey")
+  supersedingConsent    AssessmentAttemptConsent?        @relation("ConsentLineage")
+  assessments           Assessment[]
+  compositeAttempts     CompositeAssessmentAttempt[]
   relationalAssignments RelationalAssessmentAssignment[]
 
   @@index([subjectUserId, acceptedAt])
@@ -1877,29 +2028,29 @@ model AssessmentAttemptConsent {
 }
 
 model RelationalAssessmentAssignment {
-  id                       String   @id
-  episodeId                String   @map("episode_id")
-  subjectUserId            String   @map("subject_user_id")
-  subjectRole              String   @map("subject_role")
-  respondentUserId         String   @map("respondent_user_id")
-  respondentRole           String   @map("respondent_role")
-  createdByUserId          String   @map("created_by_user_id")
-  relationshipKind         String   @map("relationship_kind")
-  relationshipRef          String?  @map("relationship_ref")
-  relationshipSnapshotJson Json     @map("relationship_snapshot_json")
-  relationshipSnapshotHash String   @map("relationship_snapshot_hash")
+  id                       String    @id
+  episodeId                String    @map("episode_id")
+  subjectUserId            String    @map("subject_user_id")
+  subjectRole              String    @map("subject_role")
+  respondentUserId         String    @map("respondent_user_id")
+  respondentRole           String    @map("respondent_role")
+  createdByUserId          String    @map("created_by_user_id")
+  relationshipKind         String    @map("relationship_kind")
+  relationshipRef          String?   @map("relationship_ref")
+  relationshipSnapshotJson Json      @map("relationship_snapshot_json")
+  relationshipSnapshotHash String    @map("relationship_snapshot_hash")
   perspective              String
-  resourceKind             String   @map("resource_kind")
-  resourceKey              String   @map("resource_key")
-  resourceVersion          String   @map("resource_version")
-  applicabilityHash        String?  @map("applicability_hash")
-  analysisMode             String?  @map("analysis_mode")
-  minimumRespondents       Int?     @map("minimum_respondents")
-  consentId                String?  @map("consent_id")
-  visibilityPolicyKey      String   @map("visibility_policy_key")
-  status                   String   @default("OPEN")
-  createdAt                DateTime @default(now()) @map("created_at")
-  updatedAt                DateTime @updatedAt @map("updated_at")
+  resourceKind             String    @map("resource_kind")
+  resourceKey              String    @map("resource_key")
+  resourceVersion          String    @map("resource_version")
+  applicabilityHash        String?   @map("applicability_hash")
+  analysisMode             String?   @map("analysis_mode")
+  minimumRespondents       Int?      @map("minimum_respondents")
+  consentId                String?   @map("consent_id")
+  visibilityPolicyKey      String    @map("visibility_policy_key")
+  status                   String    @default("OPEN")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
   startedAt                DateTime? @map("started_at")
   completedAt              DateTime? @map("completed_at")
   revokedAt                DateTime? @map("revoked_at")
@@ -1990,32 +2141,32 @@ model SafetyPolicyTemplate {
 }
 
 model SafetyCase {
-  id                   String          @id @default(uuid())
-  policyKey            String          @map("policy_key")
-  policyVersion        String          @map("policy_version")
-  status               SafetyCaseStatus @default(OPEN)
-  subjectUserId        String          @map("subject_user_id")
-  primaryOwnerUserId   String          @map("primary_owner_user_id")
-  backupOwnerUserIds   String[]        @map("backup_owner_user_ids")
-  triggerSourceKind    String          @map("trigger_source_kind")
-  triggerSourceHash    String          @map("trigger_source_hash")
-  triggerSourceRecordId String?        @map("trigger_source_record_id")
-  triggerBundleKey     String?         @map("trigger_bundle_key")
-  triggerBundleVersion String?         @map("trigger_bundle_version")
-  triggerNotesJson     Json?           @map("trigger_notes_json")
-  idempotencyKey       String          @unique @map("idempotency_key")
-  priorCaseId          String?         @map("prior_case_id")
-  acknowledgedAt       DateTime?       @map("acknowledged_at")
-  disposedAt           DateTime?       @map("disposed_at")
-  ackDueAt             DateTime        @map("ack_due_at")
-  disposeDueAt         DateTime        @map("dispose_due_at")
-  createdAt            DateTime        @default(now()) @map("created_at")
-  updatedAt            DateTime        @updatedAt @map("updated_at")
+  id                    String           @id @default(uuid())
+  policyKey             String           @map("policy_key")
+  policyVersion         String           @map("policy_version")
+  status                SafetyCaseStatus @default(OPEN)
+  subjectUserId         String           @map("subject_user_id")
+  primaryOwnerUserId    String           @map("primary_owner_user_id")
+  backupOwnerUserIds    String[]         @map("backup_owner_user_ids")
+  triggerSourceKind     String           @map("trigger_source_kind")
+  triggerSourceHash     String           @map("trigger_source_hash")
+  triggerSourceRecordId String?          @map("trigger_source_record_id")
+  triggerBundleKey      String?          @map("trigger_bundle_key")
+  triggerBundleVersion  String?          @map("trigger_bundle_version")
+  triggerNotesJson      Json?            @map("trigger_notes_json")
+  idempotencyKey        String           @unique @map("idempotency_key")
+  priorCaseId           String?          @map("prior_case_id")
+  acknowledgedAt        DateTime?        @map("acknowledged_at")
+  disposedAt            DateTime?        @map("disposed_at")
+  ackDueAt              DateTime         @map("ack_due_at")
+  disposeDueAt          DateTime         @map("dispose_due_at")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
 
-  subject      User              @relation("SafetyCaseSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
-  primaryOwner User              @relation("SafetyCasePrimaryOwner", fields: [primaryOwnerUserId], references: [id], onDelete: Restrict)
-  priorCase    SafetyCase?       @relation("SafetyCasePrior", fields: [priorCaseId], references: [id], onDelete: Restrict)
-  childCases   SafetyCase[]      @relation("SafetyCasePrior")
+  subject      User                 @relation("SafetyCaseSubject", fields: [subjectUserId], references: [id], onDelete: Restrict)
+  primaryOwner User                 @relation("SafetyCasePrimaryOwner", fields: [primaryOwnerUserId], references: [id], onDelete: Restrict)
+  priorCase    SafetyCase?          @relation("SafetyCasePrior", fields: [priorCaseId], references: [id], onDelete: Restrict)
+  childCases   SafetyCase[]         @relation("SafetyCasePrior")
   events       SafetyCaseEvent[]
   wakeups      SafetyWakeupLedger[]
 
@@ -2042,14 +2193,14 @@ model SafetyCaseEvent {
 }
 
 model SafetyWakeupLedger {
-  id           String   @id @default(uuid())
-  wakeupJobId  String   @unique @map("wakeup_job_id")
-  caseId       String   @map("case_id")
-  kind         String
-  fireAt       DateTime @map("fire_at")
-  status       String
-  createdAt    DateTime @default(now()) @map("created_at")
-  processedAt  DateTime? @map("processed_at")
+  id          String    @id @default(uuid())
+  wakeupJobId String    @unique @map("wakeup_job_id")
+  caseId      String    @map("case_id")
+  kind        String
+  fireAt      DateTime  @map("fire_at")
+  status      String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  processedAt DateTime? @map("processed_at")
 
   safetyCase SafetyCase @relation(fields: [caseId], references: [id], onDelete: Restrict)
 
