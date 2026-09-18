@@ -198,7 +198,17 @@ describe('listComposites attemptCounts', () => {
 
     expect(mockPrisma.compositeAssessmentAttempt.groupBy).toHaveBeenCalledWith({
       by: ['compositeAssessmentId', 'status'],
-      where: { compositeAssessmentId: { in: ['composite-1', 'composite-2'] } },
+      where: {
+        AND: [
+          { compositeAssessmentId: { in: ['composite-1', 'composite-2'] } },
+          {
+            OR: [
+              { assignmentRef: null },
+              { assignmentRef: { in: [] } },
+            ],
+          },
+        ],
+      },
       _count: { _all: true },
     })
     expect(list[0].attemptCounts).toEqual({ started: 4, inProgress: 1, completed: 2, abandoned: 1 })
