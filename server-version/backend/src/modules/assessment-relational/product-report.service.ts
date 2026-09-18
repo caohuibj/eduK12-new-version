@@ -32,6 +32,24 @@ const assertIndividualRespondentReport = (assignment: {
   }
 }
 
+const aggregateOnlyCompositeAttempt = async (
+  db: any,
+  input: { attemptId: string; userId: string },
+): Promise<boolean> => {
+  const attempt = await db.compositeAssessmentAttempt.findUnique({
+    where: { id: input.attemptId },
+    select: { userId: true, assignmentRef: true },
+  })
+  if (!attempt || attempt.userId !== input.userId || !attempt.assignmentRef) return false
+
+  const assignment = await createSqlRelationalAssignmentRepository(db as any).findById(attempt.assignmentRef)
+    ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
+  if (assignment.respondentUserId !== input.userId) {
+    relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime respondent does not match the signed-in participant')
+  }
+  return assignment.perspective === 'RELATIONAL_EXPERIENCE' || assignment.analysisMode === 'COHORT_AGGREGATE'
+}
+
 export const createRelationalProductReportService = (
   db: any = prisma,
   registry: RelationalProductRegistryV1 = relationalProductRegistry,
@@ -45,19 +63,56 @@ export const createRelationalProductReportService = (
     attemptId: string
     userId: string
   }): Promise<void> {
-    const attempt = await db.compositeAssessmentAttempt.findUnique({
-      where: { id: input.attemptId },
-      select: { userId: true, assignmentRef: true },
-    })
-    if (!attempt || attempt.userId !== input.userId) return
-    if (!attempt.assignmentRef) return
-
-    const assignment = await createSqlRelationalAssignmentRepository(db as any).findById(attempt.assignmentRef)
-      ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
-    if (assignment.respondentUserId !== input.userId) {
-      relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime respondent does not match the signed-in participant')
+    if (await aggregateOnlyCompositeAttempt(db, input)) {
+      relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'relational-experience results are available only through minimum-N cohort projection')
     }
-    assertIndividualRespondentReport(assignment)
+  },
+
+  async aggregateOnlyCompositeAttempt(input: {
+    attemptId: string
+    userId: string
+  }): Promise<boolean> {
+    return aggregateOnlyCompositeAttempt(db, input)
+  },
+
+  async aggregateOnlyCognitiveSession(input: {
+    sessionId: string
+    userId: string
+  }): Promise<boolean> {
+    const session = await db.cognitiveSession.findUnique({
+      where: { id: input.sessionId },
+      select: { userId: true, compositeAttemptId: true, status: true },
+    })
+    if (
+      !session
+      || session.userId !== input.userId
+      || session.status !== 'COMPLETED'
+      || !session.compositeAttemptId
+    ) return false
+    return aggregateOnlyCompositeAttempt(db, {
+      attemptId: session.compositeAttemptId,
+      userId: input.userId,
+    })
+  },
+
+  async aggregateOnlyScaleAssessment(input: {
+    assessmentId: string
+    userId: string
+  }): Promise<boolean> {
+    const assessment = await db.assessment.findUnique({
+      where: { id: input.assessmentId },
+      select: { userId: true, compositeAttemptId: true, status: true },
+    })
+    if (
+      !assessment
+      || assessment.userId !== input.userId
+      || assessment.status !== 'COMPLETED'
+      || !assessment.compositeAttemptId
+    ) return false
+    return aggregateOnlyCompositeAttempt(db, {
+      attemptId: assessment.compositeAttemptId,
+      userId: input.userId,
+    })
   },
 
   async respondentReportTarget(input: {
