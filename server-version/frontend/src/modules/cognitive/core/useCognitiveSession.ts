@@ -496,7 +496,7 @@ export function useCognitiveSession(
       // The DRAFT remains writable, so returning to RUNNING is safe here.
       dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(err) })
     }
-  }, [api, sessionId])
+  }, [api, options.aggregateOnly, sessionId])
 
   const reload = useCallback(() => {
     void load()
