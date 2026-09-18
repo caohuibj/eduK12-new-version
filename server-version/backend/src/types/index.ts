@@ -2,7 +2,11 @@ import { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, Submissi
 
 export { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, SubmissionStatus }
 
-// JWT Payload
+export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
+
+// JWT is a credential, not an authority snapshot. Legacy role remains in the
+// token for compatibility, but protected authorization must use the current
+// database principal hydrated by auth middleware.
 export interface JwtPayload {
   userId: string
   username: string
@@ -11,9 +15,18 @@ export interface JwtPayload {
   mustChangePassword?: boolean
 }
 
-// Request with user
+export interface AuthenticatedPrincipal {
+  userId: string
+  username: string
+  role: UserRole
+  platformRole: PlatformRole
+  tokenVersion: number
+  mustChangePassword: boolean
+}
+
+// Request with current database principal
 export interface AuthenticatedRequest extends Express.Request {
-  user?: JwtPayload
+  user?: AuthenticatedPrincipal
 }
 
 // API Response

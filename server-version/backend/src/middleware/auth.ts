@@ -1,36 +1,23 @@
 import { Request, Response, NextFunction } from 'express'
 import { verifyToken } from '../utils/jwt'
-import { JwtPayload, UserRole } from '../types'
+import { AuthenticatedPrincipal, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
-import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
+import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 
 // Extend Express Request
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload
+      user?: AuthenticatedPrincipal
     }
   }
 }
 
-const ACCOUNT_STATUS_SELECT = {
-  isActive: true,
-  isFrozen: true,
-  expiresAt: true,
-  role: true,
-  teacherApproved: true,
-  tokenVersion: true,
-  mustChangePassword: true,
-} as const
-
-const loadAccountStatus = async (userId: string) => {
-  return measureRequestPhase('auth_account_lookup', () => prisma.user.findUnique({
-    where: { id: userId },
-    select: ACCOUNT_STATUS_SELECT,
-  }))
+const loadPrincipal = async (userId: string) => {
+  return measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId))
 }
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,19 +33,20 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, '无效的认证令牌')
     }
 
-    const user = await loadAccountStatus(payload.userId)
-    const rejection = inactiveAccountMessage(user)
+    const principal = await loadPrincipal(payload.userId)
+    const rejection = inactiveAccountMessage(principal)
     if (rejection) {
       return unauthorized(res, rejection)
     }
 
-    if (payload.tokenVersion !== user!.tokenVersion) {
+    if (payload.tokenVersion !== principal!.tokenVersion) {
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
 
-    // The database role and password-reset state are authoritative so account
-    // changes take effect immediately even before the JWT expires.
-    req.user = { ...payload, role: user!.role, mustChangePassword: user!.mustChangePassword }
+    // JWT proves possession of a session credential. Current database state is
+    // authoritative for every mutable authorization attribute, including the
+    // legacy role and the independent platform role.
+    req.user = toRequestPrincipal(principal!)
 
     const allowedWhileChangingPassword = new Set([
       '/api/auth/me',
@@ -68,7 +56,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       '/api/auth/csrf',
     ])
     if (
-      user!.mustChangePassword &&
+      principal!.mustChangePassword &&
       !allowedWhileChangingPassword.has(req.originalUrl.split('?')[0])
     ) {
       return forbidden(res, '首次登录必须先修改密码')
@@ -79,7 +67,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-// 可选认证中间件 - 有有效且未停用的 token 才挂上 req.user；课堂等公开入口不因冻结账号 401。
+// 可选认证中间件 - 有有效且未停用的 token 才挂上当前数据库 principal；公开入口不因冻结账号 401。
 export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = getSessionToken(req)
@@ -87,9 +75,9 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
       const payload = verifyToken(token)
 
       if (payload) {
-        const user = await loadAccountStatus(payload.userId)
-        if (!inactiveAccountMessage(user) && payload.tokenVersion === user!.tokenVersion) {
-          req.user = { ...payload, role: user!.role, mustChangePassword: user!.mustChangePassword }
+        const principal = await loadPrincipal(payload.userId)
+        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion) {
+          req.user = toRequestPrincipal(principal!)
         }
       }
     }
@@ -100,6 +88,8 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
   }
 }
 
+// Legacy product authorization only. Organization routes must use the
+// OrganizationAccessContext guards and must never use this role helper.
 export const requireRole = (...roles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
@@ -118,7 +108,7 @@ export const requireAdmin = requireRole(UserRole.ADMIN)
 export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
 export const requireStudent = requireRole(UserRole.STUDENT)
 
-/** Allow a user to access only their own record, unless they are an admin. */
+/** Allow a user to access only their own record, unless they are a legacy admin. */
 export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return unauthorized(res)
