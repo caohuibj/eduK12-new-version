@@ -1,7 +1,6 @@
 import type { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { hashRelationalCohortPolicy, projectRelationalCohortForSubject } from './analysis'
-import { createSqlRelationalAnalysisRepository } from './analysis-repository'
 import { relationalFail } from './errors'
 import { createRelationalProductCohortMaterializer } from './product-cohort-materializer'
 import {
@@ -251,22 +250,14 @@ export const createRelationalProductReportService = (
 
     const seed = cohort[0]
     const expectedPolicyHash = hashRelationalCohortPolicy(authoritativeCohortPolicy)
-    const analysisRepository = createSqlRelationalAnalysisRepository(db as any)
-    let snapshot = await analysisRepository.latestCohort({
-      subjectUserId: input.userId,
-      courseId: input.courseId,
-      episodeId,
-      resourceKind: input.product.resourceKind,
-      resourceKey: input.product.resourceKey,
-      resourceVersion: input.product.resourceVersion,
-      applicabilityHash: expectedHash,
+    // Do not pre-reuse by respondentCount. A revoke/replace can keep N stable
+    // while changing the authoritative completed assignment set. The
+    // materializer compares the exact snapshotHash and reuses only when the
+    // frozen inputs are identical.
+    const snapshot = await createRelationalProductCohortMaterializer(db).materialize({
+      assignments: completed,
+      policy: authoritativeCohortPolicy,
     })
-    if (!snapshot || snapshot.policyHash !== expectedPolicyHash || snapshot.respondentCount < respondentCount) {
-      snapshot = await createRelationalProductCohortMaterializer(db).materialize({
-        assignments: completed,
-        policy: authoritativeCohortPolicy,
-      })
-    }
     if (!snapshot) {
       return {
         ...base,
