@@ -64,7 +64,7 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, req
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalRespondentReportGuard, compositeController.report)
-router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), compositeController.analysisExport)
+router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalRespondentReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
 router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
 
