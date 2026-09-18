@@ -16,6 +16,10 @@ const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
     compositeAssessment: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     compositeAssessmentItem: { create: vi.fn(), deleteMany: vi.fn() },
     compositeAssessmentAttempt: { groupBy: vi.fn() },
+    relationalAssessmentAssignment: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn(),
+    },
     cognitiveTestConfig: { findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
     $transaction: vi.fn(),
