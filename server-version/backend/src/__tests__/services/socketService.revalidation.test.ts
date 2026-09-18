@@ -3,7 +3,7 @@ import { UserRole } from '../../types'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
-    user: { findUnique: vi.fn() },
+    $queryRaw: vi.fn(),
   },
 }))
 
@@ -16,6 +16,20 @@ const makeRemoteSocket = (data: Record<string, unknown>) => ({
   disconnect: vi.fn(),
 })
 
+const principalRow = (overrides: Record<string, unknown> = {}) => [{
+  id: 'teacher-1',
+  username: 'teacher-1',
+  role: UserRole.TEACHER,
+  platformRole: 'STANDARD',
+  isActive: true,
+  isFrozen: false,
+  expiresAt: null,
+  teacherApproved: true,
+  tokenVersion: 0,
+  mustChangePassword: false,
+  ...overrides,
+}]
+
 describe('SocketService manager room revalidation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -26,6 +40,7 @@ describe('SocketService manager room revalidation', () => {
       authenticated: true,
       userId: 'teacher-1',
       userRole: UserRole.TEACHER,
+      platformRole: 'STANDARD',
       tokenVersion: 0,
     })
     const service = new SocketService()
@@ -33,15 +48,7 @@ describe('SocketService manager room revalidation', () => {
     ;(service as any).classroomNamespace = {
       in: vi.fn().mockReturnValue({ fetchSockets }),
     }
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: 'teacher-1',
-      role: UserRole.TEACHER,
-      isActive: false,
-      isFrozen: false,
-      expiresAt: null,
-      teacherApproved: true,
-      tokenVersion: 0,
-    })
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow({ isActive: false }))
 
     await expect(
       service.revalidateManagerSockets('classroom:classroom-1:teacher')
@@ -50,11 +57,12 @@ describe('SocketService manager room revalidation', () => {
     expect(remoteSocket.disconnect).toHaveBeenCalledWith(true)
   })
 
-  it('disconnects a socket whose role was downgraded', async () => {
+  it('disconnects a socket whose legacy classroom role was downgraded', async () => {
     const remoteSocket = makeRemoteSocket({
       authenticated: true,
       userId: 'teacher-1',
       userRole: UserRole.TEACHER,
+      platformRole: 'STANDARD',
       tokenVersion: 0,
     })
     const service = new SocketService()
@@ -63,19 +71,33 @@ describe('SocketService manager room revalidation', () => {
         fetchSockets: vi.fn().mockResolvedValue([remoteSocket]),
       }),
     }
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: 'teacher-1',
-      role: UserRole.STUDENT,
-      isActive: true,
-      isFrozen: false,
-      expiresAt: null,
-      teacherApproved: true,
-      tokenVersion: 0,
-    })
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow({ role: UserRole.STUDENT }))
 
     await service.revalidateManagerSockets('classroom:classroom-1:teacher')
 
     expect(remoteSocket.disconnect).toHaveBeenCalledWith(true)
+  })
+
+  it('refreshes a platform demotion on the next protected socket revalidation', async () => {
+    const remoteSocket = makeRemoteSocket({
+      authenticated: true,
+      userId: 'teacher-1',
+      userRole: UserRole.TEACHER,
+      platformRole: 'SYSTEM_ADMIN',
+      tokenVersion: 0,
+    })
+    const service = new SocketService()
+    ;(service as any).classroomNamespace = {
+      in: vi.fn().mockReturnValue({
+        fetchSockets: vi.fn().mockResolvedValue([remoteSocket]),
+      }),
+    }
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow({ platformRole: 'STANDARD' }))
+
+    await service.revalidateManagerSockets('classroom:classroom-1:teacher')
+
+    expect(remoteSocket.data.platformRole).toBe('STANDARD')
+    expect(remoteSocket.disconnect).not.toHaveBeenCalled()
   })
 
   it('disconnects a socket whose token version was revoked', async () => {
@@ -83,6 +105,7 @@ describe('SocketService manager room revalidation', () => {
       authenticated: true,
       userId: 'teacher-1',
       userRole: UserRole.TEACHER,
+      platformRole: 'STANDARD',
       tokenVersion: 0,
     })
     const service = new SocketService()
@@ -91,15 +114,7 @@ describe('SocketService manager room revalidation', () => {
         fetchSockets: vi.fn().mockResolvedValue([remoteSocket]),
       }),
     }
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: 'teacher-1',
-      role: UserRole.TEACHER,
-      isActive: true,
-      isFrozen: false,
-      expiresAt: null,
-      teacherApproved: true,
-      tokenVersion: 1,
-    })
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow({ tokenVersion: 1 }))
 
     await service.revalidateManagerSockets('classroom:classroom-1:teacher')
 
@@ -111,6 +126,7 @@ describe('SocketService manager room revalidation', () => {
       authenticated: true,
       userId: 'teacher-1',
       userRole: UserRole.TEACHER,
+      platformRole: 'STANDARD',
       tokenVersion: 0,
     })
     const service = new SocketService()
@@ -119,16 +135,7 @@ describe('SocketService manager room revalidation', () => {
         fetchSockets: vi.fn().mockResolvedValue([remoteSocket]),
       }),
     }
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: 'teacher-1',
-      role: UserRole.TEACHER,
-      isActive: true,
-      isFrozen: false,
-      expiresAt: null,
-      teacherApproved: true,
-      tokenVersion: 0,
-      mustChangePassword: true,
-    })
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow({ mustChangePassword: true }))
 
     await service.revalidateManagerSockets('classroom:classroom-1:teacher')
 
