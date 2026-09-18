@@ -107,6 +107,7 @@ RA-02 regressions cover:
 - shared cohort episode and idempotent Student issuance;
 - minimum-N suppression, canonical UNIT-backed cohort materialization and subject-safe cohort projection;
 - generic Composite participant/teacher report, analysis-export, snapshot, attempt-count and wide-export bypass prevention for relational privacy;
+- UNIT child result authority: Student→Teacher completed Scale/Cognitive/Situational reads and FINAL responses expose terminal completion only, never individual scores/metrics; observer PARENT/TEACHER identities retain their allowed individual projection. This decision uses only the frozen Composite attempt identity and performs no relationship/roster lookup on FINAL.
 - START and FINAL consent authority;
 - relational Composite/Cognitive/Situational route return context;
 - Parent/Student/Teacher route guards and AppShell navigation.
