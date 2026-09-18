@@ -10,6 +10,7 @@ import { createRelationalProductReportService } from '../../modules/assessment-r
 import { createRelationalProductService } from '../../modules/assessment-relational/product.service'
 import type { RelationalCohortAnalysisPolicyV1 } from '../../modules/assessment-relational/analysis'
 import type { RelationalApplicabilityV1 } from '../../modules/assessment-relational/types'
+import { compositeExportService } from '../../modules/composite/composite-export.service'
 import {
   getAnalysisExportForTeacher,
   getReportForTeacher,
@@ -349,6 +350,12 @@ describe.skipIf(!enabled)('RA-02 Student-to-Teacher cohort persistence', () => {
       completed: 0,
       abandoned: 0,
     })
+    const wideExport = await compositeExportService.getExportData(COMPOSITE_ID, {
+      detail: 'summary',
+      anonymize: true,
+      actor: { userId: teacher.id, role: 'TEACHER' },
+    })
+    expect(wideExport.rows).toHaveLength(0)
     await expect(getReportForTeacher(
       teacher.id,
       'TEACHER',
