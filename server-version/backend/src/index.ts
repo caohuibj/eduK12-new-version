@@ -49,6 +49,7 @@ import materialGrantRoutes from './routes/materialGrants'
 import instrumentAuthorizationRoutes from './routes/instrumentAuthorizations'
 import assetRoutes, { publicAssetRouter } from './routes/assets'
 import relationalProductRoutes from './modules/assessment-relational/product.routes'
+import organizationRoutes from './modules/organization/organization.routes'
 
 const app = express()
 
@@ -201,6 +202,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/organizations', organizationRoutes)
 app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)
 app.use('/api/admin/instrument-authorizations', authenticate, requireAdmin, instrumentAuthorizationRoutes)
 app.use('/api/courses', courseRoutes)
