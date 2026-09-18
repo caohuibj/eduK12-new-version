@@ -122,7 +122,6 @@ const persistCanonicalRuntimeResult = async (input: {
   assignment: {
     assignmentId: string
     subjectUserId: string
-    respondentUserId: string
     episodeId: string
   }
   studentId: string
@@ -143,7 +142,7 @@ const persistCanonicalRuntimeResult = async (input: {
       completedItems: 1,
       completedAt,
       subjectUserId: input.assignment.subjectUserId,
-      respondentUserId: input.assignment.respondentUserId,
+      respondentUserId: input.studentId,
       episodeId: input.assignment.episodeId,
       assignmentRef: input.assignment.assignmentId,
       consentId: null,
