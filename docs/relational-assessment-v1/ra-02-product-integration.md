@@ -106,7 +106,7 @@ RA-02 regressions cover:
 - Student→Teacher teacher derivation from the course creator;
 - shared cohort episode and idempotent Student issuance;
 - minimum-N suppression, canonical UNIT-backed cohort materialization and subject-safe cohort projection;
-- generic Composite participant/teacher report, analysis-export, snapshot and attempt-count bypass prevention for relational privacy;
+- generic Composite participant/teacher report, analysis-export, snapshot, attempt-count and wide-export bypass prevention for relational privacy;
 - START and FINAL consent authority;
 - relational Composite/Cognitive/Situational route return context;
 - Parent/Student/Teacher route guards and AppShell navigation.
