@@ -5,6 +5,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
 import { RelationalAssessmentError } from '../../modules/assessment-relational/errors'
+import { projectRelationalUnitFinalResponse, resolveRelationalCompositeResultDisposition } from '../../modules/assessment-relational/result-authority'
 import { createRelationalProductRegistry } from '../../modules/assessment-relational/product-registry'
 import { createRelationalProductReportService } from '../../modules/assessment-relational/product-report.service'
 import { createRelationalProductService } from '../../modules/assessment-relational/product.service'
@@ -299,6 +300,22 @@ describe.skipIf(!enabled)('RA-02 Student-to-Teacher cohort persistence', () => {
     expect(await prisma.relationalAnalysisSnapshot.count({
       where: { subjectUserId: teacher.id },
     })).toBe(0)
+
+    expect(await resolveRelationalCompositeResultDisposition(runtimeAttempts[0].id)).toBe('COHORT_ONLY')
+    const terminalAck = await projectRelationalUnitFinalResponse(runtimeAttempts[0].id, {
+      submissionId: 'cohort-final-1',
+      payloadHash: 'cohort-payload-1',
+      replayed: false,
+      result: { total: 999 },
+      canonicalResult: { metrics: [{ key: 'total', value: 999 }] },
+    })
+    expect(terminalAck).toEqual({
+      submissionId: 'cohort-final-1',
+      payloadHash: 'cohort-payload-1',
+      replayed: false,
+      completed: true,
+    })
+    expect(JSON.stringify(terminalAck)).not.toContain('999')
 
     const ready = await reports.teacherCohortReport({
       userId: teacher.id,
