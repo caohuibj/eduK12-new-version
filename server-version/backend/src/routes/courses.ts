@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { courseController } from '../controllers/courseController'
+import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import multer from 'multer'
 import { validateUploadedFile } from '../utils/fileValidator'
@@ -75,6 +76,8 @@ router.get('/:id/students', authenticate, requireTeacher, courseController.getSt
 router.post('/batch-students', authenticate, requireTeacher, courseController.getBatchStudents)
 router.post('/:courseId/students/:studentId/reset-password', authenticate, requireTeacher, courseController.resetStudentPassword)
 router.delete('/:courseId/students/:studentId', authenticate, requireTeacher, courseController.removeStudent)
-router.put('/:courseId/students/:studentId/freeze', authenticate, requireTeacher, courseController.toggleFreezeStudent)
+// Freezing makes an account unusable, so route it through the Organization
+// usable-admin invariant instead of the legacy direct user update.
+router.put('/:courseId/students/:studentId/freeze', authenticate, requireTeacher, courseStudentLifecycleController.setFrozen)
 
 export default router

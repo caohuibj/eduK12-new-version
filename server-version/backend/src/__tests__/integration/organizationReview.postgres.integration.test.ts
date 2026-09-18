@@ -13,6 +13,7 @@ import {
   setMembershipRole,
 } from '../../modules/organization/service'
 import { setUserActiveState } from '../../services/userLifecycleService'
+import { setCourseStudentFrozenState } from '../../services/courseStudentLifecycleService'
 
 const DB_URL = integrationDatabaseUrl(
   'RELEASE_INTEGRATION_DATABASE_URL',
@@ -144,6 +145,52 @@ suite('Organization PR1 review regressions (real PostgreSQL)', () => {
       where: { id: primary.id },
       select: { isActive: true },
     })).resolves.toEqual({ isActive: true })
+  })
+
+  it('routes legacy course freezing through the same usable-admin invariant', async () => {
+    const teacher = await createUser('freeze-teacher', { role: UserRole.TEACHER })
+    const primary = await createUser('freeze-primary', { role: UserRole.STUDENT })
+    const backup = await createUser('freeze-backup', { role: UserRole.TEACHER })
+    const created = await createOrganization({
+      name: `freeze invariant ${runSuffix}`,
+      meta: { actorUserId: primary.id, commandKey: commandKey('freeze-create-org') },
+    })
+    await createMembership({
+      organizationId: created.organization.id,
+      userId: backup.id,
+      orgRole: 'ORG_ADMIN',
+      meta: { actorUserId: primary.id, commandKey: commandKey('freeze-backup') },
+    })
+    await db.user.update({ where: { id: backup.id }, data: { isActive: false } })
+
+    const course = await db.course.create({
+      data: {
+        title: `freeze review ${runSuffix}`,
+        courseCode: `${Math.floor(100000 + Math.random() * 900000)}`,
+        creatorId: teacher.id,
+      },
+      select: { id: true },
+    })
+    await db.courseStudent.create({
+      data: {
+        courseId: course.id,
+        studentId: primary.id,
+        status: 'ACTIVE',
+      },
+    })
+
+    await expect(setCourseStudentFrozenState({
+      actorUserId: teacher.id,
+      actorRole: UserRole.TEACHER,
+      courseId: course.id,
+      studentId: primary.id,
+      isFrozen: true,
+    })).rejects.toMatchObject({ code: 'LAST_ORG_ADMIN', statusCode: 409 })
+
+    await expect(db.user.findUnique({
+      where: { id: primary.id },
+      select: { isFrozen: true },
+    })).resolves.toEqual({ isFrozen: false })
   })
 
   it('prevents ORG_ADMIN from denying SYSTEM_ADMIN and permits SYSTEM_ADMIN recovery', async () => {
