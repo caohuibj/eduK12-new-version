@@ -54,7 +54,7 @@ const CognitiveRunner: React.FC = () => {
     () => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
     [isPublic, recoveryToken]
   )
-  const controller = useCognitiveSession(sessionId ?? '', sessionApi)
+  const controller = useCognitiveSession(sessionId ?? '', sessionApi, { aggregateOnly: relationalMode })
   const { state } = controller
   const administrationProvenance = useAdministrationProvenance(state.session, state.status)
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
