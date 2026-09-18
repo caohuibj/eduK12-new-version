@@ -6,6 +6,9 @@ import { isValidPassword } from '../../src/utils/password'
 export async function seedAdmin(prisma: PrismaClient): Promise<string> {
   const existingAdmin = await prisma.user.findFirst({ where: { role: UserRole.ADMIN } })
   if (existingAdmin) {
+    // ADMIN -> SYSTEM_ADMIN is a one-time migration compatibility backfill.
+    // Never repeat that inference here: an explicit later platform demotion
+    // must survive every subsequent seed run.
     console.log('管理员账号已存在，跳过创建')
     return existingAdmin.id
   }
@@ -27,6 +30,15 @@ export async function seedAdmin(prisma: PrismaClient): Promise<string> {
       nickname: '系统管理员',
     },
   })
+
+  // Fresh installations do not pass through the historical ADMIN backfill, so
+  // bootstrap the initial account explicitly. The column/type are introduced
+  // by the C01 migration before production seeding runs.
+  await prisma.$executeRaw`
+    UPDATE "users"
+    SET "platform_role" = 'SYSTEM_ADMIN'::"PlatformRole"
+    WHERE "id" = ${admin.id}
+  `
 
   console.log('默认管理员账号创建成功:')
   console.log(`  用户名: ${admin.username}`)
