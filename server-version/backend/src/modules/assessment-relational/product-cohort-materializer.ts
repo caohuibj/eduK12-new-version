@@ -2,6 +2,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
 import {
   createRelationalCohortAnalysisService,
+  hashRelationalCohortPolicy,
   validateRelationalCohortPolicy,
   type RelationalCohortAnalysisPolicyV1,
   type RelationalCohortAnalysisSnapshotV1,
@@ -116,6 +117,7 @@ export const createRelationalProductCohortMaterializer = (db: any) => ({
       return relationalFail('RELATIONAL_COHORT_ASSIGNMENT', 'cohort materialization requires completed assignments')
     }
     const policy = validateRelationalCohortPolicy(input.policy)
+    const policyHash = hashRelationalCohortPolicy(policy)
     const first = input.assignments[0]
     const courseId = first.relationshipSnapshot.courseId
       || relationalFail('RELATIONAL_COHORT_SCOPE', 'cohort assignment is missing frozen courseId')
@@ -136,7 +138,11 @@ export const createRelationalProductCohortMaterializer = (db: any) => ({
         applicabilityHash: first.applicabilityHash,
       }
       const existing = await analysisRepository.latestCohort(scope)
-      if (existing && existing.respondentCount >= input.assignments.length) return existing
+      if (
+        existing
+        && existing.policyHash === policyHash
+        && existing.respondentCount >= input.assignments.length
+      ) return existing
 
       const assignments = createSqlRelationalAssignmentRepository(tx as any)
       const analysis = createRelationalCohortAnalysisService({
