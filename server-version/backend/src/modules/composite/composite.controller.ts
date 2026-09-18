@@ -584,7 +584,11 @@ export const compositeController = {
       const query = compositeExportQuerySchema.parse(req.query)
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const { compositeExportService } = await import('./composite-export.service')
-      const data = await compositeExportService.getExportData(req.params.id, { detail: query.detail, anonymize: true })
+      const data = await compositeExportService.getExportData(req.params.id, {
+        detail: query.detail,
+        anonymize: true,
+        actor: { userId: req.user.userId, role: req.user.role },
+      })
       return success(res, { assessmentId: data.assessmentId, assessmentName: data.assessmentName, detail: data.detail, recordCount: data.rows.length, fieldCount: data.fields.length, fields: data.fields })
     } catch (err) { return handleError(res, err) }
   },
@@ -596,8 +600,14 @@ export const compositeController = {
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
       const { compositeExportService } = await import('./composite-export.service')
-      const data = await compositeExportService.getExportData(req.params.id, { detail: input.detail, anonymize, dateRange: input.dateRange })
-      const files = await compositeExportService.saveExportFiles(req.params.id, { detail: input.detail, anonymize, dateRange: input.dateRange }, input.format, data)
+      const exportOptions = {
+        detail: input.detail,
+        anonymize,
+        dateRange: input.dateRange,
+        actor: { userId: req.user.userId, role: req.user.role },
+      }
+      const data = await compositeExportService.getExportData(req.params.id, exportOptions)
+      const files = await compositeExportService.saveExportFiles(req.params.id, exportOptions, input.format, data)
       return success(res, { assessmentId: data.assessmentId, detail: input.detail, format: input.format, anonymize, recordCount: data.rows.length, fieldCount: data.fields.length, fileName: path.basename(files.filePath) }, '导出成功')
     } catch (err) { return handleError(res, err) }
   },
