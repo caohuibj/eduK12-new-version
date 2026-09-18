@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { createHash, randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
+import { assertAlternativeUsableOrgAdmin } from './adminInvariant'
 import {
   MembershipRecord,
   OrganizationCapability,
@@ -193,16 +194,39 @@ async function lockCurrentMembership(
   return rows[0]
 }
 
-async function assertCanRemoveAdmin(tx: Tx, organizationId: string): Promise<void> {
-  const rows = await tx.$queryRaw<Array<{ count: number }>>`
-    SELECT COUNT(*)::int AS "count"
-    FROM "organization_memberships"
-    WHERE "organization_id" = ${organizationId}
-      AND "org_role" = 'ORG_ADMIN'
-      AND "valid_until" IS NULL
+type DenyAuthorityRow = {
+  actorPlatformRole: 'SYSTEM_ADMIN' | 'STANDARD'
+  targetPlatformRole: 'SYSTEM_ADMIN' | 'STANDARD'
+}
+
+async function assertDenyTargetAuthority(
+  tx: Tx,
+  actorUserId: string,
+  targetUserId: string,
+): Promise<void> {
+  const rows = await tx.$queryRaw<DenyAuthorityRow[]>`
+    SELECT
+      actor."platform_role"::text AS "actorPlatformRole",
+      target."platform_role"::text AS "targetPlatformRole"
+    FROM "users" actor
+    CROSS JOIN "users" target
+    WHERE actor."id" = ${actorUserId}
+      AND target."id" = ${targetUserId}
+    LIMIT 1
   `
-  if ((rows[0]?.count ?? 0) <= 1) {
-    throw new OrganizationDomainError('LAST_ORG_ADMIN', '组织必须至少保留一个有效的组织管理员', 409)
+  const authority = rows[0]
+  if (!authority) {
+    throw new OrganizationDomainError('USER_NOT_FOUND', '用户不存在', 404)
+  }
+  if (
+    authority.targetPlatformRole === 'SYSTEM_ADMIN' &&
+    authority.actorPlatformRole !== 'SYSTEM_ADMIN'
+  ) {
+    throw new OrganizationDomainError(
+      'PLATFORM_DENY_REQUIRES_SYSTEM_ADMIN',
+      '只有系统管理员可以创建或解除针对系统管理员的拒绝规则',
+      403,
+    )
   }
 }
 
@@ -368,7 +392,9 @@ export async function endMembership(input: {
     work: async (tx, domainEventId) => {
       await lockOrganization(tx, input.organizationId)
       const membership = await lockCurrentMembership(tx, input.organizationId, input.membershipId)
-      if (membership.orgRole === 'ORG_ADMIN') await assertCanRemoveAdmin(tx, input.organizationId)
+      if (membership.orgRole === 'ORG_ADMIN') {
+        await assertAlternativeUsableOrgAdmin(tx, input.organizationId, membership.userId)
+      }
       const rows = await tx.$queryRaw<MembershipRecord[]>`
         UPDATE "organization_memberships"
         SET "valid_until" = transaction_timestamp(), "ended_by_user_id" = ${input.meta.actorUserId}, "end_reason" = ${input.reason ?? null}
@@ -404,9 +430,20 @@ export async function setMembershipRole(input: {
     work: async (tx, domainEventId) => {
       await lockOrganization(tx, input.organizationId)
       const membership = await lockCurrentMembership(tx, input.organizationId, input.membershipId)
-      if (membership.orgRole === input.orgRole) return membership
+      if (membership.orgRole === input.orgRole) {
+        await appendAudit(tx, {
+          organizationId: input.organizationId,
+          actorUserId: input.meta.actorUserId,
+          action: 'MEMBERSHIP_ROLE_UNCHANGED',
+          targetType: 'MEMBERSHIP',
+          targetId: input.membershipId,
+          domainEventId,
+          payload: { role: membership.orgRole },
+        })
+        return membership
+      }
       if (membership.orgRole === 'ORG_ADMIN' && input.orgRole !== 'ORG_ADMIN') {
-        await assertCanRemoveAdmin(tx, input.organizationId)
+        await assertAlternativeUsableOrgAdmin(tx, input.organizationId, membership.userId)
       }
       const rows = await tx.$queryRaw<MembershipRecord[]>`
         UPDATE "organization_memberships"
@@ -557,6 +594,7 @@ export async function denyOrganizationAccess(input: {
     payload: { userId: input.userId, permission: input.permission, reason: input.reason },
     work: async (tx, domainEventId) => {
       await lockOrganization(tx, input.organizationId)
+      await assertDenyTargetAuthority(tx, input.meta.actorUserId, input.userId)
       await tx.$executeRaw`
         INSERT INTO "organization_access_denies" (
           "id", "organization_id", "user_id", "permission", "reason", "denied_by_user_id"
@@ -590,6 +628,7 @@ export async function liftOrganizationAccessDeny(input: {
     payload: { userId: input.userId, permission: input.permission, lift: true },
     work: async (tx, domainEventId) => {
       await lockOrganization(tx, input.organizationId)
+      await assertDenyTargetAuthority(tx, input.meta.actorUserId, input.userId)
       const count = await tx.$executeRaw`
         UPDATE "organization_access_denies"
         SET "lifted_at" = transaction_timestamp(), "lifted_by_user_id" = ${input.meta.actorUserId}

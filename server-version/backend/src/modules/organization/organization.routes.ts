@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth'
-import { requireOrganizationGovernance } from './access'
+import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
 import { organizationController } from './organization.controller'
 
 const router = Router()
@@ -20,7 +20,10 @@ router.post('/:organizationId/memberships/:membershipId/personas', authenticate,
 router.post('/:organizationId/memberships/:membershipId/personas/revoke', authenticate, requireOrganizationGovernance, organizationController.revokePersona)
 router.post('/:organizationId/memberships/:membershipId/capabilities', authenticate, requireOrganizationGovernance, organizationController.grantCapability)
 router.post('/:organizationId/memberships/:membershipId/capabilities/revoke', authenticate, requireOrganizationGovernance, organizationController.revokeCapability)
-router.post('/:organizationId/access-denies', authenticate, requireOrganizationGovernance, organizationController.deny)
-router.post('/:organizationId/access-denies/lift', authenticate, requireOrganizationGovernance, organizationController.liftDeny)
+// Explicit deny outranks ordinary SYSTEM_ADMIN access, so deny management has a
+// narrow platform break-glass guard. All other governance routes remain under
+// requireOrganizationGovernance and continue to honor explicit deny first.
+router.post('/:organizationId/access-denies', authenticate, requireOrganizationDenyGovernance, organizationController.deny)
+router.post('/:organizationId/access-denies/lift', authenticate, requireOrganizationDenyGovernance, organizationController.liftDeny)
 
 export default router

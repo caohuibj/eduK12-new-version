@@ -91,12 +91,15 @@ suite('Organization PR1 hard gates (real PostgreSQL)', () => {
     await db.$executeRaw`
       UPDATE "users" SET "platform_role" = 'SYSTEM_ADMIN'::"PlatformRole" WHERE "id" = ${systemAdmin.id}
     `
+    // A platform operator creates the deny. Ordinary Organization governance
+    // must still honor it; the separate deny-management surface is the narrow
+    // break-glass recovery path.
     await denyOrganizationAccess({
       organizationId: created.organization.id,
       userId: systemAdmin.id,
       permission: 'ORGANIZATION_GOVERNANCE',
       reason: 'test explicit deny precedence',
-      meta: { actorUserId: creator.id, commandKey: commandKey('deny-command') },
+      meta: { actorUserId: systemAdmin.id, commandKey: commandKey('deny-command') },
     })
 
     const principal = await loadCurrentPrincipal(systemAdmin.id)

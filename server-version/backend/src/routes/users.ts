@@ -12,8 +12,10 @@ router.post('/change-password', authenticate, userController.changePassword)
 router.get('/:id', authenticate, requireSelfOrAdmin, userController.detail)
 router.put('/:id', authenticate, userController.update)
 // Historical identity is retention-critical; DELETE now means account
-// deactivation + token invalidation, never physical row deletion.
-router.delete('/:id', authenticate, requireAdmin, userLifecycleController.deactivate)
+// deactivation + token invalidation, never physical row deletion. Current DB
+// PlatformRole authority is enforced inside userLifecycleService, so a legacy
+// ADMIN that has been platform-demoted cannot use this endpoint.
+router.delete('/:id', authenticate, userLifecycleController.deactivate)
 router.post('/:id/reset-password', authenticate, requireAdmin, userController.resetPassword)
 router.post('/:id/approve-teacher', authenticate, requireAdmin, userController.approveTeacher)
 

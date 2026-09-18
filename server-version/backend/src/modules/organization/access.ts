@@ -137,6 +137,35 @@ export const requireOrganizationGovernance = async (req: Request, res: Response,
   }
 }
 
+/**
+ * Break-glass surface for explicit-deny management only.
+ *
+ * Explicit deny continues to outrank SYSTEM_ADMIN for every ordinary
+ * Organization operation. Deny management itself is the recovery surface:
+ * a current SYSTEM_ADMIN may enter even when its OrganizationAccessContext is
+ * denied, while STANDARD users still require normal Organization governance.
+ */
+export const requireOrganizationDenyGovernance = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    const organizationId = req.params.organizationId
+    if (!organizationId) return notFound(res, '组织不存在')
+    const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+    if (!context) return notFound(res, '组织不存在')
+    if (req.user.platformRole !== 'SYSTEM_ADMIN' && !context.canGovern) {
+      return forbidden(res, '无组织拒绝规则治理权限')
+    }
+    req.organizationAccess = context
+    next()
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const requireOrganizationCapability = (capability: OrganizationCapability) => (
   async (req: Request, res: Response, next: NextFunction) => {
     try {
