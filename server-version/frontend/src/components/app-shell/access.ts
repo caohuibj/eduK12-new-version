@@ -3,8 +3,8 @@ import type { User } from '../../types'
 
 export type Role = User['role']
 export type ShellMode = 'standard' | 'focused' | 'public' | 'display'
-export const homeFor = (role?: Role) => role === 'STUDENT' ? '/student' : role ? '/dashboard' : '/'
-export const loginFor = (role?: Role) => role === 'ADMIN' ? '/admin/login' : role === 'TEACHER' ? '/teacher/account-login' : '/student/login'
+export const homeFor = (role?: Role) => role === 'STUDENT' ? '/student' : role === 'PARENT' ? '/parent' : role ? '/dashboard' : '/'
+export const loginFor = (role?: Role) => role === 'ADMIN' ? '/admin/login' : role === 'TEACHER' ? '/teacher/account-login' : role === 'PARENT' ? '/parent/login' : '/student/login'
 export const isPublicAssessmentPath = (pathname: string) => pathname.startsWith('/public/')
 
 // Presentation metadata only; route guards and API authorization remain authoritative.
@@ -15,8 +15,10 @@ const focusedPaths = [
   '/public/composite/situational/:attemptId', '/student/composite/:assessmentId',
   '/student/composite/attempts/:attemptId', '/public/composite/:token',
   '/public/composite/attempts/:attemptId', '/public/questionnaire/:token/assessment',
+  '/relational/attempts/:attemptId', '/relational/cognitive/sessions/:sessionId',
+  '/relational/composite/situational/:attemptId',
 ]
-export const isAuthPath = (pathname: string) => /^\/(admin\/login|teacher\/(login|account-login|register)|student\/(login|course-login|register))$/.test(pathname)
+export const isAuthPath = (pathname: string) => /^\/(admin\/login|teacher\/(login|account-login|register)|student\/(login|course-login|register)|parent\/login)$/.test(pathname)
 export function shellModeFor(pathname: string): ShellMode {
   if (pathname.startsWith('/bigscreen/')) return 'display'
   if (pathname !== '/student/situational/history' && focusedPaths.some((path) => matchPath(path, pathname))) return 'focused'
@@ -42,8 +44,10 @@ export function returnAfterLogin(value: string | null | undefined, role: Role): 
   if (!target) return homeFor(role)
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
   if (isAuthPath(pathname)) return homeFor(role)
-  const allowed = inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student')
-    : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root))))
+  const allowed = role === 'PARENT'
+    ? inRoot(pathname, 'parent') || inRoot(pathname, 'relational')
+    : inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student') || inRoot(pathname, 'relational')
+      : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root))))
   return allowed ? target : homeFor(role)
 }
 export function loginUrl(role: Role | undefined, destination: string) {
@@ -56,7 +60,7 @@ export type ReauthReturn = { userId: number | string; target: string; role: Role
 export function readReauthReturn(): ReauthReturn | null {
   try {
     const value = JSON.parse(sessionStorage.getItem(resumeKey) || 'null')
-    return value && ['number', 'string'].includes(typeof value.userId) && ['STUDENT', 'TEACHER', 'ADMIN'].includes(value.role) && internalReturnTo(value.target) ? value : null
+    return value && ['number', 'string'].includes(typeof value.userId) && ['STUDENT', 'TEACHER', 'ADMIN', 'PARENT'].includes(value.role) && internalReturnTo(value.target) ? value : null
   } catch { return null }
 }
 export function rememberReauthReturn(user: Pick<User, 'id' | 'role'>, target: string) {
@@ -69,7 +73,10 @@ export function parentReturnTo(value: string | null, isPublic: boolean, fallback
   const target = internalReturnTo(value)
   if (!target) return fallback
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
-  return pathname.startsWith(isPublic ? '/public/composite/' : '/student/composite/') ? target : fallback
+  const allowed = isPublic
+    ? pathname.startsWith('/public/composite/')
+    : pathname.startsWith('/student/composite/') || pathname.startsWith('/relational/attempts/')
+  return allowed ? target : fallback
 }
 
 export function sameReturnPage(left: string | undefined, right: string): boolean {

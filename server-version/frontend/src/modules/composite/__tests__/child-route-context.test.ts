@@ -40,6 +40,37 @@ describe('Composite child route context', () => {
     })
   })
 
+  it('builds relational child targets without creating a second runtime', () => {
+    const cognitive = resolveCompositeChildRouteContext({
+      publicMode: false,
+      relationalMode: true,
+      parentAttemptId: 'rel-parent',
+      item: cognitiveItem,
+    })
+    expect(cognitive).toMatchObject({
+      ok: true,
+      context: {
+        parentReturnTo: '/relational/attempts/rel-parent',
+        target: '/relational/cognitive/sessions/cognitive-session-1?returnTo=%2Frelational%2Fattempts%2Frel-parent',
+      },
+    })
+
+    const situational = resolveCompositeChildRouteContext({
+      publicMode: false,
+      relationalMode: true,
+      parentAttemptId: 'rel-parent',
+      item: situationalItem,
+    })
+    expect(situational).toMatchObject({
+      ok: true,
+      context: {
+        parentReturnTo: '/relational/attempts/rel-parent',
+        childAttemptId: 'situational-attempt-1',
+      },
+    })
+    if (situational.ok) expect(situational.context.target).toContain('/relational/composite/situational/situational-attempt-1?')
+  })
+
   it('keeps public Cognitive return context and existing session identity', () => {
     const result = resolveCompositeChildRouteContext({
       publicMode: true,

@@ -15,6 +15,8 @@ import {
 import { submitSituationalAttemptFinal } from '../modules/situational/situational-final-submit.service'
 import { situationalFinalSubmitSchema, situationalStartSchema } from '../modules/situational/situational-final-submit.schema'
 import { serveFrozenSituationalAsset } from '../modules/situational/situational-asset.service'
+import { projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
+import { prisma } from '../config/database'
 
 const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): string => (
   errorValue.errors?.[0]?.message ?? '请求参数不合法'
@@ -115,7 +117,12 @@ export const situationalController = {
         userId: req.user!.userId,
         ...parsed.data,
       }))
-      return success(res, data, data.replayed ? '情境化测评提交已确认' : '情境化测评提交成功')
+      const binding = await prisma.situationalAttempt.findUnique({
+        where: { id: req.params.attemptId },
+        select: { compositeAttemptId: true },
+      })
+      const responseData = await projectRelationalUnitFinalResponse(binding?.compositeAttemptId, data)
+      return success(res, responseData, data.replayed ? '情境化测评提交已确认' : '情境化测评提交成功')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '最终提交情境化测评失败')
     }

@@ -119,6 +119,7 @@ const compositeParentHeaderSelect = {
   frozenActiveSlotSetHash: true,
   compiledBundleRuntimeHash: true,
   completedItems: true,
+  assignmentRef: true,
 } as const
 
 const compositeParentGraphSelect = {
@@ -232,6 +233,7 @@ export type UnifiedParentHeader = {
   aggregateInputHash: string | null
   compiledBundleRuntimeHash?: string | null
   completedItems?: number | null
+  assignmentRef?: string | null
   completedScales?: number | null
   completedForms?: number | null
   contextSnapshotEncrypted: string | null
@@ -975,6 +977,20 @@ const persistCompositeCompletion = async (input: {
         },
       })
       if (updated.count !== 1) throw new AggregateCasLost()
+
+      if (input.parent.assignmentRef) {
+        const relationalUpdated = await tx.relationalAssessmentAssignment.updateMany({
+          where: { id: input.parent.assignmentRef, status: 'STARTED' },
+          data: { status: 'COMPLETED', completedAt, updatedAt: completedAt },
+        })
+        if (relationalUpdated.count !== 1) {
+          throw new InstrumentFinalSubmitError(
+            'STALE_ATTEMPT',
+            '关系测评 assignment 状态与 Composite FINAL 不一致',
+            409,
+          )
+        }
+      }
 
       if (input.packageAnalysis && input.payloadEncrypted) {
         const analysis = input.packageAnalysis.analysis

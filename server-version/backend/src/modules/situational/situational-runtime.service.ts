@@ -37,6 +37,7 @@ import {
   retainAssessmentAssetReferences,
 } from '../assessment-media/assessment-asset'
 import { assertSituationalAssetReferencesReady } from './situational-asset.service'
+import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
@@ -247,10 +248,10 @@ const decodeStoredResult = (row: Pick<SituationalAttemptRow, 'resultEncrypted' |
 export const situationalAttemptForResponse = (
   row: SituationalAttemptRow,
   snapshot: FrozenSituationalRuntimeSnapshotV1,
-  options: { replayed?: boolean } = {},
+  options: { replayed?: boolean; suppressResult?: boolean } = {},
 ) => {
-  const stored = row.status === 'COMPLETED' ? decodeStoredResult(row) : null
-  if (row.status === 'COMPLETED' && !stored) {
+  const stored = row.status === 'COMPLETED' && !options.suppressResult ? decodeStoredResult(row) : null
+  if (row.status === 'COMPLETED' && !options.suppressResult && !stored) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
   }
   return {
@@ -530,14 +531,16 @@ export const createEmbeddedSituationalAttempt = async (
 
 export const resumeSituationalAttempt = async (attemptId: string, userId: string) => {
   const runtime = await loadSituationalAttemptRuntime(attemptId, userId)
-  return situationalAttemptForResponse(runtime.row, runtime.snapshot)
+  const suppressResult = runtime.row.status === 'COMPLETED'
+    && await isRelationalCohortOnlyCompositeAttempt(runtime.row.compositeAttemptId)
+  return situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult })
 }
 
 export const getSituationalAttemptResult = resumeSituationalAttempt
 
 export const listSituationalHistory = async (userId: string) => {
   const rows = await prisma.situationalAttempt.findMany({
-    where: { userId },
+    where: { userId, compositeAttemptId: null },
     orderBy: { startedAt: 'desc' },
     take: 100,
     select: SITUATIONAL_ATTEMPT_SELECT,

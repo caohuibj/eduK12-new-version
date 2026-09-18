@@ -19,6 +19,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const params = useParams<{ assessmentId?: string; token?: string; attemptId?: string }>()
   const navigate = useNavigate()
   const publicMode = window.location.pathname.startsWith('/public/composite')
+  const relationalMode = window.location.pathname.startsWith('/relational/')
   const token = params.token || ''
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -55,6 +56,10 @@ const CompositeAssessmentPage: React.FC = () => {
   }
 
   const goReport = (id: string) => {
+    if (relationalMode) {
+      navigate('/relational/tasks')
+      return
+    }
     navigate(publicMode ? `/public/composite/attempts/${id}/report` : `/student/composite/attempts/${id}/report`)
   }
 
@@ -126,6 +131,10 @@ const CompositeAssessmentPage: React.FC = () => {
 
   const restartLegacyAttempt = async () => {
     if (!state) return
+    if (relationalMode) {
+      setError('关系测评旧版记录不能从通用重启入口迁移，请返回任务列表重新发起。')
+      return
+    }
     try {
       setSubmitting(true)
       setError(null)
@@ -190,7 +199,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const saveAndExit = async () => {
     if (!attemptId) return
     if (state?.deliveryMode === 'FINAL_ONLY') {
-      navigate(publicMode ? '/' : '/student')
+      navigate(publicMode ? '/' : relationalMode ? '/relational/tasks' : '/student')
       return
     }
     try {
@@ -256,6 +265,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const enterChild = (item: CompositeCurrentItem) => {
     const result = resolveCompositeChildRouteContext({
       publicMode,
+      relationalMode,
       parentAttemptId: state?.id || '',
       item,
     })
@@ -305,7 +315,7 @@ const CompositeAssessmentPage: React.FC = () => {
   if (!state) return <div className="text-center py-12 text-gray-500">{error || '综合测评不存在或不可访问'}</div>
 
   if (state.status === 'COMPLETED') {
-    return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">综合测评已完成</h1><button onClick={() => goReport(state.id)} className="btn-primary">查看个人报告</button></div>
+    return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">综合测评已完成</h1><button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>
   }
 
   if (state.deliveryMode === 'LEGACY') {
@@ -328,7 +338,7 @@ const CompositeAssessmentPage: React.FC = () => {
         submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
         submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
         onReload={() => loadAttempt(state.id, recoveryToken)}
-        onExit={() => navigate(publicMode ? '/' : '/student')}
+        onExit={() => navigate(publicMode ? '/' : relationalMode ? '/relational/tasks' : '/student')}
         onCompleted={() => goReport(state.id)}
         onEnterCognitive={enterChild}
         onEnterSituational={enterChild}

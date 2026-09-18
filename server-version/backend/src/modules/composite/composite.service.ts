@@ -185,8 +185,8 @@ const assertOwner = (resource: { createdBy: string | null }, userId: string, rol
 
 const parseDate = (value: string | null | undefined) => (value ? new Date(value) : null)
 
-const loadComposite = async (id: string, includeItems = false) => {
-  const composite = await prisma.compositeAssessment.findUnique({
+const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
+  const composite = await db.compositeAssessment.findUnique({
     where: { id },
     include: {
       creator: { select: { id: true, role: true } },
@@ -613,12 +613,73 @@ const emptyAttemptCounts = (): AttemptCounts => ({
   abandoned: 0,
 })
 
-const loadAttemptCountsByCompositeIds = async (ids: string[]): Promise<Map<string, AttemptCounts>> => {
+const relationalTeacherReadableAssignmentIds = async (userId: string): Promise<string[]> => {
+  const rows = await prisma.relationalAssessmentAssignment.findMany({
+    where: {
+      createdByUserId: userId,
+      perspective: 'OBSERVER_REPORT',
+      analysisMode: 'INDIVIDUAL_ONLY',
+      visibilityPolicyKey: 'observer_assigning_teacher_v1',
+    },
+    select: { id: true },
+  })
+  return rows.map((row) => row.id)
+}
+
+const teacherRelationalAttemptVisibility = async (
+  userId: string,
+  role: UserRole,
+): Promise<Prisma.CompositeAssessmentAttemptWhereInput | null> => {
+  if (role !== UserRole.TEACHER) return null
+  const readableAssignmentIds = await relationalTeacherReadableAssignmentIds(userId)
+  return {
+    OR: [
+      { assignmentRef: null },
+      { assignmentRef: { in: readableAssignmentIds } },
+    ],
+  }
+}
+
+const assertRelationalTeacherAttemptReadAllowed = async (
+  attempt: { assignmentRef?: string | null },
+  userId: string,
+  role: UserRole,
+): Promise<void> => {
+  if (role === UserRole.ADMIN || !attempt.assignmentRef) return
+  const assignment = await prisma.relationalAssessmentAssignment.findUnique({
+    where: { id: attempt.assignmentRef },
+    select: {
+      createdByUserId: true,
+      perspective: true,
+      analysisMode: true,
+      visibilityPolicyKey: true,
+    },
+  })
+  if (
+    !assignment
+    || assignment.perspective !== 'OBSERVER_REPORT'
+    || assignment.analysisMode !== 'INDIVIDUAL_ONLY'
+    || assignment.visibilityPolicyKey !== 'observer_assigning_teacher_v1'
+    || assignment.createdByUserId !== userId
+  ) {
+    throw compositeForbidden('关系测评个人结果不能通过通用教师结果接口读取')
+  }
+}
+
+const loadAttemptCountsByCompositeIds = async (
+  ids: string[],
+  userId: string,
+  role: UserRole,
+): Promise<Map<string, AttemptCounts>> => {
   const byId = new Map<string, AttemptCounts>()
   if (ids.length === 0) return byId
+  const visibility = await teacherRelationalAttemptVisibility(userId, role)
+  const where = visibility
+    ? { AND: [{ compositeAssessmentId: { in: ids } }, visibility] }
+    : { compositeAssessmentId: { in: ids } }
   const grouped = await prisma.compositeAssessmentAttempt.groupBy({
     by: ['compositeAssessmentId', 'status'],
-    where: { compositeAssessmentId: { in: ids } },
+    where,
     _count: { _all: true },
   })
   for (const row of grouped) {
@@ -796,7 +857,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
   const supportedList = config.cognitiveModuleEnabled
     ? list
     : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
-  const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id))
+  const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id), userId, role)
   return supportedList.map((item: any) => {
     const {
       _count: _ignoredCount,
@@ -835,7 +896,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
   await ensureCompositeFormSections(id)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
-  const counts = await loadAttemptCountsByCompositeIds([composite.id])
+  const counts = await loadAttemptCountsByCompositeIds([composite.id], userId, role)
   const [contentUnits, formSections] = await Promise.all([
     listCompositeContentUnits(composite.id),
     listCompositeFormSections(composite.id),
@@ -1144,16 +1205,21 @@ export const listAttemptsForTeacher = async (
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
 
-  const where: Record<string, unknown> = { compositeAssessmentId: compositeId }
-  if (query.status) where.status = query.status
+  const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{ compositeAssessmentId: compositeId }]
+  const visibility = await teacherRelationalAttemptVisibility(userId, role)
+  if (visibility) filters.push(visibility)
+  if (query.status) filters.push({ status: query.status })
   const q = query.q?.trim()
   if (q) {
-    where.OR = [
-      { anonymousCode: { contains: q, mode: 'insensitive' } },
-      { user: { is: { nickname: { contains: q, mode: 'insensitive' } } } },
-      { user: { is: { username: { contains: q, mode: 'insensitive' } } } },
-    ]
+    filters.push({
+      OR: [
+        { anonymousCode: { contains: q, mode: 'insensitive' } },
+        { user: { is: { nickname: { contains: q, mode: 'insensitive' } } } },
+        { user: { is: { username: { contains: q, mode: 'insensitive' } } } },
+      ],
+    })
   }
+  const where: Prisma.CompositeAssessmentAttemptWhereInput = filters.length === 1 ? filters[0] : { AND: filters }
 
   const [attempts, total, counts] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
@@ -1179,7 +1245,7 @@ export const listAttemptsForTeacher = async (
       },
     }),
     prisma.compositeAssessmentAttempt.count({ where }),
-    loadAttemptCountsByCompositeIds([compositeId]),
+    loadAttemptCountsByCompositeIds([compositeId], userId, role),
   ])
 
   const totalPages = Math.ceil(total / query.pageSize)
@@ -2167,6 +2233,15 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
   return runtime
 }
 
+export interface RelationalCompositeAttemptIdentityV1 {
+  subjectUserId: string
+  respondentUserId: string
+  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | null
+  episodeId: string
+  assignmentRef: string
+  consentId: string | null
+}
+
 const createAttempt = async (
   db: Db,
   composite: any,
@@ -2175,6 +2250,7 @@ const createAttempt = async (
   credential?: ReturnType<typeof createRecoveryCredential>,
   attemptNo = 1,
   attemptEpoch = 1,
+  relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
@@ -2214,6 +2290,14 @@ const createAttempt = async (
       runtimeGeneration: finalOnly ? 'UNIFIED_V1' : null,
       compiledBundleRuntimeHash: packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null,
       attemptEpoch,
+      ...(relationalIdentity ? {
+        subjectUserId: relationalIdentity.subjectUserId,
+        respondentUserId: relationalIdentity.respondentUserId,
+        respondentType: relationalIdentity.respondentType,
+        episodeId: relationalIdentity.episodeId,
+        assignmentRef: relationalIdentity.assignmentRef,
+        consentId: relationalIdentity.consentId,
+      } : {}),
       completedItems,
       progress,
     },
@@ -2248,6 +2332,53 @@ const createAttempt = async (
     })
   }
   return attempt
+}
+
+export const startRelationalCompositeAttemptInTransaction = async (
+  db: Db,
+  input: {
+    compositeAssessmentId: string
+    respondentUserId: string
+    attemptIdentity: RelationalCompositeAttemptIdentityV1
+  },
+) => {
+  if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
+    throw compositeForbidden('关系测评 respondent identity 不匹配')
+  }
+  await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${input.compositeAssessmentId} FOR UPDATE`
+  const composite = await loadComposite(input.compositeAssessmentId, true, db)
+  assertSupportedComposite(composite)
+  if (composite.status !== 'PUBLISHED') throw compositeBadRequest('关系测评运行目标尚未发布')
+  if (composite.deliveryMode === 'LEGACY') throw compositeBadRequest('关系测评必须使用 Unified FINAL_ONLY 运行时')
+  if (composite.course?.isLibrary) throw compositeBadRequest('库课程综合测评不能作为关系测评运行目标')
+
+  const existing = await db.compositeAssessmentAttempt.findFirst({
+    where: { assignmentRef: input.attemptIdentity.assignmentRef },
+    orderBy: { startedAt: 'desc' },
+  })
+  if (existing) {
+    if (existing.userId !== input.respondentUserId || existing.compositeAssessmentId !== input.compositeAssessmentId) {
+      throw compositeConflict('关系测评 assignmentRef 已绑定到其他运行记录')
+    }
+    return existing
+  }
+
+  const participantKey = `user:${input.respondentUserId}`
+  const latest = await db.compositeAssessmentAttempt.findFirst({
+    where: { compositeAssessmentId: input.compositeAssessmentId, participantKey },
+    orderBy: { attemptNo: 'desc' },
+    select: { attemptNo: true },
+  })
+  return createAttempt(
+    db,
+    composite,
+    input.respondentUserId,
+    null,
+    undefined,
+    (latest?.attemptNo ?? 0) + 1,
+    1,
+    input.attemptIdentity,
+  )
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
@@ -4502,6 +4633,7 @@ export const listPackageAnalysisSnapshotsForTeacher = async (
   const attempt = await loadAttemptWithChildren(attemptId)
   const composite = await loadComposite(attempt.compositeAssessmentId)
   assertOwner(composite, userId, role)
+  await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   assertSupportedComposite(attempt.compositeAssessment)
   if (!attempt.compositeAssessment.reportPackageKey) return { list: [], total: 0 }
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
@@ -4571,6 +4703,7 @@ export const getReportForTeacher = async (
   assertOwner(composite, userId, role)
   const attempt = await loadAttemptWithChildren(attemptId)
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment)
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
@@ -4588,6 +4721,7 @@ export const getAnalysisExportForTeacher = async (
   assertOwner(composite, userId, role)
   const attempt = await loadAttemptWithChildren(attemptId)
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment)
   return packageAnalysisExportContextFor(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)

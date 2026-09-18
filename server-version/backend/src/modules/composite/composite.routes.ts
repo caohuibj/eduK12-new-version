@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type NextFunction, type Request, type Response } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
 import { compositeVideoController } from './composite-video.controller'
@@ -6,30 +6,65 @@ import { situationalVideoController } from '../situational/situational-video.con
 import { authenticate, requireAdmin, requireRole, requireTeacher } from '../../middleware/auth'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
+import { instrumentError } from '../../utils/response'
+import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { relationalProductReportService } from '../assessment-relational/product-report.service'
+import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 
 const router = Router()
+const respondentAttemptAccess = requireRole(UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER)
+
+const relationalGuardError = (res: Response, error: RelationalAssessmentError) => {
+  const status = error.code === 'RELATIONAL_ANALYSIS_ACCESS' || error.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
+  return instrumentError(res, error.code, error.message, status)
+}
+
+const relationalRespondentReportGuard = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) return next()
+    await relationalProductReportService.assertRespondentReportAllowed({
+      attemptId: req.params.attemptId,
+      userId: req.user.userId,
+    })
+    return next()
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) return relationalGuardError(res, error)
+    return next(error)
+  }
+}
+
+const relationalFinalConsentGuard = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) return next()
+    await relationalRuntimeConsentAuthority.assertCompositeFinal(req.params.attemptId, req.user.userId)
+    return next()
+  } catch (error) {
+    if (error instanceof RelationalAssessmentError) return relationalGuardError(res, error)
+    return next(error)
+  }
+}
 
 // 学生端（必须在 /:id 之前）
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
-router.get('/attempts/:attemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getAttempt)
-router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedFormImage)
-router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeImageController.authenticatedScaleImage)
-router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, requireRole(UserRole.STUDENT), compositeVideoController.authenticatedFormVideo)
-router.post('/attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability', authenticate, requireRole(UserRole.STUDENT), compositeVideoController.authenticatedScaleVideo)
-router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', authenticate, requireRole(UserRole.STUDENT), compositeController.getEmbeddedSituational)
-router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', authenticate, requireRole(UserRole.STUDENT), compositeController.embeddedSituationalAsset)
-router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/scenes/:sceneKey/video-sources', authenticate, requireRole(UserRole.STUDENT), situationalVideoController.embeddedAuthenticated)
+router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
+router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
+router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedScaleImage)
+router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedFormVideo)
+router.post('/attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedScaleVideo)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId', authenticate, respondentAttemptAccess, compositeController.getEmbeddedSituational)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeController.embeddedSituationalAsset)
+router.get('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/scenes/:sceneKey/video-sources', authenticate, respondentAttemptAccess, situationalVideoController.embeddedAuthenticated)
 router.post('/attempts/:attemptId/restart', authenticate, requireRole(UserRole.STUDENT), compositeController.restartAttempt)
 router.post('/attempts/:attemptId/context/freeze', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
-router.post('/attempts/:attemptId/form-sections/:sectionId/submit', authenticate, requireRole(UserRole.STUDENT), compositeController.submitFinalFormSection)
-router.post('/attempts/:attemptId/items/:itemId/scale/submit', authenticate, requireRole(UserRole.STUDENT), compositeController.submitFinalScale)
-router.post('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit', authenticate, requireRole(UserRole.STUDENT), compositeController.submitEmbeddedSituational)
+router.post('/attempts/:attemptId/form-sections/:sectionId/submit', authenticate, respondentAttemptAccess, relationalFinalConsentGuard, compositeController.submitFinalFormSection)
+router.post('/attempts/:attemptId/items/:itemId/scale/submit', authenticate, respondentAttemptAccess, relationalFinalConsentGuard, compositeController.submitFinalScale)
+router.post('/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit', authenticate, respondentAttemptAccess, relationalFinalConsentGuard, compositeController.submitEmbeddedSituational)
 router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
-router.get('/attempts/:attemptId/report', authenticate, requireRole(UserRole.STUDENT), compositeController.report)
-router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), compositeController.analysisExport)
+router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalRespondentReportGuard, compositeController.report)
+router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalRespondentReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
 router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
 

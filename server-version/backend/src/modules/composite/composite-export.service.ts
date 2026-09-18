@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import * as path from 'path'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
 import { v4 as uuidv4 } from 'uuid'
+import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { safeDecrypt } from '../../utils/encryption'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
@@ -40,6 +41,13 @@ export interface CompositeExportData {
   fields: CompositeExportField[]
   rows: Record<string, unknown>[]
   trialCount: number
+}
+
+export interface CompositeExportOptions {
+  detail?: CompositeExportDetail
+  anonymize?: boolean
+  dateRange?: { start?: string; end?: string }
+  actor?: { userId: string; role: UserRole }
 }
 
 const EXPORT_DIR = path.join(__dirname, '../../../exports')
@@ -112,14 +120,43 @@ const completedDateWhere = (dateRange?: { start?: string; end?: string }) => {
   return value
 }
 
-export const getExportData = async (assessmentId: string, options: { detail?: CompositeExportDetail; anonymize?: boolean; dateRange?: { start?: string; end?: string } } = {}): Promise<CompositeExportData> => {
+const teacherRelationalExportVisibility = async (
+  actor: CompositeExportOptions['actor'],
+): Promise<Prisma.CompositeAssessmentAttemptWhereInput | null> => {
+  if (!actor || actor.role !== UserRole.TEACHER) return null
+  const readable = await prisma.relationalAssessmentAssignment.findMany({
+    where: {
+      createdByUserId: actor.userId,
+      perspective: 'OBSERVER_REPORT',
+      analysisMode: 'INDIVIDUAL_ONLY',
+      visibilityPolicyKey: 'observer_assigning_teacher_v1',
+    },
+    select: { id: true },
+  })
+  return {
+    OR: [
+      { assignmentRef: null },
+      { assignmentRef: { in: readable.map((row) => row.id) } },
+    ],
+  }
+}
+
+export const getExportData = async (
+  assessmentId: string,
+  options: CompositeExportOptions = {},
+): Promise<CompositeExportData> => {
   const detail = options.detail ?? 'summary'
   const anonymize = options.anonymize ?? true
-  const completedAttemptWhere = {
+  const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{
     compositeAssessmentId: assessmentId,
-    status: 'COMPLETED' as const,
+    status: 'COMPLETED',
     ...(completedDateWhere(options.dateRange) ? { completedAt: completedDateWhere(options.dateRange) } : {}),
-  }
+  }]
+  const relationalVisibility = await teacherRelationalExportVisibility(options.actor)
+  if (relationalVisibility) filters.push(relationalVisibility)
+  const completedAttemptWhere: Prisma.CompositeAssessmentAttemptWhereInput = filters.length === 1
+    ? filters[0]
+    : { AND: filters }
 
   // Preflight the bounded export scope before materializing nested answers,
   // sessions, trials, or encrypted payloads. The later query and final check
@@ -459,7 +496,7 @@ export const makeFileName = (assessmentId: string, detail: CompositeExportDetail
 
 export const saveExportFiles = async (
   assessmentId: string,
-  options: { detail?: CompositeExportDetail; anonymize?: boolean; dateRange?: { start?: string; end?: string } },
+  options: CompositeExportOptions,
   format: CompositeExportFormat,
   data?: CompositeExportData
 ) => {

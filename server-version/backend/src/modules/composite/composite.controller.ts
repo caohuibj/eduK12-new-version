@@ -48,6 +48,7 @@ import { serveFrozenSituationalAsset } from '../situational/situational-asset.se
 import { submitSituationalAttemptFinal } from '../situational/situational-final-submit.service'
 import { situationalFinalSubmitSchema } from '../situational/situational-final-submit.schema'
 import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
+import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
 import {
   assignCompositeFormItemToSection,
   createCompositeFormSection,
@@ -372,7 +373,9 @@ export const compositeController = {
         req.params.situationalAttemptId,
         embeddedSituationalAccess(req, { userId: req.user.userId }),
       )
-      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot))
+      const suppressResult = runtime.row.status === 'COMPLETED'
+        && await isRelationalCohortOnlyCompositeAttempt(req.params.attemptId)
+      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult }))
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
@@ -408,7 +411,8 @@ export const compositeController = {
         embedded: embeddedSituationalAccess(req, { userId: req.user!.userId }),
         ...parsed.data,
       }))
-      return success(res, data, data.replayed ? '综合测评情境化模块提交已确认' : '综合测评情境化模块提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '综合测评情境化模块提交已确认' : '综合测评情境化模块提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
@@ -486,7 +490,8 @@ export const compositeController = {
         input,
         { userId: req.user.userId },
       )
-      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
@@ -584,7 +589,11 @@ export const compositeController = {
       const query = compositeExportQuerySchema.parse(req.query)
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const { compositeExportService } = await import('./composite-export.service')
-      const data = await compositeExportService.getExportData(req.params.id, { detail: query.detail, anonymize: true })
+      const data = await compositeExportService.getExportData(req.params.id, {
+        detail: query.detail,
+        anonymize: true,
+        actor: { userId: req.user.userId, role: req.user.role },
+      })
       return success(res, { assessmentId: data.assessmentId, assessmentName: data.assessmentName, detail: data.detail, recordCount: data.rows.length, fieldCount: data.fields.length, fields: data.fields })
     } catch (err) { return handleError(res, err) }
   },
@@ -596,8 +605,14 @@ export const compositeController = {
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
       const { compositeExportService } = await import('./composite-export.service')
-      const data = await compositeExportService.getExportData(req.params.id, { detail: input.detail, anonymize, dateRange: input.dateRange })
-      const files = await compositeExportService.saveExportFiles(req.params.id, { detail: input.detail, anonymize, dateRange: input.dateRange }, input.format, data)
+      const exportOptions = {
+        detail: input.detail,
+        anonymize,
+        dateRange: input.dateRange,
+        actor: { userId: req.user.userId, role: req.user.role },
+      }
+      const data = await compositeExportService.getExportData(req.params.id, exportOptions)
+      const files = await compositeExportService.saveExportFiles(req.params.id, exportOptions, input.format, data)
       return success(res, { assessmentId: data.assessmentId, detail: input.detail, format: input.format, anonymize, recordCount: data.rows.length, fieldCount: data.fields.length, fileName: path.basename(files.filePath) }, '导出成功')
     } catch (err) { return handleError(res, err) }
   },

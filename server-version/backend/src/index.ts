@@ -48,6 +48,7 @@ import capabilitiesRoutes from './routes/capabilities'
 import materialGrantRoutes from './routes/materialGrants'
 import instrumentAuthorizationRoutes from './routes/instrumentAuthorizations'
 import assetRoutes, { publicAssetRouter } from './routes/assets'
+import relationalProductRoutes from './modules/assessment-relational/product.routes'
 
 const app = express()
 
@@ -220,6 +221,7 @@ app.use('/api/public/assets', publicAssetRouter)
 app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
 app.use('/api/composite-assessments', compositeRoutes)
+app.use('/api/relational-assessments', relationalProductRoutes)
 app.use('/api/public/composite-assessments', ...publicAssessmentRateLimiters, compositePublicRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)

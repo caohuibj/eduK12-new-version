@@ -163,7 +163,7 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
       },
     })
     questionnaireId = questionnaire.id
-  })
+  }, 30_000)
 
   afterAll(async () => {
     try {

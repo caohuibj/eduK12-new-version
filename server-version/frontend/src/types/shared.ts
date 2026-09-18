@@ -39,7 +39,7 @@ export interface ApiResponse<T = any> {
 }
 
 // 用户角色
-export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
+export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT'
 
 // 课程状态
 export type CourseStatus = 'DRAFT' | 'PUBLISHED' | 'COMPLETED'

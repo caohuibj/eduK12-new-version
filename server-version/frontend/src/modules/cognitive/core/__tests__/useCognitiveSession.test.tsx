@@ -147,6 +147,48 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     }
   })
 
+  it('accepts a relational aggregate-only FINAL terminal ACK without exposing an individual result', async () => {
+    const finalSession: CognitiveSession = {
+      ...session,
+      sessionId: 'cognitive-session-relational-aggregate',
+      deliveryMode: 'FINAL_ONLY',
+      definitionHash: 'definition-relational',
+      contextSnapshotHash: null,
+      attemptEpoch: 1,
+    }
+    const finalApi = {
+      ...api,
+      getSession: vi.fn().mockResolvedValue({ code: 0, message: 'ok', data: finalSession }),
+      submitFinal: vi.fn().mockResolvedValue({
+        code: 0,
+        message: 'ok',
+        data: {
+          submissionId: 'relational-submit-1',
+          payloadHash: 'relational-payload-1',
+          replayed: false,
+          completed: true,
+        },
+      }),
+    }
+
+    const { result } = renderHook(() => useCognitiveSession(
+      finalSession.sessionId,
+      finalApi,
+      { aggregateOnly: true },
+    ))
+
+    await waitFor(() => expect(result.current.state.status).toBe('READY'))
+    await act(async () => {
+      result.current.start()
+      await result.current.appendTrial({ correct: true, rtMs: 420 })
+      await result.current.complete()
+    })
+
+    await waitFor(() => expect(result.current.state.status).toBe('COMPLETED'))
+    expect(result.current.state.result).toBeNull()
+    expect(finalApi.submitFinal).toHaveBeenCalledTimes(1)
+  })
+
   it('replays an existing sealed FINAL after refresh and never remounts the task', async () => {
     const finalSession: CognitiveSession = {
       ...session,

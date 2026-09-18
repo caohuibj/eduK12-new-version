@@ -1,7 +1,7 @@
 export interface User {
   id: string
   username: string
-  role: 'STUDENT' | 'TEACHER' | 'ADMIN'
+  role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT'
   nickname?: string
   avatarUrl?: string
   phone?: string

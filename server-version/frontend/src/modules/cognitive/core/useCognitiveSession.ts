@@ -114,7 +114,11 @@ export interface CognitiveSessionController {
   reload: () => void
 }
 
-export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi = cognitiveApi): CognitiveSessionController {
+export function useCognitiveSession(
+  sessionId: string,
+  api: CognitiveSessionApi = cognitiveApi,
+  options: { aggregateOnly?: boolean } = {},
+): CognitiveSessionController {
   const [state, dispatch] = useReducer(runnerReducer, initialRunnerState)
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
@@ -148,7 +152,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       }
     }
     return { acceptedSequences: batch.records.map((record) => record.sequence) }
-  }, [api, sessionId])
+  }, [api, options.aggregateOnly, sessionId])
 
   const flushCognitiveCheckpoints = useCallback(async () => {
     await checkpointScheduler.flush('cognitive', sessionId)
@@ -415,6 +419,16 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
             return next
           },
         })
+        if (options.aggregateOnly && (response.data as any).completed === true) {
+          await finalDraftStore.setStatus(draftKey, 'COMPLETED')
+          await finalDraftStore.delete(draftKey)
+          dispatch({
+            type: 'SESSION_LOADED',
+            session: { ...session, status: 'COMPLETED' },
+            trialIndex: 0,
+          })
+          return
+        }
         const resultData = (response.data as any).response ?? (response.data as any)
         const result: CognitiveResult | null = resultData.result
           ?? (((resultData as any).metrics !== undefined || (resultData as any).quality !== undefined)
@@ -482,7 +496,7 @@ export function useCognitiveSession(sessionId: string, api: CognitiveSessionApi 
       // The DRAFT remains writable, so returning to RUNNING is safe here.
       dispatch({ type: 'COMPLETE_FAILED', error: friendlyError(err) })
     }
-  }, [api, sessionId])
+  }, [api, options.aggregateOnly, sessionId])
 
   const reload = useCallback(() => {
     void load()
