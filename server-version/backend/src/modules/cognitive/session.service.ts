@@ -22,6 +22,7 @@ import {
 import { cognitivePresentationAssetReferences } from './v2/presentation'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
+import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 import { freezeExactReferenceBindings, type ExactReferenceDb } from '../assessment-runtime/reference-binding'
 import {
   ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD,
@@ -408,8 +409,20 @@ export const getSession = async (userId: string, sessionId: string) => {
   if (session.userId !== userId) throw FORBIDDEN('Not the owner of this session')
 
   if (session.status === 'COMPLETED') {
-    // D6 后：完成态返回 decrypted result。
+    // Relational cohort-only attempts expose terminal state but never an
+    // individual Cognitive result. The parent cohort projection is authoritative.
     const runnerPayload = toRunnerPayload(session)
+    if (
+      session.compositeAttemptId
+      && await isRelationalCohortOnlyCompositeAttempt(session.compositeAttemptId)
+    ) {
+      return {
+        ...runnerPayload,
+        status: session.status,
+        finishedAt: session.finishedAt,
+      }
+    }
+    // D6 后：普通完成态返回 decrypted result。
     const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
     if (storedConfig.snapshot) {
       if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
