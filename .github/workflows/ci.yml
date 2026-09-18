@@ -18,6 +18,7 @@
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
 #   browser       : isolated PostgreSQL/Redis + seeded Bundle + real Playwright acceptance flow
 #   docker        : baseline + monitoring compose config + backend/frontend production image build
+#   merge-gate    : fail-closed aggregate; only exact success for every Full Gate dependency passes
 #
 # 说明：
 #   - Vite build 不作为 TypeScript typecheck 的替代品（v1.1 §11）。
@@ -27,6 +28,7 @@
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
 #   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
 #   - browser 使用 Vite dev server 做验收，因此不重复 production frontend build；production build 已由 frontend gate 覆盖。
+#   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
 name: CI
 
@@ -608,3 +610,67 @@ jobs:
           # uploading results to an unavailable code-scanning endpoint.
           upload: never
           upload-database: false
+
+  merge-gate:
+    name: merge gate / ready PR
+    needs: [backend, frontend, browser, docker, codeql]
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
+    env:
+      BACKEND_RESULT: ${{ needs.backend.result }}
+      FRONTEND_RESULT: ${{ needs.frontend.result }}
+      BROWSER_RESULT: ${{ needs.browser.result }}
+      DOCKER_RESULT: ${{ needs.docker.result }}
+      CODEQL_RESULT: ${{ needs.codeql.result }}
+    steps:
+      - name: verify fail-closed decision table
+        shell: bash
+        run: |
+          set -euo pipefail
+          assert_gate() {
+            local expected="$1"
+            shift
+            local actual=success
+            local result
+            for result in "$@"; do
+              if [ "$result" != success ]; then
+                actual=failure
+                break
+              fi
+            done
+            if [ "$actual" != "$expected" ]; then
+              echo "merge-gate self-test failed: expected=$expected actual=$actual inputs=$*" >&2
+              exit 1
+            fi
+          }
+          assert_gate success success success success success success
+          assert_gate failure failure success success success success
+          assert_gate failure success success success success failure
+          assert_gate failure success success skipped success success
+          assert_gate failure success cancelled success success success
+          assert_gate failure success success success missing success
+      - name: require exact success from every Full Gate dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          check_result() {
+            local job="$1"
+            local result="$2"
+            echo "$job=$result"
+            if [ "$result" != success ]; then
+              failed=1
+            fi
+          }
+          check_result backend "$BACKEND_RESULT"
+          check_result frontend "$FRONTEND_RESULT"
+          check_result browser "$BROWSER_RESULT"
+          check_result docker "$DOCKER_RESULT"
+          check_result codeql "$CODEQL_RESULT"
+          if [ "$failed" -ne 0 ]; then
+            echo "Ready-PR merge gate is fail-closed: every required dependency must conclude success." >&2
+            exit 1
+          fi
