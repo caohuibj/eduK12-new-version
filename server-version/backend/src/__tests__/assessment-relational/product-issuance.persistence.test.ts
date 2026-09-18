@@ -59,6 +59,15 @@ const registry = createRelationalProductRegistry([
   releaseStatus: 'PUBLISHED' as const,
   scienceMaturity: 'PILOT' as const,
   applicability: entry,
+  cohortAnalysisPolicy: entry.analysisMode === 'COHORT_AGGREGATE'
+    ? {
+        schemaVersion: 1 as const,
+        policyKey: 'ra02-issuance-cohort-v1',
+        policyVersion: '1.0.0',
+        minimumRespondents: entry.minimumRespondents!,
+        metricKeys: ['total'],
+      }
+    : null,
   launchTarget: { runtime: 'COMPOSITE' as const, compositeAssessmentId: 'ra02-fixture-composite' },
 })))
 
