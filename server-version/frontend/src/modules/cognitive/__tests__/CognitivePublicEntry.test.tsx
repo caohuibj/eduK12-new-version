@@ -26,7 +26,7 @@ describe('public Cognitive entry authority', () => {
     await userEvent.type(screen.getByLabelText('恢复凭证'), 'saved-credential')
     await userEvent.click(screen.getByRole('button', { name: '恢复测评' }))
     expect(mocks.publicFactory).toHaveBeenCalledWith('saved-credential')
-    expect(mocks.hook).toHaveBeenCalledWith('s1', expect.objectContaining({ getSession: mocks.publicGet }))
+    expect(mocks.hook).toHaveBeenCalledWith('s1', expect.objectContaining({ getSession: mocks.publicGet }), { aggregateOnly: false })
   })
   it('selects the public result API without public=1 and never falls back to authenticated reads', async () => {
     sessionStorage.setItem('cognitive:recovery:s1', 'credential')
@@ -37,7 +37,7 @@ describe('public Cognitive entry authority', () => {
   it('does not let a query parameter turn a protected namespace into public access', () => {
     renderAt('/student/cognitive/sessions/s1?public=1')
     expect(mocks.publicFactory).not.toHaveBeenCalled()
-    expect(mocks.hook).toHaveBeenCalledWith('s1', expect.objectContaining({ getSession: mocks.authGet }))
+    expect(mocks.hook).toHaveBeenCalledWith('s1', expect.objectContaining({ getSession: mocks.authGet }), { aggregateOnly: false })
   })
   it('shows a recoverable missing-locator error instead of mounting a loading controller', () => {
     renderAt('/missing', false, true)
