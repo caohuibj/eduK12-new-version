@@ -55,7 +55,7 @@ Student→Teacher relational-experience assignments are explicitly consent-free 
 
 RA-02 adds a small relational product registry keyed by exact `{resourceKind, resourceKey, resourceVersion}`. A registry entry contains display metadata, `RelationalApplicabilityV1`, release state and an explicit existing-runtime launch target. Catalog APIs expose only entries that are both released and launchable.
 
-The production registry is intentionally empty while current observer/classroom content remains unreleased. Tests inject explicit `PUBLISHED + PILOT` fixtures. A later content PR may register a resource only after its own content, rights and scientific release gates pass.
+The production registry is intentionally empty while current observer/classroom content remains unreleased. Tests inject explicit `PUBLISHED + PILOT` fixtures. Published `COHORT_AGGREGATE` entries must also freeze an authoritative cohort analysis policy whose minimum-N exactly matches applicability and whose metric keys are resolved only from persisted canonical UNIT results. A later content PR may register a resource only after its own content, rights and scientific release gates pass.
 
 ## Student→Teacher cohort scope
 
@@ -71,8 +71,10 @@ Report states are:
 
 - `EMPTY` — no eligible completed cohort yet;
 - `INSUFFICIENT` — below the frozen minimum-N; exact sub-threshold respondent count is not disclosed;
-- `AWAITING_ANALYSIS` — minimum-N reached but no authoritative cohort snapshot is available yet;
+- `AWAITING_ANALYSIS` — reserved fallback when an authoritative cohort snapshot is not yet available;
 - `READY` — returns only the RA-01 subject-safe cohort projection.
+
+Once minimum-N is reached, the Teacher cohort read path materializes the authoritative snapshot outside the UNIT/FINAL hot path. It serializes by the frozen cohort `AssessmentEpisode`, resolves each completed assignment to its bound completed Composite attempt, consumes only encrypted `AssessmentUnitSnapshot` canonical UNIT results, applies the registry-frozen metric policy, and persists through the RA-01 analysis repository. Repeated reads reuse the latest matching snapshot; later completed respondents produce a new append-only snapshot.
 
 `READY` projections contain aggregate metrics and policy/provenance fields but not respondent identities or `inputResultHashes`.
 
@@ -103,7 +105,8 @@ RA-02 regressions cover:
 - relationship/roster-authoritative Teacher and Parent issuance;
 - Student→Teacher teacher derivation from the course creator;
 - shared cohort episode and idempotent Student issuance;
-- minimum-N suppression and subject-safe cohort projection;
+- minimum-N suppression, canonical UNIT-backed cohort materialization and subject-safe cohort projection;
+- generic Composite participant/teacher report, analysis-export, snapshot and attempt-count bypass prevention for relational privacy;
 - START and FINAL consent authority;
 - relational Composite/Cognitive/Situational route return context;
 - Parent/Student/Teacher route guards and AppShell navigation.
