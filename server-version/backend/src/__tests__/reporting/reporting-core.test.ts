@@ -139,6 +139,19 @@ describe('PR3 deterministic reporting primitives', () => {
     expect(one.quartiles).toEqual({ q1: 5, q2: 5, q3: 5 })
   })
 
+  it('keeps projections and hashes identical when floating-point observations are reordered', () => {
+    const c = cohort(3)
+    const s = spec([rule('score')])
+    const results = [resolved(0, { score: 1e16 }), resolved(1, { score: -1e16 }), resolved(2, { score: 1 })]
+    const original = build(c, s, batch(c, results))
+    for (const permutation of [[results[0], results[2], results[1]], [...results].reverse()]) {
+      const reordered = build(c, s, batch(c, permutation))
+      expect(reordered.analysisIdentityHash).toBe(original.analysisIdentityHash)
+      expect(reordered.payload.projection).toEqual(original.payload.projection)
+      expect(reordered.snapshotHash).toBe(original.snapshotHash)
+    }
+  })
+
   it('rejects PR4 analysis kinds at the PR3 spec boundary', () => {
     expect(() => validateReportingSpecDefinition({ ...definition([rule('score')]), analysisKind: 'LONGITUDINAL' }))
       .toThrowError(expect.objectContaining({ code: 'REPORT_SPEC_INVALID' }))
@@ -157,6 +170,30 @@ describe('PR3 deterministic reporting primitives', () => {
     const metric = artifact.payload.projection.metrics!.score
     expect(metric).toMatchObject({ state: 'present', validN: 3, missingN: 2 })
     expect(metric.aggregations?.mean).toBeCloseTo(7 / 3)
+  })
+
+  it('A-01 excludes non-finite and disallowed-quality observations', () => {
+    const c = cohort(7)
+    const results = [1, 2, 3, Infinity, NaN, 6, 7].map((score, index) => resolved(index, { score }))
+    results[5].metrics[0].resultQuality = 'invalid'
+    results[6].metrics[0].metricQuality = 'unapproved'
+    const r = rule('score')
+    r.acceptedMetricQuality = ['approved']
+    for (const result of results.slice(0, 6)) result.metrics[0].metricQuality = 'approved'
+    const artifact = build(c, spec([r]), batch(c, results))
+    expect(artifact.payload.projection.metrics?.score).toMatchObject({ state: 'present', validN: 3, missingN: 4 })
+    expect(artifact.payload.projection.metrics?.score.aggregations?.mean).toBe(2)
+  })
+
+  it('never lowers the resource floor for either contributors or metric values', () => {
+    const c = cohort(6)
+    const s = spec([rule('score', 3)])
+    const sparseContributors = c.members.slice(0, 4).map((_, index) => resolved(index, { score: index }))
+    expect(build(c, s, batch(c, sparseContributors, 5)).payload.projection.state).toBe('suppressed')
+    const sparseMetric = c.members.map((_, index) => resolved(index, { score: index < 4 ? index : null }))
+    const projection = build(c, s, batch(c, sparseMetric, 5)).payload.projection
+    expect(projection.state).toBe('present')
+    expect(projection.metrics?.score).toEqual({ state: 'suppressed' })
   })
 
   it('A-02 rejects duplicate subject observations instead of inflating N', () => {

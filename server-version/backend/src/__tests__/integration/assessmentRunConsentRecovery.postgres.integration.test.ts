@@ -287,6 +287,6 @@ suite('Assessment Run consent-bearing UNKNOWN recovery gate (real PostgreSQL)', 
       assignments,
     })
     await expect(finalAuthority.assertCompositeFinal('synthetic-runtime-attempt', execution.actorUserId))
-      .rejects.toMatchObject({ code: 'RELATIONAL_CONSENT_REQUIRED' })
+      .rejects.toMatchObject({ code: 'RELATIONAL_CONSENT_REVOKED' })
   })
 })

@@ -44,8 +44,10 @@ export const reportingAggregations = (input: {
   if (values.some((value) => value === null)) {
     return reportingFail('REPORT_STATISTIC_INPUT', 'statistics require finite numeric values', 500)
   }
-  const numeric = values as number[]
-  const ordered = sorted(numeric)
+  // Floating-point accumulation must use one order for a given input set.
+  // Analysis identities are order-independent, so their projections must be too.
+  const numeric = sorted(values as number[])
+  const ordered = numeric
   const output: Record<string, unknown> = {}
   for (const aggregation of input.aggregations) {
     if (aggregation === 'MEAN') output.mean = mean(numeric)
