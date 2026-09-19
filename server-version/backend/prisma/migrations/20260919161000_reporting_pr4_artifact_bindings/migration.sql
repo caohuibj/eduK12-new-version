@@ -59,8 +59,7 @@ ALTER TABLE "reporting_analysis_artifacts"
 CREATE UNIQUE INDEX "reporting_analysis_artifacts_org_id_id_key"
   ON "reporting_analysis_artifacts"("organization_id","id");
 CREATE UNIQUE INDEX "reporting_analysis_artifacts_org_id_series_id_key"
-  ON "reporting_analysis_artifacts"("organization_id","id","series_id")
-  WHERE "series_id" IS NOT NULL;
+  ON "reporting_analysis_artifacts"("organization_id","id","series_id");
 CREATE INDEX "reporting_analysis_artifacts_kind_idx"
   ON "reporting_analysis_artifacts"("organization_id","analysis_kind","generated_at" DESC);
 
