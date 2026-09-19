@@ -14,15 +14,18 @@ CREATE TABLE "organization_units" (
   ),
   CONSTRAINT "organization_units_organization_id_fkey"
     FOREIGN KEY ("organization_id") REFERENCES "organizations"("id")
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT "organization_units_parent_fkey"
-    FOREIGN KEY ("organization_id", "parent_unit_id")
-    REFERENCES "organization_units"("organization_id", "id")
     ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE UNIQUE INDEX "organization_units_org_id_id_key"
   ON "organization_units"("organization_id", "id");
+
+ALTER TABLE "organization_units"
+  ADD CONSTRAINT "organization_units_parent_fkey"
+  FOREIGN KEY ("organization_id", "parent_unit_id")
+  REFERENCES "organization_units"("organization_id", "id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
 CREATE INDEX "organization_units_org_kind_idx"
   ON "organization_units"("organization_id", "unit_kind", "created_at");
 CREATE INDEX "organization_units_parent_idx"
