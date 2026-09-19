@@ -444,6 +444,9 @@ jobs:
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
+      - name: seed PR5 Organization fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
       - name: start backend
         run: |
           mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
@@ -471,6 +474,8 @@ jobs:
         run: node e2e/fe-11-storage-fault-browser-e2e.cjs
       - name: run RA-02 four-role relational acceptance
         run: node e2e/relational-four-role-browser-e2e.cjs
+      - name: run PR5 Organization cross-role acceptance
+        run: node e2e/pr5-organization-browser-e2e.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
