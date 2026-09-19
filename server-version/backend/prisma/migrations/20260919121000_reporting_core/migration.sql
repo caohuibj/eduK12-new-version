@@ -38,13 +38,16 @@ BEGIN
   ELSIF OLD.status = 'RETIRED' AND NEW.status <> 'RETIRED' THEN
     RAISE EXCEPTION 'retired reporting spec is immutable';
   END IF;
-  IF OLD.status IN ('PUBLISHED','RETIRED') AND (
+  -- REVIEWED is a governance freeze point: any content change must be made as
+  -- a new DRAFT version and reviewed again. Published/retired content remains
+  -- historically immutable as before.
+  IF OLD.status IN ('REVIEWED','PUBLISHED','RETIRED') AND (
     NEW.definition IS DISTINCT FROM OLD.definition
     OR NEW.spec_hash IS DISTINCT FROM OLD.spec_hash
     OR NEW.spec_key IS DISTINCT FROM OLD.spec_key
     OR NEW.version IS DISTINCT FROM OLD.version
   ) THEN
-    RAISE EXCEPTION 'published reporting spec definition is immutable';
+    RAISE EXCEPTION 'reviewed reporting spec definition is immutable';
   END IF;
   RETURN NEW;
 END;
@@ -98,3 +101,21 @@ CREATE TABLE "reporting_analysis_artifacts" (
 );
 CREATE UNIQUE INDEX "reporting_analysis_artifacts_identity_key" ON "reporting_analysis_artifacts"("analysis_identity_hash");
 CREATE INDEX "reporting_analysis_artifacts_org_created_idx" ON "reporting_analysis_artifacts"("organization_id", "generated_at" DESC);
+
+-- Cohort snapshots and analysis artifacts are historical evidence records, not
+-- mutable cache rows. Re-analysis creates/reuses another immutable identity;
+-- it never edits the evidence that an existing artifact was derived from.
+CREATE OR REPLACE FUNCTION "reject_reporting_snapshot_mutation"()
+RETURNS trigger AS $$
+BEGIN
+  RAISE EXCEPTION 'reporting snapshot rows are immutable';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "reporting_cohort_snapshots_immutable"
+BEFORE UPDATE OR DELETE ON "reporting_cohort_snapshots"
+FOR EACH ROW EXECUTE FUNCTION "reject_reporting_snapshot_mutation"();
+
+CREATE TRIGGER "reporting_analysis_artifacts_immutable"
+BEFORE UPDATE OR DELETE ON "reporting_analysis_artifacts"
+FOR EACH ROW EXECUTE FUNCTION "reject_reporting_snapshot_mutation"();
