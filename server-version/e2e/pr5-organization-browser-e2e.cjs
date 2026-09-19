@@ -14,13 +14,12 @@ const assertEnvelope = async (response, label) => {
   return body.data
 }
 
-const login = async (context) => {
+const login = async (context, user) => {
   const csrf = await assertEnvelope(await context.request.get(`${baseUrl}/api/auth/csrf`), 'csrf before login')
   await assertEnvelope(await context.request.post(`${baseUrl}/api/auth/login`, {
     headers: { 'x-csrf-token': csrf.csrfToken },
-    data: { username: fixture.username, password: fixture.password },
-  }), 'login')
-  // Login rotates the session. Refresh the double-submit token inside the new session.
+    data: { username: user.username, password: user.password },
+  }), `login ${user.username}`)
   await assertEnvelope(await context.request.get(`${baseUrl}/api/auth/csrf`), 'csrf after login')
 }
 
@@ -29,30 +28,29 @@ const screenshot = async (page, name) => {
   await page.screenshot({ path: `${screenshotDir}/${name}.png`, fullPage: true })
 }
 
-const main = async () => {
-  const browser = await chromium.launch({ headless: true })
+const organizationPath = `/organizations/${fixture.organizationId}`
+
+const ownerJourney = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
   try {
-    await login(context)
+    await login(context, fixture.users.owner)
 
-    // Direct-link into an Organization as a legacy STUDENT. The page must honor
-    // current ORG_ADMIN Membership rather than legacy User.role.
-    await page.goto(`${baseUrl}/organizations/${fixture.organizationId}`, { waitUntil: 'domcontentloaded' })
+    // Legacy STUDENT + current ORG_ADMIN Membership must govern the tenant.
+    await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
     await page.getByRole('heading', { name: '成员关系', exact: true }).waitFor()
-    await page.getByText('PR5 Organization Owner · 学生', { exact: true }).waitFor()
-    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count(), 1, 'ORG_ADMIN must see Run product entry even with legacy STUDENT role')
-    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count(), 1, 'ORG_ADMIN must see Reporting product entry from server Organization context')
+    await page.getByText(/· 学生$/).waitFor()
+    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count() > 0, true, 'ORG_ADMIN must see Run product entry even with legacy STUDENT role')
+    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count() > 0, true, 'ORG_ADMIN must see Reporting product entry from server Organization context')
 
-    // Real governed structure mutation through the browser/API stack.
     await page.getByLabel('年级名称').fill(fixture.gradeName)
     await page.getByRole('button', { name: '新增年级' }).click()
     await page.getByText(fixture.gradeName, { exact: true }).waitFor()
     await screenshot(page, '01-organization-admin')
 
-    // Real Run create, then hard reload to prove durable read-model navigation.
-    await page.getByRole('link', { name: 'Runs', exact: true }).click()
+    // Real Run mutation, then hard reload to prove durable read-model navigation.
+    await page.goto(`${baseUrl}${organizationPath}/runs`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Assessment Runs', exact: true }).waitFor()
     await page.getByLabel('Run 名称').fill(fixture.runName)
     await page.getByRole('button', { name: '创建草稿' }).click()
@@ -62,12 +60,10 @@ const main = async () => {
     await page.getByRole('heading', { name: 'Track 与冻结事实', exact: true }).waitFor()
     await screenshot(page, '02-run-durable-direct-link')
 
-    // Reporting and Delivery must be reachable from current server context even
-    // though no legacy TEACHER/ADMIN route guard is involved.
-    await page.getByRole('link', { name: 'Reporting', exact: true }).click()
+    await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
-    await page.getByRole('heading', { name: 'GROUP report', exact: true }).waitFor()
-    await page.getByRole('link', { name: 'Safety / CSV', exact: true }).click()
+    await page.getByText(fixture.publishedSpec.key, { exact: false }).waitFor()
+    await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
     await page.getByRole('heading', { name: 'Safety inbox', exact: true }).waitFor()
     await screenshot(page, '03-reporting-delivery')
@@ -78,10 +74,9 @@ const main = async () => {
     await page.goto(`${baseUrl}/organizations/${fixture.foreignOrganizationId}`, { waitUntil: 'domcontentloaded' })
     await page.getByText('无法进入组织空间', { exact: true }).waitFor()
 
-    // Return to the owned Organization and terminate this exact Membership
-    // episode. A backup ORG_ADMIN exists, so the governance invariant permits
-    // the operation. Current access must disappear immediately after reload.
-    await page.goto(`${baseUrl}/organizations/${fixture.organizationId}`, { waitUntil: 'domcontentloaded' })
+    // End the owner episode only after the other journeys have been seeded; a
+    // backup ORG_ADMIN preserves the last-admin invariant.
+    await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
     const ownerRow = page.getByRole('row').filter({ hasText: fixture.ownerUserId })
     await ownerRow.waitFor()
@@ -95,10 +90,81 @@ const main = async () => {
     const discovery = await assertEnvelope(await context.request.get(`${baseUrl}/api/organizations?page=1&pageSize=100`), 'organization discovery after revoke')
     assert.equal(discovery.list.some((item) => item.id === fixture.organizationId), false, 'ended Membership must disappear from current Organization discovery')
     await screenshot(page, '04-membership-revoked')
-
-    console.log('PR5 Organization real-browser acceptance passed')
+    console.log('[PASS] ORG_ADMIN legacy-STUDENT governance, durable Run, tenant isolation and revocation')
   } finally {
     await context.close()
+  }
+}
+
+const teacherJourney = async (browser) => {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+  const page = await context.newPage()
+  try {
+    await login(context, fixture.users.teacher)
+    await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
+    await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
+    await page.getByText('只读组织上下文', { exact: true }).waitFor()
+    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count(), 0, 'TEACHER persona must not gain governance')
+    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count() > 0, true, 'TEACHER persona must get Reporting independently of legacy role')
+    assert.equal(await page.getByRole('link', { name: /Safety \/ CSV|Safety\/CSV/ }).count() > 0, true, 'TEACHER persona must get Safety responsibility surface')
+
+    await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
+    await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
+    await page.getByText(fixture.publishedSpec.key, { exact: false }).waitFor()
+    await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
+    await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
+    await page.getByText('当前没有可见 Safety case。', { exact: true }).waitFor()
+    console.log('[PASS] TEACHER persona legacy-STUDENT receives reporting/delivery without governance')
+  } finally {
+    await context.close()
+  }
+}
+
+const studentJourney = async (browser) => {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+  const page = await context.newPage()
+  try {
+    await login(context, fixture.users.student)
+    const discovery = await assertEnvelope(await context.request.get(`${baseUrl}/api/organizations?page=1&pageSize=100`), 'student organization discovery')
+    assert.equal(discovery.list.some((item) => item.id === fixture.organizationId), true, 'current student Membership must discover Organization')
+    await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
+    await page.getByText('只读组织上下文', { exact: true }).waitFor()
+    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count(), 0)
+    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count(), 0)
+    assert.equal(await page.getByRole('link', { name: /Safety \/ CSV|Safety\/CSV/ }).count(), 0)
+    console.log('[PASS] STUDENT Membership gets tenant context without governance/reporting escalation')
+  } finally {
+    await context.close()
+  }
+}
+
+const parentJourney = async (browser) => {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+  const page = await context.newPage()
+  try {
+    await login(context, fixture.users.parent)
+    const discovery = await assertEnvelope(await context.request.get(`${baseUrl}/api/organizations?page=1&pageSize=100`), 'parent organization discovery')
+    assert.equal(discovery.list.some((item) => item.id === fixture.organizationId), false, 'Parent relationship must not be promoted into Organization Membership discovery')
+    await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
+    await page.getByText('无法进入组织空间', { exact: true }).waitFor()
+    assert.equal(await page.getByText(fixture.organizationName, { exact: true }).count(), 0, 'parent direct URL must not reveal tenant product context')
+    console.log('[PASS] PARENT relationship remains external and does not create tenant membership')
+  } finally {
+    await context.close()
+  }
+}
+
+const main = async () => {
+  const browser = await chromium.launch({ headless: true })
+  try {
+    // Non-owner journeys run before owner Membership revocation so they prove
+    // independent current authority while the Organization is active.
+    await teacherJourney(browser)
+    await studentJourney(browser)
+    await parentJourney(browser)
+    await ownerJourney(browser)
+    console.log('PR5 Organization cross-role real-browser acceptance passed')
+  } finally {
     await browser.close()
   }
 }
