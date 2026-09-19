@@ -47,6 +47,11 @@ export const listOrganizationSafetyCases = async (input: {
   ) return hidden()
 
   const canSeeOrganizationSummary = context.organizationStatus === 'ACTIVE' && context.orgRole === 'ORG_ADMIN'
+  const canSeeOwnerProjection = context.capabilities.includes('PSYCHOLOGY_STAFF')
+    || context.personas.includes('TEACHER')
+    || context.personas.includes('COUNSELOR')
+  if (!canSeeOrganizationSummary && !canSeeOwnerProjection) return { list: [], truncated: false }
+
   const candidateRows = await prisma.$queryRaw<CandidateRow[]>`
     SELECT
       c."id" AS "caseId",
@@ -80,10 +85,22 @@ export const listOrganizationSafetyCases = async (input: {
       AND subject."user_id" = c."subject_user_id"
     WHERE c."trigger_source_kind" = 'CANONICAL_UNIT_RESULT'
       AND c."subject_user_id" <> ${input.principal.userId}
+      AND NOT EXISTS (
+        SELECT 1
+        FROM "parent_student_relationships" parent_relation
+        WHERE parent_relation."parent_user_id" = ${input.principal.userId}
+          AND parent_relation."student_user_id" = c."subject_user_id"
+          AND parent_relation."status" = 'ACTIVE'
+      )
       AND (
         ${canSeeOrganizationSummary}
-        OR c."primary_owner_user_id" = ${input.principal.userId}
-        OR ${input.principal.userId} = ANY(c."backup_owner_user_ids")
+        OR (
+          ${canSeeOwnerProjection}
+          AND (
+            c."primary_owner_user_id" = ${input.principal.userId}
+            OR ${input.principal.userId} = ANY(c."backup_owner_user_ids")
+          )
+        )
       )
     GROUP BY c."id", c."status", c."created_at", c."acknowledged_at", c."disposed_at", c."ack_due_at", c."dispose_due_at"
     HAVING COUNT(DISTINCT execution."id") = 1
