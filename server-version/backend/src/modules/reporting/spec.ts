@@ -105,6 +105,14 @@ const assertSystemAdmin = (actor: { userId: string; platformRole: string }): voi
   if (actor.platformRole !== 'SYSTEM_ADMIN') reportingFail('REPORT_SPEC_AUTHORITY', 'platform reporting specs require SYSTEM_ADMIN', 403)
 }
 
+const isUniqueViolation = (error: unknown): boolean => {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false
+  if (error.code === 'P2002') return true
+  if (error.code !== 'P2010') return false
+  const meta = error.meta as Record<string, unknown> | undefined
+  return meta?.code === '23505'
+}
+
 export const createPlatformReportingSpec = async (input: {
   actor: { userId: string; platformRole: string }
   specKey: string
@@ -130,7 +138,7 @@ export const createPlatformReportingSpec = async (input: {
     `
     return toRecord(rows[0])
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (isUniqueViolation(error)) {
       reportingFail('REPORT_SPEC_VERSION_CONFLICT', 'reporting spec key/version already exists', 409)
     }
     throw error
