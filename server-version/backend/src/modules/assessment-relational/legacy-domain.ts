@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { relationalFail } from './errors'
 
@@ -14,4 +15,18 @@ export const assertLegacyRelationalAssignmentDomain = async (assignmentId: strin
   if (row.policyDomain !== 'LEGACY_COURSE') {
     relationalFail('RELATIONAL_POLICY_DOMAIN', 'Organization Run assignments must use the Run execution surface')
   }
+}
+
+export const filterLegacyRelationalAssignments = async <T extends { assignmentId: string }>(
+  items: T[],
+): Promise<T[]> => {
+  if (items.length === 0) return items
+  const ids = [...new Set(items.map((item) => item.assignmentId))]
+  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "relational_assessment_assignments"
+    WHERE "id" IN (${Prisma.join(ids)}) AND "policy_domain" = 'LEGACY_COURSE'
+  `
+  const allowed = new Set(rows.map((row) => row.id))
+  return items.filter((item) => allowed.has(item.assignmentId))
 }
