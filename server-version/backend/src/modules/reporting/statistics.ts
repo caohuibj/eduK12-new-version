@@ -8,6 +8,13 @@ export const finiteReportingNumber = (value: unknown): number | null => {
   return Object.is(value, -0) ? 0 : value
 }
 
+const finiteStatistic = (value: number, operation: string): number => {
+  if (!Number.isFinite(value)) {
+    return reportingFail('REPORT_STATISTIC_OVERFLOW', `${operation} produced a non-finite result`, 500)
+  }
+  return Object.is(value, -0) ? 0 : value
+}
+
 /** Hyndman-Fan Type 7, identical to R's default quantile algorithm. */
 export const type7Quantile = (input: number[], probability: number): number | null => {
   if (input.length === 0) return null
@@ -21,18 +28,24 @@ export const type7Quantile = (input: number[], probability: number): number | nu
   const gamma = h - j
   if (j <= 0) return values[0]
   if (j >= values.length) return values[values.length - 1]
-  return values[j - 1] + gamma * (values[j] - values[j - 1])
+  return finiteStatistic(values[j - 1] + gamma * (values[j] - values[j - 1]), 'quantile interpolation')
 }
 
-const mean = (values: number[]): number | null => (
-  values.length === 0 ? null : values.reduce((sum, value) => sum + value, 0) / values.length
-)
+const mean = (values: number[]): number | null => {
+  if (values.length === 0) return null
+  const sum = finiteStatistic(values.reduce((total, value) => total + value, 0), 'mean accumulation')
+  return finiteStatistic(sum / values.length, 'mean')
+}
 
 const variance = (values: number[], sample: boolean): number | null => {
   if (values.length === 0 || (sample && values.length < 2)) return null
   const average = mean(values)!
   const denominator = sample ? values.length - 1 : values.length
-  return values.reduce((sum, value) => sum + ((value - average) ** 2), 0) / denominator
+  const sumOfSquares = finiteStatistic(
+    values.reduce((sum, value) => sum + ((value - average) ** 2), 0),
+    sample ? 'sample variance accumulation' : 'population variance accumulation',
+  )
+  return finiteStatistic(sumOfSquares / denominator, sample ? 'sample variance' : 'population variance')
 }
 
 export const reportingAggregations = (input: {
@@ -54,10 +67,10 @@ export const reportingAggregations = (input: {
     else if (aggregation === 'MEDIAN') output.median = type7Quantile(numeric, 0.5)
     else if (aggregation === 'SD_POPULATION') {
       const value = variance(numeric, false)
-      output.sdPopulation = value === null ? null : Math.sqrt(value)
+      output.sdPopulation = value === null ? null : finiteStatistic(Math.sqrt(value), 'population standard deviation')
     } else if (aggregation === 'SD_SAMPLE') {
       const value = variance(numeric, true)
-      output.sdSample = value === null ? null : Math.sqrt(value)
+      output.sdSample = value === null ? null : finiteStatistic(Math.sqrt(value), 'sample standard deviation')
     } else if (aggregation === 'MIN_MAX') {
       output.minMax = numeric.length === 0 ? null : { min: ordered[0], max: ordered[ordered.length - 1] }
     } else if (aggregation === 'QUARTILES') {
