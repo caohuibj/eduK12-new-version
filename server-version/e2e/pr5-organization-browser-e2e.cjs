@@ -60,7 +60,7 @@ const ownerJourney = async (browser) => {
 
     await page.getByLabel('年级名称').fill(fixture.gradeName)
     await page.getByRole('button', { name: '新增年级' }).click()
-    await page.getByText(fixture.gradeName, { exact: true }).waitFor()
+    await page.getByRole('region', { name: '年级与班级结构' }).locator('strong').filter({ hasText: fixture.gradeName }).waitFor()
     await screenshot(page, '01-organization-admin')
 
     // Real Run mutation, then hard reload to prove durable read-model navigation.
