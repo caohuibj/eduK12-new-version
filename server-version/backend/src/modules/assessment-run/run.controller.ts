@@ -3,12 +3,13 @@ import { acceptRunExecutionConsent } from './consent'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { error, success, unauthorized } from '../../utils/response'
-import { addAssessmentRunTrackDraft, createAssessmentRunDraft } from './repository'
+import { addAssessmentRunTrackDraft, createAssessmentRunDraft, type AssessmentRunStatus } from './repository'
 import { publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
 import { assertCurrentRunPublisherBoundary, assertRunExecutionParent } from './resourceBoundary'
+import { listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
 const selectorSchema = z.record(z.unknown()).default({})
 const policySchema = z.object({
@@ -35,6 +36,11 @@ const addTrackSchema = z.object({
   requestedPolicy: policySchema,
 })
 const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
+const listRunSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(50),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'CLOSED', 'CANCELLED']).optional(),
+})
 
 const fail = (res: Response, err: unknown) => {
   if (err instanceof RelationalAssessmentError) return error(res, err.message, -1, 409)
@@ -46,6 +52,30 @@ const fail = (res: Response, err: unknown) => {
 }
 
 export const assessmentRunController = {
+  async list(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = listRunSchema.safeParse(req.query)
+    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    try {
+      return success(res, await listAssessmentRunProducts({
+        organizationId: req.params.organizationId,
+        page: parsed.data.page,
+        pageSize: parsed.data.pageSize,
+        status: parsed.data.status as AssessmentRunStatus | undefined,
+      }))
+    } catch (err) { return fail(res, err) }
+  },
+
+  async detail(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      return success(res, await readAssessmentRunProduct(
+        req.params.organizationId,
+        req.params.runId,
+      ))
+    } catch (err) { return fail(res, err) }
+  },
+
   async create(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = createRunSchema.safeParse(req.body)

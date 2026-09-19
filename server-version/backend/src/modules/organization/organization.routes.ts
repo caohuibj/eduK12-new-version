@@ -57,9 +57,13 @@ router.get('/:organizationId/staff-class-assignments', authenticate, requireOrga
 router.post('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStaff)
 router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStaffAssignment)
 
-// Organization Run V1. Draft governance and lifecycle management are tenant-governance
-// operations. Publish intentionally delegates scoped TEACHER/COUNSELOR authority to
-// the domain service; START is respondent-scoped by frozen actor identity.
+// Organization Run V1. Product list/detail reads are bounded summaries over the
+// authoritative Run graph. Draft governance and lifecycle management are
+// tenant-governance operations. Publish intentionally delegates scoped
+// TEACHER/COUNSELOR authority to the domain service; START is respondent-scoped
+// by frozen actor identity.
+router.get('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.list)
+router.get('/:organizationId/runs/:runId', authenticate, requireOrganizationGovernance, assessmentRunController.detail)
 router.post('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.create)
 router.post('/:organizationId/runs/:runId/tracks', authenticate, requireOrganizationGovernance, assessmentRunController.addTrack)
 router.post('/:organizationId/runs/:runId/publish', authenticate, assessmentRunController.publish)
