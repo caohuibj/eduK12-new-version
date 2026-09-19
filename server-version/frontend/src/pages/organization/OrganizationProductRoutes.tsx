@@ -27,6 +27,22 @@ export default function OrganizationProductRoutes() {
       || context.access.personas.includes('COUNSELOR')
     ),
   )
+  const deliveryDenied = context?.access.explicitDenies.some((permission) => ['*', 'REPORT_READ'].includes(permission)) === true
+  const safetyDenied = context?.access.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'SAFETY_READ'].includes(permission)) === true
+  const canOpenDelivery = Boolean(
+    context?.access.membershipId
+    && !deliveryDenied
+    && (
+      context.access.capabilities.includes('REPORT_EXPORT')
+      || context.access.capabilities.includes('REPORT_MEMBER_EXPORT')
+      || (!safetyDenied && (
+        context.access.orgRole === 'ORG_ADMIN'
+        || context.access.capabilities.includes('PSYCHOLOGY_STAFF')
+        || context.access.personas.includes('TEACHER')
+        || context.access.personas.includes('COUNSELOR')
+      ))
+    ),
+  )
 
   if (isLoading) return <RouteLoading />
   if (!user) {
@@ -47,7 +63,7 @@ export default function OrganizationProductRoutes() {
           <Link to={organizationRoot}>组织</Link>
           {context?.access.canGovern && <Link to={`${organizationRoot}/runs`}>Runs</Link>}
           {canOpenReporting && <Link to={`${organizationRoot}/reporting`}>Reporting</Link>}
-          {canOpenReporting && <Link to={`${organizationRoot}/delivery`}>Safety / CSV</Link>}
+          {canOpenDelivery && <Link to={`${organizationRoot}/delivery`}>Safety / CSV</Link>}
         </nav>
       )}
       <Routes>
