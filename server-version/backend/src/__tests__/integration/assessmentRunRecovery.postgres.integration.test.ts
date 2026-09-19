@@ -133,12 +133,17 @@ suite('Assessment Run external START recovery gate (real PostgreSQL)', () => {
     const recoveredBinding = { runtimeBindingKind: 'FAKE_RUNTIME', runtimeBindingRef: `fake:${operationKey}` }
     runtime.byOperation.set(operationKey, recoveredBinding)
     runtime.mode = 'normal'
-    await db.$executeRawUnsafe(`UPDATE assessment_run_execution_start_claims SET lease_until=NOW()-INTERVAL '1 second' WHERE id=$1`, claims[0].id)
+    await db.$executeRawUnsafe(
+      `UPDATE assessment_run_execution_start_claims
+       SET claimed_at=NOW()-INTERVAL '2 seconds', lease_until=NOW()-INTERVAL '1 second'
+       WHERE id=$1`,
+      claims[0].id,
+    )
 
     const recovered = await startAssessmentRunExecution({ ...execution, resourceRegistry, runtimeAdapters: adapters })
     expect(recovered).toMatchObject({ state: 'STARTED', runtimeBindingRef: recoveredBinding.runtimeBindingRef, replayed: true })
     const after = await db.$queryRawUnsafe<Array<{ operationKey: string; claimGeneration: number; state: string }>>(
-      `SELECT operation_key AS "operationKey", claim_generation AS "claimGeneration", state FROM assessment_run_execution_start_claims WHERE execution_id=$1`,
+      `SELECT operation_key AS "operationKey", claim_generation AS "claimGeneration", state FROM assessment_run_execution_start_claimims WHERE execution_id=$1`,
       execution.executionId,
     )
     expect(after[0].operationKey).toBe(operationKey)
