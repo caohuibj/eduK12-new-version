@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { randomUUID } from 'node:crypto'
 import { writeFileSync } from 'node:fs'
 import bcrypt from '../backend/node_modules/bcryptjs'
