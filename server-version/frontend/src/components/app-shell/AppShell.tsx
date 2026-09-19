@@ -44,7 +44,6 @@ function AppShellContent({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mode === 'display') return
     document.title = `${title === 'Huisurvey' ? '' : `${title} · `}Huisurvey`
-    // Path navigation only: query changes and trial updates must not steal player focus.
     if (previousPath.current !== location.pathname && mode !== 'focused') mainRef.current?.focus()
     previousPath.current = location.pathname
   }, [location.pathname, title, mode])
@@ -69,23 +68,16 @@ function AppShellContent({ children }: { children: ReactNode }) {
                 onChange={(event) => {
                   const organizationId = event.target.value
                   if (!organizationId) return
-                  if (organizationRoute) {
-                    navigate(`/organizations/${encodeURIComponent(organizationId)}`)
-                  } else {
-                    void selectOrganization(organizationId)
-                  }
+                  if (organizationRoute) navigate(`/organizations/${encodeURIComponent(organizationId)}`)
+                  else void selectOrganization(organizationId)
                 }}
               >
                 <option value="" disabled>{organizationLoading ? '正在加载…' : '选择组织'}</option>
-                {organizations.map((organization) => (
-                  <option key={organization.id} value={organization.id}>
-                    {organization.name}{organization.status === 'SUSPENDED' ? '（已暂停）' : ''}
-                  </option>
-                ))}
+                {organizations.map((organization) => <option key={organization.id} value={organization.id}>{organization.name}{organization.status === 'SUSPENDED' ? '（已暂停）' : ''}</option>)}
               </select>
             </label>
           )}
-          {user && mode === 'standard' && activeOrganization && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>}
+          {user && mode === 'standard' && activeOrganization && <><Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>{activeOrganization.access.canGovern && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/runs`}>Runs</Link>}</>}
           {user && mode === 'standard' && organizationError && <span role="status" className="text-sm text-red-700">组织上下文不可用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>
@@ -105,9 +97,5 @@ function AppShellContent({ children }: { children: ReactNode }) {
 }
 
 export default function AppShell({ children }: { children: ReactNode }) {
-  return (
-    <OrganizationProvider>
-      <AppShellContent>{children}</AppShellContent>
-    </OrganizationProvider>
-  )
+  return <OrganizationProvider><AppShellContent>{children}</AppShellContent></OrganizationProvider>
 }
