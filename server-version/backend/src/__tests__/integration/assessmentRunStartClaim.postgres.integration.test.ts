@@ -146,7 +146,9 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
     expect(first.kind).toBe('ACQUIRED')
     if (first.kind !== 'ACQUIRED') throw new Error('expected acquired')
     await db.$executeRawUnsafe(
-      `UPDATE "assessment_run_execution_start_claims" SET "lease_until"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
+      `UPDATE "assessment_run_execution_start_claims"
+       SET "claimed_at"=NOW()-INTERVAL '2 seconds', "lease_until"=NOW()-INTERVAL '1 second'
+       WHERE "id"=$1`,
       first.claim.id,
     )
     const second = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
@@ -166,7 +168,9 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
       leaseMs: 30_000,
     })
     await db.$executeRawUnsafe(
-      `UPDATE "assessment_run_execution_start_claims" SET "lease_until"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
+      `UPDATE "assessment_run_execution_start_claims"
+       SET "claimed_at"=NOW()-INTERVAL '2 seconds', "lease_until"=NOW()-INTERVAL '1 second'
+       WHERE "id"=$1`,
       first.claim.id,
     )
     const recovered = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
