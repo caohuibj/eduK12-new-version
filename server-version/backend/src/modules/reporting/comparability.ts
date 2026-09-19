@@ -8,7 +8,7 @@ import {
 } from './types'
 
 const HASH = /^[0-9a-f]{64}$/
-const levels = new Set<ReportingComparabilityLevel>(['EXACT', 'COMPATIBLE', 'LINKED', 'LIMITED', 'NOT_COMPARABLE'])
+const positiveLevels = new Set<ReportingComparabilityRuleV1['level']>(['EXACT', 'COMPATIBLE', 'LINKED', 'LIMITED'])
 
 const operationsFor = (level: ReportingComparabilityLevel): ReportingComparabilityOperation[] => {
   if (level === 'EXACT' || level === 'COMPATIBLE' || level === 'LINKED') {
@@ -20,7 +20,7 @@ const operationsFor = (level: ReportingComparabilityLevel): ReportingComparabili
 
 export const validateComparabilityRule = (rule: ReportingComparabilityRuleV1 | unknown): ReportingComparabilityRuleV1 => {
   const value = rule as ReportingComparabilityRuleV1
-  if (!value || value.schemaVersion !== 1 || !levels.has(value.level) || value.level === 'NOT_COMPARABLE') {
+  if (!value || value.schemaVersion !== 1 || !positiveLevels.has(value.level)) {
     reportingFail('REPORT_COMPARABILITY_RULE_INVALID', 'comparability rule is invalid', 400)
   }
   for (const field of ['metricId', 'resourceKey', 'fromVersion', 'toVersion', 'evidenceRef'] as const) {
