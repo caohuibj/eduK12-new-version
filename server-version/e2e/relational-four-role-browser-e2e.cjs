@@ -1,4 +1,6 @@
 const assert = require('node:assert/strict')
+const { execFileSync } = require('node:child_process')
+const { join } = require('node:path')
 const { chromium } = require('../backend/node_modules/playwright-core')
 
 const baseUrl = process.env.RELATIONAL_E2E_BASE_URL || 'http://127.0.0.1:5173'
@@ -115,7 +117,7 @@ const installMocks = async (page, role) => {
   })
 }
 
-const main = async () => {
+const relationalAcceptance = async () => {
   const browser = await chromium.launch({ headless: true })
   try {
     for (const role of ['PARENT', 'STUDENT', 'TEACHER', 'ADMIN']) {
@@ -145,6 +147,29 @@ const main = async () => {
   } finally {
     await browser.close()
   }
+}
+
+const pr5OrganizationAcceptance = () => {
+  const serverRoot = join(__dirname, '..')
+  const tsx = join(serverRoot, 'backend', 'node_modules', '.bin', 'tsx')
+  execFileSync(tsx, [join(__dirname, 'pr5-organization-browser-fixture.ts')], {
+    cwd: serverRoot,
+    env: process.env,
+    stdio: 'inherit',
+  })
+  execFileSync(process.execPath, [join(__dirname, 'pr5-organization-browser-e2e.cjs')], {
+    cwd: serverRoot,
+    env: process.env,
+    stdio: 'inherit',
+  })
+}
+
+const main = async () => {
+  await relationalAcceptance()
+  // PR5 deliberately runs in the same exact-head browser job and against the
+  // same live PostgreSQL/backend/frontend services, after the existing RA-02
+  // acceptance. No route mocks are installed for this Organization journey.
+  pr5OrganizationAcceptance()
 }
 
 main().catch((error) => {
