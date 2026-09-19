@@ -23,7 +23,25 @@ export interface RunProgressProjection {
   executions: RunExecutionProgressProjection[]
 }
 
-export const readAssessmentRunProgress = async (runId: string): Promise<RunProgressProjection> => {
+export class RunProgressError extends Error {
+  constructor(public readonly code: string, message: string, public readonly statusCode = 404) {
+    super(message)
+    this.name = 'RunProgressError'
+  }
+}
+
+export const readAssessmentRunProgress = async (
+  organizationId: string,
+  runId: string,
+): Promise<RunProgressProjection> => {
+  const runs = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id"
+    FROM "assessment_runs"
+    WHERE "organization_id" = ${organizationId} AND "id" = ${runId}
+    LIMIT 1
+  `
+  if (!runs[0]) throw new RunProgressError('RUN_NOT_FOUND', 'Run not found in organization', 404)
+
   const rows = await prisma.$queryRaw<Array<{
     executionId: string
     executionStatus: string
@@ -39,7 +57,7 @@ export const readAssessmentRunProgress = async (runId: string): Promise<RunProgr
     LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
     LEFT JOIN "composite_assessment_attempts" ca
       ON e."runtime_binding_kind" = 'COMPOSITE' AND ca."id" = e."runtime_binding_ref"
-    WHERE e."run_id" = ${runId}
+    WHERE e."organization_id" = ${organizationId} AND e."run_id" = ${runId}
     ORDER BY e."created_at", e."id"
   `
 
