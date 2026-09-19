@@ -213,11 +213,22 @@ export const assertRunTrackNarrowing = (
   }
 }
 
-// C04 intentionally does not enable START. C12 replaces capability declarations
-// only after the adapter proves transactional start or operation-key recovery.
+const transactionalCompositeCapabilities: Partial<RunResourceAdapterCapabilities> = {
+  transactionMode: 'TRANSACTIONAL_DB',
+  startMode: 'TRANSACTIONAL',
+  supportsLookupByOperationKey: false,
+  supportsSafeCancel: false,
+  finalAuthority: 'CANONICAL_RUNTIME',
+  runtimeBindingKind: 'COMPOSITE',
+  runV1Enabled: true,
+}
+
+// C12 proves the existing relational Composite START can transition the assignment,
+// create the runtime attempt, attach the Run binding, and complete the claim in one
+// database transaction. Families that do not launch through Composite stay unsupported.
 export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRegistry([
-  createRelationalRunResourceAdapter({ family: 'BUNDLE' }),
-  createRelationalRunResourceAdapter({ family: 'SCALE' }),
-  createRelationalRunResourceAdapter({ family: 'FORM' }),
-  createRelationalRunResourceAdapter({ family: 'SITUATIONAL' }),
+  createRelationalRunResourceAdapter({ family: 'BUNDLE', capabilities: transactionalCompositeCapabilities }),
+  createRelationalRunResourceAdapter({ family: 'SCALE', capabilities: transactionalCompositeCapabilities }),
+  createRelationalRunResourceAdapter({ family: 'FORM', capabilities: transactionalCompositeCapabilities }),
+  createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
 ])
