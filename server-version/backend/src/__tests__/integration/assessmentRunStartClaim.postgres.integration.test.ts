@@ -11,6 +11,7 @@ import {
   acquireRunExecutionStartClaim,
   markRunStartDispatchIntent,
 } from '../../modules/assessment-run/startClaim'
+import { freezeRunExecutionScientificProvenance } from '../../modules/assessment-run/scientificProvenance'
 
 const DB_URL = integrationDatabaseUrl(
   'RELEASE_INTEGRATION_DATABASE_URL',
@@ -107,11 +108,11 @@ async function createExecution(label: string) {
     expectedVersion: 2,
     resourceRegistry: registry,
   })
-  const executions = await db.$queryRawUnsafe<Array<{ id: string }>>(
-    `SELECT id FROM "assessment_run_executions" WHERE "run_id"=$1`,
+  const executions = await db.$queryRawUnsafe<Array<{ id: string; trackId: string }>>(
+    `SELECT id, track_id AS "trackId" FROM "assessment_run_executions" WHERE "run_id"=$1`,
     run.id,
   )
-  return { executionId: executions[0].id, actorUserId: student.id }
+  return { executionId: executions[0].id, trackId: executions[0].trackId, actorUserId: student.id }
 }
 
 suite('Assessment Run durable START claims (real PostgreSQL)', () => {
@@ -124,8 +125,8 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
   it('admits exactly one active claim under concurrent START and never accepts a client operation key', async () => {
     const execution = await createExecution('concurrent')
     const results = await Promise.all([
-      acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 }),
-      acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 }),
+      acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 }),
+      acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 }),
     ])
     expect(results.filter((result) => result.kind === 'ACQUIRED')).toHaveLength(1)
     expect(results.filter((result) => result.kind === 'IN_PROGRESS')).toHaveLength(1)
@@ -141,14 +142,14 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
 
   it('takes over an expired undispatched claim by generation while preserving the server operation key', async () => {
     const execution = await createExecution('takeover')
-    const first = await acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 })
+    const first = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
     expect(first.kind).toBe('ACQUIRED')
     if (first.kind !== 'ACQUIRED') throw new Error('expected acquired')
     await db.$executeRawUnsafe(
       `UPDATE "assessment_run_execution_start_claims" SET "lease_until"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
       first.claim.id,
     )
-    const second = await acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 })
+    const second = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
     expect(second.kind).toBe('ACQUIRED')
     if (second.kind !== 'ACQUIRED') throw new Error('expected takeover')
     expect(second.claim.operationKey).toBe(first.claim.operationKey)
@@ -157,7 +158,7 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
 
   it('routes an expired dispatched claim to recovery with the same operation key instead of blind retry', async () => {
     const execution = await createExecution('recovery')
-    const first = await acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 })
+    const first = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
     if (first.kind !== 'ACQUIRED') throw new Error('expected acquired')
     const dispatched = await markRunStartDispatchIntent({
       claimId: first.claim.id,
@@ -168,11 +169,35 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
       `UPDATE "assessment_run_execution_start_claims" SET "lease_until"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
       first.claim.id,
     )
-    const recovered = await acquireRunExecutionStartClaim({ ...execution, leaseMs: 30_000 })
+    const recovered = await acquireRunExecutionStartClaim({ executionId: execution.executionId, actorUserId: execution.actorUserId, leaseMs: 30_000 })
     expect(recovered.kind).toBe('RECOVER')
     if (recovered.kind !== 'RECOVER') throw new Error('expected recovery')
     expect(recovered.claim.operationKey).toBe(dispatched.operationKey)
     expect(recovered.claim.claimGeneration).toBe(dispatched.claimGeneration + 1)
     expect(recovered.claim.state).toBe('DISPATCHED')
+  })
+
+  it('freezes maturity exactly once from publish-time resource provenance even if the Track metadata later changes', async () => {
+    const execution = await createExecution('science')
+    const first = await freezeRunExecutionScientificProvenance(execution.executionId)
+    expect(first.scientificMaturity).toBe('PILOT')
+
+    const promotedPolicy = {
+      family: 'BUNDLE',
+      key: 'promoted',
+      version: '1.0.0',
+      scientificMaturity: 'RESEARCH_READY',
+    }
+    await db.$executeRawUnsafe(
+      `UPDATE "assessment_run_tracks" SET "frozen_resource_policy"=$1::jsonb, "resource_policy_hash"=$2 WHERE "id"=$3`,
+      JSON.stringify(promotedPolicy),
+      canonicalHash(promotedPolicy),
+      execution.trackId,
+    )
+
+    const replay = await freezeRunExecutionScientificProvenance(execution.executionId)
+    expect(replay.scientificMaturity).toBe('PILOT')
+    expect(replay.scientificProvenanceHash).toBe(first.scientificProvenanceHash)
+    expect(replay.scientificProvenance.resourcePolicyHash).toBe(first.scientificProvenance.resourcePolicyHash)
   })
 })
