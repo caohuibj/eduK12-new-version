@@ -8,11 +8,15 @@ import type {
 } from './types'
 
 const EXACT_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/
-const ACTOR_ROLES = new Set<RelationalActorRoleV1>(['STUDENT', 'TEACHER', 'PARENT'])
+const ACTOR_ROLES = new Set<RelationalActorRoleV1>([
+  'STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT',
+])
 const RELATIONSHIP_KINDS = new Set<RelationalRelationshipKindV1>([
   'SELF',
   'PARENT_CHILD',
   'COURSE_TEACHER_STUDENT',
+  'CLASS_TEACHER_STUDENT',
+  'COUNSELOR_CLIENT',
 ])
 const PERSPECTIVES = new Set<RelationalPerspectiveV1>([
   'SELF_REPORT',
