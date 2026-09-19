@@ -4,7 +4,7 @@ const { chromium } = require('../backend/node_modules/playwright-core')
 
 const baseUrl = (process.env.PR5_ORGANIZATION_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const fixtureFile = process.env.PR5_ORGANIZATION_E2E_FIXTURE_FILE || '/tmp/eduk12-pr5-organization-fixture.json'
-const screenshotDir = process.env.PR5_ORGANIZATION_E2E_SCREENSHOT_DIR || '/tmp/eduk12-pr5-organization-e2e'
+const screenshotDir = process.env.PR5_ORGANIZATION_E2E_SCREENSHOT_DIR || '/tmp/eduk12-situational-bundle-e2e/pr5-organization'
 const fixture = JSON.parse(readFileSync(fixtureFile, 'utf8'))
 
 const assertEnvelope = async (response, label) => {
