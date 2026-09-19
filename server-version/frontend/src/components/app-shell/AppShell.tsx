@@ -36,7 +36,9 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const [loggingOut, setLoggingOut] = useState(false)
   const menuOpen = openPath === location.pathname
   const reportingContext = activeOrganization?.access
-  const reportingDenied = reportingContext?.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'ORG_GROUP_REPORT_V1'].includes(permission)) === true
+  const explicitDenies = reportingContext?.explicitDenies ?? []
+  const hasDeny = (...permissions: string[]) => explicitDenies.some((permission) => permission === '*' || permissions.includes(permission))
+  const reportingDenied = hasDeny('REPORT_READ', 'ORG_GROUP_REPORT_V1')
   const canOpenReporting = Boolean(
     activeOrganization?.organization.status === 'ACTIVE'
     && reportingContext?.membershipId
@@ -48,22 +50,30 @@ function AppShellContent({ children }: { children: ReactNode }) {
       || reportingContext.personas.includes('COUNSELOR')
     ),
   )
-  const deliveryDenied = reportingContext?.explicitDenies.some((permission) => ['*', 'REPORT_READ'].includes(permission)) === true
-  const safetyDenied = reportingContext?.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'SAFETY_READ'].includes(permission)) === true
-  const canOpenDelivery = Boolean(
+  const canExportAggregate = Boolean(
+    activeOrganization?.organization.status === 'ACTIVE'
+    && reportingContext?.membershipId
+    && reportingContext.capabilities.includes('REPORT_EXPORT')
+    && !hasDeny('REPORT_READ', 'REPORT_EXPORT'),
+  )
+  const canExportMember = Boolean(
+    activeOrganization?.organization.status === 'ACTIVE'
+    && reportingContext?.membershipId
+    && reportingContext.capabilities.includes('REPORT_MEMBER_EXPORT')
+    && !hasDeny('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT'),
+  )
+  const safetyDenied = hasDeny('REPORT_READ', 'SAFETY_READ')
+  const canOpenSafety = Boolean(
     reportingContext?.membershipId
-    && !deliveryDenied
+    && !safetyDenied
     && (
-      reportingContext.capabilities.includes('REPORT_EXPORT')
-      || reportingContext.capabilities.includes('REPORT_MEMBER_EXPORT')
-      || (!safetyDenied && (
-        reportingContext.orgRole === 'ORG_ADMIN'
-        || reportingContext.capabilities.includes('PSYCHOLOGY_STAFF')
-        || reportingContext.personas.includes('TEACHER')
-        || reportingContext.personas.includes('COUNSELOR')
-      ))
+      (activeOrganization?.organization.status === 'ACTIVE' && reportingContext.orgRole === 'ORG_ADMIN')
+      || reportingContext.capabilities.includes('PSYCHOLOGY_STAFF')
+      || reportingContext.personas.includes('TEACHER')
+      || reportingContext.personas.includes('COUNSELOR')
     ),
   )
+  const canOpenDelivery = canExportAggregate || canExportMember || canOpenSafety
 
   useEffect(() => {
     if (!user || mode !== 'standard' || activeOrganization || organizationLoading || organizations.length !== 1) return
