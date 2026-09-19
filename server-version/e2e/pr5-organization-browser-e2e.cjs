@@ -30,6 +30,20 @@ const screenshot = async (page, name) => {
 
 const organizationPath = `/organizations/${fixture.organizationId}`
 
+const assertPublishedGroupSpec = async (page) => {
+  // Native <option> elements are not considered visible by Playwright even
+  // when they are present in a rendered <select>. Exercise the actual control
+  // instead: selectOption waits for the discovered option to exist and proves
+  // that the published spec is usable by the product surface.
+  const specSelect = page.getByLabel('Published GROUP spec')
+  await specSelect.selectOption(fixture.publishedSpec.id)
+  assert.equal(
+    await specSelect.inputValue(),
+    fixture.publishedSpec.id,
+    'published GROUP spec must be discoverable and selectable',
+  )
+}
+
 const ownerJourney = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
@@ -62,7 +76,7 @@ const ownerJourney = async (browser) => {
 
     await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
-    await page.getByText(fixture.publishedSpec.key, { exact: false }).waitFor()
+    await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
     await page.getByRole('heading', { name: 'Safety inbox', exact: true }).waitFor()
@@ -110,7 +124,7 @@ const teacherJourney = async (browser) => {
 
     await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
-    await page.getByText(fixture.publishedSpec.key, { exact: false }).waitFor()
+    await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
     await page.getByText('当前没有可见 Safety case。', { exact: true }).waitFor()
