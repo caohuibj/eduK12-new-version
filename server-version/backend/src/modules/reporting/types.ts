@@ -4,6 +4,31 @@ export type ReportingMaturity = 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
 export type ReportingProvenanceState = 'FROZEN' | 'LEGACY_UNFROZEN'
 export type ReportingResultQuality = 'interpretable' | 'limited' | 'invalid'
 export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
+export type ReportingComparabilityLevel = 'EXACT' | 'COMPATIBLE' | 'LINKED' | 'LIMITED' | 'NOT_COMPARABLE'
+export type ReportingComparabilityOperation = 'SIDE_BY_SIDE' | 'DESCRIPTIVE_TREND' | 'NUMERIC_DELTA'
+
+export interface ReportingComparabilityRuleV1 {
+  schemaVersion: 1
+  metricId: string
+  resourceFamily: ReportingResourceFamily
+  resourceKey: string
+  fromVersion: string
+  toVersion: string
+  level: Exclude<ReportingComparabilityLevel, 'NOT_COMPARABLE'>
+  /** Reviewed evidence identity; never inferred from display labels. */
+  evidenceRef: string
+  evidenceHash: string
+}
+
+export interface ReportingComparabilityDecisionV1 {
+  schemaVersion: 1
+  metricId: string
+  level: ReportingComparabilityLevel
+  allowedOperations: ReportingComparabilityOperation[]
+  evidenceRef: string | null
+  evidenceHash: string | null
+  limitations: string[]
+}
 
 export interface ReportingMetricRuleV1 {
   metricId: string
