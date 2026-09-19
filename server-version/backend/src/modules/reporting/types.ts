@@ -3,6 +3,7 @@ export type ReportingAggregation = 'MEAN' | 'MEDIAN' | 'SD_POPULATION' | 'SD_SAM
 export type ReportingMaturity = 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
 export type ReportingProvenanceState = 'FROZEN' | 'LEGACY_UNFROZEN'
 export type ReportingResultQuality = 'interpretable' | 'limited' | 'invalid'
+export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
 
 export interface ReportingMetricRuleV1 {
   metricId: string
@@ -74,6 +75,69 @@ export interface ReportingCohortSnapshotRecord {
   generatedAt: Date
 }
 
+export interface ReportingSeriesScopeV1 {
+  schemaVersion: 1
+  resourceFamily: ReportingResourceFamily
+  /** Stable resource identity across versions; comparability governs cross-version deltas. */
+  resourceKey: string
+}
+
+export interface ReportingSeriesRecordV1 {
+  id: string
+  organizationId: string
+  seriesKey: string
+  scope: ReportingSeriesScopeV1
+  seriesIdentityHash: string
+  snapshotHash: string
+  createdByUserId: string
+  createdAt: Date
+}
+
+export interface ReportingWaveResolvedInputV1 {
+  executionId: string
+  subjectUserId: string
+  membershipId: string
+  canonicalResultHash: string
+  scientificMaturity: ReportingMaturity | null
+  provenanceState: ReportingProvenanceState
+  scientificProvenanceHash: string | null
+}
+
+export interface ReportingWaveUnresolvedInputV1 {
+  executionId: string
+  subjectUserId: string
+  membershipId: string
+  reason: 'NOT_COMPLETED'
+}
+
+export interface ReportingWaveInputManifestV1 {
+  schemaVersion: 1
+  resource: {
+    family: ReportingResourceFamily
+    key: string
+    version: string
+    minimumN: number | null
+  }
+  resolved: ReportingWaveResolvedInputV1[]
+  unresolved: ReportingWaveUnresolvedInputV1[]
+}
+
+export interface ReportingSeriesWaveRecordV1 {
+  id: string
+  organizationId: string
+  seriesId: string
+  waveKey: string
+  ordinal: number
+  cohortSnapshotId: string
+  sourceRunId: string
+  sourceTrackId: string
+  inputManifest: ReportingWaveInputManifestV1
+  inputIdentityHash: string
+  snapshotHash: string
+  createdByUserId: string
+  createdAt: Date
+}
+
 export interface ReportingResolvedMetricV1 {
   key: string
   value: unknown
@@ -101,7 +165,7 @@ export interface ReportingUnresolvedExecutionV1 {
 }
 
 export interface ReportingResultBatchV1 {
-  resourceFamily: 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
+  resourceFamily: ReportingResourceFamily
   resourceKey: string
   resourceVersion: string
   resourceMinimumN: number | null
