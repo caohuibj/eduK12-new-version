@@ -109,6 +109,7 @@ export const buildReportingWaveInputManifest = (batch: ReportingResultBatchV1): 
     subjectUserId: result.subjectUserId,
     membershipId: result.membershipId,
     canonicalResultHash: result.canonicalResultHash,
+    metrics: [...result.metrics].sort((a, b) => a.key.localeCompare(b.key)),
     scientificMaturity: result.scientificMaturity,
     provenanceState: result.provenanceState,
     scientificProvenanceHash: result.scientificProvenanceHash,

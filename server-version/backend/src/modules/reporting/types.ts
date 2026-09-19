@@ -55,6 +55,20 @@ export interface ReportingAnalysisSpecDefinitionV1 {
   metricRules: ReportingMetricRuleV1[]
 }
 
+export interface ReportingRepeatedCohortSpecV1 {
+  schemaVersion: 1
+  analysisKind: 'REPEATED_COHORT'
+  engineKey: 'ORG_REPEATED_COHORT_V1'
+  engineVersion: '1.0.0'
+  privacyUnit: 'SUBJECT'
+  selectionPolicy: 'UNIQUE_OR_REJECT'
+  minimumCohortN: number
+  minimumContributorN: number
+  reportEvidenceCeiling: ReportingMaturity
+  metricRules: ReportingMetricRuleV1[]
+  comparabilityRules: ReportingComparabilityRuleV1[]
+}
+
 export interface ReportingAnalysisSpecRecord {
   id: string
   specKey: string
@@ -118,11 +132,19 @@ export interface ReportingSeriesRecordV1 {
   createdAt: Date
 }
 
+export interface ReportingResolvedMetricV1 {
+  key: string
+  value: unknown
+  resultQuality: ReportingResultQuality
+  metricQuality: string | null
+}
+
 export interface ReportingWaveResolvedInputV1 {
   executionId: string
   subjectUserId: string
   membershipId: string
   canonicalResultHash: string
+  metrics: ReportingResolvedMetricV1[]
   scientificMaturity: ReportingMaturity | null
   provenanceState: ReportingProvenanceState
   scientificProvenanceHash: string | null
@@ -161,13 +183,6 @@ export interface ReportingSeriesWaveRecordV1 {
   snapshotHash: string
   createdByUserId: string
   createdAt: Date
-}
-
-export interface ReportingResolvedMetricV1 {
-  key: string
-  value: unknown
-  resultQuality: ReportingResultQuality
-  metricQuality: string | null
 }
 
 export interface ReportingResolvedExecutionV1 {
@@ -218,6 +233,32 @@ export interface ReportingSafeProjectionV1 {
   resultContributorN?: number
   metrics?: Record<string, ReportingMetricProjectionV1>
   evidence?: ReportingEvidenceProjectionV1
+}
+
+export interface ReportingRepeatedWaveProjectionV1 {
+  waveId: string
+  waveKey: string
+  ordinal: number
+  state: 'present' | 'suppressed'
+  eligibleN?: number
+  resultContributorN?: number
+  metrics?: Record<string, ReportingMetricProjectionV1>
+  evidence: ReportingEvidenceProjectionV1
+}
+
+export interface ReportingWavePairComparabilityV1 {
+  fromWaveId: string
+  toWaveId: string
+  metrics: Record<string, ReportingComparabilityDecisionV1>
+}
+
+export interface ReportingRepeatedCohortProjectionV1 {
+  schemaVersion: 1
+  kind: 'REPEATED_COHORT'
+  state: 'present' | 'suppressed'
+  waves: ReportingRepeatedWaveProjectionV1[]
+  comparisons: ReportingWavePairComparabilityV1[]
+  limitations: ['INDEPENDENT_WAVE_POPULATIONS', 'NOT_INDIVIDUAL_CHANGE']
 }
 
 export interface ReportingArtifactPayloadV1 {

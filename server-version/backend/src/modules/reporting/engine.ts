@@ -16,8 +16,8 @@ const maturityByRank: ReportingMaturity[] = ['PILOT', 'RESEARCH_READY', 'RESEARC
 
 const subjectKey = (userId: string, membershipId: string): string => `${userId}\u0000${membershipId}`
 
-const evidenceFor = (
-  resolved: ReportingResolvedExecutionV1[],
+export const reportingEvidenceFor = (
+  resolved: Array<Pick<ReportingResolvedExecutionV1, 'scientificMaturity' | 'provenanceState'>>,
   ceiling: ReportingMaturity,
 ): { level: ReportingMaturity; limitations: string[]; profile: Record<string, number> } => {
   const profile: Record<string, number> = { PILOT: 0, RESEARCH_READY: 0, RESEARCH_GRADE: 0, LEGACY_UNFROZEN: 0 }
@@ -110,7 +110,7 @@ export const buildReportingArtifact = (input: {
     }
   }
 
-  const evidence = evidenceFor(input.batch.resolved, input.spec.definition.reportEvidenceCeiling)
+  const evidence = reportingEvidenceFor(input.batch.resolved, input.spec.definition.reportEvidenceCeiling)
   const projection: ReportingSafeProjectionV1 = overallPresent
     ? {
         schemaVersion: 1,
