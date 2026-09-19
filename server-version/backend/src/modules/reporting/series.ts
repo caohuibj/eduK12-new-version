@@ -6,6 +6,7 @@ import { readReportingCohort } from './cohort'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import {
   reportingFail,
+  type ReportingResourceFamily,
   type ReportingResultBatchV1,
   type ReportingSeriesRecordV1,
   type ReportingSeriesScopeV1,
@@ -40,7 +41,7 @@ type WaveRow = {
   createdAt: Date
 }
 
-const resourceFamilies = new Set(['BUNDLE', 'SCALE', 'COGNITIVE', 'SITUATIONAL'])
+const resourceFamilies = new Set<ReportingResourceFamily>(['BUNDLE', 'SCALE', 'COGNITIVE', 'SITUATIONAL'])
 
 export const validateReportingSeriesScope = (input: ReportingSeriesScopeV1 | unknown): ReportingSeriesScopeV1 => {
   const scope = input as ReportingSeriesScopeV1
@@ -51,6 +52,23 @@ export const validateReportingSeriesScope = (input: ReportingSeriesScopeV1 | unk
     reportingFail('REPORT_SERIES_SCOPE_INVALID', 'reporting series resourceKey is required', 400)
   }
   return { schemaVersion: 1, resourceFamily: scope.resourceFamily, resourceKey: scope.resourceKey.trim() }
+}
+
+const validateWaveManifest = (input: ReportingWaveInputManifestV1 | unknown): ReportingWaveInputManifestV1 => {
+  const manifest = input as ReportingWaveInputManifestV1
+  if (
+    !manifest
+    || manifest.schemaVersion !== 1
+    || !manifest.resource
+    || !resourceFamilies.has(manifest.resource.family)
+    || typeof manifest.resource.key !== 'string'
+    || manifest.resource.key.length === 0
+    || typeof manifest.resource.version !== 'string'
+    || manifest.resource.version.length === 0
+    || !Array.isArray(manifest.resolved)
+    || !Array.isArray(manifest.unresolved)
+  ) reportingFail('REPORT_WAVE_INTEGRITY', 'stored Wave manifest is invalid', 500)
+  return manifest
 }
 
 const seriesSnapshotPayload = (row: SeriesRow) => ({
@@ -129,19 +147,12 @@ const waveSnapshotPayload = (row: WaveRow) => ({
 
 const assertWaveIntegrity = (row: WaveRow): ReportingSeriesWaveRecordV1 => {
   if (!Number.isInteger(row.ordinal) || row.ordinal < 1) reportingFail('REPORT_WAVE_INTEGRITY', 'stored Wave ordinal is invalid', 500)
-  const expectedInput = canonicalHash({
-    schema: 'ReportingWaveInputIdentityV1',
-    cohortIdentityHash: '__verified-at-source-read__',
-    manifest: row.inputManifest,
-  })
-  // The cohort hash is not duplicated into the Wave row. Full source binding is rechecked in readReportingSeriesWave.
-  if (!row.inputIdentityHash || !row.snapshotHash || !expectedInput) {
-    reportingFail('REPORT_WAVE_INTEGRITY', 'stored Wave identity is incomplete', 500)
-  }
-  if (canonicalHash(waveSnapshotPayload(row)) !== row.snapshotHash) {
+  const inputManifest = validateWaveManifest(row.inputManifest)
+  const normalized = { ...row, inputManifest }
+  if (canonicalHash(waveSnapshotPayload(normalized)) !== row.snapshotHash) {
     reportingFail('REPORT_WAVE_INTEGRITY', 'stored reporting Wave failed integrity verification', 500)
   }
-  return row
+  return normalized
 }
 
 const isUniqueViolation = (error: unknown): boolean => {
@@ -254,12 +265,9 @@ export const bindReportingSeriesWave = async (input: {
       VALUES (${row.id},${row.organizationId},${row.seriesId},${row.waveKey},${row.ordinal},${row.cohortSnapshotId},${row.sourceRunId},${row.sourceTrackId},
         ${JSON.stringify(row.inputManifest)}::jsonb,${row.inputIdentityHash},${row.snapshotHash},${row.createdByUserId},${row.createdAt})
       ON CONFLICT ("organization_id","series_id","wave_key") DO NOTHING
-      RETURNING "id", "organization_id" AS "organizationId", "series_id" AS "seriesId", "wave_key" AS "waveKey", "ordinal",
-        "cohort_snapshot_id" AS "cohortSnapshotId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
-        "input_manifest" AS "inputManifest", "input_identity_hash" AS "inputIdentityHash", "snapshot_hash" AS "snapshotHash",
-        "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt"
+      RETURNING "id"
     `
-    if (inserted[0]) return assertWaveIntegrity(inserted[0])
+    if (inserted[0]) return readReportingSeriesWave({ organizationId: row.organizationId, seriesId: row.seriesId, waveKey: row.waveKey })
   } catch (error) {
     if (isUniqueViolation(error)) reportingFail('REPORT_WAVE_CONFLICT', 'Wave ordinal or source binding conflicts with an existing Wave', 409)
     throw error

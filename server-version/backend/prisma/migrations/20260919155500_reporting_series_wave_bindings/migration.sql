@@ -15,8 +15,11 @@ CREATE TABLE "reporting_series" (
   CONSTRAINT "reporting_series_key_check" CHECK (length(btrim("series_key")) > 0),
   CONSTRAINT "reporting_series_scope_shape_check" CHECK (
     jsonb_typeof("scope") = 'object'
-    AND ("scope"->>'schemaVersion')::int = 1
+    AND jsonb_typeof("scope"->'schemaVersion') = 'number'
+    AND "scope"->>'schemaVersion' = '1'
+    AND jsonb_typeof("scope"->'resourceFamily') = 'string'
     AND "scope"->>'resourceFamily' IN ('BUNDLE','SCALE','COGNITIVE','SITUATIONAL')
+    AND jsonb_typeof("scope"->'resourceKey') = 'string'
     AND length(btrim("scope"->>'resourceKey')) > 0
   ),
   CONSTRAINT "reporting_series_identity_hash_check" CHECK ("series_identity_hash" ~ '^[0-9a-f]{64}$'),
@@ -52,7 +55,9 @@ CREATE TABLE "reporting_series_waves" (
   CONSTRAINT "reporting_series_waves_ordinal_check" CHECK ("ordinal" >= 1),
   CONSTRAINT "reporting_series_waves_manifest_shape_check" CHECK (
     jsonb_typeof("input_manifest") = 'object'
-    AND ("input_manifest"->>'schemaVersion')::int = 1
+    AND jsonb_typeof("input_manifest"->'schemaVersion') = 'number'
+    AND "input_manifest"->>'schemaVersion' = '1'
+    AND jsonb_typeof("input_manifest"->'resource') = 'object'
     AND jsonb_typeof("input_manifest"->'resolved') = 'array'
     AND jsonb_typeof("input_manifest"->'unresolved') = 'array'
   ),
