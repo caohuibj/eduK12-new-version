@@ -29,6 +29,7 @@ type ExecutionRow = {
   resourceFamily: string
   resourceKey: string
   resourceVersion: string
+  requestedPolicy: Record<string, unknown> | null
   frozenResourcePolicy: Record<string, unknown> | null
   scientificMaturity: 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE' | null
   scientificProvenanceHash: string | null
@@ -39,6 +40,10 @@ const asQuality = (value: string): ReportingResultQuality => {
   return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical result has unknown quality state', 500)
 }
 
+const positiveMinimum = (value: unknown): number | null => (
+  typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null
+)
+
 const resolveInTransaction = async (
   tx: Tx,
   cohort: ReportingCohortSnapshotRecord,
@@ -48,7 +53,7 @@ const resolveInTransaction = async (
       e."relational_assignment_id" AS "assignmentId", e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
       subject."user_id" AS "subjectUserId", subject."membership_id" AS "membershipId", respondent."user_id" AS "respondentUserId",
       relationship."relationship_kind" AS "relationshipKind", t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
-      t."resource_version" AS "resourceVersion", t."frozen_resource_policy" AS "frozenResourcePolicy",
+      t."resource_version" AS "resourceVersion", t."requested_policy" AS "requestedPolicy", t."frozen_resource_policy" AS "frozenResourcePolicy",
       e."scientific_maturity" AS "scientificMaturity", e."scientific_provenance_hash" AS "scientificProvenanceHash"
     FROM "assessment_run_executions" e
     JOIN "assessment_run_tracks" t ON t."organization_id"=e."organization_id" AND t."run_id"=e."run_id" AND t."id"=e."track_id"
@@ -77,8 +82,9 @@ const resolveInTransaction = async (
   if (executions.some((row) => row.resourceFamily !== first.resourceFamily || row.resourceKey !== first.resourceKey || row.resourceVersion !== first.resourceVersion)) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'Run Track contains mixed resource identities', 500)
   }
-  const minimum = first.frozenResourcePolicy?.minimumRespondents
-  const resourceMinimumN = typeof minimum === 'number' && Number.isInteger(minimum) && minimum > 0 ? minimum : null
+  const resourceMinimumN = positiveMinimum(first.frozenResourcePolicy?.minimumRespondents)
+  const trackMinimumN = positiveMinimum(first.requestedPolicy?.minimumRespondents)
+  const effectiveMinimumN = Math.max(resourceMinimumN ?? 0, trackMinimumN ?? 0) || null
 
   const unresolved: ReportingUnresolvedExecutionV1[] = executions
     .filter((row) => row.executionStatus !== 'COMPLETED')
@@ -185,7 +191,9 @@ const resolveInTransaction = async (
     resourceFamily: first.resourceFamily as ReportingResultBatchV1['resourceFamily'],
     resourceKey: first.resourceKey,
     resourceVersion: first.resourceVersion,
-    resourceMinimumN,
+    // This field carries the effective privacy floor for reporting: a Run Track
+    // may tighten, but never lower, the owning resource's minimumRespondents.
+    resourceMinimumN: effectiveMinimumN,
     resolved,
     unresolved,
   }
