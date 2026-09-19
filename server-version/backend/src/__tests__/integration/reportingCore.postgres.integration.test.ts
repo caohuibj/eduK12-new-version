@@ -120,7 +120,7 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
   })
   afterAll(async () => db.$disconnect())
 
-  it('freezes exact membership cohorts, makes published specs immutable, reuses one concurrent artifact, and reauthorizes cached reads', async () => {
+  it('freezes exact membership cohorts, makes governed records immutable, reuses one concurrent artifact, and reauthorizes cached reads', async () => {
     const admin = await createUser('admin', PlatformRole.SYSTEM_ADMIN)
     const students = await Promise.all(Array.from({ length: 4 }, (_, index) => createUser(`student-${index}`)))
     const org = await createOrganization({
@@ -162,6 +162,14 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
     expect(cohortA.cohortIdentityHash).not.toBe(cohortB.cohortIdentityHash)
     expect(cohortA.members.map((member) => member.membershipId).sort())
       .not.toEqual(cohortB.members.map((member) => member.membershipId).sort())
+    await expect(db.$executeRawUnsafe(
+      `UPDATE reporting_cohort_snapshots SET eligible_n=eligible_n+1 WHERE id=$1`,
+      cohortA.id,
+    )).rejects.toThrow()
+    await expect(db.$executeRawUnsafe(
+      `DELETE FROM reporting_cohort_snapshots WHERE id=$1`,
+      cohortA.id,
+    )).rejects.toThrow()
 
     const draft = await createPlatformReportingSpec({
       actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
@@ -169,7 +177,13 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       version: 1,
       definition: specDefinition,
     })
-    await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
+    const reviewed = await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
+    expect(reviewed.status).toBe('REVIEWED')
+    await expect(db.$executeRawUnsafe(
+      `UPDATE reporting_analysis_specs SET definition='{}'::jsonb, spec_hash=$2 WHERE id=$1`,
+      draft.id,
+      canonicalHash({}),
+    )).rejects.toThrow()
     const published = await publishPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
     await expect(db.$executeRawUnsafe(
       `UPDATE reporting_analysis_specs SET definition='{}'::jsonb WHERE id=$1`,
@@ -224,6 +238,14 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       artifacts[0].analysisIdentityHash,
     )
     expect(persisted[0].count).toBe(1)
+    await expect(db.$executeRawUnsafe(
+      `UPDATE reporting_analysis_artifacts SET generated_at=generated_at+INTERVAL '1 second' WHERE id=$1`,
+      artifacts[0].id,
+    )).rejects.toThrow()
+    await expect(db.$executeRawUnsafe(
+      `DELETE FROM reporting_analysis_artifacts WHERE id=$1`,
+      artifacts[0].id,
+    )).rejects.toThrow()
 
     const beforeDeny = await readOrganizationGroupArtifact({
       principal: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
