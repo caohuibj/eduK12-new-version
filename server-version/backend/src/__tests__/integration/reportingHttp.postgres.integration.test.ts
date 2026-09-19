@@ -109,6 +109,12 @@ const authHeaders = (user: TestUser, csrf = `csrf-${suffix}`): Record<string, st
   }
 }
 
+const csrfOnlyHeaders = (csrf = `csrf-${suffix}`): Record<string, string> => ({
+  cookie: `${CSRF_COOKIE_NAME}=${encodeURIComponent(csrf)}`,
+  [CSRF_HEADER_NAME]: csrf,
+  'content-type': 'application/json',
+})
+
 async function jsonRequest(path: string, input: {
   method?: string
   user?: TestUser
@@ -118,7 +124,9 @@ async function jsonRequest(path: string, input: {
   const method = input.method ?? 'GET'
   const headers: Record<string, string> = input.user
     ? authHeaders(input.user)
-    : { 'content-type': 'application/json' }
+    : input.includeCsrf
+      ? csrfOnlyHeaders()
+      : { 'content-type': 'application/json' }
   if (input.user && input.includeCsrf === false) delete headers[CSRF_HEADER_NAME]
   const response = await fetch(`${baseUrl}${path}`, {
     method,
@@ -180,8 +188,17 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
     const standard = await createUser('standard', UserRole.TEACHER)
     const specKey = `http-governed-${suffix}`
 
-    const unauthenticated = await jsonRequest('/api/organizations/reporting-specs', {
+    // Production mounts CSRF protection before authenticated Organization routes.
+    // A write with neither session nor CSRF is rejected at the outer boundary.
+    const blockedByCsrf = await jsonRequest('/api/organizations/reporting-specs', {
       method: 'POST', body: { specKey, version: 1, definition },
+    })
+    expect(blockedByCsrf.status).toBe(403)
+
+    // Once the double-submit CSRF boundary is satisfied, the missing session is
+    // evaluated by authenticate and remains a distinct 401 failure.
+    const unauthenticated = await jsonRequest('/api/organizations/reporting-specs', {
+      method: 'POST', includeCsrf: true, body: { specKey, version: 1, definition },
     })
     expect(unauthenticated.status).toBe(401)
 
