@@ -66,9 +66,42 @@ suite('PR5 Safety product discovery (real PostgreSQL)', () => {
       },
     })
 
+    const hiddenSnapshot = await db.assessmentUnitSnapshot.findFirstOrThrow({
+      where: { compositeAttemptId: fixture.members[1].attemptId },
+    })
+    const hiddenCanonical = parseStoredCanonicalUnitResult(hiddenSnapshot.canonicalResultEncrypted!)
+    await db.parentStudentRelationship.create({
+      data: {
+        parentUserId: owner.id,
+        studentUserId: fixture.members[1].userId,
+        status: 'ACTIVE',
+        approvedByUserId: owner.id,
+        approvedAt: new Date(),
+      },
+    })
+    const hiddenBaseTime = Date.now() + 60_000
+    await db.safetyCase.createMany({
+      data: Array.from({ length: 101 }, (_, index) => ({
+        policyKey: 'pr5-discovery-parent-hidden',
+        policyVersion: '1.0.0',
+        subjectUserId: fixture.members[1].userId,
+        primaryOwnerUserId: owner.id,
+        backupOwnerUserIds: [],
+        triggerSourceKind: 'CANONICAL_UNIT_RESULT' as const,
+        triggerSourceRecordId: hiddenSnapshot.id,
+        triggerSourceHash: hiddenCanonical.resultHash,
+        idempotencyKey: randomUUID(),
+        ackDueAt: new Date(hiddenBaseTime + 120_000 + index),
+        disposeDueAt: new Date(hiddenBaseTime + 240_000 + index),
+        createdAt: new Date(hiddenBaseTime + index),
+      })),
+    })
+
     const summary = await listOrganizationSafetyCases({ principal, organizationId })
     const summaryItem = summary.list.find((item) => item.caseId === safetyCase.id)
     expect(summaryItem).toMatchObject({ projection: 'SUMMARY', status: safetyCase.status })
+    expect(summary.list).toHaveLength(1)
+    expect(summary.truncated).toBe(false)
     expect(summaryItem).not.toHaveProperty('subjectUserId')
     expect(summaryItem).not.toHaveProperty('triggerSourceHash')
     expect(summaryItem).not.toHaveProperty('primaryOwnerUserId')
