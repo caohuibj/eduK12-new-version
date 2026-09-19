@@ -35,6 +35,19 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const [openPath, setOpenPath] = useState<string | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
   const menuOpen = openPath === location.pathname
+  const reportingContext = activeOrganization?.access
+  const reportingDenied = reportingContext?.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'ORG_GROUP_REPORT_V1'].includes(permission)) === true
+  const canOpenReporting = Boolean(
+    activeOrganization?.organization.status === 'ACTIVE'
+    && reportingContext?.membershipId
+    && !reportingDenied
+    && (
+      reportingContext.orgRole === 'ORG_ADMIN'
+      || reportingContext.capabilities.includes('PSYCHOLOGY_STAFF')
+      || reportingContext.personas.includes('TEACHER')
+      || reportingContext.personas.includes('COUNSELOR')
+    ),
+  )
 
   useEffect(() => {
     if (!user || mode !== 'standard' || activeOrganization || organizationLoading || organizations.length !== 1) return
@@ -77,7 +90,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
               </select>
             </label>
           )}
-          {user && mode === 'standard' && activeOrganization && <><Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>{activeOrganization.access.canGovern && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/runs`}>Runs</Link>}</>}
+          {user && mode === 'standard' && activeOrganization && <><Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>{activeOrganization.access.canGovern && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/runs`}>Runs</Link>}{canOpenReporting && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/reporting`}>Reporting</Link>}</>}
           {user && mode === 'standard' && organizationError && <span role="status" className="text-sm text-red-700">组织上下文不可用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>
