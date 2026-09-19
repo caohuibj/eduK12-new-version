@@ -1,6 +1,4 @@
 const assert = require('node:assert/strict')
-const { execFileSync } = require('node:child_process')
-const { join } = require('node:path')
 const { chromium } = require('../backend/node_modules/playwright-core')
 
 const baseUrl = process.env.RELATIONAL_E2E_BASE_URL || 'http://127.0.0.1:5173'
@@ -58,6 +56,20 @@ const installMocks = async (page, role) => {
     }
     if (path === '/api/auth/me') return json(route, envelope(user))
     if (path === '/api/capabilities') return json(route, envelope({ cognitive: true }))
+    // RA-02 is a route-mocked frontend acceptance and does not establish a real
+    // cookie session. AppShell now performs Organization discovery for signed-in
+    // identities, so keep that shell request inside the same mocked authority
+    // boundary. Letting it fall through to the live backend would correctly
+    // return 401 and make the transport invalidate this synthetic login.
+    if (path === '/api/organizations') {
+      return json(route, envelope({
+        platformRole: 'STANDARD',
+        list: [],
+        total: 0,
+        page: 1,
+        pageSize: 100,
+      }))
+    }
 
     if (path === '/api/relational/catalog') {
       if (role === 'TEACHER') return json(route, envelope({ list: [{ ...product, journeys: ['TEACHER_COHORT_REPORT'] }] }))
@@ -149,30 +161,7 @@ const relationalAcceptance = async () => {
   }
 }
 
-const pr5OrganizationAcceptance = () => {
-  const serverRoot = join(__dirname, '..')
-  const tsx = join(serverRoot, 'backend', 'node_modules', '.bin', 'tsx')
-  execFileSync(tsx, [join(__dirname, 'pr5-organization-browser-fixture.ts')], {
-    cwd: serverRoot,
-    env: process.env,
-    stdio: 'inherit',
-  })
-  execFileSync(process.execPath, [join(__dirname, 'pr5-organization-browser-e2e.cjs')], {
-    cwd: serverRoot,
-    env: process.env,
-    stdio: 'inherit',
-  })
-}
-
-const main = async () => {
-  await relationalAcceptance()
-  // PR5 deliberately runs in the same exact-head browser job and against the
-  // same live PostgreSQL/backend/frontend services, after the existing RA-02
-  // acceptance. No route mocks are installed for this Organization journey.
-  pr5OrganizationAcceptance()
-}
-
-main().catch((error) => {
+relationalAcceptance().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })
