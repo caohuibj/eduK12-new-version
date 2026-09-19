@@ -6,6 +6,7 @@ import { publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
+import { assertCurrentRunPublisherBoundary, assertRunExecutionParent } from './resourceBoundary'
 
 const selectorSchema = z.record(z.unknown()).default({})
 const policySchema = z.object({
@@ -77,6 +78,11 @@ export const assessmentRunController = {
     const parsed = publishSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
     try {
+      await assertCurrentRunPublisherBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await publishAssessmentRun({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
@@ -89,9 +95,12 @@ export const assessmentRunController = {
   async startExecution(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      return success(res, await startAssessmentRunExecution({
+      await assertRunExecutionParent({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
+        executionId: req.params.executionId,
+      })
+      return success(res, await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
       }))
