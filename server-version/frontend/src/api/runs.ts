@@ -53,7 +53,7 @@ export interface AssessmentRunTrack {
   subjectSelector: RunPopulationSelector
   respondentSelector: RunPopulationSelector
   requestedPolicy: RunRequestedPolicy
-  frozenResourcePolicy: unknown | null
+  frozenResourcePolicy: Record<string, unknown> | null
   resourcePolicyHash: string | null
 }
 
