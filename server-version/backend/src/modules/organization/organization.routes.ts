@@ -48,9 +48,15 @@ router.post('/:organizationId/runs/:runId/cancel', authenticate, requireOrganiza
 router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, assessmentRunController.acceptConsent)
 router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
 
-// PR3 generic Organization group reporting only. Central reporting authorization
-// rechecks current authority on generation and every artifact read; protected,
-// longitudinal and multi-rater kinds remain unavailable until PR4.
+// Reporting keeps one analysis/artifact authority. Series/Wave bindings are
+// immutable scoped resources; analysis/read dispatches server-side by governed
+// analysisKind/policyDomain. Protected requests never accept actor-role or
+// privacy overrides from clients.
+router.post('/:organizationId/reporting/series', authenticate, reportingController.createSeries)
+router.post('/:organizationId/reporting/series/:seriesId/waves', authenticate, reportingController.bindWave)
+router.post('/:organizationId/reporting/exports', authenticate, reportingController.createExport)
+router.get('/:organizationId/reporting/exports/:exportId', authenticate, reportingController.downloadExport)
+router.get('/:organizationId/safety/cases/:caseId', authenticate, reportingController.readSafetyCase)
 router.post('/:organizationId/reporting/analyses', authenticate, reportingController.analyze)
 router.get('/:organizationId/reporting/artifacts/:artifactId', authenticate, reportingController.readArtifact)
 

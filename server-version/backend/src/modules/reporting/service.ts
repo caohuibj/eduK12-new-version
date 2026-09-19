@@ -10,7 +10,7 @@ import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
-import { reportingFail, type ReportingArtifactRecord } from './types'
+import { reportingFail, type ReportingArtifactRecord, type ReportingGroupArtifactRecord } from './types'
 
 const publicArtifact = (artifact: ReportingArtifactRecord) => ({
   artifactId: artifact.id,
@@ -49,8 +49,6 @@ export const generateOrganizationGroupAnalysis = async (input: {
     options: {},
   })
 
-  // Calculation reuse never carries authorization. Recheck immediately before
-  // persistence and again before returning the projection.
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
@@ -74,12 +72,19 @@ export const generateOrganizationGroupAnalysis = async (input: {
   return publicArtifact(artifact)
 }
 
+const requireGroupArtifact = (artifact: ReportingArtifactRecord): ReportingGroupArtifactRecord => {
+  if (artifact.analysisKind !== 'GROUP' || artifact.policyDomain !== 'ORG_GROUP_REPORT_V1') {
+    return reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  }
+  return artifact
+}
+
 export const readOrganizationGroupArtifact = async (input: {
   principal: ReportingPrincipal
   organizationId: string
   artifactId: string
 }): Promise<ReturnType<typeof publicArtifact>> => {
-  const artifact = await readReportingArtifactRecord(input.artifactId)
+  const artifact = requireGroupArtifact(await readReportingArtifactRecord(input.artifactId))
   if (artifact.organizationId !== input.organizationId) {
     reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
   }

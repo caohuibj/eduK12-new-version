@@ -3,8 +3,8 @@ import { finiteReportingNumber, reportingAggregations } from './statistics'
 import {
   reportingFail,
   type ReportingAnalysisSpecRecord,
-  type ReportingArtifactPayloadV1,
   type ReportingCohortSnapshotRecord,
+  type ReportingGroupArtifactPayloadV1,
   type ReportingMaturity,
   type ReportingResolvedExecutionV1,
   type ReportingResultBatchV1,
@@ -13,11 +13,10 @@ import {
 
 const maturityRank: Record<ReportingMaturity, number> = { PILOT: 0, RESEARCH_READY: 1, RESEARCH_GRADE: 2 }
 const maturityByRank: ReportingMaturity[] = ['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE']
-
 const subjectKey = (userId: string, membershipId: string): string => `${userId}\u0000${membershipId}`
 
-const evidenceFor = (
-  resolved: ReportingResolvedExecutionV1[],
+export const reportingEvidenceFor = (
+  resolved: Array<Pick<ReportingResolvedExecutionV1, 'scientificMaturity' | 'provenanceState'>>,
   ceiling: ReportingMaturity,
 ): { level: ReportingMaturity; limitations: string[]; profile: Record<string, number> } => {
   const profile: Record<string, number> = { PILOT: 0, RESEARCH_READY: 0, RESEARCH_GRADE: 0, LEGACY_UNFROZEN: 0 }
@@ -49,8 +48,11 @@ export const buildReportingArtifact = (input: {
   cohort: ReportingCohortSnapshotRecord
   batch: ReportingResultBatchV1
   options?: Record<string, never>
-}): { payload: ReportingArtifactPayloadV1; snapshotHash: string; analysisIdentityHash: string } => {
+}): { payload: ReportingGroupArtifactPayloadV1; snapshotHash: string; analysisIdentityHash: string } => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'analysis requires a published reporting spec', 409)
+  const definition = input.spec.definition
+  if (definition.analysisKind !== 'GROUP') return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires GROUP spec', 409)
+  if (definition.engineKey !== 'ORG_GROUP_V1') return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires ORG_GROUP_V1', 409)
   if (input.batch.resolved.length + input.batch.unresolved.length !== input.cohort.eligibleN) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'resolved and unresolved executions do not cover frozen cohort', 500)
   }
@@ -77,12 +79,10 @@ export const buildReportingArtifact = (input: {
   if (observedSubjects.size !== input.cohort.eligibleN) reportingFail('REPORT_RESULT_INTEGRITY', 'subject observations do not exactly cover eligible cohort', 500)
 
   const resourceFloor = input.batch.resourceMinimumN ?? 0
-  const contributorFloor = Math.max(input.spec.definition.minimumContributorN, resourceFloor)
-  const overallPresent = input.cohort.eligibleN >= input.spec.definition.minimumCohortN
-    && input.batch.resolved.length >= contributorFloor
+  const contributorFloor = Math.max(definition.minimumContributorN, resourceFloor)
+  const overallPresent = input.cohort.eligibleN >= definition.minimumCohortN && input.batch.resolved.length >= contributorFloor
   const metrics: ReportingSafeProjectionV1['metrics'] = {}
-
-  for (const rule of input.spec.definition.metricRules) {
+  for (const rule of definition.metricRules) {
     const values: number[] = []
     for (const result of input.batch.resolved) {
       const candidates = result.metrics.filter((metric) => metric.key === rule.sourceMetricKey)
@@ -103,31 +103,15 @@ export const buildReportingArtifact = (input: {
       continue
     }
     metrics[rule.metricId] = {
-      state: 'present',
-      validN,
-      missingN,
+      state: 'present', validN, missingN,
       aggregations: reportingAggregations({ values, aggregations: rule.aggregations, distributionCellFloor: metricFloor }),
     }
   }
 
-  const evidence = evidenceFor(input.batch.resolved, input.spec.definition.reportEvidenceCeiling)
+  const evidence = reportingEvidenceFor(input.batch.resolved, definition.reportEvidenceCeiling)
   const projection: ReportingSafeProjectionV1 = overallPresent
-    ? {
-        schemaVersion: 1,
-        kind: 'GROUP',
-        state: 'present',
-        eligibleN: input.cohort.eligibleN,
-        resultContributorN: input.batch.resolved.length,
-        metrics,
-        evidence: { level: evidence.level, limitations: evidence.limitations },
-      }
-    : {
-        schemaVersion: 1,
-        kind: 'GROUP',
-        state: 'suppressed',
-        evidence: { level: evidence.level, limitations: evidence.limitations },
-      }
-
+    ? { schemaVersion: 1, kind: 'GROUP', state: 'present', eligibleN: input.cohort.eligibleN, resultContributorN: input.batch.resolved.length, metrics, evidence: { level: evidence.level, limitations: evidence.limitations } }
+    : { schemaVersion: 1, kind: 'GROUP', state: 'suppressed', evidence: { level: evidence.level, limitations: evidence.limitations } }
   const inputManifest = input.batch.resolved.map((result) => ({
     executionId: result.executionId,
     subjectUserId: result.subjectUserId,
@@ -137,25 +121,18 @@ export const buildReportingArtifact = (input: {
     provenanceState: result.provenanceState,
     scientificProvenanceHash: result.scientificProvenanceHash,
   })).sort((left, right) => left.executionId < right.executionId ? -1 : left.executionId > right.executionId ? 1 : 0)
-
   const analysisIdentityHash = canonicalHash({
     schema: 'ReportingAnalysisIdentityV1',
-    analysisKind: input.spec.definition.analysisKind,
-    engine: { key: input.spec.definition.engineKey, version: input.spec.definition.engineVersion },
+    analysisKind: definition.analysisKind,
+    engine: { key: definition.engineKey, version: definition.engineVersion },
     organizationId: input.cohort.organizationId,
     cohortIdentityHash: input.cohort.cohortIdentityHash,
     spec: { id: input.spec.id, hash: input.spec.specHash },
-    resource: {
-      family: input.batch.resourceFamily,
-      key: input.batch.resourceKey,
-      version: input.batch.resourceVersion,
-      effectiveMinimumN: input.batch.resourceMinimumN,
-    },
+    resource: { family: input.batch.resourceFamily, key: input.batch.resourceKey, version: input.batch.resourceVersion, effectiveMinimumN: input.batch.resourceMinimumN },
     inputs: inputManifest,
     options: input.options ?? {},
   })
-
-  const payload: ReportingArtifactPayloadV1 = {
+  const payload: ReportingGroupArtifactPayloadV1 = {
     schemaVersion: 1,
     artifactId: input.artifactId,
     organizationId: input.cohort.organizationId,

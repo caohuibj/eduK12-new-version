@@ -15,8 +15,8 @@ type FrozenRelationalAttemptIdentity = {
  * PARENT/TEACHER are observer-report identities, while Student->Teacher keeps
  * respondentType null and is authorized only through its relational assignment.
  *
- * Result privacy must not introduce relationship/roster reads on FINAL. This
- * projection therefore uses only that frozen attempt identity. A future
+ * Result privacy must not introduce relationship/roster reads on FINAL. The
+ * identity is a conservative first filter; observer reads also verify frozen assignment policy. A future
  * relational mode that also uses a null respondentType fails closed as
  * aggregate-only until it declares an explicit result-visibility contract.
  */
@@ -40,7 +40,18 @@ export const resolveRelationalCompositeResultDisposition = async (
   })
   // Missing parent is an integrity failure for an embedded UNIT. Fail closed.
   if (!attempt) return 'COHORT_ONLY'
-  return dispositionFromFrozenRelationalAttemptIdentity(attempt)
+  const disposition = dispositionFromFrozenRelationalAttemptIdentity(attempt)
+  if (disposition !== 'INDIVIDUAL_ALLOWED') return disposition
+  // Observer identity alone is insufficient: an Organization resource may
+  // freeze aggregate-only visibility for Parent/Teacher respondents as well.
+  // Read only immutable assignment policy; never consult live roster or rescore.
+  const policies = await db.$queryRaw`
+    SELECT perspective, analysis_mode AS "analysisMode"
+    FROM relational_assessment_assignments WHERE id=${attempt.assignmentRef}
+  `
+  const policy = policies[0]
+  if (!policy || policy.perspective === 'RELATIONAL_EXPERIENCE' || policy.analysisMode !== 'INDIVIDUAL_ONLY') return 'COHORT_ONLY'
+  return 'INDIVIDUAL_ALLOWED'
 }
 
 export const isRelationalCohortOnlyCompositeAttempt = async (
