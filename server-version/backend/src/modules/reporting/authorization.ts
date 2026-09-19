@@ -49,9 +49,9 @@ const resolveScopedContext = async (input: {
     resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId }),
     readScopedRun(input.organizationId, input.runId),
   ])
-  if (resolved === null) hidden()
-  assertNoReportDeny(resolved)
-  return { context: resolved, run }
+  const context = resolved ?? hidden()
+  assertNoReportDeny(context)
+  return { context, run }
 }
 
 /**
