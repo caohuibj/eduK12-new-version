@@ -153,6 +153,9 @@ const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void =
     metricIds.add(rule.metricId)
     sourceMetricKeys.add(rule.sourceMetricKey)
     if (definition.analysisKind !== 'GROUP') {
+      if (!('longitudinalMetricKey' in rule)) {
+        return reportingFail('REPORT_SPEC_INVALID', `PR4 metric ${rule.metricId} is missing longitudinal identity`, 400)
+      }
       if (longitudinalMetricKeys.has(rule.longitudinalMetricKey)) {
         reportingFail('REPORT_SPEC_INVALID', `duplicate longitudinalMetricKey ${rule.longitudinalMetricKey}`, 400)
       }
@@ -165,7 +168,7 @@ const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void =
     const comparisonKeys = new Set<string>()
     for (const rule of definition.comparabilityRules) {
       const metric = metricById.get(rule.metricId)
-      if (!metric) reportingFail('REPORT_SPEC_INVALID', `comparability rule references unknown metric ${rule.metricId}`, 400)
+      if (!metric) return reportingFail('REPORT_SPEC_INVALID', `comparability rule references unknown metric ${rule.metricId}`, 400)
       if (metric.sourceFamily !== rule.resourceFamily || metric.sourceResourceKey !== rule.resourceKey) {
         reportingFail('REPORT_SPEC_INVALID', `comparability rule resource mismatch for ${rule.metricId}`, 400)
       }

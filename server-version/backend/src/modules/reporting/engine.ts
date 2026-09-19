@@ -52,8 +52,11 @@ export const buildReportingArtifact = (input: {
 }): { payload: ReportingArtifactPayloadV1; snapshotHash: string; analysisIdentityHash: string } => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'analysis requires a published reporting spec', 409)
   const definition = input.spec.definition
-  if (definition.analysisKind !== 'GROUP' || definition.engineKey !== 'ORG_GROUP_V1') {
-    reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires GROUP spec', 409)
+  if (definition.analysisKind !== 'GROUP') {
+    return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires GROUP spec', 409)
+  }
+  if (definition.engineKey !== 'ORG_GROUP_V1') {
+    return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires ORG_GROUP_V1', 409)
   }
   if (input.batch.resolved.length + input.batch.unresolved.length !== input.cohort.eligibleN) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'resolved and unresolved executions do not cover frozen cohort', 500)
