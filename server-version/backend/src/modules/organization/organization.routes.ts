@@ -15,6 +15,12 @@ router.post('/reporting-specs/:specId/review', authenticate, reportingController
 router.post('/reporting-specs/:specId/publish', authenticate, reportingController.publishSpec)
 router.post('/reporting-specs/:specId/retire', authenticate, reportingController.retireSpec)
 
+// Organization product discovery is a read-only authority projection. It is
+// deliberately separate from legacy User.role and does not grant authority:
+// every downstream Organization operation re-authorizes current DB facts.
+router.get('/', authenticate, organizationController.listAccessible)
+router.get('/:organizationId/context', authenticate, organizationController.readContext)
+
 // Any authenticated account may create an organization and becomes its first
 // ORG_ADMIN. Organization authority after creation is never derived from
 // legacy User.role.

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
-import { error, success } from '../../utils/response'
+import { error, notFound, success, unauthorized } from '../../utils/response'
+import { resolveOrganizationAccessContext } from './access'
 import {
   createMembership,
   createOrganization,
@@ -39,6 +40,15 @@ const liftDenySchema = z.object({
   permission: z.string().trim().min(1).max(100),
 })
 
+type AccessibleOrganizationRow = {
+  id: string
+  name: string
+  status: string
+  membershipId: string | null
+  orgRole: string | null
+  createdAt: Date
+}
+
 function commandMeta(req: Request) {
   return {
     actorUserId: req.user!.userId,
@@ -65,6 +75,116 @@ function parsePage(req: Request) {
 }
 
 export const organizationController = {
+  async listAccessible(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const { page, pageSize, offset } = parsePage(req)
+      const { userId, platformRole } = req.user
+      let rows: AccessibleOrganizationRow[]
+      let totals: Array<{ count: number }>
+
+      if (platformRole === 'SYSTEM_ADMIN') {
+        ;[rows, totals] = await Promise.all([
+          prisma.$queryRaw<AccessibleOrganizationRow[]>`
+            SELECT
+              o."id",
+              o."name",
+              o."status",
+              m."id" AS "membershipId",
+              m."org_role" AS "orgRole",
+              o."created_at" AS "createdAt"
+            FROM "organizations" o
+            LEFT JOIN "organization_memberships" m
+              ON m."organization_id" = o."id"
+             AND m."user_id" = ${userId}
+             AND m."valid_from" <= statement_timestamp()
+             AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+            ORDER BY o."name", o."id"
+            LIMIT ${pageSize} OFFSET ${offset}
+          `,
+          prisma.$queryRaw<Array<{ count: number }>>`
+            SELECT COUNT(*)::int AS "count" FROM "organizations"
+          `,
+        ])
+      } else {
+        ;[rows, totals] = await Promise.all([
+          prisma.$queryRaw<AccessibleOrganizationRow[]>`
+            SELECT
+              o."id",
+              o."name",
+              o."status",
+              m."id" AS "membershipId",
+              m."org_role" AS "orgRole",
+              o."created_at" AS "createdAt"
+            FROM "organization_memberships" m
+            JOIN "organizations" o ON o."id" = m."organization_id"
+            WHERE m."user_id" = ${userId}
+              AND m."valid_from" <= statement_timestamp()
+              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+            ORDER BY o."name", o."id"
+            LIMIT ${pageSize} OFFSET ${offset}
+          `,
+          prisma.$queryRaw<Array<{ count: number }>>`
+            SELECT COUNT(*)::int AS "count"
+            FROM "organization_memberships" m
+            WHERE m."user_id" = ${userId}
+              AND m."valid_from" <= statement_timestamp()
+              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+          `,
+        ])
+      }
+
+      return success(res, {
+        platformRole,
+        list: rows.map((row) => ({
+          ...row,
+          createdAt: row.createdAt.toISOString(),
+          scopeBasis: platformRole === 'SYSTEM_ADMIN' ? 'SYSTEM_ADMIN' : 'MEMBERSHIP',
+        })),
+        total: totals[0]?.count ?? 0,
+        page,
+        pageSize,
+      })
+    } catch (err) {
+      return sendDomainError(res, err)
+    }
+  },
+
+  async readContext(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const organizationId = req.params.organizationId
+      const access = await resolveOrganizationAccessContext({
+        principal: req.user,
+        organizationId,
+      })
+      if (!access) return notFound(res, '组织不存在')
+
+      // Organization product discovery is limited to direct current Membership
+      // or current SYSTEM_ADMIN scope. Parent relationship evidence remains a
+      // separate subject-scoped authority and is not promoted to Membership.
+      if (req.user.platformRole !== 'SYSTEM_ADMIN' && access.membershipId === null) {
+        return notFound(res, '组织不存在')
+      }
+
+      const organizations = await prisma.$queryRaw<Array<{ id: string; name: string; status: string }>>`
+        SELECT "id", "name", "status"
+        FROM "organizations"
+        WHERE "id" = ${organizationId}
+        LIMIT 1
+      `
+      const organization = organizations[0]
+      if (!organization) return notFound(res, '组织不存在')
+
+      return success(res, {
+        organization,
+        access,
+      })
+    } catch (err) {
+      return sendDomainError(res, err)
+    }
+  },
+
   async create(req: Request, res: Response) {
     const parsed = createOrganizationSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message)
