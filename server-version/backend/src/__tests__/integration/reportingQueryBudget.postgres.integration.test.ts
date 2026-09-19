@@ -19,14 +19,15 @@ import { integrationDatabaseUrl } from './integration-env'
  * PR3 / A-08 — real PostgreSQL population query-budget gate.
  *
  * Fixture creation is deliberately bulk-oriented and excluded from observation.
- * The measured operation is only resolveAuthoritativeRunResults().  Growing a
- * cohort from 100 to 500 subjects must not add service-level Prisma calls:
+ * The measured operation is only resolveAuthoritativeRunResults(). Growing a
+ * cohort from 100 to 500 subjects must keep the same three batch operations:
  *   1 raw Run graph read
  *   1 CompositeAssessmentAttempt batch read
  *   1 AssessmentUnitSnapshot batch read
  *
- * This is a logical-call budget (same convention as Work C query-budget tests),
- * not a claim that Prisma emits exactly three PostgreSQL wire round trips.
+ * Prisma middleware records both the operation shape and the actual array row
+ * count returned by each measured batch. This fixes an explicit PR3 budget for
+ * call count and returned rows without introducing per-subject instrumentation.
  */
 const DB_URL = integrationDatabaseUrl(
   'RELEASE_INTEGRATION_DATABASE_URL',
@@ -35,7 +36,7 @@ const DB_URL = integrationDatabaseUrl(
 )
 const suite = DB_URL ? describe : describe.skip
 
-type ObservedPrismaCall = { model?: string; action: string }
+type ObservedPrismaCall = { model?: string; action: string; rows: number | null }
 type FixtureMember = {
   userId: string
   membershipId: string
@@ -334,8 +335,13 @@ suite('PR3 reporting result-source query budget (real PostgreSQL)', () => {
     encryptUnifiedRuntimePayload = (await import('../../modules/assessment-runtime/security')).encryptUnifiedRuntimePayload
     createCanonicalUnitResultEnvelope = (await import('../../modules/assessment-runtime/unit-result')).createCanonicalUnitResultEnvelope
     prisma.$use(async (params, next) => {
-      try { return await next(params) }
-      finally { observedPrismaCalls.push({ model: params.model, action: params.action }) }
+      const result = await next(params)
+      observedPrismaCalls.push({
+        model: params.model,
+        action: params.action,
+        rows: Array.isArray(result) ? result.length : null,
+      })
+      return result
     })
   })
 
@@ -344,7 +350,7 @@ suite('PR3 reporting result-source query budget (real PostgreSQL)', () => {
     await prisma.$disconnect()
   }, 120_000)
 
-  it('keeps the same logical query budget for 100 and 500 SUBJECT observations', async () => {
+  it('A-08 fixes the same batch-call shape and linear returned-row budget for 100 and 500 SUBJECT observations', async () => {
     const oneHundred = await buildFixture(100)
     const fiveHundred = await buildFixture(500)
 
@@ -356,12 +362,63 @@ suite('PR3 reporting result-source query budget (real PostgreSQL)', () => {
     expect(measured100.value.unresolved).toHaveLength(0)
     expect(measured500.value.unresolved).toHaveLength(0)
 
-    for (const measured of [measured100, measured500]) {
+    for (const [population, measured] of [[100, measured100], [500, measured500]] as const) {
       expect(countCall(measured.calls, undefined, 'queryRaw')).toBe(1)
       expect(countCall(measured.calls, 'CompositeAssessmentAttempt', 'findMany')).toBe(1)
       expect(countCall(measured.calls, 'AssessmentUnitSnapshot', 'findMany')).toBe(1)
       expect(measured.calls).toHaveLength(3)
+      expect(measured.calls.map((call) => call.rows)).toEqual([population, population, population])
+      expect(measured.calls.reduce((sum, call) => sum + (call.rows ?? 0), 0)).toBe(population * 3)
     }
-    expect(measured500.calls).toEqual(measured100.calls)
+    expect(measured500.calls.map(({ model, action }) => ({ model, action })))
+      .toEqual(measured100.calls.map(({ model, action }) => ({ model, action })))
   }, 120_000)
+
+  it('keeps non-completed executions diagnostic and out of the resolved contribution set', async () => {
+    const fixture = await buildFixture(3)
+    await prisma.$executeRawUnsafe(
+      `UPDATE assessment_run_executions SET status='STARTED', completed_at=NULL WHERE id=$1`,
+      fixture.members[0].executionId,
+    )
+    const result = await resolveAuthoritativeRunResults(fixture.cohort)
+    expect(result.resolved).toHaveLength(2)
+    expect(result.unresolved).toEqual([{
+      executionId: fixture.members[0].executionId,
+      subjectUserId: fixture.members[0].userId,
+      membershipId: fixture.members[0].membershipId,
+      reason: 'NOT_COMPLETED',
+    }])
+  })
+
+  it('rejects COMPLETED executions whose authoritative runtime result is missing', async () => {
+    const fixture = await buildFixture(3)
+    await prisma.$executeRawUnsafe(
+      `UPDATE assessment_run_executions SET runtime_binding_ref=$2 WHERE id=$1`,
+      fixture.members[0].executionId,
+      randomUUID(),
+    )
+    await expect(resolveAuthoritativeRunResults(fixture.cohort))
+      .rejects.toMatchObject({ code: 'REPORT_RESULT_INTEGRITY', statusCode: 500 })
+  })
+
+  it('rejects authoritative results whose frozen subject/respondent identity belongs to another execution', async () => {
+    const fixture = await buildFixture(3)
+    await prisma.compositeAssessmentAttempt.update({
+      where: { id: fixture.members[0].attemptId },
+      data: {
+        userId: fixture.members[1].userId,
+        subjectUserId: fixture.members[1].userId,
+        respondentUserId: fixture.members[1].userId,
+      },
+    })
+    await expect(resolveAuthoritativeRunResults(fixture.cohort))
+      .rejects.toMatchObject({ code: 'REPORT_RESULT_INTEGRITY', statusCode: 500 })
+  })
+
+  it('rejects COMPLETED runtime attempts that have no canonical UNIT_RESULT snapshot', async () => {
+    const fixture = await buildFixture(3)
+    await prisma.assessmentUnitSnapshot.deleteMany({ where: { compositeAttemptId: fixture.members[0].attemptId } })
+    await expect(resolveAuthoritativeRunResults(fixture.cohort))
+      .rejects.toMatchObject({ code: 'REPORT_RESULT_INTEGRITY', statusCode: 500 })
+  })
 })
