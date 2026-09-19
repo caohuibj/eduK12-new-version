@@ -145,7 +145,12 @@ export const buildReportingArtifact = (input: {
     organizationId: input.cohort.organizationId,
     cohortIdentityHash: input.cohort.cohortIdentityHash,
     spec: { id: input.spec.id, hash: input.spec.specHash },
-    resource: { family: input.batch.resourceFamily, key: input.batch.resourceKey, version: input.batch.resourceVersion },
+    resource: {
+      family: input.batch.resourceFamily,
+      key: input.batch.resourceKey,
+      version: input.batch.resourceVersion,
+      effectiveMinimumN: input.batch.resourceMinimumN,
+    },
     inputs: inputManifest,
     options: input.options ?? {},
   })
