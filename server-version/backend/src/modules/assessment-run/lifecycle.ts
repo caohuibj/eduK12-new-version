@@ -33,18 +33,43 @@ const lockRunEnvelope = async (tx: Tx, organizationId: string, runId: string) =>
   return runs[0]
 }
 
-const lockExecutions = async (tx: Tx, runId: string): Promise<ExecutionLifecycleRow[]> => (
-  tx.$queryRaw<ExecutionLifecycleRow[]>`
-    SELECT e."id", e."status", e."relational_assignment_id" AS "relationalAssignmentId",
-      e."runtime_binding_ref" AS "runtimeBindingRef", c."state" AS "claimState",
-      c."dispatched_at" AS "claimDispatchedAt"
-    FROM "assessment_run_executions" e
-    LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
-    WHERE e."run_id" = ${runId}
-    ORDER BY e."id"
-    FOR UPDATE OF e, c
+const lockExecutions = async (tx: Tx, runId: string): Promise<ExecutionLifecycleRow[]> => {
+  const executions = await tx.$queryRaw<Array<{
+    id: string
+    status: string
+    relationalAssignmentId: string | null
+    runtimeBindingRef: string | null
+  }>>`
+    SELECT "id", "status", "relational_assignment_id" AS "relationalAssignmentId",
+      "runtime_binding_ref" AS "runtimeBindingRef"
+    FROM "assessment_run_executions"
+    WHERE "run_id" = ${runId}
+    ORDER BY "id"
+    FOR UPDATE
   `
-)
+  if (executions.length === 0) return []
+  const ids = executions.map((row) => row.id)
+  const claims = await tx.$queryRaw<Array<{
+    executionId: string
+    state: string
+    dispatchedAt: Date | null
+  }>>`
+    SELECT "execution_id" AS "executionId", "state", "dispatched_at" AS "dispatchedAt"
+    FROM "assessment_run_execution_start_claims"
+    WHERE "execution_id" IN (${Prisma.join(ids)})
+    ORDER BY "execution_id"
+    FOR UPDATE
+  `
+  const claimByExecution = new Map(claims.map((claim) => [claim.executionId, claim]))
+  return executions.map((row) => {
+    const claim = claimByExecution.get(row.id)
+    return {
+      ...row,
+      claimState: claim?.state ?? null,
+      claimDispatchedAt: claim?.dispatchedAt ?? null,
+    }
+  })
+}
 
 const expireUnstarted = async (tx: Tx, row: ExecutionLifecycleRow, mode: 'CLOSE' | 'CANCEL') => {
   if (row.status === 'COMPLETED') return
@@ -86,8 +111,6 @@ export const closeAssessmentRun = async (input: {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be closed', 409)
   }
   const executions = await lockExecutions(tx, input.runId)
-  // A dispatched call with no binding is an ambiguous external outcome. Closing
-  // would hide the recovery obligation, so fail before changing the Run gate.
   const ambiguous = executions.find((row) => (
     !row.runtimeBindingRef && (row.claimState === 'DISPATCHED' || row.claimState === 'UNKNOWN')
   ))
@@ -114,8 +137,6 @@ export const cancelAssessmentRun = async (input: {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be cancelled', 409)
   }
   const executions = await lockExecutions(tx, input.runId)
-  // PR2 production Composite adapter has no proven safe cancellation primitive.
-  // Never turn an active runtime into a fake CANCELLED state.
   const activeRuntime = executions.find((row) => (
     row.status !== 'COMPLETED'
     && (Boolean(row.runtimeBindingRef) || row.claimState === 'DISPATCHED' || row.claimState === 'UNKNOWN' || row.claimState === 'COMPLETED')
