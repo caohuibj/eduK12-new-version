@@ -78,7 +78,8 @@ const seedBaseline = async () => {
   try {
     await client.$connect()
     await client.$executeRawUnsafe(
-      `INSERT INTO "users" ("id","username","password_hash","role") VALUES ($1,$2,$3,'STUDENT')`,
+      `INSERT INTO "users" ("id","username","password_hash","role","updated_at")
+       VALUES ($1,$2,$3,'STUDENT',CURRENT_TIMESTAMP)`,
       ids.user,
       `pr3-upgrade-${ids.user}`,
       'test-only',
