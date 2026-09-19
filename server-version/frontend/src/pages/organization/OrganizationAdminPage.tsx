@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { Link, useParams } from 'react-router-dom'
 import { organizationApi, type CapabilityGrantHistory, type MembershipAccessHistory, type OrganizationCapability, type OrganizationMembership, type OrganizationPersona, type OrganizationRole, type OrganizationUnit, type PersonaGrantHistory, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
 import { useOrganization } from '../../contexts/OrganizationContext'
+import OrganizationClassificationPanel from './OrganizationClassificationPanel'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 const PERSONAS: OrganizationPersona[] = ['TEACHER', 'STUDENT', 'COUNSELOR', 'CLIENT']
@@ -51,7 +52,7 @@ export default function OrganizationAdminPage() {
 
   const context = active?.organization.id === organizationId ? active : null
   const canGovern = context?.access.canGovern === true
-  const canManageDenies = context?.access.platformRole === 'SYSTEM_ADMIN' || canGovern
+  const canManageDenies = context?.allowedActions?.includes('MANAGE_DENIES') === true
   const grades = useMemo(() => units.filter((unit) => unit.unitKind === 'GRADE'), [units])
   const classes = useMemo(() => units.filter((unit) => unit.unitKind === 'CLASS'), [units])
 
@@ -212,7 +213,7 @@ export default function OrganizationAdminPage() {
       <PageHeader
         title={context.organization.name}
         description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}
-        actions={canGovern ? (
+        actions={context.allowedActions?.some(action => action === 'SUSPEND' || action === 'RESUME') ? (
           context.organization.status === 'ACTIVE'
             ? <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation('org-suspend', '组织已暂停', () => organizationApi.suspend(organizationId))}>暂停组织</ProductButton>
             : <ProductButton variant="primary" disabled={busyKey !== null} onClick={() => void runMutation('org-resume', '组织已恢复', () => organizationApi.resume(organizationId))}>恢复组织</ProductButton>
@@ -230,6 +231,7 @@ export default function OrganizationAdminPage() {
 
       {canGovern && (
         <div className="space-y-8">
+          <OrganizationClassificationPanel organizationId={organizationId} memberships={memberships} />
           <section aria-labelledby="org-memberships-heading" className="space-y-4">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>

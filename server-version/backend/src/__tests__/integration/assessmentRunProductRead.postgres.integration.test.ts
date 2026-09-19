@@ -4,13 +4,15 @@ import express from 'express'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
+import { authenticate } from '../../middleware/auth'
+import { runOrLegacyRespondentAccess } from '../../modules/assessment-run/runtimeAccess'
 import organizationRoutes from '../../modules/organization/organization.routes'
 import { csrfProtection } from '../../middleware/csrf'
 import { AUTH_COOKIE_NAME, CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../utils/authCookies'
 import { generateToken } from '../../utils/jwt'
 import { createMembership, createOrganization, grantPersona } from '../../modules/organization/service'
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft } from '../../modules/assessment-run/repository'
-import { publishAssessmentRun } from '../../modules/assessment-run/publish'
+import { previewAssessmentRun, publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
@@ -97,6 +99,7 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     app.use(express.json())
     app.use('/api', csrfProtection)
     app.use('/api/organizations', organizationRoutes)
+    app.get('/api/runtime-probe/:attemptId', authenticate, runOrLegacyRespondentAccess('COMPOSITE'), (_req, res) => res.json({ allowed: true }))
     server = createServer(app)
     await new Promise<void>((resolve, reject) => {
       server.once('error', reject)
@@ -145,6 +148,12 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
       respondentSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] },
       requestedPolicy,
     })
+    const preview = await previewAssessmentRun({ organizationId: created.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })
+    expect(preview.tracks[0]).toMatchObject({ subjectCount: 1, respondentCount: 1, executionCount: 1 })
+    const beforePublish = await jsonRequest(`/api/organizations/${created.organization.id}/runs/${run.id}`, owner)
+    expect(beforePublish.body.data.run.executionCount).toBe(0)
+    expect(beforePublish.body.data.run.status).toBe('DRAFT')
+    await expect(previewAssessmentRun({ organizationId: created.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 1, resourceRegistry: registry })).rejects.toMatchObject({ code: 'RUN_STATE_CONFLICT' })
     await publishAssessmentRun({
       organizationId: created.organization.id,
       runId: run.id,
@@ -180,5 +189,22 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     expect(detail.body.data.executions).toEqual(expect.arrayContaining([
       expect.objectContaining({ status: 'ASSIGNED', count: 1 }),
     ]))
+    const tasks = await jsonRequest('/api/organizations/assigned-tasks', student)
+    expect(tasks.status).toBe(200)
+    expect(tasks.body.data.list.some((task: any) => task.runId === run.id)).toBe(true)
+    const foreignTasks = await jsonRequest('/api/organizations/assigned-tasks', outsider)
+    expect(foreignTasks.body.data.list.some((task: any) => task.runId === run.id)).toBe(false)
+    expect(JSON.stringify(tasks.body.data)).not.toContain('subjectUserId')
+
+    // Exact Run binding admits an assigned ADMIN respondent, never other ADMINs.
+    const task = tasks.body.data.list.find((item: any) => item.runId === run.id)
+    const runtimeRef = randomUUID()
+    await db.$executeRaw`UPDATE "assessment_run_executions" SET "runtime_binding_kind" = 'COMPOSITE', "runtime_binding_ref" = ${runtimeRef} WHERE "id" = ${task.executionId}`
+    await db.user.update({ where: { id: student.id }, data: { role: UserRole.ADMIN } })
+    await db.user.update({ where: { id: outsider.id }, data: { role: UserRole.ADMIN } })
+    expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, student)).status).toBe(200)
+    expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, outsider)).status).toBe(403)
+    expect((await jsonRequest(`/api/runtime-probe/${randomUUID()}`, student)).status).toBe(403)
+
   })
 })

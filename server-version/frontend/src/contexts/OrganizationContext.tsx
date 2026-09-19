@@ -45,6 +45,8 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [active, setActive] = useState<OrganizationContextProjection | null>(null)
   const [activeLoading, setActiveLoading] = useState(false)
   const [activeError, setActiveError] = useState<string | null>(null)
+  const activeRef = useRef(active)
+  activeRef.current = active
   const discoveryEpochRef = useRef(0)
   const activeEpochRef = useRef(0)
 
@@ -76,10 +78,25 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setPlatformRole(projection.platformRole)
       setOrganizations(projection.list)
       setTotal(projection.total)
-      if (activeEpochRef.current === activeEpochAtStart) {
-        setActive((current) => current && projection.list.some((item) => item.id === current.organization.id)
-          ? current
-          : null)
+      // Discovery is paginated and is not an authority refresh. Re-read the
+      // selected exact context, including roles/grants changed on the server.
+      const selected = activeRef.current
+      if (selected && activeEpochRef.current === activeEpochAtStart) {
+        setActiveLoading(true)
+        try {
+          const next = await organizationApi.context(selected.organization.id)
+          if (discoveryEpoch === discoveryEpochRef.current && activeEpochRef.current === activeEpochAtStart) {
+            setActive(next)
+            setActiveError(null)
+          }
+        } catch (err) {
+          if (discoveryEpoch === discoveryEpochRef.current && activeEpochRef.current === activeEpochAtStart) {
+            setActive(null)
+            setActiveError(errorMessage(err, '组织权限已失效'))
+          }
+        } finally {
+          if (discoveryEpoch === discoveryEpochRef.current && activeEpochRef.current === activeEpochAtStart) setActiveLoading(false)
+        }
       }
     } catch (err) {
       if (discoveryEpoch !== discoveryEpochRef.current) return
@@ -127,8 +144,16 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       reset()
       return
     }
+    reset()
     void refresh()
   }, [authLoading, isAuthenticated, user?.id, refresh, reset])
+
+  useEffect(() => {
+    if (!isAuthenticated || authLoading) return
+    const refreshOnFocus = () => { void refresh() }
+    window.addEventListener('focus', refreshOnFocus)
+    return () => window.removeEventListener('focus', refreshOnFocus)
+  }, [isAuthenticated, authLoading, refresh])
 
   return (
     <OrganizationProductContext.Provider value={{

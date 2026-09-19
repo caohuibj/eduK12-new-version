@@ -14,6 +14,7 @@ import {
   endStudentClassAssignment,
 } from './classRelationships'
 import { OrganizationDomainError } from './types'
+import { createClassificationDimension, createOrganizationLabel, assignOrganizationLabel, endOrganizationLabelAssignment, createCounselorClientRelationship, endCounselorClientRelationship } from './classificationRelations'
 
 const unitSchema = z.object({
   unitKind: z.enum(['GRADE', 'CLASS']),
@@ -49,6 +50,56 @@ function currentOnly(req: Request) {
 }
 
 export const organizationAdminController = {
+  async listClassification(req: Request, res: Response) {
+    try {
+      const id = req.params.organizationId
+      const [dimensions, labels, assignments, relationships] = await Promise.all([
+        prisma.$queryRaw`SELECT "id", "key", "name", "cardinality" FROM "organization_classification_dimensions" WHERE "organization_id" = ${id} ORDER BY "name", "id"`,
+        prisma.$queryRaw`SELECT "id", "dimension_id" AS "dimensionId", "name" FROM "organization_labels" WHERE "organization_id" = ${id} ORDER BY "name", "id"`,
+        prisma.$queryRaw`SELECT "id", "membership_id" AS "membershipId", "label_id" AS "labelId", "valid_from" AS "validFrom", "valid_until" AS "validUntil" FROM "organization_label_assignments" WHERE "organization_id" = ${id} ORDER BY "valid_from" DESC, "id" DESC LIMIT 100`,
+        prisma.$queryRaw`SELECT "id", "counselor_membership_id" AS "counselorMembershipId", "client_membership_id" AS "clientMembershipId", "valid_from" AS "validFrom", "valid_until" AS "validUntil" FROM "organization_counselor_client_relationships" WHERE "organization_id" = ${id} ORDER BY "valid_from" DESC, "id" DESC LIMIT 100`,
+      ])
+      return success(res, { dimensions, labels, assignments, relationships, historyLimit: 100 })
+    } catch (err) { return sendDomainError(res, err) }
+  },
+
+  async classificationCommand(req: Request, res: Response) {
+    const schema = z.discriminatedUnion('operation', [
+      z.object({ operation: z.literal('CREATE_DIMENSION'), key: z.string().trim().min(1).max(100), name: z.string().trim().min(1).max(200), cardinality: z.enum(['SINGLE', 'MULTI']) }),
+      z.object({ operation: z.literal('CREATE_LABEL'), dimensionId: z.string().min(1), name: z.string().trim().min(1).max(200) }),
+      z.object({ operation: z.literal('ASSIGN_LABEL'), membershipId: z.string().min(1), labelId: z.string().min(1) }),
+      z.object({ operation: z.literal('END_LABEL'), assignmentId: z.string().min(1) }),
+      z.object({ operation: z.literal('CREATE_RELATIONSHIP'), counselorMembershipId: z.string().min(1), clientMembershipId: z.string().min(1) }),
+      z.object({ operation: z.literal('END_RELATIONSHIP'), relationshipId: z.string().min(1) }),
+    ])
+    const parsed = schema.safeParse(req.body)
+    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    const input = { ...parsed.data, organizationId: req.params.organizationId }
+    try {
+      switch (input.operation) {
+        case 'CREATE_DIMENSION': return success(res, await createClassificationDimension(input))
+        case 'CREATE_LABEL': return success(res, await createOrganizationLabel(input))
+        case 'ASSIGN_LABEL': return success(res, await assignOrganizationLabel(input))
+        case 'END_LABEL': await endOrganizationLabelAssignment(input); break
+        case 'CREATE_RELATIONSHIP': return success(res, await createCounselorClientRelationship(input))
+        case 'END_RELATIONSHIP': await endCounselorClientRelationship(input); break
+      }
+      return success(res, { ended: true })
+    } catch (err) { return sendDomainError(res, err) }
+  },
+
+  async listAudit(req: Request, res: Response) {
+    try {
+      const { page, pageSize, offset } = parsePage(req)
+      const list = await prisma.$queryRaw`
+        SELECT "id", "action", "actor_user_id" AS "actorUserId", "target_type" AS "targetType", "target_id" AS "targetId", "created_at" AS "createdAt"
+        FROM "organization_governance_audits" WHERE "organization_id" = ${req.params.organizationId}
+        ORDER BY "created_at" DESC, "id" DESC LIMIT ${pageSize} OFFSET ${offset}
+      `
+      return success(res, { list, page, pageSize })
+    } catch (err) { return sendDomainError(res, err) }
+  },
+
   async listUnits(req: Request, res: Response) {
     try {
       return success(res, { list: await listOrganizationUnits(req.params.organizationId) })

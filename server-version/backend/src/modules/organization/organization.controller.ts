@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
-import { error, notFound, success, unauthorized } from '../../utils/response'
-import { resolveOrganizationAccessContext } from './access'
+import { error, notFound, success, unauthorized, forbidden } from '../../utils/response'
+import { resolveOrganizationAccessContext, type OrganizationAccessContext } from './access'
 import {
   createMembership,
   createOrganization,
@@ -19,7 +19,27 @@ import {
 } from './service'
 import { OrganizationDomainError } from './types'
 
-const createOrganizationSchema = z.object({ name: z.string().trim().min(1).max(200) })
+// Navigation hints are server-owned. Exact resources still authorize every request.
+export function organizationProductActions(context: OrganizationAccessContext): string[] {
+  const denied = (...permissions: string[]) => context.explicitDenies.some(value => value === '*' || permissions.includes(value))
+  const active = context.organizationStatus === 'ACTIVE'
+  const member = context.membershipId !== null
+  const professional = context.personas.includes('TEACHER') || context.personas.includes('COUNSELOR')
+  const psychology = context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const actions: string[] = []
+  if (context.canGovern) actions.push('GOVERN')
+  if (context.canGovern && active) actions.push('RUNS')
+  if (context.platformRole === 'SYSTEM_ADMIN' || context.canGovern) actions.push('MANAGE_DENIES')
+  if (context.platformRole === 'SYSTEM_ADMIN' && !denied('ORGANIZATION_GOVERNANCE')) actions.push(active ? 'SUSPEND' : 'RESUME')
+  if (member && active && !denied('REPORT_READ', 'ORG_GROUP_REPORT_V1') && (context.orgRole === 'ORG_ADMIN' || psychology || professional)) actions.push('REPORTING')
+  if (member && !denied('REPORT_READ', 'SAFETY_READ') && ((active && context.orgRole === 'ORG_ADMIN') || psychology || professional)) actions.push('SAFETY')
+  if (member && active && !denied('REPORT_READ', 'REPORT_EXPORT') && context.capabilities.includes('REPORT_EXPORT')) actions.push('EXPORT_AGGREGATE')
+  if (member && active && !denied('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT') && context.capabilities.includes('REPORT_MEMBER_EXPORT')) actions.push('EXPORT_MEMBER')
+  if (actions.some(action => ['SAFETY', 'EXPORT_AGGREGATE', 'EXPORT_MEMBER'].includes(action))) actions.push('DELIVERY')
+  return actions
+}
+
+const createOrganizationSchema = z.object({ name: z.string().trim().min(1).max(200), firstAdminUserId: z.string().min(1).optional() })
 const membershipSchema = z.object({
   userId: z.string().min(1),
   orgRole: z.enum(['MEMBER', 'ORG_ADMIN']).optional(),
@@ -136,6 +156,7 @@ export const organizationController = {
 
       return success(res, {
         platformRole,
+        allowedActions: platformRole === 'SYSTEM_ADMIN' ? ['CREATE_ORGANIZATION'] : [],
         list: rows.map((row) => ({
           ...row,
           createdAt: row.createdAt.toISOString(),
@@ -179,6 +200,7 @@ export const organizationController = {
       return success(res, {
         organization,
         access,
+        allowedActions: organizationProductActions(access),
       })
     } catch (err) {
       return sendDomainError(res, err)
@@ -186,16 +208,18 @@ export const organizationController = {
   },
 
   async create(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可创建组织')
     const parsed = createOrganizationSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message)
     try {
-      return success(res, await createOrganization({ name: parsed.data.name, meta: commandMeta(req) }))
+      return success(res, await createOrganization({ ...parsed.data, meta: commandMeta(req) }))
     } catch (err) {
       return sendDomainError(res, err)
     }
   },
 
   async suspend(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可暂停组织')
     try {
       return success(res, await suspendOrganization({ organizationId: req.params.organizationId, meta: commandMeta(req) }))
     } catch (err) {
@@ -204,6 +228,7 @@ export const organizationController = {
   },
 
   async resume(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可恢复组织')
     try {
       return success(res, await resumeOrganization({ organizationId: req.params.organizationId, meta: commandMeta(req) }))
     } catch (err) {

@@ -5,10 +5,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import OrganizationRunDetailPage from '../OrganizationRunDetailPage'
 
 const api = vi.hoisted(() => ({
+  resources: vi.fn(),
   detail: vi.fn(),
   progress: vi.fn(),
   addTrack: vi.fn(),
   publish: vi.fn(),
+  preview: vi.fn(),
   close: vi.fn(),
   cancel: vi.fn(),
 }))
@@ -50,7 +52,9 @@ beforeEach(() => {
   org.activeLoading = false
   org.activeError = null
   org.selectOrganization.mockResolvedValue(null)
+  api.resources.mockResolvedValue({ list: [] })
   api.detail.mockResolvedValue(draftDetail)
+  api.preview.mockResolvedValue({ runId: 'run-1', version: 2, tracks: [{ trackId: 'track-1', subjectCount: 1, respondentCount: 1, executionCount: 1 }] })
   api.publish.mockResolvedValue({ runId: 'run-1', version: 3, trackCount: 1, executionCount: 1 })
   api.progress.mockResolvedValue({ runId: 'run-1', total: 1, counts: { NOT_STARTED: 1, STARTING: 0, IN_PROGRESS: 0, COMPLETED: 0, CANCELLED: 0, EXPIRED: 0, UNKNOWN: 0 }, executions: [] })
 })
@@ -60,6 +64,8 @@ describe('Organization Run product journey', () => {
     renderPage()
     const publish = await screen.findByRole('button', { name: '发布 Run' })
     await userEvent.click(publish)
+    expect(api.publish).not.toHaveBeenCalled()
+    await userEvent.click(await screen.findByRole('button', { name: '确认发布' }))
     await waitFor(() => expect(api.publish).toHaveBeenCalledWith('org-1', 'run-1', 2))
   })
 

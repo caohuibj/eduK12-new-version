@@ -139,6 +139,7 @@ describe('one shared chrome', () => {
   it('keeps Safety responsibility discoverable for a suspended teacher owner', () => {
     organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'SUSPENDED' }]
     organization.active = {
+      allowedActions: ['SAFETY', 'DELIVERY'],
       organization: { id: 'org-a', name: '组织 A', status: 'SUSPENDED' },
       access: {
         membershipId: 'membership-a',
@@ -160,4 +161,9 @@ describe('one shared chrome', () => {
     expect(screen.getByText('task control').closest('.hui-product')).toBeNull()
     expect(screen.getAllByRole('main')).toHaveLength(1)
   })
+})
+it('uses authentication and reauth identity without legacy-role gating for shared runtimes', () => {
+  auth.user = { id: 'admin-respondent', role: 'ADMIN', username: 'admin' } as User
+  render(<MemoryRouter initialEntries={['/relational/attempts/run-attempt']}><RouteAccess><p>assigned runtime</p></RouteAccess></MemoryRouter>)
+  expect(screen.getByText('assigned runtime')).toBeInTheDocument()
 })

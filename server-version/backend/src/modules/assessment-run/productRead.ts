@@ -61,8 +61,8 @@ const runSelect = `
   r."created_by_user_id" AS "createdByUserId", r."intake_deadline" AS "intakeDeadline",
   r."published_at" AS "publishedAt", r."closed_at" AS "closedAt", r."cancelled_at" AS "cancelledAt",
   r."created_at" AS "createdAt", r."updated_at" AS "updatedAt",
-  COUNT(DISTINCT t."id")::int AS "trackCount",
-  COUNT(DISTINCT e."id")::int AS "executionCount"
+  (SELECT COUNT(*)::int FROM "assessment_run_tracks" t WHERE t."organization_id" = r."organization_id" AND t."run_id" = r."id") AS "trackCount",
+  (SELECT COUNT(*)::int FROM "assessment_run_executions" e WHERE e."organization_id" = r."organization_id" AND e."run_id" = r."id") AS "executionCount"
 `
 
 export async function listAssessmentRunProducts(input: {
@@ -79,12 +79,7 @@ export async function listAssessmentRunProducts(input: {
   const list = await prisma.$queryRawUnsafe<AssessmentRunProductListItem[]>(
     `SELECT ${runSelect}
      FROM "assessment_runs" r
-     LEFT JOIN "assessment_run_tracks" t
-       ON t."organization_id" = r."organization_id" AND t."run_id" = r."id"
-     LEFT JOIN "assessment_run_executions" e
-       ON e."organization_id" = r."organization_id" AND e."run_id" = r."id"
      WHERE r."organization_id" = $1 ${whereStatus}
-     GROUP BY r."id"
      ORDER BY r."created_at" DESC, r."id" DESC
      LIMIT $2 OFFSET $3`,
     ...params,
@@ -110,12 +105,7 @@ export async function readAssessmentRunProduct(
   const runs = await prisma.$queryRawUnsafe<AssessmentRunProductListItem[]>(
     `SELECT ${runSelect}
      FROM "assessment_runs" r
-     LEFT JOIN "assessment_run_tracks" t
-       ON t."organization_id" = r."organization_id" AND t."run_id" = r."id"
-     LEFT JOIN "assessment_run_executions" e
-       ON e."organization_id" = r."organization_id" AND e."run_id" = r."id"
-     WHERE r."organization_id" = $1 AND r."id" = $2
-     GROUP BY r."id"`,
+     WHERE r."organization_id" = $1 AND r."id" = $2`,
     organizationId,
     runId,
   )
@@ -161,4 +151,35 @@ export async function readAssessmentRunProduct(
     frozenPopulation: { actors, relationships },
     executions,
   }
+}
+
+/** Assigned-respondent inbox: no tenant navigation, subjects or other respondents. */
+export async function listAssignedRunTasks(userId: string) {
+  const list = await prisma.$queryRaw<Array<{
+    executionId: string; organizationId: string; runId: string; runName: string;
+    runStatus: string; status: string; claimState: string | null;
+    resourceFamily: string; resourceKey: string; resourceVersion: string;
+    consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
+  }>>`
+    SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
+      r."name" AS "runName", r."status" AS "runStatus", e."status",
+      c."state" AS "claimState", t."resource_family" AS "resourceFamily",
+      t."resource_key" AS "resourceKey", t."resource_version" AS "resourceVersion",
+      (a."consent_id" IS NOT NULL) AS "consentRequired",
+      consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
+    FROM "assessment_run_executions" e
+    JOIN "assessment_run_actor_snapshots" respondent ON respondent."id" = e."respondent_actor_snapshot_id"
+      AND respondent."organization_id" = e."organization_id" AND respondent."run_id" = e."run_id"
+    JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
+    JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
+    LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
+    LEFT JOIN "relational_assessment_assignments" a ON a."id" = e."relational_assignment_id"
+    LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
+    WHERE respondent."user_id" = ${userId}
+      AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
+        WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
+          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START'))
+    ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
+  `
+  return { list: list.slice(0, 100), truncated: list.length > 100 }
 }

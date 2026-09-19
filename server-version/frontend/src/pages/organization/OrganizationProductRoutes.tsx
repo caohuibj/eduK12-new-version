@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import { ProductPage, ProductStatus } from '../../components/product-ui'
 import { RouteLoading } from '../../components/app-shell/RouteAccess'
+import OrganizationCreatePage from './OrganizationCreatePage'
+import OrganizationTasksPage from './OrganizationTasksPage'
 import OrganizationAdminPage from './OrganizationAdminPage'
 import OrganizationRunListPage from './OrganizationRunListPage'
 import OrganizationRunDetailPage from './OrganizationRunDetailPage'
@@ -19,48 +21,12 @@ export default function OrganizationProductRoutes() {
   const { user, isLoading } = useAuth()
   const { active, activeError, selectOrganization } = useOrganization()
   const location = useLocation()
-  const routeOrganizationId = location.pathname.split('/')[2] || ''
+  const routeOrganizationId = location.pathname === '/organizations/new' ? '' : location.pathname.split('/')[2] || ''
   const context = active?.organization.id === routeOrganizationId ? active : null
   const routeContextKey = user && routeOrganizationId ? `${user.id}:${routeOrganizationId}` : ''
   const [routeContextCheck, setRouteContextCheck] = useState<RouteContextCheck | null>(null)
-  const explicitDenies = context?.access.explicitDenies ?? []
-  const hasDeny = (...permissions: string[]) => explicitDenies.some((permission) => permission === '*' || permissions.includes(permission))
-  const reportingDenied = hasDeny('REPORT_READ', 'ORG_GROUP_REPORT_V1')
-  const canOpenReporting = Boolean(
-    context?.organization.status === 'ACTIVE'
-    && context.access.membershipId
-    && !reportingDenied
-    && (
-      context.access.orgRole === 'ORG_ADMIN'
-      || context.access.capabilities.includes('PSYCHOLOGY_STAFF')
-      || context.access.personas.includes('TEACHER')
-      || context.access.personas.includes('COUNSELOR')
-    ),
-  )
-  const canExportAggregate = Boolean(
-    context?.organization.status === 'ACTIVE'
-    && context.access.membershipId
-    && context.access.capabilities.includes('REPORT_EXPORT')
-    && !hasDeny('REPORT_READ', 'REPORT_EXPORT'),
-  )
-  const canExportMember = Boolean(
-    context?.organization.status === 'ACTIVE'
-    && context.access.membershipId
-    && context.access.capabilities.includes('REPORT_MEMBER_EXPORT')
-    && !hasDeny('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT'),
-  )
-  const safetyDenied = hasDeny('REPORT_READ', 'SAFETY_READ')
-  const canOpenSafety = Boolean(
-    context?.access.membershipId
-    && !safetyDenied
-    && (
-      (context.organization.status === 'ACTIVE' && context.access.orgRole === 'ORG_ADMIN')
-      || context.access.capabilities.includes('PSYCHOLOGY_STAFF')
-      || context.access.personas.includes('TEACHER')
-      || context.access.personas.includes('COUNSELOR')
-    ),
-  )
-  const canOpenDelivery = canExportAggregate || canExportMember || canOpenSafety
+  const canOpenReporting = context?.allowedActions?.includes('REPORTING') === true
+  const canOpenDelivery = context?.allowedActions?.includes('DELIVERY') === true
 
   useEffect(() => {
     if (isLoading || !user || !routeOrganizationId || !routeContextKey) return
@@ -96,6 +62,9 @@ export default function OrganizationProductRoutes() {
     )
   }
 
+  if (location.pathname === '/organizations/new') return <OrganizationCreatePage />
+  if (location.pathname === '/organization-tasks') return <OrganizationTasksPage key={user.id} />
+
   if (routeOrganizationId && !context) {
     const currentCheck = routeContextCheck?.key === routeContextKey ? routeContextCheck : null
     if (currentCheck?.status === 'failed') {
@@ -116,12 +85,12 @@ export default function OrganizationProductRoutes() {
       {routeOrganizationId && context && (
         <nav className="hui-product mb-4 flex flex-wrap gap-3 text-sm" aria-label="Organization 产品导航">
           <Link to={organizationRoot}>组织</Link>
-          {context.access.canGovern && <Link to={`${organizationRoot}/runs`}>Runs</Link>}
+          {context.allowedActions?.includes('RUNS') && <Link to={`${organizationRoot}/runs`}>Runs</Link>}
           {canOpenReporting && <Link to={`${organizationRoot}/reporting`}>Reporting</Link>}
           {canOpenDelivery && <Link to={`${organizationRoot}/delivery`}>Safety / CSV</Link>}
         </nav>
       )}
-      <Routes key={location.pathname}>
+      <Routes key={`${user.id}:${location.pathname}`}>
         <Route path="/organizations/:organizationId" element={<OrganizationAdminPage />} />
         <Route path="/organizations/:organizationId/runs" element={<OrganizationRunListPage />} />
         <Route path="/organizations/:organizationId/runs/:runId" element={<OrganizationRunDetailPage />} />

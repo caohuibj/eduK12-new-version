@@ -2,6 +2,32 @@
 
 PR5 is the product-convergence layer on top of merged PR1–PR4. It does not add a second Organization authority model, Assessment Runtime, reporting engine, Safety classifier, or CSV generator.
 
+## Review follow-up (2026-09-20)
+
+Implemented and reviewed in this follow-up:
+
+- Server-owned `allowedActions` drives navigation; identity changes and focus refresh current Organization authority.
+- Organization creation, suspension and resumption require current SYSTEM_ADMIN. Creation can appoint a validated active first administrator. Ordinary governance is unavailable while suspended; existing responsible Safety access remains separately authorized.
+- Classification dimensions/labels, temporal label assignments, counselor/client relationships and governance audit history have governed HTTP adapters and product forms.
+- The Run builder lists only released server registry resources and narrows choices to their policy. A read-only server preview resolves population and authority before publication; publication rechecks the exact version and all invariants.
+- A respondent task inbox supports explicit consent, START and recovery of the same execution. Exact assigned Run ownership permits legacy ADMIN respondents through shared runtime routes without granting access to other attempts; child runtime return navigation preserves the task inbox.
+- Failed/denied report and Safety rereads remove previously displayed payloads. Run progress failures are visible. Run list counts avoid a Track/execution Cartesian join.
+- Browser acceptance additionally exercises label assignment, consultation relationship ending/history, client mobile navigation, and platform-only lifecycle visibility. The Grade locator is scoped to avoid matching the select option.
+
+Local validation:
+
+- Fresh PostgreSQL migrations succeeded.
+- Backend build passed; 26 relevant real-PostgreSQL suites / 82 tests passed with one worker, matching CI's nonparallel file execution. An exploratory two-worker run encountered PostgreSQL serialization failure `40001` in the pre-existing reporting-core publish fixture; the serial rerun passed. This does not establish automatic retry under arbitrary concurrent publication.
+- Full frontend suite: 130 files / 487 tests passed.
+- Frontend typecheck and production build passed; lint: zero errors, 101 existing warnings.
+- Expanded real PostgreSQL/backend/Chromium Organization browser journeys passed. These browser assertions exercise product navigation/governance and negative authority boundaries; they do not establish all full assessment/report/export scenarios below.
+
+### Acceptance still outstanding
+
+The original C0–C7 headings below describe implementation slices, not certification of all C01–C10 requirements in the development plan. Complete school assessment → canonical result → report → CSV, consultation two-wave longitudinal, and protected multi-rater business scenarios have not all been demonstrated through a real browser. Full migration/backup/restore release rehearsal and parent historical report discovery also remain unverified here. The production resource registry remains intentionally empty until governed resources are released; no scientific content or Safety trigger is auto-published.
+
+The final push requests the existing Ready-PR exact-head CI. Per the user's request this task stops immediately after triggering CI; final CI results and merge readiness are not asserted.
+
 ## Baseline
 
 - Base: `main@e10b77af73e3fad6bc62aa941dc883b7bd452c21` (merged PR4 baseline).
@@ -47,7 +73,8 @@ PR5 exposes thin governed HTTP adapters over the already-authoritative structure
 - Persona and Capability history;
 - Grade/Class structure;
 - Student/Class and Staff/Class temporal relationships;
-- Organization suspend/resume;
+- platform-only Organization create/suspend/resume;
+- classification labels, counselor/client relationships and audit history;
 - explicit-deny break-glass management.
 
 The UI preserves current vs historical episodes; it does not collapse membership or class relations into mutable booleans.

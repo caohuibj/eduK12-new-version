@@ -1,3 +1,4 @@
+import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
 import { cognitiveController } from './cognitive.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
@@ -15,7 +16,7 @@ import { relationalRuntimeConsentAuthority } from '../assessment-relational/runt
  * `/assignments/my` 必须先于 `/assignments/:id` 注册。
  */
 const router = Router()
-const respondentAttemptAccess = requireRole(UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER)
+const respondentAttemptAccess = runOrLegacyRespondentAccess('COGNITIVE')
 const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) return next()

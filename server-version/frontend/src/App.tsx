@@ -125,7 +125,7 @@ class RouteErrorBoundary extends React.Component<
 const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
 const ParentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['PARENT']}>{children}</RouteAccess>
 const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT']}>{children}</RouteAccess>
-const RelationalProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'PARENT', 'TEACHER']}>{children}</RouteAccess>
+const RelationalProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess>{children}</RouteAccess>
 const ScaleLibraryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'TEACHER', 'ADMIN']}>{children}</RouteAccess>
 const OptionalStudentRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useAuth()

@@ -5,6 +5,14 @@ Baseline: `main@e10b77af73e3fad6bc62aa941dc883b7bd452c21`
 Prerequisites: PR3 #121 and PR4 #122 merged; PR4 exact-head Full Gate and post-merge main smoke passed.  
 Scope: Organization / Reporting V2.1 product integration. This document does not change reporting science, Runtime semantics, scoring, authorization policy, or production publication state.
 
+## Review reconciliation (2026-09-20)
+
+The baseline inventory below records pre-PR5 behavior. The reviewed implementation intentionally narrows Organization create/suspend/resume HTTP operations to current SYSTEM_ADMIN, supports a designated active first administrator, and blocks ordinary governance on suspended Organizations. Server-returned action hints drive product navigation; every endpoint still independently authorizes requests.
+
+The completed product adapters now also include classification/relationship history, audit reads, released resource discovery, authoritative read-only Run preview, and exact respondent task discovery. Shared relational runtime routes accept authenticated users at the shell and authorize exact resources on the server; legacy ADMIN access is added only for an exact frozen Run respondent binding. This is not Organization authority inferred from a legacy role.
+
+See `pr5-evidence.md` for the tested scope and outstanding development-plan acceptance evidence. This contract does not certify C01–C10 completion or CI success.
+
 ## 1. PR5 objective
 
 PR5 turns the server-authoritative Organization / Run / Reporting capabilities delivered by PR1–PR4 into a usable product surface.

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { runApi, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
+import { runApi, type RunResourceChoice, type RunPreview, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
@@ -43,7 +43,10 @@ export default function OrganizationRunDetailPage() {
   const [busy, setBusy] = useState(false)
   const [mutationError, setMutationError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [confirmPublish, setConfirmPublish] = useState<RunPreview | null>(null)
 
+  const [resources, setResources] = useState<RunResourceChoice[]>([])
+  const [selectedResource, setSelectedResource] = useState<RunResourceChoice | null>(null)
   const [resourceFamily, setResourceFamily] = useState<RunResourceFamily>('BUNDLE')
   const [resourceKey, setResourceKey] = useState('')
   const [resourceVersion, setResourceVersion] = useState('1.0.0')
@@ -68,15 +71,17 @@ export default function OrganizationRunDetailPage() {
     if (!organizationId || !runId || !canGovern) return
     setLoading(true)
     setLoadError(null)
+    setProgress(null)
     try {
       const next = await runApi.detail(organizationId, runId)
       setDetail(next)
-      if (next.run.status === 'DRAFT') setProgress(null)
+      if (next.run.status === 'DRAFT') { setProgress(null); setResources((await runApi.resources(organizationId)).list) }
       else {
         try { setProgress(await runApi.progress(organizationId, runId)) }
-        catch { setProgress(null) }
+        catch (err) { setLoadError(errorText(err, '执行进度读取失败，请重试。')) }
       }
     } catch (err) {
+      setDetail(null)
       setLoadError(errorText(err, '无法加载 Run'))
     } finally {
       setLoading(false)
@@ -96,10 +101,37 @@ export default function OrganizationRunDetailPage() {
       await load()
     } catch (err) {
       setMutationError(errorText(err, 'Run 操作失败'))
+      await load()
     } finally {
       setBusy(false)
     }
   }, [busy, load])
+
+  const chooseResource = (index: string) => {
+    const resource = resources[Number(index)]
+    if (!resource) return
+    setSelectedResource(resource)
+    setResourceFamily(resource.family)
+    setResourceKey(resource.key)
+    setResourceVersion(resource.version)
+    setSubjectRole(resource.subjectRoles[0] as RunActorRole)
+    setRespondentRole(resource.respondentRoles[0] as RunActorRole)
+    setRelationshipKind(resource.relationshipKinds[0] as RunRelationshipKind)
+    setPerspective(resource.perspectives[0] as RunPerspective)
+    setAnalysisMode(resource.analysisMode as RunAnalysisMode)
+    setVisibilityPolicyKey(resource.visibilityPolicyKey)
+    setMinimumRespondents(resource.minimumRespondents === null ? '' : String(resource.minimumRespondents))
+  }
+
+  const previewPublish = async () => {
+    if (!detail || busy) return
+    setBusy(true)
+    setMutationError(null)
+    setConfirmPublish(null)
+    try { setConfirmPublish(await runApi.preview(organizationId, runId, detail.run.version)) }
+    catch (err) { setMutationError(errorText(err, '发布预览失败')); await load() }
+    finally { setBusy(false) }
+  }
 
   const addTrack = async (event: FormEvent) => {
     event.preventDefault()
@@ -115,7 +147,7 @@ export default function OrganizationRunDetailPage() {
       setMutationError('所选 selector 需要至少一个 ID。多个 ID 使用英文逗号分隔。')
       return
     }
-    const minimum = minimumRespondents.trim() ? Number.parseInt(minimumRespondents, 10) : null
+    const minimum = minimumRespondents.trim() ? Number(minimumRespondents) : null
     if (minimumRespondents.trim() && (!Number.isInteger(minimum) || (minimum ?? 0) < 1)) {
       setMutationError('minimumRespondents 必须为空或正整数。')
       return
@@ -150,8 +182,15 @@ export default function OrganizationRunDetailPage() {
       <PageHeader
         title={detail.run.name}
         description={`状态：${detail.run.status} · version ${detail.run.version} · Track ${detail.run.trackCount} · Execution ${detail.run.executionCount}`}
-        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>Run 列表</Link>{detail.run.status === 'DRAFT' && <ProductButton variant="primary" disabled={busy || detail.tracks.length === 0} onClick={() => void mutate('Run 已发布；人口、资源与策略身份已冻结。', () => runApi.publish(organizationId, runId, detail.run.version))}>发布 Run</ProductButton>}{detail.run.status === 'PUBLISHED' && <><ProductButton disabled={busy} onClick={() => void mutate('Run 已关闭。', () => runApi.close(organizationId, runId))}>关闭 Run</ProductButton><ProductButton variant="danger" disabled={busy} onClick={() => void mutate('Run 已取消。', () => runApi.cancel(organizationId, runId))}>取消 Run</ProductButton></>}</div>}
+        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>Run 列表</Link>{detail.run.status === 'DRAFT' && <ProductButton variant="primary" disabled={busy || detail.tracks.length === 0} onClick={() => void previewPublish()}>发布 Run</ProductButton>}{detail.run.status === 'PUBLISHED' && <><ProductButton disabled={busy} onClick={() => void mutate('Run 已关闭。', () => runApi.close(organizationId, runId))}>关闭 Run</ProductButton><ProductButton variant="danger" disabled={busy} onClick={() => void mutate('Run 已取消。', () => runApi.cancel(organizationId, runId))}>取消 Run</ProductButton></>}</div>}
       />
+      {confirmPublish && detail.run.status === 'DRAFT' && <section role="dialog" aria-modal="true" aria-label="确认发布测评" className="space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <h2 className="font-semibold">确认发布测评</h2>
+        <ul>{confirmPublish.tracks.map(track => <li key={track.trackId}>Track {track.trackId}：受测者 {track.subjectCount}，评价者 {track.respondentCount}，任务 {track.executionCount}</li>)}</ul>
+        <p>将按当前显示的 {detail.tracks.length} 个 Track 发布。服务器会重新检查资源限制、成员与关系；发布后配置不可修改。</p>
+        <ProductButton autoFocus disabled={busy} onClick={() => setConfirmPublish(null)}>返回检查</ProductButton>
+        <ProductButton disabled={busy} variant="primary" onClick={() => { setConfirmPublish(null); void mutate('Run 已发布；人口、资源与策略身份已冻结。', () => runApi.publish(organizationId, runId, confirmPublish.version)) }}>确认发布</ProductButton>
+      </section>}
       {loadError && <ProductStatus kind="error" title="刷新失败">{loadError}</ProductStatus>}
       {mutationError && <ProductStatus kind="error" title="Run 操作失败" announce="assertive">{mutationError}</ProductStatus>}
       {notice && <ProductStatus kind="success" title="Run 已更新" announce="polite">{notice}</ProductStatus>}
@@ -166,22 +205,24 @@ export default function OrganizationRunDetailPage() {
       {detail.run.status === 'DRAFT' && (
         <section className="mt-8 space-y-4" aria-labelledby="run-add-track-heading">
           <div><h2 id="run-add-track-heading" className="text-xl font-semibold text-slate-900">添加 Track</h2><p className="mt-1 text-sm text-slate-600">这里只声明 resource、population selector 与 requested policy。发布时服务器重新解析 authority，并冻结 resource policy、actor 与 relationship snapshots。</p></div>
+          {resources.length === 0 && <ProductStatus kind="info" title="暂无已发布的可用资源">内容发布独立于代码发布。当前服务器没有允许用于此流程的资源。</ProductStatus>}
+          <label className="grid gap-1 text-sm font-medium">已发布资源<select className="min-h-11 rounded-lg border px-3" defaultValue="" onChange={event => chooseResource(event.target.value)}><option value="" disabled>请选择资源</option>{resources.map((item, index) => <option key={`${item.family}:${item.key}:${item.version}`} value={index}>{item.title} · {item.family}/{item.key}@{item.version}</option>)}</select></label>
           <form className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-3" onSubmit={addTrack}>
-            <label className="grid gap-1 text-sm font-medium">资源类型<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={resourceFamily} onChange={(event) => setResourceFamily(event.target.value as RunResourceFamily)}>{RESOURCE_FAMILIES.map((family) => <option key={family}>{family}</option>)}</select></label>
-            <label className="grid gap-1 text-sm font-medium">资源 key<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={resourceKey} onChange={(event) => setResourceKey(event.target.value)} /></label>
-            <label className="grid gap-1 text-sm font-medium">资源 version<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={resourceVersion} onChange={(event) => setResourceVersion(event.target.value)} /></label>
+            <label className="grid gap-1 text-sm font-medium">资源类型<select className="min-h-11 rounded-lg border border-slate-300 px-3" disabled value={resourceFamily} onChange={(event) => setResourceFamily(event.target.value as RunResourceFamily)}>{RESOURCE_FAMILIES.map((family) => <option key={family}>{family}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">资源 key<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={resourceKey} onChange={(event) => setResourceKey(event.target.value)} /></label>
+            <label className="grid gap-1 text-sm font-medium">资源 version<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={resourceVersion} onChange={(event) => setResourceVersion(event.target.value)} /></label>
             <label className="grid gap-1 text-sm font-medium">Subject selector<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={subjectSelectorKind} onChange={(event) => setSubjectSelectorKind(event.target.value as SelectorKind)}>{SELECTOR_KINDS.map((kind) => <option key={kind}>{kind}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">Subject IDs<input className="min-h-11 rounded-lg border border-slate-300 px-3" disabled={subjectSelectorKind === 'ALL_CURRENT'} value={subjectSelectorValues} onChange={(event) => setSubjectSelectorValues(event.target.value)} placeholder="多个 ID 用英文逗号分隔" /></label>
-            <label className="grid gap-1 text-sm font-medium">Subject role<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={subjectRole} onChange={(event) => setSubjectRole(event.target.value as RunActorRole)}>{ACTOR_ROLES.map((role) => <option key={role}>{role}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">Subject role<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={subjectRole} onChange={(event) => setSubjectRole(event.target.value as RunActorRole)}>{(selectedResource?.subjectRoles ?? ACTOR_ROLES).map((role) => <option key={role}>{role}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">Respondent selector<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={respondentSelectorKind} onChange={(event) => setRespondentSelectorKind(event.target.value as SelectorKind)}>{RESPONDENT_SELECTOR_KINDS.map((kind) => <option key={kind}>{kind}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">Respondent IDs<input className="min-h-11 rounded-lg border border-slate-300 px-3" disabled={respondentSelectorKind === 'ALL_CURRENT' || respondentSelectorKind === 'RELATED_PARENT'} value={respondentSelectorValues} onChange={(event) => setRespondentSelectorValues(event.target.value)} placeholder="多个 ID 用英文逗号分隔" /></label>
-            <label className="grid gap-1 text-sm font-medium">Respondent role<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={respondentRole} onChange={(event) => setRespondentRole(event.target.value as RunActorRole)}>{ACTOR_ROLES.map((role) => <option key={role}>{role}</option>)}</select></label>
-            <label className="grid gap-1 text-sm font-medium">Relationship<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={relationshipKind} onChange={(event) => setRelationshipKind(event.target.value as RunRelationshipKind)}>{RELATIONSHIPS.map((kind) => <option key={kind}>{kind}</option>)}</select></label>
-            <label className="grid gap-1 text-sm font-medium">Perspective<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={perspective} onChange={(event) => setPerspective(event.target.value as RunPerspective)}>{PERSPECTIVES.map((value) => <option key={value}>{value}</option>)}</select></label>
-            <label className="grid gap-1 text-sm font-medium">Analysis mode<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={analysisMode} onChange={(event) => setAnalysisMode(event.target.value as RunAnalysisMode)}>{ANALYSIS_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
-            <label className="grid gap-1 text-sm font-medium">Visibility policy key<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={visibilityPolicyKey} onChange={(event) => setVisibilityPolicyKey(event.target.value)} /></label>
-            <label className="grid gap-1 text-sm font-medium">Minimum respondents<input type="number" min="1" className="min-h-11 rounded-lg border border-slate-300 px-3" value={minimumRespondents} onChange={(event) => setMinimumRespondents(event.target.value)} placeholder="空 = null" /></label>
-            <div className="flex items-end"><ProductButton type="submit" variant="primary" disabled={busy || !resourceKey.trim() || !resourceVersion.trim() || !visibilityPolicyKey.trim()}>添加 Track</ProductButton></div>
+            <label className="grid gap-1 text-sm font-medium">Respondent role<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={respondentRole} onChange={(event) => setRespondentRole(event.target.value as RunActorRole)}>{(selectedResource?.respondentRoles ?? ACTOR_ROLES).map((role) => <option key={role}>{role}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">Relationship<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={relationshipKind} onChange={(event) => setRelationshipKind(event.target.value as RunRelationshipKind)}>{(selectedResource?.relationshipKinds ?? RELATIONSHIPS).map((kind) => <option key={kind}>{kind}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">Perspective<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={perspective} onChange={(event) => setPerspective(event.target.value as RunPerspective)}>{(selectedResource?.perspectives ?? PERSPECTIVES).map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">Analysis mode<select className="min-h-11 rounded-lg border border-slate-300 px-3" disabled value={analysisMode} onChange={(event) => setAnalysisMode(event.target.value as RunAnalysisMode)}>{ANALYSIS_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label className="grid gap-1 text-sm font-medium">Visibility policy key<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={visibilityPolicyKey} onChange={(event) => setVisibilityPolicyKey(event.target.value)} /></label>
+            <label className="grid gap-1 text-sm font-medium">Minimum respondents<input type="number" min={selectedResource?.minimumRespondents ?? 1} className="min-h-11 rounded-lg border border-slate-300 px-3" value={minimumRespondents} onChange={(event) => setMinimumRespondents(event.target.value)} placeholder="空 = null" /></label>
+            <div className="flex items-end"><ProductButton type="submit" variant="primary" disabled={busy || !selectedResource || !resourceKey.trim() || !resourceVersion.trim() || !visibilityPolicyKey.trim()}>添加 Track</ProductButton></div>
           </form>
         </section>
       )}

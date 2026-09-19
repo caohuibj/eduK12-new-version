@@ -15,6 +15,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const cognitive = useCognitiveEnabled()
   const {
     organizations,
+    platformRole,
     active: activeOrganization,
     activeLoading: organizationLoading,
     activeError: organizationError,
@@ -22,7 +23,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   } = useOrganization()
   const location = useLocation()
   const navigate = useNavigate()
-  const organizationRoute = location.pathname.startsWith('/organizations/')
+  const organizationRoute = (location.pathname.startsWith('/organizations/') || location.pathname === '/organization-tasks')
   const desiredMode = shellModeFor(location.pathname)
   const guestClassroom = location.pathname.startsWith('/student/classroom/') && user?.role !== 'STUDENT'
   const mode = guestClassroom || (desiredMode === 'standard' && !user) ? 'public' : desiredMode
@@ -35,50 +36,13 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const [openPath, setOpenPath] = useState<string | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
   const menuOpen = openPath === location.pathname
-  const reportingContext = activeOrganization?.access
-  const explicitDenies = reportingContext?.explicitDenies ?? []
-  const hasDeny = (...permissions: string[]) => explicitDenies.some((permission) => permission === '*' || permissions.includes(permission))
-  const reportingDenied = hasDeny('REPORT_READ', 'ORG_GROUP_REPORT_V1')
-  const canOpenReporting = Boolean(
-    activeOrganization?.organization.status === 'ACTIVE'
-    && reportingContext?.membershipId
-    && !reportingDenied
-    && (
-      reportingContext.orgRole === 'ORG_ADMIN'
-      || reportingContext.capabilities.includes('PSYCHOLOGY_STAFF')
-      || reportingContext.personas.includes('TEACHER')
-      || reportingContext.personas.includes('COUNSELOR')
-    ),
-  )
-  const canExportAggregate = Boolean(
-    activeOrganization?.organization.status === 'ACTIVE'
-    && reportingContext?.membershipId
-    && reportingContext.capabilities.includes('REPORT_EXPORT')
-    && !hasDeny('REPORT_READ', 'REPORT_EXPORT'),
-  )
-  const canExportMember = Boolean(
-    activeOrganization?.organization.status === 'ACTIVE'
-    && reportingContext?.membershipId
-    && reportingContext.capabilities.includes('REPORT_MEMBER_EXPORT')
-    && !hasDeny('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT'),
-  )
-  const safetyDenied = hasDeny('REPORT_READ', 'SAFETY_READ')
-  const canOpenSafety = Boolean(
-    reportingContext?.membershipId
-    && !safetyDenied
-    && (
-      (activeOrganization?.organization.status === 'ACTIVE' && reportingContext.orgRole === 'ORG_ADMIN')
-      || reportingContext.capabilities.includes('PSYCHOLOGY_STAFF')
-      || reportingContext.personas.includes('TEACHER')
-      || reportingContext.personas.includes('COUNSELOR')
-    ),
-  )
-  const canOpenDelivery = canExportAggregate || canExportMember || canOpenSafety
+  const canOpenReporting = activeOrganization?.allowedActions?.includes('REPORTING') === true
+  const canOpenDelivery = activeOrganization?.allowedActions?.includes('DELIVERY') === true
 
   useEffect(() => {
-    if (!user || mode !== 'standard' || activeOrganization || organizationLoading || organizations.length !== 1) return
+    if (organizationError || !user || mode !== 'standard' || activeOrganization || organizationLoading || organizations.length !== 1) return
     void selectOrganization(organizations[0].id)
-  }, [user, mode, activeOrganization, organizationLoading, organizations, selectOrganization])
+  }, [user, mode, activeOrganization, organizationLoading, organizations, selectOrganization, organizationError])
 
   useEffect(() => {
     if (mode === 'display') return
@@ -116,7 +80,9 @@ function AppShellContent({ children }: { children: ReactNode }) {
               </select>
             </label>
           )}
-          {user && mode === 'standard' && activeOrganization && <><Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>{activeOrganization.access.canGovern && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/runs`}>Runs</Link>}{canOpenReporting && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/reporting`}>Reporting</Link>}{canOpenDelivery && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/delivery`}>Safety/CSV</Link>}</>}
+          {user && mode === 'standard' && platformRole === 'SYSTEM_ADMIN' && <Link to="/organizations/new">创建组织</Link>}
+          {user && mode === 'standard' && <Link to="/organization-tasks">组织测评任务</Link>}
+          {user && mode === 'standard' && activeOrganization && <><Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>{activeOrganization.allowedActions?.includes('RUNS') && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/runs`}>Runs</Link>}{canOpenReporting && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/reporting`}>Reporting</Link>}{canOpenDelivery && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}/delivery`}>Safety/CSV</Link>}</>}
           {user && mode === 'standard' && organizationError && <span role="status" className="text-sm text-red-700">组织上下文不可用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>

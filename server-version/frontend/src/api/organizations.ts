@@ -20,6 +20,7 @@ export interface AccessibleOrganization {
 }
 
 export interface OrganizationListProjection {
+  allowedActions: Array<'CREATE_ORGANIZATION'>
   platformRole: PlatformRole
   list: AccessibleOrganization[]
   total: number
@@ -41,7 +42,10 @@ export interface OrganizationAccessContext {
   canGovern: boolean
 }
 
+export type OrganizationProductAction = 'GOVERN' | 'RUNS' | 'MANAGE_DENIES' | 'SUSPEND' | 'RESUME' | 'REPORTING' | 'SAFETY' | 'EXPORT_AGGREGATE' | 'EXPORT_MEMBER' | 'DELIVERY'
+
 export interface OrganizationContextProjection {
+  allowedActions: OrganizationProductAction[]
   organization: {
     id: string
     name: string
@@ -129,7 +133,27 @@ const requireData = <T>(response: { code: number | string; message: string; data
 const commandKey = (prefix: string) => `${prefix}-${typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`
 const orgPath = (organizationId: string) => `/organizations/${encodeURIComponent(organizationId)}`
 
+export interface ClassificationProjection {
+  dimensions: Array<{ id: string; key: string; name: string; cardinality: 'SINGLE' | 'MULTI' }>
+  labels: Array<{ id: string; dimensionId: string; name: string }>
+  assignments: Array<{ id: string; membershipId: string; labelId: string; validFrom: string; validUntil: string | null }>
+  relationships: Array<{ id: string; counselorMembershipId: string; clientMembershipId: string; validFrom: string; validUntil: string | null }>
+  historyLimit: number
+}
+
 export const organizationApi = {
+  async create(name: string, firstAdminUserId: string): Promise<{ organization: { id: string } }> {
+    return requireData(await apiClient.post('/organizations', { name, firstAdminUserId, commandKey: commandKey('org-create') }))
+  },
+  async classification(organizationId: string): Promise<ClassificationProjection> {
+    return requireData(await apiClient.get<ClassificationProjection>(`${orgPath(organizationId)}/classification`))
+  },
+  async classificationCommand(organizationId: string, command: Record<string, string>): Promise<unknown> {
+    return requireData(await apiClient.post(`${orgPath(organizationId)}/classification`, command))
+  },
+  async audit(organizationId: string, page = 1): Promise<{ list: Array<{ id: string; action: string; actorUserId: string; targetType: string; targetId: string; createdAt: string }> }> {
+    return requireData(await apiClient.get(`${orgPath(organizationId)}/audit`, { params: { page, pageSize: 50 } }))
+  },
   async list(page = 1, pageSize = 50): Promise<OrganizationListProjection> {
     return requireData(await apiClient.get<OrganizationListProjection>('/organizations', {
       params: { page, pageSize },

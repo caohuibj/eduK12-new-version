@@ -31,6 +31,7 @@ const organization = { id: 'org-1', name: 'Org 1', status: 'ACTIVE' }
 const accessibleOrganization = { id: 'org-1', name: 'Org 1', status: 'ACTIVE' }
 const contextProjection = {
   organization,
+  allowedActions: ['REPORTING'],
   access: {
     organizationId: 'org-1',
     organizationStatus: 'ACTIVE',
@@ -59,6 +60,7 @@ function Probe() {
   return (
     <>
       <output aria-label="active-organization">{active?.organization.id ?? 'none'}</output>
+      <output aria-label="actions">{active?.allowedActions?.join(',') ?? 'none'}</output>
       <output aria-label="loading-state">{String(isLoading)}:{String(activeLoading)}</output>
       <button onClick={() => void selectOrganization('org-1')}>select</button>
       <button onClick={() => void refresh()}>refresh</button>
@@ -106,4 +108,26 @@ describe('OrganizationContext concurrency', () => {
     expect(screen.getByLabelText('active-organization')).toHaveTextContent('org-1')
     await waitFor(() => expect(screen.getByLabelText('loading-state')).toHaveTextContent('false:false'))
   })
+  it('refreshes current grants even while membership remains discoverable', async () => {
+    render(<OrganizationProvider><Probe /></OrganizationProvider>)
+    await waitFor(() => expect(api.list).toHaveBeenCalledTimes(1))
+    await act(async () => screen.getByRole('button', { name: 'select' }).click())
+    expect(screen.getByLabelText('actions')).toHaveTextContent('REPORTING')
+    api.context.mockResolvedValue({ ...contextProjection, allowedActions: [] })
+    await act(async () => screen.getByRole('button', { name: 'refresh' }).click())
+    await waitFor(() => expect(screen.getByLabelText('actions')).not.toHaveTextContent('REPORTING'))
+  })
+
+  it('clears exact context when refresh is denied and ignores discovery pagination', async () => {
+    render(<OrganizationProvider><Probe /></OrganizationProvider>)
+    await waitFor(() => expect(api.list).toHaveBeenCalledTimes(1))
+    await act(async () => screen.getByRole('button', { name: 'select' }).click())
+    api.list.mockResolvedValue({ ...listProjection, list: [], total: 101 })
+    await act(async () => screen.getByRole('button', { name: 'refresh' }).click())
+    expect(screen.getByLabelText('active-organization')).toHaveTextContent('org-1')
+    api.context.mockRejectedValue(new Error('authority revoked'))
+    await act(async () => screen.getByRole('button', { name: 'refresh' }).click())
+    await waitFor(() => expect(screen.getByLabelText('active-organization')).toHaveTextContent('none'))
+  })
+
 })

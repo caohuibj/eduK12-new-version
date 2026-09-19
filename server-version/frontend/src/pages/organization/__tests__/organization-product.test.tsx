@@ -5,6 +5,8 @@ import OrganizationAdminPage from '../OrganizationAdminPage'
 import OrganizationProductRoutes from '../OrganizationProductRoutes'
 
 const api = vi.hoisted(() => ({
+  classification: vi.fn(),
+  audit: vi.fn(),
   listMemberships: vi.fn(),
   listUnits: vi.fn(),
   listStudentAssignments: vi.fn(),
@@ -88,6 +90,8 @@ beforeEach(() => {
   org.selectOrganization.mockResolvedValue(null)
   org.refresh.mockResolvedValue(undefined)
   api.listMemberships.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
+  api.classification.mockResolvedValue({ dimensions: [], labels: [], assignments: [], relationships: [], historyLimit: 100 })
+  api.audit.mockResolvedValue({ list: [] })
   api.listUnits.mockResolvedValue([])
   api.listStudentAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
   api.listStaffAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
@@ -123,6 +127,7 @@ describe('Organization product authority boundary', () => {
 
   it('keeps SYSTEM_ADMIN deny recovery reachable when ordinary governance is denied', () => {
     org.active = {
+      allowedActions: ['MANAGE_DENIES'],
       organization: { id: 'org-1', name: '系统治理组织', status: 'ACTIVE' },
       access: {
         ...baseAccess,

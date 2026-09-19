@@ -42,7 +42,7 @@ function Evidence({ level, limitations }: { level: string; limitations: string[]
   return <div className="rounded-lg border border-slate-200 bg-slate-50 p-3"><strong>Scientific status · {level}</strong>{limitations.length > 0 ? <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">{limitations.map((item) => <li key={item}>{item}</li>)}</ul> : <p className="mt-1 text-sm text-slate-600">无额外 limitation。</p>}</div>
 }
 
-function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProjection }) {
+export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProjection }) {
   const projection: ReportingProjection = artifact.projection
   const suppressed = projection.state === 'suppressed'
   return (
@@ -127,6 +127,7 @@ export default function OrganizationReportingPage() {
   const load = useCallback(async () => {
     if (!organizationId || !context) return
     setLoading(true)
+    setArtifact(null)
     setLoadError(null)
     try {
       const [specPage, sourcePage, protectedPage, seriesPage] = await Promise.all([
@@ -148,6 +149,11 @@ export default function OrganizationReportingPage() {
       setProtectedSpecId((current) => current || specPage.list.find((item) => item.analysisKind === 'PROTECTED_FEEDBACK')?.specId || '')
       setProtectedSourceKey((current) => current || (protectedPage.list[0] ? `${sourceKey(protectedPage.list[0])}::${protectedPage.list[0].subject.userId}::${protectedPage.list[0].relationshipKind}::${protectedPage.list[0].perspective}` : ''))
     } catch (error) {
+      setArtifact(null)
+      setSpecs([])
+      setSources([])
+      setProtectedSources([])
+      setSeries([])
       setLoadError(errorText(error, '当前账户无法进入 Reporting workspace'))
     } finally {
       setLoading(false)
@@ -159,12 +165,14 @@ export default function OrganizationReportingPage() {
   const act = useCallback(async (successMessage: string, operation: () => Promise<void>) => {
     if (busy) return
     setBusy(true)
+    setArtifact(null)
     setActionError(null)
     setNotice(null)
     try {
       await operation()
       setNotice(successMessage)
     } catch (error) {
+      setArtifact(null)
       setActionError(errorText(error, 'Reporting 操作失败'))
     } finally {
       setBusy(false)

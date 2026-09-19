@@ -41,6 +41,7 @@ const main = async () => {
   const teacher = await createUser('teacher_persona', 'STUDENT')
   const student = await createUser('student', 'STUDENT')
   const parent = await createUser('parent', 'PARENT')
+  const client = await createUser('client', 'STUDENT')
   const outsider = await createUser('outsider', 'STUDENT')
   const systemAdmin = await createUser('system_admin', 'ADMIN', 'SYSTEM_ADMIN')
 
@@ -78,6 +79,10 @@ const main = async () => {
     persona: 'STUDENT',
     meta: { actorUserId: owner.id, commandKey: key('student-persona', suffix) },
   })
+
+  await grantPersona({ organizationId: primary.organization.id, membershipId: teacherMembership.id, persona: 'COUNSELOR', meta: { actorUserId: owner.id, commandKey: key('counselor-persona', suffix) } })
+  const clientMembership = await createMembership({ organizationId: primary.organization.id, userId: client.id, meta: { actorUserId: owner.id, commandKey: key('client-member', suffix) } })
+  await grantPersona({ organizationId: primary.organization.id, membershipId: clientMembership.id, persona: 'CLIENT', meta: { actorUserId: owner.id, commandKey: key('client-persona', suffix) } })
 
   await prisma.parentStudentRelationship.create({
     data: {
@@ -131,6 +136,8 @@ const main = async () => {
     password,
     ownerUserId: owner.id,
     ownerMembershipId: primary.membership.id,
+    counselorMembershipId: teacherMembership.id,
+    clientMembershipId: clientMembership.id,
     organizationId: primary.organization.id,
     organizationName: primary.organization.name,
     foreignOrganizationId: foreign.organization.id,
@@ -139,6 +146,7 @@ const main = async () => {
     gradeName: `PR5 Browser Grade ${suffix}`,
     publishedSpec: { id: spec.id, key: spec.specKey },
     users: {
+      client: { id: client.id, username: client.username, password, legacyRole: client.role },
       owner: { id: owner.id, username: owner.username, password, legacyRole: owner.role },
       teacher: { id: teacher.id, username: teacher.username, password, legacyRole: teacher.role },
       student: { id: student.id, username: student.username, password, legacyRole: student.role },

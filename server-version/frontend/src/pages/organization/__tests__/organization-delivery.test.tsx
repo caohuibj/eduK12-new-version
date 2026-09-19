@@ -129,4 +129,16 @@ describe('Organization Safety and CSV delivery', () => {
     await waitFor(() => expect(screen.queryAllByText('case-1')).toHaveLength(0))
     expect(screen.getAllByText('case-2').length).toBeGreaterThan(0)
   })
+  it('removes a previously returned FULL payload when exact reauthorization fails', async () => {
+    api.readSafetyCase.mockResolvedValueOnce({ projection: 'FULL', data: { sensitive: 'private-trigger' } })
+    renderPage()
+    await screen.findByRole('radio')
+    await userEvent.click(screen.getByRole('button', { name: '读取 exact projection' }))
+    expect(await screen.findByText(/private-trigger/)).toBeInTheDocument()
+    api.readSafetyCase.mockRejectedValueOnce(new Error('authority revoked'))
+    await userEvent.click(screen.getByRole('button', { name: '读取 exact projection' }))
+    expect(await screen.findByText('authority revoked')).toBeInTheDocument()
+    expect(screen.queryByText(/private-trigger/)).not.toBeInTheDocument()
+  })
+
 })

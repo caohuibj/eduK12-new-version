@@ -95,7 +95,35 @@ const requireData = <T>(response: { code: number | string; message: string; data
 
 const runPath = (organizationId: string, runId?: string) => `/organizations/${encodeURIComponent(organizationId)}/runs${runId ? `/${encodeURIComponent(runId)}` : ''}`
 
+export interface AssignedRunTask {
+  executionId: string; organizationId: string; runId: string; runName: string;
+  runStatus: string; status: string; claimState: string | null;
+  resourceFamily: string; resourceKey: string; resourceVersion: string;
+  consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
+}
+export interface RunPreview {
+  runId: string; version: number;
+  tracks: Array<{ trackId: string; executionCount: number; subjectCount: number; respondentCount: number }>
+}
+export interface RunResourceChoice extends RunRequestedPolicy {
+  title: string; family: RunResourceFamily; key: string; version: string;
+}
 export const runApi = {
+  async resources(organizationId: string): Promise<{ list: RunResourceChoice[] }> {
+    return requireData(await apiClient.get(`/organizations/${encodeURIComponent(organizationId)}/run-resources`))
+  },
+  async preview(organizationId: string, runId: string, expectedVersion: number): Promise<RunPreview> {
+    return requireData(await apiClient.post(`${runPath(organizationId, runId)}/preview`, { expectedVersion }))
+  },
+  async assignedTasks(): Promise<{ list: AssignedRunTask[]; truncated: boolean }> {
+    return requireData(await apiClient.get('/organizations/assigned-tasks'))
+  },
+  async acceptConsent(task: AssignedRunTask): Promise<unknown> {
+    return requireData(await apiClient.post(`${runPath(task.organizationId, task.runId)}/executions/${encodeURIComponent(task.executionId)}/consent/accept`))
+  },
+  async start(task: AssignedRunTask): Promise<{ state: 'STARTED'; runtimeBindingKind: string; runtimeBindingRef: string } | { state: 'IN_PROGRESS'; operationKey: string }> {
+    return requireData(await apiClient.post(`${runPath(task.organizationId, task.runId)}/executions/${encodeURIComponent(task.executionId)}/start`))
+  },
   async list(organizationId: string, input: { page?: number; pageSize?: number; status?: AssessmentRunStatus } = {}): Promise<RunListPage> {
     return requireData(await apiClient.get<RunListPage>(runPath(organizationId), {
       params: {

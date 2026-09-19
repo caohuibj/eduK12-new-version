@@ -8,6 +8,7 @@ import { organizationAdminController } from './organization.admin.controller'
 import { organizationController } from './organization.controller'
 
 const router = Router()
+router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
 
 // Platform-governed ReportingAnalysisSpec lifecycle. These handlers enforce
 // current PlatformRole=SYSTEM_ADMIN themselves; Organization admins cannot
@@ -20,12 +21,12 @@ router.post('/reporting-specs/:specId/retire', authenticate, reportingController
 // Organization product discovery is a read-only authority projection. It is
 // deliberately separate from legacy User.role and does not grant authority:
 // every downstream Organization operation re-authorizes current DB facts.
+router.get('/assigned-tasks', authenticate, assessmentRunController.assignedTasks)
 router.get('/', authenticate, organizationController.listAccessible)
 router.get('/:organizationId/context', authenticate, organizationController.readContext)
 
-// Any authenticated account may create an organization and becomes its first
-// ORG_ADMIN. Organization authority after creation is never derived from
-// legacy User.role.
+// Platform lifecycle handlers require current SYSTEM_ADMIN; tenant governance
+// and legacy User.role never grant create/suspend/resume authority.
 router.post('/', authenticate, organizationController.create)
 
 router.get('/:organizationId/memberships', authenticate, requireOrganizationGovernance, organizationController.listMemberships)
@@ -48,6 +49,9 @@ router.post('/:organizationId/access-denies/lift', authenticate, requireOrganiza
 // Thin product adapters over the already-tested Organization structure and
 // class-relationship services. All reads and writes remain governance-scoped;
 // temporal episodes are returned as history rather than collapsed into flags.
+router.get('/:organizationId/classification', authenticate, requireOrganizationGovernance, organizationAdminController.listClassification)
+router.post('/:organizationId/classification', authenticate, requireOrganizationGovernance, organizationAdminController.classificationCommand)
+router.get('/:organizationId/audit', authenticate, requireOrganizationGovernance, organizationAdminController.listAudit)
 router.get('/:organizationId/units', authenticate, requireOrganizationGovernance, organizationAdminController.listUnits)
 router.post('/:organizationId/units', authenticate, requireOrganizationGovernance, organizationAdminController.createUnit)
 router.delete('/:organizationId/units/:unitId', authenticate, requireOrganizationGovernance, organizationAdminController.deleteUnit)
@@ -63,10 +67,12 @@ router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authen
 // tenant-governance operations. Publish intentionally delegates scoped
 // TEACHER/COUNSELOR authority to the domain service; START is respondent-scoped
 // by frozen actor identity.
+router.get('/:organizationId/run-resources', authenticate, requireOrganizationGovernance, assessmentRunController.resources)
 router.get('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.list)
 router.get('/:organizationId/runs/:runId', authenticate, requireOrganizationGovernance, assessmentRunController.detail)
 router.post('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.create)
 router.post('/:organizationId/runs/:runId/tracks', authenticate, requireOrganizationGovernance, assessmentRunController.addTrack)
+router.post('/:organizationId/runs/:runId/preview', authenticate, requireOrganizationGovernance, assessmentRunController.preview)
 router.post('/:organizationId/runs/:runId/publish', authenticate, assessmentRunController.publish)
 router.get('/:organizationId/runs/:runId/progress', authenticate, requireOrganizationGovernance, assessmentRunController.progress)
 router.post('/:organizationId/runs/:runId/close', authenticate, requireOrganizationGovernance, assessmentRunController.close)

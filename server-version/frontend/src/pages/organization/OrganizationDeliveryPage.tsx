@@ -98,6 +98,7 @@ export default function OrganizationDeliveryPage() {
       if (organizationScopeRef.current === scopeOrganizationId) setNotice(successMessage)
     } catch (error) {
       if (organizationScopeRef.current === scopeOrganizationId) {
+        setSafetyProjection(null)
         setActionError(errorText(error, 'Delivery 操作失败'))
       }
     } finally {
@@ -107,6 +108,7 @@ export default function OrganizationDeliveryPage() {
 
   const readSafety = () => act('Safety case 已按当前责任/权限重新读取。', async (scopeOrganizationId) => {
     const caseId = selectedCaseId
+    setSafetyProjection(null)
     if (!caseId) throw new Error('请选择 Safety case')
     const projection = await deliveryApi.readSafetyCase(scopeOrganizationId, caseId)
     if (organizationScopeRef.current !== scopeOrganizationId) return

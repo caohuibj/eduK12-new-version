@@ -4,12 +4,14 @@ import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { error, success, unauthorized } from '../../utils/response'
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft, type AssessmentRunStatus } from './repository'
-import { publishAssessmentRun } from './publish'
+import { previewAssessmentRun, publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
 import { assertCurrentRunPublisherBoundary, assertRunExecutionParent } from './resourceBoundary'
-import { listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
+import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
+import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
 const selectorSchema = z.record(z.unknown()).default({})
 const policySchema = z.object({
@@ -52,6 +54,31 @@ const fail = (res: Response, err: unknown) => {
 }
 
 export const assessmentRunController = {
+  async resources(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const entries = new Map<string, ReturnType<typeof relationalProductRegistry.listReleasedForRespondent>[number]>()
+    for (const role of ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'] as const) {
+      for (const entry of relationalProductRegistry.listReleasedForRespondent(role)) {
+        const ref = entry.applicability
+        entries.set(`${ref.resourceKind}:${ref.resourceKey}:${ref.resourceVersion}`, entry)
+      }
+    }
+    try {
+      const list = []
+      for (const entry of entries.values()) {
+        const ref = entry.applicability
+        productionRunResourceAuthorityRegistry.assertStartSupported(ref.resourceKind)
+        const policy = await productionRunResourceAuthorityRegistry.resolveExact({ family: ref.resourceKind, key: ref.resourceKey, version: ref.resourceVersion })
+        list.push({ title: entry.title, ...policy })
+      }
+      return success(res, { list })
+    } catch (err) { return fail(res, err) }
+  },
+  async assignedTasks(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try { return success(res, await listAssignedRunTasks(req.user.userId)) }
+    catch (err) { return fail(res, err) }
+  },
   async list(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = listRunSchema.safeParse(req.query)
@@ -103,6 +130,15 @@ export const assessmentRunController = {
         respondentSelector: parsed.data.respondentSelector ?? {},
         requestedPolicy: parsed.data.requestedPolicy,
       }))
+    } catch (err) { return fail(res, err) }
+  },
+
+  async preview(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = publishSchema.safeParse(req.body)
+    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    try {
+      return success(res, await previewAssessmentRun({ organizationId: req.params.organizationId, runId: req.params.runId, actorUserId: req.user.userId, expectedVersion: parsed.data.expectedVersion }))
     } catch (err) { return fail(res, err) }
   },
 
