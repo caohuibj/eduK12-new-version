@@ -3,6 +3,7 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
 import {
+  ReportingError,
   reportingFail,
   type ReportingCohortSnapshotRecord,
   type ReportingResolvedExecutionV1,
@@ -110,8 +111,10 @@ const resolveInTransaction = async (
   })
   const attemptById = new Map(attempts.map((attempt) => [attempt.id, attempt]))
   for (const row of completed) {
-    const attempt = attemptById.get(row.runtimeBindingRef!)
-    if (!attempt || attempt.status !== 'COMPLETED') reportingFail('REPORT_RESULT_INTEGRITY', 'completed Run execution has no completed authoritative runtime result', 500)
+    const runtimeRef = row.runtimeBindingRef!
+    const attempt = attemptById.get(runtimeRef)
+    if (!attempt) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'completed Run execution has no authoritative runtime result', 500)
+    if (attempt.status !== 'COMPLETED') reportingFail('REPORT_RESULT_INTEGRITY', 'completed Run execution has no completed authoritative runtime result', 500)
     if (
       attempt.userId !== row.respondentUserId
       || attempt.subjectUserId !== row.subjectUserId
@@ -143,16 +146,19 @@ const resolveInTransaction = async (
   }
 
   const resolved: ReportingResolvedExecutionV1[] = completed.map((row) => {
-    const attempt = attemptById.get(row.runtimeBindingRef!)!
+    const runtimeRef = row.runtimeBindingRef!
+    const attempt = attemptById.get(runtimeRef)
+    if (!attempt) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'authoritative runtime result disappeared during reporting read', 500)
     const unitRows = (snapshotsByAttempt.get(attempt.id) ?? []).filter((snapshot) => snapshot.attemptEpoch === attempt.attemptEpoch)
     if (unitRows.length === 0) reportingFail('REPORT_RESULT_INTEGRITY', 'completed runtime has no canonical UNIT_RESULT snapshots', 500)
     const seen = new Set<string>()
     const metrics: ReportingResolvedMetricV1[] = []
     const hashes: Array<{ slotKey: string; resultHash: string }> = []
     for (const snapshot of unitRows) {
-      if (!snapshot.canonicalResultEncrypted) reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
+      const encrypted = snapshot.canonicalResultEncrypted
+      if (!encrypted) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
       let envelope
-      try { envelope = parseStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted) }
+      try { envelope = parseStoredCanonicalUnitResult(encrypted) }
       catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
       hashes.push({ slotKey: snapshot.slotKey, resultHash: envelope.resultHash })
       const resultQuality = asQuality(envelope.core.quality.status)
