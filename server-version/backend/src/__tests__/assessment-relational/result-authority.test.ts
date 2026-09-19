@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dispositionFromFrozenRelationalAttemptIdentity } from '../../modules/assessment-relational/result-authority'
+import { dispositionFromFrozenRelationalAttemptIdentity, resolveRelationalCompositeResultDisposition } from '../../modules/assessment-relational/result-authority'
 
 describe('RA-02 frozen relational result authority', () => {
   it('keeps non-relational attempts unchanged', () => {
@@ -31,4 +31,15 @@ describe('RA-02 frozen relational result authority', () => {
       respondentType: 'UNKNOWN',
     })).toBe('COHORT_ONLY')
   })
+  it.each(['PARENT', 'TEACHER'])('checks frozen visibility before exposing %s runtime results', async (respondentType) => {
+    const db = (policy: unknown[]) => ({
+      compositeAssessmentAttempt: { findUnique: async () => ({ assignmentRef: 'protected', respondentType }) },
+      $queryRaw: async () => policy,
+    })
+    await expect(resolveRelationalCompositeResultDisposition('attempt', db([{ perspective: 'OBSERVER_REPORT', analysisMode: 'COHORT_AGGREGATE' }]))).resolves.toBe('COHORT_ONLY')
+    await expect(resolveRelationalCompositeResultDisposition('attempt', db([{ perspective: 'RELATIONAL_EXPERIENCE', analysisMode: 'INDIVIDUAL_ONLY' }]))).resolves.toBe('COHORT_ONLY')
+    await expect(resolveRelationalCompositeResultDisposition('attempt', db([]))).resolves.toBe('COHORT_ONLY')
+    await expect(resolveRelationalCompositeResultDisposition('attempt', db([{ perspective: 'OBSERVER_REPORT', analysisMode: 'INDIVIDUAL_ONLY' }]))).resolves.toBe('INDIVIDUAL_ALLOWED')
+  })
+
 })

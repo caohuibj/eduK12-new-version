@@ -16,6 +16,8 @@ import {
   readOrganizationReportingArtifact,
 } from './pr4Service'
 import { ReportingError } from './types'
+import { createReportingExport, downloadReportingExport } from './export'
+import { readOrganizationSafetyCase } from '../assessment-safety/organization-view'
 
 const createSpecSchema = z.object({
   specKey: z.string().trim().min(1).max(160),
@@ -73,6 +75,11 @@ const analysisSchema = z.union([
   protectedAnalysisSchema,
 ])
 
+const exportSchema = z.union([
+  z.object({ kind: z.enum(['AGGREGATE', 'MEMBER']), artifactId: z.string().uuid() }).strict(),
+  z.object({ kind: z.literal('SAFETY'), caseId: z.string().uuid() }).strict(),
+])
+
 const badRequest = (res: Response, message: string) => instrumentError(res, 'REPORT_REQUEST_INVALID', message, 400)
 const fail = (res: Response, error: unknown) => {
   if (error instanceof ReportingError) return instrumentError(res, error.code, error.message, error.statusCode)
@@ -81,6 +88,33 @@ const fail = (res: Response, error: unknown) => {
 const principal = (req: Request) => ({ userId: req.user!.userId, platformRole: req.user!.platformRole })
 
 export const reportingController = {
+  async createExport(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = exportSchema.safeParse(req.body)
+    if (!parsed.success) return badRequest(res, 'invalid export request')
+    try {
+      const data = await createReportingExport({ principal: principal(req), organizationId: req.params.organizationId, target: parsed.data })
+      res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data })
+    } catch (error) { return fail(res, error) }
+  },
+  async downloadExport(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const result = await downloadReportingExport({ principal: principal(req), organizationId: req.params.organizationId, exportId: req.params.exportId })
+      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`)
+      return res.type('text/csv').send(result.csv)
+    } catch (error) { return fail(res, error) }
+  },
+  async readSafetyCase(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const data = await readOrganizationSafetyCase({ principal: principal(req), organizationId: req.params.organizationId, caseId: req.params.caseId })
+      res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data })
+    } catch (error) { return fail(res, error) }
+  },
   async createSpec(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = createSpecSchema.safeParse(req.body)
@@ -92,6 +126,7 @@ export const reportingController = {
         version: parsed.data.version,
         definition: parsed.data.definition,
       })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: spec })
     } catch (error) { return fail(res, error) }
   },
@@ -100,6 +135,7 @@ export const reportingController = {
     if (!req.user) return unauthorized(res)
     try {
       const spec = await reviewPlatformReportingSpec({ actor: principal(req), specId: req.params.specId })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: spec })
     } catch (error) { return fail(res, error) }
   },
@@ -108,6 +144,7 @@ export const reportingController = {
     if (!req.user) return unauthorized(res)
     try {
       const spec = await publishPlatformReportingSpec({ actor: principal(req), specId: req.params.specId })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: spec })
     } catch (error) { return fail(res, error) }
   },
@@ -116,6 +153,7 @@ export const reportingController = {
     if (!req.user) return unauthorized(res)
     try {
       const spec = await retirePlatformReportingSpec({ actor: principal(req), specId: req.params.specId })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: spec })
     } catch (error) { return fail(res, error) }
   },
@@ -132,6 +170,7 @@ export const reportingController = {
         resourceFamily: parsed.data.scope.resourceFamily,
         resourceKey: parsed.data.scope.resourceKey,
       })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: series })
     } catch (error) { return fail(res, error) }
   },
@@ -147,6 +186,7 @@ export const reportingController = {
         seriesId: req.params.seriesId,
         ...parsed.data,
       })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: wave })
     } catch (error) { return fail(res, error) }
   },
@@ -165,7 +205,8 @@ export const reportingController = {
           trackId: data.trackId,
           specId: data.specId,
         })
-        return res.json({ code: 0, message: '操作成功', data: artifact })
+        res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       if (data.analysisKind === 'REPEATED_COHORT') {
         const artifact = await generateOrganizationLongitudinalAnalysis({
@@ -173,7 +214,8 @@ export const reportingController = {
           seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
           analysisKind: data.analysisKind,
         })
-        return res.json({ code: 0, message: '操作成功', data: artifact })
+        res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       if (data.analysisKind === 'MATCHED_LONGITUDINAL') {
         const artifact = await generateOrganizationLongitudinalAnalysis({
@@ -181,13 +223,15 @@ export const reportingController = {
           seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
           analysisKind: data.analysisKind, mode: data.options.mode,
         })
-        return res.json({ code: 0, message: '操作成功', data: artifact })
+        res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       const artifact = await generateOrganizationProtectedFeedback({
         principal: principal(req), organizationId: req.params.organizationId,
         runId: data.runId, trackId: data.trackId, subjectUserId: data.subjectUserId,
         relationshipKind: data.relationshipKind, perspective: data.perspective, specId: data.specId,
       })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: artifact })
     } catch (error) { return fail(res, error) }
   },
@@ -200,6 +244,7 @@ export const reportingController = {
         organizationId: req.params.organizationId,
         artifactId: req.params.artifactId,
       })
+      res.setHeader('Cache-Control', 'no-store')
       return res.json({ code: 0, message: '操作成功', data: artifact })
     } catch (error) { return fail(res, error) }
   },

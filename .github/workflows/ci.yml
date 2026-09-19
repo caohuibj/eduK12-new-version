@@ -276,6 +276,8 @@ jobs:
           src/__tests__/integration/reportingCore.postgres.integration.test.ts
           src/__tests__/integration/reportingHttp.postgres.integration.test.ts
           src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts
+          src/__tests__/integration/reportingDelivery.postgres.integration.test.ts
+          src/__tests__/integration/reportingSeries.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

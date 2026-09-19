@@ -54,6 +54,9 @@ router.post('/:organizationId/runs/:runId/executions/:executionId/start', authen
 // privacy overrides from clients.
 router.post('/:organizationId/reporting/series', authenticate, reportingController.createSeries)
 router.post('/:organizationId/reporting/series/:seriesId/waves', authenticate, reportingController.bindWave)
+router.post('/:organizationId/reporting/exports', authenticate, reportingController.createExport)
+router.get('/:organizationId/reporting/exports/:exportId', authenticate, reportingController.downloadExport)
+router.get('/:organizationId/safety/cases/:caseId', authenticate, reportingController.readSafetyCase)
 router.post('/:organizationId/reporting/analyses', authenticate, reportingController.analyze)
 router.get('/:organizationId/reporting/artifacts/:artifactId', authenticate, reportingController.readArtifact)
 

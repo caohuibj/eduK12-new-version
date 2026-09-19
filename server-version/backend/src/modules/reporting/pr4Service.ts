@@ -266,6 +266,9 @@ export const readOrganizationReportingArtifact = async (input: {
     return publicArtifact(artifact)
   }
 
+  if (artifact.analysisKind !== 'PROTECTED_FEEDBACK') {
+    return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'unsupported reporting artifact kind', 409)
+  }
   await assertProtectedFeedbackManagerAccess({
     principal: input.principal,
     organizationId: input.organizationId,

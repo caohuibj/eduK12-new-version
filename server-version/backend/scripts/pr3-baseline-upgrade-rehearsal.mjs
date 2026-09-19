@@ -2,7 +2,7 @@
 
 import { randomUUID } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { cpSync, mkdtempSync, rmSync } from 'node:fs'
+import { cpSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { PrismaClient } from '@prisma/client'
@@ -243,7 +243,8 @@ const verifyHead = async (ids) => {
 let createdDatabase = false
 try {
   cpSync(sourcePrismaDir, baselinePrismaDir, { recursive: true })
-  for (const migration of PR3_MIGRATIONS) {
+  // Freeze the pre-PR3 baseline even as later migrations depend on PR3 tables.
+  for (const migration of readdirSync(path.join(baselinePrismaDir, 'migrations')).filter((name) => name >= PR3_MIGRATIONS[0])) {
     rmSync(path.join(baselinePrismaDir, 'migrations', migration), { recursive: true, force: true })
   }
 

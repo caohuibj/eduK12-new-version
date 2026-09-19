@@ -67,7 +67,7 @@ suite('PR3 effective Run Track privacy floor (real PostgreSQL)', () => {
       ids.track,
       ids.organization,
       ids.run,
-      JSON.stringify({ minimumRespondents: 5 }),
+      JSON.stringify({ minimumRespondents: 5, perspectives: ['SELF_REPORT'] }),
       JSON.stringify({ minimumRespondents: 3 }),
       canonicalHash({ resource: 'privacy-floor-fixture', minimumRespondents: 3 }),
     )
