@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
+import OrganizationProductRoutes from '../../pages/organization/OrganizationProductRoutes'
 import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
@@ -20,6 +21,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
     selectOrganization,
   } = useOrganization()
   const location = useLocation()
+  const navigate = useNavigate()
+  const organizationRoute = location.pathname.startsWith('/organizations/')
   const desiredMode = shellModeFor(location.pathname)
   const guestClassroom = location.pathname.startsWith('/student/classroom/') && user?.role !== 'STUDENT'
   const mode = guestClassroom || (desiredMode === 'standard' && !user) ? 'public' : desiredMode
@@ -64,7 +67,13 @@ function AppShellContent({ children }: { children: ReactNode }) {
                 value={activeOrganization?.organization.id || ''}
                 disabled={organizationLoading}
                 onChange={(event) => {
-                  if (event.target.value) void selectOrganization(event.target.value)
+                  const organizationId = event.target.value
+                  if (!organizationId) return
+                  if (organizationRoute) {
+                    navigate(`/organizations/${encodeURIComponent(organizationId)}`)
+                  } else {
+                    void selectOrganization(organizationId)
+                  }
                 }}
               >
                 <option value="" disabled>{organizationLoading ? '正在加载…' : '选择组织'}</option>
@@ -76,6 +85,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
               </select>
             </label>
           )}
+          {user && mode === 'standard' && activeOrganization && <Link to={`/organizations/${encodeURIComponent(activeOrganization.organization.id)}`}>组织空间</Link>}
           {user && mode === 'standard' && organizationError && <span role="status" className="text-sm text-red-700">组织上下文不可用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>
@@ -85,8 +95,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
           {items.map((item) => <Link key={item.path} to={item.path} aria-current={active?.path === item.path ? 'page' : undefined} onClick={() => { setOpenPath(null); if (item.path === location.pathname) toggleRef.current?.focus() }}>{item.label}</Link>)}
         </nav>}
         <div className="hui-app-content">
-          {mode === 'standard' && <nav className="hui-product hui-breadcrumb" aria-label="当前位置"><Link to={homeFor(user?.role)}>首页</Link>{active && <><span aria-hidden="true">/</span>{active.path === location.pathname ? <span>{active.label}</span> : <Link to={active.path}>{active.label}</Link>}</>}{title !== active?.label && <><span aria-hidden="true">/</span><span>{title}</span></>}</nav>}
-          <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname) || location.pathname === '/profile' || location.pathname === '/student/profile' || user?.mustChangePassword) ? 'hui-auth-content' : ''}`}>{children}</main>
+          {mode === 'standard' && <nav className="hui-product hui-breadcrumb" aria-label="当前位置"><Link to={homeFor(user?.role)}>首页</Link>{organizationRoute ? <><span aria-hidden="true">/</span><span>组织空间</span></> : active && <><span aria-hidden="true">/</span>{active.path === location.pathname ? <span>{active.label}</span> : <Link to={active.path}>{active.label}</Link>}</>}{!organizationRoute && title !== active?.label && <><span aria-hidden="true">/</span><span>{title}</span></>}</nav>}
+          <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname) || location.pathname === '/profile' || location.pathname === '/student/profile' || user?.mustChangePassword) ? 'hui-auth-content' : ''}`}>{organizationRoute ? <OrganizationProductRoutes /> : children}</main>
         </div>
       </div>
       {mode !== 'focused' && <Footer variant="light" />}
