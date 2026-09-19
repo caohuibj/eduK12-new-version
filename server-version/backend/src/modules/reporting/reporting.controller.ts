@@ -35,7 +35,12 @@ export const reportingController = {
     const parsed = createSpecSchema.safeParse(req.body)
     if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting spec')
     try {
-      const spec = await createPlatformReportingSpec({ actor: principal(req), ...parsed.data })
+      const spec = await createPlatformReportingSpec({
+        actor: principal(req),
+        specKey: parsed.data.specKey,
+        version: parsed.data.version,
+        definition: parsed.data.definition,
+      })
       return res.json({ code: 0, message: '操作成功', data: spec })
     } catch (error) { return fail(res, error) }
   },
