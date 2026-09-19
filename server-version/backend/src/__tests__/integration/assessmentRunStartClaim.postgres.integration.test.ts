@@ -8,7 +8,7 @@ import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import {
-  acquireRunExecutionStartClaim,
+  acquireRunExecutionStartClaim as acquireClaim,
   markRunStartDispatchIntent,
 } from '../../modules/assessment-run/startClaim'
 import { freezeRunExecutionScientificProvenance } from '../../modules/assessment-run/scientificProvenance'
@@ -63,6 +63,7 @@ const testAdapter: RunResourceAuthorityAdapter = {
   },
 }
 const registry = new RunResourceAuthorityRegistry([testAdapter])
+const acquireRunExecutionStartClaim = (input: Parameters<typeof acquireClaim>[0]) => acquireClaim({ ...input, resourceRegistry: registry })
 
 async function createExecution(label: string) {
   const owner = await db.user.create({
@@ -121,6 +122,43 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
     await db.$connect()
   })
   afterAll(async () => db.$disconnect())
+
+  it.each([
+    ['suspended organization', `UPDATE organizations SET status='SUSPENDED' WHERE id=(SELECT organization_id FROM assessment_run_executions WHERE id=$1)`, 'ORGANIZATION_SUSPENDED'],
+    ['ended membership', `UPDATE organization_memberships SET valid_until=clock_timestamp() WHERE id=(SELECT a.membership_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACTOR_AUTHORITY_REVOKED'],
+    ['revoked persona', `UPDATE organization_persona_grants SET revoked_at=clock_timestamp() WHERE membership_id=(SELECT a.membership_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACTOR_AUTHORITY_REVOKED'],
+    ['expired deadline', `UPDATE assessment_runs SET intake_deadline=clock_timestamp()-INTERVAL '1 second' WHERE id=(SELECT run_id FROM assessment_run_executions WHERE id=$1)`, 'RUN_INTAKE_CLOSED'],
+    ['frozen account', `UPDATE users SET is_frozen=true WHERE id=(SELECT a.user_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACCOUNT_INACTIVE'],
+  ])('rejects first admission with %s and leaves no claim or frozen provenance', async (label, mutation, code) => {
+    const fixture = await createExecution(label.replaceAll(' ', '-'))
+    await db.$executeRawUnsafe(mutation, fixture.executionId)
+    await expect(acquireRunExecutionStartClaim(fixture)).rejects.toMatchObject({ code })
+    const rows = await db.$queryRawUnsafe<Array<{ claims: number; frozen: string | null }>>(
+      `SELECT (SELECT COUNT(*)::int FROM assessment_run_execution_start_claims WHERE execution_id=e.id) AS claims, scientific_provenance_hash AS frozen FROM assessment_run_executions e WHERE e.id=$1`, fixture.executionId,
+    )
+    expect(rows[0]).toEqual({ claims: 0, frozen: null })
+  })
+
+  it('uses maturity at first admission rather than the earlier publish value', async () => {
+    const fixture = await createExecution('promoted-before-admission')
+    const promotedRegistry = new RunResourceAuthorityRegistry([{ ...testAdapter, async resolveExact(ref) {
+      return { ...await testAdapter.resolveExact(ref), scientificMaturity: 'RESEARCH_READY' }
+    } }])
+    await acquireClaim({ ...fixture, resourceRegistry: promotedRegistry })
+    const frozen = await freezeRunExecutionScientificProvenance(fixture.executionId, registry)
+    expect(frozen.scientificMaturity).toBe('RESEARCH_READY')
+  })
+
+  it('commits admission, scientific provenance and one audit together', async () => {
+    const fixture = await createExecution('atomic-admission')
+    await acquireRunExecutionStartClaim(fixture)
+    await acquireRunExecutionStartClaim(fixture)
+    const rows = await db.$queryRawUnsafe<Array<{ frozen: string; audits: number }>>(
+      `SELECT scientific_provenance_hash AS frozen, (SELECT COUNT(*)::int FROM organization_governance_audits WHERE target_id=e.id AND action='ASSESSMENT_RUN_START_ADMITTED') AS audits FROM assessment_run_executions e WHERE e.id=$1`, fixture.executionId,
+    )
+    expect(rows[0].frozen).toBeTruthy()
+    expect(rows[0].audits).toBe(1)
+  })
 
   it('admits exactly one active claim under concurrent START and never accepts a client operation key', async () => {
     const execution = await createExecution('concurrent')
@@ -181,9 +219,9 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
     expect(recovered.claim.state).toBe('DISPATCHED')
   })
 
-  it('freezes maturity exactly once from publish-time resource provenance even if the Track metadata later changes', async () => {
+  it('freezes exact current maturity once at admission and never promotes historical provenance', async () => {
     const execution = await createExecution('science')
-    const first = await freezeRunExecutionScientificProvenance(execution.executionId)
+    const first = await freezeRunExecutionScientificProvenance(execution.executionId, registry)
     expect(first.scientificMaturity).toBe('PILOT')
 
     const promotedPolicy = {
@@ -199,7 +237,7 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
       execution.trackId,
     )
 
-    const replay = await freezeRunExecutionScientificProvenance(execution.executionId)
+    const replay = await freezeRunExecutionScientificProvenance(execution.executionId, registry)
     expect(replay.scientificMaturity).toBe('PILOT')
     expect(replay.scientificProvenanceHash).toBe(first.scientificProvenanceHash)
     expect(replay.scientificProvenance.resourcePolicyHash).toBe(first.scientificProvenance.resourcePolicyHash)

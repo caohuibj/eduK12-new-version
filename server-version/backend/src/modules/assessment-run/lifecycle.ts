@@ -72,7 +72,8 @@ const lockExecutions = async (tx: Tx, runId: string): Promise<ExecutionLifecycle
 }
 
 const expireUnstarted = async (tx: Tx, row: ExecutionLifecycleRow, mode: 'CLOSE' | 'CANCEL') => {
-  if (row.status === 'COMPLETED') return
+  if (row.status !== 'ASSIGNED' || row.runtimeBindingRef) return
+  if (mode === 'CLOSE' && ['CLAIMED', 'DISPATCHED', 'UNKNOWN', 'COMPLETED'].includes(row.claimState ?? '')) return
   const executionState = mode === 'CLOSE' ? 'EXPIRED' : 'CANCELLED'
   const assignmentState = mode === 'CLOSE' ? 'EXPIRED' : 'REVOKED'
   const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
@@ -111,12 +112,6 @@ export const closeAssessmentRun = async (input: {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be closed', 409)
   }
   const executions = await lockExecutions(tx, input.runId)
-  const ambiguous = executions.find((row) => (
-    !row.runtimeBindingRef && (row.claimState === 'DISPATCHED' || row.claimState === 'UNKNOWN')
-  ))
-  if (ambiguous) {
-    throw new RunLifecycleError('RUN_START_OUTCOME_UNKNOWN', 'Run has an unresolved dispatched START and cannot close safely', 409)
-  }
 
   await tx.$executeRaw`
     UPDATE "assessment_runs"

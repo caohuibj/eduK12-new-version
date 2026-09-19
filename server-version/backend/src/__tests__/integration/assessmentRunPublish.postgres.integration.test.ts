@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PlatformRole, PrismaClient, UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
-import { createMembership, createOrganization, grantPersona } from '../../modules/organization/service'
+import { createMembership, createOrganization, grantPersona, denyOrganizationAccess } from '../../modules/organization/service'
 import { createAssessmentRunDraft, addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
@@ -87,6 +87,9 @@ suite('Assessment Run atomic publish (real PostgreSQL)', () => {
     expect(counts[0]).toEqual({ executions: 1, allocations: 1, actors: 1 })
     expect(assignments[0]?.policyDomain).toBe('ORGANIZATION_RUN')
     expect(episodes[0]).toEqual({ initiationMode: 'ORGANIZATION_RUN', courseId: null })
+    await denyOrganizationAccess({ organizationId: org.organization.id, userId: owner.id, permission: '*', reason: 'review deny', meta: { actorUserId: owner.id, commandKey: key('deny-publisher') } })
+    await expect(publishAssessmentRun({ organizationId: org.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })).rejects.toMatchObject({ code: 'RUN_PUBLISH_FORBIDDEN' })
+
   })
 
   it('rolls back the complete graph if a later Track resolves an empty population', async () => {

@@ -77,6 +77,7 @@ export const loadRunExecutionStartAdmission = async (input: {
   tx?: Tx
   executionId: string
   actorUserId: string
+  admitted?: boolean
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
 }): Promise<RunStartAdmission> => {
   const db = input.tx ?? (prisma as unknown as Tx)
@@ -103,7 +104,7 @@ export const loadRunExecutionStartAdmission = async (input: {
   if (execution.respondentUserId !== input.actorUserId) {
     throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'only the frozen respondent may start this Run execution', 403)
   }
-  if (execution.runStatus !== 'PUBLISHED') {
+  if (!input.admitted && execution.runStatus !== 'PUBLISHED') {
     throw new RunStartAdmissionError('RUN_NOT_STARTABLE', 'Run is not open for new START admission', 409)
   }
   if (!execution.relationalAssignmentId) {
@@ -127,6 +128,9 @@ export const loadRunExecutionStartAdmission = async (input: {
     throw new RunStartAdmissionError('RUN_ASSIGNMENT_NOT_STARTABLE', 'Run assignment is not startable', 409)
   }
 
+  if (!assignment.consentId && (assignment.respondentRole === 'PARENT' || assignment.visibilityPolicyKey.startsWith('observer_'))) {
+    throw new RunStartAdmissionError('RUN_CONSENT_REQUIRED', 'observer Run assignment requires a consent lineage; republish legacy unstarted tasks')
+  }
   const attemptIdentity = await buildRunAttemptIdentity(assignment, assignmentRepository)
   return { execution, assignment, attemptIdentity }
 }

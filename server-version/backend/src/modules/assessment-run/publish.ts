@@ -1,3 +1,4 @@
+import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -527,6 +528,12 @@ const insertOrganizationAssignment = async (tx: Tx, input: {
   perspective: string
   track: PreparedTrack
 }): Promise<string> => {
+  const consentId = await createRunPendingConsent(tx, {
+    subjectUserId: input.subject.userId, respondentUserId: input.respondent.userId,
+    respondentRole: input.respondent.actorRole, createdByUserId: input.createdByUserId,
+    visibilityPolicyKey: input.track.requestedPolicy.visibilityPolicyKey,
+    resourceKind: input.track.resourceFamily, resourceKey: input.track.resourceKey, resourceVersion: input.track.resourceVersion,
+  })
   const assignmentId = randomUUID()
   const snapshotJson = JSON.stringify(input.relationshipSnapshot)
   await tx.$executeRaw`
@@ -542,7 +549,7 @@ const insertOrganizationAssignment = async (tx: Tx, input: {
       ${input.relationshipSnapshot.relationshipKind}, ${input.relationshipSnapshot.relationshipRef}, ${snapshotJson}::jsonb,
       ${input.relationshipSnapshotHash}, ${input.perspective}, ${input.track.resourceFamily}, ${input.track.resourceKey},
       ${input.track.resourceVersion}, ${input.track.resourcePolicy.applicabilityHash}, ${input.track.requestedPolicy.analysisMode},
-      ${input.track.requestedPolicy.minimumRespondents}, NULL, ${input.track.requestedPolicy.visibilityPolicyKey},
+      ${input.track.requestedPolicy.minimumRespondents}, ${consentId}, ${input.track.requestedPolicy.visibilityPolicyKey},
       'ORGANIZATION_RUN', 'OPEN', transaction_timestamp()
     )
   `
@@ -588,6 +595,12 @@ export const publishAssessmentRun = async (input: {
     `
     const run = runs[0]
     if (!run) throw new RunPublishError('RUN_NOT_FOUND', 'Run not found', 404)
+    const denies = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "organization_access_denies" WHERE "organization_id" = ${input.organizationId}
+        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'RUN_PUBLISH')
+    `
+    if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run publication', 403)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
     if (run.status === 'PUBLISHED') {
       const countRows = await tx.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS "count" FROM "assessment_run_executions" WHERE "run_id" = ${input.runId}
@@ -598,7 +611,6 @@ export const publishAssessmentRun = async (input: {
       throw new RunPublishError('RUN_STATE_CONFLICT', 'Run state/version changed before publish ownership', 409)
     }
 
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
     const currentTrackRows = await tx.$queryRaw<Array<{
       id: string; resourceFamily: string; resourceKey: string; resourceVersion: string
       subjectSelector: unknown; respondentSelector: unknown; requestedPolicy: RunTrackNarrowingRequest

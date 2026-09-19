@@ -138,6 +138,12 @@ describe('relational runtime FINAL consent authority', () => {
       .toBe('RELATIONAL_RUNTIME_BINDING')
   })
 
+  it('rejects legacy Organization observer attempts without consent while preserving completed replay', async () => {
+    const record = assignment({ policyDomain: 'ORGANIZATION_RUN', consentId: null })
+    expect(await failCode(() => authority({ record, attemptConsentId: null }).assertCompositeFinal('attempt-1', 'parent-1'))).toBe('RELATIONAL_CONSENT_REQUIRED')
+    await expect(authority({ record: { ...record, status: 'COMPLETED' }, attemptConsentId: null }).assertCompositeFinal('attempt-1', 'parent-1')).resolves.toBeUndefined()
+  })
+
   it('leaves historical completed FINAL replay semantics to the runtime', async () => {
     const completed = assignment({ status: 'COMPLETED', completedAt: '2026-09-18T00:20:00.000Z' })
     await expect(authority({ record: completed, resolvedConsentId: null }).assertCompositeFinal('attempt-1', 'parent-1'))

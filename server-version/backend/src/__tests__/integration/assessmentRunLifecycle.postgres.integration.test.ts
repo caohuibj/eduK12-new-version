@@ -6,7 +6,7 @@ import { createMembership, createOrganization, grantPersona } from '../../module
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
-import { acquireRunExecutionStartClaim, markRunStartDispatchIntent, markRunStartUnknown } from '../../modules/assessment-run/startClaim'
+import { acquireRunExecutionStartClaim as acquireClaim, markRunStartDispatchIntent, markRunStartUnknown } from '../../modules/assessment-run/startClaim'
 import { cancelAssessmentRun, closeAssessmentRun } from '../../modules/assessment-run/lifecycle'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
@@ -36,6 +36,7 @@ const adapter: RunResourceAuthorityAdapter = {
   },
 }
 const registry = new RunResourceAuthorityRegistry([adapter])
+const acquireRunExecutionStartClaim = (input: Parameters<typeof acquireClaim>[0]) => acquireClaim({ ...input, resourceRegistry: registry })
 
 async function createExecution(label: string) {
   const owner = await db.user.create({ data: { username: `life-owner-${label}-${suffix}-${randomUUID().slice(0, 8)}`, passwordHash: 'x', role: UserRole.TEACHER }, select: { id: true } })
@@ -57,7 +58,7 @@ suite('Assessment Run close/cancel arbitration (real PostgreSQL)', () => {
   })
   afterAll(async () => db.$disconnect())
 
-  it('closes the admission gate and aborts an undispatched claim atomically', async () => {
+  it('closes new intake without expiring an admitted undispatched claim', async () => {
     const fixture = await createExecution('close-claimed')
     const claim = await acquireRunExecutionStartClaim({ executionId: fixture.executionId, actorUserId: fixture.actorUserId })
     expect(claim.kind).toBe('ACQUIRED')
@@ -65,20 +66,20 @@ suite('Assessment Run close/cancel arbitration (real PostgreSQL)', () => {
     const rows = await db.$queryRawUnsafe<Array<{ runStatus: string; executionStatus: string; claimState: string }>>(
       `SELECT r.status AS "runStatus", e.status AS "executionStatus", c.state AS "claimState" FROM assessment_runs r JOIN assessment_run_executions e ON e.run_id=r.id JOIN assessment_run_execution_start_claims c ON c.execution_id=e.id WHERE e.id=$1`, fixture.executionId,
     )
-    expect(rows[0]).toEqual({ runStatus: 'CLOSED', executionStatus: 'EXPIRED', claimState: 'ABORTED' })
+    expect(rows[0]).toEqual({ runStatus: 'CLOSED', executionStatus: 'ASSIGNED', claimState: 'CLAIMED' })
     await expect(acquireRunExecutionStartClaim({ executionId: fixture.executionId, actorUserId: fixture.actorUserId }))
-      .rejects.toMatchObject({ code: 'RUN_NOT_STARTABLE' })
+      .resolves.toMatchObject({ kind: 'IN_PROGRESS' })
   })
 
-  it('refuses to close when a dispatched outcome is UNKNOWN', async () => {
+  it('closes intake while preserving UNKNOWN for recovery', async () => {
     const fixture = await createExecution('close-unknown')
     const acquired = await acquireRunExecutionStartClaim({ executionId: fixture.executionId, actorUserId: fixture.actorUserId })
     if (acquired.kind !== 'ACQUIRED') throw new Error('expected acquired')
     const dispatched = await markRunStartDispatchIntent({ claimId: acquired.claim.id, generation: acquired.claim.claimGeneration })
     await markRunStartUnknown({ claimId: dispatched.id, generation: dispatched.claimGeneration })
-    await expect(closeAssessmentRun(fixture)).rejects.toMatchObject({ code: 'RUN_START_OUTCOME_UNKNOWN' })
+    await expect(closeAssessmentRun(fixture)).resolves.toEqual({ status: 'CLOSED' })
     const run = await db.$queryRawUnsafe<Array<{ status: string }>>(`SELECT status FROM assessment_runs WHERE id=$1`, fixture.runId)
-    expect(run[0].status).toBe('PUBLISHED')
+    expect(run[0].status).toBe('CLOSED')
   })
 
   it('refuses cancellation when an active runtime binding exists instead of manufacturing cancellation', async () => {

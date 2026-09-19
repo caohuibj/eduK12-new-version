@@ -1,3 +1,5 @@
+import { acquireRunExecutionStartClaim as acquireClaim } from '../../modules/assessment-run/startClaim'
+import { acceptRunExecutionConsent } from '../../modules/assessment-run/consent'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -17,7 +19,7 @@ const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 const key = (label: string) => `allocation-matrix-${label}-${suffix}-${randomUUID()}`
 const policy = {
   subjectRoles: ['STUDENT'], respondentRoles: ['TEACHER'], relationshipKinds: ['CLASS_TEACHER_STUDENT'],
-  perspectives: ['OBSERVER_REPORT'], analysisMode: 'INDIVIDUAL_ONLY', visibilityPolicyKey: 'ORG_CLASS_OBSERVER_V1', minimumRespondents: null,
+  perspectives: ['OBSERVER_REPORT'], analysisMode: 'INDIVIDUAL_ONLY', visibilityPolicyKey: 'observer_assigning_teacher_v1', minimumRespondents: null,
 }
 const adapter: RunResourceAuthorityAdapter = {
   family: 'BUNDLE',
@@ -30,15 +32,16 @@ const adapter: RunResourceAuthorityAdapter = {
       family: ref.family, key: ref.key, version: ref.version, scientificMaturity: 'PILOT',
       applicabilityHash: canonicalHash({ ref, policy }), subjectRoles: ['STUDENT'], respondentRoles: ['TEACHER'],
       relationshipKinds: ['CLASS_TEACHER_STUDENT'], perspectives: ['OBSERVER_REPORT'], analysisMode: 'INDIVIDUAL_ONLY',
-      visibilityPolicyKey: 'ORG_CLASS_OBSERVER_V1', minimumRespondents: null,
+      visibilityPolicyKey: 'observer_assigning_teacher_v1', minimumRespondents: null,
       runtimeLaunchTarget: { kind: 'COMPOSITE', ref: 'test-composite' },
     }
   },
 }
 const registry = new RunResourceAuthorityRegistry([adapter])
+const acquireRunExecutionStartClaim = (input: Parameters<typeof acquireClaim>[0]) => acquireClaim({ ...input, resourceRegistry: registry })
 
 async function user(label: string, role: UserRole) {
-  return db.user.create({ data: { username: `matrix-${label}-${suffix}-${randomUUID().slice(0, 8)}`, passwordHash: 'x', role }, select: { id: true } })
+  return db.user.create({ data: { username: `matrix-${label}-${suffix}-${randomUUID().slice(0, 8)}`, passwordHash: 'x', role, teacherApproved: true }, select: { id: true } })
 }
 
 suite('Assessment Run Episode allocation matrix (real PostgreSQL)', () => {
@@ -47,6 +50,32 @@ suite('Assessment Run Episode allocation matrix (real PostgreSQL)', () => {
     await db.$connect()
   })
   afterAll(async () => db.$disconnect())
+
+  it('requires explicit Parent consent and current relationship without relying on legacy role', async () => {
+    const owner = await user('parent-owner', UserRole.TEACHER)
+    const child = await user('child', UserRole.STUDENT)
+    const parent = await user('external-parent', UserRole.STUDENT)
+    const org = await createOrganization({ name: `parent ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('parent-org') } })
+    const member = await createMembership({ organizationId: org.organization.id, userId: child.id, meta: { actorUserId: owner.id, commandKey: key('child-member') } })
+    await grantPersona({ organizationId: org.organization.id, membershipId: member.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: key('child-persona') } })
+    const relationship = await db.parentStudentRelationship.create({ data: { parentUserId: parent.id, studentUserId: child.id, status: 'ACTIVE', approvedAt: new Date(), approvedByUserId: owner.id } })
+    const parentPolicy = { ...policy, respondentRoles: ['PARENT'], relationshipKinds: ['PARENT_CHILD'] }
+    const parentRegistry = new RunResourceAuthorityRegistry([{ ...adapter, async resolveExact(ref) {
+      return { ...await adapter.resolveExact(ref), ...parentPolicy }
+    } }])
+    const run = await createAssessmentRunDraft({ organizationId: org.organization.id, name: 'parent consent', createdByUserId: owner.id })
+    await addAssessmentRunTrackDraft({ organizationId: org.organization.id, runId: run.id, resource: { family: 'BUNDLE', key: 'parent-observer', version: '1.0.0' }, subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] }, respondentSelector: { kind: 'RELATED_PARENT' }, requestedPolicy: parentPolicy })
+    await publishAssessmentRun({ organizationId: org.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: parentRegistry })
+    const tasks = await db.$queryRawUnsafe<Array<{ id: string; consentId: string }>>(`SELECT e.id, a.consent_id AS "consentId" FROM assessment_run_executions e JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id WHERE e.run_id=$1`, run.id)
+    const task = tasks[0]
+    const root = await db.assessmentAttemptConsent.findUniqueOrThrow({ where: { id: task.consentId } })
+    expect(root.acceptedAt).toBeNull()
+    const start = () => acquireClaim({ executionId: task.id, actorUserId: parent.id, resourceRegistry: parentRegistry })
+    await expect(start()).rejects.toMatchObject({ code: 'RUN_CONSENT_REQUIRED' })
+    await acceptRunExecutionConsent({ executionId: task.id, actorUserId: parent.id })
+    await db.parentStudentRelationship.update({ where: { id: relationship.id }, data: { status: 'REVOKED', revokedAt: new Date() } })
+    await expect(start()).rejects.toMatchObject({ code: 'RUN_RELATIONSHIP_REVOKED' })
+  })
 
   it('creates one Episode per Track+subject while allowing multiple respondents and separating different subjects', async () => {
     const owner = await user('owner', UserRole.TEACHER)
@@ -85,6 +114,24 @@ suite('Assessment Run Episode allocation matrix (real PostgreSQL)', () => {
     })
     const published = await publishAssessmentRun({ organizationId: org.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })
     expect(published.executionCount).toBe(4)
+
+    const tasks = await db.$queryRawUnsafe<Array<{ id: string; respondent: string; consentId: string }>>(
+      `SELECT e.id, a.respondent_user_id AS respondent, a.consent_id AS "consentId" FROM assessment_run_executions e JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id WHERE e.run_id=$1`, run.id,
+    )
+    expect(tasks.every((task) => Boolean(task.consentId))).toBe(true)
+    const task = tasks[0]
+    await expect(acquireRunExecutionStartClaim({ executionId: task.id, actorUserId: task.respondent })).rejects.toMatchObject({ code: 'RUN_CONSENT_REQUIRED' })
+    await expect(acceptRunExecutionConsent({ executionId: task.id, actorUserId: owner.id })).rejects.toMatchObject({ code: 'RUN_EXECUTION_ACTOR' })
+    await expect(acceptRunExecutionConsent({ executionId: task.id, actorUserId: task.respondent })).resolves.toEqual({ accepted: true, replayed: false })
+    await expect(acceptRunExecutionConsent({ executionId: task.id, actorUserId: task.respondent })).resolves.toEqual({ accepted: true, replayed: true })
+    const admitted = await acquireRunExecutionStartClaim({ executionId: task.id, actorUserId: task.respondent })
+    expect(admitted.kind).toBe('ACQUIRED')
+    if (admitted.kind !== 'ACQUIRED') throw new Error('expected admission')
+    expect(admitted.admission.attemptIdentity.consentId).not.toBe(task.consentId)
+    const second = tasks[1]
+    await acceptRunExecutionConsent({ executionId: second.id, actorUserId: second.respondent })
+    await db.assessmentAttemptConsent.updateMany({ where: { priorConsentId: second.consentId }, data: { revokedAt: new Date() } })
+    await expect(acquireRunExecutionStartClaim({ executionId: second.id, actorUserId: second.respondent })).rejects.toMatchObject({ code: 'RELATIONAL_CONSENT_REVOKED' })
 
     const counts = await db.$queryRawUnsafe<Array<{ executions: number; allocations: number; episodes: number }>>(
       `SELECT (SELECT COUNT(*)::int FROM assessment_run_executions WHERE run_id=$1) executions,

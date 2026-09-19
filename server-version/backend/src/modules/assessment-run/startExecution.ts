@@ -10,6 +10,7 @@ import {
 } from './resourceAuthority'
 import {
   acquireRunExecutionStartClaim,
+  lockExecutionEnvelope,
   markRunStartClaimCompleted,
   markRunStartDispatchIntent,
   markRunStartUnknown,
@@ -71,6 +72,7 @@ const attachBindingInTransaction = async (tx: Tx, input: {
   claim: RunStartClaimRecord
   binding: RunRuntimeBinding
 }): Promise<void> => {
+  await lockExecutionEnvelope(tx, input.executionId)
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
     SELECT "state", "claim_generation" AS "claimGeneration"
     FROM "assessment_run_execution_start_claims"
@@ -119,6 +121,7 @@ const startTransactionalComposite = async (input: {
   actorUserId: string
   launch: LaunchEnvelope
 }): Promise<RunStartExecutionResult> => prisma.$transaction(async (tx) => {
+  await lockExecutionEnvelope(tx, input.executionId)
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
     SELECT "state", "claim_generation" AS "claimGeneration"
     FROM "assessment_run_execution_start_claims"
@@ -133,6 +136,7 @@ const startTransactionalComposite = async (input: {
     tx,
     executionId: input.executionId,
     actorUserId: input.actorUserId,
+    admitted: true,
   })
   await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId)
 
@@ -273,7 +277,7 @@ export const startAssessmentRunExecution = async (input: {
   resourceRegistry?: RunResourceAuthorityRegistry
   runtimeAdapters?: RunRuntimeAdapterRegistry
 }): Promise<RunStartExecutionResult> => {
-  const decision = await acquireRunExecutionStartClaim({ executionId: input.executionId, actorUserId: input.actorUserId })
+  const decision = await acquireRunExecutionStartClaim({ executionId: input.executionId, actorUserId: input.actorUserId, resourceRegistry: input.resourceRegistry })
   if (decision.kind === 'BOUND') {
     return {
       state: 'STARTED',
