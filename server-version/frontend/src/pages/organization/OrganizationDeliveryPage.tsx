@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   deliveryApi,
@@ -16,6 +16,7 @@ export default function OrganizationDeliveryPage() {
   const { organizationId = '' } = useParams<{ organizationId: string }>()
   const { active, activeLoading, activeError, selectOrganization } = useOrganization()
   const context = active?.organization.id === organizationId ? active : null
+  const organizationScopeRef = useRef(organizationId)
   const [cases, setCases] = useState<OrganizationSafetyCaseSummary[]>([])
   const [casesTruncated, setCasesTruncated] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -30,66 +31,108 @@ export default function OrganizationDeliveryPage() {
   const [tickets, setTickets] = useState<Array<ReportingExportTicket & { label: string }>>([])
 
   useEffect(() => {
+    organizationScopeRef.current = organizationId
+    setCases([])
+    setCasesTruncated(false)
+    setLoading(false)
+    setLoadError(null)
+    setBusy(false)
+    setActionError(null)
+    setNotice(null)
+    setSelectedCaseId('')
+    setSafetyProjection(null)
+    setArtifactId('')
+    setArtifactExportKind('AGGREGATE')
+    setTickets([])
+  }, [organizationId])
+
+  useEffect(() => {
     if (!organizationId || context || activeLoading) return
     void selectOrganization(organizationId)
   }, [organizationId, context, activeLoading, selectOrganization])
 
-  const loadCases = useCallback(async () => {
+  useEffect(() => {
     if (!organizationId || !context) return
+    let cancelled = false
     setLoading(true)
     setLoadError(null)
-    try {
-      const result = await deliveryApi.listSafetyCases(organizationId)
-      setCases(result.list)
-      setCasesTruncated(result.truncated)
-      setSelectedCaseId((current) => current || result.list[0]?.caseId || '')
-    } catch (error) {
-      setLoadError(errorText(error, '当前账户没有可见 Safety case，或 Safety workspace 不可用'))
-      setCases([])
-      setCasesTruncated(false)
-    } finally {
-      setLoading(false)
-    }
-  }, [organizationId, context])
+    setSafetyProjection(null)
 
-  useEffect(() => { void loadCases() }, [loadCases])
+    void deliveryApi.listSafetyCases(organizationId)
+      .then((result) => {
+        if (cancelled || organizationScopeRef.current !== organizationId) return
+        setCases(result.list)
+        setCasesTruncated(result.truncated)
+        setSelectedCaseId((current) => result.list.some((item) => item.caseId === current)
+          ? current
+          : result.list[0]?.caseId || '')
+      })
+      .catch((error) => {
+        if (cancelled || organizationScopeRef.current !== organizationId) return
+        setLoadError(errorText(error, '当前账户没有可见 Safety case，或 Safety workspace 不可用'))
+        setCases([])
+        setCasesTruncated(false)
+        setSelectedCaseId('')
+        setSafetyProjection(null)
+      })
+      .finally(() => {
+        if (!cancelled && organizationScopeRef.current === organizationId) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [organizationId, context])
 
   const selectedCase = useMemo(() => cases.find((item) => item.caseId === selectedCaseId) ?? null, [cases, selectedCaseId])
 
-  const act = useCallback(async (successMessage: string, operation: () => Promise<void>) => {
+  const act = useCallback(async (
+    successMessage: string,
+    operation: (scopeOrganizationId: string) => Promise<void>,
+  ) => {
     if (busy) return
+    const scopeOrganizationId = organizationId
     setBusy(true)
     setActionError(null)
     setNotice(null)
     try {
-      await operation()
-      setNotice(successMessage)
+      await operation(scopeOrganizationId)
+      if (organizationScopeRef.current === scopeOrganizationId) setNotice(successMessage)
     } catch (error) {
-      setActionError(errorText(error, 'Delivery 操作失败'))
+      if (organizationScopeRef.current === scopeOrganizationId) {
+        setActionError(errorText(error, 'Delivery 操作失败'))
+      }
     } finally {
-      setBusy(false)
+      if (organizationScopeRef.current === scopeOrganizationId) setBusy(false)
     }
-  }, [busy])
+  }, [busy, organizationId])
 
-  const readSafety = () => act('Safety case 已按当前责任/权限重新读取。', async () => {
-    if (!selectedCaseId) throw new Error('请选择 Safety case')
-    setSafetyProjection(await deliveryApi.readSafetyCase(organizationId, selectedCaseId))
+  const readSafety = () => act('Safety case 已按当前责任/权限重新读取。', async (scopeOrganizationId) => {
+    const caseId = selectedCaseId
+    if (!caseId) throw new Error('请选择 Safety case')
+    const projection = await deliveryApi.readSafetyCase(scopeOrganizationId, caseId)
+    if (organizationScopeRef.current !== scopeOrganizationId) return
+    setSafetyProjection(projection)
   })
 
-  const createArtifactExport = () => act(`${artifactExportKind} export ticket 已创建。`, async () => {
-    if (!artifactId.trim()) throw new Error('请输入 artifact ID')
-    const ticket = await deliveryApi.createArtifactExport(organizationId, artifactExportKind, artifactId.trim())
-    setTickets((current) => [{ ...ticket, label: `${artifactExportKind} · ${artifactId.trim()}` }, ...current])
+  const createArtifactExport = () => act(`${artifactExportKind} export ticket 已创建。`, async (scopeOrganizationId) => {
+    const normalizedArtifactId = artifactId.trim()
+    const exportKind = artifactExportKind
+    if (!normalizedArtifactId) throw new Error('请输入 artifact ID')
+    const ticket = await deliveryApi.createArtifactExport(scopeOrganizationId, exportKind, normalizedArtifactId)
+    if (organizationScopeRef.current !== scopeOrganizationId) return
+    setTickets((current) => [{ ...ticket, label: `${exportKind} · ${normalizedArtifactId}` }, ...current])
   })
 
-  const createSafetyExport = () => act('SAFETY export ticket 已创建。', async () => {
-    if (!selectedCaseId) throw new Error('请选择 Safety case')
-    const ticket = await deliveryApi.createSafetyExport(organizationId, selectedCaseId)
-    setTickets((current) => [{ ...ticket, label: `SAFETY · ${selectedCaseId}` }, ...current])
+  const createSafetyExport = () => act('SAFETY export ticket 已创建。', async (scopeOrganizationId) => {
+    const caseId = selectedCaseId
+    if (!caseId) throw new Error('请选择 Safety case')
+    const ticket = await deliveryApi.createSafetyExport(scopeOrganizationId, caseId)
+    if (organizationScopeRef.current !== scopeOrganizationId) return
+    setTickets((current) => [{ ...ticket, label: `SAFETY · ${caseId}` }, ...current])
   })
 
-  const download = (ticket: ReportingExportTicket & { label: string }) => act('CSV 已由服务器重新授权并交付。', async () => {
-    const result = await deliveryApi.downloadExport(organizationId, ticket.exportId)
+  const download = (ticket: ReportingExportTicket & { label: string }) => act('CSV 已由服务器重新授权并交付。', async (scopeOrganizationId) => {
+    const result = await deliveryApi.downloadExport(scopeOrganizationId, ticket.exportId)
+    if (organizationScopeRef.current !== scopeOrganizationId) return
     const url = URL.createObjectURL(result.blob)
     try {
       const anchor = document.createElement('a')
@@ -122,7 +165,7 @@ export default function OrganizationDeliveryPage() {
         {loading && cases.length === 0 ? <ProductStatus kind="pending" title="正在读取 Safety inbox">正在按当前责任范围筛选。</ProductStatus> : (
           <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
-              {cases.length === 0 ? <p className="text-sm text-slate-600">当前没有可见 Safety case。</p> : <div className="grid gap-2">{cases.map((item) => <label key={item.caseId} className="grid cursor-pointer gap-1 rounded-lg border border-slate-200 p-3"><span className="flex items-center gap-2"><input type="radio" name="safety-case" checked={selectedCaseId === item.caseId} onChange={() => { setSelectedCaseId(item.caseId); setSafetyProjection(null) }} /><strong>{item.caseId}</strong><span className="text-xs font-semibold text-slate-500">{item.projection}</span></span><span className="text-sm text-slate-600">status {item.status} · created {formatTime(item.createdAt)}{item.ackDueAt ? ` · ack due ${formatTime(item.ackDueAt)}` : ''}{item.disposeDueAt ? ` · dispose due ${formatTime(item.disposeDueAt)}` : ''}</span></label>)}</div>}
+              {cases.length === 0 ? <p className="text-sm text-slate-600">当前没有可见 Safety case。</p> : <div className="grid gap-2">{cases.map((item) => <label key={item.caseId} className="grid cursor-pointer gap-1 rounded-lg border border-slate-200 p-3"><span className="flex items-center gap-2"><input type="radio" name="safety-case" checked={selectedCaseId === item.caseId} disabled={busy} onChange={() => { setSelectedCaseId(item.caseId); setSafetyProjection(null) }} /><strong>{item.caseId}</strong><span className="text-xs font-semibold text-slate-500">{item.projection}</span></span><span className="text-sm text-slate-600">status {item.status} · created {formatTime(item.createdAt)}{item.ackDueAt ? ` · ack due ${formatTime(item.ackDueAt)}` : ''}{item.disposeDueAt ? ` · dispose due ${formatTime(item.disposeDueAt)}` : ''}</span></label>)}</div>}
               {casesTruncated && <p className="mt-3 text-sm text-amber-700">Safety inbox 达到服务器上限；需要更多记录时应增加后端分页，而不是客户端扩展查询范围。</p>}
             </div>
             <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
@@ -139,8 +182,8 @@ export default function OrganizationDeliveryPage() {
       <section className="mt-8 space-y-4" aria-labelledby="artifact-export-heading">
         <div><h2 id="artifact-export-heading" className="text-xl font-semibold">Reporting CSV export</h2><p className="mt-1 text-sm text-slate-600">AGGREGATE/MEMBER 都引用 immutable artifact ID。服务器会先重新读取底层 projection，再检查当前 export capability；MEMBER 不会因为拥有 aggregate artifact 就自动获准。</p></div>
         <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-[1fr_2fr_auto]">
-          <label className="grid gap-1 text-sm font-medium">Export kind<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactExportKind} onChange={(event) => setArtifactExportKind(event.target.value as typeof artifactExportKind)}><option>AGGREGATE</option><option>MEMBER</option></select></label>
-          <label className="grid gap-1 text-sm font-medium">Artifact ID<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactId} onChange={(event) => setArtifactId(event.target.value)} placeholder="artifact UUID" /></label>
+          <label className="grid gap-1 text-sm font-medium">Export kind<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactExportKind} disabled={busy} onChange={(event) => setArtifactExportKind(event.target.value as typeof artifactExportKind)}><option>AGGREGATE</option><option>MEMBER</option></select></label>
+          <label className="grid gap-1 text-sm font-medium">Artifact ID<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactId} disabled={busy} onChange={(event) => setArtifactId(event.target.value)} placeholder="artifact UUID" /></label>
           <div className="flex items-end"><ProductButton variant="primary" disabled={busy || !artifactId.trim()} onClick={() => void createArtifactExport()}>创建 CSV ticket</ProductButton></div>
         </div>
       </section>
