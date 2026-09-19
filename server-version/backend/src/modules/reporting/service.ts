@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto'
-import { assertOrganizationGroupReportAccess, hideUnauthorizedArtifact, type ReportingPrincipal } from './authorization'
+import {
+  assertOrganizationGroupArtifactReadAccess,
+  assertOrganizationGroupReportGenerateAccess,
+  hideUnauthorizedArtifact,
+  type ReportingPrincipal,
+} from './authorization'
 import { createOrReuseReportingArtifact, readReportingArtifactRecord } from './artifact'
 import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
@@ -20,7 +25,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
   trackId: string
   specId: string
 }): Promise<ReturnType<typeof publicArtifact>> => {
-  await assertOrganizationGroupReportAccess({
+  await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
     runId: input.runId,
@@ -46,7 +51,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
 
   // Calculation reuse never carries authorization. Recheck immediately before
   // persistence and again before returning the projection.
-  await assertOrganizationGroupReportAccess({
+  await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
     runId: input.runId,
@@ -61,7 +66,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     generatedByUserId: input.principal.userId,
     generatedAt,
   })
-  await assertOrganizationGroupReportAccess({
+  await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
     runId: input.runId,
@@ -78,7 +83,7 @@ export const readOrganizationGroupArtifact = async (input: {
   if (artifact.organizationId !== input.organizationId) {
     reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
   }
-  await hideUnauthorizedArtifact(() => assertOrganizationGroupReportAccess({
+  await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactReadAccess({
     principal: input.principal,
     organizationId: artifact.organizationId,
     runId: artifact.artifactPayload.source.runId,
