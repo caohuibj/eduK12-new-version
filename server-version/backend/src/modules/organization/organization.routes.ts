@@ -86,6 +86,11 @@ router.post('/:organizationId/reporting/series', authenticate, reportingControll
 router.post('/:organizationId/reporting/series/:seriesId/waves', authenticate, reportingController.bindWave)
 router.post('/:organizationId/reporting/exports', authenticate, reportingController.createExport)
 router.get('/:organizationId/reporting/exports/:exportId', authenticate, reportingController.downloadExport)
+
+// Safety remains server-authoritative. The inbox is an already-filtered product
+// projection that exposes no subject/trigger/owner detail; exact case reads still
+// decide FULL/ACTION/SUMMARY on every request.
+router.get('/:organizationId/safety/cases', authenticate, reportingController.listSafetyCases)
 router.get('/:organizationId/safety/cases/:caseId', authenticate, reportingController.readSafetyCase)
 router.post('/:organizationId/reporting/analyses', authenticate, reportingController.analyze)
 router.get('/:organizationId/reporting/artifacts/:artifactId', authenticate, reportingController.readArtifact)
