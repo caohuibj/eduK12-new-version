@@ -1,13 +1,23 @@
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { PlatformRole, PrismaClient, UserRole } from '@prisma/client'
+import { ParentRelationshipStatus, PlatformRole, PrismaClient, UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import {
   createMembership,
   createOrganization,
   denyOrganizationAccess,
+  endMembership,
   grantPersona,
+  resumeOrganization,
+  suspendOrganization,
 } from '../../modules/organization/service'
+import {
+  assignOrganizationLabel,
+  createClassificationDimension,
+  createOrganizationLabel,
+  endOrganizationLabelAssignment,
+} from '../../modules/organization/classificationRelations'
+import { hasCurrentParentOrganizationEvidence } from '../../modules/organization/parentEvidence'
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
@@ -20,7 +30,7 @@ import {
 import { freezeRunTrackCohort } from '../../modules/reporting/cohort'
 import { buildReportingArtifact } from '../../modules/reporting/engine'
 import { createOrReuseReportingArtifact } from '../../modules/reporting/artifact'
-import { readOrganizationGroupArtifact } from '../../modules/reporting/service'
+import { generateOrganizationGroupAnalysis, readOrganizationGroupArtifact } from '../../modules/reporting/service'
 import type { ReportingAnalysisSpecDefinitionV1, ReportingResultBatchV1 } from '../../modules/reporting/types'
 
 const DB_URL = integrationDatabaseUrl(
@@ -77,12 +87,16 @@ const specDefinition: ReportingAnalysisSpecDefinitionV1 = {
   }],
 }
 
-async function createUser(label: string, platformRole: PlatformRole = PlatformRole.STANDARD) {
+async function createUser(
+  label: string,
+  platformRole: PlatformRole = PlatformRole.STANDARD,
+  role: UserRole = UserRole.STUDENT,
+) {
   return db.user.create({
     data: {
       username: `reporting-${label}-${suffix}-${randomUUID().slice(0, 8)}`,
       passwordHash: 'test-only',
-      role: UserRole.STUDENT,
+      role,
       platformRole,
     },
     select: { id: true },
@@ -113,6 +127,48 @@ async function publishSelfRun(organizationId: string, ownerId: string, membershi
   return { runId: run.id, trackId: tracks[0].id }
 }
 
+async function publishLabelSelfRun(organizationId: string, ownerId: string, labelId: string, name: string) {
+  const run = await createAssessmentRunDraft({ organizationId, name, createdByUserId: ownerId })
+  const selector = { kind: 'LABELS' as const, labelIds: [labelId], match: 'ANY' as const }
+  await addAssessmentRunTrackDraft({
+    organizationId,
+    runId: run.id,
+    resource: { family: 'BUNDLE', key: `reporting-${name}`, version: '1.0.0' },
+    subjectSelector: selector,
+    respondentSelector: selector,
+    requestedPolicy,
+  })
+  await publishAssessmentRun({
+    organizationId,
+    runId: run.id,
+    actorUserId: ownerId,
+    expectedVersion: 2,
+    resourceRegistry,
+  })
+  const tracks = await db.$queryRawUnsafe<Array<{ id: string }>>(
+    `SELECT id FROM assessment_run_tracks WHERE run_id=$1 ORDER BY created_at LIMIT 1`,
+    run.id,
+  )
+  return { runId: run.id, trackId: tracks[0].id }
+}
+
+const createStartBarrier = (participants: number) => {
+  let ready = 0
+  let resolveReady!: () => void
+  let release!: () => void
+  const allReady = new Promise<void>((resolve) => { resolveReady = resolve })
+  const released = new Promise<void>((resolve) => { release = resolve })
+  return {
+    arrive: async () => {
+      ready += 1
+      if (ready === participants) resolveReady()
+      await released
+    },
+    waitUntilReady: () => allReady,
+    release: () => release(),
+  }
+}
+
 suite('PR3 reporting core release gate (real PostgreSQL)', () => {
   beforeAll(async () => {
     db = new PrismaClient({ datasources: { db: { url: DB_URL! } } })
@@ -120,8 +176,8 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
   })
   afterAll(async () => db.$disconnect())
 
-  it('freezes exact membership cohorts, makes governed records immutable, reuses one concurrent artifact, and reauthorizes cached reads', async () => {
-    const admin = await createUser('admin', PlatformRole.SYSTEM_ADMIN)
+  it('closes governed spec, frozen cohort, concurrency and authorization contracts', async () => {
+    const admin = await createUser('admin', PlatformRole.SYSTEM_ADMIN, UserRole.ADMIN)
     const students = await Promise.all(Array.from({ length: 4 }, (_, index) => createUser(`student-${index}`)))
     const org = await createOrganization({
       name: `reporting core ${suffix}`,
@@ -171,12 +227,50 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       cohortA.id,
     )).rejects.toThrow()
 
+    const dimension = await createClassificationDimension({
+      organizationId: org.organization.id,
+      key: `reporting-label-${suffix}`,
+      name: 'Reporting cohort label',
+      cardinality: 'MULTI',
+    })
+    const label = await createOrganizationLabel({
+      organizationId: org.organization.id,
+      dimensionId: dimension.id,
+      name: `pilot-${suffix}`,
+    })
+    const originalAssignments = [] as Array<{ id: string }>
+    for (const membership of memberships.slice(0, 3)) {
+      originalAssignments.push(await assignOrganizationLabel({
+        organizationId: org.organization.id,
+        membershipId: membership.id,
+        labelId: label.id,
+      }))
+    }
+    const labelSource = await publishLabelSelfRun(org.organization.id, admin.id, label.id, 'label-run')
+    await endOrganizationLabelAssignment({ organizationId: org.organization.id, assignmentId: originalAssignments[0].id })
+    await assignOrganizationLabel({ organizationId: org.organization.id, membershipId: memberships[3].id, labelId: label.id })
+    const labelCohort = await freezeRunTrackCohort({
+      organizationId: org.organization.id,
+      runId: labelSource.runId,
+      trackId: labelSource.trackId,
+      generatedByUserId: admin.id,
+    })
+    expect(labelCohort.members.map((member) => member.membershipId).sort())
+      .toEqual(memberships.slice(0, 3).map((membership) => membership.id).sort())
+
+    const specKey = `generic-${suffix}`
     const draft = await createPlatformReportingSpec({
       actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
-      specKey: `generic-${suffix}`,
+      specKey,
       version: 1,
       definition: specDefinition,
     })
+    await expect(createPlatformReportingSpec({
+      actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
+      specKey,
+      version: 1,
+      definition: specDefinition,
+    })).rejects.toMatchObject({ code: 'REPORT_SPEC_VERSION_CONFLICT', statusCode: 409 })
     const reviewed = await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
     expect(reviewed.status).toBe('REVIEWED')
     await expect(db.$executeRawUnsafe(
@@ -210,7 +304,9 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       unresolved: [],
     }
 
-    const writes = Array.from({ length: 8 }, (_, index) => {
+    const participantCount = 8
+    const barrier = createStartBarrier(participantCount)
+    const writes = Array.from({ length: participantCount }, (_, index) => (async () => {
       const generatedAt = new Date(Date.UTC(2026, 0, 3, 0, 0, index))
       const built = buildReportingArtifact({
         artifactId: randomUUID(),
@@ -220,6 +316,7 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
         cohort: cohortA,
         batch: resultBatch,
       })
+      await barrier.arrive()
       return createOrReuseReportingArtifact({
         organizationId: org.organization.id,
         cohortSnapshotId: cohortA.id,
@@ -230,7 +327,9 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
         generatedByUserId: admin.id,
         generatedAt,
       })
-    })
+    })())
+    await barrier.waitUntilReady()
+    barrier.release()
     const artifacts = await Promise.all(writes)
     expect(new Set(artifacts.map((artifact) => artifact.id)).size).toBe(1)
     const persisted = await db.$queryRawUnsafe<Array<{ count: number }>>(
@@ -255,6 +354,80 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
     expect(beforeDeny.projection.state).toBe('present')
     expect(beforeDeny).not.toHaveProperty('inputManifest')
     expect(beforeDeny).not.toHaveProperty('snapshotHash')
+    expect(beforeDeny).not.toHaveProperty('analysisIdentityHash')
+    await expect(readOrganizationGroupArtifact({
+      principal: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
+      organizationId: randomUUID(),
+      artifactId: artifacts[0].id,
+    })).rejects.toMatchObject({ code: 'REPORT_ARTIFACT_NOT_FOUND', statusCode: 404 })
+
+    const parent = await createUser('parent', PlatformRole.STANDARD, UserRole.PARENT)
+    const parentRelationship = await db.parentStudentRelationship.create({
+      data: {
+        parentUserId: parent.id,
+        studentUserId: students[0].id,
+        status: ParentRelationshipStatus.ACTIVE,
+        approvedByUserId: admin.id,
+        approvedAt: new Date(),
+      },
+    })
+    await expect(hasCurrentParentOrganizationEvidence({
+      parentUserId: parent.id,
+      studentUserId: students[0].id,
+      organizationId: org.organization.id,
+    })).resolves.toBe(true)
+    await expect(readOrganizationGroupArtifact({
+      principal: { userId: parent.id, platformRole: 'STANDARD' },
+      organizationId: org.organization.id,
+      artifactId: artifacts[0].id,
+    })).rejects.toMatchObject({ code: 'REPORT_ARTIFACT_NOT_FOUND', statusCode: 404 })
+    await endMembership({
+      organizationId: org.organization.id,
+      membershipId: memberships[0].id,
+      reason: 'historical parent boundary',
+      meta: { actorUserId: admin.id, commandKey: key('end-child') },
+    })
+    await expect(hasCurrentParentOrganizationEvidence({
+      parentUserId: parent.id,
+      studentUserId: students[0].id,
+      organizationId: org.organization.id,
+    })).resolves.toBe(false)
+    await db.parentStudentRelationship.update({
+      where: { id: parentRelationship.id },
+      data: {
+        status: ParentRelationshipStatus.REVOKED,
+        revokedByUserId: admin.id,
+        revokedAt: new Date(),
+        revokeReason: 'reporting historical authorization regression',
+      },
+    })
+    await expect(readOrganizationGroupArtifact({
+      principal: { userId: parent.id, platformRole: 'STANDARD' },
+      organizationId: org.organization.id,
+      artifactId: artifacts[0].id,
+    })).rejects.toMatchObject({ code: 'REPORT_ARTIFACT_NOT_FOUND', statusCode: 404 })
+
+    await suspendOrganization({
+      organizationId: org.organization.id,
+      meta: { actorUserId: admin.id, commandKey: key('suspend') },
+    })
+    const suspendedHistoricalRead = await readOrganizationGroupArtifact({
+      principal: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
+      organizationId: org.organization.id,
+      artifactId: artifacts[0].id,
+    })
+    expect(suspendedHistoricalRead.artifactId).toBe(artifacts[0].id)
+    await expect(generateOrganizationGroupAnalysis({
+      principal: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' },
+      organizationId: org.organization.id,
+      runId: sourceA.runId,
+      trackId: sourceA.trackId,
+      specId: published.id,
+    })).rejects.toMatchObject({ code: 'ORGANIZATION_SUSPENDED', statusCode: 409 })
+    await resumeOrganization({
+      organizationId: org.organization.id,
+      meta: { actorUserId: admin.id, commandKey: key('resume') },
+    })
 
     await denyOrganizationAccess({
       organizationId: org.organization.id,
