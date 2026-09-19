@@ -187,6 +187,7 @@ const expectedConsentScope = (assignment: RelationalAssignmentRecordV1): string 
 }
 
 const expectedConsentPurpose = (assignment: RelationalAssignmentRecordV1): string | null => {
+  if (assignment.policyDomain === 'ORGANIZATION_RUN') return `organization_run:${assignment.resourceKind}:${assignment.resourceKey}:${assignment.resourceVersion}`
   if (
     assignment.visibilityPolicyKey === 'observer_private_respondent_v1'
     && assignment.respondentRole === 'PARENT'

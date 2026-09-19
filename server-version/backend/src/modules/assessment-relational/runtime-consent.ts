@@ -58,6 +58,9 @@ export const createRelationalRuntimeConsentAuthority = (input?: {
     if (assignment.status === 'COMPLETED') return
 
     if (!assignment.consentId) {
+      if (assignment.policyDomain === 'ORGANIZATION_RUN' && (assignment.respondentRole === 'PARENT' || assignment.visibilityPolicyKey.startsWith('observer_'))) {
+        relationalFail('RELATIONAL_CONSENT_REQUIRED', 'Organization observer runtime requires a consent lineage')
+      }
       if (attempt.consentId !== null) {
         relationalFail('RELATIONAL_RUNTIME_BINDING', 'consent-free relational assignment has an unexpected runtime consent')
       }

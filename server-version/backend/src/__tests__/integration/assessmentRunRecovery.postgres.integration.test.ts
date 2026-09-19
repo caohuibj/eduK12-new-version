@@ -1,3 +1,4 @@
+import { closeAssessmentRun } from '../../modules/assessment-run/lifecycle'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -89,7 +90,7 @@ async function createExecution(label: string) {
   })
   await publishAssessmentRun({ organizationId: org.organization.id, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry })
   const rows = await db.$queryRawUnsafe<Array<{ id: string }>>(`SELECT id FROM assessment_run_executions WHERE run_id=$1`, run.id)
-  return { executionId: rows[0].id, actorUserId: student.id }
+  return { executionId: rows[0].id, actorUserId: student.id, organizationId: org.organization.id, runId: run.id }
 }
 
 suite('Assessment Run external START recovery gate (real PostgreSQL)', () => {
@@ -98,6 +99,23 @@ suite('Assessment Run external START recovery gate (real PostgreSQL)', () => {
     await db.$connect()
   })
   afterAll(async () => db.$disconnect())
+
+  it('finishes the same admitted start when CLOSE commits during external dispatch', async () => {
+    const fixture = await createExecution('close-during-dispatch')
+    const runtime = new FaultRuntime()
+    const originalStart = runtime.startWithOperationKey.bind(runtime)
+    runtime.startWithOperationKey = async (request) => {
+      await closeAssessmentRun(fixture)
+      return originalStart(request)
+    }
+    const result = await startAssessmentRunExecution({ ...fixture, resourceRegistry, runtimeAdapters: new RunRuntimeAdapterRegistry([runtime]) })
+    expect(result.state).toBe('STARTED')
+    const rows = await db.$queryRawUnsafe<Array<{ run: string; execution: string; claim: string }>>(
+      `SELECT r.status AS run, e.status AS execution, c.state AS claim FROM assessment_runs r JOIN assessment_run_executions e ON e.run_id=r.id JOIN assessment_run_execution_start_claims c ON c.execution_id=e.id WHERE e.id=$1`, fixture.executionId,
+    )
+    expect(rows[0]).toEqual({ run: 'CLOSED', execution: 'STARTED', claim: 'COMPLETED' })
+    expect(runtime.byOperation.size).toBe(1)
+  })
 
   it('recovers a remote commit after the owner dies mid-call and never creates a second runtime identity', async () => {
     const execution = await createExecution('mid-call')

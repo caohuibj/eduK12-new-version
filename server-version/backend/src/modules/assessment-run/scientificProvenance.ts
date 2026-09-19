@@ -1,3 +1,4 @@
+import { productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -34,6 +35,7 @@ const MATURITIES = new Set<RunScientificMaturity>(['PILOT', 'RESEARCH_READY', 'R
 export const freezeRunExecutionScientificProvenanceInTransaction = async (
   tx: Tx,
   executionId: string,
+  registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
 ): Promise<FrozenRunScientificRecord> => {
   const rows = await tx.$queryRaw<Array<{
     resourceFamily: string
@@ -71,7 +73,8 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   if (!row.resourcePolicyHash || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
     throw new RunScientificProvenanceError('RUN_RESOURCE_POLICY_NOT_FROZEN', 'Run resource policy must be frozen before START', 409)
   }
-  const maturity = (row.frozenResourcePolicy as Record<string, unknown>).scientificMaturity
+  const current = await registry.resolveExact({ family: row.resourceFamily as RunResourceFamily, key: row.resourceKey, version: row.resourceVersion })
+  const maturity = current.scientificMaturity
   if (typeof maturity !== 'string' || !MATURITIES.has(maturity as RunScientificMaturity)) {
     throw new RunScientificProvenanceError('RUN_SCIENCE_MATURITY_INVALID', 'frozen resource policy has no valid scientific maturity', 409)
   }
@@ -108,6 +111,7 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
 
 export const freezeRunExecutionScientificProvenance = (
   executionId: string,
+  registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
 ): Promise<FrozenRunScientificRecord> => prisma.$transaction((tx) => (
-  freezeRunExecutionScientificProvenanceInTransaction(tx, executionId)
+  freezeRunExecutionScientificProvenanceInTransaction(tx, executionId, registry)
 ))

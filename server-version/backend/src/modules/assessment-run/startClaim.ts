@@ -1,6 +1,9 @@
+import type { RunResourceAuthorityRegistry } from './resourceAuthority'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { assertCurrentRunStartAuthority } from './startAuthority'
+import { freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
 import { loadRunExecutionStartAdmission, type RunStartAdmission } from './startAdmission'
 
 export type RunStartClaimState = 'CLAIMED' | 'DISPATCHED' | 'COMPLETED' | 'ABORTED' | 'UNKNOWN'
@@ -52,7 +55,7 @@ const CLAIM_PROJECTION = `
   "completed_at" AS "completedAt", "aborted_at" AS "abortedAt", "unknown_at" AS "unknownAt"
 `
 
-const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promise<ExecutionLockRow> => {
+export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promise<ExecutionLockRow> => {
   const identity = await tx.$queryRaw<Array<{ organizationId: string; runId: string }>>`
     SELECT "organization_id" AS "organizationId", "run_id" AS "runId"
     FROM "assessment_run_executions"
@@ -105,6 +108,7 @@ export const acquireRunExecutionStartClaim = async (input: {
   executionId: string
   actorUserId: string
   leaseMs?: number
+  resourceRegistry?: RunResourceAuthorityRegistry
 }): Promise<RunStartClaimDecision> => {
   const leaseMs = input.leaseMs ?? 30_000
   if (!Number.isInteger(leaseMs) || leaseMs < 1_000 || leaseMs > 5 * 60_000) {
@@ -126,16 +130,19 @@ export const acquireRunExecutionStartClaim = async (input: {
       }
     }
 
+    const existing = await lockClaim(tx, input.executionId)
+    if (existing?.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
+    if (!existing) await assertCurrentRunStartAuthority(tx, input.executionId)
     const admission = await loadRunExecutionStartAdmission({
       tx,
       executionId: input.executionId,
       actorUserId: input.actorUserId,
+      admitted: Boolean(existing),
     })
     const now = await dbNow(tx)
     const leaseUntil = leaseAt(now, leaseMs)
-    const existing = await lockClaim(tx, input.executionId)
-
     if (!existing) {
+      await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId, input.resourceRegistry)
       const id = randomUUID()
       const operationKey = `run-start:${input.executionId}:${randomUUID()}`
       const rows = await tx.$queryRaw<RunStartClaimRecord[]>`
@@ -148,13 +155,19 @@ export const acquireRunExecutionStartClaim = async (input: {
         )
         RETURNING ${Prisma.raw(CLAIM_PROJECTION)}
       `
+      await tx.$executeRaw`
+        INSERT INTO "organization_governance_audits"
+          ("id", "organization_id", "actor_user_id", "action", "target_type", "target_id", "domain_event_id", "payload")
+        VALUES (${randomUUID()}, ${execution.organizationId}, ${input.actorUserId}, 'ASSESSMENT_RUN_START_ADMITTED',
+          'AssessmentRunExecution', ${input.executionId}, ${id},
+          ${JSON.stringify({ operationKey, assignmentId: admission.assignment.assignmentId, attemptIdentity: admission.attemptIdentity })}::jsonb)
+      `
       return { kind: 'ACQUIRED' as const, claim: rows[0], admission }
     }
 
     if (existing.state === 'COMPLETED') {
       throw new RunStartClaimError('RUN_START_BINDING_MISSING', 'completed START claim has no runtime binding', 500)
     }
-    if (existing.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
 
     if (existing.leaseUntil.getTime() > now.getTime()) {
       return { kind: 'IN_PROGRESS' as const, claim: existing }

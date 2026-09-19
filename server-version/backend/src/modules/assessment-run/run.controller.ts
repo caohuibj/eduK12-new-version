@@ -1,3 +1,5 @@
+import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { acceptRunExecutionConsent } from './consent'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { error, success, unauthorized } from '../../utils/response'
@@ -35,6 +37,7 @@ const addTrackSchema = z.object({
 const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
 
 const fail = (res: Response, err: unknown) => {
+  if (err instanceof RelationalAssessmentError) return error(res, err.message, -1, 409)
   const known = err as { code?: string; message?: string; statusCode?: number }
   if (known && typeof known.statusCode === 'number') {
     return error(res, known.message ?? known.code ?? 'Run operation failed', -1, known.statusCode)
@@ -89,6 +92,14 @@ export const assessmentRunController = {
         actorUserId: req.user.userId,
         expectedVersion: parsed.data.expectedVersion,
       }))
+    } catch (err) { return fail(res, err) }
+  },
+
+  async acceptConsent(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      await assertRunExecutionParent({ organizationId: req.params.organizationId, runId: req.params.runId, executionId: req.params.executionId })
+      return success(res, await acceptRunExecutionConsent({ executionId: req.params.executionId, actorUserId: req.user.userId }))
     } catch (err) { return fail(res, err) }
   },
 
