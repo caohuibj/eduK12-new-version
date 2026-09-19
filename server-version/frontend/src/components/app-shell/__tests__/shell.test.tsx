@@ -14,8 +14,19 @@ const auth = vi.hoisted(() => ({
   reauthReturn: null,
   clearReauthentication: vi.fn(),
 }))
+const organization = vi.hoisted(() => ({
+  organizations: [] as Array<{ id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' }>,
+  active: null as null | { organization: { id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' } },
+  activeLoading: false,
+  activeError: null as string | null,
+  selectOrganization: vi.fn(),
+}))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
+vi.mock('../../../contexts/OrganizationContext', () => ({
+  OrganizationProvider: ({ children }: { children: React.ReactNode }) => children,
+  useOrganization: () => organization,
+}))
 vi.mock('../../../pages/FirstLoginPasswordChange', () => ({ default: () => <p>修改临时密码</p> }))
 const student = { id: 's1', role: 'STUDENT', username: 'student' } as User
 beforeEach(() => {
@@ -24,6 +35,11 @@ beforeEach(() => {
   auth.reauthReturn = null
   auth.clearReauthentication.mockReset()
   auth.clearReauthentication.mockImplementation(() => sessionStorage.removeItem('huisurvey:reauth-return'))
+  organization.organizations = []
+  organization.active = null
+  organization.activeLoading = false
+  organization.activeError = null
+  organization.selectOrganization.mockReset()
   sessionStorage.clear()
 })
 function Location() { const location = useLocation(); return <output>{location.pathname}{location.search}</output> }
@@ -90,6 +106,19 @@ describe('one shared chrome', () => {
     await userEvent.keyboard('{Escape}')
     expect(toggle).toHaveFocus()
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+  it('shows server-projected Organization scope independently of legacy user role', async () => {
+    organization.organizations = [
+      { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
+      { id: 'org-b', name: '组织 B', status: 'SUSPENDED' },
+    ]
+    organization.selectOrganization.mockResolvedValue(null)
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    const selector = screen.getByRole('combobox', { name: '当前组织' })
+    expect(selector).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '组织 B（已暂停）' })).toBeInTheDocument()
+    await userEvent.selectOptions(selector, 'org-b')
+    expect(organization.selectOrganization).toHaveBeenCalledWith('org-b')
   })
   it('keeps focused player descendants outside product token scope', () => {
     render(<MemoryRouter initialEntries={['/public/cognitive/sessions/s1']}><AppShell><button>task control</button></AppShell></MemoryRouter>)

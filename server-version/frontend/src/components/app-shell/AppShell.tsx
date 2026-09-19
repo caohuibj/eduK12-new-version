@@ -2,15 +2,23 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
+import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
 import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
 import { activeNavigation, navigationFor, routeTitle } from './navigation'
 import './app-shell.css'
 
-export default function AppShell({ children }: { children: ReactNode }) {
+function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const cognitive = useCognitiveEnabled()
+  const {
+    organizations,
+    active: activeOrganization,
+    activeLoading: organizationLoading,
+    activeError: organizationError,
+    selectOrganization,
+  } = useOrganization()
   const location = useLocation()
   const desiredMode = shellModeFor(location.pathname)
   const guestClassroom = location.pathname.startsWith('/student/classroom/') && user?.role !== 'STUDENT'
@@ -24,6 +32,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const [openPath, setOpenPath] = useState<string | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
   const menuOpen = openPath === location.pathname
+
+  useEffect(() => {
+    if (!user || mode !== 'standard' || activeOrganization || organizationLoading || organizations.length !== 1) return
+    void selectOrganization(organizations[0].id)
+  }, [user, mode, activeOrganization, organizationLoading, organizations, selectOrganization])
+
   useEffect(() => {
     if (mode === 'display') return
     document.title = `${title === 'Huisurvey' ? '' : `${title} · `}Huisurvey`
@@ -31,6 +45,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     if (previousPath.current !== location.pathname && mode !== 'focused') mainRef.current?.focus()
     previousPath.current = location.pathname
   }, [location.pathname, title, mode])
+
   if (mode === 'display') return <>{children}</>
   return (
     <div className={`hui-app hui-app--${mode}`} data-shell-mode={mode}>
@@ -40,6 +55,28 @@ export default function AppShell({ children }: { children: ReactNode }) {
         {mode === 'standard' && <ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={(event) => { if (event.key === 'Escape') setOpenPath(null) }} onClick={() => setOpenPath(menuOpen ? null : location.pathname)}>导航菜单</ProductButton>}
         <div className="hui-account">
           {isPublicAssessmentPath(location.pathname) ? <span>公开参与</span> : user ? <span>{user.nickname || user.username} · {{ STUDENT: '学生', TEACHER: '教师', ADMIN: '管理员', PARENT: '家长' }[user.role]}</span> : <span>欢迎使用</span>}
+          {user && mode === 'standard' && organizations.length > 0 && (
+            <label className="flex min-h-11 items-center gap-2 text-sm text-slate-700">
+              <span>组织</span>
+              <select
+                aria-label="当前组织"
+                className="min-h-11 max-w-56 rounded-lg border border-slate-300 bg-white px-3 text-slate-900"
+                value={activeOrganization?.organization.id || ''}
+                disabled={organizationLoading}
+                onChange={(event) => {
+                  if (event.target.value) void selectOrganization(event.target.value)
+                }}
+              >
+                <option value="" disabled>{organizationLoading ? '正在加载…' : '选择组织'}</option>
+                {organizations.map((organization) => (
+                  <option key={organization.id} value={organization.id}>
+                    {organization.name}{organization.status === 'SUSPENDED' ? '（已暂停）' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {user && mode === 'standard' && organizationError && <span role="status" className="text-sm text-red-700">组织上下文不可用</span>}
           {user && mode === 'standard' && <ProductButton disabled={loggingOut} onClick={async () => { setLoggingOut(true); try { await logout() } finally { setLoggingOut(false) } }}>{loggingOut ? '正在退出…' : '退出登录'}</ProductButton>}
         </div>
       </header>
@@ -54,5 +91,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </div>
       {mode !== 'focused' && <Footer variant="light" />}
     </div>
+  )
+}
+
+export default function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <OrganizationProvider>
+      <AppShellContent>{children}</AppShellContent>
+    </OrganizationProvider>
   )
 }
