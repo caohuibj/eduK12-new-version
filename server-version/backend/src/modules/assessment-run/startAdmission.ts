@@ -24,6 +24,7 @@ type ExecutionAdmissionRow = {
   executionStatus: string
   runStatus: string
   relationalAssignmentId: string | null
+  policyDomain: string | null
   respondentUserId: string
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
@@ -82,8 +83,9 @@ export const loadRunExecutionStartAdmission = async (input: {
   const rows = await db.$queryRaw<ExecutionAdmissionRow[]>`
     SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."track_id" AS "trackId", e."status" AS "executionStatus", r."status" AS "runStatus",
-      e."relational_assignment_id" AS "relationalAssignmentId", respondent."user_id" AS "respondentUserId",
-      e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef"
+      e."relational_assignment_id" AS "relationalAssignmentId", ra."policy_domain" AS "policyDomain",
+      respondent."user_id" AS "respondentUserId", e."runtime_binding_kind" AS "runtimeBindingKind",
+      e."runtime_binding_ref" AS "runtimeBindingRef"
     FROM "assessment_run_executions" e
     JOIN "assessment_runs" r
       ON r."organization_id" = e."organization_id" AND r."id" = e."run_id"
@@ -91,6 +93,8 @@ export const loadRunExecutionStartAdmission = async (input: {
       ON respondent."organization_id" = e."organization_id"
       AND respondent."run_id" = e."run_id"
       AND respondent."id" = e."respondent_actor_snapshot_id"
+    LEFT JOIN "relational_assessment_assignments" ra
+      ON ra."id" = e."relational_assignment_id"
     WHERE e."id" = ${input.executionId}
     LIMIT 1
   `
@@ -105,6 +109,9 @@ export const loadRunExecutionStartAdmission = async (input: {
   if (!execution.relationalAssignmentId) {
     throw new RunStartAdmissionError('RUN_ASSIGNMENT_MISSING', 'Run execution has no relational assignment binding', 409)
   }
+  if (execution.policyDomain !== 'ORGANIZATION_RUN') {
+    throw new RunStartAdmissionError('RUN_ASSIGNMENT_DOMAIN', 'Run execution must bind an ORGANIZATION_RUN assignment', 409)
+  }
   if (!['ASSIGNED', 'STARTED'].includes(execution.executionStatus)) {
     throw new RunStartAdmissionError('RUN_EXECUTION_NOT_STARTABLE', 'Run execution is not startable', 409)
   }
@@ -113,9 +120,6 @@ export const loadRunExecutionStartAdmission = async (input: {
     ?? createSqlRelationalAssignmentRepository(db as any)
   const assignment = await assignmentRepository.findById(execution.relationalAssignmentId)
   if (!assignment) throw new RunStartAdmissionError('RUN_ASSIGNMENT_MISSING', 'Run assignment does not exist', 409)
-  if (assignment.policyDomain !== 'ORGANIZATION_RUN') {
-    throw new RunStartAdmissionError('RUN_ASSIGNMENT_DOMAIN', 'Run execution must bind an ORGANIZATION_RUN assignment', 409)
-  }
   if (assignment.respondentUserId !== input.actorUserId) {
     throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'assignment respondent does not match frozen Run respondent', 403)
   }
