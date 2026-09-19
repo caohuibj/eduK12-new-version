@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth'
+import { assessmentRunController } from '../assessment-run/run.controller'
 import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
 import { organizationController } from './organization.controller'
 
@@ -25,5 +26,16 @@ router.post('/:organizationId/memberships/:membershipId/capabilities/revoke', au
 // requireOrganizationGovernance and continue to honor explicit deny first.
 router.post('/:organizationId/access-denies', authenticate, requireOrganizationDenyGovernance, organizationController.deny)
 router.post('/:organizationId/access-denies/lift', authenticate, requireOrganizationDenyGovernance, organizationController.liftDeny)
+
+// Organization Run V1. Draft governance and lifecycle management are tenant-governance
+// operations. Publish intentionally delegates scoped TEACHER/COUNSELOR authority to
+// the domain service; START is respondent-scoped by frozen actor identity.
+router.post('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.create)
+router.post('/:organizationId/runs/:runId/tracks', authenticate, requireOrganizationGovernance, assessmentRunController.addTrack)
+router.post('/:organizationId/runs/:runId/publish', authenticate, assessmentRunController.publish)
+router.get('/:organizationId/runs/:runId/progress', authenticate, requireOrganizationGovernance, assessmentRunController.progress)
+router.post('/:organizationId/runs/:runId/close', authenticate, requireOrganizationGovernance, assessmentRunController.close)
+router.post('/:organizationId/runs/:runId/cancel', authenticate, requireOrganizationGovernance, assessmentRunController.cancel)
+router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
 
 export default router

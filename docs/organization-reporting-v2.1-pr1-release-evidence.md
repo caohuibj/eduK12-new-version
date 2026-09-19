@@ -48,7 +48,13 @@ A failure in any step rolls back all three. A concurrent duplicate command that 
 
 Membership is an episode, not a mutable eternal association. Ending M1 sets `valid_until`; rejoin always inserts a new M2 id. Historical M1 is never cleared or resurrected. Current membership queries use half-open temporal semantics.
 
-Organization-row locking serializes ORG_ADMIN count mutations. Ending or demoting the last current ORG_ADMIN is rejected, including concurrent attempts.
+Organization-row locking serializes ORG_ADMIN count mutations. Ending or demoting the last usable current ORG_ADMIN is rejected, including concurrent attempts. Usability includes account active/frozen/expiry/teacher-approval state and required-password-change state.
+
+## Account-authority mutation boundary
+
+Any operation that can change an account from normally usable to unusable is treated as an account-authority mutation. Platform lifecycle commands use current DB `platform_role`; legacy Course/product authority cannot make a SYSTEM_ADMIN unusable. Mutations that would make a current ORG_ADMIN unusable lock the affected Organizations and must preserve an alternative usable ORG_ADMIN.
+
+The legacy `extend-account` operation is extension-only: `months` must be a positive integer. Expiry shortening is not exposed through that legacy surface.
 
 ## Parent evidence boundary
 
@@ -70,6 +76,7 @@ The production `DELETE /api/users/:id` route now performs account deactivation p
 | I-04 parent current-scope revocation | same real-PG suite: active relationship loses current Organization evidence after child membership ends |
 | I-05 concurrent last-admin protection | same real-PG suite: concurrent demotions serialize and exactly one ORG_ADMIN remains |
 | I-06 mutation/audit atomicity | same real-PG suite injects an audit-insert failure and verifies membership + audit + receipt all roll back, then verifies one committed audit on retry/replay |
+| Account-authority review regressions | `organizationAccountAuthority.postgres.integration.test.ts`: forced-password state is not usable admin authority; Course freeze cannot target SYSTEM_ADMIN; forced reset requires current SYSTEM_ADMIN and preserves last usable ORG_ADMIN |
 | DB bypass constraints | same real-PG suite directly attempts invalid interval and duplicate-current SQL writes and requires database rejection |
 
 The existing `platformRole.postgres.integration.test.ts` additionally covers STANDARD default, bootstrap/backfill semantics, and no repeated seed promotion.

@@ -1,9 +1,11 @@
-export type RelationalActorRoleV1 = 'STUDENT' | 'TEACHER' | 'PARENT'
+export type RelationalActorRoleV1 = 'STUDENT' | 'TEACHER' | 'PARENT' | 'COUNSELOR' | 'CLIENT'
 
 export type RelationalRelationshipKindV1 =
   | 'SELF'
   | 'PARENT_CHILD'
   | 'COURSE_TEACHER_STUDENT'
+  | 'CLASS_TEACHER_STUDENT'
+  | 'COUNSELOR_CLIENT'
 
 export type RelationalPerspectiveV1 =
   | 'SELF_REPORT'
@@ -16,6 +18,8 @@ export type RelationalAnalysisModeV1 =
   | 'INDIVIDUAL_ONLY'
   | 'COHORT_AGGREGATE'
   | 'MULTI_INFORMANT_SYNTHESIS'
+
+export type RelationalPolicyDomainV1 = 'LEGACY_COURSE' | 'ORGANIZATION_RUN'
 
 export interface RelationalApplicabilityV1 {
   schemaVersion: 1
@@ -68,6 +72,8 @@ export interface RelationalAssignmentRecordV1 {
   minimumRespondents: number | null
   consentId: string | null
   visibilityPolicyKey: string
+  /** Existing fixtures default to LEGACY_COURSE; Organization Run must persist ORGANIZATION_RUN explicitly. */
+  policyDomain?: RelationalPolicyDomainV1
   status: RelationalAssignmentStatusV1
   createdAt: string
   startedAt: string | null

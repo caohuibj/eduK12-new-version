@@ -1,8 +1,9 @@
 import { prisma } from '../config/database'
 import {
-  assertAlternativeUsableOrgAdmin,
-  lockOrganizationsForCurrentOrgAdmin,
-} from '../modules/organization/adminInvariant'
+  AccountAuthorityError,
+  assertAccountUsabilityMutationSafe,
+  assertCurrentSystemAdmin,
+} from './accountAuthorityService'
 
 export class UserLifecycleError extends Error {
   constructor(
@@ -15,7 +16,6 @@ export class UserLifecycleError extends Error {
   }
 }
 
-type PlatformRoleRow = { platformRole: 'SYSTEM_ADMIN' | 'STANDARD' }
 type UserStateRow = { id: string; isActive: boolean }
 
 /**
@@ -31,51 +31,43 @@ export async function setUserActiveState(input: {
   targetUserId: string
   isActive: boolean
 }): Promise<{ id: string; isActive: boolean }> {
-  return prisma.$transaction(async (tx) => {
-    const actors = await tx.$queryRaw<PlatformRoleRow[]>`
-      SELECT "platform_role"::text AS "platformRole"
-      FROM "users"
-      WHERE "id" = ${input.actorUserId}
-      LIMIT 1
-    `
-    if (actors[0]?.platformRole !== 'SYSTEM_ADMIN') {
-      throw new UserLifecycleError(
-        'SYSTEM_ADMIN_REQUIRED',
-        '只有系统管理员可以修改账号启停状态',
-        403,
-      )
-    }
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await assertCurrentSystemAdmin(tx, input.actorUserId)
 
-    const targets = await tx.$queryRaw<UserStateRow[]>`
-      SELECT "id", "is_active" AS "isActive"
-      FROM "users"
-      WHERE "id" = ${input.targetUserId}
-      FOR UPDATE
-    `
-    const target = targets[0]
-    if (!target) {
-      throw new UserLifecycleError('USER_NOT_FOUND', '用户不存在', 404)
-    }
-
-    if (target.isActive === input.isActive) {
-      return { id: target.id, isActive: target.isActive }
-    }
-
-    if (!input.isActive) {
-      const organizationIds = await lockOrganizationsForCurrentOrgAdmin(tx, input.targetUserId)
-      for (const organizationId of organizationIds) {
-        await assertAlternativeUsableOrgAdmin(tx, organizationId, input.targetUserId)
+      const targets = await tx.$queryRaw<UserStateRow[]>`
+        SELECT "id", "is_active" AS "isActive"
+        FROM "users"
+        WHERE "id" = ${input.targetUserId}
+        FOR UPDATE
+      `
+      const target = targets[0]
+      if (!target) {
+        throw new UserLifecycleError('USER_NOT_FOUND', '用户不存在', 404)
       }
-    }
 
-    const rows = await tx.$queryRaw<UserStateRow[]>`
-      UPDATE "users"
-      SET "is_active" = ${input.isActive},
-          "token_version" = "token_version" + 1,
-          "updated_at" = transaction_timestamp()
-      WHERE "id" = ${input.targetUserId}
-      RETURNING "id", "is_active" AS "isActive"
-    `
-    return rows[0]
-  })
+      if (target.isActive === input.isActive) {
+        return { id: target.id, isActive: target.isActive }
+      }
+
+      if (!input.isActive) {
+        await assertAccountUsabilityMutationSafe(tx, input.targetUserId)
+      }
+
+      const rows = await tx.$queryRaw<UserStateRow[]>`
+        UPDATE "users"
+        SET "is_active" = ${input.isActive},
+            "token_version" = "token_version" + 1,
+            "updated_at" = transaction_timestamp()
+        WHERE "id" = ${input.targetUserId}
+        RETURNING "id", "is_active" AS "isActive"
+      `
+      return rows[0]
+    })
+  } catch (err) {
+    if (err instanceof AccountAuthorityError) {
+      throw new UserLifecycleError(err.code, err.message, err.statusCode)
+    }
+    throw err
+  }
 }

@@ -2,6 +2,7 @@ import { Router, type Response } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { instrumentError, success, unauthorized } from '../../utils/response'
 import { RelationalAssessmentError } from './errors'
+import { assertLegacyRelationalAssignmentDomain, filterLegacyRelationalAssignments } from './legacy-domain'
 import { relationalProductCatalogService } from './product-catalog.service'
 import { relationalProductContextService } from './product-context.service'
 import { relationalProductReportService } from './product-report.service'
@@ -17,6 +18,7 @@ const statusFor = (code: string): number => {
     || code === 'RELATIONAL_PRODUCT_ROLE'
     || code === 'RELATIONAL_COURSE_TEACHER'
     || code === 'RELATIONAL_ANALYSIS_ACCESS'
+    || code === 'RELATIONAL_POLICY_DOMAIN'
   ) return 403
   if (code === 'RELATIONAL_PRODUCT_UNAVAILABLE' || code === 'RELATIONAL_REPORT_NOT_READY') return 409
   if (
@@ -39,32 +41,19 @@ const relationalError = (res: Response, error: unknown) => {
 
 const requiredString = (body: unknown, key: string): string => {
   const value = body && typeof body === 'object' ? (body as Record<string, unknown>)[key] : undefined
-  if (typeof value !== 'string' || !value.trim()) {
-    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', `${key} is required`)
-  }
+  if (typeof value !== 'string' || !value.trim()) throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', `${key} is required`)
   return value.trim()
 }
-
 const requiredQueryString = (query: Record<string, unknown>, key: string): string => {
   const value = query[key]
-  if (typeof value !== 'string' || !value.trim()) {
-    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', `${key} is required`)
-  }
+  if (typeof value !== 'string' || !value.trim()) throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', `${key} is required`)
   return value.trim()
 }
-
 const checkedResourceKind = (value: string): RelationalResourceKindV1 => {
-  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(value)) {
-    throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
-  }
+  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(value)) throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
   return value as RelationalResourceKindV1
 }
-
-const productRef = (body: unknown): {
-  resourceKind: RelationalResourceKindV1
-  resourceKey: string
-  resourceVersion: string
-} => ({
+const productRef = (body: unknown) => ({
   resourceKind: checkedResourceKind(requiredString(body, 'resourceKind')),
   resourceKey: requiredString(body, 'resourceKey'),
   resourceVersion: requiredString(body, 'resourceVersion'),
@@ -74,18 +63,15 @@ router.get('/catalog', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, { list: relationalProductCatalogService.catalog(req.user.role) })
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 router.get('/tasks', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, { list: await relationalProductService.tasks(req.user.userId, req.user.role) })
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    const tasks = await relationalProductService.tasks(req.user.userId, req.user.role)
+    return success(res, { list: await filterLegacyRelationalAssignments(tasks) })
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 router.get('/reports/cohort', authenticate, async (req, res, next) => {
@@ -101,148 +87,83 @@ router.get('/reports/cohort', authenticate, async (req, res, next) => {
         resourceVersion: requiredQueryString(req.query as Record<string, unknown>, 'resourceVersion'),
       },
     }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 router.get('/context/parent-children', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, {
-      list: await relationalProductContextService.parentChildren({
-        userId: req.user.userId,
-        role: req.user.role,
-      }),
-    })
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    return success(res, { list: await relationalProductContextService.parentChildren({ userId: req.user.userId, role: req.user.role }) })
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.get('/context/courses/:courseId/roster', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, await relationalProductContextService.teacherRoster({
-      userId: req.user.userId,
-      role: req.user.role,
-      courseId: req.params.courseId,
-    }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    return success(res, await relationalProductContextService.teacherRoster({ userId: req.user.userId, role: req.user.role, courseId: req.params.courseId }))
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.get('/context/student-courses', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, {
-      list: await relationalProductContextService.studentCourses({
-        userId: req.user.userId,
-        role: req.user.role,
-      }),
-    })
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    return success(res, { list: await relationalProductContextService.studentCourses({ userId: req.user.userId, role: req.user.role }) })
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 router.post('/assignments/teacher-parent', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, await relationalProductService.issueTeacherToParent({
-      teacherUserId: req.user.userId,
-      role: req.user.role,
-      courseId: requiredString(req.body, 'courseId'),
-      studentUserId: requiredString(req.body, 'studentUserId'),
-      parentUserId: requiredString(req.body, 'parentUserId'),
-      product: productRef(req.body),
+      teacherUserId: req.user.userId, role: req.user.role, courseId: requiredString(req.body, 'courseId'),
+      studentUserId: requiredString(req.body, 'studentUserId'), parentUserId: requiredString(req.body, 'parentUserId'), product: productRef(req.body),
     }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.post('/assignments/teacher-observer', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, await relationalProductService.issueTeacherObserver({
-      teacherUserId: req.user.userId,
-      role: req.user.role,
-      courseId: requiredString(req.body, 'courseId'),
-      studentUserId: requiredString(req.body, 'studentUserId'),
-      product: productRef(req.body),
+      teacherUserId: req.user.userId, role: req.user.role, courseId: requiredString(req.body, 'courseId'),
+      studentUserId: requiredString(req.body, 'studentUserId'), product: productRef(req.body),
     }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.post('/assignments/parent-self-serve', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, await relationalProductService.issueParentSelfServe({
-      parentUserId: req.user.userId,
-      role: req.user.role,
-      studentUserId: requiredString(req.body, 'studentUserId'),
-      product: productRef(req.body),
+      parentUserId: req.user.userId, role: req.user.role, studentUserId: requiredString(req.body, 'studentUserId'), product: productRef(req.body),
     }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.post('/assignments/student-experience', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
     return success(res, await relationalProductService.issueStudentExperience({
-      studentUserId: req.user.userId,
-      role: req.user.role,
-      courseId: requiredString(req.body, 'courseId'),
-      product: productRef(req.body),
+      studentUserId: req.user.userId, role: req.user.role, courseId: requiredString(req.body, 'courseId'), product: productRef(req.body),
     }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 router.post('/assignments/:assignmentId/consent/accept', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, await relationalProductService.acceptConsent({
-      assignmentId: req.params.assignmentId,
-      userId: req.user.userId,
-      role: req.user.role,
-    }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    await assertLegacyRelationalAssignmentDomain(req.params.assignmentId)
+    return success(res, await relationalProductService.acceptConsent({ assignmentId: req.params.assignmentId, userId: req.user.userId, role: req.user.role }))
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.get('/assignments/:assignmentId/report-target', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, await relationalProductReportService.respondentReportTarget({
-      assignmentId: req.params.assignmentId,
-      userId: req.user.userId,
-      role: req.user.role,
-    }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    await assertLegacyRelationalAssignmentDomain(req.params.assignmentId)
+    return success(res, await relationalProductReportService.respondentReportTarget({ assignmentId: req.params.assignmentId, userId: req.user.userId, role: req.user.role }))
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
-
 router.post('/assignments/:assignmentId/start', authenticate, async (req, res, next) => {
   try {
     if (!req.user) return unauthorized(res)
-    return success(res, await relationalProductService.start({
-      assignmentId: req.params.assignmentId,
-      userId: req.user.userId,
-      role: req.user.role,
-    }))
-  } catch (error) {
-    try { return relationalError(res, error) } catch (unexpected) { return next(unexpected) }
-  }
+    await assertLegacyRelationalAssignmentDomain(req.params.assignmentId)
+    return success(res, await relationalProductService.start({ assignmentId: req.params.assignmentId, userId: req.user.userId, role: req.user.role }))
+  } catch (err) { try { return relationalError(res, err) } catch (unexpected) { return next(unexpected) } }
 })
 
 export default router

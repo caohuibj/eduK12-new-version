@@ -5,6 +5,7 @@ import type {
   RelationalAssignmentRecordV1,
   RelationalAssignmentStatusV1,
   RelationalPerspectiveV1,
+  RelationalPolicyDomainV1,
   RelationalRelationshipKindV1,
   RelationalRelationshipSnapshotV1,
   RelationalResourceKindV1,
@@ -36,6 +37,7 @@ type AssignmentRow = {
   minimumRespondents: number | null
   consentId: string | null
   visibilityPolicyKey: string
+  policyDomain: RelationalPolicyDomainV1
   status: RelationalAssignmentStatusV1
   createdAt: Date
   startedAt: Date | null
@@ -86,6 +88,7 @@ const SELECT_ASSIGNMENT = `
     minimum_respondents AS "minimumRespondents",
     consent_id AS "consentId",
     visibility_policy_key AS "visibilityPolicyKey",
+    policy_domain AS "policyDomain",
     status,
     created_at AS "createdAt",
     started_at AS "startedAt",
@@ -160,6 +163,7 @@ const toRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => {
     minimumRespondents: analysis.minimumRespondents,
     consentId: row.consentId,
     visibilityPolicyKey: row.visibilityPolicyKey,
+    policyDomain: row.policyDomain,
     status: row.status,
     createdAt: row.createdAt.toISOString(),
     startedAt: iso(row.startedAt),
@@ -267,10 +271,10 @@ export const createSqlRelationalAssignmentRepository = (
         created_by_user_id, relationship_kind, relationship_ref, relationship_snapshot_json,
         relationship_snapshot_hash, perspective, resource_kind, resource_key, resource_version,
         applicability_hash, analysis_mode, minimum_respondents,
-        consent_id, visibility_policy_key, status, created_at, updated_at, started_at, completed_at, revoked_at
+        consent_id, visibility_policy_key, policy_domain, status, created_at, updated_at, started_at, completed_at, revoked_at
       ) VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,$17,$18,
-        $19,$20,$21,$22::timestamp,$22::timestamp,$23::timestamp,$24::timestamp,$25::timestamp
+        $19,$20,$21,$22,$23::timestamp,$23::timestamp,$24::timestamp,$25::timestamp,$26::timestamp
       )`,
       assignment.assignmentId,
       assignment.episodeId,
@@ -292,6 +296,7 @@ export const createSqlRelationalAssignmentRepository = (
       assignment.minimumRespondents,
       assignment.consentId,
       assignment.visibilityPolicyKey,
+      assignment.policyDomain ?? 'LEGACY_COURSE',
       assignment.status,
       assignment.createdAt,
       assignment.startedAt,

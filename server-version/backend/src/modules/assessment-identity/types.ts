@@ -9,6 +9,7 @@ export type AssessmentEpisodeInitiationModeV1 =
   | 'PARENT_SELF_SERVE'
   | 'STUDENT_SELF'
   | 'ANONYMOUS_SELF'
+  | 'ORGANIZATION_RUN'
 
 export interface AttemptIdentityV1 {
   subjectUserId: string | null
