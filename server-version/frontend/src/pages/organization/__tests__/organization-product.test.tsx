@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import OrganizationAdminPage from '../OrganizationAdminPage'
+import OrganizationProductRoutes from '../OrganizationProductRoutes'
 
 const api = vi.hoisted(() => ({
   listMemberships: vi.fn(),
@@ -28,6 +29,12 @@ const api = vi.hoisted(() => ({
   endStaffAssignment: vi.fn(),
 }))
 
+const auth = vi.hoisted(() => ({
+  user: { id: 'user-1', username: 'user-1', role: 'STUDENT', mustChangePassword: false } as any,
+  isLoading: false,
+  isAuthenticated: true,
+}))
+
 const org = vi.hoisted(() => ({
   active: null as any,
   activeLoading: false,
@@ -37,6 +44,7 @@ const org = vi.hoisted(() => ({
 }))
 
 vi.mock('../../../api/organizations', () => ({ organizationApi: api }))
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/OrganizationContext', () => ({ useOrganization: () => org }))
 
 const baseAccess = {
@@ -61,8 +69,20 @@ function renderPage() {
   )
 }
 
+function renderProductRoutes(path = '/organizations/org-1') {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <OrganizationProductRoutes />
+    </MemoryRouter>,
+  )
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
+  auth.user = { id: 'user-1', username: 'user-1', role: 'STUDENT', mustChangePassword: false }
+  auth.isLoading = false
+  auth.isAuthenticated = true
+  org.active = null
   org.activeLoading = false
   org.activeError = null
   org.selectOrganization.mockResolvedValue(null)
@@ -74,6 +94,21 @@ beforeEach(() => {
 })
 
 describe('Organization product authority boundary', () => {
+  it('fails closed after one direct-route context denial instead of retrying forever', async () => {
+    org.activeError = '组织不存在或不可访问'
+    org.selectOrganization.mockResolvedValue(null)
+
+    renderProductRoutes('/organizations/org-hidden')
+
+    await waitFor(() => expect(screen.getByText('无法进入组织空间')).toBeInTheDocument())
+    expect(screen.getByText('组织不存在或不可访问')).toBeInTheDocument()
+    expect(org.selectOrganization).toHaveBeenCalledTimes(1)
+    expect(org.selectOrganization).toHaveBeenCalledWith('org-hidden')
+
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(org.selectOrganization).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps an ordinary member read-only and does not probe governance endpoints', async () => {
     org.active = {
       organization: { id: 'org-1', name: '成员组织', status: 'ACTIVE' },
