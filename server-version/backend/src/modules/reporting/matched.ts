@@ -183,11 +183,14 @@ const ruleForPair = (input: {
   })
 }
 
-const finiteDelta = (left: number, right: number): number => {
-  const delta = finiteReportingNumber(right - left)
-  if (delta === null) reportingFail('REPORT_STATISTIC_OVERFLOW', 'matched delta produced a non-finite result', 500)
-  return delta
+const requireFiniteStatistic = (value: unknown, errorCode: string, message: string): number => {
+  const numeric = finiteReportingNumber(value)
+  return numeric === null ? reportingFail(errorCode, message, 500) : numeric
 }
+
+const finiteDelta = (left: number, right: number): number => (
+  requireFiniteStatistic(right - left, 'REPORT_STATISTIC_OVERFLOW', 'matched delta produced a non-finite result')
+)
 
 export const buildMatchedLongitudinalProjection = (input: {
   waves: ReportingSeriesWaveRecordV1[]
@@ -217,17 +220,20 @@ export const buildMatchedLongitudinalProjection = (input: {
       metrics[rule.metricId] = { state: 'suppressed' }
       continue
     }
-    const waveMeans = waves.map((wave) => {
+    const waveMeans: Array<{ waveId: string; waveKey: string; mean: number }> = waves.map((wave) => {
       const values = selected.cases.map((item) => item.values[wave.id])
       if (values.some((value) => value === undefined)) reportingFail('REPORT_RESULT_INTEGRITY', 'complete case is missing a Wave value', 500)
-      const mean = reportingAggregations({ values: values as number[], aggregations: ['MEAN'], distributionCellFloor: effectiveFloor }).mean
-      if (typeof mean !== 'number') reportingFail('REPORT_STATISTIC', 'matched mean is unavailable', 500)
+      const aggregations = reportingAggregations({ values: values as number[], aggregations: ['MEAN'], distributionCellFloor: effectiveFloor })
+      const mean = requireFiniteStatistic(aggregations.mean, 'REPORT_STATISTIC', 'matched mean is unavailable')
       return { waveId: wave.id, waveKey: wave.waveKey, mean }
     })
     const comparisons: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']> = []
     for (let index = 0; index < waves.length - 1; index += 1) {
       const left = waves[index]
       const right = waves[index + 1]
+      const leftMean = waveMeans[index]
+      const rightMean = waveMeans[index + 1]
+      if (!leftMean || !rightMean) reportingFail('REPORT_RESULT_INTEGRITY', 'matched Wave mean pair is unavailable', 500)
       const comparability = ruleForPair({ spec: input.spec, metricId: rule.metricId, left, right })
       const comparison: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']>[number] = {
         fromWaveId: left.id,
@@ -236,7 +242,7 @@ export const buildMatchedLongitudinalProjection = (input: {
       }
       if (comparability.allowedOperations.includes('NUMERIC_DELTA')) {
         assertNumericDeltaAllowed(comparability)
-        comparison.delta = finiteDelta(waveMeans[index].mean, waveMeans[index + 1].mean)
+        comparison.delta = finiteDelta(leftMean.mean, rightMean.mean)
       }
       comparisons.push(comparison)
     }

@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database'
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import { reportingAggregations } from './statistics'
 import { reportingFail, type ReportingAggregation, type ReportingMetricRuleV1 } from './types'
 import type { ReportingPrincipal } from './authorization'
@@ -40,6 +40,13 @@ export interface ReportingProtectedFeedbackInternalCountsV1 {
 }
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
+
+type CurrentProtectedContext = OrganizationAccessContext & { membershipId: string }
+
+const requireCurrentProtectedContext = (context: OrganizationAccessContext | null): CurrentProtectedContext => {
+  if (!context || context.membershipId === null) return hidden()
+  return context as CurrentProtectedContext
+}
 
 export const assertProtectedSubjectNotViewer = (viewerUserId: string, subjectUserId: string): void => {
   if (viewerUserId === subjectUserId) {
@@ -112,8 +119,10 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
 }): Promise<void> => {
   // Explicit subject deny precedes every platform/Organization allow basis.
   assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
-  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
-  if (!context || context.membershipId === null) hidden()
+  const context = requireCurrentProtectedContext(await resolveOrganizationAccessContext({
+    principal: input.principal,
+    organizationId: input.organizationId,
+  }))
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   if (
     context.explicitDenies.includes('*')
