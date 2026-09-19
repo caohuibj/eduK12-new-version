@@ -223,6 +223,8 @@ jobs:
         run: npm run db:backfill:checkin-tokens
       - name: guarded migration idempotency after seeded data
         run: npm run db:migrate:guarded
+      - name: PR3 populated baseline-to-head upgrade rehearsal
+        run: node scripts/pr3-baseline-upgrade-rehearsal.mjs
       - name: prepare release preflight upload directory
         run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
@@ -270,6 +272,10 @@ jobs:
           src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
           src/__tests__/hotpath/query-budget.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunConsentRecovery.postgres.integration.test.ts
+          src/__tests__/integration/reportingCore.postgres.integration.test.ts
+          src/__tests__/integration/reportingHttp.postgres.integration.test.ts
+          src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

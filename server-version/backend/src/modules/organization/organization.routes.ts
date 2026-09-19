@@ -1,10 +1,19 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { assessmentRunController } from '../assessment-run/run.controller'
+import { reportingController } from '../reporting/reporting.controller'
 import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
 import { organizationController } from './organization.controller'
 
 const router = Router()
+
+// Platform-governed ReportingAnalysisSpec lifecycle. These handlers enforce
+// current PlatformRole=SYSTEM_ADMIN themselves; Organization admins cannot
+// fork or weaken the platform spec contract.
+router.post('/reporting-specs', authenticate, reportingController.createSpec)
+router.post('/reporting-specs/:specId/review', authenticate, reportingController.reviewSpec)
+router.post('/reporting-specs/:specId/publish', authenticate, reportingController.publishSpec)
+router.post('/reporting-specs/:specId/retire', authenticate, reportingController.retireSpec)
 
 // Any authenticated account may create an organization and becomes its first
 // ORG_ADMIN. Organization authority after creation is never derived from
@@ -38,5 +47,11 @@ router.post('/:organizationId/runs/:runId/close', authenticate, requireOrganizat
 router.post('/:organizationId/runs/:runId/cancel', authenticate, requireOrganizationGovernance, assessmentRunController.cancel)
 router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, assessmentRunController.acceptConsent)
 router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
+
+// PR3 generic Organization group reporting only. Central reporting authorization
+// rechecks current authority on generation and every artifact read; protected,
+// longitudinal and multi-rater kinds remain unavailable until PR4.
+router.post('/:organizationId/reporting/analyses', authenticate, reportingController.analyze)
+router.get('/:organizationId/reporting/artifacts/:artifactId', authenticate, reportingController.readArtifact)
 
 export default router

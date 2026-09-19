@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertCurrentRunStartAuthority } from './startAuthority'
 import { freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
-import { loadRunExecutionStartAdmission, type RunStartAdmission } from './startAdmission'
+import { loadRunExecutionStartAdmission, type RunAttemptIdentityBinding, type RunStartAdmission } from './startAdmission'
 
 export type RunStartClaimState = 'CLAIMED' | 'DISPATCHED' | 'COMPLETED' | 'ABORTED' | 'UNKNOWN'
 
@@ -22,6 +22,7 @@ export interface RunStartClaimRecord {
   completedAt: Date | null
   abortedAt: Date | null
   unknownAt: Date | null
+  admittedAttemptIdentity: RunAttemptIdentityBinding
 }
 
 export type RunStartClaimDecision =
@@ -52,7 +53,8 @@ const CLAIM_PROJECTION = `
   "id", "organization_id" AS "organizationId", "run_id" AS "runId", "execution_id" AS "executionId",
   "operation_key" AS "operationKey", "claim_generation" AS "claimGeneration", "state",
   "claimed_at" AS "claimedAt", "lease_until" AS "leaseUntil", "dispatched_at" AS "dispatchedAt",
-  "completed_at" AS "completedAt", "aborted_at" AS "abortedAt", "unknown_at" AS "unknownAt"
+  "completed_at" AS "completedAt", "aborted_at" AS "abortedAt", "unknown_at" AS "unknownAt",
+  "admitted_attempt_identity" AS "admittedAttemptIdentity"
 `
 
 export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promise<ExecutionLockRow> => {
@@ -148,10 +150,10 @@ export const acquireRunExecutionStartClaim = async (input: {
       const rows = await tx.$queryRaw<RunStartClaimRecord[]>`
         INSERT INTO "assessment_run_execution_start_claims" (
           "id", "organization_id", "run_id", "execution_id", "operation_key", "claim_generation",
-          "state", "claimed_at", "lease_until", "updated_at"
+          "state", "claimed_at", "lease_until", "admitted_attempt_identity", "updated_at"
         ) VALUES (
           ${id}, ${admission.execution.organizationId}, ${admission.execution.runId}, ${input.executionId},
-          ${operationKey}, 1, 'CLAIMED', ${now}, ${leaseUntil}, ${now}
+          ${operationKey}, 1, 'CLAIMED', ${now}, ${leaseUntil}, ${JSON.stringify(admission.attemptIdentity)}::jsonb, ${now}
         )
         RETURNING ${Prisma.raw(CLAIM_PROJECTION)}
       `
