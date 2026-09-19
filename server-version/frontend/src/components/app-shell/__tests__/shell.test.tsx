@@ -120,6 +120,39 @@ describe('one shared chrome', () => {
     await userEvent.selectOptions(selector, 'org-b')
     expect(organization.selectOrganization).toHaveBeenCalledWith('org-b')
   })
+  it('hides Delivery when an explicit export deny overrides an export capability', () => {
+    organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'ACTIVE' }]
+    organization.active = {
+      organization: { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
+      access: {
+        membershipId: 'membership-a',
+        orgRole: 'MEMBER',
+        capabilities: ['REPORT_EXPORT'],
+        personas: [],
+        explicitDenies: ['REPORT_EXPORT'],
+        canGovern: false,
+      },
+    } as any
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    expect(screen.queryByRole('link', { name: 'Safety/CSV' })).not.toBeInTheDocument()
+  })
+  it('keeps Safety responsibility discoverable for a suspended teacher owner', () => {
+    organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'SUSPENDED' }]
+    organization.active = {
+      organization: { id: 'org-a', name: '组织 A', status: 'SUSPENDED' },
+      access: {
+        membershipId: 'membership-a',
+        orgRole: 'MEMBER',
+        capabilities: [],
+        personas: ['TEACHER'],
+        explicitDenies: [],
+        canGovern: false,
+      },
+    } as any
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    expect(screen.getByRole('link', { name: 'Safety/CSV' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Reporting' })).not.toBeInTheDocument()
+  })
   it('keeps focused player descendants outside product token scope', () => {
     render(<MemoryRouter initialEntries={['/public/cognitive/sessions/s1']}><AppShell><button>task control</button></AppShell></MemoryRouter>)
     expect(screen.queryByRole('navigation', { name: '主要导航' })).not.toBeInTheDocument()
