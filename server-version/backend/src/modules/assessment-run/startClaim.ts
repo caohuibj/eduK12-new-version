@@ -219,7 +219,7 @@ export const markRunStartClaimCompleted = async (
   const now = await dbNow(tx)
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_execution_start_claims"
-    SET "state" = 'COMPLETED', "completed_at" = ${now}, "updated_at" = ${now}
+    SET "state" = 'COMPLETED', "completed_at" = ${now}, "unknown_at" = NULL, "updated_at" = ${now}
     WHERE "id" = ${input.claimId} AND "claim_generation" = ${input.generation} AND "state" IN ('DISPATCHED','UNKNOWN')
   `
   if (Number(changed) !== 1) throw new RunStartClaimError('RUN_START_FENCE_LOST', 'START claim ownership fence was lost', 409)
