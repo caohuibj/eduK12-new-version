@@ -12,8 +12,10 @@ export const assertOrganizationGroupReportAccess = async (input: {
   organizationId: string
   runId: string
 }): Promise<void> => {
-  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
-  if (!context || !context.membershipId) reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
+  const resolved = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
+  if (resolved === null) throw new ReportingError('REPORT_NOT_FOUND', 'reporting resource not found', 404)
+  const context = resolved
+  if (context.membershipId === null) throw new ReportingError('REPORT_NOT_FOUND', 'reporting resource not found', 404)
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   if (
     context.explicitDenies.includes('*')
