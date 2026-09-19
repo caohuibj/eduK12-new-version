@@ -7,6 +7,7 @@ export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUAT
 export type ReportingComparabilityLevel = 'EXACT' | 'COMPATIBLE' | 'LINKED' | 'LIMITED' | 'NOT_COMPARABLE'
 export type ReportingComparabilityOperation = 'SIDE_BY_SIDE' | 'DESCRIPTIVE_TREND' | 'NUMERIC_DELTA'
 export type ReportingAnalysisKindV1 = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK'
+export type ReportingArtifactPolicyDomainV1 = 'ORG_GROUP_REPORT_V1' | 'ORG_PROTECTED_FEEDBACK_V1'
 
 export interface ReportingComparabilityRuleV1 {
   schemaVersion: 1
@@ -16,7 +17,6 @@ export interface ReportingComparabilityRuleV1 {
   fromVersion: string
   toVersion: string
   level: Exclude<ReportingComparabilityLevel, 'NOT_COMPARABLE'>
-  /** Reviewed evidence identity; never inferred from display labels. */
   evidenceRef: string
   evidenceHash: string
 }
@@ -31,7 +31,6 @@ export interface ReportingComparabilityDecisionV1 {
   limitations: string[]
 }
 
-/** Legacy-compatible PR3 GROUP metric contract. */
 export interface ReportingMetricRuleV1 {
   metricId: string
   sourceMetricKey: string
@@ -44,7 +43,6 @@ export interface ReportingMetricRuleV1 {
   selectionPolicy: 'UNIQUE_OR_REJECT'
 }
 
-/** PR4 metrics freeze scientific/source identity in addition to the PR3 rule. */
 export interface ReportingPr4MetricIdentityV1 {
   sourceFamily: ReportingResourceFamily
   sourceResourceKey: string
@@ -53,7 +51,6 @@ export interface ReportingPr4MetricIdentityV1 {
 }
 
 export type ReportingLongitudinalMetricRuleV1 = ReportingMetricRuleV1 & ReportingPr4MetricIdentityV1
-
 export type ReportingProtectedMetricRuleV1 = Omit<ReportingMetricRuleV1, 'observationUnit'>
   & ReportingPr4MetricIdentityV1
   & { observationUnit: 'RESPONDENT' }
@@ -166,7 +163,6 @@ export interface ReportingCohortSnapshotRecord {
 export interface ReportingSeriesScopeV1 {
   schemaVersion: 1
   resourceFamily: ReportingResourceFamily
-  /** Stable resource identity across versions; comparability governs cross-version deltas. */
   resourceKey: string
 }
 
@@ -310,7 +306,45 @@ export interface ReportingRepeatedCohortProjectionV1 {
   limitations: ['INDEPENDENT_WAVE_POPULATIONS', 'NOT_INDIVIDUAL_CHANGE']
 }
 
-export interface ReportingArtifactPayloadV1 {
+export type ReportingMatchedModeV1 = 'PAIRWISE' | 'FULL_CASE'
+export interface ReportingMatchedArtifactMetricProjectionV1 {
+  state: 'present' | 'suppressed'
+  countKind?: 'PAIRED_VALID' | 'COMPLETE_CASE'
+  validCaseN?: number
+  waveMeans?: Array<{ waveId: string; waveKey: string; mean: number }>
+  comparisons?: Array<{
+    fromWaveId: string
+    toWaveId: string
+    comparability: ReportingComparabilityDecisionV1
+    delta?: number
+  }>
+}
+export interface ReportingMatchedArtifactProjectionV1 {
+  schemaVersion: 1
+  kind: 'MATCHED_LONGITUDINAL'
+  mode: ReportingMatchedModeV1
+  state: 'present' | 'suppressed'
+  waveIds: string[]
+  matchedEligibleN?: number
+  metrics?: Record<string, ReportingMatchedArtifactMetricProjectionV1>
+  evidence: ReportingEvidenceProjectionV1
+}
+
+export interface ReportingProtectedMetricProjectionV1 {
+  state: 'present' | 'suppressed'
+  aggregations?: Record<string, unknown>
+}
+export interface ReportingProtectedFeedbackProjectionV1 {
+  schemaVersion: 1
+  kind: 'PROTECTED_FEEDBACK'
+  policyDomain: 'ORG_PROTECTED_FEEDBACK_V1'
+  state: 'present' | 'suppressed'
+  metrics?: Record<string, ReportingProtectedMetricProjectionV1>
+  limitations: ['RESPONDENT_PRIVACY_PROTECTED', 'NO_RESPONDENT_IDENTITIES']
+}
+
+/** Exact legacy GROUP artifact payload. Do not add fields: existing snapshot hashes commit this shape. */
+export interface ReportingGroupArtifactPayloadV1 {
   schemaVersion: 1
   artifactId: string
   organizationId: string
@@ -335,17 +369,123 @@ export interface ReportingArtifactPayloadV1 {
   projection: ReportingSafeProjectionV1
 }
 
-export interface ReportingArtifactRecord {
+export interface ReportingLongitudinalWaveBindingV1 {
+  waveId: string
+  waveKey: string
+  ordinal: number
+  cohortSnapshotId: string
+  inputIdentityHash: string
+  snapshotHash: string
+}
+
+export interface ReportingLongitudinalArtifactPayloadV1 {
+  schemaVersion: 1
+  artifactId: string
+  organizationId: string
+  analysisKind: 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
+  policyDomain: 'ORG_GROUP_REPORT_V1'
+  source: { kind: 'SERIES'; seriesId: string; seriesIdentityHash: string }
+  specId: string
+  specHash: string
+  analysisIdentityHash: string
+  generatedByUserId: string
+  generatedAt: string
+  waveBindings: ReportingLongitudinalWaveBindingV1[]
+  maturityProfile: Record<string, number>
+  options: { mode?: ReportingMatchedModeV1 }
+  projection: ReportingRepeatedCohortProjectionV1 | ReportingMatchedArtifactProjectionV1
+}
+
+export interface ReportingProtectedArtifactInputV1 {
+  executionId: string
+  respondentUserId: string
+  respondentMembershipId: string | null
+  state: 'COMPLETED' | 'MISSING'
+  canonicalResultHash: string | null
+  scientificMaturity: ReportingMaturity | null
+  provenanceState: ReportingProvenanceState | null
+  scientificProvenanceHash: string | null
+}
+
+export interface ReportingProtectedArtifactPayloadV1 {
+  schemaVersion: 1
+  artifactId: string
+  organizationId: string
+  analysisKind: 'PROTECTED_FEEDBACK'
+  policyDomain: 'ORG_PROTECTED_FEEDBACK_V1'
+  source: {
+    kind: 'RUN_TRACK_PROTECTED'
+    runId: string
+    trackId: string
+    subjectActorSnapshotId: string
+    subjectUserId: string
+    relationshipKind: string
+    perspective: 'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'
+  }
+  resource: { family: ReportingResourceFamily; key: string; version: string }
+  specId: string
+  specHash: string
+  analysisIdentityHash: string
+  generatedByUserId: string
+  generatedAt: string
+  inputManifest: ReportingProtectedArtifactInputV1[]
+  inputIdentityHash: string
+  maturityProfile: Record<string, number>
+  evidence: ReportingEvidenceProjectionV1
+  projection: ReportingProtectedFeedbackProjectionV1
+}
+
+export type ReportingArtifactPayloadV1 =
+  | ReportingGroupArtifactPayloadV1
+  | ReportingLongitudinalArtifactPayloadV1
+  | ReportingProtectedArtifactPayloadV1
+
+interface ReportingArtifactRecordBase {
   id: string
   organizationId: string
-  cohortSnapshotId: string
   specId: string
   analysisIdentityHash: string
-  artifactPayload: ReportingArtifactPayloadV1
   snapshotHash: string
   generatedByUserId: string
   generatedAt: Date
 }
+export interface ReportingGroupArtifactRecord extends ReportingArtifactRecordBase {
+  analysisKind: 'GROUP'
+  policyDomain: 'ORG_GROUP_REPORT_V1'
+  cohortSnapshotId: string
+  seriesId: null
+  sourceRunId: null
+  sourceTrackId: null
+  subjectActorSnapshotId: null
+  relationshipKind: null
+  perspective: null
+  artifactPayload: ReportingGroupArtifactPayloadV1
+}
+export interface ReportingLongitudinalArtifactRecord extends ReportingArtifactRecordBase {
+  analysisKind: 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
+  policyDomain: 'ORG_GROUP_REPORT_V1'
+  cohortSnapshotId: null
+  seriesId: string
+  sourceRunId: null
+  sourceTrackId: null
+  subjectActorSnapshotId: null
+  relationshipKind: null
+  perspective: null
+  artifactPayload: ReportingLongitudinalArtifactPayloadV1
+}
+export interface ReportingProtectedArtifactRecord extends ReportingArtifactRecordBase {
+  analysisKind: 'PROTECTED_FEEDBACK'
+  policyDomain: 'ORG_PROTECTED_FEEDBACK_V1'
+  cohortSnapshotId: null
+  seriesId: null
+  sourceRunId: string
+  sourceTrackId: string
+  subjectActorSnapshotId: string
+  relationshipKind: string
+  perspective: 'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'
+  artifactPayload: ReportingProtectedArtifactPayloadV1
+}
+export type ReportingArtifactRecord = ReportingGroupArtifactRecord | ReportingLongitudinalArtifactRecord | ReportingProtectedArtifactRecord
 
 export class ReportingError extends Error {
   constructor(public readonly code: string, message: string, public readonly statusCode = 409) {

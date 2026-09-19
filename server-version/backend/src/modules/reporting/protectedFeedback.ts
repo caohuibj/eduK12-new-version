@@ -1,37 +1,18 @@
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import { reportingAggregations } from './statistics'
-import { reportingFail, type ReportingAggregation, type ReportingMetricRuleV1 } from './types'
+import {
+  reportingFail,
+  type ReportingAggregation,
+  type ReportingProtectedFeedbackProjectionV1,
+  type ReportingProtectedFeedbackSpecV1,
+} from './types'
 import type { ReportingPrincipal } from './authorization'
 import type { ReportingSeparatedMultiRaterV1, ReportingSeparatedRaterObservationV1 } from './multiRater'
 
+export type { ReportingProtectedFeedbackSpecV1 } from './types'
+
 export const ORG_PROTECTED_FEEDBACK_POLICY = 'ORG_PROTECTED_FEEDBACK_V1' as const
-
-export interface ReportingProtectedFeedbackSpecV1 {
-  schemaVersion: 1
-  analysisKind: 'PROTECTED_FEEDBACK'
-  engineKey: 'ORG_PROTECTED_FEEDBACK_V1'
-  engineVersion: '1.0.0'
-  privacyUnit: 'RESPONDENT'
-  selectionPolicy: 'UNIQUE_OR_REJECT'
-  minimumRespondentN: number
-  minimumContributorN: number
-  metricRules: ReportingMetricRuleV1[]
-}
-
-export interface ReportingProtectedMetricProjectionV1 {
-  state: 'present' | 'suppressed'
-  aggregations?: Record<string, unknown>
-}
-
-export interface ReportingProtectedFeedbackProjectionV1 {
-  schemaVersion: 1
-  kind: 'PROTECTED_FEEDBACK'
-  policyDomain: typeof ORG_PROTECTED_FEEDBACK_POLICY
-  state: 'present' | 'suppressed'
-  metrics?: Record<string, ReportingProtectedMetricProjectionV1>
-  limitations: ['RESPONDENT_PRIVACY_PROTECTED', 'NO_RESPONDENT_IDENTITIES']
-}
 
 export interface ReportingProtectedFeedbackInternalCountsV1 {
   eligibleRespondentN: number
@@ -40,18 +21,14 @@ export interface ReportingProtectedFeedbackInternalCountsV1 {
 }
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
-
 type CurrentProtectedContext = OrganizationAccessContext & { membershipId: string }
-
 const requireCurrentProtectedContext = (context: OrganizationAccessContext | null): CurrentProtectedContext => {
   if (!context || context.membershipId === null) return hidden()
   return context as CurrentProtectedContext
 }
 
 export const assertProtectedSubjectNotViewer = (viewerUserId: string, subjectUserId: string): void => {
-  if (viewerUserId === subjectUserId) {
-    reportingFail('SUBJECT_EXCLUDED', 'protected feedback is not readable by its subject', 403)
-  }
+  if (viewerUserId === subjectUserId) reportingFail('SUBJECT_EXCLUDED', 'protected feedback is not readable by its subject', 403)
 }
 
 const hasTeacherSubjectScope = async (input: {
@@ -117,7 +94,6 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
   organizationId: string
   subjectUserId: string
 }): Promise<void> => {
-  // Explicit subject deny precedes every platform/Organization allow basis.
   assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
   const context = requireCurrentProtectedContext(await resolveOrganizationAccessContext({
     principal: input.principal,
@@ -129,9 +105,6 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
     || context.explicitDenies.includes('REPORT_READ')
     || context.explicitDenies.includes(ORG_PROTECTED_FEEDBACK_POLICY)
   ) hidden()
-
-  // SYSTEM_ADMIN alone is not sensitive-content authority. A current Organization
-  // role/capability/relationship is still required.
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (context.personas.includes('TEACHER')) {
     if (await hasTeacherSubjectScope({
@@ -203,7 +176,7 @@ export const buildProtectedFeedbackProjection = (input: {
   const contributorFloor = Math.max(input.spec.minimumContributorN, sourceFloor)
   const overallPresent = observations.length >= eligibleFloor && completed.length >= contributorFloor
   const metricValidN: Record<string, number> = {}
-  const metrics: Record<string, ReportingProtectedMetricProjectionV1> = {}
+  const metrics: NonNullable<ReportingProtectedFeedbackProjectionV1['metrics']> = {}
 
   for (const rule of input.spec.metricRules) {
     const values: number[] = []
@@ -227,11 +200,7 @@ export const buildProtectedFeedbackProjection = (input: {
     }
   }
 
-  const internalCounts = {
-    eligibleRespondentN: observations.length,
-    resultContributorN: completed.length,
-    metricValidN,
-  }
+  const internalCounts = { eligibleRespondentN: observations.length, resultContributorN: completed.length, metricValidN }
   if (!overallPresent) {
     return {
       internalCounts,

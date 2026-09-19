@@ -33,6 +33,9 @@ export interface ReportingSeparatedMultiRaterV1 {
   limitations: ['NO_CROSS_RATER_COMBINATION']
 }
 
+type MultiRaterMetricRuleV1 = Pick<ReportingMetricRuleV1,
+  'metricId' | 'sourceMetricKey' | 'acceptedResultQuality' | 'acceptedMetricQuality'>
+
 const observationKey = (observation: ReportingResolvedObservationV1 | ReportingUnresolvedObservationV1): string => [
   observation.trackId,
   observation.relationshipKind,
@@ -40,7 +43,7 @@ const observationKey = (observation: ReportingResolvedObservationV1 | ReportingU
   observation.respondent.userId,
 ].join('\u0000')
 
-const metricsFor = (observation: ReportingResolvedObservationV1, rules: ReportingMetricRuleV1[]): Record<string, ReportingSeparatedMetricV1> => {
+const metricsFor = (observation: ReportingResolvedObservationV1, rules: ReadonlyArray<MultiRaterMetricRuleV1>): Record<string, ReportingSeparatedMetricV1> => {
   const output: Record<string, ReportingSeparatedMetricV1> = {}
   for (const rule of rules) {
     const candidates = observation.metrics.filter((metric) => metric.key === rule.sourceMetricKey)
@@ -63,7 +66,7 @@ const metricsFor = (observation: ReportingResolvedObservationV1, rules: Reportin
 export const buildSeparatedMultiRaterObservations = (input: {
   subjectUserId: string
   batches: ReportingObservationBatchV1[]
-  metricRules: ReportingMetricRuleV1[]
+  metricRules: ReadonlyArray<MultiRaterMetricRuleV1>
   allowedExecutionIds: ReadonlySet<string>
 }): ReportingSeparatedMultiRaterV1 => {
   if (!input.subjectUserId) reportingFail('REPORT_MULTI_RATER_SUBJECT_REQUIRED', 'multi-rater subject is required', 400)
