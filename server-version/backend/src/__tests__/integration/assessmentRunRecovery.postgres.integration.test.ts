@@ -143,7 +143,7 @@ suite('Assessment Run external START recovery gate (real PostgreSQL)', () => {
     const recovered = await startAssessmentRunExecution({ ...execution, resourceRegistry, runtimeAdapters: adapters })
     expect(recovered).toMatchObject({ state: 'STARTED', runtimeBindingRef: recoveredBinding.runtimeBindingRef, replayed: true })
     const after = await db.$queryRawUnsafe<Array<{ operationKey: string; claimGeneration: number; state: string }>>(
-      `SELECT operation_key AS "operationKey", claim_generation AS "claimGeneration", state FROM assessment_run_execution_start_claimims WHERE execution_id=$1`,
+      `SELECT operation_key AS "operationKey", claim_generation AS "claimGeneration", state FROM assessment_run_execution_start_claims WHERE execution_id=$1`,
       execution.executionId,
     )
     expect(after[0].operationKey).toBe(operationKey)
