@@ -90,6 +90,8 @@ export const assessmentRunController = {
     if (!req.user) return unauthorized(res)
     try {
       return success(res, await startAssessmentRunExecution({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
       }))
@@ -98,8 +100,12 @@ export const assessmentRunController = {
 
   async progress(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    try { return success(res, await readAssessmentRunProgress(req.params.runId)) }
-    catch (err) { return fail(res, err) }
+    try {
+      return success(res, await readAssessmentRunProgress(
+        req.params.organizationId,
+        req.params.runId,
+      ))
+    } catch (err) { return fail(res, err) }
   },
 
   async close(req: Request, res: Response) {
