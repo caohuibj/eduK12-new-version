@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrganization } from '../../contexts/OrganizationContext'
@@ -9,12 +10,19 @@ import OrganizationRunDetailPage from './OrganizationRunDetailPage'
 import OrganizationReportingPage from './OrganizationReportingPage'
 import OrganizationDeliveryPage from './OrganizationDeliveryPage'
 
+type RouteContextCheck = {
+  key: string
+  status: 'checking' | 'verified' | 'failed'
+}
+
 export default function OrganizationProductRoutes() {
   const { user, isLoading } = useAuth()
-  const { active } = useOrganization()
+  const { active, activeError, selectOrganization } = useOrganization()
   const location = useLocation()
   const routeOrganizationId = location.pathname.split('/')[2] || ''
   const context = active?.organization.id === routeOrganizationId ? active : null
+  const routeContextKey = user && routeOrganizationId ? `${user.id}:${routeOrganizationId}` : ''
+  const [routeContextCheck, setRouteContextCheck] = useState<RouteContextCheck | null>(null)
   const explicitDenies = context?.access.explicitDenies ?? []
   const hasDeny = (...permissions: string[]) => explicitDenies.some((permission) => permission === '*' || permissions.includes(permission))
   const reportingDenied = hasDeny('REPORT_READ', 'ORG_GROUP_REPORT_V1')
@@ -54,6 +62,29 @@ export default function OrganizationProductRoutes() {
   )
   const canOpenDelivery = canExportAggregate || canExportMember || canOpenSafety
 
+  useEffect(() => {
+    if (isLoading || !user || !routeOrganizationId || !routeContextKey) return
+    if (context) {
+      setRouteContextCheck((current) => current?.key === routeContextKey && current.status === 'verified'
+        ? current
+        : { key: routeContextKey, status: 'verified' })
+      return
+    }
+
+    let cancelled = false
+    setRouteContextCheck({ key: routeContextKey, status: 'checking' })
+    void selectOrganization(routeOrganizationId).then((projection) => {
+      if (cancelled) return
+      setRouteContextCheck({
+        key: routeContextKey,
+        status: projection?.organization.id === routeOrganizationId ? 'verified' : 'failed',
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [context, isLoading, routeContextKey, routeOrganizationId, selectOrganization, user])
+
   if (isLoading) return <RouteLoading />
   if (!user) {
     return (
@@ -65,13 +96,27 @@ export default function OrganizationProductRoutes() {
     )
   }
 
+  if (routeOrganizationId && !context) {
+    const currentCheck = routeContextCheck?.key === routeContextKey ? routeContextCheck : null
+    if (currentCheck?.status === 'failed') {
+      return (
+        <ProductPage>
+          <ProductStatus kind="error" title="无法进入组织空间" actions={<Link to="/">返回首页</Link>}>
+            {activeError || '当前账户没有此组织的有效访问上下文。'}
+          </ProductStatus>
+        </ProductPage>
+      )
+    }
+    return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  }
+
   const organizationRoot = `/organizations/${encodeURIComponent(routeOrganizationId)}`
   return (
     <>
-      {routeOrganizationId && (
+      {routeOrganizationId && context && (
         <nav className="hui-product mb-4 flex flex-wrap gap-3 text-sm" aria-label="Organization 产品导航">
           <Link to={organizationRoot}>组织</Link>
-          {context?.access.canGovern && <Link to={`${organizationRoot}/runs`}>Runs</Link>}
+          {context.access.canGovern && <Link to={`${organizationRoot}/runs`}>Runs</Link>}
           {canOpenReporting && <Link to={`${organizationRoot}/reporting`}>Reporting</Link>}
           {canOpenDelivery && <Link to={`${organizationRoot}/delivery`}>Safety / CSV</Link>}
         </nav>
