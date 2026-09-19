@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/auth'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
 import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
+import { organizationAdminController } from './organization.admin.controller'
 import { organizationController } from './organization.controller'
 
 const router = Router()
@@ -27,6 +28,7 @@ router.get('/:organizationId/context', authenticate, organizationController.read
 router.post('/', authenticate, organizationController.create)
 
 router.get('/:organizationId/memberships', authenticate, requireOrganizationGovernance, organizationController.listMemberships)
+router.get('/:organizationId/memberships/:membershipId/access-history', authenticate, requireOrganizationGovernance, organizationAdminController.membershipAccessHistory)
 router.post('/:organizationId/suspend', authenticate, requireOrganizationGovernance, organizationController.suspend)
 router.post('/:organizationId/resume', authenticate, requireOrganizationGovernance, organizationController.resume)
 router.post('/:organizationId/memberships', authenticate, requireOrganizationGovernance, organizationController.createMembership)
@@ -41,6 +43,19 @@ router.post('/:organizationId/memberships/:membershipId/capabilities/revoke', au
 // requireOrganizationGovernance and continue to honor explicit deny first.
 router.post('/:organizationId/access-denies', authenticate, requireOrganizationDenyGovernance, organizationController.deny)
 router.post('/:organizationId/access-denies/lift', authenticate, requireOrganizationDenyGovernance, organizationController.liftDeny)
+
+// Thin product adapters over the already-tested Organization structure and
+// class-relationship services. All reads and writes remain governance-scoped;
+// temporal episodes are returned as history rather than collapsed into flags.
+router.get('/:organizationId/units', authenticate, requireOrganizationGovernance, organizationAdminController.listUnits)
+router.post('/:organizationId/units', authenticate, requireOrganizationGovernance, organizationAdminController.createUnit)
+router.delete('/:organizationId/units/:unitId', authenticate, requireOrganizationGovernance, organizationAdminController.deleteUnit)
+router.get('/:organizationId/student-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.listStudentClassAssignments)
+router.post('/:organizationId/student-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStudent)
+router.post('/:organizationId/student-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStudentAssignment)
+router.get('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.listStaffClassAssignments)
+router.post('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStaff)
+router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStaffAssignment)
 
 // Organization Run V1. Draft governance and lifecycle management are tenant-governance
 // operations. Publish intentionally delegates scoped TEACHER/COUNSELOR authority to
