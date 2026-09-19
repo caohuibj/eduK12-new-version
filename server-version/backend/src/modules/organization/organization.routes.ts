@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
+import { reportingDiscoveryController } from '../reporting/discovery.controller'
 import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
 import { organizationAdminController } from './organization.admin.controller'
 import { organizationController } from './organization.controller'
@@ -73,10 +74,11 @@ router.post('/:organizationId/runs/:runId/cancel', authenticate, requireOrganiza
 router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, assessmentRunController.acceptConsent)
 router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
 
-// Reporting keeps one analysis/artifact authority. Series/Wave bindings are
-// immutable scoped resources; analysis/read dispatches server-side by governed
-// analysisKind/policyDomain. Protected requests never accept actor-role or
-// privacy overrides from clients.
+// Reporting keeps one analysis/artifact authority. Product discovery is a
+// bounded, server-authorized summary over published Specs and Organization
+// Series/Waves; it never exposes raw observations or expands report authority.
+router.get('/:organizationId/reporting/specs', authenticate, reportingDiscoveryController.listSpecs)
+router.get('/:organizationId/reporting/series', authenticate, reportingDiscoveryController.listSeries)
 router.post('/:organizationId/reporting/series', authenticate, reportingController.createSeries)
 router.post('/:organizationId/reporting/series/:seriesId/waves', authenticate, reportingController.bindWave)
 router.post('/:organizationId/reporting/exports', authenticate, reportingController.createExport)
