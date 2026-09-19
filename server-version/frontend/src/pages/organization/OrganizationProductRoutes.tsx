@@ -15,7 +15,9 @@ export default function OrganizationProductRoutes() {
   const location = useLocation()
   const routeOrganizationId = location.pathname.split('/')[2] || ''
   const context = active?.organization.id === routeOrganizationId ? active : null
-  const reportingDenied = context?.access.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'ORG_GROUP_REPORT_V1'].includes(permission)) === true
+  const explicitDenies = context?.access.explicitDenies ?? []
+  const hasDeny = (...permissions: string[]) => explicitDenies.some((permission) => permission === '*' || permissions.includes(permission))
+  const reportingDenied = hasDeny('REPORT_READ', 'ORG_GROUP_REPORT_V1')
   const canOpenReporting = Boolean(
     context?.organization.status === 'ACTIVE'
     && context.access.membershipId
@@ -27,22 +29,30 @@ export default function OrganizationProductRoutes() {
       || context.access.personas.includes('COUNSELOR')
     ),
   )
-  const deliveryDenied = context?.access.explicitDenies.some((permission) => ['*', 'REPORT_READ'].includes(permission)) === true
-  const safetyDenied = context?.access.explicitDenies.some((permission) => ['*', 'REPORT_READ', 'SAFETY_READ'].includes(permission)) === true
-  const canOpenDelivery = Boolean(
+  const canExportAggregate = Boolean(
+    context?.organization.status === 'ACTIVE'
+    && context.access.membershipId
+    && context.access.capabilities.includes('REPORT_EXPORT')
+    && !hasDeny('REPORT_READ', 'REPORT_EXPORT'),
+  )
+  const canExportMember = Boolean(
+    context?.organization.status === 'ACTIVE'
+    && context.access.membershipId
+    && context.access.capabilities.includes('REPORT_MEMBER_EXPORT')
+    && !hasDeny('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT'),
+  )
+  const safetyDenied = hasDeny('REPORT_READ', 'SAFETY_READ')
+  const canOpenSafety = Boolean(
     context?.access.membershipId
-    && !deliveryDenied
+    && !safetyDenied
     && (
-      context.access.capabilities.includes('REPORT_EXPORT')
-      || context.access.capabilities.includes('REPORT_MEMBER_EXPORT')
-      || (!safetyDenied && (
-        context.access.orgRole === 'ORG_ADMIN'
-        || context.access.capabilities.includes('PSYCHOLOGY_STAFF')
-        || context.access.personas.includes('TEACHER')
-        || context.access.personas.includes('COUNSELOR')
-      ))
+      (context.organization.status === 'ACTIVE' && context.access.orgRole === 'ORG_ADMIN')
+      || context.access.capabilities.includes('PSYCHOLOGY_STAFF')
+      || context.access.personas.includes('TEACHER')
+      || context.access.personas.includes('COUNSELOR')
     ),
   )
+  const canOpenDelivery = canExportAggregate || canExportMember || canOpenSafety
 
   if (isLoading) return <RouteLoading />
   if (!user) {
@@ -66,7 +76,7 @@ export default function OrganizationProductRoutes() {
           {canOpenDelivery && <Link to={`${organizationRoot}/delivery`}>Safety / CSV</Link>}
         </nav>
       )}
-      <Routes>
+      <Routes key={location.pathname}>
         <Route path="/organizations/:organizationId" element={<OrganizationAdminPage />} />
         <Route path="/organizations/:organizationId/runs" element={<OrganizationRunListPage />} />
         <Route path="/organizations/:organizationId/runs/:runId" element={<OrganizationRunDetailPage />} />
