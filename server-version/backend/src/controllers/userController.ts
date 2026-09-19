@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { clearSessionCookie } from '../utils/authCookies'
 import path from 'node:path'
 import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
+import { setUserActiveState, UserLifecycleError } from '../services/userLifecycleService'
 
 const createUserSchema = z.object({
   username: z.string().min(3, '用户名至少3个字符'),
@@ -21,6 +22,8 @@ const updateUserSchema = z.object({
   nickname: z.string().optional(),
   avatarUrl: z.string().optional(),
   phone: z.string().optional(),
+  // Compatibility input only. The controller never writes this field directly;
+  // it delegates to the platform-authoritative lifecycle service.
   isActive: z.boolean().optional(),
 })
 
@@ -214,6 +217,33 @@ export const userController = {
         return error(res, result.error.errors[0].message)
       }
 
+      // Account activation/deactivation is not a generic profile mutation.
+      // Preserve the legacy PUT shape for clients, but delegate the authority
+      // and invariant to the platform lifecycle service before any legacy-role
+      // profile authorization can run.
+      if (result.data.isActive !== undefined) {
+        const hasProfileMutation =
+          result.data.nickname !== undefined ||
+          result.data.avatarUrl !== undefined ||
+          result.data.phone !== undefined
+        if (hasProfileMutation) {
+          return error(res, '账号启停不能与资料修改在同一请求中提交', -1, 400)
+        }
+        try {
+          const lifecycle = await setUserActiveState({
+            actorUserId: req.user!.userId,
+            targetUserId: id,
+            isActive: result.data.isActive,
+          })
+          return success(res, lifecycle, result.data.isActive ? '用户已启用' : '用户已停用')
+        } catch (err) {
+          if (err instanceof UserLifecycleError) {
+            return error(res, err.message, -1, err.statusCode)
+          }
+          throw err
+        }
+      }
+
       const user = await prisma.user.findUnique({
         where: { id }
       })
@@ -222,22 +252,15 @@ export const userController = {
         return notFound(res, '用户不存在')
       }
 
-      // 权限检查：只能修改自己或管理员修改任何人
+      // Legacy profile authorization remains unchanged. It does not grant any
+      // Organization or platform lifecycle authority.
       if (id !== currentUserId && currentUserRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限修改此用户')
       }
 
-      // 账号启停是管理动作，不能由用户通过自助资料接口修改自己的状态。
-      if (result.data.isActive !== undefined && currentUserRole !== UserRole.ADMIN) {
-        return forbidden(res, '只有管理员可以修改账号状态')
-      }
-
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: {
-          ...result.data,
-          ...(result.data.isActive !== undefined ? { tokenVersion: { increment: 1 } } : {}),
-        },
+        data: result.data,
         select: {
           id: true,
           username: true,
@@ -254,30 +277,6 @@ export const userController = {
       return success(res, updatedUser, '用户更新成功')
     } catch (err) {
       logger.error('更新用户错误', err)
-      return error(res, Messages.COMMON.FAILED)
-    }
-  },
-
-  // 删除用户（管理员）
-  async delete(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-
-      const user = await prisma.user.findUnique({
-        where: { id }
-      })
-
-      if (!user) {
-        return notFound(res, '用户不存在')
-      }
-
-      await prisma.user.delete({
-        where: { id }
-      })
-
-      return success(res, null, '用户已删除')
-    } catch (err) {
-      logger.error('删除用户错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },

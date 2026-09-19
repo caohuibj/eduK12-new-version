@@ -14,10 +14,10 @@ import { logger } from '../utils/logger'
 import { getRedisUrl } from '../config/redis'
 import { config } from '../config'
 import { verifyToken } from '../utils/jwt'
-import { prisma } from '../config/database'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { UserRole } from '../types'
 import { getCookieValue } from '../utils/authCookies'
+import { loadCurrentPrincipal } from '../modules/organization/principal'
 
 type SocketNext = (error?: Error) => void
 export type SocketRedisState = 'ready' | 'degraded' | 'failed'
@@ -67,8 +67,6 @@ export class SocketService {
           client.disconnect()
         }
       } catch {
-        // Shutdown is best effort; another client and the HTTP server still
-        // need their own close attempt.
         try {
           client.disconnect?.()
         } catch {
@@ -80,9 +78,6 @@ export class SocketService {
     this.redisClientsClosing = false
   }
 
-  /**
-   * 初始化 Socket.IO 服务器
-   */
   async initialize(server: HttpServer): Promise<void> {
     const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '10000')
 
@@ -100,7 +95,6 @@ export class SocketService {
 
     this.classroomNamespace = this.io.of('/classroom')
 
-    // 配置 Redis Adapter（支持 PM2 集群模式）。连接串不得写入日志。
     try {
       const redisUrl = getRedisUrl()
 
@@ -126,7 +120,6 @@ export class SocketService {
       this.redisState = 'degraded'
     }
 
-    // 连接数限制和 Socket JWT 认证中间件
     this.classroomNamespace.use(async (socket: Socket, next: SocketNext) => {
       try {
         const connectedClients = this.classroomNamespace.sockets.size
@@ -151,39 +144,25 @@ export class SocketService {
             return next(new Error('Socket认证失败'))
           }
 
-          const user = await prisma.user.findUnique({
-            where: { id: payload.userId },
-            select: {
-              id: true,
-              role: true,
-              isActive: true,
-              isFrozen: true,
-              expiresAt: true,
-              teacherApproved: true,
-              tokenVersion: true,
-              mustChangePassword: true,
-            },
-          })
-
-          const rejection = inactiveAccountMessage(user)
+          const principal = await loadCurrentPrincipal(payload.userId)
+          const rejection = inactiveAccountMessage(principal)
           if (rejection) {
             return next(new Error(rejection))
           }
 
-          if (payload.tokenVersion !== user!.tokenVersion) {
+          if (payload.tokenVersion !== principal!.tokenVersion) {
             return next(new Error('Socket认证令牌已失效'))
           }
 
-          if (user!.mustChangePassword) {
+          if (principal!.mustChangePassword) {
             return next(new Error('首次登录必须先修改密码'))
           }
 
           socket.data.authenticated = true
-          socket.data.userId = user!.id
+          socket.data.userId = principal!.userId
           socket.data.tokenVersion = payload.tokenVersion
-          // Always use the current database role, never the JWT role or a
-          // client-supplied role.
-          socket.data.userRole = user!.role
+          socket.data.userRole = principal!.role
+          socket.data.platformRole = principal!.platformRole
         }
 
         logger.debug('Socket连接认证完成', {
@@ -205,7 +184,7 @@ export class SocketService {
   /**
    * Re-check the account behind an already-connected privileged socket.
    * Handshake authentication is not enough because an administrator can
-   * freeze, deactivate, expire, or change the role of an account while the
+   * freeze, deactivate, expire, or change either authority role while the
    * socket remains open.
    */
   async refreshAuthenticatedSocket(socket: Socket): Promise<boolean> {
@@ -217,50 +196,35 @@ export class SocketService {
     }
 
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: socket.data.userId },
-        select: {
-          id: true,
-          role: true,
-          isActive: true,
-          isFrozen: true,
-          expiresAt: true,
-          teacherApproved: true,
-          tokenVersion: true,
-          mustChangePassword: true,
-        },
-      })
+      const principal = await loadCurrentPrincipal(socket.data.userId)
 
       if (
-        !user ||
-        inactiveAccountMessage(user) ||
-        user.mustChangePassword ||
-        user.tokenVersion !== socket.data.tokenVersion
+        !principal ||
+        inactiveAccountMessage(principal) ||
+        principal.mustChangePassword ||
+        principal.tokenVersion !== socket.data.tokenVersion
       ) {
         socket.data.authenticated = false
         socket.data.userId = undefined
         socket.data.userRole = undefined
+        socket.data.platformRole = undefined
         socket.data.tokenVersion = undefined
         return false
       }
 
-      socket.data.userRole = user.role
+      socket.data.userRole = principal.role
+      socket.data.platformRole = principal.platformRole
       return true
     } catch {
-      // Fail closed if the account cannot be revalidated.
       socket.data.authenticated = false
       socket.data.userId = undefined
       socket.data.userRole = undefined
+      socket.data.platformRole = undefined
       socket.data.tokenVersion = undefined
       return false
     }
   }
 
-  /**
-   * Revalidate every manager socket in a room before sensitive manager-only
-   * data is broadcast. fetchSockets also covers sockets connected to another
-   * process when the Redis adapter is active.
-   */
   async revalidateManagerSockets(room: string): Promise<boolean> {
     if (!this.classroomNamespace) {
       return false
@@ -282,15 +246,11 @@ export class SocketService {
       )
       return true
     } catch {
-      // Do not send manager-only data when the room cannot be revalidated.
       logger.error('课堂 manager Socket 撤权校验失败')
       return false
     }
   }
 
-  /**
-   * 获取课堂命名空间
-   */
   getClassroomNamespace(): any {
     if (!this.classroomNamespace) {
       throw new Error('Socket.IO 服务未初始化')
@@ -298,9 +258,6 @@ export class SocketService {
     return this.classroomNamespace
   }
 
-  /**
-   * 获取 Socket.IO 服务器实例
-   */
   getIO(): Server {
     if (!this.io) {
       throw new Error('Socket.IO 服务未初始化')
@@ -308,9 +265,6 @@ export class SocketService {
     return this.io
   }
 
-  /**
-   * 关闭 Socket.IO 服务器
-   */
   async close(): Promise<void> {
     const io = this.io
     this.io = null
@@ -329,9 +283,6 @@ export class SocketService {
     this.redisState = 'degraded'
   }
 
-  /**
-   * 获取房间内的所有 Socket ID
-   */
   async getSocketsInRoom(room: string): Promise<string[]> {
     if (!this.classroomNamespace) {
       return []
@@ -341,17 +292,11 @@ export class SocketService {
     return sockets.map((socket: Socket) => socket.id)
   }
 
-  /**
-   * 获取房间内的连接数
-   */
   async getRoomConnectionCount(room: string): Promise<number> {
     const sockets = await this.getSocketsInRoom(room)
     return sockets.length
   }
 
-  /**
-   * 向房间广播消息
-   */
   broadcastToRoom(room: string, event: string, data: any): void {
     if (!this.classroomNamespace) {
       logger.error('课堂命名空间未初始化')
@@ -359,13 +304,9 @@ export class SocketService {
     }
 
     this.classroomNamespace.to(room).emit(event, data)
-    // Do not include payloads: question content and answers can be sensitive.
     logger.debug('课堂房间广播完成', { room, event })
   }
 
-  /**
-   * 向特定 Socket 发送消息
-   */
   sendToSocket(socketId: string, event: string, data: any): void {
     if (!this.classroomNamespace) {
       logger.error('课堂命名空间未初始化')

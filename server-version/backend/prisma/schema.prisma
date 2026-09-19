@@ -12,6 +12,7 @@ model User {
   username                            String                           @unique
   passwordHash                        String                           @map("password_hash")
   role                                UserRole                         @default(STUDENT)
+  platformRole                        PlatformRole                     @default(STANDARD) @map("platform_role")
   nickname                            String?
   avatarUrl                           String?                          @map("avatar_url")
   phone                               String?
@@ -79,7 +80,154 @@ model User {
   safetyCasesAsSubject          SafetyCase[]                @relation("SafetyCaseSubject")
   safetyCasesAsPrimaryOwner     SafetyCase[]                @relation("SafetyCasePrimaryOwner")
 
+  // Organization / Reporting V2.1 identity authority
+  organizationsCreated                 Organization[]                @relation("OrganizationCreator")
+  organizationMemberships              OrganizationMembership[]      @relation("OrganizationMembershipUser")
+  organizationMembershipsEnded         OrganizationMembership[]      @relation("OrganizationMembershipEnder")
+  organizationPersonaGrantsGiven       OrganizationPersonaGrant[]    @relation("OrganizationPersonaGrantGranter")
+  organizationPersonaGrantsRevoked     OrganizationPersonaGrant[]    @relation("OrganizationPersonaGrantRevoker")
+  organizationCapabilityGrantsGiven    OrganizationCapabilityGrant[] @relation("OrganizationCapabilityGrantGranter")
+  organizationCapabilityGrantsRevoked  OrganizationCapabilityGrant[] @relation("OrganizationCapabilityGrantRevoker")
+  organizationAccessDeniesReceived     OrganizationAccessDeny[]      @relation("OrganizationAccessDenySubject")
+  organizationAccessDeniesGiven        OrganizationAccessDeny[]      @relation("OrganizationAccessDenyDenier")
+  organizationAccessDeniesLifted       OrganizationAccessDeny[]      @relation("OrganizationAccessDenyLifter")
+  organizationGovernanceAudits         OrganizationGovernanceAudit[] @relation("OrganizationGovernanceAuditActor")
+  organizationCommandReceipts          OrganizationCommandReceipt[]  @relation("OrganizationCommandReceiptActor")
+
   @@map("users")
+}
+
+
+// ==================== Organization / Reporting V2.1 identity authority ====================
+// PostgreSQL-only partial/expression indexes, CHECK constraints, and the
+// append-only audit trigger remain authoritative in the handwritten migrations.
+model Organization {
+  id              String    @id
+  name            String
+  status          String    @default("ACTIVE")
+  createdByUserId String    @map("created_by_user_id")
+  suspendedAt     DateTime? @map("suspended_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  createdBy        User                          @relation("OrganizationCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  memberships      OrganizationMembership[]
+  accessDenies     OrganizationAccessDeny[]
+  governanceAudits OrganizationGovernanceAudit[]
+  commandReceipts  OrganizationCommandReceipt[]
+
+  @@map("organizations")
+}
+
+model OrganizationMembership {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  userId         String    @map("user_id")
+  orgRole        String    @default("MEMBER") @map("org_role")
+  validFrom      DateTime  @default(now()) @map("valid_from") @db.Timestamptz(6)
+  validUntil     DateTime? @map("valid_until") @db.Timestamptz(6)
+  endedByUserId  String?   @map("ended_by_user_id")
+  endReason      String?   @map("end_reason")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  organization     Organization                  @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_organization_id_fkey")
+  user             User                          @relation("OrganizationMembershipUser", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_user_id_fkey")
+  endedBy          User?                         @relation("OrganizationMembershipEnder", fields: [endedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_memberships_ended_by_user_id_fkey")
+  personaGrants    OrganizationPersonaGrant[]
+  capabilityGrants OrganizationCapabilityGrant[]
+
+  @@unique([organizationId, id], map: "organization_memberships_org_id_id_key")
+  @@index([userId, organizationId, validFrom(sort: Desc)], map: "organization_memberships_user_history_idx")
+  @@map("organization_memberships")
+}
+
+model OrganizationPersonaGrant {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  membershipId    String    @map("membership_id")
+  persona         String
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?   @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  membership OrganizationMembership @relation(fields: [organizationId, membershipId], references: [organizationId, id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_membership_fkey")
+  grantedBy  User                   @relation("OrganizationPersonaGrantGranter", fields: [grantedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_granted_by_fkey")
+  revokedBy  User?                  @relation("OrganizationPersonaGrantRevoker", fields: [revokedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_persona_grants_revoked_by_fkey")
+
+  @@index([organizationId, membershipId], map: "organization_persona_grants_org_membership_idx")
+  @@map("organization_persona_grants")
+}
+
+model OrganizationCapabilityGrant {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  membershipId    String    @map("membership_id")
+  capability      String
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?   @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  membership OrganizationMembership @relation(fields: [organizationId, membershipId], references: [organizationId, id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_membership_fkey")
+  grantedBy  User                   @relation("OrganizationCapabilityGrantGranter", fields: [grantedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_granted_by_fkey")
+  revokedBy  User?                  @relation("OrganizationCapabilityGrantRevoker", fields: [revokedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_capability_grants_revoked_by_fkey")
+
+  @@index([organizationId, membershipId], map: "organization_capability_grants_org_membership_idx")
+  @@map("organization_capability_grants")
+}
+
+model OrganizationAccessDeny {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  userId         String    @map("user_id")
+  permission     String
+  reason         String
+  deniedByUserId String    @map("denied_by_user_id")
+  deniedAt       DateTime  @default(now()) @map("denied_at") @db.Timestamptz(6)
+  liftedByUserId String?   @map("lifted_by_user_id")
+  liftedAt       DateTime? @map("lifted_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_org_fkey")
+  user         User         @relation("OrganizationAccessDenySubject", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_user_fkey")
+  deniedBy     User         @relation("OrganizationAccessDenyDenier", fields: [deniedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_denied_by_fkey")
+  liftedBy     User?        @relation("OrganizationAccessDenyLifter", fields: [liftedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_access_denies_lifted_by_fkey")
+
+  @@map("organization_access_denies")
+}
+
+model OrganizationGovernanceAudit {
+  id             String   @id
+  organizationId String?  @map("organization_id")
+  actorUserId    String   @map("actor_user_id")
+  action         String
+  targetType     String   @map("target_type")
+  targetId       String?  @map("target_id")
+  domainEventId  String   @unique(map: "organization_governance_audits_domain_event_id_key") @map("domain_event_id")
+  payload        Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_governance_audits_org_fkey")
+  actor        User          @relation("OrganizationGovernanceAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_governance_audits_actor_fkey")
+
+  @@index([organizationId, createdAt(sort: Desc)], map: "organization_governance_audits_org_created_idx")
+  @@map("organization_governance_audits")
+}
+
+model OrganizationCommandReceipt {
+  id             String   @id
+  actorUserId    String   @map("actor_user_id")
+  organizationId String?  @map("organization_id")
+  commandKey     String   @map("command_key")
+  payloadHash    String   @map("payload_hash")
+  response       Json
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor        User          @relation("OrganizationCommandReceiptActor", fields: [actorUserId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_command_receipts_actor_fkey")
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "organization_command_receipts_org_fkey")
+
+  @@index([createdAt], map: "organization_command_receipts_created_idx")
+  @@map("organization_command_receipts")
 }
 
 model TeacherCode {
@@ -348,6 +496,11 @@ model Video {
 
   @@index([status, processingStartedAt])
   @@map("videos")
+}
+
+enum PlatformRole {
+  SYSTEM_ADMIN
+  STANDARD
 }
 
 enum UserRole {
