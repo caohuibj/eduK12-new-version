@@ -3,6 +3,7 @@ import { authController } from '../controllers/authController'
 import { authenticate, requireAdmin } from '../middleware/auth'
 import { issueCsrfToken } from '../utils/authCookies'
 import { loginRateLimit } from '../middleware/loginRateLimit'
+import { requirePositiveAccountExtension } from '../middleware/accountExtensionValidation'
 import rateLimit from 'express-rate-limit'
 
 const router = Router()
@@ -38,7 +39,7 @@ router.get('/me', authenticate, authController.me)
 router.post('/change-password', authenticate, authController.changePassword)
 router.post('/logout', authenticate, authController.logout)
 
-// 管理员专属接口 - 账号延期
-router.post('/extend-account', authenticate, requireAdmin, authController.extendAccount)
+// 管理员专属接口 - 仅允许延期，不允许通过负 months 缩短有效期。
+router.post('/extend-account', authenticate, requireAdmin, requirePositiveAccountExtension, authController.extendAccount)
 
 export default router
