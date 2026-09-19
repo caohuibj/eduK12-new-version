@@ -33,17 +33,17 @@ const assertIndividualRespondentReport = (assignment: {
 
 const aggregateOnlyCompositeAttempt = async (
   db: any,
-  input: { attemptId: string; userId: string },
+  input: { attemptId: string; userId?: string },
 ): Promise<boolean> => {
   const attempt = await db.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
     select: { userId: true, assignmentRef: true },
   })
-  if (!attempt || attempt.userId !== input.userId || !attempt.assignmentRef) return false
+  if (!attempt || (input.userId && attempt.userId !== input.userId) || !attempt.assignmentRef) return false
 
   const assignment = await createSqlRelationalAssignmentRepository(db as any).findById(attempt.assignmentRef)
     ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
-  if (assignment.respondentUserId !== input.userId) {
+  if (input.userId && assignment.respondentUserId !== input.userId) {
     relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime respondent does not match the signed-in participant')
   }
   return assignment.perspective === 'RELATIONAL_EXPERIENCE' || assignment.analysisMode === 'COHORT_AGGREGATE'
@@ -53,17 +53,24 @@ export const createRelationalProductReportService = (
   db: any = prisma,
   registry: RelationalProductRegistryV1 = relationalProductRegistry,
 ) => ({
-  /**
-   * Guard the generic participant Composite report endpoint. Historical/non-relational
-   * attempts remain unchanged; relational-experience attempts fail closed so a
-   * respondent cannot bypass the product UI by guessing an attempt URL.
-   */
+  /** Respondent-specific compatibility guard retained for existing callers. */
   async assertRespondentReportAllowed(input: {
     attemptId: string
     userId: string
   }): Promise<void> {
     if (await aggregateOnlyCompositeAttempt(db, input)) {
       relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'relational-experience results are available only through minimum-N cohort projection')
+    }
+  },
+
+  /**
+   * Generic Composite report/export surfaces must reject aggregate/protected
+   * relational attempts for every viewer, including teachers and admins.
+   * The owning policy surface is responsible for any permitted projection.
+   */
+  async assertGenericCompositeReportAllowed(input: { attemptId: string }): Promise<void> {
+    if (await aggregateOnlyCompositeAttempt(db, input)) {
+      relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'aggregate relational attempts cannot use generic Composite report/export routes')
     }
   },
 
@@ -112,6 +119,17 @@ export const createRelationalProductReportService = (
       attemptId: assessment.compositeAttemptId,
       userId: input.userId,
     })
+  },
+
+  async assertGenericScaleReportAllowed(input: { assessmentId: string }): Promise<void> {
+    const assessment = await db.assessment.findUnique({
+      where: { id: input.assessmentId },
+      select: { compositeAttemptId: true, status: true },
+    })
+    if (!assessment?.compositeAttemptId || assessment.status !== 'COMPLETED') return
+    if (await aggregateOnlyCompositeAttempt(db, { attemptId: assessment.compositeAttemptId })) {
+      relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'aggregate relational assessments cannot use generic Scale/Questionnaire report routes')
+    }
   },
 
   async respondentReportTarget(input: {
@@ -201,7 +219,8 @@ export const createRelationalProductReportService = (
     const repository = createSqlRelationalAssignmentRepository(db as any)
     const expectedHash = registry.applicabilityHash(entry)
     const candidates = (await repository.listForSubject(input.userId, 200)).filter((assignment) => (
-      assignment.subjectRole === 'TEACHER'
+      assignment.policyDomain === 'LEGACY_COURSE'
+      && assignment.subjectRole === 'TEACHER'
       && assignment.perspective === 'RELATIONAL_EXPERIENCE'
       && assignment.analysisMode === 'COHORT_AGGREGATE'
       && assignment.relationshipKind === 'COURSE_TEACHER_STUDENT'
@@ -227,9 +246,6 @@ export const createRelationalProductReportService = (
       return { ...base, state: 'EMPTY' as const, respondentCount: null, snapshot: null }
     }
 
-    // New RA-02 issuance uses one deterministic cohort episode. For compatibility
-    // with any pre-release rows, select the most recently active episode rather
-    // than mixing assignments across episodes.
     const episodeLatest = new Map<string, string>()
     for (const assignment of candidates) {
       const previous = episodeLatest.get(assignment.episodeId)
@@ -250,10 +266,6 @@ export const createRelationalProductReportService = (
 
     const seed = cohort[0]
     const expectedPolicyHash = hashRelationalCohortPolicy(authoritativeCohortPolicy)
-    // Do not pre-reuse by respondentCount. A revoke/replace can keep N stable
-    // while changing the authoritative completed assignment set. The
-    // materializer compares the exact snapshotHash and reuses only when the
-    // frozen inputs are identical.
     const snapshot = await createRelationalProductCohortMaterializer(db).materialize({
       assignments: completed,
       policy: authoritativeCohortPolicy,
