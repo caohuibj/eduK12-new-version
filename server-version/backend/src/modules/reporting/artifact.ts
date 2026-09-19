@@ -201,7 +201,7 @@ export const createOrReuseReportingArtifact = async (input: {
   }
   const existing = await verifyStored(tx, await readByIdentity(tx, input.analysisIdentityHash))
   if (existing.analysisKind !== 'GROUP') reportingFail('REPORT_ANALYSIS_REUSE', 'analysis identity collides with a different artifact kind', 500)
-  return existing
+  return existing as ReportingGroupArtifactRecord
 }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
 
 export const createOrReuseLongitudinalReportingArtifact = async (input: {
@@ -286,7 +286,7 @@ export const createOrReuseProtectedReportingArtifact = async (input: {
   }
   const existing = await verifyStored(tx, await readByIdentity(tx, input.analysisIdentityHash))
   if (existing.analysisKind !== 'PROTECTED_FEEDBACK') reportingFail('REPORT_ANALYSIS_REUSE', 'analysis identity collides with a different artifact kind', 500)
-  return existing
+  return existing as ReportingProtectedArtifactRecord
 }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
 
 export const readReportingArtifactRecord = async (artifactId: string): Promise<ReportingArtifactRecord> => prisma.$transaction(async (tx) => {
