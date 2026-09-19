@@ -6,6 +6,7 @@ export type ReportingResultQuality = 'interpretable' | 'limited' | 'invalid'
 export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
 export type ReportingComparabilityLevel = 'EXACT' | 'COMPATIBLE' | 'LINKED' | 'LIMITED' | 'NOT_COMPARABLE'
 export type ReportingComparabilityOperation = 'SIDE_BY_SIDE' | 'DESCRIPTIVE_TREND' | 'NUMERIC_DELTA'
+export type ReportingAnalysisKindV1 = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK'
 
 export interface ReportingComparabilityRuleV1 {
   schemaVersion: 1
@@ -30,6 +31,7 @@ export interface ReportingComparabilityDecisionV1 {
   limitations: string[]
 }
 
+/** Legacy-compatible PR3 GROUP metric contract. */
 export interface ReportingMetricRuleV1 {
   metricId: string
   sourceMetricKey: string
@@ -42,7 +44,21 @@ export interface ReportingMetricRuleV1 {
   selectionPolicy: 'UNIQUE_OR_REJECT'
 }
 
-export interface ReportingAnalysisSpecDefinitionV1 {
+/** PR4 metrics freeze scientific/source identity in addition to the PR3 rule. */
+export interface ReportingPr4MetricIdentityV1 {
+  sourceFamily: ReportingResourceFamily
+  sourceResourceKey: string
+  valueType: 'NUMBER'
+  longitudinalMetricKey: string
+}
+
+export type ReportingLongitudinalMetricRuleV1 = ReportingMetricRuleV1 & ReportingPr4MetricIdentityV1
+
+export type ReportingProtectedMetricRuleV1 = Omit<ReportingMetricRuleV1, 'observationUnit'>
+  & ReportingPr4MetricIdentityV1
+  & { observationUnit: 'RESPONDENT' }
+
+export interface ReportingGroupSpecV1 {
   schemaVersion: 1
   analysisKind: 'GROUP'
   engineKey: 'ORG_GROUP_V1'
@@ -65,16 +81,49 @@ export interface ReportingRepeatedCohortSpecV1 {
   minimumCohortN: number
   minimumContributorN: number
   reportEvidenceCeiling: ReportingMaturity
-  metricRules: ReportingMetricRuleV1[]
+  metricRules: ReportingLongitudinalMetricRuleV1[]
   comparabilityRules: ReportingComparabilityRuleV1[]
 }
 
-export interface ReportingAnalysisSpecRecord {
+export interface ReportingMatchedLongitudinalSpecV1 {
+  schemaVersion: 1
+  analysisKind: 'MATCHED_LONGITUDINAL'
+  engineKey: 'ORG_MATCHED_LONGITUDINAL_V1'
+  engineVersion: '1.0.0'
+  privacyUnit: 'SUBJECT'
+  selectionPolicy: 'UNIQUE_OR_REJECT'
+  minimumCohortN: number
+  minimumContributorN: number
+  reportEvidenceCeiling: ReportingMaturity
+  metricRules: ReportingLongitudinalMetricRuleV1[]
+  comparabilityRules: ReportingComparabilityRuleV1[]
+}
+
+export interface ReportingProtectedFeedbackSpecV1 {
+  schemaVersion: 1
+  analysisKind: 'PROTECTED_FEEDBACK'
+  engineKey: 'ORG_PROTECTED_FEEDBACK_V1'
+  engineVersion: '1.0.0'
+  privacyUnit: 'RESPONDENT'
+  selectionPolicy: 'UNIQUE_OR_REJECT'
+  minimumRespondentN: number
+  minimumContributorN: number
+  reportEvidenceCeiling: ReportingMaturity
+  metricRules: ReportingProtectedMetricRuleV1[]
+}
+
+export type ReportingAnalysisSpecDefinitionV1 =
+  | ReportingGroupSpecV1
+  | ReportingRepeatedCohortSpecV1
+  | ReportingMatchedLongitudinalSpecV1
+  | ReportingProtectedFeedbackSpecV1
+
+export interface ReportingAnalysisSpecRecord<TDefinition extends ReportingAnalysisSpecDefinitionV1 = ReportingAnalysisSpecDefinitionV1> {
   id: string
   specKey: string
   version: number
   status: ReportingSpecStatus
-  definition: ReportingAnalysisSpecDefinitionV1
+  definition: TDefinition
   specHash: string
   createdByUserId: string
   createdAt: Date

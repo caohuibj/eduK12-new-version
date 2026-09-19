@@ -12,7 +12,11 @@ import {
 
 const quality = z.enum(['interpretable', 'limited', 'invalid'])
 const aggregation = z.enum(['MEAN', 'MEDIAN', 'SD_POPULATION', 'SD_SAMPLE', 'MIN_MAX', 'QUARTILES', 'DISTRIBUTION'])
-const metricRule = z.object({
+const resourceFamily = z.enum(['BUNDLE', 'SCALE', 'COGNITIVE', 'SITUATIONAL'])
+const maturity = z.enum(['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE'])
+const hash64 = z.string().regex(/^[0-9a-f]{64}$/)
+
+const metricBase = {
   metricId: z.string().trim().min(1).max(160),
   sourceMetricKey: z.string().trim().min(1).max(240),
   acceptedResultQuality: z.array(quality).min(1),
@@ -23,22 +27,97 @@ const metricRule = z.object({
   aggregations: z.array(aggregation).min(1),
   missingnessRule: z.literal('EXCLUDE'),
   minimumMetricN: z.number().int().min(3),
-  observationUnit: z.literal('SUBJECT'),
   selectionPolicy: z.literal('UNIQUE_OR_REJECT'),
+}
+
+const groupMetricRule = z.object({
+  ...metricBase,
+  observationUnit: z.literal('SUBJECT'),
 }).strict()
 
-const definitionSchema = z.object({
+const pr4MetricIdentity = {
+  sourceFamily: resourceFamily,
+  sourceResourceKey: z.string().trim().min(1).max(240),
+  valueType: z.literal('NUMBER'),
+  longitudinalMetricKey: z.string().trim().min(1).max(240),
+}
+
+const longitudinalMetricRule = z.object({
+  ...metricBase,
+  ...pr4MetricIdentity,
+  observationUnit: z.literal('SUBJECT'),
+}).strict()
+
+const protectedMetricRule = z.object({
+  ...metricBase,
+  ...pr4MetricIdentity,
+  observationUnit: z.literal('RESPONDENT'),
+}).strict()
+
+const comparabilityRule = z.object({
   schemaVersion: z.literal(1),
+  metricId: z.string().trim().min(1).max(160),
+  resourceFamily,
+  resourceKey: z.string().trim().min(1).max(240),
+  fromVersion: z.string().trim().min(1).max(160),
+  toVersion: z.string().trim().min(1).max(160),
+  level: z.enum(['EXACT', 'COMPATIBLE', 'LINKED', 'LIMITED']),
+  evidenceRef: z.string().trim().min(1).max(500),
+  evidenceHash: hash64,
+}).strict()
+
+const common = {
+  schemaVersion: z.literal(1),
+  engineVersion: z.literal('1.0.0'),
+  selectionPolicy: z.literal('UNIQUE_OR_REJECT'),
+  minimumContributorN: z.number().int().min(3),
+  reportEvidenceCeiling: maturity,
+}
+
+const groupDefinition = z.object({
+  ...common,
   analysisKind: z.literal('GROUP'),
   engineKey: z.literal('ORG_GROUP_V1'),
-  engineVersion: z.literal('1.0.0'),
   privacyUnit: z.literal('SUBJECT'),
-  selectionPolicy: z.literal('UNIQUE_OR_REJECT'),
   minimumCohortN: z.number().int().min(3),
-  minimumContributorN: z.number().int().min(3),
-  reportEvidenceCeiling: z.enum(['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE']),
-  metricRules: z.array(metricRule).min(1),
+  metricRules: z.array(groupMetricRule).min(1),
 }).strict()
+
+const repeatedDefinition = z.object({
+  ...common,
+  analysisKind: z.literal('REPEATED_COHORT'),
+  engineKey: z.literal('ORG_REPEATED_COHORT_V1'),
+  privacyUnit: z.literal('SUBJECT'),
+  minimumCohortN: z.number().int().min(3),
+  metricRules: z.array(longitudinalMetricRule).min(1),
+  comparabilityRules: z.array(comparabilityRule),
+}).strict()
+
+const matchedDefinition = z.object({
+  ...common,
+  analysisKind: z.literal('MATCHED_LONGITUDINAL'),
+  engineKey: z.literal('ORG_MATCHED_LONGITUDINAL_V1'),
+  privacyUnit: z.literal('SUBJECT'),
+  minimumCohortN: z.number().int().min(3),
+  metricRules: z.array(longitudinalMetricRule).min(1),
+  comparabilityRules: z.array(comparabilityRule),
+}).strict()
+
+const protectedDefinition = z.object({
+  ...common,
+  analysisKind: z.literal('PROTECTED_FEEDBACK'),
+  engineKey: z.literal('ORG_PROTECTED_FEEDBACK_V1'),
+  privacyUnit: z.literal('RESPONDENT'),
+  minimumRespondentN: z.number().int().min(3),
+  metricRules: z.array(protectedMetricRule).min(1),
+}).strict()
+
+const definitionSchema = z.discriminatedUnion('analysisKind', [
+  groupDefinition,
+  repeatedDefinition,
+  matchedDefinition,
+  protectedDefinition,
+])
 
 type SpecRow = {
   id: string
@@ -55,12 +134,10 @@ type SpecRow = {
 
 type Tx = Prisma.TransactionClient
 
-export const validateReportingSpecDefinition = (input: unknown): ReportingAnalysisSpecDefinitionV1 => {
-  const parsed = definitionSchema.safeParse(input)
-  if (!parsed.success) reportingFail('REPORT_SPEC_INVALID', parsed.error.errors[0]?.message ?? 'reporting spec is invalid', 400)
-  const definition = parsed.data as ReportingAnalysisSpecDefinitionV1
+const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void => {
   const metricIds = new Set<string>()
   const sourceMetricKeys = new Set<string>()
+  const longitudinalMetricKeys = new Set<string>()
   for (const rule of definition.metricRules) {
     if (metricIds.has(rule.metricId)) reportingFail('REPORT_SPEC_INVALID', `duplicate metricId ${rule.metricId}`, 400)
     if (sourceMetricKeys.has(rule.sourceMetricKey)) reportingFail('REPORT_SPEC_INVALID', `duplicate sourceMetricKey ${rule.sourceMetricKey}`, 400)
@@ -75,10 +152,39 @@ export const validateReportingSpecDefinition = (input: unknown): ReportingAnalys
     }
     metricIds.add(rule.metricId)
     sourceMetricKeys.add(rule.sourceMetricKey)
+    if (definition.analysisKind !== 'GROUP') {
+      if (longitudinalMetricKeys.has(rule.longitudinalMetricKey)) {
+        reportingFail('REPORT_SPEC_INVALID', `duplicate longitudinalMetricKey ${rule.longitudinalMetricKey}`, 400)
+      }
+      longitudinalMetricKeys.add(rule.longitudinalMetricKey)
+    }
   }
+
+  if (definition.analysisKind === 'REPEATED_COHORT' || definition.analysisKind === 'MATCHED_LONGITUDINAL') {
+    const metricById = new Map(definition.metricRules.map((rule) => [rule.metricId, rule]))
+    const comparisonKeys = new Set<string>()
+    for (const rule of definition.comparabilityRules) {
+      const metric = metricById.get(rule.metricId)
+      if (!metric) reportingFail('REPORT_SPEC_INVALID', `comparability rule references unknown metric ${rule.metricId}`, 400)
+      if (metric.sourceFamily !== rule.resourceFamily || metric.sourceResourceKey !== rule.resourceKey) {
+        reportingFail('REPORT_SPEC_INVALID', `comparability rule resource mismatch for ${rule.metricId}`, 400)
+      }
+      const key = [rule.metricId, rule.resourceFamily, rule.resourceKey, rule.fromVersion, rule.toVersion].join('\u0000')
+      if (comparisonKeys.has(key)) reportingFail('REPORT_SPEC_INVALID', `duplicate comparability rule for ${rule.metricId}`, 400)
+      comparisonKeys.add(key)
+    }
+  }
+}
+
+export const validateReportingSpecDefinition = (input: unknown): ReportingAnalysisSpecDefinitionV1 => {
+  const parsed = definitionSchema.safeParse(input)
+  if (!parsed.success) reportingFail('REPORT_SPEC_INVALID', parsed.error.errors[0]?.message ?? 'reporting spec is invalid', 400)
+  const definition = parsed.data as ReportingAnalysisSpecDefinitionV1
+  validateRuleSets(definition)
   return definition
 }
 
+/** Keep the PR3 hash envelope stable; existing GROUP definitions therefore retain the same hash. */
 export const reportingSpecHash = (definition: ReportingAnalysisSpecDefinitionV1): string => (
   canonicalHash({ schema: 'ReportingAnalysisSpecDefinitionV1', definition: validateReportingSpecDefinition(definition) })
 )
