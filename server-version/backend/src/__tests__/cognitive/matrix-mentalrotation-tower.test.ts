@@ -62,7 +62,7 @@ describe('Round 2 PR5 task contracts', () => {
   it('scores matrix answers from the server-held item bank', () => {
     const seed = 'matrix-seed'
     const expected = matrixSequence(seed, matrixConfig.itemCount)
-    const trials = expected.map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, selectedOption: item.correctOption, rtMs: 1000, interrupted: false } }))
+    const trials = expected.map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, selectedOption: item.correctOption, rtMs: 1000, interrupted: false, timedOut: false } }))
     const result = scoreMatrixV1({ config: matrixConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ accuracy: 1, reachedDifficulty: 3, omissionRate: 0 })
     const forged = structuredClone(trials); forged[0].payload.itemId = 'matrix-24'
@@ -71,14 +71,8 @@ describe('Round 2 PR5 task contracts', () => {
     expect(new Set(standard.map((item) => item.ruleFamily))).toEqual(new Set(['progression', 'alternation', 'combination']))
     expect(new Set(standard.map((item) => item.difficulty))).toEqual(new Set([1, 2, 3]))
     const fullBank = matrixSequence('content-audit', 24)
-    expect(fullBank.reduce((counts, item) => {
-      counts[item.correctOption] += 1
-      return counts
-    }, [0, 0, 0, 0])).toEqual([6, 6, 6, 6])
-    const shortPositionCounts = matrixSequence('short-position-audit', 6).reduce((counts, item) => {
-      counts[item.correctOption] += 1
-      return counts
-    }, [0, 0, 0, 0])
+    expect(fullBank.reduce((counts, item) => { counts[item.correctOption] += 1; return counts }, [0, 0, 0, 0])).toEqual([6, 6, 6, 6])
+    const shortPositionCounts = matrixSequence('short-position-audit', 6).reduce((counts, item) => { counts[item.correctOption] += 1; return counts }, [0, 0, 0, 0])
     expect(Math.max(...shortPositionCounts) - Math.min(...shortPositionCounts)).toBeLessThanOrEqual(1)
     for (const item of fullBank) {
       expect(applicableMatrixRules(item.panels)).toEqual([item.ruleFamily])
@@ -96,7 +90,7 @@ describe('Round 2 PR5 task contracts', () => {
     const seed = 'rotation-seed'
     const expected = mentalRotationSequence(seed, rotationConfig.totalTrials)
     expect(expected.filter((item) => item.mirrored)).toHaveLength(6)
-    const trials = expected.map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, response: item.correctResponse, rtMs: item.angle >= 135 ? 900 : 500, interrupted: false } }))
+    const trials = expected.map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, response: item.correctResponse, rtMs: item.angle >= 135 ? 900 : 500, interrupted: false, timedOut: false } }))
     const result = scoreMentalrotationV1({ config: rotationConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ accuracy: 1, angleCost: 400, mirrorErrorRate: 0 })
     expect(result.qualityFlags.interpretable).toBe(true)
@@ -108,7 +102,7 @@ describe('Round 2 PR5 task contracts', () => {
     const trials = expected.map((problem, trialIndex) => {
       const path = shortestPath(problem.initialState, problem.targetState)
       expect(path).toHaveLength(problem.minimumMoves)
-      return { trialIndex, payload: { problemId: problem.problemId, moves: path.map((move, index) => ({ ...move, atMs: 500 + index * 300 })), gaveUp: false, interrupted: false } }
+      return { trialIndex, payload: { problemId: problem.problemId, moves: path.map((move, index) => ({ ...move, atMs: 500 + index * 300 })), gaveUp: false, interrupted: false, timedOut: false } }
     })
     const result = scoreTowerV1({ config: towerConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ minimumMoveSolveRate: 1, solveRate: 1, excessMoves: 0, ruleViolations: 0 })
@@ -121,10 +115,10 @@ describe('Round 2 PR5 task contracts', () => {
 
   it('flags constant/no-attempt patterns without turning low performance into IQ labels', () => {
     const matrixSeed = 'matrix-quality'
-    const matrixTrials = matrixSequence(matrixSeed, 6).map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, selectedOption: 0, rtMs: 500, interrupted: false } }))
+    const matrixTrials = matrixSequence(matrixSeed, 6).map((item, trialIndex) => ({ trialIndex, payload: { itemId: item.itemId, selectedOption: 0, rtMs: 500, interrupted: false, timedOut: false } }))
     expect(scoreMatrixV1({ config: matrixConfig, trials: matrixTrials, randomSeed: matrixSeed }).qualityFlags).toMatchObject({ interpretable: false, constantResponse: true })
     const towerSeed = 'tower-quality'
-    const towerTrials = towerSequence(towerSeed, 4).map((item, trialIndex) => ({ trialIndex, payload: { problemId: item.problemId, moves: [], gaveUp: true, interrupted: false } }))
+    const towerTrials = towerSequence(towerSeed, 4).map((item, trialIndex) => ({ trialIndex, payload: { problemId: item.problemId, moves: [], gaveUp: true, interrupted: false, timedOut: false } }))
     expect(scoreTowerV1({ config: towerConfig, trials: towerTrials, randomSeed: towerSeed }).qualityFlags).toMatchObject({ interpretable: false, insufficientAttemptedProblems: true })
   })
 
