@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { sstSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
@@ -207,6 +208,22 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     rtRef.current = Math.round(performance.now() - onsetRef.current)
   }
 
+  useEffect(() => {
+    if (phase !== 'practice' && phase !== 'formal') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) return
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        respond('left')
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        respond('right')
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   if (phase === 'instruction') {
     return (
       <div className="text-center p-8">
@@ -214,7 +231,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
         <p className="text-gray-600 mb-2">箭头出现时请立即、尽快按对应方向。</p>
         <p className="text-gray-600 mb-2">偶尔会在箭头出现后看到红色停止信号；只有看到停止信号时才尝试停止按键。</p>
         <p className="text-gray-600 mb-4 font-medium">不要为了等待停止信号而故意放慢普通箭头反应。</p>
-        <p className="text-xs text-gray-400 mb-6">先练习快速方向反应，再练习混合的 Go / Stop 试次；练习不计入正式成绩。</p>
+        <p className="text-xs text-gray-400 mb-6">电脑使用左右方向键；触屏使用下方左右按键。练习不计入正式成绩。</p>
         <button className="btn-primary" onClick={startPractice}>开始练习</button>
       </div>
     )
@@ -245,21 +262,24 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  return (
-    <div className="text-center p-8">
-      <p className="text-sm text-gray-500 mb-2">
-        {phase === 'practice'
-          ? `${practiceStage === 'go' ? '方向反应练习' : 'Go / Stop 混合练习'} ${practiceIndex + 1} / ${practiceTrials.length}`
-          : `试次 ${trialIndex + 1} / ${total}`}
-      </p>
+  const taskBody = (
+    <div className="mx-auto max-w-2xl text-center p-6 sm:p-8">
+      {phase === 'practice' ? (
+        <p className="text-sm text-gray-500 mb-2">{`${practiceStage === 'go' ? '方向反应练习' : 'Go / Stop 混合练习'} ${practiceIndex + 1} / ${practiceTrials.length}`}</p>
+      ) : null}
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <div className={`mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full text-5xl ${stopVisible ? 'ring-8 ring-red-500' : ''}`}>
         {visible ? (current?.goStimulus === 'left' ? '←' : '→') : ''}
       </div>
-      <div className="flex justify-center gap-6">
-        <button type="button" className="btn-secondary px-8" onClick={() => respond('left')}>左</button>
-        <button type="button" className="btn-secondary px-8" onClick={() => respond('right')}>右</button>
+      <div className="flex justify-center gap-4 sm:gap-6">
+        <button type="button" className="btn-secondary min-h-12 min-w-24 px-8" onPointerDown={() => respond('left')}>← 左</button>
+        <button type="button" className="btn-secondary min-h-12 min-w-24 px-8" onPointerDown={() => respond('right')}>右 →</button>
       </div>
+      {phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">使用 ← / →，看到红色停止信号后不要继续按</p> : null}
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="停止信号正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }
