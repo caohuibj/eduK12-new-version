@@ -14,11 +14,12 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     isiMs: number
   }
   const total = config.totalTrials ?? 180
+  const blockCount = config.blockCount ?? 1
   const isiMs = config.isiMs ?? 400
   const stimulusMs = config.stimulusMs ?? 500
   const sequence = useMemo(
-    () => cptSequence(taskContext.randomSeed, total, config.targetRatio ?? 0.2, config.blockCount ?? 1),
-    [taskContext.randomSeed, total, config.targetRatio, config.blockCount],
+    () => cptSequence(taskContext.randomSeed, total, config.targetRatio ?? 0.2, blockCount),
+    [taskContext.randomSeed, total, config.targetRatio, blockCount],
   )
   const [phase, setPhase] = useState<Phase>('instruction')
   const [visible, setVisible] = useState(false)
@@ -26,6 +27,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(blockCount > 1 ? null : 0)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
   const interruptedRef = useRef(false)
@@ -50,6 +52,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
+    setAcknowledgedBlockIndex(blockCount > 1 ? null : 0)
     setPhase('formal')
   }
 
@@ -65,6 +68,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
       ? sequence[trialIndex]
       : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
     if (phase === 'formal' && (trialIndex >= total || !current)) return
+    if (phase === 'formal' && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) return
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
@@ -104,7 +108,19 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
       }
     }, isiMs + stimulusMs)
     return () => { window.clearTimeout(show); window.clearTimeout(hide) }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, isiMs, stimulusMs, onTrialComplete])
+  }, [
+    phase,
+    trialIndex,
+    practiceIndex,
+    practiceNonce,
+    sequence,
+    total,
+    blockCount,
+    acknowledgedBlockIndex,
+    isiMs,
+    stimulusMs,
+    onTrialComplete,
+  ])
 
   const current = phase === 'formal'
     ? sequence[trialIndex]
@@ -130,7 +146,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">连续执行任务</h2>
         <p className="text-gray-600 mb-4">只在出现字母 X 时按下，其他字母不要按。</p>
-        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩，未通过可以重练。</p>
+        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩，未通过可以重练。多区块版本会在区块之间暂停，准备好后再继续。</p>
         <button className="btn-primary" onClick={startPractice}>开始练习</button>
       </div>
     )
@@ -150,10 +166,28 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     )
   }
 
+  if (phase === 'formal' && current && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) {
+    const isFirstBlock = current.blockIndex === 0
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-3">{isFirstBlock ? '准备开始持续注意测验' : '区块完成，可以短暂休息'}</h2>
+        <p className="text-gray-600 mb-2">即将开始区块 {current.blockIndex + 1} / {blockCount}</p>
+        <p className="text-sm text-gray-500 mb-6">
+          {isFirstBlock ? '正式测验分为多个区块。每个区块都保持同一规则：只对 X 作答。' : '准备好后继续。休息时请不要离开测评页面太久。'}
+        </p>
+        <button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>
+          {isFirstBlock ? '开始第 1 区块' : '继续下一组'}
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="text-center p-8" onClick={() => { void respond() }} onKeyDown={() => { void respond() }} role="button" tabIndex={0}>
       <p className="text-sm text-gray-500 mb-2">
-        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}
+        {phase === 'practice'
+          ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}`
+          : `试次 ${trialIndex + 1} / ${total}${blockCount > 1 && current ? ` · 区块 ${current.blockIndex + 1} / ${blockCount}` : ''}`}
       </p>
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current.stimulus : ''}</div>
