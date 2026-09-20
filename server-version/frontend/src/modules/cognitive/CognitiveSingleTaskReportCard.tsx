@@ -76,7 +76,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
         </div>
         {activeFlags.length > 0 && (
           <div className="mt-2">
-            <p className="text-xs text-gray-500">解释提示</p>
+            <p className="text-xs text-gray-500">解释提示（不自动表示结果无效）</p>
             <ul className="mt-1 text-xs text-gray-500 list-disc list-inside">
               {activeFlags.map((flag) => <li key={flag.key}>{flag.label}</li>)}
             </ul>
