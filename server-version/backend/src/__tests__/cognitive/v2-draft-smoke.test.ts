@@ -24,15 +24,15 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'corsi': return { phase: 'test', payload: { spanLength: 3, trialWithinLevel: 1, sequence: [0, 1, 2], response: [0, 1, 2], responseDurationMs: 500, interrupted: false } }
     case 'sst': return { phase: 'test', payload: { trialType: 'go', goStimulus: 'left', response: 'left', rtMs: 300, ssdMs: null, stopSignalPresented: false, interrupted: false } }
     case 'taskswitch': return { phase: 'test', payload: { blockIndex: 0, taskRule: 'parity', previousTaskRule: null, switchType: 'start', stimulus: 2, response: 'left', rtMs: 300, interrupted: false } }
-    case 'patterncompare': return { phase: 'test', payload: { leftPattern: { shape: 'circle', fill: 'solid', marks: 1, rotation: 0 }, rightPattern: { shape: 'circle', fill: 'solid', marks: 1, rotation: 0 }, response: 'same', rtMs: 300, interrupted: false } }
-    case 'flanker': return { phase: 'test', payload: { targetDirection: 'left', flankerDirection: 'right', response: 'left', rtMs: 300, interrupted: false } }
-    case 'cardsort': return { phase: 'test', payload: { ruleCue: 'color', stimulusColor: 'red', stimulusShape: 'circle', response: 'left', rtMs: 300, interrupted: false } }
-    case 'digitbackward': return { phase: 'test', payload: { spanLength: 2, trialWithinLevel: 1, sequence: [1, 2], response: [2, 1], responseDurationMs: 100, interrupted: false } }
-    case 'picturesequence': return { phase: 'learning', payload: { phase: 'learning', roundIndex: 0, itemIds: sceneIds, responseOrder: sceneIds, responseDurationMs: 100, interrupted: false } }
-    case 'pairedassociate': return { phase: 'learning', payload: { phase: 'learning', roundIndex: 0, responses: pairResponses, responseDurationMs: 100, interrupted: false } }
-    case 'matrix': return { phase: 'test', payload: { itemId: 'matrix-01', selectedOption: 0, rtMs: 300, interrupted: false } }
-    case 'mentalrotation': return { phase: 'test', payload: { itemId: 'rotation-001', response: 'same', rtMs: 300, interrupted: false } }
-    case 'tower': return { phase: 'test', payload: { problemId: 'tower-01', moves: [], gaveUp: false, interrupted: false } }
+    case 'patterncompare': return { phase: 'test', payload: { leftPattern: { shape: 'circle', fill: 'solid', marks: 1, rotation: 0 }, rightPattern: { shape: 'circle', fill: 'solid', marks: 1, rotation: 0 }, response: 'same', rtMs: 300, interrupted: false, timedOut: false } }
+    case 'flanker': return { phase: 'test', payload: { targetDirection: 'left', flankerDirection: 'right', response: 'left', rtMs: 300, interrupted: false, timedOut: false } }
+    case 'cardsort': return { phase: 'test', payload: { ruleCue: 'color', stimulusColor: 'red', stimulusShape: 'circle', response: 'left', rtMs: 300, interrupted: false, timedOut: false } }
+    case 'digitbackward': return { phase: 'test', payload: { spanLength: 2, trialWithinLevel: 1, sequence: [1, 2], response: [2, 1], responseDurationMs: 100, interrupted: false, timedOut: false } }
+    case 'picturesequence': return { phase: 'learning', payload: { phase: 'learning', roundIndex: 0, itemIds: sceneIds, responseOrder: sceneIds, responseDurationMs: 100, interrupted: false, timedOut: false } }
+    case 'pairedassociate': return { phase: 'learning', payload: { phase: 'learning', roundIndex: 0, responses: pairResponses, responseDurationMs: 100, interrupted: false, timedOut: false } }
+    case 'matrix': return { phase: 'test', payload: { itemId: 'matrix-01', selectedOption: 0, rtMs: 300, interrupted: false, timedOut: false } }
+    case 'mentalrotation': return { phase: 'test', payload: { itemId: 'rotation-001', response: 'same', rtMs: 300, interrupted: false, timedOut: false } }
+    case 'tower': return { phase: 'test', payload: { problemId: 'tower-01', moves: [], gaveUp: false, interrupted: false, timedOut: false } }
     case 'trailmaking': return { phase: 'test', payload: { attempts: [], deviceClass: 'desktop', interrupted: false } }
     case 'reversallearning': return { phase: 'test', payload: { choice: 'left', rtMs: 300, interrupted: false } }
     case 'bart': return { phase: 'test', payload: { pumpCount: 1, completed: true, cashedOut: true, interrupted: false } }
