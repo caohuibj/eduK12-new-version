@@ -23,6 +23,10 @@ const sceneLabel = (itemId: string) => {
   const number = Number(itemId.slice(-2))
   return `故事 ${Math.floor((number - 1) / 15) + 1} · ${actions[(number - 1) % 15]}`
 }
+const advanceDigitPresentation = async () => {
+  await act(async () => { await vi.advanceTimersByTimeAsync(1) })
+  await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+}
 
 afterEach(() => vi.useRealTimers())
 
@@ -43,7 +47,7 @@ describe('Round 2 PR4 task runners', () => {
     render(<DigitbackwardTask taskContext={{ ...context, config: { startSpan: 2, maxSpan: 4, digitDisplayMs: 1, digitIntervalMs: 0, readyDurationMs: 1, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     for (let question = 0; question < 4; question += 1) {
-      await act(async () => { await vi.advanceTimersByTimeAsync(12) })
+      await advanceDigitPresentation()
       for (let digit = 0; digit < 3; digit += 1) fireEvent.click(screen.getByRole('button', { name: '0' }))
       fireEvent.click(screen.getByRole('button', { name: '提交' }))
       fireEvent.click(screen.getByRole('button', { name: question === 3 ? '查看练习结果' : '下一题' }))
@@ -87,13 +91,13 @@ describe('Round 2 PR4 task runners', () => {
     render(<DigitbackwardTask taskContext={{ ...context, config: { startSpan: 2, maxSpan: 4, digitDisplayMs: 1, digitIntervalMs: 0, readyDurationMs: 1, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     for (let question = 0; question < 4; question += 1) {
-      await act(async () => { await vi.advanceTimersByTimeAsync(12) })
+      await advanceDigitPresentation()
       for (const digit of [...digitPractice[question]].reverse()) fireEvent.click(screen.getByRole('button', { name: String(digit) }))
       fireEvent.click(screen.getByRole('button', { name: '提交' }))
       fireEvent.click(screen.getByRole('button', { name: question === 3 ? '查看练习结果' : '下一题' }))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
-    await act(async () => { await vi.advanceTimersByTimeAsync(12) })
+    await advanceDigitPresentation()
     const expected = digitBackwardSequence(context.randomSeed, 0, 2)
     fireEvent.keyDown(window, { key: String(expected[1]) })
     expect(screen.getByText('已输入 1 / 2')).toBeInTheDocument()
