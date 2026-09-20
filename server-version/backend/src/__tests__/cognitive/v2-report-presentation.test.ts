@@ -110,4 +110,17 @@ describe('Cognitive V2 participant report presentation', () => {
     expect(memory.practicalTips).toEqual([])
     expect(stroop.practicalTips).toEqual([])
   })
+
+  it('keeps Matrix reachedDifficulty as raw research data, not a participant-facing level', () => {
+    const report = project('matrix', '1.0.0', 'standard', {
+      accuracy: 0.75,
+      accuracyByRuleFamily: { progression: 0.8, alternation: 0.7, combination: 0.75 },
+      reachedDifficulty: 3,
+      medianRtMs: 3200,
+      omissionRate: 0,
+    })
+    const visibleKeys = [...report.headline, ...report.user, ...report.detail].map((metric) => metric.key)
+    expect(visibleKeys).not.toContain('reachedDifficulty')
+    expect(visibleKeys).toContain('accuracy')
+  })
 })
