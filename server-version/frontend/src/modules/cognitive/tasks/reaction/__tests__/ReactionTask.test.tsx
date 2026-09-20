@@ -75,6 +75,14 @@ function advanceFormalToGreen(trialIndex = 0, seed = 'seed-123') {
   act(() => vi.advanceTimersByTime(deterministicForeperiod(seed, trialIndex, 700, 1500)))
 }
 
+function pointerRespond() {
+  fireEvent.pointerDown(screen.getByLabelText('trial 0'), {
+    isPrimary: true,
+    pointerType: 'mouse',
+    button: 0,
+  })
+}
+
 describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
   it('is deterministic per (seed, trialIndex) and within range', () => {
     const a = deterministicForeperiod('seed-123', 0, 700, 1500)
@@ -121,7 +129,7 @@ describe('ReactionTask — formal trial', () => {
 
     advanceFormalToGreen()
     now += 320
-    fireEvent.click(screen.getByLabelText('trial 0'))
+    pointerRespond()
     await act(async () => {})
 
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
@@ -137,28 +145,28 @@ describe('ReactionTask — formal trial', () => {
     expect(Object.keys(payload).sort()).toEqual(['foreperiodMs', 'inputMode', 'interrupted', 'prematureCount', 'rtMs'])
   })
 
-  it('premature response: does not advance trialIndex, re-enters ready, restarts ready timer (§31)', async () => {
+  it('premature response: does not advance trialIndex, restarts ready timer without adding a compound visual cue (§31)', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
 
     act(() => {
       vi.advanceTimersByTime(600) // 仍在 ready
     })
-    fireEvent.click(screen.getByLabelText('trial 0')) // 过早响应
+    pointerRespond() // 过早响应
     expect(onTrialComplete).not.toHaveBeenCalled()
 
-    // t=1100：若未重启 timer，此刻早该 green；重启后仍在准备
+    // t=1100：若未重启 timer，此刻早该进入 foreperiod；重启后目标仍为非绿色。
     act(() => {
       vi.advanceTimersByTime(500)
     })
-    expect(screen.getByText('准备…')).toBeTruthy()
+    expect(screen.getByLabelText('trial 0').className).toContain('bg-gray-300')
 
     act(() => vi.advanceTimersByTime(600)) // 重启后的 ready timer 触发 → gray
     act(() => vi.advanceTimersByTime(deterministicForeperiod('seed-123', 0, 700, 1500)))
-    expect(screen.getByText('点击！')).toBeTruthy()
+    expect(screen.getByLabelText('trial 0').className).toContain('bg-green-500')
 
     now += 250
-    fireEvent.click(screen.getByLabelText('trial 0'))
+    pointerRespond()
     await act(async () => {})
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     expect(onTrialComplete.mock.calls[0][0].prematureCount).toBe(1)
@@ -169,17 +177,17 @@ describe('ReactionTask — formal trial', () => {
     await enterFormal(onTrialComplete)
     advanceFormalToGreen()
     now += 320.6
-    fireEvent.click(screen.getByLabelText('trial 0'))
+    pointerRespond()
     await act(async () => {})
     expect(onTrialComplete.mock.calls[0][0].rtMs).toBe(321)
   })
 
-  it('does not append a second trial when the miss timeout fires after a click', async () => {
+  it('does not append a second trial when the miss timeout fires after a pointer response', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
     advanceFormalToGreen()
     now += 320
-    fireEvent.click(screen.getByLabelText('trial 0'))
+    pointerRespond()
     await act(async () => {})
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     act(() => {
@@ -214,8 +222,8 @@ describe('ReactionTask — formal trial', () => {
 
     advanceFormalToGreen()
     now += 200
-    fireEvent.click(screen.getByLabelText('trial 0'))
-    fireEvent.click(screen.getByLabelText('trial 0')) // 提交未完成时第二次点击
+    pointerRespond()
+    pointerRespond() // 提交未完成时第二次 pointerdown
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     release()
     await act(async () => {})
@@ -229,7 +237,7 @@ describe('ReactionTask — formal trial', () => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
     fireEvent(document, new Event('visibilitychange'))
     now += 200
-    fireEvent.click(screen.getByLabelText('trial 0'))
+    pointerRespond()
     await act(async () => {})
     expect(onTrialComplete.mock.calls[0][0].interrupted).toBe(true)
   })
