@@ -9,21 +9,12 @@ import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } fro
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 
 export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete }) => {
-  const config = taskContext.config as {
-    totalTrials: number
-    targetRatio: number
-    blockCount: number
-    stimulusMs: number
-    isiMs: number
-  }
+  const config = taskContext.config as { totalTrials: number; targetRatio: number; blockCount: number; stimulusMs: number; isiMs: number }
   const total = config.totalTrials ?? 180
   const blockCount = config.blockCount ?? 1
   const isiMs = config.isiMs ?? 400
   const stimulusMs = config.stimulusMs ?? 500
-  const sequence = useMemo(
-    () => cptSequence(taskContext.randomSeed, total, config.targetRatio ?? 0.2, blockCount),
-    [taskContext.randomSeed, total, config.targetRatio, blockCount],
-  )
+  const sequence = useMemo(() => cptSequence(taskContext.randomSeed, total, config.targetRatio ?? 0.2, blockCount), [taskContext.randomSeed, total, config.targetRatio, blockCount])
   const [timingDiagnostics] = useState(createTaskTimingDiagnostics)
   const [phase, setPhase] = useState<Phase>('instruction')
   const [visible, setVisible] = useState(false)
@@ -38,26 +29,12 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const practiceCorrectRef = useRef(0)
 
   const startPractice = () => {
-    setPracticeIndex(0)
-    setPracticeCorrect(0)
-    practiceCorrectRef.current = 0
-    setFeedback(null)
-    setVisible(false)
-    respondedRef.current = false
-    interruptedRef.current = false
-    onsetRef.current = null
-    setPracticeNonce((value) => value + 1)
-    setPhase('practice')
+    setPracticeIndex(0); setPracticeCorrect(0); practiceCorrectRef.current = 0; setFeedback(null); setVisible(false)
+    respondedRef.current = false; interruptedRef.current = false; onsetRef.current = null; setPracticeNonce((value) => value + 1); setPhase('practice')
   }
-
   const startFormal = () => {
-    setFeedback(null)
-    setVisible(false)
-    respondedRef.current = false
-    interruptedRef.current = false
-    onsetRef.current = null
-    setAcknowledgedBlockIndex(blockCount > 1 ? null : 0)
-    setPhase('formal')
+    setFeedback(null); setVisible(false); respondedRef.current = false; interruptedRef.current = false; onsetRef.current = null
+    setAcknowledgedBlockIndex(blockCount > 1 ? null : 0); setPhase('formal')
   }
 
   useEffect(() => {
@@ -66,33 +43,19 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       interruptedRef.current = true
       if (phase === 'formal' && trialIndex < total) timingDiagnostics.visibilityLost(performance.now(), trialIndex)
     }
-    const onBlur = () => {
-      if (phase === 'formal' && trialIndex < total) timingDiagnostics.focusLost(performance.now(), trialIndex)
-    }
-    document.addEventListener('visibilitychange', onHidden)
-    window.addEventListener('blur', onBlur)
-    return () => {
-      document.removeEventListener('visibilitychange', onHidden)
-      window.removeEventListener('blur', onBlur)
-    }
+    const onBlur = () => { if (phase === 'formal' && trialIndex < total) timingDiagnostics.focusLost(performance.now(), trialIndex) }
+    document.addEventListener('visibilitychange', onHidden); window.addEventListener('blur', onBlur)
+    return () => { document.removeEventListener('visibilitychange', onHidden); window.removeEventListener('blur', onBlur) }
   }, [phase, trialIndex, total, timingDiagnostics])
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    const current = phase === 'formal'
-      ? sequence[trialIndex]
-      : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
+    const current = phase === 'formal' ? sequence[trialIndex] : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
     if (phase === 'formal' && (trialIndex >= total || !current)) return
     if (phase === 'formal' && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) return
-    respondedRef.current = false
-    interruptedRef.current = false
-    onsetRef.current = null
-    setVisible(false)
-    setFeedback(null)
-
+    respondedRef.current = false; interruptedRef.current = false; onsetRef.current = null; setVisible(false); setFeedback(null)
     let animationFrameId: number | null = null
     let hideTimerId: number | null = null
-
     const finishStimulus = async () => {
       setVisible(false)
       const responded = respondedRef.current
@@ -102,64 +65,38 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
         if (correct) practiceCorrectRef.current += 1
         const nextIndex = practiceIndex + 1
         window.setTimeout(() => {
-          if (nextIndex >= PRACTICE_TRIAL_COUNT) {
-            setPracticeCorrect(practiceCorrectRef.current)
-            setPhase('practice-result')
-            return
-          }
+          if (nextIndex >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(practiceCorrectRef.current); setPhase('practice-result'); return }
           setPracticeIndex(nextIndex)
         }, PRACTICE_FEEDBACK_MS)
         return
       }
-      if (!responded) {
-        await onTrialComplete({
-          blockIndex: current.blockIndex,
-          stimulus: current.stimulus,
-          isTarget: current.isTarget,
-          responded: false,
-          rtMs: null,
-          interrupted: interruptedRef.current,
-        })
-      }
+      if (!responded) await onTrialComplete({ blockIndex: current.blockIndex, stimulus: current.stimulus, isTarget: current.isTarget, responded: false, rtMs: null, interrupted: interruptedRef.current })
     }
-
     const present = (onsetPerfMs: number) => {
       const captured = captureFrameTimingOnset(onsetPerfMs)
       if (captured.ok) onsetRef.current = captured.onset
-      else {
-        interruptedRef.current = true
-        onsetRef.current = null
-      }
+      else { interruptedRef.current = true; onsetRef.current = null }
       setVisible(true)
       hideTimerId = window.setTimeout(() => { void finishStimulus() }, stimulusMs)
     }
-
     const show = window.setTimeout(() => {
       const eligiblePerfMs = performance.now()
-      if (typeof window.requestAnimationFrame !== 'function') {
-        interruptedRef.current = true
-        present(performance.now())
-        return
-      }
+      if (typeof window.requestAnimationFrame !== 'function') { interruptedRef.current = true; present(performance.now()); return }
       animationFrameId = window.requestAnimationFrame((framePerfMs) => {
         if (phase === 'formal') timingDiagnostics.frameCallback({ eligiblePerfMs, framePerfMs, trialIndex })
         present(framePerfMs)
       })
     }, isiMs)
-
     return () => {
-      window.clearTimeout(show)
-      if (hideTimerId != null) window.clearTimeout(hideTimerId)
+      window.clearTimeout(show); if (hideTimerId != null) window.clearTimeout(hideTimerId)
       if (animationFrameId != null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(animationFrameId)
     }
   }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, blockCount, acknowledgedBlockIndex, isiMs, stimulusMs, onTrialComplete, timingDiagnostics])
 
-  const current = phase === 'formal'
-    ? sequence[trialIndex]
-    : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
+  const current = phase === 'formal' ? sequence[trialIndex] : { stimulus: practiceIndex % 2 === 0 ? 'X' : 'A', isTarget: practiceIndex % 2 === 0, blockIndex: 0 }
 
   const respond = async (eventTimeStamp: number) => {
-    if (!visible || respondedRef.current || onsetRef.current == null) return
+    if (!visible || respondedRef.current || onsetRef.current == null || !current) return
     const resolved = resolveEventResponseTimestamp(eventTimeStamp, onsetRef.current)
     const responsePerfMs = resolved.ok ? resolved.responsePerfMs : resolved.fallbackPerfMs
     if (!resolved.ok) {
@@ -167,37 +104,26 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       if (phase === 'formal') timingDiagnostics.responseFailure({ result: resolved, eventTimeStamp, trialIndex })
     }
     if (responsePerfMs == null) return
-
     respondedRef.current = true
     const rtMs = Math.round(Math.max(0, responsePerfMs - onsetRef.current.perfMs))
     if (phase !== 'formal') return
-    await onTrialComplete({
-      blockIndex: current.blockIndex,
-      stimulus: current.stimulus,
-      isTarget: current.isTarget,
-      responded: true,
-      rtMs,
-      interrupted: interruptedRef.current,
-    })
+    await onTrialComplete({ blockIndex: current.blockIndex, stimulus: current.stimulus, isTarget: current.isTarget, responded: true, rtMs, interrupted: interruptedRef.current })
   }
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
-      event.preventDefault()
-      void respond(event.timeStamp)
+      event.preventDefault(); void respond(event.timeStamp)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
 
   const pointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!event.isPrimary) return
-    if (event.pointerType === 'mouse' && event.button !== 0) return
+    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return
     void respond(event.timeStamp)
   }
-
   const pointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return
     interruptedRef.current = true
@@ -205,18 +131,16 @@ export const CptFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   }
 
   if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">连续执行任务</h2><p className="text-gray-600 mb-4">只在出现字母 X 时按下，其他字母不要按。</p><p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩，多区块版本会在区块之间暂停。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
     return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>{passed ? <button className="btn-primary" onClick={startFormal}>开始正式测验</button> : <button className="btn-secondary" onClick={startPractice}>重新练习</button>}</div>
   }
-
+  if (phase === 'formal' && trialIndex >= total) return <div className="card p-8 text-center text-gray-600">正式试次已完成，请完成本次测评。</div>
   if (phase === 'formal' && current && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) {
     const isFirstBlock = current.blockIndex === 0
     return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">{isFirstBlock ? '准备开始持续注意测验' : '区块完成，可以短暂休息'}</h2><p className="text-gray-600 mb-2">即将开始区块 {current.blockIndex + 1} / {blockCount}</p><p className="text-sm text-gray-500 mb-6">{isFirstBlock ? '正式测验分为多个区块。每个区块都保持同一规则：只对 X 作答。' : '准备好后继续。休息时请不要离开测评页面太久。'}</p><button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>{isFirstBlock ? '开始第 1 区块' : '继续下一组'}</button></div>
   }
 
-  const taskBody = <div className="mx-auto max-w-2xl text-center p-8" onPointerDown={pointerDown} onPointerCancel={pointerCancel} role="button" tabIndex={-1} aria-label={phase === 'practice' ? 'CPT 练习作答区' : 'CPT 正式作答区'}>{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<div className="text-6xl font-bold text-gray-800 h-24">{visible ? current.stimulus : ''}</div>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">仅看到 X 时按空格 / Enter，或点击此区域</p> : null}</div>
-
+  const taskBody = <div className="mx-auto max-w-2xl text-center p-8" onPointerDown={pointerDown} onPointerCancel={pointerCancel} role="button" tabIndex={-1} aria-label={phase === 'practice' ? 'CPT 练习作答区' : 'CPT 正式作答区'}>{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<div className="text-6xl font-bold text-gray-800 h-24">{visible ? current?.stimulus : ''}</div>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">仅看到 X 时按空格 / Enter，或点击此区域</p> : null}</div>
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="CPT 正式测验">{taskBody}</CognitiveFocusStage> : taskBody
 }
