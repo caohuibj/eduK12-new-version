@@ -27,16 +27,17 @@ const context = {
 }
 
 describe('SST and Task Switching runners', () => {
-  it('starts SST from instruction into practice without persisting', () => {
+  it('starts SST with anti-waiting guidance and a Go-only unscored practice stage', () => {
     const onTrialComplete = vi.fn()
     render(<SstTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
     expect(screen.getByText('停止信号任务')).toBeTruthy()
+    expect(screen.getByText(/不要为了等待停止信号而故意放慢/)).toBeTruthy()
     fireEvent.click(screen.getByText('开始练习'))
-    expect(screen.getByText(/练习 1/)).toBeTruthy()
+    expect(screen.getByText(/方向反应练习 1 \/ 4/)).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
-  it('starts Task Switching from instruction into practice without persisting', () => {
+  it('starts Task Switching with separate-rule practice before mixed switching', () => {
     const onTrialComplete = vi.fn()
     render(
       <TaskswitchTask
@@ -59,8 +60,9 @@ describe('SST and Task Switching runners', () => {
       />,
     )
     expect(screen.getByText('任务转换')).toBeTruthy()
+    expect(screen.getByText(/规则会在试次之间切换/)).toBeTruthy()
     fireEvent.click(screen.getByText('开始练习'))
-    expect(screen.getByText(/练习 1/)).toBeTruthy()
+    expect(screen.getByText(/奇偶规则练习 1 \/ 4/)).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
