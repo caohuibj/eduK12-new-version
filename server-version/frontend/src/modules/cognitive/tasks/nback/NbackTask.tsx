@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
-import { nbackSequence } from '../shared/prng'
+import { nbackSequence, type NbackTrialSpec } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 type NLevel = 1 | 2 | 3
 type PracticeTrial = { nLevel: NLevel; stimulus: string; target: boolean }
+
+const isNbackFormalTrial = (
+  trial: PracticeTrial | NbackTrialSpec | undefined,
+): trial is NbackTrialSpec => Boolean(
+  trial && 'blockIndex' in trial && typeof trial.blockIndex === 'number',
+)
 
 const PRACTICE_BY_N: Record<NLevel, PracticeTrial[]> = {
   1: [
@@ -117,7 +123,9 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     startFormal()
   }
 
-  const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
+  const current: PracticeTrial | NbackTrialSpec | undefined = phase === 'formal'
+    ? sequence[trialIndex]
+    : practiceTrials[practiceIndex]
 
   useEffect(() => {
     const onHidden = () => { if (document.hidden) interruptedRef.current = true }
@@ -127,9 +135,12 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    if (phase === 'formal' && (trialIndex >= total || !current || !('blockIndex' in current))) return
-    if (phase === 'formal' && !practicedLevels.includes(current.nLevel)) return
-    if (phase === 'formal' && acknowledgedBlockIndex !== current.blockIndex) return
+    if (phase === 'formal') {
+      if (trialIndex >= total || !isNbackFormalTrial(current)) return
+      if (!practicedLevels.includes(current.nLevel)) return
+      if (acknowledgedBlockIndex !== current.blockIndex) return
+    }
+    if (!current) return
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
@@ -158,7 +169,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
         }, PRACTICE_FEEDBACK_MS)
         return
       }
-      if (!responded && !submittingRef.current && 'blockIndex' in current) {
+      if (!responded && !submittingRef.current && isNbackFormalTrial(current)) {
         submittingRef.current = true
         await onTrialComplete({
           blockIndex: current.blockIndex,
@@ -194,7 +205,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     if (!visible || respondedRef.current || onsetRef.current == null || submittingRef.current) return
     respondedRef.current = true
     const rtMs = Math.round(performance.now() - onsetRef.current)
-    if (phase !== 'formal' || !current || !('blockIndex' in current)) return
+    if (phase !== 'formal' || !isNbackFormalTrial(current)) return
     submittingRef.current = true
     await onTrialComplete({
       blockIndex: current.blockIndex,
@@ -249,7 +260,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  if (phase === 'formal' && current && 'blockIndex' in current && !practicedLevels.includes(current.nLevel)) {
+  if (phase === 'formal' && isNbackFormalTrial(current) && !practicedLevels.includes(current.nLevel)) {
     return (
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">准备进入 {current.nLevel}-back</h2>
@@ -260,7 +271,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  if (phase === 'formal' && current && 'blockIndex' in current && acknowledgedBlockIndex !== current.blockIndex) {
+  if (phase === 'formal' && isNbackFormalTrial(current) && acknowledgedBlockIndex !== current.blockIndex) {
     const totalBlocks = sequence.length === 0 ? 0 : Math.max(...sequence.map((trial) => trial.blockIndex)) + 1
     return (
       <div className="text-center p-8">
@@ -283,7 +294,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
       <p className="text-sm text-gray-500 mb-2">
         {phase === 'practice'
           ? `${practiceNLevel}-back 练习 ${practiceIndex + 1} / ${practiceTrials.length}`
-          : `${current && 'nLevel' in current ? current.nLevel : firstNLevel}-back`}
+          : `${current?.nLevel ?? firstNLevel}-back`}
       </p>
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current?.stimulus : ''}</div>
