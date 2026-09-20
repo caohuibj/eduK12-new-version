@@ -76,11 +76,13 @@ function advanceFormalToGreen(trialIndex = 0, seed = 'seed-123') {
 }
 
 function pointerRespond() {
-  fireEvent.pointerDown(screen.getByLabelText('trial 0'), {
-    isPrimary: true,
-    pointerType: 'mouse',
-    button: 0,
+  const event = new Event('pointerdown', { bubbles: true, cancelable: true })
+  Object.defineProperties(event, {
+    isPrimary: { value: true },
+    pointerType: { value: 'mouse' },
+    button: { value: 0 },
   })
+  fireEvent(screen.getByLabelText('trial 0'), event)
 }
 
 describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
