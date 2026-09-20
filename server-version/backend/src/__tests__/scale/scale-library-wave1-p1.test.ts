@@ -1,0 +1,148 @@
+import { describe, expect, it } from 'vitest'
+import {
+  approveInstrumentAuthorization,
+  createInstrumentAuthorizationDraft,
+} from '../../modules/assessment-authorization'
+import { isScaleLibraryPublicPayloadSafe } from '../../modules/scale/library/scale-library-read-model'
+import {
+  buildExpandedScaleLibraryReadModel,
+  filterExpandedScaleLibraryEntries,
+} from '../../modules/scale/library/wave1-p1-read-model'
+import { enrichExistingP1Evidence } from '../../modules/scale/library/wave1-p1-existing-evidence'
+
+const NOW = '2026-09-20T00:00:00.000Z'
+
+const keys = (entries: Array<{ identity: { instrumentKey: string } }>): string[] => entries.map((entry) => entry.identity.instrumentKey)
+
+const approvedAuthorization = (instrumentKey: string, instrumentVersion: string) => {
+  const draft = createInstrumentAuthorizationDraft({
+    instrumentKey,
+    instrumentVersion,
+    grantor: 'Wave 1 P1 test rights record',
+    grantee: 'eduK12',
+    scope: {
+      electronicAdministration: true,
+      scoring: true,
+      translation: true,
+      display: true,
+      territories: ['CN'],
+      locales: ['zh-CN'],
+      commercialNature: 'NON_COMMERCIAL',
+    },
+    validFrom: '2026-01-01T00:00:00.000Z',
+    validTo: '2027-01-01T00:00:00.000Z',
+    basis: 'Test-only authorization; does not create production rights.',
+    createdByUserId: 'wave1-test-admin',
+    now: NOW,
+  })
+  return approveInstrumentAuthorization({
+    record: draft,
+    actorUserId: 'wave1-test-approver',
+    now: NOW,
+  }).record
+}
+
+describe('Wave 1 P1 scale-library integration', () => {
+  it('keeps the six Wave 0 executable entries and adds four catalog-first P1 entries', () => {
+    const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    expect(model.entries).toHaveLength(10)
+    expect(keys(model.entries)).toEqual([
+      'adexi_v1',
+      'who5',
+      'sdq_parent_zh_cn',
+      'sdq_teacher_zh_cn',
+      'texi_parent_zh_cn',
+      'texi_teacher_zh_cn',
+      'dass21_zh_cn',
+      'gse_zh_cn',
+      'mpfi24_zh_cn',
+      'pss10_zh_cn',
+    ])
+
+    const wave1 = model.entries.slice(6)
+    expect(wave1.every((entry) => entry.availability.status === 'NOT_AVAILABLE')).toBe(true)
+    expect(wave1.every((entry) => entry.availability.launch === undefined)).toBe(true)
+    expect(wave1.every((entry) => isScaleLibraryPublicPayloadSafe(entry))).toBe(true)
+  })
+
+  it('exposes Simplified-Chinese validation populations without claiming norms or diagnosis', () => {
+    const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
+
+    const dass = model.entries.find((entry) => entry.identity.instrumentKey === 'dass21_zh_cn')!
+    expect(dass.applicability.populationNotes).toContain('1,507')
+    expect(dass.applicability.populationNotes).toContain('1,131')
+    expect(dass.evidence.recordCount).toBe(2)
+    expect(dass.report.dimensionLabels).toEqual(['抑郁相关体验', '焦虑相关体验', '压力/紧张相关体验'])
+    expect(dass.report.maxEligibleLevel).toBeNull()
+    expect(dass.report.limitations.join(' ')).toContain('不提供诊断')
+    expect(dass.governance?.packageReleaseStatus).toBe('NOT_BUILT')
+    expect(dass.governance?.gate.publishable).toBe(false)
+
+    const gse = model.entries.find((entry) => entry.identity.instrumentKey === 'gse_zh_cn')!
+    expect(gse.applicability.populationNotes).toContain('9,578')
+    expect(gse.evidence.recordCount).toBe(2)
+
+    const mpfi = model.entries.find((entry) => entry.identity.instrumentKey === 'mpfi24_zh_cn')!
+    expect(mpfi.applicability.populationNotes).toContain('3,568')
+    expect(mpfi.report.dimensionLabels).toEqual(['心理灵活性', '心理不灵活性'])
+
+    const pss = model.entries.find((entry) => entry.identity.instrumentKey === 'pss10_zh_cn')!
+    expect(pss.applicability.populationNotes).toContain('1,096')
+    expect(pss.report.limitations.join(' ')).toContain('cut-off')
+  })
+
+  it('never turns a catalog-first entry launchable merely because an authorization record exists', () => {
+    const model = buildExpandedScaleLibraryReadModel({
+      locale: 'zh-CN',
+      territory: 'CN',
+      respondent: 'SELF',
+      viewerRole: 'ADMIN',
+      nowIso: NOW,
+      authorizations: [approvedAuthorization('gse_zh_cn', '1.0.0')],
+    })
+    const gse = model.entries.find((entry) => entry.identity.instrumentKey === 'gse_zh_cn')!
+    expect(gse.rights.status).toBe('EVIDENCE_PENDING')
+    expect(gse.availability.status).toBe('NOT_AVAILABLE')
+    expect(gse.availability.launch).toBeUndefined()
+    expect(gse.availability.reasons.join(' ')).toContain('尚无经治理审核的可执行 Scale package')
+  })
+
+  it('filters Wave 1 entries with the existing library filter semantics', () => {
+    const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { locale: 'zh-CN' }))).toEqual([
+      'adexi_v1',
+      'who5',
+      'sdq_parent_zh_cn',
+      'dass21_zh_cn',
+      'gse_zh_cn',
+      'mpfi24_zh_cn',
+      'pss10_zh_cn',
+    ])
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { primaryDomain: 'SELF_EFFICACY' }))).toEqual(['gse_zh_cn'])
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { availability: 'NOT_AVAILABLE', respondent: 'SELF' }))).toContain('dass21_zh_cn')
+  })
+
+  it('adds Chinese validation evidence to existing WHO-5 and SDQ entries without activating references', () => {
+    const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel({
+      locale: 'zh-CN',
+      territory: 'CN',
+      viewerRole: 'ADMIN',
+      nowIso: NOW,
+    }))
+
+    const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
+    expect(who5.evidence.recordCount).toBe(1)
+    expect(who5.evidence.coverageText).toContain('大学生')
+    expect(who5.evidence.coverageText).toContain('不直接验证当前产品 9–18 岁入口')
+    expect(who5.references.policy).toBe('none')
+    expect(who5.governance?.evidence.some((record) => record.evidenceId === 'who5-cn-fung-2022')).toBe(true)
+
+    const sdqParent = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_parent_zh_cn')!
+    expect(sdqParent.evidence.recordCount).toBe(1)
+    expect(sdqParent.evidence.coverageText).toContain('3–17 岁')
+    expect(sdqParent.references.policy).toBe('none')
+
+    const sdqTeacher = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')!
+    expect(sdqTeacher.evidence.coverageText).toContain('当前 executable Teacher T4–10 package 仍是英文来源')
+  })
+})
