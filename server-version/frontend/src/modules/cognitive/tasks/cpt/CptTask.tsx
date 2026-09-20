@@ -131,7 +131,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     if (!visible || respondedRef.current || onsetRef.current == null) return
     respondedRef.current = true
     const rtMs = Math.round(performance.now() - onsetRef.current)
-    if (phase !== 'formal') return
+    if (phase !== 'formal' || !current) return
     await onTrialComplete({
       blockIndex: current.blockIndex,
       stimulus: current.stimulus,
@@ -178,6 +178,10 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     )
   }
 
+  if (phase === 'formal' && trialIndex >= total) {
+    return <div className="card p-8 text-center text-gray-600">正式试次已完成，请完成本次测评。</div>
+  }
+
   if (phase === 'formal' && current && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) {
     const isFirstBlock = current.blockIndex === 0
     return (
@@ -204,7 +208,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     >
       {phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
-      <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current.stimulus : ''}</div>
+      <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current?.stimulus : ''}</div>
       {phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">仅看到 X 时按空格 / Enter，或点击此区域</p> : null}
     </div>
   )
