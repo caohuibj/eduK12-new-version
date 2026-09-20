@@ -114,6 +114,6 @@ async function main() {
 main().catch(error => { manifest.status = 'FAILED'; manifest.error = String(error); console.error(error); process.exitCode = 1; }).finally(() => {
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 2));
-  for (const container of [source, target]) spawnSync('docker', ['rm', '--force', container], { stdio: 'ignore' });
+  for (const container of [source, target]) spawnSync('docker', ['rm', '--force', '--volumes', container], { stdio: 'ignore' });
   fs.rmSync(scratch, { recursive: true, force: true });
 });

@@ -2,6 +2,16 @@
 
 PR5 is the product-convergence layer on top of merged PR1–PR4. It does not add a second Organization authority model, Assessment Runtime, reporting engine, Safety classifier, or CSV generator.
 
+## CI disk exhaustion correction (2026-09-20)
+
+Run `35505548463` on `1d15c03` passed backend, frontend and CodeQL. All four independent browser workflows passed, confirming the prior authentication fix. The main browser job reached PR5 real runtime completions, then failed with `No space left on device` in the self-hosted runner diagnostic log and a browser fetch error.
+
+The Lima CI filesystem was 98% used with about 1.1 GiB free. Docker reported 624 volumes (614 unreferenced) and accumulated build cache. Reclaiming regenerable build cache recovered 3.439 GB and left about 4.2 GiB free; existing application containers and data volumes were preserved. Unidentified orphan volumes were not globally pruned.
+
+Every service-based acceptance job now removes its exact GitHub-supplied temporary container IDs with `--volumes` after artifact upload. This removes image-created anonymous PostgreSQL/Redis volumes; named volumes are preserved. PR5 rehearsal container teardown also removes its own anonymous volumes. Linux CI jobs check for 3 GiB free space before work, attempt build-cache-only reclamation below that threshold, and fail clearly if capacity is still insufficient. No domain test or required gate was skipped.
+
+Validation: workflow parsing and separate final cleanup-step coverage passed; shell syntax passed; an isolated real Docker test verified anonymous volume deletion, repeat cleanup and invalid target rejection. Disk preflight passed on the actual CI filesystem. All five production backup/restore and migration-failure recovery stages passed again with the updated teardown. The final push triggers new CI; its results are not awaited.
+
 ## CI login recovery correction (2026-09-20)
 
 CI for `a12c1eb` passed backend/full frontend/CodeQL, but failed five browser jobs at login navigation or original-account recovery (main run `35504129488`, AppShell `35504129499`, media runs `35504129602`, `35504129678`, `35504129453`). The account-keyed Organization provider remounted the entire route tree when authentication changed, invalidating the login component's navigation callback and recovery state.

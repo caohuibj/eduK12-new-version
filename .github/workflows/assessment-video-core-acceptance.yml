@@ -72,6 +72,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -162,3 +164,9 @@ jobs:
         run: |
           if [ -f /tmp/eduk12-assessment-video-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-assessment-video-frontend.pid) || true; fi
           if [ -f /tmp/eduk12-assessment-video-backend.pid ]; then kill -- -$(cat /tmp/eduk12-assessment-video-backend.pid) || true; fi
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"

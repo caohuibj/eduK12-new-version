@@ -199,6 +199,8 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -293,6 +295,13 @@ jobs:
             /tmp/eduk12-backend-vitest.json
             /tmp/eduk12-ci-env.txt
           if-no-files-found: ignore
+
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
@@ -394,6 +403,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -526,6 +537,13 @@ jobs:
           if [ -f /tmp/eduk12-situational-bundle-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-frontend.pid) || true; fi
           if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) || true; fi
 
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+
   docker:
     name: docker (compose config + production builds)
     # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
@@ -559,6 +577,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
