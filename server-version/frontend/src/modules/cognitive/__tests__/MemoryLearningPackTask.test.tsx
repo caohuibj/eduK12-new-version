@@ -43,8 +43,7 @@ describe('Round 2 PR4 task runners', () => {
     render(<DigitbackwardTask taskContext={{ ...context, config: { startSpan: 2, maxSpan: 4, digitDisplayMs: 1, digitIntervalMs: 0, readyDurationMs: 1, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     for (let question = 0; question < 4; question += 1) {
-      await act(async () => { await vi.advanceTimersByTimeAsync(2) })
-      await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+      await act(async () => { await vi.advanceTimersByTimeAsync(12) })
       for (let digit = 0; digit < 3; digit += 1) fireEvent.click(screen.getByRole('button', { name: '0' }))
       fireEvent.click(screen.getByRole('button', { name: '提交' }))
       fireEvent.click(screen.getByRole('button', { name: question === 3 ? '查看练习结果' : '下一题' }))
@@ -82,28 +81,31 @@ describe('Round 2 PR4 task runners', () => {
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
-  it('submits the seed-derived reverse digit trial after passing practice', async () => {
+  it('hides formal digit responses while retaining practice feedback and keyboard-capable submission', async () => {
     vi.useFakeTimers()
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<DigitbackwardTask taskContext={{ ...context, config: { startSpan: 2, maxSpan: 4, digitDisplayMs: 1, digitIntervalMs: 0, readyDurationMs: 1, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     for (let question = 0; question < 4; question += 1) {
-      await act(async () => { await vi.advanceTimersByTimeAsync(2) })
-      await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+      await act(async () => { await vi.advanceTimersByTimeAsync(12) })
       for (const digit of [...digitPractice[question]].reverse()) fireEvent.click(screen.getByRole('button', { name: String(digit) }))
       fireEvent.click(screen.getByRole('button', { name: '提交' }))
       fireEvent.click(screen.getByRole('button', { name: question === 3 ? '查看练习结果' : '下一题' }))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
-    await act(async () => { await vi.advanceTimersByTimeAsync(2) })
-    await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+    await act(async () => { await vi.advanceTimersByTimeAsync(12) })
     const expected = digitBackwardSequence(context.randomSeed, 0, 2)
-    for (const digit of [...expected].reverse()) fireEvent.click(screen.getByRole('button', { name: String(digit) }))
-    fireEvent.click(screen.getByRole('button', { name: '提交' }))
-    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ sequence: expected, response: [...expected].reverse() })))
+    fireEvent.keyDown(window, { key: String(expected[1]) })
+    expect(screen.getByText('已输入 1 / 2')).toBeInTheDocument()
+    expect(screen.queryByText('退格')).not.toBeInTheDocument()
+    expect(screen.queryByText(/倒序输入：/)).not.toBeInTheDocument()
+    fireEvent.keyDown(window, { key: String(expected[0]) })
+    fireEvent.keyDown(window, { key: 'Enter' })
+    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ sequence: expected, response: [...expected].reverse(), timedOut: false })))
   })
 
-  it('submits the frozen picture set after passing practice', async () => {
+  it('uses fixed formal study exposure for picture sequence before recall', async () => {
+    vi.useFakeTimers()
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<PicturesequenceTask taskContext={{ ...context, testType: 'picturesequence', config: { itemCount: 6, learningRounds: 2, delayedEnabled: false, delayedDelayMs: 0, studyMsPerItem: 100, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
@@ -114,14 +116,17 @@ describe('Round 2 PR4 task runners', () => {
       fireEvent.click(screen.getByText(question === 3 ? '查看练习结果' : '下一题'))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
-    fireEvent.click(screen.getByText('我记好了，开始排序'))
+    expect(screen.queryByText('我记好了，开始排序')).not.toBeInTheDocument()
+    expect(screen.getByText('请持续记忆，呈现结束后将自动进入排序。')).toBeInTheDocument()
+    await act(async () => { await vi.advanceTimersByTimeAsync(600) })
     const expected = pictureSequenceItems(context.randomSeed, 6)
     for (const item of expected) fireEvent.click(screen.getByRole('button', { name: sceneLabel(item) }))
     fireEvent.click(screen.getByText('提交排序'))
-    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemIds: expected, responseOrder: expected, phase: 'learning' })))
+    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemIds: expected, responseOrder: expected, phase: 'learning', timedOut: false })))
   })
 
-  it('submits server-replayable paired-associate responses after passing practice', async () => {
+  it('uses fixed formal study exposure for paired associate before recall', async () => {
+    vi.useFakeTimers()
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<PairedassociateTask taskContext={{ ...context, testType: 'pairedassociate', config: { pairCount: 6, learningRounds: 2, delayedEnabled: false, delayedDelayMs: 0, studyDurationMs: 100, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
@@ -133,10 +138,12 @@ describe('Round 2 PR4 task runners', () => {
       fireEvent.click(screen.getByText(question === 3 ? '查看练习结果' : '下一题'))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
-    fireEvent.click(screen.getByText('我记好了，开始作答'))
+    expect(screen.queryByText('我记好了，开始作答')).not.toBeInTheDocument()
+    expect(screen.getByText('请持续记忆，呈现结束后将自动进入作答。')).toBeInTheDocument()
+    await act(async () => { await vi.advanceTimersByTimeAsync(100) })
     const expected = pairedAssociateSet(context.randomSeed, 6)
     for (const item of expected) fireEvent.click(screen.getByRole('button', { name: `位置 ${item.targetPosition + 1}` }))
     fireEvent.click(screen.getByText('提交本轮'))
-    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ responses: expected.map((item) => ({ itemId: item.itemId, selectedPosition: item.targetPosition })), phase: 'learning' })))
+    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ responses: expected.map((item) => ({ itemId: item.itemId, selectedPosition: item.targetPosition })), phase: 'learning', timedOut: false })))
   })
 })
