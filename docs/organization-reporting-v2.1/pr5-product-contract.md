@@ -11,7 +11,7 @@ The baseline inventory below records pre-PR5 behavior. The reviewed implementati
 
 The completed product adapters now also include classification/relationship history, audit reads, released resource discovery, authoritative read-only Run preview, and exact respondent task discovery. Shared relational runtime routes accept authenticated users at the shell and authorize exact resources on the server; legacy ADMIN access is added only for an exact frozen Run respondent binding. This is not Organization authority inferred from a legacy role.
 
-See `pr5-evidence.md` for the tested scope and outstanding development-plan acceptance evidence. This contract does not certify C01–C10 completion or CI success.
+See `pr5-evidence.md` and its candidate-linked manifests for completed local business scenarios, compatibility checks and recovery rehearsal. Final exact-head CI success remains a separate merge requirement.
 
 ## 1. PR5 objective
 

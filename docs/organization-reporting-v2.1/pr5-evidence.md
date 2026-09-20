@@ -14,19 +14,53 @@ Implemented and reviewed in this follow-up:
 - Failed/denied report and Safety rereads remove previously displayed payloads. Run progress failures are visible. Run list counts avoid a Track/execution Cartesian join.
 - Browser acceptance additionally exercises label assignment, consultation relationship ending/history, client mobile navigation, and platform-only lifecycle visibility. The Grade locator is scoped to avoid matching the select option.
 
-Local validation:
+## Final acceptance follow-up (2026-09-20)
 
-- Fresh PostgreSQL migrations succeeded.
-- Backend build passed; 26 relevant real-PostgreSQL suites / 82 tests passed with one worker, matching CI's nonparallel file execution. An exploratory two-worker run encountered PostgreSQL serialization failure `40001` in the pre-existing reporting-core publish fixture; the serial rerun passed. This does not establish automatic retry under arbitrary concurrent publication.
-- Full frontend suite: 130 files / 487 tests passed.
-- Frontend typecheck and production build passed; lint: zero errors, 101 existing warnings.
-- Expanded real PostgreSQL/backend/Chromium Organization browser journeys passed. These browser assertions exercise product navigation/governance and negative authority boundaries; they do not establish all full assessment/report/export scenarios below.
+Tested code candidate: `00b477957b15e34a3f101bb8918b5b9c39c050a2`. The following documentation-only commit archives these results; GitHub must still validate the final PR head.
 
-### Acceptance still outstanding
+Resolved review/CI defects:
 
-The original C0–C7 headings below describe implementation slices, not certification of all C01–C10 requirements in the development plan. Complete school assessment → canonical result → report → CSV, consultation two-wave longitudinal, and protected multi-rater business scenarios have not all been demonstrated through a real browser. Full migration/backup/restore release rehearsal and parent historical report discovery also remain unverified here. The production resource registry remains intentionally empty until governed resources are released; no scientific content or Safety trigger is auto-published.
+- RA-02 failed because the legacy task-list shell admitted ADMIN. The legacy task list retains its old roles; exact shared runtime routes still admit an authenticated frozen Organization respondent and enforce server resource authorization.
+- Canonical Composite FINAL did not update Run completion, leaving valid results unavailable for reporting. Completion now calls the existing reconciler after the runtime transaction. An authorized completed-attempt GET repairs projection loss; a browser fault injection proves the same execution recovers with exactly one canonical result. Legacy Course completion uses an exact actor/episode binding and cannot update Organization assignments.
+- Parent task discovery now links an exact completed individual historical report. It grants neither tenant navigation nor historical CSV authority.
+- Identity-keyed Organization context prevents a mount-time reset from cancelling deep-link selection. Report form controls now shrink within their grid; desktop screenshots and viewport assertions verify no overflow.
+- Production backup streamed pg_dump through the default 1 MiB process buffer and failed on larger dumps. It now streams to a private file descriptor. The real encrypted backup/restore entry points passed with a 7,822,369-byte encrypted package, including a deliberately large isolated probe.
 
-The final push requests the existing Ready-PR exact-head CI. Per the user's request this task stops immediately after triggering CI; final CI results and merge readiness are not asserted.
+### Local results
+
+- Backend build passed. Broad relevant regression: 60/61 suites passed initially; the remaining shared-DB pagination assumption was corrected and its 3 tests passed. The final runtime/relational/context rerun passed 35 suites / 237 tests. Earlier explicit runtime PostgreSQL gates passed 20 tests with their required database variables enabled.
+- Full frontend: 130 suites / 489 tests passed. Final typecheck and route/session-gate inventory passed. Production build passed. Lint: zero errors, 101 existing warnings.
+- Original CI failure RA-02 four-role browser acceptance passed again.
+- Three complete business scenarios, legacy compatibility, and FINAL projection-loss recovery passed against real HTTP, PostgreSQL and Chromium. No request mocks or pre-completed canonical results are used.
+- Fresh PostgreSQL 14 migrations, encrypted backup verification/restore, row-count/hash comparison, failed migration transaction rollback and explicit forward recovery all passed in disposable containers.
+
+### Development-plan C01–C10 evidence map
+
+| Scope | Reproducible evidence |
+| --- | --- |
+| C01–C03 identity, lifecycle, structure | `organizationProductContext`, `organizationProductAdmin`, `organizationClassificationRelations`, `organizationClassRelationships` PostgreSQL suites; `pr5-organization-browser-e2e.cjs`; OrganizationContext frontend tests |
+| C04–C05 constrained Run, recovery | `assessmentRunResourceBoundary`, `assessmentRunPublish`, `assessmentRunStartClaim`, `assessmentRunRecovery`, `assessmentRunLifecycle`, `assessmentRunConsentRecovery` PostgreSQL suites; real resource selection/preview/publish, runtime FINAL and projection-loss recovery in `pr5-product-scenarios.ts` |
+| C06–C08 reporting, history, Safety/export | reporting PostgreSQL/privacy/delivery suites; all three scenarios, exact Parent historical report UI, protected audience denials, SUMMARY/ACTION/FULL, suspended responsibility, actual CSV download and revoked-ticket denial |
+| C09 legacy isolation | route inventory; RA-02; legacy STUDENT Organization staff and legacy ADMIN exact respondent; three real legacy Course completions and old aggregate report; Organization ID injection rejection |
+| C10 business and release rehearsal | `pr5-product-scenarios.ts` and `pr5-release-rehearsal.mjs`, wired into the required browser CI job without skips |
+
+The [business manifest](evidence/pr5-2026-09-20/business-manifest.json) records exact candidate, runtime/snapshot/result identities and successful assertions; the [business log](evidence/pr5-2026-09-20/business.log) records the executed scenarios. The [recovery manifest](evidence/pr5-2026-09-20/recovery-manifest.json) records the candidate, backup size/hash and restored table counts/hashes; the [recovery log](evidence/pr5-2026-09-20/recovery.log) records all five passed stages.
+
+Business coverage:
+
+1. School creation and first administrator; SINGLE/MULTI teacher labels; SELF execution; canonical results; all-school and label reports; browser CSV download; export revocation; frozen history after label/membership ending and a new membership episode.
+2. Student SELF, Teacher→Student, Parent→Student and Student→Teacher protected feedback; relationship/membership/consent revocation; exact Parent historical report after leaving; subject/generic-report denial; Safety three projections and suspended responsible access; old Course aggregate remains available.
+3. Client SELF, Counselor→Client and Client→Counselor; exact legacy ADMIN respondent; current Client read authority and outsider/ended-relationship denial; pending START denied after relationship end; Counselor M1/M2 same-User pairing, three paired valid cases; repeated/matched projections and NOT_COMPARABLE without invented deltas; mobile task inbox and keyboard access. One staff member has both TEACHER and COUNSELOR Personas.
+
+### Reproduction and release procedure
+
+The CI browser job is the authoritative reproducible sequence: install/migrate/seed, run the existing production-server gates, seed `e2e/pr5-product-scenarios-fixture.ts`, replace only the test backend with `e2e/pr5-product-scenarios-server.ts` (`NODE_ENV=test`, `PR5_SCENARIOS_ENABLED=true`), run `e2e/pr5-product-scenarios.ts`, then `node e2e/pr5-release-rehearsal.mjs`. Local Chromium may be selected with `PR5_CHROMIUM_EXECUTABLE`. Required test database/encryption/session settings are listed in `.github/workflows/ci.yml`; credentials and dumps are not committed as evidence.
+
+The rehearsal uses new random Docker containers, applies repository migrations, copies the real scenario database, invokes production backup/verify/restore, and compares domain row hashes. It injects a transactional failed migration only into a temporary copy, verifies DDL rollback and unchanged history, explicitly resolves that migration as rolled back, and reapplies the current migration head. It removes only its own containers and temporary keys/backups. Production recovery still requires choosing the verified backup and approved target; do not erase migration history or mark an unapplied production migration complete. No production deployment was performed.
+
+The isolated registry fixture and Safety-case fault injection are test inputs. Safety authorization is exercised against a real canonical snapshot, but this does not certify a production clinical trigger. Production scientific resources, specs and triggers remain governed and are not auto-published. Existing upstream statistical/fault matrices remain required backend gates; these three scenarios do not replace them.
+
+The final push requests the existing Ready-PR exact-head Full CI. Per the user's request this task stops after triggering CI; final CI results and merge readiness are not asserted.
 
 ## Baseline
 

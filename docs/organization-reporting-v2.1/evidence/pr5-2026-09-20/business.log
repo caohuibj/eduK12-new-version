@@ -1,0 +1,32 @@
+PASS FINAL projection failure: authorized GET repairs the same execution without another canonical result
+Runtime FINAL verified: teacher0 / teacher-self
+Runtime FINAL verified: teacher1 / teacher-self
+Runtime FINAL verified: teacher2 / teacher-self
+Runtime FINAL verified: teacher0 / teacher-self
+Runtime FINAL verified: teacher1 / teacher-self
+Runtime FINAL verified: teacher2 / teacher-self
+PASS school: platform-create, SINGLE/MULTI labels, SELF runtime/canonical, all/label group, CSV revocation, frozen history and rejoin
+Runtime FINAL verified: student0 / student-self
+Runtime FINAL verified: student1 / student-self
+Runtime FINAL verified: student2 / student-self
+Runtime FINAL verified: teacher0 / teacher-student
+Runtime FINAL verified: parent / parent-student
+Runtime FINAL verified: student0 / student-teacher
+Runtime FINAL verified: student1 / student-teacher
+Runtime FINAL verified: student2 / student-teacher
+PASS school mental health: four directions, protected subject/generic report denial, consent and relationship revocation, historical Parent report, Safety SUMMARY/ACTION/FULL
+Runtime FINAL verified: client0 / client-self
+Runtime FINAL verified: client1 / client-self
+Runtime FINAL verified: client2 / client-self
+Runtime FINAL verified: counselor0 / counselor-client
+Runtime FINAL verified: client0 / client-counselor
+Runtime FINAL verified: client1 / client-counselor
+Runtime FINAL verified: client2 / client-counselor
+Runtime FINAL verified: counselor0 / counselor-self
+Runtime FINAL verified: counselor1 / counselor-self
+Runtime FINAL verified: counselor2 / counselor-self
+Runtime FINAL verified: counselor0 / counselor-self
+Runtime FINAL verified: counselor1 / counselor-self
+Runtime FINAL verified: counselor2 / counselor-self
+PASS consultation: Client SELF, both professional directions, exact ADMIN respondent, ended relation START denial, Counselor M1/M2 matched and repeated, mobile keyboard
+PASS legacy Course: three real canonical results aggregate normally; Organization assignment cannot enter legacy report target
