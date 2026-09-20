@@ -13,6 +13,7 @@ import {
   filterExpandedScaleLibraryEntries,
 } from '../../modules/scale/library/wave1-p1-read-model'
 import { enrichExistingP1Evidence } from '../../modules/scale/library/wave1-p1-existing-evidence'
+import { applyDass21ProductPolicy } from '../../modules/scale/library/wave1-dass21-product-policy'
 import { WAVE1_P1_SCALE_CATALOG_MANIFESTS } from '../../modules/scale/library/wave1-p1-catalog'
 
 const NOW = '2026-09-20T00:00:00.000Z'
@@ -80,16 +81,32 @@ describe('Wave 1 P1 scale-library integration', () => {
     expect(wave1.every((entry) => isScaleLibraryPublicPayloadSafe(entry as unknown as ScaleLibraryEntry))).toBe(true)
   })
 
+  it('records DASS-21 as the standard 14+ line and keeps DASS-Y separate', () => {
+    const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
+    const dass = model.entries.find((entry) => entry.identity.instrumentKey === 'dass21_zh_cn')!
+
+    expect(dass.identity.canonicalName).toContain('(14+)')
+    expect(dass.applicability.minAge).toBe(14)
+    expect(dass.applicability.maxAge).toBe(100)
+    expect(dass.applicability.gradeRange).toBeUndefined()
+    expect(dass.applicability.populationNotes).toContain('DASS-Y')
+    expect(dass.applicability.populationNotes).toContain('14 岁以下')
+    expect(dass.evidence.recordCount).toBe(3)
+    expect(dass.governance?.evidence.map((record) => record.evidenceId)).toEqual([
+      'dass21-cn-gong-2010',
+      'dass21-cn-wen-2012',
+      'dass21-cn-wang-2016',
+    ])
+  })
+
   it('exposes Simplified-Chinese validation populations without claiming norms or diagnosis', () => {
     const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
 
     const dass = model.entries.find((entry) => entry.identity.instrumentKey === 'dass21_zh_cn')!
-    expect(dass.applicability.populationNotes).toContain('1,507')
-    expect(dass.applicability.populationNotes).toContain('1,131')
-    expect(dass.evidence.recordCount).toBe(2)
+    expect(dass.applicability.populationNotes).toContain('大学生和成人')
+    expect(dass.evidence.recordCount).toBe(3)
     expect(dass.report.dimensionLabels).toEqual(['抑郁相关体验', '焦虑相关体验', '压力/紧张相关体验'])
     expect(dass.report.maxEligibleLevel).toBeNull()
-    expect(dass.report.limitations.join(' ')).toContain('不提供诊断')
     expect(dass.governance?.packageReleaseStatus).toBe('NOT_BUILT')
     expect(dass.governance?.gate.publishable).toBe(false)
 
@@ -104,6 +121,26 @@ describe('Wave 1 P1 scale-library integration', () => {
     const pss = model.entries.find((entry) => entry.identity.instrumentKey === 'pss10_zh_cn')!
     expect(pss.applicability.populationNotes).toContain('1,096')
     expect(pss.report.limitations.join(' ')).toContain('cut-off')
+  })
+
+  it('encodes respondent-safe DASS feedback as descriptive and non-numeric', () => {
+    const model = applyDass21ProductPolicy(buildExpandedScaleLibraryReadModel({
+      locale: 'zh-CN',
+      territory: 'CN',
+      viewerRole: 'ADMIN',
+      nowIso: NOW,
+    }))
+    const dass = model.entries.find((entry) => entry.identity.instrumentKey === 'dass21_zh_cn')!
+
+    expect(dass.report.limitations.join(' ')).toContain('不显示 DASS 数值分数')
+    expect(dass.report.limitations.join(' ')).toContain('不依赖隐藏分数')
+    expect(dass.report.limitations.join(' ')).toContain('14 岁及以上')
+    expect(dass.report.disclaimer).toContain('非分数化')
+    expect(dass.report.disclaimer).toContain('不代表对个人心理健康状态的认定')
+    expect(dass.availability.reasons.join(' ')).toContain('respondent-safe result projection')
+    expect(dass.availability.reasons.join(' ')).toContain('14+ 年龄准入')
+    expect(dass.governance?.gate.errors.join(' ')).toContain('age >= 14 runtime admission gate')
+    expect(dass.governance?.gate.publishable).toBe(false)
   })
 
   it('never turns a catalog-first entry launchable merely because an authorization record exists', () => {
@@ -135,6 +172,8 @@ describe('Wave 1 P1 scale-library integration', () => {
     ])
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { primaryDomain: 'SELF_EFFICACY' }))).toEqual(['gse_zh_cn'])
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { availability: 'NOT_AVAILABLE', respondent: 'SELF' }))).toContain('dass21_zh_cn')
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { minAge: 8, maxAge: 13 }))).not.toContain('dass21_zh_cn')
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { minAge: 14, maxAge: 17 }))).toContain('dass21_zh_cn')
   })
 
   it('adds Chinese validation evidence to existing WHO-5 and SDQ entries without activating references', () => {
