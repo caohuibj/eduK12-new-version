@@ -1,3 +1,4 @@
+import { compileScalePolicy, type CompiledScalePolicyV1 } from '../policy/compile'
 import { projectScalePackage } from './define-instrument'
 import { buildLegacyInstrumentSources } from './legacy-adapter'
 import { materializeCatalogManifest, materializeLocalizationManifest, validateScaleInstrumentSource } from './validate-instrument'
@@ -12,6 +13,7 @@ const identityKey = (source: Pick<ScaleInstrumentSourceV1, 'identity'>): string 
 export interface ScaleInstrumentRegistry {
   getSource(instrumentKey: string, instrumentVersion: string): ScaleInstrumentSourceV1 | undefined
   getExecutable(instrumentKey: string, instrumentVersion: string): ScalePackageV2 | undefined
+  getRuntimePolicy(instrumentKey: string, instrumentVersion: string): CompiledScalePolicyV1 | undefined
   listSources(): ScaleInstrumentSourceV1[]
   listCatalogEntries(): ScaleCatalogManifestV1[]
   getLocalization(instrumentKey: string, instrumentVersion: string): LocalizationManifestV1 | undefined
@@ -38,6 +40,10 @@ export const createScaleInstrumentRegistry = (sources: readonly ScaleInstrumentS
       const source = byIdentity.get(`${instrumentKey}:${instrumentVersion}`)
       return source ? projectScalePackage(source) : undefined
     },
+    getRuntimePolicy: (instrumentKey, instrumentVersion) => {
+      const source = byIdentity.get(`${instrumentKey}:${instrumentVersion}`)
+      return source?.executable ? compileScalePolicy(source) : undefined
+    },
     listSources: sortedSources,
     listCatalogEntries: () => sortedSources().map((source) => materializeCatalogManifest(source) as ScaleCatalogManifestV1),
     getLocalization: (instrumentKey, instrumentVersion) => {
@@ -53,3 +59,4 @@ export const getScaleInstrumentSource = SCALE_INSTRUMENT_REGISTRY.getSource
 export const listScaleInstrumentSources = SCALE_INSTRUMENT_REGISTRY.listSources
 export const listScaleInstrumentCatalogEntries = SCALE_INSTRUMENT_REGISTRY.listCatalogEntries
 export const getScaleInstrumentLocalization = SCALE_INSTRUMENT_REGISTRY.getLocalization
+export const getScaleInstrumentRuntimePolicy = SCALE_INSTRUMENT_REGISTRY.getRuntimePolicy

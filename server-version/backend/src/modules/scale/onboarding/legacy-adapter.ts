@@ -2,46 +2,12 @@ import { WAVE0_LOCALIZATION_MANIFESTS, WAVE0_SCALE_CATALOG_MANIFESTS } from '../
 import { WAVE1_P1_LOCALIZATION_MANIFESTS, WAVE1_P1_SCALE_CATALOG_MANIFESTS } from '../library/wave1-p1-catalog'
 import type { ScaleCatalogManifestV1 } from '../library/catalog-manifest'
 import type { LocalizationManifestV1 } from '../library/localization-manifest'
-import type { AudienceDisclosurePolicyV1, DisclosureCapabilitiesV1, InstrumentApplicabilityV1 } from '../policy/types'
+import { getLegacyScaleCompatibilityProfile } from '../policy/legacy-profile'
 import { defineScaleInstrumentSource } from './define-instrument'
 import { listExecutableScalePackages } from './executable-registry'
 import type { ScaleInstrumentSourceV1, ScalePackageV2 } from './types'
 
 const identityKey = (key: string, version: string): string => `${key}:${version}`
-
-const legacyFullCapabilities: DisclosureCapabilitiesV1 = {
-  numericScores: true,
-  references: true,
-  individualInterpretations: true,
-  scoreDerivedLabels: true,
-  resultQualityDetails: true,
-  rawAnswers: false,
-  itemScores: true,
-  methods: true,
-  educationalContent: true,
-}
-
-const legacyDisclosure = (): AudienceDisclosurePolicyV1 => ({
-  schemaVersion: 1,
-  policyVersion: 'legacy-compat-v1',
-  audiences: {
-    respondent: { ...legacyFullCapabilities },
-    subject: { ...legacyFullCapabilities },
-    teacher: { ...legacyFullCapabilities },
-    researcher: { ...legacyFullCapabilities },
-  },
-  unknownAudience: 'DENY',
-})
-
-const legacyApplicability = (catalog: ScaleCatalogManifestV1): InstrumentApplicabilityV1 => ({
-  schemaVersion: 1,
-  policyVersion: 'legacy-compat-v1',
-  // PR-1 records trusted respondent semantics but deliberately does not turn
-  // catalog age/evidence ranges into runtime admission gates. PR-3 performs
-  // deployment-by-deployment applicability activation.
-  respondentTypes: [...catalog.population.respondentTypes],
-  requiredContextKeys: [],
-})
 
 const stripCatalogIdentity = (catalog: ScaleCatalogManifestV1): ScaleInstrumentSourceV1['catalog'] => {
   const { instrumentKey: _key, instrumentVersion: _version, ...identityBody } = catalog.identity
@@ -68,6 +34,12 @@ const adaptLegacySource = (input: {
         goldenCases: input.executable.goldenCases,
       }
     : undefined
+  const compatibilityProfile = executable
+    ? getLegacyScaleCompatibilityProfile(input.catalog.identity.instrumentKey, input.catalog.identity.instrumentVersion)
+    : undefined
+  if (executable && !compatibilityProfile) {
+    throw new Error(`Executable legacy Scale source has no compatibility profile: ${input.catalog.identity.instrumentKey}@${input.catalog.identity.instrumentVersion}`)
+  }
 
   return defineScaleInstrumentSource({
     schemaVersion: 1,
@@ -77,10 +49,10 @@ const adaptLegacySource = (input: {
     },
     catalog: stripCatalogIdentity(input.catalog),
     ...(input.localization ? { localization: stripLocalizationIdentity(input.localization) } : {}),
-    ...(executable
+    ...(executable && compatibilityProfile
       ? {
-          applicability: legacyApplicability(input.catalog),
-          disclosure: legacyDisclosure(),
+          applicability: compatibilityProfile.applicability,
+          disclosure: compatibilityProfile.disclosure,
           executable,
         }
       : {

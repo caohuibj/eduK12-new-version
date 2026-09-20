@@ -1,4 +1,4 @@
-import type { AssessmentContextKey } from '../../assessment-context/context'
+import type { AssessmentContextKey, GradeLevel } from '../../assessment-context/context'
 
 export const SCALE_POLICY_SCHEMA_VERSION = 1 as const
 
@@ -41,11 +41,7 @@ export interface AudienceDisclosurePolicyV1 {
   unknownAudience: 'DENY'
 }
 
-/**
- * Source-owned requirements, not proof that a right has been granted.
- * Deployment-specific scope and durable InstrumentAuthorization bindings are
- * deliberately introduced by PR-3 rather than stored here as facts.
- */
+/** Source-owned requirements; durable grants stay in InstrumentAuthorization. */
 export interface InstrumentUsageRequirementsV1 {
   schemaVersion: typeof SCALE_POLICY_SCHEMA_VERSION
   policyVersion: string
@@ -73,4 +69,45 @@ export interface EducationalFeedbackDefinitionV1 {
   blocks: EducationalFeedbackBlockV1[]
   choices?: EducationalFeedbackChoiceV1[]
   disclaimer?: string
+}
+
+export type ScaleEligibilityOutcome = 'ELIGIBLE' | 'INELIGIBLE' | 'INDETERMINATE'
+
+export interface ScaleEligibilityFactsV1 {
+  respondentType?: ScalePolicyRespondentType | 'UNKNOWN'
+  subject?: {
+    ageMonths?: number
+    gradeLevel?: GradeLevel
+  }
+  assessmentContext?: string
+  availableContextKeys: AssessmentContextKey[]
+}
+
+export interface ScaleEligibilityReasonV1 {
+  code: string
+  rule: string
+  field?: string
+}
+
+export interface ScaleEligibilityEvaluationV1 {
+  outcome: ScaleEligibilityOutcome
+  reasons: ScaleEligibilityReasonV1[]
+}
+
+export interface FrozenEligibilityDecisionV1 {
+  schemaVersion: 1
+  evaluatorVersion: string
+  policyVersion: string
+  policyHash: string
+  contextHash: string | null
+  identityBindingHash: string
+  contextFrozenAt: string | null
+  evaluatedAt: string
+  outcome: ScaleEligibilityOutcome
+  reasons: ScaleEligibilityReasonV1[]
+  factProvenance: {
+    subject: string
+    respondent: string
+    ageBasis?: string
+  }
 }
