@@ -9,12 +9,14 @@ import {
   respondentTypeSchema,
 } from '../modules/scale/library/catalog-manifest'
 import {
-  buildScaleLibraryReadModel,
-  filterScaleLibraryEntries,
-  getScaleLibraryEntry,
   type ScaleLibraryFilterInput,
   type ScaleLibraryReadModelContext,
 } from '../modules/scale/library/scale-library-read-model'
+import {
+  buildExpandedScaleLibraryReadModel,
+  filterExpandedScaleLibraryEntries,
+  getExpandedScaleLibraryEntry,
+} from '../modules/scale/library/wave1-p1-read-model'
 import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../modules/scale/library/wave0-catalog'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
@@ -62,14 +64,19 @@ const libraryQuerySchema = z.object({
   }
 })
 
-const wave0ScalePairs = WAVE0_SCALE_CATALOG_MANIFESTS.map((manifest) => ({
+/**
+ * Only executable Wave 0 packages can currently have Scale deployment rows.
+ * Wave 1 P1 catalog-first entries deliberately have no deployment until their
+ * exact-form package / rights / report contract is closed.
+ */
+const deployedScalePairs = WAVE0_SCALE_CATALOG_MANIFESTS.map((manifest) => ({
   code: manifest.identity.instrumentKey,
   instrumentVersion: manifest.identity.instrumentVersion,
 }))
 
 const loadDeployments = async (req: Request) => {
   const rows = await prisma.scale.findMany({
-    where: { OR: wave0ScalePairs },
+    where: { OR: deployedScalePairs },
     select: {
       id: true,
       code: true,
@@ -143,11 +150,11 @@ export const scaleLibraryController = {
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
       const query = parsed.query
-      const model = buildScaleLibraryReadModel(await buildContext(req, query))
+      const model = buildExpandedScaleLibraryReadModel(await buildContext(req, query))
       return success(res, {
         schemaVersion: model.schemaVersion,
         generatedAt: model.generatedAt,
-        entries: filterScaleLibraryEntries(model.entries, filterFromQuery(query)),
+        entries: filterExpandedScaleLibraryEntries(model.entries, filterFromQuery(query)),
       })
     } catch (err) {
       return handleError(res, err)
@@ -159,8 +166,8 @@ export const scaleLibraryController = {
       if (!req.user) return unauthorized(res)
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
-      const model = buildScaleLibraryReadModel(await buildContext(req, parsed.query))
-      const entry = getScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
+      const model = buildExpandedScaleLibraryReadModel(await buildContext(req, parsed.query))
+      const entry = getExpandedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
       if (!entry) return notFound(res, '量表库条目不存在')
       return success(res, { entry })
     } catch (err) {
