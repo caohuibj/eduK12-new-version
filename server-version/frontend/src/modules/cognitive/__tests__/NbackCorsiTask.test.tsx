@@ -55,7 +55,7 @@ describe('N-Back and Corsi runners', () => {
       const practiceResponses = [false, true, false, true]
       for (const shouldRespond of practiceResponses) {
         await act(async () => { vi.advanceTimersByTime(10) })
-        if (shouldRespond) fireEvent.click(screen.getByRole('button'))
+        if (shouldRespond) fireEvent.pointerDown(screen.getByRole('button'))
         await act(async () => { vi.advanceTimersByTime(10 + 600) })
       }
 
