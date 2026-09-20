@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { MemoryConfig, MemoryTrialPayload } from '../../types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { deterministicMemorySequence } from './prng'
 
 const PRACTICE_SEQUENCES = [[3, 7, 1], [9, 4, 2]]
 const PRACTICE_PASS_CORRECT = 1
+const KEYPAD_DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 
 type Phase = 'instruction' | 'practice' | 'formal'
 type FormalSubPhase = 'ready' | 'display' | 'response'
@@ -17,14 +19,14 @@ const Keypad: React.FC<{
   onDigit: (digit: number) => void
   disabled?: boolean
 }> = ({ onDigit, disabled = false }) => (
-  <div className="grid grid-cols-5 gap-2 max-w-sm mx-auto">
-    {Array.from({ length: 10 }, (_, digit) => (
+  <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+    {KEYPAD_DIGITS.map((digit) => (
       <button
         key={digit}
         type="button"
         disabled={disabled}
         onClick={() => onDigit(digit)}
-        className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+        className={`min-h-12 rounded-lg border border-gray-200 bg-white px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 ${digit === 0 ? 'col-start-2' : ''}`}
       >
         {digit}
       </button>
@@ -250,9 +252,7 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key >= '0' && event.key <= '9') handleDigit(Number(event.key))
-      else if (phase === 'formal' && formalSubPhase === 'response' && event.key === 'Backspace') {
-        setResponse((current) => current.slice(0, -1))
-      } else if (phase === 'formal' && formalSubPhase === 'response' && event.key === 'Enter') {
+      else if (phase === 'formal' && formalSubPhase === 'response' && event.key === 'Enter') {
         void submitFormal()
       }
     }
@@ -265,7 +265,7 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
       <div className="card p-8 max-w-2xl text-center">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">数字序列短时记忆</h1>
         <p className="text-gray-600 mb-3">数字会依次出现，请按原顺序输入。每个长度会完成两题，至少答对一题才进入下一长度。</p>
-        <p className="text-gray-400 text-xs mb-6">先完成两道不计分练习；至少答对一道才开始正式测评。结果反映本次任务表现，不代表诊断或正式能力评估。</p>
+        <p className="text-gray-400 text-xs mb-6">先完成两道不计分练习；至少答对一道才开始正式测评。正式测验输入后不会回显具体数字，也不能退格修改。</p>
         <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
       </div>
     )
@@ -303,29 +303,30 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
 
   const responseReady = formalSubPhase === 'response' && !inactivityExpired
   return (
-    <div className="card p-8 max-w-2xl text-center">
-      <div className="text-sm text-gray-500 mb-4">正式试次 {trialIndex + 1} · 当前长度 {length} · 第 {trialWithinLevel} 题 / 2</div>
-      {formalSubPhase === 'ready' && <div className="text-gray-500 h-20 pt-6">准备…</div>}
-      {formalSubPhase === 'display' && <div className="text-6xl font-bold text-primary h-20">{displayDigit}</div>}
-      {formalSubPhase === 'response' && (
-        <>
-          <div className="text-lg text-gray-600 mb-4">按顺序输入：{response.join(' ') || '—'}</div>
-          <Keypad onDigit={handleDigit} disabled={!responseReady || submittingRef.current} />
-          <div className="flex items-center justify-center gap-3 mt-5">
-            <button type="button" onClick={() => setResponse((current) => current.slice(0, -1))} className="btn-secondary" disabled={!responseReady}>退格</button>
-            <button type="button" onClick={() => void submitFormal()} className="btn-primary" disabled={!responseReady || response.length !== sequence.length || submittingRef.current}>提交</button>
-          </div>
-          {inactivityExpired && (
-            <div className="mt-5 rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
-              <p className="mb-3">输入时间较长，要继续这道题还是退出测评？</p>
-              <div className="flex justify-center gap-3">
-                <button type="button" className="btn-primary" onClick={() => { setInactivityExpired(false); setGuardKey((key) => key + 1) }}>继续作答</button>
-                <button type="button" className="btn-secondary" onClick={() => window.history.back()}>退出测评</button>
-              </div>
+    <CognitiveFocusStage ariaLabel="数字广度正式测验">
+      <div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
+        <div className="text-sm text-gray-500 mb-4">当前长度 {length} · 第 {trialWithinLevel} 题 / 2</div>
+        {formalSubPhase === 'ready' && <div className="text-gray-500 h-20 pt-6">准备…</div>}
+        {formalSubPhase === 'display' && <div className="text-6xl font-bold text-primary h-20">{displayDigit}</div>}
+        {formalSubPhase === 'response' && (
+          <>
+            <div className="text-lg text-gray-600 mb-4">已输入 {response.length} / {sequence.length}</div>
+            <Keypad onDigit={handleDigit} disabled={!responseReady || submittingRef.current} />
+            <div className="mt-5 flex items-center justify-center">
+              <button type="button" onClick={() => void submitFormal()} className="btn-primary min-h-12" disabled={!responseReady || response.length !== sequence.length || submittingRef.current}>提交</button>
             </div>
-          )}
-        </>
-      )}
-    </div>
+            {inactivityExpired && (
+              <div className="mt-5 rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
+                <p className="mb-3">输入时间较长，要继续这道题还是退出测评？</p>
+                <div className="flex justify-center gap-3">
+                  <button type="button" className="btn-primary" onClick={() => { setInactivityExpired(false); setGuardKey((key) => key + 1) }}>继续作答</button>
+                  <button type="button" className="btn-secondary" onClick={() => window.history.back()}>退出测评</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </CognitiveFocusStage>
   )
 }
