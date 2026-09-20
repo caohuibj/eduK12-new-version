@@ -7,6 +7,7 @@ export const picturesequenceTrialSchema = z.object({
   responseOrder: z.array(z.string().regex(/^scene-\d{2}$/)).max(15),
   responseDurationMs: z.number().int().nonnegative(),
   interrupted: z.boolean(),
+  timedOut: z.boolean().optional(),
 }).strict()
 
 export type PicturesequenceTrial = z.infer<typeof picturesequenceTrialSchema>
