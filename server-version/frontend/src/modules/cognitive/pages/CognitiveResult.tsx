@@ -7,8 +7,9 @@ import { ArrowLeft, CheckCircle } from 'lucide-react'
 import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { resolveRunner, type MetricDefinition } from '../registry'
-import type { CognitiveSession, CognitiveV2Report, CognitiveV2ReportMetricView } from '../types'
+import type { CognitiveSession, CognitiveV2Report } from '../types'
 import CognitiveSingleTaskReportCard from '../CognitiveSingleTaskReportCard'
+import CognitiveV2ReportCard from '../CognitiveV2ReportCard'
 
 const formatMetric = (definition: MetricDefinition, value: unknown): string => {
   if (value === null || value === undefined || value === '') return '—'
@@ -83,118 +84,27 @@ const CognitiveResult: React.FC = () => {
   const { result } = session
   const v2Report = isCognitiveV2Report(result.report) ? result.report : null
   if (v2Report) {
-    const renderV2Metrics = (metrics: CognitiveV2ReportMetricView[]) => (
-      metrics.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {metrics.map((metric) => (
-            <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
-              <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-              <div className="text-xs text-gray-500">{metric.label}</div>
-              <div className="text-[11px] text-gray-400 mt-1">{metric.category}</div>
-            </div>
-          ))}
-        </div>
-      ) : <p className="text-sm text-gray-500">本次没有可展示的定量指标。</p>
-    )
-    const activeQuality = v2Report.quality.filter((item) => item.active)
-    const qualityStyle = v2Report.qualityState === 'interpretable'
-      ? 'bg-green-50 text-green-700'
-      : v2Report.qualityState === 'limited'
-        ? 'bg-amber-50 text-amber-800'
-        : 'bg-red-50 text-red-700'
-    const qualityLabel = v2Report.qualityState === 'interpretable'
-      ? '数据质量：可解释'
-      : v2Report.qualityState === 'limited'
-        ? '数据质量：受限解释'
-        : '数据质量：无效，暂不解释'
-    // The server omits references for invalid results. Keep the projection
-    // boundary defensive so a stale/cached payload cannot reveal them either.
-    const referenceRows = v2Report.qualityState === 'invalid'
-      ? []
-      : (result.references ?? []).filter((reference) => reference && typeof reference === 'object') as Array<Record<string, unknown>>
-
+    const referenceRows = (result.references ?? [])
+      .filter((reference) => reference && typeof reference === 'object') as Array<Record<string, unknown>>
     return (
       <div>
         <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
           <ArrowLeft className="w-4 h-4 mr-1" /> 返回列表
         </button>
-        <div className="card p-8 max-w-2xl text-center">
+        <div className="card p-5 max-w-2xl text-center sm:p-8">
           <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">{v2Report.title}</h1>
-          <p className="text-sm text-gray-500 mb-6">
-            尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}
-            {v2Report.method.profile ? ` · ${profileLabel(v2Report.method.profile)}` : ''}
-            {isPublic && session.anonymousCode ? ` · 匿名编号 ${session.anonymousCode}` : ''}
-            {session.finishedAt ? ` · ${new Date(session.finishedAt).toLocaleString('zh-CN')}` : ''}）
-          </p>
-
-          <section className="text-left mb-6">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2">结果结论</h2>
-            <div className={`rounded-lg px-4 py-3 text-sm ${qualityStyle}`}>
-              <p>{v2Report.conclusion}</p>
-              <p className="mt-1 font-medium">{qualityLabel}</p>
-            </div>
-            {activeQuality.length > 0 && (
-              <ul className="mt-2 text-xs text-gray-500 list-disc list-inside">
-                {activeQuality.map((item) => <li key={item.key}>{item.label}</li>)}
-              </ul>
-            )}
-          </section>
-
-          {v2Report.headline.length > 0 && (
-            <section className="text-left mb-6">
-              <h2 className="text-sm font-semibold text-gray-600 mb-2">核心指标</h2>
-              {renderV2Metrics(v2Report.headline)}
-            </section>
-          )}
-
-          {v2Report.user.length > 0 && (
-            <section className="text-left mb-6">
-              <h2 className="text-sm font-semibold text-gray-600 mb-2">任务表现</h2>
-              {renderV2Metrics(v2Report.user)}
-            </section>
-          )}
-
-          <details className="text-left border-t pt-4">
-            <summary className="cursor-pointer text-sm font-semibold text-gray-600">展开详情与方法</summary>
-            <div className="mt-4">
-              {v2Report.detail.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-sm font-semibold text-gray-600 mb-2">详细指标</h2>
-                  {renderV2Metrics(v2Report.detail)}
-                </section>
-              )}
-              {referenceRows.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-sm font-semibold text-gray-600 mb-2">参考信息</h2>
-                  {referenceRows.map((reference, index) => (
-                    <div key={`${String(reference.metricKey ?? reference.scoreKey ?? 'reference')}-${index}`} className="text-sm text-gray-600 mb-2">
-                      <p className="font-medium">{typeof reference.label === 'string' ? reference.label : '参考暂不可用'}</p>
-                      {reference.status === 'available' && typeof reference.disclaimer === 'string' && <p className="text-xs text-gray-400 mt-1">{reference.disclaimer}</p>}
-                      {reference.status !== 'available' && typeof reference.unavailableReason === 'string' && <p className="text-xs text-gray-400 mt-1">当前未使用该参考：{reference.unavailableReason}</p>}
-                    </div>
-                  ))}
-                </section>
-              )}
-              <section className="mb-5">
-                <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明</h2>
-                <p className="text-xs text-gray-500">
-                  任务 {v2Report.method.testType} · 引擎 {v2Report.method.engineVersion} · 评分 {v2Report.method.scoringVersion} · 配置 {v2Report.method.configVersion}
-                </p>
-              </section>
-              {v2Report.practicalTips.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-sm font-semibold text-gray-600 mb-2">阅读提示</h2>
-                  {v2Report.practicalTips.map((tip) => <p key={tip} className="text-sm text-gray-500">{tip}</p>)}
-                </section>
-              )}
-            </div>
-          </details>
-          <p className="text-xs text-gray-400 mt-6 border-t pt-3">{v2Report.disclaimer}</p>
+          <CognitiveV2ReportCard
+            report={v2Report}
+            references={referenceRows}
+            attemptNo={session.attemptNo}
+            finishedAt={session.finishedAt}
+            anonymousCode={isPublic ? session.anonymousCode : null}
+          />
         </div>
       </div>
     )
   }
+
   const entry = resolveRunner(session.testType, session.engineVersion)
   const report = session.reportDefinition
     ? {
@@ -223,7 +133,8 @@ const CognitiveResult: React.FC = () => {
         displayType: definition.unit === 'ms' ? 'ms' as const : definition.unit === 'ratio' ? 'percentage' as const : 'number' as const,
       }))
     : (entry?.metricDefinitions ?? [])
-  const interpretable = (result.qualityFlags ?? result.quality?.flags ?? {}).interpretable !== false
+  const qualityFlagMap = result.qualityFlags ?? result.quality?.flags ?? {}
+  const interpretable = qualityFlagMap.interpretable !== false
   const metricValue = (key: string) => result.metrics?.[key]
   const headlineDefinition = report
     ? metricDefs.find((definition) => definition.key === report.headlineMetric)
@@ -243,18 +154,20 @@ const CognitiveResult: React.FC = () => {
       </div>
     ) : null
   })
-  const qualityLabels = Object.entries(result.qualityFlags)
+  const qualityLabels = Object.entries(qualityFlagMap)
     .filter(([key, value]) => key !== 'interpretable' && value === true)
     .map(([key]) => session.qualityDefinitions?.[key]?.label ?? key)
   const comparison = result.reference?.comparison
-  const tips = session.reportDefinition?.practicalTips ?? []
+  const tips = session.testType === 'memory' || session.testType === 'stroop'
+    ? []
+    : (session.reportDefinition?.practicalTips ?? [])
 
   return (
     <div>
       <button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" /> 返回列表
       </button>
-      <div className="card p-8 max-w-2xl text-center">
+      <div className="card p-5 max-w-2xl text-center sm:p-8">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
         {result.singleTaskReport ? (
           <CognitiveSingleTaskReportCard
@@ -264,92 +177,99 @@ const CognitiveResult: React.FC = () => {
             anonymousCode={isPublic ? session.anonymousCode : null}
           />
         ) : (
-        <>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">{report?.title ?? entry?.name ?? '测评完成'}</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          尝试 #{session.attemptNo}（{session.testType} / {session.engineVersion}
-          {profileLabel(session.profile) ? ` · ${profileLabel(session.profile)}` : ''}
-          {isPublic && session.anonymousCode ? ` · 匿名编号 ${session.anonymousCode}` : ''}
-          {session.finishedAt ? ` · ${new Date(session.finishedAt).toLocaleString('zh-CN')}` : ''}）
-        </p>
+          <>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">{report?.title ?? entry?.name ?? '测评完成'}</h1>
+            <p className="text-sm text-gray-500 mb-4">
+              尝试 #{session.attemptNo}（{profileLabel(session.profile) || '认知任务'}
+              {isPublic && session.anonymousCode ? ` · 匿名编号 ${session.anonymousCode}` : ''}
+              {session.finishedAt ? ` · ${new Date(session.finishedAt).toLocaleString('zh-CN')}` : ''}）
+            </p>
 
-        <section className="text-left mb-6">
-          <h2 className="text-sm font-semibold text-gray-600 mb-2">数据质量</h2>
-          <div className={`rounded-lg px-4 py-3 text-sm ${interpretable ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
-            {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议重新测量。'}
-          </div>
-          {qualityLabels.length > 0 && (
-            <ul className="mt-2 text-xs text-gray-500 list-disc list-inside">
-              {qualityLabels.map((label) => <li key={label}>{label}</li>)}
-            </ul>
-          )}
-        </section>
+            {session.profile === 'experience' ? (
+              <div className="mb-6 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-left text-sm text-blue-800">
+                <p className="font-medium">体验版 · 短程协议</p>
+                <p className="mt-1 text-xs leading-relaxed text-blue-700">本报告使用正式评分器计算，但试次数较少，更适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。</p>
+              </div>
+            ) : null}
 
-        {interpretable && report && headlineDefinition && (
-          <div className="mb-6">
-            <div className="text-5xl font-bold text-primary">{formatMetric(headlineDefinition, metricValue(report.headlineMetric))}</div>
-            <div className="text-sm text-gray-400 mt-1">{headlineDefinition.label}</div>
-          </div>
-        )}
+            <section className="text-left mb-6">
+              <h2 className="text-sm font-semibold text-gray-600 mb-2">数据质量</h2>
+              <div className={`rounded-lg px-4 py-3 text-sm ${interpretable ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
+                {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议在相近设备和环境下重新测量。'}
+              </div>
+              {qualityLabels.length > 0 && (
+                <ul className="mt-2 text-xs text-gray-500 list-disc list-inside">
+                  {qualityLabels.map((label) => <li key={label}>{label}</li>)}
+                </ul>
+              )}
+            </section>
 
-        {report?.showProductIndex !== false && (
-          <div className={`rounded-lg mb-6 ${interpretable ? 'bg-primary/5 p-5' : 'bg-gray-50 p-4'}`}>
-            <div className="text-sm text-gray-500">任务表现指数</div>
-            <div className={`font-bold ${interpretable ? 'text-4xl text-primary' : 'text-lg text-gray-400'}`}>
-              {interpretable && result.score !== undefined ? `${Math.round(result.score)} / 100` : '暂不显示'}
-            </div>
-          </div>
-        )}
-
-        {report && primaryKeys.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">主要指标</h2>
-            <div className="grid grid-cols-2 gap-3">{renderMetricCards(primaryKeys)}</div>
-          </section>
-        )}
-
-        {report && secondaryKeys.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">次级指标</h2>
-            <div className="grid grid-cols-2 gap-3">{renderMetricCards(secondaryKeys)}</div>
-          </section>
-        )}
-
-        {interpretable && result.reference && result.reference.mode !== 'none' && (
-          <section className="text-left mt-4 border-t pt-3">
-            <p className="text-sm font-semibold text-gray-600">{result.reference.label}</p>
-            {result.reference.available && comparison && (
-              <>
-                <p className="text-lg font-semibold text-gray-800 mt-1">{comparison.rangeLabel}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  观察值 {comparison.observed} · {comparison.meanLabel || '参考均值'} {comparison.referenceMean}
-                  {comparison.referenceSd ? `（SD ${comparison.referenceSd}）` : ''}
-                </p>
-              </>
+            {interpretable && report && headlineDefinition && (
+              <div className="mb-6">
+                <div className="text-4xl font-bold text-primary sm:text-5xl">{formatMetric(headlineDefinition, metricValue(report.headlineMetric))}</div>
+                <div className="text-sm text-gray-400 mt-1">{headlineDefinition.label}</div>
+              </div>
             )}
-            {result.reference.band && <p className="text-xs text-gray-400 mt-1">参考区间：{result.reference.band}</p>}
-            <p className="text-xs text-gray-400 mt-1">{result.reference.disclaimer}</p>
-          </section>
-        )}
 
-        {(session.reportCaveats && session.reportCaveats.length > 0) || tips.length > 0 ? (
-          <section className="text-left mt-4 border-t pt-3">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2">简要解释</h2>
-            {session.reportCaveats?.map((caveat) => <p key={caveat} className="text-sm text-amber-800">{caveat}</p>)}
-            {tips.map((tip) => <p key={tip} className="text-sm text-gray-500">{tip}</p>)}
-          </section>
-        ) : null}
+            {interpretable && report?.showProductIndex !== false && (
+              <div className="rounded-lg mb-6 border border-gray-200 bg-white p-4 text-left">
+                <div className="text-xs font-medium text-gray-500">任务表现指数</div>
+                <div className="mt-1 text-2xl font-semibold text-gray-800">
+                  {result.score !== undefined ? `${Math.round(result.score)} / 100` : '暂不显示'}
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-gray-400">内部综合指数，用于汇总本次任务表现；不代表百分位、年龄等级、学校成绩或诊断结论。</p>
+              </div>
+            )}
 
-        <section className="text-left mt-4 border-t pt-3">
-          <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明</h2>
-          <p className="text-xs text-gray-500">
-            任务 {session.testType} · 引擎 {session.engineVersion} · 评分 {session.scoringVersion} · 配置 {session.configVersion}
-            {session.profile ? ` · ${profileLabel(session.profile)}` : ''}
-          </p>
-        </section>
+            {interpretable && report && primaryKeys.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">主要指标</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{renderMetricCards(primaryKeys)}</div>
+              </section>
+            )}
 
-        {report?.disclaimer && <p className="text-xs text-gray-400 mt-6 border-t pt-3">{report.disclaimer}</p>}
-        </>
+            {interpretable && report && secondaryKeys.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">次级指标</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{renderMetricCards(secondaryKeys)}</div>
+              </section>
+            )}
+
+            {interpretable && result.reference && result.reference.mode !== 'none' && (
+              <section className="text-left mt-4 border-t pt-3">
+                <p className="text-sm font-semibold text-gray-600">{result.reference.label}</p>
+                {result.reference.available && comparison && (
+                  <>
+                    <p className="text-lg font-semibold text-gray-800 mt-1">{comparison.rangeLabel}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      观察值 {comparison.observed} · {comparison.meanLabel || '参考均值'} {comparison.referenceMean}
+                      {comparison.referenceSd ? `（SD ${comparison.referenceSd}）` : ''}
+                    </p>
+                  </>
+                )}
+                {result.reference.band && <p className="text-xs text-gray-400 mt-1">参考区间：{result.reference.band}</p>}
+                <p className="text-xs text-gray-400 mt-1">{result.reference.disclaimer}</p>
+              </section>
+            )}
+
+            {(session.reportCaveats && session.reportCaveats.length > 0) || tips.length > 0 ? (
+              <section className="text-left mt-4 border-t pt-3">
+                <h2 className="text-sm font-semibold text-gray-600 mb-2">简要解释</h2>
+                {session.reportCaveats?.map((caveat) => <p key={caveat} className="text-sm text-amber-800">{caveat}</p>)}
+                {tips.map((tip) => <p key={tip} className="text-sm text-gray-500">{tip}</p>)}
+              </section>
+            ) : null}
+
+            <details className="text-left mt-4 border-t pt-3">
+              <summary className="cursor-pointer text-sm font-semibold text-gray-600">方法说明（技术信息）</summary>
+              <p className="mt-2 text-xs text-gray-500">
+                任务 {session.testType} · 引擎 {session.engineVersion} · 评分 {session.scoringVersion} · 配置 {session.configVersion}
+                {session.profile ? ` · ${profileLabel(session.profile)}` : ''}
+              </p>
+            </details>
+
+            {report?.disclaimer && <p className="text-xs text-gray-400 mt-6 border-t pt-3">{report.disclaimer}</p>}
+          </>
         )}
       </div>
     </div>
