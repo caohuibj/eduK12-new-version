@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { nbackSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
@@ -207,13 +208,24 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     if (trialIndex + 1 >= total) await onTaskComplete?.()
   }
 
+  useEffect(() => {
+    if (phase !== 'practice' && phase !== 'formal') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
+      event.preventDefault()
+      void respond()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   if (phase === 'instruction') {
     return (
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">N-Back</h2>
         <p className="text-gray-600 mb-2">字母与 N 个之前相同时尽快按下，否则不要按。</p>
         <p className="text-gray-600 mb-4">如果正式测验升级到 2-back 或 3-back，会先完成对应的不计分练习，再进入该难度。</p>
-        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩；每个新 N 难度都需要先通过练习。</p>
+        <p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩。</p>
         <button className="btn-primary" onClick={() => startPractice(firstNLevel, false)}>开始练习</button>
       </div>
     )
@@ -260,15 +272,26 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  return (
-    <div className="text-center p-8" onClick={() => { void respond() }} onKeyDown={() => { void respond() }} role="button" tabIndex={0}>
+  const taskBody = (
+    <div
+      className="mx-auto max-w-2xl text-center p-8"
+      onPointerDown={() => { void respond() }}
+      role="button"
+      tabIndex={-1}
+      aria-label={phase === 'practice' ? `${practiceNLevel}-back 练习作答区` : 'N-back 正式作答区'}
+    >
       <p className="text-sm text-gray-500 mb-2">
         {phase === 'practice'
           ? `${practiceNLevel}-back 练习 ${practiceIndex + 1} / ${practiceTrials.length}`
-          : `试次 ${trialIndex + 1} / ${total} · ${current && 'nLevel' in current ? current.nLevel : firstNLevel}-back`}
+          : `${current && 'nLevel' in current ? current.nLevel : firstNLevel}-back`}
       </p>
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current?.stimulus : ''}</div>
+      <p className="mt-5 text-xs text-gray-400">目标出现时按空格 / Enter，或点击此区域</p>
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="N-back 正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }
