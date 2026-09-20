@@ -1,0 +1,276 @@
+{
+  "candidate": "00b477957b15e34a3f101bb8918b5b9c39c050a2",
+  "checks": [
+    {
+      "name": "FINAL projection failure: authorized GET repairs the same execution without another canonical result"
+    },
+    {
+      "name": "school: platform-create, SINGLE/MULTI labels, SELF runtime/canonical, all/label group, CSV revocation, frozen history and rejoin"
+    },
+    {
+      "name": "school mental health: four directions, protected subject/generic report denial, consent and relationship revocation, historical Parent report, Safety SUMMARY/ACTION/FULL"
+    },
+    {
+      "name": "consultation: Client SELF, both professional directions, exact ADMIN respondent, ended relation START denial, Counselor M1/M2 matched and repeated, mobile keyboard"
+    },
+    {
+      "name": "legacy Course: three real canonical results aggregate normally; Organization assignment cannot enter legacy report target"
+    }
+  ],
+  "artifacts": [
+    {
+      "organizationId": "ada12616-0866-419b-b232-891b929c898b",
+      "artifactId": "b8b1bbe3-7a8b-40ae-8f21-7ae6d8ec8231",
+      "kind": "GROUP"
+    },
+    {
+      "organizationId": "ada12616-0866-419b-b232-891b929c898b",
+      "artifactId": "7e526f85-b586-4959-b9ed-c4bdea86b059",
+      "kind": "GROUP"
+    },
+    {
+      "organizationId": "ada12616-0866-419b-b232-891b929c898b",
+      "artifactId": "50e531aa-ff54-4015-9e34-05baf81085c2",
+      "kind": "GROUP"
+    },
+    {
+      "organizationId": "ada12616-0866-419b-b232-891b929c898b",
+      "artifactId": "9113b754-869b-4d89-9dfc-e0f3a9430681",
+      "kind": "PROTECTED_FEEDBACK"
+    },
+    {
+      "organizationId": "9ded6c98-1cde-4392-ab61-cc25926f9fad",
+      "artifactId": "bbb1c6d5-7ffe-4b97-89de-d793f5497cdf",
+      "kind": "GROUP"
+    },
+    {
+      "organizationId": "9ded6c98-1cde-4392-ab61-cc25926f9fad",
+      "artifactId": "78e6cbc6-c091-4a2c-b88c-c66ee91d79a4",
+      "kind": "REPEATED_COHORT"
+    },
+    {
+      "organizationId": "9ded6c98-1cde-4392-ab61-cc25926f9fad",
+      "artifactId": "69213574-44fb-4147-9f81-b84a82462b4a",
+      "kind": "MATCHED_LONGITUDINAL"
+    }
+  ],
+  "attempts": [
+    {
+      "executionId": "c3203b41-3cc9-43b6-8b8a-03267cd72892",
+      "attemptId": "1a0c8300-285e-44ed-8695-b4d2f00665a4",
+      "snapshotId": "5f7f2d30-8c70-48d4-b498-35b9feeacff3",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher0",
+      "runId": "652cd4d3-b4a3-4bd8-94d3-d27f4de47158"
+    },
+    {
+      "executionId": "0578f140-2a0a-4411-a240-a9d9b9dca600",
+      "attemptId": "71b7f826-4d65-4e27-9800-39083b6123ab",
+      "snapshotId": "66bcbdf3-d71d-454c-89ba-1302f3190821",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher1",
+      "runId": "652cd4d3-b4a3-4bd8-94d3-d27f4de47158"
+    },
+    {
+      "executionId": "689e981b-869b-47b8-bf00-2a6fd4b5d4b1",
+      "attemptId": "5441da50-0468-4d2e-a0c8-27e43fc58e41",
+      "snapshotId": "673e8325-dde0-478a-9cb9-a58d8f3da7d5",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher2",
+      "runId": "652cd4d3-b4a3-4bd8-94d3-d27f4de47158"
+    },
+    {
+      "executionId": "882eeb31-559b-4136-bf65-b67aec3e867b",
+      "attemptId": "858df4f9-a02b-4e09-8867-f91f3c2bcc76",
+      "snapshotId": "fb4e78cf-f66d-4239-8a69-145feaf82805",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher0",
+      "runId": "4fef2f3c-d38d-4c8f-b7ed-53147cf117b8"
+    },
+    {
+      "executionId": "24f16ad4-5b96-4d08-ba95-a56235f97528",
+      "attemptId": "a7f1be89-ef0a-4603-ace1-c6f677a0aaf2",
+      "snapshotId": "4171e6bf-8cd4-4587-a1b3-8563a76a639a",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher1",
+      "runId": "4fef2f3c-d38d-4c8f-b7ed-53147cf117b8"
+    },
+    {
+      "executionId": "11c39d2c-aa16-42d9-a4b7-996f83aa37be",
+      "attemptId": "7fb8c525-e0ff-47f8-b6d4-9ac820f6db08",
+      "snapshotId": "a95996e5-6080-4111-b026-24e4bb13ce0e",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher2",
+      "runId": "4fef2f3c-d38d-4c8f-b7ed-53147cf117b8"
+    },
+    {
+      "executionId": "bf696338-2861-42b4-9971-44a9d667b150",
+      "attemptId": "6354044c-8c36-4984-be04-1e55f994566f",
+      "snapshotId": "da59ecb8-23df-4091-9918-224bf7c793e3",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student0",
+      "runId": "92f2d4a2-2120-446e-a577-265635e2e72c"
+    },
+    {
+      "executionId": "e11a0b5a-377a-4904-8a22-45678a9398f0",
+      "attemptId": "0d06d247-653a-4b84-a790-84b91fb30766",
+      "snapshotId": "5541101f-cc1a-49e0-b76a-4ac2b79f8770",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student1",
+      "runId": "92f2d4a2-2120-446e-a577-265635e2e72c"
+    },
+    {
+      "executionId": "33bc03d9-66aa-47aa-825f-94e1cad9e77b",
+      "attemptId": "155e3e41-0855-407f-9eb9-8283475ef1e8",
+      "snapshotId": "dc3efc72-12ac-48f4-97d0-e4537166288c",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student2",
+      "runId": "92f2d4a2-2120-446e-a577-265635e2e72c"
+    },
+    {
+      "executionId": "49fc10f7-74b7-4b7e-91c5-592fcfe279a7",
+      "attemptId": "9a2efc64-4a98-4eef-9c46-4d4939a53f56",
+      "snapshotId": "28bae9ce-3875-4c90-8f41-7bedac7ec197",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "teacher0",
+      "runId": "76fcbb27-97c8-41a5-9557-c5027cf67f3d"
+    },
+    {
+      "executionId": "3697a8aa-ce5d-4e05-b501-013fb64ce875",
+      "attemptId": "e6666c67-11c9-4ee9-b6f1-cd28cf6baf8b",
+      "snapshotId": "87838c1a-18a5-4421-8298-6cf90209d583",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "parent",
+      "runId": "c5807eb8-5c2c-47e2-b9c3-1247775a6cf9"
+    },
+    {
+      "executionId": "6b2e27fd-8cf0-49d3-ba1b-2f00029993af",
+      "attemptId": "18b9d63b-593f-41f0-8f46-4bfc7fee968c",
+      "snapshotId": "a23c3e1e-9453-4048-b8f6-c0896f67be65",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student0",
+      "runId": "a094ab9b-b513-4b98-9cd3-f0502d5817d5"
+    },
+    {
+      "executionId": "8c5623e9-a7dc-4d42-8275-025c26d61249",
+      "attemptId": "f818a899-b933-409d-b23f-a10cd65cab09",
+      "snapshotId": "725cd1de-e0f3-4eb2-94d9-c2d97a0312b4",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student1",
+      "runId": "a094ab9b-b513-4b98-9cd3-f0502d5817d5"
+    },
+    {
+      "executionId": "12f8624b-5b83-4512-80ce-39d12f4e50bb",
+      "attemptId": "4db54c90-020a-4f8d-bf66-425c3cd308da",
+      "snapshotId": "487b7970-2fd9-4e7e-841b-5903f1dbc2f8",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "student2",
+      "runId": "a094ab9b-b513-4b98-9cd3-f0502d5817d5"
+    },
+    {
+      "executionId": "322512c6-e115-47e2-9465-1ed42d5edc71",
+      "attemptId": "ea9fe776-ae84-43c1-a950-be2e05e53fe0",
+      "snapshotId": "44009928-4b40-4d53-9928-578f34af6f49",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client0",
+      "runId": "72e05759-d9f7-4898-9a3e-ff26f7562f7a"
+    },
+    {
+      "executionId": "84236c45-9d7b-4e34-9779-6f8446d6bc66",
+      "attemptId": "33c44882-7094-48c8-b6ce-4c49490fb381",
+      "snapshotId": "0ed2272e-6957-46bc-bcc3-d55dc3391d98",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client1",
+      "runId": "72e05759-d9f7-4898-9a3e-ff26f7562f7a"
+    },
+    {
+      "executionId": "f0ce6573-5ab7-4418-be4a-22dbacd5f138",
+      "attemptId": "bda2ee81-fa19-4eb2-a600-7981d8334ac0",
+      "snapshotId": "1934f468-84b4-447d-bd57-b647a4ba47ac",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client2",
+      "runId": "72e05759-d9f7-4898-9a3e-ff26f7562f7a"
+    },
+    {
+      "executionId": "578f8188-ed54-4652-b424-a53985c259c0",
+      "attemptId": "27a9cf07-4659-4909-aeb3-d26b5b2fb587",
+      "snapshotId": "7711eb54-063f-4ab8-b985-35897b4efbac",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor0",
+      "runId": "3dd7a79f-1895-46bb-a4f6-752c0140a1d1"
+    },
+    {
+      "executionId": "08375c5d-789e-439c-b1c0-9a118c6b4edf",
+      "attemptId": "a7ec0843-d018-4c10-82be-ef245d596d17",
+      "snapshotId": "4038aea5-2080-4167-8560-a264be63ee31",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client0",
+      "runId": "a026a510-6dad-4226-a82b-876ecb5f64f8"
+    },
+    {
+      "executionId": "dff7d6c3-5c5c-42fc-9419-53ec7cb121da",
+      "attemptId": "98981380-c769-4464-ae90-091de1d9b722",
+      "snapshotId": "d2781d63-082a-4195-a39c-4eb95c53e379",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client1",
+      "runId": "a026a510-6dad-4226-a82b-876ecb5f64f8"
+    },
+    {
+      "executionId": "cc1033b9-5ad9-4224-87d8-0462ecec80f8",
+      "attemptId": "dd01faa5-2fcd-4a46-8571-148d372738a6",
+      "snapshotId": "53d12895-8e7e-498b-8bb3-c69e67bed95e",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "client2",
+      "runId": "a026a510-6dad-4226-a82b-876ecb5f64f8"
+    },
+    {
+      "executionId": "fd99561e-e5b3-4e3d-9f24-fee043fb1324",
+      "attemptId": "581c13ac-8dc7-4f01-80b6-da41d9d28dce",
+      "snapshotId": "e72a1c22-1246-40c2-9966-7354f859688d",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor0",
+      "runId": "8a46f136-bee6-4c4d-b21f-6029f8a93720"
+    },
+    {
+      "executionId": "a346590c-d9b7-4ed2-9e97-bd4a44d61771",
+      "attemptId": "b7c62aba-d777-4d3c-9b09-8bc6e26f7ce2",
+      "snapshotId": "a12067c1-5342-4c8d-83fd-e76e85631fdd",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor1",
+      "runId": "8a46f136-bee6-4c4d-b21f-6029f8a93720"
+    },
+    {
+      "executionId": "eecead0a-1fb5-4b88-ac63-ee161d585c42",
+      "attemptId": "ccb8ff25-8a6c-4db9-bafc-134b9750f525",
+      "snapshotId": "914c64b1-1ac7-4db0-aee9-728805f7e453",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor2",
+      "runId": "8a46f136-bee6-4c4d-b21f-6029f8a93720"
+    },
+    {
+      "executionId": "294fed51-9efd-44b6-9741-7345aa241563",
+      "attemptId": "dd046ddd-ca78-46ad-8947-9771a4ab19c1",
+      "snapshotId": "2b22b785-0b14-4497-a834-5c42dbd5386e",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor0",
+      "runId": "bfb18bd0-5dd3-48fa-ae02-4b9e5048b10e"
+    },
+    {
+      "executionId": "1bd62922-d2a8-4b12-83dc-f326a312bc15",
+      "attemptId": "8fb39c6b-b5d8-4355-b556-0dc86406ef7c",
+      "snapshotId": "5b700eef-e8b2-4476-a4fc-d7347203b6d7",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor1",
+      "runId": "bfb18bd0-5dd3-48fa-ae02-4b9e5048b10e"
+    },
+    {
+      "executionId": "bf070571-d0c0-4390-9775-763e74765087",
+      "attemptId": "9a940a30-154d-4813-8f0e-a7e83c7056cc",
+      "snapshotId": "9240178c-96e3-4fc6-8c11-f5381138fa55",
+      "resultHash": "df87707a60fb1989a687d6a766f32cba19353ab83f2e8b8881645dc565fcca6c",
+      "user": "counselor2",
+      "runId": "bfb18bd0-5dd3-48fa-ae02-4b9e5048b10e"
+    }
+  ],
+  "status": "PASSED"
+}

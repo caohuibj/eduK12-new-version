@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
-import { error, success } from '../../utils/response'
+import { error, notFound, success, unauthorized, forbidden } from '../../utils/response'
+import { resolveOrganizationAccessContext, type OrganizationAccessContext } from './access'
 import {
   createMembership,
   createOrganization,
@@ -18,7 +19,27 @@ import {
 } from './service'
 import { OrganizationDomainError } from './types'
 
-const createOrganizationSchema = z.object({ name: z.string().trim().min(1).max(200) })
+// Navigation hints are server-owned. Exact resources still authorize every request.
+export function organizationProductActions(context: OrganizationAccessContext): string[] {
+  const denied = (...permissions: string[]) => context.explicitDenies.some(value => value === '*' || permissions.includes(value))
+  const active = context.organizationStatus === 'ACTIVE'
+  const member = context.membershipId !== null
+  const professional = context.personas.includes('TEACHER') || context.personas.includes('COUNSELOR')
+  const psychology = context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const actions: string[] = []
+  if (context.canGovern) actions.push('GOVERN')
+  if (context.canGovern && active) actions.push('RUNS')
+  if (context.platformRole === 'SYSTEM_ADMIN' || context.canGovern) actions.push('MANAGE_DENIES')
+  if (context.platformRole === 'SYSTEM_ADMIN' && !denied('ORGANIZATION_GOVERNANCE')) actions.push(active ? 'SUSPEND' : 'RESUME')
+  if (member && active && !denied('REPORT_READ', 'ORG_GROUP_REPORT_V1') && (context.orgRole === 'ORG_ADMIN' || psychology || professional)) actions.push('REPORTING')
+  if (member && !denied('REPORT_READ', 'SAFETY_READ') && ((active && context.orgRole === 'ORG_ADMIN') || psychology || professional)) actions.push('SAFETY')
+  if (member && active && !denied('REPORT_READ', 'REPORT_EXPORT') && context.capabilities.includes('REPORT_EXPORT')) actions.push('EXPORT_AGGREGATE')
+  if (member && active && !denied('REPORT_READ', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT') && context.capabilities.includes('REPORT_MEMBER_EXPORT')) actions.push('EXPORT_MEMBER')
+  if (actions.some(action => ['SAFETY', 'EXPORT_AGGREGATE', 'EXPORT_MEMBER'].includes(action))) actions.push('DELIVERY')
+  return actions
+}
+
+const createOrganizationSchema = z.object({ name: z.string().trim().min(1).max(200), firstAdminUserId: z.string().min(1).optional() })
 const membershipSchema = z.object({
   userId: z.string().min(1),
   orgRole: z.enum(['MEMBER', 'ORG_ADMIN']).optional(),
@@ -38,6 +59,15 @@ const liftDenySchema = z.object({
   userId: z.string().min(1),
   permission: z.string().trim().min(1).max(100),
 })
+
+type AccessibleOrganizationRow = {
+  id: string
+  name: string
+  status: string
+  membershipId: string | null
+  orgRole: string | null
+  createdAt: Date
+}
 
 function commandMeta(req: Request) {
   return {
@@ -65,17 +95,131 @@ function parsePage(req: Request) {
 }
 
 export const organizationController = {
+  async listAccessible(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const { page, pageSize, offset } = parsePage(req)
+      const { userId, platformRole } = req.user
+      let rows: AccessibleOrganizationRow[]
+      let totals: Array<{ count: number }>
+
+      if (platformRole === 'SYSTEM_ADMIN') {
+        ;[rows, totals] = await Promise.all([
+          prisma.$queryRaw<AccessibleOrganizationRow[]>`
+            SELECT
+              o."id",
+              o."name",
+              o."status",
+              m."id" AS "membershipId",
+              m."org_role" AS "orgRole",
+              o."created_at" AS "createdAt"
+            FROM "organizations" o
+            LEFT JOIN "organization_memberships" m
+              ON m."organization_id" = o."id"
+             AND m."user_id" = ${userId}
+             AND m."valid_from" <= statement_timestamp()
+             AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+            ORDER BY o."name", o."id"
+            LIMIT ${pageSize} OFFSET ${offset}
+          `,
+          prisma.$queryRaw<Array<{ count: number }>>`
+            SELECT COUNT(*)::int AS "count" FROM "organizations"
+          `,
+        ])
+      } else {
+        ;[rows, totals] = await Promise.all([
+          prisma.$queryRaw<AccessibleOrganizationRow[]>`
+            SELECT
+              o."id",
+              o."name",
+              o."status",
+              m."id" AS "membershipId",
+              m."org_role" AS "orgRole",
+              o."created_at" AS "createdAt"
+            FROM "organization_memberships" m
+            JOIN "organizations" o ON o."id" = m."organization_id"
+            WHERE m."user_id" = ${userId}
+              AND m."valid_from" <= statement_timestamp()
+              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+            ORDER BY o."name", o."id"
+            LIMIT ${pageSize} OFFSET ${offset}
+          `,
+          prisma.$queryRaw<Array<{ count: number }>>`
+            SELECT COUNT(*)::int AS "count"
+            FROM "organization_memberships" m
+            WHERE m."user_id" = ${userId}
+              AND m."valid_from" <= statement_timestamp()
+              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+          `,
+        ])
+      }
+
+      return success(res, {
+        platformRole,
+        allowedActions: platformRole === 'SYSTEM_ADMIN' ? ['CREATE_ORGANIZATION'] : [],
+        list: rows.map((row) => ({
+          ...row,
+          createdAt: row.createdAt.toISOString(),
+          scopeBasis: platformRole === 'SYSTEM_ADMIN' ? 'SYSTEM_ADMIN' : 'MEMBERSHIP',
+        })),
+        total: totals[0]?.count ?? 0,
+        page,
+        pageSize,
+      })
+    } catch (err) {
+      return sendDomainError(res, err)
+    }
+  },
+
+  async readContext(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const organizationId = req.params.organizationId
+      const access = await resolveOrganizationAccessContext({
+        principal: req.user,
+        organizationId,
+      })
+      if (!access) return notFound(res, '组织不存在')
+
+      // Organization product discovery is limited to direct current Membership
+      // or current SYSTEM_ADMIN scope. Parent relationship evidence remains a
+      // separate subject-scoped authority and is not promoted to Membership.
+      if (req.user.platformRole !== 'SYSTEM_ADMIN' && access.membershipId === null) {
+        return notFound(res, '组织不存在')
+      }
+
+      const organizations = await prisma.$queryRaw<Array<{ id: string; name: string; status: string }>>`
+        SELECT "id", "name", "status"
+        FROM "organizations"
+        WHERE "id" = ${organizationId}
+        LIMIT 1
+      `
+      const organization = organizations[0]
+      if (!organization) return notFound(res, '组织不存在')
+
+      return success(res, {
+        organization,
+        access,
+        allowedActions: organizationProductActions(access),
+      })
+    } catch (err) {
+      return sendDomainError(res, err)
+    }
+  },
+
   async create(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可创建组织')
     const parsed = createOrganizationSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message)
     try {
-      return success(res, await createOrganization({ name: parsed.data.name, meta: commandMeta(req) }))
+      return success(res, await createOrganization({ ...parsed.data, meta: commandMeta(req) }))
     } catch (err) {
       return sendDomainError(res, err)
     }
   },
 
   async suspend(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可暂停组织')
     try {
       return success(res, await suspendOrganization({ organizationId: req.params.organizationId, meta: commandMeta(req) }))
     } catch (err) {
@@ -84,6 +228,7 @@ export const organizationController = {
   },
 
   async resume(req: Request, res: Response) {
+    if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可恢复组织')
     try {
       return success(res, await resumeOrganization({ organizationId: req.params.organizationId, meta: commandMeta(req) }))
     } catch (err) {

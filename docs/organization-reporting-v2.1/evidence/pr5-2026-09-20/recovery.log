@@ -1,0 +1,5 @@
+PASS fresh PostgreSQL14: all repository migrations applied
+PASS production encrypted backup/verify/restore entry points preserve all tested row hashes and counts
+PASS restored database accepts current application migration head
+PASS failed migration rolls back its DDL and preserves historical/runtime/report data
+PASS explicit failed-migration resolution and forward deployment recover without deleting domain history

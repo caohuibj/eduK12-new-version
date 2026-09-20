@@ -40,6 +40,11 @@ describe('Composite child route context', () => {
     })
   })
 
+  it('keeps the assigned organization task return path through child runners', () => {
+    const result = resolveCompositeChildRouteContext({ publicMode: false, relationalMode: true, organizationTask: true, parentAttemptId: 'run-parent', item: cognitiveItem })
+    expect(result).toMatchObject({ ok: true, context: { parentReturnTo: '/relational/attempts/run-parent?returnTo=%2Forganization-tasks' } })
+  })
+
   it('builds relational child targets without creating a second runtime', () => {
     const cognitive = resolveCompositeChildRouteContext({
       publicMode: false,

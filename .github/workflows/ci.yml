@@ -199,6 +199,8 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -278,6 +280,11 @@ jobs:
           src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts
           src/__tests__/integration/reportingDelivery.postgres.integration.test.ts
           src/__tests__/integration/reportingSeries.postgres.integration.test.ts
+          src/__tests__/integration/organizationProductContext.postgres.integration.test.ts
+          src/__tests__/integration/organizationProductAdmin.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunProductRead.postgres.integration.test.ts
+          src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts
+          src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true
@@ -288,6 +295,13 @@ jobs:
             /tmp/eduk12-backend-vitest.json
             /tmp/eduk12-ci-env.txt
           if-no-files-found: ignore
+
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
 
   frontend:
     name: frontend (lint + typecheck + full tests + build)
@@ -389,6 +403,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -444,6 +460,9 @@ jobs:
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
+      - name: seed PR5 Organization fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
       - name: start backend
         run: |
           mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
@@ -471,6 +490,33 @@ jobs:
         run: node e2e/fe-11-storage-fault-browser-e2e.cjs
       - name: run RA-02 four-role relational acceptance
         run: node e2e/relational-four-role-browser-e2e.cjs
+      - name: run PR5 Organization cross-role acceptance
+        run: node e2e/pr5-organization-browser-e2e.cjs
+      - name: seed three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-fixture.ts
+      - name: start isolated PR5 scenario resource server
+        env:
+          PR5_SCENARIOS_ENABLED: 'true'
+        run: |
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          nohup setsid backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-server.ts > /tmp/eduk12-pr5-scenario-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-pr5-scenario-backend.log
+          exit 1
+      - name: certify three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios.ts
+      - name: rehearse PR5 encrypted backup restore and migration failure recovery
+        env:
+          PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: node e2e/pr5-release-rehearsal.mjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
@@ -481,12 +527,22 @@ jobs:
             /tmp/eduk12-situational-bundle-e2e
             /tmp/eduk12-situational-bundle-backend.log
             /tmp/eduk12-situational-bundle-frontend.log
+            /tmp/eduk12-pr5-scenarios-evidence
+            /tmp/eduk12-pr5-release-rehearsal
+            /tmp/eduk12-pr5-scenario-backend.log
           if-no-files-found: ignore
       - name: stop seeded services
         if: always()
         run: |
           if [ -f /tmp/eduk12-situational-bundle-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-frontend.pid) || true; fi
           if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) || true; fi
+
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
 
   docker:
     name: docker (compose config + production builds)
@@ -521,6 +577,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
