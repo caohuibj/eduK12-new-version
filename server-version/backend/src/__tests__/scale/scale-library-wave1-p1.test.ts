@@ -3,12 +3,17 @@ import {
   approveInstrumentAuthorization,
   createInstrumentAuthorizationDraft,
 } from '../../modules/assessment-authorization'
-import { isScaleLibraryPublicPayloadSafe } from '../../modules/scale/library/scale-library-read-model'
+import { createScaleCatalogRegistry } from '../../modules/scale/library/catalog-registry'
+import {
+  isScaleLibraryPublicPayloadSafe,
+  type ScaleLibraryEntry,
+} from '../../modules/scale/library/scale-library-read-model'
 import {
   buildExpandedScaleLibraryReadModel,
   filterExpandedScaleLibraryEntries,
 } from '../../modules/scale/library/wave1-p1-read-model'
 import { enrichExistingP1Evidence } from '../../modules/scale/library/wave1-p1-existing-evidence'
+import { WAVE1_P1_SCALE_CATALOG_MANIFESTS } from '../../modules/scale/library/wave1-p1-catalog'
 
 const NOW = '2026-09-20T00:00:00.000Z'
 
@@ -43,6 +48,16 @@ const approvedAuthorization = (instrumentKey: string, instrumentVersion: string)
 }
 
 describe('Wave 1 P1 scale-library integration', () => {
+  it('accepts REVIEWED catalog-first entries as warnings while keeping ACCEPTED package binding fail-closed', () => {
+    const registry = createScaleCatalogRegistry(WAVE1_P1_SCALE_CATALOG_MANIFESTS)
+    expect(registry.valid).toBe(true)
+    expect(registry.entries).toHaveLength(4)
+    expect(registry.entries.every((entry) => entry.bindingStatus === 'PACKAGE_MISSING')).toBe(true)
+    const missingDiagnostics = registry.diagnostics.filter((diagnostic) => diagnostic.code === 'CATALOG_PACKAGE_MISSING')
+    expect(missingDiagnostics).toHaveLength(4)
+    expect(missingDiagnostics.every((diagnostic) => diagnostic.severity === 'warning')).toBe(true)
+  })
+
   it('keeps the six Wave 0 executable entries and adds four catalog-first P1 entries', () => {
     const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
     expect(model.entries).toHaveLength(10)
@@ -62,7 +77,7 @@ describe('Wave 1 P1 scale-library integration', () => {
     const wave1 = model.entries.slice(6)
     expect(wave1.every((entry) => entry.availability.status === 'NOT_AVAILABLE')).toBe(true)
     expect(wave1.every((entry) => entry.availability.launch === undefined)).toBe(true)
-    expect(wave1.every((entry) => isScaleLibraryPublicPayloadSafe(entry))).toBe(true)
+    expect(wave1.every((entry) => isScaleLibraryPublicPayloadSafe(entry as unknown as ScaleLibraryEntry))).toBe(true)
   })
 
   it('exposes Simplified-Chinese validation populations without claiming norms or diagnosis', () => {
