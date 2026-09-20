@@ -58,6 +58,25 @@ const submitResponse = (response: number[]) => {
 }
 
 describe('MemoryTask Digit Span Forward', () => {
+  it('requires at least one correct practice trial before formal scoring', () => {
+    const onTrialComplete = vi.fn()
+    render(<MemoryTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    fireEvent.click(screen.getByText('开始练习'))
+
+    for (let practiceIndex = 0; practiceIndex < 2; practiceIndex += 1) {
+      showSequence(3)
+      ;[0, 0, 0].forEach((digit) => fireEvent.click(screen.getByRole('button', { name: String(digit) })))
+      fireEvent.click(screen.getByText('提交练习'))
+      if (practiceIndex === 0) fireEvent.click(screen.getByText('下一个'))
+    }
+
+    expect(screen.getByText(/练习正确 0 \/ 2/)).toBeTruthy()
+    expect(screen.getByText('重新练习')).toBeTruthy()
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('重新练习'))
+    expect(screen.getByText(/练习 1 \/ 2/)).toBeTruthy()
+  })
+
   it('keeps trial 1 and trial 2 at the same length before advancing', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
