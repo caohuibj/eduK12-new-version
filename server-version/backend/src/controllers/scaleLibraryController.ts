@@ -18,6 +18,7 @@ import {
   getExpandedScaleLibraryEntry,
 } from '../modules/scale/library/wave1-p1-read-model'
 import { enrichExistingP1Evidence } from '../modules/scale/library/wave1-p1-existing-evidence'
+import { applyDass21ProductPolicy } from '../modules/scale/library/wave1-dass21-product-policy'
 import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../modules/scale/library/wave0-catalog'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
@@ -139,6 +140,10 @@ const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibrar
   availability: query.availability,
 })
 
+const buildLibraryModel = (context: ScaleLibraryReadModelContext) => applyDass21ProductPolicy(
+  enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(context)),
+)
+
 const handleError = (res: Response, err: unknown) => {
   if (err instanceof Error && err.name === 'ZodError') return error(res, '量表库请求参数无效')
   return error(res, '服务器内部错误', -1, 500)
@@ -151,7 +156,7 @@ export const scaleLibraryController = {
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
       const query = parsed.query
-      const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(await buildContext(req, query)))
+      const model = buildLibraryModel(await buildContext(req, query))
       return success(res, {
         schemaVersion: model.schemaVersion,
         generatedAt: model.generatedAt,
@@ -167,7 +172,7 @@ export const scaleLibraryController = {
       if (!req.user) return unauthorized(res)
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
-      const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(await buildContext(req, parsed.query)))
+      const model = buildLibraryModel(await buildContext(req, parsed.query))
       const entry = getExpandedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
       if (!entry) return notFound(res, '量表库条目不存在')
       return success(res, { entry })
