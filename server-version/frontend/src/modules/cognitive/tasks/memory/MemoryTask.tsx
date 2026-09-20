@@ -4,6 +4,7 @@ import type { MemoryConfig, MemoryTrialPayload } from '../../types'
 import { deterministicMemorySequence } from './prng'
 
 const PRACTICE_SEQUENCES = [[3, 7, 1], [9, 4, 2]]
+const PRACTICE_PASS_CORRECT = 1
 
 type Phase = 'instruction' | 'practice' | 'formal'
 type FormalSubPhase = 'ready' | 'display' | 'response'
@@ -56,6 +57,7 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceResponse, setPracticeResponse] = useState<number[]>([])
   const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceCorrectCount, setPracticeCorrectCount] = useState(0)
   const [inactivityExpired, setInactivityExpired] = useState(false)
   const [guardKey, setGuardKey] = useState(0)
   const [interrupted, setInterrupted] = useState(false)
@@ -132,6 +134,7 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
     setPracticeIndex(0)
     setPracticeResponse([])
     setPracticeFeedback(null)
+    setPracticeCorrectCount(0)
     setPracticeSubPhase('ready')
   }, [])
 
@@ -159,13 +162,30 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
 
   const submitPractice = useCallback(() => {
     if (practiceSubPhase !== 'response' || practiceResponse.length !== practiceSequence.length) return
+    const correct = sameSequence(practiceResponse, practiceSequence)
+    if (correct) setPracticeCorrectCount((current) => current + 1)
     setPracticeFeedback(
-      sameSequence(practiceResponse, practiceSequence)
+      correct
         ? '正确，可以按原顺序输入。'
         : '这次不一致，再看清数字出现的顺序。'
     )
     setPracticeSubPhase('feedback')
   }, [practiceSubPhase, practiceResponse, practiceSequence])
+
+  const advancePractice = useCallback(() => {
+    if (practiceIndex + 1 < PRACTICE_SEQUENCES.length) {
+      setPracticeIndex((current) => current + 1)
+      setPracticeResponse([])
+      setPracticeFeedback(null)
+      setPracticeSubPhase('ready')
+      return
+    }
+    if (practiceCorrectCount >= PRACTICE_PASS_CORRECT) {
+      startFormal()
+      return
+    }
+    startPractice()
+  }, [practiceIndex, practiceCorrectCount, startFormal, startPractice])
 
   const submitFormal = useCallback(async () => {
     if (
@@ -245,13 +265,15 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
       <div className="card p-8 max-w-2xl text-center">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">数字序列短时记忆</h1>
         <p className="text-gray-600 mb-3">数字会依次出现，请按原顺序输入。每个长度会完成两题，至少答对一题才进入下一长度。</p>
-        <p className="text-gray-400 text-xs mb-6">结果反映本次任务表现，不代表诊断或正式能力评估。</p>
+        <p className="text-gray-400 text-xs mb-6">先完成两道不计分练习；至少答对一道才开始正式测评。结果反映本次任务表现，不代表诊断或正式能力评估。</p>
         <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
       </div>
     )
   }
 
   if (phase === 'practice') {
+    const lastPractice = practiceIndex + 1 >= PRACTICE_SEQUENCES.length
+    const practicePassed = practiceCorrectCount >= PRACTICE_PASS_CORRECT
     return (
       <div className="card p-8 max-w-2xl text-center">
         <div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_SEQUENCES.length} · 不计入成绩</div>
@@ -266,21 +288,12 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
         )}
         {practiceSubPhase === 'feedback' && (
           <div>
-            <p className="text-gray-700 mb-5">{practiceFeedback}</p>
-            <button
-              type="button"
-              onClick={() => {
-                if (practiceIndex + 1 >= PRACTICE_SEQUENCES.length) startFormal()
-                else {
-                  setPracticeIndex((current) => current + 1)
-                  setPracticeResponse([])
-                  setPracticeFeedback(null)
-                  setPracticeSubPhase('ready')
-                }
-              }}
-              className="btn-primary"
-            >
-              {practiceIndex + 1 >= PRACTICE_SEQUENCES.length ? '开始正式测评' : '下一个'}
+            <p className="text-gray-700 mb-2">{practiceFeedback}</p>
+            {lastPractice && (
+              <p className="text-sm text-gray-500 mb-5">练习正确 {practiceCorrectCount} / {PRACTICE_SEQUENCES.length}；至少正确 {PRACTICE_PASS_CORRECT} 题。</p>
+            )}
+            <button type="button" onClick={advancePractice} className="btn-primary">
+              {!lastPractice ? '下一个' : practicePassed ? '开始正式测评' : '重新练习'}
             </button>
           </div>
         )}
