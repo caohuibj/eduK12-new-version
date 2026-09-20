@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { digitBackwardSequence } from '../shared/prng'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 
 type Phase = 'instruction' | 'practice' | 'practice-feedback' | 'practice-result' | 'formal'
 type SubPhase = 'ready' | 'display' | 'response'
@@ -9,17 +10,15 @@ const PRACTICE = [[3, 8, 1], [6, 2, 9], [4, 7, 0], [5, 1, 8]]
 const same = (left: number[], right: number[]) => left.length === right.length && left.every((value, index) => value === right[index])
 
 const Keypad: React.FC<{ onDigit: (digit: number) => void; disabled?: boolean }> = ({ onDigit, disabled }) => (
-  <div className="grid grid-cols-5 gap-2 max-w-sm mx-auto">
+  <div className="mx-auto grid max-w-sm grid-cols-5 gap-2">
     {Array.from({ length: 10 }, (_, digit) => (
-      <button key={digit} type="button" disabled={disabled} className="btn-secondary" onClick={() => onDigit(digit)}>{digit}</button>
+      <button key={digit} type="button" disabled={disabled} className="btn-secondary min-h-12" onClick={() => onDigit(digit)}>{digit}</button>
     ))}
   </div>
 )
 
 export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
-  const config = taskContext.config as {
-    startSpan: number; maxSpan: number; digitDisplayMs: number; digitIntervalMs: number; readyDurationMs: number; inactivityGuardMs: number
-  }
+  const config = taskContext.config as { startSpan: number; maxSpan: number; digitDisplayMs: number; digitIntervalMs: number; readyDurationMs: number; inactivityGuardMs: number }
   const startSpan = config.startSpan ?? 2
   const maxSpan = config.maxSpan ?? 7
   const digitDisplayMs = config.digitDisplayMs ?? 800
@@ -47,14 +46,8 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
 
   const resetResponse = () => { setResponse([]); responseRef.current = []; setDisplayDigit(''); setSubPhase('ready') }
   const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setPracticeFeedback(''); resetResponse(); setPhase('practice') }
-  const startFormal = () => {
-    setSpan(startSpan); setTrialWithinLevel(1); setLevelCorrect(0); setInterrupted(false); completingRef.current = false; resetResponse(); setPhase('formal')
-  }
-  const completeOnce = useCallback(async () => {
-    if (completingRef.current) return
-    completingRef.current = true
-    await onTaskComplete?.()
-  }, [onTaskComplete])
+  const startFormal = () => { setSpan(startSpan); setTrialWithinLevel(1); setLevelCorrect(0); setInterrupted(false); completingRef.current = false; resetResponse(); setPhase('formal') }
+  const completeOnce = useCallback(async () => { if (completingRef.current) return; completingRef.current = true; await onTaskComplete?.() }, [onTaskComplete])
 
   useEffect(() => {
     if ((phase !== 'practice' && phase !== 'formal') || subPhase !== 'ready') return
@@ -70,10 +63,7 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
       timers.push(window.setTimeout(() => setDisplayDigit(String(digit)), index * step))
       timers.push(window.setTimeout(() => setDisplayDigit(''), index * step + digitDisplayMs))
     })
-    timers.push(window.setTimeout(() => {
-      responseStartedRef.current = performance.now()
-      setSubPhase('response')
-    }, (activeSequence.length - 1) * step + digitDisplayMs))
+    timers.push(window.setTimeout(() => { responseStartedRef.current = performance.now(); setSubPhase('response') }, (activeSequence.length - 1) * step + digitDisplayMs))
     return () => timers.forEach((timer) => window.clearTimeout(timer))
   }, [phase, subPhase, activeSequence, digitDisplayMs, digitIntervalMs])
 
@@ -89,26 +79,12 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     submittingRef.current = true
     const correct = same(answer, [...sequence].reverse())
     try {
-      const accepted = await onTrialComplete({
-        spanLength: span,
-        trialWithinLevel,
-        sequence,
-        response: answer,
-        responseDurationMs: Math.max(0, Math.round(performance.now() - responseStartedRef.current)),
-        interrupted,
-        timedOut,
-      })
+      const accepted = await onTrialComplete({ spanLength: span, trialWithinLevel, sequence, response: answer, responseDurationMs: Math.max(0, Math.round(performance.now() - responseStartedRef.current)), interrupted, timedOut })
       if (accepted === false) return
-      if (trialWithinLevel === 1) {
-        setLevelCorrect(correct ? 1 : 0); setTrialWithinLevel(2); setInterrupted(false); resetResponse()
-      } else if (levelCorrect + (correct ? 1 : 0) === 0 || span >= maxSpan) {
-        await completeOnce()
-      } else {
-        setSpan((value) => value + 1); setTrialWithinLevel(1); setLevelCorrect(0); setInterrupted(false); resetResponse()
-      }
-    } finally {
-      submittingRef.current = false
-    }
+      if (trialWithinLevel === 1) { setLevelCorrect(correct ? 1 : 0); setTrialWithinLevel(2); setInterrupted(false); resetResponse() }
+      else if (levelCorrect + (correct ? 1 : 0) === 0 || span >= maxSpan) await completeOnce()
+      else { setSpan((value) => value + 1); setTrialWithinLevel(1); setLevelCorrect(0); setInterrupted(false); resetResponse() }
+    } finally { submittingRef.current = false }
   }, [phase, subPhase, sequence, span, trialWithinLevel, interrupted, levelCorrect, maxSpan, onTrialComplete, completeOnce])
 
   useEffect(() => {
@@ -118,33 +94,49 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   }, [phase, subPhase, trialIndex, inactivityGuardMs, submitFormal])
 
   const addDigit = (digit: number) => {
-    if (subPhase !== 'response' || response.length >= activeSequence.length) return
-    const next = [...response, digit]
+    if (subPhase !== 'response' || responseRef.current.length >= activeSequence.length) return
+    const next = [...responseRef.current, digit]
+    setResponse(next); responseRef.current = next
+  }
+  const removeLastPracticeDigit = () => {
+    if (phase !== 'practice' || subPhase !== 'response') return
+    const next = responseRef.current.slice(0, -1)
     setResponse(next); responseRef.current = next
   }
   const submitPractice = () => {
-    if (response.length !== activeSequence.length) return
-    const correct = same(response, [...activeSequence].reverse())
+    if (responseRef.current.length !== activeSequence.length) return
+    const correct = same(responseRef.current, [...activeSequence].reverse())
     setPracticeCorrect((value) => value + (correct ? 1 : 0))
     setPracticeFeedback(correct ? '正确：按出现顺序的反方向输入。' : '错误：请从最后一个数字开始倒着输入。')
     setPhase('practice-feedback')
   }
+  const submitCurrent = () => {
+    if (responseRef.current.length !== activeSequence.length) return
+    if (phase === 'practice') submitPractice()
+    else void submitFormal()
+  }
+
+  useEffect(() => {
+    if ((phase !== 'practice' && phase !== 'formal') || subPhase !== 'response') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) return
+      if (/^[0-9]$/.test(event.key)) { event.preventDefault(); addDigit(Number(event.key)); return }
+      if (event.key === 'Enter') { event.preventDefault(); submitCurrent(); return }
+      if (event.key === 'Backspace' && phase === 'practice') { event.preventDefault(); removeLastPracticeDigit() }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   const nextPractice = () => {
     if (practiceIndex + 1 >= PRACTICE.length) { setPhase('practice-result'); return }
     setPracticeIndex((value) => value + 1); resetResponse(); setPhase('practice')
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">数字倒背</h2><p className="mb-2 text-gray-600">记住依次出现的数字，然后从最后一个开始倒着输入。</p><p className="mb-6 text-xs text-gray-400">练习至少答对 3 / 4；练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-  if (phase === 'practice-result') {
-    const passed = practiceCorrect >= 3
-    return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div>
-  }
-  if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-5">{practiceFeedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
+  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">数字倒背</h2><p className="mb-2 text-gray-600">记住依次出现的数字，然后从最后一个开始倒着输入。</p><p className="mb-2 text-sm text-gray-500">可使用数字键输入，Enter 提交。正式测验不会回显已输入数字，也不提供退格修改。</p><p className="mb-6 text-xs text-gray-400">练习至少答对 3 / 4；练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
+  if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-5">{practiceFeedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 
-  return <div className="text-center p-8">
-    <p className="text-sm text-gray-500 mb-4">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式试次 ${trialIndex + 1} · 广度 ${span} · 第 ${trialWithinLevel} 题 / 2`}</p>
-    {subPhase === 'ready' && <div className="h-20 pt-5 text-gray-500">准备记忆…</div>}
-    {subPhase === 'display' && <div className="h-20 text-6xl font-bold text-primary">{displayDigit}</div>}
-    {subPhase === 'response' && <><p className="mb-4">倒序输入：{response.join(' ') || '—'}</p><Keypad onDigit={addDigit} disabled={submittingRef.current} /><div className="mt-5 flex justify-center gap-3"><button className="btn-secondary" onClick={() => { const next = response.slice(0, -1); setResponse(next); responseRef.current = next }}>退格</button><button className="btn-primary" disabled={response.length !== activeSequence.length} onClick={() => phase === 'practice' ? submitPractice() : void submitFormal()}>提交</button></div></>}
-  </div>
+  const content = <div className="p-8 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式试次 ${trialIndex + 1} · 广度 ${span} · 第 ${trialWithinLevel} 题 / 2`}</p>{subPhase === 'ready' && <div className="h-20 pt-5 text-gray-500">准备记忆…</div>}{subPhase === 'display' && <div className="h-20 text-6xl font-bold text-primary">{displayDigit}</div>}{subPhase === 'response' && <><p className="mb-4">{phase === 'formal' ? `已输入 ${response.length} / ${activeSequence.length}` : `倒序输入：${response.join(' ') || '—'}`}</p><Keypad onDigit={addDigit} disabled={submittingRef.current} /><div className="mt-5 flex justify-center gap-3">{phase === 'practice' && <button className="btn-secondary" onClick={removeLastPracticeDigit}>退格</button>}<button className="btn-primary" disabled={response.length !== activeSequence.length} onClick={submitCurrent}>提交</button></div></>}</div>
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="数字倒背正式作答">{content}</CognitiveFocusStage> : content
 }
