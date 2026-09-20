@@ -36,13 +36,9 @@ const errorMessage = (value: unknown, fallback: string) => value instanceof Erro
   : fallback
 
 export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth()
-  // A new principal gets a fresh provider before descendants select a tenant.
-  return <OrganizationSessionProvider key={user?.id ?? 'anonymous'}>{children}</OrganizationSessionProvider>
-}
-
-const OrganizationSessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
+  const principal = isAuthenticated ? user?.id ?? null : null
+  const [statePrincipal, setStatePrincipal] = useState(principal)
   const [platformRole, setPlatformRole] = useState<PlatformRole | null>(null)
   const [organizations, setOrganizations] = useState<AccessibleOrganization[]>([])
   const [total, setTotal] = useState(0)
@@ -69,8 +65,16 @@ const OrganizationSessionProvider: React.FC<{ children: ReactNode }> = ({ childr
     setActiveLoading(false)
   }, [])
 
+  // Reset this provider before rendering descendants for the new principal.
+  // Do not key/remount the route tree: login navigation and account-recovery
+  // state must survive the authentication update that they initiated.
+  if (statePrincipal !== principal) {
+    setStatePrincipal(principal)
+    reset()
+  }
+
   const refresh = useCallback(async () => {
-    if (!isAuthenticated) {
+    if (!principal) {
       reset()
       return
     }
@@ -114,10 +118,10 @@ const OrganizationSessionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       if (discoveryEpoch === discoveryEpochRef.current) setIsLoading(false)
     }
-  }, [isAuthenticated, reset])
+  }, [principal, reset])
 
   const selectOrganization = useCallback(async (organizationId: string) => {
-    if (!isAuthenticated || !organizationId) return null
+    if (!principal || !organizationId) return null
     const activeEpoch = ++activeEpochRef.current
     setActiveLoading(true)
     setActiveError(null)
@@ -135,7 +139,7 @@ const OrganizationSessionProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       if (activeEpoch === activeEpochRef.current) setActiveLoading(false)
     }
-  }, [isAuthenticated])
+  }, [principal])
 
   const clearActiveOrganization = useCallback(() => {
     activeEpochRef.current += 1

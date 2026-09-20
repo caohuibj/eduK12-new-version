@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { useEffect, useState } from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const api = vi.hoisted(() => ({
@@ -72,8 +72,34 @@ function Probe() {
 describe('OrganizationContext concurrency', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    auth.value = { isAuthenticated: true, isLoading: false, user: { id: 'user-1', username: 'teacher', role: 'STUDENT' } }
     api.list.mockResolvedValue(listProjection)
     api.context.mockResolvedValue(contextProjection)
+  })
+
+  it('preserves descendant login/recovery state while clearing another principal’s authority and pending responses', async () => {
+    let resolveOld: ((value: typeof contextProjection) => void) | undefined
+    function RecoveryProbe() {
+      const [draft, setDraft] = useState('')
+      return <><input aria-label="recovery-state" value={draft} onChange={event => setDraft(event.target.value)} /><Probe /></>
+    }
+    const { rerender } = render(<OrganizationProvider><RecoveryProbe /></OrganizationProvider>)
+    await waitFor(() => expect(api.list).toHaveBeenCalledTimes(1))
+    await act(async () => screen.getByRole('button', { name: 'select' }).click())
+    expect(screen.getByLabelText('active-organization')).toHaveTextContent('org-1')
+    const input = screen.getByLabelText('recovery-state') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'pending-return-target' } })
+    // DOM identity also catches remounts that lose login navigation callbacks.
+    api.context.mockReturnValueOnce(new Promise(resolve => { resolveOld = resolve }))
+    act(() => screen.getByRole('button', { name: 'select' }).click())
+    auth.value = { ...auth.value, user: { ...auth.value.user, id: 'user-2' } }
+    api.list.mockResolvedValue({ ...listProjection, list: [], total: 0 })
+    rerender(<OrganizationProvider><RecoveryProbe /></OrganizationProvider>)
+    expect(screen.getByLabelText('recovery-state')).toBe(input)
+    expect(input.value).toBe('pending-return-target')
+    expect(screen.getByLabelText('active-organization')).toHaveTextContent('none')
+    await act(async () => { resolveOld?.(contextProjection); await Promise.resolve() })
+    expect(screen.getByLabelText('active-organization')).toHaveTextContent('none')
   })
 
   it('preserves a deep-link selection started by a child mount effect', async () => {

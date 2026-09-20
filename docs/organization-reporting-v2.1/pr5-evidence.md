@@ -2,6 +2,14 @@
 
 PR5 is the product-convergence layer on top of merged PR1–PR4. It does not add a second Organization authority model, Assessment Runtime, reporting engine, Safety classifier, or CSV generator.
 
+## CI login recovery correction (2026-09-20)
+
+CI for `a12c1eb` passed backend/full frontend/CodeQL, but failed five browser jobs at login navigation or original-account recovery (main run `35504129488`, AppShell `35504129499`, media runs `35504129602`, `35504129678`, `35504129453`). The account-keyed Organization provider remounted the entire route tree when authentication changed, invalidating the login component's navigation callback and recovery state.
+
+The provider now resets only its own state before rendering the new principal, invalidates pending authority requests, and recreates principal-scoped discovery/selection callbacks. Descendant routes remain mounted. No login wait or authorization assertion is relaxed.
+
+Local verification: 4 frontend suites / 31 tests passed, including deep-link selection and a new account-switch test proving descendant DOM/state preservation, authority clearing and stale-response rejection. The existing AppShell browser matrix passed all 26 cases, including expiry/wrong-account/original-account recovery. The existing seeded Situational Bundle browser test passed authenticated and public submission/recovery with one canonical result each. Typecheck and route/session inventory passed; lint has zero errors and 101 existing warnings. Media-specific content flows were not rerun locally; their failed login boundary is covered by the real seeded login and AppShell regression. The next push triggers all configured CI gates; results are not awaited.
+
 ## Review follow-up (2026-09-20)
 
 Implemented and reviewed in this follow-up:
@@ -23,7 +31,7 @@ Resolved review/CI defects:
 - RA-02 failed because the legacy task-list shell admitted ADMIN. The legacy task list retains its old roles; exact shared runtime routes still admit an authenticated frozen Organization respondent and enforce server resource authorization.
 - Canonical Composite FINAL did not update Run completion, leaving valid results unavailable for reporting. Completion now calls the existing reconciler after the runtime transaction. An authorized completed-attempt GET repairs projection loss; a browser fault injection proves the same execution recovers with exactly one canonical result. Legacy Course completion uses an exact actor/episode binding and cannot update Organization assignments.
 - Parent task discovery now links an exact completed individual historical report. It grants neither tenant navigation nor historical CSV authority.
-- Identity-keyed Organization context prevents a mount-time reset from cancelling deep-link selection. Report form controls now shrink within their grid; desktop screenshots and viewport assertions verify no overflow.
+- Organization context preserves deep-link selection; the later CI correction above also preserves the route tree during authentication changes. Report form controls now shrink within their grid; desktop screenshots and viewport assertions verify no overflow.
 - Production backup streamed pg_dump through the default 1 MiB process buffer and failed on larger dumps. It now streams to a private file descriptor. The real encrypted backup/restore entry points passed with a 7,822,369-byte encrypted package, including a deliberately large isolated probe.
 
 ### Local results
