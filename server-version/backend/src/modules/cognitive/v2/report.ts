@@ -116,6 +116,15 @@ const projectKeys = (
   )
 })
 
+const participantMetricAllowed = (testType: string, key: string): boolean => {
+  // Matrix `reachedDifficulty` only means that at least one item in a design
+  // tier was answered correctly. It is useful as a raw research descriptor,
+  // but a single lucky response can raise it, so it must not be presented as
+  // a participant ability/difficulty level.
+  if (testType === 'matrix' && key === 'reachedDifficulty') return false
+  return true
+}
+
 const experienceHeadlineByTestType: Record<string, string> = {
   stroop: 'incongruentAccuracy',
   nback: 'dPrimeByN',
@@ -135,6 +144,7 @@ const resolveHeadlineKeys = (input: {
   if (
     experienceHeadline
     && eligibleMetric(experienceHeadline, input.metricDefinitions, input.profile, input.quality)
+    && participantMetricAllowed(input.testType, experienceHeadline)
   ) {
     return [experienceHeadline]
   }
@@ -144,7 +154,7 @@ const resolveHeadlineKeys = (input: {
     input.metricDefinitions,
     input.profile,
     input.quality,
-  )
+  ).filter((key) => participantMetricAllowed(input.testType, key))
 }
 
 const conclusionFor = (state: QualityState, profile: CognitiveProfile | null): string => {
@@ -190,7 +200,9 @@ export const projectThreeLayerReport = (input: {
   const headlineSet = new Set(headlineKeys)
   const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => !headlineSet.has(key))
+    .filter((key) => participantMetricAllowed(input.testType, key))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
+    .filter((key) => participantMetricAllowed(input.testType, key))
   return {
     title: input.definition.title,
     qualityState: input.score.quality.state,
