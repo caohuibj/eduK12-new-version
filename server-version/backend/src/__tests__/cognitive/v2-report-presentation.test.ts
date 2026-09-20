@@ -80,6 +80,33 @@ describe('Cognitive V2 participant report presentation', () => {
     expect(nback.headline.map((metric) => metric.key)).toEqual(['maxReliableN'])
   })
 
+  it('projects profile-specific caveats into the V2 report', () => {
+    const cpt = project('cpt', '1.0.0', 'standard', {
+      dPrime: 1.2,
+      omissionRate: 0.08,
+      commissionRate: 0.05,
+      rtICV: 0.2,
+    })
+    expect(cpt.caveats).toContain('正式版须同时看 d′、遗漏、误报和 RT 变异。')
+  })
+
+  it('shows research-only metrics only in the research profile', () => {
+    const metrics = {
+      switchCostRtMs: 85,
+      switchCostAccuracy: 0.04,
+      medianRtSwitch: 610,
+      medianRtRepeat: 525,
+      accuracySwitch: 0.91,
+      accuracyRepeat: 0.95,
+      mixingCost: 48,
+    }
+    const standard = project('taskswitch', '1.0.0', 'standard', metrics)
+    const research = project('taskswitch', '1.0.0', 'research', metrics)
+
+    expect(standard.research).toEqual([])
+    expect(research.research.map((metric) => metric.key)).toEqual(['mixingCost'])
+  })
+
   it('hides all quantitative layers when V2 quality is invalid', () => {
     const report = project('cpt', '1.0.0', 'standard', {
       dPrime: 1.1,
@@ -90,6 +117,7 @@ describe('Cognitive V2 participant report presentation', () => {
     expect(report.headline).toEqual([])
     expect(report.user).toEqual([])
     expect(report.detail).toEqual([])
+    expect(report.research).toEqual([])
     expect(report.conclusion).toMatch(/暂不提供表现结论/)
   })
 
@@ -119,8 +147,22 @@ describe('Cognitive V2 participant report presentation', () => {
       medianRtMs: 3200,
       omissionRate: 0,
     })
-    const visibleKeys = [...report.headline, ...report.user, ...report.detail].map((metric) => metric.key)
+    const visibleKeys = [...report.headline, ...report.user, ...report.detail, ...report.research].map((metric) => metric.key)
     expect(visibleKeys).not.toContain('reachedDifficulty')
     expect(visibleKeys).toContain('accuracy')
+  })
+
+  it('applies the same participant-copy fallback to future task definitions', () => {
+    const report = project('patterncompare', '1.0.0', 'experience', {
+      correctPerMinute: 42,
+      accuracy: 0.9,
+      medianCorrectRtMs: 720,
+      lapseRate: 0.05,
+      correctCount: 21,
+      completedTrialCount: 24,
+    })
+    expect(report.caveats).toContain('体验版仅持续 30 秒，速度指标稳定性有限，不进入综合分析。')
+    expect(report.headline[0].description).toContain('每分钟正确数')
+    expect(report.headline[0].description).not.toContain('processing_speed')
   })
 })
