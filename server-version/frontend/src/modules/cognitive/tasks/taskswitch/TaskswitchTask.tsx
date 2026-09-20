@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
-import { taskswitchSequence } from '../shared/prng'
+import { taskswitchSequence, type TaskswitchTrialSpec } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
@@ -9,6 +9,12 @@ type SubPhase = 'cue' | 'stimulus'
 type PracticeStage = 'parity' | 'magnitude' | 'mixed'
 type TaskRule = 'parity' | 'magnitude'
 type PracticeTrial = { taskRule: TaskRule; stimulus: number; correctResponse: 'left' | 'right' }
+
+const isTaskswitchFormalTrial = (
+  trial: PracticeTrial | TaskswitchTrialSpec | undefined,
+): trial is TaskswitchTrialSpec => Boolean(
+  trial && 'blockIndex' in trial && typeof trial.blockIndex === 'number',
+)
 
 const PARITY_PRACTICE: PracticeTrial[] = [
   { taskRule: 'parity', stimulus: 3, correctResponse: 'left' },
@@ -125,9 +131,14 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
-    if (phase === 'formal' && (trialIndex >= total || !current)) return
-    if (phase === 'formal' && 'blockIndex' in current && acknowledgedBlockIndex !== current.blockIndex) return
+    const current: PracticeTrial | TaskswitchTrialSpec | undefined = phase === 'formal'
+      ? sequence[trialIndex]
+      : practiceTrials[practiceIndex]
+    if (phase === 'formal') {
+      if (trialIndex >= total || !isTaskswitchFormalTrial(current)) return
+      if (acknowledgedBlockIndex !== current.blockIndex) return
+    }
+    if (!current) return
     respondedRef.current = false
     responseRef.current = null
     rtRef.current = null
@@ -141,7 +152,10 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
       onsetRef.current = performance.now()
     }, isiMs + cueMs)
     const hide = window.setTimeout(async () => {
-      const currentTrial = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
+      const currentTrial: PracticeTrial | TaskswitchTrialSpec | undefined = phase === 'formal'
+        ? sequence[trialIndex]
+        : practiceTrials[practiceIndex]
+      if (!currentTrial) return
       const correct = responseRef.current === currentTrial.correctResponse
       if (phase === 'practice') {
         setFeedback(correct ? '正确' : `错误：当前规则是“${cueLabel(currentTrial.taskRule)}”。`)
@@ -157,7 +171,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
         }, PRACTICE_FEEDBACK_MS)
         return
       }
-      if (!submittingRef.current && 'blockIndex' in currentTrial) {
+      if (!submittingRef.current && isTaskswitchFormalTrial(currentTrial)) {
         submittingRef.current = true
         await onTrialComplete({
           blockIndex: currentTrial.blockIndex,
@@ -193,7 +207,9 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     onTaskComplete,
   ])
 
-  const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
+  const current: PracticeTrial | TaskswitchTrialSpec | undefined = phase === 'formal'
+    ? sequence[trialIndex]
+    : practiceTrials[practiceIndex]
 
   const respond = (side: 'left' | 'right') => {
     if (subPhase !== 'stimulus' || respondedRef.current || onsetRef.current == null) return
@@ -253,7 +269,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  if (phase === 'formal' && current && 'blockIndex' in current && acknowledgedBlockIndex !== current.blockIndex) {
+  if (phase === 'formal' && isTaskswitchFormalTrial(current) && acknowledgedBlockIndex !== current.blockIndex) {
     const isFirstBlock = current.blockIndex === 0
     return (
       <div className="text-center p-8">
