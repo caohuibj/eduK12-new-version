@@ -40,9 +40,7 @@ describe('Round 2 PR5 task runners', () => {
     const matrixTrial = vi.fn()
     const matrix = render(<MatrixTask taskContext={{ ...context, config: { itemCount: 6, itemTimeoutMs: 1000 } }} trialIndex={0} onTrialComplete={matrixTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) {
-      fireEvent.click(screen.getByRole('button', { name: `选项 ${(item.correctOption + 1) % 4 + 1}` }))
-    }
+    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) fireEvent.click(screen.getByRole('button', { name: `选项 ${(item.correctOption + 1) % 4 + 1}` }))
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(matrixTrial).not.toHaveBeenCalled(); matrix.unmount()
 
     const rotationTrial = vi.fn()
@@ -58,18 +56,19 @@ describe('Round 2 PR5 task runners', () => {
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(towerTrial).not.toHaveBeenCalled()
   })
 
-  it('submits the frozen matrix item after passing practice', async () => {
+  it('hides matrix design difficulty and submits the frozen item', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<MatrixTask taskContext={{ ...context, config: { itemCount: 6, itemTimeoutMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
     for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) fireEvent.click(screen.getByRole('button', { name: `选项 ${item.correctOption + 1}` }))
     fireEvent.click(screen.getByText('开始正式测验'))
+    expect(screen.queryByText(/难度\s*[123]/)).not.toBeInTheDocument()
     const item = matrixSequence(context.randomSeed, 6)[0]
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: `选项 ${item.correctOption + 1}` })) })
-    expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemId: item.itemId, selectedOption: item.correctOption }))
+    expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemId: item.itemId, selectedOption: item.correctOption, timedOut: false }))
   })
 
-  it('submits the frozen rotation item after passing practice', async () => {
+  it('does not expose rotation answer metadata and supports formal keyboard response', async () => {
     vi.useFakeTimers()
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<MentalrotationTask taskContext={{ ...context, testType: 'mentalrotation', config: { totalTrials: 12, stimulusMs: 50, isiMs: 1 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
@@ -77,12 +76,13 @@ describe('Round 2 PR5 task runners', () => {
     for (const item of mentalRotationSequence('rotation-practice-v1', 12).slice(0, 4)) fireEvent.click(screen.getByText(item.correctResponse === 'same' ? '同一图形' : '镜像图形'))
     fireEvent.click(screen.getByText('开始正式测验'))
     await act(async () => { await vi.advanceTimersByTimeAsync(2) })
+    expect(screen.queryByLabelText(/镜像旋转|旋转 \d+ 度/)).not.toBeInTheDocument()
     const item = mentalRotationSequence(context.randomSeed, 12)[0]
-    await act(async () => { fireEvent.click(screen.getByText(item.correctResponse === 'same' ? '同一图形' : '镜像图形')) })
-    expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemId: item.itemId, response: item.correctResponse }))
+    fireEvent.keyDown(window, { key: item.correctResponse === 'same' ? 'ArrowLeft' : 'ArrowRight' })
+    await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ itemId: item.itemId, response: item.correctResponse, timedOut: false })))
   })
 
-  it('submits replayable Tower moves after passing practice', async () => {
+  it('does not reveal Tower optimal-move targets and submits replayable moves', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<TowerTask taskContext={{ ...context, testType: 'tower', config: { problemCount: 4, maxMovesFactor: 3, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
@@ -90,10 +90,12 @@ describe('Round 2 PR5 task runners', () => {
       fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${from + 1}` })); fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${to + 1}` })); fireEvent.click(screen.getByText(index === 3 ? '查看练习结果' : '下一题'))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
+    expect(screen.queryByText(/最短\s*\d+\s*步/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/已移动\s*0\s*\/\s*\d+/)).not.toBeInTheDocument()
     const problem = towerSequence(context.randomSeed, 4)[0]
     const path = shortestPath(problem.initialState, problem.targetState)
     for (const move of path) { fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${move.from + 1}` })); fireEvent.click(screen.getByRole('button', { name: `当前状态 柱 ${move.to + 1}` })) }
     await act(async () => { fireEvent.click(screen.getByText('提交已解问题')) })
-    expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ problemId: problem.problemId, gaveUp: false, moves: expect.any(Array) }))
+    expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ problemId: problem.problemId, gaveUp: false, moves: expect.any(Array), timedOut: false }))
   }, 10_000)
 })
