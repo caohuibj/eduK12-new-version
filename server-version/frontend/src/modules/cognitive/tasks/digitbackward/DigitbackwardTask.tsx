@@ -95,7 +95,8 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
         sequence,
         response: answer,
         responseDurationMs: Math.max(0, Math.round(performance.now() - responseStartedRef.current)),
-        interrupted: interrupted || timedOut,
+        interrupted,
+        timedOut,
       })
       if (accepted === false) return
       if (trialWithinLevel === 1) {
