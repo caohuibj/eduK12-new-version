@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { GonogoTask } from '../tasks/gonogo/GonogoTask'
 import { CptTask } from '../tasks/cpt/CptTask'
@@ -16,7 +16,7 @@ const context = {
 }
 
 describe('Go/No-Go and CPT runners', () => {
-  it('starts Go/No-Go from instruction into practice without persisting', async () => {
+  it('starts Go/No-Go from instruction into practice without persisting', () => {
     const onTrialComplete = vi.fn()
     render(<GonogoTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
     expect(screen.getByText('Go/No-Go')).toBeTruthy()
@@ -25,7 +25,7 @@ describe('Go/No-Go and CPT runners', () => {
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
-  it('starts CPT from instruction into practice without persisting', async () => {
+  it('starts CPT from instruction into practice without persisting', () => {
     const onTrialComplete = vi.fn()
     render(
       <CptTask
@@ -63,7 +63,7 @@ describe('Go/No-Go and CPT runners', () => {
 
       for (let practiceIndex = 0; practiceIndex < 4; practiceIndex += 1) {
         await act(async () => { vi.advanceTimersByTime(20) })
-        if (practiceIndex % 2 === 0) fireEvent.click(screen.getByRole('button'))
+        if (practiceIndex % 2 === 0) fireEvent.pointerDown(screen.getByRole('button'))
         await act(async () => { vi.advanceTimersByTime(20 + 600) })
       }
 
@@ -73,7 +73,8 @@ describe('Go/No-Go and CPT runners', () => {
       expect(screen.getByText(/区块 1 \/ 2/)).toBeTruthy()
       expect(onTrialComplete).not.toHaveBeenCalled()
       fireEvent.click(screen.getByText('开始第 1 区块'))
-      expect(screen.getByText(/试次 1 \/ 8 · 区块 1 \/ 2/)).toBeTruthy()
+      expect(screen.getByLabelText('CPT 正式测验')).toBeTruthy()
+      expect(screen.queryByText(/试次 1 \/ 8/)).toBeNull()
     } finally {
       vi.useRealTimers()
     }
