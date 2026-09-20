@@ -211,6 +211,8 @@ export interface ReportDefinition {
   userMetrics: string[]
   /** Expandable detail: method, secondary metrics and limitations. */
   detailMetrics: string[]
+  /** Profile-specific participant caveats, carried through the shared V2 report projection. */
+  profileCaveats?: Partial<Record<CognitiveProfile, string[]>>
   disclaimer: string
   practicalTips: string[]
 }
