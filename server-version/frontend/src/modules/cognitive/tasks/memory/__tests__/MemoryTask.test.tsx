@@ -77,6 +77,19 @@ describe('MemoryTask Digit Span Forward', () => {
     expect(screen.getByText(/练习 1 \/ 2/)).toBeTruthy()
   })
 
+  it('keeps formal response digits private and removes backspace editing', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    await enterFormal(onTrialComplete)
+    expect(screen.getByLabelText('数字广度正式测验')).toBeTruthy()
+    showSequence(2)
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    expect(screen.getByText('已输入 1 / 2')).toBeTruthy()
+    expect(screen.queryByText(/按顺序输入：/)).toBeNull()
+    expect(screen.queryByRole('button', { name: '退格' })).toBeNull()
+    fireEvent.keyDown(window, { key: 'Backspace' })
+    expect(screen.getByText('已输入 1 / 2')).toBeTruthy()
+  })
+
   it('keeps trial 1 and trial 2 at the same length before advancing', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
