@@ -124,7 +124,7 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(await screen.findByText('该测评尚未完成')).toBeTruthy()
   })
 
-  it('hides a strong headline, index, and reference when quality is insufficient', async () => {
+  it('fails closed and hides quantitative sections when quality is insufficient', async () => {
     mockCognitiveApi.getSession.mockResolvedValue({
       code: 0,
       message: 'ok',
@@ -156,13 +156,15 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
 
     renderAt()
 
-    expect(await screen.findByText('本次数据不足以稳定解释，建议重新测量。')).toBeTruthy()
-    expect(screen.getByText('暂不显示')).toBeTruthy()
+    expect(await screen.findByText('本次数据不足以稳定解释，建议在相近设备和环境下重新测量。')).toBeTruthy()
+    expect(screen.queryByText('暂不显示')).toBeNull()
     expect(screen.queryByText('参考位置 10 / 100')).toBeNull()
-    expect(screen.getByText('中位反应时')).toBeTruthy()
+    expect(screen.queryByText('中位反应时')).toBeNull()
+    expect(screen.queryByText('主要指标')).toBeNull()
+    expect(screen.queryByText('次级指标')).toBeNull()
   })
 
-  it('renders quality → primary → secondary → method and never shows a rank position', async () => {
+  it('renders quality → primary → secondary, folds technical method details, and never shows a rank position', async () => {
     mockCognitiveApi.getSession.mockResolvedValue({
       code: 0,
       message: 'ok',
@@ -220,15 +222,14 @@ describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §
     expect(await screen.findByText('数据质量')).toBeTruthy()
     expect(screen.getByText('主要指标')).toBeTruthy()
     expect(screen.getByText('次级指标')).toBeTruthy()
-    expect(screen.getByText('方法说明')).toBeTruthy()
+    expect(screen.getByText('方法说明（技术信息）')).toBeTruthy()
     expect(screen.getByText('任务表现指数')).toBeTruthy()
     expect(screen.getByText('接近该研究样本报告范围')).toBeTruthy()
     expect(screen.queryByText(/参考位置/)).toBeNull()
-    expect(screen.queryByText(/百分位/)).toBeNull()
+    expect(screen.getByText(/不代表百分位、年龄等级、学校成绩或诊断结论/)).toBeTruthy()
     const headings = screen.getAllByRole('heading').map((node) => node.textContent)
     expect(headings.indexOf('数据质量')).toBeLessThan(headings.indexOf('主要指标'))
     expect(headings.indexOf('主要指标')).toBeLessThan(headings.indexOf('次级指标'))
-    expect(headings.indexOf('次级指标')).toBeLessThan(headings.indexOf('方法说明'))
   })
 
   it('uses frozen practical tips instead of the live frontend registry', async () => {
