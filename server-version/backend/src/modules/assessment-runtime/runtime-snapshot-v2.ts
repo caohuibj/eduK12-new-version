@@ -8,7 +8,12 @@ import {
   type FrozenScaleRuntimeSnapshotV1,
 } from './runtime-snapshot'
 import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
-import { hashCompiledScalePolicy, type CompiledScalePolicyV1 } from '../scale/policy/compile'
+import {
+  compiledScalePolicyV1Schema,
+  hashCompiledScalePolicy,
+  parseCompiledScalePolicy,
+  type CompiledScalePolicyV1,
+} from '../scale/policy/compile'
 import type { ReferenceBindingSnapshot } from './types'
 
 export interface FrozenScaleRuntimeSnapshotV2 {
@@ -47,7 +52,7 @@ const frozenScaleRuntimeSnapshotV2Schema = z.object({
   compiledRuntime: z.record(z.unknown()),
   referenceBindings: z.array(referenceBindingSchema),
   definition: scaleDefinitionSchema,
-  compiledPolicy: z.record(z.unknown()),
+  compiledPolicy: compiledScalePolicyV1Schema,
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
@@ -117,13 +122,18 @@ export const createFrozenScaleRuntimeSnapshotV2ForTest = (input: {
 }
 
 export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRuntimeSnapshotV2 => {
-  const snapshot = frozenScaleRuntimeSnapshotV2Schema.parse(value) as unknown as FrozenScaleRuntimeSnapshotV2
+  const rawSnapshot = frozenScaleRuntimeSnapshotV2Schema.parse(value)
+  const compiledRuntime = parseCompiledInstrumentRuntime(rawSnapshot.compiledRuntime)
+  const compiledPolicy = parseCompiledScalePolicy(rawSnapshot.compiledPolicy)
+  const snapshot: FrozenScaleRuntimeSnapshotV2 = {
+    ...rawSnapshot,
+    compiledRuntime,
+    compiledPolicy,
+  }
+
   if (hashFrozenScaleRuntimeSnapshotV2(snapshot) !== snapshot.snapshotHash) {
     throw new Error('Frozen Scale V2 runtime snapshot hash mismatch')
   }
-
-  const compiledRuntime = parseCompiledInstrumentRuntime(snapshot.compiledRuntime)
-  const compiledPolicy = snapshot.compiledPolicy as CompiledScalePolicyV1
   if (hashCompiledScalePolicy(compiledPolicy) !== snapshot.runtimePolicyHash || compiledPolicy.runtimePolicyHash !== snapshot.runtimePolicyHash) {
     throw new Error('Frozen Scale V2 runtime policy hash mismatch')
   }
@@ -150,7 +160,7 @@ export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRu
     snapshotHash: hashFrozenScaleRuntimeSnapshot({ ...v1Unsigned, snapshotHash: '0'.repeat(64) }),
   }
   parseFrozenScaleRuntimeSnapshot(v1Candidate)
-  return { ...snapshot, compiledRuntime, compiledPolicy }
+  return snapshot
 }
 
 export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1 | FrozenScaleRuntimeSnapshotV2

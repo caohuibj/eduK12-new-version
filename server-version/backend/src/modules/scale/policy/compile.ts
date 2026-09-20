@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import {
   audienceDisclosurePolicyV1Schema,
@@ -28,6 +29,23 @@ export interface CompiledScalePolicyV1 {
   referenceBindings: Array<{ referenceVersion: string; referenceHash: string }>
   runtimePolicyHash: string
 }
+
+export const compiledScalePolicyV1Schema = z.object({
+  schemaVersion: z.literal(1),
+  compilerVersion: z.literal(SCALE_POLICY_COMPILER_VERSION),
+  instrumentKey: z.string().regex(/^[a-z][a-z0-9_]*$/),
+  instrumentVersion: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
+  contentLocale: z.string().min(1),
+  applicability: instrumentApplicabilityV1Schema,
+  disclosure: audienceDisclosurePolicyV1Schema,
+  usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
+  educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
+  referenceBindings: z.array(z.object({
+    referenceVersion: z.string().min(1),
+    referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
+  }).strict()),
+  runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
+}).strict()
 
 const unsignedCompiledPolicy = (policy: Omit<CompiledScalePolicyV1, 'runtimePolicyHash'>) => ({
   schemaVersion: policy.schemaVersion,
@@ -76,6 +94,10 @@ export const compileScalePolicy = (source: ScaleInstrumentSourceV1): CompiledSca
   }
   return { ...unsigned, runtimePolicyHash: canonicalHash(unsignedCompiledPolicy(unsigned)) }
 }
+
+export const parseCompiledScalePolicy = (value: unknown): CompiledScalePolicyV1 => (
+  compiledScalePolicyV1Schema.parse(value) as CompiledScalePolicyV1
+)
 
 export const hashCompiledScalePolicy = (policy: CompiledScalePolicyV1): string => (
   canonicalHash(unsignedCompiledPolicy(policy))
