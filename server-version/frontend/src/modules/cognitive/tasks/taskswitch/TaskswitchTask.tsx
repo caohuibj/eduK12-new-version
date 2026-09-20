@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { taskswitchSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
@@ -53,6 +54,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     isiMs: number
   }
   const total = config.totalTrials ?? 128
+  const blockCount = config.blockCount ?? 4
   const cueMs = config.cueMs ?? 400
   const stimulusMs = config.stimulusMs ?? 2000
   const isiMs = config.isiMs ?? 400
@@ -60,11 +62,11 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     () => taskswitchSequence(
       taskContext.randomSeed,
       total,
-      config.blockCount ?? 4,
+      blockCount,
       config.switchRatio ?? 0.5,
       config.includePureBlocks ?? false,
     ),
-    [taskContext.randomSeed, total, config.blockCount, config.switchRatio, config.includePureBlocks],
+    [taskContext.randomSeed, total, blockCount, config.switchRatio, config.includePureBlocks],
   )
   const [phase, setPhase] = useState<Phase>('instruction')
   const [subPhase, setSubPhase] = useState<SubPhase>('cue')
@@ -73,6 +75,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(null)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
   const responseRef = useRef<'left' | 'right' | null>(null)
@@ -110,6 +113,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     responseRef.current = null
     rtRef.current = null
     interruptedRef.current = false
+    setAcknowledgedBlockIndex(null)
     setPhase('formal')
   }
 
@@ -123,6 +127,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     if (phase !== 'practice' && phase !== 'formal') return
     const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
     if (phase === 'formal' && (trialIndex >= total || !current)) return
+    if (phase === 'formal' && 'blockIndex' in current && acknowledgedBlockIndex !== current.blockIndex) return
     respondedRef.current = false
     responseRef.current = null
     rtRef.current = null
@@ -183,6 +188,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     cueMs,
     stimulusMs,
     isiMs,
+    acknowledgedBlockIndex,
     onTrialComplete,
     onTaskComplete,
   ])
@@ -196,6 +202,22 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     rtRef.current = Math.round(performance.now() - onsetRef.current)
   }
 
+  useEffect(() => {
+    if (phase !== 'practice' && phase !== 'formal') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) return
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        respond('left')
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        respond('right')
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   if (phase === 'instruction') {
     return (
       <div className="text-center p-8">
@@ -203,7 +225,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
         <p className="text-gray-600 mb-2">看到“奇偶”：奇数按左，偶数按右。</p>
         <p className="text-gray-600 mb-2">看到“大小”：小于 5 按左，大于 5 按右。</p>
         <p className="text-gray-600 mb-4">正式测验中规则会在试次之间切换，所以每一题都先看规则提示，再按对应规则作答。</p>
-        <p className="text-xs text-gray-400 mb-6">先分别练习两条规则，再练习规则混合转换；练习不计入正式成绩。</p>
+        <p className="text-xs text-gray-400 mb-6">电脑使用左右方向键；触屏使用下方左右按键。先分别练习两条规则，再练习混合转换。</p>
         <button className="btn-primary" onClick={startPractice}>开始练习</button>
       </div>
     )
@@ -231,20 +253,35 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  return (
-    <div className="text-center p-8">
-      <p className="text-sm text-gray-500 mb-2">
-        {phase === 'practice'
-          ? `${stageLabel(practiceStage)}练习 ${practiceIndex + 1} / ${practiceTrials.length}`
-          : `试次 ${trialIndex + 1} / ${total}`}
-      </p>
+  if (phase === 'formal' && current && 'blockIndex' in current && acknowledgedBlockIndex !== current.blockIndex) {
+    const isFirstBlock = current.blockIndex === 0
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-3">{isFirstBlock ? '准备开始任务转换测验' : '区块完成，可以短暂休息'}</h2>
+        <p className="text-gray-600 mb-2">即将开始区块 {current.blockIndex + 1} / {blockCount}</p>
+        <p className="text-sm text-gray-500 mb-6">准备好后继续；每题先看“奇偶 / 大小”规则提示，再使用左右方向作答。</p>
+        <button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>
+          {isFirstBlock ? '开始第 1 区块' : '继续下一组'}
+        </button>
+      </div>
+    )
+  }
+
+  const taskBody = (
+    <div className="mx-auto max-w-2xl text-center p-6 sm:p-8">
+      {phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">{`${stageLabel(practiceStage)}练习 ${practiceIndex + 1} / ${practiceTrials.length}`}</p> : null}
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <p className="text-lg text-gray-500 mb-3">{current ? cueLabel(current.taskRule) : ''}</p>
       <div className="text-6xl font-bold text-gray-800 h-24 mb-6">{subPhase === 'stimulus' ? current?.stimulus : ''}</div>
-      <div className="flex justify-center gap-6">
-        <button type="button" className="btn-secondary px-8" onClick={() => respond('left')}>左</button>
-        <button type="button" className="btn-secondary px-8" onClick={() => respond('right')}>右</button>
+      <div className="flex justify-center gap-4 sm:gap-6">
+        <button type="button" className="btn-secondary min-h-12 min-w-24 px-8" onPointerDown={() => respond('left')}>← 左</button>
+        <button type="button" className="btn-secondary min-h-12 min-w-24 px-8" onPointerDown={() => respond('right')}>右 →</button>
       </div>
+      {phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">使用 ← / → 作答</p> : null}
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="任务转换正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }
