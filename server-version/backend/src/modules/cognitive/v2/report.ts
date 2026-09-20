@@ -11,6 +11,7 @@ import { metricIsQualityGated } from './quality'
 export interface ReportMetricView {
   key: string
   label: string
+  description: string
   category: string
   direction: MetricDefinition['direction']
   unit: MetricDefinition['unit']
@@ -25,6 +26,8 @@ export interface ThreeLayerReport {
   headline: ReportMetricView[]
   user: ReportMetricView[]
   detail: ReportMetricView[]
+  research: ReportMetricView[]
+  caveats: string[]
   quality: Array<{ key: string; label: string; active: boolean; effect: QualityDefinition['effect'] }>
   method: {
     testType: string
@@ -66,6 +69,24 @@ const formatMetric = (definition: MetricDefinition, value: unknown): string => {
   return String(rounded)
 }
 
+const participantMetricDescription = (definition: MetricDefinition): string => {
+  const declared = definition.description?.trim()
+  if (declared && declared !== definition.label) return declared
+  if (definition.direction === 'higher_is_better') {
+    return `${definition.label}用于描述本次任务表现；在其他条件相近且数据质量可接受时，数值较高通常表示该指标表现较高。`
+  }
+  if (definition.direction === 'lower_is_better') {
+    return `${definition.label}用于描述本次任务表现；在其他条件相近且数据质量可接受时，数值较低通常表示该指标表现较好。`
+  }
+  if (definition.direction === 'target_range') {
+    return `${definition.label}用于检查结果是否处在该任务预期的可解释范围，应结合数据质量和其他指标共同阅读。`
+  }
+  if (definition.direction === 'signed') {
+    return `${definition.label}表示条件或负荷之间差异的方向与大小，应结合相关准确率、反应时和任务结构共同阅读。`
+  }
+  return `${definition.label}是本次任务的描述性观察值，不应单独解释为能力高低或常模位置。`
+}
+
 const metricView = (
   key: string,
   metrics: Record<string, unknown>,
@@ -76,6 +97,7 @@ const metricView = (
   return {
     key,
     label: definition.label,
+    description: participantMetricDescription(definition),
     category: definition.category,
     direction: definition.direction,
     unit: definition.unit,
@@ -203,19 +225,34 @@ export const projectThreeLayerReport = (input: {
     .filter((key) => participantMetricAllowed(input.testType, key))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => participantMetricAllowed(input.testType, key))
+  const researchKeys = input.profile === 'research'
+    ? Object.values(input.metricDefinitions)
+        .filter((definition) => definition.visibility === 'research_only')
+        .map((definition) => definition.key)
+        .filter((key) => eligibleMetric(key, input.metricDefinitions, input.profile, input.score.quality))
+        .filter((key) => participantMetricAllowed(input.testType, key))
+    : []
+  const caveats = input.profile
+    ? input.definition.profileCaveats?.[input.profile] ?? []
+    : []
+  const invalid = input.score.quality.state === 'invalid'
   return {
     title: input.definition.title,
     qualityState: input.score.quality.state,
     conclusion: conclusionFor(input.score.quality.state, input.profile),
-    headline: input.score.quality.state === 'invalid'
+    headline: invalid
       ? []
       : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
-    user: input.score.quality.state === 'invalid'
+    user: invalid
       ? []
       : userKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
-    detail: input.score.quality.state === 'invalid'
+    detail: invalid
       ? []
       : detailKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
+    research: invalid
+      ? []
+      : researchKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
+    caveats,
     quality: qualityEntries,
     method: {
       testType: input.testType,
