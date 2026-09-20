@@ -46,7 +46,7 @@ export const validateRegistryReferenceEligibility = (entry: {
       return
     }
     if (metric.valueType !== 'number' && metric.valueType !== 'integer') {
-      issues.push({ path, message: `eligible metric ${key} must expose a scalar number or integer valueType`)
+      issues.push({ path, message: `eligible metric ${key} must expose a scalar number or integer valueType` })
     }
     if (metric.role === 'quality' || metric.role === 'research_only') {
       issues.push({ path, message: `quality or research_only metric ${key} cannot be reference eligible` })
