@@ -1,19 +1,41 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { taskswitchSequence } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 type SubPhase = 'cue' | 'stimulus'
+type PracticeStage = 'parity' | 'magnitude' | 'mixed'
+type TaskRule = 'parity' | 'magnitude'
+type PracticeTrial = { taskRule: TaskRule; stimulus: number; correctResponse: 'left' | 'right' }
 
-const PRACTICE = [
-  { taskRule: 'parity' as const, stimulus: 3, correctResponse: 'left' as const },
-  { taskRule: 'parity' as const, stimulus: 4, correctResponse: 'right' as const },
-  { taskRule: 'magnitude' as const, stimulus: 2, correctResponse: 'left' as const },
-  { taskRule: 'magnitude' as const, stimulus: 8, correctResponse: 'right' as const },
+const PARITY_PRACTICE: PracticeTrial[] = [
+  { taskRule: 'parity', stimulus: 3, correctResponse: 'left' },
+  { taskRule: 'parity', stimulus: 4, correctResponse: 'right' },
+  { taskRule: 'parity', stimulus: 7, correctResponse: 'left' },
+  { taskRule: 'parity', stimulus: 8, correctResponse: 'right' },
 ]
 
-const cueLabel = (rule: 'parity' | 'magnitude') => (rule === 'parity' ? '奇偶' : '大小')
+const MAGNITUDE_PRACTICE: PracticeTrial[] = [
+  { taskRule: 'magnitude', stimulus: 2, correctResponse: 'left' },
+  { taskRule: 'magnitude', stimulus: 8, correctResponse: 'right' },
+  { taskRule: 'magnitude', stimulus: 3, correctResponse: 'left' },
+  { taskRule: 'magnitude', stimulus: 7, correctResponse: 'right' },
+]
+
+const MIXED_PRACTICE: PracticeTrial[] = [
+  { taskRule: 'parity', stimulus: 3, correctResponse: 'left' },
+  { taskRule: 'magnitude', stimulus: 8, correctResponse: 'right' },
+  { taskRule: 'magnitude', stimulus: 2, correctResponse: 'left' },
+  { taskRule: 'parity', stimulus: 4, correctResponse: 'right' },
+  { taskRule: 'parity', stimulus: 7, correctResponse: 'left' },
+  { taskRule: 'magnitude', stimulus: 3, correctResponse: 'left' },
+  { taskRule: 'parity', stimulus: 8, correctResponse: 'right' },
+  { taskRule: 'magnitude', stimulus: 7, correctResponse: 'right' },
+]
+
+const cueLabel = (rule: TaskRule) => (rule === 'parity' ? '奇偶' : '大小')
+const stageLabel = (stage: PracticeStage) => stage === 'parity' ? '奇偶规则' : stage === 'magnitude' ? '大小规则' : '混合转换'
 
 export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   taskContext,
@@ -46,6 +68,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   )
   const [phase, setPhase] = useState<Phase>('instruction')
   const [subPhase, setSubPhase] = useState<SubPhase>('cue')
+  const [practiceStage, setPracticeStage] = useState<PracticeStage>('parity')
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
@@ -58,15 +81,27 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   const practiceCorrectRef = useRef(0)
   const submittingRef = useRef(false)
 
-  const startPractice = () => {
+  const practiceTrials = practiceStage === 'parity'
+    ? PARITY_PRACTICE
+    : practiceStage === 'magnitude'
+      ? MAGNITUDE_PRACTICE
+      : MIXED_PRACTICE
+
+  const startPracticeStage = (stage: PracticeStage) => {
+    setPracticeStage(stage)
     setPracticeIndex(0)
     setPracticeCorrect(0)
     practiceCorrectRef.current = 0
     setFeedback(null)
     setSubPhase('cue')
+    respondedRef.current = false
+    responseRef.current = null
+    rtRef.current = null
     setPracticeNonce((value) => value + 1)
     setPhase('practice')
   }
+
+  const startPractice = () => startPracticeStage('parity')
 
   const startFormal = () => {
     setFeedback(null)
@@ -86,7 +121,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
+    const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
     if (phase === 'formal' && (trialIndex >= total || !current)) return
     respondedRef.current = false
     responseRef.current = null
@@ -101,14 +136,14 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
       onsetRef.current = performance.now()
     }, isiMs + cueMs)
     const hide = window.setTimeout(async () => {
-      const currentTrial = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
+      const currentTrial = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
       const correct = responseRef.current === currentTrial.correctResponse
       if (phase === 'practice') {
-        setFeedback(correct ? '正确' : '错误')
+        setFeedback(correct ? '正确' : `错误：当前规则是“${cueLabel(currentTrial.taskRule)}”。`)
         if (correct) practiceCorrectRef.current += 1
         const nextIndex = practiceIndex + 1
         window.setTimeout(() => {
-          if (nextIndex >= PRACTICE_TRIAL_COUNT) {
+          if (nextIndex >= practiceTrials.length) {
             setPracticeCorrect(practiceCorrectRef.current)
             setPhase('practice-result')
             return
@@ -136,9 +171,23 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
       window.clearTimeout(showStimulus)
       window.clearTimeout(hide)
     }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, sequence, total, cueMs, stimulusMs, isiMs, onTrialComplete, onTaskComplete])
+  }, [
+    phase,
+    trialIndex,
+    practiceIndex,
+    practiceNonce,
+    practiceStage,
+    practiceTrials,
+    sequence,
+    total,
+    cueMs,
+    stimulusMs,
+    isiMs,
+    onTrialComplete,
+    onTaskComplete,
+  ])
 
-  const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
+  const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
 
   const respond = (side: 'left' | 'right') => {
     if (subPhase !== 'stimulus' || respondedRef.current || onsetRef.current == null) return
@@ -152,22 +201,31 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">任务转换</h2>
         <p className="text-gray-600 mb-2">看到“奇偶”：奇数按左，偶数按右。</p>
-        <p className="text-gray-600 mb-4">看到“大小”：小于 5 按左，大于 5 按右。</p>
-        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩，未通过可以重练。</p>
+        <p className="text-gray-600 mb-2">看到“大小”：小于 5 按左，大于 5 按右。</p>
+        <p className="text-gray-600 mb-4">正式测验中规则会在试次之间切换，所以每一题都先看规则提示，再按对应规则作答。</p>
+        <p className="text-xs text-gray-400 mb-6">先分别练习两条规则，再练习规则混合转换；练习不计入正式成绩。</p>
         <button className="btn-primary" onClick={startPractice}>开始练习</button>
       </div>
     )
   }
 
   if (phase === 'practice-result') {
-    const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
+    const passCorrect = practiceStage === 'mixed' ? 6 : 3
+    const passed = practiceCorrect >= passCorrect
+    const nextStage: PracticeStage | null = practiceStage === 'parity' ? 'magnitude' : practiceStage === 'magnitude' ? 'mixed' : null
     return (
       <div className="text-center p-8">
-        <p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>
+        <h2 className="text-xl font-semibold mb-3">{stageLabel(practiceStage)}练习结果</h2>
+        <p className="mb-2">练习正确 {practiceCorrect} / {practiceTrials.length}</p>
+        <p className="text-sm text-gray-500 mb-4">需要至少正确 {passCorrect} 题才能继续。</p>
         {passed ? (
-          <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
+          nextStage ? (
+            <button className="btn-primary" onClick={() => startPracticeStage(nextStage)}>继续{stageLabel(nextStage)}练习</button>
+          ) : (
+            <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
+          )
         ) : (
-          <button className="btn-secondary" onClick={startPractice}>重新练习</button>
+          <button className="btn-secondary" onClick={() => startPracticeStage(practiceStage)}>重新练习本阶段</button>
         )}
       </div>
     )
@@ -176,7 +234,9 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   return (
     <div className="text-center p-8">
       <p className="text-sm text-gray-500 mb-2">
-        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}
+        {phase === 'practice'
+          ? `${stageLabel(practiceStage)}练习 ${practiceIndex + 1} / ${practiceTrials.length}`
+          : `试次 ${trialIndex + 1} / ${total}`}
       </p>
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <p className="text-lg text-gray-500 mb-3">{current ? cueLabel(current.taskRule) : ''}</p>
