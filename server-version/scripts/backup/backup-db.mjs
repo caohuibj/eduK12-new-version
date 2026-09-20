@@ -55,7 +55,7 @@ function run(command, args, options = {}) {
   });
 
   if (result.error) {
-    throw new Error(`${command} failed to start`);
+    throw new Error(`${command} failed to start (${result.error.code || result.error.message})`);
   }
   if (result.status !== 0) {
     const detail = typeof result.stderr === 'string' ? result.stderr.trim() : '';
@@ -153,12 +153,18 @@ function createDatabaseDump(tempDir) {
   const container = env('POSTGRES_CONTAINER', 'ptool-postgres');
   const database = env('DB_NAME', 'ptool');
   const user = env('DB_USER', 'ptool');
-  const result = run(
-    'docker',
-    ['exec', container, 'pg_dump', '--format=custom', '--no-owner', '--no-privileges', '--username', user, '--dbname', database],
-    { encoding: null },
-  );
-  fs.writeFileSync(dumpPath, result.stdout);
+  // Stream binary dumps directly to disk; spawnSync's default stdout buffer
+  // is only 1 MiB and aborts otherwise-valid production backups above that size.
+  const dumpFd = fs.openSync(dumpPath, 'wx', 0o600);
+  try {
+    run(
+      'docker',
+      ['exec', container, 'pg_dump', '--format=custom', '--no-owner', '--no-privileges', '--username', user, '--dbname', database],
+      { encoding: null, stdio: ['ignore', dumpFd, 'pipe'] },
+    );
+  } finally {
+    fs.closeSync(dumpFd);
+  }
   return dumpPath;
 }
 

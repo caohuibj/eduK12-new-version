@@ -2898,6 +2898,7 @@ const unifiedCompositeProgressSnapshot = (
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   id: true,
+  assignmentRef: true,
   userId: true,
   recoveryTokenHash: true,
   status: true,
@@ -3690,14 +3691,24 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
 export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
   const route = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { deliveryMode: true, runtimeGeneration: true },
+    select: { deliveryMode: true, runtimeGeneration: true, assignmentRef: true },
   })
+  let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
     const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
-    return finalizeCompositeAttemptUnifiedIfReady(attemptId)
+    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId)
+  } else if (!route || route.deliveryMode !== 'FINAL_ONLY') {
+    result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
+  } else {
+    result = await finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
   }
-  if (!route || route.deliveryMode !== 'FINAL_ONLY') return finalizeCompositeAttemptLegacyIfReady(attemptId)
-  return finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
+  // The canonical runtime commits first. Reconcile outside its transaction to
+  // preserve the Run -> runtime lock order. Repeated FINAL/GET repairs any lag.
+  if (result?.status === 'COMPLETED' && route?.assignmentRef) {
+    const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
+    await reconcileRelationalCompositeCompletion(attemptId)
+  }
+  return result
 }
 
 
@@ -3737,6 +3748,12 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
     const state = await getUnifiedCompositeAttemptState(runtime, context)
+    // An authorized reread repairs a completion projection that failed after
+    // canonical FINAL committed, without creating or resubmitting an attempt.
+    if (state.status === 'COMPLETED' && runtime.assignmentRef) {
+      const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
+      await reconcileRelationalCompositeCompletion(attemptId)
+    }
     if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
       // Reconcile-once: patch parent completion fields onto the first projection.
       const finalized = await finalizeCompositeAttemptIfReady(attemptId)

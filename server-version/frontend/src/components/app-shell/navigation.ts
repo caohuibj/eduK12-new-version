@@ -38,6 +38,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 export function routeTitle(pathname: string, active?: NavigationItem): string {
+  if (pathname.startsWith('/organizations/')) return '组织空间'
   if (pathname.includes('/result') || pathname.endsWith('/report')) return '测评结果'
   if (pathname.endsWith('/history')) return '测评历史'
   if (pathname.endsWith('/register')) return '注册账户'

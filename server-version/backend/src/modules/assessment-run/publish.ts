@@ -726,3 +726,35 @@ export const publishAssessmentRun = async (input: {
     return { runId: input.runId, version, trackCount: preparedTracks.length, executionCount }
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
 }
+
+/** Advisory, write-free population preview; publish repeats every authority check. */
+export const previewAssessmentRun = async (input: {
+  organizationId: string; runId: string; actorUserId: string; expectedVersion: number;
+  resourceRegistry?: RunResourceAuthorityRegistry;
+}) => {
+  const prepared = await prepareTracks(input.runId, input.organizationId, input.resourceRegistry ?? productionRunResourceAuthorityRegistry)
+  return prisma.$transaction(async tx => {
+    const organizations = await tx.$queryRaw<Array<{ status: string }>>`
+      SELECT "status" FROM "organizations" WHERE "id" = ${input.organizationId} FOR SHARE
+    `
+    if (organizations[0]?.status !== 'ACTIVE') throw new RunPublishError('ORGANIZATION_SUSPENDED', 'Organization is not active', 409)
+    const runs = await tx.$queryRaw<Array<{ status: string; version: number }>>`
+      SELECT "status", "version" FROM "assessment_runs" WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR SHARE
+    `
+    if (runs[0]?.status !== 'DRAFT' || runs[0]?.version !== input.expectedVersion) throw new RunPublishError('RUN_STATE_CONFLICT', 'Run changed; refresh before preview', 409)
+    const denies = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "organization_access_denies" WHERE "organization_id" = ${input.organizationId}
+        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'RUN_PUBLISH')
+    `
+    if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run preview', 403)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    const tracks = []
+    for (const track of prepared) {
+      const pairs = await resolvePairs(tx, input.organizationId, track)
+      if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', 'Track resolved no eligible actor pairs', 409)
+      for (const pair of pairs) assertPublisherScope(authority, input.actorUserId, pair)
+      tracks.push({ trackId: track.id, executionCount: pairs.length, subjectCount: new Set(pairs.map(pair => actorCacheKey(pair.subject))).size, respondentCount: new Set(pairs.map(pair => actorCacheKey(pair.respondent))).size, resourcePolicy: track.resourcePolicy })
+    }
+    return { runId: input.runId, version: input.expectedVersion, tracks }
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
+}

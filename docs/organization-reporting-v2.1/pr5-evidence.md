@@ -1,0 +1,250 @@
+# Organization / Reporting V2.1 — PR5 Product Integration Evidence
+
+PR5 is the product-convergence layer on top of merged PR1–PR4. It does not add a second Organization authority model, Assessment Runtime, reporting engine, Safety classifier, or CSV generator.
+
+## CI disk exhaustion correction (2026-09-20)
+
+Run `35505548463` on `1d15c03` passed backend, frontend and CodeQL. All four independent browser workflows passed, confirming the prior authentication fix. The main browser job reached PR5 real runtime completions, then failed with `No space left on device` in the self-hosted runner diagnostic log and a browser fetch error.
+
+The Lima CI filesystem was 98% used with about 1.1 GiB free. Docker reported 624 volumes (614 unreferenced) and accumulated build cache. Reclaiming regenerable build cache recovered 3.439 GB and left about 4.2 GiB free; existing application containers and data volumes were preserved. Unidentified orphan volumes were not globally pruned.
+
+Every service-based acceptance job now removes its exact GitHub-supplied temporary container IDs with `--volumes` after artifact upload. This removes image-created anonymous PostgreSQL/Redis volumes; named volumes are preserved. PR5 rehearsal container teardown also removes its own anonymous volumes. Linux CI jobs check for 3 GiB free space before work, attempt build-cache-only reclamation below that threshold, and fail clearly if capacity is still insufficient. No domain test or required gate was skipped.
+
+Validation: workflow parsing and separate final cleanup-step coverage passed; shell syntax passed; an isolated real Docker test verified anonymous volume deletion, repeat cleanup and invalid target rejection. Disk preflight passed on the actual CI filesystem. All five production backup/restore and migration-failure recovery stages passed again with the updated teardown. The final push triggers new CI; its results are not awaited.
+
+## CI login recovery correction (2026-09-20)
+
+CI for `a12c1eb` passed backend/full frontend/CodeQL, but failed five browser jobs at login navigation or original-account recovery (main run `35504129488`, AppShell `35504129499`, media runs `35504129602`, `35504129678`, `35504129453`). The account-keyed Organization provider remounted the entire route tree when authentication changed, invalidating the login component's navigation callback and recovery state.
+
+The provider now resets only its own state before rendering the new principal, invalidates pending authority requests, and recreates principal-scoped discovery/selection callbacks. Descendant routes remain mounted. No login wait or authorization assertion is relaxed.
+
+Local verification: 4 frontend suites / 31 tests passed, including deep-link selection and a new account-switch test proving descendant DOM/state preservation, authority clearing and stale-response rejection. The existing AppShell browser matrix passed all 26 cases, including expiry/wrong-account/original-account recovery. The existing seeded Situational Bundle browser test passed authenticated and public submission/recovery with one canonical result each. Typecheck and route/session inventory passed; lint has zero errors and 101 existing warnings. Media-specific content flows were not rerun locally; their failed login boundary is covered by the real seeded login and AppShell regression. The next push triggers all configured CI gates; results are not awaited.
+
+## Review follow-up (2026-09-20)
+
+Implemented and reviewed in this follow-up:
+
+- Server-owned `allowedActions` drives navigation; identity changes and focus refresh current Organization authority.
+- Organization creation, suspension and resumption require current SYSTEM_ADMIN. Creation can appoint a validated active first administrator. Ordinary governance is unavailable while suspended; existing responsible Safety access remains separately authorized.
+- Classification dimensions/labels, temporal label assignments, counselor/client relationships and governance audit history have governed HTTP adapters and product forms.
+- The Run builder lists only released server registry resources and narrows choices to their policy. A read-only server preview resolves population and authority before publication; publication rechecks the exact version and all invariants.
+- A respondent task inbox supports explicit consent, START and recovery of the same execution. Exact assigned Run ownership permits legacy ADMIN respondents through shared runtime routes without granting access to other attempts; child runtime return navigation preserves the task inbox.
+- Failed/denied report and Safety rereads remove previously displayed payloads. Run progress failures are visible. Run list counts avoid a Track/execution Cartesian join.
+- Browser acceptance additionally exercises label assignment, consultation relationship ending/history, client mobile navigation, and platform-only lifecycle visibility. The Grade locator is scoped to avoid matching the select option.
+
+## Final acceptance follow-up (2026-09-20)
+
+Tested code candidate: `00b477957b15e34a3f101bb8918b5b9c39c050a2`. The following documentation-only commit archives these results; GitHub must still validate the final PR head.
+
+Resolved review/CI defects:
+
+- RA-02 failed because the legacy task-list shell admitted ADMIN. The legacy task list retains its old roles; exact shared runtime routes still admit an authenticated frozen Organization respondent and enforce server resource authorization.
+- Canonical Composite FINAL did not update Run completion, leaving valid results unavailable for reporting. Completion now calls the existing reconciler after the runtime transaction. An authorized completed-attempt GET repairs projection loss; a browser fault injection proves the same execution recovers with exactly one canonical result. Legacy Course completion uses an exact actor/episode binding and cannot update Organization assignments.
+- Parent task discovery now links an exact completed individual historical report. It grants neither tenant navigation nor historical CSV authority.
+- Organization context preserves deep-link selection; the later CI correction above also preserves the route tree during authentication changes. Report form controls now shrink within their grid; desktop screenshots and viewport assertions verify no overflow.
+- Production backup streamed pg_dump through the default 1 MiB process buffer and failed on larger dumps. It now streams to a private file descriptor. The real encrypted backup/restore entry points passed with a 7,822,369-byte encrypted package, including a deliberately large isolated probe.
+
+### Local results
+
+- Backend build passed. Broad relevant regression: 60/61 suites passed initially; the remaining shared-DB pagination assumption was corrected and its 3 tests passed. The final runtime/relational/context rerun passed 35 suites / 237 tests. Earlier explicit runtime PostgreSQL gates passed 20 tests with their required database variables enabled.
+- Full frontend: 130 suites / 489 tests passed. Final typecheck and route/session-gate inventory passed. Production build passed. Lint: zero errors, 101 existing warnings.
+- Original CI failure RA-02 four-role browser acceptance passed again.
+- Three complete business scenarios, legacy compatibility, and FINAL projection-loss recovery passed against real HTTP, PostgreSQL and Chromium. No request mocks or pre-completed canonical results are used.
+- Fresh PostgreSQL 14 migrations, encrypted backup verification/restore, row-count/hash comparison, failed migration transaction rollback and explicit forward recovery all passed in disposable containers.
+
+### Development-plan C01–C10 evidence map
+
+| Scope | Reproducible evidence |
+| --- | --- |
+| C01–C03 identity, lifecycle, structure | `organizationProductContext`, `organizationProductAdmin`, `organizationClassificationRelations`, `organizationClassRelationships` PostgreSQL suites; `pr5-organization-browser-e2e.cjs`; OrganizationContext frontend tests |
+| C04–C05 constrained Run, recovery | `assessmentRunResourceBoundary`, `assessmentRunPublish`, `assessmentRunStartClaim`, `assessmentRunRecovery`, `assessmentRunLifecycle`, `assessmentRunConsentRecovery` PostgreSQL suites; real resource selection/preview/publish, runtime FINAL and projection-loss recovery in `pr5-product-scenarios.ts` |
+| C06–C08 reporting, history, Safety/export | reporting PostgreSQL/privacy/delivery suites; all three scenarios, exact Parent historical report UI, protected audience denials, SUMMARY/ACTION/FULL, suspended responsibility, actual CSV download and revoked-ticket denial |
+| C09 legacy isolation | route inventory; RA-02; legacy STUDENT Organization staff and legacy ADMIN exact respondent; three real legacy Course completions and old aggregate report; Organization ID injection rejection |
+| C10 business and release rehearsal | `pr5-product-scenarios.ts` and `pr5-release-rehearsal.mjs`, wired into the required browser CI job without skips |
+
+The [business manifest](evidence/pr5-2026-09-20/business-manifest.json) records exact candidate, runtime/snapshot/result identities and successful assertions; the [business log](evidence/pr5-2026-09-20/business.log) records the executed scenarios. The [recovery manifest](evidence/pr5-2026-09-20/recovery-manifest.json) records the candidate, backup size/hash and restored table counts/hashes; the [recovery log](evidence/pr5-2026-09-20/recovery.log) records all five passed stages.
+
+Business coverage:
+
+1. School creation and first administrator; SINGLE/MULTI teacher labels; SELF execution; canonical results; all-school and label reports; browser CSV download; export revocation; frozen history after label/membership ending and a new membership episode.
+2. Student SELF, Teacher→Student, Parent→Student and Student→Teacher protected feedback; relationship/membership/consent revocation; exact Parent historical report after leaving; subject/generic-report denial; Safety three projections and suspended responsible access; old Course aggregate remains available.
+3. Client SELF, Counselor→Client and Client→Counselor; exact legacy ADMIN respondent; current Client read authority and outsider/ended-relationship denial; pending START denied after relationship end; Counselor M1/M2 same-User pairing, three paired valid cases; repeated/matched projections and NOT_COMPARABLE without invented deltas; mobile task inbox and keyboard access. One staff member has both TEACHER and COUNSELOR Personas.
+
+### Reproduction and release procedure
+
+The CI browser job is the authoritative reproducible sequence: install/migrate/seed, run the existing production-server gates, seed `e2e/pr5-product-scenarios-fixture.ts`, replace only the test backend with `e2e/pr5-product-scenarios-server.ts` (`NODE_ENV=test`, `PR5_SCENARIOS_ENABLED=true`), run `e2e/pr5-product-scenarios.ts`, then `node e2e/pr5-release-rehearsal.mjs`. Local Chromium may be selected with `PR5_CHROMIUM_EXECUTABLE`. Required test database/encryption/session settings are listed in `.github/workflows/ci.yml`; credentials and dumps are not committed as evidence.
+
+The rehearsal uses new random Docker containers, applies repository migrations, copies the real scenario database, invokes production backup/verify/restore, and compares domain row hashes. It injects a transactional failed migration only into a temporary copy, verifies DDL rollback and unchanged history, explicitly resolves that migration as rolled back, and reapplies the current migration head. It removes only its own containers and temporary keys/backups. Production recovery still requires choosing the verified backup and approved target; do not erase migration history or mark an unapplied production migration complete. No production deployment was performed.
+
+The isolated registry fixture and Safety-case fault injection are test inputs. Safety authorization is exercised against a real canonical snapshot, but this does not certify a production clinical trigger. Production scientific resources, specs and triggers remain governed and are not auto-published. Existing upstream statistical/fault matrices remain required backend gates; these three scenarios do not replace them.
+
+The final push requests the existing Ready-PR exact-head Full CI. Per the user's request this task stops after triggering CI; final CI results and merge readiness are not asserted.
+
+## Baseline
+
+- Base: `main@e10b77af73e3fad6bc62aa941dc883b7bd452c21` (merged PR4 baseline).
+- PR3 and PR4 were merged before PR5 branched.
+- PR5 remains PR-only and must pass the repository Ready-PR exact-head Full Gate before merge.
+
+## C0 — Final-main contract reconciliation
+
+`pr5-product-contract.md` freezes the final PR1–PR4 contract and the product seams PR5 is allowed to add.
+
+Confirmed invariants:
+
+- Organization authority is `PlatformRole + current Membership + orgRole + Persona + Capability + explicit deny`.
+- legacy `User.role` is not Organization authority.
+- Organization Run remains orchestration over the existing Assessment Runtime.
+- reporting statistics/privacy/longitudinal matching/protected feedback/Safety remain server-authoritative.
+- CSV remains server-generated and reauthorized.
+
+## C1 — Organization identity/context product projection
+
+Implemented:
+
+- authenticated Organization discovery;
+- current `OrganizationAccessContext` projection;
+- frontend `OrganizationProvider` and Organization selector;
+- Organization product routes independent of legacy `ProtectedRoute` role checks.
+
+Real-PostgreSQL/HTTP coverage locks:
+
+- STANDARD users discover current direct Membership only;
+- Parent relationship evidence does not become Organization Membership;
+- ended Membership immediately removes current discovery/context;
+- SYSTEM_ADMIN does not require synthetic Membership for platform context;
+- explicit deny remains visible and outranks ordinary governance;
+- cross-Organization ID guessing fails closed.
+
+## C2 — Organization administration
+
+PR5 exposes thin governed HTTP adapters over the already-authoritative structure services and adds product UI for:
+
+- temporal Membership episodes;
+- ORG_ADMIN/MEMBER role changes;
+- Persona and Capability history;
+- Grade/Class structure;
+- Student/Class and Staff/Class temporal relationships;
+- platform-only Organization create/suspend/resume;
+- classification labels, counselor/client relationships and audit history;
+- explicit-deny break-glass management.
+
+The UI preserves current vs historical episodes; it does not collapse membership or class relations into mutable booleans.
+
+## C3 — Assessment Run product journey
+
+Added bounded Run list/detail read models over the existing Run graph and a product flow for:
+
+`create -> add Track -> review -> publish(expectedVersion) -> progress -> close/cancel`.
+
+The read model projects existing Run/Track/frozen actor/frozen relationship/execution facts only. It adds no new Run state machine.
+
+Publish remains server-authoritative: frozen population/resource/policy resolution happens in the existing publish service, not in React.
+
+## C4 — Organization Reporting workspace
+
+Added bounded discovery for:
+
+- published ReportingAnalysisSpec summaries;
+- currently authorized Run/Track reporting sources;
+- subject-scoped protected-feedback sources;
+- Organization Series/Wave summaries.
+
+The frontend consumes the existing PR3/PR4 analysis APIs for:
+
+- `GROUP`;
+- `REPEATED_COHORT`;
+- `MATCHED_LONGITUDINAL` (`PAIRWISE` / `FULL_CASE`);
+- `PROTECTED_FEEDBACK`.
+
+Rendering is projection-driven. The browser does not calculate:
+
+- cohort identity or N;
+- statistics/quartiles/SD;
+- privacy floors or suppression;
+- longitudinal matching;
+- multi-rater synthesis;
+- scientific maturity/evidence ceilings.
+
+Real-PG discovery tests verify current workspace authority and ensure discovery does not expose raw observations or hidden population counts.
+
+## C5 — Safety and CSV delivery
+
+Added a server-filtered Safety inbox. It returns only currently authorized safe summaries and then re-runs the exact-case authorization path before returning a candidate.
+
+Safety exact-case projection remains server-selected:
+
+- `FULL` — current responsible viewer with Psychology Staff capability;
+- `ACTION` — current responsible Teacher/Counselor viewer;
+- `SUMMARY` — permitted Organization administrative summary.
+
+The inbox does not return subject identity, trigger detail, owner identity, or raw event detail.
+
+CSV delivery uses the existing immutable export-ticket contract:
+
+1. request export target (`AGGREGATE`, `MEMBER`, or `SAFETY`);
+2. server reauthorizes underlying read + export capability;
+3. server creates a viewer-bound short-lived ticket;
+4. download reauthorizes again;
+5. browser downloads the server-generated CSV blob.
+
+The frontend never reconstructs CSV from page data.
+
+A navigation correction preserves Safety responsibility during Organization suspension: suspended responsible staff may still reach the Delivery surface even though ordinary Reporting generation is unavailable.
+
+## C6 — Cross-role real-DB/browser acceptance
+
+PR5 extends the existing seeded browser Full Gate. The Organization fixture and Playwright acceptance use the same live PostgreSQL, backend and frontend processes as the exact-head browser job; Organization routes are not mocked.
+
+The fixture deliberately gives ORG_ADMIN and Teacher-persona actors legacy `STUDENT` roles to prove Organization authority is independent of legacy `User.role`.
+
+Browser journeys cover:
+
+| Actor | Real product assertions |
+| --- | --- |
+| ORG_ADMIN (legacy STUDENT) | enters Organization governance, creates Grade, creates durable DRAFT Run, reload/direct-link works, reaches Reporting and Delivery |
+| Teacher Persona (legacy STUDENT) | gets read-only tenant context, no governance Runs entry, can reach Reporting and Safety/CSV surfaces |
+| Student Membership | discovers Organization, receives read-only context, gets no governance/reporting/Safety escalation |
+| Parent relationship only | does not discover Organization and direct Organization URL fails closed |
+| Cross-tenant guess | foreign Organization context returns hidden/404 |
+| Ended Membership | current context and discovery disappear immediately after ending the exact episode |
+
+The fixture uses dependencies from `backend/node_modules`, matching the established seeded-browser fixture layout, so the Full Gate exercises the same install topology as CI.
+
+## C7 — Release gate
+
+The final candidate must be marked Ready and pass the existing exact-head Full Gate:
+
+- backend migrate/build/full regression on real PostgreSQL;
+- frontend lint/typecheck/full tests/build;
+- seeded browser acceptance, including PR5 real-DB Organization journeys;
+- Docker production builds/scans;
+- CodeQL;
+- fail-closed `merge gate / ready PR`.
+
+PR5-specific real-PG suites are part of backend full regression:
+
+- `organizationProductContext.postgres.integration.test.ts`;
+- `organizationProductAdmin.postgres.integration.test.ts`;
+- `assessmentRunProductRead.postgres.integration.test.ts`;
+- `reportingDiscovery.postgres.integration.test.ts`;
+- `safetyDiscovery.postgres.integration.test.ts`.
+
+Exact-head GitHub workflow/run evidence should be recorded on PR #123 after the Ready Full Gate completes. No code or documentation commit may be added after that evidence without rerunning the exact-head gate.
+
+## Explicit non-goals preserved
+
+PR5 does not:
+
+- redesign Organization authority;
+- infer tenant authority from legacy `User.role`;
+- create a second Assessment Runtime;
+- alter ONE UNIT / ONE FINAL;
+- change scoring or CanonicalUnitResult identity;
+- invent reporting statistics or new scientific interpretation;
+- perform privacy, matching, multi-rater or Safety decisions in the browser;
+- auto-publish governed reporting specs;
+- auto-enable production Safety triggers;
+- expose raw protected respondent observations;
+- weaken export reauthorization;
+- introduce a universal report renderer that owns domain science.

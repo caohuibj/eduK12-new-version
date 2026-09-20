@@ -56,6 +56,20 @@ const installMocks = async (page, role) => {
     }
     if (path === '/api/auth/me') return json(route, envelope(user))
     if (path === '/api/capabilities') return json(route, envelope({ cognitive: true }))
+    // RA-02 is a route-mocked frontend acceptance and does not establish a real
+    // cookie session. AppShell now performs Organization discovery for signed-in
+    // identities, so keep that shell request inside the same mocked authority
+    // boundary. Letting it fall through to the live backend would correctly
+    // return 401 and make the transport invalidate this synthetic login.
+    if (path === '/api/organizations') {
+      return json(route, envelope({
+        platformRole: 'STANDARD',
+        list: [],
+        total: 0,
+        page: 1,
+        pageSize: 100,
+      }))
+    }
 
     if (path === '/api/relational/catalog') {
       if (role === 'TEACHER') return json(route, envelope({ list: [{ ...product, journeys: ['TEACHER_COHORT_REPORT'] }] }))
@@ -115,8 +129,8 @@ const installMocks = async (page, role) => {
   })
 }
 
-const main = async () => {
-  const browser = await chromium.launch({ headless: true })
+const relationalAcceptance = async () => {
+  const browser = await chromium.launch({ headless: true, ...(process.env.PR5_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PR5_CHROMIUM_EXECUTABLE } : {}) })
   try {
     for (const role of ['PARENT', 'STUDENT', 'TEACHER', 'ADMIN']) {
       const context = await browser.newContext()
@@ -147,7 +161,7 @@ const main = async () => {
   }
 }
 
-main().catch((error) => {
+relationalAcceptance().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })

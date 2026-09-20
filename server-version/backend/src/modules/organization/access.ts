@@ -93,7 +93,7 @@ export async function resolveOrganizationAccessContext(input: {
   if (capabilityRows.length > 0) basis.push('CAPABILITY')
 
   const deniedAll = explicitDenies.includes('*') || explicitDenies.includes('ORGANIZATION_GOVERNANCE')
-  const canGovern = !deniedAll && (
+  const canGovern = !deniedAll && (organization.status === 'ACTIVE' || input.principal.platformRole === 'SYSTEM_ADMIN') && (
     input.principal.platformRole === 'SYSTEM_ADMIN' || membership?.orgRole === 'ORG_ADMIN'
   )
 
