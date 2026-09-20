@@ -24,9 +24,26 @@ describe('FE-07A Cognitive readiness matrix', () => {
   })
 
   it('keeps global keyboard capture exact and does not infer input from viewport width', () => {
-    expect(usesGlobalKeyboardCapture('reaction', '1.0.0')).toBe(true)
-    expect(usesGlobalKeyboardCapture('stroop', '1.0.0')).toBe(true)
+    for (const testType of [
+      'reaction',
+      'memory',
+      'stroop',
+      'gonogo',
+      'cpt',
+      'nback',
+      'sst',
+      'taskswitch',
+      'patterncompare',
+      'flanker',
+      'cardsort',
+      'digitbackward',
+      'mentalrotation',
+    ]) {
+      expect(usesGlobalKeyboardCapture(testType, '1.0.0')).toBe(true)
+    }
+    expect(usesGlobalKeyboardCapture('corsi', '1.0.0')).toBe(false)
     expect(usesGlobalKeyboardCapture('matrix', '1.0.0')).toBe(false)
+    expect(usesGlobalKeyboardCapture('picturesequence', '1.0.0')).toBe(false)
     expect(cognitiveInputNotice('reaction', '1.0.0')).toMatch(/实际输入/)
     expect(cognitiveInputNotice('unknown', '1.0.0')).toBeNull()
   })

@@ -1,16 +1,43 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
-import { nbackSequence } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
+import { nbackSequence, type NbackTrialSpec } from '../shared/prng'
+import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
+type NLevel = 1 | 2 | 3
+type PracticeTrial = { nLevel: NLevel; stimulus: string; target: boolean }
 
-const PRACTICE = [
-  { nLevel: 1 as const, blockIndex: 0, stimulus: 'B', target: false },
-  { nLevel: 1 as const, blockIndex: 0, stimulus: 'B', target: true },
-  { nLevel: 1 as const, blockIndex: 0, stimulus: 'C', target: false },
-  { nLevel: 1 as const, blockIndex: 0, stimulus: 'C', target: true },
-]
+const isNbackFormalTrial = (
+  trial: PracticeTrial | NbackTrialSpec | undefined,
+): trial is NbackTrialSpec => Boolean(
+  trial && 'blockIndex' in trial && typeof trial.blockIndex === 'number',
+)
+
+const PRACTICE_BY_N: Record<NLevel, PracticeTrial[]> = {
+  1: [
+    { nLevel: 1, stimulus: 'B', target: false },
+    { nLevel: 1, stimulus: 'B', target: true },
+    { nLevel: 1, stimulus: 'C', target: false },
+    { nLevel: 1, stimulus: 'C', target: true },
+  ],
+  2: [
+    { nLevel: 2, stimulus: 'B', target: false },
+    { nLevel: 2, stimulus: 'C', target: false },
+    { nLevel: 2, stimulus: 'B', target: true },
+    { nLevel: 2, stimulus: 'D', target: false },
+    { nLevel: 2, stimulus: 'C', target: false },
+    { nLevel: 2, stimulus: 'D', target: true },
+  ],
+  3: [
+    { nLevel: 3, stimulus: 'B', target: false },
+    { nLevel: 3, stimulus: 'C', target: false },
+    { nLevel: 3, stimulus: 'D', target: false },
+    { nLevel: 3, stimulus: 'B', target: true },
+    { nLevel: 3, stimulus: 'E', target: false },
+    { nLevel: 3, stimulus: 'D', target: true },
+  ],
+}
 
 export const NbackTask: React.FC<CognitiveTaskProps> = ({
   taskContext,
@@ -19,7 +46,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
   onTaskComplete,
 }) => {
   const config = taskContext.config as {
-    nLevels: Array<1 | 2 | 3>
+    nLevels: NLevel[]
     trialCountByN: number[]
     blockCountByN: number[]
     targetRatio: number
@@ -40,11 +67,15 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     [taskContext.randomSeed, config.nLevels, config.trialCountByN, config.blockCountByN, config.targetRatio],
   )
   const total = sequence.length
+  const firstNLevel = config.nLevels?.[0] ?? 1
   const [phase, setPhase] = useState<Phase>('instruction')
   const [visible, setVisible] = useState(false)
+  const [practiceNLevel, setPracticeNLevel] = useState<NLevel>(firstNLevel)
+  const [practiceReturnToFormal, setPracticeReturnToFormal] = useState(false)
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
+  const [practicedLevels, setPracticedLevels] = useState<NLevel[]>([])
   const [feedback, setFeedback] = useState<string | null>(null)
   const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(null)
   const onsetRef = useRef<number | null>(null)
@@ -53,7 +84,12 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
   const practiceCorrectRef = useRef(0)
   const submittingRef = useRef(false)
 
-  const startPractice = () => {
+  const practiceTrials = PRACTICE_BY_N[practiceNLevel]
+  const practicePassCorrect = Math.ceil(practiceTrials.length * 0.75)
+
+  const startPractice = (nLevel: NLevel = firstNLevel, returnToFormal = false) => {
+    setPracticeNLevel(nLevel)
+    setPracticeReturnToFormal(returnToFormal)
     setPracticeIndex(0)
     setPracticeCorrect(0)
     practiceCorrectRef.current = 0
@@ -76,7 +112,20 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     setPhase('formal')
   }
 
-  const current = phase === 'formal' ? sequence[trialIndex] : PRACTICE[practiceIndex]
+  const completePassedPractice = () => {
+    setPracticedLevels((current) => current.includes(practiceNLevel) ? current : [...current, practiceNLevel])
+    if (practiceReturnToFormal) {
+      setFeedback(null)
+      setVisible(false)
+      setPhase('formal')
+      return
+    }
+    startFormal()
+  }
+
+  const current: PracticeTrial | NbackTrialSpec | undefined = phase === 'formal'
+    ? sequence[trialIndex]
+    : practiceTrials[practiceIndex]
 
   useEffect(() => {
     const onHidden = () => { if (document.hidden) interruptedRef.current = true }
@@ -86,8 +135,12 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
-    if (phase === 'formal' && (trialIndex >= total || !current)) return
-    if (phase === 'formal' && acknowledgedBlockIndex !== current.blockIndex) return
+    if (phase === 'formal') {
+      if (trialIndex >= total || !isNbackFormalTrial(current)) return
+      if (!practicedLevels.includes(current.nLevel)) return
+      if (acknowledgedBlockIndex !== current.blockIndex) return
+    }
+    if (!current) return
     respondedRef.current = false
     interruptedRef.current = false
     onsetRef.current = null
@@ -103,11 +156,11 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
       const responded = respondedRef.current
       const correct = current.target ? responded : !responded
       if (phase === 'practice') {
-        setFeedback(correct ? '正确' : '错误')
+        setFeedback(correct ? '正确' : `错误：${practiceNLevel}-back 要判断当前字母是否和前 ${practiceNLevel} 个位置的字母相同。`)
         if (correct) practiceCorrectRef.current += 1
         const nextIndex = practiceIndex + 1
         window.setTimeout(() => {
-          if (nextIndex >= PRACTICE_TRIAL_COUNT) {
+          if (nextIndex >= practiceTrials.length) {
             setPracticeCorrect(practiceCorrectRef.current)
             setPhase('practice-result')
             return
@@ -116,7 +169,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
         }, PRACTICE_FEEDBACK_MS)
         return
       }
-      if (!responded && !submittingRef.current) {
+      if (!responded && !submittingRef.current && isNbackFormalTrial(current)) {
         submittingRef.current = true
         await onTrialComplete({
           blockIndex: current.blockIndex,
@@ -131,13 +184,28 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
       }
     }, isiMs + stimulusMs)
     return () => { window.clearTimeout(show); window.clearTimeout(hide) }
-  }, [phase, trialIndex, practiceIndex, practiceNonce, current, total, isiMs, stimulusMs, acknowledgedBlockIndex, onTrialComplete, onTaskComplete])
+  }, [
+    phase,
+    trialIndex,
+    practiceIndex,
+    practiceNonce,
+    practiceNLevel,
+    practiceTrials.length,
+    practicedLevels,
+    current,
+    total,
+    isiMs,
+    stimulusMs,
+    acknowledgedBlockIndex,
+    onTrialComplete,
+    onTaskComplete,
+  ])
 
   const respond = async () => {
     if (!visible || respondedRef.current || onsetRef.current == null || submittingRef.current) return
     respondedRef.current = true
     const rtMs = Math.round(performance.now() - onsetRef.current)
-    if (phase !== 'formal' || !current || !('nLevel' in current)) return
+    if (phase !== 'formal' || !isNbackFormalTrial(current)) return
     submittingRef.current = true
     await onTrialComplete({
       blockIndex: current.blockIndex,
@@ -151,32 +219,59 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     if (trialIndex + 1 >= total) await onTaskComplete?.()
   }
 
+  useEffect(() => {
+    if (phase !== 'practice' && phase !== 'formal') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
+      event.preventDefault()
+      void respond()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   if (phase === 'instruction') {
     return (
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">N-Back</h2>
-        <p className="text-gray-600 mb-4">字母与 N 个之前相同时尽快按下，否则不要按。</p>
-        <p className="text-xs text-gray-400 mb-6">练习为 1-back，不计入正式成绩，未通过可以重练。</p>
-        <button className="btn-primary" onClick={startPractice}>开始练习</button>
+        <p className="text-gray-600 mb-2">字母与 N 个之前相同时尽快按下，否则不要按。</p>
+        <p className="text-gray-600 mb-4">如果正式测验升级到 2-back 或 3-back，会先完成对应的不计分练习，再进入该难度。</p>
+        <p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩。</p>
+        <button className="btn-primary" onClick={() => startPractice(firstNLevel, false)}>开始练习</button>
       </div>
     )
   }
 
   if (phase === 'practice-result') {
-    const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
+    const passed = practiceCorrect >= practicePassCorrect
     return (
       <div className="text-center p-8">
-        <p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>
+        <h2 className="text-xl font-semibold mb-3">{practiceNLevel}-back 练习结果</h2>
+        <p className="mb-2">练习正确 {practiceCorrect} / {practiceTrials.length}</p>
+        <p className="text-sm text-gray-500 mb-4">需要至少正确 {practicePassCorrect} 题才能继续。</p>
         {passed ? (
-          <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
+          <button className="btn-primary" onClick={completePassedPractice}>
+            {practiceReturnToFormal ? `继续 ${practiceNLevel}-back 正式测验` : '开始正式测验'}
+          </button>
         ) : (
-          <button className="btn-secondary" onClick={startPractice}>重新练习</button>
+          <button className="btn-secondary" onClick={() => startPractice(practiceNLevel, practiceReturnToFormal)}>重新练习</button>
         )}
       </div>
     )
   }
 
-  if (phase === 'formal' && current && acknowledgedBlockIndex !== current.blockIndex) {
+  if (phase === 'formal' && isNbackFormalTrial(current) && !practicedLevels.includes(current.nLevel)) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-3">准备进入 {current.nLevel}-back</h2>
+        <p className="text-gray-600 mb-2">难度即将变化。先完成一组 {current.nLevel}-back 不计分练习，确认规则后再继续正式测验。</p>
+        <p className="text-xs text-gray-400 mb-6">练习结果不会计入最终得分。</p>
+        <button className="btn-primary" onClick={() => startPractice(current.nLevel, true)}>开始 {current.nLevel}-back 练习</button>
+      </div>
+    )
+  }
+
+  if (phase === 'formal' && isNbackFormalTrial(current) && acknowledgedBlockIndex !== current.blockIndex) {
     const totalBlocks = sequence.length === 0 ? 0 : Math.max(...sequence.map((trial) => trial.blockIndex)) + 1
     return (
       <div className="text-center p-8">
@@ -188,15 +283,26 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  return (
-    <div className="text-center p-8" onClick={() => { void respond() }} onKeyDown={() => { void respond() }} role="button" tabIndex={0}>
+  const taskBody = (
+    <div
+      className="mx-auto max-w-2xl text-center p-8"
+      onPointerDown={() => { void respond() }}
+      role="button"
+      tabIndex={-1}
+      aria-label={phase === 'practice' ? `${practiceNLevel}-back 练习作答区` : 'N-back 正式作答区'}
+    >
       <p className="text-sm text-gray-500 mb-2">
         {phase === 'practice'
-          ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT} · 1-back`
-          : `试次 ${trialIndex + 1} / ${total} · ${current && 'nLevel' in current ? current.nLevel : 1}-back`}
+          ? `${practiceNLevel}-back 练习 ${practiceIndex + 1} / ${practiceTrials.length}`
+          : `${current?.nLevel ?? firstNLevel}-back`}
       </p>
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <div className="text-6xl font-bold text-gray-800 h-24">{visible ? current?.stimulus : ''}</div>
+      <p className="mt-5 text-xs text-gray-400">目标出现时按空格 / Enter，或点击此区域</p>
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="N-back 正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }

@@ -11,34 +11,9 @@ import { cardsortSequence, flankerSequence, patterncompareTrial } from '../../mo
 import golden from '../../../../cognitive-randomization-golden-v1.json'
 
 const NONE_REPORT = { reportVersion: '1.0.0' as const, referenceMode: 'none' as const }
-const patternConfig = {
-  durationSec: 60,
-  trialTimeoutMs: 2500,
-  isiMs: 250,
-  validRtFloorMs: 150,
-  stimulusSetVersion: 'geometric-v1.0.0' as const,
-  report: NONE_REPORT,
-}
-const flankerConfig = {
-  totalTrials: 24,
-  congruentRatio: 0.5 as const,
-  stimulusMs: 1800,
-  isiMs: 400,
-  validRtFloorMs: 150,
-  stimulusSetVersion: 'arrows-v1.0.0' as const,
-  report: NONE_REPORT,
-}
-const cardsortConfig = {
-  totalTrials: 24,
-  switchRatio: 0.33,
-  blockCount: 2,
-  cueMs: 500,
-  stimulusMs: 2000,
-  isiMs: 350,
-  validRtFloorMs: 150,
-  stimulusSetVersion: 'geometric-cards-v1.0.0' as const,
-  report: NONE_REPORT,
-}
+const patternConfig = { durationSec: 60, trialTimeoutMs: 2500, isiMs: 250, validRtFloorMs: 150, stimulusSetVersion: 'geometric-v1.0.0' as const, report: NONE_REPORT }
+const flankerConfig = { totalTrials: 24, congruentRatio: 0.5 as const, stimulusMs: 1800, isiMs: 400, validRtFloorMs: 150, stimulusSetVersion: 'arrows-v1.0.0' as const, report: NONE_REPORT }
+const cardsortConfig = { totalTrials: 24, switchRatio: 0.33, blockCount: 2, cueMs: 500, stimulusMs: 2000, isiMs: 350, validRtFloorMs: 150, stimulusSetVersion: 'geometric-cards-v1.0.0' as const, report: NONE_REPORT }
 
 describe('Round 2 PR3 task contracts', () => {
   it('has strict schemas and three exact profile patches', () => {
@@ -66,16 +41,7 @@ describe('Round 2 PR3 task contracts', () => {
     const config = { ...patternConfig, durationSec: 30 }
     const trials = Array.from({ length: 12 }, (_, trialIndex) => {
       const spec = patterncompareTrial(seed, trialIndex)
-      return {
-        trialIndex,
-        payload: {
-          leftPattern: spec.leftPattern,
-          rightPattern: spec.rightPattern,
-          response: spec.correctResponse,
-          rtMs: 500 + trialIndex,
-          interrupted: false,
-        },
-      }
+      return { trialIndex, payload: { leftPattern: spec.leftPattern, rightPattern: spec.rightPattern, response: spec.correctResponse, rtMs: 500 + trialIndex, interrupted: false, timedOut: false } }
     })
     const result = scorePatterncompareV1({ config, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ correctPerMinute: 24, accuracy: 1, lapseRate: 0 })
@@ -91,16 +57,7 @@ describe('Round 2 PR3 task contracts', () => {
     const expected = flankerSequence(seed, flankerConfig.totalTrials)
     expect(expected.filter((trial) => trial.targetDirection === trial.flankerDirection)).toHaveLength(12)
     expect(expected.filter((trial) => trial.targetDirection === 'left')).toHaveLength(12)
-    const trials = expected.map((spec, trialIndex) => ({
-      trialIndex,
-      payload: {
-        targetDirection: spec.targetDirection,
-        flankerDirection: spec.flankerDirection,
-        response: spec.correctResponse,
-        rtMs: spec.targetDirection === spec.flankerDirection ? 500 : 600,
-        interrupted: false,
-      },
-    }))
+    const trials = expected.map((spec, trialIndex) => ({ trialIndex, payload: { targetDirection: spec.targetDirection, flankerDirection: spec.flankerDirection, response: spec.correctResponse, rtMs: spec.targetDirection === spec.flankerDirection ? 500 : 600, interrupted: false, timedOut: false } }))
     const result = scoreFlankerV1({ config: flankerConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ flankerEffectMs: 100, incongruentAccuracy: 1, congruentAccuracy: 1 })
     expect(result.qualityFlags.interpretable).toBe(true)
@@ -109,17 +66,7 @@ describe('Round 2 PR3 task contracts', () => {
   it('derives card-sort switches and perseveration from the frozen rule sequence', () => {
     const seed = 'cardsort-seed'
     const expected = cardsortSequence(seed, cardsortConfig.totalTrials, cardsortConfig.blockCount, cardsortConfig.switchRatio)
-    const trials = expected.map((spec, trialIndex) => ({
-      trialIndex,
-      payload: {
-        ruleCue: spec.ruleCue,
-        stimulusColor: spec.stimulusColor,
-        stimulusShape: spec.stimulusShape,
-        response: spec.switchType === 'switch' ? spec.previousRuleResponse : spec.correctResponse,
-        rtMs: spec.switchType === 'switch' ? 700 : 500,
-        interrupted: false,
-      },
-    }))
+    const trials = expected.map((spec, trialIndex) => ({ trialIndex, payload: { ruleCue: spec.ruleCue, stimulusColor: spec.stimulusColor, stimulusShape: spec.stimulusShape, response: spec.switchType === 'switch' ? spec.previousRuleResponse : spec.correctResponse, rtMs: spec.switchType === 'switch' ? 700 : 500, interrupted: false, timedOut: false } }))
     const result = scoreCardsortV1({ config: cardsortConfig, trials, randomSeed: seed })
     expect(Number(result.metrics.perseverativeErrorRate)).toBeGreaterThan(0)
     expect(Number(result.metrics.accuracyRepeat)).toBe(1)
@@ -133,36 +80,13 @@ describe('Round 2 PR3 task contracts', () => {
     const patternSeed = 'pattern-quality'
     const shortPatternTrials = Array.from({ length: 4 }, (_, trialIndex) => {
       const spec = patterncompareTrial(patternSeed, trialIndex)
-      return {
-        trialIndex,
-        payload: {
-          leftPattern: spec.leftPattern,
-          rightPattern: spec.rightPattern,
-          response: spec.correctResponse,
-          rtMs: 500,
-          interrupted: false,
-        },
-      }
+      return { trialIndex, payload: { leftPattern: spec.leftPattern, rightPattern: spec.rightPattern, response: spec.correctResponse, rtMs: 500, interrupted: false, timedOut: false } }
     })
-    expect(scorePatterncompareV1({
-      config: { ...patternConfig, durationSec: 30 },
-      trials: shortPatternTrials,
-      randomSeed: patternSeed,
-    }).qualityFlags).toMatchObject({ interpretable: false, insufficientCompletedTrials: true })
+    expect(scorePatterncompareV1({ config: { ...patternConfig, durationSec: 30 }, trials: shortPatternTrials, randomSeed: patternSeed }).qualityFlags).toMatchObject({ interpretable: false, insufficientCompletedTrials: true })
 
     const flankerSeed = 'flanker-quality'
-    const constantTrials = flankerSequence(flankerSeed, 24).map((spec, trialIndex) => ({
-      trialIndex,
-      payload: {
-        targetDirection: spec.targetDirection,
-        flankerDirection: spec.flankerDirection,
-        response: 'left' as const,
-        rtMs: 500,
-        interrupted: false,
-      },
-    }))
-    expect(scoreFlankerV1({ config: flankerConfig, trials: constantTrials, randomSeed: flankerSeed }).qualityFlags)
-      .toMatchObject({ interpretable: false, constantResponse: true })
+    const constantTrials = flankerSequence(flankerSeed, 24).map((spec, trialIndex) => ({ trialIndex, payload: { targetDirection: spec.targetDirection, flankerDirection: spec.flankerDirection, response: 'left' as const, rtMs: 500, interrupted: false, timedOut: false } }))
+    expect(scoreFlankerV1({ config: flankerConfig, trials: constantTrials, randomSeed: flankerSeed }).qualityFlags).toMatchObject({ interpretable: false, constantResponse: true })
   })
 
   it('is deterministic and changes with the seed', () => {

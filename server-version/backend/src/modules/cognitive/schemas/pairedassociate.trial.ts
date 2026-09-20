@@ -9,6 +9,7 @@ export const pairedassociateTrialSchema = z.object({
   }).strict()).min(6).max(18),
   responseDurationMs: z.number().int().nonnegative(),
   interrupted: z.boolean(),
+  timedOut: z.boolean().optional(),
 }).strict()
 
 export type PairedassociateTrial = z.infer<typeof pairedassociateTrialSchema>

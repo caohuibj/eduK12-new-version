@@ -7,6 +7,7 @@ export const digitbackwardTrialSchema = z.object({
   response: z.array(z.number().int().min(0).max(9)).max(9),
   responseDurationMs: z.number().int().nonnegative(),
   interrupted: z.boolean(),
+  timedOut: z.boolean().optional(),
 }).strict().superRefine((value, ctx) => {
   if (value.sequence.length !== value.spanLength) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'sequence length must equal spanLength', path: ['sequence'] })

@@ -58,6 +58,38 @@ const submitResponse = (response: number[]) => {
 }
 
 describe('MemoryTask Digit Span Forward', () => {
+  it('requires at least one correct practice trial before formal scoring', () => {
+    const onTrialComplete = vi.fn()
+    render(<MemoryTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    fireEvent.click(screen.getByText('开始练习'))
+
+    for (let practiceIndex = 0; practiceIndex < 2; practiceIndex += 1) {
+      showSequence(3)
+      ;[0, 0, 0].forEach((digit) => fireEvent.click(screen.getByRole('button', { name: String(digit) })))
+      fireEvent.click(screen.getByText('提交练习'))
+      if (practiceIndex === 0) fireEvent.click(screen.getByText('下一个'))
+    }
+
+    expect(screen.getByText(/练习正确 0 \/ 2/)).toBeTruthy()
+    expect(screen.getByText('重新练习')).toBeTruthy()
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('重新练习'))
+    expect(screen.getByText(/练习 1 \/ 2/)).toBeTruthy()
+  })
+
+  it('keeps formal response digits private and removes backspace editing', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    await enterFormal(onTrialComplete)
+    expect(screen.getByLabelText('数字广度正式测验')).toBeTruthy()
+    showSequence(2)
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    expect(screen.getByText('已输入 1 / 2')).toBeTruthy()
+    expect(screen.queryByText(/按顺序输入：/)).toBeNull()
+    expect(screen.queryByRole('button', { name: '退格' })).toBeNull()
+    fireEvent.keyDown(window, { key: 'Backspace' })
+    expect(screen.getByText('已输入 1 / 2')).toBeTruthy()
+  })
+
   it('keeps trial 1 and trial 2 at the same length before advancing', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)

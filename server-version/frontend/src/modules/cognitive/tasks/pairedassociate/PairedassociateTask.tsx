@@ -14,7 +14,7 @@ const Symbol: React.FC<{ itemId: string }> = ({ itemId }) => {
   const index = itemId === 'practice-circle' ? 0 : itemId === 'practice-star' ? 1 : Math.max(0, Number(itemId.slice(-2)) - 1)
   const outer = index % 3
   const color = ['#0f766e', '#7c3aed', '#c2410c'][Math.floor(index / 3) % 3]
-  return <svg aria-label={`抽象图形 ${index + 1}`} viewBox="0 0 64 64" className="mx-auto h-12 w-12">
+  return <svg aria-hidden="true" viewBox="0 0 64 64" className="mx-auto h-12 w-12">
     {outer === 0 && <circle cx="32" cy="32" r="24" fill="none" stroke={color} strokeWidth="6" />}
     {outer === 1 && <rect x="10" y="10" width="44" height="44" rx="7" fill="none" stroke={color} strokeWidth="6" />}
     {outer === 2 && <polygon points="32,6 58,54 6,54" fill="none" stroke={color} strokeWidth="6" strokeLinejoin="round" />}
@@ -81,7 +81,14 @@ export const PairedassociateTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     try {
       const byId = new Map(answers.map((item) => [item.itemId, item.selectedPosition]))
       const normalized = set.map((item) => ({ itemId: item.itemId, selectedPosition: byId.get(item.itemId) ?? null }))
-      const accepted = await onTrialComplete({ phase: isDelayed ? 'delayed' : 'learning', roundIndex: isDelayed ? 1 : trialIndex + 1, responses: normalized, responseDurationMs: Math.max(0, Math.round(performance.now() - startedRef.current)), interrupted: interrupted || timedOut })
+      const accepted = await onTrialComplete({
+        phase: isDelayed ? 'delayed' : 'learning',
+        roundIndex: isDelayed ? 1 : trialIndex + 1,
+        responses: normalized,
+        responseDurationMs: Math.max(0, Math.round(performance.now() - startedRef.current)),
+        interrupted,
+        timedOut,
+      })
       if (accepted !== false) await advanceAfterFormal()
     } finally { submittingRef.current = false }
   }, [set, isDelayed, trialIndex, interrupted, onTrialComplete, advanceAfterFormal])
@@ -107,14 +114,14 @@ export const PairedassociateTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     setPracticeIndex((value) => value + 1); resetRecall(); setPhase('practice-study')
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">图形—位置配对学习</h2><p className="mb-2 text-gray-600">记住每个抽象图形所在的位置，随后为每个图形选择原位置。</p><p className="mb-6 text-xs text-gray-400">练习至少答对 3 / 4；练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">图形—位置配对学习</h2><p className="mb-2 text-gray-600">记住每个抽象图形所在的位置，随后为每个图形选择原位置。</p><p className="mb-2 text-xs text-gray-400">本任务依赖视觉辨认图形；练习至少答对 3 / 4。</p><p className="mb-6 text-xs text-gray-400">练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
-  if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">延迟保持阶段</h3><p className="text-gray-600">请稍候，之后将在不重复呈现配对的情况下再次作答。</p></div>
+  if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现配对的情况下再次作答。</p></div>
 
   const studying = phase === 'practice-study' || phase === 'formal-study'
   const positions = Array.from({ length: phase.startsWith('practice') ? 4 : activeSet.length }, (_, index) => index)
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '延迟回忆' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
-    {studying ? <><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => { const item = activeSet.find((candidate) => candidate.targetPosition === position); return <div key={position} className="rounded-lg border bg-white p-3"><div className="text-xs text-gray-400">位置 {position + 1}</div><div className="mt-2">{item ? <Symbol itemId={item.itemId} /> : '·'}</div></div> })}</div><button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始作答</button></> : <><div className="mb-5">{responseIndex < activeSet.length ? <Symbol itemId={activeSet[responseIndex].itemId} /> : <span className="text-5xl">✓</span>}</div><p className="mb-3 text-sm text-gray-500">已回答 {responses.length} / {activeSet.length}</p><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => <button key={position} className="btn-secondary" disabled={responseIndex >= activeSet.length} onClick={() => choosePosition(position)}>位置 {position + 1}</button>)}</div>{responses.length === activeSet.length && <button className="btn-primary mt-6" onClick={() => phase === 'practice-recall' ? submitPractice() : void persistFormal(responses, false)}>提交本轮</button>}</>}
+  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟回忆' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
+    {studying ? <><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => { const item = activeSet.find((candidate) => candidate.targetPosition === position); return <div key={position} className="rounded-lg border bg-white p-3"><div className="text-xs text-gray-400">位置 {position + 1}</div><div className="mt-2">{item ? <Symbol itemId={item.itemId} /> : '·'}</div></div> })}</div>{phase === 'practice-study' ? <button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始作答</button> : <p className="mt-6 text-sm text-gray-500">请持续记忆，呈现结束后将自动进入作答。</p>}</> : <><div className="mb-5">{responseIndex < activeSet.length ? <Symbol itemId={activeSet[responseIndex].itemId} /> : <span className="text-5xl">✓</span>}</div><p className="mb-3 text-sm text-gray-500">已回答 {responses.length} / {activeSet.length}</p><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => <button key={position} className="btn-secondary" disabled={responseIndex >= activeSet.length} onClick={() => choosePosition(position)}>位置 {position + 1}</button>)}</div>{responses.length === activeSet.length && <button className="btn-primary mt-6" onClick={() => phase === 'practice-recall' ? submitPractice() : void persistFormal(responses, false)}>提交本轮</button>}</>}
   </div>
 }

@@ -33,14 +33,18 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
+const respondWith = (name: RegExp) => {
+  fireEvent.pointerDown(screen.getByRole('button', { name }), { pointerType: 'mouse', button: 0 })
+}
+
 const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
   render(<StroopTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
   fireEvent.click(screen.getByText('开始练习'))
   act(() => vi.advanceTimersByTime(400))
-  fireEvent.click(screen.getByRole('button', { name: /1 · 红/ }))
+  respondWith(/1 · 红/)
   fireEvent.click(screen.getByText('下一个'))
   act(() => vi.advanceTimersByTime(400))
-  fireEvent.click(screen.getByRole('button', { name: /2 · 绿/ }))
+  respondWith(/2 · 绿/)
   fireEvent.click(screen.getByText('开始正式测评'))
   await act(async () => {})
 }
@@ -50,7 +54,7 @@ describe('StroopTask', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)
     act(() => vi.advanceTimersByTime(500))
-    fireEvent.click(screen.getByRole('button', { name: /1 · 红/ }))
+    respondWith(/1 · 红/)
     await act(async () => {})
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     expect(screen.getByText('已记录，下一题准备中')).toBeTruthy()
@@ -79,10 +83,10 @@ describe('StroopTask', () => {
     fireEvent.click(screen.getByText('开始练习'))
     for (let attempt = 0; attempt < 2; attempt += 1) {
       act(() => vi.advanceTimersByTime(400))
-      fireEvent.click(screen.getByRole('button', { name: /2 · 绿/ }))
+      respondWith(/2 · 绿/)
       fireEvent.click(screen.getByText('下一个'))
       act(() => vi.advanceTimersByTime(400))
-      fireEvent.click(screen.getByRole('button', { name: /1 · 红/ }))
+      respondWith(/1 · 红/)
       fireEvent.click(screen.getByText(attempt === 0 ? '重新练习' : '结束'))
     }
     expect(screen.getByText('练习尚未通过，本次正式测评未开始。')).toBeTruthy()

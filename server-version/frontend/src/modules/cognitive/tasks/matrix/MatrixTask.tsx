@@ -8,7 +8,7 @@ const PRACTICE = matrixSequence('matrix-practice-v1', 6).slice(0, 4)
 const Glyph: React.FC<{ value: number }> = ({ value }) => {
   const shape = value % 3
   const count = Math.floor((value - 1) / 3) + 1
-  return <svg aria-label={`图形符号 ${value}`} viewBox="0 0 72 72" className="h-16 w-16">
+  return <svg aria-hidden="true" viewBox="0 0 72 72" className="h-16 w-16">
     {Array.from({ length: count }, (_, index) => {
       const x = 20 + index * 16
       if (shape === 0) return <circle key={index} cx={x} cy="36" r="9" fill="#0f766e" />
@@ -20,7 +20,7 @@ const Glyph: React.FC<{ value: number }> = ({ value }) => {
 
 const ItemView: React.FC<{ item: MatrixItemSpec; choose: (index: number) => void; disabled?: boolean }> = ({ item, choose, disabled }) => (
   <>
-    <div className="mx-auto mb-6 grid w-fit grid-cols-3 gap-2 rounded-xl bg-slate-200 p-2">
+    <div className="mx-auto mb-6 grid w-fit grid-cols-3 gap-2 rounded-xl bg-slate-200 p-2" aria-label="矩阵图形题">
       {item.panels.map((value, index) => <div key={`${value}-${index}`} className="flex h-20 w-24 items-center justify-center rounded-lg bg-white"><Glyph value={value} /></div>)}
       <div className="flex h-20 w-24 items-center justify-center rounded-lg bg-white text-3xl font-bold text-slate-400">?</div>
     </div>
@@ -59,7 +59,13 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     if (phase !== 'formal' || submittingRef.current) return
     submittingRef.current = true
     try {
-      const accepted = await onTrialComplete({ itemId: item.itemId, selectedOption, rtMs: selectedOption == null ? null : Math.max(0, Math.round(performance.now() - startedRef.current)), interrupted: interrupted || timedOut })
+      const accepted = await onTrialComplete({
+        itemId: item.itemId,
+        selectedOption,
+        rtMs: selectedOption == null ? null : Math.max(0, Math.round(performance.now() - startedRef.current)),
+        interrupted,
+        timedOut,
+      })
       if (accepted !== false) { setInterrupted(false); if (trialIndex + 1 >= itemCount) await completeOnce() }
     } finally { submittingRef.current = false }
   }, [phase, item.itemId, interrupted, onTrialComplete, trialIndex, itemCount, completeOnce])
@@ -78,7 +84,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     else setPracticeIndex((value) => value + 1)
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">矩阵规则推理</h2><p className="mb-2 text-gray-600">观察前两行的变化规律，选择最适合填入第三行问号的图形。</p><p className="mb-6 text-xs text-gray-400">内部生成题目；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">矩阵规则推理</h2><p className="mb-2 text-gray-600">观察前两行的变化规律，选择最适合填入第三行问号的图形。</p><p className="mb-2 text-xs text-gray-400">本任务依赖视觉规则归纳；正式题目不会提示设计难度。</p><p className="mb-6 text-xs text-gray-400">内部生成题目；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-2">练习正确 {practiceCorrect} / 4</p><p className="mb-4 text-sm text-gray-500">上一题：{feedback}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式题目 ${trialIndex + 1} / ${itemCount} · 难度 ${item.difficulty}`}</p><ItemView item={item} disabled={submittingRef.current} choose={(option) => phase === 'practice' ? choosePractice(option) : void submitFormal(option)} /></div>
+  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式题目 ${trialIndex + 1} / ${itemCount}`}</p><ItemView item={item} disabled={submittingRef.current} choose={(option) => phase === 'practice' ? choosePractice(option) : void submitFormal(option)} /></div>
 }

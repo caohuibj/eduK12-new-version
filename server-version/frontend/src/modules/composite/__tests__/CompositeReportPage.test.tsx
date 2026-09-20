@@ -83,7 +83,8 @@ describe('CompositeReportPage cognitive module', () => {
       </MemoryRouter>
     )
 
-    expect(await screen.findByText('中位反应时')).toBeTruthy()
+    expect(await screen.findByText('简单反应时')).toBeTruthy()
+    expect(screen.queryByText('中位反应时')).toBeNull()
     expect(screen.getByText('体验版，结果仅供体验。')).toBeTruthy()
     expect(screen.getByText('暂不显示')).toBeTruthy()
     expect(screen.getByText('任务表现指数')).toBeTruthy()
