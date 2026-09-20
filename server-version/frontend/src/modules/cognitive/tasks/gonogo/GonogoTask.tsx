@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { gonogoSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 
@@ -117,12 +118,23 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     })
   }
 
+  useEffect(() => {
+    if (phase !== 'practice' && phase !== 'formal') return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
+      event.preventDefault()
+      void respond()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   if (phase === 'instruction') {
     return (
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold mb-3">Go/No-Go</h2>
         <p className="text-gray-600 mb-4">绿色出现时尽快按下；红色出现时不要按。</p>
-        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩，未通过可以重练。</p>
+        <p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。</p>
         <button className="btn-primary" onClick={startPractice}>开始练习</button>
       </div>
     )
@@ -142,18 +154,21 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     )
   }
 
-  return (
-    <div className="text-center p-8">
-      <p className="text-sm text-gray-500 mb-2">
-        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}
-      </p>
+  const taskBody = (
+    <div className="mx-auto max-w-2xl text-center p-8">
+      {phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}
       {feedback && <p className="text-sm mb-3">{feedback}</p>}
       <button
         type="button"
         aria-label="respond"
         className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`}
-        onClick={() => { void respond() }}
+        onPointerDown={() => { void respond() }}
       />
+      {phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">绿色：按空格 / Enter 或点击圆形；红色：不要按</p> : null}
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }
