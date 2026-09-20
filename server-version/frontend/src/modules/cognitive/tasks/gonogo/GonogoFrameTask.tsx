@@ -131,6 +131,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
     return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>{passed ? <button className="btn-primary" onClick={startFormal}>开始正式测验</button> : <button className="btn-secondary" onClick={startPractice}>重新练习</button>}</div>
   }
+  if (phase === 'formal' && trialIndex >= total) return <div className="card p-8 text-center text-gray-600">正式试次已完成，请完成本次测评。</div>
 
   const taskBody = <div className="mx-auto max-w-2xl text-center p-8">{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<button type="button" aria-label="respond" className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`} onPointerDown={pointerDown} onPointerCancel={cancelPointer}/>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">绿色：按空格 / Enter 或点击圆形；红色：不要按</p> : null}</div>
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验">{taskBody}</CognitiveFocusStage> : taskBody
