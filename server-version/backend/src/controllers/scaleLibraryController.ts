@@ -17,6 +17,7 @@ import {
   filterExpandedScaleLibraryEntries,
   getExpandedScaleLibraryEntry,
 } from '../modules/scale/library/wave1-p1-read-model'
+import { enrichExistingP1Evidence } from '../modules/scale/library/wave1-p1-existing-evidence'
 import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../modules/scale/library/wave0-catalog'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
@@ -150,7 +151,7 @@ export const scaleLibraryController = {
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
       const query = parsed.query
-      const model = buildExpandedScaleLibraryReadModel(await buildContext(req, query))
+      const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(await buildContext(req, query)))
       return success(res, {
         schemaVersion: model.schemaVersion,
         generatedAt: model.generatedAt,
@@ -166,7 +167,7 @@ export const scaleLibraryController = {
       if (!req.user) return unauthorized(res)
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
-      const model = buildExpandedScaleLibraryReadModel(await buildContext(req, parsed.query))
+      const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(await buildContext(req, parsed.query)))
       const entry = getExpandedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
       if (!entry) return notFound(res, '量表库条目不存在')
       return success(res, { entry })
