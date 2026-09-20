@@ -481,6 +481,31 @@ jobs:
         run: node e2e/relational-four-role-browser-e2e.cjs
       - name: run PR5 Organization cross-role acceptance
         run: node e2e/pr5-organization-browser-e2e.cjs
+      - name: seed three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-fixture.ts
+      - name: start isolated PR5 scenario resource server
+        env:
+          PR5_SCENARIOS_ENABLED: 'true'
+        run: |
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          nohup setsid backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-server.ts > /tmp/eduk12-pr5-scenario-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-pr5-scenario-backend.log
+          exit 1
+      - name: certify three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios.ts
+      - name: rehearse PR5 encrypted backup restore and migration failure recovery
+        env:
+          PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: node e2e/pr5-release-rehearsal.mjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
@@ -491,6 +516,9 @@ jobs:
             /tmp/eduk12-situational-bundle-e2e
             /tmp/eduk12-situational-bundle-backend.log
             /tmp/eduk12-situational-bundle-frontend.log
+            /tmp/eduk12-pr5-scenarios-evidence
+            /tmp/eduk12-pr5-release-rehearsal
+            /tmp/eduk12-pr5-scenario-backend.log
           if-no-files-found: ignore
       - name: stop seeded services
         if: always()

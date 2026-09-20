@@ -99,6 +99,7 @@ export interface AssignedRunTask {
   executionId: string; organizationId: string; runId: string; runName: string;
   runStatus: string; status: string; claimState: string | null;
   resourceFamily: string; resourceKey: string; resourceVersion: string;
+  reportAttemptId?: string | null
   consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
 }
 export interface RunPreview {

@@ -130,7 +130,7 @@ const installMocks = async (page, role) => {
 }
 
 const relationalAcceptance = async () => {
-  const browser = await chromium.launch({ headless: true })
+  const browser = await chromium.launch({ headless: true, ...(process.env.PR5_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PR5_CHROMIUM_EXECUTABLE } : {}) })
   try {
     for (const role of ['PARENT', 'STUDENT', 'TEACHER', 'ADMIN']) {
       const context = await browser.newContext()

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -73,6 +74,16 @@ describe('OrganizationContext concurrency', () => {
     vi.clearAllMocks()
     api.list.mockResolvedValue(listProjection)
     api.context.mockResolvedValue(contextProjection)
+  })
+
+  it('preserves a deep-link selection started by a child mount effect', async () => {
+    function DeepLink() {
+      const { selectOrganization } = useOrganization()
+      useEffect(() => { void selectOrganization('org-1') }, [selectOrganization])
+      return <Probe />
+    }
+    render(<OrganizationProvider><DeepLink /></OrganizationProvider>)
+    await waitFor(() => expect(screen.getByLabelText('active-organization')).toHaveTextContent('org-1'))
   })
 
   it('does not let a concurrent discovery refresh cancel a newer active context selection', async () => {

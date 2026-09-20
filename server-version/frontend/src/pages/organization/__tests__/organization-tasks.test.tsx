@@ -20,6 +20,12 @@ describe('assigned Organization tasks', () => {
     expect(api.start).toHaveBeenCalledWith(task)
     expect(await screen.findByRole('link', { name: '进入测评' })).toHaveAttribute('href', '/relational/attempts/attempt-1?returnTo=%2Forganization-tasks')
   })
+  it('offers only the server-projected exact historical report for completed tasks', async () => {
+    api.assignedTasks.mockResolvedValue({ list: [{ ...task, status: 'COMPLETED', reportAttemptId: 'history-1' }], truncated: false })
+    render(<MemoryRouter><OrganizationTasksPage /></MemoryRouter>)
+    expect(await screen.findByRole('link', { name: '查看本次历史报告' })).toHaveAttribute('href', '/relational/attempts/history-1/report')
+    expect(screen.queryByRole('button', { name: '开始任务' })).not.toBeInTheDocument()
+  })
   it('recovers the same execution when START outcome is unknown', async () => {
     const unknown = { ...task, claimState: 'UNKNOWN' }
     api.assignedTasks.mockResolvedValue({ list: [unknown], truncated: false })

@@ -36,6 +36,12 @@ const errorMessage = (value: unknown, fallback: string) => value instanceof Erro
   : fallback
 
 export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth()
+  // A new principal gets a fresh provider before descendants select a tenant.
+  return <OrganizationSessionProvider key={user?.id ?? 'anonymous'}>{children}</OrganizationSessionProvider>
+}
+
+const OrganizationSessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const [platformRole, setPlatformRole] = useState<PlatformRole | null>(null)
   const [organizations, setOrganizations] = useState<AccessibleOrganization[]>([])
@@ -144,7 +150,6 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       reset()
       return
     }
-    reset()
     void refresh()
   }, [authLoading, isAuthenticated, user?.id, refresh, reset])
 

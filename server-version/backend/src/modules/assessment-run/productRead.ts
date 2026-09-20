@@ -159,14 +159,18 @@ export async function listAssignedRunTasks(userId: string) {
     executionId: string; organizationId: string; runId: string; runName: string;
     runStatus: string; status: string; claimState: string | null;
     resourceFamily: string; resourceKey: string; resourceVersion: string;
-    consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
+    reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
     SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
-      r."name" AS "runName", r."status" AS "runStatus", e."status",
+      r."name" AS "runName", r."status" AS "runStatus",
+      CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED' ELSE e."status" END AS "status",
       c."state" AS "claimState", t."resource_family" AS "resourceFamily",
       t."resource_key" AS "resourceKey", t."resource_version" AS "resourceVersion",
       (a."consent_id" IS NOT NULL) AS "consentRequired",
-      consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
+      consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility",
+      CASE WHEN ca."status" = 'COMPLETED' AND a."analysis_mode" = 'INDIVIDUAL_ONLY'
+        AND a."perspective" <> 'RELATIONAL_EXPERIENCE'
+        THEN ca."id" ELSE NULL END AS "reportAttemptId"
     FROM "assessment_run_executions" e
     JOIN "assessment_run_actor_snapshots" respondent ON respondent."id" = e."respondent_actor_snapshot_id"
       AND respondent."organization_id" = e."organization_id" AND respondent."run_id" = e."run_id"
@@ -174,6 +178,8 @@ export async function listAssignedRunTasks(userId: string) {
     JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
     LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
     LEFT JOIN "relational_assessment_assignments" a ON a."id" = e."relational_assignment_id"
+    LEFT JOIN "composite_assessment_attempts" ca ON e."runtime_binding_kind" = 'COMPOSITE'
+      AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d

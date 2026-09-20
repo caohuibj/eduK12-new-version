@@ -47,6 +47,7 @@ export default function OrganizationTasksPage() {
         <p>任务状态：{task.status} · 开始认领：{task.claimState ?? '尚未认领'}</p>
         {task.claimState === 'UNKNOWN' && <p role="status">开始结果未知。恢复将查询同一次运行，不会分配第二个任务。</p>}
         {task.consentRequired && task.status === 'ASSIGNED' && !task.claimState && <label className="flex gap-2"><input type="checkbox" checked={consent[task.executionId] ?? false} onChange={event => setConsent(current => ({ ...current, [task.executionId]: event.target.checked }))} />我已阅读并同意：{task.consentPurpose}；报告可见范围：{task.consentVisibility}。</label>}
+        {task.reportAttemptId && <Link to={`/relational/attempts/${encodeURIComponent(task.reportAttemptId)}/report`}>查看本次历史报告</Link>}
         {!terminal && <ProductButton disabled={busy !== null} onClick={() => void start(task)}>{task.claimState || task.status === 'STARTED' ? '恢复同一任务' : '开始任务'}</ProductButton>}
         {launch?.executionId === task.executionId && <Link to={`/relational/attempts/${encodeURIComponent(launch.attemptId)}?returnTo=%2Forganization-tasks`}>进入测评</Link>}
       </article>

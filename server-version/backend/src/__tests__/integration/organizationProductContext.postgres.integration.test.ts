@@ -183,7 +183,14 @@ suite('PR5 Organization product context HTTP gate (real PostgreSQL)', () => {
     const listed = await jsonRequest('/api/organizations?page=1&pageSize=100', systemAdmin)
     expect(listed.status).toBe(200)
     expect(listed.body.data.platformRole).toBe('SYSTEM_ADMIN')
-    expect(listed.body.data.list.find((row: any) => row.id === created.organization.id)?.scopeBasis).toBe('SYSTEM_ADMIN')
+    // Shared integration databases can contain more than one page after reruns.
+    let rows = listed.body.data.list
+    for (let page = 2; !rows.some((row: any) => row.id === created.organization.id) && (page - 1) * 100 < listed.body.data.total; page++) {
+      const next = await jsonRequest(`/api/organizations?page=${page}&pageSize=100`, systemAdmin)
+      expect(next.status).toBe(200)
+      rows = [...rows, ...next.body.data.list]
+    }
+    expect(rows.find((row: any) => row.id === created.organization.id)?.scopeBasis).toBe('SYSTEM_ADMIN')
 
     const beforeDeny = await jsonRequest(`/api/organizations/${created.organization.id}/context`, systemAdmin)
     expect(beforeDeny.status).toBe(200)
