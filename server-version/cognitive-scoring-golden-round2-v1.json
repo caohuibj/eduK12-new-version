@@ -1,0 +1,176 @@
+{
+  "version": "round2-scoring-v1",
+  "patterncompare": {
+    "score": 100,
+    "metrics": {
+      "correctPerMinute": 24,
+      "accuracy": 1,
+      "medianCorrectRtMs": 505.5,
+      "lapseRate": 0,
+      "correctCount": 12,
+      "completedTrialCount": 12
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientCompletedTrials": false,
+      "lowAccuracy": false,
+      "excessiveLapses": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  },
+  "flanker": {
+    "score": 100,
+    "metrics": {
+      "flankerEffectMs": 100,
+      "incongruentAccuracy": 1,
+      "congruentAccuracy": 1,
+      "errorCost": 0,
+      "accuracy": 1,
+      "medianRtCongruent": 500,
+      "medianRtIncongruent": 600,
+      "omissionRate": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientCongruentTrials": false,
+      "insufficientIncongruentTrials": false,
+      "lowAccuracy": false,
+      "excessiveOmissions": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  },
+  "cardsort": {
+    "score": 100,
+    "metrics": {
+      "switchCostRtMs": 200,
+      "switchCostAccuracy": 0,
+      "perseverativeErrorRate": 0,
+      "postSwitchRecovery": 0,
+      "accuracySwitch": 1,
+      "accuracyRepeat": 1,
+      "medianRtSwitch": 700,
+      "medianRtRepeat": 500,
+      "overallAccuracy": 1,
+      "omissionRate": 0,
+      "perseverativeErrorCount": 0
+    },
+    "qualityFlags": {
+      "interpretable": false,
+      "insufficientSwitchTrials": false,
+      "insufficientRepeatTrials": true,
+      "lowAccuracy": false,
+      "excessiveOmissions": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  },
+  "digitbackward": {
+    "score": 100,
+    "metrics": {
+      "maxSpan": 4,
+      "totalCorrectTrials": 6,
+      "sequenceDistance": 0,
+      "medianResponseDurationMs": 800,
+      "completedLevelCount": 3
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "insufficientCompletedLevels": false,
+      "constantResponse": false,
+      "interrupted": false
+    }
+  },
+  "picturesequence": {
+    "score": 100,
+    "metrics": {
+      "adjacentPairScore": 1,
+      "positionScore": 1,
+      "learningGain": 1,
+      "adjacentPairScoreByRound": [0, 1, 1],
+      "positionScoreByRound": [0, 1, 1],
+      "delayedRetention": null
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "emptyResponse": false,
+      "incompleteResponse": false,
+      "unchangedIncorrectOrder": false,
+      "delayedStageIncomplete": false,
+      "interrupted": false
+    }
+  },
+  "pairedassociate": {
+    "score": 100,
+    "metrics": {
+      "correctByTrial": [6, 12, 12],
+      "learningSlope": 0.25,
+      "trialsToCriterion": 2,
+      "immediateAccuracy": 1,
+      "delayedAccuracy": null
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "excessiveOmissions": false,
+      "constantPositionResponse": false,
+      "delayedStageIncomplete": false,
+      "interrupted": false
+    }
+  },
+  "matrix": {
+    "score": 100,
+    "metrics": {
+      "accuracy": 1,
+      "accuracyByRuleFamily": {
+        "progression": 1,
+        "alternation": 1,
+        "combination": 1
+      },
+      "reachedDifficulty": 3,
+      "medianRtMs": 1000,
+      "omissionRate": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "constantResponse": false,
+      "excessiveOmissions": false,
+      "interrupted": false
+    }
+  },
+  "mentalrotation": {
+    "score": 100,
+    "metrics": {
+      "accuracy": 1,
+      "medianCorrectRtMs": 500,
+      "angleCost": 400,
+      "mirrorErrorRate": 0,
+      "omissionRate": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "constantResponse": false,
+      "insufficientAngleCoverage": false,
+      "excessiveOmissions": false,
+      "lowAccuracy": false,
+      "interrupted": false
+    }
+  },
+  "tower": {
+    "score": 100,
+    "metrics": {
+      "minimumMoveSolveRate": 1,
+      "solveRate": 1,
+      "excessMoves": 0,
+      "firstMoveLatencyMs": 500,
+      "ruleViolations": 0,
+      "noAttemptRate": 0
+    },
+    "qualityFlags": {
+      "interpretable": true,
+      "excessiveRuleViolations": false,
+      "insufficientAttemptedProblems": false,
+      "interrupted": false
+    }
+  }
+}
