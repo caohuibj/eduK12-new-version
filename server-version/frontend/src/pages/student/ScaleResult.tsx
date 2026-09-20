@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
+import Dass21StudentReport from '../../modules/reporting/Dass21StudentReport'
 import type { ScaleResultV2, ScaleUnitReport } from '../../modules/reporting/types'
 
 export interface Assessment {
@@ -105,19 +106,30 @@ const ScaleResult: React.FC = () => {
     ...(assessment.completedAt ? [{ label: '完成时间', value: new Date(assessment.completedAt).toLocaleString('zh-CN') }] : []),
     ...(assessment.totalTime != null ? [{ label: '用时', value: formatTime(assessment.totalTime) }] : []),
   ]
+  const isDass21 = assessment.scale.code === 'dass21_zh_cn'
 
   return (
     <ReportShell
       title={assessment.scale.name}
-      description="测评报告"
+      description={isDass21 ? '完成反馈' : '测评报告'}
       facts={facts}
-      status={{ kind: 'success', title: '已提交', description: '以下内容来自当前已完成结果记录。' }}
+      status={{
+        kind: 'success',
+        title: '已提交',
+        description: isDass21
+          ? '下面是一份不提供分数或心理健康标签的描述性反馈。'
+          : '以下内容来自当前已完成结果记录。',
+      }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
     >
-      <section className="card p-6" aria-labelledby="scale-report-detail-heading">
-        <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
-        <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
-      </section>
+      {isDass21 ? (
+        <Dass21StudentReport />
+      ) : (
+        <section className="card p-6" aria-labelledby="scale-report-detail-heading">
+          <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
+          <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
+        </section>
+      )}
     </ReportShell>
   )
 }
