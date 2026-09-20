@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { mentalRotationSequence, type RotationItemSpec } from '../shared/prng'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
@@ -83,8 +84,14 @@ export const MentalrotationTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
     if (practiceIndex + 1 >= 4) setPhase('practice-result'); else setPracticeIndex((value) => value + 1)
   }
 
+  const onPointerResponse = (event: ReactPointerEvent<HTMLButtonElement>, response: 'same' | 'mirror') => {
+    if (phase !== 'formal' || !event.isPrimary || event.button !== 0) return
+    event.preventDefault()
+    choose(response)
+  }
+
   if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">心理旋转</h2><p className="mb-2 text-gray-600">判断右侧图形只是旋转后的同一图形，还是镜像图形。</p><p className="mb-2 text-xs text-gray-400">正式测验可用方向键：← 同一图形，→ 镜像图形。</p><p className="mb-6 text-xs text-gray-400">本任务依赖视觉比较；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-2">练习正确 {practiceCorrect} / 4</p><p className="mb-4 text-sm text-gray-500">上一题：{feedback}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  const content = <div className="p-8 text-center"><p className="mb-5 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式试次 ${trialIndex + 1} / ${total}`}</p><div aria-label="两幅图形，请视觉判断是否为镜像" className={`mb-7 flex min-h-32 items-center justify-center gap-16 ${phase === 'formal' && !visible ? 'invisible' : ''}`}><ObjectGlyph family={item.objectFamily} variant={item.variant} /><ObjectGlyph family={item.objectFamily} variant={item.variant} angle={item.angle} mirrored={item.mirrored} /></div><div className="flex justify-center gap-4"><button className="btn-secondary px-8" onPointerDown={() => { if (phase === 'formal') choose('same') }} onClick={() => { if (phase !== 'formal') choose('same') }}>同一图形</button><button className="btn-secondary px-8" onPointerDown={() => { if (phase === 'formal') choose('mirror') }} onClick={() => { if (phase !== 'formal') choose('mirror') }}>镜像图形</button></div></div>
+  const content = <div className="p-8 text-center"><p className="mb-5 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式试次 ${trialIndex + 1} / ${total}`}</p><div aria-label="两幅图形，请视觉判断是否为镜像" className={`mb-7 flex min-h-32 items-center justify-center gap-16 ${phase === 'formal' && !visible ? 'invisible' : ''}`}><ObjectGlyph family={item.objectFamily} variant={item.variant} /><ObjectGlyph family={item.objectFamily} variant={item.variant} angle={item.angle} mirrored={item.mirrored} /></div><div className="flex justify-center gap-4"><button className="btn-secondary px-8" onPointerDown={(event) => onPointerResponse(event, 'same')} onClick={() => { if (phase !== 'formal') choose('same') }}>同一图形</button><button className="btn-secondary px-8" onPointerDown={(event) => onPointerResponse(event, 'mirror')} onClick={() => { if (phase !== 'formal') choose('mirror') }}>镜像图形</button></div></div>
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="心理旋转正式作答">{content}</CognitiveFocusStage> : content
 }
