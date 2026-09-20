@@ -1,5 +1,5 @@
 import { CognitiveScoreResult, CognitiveScoringInputError, ScoringTrial } from '../cognitive.types'
-import { cardsortSequence } from '../randomization'
+import { cardsortCorrectResponse, cardsortSequence } from '../randomization'
 import { CardsortConfig } from '../schemas/cardsort.config'
 import { CardsortTrial } from '../schemas/cardsort.trial'
 import { median } from './signal-detection'
@@ -35,14 +35,16 @@ export const scoreCardsortV1 = (input: {
       && trial.payload.rtMs != null
       && trial.payload.rtMs >= input.config.validRtFloorMs
   }
-  const isConflict = (trial: ScoringTrial<CardsortTrial>) => {
+  const hasRuleConflict = (trial: ScoringTrial<CardsortTrial>) => {
     const spec = expected[trial.trialIndex]
-    return spec.previousRuleResponse != null && spec.previousRuleResponse !== spec.correctResponse
+    const colorResponse = cardsortCorrectResponse('color', spec.stimulusColor, spec.stimulusShape)
+    const shapeResponse = cardsortCorrectResponse('shape', spec.stimulusColor, spec.stimulusShape)
+    return colorResponse !== shapeResponse
   }
 
   const switchTrials = sorted.filter((trial) => expected[trial.trialIndex].switchType === 'switch')
   const repeatTrials = sorted.filter((trial) => expected[trial.trialIndex].switchType === 'repeat')
-  const conflictRepeatTrials = repeatTrials.filter(isConflict)
+  const conflictRepeatTrials = repeatTrials.filter(hasRuleConflict)
   const switchCorrect = switchTrials.filter(isCorrect)
   const conflictRepeatCorrect = conflictRepeatTrials.filter(isCorrect)
   const accuracySwitch = switchTrials.length ? switchCorrect.length / switchTrials.length : 0
@@ -55,13 +57,15 @@ export const scoreCardsortV1 = (input: {
     const spec = expected[trial.trialIndex]
     const previous = trial.trialIndex > 0 ? expected[trial.trialIndex - 1] : null
     return spec.switchType === 'repeat' && previous?.switchType === 'switch'
-  }).filter(isConflict)
+  }).filter(hasRuleConflict)
   const postSwitchAccuracy = postSwitchTrials.length ? postSwitchTrials.filter(isCorrect).length / postSwitchTrials.length : null
 
-  const conflictSwitchTrials = switchTrials.filter(isConflict)
+  const conflictSwitchTrials = switchTrials.filter(hasRuleConflict)
   const perseverativeErrors = conflictSwitchTrials.filter((trial) => {
     const spec = expected[trial.trialIndex]
-    return trial.payload.response === spec.previousRuleResponse && trial.payload.response !== spec.correctResponse
+    return spec.previousRuleResponse != null
+      && trial.payload.response === spec.previousRuleResponse
+      && trial.payload.response !== spec.correctResponse
   }).length
   const perseverativeErrorRate = conflictSwitchTrials.length ? perseverativeErrors / conflictSwitchTrials.length : 0
 
