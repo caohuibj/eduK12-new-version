@@ -141,7 +141,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
 
       {(report.caveats.length > 0 || report.practicalTips.length > 0) && (
         <section className="text-left mt-4 border-t pt-3">
-          <SectionHeading className="text-sm font-semibold text-gray-600 mb-2">如何理解</SectionHeading>
+          <SectionHeading className="text-sm font-semibold text-gray-600 mb-2">简要解释</SectionHeading>
           {report.caveats.map((caveat) => <p key={caveat} className="text-sm text-amber-800">{caveat}</p>)}
           {report.practicalTips.map((tip) => <p key={tip} className="text-sm text-gray-500">{tip}</p>)}
         </section>
@@ -149,7 +149,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
 
       {(method.engineVersion || method.scoringVersion || method.configVersion) && (
         <details className="text-left mt-4 border-t pt-3">
-          <summary className="cursor-pointer text-sm font-semibold text-gray-600">技术信息</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-gray-600">方法说明（技术信息）</summary>
           <p className="mt-2 text-xs text-gray-500">
             任务 {method.testType || report.testType} · 引擎 {method.engineVersion} · 评分 {method.scoringVersion} · 配置 {method.configVersion}
             {profileText ? ` · ${profileText}` : ''}
