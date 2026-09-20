@@ -36,7 +36,11 @@ const isCognitiveV2Report = (value: unknown): value is CognitiveV2Report => {
     && Array.isArray(candidate.headline)
     && Array.isArray(candidate.user)
     && Array.isArray(candidate.detail)
+    && Array.isArray(candidate.quality)
     && typeof candidate.method === 'object'
+    && candidate.method !== null
+    && typeof candidate.disclaimer === 'string'
+    && Array.isArray(candidate.practicalTips)
 }
 
 const CognitiveResult: React.FC = () => {
