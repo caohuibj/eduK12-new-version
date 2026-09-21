@@ -7,6 +7,8 @@ import type { FormSectionCollectionFactsV1 } from '../assessment-runtime/form-fa
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import type { ScaleProjectionContext } from '../scale/projection/types'
 
+const INTERNAL_SCALE_REPORTS = '__internalScaleReports'
+
 const readStoredAggregate = (qa: any): any => {
   if (qa?.aggregateReportEncrypted) {
     const decrypted = safeDecrypt<any>(qa.aggregateReportEncrypted)
@@ -30,6 +32,16 @@ const projectUnit = (report: ScaleUnitReport, options?: QuestionnaireCollectionP
   projectScaleUnitReport(report, options?.contextForScale?.(report) ?? defaultContextForScale(report))
 )
 
+const attachInternalScaleReports = <T extends object>(output: T, reports: ScaleUnitReport[]): T => {
+  Object.defineProperty(output, INTERNAL_SCALE_REPORTS, {
+    value: reports,
+    enumerable: false,
+    configurable: false,
+    writable: false,
+  })
+  return output
+}
+
 /** Collection-only external projection; stored aggregates are always re-projected. */
 export const buildQuestionnaireCollectionReport = (qa: any, options?: QuestionnaireCollectionProjectionOptions): any => {
   const storedAggregate = readStoredAggregate(qa)
@@ -38,17 +50,18 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
     && Array.isArray(storedAggregate.scaleReports)
     && Array.isArray(storedAggregate.backgroundValues)
   ) {
-    const unitReports = storedAggregate.scaleReports.map((stored: ScaleUnitReport) => projectUnit(stored, options))
+    const internalUnitReports = storedAggregate.scaleReports as ScaleUnitReport[]
+    const unitReports = internalUnitReports.map((stored) => projectUnit(stored, options))
     const totalDimensions = unitReports.reduce(
       (sum: number, report: any) => sum + (Array.isArray(report?.scores) ? report.scores.length : 0),
       0,
     )
-    return {
+    return attachInternalScaleReports({
       questionnaireName: qa.questionnaire?.name || '问卷',
       totalDimensions,
       backgroundValues: storedAggregate.backgroundValues,
       unitReports,
-    }
+    }, internalUnitReports)
   }
 
   const questionnaireScales = [...(qa.questionnaire?.questionnaireScales || [])]
@@ -64,7 +77,7 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
     scale?: any
     assessment?: any
     stored?: any
-  }) => {
+  }): ScaleUnitReport => {
     const { scale, assessment, stored } = input
     const internal = buildScaleUnitReport({
       itemId: input.itemId,
@@ -77,10 +90,9 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
       completedAt: assessment?.completedAt ?? stored?.completedAt,
       totalTime: assessment?.totalTime ?? stored?.totalTime,
     })
-    // Stored unified aggregates can have result=null with already-materialized
-    // score/reference fields. Preserve them only as internal input before the
-    // audience projection below.
-    const mergedInternal: ScaleUnitReport = stored && internal.result === null ? {
+    // Stored unified aggregates can have result=null with materialized score
+    // fields. They remain internal facts until projectUnit below.
+    return stored && internal.result === null ? {
       ...internal,
       quality: stored.quality ?? internal.quality,
       scores: Array.isArray(stored.scores) ? stored.scores : internal.scores,
@@ -89,10 +101,9 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
       method: stored.method ?? internal.method,
       ...(stored.decryptError ? { decryptError: true } : {}),
     } : internal
-    return projectUnit(mergedInternal, options)
   }
 
-  const unitReports = [
+  const internalUnitReports = [
     ...questionnaireScales.map((questionnaireScale: any) => {
       const scaleId = questionnaireScale.scaleId
       seen.add(scaleId)
@@ -110,6 +121,7 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
       .filter((stored: any) => !seen.has(stored.scaleId) && !assessments.some((assessment: any) => assessment.scaleId === stored.scaleId))
       .map((stored: any) => reportFor({ itemId: stored.scaleId, scaleId: stored.scaleId, stored })),
   ]
+  const unitReports = internalUnitReports.map((report) => projectUnit(report, options))
 
   const formItems = [...(qa.questionnaire?.formItems || [])]
     .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
@@ -123,18 +135,18 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
     label: item.label,
     value: formAnswers.has(item.id) ? String(formAnswers.get(item.id)) : null,
   }))
-  return {
+  return attachInternalScaleReports({
     questionnaireName: qa.questionnaire?.name || '问卷',
     totalDimensions: unitReports.reduce((sum: number, report: any) => sum + (Array.isArray(report.scores) ? report.scores.length : 0), 0),
     backgroundValues,
     unitReports,
-  }
+  }, internalUnitReports)
 }
 
-/** Internal storage payload; it is not audience-safe and must be projected on read. */
+/** Internal storage payload; the hidden full reports survive even when the returned DTO is restricted. */
 export const collectionReportForStorage = (report: any) => ({
   reportDefinitionVersion: 'collection-only-v2',
-  scaleReports: report.unitReports,
+  scaleReports: Array.isArray(report?.[INTERNAL_SCALE_REPORTS]) ? report[INTERNAL_SCALE_REPORTS] : report.unitReports,
   totalDimensions: report.totalDimensions,
   ...(Array.isArray(report.backgroundValues) ? { backgroundValues: report.backgroundValues } : {}),
 })
