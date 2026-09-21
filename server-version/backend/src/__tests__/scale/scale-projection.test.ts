@@ -93,7 +93,13 @@ describe('Scale result audience projection', () => {
     const high = project(90, context(educationalCaps))
     expect(low).toEqual(high)
     expect(low.kind).toBe('educational')
-    expect(JSON.stringify(low)).not.toMatch(/10|90|HIGH|LOW|高分|低分/)
+    expect(low).not.toHaveProperty('scores')
+    expect(low).not.toHaveProperty('itemScores')
+    expect(low).not.toHaveProperty('references')
+    expect(low).not.toHaveProperty('interpretations')
+    expect(low).not.toHaveProperty('quality')
+    expect(low).not.toHaveProperty('method')
+    expect(JSON.stringify(low)).not.toMatch(/HIGH|LOW|高分|低分/)
   })
 
   it('intersects resource access with the instrument ceiling', () => {

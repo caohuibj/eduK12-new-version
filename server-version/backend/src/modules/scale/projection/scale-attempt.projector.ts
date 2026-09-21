@@ -38,6 +38,7 @@ const attemptBase = (assessment: any, result?: ScaleResultV2 | null) => ({
   ...(typeof assessment?.attemptEpoch === 'number' ? { attemptEpoch: assessment.attemptEpoch } : {}),
   ...(assessment?.deliveryMode ? { deliveryMode: assessment.deliveryMode } : {}),
   ...(assessment?.runtimeGeneration ? { runtimeGeneration: assessment.runtimeGeneration } : {}),
+  ...(typeof assessment?.submissionId === 'string' ? { submissionId: assessment.submissionId } : {}),
   ...(assessment?.questionnaireAssessmentId ? { questionnaireAssessmentId: assessment.questionnaireAssessmentId } : {}),
   ...(assessment?.compositeAttemptId ? { compositeAttemptId: assessment.compositeAttemptId } : {}),
   ...(assessment?.user && typeof assessment.user === 'object' ? {

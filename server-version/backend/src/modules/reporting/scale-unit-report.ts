@@ -4,7 +4,6 @@ import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import {
   projectExternalEducationalFeedback,
   projectExternalInterpretations,
-  projectExternalScaleItemScores,
   projectExternalScaleMethod,
   projectExternalScaleQuality,
   projectExternalScaleReferences,
@@ -159,24 +158,21 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
 
   const quality = capabilities.resultQualityDetails ? projectExternalScaleQuality(report.quality) : null
   const method = capabilities.methods ? projectExternalScaleMethod(report.method) : null
+  // Collection/Composite surfaces intentionally expose a stricter subset than
+  // standalone full reports: item-level data stays on the standalone boundary.
+  // Keep the historical rich unit shape while serializing every child by an
+  // explicit allowlist, so future internal fields cannot cross automatically.
   return {
     ...base,
-    reportKind: 'full',
     ...(capabilities.numericScores ? { scores: projectExternalScaleScores(report.scores) } : {}),
     ...(capabilities.references ? { references: projectExternalScaleReferences(report.references, capabilities) } : {}),
     ...(capabilities.individualInterpretations ? {
       interpretations: projectExternalInterpretations(report.interpretations, capabilities),
     } : {}),
     ...(quality ? { quality, caveats: report.caveats.map(String) } : {}),
-    ...(capabilities.itemScores && report.result
-      ? { itemScores: projectExternalScaleItemScores(report.result.itemScores, capabilities.rawAnswers) }
-      : {}),
     ...(method ? { method } : {}),
     ...(capabilities.educationalContent && feedback ? { educationalFeedback: feedback } : {}),
     disclaimer: report.disclaimer,
-    // No nested result field is ever emitted here. A future field added to the
-    // internal ScaleResult cannot cross this boundary without an explicit edit.
-    result: null,
   }
 }
 

@@ -63,20 +63,12 @@ export const projectCompositeUnitReports = (
   return legacy.projectCompositeUnitReports([unit], audience, context)
 })
 
-const withLegacyModules = (report: Record<string, any>): Record<string, any> => {
-  Object.defineProperty(report, 'modules', {
-    value: report.unitReports,
-    enumerable: false,
-  })
-  return report
-}
-
 const replaceScaleUnits = (
   projected: Record<string, any>,
   source: Record<string, any>,
   audience: CompositeReportAudience,
   context: 'collection' | 'package',
-): Record<string, any> => withLegacyModules({
+): Record<string, any> => ({
   ...projected,
   unitReports: projectCompositeUnitReports(Array.isArray(source.unitReports) ? source.unitReports : [], audience, context),
 })
@@ -86,7 +78,12 @@ const restrictedScaleCodes = (
   audience: CompositeReportAudience,
 ): Set<string> => {
   const restricted = new Set<string>()
-  for (const measurement of packageSnapshot.analysisProtocolSnapshot.scaleMeasurements ?? []) {
+  // Historical frozen package fixtures predate analysisProtocolSnapshot. They
+  // remain readable; without a frozen Scale measurement list there is no
+  // lineage claim to promote, so this guard returns an empty set rather than
+  // crashing an otherwise valid report/export projection.
+  const measurements = packageSnapshot.analysisProtocolSnapshot?.scaleMeasurements ?? []
+  for (const measurement of measurements) {
     const context = createScaleProjectionContext({
       instrumentKey: measurement.scaleCode,
       instrumentVersion: measurement.instrumentVersion ?? null,

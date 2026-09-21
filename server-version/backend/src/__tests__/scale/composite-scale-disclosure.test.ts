@@ -31,7 +31,7 @@ const scaleUnit = {
   scaleName: 'Synthetic restricted',
   completedAt: '2026-09-21T00:00:00.000Z',
   totalTime: 10,
-  scores: [{ key: 'secret', value: 99 }],
+  scores: [{ key: 'secret', label: 'Secret score', value: 99 }],
   references: [{ secretPercentile: 99 }],
   interpretations: [{ scoreKey: 'secret', headline: 'HIGH', label: 'HIGH', interpretation: 'secret', guidance: [], limitations: [], referenceVersion: null }],
   quality: { status: 'interpretable', flags: [] },
@@ -60,7 +60,6 @@ describe('Composite Scale disclosure wrapper', () => {
       unitReports: [scaleUnit],
       backgroundValues: [],
     }, 'teacher')
-    expect(output.unitReports[0]).toMatchObject({ reportKind: 'full' })
-    expect(output.unitReports[0].scores).toEqual([{ key: 'secret', value: 99 }])
+    expect(output.unitReports[0].scores).toEqual([{ key: 'secret', label: 'Secret score', value: 99 }])
   })
 })
