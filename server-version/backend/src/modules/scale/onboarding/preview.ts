@@ -24,7 +24,7 @@ export const previewScaleInstrument = (input: {
   nowIso?: string
 }) => {
   const source: ScaleInstrumentSourceV1 | undefined = input.source
-    ? scaleInstrumentSourceV1Schema.parse(input.source)
+    ? scaleInstrumentSourceV1Schema.parse(input.source) as unknown as ScaleInstrumentSourceV1
     : (input.instrumentKey && input.instrumentVersion ? getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion) : undefined)
   if (!source) throw new Error('Scale instrument source not found')
   const validation = validateScaleInstrumentSource(source)
@@ -48,7 +48,7 @@ export const previewScaleInstrument = (input: {
       territory: input.territory,
       deploymentModes: modes,
       commercialNature: input.commercialNature,
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as const,
+      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
       authorizationRefs: refs.length ? refs : ['__MISSING_AUTHORIZATION__'],
       runtimePolicyHash: runtime.runtimePolicyHash,
       ...(localization?.localizationVersion ? { localizationVersion: localization.localizationVersion } : {}),
