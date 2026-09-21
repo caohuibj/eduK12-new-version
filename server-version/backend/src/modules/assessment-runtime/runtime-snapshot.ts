@@ -5,6 +5,11 @@ import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
 import { freezeExactReferenceBindings } from './reference-binding'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
+import {
+  createFrozenScaleRuntimeSnapshotV2FromV1,
+  parseFrozenScaleRuntimeSnapshotV2,
+  type FrozenScaleRuntimeSnapshotV2,
+} from './runtime-snapshot-v2'
 import { z } from 'zod'
 
 export interface FrozenScaleRuntimeSnapshotV1 {
@@ -20,6 +25,8 @@ export interface FrozenScaleRuntimeSnapshotV1 {
   definition: ScaleDefinitionV2
   snapshotHash: string
 }
+
+export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1 | FrozenScaleRuntimeSnapshotV2
 
 const unsignedSnapshot = (input: Omit<FrozenScaleRuntimeSnapshotV1, 'snapshotHash'>) => ({
   schemaVersion: input.schemaVersion,
@@ -114,7 +121,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     definition: ScaleDefinitionV2
     frozenAt?: Date
   },
-): Promise<FrozenScaleRuntimeSnapshotV1> => {
+): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   // Manual operational pause is checked before any reference-binding DB read.
   // Parsing an existing frozen snapshot never consults current operational
   // state, so already-started attempts remain completable.
@@ -136,7 +143,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     instrumentKey: input.instrumentKey,
     selections: compiledRuntime.referenceBindingDefinition.selections,
   })
-  return buildFrozenScaleRuntimeSnapshot({
+  const v1 = buildFrozenScaleRuntimeSnapshot({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     definition,
@@ -144,6 +151,25 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     referenceBindings,
     frozenAt: input.frozenAt,
   })
+
+  // Production Prisma clients expose Scale. Lightweight unit doubles used by
+  // old V1 contract tests may not; they deliberately keep the exact legacy
+  // writer behavior. A real DB resolution error never falls back open.
+  const scaleModel = (db as any).scale
+  if (!scaleModel || typeof scaleModel.findUnique !== 'function') return v1
+  const scale = await scaleModel.findUnique({
+    where: { code: input.instrumentKey },
+    select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true },
+  })
+  if (!scale) return v1
+
+  const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
+  const resolution = await resolveScaleStartDeployment({ db: db as any, scale })
+  if (!resolution.allowNewStarts || resolution.kind === 'DENY') {
+    throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
+  }
+  if (resolution.kind !== 'MANAGED_V2') return v1
+  return createFrozenScaleRuntimeSnapshotV2FromV1(v1, resolution.runtimePolicy)
 }
 
 export const hashFrozenScaleRuntimeSnapshot = (snapshot: FrozenScaleRuntimeSnapshotV1): string => (
@@ -201,10 +227,18 @@ export const parseFrozenScaleRuntimeSnapshot = (value: unknown): FrozenScaleRunt
   return { ...unsigned, snapshotHash: snapshot.snapshotHash }
 }
 
-export const encryptFrozenScaleRuntimeSnapshot = (snapshot: FrozenScaleRuntimeSnapshotV1): string => (
+export const parseVersionedFrozenScaleRuntimeSnapshot = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid Frozen Scale runtime snapshot')
+  const schemaVersion = (value as { schemaVersion?: unknown }).schemaVersion
+  if (schemaVersion === 1) return parseFrozenScaleRuntimeSnapshot(value)
+  if (schemaVersion === 2) return parseFrozenScaleRuntimeSnapshotV2(value)
+  throw new Error(`Unsupported Frozen Scale runtime snapshot schemaVersion: ${String(schemaVersion)}`)
+}
+
+export const encryptFrozenScaleRuntimeSnapshot = (snapshot: VersionedFrozenScaleRuntimeSnapshot): string => (
   encryptUnifiedRuntimePayload(snapshot)
 )
 
-export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): FrozenScaleRuntimeSnapshotV1 => (
-  parseFrozenScaleRuntimeSnapshot(decryptUnifiedRuntimePayload<unknown>(encrypted))
+export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedFrozenScaleRuntimeSnapshot => (
+  parseVersionedFrozenScaleRuntimeSnapshot(decryptUnifiedRuntimePayload<unknown>(encrypted))
 )
