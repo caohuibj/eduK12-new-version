@@ -7,6 +7,7 @@ import type {
   QualityState,
 } from './types'
 import { metricIsQualityGated } from './quality'
+import { resolveCognitiveProtocolPresentation } from '../protocol-presentation'
 
 export interface ReportMetricView {
   key: string
@@ -20,6 +21,7 @@ export interface ReportMetricView {
 
 export interface ThreeLayerReport {
   title: string
+  profileLabel: string | null
   qualityState: QualityState
   conclusion: string
   headline: ReportMetricView[]
@@ -117,10 +119,6 @@ const projectKeys = (
 })
 
 const participantMetricAllowed = (testType: string, key: string): boolean => {
-  // Matrix `reachedDifficulty` only means that at least one item in a design
-  // tier was answered correctly. It is useful as a raw research descriptor,
-  // but a single lucky response can raise it, so it must not be presented as
-  // a participant ability/difficulty level.
   if (testType === 'matrix' && key === 'reachedDifficulty') return false
   return true
 }
@@ -157,9 +155,14 @@ const resolveHeadlineKeys = (input: {
   ).filter((key) => participantMetricAllowed(input.testType, key))
 }
 
-const conclusionFor = (state: QualityState, profile: CognitiveProfile | null): string => {
+const conclusionFor = (
+  state: QualityState,
+  profile: CognitiveProfile | null,
+  reviewedConclusion?: string,
+): string => {
   if (state === 'invalid') return '本次数据未达到可解释条件，暂不提供表现结论。'
   if (state === 'limited') return '本次结果存在质量限制，请结合展开详情谨慎阅读。'
+  if (reviewedConclusion) return reviewedConclusion
   if (profile === 'experience') {
     return '体验版使用短程协议；以下指标由正式评分器计算，适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。'
   }
@@ -169,6 +172,13 @@ const conclusionFor = (state: QualityState, profile: CognitiveProfile | null): s
 const participantPracticalTips = (testType: string, tips: string[]): string[] => {
   if (testType === 'memory' || testType === 'stroop') return []
   return tips
+}
+
+const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => {
+  if (profile === 'experience') return '体验版'
+  if (profile === 'standard') return '正式版'
+  if (profile === 'research') return '科研版'
+  return null
 }
 
 export const projectThreeLayerReport = (input: {
@@ -203,10 +213,21 @@ export const projectThreeLayerReport = (input: {
     .filter((key) => participantMetricAllowed(input.testType, key))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => participantMetricAllowed(input.testType, key))
+  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    testType: input.testType,
+    engineVersion: input.engineVersion,
+    scoringVersion: input.scoringVersion,
+    profile: input.profile,
+  })
   return {
     title: input.definition.title,
+    profileLabel: protocolPresentation?.profileLabel ?? legacyProfileLabel(input.profile),
     qualityState: input.score.quality.state,
-    conclusion: conclusionFor(input.score.quality.state, input.profile),
+    conclusion: conclusionFor(
+      input.score.quality.state,
+      input.profile,
+      protocolPresentation?.participantConclusion,
+    ),
     headline: input.score.quality.state === 'invalid'
       ? []
       : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),

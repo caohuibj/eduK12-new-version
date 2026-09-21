@@ -8,6 +8,10 @@ import type {
   RegistryEntry,
   SingleTaskReportDefinition,
 } from './cognitive.types'
+import {
+  resolveCognitiveProtocolPresentation,
+  type CognitiveProtocolTier,
+} from './protocol-presentation'
 
 export interface FrozenReportSnapshot {
   profile: CognitiveProfile
@@ -21,6 +25,11 @@ export interface FrozenReportSnapshot {
   metricDefinitions: Record<string, MetricDefinition>
   qualityDefinitions: Record<string, QualityDefinition>
   reportDefinition: SingleTaskReportDefinition
+  /** Publish-prep protocol presentation is frozen with the assignment when reviewed. */
+  protocolTier?: CognitiveProtocolTier
+  profileLabel?: string
+  participantConclusion?: string
+  protocolShowProductIndex?: boolean
 }
 
 const sortValue = (value: unknown): unknown => {
@@ -66,6 +75,12 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 }) => {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
   const profileDefinition = input.entry.profiles[input.profile]
+  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    testType: input.entry.testType,
+    engineVersion: input.entry.engineVersion,
+    scoringVersion: input.entry.scoringVersion,
+    profile: input.profile,
+  })
   const resolvedReport: FrozenReportSnapshot = {
     profile: input.profile,
     randomizationAlgorithmVersion: input.entry.randomizationAlgorithmVersion,
@@ -73,10 +88,16 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     metricDefinitionVersion: input.entry.metricDefinitionVersion,
     qualityDefinitionVersion: input.entry.qualityDefinitionVersion,
     reportDefinitionVersion: input.entry.reportDefinitionVersion,
-    reportCaveats: profileDefinition.reportCaveats,
+    reportCaveats: protocolPresentation?.reportCaveats ?? profileDefinition.reportCaveats,
     metricDefinitions: input.entry.metricDefinitions,
     qualityDefinitions: input.entry.qualityDefinitions,
     reportDefinition: input.entry.reportDefinition,
+    ...(protocolPresentation ? {
+      protocolTier: protocolPresentation.tier,
+      profileLabel: protocolPresentation.profileLabel,
+      participantConclusion: protocolPresentation.participantConclusion,
+      protocolShowProductIndex: protocolPresentation.showProductIndex,
+    } : {}),
   }
   return {
     profile: input.profile,

@@ -8,6 +8,14 @@ const profileLabel = (profile: CognitiveV2Report['method']['profile']): string =
   return ''
 }
 
+const PARTICIPANT_METRIC_LABELS: Record<string, string> = {
+  correctPerMinute: '每分钟正确比较数',
+  medianCorrectRtMs: '典型正确反应时间',
+  lapseRate: '未作答比例',
+  correctCount: '正确比较次数',
+  completedTrialCount: '完成比较次数',
+}
+
 const METRIC_EXPLANATIONS: Record<string, string> = {
   medianRtMs: '典型反应速度：多数有效反应所需的时间。',
   rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
@@ -25,17 +33,27 @@ const METRIC_EXPLANATIONS: Record<string, string> = {
   ssrtMs: '停止反应估计时间：根据停止信号模型估计的动作停止时间。',
   switchCostRtMs: '规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。',
   switchCostAccuracy: '准确率转换代价：切换规则时相对重复规则时的正确率变化。',
+  correctPerMinute: '单位时间内正确完成图形比较的数量，应与准确率一起阅读，避免把快速猜测理解为更快的加工速度。',
+  accuracy: '正确率：正式作答中判断正确的比例。',
+  medianCorrectRtMs: '典型正确反应时间：仅统计正确且达到有效反应时间门槛的试次，中位数越小表示本次正确判断通常更快。',
+  lapseRate: '未作答比例：正式试次中未在有效时间内作答的比例。',
+  correctCount: '正确比较次数：本次正式计时内完成并判断正确的试次数。',
+  completedTrialCount: '完成比较次数：本次正式计时内进入评分的试次数。',
 }
+
+const participantMetricLabel = (metric: CognitiveV2ReportMetricView): string =>
+  PARTICIPANT_METRIC_LABELS[metric.key] ?? metric.label
+
+const metricExplanation = (metric: CognitiveV2ReportMetricView): string =>
+  METRIC_EXPLANATIONS[metric.key] ?? '该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。'
 
 const MetricGrid = ({ metrics }: { metrics: CognitiveV2ReportMetricView[] }) => (
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
     {metrics.map((metric) => (
       <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
         <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-        <div className="text-xs font-medium text-gray-500">{metric.label}</div>
-        <p className="mt-1 text-xs leading-relaxed text-gray-400">
-          {METRIC_EXPLANATIONS[metric.key] ?? metric.category}
-        </p>
+        <div className="text-xs font-medium text-gray-500">{participantMetricLabel(metric)}</div>
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric)}</p>
       </div>
     ))}
   </div>
@@ -49,7 +67,8 @@ const CognitiveV2ReportCard: React.FC<{
   anonymousCode?: string | null
 }> = ({ report, references = [], attemptNo, finishedAt, anonymousCode }) => {
   const activeQuality = report.quality.filter((item) => item.active)
-  const profileText = profileLabel(report.method.profile)
+  const reviewedProfileLabel = (report as CognitiveV2Report & { profileLabel?: string | null }).profileLabel
+  const profileText = reviewedProfileLabel || profileLabel(report.method.profile)
   const qualityStyle = report.qualityState === 'interpretable'
     ? 'bg-green-50 text-green-700'
     : report.qualityState === 'limited'
@@ -99,9 +118,9 @@ const CognitiveV2ReportCard: React.FC<{
           {report.headline.length === 1 ? (
             <div className="text-center py-2">
               <div className="text-4xl font-bold text-primary sm:text-5xl">{report.headline[0].formatted}</div>
-              <div className="mt-1 text-sm font-medium text-gray-500">{report.headline[0].label}</div>
+              <div className="mt-1 text-sm font-medium text-gray-500">{participantMetricLabel(report.headline[0])}</div>
               <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">
-                {METRIC_EXPLANATIONS[report.headline[0].key] ?? report.headline[0].category}
+                {metricExplanation(report.headline[0])}
               </p>
             </div>
           ) : <MetricGrid metrics={report.headline} />}
@@ -146,6 +165,7 @@ const CognitiveV2ReportCard: React.FC<{
             <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明（技术信息）</h2>
             <p className="text-xs text-gray-500">
               任务 {report.method.testType} · 引擎 {report.method.engineVersion} · 评分 {report.method.scoringVersion} · 配置 {report.method.configVersion}
+              {profileText ? ` · ${profileText}` : ''}
             </p>
           </section>
         </div>
