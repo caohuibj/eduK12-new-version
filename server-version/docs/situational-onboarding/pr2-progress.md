@@ -4,7 +4,7 @@ Status: **Draft, C01 implemented; C02–C05 pending. Not ready to merge.**
 
 ## Baseline and compatibility
 
-PR1 #151 supplies data-only sources, explicit publication, immutable released content and frozen execution compatibility. This branch starts from its integration with main `5cf5d8e` (Scale onboarding #152); the PR1 integration commit is `05a96e7`. The final merged main commit is recorded when PR1 completes CI.
+PR1 #151 supplies data-only sources, explicit publication, immutable released content and frozen execution compatibility. This branch starts from its integration with main `5cf5d8e` (Scale onboarding #152); the PR1 integration commit is `05a96e7`. PR1 merged into main at `8b916eba6d76bfad1911e10189e7258be122a15c`; this branch incorporates that merged base. Full Gate run `35663856001`, attempt 3, passed all required checks before merging.
 
 Scale and Cognitive now both use scoped evidence adapters. SJT reuses the shared `evaluateScientificQualification` policy without changing either family. The definition's source/license remains a valid provenance fact, but it cannot establish research foundation, empirical support or formal output.
 
