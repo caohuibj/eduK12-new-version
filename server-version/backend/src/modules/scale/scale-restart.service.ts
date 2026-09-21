@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
@@ -132,5 +133,5 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
     })
     await retainFrozenScaleAssessmentImages({ assessmentId: next.id, snapshot: runtimeSnapshot, db: tx as never })
     return next
-  })
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
 )
