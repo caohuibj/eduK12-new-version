@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { canonicalHash } from './canonical'
+import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
 import {
   createFrozenUnitAdmission,
   hashFrozenUnitAdmission,
@@ -9,9 +10,19 @@ import {
 import type { AssessmentContextValues } from '../assessment-context/context'
 import type { FrozenEligibilityDecisionV1 } from '../scale/policy/types'
 
+export interface FrozenScaleDeploymentAdmissionBindingV1 {
+  revision: number
+  policyHash: string
+  authorizationId: string
+  authorizationVersion: number
+  evaluatedAt: string
+}
+
 export interface FrozenScalePolicyAdmissionBindingV2 {
   runtimePolicyHash: string
   eligibility: FrozenEligibilityDecisionV1
+  /** PR-3 start authorization audit. Older test-only V2 fixtures may omit it. */
+  deployment?: FrozenScaleDeploymentAdmissionBindingV1
 }
 
 export interface FrozenUnitAdmissionV2 {
@@ -52,6 +63,14 @@ const eligibilitySchema = z.object({
     respondent: z.string().min(1),
     ageBasis: z.string().min(1).optional(),
   }).strict(),
+}).strict()
+
+const deploymentBindingSchema = z.object({
+  revision: z.number().int().positive(),
+  policyHash: z.string().regex(/^[0-9a-f]{64}$/),
+  authorizationId: z.string().min(1),
+  authorizationVersion: z.number().int().positive(),
+  evaluatedAt: z.string().datetime({ offset: true }),
 }).strict()
 
 const frozenUnitAdmissionV2Schema = z.object({
@@ -99,6 +118,7 @@ const frozenUnitAdmissionV2Schema = z.object({
   scalePolicy: z.object({
     runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
     eligibility: eligibilitySchema,
+    deployment: deploymentBindingSchema.optional(),
   }).strict().optional(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict().superRefine((value, ctx) => {
@@ -130,8 +150,7 @@ const unsignedV2 = (input: Omit<FrozenUnitAdmissionV2, 'snapshotHash'>) => {
 
 export const hashFrozenUnitAdmissionV2 = (snapshot: FrozenUnitAdmissionV2): string => canonicalHash(unsignedV2(snapshot))
 
-/** Test/contract factory only; production createFrozenUnitAdmission remains V1. */
-export const createFrozenUnitAdmissionV2ForTest = (input: {
+export const createFrozenUnitAdmissionV2 = (input: {
   attemptEpoch: number
   scale?: FrozenUnitAdmissionV1['scale']
   cognitive?: FrozenUnitAdmissionV1['cognitive']
@@ -175,6 +194,9 @@ export const createFrozenUnitAdmissionV2ForTest = (input: {
   return { ...unsigned, snapshotHash: canonicalHash(unsignedV2(unsigned)) }
 }
 
+/** Backward-compatible PR-1 test name. */
+export const createFrozenUnitAdmissionV2ForTest = createFrozenUnitAdmissionV2
+
 export const parseFrozenUnitAdmissionV2 = (value: unknown): FrozenUnitAdmissionV2 => {
   const snapshot = frozenUnitAdmissionV2Schema.parse(value) as unknown as FrozenUnitAdmissionV2
   if (hashFrozenUnitAdmissionV2(snapshot) !== snapshot.snapshotHash) throw new Error('Frozen V2 unit admission hash mismatch')
@@ -215,3 +237,24 @@ export const parseVersionedFrozenUnitAdmission = (value: unknown): VersionedFroz
   if (schemaVersion === 2) return parseFrozenUnitAdmissionV2(value)
   throw new Error(`Unsupported Frozen unit admission schemaVersion: ${String(schemaVersion)}`)
 }
+
+export const encryptVersionedFrozenUnitAdmission = (snapshot: VersionedFrozenUnitAdmission): string => (
+  encryptUnifiedRuntimePayload(snapshot)
+)
+
+export const decryptVersionedFrozenUnitAdmission = (
+  encrypted: string,
+  storedHash?: string | null,
+): VersionedFrozenUnitAdmission => {
+  const snapshot = parseVersionedFrozenUnitAdmission(decryptUnifiedRuntimePayload<unknown>(encrypted))
+  if (storedHash && storedHash !== snapshot.snapshotHash) throw new Error('Frozen unit admission stored hash mismatch')
+  return snapshot
+}
+
+export const versionedFrozenAdmissionPersistence = (snapshot: VersionedFrozenUnitAdmission): {
+  frozenAdmissionSnapshotEncrypted: string
+  frozenAdmissionSnapshotHash: string
+} => ({
+  frozenAdmissionSnapshotEncrypted: encryptVersionedFrozenUnitAdmission(snapshot),
+  frozenAdmissionSnapshotHash: snapshot.snapshotHash,
+})
