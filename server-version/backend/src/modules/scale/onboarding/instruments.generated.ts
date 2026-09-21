@@ -7,7 +7,8 @@ import * as entry2 from './entries/02-sdq_parent_zh_cn__1_0_0.instrument'
 import * as entry3 from './entries/03-sdq_teacher_zh_cn__1_0_0.instrument'
 import * as entry4 from './entries/04-texi_parent_zh_cn__1_0_0.instrument'
 import * as entry5 from './entries/05-texi_teacher_zh_cn__1_0_0.instrument'
-import type { ScalePackageV2, VersionedScorerRegistration } from './types'
+
+import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 export const GENERATED_EXECUTABLE_SCALE_PACKAGES: readonly ScalePackageV2[] = [
   entry0.EXECUTABLE_SCALE_PACKAGE,
@@ -25,4 +26,8 @@ export const GENERATED_SCALE_SCORER_PLUGINS: readonly VersionedScorerRegistratio
   ...entry3.SCALE_SCORER_PLUGINS,
   ...entry4.SCALE_SCORER_PLUGINS,
   ...entry5.SCALE_SCORER_PLUGINS,
+]
+
+export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV1[] = [
+
 ]

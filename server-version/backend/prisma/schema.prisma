@@ -37,6 +37,7 @@ model User {
   receivedCourses                     CourseShare[]                    @relation("SharedTo")
   // 心理问卷模块关联
   assessments                         Assessment[]
+  scaleDeploymentPolicies            ScaleDeploymentPolicy[]
   createdScales                       Scale[]                          @relation("ScaleCreator")
   // 聚合问卷模块关联
   createdQuestionnaires               Questionnaire[]                  @relation("QuestionnaireCreator")
@@ -668,6 +669,7 @@ model Scale {
 
   // 关联
   creator             User                      @relation("ScaleCreator", fields: [creatorId], references: [id])
+  deploymentPolicies  ScaleDeploymentPolicy[]
   assessments         Assessment[]
   courseScales        CourseScale[]
   // 聚合问卷模块关联
@@ -2209,4 +2211,24 @@ model SafetyWakeupLedger {
   @@unique([caseId, kind])
   @@index([caseId, status])
   @@map("safety_wakeup_ledger")
+}
+
+// Partial ACTIVE uniqueness and CHECK constraints are defined in the additive SQL migration.
+model ScaleDeploymentPolicy {
+  id String @id @db.Uuid
+  scaleId String @map("scale_id")
+  revision Int
+  status String
+  policyJson Json @map("policy_json")
+  policyHash String @map("policy_hash")
+  authorizationRefs Json @default("[]") @map("authorization_refs")
+  createdByUserId String? @map("created_by_user_id")
+  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  activatedAt DateTime? @db.Timestamptz(6) @map("activated_at")
+  retiredAt DateTime? @db.Timestamptz(6) @map("retired_at")
+  scale Scale @relation(fields: [scaleId], references: [id], onDelete: Restrict)
+  createdBy User? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  @@unique([scaleId, revision], map: "scale_deployment_policies_scale_revision_key")
+  @@index([status, createdAt(sort: Desc)], map: "scale_deployment_policies_status_created_idx")
+  @@map("scale_deployment_policies")
 }

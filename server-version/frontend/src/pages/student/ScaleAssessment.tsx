@@ -26,6 +26,8 @@ import {
 } from '../../modules/scale/device-input-provenance'
 import { elapsedScaleResponseTimeMs, readScaleTimingNow } from '../../modules/scale/response-timing'
 
+import ScaleContextPreflight, { type ScaleContextKey } from '../../modules/assessment-context/ScaleContextPreflight'
+
 type ResponseValue = string | number
 
 type ScaleFinalPayload = {
@@ -125,6 +127,8 @@ const ScaleAssessment: React.FC = () => {
   const { scaleId } = useParams<{ scaleId: string }>()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
+  const [contextInput, setContextInput] = useState<Partial<Record<ScaleContextKey, string>>>()
+  const [requiredContextKeys, setRequiredContextKeys] = useState<ScaleContextKey[] | null>(null)
   const [scale, setScale] = useState<Scale | null>(null)
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -211,8 +215,13 @@ const ScaleAssessment: React.FC = () => {
     let cancelled = false
     const startAssessment = async () => {
       try {
-        const response = await apiClient.post<{ assessment: Assessment; scale: Scale & { definitionHash?: string } }>(`/scales/${scaleId}/assessments`)
+        const response = await apiClient.post<{ assessment: Assessment; scale: Scale & { definitionHash?: string }; preflight?: { requiredContextKeys: ScaleContextKey[] } }>(`/scales/${scaleId}/assessments`, contextInput ? { context: contextInput } : undefined)
         if (cancelled || response.code !== 0 || !response.data) return
+        if (response.data.preflight) {
+          setRequiredContextKeys(response.data.preflight.requiredContextKeys)
+          return
+        }
+        setRequiredContextKeys(null)
         const nextAssessment = response.data.assessment
         setAssessment(nextAssessment)
         setScale(response.data.scale)
@@ -298,7 +307,7 @@ const ScaleAssessment: React.FC = () => {
     }
     void startAssessment()
     return () => { cancelled = true }
-  }, [navigate, registerScalePersistence, scaleId])
+  }, [navigate, registerScalePersistence, scaleId, contextInput])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
     if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return
@@ -481,10 +490,17 @@ const ScaleAssessment: React.FC = () => {
     )
   }
 
+  if (requiredContextKeys) return <ScaleContextPreflight requiredKeys={requiredContextKeys} onSubmit={values => {
+    setCompletionNotice(null)
+    setRequiredContextKeys(null)
+    setLoading(true)
+    setContextInput(values)
+  }} />
+
   if (!scale || !assessment) {
     return (
       <ProductPage width="assessment">
-        <ProductStatus kind="error" title="无法开始量表">量表不存在、未发布或尚未安装有效定义。</ProductStatus>
+        <ProductStatus kind="error" title="无法开始量表">{completionNotice ?? '量表不存在、未发布或尚未安装有效定义。'}</ProductStatus>
       </ProductPage>
     )
   }

@@ -7,6 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "scale:instruments:generate": "tsx scripts/generate-scale-instruments.ts",
     "scale:instruments:check": "tsx scripts/generate-scale-instruments.ts --check",
+    "scale:instrument:install": "tsx src/scripts/install-scale-instrument.ts",
     "build": "npm run scale:instruments:check && tsc",
     "start": "node dist/index.js",
     "start:worker": "node dist/workers/main.js",

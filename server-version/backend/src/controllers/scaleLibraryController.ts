@@ -3,6 +3,7 @@ import { UserRole } from '../types'
 import { prisma } from '../config/database'
 import { createPrismaAuthorizationRepository } from '../modules/assessment-authorization'
 import { canStudentAccessScale } from '../modules/scale/scale-access'
+import { resolveScaleStartDeployment } from '../modules/scale/deployment/service'
 import {
   constructDomainSchema,
   intendedUseSchema,
@@ -19,7 +20,7 @@ import {
 } from '../modules/scale/library/wave1-p1-read-model'
 import { enrichExistingP1Evidence } from '../modules/scale/library/wave1-p1-existing-evidence'
 import { applyDass21ProductPolicy } from '../modules/scale/library/wave1-dass21-product-policy'
-import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../modules/scale/library/wave0-catalog'
+import { listScaleInstrumentSources } from '../modules/scale/onboarding/instrument-registry'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
 import { z } from 'zod'
@@ -71,23 +72,30 @@ const libraryQuerySchema = z.object({
  * Wave 1 P1 catalog-first entries deliberately have no deployment until their
  * exact-form package / rights / report contract is closed.
  */
-const deployedScalePairs = WAVE0_SCALE_CATALOG_MANIFESTS.map((manifest) => ({
+const deployedScalePairs = listScaleInstrumentSources().filter(source => source.executable).map((manifest) => ({
   code: manifest.identity.instrumentKey,
   instrumentVersion: manifest.identity.instrumentVersion,
 }))
 
-const loadDeployments = async (req: Request) => {
+type LibraryDeployment = NonNullable<ScaleLibraryReadModelContext['deployments']>[number] & {
+  allowNewStarts: boolean
+  startReasons: string[]
+  participantCheckRequired: boolean
+}
+
+const loadDeployments = async (req: Request): Promise<LibraryDeployment[]> => {
   const rows = await prisma.scale.findMany({
     where: { OR: deployedScalePairs },
     select: {
       id: true,
       code: true,
       instrumentVersion: true,
+      instrumentClass: true,
       status: true,
       visibility: true,
     },
   })
-  const deployments = []
+  const deployments: LibraryDeployment[] = []
   for (const row of rows) {
     if (req.user?.role === UserRole.STUDENT) {
       const accessible = await canStudentAccessScale({
@@ -97,12 +105,26 @@ const loadDeployments = async (req: Request) => {
       }, req.user.userId)
       if (!accessible) continue
     }
+    const start = await resolveScaleStartDeployment({
+      db: prisma,
+      scale: {
+        id: row.id,
+        code: row.code,
+        instrumentVersion: row.instrumentVersion,
+        instrumentClass: row.instrumentClass,
+        status: String(row.status),
+      },
+      requestedMode: 'STANDALONE',
+    })
     deployments.push({
       scaleId: row.id,
       code: row.code,
       instrumentVersion: row.instrumentVersion,
       status: String(row.status),
       visibility: String(row.visibility),
+      allowNewStarts: start.allowNewStarts,
+      startReasons: [...start.reasons],
+      participantCheckRequired: start.kind === 'MANAGED_V2',
     })
   }
   return deployments
@@ -140,9 +162,36 @@ const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibrar
   availability: query.availability,
 })
 
-const buildLibraryModel = (context: ScaleLibraryReadModelContext) => applyDass21ProductPolicy(
-  enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(context)),
-)
+const buildLibraryModel = (context: ScaleLibraryReadModelContext) => {
+  const base = applyDass21ProductPolicy(
+    enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(context)),
+  )
+  const deployments = (context.deployments ?? []) as LibraryDeployment[]
+  const byIdentity = new Map(deployments.map((deployment) => [
+    `${deployment.code}:${deployment.instrumentVersion}`,
+    deployment,
+  ]))
+  return {
+    ...base,
+    entries: base.entries.map((entry) => {
+      const deployment = byIdentity.get(`${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`)
+      if (!deployment) return entry
+      if (deployment.allowNewStarts) return deployment.participantCheckRequired ? {
+        ...entry, availability: { ...entry.availability, participantEligibility: 'NOT_EVALUATED' as const,
+          reasons: [...entry.availability.reasons, '个人适用资格将在开始前根据必需资料确认。'] },
+      } : entry
+      const { launch: _launch, ...availability } = entry.availability
+      return {
+        ...entry,
+        availability: {
+          ...availability,
+          status: availability.status === 'NOT_AVAILABLE' ? 'NOT_AVAILABLE' as const : 'RESTRICTED' as const,
+          reasons: [...new Set([...availability.reasons, ...deployment.startReasons])],
+        },
+      }
+    }),
+  }
+}
 
 const handleError = (res: Response, err: unknown) => {
   if (err instanceof Error && err.name === 'ZodError') return error(res, '量表库请求参数无效')

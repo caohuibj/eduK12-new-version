@@ -7,6 +7,7 @@ import { encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slo
 import { mapCompositeSection } from '../../modules/composite/final-submit.service'
 import { mapQuestionnaireSection } from '../../modules/assessment-runtime/form-section-definition'
 import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { tokenService } from '../../services/tokenService'
 import { hashPublicAccessToken, encryptPublicAccessToken } from '../../services/publicAccessTokenCrypto'
@@ -489,14 +490,17 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
         completedItems: 0,
       },
     })
+    const runtime = createFrozenScaleRuntimeSnapshot({
+      instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion, definition: ADEXI_V2_DEFINITION,
+    })
     const frozen = freezeCompositeActiveSlotSet({
       attemptEpoch: 1,
       scales: [{
         compositeItemId: item.id,
         code: scale.code,
         instrumentVersion: scale.instrumentVersion,
-        sourceDefinitionHash: 'b'.repeat(64),
-        compiledRuntimeHash: 'c'.repeat(64),
+        sourceDefinitionHash: runtime.sourceDefinitionHash,
+        compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
       }],
       cognitive: [],
       formSections: [],
@@ -514,6 +518,8 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
         userId: teacherId,
         compositeAttemptId: attempt.id,
         compositeItemId: item.id,
+        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtime),
+        compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         runtimeGeneration: 'UNIFIED_V1',

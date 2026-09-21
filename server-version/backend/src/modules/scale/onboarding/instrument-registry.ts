@@ -1,3 +1,4 @@
+import { GENERATED_SCALE_INSTRUMENT_SOURCES } from './instruments.generated'
 import { compileScalePolicy, type CompiledScalePolicyV1 } from '../policy/compile'
 import { projectScalePackage } from './define-instrument'
 import { buildLegacyInstrumentSources } from './legacy-adapter'
@@ -53,7 +54,7 @@ export const createScaleInstrumentRegistry = (sources: readonly ScaleInstrumentS
   }
 }
 
-export const SCALE_INSTRUMENT_REGISTRY = createScaleInstrumentRegistry(buildLegacyInstrumentSources())
+export const SCALE_INSTRUMENT_REGISTRY = createScaleInstrumentRegistry([...buildLegacyInstrumentSources(), ...GENERATED_SCALE_INSTRUMENT_SOURCES])
 
 export const getScaleInstrumentSource = SCALE_INSTRUMENT_REGISTRY.getSource
 export const listScaleInstrumentSources = SCALE_INSTRUMENT_REGISTRY.listSources

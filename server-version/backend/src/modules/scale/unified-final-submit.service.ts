@@ -18,7 +18,7 @@ import { buildScaleResult, type ScaleResultV2 } from './scale-result'
 import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse } from './scale-workflow.service'
 import {
   decryptFrozenScaleRuntimeSnapshot,
-  type FrozenScaleRuntimeSnapshotV1,
+  type VersionedFrozenScaleRuntimeSnapshot,
 } from '../assessment-runtime/runtime-snapshot'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import {
@@ -29,7 +29,7 @@ import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
 import { loadFrozenReferenceSets } from '../assessment-runtime/reference-binding'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
-import type { FrozenUnitAdmissionV1 } from '../assessment-runtime/admission-snapshot'
+import type { VersionedFrozenUnitAdmission } from '../assessment-runtime/admission-snapshot-v2'
 import { buildScaleBundleBridge } from '../assessment-bundle/sources'
 import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 import {
@@ -59,7 +59,7 @@ export type UnifiedScaleFinalSubmitInput = {
 
 export type UnifiedScaleAdmission = ScaleAdmissionChildRow
 
-const assertPrincipal = (child: ScaleAdmissionChildRow, admission: FrozenUnitAdmissionV1, input: UnifiedScaleFinalSubmitInput): void => {
+const assertPrincipal = (child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, input: UnifiedScaleFinalSubmitInput): void => {
   if (input.userId && (child.userId === input.userId || admission.principal.userId === input.userId)) return
   if (input.questionnaireSessionId && admission.principal.questionnaireSessionId === input.questionnaireSessionId) {
     if (input.userId && admission.principal.userId === input.userId) return
@@ -73,7 +73,7 @@ const assertPrincipal = (child: ScaleAdmissionChildRow, admission: FrozenUnitAdm
 }
 
 const normalizeAnswers = (
-  definition: FrozenScaleRuntimeSnapshotV1['definition'],
+  definition: VersionedFrozenScaleRuntimeSnapshot['definition'],
   input: UnifiedScaleFinalSubmitInput['answers'],
 ): ScaleAnswer[] => {
   const byItem = new Map<string, ScaleAnswer>()
@@ -103,7 +103,7 @@ const normalizeAnswers = (
 
 const assertFrozenAdmission = (
   child: ScaleAdmissionChildRow,
-  admission: FrozenUnitAdmissionV1,
+  admission: VersionedFrozenUnitAdmission,
   input: UnifiedScaleFinalSubmitInput,
 ): void => {
   if (child.runtimeGeneration !== 'UNIFIED_V1' || !child.runtimeSnapshotEncrypted) {
@@ -139,8 +139,8 @@ const assertFrozenAdmission = (
 
 const assertRuntimeAgainstAdmission = (
   child: ScaleAdmissionChildRow,
-  admission: FrozenUnitAdmissionV1,
-  snapshot: FrozenScaleRuntimeSnapshotV1,
+  admission: VersionedFrozenUnitAdmission,
+  snapshot: VersionedFrozenScaleRuntimeSnapshot,
   input: UnifiedScaleFinalSubmitInput,
 ): void => {
   if (snapshot.instrumentKey !== child.scale.code || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
@@ -162,9 +162,9 @@ const assertRuntimeAgainstAdmission = (
 
 const buildResult = async (
   child: ScaleAdmissionChildRow,
-  snapshot: FrozenScaleRuntimeSnapshotV1,
+  snapshot: VersionedFrozenScaleRuntimeSnapshot,
   answers: ScaleAnswer[],
-  admission: FrozenUnitAdmissionV1,
+  admission: VersionedFrozenUnitAdmission,
 ): Promise<ScaleResultV2> => {
   let references: Awaited<ReturnType<typeof loadFrozenReferenceSets>> = []
   if (snapshot.referenceBindings.length > 0) {
@@ -243,6 +243,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
         parent: null,
       }
     }
+  }
+
+  if (admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+    && Date.now() > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
   }
 
   // The child row is already loaded by the final-submit admission path. Resolve

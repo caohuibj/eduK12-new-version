@@ -1,20 +1,15 @@
 import { z } from 'zod'
 import { canonicalHash } from './canonical'
-import { parseCompiledInstrumentRuntime } from './compiler'
-import {
-  createFrozenScaleRuntimeSnapshot,
-  hashFrozenScaleRuntimeSnapshot,
-  parseFrozenScaleRuntimeSnapshot,
-  type FrozenScaleRuntimeSnapshotV1,
-} from './runtime-snapshot'
-import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
+import { parseFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
+import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
+import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import {
   compiledScalePolicyV1Schema,
   hashCompiledScalePolicy,
   parseCompiledScalePolicy,
   type CompiledScalePolicyV1,
 } from '../scale/policy/compile'
-import type { ReferenceBindingSnapshot } from './types'
+import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
 
 export interface FrozenScaleRuntimeSnapshotV2 {
   schemaVersion: 2
@@ -24,11 +19,25 @@ export interface FrozenScaleRuntimeSnapshotV2 {
   instrumentVersion: string
   sourceDefinitionHash: string
   legacyDefinitionHash: string
-  compiledRuntime: FrozenScaleRuntimeSnapshotV1['compiledRuntime']
+  compiledRuntime: CompiledInstrumentRuntimeV1
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
   compiledPolicy: CompiledScalePolicyV1
   runtimePolicyHash: string
+  snapshotHash: string
+}
+
+export interface FrozenScaleRuntimeSnapshotV1Like {
+  schemaVersion: 1
+  runtimeGeneration: 'UNIFIED_V1'
+  frozenAt: string
+  instrumentKey: string
+  instrumentVersion: string
+  sourceDefinitionHash: string
+  legacyDefinitionHash: string
+  compiledRuntime: CompiledInstrumentRuntimeV1
+  referenceBindings: ReferenceBindingSnapshot[]
+  definition: ScaleDefinitionV2
   snapshotHash: string
 }
 
@@ -76,10 +85,46 @@ export const hashFrozenScaleRuntimeSnapshotV2 = (snapshot: FrozenScaleRuntimeSna
   canonicalHash(unsignedV2(snapshot))
 )
 
-/**
- * PR-1 test/contract factory only. Production freezeScaleRuntimeAtAttemptStart
- * remains a V1 writer until PR-3 enables versioned admission end-to-end.
- */
+const assertRuntimeAndReferenceIdentity = (snapshot: FrozenScaleRuntimeSnapshotV2): void => {
+  if (snapshot.sourceDefinitionHash !== canonicalHash(snapshot.definition)) {
+    throw new Error('Frozen Scale V2 source definition hash mismatch')
+  }
+  if (snapshot.legacyDefinitionHash !== hashScaleDefinition(snapshot.definition)) {
+    throw new Error('Frozen Scale V2 legacy definition hash mismatch')
+  }
+  const compiledRuntime = snapshot.compiledRuntime
+  if (
+    compiledRuntime.instrumentType !== 'SCALE'
+    || compiledRuntime.instrumentKey !== snapshot.instrumentKey
+    || compiledRuntime.instrumentVersion !== snapshot.instrumentVersion
+    || compiledRuntime.sourceDefinitionHash !== snapshot.sourceDefinitionHash
+  ) throw new Error('Frozen Scale V2 compiled runtime identity mismatch')
+
+  const selections = compiledRuntime.referenceBindingDefinition.selections
+  if (snapshot.referenceBindings.length !== selections.length) {
+    throw new Error('Frozen Scale V2 reference bindings do not match the compiled runtime')
+  }
+  selections.forEach((selection, index) => {
+    const binding = snapshot.referenceBindings[index]
+    if (
+      !binding
+      || binding.referenceKey !== selection.referenceKey
+      || binding.referenceVersion !== selection.referenceVersion
+      || binding.scoreKey !== selection.scoreKey
+      || binding.referenceKind !== selection.referenceKind
+    ) throw new Error('Frozen Scale V2 reference binding identity mismatch')
+  })
+
+  const policyByVersion = new Map(snapshot.compiledPolicy.referenceBindings.map((binding) => [binding.referenceVersion, binding.referenceHash]))
+  snapshot.referenceBindings.forEach((binding) => {
+    const expectedHash = policyByVersion.get(binding.referenceVersion)
+    if (expectedHash !== undefined && expectedHash !== binding.referenceHash) {
+      throw new Error('Frozen Scale V2 reference binding policy hash mismatch')
+    }
+  })
+}
+
+/** PR-1 test/contract factory; production writer upgrades an already-frozen V1 runtime. */
 export const createFrozenScaleRuntimeSnapshotV2ForTest = (input: {
   instrumentKey: string
   instrumentVersion: string
@@ -88,22 +133,42 @@ export const createFrozenScaleRuntimeSnapshotV2ForTest = (input: {
   referenceBindings?: ReferenceBindingSnapshot[]
   frozenAt?: Date
 }): FrozenScaleRuntimeSnapshotV2 => {
-  if (
-    input.compiledPolicy.instrumentKey !== input.instrumentKey
-    || input.compiledPolicy.instrumentVersion !== input.instrumentVersion
-  ) {
-    throw new Error('Compiled Scale policy identity mismatch')
-  }
-  if (hashCompiledScalePolicy(input.compiledPolicy) !== input.compiledPolicy.runtimePolicyHash) {
-    throw new Error('Compiled Scale policy hash mismatch')
-  }
-  const v1 = createFrozenScaleRuntimeSnapshot({
+  const definition = scaleDefinitionSchema.parse(input.definition)
+  const sourceDefinitionHash = canonicalHash(definition)
+  const compiledRuntime = compileScaleRuntime({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
-    definition: input.definition,
-    referenceBindings: input.referenceBindings,
-    frozenAt: input.frozenAt,
+    definition,
+    sourceDefinitionHash,
   })
+  const base: FrozenScaleRuntimeSnapshotV1Like = {
+    schemaVersion: 1,
+    runtimeGeneration: 'UNIFIED_V1',
+    frozenAt: (input.frozenAt ?? new Date()).toISOString(),
+    instrumentKey: input.instrumentKey,
+    instrumentVersion: input.instrumentVersion,
+    sourceDefinitionHash,
+    legacyDefinitionHash: hashScaleDefinition(definition),
+    compiledRuntime,
+    referenceBindings: input.referenceBindings ?? [],
+    definition,
+    snapshotHash: '0'.repeat(64),
+  }
+  return createFrozenScaleRuntimeSnapshotV2FromV1(base, input.compiledPolicy)
+}
+
+export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
+  v1: FrozenScaleRuntimeSnapshotV1Like,
+  compiledPolicyInput: CompiledScalePolicyV1,
+): FrozenScaleRuntimeSnapshotV2 => {
+  const compiledPolicy = parseCompiledScalePolicy(compiledPolicyInput)
+  if (
+    compiledPolicy.instrumentKey !== v1.instrumentKey
+    || compiledPolicy.instrumentVersion !== v1.instrumentVersion
+  ) throw new Error('Compiled Scale policy identity mismatch')
+  if (hashCompiledScalePolicy(compiledPolicy) !== compiledPolicy.runtimePolicyHash) {
+    throw new Error('Compiled Scale policy hash mismatch')
+  }
   const unsigned: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'> = {
     schemaVersion: 2,
     runtimeGeneration: v1.runtimeGeneration,
@@ -115,60 +180,45 @@ export const createFrozenScaleRuntimeSnapshotV2ForTest = (input: {
     compiledRuntime: v1.compiledRuntime,
     referenceBindings: v1.referenceBindings,
     definition: v1.definition,
-    compiledPolicy: input.compiledPolicy,
-    runtimePolicyHash: input.compiledPolicy.runtimePolicyHash,
+    compiledPolicy,
+    runtimePolicyHash: compiledPolicy.runtimePolicyHash,
   }
-  return { ...unsigned, snapshotHash: canonicalHash(unsignedV2(unsigned)) }
+  const snapshot: FrozenScaleRuntimeSnapshotV2 = { ...unsigned, snapshotHash: canonicalHash(unsignedV2(unsigned)) }
+  assertRuntimeAndReferenceIdentity(snapshot)
+  return snapshot
 }
 
 export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRuntimeSnapshotV2 => {
   const rawSnapshot = frozenScaleRuntimeSnapshotV2Schema.parse(value)
-  const compiledRuntime = parseCompiledInstrumentRuntime(rawSnapshot.compiledRuntime)
-  const compiledPolicy = parseCompiledScalePolicy(rawSnapshot.compiledPolicy)
   const snapshot: FrozenScaleRuntimeSnapshotV2 = {
     ...rawSnapshot,
-    compiledRuntime,
-    compiledPolicy,
+    compiledRuntime: parseCompiledInstrumentRuntime(rawSnapshot.compiledRuntime),
+    compiledPolicy: parseCompiledScalePolicy(rawSnapshot.compiledPolicy),
   }
-
   if (hashFrozenScaleRuntimeSnapshotV2(snapshot) !== snapshot.snapshotHash) {
     throw new Error('Frozen Scale V2 runtime snapshot hash mismatch')
   }
-  if (hashCompiledScalePolicy(compiledPolicy) !== snapshot.runtimePolicyHash || compiledPolicy.runtimePolicyHash !== snapshot.runtimePolicyHash) {
-    throw new Error('Frozen Scale V2 runtime policy hash mismatch')
-  }
-  if (compiledPolicy.instrumentKey !== snapshot.instrumentKey || compiledPolicy.instrumentVersion !== snapshot.instrumentVersion) {
-    throw new Error('Frozen Scale V2 runtime policy identity mismatch')
-  }
-
-  // Reuse the unchanged V1 validator for definition/runtime/reference identity
-  // invariants without ever adding V2 defaults to a persisted V1 object.
-  const v1Unsigned: Omit<FrozenScaleRuntimeSnapshotV1, 'snapshotHash'> = {
-    schemaVersion: 1,
-    runtimeGeneration: snapshot.runtimeGeneration,
-    frozenAt: snapshot.frozenAt,
-    instrumentKey: snapshot.instrumentKey,
-    instrumentVersion: snapshot.instrumentVersion,
-    sourceDefinitionHash: snapshot.sourceDefinitionHash,
-    legacyDefinitionHash: snapshot.legacyDefinitionHash,
-    compiledRuntime,
-    referenceBindings: snapshot.referenceBindings,
-    definition: snapshot.definition,
-  }
-  const v1Candidate: FrozenScaleRuntimeSnapshotV1 = {
-    ...v1Unsigned,
-    snapshotHash: hashFrozenScaleRuntimeSnapshot({ ...v1Unsigned, snapshotHash: '0'.repeat(64) }),
-  }
-  parseFrozenScaleRuntimeSnapshot(v1Candidate)
+  if (
+    hashCompiledScalePolicy(snapshot.compiledPolicy) !== snapshot.runtimePolicyHash
+    || snapshot.compiledPolicy.runtimePolicyHash !== snapshot.runtimePolicyHash
+  ) throw new Error('Frozen Scale V2 runtime policy hash mismatch')
+  if (
+    snapshot.compiledPolicy.instrumentKey !== snapshot.instrumentKey
+    || snapshot.compiledPolicy.instrumentVersion !== snapshot.instrumentVersion
+  ) throw new Error('Frozen Scale V2 runtime policy identity mismatch')
+  assertRuntimeAndReferenceIdentity(snapshot)
   return snapshot
 }
 
-export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1 | FrozenScaleRuntimeSnapshotV2
+export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1Like | FrozenScaleRuntimeSnapshotV2
 
+/** Compatibility export retained for PR-1/PR-2 callers. The V1 parser is only called after module initialization. */
 export const parseVersionedFrozenScaleRuntimeSnapshot = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid Frozen Scale runtime snapshot')
   const schemaVersion = (value as { schemaVersion?: unknown }).schemaVersion
-  if (schemaVersion === 1) return parseFrozenScaleRuntimeSnapshot(value)
   if (schemaVersion === 2) return parseFrozenScaleRuntimeSnapshotV2(value)
+  if (schemaVersion === 1) {
+    return parseFrozenScaleRuntimeSnapshot(value)
+  }
   throw new Error(`Unsupported Frozen Scale runtime snapshot schemaVersion: ${String(schemaVersion)}`)
 }

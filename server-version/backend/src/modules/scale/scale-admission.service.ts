@@ -1,3 +1,5 @@
+import { withSerializableScaleTransaction } from './deployment/transactions'
+import { type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -7,13 +9,27 @@ import {
   type FrozenUnitAdmissionV1,
 } from '../assessment-runtime/admission-snapshot'
 import {
+  createFrozenUnitAdmissionV2,
+  versionedFrozenAdmissionPersistence,
+  type FrozenUnitAdmissionV2,
+  type VersionedFrozenUnitAdmission,
+} from '../assessment-runtime/admission-snapshot-v2'
+import {
   assertAdmissionParentBinding as assertSharedAdmissionParentBinding,
-  persistAdmissionOnce,
-  readStoredUnitAdmission,
+  persistVersionedAdmissionOnce,
+  readStoredVersionedUnitAdmission,
 } from '../assessment-runtime/unit-admission'
 import { getFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
+import { decryptFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { canonicalHash } from '../assessment-runtime/canonical'
+import { ageMonthsAt, assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
+import { resolveScaleStartDeployment } from './deployment/service'
+import type { ScaleDeploymentModeV1 } from './policy/deployment'
+import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
+import type { FrozenEligibilityDecisionV1, ScalePolicyRespondentType } from './policy/types'
 
 const COMPILED_RUNTIME_HASH = /^[0-9a-f]{64}$/
+type Db = PrismaClient | Prisma.TransactionClient
 
 export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   id: true,
@@ -34,8 +50,18 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   compositeAttemptId: true,
   compositeItemId: true,
   scaleId: true,
+  subjectUserId: true,
+  respondentUserId: true,
+  respondentType: true,
   scale: {
-    select: { id: true, code: true, name: true, instrumentVersion: true },
+    select: {
+      id: true,
+      code: true,
+      name: true,
+      instrumentVersion: true,
+      instrumentClass: true,
+      status: true,
+    },
   },
 } as const
 
@@ -58,7 +84,17 @@ export type ScaleAdmissionChildRow = {
   compositeAttemptId: string | null
   compositeItemId: string | null
   scaleId: string
-  scale: { id: string; code: string; name: string; instrumentVersion: string }
+  subjectUserId: string | null
+  respondentUserId: string | null
+  respondentType: string | null
+  scale: {
+    id: string
+    code: string
+    name: string
+    instrumentVersion: string
+    instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+    status: string
+  }
 }
 
 // Composite parent rows are loaded once (load-once admission) and shared by
@@ -139,20 +175,244 @@ export const createStandaloneScaleAdmission = (input: {
   requiresContext: false,
 })
 
+/** Legacy helper retained for V1/custom starts and old tests. */
 export const standaloneAdmissionPersistence = (input: {
   attemptEpoch: number
   userId: string | null
   scale: NonNullable<FrozenUnitAdmissionV1['scale']>
 }) => frozenAdmissionPersistence(createStandaloneScaleAdmission(input))
 
-const persistAdmission = async (assessmentId: string, snapshot: FrozenUnitAdmissionV1): Promise<FrozenUnitAdmissionV1> => (
-  persistAdmissionOnce({
+const readRuntime = (encrypted: string | null): VersionedFrozenScaleRuntimeSnapshot => {
+  if (!encrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
+  try {
+    return decryptFrozenScaleRuntimeSnapshot(encrypted)
+  } catch (error) {
+    throw new InstrumentFinalSubmitError(
+      'DEFINITION_MISMATCH',
+      error instanceof Error ? error.message : '量表冻结运行时无法读取，请重启测评',
+      409,
+    )
+  }
+}
+
+const availableContextKeys = (values: AssessmentContextValues | null) => (
+  values
+    ? assessmentContextKeys.filter((key) => values[key] !== undefined)
+    : []
+)
+
+export const resolveScalePolicyRespondentType = (input: {
+  respondentType?: string | null
+  subjectUserId?: string | null
+  respondentUserId?: string | null
+}): ScalePolicyRespondentType | 'UNKNOWN' => {
+  const normalized = input.respondentType?.toUpperCase()
+  if (normalized === 'PARENT' || normalized === 'TEACHER' || normalized === 'OBSERVER' || normalized === 'CLINICIAN' || normalized === 'SELF') {
+    return normalized
+  }
+  const subject = input.subjectUserId ?? null
+  const respondent = input.respondentUserId ?? null
+  if ((subject === null && respondent === null) || (subject !== null && subject === respondent)) return 'SELF'
+  // A relational binding with an unclassified or asymmetric respondent must
+  // never be widened into SELF. Eligibility treats UNKNOWN as indeterminate.
+  return 'UNKNOWN'
+}
+
+const policyRequiresContext = (runtime: Extract<VersionedFrozenScaleRuntimeSnapshot, { schemaVersion: 2 }>): boolean => {
+  const applicability = runtime.compiledPolicy.applicability
+  return Boolean(
+    applicability.requiredContextKeys.length > 0
+    || applicability.subject?.ageMonths
+    || (applicability.subject?.grades && applicability.subject.grades.length > 0),
+  )
+}
+
+const assertReady = <T extends VersionedFrozenUnitAdmission>(snapshot: T): T => {
+  if (snapshot.governance.status !== 'READY') {
+    throw new InstrumentFinalSubmitError(
+      'STALE_ATTEMPT',
+      snapshot.governance.holdReason ?? '当前量表不满足准入条件',
+      409,
+    )
+  }
+  return snapshot
+}
+
+export const createScaleAdmissionForRuntime = async (input: {
+  db: Db
+  attemptEpoch: number
+  scale: ScaleAdmissionChildRow['scale']
+  principal: FrozenUnitAdmissionV1['principal']
+  parent: FrozenUnitAdmissionV1['parent']
+  runtime: VersionedFrozenScaleRuntimeSnapshot
+  requestedMode: ScaleDeploymentModeV1
+  contextSnapshotHash: string | null
+  contextValues: AssessmentContextValues | null
+  contextFrozenAt: string | null
+  contextSubjectUserId?: string | null
+  respondentType?: string | null
+  subjectUserId?: string | null
+  respondentUserId?: string | null
+  legacyRequiresContext?: boolean
+}): Promise<VersionedFrozenUnitAdmission> => {
+  if (input.runtime.instrumentKey !== input.scale.code || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时身份不匹配', 409)
+  }
+
+  if (input.runtime.schemaVersion === 1) {
+    return createFrozenUnitAdmission({
+      attemptEpoch: input.attemptEpoch,
+      scale: input.scale,
+      principal: input.principal,
+      parent: input.parent,
+      requiresContext: Boolean(input.legacyRequiresContext),
+      contextSnapshotHash: input.contextSnapshotHash,
+      contextValues: input.contextValues,
+    })
+  }
+
+  const deployment = await resolveScaleStartDeployment({
+    db: input.db,
+    scale: input.scale,
+    requestedMode: input.requestedMode,
+  })
+  if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts || !deployment.decision.authorization) {
+    throw new InstrumentFinalSubmitError(
+      'STALE_ATTEMPT',
+      `量表当前不可启动：${deployment.reasons.join(',') || 'DEPLOYMENT_DENIED'}`,
+      409,
+    )
+  }
+  if (deployment.runtimePolicy.runtimePolicyHash !== input.runtime.runtimePolicyHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结策略与当前部署绑定不匹配', 409)
+  }
+
+  const resolvedRespondentType = resolveScalePolicyRespondentType({
+    respondentType: input.respondentType,
+    subjectUserId: input.subjectUserId,
+    respondentUserId: input.respondentUserId,
+  })
+  const eligibility = evaluateInstrumentEligibility(input.runtime.compiledPolicy.applicability, {
+    respondentType: resolvedRespondentType,
+    subject: {
+      ageMonths: input.contextValues?.birthYearMonth && input.contextFrozenAt
+        ? ageMonthsAt(input.contextValues.birthYearMonth, new Date(input.contextFrozenAt)) : undefined,
+      gradeLevel: input.contextValues?.gradeLevel,
+    },
+    assessmentContext: input.requestedMode,
+    availableContextKeys: availableContextKeys(input.contextValues),
+  })
+  if (resolvedRespondentType !== 'SELF' && policyRequiresContext(input.runtime)
+    && (!input.subjectUserId || input.contextSubjectUserId !== input.subjectUserId)) {
+    eligibility.outcome = 'INDETERMINATE'
+    eligibility.reasons.push({ code: 'SUBJECT_CONTEXT_UNBOUND', rule: 'Observer context must bind the frozen subject identity' })
+  }
+  const evaluatedAt = new Date().toISOString()
+  const identityBindingHash = canonicalHash({
+    instrumentKey: input.scale.code,
+    instrumentVersion: input.scale.instrumentVersion,
+    sourceDefinitionHash: input.runtime.sourceDefinitionHash,
+    compiledRuntimeHash: input.runtime.compiledRuntime.compiledRuntimeHash,
+    runtimePolicyHash: input.runtime.runtimePolicyHash,
+    deploymentPolicyHash: deployment.deployment.policyHash,
+    attemptEpoch: input.attemptEpoch,
+    principal: input.principal,
+    parent: input.parent,
+    subjectUserId: input.subjectUserId ?? null,
+    respondentUserId: input.respondentUserId ?? null,
+    respondentType: resolvedRespondentType,
+  })
+  const frozenEligibility: FrozenEligibilityDecisionV1 = {
+    schemaVersion: 1,
+    evaluatorVersion: SCALE_ELIGIBILITY_EVALUATOR_VERSION,
+    policyVersion: input.runtime.compiledPolicy.applicability.policyVersion,
+    policyHash: input.runtime.runtimePolicyHash,
+    contextHash: input.contextSnapshotHash,
+    identityBindingHash,
+    contextFrozenAt: input.contextFrozenAt,
+    evaluatedAt,
+    outcome: eligibility.outcome,
+    reasons: eligibility.reasons,
+    factProvenance: {
+      subject: input.subjectUserId ? 'FROZEN_SUBJECT_BINDING' : 'SELF_SURFACE_SUBJECT',
+      respondent: input.respondentUserId ? 'FROZEN_RESPONDENT_BINDING' : 'SELF_SURFACE_RESPONDENT',
+      ...(input.contextValues?.ageMonthsAtFreeze !== undefined
+        ? { ageBasis: 'birthYearMonth+context.frozenAt/month-precision' }
+        : {}),
+    },
+  }
+  const holdReason = eligibility.outcome === 'ELIGIBLE'
+    ? null
+    : `ELIGIBILITY_${eligibility.outcome}:${eligibility.reasons.map((reason) => reason.code).join(',')}`
+
+  return createFrozenUnitAdmissionV2({
+    attemptEpoch: input.attemptEpoch,
+    scale: input.scale,
+    principal: input.principal,
+    parent: input.parent,
+    requiresContext: policyRequiresContext(input.runtime),
+    contextSnapshotHash: input.contextSnapshotHash,
+    contextValues: input.contextValues,
+    governance: {
+      status: eligibility.outcome === 'ELIGIBLE' ? 'READY' : 'HOLD',
+      holdReason,
+    },
+    scalePolicy: {
+      runtimePolicyHash: input.runtime.runtimePolicyHash,
+      eligibility: frozenEligibility,
+      deployment: {
+        revision: deployment.deployment.revision,
+        policyHash: deployment.deployment.policyHash,
+        authorizationId: deployment.decision.authorization.authorizationId,
+        authorizationVersion: deployment.decision.authorization.version,
+        evaluatedAt,
+        completionDeadline: new Date(Date.parse(evaluatedAt) + (deployment.deployment.policy.completionWindowMs ?? 7 * 24 * 60 * 60 * 1000)).toISOString(),
+      },
+    },
+  })
+}
+
+export const standaloneAdmissionPersistenceForRuntime = async (input: {
+  db: Db
+  attemptEpoch: number
+  userId: string
+  scale: ScaleAdmissionChildRow['scale']
+  runtime: VersionedFrozenScaleRuntimeSnapshot
+  contextSnapshotHash: string | null
+  contextValues: AssessmentContextValues | null
+  contextFrozenAt: string | null
+}) => {
+  const snapshot = await createScaleAdmissionForRuntime({
+    db: input.db,
+    attemptEpoch: input.attemptEpoch,
+    scale: input.scale,
+    principal: { userId: input.userId, questionnaireSessionId: null, recoveryTokenHash: null },
+    parent: null,
+    runtime: input.runtime,
+    requestedMode: 'STANDALONE',
+    contextSnapshotHash: input.contextSnapshotHash,
+    contextValues: input.contextValues,
+    contextFrozenAt: input.contextFrozenAt,
+    respondentType: 'SELF',
+    subjectUserId: input.userId,
+    respondentUserId: input.userId,
+  })
+  assertReady(snapshot)
+  return versionedFrozenAdmissionPersistence(snapshot)
+}
+
+const persistAdmission = async <T extends VersionedFrozenUnitAdmission>(
+  db: Db,
+  assessmentId: string,
+  snapshot: T,
+): Promise<T> => (
+  persistVersionedAdmissionOnce({
     snapshot,
-    writeIfEmpty: (persisted) => prisma.assessment.updateMany({
+    writeIfEmpty: (persisted) => db.assessment.updateMany({
       where: { id: assessmentId, frozenAdmissionSnapshotHash: null },
       data: persisted,
     }),
-    read: () => prisma.assessment.findUnique({
+    read: () => db.assessment.findUnique({
       where: { id: assessmentId },
       select: {
         frozenAdmissionSnapshotEncrypted: true,
@@ -166,26 +426,19 @@ const persistAdmission = async (assessmentId: string, snapshot: FrozenUnitAdmiss
 
 export const assertAdmissionParentBinding = (
   child: Pick<ScaleAdmissionChildRow, 'questionnaireAssessmentId' | 'compositeAttemptId'>,
-  admission: FrozenUnitAdmissionV1,
+  admission: VersionedFrozenUnitAdmission,
 ): void => assertSharedAdmissionParentBinding(child, admission)
 
 export const ensureScaleAdmissionAtDelivery = async (
   assessmentId: string,
   parent?: CompositeScaleAdmissionParent,
   child?: ScaleAdmissionChildRow,
-): Promise<FrozenUnitAdmissionV1> => {
-  // Load-once completion: the unified attempt-state reader already holds the
-  // child row (with the full admission select) and passes it in, so a
-  // current-unit delivery never re-reads the same scale assessment row.
+): Promise<VersionedFrozenUnitAdmission> => {
   const loaded = child ?? await prisma.assessment.findUnique({
     where: { id: assessmentId },
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
   })
   if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
-  // Identity assertion (Work C): when a caller supplies an already-loaded child
-  // or parent, verify the structural relationship that the old DB query used to
-  // guarantee implicitly. A mismatched pairing would otherwise persist a frozen
-  // admission snapshot under the wrong parent binding.
   if (child && child.id !== assessmentId) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表记录与请求身份不匹配', 409)
   }
@@ -195,25 +448,60 @@ export const ensureScaleAdmissionAtDelivery = async (
   if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时版本不匹配，请重启测评', 409)
   }
-  return activateScaleAdmission(loaded, parent)
+  return activateScaleAdmission(loaded as ScaleAdmissionChildRow, parent)
 }
 
 export const readStoredScaleAdmission = (
   row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>,
-): FrozenUnitAdmissionV1 | null => (
-  readStoredUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答')
+): VersionedFrozenUnitAdmission | null => (
+  readStoredVersionedUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答')
 )
 
-export const activateScaleAdmission = async (
+const validateStoredAgainstRuntime = (
   row: ScaleAdmissionChildRow,
-  parent?: CompositeScaleAdmissionParent,
-): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredScaleAdmission(row)
-  if (stored) return stored
-  assertFinalOnly(row.deliveryMode)
+  stored: VersionedFrozenUnitAdmission,
+): VersionedFrozenUnitAdmission => {
+  assertAdmissionParentBinding(row, stored)
+  if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
+    || stored.scale?.code !== row.scale.code || stored.scale?.instrumentVersion !== row.scale.instrumentVersion
+    || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
+  }
+  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  if (runtime.schemaVersion !== stored.schemaVersion) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
+  }
+  if (stored.schemaVersion === 2 && runtime.schemaVersion === 2) {
+    if (row.status !== 'COMPLETED' && stored.scalePolicy?.deployment?.completionDeadline
+      && Date.now() > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
+    }
+    const identityBindingHash = canonicalHash({
+      instrumentKey: row.scale.code, instrumentVersion: row.scale.instrumentVersion,
+      sourceDefinitionHash: runtime.sourceDefinitionHash, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      runtimePolicyHash: runtime.runtimePolicyHash, deploymentPolicyHash: stored.scalePolicy?.deployment?.policyHash,
+      attemptEpoch: row.attemptEpoch, principal: stored.principal, parent: stored.parent,
+      subjectUserId: row.subjectUserId ?? null, respondentUserId: row.respondentUserId ?? null,
+      respondentType: resolveScalePolicyRespondentType(row),
+    })
+    if (stored.scalePolicy?.deployment && identityBindingHash !== stored.scalePolicy.eligibility.identityBindingHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结身份绑定不匹配', 409)
+    }
+    if (stored.scalePolicy?.runtimePolicyHash !== runtime.runtimePolicyHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结策略绑定不匹配', 409)
+    }
+  }
+  return assertReady(stored)
+}
 
+const activateUnstoredScaleAdmission = async (
+  db: Db,
+  row: ScaleAdmissionChildRow,
+  runtime: VersionedFrozenScaleRuntimeSnapshot,
+  parent?: CompositeScaleAdmissionParent,
+): Promise<VersionedFrozenUnitAdmission> => {
   if (row.questionnaireAssessmentId) {
-    const parent = await prisma.questionnaireAssessment.findUnique({
+    const loadedParent = await db.questionnaireAssessment.findUnique({
       where: { id: row.questionnaireAssessmentId },
       select: {
         id: true,
@@ -228,55 +516,68 @@ export const activateScaleAdmission = async (
         frozenActiveSlotSetHash: true,
         questionnaire: {
           select: {
+            type: true,
             questionnaireScales: { select: { id: true, scaleId: true } },
             formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
           },
         },
       },
     })
-    if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
-    assertFinalOnly(parent.deliveryMode)
-    assertAttemptEpoch(parent.attemptEpoch, row.attemptEpoch)
-    const binding = parent.questionnaire.questionnaireScales.find((item) => item.scaleId === row.scale.id)
+    if (!loadedParent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    assertFinalOnly(loadedParent.deliveryMode)
+    assertAttemptEpoch(loadedParent.attemptEpoch, row.attemptEpoch)
+    const binding = loadedParent.questionnaire.questionnaireScales.find((item) => item.scaleId === row.scale.id)
     if (!binding) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = questionnaireScaleSlotKey(binding.id)
     const slot = readRequiredScaleSlot({
-      encrypted: parent.frozenActiveSlotSetEncrypted,
-      storedHash: parent.frozenActiveSlotSetHash,
+      encrypted: loadedParent.frozenActiveSlotSetEncrypted,
+      storedHash: loadedParent.frozenActiveSlotSetHash,
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
     })
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
-    const requiresContext = hasContextSection(parent.questionnaire.formSections)
-    if (requiresContext && parent.contextSnapshotHash === null) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+    if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
     }
-    const context = readQuestionnaireAssessmentContext(parent)
+    const legacyRequiresContext = hasContextSection(loadedParent.questionnaire.formSections)
+    const context = readQuestionnaireAssessmentContext(loadedParent)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-    return persistAdmission(row.id, createFrozenUnitAdmission({
+    const requestedMode: ScaleDeploymentModeV1 = loadedParent.questionnaire.type === 'GENERAL'
+      ? 'PUBLIC_QUESTIONNAIRE'
+      : 'QUESTIONNAIRE'
+    const snapshot = await createScaleAdmissionForRuntime({
+      db,
       attemptEpoch: row.attemptEpoch,
       scale: row.scale,
       principal: {
-        userId: row.userId ?? parent.userId,
-        questionnaireSessionId: parent.sessionId,
-        recoveryTokenHash: parent.resumeTokenHash,
+        userId: row.userId ?? loadedParent.userId,
+        questionnaireSessionId: loadedParent.sessionId,
+        recoveryTokenHash: loadedParent.resumeTokenHash,
       },
       parent: {
         kind: 'questionnaire',
-        parentId: parent.id,
+        parentId: loadedParent.id,
         slotKey,
         sourceDefinitionHash: slot.sourceDefinitionIdentity.hash,
         compiledRuntimeHash,
       },
-      requiresContext,
-      contextSnapshotHash: parent.contextSnapshotHash,
+      runtime,
+      requestedMode,
+      contextSnapshotHash: loadedParent.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
-    }))
+      contextFrozenAt: context.context?.frozenAt ?? null,
+      contextSubjectUserId: context.context?.subjectUserId ?? null,
+      respondentType: row.respondentType,
+      subjectUserId: row.subjectUserId,
+      respondentUserId: row.respondentUserId,
+      legacyRequiresContext,
+    })
+    return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
+    const loaded = parent ?? await db.compositeAssessmentAttempt.findUnique({
       where: { id: row.compositeAttemptId },
       select: {
         id: true,
@@ -306,17 +607,19 @@ export const activateScaleAdmission = async (
       scale: row.scale,
     })
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
-    const requiresContext = hasContextSection(loaded.compositeAssessment.formSections)
-    if (requiresContext && loaded.contextSnapshotHash === null) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '请先完成并提交人口学上下文区段', 409)
+    if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
     }
+    const legacyRequiresContext = hasContextSection(loaded.compositeAssessment.formSections)
     const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-    return persistAdmission(row.id, createFrozenUnitAdmission({
+    const snapshot = await createScaleAdmissionForRuntime({
+      db,
       attemptEpoch: row.attemptEpoch,
       scale: row.scale,
       principal: {
         userId: row.userId ?? loaded.userId,
+        questionnaireSessionId: null,
         recoveryTokenHash: loaded.recoveryTokenHash,
       },
       parent: {
@@ -326,15 +629,58 @@ export const activateScaleAdmission = async (
         sourceDefinitionHash: slot.sourceDefinitionIdentity.hash,
         compiledRuntimeHash,
       },
-      requiresContext,
+      runtime,
+      requestedMode: 'COMPOSITE',
       contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
-    }))
+      contextFrozenAt: context.context?.frozenAt ?? null,
+      contextSubjectUserId: context.context?.subjectUserId ?? null,
+      respondentType: row.respondentType,
+      subjectUserId: row.subjectUserId,
+      respondentUserId: row.respondentUserId,
+      legacyRequiresContext,
+    })
+    return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
   }
 
-  return persistAdmission(row.id, createStandaloneScaleAdmission({
+  const snapshot = await createScaleAdmissionForRuntime({
+    db,
     attemptEpoch: row.attemptEpoch,
-    userId: row.userId,
     scale: row.scale,
-  }))
+    principal: { userId: row.userId, questionnaireSessionId: null, recoveryTokenHash: null },
+    parent: null,
+    runtime,
+    requestedMode: 'STANDALONE',
+    contextSnapshotHash: null,
+    contextValues: null,
+    contextFrozenAt: null,
+    respondentType: 'SELF',
+    subjectUserId: row.userId,
+    respondentUserId: row.userId,
+    legacyRequiresContext: false,
+  })
+  return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
+}
+
+export const activateScaleAdmission = async (
+  row: ScaleAdmissionChildRow,
+  parent?: CompositeScaleAdmissionParent,
+): Promise<VersionedFrozenUnitAdmission> => {
+  const stored = readStoredScaleAdmission(row)
+  if (stored) return validateStoredAgainstRuntime(row, stored)
+  assertFinalOnly(row.deliveryMode)
+  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
+
+  return withSerializableScaleTransaction(prisma,
+    async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`
+      const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
+      if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
+      const winner = readStoredScaleAdmission(current)
+      if (winner) return validateStoredAgainstRuntime(current, winner)
+      // Load the parent inside this transaction, never use a pre-transaction context.
+      return activateUnstoredScaleAdmission(tx, current, readRuntime(current.runtimeSnapshotEncrypted))
+    },
+  )
 }

@@ -1,3 +1,5 @@
+import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
+import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
   evaluateAuthorizationOverlayStatus,
   resolveEffectiveAuthorization,
@@ -30,7 +32,7 @@ import {
   type ScaleEvidenceRecord,
   type ScaleReferenceApplicabilityRecord,
 } from './catalog-manifest'
-import { getWave0LocalizationManifest, WAVE0_SCALE_CATALOG_MANIFESTS } from './wave0-catalog'
+import { WAVE0_SCALE_CATALOG_MANIFESTS } from './wave0-catalog'
 import {
   evaluatePilotFirstPublicationGate,
   type PilotFirstPublicationGateResult,
@@ -473,9 +475,12 @@ export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext
   const territory = context.territory ?? DEFAULT_TERRITORY
   const nowIso = context.nowIso ?? new Date().toISOString()
   const entries: ScaleLibraryEntry[] = []
-  WAVE0_SCALE_LIBRARY_REGISTRY.entries.forEach((catalogEntry) => {
+  const legacyIdentities = new Set(WAVE0_SCALE_CATALOG_MANIFESTS.map(manifest => bindingKey(manifest.identity.instrumentKey, manifest.identity.instrumentVersion)))
+  const additional = listScaleInstrumentSources().filter(source => source.executable && !legacyIdentities.has(bindingKey(source.identity.instrumentKey, source.identity.instrumentVersion)))
+  const registry = createScaleCatalogRegistry([...WAVE0_SCALE_CATALOG_MANIFESTS, ...additional.map(materializeCatalogManifest)])
+  registry.entries.forEach((catalogEntry) => {
     if (!catalogEntry.pkg) return
-    const localization = getWave0LocalizationManifest(catalogEntry.manifest.identity.instrumentKey, catalogEntry.manifest.identity.instrumentVersion)
+    const localization = getScaleInstrumentLocalization(catalogEntry.manifest.identity.instrumentKey, catalogEntry.manifest.identity.instrumentVersion)
     if (!localization) return
     const locale = context.locale ?? localization.targetLocale
     entries.push(buildEntry({
@@ -488,7 +493,7 @@ export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext
     schemaVersion: 1,
     generatedAt: nowIso,
     entries,
-    diagnostics: WAVE0_SCALE_LIBRARY_REGISTRY.diagnostics.map((diagnostic) => ({
+    diagnostics: registry.diagnostics.map((diagnostic) => ({
       severity: diagnostic.severity,
       code: diagnostic.code,
       message: diagnostic.message,
@@ -552,7 +557,7 @@ export const getScaleLibraryContentLocale = (instrumentKey: string): string | un
 )
 
 export const getScaleLibraryLocalizationManifest = (instrumentKey: string, instrumentVersion: string): LocalizationManifestV1 | undefined => (
-  getWave0LocalizationManifest(instrumentKey, instrumentVersion)
+  getScaleInstrumentLocalization(instrumentKey, instrumentVersion)
 )
 
 export const parseScaleLibraryLocalizationManifest = (value: unknown): LocalizationManifestV1 | undefined => {
