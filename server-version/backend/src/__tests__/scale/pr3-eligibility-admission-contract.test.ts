@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createFrozenUnitAdmissionV2, parseFrozenUnitAdmissionV2 } from '../../modules/assessment-runtime/admission-snapshot-v2'
+import { resolveScalePolicyRespondentType } from '../../modules/scale/scale-admission.service'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from '../../modules/scale/policy/eligibility'
 import type { InstrumentApplicabilityV1, ScaleEligibilityFactsV1 } from '../../modules/scale/policy/types'
 
@@ -52,6 +53,19 @@ describe('PR3 frozen eligibility admission contract', () => {
     expect(evaluateInstrumentEligibility(applicability, facts({ subject: { ageMonths: 120, gradeLevel: '8' } })).outcome).toBe('INELIGIBLE')
     expect(evaluateInstrumentEligibility(applicability, facts({ respondentType: 'PARENT' })).outcome).toBe('INELIGIBLE')
     expect(evaluateInstrumentEligibility(applicability, facts({ assessmentContext: 'UNBOUND_SURFACE' })).outcome).toBe('INELIGIBLE')
+  })
+
+  it('never widens an ambiguous relational respondent into SELF', () => {
+    expect(resolveScalePolicyRespondentType({ respondentType: null, subjectUserId: null, respondentUserId: null })).toBe('SELF')
+    expect(resolveScalePolicyRespondentType({ respondentType: null, subjectUserId: 'student-1', respondentUserId: 'student-1' })).toBe('SELF')
+    expect(resolveScalePolicyRespondentType({ respondentType: 'PARENT', subjectUserId: 'student-1', respondentUserId: 'parent-1' })).toBe('PARENT')
+    const ambiguous = resolveScalePolicyRespondentType({
+      respondentType: null,
+      subjectUserId: 'student-1',
+      respondentUserId: 'student-2',
+    })
+    expect(ambiguous).toBe('UNKNOWN')
+    expect(evaluateInstrumentEligibility(applicability, facts({ respondentType: ambiguous })).outcome).toBe('INDETERMINATE')
   })
 
   it('persists a HOLD decision together with deployment and identity provenance', () => {
