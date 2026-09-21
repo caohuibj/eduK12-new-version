@@ -1,10 +1,11 @@
 import { safeDecrypt } from '../../utils/encryption'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
+import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
+import type { ScaleProjectionContext } from '../scale/projection/types'
 
 /**
- * A scale report is a per-instrument projection. It deliberately does not
- * contain a collection average, an overall assessment, or a cross-instrument
- * conclusion.
+ * A scale report is an internal per-instrument report input. It may contain a
+ * complete authoritative result and therefore must not be serialized directly.
  */
 export const SCALE_REPORT_DISCLAIMER = '量表结果仅反映本次作答，不构成医学诊断或人口常模。'
 export const SCALE_REPORT_DEFINITION_VERSION = 'scale-unit-report-v2'
@@ -75,7 +76,7 @@ const emptyResultProjection = (input: BuildScaleUnitReportInput): ScaleUnitRepor
   interpretations: [],
 })
 
-/** Build the same v2 DTO for standalone, questionnaire and composite contexts. */
+/** Internal builder. External callers must pass its output through projectScaleUnitReport. */
 export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUnitReport => {
   const decoded = decodeReportField<ScaleResultV2>(input.result)
   if (!decoded.ok) return { ...emptyResultProjection(input), decryptError: true }
@@ -96,6 +97,94 @@ export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUni
     method: result.method,
     caveats: input.caveats?.map(String) ?? result.caveats,
     disclaimer: input.disclaimer || result.disclaimer || SCALE_REPORT_DISCLAIMER,
+  }
+}
+
+const externalBase = (report: ScaleUnitReport) => ({
+  ...(report.itemId ? { itemId: report.itemId } : {}),
+  type: 'SCALE' as const,
+  kind: 'scale' as const,
+  scaleId: report.scaleId,
+  scaleCode: report.scaleCode ?? null,
+  label: report.label ?? report.scaleName,
+  scaleName: report.scaleName,
+  completedAt: report.completedAt ?? null,
+  totalTime: report.totalTime ?? null,
+})
+
+/** Strict audience-safe serializer for ScaleUnitReport, including stored aggregates. */
+export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScaleProjectionContext): any => {
+  const base = externalBase(report)
+  if (context.frozenPolicy.disposition === 'UNKNOWN') {
+    return { ...base, reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' }
+  }
+  if (report.decryptError) return { ...base, reportKind: 'unavailable', reason: 'RESULT_UNAVAILABLE', decryptError: true }
+  const capabilities = resolveEffectiveScaleDisclosure(context)
+  const rich = capabilities.references
+    || capabilities.individualInterpretations
+    || capabilities.scoreDerivedLabels
+    || capabilities.resultQualityDetails
+    || capabilities.itemScores
+    || capabilities.methods
+  const feedback = context.frozenPolicy.educationalFeedback
+
+  if (!capabilities.numericScores && !rich) {
+    if (capabilities.educationalContent && feedback) {
+      return {
+        ...base,
+        reportKind: 'educational',
+        educationalFeedback: {
+          contentVersion: feedback.contentVersion,
+          blocks: feedback.blocks.map((block) => ({ ...block })),
+          ...(feedback.choices ? { choices: feedback.choices.map((choice) => ({ ...choice })) } : {}),
+          ...(feedback.disclaimer ? { disclaimer: feedback.disclaimer } : {}),
+        },
+      }
+    }
+    return { ...base, reportKind: 'completion' }
+  }
+
+  if (capabilities.numericScores && !rich) {
+    return {
+      ...base,
+      reportKind: 'scores',
+      scores: report.scores.map((score) => ({ ...score })),
+      disclaimer: report.disclaimer,
+    }
+  }
+
+  const result = report.result
+  return {
+    ...base,
+    reportKind: 'full',
+    ...(capabilities.numericScores ? { scores: report.scores.map((score) => ({ ...score })) } : {}),
+    ...(capabilities.references ? { references: report.references.map((reference) => ({ ...reference })) } : {}),
+    ...(capabilities.individualInterpretations ? {
+      interpretations: report.interpretations.map((entry) => ({
+        scoreKey: entry.scoreKey,
+        ...(capabilities.scoreDerivedLabels ? { headline: entry.headline, label: entry.label } : {}),
+        interpretation: entry.interpretation,
+        guidance: entry.guidance.map((guidance) => ({ ...guidance })),
+        limitations: [...entry.limitations],
+        referenceVersion: entry.referenceVersion,
+      })),
+    } : {}),
+    ...(capabilities.resultQualityDetails && report.quality
+      ? { quality: { status: report.quality.status, flags: [...report.quality.flags] }, caveats: [...report.caveats] }
+      : {}),
+    ...(capabilities.itemScores && result ? { itemScores: result.itemScores.map((item) => ({ ...item })) } : {}),
+    ...(capabilities.methods && report.method ? {
+      method: {
+        ...report.method,
+        referenceVersions: [...report.method.referenceVersions],
+        assessmentContext: report.method.assessmentContext ? { ...report.method.assessmentContext } : null,
+      },
+    } : {}),
+    ...(capabilities.educationalContent && feedback ? { educationalFeedback: feedback } : {}),
+    disclaimer: report.disclaimer,
+    // No nested result field is ever emitted here. A future field added to the
+    // internal ScaleResult cannot cross this boundary without an explicit edit.
+    result: null,
   }
 }
 
