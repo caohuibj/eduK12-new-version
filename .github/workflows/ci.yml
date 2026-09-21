@@ -247,6 +247,12 @@ jobs:
           tar -C dist -cf "$temp_artifact" .
           mv "$temp_artifact" "$artifact"
           find "$handoff_dir" -type f -name '*.tar' -mtime +7 -delete
+      # The unknown-package contract imports the generated frontend runner.
+      # This job has its own checkout; dependencies installed by the frontend
+      # job are not available here. Preserve the real import instead of mocking it.
+      - name: frontend dependencies for cross-tree Cognitive package tests
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
       - name: full regression
         # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
         # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
