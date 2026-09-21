@@ -35,7 +35,7 @@ export const scaleDeploymentPolicyV1Schema = z.object({
   deploymentModes: z.array(scaleDeploymentModeSchema).min(1),
   commercialNature: z.enum(['NON_COMMERCIAL', 'COMMERCIAL']),
   requiredRightsActions: z.array(scaleDeploymentRightActionSchema).min(1),
-  authorizationRefs: z.array(z.string().min(1)),
+  authorizationRefs: z.array(z.string().min(1)).min(1),
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   localizationVersion: z.string().min(1).optional(),
   inFlightCompletion: z.literal('FROZEN_DEADLINE'),
@@ -112,9 +112,8 @@ export const evaluateScaleDeployment = (input: {
       && candidate.status === 'REVOKED')
     return !revocations.some(revoked => revoked.version >= row.version && row.status !== 'REVOKED')
   })
-  const boundAuthorizations = policy.authorizationRefs.length
-    ? eligibleLineages.filter(row => policy.authorizationRefs.includes(row.authorizationId)) : eligibleLineages
-  if (policy.authorizationRefs.length && !boundAuthorizations.length && input.authorizations.length) reasons.push('AUTHORIZATION_BINDING_STALE')
+  const boundAuthorizations = eligibleLineages.filter(row => policy.authorizationRefs.includes(row.authorizationId))
+  if (!boundAuthorizations.length && input.authorizations.length) reasons.push('AUTHORIZATION_BINDING_STALE')
   if (input.usageRequirements?.requiredRightsActions.some(action => !scaleDeploymentRightActionSchema.safeParse(action).success)) {
     reasons.push('UNSUPPORTED_RIGHTS_ACTION')
   }
@@ -156,7 +155,7 @@ export const evaluateScaleDeployment = (input: {
     if (!actionAllowed(effective, action)) reasons.push(`RIGHT_${action}_MISSING`)
   }
 
-  if (policy.authorizationRefs.length > 0 && !policy.authorizationRefs.includes(effective.authorizationId)) {
+  if (!policy.authorizationRefs.includes(effective.authorizationId)) {
     reasons.push('AUTHORIZATION_BINDING_STALE')
   }
 
