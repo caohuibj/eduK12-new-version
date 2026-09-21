@@ -18,6 +18,12 @@ import {
   type AssessmentReferenceSetDefinition,
   type ReferenceContext,
 } from '../assessment-reference/reference'
+import { DISCLOSURE_PRESETS } from './policy/disclosure'
+import type { DisclosureCapabilitiesV1, ScaleDisclosureAudience } from './policy/types'
+import { parseVersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot-v2'
+import { projectScaleAttemptForResume, projectScaleCompletedResponse } from './projection/scale-attempt.projector'
+import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from './projection/policy-resolver'
+import type { ScaleProjectionPurpose, ScaleRelationalDisposition } from './projection/types'
 
 export class ScaleDefinitionUnavailableError extends Error {
   constructor(message = '量表尚未安装有效的 v2 definition') {
@@ -137,35 +143,81 @@ export const readScaleResult = (value: unknown): { result: ScaleResultV2 | null;
   }
 }
 
-const scaleMetadataForResponse = (scale: unknown): unknown => {
-  if (!scale || typeof scale !== 'object' || Array.isArray(scale)) return scale
-  const { definition: _definition, ...metadata } = scale as Record<string, unknown>
-  return metadata
+export interface ScaleResponseProjectionOptions {
+  principalId?: string | null
+  audience?: ScaleDisclosureAudience
+  purpose?: ScaleProjectionPurpose
+  accessCapabilities?: DisclosureCapabilitiesV1
+  currentRestrictions?: DisclosureCapabilitiesV1
+  relationalDisposition?: ScaleRelationalDisposition
+  includeResumeAnswers?: boolean
 }
 
-/** Return a response-safe assessment without encrypted JSON columns. */
-export const scaleAssessmentForResponse = (assessment: any): any => {
+const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null) => {
+  const snapshotRead = readJsonField<Record<string, unknown>>(assessment?.runtimeSnapshotEncrypted)
+  if (snapshotRead.decryptError) return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }
+  if (snapshotRead.value) {
+    try {
+      const snapshot = parseVersionedFrozenScaleRuntimeSnapshot(snapshotRead.value)
+      if (snapshot.schemaVersion === 2) return { policy: scaleProjectionPolicyFromCompiled(snapshot.compiledPolicy), snapshotError: false }
+    } catch {
+      return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }
+    }
+  }
+  const instrumentKey = assessment?.scale?.code ?? result?.instrument.code
+  const instrumentVersion = assessment?.scale?.instrumentVersion ?? result?.instrument.instrumentVersion
+  const instrumentClass = assessment?.scale?.instrumentClass
+  if (!instrumentKey || !instrumentVersion) return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: false }
+  return {
+    policy: resolveLegacyScaleProjectionPolicy(instrumentKey, instrumentVersion, instrumentClass),
+    snapshotError: false,
+  }
+}
+
+/**
+ * Strict response projection. Resume and completed DTOs use explicit allowlists;
+ * completed responses never return raw answers. V2 snapshots use their frozen
+ * policy, while known V1 identities use the explicit PR-1 compatibility profile.
+ */
+export const scaleAssessmentForResponse = (
+  assessment: any,
+  options: ScaleResponseProjectionOptions = {},
+): any => {
   const answers = readScaleAnswers(assessment?.answers)
   const result = readScaleResult(assessment?.result)
   const directProvenance = deviceInputProvenanceV1Schema.safeParse(assessment?.deviceInputProvenance)
-  const {
-    answers: _encryptedAnswers,
-    result: _encryptedResult,
-    runtimeSnapshotEncrypted: _runtimeSnapshotEncrypted,
-    deviceInputProvenance: _directDeviceInputProvenance,
-    scale,
-    ...metadata
-  } = assessment ?? {}
-  return {
-    ...metadata,
-    ...(scale !== undefined ? { scale: scaleMetadataForResponse(scale) } : {}),
-    answers: answers.answers,
-    result: result.result,
-    ...(answers.deviceInputProvenance || (directProvenance.success ? directProvenance.data : undefined)
-      ? { deviceInputProvenance: answers.deviceInputProvenance ?? directProvenance.data }
-      : {}),
-    ...(answers.decryptError || result.decryptError ? { decryptError: true } : {}),
+  const full = DISCLOSURE_PRESETS.FULL_REPORT()
+  const resolved = resolveProjectionPolicyForAssessment(assessment, result.result)
+  const audience = options.audience ?? 'respondent'
+  const projectionContext = {
+    principalId: options.principalId ?? null,
+    audience,
+    purpose: options.purpose ?? (assessment?.status === 'COMPLETED' ? 'result' : 'resume'),
+    accessDecision: {
+      source: 'RESOURCE_AUTHORIZATION' as const,
+      allowed: true,
+      capabilities: options.accessCapabilities ?? full,
+    },
+    frozenPolicy: resolved.policy,
+    currentRestrictions: options.currentRestrictions ?? full,
+    relationalDisposition: options.relationalDisposition ?? 'NON_RELATIONAL',
   }
+
+  if (assessment?.status === 'COMPLETED') {
+    return projectScaleCompletedResponse({
+      assessment,
+      result: result.result,
+      context: projectionContext,
+      decryptError: result.decryptError || resolved.snapshotError,
+    })
+  }
+  return projectScaleAttemptForResume({
+    assessment,
+    answers: answers.answers,
+    deviceInputProvenance: answers.deviceInputProvenance ?? (directProvenance.success ? directProvenance.data : undefined),
+    includeAnswers: options.includeResumeAnswers ?? audience === 'respondent',
+    decryptError: answers.decryptError || resolved.snapshotError,
+  })
 }
 
 export const loadScaleReferenceSets = async (instrumentKey: string): Promise<AssessmentReferenceSetDefinition[]> => {

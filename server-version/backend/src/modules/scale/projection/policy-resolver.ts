@@ -1,7 +1,19 @@
+import { DISCLOSURE_PRESETS } from '../policy/disclosure'
 import { getLegacyScaleCompatibilityProfile } from '../policy/legacy-profile'
 import type { CompiledScalePolicyV1 } from '../policy/compile'
-import { denyAllDisclosureCapabilities } from '../policy/disclosure'
 import type { EffectiveScaleDisclosureSnapshot } from './types'
+
+const fullLegacyDisclosure = () => ({
+  schemaVersion: 1 as const,
+  policyVersion: 'legacy-custom-descriptive-v1',
+  audiences: {
+    respondent: DISCLOSURE_PRESETS.FULL_REPORT(),
+    subject: DISCLOSURE_PRESETS.FULL_REPORT(),
+    teacher: DISCLOSURE_PRESETS.FULL_REPORT(),
+    researcher: DISCLOSURE_PRESETS.FULL_REPORT(),
+  },
+  unknownAudience: 'DENY' as const,
+})
 
 const unknownPolicy = (): EffectiveScaleDisclosureSnapshot => ({
   disposition: 'UNKNOWN',
@@ -25,7 +37,11 @@ export const scaleProjectionPolicyFromCompiled = (
 export const resolveLegacyScaleProjectionPolicy = (
   instrumentKey: string,
   instrumentVersion: string,
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null,
 ): EffectiveScaleDisclosureSnapshot => {
+  if (instrumentClass === 'CUSTOM_DESCRIPTIVE') {
+    return { disposition: 'LEGACY_PROFILE', disclosure: fullLegacyDisclosure() }
+  }
   const profile = getLegacyScaleCompatibilityProfile(instrumentKey, instrumentVersion)
   if (!profile) return unknownPolicy()
   return {
@@ -35,7 +51,3 @@ export const resolveLegacyScaleProjectionPolicy = (
 }
 
 export const denyAllScaleProjectionPolicy = unknownPolicy
-
-// Keep this import live as a compile-time guard that the deny policy remains
-// capability-based rather than falling back to a permissive legacy object.
-void denyAllDisclosureCapabilities

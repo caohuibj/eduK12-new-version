@@ -1,0 +1,130 @@
+import type { DeviceInputProvenanceV1 } from '../device-input-provenance'
+import type { ScaleAnswer } from '../scale-scoring'
+import type { ScaleResultV2 } from '../scale-result'
+import { projectScaleResult } from './scale-result.projector'
+import type { ScaleProjectionContext } from './types'
+
+const timeValue = (value: unknown): string | null => {
+  if (!value) return null
+  if (value instanceof Date) return value.toISOString()
+  return typeof value === 'string' ? value : null
+}
+
+const scaleMetadata = (scale: any, result?: ScaleResultV2 | null) => {
+  const instrument = result?.instrument
+  if (!scale && !instrument) return undefined
+  return {
+    id: scale?.id ?? instrument?.scaleId,
+    code: scale?.code ?? instrument?.code,
+    name: scale?.name ?? instrument?.name,
+    ...(scale?.description !== undefined ? { description: scale.description } : {}),
+    ...(scale?.instruction !== undefined ? { instruction: scale.instruction } : {}),
+    ...(scale?.estimatedTime !== undefined ? { estimatedTime: scale.estimatedTime } : {}),
+    instrumentVersion: scale?.instrumentVersion ?? instrument?.instrumentVersion,
+    ...(scale?.instrumentClass !== undefined ? { instrumentClass: scale.instrumentClass } : {}),
+  }
+}
+
+const attemptBase = (assessment: any, result?: ScaleResultV2 | null) => ({
+  id: assessment?.id,
+  status: assessment?.status,
+  scaleId: assessment?.scaleId,
+  progress: assessment?.progress ?? 0,
+  startedAt: timeValue(assessment?.startedAt),
+  completedAt: timeValue(assessment?.completedAt),
+  totalTime: typeof assessment?.totalTime === 'number' ? assessment.totalTime : null,
+  ...(typeof assessment?.answersRevision === 'number' ? { answersRevision: assessment.answersRevision } : {}),
+  ...(typeof assessment?.attemptEpoch === 'number' ? { attemptEpoch: assessment.attemptEpoch } : {}),
+  ...(assessment?.deliveryMode ? { deliveryMode: assessment.deliveryMode } : {}),
+  ...(assessment?.runtimeGeneration ? { runtimeGeneration: assessment.runtimeGeneration } : {}),
+  ...(assessment?.questionnaireAssessmentId ? { questionnaireAssessmentId: assessment.questionnaireAssessmentId } : {}),
+  ...(assessment?.compositeAttemptId ? { compositeAttemptId: assessment.compositeAttemptId } : {}),
+  ...(assessment?.user && typeof assessment.user === 'object' ? {
+    user: {
+      id: assessment.user.id,
+      username: assessment.user.username,
+      nickname: assessment.user.nickname,
+    },
+  } : {}),
+  ...(scaleMetadata(assessment?.scale, result) ? { scale: scaleMetadata(assessment?.scale, result) } : {}),
+})
+
+export const projectScaleAttemptForResume = (input: {
+  assessment: any
+  answers: ScaleAnswer[]
+  deviceInputProvenance?: DeviceInputProvenanceV1
+  includeAnswers: boolean
+  decryptError?: boolean
+}) => ({
+  ...attemptBase(input.assessment),
+  ...(input.includeAnswers ? { answers: input.answers.map((answer) => ({ ...answer })) } : {}),
+  ...(input.includeAnswers && input.deviceInputProvenance ? { deviceInputProvenance: { ...input.deviceInputProvenance } } : {}),
+  ...(input.decryptError ? { decryptError: true } : {}),
+})
+
+const legacyFullResultAlias = (report: ReturnType<typeof projectScaleResult>, result: ScaleResultV2 | null): ScaleResultV2 | null => {
+  if (!result || report.kind !== 'full') return null
+  if (!report.scores || !report.references || !report.interpretations || !report.quality || !report.itemScores || !report.method) return null
+  if (report.interpretations.some((entry) => entry.headline === undefined || !Object.prototype.hasOwnProperty.call(entry, 'label'))) return null
+  return {
+    schemaVersion: 2,
+    instrument: {
+      scaleId: report.instrument.scaleId,
+      code: report.instrument.code,
+      name: report.instrument.name,
+      instrumentVersion: report.instrument.instrumentVersion,
+    },
+    method: {
+      ...report.method,
+      referenceVersions: [...report.method.referenceVersions],
+      assessmentContext: report.method.assessmentContext ? { ...report.method.assessmentContext } : null,
+    },
+    quality: { status: report.quality.status, flags: [...report.quality.flags] },
+    itemScores: report.itemScores.map((item) => ({ ...item })),
+    scores: report.scores.map((score) => ({ ...score })),
+    references: report.references.map((reference) => ({ ...reference })),
+    interpretations: report.interpretations.map((entry) => ({
+      scoreKey: entry.scoreKey,
+      headline: entry.headline as string,
+      label: entry.label ?? null,
+      interpretation: entry.interpretation,
+      guidance: entry.guidance.map((guidance) => ({ ...guidance })),
+      limitations: [...entry.limitations],
+      referenceVersion: entry.referenceVersion,
+    })),
+    caveats: [...(report.caveats ?? [])],
+    disclaimer: report.disclaimer,
+  }
+}
+
+export const projectScaleCompletedResponse = (input: {
+  assessment: any
+  result: ScaleResultV2 | null
+  context: ScaleProjectionContext
+  decryptError?: boolean
+}) => {
+  const scale = scaleMetadata(input.assessment?.scale, input.result)
+  const instrument = {
+    scaleId: scale?.id ?? input.result?.instrument.scaleId ?? input.assessment?.scaleId ?? 'unknown',
+    code: scale?.code ?? input.result?.instrument.code ?? 'unknown',
+    name: scale?.name ?? input.result?.instrument.name ?? '量表',
+    instrumentVersion: scale?.instrumentVersion ?? input.result?.instrument.instrumentVersion ?? 'unknown',
+  }
+  const report = projectScaleResult({
+    result: input.result,
+    instrument,
+    completedAt: input.assessment?.completedAt,
+    totalTime: input.assessment?.totalTime,
+    context: input.context,
+    decryptError: input.decryptError,
+  })
+  return {
+    ...attemptBase(input.assessment, input.result),
+    report,
+    // Transitional compatibility for existing full-report consumers. This is
+    // rebuilt from the strict allowlist projection and is never the stored
+    // authoritative result object. Restricted policies receive null.
+    result: legacyFullResultAlias(report, input.result),
+    ...(input.decryptError ? { decryptError: true } : {}),
+  }
+}
