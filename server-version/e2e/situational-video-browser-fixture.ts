@@ -87,7 +87,7 @@ const main = async () => {
     '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=24:duration=12',
     '-f', 'lavfi', '-i', 'sine=frequency=520:duration=12',
     '-shortest', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '8', '-b:v', '450k',
-    '-c:a', 'libvorbis', '-b:a', '64k', generatedVideo,
+    '-c:a', process.env.SITUATIONAL_VIDEO_E2E_AUDIO_ENCODER || 'libvorbis', '-b:a', '64k', generatedVideo,
   ])
 
   const video = await persistAsset({

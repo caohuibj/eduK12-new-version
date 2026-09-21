@@ -313,12 +313,12 @@ const assertSituationalCompositeItem = (item: {
   return { situationPackage, runtime, definitionHash: validation.definitionHash }
 }
 
-const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }) => {
+const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }, frozenAttempt = false) => {
   if (!config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
     throw compositeBadRequest('认知模块未启用')
   }
   for (const item of composite.items ?? []) {
-    if (item.type === 'SITUATIONAL') assertSituationalCompositeItem(item)
+    if (item.type === 'SITUATIONAL' && !frozenAttempt) assertSituationalCompositeItem(item)
   }
 }
 
@@ -3055,7 +3055,9 @@ const getUnifiedCompositeAttemptState = async (
   if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
     throw compositeConflict('综合测评运行时版本不匹配，请重启测评')
   }
-  assertSupportedComposite(attempt.compositeAssessment)
+  // Publication controls new admission. Existing attempts are validated against
+  // their frozen slot set below, so retiring content cannot break resume/history.
+  assertSupportedComposite(attempt.compositeAssessment, true)
 
   let frozenSlotSet
   try {

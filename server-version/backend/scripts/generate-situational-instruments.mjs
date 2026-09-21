@@ -34,7 +34,7 @@ export function renderManifest(sources) {
     + '\nexport const GENERATED_SITUATIONAL_INSTRUMENT_SOURCES: readonly unknown[] = [\n'
     + sources.map((_, i) => `  { content: instrument${i}, publication: publication${i}, scientific: scientific${i} },`).join('\n') + '\n]\n'
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const out = path.join(moduleRoot, 'onboarding/instruments.generated.ts')
   const result = renderManifest(discoverSources())
   if (process.argv.includes('--check')) {

@@ -1,0 +1,29 @@
+name: Situational publication integrity
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  publication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --ignore-scripts
+        working-directory: server-version/backend
+      - name: Verify exact content, immutable identities and human publication reviews
+        working-directory: server-version/backend
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: npm run situational:onboarding-check -- --all --json --verify-reviews --base "$PUBLICATION_BASE_SHA"
