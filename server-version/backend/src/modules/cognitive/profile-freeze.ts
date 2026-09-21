@@ -8,6 +8,10 @@ import type {
   RegistryEntry,
   SingleTaskReportDefinition,
 } from './cognitive.types'
+import {
+  resolveCognitiveProtocolPresentation,
+  type CognitiveProtocolTier,
+} from './protocol-presentation'
 
 export interface FrozenReportSnapshot {
   profile: CognitiveProfile
@@ -21,6 +25,11 @@ export interface FrozenReportSnapshot {
   metricDefinitions: Record<string, MetricDefinition>
   qualityDefinitions: Record<string, QualityDefinition>
   reportDefinition: SingleTaskReportDefinition
+  /** Publish-prep protocol presentation is frozen with the assignment when reviewed. */
+  protocolTier?: CognitiveProtocolTier
+  profileLabel?: string
+  participantConclusion?: string
+  protocolShowProductIndex?: boolean
 }
 
 const sortValue = (value: unknown): unknown => {
@@ -37,7 +46,7 @@ const sortValue = (value: unknown): unknown => {
 }
 
 export const hashResolvedConfig = (config: unknown): string =>
-  createHash('sha256').update(JSON.stringify(sortValue(config))).digest('hex')
+  createHash('sha256').update(JSON.stringify(sortValue(value))).digest('hex')
 
 export const mergeProfileConfig = <TConfig, TTrial>(
   entry: RegistryEntry<TConfig, TTrial>,
@@ -66,6 +75,12 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 }) => {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
   const profileDefinition = input.entry.profiles[input.profile]
+  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    testType: input.entry.testType,
+    engineVersion: input.entry.engineVersion,
+    scoringVersion: input.entry.scoringVersion,
+    profile: input.profile,
+  })
   const resolvedReport: FrozenReportSnapshot = {
     profile: input.profile,
     randomizationAlgorithmVersion: input.entry.randomizationAlgorithmVersion,
@@ -73,10 +88,16 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     metricDefinitionVersion: input.entry.metricDefinitionVersion,
     qualityDefinitionVersion: input.entry.qualityDefinitionVersion,
     reportDefinitionVersion: input.entry.reportDefinitionVersion,
-    reportCaveats: profileDefinition.reportCaveats,
+    reportCaveats: protocolPresentation?.reportCaveats ?? profileDefinition.reportCaveats,
     metricDefinitions: input.entry.metricDefinitions,
     qualityDefinitions: input.entry.qualityDefinitions,
     reportDefinition: input.entry.reportDefinition,
+    ...(protocolPresentation ? {
+      protocolTier: protocolPresentation.tier,
+      profileLabel: protocolPresentation.profileLabel,
+      participantConclusion: protocolPresentation.participantConclusion,
+      protocolShowProductIndex: protocolPresentation.showProductIndex,
+    } : {}),
   }
   return {
     profile: input.profile,
@@ -98,45 +119,3 @@ export interface FrozenMeasurementContext {
   frozenReport: FrozenReportSnapshot | null
   resolvedConfigHash: string | null
 }
-
-/** 读取发布时冻结的 Profile / 报告快照；缺失时保持 null，不得回填 standard。 */
-export const loadFrozenMeasurementContext = async (
-  db: { cognitiveAssignment: { findUnique: (args: never) => Promise<unknown> } },
-  assignmentId: string | null | undefined,
-): Promise<FrozenMeasurementContext> => {
-  if (!assignmentId) {
-    return { profile: null, frozenReport: null, resolvedConfigHash: null }
-  }
-  const assignment = await db.cognitiveAssignment.findUnique({
-    where: { id: assignmentId },
-    select: {
-      profile: true,
-      resolvedConfigHash: true,
-      resolvedReportSnapshotEncrypted: true,
-    },
-  } as never) as {
-    profile: string | null
-    resolvedConfigHash: string | null
-    resolvedReportSnapshotEncrypted: string | null
-  } | null
-  if (!assignment) {
-    return { profile: null, frozenReport: null, resolvedConfigHash: null }
-  }
-  const profile =
-    assignment.profile === 'experience' || assignment.profile === 'standard' || assignment.profile === 'research'
-      ? assignment.profile
-      : null
-  return {
-    profile,
-    frozenReport: readFrozenReport(assignment.resolvedReportSnapshotEncrypted),
-    resolvedConfigHash: assignment.resolvedConfigHash,
-  }
-}
-
-export const freezeDataForWrite = (freeze: ReturnType<typeof freezeAssignmentProfile>) => ({
-  profile: freeze.profile,
-  profileDefinitionVersion: freeze.profileDefinitionVersion,
-  resolvedConfigSnapshotEncrypted: freeze.resolvedConfigSnapshotEncrypted,
-  resolvedConfigHash: freeze.resolvedConfigHash,
-  resolvedReportSnapshotEncrypted: freeze.resolvedReportSnapshotEncrypted,
-})
