@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "lexicaldecision",
+  "order": 23,
+  "identities": [
+    {
+      "testType": "lexicaldecision",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 26
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "lexicaldecision",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/lexicaldecision.registry.ts",
+      "export": "lexicaldecisionRegistryEntry"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "nback",
+  "order": 6,
+  "identities": [
+    {
+      "testType": "nback",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 9
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "nback",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/nback/nback.registry.ts",
+      "export": "nbackRegistryEntry"
+    }
+  ]
+}

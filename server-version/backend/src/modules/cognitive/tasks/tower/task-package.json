@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "tower",
+  "order": 18,
+  "identities": [
+    {
+      "testType": "tower",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 21
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "tower",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/tower/tower.registry.ts",
+      "export": "towerRegistryEntry"
+    }
+  ]
+}

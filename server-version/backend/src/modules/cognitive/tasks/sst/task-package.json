@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "sst",
+  "order": 8,
+  "identities": [
+    {
+      "testType": "sst",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 11
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "sst",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sst/sst.registry.ts",
+      "export": "sstRegistryEntry"
+    }
+  ]
+}

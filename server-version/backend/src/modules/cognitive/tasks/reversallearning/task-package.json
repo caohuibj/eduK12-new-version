@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "reversallearning",
+  "order": 20,
+  "identities": [
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 23
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
+      "export": "reversallearningRegistryEntry"
+    }
+  ]
+}

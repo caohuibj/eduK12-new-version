@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "trailmaking",
+  "order": 19,
+  "identities": [
+    {
+      "testType": "trailmaking",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 22
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "trailmaking",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts",
+      "export": "trailmakingRegistryEntry"
+    }
+  ]
+}

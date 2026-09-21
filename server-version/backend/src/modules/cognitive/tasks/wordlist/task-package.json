@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "wordlist",
+  "order": 22,
+  "identities": [
+    {
+      "testType": "wordlist",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 25
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "wordlist",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.registry.ts",
+      "export": "wordlistRegistryEntry"
+    }
+  ]
+}

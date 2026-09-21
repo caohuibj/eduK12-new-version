@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "task": "reaction",
+  "order": 1,
+  "identities": [
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 1
+    },
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0",
+      "order": 4
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/reaction/reaction.registry.ts",
+      "export": "reactionRegistryEntry"
+    }
+  ]
+}

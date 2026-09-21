@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "task": "mentalrotation",
+  "order": 17,
+  "identities": [
+    {
+      "testType": "mentalrotation",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 20
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "mentalrotation",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/mentalrotation.registry.ts",
+      "export": "mentalrotationRegistryEntry"
+    }
+  ]
+}

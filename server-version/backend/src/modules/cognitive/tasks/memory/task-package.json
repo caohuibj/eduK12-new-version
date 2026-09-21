@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "task": "memory",
+  "order": 2,
+  "identities": [
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 2
+    },
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0",
+      "order": 5
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/memory/memory.registry.ts",
+      "export": "memoryRegistryEntry"
+    }
+  ]
+}
