@@ -14,7 +14,7 @@ import {
   assessmentVideoPresentationAssetReferences,
   assessmentVideoPresentationSchema,
 } from '../assessment-media/assessment-video'
-import type { FrozenScaleRuntimeSnapshotV1 } from '../assessment-runtime/runtime-snapshot'
+import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import type { ScaleDefinitionV2 } from './scale-definition'
 
 export const scaleAssessmentImageReferences = (definition: ScaleDefinitionV2) => (
@@ -66,7 +66,7 @@ export const retainScaleAssessmentImages = async (input: {
 
 export const retainFrozenScaleAssessmentImages = async (input: {
   assessmentId: string
-  snapshot: FrozenScaleRuntimeSnapshotV1
+  snapshot: VersionedFrozenScaleRuntimeSnapshot
   db: AssetDatabase
 }): Promise<void> => retainScaleAssessmentImages({
   owner: frozenScaleMediaOwner(input.assessmentId),

@@ -15,6 +15,10 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 import { encryptScaleAnswers } from '../../modules/scale/scale-workflow.service'
 import { getQuestionnaireExportData, getScaleExportData } from '../../services/exportService'
+import {
+  getQuestionnaireExportData as getInternalQuestionnaireExportData,
+  getScaleExportData as getInternalScaleExportData,
+} from '../../services/exportService.legacy'
 
 const definition = {
   items: [{ itemCode: 'Q1', content: '题目 1' }],
@@ -45,8 +49,14 @@ beforeEach(() => {
 })
 
 describe('Scale response and device provenance export', () => {
-  it('exports standalone attempt provenance beside responseTimeMs', async () => {
-    mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-1', name: '测试量表', definition })
+  it('keeps provenance in the internal export dataset but removes it from the default teacher projection', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({
+      id: 'scale-1',
+      name: '测试量表',
+      code: 'adexi_v1',
+      instrumentVersion: '2.0.0',
+      definition,
+    })
     mockPrisma.assessment.findMany.mockResolvedValue([{
       userId: 'user-1',
       user: null,
@@ -57,19 +67,8 @@ describe('Scale response and device provenance export', () => {
       result: null,
     }])
 
-    const data = await getScaleExportData('scale-1')
-    const names = data.fields.map((field) => field.name)
-    expect(names).toEqual(expect.arrayContaining([
-      'DEVICE_CLASS',
-      'DEVICE_OS_FAMILY',
-      'DEVICE_BROWSER_FAMILY',
-      'DEVICE_VIEWPORT_WIDTH',
-      'DEVICE_SCREEN_HEIGHT',
-      'DEVICE_PRIMARY_POINTER',
-      'DEVICE_CAPTURED_AT',
-      'RT_q1',
-    ]))
-    expect(data.rows[0]).toMatchObject({
+    const internal = await getInternalScaleExportData('scale-1')
+    expect(internal.rows[0]).toMatchObject({
       DEVICE_CLASS: 'TABLET',
       DEVICE_OS_FAMILY: 'Android',
       DEVICE_BROWSER_FAMILY: 'Chrome',
@@ -79,14 +78,31 @@ describe('Scale response and device provenance export', () => {
       DEVICE_CAPTURED_AT: '2026-09-08T00:00:00.000Z',
       RT_q1: 1234,
     })
+
+    const projected = await getScaleExportData('scale-1')
+    const names = projected.fields.map((field) => field.name)
+    expect(names).not.toEqual(expect.arrayContaining([
+      'DEVICE_CLASS',
+      'DEVICE_OS_FAMILY',
+      'DEVICE_BROWSER_FAMILY',
+      'DEVICE_VIEWPORT_WIDTH',
+      'DEVICE_SCREEN_HEIGHT',
+      'DEVICE_PRIMARY_POINTER',
+      'DEVICE_CAPTURED_AT',
+      'RT_q1',
+      'Q_V_q1',
+    ]))
+    expect(JSON.stringify(projected.rows[0])).not.toContain('TABLET')
+    expect(JSON.stringify(projected.rows[0])).not.toContain('1234')
+    expect(JSON.stringify(projected.rows[0])).not.toContain('yes')
   })
 
-  it('exports questionnaire Scale provenance and leaves historical missing provenance null', async () => {
+  it('keeps questionnaire provenance internally while the audience-safe export strips raw response provenance', async () => {
     mockPrisma.questionnaire.findUnique.mockResolvedValue({
       id: 'questionnaire-1',
       formItems: [],
       questionnaireScales: [{
-        scale: { id: 'scale-1', name: '测试量表', code: 'TEST', instrumentVersion: '1.0.0', definition },
+        scale: { id: 'scale-1', name: '测试量表', code: 'adexi_v1', instrumentVersion: '2.0.0', definition },
       }],
     })
     mockPrisma.questionnaireAssessment.findMany.mockResolvedValue([{
@@ -101,12 +117,20 @@ describe('Scale response and device provenance export', () => {
       ],
     }])
 
-    const data = await getQuestionnaireExportData('questionnaire-1')
-    expect(data.rows[0]).toMatchObject({
+    const internal = await getInternalQuestionnaireExportData('questionnaire-1')
+    expect(internal.rows[0]).toMatchObject({
       S1_DEVICE_CLASS: 'TABLET',
       S1_DEVICE_CAPTURED_AT: '2026-09-08T00:00:00.000Z',
       S1_RT_q1: 1234,
     })
+
+    const projected = await getQuestionnaireExportData('questionnaire-1')
+    expect(projected.fields.map((field) => field.name)).not.toEqual(expect.arrayContaining([
+      'S1_DEVICE_CLASS',
+      'S1_DEVICE_CAPTURED_AT',
+      'S1_RT_q1',
+      'S1_Q_V_q1',
+    ]))
 
     mockPrisma.questionnaireAssessment.findMany.mockResolvedValueOnce([{
       userId: null,
@@ -117,8 +141,8 @@ describe('Scale response and device provenance export', () => {
       formAnswers: [],
       scaleAssessments: [{ scaleId: 'scale-1', status: 'COMPLETED', answers: encryptScaleAnswers([{ itemCode: 'Q1', responseValue: 'yes' }]), result: null }],
     }])
-    const historical = await getQuestionnaireExportData('questionnaire-1')
-    expect(historical.rows[0].S1_DEVICE_CLASS).toBeNull()
-    expect(historical.rows[0].S1_RT_q1).toBeNull()
+    const historicalInternal = await getInternalQuestionnaireExportData('questionnaire-1')
+    expect(historicalInternal.rows[0].S1_DEVICE_CLASS).toBeNull()
+    expect(historicalInternal.rows[0].S1_RT_q1).toBeNull()
   })
 })

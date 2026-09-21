@@ -53,7 +53,7 @@ import {
   SDQ_TEACHER_OVERALL_ITEM,
   sdqTeacherT410Scorer,
 } from "../../modules/scale/packages/sdq-teacher-impact-scorer"
-import { isTexiLocalizationManifestSigned } from "../../modules/scale/localization/texi-localization-manifest"
+import { getScaleInstrumentLocalization } from "../../modules/scale/onboarding/instrument-registry"
 
 const HASH_A = "a".repeat(64)
 const HASH_B = "b".repeat(64)
@@ -107,7 +107,7 @@ describe("Commit 16 Bundle release gates (contract; no Docker)", () => {
       expect(validated.bundleKey).toBe(pkg.bundleKey)
       expect(validated.status).toBe("DRAFT")
     }
-    expect(isTexiLocalizationManifestSigned()).toBe(false)
+    expect(getScaleInstrumentLocalization("texi_parent_zh_cn", "1.0.0")?.reviewStatus).toBe("PENDING")
   })
 
   it("covers observer paths and standalone package freeze", () => {

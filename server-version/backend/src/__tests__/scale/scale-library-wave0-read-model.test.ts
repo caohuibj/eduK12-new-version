@@ -181,17 +181,17 @@ describe('Wave 0 Scale Library read model', () => {
     const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.governance?.scientificMaturity).toBe('PILOT')
-    expect(who5.governance?.evidence).toEqual([])
+    expect(who5.governance?.evidence).toHaveLength(1)
     expect(who5.source.citation).toContain('World Health Organization')
     expect(who5.governance?.gate.reportEligibility.maxEligibleLevel).toBe('L2_DESCRIPTIVE')
-    expect(who5.evidence.recordCount).toBe(0)
-    expect(who5.evidence.status).toBe('NO_EVIDENCE_RECORDED')
+    expect(who5.evidence.recordCount).toBe(1)
+    expect(who5.evidence.status).toBe('EVIDENCE_RECORDED')
     expect(who5.evidence.coverageText).toContain('Scientific Evidence Matrix')
-    expect(who5.evidence.coverageText).toContain('不作验证、常模或诊断声称')
+    expect(who5.evidence.coverageText).toContain('不作超出样本的验证、常模或诊断声称')
 
     const sdqParent = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_parent_zh_cn')!
     expect(sdqParent.source.citation).toContain('Goodman R.')
-    expect(sdqParent.governance?.evidence).toEqual([])
-    expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toEqual([])
+    expect(sdqParent.governance?.evidence).toHaveLength(1)
+    expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toHaveLength(3)
   })
 })

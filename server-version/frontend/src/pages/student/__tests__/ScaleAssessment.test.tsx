@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
@@ -171,12 +171,27 @@ describe('ScaleAssessment answer navigation', () => {
     await waitFor(() => expect(lastOption).toBeChecked())
     expect(screen.getByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
     expect(mockPost).toHaveBeenCalledTimes(1)
-    expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments')
+    expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments', undefined)
 
     await user.click(screen.getByRole('button', { name: '完成测评' }))
     await waitFor(() => expect(mockPatch).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2))
     expect(mockPost).toHaveBeenLastCalledWith(expect.stringMatching(/^\/scales\/assessments\/assessment-complete-\d+\/complete$/))
     expect(await screen.findByText('RESULT_PAGE')).toBeInTheDocument()
+  })
+})
+
+
+describe('ScaleAssessment context preflight', () => {
+  it('collects only required facts and does not display items before admission', async () => {
+    mockPost.mockResolvedValueOnce({ code: 0, data: { preflight: { kind: 'CONTEXT_REQUIRED', requiredContextKeys: ['birthYearMonth'] } } })
+    renderPage()
+    const month = await screen.findByLabelText('出生年月')
+    expect(screen.queryByText('第一题内容')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('年级')).not.toBeInTheDocument()
+    fireEvent.change(month, { target: { value: '2010-09' } })
+    await userEvent.click(screen.getByRole('button', { name: '确认并开始' }))
+    await screen.findByRole('heading', { name: '第一题内容' })
+    expect(mockPost).toHaveBeenCalledWith('/scales/scale-1/assessments', { context: { birthYearMonth: '2010-09' } })
   })
 })

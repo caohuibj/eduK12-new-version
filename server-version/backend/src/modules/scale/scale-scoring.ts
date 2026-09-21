@@ -98,6 +98,7 @@ export type ScaleCustomScorer = (input: ScaleCustomScorerInput) => ScaleCustomSc
 const customScorerRegistry = new Map<string, ScaleCustomScorer>()
 
 export const registerScaleCustomScorer = (key: string, scorer: ScaleCustomScorer): void => {
+  if (customScorerRegistry.has(key)) throw new Error(`Scale custom scorer already registered: ${key}`)
   customScorerRegistry.set(key, scorer)
 }
 

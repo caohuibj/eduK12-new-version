@@ -7,7 +7,7 @@ import {
   amendApprovedInstrumentAuthorization,
   approveInstrumentAuthorization,
 } from '../../modules/assessment-authorization/records'
-import { TEXI_LOCALIZATION_MANIFEST_PENDING } from '../../modules/scale/localization/texi-localization-manifest'
+import { getScaleInstrumentLocalization } from '../../modules/scale/onboarding/instrument-registry'
 import { parseScaleCatalogManifest } from '../../modules/scale/library/catalog-manifest'
 import { createScaleCatalogRegistry } from '../../modules/scale/library/catalog-registry'
 import { getScalePackage } from '../../modules/scale/scale-package.registry'
@@ -67,9 +67,7 @@ describe('Scale Library catalog version semantics (SL1-C7)', () => {
     if (result.ok) {
       expect('localization' in result.manifest).toBe(false)
     }
-    // 当前本地化版本轴由 TEXI fixedSourceVersion 承担，SL2-C1 才泛化为
-    // LocalizationManifestV1.localizationVersion。
-    expect(TEXI_LOCALIZATION_MANIFEST_PENDING.fixedSourceVersion.length).toBeGreaterThan(0)
+    expect(getScaleInstrumentLocalization('texi_parent_zh_cn', '1.0.0')?.localizationVersion).toBe('1.0.0')
   })
 
   it('allows catalog content changes to bump only catalogManifestVersion', () => {

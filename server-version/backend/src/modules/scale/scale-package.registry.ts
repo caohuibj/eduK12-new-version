@@ -1,59 +1,39 @@
-import { registerScaleCustomScorer } from './scale-scoring'
-import { SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer } from './packages/sdq-teacher-impact-scorer'
-import { ADEXI_V2_PACKAGE as ADEXI_V2_PACKAGE_SOURCE, type ScaleGoldenCase } from './packages/adexi-v2'
-import { WHO5_ZH_CN_V1_PACKAGE as WHO5_ZH_CN_V1_PACKAGE_SOURCE } from './packages/who5-zh-cn-v1'
-import { SDQ_PARENT_ZH_CN_V1_PACKAGE as SDQ_PARENT_ZH_CN_V1_PACKAGE_SOURCE } from './packages/sdq-parent-zh-cn-v1'
-import { SDQ_TEACHER_EN_T4_10_V1_PACKAGE as SDQ_TEACHER_EN_T4_10_V1_PACKAGE_SOURCE } from './packages/sdq-teacher-en-t4-10-v1'
-import { TEXI_PARENT_EN_V1_PACKAGE as TEXI_PARENT_EN_V1_PACKAGE_SOURCE, TEXI_TEACHER_EN_V1_PACKAGE as TEXI_TEACHER_EN_V1_PACKAGE_SOURCE } from './packages/texi-en-v1'
-import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue, type ScaleDefinitionV2 } from './scale-definition'
+import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue } from './scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from './scale-scoring'
-import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
+import { validateReferenceSetDefinition } from '../assessment-reference/reference'
+import {
+  getExecutableScalePackage,
+  hasExecutableScalePackage,
+  listExecutableScalePackages,
+} from './onboarding/executable-registry'
+import type { ScaleGoldenCase, ScalePackageV2 } from './onboarding/types'
 
-export interface ScalePackageV2 {
-  key: string
-  instrumentVersion: string
-  releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
-  definition: ScaleDefinitionV2
-  references: AssessmentReferenceSetDefinition[]
-  goldenCases: ScaleGoldenCase[]
+export type { ScaleGoldenCase, ScalePackageV2 } from './onboarding/types'
+
+const requirePackage = (key: string, version: string): ScalePackageV2 => {
+  const pkg = getExecutableScalePackage(key, version)
+  if (!pkg) throw new Error(`Missing generated Scale package: ${key}@${version}`)
+  return pkg
 }
 
-registerScaleCustomScorer(SDQ_TEACHER_SCORER_KEY, sdqTeacherT410Scorer)
+// Compatibility named exports. The executable projection preserves the exact
+// legacy identities and PUBLISHED normalization without importing Library data.
+export const ADEXI_V2_PACKAGE = requirePackage('adexi_v1', '2.0.0')
+export const WHO5_ZH_CN_V1_PACKAGE = requirePackage('who5', '1.0.0')
+export const SDQ_PARENT_ZH_CN_V1_PACKAGE = requirePackage('sdq_parent_zh_cn', '1.0.0')
+export const SDQ_TEACHER_EN_T4_10_V1_PACKAGE = requirePackage('sdq_teacher_zh_cn', '1.0.0')
+export const TEXI_PARENT_EN_V1_PACKAGE = requirePackage('texi_parent_zh_cn', '1.0.0')
+export const TEXI_TEACHER_EN_V1_PACKAGE = requirePackage('texi_teacher_zh_cn', '1.0.0')
 
-/**
- * Wave-0 package source files predate the converged lifecycle model and some
- * still carry legacy DRAFT literals. The registry is the authoritative product
- * catalog, so executable-complete packages are normalized here to PUBLISHED.
- * Scientific maturity, rights and deployment suitability remain separate.
- */
-const publishExecutablePackage = (pkg: ScalePackageV2): ScalePackageV2 => ({
-  ...pkg,
-  releaseStatus: 'PUBLISHED',
-})
+export const getScalePackage = (key: string, instrumentVersion: string): ScalePackageV2 | undefined => (
+  getExecutableScalePackage(key, instrumentVersion)
+)
 
-export const ADEXI_V2_PACKAGE = publishExecutablePackage(ADEXI_V2_PACKAGE_SOURCE)
-export const WHO5_ZH_CN_V1_PACKAGE = publishExecutablePackage(WHO5_ZH_CN_V1_PACKAGE_SOURCE)
-export const SDQ_PARENT_ZH_CN_V1_PACKAGE = publishExecutablePackage(SDQ_PARENT_ZH_CN_V1_PACKAGE_SOURCE)
-export const SDQ_TEACHER_EN_T4_10_V1_PACKAGE = publishExecutablePackage(SDQ_TEACHER_EN_T4_10_V1_PACKAGE_SOURCE)
-export const TEXI_PARENT_EN_V1_PACKAGE = publishExecutablePackage(TEXI_PARENT_EN_V1_PACKAGE_SOURCE)
-export const TEXI_TEACHER_EN_V1_PACKAGE = publishExecutablePackage(TEXI_TEACHER_EN_V1_PACKAGE_SOURCE)
+export const listScalePackages = (): ScalePackageV2[] => listExecutableScalePackages()
 
-const packages: ScalePackageV2[] = [
-  ADEXI_V2_PACKAGE,
-  WHO5_ZH_CN_V1_PACKAGE,
-  SDQ_PARENT_ZH_CN_V1_PACKAGE,
-  SDQ_TEACHER_EN_T4_10_V1_PACKAGE,
-  TEXI_PARENT_EN_V1_PACKAGE,
-  TEXI_TEACHER_EN_V1_PACKAGE,
-]
-
-const packageByKey = new Map(packages.map((scalePackage) => [`${scalePackage.key}:${scalePackage.instrumentVersion}`, scalePackage]))
-
-export const getScalePackage = (key: string, instrumentVersion: string): ScalePackageV2 | undefined => packageByKey.get(`${key}:${instrumentVersion}`)
-
-export const listScalePackages = (): ScalePackageV2[] => [...packages]
-
-export const hasScalePackage = (key: string, instrumentVersion: string): boolean => packageByKey.has(`${key}:${instrumentVersion}`)
+export const hasScalePackage = (key: string, instrumentVersion: string): boolean => (
+  hasExecutableScalePackage(key, instrumentVersion)
+)
 
 export interface ScalePackageValidation {
   valid: boolean
@@ -82,14 +62,11 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
   })
   const issues = [...identityIssues, ...validation.issues]
 
-  // These are product capability constraints, not scientific/rights gates.
   if (scalePackage.definition.display.randomizeItems) {
     issues.push({ path: 'display.randomizeItems', message: '当前 Runner 不支持题目随机化', severity: 'error' })
   }
   scalePackage.definition.items.forEach((item, index) => {
-    if (item.randomizeOptions) {
-      issues.push({ path: `items.${index}.randomizeOptions`, message: '当前 Runner 不支持选项随机化', severity: 'error' })
-    }
+    if (item.randomizeOptions) issues.push({ path: `items.${index}.randomizeOptions`, message: '当前 Runner 不支持选项随机化', severity: 'error' })
   })
   if (scalePackage.goldenCases.length === 0) {
     issues.push({ path: 'goldenCases', message: '标准量表缺少 golden scoring fixture', severity: 'error' })
@@ -100,29 +77,15 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
   scalePackage.references.forEach((reference, referenceIndex) => {
     const path = `references.${referenceIndex}`
     const referenceValidation = validateReferenceSetDefinition(reference)
-    referenceValidation.issues.forEach((issue) => {
-      issues.push({ path: `${path}.${issue.path}`, message: issue.message, severity: issue.severity })
-    })
-    if (reference.instrumentType !== 'scale') {
-      issues.push({ path: `${path}.instrumentType`, message: 'Scale package 只能携带 instrumentType=scale 的 reference', severity: 'error' })
-    }
-    if (reference.instrumentKey !== scalePackage.key) {
-      issues.push({ path: `${path}.instrumentKey`, message: `reference instrumentKey 必须等于 package key：${scalePackage.key}`, severity: 'error' })
-    }
-    if (referenceVersions.has(reference.referenceVersion)) {
-      issues.push({ path: `${path}.referenceVersion`, message: '同一 package 不能重复声明 referenceVersion', severity: 'error' })
-    }
+    referenceValidation.issues.forEach((issue) => issues.push({ path: `${path}.${issue.path}`, message: issue.message, severity: issue.severity }))
+    if (reference.instrumentType !== 'scale') issues.push({ path: `${path}.instrumentType`, message: 'Scale package 只能携带 instrumentType=scale 的 reference', severity: 'error' })
+    if (reference.instrumentKey !== scalePackage.key) issues.push({ path: `${path}.instrumentKey`, message: `reference instrumentKey 必须等于 package key：${scalePackage.key}`, severity: 'error' })
+    if (referenceVersions.has(reference.referenceVersion)) issues.push({ path: `${path}.referenceVersion`, message: '同一 package 不能重复声明 referenceVersion', severity: 'error' })
     referenceVersions.add(reference.referenceVersion)
     reference.entries.forEach((entry, entryIndex) => {
-      if (!scoreKeys.has(entry.scoreKey)) {
-        issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference 引用了不存在的 score：${entry.scoreKey}`, severity: 'error' })
-      }
-      if (entry.instrumentVersion !== scalePackage.instrumentVersion) {
-        issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 必须与 package 一致', severity: 'error' })
-      }
-      if (entry.scoringVersion !== scalePackage.definition.scoring.scoringVersion) {
-        issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 必须与 definition 一致', severity: 'error' })
-      }
+      if (!scoreKeys.has(entry.scoreKey)) issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference 引用了不存在的 score：${entry.scoreKey}`, severity: 'error' })
+      if (entry.instrumentVersion !== scalePackage.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 必须与 package 一致', severity: 'error' })
+      if (entry.scoringVersion !== scalePackage.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 必须与 definition 一致', severity: 'error' })
     })
   })
   if (scalePackage.definition.referencePolicy.type === 'none' && scalePackage.references.length > 0) {
@@ -132,9 +95,7 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
     const declaredKeys = new Set<string>()
     scalePackage.definition.referencePolicy.selections.forEach((selection, selectionIndex) => {
       const selectionKey = `${selection.scoreKey}:${selection.referenceVersion}:${selection.referenceKind}`
-      if (declaredKeys.has(selectionKey)) {
-        issues.push({ path: `definition.referencePolicy.selections.${selectionIndex}`, message: 'reference selection 不能重复', severity: 'error' })
-      }
+      if (declaredKeys.has(selectionKey)) issues.push({ path: `definition.referencePolicy.selections.${selectionIndex}`, message: 'reference selection 不能重复', severity: 'error' })
       declaredKeys.add(selectionKey)
       const reference = scalePackage.references.find((candidate) => candidate.referenceVersion === selection.referenceVersion)
       if (!reference) {
@@ -142,12 +103,8 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
         return
       }
       const entry = reference.entries.find((candidate) => candidate.scoreKey === selection.scoreKey && candidate.referenceKind === selection.referenceKind)
-      if (!entry) {
-        issues.push({ path: `definition.referencePolicy.selections.${selectionIndex}`, message: 'package reference 中缺少与 selection 匹配的 scoreKey/referenceKind', severity: 'error' })
-      }
-      if (reference.status !== 'ACTIVE') {
-        issues.push({ path: `references.${scalePackage.references.indexOf(reference)}.status`, message: '当前报告 contract 使用的 reference 必须为 ACTIVE', severity: 'error' })
-      }
+      if (!entry) issues.push({ path: `definition.referencePolicy.selections.${selectionIndex}`, message: 'package reference 中缺少与 selection 匹配的 scoreKey/referenceKind', severity: 'error' })
+      if (reference.status !== 'ACTIVE') issues.push({ path: `references.${scalePackage.references.indexOf(reference)}.status`, message: '当前报告 contract 使用的 reference 必须为 ACTIVE', severity: 'error' })
     })
   }
   if (hashScaleDefinition(scalePackage.definition) !== hashScaleDefinition(validation.definition ?? scalePackage.definition)) {
@@ -160,7 +117,7 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
   } catch (error) {
     issues.push({ path: 'runner', message: error instanceof Error ? error.message : 'Runner definition 无法构建', severity: 'error' })
   }
-  scalePackage.goldenCases.forEach((fixture, index) => {
+  scalePackage.goldenCases.forEach((fixture: ScaleGoldenCase, index) => {
     try {
       const output = scoreScale(scalePackage.definition, fixture.answers)
       if (output.quality.status !== fixture.expected.quality) issues.push({ path: `goldenCases.${index}.quality`, message: `golden case ${fixture.name} 的 quality 不匹配`, severity: 'error' })
