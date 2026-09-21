@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -285,12 +285,13 @@ export const createScaleAdmissionForRuntime = async (input: {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结策略与当前部署绑定不匹配', 409)
   }
 
+  const resolvedRespondentType = resolveScalePolicyRespondentType({
+    respondentType: input.respondentType,
+    subjectUserId: input.subjectUserId,
+    respondentUserId: input.respondentUserId,
+  })
   const eligibility = evaluateInstrumentEligibility(input.runtime.compiledPolicy.applicability, {
-    respondentType: resolveScalePolicyRespondentType({
-      respondentType: input.respondentType,
-      subjectUserId: input.subjectUserId,
-      respondentUserId: input.respondentUserId,
-    }),
+    respondentType: resolvedRespondentType,
     subject: {
       ageMonths: input.contextValues?.ageMonthsAtFreeze,
       gradeLevel: input.contextValues?.gradeLevel,
@@ -311,6 +312,7 @@ export const createScaleAdmissionForRuntime = async (input: {
     parent: input.parent,
     subjectUserId: input.subjectUserId ?? null,
     respondentUserId: input.respondentUserId ?? null,
+    respondentType: resolvedRespondentType,
   })
   const frozenEligibility: FrozenEligibilityDecisionV1 = {
     schemaVersion: 1,
@@ -390,14 +392,18 @@ export const standaloneAdmissionPersistenceForRuntime = async (input: {
   return versionedFrozenAdmissionPersistence(snapshot)
 }
 
-const persistAdmission = async <T extends VersionedFrozenUnitAdmission>(assessmentId: string, snapshot: T): Promise<T> => (
+const persistAdmission = async <T extends VersionedFrozenUnitAdmission>(
+  db: Db,
+  assessmentId: string,
+  snapshot: T,
+): Promise<T> => (
   persistVersionedAdmissionOnce({
     snapshot,
-    writeIfEmpty: (persisted) => prisma.assessment.updateMany({
+    writeIfEmpty: (persisted) => db.assessment.updateMany({
       where: { id: assessmentId, frozenAdmissionSnapshotHash: null },
       data: persisted,
     }),
-    read: () => prisma.assessment.findUnique({
+    read: () => db.assessment.findUnique({
       where: { id: assessmentId },
       select: {
         frozenAdmissionSnapshotEncrypted: true,
@@ -459,17 +465,14 @@ const validateStoredAgainstRuntime = (
   return assertReady(stored)
 }
 
-export const activateScaleAdmission = async (
+const activateUnstoredScaleAdmission = async (
+  db: Db,
   row: ScaleAdmissionChildRow,
+  runtime: VersionedFrozenScaleRuntimeSnapshot,
   parent?: CompositeScaleAdmissionParent,
 ): Promise<VersionedFrozenUnitAdmission> => {
-  const stored = readStoredScaleAdmission(row)
-  if (stored) return validateStoredAgainstRuntime(row, stored)
-  assertFinalOnly(row.deliveryMode)
-  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
-
   if (row.questionnaireAssessmentId) {
-    const loadedParent = await prisma.questionnaireAssessment.findUnique({
+    const loadedParent = await db.questionnaireAssessment.findUnique({
       where: { id: row.questionnaireAssessmentId },
       select: {
         id: true,
@@ -515,7 +518,7 @@ export const activateScaleAdmission = async (
       ? 'PUBLIC_QUESTIONNAIRE'
       : 'QUESTIONNAIRE'
     const snapshot = await createScaleAdmissionForRuntime({
-      db: prisma,
+      db,
       attemptEpoch: row.attemptEpoch,
       scale: row.scale,
       principal: {
@@ -540,11 +543,11 @@ export const activateScaleAdmission = async (
       respondentUserId: row.respondentUserId,
       legacyRequiresContext,
     })
-    return assertReady(await persistAdmission(row.id, snapshot))
+    return assertReady(await persistAdmission(db, row.id, snapshot))
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
+    const loaded = parent ?? await db.compositeAssessmentAttempt.findUnique({
       where: { id: row.compositeAttemptId },
       select: {
         id: true,
@@ -581,7 +584,7 @@ export const activateScaleAdmission = async (
     const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
     const snapshot = await createScaleAdmissionForRuntime({
-      db: prisma,
+      db,
       attemptEpoch: row.attemptEpoch,
       scale: row.scale,
       principal: {
@@ -606,11 +609,11 @@ export const activateScaleAdmission = async (
       respondentUserId: row.respondentUserId,
       legacyRequiresContext,
     })
-    return assertReady(await persistAdmission(row.id, snapshot))
+    return assertReady(await persistAdmission(db, row.id, snapshot))
   }
 
   const snapshot = await createScaleAdmissionForRuntime({
-    db: prisma,
+    db,
     attemptEpoch: row.attemptEpoch,
     scale: row.scale,
     principal: { userId: row.userId, questionnaireSessionId: null, recoveryTokenHash: null },
@@ -625,5 +628,21 @@ export const activateScaleAdmission = async (
     respondentUserId: row.userId,
     legacyRequiresContext: false,
   })
-  return assertReady(await persistAdmission(row.id, snapshot))
+  return assertReady(await persistAdmission(db, row.id, snapshot))
+}
+
+export const activateScaleAdmission = async (
+  row: ScaleAdmissionChildRow,
+  parent?: CompositeScaleAdmissionParent,
+): Promise<VersionedFrozenUnitAdmission> => {
+  const stored = readStoredScaleAdmission(row)
+  if (stored) return validateStoredAgainstRuntime(row, stored)
+  assertFinalOnly(row.deliveryMode)
+  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
+
+  return prisma.$transaction(
+    (tx) => activateUnstoredScaleAdmission(tx, row, runtime, parent),
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  )
 }
