@@ -2,7 +2,6 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { evaluateScientificQualification } from '../../modules/assessment-governance/scientific-qualification'
-import { productNotReady, productReady } from '../../modules/assessment-governance/product-readiness'
 
 const MODULE_ROOT = resolve(process.cwd(), 'src/modules')
 
@@ -44,15 +43,28 @@ describe('assessment qualification governance boundaries', () => {
     }
   })
 
-  it('defines Pilot as product-ready without requiring research evidence', () => {
+  it('keeps scientific qualification independent of product-readiness and release modules', () => {
+    const files = [
+      'assessment-governance/scientific-qualification.ts',
+      'scale/library/scientific-qualification.ts',
+      'cognitive/library/scientific-qualification.ts',
+      'situational/scientific-qualification.ts',
+    ]
+    for (const file of files) {
+      const source = readModule(file)
+      expect(source, file).not.toMatch(/productReadiness|product-readiness|releaseStatus|publication\.status|CognitiveTestConfig/u)
+    }
+  })
+
+  it('defines Pilot as the default lowest evidence maturity without research evidence', () => {
     const result = evaluateScientificQualification({
-      productReadiness: productReady(),
       hasResearchFoundation: false,
       hasTraceableProvenance: false,
       hasEmpiricalReference: false,
       hasFormalResearchOutput: false,
     })
     expect(result.pilot.eligible).toBe(true)
+    expect(result.pilot.blockers).toEqual([])
     expect(result.researchReady.eligible).toBe(false)
     expect(result.researchGrade.eligible).toBe(false)
     expect(result.maxEligibleMaturity).toBe('PILOT')
@@ -60,7 +72,6 @@ describe('assessment qualification governance boundaries', () => {
 
   it('requires research foundation + provenance for Research Ready', () => {
     const result = evaluateScientificQualification({
-      productReadiness: productReady(),
       hasResearchFoundation: true,
       hasTraceableProvenance: true,
       hasEmpiricalReference: false,
@@ -76,7 +87,6 @@ describe('assessment qualification governance boundaries', () => {
 
   it('requires empirical reference evidence and formal output for Research Grade', () => {
     const result = evaluateScientificQualification({
-      productReadiness: productReady(),
       hasResearchFoundation: true,
       hasTraceableProvenance: true,
       hasEmpiricalReference: true,
@@ -84,17 +94,5 @@ describe('assessment qualification governance boundaries', () => {
     })
     expect(result.researchGrade.eligible).toBe(true)
     expect(result.maxEligibleMaturity).toBe('RESEARCH_GRADE')
-  })
-
-  it('never qualifies scientific maturity when product readiness fails', () => {
-    const result = evaluateScientificQualification({
-      productReadiness: productNotReady([{ stage: 'PRESENTATION', code: 'NO_RENDERER', message: 'renderer missing' }]),
-      hasResearchFoundation: true,
-      hasTraceableProvenance: true,
-      hasEmpiricalReference: true,
-      hasFormalResearchOutput: true,
-    })
-    expect(result.maxEligibleMaturity).toBeNull()
-    expect(result.pilot.blockers).toEqual(['PRODUCT_NOT_READY'])
   })
 })
