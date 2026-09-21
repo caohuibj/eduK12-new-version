@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "identities": [
+    {
+      "testType": "fake",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "stroop",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "stroop",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "gonogo",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "cpt",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "nback",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "corsi",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sst",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "taskswitch",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "patterncompare",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "flanker",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "cardsort",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "digitbackward",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "picturesequence",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "pairedassociate",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "matrix",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "mentalrotation",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "tower",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "trailmaking",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "bart",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "wordlist",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "lexicaldecision",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "emotionrecognition",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    }
+  ],
+  "runners": [
+    {
+      "testType": "fake",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "reaction",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "memory",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "stroop",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "gonogo",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "cpt",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "nback",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "corsi",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "sst",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "taskswitch",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "patterncompare",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "flanker",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "cardsort",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "digitbackward",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "picturesequence",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "pairedassociate",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "matrix",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "mentalrotation",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "tower",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "trailmaking",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "bart",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "wordlist",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "lexicaldecision",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "emotionrecognition",
+      "engineVersion": "1.0.0"
+    }
+  ]
+}

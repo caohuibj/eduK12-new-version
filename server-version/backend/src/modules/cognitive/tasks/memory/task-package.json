@@ -27,5 +27,17 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/memory/memory.registry.ts",
       "export": "memoryRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      2,
+      5
+    ]
+  }
 }

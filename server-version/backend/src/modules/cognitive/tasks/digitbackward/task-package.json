@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts",
       "export": "digitbackwardRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      16
+    ]
+  }
 }

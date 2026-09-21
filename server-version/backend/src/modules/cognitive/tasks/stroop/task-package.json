@@ -27,5 +27,17 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/stroop/stroop.registry.ts",
       "export": "stroopRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      3,
+      6
+    ]
+  }
 }

@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.registry.ts",
       "export": "wordlistRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      25
+    ]
+  }
 }

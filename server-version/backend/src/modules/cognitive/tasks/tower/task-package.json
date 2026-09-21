@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/tower/tower.registry.ts",
       "export": "towerRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      21
+    ]
+  }
 }

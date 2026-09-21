@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/cardsort/cardsort.registry.ts",
       "export": "cardsortRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      15
+    ]
+  }
 }

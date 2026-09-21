@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts",
       "export": "trailmakingRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      22
+    ]
+  }
 }

@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/cpt/cpt.registry.ts",
       "export": "cptRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      8
+    ]
+  }
 }

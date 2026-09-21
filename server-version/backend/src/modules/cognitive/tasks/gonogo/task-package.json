@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/gonogo/gonogo.registry.ts",
       "export": "gonogoRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      7
+    ]
+  }
 }

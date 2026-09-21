@@ -15,7 +15,9 @@
     "preview": "vite preview",
     "deploy": "bash /opt/ptool/scripts/deploy.sh frontend",
     "inventory:product-ui": "node scripts/product-route-inventory.mjs",
-    "inventory:product-ui:check": "node scripts/product-route-inventory.mjs --check"
+    "inventory:product-ui:check": "node scripts/product-route-inventory.mjs --check",
+    "cognitive:manifest:generate": "node ../scripts/cognitive/manifests.cjs",
+    "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",

@@ -26,7 +26,7 @@ const APPROVED_PUBLISHED_SEED_BASELINE = new Set([
 ])
 
 const FRONTEND_COGNITIVE_ROOT = resolve(process.cwd(), '../frontend/src/modules/cognitive')
-const FRONTEND_REGISTRY_PATH = resolve(FRONTEND_COGNITIVE_ROOT, 'registry.ts')
+const FRONTEND_REGISTRY_PATH = resolve(FRONTEND_COGNITIVE_ROOT, 'generated/runners.ts')
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -73,7 +73,7 @@ describe('Cognitive onboarding hardening', () => {
       expect(taskRegistrySource, taskRegistryPath).toContain(`engineVersion: '${engineVersion}'`)
 
       const importPattern = new RegExp(
-        `import \\{ ([A-Za-z0-9_]+) \\} from '\\.\\/tasks\\/${escapeRegex(testType)}\\/${escapeRegex(testType)}\\.registry'`,
+        `import \\{ ([A-Za-z0-9_]+) as [A-Za-z0-9_]+ \\} from '\\.\\.\\/tasks\\/${escapeRegex(testType)}\\/${escapeRegex(testType)}\\.registry'`,
       )
       const imported = frontendRegistry.match(importPattern)
       expect(imported, `frontend root registry must import ${testType}/${engineVersion}`).not.toBeNull()
@@ -81,7 +81,7 @@ describe('Cognitive onboarding hardening', () => {
       expect(
         frontendRegistry,
         `frontend root registry must register ${testType}/${engineVersion}`,
-      ).toContain(`registerCognitiveRunner(${imported[1]})`)
+      ).toContain(`cognitiveRunnerEntries`)
     }
   })
 })

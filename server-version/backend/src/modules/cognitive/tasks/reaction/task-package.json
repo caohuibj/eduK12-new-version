@@ -27,5 +27,17 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/reaction/reaction.registry.ts",
       "export": "reactionRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      1,
+      4
+    ]
+  }
 }

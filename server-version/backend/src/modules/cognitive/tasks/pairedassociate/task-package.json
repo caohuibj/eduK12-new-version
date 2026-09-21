@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/pairedassociate.registry.ts",
       "export": "pairedassociateRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      18
+    ]
+  }
 }

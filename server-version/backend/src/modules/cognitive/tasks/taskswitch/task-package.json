@@ -21,5 +21,16 @@
       "file": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts",
       "export": "taskswitchRegistryEntry"
     }
-  ]
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      11
+    ]
+  }
 }
