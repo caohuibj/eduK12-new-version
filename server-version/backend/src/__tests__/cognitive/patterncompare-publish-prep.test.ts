@@ -2,23 +2,30 @@ import { describe, expect, it } from 'vitest'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
 import { resolveCognitiveProtocolPresentation } from '../../modules/cognitive/protocol-presentation'
-import type { FrozenReportSnapshot } from '../../modules/cognitive/profile-freeze'
+import {
+  freezeAssignmentProfile,
+  readFrozenReport,
+  type FrozenReportSnapshot,
+} from '../../modules/cognitive/profile-freeze'
 
 const entry = getCognitiveRegistryEntry('patterncompare', '1.0.0', '1.0.0')
 if (!entry) throw new Error('patterncompare registry entry missing')
 
-const frozenFor = (profile: 'standard' | 'research'): FrozenReportSnapshot => ({
-  profile,
-  randomizationAlgorithmVersion: entry.randomizationAlgorithmVersion,
-  profileDefinitionVersion: entry.profileDefinitionVersion,
-  metricDefinitionVersion: entry.metricDefinitionVersion,
-  qualityDefinitionVersion: entry.qualityDefinitionVersion,
-  reportDefinitionVersion: entry.reportDefinitionVersion,
-  reportCaveats: entry.profiles[profile].reportCaveats,
-  metricDefinitions: entry.metricDefinitions,
-  qualityDefinitions: entry.qualityDefinitions,
-  reportDefinition: entry.reportDefinition,
-})
+const baseConfig = {
+  durationSec: 60,
+  trialTimeoutMs: 2500,
+  isiMs: 250,
+  validRtFloorMs: 150,
+  stimulusSetVersion: 'geometric-v1.0.0',
+  report: { reportVersion: '1.0.0', referenceMode: 'none' },
+}
+
+const frozenFor = (profile: 'standard' | 'research'): FrozenReportSnapshot => {
+  const frozen = freezeAssignmentProfile({ entry, baseConfig, profile })
+  const report = readFrozenReport(frozen.resolvedReportSnapshotEncrypted)
+  if (!report) throw new Error(`missing frozen report for ${profile}`)
+  return report
+}
 
 const metrics = {
   correctPerMinute: 42,
@@ -64,6 +71,26 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
       scoringVersion: '1.0.0',
       profile: 'standard',
     })).toBeNull()
+  })
+
+  it('freezes the reviewed tier, label, interpretation and index policy with the assignment', () => {
+    const pilot = frozenFor('standard')
+    expect(pilot).toMatchObject({
+      protocolTier: 'PILOT',
+      profileLabel: 'Pilot 版',
+      protocolShowProductIndex: false,
+    })
+    expect(pilot.participantConclusion).toContain('提示')
+    expect(pilot.reportCaveats.join(' ')).toContain('60 秒')
+
+    const ready = frozenFor('research')
+    expect(ready).toMatchObject({
+      protocolTier: 'RESEARCH_READY',
+      profileLabel: 'Research Ready 版',
+      protocolShowProductIndex: false,
+    })
+    expect(ready.participantConclusion).toContain('显示')
+    expect(ready.reportCaveats.join(' ')).toContain('90 秒')
   })
 
   it('uses tentative task-level language for Pilot without exposing a misleading product index', () => {
