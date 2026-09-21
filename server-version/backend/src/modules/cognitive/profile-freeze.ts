@@ -46,7 +46,7 @@ const sortValue = (value: unknown): unknown => {
 }
 
 export const hashResolvedConfig = (config: unknown): string =>
-  createHash('sha256').update(JSON.stringify(sortValue(value))).digest('hex')
+  createHash('sha256').update(JSON.stringify(sortValue(config))).digest('hex')
 
 export const mergeProfileConfig = <TConfig, TTrial>(
   entry: RegistryEntry<TConfig, TTrial>,
