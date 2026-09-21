@@ -71,6 +71,8 @@ jobs:
         run: npm ci
       - name: check Cognitive generated manifests
         run: npm run cognitive:manifest:check
+      - name: check Cognitive task import boundaries
+        run: npm run cognitive:import-check
       - name: prisma generate
         run: npx prisma generate
       - name: build (tsc)
@@ -214,6 +216,8 @@ jobs:
         run: npm ci
       - name: check Cognitive generated manifests
         run: npm run cognitive:manifest:check
+      - name: check Cognitive task import boundaries
+        run: npm run cognitive:import-check
       - name: dependency audit (high and critical)
         run: npm audit --audit-level=high
       - name: prisma generate
