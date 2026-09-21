@@ -22,7 +22,7 @@ export const instrumentAuthorizationApi = {
       selfApprovalDeclaration,
     })
   ),
-  publishPreviewWho5: (body: Record<string, unknown> = {}) => (
-    apiClient.post<any>('/admin/instrument-authorizations/publish-preview/who5', body)
+  publishPreviewScale: (body: Record<string, unknown>) => (
+    apiClient.post<any>('/admin/instrument-authorizations/publish-preview/scale', body)
   ),
 }

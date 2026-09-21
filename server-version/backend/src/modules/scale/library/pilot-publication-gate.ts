@@ -10,7 +10,7 @@
  * never consulted by participant save/FINAL paths.
  */
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
-import { evaluateDurableInstrumentRights } from '../scale-package-gates'
+import { evaluateDurableInstrumentRights } from '../deployment/rights'
 import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authorization'
 import { parseLocalizationManifest } from './localization-manifest'
 import {

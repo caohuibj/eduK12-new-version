@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
-import Dass21StudentReport from '../../modules/reporting/Dass21StudentReport'
 import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
 
 export interface Assessment {
@@ -146,25 +145,22 @@ const ScaleResult: React.FC = () => {
   ]
   const safeReport = toScaleUnitReport(assessment)
   const isEducational = safeReport.reportKind === 'educational'
-  const useLegacyDassFallback = !assessment.report && assessment.scale.code === 'dass21_zh_cn'
 
   return (
     <ReportShell
       title={assessment.scale.name}
-      description={isEducational || useLegacyDassFallback ? '完成反馈' : '测评报告'}
+      description={isEducational ? '完成反馈' : '测评报告'}
       facts={facts}
       status={{
         kind: 'success',
         title: '已提交',
-        description: isEducational || useLegacyDassFallback
+        description: isEducational
           ? '下面是一份不提供受限个体分数或心理健康标签的教育性反馈。'
           : '以下内容来自当前已完成结果记录。',
       }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
     >
-      {useLegacyDassFallback ? (
-        <Dass21StudentReport />
-      ) : (
+      {(
         <section className="card p-6" aria-labelledby="scale-report-detail-heading">
           <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
           <ScaleUnitReportCard report={safeReport} />

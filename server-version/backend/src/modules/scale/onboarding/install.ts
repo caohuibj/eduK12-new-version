@@ -1,5 +1,4 @@
 import { withSerializableScaleTransaction } from '../deployment/transactions'
-import { legacyDeploymentGateReasons } from '../deployment/legacy-gates'
 import { scaleLocalizationReasons } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
@@ -78,7 +77,6 @@ const resolvePlan = async (
   }
 
   const authorizations = await listScaleInstrumentAuthorizations(db, input.instrumentKey, input.instrumentVersion)
-  blockers.push(...legacyDeploymentGateReasons(input.instrumentKey, input.instrumentVersion, deploymentPolicy, authorizations))
   for (const requestedMode of deploymentPolicy.deploymentModes) {
     const decision = evaluateScaleDeployment({
       policy: deploymentPolicy,

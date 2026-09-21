@@ -5,7 +5,7 @@ const router = Router()
 
 router.get('/', instrumentAuthorizationController.list)
 router.post('/', instrumentAuthorizationController.create)
-router.post('/publish-preview/who5', instrumentAuthorizationController.publishPreviewWho5)
+router.post('/publish-preview/scale', instrumentAuthorizationController.publishPreviewScale)
 router.post('/:authorizationId/approve', instrumentAuthorizationController.approve)
 router.post('/:authorizationId/revoke', instrumentAuthorizationController.revoke)
 router.post('/:authorizationId/attach-evidence', instrumentAuthorizationController.attachEvidence)
