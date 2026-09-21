@@ -5,14 +5,6 @@ import {
   resolveEffectiveAuthorization,
   type InstrumentAuthorizationRecordV1,
 } from '../../assessment-authorization'
-import { resolvePackageContentLocale } from '../content-locale'
-import {
-  evaluateDurableInstrumentRights,
-  evaluateSdqElectronicAdminGate,
-  evaluateTexiLocalizationGate,
-  evaluateWho5ScalePackageGate,
-} from '../scale-package-gates'
-import { TEXI_LOCALIZATION_MANIFEST_PENDING } from '../localization/texi-localization-manifest'
 import { hashScaleDefinition } from '../scale-definition'
 import {
   getScalePackage,
@@ -32,7 +24,6 @@ import {
   type ScaleEvidenceRecord,
   type ScaleReferenceApplicabilityRecord,
 } from './catalog-manifest'
-import { WAVE0_SCALE_CATALOG_MANIFESTS } from './wave0-catalog'
 import {
   evaluatePilotFirstPublicationGate,
   type PilotFirstPublicationGateResult,
@@ -188,8 +179,6 @@ export interface ScaleLibraryReadModel {
 
 const DEFAULT_TERRITORY = 'CN'
 
-export const WAVE0_SCALE_LIBRARY_REGISTRY: ScaleCatalogRegistry = createScaleCatalogRegistry(WAVE0_SCALE_CATALOG_MANIFESTS)
-
 const bindingKey = (instrumentKey: string, instrumentVersion: string): string => `${instrumentKey}:${instrumentVersion}`
 
 const unique = (values: string[]): string[] => [...new Set(values)]
@@ -236,54 +225,6 @@ const summarizeRights = (input: {
   }
 }
 
-const deploymentCommercialNature = (rights: ScaleLibraryRightsSummary): InstrumentAuthorizationRecordV1['scope']['commercialNature'] => rights.commercialNature
-
-const evaluateSpecialGate = (input: {
-  pkg: ScalePackageV2
-  authorizations: readonly InstrumentAuthorizationRecordV1[]
-  locale: string
-  territory: string
-  respondent: RespondentType
-  nowIso: string
-}): { errors: string[]; warnings: string[] } => {
-  if (input.pkg.key === 'who5') {
-    const rights = summarizeRights({ ...input, authorizations: input.authorizations })
-    const gate = evaluateWho5ScalePackageGate({
-      authorizations: [...input.authorizations],
-      deploymentCommercialNature: deploymentCommercialNature(rights),
-      locale: input.locale,
-      territory: input.territory,
-      nowIso: input.nowIso,
-    })
-    return { errors: gate.errors, warnings: gate.warnings }
-  }
-  if (input.pkg.key === 'sdq_parent_zh_cn' || input.pkg.key === 'sdq_teacher_zh_cn') {
-    const gate = evaluateSdqElectronicAdminGate({
-      instrumentKey: input.pkg.key,
-      instrumentVersion: input.pkg.instrumentVersion,
-      authorizations: [...input.authorizations],
-      locale: input.locale,
-      territory: input.territory,
-      nowIso: input.nowIso,
-      allowEnglishTeacherSource: input.pkg.key === 'sdq_teacher_zh_cn' && input.locale === 'en',
-    })
-    return { errors: gate.errors, warnings: gate.warnings }
-  }
-  if (input.pkg.key === 'texi_parent_zh_cn' || input.pkg.key === 'texi_teacher_zh_cn') {
-    const gate = evaluateTexiLocalizationGate({
-      instrumentKey: input.pkg.key,
-      instrumentVersion: input.pkg.instrumentVersion,
-      localizationManifest: TEXI_LOCALIZATION_MANIFEST_PENDING,
-      authorizations: [...input.authorizations],
-      locale: input.locale,
-      territory: input.territory,
-      nowIso: input.nowIso,
-    })
-    return { errors: gate.errors, warnings: gate.warnings }
-  }
-  return { errors: [], warnings: [] }
-}
-
 const summarizeGateReason = (input: {
   pkg: ScalePackageV2
   manifest: ScaleCatalogManifestV1
@@ -292,7 +233,6 @@ const summarizeGateReason = (input: {
   locale: string
   respondent: RespondentType
   gate: PilotFirstPublicationGateResult
-  specialGate: { errors: string[]; warnings: string[] }
 }): { status: ScaleLibraryAvailabilityStatus; reasons: string[] } => {
   const reasons: string[] = []
   const targetLocaleMatches = input.localization.targetLocale === input.locale
@@ -306,8 +246,8 @@ const summarizeGateReason = (input: {
   if (!input.deployment) reasons.push('当前环境尚无已发布的可启动量表部署。')
   else if (!deploymentPublished) reasons.push('当前量表部署尚未发布。')
   if (input.pkg.releaseStatus !== 'PUBLISHED') reasons.push('量表包尚未发布，当前仅可浏览目录信息。')
-  if (input.gate.decision.errors.length > 0 || input.specialGate.errors.length > 0) {
-    const allErrors = [...input.gate.decision.errors, ...input.specialGate.errors]
+  if (input.gate.decision.errors.length > 0) {
+    const allErrors = input.gate.decision.errors
     const rightsFailure = allErrors.some((error) => /authorization|rights|commercialNature|electronicAdministration|scoring required|translation required|display required|locale\/territory/i.test(error))
     const localizationFailure = allErrors.some((error) => /localization|contentLocale|targetLocale|translation pending/i.test(error))
     if (rightsFailure) reasons.push('当前 locale/territory 的电子施测、计分或显示授权未满足。')
@@ -379,14 +319,6 @@ const buildEntry = (input: {
     requestedRespondent: respondent,
     nowIso: context.nowIso,
   })
-  const specialGate = evaluateSpecialGate({
-    pkg,
-    authorizations,
-    locale: context.locale,
-    territory: context.territory,
-    respondent,
-    nowIso: context.nowIso,
-  })
   const availabilitySummary = summarizeGateReason({
     pkg,
     manifest,
@@ -395,7 +327,6 @@ const buildEntry = (input: {
     locale: context.locale,
     respondent,
     gate,
-    specialGate,
   })
   const rights = summarizeRights({
     pkg,
@@ -457,9 +388,9 @@ const buildEntry = (input: {
       evidence: manifest.evidence.map((record) => ({ ...record })),
       referenceApplicability: manifest.referenceApplicability.map((record) => ({ ...record })),
       gate: {
-        publishable: gate.decision.publishable && specialGate.errors.length === 0 && pkg.releaseStatus === 'PUBLISHED' && deployment?.status === 'PUBLISHED',
-        errors: unique([...gate.decision.errors, ...specialGate.errors]),
-        warnings: unique([...gate.decision.warnings, ...specialGate.warnings]),
+        publishable: gate.decision.publishable && pkg.releaseStatus === 'PUBLISHED' && deployment?.status === 'PUBLISHED',
+        errors: unique([...gate.decision.errors]),
+        warnings: unique([...gate.decision.warnings]),
         reportEligibility: gate.reportEligibility,
       },
       ...(effective
@@ -475,9 +406,7 @@ export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext
   const territory = context.territory ?? DEFAULT_TERRITORY
   const nowIso = context.nowIso ?? new Date().toISOString()
   const entries: ScaleLibraryEntry[] = []
-  const legacyIdentities = new Set(WAVE0_SCALE_CATALOG_MANIFESTS.map(manifest => bindingKey(manifest.identity.instrumentKey, manifest.identity.instrumentVersion)))
-  const additional = listScaleInstrumentSources().filter(source => source.executable && !legacyIdentities.has(bindingKey(source.identity.instrumentKey, source.identity.instrumentVersion)))
-  const registry = createScaleCatalogRegistry([...WAVE0_SCALE_CATALOG_MANIFESTS, ...additional.map(materializeCatalogManifest)])
+  const registry = createScaleCatalogRegistry(listScaleInstrumentSources().filter(source => source.executable).map(materializeCatalogManifest))
   registry.entries.forEach((catalogEntry) => {
     if (!catalogEntry.pkg) return
     const localization = getScaleInstrumentLocalization(catalogEntry.manifest.identity.instrumentKey, catalogEntry.manifest.identity.instrumentVersion)
@@ -553,7 +482,7 @@ export const isScaleLibraryPublicPayloadSafe = (entry: ScaleLibraryEntry): boole
 export const getScaleLibraryPackage = (instrumentKey: string, instrumentVersion: string): ScalePackageV2 | undefined => getScalePackage(instrumentKey, instrumentVersion)
 
 export const getScaleLibraryContentLocale = (instrumentKey: string): string | undefined => (
-  resolvePackageContentLocale(instrumentKey) ?? undefined
+  listScaleInstrumentSources().find(source => source.identity.instrumentKey === instrumentKey)?.executable?.contentLocale
 )
 
 export const getScaleLibraryLocalizationManifest = (instrumentKey: string, instrumentVersion: string): LocalizationManifestV1 | undefined => (
