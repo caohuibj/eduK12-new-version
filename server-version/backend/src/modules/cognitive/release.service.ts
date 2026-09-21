@@ -13,6 +13,8 @@ const lifecycleSelect = {
   scoringVersion: true,
   status: true,
   accessPolicy: true,
+  publishedAt: true,
+  updatedAt: true,
 } as const
 
 const readinessBlockerMessage = (blockers: Array<{ stage: string; code: string; message: string }>): string =>
@@ -51,12 +53,23 @@ export const publishCognitiveConfig = async (configId: string) => {
     throw BAD_REQUEST(`Cognitive product readiness failed: ${readinessBlockerMessage(readiness.blockers)}`)
   }
 
+  // Snapshot-safe CAS: if any DRAFT core/operational update lands after the
+  // readiness read, updatedAt changes and this transition fails closed instead
+  // of publishing a row that was not actually validated.
+  const publishedAt = new Date()
   const result = await prisma.cognitiveTestConfig.updateMany({
-    where: { id: config.id, status: 'DRAFT' },
-    data: { status: 'PUBLISHED' },
+    where: {
+      id: config.id,
+      status: 'DRAFT',
+      updatedAt: config.updatedAt,
+    },
+    data: {
+      status: 'PUBLISHED',
+      publishedAt,
+    },
   })
   if (result.count !== 1) {
-    throw CONFLICT('CognitiveTestConfig status changed while publishing; reload and retry')
+    throw CONFLICT('CognitiveTestConfig changed while publishing; reload, re-run readiness, and retry')
   }
 
   const published = await prisma.cognitiveTestConfig.findUnique({
@@ -79,11 +92,11 @@ export const retireCognitiveConfig = async (configId: string) => {
   }
 
   const result = await prisma.cognitiveTestConfig.updateMany({
-    where: { id: config.id, status: 'PUBLISHED' },
+    where: { id: config.id, status: 'PUBLISHED', updatedAt: config.updatedAt },
     data: { status: 'RETIRED' },
   })
   if (result.count !== 1) {
-    throw CONFLICT('CognitiveTestConfig status changed while retiring; reload and retry')
+    throw CONFLICT('CognitiveTestConfig changed while retiring; reload and retry')
   }
 
   const retired = await prisma.cognitiveTestConfig.findUnique({
