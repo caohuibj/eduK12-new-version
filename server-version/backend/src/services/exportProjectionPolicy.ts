@@ -26,13 +26,6 @@ export interface ExportProjectionBindingV1 {
   fingerprint: string
 }
 
-const legacyRawExportCapabilities = (
-  disposition: ExportScaleProjectionBindingV1['policyDisposition'],
-  capabilities: DisclosureCapabilitiesV1,
-): DisclosureCapabilitiesV1 => disposition === 'LEGACY_PROFILE'
-  ? { ...capabilities, rawAnswers: true }
-  : capabilities
-
 const scaleBinding = (input: {
   scaleId: string
   instrumentKey: string
@@ -53,7 +46,9 @@ const scaleBinding = (input: {
     policyDisposition: context.frozenPolicy.disposition,
     policyVersion: context.frozenPolicy.disclosure.policyVersion,
     ...(context.frozenPolicy.runtimePolicyHash ? { runtimePolicyHash: context.frozenPolicy.runtimePolicyHash } : {}),
-    capabilities: legacyRawExportCapabilities(context.frozenPolicy.disposition, effective),
+    // Do not infer rawAnswers from FULL_REPORT. Raw answers are an independent
+    // disclosure capability and must be explicitly enabled by policy.
+    capabilities: effective,
   }
 }
 
@@ -71,7 +66,7 @@ const finishBinding = (input: Omit<ExportProjectionBindingV1, 'fingerprint'>): E
 export const resolveExportProjectionBinding = async (
   resourceType: 'SCALE' | 'QUESTIONNAIRE',
   resourceId: string,
-  audience: ScaleDisclosureAudience = 'researcher',
+  audience: ScaleDisclosureAudience = 'teacher',
 ): Promise<ExportProjectionBindingV1> => {
   if (resourceType === 'SCALE') {
     const scale = await prisma.scale.findUnique({
@@ -151,19 +146,28 @@ export const projectExportData = (data: ExportData, binding: ExportProjectionBin
   return filterData(data, (field) => questionnaireAllowed(field.name, binding))
 }
 
-const FINGERPRINT_MARKER = '__projection_'
+const FINGERPRINT_MARKER = '__projection_v1_'
+const AUDIENCES: ScaleDisclosureAudience[] = ['respondent', 'subject', 'teacher', 'researcher']
 
-export const bindExportStorageKey = (storageKey: string, fingerprint: string): string => {
+export interface StoredExportProjectionBinding {
+  audience: ScaleDisclosureAudience
+  fingerprintPrefix: string
+}
+
+/** Persist the projection audience + fingerprint in the artifact storage key. */
+export const bindExportStorageKey = (storageKey: string, binding: ExportProjectionBindingV1): string => {
   const dot = storageKey.lastIndexOf('.')
-  const suffix = `${FINGERPRINT_MARKER}${fingerprint.slice(0, 24)}`
+  const suffix = `${FINGERPRINT_MARKER}${binding.audience}_${binding.fingerprint.slice(0, 24)}`
   return dot > 0 ? `${storageKey.slice(0, dot)}${suffix}${storageKey.slice(dot)}` : `${storageKey}${suffix}`
 }
 
-export const projectionFingerprintFromStorageKey = (storageKey: string): string | null => {
-  const match = storageKey.match(/__projection_([0-9a-f]{24})(?=\.)/)
-  return match?.[1] ?? null
+export const projectionBindingFromStorageKey = (storageKey: string): StoredExportProjectionBinding | null => {
+  const match = storageKey.match(/__projection_v1_(respondent|subject|teacher|researcher)_([0-9a-f]{24})(?=\.)/)
+  if (!match || !AUDIENCES.includes(match[1] as ScaleDisclosureAudience)) return null
+  return { audience: match[1] as ScaleDisclosureAudience, fingerprintPrefix: match[2] }
 }
 
-export const storageKeyMatchesProjection = (storageKey: string, binding: ExportProjectionBindingV1): boolean => (
-  projectionFingerprintFromStorageKey(storageKey) === binding.fingerprint.slice(0, 24)
-)
+export const storageKeyMatchesProjection = (storageKey: string, binding: ExportProjectionBindingV1): boolean => {
+  const stored = projectionBindingFromStorageKey(storageKey)
+  return stored?.audience === binding.audience && stored.fingerprintPrefix === binding.fingerprint.slice(0, 24)
+}

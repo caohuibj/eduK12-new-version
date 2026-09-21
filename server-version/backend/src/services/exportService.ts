@@ -25,13 +25,13 @@ export interface ExportOptions {
 
 export async function getScaleExportData(scaleId: string, options: ExportOptions = {}): Promise<legacy.ExportData> {
   const data = await legacy.getScaleExportData(scaleId, options)
-  const binding = await resolveExportProjectionBinding('SCALE', scaleId, options.projectionAudience ?? 'researcher')
+  const binding = await resolveExportProjectionBinding('SCALE', scaleId, options.projectionAudience ?? 'teacher')
   return projectExportData(data, binding)
 }
 
 export async function getQuestionnaireExportData(questionnaireId: string, options: ExportOptions = {}): Promise<legacy.ExportData> {
   const data = await legacy.getQuestionnaireExportData(questionnaireId, options)
-  const binding = await resolveExportProjectionBinding('QUESTIONNAIRE', questionnaireId, options.projectionAudience ?? 'researcher')
+  const binding = await resolveExportProjectionBinding('QUESTIONNAIRE', questionnaireId, options.projectionAudience ?? 'teacher')
   return projectExportData(data, binding)
 }
 

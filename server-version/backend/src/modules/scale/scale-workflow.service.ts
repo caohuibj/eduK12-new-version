@@ -204,12 +204,29 @@ export const scaleAssessmentForResponse = (
   }
 
   if (assessment?.status === 'COMPLETED') {
-    return projectScaleCompletedResponse({
-      assessment,
-      result: result.result,
-      context: projectionContext,
-      decryptError: result.decryptError || resolved.snapshotError,
-    })
+    try {
+      return projectScaleCompletedResponse({
+        assessment,
+        result: result.result,
+        context: projectionContext,
+        decryptError: result.decryptError || resolved.snapshotError,
+      })
+    } catch {
+      // Scoring/persistence has already completed before this serializer runs.
+      // A projection defect must fail closed as an unavailable DTO rather than
+      // causing the client to retry FINAL and potentially confuse persistence
+      // success with response serialization failure.
+      return projectScaleCompletedResponse({
+        assessment,
+        result: null,
+        context: {
+          ...projectionContext,
+          frozenPolicy: resolveLegacyScaleProjectionPolicy('', ''),
+          currentRestrictions: DISCLOSURE_PRESETS.NONE(),
+        },
+        decryptError: true,
+      })
+    }
   }
   return projectScaleAttemptForResume({
     assessment,

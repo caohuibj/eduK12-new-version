@@ -45,4 +45,22 @@ describe('Scale attempt strict response projection', () => {
     }, { audience: 'teacher', purpose: 'history' })
     expect(response).not.toHaveProperty('answers')
   })
+
+  it('fails closed for a malformed completed result instead of returning the persisted object', () => {
+    const response = scaleAssessmentForResponse({
+      id: 'assessment-1',
+      scaleId: 'scale-1',
+      status: 'COMPLETED',
+      progress: 100,
+      answers: [{ itemCode: 'i1', responseValue: 'SECRET_RAW_ANSWER' }],
+      result: { futureAuthoritativePayload: 'SECRET_RESULT', scores: [{ value: 999 }] },
+      completedAt: new Date('2026-09-21T00:05:00.000Z'),
+      scale,
+    })
+    expect(response.report).toMatchObject({ kind: 'unavailable', reason: 'RESULT_UNAVAILABLE' })
+    expect(response.result).toBeNull()
+    expect(JSON.stringify(response)).not.toContain('SECRET_RAW_ANSWER')
+    expect(JSON.stringify(response)).not.toContain('SECRET_RESULT')
+    expect(JSON.stringify(response)).not.toContain('999')
+  })
 })

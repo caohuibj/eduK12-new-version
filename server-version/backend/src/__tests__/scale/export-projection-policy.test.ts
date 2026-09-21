@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { DISCLOSURE_PRESETS } from '../../modules/scale/policy/disclosure'
-import { projectExportData, type ExportProjectionBindingV1 } from '../../services/exportProjectionPolicy'
+import {
+  bindExportStorageKey,
+  projectExportData,
+  projectionBindingFromStorageKey,
+  storageKeyMatchesProjection,
+  type ExportProjectionBindingV1,
+} from '../../services/exportProjectionPolicy'
 
 const binding = (caps = DISCLOSURE_PRESETS.EDUCATIONAL_ONLY()): ExportProjectionBindingV1 => ({
   projectionVersion: 'scale-export-projection-v1',
@@ -39,12 +45,28 @@ describe('export projection policy', () => {
     expect(projected.rows).toEqual([{ U_id: 'U1' }])
   })
 
-  it('treats raw answers and item scores as capabilities separate from FULL_REPORT', () => {
+  it('treats raw answers as a capability separate from FULL_REPORT', () => {
     const projected = projectExportData(data, binding(DISCLOSURE_PRESETS.FULL_REPORT()))
     const names = projected.fields.map((field) => field.name)
     expect(names).toContain('SCORE_total')
     expect(names).toContain('Q_S_item')
     expect(names).not.toContain('Q_V_item')
     expect(names).not.toContain('RT_item')
+  })
+
+  it('persists audience scope in the storage key and rejects cross-audience artifact reuse', () => {
+    const teacher = {
+      ...binding(DISCLOSURE_PRESETS.FULL_REPORT()),
+      audience: 'teacher' as const,
+      fingerprint: 'b'.repeat(64),
+    }
+    const storageKey = bindExportStorageKey('scale_export.csv', teacher)
+    expect(projectionBindingFromStorageKey(storageKey)).toEqual({
+      audience: 'teacher',
+      fingerprintPrefix: 'b'.repeat(24),
+    })
+    expect(storageKeyMatchesProjection(storageKey, teacher)).toBe(true)
+    expect(storageKeyMatchesProjection(storageKey, { ...teacher, audience: 'researcher' })).toBe(false)
+    expect(projectionBindingFromStorageKey('legacy_export.csv')).toBeNull()
   })
 })

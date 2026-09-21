@@ -2,8 +2,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../config/database'
 import { ExportArtifactStatus, Prisma, UserRole } from '@prisma/client'
+import type { ScaleDisclosureAudience } from '../modules/scale/policy/types'
 import {
   bindExportStorageKey,
+  projectionBindingFromStorageKey,
   resolveExportProjectionBinding,
   storageKeyMatchesProjection,
 } from './exportProjectionPolicy'
@@ -41,6 +43,7 @@ export async function createExportArtifact(params: {
   format: string
   anonymized: boolean
   storageKey: string
+  projectionAudience?: ScaleDisclosureAudience
   expiresAt?: Date
   status?: ExportArtifactStatus
   batchId?: string
@@ -50,8 +53,14 @@ export async function createExportArtifact(params: {
   if (path.extname(originalPath).toLowerCase() !== extensionForFormat(params.format)) {
     throw new Error('导出文件扩展名与格式不一致')
   }
-  const binding = await resolveExportProjectionBinding(params.resourceType, params.resourceId, 'researcher')
-  const storageKey = bindExportStorageKey(params.storageKey, binding.fingerprint)
+  // Generic Scale/Questionnaire export routes are teacher-facing. Research
+  // exports must opt in explicitly and receive a distinct persisted binding.
+  const binding = await resolveExportProjectionBinding(
+    params.resourceType,
+    params.resourceId,
+    params.projectionAudience ?? 'teacher',
+  )
+  const storageKey = bindExportStorageKey(params.storageKey, binding)
   const storagePath = validateStorageKey(storageKey)
   if (fs.existsSync(originalPath) && originalPath !== storagePath) fs.renameSync(originalPath, storagePath)
   const expiresAt = params.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -78,9 +87,17 @@ export async function authorizeExportDownload(actor: ExportActor, artifact: { cr
   if (!artifact.anonymized && actor.role !== UserRole.ADMIN) return false
   if (actor.role !== UserRole.ADMIN && resource.creatorId && resource.creatorId !== actor.userId) return false
   if (artifact.resourceType !== 'SCALE' && artifact.resourceType !== 'QUESTIONNAIRE') return false
+  const storedBinding = projectionBindingFromStorageKey(artifact.storageKey)
+  // Pre-PR-2 artifacts have no disclosure binding and fail closed rather than
+  // being re-used after a policy change.
+  if (!storedBinding) return false
   try {
-    const binding = await resolveExportProjectionBinding(artifact.resourceType, artifact.resourceId, 'researcher')
-    if (!storageKeyMatchesProjection(artifact.storageKey, binding)) return false
+    const currentBinding = await resolveExportProjectionBinding(
+      artifact.resourceType,
+      artifact.resourceId,
+      storedBinding.audience,
+    )
+    if (!storageKeyMatchesProjection(artifact.storageKey, currentBinding)) return false
   } catch {
     return false
   }
